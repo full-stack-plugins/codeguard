@@ -70,6 +70,14 @@ fn error_and_missing_recoveries_keep_byte_positions() {
 fn diagnostic_budget_is_explicitly_incomplete() {
     let mut grammar = java_grammar();
     let invalid = grammar.parse(b"class A { int x = ; int y = ; }").unwrap();
+    let full = scan_wasm_recoveries(&invalid, 32).unwrap();
+    let groups = full
+        .recoveries
+        .iter()
+        .filter(|node| node.kind == "ERROR")
+        .map(|node| node.group_id)
+        .collect::<std::collections::BTreeSet<_>>();
+    assert_eq!(groups.len(), 2, "并列错误不能合并成一个修复任务");
     let limited = scan_wasm_recoveries(&invalid, 1).unwrap();
     assert_eq!(limited.recoveries.len(), 1);
     assert!(limited.truncated);
@@ -95,4 +103,15 @@ fn typescript_recoveries_are_observations_with_original_byte_ranges() {
             && node.start_byte <= node.end_byte
             && node.end_byte <= source.len()
     }));
+
+    let separate = grammar
+        .parse(b"const a: number = ;\nconst b: number = ;")
+        .unwrap();
+    let separate_scan = scan_wasm_recoveries(&separate, 32).unwrap();
+    let groups = separate_scan
+        .recoveries
+        .iter()
+        .map(|node| node.group_id)
+        .collect::<std::collections::BTreeSet<_>>();
+    assert_eq!(groups.len(), 2, "两行独立错误不能被位置邻近规则合并");
 }

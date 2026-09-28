@@ -29,6 +29,7 @@ impl<'a> SourceMap<'a> {
     /// 不猜测插入位置或缺失 token；不一致时返回不完整错误。
     pub fn map(&self, anchor: &SyntaxRecoveryAnchor) -> Result<SourceMappedRecovery, String> {
         if !matches!(anchor.kind, "ERROR" | "MISSING")
+            || anchor.group_id == 0
             || anchor.syntax_kind.is_empty()
             || anchor.syntax_kind.len() > 128
             || anchor.start_byte > anchor.end_byte
@@ -45,6 +46,7 @@ impl<'a> SourceMap<'a> {
         }
         Ok(SourceMappedRecovery {
             kind: anchor.kind,
+            group_id: anchor.group_id,
             syntax_kind: anchor.syntax_kind.clone(),
             start_byte: anchor.start_byte,
             end_byte: anchor.end_byte,

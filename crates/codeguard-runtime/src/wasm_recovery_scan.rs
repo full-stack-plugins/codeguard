@@ -18,12 +18,13 @@ pub fn scan_wasm_recoveries(tree: &Tree, max_records: usize) -> Result<WasmRecov
     if !(1..=1024).contains(&max_records) {
         return Err("语法恢复节点预算无效".into());
     }
-    let mut stack = vec![tree.root_node()];
+    let mut stack = vec![(tree.root_node(), None)];
+    let mut next_group_id = 1usize;
     let mut visited = 0usize;
     let mut recoveries = Vec::new();
     let mut seen = BTreeSet::new();
     let mut truncated = false;
-    while let Some(node) = stack.pop() {
+    while let Some((node, ancestor_error_group)) = stack.pop() {
         visited += 1;
         if visited > 200_000 {
             truncated = true;
@@ -39,22 +40,40 @@ pub fn scan_wasm_recoveries(tree: &Tree, max_records: usize) -> Result<WasmRecov
         } else {
             None
         };
-        if let Some(kind) = kind {
-            let key = (kind, node.kind(), node.start_byte(), node.end_byte());
+        let group_id = kind.map(|_| {
+            ancestor_error_group.unwrap_or_else(|| {
+                let id = next_group_id;
+                next_group_id += 1;
+                id
+            })
+        });
+        if let (Some(kind), Some(group_id)) = (kind, group_id) {
+            let key = (
+                group_id,
+                kind,
+                node.kind(),
+                node.start_byte(),
+                node.end_byte(),
+            );
             if seen.insert(key) {
                 if recoveries.len() == max_records {
                     truncated = true;
                     break;
                 }
-                recoveries.push(recovery(kind, node));
+                recoveries.push(recovery(kind, group_id, node));
             }
         }
+        let child_error_group = if node.is_error() {
+            group_id
+        } else {
+            ancestor_error_group
+        };
         for index in (0..node.child_count()).rev() {
             let Some(child) = node.child(index) else {
                 continue;
             };
             if child.has_error() || child.is_error() || child.is_missing() {
-                stack.push(child);
+                stack.push((child, child_error_group));
                 if stack.len() > 200_000 {
                     truncated = true;
                     break;
@@ -71,11 +90,12 @@ pub fn scan_wasm_recoveries(tree: &Tree, max_records: usize) -> Result<WasmRecov
     })
 }
 
-fn recovery(kind: &'static str, node: Node<'_>) -> WasmRecovery {
+fn recovery(kind: &'static str, group_id: usize, node: Node<'_>) -> WasmRecovery {
     let start = node.start_position();
     let end = node.end_position();
     WasmRecovery {
         kind,
+        group_id,
         syntax_kind: node.kind().to_owned(),
         start_byte: node.start_byte(),
         end_byte: node.end_byte(),

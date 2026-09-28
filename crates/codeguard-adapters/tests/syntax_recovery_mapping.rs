@@ -8,6 +8,7 @@ fn maps_utf8_and_crlf_without_losing_original_byte_anchor() {
     let row_start = source.find('\n').unwrap() + 1;
     let anchor = SyntaxRecoveryAnchor {
         kind: "MISSING",
+        group_id: 7,
         syntax_kind: "}".into(),
         start_byte,
         end_byte: start_byte,
@@ -24,6 +25,7 @@ fn maps_utf8_and_crlf_without_losing_original_byte_anchor() {
         "  String s = \"中\";".chars().count() + 1
     );
     assert_eq!(mapped.kind, "MISSING");
+    assert_eq!(mapped.group_id, 7);
     assert_eq!(mapped.syntax_kind, "}");
 }
 
@@ -32,6 +34,7 @@ fn invalid_encoding_boundaries_and_mismatched_points_are_incomplete() {
     let source = "a中";
     let anchor = SyntaxRecoveryAnchor {
         kind: "ERROR",
+        group_id: 1,
         syntax_kind: "ERROR".into(),
         start_byte: 1,
         end_byte: 4,
@@ -52,6 +55,9 @@ fn invalid_encoding_boundaries_and_mismatched_points_are_incomplete() {
     assert!(map_syntax_recovery(source.as_bytes(), &invalid).is_err());
     let mut invalid = anchor.clone();
     invalid.kind = "CLEAN";
+    assert!(map_syntax_recovery(source.as_bytes(), &invalid).is_err());
+    let mut invalid = anchor.clone();
+    invalid.group_id = 0;
     assert!(map_syntax_recovery(source.as_bytes(), &invalid).is_err());
     assert!(map_syntax_recovery(b"\xff", &anchor).is_err());
 }

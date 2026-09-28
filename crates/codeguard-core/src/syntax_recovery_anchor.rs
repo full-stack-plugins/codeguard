@@ -3,6 +3,8 @@
 pub struct SyntaxRecoveryAnchor {
     /// 恢复种类，固定为 ERROR 或 MISSING。
     pub kind: &'static str,
+    /// 同一语法树内的结构恢复组 ID；只表示节点祖先关系，不证明同一修复原因。
+    pub group_id: usize,
     /// Grammar 给出的节点种类，不推断缺少的具体源码文本。
     pub syntax_kind: String,
     /// 原始源码字节起点。
