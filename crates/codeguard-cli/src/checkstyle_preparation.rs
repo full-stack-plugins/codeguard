@@ -66,8 +66,8 @@ pub(crate) fn fingerprint(workspace: &str) -> String {
 
 /// 恢复最新摘要绑定的准备诊断与复扫方向；不执行历史路径或可编辑 Markdown。
 pub(crate) fn guidance(root: &Path, id: &str, workspace: &str) -> Result<Value, &'static str> {
-    let directory = root.join("codeguard/state/observations").join(id);
-    for path in [&root.join("codeguard/state/observations"), &directory] {
+    let directory = root.join(".codeguard/state/observations").join(id);
+    for path in [&root.join(".codeguard/state/observations"), &directory] {
         if !std::fs::symlink_metadata(path).is_ok_and(|m| m.file_type().is_dir()) {
             return Err("preparation_observations_unavailable");
         }
@@ -107,7 +107,7 @@ pub(crate) fn guidance(root: &Path, id: &str, workspace: &str) -> Result<Value, 
         .as_str()
         .ok_or("preparation_observation_invalid")?;
     let bytes = read_bounded_regular_file(
-        &root.join("codeguard/reports").join(format!("{run}.json")),
+        &root.join(".codeguard/reports").join(format!("{run}.json")),
         16 * 1024 * 1024,
     )
     .map_err(|_| "preparation_report_unavailable")?;
@@ -215,7 +215,7 @@ fn later_native_observation(root: &Path, preparation: &Value) -> Result<Value, &
         .ok_or("preparation_report_invalid")?;
     let mut latest: Option<(u128, Value)> = None;
     let mut count = 0;
-    for entry in std::fs::read_dir(root.join("codeguard/reports"))
+    for entry in std::fs::read_dir(root.join(".codeguard/reports"))
         .map_err(|_| "preparation_reports_unavailable")?
     {
         let entry = entry.map_err(|_| "preparation_reports_unavailable")?;
@@ -269,7 +269,7 @@ fn later_native_observation(root: &Path, preparation: &Value) -> Result<Value, &
             continue;
         }
         let marker = root
-            .join("codeguard/state/consumed")
+            .join(".codeguard/state/consumed")
             .join(format!("{run}.json"));
         let marker: Value = match read_bounded_regular_file(&marker, 4096)
             .ok()

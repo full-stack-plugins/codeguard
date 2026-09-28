@@ -1166,8 +1166,8 @@ fn persist_observation(
     let report_sha256 = format!("{:x}", Sha256::digest(&report_bytes));
     let run_id = scan["run_id"].as_str().ok_or("run_id_invalid")?;
     let task_id = brief["task_id"].as_str().ok_or("task_id_invalid")?;
-    let events = root.join(format!("codeguard/findings/{task_id}/events"));
-    let state = root.join("codeguard/state");
+    let events = root.join(format!(".codeguard/findings/{task_id}/events"));
+    let state = root.join(".codeguard/state");
     if !real_directory(&events) || !real_directory(&state) {
         return Err("task_events_unavailable");
     }

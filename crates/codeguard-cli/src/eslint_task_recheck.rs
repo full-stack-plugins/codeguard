@@ -62,7 +62,7 @@ pub(crate) fn run(
         .as_str()
         .and_then(|run| {
             read_bounded_regular_file(
-                &root.join("codeguard/reports").join(format!("{run}.json")),
+                &root.join(".codeguard/reports").join(format!("{run}.json")),
                 16 * 1024 * 1024,
             )
             .ok()

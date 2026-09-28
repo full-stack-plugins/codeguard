@@ -771,7 +771,7 @@ fn missing_p3c_configuration_creates_one_stable_environment_task() {
     let second = project.check(&[]);
     assert_eq!(second["next"]["repair_brief"]["task_id"], id);
     assert_eq!(
-        fs::read_dir(project.0.join("codeguard/tasks"))
+        fs::read_dir(project.0.join(".codeguard/tasks"))
             .unwrap()
             .count(),
         1
@@ -828,7 +828,7 @@ fn java_environment_task_requires_original_checker_recheck_after_configuration_r
         &fs::read(
             project
                 .0
-                .join("codeguard/findings")
+                .join(".codeguard/findings")
                 .join(id)
                 .join("finding.json"),
         )
@@ -1031,7 +1031,7 @@ fn work_sync_rejects_a_replayed_java_report_with_wrong_ruleset_identity() {
     let run_id = first["native_results"]["java_p3c"]["run_id"]
         .as_str()
         .unwrap();
-    let saved = project.0.join(format!("codeguard/reports/{run_id}.json"));
+    let saved = project.0.join(format!(".codeguard/reports/{run_id}.json"));
     let original: Value = serde_json::from_slice(&fs::read(saved).unwrap()).unwrap();
     let mut replay = original.clone();
     let replay_id = format!("{run_id}-replayed");
@@ -1041,7 +1041,7 @@ fn work_sync_rejects_a_replayed_java_report_with_wrong_ruleset_identity() {
     fs::write(
         project
             .0
-            .join(format!("codeguard/reports/{replay_id}.json")),
+            .join(format!(".codeguard/reports/{replay_id}.json")),
         serde_json::to_vec_pretty(&replay).unwrap(),
     )
     .unwrap();
@@ -1064,7 +1064,7 @@ fn work_sync_rejects_a_replayed_java_report_with_wrong_ruleset_identity() {
         fs::write(
             project
                 .0
-                .join(format!("codeguard/reports/{altered_id}.json")),
+                .join(format!(".codeguard/reports/{altered_id}.json")),
             serde_json::to_vec_pretty(&altered).unwrap(),
         )
         .unwrap();
@@ -1119,7 +1119,7 @@ fn configured_p3c_finding_syncs_once_and_verifies_with_maven() {
     let second = project.check(&args);
     assert_eq!(second["next"]["repair_brief"]["task_id"], id);
     assert_eq!(
-        fs::read_dir(project.0.join("codeguard/tasks"))
+        fs::read_dir(project.0.join(".codeguard/tasks"))
             .unwrap()
             .count(),
         1
@@ -1179,7 +1179,7 @@ fn configured_p3c_finding_syncs_once_and_verifies_with_maven() {
         &fs::read(
             project
                 .0
-                .join("codeguard/findings")
+                .join(".codeguard/findings")
                 .join(id)
                 .join("finding.json"),
         )
@@ -1361,7 +1361,7 @@ fn real_native_p3c_finding_survives_task_verify() {
         &fs::read(
             project
                 .0
-                .join("codeguard/findings")
+                .join(".codeguard/findings")
                 .join(id)
                 .join("finding.json"),
         )

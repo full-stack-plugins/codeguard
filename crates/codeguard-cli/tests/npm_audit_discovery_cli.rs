@@ -105,6 +105,6 @@ fn discovery_retains_per_project_audit_declarations_without_running_scripts() {
     assert!(human.contains("构建根：\"custom\""));
     assert!(human.contains("npm_audit_custom_invocation_requires_review"));
     assert!(human.contains("漏洞数据时效"));
-    assert!(!fixture.0.join("codeguard").exists());
+    assert!(!fixture.0.join(".codeguard").exists());
     assert!(!fixture.0.join("custom/SHOULD_NOT_EXIST").exists());
 }

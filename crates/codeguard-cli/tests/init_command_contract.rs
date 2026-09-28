@@ -51,7 +51,7 @@ fn default_init_is_read_only_and_does_not_execute_project_wrapper() {
     assert_eq!(report["init_status"], "planned");
     assert_eq!(report["readiness"], "unknown");
     assert_eq!(report["delivery_decision"], "not_evaluated");
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
     assert!(!project.0.join("wrapper-ran").exists());
     assert!(!report["planned_files"].as_array().unwrap().is_empty());
 }
@@ -75,7 +75,7 @@ fn apply_creates_bounded_workspace_and_is_idempotent() {
         "module-graph.json",
         "architecture.md",
     ] {
-        assert!(project.0.join("codeguard").join(path).is_file(), "{path}");
+        assert!(project.0.join(".codeguard").join(path).is_file(), "{path}");
     }
     for directory in [
         "findings",
@@ -88,12 +88,12 @@ fn apply_creates_bounded_workspace_and_is_idempotent() {
         "state",
     ] {
         assert!(
-            project.0.join("codeguard").join(directory).is_dir(),
+            project.0.join(".codeguard").join(directory).is_dir(),
             "{directory}"
         );
     }
     let project_json: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/project.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/project.json")).unwrap())
             .unwrap();
     assert_eq!(project_json["delivery_decision"], "not_evaluated");
     assert!(
@@ -103,7 +103,7 @@ fn apply_creates_bounded_workspace_and_is_idempotent() {
             .iter()
             .any(|item| item["id"] == "rust")
     );
-    let workspace_before = fs::read(project.0.join("codeguard/workspace.json")).unwrap();
+    let workspace_before = fs::read(project.0.join(".codeguard/workspace.json")).unwrap();
     let workspace: Value = serde_json::from_slice(&workspace_before).unwrap();
     assert_eq!(workspace["schema_version"], "0.3.0");
     assert_eq!(workspace["workspace_id"], first["workspace_id"]);
@@ -117,14 +117,14 @@ fn apply_creates_bounded_workspace_and_is_idempotent() {
         workspace["project_sha256"],
         format!(
             "{:x}",
-            Sha256::digest(fs::read(project.0.join("codeguard/project.json")).unwrap())
+            Sha256::digest(fs::read(project.0.join(".codeguard/project.json")).unwrap())
         )
     );
     assert_eq!(
         workspace["module_graph_sha256"],
         format!(
             "{:x}",
-            Sha256::digest(fs::read(project.0.join("codeguard/module-graph.json")).unwrap())
+            Sha256::digest(fs::read(project.0.join(".codeguard/module-graph.json")).unwrap())
         )
     );
     assert_eq!(
@@ -139,7 +139,7 @@ fn apply_creates_bounded_workspace_and_is_idempotent() {
     assert_eq!(again["init_status"], "partial", "{again}");
     assert_eq!(again["workspace_id"], workspace["workspace_id"]);
     assert_eq!(
-        fs::read(project.0.join("codeguard/workspace.json")).unwrap(),
+        fs::read(project.0.join(".codeguard/workspace.json")).unwrap(),
         workspace_before
     );
 }
@@ -147,16 +147,45 @@ fn apply_creates_bounded_workspace_and_is_idempotent() {
 #[test]
 fn conflicting_user_file_is_preserved_and_does_not_create_other_artifacts() {
     let project = Project::new();
-    fs::create_dir(project.0.join("codeguard")).unwrap();
-    fs::write(project.0.join("codeguard/README.md"), "user owned\n").unwrap();
+    fs::create_dir(project.0.join(".codeguard")).unwrap();
+    fs::write(project.0.join(".codeguard/README.md"), "user owned\n").unwrap();
     let (exit, report) = project.run(&["--apply", "--format=json"]);
     assert_eq!(exit, 3);
     assert_eq!(report["init_status"], "conflict");
     assert_eq!(
-        fs::read_to_string(project.0.join("codeguard/README.md")).unwrap(),
+        fs::read_to_string(project.0.join(".codeguard/README.md")).unwrap(),
         "user owned\n"
     );
-    assert!(!project.0.join("codeguard/workspace.json").exists());
+    assert!(!project.0.join(".codeguard/workspace.json").exists());
+}
+
+#[test]
+fn legacy_workspace_blocks_new_location_without_moving_user_source() {
+    let project = Project::new();
+    fs::create_dir(project.0.join("codeguard")).unwrap();
+    fs::write(
+        project.0.join("codeguard/workspace.json"),
+        r#"{"document_type":"codeguard_workspace"}"#,
+    )
+    .unwrap();
+    fs::create_dir(project.0.join("codeguard/src")).unwrap();
+    fs::write(project.0.join("codeguard/src/user.py"), "print('kept')\n").unwrap();
+    let (exit, report) = project.run(&["--apply", "--format=json"]);
+    assert_eq!(exit, 3);
+    assert_eq!(report["init_status"], "conflict");
+    assert_eq!(report["conflict_file"], "codeguard/workspace.json");
+    assert!(
+        report["unresolved"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|item| item == "legacy_workspace_requires_manual_migration")
+    );
+    assert!(!project.0.join(".codeguard").exists());
+    assert_eq!(
+        fs::read_to_string(project.0.join("codeguard/src/user.py")).unwrap(),
+        "print('kept')\n"
+    );
 }
 
 #[test]
@@ -164,6 +193,7 @@ fn discovery_skips_managed_records_but_keeps_user_source_under_codeguard() {
     let project = Project::new();
     let (exit, _) = project.run(&["--apply", "--format=json"]);
     assert_eq!(exit, 3);
+    fs::create_dir(project.0.join("codeguard")).unwrap();
     fs::create_dir(project.0.join("codeguard/src")).unwrap();
     fs::write(project.0.join("codeguard/src/user.py"), "print('kept')\n").unwrap();
     let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
@@ -181,7 +211,7 @@ fn discovery_skips_managed_records_but_keeps_user_source_under_codeguard() {
         .filter_map(Value::as_str)
         .collect();
     assert!(source_paths.contains(&"codeguard/src/user.py"));
-    assert!(!source_paths.contains(&"codeguard/README.md"));
+    assert!(!source_paths.contains(&".codeguard/README.md"));
 }
 
 #[test]
@@ -199,7 +229,7 @@ fn project_human_instructions_are_not_overwritten_by_partial_init() {
     assert!(generated.starts_with("# Human rules\nKeep this text.\n"));
     assert!(generated.contains("<!-- CODEGUARD:BEGIN project-context -->"));
     assert!(generated.contains("<!-- CODEGUARD:END project-context -->"));
-    assert!(generated.contains("codeguard/project.json"));
+    assert!(generated.contains(".codeguard/project.json"));
     let (again_exit, again) = project.run(&["--apply", "--format=json"]);
     assert_eq!(again_exit, 3);
     assert_eq!(again["init_status"], "partial");
@@ -221,14 +251,14 @@ fn malformed_or_manually_modified_agents_block_is_a_preflight_conflict() {
     assert_eq!(exit, 3);
     assert_eq!(report["init_status"], "conflict");
     assert_eq!(report["conflict_file"], "AGENTS.md");
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
     fs::write(project.0.join("AGENTS.md"), "# Human\n").unwrap();
     let (applied_exit, _) = project.run(&["--apply", "--format=json"]);
     assert_eq!(applied_exit, 3);
     let before = fs::read_to_string(project.0.join("AGENTS.md")).unwrap();
     fs::write(
         project.0.join("AGENTS.md"),
-        before.replace("codeguard/project.json", "tampered/project.json"),
+        before.replace(".codeguard/project.json", "tampered/project.json"),
     )
     .unwrap();
     let (conflict_exit, conflict) = project.run(&["--apply", "--format=json"]);
@@ -264,7 +294,7 @@ fn duplicate_codeguard_markers_are_rejected_before_workspace_writes() {
     assert_eq!(exit, 3);
     assert_eq!(report["init_status"], "conflict");
     assert_eq!(report["conflict_file"], "AGENTS.md");
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
 }
 
 #[cfg(unix)]
@@ -282,7 +312,7 @@ fn symlinked_agents_file_is_not_followed() {
         fs::read_to_string(outside.0.join("AGENTS.md")).unwrap(),
         "# Outside\n"
     );
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
 }
 
 #[test]
@@ -294,15 +324,15 @@ fn changed_manifest_refreshes_owned_profile_without_clearing_work_records() {
     )
     .unwrap();
     assert_eq!(project.run(&["--apply", "--format=json"]).0, 3);
-    let before = fs::read(project.0.join("codeguard/project.json")).unwrap();
+    let before = fs::read(project.0.join(".codeguard/project.json")).unwrap();
     let agents_before = fs::read(project.0.join("AGENTS.md")).unwrap();
     fs::write(
-        project.0.join("codeguard/tasks/CG-1.md"),
+        project.0.join(".codeguard/tasks/CG-1.md"),
         "# Human note\nkeep\n",
     )
     .unwrap();
     fs::write(
-        project.0.join("codeguard/findings/CG-1.json"),
+        project.0.join(".codeguard/findings/CG-1.json"),
         "{\"id\":\"CG-1\"}\n",
     )
     .unwrap();
@@ -316,14 +346,14 @@ fn changed_manifest_refreshes_owned_profile_without_clearing_work_records() {
     assert_eq!(dry["profile_stale"], true);
     assert!(dry["changed_files"].as_array().unwrap().is_empty());
     assert_eq!(
-        fs::read(project.0.join("codeguard/project.json")).unwrap(),
+        fs::read(project.0.join(".codeguard/project.json")).unwrap(),
         before
     );
     let (apply_exit, apply) = project.run(&["--apply", "--format=json"]);
     assert_eq!(apply_exit, 3);
     assert_eq!(apply["init_status"], "partial");
     assert_ne!(
-        fs::read(project.0.join("codeguard/project.json")).unwrap(),
+        fs::read(project.0.join(".codeguard/project.json")).unwrap(),
         before
     );
     assert_ne!(
@@ -331,11 +361,11 @@ fn changed_manifest_refreshes_owned_profile_without_clearing_work_records() {
         agents_before
     );
     assert_eq!(
-        fs::read_to_string(project.0.join("codeguard/tasks/CG-1.md")).unwrap(),
+        fs::read_to_string(project.0.join(".codeguard/tasks/CG-1.md")).unwrap(),
         "# Human note\nkeep\n"
     );
     assert_eq!(
-        fs::read_to_string(project.0.join("codeguard/findings/CG-1.json")).unwrap(),
+        fs::read_to_string(project.0.join(".codeguard/findings/CG-1.json")).unwrap(),
         "{\"id\":\"CG-1\"}\n"
     );
     let (again_exit, again) = project.run(&["--apply", "--format=json"]);
@@ -362,7 +392,7 @@ fn added_build_root_changes_graph_and_removal_changes_it_back() {
     .unwrap();
     assert_eq!(project.run(&["--apply", "--format=json"]).0, 3);
     let graph: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/module-graph.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/module-graph.json")).unwrap())
             .unwrap();
     assert!(
         graph["edges"]
@@ -386,7 +416,7 @@ fn added_build_root_changes_graph_and_removal_changes_it_back() {
     fs::remove_file(project.0.join("service-b/Cargo.toml")).unwrap();
     assert_eq!(project.run(&["--apply", "--format=json"]).0, 3);
     let graph: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/module-graph.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/module-graph.json")).unwrap())
             .unwrap();
     assert!(
         !graph["edges"]
@@ -411,7 +441,7 @@ fn manually_changed_profile_cannot_be_refreshed_as_owned_content() {
     )
     .unwrap();
     assert_eq!(project.run(&["--apply", "--format=json"]).0, 3);
-    fs::write(project.0.join("codeguard/project.json"), "human edit\n").unwrap();
+    fs::write(project.0.join(".codeguard/project.json"), "human edit\n").unwrap();
     fs::write(
         project.0.join("Cargo.toml"),
         "[package]\nname = \"demo\"\nversion = \"0.2.0\"\n",
@@ -420,9 +450,9 @@ fn manually_changed_profile_cannot_be_refreshed_as_owned_content() {
     let (exit, report) = project.run(&["--apply", "--format=json"]);
     assert_eq!(exit, 3);
     assert_eq!(report["init_status"], "conflict");
-    assert_eq!(report["conflict_file"], "codeguard/project.json");
+    assert_eq!(report["conflict_file"], ".codeguard/project.json");
     assert_eq!(
-        fs::read_to_string(project.0.join("codeguard/project.json")).unwrap(),
+        fs::read_to_string(project.0.join(".codeguard/project.json")).unwrap(),
         "human edit\n"
     );
 }
@@ -438,14 +468,14 @@ fn lockfile_change_refreshes_profile_without_claiming_dependency_analysis() {
     fs::write(project.0.join("Cargo.lock"), "first\n").unwrap();
     assert_eq!(project.run(&["--apply", "--format=json"]).0, 3);
     let prior: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/project.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/project.json")).unwrap())
             .unwrap();
     fs::write(project.0.join("Cargo.lock"), "second\n").unwrap();
     let (exit, report) = project.run(&["--apply", "--format=json"]);
     assert_eq!(exit, 3);
     assert_eq!(report["profile_stale"], true);
     let current: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/project.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/project.json")).unwrap())
             .unwrap();
     assert_ne!(
         prior["lock_sha256"]["Cargo.lock"],
@@ -461,19 +491,19 @@ fn ruff_rule_change_and_removal_refresh_profile_without_erasing_findings() {
     fs::write(project.0.join(".ruff.toml"), "[lint]\nselect = [\"E\"]\n").unwrap();
     assert_eq!(project.run(&["--apply", "--format=json"]).0, 3);
     fs::write(
-        project.0.join("codeguard/findings/CG-1.json"),
+        project.0.join(".codeguard/findings/CG-1.json"),
         "{\"id\":\"CG-1\"}\n",
     )
     .unwrap();
     let prior: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/project.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/project.json")).unwrap())
             .unwrap();
     fs::write(project.0.join(".ruff.toml"), "[lint]\nselect = [\"F\"]\n").unwrap();
     let (changed_exit, changed) = project.run(&["--apply", "--format=json"]);
     assert_eq!(changed_exit, 3);
     assert_eq!(changed["profile_stale"], true);
     let refreshed: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/project.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/project.json")).unwrap())
             .unwrap();
     assert_ne!(
         prior["checker_config_sha256"][".ruff.toml"],
@@ -484,7 +514,7 @@ fn ruff_rule_change_and_removal_refresh_profile_without_erasing_findings() {
     assert_eq!(removed_exit, 3);
     assert_eq!(removed["profile_stale"], true);
     let current: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/project.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/project.json")).unwrap())
             .unwrap();
     assert!(
         current["checker_config_sha256"]
@@ -501,11 +531,11 @@ fn ruff_rule_change_and_removal_refresh_profile_without_erasing_findings() {
     assert_eq!(added_exit, 3);
     assert_eq!(added["profile_stale"], true);
     let readded: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/project.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/project.json")).unwrap())
             .unwrap();
     assert!(readded["checker_config_sha256"][".ruff.toml"].is_string());
     assert_eq!(
-        fs::read_to_string(project.0.join("codeguard/findings/CG-1.json")).unwrap(),
+        fs::read_to_string(project.0.join(".codeguard/findings/CG-1.json")).unwrap(),
         "{\"id\":\"CG-1\"}\n"
     );
 }
@@ -539,7 +569,7 @@ fn known_visible_rule_files_across_languages_invalidate_profile_without_claiming
     fs::write(project.0.join("eslint.config.mjs"), "export default [];\n").unwrap();
     assert_eq!(project.run(&["--apply", "--format=json"]).0, 3);
     let prior: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/project.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/project.json")).unwrap())
             .unwrap();
     assert!(prior["checker_config_sha256"]["checkstyle.xml"].is_string());
     assert!(prior["checker_config_sha256"]["eslint.config.mjs"].is_string());
@@ -556,7 +586,7 @@ fn known_visible_rule_files_across_languages_invalidate_profile_without_claiming
     assert_eq!(changed_exit, 3);
     assert_eq!(changed["profile_stale"], true);
     let refreshed: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/project.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/project.json")).unwrap())
             .unwrap();
     assert_ne!(
         prior["checker_config_sha256"]["checkstyle.xml"],
@@ -567,7 +597,7 @@ fn known_visible_rule_files_across_languages_invalidate_profile_without_claiming
     assert_eq!(removed_exit, 3);
     assert_eq!(removed["profile_stale"], true);
     let current: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/project.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/project.json")).unwrap())
             .unwrap();
     assert!(
         current["checker_config_sha256"]
@@ -584,7 +614,7 @@ fn registry_declared_dot_config_is_observed_without_scanning_other_dot_files() {
     fs::write(project.0.join(".secret-source.ts"), "not ordinary source\n").unwrap();
     assert_eq!(project.run(&["--apply", "--format=json"]).0, 3);
     let prior: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/project.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/project.json")).unwrap())
             .unwrap();
     assert!(prior["checker_config_sha256"][".eslintrc"].is_string());
     assert!(
@@ -606,14 +636,14 @@ fn changed_source_path_with_same_count_refreshes_profile() {
     fs::write(project.0.join("old.py"), "print(1)\n").unwrap();
     assert_eq!(project.run(&["--apply", "--format=json"]).0, 3);
     let prior: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/project.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/project.json")).unwrap())
             .unwrap();
     fs::rename(project.0.join("old.py"), project.0.join("new.py")).unwrap();
     let (exit, report) = project.run(&["--apply", "--format=json"]);
     assert_eq!(exit, 3);
     assert_eq!(report["profile_stale"], true);
     let current: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/project.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/project.json")).unwrap())
             .unwrap();
     assert_eq!(
         prior["languages"][0]["source_file_count"],
@@ -636,7 +666,7 @@ fn package_version_is_not_misreported_as_language_target_version() {
     fs::write(project.0.join("index.ts"), "export const value = 1;\n").unwrap();
     assert_eq!(project.run(&["--apply", "--format=json"]).0, 3);
     let profile: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/project.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/project.json")).unwrap())
             .unwrap();
     assert_eq!(
         profile["package_declared_versions"]["package.json"],
@@ -689,7 +719,7 @@ fn interrupted_refresh_accepts_target_projection_and_finishes_workspace_marker()
     }
     assert_eq!(project.run(&["--apply", "--format=json"]).0, 3);
     assert_eq!(reference.run(&["--apply", "--format=json"]).0, 3);
-    let old_workspace = fs::read(project.0.join("codeguard/workspace.json")).unwrap();
+    let old_workspace = fs::read(project.0.join(".codeguard/workspace.json")).unwrap();
     for root in [&project.0, &reference.0] {
         fs::write(
             root.join("Cargo.toml"),
@@ -699,22 +729,22 @@ fn interrupted_refresh_accepts_target_projection_and_finishes_workspace_marker()
     }
     assert_eq!(reference.run(&["--apply", "--format=json"]).0, 3);
     fs::write(
-        project.0.join("codeguard/project.json"),
-        fs::read(reference.0.join("codeguard/project.json")).unwrap(),
+        project.0.join(".codeguard/project.json"),
+        fs::read(reference.0.join(".codeguard/project.json")).unwrap(),
     )
     .unwrap();
     let (exit, report) = project.run(&["--apply", "--format=json"]);
     assert_eq!(exit, 3);
     assert_eq!(report["init_status"], "partial");
     assert_ne!(
-        fs::read(project.0.join("codeguard/workspace.json")).unwrap(),
+        fs::read(project.0.join(".codeguard/workspace.json")).unwrap(),
         old_workspace
     );
     let mut updated_workspace: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/workspace.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/workspace.json")).unwrap())
             .unwrap();
     let mut reference_workspace: Value =
-        serde_json::from_slice(&fs::read(reference.0.join("codeguard/workspace.json")).unwrap())
+        serde_json::from_slice(&fs::read(reference.0.join(".codeguard/workspace.json")).unwrap())
             .unwrap();
     assert_ne!(
         updated_workspace["workspace_id"],
@@ -751,9 +781,9 @@ fn malformed_workspace_identity_blocks_refresh_without_writes() {
     )
     .unwrap();
     assert_eq!(project.run(&["--apply", "--format=json"]).0, 3);
-    let before = fs::read(project.0.join("codeguard/project.json")).unwrap();
+    let before = fs::read(project.0.join(".codeguard/project.json")).unwrap();
     fs::write(
-        project.0.join("codeguard/workspace.json"),
+        project.0.join(".codeguard/workspace.json"),
         "{\"approved\":true}\n",
     )
     .unwrap();
@@ -765,9 +795,9 @@ fn malformed_workspace_identity_blocks_refresh_without_writes() {
     let (exit, report) = project.run(&["--apply", "--format=json"]);
     assert_eq!(exit, 3);
     assert_eq!(report["init_status"], "conflict");
-    assert_eq!(report["conflict_file"], "codeguard/workspace.json");
+    assert_eq!(report["conflict_file"], ".codeguard/workspace.json");
     assert_eq!(
-        fs::read(project.0.join("codeguard/project.json")).unwrap(),
+        fs::read(project.0.join(".codeguard/project.json")).unwrap(),
         before
     );
 }
@@ -777,12 +807,12 @@ fn legacy_workspace_upgrades_identity_without_erasing_findings() {
     let project = Project::new();
     fs::write(project.0.join("app.py"), "pass\n").unwrap();
     assert_eq!(project.run(&["--apply", "--format=json"]).0, 3);
-    let path = project.0.join("codeguard/workspace.json");
+    let path = project.0.join(".codeguard/workspace.json");
     let mut legacy: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
     legacy["schema_version"] = serde_json::json!("0.2.0");
     legacy.as_object_mut().unwrap().remove("workspace_id");
     fs::write(&path, serde_json::to_vec_pretty(&legacy).unwrap()).unwrap();
-    let finding = project.0.join("codeguard/findings/user-note.txt");
+    let finding = project.0.join(".codeguard/findings/user-note.txt");
     fs::write(&finding, "keep this\n").unwrap();
     let (exit, report) = project.run(&["--apply", "--format=json"]);
     assert_eq!(exit, 3);
@@ -799,11 +829,11 @@ fn symlinked_workspace_is_a_conflict_without_following_it() {
     use std::os::unix::fs::symlink;
     let project = Project::new();
     let outside = Project::new();
-    symlink(&outside.0, project.0.join("codeguard")).unwrap();
+    symlink(&outside.0, project.0.join(".codeguard")).unwrap();
     let (exit, report) = project.run(&["--apply", "--format=json"]);
     assert_eq!(exit, 3);
     assert_eq!(report["init_status"], "conflict");
-    assert_eq!(report["conflict_file"], "codeguard");
+    assert_eq!(report["conflict_file"], ".codeguard");
     assert!(!outside.0.join("workspace.json").exists());
 }
 
@@ -842,7 +872,7 @@ fn init_separates_maven_aggregation_and_explicit_local_dependency_with_evidence(
     let (exit, _) = project.run(&["--apply", "--format=json"]);
     assert_eq!(exit, 3);
     let graph: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/module-graph.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/module-graph.json")).unwrap())
             .unwrap();
     assert_eq!(graph["schema_version"], "0.3.0");
     let edges = graph["edges"].as_array().unwrap();
@@ -882,7 +912,7 @@ fn init_keeps_ambiguous_conditional_and_escaping_maven_relations_unresolved() {
     fs::write(project.0.join("service/pom.xml"), "<project><groupId>example</groupId><artifactId>service</artifactId><version>1</version><parent/><dependencies><dependency><groupId>example</groupId><artifactId>api</artifactId><version>1</version></dependency><dependency><groupId>example</groupId><artifactId>other</artifactId><version>${version}</version></dependency></dependencies></project>").unwrap();
     assert_eq!(project.run(&["--apply", "--format=json"]).0, 3);
     let graph: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/module-graph.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/module-graph.json")).unwrap())
             .unwrap();
     assert!(
         !graph["edges"]
@@ -926,9 +956,9 @@ fn refreshed_maven_dependency_graph_changes_with_manifest_bytes_and_preserves_wo
     let service = "<project><groupId>example</groupId><artifactId>service</artifactId><version>1</version><dependencies><dependency><groupId>example</groupId><artifactId>api</artifactId><version>1</version></dependency></dependencies></project>";
     fs::write(project.0.join("service/pom.xml"), service).unwrap();
     assert_eq!(project.run(&["--apply", "--format=json"]).0, 3);
-    let before = fs::read(project.0.join("codeguard/module-graph.json")).unwrap();
+    let before = fs::read(project.0.join(".codeguard/module-graph.json")).unwrap();
     fs::write(
-        project.0.join("codeguard/tasks/user-notes.md"),
+        project.0.join(".codeguard/tasks/user-notes.md"),
         "人工备注，不允许清空",
     )
     .unwrap();
@@ -943,7 +973,7 @@ fn refreshed_maven_dependency_graph_changes_with_manifest_bytes_and_preserves_wo
     let (exit, report) = project.run(&["--apply", "--format=json"]);
     assert_eq!(exit, 3);
     assert_eq!(report["profile_stale"], true);
-    let after = fs::read(project.0.join("codeguard/module-graph.json")).unwrap();
+    let after = fs::read(project.0.join(".codeguard/module-graph.json")).unwrap();
     assert_ne!(before, after);
     let graph: Value = serde_json::from_slice(&after).unwrap();
     assert!(
@@ -954,7 +984,7 @@ fn refreshed_maven_dependency_graph_changes_with_manifest_bytes_and_preserves_wo
             .any(|edge| edge["kind"] == "build_dependency")
     );
     assert_eq!(
-        fs::read_to_string(project.0.join("codeguard/tasks/user-notes.md")).unwrap(),
+        fs::read_to_string(project.0.join(".codeguard/tasks/user-notes.md")).unwrap(),
         "人工备注，不允许清空"
     );
     assert_eq!(
@@ -988,7 +1018,7 @@ fn init_observes_cargo_members_and_renamed_local_path_dependencies_without_execu
     .unwrap();
     assert_eq!(project.run(&["--apply", "--format=json"]).0, 3);
     let graph: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/module-graph.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/module-graph.json")).unwrap())
             .unwrap();
     assert_eq!(graph["schema_version"], "0.3.0");
     let edges = graph["edges"].as_array().unwrap();
@@ -1040,7 +1070,7 @@ fn cargo_graph_refuses_wrong_alias_missing_target_escaping_path_and_conditions()
     fs::write(project.0.join("service/Cargo.toml"),"[package]\nname='service'\nversion='1.0.0'\n[dependencies]\nwrong={path='../api'}\nmissing={path='../missing'}\nescape={path='../../outside'}\nconditional={path='../api',package='actual-api',optional=true}\ninherited={workspace=true}\n[target.'cfg(unix)'.dependencies]\nactual-api={path='../api'}\n").unwrap();
     assert_eq!(project.run(&["--apply", "--format=json"]).0, 3);
     let graph: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/module-graph.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/module-graph.json")).unwrap())
             .unwrap();
     assert!(
         !graph["edges"]
@@ -1085,8 +1115,8 @@ fn cargo_dependency_refresh_removes_old_relationship_and_preserves_notes() {
     let service = "[package]\nname='service'\nversion='1.0.0'\n[dev-dependencies]\nalias={path='../api',package='actual-api'}\n";
     fs::write(project.0.join("service/Cargo.toml"), service).unwrap();
     assert_eq!(project.run(&["--apply", "--format=json"]).0, 3);
-    let before = fs::read(project.0.join("codeguard/module-graph.json")).unwrap();
-    fs::write(project.0.join("codeguard/tasks/notes.md"), "保留记录").unwrap();
+    let before = fs::read(project.0.join(".codeguard/module-graph.json")).unwrap();
+    fs::write(project.0.join(".codeguard/tasks/notes.md"), "保留记录").unwrap();
     fs::write(
         project.0.join("service/Cargo.toml"),
         service.replace("actual-api", "wrong-name"),
@@ -1096,7 +1126,7 @@ fn cargo_dependency_refresh_removes_old_relationship_and_preserves_notes() {
         project.run(&["--apply", "--format=json"]).1["profile_stale"],
         true
     );
-    let after = fs::read(project.0.join("codeguard/module-graph.json")).unwrap();
+    let after = fs::read(project.0.join(".codeguard/module-graph.json")).unwrap();
     assert_ne!(before, after);
     let graph: Value = serde_json::from_slice(&after).unwrap();
     assert!(
@@ -1107,7 +1137,7 @@ fn cargo_dependency_refresh_removes_old_relationship_and_preserves_notes() {
             .any(|edge| edge["kind"] == "build_dependency")
     );
     assert_eq!(
-        fs::read_to_string(project.0.join("codeguard/tasks/notes.md")).unwrap(),
+        fs::read_to_string(project.0.join(".codeguard/tasks/notes.md")).unwrap(),
         "保留记录"
     );
     assert_eq!(
@@ -1137,7 +1167,7 @@ fn init_keeps_per_manifest_java_and_rust_targets_separate_from_package_and_insta
     .unwrap();
     assert_eq!(project.run(&["--apply", "--format=json"]).0, 3);
     let profile: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/project.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/project.json")).unwrap())
             .unwrap();
     assert_eq!(profile["schema_version"], "0.3.0");
     let targets = profile["language_targets"]
@@ -1198,7 +1228,7 @@ fn unresolved_language_targets_are_visible_and_refresh_preserves_notes() {
     fs::write(project.0.join("Cargo.toml"),"[package]\nname='app'\nversion='1.0.0'\nrust-version={workspace=true}\nedition={workspace=true}\n").unwrap();
     assert_eq!(project.run(&["--apply", "--format=json"]).0, 3);
     let before: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/project.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/project.json")).unwrap())
             .unwrap();
     assert!(before["language_targets"].as_array().unwrap().is_empty());
     for reason in [
@@ -1214,14 +1244,14 @@ fn unresolved_language_targets_are_visible_and_refresh_preserves_notes() {
             "{reason}"
         );
     }
-    fs::write(project.0.join("codeguard/tasks/notes.md"), "保留人工备注").unwrap();
+    fs::write(project.0.join(".codeguard/tasks/notes.md"), "保留人工备注").unwrap();
     fs::write(project.0.join("java/pom.xml"),"<project><properties><maven.compiler.release>17</maven.compiler.release></properties></project>").unwrap();
     assert_eq!(
         project.run(&["--apply", "--format=json"]).1["profile_stale"],
         true
     );
     let after: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/project.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/project.json")).unwrap())
             .unwrap();
     assert_eq!(after["language_targets"][0]["value"], "17");
     assert!(
@@ -1233,7 +1263,7 @@ fn unresolved_language_targets_are_visible_and_refresh_preserves_notes() {
             ))
     );
     assert_eq!(
-        fs::read_to_string(project.0.join("codeguard/tasks/notes.md")).unwrap(),
+        fs::read_to_string(project.0.join(".codeguard/tasks/notes.md")).unwrap(),
         "保留人工备注"
     );
     assert_eq!(
@@ -1260,7 +1290,7 @@ fn dry_run_returns_the_profile_summary_without_creating_files() {
     assert_eq!(summary["language_targets"][0]["status"], "declared_only");
     assert_eq!(report["readiness"], "unknown");
     assert_eq!(report["delivery_decision"], "not_evaluated");
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
     assert!(!project.0.join("AGENTS.md").exists());
     let (_, applied) = project.run(&["--apply", "--format=json"]);
     assert_eq!(applied["profile_summary"], report["profile_summary"]);
@@ -1296,7 +1326,7 @@ fn human_init_reports_the_same_declared_target_and_unknown_readiness() {
     assert!(text.contains("状态 declared_only"));
     assert!(text.contains("待确认："));
     assert!(!text.contains(&project.0.to_string_lossy().to_string()));
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
 }
 
 #[test]
@@ -1320,7 +1350,7 @@ fn human_init_cannot_turn_project_path_control_characters_into_terminal_status_l
     assert!(!text.contains('\u{1b}'));
     assert!(!text.lines().any(|line| line.starts_with("FORGED_STATUS")));
     assert!(text.contains("\\nFORGED_STATUS\\u001b[31m"));
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
 }
 
 #[test]
@@ -1353,7 +1383,7 @@ fn init_feedback_separates_checker_configuration_from_execution_and_required_pol
     assert_eq!(cve["execution"], "not_run");
     assert_eq!(report["readiness"], "unknown");
     assert_eq!(report["delivery_decision"], "not_evaluated");
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
     assert!(!project.0.join("target").exists());
 }
 
@@ -1411,7 +1441,7 @@ fn init_checker_feedback_preserves_four_configuration_states_per_build_root() {
     assert!(text.contains("必需性：未绑定"));
     assert!(text.contains("配置依据："));
     assert!(text.contains("下一步："));
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
 
     assert_eq!(project.run(&["--apply", "--format=json"]).0, 3);
     let agents = fs::read_to_string(project.0.join("AGENTS.md")).unwrap();
@@ -1460,7 +1490,7 @@ fn maven_and_cargo_package_versions_are_per_manifest_and_not_language_targets() 
     fs::write(project.0.join("rust/Cargo.toml"), cargo).unwrap();
     assert_eq!(project.run(&["--apply", "--format=json"]).0, 3);
     let profile: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/project.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/project.json")).unwrap())
             .unwrap();
     assert_eq!(
         profile["package_declared_versions"]["java/pom.xml"],
@@ -1503,7 +1533,7 @@ fn unresolved_package_versions_refresh_without_erasing_work_or_guessing_inherita
     .unwrap();
     assert_eq!(project.run(&["--apply", "--format=json"]).0, 3);
     let before: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/project.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/project.json")).unwrap())
             .unwrap();
     assert!(
         before["package_declared_versions"]
@@ -1523,7 +1553,7 @@ fn unresolved_package_versions_refresh_without_erasing_work_or_guessing_inherita
             "{reason}"
         );
     }
-    fs::write(project.0.join("codeguard/tasks/notes.md"), "保留人工备注").unwrap();
+    fs::write(project.0.join(".codeguard/tasks/notes.md"), "保留人工备注").unwrap();
     let pom = "<project><version>2.0-SNAPSHOT</version></project>";
     let cargo = "[package]\nname='app'\nversion='3.0.0-rc.1'\n";
     fs::write(project.0.join("pom.xml"), pom).unwrap();
@@ -1533,7 +1563,7 @@ fn unresolved_package_versions_refresh_without_erasing_work_or_guessing_inherita
         true
     );
     let after: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/project.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/project.json")).unwrap())
             .unwrap();
     for (manifest, version, content) in [
         ("pom.xml", "2.0-SNAPSHOT", pom),
@@ -1546,7 +1576,7 @@ fn unresolved_package_versions_refresh_without_erasing_work_or_guessing_inherita
         );
     }
     assert_eq!(
-        fs::read_to_string(project.0.join("codeguard/tasks/notes.md")).unwrap(),
+        fs::read_to_string(project.0.join(".codeguard/tasks/notes.md")).unwrap(),
         "保留人工备注"
     );
     assert_eq!(

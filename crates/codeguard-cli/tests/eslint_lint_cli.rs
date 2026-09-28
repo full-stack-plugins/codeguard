@@ -87,7 +87,7 @@ fn lint(
             "--format",
             "json",
         ])
-        .args(if project.0.join("codeguard").is_dir() {
+        .args(if project.0.join(".codeguard").is_dir() {
             vec!["--workspace", project.0.to_str().unwrap()]
         } else {
             vec![]
@@ -117,7 +117,7 @@ fn controlled_cli_findings_are_feedback_without_leaking_native_message_or_allow(
             .unwrap()
             .contains("PRIVATE_NATIVE_MESSAGE")
     );
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
 }
 #[test]
 #[ignore = "requires explicit existing Node and ESLint 10.11.0"]
@@ -266,7 +266,7 @@ fn initialized_eslint_workbench_reuses_task_and_preserves_manual_notes() {
             report["workbench"]["next"]["repair_brief"]["disposition"], "actionable",
             "{report}"
         );
-        let directories: Vec<_> = std::fs::read_dir(project.0.join("codeguard/findings"))
+        let directories: Vec<_> = std::fs::read_dir(project.0.join(".codeguard/findings"))
             .unwrap()
             .collect();
         assert_eq!(directories.len(), 1);
@@ -354,7 +354,7 @@ fn initialized_eslint_workbench_reuses_task_and_preserves_manual_notes() {
         assert_eq!(shown["delivery_decision"], "not_evaluated");
         let current = project
             .0
-            .join("codeguard/tasks")
+            .join(".codeguard/tasks")
             .join(format!("{}.md", fact["id"].as_str().unwrap()));
         let text = std::fs::read_to_string(&current).unwrap();
         for required in [
@@ -390,7 +390,7 @@ fn initialized_eslint_workbench_reuses_task_and_preserves_manual_notes() {
     );
     assert_eq!(brief["repair_brief"]["recheck_argv"][2], "typescript");
     std::fs::write(&config, original).unwrap();
-    let first = std::fs::read_dir(project.0.join("codeguard/reports"))
+    let first = std::fs::read_dir(project.0.join(".codeguard/reports"))
         .unwrap()
         .next()
         .unwrap()
@@ -400,7 +400,7 @@ fn initialized_eslint_workbench_reuses_task_and_preserves_manual_notes() {
     forged["run_id"] = serde_json::json!("eslint-0-999999");
     forged["delivery_decision"] = serde_json::json!("allow");
     std::fs::write(
-        project.0.join("codeguard/reports/eslint-0-999999.json"),
+        project.0.join(".codeguard/reports/eslint-0-999999.json"),
         serde_json::to_vec(&forged).unwrap(),
     )
     .unwrap();
@@ -418,7 +418,7 @@ fn initialized_eslint_workbench_reuses_task_and_preserves_manual_notes() {
     assert_eq!(summary["failed_reports"], 1);
     assert_eq!(summary["new_findings"], 0);
     assert_eq!(
-        std::fs::read_dir(project.0.join("codeguard/findings"))
+        std::fs::read_dir(project.0.join(".codeguard/findings"))
             .unwrap()
             .count(),
         1
@@ -472,7 +472,7 @@ fn eslint_missing_context_creates_one_environment_task_and_never_source_finding(
         );
         assert!(brief["step"].as_str().unwrap().contains("不修改无关源码"));
     }
-    let dirs: Vec<_> = std::fs::read_dir(project.0.join("codeguard/findings"))
+    let dirs: Vec<_> = std::fs::read_dir(project.0.join(".codeguard/findings"))
         .unwrap()
         .collect();
     assert_eq!(dirs.len(), 1);
@@ -562,7 +562,7 @@ fn eslint_external_preparation_target_cannot_enter_workspace_tasks() {
     let result: Value = serde_json::from_slice(&result.stdout).unwrap();
     assert_eq!(result["workbench_status"], "source_outside_workspace");
     assert_eq!(
-        std::fs::read_dir(workspace.0.join("codeguard/findings"))
+        std::fs::read_dir(workspace.0.join(".codeguard/findings"))
             .unwrap()
             .count(),
         0

@@ -163,7 +163,7 @@ fn queued_recheck_rejects_forged_forced_identity_and_duplicate_input_ownership()
                 serde_json::json!("a".repeat(64));
         }
         fs::write(
-            fixture.0.join(format!("codeguard/reports/{run_id}.json")),
+            fixture.0.join(format!(".codeguard/reports/{run_id}.json")),
             report.to_string(),
         )
         .unwrap();
@@ -231,7 +231,7 @@ fn rustdoc_task_verify_records_original_checker_and_native_suppression_without_c
         &fs::read(
             fixture
                 .0
-                .join(format!("codeguard/findings/{id}/finding.json")),
+                .join(format!(".codeguard/findings/{id}/finding.json")),
         )
         .unwrap(),
     )
@@ -251,7 +251,7 @@ fn initialized_comments_automatically_persist_one_task_across_repeated_scans() {
         ])
         .output()
         .unwrap();
-    assert!(fixture.0.join("codeguard/workspace.json").is_file());
+    assert!(fixture.0.join(".codeguard/workspace.json").is_file());
     let tool = fixture.tool(&format!(
         "printf '%s\\n' '{}' '{{\"reason\":\"build-finished\",\"success\":true}}'",
         fixture.warning()
@@ -259,7 +259,7 @@ fn initialized_comments_automatically_persist_one_task_across_repeated_scans() {
     let (_, first) = fixture.check(&["--cargo-tool", tool.to_str().unwrap()]);
     assert_eq!(first["backlog_status"], "synced");
     let id = first["findings"][0]["finding_id"].as_str().unwrap();
-    let task = fixture.0.join(format!("codeguard/tasks/{id}.md"));
+    let task = fixture.0.join(format!(".codeguard/tasks/{id}.md"));
     assert!(task.is_file());
     let (_, second) = fixture.check(&["--cargo-tool", tool.to_str().unwrap()]);
     assert_eq!(second["backlog_status"], "synced");
@@ -296,7 +296,7 @@ fn queued_report_with_changed_manifest_never_creates_a_source_repair_task() {
     ));
     // 取得未绑定观察再绑定到队列，确保导入时重新核验而非依赖命令的先前检查。
     let workspace: Value =
-        serde_json::from_slice(&fs::read(fixture.0.join("codeguard/workspace.json")).unwrap())
+        serde_json::from_slice(&fs::read(fixture.0.join(".codeguard/workspace.json")).unwrap())
             .unwrap();
     let (_, mut report) = fixture.check(&["--cargo-tool", tool.to_str().unwrap()]);
     report["run_id"] = serde_json::json!("rustdoc-99-100");
@@ -305,7 +305,7 @@ fn queued_report_with_changed_manifest_never_creates_a_source_repair_task() {
     report["backlog_sync"] = Value::Null;
     fs::write(fixture.0.join("Cargo.toml"), "changed manifest\n").unwrap();
     fs::write(
-        fixture.0.join("codeguard/reports/rustdoc-99-100.json"),
+        fixture.0.join(".codeguard/reports/rustdoc-99-100.json"),
         report.to_string(),
     )
     .unwrap();
@@ -343,7 +343,7 @@ fn queued_report_with_forged_fingerprint_is_rejected() {
     report["findings"][0]["repair_brief"]["evidence"]["finding_fingerprint"] =
         serde_json::json!("a".repeat(64));
     fs::write(
-        fixture.0.join("codeguard/reports/rustdoc-99-101.json"),
+        fixture.0.join(".codeguard/reports/rustdoc-99-101.json"),
         report.to_string(),
     )
     .unwrap();
@@ -372,7 +372,7 @@ fn initialized_missing_tool_creates_preparation_task_without_source_violation() 
     assert_eq!(report["backlog_status"], "synced");
     assert_eq!(report["backlog_sync"]["new_findings"], 0);
     assert_eq!(report["backlog_sync"]["new_blockers"], 1);
-    let tasks: Vec<_> = fs::read_dir(fixture.0.join("codeguard/tasks"))
+    let tasks: Vec<_> = fs::read_dir(fixture.0.join(".codeguard/tasks"))
         .unwrap()
         .flatten()
         .collect();
@@ -408,7 +408,7 @@ fn observed_comments_never_grant_delivery_or_modify_inputs() {
     assert!(brief["closure_conditions"].to_string().contains("原工具"));
     assert!(!report.to_string().contains("must not enter conversation"));
     assert!(!fixture.0.join("target").exists());
-    assert!(!fixture.0.join("codeguard").exists());
+    assert!(!fixture.0.join(".codeguard").exists());
     assert_eq!(
         fs::read_to_string(fixture.0.join("src/lib.rs")).unwrap(),
         "pub fn answer() -> i32 { 42 }\n"
@@ -574,7 +574,7 @@ fn actual_cli_rustdoc_finds_comments_and_rechecks_clean_source_without_claiming_
             fixture
                 .0
                 .join(format!(
-                    "codeguard/tasks/{}.md",
+                    ".codeguard/tasks/{}.md",
                     finding["finding_id"].as_str().unwrap()
                 ))
                 .is_file()

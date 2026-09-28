@@ -41,7 +41,7 @@ pub fn run_status(args: &[String]) -> ExitCode {
     let mut findings = 0_u64;
     let mut blockers = 0_u64;
     if initialized {
-        let directory = root.join("codeguard/findings");
+        let directory = root.join(".codeguard/findings");
         if !real_directory(&directory) {
             return output_error(
                 "status",

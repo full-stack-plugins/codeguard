@@ -166,7 +166,7 @@ fn valid_advisory_after_native_crash_remains_visible_with_incomplete_status() {
                 .as_str()
                 .is_some_and(|text| text.contains("已同步稳定待处理任务")))
     );
-    let tasks: Vec<_> = fs::read_dir(fixture.0.join("codeguard/tasks"))
+    let tasks: Vec<_> = fs::read_dir(fixture.0.join(".codeguard/tasks"))
         .unwrap()
         .filter_map(Result::ok)
         .filter(|entry| {

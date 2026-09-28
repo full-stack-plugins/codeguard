@@ -57,7 +57,7 @@ fn deleted_manifest_is_kept_as_preparation_scope_without_reusing_old_input_or_au
         );
         assert_eq!(missing["feedback"]["workbench"]["new_blockers"], count);
         assert_eq!(
-            fs::read_dir(root.join("codeguard/tasks")).unwrap().count(),
+            fs::read_dir(root.join(".codeguard/tasks")).unwrap().count(),
             2
         );
     }
@@ -107,7 +107,7 @@ fn deleted_manifest_is_kept_as_preparation_scope_without_reusing_old_input_or_au
             .lines()
             .all(|cwd| cwd == root.join("ab").to_str().unwrap())
     );
-    let profile = root.join("codeguard/project.json");
+    let profile = root.join(".codeguard/project.json");
     let bytes = fs::read(&profile).unwrap();
     let mut bad: Value = serde_json::from_slice(&bytes).unwrap();
     bad["manifest_sha256"]["../outside/package.json"] = serde_json::json!("0".repeat(64));
@@ -129,7 +129,7 @@ fn deleted_manifest_is_kept_as_preparation_scope_without_reusing_old_input_or_au
     );
     // 项目自行同时改画像与本地摘要，也不能扩展到越界路径或改变协议身份。
     use sha2::{Digest, Sha256};
-    let workspace = root.join("codeguard/workspace.json");
+    let workspace = root.join(".codeguard/workspace.json");
     let workspace_bytes = fs::read(&workspace).unwrap();
     let invalid_profile = fs::read(&profile).unwrap();
     let mut rewritten: Value = serde_json::from_slice(&workspace_bytes).unwrap();
@@ -191,7 +191,7 @@ fn deleted_manifest_is_kept_as_preparation_scope_without_reusing_old_input_or_au
                 .any(|v| v == "historical_npm_scope_unavailable")
         );
         assert_eq!(
-            fs::read_dir(root.join("codeguard/tasks")).unwrap().count(),
+            fs::read_dir(root.join(".codeguard/tasks")).unwrap().count(),
             2
         );
     }
@@ -211,7 +211,7 @@ fn deleted_manifest_is_kept_as_preparation_scope_without_reusing_old_input_or_au
         2
     );
     assert_eq!(
-        fs::read_dir(root.join("codeguard/tasks")).unwrap().count(),
+        fs::read_dir(root.join(".codeguard/tasks")).unwrap().count(),
         2
     );
 }

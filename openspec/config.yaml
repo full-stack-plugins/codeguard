@@ -1,0 +1,6 @@
+schema: spec-driven
+context: |
+  Codeguard Rust workspace: CLI, core, runtime, native-tool adapters.
+  This repository owns introduce-rust-codeguard-cli, migrated from codeguard-plugin.
+  Native tools remain authoritative; WASM syntax precheck is planned, not implemented.
+  Only tasks.md tracks completion; preserve evidence and unresolved coverage.

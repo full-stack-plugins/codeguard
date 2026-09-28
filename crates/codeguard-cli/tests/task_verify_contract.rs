@@ -80,7 +80,7 @@ impl Project {
     }
 
     fn one_task(&self) -> String {
-        let tasks = fs::read_dir(self.0.join("codeguard/tasks"))
+        let tasks = fs::read_dir(self.0.join(".codeguard/tasks"))
             .unwrap()
             .map(|entry| {
                 entry
@@ -98,7 +98,11 @@ impl Project {
 
     fn fact(&self, id: &str) -> Value {
         serde_json::from_slice(
-            &fs::read(self.0.join(format!("codeguard/findings/{id}/finding.json"))).unwrap(),
+            &fs::read(
+                self.0
+                    .join(format!(".codeguard/findings/{id}/finding.json")),
+            )
+            .unwrap(),
         )
         .unwrap()
     }
@@ -144,7 +148,7 @@ fn invalid_verify_budget_is_rejected_before_leasing_or_native_execution() {
         assert!(
             !project
                 .0
-                .join(format!("codeguard/state/leases/{id}.json"))
+                .join(format!(".codeguard/state/leases/{id}.json"))
                 .exists()
         );
     }
@@ -166,7 +170,7 @@ fn invalid_verify_budget_is_rejected_before_leasing_or_native_execution() {
     assert!(
         !project
             .0
-            .join(format!("codeguard/state/leases/{id}.json"))
+            .join(format!(".codeguard/state/leases/{id}.json"))
             .exists()
     );
 }
@@ -181,7 +185,7 @@ fn verify_deadline_keeps_task_open_and_does_not_persist_incomplete_resolution() 
     fs::write(&tool, "#!/bin/sh\nsleep 2\nprintf 'ruff 0.16.8\\n'\n").unwrap();
     use std::os::unix::fs::PermissionsExt;
     fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
-    let events = project.0.join(format!("codeguard/findings/{id}/events"));
+    let events = project.0.join(format!(".codeguard/findings/{id}/events"));
     let before = fs::read_dir(&events).unwrap().count();
     let started = Instant::now();
     let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
@@ -216,7 +220,7 @@ fn verify_deadline_keeps_task_open_and_does_not_persist_incomplete_resolution() 
     );
     assert_eq!(fs::read_dir(&events).unwrap().count(), before);
     let lease: Value = serde_json::from_slice(
-        &fs::read(project.0.join(format!("codeguard/state/leases/{id}.json"))).unwrap(),
+        &fs::read(project.0.join(format!(".codeguard/state/leases/{id}.json"))).unwrap(),
     )
     .unwrap();
     assert_eq!(lease["status"], "released");
@@ -231,7 +235,7 @@ fn verify_without_existing_owner_uses_and_releases_its_own_lease() {
     let (_, report) = project.verify(&id, None);
     assert_eq!(report["event_persisted"], true);
     let lease: Value = serde_json::from_slice(
-        &fs::read(project.0.join(format!("codeguard/state/leases/{id}.json"))).unwrap(),
+        &fs::read(project.0.join(format!(".codeguard/state/leases/{id}.json"))).unwrap(),
     )
     .unwrap();
     assert_eq!(lease["status"], "released");
@@ -249,7 +253,7 @@ fn verify_reads_project_runtime_default_and_keeps_task_open() {
     project.lint(None);
     let id = project.one_task();
     fs::write(
-        project.0.join("codeguard/runtime.json"),
+        project.0.join(".codeguard/runtime.json"),
         r#"{"schema_version":"1.0","document_type":"codeguard_runtime_options","timeout":"2s"}"#,
     )
     .unwrap();
@@ -280,7 +284,7 @@ fn borrowed_verify_keeps_caller_lease_and_wrong_token_never_starts_scan() {
     assert_eq!(claim.status.code(), Some(0));
     let receipt: Value = serde_json::from_slice(&claim.stdout).unwrap();
     let token = receipt["lease_token"].as_str().unwrap();
-    let reports_before = fs::read_dir(project.0.join("codeguard/reports"))
+    let reports_before = fs::read_dir(project.0.join(".codeguard/reports"))
         .unwrap()
         .count();
     let (unclaimed_exit, unclaimed) = project.verify(&id, None);
@@ -293,7 +297,7 @@ fn borrowed_verify_keeps_caller_lease_and_wrong_token_never_starts_scan() {
     assert_eq!(denied["reason"], "lease_token_mismatch");
     assert!(denied["native_scan"].is_null());
     assert_eq!(
-        fs::read_dir(project.0.join("codeguard/reports"))
+        fs::read_dir(project.0.join(".codeguard/reports"))
             .unwrap()
             .count(),
         reports_before
@@ -301,7 +305,7 @@ fn borrowed_verify_keeps_caller_lease_and_wrong_token_never_starts_scan() {
     let (_, observed) = project.verify_with_lease(&id, None, Some("agent-a"), Some(token));
     assert_eq!(observed["event_persisted"], true);
     let lease: Value = serde_json::from_slice(
-        &fs::read(project.0.join(format!("codeguard/state/leases/{id}.json"))).unwrap(),
+        &fs::read(project.0.join(format!(".codeguard/state/leases/{id}.json"))).unwrap(),
     )
     .unwrap();
     assert_eq!(lease["status"], "active");
@@ -333,7 +337,7 @@ fn native_ruff_verify_respects_the_borrowed_token_before_scanning() {
     assert_eq!(claim.status.code(), Some(0));
     let receipt: Value = serde_json::from_slice(&claim.stdout).unwrap();
     let token = receipt["lease_token"].as_str().unwrap();
-    let reports_before = fs::read_dir(project.0.join("codeguard/reports"))
+    let reports_before = fs::read_dir(project.0.join(".codeguard/reports"))
         .unwrap()
         .count();
     let (_, denied) =
@@ -341,7 +345,7 @@ fn native_ruff_verify_respects_the_borrowed_token_before_scanning() {
     assert_eq!(denied["reason"], "lease_token_mismatch");
     assert!(denied["native_scan"].is_null());
     assert_eq!(
-        fs::read_dir(project.0.join("codeguard/reports"))
+        fs::read_dir(project.0.join(".codeguard/reports"))
             .unwrap()
             .count(),
         reports_before
@@ -350,7 +354,7 @@ fn native_ruff_verify_respects_the_borrowed_token_before_scanning() {
     assert_eq!(verified["event_persisted"], true);
     assert_eq!(verified["observation"], "still_present");
     let lease: Value = serde_json::from_slice(
-        &fs::read(project.0.join(format!("codeguard/state/leases/{id}.json"))).unwrap(),
+        &fs::read(project.0.join(format!(".codeguard/state/leases/{id}.json"))).unwrap(),
     )
     .unwrap();
     assert_eq!(lease["status"], "active");
@@ -557,14 +561,18 @@ fn missing_config_remains_blocked_and_records_native_recheck_without_closure() {
     assert_eq!(verification["event_persisted"], true);
     assert_eq!(verification["delivery_decision"], "not_evaluated");
     assert_eq!(project.fact(&id)["state"], "open");
-    let events = fs::read_dir(project.0.join(format!("codeguard/findings/{id}/events")))
+    let events = fs::read_dir(project.0.join(format!(".codeguard/findings/{id}/events")))
         .unwrap()
         .count();
     assert_eq!(events, 2); // 初见与复检观察；再次扫描只写本地证据。
     assert_eq!(
-        fs::read_dir(project.0.join(format!("codeguard/state/observations/{id}")))
-            .unwrap()
-            .count(),
+        fs::read_dir(
+            project
+                .0
+                .join(format!(".codeguard/state/observations/{id}"))
+        )
+        .unwrap()
+        .count(),
         2
     );
 }
@@ -584,7 +592,7 @@ fn invalid_or_missing_task_does_not_start_a_native_scan() {
         .unwrap();
     assert_eq!(output.status.code(), Some(2));
     assert!(
-        fs::read_dir(project.0.join("codeguard/reports"))
+        fs::read_dir(project.0.join(".codeguard/reports"))
             .unwrap()
             .next()
             .is_none()
@@ -597,7 +605,7 @@ fn invalid_or_missing_task_does_not_start_a_native_scan() {
     assert_eq!(result["execution_budget"]["timeout_ms"], 1_800_000);
     assert_eq!(result["execution_budget"]["source"], "builtin_default");
     assert!(
-        fs::read_dir(project.0.join("codeguard/reports"))
+        fs::read_dir(project.0.join(".codeguard/reports"))
             .unwrap()
             .next()
             .is_none()
@@ -610,7 +618,7 @@ fn forged_recovery_event_cannot_suppress_an_actual_blocker_in_next() {
     project.lint(None);
     let id = project.one_task();
     assert_eq!(project.verify(&id, None).1["observation"], "still_blocked");
-    let event = fs::read_dir(project.0.join(format!("codeguard/findings/{id}/events")))
+    let event = fs::read_dir(project.0.join(format!(".codeguard/findings/{id}/events")))
         .unwrap()
         .map(|entry| entry.unwrap().path())
         .find(|path| {
@@ -640,7 +648,7 @@ fn missing_local_recheck_report_does_not_reuse_an_unverifiable_recovery_claim() 
     let id = project.one_task();
     let verification = project.verify(&id, None).1;
     let run_id = verification["native_scan"]["run_id"].as_str().unwrap();
-    fs::remove_file(project.0.join(format!("codeguard/reports/{run_id}.json"))).unwrap();
+    fs::remove_file(project.0.join(format!(".codeguard/reports/{run_id}.json"))).unwrap();
     let next = project.next();
     assert_eq!(next["disposition"], "needs_decision");
     assert_eq!(
@@ -789,13 +797,13 @@ fn d101_task_explains_class_docstring_and_requires_native_recheck() {
     assert_eq!(initial.status.code(), Some(3));
     let id = project.one_task();
     let task =
-        fs::read_to_string(project.0.join("codeguard/tasks").join(format!("{id}.md"))).unwrap();
+        fs::read_to_string(project.0.join(".codeguard/tasks").join(format!("{id}.md"))).unwrap();
     assert!(task.contains("Ruff 规则 `D101`"));
     assert!(task.contains("确认该公共类的职责，为类补充准确的 docstring。"));
     assert_eq!(project.next()["repair_brief"]["native_rule_id"], "D101");
 
     fs::write(
-        project.0.join("codeguard/decisions/forged.json"),
+        project.0.join(".codeguard/decisions/forged.json"),
         format!("{{\"finding_id\":\"{id}\",\"native_rule_id\":\"D101\",\"approved\":true}}"),
     )
     .unwrap();

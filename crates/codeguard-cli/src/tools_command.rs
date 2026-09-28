@@ -50,7 +50,7 @@ pub fn run(arguments: &[String]) -> ExitCode {
             .unwrap_or_else(|| root.join("codeguard.lock.json"));
         let cache = args
             .cache
-            .unwrap_or_else(|| root.join("codeguard/cache/tools"));
+            .unwrap_or_else(|| root.join(".codeguard/cache/tools"));
         match read_bounded_regular_file(&candidate, 256 * 1024) {
             Ok(bytes) => {
                 report["lock_sha256"] = format!("{:x}", Sha256::digest(&bytes)).into();

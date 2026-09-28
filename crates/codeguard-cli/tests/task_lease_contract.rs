@@ -56,7 +56,7 @@ impl Project {
             .unwrap();
         assert_eq!(init.status.code(), Some(3));
         let workspace: Value =
-            serde_json::from_slice(&fs::read(root.join("codeguard/workspace.json")).unwrap())
+            serde_json::from_slice(&fs::read(root.join(".codeguard/workspace.json")).unwrap())
                 .unwrap();
         let fingerprint = "a".repeat(64);
         let task_id = format!("CG-{}", &fingerprint[..32]);
@@ -77,7 +77,7 @@ impl Project {
                     "path":"app.py","rule_id":"F401","line":1}]}]
         });
         fs::write(
-            root.join("codeguard/reports/lint-1-100.json"),
+            root.join(".codeguard/reports/lint-1-100.json"),
             serde_json::to_vec_pretty(&report).unwrap(),
         )
         .unwrap();
@@ -334,7 +334,7 @@ fn expired_claim_records_abandoned_before_new_generation_and_old_finish_cannot_c
     let attempt_id = started["attempt_id"].as_str().unwrap();
     let lease_path = project
         .root
-        .join(format!("codeguard/state/leases/{}.json", project.task_id));
+        .join(format!(".codeguard/state/leases/{}.json", project.task_id));
     let mut lease: Value = serde_json::from_slice(&fs::read(&lease_path).unwrap()).unwrap();
     lease["expires_at"] = json!(1);
     fs::write(&lease_path, serde_json::to_vec_pretty(&lease).unwrap()).unwrap();
@@ -342,7 +342,7 @@ fn expired_claim_records_abandoned_before_new_generation_and_old_finish_cannot_c
     assert_eq!(exit, 0);
     assert_eq!(second["generation"], 2);
     let finish_path = project.root.join(format!(
-        "codeguard/findings/{}/events/attempt-{}-finish.json",
+        ".codeguard/findings/{}/events/attempt-{}-finish.json",
         project.task_id, attempt_id
     ));
     let finish: Value = serde_json::from_slice(&fs::read(&finish_path).unwrap()).unwrap();
@@ -530,7 +530,7 @@ fn ready_to_verify_requires_original_recheck_and_failed_rechecks_consume_budget(
         assert_eq!(observation["event_persisted"], true);
         assert_eq!(observation["observation"], "incomplete");
         let event = project.root.join(format!(
-            "codeguard/findings/{}/events/verify-{}.json",
+            ".codeguard/findings/{}/events/verify-{}.json",
             project.task_id,
             observation["native_scan"]["run_id"].as_str().unwrap()
         ));
@@ -602,7 +602,7 @@ fn missing_private_recheck_report_requires_a_new_native_recheck() {
     fs::remove_file(
         project
             .root
-            .join(format!("codeguard/reports/{run_id}.json")),
+            .join(format!(".codeguard/reports/{run_id}.json")),
     )
     .unwrap();
     let (exit, pending) = project.attempt("start", "agent-a", token, &["--action-id", &action]);
@@ -659,7 +659,7 @@ fn expired_lease_can_be_reclaimed_without_reusing_the_old_token() {
     let old_token = first["lease_token"].as_str().unwrap();
     let state = project
         .root
-        .join(format!("codeguard/state/leases/{}.json", project.task_id));
+        .join(format!(".codeguard/state/leases/{}.json", project.task_id));
     let mut lease: Value = serde_json::from_slice(&fs::read(&state).unwrap()).unwrap();
     lease["expires_at"] = json!(1);
     fs::write(&state, serde_json::to_vec_pretty(&lease).unwrap()).unwrap();
@@ -686,9 +686,9 @@ fn missing_task_and_symlinked_lease_state_fail_without_claiming() {
         .output()
         .unwrap();
     assert_eq!(output.status.code(), Some(3));
-    assert!(!project.root.join("codeguard/state/task_locks").exists());
+    assert!(!project.root.join(".codeguard/state/task_locks").exists());
 
-    let leases = project.root.join("codeguard/state/leases");
+    let leases = project.root.join(".codeguard/state/leases");
     fs::create_dir(&leases).unwrap();
     let outside = project.root.join("protected.txt");
     fs::write(&outside, "do not change").unwrap();
@@ -702,7 +702,7 @@ fn missing_task_and_symlinked_lease_state_fail_without_claiming() {
 #[test]
 fn held_lock_returns_incomplete_without_waiting_for_the_owner() {
     let project = Project::new();
-    let locks = project.root.join("codeguard/state/task_locks");
+    let locks = project.root.join(".codeguard/state/task_locks");
     fs::create_dir(&locks).unwrap();
     let _held = TaskFileLock::acquire(&locks.join(format!("{}.lock", project.task_id))).unwrap();
     let (exit, report) = project.run("claim", "agent-b", None);
@@ -711,7 +711,7 @@ fn held_lock_returns_incomplete_without_waiting_for_the_owner() {
     assert!(
         !project
             .root
-            .join(format!("codeguard/state/leases/{}.json", project.task_id))
+            .join(format!(".codeguard/state/leases/{}.json", project.task_id))
             .exists()
     );
 }
@@ -720,7 +720,7 @@ fn held_lock_returns_incomplete_without_waiting_for_the_owner() {
 fn environment_blocker_can_be_claimed_for_repair() {
     let project = Project::new();
     let workspace: Value =
-        serde_json::from_slice(&fs::read(project.root.join("codeguard/workspace.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.root.join(".codeguard/workspace.json")).unwrap())
             .unwrap();
     let report = json!({
         "schema_version":"0.4.0", "report_type":"python_lint_feedback",
@@ -733,7 +733,7 @@ fn environment_blocker_can_be_claimed_for_repair() {
             "recheck_argv":["ruff","check","app.py"], "findings":[]}]
     });
     fs::write(
-        project.root.join("codeguard/reports/lint-1-200.json"),
+        project.root.join(".codeguard/reports/lint-1-200.json"),
         serde_json::to_vec_pretty(&report).unwrap(),
     )
     .unwrap();
@@ -747,7 +747,7 @@ fn environment_blocker_can_be_claimed_for_repair() {
         .output()
         .unwrap();
     assert_eq!(sync.status.code(), Some(3));
-    let blocker_id = fs::read_dir(project.root.join("codeguard/tasks"))
+    let blocker_id = fs::read_dir(project.root.join(".codeguard/tasks"))
         .unwrap()
         .map(|entry| entry.unwrap().file_name().into_string().unwrap())
         .find(|name| name.starts_with("CG-B-"))

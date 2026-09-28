@@ -1,0 +1,123 @@
+{
+  "source_repository": "full-stack-plugins/codeguard-plugin",
+  "destination_repository": "full-stack-plugins/codeguard",
+  "date": "2026-09-28",
+  "files": [
+    {
+      "path": "docs/rust-cli/legacy-v1-protocol-map.zh-CN.md",
+      "sha256_before": "bf6d6070728ba55a94617d169864fc5a3a9fe4fa5d854d2f116580a1a09d9ea0"
+    },
+    {
+      "path": "docs/rust-cli/architecture.zh-CN.md",
+      "sha256_before": "0385e1afc6dac5bd1ed597726a15159d20ad0292d3e540392d8957b7f04b7b0d"
+    },
+    {
+      "path": "docs/rust-cli/command-architecture.zh-CN.md",
+      "sha256_before": "d675b16c3ee7b68850c59f9f34a46aa2a09f7dccedfe5a494d4d32ac1ef3c515"
+    },
+    {
+      "path": "docs/rust-cli/project-initialization.zh-CN.md",
+      "sha256_before": "61aac86de5ccd84fe98d139c6911ca44d83cafc5ce6eb1b5f6712f8f2dbbf9a4"
+    },
+    {
+      "path": "docs/rust-cli/technical-design.zh-CN.md",
+      "sha256_before": "aa3a51ca691bd5d0762e1420c5943a003723240f1b88ea2c7e93f674406300c1"
+    },
+    {
+      "path": "docs/rust-cli/README.md",
+      "sha256_before": "1d6440bdd0e8e34dcd3b71faa0621b4098b54abecd8ff785448fe8d9a6358b32"
+    },
+    {
+      "path": "docs/rust-cli/false-positive-allowlist.zh-CN.md",
+      "sha256_before": "8b68914441323f4d99cf4321ccfe6aa628c5dba4e741e964eab13f0f275f89fd"
+    },
+    {
+      "path": "docs/rust-cli/coverage-and-acceptance.zh-CN.md",
+      "sha256_before": "9855ad1ceff3c4e1c5fdee7eb9d0aa0f8c7276fa12d199832d0d27b6cc96ab20"
+    },
+    {
+      "path": "docs/rust-cli/legacy-delta-20260924.zh-CN.md",
+      "sha256_before": "f6c4c13d8e44a5bf0b4f71f9407102366c1d294023a3911b6cb8f3eb4f86365f"
+    },
+    {
+      "path": "docs/rust-cli/static-check-catalog.zh-CN.md",
+      "sha256_before": "db484bc2cf22637a53835780f95c682cec2078c7e96683d8347bba82ca1567a8"
+    },
+    {
+      "path": "docs/rust-cli/remediation-workflow.zh-CN.md",
+      "sha256_before": "ad194fb50c9e63bb483a88a7a3922f926a59518a4e83c920ce7402272d441355"
+    },
+    {
+      "path": "openspec/changes/introduce-rust-codeguard-cli/implementation-coverage.md",
+      "sha256_before": "777965a15ba590f3dade6bb98a062642135ecec01628a92ba29c49845c396ed7"
+    },
+    {
+      "path": "openspec/changes/introduce-rust-codeguard-cli/.openspec.yaml",
+      "sha256_before": "5a8eaf40454a1d61408caab79d4783ed9c0abb09014c42d96c46ba9a873f4ad0"
+    },
+    {
+      "path": "openspec/changes/introduce-rust-codeguard-cli/tasks.md",
+      "sha256_before": "003cf9022fa0ece12728e7abe557afe728f8098937966637f13bbcc407863cf3"
+    },
+    {
+      "path": "openspec/changes/introduce-rust-codeguard-cli/verification.md",
+      "sha256_before": "825d07d3c50586ab895ce53aaaeb0bf7080d4502078888e55041e08bcd5036b3"
+    },
+    {
+      "path": "openspec/changes/introduce-rust-codeguard-cli/design.md",
+      "sha256_before": "059003aa28839fb62299ea0706fa1b539a756603eff311c02b39bbdad1027014"
+    },
+    {
+      "path": "openspec/changes/introduce-rust-codeguard-cli/proposal.md",
+      "sha256_before": "771cabd6ecb3ea5ea836ec43eda81b84a0c756f7a10629daaf21167be7d4610e"
+    },
+    {
+      "path": "openspec/changes/introduce-rust-codeguard-cli/specs/syntax-precheck/spec.md",
+      "sha256_before": "f5bf7d0a53be5cb1f530b05a355d9f9dd841eaaf4a89878a39458898d2a7b3b0"
+    },
+    {
+      "path": "openspec/changes/introduce-rust-codeguard-cli/specs/execution-kernel/spec.md",
+      "sha256_before": "bed6480d47878b10cebff962c2d3bfc291b459457d8130f4bf3f9f645af23928"
+    },
+    {
+      "path": "openspec/changes/introduce-rust-codeguard-cli/specs/verdict-integrity/spec.md",
+      "sha256_before": "9840888bb97c478066774fe39d3d3ac40363da53df966981a81f6f39fef5bd3b"
+    },
+    {
+      "path": "openspec/changes/introduce-rust-codeguard-cli/specs/binary-distribution/spec.md",
+      "sha256_before": "74d6d9d8cd9c7d3d75b09bb79dccca16b18a3d54518f0c89199ae6275a8ca1d2"
+    },
+    {
+      "path": "openspec/changes/introduce-rust-codeguard-cli/specs/scan-scope-policy/spec.md",
+      "sha256_before": "cb5286043af8425ca60598f3b731211c09f172131a9df02e6761e44692bd90af"
+    },
+    {
+      "path": "openspec/changes/introduce-rust-codeguard-cli/specs/native-tool-adapters/spec.md",
+      "sha256_before": "68dd04548ffa3a4c9e037af265b7b4d5877152e9905c4df09095a3c85798ac32"
+    },
+    {
+      "path": "openspec/changes/introduce-rust-codeguard-cli/specs/language-gate-commands/spec.md",
+      "sha256_before": "95e587c0467aa045e12f8f1914ba814d4cb798551bb9b5f8453d7b3c5acdd437"
+    },
+    {
+      "path": "openspec/changes/introduce-rust-codeguard-cli/specs/remediation-workflow/spec.md",
+      "sha256_before": "b6b2412112ee9a8f1d93585f0d74d556aaec5cd3098e17a6d86b8e8d8111d47e"
+    },
+    {
+      "path": "openspec/changes/introduce-rust-codeguard-cli/specs/rulepack-governance/spec.md",
+      "sha256_before": "c672301002d77837c57e90eda3838a203592594f616c346668c4db534d9ebba7"
+    },
+    {
+      "path": "openspec/changes/introduce-rust-codeguard-cli/specs/unified-cli-contract/spec.md",
+      "sha256_before": "635abcbe1ed2b22d5f6ad53e6f5f5b699dbda54e38d0048815a36be97f31d1d0"
+    },
+    {
+      "path": "openspec/changes/introduce-rust-codeguard-cli/specs/hook-protocol/spec.md",
+      "sha256_before": "f10d1d45f63dc2b210e85d76bdcfa0917a8695e49249bf388e2c7b24e44391cd"
+    },
+    {
+      "path": "openspec/changes/introduce-rust-codeguard-cli/specs/project-initialization/spec.md",
+      "sha256_before": "f8a8312a0e2716ee4f117a32d72a77b54be38f62c399e5975b0d3ab49d678a93"
+    }
+  ]
+}

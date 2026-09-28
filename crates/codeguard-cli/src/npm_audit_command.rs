@@ -56,7 +56,7 @@ pub fn run(args: &[String]) -> ExitCode {
                 Err(_) => {
                     let mut report = feedback("npm_runtime_defaults_invalid");
                     report["next_action"] = json!(
-                        "修正工作区codeguard/runtime.json的版本、类型和预算字段，禁止加入规则排除或白名单；随后重新执行原生审计"
+                        "修正工作区.codeguard/runtime.json的版本、类型和预算字段，禁止加入规则排除或白名单；随后重新执行原生审计"
                     );
                     report
                 }

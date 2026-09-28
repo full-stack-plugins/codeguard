@@ -897,7 +897,7 @@ fn node_flat_configs_are_observed_without_executing_or_claiming_effective_rules(
         assert_eq!(entry["configuration"], "unknown");
         assert_eq!(entry["reason"], "eslint_config_selection_not_resolved");
     }
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
 }
 
 #[test]

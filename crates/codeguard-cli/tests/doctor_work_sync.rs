@@ -35,7 +35,7 @@ impl Project {
         assert_eq!(self.run(&["init"], &["--apply"]).0, 3);
     }
     fn tasks(&self) -> Vec<PathBuf> {
-        fs::read_dir(self.0.join("codeguard/tasks"))
+        fs::read_dir(self.0.join(".codeguard/tasks"))
             .unwrap()
             .map(|e| e.unwrap().path())
             .filter(|p| p.extension().is_some_and(|e| e == "md"))
@@ -62,7 +62,7 @@ fn doctor_failure_is_saved_and_synced_to_one_stable_environment_task() {
             project
                 .0
                 .join(format!(
-                    "codeguard/reports/{}.json",
+                    ".codeguard/reports/{}.json",
                     report["run_id"].as_str().unwrap()
                 ))
                 .exists()
@@ -100,7 +100,7 @@ fn foreign_workspace_or_modified_consumed_report_is_rejected() {
     project.init();
     let report = project.run(&["doctor"], &[]).1;
     let path = project.0.join(format!(
-        "codeguard/reports/{}.json",
+        ".codeguard/reports/{}.json",
         report["run_id"].as_str().unwrap()
     ));
     let mut saved: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
@@ -116,7 +116,7 @@ fn uninitialized_doctor_does_not_initialize_or_persist() {
     let report = project.run(&["doctor"], &[]).1;
     assert_eq!(report["workspace_binding"], "uninitialized");
     assert_eq!(report["persistence"], "not_saved");
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
 }
 
 #[test]
@@ -138,7 +138,7 @@ fn changing_diagnostic_reason_keeps_task_identity_and_each_observation() {
     assert_eq!(project.tasks(), tasks);
     let id = tasks[0].file_stem().unwrap();
     let observations =
-        fs::read_dir(project.0.join("codeguard/state/observations").join(id)).unwrap();
+        fs::read_dir(project.0.join(".codeguard/state/observations").join(id)).unwrap();
     let mut reasons: Vec<String> = observations
         .map(|entry| {
             let value: Value =
@@ -163,14 +163,14 @@ fn fake_authority_and_unknown_fields_in_new_reports_are_rejected() {
         project.init();
         let report = project.run(&["doctor"], &[]).1;
         let old = project.0.join(format!(
-            "codeguard/reports/{}.json",
+            ".codeguard/reports/{}.json",
             report["run_id"].as_str().unwrap()
         ));
         let mut saved: Value = serde_json::from_slice(&fs::read(old).unwrap()).unwrap();
         saved["run_id"] = "doctor-123-456-789".into();
         saved[field] = value;
         fs::write(
-            project.0.join("codeguard/reports/doctor-123-456-789.json"),
+            project.0.join(".codeguard/reports/doctor-123-456-789.json"),
             serde_json::to_vec(&saved).unwrap(),
         )
         .unwrap();
@@ -184,8 +184,8 @@ fn report_directory_link_is_not_followed_and_failure_is_visible() {
     let project = Project::new();
     let outside = Project::new();
     project.init();
-    fs::remove_dir(project.0.join("codeguard/reports")).unwrap();
-    std::os::unix::fs::symlink(&outside.0, project.0.join("codeguard/reports")).unwrap();
+    fs::remove_dir(project.0.join(".codeguard/reports")).unwrap();
+    std::os::unix::fs::symlink(&outside.0, project.0.join(".codeguard/reports")).unwrap();
     let report = project.run(&["doctor"], &[]).1;
     assert_eq!(report["persistence"], "backlog_update_failed");
     assert_eq!(report["ruff_version"]["status"], "not_selected");
@@ -312,7 +312,7 @@ fn task_verify_real_doctor_recovery_is_recorded_without_closure() {
         &fs::read(
             project
                 .0
-                .join(format!("codeguard/findings/{id}/finding.json")),
+                .join(format!(".codeguard/findings/{id}/finding.json")),
         )
         .unwrap(),
     )

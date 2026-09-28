@@ -47,7 +47,7 @@ impl Project {
     }
 
     fn task_id(&self) -> String {
-        let ids = fs::read_dir(self.0.join("codeguard/tasks"))
+        let ids = fs::read_dir(self.0.join(".codeguard/tasks"))
             .unwrap()
             .map(|entry| {
                 entry
@@ -162,7 +162,7 @@ fn environment_blocker_cannot_become_false_positive_candidate() {
     assert!(report["candidate"].is_null());
     assert_eq!(report["gate_effect"], "none");
     assert_eq!(
-        fs::read_dir(project.0.join("codeguard/decisions"))
+        fs::read_dir(project.0.join(".codeguard/decisions"))
             .unwrap()
             .count(),
         0
@@ -177,7 +177,7 @@ fn missing_task_does_not_produce_candidate() {
     assert!(report["candidate"].is_null());
     assert_eq!(report["gate_effect"], "none");
     assert_eq!(
-        fs::read_dir(project.0.join("codeguard/decisions"))
+        fs::read_dir(project.0.join(".codeguard/decisions"))
             .unwrap()
             .count(),
         0
@@ -316,7 +316,7 @@ fn correction_preview_requires_current_original_checker_receipt_and_never_self_a
     assert_eq!(recorded["proposal"], report["proposal"]);
     let reference = recorded["record_ref"].as_str().unwrap();
     assert!(reference.starts_with(&format!(
-        "codeguard/findings/{id}/events/correction-proposed-"
+        ".codeguard/findings/{id}/events/correction-proposed-"
     )));
     let event_path = project.0.join(reference);
     let first_bytes = fs::read(&event_path).unwrap();
@@ -435,7 +435,7 @@ fn correction_preview_requires_current_original_checker_receipt_and_never_self_a
     assert_eq!(escaped["status"], "replacement_scope_mismatch");
     assert!(escaped["proposal"].is_null());
     assert_eq!(
-        fs::read_dir(project.0.join("codeguard/decisions"))
+        fs::read_dir(project.0.join(".codeguard/decisions"))
             .unwrap()
             .count(),
         0
@@ -474,7 +474,7 @@ fn correction_preview_requires_current_original_checker_receipt_and_never_self_a
     assert!(stale_recorded["proposal"].is_null());
     assert!(stale_recorded.get("record_ref").is_none());
     assert_eq!(
-        fs::read_dir(project.0.join(format!("codeguard/findings/{id}/events")))
+        fs::read_dir(project.0.join(format!(".codeguard/findings/{id}/events")))
             .unwrap()
             .filter(|entry| entry
                 .as_ref()
@@ -566,18 +566,18 @@ fn native_finding_binds_current_adapter_but_never_self_approves() {
             .contains(&Value::String("approved_rulepack_identity".into()))
     );
     assert_eq!(
-        fs::read_dir(project.0.join("codeguard/decisions"))
+        fs::read_dir(project.0.join(".codeguard/decisions"))
             .unwrap()
             .count(),
         0
     );
 
     let run_id = report["observed_artifacts"]["run_id"].as_str().unwrap();
-    let original_path = project.0.join(format!("codeguard/reports/{run_id}.json"));
+    let original_path = project.0.join(format!(".codeguard/reports/{run_id}.json"));
     let original_report = fs::read(&original_path).unwrap();
     let marker_path = project
         .0
-        .join(format!("codeguard/state/consumed/{run_id}.json"));
+        .join(format!(".codeguard/state/consumed/{run_id}.json"));
     let original_marker = fs::read(&marker_path).unwrap();
     let mut tampered: Value = serde_json::from_slice(&original_report).unwrap();
     tampered["adapter_sha256"] = json!("1".repeat(64));
@@ -596,11 +596,11 @@ fn native_finding_binds_current_adapter_but_never_self_approves() {
     let (prefix, nanos) = run_id.rsplit_once('-').unwrap();
     let later = format!("{prefix}-{}", nanos.parse::<u128>().unwrap() + 1);
     let mut unconsumed: Value = serde_json::from_slice(
-        &fs::read(project.0.join(format!("codeguard/reports/{run_id}.json"))).unwrap(),
+        &fs::read(project.0.join(format!(".codeguard/reports/{run_id}.json"))).unwrap(),
     )
     .unwrap();
     unconsumed["run_id"] = Value::String(later.clone());
-    let unconsumed_path = project.0.join(format!("codeguard/reports/{later}.json"));
+    let unconsumed_path = project.0.join(format!(".codeguard/reports/{later}.json"));
     fs::write(&unconsumed_path, serde_json::to_vec(&unconsumed).unwrap()).unwrap();
     let (_, pending) = project.propose(&id);
     assert_eq!(pending["status"], "latest_report_not_synced");

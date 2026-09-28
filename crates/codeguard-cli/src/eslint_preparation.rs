@@ -189,7 +189,7 @@ pub(crate) fn guidance(root: &Path, fact: &Value) -> Value {
         return fallback;
     };
     let workspace = fact["workspace_id"].as_str().unwrap_or("");
-    let Ok(entries) = std::fs::read_dir(root.join("codeguard/reports")) else {
+    let Ok(entries) = std::fs::read_dir(root.join(".codeguard/reports")) else {
         return fallback;
     };
     let mut latest = None;
@@ -255,7 +255,7 @@ pub(crate) fn guidance(root: &Path, fact: &Value) -> Value {
     let sha = format!("{:x}", Sha256::digest(bytes));
     let receipt = read_bounded_regular_file(
         &root
-            .join("codeguard/state/consumed")
+            .join(".codeguard/state/consumed")
             .join(format!("{run}.json")),
         4096,
     )

@@ -18,15 +18,15 @@ use crate::workspace_refresh::{WorkspaceBaseline, read_workspace_baseline};
 
 static NEXT_TEMP: AtomicU64 = AtomicU64::new(0);
 const DIRECTORIES: &[&str] = &[
-    "codeguard",
-    "codeguard/findings",
-    "codeguard/tasks",
-    "codeguard/decisions",
-    "codeguard/reports",
-    "codeguard/runs",
-    "codeguard/cache",
-    "codeguard/worktrees",
-    "codeguard/state",
+    ".codeguard",
+    ".codeguard/findings",
+    ".codeguard/tasks",
+    ".codeguard/decisions",
+    ".codeguard/reports",
+    ".codeguard/runs",
+    ".codeguard/cache",
+    ".codeguard/worktrees",
+    ".codeguard/state",
 ];
 
 struct Arguments {
@@ -90,11 +90,11 @@ pub fn run(args: &[String]) -> ExitCode {
         .map(|baseline| {
             let project = files
                 .iter()
-                .find(|item| item.relative == "codeguard/project.json")
+                .find(|item| item.relative == ".codeguard/project.json")
                 .expect("固定画像");
             let graph = files
                 .iter()
-                .find(|item| item.relative == "codeguard/module-graph.json")
+                .find(|item| item.relative == ".codeguard/module-graph.json")
                 .expect("固定模块图");
             baseline.profile_stale(
                 &format!("{:x}", Sha256::digest(&project.bytes)),
@@ -103,12 +103,20 @@ pub fn run(args: &[String]) -> ExitCode {
         });
     let mut planned_files: Vec<_> = files.iter().map(|item| item.relative).collect();
     planned_files.push("AGENTS.md");
+    let legacy_workspace = baseline
+        .as_ref()
+        .err()
+        .is_some_and(|error| error == "legacy_workspace_requires_manual_migration");
     let (status, changed_files, changed_directories, conflict_file) = if baseline.is_err() {
         (
             "conflict",
             Vec::new(),
             Vec::new(),
-            Some("codeguard/workspace.json".into()),
+            Some(if legacy_workspace {
+                "codeguard/workspace.json".into()
+            } else {
+                ".codeguard/workspace.json".into()
+            }),
         )
     } else if parsed.apply {
         match apply_files(
@@ -140,6 +148,10 @@ pub fn run(args: &[String]) -> ExitCode {
     if conflict_file.is_some() {
         unresolved.push("managed_file_conflict");
     }
+    if legacy_workspace {
+        unresolved.push("legacy_workspace_requires_manual_migration");
+    }
+    let has_conflict = conflict_file.is_some();
     let report = json!({
         "schema_version":"0.5.0",
         "report_type":"init_plan",
@@ -171,7 +183,7 @@ pub fn run(args: &[String]) -> ExitCode {
             println!("冲突：{}", json!(path));
         }
     }
-    if parsed.apply {
+    if parsed.apply || has_conflict {
         ExitCode::from(3)
     } else {
         ExitCode::SUCCESS
@@ -227,17 +239,17 @@ fn plan_files(discovery: &DiscoveryReport, workspace_id: &str) -> (Vec<PlannedFi
     let agents_block =
         render_project_context(&project_sha256, &module_graph_sha256, &project, &graph);
     let mut files = vec![
-        planned("codeguard/.gitignore", b"/reports/\n/runs/\n/cache/\n/worktrees/\n/state/\n".to_vec()),
-        planned("codeguard/README.md", "# Codeguard 工作区\n\nproject.json 与 module-graph.json 是静态观察结果，不是批准质量策略。findings/、tasks/ 和 decisions/ 保存可审查的工作记录；reports/、runs/、cache/、worktrees/、state/ 为本地数据。任务清空不代表质量通过，修复须经原检查器复检。\n".as_bytes().to_vec()),
-        planned("codeguard/project.json", project_bytes),
-        planned("codeguard/module-graph.json", graph_bytes),
-        planned("codeguard/architecture.md", "# 项目架构观察\n\n当前架构状态：unknown。静态清单与源码目录不足以确认 MVC、DDD 或其它架构规则；不据此启用阻断。\n\n- 项目画像：[project.json](project.json)\n- 模块关系：[module-graph.json](module-graph.json)\n- 模块依赖：见图中的直接声明及 unresolved；源码引用：unresolved。\n".as_bytes().to_vec()),
+        planned(".codeguard/.gitignore", b"/reports/\n/runs/\n/cache/\n/worktrees/\n/state/\n".to_vec()),
+        planned(".codeguard/README.md", "# Codeguard 工作区\n\nproject.json 与 module-graph.json 是静态观察结果，不是批准质量策略。findings/、tasks/ 和 decisions/ 保存可审查的工作记录；reports/、runs/、cache/、worktrees/、state/ 为本地数据。任务清空不代表质量通过，修复须经原检查器复检。\n".as_bytes().to_vec()),
+        planned(".codeguard/project.json", project_bytes),
+        planned(".codeguard/module-graph.json", graph_bytes),
+        planned(".codeguard/architecture.md", "# 项目架构观察\n\n当前架构状态：unknown。静态清单与源码目录不足以确认 MVC、DDD 或其它架构规则；不据此启用阻断。\n\n- 项目画像：[project.json](project.json)\n- 模块关系：[module-graph.json](module-graph.json)\n- 模块依赖：见图中的直接声明及 unresolved；源码引用：unresolved。\n".as_bytes().to_vec()),
     ];
     let managed_sha256: BTreeMap<_, _> = files
         .iter()
         .map(|file| {
             (
-                file.relative.strip_prefix("codeguard/").expect("固定路径"),
+                file.relative.strip_prefix(".codeguard/").expect("固定路径"),
                 format!("{:x}", Sha256::digest(&file.bytes)),
             )
         })
@@ -255,7 +267,10 @@ fn plan_files(discovery: &DiscoveryReport, workspace_id: &str) -> (Vec<PlannedFi
         "workflow_status":"initialization_partial",
         "quality_gate":"not_evaluated"
     });
-    files.push(planned("codeguard/workspace.json", pretty_json(&workspace)));
+    files.push(planned(
+        ".codeguard/workspace.json",
+        pretty_json(&workspace),
+    ));
     (files, agents_block)
 }
 
@@ -286,10 +301,10 @@ fn apply_files(
         baseline.map(WorkspaceBaseline::agents_block_sha256),
     )
     .map_err(|_| (Vec::new(), Vec::new(), "AGENTS.md".into()))?;
-    let workspace = root.join("codeguard");
+    let workspace = root.join(".codeguard");
     if let Ok(metadata) = fs::symlink_metadata(&workspace) {
         if !metadata.file_type().is_dir() {
-            return Err((Vec::new(), Vec::new(), "codeguard".into()));
+            return Err((Vec::new(), Vec::new(), ".codeguard".into()));
         }
     }
     for item in files {
@@ -324,7 +339,7 @@ fn apply_files(
     let mut changed = Vec::new();
     for item in files
         .iter()
-        .filter(|item| item.relative != "codeguard/workspace.json")
+        .filter(|item| item.relative != ".codeguard/workspace.json")
     {
         let target = root.join(item.relative);
         let status = match existing_file_status(&target, item, baseline) {
@@ -344,7 +359,7 @@ fn apply_files(
     }
     let item = files
         .iter()
-        .find(|item| item.relative == "codeguard/workspace.json")
+        .find(|item| item.relative == ".codeguard/workspace.json")
         .expect("固定工作区文档");
     let target = root.join(item.relative);
     let status = match existing_file_status(&target, item, baseline) {
@@ -370,7 +385,7 @@ fn existing_file_status(
             let bytes = fs::read(path).map_err(|_| "受管文件不可读取")?;
             if bytes == item.bytes {
                 Ok(ExistingFile::Current)
-            } else if (item.relative == "codeguard/workspace.json"
+            } else if (item.relative == ".codeguard/workspace.json"
                 && baseline.is_some_and(|old| old.bytes() == bytes))
                 || baseline
                     .and_then(|old| old.managed_digest(item.relative))

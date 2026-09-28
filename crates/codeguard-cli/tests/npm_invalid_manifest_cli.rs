@@ -99,7 +99,7 @@ fn malformed_manifest_stops_native_launch_and_enters_the_same_repair_task() {
         assert_eq!(report["local_coherent"], false);
         assert!(!marker.exists());
         assert_eq!(
-            fs::read_dir(root.join("codeguard/tasks")).unwrap().count(),
+            fs::read_dir(root.join(".codeguard/tasks")).unwrap().count(),
             1
         );
     }
@@ -143,14 +143,14 @@ fn malformed_manifest_stops_native_launch_and_enters_the_same_repair_task() {
         Sha256::digest(fs::read(root.join("package.json")).unwrap())
     ));
     fs::write(
-        root.join("codeguard/reports/npm-fake-manifest-invalid.json"),
+        root.join(".codeguard/reports/npm-fake-manifest-invalid.json"),
         forged.to_string(),
     )
     .unwrap();
     let (_, synced) = execute(&["work", "sync", root.to_str().unwrap(), "--format", "json"]);
     assert_eq!(synced["failed_reports"], 1, "{synced}");
     assert_eq!(
-        fs::read_dir(root.join("codeguard/tasks")).unwrap().count(),
+        fs::read_dir(root.join(".codeguard/tasks")).unwrap().count(),
         1
     );
 }

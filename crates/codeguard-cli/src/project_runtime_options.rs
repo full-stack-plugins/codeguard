@@ -37,7 +37,7 @@ pub(crate) fn read_project_timeout(root: &Path) -> Result<Option<u64>, String> {
 
 /// 读取并严格校验同一版本化项目预算文件；质量策略字段一律拒绝。
 pub(crate) fn read_project_runtime(root: &Path) -> Result<Option<ProjectRuntimeBudget>, String> {
-    let directory = root.join("codeguard");
+    let directory = root.join(".codeguard");
     let metadata = match fs::symlink_metadata(&directory) {
         Ok(metadata) => metadata,
         Err(error) if error.kind() == ErrorKind::NotFound => return Ok(None),

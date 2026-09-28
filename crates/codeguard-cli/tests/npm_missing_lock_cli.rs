@@ -101,7 +101,7 @@ fn missing_lock_is_a_stable_preparation_task_and_changes_invalidate_its_receipt(
     assert_eq!(report["reason"], "npm_execution_context_missing");
     assert_eq!(report["workbench"]["new_blockers"], 0);
     assert_eq!(
-        fs::read_dir(fixture.0.join("codeguard/tasks"))
+        fs::read_dir(fixture.0.join(".codeguard/tasks"))
             .unwrap()
             .count(),
         1
@@ -125,7 +125,7 @@ fn missing_lock_is_a_stable_preparation_task_and_changes_invalidate_its_receipt(
         fs::write(
             fixture
                 .0
-                .join(format!("codeguard/reports/npm-forged-{i}.json")),
+                .join(format!(".codeguard/reports/npm-forged-{i}.json")),
             forged.to_string(),
         )
         .unwrap();
@@ -135,14 +135,14 @@ fn missing_lock_is_a_stable_preparation_task_and_changes_invalidate_its_receipt(
     fs::write(
         fixture
             .0
-            .join("codeguard/reports/npm-stale-missing-lock.json"),
+            .join(".codeguard/reports/npm-stale-missing-lock.json"),
         stale.to_string(),
     )
     .unwrap();
     let (_, synced) = run(&["work", "sync", path, "--format", "json"]);
     assert_eq!(synced["failed_reports"], 5, "{synced}");
     assert_eq!(
-        fs::read_dir(fixture.0.join("codeguard/tasks"))
+        fs::read_dir(fixture.0.join(".codeguard/tasks"))
             .unwrap()
             .count(),
         1

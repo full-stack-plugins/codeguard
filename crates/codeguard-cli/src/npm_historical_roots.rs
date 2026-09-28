@@ -16,14 +16,14 @@ pub(crate) fn collect(root: &Path) -> Result<Vec<String>, &'static str> {
     if baseline.workspace_id().is_none() {
         return Ok(Vec::new());
     }
-    let path = root.join("codeguard/project.json");
+    let path = root.join(".codeguard/project.json");
     if path.canonicalize().ok().as_ref() != Some(&path) {
         return Err("historical_npm_profile_path_invalid");
     }
     let bytes = read_bounded_regular_file(&path, 4 * 1024 * 1024)
         .map_err(|_| "historical_npm_profile_unavailable")?;
     let hash = format!("{:x}", Sha256::digest(&bytes));
-    if baseline.managed_digest("codeguard/project.json") != Some(hash.as_str()) {
+    if baseline.managed_digest(".codeguard/project.json") != Some(hash.as_str()) {
         return Err("historical_npm_profile_changed");
     }
     let profile = codeguard_adapters::parse_unique_json(&bytes)

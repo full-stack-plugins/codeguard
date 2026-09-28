@@ -122,7 +122,7 @@ printf '[INFO] --- dependency-check:12.1.0:check (default-cli) @ app ---\n[INFO]
         report["native_results"]["java_cve"]["backlog_status"],
         "synced_partial"
     );
-    let blockers: Vec<_> = fs::read_dir(project.0.join("codeguard/findings"))
+    let blockers: Vec<_> = fs::read_dir(project.0.join(".codeguard/findings"))
         .unwrap()
         .map(|entry| {
             let path = entry.unwrap().path().join("finding.json");
@@ -171,7 +171,7 @@ printf '[INFO] --- dependency-check:12.1.0:check (default-cli) @ app ---\n[INFO]
     assert_eq!(verify["event_persisted"], true, "{verify}");
     assert_eq!(verify["reason"], Value::Null);
     let task = fs::read_to_string(project.0.join(format!(
-        "codeguard/tasks/{}.md",
+        ".codeguard/tasks/{}.md",
         blockers[0]["id"].as_str().unwrap()
     )))
     .unwrap();
@@ -248,7 +248,7 @@ printf '[INFO] --- dependency-check:12.1.0:check (default-cli) @ app ---\n[INFO]
         mixed["native_results"]["java_cve"]["observed_report_count"],
         1
     );
-    let repeated_database_blockers = fs::read_dir(project.0.join("codeguard/findings"))
+    let repeated_database_blockers = fs::read_dir(project.0.join(".codeguard/findings"))
         .unwrap()
         .map(|entry| {
             let path = entry.unwrap().path().join("finding.json");
@@ -319,7 +319,7 @@ fn missing_database_keeps_configured_checker_incomplete_before_native_start() {
         report["native_results"]["java_cve"]["backlog_status"],
         "synced_partial"
     );
-    let facts: Vec<_> = fs::read_dir(project.0.join("codeguard/findings"))
+    let facts: Vec<_> = fs::read_dir(project.0.join(".codeguard/findings"))
         .unwrap()
         .map(|entry| {
             let path = entry.unwrap().path().join("finding.json");
@@ -334,7 +334,7 @@ fn missing_database_keeps_configured_checker_incomplete_before_native_start() {
     let run_id = report["native_results"]["java_cve"]["run_id"]
         .as_str()
         .unwrap();
-    let local_report = project.0.join(format!("codeguard/reports/{run_id}.json"));
+    let local_report = project.0.join(format!(".codeguard/reports/{run_id}.json"));
     let bytes = fs::read_to_string(&local_report).unwrap();
     fs::write(&local_report, bytes.replace("\"unverified\"", "\"fresh\"")).unwrap();
     let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
@@ -380,7 +380,7 @@ fn cve_blocker_verify_uses_original_checker_and_keeps_task_open() {
         &fs::read(
             project
                 .0
-                .join(format!("codeguard/findings/{id}/finding.json")),
+                .join(format!(".codeguard/findings/{id}/finding.json")),
         )
         .unwrap(),
     )
@@ -408,7 +408,7 @@ fn repeated_cve_blocker_scans_keep_local_evidence_without_tracked_event_noise() 
     let id = first["native_results"]["java_cve"]["next"]["repair_brief"]["task_id"]
         .as_str()
         .unwrap();
-    let events = project.0.join(format!("codeguard/findings/{id}/events"));
+    let events = project.0.join(format!(".codeguard/findings/{id}/events"));
     assert_eq!(fs::read_dir(&events).unwrap().count(), 1);
     let (_, repeated) = project.check(&[]);
     let run_id = repeated["native_results"]["java_cve"]["run_id"]
@@ -417,7 +417,7 @@ fn repeated_cve_blocker_scans_keep_local_evidence_without_tracked_event_noise() 
     assert_eq!(fs::read_dir(&events).unwrap().count(), 1);
     let observation = project
         .0
-        .join(format!("codeguard/state/observations/{id}/{run_id}.json"));
+        .join(format!(".codeguard/state/observations/{id}/{run_id}.json"));
     let observation: Value = serde_json::from_slice(&fs::read(observation).unwrap()).unwrap();
     assert_eq!(observation["record_type"], "local_blocker_observation");
     assert_eq!(observation["blocker_id"], id);

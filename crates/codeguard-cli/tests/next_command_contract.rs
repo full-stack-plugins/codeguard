@@ -62,7 +62,7 @@ impl Project {
 
     fn workspace_id(&self) -> String {
         let value: Value =
-            serde_json::from_slice(&fs::read(self.0.join("codeguard/workspace.json")).unwrap())
+            serde_json::from_slice(&fs::read(self.0.join(".codeguard/workspace.json")).unwrap())
                 .unwrap();
         value["workspace_id"].as_str().unwrap().into()
     }
@@ -88,7 +88,7 @@ impl Project {
             }]
         });
         fs::write(
-            self.0.join("codeguard/reports/run-finding.json"),
+            self.0.join(".codeguard/reports/run-finding.json"),
             serde_json::to_vec_pretty(&report).unwrap(),
         )
         .unwrap();
@@ -103,6 +103,23 @@ impl Project {
         let report: Value = serde_json::from_slice(&output.stdout).unwrap();
         assert_eq!(report["failed_reports"], 0);
     }
+}
+
+#[test]
+fn legacy_workspace_requires_migration_instead_of_recommending_a_second_init() {
+    let project = Project::new();
+    fs::create_dir(project.0.join("codeguard")).unwrap();
+    fs::write(
+        project.0.join("codeguard/workspace.json"),
+        r#"{"document_type":"codeguard_workspace"}"#,
+    )
+    .unwrap();
+    let (exit, report) = project.next();
+    assert_eq!(exit, 3);
+    assert_eq!(
+        report["reason"],
+        "legacy_workspace_requires_manual_migration"
+    );
 }
 
 impl Drop for Project {
@@ -152,7 +169,7 @@ fn missing_config_returns_bounded_decision_brief_without_trusting_task_text() {
     project.init();
     let report = project.lint(None);
     assert_eq!(report["backlog_sync"]["new_blockers"], 1);
-    let task = fs::read_dir(project.0.join("codeguard/tasks"))
+    let task = fs::read_dir(project.0.join(".codeguard/tasks"))
         .unwrap()
         .next()
         .unwrap()
@@ -187,7 +204,7 @@ fn tool_blocker_precedes_source_finding_and_stale_source_requires_recheck() {
     fs::remove_file(
         project
             .0
-            .join(format!("codeguard/findings/{blocker_id}/finding.json")),
+            .join(format!(".codeguard/findings/{blocker_id}/finding.json")),
     )
     .unwrap();
     let (exit, invalid) = project.next();

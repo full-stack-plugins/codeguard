@@ -62,7 +62,7 @@ pub(crate) fn run(args: &[String]) -> ExitCode {
 
 fn record(args: &Args) -> Result<Value, &'static str> {
     let root = args.root.canonicalize().map_err(|_| "project_unreadable")?;
-    let state = root.join("codeguard/state");
+    let state = root.join(".codeguard/state");
     if !real_directory(&state) {
         return Err("workspace_state_unavailable");
     }
@@ -76,7 +76,7 @@ fn record(args: &Args) -> Result<Value, &'static str> {
         return Err("correction_evidence_changed");
     }
     let events = root
-        .join("codeguard/findings")
+        .join(".codeguard/findings")
         .join(&args.finding_id)
         .join("events");
     if !real_directory(&events) {
@@ -93,18 +93,18 @@ fn record(args: &Args) -> Result<Value, &'static str> {
     let digest = format!("{:x}", Sha256::digest(&bytes));
     let name = format!("correction-proposed-{digest}.json");
     write_once(&events.join(&name), &bytes, &state).map_err(|_| "correction_record_failed")?;
-    let reference = format!("codeguard/findings/{}/events/{name}", args.finding_id);
+    let reference = format!(".codeguard/findings/{}/events/{name}", args.finding_id);
     current["record_ref"] = json!(reference);
     // 事件为事实源，附件失败保留事件引用；同一提案可重试重建且不覆盖用户编辑。
     let projection_ref = format!(
-        "codeguard/tasks/corrections/{}/{}.md",
+        ".codeguard/tasks/corrections/{}/{}.md",
         args.finding_id, digest
     );
     let result = (|| {
         let brief = read_task_brief(&root, &args.finding_id)?;
         let projection =
             crate::whitelist_correction_projection::render(&current, &reference, &brief);
-        let tasks = root.join("codeguard/tasks");
+        let tasks = root.join(".codeguard/tasks");
         if !real_directory(&tasks) {
             return Err("task_directory_unavailable");
         }

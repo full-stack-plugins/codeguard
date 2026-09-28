@@ -134,7 +134,7 @@ pub(super) fn parse(
                 diagnostic_reason: Some(reason.into()),
                 build_root: ".".into(),
                 scope: ".".into(),
-                affected_paths: vec!["codeguard/workspace.json".into()],
+                affected_paths: vec![".codeguard/workspace.json".into()],
             });
         }
         _ => return Err("doctor_diagnosis_inconsistent"),

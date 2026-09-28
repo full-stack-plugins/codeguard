@@ -216,9 +216,9 @@ fn jobs_limit_uses_cli_environment_project_and_builtin_priority() {
     .unwrap();
     fs::create_dir(project.0.join("src")).unwrap();
     fs::write(project.0.join("src/lib.rs"), "pub fn sample() {}\n").unwrap();
-    fs::create_dir(project.0.join("codeguard")).unwrap();
+    fs::create_dir(project.0.join(".codeguard")).unwrap();
     fs::write(
-        project.0.join("codeguard/runtime.json"),
+        project.0.join(".codeguard/runtime.json"),
         r#"{"schema_version":"1.1","document_type":"codeguard_runtime_options","timeout":"30s","jobs":3}"#,
     )
     .unwrap();
@@ -243,7 +243,7 @@ fn jobs_limit_uses_cli_environment_project_and_builtin_priority() {
     assert_eq!(cli["execution_budget"]["jobs_source"], "cli");
 
     fs::write(
-        project.0.join("codeguard/runtime.json"),
+        project.0.join(".codeguard/runtime.json"),
         r#"{"schema_version":"1.1","document_type":"codeguard_runtime_options","timeout":"30s","jobs":0}"#,
     )
     .unwrap();
@@ -410,7 +410,7 @@ fn checker_configuration_change_is_a_scope_gap_but_managed_records_are_not() {
         fs::write(project.0.join("app.py"), "import os\n").unwrap();
         let configuration = project.0.join("ruff.toml");
         fs::write(&configuration, "[lint]\nselect = ['F401']\n").unwrap();
-        let managed = project.0.join("codeguard/state/native-observed");
+        let managed = project.0.join(".codeguard/state/native-observed");
         let action = if changes_configuration {
             format!(
                 "printf '[lint]\\nselect = [\\\"E501\\\"]\\n' > '{}'",
@@ -521,7 +521,7 @@ fn rust_only_project_keeps_categories_as_candidates_without_inventing_policy_obl
             .iter()
             .any(|item| item["language"] == "rust" && item["category"] == "lint")
     );
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
 }
 
 #[test]
@@ -678,9 +678,9 @@ fn versioned_project_runtime_default_has_lower_priority_than_env_and_cli() {
     .unwrap();
     fs::create_dir(project.0.join("src")).unwrap();
     fs::write(project.0.join("src/lib.rs"), "pub fn sample() {}\n").unwrap();
-    fs::create_dir(project.0.join("codeguard")).unwrap();
+    fs::create_dir(project.0.join(".codeguard")).unwrap();
     fs::write(
-        project.0.join("codeguard/runtime.json"),
+        project.0.join(".codeguard/runtime.json"),
         r#"{"schema_version":"1.0","document_type":"codeguard_runtime_options","timeout":"250ms"}"#,
     )
     .unwrap();
@@ -707,7 +707,7 @@ fn versioned_project_runtime_default_has_lower_priority_than_env_and_cli() {
     assert_eq!(cli["execution_budget"]["source"], "cli");
 
     fs::write(
-        project.0.join("codeguard/runtime.json"),
+        project.0.join(".codeguard/runtime.json"),
         r#"{"schema_version":"1.0","document_type":"codeguard_runtime_options","timeout":"0ms"}"#,
     )
     .unwrap();
@@ -732,13 +732,13 @@ fn malformed_or_linked_project_runtime_default_is_rejected_before_native_executi
     let project = Project::new();
     fs::write(project.0.join("app.py"), "import os\n").unwrap();
     fs::write(project.0.join("ruff.toml"), "[lint]\nselect = ['F401']\n").unwrap();
-    fs::create_dir(project.0.join("codeguard")).unwrap();
+    fs::create_dir(project.0.join(".codeguard")).unwrap();
     let marker = project.0.join("native-started");
     let tool = project.0.join("ruff");
     fs::write(&tool, format!("#!/bin/sh\ntouch '{}'\n", marker.display())).unwrap();
     use std::os::unix::fs::PermissionsExt;
     fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
-    let runtime = project.0.join("codeguard/runtime.json");
+    let runtime = project.0.join(".codeguard/runtime.json");
     for content in [
         r#"{"schema_version":"1.0","document_type":"codeguard_runtime_options","timeout":"0ms"}"#,
         r#"{"schema_version":"2.0","document_type":"codeguard_runtime_options","timeout":"1s"}"#,
@@ -793,7 +793,7 @@ fn malformed_or_linked_project_runtime_default_is_rejected_before_native_executi
     assert_eq!(output.status.code(), Some(2));
     assert!(!marker.exists());
     fs::remove_file(&runtime).unwrap();
-    fs::remove_dir(project.0.join("codeguard")).unwrap();
+    fs::remove_dir(project.0.join(".codeguard")).unwrap();
     let alternate = project.0.join("elsewhere");
     fs::create_dir(&alternate).unwrap();
     fs::write(
@@ -801,7 +801,7 @@ fn malformed_or_linked_project_runtime_default_is_rejected_before_native_executi
         r#"{"schema_version":"1.0","document_type":"codeguard_runtime_options","timeout":"1s"}"#,
     )
     .unwrap();
-    std::os::unix::fs::symlink(&alternate, project.0.join("codeguard")).unwrap();
+    std::os::unix::fs::symlink(&alternate, project.0.join(".codeguard")).unwrap();
     let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
         .args([
             "check",
@@ -990,9 +990,9 @@ fn original_ruff_finding_survives_check_all_partial_result() {
     let project = Project::new();
     fs::write(project.0.join("app.py"), "import os\n").unwrap();
     fs::write(project.0.join("ruff.toml"), "[lint]\nselect = ['F401']\n").unwrap();
-    fs::create_dir(project.0.join("codeguard")).unwrap();
+    fs::create_dir(project.0.join(".codeguard")).unwrap();
     fs::write(
-        project.0.join("codeguard/runtime.json"),
+        project.0.join(".codeguard/runtime.json"),
         r#"{"schema_version":"1.0","document_type":"codeguard_runtime_options","timeout":"30s"}"#,
     )
     .unwrap();

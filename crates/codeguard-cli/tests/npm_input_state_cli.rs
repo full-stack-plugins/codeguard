@@ -81,7 +81,7 @@ fn unavailable_inputs_produce_stable_tasks_and_verification_history_without_fake
         assert!(verify["native_scan"]["manifest_sha256"].is_null());
         last_verify = verify["native_scan"].clone();
         assert_eq!(
-            fs::read_dir(root.join("codeguard/tasks")).unwrap().count(),
+            fs::read_dir(root.join(".codeguard/tasks")).unwrap().count(),
             1
         );
         if state == "not_regular" {
@@ -114,21 +114,21 @@ fn unavailable_inputs_produce_stable_tasks_and_verification_history_without_fake
         bad["run_id"] = serde_json::json!(format!("npm-bad-input-{i}"));
         bad[key] = value;
         fs::write(
-            root.join(format!("codeguard/reports/npm-bad-input-{i}.json")),
+            root.join(format!(".codeguard/reports/npm-bad-input-{i}.json")),
             bad.to_string(),
         )
         .unwrap();
     }
     last_verify["run_id"] = serde_json::json!("npm-stale-input");
     fs::write(
-        root.join("codeguard/reports/npm-stale-input.json"),
+        root.join(".codeguard/reports/npm-stale-input.json"),
         last_verify.to_string(),
     )
     .unwrap();
     let (_, synced) = run(&["work", "sync", path, "--format", "json"]);
     assert_eq!(synced["failed_reports"], 7, "{synced}");
     assert_eq!(
-        fs::read_dir(root.join("codeguard/tasks")).unwrap().count(),
+        fs::read_dir(root.join(".codeguard/tasks")).unwrap().count(),
         1
     );
     assert!(!root.join("node_modules").exists());

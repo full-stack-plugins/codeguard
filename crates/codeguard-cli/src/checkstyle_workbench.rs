@@ -134,8 +134,8 @@ pub(crate) fn task_guidance(
     id: &str,
     workspace_id: &str,
 ) -> Result<Value, &'static str> {
-    let directory = root.join("codeguard/state/observations").join(id);
-    for path in [&root.join("codeguard/state/observations"), &directory] {
+    let directory = root.join(".codeguard/state/observations").join(id);
+    for path in [&root.join(".codeguard/state/observations"), &directory] {
         if !std::fs::symlink_metadata(path).is_ok_and(|m| m.file_type().is_dir()) {
             return Err("checkstyle_observations_unavailable");
         }
@@ -172,7 +172,7 @@ pub(crate) fn task_guidance(
         .as_str()
         .ok_or("checkstyle_observation_invalid")?;
     let bytes = read_bounded_regular_file(
-        &root.join("codeguard/reports").join(format!("{run}.json")),
+        &root.join(".codeguard/reports").join(format!("{run}.json")),
         16 * 1024 * 1024,
     )
     .map_err(|_| "checkstyle_report_unavailable")?;
@@ -201,7 +201,7 @@ pub(crate) fn task_guidance(
     let fact: Value = serde_json::from_slice(
         &read_bounded_regular_file(
             &root
-                .join("codeguard/findings")
+                .join(".codeguard/findings")
                 .join(id)
                 .join("finding.json"),
             128 * 1024,
@@ -215,7 +215,7 @@ pub(crate) fn task_guidance(
         .ok_or("checkstyle_first_fact_invalid")?;
     let first_bytes = read_bounded_regular_file(
         &root
-            .join("codeguard/reports")
+            .join(".codeguard/reports")
             .join(format!("{first_run}.json")),
         16 * 1024 * 1024,
     )

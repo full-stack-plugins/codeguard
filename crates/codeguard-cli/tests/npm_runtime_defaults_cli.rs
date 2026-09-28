@@ -16,8 +16,8 @@ fn npm_cve_budget_uses_cli_environment_project_and_builtin_in_order() {
     fs::create_dir(&root).unwrap();
     let fixture = Fixture(root);
     fs::write(fixture.0.join("package.json"), "{}").unwrap();
-    fs::create_dir(fixture.0.join("codeguard")).unwrap();
-    let config = fixture.0.join("codeguard/runtime.json");
+    fs::create_dir(fixture.0.join(".codeguard")).unwrap();
+    let config = fixture.0.join(".codeguard/runtime.json");
     let run = |extra: &[&str], env: Option<&str>| {
         let mut cmd = Command::new(env!("CARGO_BIN_EXE_codeguard"));
         cmd.args([

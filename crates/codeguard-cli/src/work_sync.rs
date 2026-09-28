@@ -84,8 +84,8 @@ pub fn save_local_report(root: &Path, report: &Value) -> Result<(), &'static str
     let Some(run_id) = report["run_id"].as_str().filter(|id| safe_run_id(id)) else {
         return Err("invalid_run_id");
     };
-    let reports = root.join("codeguard/reports");
-    let state = root.join("codeguard/state");
+    let reports = root.join(".codeguard/reports");
+    let state = root.join(".codeguard/state");
     if !real_directory(&reports) || !real_directory(&state) {
         return Err("reports_directory_unavailable");
     }
@@ -155,10 +155,10 @@ pub fn sync_local_workspace(root: &Path) -> Result<SyncSummary, &'static str> {
         },
         _ => return Err("workspace_not_initialized"),
     };
-    let reports = root.join("codeguard/reports");
-    let findings = root.join("codeguard/findings");
-    let tasks = root.join("codeguard/tasks");
-    let state = root.join("codeguard/state");
+    let reports = root.join(".codeguard/reports");
+    let findings = root.join(".codeguard/findings");
+    let tasks = root.join(".codeguard/tasks");
+    let state = root.join(".codeguard/state");
     if ![&reports, &findings, &tasks, &state]
         .iter()
         .all(|path| real_directory(path))
@@ -281,8 +281,8 @@ pub(crate) fn latest_current_finding_observation(
         .flatten()
         .and_then(|baseline| baseline.workspace_id().map(str::to_owned))
         .ok_or("workspace_not_initialized")?;
-    let reports = root.join("codeguard/reports");
-    let consumed = root.join("codeguard/state/consumed");
+    let reports = root.join(".codeguard/reports");
+    let consumed = root.join(".codeguard/state/consumed");
     if !real_directory(&reports) || !real_directory(&consumed) {
         return Err("report_queue_unavailable");
     }
@@ -406,7 +406,7 @@ pub(crate) fn inspect_npm_observation(root: &Path, report: &Value) -> Result<(),
     npm_report::parse(
         root,
         id,
-        &root.join("codeguard/reports").join(format!("{run}.json")),
+        &root.join(".codeguard/reports").join(format!("{run}.json")),
         report,
         String::new(),
     )
@@ -429,7 +429,7 @@ pub(crate) fn valid_python_cve_observation(root: &Path, report: &Value) -> bool 
         root,
         &workspace_id,
         &root
-            .join("codeguard/reports")
+            .join(".codeguard/reports")
             .join(format!("{run_id}.json")),
         report,
         String::new(),
@@ -2658,7 +2658,7 @@ mod tests {
             ExitCode::from(3)
         );
         let baseline: Value =
-            serde_json::from_slice(&fs::read(root.join("codeguard/workspace.json")).unwrap())
+            serde_json::from_slice(&fs::read(root.join(".codeguard/workspace.json")).unwrap())
                 .unwrap();
         let fingerprint = "a".repeat(64);
         let source_sha256 = format!(
@@ -2680,7 +2680,7 @@ mod tests {
             }]
         });
         fs::write(
-            root.join("codeguard/reports/run-one.json"),
+            root.join(".codeguard/reports/run-one.json"),
             serde_json::to_vec_pretty(&report).unwrap(),
         )
         .unwrap();
@@ -2699,10 +2699,10 @@ mod tests {
             "{}",
             String::from_utf8_lossy(&output.stderr)
         );
-        let finding_dir = root.join(format!("codeguard/findings/CG-{}", "a".repeat(32)));
+        let finding_dir = root.join(format!(".codeguard/findings/CG-{}", "a".repeat(32)));
         let event = finding_dir.join("events/run-one.json");
         let before = fs::read(&event).unwrap();
-        let marker = root.join("codeguard/state/consumed/run-one.json");
+        let marker = root.join(".codeguard/state/consumed/run-one.json");
         assert!(!marker.exists());
 
         let recovered = sync_local_workspace(&root).unwrap();

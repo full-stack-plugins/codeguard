@@ -66,11 +66,11 @@ impl WorkspaceBaseline {
     #[must_use]
     pub fn managed_digest(&self, relative: &str) -> Option<&str> {
         match relative {
-            "codeguard/project.json" => Some(&self.project_sha256),
-            "codeguard/module-graph.json" => Some(&self.module_graph_sha256),
+            ".codeguard/project.json" => Some(&self.project_sha256),
+            ".codeguard/module-graph.json" => Some(&self.module_graph_sha256),
             _ => self
                 .managed_sha256
-                .get(relative.strip_prefix("codeguard/")?)
+                .get(relative.strip_prefix(".codeguard/")?)
                 .map(String::as_str),
         }
     }
@@ -84,7 +84,23 @@ impl WorkspaceBaseline {
 
 /// 只读解析已初始化工作区；自写字段不可变成策略或交付权威。
 pub fn read_workspace_baseline(root: &Path) -> Result<Option<WorkspaceBaseline>, String> {
-    let path = root.join("codeguard/workspace.json");
+    // 旧版工作区可能与用户的 codeguard/ 源码共存；不能静默创建第二份事实。
+    let legacy = root.join("codeguard/workspace.json");
+    if let Ok(metadata) = fs::symlink_metadata(&legacy) {
+        if metadata.file_type().is_file() && metadata.len() <= MAX_WORKSPACE_BYTES {
+            if let Ok(bytes) = fs::read(&legacy) {
+                if serde_json::from_slice::<serde_json::Value>(&bytes)
+                    .ok()
+                    .and_then(|document| document["document_type"].as_str().map(str::to_owned))
+                    .as_deref()
+                    == Some("codeguard_workspace")
+                {
+                    return Err("legacy_workspace_requires_manual_migration".into());
+                }
+            }
+        }
+    }
+    let path = root.join(".codeguard/workspace.json");
     let metadata = match fs::symlink_metadata(&path) {
         Ok(metadata) => metadata,
         Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(None),

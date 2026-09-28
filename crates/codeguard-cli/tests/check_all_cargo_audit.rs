@@ -170,7 +170,7 @@ fn missing_cargo_audit_is_a_visible_environment_blocker() {
         "native_incomplete"
     );
     assert_eq!(report["delivery_decision"], "incomplete");
-    let tasks: Vec<_> = fs::read_dir(fixture.0.join("codeguard/findings"))
+    let tasks: Vec<_> = fs::read_dir(fixture.0.join(".codeguard/findings"))
         .unwrap()
         .map(|entry| entry.unwrap().path())
         .collect();
@@ -191,7 +191,7 @@ fn initialized_rust_cve_reuses_one_task_and_native_recheck_keeps_it_open() {
         assert_eq!(report["findings"][0]["advisory_id"], "RUSTSEC-2020-0071");
         assert_eq!(report["delivery_decision"], "not_evaluated");
     }
-    let tasks: Vec<_> = fs::read_dir(fixture.0.join("codeguard/findings"))
+    let tasks: Vec<_> = fs::read_dir(fixture.0.join(".codeguard/findings"))
         .unwrap()
         .map(|entry| entry.unwrap().path())
         .collect();
@@ -256,7 +256,7 @@ fn initialized_rust_cve_reuses_one_task_and_native_recheck_keeps_it_open() {
         check_report["native_results"]["rust_cve"]["findings"][0]["advisory_id"],
         "RUSTSEC-2020-0071"
     );
-    let cve_tasks = fs::read_dir(fixture.0.join("codeguard/findings"))
+    let cve_tasks = fs::read_dir(fixture.0.join(".codeguard/findings"))
         .unwrap()
         .filter_map(|entry| {
             let path = entry.ok()?.path().join("finding.json");
@@ -547,7 +547,7 @@ fn input_change_after_attempt_cannot_bind_a_new_cve_recheck_to_it() {
     ]);
     assert_eq!(verified["event_persisted"], true, "{verified}");
     let event_path = fixture.0.join(format!(
-        "codeguard/findings/{id}/events/verify-{}.json",
+        ".codeguard/findings/{id}/events/verify-{}.json",
         verified["native_scan"]["run_id"].as_str().unwrap()
     ));
     let event: Value = serde_json::from_slice(&fs::read(event_path).unwrap()).unwrap();

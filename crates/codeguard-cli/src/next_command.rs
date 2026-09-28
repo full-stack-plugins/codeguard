@@ -102,13 +102,19 @@ pub fn read_task_brief(root: &Path, id: &str) -> Result<Value, &'static str> {
     if !safe_id(id) {
         return Err("task_id_invalid");
     }
-    let baseline = read_workspace_baseline(root).map_err(|_| "workspace_invalid")?;
+    let baseline = read_workspace_baseline(root).map_err(|reason| {
+        if reason == "legacy_workspace_requires_manual_migration" {
+            "legacy_workspace_requires_manual_migration"
+        } else {
+            "workspace_invalid"
+        }
+    })?;
     let workspace_id = baseline
         .as_ref()
         .and_then(|value| value.workspace_id())
         .ok_or("workspace_not_initialized")?;
-    let facts = root.join("codeguard/findings");
-    let tasks = root.join("codeguard/tasks");
+    let facts = root.join(".codeguard/findings");
+    let tasks = root.join(".codeguard/tasks");
     if !real_directory(&facts) || !real_directory(&tasks) {
         return Err("workspace_records_unavailable");
     }
@@ -136,7 +142,13 @@ pub fn read_task_brief(root: &Path, id: &str) -> Result<Value, &'static str> {
 }
 
 fn build_view(root: &Path, checker_id: Option<&str>) -> Result<Value, &'static str> {
-    let baseline = read_workspace_baseline(root).map_err(|_| "workspace_invalid")?;
+    let baseline = read_workspace_baseline(root).map_err(|reason| {
+        if reason == "legacy_workspace_requires_manual_migration" {
+            "legacy_workspace_requires_manual_migration"
+        } else {
+            "workspace_invalid"
+        }
+    })?;
     let Some(baseline) = baseline else {
         return Ok(view(
             "actionable",
@@ -146,7 +158,7 @@ fn build_view(root: &Path, checker_id: Option<&str>) -> Result<Value, &'static s
         ));
     };
     let workspace_id = baseline.workspace_id().ok_or("workspace_id_unavailable")?;
-    let workspace = root.join("codeguard");
+    let workspace = root.join(".codeguard");
     let findings = workspace.join("findings");
     let tasks = workspace.join("tasks");
     let reports = workspace.join("reports");
@@ -1130,7 +1142,7 @@ fn current_correction_refs(
     let Some(report_sha) = brief["verification_report_sha256"].as_str() else {
         return Ok((Vec::new(), Vec::new()));
     };
-    let events = root.join("codeguard/findings").join(id).join("events");
+    let events = root.join(".codeguard/findings").join(id).join("events");
     if !real_directory(&events) {
         return Err("task_events_unavailable");
     }
@@ -1172,11 +1184,11 @@ fn current_correction_refs(
         {
             continue;
         }
-        let reference = format!("codeguard/findings/{id}/events/{name}");
-        let projection_ref = format!("codeguard/tasks/corrections/{id}/{digest}.md");
+        let reference = format!(".codeguard/findings/{id}/events/{name}");
+        let projection_ref = format!(".codeguard/tasks/corrections/{id}/{digest}.md");
         // 附件可写；只展示与当前事件重建字节完全相同的投影，不从附件读指令。
-        let corrections = root.join("codeguard/tasks/corrections");
-        if real_directory(&root.join("codeguard/tasks"))
+        let corrections = root.join(".codeguard/tasks/corrections");
+        if real_directory(&root.join(".codeguard/tasks"))
             && real_directory(&corrections)
             && real_directory(&corrections.join(id))
             && read_bounded(&root.join(&projection_ref), MAX_FACT_BYTES).is_ok_and(|bytes| {
@@ -1223,7 +1235,7 @@ fn latest_verification_observation(
     fact: &Value,
     brief: &Value,
 ) -> Result<Option<VerificationObservation>, &'static str> {
-    let events = root.join(format!("codeguard/findings/{id}/events"));
+    let events = root.join(format!(".codeguard/findings/{id}/events"));
     if !real_directory(&events) {
         return Err("task_events_unavailable");
     }
@@ -1267,7 +1279,7 @@ fn latest_verification_observation(
                     "verification_event_invalid"
                 });
             }
-            let report_path = root.join(format!("codeguard/reports/{run_id}.json"));
+            let report_path = root.join(format!(".codeguard/reports/{run_id}.json"));
             let report_bytes = match read_bounded(&report_path, 16 * 1024 * 1024) {
                 Ok(bytes) => bytes,
                 Err(_) if !report_path.exists() => {
@@ -1688,7 +1700,7 @@ fn pending_reports(
                     queue.failed.push(json!({
                         "run_id":run_id,
                         "reason":receipt["reason"],
-                        "report_ref":format!("codeguard/reports/{run_id}.json")
+                        "report_ref":format!(".codeguard/reports/{run_id}.json")
                     }));
                 } else {
                     queue.untried = true;

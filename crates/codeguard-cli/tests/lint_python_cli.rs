@@ -231,9 +231,9 @@ fn unconfigured_project_returns_visible_missing_status_without_starting_tool() {
 fn lint_python_reads_versioned_project_runtime_default_without_changing_quality() {
     let project = Project::new();
     fs::write(project.0.join("app.py"), "import os\n").unwrap();
-    fs::create_dir(project.0.join("codeguard")).unwrap();
+    fs::create_dir(project.0.join(".codeguard")).unwrap();
     fs::write(
-        project.0.join("codeguard/runtime.json"),
+        project.0.join(".codeguard/runtime.json"),
         r#"{"schema_version":"1.0","document_type":"codeguard_runtime_options","timeout":"2s"}"#,
     )
     .unwrap();
@@ -263,7 +263,7 @@ fn initialized_lint_report_binds_the_existing_workspace_identity() {
         .unwrap();
     assert_eq!(init.status.code(), Some(3));
     let workspace: Value =
-        serde_json::from_slice(&fs::read(project.0.join("codeguard/workspace.json")).unwrap())
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/workspace.json")).unwrap())
             .unwrap();
     let (_, report) = run(&project, &["--ruff-tool", "/nonexistent/ruff"]);
     assert_eq!(report["schema_version"], "0.12.0");
@@ -283,7 +283,7 @@ fn initialized_lint_report_binds_the_existing_workspace_identity() {
     assert_eq!(report["next"]["delivery_decision"], "not_evaluated");
     let run_id = report["run_id"].as_str().unwrap();
     let saved: Value = serde_json::from_slice(
-        &fs::read(project.0.join(format!("codeguard/reports/{run_id}.json"))).unwrap(),
+        &fs::read(project.0.join(format!(".codeguard/reports/{run_id}.json"))).unwrap(),
     )
     .unwrap();
     assert_eq!(saved["run_id"], run_id);
@@ -293,7 +293,7 @@ fn initialized_lint_report_binds_the_existing_workspace_identity() {
     assert!(
         project
             .0
-            .join(format!("codeguard/state/consumed/{run_id}.json"))
+            .join(format!(".codeguard/state/consumed/{run_id}.json"))
             .exists()
     );
 }
@@ -312,7 +312,7 @@ fn brief_read_failure_keeps_native_scan_and_synced_backlog_visible() {
         .output()
         .unwrap();
     assert_eq!(init.status.code(), Some(3));
-    fs::create_dir(project.0.join("codeguard/findings/invalid-record")).unwrap();
+    fs::create_dir(project.0.join(".codeguard/findings/invalid-record")).unwrap();
     let (exit, report) = run(&project, &[]);
     assert_eq!(exit, 3);
     assert_eq!(
@@ -510,7 +510,7 @@ fn native_noqa_is_visible_as_suppression_without_creating_active_finding_task() 
     assert_eq!(report["backlog_status"], "synced_partial");
     assert_eq!(report["backlog_sync"]["new_findings"], 0);
     assert_eq!(
-        fs::read_dir(project.0.join("codeguard/tasks"))
+        fs::read_dir(project.0.join(".codeguard/tasks"))
             .unwrap()
             .count(),
         0

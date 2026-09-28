@@ -124,7 +124,7 @@ fn execute(args: &Args) -> Result<Value, &'static str> {
     if !root.is_dir() {
         return Err("project_unreadable");
     }
-    let state = root.join("codeguard/state");
+    let state = root.join(".codeguard/state");
     if !real_directory(&state) {
         return Err("workspace_state_unavailable");
     }
@@ -474,7 +474,7 @@ fn verified_rechecks(
         {
             return Err("verification_event_invalid");
         }
-        let report_path = root.join(format!("codeguard/reports/{run_id}.json"));
+        let report_path = root.join(format!(".codeguard/reports/{run_id}.json"));
         let report_bytes = match bounded_regular(&report_path, 16 * 1024 * 1024) {
             Ok(bytes) => bytes,
             Err("verification_evidence_unavailable") if !report_path.exists() => {
@@ -646,7 +646,7 @@ pub(crate) fn recover_abandoned(
     };
     write_event(
         &events,
-        &root.join("codeguard/state"),
+        &root.join(".codeguard/state"),
         &start.attempt_id,
         "finish",
         &finish,
@@ -662,7 +662,7 @@ impl AttemptLedger {
 }
 
 fn events_dir(root: &Path, id: &str) -> Result<PathBuf, &'static str> {
-    let events = root.join("codeguard/findings").join(id).join("events");
+    let events = root.join(".codeguard/findings").join(id).join("events");
     if !real_directory(&events) {
         return Err("attempt_events_unavailable");
     }

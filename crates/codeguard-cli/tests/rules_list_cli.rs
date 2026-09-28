@@ -73,7 +73,7 @@ fn configured_checker_does_not_promote_candidate_rules_to_enabled_or_executed() 
                 .starts_with("https://docs.astral.sh/ruff/")
         );
     }
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
 }
 
 #[test]

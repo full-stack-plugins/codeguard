@@ -66,7 +66,7 @@ fn list_reports_declared_inventory_and_artifact_gaps_without_execution() {
     assert_eq!(report["tools"][0]["artifact_status"], "matched_untrusted");
     assert_eq!(report["tools"][0]["execution"], "not_run");
     assert!(!project.0.join("marker").exists());
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
     assert!(!report.to_string().contains(project.0.to_str().unwrap()));
 }
 
@@ -184,7 +184,7 @@ fn install_defaults_to_preview_and_never_writes_from_a_candidate_lock() {
         report["tools"][0]["install_action"],
         "bind_approved_distribution_manifest"
     );
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
 }
 
 #[test]
@@ -199,7 +199,7 @@ fn install_apply_is_blocked_before_writing_without_trusted_source() {
     assert_eq!(report["reason"], "approved_install_source_unbound");
     assert_eq!(report["installation_status"], "blocked_before_mutation");
     assert_eq!(report["writes_performed"], false);
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
 }
 
 #[test]
@@ -242,7 +242,7 @@ fn wrapper_hash_match_is_read_only_and_never_proves_runtime_or_policy() {
     assert_eq!(report["readiness"], "unknown");
     assert_eq!(report["gate_effect"], "none");
     assert!(!project.0.join("marker").exists());
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
     assert!(!report.to_string().contains(project.0.to_str().unwrap()));
 }
 
@@ -340,7 +340,7 @@ fn managed_cache_and_explicit_runtime_match_without_execution() {
     assert_eq!(report["tools"][0]["artifact_status"], "matched_untrusted");
     assert_eq!(report["tools"][0]["runtime"]["digest_matched"], true);
     assert!(!project.0.join("marker").exists());
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
 }
 
 #[test]
@@ -379,7 +379,7 @@ fn installation_and_ambiguous_arguments_are_rejected_before_observation() {
         assert_eq!(output.status.code(), Some(2));
         assert!(output.stdout.is_empty());
     }
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
 }
 
 #[test]
@@ -444,7 +444,7 @@ fn install_manifest_binding_is_observed_without_approval_or_mutation() {
     assert_eq!(report["authority"], "unverified");
     assert_eq!(report["writes_performed"], false);
     assert!(!report.to_string().contains("https://example.org"));
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
 }
 
 #[test]
@@ -604,7 +604,7 @@ fn fifo_lock_and_manifest_return_incomplete_without_hanging_install() {
         assert_eq!(report["writes_performed"], false);
         assert_eq!(report["readiness"], "unknown");
     }
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
 }
 
 #[test]
@@ -660,7 +660,7 @@ fn install_preview_explains_full_layout_without_reading_packages_or_writing() {
         assert_eq!(report["writes_performed"], false);
         assert_eq!(report["readiness"], "unknown");
         assert!(!report.to_string().contains("private-name"));
-        assert!(!project.0.join("codeguard").exists());
+        assert!(!project.0.join(".codeguard").exists());
     }
     let human = Command::new(env!("CARGO_BIN_EXE_codeguard"))
         .args(["tools", "install"])
@@ -736,5 +736,5 @@ fn raw_versioned_locator_is_bound_before_preview_advances_to_content_verificatio
         "distribution_raw_locator_mismatch"
     );
     assert_eq!(report["tools"][0]["distribution"], Value::Null);
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
 }

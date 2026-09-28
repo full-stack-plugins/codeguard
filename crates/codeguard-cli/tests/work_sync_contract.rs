@@ -48,7 +48,7 @@ impl Project {
 
     fn workspace_id(&self) -> String {
         let value: Value =
-            serde_json::from_slice(&fs::read(self.0.join("codeguard/workspace.json")).unwrap())
+            serde_json::from_slice(&fs::read(self.0.join(".codeguard/workspace.json")).unwrap())
                 .unwrap();
         value["workspace_id"].as_str().unwrap().into()
     }
@@ -77,7 +77,7 @@ impl Project {
 
     fn write_report(&self, run_id: &str, report: &Value) {
         fs::write(
-            self.0.join(format!("codeguard/reports/{run_id}.json")),
+            self.0.join(format!(".codeguard/reports/{run_id}.json")),
             serde_json::to_vec_pretty(report).unwrap(),
         )
         .unwrap();
@@ -111,14 +111,14 @@ fn sync_rejects_a_concurrent_import_before_writing_records() {
     let project = Project::new();
     let workspace_id = project.workspace_id();
     project.write_report("run-one", &project.report("run-one", &workspace_id));
-    let state = project.0.join("codeguard/state");
+    let state = project.0.join(".codeguard/state");
     let held = TaskFileLock::acquire(&state.join("work-sync.lock")).unwrap();
     let (exit, blocked) = project.sync();
     assert_eq!(exit, 3);
     assert_eq!(blocked["schema_version"], "0.2.0");
     assert_eq!(blocked["reason"], "work_sync_busy");
     assert_eq!(
-        fs::read_dir(project.0.join("codeguard/findings"))
+        fs::read_dir(project.0.join(".codeguard/findings"))
             .unwrap()
             .count(),
         0
@@ -145,15 +145,15 @@ fn first_finding_import_resumes_from_each_persisted_boundary() {
         let finding_id = format!("CG-{}", "a".repeat(32));
         let fact = project
             .0
-            .join(format!("codeguard/findings/{finding_id}/finding.json"));
-        let task = project.0.join(format!("codeguard/tasks/{finding_id}.md"));
+            .join(format!(".codeguard/findings/{finding_id}/finding.json"));
+        let task = project.0.join(format!(".codeguard/tasks/{finding_id}.md"));
         let event = project.0.join(format!(
-            "codeguard/findings/{finding_id}/events/run-one.json"
+            ".codeguard/findings/{finding_id}/events/run-one.json"
         ));
         let observation = project.0.join(format!(
-            "codeguard/state/observations/{finding_id}/run-one.json"
+            ".codeguard/state/observations/{finding_id}/run-one.json"
         ));
-        let marker = project.0.join("codeguard/state/consumed/run-one.json");
+        let marker = project.0.join(".codeguard/state/consumed/run-one.json");
         let original_fact = fs::read(&fact).unwrap();
         let original_task = fs::read(&task).unwrap();
         let original_event = fs::read(&event).unwrap();
@@ -203,7 +203,7 @@ fn blocker_fact_without_observation_or_event_is_replayed_before_cursor() {
     let scan: Value = serde_json::from_slice(&output.stdout).unwrap();
     assert_eq!(scan["backlog_sync"]["new_blockers"], 1);
     let run_id = scan["run_id"].as_str().unwrap();
-    let task_entry = fs::read_dir(project.0.join("codeguard/tasks"))
+    let task_entry = fs::read_dir(project.0.join(".codeguard/tasks"))
         .unwrap()
         .next()
         .unwrap()
@@ -216,16 +216,16 @@ fn blocker_fact_without_observation_or_event_is_replayed_before_cursor() {
         .to_owned();
     let fact = project
         .0
-        .join(format!("codeguard/findings/{blocker_id}/finding.json"));
+        .join(format!(".codeguard/findings/{blocker_id}/finding.json"));
     let event = project.0.join(format!(
-        "codeguard/findings/{blocker_id}/events/{run_id}.json"
+        ".codeguard/findings/{blocker_id}/events/{run_id}.json"
     ));
     let observation = project.0.join(format!(
-        "codeguard/state/observations/{blocker_id}/{run_id}.json"
+        ".codeguard/state/observations/{blocker_id}/{run_id}.json"
     ));
     let marker = project
         .0
-        .join(format!("codeguard/state/consumed/{run_id}.json"));
+        .join(format!(".codeguard/state/consumed/{run_id}.json"));
     let original_fact = fs::read(&fact).unwrap();
     let original_event = fs::read(&event).unwrap();
     let original_observation = fs::read(&observation).unwrap();
@@ -252,12 +252,12 @@ fn repeat_reports_keep_one_finding_and_crash_retry_restores_marker() {
     assert_eq!(first["new_findings"], 1);
     assert_eq!(first["delivery_decision"], "not_evaluated");
     let finding = project.0.join(format!(
-        "codeguard/findings/CG-{}/finding.json",
+        ".codeguard/findings/CG-{}/finding.json",
         "a".repeat(32)
     ));
     let task = project
         .0
-        .join(format!("codeguard/tasks/CG-{}.md", "a".repeat(32)));
+        .join(format!(".codeguard/tasks/CG-{}.md", "a".repeat(32)));
     let before_fact = fs::read(&finding).unwrap();
     let before_task = fs::read(&task).unwrap();
     assert!(!String::from_utf8_lossy(&before_task).contains("import os"));
@@ -273,7 +273,7 @@ fn repeat_reports_keep_one_finding_and_crash_retry_restores_marker() {
     assert!(!events.join("run-two.json").exists());
     assert_eq!(fs::read_dir(&events).unwrap().count(), 1);
     let observations = project.0.join(format!(
-        "codeguard/state/observations/CG-{}",
+        ".codeguard/state/observations/CG-{}",
         "a".repeat(32)
     ));
     for run in ["run-one", "run-two"] {
@@ -302,14 +302,14 @@ fn repeat_reports_keep_one_finding_and_crash_retry_restores_marker() {
     }
     assert_eq!(fs::read_dir(&events).unwrap().count(), 1);
     assert_eq!(fs::read_dir(&observations).unwrap().count(), 10);
-    fs::remove_file(project.0.join("codeguard/state/consumed/run-one.json")).unwrap();
+    fs::remove_file(project.0.join(".codeguard/state/consumed/run-one.json")).unwrap();
     let (_, recovered) = project.sync();
     assert_eq!(recovered["imported_reports"], 1);
     assert_eq!(recovered["new_findings"], 0);
     assert!(
         project
             .0
-            .join("codeguard/state/consumed/run-one.json")
+            .join(".codeguard/state/consumed/run-one.json")
             .exists()
     );
     assert_eq!(fs::read(&task).unwrap(), before_task);
@@ -324,10 +324,10 @@ fn reappearance_after_verification_emits_one_event_then_keeps_local_observations
     let finding_id = format!("CG-{}", "a".repeat(32));
     let events = project
         .0
-        .join(format!("codeguard/findings/{finding_id}/events"));
+        .join(format!(".codeguard/findings/{finding_id}/events"));
     let observations = project
         .0
-        .join(format!("codeguard/state/observations/{finding_id}"));
+        .join(format!(".codeguard/state/observations/{finding_id}"));
     project.write_report("lint-1-100", &project.report("lint-1-100", &workspace_id));
     assert_eq!(project.sync().1["new_findings"], 1);
     fs::write(events.join("verify-lint-1-200.json"), b"{}\n").unwrap();
@@ -512,7 +512,7 @@ fn stale_report_is_historical_and_bad_report_does_not_block_valid_one() {
     assert!(
         !project
             .0
-            .join(format!("codeguard/tasks/CG-{}.md", "a".repeat(32)))
+            .join(format!(".codeguard/tasks/CG-{}.md", "a".repeat(32)))
             .exists()
     );
     project.write_report("run-bad", &project.report("run-bad", "ws-invalid"));
@@ -566,7 +566,7 @@ fn missing_tool_groups_two_files_into_one_actionable_blocker() {
     }));
     assert_eq!(first["backlog_sync"]["new_findings"], 0);
     assert_eq!(first["backlog_sync"]["new_blockers"], 1);
-    let task = fs::read_dir(project.0.join("codeguard/tasks"))
+    let task = fs::read_dir(project.0.join(".codeguard/tasks"))
         .unwrap()
         .map(|entry| entry.unwrap().path())
         .collect::<Vec<_>>();
@@ -581,7 +581,7 @@ fn missing_tool_groups_two_files_into_one_actionable_blocker() {
         &fs::read(
             project
                 .0
-                .join(format!("codeguard/findings/{id}/finding.json")),
+                .join(format!(".codeguard/findings/{id}/finding.json")),
         )
         .unwrap(),
     )
@@ -592,12 +592,14 @@ fn missing_tool_groups_two_files_into_one_actionable_blocker() {
     assert_eq!(second["backlog_sync"]["new_blockers"], 0);
     assert_eq!(fs::read(&task[0]).unwrap(), task_before);
     assert_eq!(
-        fs::read_dir(project.0.join(format!("codeguard/findings/{id}/events")))
+        fs::read_dir(project.0.join(format!(".codeguard/findings/{id}/events")))
             .unwrap()
             .count(),
         1
     );
-    let observations = project.0.join(format!("codeguard/state/observations/{id}"));
+    let observations = project
+        .0
+        .join(format!(".codeguard/state/observations/{id}"));
     assert_eq!(fs::read_dir(&observations).unwrap().count(), 2);
     for scan in [&first, &second] {
         let run_id = scan["run_id"].as_str().unwrap();
@@ -628,7 +630,7 @@ fn missing_config_creates_preparation_task_without_claiming_violation() {
         "project_ruff_config_not_found"
     );
     assert_eq!(report["backlog_sync"]["new_blockers"], 1);
-    let task = fs::read_dir(project.0.join("codeguard/tasks"))
+    let task = fs::read_dir(project.0.join(".codeguard/tasks"))
         .unwrap()
         .next()
         .unwrap()
@@ -661,7 +663,7 @@ fn same_reason_in_different_build_roots_is_not_merged() {
     let (_, result) = project.sync();
     assert_eq!(result["new_blockers"], 2);
     assert_eq!(
-        fs::read_dir(project.0.join("codeguard/tasks"))
+        fs::read_dir(project.0.join(".codeguard/tasks"))
             .unwrap()
             .count(),
         2
@@ -699,7 +701,7 @@ fn native_ruff_scan_queues_and_syncs_one_stable_task() {
     let (_, synced) = project.sync();
     assert_eq!(synced["new_findings"], 0);
     assert_eq!(synced["already_consumed_reports"], 1);
-    let task_path = project.0.join(format!("codeguard/tasks/{id}.md"));
+    let task_path = project.0.join(format!(".codeguard/tasks/{id}.md"));
     let task = fs::read(&task_path).unwrap();
     assert!(!String::from_utf8_lossy(&task).contains("os imported but unused"));
     let second = scan();
@@ -716,8 +718,8 @@ fn native_ruff_scan_queues_and_syncs_one_stable_task() {
 fn backlog_failure_keeps_native_finding_visible_without_claiming_task_creation() {
     let project = Project::new();
     fs::write(project.0.join("ruff.toml"), "[lint]\nselect = ['F']\n").unwrap();
-    fs::remove_dir(project.0.join("codeguard/reports")).unwrap();
-    fs::write(project.0.join("codeguard/reports"), "blocked").unwrap();
+    fs::remove_dir(project.0.join(".codeguard/reports")).unwrap();
+    fs::write(project.0.join(".codeguard/reports"), "blocked").unwrap();
     let tool = std::env::var("CODEGUARD_RUFF_BIN").unwrap();
     let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
         .args([
@@ -736,7 +738,7 @@ fn backlog_failure_keeps_native_finding_visible_without_claiming_task_creation()
     assert_eq!(report["backlog_status"], "backlog_update_failed");
     assert_eq!(report["delivery_decision"], "not_evaluated");
     assert!(
-        fs::read_dir(project.0.join("codeguard/tasks"))
+        fs::read_dir(project.0.join(".codeguard/tasks"))
             .unwrap()
             .next()
             .is_none()

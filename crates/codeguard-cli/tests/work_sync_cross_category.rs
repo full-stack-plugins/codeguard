@@ -49,7 +49,7 @@ impl Project {
     }
 
     fn facts(&self, checker: &str) -> usize {
-        fs::read_dir(self.0.join("codeguard/findings"))
+        fs::read_dir(self.0.join(".codeguard/findings"))
             .unwrap()
             .filter(|entry| {
                 let fact: Value = serde_json::from_slice(
@@ -62,7 +62,7 @@ impl Project {
     }
 
     fn event_count(&self) -> usize {
-        fs::read_dir(self.0.join("codeguard/findings"))
+        fs::read_dir(self.0.join(".codeguard/findings"))
             .unwrap()
             .map(|entry| {
                 fs::read_dir(entry.unwrap().path().join("events"))
@@ -83,7 +83,7 @@ impl Drop for Project {
 fn lint_then_cve_pending_reports_both_import_despite_a_bad_report() {
     let project = Project::new();
     let root = project.0.to_str().unwrap();
-    let consumed = project.0.join("codeguard/state/consumed");
+    let consumed = project.0.join(".codeguard/state/consumed");
     fs::remove_dir(&consumed).unwrap_or(());
     fs::write(&consumed, b"blocked").unwrap();
 
@@ -104,13 +104,13 @@ fn lint_then_cve_pending_reports_both_import_despite_a_bad_report() {
     assert!(
         project
             .0
-            .join(format!("codeguard/reports/{lint_run}.json"))
+            .join(format!(".codeguard/reports/{lint_run}.json"))
             .is_file()
     );
     assert!(
         project
             .0
-            .join(format!("codeguard/reports/{cve_run}.json"))
+            .join(format!(".codeguard/reports/{cve_run}.json"))
             .is_file()
     );
     assert_eq!(project.facts("python.ruff"), 0);
@@ -118,7 +118,7 @@ fn lint_then_cve_pending_reports_both_import_despite_a_bad_report() {
 
     fs::remove_file(&consumed).unwrap();
     fs::create_dir(&consumed).unwrap();
-    fs::write(project.0.join("codeguard/reports/bad.json"), b"not-json").unwrap();
+    fs::write(project.0.join(".codeguard/reports/bad.json"), b"not-json").unwrap();
     let (_, sync) = project.call(&["work", "sync", root, "--format=json"]);
     assert!(sync["imported_reports"].as_u64().unwrap() >= 2, "{sync}");
     assert_eq!(sync["failed_reports"], 1);
@@ -135,7 +135,7 @@ fn lint_then_cve_pending_reports_both_import_despite_a_bad_report() {
     assert_eq!(status["pending_reports"], true);
     assert_eq!(status["next"]["reason"], "failed_report_requires_repair");
 
-    let bad = project.0.join("codeguard/reports/bad.json");
+    let bad = project.0.join(".codeguard/reports/bad.json");
     fs::write(&bad, b"still-not-json").unwrap();
     let (_, changed) = project.call(&["next", root, "--format=json"]);
     assert_eq!(changed["reason"], "pending_reports_require_sync");

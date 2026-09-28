@@ -11,7 +11,7 @@ pub(crate) fn collect(root: &Path) -> Result<Vec<String>, &'static str> {
     let Some(workspace_id) = baseline.as_ref().and_then(|b| b.workspace_id()) else {
         return Ok(Vec::new());
     };
-    let findings = root.join("codeguard/findings");
+    let findings = root.join(".codeguard/findings");
     match fs::symlink_metadata(&findings) {
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(Vec::new()),
         _ if findings.canonicalize().ok().as_ref() != Some(&findings) || !findings.is_dir() => {

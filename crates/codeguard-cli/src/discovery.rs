@@ -287,7 +287,7 @@ fn managed_workspace_artifact(relative: &str) -> bool {
     if relative == "AGENTS.md" {
         return true;
     }
-    let Some(within) = relative.strip_prefix("codeguard/") else {
+    let Some(within) = relative.strip_prefix(".codeguard/") else {
         return false;
     };
     if matches!(

@@ -80,7 +80,7 @@ fn public_cve_command_shows_preparation_native_counts_and_unverified_coverage() 
             .code(),
         Some(2)
     );
-    assert!(!fixture.0.join("codeguard").exists());
+    assert!(!fixture.0.join(".codeguard").exists());
     let initialized = Command::new(env!("CARGO_BIN_EXE_codeguard"))
         .args([
             "init",
@@ -145,7 +145,7 @@ fn public_cve_command_shows_preparation_native_counts_and_unverified_coverage() 
         assert_eq!(report["workbench_status"], "synced_partial", "{report}");
         assert_eq!(report["workbench"]["new_blockers"], count);
     }
-    let tasks: Vec<_> = fs::read_dir(fixture.0.join("codeguard/tasks"))
+    let tasks: Vec<_> = fs::read_dir(fixture.0.join(".codeguard/tasks"))
         .unwrap()
         .collect();
     assert_eq!(tasks.len(), 1);
@@ -311,7 +311,7 @@ fn public_cve_command_shows_preparation_native_counts_and_unverified_coverage() 
     assert_eq!(truncated["reason"], "npm_audit_output_limit", "{truncated}");
     assert_eq!(truncated["findings"], serde_json::json!([]));
     fs::write(&node,format!("#!/bin/sh\nif [ \"$3\" = --version ]; then printf '11.16.0\\n'; else printf '%s' '{}'; exit 1; fi\n",advisory)).unwrap();
-    let reports = fixture.0.join("codeguard/reports");
+    let reports = fixture.0.join(".codeguard/reports");
     let original = fs::read_dir(&reports)
         .unwrap()
         .map(|e| e.unwrap().path())
@@ -358,7 +358,7 @@ fn public_cve_command_shows_preparation_native_counts_and_unverified_coverage() 
     let sync: Value = serde_json::from_slice(&sync.stdout).unwrap();
     assert_eq!(sync["failed_reports"], 3, "{sync}");
     assert_eq!(
-        fs::read_dir(fixture.0.join("codeguard/tasks"))
+        fs::read_dir(fixture.0.join(".codeguard/tasks"))
             .unwrap()
             .count(),
         1
@@ -426,12 +426,12 @@ fn public_cve_command_runs_real_npm_without_claiming_delivery() {
     assert!(!fixture.0.join("node_modules").exists());
     assert_eq!(report["workbench_status"], "synced_partial");
     assert_eq!(
-        fs::read_dir(fixture.0.join("codeguard/tasks"))
+        fs::read_dir(fixture.0.join(".codeguard/tasks"))
             .unwrap()
             .count(),
         1
     );
-    let tasks: Vec<_> = fs::read_dir(fixture.0.join("codeguard/tasks"))
+    let tasks: Vec<_> = fs::read_dir(fixture.0.join(".codeguard/tasks"))
         .unwrap()
         .map(|e| e.unwrap().path())
         .collect();

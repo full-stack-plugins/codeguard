@@ -112,7 +112,7 @@ pub(crate) fn guidance(root: &Path, fact: &Value) -> Value {
     let Some(scope) = fact["path"].as_str() else {
         return fallback;
     };
-    let Ok(entries) = std::fs::read_dir(root.join("codeguard/reports")) else {
+    let Ok(entries) = std::fs::read_dir(root.join(".codeguard/reports")) else {
         return fallback;
     };
     let mut latest = None;
@@ -174,7 +174,7 @@ pub(crate) fn guidance(root: &Path, fact: &Value) -> Value {
         .map_or(Value::Null, |outer| outer["effective_rule"].clone());
     let run = report["run_id"].as_str().unwrap();
     let receipt = root
-        .join("codeguard/state/consumed")
+        .join(".codeguard/state/consumed")
         .join(format!("{run}.json"));
     let valid_receipt = read_bounded_regular_file(&receipt, 4096)
         .ok()
@@ -195,7 +195,7 @@ pub(crate) fn guidance(root: &Path, fact: &Value) -> Value {
     {
         return fallback;
     }
-    let first = root.join("codeguard/reports").join(format!(
+    let first = root.join(".codeguard/reports").join(format!(
         "{}.json",
         fact["first_run_id"].as_str().unwrap_or("")
     ));

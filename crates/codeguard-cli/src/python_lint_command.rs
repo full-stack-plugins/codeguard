@@ -538,7 +538,7 @@ fn print_human(feedback: &Value) {
     );
     if feedback["backlog_status"] == "synced_partial" {
         println!(
-            "本次新增源码问题 {} 项、环境/配置任务 {} 项；下一步查看 codeguard/tasks/ 并按任务复检。",
+            "本次新增源码问题 {} 项、环境/配置任务 {} 项；下一步查看 .codeguard/tasks/ 并按任务复检。",
             feedback["backlog_sync"]["new_findings"]
                 .as_u64()
                 .unwrap_or(0),

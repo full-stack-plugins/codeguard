@@ -52,13 +52,13 @@ fn nested_npm_scopes_share_parent_workbench_without_merging_or_scanning_external
         .unwrap();
     assert_eq!(init.status.code(), Some(3));
     fs::write(
-        fixture.0.join("codeguard/runtime.json"),
+        fixture.0.join(".codeguard/runtime.json"),
         r#"{"schema_version":"1.0","document_type":"codeguard_runtime_options","timeout":"8s"}"#,
     )
     .unwrap();
-    fs::create_dir(fixture.0.join("a/codeguard")).unwrap();
+    fs::create_dir(fixture.0.join("a/.codeguard")).unwrap();
     fs::write(
-        fixture.0.join("a/codeguard/runtime.json"),
+        fixture.0.join("a/.codeguard/runtime.json"),
         r#"{"schema_version":"1.0","document_type":"codeguard_runtime_options","timeout":"9s"}"#,
     )
     .unwrap();
@@ -104,13 +104,13 @@ fn nested_npm_scopes_share_parent_workbench_without_merging_or_scanning_external
         assert_eq!(report["execution_budget"]["source"], "project_default");
     }
     assert_eq!(
-        fs::read_dir(fixture.0.join("codeguard/tasks"))
+        fs::read_dir(fixture.0.join(".codeguard/tasks"))
             .unwrap()
             .count(),
         2
     );
-    assert!(!fixture.0.join("a/codeguard/tasks").exists());
-    assert!(!fixture.0.join("ab/codeguard").exists());
+    assert!(!fixture.0.join("a/.codeguard/tasks").exists());
+    assert!(!fixture.0.join("ab/.codeguard").exists());
     let next = Command::new(env!("CARGO_BIN_EXE_codeguard"))
         .args(["next", fixture.0.to_str().unwrap(), "--format", "json"])
         .output()
@@ -277,15 +277,15 @@ fn nested_npm_scopes_share_parent_workbench_without_merging_or_scanning_external
 
     // 即使本地事件被一并改写摘要，损坏/重复字段也不能被当成输入过期静默忽略。
     let run_id = failed["native_scan"]["run_id"].as_str().unwrap();
-    let report_path = fixture.0.join(format!("codeguard/reports/{run_id}.json"));
+    let report_path = fixture.0.join(format!(".codeguard/reports/{run_id}.json"));
     let event_path = fixture.0.join(format!(
-        "codeguard/findings/{task_id}/events/verify-{run_id}.json"
+        ".codeguard/findings/{task_id}/events/verify-{run_id}.json"
     ));
     let original_report = fs::read(&report_path).unwrap();
     let original_event = fs::read(&event_path).unwrap();
     let marker_path = fixture
         .0
-        .join(format!("codeguard/state/consumed/{run_id}.json"));
+        .join(format!(".codeguard/state/consumed/{run_id}.json"));
     let original_marker = fs::read(&marker_path).unwrap();
     let mut malformed: Value = serde_json::from_slice(&original_report).unwrap();
     malformed["coverage_proven"] = serde_json::json!(true);

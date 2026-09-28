@@ -210,8 +210,8 @@ fn directory_scans_each_file_and_reuses_stable_tasks_without_claiming_full_cover
         .replace("case \"$source\" in */b/app.js) exit 2;; esac\n", "");
     std::fs::write(&node, normal).unwrap();
     std::fs::rename(
-        project.0.join("codeguard/workspace.json"),
-        project.0.join("codeguard/workspace.backup.json"),
+        project.0.join(".codeguard/workspace.json"),
+        project.0.join(".codeguard/workspace.backup.json"),
     )
     .unwrap();
     let disconnected = scan(None);

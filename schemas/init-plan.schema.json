@@ -393,7 +393,7 @@
       "uniqueItems": true,
       "items": {
         "type": "string",
-        "pattern": "^(?:AGENTS\\.md|codeguard(?:/[^/]+)*)$"
+        "pattern": "^(?:AGENTS\\.md|\\.codeguard(?:/[^/]+)*)$"
       }
     },
     "sha256": {

@@ -87,7 +87,7 @@
     },
     "record_ref": {
       "type": "string",
-      "pattern": "^codeguard/findings/CG-[0-9a-f]{32}/events/correction-proposed-[0-9a-f]{64}\\.json$"
+      "pattern": "^\\.codeguard/findings/CG-[0-9a-f]{32}/events/correction-proposed-[0-9a-f]{64}\\.json$"
     },
     "projection_status": {
       "enum": [
@@ -101,7 +101,7 @@
         "string",
         "null"
       ],
-      "pattern": "^codeguard/tasks/corrections/CG-[0-9a-f]{32}/[0-9a-f]{64}\\.md$"
+      "pattern": "^\\.codeguard/tasks/corrections/CG-[0-9a-f]{32}/[0-9a-f]{64}\\.md$"
     },
     "projection_reason": {
       "type": [

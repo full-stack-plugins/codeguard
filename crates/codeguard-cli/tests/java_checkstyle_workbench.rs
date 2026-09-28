@@ -55,7 +55,7 @@ fn workspace_without_native_observation_does_not_create_source_tasks() {
         "java.checkstyle.preparation"
     );
     assert_eq!(
-        fs::read_dir(p.0.join("codeguard/tasks")).unwrap().count(),
+        fs::read_dir(p.0.join(".codeguard/tasks")).unwrap().count(),
         1
     );
 }
@@ -108,10 +108,10 @@ fn native_checkstyle_syncs_stable_tasks_and_next_without_closing() {
         );
     }
     assert_eq!(
-        fs::read_dir(p.0.join("codeguard/tasks")).unwrap().count(),
+        fs::read_dir(p.0.join(".codeguard/tasks")).unwrap().count(),
         1
     );
-    let task = fs::read_dir(p.0.join("codeguard/tasks"))
+    let task = fs::read_dir(p.0.join(".codeguard/tasks"))
         .unwrap()
         .next()
         .unwrap()
@@ -141,7 +141,7 @@ fn native_checkstyle_syncs_stable_tasks_and_next_without_closing() {
         next["repair_brief"]["checkstyle_guidance"]["configuration_current"],
         false
     );
-    let file = fs::read_dir(p.0.join("codeguard/reports"))
+    let file = fs::read_dir(p.0.join(".codeguard/reports"))
         .unwrap()
         .next()
         .unwrap()
@@ -150,7 +150,7 @@ fn native_checkstyle_syncs_stable_tasks_and_next_without_closing() {
     let mut report: Value = serde_json::from_slice(&fs::read(file).unwrap()).unwrap();
     report["run_id"] = serde_json::json!("checkstyle-stale-1");
     fs::write(
-        p.0.join("codeguard/reports/checkstyle-stale-1.json"),
+        p.0.join(".codeguard/reports/checkstyle-stale-1.json"),
         serde_json::to_vec(&report).unwrap(),
     )
     .unwrap();
@@ -282,7 +282,7 @@ fn task_verify_replays_native_rules_and_retains_open_task() {
             assert_eq!(view["repair_brief"]["disposition"], "verification_required");
         }
         let fact: Value = serde_json::from_slice(
-            &fs::read(p.0.join(format!("codeguard/findings/{id}/finding.json"))).unwrap(),
+            &fs::read(p.0.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
         )
         .unwrap();
         assert_eq!(fact["state"], "open");
@@ -388,7 +388,7 @@ fn changed_preparation_diagnosis_reuses_task_and_preserves_markdown() {
         } else {
             id = Some(current.clone());
             fs::write(
-                p.0.join(format!("codeguard/tasks/{current}.md")),
+                p.0.join(format!(".codeguard/tasks/{current}.md")),
                 "# 人工备注\n- [x] 已处理\n",
             )
             .unwrap();
@@ -396,15 +396,15 @@ fn changed_preparation_diagnosis_reuses_task_and_preserves_markdown() {
     }
     let id = id.unwrap();
     assert_eq!(
-        fs::read_dir(p.0.join("codeguard/tasks")).unwrap().count(),
+        fs::read_dir(p.0.join(".codeguard/tasks")).unwrap().count(),
         1
     );
     assert_eq!(
-        fs::read_to_string(p.0.join(format!("codeguard/tasks/{id}.md"))).unwrap(),
+        fs::read_to_string(p.0.join(format!(".codeguard/tasks/{id}.md"))).unwrap(),
         "# 人工备注\n- [x] 已处理\n"
     );
     let fact: Value = serde_json::from_slice(
-        &fs::read(p.0.join(format!("codeguard/findings/{id}/finding.json"))).unwrap(),
+        &fs::read(p.0.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
     )
     .unwrap();
     assert_eq!(fact["state"], "open");
@@ -429,7 +429,7 @@ fn source_outside_workspace_never_creates_preparation_task() {
     let r: Value = serde_json::from_slice(&output.stdout).unwrap();
     assert_eq!(r["workbench"]["status"], "source_outside_workspace");
     assert_eq!(
-        fs::read_dir(p.0.join("codeguard/tasks")).unwrap().count(),
+        fs::read_dir(p.0.join(".codeguard/tasks")).unwrap().count(),
         0
     );
 }
@@ -496,7 +496,7 @@ fn same_scope_native_recovery_changes_preparation_next_without_closing() {
         "same_scope_native_observed_unverified"
     );
     let fact: Value = serde_json::from_slice(
-        &fs::read(p.0.join(format!("codeguard/findings/{id}/finding.json"))).unwrap(),
+        &fs::read(p.0.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
     )
     .unwrap();
     assert_eq!(fact["state"], "open");
@@ -568,7 +568,7 @@ fn preparation_verify_records_blocked_observation_and_keeps_task_open() {
         "{status}"
     );
     let fact: Value = serde_json::from_slice(
-        &fs::read(p.0.join(format!("codeguard/findings/{id}/finding.json"))).unwrap(),
+        &fs::read(p.0.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
     )
     .unwrap();
     assert_eq!(fact["state"], "open");
@@ -692,7 +692,7 @@ fn preparation_verify_native_recovery_creates_source_task_but_keeps_blocker_open
     assert_eq!(result["event_persisted"], true, "{result}");
     let event: Value = serde_json::from_slice(
         &fs::read(p.0.join(format!(
-            "codeguard/findings/{id}/events/verify-{}.json",
+            ".codeguard/findings/{id}/events/verify-{}.json",
             result["native_scan"]["run_id"].as_str().unwrap()
         )))
         .unwrap(),
@@ -726,11 +726,11 @@ fn preparation_verify_native_recovery_creates_source_task_but_keeps_blocker_open
         "{view}"
     );
     assert_eq!(
-        fs::read_dir(p.0.join("codeguard/tasks")).unwrap().count(),
+        fs::read_dir(p.0.join(".codeguard/tasks")).unwrap().count(),
         2
     );
     let fact: Value = serde_json::from_slice(
-        &fs::read(p.0.join(format!("codeguard/findings/{id}/finding.json"))).unwrap(),
+        &fs::read(p.0.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
     )
     .unwrap();
     assert_eq!(fact["state"], "open");
@@ -802,7 +802,9 @@ fn preparation_verify_wrong_lease_cannot_write_recovery_observation() {
         .output()
         .unwrap();
     assert_eq!(claimed.status.code(), Some(0));
-    let before = fs::read_dir(p.0.join("codeguard/reports")).unwrap().count();
+    let before = fs::read_dir(p.0.join(".codeguard/reports"))
+        .unwrap()
+        .count();
     let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
         .args([
             "task",
@@ -823,7 +825,9 @@ fn preparation_verify_wrong_lease_cannot_write_recovery_observation() {
     assert_eq!(rejected["event_persisted"], false);
     assert!(rejected["native_scan"].is_null());
     assert_eq!(
-        fs::read_dir(p.0.join("codeguard/reports")).unwrap().count(),
+        fs::read_dir(p.0.join(".codeguard/reports"))
+            .unwrap()
+            .count(),
         before
     );
 }
@@ -924,7 +928,7 @@ fn preparation_failed_rechecks_count_attempts_and_stop_repetition() {
         assert_eq!(verified["event_persisted"], true);
         let event: Value = serde_json::from_slice(
             &fs::read(p.0.join(format!(
-                "codeguard/findings/{id}/events/verify-{}.json",
+                ".codeguard/findings/{id}/events/verify-{}.json",
                 verified["native_scan"]["run_id"].as_str().unwrap()
             )))
             .unwrap(),
@@ -955,7 +959,7 @@ fn preparation_failed_rechecks_count_attempts_and_stop_repetition() {
     let (_, next) = run(&["next", root]);
     assert_eq!(next["disposition"], "needs_decision");
     let fact: Value = serde_json::from_slice(
-        &fs::read(p.0.join(format!("codeguard/findings/{id}/finding.json"))).unwrap(),
+        &fs::read(p.0.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
     )
     .unwrap();
     assert_eq!(fact["state"], "open");
@@ -1030,7 +1034,7 @@ fn native_field_javadoc_respects_scope_and_rechecks_stable_task() {
     );
     assert_eq!(verified["event_persisted"], true);
     let fact: Value = serde_json::from_slice(
-        &fs::read(p.0.join(format!("codeguard/findings/{id}/finding.json"))).unwrap(),
+        &fs::read(p.0.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
     )
     .unwrap();
     assert_eq!(fact["state"], "open");
@@ -1174,7 +1178,7 @@ fn official_module_aliases_share_native_finding_and_task_identity() {
         }
     }
     assert_eq!(
-        fs::read_dir(p.0.join("codeguard/tasks")).unwrap().count(),
+        fs::read_dir(p.0.join(".codeguard/tasks")).unwrap().count(),
         1
     );
     let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
@@ -1262,7 +1266,7 @@ fn original_missing_method_properties_select_native_tasks() {
         assert_eq!(scan["delivery_decision"], "not_evaluated");
     }
     // 原配置使本轮零诊断，但其它历史方法任务不得因此关闭。
-    for entry in fs::read_dir(p.0.join("codeguard/findings")).unwrap() {
+    for entry in fs::read_dir(p.0.join(".codeguard/findings")).unwrap() {
         let fact: Value =
             serde_json::from_slice(&fs::read(entry.unwrap().path().join("finding.json")).unwrap())
                 .unwrap();
@@ -1330,7 +1334,7 @@ fn native_method_tokens_select_constructors_and_annotation_members() {
         );
         assert_eq!(scan["coverage_proven"], false);
         // 从原生报告投影选择紧凑构造器，不能依赖 next 的任务排序。
-        for entry in fs::read_dir(p.0.join("codeguard/reports")).unwrap() {
+        for entry in fs::read_dir(p.0.join(".codeguard/reports")).unwrap() {
             let entry = entry.unwrap();
             if entry.path().extension().is_some_and(|ext| ext == "json") {
                 let report: Value =
@@ -1381,10 +1385,10 @@ fn native_method_tokens_select_constructors_and_annotation_members() {
         assert_eq!(result["event_persisted"], true);
     }
     assert_eq!(
-        fs::read_dir(p.0.join("codeguard/tasks")).unwrap().count(),
+        fs::read_dir(p.0.join(".codeguard/tasks")).unwrap().count(),
         4
     );
-    for entry in fs::read_dir(p.0.join("codeguard/findings")).unwrap() {
+    for entry in fs::read_dir(p.0.join(".codeguard/findings")).unwrap() {
         let fact: Value =
             serde_json::from_slice(&fs::read(entry.unwrap().path().join("finding.json")).unwrap())
                 .unwrap();
@@ -1472,7 +1476,12 @@ fn changed_native_field_exclusion_cannot_become_a_repair_candidate() {
         assert_eq!(result["event_persisted"], true);
     }
     let fact: Value = serde_json::from_slice(
-        &fs::read(p.0.join("codeguard/findings").join(id).join("finding.json")).unwrap(),
+        &fs::read(
+            p.0.join(".codeguard/findings")
+                .join(id)
+                .join("finding.json"),
+        )
+        .unwrap(),
     )
     .unwrap();
     assert_eq!(fact["state"], "open");
@@ -1587,7 +1596,7 @@ fn original_method_tag_options_control_native_diagnostics_and_repair() {
         assert_eq!(verified["observation"], expected, "{verified}");
         assert_eq!(verified["event_persisted"], true);
     }
-    for entry in fs::read_dir(p.0.join("codeguard/findings")).unwrap() {
+    for entry in fs::read_dir(p.0.join(".codeguard/findings")).unwrap() {
         let fact: Value =
             serde_json::from_slice(&fs::read(entry.unwrap().path().join("finding.json")).unwrap())
                 .unwrap();
@@ -1707,7 +1716,7 @@ fn original_type_options_select_native_documentation_tasks() {
         assert_eq!(scan["coverage_proven"], false);
     }
     let mut target = None;
-    for entry in fs::read_dir(p.0.join("codeguard/findings")).unwrap() {
+    for entry in fs::read_dir(p.0.join(".codeguard/findings")).unwrap() {
         let entry = entry.unwrap();
         let fact: Value =
             serde_json::from_slice(&fs::read(entry.path().join("finding.json")).unwrap()).unwrap();
@@ -1748,7 +1757,7 @@ fn original_type_options_select_native_documentation_tasks() {
         "{verified}"
     );
     assert_eq!(verified["event_persisted"], true);
-    for entry in fs::read_dir(p.0.join("codeguard/findings")).unwrap() {
+    for entry in fs::read_dir(p.0.join(".codeguard/findings")).unwrap() {
         let fact: Value =
             serde_json::from_slice(&fs::read(entry.unwrap().path().join("finding.json")).unwrap())
                 .unwrap();
@@ -1880,7 +1889,7 @@ fn original_type_author_version_formats_preserve_native_failures_and_repair() {
         assert_eq!(scan["workbench"]["new_findings"], 0);
         assert_eq!(scan["workbench"]["new_blockers"], expected_blockers);
     }
-    for entry in fs::read_dir(p.0.join("codeguard/findings")).unwrap() {
+    for entry in fs::read_dir(p.0.join(".codeguard/findings")).unwrap() {
         let fact: Value =
             serde_json::from_slice(&fs::read(entry.unwrap().path().join("finding.json")).unwrap())
                 .unwrap();

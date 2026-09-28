@@ -64,7 +64,7 @@ fn missing_go_tool_creates_one_stable_environment_task_and_next() {
     let again = p.lint(None);
     assert_eq!(again["backlog_sync"]["new_blockers"], 0);
     assert_eq!(
-        fs::read_dir(p.0.join("codeguard/tasks")).unwrap().count(),
+        fs::read_dir(p.0.join(".codeguard/tasks")).unwrap().count(),
         1
     );
     let next = p.query(&["next"]);
@@ -93,7 +93,7 @@ fn real_go_findings_sync_without_duplicate_tasks_or_false_closure() {
     assert_eq!(first["backlog_status"], "synced_partial", "{first}");
     assert_eq!(first["backlog_sync"]["new_findings"], 1);
     let id = first["findings"][0]["finding_id"].as_str().unwrap();
-    let task = fs::read_to_string(p.0.join(format!("codeguard/tasks/{id}.md"))).unwrap();
+    let task = fs::read_to_string(p.0.join(format!(".codeguard/tasks/{id}.md"))).unwrap();
     for heading in [
         "问题证据",
         "规则依据",
@@ -112,7 +112,7 @@ fn real_go_findings_sync_without_duplicate_tasks_or_false_closure() {
     let clean = p.lint(Some(&tool));
     assert!(clean["findings"].as_array().unwrap().is_empty());
     let fact: Value = serde_json::from_slice(
-        &fs::read(p.0.join(format!("codeguard/findings/{id}/finding.json"))).unwrap(),
+        &fs::read(p.0.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
     )
     .unwrap();
     assert_eq!(fact["state"], "open");
@@ -166,7 +166,7 @@ fn synthetic_report(p: &Project) -> Value {
 }
 fn queue(p: &Project, report: &Value) {
     fs::write(
-        p.0.join("codeguard/reports/synthetic-go.json"),
+        p.0.join(".codeguard/reports/synthetic-go.json"),
         serde_json::to_vec(report).unwrap(),
     )
     .unwrap();
@@ -281,7 +281,7 @@ fn go_task_recheck_preserves_evidence_without_unverified_closure() {
     assert!(changed["step"].as_str().unwrap().contains("模块配置"));
     fs::write(p.0.join("go.mod"), manifest).unwrap();
     let fact: Value = serde_json::from_slice(
-        &fs::read(p.0.join(format!("codeguard/findings/{id}/finding.json"))).unwrap(),
+        &fs::read(p.0.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
     )
     .unwrap();
     assert_eq!(fact["state"], "open");
@@ -320,7 +320,7 @@ fn native_build_exclusion_is_not_a_repair_candidate() {
         let brief = codeguard_cli::next_command::read_task_brief(&p.0, id).unwrap();
         assert!(brief["step"].as_str().unwrap().contains("构建"), "{brief}");
         let fact: Value = serde_json::from_slice(
-            &fs::read(p.0.join(format!("codeguard/findings/{id}/finding.json"))).unwrap(),
+            &fs::read(p.0.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
         )
         .unwrap();
         assert_eq!(fact["state"], "open");

@@ -109,10 +109,10 @@ fn symlinked_project_config_is_not_followed() {
 fn malformed_tool_lock_and_forged_local_decision_never_grant_a_whitelist() {
     let project = Project::new();
     project.write("codeguard.lock.json", &json!({"approved":true}));
-    fs::create_dir(project.0.join("codeguard")).unwrap();
-    fs::create_dir(project.0.join("codeguard/decisions")).unwrap();
+    fs::create_dir(project.0.join(".codeguard")).unwrap();
+    fs::create_dir(project.0.join(".codeguard/decisions")).unwrap();
     project.write(
-        "codeguard/decisions/allow.json",
+        ".codeguard/decisions/allow.json",
         &json!({"approved":true,"path":"*"}),
     );
     let (exit, report) = project.inspect("validate");

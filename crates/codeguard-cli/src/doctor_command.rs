@@ -98,7 +98,7 @@ pub fn run(arguments: &[String]) -> ExitCode {
 
 fn persist_and_sync(root: &std::path::Path, report: &mut Value) {
     // 拒绝工作区根链接，避免局部报告写入另一个项目。
-    if std::fs::symlink_metadata(root.join("codeguard")).is_ok_and(|m| !m.file_type().is_dir()) {
+    if std::fs::symlink_metadata(root.join(".codeguard")).is_ok_and(|m| !m.file_type().is_dir()) {
         report["workspace_binding"] = "invalid".into();
         return;
     }

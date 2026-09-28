@@ -187,7 +187,7 @@ fn valid_python_advisory_after_native_failure_remains_partial_evidence() {
             .as_str()
             .is_some_and(|value| value.contains("已同步稳定 Python CVE 待处理任务"))
     );
-    let tasks: Vec<_> = fs::read_dir(project.0.join("codeguard/tasks"))
+    let tasks: Vec<_> = fs::read_dir(project.0.join(".codeguard/tasks"))
         .unwrap()
         .filter_map(Result::ok)
         .filter(|entry| {
@@ -382,7 +382,7 @@ fn conditional_pylock_runs_native_audit_without_attributing_unselected_packages(
         initialized["native_results"]["python_cve"][0]["backlog_status"],
         "synced_partial"
     );
-    let tasks: Vec<_> = fs::read_dir(project.0.join("codeguard/tasks"))
+    let tasks: Vec<_> = fs::read_dir(project.0.join(".codeguard/tasks"))
         .unwrap()
         .filter_map(Result::ok)
         .filter(|entry| {
@@ -548,7 +548,7 @@ fn initialized_python_cve_creates_one_stable_task_for_repeated_scans() {
             "{report}"
         );
     }
-    let tasks: Vec<_> = fs::read_dir(project.0.join("codeguard/tasks"))
+    let tasks: Vec<_> = fs::read_dir(project.0.join(".codeguard/tasks"))
         .unwrap()
         .filter_map(Result::ok)
         .filter(|entry| entry.file_name().to_string_lossy().ends_with(".md"))
@@ -616,7 +616,7 @@ fn initialized_python_cve_creates_one_stable_task_for_repeated_scans() {
         &fs::read(
             project
                 .0
-                .join(format!("codeguard/findings/{id}/finding.json")),
+                .join(format!(".codeguard/findings/{id}/finding.json")),
         )
         .unwrap(),
     )
@@ -666,7 +666,7 @@ fn initialized_python_cve_creates_one_stable_task_for_repeated_scans() {
         &fs::read(
             project
                 .0
-                .join(format!("codeguard/findings/{id}/finding.json")),
+                .join(format!(".codeguard/findings/{id}/finding.json")),
         )
         .unwrap(),
     )
@@ -714,7 +714,7 @@ fn initialized_multi_root_python_cve_keeps_distinct_stable_tasks() {
                 .all(|scan| scan["backlog_status"] == "synced_partial")
         );
     }
-    let facts: Vec<Value> = fs::read_dir(project.0.join("codeguard/findings"))
+    let facts: Vec<Value> = fs::read_dir(project.0.join(".codeguard/findings"))
         .unwrap()
         .filter_map(Result::ok)
         .filter_map(|entry| fs::read(entry.path().join("finding.json")).ok())

@@ -77,7 +77,7 @@ fn check_all_runs_each_npm_root_and_syncs_without_claiming_vulnerability_coverag
             assert_eq!(scan["backlog_status"], "synced_partial", "{scan}");
         }
         assert_eq!(
-            fs::read_dir(fixture.0.join("codeguard/tasks"))
+            fs::read_dir(fixture.0.join(".codeguard/tasks"))
                 .unwrap()
                 .count(),
             2
@@ -126,7 +126,7 @@ fn check_all_runs_each_npm_root_and_syncs_without_claiming_vulnerability_coverag
         }
         assert_eq!(report["execution_tasks"].as_array().unwrap().len(), 2);
         assert_eq!(
-            fs::read_dir(fixture.0.join("codeguard/tasks"))
+            fs::read_dir(fixture.0.join(".codeguard/tasks"))
                 .unwrap()
                 .count(),
             2
@@ -142,7 +142,7 @@ fn check_all_runs_each_npm_root_and_syncs_without_claiming_vulnerability_coverag
             2
         );
     }
-    assert!(!fixture.0.join("a/codeguard").exists());
+    assert!(!fixture.0.join("a/.codeguard").exists());
     let native_args = [
         "--node-tool",
         node.to_str().unwrap(),
@@ -232,7 +232,7 @@ fn check_all_runs_each_npm_root_and_syncs_without_claiming_vulnerability_coverag
         1
     );
     assert_eq!(
-        fs::read_dir(fixture.0.join("codeguard/tasks"))
+        fs::read_dir(fixture.0.join(".codeguard/tasks"))
             .unwrap()
             .count(),
         2
@@ -421,7 +421,7 @@ fn real_npm_audit_enters_check_all_workbench() {
         "synced_partial"
     );
     assert_eq!(
-        fs::read_dir(fixture.0.join("codeguard/tasks"))
+        fs::read_dir(fixture.0.join(".codeguard/tasks"))
             .unwrap()
             .count(),
         1
@@ -485,8 +485,8 @@ fn automatic_npm_preparation_does_not_initialize_a_workspace_or_enter_java_only_
         "workspace_not_initialized"
     );
     assert!(scans[0]["observation"].is_null());
-    assert!(!fixture.0.join("codeguard").exists());
+    assert!(!fixture.0.join(".codeguard").exists());
     let report = run("java");
     assert_eq!(report["native_results"]["npm_cve"], serde_json::json!([]));
-    assert!(!fixture.0.join("codeguard").exists());
+    assert!(!fixture.0.join(".codeguard").exists());
 }

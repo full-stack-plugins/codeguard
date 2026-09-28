@@ -53,7 +53,7 @@ fn default_doctor_observes_configuration_without_selecting_or_running_tools() {
         report["profile_summary"]["checkers"][0]["configuration"],
         "missing"
     );
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
     assert_eq!(
         fs::read_to_string(project.0.join("app.py")).unwrap(),
         "import os\n"
@@ -98,7 +98,7 @@ fn selected_real_ruff_runs_only_version_and_keeps_policy_unverified() {
     assert_eq!(report["quality_checks"], "not_run");
     assert!(report.get("findings").is_none());
     assert!(!report.to_string().contains(tool.to_str().unwrap()));
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
 }
 
 #[test]
@@ -119,7 +119,7 @@ fn bad_arguments_do_not_start_diagnostics() {
         assert_eq!(output.status.code(), Some(2));
         assert!(output.stdout.is_empty());
     }
-    assert!(!project.0.join("codeguard").exists());
+    assert!(!project.0.join(".codeguard").exists());
 }
 
 #[test]

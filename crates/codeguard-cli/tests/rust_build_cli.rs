@@ -294,7 +294,7 @@ fn initialized_build_scans_sync_one_stable_task_and_next_uses_original_build_che
         assert_eq!(report["backlog_status"], "synced", "{report}");
     }
     assert_eq!(
-        fs::read_dir(fixture.0.join("codeguard/tasks"))
+        fs::read_dir(fixture.0.join(".codeguard/tasks"))
             .unwrap()
             .count(),
         1
@@ -313,7 +313,7 @@ fn initialized_build_scans_sync_one_stable_task_and_next_uses_original_build_che
             .to_string()
             .contains("verify")
     );
-    let task = fs::read_dir(fixture.0.join("codeguard/tasks"))
+    let task = fs::read_dir(fixture.0.join(".codeguard/tasks"))
         .unwrap()
         .next()
         .unwrap()
@@ -380,7 +380,7 @@ fn initialized_build_missing_tool_is_a_stable_preparation_task() {
         assert_eq!(report["backlog_status"], "synced");
     }
     assert_eq!(
-        fs::read_dir(fixture.0.join("codeguard/tasks"))
+        fs::read_dir(fixture.0.join(".codeguard/tasks"))
             .unwrap()
             .count(),
         1
@@ -406,7 +406,7 @@ fn queued_build_rejects_forged_fingerprint_and_stale_target_only_creates_prepara
         value["backlog_status"] = json!("queued");
         value["backlog_sync"] = Value::Null;
         fs::write(
-            fixture.0.join(format!("codeguard/reports/{run}.json")),
+            fixture.0.join(format!(".codeguard/reports/{run}.json")),
             serde_json::to_vec(&value).unwrap(),
         )
         .unwrap();

@@ -272,7 +272,7 @@ fn initialized_rust_finding_becomes_one_stable_repair_task() {
     assert!(
         fixture
             .0
-            .join("codeguard/tasks")
+            .join(".codeguard/tasks")
             .join(format!("{id}.md"))
             .is_file()
     );
@@ -295,7 +295,7 @@ fn initialized_rust_finding_becomes_one_stable_repair_task() {
     let (_, second) = fixture.check(&["--cargo-tool", tool.to_str().unwrap()]);
     assert_eq!(second["next"]["repair_brief"]["task_id"], id);
     assert_eq!(
-        fs::read_dir(fixture.0.join("codeguard/tasks"))
+        fs::read_dir(fixture.0.join(".codeguard/tasks"))
             .unwrap()
             .count(),
         2
@@ -450,7 +450,7 @@ fn initialized_missing_cargo_becomes_an_environment_task() {
     let (_, second) = fixture.check(&[]);
     assert_eq!(second["next"]["repair_brief"]["task_id"], id);
     assert_eq!(
-        fs::read_dir(fixture.0.join("codeguard/tasks"))
+        fs::read_dir(fixture.0.join(".codeguard/tasks"))
             .unwrap()
             .count(),
         4
@@ -502,7 +502,7 @@ fn project_writable_decision_cannot_hide_a_clippy_finding() {
         .unwrap();
     assert_eq!(init.status.code(), Some(3));
     fs::write(
-        fixture.0.join("codeguard/decisions/local.json"),
+        fixture.0.join(".codeguard/decisions/local.json"),
         r#"{"kind":"false_positive","native_rule_id":"clippy::needless_return","approved":true}"#,
     )
     .unwrap();
@@ -667,7 +667,7 @@ fn real_cargo_clippy_rechecks_a_persistent_task() {
         &fs::read(
             fixture
                 .0
-                .join(format!("codeguard/findings/{id}/finding.json")),
+                .join(format!(".codeguard/findings/{id}/finding.json")),
         )
         .unwrap(),
     )

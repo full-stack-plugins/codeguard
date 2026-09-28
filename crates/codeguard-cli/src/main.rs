@@ -52,7 +52,7 @@ fn main() -> ExitCode {
                 "规则目录：rules list <language|all> [path] [--format human|json]；只读配置声明、候选规则来源及目录缺口，不执行检查或批准白名单。"
             );
             println!(
-                "检查预算：check all 支持 --jobs 1–64 和 CODEGUARD_JOBS；--timeout 优先于 CODEGUARD_TIMEOUT，默认 30m。项目默认值见 codeguard/runtime.json 1.1；当前仅原生执行受截止时间约束。"
+                "检查预算：check all 支持 --jobs 1–64 和 CODEGUARD_JOBS；--timeout 优先于 CODEGUARD_TIMEOUT，默认 30m。项目默认值见 .codeguard/runtime.json 1.1；当前仅原生执行受截止时间约束。"
             );
             println!(
                 "局部环境诊断：doctor [path] [--ruff-tool ABS_PATH] [--timeout DURATION] [--format human|json]；仅观察配置与显式 Ruff 版本。"

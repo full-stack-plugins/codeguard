@@ -95,7 +95,7 @@ fn execute(args: &Args) -> Result<Value, &'static str> {
     if !root.is_dir() {
         return Err("project_unreadable");
     }
-    let state = root.join("codeguard/state");
+    let state = root.join(".codeguard/state");
     if !real_directory(&state) {
         return Err("workspace_state_unavailable");
     }
@@ -260,7 +260,7 @@ fn lock_verification_inner(
     token: &str,
     generation: Option<u64>,
 ) -> Result<(TaskFileLock, u64), &'static str> {
-    let state = root.join("codeguard/state");
+    let state = root.join(".codeguard/state");
     if !real_directory(&state) {
         return Err("workspace_state_unavailable");
     }

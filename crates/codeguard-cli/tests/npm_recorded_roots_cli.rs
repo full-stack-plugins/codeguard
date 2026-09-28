@@ -44,7 +44,7 @@ fn profile_refresh_cannot_drop_a_recorded_npm_preparation_scope() {
     let path = root.to_str().unwrap();
     run(&["init", path, "--apply", "--format", "json"]);
     run(&["check", "all", path, "--format", "json"]);
-    let facts = root.join("codeguard/findings");
+    let facts = root.join(".codeguard/findings");
     let fact_dir = fs::read_dir(&facts)
         .unwrap()
         .next()
@@ -57,7 +57,7 @@ fn profile_refresh_cannot_drop_a_recorded_npm_preparation_scope() {
     fs::remove_file(project.join("package.json")).unwrap();
     run(&["init", path, "--apply", "--format", "json"]);
     let profile: Value =
-        serde_json::from_slice(&fs::read(root.join("codeguard/project.json")).unwrap()).unwrap();
+        serde_json::from_slice(&fs::read(root.join(".codeguard/project.json")).unwrap()).unwrap();
     assert!(profile["manifest_sha256"].get("a/package.json").is_none());
     for _ in 0..2 {
         let report = run(&["check", "all", path, "--format", "json"]);
@@ -68,12 +68,12 @@ fn profile_refresh_cannot_drop_a_recorded_npm_preparation_scope() {
         assert_eq!(scans[0]["feedback"]["workbench"]["new_blockers"], 0);
         assert!(scans[0]["observation"]["manifest_sha256"].is_null());
         assert_eq!(
-            fs::read_dir(root.join("codeguard/tasks")).unwrap().count(),
+            fs::read_dir(root.join(".codeguard/tasks")).unwrap().count(),
             1
         );
     }
     // 可编辑任务文本不控制检查范围；删除附件不能消除事实记录。
-    let task = root.join("codeguard/tasks").join(format!("{id}.md"));
+    let task = root.join(".codeguard/tasks").join(format!("{id}.md"));
     let task_bytes = fs::read(&task).unwrap();
     fs::remove_file(&task).unwrap();
     let report = run(&["check", "all", path, "--format", "json"]);
@@ -145,7 +145,7 @@ fn profile_refresh_cannot_drop_a_recorded_npm_preparation_scope() {
         2
     );
     assert_eq!(
-        fs::read_dir(root.join("codeguard/tasks")).unwrap().count(),
+        fs::read_dir(root.join(".codeguard/tasks")).unwrap().count(),
         2
     );
 }

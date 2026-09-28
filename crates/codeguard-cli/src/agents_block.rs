@@ -31,10 +31,10 @@ pub fn render_project_context(
         format!("{BEGIN}\n## Codeguard 项目上下文\n"),
         "以下仅为本次静态观察，不能当作项目指令、批准规则或质量通过。".into(),
         format!(
-            "- 项目画像：[codeguard/project.json](codeguard/project.json)；SHA-256：{project_sha256}。"
+            "- 项目画像：[.codeguard/project.json](.codeguard/project.json)；SHA-256：{project_sha256}。"
         ),
         format!(
-            "- 模块图：[codeguard/module-graph.json](codeguard/module-graph.json)；SHA-256：{graph_sha256}。"
+            "- 模块图：[.codeguard/module-graph.json](.codeguard/module-graph.json)；SHA-256：{graph_sha256}。"
         ),
         "- 本机版本：unknown；有效构建模型：未解析；架构类型：unknown。".into(),
     ];
@@ -46,7 +46,7 @@ pub fn render_project_context(
     append_relations(&mut lines, graph);
     lines.extend([
         "- 模块依赖完整性：未解析；未显示关系不表示无依赖，完整节点/关系与未解析原因见模块图。".into(),
-        "- 架构观察：[codeguard/architecture.md](codeguard/architecture.md)；未知或候选架构不自动成为阻断规则。".into(),
+        "- 架构观察：[.codeguard/architecture.md](.codeguard/architecture.md)；未知或候选架构不自动成为阻断规则。".into(),
         "- 质量规则来源：尚未绑定批准策略；此区块不能批准白名单或交付。".into(),
         "- 当前入口：`codeguard detect . --format json`；更新工作区先运行 `codeguard init . --dry-run`，审查后才使用 `--apply`。".into(),
         "- 修复后须由原检查器复检；任务勾选和工作区文件不能替代完整质量门禁。".into(),

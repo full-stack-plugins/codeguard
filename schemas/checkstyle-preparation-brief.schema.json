@@ -94,7 +94,7 @@
           },
           "report_ref": {
             "type": "string",
-            "pattern": "^codeguard/reports/[A-Za-z0-9_-]{1,120}\\.json$"
+            "pattern": "^\\.codeguard/reports/[A-Za-z0-9_-]{1,120}\\.json$"
           }
         }
       }
@@ -351,7 +351,7 @@
           "uniqueItems": true,
           "items": {
             "type": "string",
-            "pattern": "^codeguard/findings/CG-[0-9a-f]{32}/events/correction-proposed-[0-9a-f]{64}\\.json$"
+            "pattern": "^\\.codeguard/findings/CG-[0-9a-f]{32}/events/correction-proposed-[0-9a-f]{64}\\.json$"
           }
         },
         "correction_task_refs": {
@@ -360,7 +360,7 @@
           "uniqueItems": true,
           "items": {
             "type": "string",
-            "pattern": "^codeguard/tasks/corrections/CG-[0-9a-f]{32}/[0-9a-f]{64}\\.md$"
+            "pattern": "^\\.codeguard/tasks/corrections/CG-[0-9a-f]{32}/[0-9a-f]{64}\\.md$"
           }
         },
         "first_diagnostic_reason": {
