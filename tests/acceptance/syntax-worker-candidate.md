@@ -10,6 +10,8 @@
 
 本机增量验证：`process_contract` 16 项、`syntax_worker_candidate` 4 项、`typescript_syntax_fallback_candidate` 5 项通过；启用 WASM 特性的全工作区离线回归 175 组、1048 通过、101 条条件忽略、零失败。CLI 特性 Clippy 与全工作区 Clippy `-D warnings`、受改文件 `rustfmt --check`、OpenSpec strict、分层检查及 `git diff --check` 均退出 0。Linux 专用分配负例被平台条件编译排除，需查看推送后 CI 的真实运行结果。
 
+Linux 实机证据：[GitHub Actions run 36475894172](https://github.com/full-stack-plugins/codeguard/actions/runs/36475894172) 在提交 `dbac346ac1b2b2e02ef85d7ec2ee9a1b29b65163` 上通过。专项目标步骤真实运行 `linux_address_space_limit_rejects_a_larger_allocation`，runtime 18 项、Java/通用 worker 4 项、TypeScript fallback 5 项均通过；随后普通工作区构建、全量测试及分层检查也通过。首次 run `36475507492` 在专项步骤之前遇到未改动的 `native_version_observation` 30 ms 超时用例返回 `SpawnFailure`，第二轮全量通过；该偶发故障根因未独立定位，不纳入 Linux 内存证明。以上只证明当前 Ubuntu runner 上的进程地址空间限制及其测试路径，不证明 macOS/Windows 内存边界、内核级隔离或全部语法能力。
+
 验证命令及结果在提交前记录：
 
 ```text
