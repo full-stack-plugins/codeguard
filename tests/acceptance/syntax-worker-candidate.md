@@ -16,6 +16,8 @@ Linux 实机证据：[GitHub Actions run 36475894172](https://github.com/full-st
 
 对应 Linux 验证：[GitHub Actions run 36477434825](https://github.com/full-stack-plugins/codeguard/actions/runs/36477434825) 在提交 `8268121fc943f7a3a897adde81bd897da98ca6ff` 上通过；启用 WASM 的 worker 专项步骤及其后的全工作区套件均为绿色。故障隔离证据仅适用于所测 macOS arm64 与 Ubuntu x86_64；其它平台及损坏 grammar 注入仍待单独验收。
 
+重复验证发现夹具时序问题：`4b3e21e` 的 [run 36477978722](https://github.com/full-stack-plugins/codeguard/actions/runs/36477978722) 在 Linux 将假 worker 的过早退出记录为 `WriteFailure`，而测试只接受 `Exited(9)`。夹具现先用 `/bin/cat` 读尽 stdin，再启动后代并退出，避免把合法的写入竞态误判为清理失败；Linux `rlim_t` 由无效的 `try_from` 分支改为明确上界核验。最终代码提交 `6629da65a1fcf7f9810e9cb5c9a6b0c050267d64` 的 [run 36478461118](https://github.com/full-stack-plugins/codeguard/actions/runs/36478461118) 已通过专项与全量测试。该修正不扩大平台或 grammar 覆盖声明。
+
 验证命令及结果在提交前记录：
 
 ```text
