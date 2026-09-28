@@ -315,6 +315,8 @@ Host hooks pass events, workspace identity and known targets. Rust core selects 
 
 Separately, `lint python . --file REL_PATH` can invoke native Ruff within the same path budget and report only the selected files. `hook plan` does not yet invoke it automatically, and this local result is neither a real Git-scope check nor a full workbench scan.
 
+`hook execute PATH --timeout DURATION --format=json` now consumes the same versioned host event and core route. Session start performs read-only discovery; a confirmed, bounded, Python-only edit calls that Ruff fast check. Mixed languages, uncertain or failed writes, repair and delivery events remain explicitly `not_run`. Its `hook_execution_feedback` 0.1 is candidate local evidence; plugin Hooks, cache reuse and real Git/CI gates are still unwired.
+
 ```mermaid
 flowchart LR
     H[Host event] --> R[Pure Rust event routing]

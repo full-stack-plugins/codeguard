@@ -159,6 +159,7 @@ Supply the original checker's required tool/configuration options to `task verif
 | `tools list / verify`, `doctor` | Inspect tools and limited environment probes | Explicit Ruff doctor probe; `tools install --apply` is blocked |
 | `plan CATEGORY LANGUAGE` | Preview selections and gaps | Not a certified execution plan |
 | `hook plan` | Route a versioned host event to a candidate check tier | Reads bounded JSON on stdin; exit 3, no check or host blocking |
+| `hook execute` | Execute the currently wired read-only discovery or Python edit feedback | Explicit timeout; other events report `not_run`; no host delivery gate |
 | `lint python / java / typescript / go` | Run selected native checks | Adapter-specific options and scope |
 | `comments rust`, `build rust` | Documentation and type checking | Build does not run project tests |
 | `cve rust / python / typescript` | Native advisory observations | Database identity/freshness and full coverage remain limited |

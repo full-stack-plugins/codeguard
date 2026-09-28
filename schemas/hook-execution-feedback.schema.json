@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:hook-execution-feedback:0.1.0",
+  "title": "Candidate host-event execution; never a delivery gate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "report_type", "plan", "execution", "reason", "local_feedback", "delivery_decision", "host_blocking_verified", "soft_result_reused"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "report_type": {"const": "hook_execution_feedback"},
+    "plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "target_paths", "scope_resolution_reason", "task_id", "requires_git_snapshot", "soft_result_reuse_candidate", "host_blocking_claimed", "may_claim_delivery"],
+      "properties": {
+        "action": {"enum": ["no_check", "discover_project", "show_intent_guidance", "fast_file_check", "resolve_changed_scope", "verify_task", "commit_gate", "push_gate", "full_project_check", "show_summary"]},
+        "target_paths": {"type": "array", "maxItems": 8, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 512}},
+        "scope_resolution_reason": {"enum": [null, "changed_paths_missing", "write_outcome_unknown", "fast_scope_budget_exceeded"]},
+        "task_id": {"type": ["string", "null"]},
+        "requires_git_snapshot": {"type": "boolean"},
+        "soft_result_reuse_candidate": {"type": "boolean"},
+        "host_blocking_claimed": {"type": "boolean"},
+        "may_claim_delivery": {"const": false}
+      }
+    },
+    "execution": {"enum": ["not_run", "read_only_discovery", "local_observation"]},
+    "reason": {"enum": [null, "workspace_unavailable", "registry_unavailable", "adapter_unavailable", "request_cancelled", "fast_scope_not_wired", "write_failed", "scope_resolution_required", "delivery_gate_not_wired", "action_not_wired"]},
+    "local_feedback": {"type": ["object", "null"]},
+    "delivery_decision": {"const": "not_evaluated"},
+    "host_blocking_verified": {"const": false},
+    "soft_result_reused": {"const": false}
+  },
+  "allOf": [
+    {"if": {"properties": {"execution": {"const": "not_run"}}, "required": ["execution"]}, "then": {"properties": {"local_feedback": {"type": "null"}, "reason": {"type": "string"}}}},
+    {"if": {"properties": {"execution": {"const": "read_only_discovery"}}, "required": ["execution"]}, "then": {"properties": {"plan": {"properties": {"action": {"const": "discover_project"}}}, "reason": {"type": "null"}, "local_feedback": {"$ref": "#/$defs/discovery_summary"}}}},
+    {"if": {"properties": {"execution": {"const": "local_observation"}}, "required": ["execution"]}, "then": {"properties": {"plan": {"properties": {"action": {"const": "fast_file_check"}}}, "reason": {"enum": [null, "request_cancelled"]}, "local_feedback": {"type": "object", "required": ["schema_version", "report_type", "scan_scope", "delivery_decision"], "properties": {"schema_version": {"const": "0.13.0"}, "report_type": {"const": "python_lint_feedback"}, "scan_scope": {"const": "selected_files"}, "delivery_decision": {"const": "not_evaluated"}}}}}}
+  ],
+  "$defs": {
+    "discovery_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "report_type", "languages", "checker_configurations", "checker_count", "checker_list_truncated", "observation_complete", "unknown_condition_count", "source_check", "delivery_decision"],
+      "properties": {
+        "schema_version": {"const": "0.1.0"},
+        "report_type": {"const": "hook_discovery_summary"},
+        "languages": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "checker_configurations": {"type": "array", "maxItems": 32, "items": {"type": "object", "additionalProperties": false, "required": ["checker_id", "build_root", "configuration"], "properties": {"checker_id": {"type": "string"}, "build_root": {"type": "string"}, "configuration": {"type": "string"}}}},
+        "checker_count": {"type": "integer", "minimum": 0},
+        "checker_list_truncated": {"type": "boolean"},
+        "observation_complete": {"type": "boolean"},
+        "unknown_condition_count": {"type": "integer", "minimum": 0},
+        "source_check": {"const": "not_run"},
+        "delivery_decision": {"const": "not_evaluated"}
+      }
+    }
+  }
+}

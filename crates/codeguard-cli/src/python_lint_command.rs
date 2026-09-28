@@ -202,8 +202,9 @@ pub fn annotate_conversation_budget(feedback: &mut Value, timeout_ms: u64, sourc
     document.insert("execution_budget".into(), budget_record(timeout_ms, source));
 }
 
-/// 编辑快反馈仅观察指定文件，不把局部报告作为完整工作区报告导入工作台。
-fn scan_selected_report_with_deadline(
+/// 编辑快反馈仅观察 `selected_paths`，不把局部报告作为完整工作区报告导入工作台。
+/// `root` 是规范化项目根，`deadline` 和 `cancelled` 约束本轮原生执行；返回局部报告或清单错误。
+pub(crate) fn scan_selected_report_with_deadline(
     root: &Path,
     ruff_tool: Option<&Path>,
     selected_paths: &[String],

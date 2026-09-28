@@ -58,7 +58,8 @@ pub fn run(args: &[String]) -> ExitCode {
     ExitCode::from(3)
 }
 
-fn parse_request(raw: &[u8]) -> Result<HookTriggerInput, String> {
+/// 解析原始 `raw` 宿主请求；返回版本化事件或严格协议错误。
+pub(crate) fn parse_request(raw: &[u8]) -> Result<HookTriggerInput, String> {
     let value = codeguard_adapters::parse_unique_json(raw).map_err(str::to_owned)?;
     let object = value.as_object().ok_or("hook_request_not_object")?;
     if object.len() != 3

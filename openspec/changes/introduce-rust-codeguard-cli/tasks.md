@@ -565,6 +565,7 @@
 - [ ] 11.16 将配置探测与原生检查结果反馈到 Codex/ZCode/Kimi 智能体对话；验收：已配置检查器、未配置项、有效诊断、工具故障、修复建议和复检命令清楚可见；backlog 同步失败仍显示本次结果，原始工具文本不能作为智能体指令。进行中：相邻 Rust `conversation_feedback` 已从结构校验后的 RunReport 生成 JSON/human 状态、规则 ID、可用的位置、未完成原因与复检 argv；`lint python` 把真实 Ruff 扫描配置、诊断、故障及 backlog 同步状态渲染成 CLI human/JSON，存储失败仍显示原生 finding，均排除原始工具文案；见 `codeguard-cli/tests/acceptance/{conversation-feedback-baseline,python-lint-scan,work-sync-ruff-baseline}.md`。可信来源绑定、完整规则解释与三宿主自动对话接线未完成，故不勾选。
 - [ ] 11.17 实现事件驱动的检查档位与宿主接线；责任：core/CLI/plugin。验收：启动只发现、成功编辑局部快检、失败写入无源码检查、未知写入重定范围、修复按原任务复检、提交/推送/CI 各取本轮真实范围；软结果身份等价才可复用，无法阻断的宿主不宣称硬门禁。进行中：core 已有纯事件路由及[反例目标测试](../../../tests/acceptance/hook-trigger-routing-candidate.md)；CLI 已有严格、有界的只读 `hook plan`，1.1 响应对逐文件快检限制 8 个不同路径、单路径 512 字节、路径总计 2 KiB，超预算明确重定范围而非截断或假称检查，保留 1.0 历史 schema，见[CLI 局部验收](../../../tests/acceptance/hook-plan-cli-candidate.md)。档位到真实检查器的命令映射、工具/配置/源码身份、时间/并发预算、三宿主 Hook 和真实 Git/CI 接线尚缺，不勾选。
   - 新增 `lint python [path] --file REL_PATH` 的有界逐文件 Ruff 执行切片；报告明确 `scan_scope=selected_files`，未知目标未完成，局部结果不导入工作台为完整扫描。真实宿主事件到该 CLI 的调用、局部任务同步、软结果身份缓存及其它语言快检仍未完成，见[局部验收](../../../tests/acceptance/python-edit-scope-candidate.md)。
+  - 新增 `hook execute` 消费同一宿主事件并调用 core 路由：启动只读发现，确认成功的纯 Python 编辑执行局部 Ruff；失败/未知写入、混合语言和交付动作不会误调用或声称通过。事件报告固定 `not_evaluated`，见[局部验收](../../../tests/acceptance/hook-execute-python-candidate.md)。插件实际 Hook、任务复检及 Git/CI 门禁仍未接线，11.17 保持未完成。
 
 ## 12. S12 质量评测与验收
 

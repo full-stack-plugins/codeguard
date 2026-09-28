@@ -315,6 +315,8 @@ sequenceDiagram
 
 独立的 `lint python . --file REL_PATH` 已能以相同路径预算调用原生 Ruff，仅输出指定文件的局部反馈；它没有由 `hook plan` 自动调起，未执行本轮 Git 范围检查，也不将局部结果当作完整工作台扫描。
 
+新增 `hook execute PATH --timeout DURATION --format=json` 消费同一版本化宿主事件。它调用 core 的事件规划：会话启动只读发现，确认成功且全为 Python 的有界编辑范围调用前述 Ruff 快检。混合语言、未知/失败写入、修复及交付事件保持显式 `not_run`；返回的 `hook_execution_feedback` 0.1 始终是候选局部观察，未接入插件 Hook、缓存复用或真实 Git/CI 门禁。
+
 ```mermaid
 flowchart LR
     H[宿主事件] --> R[纯 Rust 事件路由]
