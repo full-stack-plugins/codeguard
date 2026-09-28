@@ -1,5 +1,8 @@
 use ring::digest::{SHA256, digest};
-use tree_sitter::{Parser, Tree, WasmStore, wasmtime::Engine};
+use tree_sitter::{
+    Parser, Tree, WasmStore,
+    wasmtime::{Config, Engine},
+};
 
 /// 经调用方固定清单校验的 Tree-sitter WASM grammar 的 Rust 加载与解析器。
 /// 仅提供语法树；是否属于源码违规由上层规则和原生检查结果决定。
@@ -43,7 +46,14 @@ impl WasmGrammar {
             return Err("WASM SHA-256 与固定资产不符".into());
         }
 
-        let engine = Engine::default();
+        // 默认 4 GiB 虚拟内存预留会先于 Linux worker 的地址空间上限失败。
+        // 这仅缩小预留量；真正的进程硬限制由父进程设置并按平台验收。
+        let mut config = Config::new();
+        config
+            .memory_reservation(64 * 1024 * 1024)
+            .memory_guard_size(16 * 1024 * 1024)
+            .max_wasm_stack(2 * 1024 * 1024);
+        let engine = Engine::new(&config).map_err(|error| error.to_string())?;
         let mut store = WasmStore::new(&engine).map_err(|error| error.to_string())?;
         let language = store
             .load_language(name, wasm)

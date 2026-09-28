@@ -91,7 +91,7 @@ pub use private_log::{
     ReportEvidenceFailureKind, ReportedProcessOutcome, prepare_fresh_report, run_process_recorded,
     run_process_recorded_with_report, write_private_log,
 };
-pub use process_runner::{ProcessOutcome, run_process};
+pub use process_runner::{ProcessOutcome, run_process, run_process_with_address_space_limit};
 pub use process_spec::ProcessSpec;
 #[cfg(unix)]
 mod native_version_request;

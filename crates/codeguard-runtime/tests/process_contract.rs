@@ -1,6 +1,8 @@
 #![cfg(unix)]
 
-use codeguard_runtime::{ProcessSpec, Termination, run_process};
+use codeguard_runtime::{
+    ProcessSpec, Termination, run_process, run_process_with_address_space_limit,
+};
 use std::collections::BTreeMap;
 use std::ffi::OsString;
 use std::fs;
@@ -20,6 +22,51 @@ fn spec(executable: &str, args: &[&str]) -> ProcessSpec {
         deadline: Instant::now() + Duration::from_secs(2),
         output_limit_bytes: 1024,
     }
+}
+
+#[test]
+fn address_space_limit_requires_a_supported_platform_and_positive_budget() {
+    let request = spec("/bin/echo", &["hello"]);
+    let zero = run_process_with_address_space_limit(&request, &AtomicBool::new(false), 0);
+    assert_eq!(zero.termination, Termination::InvalidSpec);
+    #[cfg(not(target_os = "linux"))]
+    {
+        let result = run_process_with_address_space_limit(
+            &request,
+            &AtomicBool::new(false),
+            256 * 1024 * 1024,
+        );
+        assert_eq!(result.termination, Termination::UnsupportedPlatform);
+    }
+}
+
+#[cfg(target_os = "linux")]
+#[test]
+fn address_space_probe_child() {
+    if std::env::var_os("CODEGUARD_MEMORY_PROBE").is_none() {
+        return;
+    }
+    let mut bytes = Vec::<u8>::new();
+    assert!(bytes.try_reserve_exact(3 * 1024 * 1024 * 1024).is_err());
+}
+
+#[cfg(target_os = "linux")]
+#[test]
+fn linux_address_space_limit_rejects_a_larger_allocation() {
+    let executable = std::env::current_exe().unwrap();
+    let mut request = spec(
+        executable.to_str().unwrap(),
+        &["--exact", "address_space_probe_child"],
+    );
+    request
+        .env
+        .insert("CODEGUARD_MEMORY_PROBE".into(), "1".into());
+    let result = run_process_with_address_space_limit(
+        &request,
+        &AtomicBool::new(false),
+        2 * 1024 * 1024 * 1024,
+    );
+    assert_eq!(result.termination, Termination::Exited(0));
 }
 
 #[test]

@@ -4,7 +4,11 @@ use crate::syntax_worker_candidate_observation::SyntaxWorkerCandidateObservation
 use crate::syntax_worker_envelope::SyntaxWorkerEnvelope;
 use codeguard_adapters::bundled_grammar_candidates;
 use codeguard_core::{SyntaxFileObservation, SyntaxFileState, assess_syntax_precheck};
-use codeguard_runtime::{ProcessSpec, Termination, run_process};
+#[cfg(not(target_os = "linux"))]
+use codeguard_runtime::run_process;
+#[cfg(target_os = "linux")]
+use codeguard_runtime::run_process_with_address_space_limit;
+use codeguard_runtime::{ProcessSpec, Termination};
 use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use std::ffi::OsString;
@@ -14,7 +18,7 @@ use std::time::Instant;
 
 /// 启动同一二进制的私有解析进程并核验来源、字节身份、位置和状态。
 /// 输入为绝对二进制路径、固定语种、相对源码路径、本轮源码字节、共同截止时间及取消标记。
-/// 返回只具候选观察权威的状态；内存隔离和正式 lint 接线尚未验收。
+/// 返回只具候选观察权威的状态；Linux 内存上限与正式检查覆盖仍待实测验收。
 pub fn run_syntax_worker_candidate(
     executable: &Path,
     language: &str,
@@ -44,6 +48,10 @@ pub fn run_syntax_worker_candidate(
         deadline,
         output_limit_bytes: 64 * 1024,
     };
+    // Linux 为整个私有进程设置地址空间硬上限；其它 Unix 平台尚无实测硬限制。
+    #[cfg(target_os = "linux")]
+    let process = run_process_with_address_space_limit(&spec, cancelled, 2 * 1024 * 1024 * 1024);
+    #[cfg(not(target_os = "linux"))]
     let process = run_process(&spec, cancelled);
     if process.termination != Termination::Exited(0) {
         return Err(format!(

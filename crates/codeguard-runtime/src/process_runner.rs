@@ -35,6 +35,25 @@ impl ProcessOutcome {
 /// 运行一条受控原生命令；取消、超时和超限时停止 Unix 进程组。
 #[must_use]
 pub fn run_process(spec: &ProcessSpec, cancelled: &AtomicBool) -> ProcessOutcome {
+    run_process_with_limit(spec, cancelled, None)
+}
+
+/// 以 Linux 地址空间硬限制运行私有工作进程；不支持的平台不得声称内存隔离。
+/// 参数 `memory_limit_bytes` 为子进程的总虚拟地址空间上限，返回真实进程终止原因。
+#[must_use]
+pub fn run_process_with_address_space_limit(
+    spec: &ProcessSpec,
+    cancelled: &AtomicBool,
+    memory_limit_bytes: u64,
+) -> ProcessOutcome {
+    run_process_with_limit(spec, cancelled, Some(memory_limit_bytes))
+}
+
+fn run_process_with_limit(
+    spec: &ProcessSpec,
+    cancelled: &AtomicBool,
+    memory_limit_bytes: Option<u64>,
+) -> ProcessOutcome {
     let started = Instant::now();
     if cancellation_requested(cancelled) {
         return ProcessOutcome::empty(Termination::Cancelled, started);
@@ -45,6 +64,7 @@ pub fn run_process(spec: &ProcessSpec, cancelled: &AtomicBool) -> ProcessOutcome
     if !spec.executable.is_absolute()
         || !spec.cwd.is_absolute()
         || spec.output_limit_bytes == 0
+        || memory_limit_bytes == Some(0)
         || spec
             .stdin
             .as_ref()
@@ -52,17 +72,26 @@ pub fn run_process(spec: &ProcessSpec, cancelled: &AtomicBool) -> ProcessOutcome
     {
         return ProcessOutcome::empty(Termination::InvalidSpec, started);
     }
+    #[cfg(not(target_os = "linux"))]
+    if memory_limit_bytes.is_some() {
+        return ProcessOutcome::empty(Termination::UnsupportedPlatform, started);
+    }
     #[cfg(not(unix))]
     {
         let _ = spec;
         return ProcessOutcome::empty(Termination::UnsupportedPlatform, started);
     }
     #[cfg(unix)]
-    run_unix(spec, cancelled, started)
+    run_unix(spec, cancelled, started, memory_limit_bytes)
 }
 
 #[cfg(unix)]
-fn run_unix(spec: &ProcessSpec, cancelled: &AtomicBool, started: Instant) -> ProcessOutcome {
+fn run_unix(
+    spec: &ProcessSpec,
+    cancelled: &AtomicBool,
+    started: Instant,
+    memory_limit_bytes: Option<u64>,
+) -> ProcessOutcome {
     use std::os::unix::process::CommandExt;
 
     let mut command = Command::new(&spec.executable);
@@ -79,6 +108,28 @@ fn run_unix(spec: &ProcessSpec, cancelled: &AtomicBool, started: Instant) -> Pro
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .process_group(0);
+    #[cfg(target_os = "linux")]
+    if let Some(limit) = memory_limit_bytes {
+        let Ok(limit) = libc::rlim_t::try_from(limit) else {
+            return ProcessOutcome::empty(Termination::InvalidSpec, started);
+        };
+        // pre_exec 中仅调用 async-signal-safe 的 setrlimit；失败会阻止 exec。
+        unsafe {
+            command.pre_exec(move || {
+                let bound = libc::rlimit {
+                    rlim_cur: limit,
+                    rlim_max: limit,
+                };
+                if libc::setrlimit(libc::RLIMIT_AS, &bound) == 0 {
+                    Ok(())
+                } else {
+                    Err(io::Error::last_os_error())
+                }
+            });
+        }
+    }
+    #[cfg(not(target_os = "linux"))]
+    let _ = memory_limit_bytes;
     let mut child = match command.spawn() {
         Ok(child) => child,
         Err(_) => return ProcessOutcome::empty(Termination::SpawnFailure, started),

@@ -32,6 +32,11 @@ jobs:
       - name: Run test suite
         run: cargo test --workspace --all-targets
 
+      - name: Verify Linux WASM worker resource boundary
+        run: |
+          cargo test -p codeguard-runtime --features wasm-precheck --test process_contract
+          cargo test -p codeguard-cli --features wasm-precheck --test syntax_worker_candidate --test typescript_syntax_fallback_candidate
+
       - name: Explain remaining layering debt
         if: always()
         run: python3 scripts/check_layering.py --explain

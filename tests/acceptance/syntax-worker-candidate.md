@@ -4,7 +4,11 @@
 
 目标测试先因 `syntax_worker_runner` 不存在而编译失败。实现后，Java 缺失 token 的 `MISSING` 位置、TypeScript 无恢复节点但未验收、过大输入、取消前置、超时工作进程、伪造输出和随后正常进程的独立性均通过测试。工具故障是未完成，不转换为源码违规；私有 worker 不从项目路径加载 grammar，不调用 Node、CodeGraph 或 tree-sitter-cli。
 
-本候选不是正式 WASM fallback：未设置经各平台实测的内存上限，尚无 worker 内的文件系统/网络沙箱证明，也未接入 `lint/check`、任务、对话反馈或发行包；Windows 进程组能力仍未验收。超时测试证明父进程对假 worker 的截止时间处理，尚不证明所有损坏 grammar 的隔离。OpenSpec 14.2/14.3/14.7 均保持未完成。
+本候选不是完整 WASM fallback：TypeScript 显式单文件、缺原生上下文的 `lint` 已接入疑似观察与对话反馈，`check all`、任务、正式 grammar 验收及发行包尚未接入；尚无经各平台实测的内存上限或 worker 内文件系统/网络沙箱证明。Windows 进程组能力仍未验收。超时测试证明父进程对假 worker 的截止时间处理，尚不证明所有损坏 grammar 的隔离。OpenSpec 14.2/14.3/14.7 均保持未完成。
+
+2026-09-29 增量：Linux 私有 worker 在 `exec` 前设置 `RLIMIT_AS=2 GiB`，设置失败即不能启动；Wasmtime 将默认 4 GiB 虚拟内存预留调为 64 MiB，并把 guard 调为 16 MiB。Linux 专用反例测试要求 3 GiB 的实际 `Vec::try_reserve_exact` 在子进程中失败，CI 新增启用 `wasm-precheck` 特性的 Linux 测试。当前本机为 macOS arm64，实测 `setrlimit(RLIMIT_AS)`、`RLIMIT_DATA`、`RLIMIT_RSS` 均返回 `EINVAL`；受限进程入口在 macOS 返回 `UnsupportedPlatform`，现有候选初检仍保持未限定内存的 `incomplete` 状态，不能据此声明内存隔离。Linux CI、真实 Linux grammar 运行、其它目标平台、损坏 grammar 与并发边界仍待验收，14.3 不勾选。
+
+本机增量验证：`process_contract` 16 项、`syntax_worker_candidate` 4 项、`typescript_syntax_fallback_candidate` 5 项通过；启用 WASM 特性的全工作区离线回归 175 组、1048 通过、101 条条件忽略、零失败。CLI 特性 Clippy 与全工作区 Clippy `-D warnings`、受改文件 `rustfmt --check`、OpenSpec strict、分层检查及 `git diff --check` 均退出 0。Linux 专用分配负例被平台条件编译排除，需查看推送后 CI 的真实运行结果。
 
 验证命令及结果在提交前记录：
 
