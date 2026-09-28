@@ -94,6 +94,16 @@ pub mod git_index_safety;
 #[cfg(unix)]
 pub mod git_index_safety_command;
 pub mod hook_plan_command;
+#[cfg(feature = "wasm-precheck")]
+pub mod syntax_worker_command;
+#[cfg(feature = "wasm-precheck")]
+pub mod syntax_worker_runner;
+#[cfg(feature = "wasm-precheck")]
+mod syntax_worker_envelope;
+#[cfg(feature = "wasm-precheck")]
+mod syntax_worker_recovery;
+#[cfg(feature = "wasm-precheck")]
+mod syntax_worker_candidate_observation;
 #[cfg(unix)]
 pub mod go_lint_command;
 pub mod init_command;

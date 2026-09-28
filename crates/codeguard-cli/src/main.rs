@@ -73,6 +73,10 @@ fn main() -> ExitCode {
         [command, operation, rest @ ..] if command == "hook" && operation == "plan" => {
             codeguard_cli::hook_plan_command::run(rest)
         }
+        #[cfg(feature = "wasm-precheck")]
+        [command, rest @ ..] if command == "__syntax-worker" => {
+            codeguard_cli::syntax_worker_command::run(rest)
+        }
         #[cfg(unix)]
         [command, language, rest @ ..] if command == "comments" && language == "rust" => {
             codeguard_cli::rust_comments_command::run(rest)

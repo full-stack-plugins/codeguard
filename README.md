@@ -94,7 +94,7 @@ cargo build --locked -p codeguard-cli
 
 Version output includes `cli_version`, `target`, and protocol information. Discovery and init preview return observations and unknowns. Dry-run creates neither `AGENTS.md` nor a project data directory. Add Cargo `--offline` only when dependencies are cached.
 
-The workspace requires `std` and declares no public Cargo `[features]` matrix. No `no_std`, implemented WASM backend, zero-unsafe, or fastest-runtime claim is made. Bundled WASM syntax precheck is a design target described below. Runtime OS calls require safety review; a comprehensive security audit is not claimed.
+The workspace requires `std`. The CLI now has an opt-in `wasm-precheck` build feature for an internal, bounded Rust worker using pinned Java/TypeScript grammar candidates; it is not wired into public `lint/check` or the published npm `0.1.0` package. No `no_std`, completed WASM fallback, zero-unsafe, or fastest-runtime claim is made. Runtime OS calls require safety review; a comprehensive security audit is not claimed.
 
 ### npm installation and one-off use
 
