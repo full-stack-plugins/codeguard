@@ -2,7 +2,9 @@
 
 use codeguard_cli::syntax_worker_runner::run_syntax_worker_candidate;
 use codeguard_core::SyntaxPrecheckStatus;
+use std::sync::Arc;
 use std::sync::atomic::AtomicBool;
+use std::thread;
 use std::time::{Duration, Instant};
 #[cfg(unix)]
 use std::{fs, os::unix::fs::PermissionsExt, path::PathBuf};
@@ -140,4 +142,102 @@ fn timeout_or_forged_worker_output_does_not_poison_later_observation() {
         &AtomicBool::new(false),
     );
     assert!(good.is_ok());
+}
+
+#[cfg(unix)]
+#[test]
+fn crashed_worker_reaps_its_descendant_and_preserves_the_next_observation() {
+    let marker = std::env::temp_dir().join(format!(
+        "codeguard-crashed-worker-marker-{}",
+        std::process::id()
+    ));
+    assert!(!marker.exists());
+    let worker = fake_worker(&format!(
+        "(sleep 1; printf orphan > '{}') & exit 9",
+        marker.display()
+    ));
+    let crashed = run_syntax_worker_candidate(
+        &worker,
+        "java",
+        "src/A.java",
+        b"class A {}",
+        deadline(),
+        &AtomicBool::new(false),
+    );
+    fs::remove_file(&worker).unwrap();
+    assert!(
+        crashed
+            .as_ref()
+            .is_err_and(|reason| reason.contains("Exited(9)")),
+        "异常退出必须保持失败语义：{crashed:?}"
+    );
+    thread::sleep(Duration::from_millis(1200));
+    assert!(!marker.exists(), "worker 退出后不能遗留写入的后代进程");
+    assert!(
+        run_syntax_worker_candidate(
+            env!("CARGO_BIN_EXE_codeguard").as_ref(),
+            "java",
+            "src/A.java",
+            b"class A {}",
+            deadline(),
+            &AtomicBool::new(false),
+        )
+        .is_ok()
+    );
+}
+
+#[cfg(unix)]
+#[test]
+fn output_flood_and_midflight_cancel_do_not_poison_later_observation() {
+    let flood = fake_worker("while :; do printf '0123456789abcdef'; done");
+    let limited = run_syntax_worker_candidate(
+        &flood,
+        "java",
+        "src/A.java",
+        b"class A {}",
+        deadline(),
+        &AtomicBool::new(false),
+    );
+    fs::remove_file(&flood).unwrap();
+    assert!(
+        limited
+            .as_ref()
+            .is_err_and(|reason| reason.contains("OutputLimit")),
+        "输出洪泛必须保持超限语义：{limited:?}"
+    );
+
+    let busy = fake_worker("while :; do :; done");
+    let cancelled = Arc::new(AtomicBool::new(false));
+    let signal = Arc::clone(&cancelled);
+    let trigger = thread::spawn(move || {
+        thread::sleep(Duration::from_millis(50));
+        signal.store(true, std::sync::atomic::Ordering::Relaxed);
+    });
+    let interrupted = run_syntax_worker_candidate(
+        &busy,
+        "java",
+        "src/A.java",
+        b"class A {}",
+        deadline(),
+        &cancelled,
+    );
+    trigger.join().unwrap();
+    fs::remove_file(&busy).unwrap();
+    assert!(
+        interrupted
+            .as_ref()
+            .is_err_and(|reason| reason.contains("Cancelled")),
+        "执行中取消必须保持取消语义：{interrupted:?}"
+    );
+    assert!(
+        run_syntax_worker_candidate(
+            env!("CARGO_BIN_EXE_codeguard").as_ref(),
+            "java",
+            "src/A.java",
+            b"class A {}",
+            deadline(),
+            &AtomicBool::new(false),
+        )
+        .is_ok()
+    );
 }

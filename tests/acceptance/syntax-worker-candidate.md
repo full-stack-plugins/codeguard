@@ -12,6 +12,8 @@
 
 Linux 实机证据：[GitHub Actions run 36475894172](https://github.com/full-stack-plugins/codeguard/actions/runs/36475894172) 在提交 `dbac346ac1b2b2e02ef85d7ec2ee9a1b29b65163` 上通过。专项目标步骤真实运行 `linux_address_space_limit_rejects_a_larger_allocation`，runtime 18 项、Java/通用 worker 4 项、TypeScript fallback 5 项均通过；随后普通工作区构建、全量测试及分层检查也通过。首次 run `36475507492` 在专项步骤之前遇到未改动的 `native_version_observation` 30 ms 超时用例返回 `SpawnFailure`，第二轮全量通过；该偶发故障根因未独立定位，不纳入 Linux 内存证明。以上只证明当前 Ubuntu runner 上的进程地址空间限制及其测试路径，不证明 macOS/Windows 内存边界、内核级隔离或全部语法能力。
 
+工作进程故障隔离增量：候选入口补充两个实际子进程反例。第一例让 worker 退出 9、留下拟在 1 秒后写文件的后台后代；父进程保留异常退出并清理进程组，标记文件没有出现，随后真实 Java WASM 观察仍成功。第二例让 worker 持续输出超过 64 KiB，再对另一个忙循环 worker 执行运行中取消；两个结果分别保留 `OutputLimit` 与 `Cancelled`，下一次真实观察仍成功。本机 6 项候选测试通过；这些证据仍不覆盖损坏 grammar 的真实加载、所有子进程跨平台行为或内存上限。
+
 验证命令及结果在提交前记录：
 
 ```text
