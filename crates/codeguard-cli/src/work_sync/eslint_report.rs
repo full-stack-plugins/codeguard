@@ -115,7 +115,7 @@ pub(super) fn parse(
     {
         return Err("eslint_completion_invalid");
     }
-    if !crate::eslint_finding_identity::validate_records(
+    if !codeguard_adapters::validate_records(
         relative,
         absolute,
         &bytes["source"],

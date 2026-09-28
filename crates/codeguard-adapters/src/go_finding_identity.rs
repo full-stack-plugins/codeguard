@@ -1,6 +1,6 @@
 //! Go 原生诊断的局部稳定身份；行号用于定位，源码字节摘要用于本轮归属复核。
 
-use codeguard_adapters::GoVetFinding;
+use crate::GoVetFinding;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 

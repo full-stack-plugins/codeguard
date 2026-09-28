@@ -1,6 +1,6 @@
 //! 原生 Cargo/check 类型检查观察；完整项目策略与修复任务仍独立核验。
 
-use crate::cargo_build_finding_identity::cargo_build_finding_record;
+use codeguard_adapters::cargo_build_finding_record;
 use crate::cargo_build_repair_brief::cargo_build_repair_brief;
 use crate::check_budget::{
     budget_record, parse_check_timeout, resolve_project_default, select_check_timeout,

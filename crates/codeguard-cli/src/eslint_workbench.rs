@@ -1,6 +1,6 @@
 //! ESLint 局部原生观察到既有修复队列的连接；没有审批或关闭权威。
+use codeguard_adapters::project_eslint_findings;
 use crate::{
-    eslint_finding_identity::project_eslint_findings,
     eslint_lint_arguments::EslintLintArguments,
     eslint_probe_request::EslintProbeRequest,
     eslint_probe_result::EslintProbeResult,

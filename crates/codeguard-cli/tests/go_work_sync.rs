@@ -121,7 +121,7 @@ fn real_go_findings_sync_without_duplicate_tasks_or_false_closure() {
 
 fn synthetic_report(p: &Project) -> Value {
     use codeguard_adapters::GoVetFinding;
-    use codeguard_cli::go_finding_identity::go_finding_record;
+    use codeguard_adapters::go_finding_record;
     use sha2::{Digest, Sha256};
     let mut report = p.lint(None);
     report["run_id"] = serde_json::json!("synthetic-go");

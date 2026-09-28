@@ -2,7 +2,7 @@
 
 use crate::check_budget::parse_check_timeout;
 use crate::discovery::discover;
-use crate::go_finding_identity::go_finding_record;
+use codeguard_adapters::go_finding_record;
 use crate::work_sync::{save_local_report, sync_local_workspace};
 use crate::workspace_refresh::read_workspace_baseline;
 use codeguard_adapters::{GoVetParseState, legacy_registry, parse_go_vet_json};

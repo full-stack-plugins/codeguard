@@ -351,3 +351,11 @@ mod tests {
         assert!(parse_legacy_registry(r#"{"languages":[]}"#).is_err());
     }
 }
+mod cargo_build_finding_identity;
+pub use cargo_build_finding_identity::cargo_build_finding_record;
+mod eslint_finding_identity;
+pub use eslint_finding_identity::{project_eslint_findings, validate_records};
+mod go_finding_identity;
+pub use go_finding_identity::go_finding_record;
+mod rustdoc_finding_identity;
+pub use rustdoc_finding_identity::rustdoc_finding_record;

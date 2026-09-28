@@ -1,5 +1,5 @@
 use codeguard_adapters::parse_cargo_rustdoc_json;
-use codeguard_cli::rustdoc_finding_identity::rustdoc_finding_record;
+use codeguard_adapters::rustdoc_finding_record;
 use serde_json::json;
 
 fn record(source: &[u8], start: u64, end: u64) -> serde_json::Value {

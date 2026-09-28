@@ -1,0 +1,19 @@
+{
+  "accepted": {
+    "cargo_module_graph.rs": "Cargo 模块图领域模型；目标 core",
+    "checkstyle_probe.rs": "包裹 checkstyle 原生调用；目标 adapters，随 checkstyle 适配迁移",
+    "eslint_probe.rs": "包裹 eslint 原生调用与配置解析；目标 adapters，随 eslint 适配迁移",
+    "maven_dependency_probe.rs": "包裹 OWASP dependency-check；目标 adapters",
+    "maven_javadoc_probe.rs": "包裹 Maven Javadoc 生命周期；目标 adapters",
+    "maven_probe.rs": "包裹 Maven 原生调用；目标 adapters，随 Maven 适配迁移",
+    "module_graph.rs": "模块图领域模型；目标 core，与 core 既有 task_graph 同类",
+    "npm_audit_probe.rs": "包裹 npm audit 原生调用；目标 adapters",
+    "npm_input_state.rs": "npm 输入状态领域模型；目标 core",
+    "owasp_maven_probe.rs": "包裹 OWASP Maven 报告解析；目标 adapters",
+    "pmd6_probe.rs": "包裹 PMD6 原生调用；目标 adapters，随 PMD 适配迁移",
+    "ruff_probe.rs": "包裹 ruff 原生调用与配置观察；目标 adapters，随 ruff 适配迁移",
+    "tool_identity.rs": "工具身份与版本绑定；目标 adapters，core 已有 native_checker_binding 可对齐"
+  },
+  "note": "codeguard-cli 中的已知分层债务。只减不增：模块下移后必须同步移除本文件登记。",
+  "version": 1
+}

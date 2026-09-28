@@ -1,0 +1,37 @@
+name: codeguard
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    # ubuntu-latest 预装稳定版 Rust；Cargo.toml 声明 rust-version = 1.85 / edition = 2024。
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Check out corpus evidence source
+        # 固定语料按 sha256 校验来自插件仓的真实文件（provenance.source_ref =
+        # codeguard-plugin@9e4adb1），因此必须把该 commit 检出到兄弟目录；
+        # 只建空目录不够，会因摘要不匹配而失败。
+        run: |
+          git clone --quiet https://github.com/full-stack-plugins/codeguard-plugin.git ../codeguard-plugin
+          git -C ../codeguard-plugin checkout --quiet 9e4adb1
+
+      - name: Verify crate layering debt does not grow
+        run: python3 scripts/check_layering.py
+
+      - name: Build workspace
+        run: cargo build --workspace --all-targets
+
+      - name: Run test suite
+        run: cargo test --workspace --all-targets
+
+      - name: Explain remaining layering debt
+        if: always()
+        run: python3 scripts/check_layering.py --explain
