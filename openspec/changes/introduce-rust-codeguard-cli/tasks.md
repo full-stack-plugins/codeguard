@@ -563,7 +563,7 @@
 - [ ] 11.14 完成ZCode宿主同一接入清单；依赖11.2–11.5与S09/S10；验收：按其真实协议映射、不透传新CLI退出码，无法阻断的入口如实披露并验证真实Git/CI接入。
 - [ ] 11.15 完成Kimi宿主同一接入清单；依赖11.2–11.5与S09/S10；验收：实际调用二进制、失败可恢复、任务链闭合，不以其他宿主通过代替。
 - [ ] 11.16 将配置探测与原生检查结果反馈到 Codex/ZCode/Kimi 智能体对话；验收：已配置检查器、未配置项、有效诊断、工具故障、修复建议和复检命令清楚可见；backlog 同步失败仍显示本次结果，原始工具文本不能作为智能体指令。进行中：相邻 Rust `conversation_feedback` 已从结构校验后的 RunReport 生成 JSON/human 状态、规则 ID、可用的位置、未完成原因与复检 argv；`lint python` 把真实 Ruff 扫描配置、诊断、故障及 backlog 同步状态渲染成 CLI human/JSON，存储失败仍显示原生 finding，均排除原始工具文案；见 `codeguard-cli/tests/acceptance/{conversation-feedback-baseline,python-lint-scan,work-sync-ruff-baseline}.md`。可信来源绑定、完整规则解释与三宿主自动对话接线未完成，故不勾选。
-- [ ] 11.17 实现事件驱动的检查档位与宿主接线；责任：core/CLI/plugin。验收：启动只发现、成功编辑局部快检、失败写入无源码检查、未知写入重定范围、修复按原任务复检、提交/推送/CI 各取本轮真实范围；软结果身份等价才可复用，无法阻断的宿主不宣称硬门禁。进行中：core 已有纯事件路由及[反例目标测试](../../../tests/acceptance/hook-trigger-routing-candidate.md)；CLI 新增版本化、严格、有界的只读 `hook plan` 入口，见[CLI 局部验收](../../../tests/acceptance/hook-plan-cli-candidate.md)。档位到真实检查器的命令映射、工具/配置身份、节流与资源预算、三宿主 Hook 和真实 Git/CI 接线尚缺，不勾选。
+- [ ] 11.17 实现事件驱动的检查档位与宿主接线；责任：core/CLI/plugin。验收：启动只发现、成功编辑局部快检、失败写入无源码检查、未知写入重定范围、修复按原任务复检、提交/推送/CI 各取本轮真实范围；软结果身份等价才可复用，无法阻断的宿主不宣称硬门禁。进行中：core 已有纯事件路由及[反例目标测试](../../../tests/acceptance/hook-trigger-routing-candidate.md)；CLI 已有严格、有界的只读 `hook plan`，1.1 响应对逐文件快检限制 8 个不同路径、单路径 512 字节、路径总计 2 KiB，超预算明确重定范围而非截断或假称检查，保留 1.0 历史 schema，见[CLI 局部验收](../../../tests/acceptance/hook-plan-cli-candidate.md)。档位到真实检查器的命令映射、工具/配置/源码身份、时间/并发预算、三宿主 Hook 和真实 Git/CI 接线尚缺，不勾选。
 
 ## 12. S12 质量评测与验收
 

@@ -24,7 +24,7 @@ fn main() -> ExitCode {
             );
             println!("check all 可汇总已接入的原生结果与未完成义务；完整质量门禁尚未实现。");
             println!(
-                "宿主事件只读规划：hook plan [--format=json] 从 stdin 读取 hook_trigger_request 1.0.0，返回 hook_trigger_plan 1.0.0 与退出码 3；尚不执行检查或阻断宿主。"
+                "宿主事件只读规划：hook plan [--format=json] 从 stdin 读取 hook_trigger_request 1.0.0，返回 hook_trigger_plan 1.1.0 与退出码 3；批量编辑超出快检预算时要求改用有界批量范围，尚不执行检查或阻断宿主。"
             );
             println!(
                 "check all 的 Python CVE 节点可用 --pip-audit-tool ABS_PATH --pip-audit-version VERSION；逐构建根反馈原生结果或锁文件/工具阻塞，不签发零漏洞结论。"

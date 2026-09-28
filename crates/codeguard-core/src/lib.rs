@@ -11,6 +11,7 @@ mod evaluation;
 mod false_positive_allowlist;
 mod finding;
 mod hook_event;
+mod hook_scope_resolution_reason;
 mod hook_trigger_action;
 mod hook_trigger_input;
 mod hook_trigger_plan;
@@ -52,6 +53,7 @@ pub use false_positive_allowlist::{
 };
 pub use finding::{Finding, FindingLocation, GateImpact};
 pub use hook_event::HookEvent;
+pub use hook_scope_resolution_reason::HookScopeResolutionReason;
 pub use hook_trigger_action::HookTriggerAction;
 pub use hook_trigger_input::HookTriggerInput;
 pub use hook_trigger_plan::HookTriggerPlan;

@@ -77,6 +77,8 @@ CLI、MCP、宿主 Hook、真实 Git Hook 与 CI 对相同请求和证据 MUST �
 
 快反馈 MAY 仅在源码、配置、工具、规则、范围及结果完整性身份等价时复用；超时、未完成或身份变化 MUST 重新检查。事件去重只合并同一快照的重复执行，不吞掉交付事件、失败复检或修复后的重新验证。项目级构建/CVE 等重任务可在编辑阶段排队，但提交/CI 的必需义务不能被排队状态视为完成。
 
+编辑快检计划 MUST 有文件数量和路径字节预算。一次确认成功的批量编辑超出预算时，MUST 保留明确的超预算原因并请求有界批量范围检查；不得截断目标列表后声称选定文件已全部检查，也不得把原列表无限重新提交给逐文件计划。预算仅控制软反馈调度，不减少后续真实 Git/CI 义务。
+
 #### Scenario: Edit succeeds twice without changing content
 - **WHEN** 同一文件产生两个成功编辑事件且全部软检查身份一致
 - **THEN** 可以复用完整的快反馈，并保留复用原因；后续提交仍取本轮 Git 内容面执行严格门禁
@@ -88,6 +90,10 @@ CLI、MCP、宿主 Hook、真实 Git Hook 与 CI 对相同请求和证据 MUST �
 #### Scenario: Failed write does not run a checker
 - **WHEN** 宿主确认写入失败
 - **THEN** 不因该事件启动源码检查；既有交付义务不因此被免除
+
+#### Scenario: Successful bulk edit exceeds fast-feedback budget
+- **WHEN** 一次成功编辑涉及的不同路径数量或路径字节总量超过快检预算
+- **THEN** 计划返回明确的超预算原因并转为有界批量范围检查，不截断成部分逐文件目标；提交时仍独立取得真实 Git 范围
 
 #### Scenario: Prompt mentions a commit
 - **WHEN** 用户提示文字包含提交意图，但尚无实际 Git 提交操作

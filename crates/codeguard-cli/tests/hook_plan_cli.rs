@@ -37,13 +37,14 @@ fn successful_edit_routes_to_fast_feedback_without_delivery_claim() {
     input["input"]["write_outcome"] = json!("confirmed");
     let (status, report) = run(&serde_json::to_vec(&input).unwrap());
     assert_eq!(status, 3);
-    assert_eq!(report["schema_version"], "1.0.0");
+    assert_eq!(report["schema_version"], "1.1.0");
     assert_eq!(report["report_type"], "hook_trigger_plan");
     assert_eq!(report["execution"], "not_run");
     assert_eq!(report["delivery_decision"], "not_evaluated");
     assert_eq!(report["plan"]["action"], "fast_file_check");
     assert_eq!(report["plan"]["target_paths"], json!(["src/A.java"]));
     assert_eq!(report["plan"]["soft_result_reuse_candidate"], true);
+    assert!(report["plan"]["scope_resolution_reason"].is_null());
     assert_eq!(report["plan"]["may_claim_delivery"], false);
 }
 
@@ -79,6 +80,27 @@ fn failed_write_and_unknown_scope_do_not_claim_a_scan() {
 }
 
 #[test]
+fn bulk_successful_edit_does_not_emit_an_unbounded_file_check_list() {
+    let mut input = request("file_changed");
+    input["input"]["write_outcome"] = json!("confirmed");
+    input["input"]["changed_paths"] = json!(
+        (0..9)
+            .map(|index| format!("src/File{index}.java"))
+            .collect::<Vec<_>>()
+    );
+    let (status, report) = run(&serde_json::to_vec(&input).unwrap());
+    assert_eq!(status, 3);
+    assert_eq!(report["plan"]["action"], "resolve_changed_scope");
+    assert_eq!(
+        report["plan"]["scope_resolution_reason"],
+        "fast_scope_budget_exceeded"
+    );
+    assert_eq!(report["plan"]["target_paths"], json!([]));
+    assert_eq!(report["plan"]["soft_result_reuse_candidate"], false);
+    assert_eq!(report["execution"], "not_run");
+}
+
+#[test]
 fn malformed_or_future_requests_are_rejected_without_plan() {
     let mut input = request("ci");
     input["schema_version"] = json!("2.0.0");
@@ -101,6 +123,10 @@ fn published_request_and_plan_schemas_are_closed() {
     ))
     .unwrap();
     let plan_schema: Value = serde_json::from_str(include_str!(
+        "../../../schemas/hook-trigger-plan-v1.1.schema.json"
+    ))
+    .unwrap();
+    let historical_plan_schema: Value = serde_json::from_str(include_str!(
         "../../../schemas/hook-trigger-plan.schema.json"
     ))
     .unwrap();
@@ -109,6 +135,14 @@ fn published_request_and_plan_schemas_are_closed() {
         "1.0.0"
     );
     assert_eq!(plan_schema["properties"]["execution"]["const"], "not_run");
+    assert_eq!(
+        plan_schema["properties"]["schema_version"]["const"],
+        "1.1.0"
+    );
+    assert_eq!(
+        historical_plan_schema["properties"]["schema_version"]["const"],
+        "1.0.0"
+    );
     assert_eq!(request_schema["additionalProperties"], false);
     assert_eq!(plan_schema["additionalProperties"], false);
     let (_, report) = run(&serde_json::to_vec(&request("session_start")).unwrap());

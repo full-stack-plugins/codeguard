@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-use crate::HookTriggerAction;
+use crate::{HookScopeResolutionReason, HookTriggerAction};
 
 /// 事件路由的只读候选计划；没有执行证据，不可签发交付通过。
 #[derive(Clone, Debug, Eq, PartialEq, Serialize)]
@@ -9,6 +9,8 @@ pub struct HookTriggerPlan {
     pub action: HookTriggerAction,
     /// 编辑快检的目标路径；交付阶段必须忽略宿主猜测的路径集合。
     pub target_paths: Vec<String>,
+    /// 重定范围的原因；批量超预算需选择批量检查，不能重复逐文件提交同一列表。
+    pub scope_resolution_reason: Option<HookScopeResolutionReason>,
     /// 原检查器复检目标。
     pub task_id: Option<String>,
     /// 是否须从本轮 Git 获取真实提交或推送快照。

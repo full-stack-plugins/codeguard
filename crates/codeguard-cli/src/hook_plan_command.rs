@@ -47,7 +47,7 @@ pub fn run(args: &[String]) -> ExitCode {
     println!(
         "{}",
         json!({
-            "schema_version": "1.0.0",
+            "schema_version": "1.1.0",
             "report_type": "hook_trigger_plan",
             "planning_status": "candidate",
             "execution": "not_run",

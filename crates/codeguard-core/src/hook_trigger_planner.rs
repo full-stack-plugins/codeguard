@@ -1,6 +1,13 @@
 use std::collections::BTreeSet;
 
-use crate::{HookEvent, HookTriggerAction, HookTriggerInput, HookTriggerPlan, HookWriteOutcome};
+use crate::{
+    HookEvent, HookScopeResolutionReason, HookTriggerAction, HookTriggerInput, HookTriggerPlan,
+    HookWriteOutcome,
+};
+
+const MAX_FAST_FILES: usize = 8;
+const MAX_FAST_PATH_BYTES: usize = 512;
+const MAX_FAST_SCOPE_BYTES: usize = 2048;
 
 /// 把宿主事件映射为检查阶段，交付事件始终要求重新取得真实范围。
 /// 返回候选计划或损坏事件输入；不执行检查、复用缓存或签发门禁结论。
@@ -8,6 +15,7 @@ pub fn plan_hook_trigger(input: &HookTriggerInput) -> Result<HookTriggerPlan, &'
     let mut plan = HookTriggerPlan {
         action: HookTriggerAction::DiscoverProject,
         target_paths: Vec::new(),
+        scope_resolution_reason: None,
         task_id: None,
         requires_git_snapshot: false,
         soft_result_reuse_candidate: false,
@@ -19,21 +27,47 @@ pub fn plan_hook_trigger(input: &HookTriggerInput) -> Result<HookTriggerPlan, &'
         HookEvent::PromptSubmitted => plan.action = HookTriggerAction::ShowIntentGuidance,
         HookEvent::FileChanged => {
             let mut seen = BTreeSet::new();
+            let mut selected_bytes = 0_usize;
+            let mut fast_scope_exceeded = false;
             for path in &input.changed_paths {
                 if !valid_relative_path(path) {
                     return Err("hook_changed_path_invalid");
                 }
-                if seen.insert(path.as_str()) {
+                if input.write_outcome == HookWriteOutcome::Confirmed
+                    && !fast_scope_exceeded
+                    && seen.insert(path.as_str())
+                {
+                    selected_bytes += path.len();
+                    if seen.len() > MAX_FAST_FILES
+                        || path.len() > MAX_FAST_PATH_BYTES
+                        || selected_bytes > MAX_FAST_SCOPE_BYTES
+                    {
+                        fast_scope_exceeded = true;
+                        plan.target_paths.clear();
+                        continue;
+                    }
                     plan.target_paths.push(path.clone());
                 }
             }
             plan.action = match input.write_outcome {
                 HookWriteOutcome::Failed => HookTriggerAction::NoCheck,
-                HookWriteOutcome::Confirmed if !plan.target_paths.is_empty() => {
+                HookWriteOutcome::Confirmed
+                    if !fast_scope_exceeded && !plan.target_paths.is_empty() =>
+                {
                     plan.soft_result_reuse_candidate = true;
                     HookTriggerAction::FastFileCheck
                 }
-                HookWriteOutcome::Confirmed | HookWriteOutcome::Unknown => {
+                HookWriteOutcome::Confirmed => {
+                    plan.scope_resolution_reason = Some(if fast_scope_exceeded {
+                        HookScopeResolutionReason::FastScopeBudgetExceeded
+                    } else {
+                        HookScopeResolutionReason::ChangedPathsMissing
+                    });
+                    HookTriggerAction::ResolveChangedScope
+                }
+                HookWriteOutcome::Unknown => {
+                    plan.scope_resolution_reason =
+                        Some(HookScopeResolutionReason::WriteOutcomeUnknown);
                     HookTriggerAction::ResolveChangedScope
                 }
             };
