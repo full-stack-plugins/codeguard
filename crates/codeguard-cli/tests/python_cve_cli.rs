@@ -281,8 +281,8 @@ fn valid_python_advisory_after_native_failure_remains_partial_evidence() {
     let (all_limited_exit, all_limited) = project.check_all(Some(&tool));
     assert_eq!(all_limited_exit, 3);
     assert_eq!(
-        all_limited["native_results"]["python_cve"][0]["reason"],
-        "pip_audit_output_limit"
+        all_limited["native_results"]["python_cve"][0]["reason"], "pip_audit_output_limit",
+        "{all_limited}"
     );
     assert_eq!(
         all_limited["native_results"]["python_cve"][0]["findings"][0]["advisory_id"],
