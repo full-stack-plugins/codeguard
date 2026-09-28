@@ -1,0 +1,46 @@
+{
+  "schema_version": "1.0.0",
+  "source_repository": "https://github.com/partme-ai/codegraph",
+  "source_commit": "40f112453583a2304c4b605a3a9d6545919662bd",
+  "codegraph_license": "LICENSE.codegraph",
+  "codegraph_license_sha256": "e6d98f98c666bebe065ac2492a0a19232cc318d4d67bac3ca42ffb77bacc8809",
+  "build_tool": "tree-sitter-cli 0.25.10 build --wasm",
+  "assets": [
+    {
+      "language": "java",
+      "dialect": "java",
+      "grammar_repository": "https://github.com/tree-sitter/tree-sitter-java",
+      "grammar_commit": "94703d5a6bed02b98e438d7cad1136c01a60ba2c",
+      "grammar_version": "v0.23.5",
+      "path": "java/parser.wasm",
+      "sha256": "181a6fbc34d7864a551d91c13882fc33007e923b3c81a4bdbe7fa47492090077",
+      "bytes": 414653,
+      "license": "java/LICENSE",
+      "license_sha256": "52ed137b039cd9c46409bc22e89938af911c95b157feae2d040b51e6084369a7",
+      "abi_version": 14,
+      "codegraph_runtime": "web-tree-sitter 0.25.3",
+      "codeguard_runtime_validation": "pending",
+      "language_versions": [],
+      "known_limitations": ["CodeGuard Rust runtime, dialect versions and syntax corpus are not yet validated"],
+      "release_status": "candidate_unvalidated"
+    },
+    {
+      "language": "typescript",
+      "dialect": "typescript",
+      "grammar_repository": "https://github.com/tree-sitter/tree-sitter-typescript",
+      "grammar_commit": "f975a621f4e7f532fe322e13c4f79495e0a7b2e7",
+      "grammar_version": "v0.23.2",
+      "path": "typescript/parser.wasm",
+      "sha256": "3a44d634c9840dccec36f33b99592bd086a2f940e9cd80c64347c45b7dce662f",
+      "bytes": 1414055,
+      "license": "typescript/LICENSE",
+      "license_sha256": "49bf33cf78ef5897e4e161ce1517df7de1ae5042a65b6bcfd44401e0fc606559",
+      "abi_version": 14,
+      "codegraph_runtime": "web-tree-sitter 0.25.3",
+      "codeguard_runtime_validation": "pending",
+      "language_versions": [],
+      "known_limitations": ["CodeGuard Rust runtime, dialect versions and syntax corpus are not yet validated"],
+      "release_status": "candidate_unvalidated"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:grammar-asset-manifest:1.0.0",
+  "title": "Pinned candidate Tree-sitter WASM assets; no CodeGuard syntax support claim",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source_repository", "source_commit", "codegraph_license", "codegraph_license_sha256", "build_tool", "assets"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "source_repository": {"const": "https://github.com/partme-ai/codegraph"},
+    "source_commit": {"$ref": "#/$defs/commit"},
+    "codegraph_license": {"const": "LICENSE.codegraph"},
+    "codegraph_license_sha256": {"$ref": "#/$defs/sha256"},
+    "build_tool": {"const": "tree-sitter-cli 0.25.10 build --wasm"},
+    "assets": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {"$ref": "#/$defs/asset"}
+    }
+  },
+  "$defs": {
+    "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["language", "dialect", "grammar_repository", "grammar_commit", "grammar_version", "path", "sha256", "bytes", "license", "license_sha256", "abi_version", "codegraph_runtime", "codeguard_runtime_validation", "language_versions", "known_limitations", "release_status"],
+      "properties": {
+        "language": {"enum": ["java", "typescript"]},
+        "dialect": {"enum": ["java", "typescript"]},
+        "grammar_repository": {"type": "string", "pattern": "^https://github.com/tree-sitter/tree-sitter-"},
+        "grammar_commit": {"$ref": "#/$defs/commit"},
+        "grammar_version": {"type": "string", "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "path": {"enum": ["java/parser.wasm", "typescript/parser.wasm"]},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 8, "maximum": 8388608},
+        "license": {"enum": ["java/LICENSE", "typescript/LICENSE"]},
+        "license_sha256": {"$ref": "#/$defs/sha256"},
+        "abi_version": {"const": 14},
+        "codegraph_runtime": {"const": "web-tree-sitter 0.25.3"},
+        "codeguard_runtime_validation": {"const": "pending"},
+        "language_versions": {"type": "array", "maxItems": 0},
+        "known_limitations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "release_status": {"const": "candidate_unvalidated"}
+      }
+    }
+  }
+}

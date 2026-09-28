@@ -51,6 +51,11 @@ mod eslint_json;
 mod eslint_message_report;
 mod eslint_parsed;
 mod go_candidate;
+mod grammar_asset_manifest;
+pub use grammar_asset_manifest::{
+    GrammarAsset, GrammarAssetManifest, bundled_grammar_candidates, parse_grammar_asset_manifest,
+    verify_grammar_asset,
+};
 mod go_list_package;
 mod go_list_scope;
 mod go_vet;

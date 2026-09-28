@@ -71,6 +71,10 @@ Git 联合入口现进一步核对每跳已签名基线的原生祖先关系（�
 
 npm 已发布 macOS arm64 0.1.0；Node 只转发到打包的 Rust 二进制，无检测或解析逻辑，无安装生命周期脚本。默认本地 private 打包与显式 public 模式分开。当前缺不可变源码/tag 绑定，多平台支持不能由打包器分支或交叉编译推断。使用方式归 [README](../README.zh-CN.md#npm-安装与一次性调用)。
 
-WASM 资产是 S14 待实现分发内容：固定来源提交/补丁/许可证/散列/ABI/运行时/方言兼容及语料；不得复制活动目录或运行时取 latest。包内资产应离线可用，按需加载；取消或部分覆盖不缓存 clean。升级/回滚重新核验资产和缓存身份，保留历史观察与白名单失效记录。完整生产声明还需平台、宿主、原生工具和质量评测分别验收。
+目前已有[候选资产清单](../grammars/manifest.json)及固定提交的 Java、TypeScript WASM 与三份 MIT 许可证；[Rust 校验器](../crates/codeguard-adapters/src/grammar_asset_manifest.rs)核对来源字段和原始字节。两份资产在 CodeGraph 运行时测得 ABI 14，但 CodeGuard Rust 加载、语言版本、方言和语料均未验收，状态固定为 `candidate_unvalidated`。详见[局部验收](../tests/acceptance/grammar-asset-candidates.md)。这些字节尚未进入公开 npm 包，也不触发初检。
+
+CodeGraph 使用 JavaScript `web-tree-sitter` 加载这些 WASM；本次 ABI 观察沿用该加载器。CodeGuard 按 Rust 检测运行时的既定边界，计划在 Rust 中以 Tree-sitter `WasmStore` 或经实测等价的 Rust 后端加载**同一固定字节**。清单/Node 加载成功不能证明 Rust 兼容，实际加载属于 OpenSpec 14.2。
+
+完整 WASM 发行仍须固定补丁、兼容范围及语料，不得复制活动目录或运行时取 latest。包内资产应离线可用，按需加载；取消或部分覆盖不缓存 clean。升级/回滚重新核验资产和缓存身份，保留历史观察与白名单失效记录。完整生产声明还需平台、宿主、原生工具和质量评测分别验收。
 
 回滚不得静默回到旧 Python fail-open。只能恢复兼容严格契约的已验证版本；只能使用 legacy 观察时，交付继续未认证。
