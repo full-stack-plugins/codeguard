@@ -24,6 +24,9 @@ fn main() -> ExitCode {
             );
             println!("check all 可汇总已接入的原生结果与未完成义务；完整质量门禁尚未实现。");
             println!(
+                "lint python [path] 可重复使用 --file REL_PATH 指定最多 8 个本轮编辑文件作局部 Ruff 反馈；不会把局部报告同步成完整工作台扫描，也不签发交付通过。"
+            );
+            println!(
                 "宿主事件只读规划：hook plan [--format=json] 从 stdin 读取 hook_trigger_request 1.0.0，返回 hook_trigger_plan 1.1.0 与退出码 3；批量编辑超出快检预算时要求改用有界批量范围，尚不执行检查或阻断宿主。"
             );
             println!(

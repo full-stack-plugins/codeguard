@@ -417,6 +417,8 @@ gate 与 check 使用同一个义务/适配器/报告内核，差异是权威内
 
 当前已有局部只读入口 `codeguard hook plan [--format=json]`，从 stdin 读取最多 64 KiB 的 [`hook_trigger_request` 1.0.0](../schemas/hook-trigger-request.schema.json)，返回 [`hook_trigger_plan` 1.1.0](../schemas/hook-trigger-plan-v1.1.schema.json) 与退出码 3。确认成功的编辑最多选择 8 个不同路径、单路径 512 字节及总计 2 KiB 作逐文件快检；超预算返回 `fast_scope_budget_exceeded` 并要求重新确定有界批量范围，不截断后假称已检查，也不能反复提交同一超预算列表。旧 [1.0 响应 schema](../schemas/hook-trigger-plan.schema.json)保留供历史消费者识别。`execution=not_run`、`delivery_decision=not_evaluated` 固定，尚未调用检查器、取得 Git 快照或阻断任一宿主。它不是下述完整宿主接入的验收证明，见[局部验收](../tests/acceptance/hook-plan-cli-candidate.md)。
 
+已提供独立的 Python 执行切片：`codeguard lint python . --file src/changed.py --format json`。`--file` 可重复，但遵守同一 8 文件/512 字节单路径/2 KiB 总路径预算；只扫描被发现且精确选中的 Python 文件，未发现目标保留未完成原因。CLI 对话报告为 `python_lint_feedback` 0.13，返回 `scan_scope=selected_files` 和 `requested_paths`，不把该局部反馈保存并同步为完整工作台扫描，`delivery_decision` 仍为 `not_evaluated`。原 0.12 报告 schema 保留供历史结果识别；`check all` 的嵌套 Python 结果未因此升级。目前 `hook plan` 尚未自动调用它；其它语言、宿主入口和批量范围执行仍待接线。
+
 ### C34 — mcp serve
 
 - **语法与价值**：`codeguard mcp serve`；初版通过stdio提供结构化工具入口，供支持MCP的宿主复用统一内核。

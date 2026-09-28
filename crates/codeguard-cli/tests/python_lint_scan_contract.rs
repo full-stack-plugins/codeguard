@@ -56,6 +56,7 @@ fn scan(
     let request = PythonLintScanRequest {
         root: &project.0,
         discovery: &report,
+        selected_paths: None,
         tool: Some(tool.to_path_buf()),
         tool_unavailable_reason: "ruff_tool_not_found",
         expected_tool_sha256: expected_digest,
@@ -110,6 +111,7 @@ fn conversation_feedback_separates_configuration_execution_and_diagnostics() {
     let request = PythonLintScanRequest {
         root: &project.0,
         discovery: &discovery,
+        selected_paths: None,
         tool: Some("/bin/echo".into()),
         tool_unavailable_reason: "ruff_tool_not_found",
         expected_tool_sha256: [0; 32],

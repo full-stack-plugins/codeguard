@@ -54,6 +54,131 @@ fn run(project: &Project, extra: &[&str]) -> (i32, Value) {
 }
 
 #[test]
+fn selected_file_feedback_never_claims_full_python_coverage() {
+    let project = Project::new();
+    fs::write(project.0.join("changed.py"), "import os\n").unwrap();
+    fs::write(project.0.join("untouched.py"), "import sys\n").unwrap();
+    let (exit, report) = run(&project, &["--file", "changed.py"]);
+    assert_eq!(exit, 3);
+    assert_eq!(report["scan_scope"], "selected_files");
+    assert_eq!(report["requested_paths"], serde_json::json!(["changed.py"]));
+    assert_eq!(report["files"].as_array().unwrap().len(), 1);
+    assert_eq!(report["files"][0]["path"], "changed.py");
+    assert_eq!(report["delivery_decision"], "not_evaluated");
+    assert_eq!(report["backlog_status"], "not_synced_scoped");
+}
+
+#[test]
+fn unknown_selected_file_is_incomplete_and_does_not_scan_another_file() {
+    let project = Project::new();
+    fs::write(project.0.join("untouched.py"), "import sys\n").unwrap();
+    let (exit, report) = run(&project, &["--file", "missing.py"]);
+    assert_eq!(exit, 3);
+    assert_eq!(report["scan_scope"], "selected_files");
+    assert!(report["files"].as_array().unwrap().is_empty());
+    assert_eq!(report["local_scan_complete"], false);
+    assert!(
+        report["incomplete_reasons"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|reason| reason == "target_not_discovered:missing.py")
+    );
+}
+
+#[test]
+fn selected_paths_reject_escape_and_over_budget_before_scanning() {
+    let project = Project::new();
+    fs::write(project.0.join("app.py"), "pass\n").unwrap();
+    for file in ["../outside.py", "/tmp/outside.py", "dir\\outside.py"] {
+        let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args([
+                "lint",
+                "python",
+                project.0.to_str().unwrap(),
+                "--file",
+                file,
+            ])
+            .output()
+            .unwrap();
+        assert_eq!(output.status.code(), Some(2), "{file}");
+        assert!(output.stdout.is_empty(), "{file}");
+    }
+    let mut command = Command::new(env!("CARGO_BIN_EXE_codeguard"));
+    command.args(["lint", "python", project.0.to_str().unwrap()]);
+    for index in 0..9 {
+        command.args(["--file", &format!("file{index}.py")]);
+    }
+    let output = command.output().unwrap();
+    assert_eq!(output.status.code(), Some(2));
+    assert!(output.stdout.is_empty());
+}
+
+#[test]
+fn unrelated_nested_ruff_configuration_does_not_start_tool_for_selected_file() {
+    use std::os::unix::fs::PermissionsExt;
+
+    let project = Project::new();
+    fs::write(project.0.join("changed.py"), "import os\n").unwrap();
+    fs::create_dir(project.0.join("nested")).unwrap();
+    fs::write(project.0.join("nested/untouched.py"), "import sys\n").unwrap();
+    fs::write(
+        project.0.join("nested/ruff.toml"),
+        "[lint]\nselect = ['F']\n",
+    )
+    .unwrap();
+    let marker = project.0.join("tool-was-started");
+    let tool = project.0.join("fake-ruff");
+    fs::write(&tool, format!("#!/bin/sh\ntouch '{}'\n", marker.display())).unwrap();
+    fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
+    let (exit, report) = run(
+        &project,
+        &[
+            "--file",
+            "changed.py",
+            "--ruff-tool",
+            tool.to_str().unwrap(),
+        ],
+    );
+    assert_eq!(exit, 3);
+    assert!(!marker.exists());
+    assert_eq!(report["files"].as_array().unwrap().len(), 1);
+    assert_eq!(report["files"][0]["path"], "changed.py");
+    assert_eq!(report["files"][0]["run_status"], "incomplete");
+}
+
+#[test]
+#[ignore = "requires native Ruff 0.16.8 via CODEGUARD_RUFF_BIN"]
+fn selected_file_runs_native_ruff_without_importing_partial_backlog() {
+    let project = Project::new();
+    fs::write(project.0.join("changed.py"), "import os\n").unwrap();
+    fs::write(project.0.join("untouched.py"), "import sys\n").unwrap();
+    fs::write(project.0.join("ruff.toml"), "[lint]\nselect = ['F401']\n").unwrap();
+    let init = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "init",
+            project.0.to_str().unwrap(),
+            "--apply",
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(init.status.code(), Some(3));
+    let reports_dir = project.0.join(".codeguard/reports");
+    let before_reports = fs::read_dir(&reports_dir).unwrap().count();
+    let tool = std::env::var("CODEGUARD_RUFF_BIN").unwrap();
+    let (exit, report) = run(&project, &["--file", "changed.py", "--ruff-tool", &tool]);
+    assert_eq!(exit, 3);
+    assert_eq!(report["files"].as_array().unwrap().len(), 1);
+    assert_eq!(report["files"][0]["path"], "changed.py");
+    assert_eq!(report["files"][0]["run_status"], "findings");
+    assert_eq!(report["files"][0]["findings"][0]["rule_id"], "F401");
+    assert_eq!(report["backlog_status"], "not_synced_scoped");
+    assert_eq!(fs::read_dir(reports_dir).unwrap().count(), before_reports);
+    assert_eq!(report["delivery_decision"], "not_evaluated");
+}
+
+#[test]
 fn sigint_during_native_probe_reaps_descendants_and_returns_130() {
     use std::os::unix::fs::PermissionsExt;
     use std::process::Stdio;
@@ -266,7 +391,7 @@ fn initialized_lint_report_binds_the_existing_workspace_identity() {
         serde_json::from_slice(&fs::read(project.0.join(".codeguard/workspace.json")).unwrap())
             .unwrap();
     let (_, report) = run(&project, &["--ruff-tool", "/nonexistent/ruff"]);
-    assert_eq!(report["schema_version"], "0.12.0");
+    assert_eq!(report["schema_version"], "0.13.0");
     assert_eq!(report["execution_budget"]["timeout_ms"], 1_800_000);
     assert_eq!(report["execution_budget"]["source"], "builtin_default");
     assert_eq!(report["workspace_binding"], "bound");
@@ -431,7 +556,7 @@ fn configured_project_emits_native_findings_to_cli_feedback() {
     assert_eq!(report["files"][0]["run_status"], "findings");
     assert_eq!(report["files"][0]["findings"][0]["rule_id"], "F401");
     assert_eq!(report["files"][0]["findings"][0]["line"], 1);
-    assert_eq!(report["schema_version"], "0.12.0");
+    assert_eq!(report["schema_version"], "0.13.0");
     assert_eq!(
         report["files"][0]["rule_settings"]["globally_enabled_mapped_rules"],
         serde_json::json!(["F401"])
@@ -491,7 +616,7 @@ fn native_noqa_is_visible_as_suppression_without_creating_active_finding_task() 
     let tool = std::env::var("CODEGUARD_RUFF_BIN").unwrap();
     let (exit, report) = run(&project, &["--ruff-tool", &tool]);
     assert_eq!(exit, 3);
-    assert_eq!(report["schema_version"], "0.12.0");
+    assert_eq!(report["schema_version"], "0.13.0");
     assert_eq!(report["files"][0]["run_status"], "suppressed");
     assert!(
         report["files"][0]["findings"]

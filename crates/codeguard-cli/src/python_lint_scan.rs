@@ -17,6 +17,8 @@ use std::time::Instant;
 pub struct PythonLintScanRequest<'a> {
     pub root: &'a Path,
     pub discovery: &'a DiscoveryReport,
+    /// 编辑快反馈的精确工作区相对路径；None 才表示本轮发现到的全部 Python 源码。
+    pub selected_paths: Option<&'a [String]>,
     pub tool: Option<PathBuf>,
     pub tool_unavailable_reason: &'static str,
     pub expected_tool_sha256: [u8; 32],
@@ -218,12 +220,34 @@ pub fn scan_python_lint(
         output.incomplete_reasons.push("no_python_sources".into());
         return output;
     }
+    let sources: Vec<&String> = if let Some(selected) = request.selected_paths {
+        if selected.is_empty() {
+            output
+                .incomplete_reasons
+                .push("selected_scope_empty".into());
+            return output;
+        }
+        for target in selected {
+            if !python.source_files.contains(target) {
+                output
+                    .incomplete_reasons
+                    .push(format!("target_not_discovered:{target}"));
+            }
+        }
+        python
+            .source_files
+            .iter()
+            .filter(|source| selected.contains(source))
+            .collect()
+    } else {
+        python.source_files.iter().collect()
+    };
     let mut input_digests = BTreeMap::new();
-    for source in &python.source_files {
+    for source in &sources {
         let path = request.root.join(source);
         match digest_file(&path, 16 * 1024 * 1024) {
             Some(digest) => {
-                input_digests.insert(source.clone(), digest);
+                input_digests.insert((*source).clone(), digest);
             }
             None => {
                 output
@@ -238,7 +262,13 @@ pub fn scan_python_lint(
         .checker_configurations
         .iter()
         .filter(|checker| {
-            checker.checker_id == "python.ruff" && checker.configuration == "configured"
+            checker.checker_id == "python.ruff"
+                && checker.configuration == "configured"
+                && sources.iter().any(|source| {
+                    select_checker(request.discovery, source).is_some_and(|selected| {
+                        selected.configuration_ref == checker.configuration_ref
+                    })
+                })
         })
     {
         if let Some(digest) =
@@ -251,7 +281,8 @@ pub fn scan_python_lint(
                 .push(format!("config_unavailable:{}", checker.configuration_ref));
         }
     }
-    for (index, source) in python.source_files.iter().enumerate() {
+    for (index, source) in sources.iter().enumerate() {
+        let source = *source;
         let Some(checker) = select_checker(request.discovery, source) else {
             output
                 .files
@@ -335,7 +366,7 @@ pub fn scan_python_lint(
             reason = Some("finding_identity_unavailable".into());
         }
         output.files.push(PythonLintFileResult {
-            path: source.clone(),
+            path: (*source).clone(),
             config_ref: Some(checker.configuration_ref.clone()),
             config_sha256: completion.then(|| hex_digest(&config_digest)),
             tool_sha256: completion.then(|| hex_digest(&request.expected_tool_sha256)),

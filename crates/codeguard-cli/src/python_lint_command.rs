@@ -5,7 +5,9 @@ use crate::check_budget::{
 };
 use crate::discovery::discover;
 use crate::next_command::read_local_brief;
-use crate::python_lint_scan::{PythonLintScanRequest, python_lint_feedback, scan_python_lint};
+use crate::python_lint_scan::{
+    PythonLintScanRequest, python_lint_feedback, scan_python_lint, select_checker,
+};
 use crate::work_sync::{save_local_report, sync_local_workspace};
 use crate::workspace_refresh::read_workspace_baseline;
 use codeguard_adapters::{bundled_ruff_rulepack, legacy_registry};
@@ -14,7 +16,7 @@ use codeguard_runtime::{
 };
 use serde_json::Value;
 use sha2::{Digest, Sha256};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
@@ -26,6 +28,7 @@ struct Arguments {
     root: PathBuf,
     json: bool,
     ruff_tool: Option<PathBuf>,
+    selected_paths: Vec<String>,
     timeout_ms: u64,
     timeout_source: &'static str,
 }
@@ -74,12 +77,22 @@ pub fn run(args: &[String]) -> ExitCode {
         }
     }
     let deadline = started + Duration::from_millis(parsed.timeout_ms);
-    let mut feedback = match scan_and_sync_report_with_deadline(
-        &root,
-        parsed.ruff_tool.as_deref(),
-        deadline,
-        &AtomicBool::new(false),
-    ) {
+    let mut feedback = match if parsed.selected_paths.is_empty() {
+        scan_and_sync_report_with_deadline(
+            &root,
+            parsed.ruff_tool.as_deref(),
+            deadline,
+            &AtomicBool::new(false),
+        )
+    } else {
+        scan_selected_report_with_deadline(
+            &root,
+            parsed.ruff_tool.as_deref(),
+            &parsed.selected_paths,
+            deadline,
+            &AtomicBool::new(false),
+        )
+    } {
         Ok(feedback) => feedback,
         Err(_) => {
             eprintln!("内置语言清单损坏");
@@ -87,6 +100,11 @@ pub fn run(args: &[String]) -> ExitCode {
         }
     };
     annotate_conversation_budget(&mut feedback, parsed.timeout_ms, parsed.timeout_source);
+    feedback["schema_version"] = Value::String("0.13.0".into());
+    if parsed.selected_paths.is_empty() {
+        feedback["scan_scope"] = Value::String("discovered_python".into());
+        feedback["requested_paths"] = Value::Null;
+    }
     let request_cancelled = codeguard_runtime::sigint_cancellation_requested()
         || feedback["incomplete_reasons"]
             .as_array()
@@ -184,6 +202,41 @@ pub fn annotate_conversation_budget(feedback: &mut Value, timeout_ms: u64, sourc
     document.insert("execution_budget".into(), budget_record(timeout_ms, source));
 }
 
+/// 编辑快反馈仅观察指定文件，不把局部报告作为完整工作区报告导入工作台。
+fn scan_selected_report_with_deadline(
+    root: &Path,
+    ruff_tool: Option<&Path>,
+    selected_paths: &[String],
+    deadline: Instant,
+    cancelled: &AtomicBool,
+) -> Result<Value, &'static str> {
+    let mut feedback = scan_local_report_scoped_with_deadline(
+        root,
+        ruff_tool,
+        Some(selected_paths),
+        deadline,
+        cancelled,
+    )?;
+    let document = feedback.as_object_mut().expect("反馈根为对象");
+    document.insert("scan_scope".into(), Value::String("selected_files".into()));
+    document.insert("requested_paths".into(), serde_json::json!(selected_paths));
+    document.insert(
+        "backlog_status".into(),
+        Value::String("not_synced_scoped".into()),
+    );
+    document.insert("backlog_sync".into(), Value::Null);
+    document.insert(
+        "repair_brief_status".into(),
+        Value::String("unavailable".into()),
+    );
+    document.insert(
+        "repair_brief_reason".into(),
+        Value::String("not_synced_scoped".into()),
+    );
+    document.insert("next".into(), Value::Null);
+    Ok(feedback)
+}
+
 /// 对项目运行同一条局部原生 Ruff 检查链，返回可供持久同步的 0.9 报告。
 ///
 /// 参数 `root` 是规范化的项目根，`ruff_tool` 是可选的绝对可执行路径；
@@ -204,12 +257,32 @@ pub fn scan_local_report_with_deadline(
     deadline: Instant,
     cancelled: &AtomicBool,
 ) -> Result<Value, &'static str> {
+    scan_local_report_scoped_with_deadline(root, ruff_tool, None, deadline, cancelled)
+}
+
+fn scan_local_report_scoped_with_deadline(
+    root: &Path,
+    ruff_tool: Option<&Path>,
+    selected_paths: Option<&[String]>,
+    deadline: Instant,
+    cancelled: &AtomicBool,
+) -> Result<Value, &'static str> {
     let registry = legacy_registry().map_err(|_| "registry_invalid")?;
     let discovery = discover(root, &registry, &NativeObservation);
     let run_id = run_id();
-    let configured = discovery.checker_configurations.iter().any(|checker| {
-        checker.checker_id == "python.ruff" && checker.configuration == "configured"
-    });
+    let configured = selected_paths.map_or_else(
+        || {
+            discovery.checker_configurations.iter().any(|checker| {
+                checker.checker_id == "python.ruff" && checker.configuration == "configured"
+            })
+        },
+        |paths| {
+            paths.iter().any(|path| {
+                select_checker(&discovery, path)
+                    .is_some_and(|checker| checker.configuration == "configured")
+            })
+        },
+    );
     let tool = if configured {
         prepare_tool(root, ruff_tool, deadline, &run_id, cancelled)
     } else {
@@ -230,6 +303,7 @@ pub fn scan_local_report_with_deadline(
         &PythonLintScanRequest {
             root,
             discovery: &discovery,
+            selected_paths,
             tool: tool.path,
             tool_unavailable_reason: tool.unavailable_reason,
             expected_tool_sha256: tool.sha256,
@@ -357,12 +431,13 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
     let mut root = None;
     let mut json = false;
     let mut ruff_tool = None;
+    let mut selected_paths = Vec::new();
     let mut timeout_ms = 0;
     let mut timeout_seen = false;
     let mut index = 1;
     while index < args.len() {
         let arg = &args[index];
-        if arg == "--format" || arg == "--ruff-tool" || arg == "--timeout" {
+        if arg == "--format" || arg == "--ruff-tool" || arg == "--timeout" || arg == "--file" {
             index += 1;
             let value = args.get(index).ok_or_else(|| format!("{arg} 缺少值"))?;
             if arg == "--format" {
@@ -373,6 +448,8 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                 }
                 timeout_ms = parse_check_timeout(value)?;
                 timeout_seen = true;
+            } else if arg == "--file" {
+                selected_paths.push(value.clone());
             } else if ruff_tool.replace(PathBuf::from(value)).is_some() {
                 return Err("--ruff-tool 重复".into());
             }
@@ -388,11 +465,34 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
     if ruff_tool.as_ref().is_some_and(|tool| !tool.is_absolute()) {
         return Err("--ruff-tool 必须是绝对路径".into());
     }
+    let mut distinct = BTreeSet::new();
+    let mut total_bytes = 0;
+    for path in &selected_paths {
+        if path.is_empty()
+            || path.len() > 512
+            || path.starts_with('/')
+            || path.contains('\\')
+            || path.chars().any(char::is_control)
+            || path
+                .split('/')
+                .any(|part| part.is_empty() || part == "." || part == "..")
+        {
+            return Err("--file 必须是有效的工作区相对源码路径".into());
+        }
+        if distinct.insert(path.clone()) {
+            total_bytes += path.len();
+        }
+    }
+    if distinct.len() > 8 || total_bytes > 2048 {
+        return Err("--file 超出局部快检范围预算，请改用批量检查".into());
+    }
+    let selected_paths = distinct.into_iter().collect();
     let (timeout_ms, timeout_source) = select_check_timeout(timeout_seen.then_some(timeout_ms))?;
     Ok(Arguments {
         root: root.unwrap_or_else(|| PathBuf::from(".")),
         json,
         ruff_tool,
+        selected_paths,
         timeout_ms,
         timeout_source,
     })
@@ -532,6 +632,11 @@ fn create_scratch(run_id: &str) -> std::io::Result<PrivateScratch> {
 
 fn print_human(feedback: &Value) {
     println!("CodeGuard Python lint：局部原生检查；完整质量门禁尚未评估");
+    println!(
+        "本轮范围：{}；目标：{}",
+        feedback["scan_scope"].as_str().unwrap_or("unknown"),
+        feedback["requested_paths"]
+    );
     println!(
         "修复记录：{}",
         feedback["backlog_status"].as_str().unwrap_or("unknown")
