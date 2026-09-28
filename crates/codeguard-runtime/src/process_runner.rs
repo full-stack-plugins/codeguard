@@ -110,9 +110,10 @@ fn run_unix(
         .process_group(0);
     #[cfg(target_os = "linux")]
     if let Some(limit) = memory_limit_bytes {
-        let Ok(limit) = libc::rlim_t::try_from(limit) else {
+        if limit > libc::rlim_t::MAX as u64 {
             return ProcessOutcome::empty(Termination::InvalidSpec, started);
-        };
+        }
+        let limit = limit as libc::rlim_t;
         // pre_exec 中仅调用 async-signal-safe 的 setrlimit；失败会阻止 exec。
         unsafe {
             command.pre_exec(move || {

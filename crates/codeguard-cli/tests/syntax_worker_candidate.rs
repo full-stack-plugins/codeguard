@@ -153,7 +153,7 @@ fn crashed_worker_reaps_its_descendant_and_preserves_the_next_observation() {
     ));
     assert!(!marker.exists());
     let worker = fake_worker(&format!(
-        "(sleep 1; printf orphan > '{}') & exit 9",
+        "/bin/cat >/dev/null; (sleep 1; printf orphan > '{}') & exit 9",
         marker.display()
     ));
     let crashed = run_syntax_worker_candidate(
