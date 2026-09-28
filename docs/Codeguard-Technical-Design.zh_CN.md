@@ -235,7 +235,7 @@ flowchart TD
 | 下一步 | 修源码、推荐/要求准备原生工具并确认、恢复配置、重扫，还是提出具体决策？ |
 | 交付 | 只是局部观察，还是完整评估的交付结果？ |
 
-[RunReport 解析](../crates/codeguard-cli/src/run_report.rs)支持通用结构化契约，[检查编排](../crates/codeguard-cli/src/check_command.rs)当前输出 `check_feedback` `0.30.0`，适配器另有专属版本化局部观察。消费者必须按协议身份与版本分派，不能假定统一 JSON 形状。当前 human 输出以中文为主，英文文档不代表运行时消息已有英文国际化。
+[RunReport 解析](../crates/codeguard-cli/src/run_report.rs)支持通用结构化契约，[检查编排](../crates/codeguard-cli/src/check_command.rs)当前输出 `check_feedback` `0.31.0`，适配器另有专属版本化局部观察。消费者必须按协议身份与版本分派，不能假定统一 JSON 形状。当前 human 输出以中文为主，英文文档不代表运行时消息已有英文国际化。
 
 ### 7.3 对话报告示例——目标呈现
 
@@ -347,7 +347,7 @@ Codeguard：原生 lint 发现 1 项问题
 
 ### 7.5 协议版本与身份闭包
 
-当前通用 `RunReport` 为 `1.4`，聚合 `check_feedback` 为 `0.30.0`，`check_aborted` 为 `0.11.0`；适配器局部观察另有版本。版本属于具体协议，不能因为软件是 `0.1.0` 而统一改写。上面的对话/JSON 简报是目标示例，不是这三个协议的完整实例。
+当前通用 `RunReport` 为 `1.4`，聚合 `check_feedback` 为 `0.31.0`，`check_aborted` 为 `0.11.0`；适配器局部观察另有版本。版本属于具体协议，不能因为软件是 `0.1.0` 而统一改写。上面的对话/JSON 简报是目标示例，不是这三个协议的完整实例。
 
 目标证据链关联 workspace/request/run/obligation/finding/task/attempt；源码定位使用可逆路径表示与内容身份，依赖定位使用组件、解析版本、图和 advisory。非 UTF-8 路径不能经有损显示字符串参与匹配。摘要只能绑定字节，不能证明字节来源已批准。报告升级保留旧字段的版本语义，不将旧空 findings 升格为完整通过。
 

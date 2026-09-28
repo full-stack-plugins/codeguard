@@ -53,8 +53,13 @@ impl Drop for Project {
 fn check_feedback_schema_cannot_encode_allow() {
     let schema: Value =
         serde_json::from_str(include_str!("../../../schemas/check-feedback.schema.json")).unwrap();
+    let previous: Value = serde_json::from_str(include_str!(
+        "../../../schemas/check-feedback-v0.30.schema.json"
+    ))
+    .unwrap();
+    assert_eq!(previous["properties"]["schema_version"]["const"], "0.30.0");
     assert_eq!(schema["additionalProperties"], false);
-    assert_eq!(schema["properties"]["schema_version"]["const"], "0.30.0");
+    assert_eq!(schema["properties"]["schema_version"]["const"], "0.31.0");
     assert_eq!(
         schema["properties"]["export"]["properties"]["status"]["enum"],
         serde_json::json!(["not_requested", "saved", "failed"])
@@ -181,6 +186,44 @@ fn check_feedback_schema_cannot_encode_allow() {
         serde_json::json!([3, 130])
     );
     assert!(!schema.to_string().contains(".schema.json"));
+}
+
+#[test]
+fn check_all_keeps_local_checker_candidate_separate_from_execution() {
+    let project = Project::new();
+    fs::write(
+        project.0.join("package.json"),
+        r#"{"devDependencies":{"eslint":"^10.0.0"}}"#,
+    )
+    .unwrap();
+    fs::write(project.0.join("eslint.config.js"), "export default [];").unwrap();
+    fs::write(project.0.join("index.ts"), "export const x = 1;").unwrap();
+    fs::create_dir_all(project.0.join("node_modules/eslint/bin")).unwrap();
+    fs::write(
+        project.0.join("node_modules/eslint/package.json"),
+        r#"{"name":"eslint","version":"10.1.0","bin":"bin/eslint.js"}"#,
+    )
+    .unwrap();
+    fs::write(
+        project.0.join("node_modules/eslint/bin/eslint.js"),
+        "exit 99\n",
+    )
+    .unwrap();
+
+    let (exit, report) = project.check(&[]);
+    assert_eq!(exit, 3);
+    assert_eq!(report["schema_version"], "0.31.0");
+    assert_eq!(report["discovery"]["schema_version"], "0.4.0");
+    let candidates = report["discovery"]["native_tool_candidates"]
+        .as_array()
+        .unwrap();
+    assert!(candidates.iter().any(|item| {
+        item["checker_id"] == "node.eslint"
+            && item["state"] == "local_candidate_requires_native_probe"
+            && item["observed_version"] == "10.1.0"
+    }));
+    assert_ne!(report["delivery_decision"], "allow");
+    assert_eq!(report["obligation_status"], "unresolved");
 }
 
 #[test]
@@ -485,7 +528,7 @@ fn rust_only_project_keeps_categories_as_candidates_without_inventing_policy_obl
     let (exit, report) = project.check(&[]);
     assert_eq!(exit, 3);
     assert_eq!(report["report_type"], "check_feedback");
-    assert_eq!(report["schema_version"], "0.30.0");
+    assert_eq!(report["schema_version"], "0.31.0");
     assert_eq!(report["execution_budget"]["timeout_ms"], 1_800_000);
     assert_eq!(report["execution_budget"]["source"], "builtin_default");
     assert_eq!(

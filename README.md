@@ -153,7 +153,7 @@ Supply the original checker's required tool/configuration options to `task verif
 
 | Family | Value | Current boundary |
 | :--- | :--- | :--- |
-| `--version`, `capabilities`, `detect` | Binary, inventory, project observations | Queries do not perform checks |
+| `--version`, `capabilities`, `detect` | Binary, inventory, project observations | Current source `detect` 0.4.0 exposes local ESLint/Maven Wrapper candidates; no tool is run or approved |
 | `init --dry-run / --apply` | Preview/create/refresh workbench | No implicit install, build, Hook takeover, or architecture certification |
 | `config validate / explain`, `rules list` | Inspect configuration and rule origins | Candidates do not establish policy authority |
 | `tools list / verify`, `doctor` | Inspect tools and limited environment probes | Explicit Ruff doctor probe; `tools install --apply` is blocked |

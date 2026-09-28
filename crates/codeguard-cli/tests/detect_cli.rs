@@ -57,6 +57,21 @@ fn detect_reports_evidence_and_does_not_create_project_state() {
         "../../../schemas/discovery-report.schema.json"
     ))
     .expect("published discovery schema");
+    let previous: Value = serde_json::from_str(include_str!(
+        "../../../schemas/discovery-report-v0.3.schema.json"
+    ))
+    .expect("retained discovery schema");
+    assert_eq!(previous["properties"]["schema_version"]["const"], "0.3.0");
+    assert_eq!(schema["properties"]["schema_version"]["const"], "0.4.0");
+    let states =
+        schema["properties"]["native_tool_candidates"]["items"]["properties"]["state"]["enum"]
+            .as_array()
+            .unwrap();
+    assert!(
+        states
+            .iter()
+            .all(|state| state != "ready" && state != "clean")
+    );
     let required: BTreeSet<_> = schema["required"]
         .as_array()
         .expect("required fields")
@@ -163,6 +178,155 @@ fn detect_reads_literal_package_version_without_running_package_scripts() {
 }
 
 #[test]
+fn detect_observes_local_eslint_and_maven_wrapper_without_scanning_dependencies() {
+    let project = TempProject::new();
+    fs::write(
+        project.0.join("package.json"),
+        r#"{"name":"demo","version":"1.0.0","devDependencies":{"eslint":"^10.0.0"}}"#,
+    )
+    .unwrap();
+    fs::write(project.0.join("eslint.config.js"), "export default [];").unwrap();
+    fs::write(project.0.join("index.ts"), "export const x = 1;").unwrap();
+    fs::create_dir_all(project.0.join("node_modules/eslint/bin")).unwrap();
+    fs::write(
+        project.0.join("node_modules/eslint/package.json"),
+        r#"{"name":"eslint","version":"10.1.0","bin":"bin/eslint.js"}"#,
+    )
+    .unwrap();
+    fs::write(
+        project.0.join("node_modules/eslint/bin/eslint.js"),
+        "process.exit(99);",
+    )
+    .unwrap();
+    fs::write(project.0.join("pom.xml"), "<project/>").unwrap();
+    fs::write(project.0.join("mvnw"), "exit 99\n").unwrap();
+    fs::create_dir_all(project.0.join(".mvn/wrapper")).unwrap();
+    fs::write(
+        project.0.join(".mvn/wrapper/maven-wrapper.properties"),
+        "distributionUrl=https\\://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.9.9/apache-maven-3.9.9-bin.zip\n",
+    )
+    .unwrap();
+
+    let report = detect_json(&project);
+    assert_eq!(report["schema_version"], "0.4.0");
+    assert_eq!(report["observation_complete"], true);
+    assert_eq!(report["scope_summary"]["dependency_roots_excluded"], 1);
+    let candidates = report["native_tool_candidates"].as_array().unwrap();
+    assert!(candidates.iter().any(|candidate| {
+        candidate["checker_id"] == "node.eslint"
+            && candidate["state"] == "local_candidate_requires_native_probe"
+            && candidate["observed_version"] == "10.1.0"
+    }));
+    assert!(candidates.iter().any(|candidate| {
+        candidate["checker_id"] == "java.maven"
+            && candidate["state"] == "wrapper_candidate_requires_native_probe"
+            && candidate["observed_version"] == "3.9.9"
+    }));
+    assert!(report["languages"].to_string().contains("index.ts"));
+    assert!(!report["languages"].to_string().contains("node_modules"));
+    assert!(!project.0.join(".codeguard").exists());
+}
+
+#[cfg(unix)]
+#[test]
+fn detect_keeps_linked_local_tools_and_config_as_blockers() {
+    use std::os::unix::fs::symlink;
+
+    let project = TempProject::new();
+    fs::write(
+        project.0.join("package.json"),
+        r#"{"devDependencies":{"eslint":"^10.0.0"}}"#,
+    )
+    .unwrap();
+    fs::create_dir_all(project.0.join("node_modules")).unwrap();
+    fs::create_dir_all(project.0.join("outside-eslint/bin")).unwrap();
+    fs::write(
+        project.0.join("outside-eslint/package.json"),
+        r#"{"name":"eslint","version":"10.1.0","bin":"bin/eslint.js"}"#,
+    )
+    .unwrap();
+    fs::write(project.0.join("outside-eslint/bin/eslint.js"), "exit 99").unwrap();
+    symlink("../outside-eslint", project.0.join("node_modules/eslint")).unwrap();
+    fs::write(project.0.join("eslint-source.js"), "export default [];").unwrap();
+    symlink("eslint-source.js", project.0.join("eslint.config.js")).unwrap();
+    fs::write(project.0.join("pom.xml"), "<project/>").unwrap();
+    fs::write(project.0.join("mvnw"), "exit 99\n").unwrap();
+    fs::create_dir_all(project.0.join("outside-wrapper/wrapper")).unwrap();
+    fs::write(
+        project
+            .0
+            .join("outside-wrapper/wrapper/maven-wrapper.properties"),
+        "distributionUrl=https\\://example.test/apache-maven-3.9.9-bin.zip\n",
+    )
+    .unwrap();
+    symlink("outside-wrapper", project.0.join(".mvn")).unwrap();
+
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["detect", project.0.to_str().unwrap(), "--format=json"])
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    let report: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(report["observation_complete"], false);
+    let candidates = report["native_tool_candidates"].as_array().unwrap();
+    assert!(candidates.iter().any(|candidate| {
+        candidate["checker_id"] == "node.eslint"
+            && candidate["state"] == "local_package_path_untrusted"
+            && candidate["declaration_observed"] == true
+    }));
+    assert!(candidates.iter().any(|candidate| {
+        candidate["checker_id"] == "java.maven"
+            && candidate["state"] == "wrapper_configuration_untrusted"
+    }));
+    assert!(
+        report["blocked_paths"]
+            .to_string()
+            .contains("node_modules/eslint")
+    );
+    assert!(report["blocked_paths"].to_string().contains(".mvn"));
+}
+
+#[cfg(unix)]
+#[test]
+fn linked_eslint_config_is_a_configuration_blocker_not_an_install_request() {
+    use std::os::unix::fs::symlink;
+
+    let project = TempProject::new();
+    fs::write(
+        project.0.join("package.json"),
+        r#"{"devDependencies":{"eslint":"10.1.0"}}"#,
+    )
+    .unwrap();
+    fs::create_dir_all(project.0.join("node_modules/eslint/bin")).unwrap();
+    fs::write(
+        project.0.join("node_modules/eslint/package.json"),
+        r#"{"name":"eslint","version":"10.1.0","bin":"bin/eslint.js"}"#,
+    )
+    .unwrap();
+    fs::write(
+        project.0.join("node_modules/eslint/bin/eslint.js"),
+        "exit 99",
+    )
+    .unwrap();
+    fs::write(project.0.join("config-source.js"), "export default [];").unwrap();
+    symlink("config-source.js", project.0.join("eslint.config.js")).unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["detect", project.0.to_str().unwrap(), "--format=json"])
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    let report: Value = serde_json::from_slice(&output.stdout).unwrap();
+    let eslint = report["native_tool_candidates"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|item| item["checker_id"] == "node.eslint")
+        .unwrap();
+    assert_eq!(eslint["state"], "configuration_invalid");
+    assert!(!eslint["next_action"].as_str().unwrap().contains("安装"));
+}
+
+#[test]
 fn dot_prefix_exclusions_are_summarized_without_per_path_alerts() {
     let project = TempProject::new();
     fs::write(project.0.join("app.py"), "print('ok')\n").unwrap();
@@ -173,10 +337,10 @@ fn dot_prefix_exclusions_are_summarized_without_per_path_alerts() {
     fs::write(project.0.join(".ruff.toml"), "[lint]\nselect = ['F']\n").unwrap();
     fs::write(project.0.join(".pre-commit-config.yaml"), "repos: []\n").unwrap();
     let report = detect_json(&project);
-    assert_eq!(report["schema_version"], "0.3.0");
+    assert_eq!(report["schema_version"], "0.4.0");
     assert_eq!(
         report["scope_summary"]["ordinary_scan_policy"],
-        "dot_prefix_default_v1"
+        "project_sources_default_v2"
     );
     assert_eq!(report["scope_summary"]["dot_prefix_roots_excluded"], 3);
     assert_eq!(
@@ -433,7 +597,7 @@ fn maven_configuration_detection_separates_declared_missing_and_unknown() {
     )
     .expect("pom");
     let report = detect_json(&project);
-    assert_eq!(report["schema_version"], "0.3.0");
+    assert_eq!(report["schema_version"], "0.4.0");
     assert_eq!(
         checker(&report, "java.maven.javadoc")["configuration"],
         "configured"

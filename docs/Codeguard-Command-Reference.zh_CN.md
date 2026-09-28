@@ -181,6 +181,7 @@ timeout包含等待资源锁、快照、探测、执行、解析、持久化和�
 
 - **语法与价值**：`codeguard detect [path] [--format human|json]`；快速观察语言、方言、多构建根、清单、声明版本与源集，供 init/plan 复用。
 - **输入与结果**：读取批准范围中的清单、锁与源文件特征，返回 DiscoveryReport、证据位置、未知项和观察覆盖。不执行 wrapper 或读取整台机器的开发环境。
+- **当前局部实现**：发现协议 `0.4.0` 增加 `native_tool_candidates`，分别标记项目本地 ESLint 和 Maven Wrapper 的版本候选、配置损坏、链接及不完整输入。普通源码遍历排除 `node_modules`，仅对固定工具路径做有界只读观察；候选不代表已运行、已批准或 ready。
 - **副作用与失败**：不写画像/AGENTS/任务。可完整回答“存在无法静态解析的条件”时 exit 0；权限错误导致必要发现范围不可读时 exit 3，并显示部分结果。
 - **下一步**：需要持久接入用 init，需要知道规则能力用 capabilities，需要执行前计划用 plan。
 

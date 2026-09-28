@@ -1,5 +1,7 @@
 # Maven 检查器配置探测基线（2026-09-24）
 
+更新（2026-09-29）：当前发现报告已升级为 `0.4.0`，原 `0.3.0` schema 留存；下述段落记录 2026-09-24 的配置探测基线。新版另有本地 Maven Wrapper 候选观察，见 [局部验收](native-tool-readiness-candidates.md)。
+
 `codeguard detect <path> --format=json` 现在在只读项目观察中返回 `checker_configurations`；发现报告协议为 `0.3.0`。Maven POM 使用 Rust `roxmltree` 有界解析，识别直接声明的 PMD、Checkstyle、Javadoc、Maven Dependency、OWASP Dependency-Check，以及显式依赖 FindSecBugs 的 SpotBugs。各条返回构建根、配置来源、`configured/missing/invalid/unknown`、原因与下一步。此查询不运行 Maven，也不表示检查通过。
 
 后续增加独立 `java.maven.p3c` 项，避免把普通 Maven PMD 插件声明误认为阿里 P3C。当前静态 `configured` 仅在直接 PMD 插件依赖明确使用 `com.alibaba.p3c:p3c-pmd:2.1.1`、规则集引用该制品内已观察的 `rulesets/java/ali-*.xml` 路径、并显式设置 `skipPmdError=false` 时成立；通用 PMD 仍由 `java.maven.pmd` 单独报告。P3C 版本或规则路径动态、错误处理政策不明时为 `unknown`；缺 P3C 制品或规则集为 `missing`；明确跳过或吞掉 PMD 处理错误为 `invalid`。`configured` 只证明 POM 中的静态声明，不证明规则实际加载、有效模型、扫描范围或可交付。

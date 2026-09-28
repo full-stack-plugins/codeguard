@@ -8,6 +8,8 @@
 
 `codeguard lint java .`、`codeguard lint typescript .` 及 `codeguard check all .` MUST 按模块、语言版本/方言、源码范围、配置与适用原生能力选择执行路径。选择过程 MUST 检查显式工具、项目本地工具及已支持的构建集成，不以 PATH 无命令直接认定未安装。可用原生工具和有效配置 MUST 优先执行；缺工具、配置不可用或原生执行故障可提供内置初检，但 MUST 保留原阻塞及有效原生发现。原生违规 MUST NOT 触发用于覆盖原结论的降级。init/detect/plan MUST 保持只读观察，不因配置发现而启动 WASM 或安装。
 
+只读发现报告的项目本地工具候选 MUST 与检查器配置分开列示；候选只携带相对构建根、检查器、候选状态、可见版本和下一步，不回显可能含凭据的依赖声明。`node_modules` 不进入普通源码范围，固定工具路径可单独有界观察；中间目录或最终入口为链接、特殊文件、不可读或本轮输入变化时 MUST 保留不完整/不可信状态，不跟随链接读取或执行。Maven `.mvn` 配置可作为固定路径观察，不能因普通点目录跳过而误判 Wrapper 缺失。
+
 #### Scenario: Mixed modules have different tool readiness
 - **WHEN** 前端具备有效 ESLint 而 Java 模块缺少 JDK
 - **THEN** 前端运行原生 lint，Java 模块提供语法初检；两者的范围、来源和准备状态分别保留

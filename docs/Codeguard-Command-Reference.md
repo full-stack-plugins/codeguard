@@ -10,6 +10,8 @@ The command catalog below defines responsibility, not availability. Current disp
 
 Current slices include static discovery/init, selected native checks, partial aggregation, work sync/next, local attempts/leases, selected original-tool rechecks and candidate inspection. Current doctor takes `[path]`; Java doclint is selected through `lint java --checker javadoc`. Do not assume a public `lint rust`, generic fix, complete gate or MCP service exists because its target is described here. A callable recheck does not imply final verified closure.
 
+Current `detect` 0.4.0 reports local ESLint and Maven Wrapper candidates separately from checker configuration. It skips `node_modules` during ordinary source discovery while observing fixed tool paths without following links. A candidate never means the native tool was executed or approved; `check_feedback` carries this discovery under version 0.31.0.
+
 ## 2. Command responsibilities
 
 | ID | Target command | Responsibility and success boundary |

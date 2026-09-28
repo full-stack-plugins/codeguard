@@ -153,7 +153,7 @@ codeguard task verify "$TASK_ID" . --format json
 
 | 命令族 | 价值 | 当前边界 |
 | :--- | :--- | :--- |
-| `--version`、`capabilities`、`detect` | 查询二进制、清单、项目观察 | 查询不执行检查 |
+| `--version`、`capabilities`、`detect` | 查询二进制、清单、项目观察 | 当前源码的 `detect` 0.4.0 输出本地 ESLint/Maven Wrapper 候选，不执行或批准工具 |
 | `init --dry-run / --apply` | 预览、创建、刷新工作台 | 不隐式安装、构建、接管 Hook 或认证架构 |
 | `config validate / explain`、`rules list` | 查看配置和规则来源 | 候选不构成策略批准 |
 | `tools list / verify`、`doctor` | 查看工具和有限环境探测 | 显式 Ruff doctor 探测；`tools install --apply` 受阻 |

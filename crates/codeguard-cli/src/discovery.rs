@@ -1,6 +1,8 @@
 //! 只读项目发现；候选不等于已验证的检查能力。
 
 use crate::eslint_discovery::{ESLINT_CONFIG_NAMES, inspect_node_eslint};
+use crate::native_tool_candidate::NativeToolCandidate;
+use crate::native_tool_discovery::inspect_native_tools;
 use crate::npm_audit_discovery::inspect_node_npm_audit;
 use crate::python_dependency_discovery::inspect_python_cve_inputs;
 use codeguard_adapters::{
@@ -54,6 +56,9 @@ pub struct DiscoveryReport {
     pub checker_config_sha256: BTreeMap<String, String>,
     pub lockfiles: BTreeSet<String>,
     pub checker_configurations: Vec<CheckerConfiguration>,
+    /// 项目本地原生工具的只读候选；不能视为本轮工具检查成功。
+    pub native_tool_candidates: Vec<NativeToolCandidate>,
+    pub(crate) tool_hint_paths: BTreeSet<String>,
     ruff_config_files: BTreeSet<String>,
     eslint_config_files: BTreeSet<String>,
     /// (源码根、语言、用途)；仅按目录约定推断。
@@ -65,6 +70,8 @@ pub struct DiscoveryReport {
     pub dot_prefix_roots_excluded: usize,
     /// 按配置发现例外实际观察到的点前缀普通文件数。
     pub configuration_exception_files_observed: usize,
+    /// 普通源码扫描跳过的依赖目录根数；固定路径工具探测仍可只读观察。
+    pub dependency_roots_excluded: usize,
 }
 
 impl DiscoveryReport {
@@ -90,15 +97,16 @@ impl DiscoveryReport {
             })
             .collect();
         json!({
-            "schema_version":"0.3.0",
+            "schema_version":"0.4.0",
             "report_type":"discovery",
             "root":self.root,
             "observation_complete":self.observation_complete,
             "observed_entries":self.observed_entries,
             "scope_summary":{
-                "ordinary_scan_policy":"dot_prefix_default_v1",
+                "ordinary_scan_policy":"project_sources_default_v2",
                 "dot_prefix_roots_excluded":self.dot_prefix_roots_excluded,
                 "configuration_exception_files_observed":self.configuration_exception_files_observed,
+                "dependency_roots_excluded":self.dependency_roots_excluded,
                 "git_safety_status":"not_evaluated"
             },
             "languages":languages,
@@ -107,6 +115,7 @@ impl DiscoveryReport {
             "manifest_sha256":self.manifest_sha256,
             "lockfiles":self.lockfiles,
             "checker_configurations":self.checker_configurations,
+            "native_tool_candidates":self.native_tool_candidates,
             "source_set_candidates":source_set_candidates,
             "blocked_paths":self.blocked_paths,
             "unknown_conditions":self.unknown_conditions,
@@ -147,6 +156,8 @@ pub fn discover<P: ObservationPort>(
         checker_config_sha256: BTreeMap::new(),
         lockfiles: BTreeSet::new(),
         checker_configurations: Vec::new(),
+        native_tool_candidates: Vec::new(),
+        tool_hint_paths: BTreeSet::new(),
         ruff_config_files: BTreeSet::new(),
         eslint_config_files: BTreeSet::new(),
         source_set_candidates: BTreeSet::new(),
@@ -155,6 +166,7 @@ pub fn discover<P: ObservationPort>(
         observed_entries: 0,
         dot_prefix_roots_excluded: 0,
         configuration_exception_files_observed: 0,
+        dependency_roots_excluded: 0,
     };
     if !matches!(observation.classify(root), Ok(ObservedPathKind::Directory)) {
         report.observation_complete = false;
@@ -180,6 +192,24 @@ pub fn discover<P: ObservationPort>(
                 && (exact_config_files.contains(name)
                     || ESLINT_CONFIG_NAMES.contains(&name)
                     || matches!(name, ".ruff.toml" | ".pre-commit-config.yaml"));
+            if matches!(name, "node_modules" | ".mvn") {
+                match observation.classify(&child) {
+                    Ok(kind) => {
+                        if let Some(relative) = relative_path(root, &child) {
+                            report.tool_hint_paths.insert(relative);
+                        }
+                        if name == "node_modules" && kind == ObservedPathKind::Directory {
+                            report.dependency_roots_excluded += 1;
+                        } else if kind != ObservedPathKind::Directory {
+                            block(&mut report, root, &child);
+                        }
+                    }
+                    Err(_) => block(&mut report, root, &child),
+                }
+                if name == "node_modules" {
+                    continue;
+                }
+            }
             if name.starts_with('.') && !configuration_exception {
                 report.dot_prefix_roots_excluded += 1;
                 continue;
@@ -203,6 +233,9 @@ pub fn discover<P: ObservationPort>(
                 }
                 Ok(ObservedPathKind::Directory) => pending.push(child),
                 Ok(ObservedPathKind::File) => {
+                    if name == "mvnw" {
+                        report.tool_hint_paths.insert(relative.clone());
+                    }
                     if configuration_exception {
                         report.configuration_exception_files_observed += 1;
                     }
@@ -216,6 +249,9 @@ pub fn discover<P: ObservationPort>(
                     )
                 }
                 Ok(ObservedPathKind::Symlink | ObservedPathKind::Other) | Err(_) => {
+                    if name == "mvnw" {
+                        report.tool_hint_paths.insert(relative.clone());
+                    }
                     block(&mut report, root, &child);
                 }
             }
@@ -258,6 +294,7 @@ pub fn discover<P: ObservationPort>(
     inspect_python_cve_inputs(root, observation, &mut report);
     let eslint_candidates = report.eslint_config_files.clone();
     inspect_node_eslint(root, observation, &mut report, &eslint_candidates);
+    inspect_native_tools(root, observation, &mut report);
     inspect_node_npm_audit(root, observation, &mut report);
     if report
         .languages

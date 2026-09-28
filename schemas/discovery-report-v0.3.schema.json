@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:codeguard:schema:discovery-report:0.4.0",
+  "$id": "urn:codeguard:schema:discovery-report:0.3.0",
   "title": "Codeguard static project discovery report",
   "type": "object",
-  "required": ["schema_version", "report_type", "root", "observation_complete", "observed_entries", "scope_summary", "languages", "build_roots", "declared_versions", "manifest_sha256", "lockfiles", "checker_configurations", "native_tool_candidates", "source_set_candidates", "blocked_paths", "unknown_conditions"],
+  "required": ["schema_version", "report_type", "root", "observation_complete", "observed_entries", "scope_summary", "languages", "build_roots", "declared_versions", "manifest_sha256", "lockfiles", "checker_configurations", "source_set_candidates", "blocked_paths", "unknown_conditions"],
   "additionalProperties": false,
   "properties": {
-    "schema_version": {"const": "0.4.0"},
+    "schema_version": {"const": "0.3.0"},
     "report_type": {"const": "discovery"},
     "root": {"type": "string", "minLength": 1},
     "observation_complete": {"type": "boolean"},
@@ -14,12 +14,11 @@
     "scope_summary": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["ordinary_scan_policy", "dot_prefix_roots_excluded", "configuration_exception_files_observed", "dependency_roots_excluded", "git_safety_status"],
+      "required": ["ordinary_scan_policy", "dot_prefix_roots_excluded", "configuration_exception_files_observed", "git_safety_status"],
       "properties": {
-        "ordinary_scan_policy": {"const": "project_sources_default_v2"},
+        "ordinary_scan_policy": {"const": "dot_prefix_default_v1"},
         "dot_prefix_roots_excluded": {"type": "integer", "minimum": 0},
         "configuration_exception_files_observed": {"type": "integer", "minimum": 0},
-        "dependency_roots_excluded": {"type": "integer", "minimum": 0},
         "git_safety_status": {"const": "not_evaluated"}
       }
     },
@@ -66,50 +65,6 @@
           "configuration": {"enum": ["configured", "missing", "invalid", "unknown"]},
           "configuration_ref": {"type": "string", "minLength": 1},
           "reason": {"type": "string", "minLength": 1},
-          "next_action": {"type": "string", "minLength": 1}
-        }
-      }
-    },
-    "native_tool_candidates": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["build_root", "checker_id", "state", "observed_version", "declaration_observed", "next_action"],
-        "properties": {
-          "build_root": {"type": "string", "minLength": 1},
-          "checker_id": {"enum": ["node.eslint", "java.maven"]},
-          "state": {"enum": [
-            "unknown",
-            "project_manifest_input_unavailable_or_changed",
-            "project_manifest_invalid",
-            "local_dependency_root_changed",
-            "local_package_path_untrusted",
-            "local_package_unreadable",
-            "local_package_changed",
-            "local_package_identity_invalid",
-            "local_entry_unreadable",
-            "local_entry_untrusted",
-            "local_entry_identity_unknown",
-            "declared_local_entry_unobserved",
-            "local_version_conflicts_with_declaration",
-            "local_version_not_supported_by_adapter",
-            "local_candidate_requires_native_probe",
-            "configuration_invalid",
-            "wrapper_script_changed",
-            "wrapper_script_unreadable",
-            "wrapper_script_untrusted",
-            "wrapper_script_unobserved",
-            "wrapper_configuration_changed",
-            "wrapper_configuration_untrusted",
-            "wrapper_configuration_unreadable",
-            "wrapper_configuration_invalid",
-            "wrapper_configuration_unobserved",
-            "wrapper_version_not_supported_by_adapter",
-            "wrapper_candidate_requires_native_probe"
-          ]},
-          "observed_version": {"type": ["string", "null"]},
-          "declaration_observed": {"type": "boolean"},
           "next_action": {"type": "string", "minLength": 1}
         }
       }

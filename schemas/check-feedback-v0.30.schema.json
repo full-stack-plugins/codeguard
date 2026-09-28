@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:codeguard:schema:check-feedback:0.31.0",
+  "$id": "urn:codeguard:schema:check-feedback:0.30.0",
   "title": "CodeGuard partial project or language check feedback",
   "$defs": {
     "rust_cve": {
@@ -3369,7 +3369,7 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "0.31.0"
+      "const": "0.30.0"
     },
     "export": {
       "type": "object",
@@ -3582,12 +3582,11 @@
         "schema_version",
         "report_type",
         "observation_complete",
-        "languages",
-        "native_tool_candidates"
+        "languages"
       ],
       "properties": {
         "schema_version": {
-          "const": "0.4.0"
+          "const": "0.3.0"
         },
         "report_type": {
           "const": "discovery"
@@ -3596,9 +3595,6 @@
           "type": "boolean"
         },
         "languages": {
-          "type": "array"
-        },
-        "native_tool_candidates": {
           "type": "array"
         }
       }

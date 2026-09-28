@@ -235,7 +235,7 @@ Do not infer pass/fail from generic words such as `error`, `warning`, or `BUILD 
 | Next action | Repair source, recommend/require native setup and confirmation, restore configuration, rescan, or obtain a concrete decision? |
 | Delivery | Is this only a local observation or a fully evaluated delivery result? |
 
-[RunReport parsing](../crates/codeguard-cli/src/run_report.rs) supports a common structured contract; [check orchestration](../crates/codeguard-cli/src/check_command.rs) currently emits `check_feedback` `0.30.0`. Adapters also emit their own versioned local observations. Consumers must dispatch by protocol identity/version rather than assume a universal JSON shape. Human output is currently primarily Chinese; English documentation does not imply localized runtime messages.
+[RunReport parsing](../crates/codeguard-cli/src/run_report.rs) supports a common structured contract; [check orchestration](../crates/codeguard-cli/src/check_command.rs) currently emits `check_feedback` `0.31.0`. Adapters also emit their own versioned local observations. Consumers must dispatch by protocol identity/version rather than assume a universal JSON shape. Human output is currently primarily Chinese; English documentation does not imply localized runtime messages.
 
 ### 7.3 Conversation report examples — target presentation
 
@@ -347,7 +347,7 @@ Report review rules apply across all maintained documents: distinguish installed
 
 ### 7.5 Protocol versions and identity closure
 
-The current common `RunReport` is `1.4`, aggregate `check_feedback` is `0.30.0`, and `check_aborted` is `0.11.0`; adapter-local observations have separate versions. Protocol versions must not be rewritten to match software `0.1.0`. The conversation/JSON briefs above are target examples, not complete instances of these three protocols.
+The current common `RunReport` is `1.4`, aggregate `check_feedback` is `0.31.0`, and `check_aborted` is `0.11.0`; adapter-local observations have separate versions. Protocol versions must not be rewritten to match software `0.1.0`. The conversation/JSON briefs above are target examples, not complete instances of these three protocols.
 
 The target evidence chain correlates workspace/request/run/obligation/finding/task/attempt. Source locations use reversible paths and content identities; dependency locations use component, resolved version, graph and advisory identities. Lossy rendering of non-UTF-8 paths cannot participate in matching. Digests bind bytes, not approval authority. Upgrades preserve version semantics and never turn old empty findings into complete passes.
 

@@ -1452,7 +1452,7 @@ pub fn run(args: &[String]) -> ExitCode {
     })
     .count();
     let report = json!({
-        "schema_version":"0.30.0", "report_type":"check_feedback",
+        "schema_version":"0.31.0", "report_type":"check_feedback",
         "operation":"check", "selection":parsed.selection.as_str(), "command_status":if request_cancelled { "cancelled" } else { "incomplete" },
         "exit_code":if request_cancelled { 130 } else { 3 }, "delivery_decision":if parsed.selection == Selection::All { "incomplete" } else { "not_evaluated" }, "authority":"local_unverified",
         "reason":if request_cancelled { "request_cancelled" } else if parsed.selection == Selection::All { "full_project_obligations_and_trusted_policy_unavailable" } else { "java_selection_obligations_and_trusted_policy_unavailable" },
@@ -1510,6 +1510,23 @@ pub fn run(args: &[String]) -> ExitCode {
                             .unwrap_or("核对项目原审计配置")
                     );
                 }
+            }
+        }
+        if let Some(tools) = report["discovery"]["native_tool_candidates"].as_array() {
+            for tool in tools {
+                if parsed.selection == Selection::Java && tool["checker_id"] != "java.maven" {
+                    continue;
+                }
+                println!(
+                    "原生工具候选 {} [{:?}]：{}；版本 {}；下一步：{}（未执行）",
+                    tool["checker_id"].as_str().unwrap_or("未知"),
+                    tool["build_root"].as_str().unwrap_or("未知"),
+                    tool["state"].as_str().unwrap_or("unknown"),
+                    tool["observed_version"].as_str().unwrap_or("未知"),
+                    tool["next_action"]
+                        .as_str()
+                        .unwrap_or("核对原生工具及项目配置")
+                );
             }
         }
         if let Some(files) = report["native_results"]["python_lint"]["files"].as_array() {

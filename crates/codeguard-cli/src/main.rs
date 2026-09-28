@@ -207,8 +207,10 @@ fn detect(args: &[String]) -> ExitCode {
             report.observation_complete, report.observed_entries
         );
         println!(
-            "普通扫描点前缀排除根：{}；配置例外文件：{}；入库安全：未评估",
-            report.dot_prefix_roots_excluded, report.configuration_exception_files_observed
+            "普通扫描点前缀排除根：{}；依赖目录排除根：{}；配置例外文件：{}；入库安全：未评估",
+            report.dot_prefix_roots_excluded,
+            report.dependency_roots_excluded,
+            report.configuration_exception_files_observed
         );
         for (language, evidence) in &report.languages {
             println!(
@@ -231,6 +233,16 @@ fn detect(args: &[String]) -> ExitCode {
                 checker.configuration,
                 checker.configuration_ref,
                 checker.next_action
+            );
+        }
+        for tool in &report.native_tool_candidates {
+            println!(
+                "原生工具候选 {} [{:?}]：{}；版本：{}；下一步：{}（未执行）",
+                tool.checker_id,
+                tool.build_root,
+                tool.state,
+                tool.observed_version.as_deref().unwrap_or("未知"),
+                tool.next_action
             );
         }
     }

@@ -118,6 +118,8 @@ mod maven_dependency_probe;
 mod maven_javadoc_probe;
 #[cfg(unix)]
 pub mod maven_probe;
+mod native_tool_candidate;
+mod native_tool_discovery;
 pub mod next_command;
 #[cfg(unix)]
 mod owasp_maven_probe;
