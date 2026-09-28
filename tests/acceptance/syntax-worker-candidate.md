@@ -14,6 +14,8 @@ Linux 实机证据：[GitHub Actions run 36475894172](https://github.com/full-st
 
 工作进程故障隔离增量：候选入口补充两个实际子进程反例。第一例让 worker 退出 9、留下拟在 1 秒后写文件的后台后代；父进程保留异常退出并清理进程组，标记文件没有出现，随后真实 Java WASM 观察仍成功。第二例让 worker 持续输出超过 64 KiB，再对另一个忙循环 worker 执行运行中取消；两个结果分别保留 `OutputLimit` 与 `Cancelled`，下一次真实观察仍成功。本机 6 项候选测试通过；这些证据仍不覆盖损坏 grammar 的真实加载、所有子进程跨平台行为或内存上限。
 
+对应 Linux 验证：[GitHub Actions run 36477434825](https://github.com/full-stack-plugins/codeguard/actions/runs/36477434825) 在提交 `8268121fc943f7a3a897adde81bd897da98ca6ff` 上通过；启用 WASM 的 worker 专项步骤及其后的全工作区套件均为绿色。故障隔离证据仅适用于所测 macOS arm64 与 Ubuntu x86_64；其它平台及损坏 grammar 注入仍待单独验收。
+
 验证命令及结果在提交前记录：
 
 ```text
