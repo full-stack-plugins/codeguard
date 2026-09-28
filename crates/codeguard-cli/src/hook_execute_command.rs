@@ -2,6 +2,7 @@
 
 use crate::check_budget::parse_check_timeout;
 use crate::discovery::discover;
+use crate::git_index_safety::observe_index_safety_with_deadline;
 use crate::hook_plan_command::parse_request;
 use crate::python_lint_command::{
     annotate_conversation_budget, scan_selected_report_with_deadline,
@@ -10,6 +11,7 @@ use codeguard_adapters::legacy_registry;
 use codeguard_core::{HookTriggerAction, plan_hook_trigger};
 use codeguard_runtime::NativeObservation;
 use serde_json::{Value, json};
+use std::env;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
@@ -23,6 +25,7 @@ struct Arguments {
     root: PathBuf,
     timeout_ms: u64,
     ruff_tool: Option<PathBuf>,
+    git_tool: Option<PathBuf>,
 }
 
 /// 从 `args` 与 stdin 读取宿主事件，按纯路由执行已接入的局部动作。
@@ -117,6 +120,56 @@ pub fn run(args: &[String]) -> ExitCode {
         (HookTriggerAction::ResolveChangedScope, Some(_)) => {
             ("not_run", Some("scope_resolution_required"), Value::Null, 3)
         }
+        (HookTriggerAction::CommitGate, Some(root)) if arguments.git_tool.is_some() => {
+            let tool = arguments.git_tool.as_deref().expect("guarded Git tool");
+            let alternate_index = env::var_os("GIT_INDEX_FILE").map(PathBuf::from);
+            let alternate_index = alternate_index.map(|index| {
+                if index.is_absolute() {
+                    index
+                } else {
+                    root.join(index)
+                }
+            });
+            let deadline = Instant::now() + Duration::from_millis(arguments.timeout_ms.min(15_000));
+            match observe_index_safety_with_deadline(
+                root,
+                tool,
+                alternate_index.as_deref(),
+                deadline,
+            ) {
+                Ok(observation) => {
+                    let violations = observation
+                        .violations
+                        .iter()
+                        .filter(|item| item.path.len() <= 512)
+                        .take(32)
+                        .map(|item| json!({"path":item.path,"rule_id":item.rule_id}))
+                        .collect::<Vec<_>>();
+                    let truncated = violations.len() != observation.violations.len();
+                    let feedback = json!({
+                        "schema_version":"0.1.0", "report_type":"hook_git_index_summary",
+                        "index_observation":"complete", "index_listing_sha256":observation.listing_sha256,
+                        "staged_entry_count":observation.entries.len(), "object_status":if observation.objects_verified {"verified"} else {"unresolved"},
+                        "violation_count":observation.violations.len(), "violations_truncated":truncated,
+                        "violations":violations, "source_check":"not_run",
+                        "delivery_decision":"not_evaluated"
+                    });
+                    ("local_observation", None, feedback, 3)
+                }
+                Err(_) if codeguard_runtime::sigint_cancellation_requested() => {
+                    ("not_run", Some("request_cancelled"), Value::Null, 130)
+                }
+                Err(_) if Instant::now() >= deadline => {
+                    ("not_run", Some("request_deadline_exceeded"), Value::Null, 3)
+                }
+                Err(_) => (
+                    "not_run",
+                    Some("git_index_observation_failed"),
+                    Value::Null,
+                    3,
+                ),
+            }
+        }
         (
             HookTriggerAction::CommitGate
             | HookTriggerAction::PushGate
@@ -128,7 +181,7 @@ pub fn run(args: &[String]) -> ExitCode {
     println!(
         "{}",
         json!({
-            "schema_version":"0.1.0", "report_type":"hook_execution_feedback",
+            "schema_version":"0.2.0", "report_type":"hook_execution_feedback",
             "plan":plan, "execution":execution, "reason":reason,
             "local_feedback":feedback, "delivery_decision":"not_evaluated",
             "host_blocking_verified":false, "soft_result_reused":false
@@ -168,6 +221,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
     };
     let mut timeout_ms = None;
     let mut ruff_tool = None;
+    let mut git_tool = None;
     let mut format_seen = false;
     let mut index = 1;
     while index < args.len() {
@@ -190,6 +244,13 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                 }
                 ruff_tool = Some(path);
             }
+            "--git-tool" if git_tool.is_none() => {
+                let path = PathBuf::from(value);
+                if !path.is_absolute() {
+                    return Err("--git-tool 必须为绝对路径".into());
+                }
+                git_tool = Some(path);
+            }
             _ => return Err(format!("不支持或重复的参数：{key}")),
         }
         index += 1;
@@ -205,5 +266,6 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
         root: PathBuf::from(root),
         timeout_ms,
         ruff_tool,
+        git_tool,
     })
 }

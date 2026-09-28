@@ -42,7 +42,17 @@ fn run(project: &Project, request: &Value) -> (i32, Value) {
 }
 
 fn run_with_extra(project: &Project, request: &Value, extra: &[&str]) -> (i32, Value) {
-    let mut child = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+    run_with_index(project, request, extra, None)
+}
+
+fn run_with_index(
+    project: &Project,
+    request: &Value,
+    extra: &[&str],
+    index: Option<&str>,
+) -> (i32, Value) {
+    let mut command = Command::new(env!("CARGO_BIN_EXE_codeguard"));
+    command
         .args([
             "hook",
             "execute",
@@ -50,7 +60,11 @@ fn run_with_extra(project: &Project, request: &Value, extra: &[&str]) -> (i32, V
             "--timeout=5s",
             "--format=json",
         ])
-        .args(extra)
+        .args(extra);
+    if let Some(index) = index {
+        command.env("GIT_INDEX_FILE", index);
+    }
+    let mut child = command
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
@@ -196,6 +210,163 @@ fn delivery_event_cannot_reuse_edit_feedback_or_claim_blocking() {
     assert_eq!(report["reason"], "delivery_gate_not_wired");
     assert_eq!(report["delivery_decision"], "not_evaluated");
     assert_eq!(report["host_blocking_verified"], false);
+}
+
+#[test]
+fn pre_commit_observes_only_the_live_staged_index_without_claiming_delivery() {
+    let project = Project::new();
+    assert!(
+        Command::new("git")
+            .args(["init", "-q"])
+            .current_dir(&project.0)
+            .status()
+            .unwrap()
+            .success()
+    );
+    fs::write(project.0.join(".env"), "TOKEN=fixture\n").unwrap();
+    fs::write(project.0.join("unstaged.pem"), "not staged\n").unwrap();
+    assert!(
+        Command::new("git")
+            .args(["add", "-f", ".env"])
+            .current_dir(&project.0)
+            .status()
+            .unwrap()
+            .success()
+    );
+    let git_tool = std::env::split_paths(&std::env::var_os("PATH").unwrap())
+        .map(|directory| directory.join("git"))
+        .find(|candidate| candidate.is_file())
+        .unwrap()
+        .canonicalize()
+        .unwrap();
+    let mut input = request("pre_commit", &["unstaged.pem"], "unknown");
+    input["input"]["host_claims_blocking"] = json!(true);
+    let (exit, report) = run_with_extra(
+        &project,
+        &input,
+        &["--git-tool", git_tool.to_str().unwrap()],
+    );
+    assert_eq!(exit, 3);
+    assert_eq!(report["execution"], "local_observation");
+    assert_eq!(
+        report["local_feedback"]["report_type"],
+        "hook_git_index_summary"
+    );
+    assert_eq!(report["local_feedback"]["staged_entry_count"], 1);
+    assert_eq!(report["local_feedback"]["violations"][0]["path"], ".env");
+    assert_eq!(report["local_feedback"]["violation_count"], 1);
+    assert_eq!(report["local_feedback"]["violations_truncated"], false);
+    assert_eq!(report["local_feedback"]["index_observation"], "complete");
+    assert_eq!(report["local_feedback"]["source_check"], "not_run");
+    assert_eq!(report["delivery_decision"], "not_evaluated");
+    assert_eq!(report["host_blocking_verified"], false);
+    assert_eq!(report["soft_result_reused"], false);
+}
+
+#[test]
+fn pre_commit_respects_alternate_index_and_missing_git_tool_is_incomplete() {
+    let project = Project::new();
+    assert!(
+        Command::new("git")
+            .args(["init", "-q"])
+            .current_dir(&project.0)
+            .status()
+            .unwrap()
+            .success()
+    );
+    fs::write(project.0.join("safe.py"), "pass\n").unwrap();
+    assert!(
+        Command::new("git")
+            .args(["add", "safe.py"])
+            .current_dir(&project.0)
+            .status()
+            .unwrap()
+            .success()
+    );
+    fs::write(project.0.join(".env"), "TOKEN=fixture\n").unwrap();
+    let alternate = project.0.join("alternate.index");
+    assert!(
+        Command::new("git")
+            .args(["add", "-f", ".env"])
+            .env("GIT_INDEX_FILE", &alternate)
+            .current_dir(&project.0)
+            .status()
+            .unwrap()
+            .success()
+    );
+    let git_tool = std::env::split_paths(&std::env::var_os("PATH").unwrap())
+        .map(|directory| directory.join("git"))
+        .find(|candidate| candidate.is_file())
+        .unwrap()
+        .canonicalize()
+        .unwrap();
+    let input = request("pre_commit", &[], "unknown");
+    let (exit, report) = run_with_index(
+        &project,
+        &input,
+        &["--git-tool", git_tool.to_str().unwrap()],
+        Some("alternate.index"),
+    );
+    assert_eq!(exit, 3);
+    assert_eq!(report["execution"], "local_observation");
+    assert_eq!(report["local_feedback"]["staged_entry_count"], 1);
+    assert_eq!(report["local_feedback"]["violations"][0]["path"], ".env");
+
+    let (exit, report) = run_with_extra(
+        &project,
+        &input,
+        &["--git-tool", "/missing/codeguard-test-git"],
+    );
+    assert_eq!(exit, 3);
+    assert_eq!(report["execution"], "not_run");
+    assert_eq!(report["reason"], "git_index_observation_failed");
+    assert_eq!(report["delivery_decision"], "not_evaluated");
+}
+
+#[test]
+fn pre_commit_bounds_conversation_paths_without_hiding_total_violation_count() {
+    let project = Project::new();
+    assert!(
+        Command::new("git")
+            .args(["init", "-q"])
+            .current_dir(&project.0)
+            .status()
+            .unwrap()
+            .success()
+    );
+    for index in 0..33 {
+        fs::write(project.0.join(format!(".env.{index}")), "fixture\n").unwrap();
+    }
+    assert!(
+        Command::new("git")
+            .args(["add", "-f", "."])
+            .current_dir(&project.0)
+            .status()
+            .unwrap()
+            .success()
+    );
+    let git_tool = std::env::split_paths(&std::env::var_os("PATH").unwrap())
+        .map(|directory| directory.join("git"))
+        .find(|candidate| candidate.is_file())
+        .unwrap()
+        .canonicalize()
+        .unwrap();
+    let (exit, report) = run_with_extra(
+        &project,
+        &request("pre_commit", &[], "unknown"),
+        &["--git-tool", git_tool.to_str().unwrap()],
+    );
+    assert_eq!(exit, 3);
+    assert_eq!(report["local_feedback"]["violation_count"], 33);
+    assert_eq!(report["local_feedback"]["violations_truncated"], true);
+    assert_eq!(
+        report["local_feedback"]["violations"]
+            .as_array()
+            .unwrap()
+            .len(),
+        32
+    );
+    assert_eq!(report["delivery_decision"], "not_evaluated");
 }
 
 #[test]

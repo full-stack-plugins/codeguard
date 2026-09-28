@@ -319,6 +319,23 @@ This result covers the selected lint scope; delivery is not evaluated.
 
 If native execution later fails or output truncates, explicitly change execution/completion and retain only independently usable diagnostics; do not keep example D's “completed”. For CVE/other categories, replace syntax fields with actual component/version/rule and database coverage; a zero-advisory observation with unknown database coverage is not “safe”.
 
+**E. Pre-commit index safety preview: staged paths only.**
+
+```text
+Codeguard: 1 staged path needs review
+
+Scope: current Git index; 1 entry observed, 1 path violation
+Path: .env
+Rule: repository path safety
+Object check: verified ordinary blob
+Next step: remove the sensitive path from the index, then rerun the preview.
+
+Source lint, dependency checks and the full commit gate have not run.
+Delivery is not evaluated; this preview does not authorize a commit.
+```
+
+This is also illustrative, not captured output. Actual hook JSON carries an index digest, a total violation count and at most 32 displayed paths with a truncation flag. The observed index can differ from the working tree and can be supplied through `GIT_INDEX_FILE`.
+
 ### 7.4 Structured brief and host delivery — proposed contract
 
 This JSON is a **design example only**, not the existing `check_feedback` schema and not a document to feed to `work sync`. It illustrates an initialized workspace with a successfully persisted synthetic task; real asset/run/input identities stay in the full report. Protocol name/version and schemas must be defined in the existing OpenSpec change before implementation.

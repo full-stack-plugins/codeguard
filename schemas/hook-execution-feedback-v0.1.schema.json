@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:codeguard:schema:hook-execution-feedback:0.2.0",
+  "$id": "urn:codeguard:schema:hook-execution-feedback:0.1.0",
   "title": "Candidate host-event execution; never a delivery gate",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema_version", "report_type", "plan", "execution", "reason", "local_feedback", "delivery_decision", "host_blocking_verified", "soft_result_reused"],
   "properties": {
-    "schema_version": {"const": "0.2.0"},
+    "schema_version": {"const": "0.1.0"},
     "report_type": {"const": "hook_execution_feedback"},
     "plan": {
       "type": "object",
@@ -24,7 +24,7 @@
       }
     },
     "execution": {"enum": ["not_run", "read_only_discovery", "local_observation"]},
-    "reason": {"enum": [null, "workspace_unavailable", "registry_unavailable", "adapter_unavailable", "request_cancelled", "request_deadline_exceeded", "fast_scope_not_wired", "write_failed", "scope_resolution_required", "delivery_gate_not_wired", "git_index_observation_failed", "action_not_wired"]},
+    "reason": {"enum": [null, "workspace_unavailable", "registry_unavailable", "adapter_unavailable", "request_cancelled", "fast_scope_not_wired", "write_failed", "scope_resolution_required", "delivery_gate_not_wired", "action_not_wired"]},
     "local_feedback": {"type": ["object", "null"]},
     "delivery_decision": {"const": "not_evaluated"},
     "host_blocking_verified": {"const": false},
@@ -33,10 +33,7 @@
   "allOf": [
     {"if": {"properties": {"execution": {"const": "not_run"}}, "required": ["execution"]}, "then": {"properties": {"local_feedback": {"type": "null"}, "reason": {"type": "string"}}}},
     {"if": {"properties": {"execution": {"const": "read_only_discovery"}}, "required": ["execution"]}, "then": {"properties": {"plan": {"properties": {"action": {"const": "discover_project"}}}, "reason": {"type": "null"}, "local_feedback": {"$ref": "#/$defs/discovery_summary"}}}},
-    {"if": {"properties": {"execution": {"const": "local_observation"}}, "required": ["execution"]}, "then": {"oneOf": [
-      {"properties": {"plan": {"properties": {"action": {"const": "fast_file_check"}}}, "reason": {"enum": [null, "request_cancelled"]}, "local_feedback": {"type": "object", "required": ["schema_version", "report_type", "scan_scope", "delivery_decision"], "properties": {"schema_version": {"const": "0.13.0"}, "report_type": {"const": "python_lint_feedback"}, "scan_scope": {"const": "selected_files"}, "delivery_decision": {"const": "not_evaluated"}}}}},
-      {"properties": {"plan": {"properties": {"action": {"const": "commit_gate"}}}, "reason": {"type": "null"}, "local_feedback": {"$ref": "#/$defs/git_index_summary"}}}
-    ]}}
+    {"if": {"properties": {"execution": {"const": "local_observation"}}, "required": ["execution"]}, "then": {"properties": {"plan": {"properties": {"action": {"const": "fast_file_check"}}}, "reason": {"enum": [null, "request_cancelled"]}, "local_feedback": {"type": "object", "required": ["schema_version", "report_type", "scan_scope", "delivery_decision"], "properties": {"schema_version": {"const": "0.13.0"}, "report_type": {"const": "python_lint_feedback"}, "scan_scope": {"const": "selected_files"}, "delivery_decision": {"const": "not_evaluated"}}}}}}
   ],
   "$defs": {
     "discovery_summary": {
@@ -52,24 +49,6 @@
         "checker_list_truncated": {"type": "boolean"},
         "observation_complete": {"type": "boolean"},
         "unknown_condition_count": {"type": "integer", "minimum": 0},
-        "source_check": {"const": "not_run"},
-        "delivery_decision": {"const": "not_evaluated"}
-      }
-    },
-    "git_index_summary": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["schema_version", "report_type", "index_observation", "index_listing_sha256", "staged_entry_count", "object_status", "violation_count", "violations_truncated", "violations", "source_check", "delivery_decision"],
-      "properties": {
-        "schema_version": {"const": "0.1.0"},
-        "report_type": {"const": "hook_git_index_summary"},
-        "index_observation": {"const": "complete"},
-        "index_listing_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-        "staged_entry_count": {"type": "integer", "minimum": 0},
-        "object_status": {"enum": ["verified", "unresolved"]},
-        "violation_count": {"type": "integer", "minimum": 0},
-        "violations_truncated": {"type": "boolean"},
-        "violations": {"type": "array", "maxItems": 32, "items": {"type": "object", "additionalProperties": false, "required": ["path", "rule_id"], "properties": {"path": {"type": "string", "maxLength": 512}, "rule_id": {"type": "string"}}}},
         "source_check": {"const": "not_run"},
         "delivery_decision": {"const": "not_evaluated"}
       }

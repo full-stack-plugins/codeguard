@@ -566,6 +566,7 @@
 - [ ] 11.17 实现事件驱动的检查档位与宿主接线；责任：core/CLI/plugin。验收：启动只发现、成功编辑局部快检、失败写入无源码检查、未知写入重定范围、修复按原任务复检、提交/推送/CI 各取本轮真实范围；软结果身份等价才可复用，无法阻断的宿主不宣称硬门禁。进行中：core 已有纯事件路由及[反例目标测试](../../../tests/acceptance/hook-trigger-routing-candidate.md)；CLI 已有严格、有界的只读 `hook plan`，1.1 响应对逐文件快检限制 8 个不同路径、单路径 512 字节、路径总计 2 KiB，超预算明确重定范围而非截断或假称检查，保留 1.0 历史 schema，见[CLI 局部验收](../../../tests/acceptance/hook-plan-cli-candidate.md)。档位到真实检查器的命令映射、工具/配置/源码身份、时间/并发预算、三宿主 Hook 和真实 Git/CI 接线尚缺，不勾选。
   - 新增 `lint python [path] --file REL_PATH` 的有界逐文件 Ruff 执行切片；报告明确 `scan_scope=selected_files`，未知目标未完成，局部结果不导入工作台为完整扫描。真实宿主事件到该 CLI 的调用、局部任务同步、软结果身份缓存及其它语言快检仍未完成，见[局部验收](../../../tests/acceptance/python-edit-scope-candidate.md)。
   - 新增 `hook execute` 消费同一宿主事件并调用 core 路由：启动只读发现，确认成功的纯 Python 编辑执行局部 Ruff；失败/未知写入、混合语言和交付动作不会误调用或声称通过。事件报告固定 `not_evaluated`，见[局部验收](../../../tests/acceptance/hook-execute-python-candidate.md)。插件实际 Hook、任务复检及 Git/CI 门禁仍未接线，11.17 保持未完成。
+  - 后续增量：显式 Git 工具下的 `pre_commit` 已按真实暂存 index（含 `GIT_INDEX_FILE`）执行有界只读路径安全观察，报告升级为 `hook_execution_feedback` 0.2，历史 0.1 保留；仍固定 `source_check=not_run` 与交付未评估。真实仓库测试覆盖暂存/未暂存、替代 index 和缺工具，见同一[局部验收](../../../tests/acceptance/hook-execute-python-candidate.md)。这不是完整质量门禁，宿主接线和 Git/CI 全义务仍缺，11.17 不勾选。
 
 ## 12. S12 质量评测与验收
 

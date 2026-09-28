@@ -419,7 +419,7 @@ gate 与 check 使用同一个义务/适配器/报告内核，差异是权威内
 
 已提供独立的 Python 执行切片：`codeguard lint python . --file src/changed.py --format json`。`--file` 可重复，但遵守同一 8 文件/512 字节单路径/2 KiB 总路径预算；只扫描被发现且精确选中的 Python 文件，未发现目标保留未完成原因。CLI 对话报告为 `python_lint_feedback` 0.13，返回 `scan_scope=selected_files` 和 `requested_paths`，不把该局部反馈保存并同步为完整工作台扫描，`delivery_decision` 仍为 `not_evaluated`。原 0.12 报告 schema 保留供历史结果识别；`check all` 的嵌套 Python 结果未因此升级。目前 `hook plan` 尚未自动调用它；其它语言、宿主入口和批量范围执行仍待接线。
 
-现有局部执行入口 `codeguard hook execute PATH --timeout DURATION --format=json [--ruff-tool ABS_PATH]` 从 stdin 接收同一 `hook_trigger_request` 1.0.0。超时必须显式提供且不超过 120s。启动事件只读发现；确认成功且目标全为 Python 的编辑事件按规划路径执行局部 Ruff，返回 `hook_execution_feedback` 0.1 内嵌 0.13 Python 反馈。失败/未知写入、混合语言、修复、提交、推送和 CI 等未接线动作返回 `execution=not_run` 与具体原因；即使宿主声称可阻断，也固定 `host_blocking_verified=false`、`delivery_decision=not_evaluated`。该命令还没有被插件 Hook 自动调用，不能代替严格门禁。
+现有局部执行入口 `codeguard hook execute PATH --timeout DURATION --format=json [--ruff-tool ABS_PATH] [--git-tool ABS_PATH]` 从 stdin 接收同一 `hook_trigger_request` 1.0.0。超时必须显式提供且不超过 120s。启动事件只读发现；确认成功且目标全为 Python 的编辑事件执行局部 Ruff。显式给出 Git 二进制后，`pre_commit` 读取本轮真实暂存 index（含替代 `GIT_INDEX_FILE`），Git 观察本身的截止时间取传入预算与 15s 较小值；`hook_git_index_summary` 给出 index 身份、违规总数、最多 32 个且每个至多 512 字节的路径、截断状态与对象状态，同时 `source_check=not_run`，不证明完整质量覆盖。Git 缺失或 index 观察失败仍为 `not_run`。失败/未知写入、混合语言、修复、推送和 CI 也保持 `not_run`。外层 `hook_execution_feedback` 升为 0.2，历史 0.1 schema 保留；即使宿主声称可阻断，也固定 `host_blocking_verified=false`、`delivery_decision=not_evaluated`。该命令还没有被插件 Hook 自动调用，不能代替严格门禁。
 
 ### C34 — mcp serve
 

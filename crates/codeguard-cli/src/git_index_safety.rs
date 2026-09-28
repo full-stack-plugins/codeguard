@@ -120,6 +120,21 @@ pub fn observe_index_safety(
     git_tool: &Path,
     alternate_index: Option<&Path>,
 ) -> Result<IndexSafetyObservation, String> {
+    observe_index_safety_with_deadline(
+        root,
+        git_tool,
+        alternate_index,
+        Instant::now() + Duration::from_secs(15),
+    )
+}
+
+/// 复用同一 Git index 观察，同时受宿主事件的总截止时间约束。
+pub(crate) fn observe_index_safety_with_deadline(
+    root: &Path,
+    git_tool: &Path,
+    alternate_index: Option<&Path>,
+    deadline: Instant,
+) -> Result<IndexSafetyObservation, String> {
     let root = root.canonicalize().map_err(|_| "仓库路径不可读取")?;
     if !root.is_dir() || !git_tool.is_absolute() || !git_tool.is_file() {
         return Err("仓库或 Git 工具路径无效".into());
@@ -136,7 +151,6 @@ pub fn observe_index_safety(
     } else {
         None
     };
-    let deadline = Instant::now() + Duration::from_secs(15);
     let top = git(
         &root,
         git_tool,
