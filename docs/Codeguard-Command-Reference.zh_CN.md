@@ -20,7 +20,7 @@
 | gate | 仅 pre-commit 路径安全预览；不是完整内容门禁 |
 | fix/pre-push/ci/mcp/compat/dependencies/security | 目标通用入口未实现，不能复制目标例子直接使用 |
 
-[已验收实现切片](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md)跟踪当前局部能力；[tasks](../openspec/changes/introduce-rust-codeguard-cli/tasks.md)独占完成状态。WASM 的统一入口行为仍为 S14 待办，见技术方案 5.3–5.4。后文所有未标当前的语法、退出0/1与闭环承诺均为目标契约。
+[已验收实现切片](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md)跟踪当前局部能力；[tasks](../openspec/changes/introduce-rust-codeguard-cli/tasks.md)独占完成状态。WASM 的完整统一入口仍为 S14 待办；可选 `codeguard-cli/wasm-precheck` 构建仅在 `lint typescript <显式单文件>` 完全缺少原生执行上下文时输出 [0.3.0 候选反馈](../schemas/eslint-local-feedback-v0.3.schema.json)，保留原生 `not_run`、总体 incomplete 与退出 3。默认和已发布二进制仍走旧 0.2.0 路径，见[局部验收](../tests/acceptance/typescript-syntax-fallback-candidate.md)及技术方案 5.3–5.4。后文所有未标当前的语法、退出0/1与闭环承诺均为目标契约。
 
 ## 1. 命令体系与协作路线
 

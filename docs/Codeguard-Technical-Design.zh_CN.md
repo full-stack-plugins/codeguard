@@ -183,6 +183,8 @@ flowchart LR
 
 这些是目标语义字段，尚非已发行的 lint/check 报告。局部的[候选初检 schema](../schemas/syntax-precheck-candidate.schema.json) 与 [Rust 严格读者](../crates/codeguard-adapters/src/syntax_precheck_candidate_report.rs)已绑定源码 SHA-256 和固定 grammar 身份，重新计算状态，并拒绝未知版本及伪造的 `clean`。内置 grammar 仍是未验收候选，因此该读者不能返回 `clean`；CLI 生产端、恢复节点位置、准备/任务引用和宿主渲染仍缺。保持既有退出语义：必需原生执行缺失仍为未完成（`3`）；解析器疑似问题本身不是已确认违规（`1`）。初检正常不会将 `lint/check` 转成原生成功。若未来增加独立语法操作，其成功必须限定为语法初检；本文不宣称已有 `syntax` 命令。
 
+可选特性构建的 CLI 现在还会在显式 TypeScript 文件完全未提供原生执行上下文时输出 [ESLint 反馈 0.3.0](../schemas/eslint-local-feedback-v0.3.schema.json)：保留 `native=not_run`、`delivery=not_evaluated`，恢复节点只作为 Unicode 位置的疑似观察；即使零恢复节点也保持总体未完成。部分原生上下文或符号链接不触发候选路径，已配置的原生执行继续走原路径。这只是一个局部统一入口，不代表逐模块原生优先调度或宿主自动对话已完成。
+
 ### 5.4 Grammar 引入与运行生命周期——目标
 
 只引入固定 WASM 字节及上游许可证、提交/补丁来源、SHA-256、ABI、已验证运行时和语言/方言范围、语料引用与已知缺口。逐个验证 CodeGraph 资产与选定 Rust Tree-sitter 运行时兼容，不能复制 TypeScript 提取逻辑或把 CodeGraph 支持等同语法验收。发行清单属于分发资产，不属于可写的 `.codeguard/` 项目状态。

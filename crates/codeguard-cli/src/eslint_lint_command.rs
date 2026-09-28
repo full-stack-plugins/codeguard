@@ -41,6 +41,16 @@ pub fn run(args: &[String]) -> ExitCode {
     {
         return crate::eslint_directory::run(&args, deadline);
     }
+    #[cfg(feature = "wasm-precheck")]
+    if crate::typescript_syntax_precheck::eligible(&args) {
+        let report = crate::typescript_syntax_precheck::observe(&args, deadline);
+        if args.json {
+            println!("{report}");
+        } else {
+            print_feedback(&report);
+        }
+        return ExitCode::from(3);
+    }
     let report = observe_with_preparation(&args, deadline);
     if args.json {
         println!("{report}");
@@ -88,6 +98,24 @@ pub(crate) fn print_feedback(report: &Value) {
     }
     if !report["reason"].is_null() {
         println!("待处理原因：{}", report["reason"]);
+    }
+    if let Some(precheck) = report.get("syntax_precheck") {
+        println!(
+            "内置语法初检：{}；疑似恢复节点 {}；grammar 版本/方言未验收，不等于原生 lint 通过。",
+            precheck["status"],
+            precheck["observations"].as_array().map_or(0, Vec::len)
+        );
+        for observation in precheck["observations"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .take(8)
+        {
+            println!(
+                "疑似语法 {}，行 {}，列 {}；须由适用原生工具确认。",
+                observation["kind"], observation["start_line"], observation["start_column"]
+            );
+        }
     }
     println!("工作台：{}", report["workbench_status"]);
     println!("下一步：{}", report["next_action"]);

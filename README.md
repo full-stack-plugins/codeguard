@@ -175,6 +175,8 @@ Generic `dependencies`, generic `security`, arbitrary category/language combinat
 
 **The published `0.1.0` does not yet implement bundled WASM fallback or automatic conversation delivery.** The existing commands remain the unified entry points; native adapter-specific prerequisites still apply today:
 
+An opt-in source build with `--features codeguard-cli/wasm-precheck` now has a narrow TypeScript single-file candidate path: when no explicit native ESLint context is supplied, it returns a versioned [0.3.0 feedback report](schemas/eslint-local-feedback-v0.3.schema.json) with suspected parser recovery positions and native `not_run`. Its overall result is always incomplete because the bundled grammar has no accepted language/dialect range. The default and published binaries keep the previous 0.2.0 ESLint feedback. [Acceptance scope](tests/acceptance/typescript-syntax-fallback-candidate.md).
+
 ```bash
 codeguard lint java .
 codeguard lint typescript .
