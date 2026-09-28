@@ -106,6 +106,8 @@ mod syntax_worker_recovery;
 mod syntax_worker_candidate_observation;
 #[cfg(feature = "wasm-precheck")]
 mod typescript_syntax_precheck;
+#[cfg(feature = "wasm-precheck")]
+mod java_syntax_precheck;
 #[cfg(unix)]
 pub mod go_lint_command;
 pub mod init_command;

@@ -2,7 +2,7 @@
 
 > **文档说明：**将架构落实为实现契约、命令职责、扩展步骤和可观察的验收标准。
 >
-> **文档版本：**1.2.0 · **最后更新：**2026-09-29 · **源码基线：**`cd8fb72` 加当前未提交工作树（核对日期 2026-09-28；软件版本 `0.1.0`）。
+> **文档版本：**1.2.0 · **最后更新：**2026-09-29 · **源码基线：**当前检出版本与[实施证据](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md)；软件版本 `0.1.0`。
 
 [English](Codeguard-Technical-Design.md) · [架构设计](Codeguard-Architecture.zh_CN.md) · [README](../README.zh-CN.md)
 
@@ -14,7 +14,7 @@
 
 可调用行为以当前源码为准，目标契约明确标注。产品优先级是配置发现 → 原生结果 → 有用的修复指引。内部一致性校验为这个体验服务，不要求用户手工构造执行证明。
 
-WASM 的规范与 18 项实施任务已纳入既有 change；运行时、报告 schema 和宿主接线仍待实施，设计示例不是当前命令输出。
+WASM 的规范与 18 项实施任务已纳入既有 change；可选特性下的 Rust worker、固定资产及 TypeScript/Java 单文件候选报告已存在，项目级原生优先调度、grammar 版本范围验收与宿主接线仍未完成。设计示例不是当前命令输出。
 
 ## 2. 技术选型与权衡
 
@@ -181,7 +181,7 @@ flowchart LR
 
 部分文件有疑似异常、另有文件未解析时，总体为 `incomplete`，同时保留所有可用疑似观察。`clean` 要求选定范围非空且全部完成检查。
 
-这些是目标语义字段，尚非已发行的 lint/check 报告。局部的[候选初检 schema](../schemas/syntax-precheck-candidate.schema.json) 与 [Rust 严格读者](../crates/codeguard-adapters/src/syntax_precheck_candidate_report.rs)已绑定源码 SHA-256 和固定 grammar 身份，重新计算状态，并拒绝未知版本及伪造的 `clean`。内置 grammar 仍是未验收候选，因此该读者不能返回 `clean`；CLI 生产端、恢复节点位置、准备/任务引用和宿主渲染仍缺。保持既有退出语义：必需原生执行缺失仍为未完成（`3`）；解析器疑似问题本身不是已确认违规（`1`）。初检正常不会将 `lint/check` 转成原生成功。若未来增加独立语法操作，其成功必须限定为语法初检；本文不宣称已有 `syntax` 命令。
+这些是目标语义字段，尚非已发行的项目级 lint/check 报告。局部的[候选初检 schema](../schemas/syntax-precheck-candidate.schema.json) 与 [Rust 严格读者](../crates/codeguard-adapters/src/syntax_precheck_candidate_report.rs)已绑定源码 SHA-256 和固定 grammar 身份，重新计算状态，并拒绝未知版本及伪造的 `clean`。可选 CLI 的 [TypeScript](../schemas/eslint-local-feedback-v0.3.schema.json) 与 [Java](../schemas/java-syntax-precheck-feedback-v0.1.schema.json) 单文件生产端已提供恢复位置和准备指引；宿主渲染与持久任务引用仍缺。内置 grammar 仍是未验收候选，因此不能返回 `clean`。保持既有退出语义：必需原生执行缺失仍为未完成（`3`）；解析器疑似问题本身不是已确认违规（`1`）。若未来增加独立语法操作，其成功必须限定为语法初检；本文不宣称已有 `syntax` 命令。
 
 可选特性构建的 CLI 现在还会在显式 TypeScript 文件完全未提供原生执行上下文时输出 [ESLint 反馈 0.3.0](../schemas/eslint-local-feedback-v0.3.schema.json)：保留 `native=not_run`、`delivery=not_evaluated`，恢复节点只作为 Unicode 位置的疑似观察；即使零恢复节点也保持总体未完成。部分原生上下文或符号链接不触发候选路径，已配置的原生执行继续走原路径。这只是一个局部统一入口，不代表逐模块原生优先调度或宿主自动对话已完成。
 

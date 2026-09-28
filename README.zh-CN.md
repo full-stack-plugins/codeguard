@@ -8,7 +8,7 @@ Codeguard 面向开发者与编程智能体，识别项目已有质量配置，�
 
 > **当前状态：**早期开发阶段，`0.1.0`。部分原生检查和本地修复流程已在明确范围内实现。完整交付门禁、全部语言覆盖、任务自动关闭和宿主插件接入仍未完成。
 >
-> **基线：**HEAD `cd8fb72` 加当前未提交工作树，核对日期 2026-09-28；实现与文档不全包含在该提交中。声明 Rust 最低版本 `1.85`，edition `2024`，Cargo resolver `2`。`@partme.ai/codeguard@0.1.0` 已发布，当前仅支持 Apple Silicon macOS；不声称已有多平台二进制发行版或 crates.io 发布。
+> **基线：**可调用行为以当前源码和[实施证据](openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md)为准。声明 Rust 最低版本 `1.85`，edition `2024`，Cargo resolver `2`。`@partme.ai/codeguard@0.1.0` 已发布，当前仅支持 Apple Silicon macOS；不声称已有多平台二进制发行版或 crates.io 发布。
 
 ```text
 项目文件 + 已有检查器配置
@@ -94,7 +94,7 @@ cargo build --locked -p codeguard-cli
 
 版本输出包含 `cli_version`、`target` 和协议信息。发现与 init 预览返回观察及未知项。Dry-run 不创建 `AGENTS.md` 或项目数据目录。仅在依赖已缓存时为 Cargo 添加 `--offline`。
 
-工作区要求 `std`，没有公开的 Cargo `[features]` 矩阵；不声称 `no_std`、已实现 WASM 后端、零 unsafe 或性能最快。下文的内置 WASM 语法初检是设计目标。运行层系统调用需要安全审查，当前不宣称已完成整体安全审计。
+工作区要求 `std`。可选 `wasm-precheck` 构建特性已用固定的 Java/TypeScript grammar 候选资产与有界 Rust worker，为缺少显式原生上下文的 `lint java`、`lint typescript` 单文件请求提供疑似语法观察；公开 npm `0.1.0` 不含该路径。不声称 `no_std`、已完成项目级 WASM 兜底、零 unsafe 或性能最快。运行层系统调用需要安全审查，当前不宣称已完成整体安全审计。
 
 ### npm 安装与一次性调用
 
@@ -173,6 +173,8 @@ codeguard task verify "$TASK_ID" . --format json
 ### 原生优先的统一入口与语法兜底——设计目标
 
 **公开 `0.1.0` 尚未实现内置 WASM 兜底或自动对话交付。** 保留已有命令作为统一入口；当前仍须满足各原生适配器的参数和前置条件：
+
+可选源码构建的单文件候选路径已存在：`codeguard lint java Foo.java` 与 `codeguard lint typescript foo.ts` 在完全缺少显式原生上下文时分别输出 [Java](schemas/java-syntax-precheck-feedback-v0.1.schema.json) 与 [TypeScript](schemas/eslint-local-feedback-v0.3.schema.json) 的版本化初检反馈。疑似恢复位置仍需原生确认；无恢复节点也因 grammar 版本/方言未验收保持 incomplete。默认及公开二进制沿用既有原生上下文路径，见 [Java 局部验收](tests/acceptance/java-syntax-fallback-candidate.md) 与 [TypeScript 局部验收](tests/acceptance/typescript-syntax-fallback-candidate.md)。
 
 ```bash
 codeguard lint java .

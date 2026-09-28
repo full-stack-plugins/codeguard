@@ -28,7 +28,7 @@ The existing [OpenSpec change](../openspec/changes/introduce-rust-codeguard-cli/
 | [Core aggregation](../crates/codeguard-core/src/aggregate.rs), [delivery gate](../crates/codeguard-core/src/delivery_gate.rs) | Pure result semantics, not trusted public gate availability |
 | [Acceptance records](../tests/acceptance) | Scoped observations, test method, and residual gaps |
 
-WASM requirements and 18 implementation tasks are now recorded in the existing change. The runtime, report schema and host integrations remain unimplemented; design examples are not current command output.
+WASM requirements and 18 implementation tasks are recorded in the existing change. An opt-in Rust worker, pinned grammar candidates, and TypeScript/Java single-file feedback schemas now exist. Project-wide native-first routing, qualified grammar ranges, stable syntax tasks, and host integrations remain incomplete; design examples are not current command output.
 
 ## 2. Architectural drivers
 

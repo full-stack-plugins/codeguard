@@ -1,6 +1,8 @@
 //! `lint java` 的检查器选择；各适配器仍独立保留原生证据与未完成边界。
 
 use std::process::ExitCode;
+#[cfg(feature = "wasm-precheck")]
+use std::time::{Duration, Instant};
 
 use crate::{java_checkstyle_command, java_javadoc_command, java_p3c_command};
 
@@ -43,6 +45,23 @@ pub fn run(args: &[String]) -> ExitCode {
     match checker.as_deref() {
         Some("javadoc") => java_javadoc_command::run(&forwarded),
         Some("checkstyle") => java_checkstyle_command::run(&forwarded),
-        _ => java_p3c_command::run(&forwarded),
+        _ => {
+            #[cfg(feature = "wasm-precheck")]
+            if let Ok(parsed) = java_p3c_command::parse_args(&forwarded) {
+                if crate::java_syntax_precheck::eligible(&parsed) {
+                    let report = crate::java_syntax_precheck::observe(
+                        &parsed,
+                        Instant::now() + Duration::from_secs(15),
+                    );
+                    if parsed.json {
+                        println!("{report}");
+                    } else {
+                        crate::java_syntax_precheck::print_feedback(&report);
+                    }
+                    return ExitCode::from(3);
+                }
+            }
+            java_p3c_command::run(&forwarded)
+        }
     }
 }

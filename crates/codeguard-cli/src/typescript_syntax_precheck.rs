@@ -119,7 +119,7 @@ pub(crate) fn observe(args: &EslintLintArguments, deadline: Instant) -> Value {
     report
 }
 
-fn map_observations(
+pub(crate) fn map_observations(
     source: &[u8],
     recoveries: &[crate::syntax_worker_recovery::SyntaxWorkerRecovery],
 ) -> Result<Vec<Value>, String> {

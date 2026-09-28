@@ -28,7 +28,7 @@
 | [核心聚合](../crates/codeguard-core/src/aggregate.rs)、[交付门禁](../crates/codeguard-core/src/delivery_gate.rs) | 纯结果语义，不代表公开可信门禁已可用 |
 | [验收记录](../tests/acceptance) | 限定范围的观察、测试方法和剩余缺口 |
 
-WASM 的规范与 18 项实施任务已纳入既有 change；运行时、报告 schema 和宿主接线仍待实施，设计示例不是当前命令输出。
+WASM 的规范与 18 项实施任务已纳入既有 change；可选 Rust worker、固定 grammar 候选资产和 TypeScript/Java 单文件反馈 schema 已存在。项目级原生优先调度、grammar 版本范围验收、稳定语法任务及宿主接线仍未完成；设计示例不是当前命令输出。
 
 ## 2. 架构驱动
 

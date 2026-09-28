@@ -82,7 +82,7 @@ pub fn run(args: &[String]) -> ExitCode {
     ExitCode::from(3)
 }
 
-fn parse_args(args: &[String]) -> Result<Args, String> {
+pub(crate) fn parse_args(args: &[String]) -> Result<Args, String> {
     let Some(source) = args.first() else {
         return Err("lint java 缺少 Java 源文件路径".into());
     };

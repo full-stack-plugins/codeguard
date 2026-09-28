@@ -2,7 +2,7 @@
 
 > **Purpose:** turn the architecture into concrete implementation contracts, command responsibilities, extension steps, and observable acceptance criteria.
 >
-> **Document version:** 1.2.0 · **Updated:** 2026-09-29 · **Source baseline:** `cd8fb72` plus the current uncommitted working tree (reviewed 2026-09-28; software version `0.1.0`).
+> **Document version:** 1.2.0 · **Updated:** 2026-09-29 · **Source baseline:** current checkout and the [implementation evidence](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md); software version `0.1.0`.
 
 [简体中文](Codeguard-Technical-Design.zh_CN.md) · [Architecture](Codeguard-Architecture.md) · [README](../README.md)
 
@@ -14,7 +14,7 @@ The existing [OpenSpec change](../openspec/changes/introduce-rust-codeguard-cli/
 
 Current source is the authority for callable behavior. Target contracts are labelled as such. The product priority is configuration discovery → native results → useful repair guidance. Internal consistency checks support this experience; they are not a demand for users to manually construct execution certificates.
 
-WASM requirements and 18 implementation tasks are now recorded in the existing change. The runtime, report schema and host integrations remain unimplemented; design examples are not current command output.
+WASM requirements and 18 implementation tasks are recorded in the existing change. Candidate Rust worker, pinned assets, and narrow TypeScript/Java single-file reports now exist behind an opt-in feature; project-wide native-first routing, qualified grammar ranges, and host integrations remain incomplete. Design examples are not current command output.
 
 ## 2. Technology choices and trade-offs
 
@@ -181,7 +181,7 @@ If the language has no supported native confirmation adapter, return that specif
 
 When some files have suspected issues and others are unresolved, use overall `incomplete` while retaining all usable suspected observations. `clean` requires nonempty, completely checked selected scope.
 
-These are the target semantic fields, not a shipped lint/check report. A narrow [candidate precheck schema](../schemas/syntax-precheck-candidate.schema.json) and [strict Rust reader](../crates/codeguard-adapters/src/syntax_precheck_candidate_report.rs) now bind source SHA-256 and the pinned grammar identity, recalculate status, and reject unknown versions or forged `clean`. The bundled grammars remain unvalidated candidates, so this reader cannot return `clean`; it has no CLI producer, recovery spans, setup/task references or host renderer yet. Keep existing exit semantics: missing required native execution remains incomplete (`3`); a suspected parser issue alone is not a confirmed violation (`1`). A clean fallback does not turn `lint/check` into native success. If a dedicated syntax-only operation is later introduced, its success must be explicitly scoped to syntax; no new `syntax` command is claimed here.
+These are the target semantic fields, not a shipped project-wide lint/check report. A narrow [candidate precheck schema](../schemas/syntax-precheck-candidate.schema.json) and [strict Rust reader](../crates/codeguard-adapters/src/syntax_precheck_candidate_report.rs) bind source SHA-256 and pinned grammar identity, recalculate status, and reject unknown versions or forged `clean`. Optional CLI single-file [TypeScript](../schemas/eslint-local-feedback-v0.3.schema.json) and [Java](../schemas/java-syntax-precheck-feedback-v0.1.schema.json) producers now include recovery positions and setup guidance; host rendering and durable task references remain absent. The bundled grammars remain unvalidated, so these reports cannot return `clean`. Missing required native execution remains incomplete (`3`); a suspected parser issue alone is not a confirmed violation (`1`). If a dedicated syntax-only operation is later introduced, its success must be explicitly scoped to syntax; no new `syntax` command is claimed here.
 
 The opt-in CLI build now also emits [ESLint feedback 0.3.0](../schemas/eslint-local-feedback-v0.3.schema.json) for an explicit TypeScript file when no native execution context was supplied. It preserves `native=not_run` and `delivery=not_evaluated`, maps parser recoveries to suspected Unicode positions, and keeps the overall result incomplete even with zero recoveries. A partial native context or symlink does not trigger this candidate path; configured native execution stays on the original route. This is one local entry-point slice, not per-module native-first orchestration or automatic host feedback.
 

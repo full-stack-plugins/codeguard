@@ -8,7 +8,7 @@ Codeguard helps developers and coding agents discover existing quality configura
 
 > **Status:** early development, `0.1.0`. Several native checks and local repair workflows work within explicitly bounded scopes. Full delivery gates, complete language coverage, automatic task closure, and host-plugin integration remain incomplete.
 >
-> **Baseline:** HEAD `cd8fb72` plus the current uncommitted working tree, reviewed 2026-09-28; that commit alone does not contain all described changes. Declared Rust minimum `1.85`, edition `2024`, Cargo resolver `2`. `@partme.ai/codeguard@0.1.0` is published for Apple Silicon macOS; no multi-platform binary release or crates.io availability is claimed.
+> **Baseline:** The current source and [implementation evidence](openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md) define callable behavior. Declared Rust minimum `1.85`, edition `2024`, Cargo resolver `2`. `@partme.ai/codeguard@0.1.0` is published for Apple Silicon macOS; no multi-platform binary release or crates.io availability is claimed.
 
 ```text
 Project files + existing checker configuration
@@ -94,7 +94,7 @@ cargo build --locked -p codeguard-cli
 
 Version output includes `cli_version`, `target`, and protocol information. Discovery and init preview return observations and unknowns. Dry-run creates neither `AGENTS.md` nor a project data directory. Add Cargo `--offline` only when dependencies are cached.
 
-The workspace requires `std`. The CLI now has an opt-in `wasm-precheck` build feature for an internal, bounded Rust worker using pinned Java/TypeScript grammar candidates; it is not wired into public `lint/check` or the published npm `0.1.0` package. No `no_std`, completed WASM fallback, zero-unsafe, or fastest-runtime claim is made. Runtime OS calls require safety review; a comprehensive security audit is not claimed.
+The workspace requires `std`. The opt-in `wasm-precheck` build feature uses a bounded Rust worker with pinned Java/TypeScript grammar candidates. It currently reaches only single-file `lint java` and `lint typescript` requests without explicit native context; it is absent from the published npm `0.1.0` package. No `no_std`, completed project-wide WASM fallback, zero-unsafe, or fastest-runtime claim is made. Runtime OS calls require safety review; a comprehensive security audit is not claimed.
 
 ### npm installation and one-off use
 
@@ -175,7 +175,7 @@ Generic `dependencies`, generic `security`, arbitrary category/language combinat
 
 **The published `0.1.0` does not yet implement bundled WASM fallback or automatic conversation delivery.** The existing commands remain the unified entry points; native adapter-specific prerequisites still apply today:
 
-An opt-in source build with `--features codeguard-cli/wasm-precheck` now has a narrow TypeScript single-file candidate path: when no explicit native ESLint context is supplied, it returns a versioned [0.3.0 feedback report](schemas/eslint-local-feedback-v0.3.schema.json) with suspected parser recovery positions and native `not_run`. Its overall result is always incomplete because the bundled grammar has no accepted language/dialect range. The default and published binaries keep the previous 0.2.0 ESLint feedback. [Acceptance scope](tests/acceptance/typescript-syntax-fallback-candidate.md).
+An opt-in source build with `--features codeguard-cli/wasm-precheck` now has narrow TypeScript and Java single-file candidate paths: without explicit native context, they return versioned [TypeScript](schemas/eslint-local-feedback-v0.3.schema.json) or [Java](schemas/java-syntax-precheck-feedback-v0.1.schema.json) feedback with suspected parser recovery positions and native `not_run`. Both remain incomplete because the bundled grammar has no accepted language/dialect range. Default and published binaries keep their previous native-context behavior. [TypeScript acceptance](tests/acceptance/typescript-syntax-fallback-candidate.md) · [Java acceptance](tests/acceptance/java-syntax-fallback-candidate.md).
 
 ```bash
 codeguard lint java .
