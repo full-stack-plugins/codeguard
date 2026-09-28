@@ -1,0 +1,1693 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:task-verification-preview:0.7.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "command_status",
+    "exit_code",
+    "task_id",
+    "kind",
+    "observation",
+    "event_persisted",
+    "reason",
+    "native_scan",
+    "authority",
+    "delivery_decision",
+    "execution_budget",
+    "next_actions"
+  ],
+  "properties": {
+    "schema_version": {
+      "enum": [
+        "0.6.0",
+        "0.7.0"
+      ]
+    },
+    "execution_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timeout_ms",
+        "source",
+        "enforcement"
+      ],
+      "properties": {
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 86400000
+        },
+        "source": {
+          "enum": [
+            "cli",
+            "registered_environment",
+            "project_default",
+            "builtin_default"
+          ]
+        },
+        "enforcement": {
+          "const": "native_execution_only"
+        }
+      }
+    },
+    "report_type": {
+      "const": "task_verification_preview"
+    },
+    "operation": {
+      "const": "task_verify"
+    },
+    "command_status": {
+      "const": "incomplete"
+    },
+    "exit_code": {
+      "const": 3
+    },
+    "task_id": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^CG-(B-)?[0-9a-f]{32}$"
+        }
+      ]
+    },
+    "kind": {
+      "enum": [
+        "finding",
+        "blocker",
+        null
+      ]
+    },
+    "observation": {
+      "enum": [
+        "incomplete",
+        "still_present",
+        "still_blocked",
+        "suppression_requires_review",
+        "rule_coverage_requires_review",
+        "candidate_absent_unverified_policy",
+        "environment_restored_unverified_policy"
+      ]
+    },
+    "event_persisted": {
+      "type": "boolean"
+    },
+    "reason": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        }
+      ]
+    },
+    "native_scan": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "required": [
+            "schema_version",
+            "report_type",
+            "run_id",
+            "files",
+            "delivery_decision"
+          ],
+          "properties": {
+            "schema_version": {
+              "const": "0.8.0"
+            },
+            "report_type": {
+              "const": "python_lint_feedback"
+            },
+            "delivery_decision": {
+              "const": "not_evaluated"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "schema_version",
+            "report_type",
+            "checker_id",
+            "run_id",
+            "files",
+            "findings",
+            "task_input_stable",
+            "coverage_proven",
+            "delivery_decision"
+          ],
+          "properties": {
+            "schema_version": {
+              "const": "0.2.0"
+            },
+            "report_type": {
+              "const": "java_p3c_project_observation"
+            },
+            "checker_id": {
+              "const": "java.maven.p3c"
+            },
+            "task_input_stable": {
+              "type": "boolean"
+            },
+            "coverage_proven": {
+              "const": false
+            },
+            "delivery_decision": {
+              "const": "not_evaluated"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "schema_version",
+            "report_type",
+            "run_id",
+            "findings",
+            "checker_id",
+            "local_scan_complete",
+            "delivery_decision"
+          ],
+          "properties": {
+            "schema_version": {
+              "enum": [
+                "0.2.0",
+                "0.3.0"
+              ]
+            },
+            "report_type": {
+              "const": "rust_clippy_local_observation"
+            },
+            "checker_id": {
+              "const": "rust.cargo_clippy"
+            },
+            "delivery_decision": {
+              "const": "not_evaluated"
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "schema_version": {
+                    "const": "0.3.0"
+                  }
+                },
+                "required": [
+                  "schema_version"
+                ]
+              },
+              "then": {
+                "required": [
+                  "suppression_probe"
+                ],
+                "properties": {
+                  "suppression_probe": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "rule_id",
+                      "target_path",
+                      "target_finding_id",
+                      "source_sha256",
+                      "input_stable",
+                      "forced_scan"
+                    ],
+                    "properties": {
+                      "rule_id": {
+                        "type": "string",
+                        "pattern": "^clippy::[a-z0-9_]+$"
+                      },
+                      "target_path": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "target_finding_id": {
+                        "type": "string",
+                        "pattern": "^CG-[0-9a-f]{32}$"
+                      },
+                      "source_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "input_stable": {
+                        "type": "boolean"
+                      },
+                      "forced_scan": {
+                        "oneOf": [
+                          {
+                            "type": "null"
+                          },
+                          {
+                            "type": "object",
+                            "required": [
+                              "schema_version",
+                              "report_type",
+                              "checker_id",
+                              "run_id",
+                              "local_scan_complete",
+                              "reason",
+                              "findings",
+                              "recheck_command"
+                            ],
+                            "properties": {
+                              "schema_version": {
+                                "const": "0.2.0"
+                              },
+                              "report_type": {
+                                "const": "rust_clippy_local_observation"
+                              },
+                              "checker_id": {
+                                "const": "rust.cargo_clippy"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema_version",
+            "report_type",
+            "operation",
+            "language",
+            "checker_id",
+            "command_status",
+            "exit_code",
+            "delivery_decision",
+            "coverage_proven",
+            "authority",
+            "tool_approval",
+            "rulepack_approval",
+            "native_status",
+            "reason",
+            "native_tool_version",
+            "tool_sha256",
+            "manifest_sha256",
+            "go_sum_sha256",
+            "source_file_count",
+            "module_count",
+            "modules_completed",
+            "module_results",
+            "native_diagnostic_count",
+            "findings",
+            "native_recheck_argv",
+            "next_actions",
+            "workspace_binding",
+            "workspace_id",
+            "run_id",
+            "module_identities",
+            "backlog_status",
+            "backlog_sync"
+          ],
+          "properties": {
+            "schema_version": {
+              "enum": [
+                "0.4.0",
+                "0.5.0",
+                "0.6.0",
+                "0.7.0"
+              ]
+            },
+            "report_type": {
+              "const": "go_lint_local_feedback"
+            },
+            "operation": {
+              "const": "lint"
+            },
+            "language": {
+              "const": "go"
+            },
+            "checker_id": {
+              "const": "go.vet"
+            },
+            "command_status": {
+              "const": "incomplete"
+            },
+            "exit_code": {
+              "const": 3
+            },
+            "delivery_decision": {
+              "const": "not_evaluated"
+            },
+            "coverage_proven": {
+              "const": false
+            },
+            "authority": {
+              "const": "local_unverified"
+            },
+            "tool_approval": {
+              "const": "unverified"
+            },
+            "rulepack_approval": {
+              "const": "unverified"
+            },
+            "native_status": {
+              "enum": [
+                "incomplete",
+                "findings_observed_unverified",
+                "clean_observed_unverified"
+              ]
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            },
+            "root": {
+              "type": "string",
+              "minLength": 1
+            },
+            "native_tool_version": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "tool_sha256": {
+              "$ref": "#/$defs/go_nullable_sha256"
+            },
+            "manifest_sha256": {
+              "$ref": "#/$defs/go_nullable_sha256"
+            },
+            "go_sum_sha256": {
+              "$ref": "#/$defs/go_nullable_sha256"
+            },
+            "source_file_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "module_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "modules_completed": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "module_results": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/go_module_result"
+              }
+            },
+            "native_diagnostic_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "findings": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/go_finding"
+              }
+            },
+            "native_recheck_argv": {
+              "const": [
+                "go",
+                "vet",
+                "-json",
+                "./..."
+              ]
+            },
+            "next_actions": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "workspace_binding": {
+              "enum": [
+                "bound",
+                "legacy_unbound",
+                "uninitialized",
+                "invalid"
+              ]
+            },
+            "workspace_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "run_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]+$"
+            },
+            "module_identities": {
+              "type": "object",
+              "maxProperties": 64,
+              "additionalProperties": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "manifest_sha256",
+                  "go_sum_sha256"
+                ],
+                "properties": {
+                  "manifest_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "go_sum_sha256": {
+                    "$ref": "#/$defs/go_nullable_sha256"
+                  }
+                }
+              }
+            },
+            "backlog_status": {
+              "enum": [
+                "not_attempted",
+                "synced_partial",
+                "not_initialized",
+                "backlog_update_failed"
+              ]
+            },
+            "backlog_sync": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "new_findings",
+                    "new_blockers",
+                    "imported_reports",
+                    "historical_findings",
+                    "failed_reports"
+                  ],
+                  "properties": {
+                    "new_findings": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "new_blockers": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "imported_reports": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "historical_findings": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "failed_reports": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                }
+              ]
+            },
+            "task_target": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "task_id",
+                "path",
+                "source_sha256"
+              ],
+              "properties": {
+                "task_id": {
+                  "type": "string",
+                  "pattern": "^CG-[0-9a-f]{32}$"
+                },
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "source_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              }
+            },
+            "task_input_stable": {
+              "type": "boolean"
+            },
+            "source_snapshot_sha256": {
+              "$ref": "#/$defs/go_nullable_sha256"
+            },
+            "task_scope": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "schema_version",
+                "status",
+                "reason",
+                "module_root",
+                "source_sha256",
+                "source_snapshot_sha256",
+                "tool_sha256",
+                "manifest_sha256",
+                "go_sum_sha256",
+                "package_count",
+                "active_file_count",
+                "ignored_file_count",
+                "source_map_sha256",
+                "build_conditions",
+                "native_scope_argv"
+              ],
+              "properties": {
+                "schema_version": {
+                  "const": "0.1.0"
+                },
+                "status": {
+                  "enum": [
+                    "incomplete",
+                    "selected",
+                    "excluded",
+                    "not_selected"
+                  ]
+                },
+                "reason": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9_]+$"
+                },
+                "module_root": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "source_sha256": {
+                  "$ref": "#/$defs/go_nullable_sha256"
+                },
+                "source_snapshot_sha256": {
+                  "$ref": "#/$defs/go_nullable_sha256"
+                },
+                "tool_sha256": {
+                  "$ref": "#/$defs/go_nullable_sha256"
+                },
+                "manifest_sha256": {
+                  "$ref": "#/$defs/go_nullable_sha256"
+                },
+                "go_sum_sha256": {
+                  "$ref": "#/$defs/go_nullable_sha256"
+                },
+                "source_map_sha256": {
+                  "$ref": "#/$defs/go_nullable_sha256"
+                },
+                "package_count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "active_file_count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "ignored_file_count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "build_conditions": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "cgo_enabled",
+                    "tags",
+                    "platform"
+                  ],
+                  "properties": {
+                    "cgo_enabled": {
+                      "const": false
+                    },
+                    "tags": {
+                      "const": "default"
+                    },
+                    "platform": {
+                      "const": "tool_host_default"
+                    }
+                  }
+                },
+                "native_scope_argv": {
+                  "const": [
+                    "go",
+                    "list",
+                    "-json",
+                    "./..."
+                  ]
+                }
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "schema_version": {
+                    "enum": [
+                      "0.5.0",
+                      "0.7.0"
+                    ]
+                  }
+                },
+                "required": [
+                  "schema_version"
+                ]
+              },
+              "then": {
+                "required": [
+                  "task_target",
+                  "task_input_stable"
+                ]
+              },
+              "else": {
+                "not": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "task_target"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "task_input_stable"
+                      ]
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "schema_version": {
+                    "enum": [
+                      "0.6.0",
+                      "0.7.0"
+                    ]
+                  }
+                },
+                "required": [
+                  "schema_version"
+                ]
+              },
+              "then": {
+                "required": [
+                  "source_snapshot_sha256"
+                ]
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "schema_version": {
+                    "const": "0.7.0"
+                  }
+                },
+                "required": [
+                  "schema_version"
+                ]
+              },
+              "then": {
+                "required": [
+                  "task_scope"
+                ]
+              },
+              "else": {
+                "not": {
+                  "required": [
+                    "task_scope"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "object",
+          "required": [
+            "schema_version",
+            "report_type",
+            "run_id",
+            "workspace_binding",
+            "workspace_id",
+            "ruff_version",
+            "readiness",
+            "delivery_decision",
+            "quality_checks",
+            "gate_effect",
+            "authority",
+            "persistence"
+          ],
+          "properties": {
+            "schema_version": {
+              "const": "0.2.0"
+            },
+            "report_type": {
+              "const": "doctor_observation"
+            },
+            "workspace_binding": {
+              "const": "bound"
+            },
+            "readiness": {
+              "const": "unknown"
+            },
+            "delivery_decision": {
+              "const": "not_evaluated"
+            },
+            "quality_checks": {
+              "const": "not_run"
+            },
+            "gate_effect": {
+              "const": "none"
+            },
+            "authority": {
+              "const": "unverified"
+            },
+            "persistence": {
+              "const": "queued"
+            }
+          }
+        },
+        {
+          "title": "ESLint任务局部原生复检",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "schema_version": {
+              "enum": [
+                "0.1.0",
+                "0.2.0"
+              ]
+            },
+            "report_type": {
+              "const": "eslint_task_recheck"
+            },
+            "workspace_binding": {
+              "const": "bound"
+            },
+            "authority": {
+              "const": "local_unverified"
+            },
+            "coverage_proven": {
+              "const": false
+            },
+            "delivery_decision": {
+              "const": "not_evaluated"
+            },
+            "workspace_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "run_id": {
+              "type": "string",
+              "pattern": "^eslint-task-[1-9][0-9]*-[1-9][0-9]*$",
+              "maxLength": 64
+            },
+            "reason": {
+              "type": "string",
+              "pattern": "^[a-z_]+$",
+              "maxLength": 128
+            },
+            "original_context_matches": {
+              "type": "boolean"
+            },
+            "target": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "task_id",
+                "kind",
+                "checker_id",
+                "path",
+                "rule_id"
+              ],
+              "properties": {
+                "task_id": {
+                  "type": "string",
+                  "pattern": "^CG-(B-)?[0-9a-f]{32}$"
+                },
+                "kind": {
+                  "enum": [
+                    "finding",
+                    "blocker"
+                  ]
+                },
+                "checker_id": {
+                  "enum": [
+                    "node.eslint",
+                    "node.eslint.preparation"
+                  ]
+                },
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "rule_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            },
+            "scan": {
+              "type": [
+                "object",
+                "null"
+              ]
+            },
+            "effective_rule": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "rule_id",
+                "status",
+                "reason",
+                "severity",
+                "input_stable",
+                "stdout_sha256"
+              ],
+              "properties": {
+                "rule_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "status": {
+                  "enum": [
+                    "observed",
+                    "incomplete"
+                  ]
+                },
+                "reason": {
+                  "type": "string",
+                  "pattern": "^[a-z_]+$",
+                  "maxLength": 128
+                },
+                "severity": {
+                  "enum": [
+                    null,
+                    0,
+                    1,
+                    2
+                  ]
+                },
+                "input_stable": {
+                  "type": "boolean"
+                },
+                "stdout_sha256": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              }
+            }
+          },
+          "required": [
+            "schema_version",
+            "report_type",
+            "workspace_binding",
+            "authority",
+            "coverage_proven",
+            "delivery_decision",
+            "workspace_id",
+            "run_id",
+            "reason",
+            "original_context_matches",
+            "target",
+            "scan"
+          ],
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "schema_version": {
+                    "const": "0.2.0"
+                  }
+                }
+              },
+              "then": {
+                "required": [
+                  "effective_rule"
+                ]
+              },
+              "else": {
+                "not": {
+                  "required": [
+                    "effective_rule"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "$ref": "#/$defs/npmWorkbenchObservation"
+        },
+        {
+          "$ref": "rustdoc-task-recheck.schema.json"
+        }
+      ]
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "next_actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "$defs": {
+    "go_nullable_sha256": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "go_module_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "root",
+        "status",
+        "diagnostic_count"
+      ],
+      "properties": {
+        "root": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "incomplete",
+            "findings_observed_unverified",
+            "clean_observed_unverified"
+          ]
+        },
+        "diagnostic_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "go_finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "finding_id",
+        "finding_fingerprint",
+        "source_sha256",
+        "module_root",
+        "rule_id",
+        "path",
+        "line",
+        "column",
+        "native_message_sha256",
+        "message_status"
+      ],
+      "properties": {
+        "finding_id": {
+          "type": "string",
+          "pattern": "^CG-[0-9a-f]{32}$"
+        },
+        "finding_fingerprint": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "module_root": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rule_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "column": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "native_message_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "message_status": {
+          "const": "native_text_private_untrusted"
+        }
+      }
+    },
+    "npmWorkbenchObservation": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "title": "npm工作台观察0.1/0.2与输入状态准备观察0.3；不授予覆盖",
+      "oneOf": [
+        {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "title": "npm局部CVE工作台观察，不能自证漏洞或关闭",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema_version",
+            "report_type",
+            "workspace_binding",
+            "workspace_id",
+            "run_id",
+            "authority",
+            "coverage_proven",
+            "delivery_decision",
+            "checker_id",
+            "build_root",
+            "manifest_sha256",
+            "lock_sha256",
+            "diagnostic_reason",
+            "component_count",
+            "advisories"
+          ],
+          "properties": {
+            "schema_version": {
+              "const": "0.1.0"
+            },
+            "report_type": {
+              "const": "npm_cve_workbench_observation"
+            },
+            "workspace_binding": {
+              "const": "bound"
+            },
+            "workspace_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "run_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,120}$"
+            },
+            "authority": {
+              "const": "local_unverified"
+            },
+            "coverage_proven": {
+              "const": false
+            },
+            "delivery_decision": {
+              "const": "not_evaluated"
+            },
+            "checker_id": {
+              "const": "node.npm.audit"
+            },
+            "build_root": {
+              "type": "string",
+              "minLength": 1
+            },
+            "manifest_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "lock_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "diagnostic_reason": {
+              "type": "string",
+              "pattern": "^[a-z0-9_]{1,80}$"
+            },
+            "component_count": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "advisories": {
+              "type": "array",
+              "maxItems": 10000,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "component_ref",
+                  "severity",
+                  "advisory_sources",
+                  "nodes"
+                ],
+                "properties": {
+                  "component_ref": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "severity": {
+                    "enum": [
+                      "info",
+                      "low",
+                      "moderate",
+                      "high",
+                      "critical"
+                    ]
+                  },
+                  "advisory_sources": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "nodes": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "node_ref",
+                        "resolved_version"
+                      ],
+                      "properties": {
+                        "node_ref": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        },
+                        "resolved_version": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 256
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "diagnostic_reason": {
+                    "enum": [
+                      "npm_execution_context_missing",
+                      "npm_manifest_invalid",
+                      "npm_scripts_invalid"
+                    ]
+                  }
+                },
+                "required": [
+                  "diagnostic_reason"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "component_count": {
+                    "const": 0
+                  },
+                  "advisories": {
+                    "maxItems": 0
+                  }
+                }
+              }
+            },
+            {
+              "not": {
+                "properties": {
+                  "diagnostic_reason": {
+                    "const": "npm_lock_missing"
+                  }
+                },
+                "required": [
+                  "diagnostic_reason"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "title": "npm缺锁准备观察；未启动工具且没有漏洞结果",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema_version",
+            "report_type",
+            "workspace_binding",
+            "workspace_id",
+            "run_id",
+            "authority",
+            "coverage_proven",
+            "delivery_decision",
+            "checker_id",
+            "build_root",
+            "manifest_sha256",
+            "lock_sha256",
+            "diagnostic_reason",
+            "component_count",
+            "advisories",
+            "lock_state"
+          ],
+          "properties": {
+            "schema_version": {
+              "const": "0.2.0"
+            },
+            "report_type": {
+              "const": "npm_cve_workbench_observation"
+            },
+            "workspace_binding": {
+              "const": "bound"
+            },
+            "workspace_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "run_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,120}$"
+            },
+            "authority": {
+              "const": "local_unverified"
+            },
+            "coverage_proven": {
+              "const": false
+            },
+            "delivery_decision": {
+              "const": "not_evaluated"
+            },
+            "checker_id": {
+              "const": "node.npm.audit"
+            },
+            "build_root": {
+              "type": "string",
+              "minLength": 1
+            },
+            "manifest_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "lock_sha256": {
+              "type": "null"
+            },
+            "diagnostic_reason": {
+              "const": "npm_lock_missing"
+            },
+            "component_count": {
+              "const": 0
+            },
+            "advisories": {
+              "type": "array",
+              "maxItems": 0
+            },
+            "lock_state": {
+              "const": "missing"
+            }
+          }
+        },
+        {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "title": "npm输入不可用的准备观察0.3；无原生漏洞结果",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema_version",
+            "report_type",
+            "workspace_binding",
+            "workspace_id",
+            "run_id",
+            "authority",
+            "coverage_proven",
+            "delivery_decision",
+            "checker_id",
+            "build_root",
+            "manifest_sha256",
+            "lock_sha256",
+            "diagnostic_reason",
+            "component_count",
+            "advisories",
+            "manifest_state",
+            "lock_state"
+          ],
+          "properties": {
+            "schema_version": {
+              "const": "0.3.0"
+            },
+            "report_type": {
+              "const": "npm_cve_workbench_observation"
+            },
+            "workspace_binding": {
+              "const": "bound"
+            },
+            "workspace_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "run_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,120}$"
+            },
+            "authority": {
+              "const": "local_unverified"
+            },
+            "coverage_proven": {
+              "const": false
+            },
+            "delivery_decision": {
+              "const": "not_evaluated"
+            },
+            "checker_id": {
+              "const": "node.npm.audit"
+            },
+            "build_root": {
+              "type": "string",
+              "minLength": 1
+            },
+            "manifest_sha256": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              ]
+            },
+            "lock_sha256": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              ]
+            },
+            "diagnostic_reason": {
+              "enum": [
+                "npm_manifest_missing",
+                "npm_manifest_not_regular",
+                "npm_manifest_path_alias",
+                "npm_manifest_unavailable",
+                "npm_lock_missing",
+                "npm_lock_not_regular",
+                "npm_lock_path_alias",
+                "npm_lock_unavailable"
+              ]
+            },
+            "component_count": {
+              "const": 0
+            },
+            "advisories": {
+              "type": "array",
+              "maxItems": 0
+            },
+            "manifest_state": {
+              "enum": [
+                "present",
+                "missing",
+                "not_regular",
+                "path_alias",
+                "unavailable"
+              ]
+            },
+            "lock_state": {
+              "enum": [
+                "present",
+                "missing",
+                "not_regular",
+                "path_alias",
+                "unavailable"
+              ]
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "manifest_state": {
+                    "const": "present"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "manifest_sha256": {
+                    "type": "string"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "manifest_sha256": {
+                    "type": "null"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "lock_state": {
+                    "const": "present"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "lock_sha256": {
+                    "type": "string"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "lock_sha256": {
+                    "type": "null"
+                  }
+                }
+              }
+            },
+            {
+              "not": {
+                "properties": {
+                  "manifest_state": {
+                    "const": "present"
+                  },
+                  "lock_state": {
+                    "const": "present"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "manifest_state": {
+                    "const": "missing"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "diagnostic_reason": {
+                    "const": "npm_manifest_missing"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "manifest_state": {
+                    "const": "present"
+                  },
+                  "lock_state": {
+                    "const": "missing"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "diagnostic_reason": {
+                    "const": "npm_lock_missing"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "manifest_state": {
+                    "const": "not_regular"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "diagnostic_reason": {
+                    "const": "npm_manifest_not_regular"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "manifest_state": {
+                    "const": "present"
+                  },
+                  "lock_state": {
+                    "const": "not_regular"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "diagnostic_reason": {
+                    "const": "npm_lock_not_regular"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "manifest_state": {
+                    "const": "path_alias"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "diagnostic_reason": {
+                    "const": "npm_manifest_path_alias"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "manifest_state": {
+                    "const": "present"
+                  },
+                  "lock_state": {
+                    "const": "path_alias"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "diagnostic_reason": {
+                    "const": "npm_lock_path_alias"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "manifest_state": {
+                    "const": "unavailable"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "diagnostic_reason": {
+                    "const": "npm_manifest_unavailable"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "manifest_state": {
+                    "const": "present"
+                  },
+                  "lock_state": {
+                    "const": "unavailable"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "diagnostic_reason": {
+                    "const": "npm_lock_unavailable"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "native_scan": {
+            "type": "object",
+            "properties": {
+              "report_type": {
+                "const": "rustdoc_task_recheck"
+              }
+            },
+            "required": [
+              "report_type"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "schema_version": {
+            "const": "0.7.0"
+          }
+        }
+      }
+    }
+  ]
+}

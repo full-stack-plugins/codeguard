@@ -1,0 +1,186 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CodeGuard local doctor observation 0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "run_id",
+    "scope",
+    "inspection_status",
+    "authority",
+    "readiness",
+    "delivery_decision",
+    "gate_effect",
+    "quality_checks",
+    "profile_summary",
+    "budget",
+    "ruff_version",
+    "next_actions",
+    "persistence"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "report_type": {
+      "const": "doctor_observation"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^doctor-[0-9]+-[0-9]+-[0-9]+$"
+    },
+    "scope": {
+      "const": "configuration_and_ruff_version_only"
+    },
+    "inspection_status": {
+      "const": "incomplete"
+    },
+    "authority": {
+      "const": "unverified"
+    },
+    "readiness": {
+      "const": "unknown"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "gate_effect": {
+      "const": "none"
+    },
+    "quality_checks": {
+      "const": "not_run"
+    },
+    "persistence": {
+      "const": "not_saved"
+    },
+    "profile_summary": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timeout_ms",
+        "probe_limit_ms",
+        "enforcement"
+      ],
+      "properties": {
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 86400000
+        },
+        "probe_limit_ms": {
+          "const": 10000
+        },
+        "enforcement": {
+          "const": "native_execution_only"
+        }
+      }
+    },
+    "next_actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "ruff_version": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason",
+        "version",
+        "tool_sha256",
+        "required_by_policy",
+        "next_action"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "not_selected",
+            "incomplete",
+            "observed_untrusted"
+          ]
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "version": {
+          "enum": [
+            null,
+            "ruff 0.16.8"
+          ]
+        },
+        "tool_sha256": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          ]
+        },
+        "required_by_policy": {
+          "const": null
+        },
+        "next_action": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "observed_untrusted"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "const": null
+              },
+              "version": {
+                "const": "ruff 0.16.8"
+              },
+              "tool_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "version": {
+                "const": null
+              },
+              "tool_sha256": {
+                "const": null
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

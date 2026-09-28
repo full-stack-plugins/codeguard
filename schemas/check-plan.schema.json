@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:check-plan:1.1",
+  "title": "Codeguard check obligation plan",
+  "type": "object",
+  "required": ["schema_version", "report_type", "request_id", "plan_id", "content_identity", "policy_identity", "discovery_complete", "obligations", "tasks", "edges", "unresolved_conditions"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^1\\.[0-9]+$"},
+    "report_type": {"const": "check_plan"},
+    "request_id": {"type": "string", "minLength": 1},
+    "plan_id": {"type": "string", "minLength": 1},
+    "content_identity": {"$ref": "#/$defs/content_identity"},
+    "policy_identity": {"$ref": "#/$defs/policy_identity"},
+    "discovery_complete": {"type": "boolean"},
+    "obligations": {"type": "array", "items": {"$ref": "#/$defs/obligation"}},
+    "tasks": {"type": "array", "items": {"$ref": "#/$defs/task"}},
+    "edges": {"type": "array", "items": {"$ref": "#/$defs/edge"}},
+    "unresolved_conditions": {"type": "array", "items": {"$ref": "#/$defs/unresolved"}},
+    "extensions": {"$ref": "#/$defs/extensions"}
+  },
+  "if": {"properties": {"schema_version": {"not": {"const": "1.0"}}}},
+  "then": {"properties": {"obligations": {"items": {"required": ["check_kind"]}}}},
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "extensions": {"type": "object", "propertyNames": {"pattern": "^x-.+"}},
+    "content_identity": {
+      "type": "object",
+      "required": ["kind", "digest"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {"enum": ["working_tree", "git_index", "git_ref", "ci"]},
+        "digest": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "policy_identity": {
+      "type": "object",
+      "required": ["source", "revision", "digest"],
+      "additionalProperties": false,
+      "properties": {
+        "source": {"type": "string", "minLength": 1},
+        "revision": {"type": "string", "minLength": 1},
+        "digest": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "string_set": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "obligation": {
+      "type": "object",
+      "required": ["id", "module", "language", "category", "applicability", "required", "expected_targets", "rule_ids"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "module": {"type": "string", "minLength": 1},
+        "language": {"type": "string", "minLength": 1},
+        "category": {"enum": ["lint", "comments", "dependencies", "cve", "security", "build"]},
+        "check_kind": {"enum": ["lint.syntax", "lint.style", "lint.type", "lint.dataflow", "lint.complexity", "lint.duplication", "lint.dead_code", "lint.architecture", "lint.api_compatibility", "lint.schema", "comments.api_docs", "comments.comment_policy", "comments.doc_links", "dependencies.graph", "dependencies.versions", "dependencies.licenses", "dependencies.sbom", "dependencies.provenance", "cve.advisory", "security.sast", "security.secrets", "security.iac", "security.container", "security.config", "security.policy", "build.compile", "build.reproducibility", "build.manifest"]},
+        "applicability": {"enum": ["applicable", "not_applicable", "unknown"]},
+        "required": {"type": "boolean"},
+        "expected_targets": {"$ref": "#/$defs/string_set"},
+        "rule_ids": {"$ref": "#/$defs/string_set"},
+        "reason": {"type": "string", "minLength": 1}
+      },
+      "if": {"properties": {"applicability": {"const": "applicable"}}},
+      "then": {"properties": {"expected_targets": {"minItems": 1}}}
+    },
+    "task": {
+      "type": "object",
+      "required": ["id", "state", "adapter_id", "obligation_ids", "resource_keys"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "state": {"enum": ["planned", "pending_resolution", "unsupported"]},
+        "adapter_id": {"type": "string", "minLength": 1},
+        "obligation_ids": {"$ref": "#/$defs/string_set"},
+        "resource_keys": {"$ref": "#/$defs/string_set"}
+      }
+    },
+    "edge": {
+      "type": "object",
+      "required": ["before", "after"],
+      "additionalProperties": false,
+      "properties": {
+        "before": {"type": "string", "minLength": 1},
+        "after": {"type": "string", "minLength": 1}
+      }
+    },
+    "unresolved": {
+      "type": "object",
+      "required": ["obligation_id", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "obligation_id": {"type": "string", "minLength": 1},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

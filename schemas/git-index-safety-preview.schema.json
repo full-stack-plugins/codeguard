@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:git-index-safety-preview:0.2.0",
+  "title": "CodeGuard staged path safety preview",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "report_type", "operation", "command_status", "exit_code", "delivery_decision", "index_observation", "index_object_format", "index_listing_sha256", "staged_entry_count", "object_status", "verified_object_count", "unresolved_object_count", "object_verification_reason", "violations", "tool_approval", "incomplete_reasons", "next_actions"],
+  "properties": {
+    "schema_version": {"const": "0.2.0"},
+    "report_type": {"const": "git_index_safety_preview"},
+    "operation": {"const": "gate_pre_commit"},
+    "command_status": {"const": "incomplete"},
+    "exit_code": {"const": 3},
+    "delivery_decision": {"const": "not_evaluated"},
+    "index_observation": {"enum": ["complete", "incomplete"]},
+    "index_object_format": {"type": ["string", "null"], "enum": ["sha1", "sha256", null]},
+    "index_listing_sha256": {"anyOf": [{"type": "string", "pattern": "^[0-9a-f]{64}$"}, {"type": "null"}]},
+    "staged_entry_count": {"type": ["integer", "null"], "minimum": 0},
+    "object_status": {"enum": ["verified", "unresolved", "failed", "not_observed"]},
+    "verified_object_count": {"type": ["integer", "null"], "minimum": 0},
+    "unresolved_object_count": {"type": ["integer", "null"], "minimum": 0},
+    "object_verification_reason": {"type": ["string", "null"]},
+    "violations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "rule_id"],
+        "properties": {
+          "path": {"type": "string", "minLength": 1},
+          "rule_id": {"enum": ["repository_policy.generated_or_dependency_directory", "repository_policy.sensitive_filename", "repository_policy.root_dump"]}
+        }
+      }
+    },
+    "tool_approval": {"const": "unverified"},
+    "incomplete_reasons": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "next_actions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:runtime-options:1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "document_type", "timeout"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "document_type": {"const": "codeguard_runtime_options"},
+    "timeout": {"type": "string", "pattern": "^[0-9]+(ms|s|m|h)$", "maxLength": 24}
+  }
+}

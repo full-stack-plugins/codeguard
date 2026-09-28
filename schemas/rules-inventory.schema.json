@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:rules-inventory:0.1.0",
+  "title": "CodeGuard static rule inventory without effective policy authority",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "report_type", "operation", "inspection_status", "command_status", "exit_code", "authority", "gate_effect", "delivery_decision", "observation_complete", "scope", "approved_policy", "tool_lock", "languages", "next_actions"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "report_type": {"const": "rules_inventory"},
+    "operation": {"const": "list"},
+    "inspection_status": {"const": "incomplete"},
+    "command_status": {"const": "incomplete"},
+    "exit_code": {"const": 3},
+    "authority": {"const": "unverified"},
+    "gate_effect": {"const": "none"},
+    "delivery_decision": {"const": "not_evaluated"},
+    "observation_complete": {"type": "boolean"},
+    "scope": {"const": "static_project_discovery_and_bundled_candidate_mappings"},
+    "approved_policy": {"const": "unbound"},
+    "tool_lock": {"const": "not_evaluated"},
+    "next_actions": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "languages": {
+      "type": "array", "minItems": 1, "maxItems": 57,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["language", "project_detected", "catalog_status", "checker_configurations", "rules", "catalog_gaps"],
+        "properties": {
+          "language": {"type": "string", "minLength": 1},
+          "project_detected": {"type": "boolean"},
+          "catalog_status": {"const": "incomplete"},
+          "checker_configurations": {"type": "array", "items": {"$ref": "#/$defs/configuration"}},
+          "rules": {"type": "array", "items": {"$ref": "#/$defs/rule"}},
+          "catalog_gaps": {
+            "type": "array", "minItems": 6, "maxItems": 6,
+            "items": {
+              "type": "object", "additionalProperties": false,
+              "required": ["category", "reason", "next_action"],
+              "properties": {
+                "category": {"enum": ["lint", "comments", "dependencies", "cve", "security", "build"]},
+                "reason": {"enum": ["candidate_mapping_is_not_complete_effective_catalog", "native_rule_catalog_not_bound"]},
+                "next_action": {"type": "string", "minLength": 1}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "configuration": {
+      "type": "object", "additionalProperties": false,
+      "required": ["build_root", "checker_id", "category", "configuration", "configuration_ref", "reason", "next_action"],
+      "properties": {
+        "build_root": {"type": "string", "minLength": 1},
+        "checker_id": {"type": "string", "minLength": 1},
+        "category": {"type": "string", "minLength": 1},
+        "configuration": {"enum": ["configured", "missing", "invalid", "unknown"]},
+        "configuration_ref": {"type": "string"},
+        "reason": {"type": "string", "minLength": 1},
+        "next_action": {"type": "string", "minLength": 1}
+      }
+    },
+    "rule": {
+      "type": "object", "additionalProperties": false,
+      "required": ["checker_id", "native_rule_id", "codeguard_rule_id", "category", "source_ref", "severity", "enabled", "execution", "approval", "applicability", "suppression", "approved_exception", "next_action", "rulepack"],
+      "properties": {
+        "checker_id": {"const": "python.ruff"},
+        "native_rule_id": {"enum": ["F401", "E501"]},
+        "codeguard_rule_id": {"enum": ["python.ruff.F401", "python.ruff.E501"]},
+        "category": {"const": "lint"},
+        "source_ref": {"type": "string", "pattern": "^https://docs\\.astral\\.sh/ruff/rules/"},
+        "severity": {"type": "null"},
+        "enabled": {"const": "unverified"},
+        "execution": {"const": "not_run"},
+        "approval": {"const": "unverified"},
+        "applicability": {"const": "requires_native_effective_configuration"},
+        "suppression": {"const": "not_evaluated"},
+        "approved_exception": {"type": "null"},
+        "next_action": {"type": "string", "minLength": 1},
+        "rulepack": {
+          "type": "object", "additionalProperties": false,
+          "required": ["id", "version", "sha256", "status", "scope", "origin_url", "license", "license_ref", "compatible_tool_versions"],
+          "properties": {
+            "id": {"const": "python.ruff.lint.preview"},
+            "version": {"const": "0.1.0"},
+            "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "status": {"const": "candidate_unapproved"},
+            "scope": {"const": "rule_mapping_only"},
+            "origin_url": {"const": "https://docs.astral.sh/ruff/rules/"},
+            "license": {"const": "MIT"},
+            "license_ref": {"const": "https://github.com/astral-sh/ruff/blob/main/LICENSE"},
+            "compatible_tool_versions": {"const": ["ruff 0.16.8"]}
+          }
+        }
+      }
+    }
+  }
+}

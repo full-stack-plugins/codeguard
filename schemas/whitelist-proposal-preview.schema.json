@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:whitelist-proposal-preview:0.4.0",
+  "title": "CodeGuard incomplete false-positive proposal preview",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "report_type", "operation", "command_status", "exit_code", "finding_id", "status", "reason", "observed_artifacts", "candidate", "missing_evidence", "recheck_argv", "next_actions", "authority", "gate_effect", "delivery_decision"],
+  "properties": {
+    "schema_version": {"const": "0.4.0"},
+    "report_type": {"const": "whitelist_proposal_preview"},
+    "operation": {"const": "whitelist_propose"},
+    "command_status": {"const": "incomplete"},
+    "exit_code": {"const": 3},
+    "finding_id": {"type": "string", "pattern": "^CG-(B-)?[0-9a-f]{32}$"},
+    "status": {"type": "string", "minLength": 1},
+    "reason": {"type": "string", "minLength": 1},
+    "checker_id": {"type": "string", "minLength": 1},
+    "native_rule_id": {"type": "string", "minLength": 1},
+    "target": {"type": "string", "minLength": 1},
+    "observed_artifacts": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/observation"}]},
+    "candidate": {"type": "null"},
+    "missing_evidence": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "recheck_argv": {"type": ["array", "null"], "items": {"type": "string"}},
+    "next_actions": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "authority": {"const": "unverified"},
+    "gate_effect": {"const": "none"},
+    "delivery_decision": {"const": "not_evaluated"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "observation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["run_id", "report_sha256", "workspace_id", "finding_fingerprint", "source_sha256", "native_rule_id", "target", "tool_sha256", "adapter_sha256", "config_sha256", "native_tool_version", "codeguard_rule_id", "rulepack_sha256", "rulepack_status", "authority"],
+      "properties": {
+        "run_id": {"type": "string", "pattern": "^lint-[0-9]+-[0-9]+$"},
+        "report_sha256": {"$ref": "#/$defs/sha256"},
+        "workspace_id": {"type": "string", "pattern": "^ws-[0-9a-f]{32}$"},
+        "finding_fingerprint": {"$ref": "#/$defs/sha256"},
+        "source_sha256": {"$ref": "#/$defs/sha256"},
+        "native_rule_id": {"type": "string", "minLength": 1},
+        "target": {"type": "string", "minLength": 1},
+        "tool_sha256": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]},
+        "adapter_sha256": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]},
+        "config_sha256": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]},
+        "native_tool_version": {"type": ["string", "null"]},
+        "codeguard_rule_id": {"type": ["string", "null"]},
+        "rulepack_sha256": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]},
+        "rulepack_status": {"type": ["string", "null"]},
+        "authority": {"const": "local_unverified"}
+      }
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CodeGuard tool artifact inspection 0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "report_type", "inspection_status", "authority", "readiness", "gate_effect", "lock_status", "lock_sha256", "tools", "next_action"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "report_type": {"const": "tool_artifact_inspection"},
+    "inspection_status": {"const": "incomplete"},
+    "authority": {"const": "unverified"},
+    "readiness": {"const": "unknown"},
+    "gate_effect": {"const": "none"},
+    "lock_status": {"enum": ["missing", "invalid", "unreadable", "structurally_valid_untrusted"]},
+    "lock_sha256": {"oneOf": [{"type": "null"}, {"type": "string", "pattern": "^[0-9a-f]{64}$"}]},
+    "next_action": {"type": "string", "minLength": 1},
+    "tools": {"type": "array", "items": {"$ref": "#/$defs/tool"}}
+  },
+  "$defs": {
+    "artifact": {
+      "type": "object", "additionalProperties": false,
+      "required": ["digest_matched", "executable_bit", "issue"],
+      "properties": {
+        "digest_matched": {"type": "boolean"},
+        "executable_bit": {"type": "boolean"},
+        "issue": {"type": ["string", "null"], "minLength": 1}
+      }
+    },
+    "bundle": {
+      "type": "object", "additionalProperties": false,
+      "required": ["digest_matched", "issue"],
+      "properties": {"digest_matched": {"type": "boolean"}, "issue": {"type": ["string", "null"], "minLength": 1}}
+    },
+    "tool": {
+      "type": "object", "additionalProperties": false,
+      "required": ["tool_id", "platform", "origin_kind", "artifact_status", "tool", "runtime", "bundle", "execution", "version_status", "next_action"],
+      "properties": {
+        "tool_id": {"type": "string", "minLength": 1},
+        "platform": {"enum": ["macos_arm64", "macos_x86_64", "linux_x86_64", "linux_aarch64", "windows_x86_64"]},
+        "origin_kind": {"enum": ["system", "project_wrapper", "managed_cache"]},
+        "artifact_status": {"enum": ["matched_untrusted", "incomplete"]},
+        "tool": {"$ref": "#/$defs/artifact"},
+        "runtime": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/artifact"}]},
+        "bundle": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/bundle"}]},
+        "execution": {"const": "not_run"},
+        "version_status": {"const": "lock_declared_only"},
+        "next_action": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

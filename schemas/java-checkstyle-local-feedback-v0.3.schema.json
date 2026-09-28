@@ -1,0 +1,311 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:java-checkstyle-local-feedback:0.3.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "language",
+    "operation",
+    "category",
+    "command_status",
+    "exit_code",
+    "local_status",
+    "reason",
+    "path",
+    "findings",
+    "authority",
+    "checker_identity",
+    "coverage_proven",
+    "delivery_decision",
+    "next_actions",
+    "recheck_argv",
+    "workbench"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.3.0"
+    },
+    "report_type": {
+      "const": "java_checkstyle_local_feedback"
+    },
+    "language": {
+      "const": "java"
+    },
+    "operation": {
+      "const": "lint"
+    },
+    "category": {
+      "const": "comments"
+    },
+    "command_status": {
+      "enum": [
+        "incomplete",
+        "cancelled"
+      ]
+    },
+    "exit_code": {
+      "enum": [
+        3,
+        130
+      ]
+    },
+    "local_status": {
+      "enum": [
+        "incomplete",
+        "observed"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "checker_identity": {
+      "const": "unverified"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "next_actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "line",
+          "column",
+          "rule_id",
+          "severity",
+          "checker_class",
+          "rule_summary",
+          "rule_reference",
+          "repair_steps"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "line": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4294967295
+          },
+          "column": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 4294967295
+              }
+            ]
+          },
+          "rule_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "severity": {
+            "enum": [
+              "error",
+              "warning",
+              "info"
+            ]
+          },
+          "checker_class": {
+            "enum": [
+              "com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocTypeCheck",
+              "com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocMethodCheck",
+              "com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocTypeCheck",
+              "com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck"
+            ]
+          },
+          "rule_summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rule_reference": {
+            "type": "string",
+            "pattern": "^https://checkstyle\\.org/checks/javadoc/[a-z]+\\.html$"
+          },
+          "repair_steps": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "recheck_argv": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "workbench": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "new_findings",
+            "next"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "minLength": 1
+            },
+            "new_findings": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "next": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "command_status": {
+            "const": "cancelled"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "exit_code": {
+            "const": 130
+          },
+          "reason": {
+            "const": "request_cancelled"
+          },
+          "local_status": {
+            "const": "incomplete"
+          },
+          "findings": {
+            "maxItems": 0
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "exit_code": {
+            "const": 3
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "local_status": {
+            "const": "incomplete"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "findings": {
+            "maxItems": 0
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "local_status": {
+            "const": "observed"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "recheck_argv": {
+            "minItems": 12,
+            "maxItems": 12,
+            "prefixItems": [
+              {
+                "const": "codeguard"
+              },
+              {
+                "const": "lint"
+              },
+              {
+                "const": "java"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "const": "--checker=checkstyle"
+              },
+              {
+                "const": "--java-tool"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "const": "--checkstyle-jar"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "const": "--config"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "const": "--format=json"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:task-lease-state:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "task_id", "workspace_id", "owner", "token_sha256", "generation", "expires_at", "status"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "task_id": {"type": "string", "pattern": "^CG-(?:B-)?[0-9a-f]{32}$"},
+    "workspace_id": {"type": "string", "pattern": "^ws-[0-9a-f]{32}$"},
+    "owner": {"type": "string", "pattern": "^[A-Za-z0-9_-]{1,120}$"},
+    "token_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "generation": {"type": "integer", "minimum": 1},
+    "expires_at": {"type": "integer", "minimum": 1},
+    "status": {"enum": ["active", "released"]}
+  }
+}

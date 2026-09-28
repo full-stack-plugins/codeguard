@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:eslint-task-recheck:0.2.0",
+  "title": "ESLint任务局部原生复检",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "enum": [
+        "0.1.0",
+        "0.2.0"
+      ]
+    },
+    "report_type": {
+      "const": "eslint_task_recheck"
+    },
+    "workspace_binding": {
+      "const": "bound"
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "workspace_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^eslint-task-[1-9][0-9]*-[1-9][0-9]*$",
+      "maxLength": 64
+    },
+    "reason": {
+      "type": "string",
+      "pattern": "^[a-z_]+$",
+      "maxLength": 128
+    },
+    "original_context_matches": {
+      "type": "boolean"
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "kind",
+        "checker_id",
+        "path",
+        "rule_id"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "pattern": "^CG-(B-)?[0-9a-f]{32}$"
+        },
+        "kind": {
+          "enum": [
+            "finding",
+            "blocker"
+          ]
+        },
+        "checker_id": {
+          "enum": [
+            "node.eslint",
+            "node.eslint.preparation"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rule_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "scan": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "effective_rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule_id",
+        "status",
+        "reason",
+        "severity",
+        "input_stable",
+        "stdout_sha256"
+      ],
+      "properties": {
+        "rule_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "enum": [
+            "observed",
+            "incomplete"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "pattern": "^[a-z_]+$",
+          "maxLength": 128
+        },
+        "severity": {
+          "enum": [
+            null,
+            0,
+            1,
+            2
+          ]
+        },
+        "input_stable": {
+          "type": "boolean"
+        },
+        "stdout_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "report_type",
+    "workspace_binding",
+    "authority",
+    "coverage_proven",
+    "delivery_decision",
+    "workspace_id",
+    "run_id",
+    "reason",
+    "original_context_matches",
+    "target",
+    "scan"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "const": "0.2.0"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "effective_rule"
+        ]
+      },
+      "else": {
+        "not": {
+          "required": [
+            "effective_rule"
+          ]
+        }
+      }
+    }
+  ]
+}

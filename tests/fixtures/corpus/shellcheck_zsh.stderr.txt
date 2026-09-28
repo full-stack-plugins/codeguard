@@ -1,0 +1,3 @@
+In scripts/run-concurrency-benchmark.zsh line 1:
+#!/bin/zsh
+^-- SC1071 (error): ShellCheck only supports sh/bash/dash/ksh scripts. Sorry!

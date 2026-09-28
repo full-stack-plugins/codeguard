@@ -1,0 +1,404 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:init-plan:0.5.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "workspace_id",
+    "operation",
+    "mode",
+    "init_status",
+    "readiness",
+    "delivery_decision",
+    "observation_complete",
+    "profile_stale",
+    "planned_files",
+    "changed_files",
+    "changed_directories",
+    "conflict_file",
+    "unresolved",
+    "next_actions",
+    "profile_summary"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.5.0"
+    },
+    "report_type": {
+      "const": "init_plan"
+    },
+    "workspace_id": {
+      "type": "string",
+      "pattern": "^ws-[0-9a-f]{32}$"
+    },
+    "operation": {
+      "const": "init"
+    },
+    "mode": {
+      "enum": [
+        "dry_run",
+        "apply"
+      ]
+    },
+    "init_status": {
+      "enum": [
+        "planned",
+        "partial",
+        "conflict"
+      ]
+    },
+    "readiness": {
+      "const": "unknown"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "observation_complete": {
+      "type": "boolean"
+    },
+    "profile_stale": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "planned_files": {
+      "$ref": "#/$defs/paths"
+    },
+    "changed_files": {
+      "$ref": "#/$defs/paths"
+    },
+    "changed_directories": {
+      "$ref": "#/$defs/paths"
+    },
+    "conflict_file": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "unresolved": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "next_actions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "profile_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "languages",
+        "build_roots",
+        "language_targets",
+        "installed_versions",
+        "build_model",
+        "architecture",
+        "unknown_conditions",
+        "checker_inventory",
+        "checkers"
+      ],
+      "properties": {
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "source_file_count",
+              "manifest_count"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_file_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "manifest_count": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          }
+        },
+        "build_roots": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "manifest_refs"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "manifest_refs": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        "language_targets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "value",
+              "status",
+              "manifest_ref",
+              "manifest_sha256",
+              "build_root",
+              "language_id",
+              "target_kind"
+            ],
+            "properties": {
+              "value": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[0-9]+(\\.[0-9]+){0,2}$"
+              },
+              "status": {
+                "const": "declared_only"
+              },
+              "manifest_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "manifest_sha256": {
+                "$ref": "#/$defs/sha256"
+              },
+              "build_root": {
+                "type": "string",
+                "minLength": 1
+              },
+              "language_id": {
+                "enum": [
+                  "java",
+                  "rust"
+                ]
+              },
+              "target_kind": {
+                "enum": [
+                  "maven.compiler.release",
+                  "maven.compiler.source",
+                  "maven.compiler.target",
+                  "rust-version",
+                  "edition"
+                ]
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "language_id": {
+                      "const": "java"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "target_kind": {
+                      "enum": [
+                        "maven.compiler.release",
+                        "maven.compiler.source",
+                        "maven.compiler.target"
+                      ]
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "target_kind": {
+                      "enum": [
+                        "rust-version",
+                        "edition"
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "target_kind": {
+                      "const": "edition"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "value": {
+                      "enum": [
+                        "2015",
+                        "2018",
+                        "2021",
+                        "2024"
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "target_kind": {
+                      "const": "maven.compiler.release"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "value": {
+                      "pattern": "^[0-9]+$",
+                      "not": {
+                        "const": "0"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "target_kind": {
+                      "const": "rust-version"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "value": {
+                      "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "installed_versions": {
+          "const": "not_probed"
+        },
+        "build_model": {
+          "const": "not_resolved"
+        },
+        "architecture": {
+          "const": "unknown"
+        },
+        "unknown_conditions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "checker_inventory": {
+          "const": "partial"
+        },
+        "checkers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "build_root",
+              "checker_id",
+              "category",
+              "configuration_ref",
+              "reason",
+              "next_action",
+              "configuration",
+              "execution",
+              "required_by_policy",
+              "gate_effect"
+            ],
+            "properties": {
+              "build_root": {
+                "type": "string",
+                "minLength": 1
+              },
+              "checker_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "category": {
+                "type": "string",
+                "minLength": 1
+              },
+              "configuration_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "next_action": {
+                "type": "string",
+                "minLength": 1
+              },
+              "configuration": {
+                "enum": [
+                  "configured",
+                  "missing",
+                  "invalid",
+                  "unknown"
+                ]
+              },
+              "execution": {
+                "const": "not_run"
+              },
+              "required_by_policy": {
+                "const": null
+              },
+              "gate_effect": {
+                "const": "none"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "paths": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(?:AGENTS\\.md|codeguard(?:/[^/]+)*)$"
+      }
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

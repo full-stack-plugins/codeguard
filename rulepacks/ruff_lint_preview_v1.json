@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0.0",
+  "id": "python.ruff.lint.preview",
+  "version": "0.1.0",
+  "status": "candidate_unapproved",
+  "scope": "rule_mapping_only",
+  "origin_url": "https://docs.astral.sh/ruff/rules/",
+  "license": "MIT",
+  "license_ref": "https://github.com/astral-sh/ruff/blob/main/LICENSE",
+  "compatible_tool_versions": ["ruff 0.16.8"],
+  "mappings": [
+    {
+      "native_rule_id": "F401",
+      "codeguard_rule_id": "python.ruff.F401",
+      "category": "lint",
+      "source_ref": "https://docs.astral.sh/ruff/rules/unused-import/"
+    },
+    {
+      "native_rule_id": "E501",
+      "codeguard_rule_id": "python.ruff.E501",
+      "category": "lint",
+      "source_ref": "https://docs.astral.sh/ruff/rules/line-too-long/"
+    }
+  ]
+}

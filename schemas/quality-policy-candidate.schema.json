@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:quality-policy-candidate:1.0",
+  "title": "Unapproved CodeGuard quality policy candidate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "policy_id", "revision", "tool_lock_sha256", "required_checks", "source_exclusions", "cve_freshness_hours", "tests_required"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "policy_id": {"$ref": "#/$defs/token"},
+    "revision": {"$ref": "#/$defs/token"},
+    "tool_lock_sha256": {"$ref": "#/$defs/sha256"},
+    "required_checks": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "language", "category", "check_kind", "rulepack_sha256", "rule_ids", "source_sets", "blocking_severities"],
+        "properties": {
+          "id": {"$ref": "#/$defs/token"},
+          "language": {"$ref": "#/$defs/token"},
+          "category": {"enum": ["lint", "comments", "dependencies", "cve", "security", "build"]},
+          "check_kind": {"$ref": "#/$defs/token"},
+          "rulepack_sha256": {"$ref": "#/$defs/sha256"},
+          "rule_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/token"}},
+          "source_sets": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/token"}},
+          "blocking_severities": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["error", "warning", "critical", "high", "medium", "low"]}}
+        }
+      }
+    },
+    "source_exclusions": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "path", "file_sha256", "reason", "expires_at"],
+        "properties": {
+          "id": {"$ref": "#/$defs/token"},
+          "path": {"type": "string", "minLength": 1, "maxLength": 4096},
+          "file_sha256": {"$ref": "#/$defs/sha256"},
+          "reason": {"enum": ["generated_source", "vendored_source", "non_applicable_source"]},
+          "expires_at": {"type": "integer", "minimum": 1}
+        }
+      }
+    },
+    "cve_freshness_hours": {"type": "integer", "minimum": 1, "maximum": 8760},
+    "tests_required": {"type": "boolean"}
+  },
+  "$defs": {
+    "token": {"type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[A-Za-z0-9._:-]+$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

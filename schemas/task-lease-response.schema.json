@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:task-lease-response:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "report_type", "operation", "task_id", "command_status", "exit_code", "reason", "lease_token", "generation", "expires_at", "authority", "delivery_decision"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "report_type": {"const": "task_lease"},
+    "operation": {"enum": ["task_claim", "task_heartbeat", "task_release"]},
+    "task_id": {"type": "string", "pattern": "^CG-(?:B-)?[0-9a-f]{32}$"},
+    "command_status": {"enum": ["complete", "incomplete"]},
+    "exit_code": {"enum": [0, 3]},
+    "reason": {"type": ["string", "null"]},
+    "lease_token": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "generation": {"type": ["integer", "null"], "minimum": 1},
+    "expires_at": {"type": ["integer", "null"], "minimum": 1},
+    "status": {"enum": ["active", "released"]},
+    "authority": {"const": "local_unverified"},
+    "delivery_decision": {"const": "not_evaluated"}
+  }
+}

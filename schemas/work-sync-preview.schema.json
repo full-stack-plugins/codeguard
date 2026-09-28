@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:work-sync-preview:0.2.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "report_type", "operation", "command_status", "delivery_decision"],
+  "properties": {
+    "schema_version": {"const": "0.2.0"},
+    "report_type": {"const": "work_sync_preview"},
+    "operation": {"const": "work_sync"},
+    "workspace_id": {"type": "string", "pattern": "^ws-[0-9a-f]{32}$"},
+    "command_status": {"enum": ["partial", "incomplete"]},
+    "reason": {"type": "string", "minLength": 1},
+    "imported_reports": {"type": "integer", "minimum": 0},
+    "already_consumed_reports": {"type": "integer", "minimum": 0},
+    "new_findings": {"type": "integer", "minimum": 0},
+    "new_blockers": {"type": "integer", "minimum": 0},
+    "historical_findings": {"type": "integer", "minimum": 0},
+    "failed_reports": {"type": "integer", "minimum": 0},
+    "delivery_decision": {"const": "not_evaluated"},
+    "next_actions": {"type": "array", "items": {"type": "string"}}
+  },
+  "oneOf": [
+    {"required": ["workspace_id", "imported_reports", "already_consumed_reports", "new_findings", "new_blockers", "historical_findings", "failed_reports", "next_actions"]},
+    {"required": ["reason"], "not": {"required": ["workspace_id"]}}
+  ]
+}

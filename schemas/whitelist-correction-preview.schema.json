@@ -1,0 +1,343 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:whitelist-correction-preview:0.2.0",
+  "title": "CodeGuard unverified false-positive correction preview",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "command_status",
+    "exit_code",
+    "finding_id",
+    "status",
+    "reason",
+    "proposal",
+    "missing_evidence",
+    "next_actions",
+    "authority",
+    "gate_effect",
+    "delivery_decision"
+  ],
+  "properties": {
+    "schema_version": {
+      "enum": [
+        "0.1.0",
+        "0.2.0"
+      ]
+    },
+    "report_type": {
+      "const": "whitelist_correction_preview"
+    },
+    "operation": {
+      "const": "whitelist_propose_correction"
+    },
+    "command_status": {
+      "const": "incomplete"
+    },
+    "exit_code": {
+      "const": 3
+    },
+    "finding_id": {
+      "type": "string",
+      "pattern": "^CG-(B-)?[0-9a-f]{32}$"
+    },
+    "status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "proposal": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/proposal"
+        }
+      ]
+    },
+    "missing_evidence": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "next_actions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "authority": {
+      "const": "unverified"
+    },
+    "gate_effect": {
+      "const": "none"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "record_ref": {
+      "type": "string",
+      "pattern": "^codeguard/findings/CG-[0-9a-f]{32}/events/correction-proposed-[0-9a-f]{64}\\.json$"
+    },
+    "projection_status": {
+      "enum": [
+        "not_requested",
+        "recorded",
+        "failed"
+      ]
+    },
+    "projection_ref": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^codeguard/tasks/corrections/CG-[0-9a-f]{32}/[0-9a-f]{64}\\.md$"
+    },
+    "projection_reason": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-z0-9_]+$"
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "verification_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_id",
+        "report_sha256",
+        "observation"
+      ],
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "pattern": "^lint-[0-9]+-[0-9]+$"
+        },
+        "report_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "observation": {
+          "enum": [
+            "still_present",
+            "candidate_absent_unverified_policy"
+          ]
+        }
+      }
+    },
+    "replacement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "replaces_decision_id",
+        "candidate_sha256",
+        "status"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "replaces_decision_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "candidate_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "status": {
+          "const": "unverified_draft"
+        }
+      }
+    },
+    "proposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "old_decision_id",
+        "finding_id",
+        "correction_reason",
+        "verification_ref",
+        "revoke_decision_ids",
+        "replacement_candidate",
+        "affected_finding_ids"
+      ],
+      "properties": {
+        "old_decision_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "finding_id": {
+          "type": "string",
+          "pattern": "^CG-[0-9a-f]{32}$"
+        },
+        "correction_reason": {
+          "enum": [
+            "erroneous_approval",
+            "scope_too_broad",
+            "evidence_invalid",
+            "root_cause_fixed"
+          ]
+        },
+        "verification_ref": {
+          "$ref": "#/$defs/verification_ref"
+        },
+        "revoke_decision_ids": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "replacement_candidate": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/replacement"
+            }
+          ]
+        },
+        "affected_finding_ids": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^CG-[0-9a-f]{32}$"
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "const": "0.2.0"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "projection_status",
+          "projection_ref",
+          "projection_reason"
+        ]
+      },
+      "else": {
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "projection_status"
+              ]
+            },
+            {
+              "required": [
+                "projection_ref"
+              ]
+            },
+            {
+              "required": [
+                "projection_reason"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "projection_status"
+        ],
+        "properties": {
+          "projection_status": {
+            "const": "recorded"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "record_ref"
+        ],
+        "properties": {
+          "projection_ref": {
+            "type": "string"
+          },
+          "projection_reason": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "projection_status"
+        ],
+        "properties": {
+          "projection_status": {
+            "const": "failed"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "record_ref"
+        ],
+        "properties": {
+          "projection_ref": {
+            "type": "null"
+          },
+          "projection_reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "projection_status"
+        ],
+        "properties": {
+          "projection_status": {
+            "const": "not_requested"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "projection_ref": {
+            "type": "null"
+          },
+          "projection_reason": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  ]
+}

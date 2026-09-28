@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:run-report:1.3",
+  "title": "Codeguard quality run report",
+  "type": "object",
+  "required": ["schema_version", "report_type", "operation", "request_id", "run_id", "command_status", "exit_code", "request", "plan_id", "identities", "results", "delivery_gate", "warnings", "next_actions"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"type": "string", "pattern": "^1\\.[0-9]+$"},
+    "report_type": {"const": "run_report"},
+    "operation": {"enum": ["lint", "comments", "dependencies", "cve", "security", "build", "check"]},
+    "request_id": {"type": "string", "minLength": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "command_status": {"enum": ["complete", "incomplete", "cancelled", "internal_error"]},
+    "exit_code": {"enum": [0, 1, 3, 4, 130]},
+    "request": {"$ref": "#/$defs/check_request"},
+    "plan_id": {"type": "string", "minLength": 1},
+    "identities": {"$ref": "#/$defs/identities"},
+    "results": {"type": "array", "items": {"$ref": "#/$defs/result"}},
+    "checker_statuses": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/checker_status"}},
+    "dispositions": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/disposition"}},
+    "delivery_gate": {"$ref": "#/$defs/gate"},
+    "warnings": {"$ref": "#/$defs/string_set"},
+    "next_actions": {"$ref": "#/$defs/string_set"},
+    "extensions": {"$ref": "#/$defs/extensions"}
+  },
+  "allOf": [
+    {"if": {"properties": {"schema_version": {"not": {"const": "1.0"}}}}, "then": {"required": ["checker_statuses"]}},
+    {"if": {"properties": {"schema_version": {"pattern": "^1\\.([2-9]|[1-9][0-9]+)$"}}}, "then": {"properties": {"results": {"items": {"properties": {"findings": {"items": {"required": ["locations"]}}}}}, "checker_statuses": {"items": {"required": ["build_root"]}}}}},
+    {"if": {"properties": {"schema_version": {"pattern": "^1\\.([3-9]|[1-9][0-9]+)$"}}},
+      "then": {"required": ["dispositions"], "properties": {"delivery_gate": {"required": ["whitelisted_false_positive_ids", "active_blocking_finding_ids"]}}},
+      "else": {"not": {"required": ["dispositions"]}, "properties": {"delivery_gate": {"not": {"anyOf": [{"required": ["whitelisted_false_positive_ids"]}, {"required": ["active_blocking_finding_ids"]}, {"properties": {"decision": {"const": "allow_with_exceptions"}}, "required": ["decision"]}]}}}}}
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "extensions": {"type": "object", "propertyNames": {"pattern": "^x-.+"}},
+    "string_set": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "checker_status": {
+      "type": "object",
+      "required": ["checker_id", "category", "configuration", "run_status", "summary"],
+      "additionalProperties": false,
+      "properties": {
+        "checker_id": {"type": "string", "minLength": 1},
+        "build_root": {"type": "string", "minLength": 1},
+        "category": {"enum": ["lint", "comments", "dependencies", "cve", "security", "build"]},
+        "configuration": {"enum": ["configured", "missing", "invalid", "unknown"]},
+        "configuration_ref": {"type": "string", "minLength": 1},
+        "run_status": {"enum": ["not_run", "passed", "findings", "tool_error"]},
+        "summary": {"type": "string", "minLength": 1},
+        "next_action": {"type": "string", "minLength": 1}
+      },
+      "if": {"properties": {"configuration": {"enum": ["missing", "invalid", "unknown"]}}},
+      "then": {"required": ["next_action"], "properties": {"run_status": {"const": "not_run"}}}
+    },
+    "check_request": {
+      "type": "object",
+      "required": ["schema_version", "report_type", "request_id", "command", "selection", "root", "content_source", "options"],
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {"type": "string", "pattern": "^1\\.[0-9]+$"},
+        "report_type": {"const": "check_request"},
+        "request_id": {"type": "string", "minLength": 1},
+        "command": {"enum": ["lint", "comments", "dependencies", "cve", "security", "build", "check"]},
+        "selection": {
+          "type": "object",
+          "required": ["language"],
+          "additionalProperties": false,
+          "properties": {"language": {"type": "string", "minLength": 1}}
+        },
+        "root": {"type": "string", "minLength": 1},
+        "content_source": {
+          "type": "object",
+          "required": ["kind"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {"enum": ["working_tree", "git_index", "git_ref", "ci"]},
+            "identity": {"type": "string", "minLength": 1}
+          },
+          "if": {"properties": {"kind": {"enum": ["git_ref", "ci"]}}},
+          "then": {"required": ["identity"]}
+        },
+        "options": {
+          "type": "object",
+          "required": ["format", "offline", "timeout_ms", "jobs"],
+          "additionalProperties": false,
+          "properties": {
+            "format": {"enum": ["human", "json", "sarif"]},
+            "offline": {"type": "boolean"},
+            "timeout_ms": {"type": "integer", "minimum": 1, "maximum": 86400000},
+            "jobs": {"type": "integer", "minimum": 1, "maximum": 64}
+          }
+        },
+        "extensions": {"$ref": "#/$defs/extensions"}
+      }
+    },
+    "identities": {
+      "type": "object",
+      "required": ["content", "policy", "tools"],
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "type": "object",
+          "required": ["kind", "digest"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": {"enum": ["working_tree", "git_index", "git_ref", "ci"]},
+            "digest": {"$ref": "#/$defs/sha256"}
+          }
+        },
+        "policy": {
+          "type": "object",
+          "required": ["source", "revision", "digest"],
+          "additionalProperties": false,
+          "properties": {
+            "source": {"type": "string", "minLength": 1},
+            "revision": {"type": "string", "minLength": 1},
+            "digest": {"$ref": "#/$defs/sha256"}
+          }
+        },
+        "tools": {"type": "array", "items": {"$ref": "#/$defs/tool_identity"}}
+      }
+    },
+    "tool_identity": {
+      "type": "object",
+      "required": ["id", "version", "binary_sha256"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1},
+        "binary_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "finding_location": {
+      "type": "object",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {"enum": ["source", "dependency", "project"]},
+        "path": {"type": "string", "minLength": 1},
+        "line": {"type": "integer", "minimum": 1, "maximum": 4294967295},
+        "column": {"type": "integer", "minimum": 1, "maximum": 4294967295},
+        "component": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1}
+      },
+      "allOf": [
+        {"if": {"properties": {"kind": {"const": "source"}}}, "then": {"required": ["path"]}},
+        {"if": {"properties": {"kind": {"const": "dependency"}}}, "then": {"required": ["component"]}},
+        {"if": {"properties": {"kind": {"const": "project"}}}, "then": {"required": ["path"]}}
+      ]
+    },
+    "finding": {
+      "type": "object",
+      "required": ["id", "native_rule_id", "tool_id", "severity", "gate_impact", "message", "obligation_id", "evidence_refs"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "native_rule_id": {"type": "string", "minLength": 1},
+        "tool_id": {"type": "string", "minLength": 1},
+        "severity": {"type": "string", "minLength": 1},
+        "gate_impact": {"enum": ["blocking", "non_blocking", "undetermined"]},
+        "message": {"type": "string", "minLength": 1},
+        "obligation_id": {"type": "string", "minLength": 1},
+        "evidence_refs": {"$ref": "#/$defs/string_set"},
+        "locations": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/finding_location"}}
+      }
+    },
+    "disposition": {
+      "type": "object",
+      "required": ["finding_id", "kind", "decision_id", "approval_ref", "approved_policy_revision", "policy_digest", "match_basis_digest", "expires_at"],
+      "additionalProperties": false,
+      "properties": {
+        "finding_id": {"type": "string", "minLength": 1},
+        "kind": {"const": "whitelisted_false_positive"},
+        "decision_id": {"type": "string", "minLength": 1},
+        "approval_ref": {"type": "string", "minLength": 1},
+        "approved_policy_revision": {"type": "string", "minLength": 1},
+        "policy_digest": {"$ref": "#/$defs/sha256"},
+        "match_basis_digest": {"$ref": "#/$defs/sha256"},
+        "expires_at": {"type": "integer", "minimum": 1}
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "required": ["expected", "observed", "unresolved", "proof_kind"],
+      "additionalProperties": false,
+      "properties": {
+        "expected": {"$ref": "#/$defs/string_set"},
+        "observed": {"$ref": "#/$defs/string_set"},
+        "unresolved": {"$ref": "#/$defs/string_set"},
+        "proof_kind": {"enum": ["native_report", "file_manifest", "build_model", "none"]}
+      }
+    },
+    "result": {
+      "type": "object",
+      "required": ["obligation_id", "completion", "findings", "coverage", "execution_refs"],
+      "additionalProperties": false,
+      "properties": {
+        "obligation_id": {"type": "string", "minLength": 1},
+        "completion": {"enum": ["complete", "incomplete", "not_applicable"]},
+        "reason": {"type": "string", "minLength": 1},
+        "findings": {"type": "array", "items": {"$ref": "#/$defs/finding"}},
+        "coverage": {"$ref": "#/$defs/coverage"},
+        "execution_refs": {"$ref": "#/$defs/string_set"}
+      },
+      "if": {"properties": {"completion": {"enum": ["incomplete", "not_applicable"]}}},
+      "then": {"required": ["reason"]}
+    },
+    "gate": {
+      "type": "object",
+      "required": ["decision", "eligible", "blocking_finding_ids", "incomplete_obligation_ids", "coverage_mismatch_ids", "invalid_ledger_ids"],
+      "additionalProperties": false,
+      "properties": {
+        "decision": {"enum": ["allow", "allow_with_exceptions", "deny", "incomplete", "not_applicable", "not_evaluated"]},
+        "eligible": {"type": "boolean"},
+        "blocking_finding_ids": {"$ref": "#/$defs/string_set"},
+        "whitelisted_false_positive_ids": {"$ref": "#/$defs/string_set"},
+        "active_blocking_finding_ids": {"$ref": "#/$defs/string_set"},
+        "incomplete_obligation_ids": {"$ref": "#/$defs/string_set"},
+        "coverage_mismatch_ids": {"$ref": "#/$defs/string_set"},
+        "invalid_ledger_ids": {"$ref": "#/$defs/string_set"}
+      }
+    }
+  }
+}

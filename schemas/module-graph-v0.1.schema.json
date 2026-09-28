@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:module-graph:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "document_type", "nodes", "edges", "dependency_edges_complete", "unresolved"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "document_type": {"const": "codeguard_module_graph"},
+    "nodes": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["id", "kind", "status"], "properties": {"id": {"type": "string"}, "kind": {"enum": ["project_root", "build_root"]}, "status": {"const": "observed"}}}},
+    "edges": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["from", "to", "kind", "status", "basis"], "properties": {"from": {"type": "string"}, "to": {"type": "string"}, "kind": {"const": "contains"}, "status": {"const": "observed"}, "basis": {"const": "manifest_location"}}}},
+    "dependency_edges_complete": {"const": false},
+    "unresolved": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}}
+  }
+}

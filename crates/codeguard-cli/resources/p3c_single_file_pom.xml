@@ -1,0 +1,28 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>local.codeguard</groupId><artifactId>p3c-single-file-observation</artifactId><version>1.0.0</version>
+  <build><plugins><plugin>
+    <groupId>org.apache.maven.plugins</groupId><artifactId>maven-pmd-plugin</artifactId><version>3.11.0</version>
+    <configuration>
+      <rulesets>
+        <ruleset>rulesets/java/ali-comment.xml</ruleset>
+        <ruleset>rulesets/java/ali-concurrent.xml</ruleset>
+        <ruleset>rulesets/java/ali-constant.xml</ruleset>
+        <ruleset>rulesets/java/ali-exception.xml</ruleset>
+        <ruleset>rulesets/java/ali-flowcontrol.xml</ruleset>
+        <ruleset>rulesets/java/ali-naming.xml</ruleset>
+        <ruleset>rulesets/java/ali-oop.xml</ruleset>
+        <ruleset>rulesets/java/ali-orm.xml</ruleset>
+        <ruleset>rulesets/java/ali-other.xml</ruleset>
+        <ruleset>rulesets/java/ali-set.xml</ruleset>
+      </rulesets>
+      <skipPmdError>false</skipPmdError><linkXRef>false</linkXRef>
+      <includeTests>false</includeTests><minimumPriority>5</minimumPriority>
+    </configuration>
+    <dependencies>
+      <dependency><groupId>com.alibaba.p3c</groupId><artifactId>p3c-pmd</artifactId><version>2.1.1</version></dependency>
+      <dependency><groupId>net.sourceforge.pmd</groupId><artifactId>pmd-core</artifactId><version>6.15.0</version></dependency>
+      <dependency><groupId>net.sourceforge.pmd</groupId><artifactId>pmd-java</artifactId><version>6.15.0</version></dependency>
+    </dependencies>
+  </plugin></plugins></build>
+</project>

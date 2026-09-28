@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:approval-snapshot:1.0",
+  "title": "CodeGuard protected false-positive approval snapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "policy_revision", "max_lifetime_seconds", "decisions"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "policy_revision": {"type": "string", "minLength": 1, "pattern": "^[^*?\\u0000-\\u001f]+$"},
+    "max_lifetime_seconds": {"type": "integer", "minimum": 1},
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "sha256"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1, "pattern": "^[^*?\\u0000-\\u001f]+$"},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    }
+  }
+}

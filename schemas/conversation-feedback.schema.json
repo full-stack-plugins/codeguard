@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:conversation-feedback:0.2",
+  "title": "Codeguard agent conversation feedback",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "report_type", "source_run_id", "source_trust", "operation", "command_status", "delivery_decision", "checker_statuses", "findings", "dispositions", "active_blocking_finding_ids", "incomplete_obligations", "recheck_argv"],
+  "properties": {
+    "schema_version": {"const": "0.2.0"},
+    "report_type": {"const": "conversation_feedback"},
+    "source_run_id": {"type": "string", "minLength": 1},
+    "source_trust": {"const": "structure_validated_provenance_unverified"},
+    "operation": {"enum": ["lint", "comments", "dependencies", "cve", "security", "build", "check"]},
+    "command_status": {"enum": ["complete", "incomplete", "cancelled", "internal_error"]},
+    "delivery_decision": {"enum": ["allow", "allow_with_exceptions", "deny", "incomplete", "not_applicable", "not_evaluated"]},
+    "checker_statuses": {"type": "array", "items": {"$ref": "#/$defs/checker"}},
+    "findings": {"type": "array", "items": {"$ref": "#/$defs/finding"}},
+    "dispositions": {"type": "array", "items": {"$ref": "#/$defs/disposition"}},
+    "active_blocking_finding_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "incomplete_obligations": {"type": "array", "items": {"$ref": "#/$defs/incomplete"}},
+    "recheck_argv": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"type": "string"}}
+  },
+  "$defs": {
+    "checker": {
+      "type": "object", "additionalProperties": false,
+      "required": ["checker_id", "build_root", "category", "configuration", "configuration_ref", "run_status", "recommended_action"],
+      "properties": {
+        "checker_id": {"type": "string"},
+        "build_root": {"type": "string"},
+        "category": {"enum": ["lint", "comments", "dependencies", "cve", "security", "build"]},
+        "configuration": {"enum": ["configured", "missing", "invalid", "unknown"]},
+        "configuration_ref": {"type": ["string", "null"]},
+        "run_status": {"enum": ["not_run", "passed", "findings", "tool_error"]},
+        "recommended_action": {"type": "string"}
+      }
+    },
+    "finding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "tool_id", "native_rule_id", "severity", "gate_impact", "obligation_id", "locations", "native_message_visibility"],
+      "properties": {
+        "id": {"type": "string"},
+        "tool_id": {"type": "string"},
+        "native_rule_id": {"type": "string"},
+        "severity": {"type": "string"},
+        "gate_impact": {"enum": ["blocking", "non_blocking", "undetermined"]},
+        "obligation_id": {"type": "string"},
+        "locations": {"type": "array", "items": {"type": "object"}},
+        "native_message_visibility": {"const": "private_evidence_only"}
+      }
+    },
+    "disposition": {
+      "type": "object", "additionalProperties": false,
+      "required": ["finding_id", "kind", "decision_id", "approval_ref", "approved_policy_revision", "expires_at", "approval_trust"],
+      "properties": {
+        "finding_id": {"type": "string", "minLength": 1},
+        "kind": {"const": "whitelisted_false_positive"},
+        "decision_id": {"type": "string", "minLength": 1},
+        "approval_ref": {"type": "string", "minLength": 1},
+        "approved_policy_revision": {"type": "string", "minLength": 1},
+        "expires_at": {"type": "integer", "minimum": 1},
+        "approval_trust": {"const": "report_claim_unverified"}
+      }
+    },
+    "incomplete": {
+      "type": "object", "additionalProperties": false,
+      "required": ["obligation_id", "reason_code"],
+      "properties": {
+        "obligation_id": {"type": "string"},
+        "reason_code": {"type": "string"}
+      }
+    }
+  }
+}

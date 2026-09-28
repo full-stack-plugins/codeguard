@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0.0",
+  "language": "go",
+  "dialect": "go_modules",
+  "platforms": ["macos_arm64", "macos_x86_64", "linux_x86_64", "linux_aarch64", "windows_x86_64"],
+  "platform_validation": "unverified",
+  "categories": [
+    {
+      "category": "lint",
+      "applicability": "applicable",
+      "status": "gap",
+      "candidate_tool": "go_vet",
+      "candidate_version": "project_toolchain",
+      "version_status": "resolved_at_run",
+      "candidate_argv": ["go", "vet", "./..."],
+      "requires_database_freshness": false,
+      "sources": ["https://pkg.go.dev/cmd/go"],
+      "coverage_gaps": ["native_adapter_and_exit_contract_unvalidated", "build_tags_and_workspace_scope_unvalidated", "go_vet_is_not_all_lint_rules"]
+    },
+    {
+      "category": "comments",
+      "applicability": "applicable",
+      "status": "gap",
+      "candidate_tool": "staticcheck",
+      "candidate_version": "2026.1",
+      "version_status": "release_candidate_unvalidated",
+      "candidate_argv": ["staticcheck", "-checks=ST1000,ST1020,ST1021,ST1022", "./..."],
+      "requires_database_freshness": false,
+      "sources": ["https://go.dev/doc/comment", "https://staticcheck.dev/docs/checks", "https://github.com/dominikh/go-tools/releases"],
+      "coverage_gaps": ["comment_checks_are_non_default", "missing_exported_symbol_comments_not_fully_detected", "native_adapter_and_report_unvalidated"]
+    },
+    {
+      "category": "dependencies",
+      "applicability": "applicable",
+      "status": "gap",
+      "candidate_tool": "go_list_modules",
+      "candidate_version": "project_toolchain",
+      "version_status": "resolved_at_run",
+      "candidate_argv": ["go", "list", "-m", "-json", "all"],
+      "requires_database_freshness": false,
+      "sources": ["https://go.dev/ref/mod", "https://pkg.go.dev/cmd/go"],
+      "coverage_gaps": ["module_graph_attribution_unvalidated", "go_work_and_replace_unvalidated", "licenses_sbom_and_provenance_not_covered", "offline_module_resolution_unvalidated"]
+    },
+    {
+      "category": "cve",
+      "applicability": "applicable",
+      "status": "gap",
+      "candidate_tool": "govulncheck",
+      "candidate_version": "v1.1.4",
+      "version_status": "release_candidate_unvalidated",
+      "candidate_argv": ["govulncheck", "-json", "./..."],
+      "requires_database_freshness": true,
+      "sources": ["https://go.dev/doc/security/vuln/", "https://github.com/golang/vuln/releases"],
+      "coverage_gaps": ["vulnerability_database_freshness_unverified", "module_and_advisory_attribution_unvalidated", "offline_database_snapshot_unvalidated", "streaming_json_and_exit_contract_unvalidated"]
+    },
+    {
+      "category": "security",
+      "applicability": "applicable",
+      "status": "gap",
+      "candidate_tool": "gosec",
+      "candidate_version": "v2.28.0",
+      "version_status": "release_candidate_unvalidated",
+      "candidate_argv": ["gosec", "-fmt=json", "./..."],
+      "requires_database_freshness": false,
+      "sources": ["https://github.com/securego/gosec", "https://github.com/securego/gosec/releases"],
+      "coverage_gaps": ["go_1_25_or_newer_tool_requirement_unverified", "native_report_and_exit_contract_unvalidated", "secret_iac_and_container_checks_not_covered"]
+    },
+    {
+      "category": "build",
+      "applicability": "applicable",
+      "status": "gap",
+      "candidate_tool": "go_build",
+      "candidate_version": "project_toolchain",
+      "version_status": "resolved_at_run",
+      "candidate_argv": ["go", "build", "./..."],
+      "requires_database_freshness": false,
+      "sources": ["https://pkg.go.dev/cmd/go", "https://go.dev/ref/mod"],
+      "coverage_gaps": ["native_build_scope_and_exit_contract_unvalidated", "build_tags_and_cross_platform_targets_unvalidated", "go_test_is_separate_obligation", "reproducibility_unvalidated"]
+    }
+  ]
+}

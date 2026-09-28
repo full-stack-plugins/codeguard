@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:workspace-status-preview:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "request_id",
+    "command_status",
+    "exit_code",
+    "next_actions",
+    "authority",
+    "delivery_decision"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "report_type": {
+      "const": "workspace_status_preview"
+    },
+    "operation": {
+      "const": "status"
+    },
+    "request_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "command_status": {
+      "enum": [
+        "complete",
+        "incomplete",
+        "invalid_request"
+      ]
+    },
+    "exit_code": {
+      "enum": [
+        0,
+        2,
+        3
+      ]
+    },
+    "reason": {
+      "type": "string"
+    },
+    "initialized": {
+      "type": "boolean"
+    },
+    "workspace_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "profile_freshness": {
+      "const": "unverified"
+    },
+    "evidence_freshness": {
+      "const": "unverified"
+    },
+    "pending_reports": {
+      "type": "boolean"
+    },
+    "open_task_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "finding_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "blocker_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "task_id",
+          "kind",
+          "checker_id",
+          "scope",
+          "disposition",
+          "reason_code",
+          "verification_observation",
+          "state",
+          "authority"
+        ],
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "pattern": "^CG-(B-)?[0-9a-f]{32}$"
+          },
+          "kind": {
+            "enum": [
+              "finding",
+              "blocker"
+            ]
+          },
+          "checker_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "scope": {
+            "type": "string",
+            "minLength": 1
+          },
+          "disposition": {
+            "enum": [
+              "actionable",
+              "verification_required",
+              "needs_decision",
+              "waiting"
+            ]
+          },
+          "reason_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "verification_observation": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "verification_reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "verification_invalidated_reason": {
+            "enum": [
+              null,
+              "tool_inputs_changed_or_unavailable",
+              "source_input_changed_or_unavailable",
+              "configuration_input_changed_or_unavailable"
+            ]
+          },
+          "state": {
+            "const": "open"
+          },
+          "authority": {
+            "const": "local_unverified"
+          }
+        }
+      }
+    },
+    "next": {
+      "type": "object"
+    },
+    "task": {
+      "type": "null"
+    },
+    "next_actions": {
+      "type": "array"
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    }
+  }
+}

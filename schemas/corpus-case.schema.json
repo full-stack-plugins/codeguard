@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:corpus-case:1.0",
+  "title": "Codeguard adjudicated corpus case",
+  "type": "object",
+  "required": ["schema_version", "cases"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "cases": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/case"}
+    }
+  },
+  "$defs": {
+    "case": {
+      "type": "object",
+      "required": ["id", "cohort", "adjudication", "input", "tool", "rule", "expected", "provenance", "privacy"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]+$"},
+        "cohort": {"enum": ["deterministic_control", "historical_incident", "real_project_observation", "real_project_holdout"]},
+        "adjudication": {"enum": ["accepted", "pending_reproduction", "disputed"]},
+        "input": {
+          "type": "object",
+          "required": ["path", "sha256", "kind"],
+          "additionalProperties": false,
+          "properties": {
+            "path": {"type": "string", "minLength": 1},
+            "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "kind": {"enum": ["source", "captured_stderr", "project"]}
+          }
+        },
+        "tool": {
+          "type": "object",
+          "required": ["id", "version", "binary_sha256"],
+          "additionalProperties": false,
+          "properties": {
+            "id": {"type": "string", "minLength": 1},
+            "version": {"type": ["string", "null"]},
+            "binary_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+            "runtime_version": {"type": "string", "minLength": 1},
+            "runtime_binary_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          }
+        },
+        "rule": {
+          "type": "object",
+          "required": ["id", "source"],
+          "additionalProperties": false,
+          "properties": {
+            "id": {"type": "string", "minLength": 1},
+            "source": {"type": "string", "minLength": 1}
+          }
+        },
+        "expected": {
+          "type": "object",
+          "required": ["completion", "finding_rule_ids", "reason"],
+          "additionalProperties": false,
+          "properties": {
+            "completion": {"enum": ["complete", "incomplete"]},
+            "finding_rule_ids": {"type": "array", "items": {"type": "string"}},
+            "reason": {"type": "string", "minLength": 1},
+            "unproven_obligations": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "provenance": {
+          "type": "object",
+          "required": ["source_ref", "source_file", "source_sha256"],
+          "additionalProperties": false,
+          "properties": {
+            "source_ref": {"type": "string", "minLength": 1},
+            "source_file": {"type": "string", "minLength": 1},
+            "source_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          }
+        },
+        "privacy": {
+          "type": "object",
+          "required": ["redacted", "review_note"],
+          "additionalProperties": false,
+          "properties": {
+            "redacted": {"type": "boolean"},
+            "review_note": {"type": "string", "minLength": 1}
+          }
+        }
+      }
+    }
+  }
+}

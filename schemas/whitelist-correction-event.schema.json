@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:whitelist-correction-event:0.1.0",
+  "title": "CodeGuard local unverified whitelist correction event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "event_type", "task_id", "finding_id", "status", "proposal", "missing_evidence", "authority", "gate_effect"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "event_type": {"const": "whitelist_correction_proposed"},
+    "task_id": {"type": "string", "pattern": "^CG-[0-9a-f]{32}$"},
+    "finding_id": {"type": "string", "pattern": "^CG-[0-9a-f]{32}$"},
+    "status": {"enum": ["review_required", "evidence_incomplete"]},
+    "proposal": {"$ref": "#/$defs/proposal"},
+    "missing_evidence": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "authority": {"const": "unverified"},
+    "gate_effect": {"const": "none"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "proposal": {
+      "type": "object", "additionalProperties": false,
+      "required": ["old_decision_id", "finding_id", "correction_reason", "verification_ref", "revoke_decision_ids", "replacement_candidate", "affected_finding_ids"],
+      "properties": {
+        "old_decision_id": {"type": "string", "minLength": 1},
+        "finding_id": {"type": "string", "pattern": "^CG-[0-9a-f]{32}$"},
+        "correction_reason": {"enum": ["erroneous_approval", "scope_too_broad", "evidence_invalid", "root_cause_fixed"]},
+        "verification_ref": {
+          "type": "object", "additionalProperties": false,
+          "required": ["run_id", "report_sha256", "observation"],
+          "properties": {
+            "run_id": {"type": "string", "pattern": "^lint-[0-9]+-[0-9]+$"},
+            "report_sha256": {"$ref": "#/$defs/sha256"},
+            "observation": {"enum": ["still_present", "candidate_absent_unverified_policy"]}
+          }
+        },
+        "revoke_decision_ids": {"type": "array", "minItems": 1, "maxItems": 1, "items": {"type": "string", "minLength": 1}},
+        "replacement_candidate": {"oneOf": [{"type": "null"}, {
+          "type": "object", "additionalProperties": false,
+          "required": ["id", "replaces_decision_id", "candidate_sha256", "status"],
+          "properties": {
+            "id": {"type": "string", "minLength": 1},
+            "replaces_decision_id": {"type": "string", "minLength": 1},
+            "candidate_sha256": {"$ref": "#/$defs/sha256"},
+            "status": {"const": "unverified_draft"}
+          }
+        }]},
+        "affected_finding_ids": {"type": "array", "minItems": 1, "maxItems": 1, "items": {"type": "string", "pattern": "^CG-[0-9a-f]{32}$"}}
+      }
+    }
+  }
+}

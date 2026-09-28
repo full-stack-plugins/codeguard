@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeguard.dev/schemas/eslint-config-map/1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "projects"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "projects": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 128,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "root",
+          "config",
+          "cwd"
+        ],
+        "properties": {
+          "root": {
+            "oneOf": [
+              {
+                "const": "."
+              },
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096,
+                "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*//)(?!.*[/]$)(?!.*[\\\\\\x00-\\x1f\\x7f]).+$"
+              }
+            ]
+          },
+          "config": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096,
+            "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*//)(?!.*[/]$)(?!.*[\\\\\\x00-\\x1f\\x7f]).+$"
+          },
+          "cwd": {
+            "oneOf": [
+              {
+                "const": "."
+              },
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 4096,
+                "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*//)(?!.*[/]$)(?!.*[\\\\\\x00-\\x1f\\x7f]).+$"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

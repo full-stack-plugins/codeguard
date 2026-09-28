@@ -1,0 +1,525 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:repair-brief-preview:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "command_status",
+    "exit_code",
+    "disposition",
+    "reason",
+    "repair_brief",
+    "next_actions",
+    "authority",
+    "delivery_decision"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "report_type": {
+      "const": "repair_brief_preview"
+    },
+    "operation": {
+      "const": "next"
+    },
+    "command_status": {
+      "enum": [
+        "complete",
+        "incomplete"
+      ]
+    },
+    "exit_code": {
+      "enum": [
+        0,
+        3
+      ]
+    },
+    "disposition": {
+      "enum": [
+        "actionable",
+        "waiting",
+        "needs_decision",
+        "verification_required",
+        "no_applicable_work"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repair_brief": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/brief"
+        },
+        {
+          "$ref": "#/$defs/rust_cve_brief"
+        },
+        {
+          "$ref": "#/$defs/python_cve_brief"
+        }
+      ]
+    },
+    "next_actions": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "failed_reports": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "run_id",
+          "reason",
+          "report_ref"
+        ],
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,120}$"
+          },
+          "reason": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]{1,80}$"
+          },
+          "report_ref": {
+            "type": "string",
+            "pattern": "^codeguard/reports/[A-Za-z0-9_-]{1,120}\\.json$"
+          }
+        }
+      }
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "first_run_id",
+        "first_report_sha256"
+      ],
+      "properties": {
+        "first_run_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,120}$"
+        },
+        "first_report_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "rust_cve_brief": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "task_id", "kind", "checker_id", "evidence_ref", "recheck_argv", "history", "action_id", "authority", "closure_condition", "scope", "build_root", "affected_paths", "reason_code", "constraints", "step", "disposition"],
+      "properties": {
+        "schema_version": {"const": "0.1.0"},
+        "task_id": {"type": "string", "pattern": "^CG-B-[0-9a-f]{32}$"},
+        "kind": {"const": "blocker"},
+        "checker_id": {"const": "rust.cargo_audit"},
+        "evidence_ref": {"$ref": "#/$defs/evidence"},
+        "recheck_argv": {
+          "type": "array",
+          "prefixItems": [
+            {"const": "codeguard"}, {"const": "task"}, {"const": "verify"},
+            {"type": "string", "pattern": "^CG-B-[0-9a-f]{32}$"},
+            {"const": "."}, {"const": "--cargo-audit-tool"},
+            {"const": "<本轮已核验绝对路径>"}, {"const": "--rustsec-db"},
+            {"const": "<已核验离线数据库绝对目录>"},
+            {"const": "--format"}, {"const": "json"}
+          ],
+          "items": false,
+          "minItems": 11
+        },
+        "history": {"$ref": "#/$defs/brief/properties/history"},
+        "action_id": {"const": "restore-checker-environment"},
+        "authority": {"const": "local_unverified"},
+        "closure_condition": {"type": "string", "minLength": 1},
+        "scope": {"const": "."},
+        "build_root": {"const": "."},
+        "affected_paths": {"const": ["Cargo.toml", "Cargo.lock"]},
+        "reason_code": {"const": "rust_cve_coverage_unverified"},
+        "constraints": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "step": {"type": "string", "minLength": 1},
+        "disposition": {"enum": ["actionable", "needs_decision", "verification_required", "waiting"]},
+        "verification_observation": {"enum": ["still_blocked", "incomplete"]},
+        "verification_run_id": {"type": "string", "pattern": "^rust-cve-[0-9]+-[0-9]+-[0-9]+$"},
+        "verification_report_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "python_cve_brief": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "task_id", "kind", "checker_id", "evidence_ref", "recheck_argv", "history", "action_id", "authority", "closure_condition", "scope", "build_root", "affected_paths", "reason_code", "constraints", "step", "disposition"],
+      "properties": {
+        "schema_version": {"const": "0.1.0"},
+        "task_id": {"type": "string", "pattern": "^CG-B-[0-9a-f]{32}$"},
+        "kind": {"const": "blocker"},
+        "checker_id": {"const": "python.pip_audit"},
+        "evidence_ref": {"$ref": "#/$defs/evidence"},
+        "recheck_argv": {
+          "type": "array",
+          "prefixItems": [
+            {"const": "codeguard"}, {"const": "task"}, {"const": "verify"},
+            {"type": "string", "pattern": "^CG-B-[0-9a-f]{32}$"},
+            {"const": "."}, {"const": "--pip-audit-tool"},
+            {"const": "<本轮已核验绝对路径>"}, {"const": "--pip-audit-version"},
+            {"const": "<本轮已核验版本>"}, {"const": "--format"},
+            {"const": "json"}
+          ],
+          "items": false,
+          "minItems": 11
+        },
+        "history": {"$ref": "#/$defs/brief/properties/history"},
+        "action_id": {"const": "restore-checker-environment"},
+        "authority": {"const": "local_unverified"},
+        "closure_condition": {"type": "string", "minLength": 1},
+        "scope": {"type": "string", "minLength": 1},
+        "build_root": {"type": "string", "minLength": 1},
+        "affected_paths": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "reason_code": {"const": "python_cve_coverage_unverified"},
+        "constraints": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "step": {"type": "string", "minLength": 1},
+        "disposition": {"enum": ["actionable", "needs_decision", "verification_required", "waiting"]},
+        "verification_observation": {"enum": ["still_blocked", "incomplete"]},
+        "verification_run_id": {"type": "string", "pattern": "^python-cve-[0-9]+-[0-9]+-[0-9]+$"},
+        "verification_report_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "brief": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "task_id",
+        "kind",
+        "checker_id",
+        "evidence_ref",
+        "recheck_argv",
+        "history",
+        "action_id",
+        "authority",
+        "closure_condition",
+        "scope",
+        "constraints",
+        "step",
+        "disposition"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "0.1.0"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^CG-(B-)?[0-9a-f]{32}$"
+        },
+        "kind": {
+          "enum": [
+            "finding",
+            "blocker"
+          ]
+        },
+        "checker_id": {
+          "const": "python.ruff"
+        },
+        "evidence_ref": {
+          "$ref": "#/$defs/evidence"
+        },
+        "recheck_argv": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": "codeguard"
+            },
+            {
+              "const": "lint"
+            },
+            {
+              "const": "python"
+            },
+            {
+              "const": "."
+            }
+          ],
+          "items": false,
+          "minItems": 4
+        },
+        "history": {
+          "oneOf": [
+            {
+              "const": "attempt_history_unavailable"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "attempt_count",
+                "no_progress_count",
+                "open_attempt_id",
+                "awaiting_verification",
+                "budget",
+                "recent"
+              ],
+              "properties": {
+                "attempt_count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "no_progress_count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "open_attempt_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "pattern": "^CG-A-[0-9a-f]{32}$"
+                },
+                "awaiting_verification": {
+                  "type": "boolean"
+                },
+                "budget": {
+                  "const": 2
+                },
+                "recent": {
+                  "type": "array",
+                  "maxItems": 5,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "attempt_id",
+                      "action_id",
+                      "outcome",
+                      "note_code",
+                      "observed_change"
+                    ],
+                    "properties": {
+                      "attempt_id": {
+                        "type": "string",
+                        "pattern": "^CG-A-[0-9a-f]{32}$"
+                      },
+                      "action_id": {
+                        "enum": [
+                          "repair-source",
+                          "review-project-policy",
+                          "restore-checker-environment"
+                        ]
+                      },
+                      "outcome": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "enum": [
+                          "ready-to-verify",
+                          "no-change",
+                          "failed",
+                          "blocked",
+                          "abandoned",
+                          null
+                        ]
+                      },
+                      "note_code": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "observed_change": {
+                        "type": [
+                          "boolean",
+                          "null"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "action_id": {
+          "enum": [
+            "repair-source",
+            "review-project-policy",
+            "restore-checker-environment"
+          ]
+        },
+        "authority": {
+          "const": "local_unverified"
+        },
+        "closure_condition": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "constraints": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "step": {
+          "type": "string",
+          "minLength": 1
+        },
+        "disposition": {
+          "enum": [
+            "actionable",
+            "needs_decision",
+            "verification_required",
+            "waiting"
+          ]
+        },
+        "build_root": {
+          "type": "string",
+          "minLength": 1
+        },
+        "affected_paths": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "reason_code": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]{1,80}$"
+        },
+        "native_rule_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "verification_observation": {
+          "enum": [
+            "candidate_absent_unverified_policy",
+            "environment_restored_unverified_policy",
+            "still_present",
+            "suppression_requires_review",
+            "rule_coverage_requires_review"
+          ]
+        },
+        "verification_run_id": {
+          "type": "string",
+          "pattern": "^lint-[A-Za-z0-9._-]+$"
+        },
+        "verification_report_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "correction_proposal_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^codeguard/findings/CG-[0-9a-f]{32}/events/correction-proposed-[0-9a-f]{64}\\.json$"
+          }
+        },
+        "correction_task_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^codeguard/tasks/corrections/CG-[0-9a-f]{32}/[0-9a-f]{64}\\.md$"
+          }
+        }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "kind": {
+              "const": "blocker"
+            }
+          },
+          "required": [
+            "build_root",
+            "affected_paths",
+            "reason_code"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "native_rule_id"
+                ]
+              },
+              {
+                "required": [
+                  "source_sha256"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "finding"
+            }
+          },
+          "required": [
+            "native_rule_id",
+            "source_sha256"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "build_root"
+                ]
+              },
+              {
+                "required": [
+                  "affected_paths"
+                ]
+              },
+              {
+                "required": [
+                  "reason_code"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

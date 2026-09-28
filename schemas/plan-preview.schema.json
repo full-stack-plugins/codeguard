@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:plan-preview:0.1",
+  "title": "CodeGuard read-only plan preview without policy authority",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "report_type", "planning_status", "quality_decision", "root", "selection", "selected_categories", "observed_languages", "observation_complete", "blocked_paths", "observed_checkers", "candidate_tasks", "policy_identity", "obligations", "unresolved_conditions", "next_action"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "report_type": {"const": "plan_preview"},
+    "planning_status": {"const": "incomplete"},
+    "quality_decision": {"const": "not_evaluated"},
+    "root": {"type": "string"},
+    "selection": {
+      "type": "object", "additionalProperties": false, "required": ["operation", "language"],
+      "properties": {
+        "operation": {"enum": ["lint", "comments", "dependencies", "cve", "security", "build", "check"]},
+        "language": {"type": "string", "minLength": 1}
+      }
+    },
+    "selected_categories": {"type": "array", "uniqueItems": true, "items": {"enum": ["lint", "comments", "dependencies", "cve", "security", "build"]}},
+    "observed_languages": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "observation_complete": {"type": "boolean"},
+    "blocked_paths": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "observed_checkers": {"type": "array", "items": {"$ref": "#/$defs/checker"}},
+    "candidate_tasks": {"type": "array", "items": {"$ref": "#/$defs/candidate_task"}},
+    "policy_identity": {"type": "null"},
+    "obligations": {"const": []},
+    "unresolved_conditions": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "next_action": {"type": "string", "minLength": 1}
+  },
+  "$defs": {
+    "checker": {
+      "type": "object", "additionalProperties": false,
+      "required": ["build_root", "checker_id", "category", "configuration", "configuration_ref", "reason", "next_action"],
+      "properties": {
+        "build_root": {"type": "string"},
+        "checker_id": {"type": "string", "minLength": 1},
+        "category": {"enum": ["lint", "comments", "dependencies", "cve", "security", "build"]},
+        "configuration": {"enum": ["configured", "missing", "unknown", "invalid"]},
+        "configuration_ref": {"type": "string"},
+        "reason": {"type": "string"},
+        "next_action": {"type": "string"}
+      }
+    },
+    "candidate_task": {
+      "type": "object", "additionalProperties": false,
+      "required": ["checker_id", "category", "build_root", "state", "command"],
+      "properties": {
+        "checker_id": {"type": "string", "minLength": 1},
+        "category": {"enum": ["lint", "comments", "dependencies", "cve", "security", "build"]},
+        "build_root": {"type": "string"},
+        "state": {"const": "pending_policy_and_tool_lock"},
+        "command": {"type": "null"}
+      }
+    }
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:checkstyle-finding-record:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "id",
+    "workspace_id",
+    "fingerprint",
+    "checker_id",
+    "native_rule_id",
+    "path",
+    "first_source_sha256",
+    "first_run_id",
+    "first_report_sha256",
+    "state",
+    "authority",
+    "delivery_decision"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "kind": {
+      "const": "finding"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^CG-[0-9a-f]{32}$"
+    },
+    "workspace_id": {
+      "type": "string",
+      "pattern": "^ws-[0-9a-f]{32}$"
+    },
+    "fingerprint": {
+      "$ref": "#/$defs/sha256"
+    },
+    "checker_id": {
+      "const": "java.checkstyle"
+    },
+    "native_rule_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]{1,80}$"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "first_source_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "first_run_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,120}$"
+    },
+    "first_report_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "state": {
+      "const": "open"
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

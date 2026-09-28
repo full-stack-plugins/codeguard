@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:task-verification-event:0.3.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "event", "task_id", "kind", "workspace_id", "run_id", "report_sha256", "observation", "attempt_id", "authority", "state_after"],
+  "properties": {
+    "schema_version": {"const": "0.3.0"},
+    "event": {"const": "verification_observed"},
+    "task_id": {"type": "string", "pattern": "^CG-(B-)?[0-9a-f]{32}$"},
+    "attempt_id": {"type":["string","null"], "pattern":"^CG-A-[0-9a-f]{32}$"},
+    "kind": {"enum": ["finding", "blocker"]},
+    "workspace_id": {"type": "string", "pattern": "^ws-[0-9a-f]{32}$"},
+    "run_id": {"type": "string", "pattern": "^[A-Za-z0-9_-]{1,120}$"},
+    "report_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "observation": {"enum": ["incomplete", "still_present", "still_blocked", "suppression_requires_review", "rule_coverage_requires_review", "candidate_absent_unverified_policy", "environment_restored_unverified_policy"]},
+    "authority": {"const": "local_unverified"},
+    "state_after": {"const": "open"}
+  }
+}

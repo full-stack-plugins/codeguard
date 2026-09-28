@@ -1,0 +1,577 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeguard.dev/schemas/eslint-directory-feedback/0.2.0",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "report_type",
+        "status",
+        "authority",
+        "coverage_proven",
+        "delivery_decision",
+        "input_stable",
+        "reason",
+        "scope_semantics",
+        "files",
+        "skipped",
+        "unexecuted_files"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "0.1.0"
+        },
+        "report_type": {
+          "const": "eslint_directory_feedback"
+        },
+        "status": {
+          "enum": [
+            "incomplete",
+            "local_observation"
+          ]
+        },
+        "authority": {
+          "const": "local_unverified"
+        },
+        "coverage_proven": {
+          "const": false
+        },
+        "delivery_decision": {
+          "const": "not_evaluated"
+        },
+        "input_stable": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string",
+          "pattern": "^[a-z_]{1,128}$"
+        },
+        "scope_semantics": {
+          "const": "explicit_config_per_file"
+        },
+        "files": {
+          "type": "array",
+          "maxItems": 10000,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "feedback"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "feedback": {
+                "title": "ESLint局部未批准反馈",
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "schema_version",
+                  "report_type",
+                  "status",
+                  "local_coherent",
+                  "coverage_proven",
+                  "delivery_decision",
+                  "reason",
+                  "findings",
+                  "suppressed_count",
+                  "workbench_status",
+                  "next_action",
+                  "workbench"
+                ],
+                "properties": {
+                  "schema_version": {
+                    "const": "0.2.0"
+                  },
+                  "report_type": {
+                    "const": "eslint_local_feedback"
+                  },
+                  "status": {
+                    "enum": [
+                      "incomplete",
+                      "local_observation"
+                    ]
+                  },
+                  "local_coherent": {
+                    "type": "boolean"
+                  },
+                  "coverage_proven": {
+                    "const": false
+                  },
+                  "delivery_decision": {
+                    "const": "not_evaluated"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "findings": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "path",
+                        "rule_id",
+                        "severity",
+                        "line",
+                        "column",
+                        "message_sha256"
+                      ],
+                      "properties": {
+                        "path": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "rule_id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "severity": {
+                          "enum": [
+                            1,
+                            2
+                          ]
+                        },
+                        "line": {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "column": {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "message_sha256": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        }
+                      }
+                    }
+                  },
+                  "suppressed_count": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "workbench_status": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "next_action": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "workbench": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          },
+                          "new_findings": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "new_blockers": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "failed_reports": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "next": {
+                            "type": [
+                              "object",
+                              "null"
+                            ]
+                          },
+                          "next_error": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "local_coherent": {
+                          "const": true
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "status": {
+                          "const": "local_observation"
+                        }
+                      }
+                    },
+                    "else": {
+                      "properties": {
+                        "status": {
+                          "const": "incomplete"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "skipped": {
+          "type": "array",
+          "maxItems": 50000,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "reason"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reason": {
+                "enum": [
+                  "symbolic_link_not_followed",
+                  "hidden_entry_not_selected",
+                  "dependency_tree_not_selected"
+                ]
+              }
+            }
+          }
+        },
+        "unexecuted_files": {
+          "type": "array",
+          "maxItems": 10000,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "report_type",
+        "status",
+        "authority",
+        "coverage_proven",
+        "delivery_decision",
+        "input_stable",
+        "reason",
+        "scope_semantics",
+        "files",
+        "skipped",
+        "unexecuted_files",
+        "config_map_sha256"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "0.2.0"
+        },
+        "report_type": {
+          "const": "eslint_directory_feedback"
+        },
+        "status": {
+          "enum": [
+            "incomplete",
+            "local_observation"
+          ]
+        },
+        "authority": {
+          "const": "local_unverified"
+        },
+        "coverage_proven": {
+          "const": false
+        },
+        "delivery_decision": {
+          "const": "not_evaluated"
+        },
+        "input_stable": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string",
+          "pattern": "^[a-z_]{1,128}$"
+        },
+        "scope_semantics": {
+          "enum": [
+            "explicit_config_per_file",
+            "explicit_config_map_per_file"
+          ]
+        },
+        "files": {
+          "type": "array",
+          "maxItems": 10000,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "feedback",
+              "configuration_scope",
+              "configuration_selection"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "feedback": {
+                "title": "ESLint局部未批准反馈",
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "schema_version",
+                  "report_type",
+                  "status",
+                  "local_coherent",
+                  "coverage_proven",
+                  "delivery_decision",
+                  "reason",
+                  "findings",
+                  "suppressed_count",
+                  "workbench_status",
+                  "next_action",
+                  "workbench"
+                ],
+                "properties": {
+                  "schema_version": {
+                    "const": "0.2.0"
+                  },
+                  "report_type": {
+                    "const": "eslint_local_feedback"
+                  },
+                  "status": {
+                    "enum": [
+                      "incomplete",
+                      "local_observation"
+                    ]
+                  },
+                  "local_coherent": {
+                    "type": "boolean"
+                  },
+                  "coverage_proven": {
+                    "const": false
+                  },
+                  "delivery_decision": {
+                    "const": "not_evaluated"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "findings": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "path",
+                        "rule_id",
+                        "severity",
+                        "line",
+                        "column",
+                        "message_sha256"
+                      ],
+                      "properties": {
+                        "path": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "rule_id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "severity": {
+                          "enum": [
+                            1,
+                            2
+                          ]
+                        },
+                        "line": {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "column": {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "message_sha256": {
+                          "type": "string",
+                          "pattern": "^[a-f0-9]{64}$"
+                        }
+                      }
+                    }
+                  },
+                  "suppressed_count": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "workbench_status": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "next_action": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "workbench": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          },
+                          "new_findings": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "new_blockers": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "failed_reports": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "next": {
+                            "type": [
+                              "object",
+                              "null"
+                            ]
+                          },
+                          "next_error": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "local_coherent": {
+                          "const": true
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "status": {
+                          "const": "local_observation"
+                        }
+                      }
+                    },
+                    "else": {
+                      "properties": {
+                        "status": {
+                          "const": "incomplete"
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              "configuration_scope": {
+                "type": "string",
+                "minLength": 1
+              },
+              "configuration_selection": {
+                "enum": [
+                  "explicit_default",
+                  "explicit_project_map"
+                ]
+              }
+            }
+          }
+        },
+        "skipped": {
+          "type": "array",
+          "maxItems": 50000,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "reason"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reason": {
+                "enum": [
+                  "symbolic_link_not_followed",
+                  "hidden_entry_not_selected",
+                  "dependency_tree_not_selected"
+                ]
+              }
+            }
+          }
+        },
+        "unexecuted_files": {
+          "type": "array",
+          "maxItems": 10000,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "config_map_sha256": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

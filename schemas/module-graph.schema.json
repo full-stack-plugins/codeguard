@@ -1,0 +1,289 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:module-graph:0.3.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "document_type",
+    "nodes",
+    "edges",
+    "dependency_edges_complete",
+    "unresolved"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.3.0"
+    },
+    "document_type": {
+      "const": "codeguard_module_graph"
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "project_root",
+              "build_root"
+            ]
+          },
+          "status": {
+            "const": "observed"
+          }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "from",
+              "to",
+              "kind",
+              "status",
+              "basis"
+            ],
+            "properties": {
+              "from": {
+                "type": "string"
+              },
+              "to": {
+                "type": "string"
+              },
+              "kind": {
+                "const": "contains"
+              },
+              "status": {
+                "const": "observed"
+              },
+              "basis": {
+                "const": "manifest_location"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "from",
+              "to",
+              "status",
+              "manifest_ref",
+              "manifest_sha256",
+              "condition",
+              "kind",
+              "basis"
+            ],
+            "properties": {
+              "from": {
+                "type": "string",
+                "minLength": 1
+              },
+              "to": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "const": "declared"
+              },
+              "manifest_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "manifest_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "condition": {
+                "const": "unconditional_declaration"
+              },
+              "kind": {
+                "const": "aggregation"
+              },
+              "basis": {
+                "const": "maven_modules_declaration"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "from",
+              "to",
+              "status",
+              "manifest_ref",
+              "manifest_sha256",
+              "condition",
+              "kind",
+              "basis",
+              "scope"
+            ],
+            "properties": {
+              "from": {
+                "type": "string",
+                "minLength": 1
+              },
+              "to": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "const": "declared"
+              },
+              "manifest_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "manifest_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "condition": {
+                "const": "unconditional_declaration"
+              },
+              "kind": {
+                "const": "build_dependency"
+              },
+              "basis": {
+                "const": "maven_dependency_declaration"
+              },
+              "scope": {
+                "enum": [
+                  "compile",
+                  "provided",
+                  "runtime",
+                  "test",
+                  "system",
+                  "import"
+                ]
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "from",
+              "to",
+              "status",
+              "manifest_ref",
+              "manifest_sha256",
+              "condition",
+              "kind",
+              "basis"
+            ],
+            "properties": {
+              "from": {
+                "type": "string",
+                "minLength": 1
+              },
+              "to": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "const": "declared"
+              },
+              "manifest_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "manifest_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "condition": {
+                "const": "unconditional_declaration"
+              },
+              "kind": {
+                "const": "aggregation"
+              },
+              "basis": {
+                "const": "cargo_members_declaration"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "from",
+              "to",
+              "status",
+              "manifest_ref",
+              "manifest_sha256",
+              "condition",
+              "kind",
+              "basis",
+              "scope"
+            ],
+            "properties": {
+              "from": {
+                "type": "string",
+                "minLength": 1
+              },
+              "to": {
+                "type": "string",
+                "minLength": 1
+              },
+              "status": {
+                "const": "declared"
+              },
+              "manifest_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "manifest_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "condition": {
+                "const": "unconditional_declaration"
+              },
+              "kind": {
+                "const": "build_dependency"
+              },
+              "basis": {
+                "const": "cargo_path_dependency_declaration"
+              },
+              "scope": {
+                "enum": [
+                  "normal",
+                  "build",
+                  "dev"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    "dependency_edges_complete": {
+      "const": false
+    },
+    "unresolved": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

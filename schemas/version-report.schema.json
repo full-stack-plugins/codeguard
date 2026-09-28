@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:version-report:0.1",
+  "title": "Codeguard CLI version query",
+  "type": "object",
+  "required": ["schema_version", "report_type", "cli_version", "target", "build_identity", "check_protocol_major", "rulepack_compatibility"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "report_type": {"const": "version"},
+    "cli_version": {"type": "string", "minLength": 1},
+    "target": {"type": "string", "minLength": 1},
+    "build_identity": {"type": ["string", "null"], "minLength": 1},
+    "check_protocol_major": {"const": 1},
+    "rulepack_compatibility": {"const": "unverified"}
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:project-profile:0.2.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "document_type", "project_root", "observation_complete", "languages", "build_roots", "manifest_sha256", "package_declared_versions", "lockfiles", "lock_sha256", "checker_config_sha256", "checker_configurations", "source_set_candidates", "blocked_paths", "unknown_conditions", "architecture_status", "delivery_decision"],
+  "properties": {
+    "schema_version": {"const": "0.2.0"},
+    "document_type": {"const": "codeguard_project_profile"},
+    "project_root": {"const": "."},
+    "observation_complete": {"type": "boolean"},
+    "languages": {"type": "array", "items": {"type": "object", "required": ["id", "source_file_count", "source_set_sha256", "manifests", "declared_version", "installed_version", "version_status"], "properties": {"id": {"type": "string"}, "source_file_count": {"type": "integer", "minimum": 0}, "source_set_sha256": {"$ref": "#/$defs/sha256"}, "manifests": {"type": "array", "items": {"type": "string"}}, "declared_version": {"type": ["string", "null"]}, "installed_version": {"const": null}, "version_status": {"enum": ["declared_only", "unknown"]}}, "additionalProperties": false}},
+    "build_roots": {"type": "array", "items": {"type": "object", "required": ["path", "manifests", "resolution"], "properties": {"path": {"type": "string"}, "manifests": {"type": "array", "items": {"type": "string"}}, "resolution": {"const": "static_observation_only"}}, "additionalProperties": false}},
+    "manifest_sha256": {"type": "object", "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{64}$"}},
+    "package_declared_versions": {"type": "object", "additionalProperties": {"type": "string", "minLength": 1}},
+    "lockfiles": {"type": "array", "items": {"type": "string"}},
+    "lock_sha256": {"type": "object", "additionalProperties": {"$ref": "#/$defs/sha256"}},
+    "checker_config_sha256": {"type": "object", "additionalProperties": {"$ref": "#/$defs/sha256"}},
+    "checker_configurations": {"type": "array"},
+    "source_set_candidates": {"type": "array"},
+    "blocked_paths": {"type": "array", "items": {"type": "string"}},
+    "unknown_conditions": {"type": "array", "items": {"type": "string"}},
+    "architecture_status": {"const": "unknown"},
+    "delivery_decision": {"const": "not_evaluated"}
+  },
+  "$defs": {"sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+}

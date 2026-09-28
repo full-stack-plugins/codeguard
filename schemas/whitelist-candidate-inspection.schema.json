@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:whitelist-candidate-inspection:0.3.0",
+  "title": "CodeGuard read-only false-positive candidate inspection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "report_type", "operation", "inspection_status", "authority", "gate_effect", "invalid_candidate_count", "conflicting_candidate_count", "comparison", "candidates"],
+  "properties": {
+    "schema_version": {"const": "0.3.0"},
+    "report_type": {"const": "whitelist_candidate_inspection"},
+    "operation": {"enum": ["list", "explain"]},
+    "inspection_status": {"enum": ["complete", "incomplete"]},
+    "authority": {"const": "unverified"},
+    "gate_effect": {"const": "none"},
+    "invalid_candidate_count": {"type": "integer", "minimum": 0},
+    "conflicting_candidate_count": {"type": "integer", "minimum": 0},
+    "comparison": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "reason", "mismatch_fields", "next_action"],
+      "properties": {
+        "status": {"enum": ["not_requested", "identity_matched", "identity_mismatch", "invalid_observation", "invalid_candidate", "not_compared"]},
+        "reason": {"enum": ["observed_identity_not_supplied", "approval_source_and_time_unverified", "different_identity", "unreadable_or_invalid_observation", "invalid_observation_identity", "invalid_candidate_identity", "decision_id_not_found", "duplicate_decision_id", "duplicate_finding_identity", "candidate_set_incomplete"]},
+        "mismatch_fields": {"type": "array", "uniqueItems": true, "items": {"enum": ["finding_id", "checker_id", "native_rule_id", "category", "target.kind", "target.path", "target.file_sha256", "target.component", "target.version", "target.graph_sha256", "target.advisory_id", "finding_fingerprint", "tool_sha256", "adapter_sha256", "rulepack_sha256"]}},
+        "next_action": {"enum": ["verify_independent_approval", "rerun_native_checker_and_review_candidate", "repair_observation_and_rerun_native_checker", "repair_candidate", "review_candidate_set_and_observation"]}
+      }
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "status", "reason"],
+        "properties": {
+          "id": {"type": ["string", "null"]},
+          "finding_id": {"type": "string"},
+          "checker_id": {"type": "string"},
+          "native_rule_id": {"type": "string"},
+          "category": {"type": "string"},
+          "target_kind": {"enum": ["source", "dependency"]},
+          "target": {"type": "string"},
+          "expires_at": {"type": "integer", "minimum": 1},
+          "status": {"enum": ["candidate_unverified", "invalid_candidate", "conflicting_candidate"]},
+          "reason": {"enum": ["approval_source_and_time_unverified", "unreadable_or_invalid_candidate", "duplicate_decision_id", "duplicate_finding_identity"]}
+        }
+      }
+    }
+  }
+}

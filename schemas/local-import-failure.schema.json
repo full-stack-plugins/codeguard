@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:local-import-failure:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "record_type", "workspace_id", "run_id", "report_sha256", "reason", "authority", "delivery_decision"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "record_type": {"const": "local_import_failure"},
+    "workspace_id": {"type": "string", "pattern": "^ws-[0-9a-f]{32}$"},
+    "run_id": {"type": "string", "pattern": "^[A-Za-z0-9_-]{1,120}$"},
+    "report_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "reason": {"type": "string", "pattern": "^[a-z0-9_]{1,80}$"},
+    "authority": {"const": "local_unverified"},
+    "delivery_decision": {"const": "not_evaluated"}
+  }
+}

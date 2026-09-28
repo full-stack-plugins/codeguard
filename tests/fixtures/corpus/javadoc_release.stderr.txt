@@ -1,0 +1,2 @@
+[ERROR] error: release version 1.8 not supported
+Command line was: <JDK_HOME>/bin/java

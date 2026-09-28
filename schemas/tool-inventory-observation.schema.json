@@ -1,0 +1,333 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CodeGuard declared tool inventory observation 0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "inspection_status",
+    "authority",
+    "readiness",
+    "gate_effect",
+    "lock_status",
+    "lock_sha256",
+    "tools",
+    "next_action",
+    "inventory_scope",
+    "required_inventory"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "report_type": {
+      "const": "tool_inventory_observation"
+    },
+    "inspection_status": {
+      "const": "incomplete"
+    },
+    "authority": {
+      "const": "unverified"
+    },
+    "readiness": {
+      "const": "unknown"
+    },
+    "gate_effect": {
+      "const": "none"
+    },
+    "lock_status": {
+      "enum": [
+        "missing",
+        "invalid",
+        "unreadable",
+        "structurally_valid_untrusted"
+      ]
+    },
+    "lock_sha256": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "next_action": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tools": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/tool"
+      }
+    },
+    "inventory_scope": {
+      "const": "declared_lock_only"
+    },
+    "required_inventory": {
+      "const": "unverified"
+    }
+  },
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "digest_matched",
+        "executable_bit",
+        "issue"
+      ],
+      "properties": {
+        "digest_matched": {
+          "type": "boolean"
+        },
+        "executable_bit": {
+          "type": "boolean"
+        },
+        "issue": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      }
+    },
+    "bundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "digest_matched",
+        "issue"
+      ],
+      "properties": {
+        "digest_matched": {
+          "type": "boolean"
+        },
+        "issue": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      }
+    },
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tool_id",
+        "platform",
+        "origin_kind",
+        "artifact_status",
+        "tool",
+        "runtime",
+        "bundle",
+        "execution",
+        "version_status",
+        "next_action",
+        "applicability",
+        "declared_version",
+        "required_by_policy",
+        "declared_runtime",
+        "adapter",
+        "rule_source"
+      ],
+      "properties": {
+        "tool_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "platform": {
+          "enum": [
+            "macos_arm64",
+            "macos_x86_64",
+            "linux_x86_64",
+            "linux_aarch64",
+            "windows_x86_64"
+          ]
+        },
+        "origin_kind": {
+          "enum": [
+            "system",
+            "project_wrapper",
+            "managed_cache"
+          ]
+        },
+        "artifact_status": {
+          "enum": [
+            "matched_untrusted",
+            "incomplete",
+            "not_inspected"
+          ]
+        },
+        "tool": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/artifact"
+            }
+          ]
+        },
+        "runtime": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/artifact"
+            }
+          ]
+        },
+        "bundle": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/bundle"
+            }
+          ]
+        },
+        "execution": {
+          "const": "not_run"
+        },
+        "version_status": {
+          "const": "lock_declared_only"
+        },
+        "next_action": {
+          "type": "string",
+          "minLength": 1
+        },
+        "applicability": {
+          "enum": [
+            "current_platform",
+            "other_platform"
+          ]
+        },
+        "declared_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required_by_policy": {
+          "const": null
+        },
+        "declared_runtime": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "version"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "version": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          ]
+        },
+        "adapter": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "version"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "version": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "rule_source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "kind",
+            "sha256"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "kind": {
+              "enum": [
+                "native_builtin",
+                "external_rulepack"
+              ]
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "applicability": {
+                "const": "other_platform"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "artifact_status": {
+                "const": "not_inspected"
+              },
+              "tool": {
+                "const": null
+              },
+              "runtime": {
+                "const": null
+              },
+              "bundle": {
+                "const": null
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "artifact_status": {
+                "enum": [
+                  "matched_untrusted",
+                  "incomplete"
+                ]
+              },
+              "tool": {
+                "$ref": "#/$defs/artifact"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

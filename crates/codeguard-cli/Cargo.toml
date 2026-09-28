@@ -1,0 +1,24 @@
+[package]
+name = "codeguard-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "codeguard"
+path = "src/main.rs"
+
+[dependencies]
+codeguard-core = { path = "../codeguard-core" }
+codeguard-runtime = { path = "../codeguard-runtime" }
+codeguard-adapters = { path = "../codeguard-adapters" }
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+sha1.workspace = true
+http = "=1.5.0"
+
+[dev-dependencies]
+ring.workspace = true
+tokio = { version="=1.53.1", features=["rt","time","net"] }

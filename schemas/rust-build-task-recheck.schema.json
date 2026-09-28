@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:rust-build-task-recheck:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "workspace_binding",
+    "workspace_id",
+    "run_id",
+    "authority",
+    "delivery_decision",
+    "coverage_proven",
+    "task_id",
+    "task_path",
+    "task_rule",
+    "input_stable",
+    "input_identities",
+    "normal_scan"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "report_type": {
+      "const": "rust_build_task_recheck"
+    },
+    "operation": {
+      "const": "task_verify"
+    },
+    "workspace_binding": {
+      "const": "bound"
+    },
+    "workspace_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^cargo-build-[0-9]+-[0-9]+$"
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "task_id": {
+      "type": "string",
+      "pattern": "^CG-(B-)?[0-9a-f]{32}$"
+    },
+    "task_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "task_rule": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "input_stable": {
+      "type": "boolean"
+    },
+    "input_identities": {
+      "type": "array",
+      "maxItems": 10000,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "normal_scan": {
+      "$ref": "rust-build-local-observation.schema.json"
+    }
+  }
+}

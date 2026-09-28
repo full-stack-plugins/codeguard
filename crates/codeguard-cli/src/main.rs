@@ -1,0 +1,503 @@
+//! Codeguard 命令行入口；仅暴露已实现的操作，未完成的检查不宣称门禁通过。
+
+use codeguard_adapters::{LegacyRegistry, capability_row, legacy_registry};
+use codeguard_cli::discovery::discover;
+use codeguard_cli::tool_identity::current_platform_id;
+use codeguard_core::{CANDIDATE_PLATFORMS, CHECK_CATEGORIES};
+use codeguard_runtime::NativeObservation;
+use std::path::PathBuf;
+use std::process::ExitCode;
+
+fn main() -> ExitCode {
+    #[cfg(unix)]
+    if let Err(error) = codeguard_runtime::install_sigint_cancellation() {
+        eprintln!("无法登记 Ctrl-C 取消：{error}");
+        return ExitCode::from(4);
+    }
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    match args.as_slice() {
+        [version, rest @ ..] if version == "--version" || version == "-V" => version_report(rest),
+        [help] if help == "--help" || help == "-h" || help == "help" => {
+            println!(
+                "codeguard {}\n用法: codeguard --version [--format human|json] | capabilities [language] [--platform ID] [--category ID] [--format human|json] | detect [path] [--format human|json] | init [path] [--dry-run|--apply] [--format human|json] | config <validate|explain> [path] [--policy-candidate FILE] [--format human|json] | plan <lint|comments|dependencies|cve|security|build|check> <language|all> [path] [--format human|json] | check all [path] [--node-tool ABS_PATH --npm-entry ABS_PATH --npm-version VERSION --userconfig ABS_PATH --globalconfig ABS_PATH [--registry URL]] [--ruff-tool ABS_PATH] [--cargo-tool ABS_PATH] [--go-tool ABS_PATH] [--maven-tool ABS_PATH --java-home ABS_PATH --maven-repo ABS_PATH --repo-sha256 SHA256] [--timeout DURATION] [--jobs N] [--format human|json|sarif] [--output PATH] | check java [path] [--maven-tool ABS_PATH --java-home ABS_PATH --maven-repo ABS_PATH --repo-sha256 SHA256] [--timeout DURATION] [--jobs N] [--format human|json|sarif] [--output PATH] | lint python [path] [--ruff-tool ABS_PATH] [--timeout DURATION] [--format human|json] | lint typescript PATH [--config-map ABS_PATH] [--node-tool ABS_PATH --eslint-entry ABS_PATH --eslint-version VERSION --config ABS_PATH --cwd ABS_PATH] [--workspace ABS_PATH] [--timeout DURATION] [--format human|json] | lint go [path] [--go-tool ABS_PATH] [--timeout DURATION] [--format human|json] | lint java FILE [--checker p3c] [--maven-tool ABS_PATH --java-home ABS_PATH --maven-repo ABS_PATH --repo-sha256 SHA256] [--format human|json] | lint java FILE --checker javadoc --java-home ABS_PATH [--format human|json] | work sync [path] [--format human|json] | status [path] [--format human|json] | next [path] [--format human|json] | task show ID [path] [--format human|json] | task <claim|heartbeat|release> ID [path] --owner ID [--lease-token TOKEN] [--format human|json] | task attempt <start|finish> ID [path] --owner ID --lease-token TOKEN [--action-id ID|--attempt-id ID --outcome OUTCOME --note-code CODE] [--format human|json] | task verify ID [path] [--owner ID --lease-token TOKEN] [--node-tool ABS_PATH --npm-entry ABS_PATH --npm-version VERSION --userconfig ABS_PATH --globalconfig ABS_PATH [--registry URL]|--node-tool ABS_PATH --eslint-entry ABS_PATH --eslint-version VERSION --config ABS_PATH --cwd ABS_PATH|--ruff-tool ABS_PATH|--cargo-tool ABS_PATH|--go-tool ABS_PATH|--maven-tool ABS_PATH --java-home ABS_PATH --maven-repo ABS_PATH --repo-sha256 SHA256 --cve-data-dir ABS_PATH --cve-data-sha256 SHA256] [--timeout DURATION] [--format human|json] | gate pre-commit [path] [--git-tool ABS_PATH] [--format human|json] | cve typescript [path] [--workspace ABS_PATH] [--node-tool ABS_PATH --npm-entry ABS_PATH --npm-version VERSION --userconfig ABS_PATH --globalconfig ABS_PATH] [--registry URL] [--timeout DURATION] [--format human|json] | rules whitelist list --candidate FILE [--candidate FILE...] [--format human|json] | rules whitelist explain ID --candidate FILE [--candidate FILE...] [--observed-identity FILE] [--format human|json] | rules whitelist propose FINDING_ID [path] [--ruff-tool ABS_PATH] [--correct-decision FILE --correction-reason CODE --verification-run RUN_ID [--replacement FILE] [--record]] [--format human|json]",
+                env!("CARGO_PKG_VERSION")
+            );
+            println!("check all 可汇总已接入的原生结果与未完成义务；完整质量门禁尚未实现。");
+            println!(
+                "check all 的 Python CVE 节点可用 --pip-audit-tool ABS_PATH --pip-audit-version VERSION；逐构建根反馈原生结果或锁文件/工具阻塞，不签发零漏洞结论。"
+            );
+            println!(
+                "Python CVE 稳定任务可用 task verify ID . --pip-audit-tool ABS_PATH --pip-audit-version VERSION --format json 原工具复检；复检只追加证据，不自动关闭任务。"
+            );
+            println!(
+                "check all 的 Rust CVE 节点使用 --cargo-audit-tool ABS_PATH --rustsec-db ABS_PATH；缺工具或数据库显示环境阻塞，漏洞库时效未核验时不放行。"
+            );
+            println!(
+                "工具库存/静态核验：tools <list|verify> [path] [--tool-lock-candidate FILE] [--managed-cache ABS_PATH] [--runtime ID=ABS_PATH] [--format human|json]；不启动或安装工具；tools install --lock FILE [--distribution-manifest FILE] [path] [--dry-run|--apply] 当前只提供未批准候选预览，apply 阻塞。"
+            );
+            println!("check java 仅执行 Java 当前可用的局部原生检查；交付决策保持 not_evaluated。");
+            println!(
+                "Rust CVE 局部探针：cve rust [path] --cargo-audit-tool ABS_PATH --db ABS_PATH [--timeout DURATION] [--format human|json]；原生离线审计，数据库时效与交付门禁尚未核验。"
+            );
+            println!(
+                "Python CVE 局部探针：cve python [path] --pip-audit-tool ABS_PATH --pip-audit-version VERSION [--timeout DURATION] [--format human|json]；仅复放标准 pylock 快照，数据库和完整项目覆盖尚未核验。"
+            );
+            println!(
+                "Rust 注释探针：comments rust [path] [--cargo-tool ABS_PATH] [--timeout DURATION] [--format human|json]；原生库目标观察，完整文档政策与任务闭环仍未接入。"
+            );
+            println!(
+                "Rust 构建探针：build rust [path] [--cargo-tool ABS_PATH] [--timeout DURATION] [--format human|json]；原生类型检查，不执行测试，完整构建政策与任务闭环尚未接入。"
+            );
+            println!(
+                "规则目录：rules list <language|all> [path] [--format human|json]；只读配置声明、候选规则来源及目录缺口，不执行检查或批准白名单。"
+            );
+            println!(
+                "检查预算：check all 支持 --jobs 1–64 和 CODEGUARD_JOBS；--timeout 优先于 CODEGUARD_TIMEOUT，默认 30m。项目默认值见 codeguard/runtime.json 1.1；当前仅原生执行受截止时间约束。"
+            );
+            println!(
+                "局部环境诊断：doctor [path] [--ruff-tool ABS_PATH] [--timeout DURATION] [--format human|json]；仅观察配置与显式 Ruff 版本。"
+            );
+            ExitCode::SUCCESS
+        }
+        [command, rest @ ..] if command == "capabilities" => capabilities(rest),
+        [command, rest @ ..] if command == "detect" => detect(rest),
+        [command, rest @ ..] if command == "init" => codeguard_cli::init_command::run(rest),
+        [command, rest @ ..] if command == "config" => codeguard_cli::config_command::run(rest),
+        [command, rest @ ..] if command == "tools" => codeguard_cli::tools_command::run(rest),
+        #[cfg(unix)]
+        [command, rest @ ..] if command == "doctor" => codeguard_cli::doctor_command::run(rest),
+        [command, rest @ ..] if command == "plan" => codeguard_cli::plan_command::run(rest),
+        #[cfg(unix)]
+        [command, language, rest @ ..] if command == "comments" && language == "rust" => {
+            codeguard_cli::rust_comments_command::run(rest)
+        }
+        #[cfg(unix)]
+        [command, language, rest @ ..] if command == "build" && language == "rust" => {
+            codeguard_cli::rust_build_command::run(rest)
+        }
+        #[cfg(unix)]
+        [command, rest @ ..] if command == "check" => codeguard_cli::check_command::run(rest),
+        #[cfg(unix)]
+        [command, language, rest @ ..] if command == "cve" && language == "rust" => {
+            codeguard_cli::cargo_audit_command::run(rest)
+        }
+        #[cfg(unix)]
+        [command, language, rest @ ..] if command == "cve" && language == "python" => {
+            codeguard_cli::python_cve_command::run(rest)
+        }
+        #[cfg(unix)]
+        [command, rest @ ..] if command == "cve" => codeguard_cli::npm_audit_command::run(rest),
+        [command, operation, rest @ ..] if command == "rules" && operation == "list" => {
+            codeguard_cli::rules_list_command::run(rest)
+        }
+        [command, rest @ ..] if command == "rules" => codeguard_cli::whitelist_command::run(rest),
+        [command, rest @ ..] if command == "work" => codeguard_cli::work_sync::run(rest),
+        [command, rest @ ..] if command == "next" => codeguard_cli::next_command::run(rest),
+        [command, rest @ ..] if command == "status" => {
+            codeguard_cli::workspace_view_command::run_status(rest)
+        }
+        [command, rest @ ..]
+            if command == "task" && rest.first().is_some_and(|part| part == "show") =>
+        {
+            codeguard_cli::workspace_view_command::run_show(&rest[1..])
+        }
+        #[cfg(unix)]
+        [command, rest @ ..]
+            if command == "task" && rest.first().is_some_and(|part| part == "attempt") =>
+        {
+            codeguard_cli::task_attempt_command::run(rest)
+        }
+        #[cfg(unix)]
+        [command, rest @ ..]
+            if command == "task"
+                && matches!(
+                    rest.first().map(String::as_str),
+                    Some("claim" | "heartbeat" | "release")
+                ) =>
+        {
+            codeguard_cli::task_lease_command::run(rest)
+        }
+        [command, rest @ ..] if command == "task" => codeguard_cli::task_verify_command::run(rest),
+        #[cfg(unix)]
+        [command, rest @ ..] if command == "lint" => {
+            if rest.first().is_some_and(|language| language == "java") {
+                codeguard_cli::java_lint_dispatch::run(&rest[1..])
+            } else if rest
+                .first()
+                .is_some_and(|language| language == "typescript")
+            {
+                codeguard_cli::eslint_lint_command::run(&rest[1..])
+            } else if rest.first().is_some_and(|language| language == "go") {
+                codeguard_cli::go_lint_command::run(&rest[1..])
+            } else {
+                codeguard_cli::python_lint_command::run(rest)
+            }
+        }
+        #[cfg(unix)]
+        [command, rest @ ..] if command == "gate" => {
+            codeguard_cli::git_index_safety_command::run(rest)
+        }
+        _ => {
+            eprintln!("未知或尚未实现的命令。使用 codeguard --help 查看可用操作。");
+            ExitCode::from(2)
+        }
+    }
+}
+
+fn version_report(args: &[String]) -> ExitCode {
+    let format = match args {
+        [] => "human",
+        [option, value] if option == "--format" && matches!(value.as_str(), "human" | "json") => {
+            value.as_str()
+        }
+        [option] if option == "--format=human" => "human",
+        [option] if option == "--format=json" => "json",
+        _ => {
+            eprintln!("--version 仅支持 --format human|json");
+            return ExitCode::from(2);
+        }
+    };
+    let target = current_platform_id()
+        .map(str::to_owned)
+        .unwrap_or_else(|| format!("{}-{}", std::env::consts::OS, std::env::consts::ARCH));
+    if format == "json" {
+        println!(
+            "{}",
+            serde_json::json!({
+                "schema_version":"0.1.0",
+                "report_type":"version",
+                "cli_version":env!("CARGO_PKG_VERSION"),
+                "target":target,
+                "build_identity":null,
+                "check_protocol_major":1,
+                "rulepack_compatibility":"unverified",
+            })
+        );
+    } else {
+        println!("codeguard {}", env!("CARGO_PKG_VERSION"));
+        println!("目标平台：{target}");
+        println!("检查协议 major：1");
+        println!("构建身份：未验证；规则包兼容范围：未验证");
+    }
+    ExitCode::SUCCESS
+}
+
+fn detect(args: &[String]) -> ExitCode {
+    let (path, json) = match parse_detect_args(args) {
+        Ok(value) => value,
+        Err(message) => {
+            eprintln!("{message}");
+            return ExitCode::from(2);
+        }
+    };
+    let registry = match legacy_registry() {
+        Ok(registry) => registry,
+        Err(error) => {
+            eprintln!("内置语言清单损坏：{error}");
+            return ExitCode::from(4);
+        }
+    };
+    let report = discover(&path, &registry, &NativeObservation);
+    if json {
+        println!("{}", report.to_json());
+    } else {
+        println!("项目：{}", report.root);
+        println!(
+            "观察完整：{}；已观察路径：{}",
+            report.observation_complete, report.observed_entries
+        );
+        println!(
+            "普通扫描点前缀排除根：{}；配置例外文件：{}；入库安全：未评估",
+            report.dot_prefix_roots_excluded, report.configuration_exception_files_observed
+        );
+        for (language, evidence) in &report.languages {
+            println!(
+                "{language}: 源文件 {}，清单 {}",
+                evidence.source_files.len(),
+                evidence.manifests.len()
+            );
+        }
+        for blocked in &report.blocked_paths {
+            println!("未读取：{blocked}");
+        }
+        for unknown in &report.unknown_conditions {
+            println!("待解析：{unknown}");
+        }
+        for checker in &report.checker_configurations {
+            println!(
+                "{} [{}]：{}（{}）；下一步：{}",
+                checker.checker_id,
+                checker.category,
+                checker.configuration,
+                checker.configuration_ref,
+                checker.next_action
+            );
+        }
+    }
+    if report.observation_complete {
+        ExitCode::SUCCESS
+    } else {
+        ExitCode::from(3)
+    }
+}
+
+fn parse_detect_args(args: &[String]) -> Result<(PathBuf, bool), String> {
+    let mut path = None;
+    let mut json = false;
+    let mut index = 0;
+    while index < args.len() {
+        let current = &args[index];
+        if current == "--format" {
+            index += 1;
+            let value = args.get(index).ok_or("--format 缺少值")?;
+            if value != "json" && value != "human" {
+                return Err(format!("不支持的格式：{value}"));
+            }
+            json = value == "json";
+        } else if let Some(value) = current.strip_prefix("--format=") {
+            if value != "json" && value != "human" {
+                return Err(format!("不支持的格式：{value}"));
+            }
+            json = value == "json";
+        } else if current.starts_with('-') || path.is_some() {
+            return Err(format!("不支持的参数：{current}"));
+        } else {
+            path = Some(PathBuf::from(current));
+        }
+        index += 1;
+    }
+    Ok((path.unwrap_or_else(|| PathBuf::from(".")), json))
+}
+
+fn capabilities(args: &[String]) -> ExitCode {
+    let query = match parse_capabilities_args(args) {
+        Ok(value) => value,
+        Err(message) => {
+            eprintln!("{message}");
+            return ExitCode::from(2);
+        }
+    };
+    capabilities_with_registry(query, legacy_registry())
+}
+
+fn capabilities_with_registry(
+    query: CapabilitiesArgs,
+    registry_result: Result<LegacyRegistry, String>,
+) -> ExitCode {
+    let registry = match registry_result {
+        Ok(registry) => registry,
+        Err(error) => {
+            eprintln!("内置语言清单损坏：{error}");
+            return ExitCode::from(4);
+        }
+    };
+    let selected: Vec<_> = registry
+        .languages
+        .iter()
+        .filter(|entry| query.language.as_ref().is_none_or(|id| id == &entry.id))
+        .collect();
+    if selected.is_empty() {
+        eprintln!("未知语言 ID：{}", query.language.expect("已确认选择为空"));
+        return ExitCode::from(2);
+    }
+    if query.json && query.platform.is_none() && query.category.is_none() {
+        let rows: Vec<_> = selected.iter().map(|entry| capability_row(entry)).collect();
+        println!(
+            "{}",
+            serde_json::json!({"schema_version":"0.2.0","report_type":"capability_inventory","release_version":env!("CARGO_PKG_VERSION"),"languages":rows})
+        );
+    } else if query.json {
+        let mut cells = Vec::new();
+        for entry in &selected {
+            let row = capability_row(entry);
+            for (platform, categories) in &row.platforms {
+                if query
+                    .platform
+                    .as_deref()
+                    .is_some_and(|chosen| chosen != *platform)
+                {
+                    continue;
+                }
+                for (category, cell) in categories {
+                    if query
+                        .category
+                        .as_deref()
+                        .is_some_and(|chosen| chosen != *category)
+                    {
+                        continue;
+                    }
+                    cells.push(serde_json::json!({
+                        "language":entry.id,
+                        "legacy_status":entry.status,
+                        "platform":platform,
+                        "category":category,
+                        "status":cell.status,
+                        "reason":cell.reason,
+                        "verified_combinations":[],
+                    }));
+                }
+            }
+        }
+        println!(
+            "{}",
+            serde_json::json!({
+                "schema_version":"0.2.0",
+                "report_type":"capability_selection",
+                "release_version":env!("CARGO_PKG_VERSION"),
+                "cells":cells,
+            })
+        );
+    } else if query.platform.is_none() && query.category.is_none() {
+        for entry in selected {
+            println!(
+                "{}: 六类别×五平台检查能力均未验证（旧状态：{}）",
+                entry.id, entry.status
+            );
+        }
+    } else {
+        for entry in selected {
+            let row = capability_row(entry);
+            for (platform, categories) in &row.platforms {
+                if query
+                    .platform
+                    .as_deref()
+                    .is_some_and(|chosen| chosen != *platform)
+                {
+                    continue;
+                }
+                for (category, cell) in categories {
+                    if query
+                        .category
+                        .as_deref()
+                        .is_some_and(|chosen| chosen != *category)
+                    {
+                        continue;
+                    }
+                    println!(
+                        "{}/{}/{}: {} ({})",
+                        entry.id, platform, category, cell.status, cell.reason
+                    );
+                }
+            }
+        }
+    }
+    ExitCode::SUCCESS
+}
+
+#[derive(Debug, Eq, PartialEq)]
+struct CapabilitiesArgs {
+    language: Option<String>,
+    platform: Option<String>,
+    category: Option<String>,
+    json: bool,
+}
+
+fn parse_capabilities_args(args: &[String]) -> Result<CapabilitiesArgs, String> {
+    let mut language = None;
+    let mut platform = None;
+    let mut category = None;
+    let mut json = false;
+    let mut index = 0;
+    while index < args.len() {
+        let current = &args[index];
+        if current == "--platform" || current == "--category" {
+            index += 1;
+            let value = args.get(index).ok_or_else(|| format!("{current} 缺少值"))?;
+            if current == "--platform" {
+                platform = Some(value.clone());
+            } else {
+                category = Some(value.clone());
+            }
+        } else if let Some(value) = current.strip_prefix("--platform=") {
+            platform = Some(value.into());
+        } else if let Some(value) = current.strip_prefix("--category=") {
+            category = Some(value.into());
+        } else if current == "--format" {
+            index += 1;
+            let value = args.get(index).ok_or("--format 缺少值")?;
+            if value != "json" && value != "human" {
+                return Err(format!("不支持的格式：{value}"));
+            }
+            json = value == "json";
+        } else if let Some(value) = current.strip_prefix("--format=") {
+            if value != "json" && value != "human" {
+                return Err(format!("不支持的格式：{value}"));
+            }
+            json = value == "json";
+        } else if current.starts_with('-') || language.is_some() {
+            return Err(format!("不支持的参数：{current}"));
+        } else {
+            language = Some(current.clone());
+        }
+        index += 1;
+    }
+    if let Some(value) = &platform {
+        if !CANDIDATE_PLATFORMS.contains(&value.as_str()) {
+            return Err(format!("未知平台 ID：{value}"));
+        }
+    }
+    if let Some(value) = &category {
+        if !CHECK_CATEGORIES.contains(&value.as_str()) {
+            return Err(format!("未知类别 ID：{value}"));
+        }
+    }
+    Ok(CapabilitiesArgs {
+        language,
+        platform,
+        category,
+        json,
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{
+        CapabilitiesArgs, capabilities_with_registry, parse_capabilities_args, parse_detect_args,
+    };
+    use std::process::ExitCode;
+
+    #[test]
+    fn rejects_unsupported_format_before_any_observation() {
+        assert!(parse_capabilities_args(&["--format".into(), "yaml".into()]).is_err());
+    }
+
+    #[test]
+    fn accepts_language_and_json_format() {
+        let actual = parse_capabilities_args(&["java".into(), "--format".into(), "json".into()]);
+        assert_eq!(
+            actual,
+            Ok(CapabilitiesArgs {
+                language: Some("java".into()),
+                platform: None,
+                category: None,
+                json: true,
+            })
+        );
+    }
+
+    #[test]
+    fn capability_filters_reject_unknown_dimensions_before_registry_use() {
+        assert!(parse_capabilities_args(&["--platform=darwin".into()]).is_err());
+        assert!(parse_capabilities_args(&["--category=style".into()]).is_err());
+    }
+
+    #[test]
+    fn detect_rejects_invalid_arguments_before_file_observation() {
+        assert!(parse_detect_args(&["--format".into(), "yaml".into()]).is_err());
+        assert!(parse_detect_args(&["a".into(), "b".into()]).is_err());
+    }
+
+    #[test]
+    fn corrupt_release_registry_is_internal_error() {
+        let query = CapabilitiesArgs {
+            language: None,
+            platform: None,
+            category: None,
+            json: true,
+        };
+        assert_eq!(
+            capabilities_with_registry(query, Err("corrupt".into())),
+            ExitCode::from(4)
+        );
+    }
+}

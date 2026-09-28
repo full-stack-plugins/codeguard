@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:false-positive-decision:1.1",
+  "title": "CodeGuard false positive replacement decision candidate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "kind", "id", "replaces_decision_id", "identity", "reason_code", "rationale", "reproducer_ref", "approved_policy_revision", "approval_ref", "reviewer", "created_at", "expires_at"],
+  "properties": {
+    "schema_version": {"const": "1.1"},
+    "kind": {"const": "false_positive"},
+    "id": {"$ref": "#/$defs/token"},
+    "replaces_decision_id": {"$ref": "#/$defs/token"},
+    "identity": {"$ref": "#/$defs/identity"},
+    "reason_code": {"type": "string", "pattern": "^[a-z0-9_]+$"},
+    "rationale": {"type": "string", "pattern": "\\S"},
+    "reproducer_ref": {"$ref": "#/$defs/token"},
+    "approved_policy_revision": {"$ref": "#/$defs/token"},
+    "approval_ref": {"$ref": "#/$defs/token"},
+    "reviewer": {"$ref": "#/$defs/token"},
+    "created_at": {"type": "integer", "minimum": 1},
+    "expires_at": {"type": "integer", "minimum": 2}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "token": {"type": "string", "pattern": "\\S", "not": {"pattern": "[\\*\\?\\x00-\\x1f\\x7f]"}},
+    "source_target": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "path", "file_sha256"],
+      "properties": {
+        "kind": {"const": "source"},
+        "path": {"allOf": [{"$ref": "#/$defs/token"}, {"not": {"pattern": "(^/|\\\\|:|(^|/)\\.{1,2}(/|$)|//|/$)"}}]},
+        "file_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "dependency_target": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "component", "version", "graph_sha256", "advisory_id"],
+      "properties": {
+        "kind": {"const": "dependency"},
+        "component": {"$ref": "#/$defs/token"},
+        "version": {"$ref": "#/$defs/token"},
+        "graph_sha256": {"$ref": "#/$defs/sha256"},
+        "advisory_id": {"$ref": "#/$defs/token"}
+      }
+    },
+    "identity": {
+      "type": "object", "additionalProperties": false,
+      "required": ["finding_id", "checker_id", "native_rule_id", "category", "target", "finding_fingerprint", "tool_sha256", "adapter_sha256", "rulepack_sha256"],
+      "properties": {
+        "finding_id": {"$ref": "#/$defs/token"},
+        "checker_id": {"$ref": "#/$defs/token"},
+        "native_rule_id": {"$ref": "#/$defs/token"},
+        "category": {"$ref": "#/$defs/token"},
+        "target": {"oneOf": [{"$ref": "#/$defs/source_target"}, {"$ref": "#/$defs/dependency_target"}]},
+        "finding_fingerprint": {"$ref": "#/$defs/sha256"},
+        "tool_sha256": {"$ref": "#/$defs/sha256"},
+        "adapter_sha256": {"$ref": "#/$defs/sha256"},
+        "rulepack_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

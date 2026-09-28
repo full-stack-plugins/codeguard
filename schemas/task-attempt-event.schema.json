@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:task-attempt-event:0.1.0",
+  "title": "CodeGuard append-only task attempt event",
+  "oneOf": [{"$ref":"#/$defs/start"},{"$ref":"#/$defs/finish"}],
+  "$defs": {
+    "sha256": {"type":"string","pattern":"^[0-9a-f]{64}$"},
+    "task_id": {"type":"string","pattern":"^CG-(?:B-)?[0-9a-f]{32}$"},
+    "attempt_id": {"type":"string","pattern":"^CG-A-[0-9a-f]{32}$"},
+    "owner": {"type":"string","pattern":"^[A-Za-z0-9_-]{1,120}$"},
+    "action_id": {"enum":["repair-source","restore-checker-environment","review-project-policy"]},
+    "start": {
+      "type":"object","additionalProperties":false,
+      "required":["schema_version","task_id","attempt_id","action_id","action_fingerprint","owner","token_sha256","generation","sequence","before_sha256","started_at"],
+      "properties": {
+        "schema_version":{"const":"0.1.0"},"task_id":{"$ref":"#/$defs/task_id"},"attempt_id":{"$ref":"#/$defs/attempt_id"},
+        "action_id":{"$ref":"#/$defs/action_id"},"action_fingerprint":{"$ref":"#/$defs/sha256"},
+        "owner":{"$ref":"#/$defs/owner"},"token_sha256":{"$ref":"#/$defs/sha256"},
+        "generation":{"type":"integer","minimum":1},"sequence":{"type":"integer","minimum":1},
+        "before_sha256":{"$ref":"#/$defs/sha256"},"started_at":{"type":"integer","minimum":1}
+      }
+    },
+    "finish": {
+      "type":"object","additionalProperties":false,
+      "required":["schema_version","task_id","attempt_id","owner","token_sha256","generation","outcome","note_code","after_sha256","observed_change","finished_at"],
+      "properties": {
+        "schema_version":{"const":"0.1.0"},"task_id":{"$ref":"#/$defs/task_id"},"attempt_id":{"$ref":"#/$defs/attempt_id"},
+        "owner":{"$ref":"#/$defs/owner"},"token_sha256":{"$ref":"#/$defs/sha256"},"generation":{"type":"integer","minimum":1},
+        "outcome":{"enum":["ready-to-verify","no-change","failed","blocked","abandoned"]},
+        "note_code":{"enum":["source_edit","tool_restored","no_change","execution_failed","blocked","lease_expired"]},
+        "after_sha256":{"$ref":"#/$defs/sha256"},"observed_change":{"type":"boolean"},
+        "finished_at":{"type":"integer","minimum":1}
+      }
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:config-inspection:0.2.0",
+  "title": "CodeGuard read-only local configuration inspection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "report_type", "operation", "request_id", "inspection_status", "command_status", "exit_code", "authority", "gate_effect", "quality_decision", "legacy_config", "tool_lock", "quality_policy", "whitelist", "effective_policy", "diagnostics", "warnings", "next_actions"],
+  "properties": {
+    "schema_version": {"const": "0.2.0"},
+    "report_type": {"const": "config_inspection"},
+    "operation": {"enum": ["validate", "explain"]},
+    "request_id": {"type": "string", "minLength": 1},
+    "inspection_status": {"const": "incomplete"},
+    "command_status": {"const": "incomplete"},
+    "exit_code": {"const": 3},
+    "authority": {"const": "unverified"},
+    "gate_effect": {"const": "none"},
+    "quality_decision": {"const": "not_evaluated"},
+    "legacy_config": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "extension_count", "exclusion_count", "custom_command_count", "gate_scope"],
+      "properties": {
+        "status": {"enum": ["missing", "invalid", "structurally_valid_untrusted"]},
+        "extension_count": {"type": "integer", "minimum": 0},
+        "exclusion_count": {"type": "integer", "minimum": 0},
+        "custom_command_count": {"type": "integer", "minimum": 0},
+        "gate_scope": {"type": ["string", "null"], "enum": ["delta", "repo", null]}
+      }
+    },
+    "tool_lock": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "tool_count"],
+      "properties": {
+        "status": {"enum": ["missing", "invalid", "structurally_valid_untrusted"]},
+        "tool_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "quality_policy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "required_check_count", "source_exclusion_count", "candidate_sha256", "tool_lock_reference"],
+      "properties": {
+        "status": {"enum": ["unbound", "missing", "invalid", "candidate_unverified"]},
+        "required_check_count": {"type": "integer", "minimum": 0},
+        "source_exclusion_count": {"type": "integer", "minimum": 0},
+        "candidate_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+        "tool_lock_reference": {"enum": ["not_checked", "unresolved", "mismatch", "matched_untrusted"]}
+      }
+    },
+    "whitelist": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "candidate_effect"],
+      "properties": {"status": {"const": "authority_unverified"}, "candidate_effect": {"const": "none"}}
+    },
+    "effective_policy": {"type": "null"},
+    "diagnostics": {"type": "array", "items": {"type": "string"}},
+    "warnings": {"type": "array", "items": {"type": "string"}},
+    "next_actions": {"type": "array", "items": {"type": "string"}}
+  }
+}

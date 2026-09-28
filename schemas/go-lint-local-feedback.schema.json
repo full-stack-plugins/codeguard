@@ -1,0 +1,559 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:go-lint-local-feedback:0.6.0",
+  "title": "Unverified local Go vet conversation feedback",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "language",
+    "checker_id",
+    "command_status",
+    "exit_code",
+    "delivery_decision",
+    "coverage_proven",
+    "authority",
+    "tool_approval",
+    "rulepack_approval",
+    "native_status",
+    "reason",
+    "native_tool_version",
+    "tool_sha256",
+    "manifest_sha256",
+    "go_sum_sha256",
+    "source_file_count",
+    "module_count",
+    "modules_completed",
+    "module_results",
+    "native_diagnostic_count",
+    "findings",
+    "native_recheck_argv",
+    "next_actions",
+    "workspace_binding",
+    "workspace_id",
+    "run_id",
+    "module_identities",
+    "backlog_status",
+    "backlog_sync"
+  ],
+  "properties": {
+    "schema_version": {
+      "enum": [
+        "0.4.0",
+        "0.5.0",
+        "0.6.0",
+        "0.7.0"
+      ]
+    },
+    "report_type": {
+      "const": "go_lint_local_feedback"
+    },
+    "operation": {
+      "const": "lint"
+    },
+    "language": {
+      "const": "go"
+    },
+    "checker_id": {
+      "const": "go.vet"
+    },
+    "command_status": {
+      "const": "incomplete"
+    },
+    "exit_code": {
+      "const": 3
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "tool_approval": {
+      "const": "unverified"
+    },
+    "rulepack_approval": {
+      "const": "unverified"
+    },
+    "native_status": {
+      "enum": [
+        "incomplete",
+        "findings_observed_unverified",
+        "clean_observed_unverified"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "root": {
+      "type": "string",
+      "minLength": 1
+    },
+    "native_tool_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "tool_sha256": {
+      "$ref": "#/$defs/nullable_sha256"
+    },
+    "manifest_sha256": {
+      "$ref": "#/$defs/nullable_sha256"
+    },
+    "go_sum_sha256": {
+      "$ref": "#/$defs/nullable_sha256"
+    },
+    "source_file_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "module_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "modules_completed": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "module_results": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/module_result"
+      }
+    },
+    "native_diagnostic_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    },
+    "native_recheck_argv": {
+      "const": [
+        "go",
+        "vet",
+        "-json",
+        "./..."
+      ]
+    },
+    "next_actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "workspace_binding": {
+      "enum": [
+        "bound",
+        "legacy_unbound",
+        "uninitialized",
+        "invalid"
+      ]
+    },
+    "workspace_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]+$"
+    },
+    "module_identities": {
+      "type": "object",
+      "maxProperties": 64,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "manifest_sha256",
+          "go_sum_sha256"
+        ],
+        "properties": {
+          "manifest_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "go_sum_sha256": {
+            "$ref": "#/$defs/nullable_sha256"
+          }
+        }
+      }
+    },
+    "backlog_status": {
+      "enum": [
+        "not_attempted",
+        "synced_partial",
+        "not_initialized",
+        "backlog_update_failed"
+      ]
+    },
+    "backlog_sync": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "new_findings",
+            "new_blockers",
+            "imported_reports",
+            "historical_findings",
+            "failed_reports"
+          ],
+          "properties": {
+            "new_findings": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "new_blockers": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "imported_reports": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "historical_findings": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "failed_reports": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        }
+      ]
+    },
+    "task_target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "path",
+        "source_sha256"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "pattern": "^CG-[0-9a-f]{32}$"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "task_input_stable": {
+      "type": "boolean"
+    },
+    "source_snapshot_sha256": {
+      "$ref": "#/$defs/nullable_sha256"
+    },
+    "task_scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "status",
+        "reason",
+        "module_root",
+        "source_sha256",
+        "source_snapshot_sha256",
+        "tool_sha256",
+        "manifest_sha256",
+        "go_sum_sha256",
+        "package_count",
+        "active_file_count",
+        "ignored_file_count",
+        "source_map_sha256",
+        "build_conditions",
+        "native_scope_argv"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "0.1.0"
+        },
+        "status": {
+          "enum": [
+            "incomplete",
+            "selected",
+            "excluded",
+            "not_selected"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$"
+        },
+        "module_root": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_sha256": {
+          "$ref": "#/$defs/nullable_sha256"
+        },
+        "source_snapshot_sha256": {
+          "$ref": "#/$defs/nullable_sha256"
+        },
+        "tool_sha256": {
+          "$ref": "#/$defs/nullable_sha256"
+        },
+        "manifest_sha256": {
+          "$ref": "#/$defs/nullable_sha256"
+        },
+        "go_sum_sha256": {
+          "$ref": "#/$defs/nullable_sha256"
+        },
+        "source_map_sha256": {
+          "$ref": "#/$defs/nullable_sha256"
+        },
+        "package_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "active_file_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ignored_file_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "build_conditions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "cgo_enabled",
+            "tags",
+            "platform"
+          ],
+          "properties": {
+            "cgo_enabled": {
+              "const": false
+            },
+            "tags": {
+              "const": "default"
+            },
+            "platform": {
+              "const": "tool_host_default"
+            }
+          }
+        },
+        "native_scope_argv": {
+          "const": [
+            "go",
+            "list",
+            "-json",
+            "./..."
+          ]
+        }
+      }
+    }
+  },
+  "$defs": {
+    "nullable_sha256": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "module_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "root",
+        "status",
+        "diagnostic_count"
+      ],
+      "properties": {
+        "root": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "incomplete",
+            "findings_observed_unverified",
+            "clean_observed_unverified"
+          ]
+        },
+        "diagnostic_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "finding_id",
+        "finding_fingerprint",
+        "source_sha256",
+        "module_root",
+        "rule_id",
+        "path",
+        "line",
+        "column",
+        "native_message_sha256",
+        "message_status"
+      ],
+      "properties": {
+        "finding_id": {
+          "type": "string",
+          "pattern": "^CG-[0-9a-f]{32}$"
+        },
+        "finding_fingerprint": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "module_root": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rule_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "column": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "native_message_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "message_status": {
+          "const": "native_text_private_untrusted"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "enum": [
+              "0.5.0",
+              "0.7.0"
+            ]
+          }
+        },
+        "required": [
+          "schema_version"
+        ]
+      },
+      "then": {
+        "required": [
+          "task_target",
+          "task_input_stable"
+        ]
+      },
+      "else": {
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "task_target"
+              ]
+            },
+            {
+              "required": [
+                "task_input_stable"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "enum": [
+              "0.6.0",
+              "0.7.0"
+            ]
+          }
+        },
+        "required": [
+          "schema_version"
+        ]
+      },
+      "then": {
+        "required": [
+          "source_snapshot_sha256"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "const": "0.7.0"
+          }
+        },
+        "required": [
+          "schema_version"
+        ]
+      },
+      "then": {
+        "required": [
+          "task_scope"
+        ]
+      },
+      "else": {
+        "not": {
+          "required": [
+            "task_scope"
+          ]
+        }
+      }
+    }
+  ]
+}

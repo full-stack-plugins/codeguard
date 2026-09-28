@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:capability-selection:0.2.0",
+  "title": "Codeguard filtered release capability query",
+  "type": "object",
+  "required": ["schema_version", "report_type", "release_version", "cells"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": "0.2.0"},
+    "report_type": {"const": "capability_selection"},
+    "release_version": {"type": "string", "minLength": 1},
+    "cells": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "required": ["language", "legacy_status", "platform", "category", "status", "reason", "verified_combinations"],
+        "additionalProperties": false,
+        "properties": {
+          "language": {"type": "string", "pattern": "^[a-z][a-z0-9]*$"},
+          "legacy_status": {"enum": ["stable", "planned"]},
+          "platform": {"enum": ["macos_arm64", "macos_x86_64", "linux_x86_64", "linux_aarch64", "windows_x86_64"]},
+          "category": {"enum": ["lint", "comments", "dependencies", "cve", "security", "build"]},
+          "status": {"enum": ["implemented", "gap", "not_applicable"]},
+          "reason": {"type": "string", "minLength": 1},
+          "evidence_ref": {"type": "string", "minLength": 1},
+          "tool_kind": {"enum": ["diagnostic", "formatter", "dependency_audit", "security_scan", "build"]},
+          "verified_combinations": {"type": "array", "items": {"type": "string", "minLength": 1}}
+        },
+        "allOf": [
+          {
+            "if": {"properties": {"status": {"enum": ["implemented", "not_applicable"]}}},
+            "then": {"required": ["evidence_ref"]}
+          },
+          {
+            "if": {"properties": {"status": {"const": "implemented"}}},
+            "then": {
+              "required": ["tool_kind"],
+              "properties": {"verified_combinations": {"minItems": 1}}
+            }
+          }
+        ]
+      }
+    }
+  }
+}

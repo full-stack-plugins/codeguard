@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:capability-inventory:0.2.0",
+  "title": "Codeguard language category platform capability inventory",
+  "type": "object",
+  "required": ["schema_version", "report_type", "release_version", "languages"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {"const": "0.2.0"},
+    "report_type": {"const": "capability_inventory"},
+    "release_version": {"type": "string", "minLength": 1},
+    "languages": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 57,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/language"}
+    }
+  },
+  "$defs": {
+    "cell": {
+      "type": "object",
+      "required": ["status", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "status": {"enum": ["implemented", "gap", "not_applicable"]},
+        "reason": {"type": "string", "minLength": 1},
+        "evidence_ref": {"type": "string", "minLength": 1},
+        "tool_kind": {"enum": ["diagnostic", "formatter", "dependency_audit", "security_scan", "build"]}
+      },
+      "if": {"properties": {"status": {"enum": ["implemented", "not_applicable"]}}},
+      "then": {"required": ["evidence_ref"]},
+      "allOf": [
+        {
+          "if": {"properties": {"status": {"const": "implemented"}}},
+          "then": {"required": ["tool_kind"]}
+        }
+      ]
+    },
+    "categories": {
+      "type": "object",
+      "required": ["lint", "comments", "dependencies", "cve", "security", "build"],
+      "additionalProperties": false,
+      "properties": {
+        "lint": {"$ref": "#/$defs/cell"},
+        "comments": {"$ref": "#/$defs/cell"},
+        "dependencies": {"$ref": "#/$defs/cell"},
+        "cve": {"$ref": "#/$defs/cell"},
+        "security": {"$ref": "#/$defs/cell"},
+        "build": {"$ref": "#/$defs/cell"}
+      }
+    },
+    "language": {
+      "type": "object",
+      "required": ["language", "legacy_status", "legacy_lint_declared", "legacy_formatter_declared", "platforms"],
+      "additionalProperties": false,
+      "properties": {
+        "language": {"type": "string", "pattern": "^[a-z][a-z0-9]*$"},
+        "legacy_status": {"enum": ["stable", "planned"]},
+        "legacy_lint_declared": {"type": "boolean"},
+        "legacy_formatter_declared": {"type": "boolean"},
+        "platforms": {
+          "type": "object",
+          "required": ["macos_arm64", "macos_x86_64", "linux_x86_64", "linux_aarch64", "windows_x86_64"],
+          "additionalProperties": false,
+          "properties": {
+            "macos_arm64": {"$ref": "#/$defs/categories"},
+            "macos_x86_64": {"$ref": "#/$defs/categories"},
+            "linux_x86_64": {"$ref": "#/$defs/categories"},
+            "linux_aarch64": {"$ref": "#/$defs/categories"},
+            "windows_x86_64": {"$ref": "#/$defs/categories"}
+          }
+        }
+      }
+    }
+  }
+}

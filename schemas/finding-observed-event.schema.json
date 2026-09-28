@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:finding-observed-event:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "event", "finding_id", "workspace_id", "run_id", "report_sha256", "parent_event_id", "state_after"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "event": {"const": "observed"},
+    "finding_id": {"type": "string", "pattern": "^CG-[0-9a-f]{32}$"},
+    "workspace_id": {"type": "string", "pattern": "^ws-[0-9a-f]{32}$"},
+    "run_id": {"type": "string", "pattern": "^[A-Za-z0-9_-]{1,120}$"},
+    "report_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "parent_event_id": {"type": "null"},
+    "state_after": {"const": "open"}
+  }
+}

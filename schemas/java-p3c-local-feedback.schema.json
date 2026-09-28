@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:java-p3c-local-feedback:0.2.0",
+  "title": "Untrusted local Maven P3C diagnostic feedback",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "report_type", "operation", "language", "request_id", "command_status", "exit_code", "local_status", "reason", "path", "source_sha256", "maven_tool_sha256", "java_runtime_sha256", "dependency_closure_sha256", "checker_identity", "rulepack_approval", "declared_rulesets", "native_plan_sha256", "coverage_proven", "findings", "delivery_decision", "warnings", "next_actions"],
+  "properties": {
+    "schema_version": {"const": "0.2.0"},
+    "report_type": {"const": "java_p3c_local_feedback"},
+    "operation": {"const": "lint"},
+    "language": {"const": "java"},
+    "request_id": {"type": "string", "minLength": 1},
+    "command_status": {"const": "incomplete"},
+    "exit_code": {"const": 3},
+    "local_status": {"enum": ["incomplete", "clean_scope_unproven", "findings_observed_untrusted"]},
+    "reason": {"type": "string", "minLength": 1},
+    "path": {"type": "string"},
+    "source_sha256": {"$ref": "#/$defs/optional_sha256"},
+    "maven_tool_sha256": {"$ref": "#/$defs/optional_sha256"},
+    "java_runtime_sha256": {"$ref": "#/$defs/optional_sha256"},
+    "dependency_closure_sha256": {"$ref": "#/$defs/optional_sha256"},
+    "checker_identity": {"const": "unverified"},
+    "rulepack_approval": {"const": "unverified"},
+    "declared_rulesets": {
+      "type": "array", "minItems": 10, "maxItems": 10, "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^rulesets/java/ali-[a-z]+\\.xml$"}
+    },
+    "native_plan_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "coverage_proven": {"const": false},
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["path", "line", "column", "rule_id", "ruleset", "native_priority", "rule_summary"],
+        "properties": {
+          "path": {"type": "string"},
+          "line": {"type": "integer", "minimum": 1},
+          "column": {"type": "integer", "minimum": 1},
+          "rule_id": {"type": "string", "minLength": 1},
+          "ruleset": {"type": "string", "minLength": 1},
+          "native_priority": {"type": "integer", "minimum": 1, "maximum": 5},
+          "rule_summary": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "delivery_decision": {"const": "not_evaluated"},
+    "warnings": {"type": "array", "items": {"type": "string"}},
+    "next_actions": {"type": "array", "items": {"type": "string"}}
+  },
+  "$defs": {
+    "optional_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}
+  }
+}

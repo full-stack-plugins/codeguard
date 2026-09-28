@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:ruff-rulepack-preview:1.0.0",
+  "title": "Unapproved CodeGuard Ruff rule mapping preview",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "version", "status", "scope", "origin_url", "license", "license_ref", "compatible_tool_versions", "mappings"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "id": {"const": "python.ruff.lint.preview"},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "status": {"const": "candidate_unapproved"},
+    "scope": {"const": "rule_mapping_only"},
+    "origin_url": {"const": "https://docs.astral.sh/ruff/rules/"},
+    "license": {"const": "MIT"},
+    "license_ref": {"const": "https://github.com/astral-sh/ruff/blob/main/LICENSE"},
+    "compatible_tool_versions": {"const": ["ruff 0.16.8"]},
+    "mappings": {
+      "type": "array", "minItems": 2, "maxItems": 2,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["native_rule_id", "codeguard_rule_id", "category", "source_ref"],
+        "properties": {
+          "native_rule_id": {"enum": ["F401", "E501"]},
+          "codeguard_rule_id": {"enum": ["python.ruff.F401", "python.ruff.E501"]},
+          "category": {"const": "lint"},
+          "source_ref": {"enum": ["https://docs.astral.sh/ruff/rules/unused-import/", "https://docs.astral.sh/ruff/rules/line-too-long/"]}
+        }
+      }
+    }
+  }
+}

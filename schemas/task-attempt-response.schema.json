@@ -1,0 +1,27 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"urn:codeguard:schema:task-attempt-response:0.1.0",
+  "title":"CodeGuard local task attempt response",
+  "type":"object","additionalProperties":false,
+  "required":["schema_version","report_type","operation","task_id","command_status","exit_code","reason","attempt_id","authority","delivery_decision"],
+  "properties": {
+    "schema_version":{"const":"0.1.0"},"report_type":{"const":"task_attempt"},
+    "operation":{"enum":["attempt_start","attempt_finish"]},
+    "task_id":{"type":"string","pattern":"^CG-(?:B-)?[0-9a-f]{32}$"},
+    "command_status":{"enum":["complete","incomplete"]},"exit_code":{"enum":[0,3]},
+    "reason":{"type":["string","null"]},
+    "attempt_id":{"type":["string","null"],"pattern":"^CG-A-[0-9a-f]{32}$"},
+    "action_id":{"enum":["repair-source","restore-checker-environment","review-project-policy"]},
+    "action_fingerprint":{"type":"string","pattern":"^[0-9a-f]{64}$"},
+    "before_sha256":{"type":"string","pattern":"^[0-9a-f]{64}$"},
+    "outcome":{"enum":["ready-to-verify","no-change","failed","blocked","abandoned"]},
+    "note_code":{"type":"string"},"after_sha256":{"type":"string","pattern":"^[0-9a-f]{64}$"},
+    "observed_change":{"type":"boolean"},
+    "authority":{"const":"local_unverified"},"delivery_decision":{"const":"not_evaluated"}
+  },
+  "oneOf":[
+    {"properties":{"command_status":{"const":"incomplete"},"exit_code":{"const":3},"reason":{"type":"string"},"attempt_id":{"const":null}},"not":{"anyOf":[{"required":["action_id"]},{"required":["outcome"]}]}},
+    {"properties":{"command_status":{"const":"complete"},"exit_code":{"const":0},"reason":{"const":null},"operation":{"const":"attempt_start"}},"required":["action_id","action_fingerprint","before_sha256"],"not":{"required":["outcome"]}},
+    {"properties":{"command_status":{"const":"complete"},"exit_code":{"const":0},"reason":{"const":null},"operation":{"const":"attempt_finish"}},"required":["outcome","note_code","after_sha256","observed_change"],"not":{"required":["action_id"]}}
+  ]
+}

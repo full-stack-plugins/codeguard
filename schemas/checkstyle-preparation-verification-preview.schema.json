@@ -1,0 +1,607 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:checkstyle-preparation-verification-preview:0.4.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "command_status",
+    "exit_code",
+    "task_id",
+    "kind",
+    "observation",
+    "event_persisted",
+    "reason",
+    "native_scan",
+    "authority",
+    "delivery_decision",
+    "execution_budget",
+    "next_actions"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.4.0"
+    },
+    "execution_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timeout_ms",
+        "source",
+        "enforcement"
+      ],
+      "properties": {
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 86400000
+        },
+        "source": {
+          "enum": [
+            "cli",
+            "registered_environment",
+            "project_default",
+            "builtin_default"
+          ]
+        },
+        "enforcement": {
+          "const": "native_execution_only"
+        }
+      }
+    },
+    "report_type": {
+      "const": "task_verification_preview"
+    },
+    "operation": {
+      "const": "task_verify"
+    },
+    "command_status": {
+      "const": "incomplete"
+    },
+    "exit_code": {
+      "const": 3
+    },
+    "task_id": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^CG-(B-)?[0-9a-f]{32}$"
+        }
+      ]
+    },
+    "kind": {
+      "enum": [
+        "blocker",
+        null
+      ]
+    },
+    "observation": {
+      "enum": [
+        "incomplete",
+        "still_blocked",
+        "environment_restored_unverified_policy"
+      ]
+    },
+    "event_persisted": {
+      "type": "boolean"
+    },
+    "reason": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        }
+      ]
+    },
+    "native_scan": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema_version",
+            "workspace_binding",
+            "workspace_id",
+            "checker_id",
+            "authority",
+            "coverage_proven",
+            "delivery_decision",
+            "run_id",
+            "report_type",
+            "local_status",
+            "reason",
+            "scan",
+            "target",
+            "task_input_stable"
+          ],
+          "properties": {
+            "schema_version": {
+              "const": "0.1.0"
+            },
+            "workspace_binding": {
+              "const": "bound"
+            },
+            "workspace_id": {
+              "type": "string",
+              "pattern": "^ws-[0-9a-f]{32}$"
+            },
+            "checker_id": {
+              "const": "java.checkstyle.preparation"
+            },
+            "authority": {
+              "const": "local_unverified"
+            },
+            "coverage_proven": {
+              "const": false
+            },
+            "delivery_decision": {
+              "const": "not_evaluated"
+            },
+            "run_id": {
+              "type": "string",
+              "pattern": "^checkstyle-preparation-verify-[0-9]+-[0-9]+$"
+            },
+            "report_type": {
+              "const": "checkstyle_preparation_recheck"
+            },
+            "local_status": {
+              "enum": [
+                "observed",
+                "incomplete"
+              ]
+            },
+            "reason": {
+              "type": "string",
+              "pattern": "^[a-z_]{1,80}$"
+            },
+            "scan": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "schema_version",
+                    "report_type",
+                    "workspace_binding",
+                    "workspace_id",
+                    "run_id",
+                    "authority",
+                    "coverage_proven",
+                    "delivery_decision",
+                    "checker_id",
+                    "source_path",
+                    "inputs",
+                    "findings"
+                  ],
+                  "properties": {
+                    "schema_version": {
+                      "const": "0.1.0"
+                    },
+                    "report_type": {
+                      "const": "java_checkstyle_workbench_observation"
+                    },
+                    "workspace_binding": {
+                      "const": "bound"
+                    },
+                    "workspace_id": {
+                      "type": "string",
+                      "pattern": "^ws-[0-9a-f]{32}$"
+                    },
+                    "run_id": {
+                      "type": "string",
+                      "pattern": "^checkstyle-[A-Za-z0-9-]{1,100}$"
+                    },
+                    "authority": {
+                      "const": "local_unverified"
+                    },
+                    "coverage_proven": {
+                      "const": false
+                    },
+                    "delivery_decision": {
+                      "const": "not_evaluated"
+                    },
+                    "checker_id": {
+                      "const": "java.checkstyle"
+                    },
+                    "source_path": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "inputs": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "source",
+                        "config",
+                        "java",
+                        "jar"
+                      ],
+                      "properties": {
+                        "source": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "path",
+                            "sha256"
+                          ],
+                          "properties": {
+                            "path": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            }
+                          }
+                        },
+                        "config": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "path",
+                            "sha256"
+                          ],
+                          "properties": {
+                            "path": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            }
+                          }
+                        },
+                        "java": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "path",
+                            "sha256"
+                          ],
+                          "properties": {
+                            "path": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            }
+                          }
+                        },
+                        "jar": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "path",
+                            "sha256"
+                          ],
+                          "properties": {
+                            "path": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "sha256": {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "findings": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "finding_id",
+                          "finding_fingerprint",
+                          "source_sha256",
+                          "path",
+                          "rule_id",
+                          "line",
+                          "native"
+                        ],
+                        "properties": {
+                          "finding_id": {
+                            "type": "string",
+                            "pattern": "^CG-[0-9a-f]{32}$"
+                          },
+                          "finding_fingerprint": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "source_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "path": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "rule_id": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "line": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 4294967295
+                          },
+                          "native": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "path",
+                              "line",
+                              "column",
+                              "rule_id",
+                              "severity",
+                              "checker_class",
+                              "rule_summary",
+                              "rule_reference",
+                              "repair_steps"
+                            ],
+                            "properties": {
+                              "path": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "line": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 4294967295
+                              },
+                              "column": {
+                                "anyOf": [
+                                  {
+                                    "type": "null"
+                                  },
+                                  {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 4294967295
+                                  }
+                                ]
+                              },
+                              "rule_id": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "severity": {
+                                "enum": [
+                                  "error",
+                                  "warning",
+                                  "info"
+                                ]
+                              },
+                              "checker_class": {
+                                "enum": [
+                                  "com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocTypeCheck",
+                                  "com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocMethodCheck",
+                                  "com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocTypeCheck",
+                                  "com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck",
+                                  "com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck"
+                                ]
+                              },
+                              "rule_summary": {
+                                "type": "string",
+                                "minLength": 1
+                              },
+                              "rule_reference": {
+                                "type": "string",
+                                "pattern": "^https://checkstyle\\.org/checks/javadoc/[a-z]+\\.html$"
+                              },
+                              "repair_steps": {
+                                "type": "array",
+                                "minItems": 1,
+                                "items": {
+                                  "type": "string",
+                                  "minLength": 1
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "target": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "task_id",
+                "path"
+              ],
+              "properties": {
+                "task_id": {
+                  "type": "string",
+                  "pattern": "^CG-B-[0-9a-f]{32}$"
+                },
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "task_input_stable": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "boolean"
+                }
+              ]
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "local_status": {
+                    "const": "incomplete"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "scan": {
+                    "type": "null"
+                  },
+                  "task_input_stable": {
+                    "type": "null"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "scan": {
+                    "type": "object"
+                  },
+                  "task_input_stable": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "next_actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "$defs": {
+    "go_nullable_sha256": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "go_module_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "root",
+        "status",
+        "diagnostic_count"
+      ],
+      "properties": {
+        "root": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "incomplete",
+            "findings_observed_unverified",
+            "clean_observed_unverified"
+          ]
+        },
+        "diagnostic_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "go_finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "finding_id",
+        "finding_fingerprint",
+        "source_sha256",
+        "module_root",
+        "rule_id",
+        "path",
+        "line",
+        "column",
+        "native_message_sha256",
+        "message_status"
+      ],
+      "properties": {
+        "finding_id": {
+          "type": "string",
+          "pattern": "^CG-[0-9a-f]{32}$"
+        },
+        "finding_fingerprint": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "module_root": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rule_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "column": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "native_message_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "message_status": {
+          "const": "native_text_private_untrusted"
+        }
+      }
+    }
+  }
+}
