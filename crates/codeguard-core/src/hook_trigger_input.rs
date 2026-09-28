@@ -1,7 +1,9 @@
 use crate::{HookEvent, HookWriteOutcome};
+use serde::Deserialize;
 
 /// 宿主事件的未核验输入；规划器不能把它当成代码或 Git 事实。
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
+#[serde(deny_unknown_fields)]
 pub struct HookTriggerInput {
     /// 事件阶段。
     pub event: HookEvent,

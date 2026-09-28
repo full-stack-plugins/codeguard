@@ -93,6 +93,7 @@ pub mod false_positive_decision;
 pub mod git_index_safety;
 #[cfg(unix)]
 pub mod git_index_safety_command;
+pub mod hook_plan_command;
 #[cfg(unix)]
 pub mod go_lint_command;
 pub mod init_command;

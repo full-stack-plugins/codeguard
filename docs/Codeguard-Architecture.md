@@ -311,7 +311,7 @@ Allowlist dispositions bind rule, source target, grammar identity and reason; re
 
 ### 8.4 Host events and check tiers — target
 
-Host hooks pass events, workspace identity and known targets. Rust core selects the check tier; the formal CheckPlan then chooses native checkers and resource budgets. An agent cannot change delivery obligations through a prompt, an old soft cache entry or a project-local `skipGate`. This remains a target design: the [pure domain router](../crates/codeguard-core/src/hook_trigger_planner.rs) has unit coverage, but no plugin, CLI or real Git/CI wiring and no verified automatic host trigger yet.
+Host hooks pass events, workspace identity and known targets. Rust core selects the check tier; the formal CheckPlan then chooses native checkers and resource budgets. An agent cannot change delivery obligations through a prompt, an old soft cache entry or a project-local `skipGate`. This remains a target design: the [pure domain router](../crates/codeguard-core/src/hook_trigger_planner.rs) and read-only `codeguard hook plan` CLI have target tests. The CLI returns only a candidate tier with exit 3; it does not execute a checker or connect the plugin, real Git/CI or any verified automatic host trigger.
 
 ```mermaid
 flowchart LR

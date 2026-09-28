@@ -415,6 +415,8 @@ gate 与 check 使用同一个义务/适配器/报告内核，差异是权威内
 
 ## 8. 宿主入口与兼容命令
 
+当前已有局部只读入口 `codeguard hook plan [--format=json]`，从 stdin 读取最多 64 KiB 的 [`hook_trigger_request` 1.0.0](../schemas/hook-trigger-request.schema.json)，返回 [`hook_trigger_plan` 1.0.0](../schemas/hook-trigger-plan.schema.json) 与退出码 3。其价值是让宿主事件先经过统一 Rust 档位路由；`execution=not_run`、`delivery_decision=not_evaluated` 固定，尚未调用检查器、取得 Git 快照或阻断任一宿主。它不是下述完整宿主接入的验收证明，见[局部验收](../tests/acceptance/hook-plan-cli-candidate.md)。
+
 ### C34 — mcp serve
 
 - **语法与价值**：`codeguard mcp serve`；初版通过stdio提供结构化工具入口，供支持MCP的宿主复用统一内核。

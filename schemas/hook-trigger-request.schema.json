@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:hook-trigger-request:1.0.0",
+  "title": "Untrusted host event for read-only CodeGuard routing",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "report_type", "input"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "report_type": {"const": "hook_trigger_request"},
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["event", "changed_paths", "task_id", "write_outcome", "host_claims_blocking"],
+      "properties": {
+        "event": {"enum": ["session_start", "prompt_submitted", "file_changed", "repair_ready", "pre_commit", "pre_push", "ci", "stop"]},
+        "changed_paths": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "task_id": {"type": ["string", "null"]},
+        "write_outcome": {"enum": ["confirmed", "failed", "unknown"]},
+        "host_claims_blocking": {"type": "boolean"}
+      }
+    }
+  }
+}

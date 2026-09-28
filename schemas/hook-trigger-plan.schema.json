@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:hook-trigger-plan:1.0.0",
+  "title": "Read-only CodeGuard event routing plan, without check or gate evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "report_type", "planning_status", "execution", "delivery_decision", "plan"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "report_type": {"const": "hook_trigger_plan"},
+    "planning_status": {"const": "candidate"},
+    "execution": {"const": "not_run"},
+    "delivery_decision": {"const": "not_evaluated"},
+    "plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "target_paths", "task_id", "requires_git_snapshot", "soft_result_reuse_candidate", "host_blocking_claimed", "may_claim_delivery"],
+      "properties": {
+        "action": {"enum": ["no_check", "discover_project", "show_intent_guidance", "fast_file_check", "resolve_changed_scope", "verify_task", "commit_gate", "push_gate", "full_project_check", "show_summary"]},
+        "target_paths": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "task_id": {"type": ["string", "null"]},
+        "requires_git_snapshot": {"type": "boolean"},
+        "soft_result_reuse_candidate": {"type": "boolean"},
+        "host_blocking_claimed": {"type": "boolean"},
+        "may_claim_delivery": {"const": false}
+      }
+    }
+  }
+}
