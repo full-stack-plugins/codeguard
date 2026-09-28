@@ -1,5 +1,5 @@
 use codeguard_adapters::EslintDiagnostic;
-use codeguard_cli::eslint_finding_identity::project_eslint_findings;
+use codeguard_adapters::project_eslint_findings;
 fn finding(line: u32, column: u32) -> EslintDiagnostic {
     EslintDiagnostic {
         path: "/fixture/app.js".into(),

@@ -1,5 +1,5 @@
 //! 原生 ESLint 发现到脱敏任务输入的稳定投影；不赋予策略或报告来源权威。
-use codeguard_adapters::EslintDiagnostic;
+use crate::EslintDiagnostic;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::{collections::BTreeMap, path::Path};
@@ -103,7 +103,7 @@ pub fn project_eslint_findings(
 }
 
 /// 复核脱敏任务输入的稳定投影；消息摘要只验证形状，不自证原生来源。
-pub(crate) fn validate_records(
+pub fn validate_records(
     relative: &str,
     absolute: &str,
     source: &[u8],

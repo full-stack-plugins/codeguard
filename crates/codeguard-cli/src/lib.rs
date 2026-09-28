@@ -14,7 +14,6 @@ mod eslint_directory;
 mod eslint_discovery;
 #[cfg(unix)]
 mod eslint_effective_settings;
-pub mod eslint_finding_identity;
 #[cfg(unix)]
 mod eslint_lint_arguments;
 #[cfg(unix)]
@@ -71,7 +70,6 @@ pub use signed_approval_verifier::verify_signed_approval;
 pub use signed_prior_approval_input::SignedPriorApprovalInput;
 pub use verified_approval_snapshot::VerifiedApprovalSnapshot;
 pub mod cargo_audit_command;
-pub mod cargo_build_finding_identity;
 pub mod cargo_build_repair_brief;
 #[cfg(unix)]
 pub mod check_budget;
@@ -95,7 +93,6 @@ pub mod false_positive_decision;
 pub mod git_index_safety;
 #[cfg(unix)]
 pub mod git_index_safety_command;
-pub mod go_finding_identity;
 #[cfg(unix)]
 pub mod go_lint_command;
 pub mod init_command;
@@ -154,7 +151,6 @@ pub mod rust_comments_command;
 pub(crate) mod rust_cve_task_recheck;
 #[cfg(unix)]
 pub mod rust_lint_scan;
-pub mod rustdoc_finding_identity;
 pub mod rustdoc_repair_brief;
 #[cfg(unix)]
 pub(crate) mod rustdoc_task_recheck;

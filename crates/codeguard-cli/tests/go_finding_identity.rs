@@ -1,5 +1,5 @@
 use codeguard_adapters::GoVetFinding;
-use codeguard_cli::go_finding_identity::go_finding_record;
+use codeguard_adapters::go_finding_record;
 
 fn finding(line: u32) -> GoVetFinding {
     GoVetFinding {

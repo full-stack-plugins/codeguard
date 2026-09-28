@@ -3,7 +3,7 @@ use super::{
     BlockerInput, FindingInput, MAX_REPORT_BYTES, ReportInput, read_bounded_file, safe_reason,
     safe_relative_path, safe_run_id, valid_sha256,
 };
-use crate::cargo_build_finding_identity::cargo_build_finding_record;
+use codeguard_adapters::cargo_build_finding_record;
 use crate::cargo_build_repair_brief::cargo_build_repair_brief;
 use codeguard_adapters::CargoBuildDiagnostic;
 use codeguard_runtime::SourceSnapshot;

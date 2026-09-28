@@ -5,7 +5,7 @@ use crate::check_budget::{
 };
 use crate::discovery::discover;
 use crate::doctor_scratch::DoctorScratch;
-use crate::rustdoc_finding_identity::rustdoc_finding_record;
+use codeguard_adapters::rustdoc_finding_record;
 use crate::rustdoc_repair_brief::rustdoc_repair_brief;
 use crate::work_sync::{save_local_report, sync_local_workspace};
 use crate::workspace_refresh::read_workspace_baseline;

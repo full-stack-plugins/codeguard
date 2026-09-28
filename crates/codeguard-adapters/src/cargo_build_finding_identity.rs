@@ -1,6 +1,6 @@
 //! 编译发现身份绑定原生源码范围；不靠诊断顺序给其它问题续用身份。
 
-use codeguard_adapters::CargoBuildDiagnostic;
+use crate::CargoBuildDiagnostic;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 
