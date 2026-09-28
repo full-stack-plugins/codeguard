@@ -1011,7 +1011,7 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 - [ ] 14.2 Rust WASM 加载器。责任：runtime。规格：SP04,SP05。依赖：14.1。验收：支持固定资产离线加载；不依赖 Node 解析器、CodeGraph 或用户安装 tree-sitter-cli；通过有效/损坏/错 ABI 样本及 MSRV。进行中：可选 `wasm-precheck` 特性已通过 Java/TypeScript Rust `WasmStore` 加载与反例测试；本机无 Rust 1.85，MSRV 实编及接入正式运行路径尚缺。
 - [ ] 14.3 进程资源隔离。责任：runtime。规格：SP05。依赖：14.2。验收：验证超时、内存、输出、取消与崩溃；损坏 grammar 不阻塞其他模块、不遗留进程。
 - [ ] 14.4 语言覆盖与源码映射。责任：adapters。规格：SP06。依赖：14.2。验收：识别 ERROR/MISSING，合并恢复节点；测试 Unicode、换行、嵌入语言、新语法和未知版本，不将不支持当源码违规。进行中：Rust 已提取两类原始节点，adapters 核对 UTF-8/CRLF 字节锚点并转换 Unicode 标量列；结构祖先归组保留并列错误，预算截断保持不完整；[局部证据](../../../tests/acceptance/syntax-recovery-candidate.md)。级联归并语料、版本/嵌入语言及原生对照仍缺。
-- [ ] 14.5 原生工具准备探测。责任：adapters。规格：SP01,SP03。依赖：现有配置发现。验收：识别项目本地工具、wrapper、版本和无效配置；PATH 缺失不等于未安装，不对坏配置重复建议安装。
+- [ ] 14.5 原生工具准备探测。责任：adapters。规格：SP01,SP03。依赖：现有配置发现。验收：识别项目本地工具、wrapper、版本和无效配置；PATH 缺失不等于未安装，不对坏配置重复建议安装。进行中：ESLint 本地包/入口及 Maven Wrapper 脚本/发行配置已有只读候选分类和反例测试；[局部证据](../../../tests/acceptance/native-tool-readiness-candidates.md)。文件观察、显式工具、原生版本探针、CLI 调度及更多构建器尚缺，不勾选。
 - [ ] 14.6 逐模块原生优先调度。责任：CLI/core。规格：SP01。依赖：14.4,14.5。验收：原生可用先执行；原生违规不得被 WASM 洗白；多根分别选择并保留运行失败与兄弟结果。
 - [ ] 14.7 初检协议与 schema。责任：core/CLI。规格：SP02,SP11。依赖：14.4。验收：固定版本和状态枚举、输入/资产身份、范围及缺口；空文件集、部分解析和未知版本不能 clean；未知 major 拒绝。
 - [ ] 14.8 安装建议与必须确认策略。责任：core。规格：SP03。依赖：14.6,14.7。验收：可选原生缺失且完整 clean 仅推荐；疑似或已有必需义务要求恢复原生确认；无适配器给具体决策。

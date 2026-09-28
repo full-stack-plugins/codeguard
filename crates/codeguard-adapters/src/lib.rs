@@ -27,6 +27,9 @@ mod checkstyle_parsed;
 mod checkstyle_result;
 mod checkstyle_rule_binding;
 mod eslint_command;
+mod eslint_config_state;
+mod eslint_local_candidate;
+mod eslint_local_readiness;
 mod npm_audit_command;
 mod npm_locked_node;
 mod rustdoc_finding;
@@ -41,6 +44,9 @@ mod npm_audit_observation;
 mod source_map;
 mod source_mapped_recovery;
 mod strict_json;
+pub use eslint_config_state::EslintConfigState;
+pub use eslint_local_candidate::EslintLocalCandidate;
+pub use eslint_local_readiness::inspect_eslint_local_candidate;
 pub use npm_audit_component::NpmAuditComponent;
 pub use npm_audit_json::parse_npm_audit_json;
 pub use npm_audit_observation::NpmAuditObservation;
@@ -69,6 +75,8 @@ mod maven_dependency_pom;
 mod maven_dependency_tree;
 mod maven_javadoc_output;
 mod maven_module_model;
+mod maven_wrapper_candidate;
+mod maven_wrapper_readiness;
 mod owasp_dependency_check;
 mod owasp_maven_attribution;
 mod owasp_maven_pom;
@@ -126,6 +134,8 @@ pub use maven_javadoc_output::{
     MavenJavadocDiagnostic, MavenJavadocParseState, MavenJavadocParsed, parse_maven_javadoc_output,
 };
 pub use maven_module_model::MavenModuleModel;
+pub use maven_wrapper_candidate::MavenWrapperCandidate;
+pub use maven_wrapper_readiness::inspect_maven_wrapper_candidate;
 pub use owasp_dependency_check::{
     OwaspAdvisoryObservation, OwaspDependencyCheckReport, parse_owasp_dependency_check_json,
 };
