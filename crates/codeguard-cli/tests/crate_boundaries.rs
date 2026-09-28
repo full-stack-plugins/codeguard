@@ -19,6 +19,7 @@ fn allowed(package: &str, dependency: &str, kind: &str) -> bool {
                             | "tokio-util"
                             | "futures-util"
                             | "idna_adapter"
+                            | "tree-sitter"
                     ))
         }
         "codeguard-adapters" => {
@@ -140,6 +141,10 @@ fn forbidden_edges_stay_forbidden_under_alias_build_and_target_variants() {
         ("codeguard-adapters", "codeguard-runtime", "build"),
         ("codeguard-adapters", "codeguard-runtime", "dev"),
         ("codeguard-adapters", "codeguard-runtime", "normal"),
+        ("codeguard-core", "tree-sitter", "normal"),
+        ("codeguard-adapters", "tree-sitter", "normal"),
+        ("codeguard-cli", "tree-sitter", "normal"),
+        ("codeguard-runtime", "tree-sitter", "dev"),
         ("codeguard-cli", "ring", "normal"),
         ("codeguard-cli", "ring", "build"),
         ("codeguard-core", "ring", "normal"),

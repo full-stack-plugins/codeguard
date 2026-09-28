@@ -154,7 +154,7 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
             || asset.license_sha256 != license_sha
             || asset.abi_version != 14
             || asset.codegraph_runtime != "web-tree-sitter 0.25.3"
-            || asset.codeguard_runtime_validation != "pending"
+            || asset.codeguard_runtime_validation != "rust_loader_smoke_passed"
             || !asset.language_versions.is_empty()
             || asset.known_limitations.is_empty()
             || asset.known_limitations.iter().any(String::is_empty)

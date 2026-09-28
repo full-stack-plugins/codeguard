@@ -1007,8 +1007,8 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 
 状态：全部待实施。统一规格 [syntax-precheck](specs/syntax-precheck/spec.md)。依赖已有 CLI/原生调度/工作台切片，不等待整个 S13；本阶段验收进入 S12、S13。各任务须先失败样本后实现与回归；不改写原生规则。责任为模块维护职责，非已分配人员。
 
-- [ ] 14.1 资产清单与来源。责任：adapters / 发布。规格：SP04。依赖：无。验收：固定 CodeGraph 来源提交、grammar 版本、许可证、SHA-256、ABI、语言/方言；缺来源、错散列和不兼容样本拒绝加载。进行中：已从固定 CodeGraph 提交复制 Java/TypeScript WASM 与 MIT 许可证，清单和 Rust 校验拒绝来源/字节/声明 ABI 漂移；[局部证据](../../../tests/acceptance/grammar-asset-candidates.md)。Rust 实际加载兼容、支持版本/方言、语料及可发行验收仍缺，不勾选。
-- [ ] 14.2 Rust WASM 加载器。责任：runtime。规格：SP04,SP05。依赖：14.1。验收：支持固定资产离线加载；不依赖 Node 解析器、CodeGraph 或用户安装 tree-sitter-cli；通过有效/损坏/错 ABI 样本及 MSRV。
+- [ ] 14.1 资产清单与来源。责任：adapters / 发布。规格：SP04。依赖：无。验收：固定 CodeGraph 来源提交、grammar 版本、许可证、SHA-256、ABI、语言/方言；缺来源、错散列和不兼容样本拒绝加载。进行中：已从固定 CodeGraph 提交复制 Java/TypeScript WASM 与 MIT 许可证，清单和 Rust 校验拒绝来源/字节/声明 ABI 漂移；两份资产已由 Rust 离线加载并实测 ABI；[局部证据](../../../tests/acceptance/grammar-asset-candidates.md)。支持版本/方言、语料及可发行验收仍缺，不勾选。
+- [ ] 14.2 Rust WASM 加载器。责任：runtime。规格：SP04,SP05。依赖：14.1。验收：支持固定资产离线加载；不依赖 Node 解析器、CodeGraph 或用户安装 tree-sitter-cli；通过有效/损坏/错 ABI 样本及 MSRV。进行中：可选 `wasm-precheck` 特性已通过 Java/TypeScript Rust `WasmStore` 加载与反例测试；本机无 Rust 1.85，MSRV 实编及接入正式运行路径尚缺。
 - [ ] 14.3 进程资源隔离。责任：runtime。规格：SP05。依赖：14.2。验收：验证超时、内存、输出、取消与崩溃；损坏 grammar 不阻塞其他模块、不遗留进程。
 - [ ] 14.4 语言覆盖与源码映射。责任：adapters。规格：SP06。依赖：14.2。验收：识别 ERROR/MISSING，合并恢复节点；测试 Unicode、换行、嵌入语言、新语法和未知版本，不将不支持当源码违规。
 - [ ] 14.5 原生工具准备探测。责任：adapters。规格：SP01,SP03。依赖：现有配置发现。验收：识别项目本地工具、wrapper、版本和无效配置；PATH 缺失不等于未安装，不对坏配置重复建议安装。

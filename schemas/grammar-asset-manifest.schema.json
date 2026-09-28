@@ -39,7 +39,7 @@
         "license_sha256": {"$ref": "#/$defs/sha256"},
         "abi_version": {"const": 14},
         "codegraph_runtime": {"const": "web-tree-sitter 0.25.3"},
-        "codeguard_runtime_validation": {"const": "pending"},
+        "codeguard_runtime_validation": {"const": "rust_loader_smoke_passed"},
         "language_versions": {"type": "array", "maxItems": 0},
         "known_limitations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
         "release_status": {"const": "candidate_unvalidated"}

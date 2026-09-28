@@ -20,7 +20,10 @@ fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support(
         };
         verify_grammar_asset(asset, wasm, license).expect("pinned candidate bytes");
         assert_eq!(asset.release_status, "candidate_unvalidated");
-        assert_eq!(asset.codeguard_runtime_validation, "pending");
+        assert_eq!(
+            asset.codeguard_runtime_validation,
+            "rust_loader_smoke_passed"
+        );
         assert!(asset.language_versions.is_empty());
     }
 }

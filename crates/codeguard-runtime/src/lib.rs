@@ -5,6 +5,11 @@ use std::io;
 use std::io::Read;
 use std::path::Path;
 
+#[cfg(feature = "wasm-precheck")]
+mod wasm_grammar;
+#[cfg(feature = "wasm-precheck")]
+pub use wasm_grammar::WasmGrammar;
+
 #[cfg(unix)]
 mod installed_artifact;
 #[cfg(unix)]
