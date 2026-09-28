@@ -568,7 +568,8 @@
   - 新增 `lint python [path] --file REL_PATH` 的有界逐文件 Ruff 执行切片；报告明确 `scan_scope=selected_files`，未知目标未完成，局部结果不导入工作台为完整扫描。真实宿主事件到该 CLI 的调用、局部任务同步、软结果身份缓存及其它语言快检仍未完成，见[局部验收](../../../tests/acceptance/python-edit-scope-candidate.md)。
   - 新增 `hook execute` 消费同一宿主事件并调用 core 路由：启动只读发现，确认成功的纯 Python 编辑执行局部 Ruff；失败/未知写入、混合语言和交付动作不会误调用或声称通过。事件报告固定 `not_evaluated`，见[局部验收](../../../tests/acceptance/hook-execute-python-candidate.md)。插件实际 Hook、任务复检及 Git/CI 门禁仍未接线，11.17 保持未完成。
   - 后续增量：显式 Git 工具下的 `pre_commit` 已按真实暂存 index（含 `GIT_INDEX_FILE`）执行有界只读路径安全观察，报告升级为 `hook_execution_feedback` 0.2，历史 0.1 保留；仍固定 `source_check=not_run` 与交付未评估。真实仓库测试覆盖暂存/未暂存、替代 index 和缺工具，见同一[局部验收](../../../tests/acceptance/hook-execute-python-candidate.md)。这不是完整质量门禁，宿主接线和 Git/CI 全义务仍缺，11.17 不勾选。
-  - Stop 增量：从现有本地事实生成有界只读下一步，最多预检 64 个 finding、64 份报告与 8 MiB 报告字节；超限明确未运行。反馈升为 0.3，保留 0.1/0.2 历史 schema；没有任务仍要求新鲜完整检查。目标测试先红后绿，见同一[局部验收](../../../tests/acceptance/hook-execute-python-candidate.md)。提示事件缺可信意图上下文，修复复检、插件宿主自动接线和交付门禁尚缺，11.17 不勾选。
+  - Stop 增量：从现有本地事实生成有界只读下一步，最多预检 64 个 finding、64 份报告与 8 MiB 报告字节；超限明确未运行。反馈当时升为 0.3，保留 0.1/0.2 历史 schema；没有任务仍要求新鲜完整检查。目标测试先红后绿，见同一[局部验收](../../../tests/acceptance/hook-execute-python-candidate.md)。提示事件缺可信意图上下文，插件宿主自动接线和交付门禁尚缺，11.17 不勾选。
+  - 修复复检增量：`repair_ready` 先核对稳定任务事实，再在有界子进程中复用 `task verify` 原工具链，反馈 0.4 仅投影脱敏观察及事件持久化状态，历史 0.3 保留。真实 Ruff F401 修复后诊断消失仍返回 `candidate_absent_unverified_policy`，任务保持 open；见同一[局部验收](../../../tests/acceptance/hook-execute-python-candidate.md)。其它原生检查器的宿主实测、提示事件、插件 Hook 接线和完整 Git/CI 门禁仍缺，11.17 不勾选。
 
 ## 12. S12 质量评测与验收
 

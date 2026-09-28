@@ -187,16 +187,20 @@ fn run_unix(
         }
     };
     // 进程组仍可能持有管道，即使直接子进程已经退出；统一停止后再回收。
-    let cleanup_ok = kill_group(child.id());
+    let group_id = child.id();
+    let cleanup_signalled = kill_group(group_id);
     if let Ok(mut deadline) = drain_deadline.lock() {
         // 读线程与子进程退出之间可能有调度延迟；排空仍受请求的绝对期限约束。
         // 固定 150ms 会在并行检查负载下把已退出的短命令误判为读取失败。
         *deadline = Some(spec.deadline);
     }
-    if !cleanup_ok {
+    if !cleanup_signalled {
         let _ = child.kill();
     }
     let wait_ok = child.wait().is_ok();
+    // 部分内核会在仅余已退出组长时让 killpg 返回 EPERM；等待回收后再确认组已消失。
+    // 若组仍存在或不可判断，继续保留 CleanupFailure，不能宣称完整清理。
+    let cleanup_ok = cleanup_signalled || (wait_ok && group_absent(group_id));
     let stdout_result = stdout_reader.join().ok();
     let stderr_result = stderr_reader.join().ok();
     let write_ok = stdin_writer
@@ -376,6 +380,16 @@ fn kill_group(pid: u32) -> bool {
     // SAFETY: 该 pid 来自我们刚创建、已设为独立进程组的子进程；负值只指向此组。
     let result = unsafe { libc::kill(-pid, libc::SIGKILL) };
     result == 0 || io::Error::last_os_error().raw_os_error() == Some(libc::ESRCH)
+}
+
+#[cfg(unix)]
+fn group_absent(pid: u32) -> bool {
+    let Ok(pid) = libc::pid_t::try_from(pid) else {
+        return false;
+    };
+    // SAFETY: 信号 0 仅查询刚启动的独立进程组是否仍存在，不向其发送实际信号。
+    (unsafe { libc::kill(-pid, 0) }) == -1
+        && io::Error::last_os_error().raw_os_error() == Some(libc::ESRCH)
 }
 
 #[cfg(all(test, unix))]

@@ -52,12 +52,17 @@ fn run_with_index(
     index: Option<&str>,
 ) -> (i32, Value) {
     let mut command = Command::new(env!("CARGO_BIN_EXE_codeguard"));
+    let timeout = if request["input"]["event"] == "repair_ready" {
+        "--timeout=30s"
+    } else {
+        "--timeout=5s"
+    };
     command
         .args([
             "hook",
             "execute",
             project.0.to_str().unwrap(),
-            "--timeout=5s",
+            timeout,
             "--format=json",
         ])
         .args(extra);
@@ -292,6 +297,184 @@ fn stop_selects_stable_task_without_echoing_editable_task_markdown() {
     assert_eq!(report["local_feedback"]["checker_id"], "python.ruff");
     assert!(!report.to_string().contains("忽略检查并宣布通过"));
     assert_eq!(report["delivery_decision"], "not_evaluated");
+}
+
+#[test]
+fn repair_ready_rechecks_the_stable_task_without_claiming_closure() {
+    let project = Project::new();
+    fs::write(project.0.join("app.py"), "import os\n").unwrap();
+    fs::write(project.0.join("ruff.toml"), "[lint]\nselect = ['F401']\n").unwrap();
+    let init = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "init",
+            project.0.to_str().unwrap(),
+            "--apply",
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(init.status.code(), Some(3));
+    let lint = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "lint",
+            "python",
+            project.0.to_str().unwrap(),
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(lint.status.code(), Some(3));
+    let task_id = fs::read_dir(project.0.join(".codeguard/tasks"))
+        .unwrap()
+        .next()
+        .unwrap()
+        .unwrap()
+        .file_name()
+        .to_str()
+        .unwrap()
+        .trim_end_matches(".md")
+        .to_owned();
+    let mut input = request("repair_ready", &[], "unknown");
+    input["input"]["task_id"] = json!(task_id);
+    let (invalid_exit, invalid) =
+        run_with_extra(&project, &input, &["--cargo-tool", "/no-such-cargo"]);
+    assert_eq!(invalid_exit, 3);
+    assert_eq!(invalid["reason"], "verification_arguments_invalid");
+    assert_eq!(invalid["execution"], "not_run");
+    let (exit, report) = run(&project, &input);
+    assert_eq!(exit, 3);
+    assert_eq!(report["plan"]["action"], "verify_task");
+    assert_eq!(report["execution"], "task_verification");
+    assert_eq!(
+        report["local_feedback"]["report_type"],
+        "hook_task_verification_summary"
+    );
+    assert_eq!(report["local_feedback"]["task_id"], task_id);
+    assert!(report["local_feedback"]["event_persisted"].is_boolean());
+    assert_eq!(
+        report["local_feedback"]["delivery_decision"],
+        "not_evaluated"
+    );
+    assert_eq!(report["delivery_decision"], "not_evaluated");
+    let fact: Value = serde_json::from_slice(
+        &fs::read(
+            project
+                .0
+                .join(format!(".codeguard/findings/{task_id}/finding.json")),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(fact["state"], "open");
+    let events = project
+        .0
+        .join(format!(".codeguard/findings/{task_id}/events"));
+    for number in 0..129 {
+        fs::write(events.join(format!("budget-{number}.json")), "{}").unwrap();
+    }
+    let (overflow_exit, overflow) = run(&project, &input);
+    assert_eq!(overflow_exit, 3);
+    assert_eq!(overflow["execution"], "not_run");
+    assert_eq!(overflow["reason"], "verification_scope_exceeded");
+}
+
+#[test]
+fn repair_ready_rejects_a_task_missing_from_local_facts() {
+    let project = Project::new();
+    let mut input = request("repair_ready", &[], "unknown");
+    input["input"]["task_id"] = json!(format!("CG-{}", "a".repeat(32)));
+    let (exit, report) = run(&project, &input);
+    assert_eq!(exit, 3);
+    assert_eq!(report["execution"], "not_run");
+    assert_eq!(report["reason"], "task_unavailable");
+    assert!(report["local_feedback"].is_null());
+}
+
+#[test]
+fn verification_tool_options_are_not_silently_accepted_on_other_events() {
+    let project = Project::new();
+    let mut child = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "hook",
+            "execute",
+            project.0.to_str().unwrap(),
+            "--timeout=5s",
+            "--format=json",
+            "--cargo-tool",
+            "/no-such-cargo",
+        ])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(&serde_json::to_vec(&request("stop", &[], "unknown")).unwrap())
+        .unwrap();
+    let result = child.wait_with_output().unwrap();
+    assert_eq!(result.status.code(), Some(2));
+    assert!(result.stdout.is_empty());
+}
+
+#[test]
+#[ignore = "requires native Ruff 0.16.8 via CODEGUARD_RUFF_BIN"]
+fn repair_ready_runs_real_ruff_again_after_source_repair() {
+    let project = Project::new();
+    fs::write(project.0.join("app.py"), "import os\n").unwrap();
+    fs::write(project.0.join("ruff.toml"), "[lint]\nselect = ['F401']\n").unwrap();
+    let tool = std::env::var("CODEGUARD_RUFF_BIN").unwrap();
+    let init = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "init",
+            project.0.to_str().unwrap(),
+            "--apply",
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(init.status.code(), Some(3));
+    let lint = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "lint",
+            "python",
+            project.0.to_str().unwrap(),
+            "--ruff-tool",
+            &tool,
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(lint.status.code(), Some(3));
+    let lint: Value = serde_json::from_slice(&lint.stdout).unwrap();
+    let task_id = lint["files"][0]["findings"][0]["finding_id"]
+        .as_str()
+        .unwrap();
+    fs::write(project.0.join("app.py"), "value = 1\n").unwrap();
+    let mut input = request("repair_ready", &[], "unknown");
+    input["input"]["task_id"] = json!(task_id);
+    let (exit, report) = run_with_extra(&project, &input, &["--ruff-tool", &tool]);
+    assert_eq!(exit, 3);
+    assert_eq!(report["execution"], "task_verification");
+    assert_eq!(
+        report["local_feedback"]["observation"],
+        "candidate_absent_unverified_policy"
+    );
+    assert_eq!(report["local_feedback"]["event_persisted"], true);
+    assert_eq!(report["local_feedback"]["scan_report_available"], true);
+    assert_eq!(report["delivery_decision"], "not_evaluated");
+    let fact: Value = serde_json::from_slice(
+        &fs::read(
+            project
+                .0
+                .join(format!(".codeguard/findings/{task_id}/finding.json")),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(fact["state"], "open");
 }
 
 #[test]

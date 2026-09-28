@@ -8,7 +8,9 @@ Rust runtime 以字面 argv 启动原生工具，并发读取 stdout/stderr，�
 
 私有日志保留原始字节，写入 0700 私有目录中的 0600 临时文件，先同步再以同目录 hard link 原子发布且不覆盖已有目标。`private_log_contract` 覆盖目标 symlink、目录末级和中间层 symlink、公开权限目录、已有目标及原生退出 0 但日志写入失败。中间层 symlink 反例在修复前实际写到了外部目录；现在逐级 `openat + O_NOFOLLOW` 拒绝该路径，外部文件保持未创建。
 
-这是 Unix 局部运行时验收。macOS 中短命令完成后的进程组清理可能返回 `EPERM`，此时报告 `CleanupFailure`，不能将其归类为原生规则违规或检查完成。Windows 等价进程控制、完整 CLI 门禁链和持久化 I/O 的硬截止时间仍未验收，OpenSpec 3.2/3.3 保持未完成。
+这是 Unix 局部运行时验收。macOS 中短命令完成后的进程组清理可能返回 `EPERM`；2026-09-29 修正后，等待直接子进程回收并再次核实组已不存在，才保留已经观察到的输出超限；组仍存在或不可确认时继续报告 `CleanupFailure`。两种结果均不能解释为原生规则违规或检查完成。Windows 等价进程控制、完整 CLI 门禁链和持久化 I/O 的硬截止时间仍未验收，OpenSpec 3.2/3.3 保持未完成。
+
+2026-09-29 定向回归：新增 17 MiB stderr 对 16 MiB 共同预算的 8 次连续进程测试，修复前实际返回 `CleanupFailure`，诊断为 `killpg` 的 `EPERM` 且输出预算已耗尽；修复后该目标连续运行 30 轮通过。原 Python CVE 部分报告用例修复前 12 轮内复现同一终止误分类，修复后连续 15 轮通过。`cargo test --workspace --all-features -- --test-threads=1 -q`、全目标 Clippy 及 OpenSpec 严格校验均退出 0；远端 CI 验收仍未完成。
 
 2026-09-25 增补：`process_contract` 在当前 macOS 环境真实启动后台子进程，超时与运行中取消后等待其预定的延迟写入时间，确认请求返回后没有后续文件副作用。CLI 入口安装 Unix SIGINT 处理器，只设置原子取消标记；执行循环据此杀死进程组并报告取消。`lint_python_cli::sigint_during_native_probe_reaps_descendants_and_returns_incomplete` 先在无信号桥接时失败（主进程被信号直接终止），接线后通过：CLI 退出 3，报告含 `request_cancelled`，后台子进程没有延迟写入。此证据不能替代 Windows Job Object、排队任务取消或完整门禁验收。
 

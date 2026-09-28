@@ -35,6 +35,10 @@
 - **WHEN** 原生工具成功退出且 stdout/stderr 已关闭，但并行负载推迟了读线程调度
 - **THEN** 在请求剩余总期限内继续排空并取得真实 EOF；不得因固定短排空窗口把完整结果误判为读取失败，超过总期限仍返回未完成
 
+#### Scenario: Group signal reports EPERM after an output limit
+- **WHEN** 输出预算已确认耗尽，但进程组信号返回 EPERM，直接子进程已被等待回收
+- **THEN** 再核实该进程组已不存在时可保留输出超限为终止原因；组仍存在或无法确认时保留清理失败，不推导检查完成或源码违规
+
 ### Requirement: Rust snapshots SHALL bind the actual delivery input
 
 真实 pre-commit MUST 尊重 GIT_INDEX_FILE；pre-push MUST 读取每条 ref/OID 元组，不能假定 HEAD；CI MUST 绑定明确不可变内容。字节完整性、类型、哈希、路径和执行前后身份 MUST 校验。快照失败或源内容被检查器修改 MUST 未完成，不改真实 index；宿主预测 MUST 不冒充完整 Shell 语义。

@@ -81,6 +81,16 @@ CLI、MCP、宿主 Hook、真实 Git Hook 与 CI 对相同请求和证据 MUST �
 
 Stop 事件 MAY 从已存在的本地任务事实生成有界、只读的下一步摘要，不运行原生检查器、不执行 Markdown 中的指令，也不签发交付结论。无任务时 MUST 建议新鲜完整检查，不能把任务清空当作通过；记录数量或读取字节超过 Hook 预算时 MUST 明示未运行，并交由显式 `codeguard next` 查询。提示事件尚无可验证意图上下文时 MUST NOT 据此猜测检查范围。
 
+`repair_ready` 事件 MUST 先按稳定任务 ID 核对本地事实，再调用已有的 `task verify` 原检查器复检路径；不得依据宿主提供的自由文本、Markdown 任务正文或历史软反馈决定目标检查器。Hook 预检任务事件目录至多 128 项、1 MiB；超限要求显式 `task verify`。复检子进程 MUST 使用同一事件截止时间、封闭的输出字节预算及字面参数，失败或超限不能伪造复检结果。宿主反馈只投影任务 ID、检查器 ID、原复检观察、事件持久化状态和脱敏原因；即使原生诊断消失，也不得由该 Hook 自动关闭任务或签发交付通过。
+
+#### Scenario: Repair-ready task recheck
+- **WHEN** 稳定任务存在，修复后触发 repair_ready，原检查器可在预算内执行
+- **THEN** 按原任务复检并记录局部观察；只将有界摘要返回对话，任务关闭和交付决策仍独立
+
+#### Scenario: Repair-ready task unavailable or child output untrusted
+- **WHEN** 本地没有该任务，或复检子进程超时、超输出预算、返回非同任务报告
+- **THEN** 保留任务状态与未完成原因，不以外层 Hook 声称复检成功
+
 #### Scenario: Stop reads a small backlog
 - **WHEN** Stop 事件面对未初始化项目或有界的本地任务事实
 - **THEN** 只返回下一步摘要与本地未验证身份，原生检查状态为未运行，交付未评估

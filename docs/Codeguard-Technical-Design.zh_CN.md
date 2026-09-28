@@ -358,6 +358,27 @@ Codeguard：1 个暂存路径需要处理
 
 这是当前 0.3 外层响应的节选，不是完整 schema 实例。它只建议执行新鲜完整检查，不表示无问题。Stop 不执行 `next_actions`；记录数或字节超预算返回 `not_run/guidance_scope_exceeded`。提示事件仍未执行，须先获得可用意图上下文和宿主侧重复消息限流能力。
 
+**G. 修复就绪：按原检查器复检，仍属本地未验证。**
+
+```json
+{
+  "execution": "task_verification",
+  "local_feedback": {
+    "report_type": "hook_task_verification_summary",
+    "task_id": "CG-51d2afe0f8e8b55fe53db2ca33214220",
+    "checker_id": "python.ruff",
+    "observation": "candidate_absent_unverified_policy",
+    "event_persisted": true,
+    "reason": null,
+    "scan_report_available": true,
+    "authority": "local_unverified",
+    "delivery_decision": "not_evaluated"
+  }
+}
+```
+
+这个示意节选采用真实 Ruff 消除 F401 诊断后的复检分类，并不声称任务已关闭：原任务事实仍保持 open，须完成受策略约束的关闭流程。0.4 外层响应限制子进程输出；任务不存在、超时或报告不可信时只返回未完成原因。
+
 ### 7.4 结构化简报与宿主交付——拟议契约
 
 以下 JSON **仅是设计示例**，不是现有 `check_feedback` schema，也不能输入 `work sync`。它示意一个已初始化工作区中的合成任务已经成功持久化，真实资产/run/输入身份保留在完整报告中。实施前须在既有 OpenSpec change 内明确协议名称/版本及 schema。

@@ -1,18 +1,20 @@
-//! 宿主事件的局部执行入口；接入只读发现、Stop 指引、Python 编辑快检和暂存面观察。
+//! 宿主事件的局部执行入口；接入只读发现、Stop 指引、任务复检、编辑快检和暂存面观察。
 
 use crate::check_budget::parse_check_timeout;
 use crate::discovery::discover;
 use crate::git_index_safety::observe_index_safety_with_deadline;
 use crate::hook_plan_command::parse_request;
-use crate::next_command::read_local_brief;
+use crate::next_command::{read_local_brief, read_task_brief};
 use crate::python_lint_command::{
     annotate_conversation_budget, scan_selected_report_with_deadline,
 };
 use codeguard_adapters::legacy_registry;
 use codeguard_core::{HookTriggerAction, plan_hook_trigger};
-use codeguard_runtime::NativeObservation;
+use codeguard_runtime::{NativeObservation, ProcessSpec, Termination, run_process};
 use serde_json::{Value, json};
+use std::collections::BTreeMap;
 use std::env;
+use std::ffi::OsString;
 use std::fs;
 use std::io::Read;
 use std::path::{Path, PathBuf};
@@ -24,12 +26,17 @@ const MAX_REQUEST_BYTES: u64 = 64 * 1024;
 const MAX_FAST_TIMEOUT_MS: u64 = 120_000;
 const MAX_GUIDANCE_RECORDS: usize = 64;
 const MAX_GUIDANCE_REPORT_BYTES: u64 = 8 * 1024 * 1024;
+const MAX_VERIFY_OUTPUT_BYTES: usize = 4 * 1024 * 1024;
+const MAX_VERIFY_OPTION_BYTES: usize = 16 * 1024;
+const MAX_VERIFY_EVENTS: usize = 128;
+const MAX_VERIFY_EVENT_BYTES: u64 = 1024 * 1024;
 
 struct Arguments {
     root: PathBuf,
     timeout_ms: u64,
     ruff_tool: Option<PathBuf>,
     git_tool: Option<PathBuf>,
+    verify_options: BTreeMap<String, String>,
 }
 
 /// 从 `args` 与 stdin 读取宿主事件，按纯路由执行已接入的局部动作。
@@ -72,6 +79,10 @@ pub fn run(args: &[String]) -> ExitCode {
             return ExitCode::from(2);
         }
     };
+    if plan.action != HookTriggerAction::VerifyTask && !arguments.verify_options.is_empty() {
+        eprintln!("任务复检参数仅用于 repair_ready 事件");
+        return ExitCode::from(2);
+    }
     let root = arguments
         .root
         .canonicalize()
@@ -90,6 +101,13 @@ pub fn run(args: &[String]) -> ExitCode {
             }
             Err(_) => ("not_run", Some("guidance_unavailable"), Value::Null, 3),
         },
+        (HookTriggerAction::VerifyTask, Some(root)) => {
+            let task_id = plan.task_id.as_deref().expect("核心已校验任务 ID");
+            match task_verification_summary(root, task_id, &arguments) {
+                Ok(feedback) => ("task_verification", None, feedback, 3),
+                Err((reason, exit_code)) => ("not_run", Some(reason), Value::Null, exit_code),
+            }
+        }
         (HookTriggerAction::FastFileCheck, Some(root))
             if plan.target_paths.iter().all(|path| path.ends_with(".py")) =>
         {
@@ -192,13 +210,199 @@ pub fn run(args: &[String]) -> ExitCode {
     println!(
         "{}",
         json!({
-            "schema_version":"0.3.0", "report_type":"hook_execution_feedback",
+            "schema_version":"0.4.0", "report_type":"hook_execution_feedback",
             "plan":plan, "execution":execution, "reason":reason,
             "local_feedback":feedback, "delivery_decision":"not_evaluated",
             "host_blocking_verified":false, "soft_result_reused":false
         })
     );
     ExitCode::from(exit_code)
+}
+
+fn task_verification_summary(
+    root: &Path,
+    task_id: &str,
+    arguments: &Arguments,
+) -> Result<Value, (&'static str, u8)> {
+    let deadline = Instant::now() + Duration::from_millis(arguments.timeout_ms);
+    check_verification_history_budget(root, task_id)?;
+    let brief = read_task_brief(root, task_id).map_err(|_| ("task_unavailable", 3))?;
+    let checker_id = brief["checker_id"]
+        .as_str()
+        .ok_or(("task_unavailable", 3))?;
+    if (arguments.ruff_tool.is_some()
+        && !matches!(checker_id, "python.ruff" | "python.ruff.doctor"))
+        || arguments
+            .verify_options
+            .keys()
+            .any(|key| !verify_option_matches_checker(key, checker_id))
+    {
+        return Err(("verification_arguments_invalid", 3));
+    }
+    let executable = env::current_exe().map_err(|_| ("verification_process_failed", 4))?;
+    let remaining_ms = deadline
+        .saturating_duration_since(Instant::now())
+        .as_millis();
+    if remaining_ms == 0 {
+        return Err(("request_deadline_exceeded", 3));
+    }
+    let mut args = vec![
+        OsString::from("task"),
+        OsString::from("verify"),
+        OsString::from(task_id),
+        root.as_os_str().to_owned(),
+        OsString::from("--timeout"),
+        OsString::from(format!("{remaining_ms}ms")),
+        OsString::from("--format=json"),
+    ];
+    if let Some(ruff_tool) = &arguments.ruff_tool {
+        args.extend([
+            OsString::from("--ruff-tool"),
+            ruff_tool.as_os_str().to_owned(),
+        ]);
+    }
+    for (key, value) in &arguments.verify_options {
+        args.extend([OsString::from(key), OsString::from(value)]);
+    }
+    let mut child_env = BTreeMap::new();
+    for key in [
+        "PATH",
+        "HOME",
+        "TMPDIR",
+        "CARGO_HOME",
+        "RUSTUP_HOME",
+        "JAVA_HOME",
+    ] {
+        if let Some(value) = env::var_os(key) {
+            child_env.insert(OsString::from(key), value);
+        }
+    }
+    let outcome = run_process(
+        &ProcessSpec {
+            executable,
+            args,
+            cwd: root.to_path_buf(),
+            env: child_env,
+            stdin: None,
+            deadline,
+            output_limit_bytes: MAX_VERIFY_OUTPUT_BYTES,
+        },
+        &AtomicBool::new(false),
+    );
+    match outcome.termination {
+        Termination::Exited(3) => {}
+        Termination::Exited(2) => return Err(("verification_arguments_invalid", 3)),
+        Termination::Exited(130) | Termination::Cancelled => {
+            return Err(("request_cancelled", 130));
+        }
+        Termination::TimedOut | Termination::DeadlineBeforeStart => {
+            return Err(("request_deadline_exceeded", 3));
+        }
+        Termination::OutputLimit => return Err(("verification_output_exceeded", 3)),
+        _ => return Err(("verification_process_failed", 4)),
+    }
+    let report: Value =
+        serde_json::from_slice(&outcome.stdout).map_err(|_| ("verification_report_invalid", 4))?;
+    if report["report_type"] != "task_verification_preview"
+        || report["operation"] != "task_verify"
+        || report["task_id"] != task_id
+        || report["exit_code"] != 3
+        || report["authority"] != "local_unverified"
+        || report["delivery_decision"] != "not_evaluated"
+        || !report["event_persisted"].is_boolean()
+    {
+        return Err(("verification_report_invalid", 4));
+    }
+    let observation = report["observation"]
+        .as_str()
+        .filter(|value| value.len() <= 64)
+        .ok_or(("verification_report_invalid", 4))?;
+    let reason = report["reason"].as_str().filter(|value| value.len() <= 128);
+    if !report["reason"].is_null() && reason.is_none() {
+        return Err(("verification_report_invalid", 4));
+    }
+    Ok(json!({
+        "schema_version":"0.1.0", "report_type":"hook_task_verification_summary",
+        "task_id":task_id, "checker_id":checker_id,
+        "observation":observation, "event_persisted":report["event_persisted"],
+        "reason":reason, "scan_report_available":report["native_scan"].is_object(),
+        "authority":"local_unverified", "delivery_decision":"not_evaluated"
+    }))
+}
+
+fn check_verification_history_budget(root: &Path, task_id: &str) -> Result<(), (&'static str, u8)> {
+    let events = root
+        .join(".codeguard/findings")
+        .join(task_id)
+        .join("events");
+    if !events.exists() {
+        return Ok(());
+    }
+    if !fs::symlink_metadata(&events).is_ok_and(|metadata| metadata.file_type().is_dir()) {
+        return Err(("task_unavailable", 3));
+    }
+    let mut total_bytes = 0_u64;
+    for (index, entry) in fs::read_dir(events)
+        .map_err(|_| ("task_unavailable", 3))?
+        .enumerate()
+    {
+        if index >= MAX_VERIFY_EVENTS {
+            return Err(("verification_scope_exceeded", 3));
+        }
+        let entry = entry.map_err(|_| ("task_unavailable", 3))?;
+        let metadata = fs::symlink_metadata(entry.path()).map_err(|_| ("task_unavailable", 3))?;
+        if !metadata.file_type().is_file() {
+            return Err(("task_unavailable", 3));
+        }
+        total_bytes = total_bytes.saturating_add(metadata.len());
+        if total_bytes > MAX_VERIFY_EVENT_BYTES {
+            return Err(("verification_scope_exceeded", 3));
+        }
+    }
+    Ok(())
+}
+
+fn verify_option_matches_checker(key: &str, checker_id: &str) -> bool {
+    if matches!(key, "--owner" | "--lease-token") {
+        return true;
+    }
+    match checker_id {
+        "node.eslint" | "node.eslint.preparation" => matches!(
+            key,
+            "--node-tool" | "--eslint-entry" | "--eslint-version" | "--config" | "--cwd"
+        ),
+        "node.npm.audit" => matches!(
+            key,
+            "--node-tool"
+                | "--npm-entry"
+                | "--npm-version"
+                | "--userconfig"
+                | "--globalconfig"
+                | "--registry"
+        ),
+        "python.pip_audit" => matches!(key, "--pip-audit-tool" | "--pip-audit-version"),
+        "go.vet" => key == "--go-tool",
+        "rust.cargo_clippy" | "rust.cargo_check" | "rust.cargo_rustdoc" => key == "--cargo-tool",
+        "rust.cargo_audit" => matches!(key, "--cargo-audit-tool" | "--rustsec-db"),
+        "java.checkstyle" | "java.checkstyle.preparation" => {
+            matches!(key, "--java-tool" | "--checkstyle-jar" | "--config")
+        }
+        "java.maven.p3c" => matches!(
+            key,
+            "--maven-tool" | "--java-home" | "--maven-repo" | "--repo-sha256"
+        ),
+        "java.maven.dependency_check" => matches!(
+            key,
+            "--maven-tool"
+                | "--java-home"
+                | "--maven-repo"
+                | "--repo-sha256"
+                | "--cve-data-dir"
+                | "--cve-data-sha256"
+        ),
+        "python.ruff" | "python.ruff.doctor" => false,
+        _ => false,
+    }
 }
 
 fn guidance_summary(root: &Path) -> Result<Value, &'static str> {
@@ -296,6 +500,8 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
     let mut timeout_ms = None;
     let mut ruff_tool = None;
     let mut git_tool = None;
+    let mut verify_options = BTreeMap::new();
+    let mut verify_option_bytes = 0_usize;
     let mut format_seen = false;
     let mut index = 1;
     while index < args.len() {
@@ -325,6 +531,64 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                 }
                 git_tool = Some(path);
             }
+            "--cargo-tool"
+            | "--cargo-audit-tool"
+            | "--rustsec-db"
+            | "--pip-audit-tool"
+            | "--pip-audit-version"
+            | "--go-tool"
+            | "--maven-tool"
+            | "--java-home"
+            | "--java-tool"
+            | "--checkstyle-jar"
+            | "--config"
+            | "--maven-repo"
+            | "--repo-sha256"
+            | "--cve-data-dir"
+            | "--cve-data-sha256"
+            | "--node-tool"
+            | "--npm-entry"
+            | "--npm-version"
+            | "--userconfig"
+            | "--globalconfig"
+            | "--registry"
+            | "--eslint-entry"
+            | "--eslint-version"
+            | "--cwd"
+            | "--owner"
+            | "--lease-token"
+                if !verify_options.contains_key(key) =>
+            {
+                if matches!(
+                    key,
+                    "--cargo-tool"
+                        | "--cargo-audit-tool"
+                        | "--rustsec-db"
+                        | "--pip-audit-tool"
+                        | "--go-tool"
+                        | "--maven-tool"
+                        | "--java-home"
+                        | "--java-tool"
+                        | "--checkstyle-jar"
+                        | "--config"
+                        | "--maven-repo"
+                        | "--cve-data-dir"
+                        | "--node-tool"
+                        | "--npm-entry"
+                        | "--userconfig"
+                        | "--globalconfig"
+                        | "--eslint-entry"
+                        | "--cwd"
+                ) && !Path::new(&value).is_absolute()
+                {
+                    return Err(format!("{key} 必须为绝对路径"));
+                }
+                verify_option_bytes = verify_option_bytes.saturating_add(key.len() + value.len());
+                if value.is_empty() || verify_option_bytes > MAX_VERIFY_OPTION_BYTES {
+                    return Err("任务复检参数为空或超预算".into());
+                }
+                verify_options.insert(key.to_owned(), value);
+            }
             _ => return Err(format!("不支持或重复的参数：{key}")),
         }
         index += 1;
@@ -341,5 +605,6 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
         timeout_ms,
         ruff_tool,
         git_tool,
+        verify_options,
     })
 }

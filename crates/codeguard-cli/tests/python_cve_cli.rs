@@ -302,7 +302,14 @@ fn valid_python_advisory_after_native_failure_remains_partial_evidence() {
     );
     let (truncated_exit, truncated_report) = project.check(&tool);
     assert_eq!(truncated_exit, 3);
-    assert_eq!(truncated_report["reason"], "pip_audit_output_limit");
+    assert_eq!(
+        truncated_report["reason"],
+        "pip_audit_output_limit",
+        "status={} native_exit={} valid={}",
+        truncated_report["command_status"],
+        truncated_report["native_exit_code"],
+        truncated_report["native_report_valid"]
+    );
     assert_eq!(truncated_report["native_report_valid"], false);
     assert_eq!(truncated_report["findings"], serde_json::json!([]));
 }

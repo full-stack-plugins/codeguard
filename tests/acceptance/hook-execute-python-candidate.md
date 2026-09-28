@@ -18,4 +18,10 @@
 
 TDD 目标测试先在 `stop` 返回 `action_not_wired` 时失败；实现后 `cargo test -p codeguard-cli --test hook_execute_cli stop_` 四项通过，覆盖未初始化、无任务、超预算及稳定任务选择（篡改任务 Markdown 不成为指令）。完整事件测试 14 项通过、1 项需显式原生 Ruff 而保持 ignored。Draft 2020-12 对启动、Stop、提示三个实际 CLI 输出通过；伪造 `delivery_decision=allow` 被拒。`cargo test --workspace --all-features -- --test-threads=1` 退出 0，`cargo clippy --workspace --all-features --all-targets -- -D warnings` 退出 0，OpenSpec 严格校验通过。原生依赖条件下的 ignored 测试及插件真实宿主接线仍未验收。
 
+## repair_ready 原工具复检增量（0.4）
+
+事件先预检单任务事件目录至多 128 项、1 MiB，再读取稳定任务事实，通过受控同一二进制执行 `task verify`；传入的显式原生工具参数逐项限制，子进程继承事件剩余截止时间、4 MiB 合计输出预算和白名单环境。反馈仅投影任务与检查器身份、原复检观察、事件是否持久化及有界原因；超时、输出超限、缺任务或损坏报告不会输出成功的复检摘要。历史 0.3 schema 单独保留；任务关闭与交付决策仍独立。
+
+目标测试先在 `repair_ready` 返回 `action_not_wired` 时失败，接线后稳定任务复检和缺失任务用例通过。使用本机现有 Ruff 0.16.8 的真实复检在修复 F401 后返回 `candidate_absent_unverified_policy`、`event_persisted=true`，finding 事实仍为 `open`，没有被误称为已关闭。`cargo test --workspace --all-features -- --test-threads=1 -q`、`cargo clippy --workspace --all-features --all-targets -- -D warnings` 和 OpenSpec 严格校验均退出 0；完整宿主接线及远端 CI 验收仍未完成。
+
 目标测试先 RED：旧 CLI 不识别 `--git-tool`。实现后真实 Git 测试确认已暂存的 `.env` 被报告、未暂存文件不计入；相对 `GIT_INDEX_FILE` 的替代 index 单独观察，缺失 Git 工具返回 `not_run`；33 条违规只展示 32 条但保留总数与截断标志。目标 Hook 测试 10 项通过、1 项需显式 Ruff 而跳过；既有 Git index 契约 13 项通过。独立 Draft 2020-12 验证器检查四类实际事件输出，旧 0.1 schema 和伪造 `allow` 均拒绝新版结果。workspace WASM feature 回归第一次在 Python CVE 输出上限测试出现间歇失败；该项单独两次及该文件 11 项串行重跑通过，随后完整 workspace 串行回归通过。完整提交质量义务、插件宿主阻断与 CI 仍未接线，因此 11.17 继续保持未完成。

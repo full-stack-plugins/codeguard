@@ -128,6 +128,31 @@ fn finite_output_over_limit_cannot_become_success_after_child_exits() {
 }
 
 #[test]
+fn completed_large_stderr_flood_keeps_output_limit_reason() {
+    for _ in 0..8 {
+        let mut request = spec(
+            "/bin/sh",
+            &[
+                "-c",
+                "printf '%s' '{\"dependencies\":[]}' ; /bin/dd if=/dev/zero bs=1048576 count=17 1>&2 2>/dev/null",
+            ],
+        );
+        request.deadline = Instant::now() + Duration::from_secs(30);
+        request.output_limit_bytes = 16 * 1024 * 1024;
+        let actual = run_process(&request, &AtomicBool::new(false));
+        assert_eq!(
+            actual.termination,
+            Termination::OutputLimit,
+            "termination={:?} retained={} elapsed={:?}",
+            actual.termination,
+            actual.stdout.len() + actual.stderr.len(),
+            actual.elapsed
+        );
+        assert!(actual.stdout.starts_with(b"{\"dependencies\":[]}"));
+    }
+}
+
+#[test]
 fn simultaneous_stdout_and_stderr_flood_share_one_budget() {
     let mut request = spec("/bin/sh", &["-c", "yes stdout & yes stderr >&2 & wait"]);
     request.output_limit_bytes = 256;
