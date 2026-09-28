@@ -309,6 +309,34 @@ For required setup, create one setup/confirmation task per module/checker obliga
 
 Allowlist dispositions bind rule, source target, grammar identity and reason; retain observations and reevaluate after relevant changes. They cannot remove required native checking or fabricate coverage. Repeated runs update stable tasks and attempt history. Emit the initial brief, then meaningful changes; preserve a status view instead of repeating unchanged installation requests. See the technical design's **7.3–7.4** for bilingual report examples and the proposed data contract.
 
+### 8.4 Host events and check tiers — target
+
+Host hooks pass events, workspace identity and known targets. Rust core selects the check tier; the formal CheckPlan then chooses native checkers and resource budgets. An agent cannot change delivery obligations through a prompt, an old soft cache entry or a project-local `skipGate`. This remains a target design: the [pure domain router](../crates/codeguard-core/src/hook_trigger_planner.rs) has unit coverage, but no plugin, CLI or real Git/CI wiring and no verified automatic host trigger yet.
+
+```mermaid
+flowchart LR
+    H[Host event] --> R[Pure Rust event routing]
+    R -->|Session start| D[Read-only discovery]
+    R -->|Confirmed edit| F[Changed-file feedback]
+    R -->|Repair ready| V[Original task and checker recheck]
+    R -->|Commit / push| G[Acquire current Git content scope]
+    R -->|CI| A[Full project obligations]
+    F --> P[Unified report / task / next action]
+    V --> P
+    G --> P
+    A --> P
+```
+
+| Event | Requested tier | Required boundary |
+| :--- | :--- | :--- |
+| Start/resume, prompt, stop | Read-only discovery, nonblocking intent guidance, session summary | Prompt text cannot replace a real Git gate or claim delivery |
+| Confirmed write | Affected-file fast check | Reuse a complete soft result only when content and all configuration identities match; queue project-wide work |
+| Failed/unknown write | No source check / resolve scope | Unknown cannot mean unchanged or checked |
+| Repair attempt completed | Original `task verify` | Installing a tool, ticking a task or WASM clean alone does not close it |
+| Commit, push, CI | Strict commit scope, actual pushed refs, full project obligations | Ignore host-supplied path guesses and old save feedback; disclose missing enforcement support |
+
+Coalescing applies only to duplicate fast feedback for the same content snapshot; it cannot swallow new input, failed rechecks or delivery events. Cache identity must cover source and dependency closure, tool, rules, configuration, platform and vulnerability database freshness. Strict gates revalidate full obligations and identities, then recompute or report incomplete when proof is missing. Measure latency percentiles, repeat execution, invalidations, missed findings and false positives per tier before fixing budgets.
+
 ## 9. Persistence and ownership
 
 ```text

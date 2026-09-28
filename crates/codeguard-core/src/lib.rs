@@ -10,6 +10,12 @@ mod delivery_gate;
 mod evaluation;
 mod false_positive_allowlist;
 mod finding;
+mod hook_event;
+mod hook_trigger_action;
+mod hook_trigger_input;
+mod hook_trigger_plan;
+mod hook_trigger_planner;
+mod hook_write_outcome;
 mod native_checker_binding;
 mod obligation_result;
 mod observation_port;
@@ -45,6 +51,12 @@ pub use false_positive_allowlist::{
     valid_false_positive_identity,
 };
 pub use finding::{Finding, FindingLocation, GateImpact};
+pub use hook_event::HookEvent;
+pub use hook_trigger_action::HookTriggerAction;
+pub use hook_trigger_input::HookTriggerInput;
+pub use hook_trigger_plan::HookTriggerPlan;
+pub use hook_trigger_planner::plan_hook_trigger;
+pub use hook_write_outcome::HookWriteOutcome;
 pub use native_checker_binding::NativeCheckerBinding;
 pub use obligation_result::ObligationResult;
 pub use observation_port::{ObservationPort, ObservedPathKind};
