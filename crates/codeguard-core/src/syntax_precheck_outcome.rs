@@ -1,9 +1,10 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::SyntaxPrecheckStatus;
 
 /// 选定文件集的纯领域聚合；不能作为 lint 通过或项目门禁依据。
-#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
 pub struct SyntaxPrecheckOutcome {
     /// 总体初检状态。
     pub status: SyntaxPrecheckStatus,

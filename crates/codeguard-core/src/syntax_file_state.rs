@@ -1,8 +1,8 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 /// 单个已选源码文件的语法初检观察；不表示原生 lint 或编译结果。
-#[derive(Clone, Debug, Eq, PartialEq, Serialize)]
-#[serde(tag = "status", rename_all = "snake_case")]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(tag = "status", rename_all = "snake_case", deny_unknown_fields)]
 pub enum SyntaxFileState {
     /// 已解析；grammar_qualified 仅表示该文件的版本与方言已被验收。
     Checked {

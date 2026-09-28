@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:syntax-precheck-candidate:1.0.0",
+  "title": "Unverified bundled WASM syntax precheck candidate observation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "report_type", "backend", "scope", "files", "precheck", "native", "delivery"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "report_type": {"const": "syntax_precheck_candidate"},
+    "backend": {"$ref": "#/$defs/backend"},
+    "scope": {"$ref": "#/$defs/scope"},
+    "files": {"type": "array", "items": {"$ref": "#/$defs/file"}},
+    "precheck": {"$ref": "#/$defs/precheck"},
+    "native": {"$ref": "#/$defs/native"},
+    "delivery": {"$ref": "#/$defs/delivery"}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "backend": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "language", "dialect", "grammar_sha256", "grammar_abi_version", "grammar_release_status"],
+      "properties": {
+        "kind": {"const": "bundled_tree_sitter_wasm"},
+        "language": {"enum": ["java", "typescript"]},
+        "dialect": {"enum": ["java", "typescript"]},
+        "grammar_sha256": {"$ref": "#/$defs/digest"},
+        "grammar_abi_version": {"const": 14},
+        "grammar_release_status": {"const": "candidate_unvalidated"}
+      }
+    },
+    "scope": {
+      "type": "object", "additionalProperties": false,
+      "required": ["enumeration_complete", "cancelled", "excluded_files"],
+      "properties": {
+        "enumeration_complete": {"type": "boolean"},
+        "cancelled": {"type": "boolean"},
+        "excluded_files": {"type": "integer", "minimum": 0, "maximum": 1000000}
+      }
+    },
+    "file": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "source_sha256", "state"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "source_sha256": {"$ref": "#/$defs/digest"},
+        "state": {"oneOf": [{"$ref": "#/$defs/checked"}, {"$ref": "#/$defs/incomplete"}, {"$ref": "#/$defs/unsupported"}]}
+      }
+    },
+    "checked": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "recoveries", "grammar_qualified", "truncated"],
+      "properties": {
+        "status": {"const": "checked"},
+        "recoveries": {"type": "integer", "minimum": 0},
+        "grammar_qualified": {"const": false},
+        "truncated": {"type": "boolean"}
+      }
+    },
+    "incomplete": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "reason"],
+      "properties": {"status": {"const": "incomplete"}, "reason": {"type": "string", "minLength": 1}}
+    },
+    "unsupported": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "reason"],
+      "properties": {"status": {"const": "unsupported"}, "reason": {"type": "string", "minLength": 1}}
+    },
+    "precheck": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "scope_complete", "cancelled", "selected_files", "checked_files", "incomplete_files", "unsupported_files", "unqualified_files", "truncated_files", "suspected_recoveries"],
+      "properties": {
+        "status": {"enum": ["not_run", "clean", "suspected_issue", "incomplete", "unsupported"]},
+        "scope_complete": {"type": "boolean"},
+        "cancelled": {"type": "boolean"},
+        "selected_files": {"type": "integer", "minimum": 0},
+        "checked_files": {"type": "integer", "minimum": 0},
+        "incomplete_files": {"type": "integer", "minimum": 0},
+        "unsupported_files": {"type": "integer", "minimum": 0},
+        "unqualified_files": {"type": "integer", "minimum": 0},
+        "truncated_files": {"type": "integer", "minimum": 0},
+        "suspected_recoveries": {"type": "integer", "minimum": 0}
+      }
+    },
+    "native": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "reason"],
+      "properties": {"status": {"const": "not_run"}, "reason": {"type": "string", "minLength": 1}}
+    },
+    "delivery": {
+      "type": "object", "additionalProperties": false,
+      "required": ["decision", "authority"],
+      "properties": {"decision": {"const": "not_evaluated"}, "authority": {"const": "local_unverified"}}
+    }
+  }
+}

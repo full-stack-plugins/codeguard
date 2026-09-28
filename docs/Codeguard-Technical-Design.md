@@ -181,7 +181,7 @@ If the language has no supported native confirmation adapter, return that specif
 
 When some files have suspected issues and others are unresolved, use overall `incomplete` while retaining all usable suspected observations. `clean` requires nonempty, completely checked selected scope.
 
-These are proposed semantic fields, not additions already accepted by current JSON schemas. Keep existing exit semantics: missing required native execution remains incomplete (`3`); a suspected parser issue alone is not a confirmed violation (`1`). A clean fallback does not turn `lint/check` into native success. If a dedicated syntax-only operation is later introduced, its success must be explicitly scoped to syntax; no new `syntax` command is claimed here.
+These are the target semantic fields, not a shipped lint/check report. A narrow [candidate precheck schema](../schemas/syntax-precheck-candidate.schema.json) and [strict Rust reader](../crates/codeguard-adapters/src/syntax_precheck_candidate_report.rs) now bind source SHA-256 and the pinned grammar identity, recalculate status, and reject unknown versions or forged `clean`. The bundled grammars remain unvalidated candidates, so this reader cannot return `clean`; it has no CLI producer, recovery spans, setup/task references or host renderer yet. Keep existing exit semantics: missing required native execution remains incomplete (`3`); a suspected parser issue alone is not a confirmed violation (`1`). A clean fallback does not turn `lint/check` into native success. If a dedicated syntax-only operation is later introduced, its success must be explicitly scoped to syntax; no new `syntax` command is claimed here.
 
 ### 5.4 Grammar import and runtime lifecycle — target
 

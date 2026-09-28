@@ -181,7 +181,7 @@ flowchart LR
 
 部分文件有疑似异常、另有文件未解析时，总体为 `incomplete`，同时保留所有可用疑似观察。`clean` 要求选定范围非空且全部完成检查。
 
-这些是拟议语义字段，不是当前 JSON schema 已支持的新增字段。保持既有退出语义：必需原生执行缺失仍为未完成（`3`）；解析器疑似问题本身不是已确认违规（`1`）。初检正常不会将 `lint/check` 转成原生成功。若未来增加独立语法操作，其成功必须限定为语法初检；本文不宣称已有 `syntax` 命令。
+这些是目标语义字段，尚非已发行的 lint/check 报告。局部的[候选初检 schema](../schemas/syntax-precheck-candidate.schema.json) 与 [Rust 严格读者](../crates/codeguard-adapters/src/syntax_precheck_candidate_report.rs)已绑定源码 SHA-256 和固定 grammar 身份，重新计算状态，并拒绝未知版本及伪造的 `clean`。内置 grammar 仍是未验收候选，因此该读者不能返回 `clean`；CLI 生产端、恢复节点位置、准备/任务引用和宿主渲染仍缺。保持既有退出语义：必需原生执行缺失仍为未完成（`3`）；解析器疑似问题本身不是已确认违规（`1`）。初检正常不会将 `lint/check` 转成原生成功。若未来增加独立语法操作，其成功必须限定为语法初检；本文不宣称已有 `syntax` 命令。
 
 ### 5.4 Grammar 引入与运行生命周期——目标
 
