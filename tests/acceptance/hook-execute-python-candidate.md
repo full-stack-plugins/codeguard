@@ -12,4 +12,10 @@
 
 `hook execute` 增加显式 `--git-tool ABS_PATH`，`pre_commit` 在 Git 观察阶段按传入预算和 15s 上限复用只读 Git index 观察。外层反馈升为 0.2，历史 0.1 schema 单独保留。新 `hook_git_index_summary` 仅公布暂存条目数、index 摘要、路径违规总数及有界路径列表（最多 32 条、单路径 512 字节）、截断标志与对象状态，固定 `source_check=not_run`、`delivery_decision=not_evaluated`。不指定 Git 工具、缺失工具或观察失败仍是不完整，不利用此前文件快检结果。
 
+## Stop 只读指引增量（0.3）
+
+`stop` 现在从既有 `.codeguard` 事实读取下一步摘要；反馈固定 `source_check=not_run`、`authority=local_unverified`、`delivery_decision=not_evaluated`。Hook 入口最多预检 64 个 finding、64 份报告与 8 MiB 报告总字节；超出返回 `not_run/guidance_scope_exceeded`，不静默截断。不读取 Markdown 作为指令，也不执行建议命令。未初始化时建议显式 init；已初始化但无任务时要求完整检查。`prompt_submitted` 因缺可信意图上下文仍未接入；插件宿主 Hook 也尚未调用本入口。
+
+TDD 目标测试先在 `stop` 返回 `action_not_wired` 时失败；实现后 `cargo test -p codeguard-cli --test hook_execute_cli stop_` 四项通过，覆盖未初始化、无任务、超预算及稳定任务选择（篡改任务 Markdown 不成为指令）。完整事件测试 14 项通过、1 项需显式原生 Ruff 而保持 ignored。Draft 2020-12 对启动、Stop、提示三个实际 CLI 输出通过；伪造 `delivery_decision=allow` 被拒。`cargo test --workspace --all-features -- --test-threads=1` 退出 0，`cargo clippy --workspace --all-features --all-targets -- -D warnings` 退出 0，OpenSpec 严格校验通过。原生依赖条件下的 ignored 测试及插件真实宿主接线仍未验收。
+
 目标测试先 RED：旧 CLI 不识别 `--git-tool`。实现后真实 Git 测试确认已暂存的 `.env` 被报告、未暂存文件不计入；相对 `GIT_INDEX_FILE` 的替代 index 单独观察，缺失 Git 工具返回 `not_run`；33 条违规只展示 32 条但保留总数与截断标志。目标 Hook 测试 10 项通过、1 项需显式 Ruff 而跳过；既有 Git index 契约 13 项通过。独立 Draft 2020-12 验证器检查四类实际事件输出，旧 0.1 schema 和伪造 `allow` 均拒绝新版结果。workspace WASM feature 回归第一次在 Python CVE 输出上限测试出现间歇失败；该项单独两次及该文件 11 项串行重跑通过，随后完整 workspace 串行回归通过。完整提交质量义务、插件宿主阻断与 CI 仍未接线，因此 11.17 继续保持未完成。

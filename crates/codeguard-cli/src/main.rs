@@ -30,7 +30,7 @@ fn main() -> ExitCode {
                 "宿主事件只读规划：hook plan [--format=json] 从 stdin 读取 hook_trigger_request 1.0.0，返回 hook_trigger_plan 1.1.0 与退出码 3；批量编辑超出快检预算时要求改用有界批量范围，尚不执行检查或阻断宿主。"
             );
             println!(
-                "局部事件执行：hook execute PATH --timeout DURATION --format=json [--ruff-tool ABS_PATH] [--git-tool ABS_PATH] 从 stdin 读取同一事件协议；启动只发现、确认 Python 编辑调用 Ruff 局部快检、显式 Git 工具的 pre_commit 观察真实 index；完整交付始终 not_evaluated。"
+                "局部事件执行：hook execute PATH --timeout DURATION --format=json [--ruff-tool ABS_PATH] [--git-tool ABS_PATH] 从 stdin 读取同一事件协议；启动只发现、Stop 有界只读提示、确认 Python 编辑调用 Ruff 局部快检、显式 Git 工具的 pre_commit 观察真实 index；完整交付始终 not_evaluated。"
             );
             println!(
                 "check all 的 Python CVE 节点可用 --pip-audit-tool ABS_PATH --pip-audit-version VERSION；逐构建根反馈原生结果或锁文件/工具阻塞，不签发零漏洞结论。"

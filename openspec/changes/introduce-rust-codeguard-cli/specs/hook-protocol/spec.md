@@ -79,6 +79,16 @@ CLI、MCP、宿主 Hook、真实 Git Hook 与 CI 对相同请求和证据 MUST �
 
 编辑快检计划 MUST 有文件数量和路径字节预算。一次确认成功的批量编辑超出预算时，MUST 保留明确的超预算原因并请求有界批量范围检查；不得截断目标列表后声称选定文件已全部检查，也不得把原列表无限重新提交给逐文件计划。预算仅控制软反馈调度，不减少后续真实 Git/CI 义务。
 
+Stop 事件 MAY 从已存在的本地任务事实生成有界、只读的下一步摘要，不运行原生检查器、不执行 Markdown 中的指令，也不签发交付结论。无任务时 MUST 建议新鲜完整检查，不能把任务清空当作通过；记录数量或读取字节超过 Hook 预算时 MUST 明示未运行，并交由显式 `codeguard next` 查询。提示事件尚无可验证意图上下文时 MUST NOT 据此猜测检查范围。
+
+#### Scenario: Stop reads a small backlog
+- **WHEN** Stop 事件面对未初始化项目或有界的本地任务事实
+- **THEN** 只返回下一步摘要与本地未验证身份，原生检查状态为未运行，交付未评估
+
+#### Scenario: Stop backlog exceeds budget
+- **WHEN** 本地记录超过 Hook 数量或字节预算
+- **THEN** 返回明确的范围超预算原因，不继续扫描、不静默截断后宣称摘要完整
+
 #### Scenario: Edit succeeds twice without changing content
 - **WHEN** 同一文件产生两个成功编辑事件且全部软检查身份一致
 - **THEN** 可以复用完整的快反馈，并保留复用原因；后续提交仍取本轮 Git 内容面执行严格门禁

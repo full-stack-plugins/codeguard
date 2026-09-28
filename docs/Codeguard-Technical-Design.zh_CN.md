@@ -336,6 +336,28 @@ Codeguard：1 个暂存路径需要处理
 
 本例同样是展示设计，不是捕获的实际输出。真实 Hook JSON 携带 index 摘要、违规总数、最多展示 32 条路径及截断标志。观察的 index 可与工作树不同，也可通过 `GIT_INDEX_FILE` 指定。
 
+**F. Stop 指引：只读修复交接。**
+
+```json
+{
+  "execution": "read_only_guidance",
+  "local_feedback": {
+    "report_type": "hook_next_guidance",
+    "disposition": "verification_required",
+    "reason": "no_tasks_without_fresh_full_gate",
+    "task_id": null,
+    "checker_id": null,
+    "step": null,
+    "next_actions": [["codeguard", "check", "all", "."]],
+    "source_check": "not_run",
+    "authority": "local_unverified",
+    "delivery_decision": "not_evaluated"
+  }
+}
+```
+
+这是当前 0.3 外层响应的节选，不是完整 schema 实例。它只建议执行新鲜完整检查，不表示无问题。Stop 不执行 `next_actions`；记录数或字节超预算返回 `not_run/guidance_scope_exceeded`。提示事件仍未执行，须先获得可用意图上下文和宿主侧重复消息限流能力。
+
 ### 7.4 结构化简报与宿主交付——拟议契约
 
 以下 JSON **仅是设计示例**，不是现有 `check_feedback` schema，也不能输入 `work sync`。它示意一个已初始化工作区中的合成任务已经成功持久化，真实资产/run/输入身份保留在完整报告中。实施前须在既有 OpenSpec change 内明确协议名称/版本及 schema。

@@ -158,7 +158,7 @@ codeguard task verify "$TASK_ID" . --format json
 | `config validate / explain`、`rules list` | 查看配置和规则来源 | 候选不构成策略批准 |
 | `tools list / verify`、`doctor` | 查看工具和有限环境探测 | 显式 Ruff doctor 探测；`tools install --apply` 受阻 |
 | `plan CATEGORY LANGUAGE` | 预览选择和缺口 | 不是已认证执行计划 |
-| `hook execute` | 执行已接线的启动发现或 Python 编辑局部反馈 | 必须给超时；其余事件明确 `not_run`，不构成宿主交付门禁 |
+| `hook execute` | 启动只读发现、Stop 有界下一步、Python 编辑局部反馈及显式 Git 工具的提交面安全预览 | 必须给超时；修复/推送/CI 仍未接线，不构成宿主交付门禁 |
 | `lint python / java / typescript / go` | 执行已接入原生检查 | 参数和范围因适配器而异 |
 | `comments rust`、`build rust` | 文档与类型检查 | build 不运行项目测试 |
 | `cve rust / python / typescript` | 原生漏洞公告观察 | 漏洞库身份、时效及完整覆盖仍有限 |

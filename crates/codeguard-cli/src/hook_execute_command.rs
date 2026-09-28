@@ -1,9 +1,10 @@
-//! 宿主事件的局部执行入口；当前只把项目发现与 Python 编辑快检接到 Rust 检查链。
+//! 宿主事件的局部执行入口；接入只读发现、Stop 指引、Python 编辑快检和暂存面观察。
 
 use crate::check_budget::parse_check_timeout;
 use crate::discovery::discover;
 use crate::git_index_safety::observe_index_safety_with_deadline;
 use crate::hook_plan_command::parse_request;
+use crate::next_command::read_local_brief;
 use crate::python_lint_command::{
     annotate_conversation_budget, scan_selected_report_with_deadline,
 };
@@ -12,6 +13,7 @@ use codeguard_core::{HookTriggerAction, plan_hook_trigger};
 use codeguard_runtime::NativeObservation;
 use serde_json::{Value, json};
 use std::env;
+use std::fs;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
@@ -20,6 +22,8 @@ use std::time::{Duration, Instant};
 
 const MAX_REQUEST_BYTES: u64 = 64 * 1024;
 const MAX_FAST_TIMEOUT_MS: u64 = 120_000;
+const MAX_GUIDANCE_RECORDS: usize = 64;
+const MAX_GUIDANCE_REPORT_BYTES: u64 = 8 * 1024 * 1024;
 
 struct Arguments {
     root: PathBuf,
@@ -78,6 +82,13 @@ pub fn run(args: &[String]) -> ExitCode {
         (HookTriggerAction::DiscoverProject, Some(root)) => match discovery_summary(root) {
             Ok(feedback) => ("read_only_discovery", None, feedback, 3),
             Err(_) => ("not_run", Some("registry_unavailable"), Value::Null, 4),
+        },
+        (HookTriggerAction::ShowSummary, Some(root)) => match guidance_summary(root) {
+            Ok(feedback) => ("read_only_guidance", None, feedback, 3),
+            Err("guidance_scope_exceeded") => {
+                ("not_run", Some("guidance_scope_exceeded"), Value::Null, 3)
+            }
+            Err(_) => ("not_run", Some("guidance_unavailable"), Value::Null, 3),
         },
         (HookTriggerAction::FastFileCheck, Some(root))
             if plan.target_paths.iter().all(|path| path.ends_with(".py")) =>
@@ -181,13 +192,76 @@ pub fn run(args: &[String]) -> ExitCode {
     println!(
         "{}",
         json!({
-            "schema_version":"0.2.0", "report_type":"hook_execution_feedback",
+            "schema_version":"0.3.0", "report_type":"hook_execution_feedback",
             "plan":plan, "execution":execution, "reason":reason,
             "local_feedback":feedback, "delivery_decision":"not_evaluated",
             "host_blocking_verified":false, "soft_result_reused":false
         })
     );
     ExitCode::from(exit_code)
+}
+
+fn guidance_summary(root: &Path) -> Result<Value, &'static str> {
+    let workspace = root.join(".codeguard");
+    if workspace.exists() {
+        if !fs::symlink_metadata(&workspace).is_ok_and(|metadata| metadata.file_type().is_dir()) {
+            return Err("guidance_unavailable");
+        }
+        for name in ["findings", "reports"] {
+            let directory = workspace.join(name);
+            if !directory.exists() {
+                continue;
+            }
+            if !fs::symlink_metadata(&directory).is_ok_and(|metadata| metadata.file_type().is_dir())
+            {
+                return Err("guidance_unavailable");
+            }
+            let mut total_bytes = 0_u64;
+            for (index, entry) in fs::read_dir(&directory)
+                .map_err(|_| "guidance_unavailable")?
+                .enumerate()
+            {
+                if index >= MAX_GUIDANCE_RECORDS {
+                    return Err("guidance_scope_exceeded");
+                }
+                let entry = entry.map_err(|_| "guidance_unavailable")?;
+                if name == "reports" {
+                    let metadata =
+                        fs::symlink_metadata(entry.path()).map_err(|_| "guidance_unavailable")?;
+                    if !metadata.file_type().is_file() {
+                        return Err("guidance_unavailable");
+                    }
+                    total_bytes = total_bytes.saturating_add(metadata.len());
+                    if total_bytes > MAX_GUIDANCE_REPORT_BYTES {
+                        return Err("guidance_scope_exceeded");
+                    }
+                }
+            }
+        }
+    }
+    let view = read_local_brief(root)?;
+    let brief = &view["repair_brief"];
+    let safe_string = |key: &str, limit: usize| {
+        brief[key]
+            .as_str()
+            .filter(|value| value.len() <= limit)
+            .map(str::to_owned)
+    };
+    let next_actions = if brief.is_object() {
+        json!([["codeguard", "next", ".", "--format=json"]])
+    } else {
+        view["next_actions"].clone()
+    };
+    Ok(json!({
+        "schema_version":"0.1.0", "report_type":"hook_next_guidance",
+        "disposition":view["disposition"], "reason":view["reason"],
+        "task_id":safe_string("task_id", 96),
+        "checker_id":safe_string("checker_id", 96),
+        "step":safe_string("step", 512),
+        "next_actions":next_actions,
+        "source_check":"not_run", "authority":"local_unverified",
+        "delivery_decision":"not_evaluated"
+    }))
 }
 
 fn discovery_summary(root: &Path) -> Result<Value, &'static str> {

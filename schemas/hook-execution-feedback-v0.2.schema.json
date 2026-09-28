@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:codeguard:schema:hook-execution-feedback:0.3.0",
+  "$id": "urn:codeguard:schema:hook-execution-feedback:0.2.0",
   "title": "Candidate host-event execution; never a delivery gate",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema_version", "report_type", "plan", "execution", "reason", "local_feedback", "delivery_decision", "host_blocking_verified", "soft_result_reused"],
   "properties": {
-    "schema_version": {"const": "0.3.0"},
+    "schema_version": {"const": "0.2.0"},
     "report_type": {"const": "hook_execution_feedback"},
     "plan": {
       "type": "object",
@@ -23,8 +23,8 @@
         "may_claim_delivery": {"const": false}
       }
     },
-    "execution": {"enum": ["not_run", "read_only_discovery", "read_only_guidance", "local_observation"]},
-    "reason": {"enum": [null, "workspace_unavailable", "registry_unavailable", "adapter_unavailable", "request_cancelled", "request_deadline_exceeded", "fast_scope_not_wired", "write_failed", "scope_resolution_required", "delivery_gate_not_wired", "git_index_observation_failed", "guidance_scope_exceeded", "guidance_unavailable", "action_not_wired"]},
+    "execution": {"enum": ["not_run", "read_only_discovery", "local_observation"]},
+    "reason": {"enum": [null, "workspace_unavailable", "registry_unavailable", "adapter_unavailable", "request_cancelled", "request_deadline_exceeded", "fast_scope_not_wired", "write_failed", "scope_resolution_required", "delivery_gate_not_wired", "git_index_observation_failed", "action_not_wired"]},
     "local_feedback": {"type": ["object", "null"]},
     "delivery_decision": {"const": "not_evaluated"},
     "host_blocking_verified": {"const": false},
@@ -33,27 +33,12 @@
   "allOf": [
     {"if": {"properties": {"execution": {"const": "not_run"}}, "required": ["execution"]}, "then": {"properties": {"local_feedback": {"type": "null"}, "reason": {"type": "string"}}}},
     {"if": {"properties": {"execution": {"const": "read_only_discovery"}}, "required": ["execution"]}, "then": {"properties": {"plan": {"properties": {"action": {"const": "discover_project"}}}, "reason": {"type": "null"}, "local_feedback": {"$ref": "#/$defs/discovery_summary"}}}},
-    {"if": {"properties": {"execution": {"const": "read_only_guidance"}}, "required": ["execution"]}, "then": {"properties": {"plan": {"properties": {"action": {"const": "show_summary"}}}, "reason": {"type": "null"}, "local_feedback": {"$ref": "#/$defs/next_guidance"}}}},
     {"if": {"properties": {"execution": {"const": "local_observation"}}, "required": ["execution"]}, "then": {"oneOf": [
       {"properties": {"plan": {"properties": {"action": {"const": "fast_file_check"}}}, "reason": {"enum": [null, "request_cancelled"]}, "local_feedback": {"type": "object", "required": ["schema_version", "report_type", "scan_scope", "delivery_decision"], "properties": {"schema_version": {"const": "0.13.0"}, "report_type": {"const": "python_lint_feedback"}, "scan_scope": {"const": "selected_files"}, "delivery_decision": {"const": "not_evaluated"}}}}},
       {"properties": {"plan": {"properties": {"action": {"const": "commit_gate"}}}, "reason": {"type": "null"}, "local_feedback": {"$ref": "#/$defs/git_index_summary"}}}
     ]}}
   ],
   "$defs": {
-    "next_guidance": {
-      "type": "object", "additionalProperties": false,
-      "required": ["schema_version", "report_type", "disposition", "reason", "task_id", "checker_id", "step", "next_actions", "source_check", "authority", "delivery_decision"],
-      "properties": {
-        "schema_version": {"const": "0.1.0"}, "report_type": {"const": "hook_next_guidance"},
-        "disposition": {"type": "string", "maxLength": 64}, "reason": {"type": "string", "maxLength": 128},
-        "task_id": {"type": ["string", "null"], "maxLength": 96},
-        "checker_id": {"type": ["string", "null"], "maxLength": 96},
-        "step": {"type": ["string", "null"], "maxLength": 512},
-        "next_actions": {"type": "array", "maxItems": 1, "items": {"type": "array", "minItems": 1, "maxItems": 4, "items": {"type": "string", "maxLength": 64}}},
-        "source_check": {"const": "not_run"}, "authority": {"const": "local_unverified"},
-        "delivery_decision": {"const": "not_evaluated"}
-      }
-    },
     "discovery_summary": {
       "type": "object",
       "additionalProperties": false,

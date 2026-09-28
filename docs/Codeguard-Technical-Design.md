@@ -336,6 +336,28 @@ Delivery is not evaluated; this preview does not authorize a commit.
 
 This is also illustrative, not captured output. Actual hook JSON carries an index digest, a total violation count and at most 32 displayed paths with a truncation flag. The observed index can differ from the working tree and can be supplied through `GIT_INDEX_FILE`.
 
+**F. Stop guidance: read-only repair handoff.**
+
+```json
+{
+  "execution": "read_only_guidance",
+  "local_feedback": {
+    "report_type": "hook_next_guidance",
+    "disposition": "verification_required",
+    "reason": "no_tasks_without_fresh_full_gate",
+    "task_id": null,
+    "checker_id": null,
+    "step": null,
+    "next_actions": [["codeguard", "check", "all", "."]],
+    "source_check": "not_run",
+    "authority": "local_unverified",
+    "delivery_decision": "not_evaluated"
+  }
+}
+```
+
+This is an excerpt of the current 0.3 outer response, not a complete schema instance. It is a recommendation to run a fresh full check, not a clean result. Stop never executes `next_actions`; backlog count or byte overflow returns `not_run/guidance_scope_exceeded`. Prompt submission is intentionally still unexecuted until the event carries usable intent context and the host adapter can bound repeat messages.
+
 ### 7.4 Structured brief and host delivery — proposed contract
 
 This JSON is a **design example only**, not the existing `check_feedback` schema and not a document to feed to `work sync`. It illustrates an initialized workspace with a successfully persisted synthetic task; real asset/run/input identities stay in the full report. Protocol name/version and schemas must be defined in the existing OpenSpec change before implementation.
