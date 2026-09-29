@@ -6,12 +6,20 @@ use codeguard_adapters::{
 #[test]
 fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support() {
     let manifest = bundled_grammar_candidates().expect("bundled manifest");
-    assert_eq!(manifest.assets.len(), 11);
+    assert_eq!(manifest.assets.len(), 15);
     for asset in &manifest.assets {
         let (wasm, license) = match asset.language.as_str() {
             "c" => (
                 include_bytes!("../../../grammars/c/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/c/LICENSE").as_slice(),
+            ),
+            "cpp" => (
+                include_bytes!("../../../grammars/cpp/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/cpp/LICENSE").as_slice(),
+            ),
+            "csharp" => (
+                include_bytes!("../../../grammars/csharp/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/csharp/LICENSE").as_slice(),
             ),
             "go" => (
                 include_bytes!("../../../grammars/go/parser.wasm").as_slice(),
@@ -20,6 +28,14 @@ fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support(
             "javascript" => (
                 include_bytes!("../../../grammars/javascript/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/javascript/LICENSE").as_slice(),
+            ),
+            "lua" => (
+                include_bytes!("../../../grammars/lua/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/lua/LICENSE").as_slice(),
+            ),
+            "luau" => (
+                include_bytes!("../../../grammars/luau/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/luau/LICENSE").as_slice(),
             ),
             "java" => (
                 include_bytes!("../../../grammars/java/parser.wasm").as_slice(),
@@ -109,6 +125,12 @@ fn missing_provenance_duplicate_fields_and_unknown_languages_are_rejected() {
     assert!(parse_grammar_asset_manifest(duplicate.as_bytes()).is_err());
     let unknown = original.replacen("\"language\": \"java\"", "\"language\": \"unknown\"", 1);
     assert!(parse_grammar_asset_manifest(unknown.as_bytes()).is_err());
+    let wrong_symbol = original.replacen(
+        "\"loader_symbol\": \"c_sharp\"",
+        "\"loader_symbol\": \"csharp\"",
+        1,
+    );
+    assert!(parse_grammar_asset_manifest(wrong_symbol.as_bytes()).is_err());
 }
 
 #[test]

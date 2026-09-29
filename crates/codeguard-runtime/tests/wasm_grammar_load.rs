@@ -14,6 +14,59 @@ const C: &[u8] = include_bytes!("../../../grammars/c/parser.wasm");
 const GO: &[u8] = include_bytes!("../../../grammars/go/parser.wasm");
 const JAVASCRIPT: &[u8] = include_bytes!("../../../grammars/javascript/parser.wasm");
 const RUST: &[u8] = include_bytes!("../../../grammars/rust/parser.wasm");
+const CPP: &[u8] = include_bytes!("../../../grammars/cpp/parser.wasm");
+const CSHARP: &[u8] = include_bytes!("../../../grammars/csharp/parser.wasm");
+const LUA: &[u8] = include_bytes!("../../../grammars/lua/parser.wasm");
+const LUAU: &[u8] = include_bytes!("../../../grammars/luau/parser.wasm");
+
+#[test]
+fn second_batch_grammars_load_offline_and_parse_basic_fixtures() {
+    for (name, wasm, sha, abi, valid, invalid) in [
+        (
+            "cpp",
+            CPP,
+            "70f5e2b9976dad56bdcd1fafcb3af8c839c7a92e7beaa437162bcf45f390e83d",
+            14,
+            b"int main() { return 0; }".as_slice(),
+            b"int main() {".as_slice(),
+        ),
+        (
+            "c_sharp",
+            CSHARP,
+            "6f69e1cae44e1c32c1eccc170dc5a9778fb94ff716f71113fe1f8c4299aa2f40",
+            15,
+            b"class C { static int F() { return 1; } }".as_slice(),
+            b"class C {".as_slice(),
+        ),
+        (
+            "lua",
+            LUA,
+            "6d95607fc7d78964cfdf065ccb1ba76be5ed217c5ec0d0a3cace13c59fa1ae43",
+            15,
+            b"local x = 1\n".as_slice(),
+            b"local =\n".as_slice(),
+        ),
+        (
+            "luau",
+            LUAU,
+            "f1647052518f2bdfae8e8c0b033ffdeca1193d69d11c78ba20f84c8374fd0fe3",
+            14,
+            b"local x: number = 1\n".as_slice(),
+            b"local x: =\n".as_slice(),
+        ),
+    ] {
+        let mut grammar = WasmGrammar::load(name, wasm, sha, abi)
+            .unwrap_or_else(|reason| panic!("{name} offline load: {reason}"));
+        assert!(
+            !grammar.parse(valid).unwrap().root_node().has_error(),
+            "{name} valid"
+        );
+        assert!(
+            grammar.parse(invalid).unwrap().root_node().has_error(),
+            "{name} invalid"
+        );
+    }
+}
 
 #[test]
 fn mainstream_grammars_load_offline_and_parse_basic_fixtures() {

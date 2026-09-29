@@ -17,3 +17,5 @@
 2026-09-29 后续增量：Objective-C 与 Solidity 的依赖包原始字节、上游许可证及可复现的 Rust `dylink` 元数据适配现已入[候选清单](../../grammars/manifest.json)；局部加载和隔离 worker 证据见[依赖 grammar 候选验收](dependency-grammar-candidates.md)。当前候选数 7，已验收发行仍为 0。上述 2/3/4/5 候选数是历史快照，旧的 `dependency_bytes_not_pinned` 状态也只适用于当时的库存。
 
 后续增量：C、Go、JavaScript、Rust 的来源与 Rust worker 基础验证见[主流语言候选验收](mainstream-grammar-candidates.md)。当前候选资产 11/32，已验收发行仍为 0；之前 7 份候选仅是历史快照。
+
+再后续增量：C++、C#、Lua、Luau 的来源与 Rust worker 基础验证见[四语种局部候选验收](cpp-csharp-lua-luau-grammar-candidates.md)。当前候选资产 15/32，已验收发行仍为 0；之前 11 份候选仅是历史快照。

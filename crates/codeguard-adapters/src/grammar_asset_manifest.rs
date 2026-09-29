@@ -15,6 +15,10 @@ const C_COMMIT: &str = "b780e47fc780ddc8da13afa35a3f4ed5c157823d";
 const GO_COMMIT: &str = "3c3775faa968158a8b4ac190a7fda867fd5fb748";
 const JAVASCRIPT_COMMIT: &str = "44c892e0be055ac465d5eeddae6d3e194424e7de";
 const RUST_COMMIT: &str = "77a3747266f4d621d0757825e6b11edcbf991ca5";
+const CPP_COMMIT: &str = "f41e1a044c8a84ea9fa8577fdd2eab92ec96de02";
+const CSHARP_COMMIT: &str = "cac6d5fb595f5811a076336682d5d595ac1c9e85";
+const LUA_COMMIT: &str = "816840c592ab973500ae9750763c707b447e7fef";
+const LUAU_COMMIT: &str = "a8914d6c1fc5131f8e1c13f769fa704c9f5eb02f";
 
 /// 代码来源、许可和每份候选 grammar 的固定身份。
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
@@ -50,6 +54,8 @@ pub struct GrammarAsset {
     pub language: String,
     /// 待验收的方言 ID。
     pub dialect: String,
+    /// 与外部语言 ID 不同时，固定 WASM 的 tree_sitter_* 导出名。
+    pub loader_symbol: Option<String>,
     /// 上游 grammar 仓库。
     pub grammar_repository: String,
     /// 上游 grammar 完整提交。
@@ -106,6 +112,14 @@ pub fn bundled_grammar_candidates() -> Result<GrammarAssetManifest, String> {
                 include_bytes!("../../../grammars/c/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/c/LICENSE").as_slice(),
             ),
+            "cpp" => (
+                include_bytes!("../../../grammars/cpp/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/cpp/LICENSE").as_slice(),
+            ),
+            "csharp" => (
+                include_bytes!("../../../grammars/csharp/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/csharp/LICENSE").as_slice(),
+            ),
             "go" => (
                 include_bytes!("../../../grammars/go/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/go/LICENSE").as_slice(),
@@ -113,6 +127,14 @@ pub fn bundled_grammar_candidates() -> Result<GrammarAssetManifest, String> {
             "javascript" => (
                 include_bytes!("../../../grammars/javascript/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/javascript/LICENSE").as_slice(),
+            ),
+            "lua" => (
+                include_bytes!("../../../grammars/lua/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/lua/LICENSE").as_slice(),
+            ),
+            "luau" => (
+                include_bytes!("../../../grammars/luau/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/luau/LICENSE").as_slice(),
             ),
             "java" => (
                 include_bytes!("../../../grammars/java/parser.wasm").as_slice(),
@@ -192,7 +214,7 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
         || manifest.dependency_package_license.as_deref() != Some("LICENSE.tree-sitter-wasms")
         || manifest.dependency_package_license_sha256.as_deref()
             != Some("6b0382b16279f26ff69014300541967a356a666eb0b91b422f6862f6b7dad17e")
-        || manifest.assets.len() != 11
+        || manifest.assets.len() != 15
     {
         return Err("grammar 清单版本、来源或资产数量不符".into());
     }
@@ -204,9 +226,13 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
     if languages
         != BTreeSet::from([
             "c",
+            "cpp",
+            "csharp",
             "go",
             "java",
             "javascript",
+            "lua",
+            "luau",
             "objc",
             "python",
             "rust",
@@ -230,6 +256,26 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
                     625716,
                     "c/LICENSE",
                     "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
+                ),
+                "cpp" => (
+                    "https://github.com/tree-sitter/tree-sitter-cpp",
+                    CPP_COMMIT,
+                    "v0.23.4",
+                    "cpp/parser.wasm",
+                    "70f5e2b9976dad56bdcd1fafcb3af8c839c7a92e7beaa437162bcf45f390e83d",
+                    3434644,
+                    "cpp/LICENSE",
+                    "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
+                ),
+                "csharp" => (
+                    "https://github.com/tree-sitter/tree-sitter-c-sharp",
+                    CSHARP_COMMIT,
+                    "v0.23.5",
+                    "csharp/parser.wasm",
+                    "6f69e1cae44e1c32c1eccc170dc5a9778fb94ff716f71113fe1f8c4299aa2f40",
+                    5350581,
+                    "csharp/LICENSE",
+                    "778fb7d63b8c1844da315648c02f325c4713a6f4a5d19644fd413421422776d3",
                 ),
                 "go" => (
                     "https://github.com/tree-sitter/tree-sitter-go",
@@ -270,6 +316,26 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
                     411832,
                     "javascript/LICENSE",
                     "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
+                ),
+                "lua" => (
+                    "https://github.com/tree-sitter-grammars/tree-sitter-lua",
+                    LUA_COMMIT,
+                    "v0.4.1",
+                    "lua/parser.wasm",
+                    "6d95607fc7d78964cfdf065ccb1ba76be5ed217c5ec0d0a3cace13c59fa1ae43",
+                    49488,
+                    "lua/LICENSE",
+                    "9a32b02e4c917b1ce6b5e79d8ea81e25cefd7f27d89c7235f2afb262c06cf32e",
+                ),
+                "luau" => (
+                    "https://github.com/tree-sitter-grammars/tree-sitter-luau",
+                    LUAU_COMMIT,
+                    "v1.2.0",
+                    "luau/parser.wasm",
+                    "f1647052518f2bdfae8e8c0b033ffdeca1193d69d11c78ba20f84c8374fd0fe3",
+                    94204,
+                    "luau/LICENSE",
+                    "099c44248f8cf353123211318680e93465587c005a4b3730ce8cb5334de043d6",
                 ),
                 "rust" => (
                     "https://github.com/tree-sitter/tree-sitter-rust",
@@ -334,6 +400,12 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
                 _ => return Err("grammar 语言未知".into()),
             };
         if asset.dialect != asset.language
+            || asset.loader_symbol.as_deref()
+                != if asset.language == "csharp" {
+                    Some("c_sharp")
+                } else {
+                    None
+                }
             || (match asset.language.as_str() {
                 "objc" => {
                     asset.source_wasm.as_deref() != Some("objc/source.wasm")
@@ -360,7 +432,10 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
             || asset.license != license_path
             || asset.license_sha256 != license_sha
             || asset.abi_version
-                != if matches!(asset.language.as_str(), "zig" | "c" | "javascript" | "rust") {
+                != if matches!(
+                    asset.language.as_str(),
+                    "zig" | "c" | "csharp" | "javascript" | "lua" | "rust"
+                ) {
                     15
                 } else {
                     14
