@@ -142,6 +142,8 @@ pub(crate) fn valid_reason(reason: &str) -> bool {
     matches!(
         reason,
         "eslint_execution_context_missing"
+            | "eslint_syntax_confirmation_needed"
+            | "eslint_syntax_precheck_unavailable"
             | "eslint_node_runtime_unresolved"
             | "eslint_project_manifest_untrusted"
             | "eslint_local_dependency_path_untrusted"
@@ -302,6 +304,12 @@ pub(crate) fn guidance(root: &Path, fact: &Value) -> Value {
         return fallback;
     }
     let step = match report["diagnostic_reason"].as_str() {
+        Some("eslint_syntax_confirmation_needed") => {
+            "当前源码只有未验收 WASM 语法初检；核对本轮疑似位置，恢复项目适用的原生 TypeScript/ESLint 语法检查并复检同一输入。初检正常、安装完成或任务勾选均不能关闭确认任务"
+        }
+        Some("eslint_syntax_precheck_unavailable") => {
+            "本轮内置语法初检未完成；核对 CLI 的具体未完成原因，恢复项目适用的原生 TypeScript/ESLint 语法检查并复检同一输入，不按未完成报告修改源码或关闭任务"
+        }
         Some("eslint_node_runtime_unresolved") => {
             "项目本地 ESLint 候选与原配置已发现；核对并提供受控 Node 路径后执行原生复检，不重复安装 ESLint 或修改无依据源码"
         }

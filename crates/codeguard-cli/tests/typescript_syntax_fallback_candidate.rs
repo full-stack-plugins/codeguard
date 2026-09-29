@@ -73,6 +73,173 @@ fn missing_native_context_yields_scoped_suspected_observation_and_incomplete_gat
 }
 
 #[test]
+fn initialized_wasm_precheck_keeps_one_native_confirmation_task() {
+    let project = Project::new();
+    let root = project.0.canonicalize().unwrap();
+    let source = root.join("bad.ts");
+    fs::write(&source, "const x: number = ;\n").unwrap();
+    let init = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "init",
+            root.to_str().unwrap(),
+            "--apply",
+            "--format",
+            "json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(init.status.code(), Some(3));
+    let lint = || {
+        let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args([
+                "lint",
+                "typescript",
+                source.to_str().unwrap(),
+                "--workspace",
+                root.to_str().unwrap(),
+                "--format",
+                "json",
+            ])
+            .output()
+            .unwrap();
+        assert_eq!(output.status.code(), Some(3));
+        serde_json::from_slice::<Value>(&output.stdout).unwrap()
+    };
+    let first = lint();
+    assert_eq!(first["schema_version"], "0.5.0");
+    let schema: Value = serde_json::from_str(include_str!(
+        "../../../schemas/eslint-local-feedback-v0.5.schema.json"
+    ))
+    .unwrap();
+    assert_eq!(schema["properties"]["schema_version"]["const"], "0.5.0");
+    assert_eq!(schema["additionalProperties"], false);
+    let actual: std::collections::BTreeSet<_> = first.as_object().unwrap().keys().collect();
+    let required: std::collections::BTreeSet<_> = schema["required"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|value| value.as_str().unwrap())
+        .collect();
+    assert_eq!(
+        actual
+            .iter()
+            .map(|value| value.as_str())
+            .collect::<std::collections::BTreeSet<_>>(),
+        required
+    );
+    assert!(
+        !first["syntax_precheck"]["observations"]
+            .as_array()
+            .unwrap()
+            .is_empty()
+    );
+    assert_eq!(first["workbench_status"], "synced_partial");
+    assert_eq!(first["workbench"]["new_blockers"], 1);
+    assert!(
+        first["next_action"]
+            .as_str()
+            .unwrap()
+            .contains("WASM 语法初检")
+    );
+    let task_id = first["setup"]["task_id"].as_str().unwrap();
+    assert!(
+        root.join(".codeguard/tasks")
+            .join(format!("{task_id}.md"))
+            .is_file()
+    );
+    let fact: Value = serde_json::from_slice(
+        &fs::read(
+            root.join(".codeguard/findings")
+                .join(task_id)
+                .join("finding.json"),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(fact["kind"], "blocker");
+    assert_eq!(fact["checker_id"], "node.eslint.preparation");
+    assert_eq!(fact["state"], "open");
+    let second = lint();
+    assert_eq!(second["setup"]["task_id"], task_id);
+    assert_eq!(second["workbench"]["new_blockers"], 0);
+    assert_eq!(second["delivery_decision"], "not_evaluated");
+    fs::write(&source, "const x: number = 1;\n").unwrap();
+    let changed = lint();
+    assert_eq!(changed["setup"]["task_id"], task_id);
+    assert_eq!(changed["workbench"]["new_blockers"], 0);
+    assert_eq!(changed["delivery_decision"], "not_evaluated");
+
+    let tsx = root.join("Component.tsx");
+    fs::write(&tsx, "const App = () => <div>;\n").unwrap();
+    let tsx_output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "lint",
+            "typescript",
+            tsx.to_str().unwrap(),
+            "--workspace",
+            root.to_str().unwrap(),
+            "--format",
+            "json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(tsx_output.status.code(), Some(3));
+    let tsx_report: Value = serde_json::from_slice(&tsx_output.stdout).unwrap();
+    assert_eq!(tsx_report["schema_version"], "0.5.0");
+    assert_eq!(tsx_report["syntax_precheck"]["language"], "tsx");
+    assert_eq!(tsx_report["workbench"]["new_blockers"], 1);
+    assert_ne!(tsx_report["setup"]["task_id"], task_id);
+    assert_eq!(
+        tsx_report["workbench"]["next"]["repair_brief"]["task_id"],
+        tsx_report["setup"]["task_id"]
+    );
+}
+
+#[test]
+fn initialized_workspace_keeps_precheck_failure_as_native_setup_task() {
+    let project = Project::new();
+    let root = project.0.canonicalize().unwrap();
+    let source = root.join("large.ts");
+    fs::write(&source, vec![b'a'; 1024 * 1024 + 1]).unwrap();
+    let init = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "init",
+            root.to_str().unwrap(),
+            "--apply",
+            "--format",
+            "json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(init.status.code(), Some(3));
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "lint",
+            "typescript",
+            source.to_str().unwrap(),
+            "--workspace",
+            root.to_str().unwrap(),
+            "--format",
+            "json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    let report: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(report["schema_version"], "0.5.0");
+    assert_eq!(report["syntax_precheck"]["reason"], "source_unavailable");
+    assert_eq!(report["workbench_status"], "synced_partial");
+    assert!(report["setup"]["task_id"].as_str().is_some());
+    assert!(report["findings"].as_array().unwrap().is_empty());
+    assert!(
+        report["next_action"]
+            .as_str()
+            .unwrap()
+            .contains("初检未完成")
+    );
+}
+
+#[test]
 fn no_recovery_remains_incomplete_and_javascript_does_not_use_typescript_grammar() {
     let project = Project::new();
     fs::write(project.0.join("good.ts"), "const x: number = 1;\n").unwrap();
