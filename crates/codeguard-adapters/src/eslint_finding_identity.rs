@@ -103,12 +103,7 @@ pub fn project_eslint_findings(
 }
 
 /// 复核脱敏任务输入的稳定投影；消息摘要只验证形状，不自证原生来源。
-pub fn validate_records(
-    relative: &str,
-    absolute: &str,
-    source: &[u8],
-    records: &[Value],
-) -> bool {
+pub fn validate_records(relative: &str, absolute: &str, source: &[u8], records: &[Value]) -> bool {
     let mut diagnostics = Vec::new();
     for record in records {
         let native = &record["native"];

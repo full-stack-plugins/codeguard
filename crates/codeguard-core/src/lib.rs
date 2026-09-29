@@ -80,7 +80,9 @@ pub use task_node::TaskNode;
 pub use verdict::Verdict;
 
 mod readiness_state;
+mod repository_content_safety;
 pub use readiness_state::ReadinessState;
+pub use repository_content_safety::has_unencrypted_openssh_ed25519_private_key;
 
 mod preparation_evidence_state;
 pub use preparation_evidence_state::PreparationEvidenceState;

@@ -7,7 +7,9 @@ use std::path::{Path, PathBuf};
 use std::sync::atomic::AtomicBool;
 use std::time::{Duration, Instant};
 
-use codeguard_core::{RepositoryPathViolation, check_repository_paths};
+use codeguard_core::{
+    RepositoryPathViolation, check_repository_paths, has_unencrypted_openssh_ed25519_private_key,
+};
 use codeguard_runtime::{ProcessSpec, Termination, run_process};
 use sha1::Sha1;
 use sha2::{Digest, Sha256};
@@ -183,7 +185,7 @@ pub(crate) fn observe_index_safety_with_deadline(
     let first = git(&root, git_tool, index.as_deref(), &args, deadline, None)?;
     let entries = parse_index_listing(&first, format)?;
     let paths: Vec<String> = entries.iter().map(|entry| entry.path.clone()).collect();
-    let violations = check_repository_paths(&paths)?;
+    let mut violations = check_repository_paths(&paths)?;
     let object_result = verify_index_objects(
         &root,
         git_tool,
@@ -198,7 +200,10 @@ pub(crate) fn observe_index_safety_with_deadline(
     }
     let (object_evidence, unresolved_object_paths, object_verification_reason) = match object_result
     {
-        Ok((evidence, unresolved)) => (evidence, unresolved, None),
+        Ok((evidence, unresolved, content_violations)) => {
+            violations.extend(content_violations);
+            (evidence, unresolved, None)
+        }
         Err(reason) => (Vec::new(), paths.clone(), Some(reason)),
     };
     let objects_verified = object_verification_reason.is_none()
@@ -223,7 +228,14 @@ fn verify_index_objects(
     entries: &[GitIndexEntry],
     format: &str,
     deadline: Instant,
-) -> Result<(Vec<IndexObjectEvidence>, Vec<String>), String> {
+) -> Result<
+    (
+        Vec<IndexObjectEvidence>,
+        Vec<String>,
+        Vec<RepositoryPathViolation>,
+    ),
+    String,
+> {
     let mut requested = BTreeMap::<&str, usize>::new();
     let mut unresolved = Vec::new();
     for entry in entries {
@@ -234,7 +246,7 @@ fn verify_index_objects(
         }
     }
     if requested.is_empty() {
-        return Ok((Vec::new(), unresolved));
+        return Ok((Vec::new(), unresolved, Vec::new()));
     }
     let oid_request = requested
         .keys()
@@ -273,7 +285,7 @@ fn verify_index_objects(
         }
         *size = count;
     }
-    let mut verified = BTreeMap::<String, (usize, String, bool)>::new();
+    let mut verified = BTreeMap::<String, (usize, String, bool, bool)>::new();
     let mut batch = Vec::<(&str, usize)>::new();
     let mut batch_size = 0_usize;
     for (oid, size) in requested {
@@ -289,11 +301,13 @@ fn verify_index_objects(
         read_blob_batch(root, tool, index, &batch, format, deadline, &mut verified)?;
     }
     let mut evidence = Vec::new();
+    let mut content_violations = Vec::new();
     for entry in entries {
         if entry.mode == "160000" {
             continue;
         }
-        let (size, digest, lfs_pointer) = verified.get(&entry.oid).ok_or("Git 对象验证结果缺失")?;
+        let (size, digest, lfs_pointer, private_key) =
+            verified.get(&entry.oid).ok_or("Git 对象验证结果缺失")?;
         let kind = if entry.mode == "120000" {
             "symlink_unresolved"
         } else if *lfs_pointer {
@@ -304,6 +318,13 @@ fn verify_index_objects(
         if kind != "regular" {
             unresolved.push(entry.path.clone());
         }
+        // 仅对已核对 OID 的普通 blob 记录精确结构命中；不回显私钥字节。
+        if kind == "regular" && *private_key {
+            content_violations.push(RepositoryPathViolation {
+                path: entry.path.clone(),
+                rule_id: "repository_policy.unencrypted_openssh_ed25519_private_key".into(),
+            });
+        }
         evidence.push(IndexObjectEvidence {
             path: entry.path.clone(),
             oid: entry.oid.clone(),
@@ -313,7 +334,7 @@ fn verify_index_objects(
         });
     }
     unresolved.sort();
-    Ok((evidence, unresolved))
+    Ok((evidence, unresolved, content_violations))
 }
 
 fn read_blob_batch(
@@ -323,7 +344,7 @@ fn read_blob_batch(
     batch: &[(&str, usize)],
     format: &str,
     deadline: Instant,
-    verified: &mut BTreeMap<String, (usize, String, bool)>,
+    verified: &mut BTreeMap<String, (usize, String, bool, bool)>,
 ) -> Result<(), String> {
     let input = batch
         .iter()
@@ -364,6 +385,7 @@ fn read_blob_batch(
                 *size,
                 format!("{:x}", Sha256::digest(content)),
                 content.starts_with(b"version https://git-lfs.github.com/spec/v1"),
+                has_unencrypted_openssh_ed25519_private_key(content),
             ),
         );
         cursor = content_end + 1;

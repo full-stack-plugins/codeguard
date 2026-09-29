@@ -100,6 +100,7 @@
 - [ ] 4.5 实现可信政策修订和例外输入校验；验收：agent 自写批准、无到期、过期、错内容或错范围凭据不生效，批准例外不显示普通 PASS。
   签名进展：Rust 已增加域分隔 Ed25519 原始载荷核验，绑定工作区、策略修订、受保护 Git 基线、序号、期限与快照字节；普通候选桥接还核对签名与快照内修订，再走精确字节/身份绑定。可信公钥、撤销、时间和最低序号仍须由宿主提供；未提供项目自批入口。签名四项及原快照十五项通过，见相邻 codeguard-cli/tests/acceptance/signed-approval-binding.md。宿主信任来源、完整签名修订链及真实门禁尚缺，4.5/4.8 不勾选。
 - [ ] 4.6 保留点前缀默认策略及两项例外，生成汇总覆盖；验收：F18 全部成立，无未授权的新排除。进行中：相邻 Rust `detect` 0.3.0 已汇总普通发现的点前缀排除根、配置例外文件及未评估入库安全状态；`gate pre-commit` 路径安全预览能在真实 index 看到点前缀 `.env`，见 `codeguard-cli/tests/acceptance/{dot-prefix-scope-baseline,git-index-safety-preview}.md`。完整安全内容扫描与正式 Git 门禁未接线，不能勾选。
+  暂存内容增量：`gate pre-commit` 0.3.0 对核对 OID 的普通 blob 识别结构完整的未加密 OpenSSH Ed25519 私钥，`.codeguard/` 受管记录也不豁免；真实 `ssh-keygen` 样本及暂存/工作树分离反例见同一验收记录。只覆盖一个高置信度格式，其他密钥、完整安全门禁和 F18 全矩阵仍缺，4.6 不勾选。
 - [ ] 4.7 接入 rules list/config validate/explain 命令；验收：有效规则、原生suppression与批准来源可解释，静态验证不执行项目脚本，配置错误为未完成而非源码违规。
   追加进展：`config validate/explain` 0.1 只返回旧配置与工具锁的静态状态、未绑定的可信质量策略和无效白名单权威；不产生有效策略或质量门禁。`rules list`、规则/原生配置差异和批准来源解释仍缺，任务不勾选。
   2026-09-27入口进展：Rust rules list现复用静态发现及内置版本化Ruff候选映射，逐语言显示配置声明、来源/许可/摘要/兼容版本和六类目录缺口；Node生态显式映射到TypeScript，不靠语言前缀丢失ESLint配置。动态配置不执行、本地同名映射/自批不授权，报告0.1固定未完成且无门禁效果。新增schema及验收用例，结果见verification.md。完整有效规则、可信来源、suppression和批准例外仍缺，4.7不勾选。
@@ -556,6 +557,7 @@
 - [ ] 11.3 实现 MCP 相同核心 API 与版本化兼容工具；验收：F22、凭据脱敏与超时/取消正确。
 - [ ] 11.4 更新五类宿主入口及 hooks/__protocol__.md 的旧新模式表；验收：保存反馈与严格交付区分，skipGate/env 不能降级新模式。
 - [ ] 11.5 实现真实 Git pre-commit/pre-push 与 CI 入口；验收：alternate index、多 ref、非 HEAD、未知 Shell 边界正确，remote参数/stdin及ci input schema显式验证，不默认HEAD或由input自授策略权威。进行中：Rust CLI 暴露 `gate pre-commit` 的真实 index 路径安全预览，固定 3/incomplete，不是可放行的完整 Git Hook；见 `codeguard-cli/tests/acceptance/git-index-safety-preview.md`。
+  内容增量：同一预览已报告暂存普通 blob 中结构完整的未加密 OpenSSH Ed25519 私钥，按暂存对象身份而非工作树读取；CLI 仍固定退出 3、交付未评估，不具备完整内容规则、可信 Git 工具或正式 Git Hook，11.5 不勾选。
 - [ ] 11.6 在独立 codeguard-skills 源仓更新调用与修复指引，再按 vendor 流程同步；验收：不直接编辑受管副本，不建议规避门禁。
 - [ ] 11.7 明确 legacy 弃用与安全回滚路径；验收：旧数字保持，但旧通过不能被新 CI 认证。
 - [ ] 11.8 完成macOS arm64候选制品和平台适配验收；依赖11.1/11.2；证据：真实启动、进程树/取消、路径/私有权限、原子写入、离线能力和代表性工具，未支持项明确gap。
