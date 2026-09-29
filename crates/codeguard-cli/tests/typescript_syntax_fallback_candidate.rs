@@ -91,6 +91,72 @@ fn no_recovery_remains_incomplete_and_javascript_does_not_use_typescript_grammar
 }
 
 #[test]
+fn tsx_uses_its_own_grammar_instead_of_reporting_valid_jsx_as_suspect() {
+    let project = Project::new();
+    fs::write(
+        project.0.join("component.tsx"),
+        "const node = <div title=\"ok\">hello</div>;\n",
+    )
+    .unwrap();
+    let (status, report) = project.lint("component.tsx");
+    assert_eq!(status, 3);
+    assert_eq!(report["schema_version"], "0.4.0");
+    assert_eq!(report["native"]["status"], "not_run");
+    assert_eq!(report["syntax_precheck"]["language"], "tsx");
+    assert_eq!(report["syntax_precheck"]["checked_files"], 1);
+    assert_eq!(
+        report["syntax_precheck"]["grammar_sha256"],
+        "8f647a1b2cafe9ab00fb2056d79021d2a144ba17a72f45511072311c1b05d08e"
+    );
+    assert!(
+        report["syntax_precheck"]["observations"]
+            .as_array()
+            .unwrap()
+            .is_empty()
+    );
+    assert_eq!(report["delivery_decision"], "not_evaluated");
+
+    fs::write(
+        project.0.join("broken.tsx"),
+        "const node = <div title=></div>;\n",
+    )
+    .unwrap();
+    let (_, broken) = project.lint("broken.tsx");
+    assert_eq!(broken["syntax_precheck"]["language"], "tsx");
+    assert!(
+        !broken["syntax_precheck"]["observations"]
+            .as_array()
+            .unwrap()
+            .is_empty()
+    );
+    assert_eq!(broken["syntax_precheck"]["status"], "incomplete");
+    assert!(broken["findings"].as_array().unwrap().is_empty());
+
+    let schema: Value = serde_json::from_str(include_str!(
+        "../../../schemas/eslint-local-feedback-v0.4.schema.json"
+    ))
+    .unwrap();
+    assert_eq!(schema["properties"]["schema_version"]["const"], "0.4.0");
+    assert_eq!(
+        schema["properties"]["syntax_precheck"]["properties"]["language"]["const"],
+        "tsx"
+    );
+    let actual: std::collections::BTreeSet<_> = report
+        .as_object()
+        .unwrap()
+        .keys()
+        .map(String::as_str)
+        .collect();
+    let required: std::collections::BTreeSet<_> = schema["required"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|item| item.as_str().unwrap())
+        .collect();
+    assert_eq!(actual, required);
+}
+
+#[test]
 fn candidate_feedback_schema_is_versioned_and_closed() {
     let schema: Value = serde_json::from_str(include_str!(
         "../../../schemas/eslint-local-feedback-v0.3.schema.json"

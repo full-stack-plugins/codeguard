@@ -14,3 +14,5 @@ TDD：新增 `grammar_asset_manifest` 测试先因缺少 Rust API 编译失败�
 Rust 加载器的 `wasm_grammar_load` 测试先因缺少 `WasmGrammar` 编译失败；实现后覆盖 Java/TypeScript 固定资产、损坏模块、错误摘要和错误 ABI 声明。离线运行 `cargo test --locked -p codeguard-runtime -p codeguard-adapters --features codeguard-runtime/wasm-precheck`、`cargo test --workspace --locked --quiet` 均通过，前者显式覆盖新功能，后者验证默认功能回归；还通过带新特性的 runtime Clippy 检查。加载器是可选编译特性，当前仅为受控兼容性试验，不进入 CLI 调度，也未具备工作进程隔离。`cargo metadata` 显示当前解析到的依赖未声明高于 1.85 的 Rust 版本；本机未安装 Rust 1.85，实际 MSRV 编译尚未验收。
 
 OpenSpec 14.1 和 14.2 仍不勾选：语言/方言版本边界、MSRV 实编、进程隔离、错误节点/位置和可发行验收仍需后续任务补齐。加载成功不意味着语法规则准确或原生 lint 义务已完成。
+
+后续增量：[TSX 候选纠错](tsx-grammar-candidate.md)把同一来源仓库的 TSX 独立 WASM 加入固定候选清单；当前候选资产数为 3。本页的“两份”及初次验收命令属于原 Java/TypeScript 引入时的历史快照。

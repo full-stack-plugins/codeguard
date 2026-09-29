@@ -63,6 +63,7 @@ fn observe(language: &str, source: &[u8]) -> Result<SyntaxWorkerEnvelope, String
     let wasm = match language {
         "java" => include_bytes!("../../../grammars/java/parser.wasm").as_slice(),
         "typescript" => include_bytes!("../../../grammars/typescript/parser.wasm").as_slice(),
+        "tsx" => include_bytes!("../../../grammars/tsx/parser.wasm").as_slice(),
         _ => return Err("不支持的 grammar 语种".into()),
     };
     let mut grammar = WasmGrammar::load(language, wasm, &asset.sha256, asset.abi_version as usize)?;

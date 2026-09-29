@@ -40,3 +40,5 @@ openspec validate introduce-rust-codeguard-cli --strict
 ```
 
 实际结果：TypeScript 候选路径 5 项测试通过；既有 ESLint CLI 测试 6 项通过、4 项需显式真实 Node/ESLint 环境而 ignored；Clippy 无警告；启用候选特性的完整 Rust workspace 回归退出码 0；OpenSpec 严格校验与 `git diff --check` 通过。真实 ESLint 自动选择、正式任务同步和三宿主对话仍未验收。
+
+后续增量：[TSX 候选纠错](tsx-grammar-candidate.md)将 `.tsx` 从普通 TypeScript grammar 改为固定 TSX grammar，并使用独立的 0.4.0 报告；本页 0.3.0 示例仍适用于 `.ts/.mts/.cts`。上述 5 项与完整 workspace 测试结果是当时的历史验收记录。

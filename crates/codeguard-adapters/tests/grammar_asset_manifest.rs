@@ -5,7 +5,7 @@ use codeguard_adapters::{
 #[test]
 fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support() {
     let manifest = bundled_grammar_candidates().expect("bundled manifest");
-    assert_eq!(manifest.assets.len(), 2);
+    assert_eq!(manifest.assets.len(), 3);
     for asset in &manifest.assets {
         let (wasm, license) = match asset.language.as_str() {
             "java" => (
@@ -14,6 +14,10 @@ fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support(
             ),
             "typescript" => (
                 include_bytes!("../../../grammars/typescript/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/typescript/LICENSE").as_slice(),
+            ),
+            "tsx" => (
+                include_bytes!("../../../grammars/tsx/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/typescript/LICENSE").as_slice(),
             ),
             other => panic!("unexpected language {other}"),

@@ -12,7 +12,7 @@ fn codegraph_coverage_is_explicit_and_never_claims_parser_or_gate_completion() {
     assert_eq!(report["report_type"], "grammar_coverage_inventory");
     assert_eq!(report["codegraph_grammar_count"], 32);
     assert_eq!(report["codegraph_vendored_count"], 30);
-    assert_eq!(report["candidate_count"], 2);
+    assert_eq!(report["candidate_count"], 3);
     assert_eq!(report["released_count"], 0);
     assert_eq!(report["authority"], "source_inventory_only");
     assert_eq!(report["parser_capability"], "unverified");
@@ -25,7 +25,7 @@ fn codegraph_coverage_is_explicit_and_never_claims_parser_or_gate_completion() {
         assert_eq!(asset["released"], false);
         assert!(!asset["gap"].as_str().unwrap().is_empty());
     }
-    for language in ["java", "typescript"] {
+    for language in ["java", "typescript", "tsx"] {
         let asset = assets
             .iter()
             .find(|row| row["language"] == language)

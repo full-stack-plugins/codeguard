@@ -14,7 +14,7 @@
 
 可调用行为以当前源码为准，目标契约明确标注。产品优先级是配置发现 → 原生结果 → 有用的修复指引。内部一致性校验为这个体验服务，不要求用户手工构造执行证明。
 
-WASM 的规范与 18 项实施任务已纳入既有 change；可选特性下的 Rust worker、固定资产及 TypeScript/Java 单文件候选报告已存在，项目级原生优先调度、grammar 版本范围验收与宿主接线仍未完成。设计示例不是当前命令输出。
+WASM 的规范与 18 项实施任务已纳入既有 change；可选特性下的 Rust worker、固定 Java/TypeScript/TSX 资产及局部单文件候选报告已存在，项目级原生优先调度、grammar 版本范围验收与宿主接线仍未完成。设计示例不是当前命令输出。
 
 ## 2. 技术选型与权衡
 
@@ -183,15 +183,15 @@ flowchart LR
 
 部分文件有疑似异常、另有文件未解析时，总体为 `incomplete`，同时保留所有可用疑似观察。`clean` 要求选定范围非空且全部完成检查。
 
-这些是目标语义字段，尚非已发行的项目级 lint/check 报告。局部的[候选初检 schema](../schemas/syntax-precheck-candidate.schema.json) 与 [Rust 严格读者](../crates/codeguard-adapters/src/syntax_precheck_candidate_report.rs)已绑定源码 SHA-256 和固定 grammar 身份，重新计算状态，并拒绝未知版本及伪造的 `clean`。可选 CLI 的 [TypeScript](../schemas/eslint-local-feedback-v0.3.schema.json) 与 [Java](../schemas/java-syntax-precheck-feedback-v0.1.schema.json) 单文件生产端已提供恢复位置和准备指引；宿主渲染与持久任务引用仍缺。内置 grammar 仍是未验收候选，因此不能返回 `clean`。保持既有退出语义：必需原生执行缺失仍为未完成（`3`）；解析器疑似问题本身不是已确认违规（`1`）。若未来增加独立语法操作，其成功必须限定为语法初检；本文不宣称已有 `syntax` 命令。
+这些是目标语义字段，尚非已发行的项目级 lint/check 报告。局部的[候选初检 schema](../schemas/syntax-precheck-candidate.schema.json) 与 [Rust 严格读者](../crates/codeguard-adapters/src/syntax_precheck_candidate_report.rs)已绑定源码 SHA-256、固定 grammar 身份和文件方言，重新计算状态，并拒绝未知版本及伪造的 `clean`。可选 CLI 的 [TypeScript](../schemas/eslint-local-feedback-v0.3.schema.json)、[TSX](../schemas/eslint-local-feedback-v0.4.schema.json) 与 [Java](../schemas/java-syntax-precheck-feedback-v0.1.schema.json) 单文件生产端已提供恢复位置和准备指引；宿主渲染与持久任务引用仍缺。内置 grammar 仍是未验收候选，因此不能返回 `clean`。保持既有退出语义：必需原生执行缺失仍为未完成（`3`）；解析器疑似问题本身不是已确认违规（`1`）。若未来增加独立语法操作，其成功必须限定为语法初检；本文不宣称已有 `syntax` 命令。
 
-可选特性构建的 CLI 现在还会在显式 TypeScript 文件完全未提供原生执行上下文时输出 [ESLint 反馈 0.3.0](../schemas/eslint-local-feedback-v0.3.schema.json)：保留 `native=not_run`、`delivery=not_evaluated`，恢复节点只作为 Unicode 位置的疑似观察；即使零恢复节点也保持总体未完成。部分原生上下文或符号链接不触发候选路径，已配置的原生执行继续走原路径。这只是一个局部统一入口，不代表逐模块原生优先调度或宿主自动对话已完成。
+可选特性构建的 CLI 在 `.ts/.mts/.cts` 完全未提供原生执行上下文时输出 [ESLint 反馈 0.3.0](../schemas/eslint-local-feedback-v0.3.schema.json)，`.tsx` 则使用独立 grammar 输出 [0.4.0](../schemas/eslint-local-feedback-v0.4.schema.json)，避免普通 TypeScript grammar 把有效 JSX 标为疑似异常。两者保留 `native=not_run`、`delivery=not_evaluated`，恢复节点只作为 Unicode 位置的疑似观察；即使零恢复节点也保持总体未完成。部分原生上下文或符号链接不触发候选路径，已配置的原生执行继续走原路径。这只是一个局部统一入口，不代表逐模块原生优先调度或宿主自动对话已完成。
 
 ### 5.4 Grammar 引入与运行生命周期——目标
 
 只引入固定 WASM 字节及上游许可证、提交/补丁来源、SHA-256、ABI、已验证运行时和语言/方言范围、语料引用与已知缺口。逐个验证 CodeGraph 资产与选定 Rust Tree-sitter 运行时兼容，不能复制 TypeScript 提取逻辑或把 CodeGraph 支持等同语法验收。发行清单属于分发资产，不属于可写的 `.codeguard/` 项目状态。
 
-可用 `codeguard grammar status --format=json` 查询独立的来源覆盖库存。它只读报告 CodeGraph 32 种独立 grammar、CodeGuard 两份候选和零项已发行能力，不运行解析器。依赖提供的两份资产尚未固定字节，COBOL 超过现有加载器的 8 MiB 限额；每语言验收前仍须解决这些缺口。
+可用 `codeguard grammar status --format=json` 查询独立的来源覆盖库存。它只读报告 CodeGraph 32 种独立 grammar、CodeGuard 三份候选和零项已发行能力，不运行解析器。依赖提供的两份资产尚未固定字节，COBOL 超过现有加载器的 8 MiB 限额；每语言验收前仍须解决这些缺口。
 
 由父进程控制解析工作进程，设置总截止时间、单文件输入上限、内存/进程限制及诊断数量上限。按需加载 grammar，不提供通用网络/文件系统导入；终止卡住的进程时保留其它模块的原生结果。宿主约束执行和 Rust MSRV 兼容性须测试，生产数值预算须经测量后确定，不编造性能承诺。
 
