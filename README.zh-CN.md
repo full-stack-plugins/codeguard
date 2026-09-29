@@ -8,7 +8,7 @@ Codeguard 面向开发者与编程智能体，识别项目已有质量配置，�
 
 > **当前状态：**早期开发阶段，源码版本 `0.1.2`。部分原生检查和本地修复流程已在明确范围内实现。完整交付门禁、全部语言覆盖、任务自动关闭和宿主插件接入仍未完成。
 >
-> **基线：**可调用行为以当前源码和[实施证据](openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md)为准。声明 Rust 最低版本 `1.85`，edition `2024`，Cargo resolver `2`。`@partme.ai/codeguard@0.1.1` 已发布，当前仅支持 Apple Silicon macOS；不声称已有多平台二进制发行版或 crates.io 发布。
+> **基线：**可调用行为以当前源码和[实施证据](openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md)为准。声明 Rust 最低版本 `1.85`，edition `2024`，Cargo resolver `2`。`@partme.ai/codeguard@0.1.2` 已发布，当前仅支持 Apple Silicon macOS；不声称已有多平台二进制发行版或 crates.io 发布。
 
 ```text
 项目文件 + 已有检查器配置
@@ -94,14 +94,14 @@ cargo build --locked -p codeguard-cli
 
 版本输出包含 `cli_version`、`target` 和协议信息。发现与 init 预览返回观察及未知项。Dry-run 不创建 `AGENTS.md` 或项目数据目录。仅在依赖已缓存时为 Cargo 添加 `--offline`。
 
-工作区要求 `std`。可选 `wasm-precheck` 构建特性已用固定的 Java/TypeScript grammar 候选资产与有界 Rust worker，为缺少显式原生上下文的 `lint java`、`lint typescript` 单文件请求提供疑似语法观察；公开 npm `0.1.1` 不含该路径。不声称 `no_std`、已完成项目级 WASM 兜底、零 unsafe 或性能最快。运行层系统调用需要安全审查，当前不宣称已完成整体安全审计。
+工作区要求 `std`。可选 `wasm-precheck` 构建特性已用固定的 Java/TypeScript grammar 候选资产与有界 Rust worker，为缺少显式原生上下文的 `lint java`、`lint typescript` 单文件请求提供疑似语法观察；公开 npm `0.1.2` 不含该路径。不声称 `no_std`、已完成项目级 WASM 兜底、零 unsafe 或性能最快。运行层系统调用需要安全审查，当前不宣称已完成整体安全审计。
 
 ### npm 安装与一次性调用
 
-已在 Apple Silicon macOS 上通过全新 npm 缓存验证公开 `0.1.1` 包：
+已在 Apple Silicon macOS 上通过全新 npm 缓存验证公开 `0.1.2` 包：
 
 ```bash
-npx --yes @partme.ai/codeguard@0.1.1 --version --format json
+npx --yes @partme.ai/codeguard@0.1.2 --version --format json
 ```
 
 检查项目时，可将包名后的参数换成需要执行的 Codeguard 指令。当前公开包仅支持 macOS arm64。
@@ -121,7 +121,7 @@ codeguard --version --format json
 npm exec --yes --package "$CODEGUARD_TARBALL" -- codeguard detect . --format json
 ```
 
-打包器在已有匹配原生程序时支持 macOS 与 Linux 的 x64/arm64 平台。打包需要 Node 18+、npm 和预先构建的本机 Rust 二进制；打包前核对二进制报告的平台和版本，在已忽略的 `release/npm/` 写入带平台标识的 tarball。默认包标记为 private，仅用于本地分发。`node scripts/pack-npm-local.mjs --public` 准备带说明、完整许可证与平台限制的公开 `@partme.ai/codeguard` 包。`0.1.1` 已发布；其公开包在 Apple Silicon macOS 上通过全新缓存 `npx` 执行和制品摘要核对。二进制回报的候选源码提交不等于签名或可复现构建证明。其它平台仍需各自验收的二进制包。见[发行技术方案](docs/Codeguard-Technical-Design.zh_CN.md)及[0.1.1 验收记录](tests/acceptance/npm-0.1.1-candidate.md)。
+打包器在已有匹配原生程序时支持 macOS 与 Linux 的 x64/arm64 平台。打包需要 Node 18+、npm 和预先构建的本机 Rust 二进制；打包前核对二进制报告的平台和版本，在已忽略的 `release/npm/` 写入带平台标识的 tarball。默认包标记为 private，仅用于本地分发。`node scripts/pack-npm-local.mjs --public` 准备带说明、完整许可证与平台限制的公开 `@partme.ai/codeguard` 包。`0.1.2` 已发布；其公开包在 Apple Silicon macOS 上通过全新缓存 `npx` 执行和制品摘要核对。二进制回报的候选源码提交不等于签名或可复现构建证明。其它平台仍需各自验收的二进制包。见[发行技术方案](docs/Codeguard-Technical-Design.zh_CN.md)及[0.1.2 验收记录](tests/acceptance/npm-0.1.2-candidate.md)。
 
 ## 5. 修复流程
 
@@ -176,7 +176,7 @@ Python 编辑快反馈可执行 `codeguard lint python . --file src/changed.py -
 
 ### 原生优先的统一入口与语法兜底——设计目标
 
-**公开 `0.1.1` 尚未实现内置 WASM 兜底或自动对话交付。** 保留已有命令作为统一入口；当前仍须满足各原生适配器的参数和前置条件：
+**公开 `0.1.2` 尚未实现内置 WASM 兜底或自动对话交付。** 保留已有命令作为统一入口；当前仍须满足各原生适配器的参数和前置条件：
 
 可选源码构建的单文件候选路径已存在：`codeguard lint java Foo.java` 与 `codeguard lint typescript foo.ts` 在完全缺少显式原生上下文时分别输出 [Java](schemas/java-syntax-precheck-feedback-v0.1.schema.json) 与 [TypeScript](schemas/eslint-local-feedback-v0.3.schema.json) 的版本化初检反馈。疑似恢复位置仍需原生确认；无恢复节点也因 grammar 版本/方言未验收保持 incomplete。默认及公开二进制沿用既有原生上下文路径，见 [Java 局部验收](tests/acceptance/java-syntax-fallback-candidate.md) 与 [TypeScript 局部验收](tests/acceptance/typescript-syntax-fallback-candidate.md)。
 

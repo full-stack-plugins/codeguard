@@ -75,7 +75,7 @@ CLI 不承担模型供应商、聊天传输、IDE UI、RAG 存储、分布式调
 | 修复 | 稳定任务、本地尝试、部分原工具复检 | 可靠的验证关闭、复发处理、完整事件协调 |
 | 误报例外 | 候选查询/提案、精确匹配和签名相关基础能力 | 可信批准来源、生命周期接线和可用生效流程 |
 | 质量门禁 | 核心判定逻辑；公开扫描仍局部；index 路径安全 | 针对实际工作树/index/ref/CI 内容的端到端检查 |
-| 分发 | 源码构建、Apple Silicon macOS npm 0.1.1；制品核验、下载和安装基础能力 | 可支持的二进制发行、平台测试和宿主运行时绑定 |
+| 分发 | 源码构建、Apple Silicon macOS npm 0.1.2；制品核验、下载和安装基础能力 | 可支持的二进制发行、平台测试和宿主运行时绑定 |
 
 当前 `check all` 已包含 Rust 构建调度和持久化，[构建复检](../tests/acceptance/rust-build-task-verification.md)也已存在。旧记录中“完全没有这些接线”的描述不能用作当前状态；完整构建组合和正式关闭仍待完成。
 
@@ -196,7 +196,7 @@ flowchart LR
 
 ### 8.1 原生优先与内置 WASM 初检路径——目标
 
-**本节是新增设计，公开的 `0.1.1` 包尚未实现。** 保留统一入口，调用者选择语言或项目，不选择解析器后端：
+**本节是新增设计，公开的 `0.1.2` 包尚未实现。** 保留统一入口，调用者选择语言或项目，不选择解析器后端：
 
 ```bash
 codeguard lint java .
@@ -451,7 +451,7 @@ CLI 返回命令专属的版本化 JSON、可读投影及部分 SARIF。[Schema 
 
 ## 15. 部署、升级与集成
 
-当前部署形态是本地构建二进制加独立准备的原生工具链。`@partme.ai/codeguard@0.1.1` npm 包通过 Node 命令入口携带 Apple Silicon macOS 二进制；Node 层只转发参数、工作目录、环境、输出与退出状态。该平台的发布、全新缓存 `npx` 版本检查及注册表/本地制品字节核对已通过。二进制回报候选源码提交，但这不证明签名来源、可复现构建、多平台发行或完整质量门禁。公开 `tools install` apply 仍受阻，内部包核验、下载和安装基础能力已有测试。
+当前部署形态是本地构建二进制加独立准备的原生工具链。`@partme.ai/codeguard@0.1.2` npm 包通过 Node 命令入口携带 Apple Silicon macOS 二进制；Node 层只转发参数、工作目录、环境、输出与退出状态。该平台的发布、全新缓存 `npx` 版本检查及注册表/本地制品字节核对已通过。二进制回报候选源码提交，但这不证明签名来源、可复现构建、多平台发行或完整质量门禁。公开 `tools install` apply 仍受阻，内部包核验、下载和安装基础能力已有测试。
 
 ```mermaid
 flowchart LR
@@ -462,7 +462,7 @@ flowchart LR
     Rust --> Native[选定的原生检查器]
 ```
 
-默认本地包标记为 private，不含 npm 安装钩子。`bin` 入口见 [npm/codeguard.cjs](../npm/codeguard.cjs)，[scripts/pack-npm-local.mjs](../scripts/pack-npm-local.mjs)使用已构建二进制打包。`--public` 模式已产出公开的 `@partme.ai/codeguard@0.1.1`，仅覆盖 Apple Silicon macOS；全新缓存运行和包/二进制摘要核对见[npm 0.1.1 验收记录](../tests/acceptance/npm-0.1.1-candidate.md)。扩大分发范围还需平台覆盖、可信制品清单、版本与摘要绑定及发行流程。CodeGraph 的 Node 入口和平台包布局为此设计提供参考；其可选网络回退不属于 Codeguard 当前安装路径。
+默认本地包标记为 private，不含 npm 安装钩子。`bin` 入口见 [npm/codeguard.cjs](../npm/codeguard.cjs)，[scripts/pack-npm-local.mjs](../scripts/pack-npm-local.mjs)使用已构建二进制打包。`--public` 模式已产出公开的 `@partme.ai/codeguard@0.1.2`，仅覆盖 Apple Silicon macOS；全新缓存运行和包/二进制摘要核对见[npm 0.1.2 验收记录](../tests/acceptance/npm-0.1.2-candidate.md)。扩大分发范围还需平台覆盖、可信制品清单、版本与摘要绑定及发行流程。CodeGraph 的 Node 入口和平台包布局为此设计提供参考；其可选网络回退不属于 Codeguard 当前安装路径。
 
 升级时记录二进制/schema 版本，保留工作区，预览受管变更，重跑有限检查，再核对报告消费。降级必须服从已有 schema 读取范围，不能为了通过解析而改写历史记录成旧格式。
 

@@ -1016,6 +1016,7 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 - [x] 2.7.1 CLI 版本身份公开输出；仅验收基线所列测试契约；剩余：不可变源码及跨平台制品绑定。
 - [x] 13.4.1 发布 `@partme.ai/codeguard@0.1.0` macOS arm64 包并验证新缓存 npx；依据 npm-public-candidate 既有实际记录；不代表完整 S13。
 - [x] 13.4.2 发布 `@partme.ai/codeguard@0.1.1` macOS arm64 候选并核对干净源码提交、自报构建身份、注册表/本地包与二进制摘要及新缓存 npx；依据 [npm 0.1.1 验收](../../../tests/acceptance/npm-0.1.1-candidate.md)。该子任务不代替 13.4 的可信来源、插件 lock、市场与已安装宿主闭环。
+- [x] 13.4.2a 发布 `@partme.ai/codeguard@0.1.2` macOS arm64 候选；同一干净源码提交的 CI、注册表完整性、包与程序字节摘要及新缓存 npx 已核对，依据 [npm 0.1.2 验收](../../../tests/acceptance/npm-0.1.2-candidate.md)。插件中仅显式候选入口锁定该制品；默认 Hook、严格交付门禁、签名来源及其它平台不在本子任务验收范围，13.4 保持未完成。
 - [x] 13.4.3 发布 codeguard-plugin 0.17.0 候选：PR #85 的四项 CI 通过后合并为 `de0936a62f8a8b649151f59823a64975f8c7db74`，标签 `v0.17.0` 指向该提交并建立 GitHub Release；市场仓 `4a0ec90c4e4ce06e577093e225240bca5bee55e5` 仅提交 CodeGuard 版本元数据。默认 Hook、三宿主已安装运行时及完整门禁仍未通过，13.4 不勾选。
 
 ## 14. S14 WASM 语法初检完善
