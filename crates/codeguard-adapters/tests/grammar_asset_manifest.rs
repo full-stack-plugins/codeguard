@@ -63,9 +63,13 @@ fn published_schema_covers_every_current_candidate_and_field() {
 #[test]
 fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support() {
     let manifest = bundled_grammar_candidates().expect("bundled manifest");
-    assert_eq!(manifest.assets.len(), 15);
+    assert_eq!(manifest.assets.len(), 18);
     for asset in &manifest.assets {
         let (wasm, license) = match asset.language.as_str() {
+            "arkts" => (
+                include_bytes!("../../../grammars/arkts/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/arkts/LICENSE").as_slice(),
+            ),
             "c" => (
                 include_bytes!("../../../grammars/c/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/c/LICENSE").as_slice(),
@@ -93,6 +97,10 @@ fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support(
             "luau" => (
                 include_bytes!("../../../grammars/luau/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/luau/LICENSE").as_slice(),
+            ),
+            "nix" => (
+                include_bytes!("../../../grammars/nix/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/nix/LICENSE").as_slice(),
             ),
             "java" => (
                 include_bytes!("../../../grammars/java/parser.wasm").as_slice(),
@@ -125,6 +133,10 @@ fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support(
             "rust" => (
                 include_bytes!("../../../grammars/rust/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/rust/LICENSE").as_slice(),
+            ),
+            "terraform" => (
+                include_bytes!("../../../grammars/terraform/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/terraform/LICENSE").as_slice(),
             ),
             other => panic!("unexpected language {other}"),
         };
@@ -188,6 +200,12 @@ fn missing_provenance_duplicate_fields_and_unknown_languages_are_rejected() {
         1,
     );
     assert!(parse_grammar_asset_manifest(wrong_symbol.as_bytes()).is_err());
+    let wrong_npm_integrity = original.replacen(
+        "tree-sitter-arkts@0.2.0 sha512-j4KpZ21YdX5koXiuuslML24LoKLOzV6uZ1PMG//c/ynAoQfD7XY2LWnFxJiX0sOLqf2pOEYHdUmKFnXjm4QL4g==",
+        "tree-sitter-arkts@0.2.0 sha512-forged",
+        1,
+    );
+    assert!(parse_grammar_asset_manifest(wrong_npm_integrity.as_bytes()).is_err());
 }
 
 #[test]

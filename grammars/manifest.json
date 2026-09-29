@@ -4,7 +4,7 @@
   "source_commit": "1072f82ce24db3d133258d30165cef6b74d108b2",
   "codegraph_license": "LICENSE.codegraph",
   "codegraph_license_sha256": "e6d98f98c666bebe065ac2492a0a19232cc318d4d67bac3ca42ffb77bacc8809",
-  "build_tool": "tree-sitter-cli 0.25.10 build --wasm; Zig: tree-sitter-cli 0.27.0 generate --abi 15 + Zig 0.16.0 wasm32-wasi",
+  "build_tool": "tree-sitter-cli 0.25.10 build --wasm; Zig: tree-sitter-cli 0.27.0 generate --abi 15 + Zig 0.16.0 wasm32-wasi; ArkTS/Terraform: pinned npm prebuilt WASM",
   "assets": [
     {
       "language": "c",
@@ -309,6 +309,62 @@
       "known_limitations": [
         "Rust loader smoke passed with byte-pinned import adaptation; Zig versions, corpus differential, resource isolation and release are not yet qualified"
       ],
+      "release_status": "candidate_unvalidated"
+    },
+    {
+      "language": "arkts",
+      "dialect": "arkts",
+      "grammar_repository": "https://github.com/harmony-contrib/tree-sitter-arkts",
+      "grammar_commit": "56f7fc288715befe92c734d603f9e6bc3c65d2a8",
+      "grammar_version": "0.2.0",
+      "package_integrity": "tree-sitter-arkts@0.2.0 sha512-j4KpZ21YdX5koXiuuslML24LoKLOzV6uZ1PMG//c/ynAoQfD7XY2LWnFxJiX0sOLqf2pOEYHdUmKFnXjm4QL4g==",
+      "path": "arkts/parser.wasm",
+      "sha256": "db0812971109457d22b3fe9dcdb1cd8e614fba2a338e220670bd254485753623",
+      "bytes": 4384161,
+      "license": "arkts/LICENSE",
+      "license_sha256": "048e4dcb7a71fb725495ebb3e7052d0e76dcb6705b828af8b9b461df10bcd8ca",
+      "abi_version": 14,
+      "codegraph_runtime": "web-tree-sitter 0.25.3",
+      "codeguard_runtime_validation": "rust_loader_smoke_passed",
+      "language_versions": [],
+      "known_limitations": ["Rust loader and narrow fixtures passed; ArkTS language versions, dialect corpus, native differential, isolation and release remain unqualified"],
+      "release_status": "candidate_unvalidated"
+    },
+    {
+      "language": "nix",
+      "dialect": "nix",
+      "grammar_repository": "https://github.com/nix-community/tree-sitter-nix",
+      "grammar_commit": "3d0173d903e630b6e14d17f1cf79488791379ded",
+      "grammar_version": "3d0173d+codegraph-cli-0.25.10",
+      "path": "nix/parser.wasm",
+      "sha256": "4acffa1c013df751193a21ce429777ca214c7d3a7e3665085b6df00dad8869f0",
+      "bytes": 80876,
+      "license": "nix/LICENSE",
+      "license_sha256": "c1b72e50266464ec5118d26200e17bf1f472d142e62ab637e1ffc23986657a78",
+      "abi_version": 15,
+      "codegraph_runtime": "web-tree-sitter 0.25.3",
+      "codeguard_runtime_validation": "rust_loader_smoke_passed",
+      "language_versions": [],
+      "known_limitations": ["Rust loader and narrow fixtures passed; Nix language versions, dialect corpus, native differential, isolation and release remain unqualified"],
+      "release_status": "candidate_unvalidated"
+    },
+    {
+      "language": "terraform",
+      "dialect": "terraform",
+      "grammar_repository": "https://github.com/tree-sitter-grammars/tree-sitter-hcl",
+      "grammar_commit": "fad991865fee927dd1de5e172fb3f08ac674d914",
+      "grammar_version": "1.2.0",
+      "package_integrity": "@tree-sitter-grammars/tree-sitter-hcl@1.2.0 sha512-2bVnOojkkdMLevp0G4v3ksbNoOQFc/Pt9GAdWX4i3aykVyI+CkktE1hsF/XAeUQFjwgGrVZnEyeCll5oD7Ibfg==",
+      "path": "terraform/parser.wasm",
+      "sha256": "0d9ef3ae926acc0411bfecba9b34df4ea659061917b96455570a45a70824e890",
+      "bytes": 92484,
+      "license": "terraform/LICENSE",
+      "license_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "abi_version": 14,
+      "codegraph_runtime": "web-tree-sitter 0.25.3",
+      "codeguard_runtime_validation": "rust_loader_smoke_passed",
+      "language_versions": [],
+      "known_limitations": ["Rust loader and narrow fixtures passed; Terraform language versions, dialect corpus, native differential, isolation and release remain unqualified"],
       "release_status": "candidate_unvalidated"
     }
   ],

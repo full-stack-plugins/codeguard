@@ -165,6 +165,36 @@ fn cpp_csharp_lua_and_luau_run_in_worker_without_claiming_clean() {
 }
 
 #[test]
+fn arkts_nix_and_terraform_run_in_worker_without_claiming_clean() {
+    for (language, path, source) in [
+        (
+            "arkts",
+            "src/Main.ets",
+            b"@Component struct C { build() { Text('hi') } }".as_slice(),
+        ),
+        ("nix", "flake.nix", b"let x = 1; in x".as_slice()),
+        (
+            "terraform",
+            "main.tf",
+            b"resource \"x\" \"y\" { foo = \"bar\" }".as_slice(),
+        ),
+    ] {
+        let result = run_syntax_worker_candidate(
+            env!("CARGO_BIN_EXE_codeguard").as_ref(),
+            language,
+            path,
+            source,
+            Instant::now() + Duration::from_secs(60),
+            &AtomicBool::new(false),
+        )
+        .expect("grammar worker candidate");
+        assert!(result.recoveries.is_empty(), "{language}");
+        assert_eq!(result.precheck.status, SyntaxPrecheckStatus::Incomplete);
+        assert!(!result.grammar_qualified);
+    }
+}
+
+#[test]
 fn invalid_input_and_cancellation_cannot_yield_observations() {
     let exe = env!("CARGO_BIN_EXE_codeguard").as_ref();
     assert!(
