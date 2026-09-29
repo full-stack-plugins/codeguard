@@ -69,6 +69,8 @@ fn observe(language: &str, source: &[u8]) -> Result<SyntaxWorkerEnvelope, String
         "typescript" => include_bytes!("../../../grammars/typescript/parser.wasm").as_slice(),
         "tsx" => include_bytes!("../../../grammars/tsx/parser.wasm").as_slice(),
         "zig" => include_bytes!("../../../grammars/zig/parser.wasm").as_slice(),
+        "objc" => include_bytes!("../../../grammars/objc/parser.wasm").as_slice(),
+        "solidity" => include_bytes!("../../../grammars/solidity/parser.wasm").as_slice(),
         _ => return Err("不支持的 grammar 语种".into()),
     };
     let mut grammar = WasmGrammar::load(language, wasm, &asset.sha256, asset.abi_version as usize)?;

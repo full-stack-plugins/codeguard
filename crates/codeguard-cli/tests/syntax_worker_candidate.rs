@@ -70,6 +70,35 @@ fn adapted_zig_asset_preserves_candidate_status_and_empty_container_syntax() {
 }
 
 #[test]
+fn dependency_grammars_run_in_worker_without_claiming_clean() {
+    for (language, path, source) in [
+        (
+            "objc",
+            "src/Foo.m",
+            b"@interface Foo : NSObject\n@end\n".as_slice(),
+        ),
+        (
+            "solidity",
+            "src/Vault.sol",
+            b"pragma solidity ^0.8.20;\ncontract Vault {}\n".as_slice(),
+        ),
+    ] {
+        let result = run_syntax_worker_candidate(
+            env!("CARGO_BIN_EXE_codeguard").as_ref(),
+            language,
+            path,
+            source,
+            Instant::now() + Duration::from_secs(60),
+            &AtomicBool::new(false),
+        )
+        .expect("dependency grammar worker candidate");
+        assert!(result.recoveries.is_empty(), "{language}");
+        assert_eq!(result.precheck.status, SyntaxPrecheckStatus::Incomplete);
+        assert!(!result.grammar_qualified);
+    }
+}
+
+#[test]
 fn invalid_input_and_cancellation_cannot_yield_observations() {
     let exe = env!("CARGO_BIN_EXE_codeguard").as_ref();
     assert!(

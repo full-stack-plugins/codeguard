@@ -127,9 +127,9 @@
     {
       "language": "objc",
       "provider": "tree_sitter_wasms_dependency",
-      "source_path": null,
-      "sha256": null,
-      "bytes": null
+      "source_path": "tree-sitter-wasms@0.1.13/out/tree-sitter-objc.wasm",
+      "sha256": "7c1b5bfdca7e64b6c63b6040bb7ba0afc347df116f9030ca32f8535d7377f6ff",
+      "bytes": 7708264
     },
     {
       "language": "pascal",
@@ -183,9 +183,9 @@
     {
       "language": "solidity",
       "provider": "tree_sitter_wasms_dependency",
-      "source_path": null,
-      "sha256": null,
-      "bytes": null
+      "source_path": "tree-sitter-wasms@0.1.13/out/tree-sitter-solidity.wasm",
+      "sha256": "160745e470f234cae903a9ba445d19e758d0b02e1197401fc765976c6254d2b6",
+      "bytes": 423940
     },
     {
       "language": "swift",

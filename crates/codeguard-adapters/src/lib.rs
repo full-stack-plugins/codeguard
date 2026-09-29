@@ -64,11 +64,13 @@ mod eslint_message_report;
 mod eslint_parsed;
 mod go_candidate;
 mod grammar_asset_manifest;
+mod legacy_dylink_compat;
 mod zig_wasm_compat;
 pub use grammar_asset_manifest::{
     GrammarAsset, GrammarAssetManifest, bundled_grammar_candidates, parse_grammar_asset_manifest,
     verify_grammar_asset,
 };
+pub use legacy_dylink_compat::adapt_legacy_dylink;
 pub use zig_wasm_compat::adapt_zig_wasm;
 mod go_list_package;
 mod go_list_scope;
