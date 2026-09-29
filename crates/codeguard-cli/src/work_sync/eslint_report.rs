@@ -115,12 +115,7 @@ pub(super) fn parse(
     {
         return Err("eslint_completion_invalid");
     }
-    if !codeguard_adapters::validate_records(
-        relative,
-        absolute,
-        &bytes["source"],
-        records,
-    ) {
+    if !codeguard_adapters::validate_records(relative, absolute, &bytes["source"], records) {
         return Err("eslint_finding_identity_invalid");
     }
     let findings = records

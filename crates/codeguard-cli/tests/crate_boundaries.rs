@@ -4,7 +4,7 @@ use std::process::Command;
 
 fn allowed(package: &str, dependency: &str, kind: &str) -> bool {
     match package {
-        "codeguard-core" => dependency == "serde",
+        "codeguard-core" => dependency == "serde" || (dependency == "base64" && kind == "normal"),
         "codeguard-runtime" => {
             matches!(dependency, "codeguard-core" | "libc" | "ring")
                 || (kind == "dev" && dependency == "rustls")
@@ -30,7 +30,7 @@ fn allowed(package: &str, dependency: &str, kind: &str) -> bool {
                 )
         }
         "codeguard-cli" => {
-            (matches!(dependency, "ring" | "tokio") && kind == "dev")
+            (matches!(dependency, "ring" | "tokio" | "base64") && kind == "dev")
                 || (dependency == "http" && kind == "normal")
                 || matches!(
                     dependency,
@@ -148,6 +148,9 @@ fn forbidden_edges_stay_forbidden_under_alias_build_and_target_variants() {
         ("codeguard-cli", "ring", "normal"),
         ("codeguard-cli", "ring", "build"),
         ("codeguard-core", "ring", "normal"),
+        ("codeguard-core", "base64", "dev"),
+        ("codeguard-core", "base64", "build"),
+        ("codeguard-cli", "base64", "normal"),
         ("codeguard-core", "semver", "normal"),
         ("codeguard-runtime", "semver", "normal"),
         ("codeguard-cli", "semver", "normal"),
@@ -171,6 +174,14 @@ fn forbidden_edges_stay_forbidden_under_alias_build_and_target_variants() {
 #[test]
 fn semver_parser_is_scoped_to_adapter_normal_dependencies() {
     assert!(violations(&one_dependency("codeguard-adapters", "semver", "normal")).is_empty());
+}
+
+#[test]
+fn base64_decoder_is_scoped_to_pure_core_and_cli_test_fixtures() {
+    assert!(violations(&one_dependency("codeguard-core", "base64", "normal")).is_empty());
+    assert!(violations(&one_dependency("codeguard-cli", "base64", "dev")).is_empty());
+    assert!(!violations(&one_dependency("codeguard-runtime", "base64", "normal")).is_empty());
+    assert!(!violations(&one_dependency("codeguard-adapters", "base64", "normal")).is_empty());
 }
 
 #[test]

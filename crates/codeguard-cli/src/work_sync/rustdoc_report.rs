@@ -3,9 +3,9 @@ use super::{
     BlockerInput, FindingInput, MAX_REPORT_BYTES, ReportInput, read_bounded_file, safe_reason,
     safe_relative_path, safe_run_id, valid_sha256,
 };
-use codeguard_adapters::rustdoc_finding_record;
 use crate::rustdoc_repair_brief::rustdoc_repair_brief;
 use codeguard_adapters::RustdocFinding;
+use codeguard_adapters::rustdoc_finding_record;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::collections::BTreeSet;

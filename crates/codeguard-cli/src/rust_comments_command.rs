@@ -5,10 +5,10 @@ use crate::check_budget::{
 };
 use crate::discovery::discover;
 use crate::doctor_scratch::DoctorScratch;
-use codeguard_adapters::rustdoc_finding_record;
 use crate::rustdoc_repair_brief::rustdoc_repair_brief;
 use crate::work_sync::{save_local_report, sync_local_workspace};
 use crate::workspace_refresh::read_workspace_baseline;
+use codeguard_adapters::rustdoc_finding_record;
 use codeguard_adapters::{legacy_registry, parse_cargo_rustdoc_json};
 use codeguard_runtime::{
     NativeObservation, ProcessSpec, SourceSnapshot, Termination, read_bounded_regular_file,

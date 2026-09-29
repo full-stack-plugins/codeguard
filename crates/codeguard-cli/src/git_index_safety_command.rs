@@ -56,7 +56,7 @@ pub fn run(args: &[String]) -> ExitCode {
                 incomplete_reasons.push("index_objects_unresolved");
             }
             json!({
-                "schema_version":"0.2.0",
+                "schema_version":"0.3.0",
                 "report_type":"git_index_safety_preview",
                 "operation":"gate_pre_commit",
                 "command_status":"incomplete",
@@ -77,7 +77,7 @@ pub fn run(args: &[String]) -> ExitCode {
             })
         }
         Err(_) => json!({
-            "schema_version":"0.2.0",
+            "schema_version":"0.3.0",
             "report_type":"git_index_safety_preview",
             "operation":"gate_pre_commit",
             "command_status":"incomplete",

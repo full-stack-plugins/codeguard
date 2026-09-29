@@ -12,6 +12,10 @@
 - **WHEN** 拟提交的持久记录意外包含密钥
 - **THEN** 入库安全仍检查并阻断，受管产物不能豁免敏感内容
 
+#### Scenario: A staged managed record contains structurally valid key material
+- **WHEN** `.codeguard/` 记录的暂存 blob 包含完整的未加密 OpenSSH Ed25519 私钥，而同一路径的工作树字节已被替换
+- **THEN** 安全检查仍以核对 Git OID 后的暂存字节报告稳定规则 ID；不得因 `.codeguard/` 名称或工作树当前内容掩盖发现，也不得泄露私钥字节。单项内容预览不能签发完整交付通过
+
 #### Scenario: Agent expands the ownership manifest
 - **WHEN** agent 将普通源码路径添加进受管排除清单
 - **THEN** 生成器所有权校验不接受扩张，不能据可写 manifest 关闭扫描

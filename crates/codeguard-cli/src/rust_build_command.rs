@@ -1,6 +1,5 @@
 //! 原生 Cargo/check 类型检查观察；完整项目策略与修复任务仍独立核验。
 
-use codeguard_adapters::cargo_build_finding_record;
 use crate::cargo_build_repair_brief::cargo_build_repair_brief;
 use crate::check_budget::{
     budget_record, parse_check_timeout, resolve_project_default, select_check_timeout,
@@ -9,6 +8,7 @@ use crate::discovery::discover;
 use crate::doctor_scratch::DoctorScratch;
 use crate::work_sync::{save_local_report, sync_local_workspace};
 use crate::workspace_refresh::read_workspace_baseline;
+use codeguard_adapters::cargo_build_finding_record;
 use codeguard_adapters::{legacy_registry, parse_cargo_build_json};
 use codeguard_runtime::{
     NativeObservation, ProcessSpec, SourceSnapshot, Termination, read_bounded_regular_file,

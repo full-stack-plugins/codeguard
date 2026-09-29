@@ -160,6 +160,7 @@ dependencies = [
 name = "codeguard-cli"
 version = "0.1.2"
 dependencies = [
+ "base64",
  "codeguard-adapters",
  "codeguard-core",
  "codeguard-runtime",
@@ -176,6 +177,7 @@ dependencies = [
 name = "codeguard-core"
 version = "0.1.2"
 dependencies = [
+ "base64",
  "serde",
 ]
 

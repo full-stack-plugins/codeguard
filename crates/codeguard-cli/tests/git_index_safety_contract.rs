@@ -1,5 +1,7 @@
 #![cfg(unix)]
 
+use base64::Engine;
+use base64::engine::general_purpose::STANDARD;
 use codeguard_cli::git_index_safety::{
     observe_index_safety, parse_index_listing, verify_git_blob_oid,
 };
@@ -57,6 +59,83 @@ fn git_binary() -> PathBuf {
         .unwrap()
         .canonicalize()
         .unwrap()
+}
+
+fn synthetic_ed25519_pem() -> String {
+    fn field(out: &mut Vec<u8>, value: &[u8]) {
+        out.extend_from_slice(&(value.len() as u32).to_be_bytes());
+        out.extend_from_slice(value);
+    }
+    let public_key = [0xa5_u8; 32];
+    let mut public = Vec::new();
+    field(&mut public, b"ssh-ed25519");
+    field(&mut public, &public_key);
+    let mut private = Vec::new();
+    private.extend_from_slice(&0x1234_5678_u32.to_be_bytes());
+    private.extend_from_slice(&0x1234_5678_u32.to_be_bytes());
+    field(&mut private, b"ssh-ed25519");
+    field(&mut private, &public_key);
+    let mut key_material = [0x5a_u8; 64];
+    key_material[32..].copy_from_slice(&public_key);
+    field(&mut private, &key_material);
+    field(&mut private, b"");
+    private.extend((1..=(8 - private.len() % 8)).map(|value| value as u8));
+    let mut envelope = b"openssh-key-v1\0".to_vec();
+    field(&mut envelope, b"none");
+    field(&mut envelope, b"none");
+    field(&mut envelope, b"");
+    envelope.extend_from_slice(&1_u32.to_be_bytes());
+    field(&mut envelope, &public);
+    field(&mut envelope, &private);
+    format!(
+        "-----BEGIN OPENSSH PRIVATE KEY-----\n{}\n-----END OPENSSH PRIVATE KEY-----\n",
+        STANDARD.encode(envelope)
+    )
+}
+
+#[test]
+fn staged_private_key_material_is_found_in_managed_records_without_reading_worktree_bytes() {
+    let repo = Repo::new();
+    fs::create_dir_all(repo.0.join(".codeguard/findings")).unwrap();
+    let record = repo.0.join(".codeguard/findings/CG-demo.md");
+    fs::write(&record, synthetic_ed25519_pem()).unwrap();
+    repo.git(&["add", ".codeguard/findings/CG-demo.md"]);
+    fs::write(&record, "safe current worktree text\n").unwrap();
+    let observed = observe_index_safety(&repo.0, &git_binary(), None).unwrap();
+    assert!(observed.objects_verified);
+    assert!(observed.violations.iter().any(|item| {
+        item.path == ".codeguard/findings/CG-demo.md"
+            && item.rule_id == "repository_policy.unencrypted_openssh_ed25519_private_key"
+    }));
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "gate",
+            "pre-commit",
+            repo.0.to_str().unwrap(),
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    let report: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(report["schema_version"], "0.3.0");
+    assert_eq!(report["delivery_decision"], "not_evaluated");
+    assert_eq!(
+        report["violations"][0]["rule_id"],
+        "repository_policy.unencrypted_openssh_ed25519_private_key"
+    );
+    assert!(!String::from_utf8_lossy(&output.stdout).contains("BEGIN OPENSSH"));
+}
+
+#[test]
+fn unstaged_private_key_material_does_not_change_the_staged_content_result() {
+    let repo = Repo::new();
+    fs::write(repo.0.join("notes.md"), "safe staged bytes\n").unwrap();
+    repo.git(&["add", "notes.md"]);
+    fs::write(repo.0.join("notes.md"), synthetic_ed25519_pem()).unwrap();
+    let observed = observe_index_safety(&repo.0, &git_binary(), None).unwrap();
+    assert!(observed.objects_verified);
+    assert!(observed.violations.is_empty());
 }
 
 #[test]
@@ -282,10 +361,15 @@ fn published_preview_schema_never_contains_an_allow_decision() {
         "../../../schemas/git-index-safety-preview.schema.json"
     ))
     .unwrap();
+    let previous: Value = serde_json::from_str(include_str!(
+        "../../../schemas/git-index-safety-preview-0.2.schema.json"
+    ))
+    .unwrap();
     assert_eq!(
         schema["$id"],
-        "urn:codeguard:schema:git-index-safety-preview:0.2.0"
+        "urn:codeguard:schema:git-index-safety-preview:0.3.0"
     );
+    assert_eq!(previous["properties"]["schema_version"]["const"], "0.2.0");
     assert_eq!(schema["additionalProperties"], false);
     assert_eq!(
         schema["properties"]["delivery_decision"]["const"],

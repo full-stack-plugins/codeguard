@@ -1,5 +1,4 @@
 //! ESLint 局部原生观察到既有修复队列的连接；没有审批或关闭权威。
-use codeguard_adapters::project_eslint_findings;
 use crate::{
     eslint_lint_arguments::EslintLintArguments,
     eslint_probe_request::EslintProbeRequest,
@@ -7,6 +6,7 @@ use crate::{
     work_sync::{save_local_report, sync_local_workspace},
     workspace_refresh::read_workspace_baseline,
 };
+use codeguard_adapters::project_eslint_findings;
 use codeguard_runtime::read_bounded_regular_file;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};

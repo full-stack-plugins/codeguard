@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:codeguard:schema:git-index-safety-preview:0.3.0",
+  "$id": "urn:codeguard:schema:git-index-safety-preview:0.2.0",
   "title": "CodeGuard staged path safety preview",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema_version", "report_type", "operation", "command_status", "exit_code", "delivery_decision", "index_observation", "index_object_format", "index_listing_sha256", "staged_entry_count", "object_status", "verified_object_count", "unresolved_object_count", "object_verification_reason", "violations", "tool_approval", "incomplete_reasons", "next_actions"],
   "properties": {
-    "schema_version": {"const": "0.3.0"},
+    "schema_version": {"const": "0.2.0"},
     "report_type": {"const": "git_index_safety_preview"},
     "operation": {"const": "gate_pre_commit"},
     "command_status": {"const": "incomplete"},
@@ -28,7 +28,7 @@
         "required": ["path", "rule_id"],
         "properties": {
           "path": {"type": "string", "minLength": 1},
-          "rule_id": {"enum": ["repository_policy.generated_or_dependency_directory", "repository_policy.sensitive_filename", "repository_policy.root_dump", "repository_policy.unencrypted_openssh_ed25519_private_key"]}
+          "rule_id": {"enum": ["repository_policy.generated_or_dependency_directory", "repository_policy.sensitive_filename", "repository_policy.root_dump"]}
         }
       }
     },
