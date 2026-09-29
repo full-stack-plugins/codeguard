@@ -289,6 +289,80 @@ fn object_size_limit_does_not_hide_a_staged_path_violation() {
 }
 
 #[test]
+fn oversized_staged_blob_does_not_erase_a_verified_private_key_finding() {
+    let repo = Repo::new();
+    fs::create_dir_all(repo.0.join(".codeguard/findings")).unwrap();
+    fs::write(
+        repo.0.join(".codeguard/findings/CG-demo.md"),
+        synthetic_ed25519_pem(),
+    )
+    .unwrap();
+    fs::write(repo.0.join("large.bin"), vec![b'x'; 8 * 1024 * 1024 + 1]).unwrap();
+    repo.git(&["add", ".codeguard/findings/CG-demo.md", "large.bin"]);
+    let observed = observe_index_safety(&repo.0, &git_binary(), None).unwrap();
+    assert!(!observed.objects_verified);
+    assert_eq!(observed.unresolved_object_paths, ["large.bin"]);
+    assert_eq!(observed.object_evidence.len(), 1);
+    assert!(observed.object_verification_reason.is_some());
+    assert!(observed.violations.iter().any(|item| {
+        item.path == ".codeguard/findings/CG-demo.md"
+            && item.rule_id == "repository_policy.unencrypted_openssh_ed25519_private_key"
+    }));
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "gate",
+            "pre-commit",
+            repo.0.to_str().unwrap(),
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    let report: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(report["object_status"], "failed");
+    assert_eq!(report["verified_object_count"], 1);
+    assert_eq!(report["unresolved_object_count"], 1);
+    assert_eq!(report["delivery_decision"], "not_evaluated");
+    assert!(report["violations"].as_array().unwrap().iter().any(|item| {
+        item["rule_id"] == "repository_policy.unencrypted_openssh_ed25519_private_key"
+    }));
+    assert!(!String::from_utf8_lossy(&output.stdout).contains("BEGIN OPENSSH"));
+}
+
+#[test]
+fn later_corrupt_git_batch_keeps_earlier_oid_verified_objects_incomplete() {
+    use std::os::unix::fs::PermissionsExt;
+
+    let repo = Repo::new();
+    for index in 0..65 {
+        fs::write(
+            repo.0.join(format!("file-{index}.txt")),
+            format!("value {index}\n"),
+        )
+        .unwrap();
+    }
+    repo.git(&["add", "."]);
+    let marker = repo.0.join("first-batch-read");
+    let wrapper = repo.0.join("git-wrapper");
+    let script = format!(
+        "#!/bin/sh\nif [ \"$1\" = cat-file ] && [ \"$2\" = --batch ]; then\n  if [ -e '{}' ]; then printf 'corrupt\\n'; exit 0; fi\n  : > '{}'\nfi\nexec '{}' \"$@\"\n",
+        marker.display(),
+        marker.display(),
+        git_binary().display()
+    );
+    fs::write(&wrapper, script).unwrap();
+    fs::set_permissions(&wrapper, fs::Permissions::from_mode(0o700)).unwrap();
+
+    let observed = observe_index_safety(&repo.0, &wrapper, None).unwrap();
+    assert_eq!(observed.entries.len(), 65);
+    assert_eq!(observed.object_evidence.len(), 64);
+    assert_eq!(observed.unresolved_object_paths.len(), 1);
+    assert!(observed.object_verification_reason.is_some());
+    assert!(!observed.objects_verified);
+    assert!(observed.violations.is_empty());
+}
+
+#[test]
 fn public_gate_preview_reports_staged_violation_without_a_false_allow() {
     let repo = Repo::new();
     fs::write(repo.0.join(".env"), "TOKEN=fixture\n").unwrap();

@@ -39,6 +39,10 @@ Rust 交付普通 allow MUST 同时满足全部适用必需义务完成、覆盖
 - **WHEN** 必需规则检出历史文件中的违规
 - **THEN** 保留 finding 并按同一策略阻断，基线分类不能改变结果
 
+#### Scenario: One staged blob exceeds the scan budget after another yields a finding
+- **WHEN** 同一 Git index 中的普通 blob 已经核对身份并检出私钥，而另一个暂存对象超过读取预算
+- **THEN** 保留已核对内容的 finding、路径和规则 ID；超预算对象单独列为 unresolved，整体结论仍为 incomplete，不能清空全部发现或签发交付通过
+
 #### Scenario: Approved false positive is the only blocker
 - **WHEN** 全部适用义务完整，唯一原始阻断 finding 有当前输入匹配的可信误报白名单
 - **THEN** 报告保留原始 finding 和处置引用，交付决策为 allow_with_exceptions

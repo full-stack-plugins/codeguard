@@ -1,6 +1,6 @@
 //! 真实 Git index 路径的有界只读观察；结果不认证完整质量门禁。
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::ffi::OsString;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -44,8 +44,15 @@ pub struct IndexSafetyObservation {
     pub objects_verified: bool,
     pub object_evidence: Vec<IndexObjectEvidence>,
     pub unresolved_object_paths: Vec<String>,
-    /// 对象读取或身份核验失败原因；路径违规仍保留。
+    /// 对象预算、读取或身份核验未完成原因；已核对的路径及内容发现仍保留。
     pub object_verification_reason: Option<String>,
+}
+
+struct VerifiedIndexObjects {
+    evidence: Vec<IndexObjectEvidence>,
+    unresolved_paths: Vec<String>,
+    content_violations: Vec<RepositoryPathViolation>,
+    incomplete_reason: Option<String>,
 }
 
 /// 独立计算 Git blob 对象身份：`blob <字节长度>\0<内容>`。
@@ -200,9 +207,13 @@ pub(crate) fn observe_index_safety_with_deadline(
     }
     let (object_evidence, unresolved_object_paths, object_verification_reason) = match object_result
     {
-        Ok((evidence, unresolved, content_violations)) => {
-            violations.extend(content_violations);
-            (evidence, unresolved, None)
+        Ok(result) => {
+            violations.extend(result.content_violations);
+            (
+                result.evidence,
+                result.unresolved_paths,
+                result.incomplete_reason,
+            )
         }
         Err(reason) => (Vec::new(), paths.clone(), Some(reason)),
     };
@@ -228,14 +239,7 @@ fn verify_index_objects(
     entries: &[GitIndexEntry],
     format: &str,
     deadline: Instant,
-) -> Result<
-    (
-        Vec<IndexObjectEvidence>,
-        Vec<String>,
-        Vec<RepositoryPathViolation>,
-    ),
-    String,
-> {
+) -> Result<VerifiedIndexObjects, String> {
     let mut requested = BTreeMap::<&str, usize>::new();
     let mut unresolved = Vec::new();
     for entry in entries {
@@ -246,7 +250,12 @@ fn verify_index_objects(
         }
     }
     if requested.is_empty() {
-        return Ok((Vec::new(), unresolved, Vec::new()));
+        return Ok(VerifiedIndexObjects {
+            evidence: Vec::new(),
+            unresolved_paths: unresolved,
+            content_violations: Vec::new(),
+            incomplete_reason: None,
+        });
     }
     let oid_request = requested
         .keys()
@@ -268,6 +277,8 @@ fn verify_index_objects(
         return Err("Git 对象大小响应数量或结束符错误".into());
     }
     let mut total = 0_usize;
+    let mut skipped_oids = BTreeSet::new();
+    let mut budget_reason = None;
     for ((oid, size), line) in requested.iter_mut().zip(lines) {
         let line = std::str::from_utf8(line).map_err(|_| "Git 对象大小响应非 UTF-8")?;
         let expected_prefix = format!("{oid} blob ");
@@ -277,28 +288,50 @@ fn verify_index_objects(
             .parse::<usize>()
             .map_err(|_| "Git 对象长度无效")?;
         if count > 8 * 1024 * 1024 {
-            return Err("Git 单个对象超出本次验证预算".into());
+            skipped_oids.insert(*oid);
+            budget_reason.get_or_insert_with(|| "Git 单个对象超出本次验证预算".to_owned());
+            continue;
         }
-        total = total.checked_add(count).ok_or("Git 对象总长度溢出")?;
-        if total > 128 * 1024 * 1024 {
-            return Err("Git 对象总长度超出本次验证预算".into());
+        let Some(next_total) = total.checked_add(count) else {
+            skipped_oids.insert(*oid);
+            budget_reason.get_or_insert_with(|| "Git 对象总长度溢出".to_owned());
+            continue;
+        };
+        if next_total > 128 * 1024 * 1024 {
+            skipped_oids.insert(*oid);
+            budget_reason.get_or_insert_with(|| "Git 对象总长度超出本次验证预算".to_owned());
+            continue;
         }
+        total = next_total;
         *size = count;
     }
     let mut verified = BTreeMap::<String, (usize, String, bool, bool)>::new();
     let mut batch = Vec::<(&str, usize)>::new();
     let mut batch_size = 0_usize;
+    let mut read_failure = None;
     for (oid, size) in requested {
+        if skipped_oids.contains(oid) {
+            continue;
+        }
         if !batch.is_empty() && (batch.len() >= 64 || batch_size + size > 8 * 1024 * 1024) {
-            read_blob_batch(root, tool, index, &batch, format, deadline, &mut verified)?;
+            if let Err(reason) =
+                read_blob_batch(root, tool, index, &batch, format, deadline, &mut verified)
+            {
+                read_failure = Some(reason);
+                break;
+            }
             batch.clear();
             batch_size = 0;
         }
         batch.push((oid, size));
         batch_size += size;
     }
-    if !batch.is_empty() {
-        read_blob_batch(root, tool, index, &batch, format, deadline, &mut verified)?;
+    if read_failure.is_none() && !batch.is_empty() {
+        if let Err(reason) =
+            read_blob_batch(root, tool, index, &batch, format, deadline, &mut verified)
+        {
+            read_failure = Some(reason);
+        }
     }
     let mut evidence = Vec::new();
     let mut content_violations = Vec::new();
@@ -306,8 +339,10 @@ fn verify_index_objects(
         if entry.mode == "160000" {
             continue;
         }
-        let (size, digest, lfs_pointer, private_key) =
-            verified.get(&entry.oid).ok_or("Git 对象验证结果缺失")?;
+        let Some((size, digest, lfs_pointer, private_key)) = verified.get(&entry.oid) else {
+            unresolved.push(entry.path.clone());
+            continue;
+        };
         let kind = if entry.mode == "120000" {
             "symlink_unresolved"
         } else if *lfs_pointer {
@@ -334,7 +369,18 @@ fn verify_index_objects(
         });
     }
     unresolved.sort();
-    Ok((evidence, unresolved, content_violations))
+    unresolved.dedup();
+    let reason = match (budget_reason, read_failure) {
+        (Some(_), Some(_)) => Some("Git 对象预算与读取均未完成".into()),
+        (Some(reason), None) | (None, Some(reason)) => Some(reason),
+        (None, None) => None,
+    };
+    Ok(VerifiedIndexObjects {
+        evidence,
+        unresolved_paths: unresolved,
+        content_violations,
+        incomplete_reason: reason,
+    })
 }
 
 fn read_blob_batch(
