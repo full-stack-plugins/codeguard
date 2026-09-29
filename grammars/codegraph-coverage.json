@@ -1,0 +1,233 @@
+{
+  "schema_version": "1.0.0",
+  "source_repository": "https://github.com/partme-ai/codegraph",
+  "source_commit": "40f112453583a2304c4b605a3a9d6545919662bd",
+  "scope": "CodeGraph grammar file map excluding the jsx alias of javascript",
+  "note": "Coverage inventory only; not an approved grammar manifest or a parser capability claim.",
+  "assets": [
+    {
+      "language": "arkts",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-arkts.wasm",
+      "sha256": "db0812971109457d22b3fe9dcdb1cd8e614fba2a338e220670bd254485753623",
+      "bytes": 4384161
+    },
+    {
+      "language": "c",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-c.wasm",
+      "sha256": "a271e584616c7c3c0ac663f01cd05dd5f1a6c2ce6d4cd23096548985a95d0ccb",
+      "bytes": 625716
+    },
+    {
+      "language": "cfml",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-cfml.wasm",
+      "sha256": "17aeb294c58dd47045b470fc082ccceac3100c8e548b13764d4f3987a062322f",
+      "bytes": 2700518
+    },
+    {
+      "language": "cfquery",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-cfquery.wasm",
+      "sha256": "9d4eaaec46eec7e6400d4b8d6c85fac7dfe33867ed5b4e5c218dfa7851c32558",
+      "bytes": 2411407
+    },
+    {
+      "language": "cfscript",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-cfscript.wasm",
+      "sha256": "e381db5d2b8a7744fc7d8e51b0a14ff03f86c8ff497cdfe32d1da467f19d4096",
+      "bytes": 2162812
+    },
+    {
+      "language": "cobol",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-cobol.wasm",
+      "sha256": "65b98799f92e831d8b5ed8cd811464c71fac31c4beabf66990a545a4f65e02f1",
+      "bytes": 16355286
+    },
+    {
+      "language": "cpp",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-cpp.wasm",
+      "sha256": "70f5e2b9976dad56bdcd1fafcb3af8c839c7a92e7beaa437162bcf45f390e83d",
+      "bytes": 3434644
+    },
+    {
+      "language": "csharp",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-c_sharp.wasm",
+      "sha256": "6f69e1cae44e1c32c1eccc170dc5a9778fb94ff716f71113fe1f8c4299aa2f40",
+      "bytes": 5350581
+    },
+    {
+      "language": "dart",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-dart.wasm",
+      "sha256": "7f5364e4256cf7e55efd01dd52421ef2663caa8061b82659b7e4bf61064545ec",
+      "bytes": 984666
+    },
+    {
+      "language": "erlang",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-erlang.wasm",
+      "sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+      "bytes": 421639
+    },
+    {
+      "language": "go",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-go.wasm",
+      "sha256": "4eda5d91c99ca981e88bc7d3d33f0db166b4bab0a84d0021a9abf39b364c78ef",
+      "bytes": 210013
+    },
+    {
+      "language": "java",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-java.wasm",
+      "sha256": "181a6fbc34d7864a551d91c13882fc33007e923b3c81a4bdbe7fa47492090077",
+      "bytes": 414653
+    },
+    {
+      "language": "javascript",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-javascript.wasm",
+      "sha256": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+      "bytes": 411832
+    },
+    {
+      "language": "kotlin",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-kotlin.wasm",
+      "sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+      "bytes": 4052313
+    },
+    {
+      "language": "lua",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-lua.wasm",
+      "sha256": "6d95607fc7d78964cfdf065ccb1ba76be5ed217c5ec0d0a3cace13c59fa1ae43",
+      "bytes": 49488
+    },
+    {
+      "language": "luau",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-luau.wasm",
+      "sha256": "f1647052518f2bdfae8e8c0b033ffdeca1193d69d11c78ba20f84c8374fd0fe3",
+      "bytes": 94204
+    },
+    {
+      "language": "nix",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-nix.wasm",
+      "sha256": "4acffa1c013df751193a21ce429777ca214c7d3a7e3665085b6df00dad8869f0",
+      "bytes": 80876
+    },
+    {
+      "language": "objc",
+      "provider": "tree_sitter_wasms_dependency",
+      "source_path": null,
+      "sha256": null,
+      "bytes": null
+    },
+    {
+      "language": "pascal",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-pascal.wasm",
+      "sha256": "be3634fca99c19f5e1035a1a9c7d93d6ee82b35e6d5024f02be4883b71329c3e",
+      "bytes": 716886
+    },
+    {
+      "language": "php",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-php.wasm",
+      "sha256": "6545a9a110bc878e26ed329950147e190c83da038bb17e999de646fe6c4d6c82",
+      "bytes": 1058082
+    },
+    {
+      "language": "python",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-python.wasm",
+      "sha256": "a7fdc587e77bd729b9f5b783c659be23c896e305a2c374472bed7114d9e01fac",
+      "bytes": 456131
+    },
+    {
+      "language": "r",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-r.wasm",
+      "sha256": "2a8f5acd1c53d91e0ec5c01a6830d8ac7f5a7f96f0ac4b3768c016c8e9d07711",
+      "bytes": 481163
+    },
+    {
+      "language": "ruby",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-ruby.wasm",
+      "sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "bytes": 2106097
+    },
+    {
+      "language": "rust",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-rust.wasm",
+      "sha256": "206031e0f67fb41ecae505868ca3bb917df7375031aebafd2f97314a849713fe",
+      "bytes": 1114303
+    },
+    {
+      "language": "scala",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-scala.wasm",
+      "sha256": "37d7fe5a91ca98941dc05493b0c05a0df0f36df5035890fa00b02497c68aaac3",
+      "bytes": 3973559
+    },
+    {
+      "language": "solidity",
+      "provider": "tree_sitter_wasms_dependency",
+      "source_path": null,
+      "sha256": null,
+      "bytes": null
+    },
+    {
+      "language": "swift",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-swift.wasm",
+      "sha256": "cc77a63b8487956270e2f385e29a03ba0773ba532a3c8a8844a26b4c98793843",
+      "bytes": 3726622
+    },
+    {
+      "language": "terraform",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-terraform.wasm",
+      "sha256": "0d9ef3ae926acc0411bfecba9b34df4ea659061917b96455570a45a70824e890",
+      "bytes": 92484
+    },
+    {
+      "language": "tsx",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-tsx.wasm",
+      "sha256": "8f647a1b2cafe9ab00fb2056d79021d2a144ba17a72f45511072311c1b05d08e",
+      "bytes": 1445641
+    },
+    {
+      "language": "typescript",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-typescript.wasm",
+      "sha256": "3a44d634c9840dccec36f33b99592bd086a2f940e9cd80c64347c45b7dce662f",
+      "bytes": 1414055
+    },
+    {
+      "language": "vbnet",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-vbnet.wasm",
+      "sha256": "e38a09e1826c7ec06340c0531a98bbb5ee79bdd710bba3d3349b79a19721e844",
+      "bytes": 6477499
+    },
+    {
+      "language": "zig",
+      "provider": "codegraph_vendored",
+      "source_path": "src/extraction/wasm/tree-sitter-zig.wasm",
+      "sha256": "512184b21b9d234b9462f0afaeb6932d508ce7b21ca5247ee47e04ba191fa807",
+      "bytes": 693809
+    }
+  ]
+}

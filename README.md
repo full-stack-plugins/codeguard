@@ -96,6 +96,8 @@ Version output includes `cli_version`, `target`, and protocol information. Disco
 
 The workspace requires `std`. The opt-in `wasm-precheck` build feature uses a bounded Rust worker with pinned Java/TypeScript grammar candidates. It currently reaches only single-file `lint java` and `lint typescript` requests without explicit native context; it is absent from the published npm `0.1.2` package. No `no_std`, completed project-wide WASM fallback, zero-unsafe, or fastest-runtime claim is made. Runtime OS calls require safety review; a comprehensive security audit is not claimed.
 
+The current source-built CLI's `codeguard grammar status --format=json` reports the coverage gap without loading grammars or running lint: the pinned CodeGraph source has 30 vendored WASM files plus two distinct grammars resolved through its dependency; CodeGuard has two unqualified candidates and zero released syntax capabilities. The separate [coverage inventory](grammars/codegraph-coverage.json) is not an approved asset manifest. COBOL's 16.4 MB source asset also exceeds the current Rust loader's 8 MiB limit.
+
 ### npm installation and one-off use
 
 On Apple Silicon macOS, the published `0.1.2` package was verified with a fresh npm cache:

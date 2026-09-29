@@ -97,6 +97,7 @@ pub mod git_index_safety;
 pub mod git_index_safety_command;
 #[cfg(unix)]
 pub mod go_lint_command;
+pub mod grammar_status_command;
 #[cfg(unix)]
 pub mod hook_execute_command;
 pub mod hook_plan_command;
