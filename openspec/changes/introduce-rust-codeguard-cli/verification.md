@@ -2057,4 +2057,6 @@ TDD 先复现报告漏洞：把源码 finding 的主定位、原生身份及白�
 
 ## 2026-09-29 插件候选运行时锁与事件桥
 
-[codeguard-plugin PR #85](https://github.com/full-stack-plugins/codeguard-plugin/pull/85) 把 0.1.1 的 macOS arm64 包、二进制、候选源码提交和检查协议主版本固定为插件锁。显式本地 tarball 与真实注册表安装、内容寻址目录及活动收据的候选路径已运行；调用前会重新核对二进制，缺失或篡改返回未完成，不从 PATH 选同名程序，也不退回 Python。Node 目标测试在真实 tarball 下 4/4，通过 Rust SessionStart 和摘要篡改反例；插件 Python 3.13.5 单元全集 653 项、独立协议 144 项、vendor 离线/在线、portable 插件校验及插件 OpenSpec strict 均通过。插件仓当前使用保护分支 PR，默认 hooks 尚未切换，PR 合并/市场发布与已安装宿主验收仍待完成。目录发布竞争、崩溃恢复、可信签名发行、跨平台锁和严格 Git/CI 门禁仍缺；11.2、11.4、11.17 与 S13 继续未完成。插件仓详细范围见 PR 内 `tests/rust-runtime-candidate.md`。
+发行补证：PR #85 的 `rust-runtime-contract` 与 Python 3.11/3.12/3.13 三项 vendor-check 全部成功后，于 2026-09-29 合并为 `de0936a62f8a8b649151f59823a64975f8c7db74`。远端 `v0.17.0^{}` 指向同一提交，[GitHub Release](https://github.com/full-stack-plugins/codeguard-plugin/releases/tag/v0.17.0) 已建立。市场仓 `4a0ec90c4e4ce06e577093e225240bca5bee55e5` 将 CodeGuard 元数据同步到 0.17.0，用户原有 CodeReview 未提交差异留在工作树且未入该提交。此链证明插件候选版本与市场引用存在，不证明三宿主已安装或默认 Hook 执行了 Rust。
+
+[codeguard-plugin PR #85](https://github.com/full-stack-plugins/codeguard-plugin/pull/85) 把 0.1.1 的 macOS arm64 包、二进制、候选源码提交和检查协议主版本固定为插件锁。显式本地 tarball 与真实注册表安装、内容寻址目录及活动收据的候选路径已运行；调用前会重新核对二进制，缺失或篡改返回未完成，不从 PATH 选同名程序，也不退回 Python。Node 目标测试在真实 tarball 下 4/4，通过 Rust SessionStart 和摘要篡改反例；插件 Python 3.13.5 单元全集 653 项、独立协议 144 项、vendor 离线/在线、portable 插件校验及插件 OpenSpec strict 均通过。插件默认 hooks 尚未切换，已安装宿主验收仍待完成。目录发布竞争、崩溃恢复、可信签名发行、跨平台锁和严格 Git/CI 门禁仍缺；11.2、11.4、11.17 与 S13 继续未完成。插件仓详细范围见 PR 内 `tests/rust-runtime-candidate.md`。

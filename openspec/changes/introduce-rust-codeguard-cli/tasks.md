@@ -552,7 +552,7 @@
   - 单平台 npm 候选增量：源码版本升为 0.1.1，公开打包器要求干净 Git checkout 且二进制 `build_identity` 等于当前提交；缺失/不一致在打包前拒绝。该身份是待外部核验的候选声明，尚非可复现构建、签名发行或多平台验收，11.1 不勾选。见[验收记录](../../../tests/acceptance/npm-0.1.1-candidate.md)。
   - 发布观察：0.1.1 macOS arm64 候选从干净提交构建，注册表下载包与本地 tarball、包内二进制逐字节摘要相符；全新缓存 `npx` 回报同一版本、平台和候选提交。仅证明这一制品可安装与字节一致，不完成其它平台、可信签名或宿主运行时锁。
 - [ ] 11.2 实现插件 runtime lock 和原子下载/切换；验收：摘要不符、缺二进制、离线均无静默 Python fallback。
-  - 插件候选进展：[codeguard-plugin PR #85](https://github.com/full-stack-plugins/codeguard-plugin/pull/85) 增加 macOS arm64 精确 npm 包/二进制/候选源码/协议锁、显式网络或本地 tarball 安装、内容寻址目录与活动收据、调用前复核和缺失/篡改反例；本机真实注册表下载及 Rust SessionStart 调用已通过。默认 hooks 仍用旧 Python；可信发行来源、目录竞争与崩溃恢复、多平台锁及宿主安装验收未完成，11.2 不勾选。
+  - 插件候选进展：已合并的 [codeguard-plugin PR #85](https://github.com/full-stack-plugins/codeguard-plugin/pull/85) 增加 macOS arm64 精确 npm 包/二进制/候选源码/协议锁、显式网络或本地 tarball 安装、内容寻址目录与活动收据、调用前复核和缺失/篡改反例；本机真实注册表下载及 Rust SessionStart 调用已通过。候选已发插件 v0.17.0 并同步市场。默认 hooks 仍用旧 Python；可信发行来源、目录竞争与崩溃恢复、多平台锁及已安装宿主验收未完成，11.2 不勾选。
 - [ ] 11.3 实现 MCP 相同核心 API 与版本化兼容工具；验收：F22、凭据脱敏与超时/取消正确。
 - [ ] 11.4 更新五类宿主入口及 hooks/__protocol__.md 的旧新模式表；验收：保存反馈与严格交付区分，skipGate/env 不能降级新模式。
 - [ ] 11.5 实现真实 Git pre-commit/pre-push 与 CI 入口；验收：alternate index、多 ref、非 HEAD、未知 Shell 边界正确，remote参数/stdin及ci input schema显式验证，不默认HEAD或由input自授策略权威。进行中：Rust CLI 暴露 `gate pre-commit` 的真实 index 路径安全预览，固定 3/incomplete，不是可放行的完整 Git Hook；见 `codeguard-cli/tests/acceptance/git-index-safety-preview.md`。
@@ -575,7 +575,7 @@
   - 修复复检增量：`repair_ready` 先核对稳定任务事实，再在有界子进程中复用 `task verify` 原工具链，反馈 0.4 仅投影脱敏观察及事件持久化状态，历史 0.3 保留。真实 Ruff F401 修复后诊断消失仍返回 `candidate_absent_unverified_policy`，任务保持 open；见同一[局部验收](../../../tests/acceptance/hook-execute-python-candidate.md)。其它原生检查器的宿主实测、提示事件、插件 Hook 接线和完整 Git/CI 门禁仍缺，11.17 不勾选。
   - Claude 保存事件候选：`hook claude post-tool-use PATH --timeout DURATION --format=json` 由 Rust 直接读取宿主 JSON，将成功 Write/Edit/MultiEdit 的项目内普通文件转为同一 `hook execute` 事件；重复键、超预算、缺失/越界/链接目标均只给未运行提示。输出有界 `additionalContext`，不回显宿主源码或原工具消息；本机现有 Ruff 0.16.8 的 F401 诊断已通过真实原生工具测试。见[局部验收](../../../tests/acceptance/claude-post-tool-hook-candidate.md)。插件尚未绑定/调用该二进制，且其它事件、宿主和严格门禁未接线，11.17 不勾选。
   - Claude 生命周期候选增量：同一入口扩展 `session-start` 只读发现、`post-tool-use-failure` 失败不检查、`stop` 有界下一步。Stop 仅在首次发现稳定待办时给一次 `additionalContext`，`stop_hook_active=true` 与空任务只展示状态；错误文本、模型输出和任务 Markdown 不进入反馈。模拟宿主反例与原 `hook execute` 回归见同一[局部验收](../../../tests/acceptance/claude-post-tool-hook-candidate.md)。插件绑定、提示意图、修复复检宿主接线、严格交付与其它宿主仍缺，11.17 不勾选。
-  - 插件候选增量：[PR #85](https://github.com/full-stack-plugins/codeguard-plugin/pull/85) 提供独立 Claude 生命周期 Node 桥，仅从受锁二进制调用 Rust，缺失时向对话返回未完成；本机从已安装候选包和 Copilot 镜像位置实测 SessionStart。它尚未成为插件默认 hooks，不覆盖提示/修复/真实 Git/CI 和三宿主，11.17 保持未完成。
+  - 插件候选增量：已合并的 [PR #85](https://github.com/full-stack-plugins/codeguard-plugin/pull/85) 提供独立 Claude 生命周期 Node 桥，仅从受锁二进制调用 Rust，缺失时向对话返回未完成；本机从已安装候选包和 Copilot 镜像位置实测 SessionStart。它尚未成为插件默认 hooks，不覆盖提示/修复/真实 Git/CI 和三宿主，11.17 保持未完成。
 
 ## 12. S12 质量评测与验收
 
@@ -1016,6 +1016,7 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 - [x] 2.7.1 CLI 版本身份公开输出；仅验收基线所列测试契约；剩余：不可变源码及跨平台制品绑定。
 - [x] 13.4.1 发布 `@partme.ai/codeguard@0.1.0` macOS arm64 包并验证新缓存 npx；依据 npm-public-candidate 既有实际记录；不代表完整 S13。
 - [x] 13.4.2 发布 `@partme.ai/codeguard@0.1.1` macOS arm64 候选并核对干净源码提交、自报构建身份、注册表/本地包与二进制摘要及新缓存 npx；依据 [npm 0.1.1 验收](../../../tests/acceptance/npm-0.1.1-candidate.md)。该子任务不代替 13.4 的可信来源、插件 lock、市场与已安装宿主闭环。
+- [x] 13.4.3 发布 codeguard-plugin 0.17.0 候选：PR #85 的四项 CI 通过后合并为 `de0936a62f8a8b649151f59823a64975f8c7db74`，标签 `v0.17.0` 指向该提交并建立 GitHub Release；市场仓 `4a0ec90c4e4ce06e577093e225240bca5bee55e5` 仅提交 CodeGuard 版本元数据。默认 Hook、三宿主已安装运行时及完整门禁仍未通过，13.4 不勾选。
 
 ## 14. S14 WASM 语法初检完善
 
