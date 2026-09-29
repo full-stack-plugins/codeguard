@@ -1,0 +1,949 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:python-lint-feedback:0.15.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "scope",
+    "scan_scope",
+    "requested_paths",
+    "operation",
+    "language",
+    "run_id",
+    "workspace_binding",
+    "workspace_id",
+    "checker_configurations",
+    "files",
+    "incomplete_reasons",
+    "local_scan_complete",
+    "command_status",
+    "exit_code",
+    "tool_approval",
+    "native_tool_version",
+    "rulepack_approval",
+    "adapter_sha256",
+    "backlog_status",
+    "backlog_sync",
+    "repair_brief_status",
+    "repair_brief_reason",
+    "next",
+    "delivery_decision",
+    "execution_budget",
+    "native",
+    "setup",
+    "next_action",
+    "syntax_precheck",
+    "task_persistence"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.15.0"
+    },
+    "execution_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timeout_ms",
+        "source",
+        "enforcement"
+      ],
+      "properties": {
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 86400000
+        },
+        "source": {
+          "enum": [
+            "cli",
+            "registered_environment",
+            "project_default",
+            "builtin_default"
+          ]
+        },
+        "enforcement": {
+          "const": "native_and_bounded_syntax_worker"
+        }
+      }
+    },
+    "report_type": {
+      "const": "python_lint_feedback"
+    },
+    "scope": {
+      "const": "local_native_and_candidate_syntax_scan"
+    },
+    "scan_scope": {
+      "enum": [
+        "discovered_python",
+        "selected_files"
+      ]
+    },
+    "requested_paths": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*//)[^\\\\\\u0000-\\u001f]+$"
+          }
+        }
+      ]
+    },
+    "operation": {
+      "const": "lint"
+    },
+    "language": {
+      "const": "python"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,120}$"
+    },
+    "workspace_binding": {
+      "const": "bound"
+    },
+    "workspace_id": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^ws-[0-9a-f]{32}$"
+        }
+      ]
+    },
+    "checker_configurations": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "run_status",
+          "tool_sha256",
+          "config_sha256",
+          "rule_settings",
+          "suppression_audit"
+        ],
+        "properties": {
+          "run_status": {
+            "enum": [
+              "passed",
+              "findings",
+              "suppressed",
+              "incomplete"
+            ]
+          },
+          "tool_sha256": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/sha256"
+              }
+            ]
+          },
+          "config_sha256": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/sha256"
+              }
+            ]
+          },
+          "rule_settings": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/rule_settings"
+              }
+            ]
+          },
+          "suppression_audit": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/suppression_audit"
+              }
+            ]
+          },
+          "findings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "codeguard_rule_id",
+                "rulepack_sha256",
+                "rulepack_status"
+              ],
+              "properties": {
+                "codeguard_rule_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "rulepack_sha256": {
+                  "oneOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "$ref": "#/$defs/sha256"
+                    }
+                  ]
+                },
+                "rulepack_status": {
+                  "enum": [
+                    "candidate_unapproved",
+                    "unverified_incomplete",
+                    "rulepack_unavailable",
+                    "unmapped_or_unvalidated_version"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "run_status": {
+                  "const": "incomplete"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "tool_sha256": {
+                  "type": "null"
+                },
+                "config_sha256": {
+                  "type": "null"
+                },
+                "rule_settings": {
+                  "type": "null"
+                },
+                "suppression_audit": {
+                  "type": "null"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "tool_sha256": {
+                  "$ref": "#/$defs/sha256"
+                },
+                "config_sha256": {
+                  "$ref": "#/$defs/sha256"
+                },
+                "rule_settings": {
+                  "$ref": "#/$defs/rule_settings"
+                },
+                "suppression_audit": {
+                  "$ref": "#/$defs/suppression_audit"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "incomplete_reasons": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "local_scan_complete": {
+      "type": "boolean"
+    },
+    "command_status": {
+      "enum": [
+        "incomplete",
+        "cancelled"
+      ]
+    },
+    "exit_code": {
+      "enum": [
+        3,
+        130
+      ]
+    },
+    "tool_approval": {
+      "const": "unverified"
+    },
+    "native_tool_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "rulepack_approval": {
+      "const": "unverified"
+    },
+    "adapter_sha256": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/sha256"
+        }
+      ]
+    },
+    "backlog_status": {
+      "enum": [
+        "synced_partial",
+        "backlog_update_failed",
+        "not_initialized",
+        "not_synced_scoped"
+      ]
+    },
+    "backlog_sync": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/backlog_sync"
+        }
+      ]
+    },
+    "repair_brief_status": {
+      "enum": [
+        "available",
+        "unavailable"
+      ]
+    },
+    "repair_brief_reason": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        }
+      ]
+    },
+    "next": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/next"
+        }
+      ]
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "native": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason"
+      ],
+      "properties": {
+        "status": {
+          "const": "incomplete"
+        },
+        "reason": {
+          "enum": [
+            "ruff_tool_not_found",
+            "project_ruff_config_not_found",
+            "ruff_section_not_declared",
+            "ruff_lint_intent_not_explicit",
+            "ruff_config_not_resolved",
+            "multiple_native_incomplete_reasons"
+          ]
+        }
+      }
+    },
+    "setup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement",
+        "reason",
+        "task_id"
+      ],
+      "properties": {
+        "requirement": {
+          "const": "required"
+        },
+        "reason": {
+          "const": "native_confirmation_needed"
+        },
+        "task_id": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^CG-B-[0-9a-f]{32}$"
+            }
+          ]
+        }
+      }
+    },
+    "next_action": {
+      "type": "string",
+      "minLength": 1
+    },
+    "syntax_precheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "backend",
+        "language",
+        "status",
+        "reason",
+        "grammar_sha256",
+        "grammar_qualified",
+        "selected_files",
+        "checked_files",
+        "checked",
+        "unavailable",
+        "truncated",
+        "observations"
+      ],
+      "properties": {
+        "backend": {
+          "const": "bundled_tree_sitter_wasm_candidate"
+        },
+        "language": {
+          "const": "python"
+        },
+        "status": {
+          "const": "incomplete"
+        },
+        "reason": {
+          "enum": [
+            "partial_unavailable",
+            "recovery_or_file_budget_truncated",
+            "grammar_version_unqualified"
+          ]
+        },
+        "grammar_sha256": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/sha256"
+            }
+          ]
+        },
+        "grammar_qualified": {
+          "const": false
+        },
+        "selected_files": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "checked_files": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 8
+        },
+        "truncated": {
+          "type": "boolean"
+        },
+        "checked": {
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "source_sha256",
+              "grammar_sha256"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_sha256": {
+                "$ref": "#/$defs/sha256"
+              },
+              "grammar_sha256": {
+                "$ref": "#/$defs/sha256"
+              }
+            }
+          }
+        },
+        "unavailable": {
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "reason"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reason": {
+                "enum": [
+                  "source_path_invalid",
+                  "file_budget_exceeded",
+                  "request_deadline_or_cancelled",
+                  "source_unavailable",
+                  "source_unavailable_or_over_budget",
+                  "source_changed",
+                  "grammar_or_worker_unavailable",
+                  "worker_incomplete",
+                  "grammar_identity_changed",
+                  "position_mapping_incomplete"
+                ]
+              }
+            }
+          }
+        },
+        "observations": {
+          "type": "array",
+          "maxItems": 128,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "classification",
+              "kind",
+              "syntax_kind",
+              "start_line",
+              "start_column",
+              "end_line",
+              "end_column",
+              "group_id",
+              "path",
+              "source_sha256"
+            ],
+            "properties": {
+              "classification": {
+                "const": "suspected"
+              },
+              "kind": {
+                "enum": [
+                  "ERROR",
+                  "MISSING"
+                ]
+              },
+              "syntax_kind": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "start_line": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "start_column": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "end_line": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "end_column": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "group_id": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_sha256": {
+                "$ref": "#/$defs/sha256"
+              }
+            }
+          }
+        }
+      }
+    },
+    "task_persistence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "synced_partial",
+            "unavailable"
+          ]
+        },
+        "reason": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            }
+          ]
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "rule_settings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "settings_sha256",
+        "globally_enabled_mapped_rules",
+        "per_file_ignores_present",
+        "coverage_proven"
+      ],
+      "properties": {
+        "settings_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "globally_enabled_mapped_rules": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "E501",
+              "F401"
+            ]
+          }
+        },
+        "per_file_ignores_present": {
+          "type": "boolean"
+        },
+        "coverage_proven": {
+          "const": false
+        }
+      }
+    },
+    "suppression_audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "audit_sha256",
+        "suppressed_diagnostic_count",
+        "suppressed_rule_ids",
+        "scope"
+      ],
+      "properties": {
+        "audit_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "suppressed_diagnostic_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "suppressed_rule_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]{1,12}$"
+          }
+        },
+        "scope": {
+          "const": "source_comments_only"
+        }
+      }
+    },
+    "backlog_sync": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "new_findings",
+        "new_blockers",
+        "imported_reports",
+        "historical_findings",
+        "failed_reports"
+      ],
+      "properties": {
+        "new_findings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "new_blockers": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "imported_reports": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "historical_findings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failed_reports": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "next": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "report_type",
+        "disposition",
+        "repair_brief",
+        "authority",
+        "delivery_decision"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "0.1.0"
+        },
+        "report_type": {
+          "const": "repair_brief_preview"
+        },
+        "disposition": {
+          "enum": [
+            "actionable",
+            "waiting",
+            "needs_decision",
+            "verification_required",
+            "no_applicable_work"
+          ]
+        },
+        "repair_brief": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "authority": {
+          "const": "local_unverified"
+        },
+        "delivery_decision": {
+          "const": "not_evaluated"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "scan_scope": {
+            "const": "selected_files"
+          }
+        },
+        "required": [
+          "scan_scope"
+        ]
+      },
+      "then": {
+        "properties": {
+          "requested_paths": {
+            "type": "array"
+          },
+          "backlog_status": {
+            "const": "not_synced_scoped"
+          },
+          "backlog_sync": {
+            "type": "null"
+          },
+          "repair_brief_status": {
+            "const": "unavailable"
+          },
+          "repair_brief_reason": {
+            "const": "not_synced_scoped"
+          },
+          "next": {
+            "type": "null"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "requested_paths": {
+            "type": "null"
+          },
+          "backlog_status": {
+            "enum": [
+              "synced_partial",
+              "backlog_update_failed",
+              "not_initialized"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "command_status": {
+            "const": "cancelled"
+          }
+        },
+        "required": [
+          "command_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "exit_code": {
+            "const": 130
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "exit_code": {
+            "const": 3
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "repair_brief_status": {
+            "const": "available"
+          }
+        },
+        "required": [
+          "repair_brief_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "next": {
+            "$ref": "#/$defs/next"
+          },
+          "repair_brief_reason": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "repair_brief_status": {
+            "const": "unavailable"
+          }
+        },
+        "required": [
+          "repair_brief_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "next": {
+            "type": "null"
+          },
+          "repair_brief_reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "task_persistence": {
+            "properties": {
+              "status": {
+                "const": "synced_partial"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          }
+        },
+        "required": [
+          "task_persistence"
+        ]
+      },
+      "then": {
+        "properties": {
+          "setup": {
+            "properties": {
+              "task_id": {
+                "type": "string",
+                "pattern": "^CG-B-[0-9a-f]{32}$"
+              }
+            }
+          },
+          "task_persistence": {
+            "properties": {
+              "reason": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "setup": {
+            "properties": {
+              "task_id": {
+                "type": "null"
+              }
+            }
+          },
+          "task_persistence": {
+            "properties": {
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

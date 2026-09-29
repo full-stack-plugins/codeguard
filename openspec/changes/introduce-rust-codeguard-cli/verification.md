@@ -2078,3 +2078,9 @@ TDD 先复现报告漏洞：把源码 finding 的主定位、原生身份及白�
 ## 2026-09-29 暂存对象部分失败保留发现
 
 `git_index_safety` 以前在任一暂存 blob 超过读取预算时丢弃所有内容观察。真实 Git 混合样本先红后绿：超 8 MiB 对象单独 unresolved，同一 index 中已核对 OID 的 `.codeguard/findings` 私钥 finding 仍出现在本地与公开 JSON；执行保持 3/incomplete/not_evaluated。受控 Git 65 个不同 OID 的第二批坏响应证明前 64 个已独立核对证据保留，第 65 个未完成。目标 Git 契约 17/17 通过，宿主事件契约 18 通过、2 项因本机 Ruff 条件跳过；CLI Clippy `-D warnings`、fmt 与 OpenSpec strict 通过。[PR #6](https://github.com/full-stack-plugins/codeguard/pull/6) 的最终 [CI 36518917839](https://github.com/full-stack-plugins/codeguard/actions/runs/36518917839) 全部通过，合并提交 `0940b028cfdd4d71a3c77390bea9a7f4f10b0d8a`。完整快照、其它坏响应组合、正式 Git/CI 门禁和跨平台验收仍缺，2.3/3.5/11.5 不勾选。
+
+## 2026-09-29 Python WASM 候选原生确认任务
+
+已初始化工作区的单文件 `lint python` 候选报告使用 0.15.0 对话协议，将固定 Python grammar、当前源码摘要与脱敏疑似位置写入独立 0.1.0 本地报告，并经现有 work sync 形成按工作区和源码范围稳定归并的 `python_syntax_confirmation_needed` 阻塞任务。未初始化工作区继续使用 0.14.0 且任务 ID 为空。重扫同一源码及源码改为零恢复节点后，任务仍为 `open`；报告目录不可用时，对话保留候选结果，标明持久化原因而不伪造任务引用。导入拒绝 grammar 摘要篡改、越界坐标和重复 JSON 键；报告不含源码文本。
+
+开发验证：新增 Python 端到端 8/8、相关 Python 原生路径 16/16（5 项真实工具用例默认忽略）、TypeScript 候选回归 14/14；本机 Ruff 0.16.8 的额外原生优先用例及 `task verify` 用例分别通过，后者记录观察而不关闭任务。实际 0.15.0 与本地 0.1.0 报告通过 JSON Schema，伪造同步成功状态被拒绝。先构建特性版产生报告，再用默认二进制执行 `work sync`，`failed_reports=0`。默认工作区测试通过，特性版 Clippy `-D warnings`、格式、分层检查及 OpenSpec strict 通过。能力匹配的原生复检关闭、多文件任务和真实宿主对话仍未完成，14.10 及相关总任务不勾选。

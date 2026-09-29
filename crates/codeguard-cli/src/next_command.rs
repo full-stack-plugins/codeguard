@@ -530,7 +530,15 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         brief["build_root"] = json!(build_root);
         brief["affected_paths"] = json!(paths);
         brief["constraints"] = json!(["先恢复检查完整性", "不得关闭检查器或修改无关源码"]);
-        let (priority, disposition, step) = if checker_id == "python.ruff.doctor" {
+        let (priority, disposition, step) = if checker_id == "python.ruff"
+            && reason == "python_syntax_confirmation_needed"
+        {
+            (
+                1,
+                "actionable",
+                "核对候选 Python 疑似位置，使用当前源码和适用原生语法能力复检；未完成前不按候选观察修改源码或关闭任务",
+            )
+        } else if checker_id == "python.ruff.doctor" {
             brief["first_diagnostic_reason"] = fact["first_diagnostic_reason"].clone();
             (
                 1,
