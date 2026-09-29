@@ -63,7 +63,7 @@ fn published_schema_covers_every_current_candidate_and_field() {
 #[test]
 fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support() {
     let manifest = bundled_grammar_candidates().expect("bundled manifest");
-    assert_eq!(manifest.assets.len(), 18);
+    assert_eq!(manifest.assets.len(), 22);
     for asset in &manifest.assets {
         let (wasm, license) = match asset.language.as_str() {
             "arkts" => (
@@ -106,9 +106,25 @@ fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support(
                 include_bytes!("../../../grammars/java/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/java/LICENSE").as_slice(),
             ),
+            "kotlin" => (
+                include_bytes!("../../../grammars/kotlin/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/kotlin/LICENSE").as_slice(),
+            ),
             "python" => (
                 include_bytes!("../../../grammars/python/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/python/LICENSE").as_slice(),
+            ),
+            "php" => (
+                include_bytes!("../../../grammars/php/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/php/LICENSE").as_slice(),
+            ),
+            "r" => (
+                include_bytes!("../../../grammars/r/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/r/LICENSE").as_slice(),
+            ),
+            "ruby" => (
+                include_bytes!("../../../grammars/ruby/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/ruby/LICENSE").as_slice(),
             ),
             "typescript" => (
                 include_bytes!("../../../grammars/typescript/parser.wasm").as_slice(),

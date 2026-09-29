@@ -1050,4 +1050,6 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 
 14.19 性能子项进展：候选 worker 已改为仅校验所选固定 grammar 及相关许可证，避免每次单文件初检遍历全部 WASM；全量库存命令保持完整校验。选择接口先 RED 后通过 15 语种身份一致性测试，单次调试构建启动观察见[局部验收](../../../tests/acceptance/syntax-worker-selected-asset.md)。这不是正式性能评测；该阶段仍为 15/32 候选和 0 份发行验收。
 
-14.19 后续增量：ArkTS、Nix、Terraform 三份 CodeGraph 随仓 WASM 已固定上游提交、许可证、字节和真实 ABI；ArkTS/Terraform 预编译 npm 包另固定完整性并核对包内字节。Rust 离线加载、窄范围正反例及隔离 worker 候选状态通过，见[局部验收](../../../tests/acceptance/arkts-nix-terraform-grammar-candidates.md)。目前 18/32 候选、14 份未入候选、已发行验收 0；公开原生优先 lint 路由和逐语言精度验收仍缺，14.1 与 14.19 保持未完成。
+14.19 后续增量：ArkTS、Nix、Terraform 三份 CodeGraph 随仓 WASM 已固定上游提交、许可证、字节和真实 ABI；ArkTS/Terraform 预编译 npm 包另固定完整性并核对包内字节。Rust 离线加载、窄范围正反例及隔离 worker 候选状态通过，见[局部验收](../../../tests/acceptance/arkts-nix-terraform-grammar-candidates.md)。该阶段 18/32 候选、14 份未入候选、已发行验收 0；公开原生优先 lint 路由和逐语言精度验收仍缺，14.1 与 14.19 保持未完成。
+
+14.19 再后续增量：R、Ruby、PHP、Kotlin 四份 CodeGraph 随仓 WASM 已固定上游提交、许可证、字节、Rust 实测 ABI，经窄范围正反例和隔离 worker 验证；PHP 正例包括 HTML/PHP 混合源码。累计 22/32 候选、10 份未入候选、已发行验收仍为 0。Dart 来源 WASM 的外部 scanner 导入使当前 Rust worker 无法实例化，`grammar status` 显示具体缺口；不得以空 scanner 代替语法功能。见[本批局部验收](../../../tests/acceptance/r-ruby-php-kotlin-grammar-candidates.md)。公开原生优先路由、逐语言精度验收和发布仍缺，14.1、14.19 保持未完成。

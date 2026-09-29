@@ -22,6 +22,10 @@ const LUAU_COMMIT: &str = "a8914d6c1fc5131f8e1c13f769fa704c9f5eb02f";
 const ARKTS_COMMIT: &str = "56f7fc288715befe92c734d603f9e6bc3c65d2a8";
 const NIX_COMMIT: &str = "3d0173d903e630b6e14d17f1cf79488791379ded";
 const TERRAFORM_COMMIT: &str = "fad991865fee927dd1de5e172fb3f08ac674d914";
+const R_COMMIT: &str = "e9944e9801595ad484f49be492daf0c4c81547ef";
+const RUBY_COMMIT: &str = "71bd32fb7607035768799732addba884a37a6210";
+const PHP_COMMIT: &str = "5b5627faaa290d89eb3d01b9bf47c3bb9e797dea";
+const KOTLIN_COMMIT: &str = "e1a2d5ad1f61f5740677183cd4125bb071cd2f30";
 
 /// 代码来源、许可和每份候选 grammar 的固定身份。
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
@@ -181,6 +185,22 @@ fn verify_bundled_asset(asset: &GrammarAsset) -> Result<&'static [u8], String> {
             include_bytes!("../../../grammars/nix/parser.wasm").as_slice(),
             include_bytes!("../../../grammars/nix/LICENSE").as_slice(),
         ),
+        "r" => (
+            include_bytes!("../../../grammars/r/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/r/LICENSE").as_slice(),
+        ),
+        "ruby" => (
+            include_bytes!("../../../grammars/ruby/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/ruby/LICENSE").as_slice(),
+        ),
+        "php" => (
+            include_bytes!("../../../grammars/php/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/php/LICENSE").as_slice(),
+        ),
+        "kotlin" => (
+            include_bytes!("../../../grammars/kotlin/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/kotlin/LICENSE").as_slice(),
+        ),
         "java" => (
             include_bytes!("../../../grammars/java/parser.wasm").as_slice(),
             include_bytes!("../../../grammars/java/LICENSE").as_slice(),
@@ -262,7 +282,7 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
         || manifest.dependency_package_license.as_deref() != Some("LICENSE.tree-sitter-wasms")
         || manifest.dependency_package_license_sha256.as_deref()
             != Some("6b0382b16279f26ff69014300541967a356a666eb0b91b422f6862f6b7dad17e")
-        || manifest.assets.len() != 18
+        || manifest.assets.len() != 22
     {
         return Err("grammar 清单版本、来源或资产数量不符".into());
     }
@@ -280,11 +300,15 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
             "go",
             "java",
             "javascript",
+            "kotlin",
             "lua",
             "luau",
             "nix",
             "objc",
+            "php",
             "python",
+            "r",
+            "ruby",
             "rust",
             "solidity",
             "terraform",
@@ -358,6 +382,16 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
                     "java/LICENSE",
                     "52ed137b039cd9c46409bc22e89938af911c95b157feae2d040b51e6084369a7",
                 ),
+                "kotlin" => (
+                    "https://github.com/fwcd/tree-sitter-kotlin",
+                    KOTLIN_COMMIT,
+                    "0.3.8",
+                    "kotlin/parser.wasm",
+                    "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+                    4052313,
+                    "kotlin/LICENSE",
+                    "948495f61768f7de26bcc61113d8cd95f50bbc15adb678c28c941c6c8fcd5903",
+                ),
                 "python" => (
                     "https://github.com/tree-sitter/tree-sitter-python",
                     PYTHON_COMMIT,
@@ -367,6 +401,36 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
                     456131,
                     "python/LICENSE",
                     "d724405ce238a22c0d35769c5a36b386ad5958192efe8bbb304fb2896254575f",
+                ),
+                "php" => (
+                    "https://github.com/tree-sitter/tree-sitter-php",
+                    PHP_COMMIT,
+                    "v0.24.2-full-php",
+                    "php/parser.wasm",
+                    "6545a9a110bc878e26ed329950147e190c83da038bb17e999de646fe6c4d6c82",
+                    1058082,
+                    "php/LICENSE",
+                    "664764fabf40c0b318e06324a5a12379092a2df25b8cbf2415f71bc0bb352346",
+                ),
+                "r" => (
+                    "https://github.com/r-lib/tree-sitter-r",
+                    R_COMMIT,
+                    "v1.2.0",
+                    "r/parser.wasm",
+                    "2a8f5acd1c53d91e0ec5c01a6830d8ac7f5a7f96f0ac4b3768c016c8e9d07711",
+                    481163,
+                    "r/LICENSE",
+                    "de2e49529f03d573bc3fa229dc83acfe22c63a5ad1766b289563edfd45b72dea",
+                ),
+                "ruby" => (
+                    "https://github.com/tree-sitter/tree-sitter-ruby",
+                    RUBY_COMMIT,
+                    "v0.23.1",
+                    "ruby/parser.wasm",
+                    "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+                    2106097,
+                    "ruby/LICENSE",
+                    "ee006f02a3d856df282e409be2a86e24a65bb573a98b9c28343771141351bb6b",
                 ),
                 "javascript" => (
                     "https://github.com/tree-sitter/tree-sitter-javascript",
@@ -525,7 +589,7 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
             || asset.abi_version
                 != if matches!(
                     asset.language.as_str(),
-                    "zig" | "c" | "csharp" | "javascript" | "lua" | "rust" | "nix"
+                    "zig" | "c" | "csharp" | "javascript" | "lua" | "rust" | "nix" | "php"
                 ) {
                     15
                 } else {

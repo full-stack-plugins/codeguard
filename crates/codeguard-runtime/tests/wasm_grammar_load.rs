@@ -21,6 +21,72 @@ const LUAU: &[u8] = include_bytes!("../../../grammars/luau/parser.wasm");
 const ARKTS: &[u8] = include_bytes!("../../../grammars/arkts/parser.wasm");
 const NIX: &[u8] = include_bytes!("../../../grammars/nix/parser.wasm");
 const TERRAFORM: &[u8] = include_bytes!("../../../grammars/terraform/parser.wasm");
+const R: &[u8] = include_bytes!("../../../grammars/r/parser.wasm");
+const RUBY: &[u8] = include_bytes!("../../../grammars/ruby/parser.wasm");
+const PHP: &[u8] = include_bytes!("../../../grammars/php/parser.wasm");
+const KOTLIN: &[u8] = include_bytes!("../../../grammars/kotlin/parser.wasm");
+
+#[test]
+fn fourth_batch_grammars_load_offline_and_parse_basic_fixtures() {
+    for (name, wasm, sha, abi, valid, invalid) in [
+        (
+            "r",
+            R,
+            "2a8f5acd1c53d91e0ec5c01a6830d8ac7f5a7f96f0ac4b3768c016c8e9d07711",
+            14,
+            b"x <- 1\n".as_slice(),
+            b"x <- \n".as_slice(),
+        ),
+        (
+            "ruby",
+            RUBY,
+            "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+            14,
+            b"def f; 1; end\n".as_slice(),
+            b"def f(\n".as_slice(),
+        ),
+        (
+            "php",
+            PHP,
+            "6545a9a110bc878e26ed329950147e190c83da038bb17e999de646fe6c4d6c82",
+            15,
+            b"<?php function f() { return 1; }".as_slice(),
+            b"<?php function f( {".as_slice(),
+        ),
+        (
+            "kotlin",
+            KOTLIN,
+            "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+            14,
+            b"fun main() { val x = 1 }".as_slice(),
+            b"fun main( {".as_slice(),
+        ),
+    ] {
+        let mut grammar = WasmGrammar::load(name, wasm, sha, abi)
+            .unwrap_or_else(|reason| panic!("{name} offline load: {reason}"));
+        assert!(
+            !grammar.parse(valid).unwrap().root_node().has_error(),
+            "{name} valid"
+        );
+        assert!(
+            grammar.parse(invalid).unwrap().root_node().has_error(),
+            "{name} invalid"
+        );
+    }
+    let mut php = WasmGrammar::load(
+        "php",
+        PHP,
+        "6545a9a110bc878e26ed329950147e190c83da038bb17e999de646fe6c4d6c82",
+        15,
+    )
+    .expect("full PHP grammar");
+    assert!(
+        !php.parse(b"<div>Hi</div><?php echo 1; ?>")
+            .unwrap()
+            .root_node()
+            .has_error()
+    );
+}
 
 #[test]
 fn third_batch_grammars_load_offline_and_parse_basic_fixtures() {

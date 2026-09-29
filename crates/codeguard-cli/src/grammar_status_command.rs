@@ -136,6 +136,7 @@ fn coverage_report() -> Result<Value, String> {
                 "released":false,
                 "gap":if candidate.is_some_and(|item| item.codeguard_runtime_validation == "rust_loader_incompatible") {"rust_loader_incompatible"}
                     else if asset.bytes.is_some_and(|bytes| bytes > 8 * 1024 * 1024) {"current_loader_size_limit"}
+                    else if asset.language == "dart" && candidate.is_none() {"rust_worker_external_scanner_import"}
                     else if candidate.is_some() {"language_qualification_and_release_pending"}
                     else {"asset_provenance_license_and_loader_validation_pending"},
             })
