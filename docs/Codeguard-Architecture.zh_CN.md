@@ -2,7 +2,7 @@
 
 > **文档说明：**说明系统职责、组件契约、修复流程，以及当前实现与目标行为之间的差距。
 >
-> **文档版本：**1.2.1 · **最后更新：**2026-09-29 · **源码基线：**当前 checkout 与[实施证据](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md)；软件版本 `0.1.1`。
+> **文档版本：**1.2.2 · **最后更新：**2026-09-29 · **源码基线：**当前 checkout 与[实施证据](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md)；软件版本 `0.1.2`。
 
 [English](Codeguard-Architecture.md) · [README](../README.zh-CN.md) · [技术方案](Codeguard-Technical-Design.zh_CN.md)
 
@@ -75,7 +75,7 @@ CLI 不承担模型供应商、聊天传输、IDE UI、RAG 存储、分布式调
 | 修复 | 稳定任务、本地尝试、部分原工具复检 | 可靠的验证关闭、复发处理、完整事件协调 |
 | 误报例外 | 候选查询/提案、精确匹配和签名相关基础能力 | 可信批准来源、生命周期接线和可用生效流程 |
 | 质量门禁 | 核心判定逻辑；公开扫描仍局部；index 路径安全 | 针对实际工作树/index/ref/CI 内容的端到端检查 |
-| 分发 | 源码构建、Apple Silicon macOS npm 0.1.1；制品核验、下载和安装基础能力 | 可支持的二进制发行、平台测试和宿主运行时绑定 |
+| 分发 | 源码构建、Apple Silicon macOS npm 0.1.2；制品核验、下载和安装基础能力 | 可支持的二进制发行、平台测试和宿主运行时绑定 |
 
 当前 `check all` 已包含 Rust 构建调度和持久化，[构建复检](../tests/acceptance/rust-build-task-verification.md)也已存在。旧记录中“完全没有这些接线”的描述不能用作当前状态；完整构建组合和正式关闭仍待完成。
 
@@ -196,7 +196,7 @@ flowchart LR
 
 ### 8.1 原生优先与内置 WASM 初检路径——目标
 
-**本节是新增设计，公开的 `0.1.1` 包尚未实现。** 保留统一入口，调用者选择语言或项目，不选择解析器后端：
+**本节是新增设计，公开的 `0.1.2` 包尚未实现。** 保留统一入口，调用者选择语言或项目，不选择解析器后端：
 
 ```bash
 codeguard lint java .
@@ -315,7 +315,7 @@ sequenceDiagram
 
 独立的 `lint python . --file REL_PATH` 已能以相同路径预算调用原生 Ruff，仅输出指定文件的局部反馈；它没有由 `hook plan` 自动调起，未执行本轮 Git 范围检查，也不将局部结果当作完整工作台扫描。
 
-`hook execute PATH --timeout DURATION --format=json` 消费同一版本化宿主事件。会话启动只读发现；Stop 只读本地有界下一步，不调用检查器；确认成功且全为 Python 的有界编辑范围调用 Ruff 快检。Stop 最多检查 64 个 finding 和 64 份报告，报告字节总预算为 8 MiB；超出后返回 `guidance_scope_exceeded`，检查仍为未运行。`repair_ready` 先将单任务历史限制在 128 项和 1 MiB，读取稳定任务事实，再经有界子进程复用现有 `task verify`，只返回原检查器观察和本地事件是否保存的摘要；不关闭任务、不批准交付。显式提供 `--git-tool ABS_PATH` 后，`pre_commit` 在事件总截止时间内观察本轮真实暂存 index（含 `GIT_INDEX_FILE`），报告路径违规与对象核验状态，绝不拿编辑快检结果充作提交门禁。缺工具或 index 观察不稳定仍是不完整。混合语言、未知/失败写入、推送和 CI 保持显式 `not_run`。`hook_execution_feedback` 0.4 仍仅是候选证据，历史 0.1–0.3 schema 保留。提示事件缺少可信意图上下文，仍未接通指引；插件 Hook、缓存复用和完整 Git/CI 质量门禁尚未接通。
+`hook execute PATH --timeout DURATION --format=json` 消费同一版本化宿主事件。会话启动只读发现；Stop 只读本地有界下一步，不调用检查器；确认成功且全为 Python 的有界编辑范围调用 Ruff 快检。Stop 最多检查 64 个 finding 和 64 份报告，报告字节总预算为 8 MiB；超出后返回 `guidance_scope_exceeded`，检查仍为未运行。`repair_ready` 先将单任务历史限制在 128 项和 1 MiB，读取稳定任务事实，再经有界子进程复用现有 `task verify`，只返回原检查器观察和本地事件是否保存的摘要；不关闭任务、不批准交付。显式提供 `--git-tool ABS_PATH` 后，`pre_commit` 在事件总截止时间内观察本轮真实暂存 index（含 `GIT_INDEX_FILE`），报告路径违规与对象核验状态，绝不拿编辑快检结果充作提交门禁。缺工具或 index 观察不稳定仍是不完整。混合语言、未知/失败写入、推送和 CI 保持显式 `not_run`。`hook_execution_feedback` 0.5 仍仅是候选证据，历史 0.1–0.4 schema 保留。用户提示事件现返回固定的非阻断检查时机指引，不解释提示词或启动检查器，不能据此认定交付意图或 Git 门禁；插件 Hook、缓存复用和完整 Git/CI 质量门禁尚未接通。
 
 Rust CLI 另有 Claude Code `SessionStart`、`PostToolUse`、`PostToolUseFailure`、`Stop` 候选软入口。启动只读发现；成功编辑核对绝对路径、项目根及普通文件后复用同一执行器；失败编辑走不检查源码的路由，不把错误文本当指令；Stop 有界读取已有任务事实，不运行检查器，仅在首次 Stop 发现稳定任务时给一次 `additionalContext` 继续指引，`stop_hook_active=true` 或无任务时只显示提示而不反复唤醒。全部反馈有界，排除源码、原工具错误及可编辑任务正文；非法/超预算输入显示未运行。宿主退出 0 仅表示软反馈已返回，不是质量通过。独立 `codeguard-plugin` 尚未绑定该 CLI，也未自动调用这些入口；见[局部验收](../tests/acceptance/claude-post-tool-hook-candidate.md)。
 
@@ -451,7 +451,7 @@ CLI 返回命令专属的版本化 JSON、可读投影及部分 SARIF。[Schema 
 
 ## 15. 部署、升级与集成
 
-当前部署形态是本地构建二进制加独立准备的原生工具链。`@partme.ai/codeguard@0.1.1` npm 包通过 Node 命令入口携带 Apple Silicon macOS 二进制；Node 层只转发参数、工作目录、环境、输出与退出状态。该平台的发布、全新缓存 `npx` 版本检查及注册表/本地制品字节核对已通过。二进制回报候选源码提交，但这不证明签名来源、可复现构建、多平台发行或完整质量门禁。公开 `tools install` apply 仍受阻，内部包核验、下载和安装基础能力已有测试。
+当前部署形态是本地构建二进制加独立准备的原生工具链。`@partme.ai/codeguard@0.1.2` npm 包通过 Node 命令入口携带 Apple Silicon macOS 二进制；Node 层只转发参数、工作目录、环境、输出与退出状态。该平台的发布、全新缓存 `npx` 版本检查及注册表/本地制品字节核对已通过。二进制回报候选源码提交，但这不证明签名来源、可复现构建、多平台发行或完整质量门禁。公开 `tools install` apply 仍受阻，内部包核验、下载和安装基础能力已有测试。
 
 ```mermaid
 flowchart LR
@@ -462,7 +462,7 @@ flowchart LR
     Rust --> Native[选定的原生检查器]
 ```
 
-默认本地包标记为 private，不含 npm 安装钩子。`bin` 入口见 [npm/codeguard.cjs](../npm/codeguard.cjs)，[scripts/pack-npm-local.mjs](../scripts/pack-npm-local.mjs)使用已构建二进制打包。`--public` 模式已产出公开的 `@partme.ai/codeguard@0.1.1`，仅覆盖 Apple Silicon macOS；全新缓存运行和包/二进制摘要核对见[npm 0.1.1 验收记录](../tests/acceptance/npm-0.1.1-candidate.md)。扩大分发范围还需平台覆盖、可信制品清单、版本与摘要绑定及发行流程。CodeGraph 的 Node 入口和平台包布局为此设计提供参考；其可选网络回退不属于 Codeguard 当前安装路径。
+默认本地包标记为 private，不含 npm 安装钩子。`bin` 入口见 [npm/codeguard.cjs](../npm/codeguard.cjs)，[scripts/pack-npm-local.mjs](../scripts/pack-npm-local.mjs)使用已构建二进制打包。`--public` 模式已产出公开的 `@partme.ai/codeguard@0.1.2`，仅覆盖 Apple Silicon macOS；全新缓存运行和包/二进制摘要核对见[npm 0.1.2 验收记录](../tests/acceptance/npm-0.1.2-candidate.md)。扩大分发范围还需平台覆盖、可信制品清单、版本与摘要绑定及发行流程。CodeGraph 的 Node 入口和平台包布局为此设计提供参考；其可选网络回退不属于 Codeguard 当前安装路径。
 
 升级时记录二进制/schema 版本，保留工作区，预览受管变更，重跑有限检查，再核对报告消费。降级必须服从已有 schema 读取范围，不能为了通过解析而改写历史记录成旧格式。
 

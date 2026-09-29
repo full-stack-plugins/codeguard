@@ -2,7 +2,7 @@
 
 > **Purpose:** turn the architecture into concrete implementation contracts, command responsibilities, extension steps, and observable acceptance criteria.
 >
-> **Document version:** 1.2.1 · **Updated:** 2026-09-29 · **Source baseline:** current checkout and the [implementation evidence](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md); software version `0.1.1`.
+> **Document version:** 1.2.2 · **Updated:** 2026-09-29 · **Source baseline:** current checkout and the [implementation evidence](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md); software version `0.1.2`.
 
 [简体中文](Codeguard-Technical-Design.zh_CN.md) · [Architecture](Codeguard-Architecture.md) · [README](../README.md)
 
@@ -145,7 +145,7 @@ Add a new adapter by defining these contracts, implementing observation first, a
 
 ### 5.3 Native-first selection and syntax fallback — target, not shipped
 
-The proposed routing extends existing `codeguard lint java .`, `codeguard lint typescript .` and `codeguard check all .` entries. It adds no requirement for callers to choose WASM. Current adapter options/prerequisites still apply until implementation and acceptance; the published `0.1.1` does not contain this fallback. The architecture document's **8.1–8.3** owns component boundaries and execution diagrams; this section defines the algorithm.
+The proposed routing extends existing `codeguard lint java .`, `codeguard lint typescript .` and `codeguard check all .` entries. It adds no requirement for callers to choose WASM. Current adapter options/prerequisites still apply until implementation and acceptance; the published `0.1.2` does not contain this fallback. The architecture document's **8.1–8.3** owns component boundaries and execution diagrams; this section defines the algorithm.
 
 ```mermaid
 flowchart LR
@@ -544,7 +544,7 @@ Artifact signature, package digest, layout, archive extraction and publication p
 
 The Node path supports the published macOS arm64 package and local packaging. For local packaging: explicitly build the Rust binary, validate its `--version --format json` target and version, create a host-tagged tarball, and install or execute it through npm. The package contains `codeguard.cjs` and the native binary, declares npm `os`/`cpu`, and has no install lifecycle script. Local packages are private by default; `--public` packages are public. The launcher does not implement checks or silently fetch tooling. [README](../README.md) contains tested commands. This is separate from Codeguard's `tools install`, which provisions external analyzers under a different trust contract.
 
-The `--public` packer mode produced `@partme.ai/codeguard@0.1.1` for `darwin-arm64`; its npm `os`/`cpu` constraints reject other hosts. Registry publication, a fresh-cache registry-hosted `npx --yes @partme.ai/codeguard@0.1.1 --version --format json` run, and registry/local tarball and binary SHA-256 comparisons passed on Apple Silicon macOS. Its clean-checkout build identity reports the candidate source commit but does not prove a reproducible build, signed provenance, or S13 release completion; see [acceptance evidence](../tests/acceptance/npm-0.1.1-candidate.md). For broader distribution, adapt CodeGraph's thin entry/platform bundle pattern only after S13 release evidence is ready: publish a version-matched package for each certified target, then a public command package with exact optional platform dependencies. Missing platform support must fail clearly; network recovery must follow Codeguard's signed selection and explicit host permission contract before any download.
+The `--public` packer mode produced `@partme.ai/codeguard@0.1.2` for `darwin-arm64`; its npm `os`/`cpu` constraints reject other hosts. Registry publication, a fresh-cache registry-hosted `npx --yes @partme.ai/codeguard@0.1.2 --version --format json` run, and registry/local tarball and binary SHA-256 comparisons passed on Apple Silicon macOS. Its clean-checkout build identity reports the candidate source commit but does not prove a reproducible build, signed provenance, or S13 release completion; see [acceptance evidence](../tests/acceptance/npm-0.1.2-candidate.md). For broader distribution, adapt CodeGraph's thin entry/platform bundle pattern only after S13 release evidence is ready: publish a version-matched package for each certified target, then a public command package with exact optional platform dependencies. Missing platform support must fail clearly; network recovery must follow Codeguard's signed selection and explicit host permission contract before any download.
 
 ## 12. Test and evaluation plan
 

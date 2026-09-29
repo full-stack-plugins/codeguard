@@ -174,6 +174,44 @@ fn session_start_only_discovers_without_running_a_checker() {
 }
 
 #[test]
+fn prompt_submitted_only_returns_non_blocking_intent_guidance() {
+    let project = Project::new();
+    fs::write(project.0.join("broken.py"), "import os\n").unwrap();
+    let (exit, report) = run(&project, &request("prompt_submitted", &[], "unknown"));
+    assert_eq!(exit, 3);
+    assert_eq!(report["schema_version"], "0.5.0");
+    assert_eq!(report["plan"]["action"], "show_intent_guidance");
+    assert_eq!(report["execution"], "read_only_intent_guidance");
+    assert_eq!(
+        report["local_feedback"]["report_type"],
+        "hook_intent_guidance"
+    );
+    assert_eq!(report["local_feedback"]["source_check"], "not_run");
+    assert_eq!(
+        report["local_feedback"]["delivery_decision"],
+        "not_evaluated"
+    );
+    assert_eq!(report["delivery_decision"], "not_evaluated");
+    assert_eq!(report["host_blocking_verified"], false);
+    assert_eq!(report["soft_result_reused"], false);
+
+    let current: Value = serde_json::from_str(include_str!(
+        "../../../schemas/hook-execution-feedback.schema.json"
+    ))
+    .unwrap();
+    let previous: Value = serde_json::from_str(include_str!(
+        "../../../schemas/hook-execution-feedback-v0.4.schema.json"
+    ))
+    .unwrap();
+    assert_eq!(current["properties"]["schema_version"]["const"], "0.5.0");
+    assert_eq!(previous["properties"]["schema_version"]["const"], "0.4.0");
+    assert_eq!(
+        current["$defs"]["intent_guidance"]["properties"]["source_check"]["const"],
+        "not_run"
+    );
+}
+
+#[test]
 fn stop_returns_bounded_next_action_without_running_a_checker() {
     let project = Project::new();
     let (exit, report) = run(&project, &request("stop", &[], "unknown"));

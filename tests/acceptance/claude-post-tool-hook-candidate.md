@@ -13,3 +13,7 @@
 扩展后完整工作区 `cargo test --workspace --all-features -- --test-threads=1 -q` 退出 0，显式设置本机 Ruff 路径后再次运行被默认忽略的真实保存事件 F401 测试，1 项通过。全目标 Clippy、三个改动 Rust 文件的 rustfmt 检查、OpenSpec 严格校验与 `git diff --check` 通过。整仓 `cargo fmt --all -- --check` 仍会报告其它未改文件的历史格式差异，本轮未扩大格式修改范围。
 
 本次只通过模拟 Claude JSON 与真实 Ruff 进程验证 CLI 候选，**没有在已安装 Claude Code 中触发插件 Hook**。独立 `codeguard-plugin` 尚未绑定本次 Rust 二进制；提交/推送/CI、其它宿主与缓存身份去重均未接线。因此 S11.17 及宿主验收仍未完成。
+
+2026-09-29 增量：为 `UserPromptSubmit` 增加固定的检查时机指引。测试先在 `hook execute` 0.4 报告上失败，随后 Rust 事件执行器新增 `read_only_intent_guidance`，Claude 适配器接受真实事件名和字符串提示，只输出固定、有界的 `additionalContext`，不回显或解析提示词。对抗测试分别发送提交祈使语与普通问题，两者获得完全相同的宿主反馈；显式传入会留下标记文件的假 Ruff 工具，确认事件未调用检查器。格式错误的提示字段保留“未运行”反馈。外层报告升至 0.5，0.4 schema 单独留存；本段没有证明默认插件 Hook 已切换，也不证明 Git/CI 门禁完成。
+
+本增量的 `cargo test --workspace --all-features -- --test-threads=1 -q` 退出 0；最终源码的 `claude_hook_cli` 为 12 passed/1 ignored，`hook_execute_cli` 为 18 passed/2 ignored，显式设置本机 Ruff 0.16.8 后真实 Claude 保存事件用例 1 passed。`cargo clippy --workspace --all-features --all-targets -- -D warnings`、改动 Rust 文件的 rustfmt 检查、`openspec validate introduce-rust-codeguard-cli --strict`、两个 Hook schema 的 JSON 解析及 `git diff --check` 均退出 0。全套测试中的 ignored 用例没有计为通过。

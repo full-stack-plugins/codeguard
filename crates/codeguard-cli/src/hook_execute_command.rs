@@ -112,6 +112,16 @@ fn execute_parsed(
             Ok(feedback) => ("read_only_discovery", None, feedback, 3),
             Err(_) => ("not_run", Some("registry_unavailable"), Value::Null, 4),
         },
+        (HookTriggerAction::ShowIntentGuidance, Some(_)) => (
+            "read_only_intent_guidance",
+            None,
+            json!({
+                "schema_version":"0.1.0", "report_type":"hook_intent_guidance",
+                "source_check":"not_run", "delivery_decision":"not_evaluated",
+                "next_action":"check_after_real_change_or_at_delivery_boundary"
+            }),
+            3,
+        ),
         (HookTriggerAction::ShowSummary, Some(root)) => match guidance_summary(root) {
             Ok(feedback) => ("read_only_guidance", None, feedback, 3),
             Err("guidance_scope_exceeded") => {
@@ -223,11 +233,10 @@ fn execute_parsed(
             | HookTriggerAction::FullProjectCheck,
             Some(_),
         ) => ("not_run", Some("delivery_gate_not_wired"), Value::Null, 3),
-        (_, Some(_)) => ("not_run", Some("action_not_wired"), Value::Null, 3),
     };
     Ok((
         json!({
-            "schema_version":"0.4.0", "report_type":"hook_execution_feedback",
+            "schema_version":"0.5.0", "report_type":"hook_execution_feedback",
             "plan":plan, "execution":execution, "reason":reason,
             "local_feedback":feedback, "delivery_decision":"not_evaluated",
             "host_blocking_verified":false, "soft_result_reused":false
