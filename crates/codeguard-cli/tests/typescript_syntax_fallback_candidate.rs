@@ -91,6 +91,59 @@ fn no_recovery_remains_incomplete_and_javascript_does_not_use_typescript_grammar
 }
 
 #[test]
+fn observed_project_local_eslint_candidate_is_not_treated_as_missing_native_lint() {
+    let project = Project::new();
+    fs::write(project.0.join("app.ts"), "const value: number = ;\n").unwrap();
+    fs::write(
+        project.0.join("package.json"),
+        r#"{"devDependencies":{"eslint":"10.0.0"}}"#,
+    )
+    .unwrap();
+    fs::write(project.0.join("eslint.config.mjs"), "export default [];\n").unwrap();
+    fs::create_dir_all(project.0.join("node_modules/eslint/bin")).unwrap();
+    fs::write(
+        project.0.join("node_modules/eslint/package.json"),
+        r#"{"name":"eslint","version":"10.0.0","bin":{"eslint":"bin/eslint.js"}}"#,
+    )
+    .unwrap();
+    fs::write(
+        project.0.join("node_modules/eslint/bin/eslint.js"),
+        "process.exit(99);\n",
+    )
+    .unwrap();
+
+    let (status, report) = project.lint("app.ts");
+    assert_eq!(status, 3);
+    assert_eq!(report["reason"], "eslint_execution_context_missing");
+    assert!(report.get("syntax_precheck").is_none());
+    assert!(
+        report["next_action"]
+            .as_str()
+            .unwrap()
+            .contains("项目本地 ESLint 候选")
+    );
+    assert_eq!(report["delivery_decision"], "not_evaluated");
+}
+
+#[test]
+fn configured_but_uninstalled_eslint_still_allows_candidate_precheck() {
+    let project = Project::new();
+    fs::write(project.0.join("app.ts"), "const value: number = ;\n").unwrap();
+    fs::write(
+        project.0.join("package.json"),
+        r#"{"devDependencies":{"eslint":"10.0.0"}}"#,
+    )
+    .unwrap();
+    fs::write(project.0.join("eslint.config.mjs"), "export default [];\n").unwrap();
+
+    let (status, report) = project.lint("app.ts");
+    assert_eq!(status, 3);
+    assert_eq!(report["native"]["status"], "not_run");
+    assert!(report.get("syntax_precheck").is_some());
+    assert_eq!(report["delivery_decision"], "not_evaluated");
+}
+
+#[test]
 fn tsx_uses_its_own_grammar_instead_of_reporting_valid_jsx_as_suspect() {
     let project = Project::new();
     fs::write(
