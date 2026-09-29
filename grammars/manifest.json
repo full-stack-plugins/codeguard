@@ -41,6 +41,24 @@
       "language_versions": [],
       "known_limitations": ["Rust loader smoke passed; MSRV build, dialect versions, isolation and syntax corpus are not yet validated"],
       "release_status": "candidate_unvalidated"
+    },
+    {
+      "language": "tsx",
+      "dialect": "tsx",
+      "grammar_repository": "https://github.com/tree-sitter/tree-sitter-typescript",
+      "grammar_commit": "f975a621f4e7f532fe322e13c4f79495e0a7b2e7",
+      "grammar_version": "v0.23.2",
+      "path": "tsx/parser.wasm",
+      "sha256": "8f647a1b2cafe9ab00fb2056d79021d2a144ba17a72f45511072311c1b05d08e",
+      "bytes": 1445641,
+      "license": "typescript/LICENSE",
+      "license_sha256": "49bf33cf78ef5897e4e161ce1517df7de1ae5042a65b6bcfd44401e0fc606559",
+      "abi_version": 14,
+      "codegraph_runtime": "web-tree-sitter 0.25.3",
+      "codeguard_runtime_validation": "rust_loader_smoke_passed",
+      "language_versions": [],
+      "known_limitations": ["Rust loader smoke passed; TSX language versions, JSX dialects, isolation and syntax corpus are not yet validated"],
+      "release_status": "candidate_unvalidated"
     }
   ]
 }

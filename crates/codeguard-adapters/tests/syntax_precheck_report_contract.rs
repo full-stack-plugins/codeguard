@@ -105,3 +105,20 @@ fn candidate_schema_declares_closed_versioned_contract() {
     assert_eq!(schema["additionalProperties"], false);
     assert_eq!(schema["properties"]["precheck"]["$ref"], "#/$defs/precheck");
 }
+
+#[test]
+fn tsx_candidate_requires_tsx_source_and_cannot_relabel_java() {
+    let mut report = candidate();
+    report["backend"]["language"] = json!("tsx");
+    report["backend"]["dialect"] = json!("tsx");
+    report["backend"]["grammar_sha256"] =
+        json!("8f647a1b2cafe9ab00fb2056d79021d2a144ba17a72f45511072311c1b05d08e");
+    assert!(read(&report).is_err());
+
+    report["files"][0]["path"] = json!("src/Component.tsx");
+    let sources = BTreeMap::from([("src/Component.tsx".into(), b"hello".to_vec())]);
+    let status =
+        parse_syntax_precheck_candidate_report(&serde_json::to_vec(&report).unwrap(), &sources)
+            .unwrap();
+    assert_eq!(status.status, SyntaxPrecheckStatus::Incomplete);
+}

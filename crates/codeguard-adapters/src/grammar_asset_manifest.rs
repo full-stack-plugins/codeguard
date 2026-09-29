@@ -68,7 +68,7 @@ pub struct GrammarAsset {
     pub release_status: String,
 }
 
-/// 读取仓内固定清单，并检查 CodeGraph 许可证及两份资产的原始字节。
+/// 读取仓内固定清单，并检查 CodeGraph 许可证及三份资产的原始字节。
 pub fn bundled_grammar_candidates() -> Result<GrammarAssetManifest, String> {
     let manifest = parse_grammar_asset_manifest(include_bytes!("../../../grammars/manifest.json"))?;
     let codegraph_license = include_bytes!("../../../grammars/LICENSE.codegraph");
@@ -83,6 +83,10 @@ pub fn bundled_grammar_candidates() -> Result<GrammarAssetManifest, String> {
             ),
             "typescript" => (
                 include_bytes!("../../../grammars/typescript/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/typescript/LICENSE").as_slice(),
+            ),
+            "tsx" => (
+                include_bytes!("../../../grammars/tsx/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/typescript/LICENSE").as_slice(),
             ),
             _ => return Err("候选语言未知".into()),
@@ -106,7 +110,7 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
         || manifest.codegraph_license != "LICENSE.codegraph"
         || manifest.codegraph_license_sha256 != CODEGRAPH_LICENSE_SHA256
         || manifest.build_tool != "tree-sitter-cli 0.25.10 build --wasm"
-        || manifest.assets.len() != 2
+        || manifest.assets.len() != 3
     {
         return Err("grammar 清单版本、来源或资产数量不符".into());
     }
@@ -115,7 +119,7 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
         .iter()
         .map(|asset| asset.language.as_str())
         .collect();
-    if languages != BTreeSet::from(["java", "typescript"]) {
+    if languages != BTreeSet::from(["java", "typescript", "tsx"]) {
         return Err("grammar 语言资产缺失或重复".into());
     }
     for asset in &manifest.assets {
@@ -138,6 +142,16 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
                     "typescript/parser.wasm",
                     "3a44d634c9840dccec36f33b99592bd086a2f940e9cd80c64347c45b7dce662f",
                     1414055,
+                    "typescript/LICENSE",
+                    "49bf33cf78ef5897e4e161ce1517df7de1ae5042a65b6bcfd44401e0fc606559",
+                ),
+                "tsx" => (
+                    "https://github.com/tree-sitter/tree-sitter-typescript",
+                    TYPESCRIPT_COMMIT,
+                    "v0.23.2",
+                    "tsx/parser.wasm",
+                    "8f647a1b2cafe9ab00fb2056d79021d2a144ba17a72f45511072311c1b05d08e",
+                    1445641,
                     "typescript/LICENSE",
                     "49bf33cf78ef5897e4e161ce1517df7de1ae5042a65b6bcfd44401e0fc606559",
                 ),

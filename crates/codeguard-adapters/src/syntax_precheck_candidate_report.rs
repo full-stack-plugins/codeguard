@@ -100,6 +100,9 @@ pub fn parse_syntax_precheck_candidate_report(
     }
     let mut observations = Vec::with_capacity(report.files.len());
     for file in report.files {
+        if !path_matches_language(&file.path, &report.backend.language) {
+            return Err("syntax_precheck_source_dialect_mismatch".into());
+        }
         let source = source_bytes
             .get(&file.path)
             .ok_or("syntax_precheck_source_missing")?;
@@ -131,4 +134,15 @@ pub fn parse_syntax_precheck_candidate_report(
         return Err("syntax_precheck_aggregate_mismatch".into());
     }
     Ok(actual)
+}
+
+fn path_matches_language(path: &str, language: &str) -> bool {
+    match language {
+        "java" => path.ends_with(".java"),
+        "typescript" => [".ts", ".mts", ".cts"]
+            .iter()
+            .any(|suffix| path.ends_with(suffix)),
+        "tsx" => path.ends_with(".tsx"),
+        _ => false,
+    }
 }

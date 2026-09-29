@@ -28,15 +28,24 @@ pub(crate) fn eligible(args: &EslintLintArguments) -> bool {
 }
 
 /// 使用本轮源码快照与私有 Rust worker 补充疑似语法观察；原生仍未运行。
-/// 参数为受支持的单文件请求及共同截止时间；返回无交付权威的 0.3.0 反馈。
+/// 参数为受支持的单文件请求及共同截止时间；返回无交付权威的 TypeScript 0.3.0 或 TSX 0.4.0 反馈。
 pub(crate) fn observe(args: &EslintLintArguments, deadline: Instant) -> Value {
+    let language = if args
+        .source
+        .extension()
+        .is_some_and(|extension| extension == "tsx")
+    {
+        "tsx"
+    } else {
+        "typescript"
+    };
     let source_name = args
         .source
         .file_name()
         .and_then(|name| name.to_str())
         .unwrap_or("source.ts");
     let mut report = json!({
-        "schema_version": "0.3.0",
+        "schema_version": if language == "tsx" { "0.4.0" } else { "0.3.0" },
         "report_type": "eslint_local_feedback",
         "status": "incomplete",
         "local_coherent": false,
@@ -51,7 +60,7 @@ pub(crate) fn observe(args: &EslintLintArguments, deadline: Instant) -> Value {
         "setup": {"requirement": "required", "reason": "native_confirmation_needed", "task_id": null},
         "syntax_precheck": {
             "backend": "bundled_tree_sitter_wasm_candidate",
-            "language": "typescript",
+            "language": language,
             "status": "incomplete",
             "reason": "not_run",
             "source_path": source_name,
@@ -82,7 +91,7 @@ pub(crate) fn observe(args: &EslintLintArguments, deadline: Instant) -> Value {
     };
     let observation = match run_syntax_worker_candidate(
         &executable,
-        "typescript",
+        language,
         source_name,
         &source,
         deadline,

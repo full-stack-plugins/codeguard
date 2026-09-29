@@ -4,6 +4,7 @@ use codeguard_runtime::WasmGrammar;
 
 const JAVA: &[u8] = include_bytes!("../../../grammars/java/parser.wasm");
 const TYPESCRIPT: &[u8] = include_bytes!("../../../grammars/typescript/parser.wasm");
+const TSX: &[u8] = include_bytes!("../../../grammars/tsx/parser.wasm");
 
 #[test]
 fn pinned_grammars_load_offline_and_parse_valid_sources() {
@@ -45,6 +46,27 @@ fn pinned_grammars_load_offline_and_parse_valid_sources() {
             .has_error()
     );
     assert!(typescript.parse(&vec![b'x'; 1024 * 1024 + 1]).is_err());
+
+    let mut tsx = WasmGrammar::load(
+        "tsx",
+        TSX,
+        "8f647a1b2cafe9ab00fb2056d79021d2a144ba17a72f45511072311c1b05d08e",
+        14,
+    )
+    .expect("固定 TSX WASM 应可由 Rust 加载");
+    assert_eq!(tsx.abi_version(), 14);
+    assert!(
+        !tsx.parse(b"const node = <div title=\"ok\">hello</div>;")
+            .unwrap()
+            .root_node()
+            .has_error()
+    );
+    assert!(
+        tsx.parse(b"const node = <div title=></div>;")
+            .unwrap()
+            .root_node()
+            .has_error()
+    );
 }
 
 #[test]

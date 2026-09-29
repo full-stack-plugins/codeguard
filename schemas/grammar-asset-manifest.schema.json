@@ -14,8 +14,8 @@
     "build_tool": {"const": "tree-sitter-cli 0.25.10 build --wasm"},
     "assets": {
       "type": "array",
-      "minItems": 2,
-      "maxItems": 2,
+      "minItems": 3,
+      "maxItems": 3,
       "items": {"$ref": "#/$defs/asset"}
     }
   },
@@ -27,12 +27,12 @@
       "additionalProperties": false,
       "required": ["language", "dialect", "grammar_repository", "grammar_commit", "grammar_version", "path", "sha256", "bytes", "license", "license_sha256", "abi_version", "codegraph_runtime", "codeguard_runtime_validation", "language_versions", "known_limitations", "release_status"],
       "properties": {
-        "language": {"enum": ["java", "typescript"]},
-        "dialect": {"enum": ["java", "typescript"]},
+        "language": {"enum": ["java", "typescript", "tsx"]},
+        "dialect": {"enum": ["java", "typescript", "tsx"]},
         "grammar_repository": {"type": "string", "pattern": "^https://github.com/tree-sitter/tree-sitter-"},
         "grammar_commit": {"$ref": "#/$defs/commit"},
         "grammar_version": {"type": "string", "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$"},
-        "path": {"enum": ["java/parser.wasm", "typescript/parser.wasm"]},
+        "path": {"enum": ["java/parser.wasm", "typescript/parser.wasm", "tsx/parser.wasm"]},
         "sha256": {"$ref": "#/$defs/sha256"},
         "bytes": {"type": "integer", "minimum": 8, "maximum": 8388608},
         "license": {"enum": ["java/LICENSE", "typescript/LICENSE"]},

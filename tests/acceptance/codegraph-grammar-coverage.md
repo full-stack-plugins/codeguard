@@ -7,3 +7,5 @@
 `cargo test --locked -p codeguard-cli --test grammar_status_cli`：2/2 通过。实际调用 `target/debug/codeguard grammar status --format=json` 返回 `grammar_coverage_inventory`、`codegraph_grammar_count=32`、`codegraph_vendored_count=30`、`candidate_count=2`、`released_count=0`、`execution=not_run`、`delivery_decision=not_evaluated`。Java/TypeScript 是 `candidate_unvalidated`；`objc`/`solidity` 为 `dependency_bytes_not_pinned`。COBOL 源文件 16,355,286 字节，超过现有 Rust 加载器 8 MiB 限额，明确显示 `current_loader_size_limit`。
 
 未完成：其余 30 份资产的上游版本/许可证、Rust ABI 与真实加载、各语言版本/方言/语料、原生对照、运行时预算和发行打包。此库存不证明任何新增语言已可进行语法初检，不改变原生 lint 或交付门禁。
+
+后续增量：[TSX 候选纠错](tsx-grammar-candidate.md)将 TSX 纳入候选资产，当前源码构建的 `grammar status` 候选数变为 3，仍无已验收发行能力。上面的 2 候选与 2/2 测试记录保留为本次覆盖库存引入时的验收快照。

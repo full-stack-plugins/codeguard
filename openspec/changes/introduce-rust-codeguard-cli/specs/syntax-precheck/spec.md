@@ -105,6 +105,13 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 
 解析 MUST 同时识别 ERROR/MISSING 恢复，并按同一恢复原因归并级联节点；诊断 MUST 保留原文件位置、必要的有界脱敏上下文及 grammar 身份。不确定版本/方言、模板、宏、嵌入语言 MUST 明示覆盖限制。CodeGraph 用于提取符号的源码遮盖/启发式 MUST NOT 静默移入语法判定。仅凭恢复节点不得猜测具体缺失 token 或自动授予源码修改范围。
 
+同一语言族有独立 grammar 的方言 MUST 按实际文件类型选择和报告；尤其 `.tsx` MUST 使用 TSX grammar，不能拿普通 TypeScript grammar 的恢复节点当作 JSX 源码异常。候选报告读者 MUST 核对 grammar 方言与源文件扩展名一致；不匹配视为报告无效，不生成源码 finding。
+
+#### Scenario: Valid JSX is parsed with a TypeScript-only grammar
+
+- **WHEN** `.tsx` 文件含合法 JSX，而普通 TypeScript grammar 会产生恢复节点
+- **THEN** 选用固定的 TSX grammar 并保留候选未验收状态；不得制造疑似源码异常或声称原生 lint 已执行
+
 #### Scenario: One unmatched delimiter produces many recovery nodes
 - **WHEN** 同一恢复原因造成重复或级联节点
 - **THEN** 归并为可处理观察并保留受影响范围，不创建大量同义任务
