@@ -15,7 +15,13 @@ fn version_json_reports_protocol_without_claiming_unverified_release_identity() 
     assert_eq!(report["cli_version"], env!("CARGO_PKG_VERSION"));
     assert_eq!(report["check_protocol_major"], 1);
     assert_eq!(report["rulepack_compatibility"], "unverified");
-    assert!(report["build_identity"].is_null());
+    let expected_build_identity = option_env!("CODEGUARD_BUILD_SHA").filter(|sha| {
+        matches!(sha.len(), 40 | 64) && sha.bytes().all(|byte| byte.is_ascii_hexdigit())
+    });
+    match expected_build_identity {
+        Some(sha) => assert_eq!(report["build_identity"], sha),
+        None => assert!(report["build_identity"].is_null()),
+    }
     assert!(
         report["target"]
             .as_str()

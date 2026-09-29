@@ -187,6 +187,9 @@ fn version_report(args: &[String]) -> ExitCode {
     let target = current_platform_id()
         .map(str::to_owned)
         .unwrap_or_else(|| format!("{}-{}", std::env::consts::OS, std::env::consts::ARCH));
+    let build_identity = option_env!("CODEGUARD_BUILD_SHA").filter(|sha| {
+        matches!(sha.len(), 40 | 64) && sha.bytes().all(|byte| byte.is_ascii_hexdigit())
+    });
     if format == "json" {
         println!(
             "{}",
@@ -195,7 +198,7 @@ fn version_report(args: &[String]) -> ExitCode {
                 "report_type":"version",
                 "cli_version":env!("CARGO_PKG_VERSION"),
                 "target":target,
-                "build_identity":null,
+                "build_identity":build_identity,
                 "check_protocol_major":1,
                 "rulepack_compatibility":"unverified",
             })
@@ -204,7 +207,10 @@ fn version_report(args: &[String]) -> ExitCode {
         println!("codeguard {}", env!("CARGO_PKG_VERSION"));
         println!("目标平台：{target}");
         println!("检查协议 major：1");
-        println!("构建身份：未验证；规则包兼容范围：未验证");
+        println!(
+            "构建来源声明：{}；规则包兼容范围：未验证",
+            build_identity.unwrap_or("未提供")
+        );
     }
     ExitCode::SUCCESS
 }

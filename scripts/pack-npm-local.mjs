@@ -48,6 +48,18 @@ const workspaceVersion = readFileSync(path.join(root, 'Cargo.toml'), 'utf8')
 if (identity.report_type !== 'version' || identity.target !== expectedTarget || identity.cli_version !== workspaceVersion) {
   throw new Error(`Binary identity must match host ${expectedTarget} and workspace version ${workspaceVersion ?? '(missing)'}`);
 }
+if (publishable) {
+  const sourceSha = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim();
+  const sourceChanges = execFileSync('git', ['status', '--porcelain=v1', '--untracked-files=normal'], {
+    cwd: root, encoding: 'utf8', maxBuffer: 128 * 1024,
+  });
+  if (sourceChanges.trim()) {
+    throw new Error('Public package requires a clean source checkout');
+  }
+  if (identity.build_identity !== sourceSha) {
+    throw new Error('Public binary build identity must equal the checked-out source commit');
+  }
+}
 
 const stage = mkdtempSync(path.join(os.tmpdir(), 'codeguard-npm-'));
 const outDir = path.join(root, 'release', 'npm');

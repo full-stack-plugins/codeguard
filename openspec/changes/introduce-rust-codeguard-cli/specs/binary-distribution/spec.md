@@ -164,6 +164,10 @@
 - **WHEN** 安装二进制摘要不符合插件锁
 - **THEN** 拒绝将其作为可信检查器，交付未完成
 
+#### Scenario: Candidate npm package is prepared from a dirty or mismatched source
+- **WHEN** 单平台公开 npm 打包器面对未提交的源码，或二进制自报的候选构建提交不同于当前 Git HEAD
+- **THEN** 在生成公开包前拒绝；匹配的候选构建提交仍只是来源声明，不能代替可复现构建、发行签名、插件锁或宿主运行验收
+
 ### Requirement: Compatibility SHALL be explicit and versioned
 
 旧 CLI/MCP/Hook 兼容 MUST 具名并按旧入口分别映射协议；禁止透传新退出码或隐式改变旧语义。新交付门禁 MUST 不接受 legacy-v1 的 fail-open 结果作为新认证。兼容移除 MUST 有发布迁移说明。

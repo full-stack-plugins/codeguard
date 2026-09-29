@@ -549,6 +549,7 @@
 依赖：S02、S03、S09，至少 S06/S07 已可真实运行。覆盖：hook-protocol、binary-distribution。
 
 - [ ] 11.1 构建候选平台二进制，固化 ABI/MSRV/签名身份/校验清单；验收：各 target 运行 smoke，未测平台不标 stable。
+  - 单平台 npm 候选增量：源码版本升为 0.1.1，公开打包器要求干净 Git checkout 且二进制 `build_identity` 等于当前提交；缺失/不一致在打包前拒绝。该身份是待外部核验的候选声明，尚非可复现构建、签名发行或多平台验收，11.1 不勾选。见[验收记录](../../../tests/acceptance/npm-0.1.1-candidate.md)。
 - [ ] 11.2 实现插件 runtime lock 和原子下载/切换；验收：摘要不符、缺二进制、离线均无静默 Python fallback。
 - [ ] 11.3 实现 MCP 相同核心 API 与版本化兼容工具；验收：F22、凭据脱敏与超时/取消正确。
 - [ ] 11.4 更新五类宿主入口及 hooks/__protocol__.md 的旧新模式表；验收：保存反馈与严格交付区分，skipGate/env 不能降级新模式。
