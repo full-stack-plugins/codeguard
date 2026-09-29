@@ -19,6 +19,9 @@ const CPP_COMMIT: &str = "f41e1a044c8a84ea9fa8577fdd2eab92ec96de02";
 const CSHARP_COMMIT: &str = "cac6d5fb595f5811a076336682d5d595ac1c9e85";
 const LUA_COMMIT: &str = "816840c592ab973500ae9750763c707b447e7fef";
 const LUAU_COMMIT: &str = "a8914d6c1fc5131f8e1c13f769fa704c9f5eb02f";
+const ARKTS_COMMIT: &str = "56f7fc288715befe92c734d603f9e6bc3c65d2a8";
+const NIX_COMMIT: &str = "3d0173d903e630b6e14d17f1cf79488791379ded";
+const TERRAFORM_COMMIT: &str = "fad991865fee927dd1de5e172fb3f08ac674d914";
 
 /// 代码来源、许可和每份候选 grammar 的固定身份。
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
@@ -62,6 +65,8 @@ pub struct GrammarAsset {
     pub grammar_commit: String,
     /// CodeGraph 记录的上游版本标签。
     pub grammar_version: String,
+    /// 对预编译 npm 资产固定包完整性；其它来源为空。
+    pub package_integrity: Option<String>,
     /// 相对于 grammars/ 的固定制品路径。
     pub path: String,
     /// WASM 原始字节摘要。
@@ -140,6 +145,10 @@ fn verify_dependency_license(manifest: &GrammarAssetManifest) -> Result<(), Stri
 
 fn verify_bundled_asset(asset: &GrammarAsset) -> Result<&'static [u8], String> {
     let (wasm, license) = match asset.language.as_str() {
+        "arkts" => (
+            include_bytes!("../../../grammars/arkts/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/arkts/LICENSE").as_slice(),
+        ),
         "c" => (
             include_bytes!("../../../grammars/c/parser.wasm").as_slice(),
             include_bytes!("../../../grammars/c/LICENSE").as_slice(),
@@ -167,6 +176,10 @@ fn verify_bundled_asset(asset: &GrammarAsset) -> Result<&'static [u8], String> {
         "luau" => (
             include_bytes!("../../../grammars/luau/parser.wasm").as_slice(),
             include_bytes!("../../../grammars/luau/LICENSE").as_slice(),
+        ),
+        "nix" => (
+            include_bytes!("../../../grammars/nix/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/nix/LICENSE").as_slice(),
         ),
         "java" => (
             include_bytes!("../../../grammars/java/parser.wasm").as_slice(),
@@ -199,6 +212,10 @@ fn verify_bundled_asset(asset: &GrammarAsset) -> Result<&'static [u8], String> {
         "rust" => (
             include_bytes!("../../../grammars/rust/parser.wasm").as_slice(),
             include_bytes!("../../../grammars/rust/LICENSE").as_slice(),
+        ),
+        "terraform" => (
+            include_bytes!("../../../grammars/terraform/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/terraform/LICENSE").as_slice(),
         ),
         _ => return Err("候选语言未知".into()),
     };
@@ -237,7 +254,7 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
         || manifest.codegraph_license != "LICENSE.codegraph"
         || manifest.codegraph_license_sha256 != CODEGRAPH_LICENSE_SHA256
         || manifest.build_tool
-            != "tree-sitter-cli 0.25.10 build --wasm; Zig: tree-sitter-cli 0.27.0 generate --abi 15 + Zig 0.16.0 wasm32-wasi"
+            != "tree-sitter-cli 0.25.10 build --wasm; Zig: tree-sitter-cli 0.27.0 generate --abi 15 + Zig 0.16.0 wasm32-wasi; ArkTS/Terraform: pinned npm prebuilt WASM"
         || manifest.dependency_package_integrity.as_deref()
             != Some(
                 "tree-sitter-wasms@0.1.13 sha512-wT+cR6DwaIz80/vho3AvSF0N4txuNx/5bcRKoXouOfClpxh/qqrF4URNLQXbbt8MaAxeksZcZd1j8gcGjc+QxQ==",
@@ -245,7 +262,7 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
         || manifest.dependency_package_license.as_deref() != Some("LICENSE.tree-sitter-wasms")
         || manifest.dependency_package_license_sha256.as_deref()
             != Some("6b0382b16279f26ff69014300541967a356a666eb0b91b422f6862f6b7dad17e")
-        || manifest.assets.len() != 15
+        || manifest.assets.len() != 18
     {
         return Err("grammar 清单版本、来源或资产数量不符".into());
     }
@@ -257,6 +274,7 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
     if languages
         != BTreeSet::from([
             "c",
+            "arkts",
             "cpp",
             "csharp",
             "go",
@@ -264,10 +282,12 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
             "javascript",
             "lua",
             "luau",
+            "nix",
             "objc",
             "python",
             "rust",
             "solidity",
+            "terraform",
             "typescript",
             "tsx",
             "zig",
@@ -278,6 +298,16 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
     for asset in &manifest.assets {
         let (repo, commit, version, wasm_path, wasm_sha, wasm_bytes, license_path, license_sha) =
             match asset.language.as_str() {
+                "arkts" => (
+                    "https://github.com/harmony-contrib/tree-sitter-arkts",
+                    ARKTS_COMMIT,
+                    "0.2.0",
+                    "arkts/parser.wasm",
+                    "db0812971109457d22b3fe9dcdb1cd8e614fba2a338e220670bd254485753623",
+                    4384161,
+                    "arkts/LICENSE",
+                    "048e4dcb7a71fb725495ebb3e7052d0e76dcb6705b828af8b9b461df10bcd8ca",
+                ),
                 "c" => (
                     "https://github.com/tree-sitter/tree-sitter-c",
                     C_COMMIT,
@@ -368,6 +398,16 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
                     "luau/LICENSE",
                     "099c44248f8cf353123211318680e93465587c005a4b3730ce8cb5334de043d6",
                 ),
+                "nix" => (
+                    "https://github.com/nix-community/tree-sitter-nix",
+                    NIX_COMMIT,
+                    "3d0173d+codegraph-cli-0.25.10",
+                    "nix/parser.wasm",
+                    "4acffa1c013df751193a21ce429777ca214c7d3a7e3665085b6df00dad8869f0",
+                    80876,
+                    "nix/LICENSE",
+                    "c1b72e50266464ec5118d26200e17bf1f472d142e62ab637e1ffc23986657a78",
+                ),
                 "rust" => (
                     "https://github.com/tree-sitter/tree-sitter-rust",
                     RUST_COMMIT,
@@ -428,9 +468,29 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
                     "solidity/LICENSE",
                     "8844f0cc9b76b9c8a9d0251904eb7536b6bb9976e0ec577e8f27ab96d42523ef",
                 ),
+                "terraform" => (
+                    "https://github.com/tree-sitter-grammars/tree-sitter-hcl",
+                    TERRAFORM_COMMIT,
+                    "1.2.0",
+                    "terraform/parser.wasm",
+                    "0d9ef3ae926acc0411bfecba9b34df4ea659061917b96455570a45a70824e890",
+                    92484,
+                    "terraform/LICENSE",
+                    "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+                ),
                 _ => return Err("grammar 语言未知".into()),
             };
         if asset.dialect != asset.language
+            || asset.package_integrity.as_deref()
+                != match asset.language.as_str() {
+                    "arkts" => Some(
+                        "tree-sitter-arkts@0.2.0 sha512-j4KpZ21YdX5koXiuuslML24LoKLOzV6uZ1PMG//c/ynAoQfD7XY2LWnFxJiX0sOLqf2pOEYHdUmKFnXjm4QL4g==",
+                    ),
+                    "terraform" => Some(
+                        "@tree-sitter-grammars/tree-sitter-hcl@1.2.0 sha512-2bVnOojkkdMLevp0G4v3ksbNoOQFc/Pt9GAdWX4i3aykVyI+CkktE1hsF/XAeUQFjwgGrVZnEyeCll5oD7Ibfg==",
+                    ),
+                    _ => None,
+                }
             || asset.loader_symbol.as_deref()
                 != if asset.language == "csharp" {
                     Some("c_sharp")
@@ -465,7 +525,7 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
             || asset.abi_version
                 != if matches!(
                     asset.language.as_str(),
-                    "zig" | "c" | "csharp" | "javascript" | "lua" | "rust"
+                    "zig" | "c" | "csharp" | "javascript" | "lua" | "rust" | "nix"
                 ) {
                     15
                 } else {

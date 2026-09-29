@@ -18,6 +18,50 @@ const CPP: &[u8] = include_bytes!("../../../grammars/cpp/parser.wasm");
 const CSHARP: &[u8] = include_bytes!("../../../grammars/csharp/parser.wasm");
 const LUA: &[u8] = include_bytes!("../../../grammars/lua/parser.wasm");
 const LUAU: &[u8] = include_bytes!("../../../grammars/luau/parser.wasm");
+const ARKTS: &[u8] = include_bytes!("../../../grammars/arkts/parser.wasm");
+const NIX: &[u8] = include_bytes!("../../../grammars/nix/parser.wasm");
+const TERRAFORM: &[u8] = include_bytes!("../../../grammars/terraform/parser.wasm");
+
+#[test]
+fn third_batch_grammars_load_offline_and_parse_basic_fixtures() {
+    for (name, wasm, sha, abi, valid, invalid) in [
+        (
+            "arkts",
+            ARKTS,
+            "db0812971109457d22b3fe9dcdb1cd8e614fba2a338e220670bd254485753623",
+            14,
+            b"@Component struct C { build() { Text('hi') } }".as_slice(),
+            b"@Component struct C { build( {".as_slice(),
+        ),
+        (
+            "nix",
+            NIX,
+            "4acffa1c013df751193a21ce429777ca214c7d3a7e3665085b6df00dad8869f0",
+            15,
+            b"let x = 1; in x".as_slice(),
+            b"let x = ; in x".as_slice(),
+        ),
+        (
+            "terraform",
+            TERRAFORM,
+            "0d9ef3ae926acc0411bfecba9b34df4ea659061917b96455570a45a70824e890",
+            14,
+            b"resource \"x\" \"y\" { foo = \"bar\" }".as_slice(),
+            b"resource \"x\" {".as_slice(),
+        ),
+    ] {
+        let mut grammar = WasmGrammar::load(name, wasm, sha, abi)
+            .unwrap_or_else(|reason| panic!("{name} offline load: {reason}"));
+        assert!(
+            !grammar.parse(valid).unwrap().root_node().has_error(),
+            "{name} valid"
+        );
+        assert!(
+            grammar.parse(invalid).unwrap().root_node().has_error(),
+            "{name} invalid"
+        );
+    }
+}
 
 #[test]
 fn second_batch_grammars_load_offline_and_parse_basic_fixtures() {
