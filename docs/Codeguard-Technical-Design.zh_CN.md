@@ -2,7 +2,7 @@
 
 > **文档说明：**将架构落实为实现契约、命令职责、扩展步骤和可观察的验收标准。
 >
-> **文档版本：**1.2.1 · **最后更新：**2026-09-29 · **源码基线：**当前检出版本与[实施证据](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md)；软件版本 `0.1.1`。
+> **文档版本：**1.2.2 · **最后更新：**2026-09-29 · **源码基线：**当前检出版本与[实施证据](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md)；软件版本 `0.1.2`。
 
 [English](Codeguard-Technical-Design.md) · [架构设计](Codeguard-Architecture.zh_CN.md) · [README](../README.zh-CN.md)
 

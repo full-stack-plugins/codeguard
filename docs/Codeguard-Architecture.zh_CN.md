@@ -2,7 +2,7 @@
 
 > **文档说明：**说明系统职责、组件契约、修复流程，以及当前实现与目标行为之间的差距。
 >
-> **文档版本：**1.2.1 · **最后更新：**2026-09-29 · **源码基线：**当前 checkout 与[实施证据](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md)；软件版本 `0.1.1`。
+> **文档版本：**1.2.2 · **最后更新：**2026-09-29 · **源码基线：**当前 checkout 与[实施证据](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md)；软件版本 `0.1.2`。
 
 [English](Codeguard-Architecture.md) · [README](../README.zh-CN.md) · [技术方案](Codeguard-Technical-Design.zh_CN.md)
 
