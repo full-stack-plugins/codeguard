@@ -72,6 +72,10 @@ fn main() -> ExitCode {
             );
             #[cfg(all(feature = "wasm-precheck", unix))]
             println!(
+                "check all 会在原生节点之后按源码方言有界执行 32 份固定 WASM 的候选初检；check_feedback 0.32.0 的 syntax_candidates 保留疑似位置和未执行范围，始终不能代替原生义务或放行交付。"
+            );
+            #[cfg(all(feature = "wasm-precheck", unix))]
+            println!(
                 "Zig 原生优先局部检查：lint zig FILE [--zig-tool ABS_PATH] [--format=json]；显式 Zig 0.16.0 使用 ast-check，未提供工具时使用未验收 WASM 候选；始终不签发完整 lint 或交付通过。"
             );
             println!(

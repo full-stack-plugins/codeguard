@@ -411,7 +411,7 @@ fn real_npm_audit_enters_check_all_workbench() {
         String::from_utf8_lossy(&out.stderr)
     );
     let report: Value = serde_json::from_slice(&out.stdout).unwrap();
-    assert_eq!(report["schema_version"], "0.31.0");
+    assert_eq!(report["schema_version"], "0.32.0");
     assert_eq!(
         report["native_results"]["npm_cve"][0]["feedback"]["local_coherent"], true,
         "{report}"

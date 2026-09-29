@@ -80,6 +80,8 @@ pub mod check_budget;
 pub mod check_command;
 pub mod check_plan;
 pub mod check_request;
+#[cfg(all(unix, feature = "wasm-precheck"))]
+mod check_syntax_candidates;
 mod checkstyle_preparation;
 mod checkstyle_preparation_recheck;
 pub mod checkstyle_probe;
@@ -102,6 +104,8 @@ pub mod git_index_safety_command;
 pub mod go_lint_command;
 #[cfg(feature = "wasm-precheck")]
 pub mod grammar_probe_command;
+#[cfg(feature = "wasm-precheck")]
+pub mod grammar_route;
 pub mod grammar_status_command;
 #[cfg(unix)]
 pub mod hook_execute_command;

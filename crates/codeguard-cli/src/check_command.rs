@@ -1451,8 +1451,30 @@ pub fn run(args: &[String]) -> ExitCode {
         )
     })
     .count();
+    #[cfg(feature = "wasm-precheck")]
+    let syntax_candidates = crate::check_syntax_candidates::observe(
+        &root,
+        &discovery,
+        parsed.selection == Selection::Java,
+        deadline,
+        if request_cancelled {
+            Some("request_cancelled")
+        } else if scope_recheck.is_some() || source_recheck.is_some() {
+            Some("source_or_scope_changed")
+        } else {
+            None
+        },
+    );
+    #[cfg(not(feature = "wasm-precheck"))]
+    let syntax_candidates = json!({
+        "status":"not_run","reason":"binary_without_wasm_precheck","execution_phase":"after_native",
+        "authority":"candidate_unqualified","delivery_decision":"incomplete",
+        "source_file_count":discovery.languages.values().map(|item| item.source_files.len()).sum::<usize>(),
+        "skipped_count":0,"unrouted_count":0,"observations":[],
+        "next_action":"使用包含固定语法资产的发行包运行候选初检，并完成适用原生检查"
+    });
     let report = json!({
-        "schema_version":"0.31.0", "report_type":"check_feedback",
+        "schema_version":"0.32.0", "report_type":"check_feedback",
         "operation":"check", "selection":parsed.selection.as_str(), "command_status":if request_cancelled { "cancelled" } else { "incomplete" },
         "exit_code":if request_cancelled { 130 } else { 3 }, "delivery_decision":if parsed.selection == Selection::All { "incomplete" } else { "not_evaluated" }, "authority":"local_unverified",
         "reason":if request_cancelled { "request_cancelled" } else if parsed.selection == Selection::All { "full_project_obligations_and_trusted_policy_unavailable" } else { "java_selection_obligations_and_trusted_policy_unavailable" },
@@ -1460,6 +1482,7 @@ pub fn run(args: &[String]) -> ExitCode {
         "native_results":{"python_lint":python_lint,"python_cve":python_cve,"rust_lint":rust_lint,"rust_comments":rust_comments,"rust_build":rust_build,"rust_cve":rust_cve,"go_lint":go_lint,"java_p3c":java_p3c,"java_javadoc":java_javadoc,"java_dependencies":java_dependencies,"java_cve":java_cve,"npm_cve":npm_cve}, "execution_tasks":execution_tasks,
         "obligation_status":"unresolved", "required_obligations":null,
         "category_candidates":candidates, "unresolved_conditions":unresolved,
+        "syntax_candidates":syntax_candidates,
         "execution_budget":check_budget_record(
             parsed.timeout_ms, parsed.timeout_source, parsed.jobs_limit, parsed.jobs_source,
             usize::from(python_present) + python_cve_roots.len() + 4 * usize::from(rust_present) + usize::from(go_present) + usize::from(java_present) + usize::from(javadoc_configured) + usize::from(dependency_configured) + usize::from(cve_configured) + npm_roots.len(), started_native_task_count
@@ -1828,6 +1851,46 @@ pub fn run(args: &[String]) -> ExitCode {
         }
         for task in &execution_tasks {
             println!("执行任务 {}: {}", task["id"], task["status"]);
+        }
+        if let Some(observations) = report["syntax_candidates"]["observations"].as_array() {
+            if report["syntax_candidates"]["status"] == "not_run" {
+                println!(
+                    "候选语法初检未运行：{}；仍需适用原生检查。",
+                    report["syntax_candidates"]["reason"]
+                );
+            } else {
+                let suspected = observations
+                    .iter()
+                    .filter(|item| {
+                        item["recovery_count"]
+                            .as_u64()
+                            .is_some_and(|count| count > 0)
+                    })
+                    .count();
+                println!(
+                    "候选语法初检：{} 个片段已观察，{} 个存在待原生确认的恢复节点，{} 个范围未执行；仍未完成完整检查。",
+                    observations
+                        .iter()
+                        .filter(|item| item["status"] == "candidate_observed")
+                        .count(),
+                    suspected,
+                    report["syntax_candidates"]["skipped_count"]
+                );
+                for item in observations
+                    .iter()
+                    .filter(|item| {
+                        item["recovery_count"]
+                            .as_u64()
+                            .is_some_and(|count| count > 0)
+                    })
+                    .take(8)
+                {
+                    println!(
+                        "  {} [{}] 候选恢复 {} 处；先运行适用原生工具确认。",
+                        item["path"], item["language"], item["recovery_count"]
+                    );
+                }
+            }
         }
         if report["unresolved_conditions"]
             .as_array()

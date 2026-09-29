@@ -59,7 +59,16 @@ fn check_feedback_schema_cannot_encode_allow() {
     .unwrap();
     assert_eq!(previous["properties"]["schema_version"]["const"], "0.30.0");
     assert_eq!(schema["additionalProperties"], false);
-    assert_eq!(schema["properties"]["schema_version"]["const"], "0.31.0");
+    assert_eq!(schema["properties"]["schema_version"]["const"], "0.32.0");
+    assert_eq!(
+        schema["properties"]["syntax_candidates"]["properties"]["observations"]["items"]["properties"]
+            ["grammar_qualified"]["const"],
+        false
+    );
+    assert_eq!(
+        schema["properties"]["syntax_candidates"]["properties"]["delivery_decision"]["const"],
+        "incomplete"
+    );
     assert_eq!(
         schema["properties"]["export"]["properties"]["status"]["enum"],
         serde_json::json!(["not_requested", "saved", "failed"])
@@ -212,7 +221,7 @@ fn check_all_keeps_local_checker_candidate_separate_from_execution() {
 
     let (exit, report) = project.check(&[]);
     assert_eq!(exit, 3);
-    assert_eq!(report["schema_version"], "0.31.0");
+    assert_eq!(report["schema_version"], "0.32.0");
     assert_eq!(report["discovery"]["schema_version"], "0.4.0");
     let candidates = report["discovery"]["native_tool_candidates"]
         .as_array()
@@ -528,7 +537,7 @@ fn rust_only_project_keeps_categories_as_candidates_without_inventing_policy_obl
     let (exit, report) = project.check(&[]);
     assert_eq!(exit, 3);
     assert_eq!(report["report_type"], "check_feedback");
-    assert_eq!(report["schema_version"], "0.31.0");
+    assert_eq!(report["schema_version"], "0.32.0");
     assert_eq!(report["execution_budget"]["timeout_ms"], 1_800_000);
     assert_eq!(report["execution_budget"]["source"], "builtin_default");
     assert_eq!(
@@ -991,6 +1000,9 @@ fn check_all_cancelled_native_task_returns_130_and_keeps_discovery() {
     assert_eq!(report["command_status"], "cancelled");
     assert_eq!(report["exit_code"], 130);
     assert_eq!(report["reason"], "request_cancelled");
+    assert_eq!(report["syntax_candidates"]["status"], "not_run");
+    #[cfg(feature = "wasm-precheck")]
+    assert_eq!(report["syntax_candidates"]["reason"], "request_cancelled");
     assert!(
         report["execution_budget"]["started_native_task_count"]
             .as_u64()
