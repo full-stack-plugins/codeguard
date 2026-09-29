@@ -2054,3 +2054,7 @@ TDD 先复现报告漏洞：把源码 finding 的主定位、原生身份及白�
 ## 2026-09-29 npm 0.1.1 单平台候选与注册表验收
 
 `f8311d63f29b76f7740e37d6689884f9ac490ca4` 的源码、全工作区测试/Clippy 和 GitHub [CI 36506889265](https://github.com/full-stack-plugins/codeguard/actions/runs/36506889265) 通过。干净 checkout 上携该 SHA 构建的 macOS arm64 候选，公开打包前要求二进制自报身份匹配。npm 发布返回成功后，元数据先出现而 tarball 暂时 404；待 tarball 可下载后，全新缓存 `npx --yes @partme.ai/codeguard@0.1.1 --version --format=json` 退出 0，返回 `cli_version=0.1.1`、`target=macos_arm64` 和同一候选源码 SHA。注册表 `npm pack` 的 tarball SHA-256 `65bcca8d5647d3618d8795970fe689ffabd76ecc835cf5dd3e2b63084fa8be83` 与本地候选相同，包内二进制 SHA-256 `0399ed58ca602c37fc7b1a7bf98803166a5a9271481d842da615acf3e7767671` 与本地构建产物相同；`latest` 指向 0.1.1。完整命令、完整性字段和限制见 [npm 0.1.1 验收](../../../tests/acceptance/npm-0.1.1-candidate.md)。构建身份可以由编译环境自报，且未证明可复现构建、可信签名、多平台发行、插件 runtime lock 或已安装宿主；仅 13.4.2 子任务完成，11.1/11.2/13.4 与整体 S13 保持未完成。
+
+## 2026-09-29 插件候选运行时锁与事件桥
+
+[codeguard-plugin PR #85](https://github.com/full-stack-plugins/codeguard-plugin/pull/85) 把 0.1.1 的 macOS arm64 包、二进制、候选源码提交和检查协议主版本固定为插件锁。显式本地 tarball 与真实注册表安装、内容寻址目录及活动收据的候选路径已运行；调用前会重新核对二进制，缺失或篡改返回未完成，不从 PATH 选同名程序，也不退回 Python。Node 目标测试在真实 tarball 下 4/4，通过 Rust SessionStart 和摘要篡改反例；插件 Python 3.13.5 单元全集 653 项、独立协议 144 项、vendor 离线/在线、portable 插件校验及插件 OpenSpec strict 均通过。插件仓当前使用保护分支 PR，默认 hooks 尚未切换，PR 合并/市场发布与已安装宿主验收仍待完成。目录发布竞争、崩溃恢复、可信签名发行、跨平台锁和严格 Git/CI 门禁仍缺；11.2、11.4、11.17 与 S13 继续未完成。插件仓详细范围见 PR 内 `tests/rust-runtime-candidate.md`。
