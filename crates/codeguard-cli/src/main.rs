@@ -64,6 +64,9 @@ fn main() -> ExitCode {
                 "规则目录：rules list <language|all> [path] [--format human|json]；只读配置声明、候选规则来源及目录缺口，不执行检查或批准白名单。"
             );
             println!(
+                "语法资产覆盖：grammar status [--format human|json]；只读列出固定 CodeGraph 来源的 32 种独立 grammar、CodeGuard 候选与未接入项；不加载 WASM、不运行 lint。"
+            );
+            println!(
                 "检查预算：check all 支持 --jobs 1–64 和 CODEGUARD_JOBS；--timeout 优先于 CODEGUARD_TIMEOUT，默认 30m。项目默认值见 .codeguard/runtime.json 1.1；当前仅原生执行受截止时间约束。"
             );
             println!(
@@ -76,6 +79,9 @@ fn main() -> ExitCode {
         [command, rest @ ..] if command == "init" => codeguard_cli::init_command::run(rest),
         [command, rest @ ..] if command == "config" => codeguard_cli::config_command::run(rest),
         [command, rest @ ..] if command == "tools" => codeguard_cli::tools_command::run(rest),
+        [command, operation, rest @ ..] if command == "grammar" && operation == "status" => {
+            codeguard_cli::grammar_status_command::run(rest)
+        }
         #[cfg(unix)]
         [command, rest @ ..] if command == "doctor" => codeguard_cli::doctor_command::run(rest),
         [command, rest @ ..] if command == "plan" => codeguard_cli::plan_command::run(rest),

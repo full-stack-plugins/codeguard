@@ -96,6 +96,8 @@ cargo build --locked -p codeguard-cli
 
 工作区要求 `std`。可选 `wasm-precheck` 构建特性已用固定的 Java/TypeScript grammar 候选资产与有界 Rust worker，为缺少显式原生上下文的 `lint java`、`lint typescript` 单文件请求提供疑似语法观察；公开 npm `0.1.2` 不含该路径。不声称 `no_std`、已完成项目级 WASM 兜底、零 unsafe 或性能最快。运行层系统调用需要安全审查，当前不宣称已完成整体安全审计。
 
+当前源码构建的 CLI 可用 `codeguard grammar status --format=json` 只读展示来源覆盖缺口，不加载 grammar 或运行 lint：固定 CodeGraph 来源含 30 份随仓 WASM，另有两种独立 grammar 从其依赖取得；CodeGuard 当前只有两份未验收候选，已发行语法能力为零。[覆盖库存](grammars/codegraph-coverage.json)不是已批准资产清单。COBOL 来源资产约 16.4 MB，还超过当前 Rust 加载器的 8 MiB 限额。
+
 ### npm 安装与一次性调用
 
 已在 Apple Silicon macOS 上通过全新 npm 缓存验证公开 `0.1.2` 包：
