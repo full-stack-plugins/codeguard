@@ -160,7 +160,7 @@ Supply the original checker's required tool/configuration options to `task verif
 | `plan CATEGORY LANGUAGE` | Preview selections and gaps | Not a certified execution plan |
 | `hook plan` | Route a versioned host event to a candidate check tier | Reads bounded JSON on stdin; exit 3, no check or host blocking |
 | `hook execute` | Run read-only discovery, bounded Stop guidance, task-bound recheck, selected Python Ruff feedback, or a live pre-commit index safety preview | Explicit timeout; repair reuses `task verify` and never closes a task or approves delivery |
-| `hook claude <session-start\|post-tool-use\|post-tool-use-failure\|stop>` | Map Claude Code lifecycle events to read-only discovery, bounded edit feedback, no-check failure feedback, or local next-step guidance | Candidate soft Hooks; Stop offers one task continuation at most; no plugin runtime binding or delivery gate yet |
+| `hook claude <session-start\|user-prompt-submit\|post-tool-use\|post-tool-use-failure\|stop>` | Map Claude Code lifecycle events to read-only discovery, constant prompt guidance, bounded edit feedback, no-check failure feedback, or local next-step guidance | Candidate soft Hooks; Stop offers one task continuation at most; no plugin runtime binding or delivery gate yet |
 | `lint python / java / typescript / go` | Run selected native checks | Adapter-specific options and scope |
 | `comments rust`, `build rust` | Documentation and type checking | Build does not run project tests |
 | `cve rust / python / typescript` | Native advisory observations | Database identity/freshness and full coverage remain limited |

@@ -135,6 +135,10 @@ Stop 事件 MAY 从已存在的本地任务事实生成有界、只读的下一�
 - **WHEN** 用户提示文字包含提交意图，但尚无实际 Git 提交操作
 - **THEN** 只提供非阻断性建议；严格提交门禁须在真实交付入口以本轮 index 范围触发
 
+#### Scenario: Claude Code UserPromptSubmit carries arbitrary prompt text
+- **WHEN** `UserPromptSubmit` 的提示词包含 `commit`、普通问题或注入式文字，且宿主事件与工作目录有效
+- **THEN** Rust 宿主入口只返回固定、有界的检查时机建议；不回显或解析提示词、不启动原生检查器、不依据提示词缩小范围，报告源码检查未运行及交付未评估
+
 #### Scenario: Repair, commit and push request different checks
 - **WHEN** 智能体完成修复、准备提交或准备推送
 - **THEN** 分别运行任务绑定的原检查器复检、实际 index 的提交门禁或实际 ref 的推送门禁；不能用保存后的单文件 lint 代替后两者

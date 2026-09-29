@@ -19,7 +19,9 @@ pub fn run(args: &[String]) -> ExitCode {
         return ExitCode::from(2);
     };
     let Some((host_event, route_event)) = mapped_event(event) else {
-        eprintln!("支持 session-start、post-tool-use、post-tool-use-failure、stop");
+        eprintln!(
+            "支持 session-start、user-prompt-submit、post-tool-use、post-tool-use-failure、stop"
+        );
         return ExitCode::from(2);
     };
     if rest.first().is_none_or(|value| value.starts_with('-')) {
@@ -80,6 +82,13 @@ pub fn run(args: &[String]) -> ExitCode {
         );
         return ExitCode::SUCCESS;
     }
+    if route_event == HookEvent::PromptSubmitted && !host["prompt"].is_string() {
+        print_context(
+            host_event,
+            "CodeGuard：用户提示事件无效；源码检查未运行，交付未评估。",
+        );
+        return ExitCode::SUCCESS;
+    }
     if route_event == HookEvent::FileChanged
         && host_event == "PostToolUseFailure"
         && (!matches!(
@@ -119,7 +128,9 @@ pub fn run(args: &[String]) -> ExitCode {
         event: route_event,
         changed_paths: path.iter().cloned().collect(),
         task_id: None,
-        write_outcome: if host_event == "PostToolUseFailure" {
+        write_outcome: if route_event != HookEvent::FileChanged {
+            HookWriteOutcome::Unknown
+        } else if host_event == "PostToolUseFailure" {
             HookWriteOutcome::Failed
         } else {
             HookWriteOutcome::Confirmed
@@ -130,6 +141,7 @@ pub fn run(args: &[String]) -> ExitCode {
         Ok((report, _)) => {
             let context = match route_event {
                 HookEvent::SessionStart => summarize_discovery(&report),
+                HookEvent::PromptSubmitted => summarize_intent_guidance(&report),
                 HookEvent::Stop => summarize_stop(&report, host["stop_hook_active"] == true),
                 HookEvent::FileChanged if host_event == "PostToolUseFailure" => {
                     "CodeGuard：写入失败，本次源码检查未运行；请先处理工具错误，交付未评估。"
@@ -160,6 +172,7 @@ pub fn run(args: &[String]) -> ExitCode {
 fn mapped_event(event: &str) -> Option<(&'static str, HookEvent)> {
     match event {
         "session-start" => Some(("SessionStart", HookEvent::SessionStart)),
+        "user-prompt-submit" => Some(("UserPromptSubmit", HookEvent::PromptSubmitted)),
         "post-tool-use" => Some(("PostToolUse", HookEvent::FileChanged)),
         "post-tool-use-failure" => Some(("PostToolUseFailure", HookEvent::FileChanged)),
         "stop" => Some(("Stop", HookEvent::Stop)),
@@ -233,6 +246,15 @@ fn summarize_discovery(report: &Value) -> String {
     format!(
         "CodeGuard：会话启动只读发现{status}；语言 {languages}，检查器配置观察 {count} 项。源码检查未运行，交付未评估。"
     )
+}
+
+fn summarize_intent_guidance(report: &Value) -> String {
+    if report["execution"] != "read_only_intent_guidance"
+        || report["local_feedback"]["report_type"] != "hook_intent_guidance"
+    {
+        return "CodeGuard：用户提示指引未运行；源码检查未运行，交付未评估。".into();
+    }
+    "CodeGuard：本事件只提供检查时机提示；代码变更后执行局部检查，真实提交或 CI 时执行完整门禁。源码检查未运行，交付未评估。".into()
 }
 
 fn safe_task_id(report: &Value) -> Option<&str> {
@@ -331,6 +353,7 @@ fn print_context(event: &str, context: &str) {
     } else {
         let label = match event {
             "SessionStart" => "CodeGuard 项目发现反馈",
+            "UserPromptSubmit" => "CodeGuard 检查时机提示",
             "PostToolUseFailure" => "CodeGuard 写入失败反馈",
             _ => "CodeGuard 局部检查反馈",
         };
