@@ -8,7 +8,7 @@ Codeguard helps developers and coding agents discover existing quality configura
 
 > **Status:** early development, source `0.1.1`. Several native checks and local repair workflows work within explicitly bounded scopes. Full delivery gates, complete language coverage, automatic task closure, and host-plugin integration remain incomplete.
 >
-> **Baseline:** The current source and [implementation evidence](openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md) define callable behavior. Declared Rust minimum `1.85`, edition `2024`, Cargo resolver `2`. `@partme.ai/codeguard@0.1.0` is published for Apple Silicon macOS; no multi-platform binary release or crates.io availability is claimed.
+> **Baseline:** The current source and [implementation evidence](openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md) define callable behavior. Declared Rust minimum `1.85`, edition `2024`, Cargo resolver `2`. `@partme.ai/codeguard@0.1.1` is published for Apple Silicon macOS; no multi-platform binary release or crates.io availability is claimed.
 
 ```text
 Project files + existing checker configuration
@@ -94,14 +94,14 @@ cargo build --locked -p codeguard-cli
 
 Version output includes `cli_version`, `target`, and protocol information. Discovery and init preview return observations and unknowns. Dry-run creates neither `AGENTS.md` nor a project data directory. Add Cargo `--offline` only when dependencies are cached.
 
-The workspace requires `std`. The opt-in `wasm-precheck` build feature uses a bounded Rust worker with pinned Java/TypeScript grammar candidates. It currently reaches only single-file `lint java` and `lint typescript` requests without explicit native context; it is absent from the published npm `0.1.0` package. No `no_std`, completed project-wide WASM fallback, zero-unsafe, or fastest-runtime claim is made. Runtime OS calls require safety review; a comprehensive security audit is not claimed.
+The workspace requires `std`. The opt-in `wasm-precheck` build feature uses a bounded Rust worker with pinned Java/TypeScript grammar candidates. It currently reaches only single-file `lint java` and `lint typescript` requests without explicit native context; it is absent from the published npm `0.1.1` package. No `no_std`, completed project-wide WASM fallback, zero-unsafe, or fastest-runtime claim is made. Runtime OS calls require safety review; a comprehensive security audit is not claimed.
 
 ### npm installation and one-off use
 
-On Apple Silicon macOS, the published `0.1.0` package was verified with a fresh npm cache:
+On Apple Silicon macOS, the published `0.1.1` package was verified with a fresh npm cache:
 
 ```bash
-npx --yes @partme.ai/codeguard --version --format json
+npx --yes @partme.ai/codeguard@0.1.1 --version --format json
 ```
 
 For a project check, replace the arguments after the package name with the desired Codeguard command. The package is currently restricted to macOS arm64.
@@ -121,7 +121,7 @@ For a one-off Node invocation without a global installation:
 npm exec --yes --package "$CODEGUARD_TARBALL" -- codeguard detect . --format json
 ```
 
-The packer currently supports macOS and Linux on x64/arm64 when a matching native binary is available. It requires Node 18+, npm, and an already built Rust binary for the current host. It checks the binary's reported target and version before packaging, and writes a platform-tagged tarball under ignored `release/npm/`. The default package is private and local-only. `node scripts/pack-npm-local.mjs --public` prepares the public `@partme.ai/codeguard` package with a README, full license, and host restrictions. Version `0.1.0` is published and its registry-hosted `npx` entry passed a fresh-cache version check on Apple Silicon macOS. Other platforms need their own verified binary packages. See the [distribution design](docs/Codeguard-Technical-Design.md) and [acceptance record](tests/acceptance/npm-public-candidate.md).
+The packer currently supports macOS and Linux on x64/arm64 when a matching native binary is available. It requires Node 18+, npm, and an already built Rust binary for the current host. It checks the binary's reported target and version before packaging, and writes a platform-tagged tarball under ignored `release/npm/`. The default package is private and local-only. `node scripts/pack-npm-local.mjs --public` prepares the public `@partme.ai/codeguard` package with a README, full license, and host restrictions. Version `0.1.1` is published; its registry-hosted `npx` entry and artifact hashes were verified on Apple Silicon macOS. The binary reports the candidate source commit, which is not a signed or reproducible-build attestation. Other platforms need their own verified binary packages. See the [distribution design](docs/Codeguard-Technical-Design.md) and [0.1.1 acceptance record](tests/acceptance/npm-0.1.1-candidate.md).
 
 ## 5. Repair workflow
 
@@ -177,7 +177,7 @@ Generic `dependencies`, generic `security`, arbitrary category/language combinat
 
 ### Native-first entry points and syntax fallback — design target
 
-**The published `0.1.0` does not yet implement bundled WASM fallback or automatic conversation delivery.** The existing commands remain the unified entry points; native adapter-specific prerequisites still apply today:
+**The published `0.1.1` does not yet implement bundled WASM fallback or automatic conversation delivery.** The existing commands remain the unified entry points; native adapter-specific prerequisites still apply today:
 
 An opt-in source build with `--features codeguard-cli/wasm-precheck` now has narrow TypeScript and Java single-file candidate paths: without explicit native context, they return versioned [TypeScript](schemas/eslint-local-feedback-v0.3.schema.json) or [Java](schemas/java-syntax-precheck-feedback-v0.1.schema.json) feedback with suspected parser recovery positions and native `not_run`. Both remain incomplete because the bundled grammar has no accepted language/dialect range. Default and published binaries keep their previous native-context behavior. [TypeScript acceptance](tests/acceptance/typescript-syntax-fallback-candidate.md) · [Java acceptance](tests/acceptance/java-syntax-fallback-candidate.md).
 

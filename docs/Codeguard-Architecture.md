@@ -2,7 +2,7 @@
 
 > **Purpose:** explain system ownership, component contracts, repair flow, and the gap between current implementation and target behavior.
 >
-> **Document version:** 1.2.0 · **Updated:** 2026-09-29 · **Source baseline:** `cd8fb72` plus the current uncommitted working tree (reviewed 2026-09-28; software version `0.1.0`).
+> **Document version:** 1.2.1 · **Updated:** 2026-09-29 · **Source baseline:** current checkout and the [implementation evidence](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md); software version `0.1.1`.
 
 [简体中文](Codeguard-Architecture.zh_CN.md) · [README](../README.md) · [Technical design](Codeguard-Technical-Design.md)
 
@@ -75,7 +75,7 @@ The CLI does not own a model provider, chat transport, IDE UI, RAG store, distri
 | Repair | Stable tasks, local attempts, selected native rechecks | Reliable verified closure, recurrence, and full event reconciliation |
 | False-positive exceptions | Candidate inspection/proposals, exact matching and signature-related building blocks | Trusted approval source, lifecycle integration, and usable activation |
 | Quality gates | Core algebra; public scans remain partial; index path safety | End-to-end checks against actual worktree/index/ref/CI content |
-| Distribution | Source build and npm 0.1.0 for Apple Silicon macOS; artifact verification/download/install primitives | Supported binary releases, platform tests and host runtime bindings |
+| Distribution | Source build and npm 0.1.1 for Apple Silicon macOS; artifact verification/download/install primitives | Supported binary releases, platform tests and host runtime bindings |
 
 Current `check all` includes Rust build scheduling and persistence; [build recheck](../tests/acceptance/rust-build-task-verification.md) is also present. Older notes saying these integrations are wholly absent must not be used as the current status. Complete build combinations and formal closure remain missing.
 
@@ -196,7 +196,7 @@ The final two nodes are target behavior. Current candidate-absent observations d
 
 ### 8.1 Native-first routing with bundled WASM precheck — target
 
-**Design addition, not implemented in the published `0.1.0` package.** Keep a single entry point; callers select a language or project, not a parser backend:
+**Design addition, not implemented in the published `0.1.1` package.** Keep a single entry point; callers select a language or project, not a parser backend:
 
 ```bash
 codeguard lint java .
@@ -451,7 +451,7 @@ There is no daemon uptime SLO, multi-region RPO/RTO, production metrics backend 
 
 ## 15. Deployment, upgrades, and integration
 
-Current deployment is a locally built binary plus independently prepared native toolchains. The `@partme.ai/codeguard@0.1.0` npm package bundles an Apple Silicon macOS binary behind a Node command entry; the Node layer only forwards arguments, cwd, environment, streams and exit status. Publication and a fresh-cache `npx` version check passed on that host. This does not establish source/tag binding, a signed multi-platform binary release, or completed quality gates. `tools install` public apply is blocked while internal package verification/download/install primitives have tests.
+Current deployment is a locally built binary plus independently prepared native toolchains. The `@partme.ai/codeguard@0.1.1` npm package bundles an Apple Silicon macOS binary behind a Node command entry; the Node layer only forwards arguments, cwd, environment, streams and exit status. Publication, a fresh-cache `npx` version check, and registry/local artifact byte comparison passed on that host. The binary reports a candidate source commit, but this does not establish signed provenance, a reproducible build, a multi-platform binary release, or completed quality gates. `tools install` public apply is blocked while internal package verification/download/install primitives have tests.
 
 ```mermaid
 flowchart LR
@@ -462,7 +462,7 @@ flowchart LR
     Rust --> Native[Selected native analyzers]
 ```
 
-The default local package is marked private and contains no npm install hook. Its `bin` entry is [npm/codeguard.cjs](../npm/codeguard.cjs); [scripts/pack-npm-local.mjs](../scripts/pack-npm-local.mjs) builds it from an existing binary. The `--public` packaging mode produced the published `@partme.ai/codeguard@0.1.0`, restricted to Apple Silicon macOS. The fresh-cache registry execution is recorded in [npm acceptance evidence](../tests/acceptance/npm-public-candidate.md). Broad registry distribution still needs approved platform coverage, a trusted artifact manifest, matching versions and hashes, and a release process. CodeGraph's Node entry and platform package layout informed this design; its optional network fallback is not part of Codeguard's current installation path.
+The default local package is marked private and contains no npm install hook. Its `bin` entry is [npm/codeguard.cjs](../npm/codeguard.cjs); [scripts/pack-npm-local.mjs](../scripts/pack-npm-local.mjs) builds it from an existing binary. The `--public` packaging mode produced the published `@partme.ai/codeguard@0.1.1`, restricted to Apple Silicon macOS. Fresh-cache registry execution and matching package/binary hashes are recorded in [npm 0.1.1 acceptance evidence](../tests/acceptance/npm-0.1.1-candidate.md). Broad registry distribution still needs approved platform coverage, a trusted artifact manifest, matching versions and hashes, and a release process. CodeGraph's Node entry and platform package layout informed this design; its optional network fallback is not part of Codeguard's current installation path.
 
 For upgrades: record binary/schema versions, preserve workbench data, preview managed changes, rerun a bounded check, and validate report consumption before adopting the new binary. Downgrade must respect supported schemas; never rewrite historical files into an older shape merely to make parsing pass.
 

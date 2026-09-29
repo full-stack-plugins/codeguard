@@ -2050,3 +2050,7 @@ TDD 先复现报告漏洞：把源码 finding 的主定位、原生身份及白�
 ## 2026-09-28 Rust 仓迁移、实现补录与 WASM 规划
 
 本记录随完整 change 移入 codeguard 仓，旧日期内容原样保留。当前补录范围、定向测试、迁移验证与限制见 [本轮验证](verification-20260928-backfill.md)。此前相邻 `codeguard-cli/` 指现 codeguard 工程。WASM 尚未实现，不能因规格校验通过而算完成。
+
+## 2026-09-29 npm 0.1.1 单平台候选与注册表验收
+
+`f8311d63f29b76f7740e37d6689884f9ac490ca4` 的源码、全工作区测试/Clippy 和 GitHub [CI 36506889265](https://github.com/full-stack-plugins/codeguard/actions/runs/36506889265) 通过。干净 checkout 上携该 SHA 构建的 macOS arm64 候选，公开打包前要求二进制自报身份匹配。npm 发布返回成功后，元数据先出现而 tarball 暂时 404；待 tarball 可下载后，全新缓存 `npx --yes @partme.ai/codeguard@0.1.1 --version --format=json` 退出 0，返回 `cli_version=0.1.1`、`target=macos_arm64` 和同一候选源码 SHA。注册表 `npm pack` 的 tarball SHA-256 `65bcca8d5647d3618d8795970fe689ffabd76ecc835cf5dd3e2b63084fa8be83` 与本地候选相同，包内二进制 SHA-256 `0399ed58ca602c37fc7b1a7bf98803166a5a9271481d842da615acf3e7767671` 与本地构建产物相同；`latest` 指向 0.1.1。完整命令、完整性字段和限制见 [npm 0.1.1 验收](../../../tests/acceptance/npm-0.1.1-candidate.md)。构建身份可以由编译环境自报，且未证明可复现构建、可信签名、多平台发行、插件 runtime lock 或已安装宿主；仅 13.4.2 子任务完成，11.1/11.2/13.4 与整体 S13 保持未完成。
