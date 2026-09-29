@@ -43,6 +43,22 @@ pub fn run(args: &[String]) -> ExitCode {
     }
     #[cfg(feature = "wasm-precheck")]
     if crate::typescript_syntax_precheck::eligible(&args) {
+        if crate::eslint_native_first_candidate::observed_candidate(&args.source) {
+            let mut report = observe_with_preparation(&args, deadline);
+            if report["reason"] == "eslint_execution_context_missing"
+                && report["workbench"]["next"]["repair_brief"]["step"].is_null()
+            {
+                report["next_action"] = json!(
+                    "项目本地 ESLint 候选和配置已发现；先核对 Node 路径、ESLint 版本与原配置并执行原生检查。候选尚未通过探测，不能认定 lint 已完成"
+                );
+            }
+            if args.json {
+                println!("{report}");
+            } else {
+                print_feedback(&report);
+            }
+            return ExitCode::from(3);
+        }
         let report = crate::typescript_syntax_precheck::observe(&args, deadline);
         if args.json {
             println!("{report}");
