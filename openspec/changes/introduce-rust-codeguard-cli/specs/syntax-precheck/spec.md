@@ -68,6 +68,18 @@
 
 CodeGuard MUST 提供只读的来源覆盖清单，区分 CodeGraph 随仓 WASM、由依赖包提供但尚未固定字节的 grammar、CodeGuard 已复制候选及已验收发行能力。覆盖清单或 `grammar status` 的存在 MUST NOT 自动改变原生检查义务、加载未经批准的字节，或把来源资产数量说成已支持语言数量。来源资产超过当前加载预算时 MUST 明示预算缺口，不能静默跳过。
 
+目标范围 MUST 包含当前固定 CodeGraph 来源的 32 份独立 grammar，并包含 Zig；`jsx` 与 `javascript` 共用同一份 grammar，不重复计数。每份 grammar 都须分别完成合法再分发来源、许可、字节与 ABI、Rust 离线加载、版本/方言正反语料、原生工具对照、统一 `lint/check` 的原生优先路由、任务/对话反馈及发行包实装验收。部分候选或来源库存不能充当全部接入。若上游 WASM 与 Rust 运行时导入不兼容，适配 MUST 固定原始和派生字节、限定变换范围并以正反解析样本复验；不能回退到已知产生误报的旧 grammar 来制造可加载状态。
+
+#### Scenario: Zig source grammar fixes a known false positive but needs a runtime adapter
+
+- **WHEN** 当前 Zig grammar 能解析合法空容器，而原始 WASM 包含 Rust 运行时不支持的导入
+- **THEN** 仅在来源、适配产物及语法反例全部可验证时列为候选；未完成版本语料、原生优先命令和发行验收前仍不宣称 Zig lint 可用
+
+#### Scenario: Every CodeGraph grammar is copied but only some are wired to lint
+
+- **WHEN** 32 份资产在来源清单或包内存在，但任一语种缺少真实解析、原生优先路由或可发行验收
+- **THEN** 总体覆盖仍未完成，逐语言报告准确缺口，不得把复制数量报告为支持数量
+
 #### Scenario: Source grammar exists but CodeGuard has not qualified it
 
 - **WHEN** 查询固定 CodeGraph 来源中的 grammar 覆盖状态

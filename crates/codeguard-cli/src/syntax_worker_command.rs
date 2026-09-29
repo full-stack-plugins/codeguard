@@ -60,11 +60,15 @@ fn observe(language: &str, source: &[u8]) -> Result<SyntaxWorkerEnvelope, String
         .iter()
         .find(|asset| asset.language == language)
         .ok_or("不支持的 grammar 语种")?;
+    if asset.codeguard_runtime_validation != "rust_loader_smoke_passed" {
+        return Err("grammar 与当前 Rust WASM 运行时不兼容".into());
+    }
     let wasm = match language {
         "java" => include_bytes!("../../../grammars/java/parser.wasm").as_slice(),
         "python" => include_bytes!("../../../grammars/python/parser.wasm").as_slice(),
         "typescript" => include_bytes!("../../../grammars/typescript/parser.wasm").as_slice(),
         "tsx" => include_bytes!("../../../grammars/tsx/parser.wasm").as_slice(),
+        "zig" => include_bytes!("../../../grammars/zig/parser.wasm").as_slice(),
         _ => return Err("不支持的 grammar 语种".into()),
     };
     let mut grammar = WasmGrammar::load(language, wasm, &asset.sha256, asset.abi_version as usize)?;

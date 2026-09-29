@@ -6,7 +6,7 @@ use serde_json::{Value, json};
 use std::collections::BTreeSet;
 use std::process::ExitCode;
 
-const SOURCE_COMMIT: &str = "40f112453583a2304c4b605a3a9d6545919662bd";
+const SOURCE_COMMIT: &str = "1072f82ce24db3d133258d30165cef6b74d108b2";
 const LANGUAGES: [&str; 32] = [
     "arkts",
     "c",
@@ -136,6 +136,7 @@ fn coverage_report() -> Result<Value, String> {
                 "released":false,
                 "gap":if asset.provider == "tree_sitter_wasms_dependency" {"dependency_bytes_not_pinned"}
                     else if asset.bytes.is_some_and(|bytes| bytes > 8 * 1024 * 1024) {"current_loader_size_limit"}
+                    else if candidate.is_some_and(|item| item.codeguard_runtime_validation == "rust_loader_incompatible") {"rust_loader_incompatible"}
                     else if candidate.is_some() {"language_qualification_and_release_pending"}
                     else {"asset_provenance_license_and_loader_validation_pending"},
             })

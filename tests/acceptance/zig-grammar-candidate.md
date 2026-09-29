@@ -1,0 +1,9 @@
+# Zig WASM 固定资产候选与 Rust 导入适配（2026-09-29）
+
+对应 OpenSpec 14.1、14.2、14.4、14.19，均未完成整体验收。CodeGraph `1072f82ce24db3d133258d30165cef6b74d108b2` 的 Zig 语法 WASM 是 ABI 15，SHA-256 `95d8eef504bde9cca06b7950d6a8ae177ce318d16080deac96f653b29c629f98`，705336 字节。上游 `@tree-sitter-grammars/tree-sitter-zig` 1.1.2 的源码提交、空容器补丁、构建器与 MIT 许可证来源记录在 CodeGraph `docs/grammars/tree-sitter-zig.md`；CodeGuard 保存原始 `grammars/zig/source.wasm` 和许可证。当前固定 CodeGraph 提交的另外 29 份随仓 WASM 也已逐字节核对库存，但未因此成为 CodeGuard 候选。
+
+RED：直接用 Rust `WasmStore` 加载新 Zig 原始 WASM，因缺少 `__main_argc_argv` 导入失败。旧 Zig WASM 虽能加载，却把合法 `const S = struct {};` 解析成错误；所以回退旧版会带回已知误报。新版导入表中 `__main_argc_argv` 与 `args_get` 同为 `(i32, i32) -> i32`；固定源字节适配只将 import section 的这一个导入名改成 `args_get`，不改语法表或树。Rust `adapt_zig_wasm` 同时验证原始 SHA-256、唯一导入位置及输出 SHA-256。适配后 `grammars/zig/parser.wasm` 为 705328 字节，SHA-256 `e8a3aa89cc07b59188122e6c1e0a812ca58cf85c9e191dcf2663a30b6b3b99e3`。更改来源任何字节、缺少导入或更改输出字节都不能获得固定资产身份。
+
+GREEN：离线 Rust 加载实测 ABI 15；`struct`、`enum`、`union(enum)`、`opaque` 四种合法空容器没有解析恢复，未闭合容器产生解析错误。本机 Zig 0.16.0 的 `zig fmt --check` 对同一四种空容器样例返回 0，形成一项窄范围原生对照。隔离 worker 对合法 Zig 文件返回候选观察，但 `grammar_qualified=false`，聚合结果保持 `incomplete`；`grammar status` 显示 Zig 为第五份 `candidate_unvalidated`，`released_count=0`。初检没有公共 Zig `lint/check` 路由、工作台任务与宿主对话接线，因此**不宣称 Zig 语法检查能力已发布**。完整 Zig 版本/方言覆盖、合法与非法语料、原生对照、性能与发行包均待验收。
+
+验证：`grammar_asset_manifest` 4/4，`wasm_grammar_load` 2/2，`grammar_status_cli` 2/2，`syntax_worker_candidate` 7/7；均以 `--locked` 离线构建，worker 测试启用 `wasm-precheck`。默认构建的 `cargo test --workspace --locked --quiet --no-fail-fast` 退出 0；启用 `codeguard-cli/wasm-precheck` 的全工作区、全部 targets 回归最终退出 0，共 180 组、1129 通过、106 条条件忽略、零失败。首轮特性回归暴露旧测试假定“工作区只有一张 Ruff 任务”；测试现按 `reason_code` 选取原生环境任务，同时核对候选初检的原生确认任务仍在。特性 Clippy `-D warnings`、格式、分层检查、OpenSpec strict 与 diff 检查退出 0。条件忽略的真实原生工具测试、Rust 1.85 MSRV 和发行包实装并未由这些结果证明。

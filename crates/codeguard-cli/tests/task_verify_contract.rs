@@ -91,6 +91,7 @@ impl Project {
                     .trim_end_matches(".md")
                     .to_owned()
             })
+            .filter(|id| self.fact(id)["reason_code"] != "python_syntax_confirmation_needed")
             .collect::<Vec<_>>();
         assert_eq!(tasks.len(), 1);
         tasks[0].clone()

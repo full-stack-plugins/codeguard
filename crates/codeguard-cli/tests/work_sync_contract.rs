@@ -203,17 +203,30 @@ fn blocker_fact_without_observation_or_event_is_replayed_before_cursor() {
     let scan: Value = serde_json::from_slice(&output.stdout).unwrap();
     assert_eq!(scan["backlog_sync"]["new_blockers"], 1);
     let run_id = scan["run_id"].as_str().unwrap();
-    let task_entry = fs::read_dir(project.0.join(".codeguard/tasks"))
+    let blocker_id = fs::read_dir(project.0.join(".codeguard/tasks"))
         .unwrap()
-        .next()
-        .unwrap()
+        .map(|entry| {
+            entry
+                .unwrap()
+                .file_name()
+                .to_str()
+                .unwrap()
+                .trim_end_matches(".md")
+                .to_owned()
+        })
+        .find(|id| {
+            let fact: Value = serde_json::from_slice(
+                &fs::read(
+                    project
+                        .0
+                        .join(format!(".codeguard/findings/{id}/finding.json")),
+                )
+                .unwrap(),
+            )
+            .unwrap();
+            fact["reason_code"] == "ruff_tool_not_found"
+        })
         .unwrap();
-    let blocker_id = task_entry
-        .file_name()
-        .to_str()
-        .unwrap()
-        .trim_end_matches(".md")
-        .to_owned();
     let fact = project
         .0
         .join(format!(".codeguard/findings/{blocker_id}/finding.json"));
@@ -630,12 +643,31 @@ fn missing_config_creates_preparation_task_without_claiming_violation() {
         "project_ruff_config_not_found"
     );
     assert_eq!(report["backlog_sync"]["new_blockers"], 1);
-    let task = fs::read_dir(project.0.join(".codeguard/tasks"))
+    let tasks = fs::read_dir(project.0.join(".codeguard/tasks"))
         .unwrap()
-        .next()
-        .unwrap()
-        .unwrap()
-        .path();
+        .map(|entry| entry.unwrap().path())
+        .collect::<Vec<_>>();
+    let task = tasks
+        .iter()
+        .find(|path| {
+            let id = path.file_stem().unwrap().to_str().unwrap();
+            let fact: Value = serde_json::from_slice(
+                &fs::read(
+                    project
+                        .0
+                        .join(format!(".codeguard/findings/{id}/finding.json")),
+                )
+                .unwrap(),
+            )
+            .unwrap();
+            fact["reason_code"] == "project_ruff_config_not_found"
+        })
+        .unwrap();
+    if cfg!(feature = "wasm-precheck") {
+        assert_eq!(tasks.len(), 2);
+    } else {
+        assert_eq!(tasks.len(), 1);
+    }
     let text = fs::read_to_string(task).unwrap();
     assert!(text.contains("确认项目是否要求 Ruff"));
     assert!(text.contains("修订项目质量策略"));

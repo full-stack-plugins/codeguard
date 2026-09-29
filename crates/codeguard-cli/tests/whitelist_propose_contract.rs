@@ -58,6 +58,17 @@ impl Project {
                     .trim_end_matches(".md")
                     .to_owned()
             })
+            .filter(|id| {
+                let fact: Value = serde_json::from_slice(
+                    &fs::read(
+                        self.0
+                            .join(format!(".codeguard/findings/{id}/finding.json")),
+                    )
+                    .unwrap(),
+                )
+                .unwrap();
+                fact["reason_code"] != "python_syntax_confirmation_needed"
+            })
             .collect::<Vec<_>>();
         assert_eq!(ids.len(), 1);
         ids[0].clone()
