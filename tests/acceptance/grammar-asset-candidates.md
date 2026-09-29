@@ -16,3 +16,5 @@ Rust 加载器的 `wasm_grammar_load` 测试先因缺少 `WasmGrammar` 编译失
 OpenSpec 14.1 和 14.2 仍不勾选：语言/方言版本边界、MSRV 实编、进程隔离、错误节点/位置和可发行验收仍需后续任务补齐。加载成功不意味着语法规则准确或原生 lint 义务已完成。
 
 后续增量：[TSX 候选纠错](tsx-grammar-candidate.md)把同一来源仓库的 TSX 独立 WASM 加入固定候选清单；当前候选资产数为 3。本页的“两份”及初次验收命令属于原 Java/TypeScript 引入时的历史快照。
+
+更晚的 [Python 资产候选](python-grammar-asset-candidate.md)把当前候选数提高到 4；Python 只通过固定字节、许可证及 Rust 离线加载试验，尚无 CLI 语法初检路径。上述“3”仍是 TSX 引入当时的历史数值。

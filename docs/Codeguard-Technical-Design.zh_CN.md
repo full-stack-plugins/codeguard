@@ -14,7 +14,7 @@
 
 可调用行为以当前源码为准，目标契约明确标注。产品优先级是配置发现 → 原生结果 → 有用的修复指引。内部一致性校验为这个体验服务，不要求用户手工构造执行证明。
 
-WASM 的规范与 18 项实施任务已纳入既有 change；可选特性下的 Rust worker、固定 Java/TypeScript/TSX 资产及局部单文件候选报告已存在，项目级原生优先调度、grammar 版本范围验收与宿主接线仍未完成。设计示例不是当前命令输出。
+WASM 的规范与 18 项实施任务已纳入既有 change；可选特性下的 Rust worker 与 Java/TypeScript/TSX 局部单文件候选报告已存在，Python 固定资产通过 Rust 加载试验但尚无 CLI 兜底。项目级原生优先调度、grammar 版本范围验收与宿主接线仍未完成。设计示例不是当前命令输出。
 
 ## 2. 技术选型与权衡
 
@@ -191,7 +191,7 @@ flowchart LR
 
 只引入固定 WASM 字节及上游许可证、提交/补丁来源、SHA-256、ABI、已验证运行时和语言/方言范围、语料引用与已知缺口。逐个验证 CodeGraph 资产与选定 Rust Tree-sitter 运行时兼容，不能复制 TypeScript 提取逻辑或把 CodeGraph 支持等同语法验收。发行清单属于分发资产，不属于可写的 `.codeguard/` 项目状态。
 
-可用 `codeguard grammar status --format=json` 查询独立的来源覆盖库存。它只读报告 CodeGraph 32 种独立 grammar、CodeGuard 三份候选和零项已发行能力，不运行解析器。依赖提供的两份资产尚未固定字节，COBOL 超过现有加载器的 8 MiB 限额；每语言验收前仍须解决这些缺口。
+可用 `codeguard grammar status --format=json` 查询独立的来源覆盖库存。它只读报告 CodeGraph 32 种独立 grammar、CodeGuard 四份资产候选和零项已发行能力，不运行解析器；Python 候选未接入 lint。依赖提供的两份资产尚未固定字节，COBOL 超过现有加载器的 8 MiB 限额；每语言验收前仍须解决这些缺口。
 
 由父进程控制解析工作进程，设置总截止时间、单文件输入上限、内存/进程限制及诊断数量上限。按需加载 grammar，不提供通用网络/文件系统导入；终止卡住的进程时保留其它模块的原生结果。宿主约束执行和 Rust MSRV 兼容性须测试，生产数值预算须经测量后确定，不编造性能承诺。
 

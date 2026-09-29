@@ -3,11 +3,34 @@
 use codeguard_runtime::WasmGrammar;
 
 const JAVA: &[u8] = include_bytes!("../../../grammars/java/parser.wasm");
+const PYTHON: &[u8] = include_bytes!("../../../grammars/python/parser.wasm");
 const TYPESCRIPT: &[u8] = include_bytes!("../../../grammars/typescript/parser.wasm");
 const TSX: &[u8] = include_bytes!("../../../grammars/tsx/parser.wasm");
 
 #[test]
 fn pinned_grammars_load_offline_and_parse_valid_sources() {
+    let mut python = WasmGrammar::load(
+        "python",
+        PYTHON,
+        "a7fdc587e77bd729b9f5b783c659be23c896e305a2c374472bed7114d9e01fac",
+        14,
+    )
+    .expect("固定 Python WASM 应可由 Rust 加载");
+    assert_eq!(python.abi_version(), 14);
+    assert!(
+        !python
+            .parse(b"def greet(name):\n    return name\n")
+            .unwrap()
+            .root_node()
+            .has_error()
+    );
+    assert!(
+        python
+            .parse(b"def greet(\n")
+            .unwrap()
+            .root_node()
+            .has_error()
+    );
     let mut java = WasmGrammar::load(
         "java",
         JAVA,

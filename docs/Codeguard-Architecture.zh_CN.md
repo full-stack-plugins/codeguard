@@ -28,7 +28,7 @@
 | [核心聚合](../crates/codeguard-core/src/aggregate.rs)、[交付门禁](../crates/codeguard-core/src/delivery_gate.rs) | 纯结果语义，不代表公开可信门禁已可用 |
 | [验收记录](../tests/acceptance) | 限定范围的观察、测试方法和剩余缺口 |
 
-WASM 的规范与 18 项实施任务已纳入既有 change；可选 Rust worker、固定 Java/TypeScript/TSX grammar 候选资产和局部单文件反馈 schema 已存在。项目级原生优先调度、grammar 版本范围验收、稳定语法任务及宿主接线仍未完成；设计示例不是当前命令输出。
+WASM 的规范与 18 项实施任务已纳入既有 change；可选 Rust worker 与 Java/TypeScript/TSX 局部单文件反馈路径已存在。Python 新增为固定且通过 Rust 加载试验的资产候选，尚未接入 CLI 兜底。项目级原生优先调度、grammar 版本范围验收、任务的能力匹配关闭及宿主接线仍未完成；设计示例不是当前命令输出。
 
 ## 2. 架构驱动
 
@@ -241,7 +241,7 @@ flowchart TD
 
 复用固定版本的 CodeGraph grammar WASM，以及适用的上游许可证、源码引用、补丁和语料。不能把 CodeGraph 的图提取或源码遮盖启发式直接用于语法判定。CodeGraph 的 `src/extraction/grammars.ts` 通过 `web-tree-sitter` 加载语言资产，在那里可加载不证明兼容 Codeguard 的 Rust 运行时。发行时必须固定不可变的来源与资产清单，不能把正在修改的本地目录直接当作发行输入。
 
-只读 `codeguard grammar status` 现投影[固定来源覆盖库存](../grammars/codegraph-coverage.json)：CodeGraph 随仓 30 份 WASM，依赖提供另两种独立 grammar；CodeGuard 有 Java、TypeScript、TSX 三份候选，尚无已验收发行能力。覆盖库存与[候选资产清单](../grammars/manifest.json)分开，不能凭库存行自动加载或宣称支持。尤其 COBOL 来源资产超过当前加载器 8 MiB 限额。
+只读 `codeguard grammar status` 现投影[固定来源覆盖库存](../grammars/codegraph-coverage.json)：CodeGraph 随仓 30 份 WASM，依赖提供另两种独立 grammar；CodeGuard 有 Java、Python、TypeScript、TSX 四份资产候选，尚无已验收发行能力。Python 只通过固定字节与 Rust 加载试验，未接入 lint。覆盖库存与[候选资产清单](../grammars/manifest.json)分开，不能凭库存行自动加载或宣称支持。尤其 COBOL 来源资产超过当前加载器 8 MiB 限额。
 
 ```text
 grammars/                         # 规划中的发行资产，不是项目状态
