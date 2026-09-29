@@ -99,6 +99,41 @@ fn dependency_grammars_run_in_worker_without_claiming_clean() {
 }
 
 #[test]
+fn mainstream_grammars_run_in_worker_without_claiming_clean() {
+    for (language, path, source) in [
+        (
+            "c",
+            "src/main.c",
+            b"int main(void) { return 0; }".as_slice(),
+        ),
+        (
+            "go",
+            "main.go",
+            b"package main\nfunc main() {}\n".as_slice(),
+        ),
+        ("javascript", "src/main.js", b"const value = 1;".as_slice()),
+        (
+            "rust",
+            "src/main.rs",
+            b"fn main() { let x = 1; }".as_slice(),
+        ),
+    ] {
+        let result = run_syntax_worker_candidate(
+            env!("CARGO_BIN_EXE_codeguard").as_ref(),
+            language,
+            path,
+            source,
+            Instant::now() + Duration::from_secs(60),
+            &AtomicBool::new(false),
+        )
+        .expect("mainstream grammar worker candidate");
+        assert!(result.recoveries.is_empty(), "{language}");
+        assert_eq!(result.precheck.status, SyntaxPrecheckStatus::Incomplete);
+        assert!(!result.grammar_qualified);
+    }
+}
+
+#[test]
 fn invalid_input_and_cancellation_cannot_yield_observations() {
     let exe = env!("CARGO_BIN_EXE_codeguard").as_ref();
     assert!(

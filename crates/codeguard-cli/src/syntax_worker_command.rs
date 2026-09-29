@@ -64,6 +64,9 @@ fn observe(language: &str, source: &[u8]) -> Result<SyntaxWorkerEnvelope, String
         return Err("grammar 与当前 Rust WASM 运行时不兼容".into());
     }
     let wasm = match language {
+        "c" => include_bytes!("../../../grammars/c/parser.wasm").as_slice(),
+        "go" => include_bytes!("../../../grammars/go/parser.wasm").as_slice(),
+        "javascript" => include_bytes!("../../../grammars/javascript/parser.wasm").as_slice(),
         "java" => include_bytes!("../../../grammars/java/parser.wasm").as_slice(),
         "python" => include_bytes!("../../../grammars/python/parser.wasm").as_slice(),
         "typescript" => include_bytes!("../../../grammars/typescript/parser.wasm").as_slice(),
@@ -71,6 +74,7 @@ fn observe(language: &str, source: &[u8]) -> Result<SyntaxWorkerEnvelope, String
         "zig" => include_bytes!("../../../grammars/zig/parser.wasm").as_slice(),
         "objc" => include_bytes!("../../../grammars/objc/parser.wasm").as_slice(),
         "solidity" => include_bytes!("../../../grammars/solidity/parser.wasm").as_slice(),
+        "rust" => include_bytes!("../../../grammars/rust/parser.wasm").as_slice(),
         _ => return Err("不支持的 grammar 语种".into()),
     };
     let mut grammar = WasmGrammar::load(language, wasm, &asset.sha256, asset.abi_version as usize)?;

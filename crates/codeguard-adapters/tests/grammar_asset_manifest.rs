@@ -6,9 +6,21 @@ use codeguard_adapters::{
 #[test]
 fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support() {
     let manifest = bundled_grammar_candidates().expect("bundled manifest");
-    assert_eq!(manifest.assets.len(), 7);
+    assert_eq!(manifest.assets.len(), 11);
     for asset in &manifest.assets {
         let (wasm, license) = match asset.language.as_str() {
+            "c" => (
+                include_bytes!("../../../grammars/c/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/c/LICENSE").as_slice(),
+            ),
+            "go" => (
+                include_bytes!("../../../grammars/go/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/go/LICENSE").as_slice(),
+            ),
+            "javascript" => (
+                include_bytes!("../../../grammars/javascript/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/javascript/LICENSE").as_slice(),
+            ),
             "java" => (
                 include_bytes!("../../../grammars/java/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/java/LICENSE").as_slice(),
@@ -36,6 +48,10 @@ fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support(
             "solidity" => (
                 include_bytes!("../../../grammars/solidity/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/solidity/LICENSE").as_slice(),
+            ),
+            "rust" => (
+                include_bytes!("../../../grammars/rust/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/rust/LICENSE").as_slice(),
             ),
             other => panic!("unexpected language {other}"),
         };
@@ -98,7 +114,12 @@ fn missing_provenance_duplicate_fields_and_unknown_languages_are_rejected() {
 #[test]
 fn changed_wasm_license_or_abi_never_qualifies_a_candidate() {
     let manifest = bundled_grammar_candidates().unwrap();
-    let mut asset = manifest.assets[0].clone();
+    let mut asset = manifest
+        .assets
+        .iter()
+        .find(|asset| asset.language == "java")
+        .expect("Java candidate")
+        .clone();
     let wasm = include_bytes!("../../../grammars/java/parser.wasm");
     let license = include_bytes!("../../../grammars/java/LICENSE");
     let mut changed = wasm.to_vec();

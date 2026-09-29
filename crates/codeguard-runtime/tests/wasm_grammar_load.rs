@@ -10,6 +10,59 @@ const ZIG: &[u8] = include_bytes!("../../../grammars/zig/parser.wasm");
 const ZIG_SOURCE: &[u8] = include_bytes!("../../../grammars/zig/source.wasm");
 const OBJC: &[u8] = include_bytes!("../../../grammars/objc/parser.wasm");
 const SOLIDITY: &[u8] = include_bytes!("../../../grammars/solidity/parser.wasm");
+const C: &[u8] = include_bytes!("../../../grammars/c/parser.wasm");
+const GO: &[u8] = include_bytes!("../../../grammars/go/parser.wasm");
+const JAVASCRIPT: &[u8] = include_bytes!("../../../grammars/javascript/parser.wasm");
+const RUST: &[u8] = include_bytes!("../../../grammars/rust/parser.wasm");
+
+#[test]
+fn mainstream_grammars_load_offline_and_parse_basic_fixtures() {
+    for (language, wasm, sha, abi, valid, invalid) in [
+        (
+            "c",
+            C,
+            "a271e584616c7c3c0ac663f01cd05dd5f1a6c2ce6d4cd23096548985a95d0ccb",
+            15,
+            b"int main(void) { return 0; }".as_slice(),
+            b"int main(void) {".as_slice(),
+        ),
+        (
+            "go",
+            GO,
+            "4eda5d91c99ca981e88bc7d3d33f0db166b4bab0a84d0021a9abf39b364c78ef",
+            14,
+            b"package main\nfunc main() {}\n".as_slice(),
+            b"package main\nfunc main( {\n".as_slice(),
+        ),
+        (
+            "javascript",
+            JAVASCRIPT,
+            "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+            15,
+            b"const value = 1;".as_slice(),
+            b"const = ;".as_slice(),
+        ),
+        (
+            "rust",
+            RUST,
+            "206031e0f67fb41ecae505868ca3bb917df7375031aebafd2f97314a849713fe",
+            15,
+            b"fn main() { let x = 1; }".as_slice(),
+            b"fn main( {".as_slice(),
+        ),
+    ] {
+        let mut grammar = WasmGrammar::load(language, wasm, sha, abi)
+            .unwrap_or_else(|reason| panic!("{language} offline load: {reason}"));
+        assert!(
+            !grammar.parse(valid).unwrap().root_node().has_error(),
+            "{language} valid"
+        );
+        assert!(
+            grammar.parse(invalid).unwrap().root_node().has_error(),
+            "{language} invalid"
+        );
+    }
+}
 
 #[test]
 fn dependency_grammars_load_offline_and_parse_basic_fixtures() {
