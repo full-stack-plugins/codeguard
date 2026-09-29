@@ -12,7 +12,7 @@ fn codegraph_coverage_is_explicit_and_never_claims_parser_or_gate_completion() {
     assert_eq!(report["report_type"], "grammar_coverage_inventory");
     assert_eq!(report["codegraph_grammar_count"], 32);
     assert_eq!(report["codegraph_vendored_count"], 30);
-    assert_eq!(report["candidate_count"], 5);
+    assert_eq!(report["candidate_count"], 7);
     assert_eq!(report["released_count"], 0);
     assert_eq!(report["authority"], "source_inventory_only");
     assert_eq!(report["parser_capability"], "unverified");
@@ -25,7 +25,15 @@ fn codegraph_coverage_is_explicit_and_never_claims_parser_or_gate_completion() {
         assert_eq!(asset["released"], false);
         assert!(!asset["gap"].as_str().unwrap().is_empty());
     }
-    for language in ["java", "python", "typescript", "tsx", "zig"] {
+    for language in [
+        "java",
+        "objc",
+        "python",
+        "solidity",
+        "typescript",
+        "tsx",
+        "zig",
+    ] {
         let asset = assets
             .iter()
             .find(|row| row["language"] == language)
@@ -46,8 +54,8 @@ fn codegraph_coverage_is_explicit_and_never_claims_parser_or_gate_completion() {
             .iter()
             .find(|row| row["language"] == language)
             .unwrap();
-        assert_eq!(asset["gap"], "dependency_bytes_not_pinned");
-        assert!(asset["source_sha256"].is_null());
+        assert_eq!(asset["gap"], "language_qualification_and_release_pending");
+        assert_eq!(asset["source_sha256"].as_str().unwrap().len(), 64);
     }
 }
 

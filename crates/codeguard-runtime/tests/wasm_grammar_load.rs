@@ -8,6 +8,54 @@ const TYPESCRIPT: &[u8] = include_bytes!("../../../grammars/typescript/parser.wa
 const TSX: &[u8] = include_bytes!("../../../grammars/tsx/parser.wasm");
 const ZIG: &[u8] = include_bytes!("../../../grammars/zig/parser.wasm");
 const ZIG_SOURCE: &[u8] = include_bytes!("../../../grammars/zig/source.wasm");
+const OBJC: &[u8] = include_bytes!("../../../grammars/objc/parser.wasm");
+const SOLIDITY: &[u8] = include_bytes!("../../../grammars/solidity/parser.wasm");
+
+#[test]
+fn dependency_grammars_load_offline_and_parse_basic_fixtures() {
+    let mut objc = WasmGrammar::load(
+        "objc",
+        OBJC,
+        "2606d4c5809fab61de44d328072d1371d53aa4aff5734436cb2a0ce8db7f2b0c",
+        14,
+    )
+    .expect("Objective-C dependency grammar loads in Rust");
+    assert!(
+        !objc
+            .parse(b"@interface Foo : NSObject\n@end\n")
+            .unwrap()
+            .root_node()
+            .has_error()
+    );
+    assert!(
+        objc.parse(b"@interface Foo : NSObject\n")
+            .unwrap()
+            .root_node()
+            .has_error()
+    );
+
+    let mut solidity = WasmGrammar::load(
+        "solidity",
+        SOLIDITY,
+        "ba02ba3c98c8ce976ed962d727ef48940b3a18dd2243830a8158b558de64b4f2",
+        14,
+    )
+    .expect("Solidity dependency grammar loads in Rust");
+    assert!(
+        !solidity
+            .parse(b"pragma solidity ^0.8.20;\ncontract Vault {}\n")
+            .unwrap()
+            .root_node()
+            .has_error()
+    );
+    assert!(
+        solidity
+            .parse(b"contract Vault {\n")
+            .unwrap()
+            .root_node()
+            .has_error()
+    );
+}
 
 #[test]
 fn pinned_grammars_load_offline_and_parse_valid_sources() {

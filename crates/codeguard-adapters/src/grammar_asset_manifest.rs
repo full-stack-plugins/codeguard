@@ -28,6 +28,12 @@ pub struct GrammarAssetManifest {
     pub codegraph_license_sha256: String,
     /// 上游记录的构建工具版本与调用；只作来源声明。
     pub build_tool: String,
+    /// CodeGraph 锁定的依赖包完整性；适用于 Objective-C 与 Solidity。
+    pub dependency_package_integrity: Option<String>,
+    /// 依赖包随附许可证路径。
+    pub dependency_package_license: Option<String>,
+    /// 依赖包许可证摘要。
+    pub dependency_package_license_sha256: Option<String>,
     /// 精确且无重复的候选语言资产。
     pub assets: Vec<GrammarAsset>,
 }
@@ -52,6 +58,10 @@ pub struct GrammarAsset {
     pub sha256: String,
     /// WASM 原始字节长度。
     pub bytes: usize,
+    /// 可重现适配前的依赖包原始路径。
+    pub source_wasm: Option<String>,
+    /// 可重现适配前的原始摘要。
+    pub source_sha256: Option<String>,
     /// 相对于 grammars/ 的许可证路径。
     pub license: String,
     /// 许可证原始字节摘要。
@@ -70,12 +80,21 @@ pub struct GrammarAsset {
     pub release_status: String,
 }
 
-/// 读取仓内固定清单，并检查 CodeGraph 许可证及五份资产的原始字节。
+/// 读取仓内固定清单，并检查来源、许可证及候选资产字节。
 pub fn bundled_grammar_candidates() -> Result<GrammarAssetManifest, String> {
     let manifest = parse_grammar_asset_manifest(include_bytes!("../../../grammars/manifest.json"))?;
     let codegraph_license = include_bytes!("../../../grammars/LICENSE.codegraph");
     if digest(codegraph_license) != CODEGRAPH_LICENSE_SHA256 {
         return Err("CodeGraph 许可证字节与固定来源不符".into());
+    }
+    if digest(include_bytes!(
+        "../../../grammars/LICENSE.tree-sitter-wasms"
+    )) != manifest
+        .dependency_package_license_sha256
+        .as_deref()
+        .unwrap_or("")
+    {
+        return Err("依赖包许可证字节与固定来源不符".into());
     }
     for asset in &manifest.assets {
         let (wasm, license) = match asset.language.as_str() {
@@ -99,6 +118,14 @@ pub fn bundled_grammar_candidates() -> Result<GrammarAssetManifest, String> {
                 include_bytes!("../../../grammars/zig/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/zig/LICENSE").as_slice(),
             ),
+            "objc" => (
+                include_bytes!("../../../grammars/objc/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/objc/LICENSE").as_slice(),
+            ),
+            "solidity" => (
+                include_bytes!("../../../grammars/solidity/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/solidity/LICENSE").as_slice(),
+            ),
             _ => return Err("候选语言未知".into()),
         };
         verify_grammar_asset(asset, wasm, license)?;
@@ -106,6 +133,18 @@ pub fn bundled_grammar_candidates() -> Result<GrammarAssetManifest, String> {
             && crate::adapt_zig_wasm(include_bytes!("../../../grammars/zig/source.wasm"))? != wasm
         {
             return Err("Zig grammar 来源适配关系不符".into());
+        }
+        if matches!(asset.language.as_str(), "objc" | "solidity") {
+            let source = if asset.language == "objc" {
+                include_bytes!("../../../grammars/objc/source.wasm").as_slice()
+            } else {
+                include_bytes!("../../../grammars/solidity/source.wasm").as_slice()
+            };
+            if asset.source_sha256.as_deref() != Some(digest(source).as_str())
+                || crate::adapt_legacy_dylink(&asset.language, source)? != wasm
+            {
+                return Err("依赖 grammar 来源适配关系不符".into());
+            }
         }
     }
     Ok(manifest)
@@ -126,7 +165,14 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
         || manifest.codegraph_license_sha256 != CODEGRAPH_LICENSE_SHA256
         || manifest.build_tool
             != "tree-sitter-cli 0.25.10 build --wasm; Zig: tree-sitter-cli 0.27.0 generate --abi 15 + Zig 0.16.0 wasm32-wasi"
-        || manifest.assets.len() != 5
+        || manifest.dependency_package_integrity.as_deref()
+            != Some(
+                "tree-sitter-wasms@0.1.13 sha512-wT+cR6DwaIz80/vho3AvSF0N4txuNx/5bcRKoXouOfClpxh/qqrF4URNLQXbbt8MaAxeksZcZd1j8gcGjc+QxQ==",
+            )
+        || manifest.dependency_package_license.as_deref() != Some("LICENSE.tree-sitter-wasms")
+        || manifest.dependency_package_license_sha256.as_deref()
+            != Some("6b0382b16279f26ff69014300541967a356a666eb0b91b422f6862f6b7dad17e")
+        || manifest.assets.len() != 7
     {
         return Err("grammar 清单版本、来源或资产数量不符".into());
     }
@@ -135,7 +181,17 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
         .iter()
         .map(|asset| asset.language.as_str())
         .collect();
-    if languages != BTreeSet::from(["java", "python", "typescript", "tsx", "zig"]) {
+    if languages
+        != BTreeSet::from([
+            "java",
+            "objc",
+            "python",
+            "solidity",
+            "typescript",
+            "tsx",
+            "zig",
+        ])
+    {
         return Err("grammar 语言资产缺失或重复".into());
     }
     for asset in &manifest.assets {
@@ -191,9 +247,46 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
                     "zig/LICENSE",
                     "0eea8dc45e89deeb03c7799bbbc7b4688f365fb274562f4540ecfebdea82e727",
                 ),
+                "objc" => (
+                    "https://github.com/amaanq/tree-sitter-objc",
+                    "dea2b2d6a1253c2f0f58b543c10d62edd2f860f2",
+                    "2.1.0",
+                    "objc/parser.wasm",
+                    "2606d4c5809fab61de44d328072d1371d53aa4aff5734436cb2a0ce8db7f2b0c",
+                    7708267,
+                    "objc/LICENSE",
+                    "099c44248f8cf353123211318680e93465587c005a4b3730ce8cb5334de043d6",
+                ),
+                "solidity" => (
+                    "https://github.com/JoranHonig/tree-sitter-solidity",
+                    "b239a95f94cfcc6e7b3e961bc73a28d55e214f02",
+                    "1.2.0",
+                    "solidity/parser.wasm",
+                    "ba02ba3c98c8ce976ed962d727ef48940b3a18dd2243830a8158b558de64b4f2",
+                    423943,
+                    "solidity/LICENSE",
+                    "8844f0cc9b76b9c8a9d0251904eb7536b6bb9976e0ec577e8f27ab96d42523ef",
+                ),
                 _ => return Err("grammar 语言未知".into()),
             };
         if asset.dialect != asset.language
+            || (match asset.language.as_str() {
+                "objc" => {
+                    asset.source_wasm.as_deref() != Some("objc/source.wasm")
+                        || asset.source_sha256.as_deref()
+                            != Some(
+                                "7c1b5bfdca7e64b6c63b6040bb7ba0afc347df116f9030ca32f8535d7377f6ff",
+                            )
+                }
+                "solidity" => {
+                    asset.source_wasm.as_deref() != Some("solidity/source.wasm")
+                        || asset.source_sha256.as_deref()
+                            != Some(
+                                "160745e470f234cae903a9ba445d19e758d0b02e1197401fc765976c6254d2b6",
+                            )
+                }
+                _ => asset.source_wasm.is_some() || asset.source_sha256.is_some(),
+            })
             || asset.grammar_repository != repo
             || asset.grammar_commit != commit
             || asset.grammar_version != version

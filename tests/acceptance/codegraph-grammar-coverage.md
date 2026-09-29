@@ -13,3 +13,5 @@
 再后续的 [Python 资产候选](python-grammar-asset-candidate.md)使当前候选数变为 4；Python 尚未接入 lint，已发行能力仍为 0。上述数值均为各次增量当时的记录。
 
 2026-09-29 增量：来源库存更新到 CodeGraph `1072f82ce24db3d133258d30165cef6b74d108b2`，当前工作树 30/30 份随仓 WASM 的长度与 SHA-256 与新库存一致。Zig 源 WASM 已变更为修复空容器误报的构建；其原始字节与 Rust 适配后的候选资产、加载测试见 [Zig 局部验收](zig-grammar-candidate.md)。当前候选资产为 5，已验收发行仍为 0。`objc` 与 `solidity` 的精确字节可从 CodeGraph 锁定的 `tree-sitter-wasms@0.1.13` 本机 npm 缓存重现，但本增量尚未把它们写入 CodeGuard 资产清单或验收为可加载能力。历史 2/3/4 候选数仅表示各次验收快照。
+
+2026-09-29 后续增量：Objective-C 与 Solidity 的依赖包原始字节、上游许可证及可复现的 Rust `dylink` 元数据适配现已入[候选清单](../../grammars/manifest.json)；局部加载和隔离 worker 证据见[依赖 grammar 候选验收](dependency-grammar-candidates.md)。当前候选数 7，已验收发行仍为 0。上述 2/3/4/5 候选数是历史快照，旧的 `dependency_bytes_not_pinned` 状态也只适用于当时的库存。

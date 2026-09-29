@@ -1,11 +1,12 @@
 use codeguard_adapters::{
-    adapt_zig_wasm, bundled_grammar_candidates, parse_grammar_asset_manifest, verify_grammar_asset,
+    adapt_legacy_dylink, adapt_zig_wasm, bundled_grammar_candidates, parse_grammar_asset_manifest,
+    verify_grammar_asset,
 };
 
 #[test]
 fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support() {
     let manifest = bundled_grammar_candidates().expect("bundled manifest");
-    assert_eq!(manifest.assets.len(), 5);
+    assert_eq!(manifest.assets.len(), 7);
     for asset in &manifest.assets {
         let (wasm, license) = match asset.language.as_str() {
             "java" => (
@@ -28,6 +29,14 @@ fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support(
                 include_bytes!("../../../grammars/zig/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/zig/LICENSE").as_slice(),
             ),
+            "objc" => (
+                include_bytes!("../../../grammars/objc/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/objc/LICENSE").as_slice(),
+            ),
+            "solidity" => (
+                include_bytes!("../../../grammars/solidity/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/solidity/LICENSE").as_slice(),
+            ),
             other => panic!("unexpected language {other}"),
         };
         verify_grammar_asset(asset, wasm, license).expect("pinned candidate bytes");
@@ -37,6 +46,27 @@ fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support(
             "rust_loader_smoke_passed"
         );
         assert!(asset.language_versions.is_empty());
+    }
+}
+
+#[test]
+fn dependency_dylink_adaptation_is_byte_pinned_and_rejects_changed_source() {
+    for language in ["objc", "solidity"] {
+        let (source, adapted) = if language == "objc" {
+            (
+                include_bytes!("../../../grammars/objc/source.wasm").as_slice(),
+                include_bytes!("../../../grammars/objc/parser.wasm").as_slice(),
+            )
+        } else {
+            (
+                include_bytes!("../../../grammars/solidity/source.wasm").as_slice(),
+                include_bytes!("../../../grammars/solidity/parser.wasm").as_slice(),
+            )
+        };
+        assert_eq!(adapt_legacy_dylink(language, source).unwrap(), adapted);
+        let mut changed = source.to_vec();
+        changed[100] ^= 1;
+        assert!(adapt_legacy_dylink(language, &changed).is_err());
     }
 }
 

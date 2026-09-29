@@ -134,9 +134,8 @@ fn coverage_report() -> Result<Value, String> {
                 "integration_status":candidate.map_or("not_integrated", |item| item.release_status.as_str()),
                 "runtime_observation":candidate.map(|item| item.codeguard_runtime_validation.as_str()),
                 "released":false,
-                "gap":if asset.provider == "tree_sitter_wasms_dependency" {"dependency_bytes_not_pinned"}
+                "gap":if candidate.is_some_and(|item| item.codeguard_runtime_validation == "rust_loader_incompatible") {"rust_loader_incompatible"}
                     else if asset.bytes.is_some_and(|bytes| bytes > 8 * 1024 * 1024) {"current_loader_size_limit"}
-                    else if candidate.is_some_and(|item| item.codeguard_runtime_validation == "rust_loader_incompatible") {"rust_loader_incompatible"}
                     else if candidate.is_some() {"language_qualification_and_release_pending"}
                     else {"asset_provenance_license_and_loader_validation_pending"},
             })
@@ -195,9 +194,26 @@ fn validate_inventory(inventory: &CoverageInventory) -> Result<(), String> {
             }
             "tree_sitter_wasms_dependency" => {
                 if !matches!(asset.language.as_str(), "objc" | "solidity")
-                    || asset.source_path.is_some()
-                    || asset.sha256.is_some()
-                    || asset.bytes.is_some()
+                    || asset.source_path.as_deref()
+                        != Some(
+                            format!(
+                                "tree-sitter-wasms@0.1.13/out/tree-sitter-{}.wasm",
+                                asset.language
+                            )
+                            .as_str(),
+                        )
+                    || asset.sha256.as_deref()
+                        != Some(if asset.language == "objc" {
+                            "7c1b5bfdca7e64b6c63b6040bb7ba0afc347df116f9030ca32f8535d7377f6ff"
+                        } else {
+                            "160745e470f234cae903a9ba445d19e758d0b02e1197401fc765976c6254d2b6"
+                        })
+                    || asset.bytes
+                        != Some(if asset.language == "objc" {
+                            7708264
+                        } else {
+                            423940
+                        })
                 {
                     return Err("CodeGraph 依赖资产身份无效".into());
                 }

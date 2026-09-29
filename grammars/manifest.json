@@ -27,22 +27,24 @@
       "release_status": "candidate_unvalidated"
     },
     {
-      "language": "typescript",
-      "dialect": "typescript",
-      "grammar_repository": "https://github.com/tree-sitter/tree-sitter-typescript",
-      "grammar_commit": "f975a621f4e7f532fe322e13c4f79495e0a7b2e7",
-      "grammar_version": "v0.23.2",
-      "path": "typescript/parser.wasm",
-      "sha256": "3a44d634c9840dccec36f33b99592bd086a2f940e9cd80c64347c45b7dce662f",
-      "bytes": 1414055,
-      "license": "typescript/LICENSE",
-      "license_sha256": "49bf33cf78ef5897e4e161ce1517df7de1ae5042a65b6bcfd44401e0fc606559",
+      "language": "objc",
+      "dialect": "objc",
+      "grammar_repository": "https://github.com/amaanq/tree-sitter-objc",
+      "grammar_commit": "dea2b2d6a1253c2f0f58b543c10d62edd2f860f2",
+      "grammar_version": "2.1.0",
+      "path": "objc/parser.wasm",
+      "sha256": "2606d4c5809fab61de44d328072d1371d53aa4aff5734436cb2a0ce8db7f2b0c",
+      "bytes": 7708267,
+      "source_wasm": "objc/source.wasm",
+      "source_sha256": "7c1b5bfdca7e64b6c63b6040bb7ba0afc347df116f9030ca32f8535d7377f6ff",
+      "license": "objc/LICENSE",
+      "license_sha256": "099c44248f8cf353123211318680e93465587c005a4b3730ce8cb5334de043d6",
       "abi_version": 14,
       "codegraph_runtime": "web-tree-sitter 0.25.3",
       "codeguard_runtime_validation": "rust_loader_smoke_passed",
       "language_versions": [],
       "known_limitations": [
-        "Rust loader smoke passed; MSRV build, dialect versions, isolation and syntax corpus are not yet validated"
+        "Rust loader smoke passed after byte-pinned dylink metadata conversion; language versions, corpus differential, resource isolation and release remain unqualified"
       ],
       "release_status": "candidate_unvalidated"
     },
@@ -67,6 +69,28 @@
       "release_status": "candidate_unvalidated"
     },
     {
+      "language": "solidity",
+      "dialect": "solidity",
+      "grammar_repository": "https://github.com/JoranHonig/tree-sitter-solidity",
+      "grammar_commit": "b239a95f94cfcc6e7b3e961bc73a28d55e214f02",
+      "grammar_version": "1.2.0",
+      "path": "solidity/parser.wasm",
+      "sha256": "ba02ba3c98c8ce976ed962d727ef48940b3a18dd2243830a8158b558de64b4f2",
+      "bytes": 423943,
+      "source_wasm": "solidity/source.wasm",
+      "source_sha256": "160745e470f234cae903a9ba445d19e758d0b02e1197401fc765976c6254d2b6",
+      "license": "solidity/LICENSE",
+      "license_sha256": "8844f0cc9b76b9c8a9d0251904eb7536b6bb9976e0ec577e8f27ab96d42523ef",
+      "abi_version": 14,
+      "codegraph_runtime": "web-tree-sitter 0.25.3",
+      "codeguard_runtime_validation": "rust_loader_smoke_passed",
+      "language_versions": [],
+      "known_limitations": [
+        "Rust loader smoke passed after byte-pinned dylink metadata conversion; language versions, corpus differential, resource isolation and release remain unqualified"
+      ],
+      "release_status": "candidate_unvalidated"
+    },
+    {
       "language": "tsx",
       "dialect": "tsx",
       "grammar_repository": "https://github.com/tree-sitter/tree-sitter-typescript",
@@ -83,6 +107,26 @@
       "language_versions": [],
       "known_limitations": [
         "Rust loader smoke passed; TSX language versions, JSX dialects, isolation and syntax corpus are not yet validated"
+      ],
+      "release_status": "candidate_unvalidated"
+    },
+    {
+      "language": "typescript",
+      "dialect": "typescript",
+      "grammar_repository": "https://github.com/tree-sitter/tree-sitter-typescript",
+      "grammar_commit": "f975a621f4e7f532fe322e13c4f79495e0a7b2e7",
+      "grammar_version": "v0.23.2",
+      "path": "typescript/parser.wasm",
+      "sha256": "3a44d634c9840dccec36f33b99592bd086a2f940e9cd80c64347c45b7dce662f",
+      "bytes": 1414055,
+      "license": "typescript/LICENSE",
+      "license_sha256": "49bf33cf78ef5897e4e161ce1517df7de1ae5042a65b6bcfd44401e0fc606559",
+      "abi_version": 14,
+      "codegraph_runtime": "web-tree-sitter 0.25.3",
+      "codeguard_runtime_validation": "rust_loader_smoke_passed",
+      "language_versions": [],
+      "known_limitations": [
+        "Rust loader smoke passed; MSRV build, dialect versions, isolation and syntax corpus are not yet validated"
       ],
       "release_status": "candidate_unvalidated"
     },
@@ -106,5 +150,8 @@
       ],
       "release_status": "candidate_unvalidated"
     }
-  ]
+  ],
+  "dependency_package_integrity": "tree-sitter-wasms@0.1.13 sha512-wT+cR6DwaIz80/vho3AvSF0N4txuNx/5bcRKoXouOfClpxh/qqrF4URNLQXbbt8MaAxeksZcZd1j8gcGjc+QxQ==",
+  "dependency_package_license": "LICENSE.tree-sitter-wasms",
+  "dependency_package_license_sha256": "6b0382b16279f26ff69014300541967a356a666eb0b91b422f6862f6b7dad17e"
 }
