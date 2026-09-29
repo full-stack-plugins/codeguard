@@ -131,6 +131,8 @@ npm exec --yes --package "$CODEGUARD_TARBALL" -- codeguard detect . --format jso
 
 The packer currently supports macOS and Linux on x64/arm64 when a matching native binary is available. It requires Node 18+, npm, and an already built Rust binary for the current host. It checks the binary's reported target and version before packaging, and writes a platform-tagged tarball under ignored `release/npm/`. The default package is private and local-only. `node scripts/pack-npm-local.mjs --public` prepares the public `@partme.ai/codeguard` package with a README, full license, and host restrictions. Version `0.1.2` is published; its registry-hosted `npx` entry and artifact hashes were verified on Apple Silicon macOS. The binary reports the candidate source commit, which is not a signed or reproducible-build attestation. Other platforms need their own verified binary packages. See the [distribution design](docs/Codeguard-Technical-Design.md) and [0.1.2 acceptance record](tests/acceptance/npm-0.1.2-candidate.md).
 
+To prepare a **local** package with candidate WASM support, build with `cargo build --locked -p codeguard-cli --features wasm-precheck` and run `node scripts/pack-npm-local.mjs --require-wasm target/debug/codeguard`. The packer rejects a binary without the worker, checks all 32 pinned asset identities, and executes a bounded Zig candidate probe before writing the tarball. `--public` now requires the same check; this does not change the already published `0.1.2`, which contains no WASM. Local offline npm execution of Zig and Dart remains candidate-only and does not qualify a language or certify a release.
+
 ## 5. Repair workflow
 
 Make the built binary available as `codeguard` on `PATH`, or use its absolute path. In a target project:

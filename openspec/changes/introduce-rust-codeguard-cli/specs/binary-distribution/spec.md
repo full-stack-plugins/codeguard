@@ -216,3 +216,7 @@ The npm package SHALL provide `npx @partme.ai/codeguard` through a minimal Node 
 #### Scenario: Optional WASM assets join a later release
 - **WHEN** a release declares bundled syntax capability
 - **THEN** its package includes the pinned assets and notices required by syntax-precheck, and independent offline invocation is validated for each advertised host
+
+#### Scenario: A package declares all pinned grammar candidates
+- **WHEN** the packer is asked to prepare an artifact containing the 32 candidate grammars
+- **THEN** it rejects a binary without the WASM worker or with a missing, duplicated or digest-mismatched candidate before creating the artifact; an accepted local artifact runs at least one pinned grammar offline through the installed Node launcher and reports an incomplete candidate rather than a qualified lint result

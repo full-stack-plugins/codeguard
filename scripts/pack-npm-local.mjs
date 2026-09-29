@@ -3,7 +3,8 @@
 // Build a local, single-platform npm package from an already-built Rust binary.
 // This script never downloads a binary or runs project checks.
 import { execFileSync, spawnSync } from 'node:child_process';
-import { copyFileSync, chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { copyFileSync, chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -21,13 +22,22 @@ if (!expectedTarget) {
   throw new Error(`No verified Codeguard package target for ${host}`);
 }
 
-const publishable = process.argv[2] === '--public';
+const options = new Set();
+let binaryArgument;
+for (const argument of process.argv.slice(2)) {
+  if (argument === '--public' || argument === '--require-wasm') {
+    if (options.has(argument)) throw new Error(`Duplicate option: ${argument}`);
+    options.add(argument);
+  } else if (argument.startsWith('--') || binaryArgument) {
+    throw new Error('Usage: pack-npm-local.mjs [--public] [--require-wasm] [binary-path]');
+  } else {
+    binaryArgument = argument;
+  }
+}
+const publishable = options.has('--public');
+const requireWasm = publishable || options.has('--require-wasm');
 if (publishable && host !== 'darwin-arm64') {
   throw new Error(`The first @partme.ai/codeguard release is certified only for darwin-arm64, not ${host}`);
-}
-const binaryArgument = publishable ? process.argv[3] : process.argv[2];
-if (process.argv.length > (publishable ? 4 : 3)) {
-  throw new Error('Usage: pack-npm-local.mjs [--public] [binary-path]');
 }
 const binary = binaryArgument
   ? path.resolve(binaryArgument)
@@ -58,6 +68,47 @@ if (publishable) {
   }
   if (identity.build_identity !== sourceSha) {
     throw new Error('Public binary build identity must equal the checked-out source commit');
+  }
+}
+
+if (requireWasm) {
+  const manifest = JSON.parse(readFileSync(path.join(root, 'grammars', 'manifest.json'), 'utf8'));
+  const expected = new Map(manifest.assets.map(asset => [asset.language, asset.sha256]));
+  if (expected.size !== 32 || manifest.assets.length !== 32) {
+    throw new Error('WASM capability probe failed: local manifest must contain 32 distinct assets');
+  }
+  const inventory = spawnSync(binary, ['grammar', 'status', '--format=json'], {
+    cwd: root, encoding: 'utf8', timeout: 30_000, maxBuffer: 1024 * 1024, shell: false,
+  });
+  let report;
+  try { report = JSON.parse(inventory.stdout); } catch { report = null; }
+  if (inventory.error || inventory.status !== 3 || report?.candidate_count !== 32 ||
+      !Array.isArray(report.assets) || report.assets.length !== 32 ||
+      new Set(report.assets.map(asset => asset.language)).size !== 32 ||
+      report.released_count !== 0 || report.delivery_decision !== 'not_evaluated' ||
+      report.assets.some(asset => !expected.has(asset.language) || expected.get(asset.language) !== asset.candidate_wasm_sha256)) {
+    throw new Error('WASM capability probe failed: 32 pinned asset identities are not present');
+  }
+  const probeDir = realpathSync(mkdtempSync(path.join(os.tmpdir(), 'codeguard-wasm-pack-probe-')));
+  try {
+    const source = path.join(probeDir, 'sample.zig');
+    const sourceText = 'const Empty = struct {};\n';
+    writeFileSync(source, sourceText);
+    const observed = spawnSync(binary, ['grammar', 'probe', 'zig', source, '--format=json'], {
+      cwd: root, encoding: 'utf8', timeout: 120_000, maxBuffer: 1024 * 1024, shell: false,
+    });
+    let candidate;
+    try { candidate = JSON.parse(observed.stdout); } catch { candidate = null; }
+    if (observed.error || observed.status !== 3 || candidate?.report_type !== 'grammar_candidate_probe' ||
+        candidate.language !== 'zig' || candidate.grammar_sha256 !== expected.get('zig') ||
+        candidate.source_sha256 !== createHash('sha256').update(sourceText).digest('hex') ||
+        candidate.grammar_qualified !== false || candidate.precheck?.status !== 'incomplete' ||
+        candidate.precheck?.checked_files !== 1 || !Array.isArray(candidate.recoveries) ||
+        candidate.native?.status !== 'not_run' || candidate.delivery_decision !== 'not_evaluated') {
+      throw new Error('WASM capability probe failed: pinned Zig worker did not produce an incomplete candidate');
+    }
+  } finally {
+    rmSync(probeDir, { recursive: true, force: true });
   }
 }
 

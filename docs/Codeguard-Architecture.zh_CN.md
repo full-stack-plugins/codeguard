@@ -478,14 +478,19 @@ CLI 返回命令专属的版本化 JSON、可读投影及部分 SARIF。[Schema 
 
 ```mermaid
 flowchart LR
-    Build[显式构建 Rust release] --> Verify[核对二进制版本和本机平台]
-    Verify --> Pack[本地带平台标识的 npm 包]
+    Build[显式构建 Rust] --> Verify[核对二进制版本和本机平台]
+    Verify --> Wasm{要求包含 WASM?}
+    Wasm -->|是| Probe[核对 32 份固定身份并运行 Zig worker]
+    Wasm -->|否，仅本地私有包| Pack[本地带平台标识的 npm 包]
+    Probe --> Pack
     Pack --> Node[Node bin: codeguard]
     Node --> Rust[包内 Rust 可执行文件]
     Rust --> Native[选定的原生检查器]
 ```
 
 默认本地包标记为 private，不含 npm 安装钩子。`bin` 入口见 [npm/codeguard.cjs](../npm/codeguard.cjs)，[scripts/pack-npm-local.mjs](../scripts/pack-npm-local.mjs)使用已构建二进制打包。`--public` 模式已产出公开的 `@partme.ai/codeguard@0.1.2`，仅覆盖 Apple Silicon macOS；全新缓存运行和包/二进制摘要核对见[npm 0.1.2 验收记录](../tests/acceptance/npm-0.1.2-candidate.md)。扩大分发范围还需平台覆盖、可信制品清单、版本与摘要绑定及发行流程。CodeGraph 的 Node 入口和平台包布局为此设计提供参考；其可选网络回退不属于 Codeguard 当前安装路径。
+
+新的 WASM 候选包使用 `--require-wasm` 或 `--public` 时，打包器会拒绝没有 worker 的二进制，核对固定清单的 32 份资产身份，并在写包前执行 Zig worker；[本地离线 npm 验收](../tests/acceptance/npm-wasm-local-package.md)另从包内运行 Zig、Dart。该检查不会让已发布 `0.1.2` 自动获得 WASM，也不证明全部语言的 lint 精度或公开发行已验收。
 
 升级时记录二进制/schema 版本，保留工作区，预览受管变更，重跑有限检查，再核对报告消费。降级必须服从已有 schema 读取范围，不能为了通过解析而改写历史记录成旧格式。
 
