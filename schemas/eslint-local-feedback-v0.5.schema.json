@@ -1,0 +1,290 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:eslint-local-feedback:0.5.0",
+  "title": "Incomplete TypeScript or TSX syntax precheck feedback with optional local confirmation task",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "status",
+    "local_coherent",
+    "coverage_proven",
+    "delivery_decision",
+    "reason",
+    "findings",
+    "suppressed_count",
+    "workbench_status",
+    "workbench",
+    "native",
+    "setup",
+    "syntax_precheck",
+    "next_action"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.5.0"
+    },
+    "report_type": {
+      "const": "eslint_local_feedback"
+    },
+    "status": {
+      "const": "incomplete"
+    },
+    "local_coherent": {
+      "const": false
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "reason": {
+      "const": "eslint_execution_context_missing"
+    },
+    "findings": {
+      "const": []
+    },
+    "suppressed_count": {
+      "const": 0
+    },
+    "workbench_status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workbench": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "minLength": 1
+            },
+            "new_findings": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "new_blockers": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "failed_reports": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "next": {
+              "type": [
+                "object",
+                "null"
+              ]
+            },
+            "next_error": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "task_id": {
+              "type": "string",
+              "pattern": "^CG-B-[0-9a-f]{32}$"
+            }
+          }
+        }
+      ]
+    },
+    "native": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason"
+      ],
+      "properties": {
+        "status": {
+          "const": "not_run"
+        },
+        "reason": {
+          "const": "explicit_context_missing"
+        }
+      }
+    },
+    "setup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement",
+        "reason",
+        "task_id"
+      ],
+      "properties": {
+        "requirement": {
+          "const": "required"
+        },
+        "reason": {
+          "const": "native_confirmation_needed"
+        },
+        "task_id": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^CG-B-[0-9a-f]{32}$"
+            }
+          ]
+        }
+      }
+    },
+    "syntax_precheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "backend",
+        "language",
+        "status",
+        "reason",
+        "source_path",
+        "source_sha256",
+        "grammar_sha256",
+        "grammar_qualified",
+        "selected_files",
+        "checked_files",
+        "truncated",
+        "observations"
+      ],
+      "properties": {
+        "backend": {
+          "const": "bundled_tree_sitter_wasm_candidate"
+        },
+        "language": {
+          "enum": [
+            "typescript",
+            "tsx"
+          ]
+        },
+        "status": {
+          "const": "incomplete"
+        },
+        "reason": {
+          "enum": [
+            "not_run",
+            "source_unavailable",
+            "worker_executable_unavailable",
+            "worker_incomplete",
+            "recovery_budget_truncated",
+            "grammar_version_unqualified",
+            "position_mapping_incomplete"
+          ]
+        },
+        "source_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_sha256": {
+          "$ref": "#/$defs/nullable_digest"
+        },
+        "grammar_sha256": {
+          "$ref": "#/$defs/nullable_digest"
+        },
+        "grammar_qualified": {
+          "const": false
+        },
+        "selected_files": {
+          "const": 1
+        },
+        "checked_files": {
+          "enum": [
+            0,
+            1
+          ]
+        },
+        "truncated": {
+          "type": "boolean"
+        },
+        "observations": {
+          "type": "array",
+          "maxItems": 128,
+          "items": {
+            "$ref": "#/$defs/observation"
+          }
+        }
+      }
+    },
+    "next_action": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "$defs": {
+    "nullable_digest": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "classification",
+        "kind",
+        "syntax_kind",
+        "start_line",
+        "start_column",
+        "end_line",
+        "end_column",
+        "group_id"
+      ],
+      "properties": {
+        "classification": {
+          "const": "suspected"
+        },
+        "kind": {
+          "enum": [
+            "ERROR",
+            "MISSING"
+          ]
+        },
+        "syntax_kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "start_line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "start_column": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "end_line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "end_column": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "group_id": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  }
+}

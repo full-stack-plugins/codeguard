@@ -24,7 +24,27 @@ pub(crate) fn connect(
 }
 pub(crate) fn connect_preparation(root: &Path, args: &EslintLintArguments, reason: &str) -> Value {
     match crate::eslint_preparation::prepare(root, args, reason) {
-        Ok(report) => persist(root, report, "node.eslint.preparation"),
+        Ok(report) => {
+            let id = report["blocker_id"].as_str().unwrap_or("").to_owned();
+            let mut result = persist(root, report, "node.eslint.preparation");
+            if matches!(
+                reason,
+                "eslint_syntax_confirmation_needed" | "eslint_syntax_precheck_unavailable"
+            ) && result["status"] == "synced_partial"
+            {
+                if let Ok(brief) = crate::next_command::read_task_brief(root, &id) {
+                    result["task_id"] = json!(id);
+                    result["next"] = json!({
+                        "schema_version":"0.1.0","report_type":"repair_brief_preview",
+                        "operation":"next","command_status":"complete","exit_code":0,
+                        "disposition":brief["disposition"],"reason":"current_source_confirmation_task",
+                        "repair_brief":brief,"next_actions":[],
+                        "authority":"local_unverified","delivery_decision":"not_evaluated"
+                    });
+                }
+            }
+            result
+        }
         Err(reason) => json!({"status":reason}),
     }
 }

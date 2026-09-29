@@ -22,6 +22,8 @@
 
 [已验收实现切片](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md)跟踪当前局部能力；[tasks](../openspec/changes/introduce-rust-codeguard-cli/tasks.md)独占完成状态。WASM 的完整统一入口仍为 S14 待办。可选 `codeguard-cli/wasm-precheck` 构建处理 `lint typescript <显式单文件>` 时，若观察到本地 ESLint 10 入口与唯一 flat config，会优先用 `PATH` 中可执行 Node 调用既有有界原生探针；缺 Node 则返回准备缺口。仅未观察到本地 ESLint 包时才输出 [TypeScript 0.3.0 候选反馈](../schemas/eslint-local-feedback-v0.3.schema.json)或 TSX 0.4.0。本地入口、包身份或配置不可信时保留具体环境阻塞，不启动 WASM。`lint java <显式单文件>` 仍输出 [Java 0.1.0 候选反馈](../schemas/java-syntax-precheck-feedback-v0.1.schema.json)。这些局部路径均不批准交付并保持退出 3；部分显式参数、Javadoc/Checkstyle 和符号链接沿用原路径，默认及已发布二进制也不含这项自动调度。见[原生优先局部验收](../tests/acceptance/native-first-eslint-candidate.md)与技术方案 5.3–5.4；后文未标当前的语法、退出0/1与闭环承诺均为目标契约。
 
+对已初始化且使用规范绝对路径的 `--workspace`，TypeScript/TSX 候选回退改用[反馈 0.5.0](../schemas/eslint-local-feedback-v0.5.schema.json)：按源码范围保存同一张 ESLint 原生确认阻塞任务，仅同步成功时返回真实 `setup.task_id`。重复扫描和后续 WASM 无恢复节点不关闭任务。逐个疑似位置的持久关联及能力匹配原生复检仍未接通，见[局部验收](../tests/acceptance/typescript-syntax-confirmation-task.md)。
+
 ## 1. 命令体系与协作路线
 
 ```mermaid

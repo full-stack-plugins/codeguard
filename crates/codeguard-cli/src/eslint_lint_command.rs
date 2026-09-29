@@ -61,7 +61,11 @@ pub fn run(args: &[String]) -> ExitCode {
                     )
                 }
             }
-            Ok(None) => crate::typescript_syntax_precheck::observe(&args, deadline),
+            Ok(None) => {
+                let mut report = crate::typescript_syntax_precheck::observe(&args, deadline);
+                connect_syntax_confirmation(&args, &mut report);
+                report
+            }
             Err(reason) => observe_with_preparation_reason(&args, deadline, Some(reason)),
         };
         if args.json {
@@ -86,6 +90,34 @@ pub fn run(args: &[String]) -> ExitCode {
     } else {
         3
     })
+}
+#[cfg(feature = "wasm-precheck")]
+fn connect_syntax_confirmation(args: &EslintLintArguments, report: &mut Value) {
+    let Some(workspace) = &args.workspace else {
+        return;
+    };
+    report["schema_version"] = json!("0.5.0");
+    let reason = if report["syntax_precheck"]["checked_files"] == 1
+        && report["syntax_precheck"]["source_sha256"].is_string()
+        && report["syntax_precheck"]["grammar_sha256"].is_string()
+    {
+        "eslint_syntax_confirmation_needed"
+    } else {
+        "eslint_syntax_precheck_unavailable"
+    };
+    report["workbench"] = match workspace.canonicalize() {
+        Ok(root) if root == *workspace => {
+            crate::eslint_workbench::connect_preparation(&root, args, reason)
+        }
+        _ => json!({"status":"workspace_invalid"}),
+    };
+    report["workbench_status"] = report["workbench"]["status"].clone();
+    if let Some(task_id) = report["workbench"]["task_id"].as_str() {
+        report["setup"]["task_id"] = json!(task_id);
+        if let Some(step) = report["workbench"]["next"]["repair_brief"]["step"].as_str() {
+            report["next_action"] = json!(step);
+        }
+    }
 }
 pub(crate) fn observe_with_preparation(args: &EslintLintArguments, deadline: Instant) -> Value {
     observe_with_preparation_reason(args, deadline, None)
