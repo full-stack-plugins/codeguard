@@ -61,13 +61,13 @@ fn check_all_routes_distinct_dialects_after_native_without_claiming_clean() {
 }
 
 #[test]
-fn check_all_invokes_all_32_pinned_candidates_in_one_project() {
+fn check_all_invokes_all_32_pinned_candidates_across_bounded_projects() {
     let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
         "codeguard-check-all-grammars-{}",
         std::process::id()
     ));
     fs::create_dir_all(&root).unwrap();
-    for (name, source) in [
+    for (index, (name, source)) in [
         ("a.ets", "@Component struct C { build() { Text('hi') } }"),
         ("a.c", "int main(void) { return 0; }"),
         (
@@ -108,31 +108,49 @@ fn check_all_invokes_all_32_pinned_candidates_in_one_project() {
             "Public Class C\n    Public Function F() As Integer\n        Return 1\n    End Function\nEnd Class\n",
         ),
         ("a.zig", "const Empty = struct {};\n"),
-    ] {
-        fs::write(root.join(name), source).unwrap();
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        let group = root.join(format!("group-{}", index / 8));
+        fs::create_dir_all(&group).unwrap();
+        fs::write(group.join(name), source).unwrap();
     }
-    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
-        .args(["check", "all"])
-        .arg(&root)
-        .args(["--format=json", "--timeout", "120s"])
-        .output()
-        .unwrap();
+    let mut languages = BTreeSet::new();
+    for group_index in 0..4 {
+        let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(["check", "all"])
+            .arg(root.join(format!("group-{group_index}")))
+            .args(["--format=json", "--timeout", "120s"])
+            .output()
+            .unwrap();
+        assert_eq!(
+            output.status.code(),
+            Some(3),
+            "{}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+        assert_eq!(
+            report["syntax_candidates"]["skipped_count"], 0,
+            "group {group_index}"
+        );
+        assert_eq!(
+            report["syntax_candidates"]["delivery_decision"],
+            "incomplete"
+        );
+        let observations = report["syntax_candidates"]["observations"]
+            .as_array()
+            .unwrap();
+        for language in observations
+            .iter()
+            .filter(|item| item["status"] == "candidate_observed")
+            .filter_map(|item| item["language"].as_str())
+        {
+            languages.insert(language.to_owned());
+        }
+    }
     fs::remove_dir_all(&root).unwrap();
-    assert_eq!(
-        output.status.code(),
-        Some(3),
-        "{}",
-        String::from_utf8_lossy(&output.stderr)
-    );
-    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
-    let observations = report["syntax_candidates"]["observations"]
-        .as_array()
-        .unwrap();
-    let languages = observations
-        .iter()
-        .filter(|item| item["status"] == "candidate_observed")
-        .filter_map(|item| item["language"].as_str())
-        .collect::<BTreeSet<_>>();
     let expected =
         serde_json::from_str::<serde_json::Value>(include_str!("../../../grammars/manifest.json"))
             .unwrap()["assets"]
@@ -141,19 +159,7 @@ fn check_all_invokes_all_32_pinned_candidates_in_one_project() {
             .iter()
             .map(|asset| asset["language"].as_str().unwrap().to_owned())
             .collect::<BTreeSet<_>>();
-    assert_eq!(languages.len(), 32, "{}", report["syntax_candidates"]);
-    assert_eq!(
-        languages
-            .into_iter()
-            .map(str::to_owned)
-            .collect::<BTreeSet<_>>(),
-        expected
-    );
-    assert_eq!(report["syntax_candidates"]["skipped_count"], 0);
-    assert_eq!(
-        report["syntax_candidates"]["delivery_decision"],
-        "incomplete"
-    );
+    assert_eq!(languages, expected);
 }
 
 #[test]

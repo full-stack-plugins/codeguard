@@ -32,7 +32,7 @@ WASM 的规范与 19 项实施任务已纳入既有 change；可选 Rust worker 
 
 源码以 `--features wasm-precheck` 构建后，可通过 `codeguard grammar probe <language> <file> --format=json` 显式调用全部 32 份固定候选资产。命令使用隔离 Rust worker，以退出码 3 报告未经语言验收的观察，不能作为 lint 或交付结论。成功观察与有效语种的输入失败都遵守[0.1.0 封闭 JSON Schema](../schemas/grammar-probe-v0.1.schema.json)，保持未完成。原生优先 `lint/check`、语言/方言验收、任务/宿主反馈及发行仍需独立完成；现有发现清单还把 JavaScript/TSX 归入 TypeScript，并未为 CFQuery/CFScript 建立独立源码映射。
 
-源码构建的 `check all` 现会在既有原生检查之后执行有界候选初检。[语法路由](../crates/codeguard-cli/src/grammar_route.rs)区分 `.tsx`、JavaScript 和 `.cfs`，只对完整的 `<cfquery>...</cfquery>` 标签体选用 CFQuery；普通 `.sql`、有歧义的 `.h` 不猜测语种。一项真实 CLI 样例逐份调用了 32 种固定 worker。[检查反馈 0.32.0](../schemas/check-feedback.schema.json)记录方言、源码及 grammar 摘要、原文件位置、未执行范围和未完成状态；候选观察不生成已确认违规或交付许可。候选阶段限 64 文件、64 片段、90 秒，本机 32 语种样例约 54 秒。当前只是候选路由，尚非逐语言验收的原生兜底、任务/宿主接线或已发布 npm 能力；见[验收记录](../tests/acceptance/check-all-32-grammar-candidates.md)。
+源码构建的 `check all` 现会在既有原生检查之后执行有界候选初检。[语法路由](../crates/codeguard-cli/src/grammar_route.rs)区分 `.tsx`、JavaScript 和 `.cfs`，只对完整的 `<cfquery>...</cfquery>` 标签体选用 CFQuery；普通 `.sql`、有歧义的 `.h` 不猜测语种。四个有界真实 CLI 样例合计逐份调用了 32 种固定 worker。[检查反馈 0.32.0](../schemas/check-feedback.schema.json)记录方言、源码及 grammar 摘要、原文件位置、未执行范围和未完成状态；候选观察不生成已确认违规或交付许可。候选阶段限 64 文件、64 片段、90 秒，本机四批 32 语种样例约 54 秒；Linux 单次 31 文件检查在 90 秒上限内完成 26/32。当前只是候选路由，尚非逐语言验收的原生兜底、任务/宿主接线或已发布 npm 能力；见[验收记录](../tests/acceptance/check-all-32-grammar-candidates.md)。
 
 ```mermaid
 flowchart LR
