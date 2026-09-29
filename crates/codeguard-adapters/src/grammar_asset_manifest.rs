@@ -26,6 +26,7 @@ const R_COMMIT: &str = "e9944e9801595ad484f49be492daf0c4c81547ef";
 const RUBY_COMMIT: &str = "71bd32fb7607035768799732addba884a37a6210";
 const PHP_COMMIT: &str = "5b5627faaa290d89eb3d01b9bf47c3bb9e797dea";
 const KOTLIN_COMMIT: &str = "e1a2d5ad1f61f5740677183cd4125bb071cd2f30";
+const DART_COMMIT: &str = "d4d8f3e337d8be23be27ffc35a0aef972343cd54";
 
 /// 代码来源、许可和每份候选 grammar 的固定身份。
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
@@ -201,6 +202,10 @@ fn verify_bundled_asset(asset: &GrammarAsset) -> Result<&'static [u8], String> {
             include_bytes!("../../../grammars/kotlin/parser.wasm").as_slice(),
             include_bytes!("../../../grammars/kotlin/LICENSE").as_slice(),
         ),
+        "dart" => (
+            include_bytes!("../../../grammars/dart/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/dart/LICENSE").as_slice(),
+        ),
         "java" => (
             include_bytes!("../../../grammars/java/parser.wasm").as_slice(),
             include_bytes!("../../../grammars/java/LICENSE").as_slice(),
@@ -245,6 +250,14 @@ fn verify_bundled_asset(asset: &GrammarAsset) -> Result<&'static [u8], String> {
     {
         return Err("Zig grammar 来源适配关系不符".into());
     }
+    if asset.language == "dart" {
+        let source = include_bytes!("../../../grammars/dart/source.wasm");
+        if asset.source_sha256.as_deref() != Some(digest(source).as_str())
+            || crate::adapt_dart_wasm(source)? != wasm
+        {
+            return Err("Dart grammar 重建来源适配关系不符".into());
+        }
+    }
     if matches!(asset.language.as_str(), "objc" | "solidity") {
         let source = if asset.language == "objc" {
             include_bytes!("../../../grammars/objc/source.wasm").as_slice()
@@ -274,7 +287,7 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
         || manifest.codegraph_license != "LICENSE.codegraph"
         || manifest.codegraph_license_sha256 != CODEGRAPH_LICENSE_SHA256
         || manifest.build_tool
-            != "tree-sitter-cli 0.25.10 build --wasm; Zig: tree-sitter-cli 0.27.0 generate --abi 15 + Zig 0.16.0 wasm32-wasi; ArkTS/Terraform: pinned npm prebuilt WASM"
+            != "tree-sitter-cli 0.25.10 build --wasm; Zig: tree-sitter-cli 0.27.0 generate --abi 15 + Zig 0.16.0 wasm32-wasi; Dart: pinned parser.c/scanner.c + Zig 0.16.0 wasm32-wasi; ArkTS/Terraform: pinned npm prebuilt WASM"
         || manifest.dependency_package_integrity.as_deref()
             != Some(
                 "tree-sitter-wasms@0.1.13 sha512-wT+cR6DwaIz80/vho3AvSF0N4txuNx/5bcRKoXouOfClpxh/qqrF4URNLQXbbt8MaAxeksZcZd1j8gcGjc+QxQ==",
@@ -282,7 +295,7 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
         || manifest.dependency_package_license.as_deref() != Some("LICENSE.tree-sitter-wasms")
         || manifest.dependency_package_license_sha256.as_deref()
             != Some("6b0382b16279f26ff69014300541967a356a666eb0b91b422f6862f6b7dad17e")
-        || manifest.assets.len() != 22
+        || manifest.assets.len() != 23
     {
         return Err("grammar 清单版本、来源或资产数量不符".into());
     }
@@ -297,6 +310,7 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
             "arkts",
             "cpp",
             "csharp",
+            "dart",
             "go",
             "java",
             "javascript",
@@ -361,6 +375,16 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
                     5350581,
                     "csharp/LICENSE",
                     "778fb7d63b8c1844da315648c02f325c4713a6f4a5d19644fd413421422776d3",
+                ),
+                "dart" => (
+                    "https://github.com/UserNobody14/tree-sitter-dart",
+                    DART_COMMIT,
+                    "master@d4d8f3e+zig-0.16.0-rebuild",
+                    "dart/parser.wasm",
+                    "7dad281b3b24924d619cb7059a42b409e7690ebeb8ebbc82882e68167656e012",
+                    989323,
+                    "dart/LICENSE",
+                    "d270cb3a4985d75033bd77d875ccebff1d66e32788a3f727891e28d76132dd46",
                 ),
                 "go" => (
                     "https://github.com/tree-sitter/tree-sitter-go",
@@ -576,6 +600,13 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
                                 "160745e470f234cae903a9ba445d19e758d0b02e1197401fc765976c6254d2b6",
                             )
                 }
+                "dart" => {
+                    asset.source_wasm.as_deref() != Some("dart/source.wasm")
+                        || asset.source_sha256.as_deref()
+                            != Some(
+                                "bbb37cc6aebca30188fab912bb2ae7201604d2b001a64ea6ef2c397674f81f5c",
+                            )
+                }
                 _ => asset.source_wasm.is_some() || asset.source_sha256.is_some(),
             })
             || asset.grammar_repository != repo
@@ -589,7 +620,7 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
             || asset.abi_version
                 != if matches!(
                     asset.language.as_str(),
-                    "zig" | "c" | "csharp" | "javascript" | "lua" | "rust" | "nix" | "php"
+                    "zig" | "c" | "csharp" | "javascript" | "lua" | "rust" | "nix" | "php" | "dart"
                 ) {
                     15
                 } else {

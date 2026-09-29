@@ -222,6 +222,22 @@ fn r_ruby_php_and_kotlin_run_in_worker_without_claiming_clean() {
 }
 
 #[test]
+fn rebuilt_dart_runs_in_worker_without_claiming_clean() {
+    let result = run_syntax_worker_candidate(
+        env!("CARGO_BIN_EXE_codeguard").as_ref(),
+        "dart",
+        "lib/main.dart",
+        b"/// doc\nString greet(String name) => 'Hello $name';",
+        Instant::now() + Duration::from_secs(60),
+        &AtomicBool::new(false),
+    )
+    .expect("Dart grammar candidate with real scanner");
+    assert!(result.recoveries.is_empty());
+    assert_eq!(result.precheck.status, SyntaxPrecheckStatus::Incomplete);
+    assert!(!result.grammar_qualified);
+}
+
+#[test]
 fn invalid_input_and_cancellation_cannot_yield_observations() {
     let exe = env!("CARGO_BIN_EXE_codeguard").as_ref();
     assert!(

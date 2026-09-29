@@ -57,6 +57,7 @@ pub use strict_json::parse_unique_json;
 pub use syntax_precheck_candidate_report::parse_syntax_precheck_candidate_report;
 mod eslint_effective_rule;
 pub use eslint_effective_rule::parse_eslint_effective_rule;
+mod dart_wasm_compat;
 mod eslint_diagnostic;
 mod eslint_file_report;
 mod eslint_json;
@@ -66,6 +67,7 @@ mod go_candidate;
 mod grammar_asset_manifest;
 mod legacy_dylink_compat;
 mod zig_wasm_compat;
+pub use dart_wasm_compat::adapt_dart_wasm;
 pub use grammar_asset_manifest::{
     GrammarAsset, GrammarAssetManifest, bundled_grammar_candidate, bundled_grammar_candidates,
     parse_grammar_asset_manifest, verify_grammar_asset,
