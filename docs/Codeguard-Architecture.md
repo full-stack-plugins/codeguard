@@ -28,7 +28,7 @@ The existing [OpenSpec change](../openspec/changes/introduce-rust-codeguard-cli/
 | [Core aggregation](../crates/codeguard-core/src/aggregate.rs), [delivery gate](../crates/codeguard-core/src/delivery_gate.rs) | Pure result semantics, not trusted public gate availability |
 | [Acceptance records](../tests/acceptance) | Scoped observations, test method, and residual gaps |
 
-WASM requirements and 19 implementation tasks are recorded in the existing change. An opt-in Rust worker and narrow Java/TypeScript/TSX single-file feedback paths and a Python Ruff-unavailable candidate path now exist. All seven grammars remain unqualified; Zig, Objective-C and Solidity are pinned Rust-loadable candidates without public lint routes. Project-wide native-first routing, qualified grammar ranges, capability-matched task closure, and host integrations remain incomplete; design examples are not current command output.
+WASM requirements and 19 implementation tasks are recorded in the existing change. An opt-in Rust worker and narrow Java/TypeScript/TSX single-file feedback paths and a Python Ruff-unavailable candidate path now exist. All eleven grammars remain unqualified; C, Go, JavaScript, Rust, Zig, Objective-C and Solidity are pinned Rust-loadable candidates without public lint routes. Project-wide native-first routing, qualified grammar ranges, capability-matched task closure, and host integrations remain incomplete; design examples are not current command output.
 
 ## 2. Architectural drivers
 

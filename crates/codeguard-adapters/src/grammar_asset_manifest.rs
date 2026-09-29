@@ -11,6 +11,10 @@ const JAVA_COMMIT: &str = "94703d5a6bed02b98e438d7cad1136c01a60ba2c";
 const TYPESCRIPT_COMMIT: &str = "f975a621f4e7f532fe322e13c4f79495e0a7b2e7";
 const PYTHON_COMMIT: &str = "bffb65a8cfe4e46290331dfef0dbf0ef3679de11";
 const ZIG_COMMIT: &str = "b670c8df85a1568f498aa5c8cae42f51a90473c0";
+const C_COMMIT: &str = "b780e47fc780ddc8da13afa35a3f4ed5c157823d";
+const GO_COMMIT: &str = "3c3775faa968158a8b4ac190a7fda867fd5fb748";
+const JAVASCRIPT_COMMIT: &str = "44c892e0be055ac465d5eeddae6d3e194424e7de";
+const RUST_COMMIT: &str = "77a3747266f4d621d0757825e6b11edcbf991ca5";
 
 /// 代码来源、许可和每份候选 grammar 的固定身份。
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
@@ -98,6 +102,18 @@ pub fn bundled_grammar_candidates() -> Result<GrammarAssetManifest, String> {
     }
     for asset in &manifest.assets {
         let (wasm, license) = match asset.language.as_str() {
+            "c" => (
+                include_bytes!("../../../grammars/c/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/c/LICENSE").as_slice(),
+            ),
+            "go" => (
+                include_bytes!("../../../grammars/go/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/go/LICENSE").as_slice(),
+            ),
+            "javascript" => (
+                include_bytes!("../../../grammars/javascript/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/javascript/LICENSE").as_slice(),
+            ),
             "java" => (
                 include_bytes!("../../../grammars/java/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/java/LICENSE").as_slice(),
@@ -125,6 +141,10 @@ pub fn bundled_grammar_candidates() -> Result<GrammarAssetManifest, String> {
             "solidity" => (
                 include_bytes!("../../../grammars/solidity/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/solidity/LICENSE").as_slice(),
+            ),
+            "rust" => (
+                include_bytes!("../../../grammars/rust/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/rust/LICENSE").as_slice(),
             ),
             _ => return Err("候选语言未知".into()),
         };
@@ -172,7 +192,7 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
         || manifest.dependency_package_license.as_deref() != Some("LICENSE.tree-sitter-wasms")
         || manifest.dependency_package_license_sha256.as_deref()
             != Some("6b0382b16279f26ff69014300541967a356a666eb0b91b422f6862f6b7dad17e")
-        || manifest.assets.len() != 7
+        || manifest.assets.len() != 11
     {
         return Err("grammar 清单版本、来源或资产数量不符".into());
     }
@@ -183,9 +203,13 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
         .collect();
     if languages
         != BTreeSet::from([
+            "c",
+            "go",
             "java",
+            "javascript",
             "objc",
             "python",
+            "rust",
             "solidity",
             "typescript",
             "tsx",
@@ -197,6 +221,26 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
     for asset in &manifest.assets {
         let (repo, commit, version, wasm_path, wasm_sha, wasm_bytes, license_path, license_sha) =
             match asset.language.as_str() {
+                "c" => (
+                    "https://github.com/tree-sitter/tree-sitter-c",
+                    C_COMMIT,
+                    "v0.24.2",
+                    "c/parser.wasm",
+                    "a271e584616c7c3c0ac663f01cd05dd5f1a6c2ce6d4cd23096548985a95d0ccb",
+                    625716,
+                    "c/LICENSE",
+                    "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
+                ),
+                "go" => (
+                    "https://github.com/tree-sitter/tree-sitter-go",
+                    GO_COMMIT,
+                    "v0.23.4",
+                    "go/parser.wasm",
+                    "4eda5d91c99ca981e88bc7d3d33f0db166b4bab0a84d0021a9abf39b364c78ef",
+                    210013,
+                    "go/LICENSE",
+                    "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
+                ),
                 "java" => (
                     "https://github.com/tree-sitter/tree-sitter-java",
                     JAVA_COMMIT,
@@ -216,6 +260,26 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
                     456131,
                     "python/LICENSE",
                     "d724405ce238a22c0d35769c5a36b386ad5958192efe8bbb304fb2896254575f",
+                ),
+                "javascript" => (
+                    "https://github.com/tree-sitter/tree-sitter-javascript",
+                    JAVASCRIPT_COMMIT,
+                    "v0.25.0",
+                    "javascript/parser.wasm",
+                    "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+                    411832,
+                    "javascript/LICENSE",
+                    "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
+                ),
+                "rust" => (
+                    "https://github.com/tree-sitter/tree-sitter-rust",
+                    RUST_COMMIT,
+                    "v0.24.2",
+                    "rust/parser.wasm",
+                    "206031e0f67fb41ecae505868ca3bb917df7375031aebafd2f97314a849713fe",
+                    1114303,
+                    "rust/LICENSE",
+                    "31d5b6f4243d5c7c6e1c4ebbbb9f6407bd1457a08bcc4f706521710341acba36",
                 ),
                 "typescript" => (
                     "https://github.com/tree-sitter/tree-sitter-typescript",
@@ -295,7 +359,12 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
             || asset.bytes != wasm_bytes
             || asset.license != license_path
             || asset.license_sha256 != license_sha
-            || asset.abi_version != if asset.language == "zig" { 15 } else { 14 }
+            || asset.abi_version
+                != if matches!(asset.language.as_str(), "zig" | "c" | "javascript" | "rust") {
+                    15
+                } else {
+                    14
+                }
             || asset.codegraph_runtime != "web-tree-sitter 0.25.3"
             || asset.codeguard_runtime_validation != "rust_loader_smoke_passed"
             || !asset.language_versions.is_empty()

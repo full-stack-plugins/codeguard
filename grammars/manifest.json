@@ -7,6 +7,46 @@
   "build_tool": "tree-sitter-cli 0.25.10 build --wasm; Zig: tree-sitter-cli 0.27.0 generate --abi 15 + Zig 0.16.0 wasm32-wasi",
   "assets": [
     {
+      "language": "c",
+      "dialect": "c",
+      "grammar_repository": "https://github.com/tree-sitter/tree-sitter-c",
+      "grammar_commit": "b780e47fc780ddc8da13afa35a3f4ed5c157823d",
+      "grammar_version": "v0.24.2",
+      "path": "c/parser.wasm",
+      "sha256": "a271e584616c7c3c0ac663f01cd05dd5f1a6c2ce6d4cd23096548985a95d0ccb",
+      "bytes": 625716,
+      "license": "c/LICENSE",
+      "license_sha256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
+      "abi_version": 15,
+      "codegraph_runtime": "web-tree-sitter 0.25.3",
+      "codeguard_runtime_validation": "rust_loader_smoke_passed",
+      "language_versions": [],
+      "known_limitations": [
+        "Rust loader smoke and narrow fixtures passed; language versions, dialect corpus, native differential, resource isolation and release remain unqualified"
+      ],
+      "release_status": "candidate_unvalidated"
+    },
+    {
+      "language": "go",
+      "dialect": "go",
+      "grammar_repository": "https://github.com/tree-sitter/tree-sitter-go",
+      "grammar_commit": "3c3775faa968158a8b4ac190a7fda867fd5fb748",
+      "grammar_version": "v0.23.4",
+      "path": "go/parser.wasm",
+      "sha256": "4eda5d91c99ca981e88bc7d3d33f0db166b4bab0a84d0021a9abf39b364c78ef",
+      "bytes": 210013,
+      "license": "go/LICENSE",
+      "license_sha256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
+      "abi_version": 14,
+      "codegraph_runtime": "web-tree-sitter 0.25.3",
+      "codeguard_runtime_validation": "rust_loader_smoke_passed",
+      "language_versions": [],
+      "known_limitations": [
+        "Rust loader smoke and narrow fixtures passed; language versions, dialect corpus, native differential, resource isolation and release remain unqualified"
+      ],
+      "release_status": "candidate_unvalidated"
+    },
+    {
       "language": "java",
       "dialect": "java",
       "grammar_repository": "https://github.com/tree-sitter/tree-sitter-java",
@@ -23,6 +63,26 @@
       "language_versions": [],
       "known_limitations": [
         "Rust loader smoke passed; MSRV build, dialect versions, isolation and syntax corpus are not yet validated"
+      ],
+      "release_status": "candidate_unvalidated"
+    },
+    {
+      "language": "javascript",
+      "dialect": "javascript",
+      "grammar_repository": "https://github.com/tree-sitter/tree-sitter-javascript",
+      "grammar_commit": "44c892e0be055ac465d5eeddae6d3e194424e7de",
+      "grammar_version": "v0.25.0",
+      "path": "javascript/parser.wasm",
+      "sha256": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+      "bytes": 411832,
+      "license": "javascript/LICENSE",
+      "license_sha256": "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
+      "abi_version": 15,
+      "codegraph_runtime": "web-tree-sitter 0.25.3",
+      "codeguard_runtime_validation": "rust_loader_smoke_passed",
+      "language_versions": [],
+      "known_limitations": [
+        "Rust loader smoke and narrow fixtures passed; language versions, dialect corpus, native differential, resource isolation and release remain unqualified"
       ],
       "release_status": "candidate_unvalidated"
     },
@@ -65,6 +125,26 @@
       "language_versions": [],
       "known_limitations": [
         "Rust loader smoke passed; Python language versions, dialects, isolation and syntax corpus are not yet validated"
+      ],
+      "release_status": "candidate_unvalidated"
+    },
+    {
+      "language": "rust",
+      "dialect": "rust",
+      "grammar_repository": "https://github.com/tree-sitter/tree-sitter-rust",
+      "grammar_commit": "77a3747266f4d621d0757825e6b11edcbf991ca5",
+      "grammar_version": "v0.24.2",
+      "path": "rust/parser.wasm",
+      "sha256": "206031e0f67fb41ecae505868ca3bb917df7375031aebafd2f97314a849713fe",
+      "bytes": 1114303,
+      "license": "rust/LICENSE",
+      "license_sha256": "31d5b6f4243d5c7c6e1c4ebbbb9f6407bd1457a08bcc4f706521710341acba36",
+      "abi_version": 15,
+      "codegraph_runtime": "web-tree-sitter 0.25.3",
+      "codeguard_runtime_validation": "rust_loader_smoke_passed",
+      "language_versions": [],
+      "known_limitations": [
+        "Rust loader smoke and narrow fixtures passed; language versions, dialect corpus, native differential, resource isolation and release remain unqualified"
       ],
       "release_status": "candidate_unvalidated"
     },
