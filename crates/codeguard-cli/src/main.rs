@@ -66,6 +66,10 @@ fn main() -> ExitCode {
             println!(
                 "语法资产覆盖：grammar status [--format human|json]；只读列出固定 CodeGraph 来源的 32 种独立 grammar、CodeGuard 候选与未接入项；不加载 WASM、不运行 lint。"
             );
+            #[cfg(feature = "wasm-precheck")]
+            println!(
+                "显式候选语法观察：grammar probe <language> <file> [--format=json]；隔离加载 32 份固定资产之一，始终返回未完成和退出码 3，不代替原生 lint。"
+            );
             println!(
                 "检查预算：check all 支持 --jobs 1–64 和 CODEGUARD_JOBS；--timeout 优先于 CODEGUARD_TIMEOUT，默认 30m。项目默认值见 .codeguard/runtime.json 1.1；当前仅原生执行受截止时间约束。"
             );
@@ -81,6 +85,10 @@ fn main() -> ExitCode {
         [command, rest @ ..] if command == "tools" => codeguard_cli::tools_command::run(rest),
         [command, operation, rest @ ..] if command == "grammar" && operation == "status" => {
             codeguard_cli::grammar_status_command::run(rest)
+        }
+        #[cfg(feature = "wasm-precheck")]
+        [command, operation, rest @ ..] if command == "grammar" && operation == "probe" => {
+            codeguard_cli::grammar_probe_command::run(rest)
         }
         #[cfg(unix)]
         [command, rest @ ..] if command == "doctor" => codeguard_cli::doctor_command::run(rest),

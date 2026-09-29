@@ -1,0 +1,2 @@
+# 来源补丁保留原始字节与固定摘要，不自动调整上下文空白。
+grammars/*/source.patch -whitespace

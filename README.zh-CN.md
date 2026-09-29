@@ -94,11 +94,13 @@ cargo build --locked -p codeguard-cli
 
 版本输出包含 `cli_version`、`target` 和协议信息。发现与 init 预览返回观察及未知项。Dry-run 不创建 `AGENTS.md` 或项目数据目录。仅在依赖已缓存时为 Cargo 添加 `--offline`。
 
-工作区要求 `std`。可选 `wasm-precheck` 构建特性已有二十三份固定 grammar 候选资产与有界 Rust worker。Java 和 TypeScript/TSX 有局部单文件兜底；`lint python` 在 Ruff 不可用或项目未声明 Ruff 配置时可报告有界疑似语法位置，原生 Ruff 结果优先。公开 npm `0.1.2` 不含该路径。不声称 `no_std`、已完成项目级 WASM 兜底、零 unsafe 或性能最快。运行层系统调用需要安全审查，当前不宣称已完成整体安全审计。
+工作区要求 `std`。可选 `wasm-precheck` 构建特性已有三十二份固定 grammar 候选资产与有界 Rust worker。Java 和 TypeScript/TSX 有局部单文件兜底；`lint python` 在 Ruff 不可用或项目未声明 Ruff 配置时可报告有界疑似语法位置，原生 Ruff 结果优先。公开 npm `0.1.2` 不含该路径。不声称 `no_std`、已完成项目级 WASM 兜底、零 unsafe 或性能最快。运行层系统调用需要安全审查，当前不宣称已完成整体安全审计。
 
-当前源码构建的 CLI 可用 `codeguard grammar status --format=json` 只读展示来源覆盖缺口，不加载 grammar 或运行 lint：固定 CodeGraph 来源含 30 份随仓 WASM，另有两种独立 grammar 从其依赖取得；CodeGuard 当前有二十三份未验收资产候选、零项已发行语法能力。C、C++、C#、Go、JavaScript、Lua、Luau、Rust、ArkTS、Nix、Terraform、R、Ruby、PHP、Kotlin 等已固定字节并由 Rust worker 做窄范围验证，但没有公开 lint 路由或发行验收。Objective-C 与 Solidity 的依赖包原始字节、许可证和固定散列的 `dylink` 元数据转换已入库；Zig 的新版语法也有固定导入适配。CodeGraph 原 Dart WASM 无法由 Rust 直接加载；CodeGuard 现以固定源码和真实外部 scanner 经 Zig 重建，并固定适配前后字节，150 例上游语料错误分类与预期一致，但仍未做 Dart 原生工具对照或发布验收，见[Dart 重建局部验收](tests/acceptance/dart-grammar-rebuild-candidate.md)。Python 已有仅限源码可选构建的 CLI 候选兜底，结果保持不完整，不能批准交付。[覆盖库存](grammars/codegraph-coverage.json)不是已批准资产清单。COBOL 来源资产约 16.4 MB，还超过当前 Rust 加载器的 8 MiB 限额。
+当前源码构建的 CLI 可用 `codeguard grammar status --format=json` 只读展示来源覆盖缺口，不加载 grammar 或运行 lint：固定 CodeGraph 来源含 30 份随仓 WASM，另有两种独立 grammar 从其依赖取得；CodeGuard 当前有三十二份未验收资产候选、零项已发行语法能力。C、C++、C#、Go、JavaScript、Lua、Luau、Rust、ArkTS、Nix、Terraform、R、Ruby、PHP、Kotlin、Erlang、Pascal、CFML、CFQuery、CFScript、COBOL、Scala、Swift、VB.NET 等已固定字节并由 Rust worker 做窄范围验证，但没有公开 lint 路由或发行验收。Objective-C 与 Solidity 的依赖包原始字节、许可证和固定散列的 `dylink` 元数据转换已入库；Zig 的新版语法也有固定导入适配。CodeGraph 原 Dart WASM 无法由 Rust 直接加载；CodeGuard 现以固定源码和真实外部 scanner 经 Zig 重建，并固定适配前后字节，150 例上游语料错误分类与预期一致，但仍未做 Dart 原生工具对照或发布验收，见[Dart 重建局部验收](tests/acceptance/dart-grammar-rebuild-candidate.md)。Erlang 已固定 CodeGraph 字节、上游 0.19 许可证和 ABI 14，Rust/隔离 worker 窄范围样例通过，但原生对照与公开 lint 尚缺，见[Erlang 候选局部验收](tests/acceptance/erlang-grammar-candidate.md)。Pascal 已固定 CodeGraph 字节、原始 Isopod 依赖提交和许可证，ABI 14 及窄范围 worker 样例通过；原生对照和公开 lint 尚缺，见[Pascal 候选局部验收](tests/acceptance/pascal-grammar-candidate.md)。其余七份 CFML/CFQuery/CFScript/COBOL/Scala/Swift/VB.NET 来源 WASM 也已固定并由 Rust worker 加载，累计 32/32 份候选、0 项已发行。CFQuery 漏掉 `SELECT FROM`，VB.NET 对合法未缩进方法体误报，COBOL 成本高；都不能发布为 lint，见[七份局部验收](tests/acceptance/final-seven-grammar-candidates.md)。Python 已有仅限源码可选构建的 CLI 候选兜底，结果保持不完整，不能批准交付。[覆盖库存](grammars/codegraph-coverage.json)不是已批准资产清单。COBOL 的 16.4 MB 固定资产现可在 20 MiB 输入限额下加载，但冷启动和内存预算尚未验收。
 
 ### npm 安装与一次性调用
+
+源码以 `--features wasm-precheck` 构建后，可显式运行 `codeguard grammar probe <language> <file> --format=json`，由隔离 worker 调用 32 份固定候选中的任意一份。命令始终以退出码 3 返回，并标记 `precheck.status=incomplete`、`native.status=not_run`、`delivery_decision=not_evaluated`；恢复锚点只是疑似观察。此诊断入口尚未把全部语种接入原生优先的 `lint/check`，也尚未进入已发布 npm 包。
 
 已在 Apple Silicon macOS 上通过全新 npm 缓存验证公开 `0.1.2` 包：
 

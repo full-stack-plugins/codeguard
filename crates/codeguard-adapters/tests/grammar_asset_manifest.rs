@@ -13,6 +13,30 @@ fn selected_candidate_matches_full_manifest_without_promoting_unknown_language()
     }
     assert!(bundled_grammar_candidate("unknown").is_err());
 }
+
+#[test]
+fn erlang_source_asset_is_a_pinned_unqualified_candidate() {
+    let (asset, wasm) = bundled_grammar_candidate("erlang").expect("Erlang candidate");
+    assert_eq!(
+        asset.grammar_commit,
+        "836aa2b6c3af2c7cef3f84049b0ed6d44485a870"
+    );
+    assert_eq!(asset.abi_version, 14);
+    assert_eq!(asset.release_status, "candidate_unvalidated");
+    assert_eq!(wasm.len(), 421639);
+}
+
+#[test]
+fn pascal_source_asset_is_a_pinned_unqualified_candidate() {
+    let (asset, wasm) = bundled_grammar_candidate("pascal").expect("Pascal candidate");
+    assert_eq!(
+        asset.grammar_commit,
+        "042119eca2e18a60e56317fb06ee3ba5c32cb447"
+    );
+    assert_eq!(asset.abi_version, 14);
+    assert_eq!(asset.release_status, "candidate_unvalidated");
+    assert_eq!(wasm.len(), 716886);
+}
 use serde_json::Value;
 
 #[test]
@@ -63,7 +87,7 @@ fn published_schema_covers_every_current_candidate_and_field() {
 #[test]
 fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support() {
     let manifest = bundled_grammar_candidates().expect("bundled manifest");
-    assert_eq!(manifest.assets.len(), 23);
+    assert_eq!(manifest.assets.len(), 32);
     for asset in &manifest.assets {
         let (wasm, license) = match asset.language.as_str() {
             "arkts" => (
@@ -73,6 +97,22 @@ fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support(
             "c" => (
                 include_bytes!("../../../grammars/c/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/c/LICENSE").as_slice(),
+            ),
+            "cfml" => (
+                include_bytes!("../../../grammars/cfml/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/cfml/LICENSE").as_slice(),
+            ),
+            "cfquery" => (
+                include_bytes!("../../../grammars/cfquery/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/cfquery/LICENSE").as_slice(),
+            ),
+            "cfscript" => (
+                include_bytes!("../../../grammars/cfscript/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/cfscript/LICENSE").as_slice(),
+            ),
+            "cobol" => (
+                include_bytes!("../../../grammars/cobol/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/cobol/LICENSE").as_slice(),
             ),
             "cpp" => (
                 include_bytes!("../../../grammars/cpp/parser.wasm").as_slice(),
@@ -85,6 +125,26 @@ fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support(
             "dart" => (
                 include_bytes!("../../../grammars/dart/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/dart/LICENSE").as_slice(),
+            ),
+            "erlang" => (
+                include_bytes!("../../../grammars/erlang/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/erlang/LICENSE").as_slice(),
+            ),
+            "pascal" => (
+                include_bytes!("../../../grammars/pascal/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/pascal/LICENSE").as_slice(),
+            ),
+            "scala" => (
+                include_bytes!("../../../grammars/scala/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/scala/LICENSE").as_slice(),
+            ),
+            "swift" => (
+                include_bytes!("../../../grammars/swift/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/swift/LICENSE").as_slice(),
+            ),
+            "vbnet" => (
+                include_bytes!("../../../grammars/vbnet/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/vbnet/LICENSE").as_slice(),
             ),
             "go" => (
                 include_bytes!("../../../grammars/go/parser.wasm").as_slice(),

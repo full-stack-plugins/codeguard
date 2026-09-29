@@ -14,7 +14,9 @@
 
 可调用行为以当前源码为准，目标契约明确标注。产品优先级是配置发现 → 原生结果 → 有用的修复指引。内部一致性校验为这个体验服务，不要求用户手工构造执行证明。
 
-WASM 的规范与 19 项实施任务已纳入既有 change；可选特性下的 Rust worker 与 Java/TypeScript/TSX 局部单文件候选报告及 Python Ruff 不可用时的候选报告已存在；二十三份候选 grammar 均未验收；ArkTS、C、C++、C#、Go、JavaScript、Lua、Luau、Nix、Rust、Terraform、Zig、Objective-C、Solidity、R、Ruby、PHP、Kotlin、Dart 仅有固定字节的 Rust 可加载候选资产，尚无公开 lint 路由。项目级原生优先调度、grammar 版本范围验收与宿主接线仍未完成。设计示例不是当前命令输出。
+WASM 的规范与 19 项实施任务已纳入既有 change；可选特性下的 Rust worker 与 Java/TypeScript/TSX 局部单文件候选报告及 Python Ruff 不可用时的候选报告已存在；三十二份候选 grammar 均未验收；ArkTS、C、C++、C#、Go、JavaScript、Lua、Luau、Nix、Rust、Terraform、Zig、Objective-C、Solidity、R、Ruby、PHP、Kotlin、Dart、Erlang、Pascal、CFML、CFQuery、CFScript、COBOL、Scala、Swift、VB.NET 仅有固定字节的 Rust 可加载候选资产，尚无公开 lint 路由。项目级原生优先调度、grammar 版本范围验收与宿主接线仍未完成。设计示例不是当前命令输出。
+
+源码以 `--features wasm-precheck` 构建后，可通过 `codeguard grammar probe <language> <file> --format=json` 显式调用全部 32 份固定候选资产。命令使用隔离 Rust worker，以退出码 3 报告未经语言验收的观察，不能作为 lint 或交付结论。原生优先 `lint/check`、语言/方言验收、任务/宿主反馈及发行仍需独立完成。
 
 ## 2. 技术选型与权衡
 
@@ -191,9 +193,9 @@ flowchart LR
 
 只引入固定 WASM 字节及上游许可证、提交/补丁来源、SHA-256、ABI、已验证运行时和语言/方言范围、语料引用与已知缺口。逐个验证 CodeGraph 资产与选定 Rust Tree-sitter 运行时兼容，不能复制 TypeScript 提取逻辑或把 CodeGraph 支持等同语法验收。发行清单属于分发资产，不属于可写的 `.codeguard/` 项目状态。
 
-可用 `codeguard grammar status --format=json` 查询独立的来源覆盖库存。它只读报告 CodeGraph 32 种独立 grammar、CodeGuard 二十三份资产候选（ArkTS、C、C++、C#、Go、Java、JavaScript、Lua、Luau、Objective-C、Python、Rust、Solidity、TypeScript、TSX、Zig、Nix、Terraform、R、Ruby、PHP、Kotlin、Dart）和零项已发行能力，不运行解析器；Python 已有源码可选构建中的局部 `lint` 兜底，结果不能视为通过。已绑定工作区的单文件反馈使用 [0.15.0 协议](../schemas/python-lint-feedback-v0.15.schema.json)，并通过现有 work sync 保存 [0.1.0 确认观察](../schemas/python-syntax-confirmation-observation-v0.1.schema.json)。任务身份绑定工作区和源码范围；导入前核对当前源码 SHA-256 与固定 grammar。能力匹配的原生关闭仍未完成。C、C++、C#、Go、JavaScript、Lua、Luau、Rust 的随仓字节和上游许可证已固定，完成窄范围 Rust worker 解析验证，尚无公开 lint 路由或语言验收。ArkTS、Nix、Terraform 的来源、许可证、字节及 Rust 正反例也已固定，仅为候选，尚无公开 lint 路由或发行验收；见[局部验收](../tests/acceptance/arkts-nix-terraform-grammar-candidates.md)。依赖提供的 Objective-C 与 Solidity 已固定原始和适配后字节、许可证及依赖包完整性，但仍未验收语言版本或公开 lint 路由；COBOL 超过现有加载器的 8 MiB 限额。
+可用 `codeguard grammar status --format=json` 查询独立的来源覆盖库存。它只读报告 CodeGraph 32 种独立 grammar、CodeGuard 三十二份资产候选（ArkTS、C、C++、C#、Go、Java、JavaScript、Lua、Luau、Objective-C、Python、Rust、Solidity、TypeScript、TSX、Zig、Nix、Terraform、R、Ruby、PHP、Kotlin、Dart、Erlang、Pascal、CFML、CFQuery、CFScript、COBOL、Scala、Swift、VB.NET）和零项已发行能力，不运行解析器；Python 已有源码可选构建中的局部 `lint` 兜底，结果不能视为通过。已绑定工作区的单文件反馈使用 [0.15.0 协议](../schemas/python-lint-feedback-v0.15.schema.json)，并通过现有 work sync 保存 [0.1.0 确认观察](../schemas/python-syntax-confirmation-observation-v0.1.schema.json)。任务身份绑定工作区和源码范围；导入前核对当前源码 SHA-256 与固定 grammar。能力匹配的原生关闭仍未完成。C、C++、C#、Go、JavaScript、Lua、Luau、Rust 的随仓字节和上游许可证已固定，完成窄范围 Rust worker 解析验证，尚无公开 lint 路由或语言验收。ArkTS、Nix、Terraform 的来源、许可证、字节及 Rust 正反例也已固定，仅为候选，尚无公开 lint 路由或发行验收；见[局部验收](../tests/acceptance/arkts-nix-terraform-grammar-candidates.md)。依赖提供的 Objective-C 与 Solidity 已固定原始和适配后字节、许可证及依赖包完整性，但仍未验收语言版本或公开 lint 路由；COBOL 现可在 20 MiB 输入限额下加载，但冷启动与内存预算未验收。
 
-R、Ruby、PHP、Kotlin 也已固定 CodeGraph 字节、许可证和 Rust 实测 ABI，并通过隔离 worker 的窄范围正反例；PHP 样例覆盖 HTML/PHP 混合内容，仍仅为未验收候选。CodeGraph 原 Dart WASM 仍不能由 Rust 直接加载；CodeGuard 现以固定上游 C 源码和真实外部 scanner 经 Zig 可重复构建，再做固定 WASI 导入适配。Rust 加载与隔离 worker 的窄范围测试通过，但公开 lint 与发行仍未验收；见[Dart 重建局部验收](../tests/acceptance/dart-grammar-rebuild-candidate.md)。
+R、Ruby、PHP、Kotlin 也已固定 CodeGraph 字节、许可证和 Rust 实测 ABI，并通过隔离 worker 的窄范围正反例；PHP 样例覆盖 HTML/PHP 混合内容，仍仅为未验收候选。CodeGraph 原 Dart WASM 仍不能由 Rust 直接加载；CodeGuard 现以固定上游 C 源码和真实外部 scanner 经 Zig 可重复构建，再做固定 WASI 导入适配。Rust 加载与隔离 worker 的窄范围测试通过，但公开 lint 与发行仍未验收；见[Dart 重建局部验收](../tests/acceptance/dart-grammar-rebuild-candidate.md)。Erlang 也已固定 CodeGraph 字节、上游 0.19 许可证及 ABI 14，Rust 与隔离 worker 的窄范围样例通过；原生对照和公开 lint 路由尚缺，见[Erlang 候选局部验收](../tests/acceptance/erlang-grammar-candidate.md)。Pascal 已固定 CodeGraph 字节、原始 Isopod 依赖提交和许可证，ABI 14 及窄范围 worker 样例通过；原生对照和公开 lint 尚缺，见[Pascal 候选局部验收](../tests/acceptance/pascal-grammar-candidate.md)。其余七份 CFML/CFQuery/CFScript/COBOL/Scala/Swift/VB.NET 来源 WASM 也已固定并由 Rust worker 加载，累计 32/32 份候选、0 项已发行。CFQuery 漏掉 `SELECT FROM`，VB.NET 对合法未缩进方法体误报，COBOL 成本高；都不能发布为 lint，见[七份局部验收](../tests/acceptance/final-seven-grammar-candidates.md)。
 
 由父进程控制解析工作进程，设置总截止时间、单文件输入上限、内存/进程限制及诊断数量上限。按需加载 grammar，不提供通用网络/文件系统导入；终止卡住的进程时保留其它模块的原生结果。宿主约束执行和 Rust MSRV 兼容性须测试，生产数值预算须经测量后确定，不编造性能承诺。
 

@@ -1057,3 +1057,11 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 14.1 / 14.19 Dart 重建增量：固定 CodeGraph 来源提交所对应的 `UserNobody14/tree-sitter-dart@d4d8f3e337d8be23be27ffc35a0aef972343cd54`，将 `parser.c`、真实 `scanner.c`、头文件与 MIT 许可证逐字节和上游核对。Zig 0.16.0 离线重建生成原始 WASM，固定 SHA-256 与适配后 SHA-256；受控 Rust 适配只更改 import section 中同签名的 `__main_argc_argv` 名称，未修改 scanner 或语法表。重建脚本重复产出相同字节，Rust 加载实测 ABI 15、注释/字符串插值正反例和隔离 worker 候选观察通过。当前 23/32 份候选、9 份未入候选、发行验收仍为 0。`grammar status` 分别显示 CodeGraph 原资产与重建/适配候选摘要。尚缺 Dart SDK 原生对照、版本/方言语料、公开原生优先 `lint dart`、任务与对话反馈和发行包验收；14.1、14.19 不勾选。见[Dart 重建局部验收](../../../tests/acceptance/dart-grammar-rebuild-candidate.md)。
 
 14.4 / 14.19 Dart 语料与性能局部增量：固定上游 15 份 corpus 共 150 例（预期正常 146、预期错误 4），Rust WASM 的错误分类全部匹配。父进程按语言选择并验证目标资产，不再为单文件 worker 全量散列 23 份 WASM；13 项隔离 worker 测试在并行执行下通过。该语料仍来自同一 grammar 仓库，不是独立 Dart SDK oracle；性能只有单次回归观察，逐版本独立语料、原生对照及冷暖启动预算仍缺，14.4、14.17、14.19 均不勾选。
+
+14.1 / 14.4 / 14.19 Erlang 增量：固定 CodeGraph `1072f82ce24db3d133258d30165cef6b74d108b2` 中的 Erlang WASM 原始字节，并固定 WhatsApp `tree-sitter-erlang` 标签 `0.19` 对应的提交与许可证；Rust 离线加载实测 ABI 14，基本合法/非法语法与隔离 worker 候选状态通过。当前累计 24/32 份候选、8 份未入候选、0 项发行验收。尚未独立重建出与 CodeGraph 相同的 WASM、没有版本/方言语料、原生 Erlang 检查器对照、误报漏报评估、统一命令原生优先路由和发行包实装；14.1、14.4、14.17、14.19 不勾选。见[Erlang 局部验收](../../../tests/acceptance/erlang-grammar-candidate.md)。
+
+14.1 / 14.4 / 14.19 Pascal 增量：固定 CodeGraph 来源 WASM 字节与原项目锁定的 `Isopod/tree-sitter-pascal@042119eca2e18a60e56317fb06ee3ba5c32cb447` 许可证，Rust 离线加载实测 ABI 14，基本合法/非法程序和隔离 worker 候选状态通过。当前累计 25/32 份候选、7 份未入候选、0 项发行验收。缺逐版本 Delphi/FreePascal 语料、原生对照、误报漏报评估、统一命令原生优先路由、宿主反馈、资源预算与发行包实装；14.1、14.4、14.17、14.19 不勾选。见[Pascal 局部验收](../../../tests/acceptance/pascal-grammar-candidate.md)。
+
+14.1 / 14.2 / 14.4 / 14.19 全来源资产候选增量：CFML、CFQuery、CFScript、COBOL、Scala、Swift、VB.NET 七份 CodeGraph WASM 已固定来源字节、许可证、上游提交或发行包及适用补丁；Rust 离线加载和隔离 worker 的窄范围正反例通过。清单累计 32/32 份候选，已发行语法能力仍为 0。COBOL 通过受限 20 MiB 输入和固定 `COBOL` 导出名加载，但冷启动/内存成本高，固定/自由格式尚未验收；CFQuery 漏掉 `SELECT FROM`，VB.NET 对合法未缩进类方法体产生 `MISSING`，均不得发布为违规检测。CFML 嵌入语境、逐语言版本/方言语料、原生工具对照、公开原生优先 `lint/check`、任务/宿主反馈、资源预算和发行包验收仍缺；14.1–14.19 不因资产凑齐而勾选。见[七份局部验收](../../../tests/acceptance/final-seven-grammar-candidates.md)。
+
+14.4 / 14.7 候选诊断增量：源码构建的 `grammar probe <language> <file> --format=json` 明确调用固定资产与隔离 worker，保留摘要、恢复锚点和未完成状态；该手动诊断不是原生优先 `lint/check`、宿主自动触发或已发行支持。32 份候选已具备内部 worker 路径，仍需各语种正反语料、原生对照和统一路由验收，父任务不勾选。
