@@ -16,7 +16,7 @@ fn native_zig_diagnostic_takes_priority_over_wasm_candidate() {
     let tool = root.join("zig-tool");
     fs::write(
         &tool,
-        "#!/bin/sh\nif [ \"$1\" = version ]; then printf '0.16.0\\n'; exit 0; fi\nif [ \"$1\" = ast-check ]; then printf '<stdin>:1:23: error: expected closing brace\\n' >&2; exit 1; fi\nexit 2\n",
+        "#!/bin/sh\nif [ \"$1\" = version ]; then printf '0.16.0\\n'; exit 0; fi\nif [ \"$1\" = ast-check ]; then while IFS= read -r line; do :; done; printf '<stdin>:1:23: error: expected closing brace\\n' >&2; exit 1; fi\nexit 2\n",
     )
     .unwrap();
     fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
@@ -28,7 +28,10 @@ fn native_zig_diagnostic_takes_priority_over_wasm_candidate() {
         .unwrap();
     assert_eq!(output.status.code(), Some(3));
     let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
-    assert_eq!(report["native"]["status"], "diagnostics_observed");
+    assert_eq!(
+        report["native"]["status"], "diagnostics_observed",
+        "{report}"
+    );
     assert_eq!(report["native"]["diagnostic_count"], 1);
     assert_eq!(report["native"]["tool_sha256"].as_str().unwrap().len(), 64);
     assert_eq!(report["syntax_precheck"], serde_json::Value::Null);
@@ -75,7 +78,7 @@ fn clean_native_ast_check_does_not_claim_full_lint_or_run_wasm() {
     let tool = root.join("zig-tool");
     fs::write(
         &tool,
-        "#!/bin/sh\nif [ \"$1\" = version ]; then printf '0.16.0\\n'; exit 0; fi\nif [ \"$1\" = ast-check ]; then exit 0; fi\nexit 2\n",
+        "#!/bin/sh\nif [ \"$1\" = version ]; then printf '0.16.0\\n'; exit 0; fi\nif [ \"$1\" = ast-check ]; then while IFS= read -r line; do :; done; exit 0; fi\nexit 2\n",
     )
     .unwrap();
     fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
@@ -87,7 +90,7 @@ fn clean_native_ast_check_does_not_claim_full_lint_or_run_wasm() {
         .unwrap();
     assert_eq!(output.status.code(), Some(3));
     let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
-    assert_eq!(report["native"]["status"], "completed");
+    assert_eq!(report["native"]["status"], "completed", "{report}");
     assert_eq!(report["syntax_precheck"], serde_json::Value::Null);
     assert_eq!(report["status"], "incomplete");
     assert_eq!(report["coverage_proven"], false);
@@ -106,7 +109,7 @@ fn changed_zig_executable_cannot_authorize_native_completion() {
     let tool = root.join("zig-tool");
     fs::write(
         &tool,
-        "#!/bin/sh\nif [ \"$1\" = version ]; then printf '0.16.0\\n'; exit 0; fi\nif [ \"$1\" = ast-check ]; then printf '#changed\\n' >> \"$0\"; exit 0; fi\nexit 2\n",
+        "#!/bin/sh\nif [ \"$1\" = version ]; then printf '0.16.0\\n'; exit 0; fi\nif [ \"$1\" = ast-check ]; then while IFS= read -r line; do :; done; printf '#changed\\n' >> \"$0\"; exit 0; fi\nexit 2\n",
     )
     .unwrap();
     fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
