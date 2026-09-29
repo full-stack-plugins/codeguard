@@ -289,6 +289,130 @@ fn unresolved_node_updates_one_stable_environment_task_with_specific_guidance() 
 }
 
 #[test]
+fn ambiguous_or_untrusted_local_eslint_is_a_setup_blocker_not_wasm_source_finding() {
+    let project = Project::new();
+    let root = project.0.canonicalize().unwrap();
+    let source = root.join("bad.ts");
+    fs::write(&source, "const value: number = ;\n").unwrap();
+    fs::write(
+        root.join("package.json"),
+        r#"{"devDependencies":{"eslint":"10.0.0"}}"#,
+    )
+    .unwrap();
+    fs::create_dir_all(root.join("node_modules/eslint/bin")).unwrap();
+    fs::write(
+        root.join("node_modules/eslint/package.json"),
+        r#"{"name":"eslint","version":"10.0.0","bin":{"eslint":"bin/eslint.js"}}"#,
+    )
+    .unwrap();
+    let entry = root.join("node_modules/eslint/bin/eslint.js");
+    fs::write(&entry, "fixture\n").unwrap();
+    fs::write(root.join("eslint.config.js"), "export default [];\n").unwrap();
+    fs::write(root.join("eslint.config.mjs"), "export default [];\n").unwrap();
+    let initialized = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "init",
+            root.to_str().unwrap(),
+            "--apply",
+            "--format",
+            "json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(initialized.status.code(), Some(3));
+    let lint = || {
+        let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args([
+                "lint",
+                "typescript",
+                source.to_str().unwrap(),
+                "--workspace",
+                root.to_str().unwrap(),
+                "--format",
+                "json",
+            ])
+            .output()
+            .unwrap();
+        assert_eq!(output.status.code(), Some(3));
+        serde_json::from_slice::<Value>(&output.stdout).unwrap()
+    };
+    let ambiguous = lint();
+    assert_eq!(ambiguous["reason"], "eslint_config_selection_unresolved");
+    assert!(ambiguous.get("syntax_precheck").is_none());
+    assert!(ambiguous["findings"].as_array().unwrap().is_empty());
+    assert_eq!(
+        ambiguous["workbench_status"], "synced_partial",
+        "{ambiguous}"
+    );
+    assert_eq!(ambiguous["workbench"]["new_blockers"], 1);
+    assert!(
+        ambiguous["next_action"]
+            .as_str()
+            .unwrap()
+            .contains("flat config")
+    );
+    let task_id = ambiguous["workbench"]["next"]["repair_brief"]["task_id"].clone();
+
+    fs::remove_file(root.join("eslint.config.mjs")).unwrap();
+    fs::remove_file(&entry).unwrap();
+    std::os::unix::fs::symlink(root.join("eslint.config.js"), &entry).unwrap();
+    let untrusted = lint();
+    assert_eq!(untrusted["reason"], "eslint_local_entry_untrusted");
+    assert!(untrusted.get("syntax_precheck").is_none());
+    assert!(untrusted["findings"].as_array().unwrap().is_empty());
+    assert_eq!(
+        untrusted["workbench_status"], "synced_partial",
+        "{untrusted}"
+    );
+    assert_eq!(untrusted["workbench"]["new_blockers"], 0);
+    assert_eq!(
+        untrusted["workbench"]["next"]["repair_brief"]["task_id"],
+        task_id
+    );
+    assert!(
+        untrusted["next_action"]
+            .as_str()
+            .unwrap()
+            .contains("路径不可信")
+    );
+
+    fs::remove_file(&entry).unwrap();
+    fs::write(&entry, "fixture\n").unwrap();
+    fs::write(root.join("node_modules/eslint/package.json"), b"{bad-json").unwrap();
+    let invalid_identity = lint();
+    assert_eq!(
+        invalid_identity["reason"],
+        "eslint_local_package_identity_invalid"
+    );
+    assert!(invalid_identity.get("syntax_precheck").is_none());
+    assert_eq!(invalid_identity["workbench"]["new_blockers"], 0);
+    assert_eq!(
+        invalid_identity["workbench"]["next"]["repair_brief"]["task_id"],
+        task_id
+    );
+
+    fs::write(
+        root.join("package.json"),
+        r#"{"devDependencies":{"eslint":"9.0.0"}}"#,
+    )
+    .unwrap();
+    fs::write(
+        root.join("node_modules/eslint/package.json"),
+        r#"{"name":"eslint","version":"9.0.0","bin":{"eslint":"bin/eslint.js"}}"#,
+    )
+    .unwrap();
+    let unsupported = lint();
+    assert_eq!(unsupported["reason"], "eslint_adapter_version_unsupported");
+    assert!(unsupported.get("syntax_precheck").is_none());
+    assert!(
+        unsupported["next_action"]
+            .as_str()
+            .unwrap()
+            .contains("补齐适配器")
+    );
+}
+
+#[test]
 fn configured_but_uninstalled_eslint_still_allows_candidate_precheck() {
     let project = Project::new();
     fs::write(project.0.join("app.ts"), "const value: number = ;\n").unwrap();
