@@ -43,42 +43,37 @@ pub fn run(args: &[String]) -> ExitCode {
     }
     #[cfg(feature = "wasm-precheck")]
     if crate::typescript_syntax_precheck::eligible(&args) {
-        if let Some(candidate) =
-            crate::eslint_native_first_candidate::observed_candidate(&args.source)
-        {
-            let mut native_args = args.clone();
-            native_args.entry = Some(candidate.entry);
-            native_args.config = Some(candidate.config);
-            native_args.cwd = Some(candidate.root);
-            native_args.version = Some(candidate.version);
-            let report = if let Some(node) = crate::eslint_native_first_candidate::node_on_path() {
-                native_args.node = Some(node);
-                observe_with_preparation(&native_args, deadline)
-            } else {
-                observe_with_preparation_reason(
-                    &args,
-                    deadline,
-                    Some("eslint_node_runtime_unresolved"),
-                )
-            };
-            if args.json {
-                println!("{report}");
-            } else {
-                print_feedback(&report);
+        let report = match crate::eslint_native_first_candidate::observed_candidate(&args.source) {
+            Ok(Some(candidate)) => {
+                let mut native_args = args.clone();
+                native_args.entry = Some(candidate.entry);
+                native_args.config = Some(candidate.config);
+                native_args.cwd = Some(candidate.root);
+                native_args.version = Some(candidate.version);
+                if let Some(node) = crate::eslint_native_first_candidate::node_on_path() {
+                    native_args.node = Some(node);
+                    observe_with_preparation(&native_args, deadline)
+                } else {
+                    observe_with_preparation_reason(
+                        &args,
+                        deadline,
+                        Some("eslint_node_runtime_unresolved"),
+                    )
+                }
             }
-            return ExitCode::from(if report["reason"] == "request_cancelled" {
-                130
-            } else {
-                3
-            });
-        }
-        let report = crate::typescript_syntax_precheck::observe(&args, deadline);
+            Ok(None) => crate::typescript_syntax_precheck::observe(&args, deadline),
+            Err(reason) => observe_with_preparation_reason(&args, deadline, Some(reason)),
+        };
         if args.json {
             println!("{report}");
         } else {
             print_feedback(&report);
         }
-        return ExitCode::from(3);
+        return ExitCode::from(if report["reason"] == "request_cancelled" {
+            130
+        } else {
+            3
+        });
     }
     let report = observe_with_preparation(&args, deadline);
     if args.json {
@@ -102,12 +97,11 @@ fn observe_with_preparation_reason(
 ) -> Value {
     let mut report = observe(args, deadline);
     if report["reason"] == "eslint_execution_context_missing"
-        && missing_context_reason == Some("eslint_node_runtime_unresolved")
+        && missing_context_reason.is_some_and(crate::eslint_preparation::valid_reason)
     {
-        report["reason"] = json!("eslint_node_runtime_unresolved");
-        report["next_action"] = json!(
-            "项目本地 ESLint 候选与原配置已发现；当前未解析到 Node。核对项目运行时并提供受控 Node 路径后原生复检，不重复安装 ESLint 或修改无依据源码"
-        );
+        let reason = missing_context_reason.unwrap_or("eslint_execution_context_missing");
+        report["reason"] = json!(reason);
+        report["next_action"] = feedback(reason)["next_action"].clone();
     }
     // 早期上下文失败也进入环境待办；取消、外部目标或不支持范围不能制造源码任务。
     if let (Some(workspace), Some(reason)) = (
@@ -278,6 +272,14 @@ fn feedback(reason: &str) -> Value {
     json!({"schema_version":"0.2.0","report_type":"eslint_local_feedback","status":"incomplete","local_coherent":false,"coverage_proven":false,"delivery_decision":"not_evaluated","reason":reason,"findings":[],"suppressed_count":0,"workbench_status":"not_connected","workbench":null,"next_action":match reason {
         "eslint_execution_context_missing"=>"提供显式 Node、原 ESLint JS 入口、具体版本、原工作目录与项目原 flat config 后复检；不安装或替换规则",
         "eslint_node_runtime_unresolved"=>"项目本地 ESLint 候选已发现；提供受控 Node 路径后原生复检，不重复安装 ESLint 或修改无依据源码",
+        "eslint_project_manifest_untrusted"=>"核对项目 package.json 的文件类型、内容及 ESLint 声明后再选择原生检查；不要先改源码或重复安装",
+        "eslint_local_dependency_path_untrusted"=>"核对 node_modules 与本地 ESLint 包目录的链接、类型及来源；不能据此判定工具缺失",
+        "eslint_local_package_identity_invalid"=>"核对本地 ESLint package.json 的名称、版本和入口声明，恢复可信包身份后原生复检",
+        "eslint_local_entry_untrusted"=>"核对本地 ESLint JS 入口的真实类型与来源，不跟随链接执行；恢复后原生复检",
+        "eslint_local_version_unresolved"=>"核对项目 ESLint 声明与本地包版本，按原项目方案恢复一致后原生复检",
+        "eslint_adapter_version_unsupported"=>"项目 ESLint 版本不受当前适配器支持；保留原项目版本与检查义务，补齐适配器或提出具体决策，不修改无依据源码",
+        "eslint_config_selection_unresolved"=>"项目本地 ESLint 已发现，但 flat config 缺失或存在多份；确认原项目选中的配置后原生复检",
+        "eslint_config_untrusted"=>"项目本地 ESLint 已发现，但配置是链接、特殊文件或不可读；恢复原配置后原生复检",
         "eslint_scope_requires_explicit_file"=>"当前入口需显式单文件；项目目录与完整源集调度尚未接通，不将目录标为已检查",
         "request_cancelled"|"request_deadline_exceeded"=>"重新安排原工具检查预算；中断不要求修改源码",
         _=>"核对原配置、parser/插件与本轮规则；按原生发现修复后用同一入口和配置复检，抑制及未知覆盖需核查，任务不能自行关闭",

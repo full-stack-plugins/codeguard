@@ -143,6 +143,14 @@ pub(crate) fn valid_reason(reason: &str) -> bool {
         reason,
         "eslint_execution_context_missing"
             | "eslint_node_runtime_unresolved"
+            | "eslint_project_manifest_untrusted"
+            | "eslint_local_dependency_path_untrusted"
+            | "eslint_local_package_identity_invalid"
+            | "eslint_local_entry_untrusted"
+            | "eslint_local_version_unresolved"
+            | "eslint_adapter_version_unsupported"
+            | "eslint_config_selection_unresolved"
+            | "eslint_config_untrusted"
             | "eslint_input_unavailable"
             | "eslint_private_workspace_unavailable"
             | "request_deadline_exceeded"
@@ -293,10 +301,29 @@ pub(crate) fn guidance(root: &Path, fact: &Value) -> Value {
     {
         return fallback;
     }
-    let step = if report["diagnostic_reason"] == "eslint_node_runtime_unresolved" {
-        "项目本地 ESLint 候选与原配置已发现；核对并提供受控 Node 路径后执行原生复检，不重复安装 ESLint 或修改无依据源码"
-    } else {
-        "核对最新ESLint前置诊断、原配置、parser/插件和运行条件；解析或抑制先复现根因，恢复原检查后复扫，不修改无关源码"
+    let step = match report["diagnostic_reason"].as_str() {
+        Some("eslint_node_runtime_unresolved") => {
+            "项目本地 ESLint 候选与原配置已发现；核对并提供受控 Node 路径后执行原生复检，不重复安装 ESLint 或修改无依据源码"
+        }
+        Some("eslint_config_selection_unresolved" | "eslint_config_untrusted") => {
+            "项目本地 ESLint 已发现；核对原项目实际选中的 flat config、文件类型与来源，恢复配置后原生复检，不修改无依据源码"
+        }
+        Some("eslint_local_entry_untrusted" | "eslint_local_dependency_path_untrusted") => {
+            "项目本地 ESLint 路径不可信；核对链接、文件类型和来源后原生复检，不重复安装或修改无依据源码"
+        }
+        Some("eslint_adapter_version_unsupported") => {
+            "项目 ESLint 版本不受当前适配器支持；保留原项目版本与检查义务，补齐适配器或提出具体决策，不修改无依据源码"
+        }
+        Some(
+            "eslint_local_package_identity_invalid"
+            | "eslint_local_version_unresolved"
+            | "eslint_project_manifest_untrusted",
+        ) => {
+            "项目本地 ESLint 身份或版本声明无法核对；检查 package.json 与原依赖方案，恢复一致后原生复检，不修改无依据源码"
+        }
+        _ => {
+            "核对最新ESLint前置诊断、原配置、parser/插件和运行条件；解析或抑制先复现根因，恢复原检查后复扫，不修改无关源码"
+        }
     };
     json!({"disposition":"actionable","step":step,"diagnostic_reason":report["diagnostic_reason"],"run_id":run,"report_sha256":sha})
 }
