@@ -26,6 +26,7 @@ pub mod eslint_probe_request;
 pub mod eslint_probe_result;
 #[cfg(unix)]
 mod eslint_project_context;
+mod eslint_syntax_evidence;
 mod eslint_task_recheck;
 #[cfg(unix)]
 mod eslint_workbench;

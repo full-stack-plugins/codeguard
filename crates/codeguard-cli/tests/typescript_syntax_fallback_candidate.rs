@@ -159,6 +159,72 @@ fn initialized_wasm_precheck_keeps_one_native_confirmation_task() {
     assert_eq!(fact["kind"], "blocker");
     assert_eq!(fact["checker_id"], "node.eslint.preparation");
     assert_eq!(fact["state"], "open");
+    let stored: Value = fs::read_dir(root.join(".codeguard/reports"))
+        .unwrap()
+        .map(|entry| {
+            serde_json::from_slice::<Value>(&fs::read(entry.unwrap().path()).unwrap()).unwrap()
+        })
+        .find(|report| report["diagnostic_reason"] == "eslint_syntax_confirmation_needed")
+        .unwrap();
+    assert_eq!(stored["schema_version"], "0.2.0");
+    let stored_schema: Value = serde_json::from_str(include_str!(
+        "../../../schemas/eslint-preparation-observation-v0.2.schema.json"
+    ))
+    .unwrap();
+    assert_eq!(stored_schema["additionalProperties"], false);
+    assert_eq!(
+        stored
+            .as_object()
+            .unwrap()
+            .keys()
+            .map(String::as_str)
+            .collect::<std::collections::BTreeSet<_>>(),
+        stored_schema["required"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|value| value.as_str().unwrap())
+            .collect()
+    );
+    assert!(!stored.to_string().contains("const x"));
+    let task_text =
+        fs::read_to_string(root.join(".codeguard/tasks").join(format!("{task_id}.md"))).unwrap();
+    assert!(task_text.contains("syntax_evidence"));
+    assert!(task_text.contains(stored["run_id"].as_str().unwrap()));
+    assert_eq!(
+        stored["syntax_evidence"]["source_sha256"],
+        stored["source_sha256"]
+    );
+    assert_eq!(
+        stored["syntax_evidence"]["grammar_sha256"],
+        first["syntax_precheck"]["grammar_sha256"]
+    );
+    assert_eq!(
+        stored["syntax_evidence"]["observations"]
+            .as_array()
+            .unwrap()
+            .len(),
+        first["syntax_precheck"]["observations"]
+            .as_array()
+            .unwrap()
+            .len()
+    );
+    assert_eq!(
+        first["workbench"]["next"]["repair_brief"]["preparation_guidance"]["suspected_positions"]
+            [0]["start_line"],
+        first["syntax_precheck"]["observations"][0]["start_line"]
+    );
+    let next = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["next", root.to_str().unwrap(), "--format", "json"])
+        .output()
+        .unwrap();
+    assert_eq!(next.status.code(), Some(0));
+    let next: Value = serde_json::from_slice(&next.stdout).unwrap();
+    assert_eq!(next["repair_brief"]["task_id"], task_id);
+    assert_eq!(
+        next["repair_brief"]["preparation_guidance"]["suspected_positions"][0]["start_line"],
+        first["syntax_precheck"]["observations"][0]["start_line"]
+    );
     let second = lint();
     assert_eq!(second["setup"]["task_id"], task_id);
     assert_eq!(second["workbench"]["new_blockers"], 0);
@@ -237,6 +303,89 @@ fn initialized_workspace_keeps_precheck_failure_as_native_setup_task() {
             .unwrap()
             .contains("初检未完成")
     );
+}
+
+#[test]
+fn forged_syntax_task_evidence_cannot_be_imported_as_a_source_finding() {
+    let project = Project::new();
+    let root = project.0.canonicalize().unwrap();
+    let source = root.join("bad.ts");
+    fs::write(&source, "const x: number = ;\n").unwrap();
+    let init = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "init",
+            root.to_str().unwrap(),
+            "--apply",
+            "--format",
+            "json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(init.status.code(), Some(3));
+    let first = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "lint",
+            "typescript",
+            source.to_str().unwrap(),
+            "--workspace",
+            root.to_str().unwrap(),
+            "--format",
+            "json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(first.status.code(), Some(3));
+    let first: Value = serde_json::from_slice(&first.stdout).unwrap();
+    let task_id = first["setup"]["task_id"].as_str().unwrap();
+    let reports = root.join(".codeguard/reports");
+    let original: Value = serde_json::from_slice(
+        &fs::read(
+            fs::read_dir(&reports)
+                .unwrap()
+                .next()
+                .unwrap()
+                .unwrap()
+                .path(),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(original["schema_version"], "0.2.0");
+
+    let mut wrong_grammar = original.clone();
+    wrong_grammar["run_id"] = serde_json::json!("eslint-preparation-999-99999999999999999991");
+    wrong_grammar["syntax_evidence"]["grammar_sha256"] = serde_json::json!("0".repeat(64));
+    fs::write(
+        reports.join("eslint-preparation-999-99999999999999999991.json"),
+        serde_json::to_vec_pretty(&wrong_grammar).unwrap(),
+    )
+    .unwrap();
+    let mut wrong_position = original;
+    wrong_position["run_id"] = serde_json::json!("eslint-preparation-999-99999999999999999992");
+    wrong_position["syntax_evidence"]["observations"][0]["start_line"] = serde_json::json!(999999);
+    fs::write(
+        reports.join("eslint-preparation-999-99999999999999999992.json"),
+        serde_json::to_vec_pretty(&wrong_position).unwrap(),
+    )
+    .unwrap();
+    let sync = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["work", "sync", root.to_str().unwrap(), "--format", "json"])
+        .output()
+        .unwrap();
+    let summary: Value = serde_json::from_slice(&sync.stdout).unwrap();
+    assert_eq!(summary["failed_reports"], 2);
+    assert_eq!(summary["new_findings"], 0);
+    assert_eq!(summary["new_blockers"], 0);
+    let fact: Value = serde_json::from_slice(
+        &fs::read(
+            root.join(".codeguard/findings")
+                .join(task_id)
+                .join("finding.json"),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(fact["state"], "open");
 }
 
 #[test]
