@@ -125,7 +125,7 @@ fn observed_project_local_eslint_candidate_is_not_treated_as_missing_native_lint
         .unwrap();
     assert_eq!(output.status.code(), Some(3));
     let report: Value = serde_json::from_slice(&output.stdout).unwrap();
-    assert_eq!(report["reason"], "eslint_execution_context_missing");
+    assert_eq!(report["reason"], "eslint_node_runtime_unresolved");
     assert!(report.get("syntax_precheck").is_none());
     assert!(
         report["next_action"]
@@ -217,6 +217,75 @@ fn available_project_local_eslint_runs_before_wasm_and_preserves_native_finding(
     assert_eq!(mismatch["reason"], "eslint_version_mismatch");
     assert_eq!(mismatch["local_coherent"], false);
     assert!(mismatch.get("syntax_precheck").is_none());
+}
+
+#[test]
+fn unresolved_node_updates_one_stable_environment_task_with_specific_guidance() {
+    let project = Project::new();
+    let root = project.0.canonicalize().unwrap();
+    let source = root.join("app.ts");
+    fs::write(&source, "const value: number = 1;\n").unwrap();
+    fs::write(
+        root.join("package.json"),
+        r#"{"devDependencies":{"eslint":"10.0.0"}}"#,
+    )
+    .unwrap();
+    fs::write(root.join("eslint.config.cjs"), "module.exports = [];\n").unwrap();
+    fs::create_dir_all(root.join("node_modules/eslint/bin")).unwrap();
+    fs::write(
+        root.join("node_modules/eslint/package.json"),
+        r#"{"name":"eslint","version":"10.0.0","bin":{"eslint":"bin/eslint.js"}}"#,
+    )
+    .unwrap();
+    fs::write(root.join("node_modules/eslint/bin/eslint.js"), "fixture\n").unwrap();
+    let initialized = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "init",
+            root.to_str().unwrap(),
+            "--apply",
+            "--format",
+            "json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(initialized.status.code(), Some(3));
+
+    let mut task_id = None;
+    for round in 0..2 {
+        let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args([
+                "lint",
+                "typescript",
+                source.to_str().unwrap(),
+                "--workspace",
+                root.to_str().unwrap(),
+                "--format",
+                "json",
+            ])
+            .env("PATH", "")
+            .output()
+            .unwrap();
+        assert_eq!(output.status.code(), Some(3));
+        let report: Value = serde_json::from_slice(&output.stdout).unwrap();
+        assert_eq!(report["reason"], "eslint_node_runtime_unresolved");
+        assert_eq!(report["workbench_status"], "synced_partial", "{report}");
+        assert_eq!(report["workbench"]["new_blockers"], 1 - round);
+        assert!(report["next_action"].as_str().unwrap().contains("Node"));
+        assert!(
+            report["next_action"]
+                .as_str()
+                .unwrap()
+                .contains("不重复安装 ESLint")
+        );
+        let current = report["workbench"]["next"]["repair_brief"]["task_id"]
+            .as_str()
+            .unwrap()
+            .to_owned();
+        if let Some(previous) = &task_id {
+            assert_eq!(&current, previous);
+        }
+        task_id = Some(current);
+    }
 }
 
 #[test]
