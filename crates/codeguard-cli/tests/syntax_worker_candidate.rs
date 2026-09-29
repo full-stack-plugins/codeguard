@@ -195,6 +195,33 @@ fn arkts_nix_and_terraform_run_in_worker_without_claiming_clean() {
 }
 
 #[test]
+fn r_ruby_php_and_kotlin_run_in_worker_without_claiming_clean() {
+    for (language, path, source) in [
+        ("r", "analysis.R", b"x <- 1\n".as_slice()),
+        ("ruby", "app.rb", b"def f; 1; end\n".as_slice()),
+        (
+            "php",
+            "index.php",
+            b"<?php function f() { return 1; }".as_slice(),
+        ),
+        ("kotlin", "Main.kt", b"fun main() { val x = 1 }".as_slice()),
+    ] {
+        let result = run_syntax_worker_candidate(
+            env!("CARGO_BIN_EXE_codeguard").as_ref(),
+            language,
+            path,
+            source,
+            Instant::now() + Duration::from_secs(60),
+            &AtomicBool::new(false),
+        )
+        .expect("isolated grammar candidate");
+        assert!(result.recoveries.is_empty(), "{language}");
+        assert_eq!(result.precheck.status, SyntaxPrecheckStatus::Incomplete);
+        assert!(!result.grammar_qualified);
+    }
+}
+
+#[test]
 fn invalid_input_and_cancellation_cannot_yield_observations() {
     let exe = env!("CARGO_BIN_EXE_codeguard").as_ref();
     assert!(
