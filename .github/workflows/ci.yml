@@ -32,6 +32,7 @@ jobs:
       - name: Verify Linux WASM worker resource boundary
         run: |
           cargo test -p codeguard-runtime --features wasm-precheck --test process_contract
+          cargo test -p codeguard-runtime --features wasm-precheck --test wasm_grammar_load --test dart_upstream_corpus
           cargo test -p codeguard-cli --features wasm-precheck --test syntax_worker_candidate --test typescript_syntax_fallback_candidate --test java_syntax_fallback_candidate
 
       - name: Run test suite

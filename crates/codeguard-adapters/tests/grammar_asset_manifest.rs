@@ -1,6 +1,6 @@
 use codeguard_adapters::{
-    adapt_legacy_dylink, adapt_zig_wasm, bundled_grammar_candidate, bundled_grammar_candidates,
-    parse_grammar_asset_manifest, verify_grammar_asset,
+    adapt_dart_wasm, adapt_legacy_dylink, adapt_zig_wasm, bundled_grammar_candidate,
+    bundled_grammar_candidates, parse_grammar_asset_manifest, verify_grammar_asset,
 };
 
 #[test]
@@ -63,7 +63,7 @@ fn published_schema_covers_every_current_candidate_and_field() {
 #[test]
 fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support() {
     let manifest = bundled_grammar_candidates().expect("bundled manifest");
-    assert_eq!(manifest.assets.len(), 22);
+    assert_eq!(manifest.assets.len(), 23);
     for asset in &manifest.assets {
         let (wasm, license) = match asset.language.as_str() {
             "arkts" => (
@@ -81,6 +81,10 @@ fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support(
             "csharp" => (
                 include_bytes!("../../../grammars/csharp/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/csharp/LICENSE").as_slice(),
+            ),
+            "dart" => (
+                include_bytes!("../../../grammars/dart/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/dart/LICENSE").as_slice(),
             ),
             "go" => (
                 include_bytes!("../../../grammars/go/parser.wasm").as_slice(),
@@ -195,6 +199,16 @@ fn zig_import_adaptation_is_byte_pinned_and_rejects_changed_source() {
     let mut changed = source.to_vec();
     changed[200] ^= 1;
     assert!(adapt_zig_wasm(&changed).is_err());
+}
+
+#[test]
+fn dart_rebuild_import_adaptation_is_byte_pinned_and_rejects_changed_source() {
+    let source = include_bytes!("../../../grammars/dart/source.wasm");
+    let adapted = include_bytes!("../../../grammars/dart/parser.wasm");
+    assert_eq!(adapt_dart_wasm(source).unwrap(), adapted);
+    let mut changed = source.to_vec();
+    changed[200] ^= 1;
+    assert!(adapt_dart_wasm(&changed).is_err());
 }
 
 #[test]

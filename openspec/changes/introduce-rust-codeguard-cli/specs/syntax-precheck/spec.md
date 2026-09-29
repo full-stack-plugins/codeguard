@@ -75,6 +75,11 @@ CodeGuard MUST 提供只读的来源覆盖清单，区分 CodeGraph 随仓 WASM�
 - **WHEN** 当前 Zig grammar 能解析合法空容器，而原始 WASM 包含 Rust 运行时不支持的导入
 - **THEN** 仅在来源、适配产物及语法反例全部可验证时列为候选；未完成版本语料、原生优先命令和发行验收前仍不宣称 Zig lint 可用
 
+#### Scenario: A Dart source WASM cannot import its external scanner into the Rust worker
+
+- **WHEN** 固定的 CodeGraph Dart WASM 具有旧动态链接元数据和无法解析的外部 scanner 导入
+- **THEN** 只可从固定提交的 parser、真实 scanner、头文件和许可证可重复构建新 WASM；固定重建前后字节与限定的导入适配，验证 scanner 相关正反语料；未完成原生对照、路由及发行验收前只能列为候选，不能以空 scanner、旧 WASM 可加载假象或初检无恢复节点宣称通过
+
 #### Scenario: Every CodeGraph grammar is copied but only some are wired to lint
 
 - **WHEN** 32 份资产在来源清单或包内存在，但任一语种缺少真实解析、原生优先路由或可发行验收

@@ -4,7 +4,7 @@
   "source_commit": "1072f82ce24db3d133258d30165cef6b74d108b2",
   "codegraph_license": "LICENSE.codegraph",
   "codegraph_license_sha256": "e6d98f98c666bebe065ac2492a0a19232cc318d4d67bac3ca42ffb77bacc8809",
-  "build_tool": "tree-sitter-cli 0.25.10 build --wasm; Zig: tree-sitter-cli 0.27.0 generate --abi 15 + Zig 0.16.0 wasm32-wasi; ArkTS/Terraform: pinned npm prebuilt WASM",
+  "build_tool": "tree-sitter-cli 0.25.10 build --wasm; Zig: tree-sitter-cli 0.27.0 generate --abi 15 + Zig 0.16.0 wasm32-wasi; Dart: pinned parser.c/scanner.c + Zig 0.16.0 wasm32-wasi; ArkTS/Terraform: pinned npm prebuilt WASM",
   "assets": [
     {
       "language": "c",
@@ -365,6 +365,26 @@
       "codeguard_runtime_validation": "rust_loader_smoke_passed",
       "language_versions": [],
       "known_limitations": ["Rust loader and narrow fixtures passed; Terraform language versions, dialect corpus, native differential, isolation and release remain unqualified"],
+      "release_status": "candidate_unvalidated"
+    },
+    {
+      "language": "dart",
+      "dialect": "dart",
+      "grammar_repository": "https://github.com/UserNobody14/tree-sitter-dart",
+      "grammar_commit": "d4d8f3e337d8be23be27ffc35a0aef972343cd54",
+      "grammar_version": "master@d4d8f3e+zig-0.16.0-rebuild",
+      "path": "dart/parser.wasm",
+      "sha256": "7dad281b3b24924d619cb7059a42b409e7690ebeb8ebbc82882e68167656e012",
+      "bytes": 989323,
+      "source_wasm": "dart/source.wasm",
+      "source_sha256": "bbb37cc6aebca30188fab912bb2ae7201604d2b001a64ea6ef2c397674f81f5c",
+      "license": "dart/LICENSE",
+      "license_sha256": "d270cb3a4985d75033bd77d875ccebff1d66e32788a3f727891e28d76132dd46",
+      "abi_version": 15,
+      "codegraph_runtime": "web-tree-sitter 0.25.3",
+      "codeguard_runtime_validation": "rust_loader_smoke_passed",
+      "language_versions": [],
+      "known_limitations": ["Pinned Dart parser and real external scanner rebuilt with Zig and byte-pinned WASI import adaptation; only narrow syntax fixtures passed; native differential, language versions, host integration and release remain unqualified"],
       "release_status": "candidate_unvalidated"
     },
     {

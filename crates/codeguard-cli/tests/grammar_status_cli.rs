@@ -12,7 +12,7 @@ fn codegraph_coverage_is_explicit_and_never_claims_parser_or_gate_completion() {
     assert_eq!(report["report_type"], "grammar_coverage_inventory");
     assert_eq!(report["codegraph_grammar_count"], 32);
     assert_eq!(report["codegraph_vendored_count"], 30);
-    assert_eq!(report["candidate_count"], 22);
+    assert_eq!(report["candidate_count"], 23);
     assert_eq!(report["released_count"], 0);
     assert_eq!(report["authority"], "source_inventory_only");
     assert_eq!(report["parser_capability"], "unverified");
@@ -30,6 +30,7 @@ fn codegraph_coverage_is_explicit_and_never_claims_parser_or_gate_completion() {
         "c",
         "cpp",
         "csharp",
+        "dart",
         "go",
         "java",
         "javascript",
@@ -63,8 +64,20 @@ fn codegraph_coverage_is_explicit_and_never_claims_parser_or_gate_completion() {
     assert_eq!(cobol["gap"], "current_loader_size_limit");
     assert!(cobol["source_bytes"].as_u64().unwrap() > 8 * 1024 * 1024);
     let dart = assets.iter().find(|row| row["language"] == "dart").unwrap();
-    assert_eq!(dart["integration_status"], "not_integrated");
-    assert_eq!(dart["gap"], "rust_worker_external_scanner_import");
+    assert_eq!(dart["integration_status"], "candidate_unvalidated");
+    assert_eq!(dart["gap"], "language_qualification_and_release_pending");
+    assert_eq!(
+        dart["source_sha256"],
+        "7f5364e4256cf7e55efd01dd52421ef2663caa8061b82659b7e4bf61064545ec"
+    );
+    assert_eq!(
+        dart["candidate_input_sha256"],
+        "bbb37cc6aebca30188fab912bb2ae7201604d2b001a64ea6ef2c397674f81f5c"
+    );
+    assert_eq!(
+        dart["candidate_wasm_sha256"],
+        "7dad281b3b24924d619cb7059a42b409e7690ebeb8ebbc82882e68167656e012"
+    );
     let zig = assets.iter().find(|row| row["language"] == "zig").unwrap();
     assert_eq!(zig["gap"], "language_qualification_and_release_pending");
     for language in ["objc", "solidity"] {

@@ -2,7 +2,7 @@
 
 use crate::syntax_worker_candidate_observation::SyntaxWorkerCandidateObservation;
 use crate::syntax_worker_envelope::SyntaxWorkerEnvelope;
-use codeguard_adapters::bundled_grammar_candidates;
+use codeguard_adapters::bundled_grammar_candidate;
 use codeguard_core::{SyntaxFileObservation, SyntaxFileState, assess_syntax_precheck};
 #[cfg(not(target_os = "linux"))]
 use codeguard_runtime::run_process;
@@ -32,12 +32,8 @@ pub fn run_syntax_worker_candidate(
     }
     let source_text =
         std::str::from_utf8(source).map_err(|_| "syntax_worker_source_encoding_invalid")?;
-    let manifest = bundled_grammar_candidates()?;
-    let asset = manifest
-        .assets
-        .iter()
-        .find(|asset| asset.language == language)
-        .ok_or("syntax_worker_language_unsupported")?;
+    let (asset, _) = bundled_grammar_candidate(language)
+        .map_err(|reason| format!("syntax_worker_candidate_unavailable:{reason}"))?;
     let expected_sha = format!("{:x}", Sha256::digest(source));
     let spec = ProcessSpec {
         executable: executable.to_path_buf(),

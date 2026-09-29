@@ -25,6 +25,53 @@ const R: &[u8] = include_bytes!("../../../grammars/r/parser.wasm");
 const RUBY: &[u8] = include_bytes!("../../../grammars/ruby/parser.wasm");
 const PHP: &[u8] = include_bytes!("../../../grammars/php/parser.wasm");
 const KOTLIN: &[u8] = include_bytes!("../../../grammars/kotlin/parser.wasm");
+const DART: &[u8] = include_bytes!("../../../grammars/dart/parser.wasm");
+const DART_REBUILT_SOURCE: &[u8] = include_bytes!("../../../grammars/dart/source.wasm");
+
+#[test]
+fn rebuilt_dart_grammar_loads_with_real_scanner_and_rejects_broken_source() {
+    assert!(
+        WasmGrammar::load(
+            "dart",
+            DART_REBUILT_SOURCE,
+            "bbb37cc6aebca30188fab912bb2ae7201604d2b001a64ea6ef2c397674f81f5c",
+            15,
+        )
+        .is_err()
+    );
+    let mut grammar = WasmGrammar::load(
+        "dart",
+        DART,
+        "7dad281b3b24924d619cb7059a42b409e7690ebeb8ebbc82882e68167656e012",
+        15,
+    )
+    .expect("rebuilt Dart grammar with compiled scanner");
+    for source in [
+        "void main() { print('hi'); }",
+        "/// doc\nString greet(String name) => 'Hello $name';",
+        "/* block */\nvoid f() {}",
+        "String nested = 'hi ${1 + 2}';",
+    ] {
+        assert!(
+            !grammar
+                .parse(source.as_bytes())
+                .unwrap()
+                .root_node()
+                .has_error(),
+            "valid Dart: {source}"
+        );
+    }
+    for source in ["void main( {", "String x = 'unfinished", "/* unclosed"] {
+        assert!(
+            grammar
+                .parse(source.as_bytes())
+                .unwrap()
+                .root_node()
+                .has_error(),
+            "broken Dart: {source}"
+        );
+    }
+}
 
 #[test]
 fn fourth_batch_grammars_load_offline_and_parse_basic_fixtures() {
