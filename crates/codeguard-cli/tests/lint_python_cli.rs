@@ -393,7 +393,7 @@ fn initialized_lint_report_binds_the_existing_workspace_identity() {
             .unwrap();
     let (_, report) = run(&project, &["--ruff-tool", "/nonexistent/ruff"]);
     #[cfg(feature = "wasm-precheck")]
-    assert_eq!(report["schema_version"], "0.14.0");
+    assert_eq!(report["schema_version"], "0.15.0");
     #[cfg(not(feature = "wasm-precheck"))]
     assert_eq!(report["schema_version"], "0.13.0");
     assert_eq!(report["execution_budget"]["timeout_ms"], 1_800_000);

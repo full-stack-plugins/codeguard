@@ -25,6 +25,7 @@ mod eslint_report;
 mod npm_preparation_report;
 mod npm_report;
 mod python_cve_report;
+mod python_syntax_confirmation_report;
 mod rust_build_report;
 mod rust_cve_report;
 mod rustdoc_report;
@@ -456,6 +457,10 @@ fn import_one(
         codeguard_adapters::parse_unique_json(&bytes)
             .map_err(|_| "eslint_preparation_duplicate_or_invalid_json")?;
     }
+    if value["report_type"] == "python_syntax_confirmation_observation" {
+        codeguard_adapters::parse_unique_json(&bytes)
+            .map_err(|_| "python_syntax_confirmation_duplicate_or_invalid_json")?;
+    }
     // 已消费的历史报告按原字节收据确认，不用当前源码重演历史输入。
     if matches!(
         value["report_type"].as_str(),
@@ -470,6 +475,7 @@ fn import_one(
                 | "checkstyle_preparation_recheck"
                 | "rust_cve_workbench_observation"
                 | "python_cve_workbench_observation"
+                | "python_syntax_confirmation_observation"
         )
     ) {
         let run = value["run_id"]
@@ -552,6 +558,9 @@ fn parse_report(
     report: &Value,
     digest: String,
 ) -> Result<ReportInput, &'static str> {
+    if report["report_type"] == "python_syntax_confirmation_observation" {
+        return python_syntax_confirmation_report::parse(root, workspace_id, path, report, digest);
+    }
     if report["report_type"] == "python_cve_workbench_observation" {
         return python_cve_report::parse(root, workspace_id, path, report, digest);
     }
@@ -2148,6 +2157,13 @@ fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
         return format!(
             "# {} 环境/配置待处理\n\n- 阻塞证据：Cargo Clippy 本轮未完成；原因 `{}`；首次报告摘要 `{}`。\n- 规则依据：原生检查完整性要求；不是源码违规。\n- 允许范围：项目根；优先恢复 Cargo、Clippy、配置或稳定输入，不得关闭检查器。\n- 修复步骤：按原因准备原生工具并重跑检查；若工具版本或规则不适用，提交策略决策。\n- 复检 argv（项目根执行）：\n\n    {}\n\n- 历史尝试：尚无记录；首次 run `{}`。\n- 关闭条件：原检查器完成同范围复检；若产生发现，应继续处理。\n\n> 本地待处理记录，不是交付通过证明。\n",
             blocker.id, blocker.reason, report.digest, recheck, report.run_id
+        );
+    }
+    if blocker.checker_id == "python.ruff" && blocker.reason == "python_syntax_confirmation_needed"
+    {
+        return format!(
+            "# {} Python 语法原生确认任务\n\n- 问题证据：源码范围 `{}` 的候选 WASM 初检尚未验收；脱敏疑似位置、源码及 grammar 摘要在 `.codeguard/reports/{}.json`，报告 SHA-256 `{}`。疑似位置不是已确认源码违规。\n- 规则依据：Tree-sitter 恢复节点只提示待核实位置，须用适用的 Python 原生语法能力和项目原配置确认。\n- 允许范围：只核对本源码、对应构建根、原生工具及配置；不得凭候选观察修改无关源码或增加白名单。\n- 修复步骤：查看同 run 的位置，再恢复原生检查；若原生反证，保留证据并调查 grammar 误报。\n- 复检命令：codeguard task verify {} . --ruff-tool <已核验绝对路径> --format json。\n- 历史尝试：首次 run `{}`；后续候选观察归并到同一任务。\n- 关闭条件：当前输入、范围与语法能力匹配的原生复检和可信策略核验完成；安装工具、任务勾选或后续 WASM 零恢复节点都不能关闭。\n",
+            blocker.id, blocker.scope, report.run_id, report.digest, blocker.id, report.run_id
         );
     }
     let step = if blocker.reason == "project_ruff_config_not_found" {

@@ -153,6 +153,21 @@ pub fn run(args: &[String]) -> ExitCode {
                     "候选 Python grammar 版本尚未验收；确认项目要求的原生检查器及配置后复检，不把零恢复节点当作通过"
                 }.into(),
             );
+            if feedback["workspace_binding"] == "bound" {
+                let task = crate::python_syntax_confirmation::persist(&root, &precheck, deadline);
+                feedback["schema_version"] = Value::String("0.15.0".into());
+                match task {
+                    Ok(id) => {
+                        feedback["setup"]["task_id"] = Value::String(id);
+                        feedback["task_persistence"] =
+                            serde_json::json!({"status":"synced_partial","reason":null});
+                    }
+                    Err(reason) => {
+                        feedback["task_persistence"] =
+                            serde_json::json!({"status":"unavailable","reason":reason});
+                    }
+                }
+            }
             feedback["syntax_precheck"] = precheck;
         }
     }
@@ -806,6 +821,11 @@ fn print_human(feedback: &Value) {
                 .as_str()
                 .unwrap_or("复查原生检查条件")
         );
+        if let Some(id) = feedback["setup"]["task_id"].as_str() {
+            println!("原生确认任务：{id}");
+        } else if let Some(reason) = feedback["task_persistence"]["reason"].as_str() {
+            println!("确认任务未保存：{reason}");
+        }
     }
     println!("本命令尚无批准策略与完整义务，交付判定：not_evaluated");
 }
