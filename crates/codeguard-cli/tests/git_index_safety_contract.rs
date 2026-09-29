@@ -330,6 +330,39 @@ fn oversized_staged_blob_does_not_erase_a_verified_private_key_finding() {
 }
 
 #[test]
+fn later_corrupt_git_batch_keeps_earlier_oid_verified_objects_incomplete() {
+    use std::os::unix::fs::PermissionsExt;
+
+    let repo = Repo::new();
+    for index in 0..65 {
+        fs::write(
+            repo.0.join(format!("file-{index}.txt")),
+            format!("value {index}\n"),
+        )
+        .unwrap();
+    }
+    repo.git(&["add", "."]);
+    let marker = repo.0.join("first-batch-read");
+    let wrapper = repo.0.join("git-wrapper");
+    let script = format!(
+        "#!/bin/sh\nif [ \"$1\" = cat-file ] && [ \"$2\" = --batch ]; then\n  if [ -e '{}' ]; then printf 'corrupt\\n'; exit 0; fi\n  : > '{}'\nfi\nexec '{}' \"$@\"\n",
+        marker.display(),
+        marker.display(),
+        git_binary().display()
+    );
+    fs::write(&wrapper, script).unwrap();
+    fs::set_permissions(&wrapper, fs::Permissions::from_mode(0o700)).unwrap();
+
+    let observed = observe_index_safety(&repo.0, &wrapper, None).unwrap();
+    assert_eq!(observed.entries.len(), 65);
+    assert_eq!(observed.object_evidence.len(), 64);
+    assert_eq!(observed.unresolved_object_paths.len(), 1);
+    assert!(observed.object_verification_reason.is_some());
+    assert!(!observed.objects_verified);
+    assert!(observed.violations.is_empty());
+}
+
+#[test]
 fn public_gate_preview_reports_staged_violation_without_a_false_allow() {
     let repo = Repo::new();
     fs::write(repo.0.join(".env"), "TOKEN=fixture\n").unwrap();
