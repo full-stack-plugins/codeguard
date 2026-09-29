@@ -4,12 +4,13 @@ use serde::Deserialize;
 use sha2::{Digest, Sha256};
 use std::collections::BTreeSet;
 
-const CODEGRAPH_COMMIT: &str = "40f112453583a2304c4b605a3a9d6545919662bd";
+const CODEGRAPH_COMMIT: &str = "1072f82ce24db3d133258d30165cef6b74d108b2";
 const CODEGRAPH_LICENSE_SHA256: &str =
     "e6d98f98c666bebe065ac2492a0a19232cc318d4d67bac3ca42ffb77bacc8809";
 const JAVA_COMMIT: &str = "94703d5a6bed02b98e438d7cad1136c01a60ba2c";
 const TYPESCRIPT_COMMIT: &str = "f975a621f4e7f532fe322e13c4f79495e0a7b2e7";
 const PYTHON_COMMIT: &str = "bffb65a8cfe4e46290331dfef0dbf0ef3679de11";
+const ZIG_COMMIT: &str = "b670c8df85a1568f498aa5c8cae42f51a90473c0";
 
 /// 代码来源、许可和每份候选 grammar 的固定身份。
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
@@ -69,7 +70,7 @@ pub struct GrammarAsset {
     pub release_status: String,
 }
 
-/// 读取仓内固定清单，并检查 CodeGraph 许可证及四份资产的原始字节。
+/// 读取仓内固定清单，并检查 CodeGraph 许可证及五份资产的原始字节。
 pub fn bundled_grammar_candidates() -> Result<GrammarAssetManifest, String> {
     let manifest = parse_grammar_asset_manifest(include_bytes!("../../../grammars/manifest.json"))?;
     let codegraph_license = include_bytes!("../../../grammars/LICENSE.codegraph");
@@ -94,9 +95,18 @@ pub fn bundled_grammar_candidates() -> Result<GrammarAssetManifest, String> {
                 include_bytes!("../../../grammars/tsx/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/typescript/LICENSE").as_slice(),
             ),
+            "zig" => (
+                include_bytes!("../../../grammars/zig/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/zig/LICENSE").as_slice(),
+            ),
             _ => return Err("候选语言未知".into()),
         };
         verify_grammar_asset(asset, wasm, license)?;
+        if asset.language == "zig"
+            && crate::adapt_zig_wasm(include_bytes!("../../../grammars/zig/source.wasm"))? != wasm
+        {
+            return Err("Zig grammar 来源适配关系不符".into());
+        }
     }
     Ok(manifest)
 }
@@ -114,8 +124,9 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
         || manifest.source_commit != CODEGRAPH_COMMIT
         || manifest.codegraph_license != "LICENSE.codegraph"
         || manifest.codegraph_license_sha256 != CODEGRAPH_LICENSE_SHA256
-        || manifest.build_tool != "tree-sitter-cli 0.25.10 build --wasm"
-        || manifest.assets.len() != 4
+        || manifest.build_tool
+            != "tree-sitter-cli 0.25.10 build --wasm; Zig: tree-sitter-cli 0.27.0 generate --abi 15 + Zig 0.16.0 wasm32-wasi"
+        || manifest.assets.len() != 5
     {
         return Err("grammar 清单版本、来源或资产数量不符".into());
     }
@@ -124,7 +135,7 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
         .iter()
         .map(|asset| asset.language.as_str())
         .collect();
-    if languages != BTreeSet::from(["java", "python", "typescript", "tsx"]) {
+    if languages != BTreeSet::from(["java", "python", "typescript", "tsx", "zig"]) {
         return Err("grammar 语言资产缺失或重复".into());
     }
     for asset in &manifest.assets {
@@ -170,6 +181,16 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
                     "typescript/LICENSE",
                     "49bf33cf78ef5897e4e161ce1517df7de1ae5042a65b6bcfd44401e0fc606559",
                 ),
+                "zig" => (
+                    "https://github.com/tree-sitter-grammars/tree-sitter-zig",
+                    ZIG_COMMIT,
+                    "1.1.2+codegraph-empty-containers-patch",
+                    "zig/parser.wasm",
+                    "e8a3aa89cc07b59188122e6c1e0a812ca58cf85c9e191dcf2663a30b6b3b99e3",
+                    705328,
+                    "zig/LICENSE",
+                    "0eea8dc45e89deeb03c7799bbbc7b4688f365fb274562f4540ecfebdea82e727",
+                ),
                 _ => return Err("grammar 语言未知".into()),
             };
         if asset.dialect != asset.language
@@ -181,7 +202,7 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
             || asset.bytes != wasm_bytes
             || asset.license != license_path
             || asset.license_sha256 != license_sha
-            || asset.abi_version != 14
+            || asset.abi_version != if asset.language == "zig" { 15 } else { 14 }
             || asset.codegraph_runtime != "web-tree-sitter 0.25.3"
             || asset.codeguard_runtime_validation != "rust_loader_smoke_passed"
             || !asset.language_versions.is_empty()

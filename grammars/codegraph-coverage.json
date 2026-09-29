@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "source_repository": "https://github.com/partme-ai/codegraph",
-  "source_commit": "40f112453583a2304c4b605a3a9d6545919662bd",
+  "source_commit": "1072f82ce24db3d133258d30165cef6b74d108b2",
   "scope": "CodeGraph grammar file map excluding the jsx alias of javascript",
   "note": "Coverage inventory only; not an approved grammar manifest or a parser capability claim.",
   "assets": [
@@ -226,8 +226,8 @@
       "language": "zig",
       "provider": "codegraph_vendored",
       "source_path": "src/extraction/wasm/tree-sitter-zig.wasm",
-      "sha256": "512184b21b9d234b9462f0afaeb6932d508ce7b21ca5247ee47e04ba191fa807",
-      "bytes": 693809
+      "sha256": "95d8eef504bde9cca06b7950d6a8ae177ce318d16080deac96f653b29c629f98",
+      "bytes": 705336
     }
   ]
 }

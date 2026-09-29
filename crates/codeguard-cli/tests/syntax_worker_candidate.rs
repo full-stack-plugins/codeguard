@@ -54,6 +54,22 @@ fn clean_candidate_cannot_be_promoted_to_clean() {
 }
 
 #[test]
+fn adapted_zig_asset_preserves_candidate_status_and_empty_container_syntax() {
+    let result = run_syntax_worker_candidate(
+        env!("CARGO_BIN_EXE_codeguard").as_ref(),
+        "zig",
+        "src/main.zig",
+        b"const Empty = struct {};\n",
+        deadline(),
+        &AtomicBool::new(false),
+    )
+    .expect("isolated Zig candidate");
+    assert!(result.recoveries.is_empty());
+    assert_eq!(result.precheck.status, SyntaxPrecheckStatus::Incomplete);
+    assert!(!result.grammar_qualified);
+}
+
+#[test]
 fn invalid_input_and_cancellation_cannot_yield_observations() {
     let exe = env!("CARGO_BIN_EXE_codeguard").as_ref();
     assert!(

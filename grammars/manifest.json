@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0.0",
   "source_repository": "https://github.com/partme-ai/codegraph",
-  "source_commit": "40f112453583a2304c4b605a3a9d6545919662bd",
+  "source_commit": "1072f82ce24db3d133258d30165cef6b74d108b2",
   "codegraph_license": "LICENSE.codegraph",
   "codegraph_license_sha256": "e6d98f98c666bebe065ac2492a0a19232cc318d4d67bac3ca42ffb77bacc8809",
-  "build_tool": "tree-sitter-cli 0.25.10 build --wasm",
+  "build_tool": "tree-sitter-cli 0.25.10 build --wasm; Zig: tree-sitter-cli 0.27.0 generate --abi 15 + Zig 0.16.0 wasm32-wasi",
   "assets": [
     {
       "language": "java",
@@ -21,7 +21,9 @@
       "codegraph_runtime": "web-tree-sitter 0.25.3",
       "codeguard_runtime_validation": "rust_loader_smoke_passed",
       "language_versions": [],
-      "known_limitations": ["Rust loader smoke passed; MSRV build, dialect versions, isolation and syntax corpus are not yet validated"],
+      "known_limitations": [
+        "Rust loader smoke passed; MSRV build, dialect versions, isolation and syntax corpus are not yet validated"
+      ],
       "release_status": "candidate_unvalidated"
     },
     {
@@ -39,7 +41,9 @@
       "codegraph_runtime": "web-tree-sitter 0.25.3",
       "codeguard_runtime_validation": "rust_loader_smoke_passed",
       "language_versions": [],
-      "known_limitations": ["Rust loader smoke passed; MSRV build, dialect versions, isolation and syntax corpus are not yet validated"],
+      "known_limitations": [
+        "Rust loader smoke passed; MSRV build, dialect versions, isolation and syntax corpus are not yet validated"
+      ],
       "release_status": "candidate_unvalidated"
     },
     {
@@ -57,7 +61,9 @@
       "codegraph_runtime": "web-tree-sitter 0.25.3",
       "codeguard_runtime_validation": "rust_loader_smoke_passed",
       "language_versions": [],
-      "known_limitations": ["Rust loader smoke passed; Python language versions, dialects, isolation and syntax corpus are not yet validated"],
+      "known_limitations": [
+        "Rust loader smoke passed; Python language versions, dialects, isolation and syntax corpus are not yet validated"
+      ],
       "release_status": "candidate_unvalidated"
     },
     {
@@ -75,7 +81,29 @@
       "codegraph_runtime": "web-tree-sitter 0.25.3",
       "codeguard_runtime_validation": "rust_loader_smoke_passed",
       "language_versions": [],
-      "known_limitations": ["Rust loader smoke passed; TSX language versions, JSX dialects, isolation and syntax corpus are not yet validated"],
+      "known_limitations": [
+        "Rust loader smoke passed; TSX language versions, JSX dialects, isolation and syntax corpus are not yet validated"
+      ],
+      "release_status": "candidate_unvalidated"
+    },
+    {
+      "language": "zig",
+      "dialect": "zig",
+      "grammar_repository": "https://github.com/tree-sitter-grammars/tree-sitter-zig",
+      "grammar_commit": "b670c8df85a1568f498aa5c8cae42f51a90473c0",
+      "grammar_version": "1.1.2+codegraph-empty-containers-patch",
+      "path": "zig/parser.wasm",
+      "sha256": "e8a3aa89cc07b59188122e6c1e0a812ca58cf85c9e191dcf2663a30b6b3b99e3",
+      "bytes": 705328,
+      "license": "zig/LICENSE",
+      "license_sha256": "0eea8dc45e89deeb03c7799bbbc7b4688f365fb274562f4540ecfebdea82e727",
+      "abi_version": 15,
+      "codegraph_runtime": "web-tree-sitter 0.25.3",
+      "codeguard_runtime_validation": "rust_loader_smoke_passed",
+      "language_versions": [],
+      "known_limitations": [
+        "Rust loader smoke passed with byte-pinned import adaptation; Zig versions, corpus differential, resource isolation and release are not yet qualified"
+      ],
       "release_status": "candidate_unvalidated"
     }
   ]

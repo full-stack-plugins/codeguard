@@ -1,11 +1,11 @@
 use codeguard_adapters::{
-    bundled_grammar_candidates, parse_grammar_asset_manifest, verify_grammar_asset,
+    adapt_zig_wasm, bundled_grammar_candidates, parse_grammar_asset_manifest, verify_grammar_asset,
 };
 
 #[test]
 fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support() {
     let manifest = bundled_grammar_candidates().expect("bundled manifest");
-    assert_eq!(manifest.assets.len(), 4);
+    assert_eq!(manifest.assets.len(), 5);
     for asset in &manifest.assets {
         let (wasm, license) = match asset.language.as_str() {
             "java" => (
@@ -24,6 +24,10 @@ fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support(
                 include_bytes!("../../../grammars/tsx/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/typescript/LICENSE").as_slice(),
             ),
+            "zig" => (
+                include_bytes!("../../../grammars/zig/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/zig/LICENSE").as_slice(),
+            ),
             other => panic!("unexpected language {other}"),
         };
         verify_grammar_asset(asset, wasm, license).expect("pinned candidate bytes");
@@ -37,6 +41,16 @@ fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support(
 }
 
 #[test]
+fn zig_import_adaptation_is_byte_pinned_and_rejects_changed_source() {
+    let source = include_bytes!("../../../grammars/zig/source.wasm");
+    let adapted = include_bytes!("../../../grammars/zig/parser.wasm");
+    assert_eq!(adapt_zig_wasm(source).unwrap(), adapted);
+    let mut changed = source.to_vec();
+    changed[200] ^= 1;
+    assert!(adapt_zig_wasm(&changed).is_err());
+}
+
+#[test]
 fn missing_provenance_duplicate_fields_and_unknown_languages_are_rejected() {
     let original = include_str!("../../../grammars/manifest.json");
     let missing = original.replacen("94703d5a6bed02b98e438d7cad1136c01a60ba2c", "", 1);
@@ -47,7 +61,7 @@ fn missing_provenance_duplicate_fields_and_unknown_languages_are_rejected() {
         1,
     );
     assert!(parse_grammar_asset_manifest(duplicate.as_bytes()).is_err());
-    let unknown = original.replacen("\"language\": \"java\"", "\"language\": \"zig\"", 1);
+    let unknown = original.replacen("\"language\": \"java\"", "\"language\": \"unknown\"", 1);
     assert!(parse_grammar_asset_manifest(unknown.as_bytes()).is_err());
 }
 

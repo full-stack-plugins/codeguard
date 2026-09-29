@@ -122,7 +122,14 @@ fn lint_then_cve_pending_reports_both_import_despite_a_bad_report() {
     let (_, sync) = project.call(&["work", "sync", root, "--format=json"]);
     assert!(sync["imported_reports"].as_u64().unwrap() >= 2, "{sync}");
     assert_eq!(sync["failed_reports"], 1);
-    assert_eq!(project.facts("python.ruff"), 1);
+    assert_eq!(
+        project.facts("python.ruff"),
+        if cfg!(feature = "wasm-precheck") {
+            2
+        } else {
+            1
+        }
+    );
     assert_eq!(project.facts("java.maven.dependency_check"), 1);
     assert!(consumed.join(format!("{lint_run}.json")).is_file());
     assert!(consumed.join(format!("{cve_run}.json")).is_file());
@@ -147,7 +154,14 @@ fn lint_then_cve_pending_reports_both_import_despite_a_bad_report() {
     let (_, repeated) = project.call(&["work", "sync", root, "--format=json"]);
     assert_eq!(repeated["new_blockers"], 0);
     assert_eq!(repeated["failed_reports"], 1);
-    assert_eq!(project.facts("python.ruff"), 1);
+    assert_eq!(
+        project.facts("python.ruff"),
+        if cfg!(feature = "wasm-precheck") {
+            2
+        } else {
+            1
+        }
+    );
     assert_eq!(project.facts("java.maven.dependency_check"), 1);
     let events_before_retry = project.event_count();
     fs::remove_file(consumed.join(format!("{lint_run}.json"))).unwrap();

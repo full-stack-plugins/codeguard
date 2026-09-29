@@ -6,6 +6,8 @@ const JAVA: &[u8] = include_bytes!("../../../grammars/java/parser.wasm");
 const PYTHON: &[u8] = include_bytes!("../../../grammars/python/parser.wasm");
 const TYPESCRIPT: &[u8] = include_bytes!("../../../grammars/typescript/parser.wasm");
 const TSX: &[u8] = include_bytes!("../../../grammars/tsx/parser.wasm");
+const ZIG: &[u8] = include_bytes!("../../../grammars/zig/parser.wasm");
+const ZIG_SOURCE: &[u8] = include_bytes!("../../../grammars/zig/source.wasm");
 
 #[test]
 fn pinned_grammars_load_offline_and_parse_valid_sources() {
@@ -90,10 +92,46 @@ fn pinned_grammars_load_offline_and_parse_valid_sources() {
             .root_node()
             .has_error()
     );
+
+    let mut zig = WasmGrammar::load(
+        "zig",
+        ZIG,
+        "e8a3aa89cc07b59188122e6c1e0a812ca58cf85c9e191dcf2663a30b6b3b99e3",
+        15,
+    )
+    .expect("patched Zig should load");
+    assert_eq!(zig.abi_version(), 15);
+    assert!(
+        !zig.parse(b"const S = struct {};\n")
+            .unwrap()
+            .root_node()
+            .has_error()
+    );
+    assert!(
+        !zig.parse(b"const S = struct {};\nconst E = enum {};\nconst U = union(enum) {};\nconst O = opaque {};\n")
+            .unwrap()
+            .root_node()
+            .has_error()
+    );
+    assert!(
+        zig.parse(b"const S = struct {\n")
+            .unwrap()
+            .root_node()
+            .has_error()
+    );
 }
 
 #[test]
 fn invalid_bytes_hash_and_abi_are_not_accepted() {
+    let original_zig = WasmGrammar::load(
+        "zig",
+        ZIG_SOURCE,
+        "95d8eef504bde9cca06b7950d6a8ae177ce318d16080deac96f653b29c629f98",
+        15,
+    )
+    .err()
+    .expect("原始 Zig WASM 与 Rust WasmStore 不兼容");
+    assert!(original_zig.contains("__main_argc_argv"));
     assert!(WasmGrammar::load("java\0unsafe", JAVA, "0", 14).is_err());
     assert!(WasmGrammar::load("java", b"broken", "0", 14).is_err());
     let empty_module = b"\0asm\x01\0\0\0";
