@@ -28,7 +28,7 @@ The existing [OpenSpec change](../openspec/changes/introduce-rust-codeguard-cli/
 | [Core aggregation](../crates/codeguard-core/src/aggregate.rs), [delivery gate](../crates/codeguard-core/src/delivery_gate.rs) | Pure result semantics, not trusted public gate availability |
 | [Acceptance records](../tests/acceptance) | Scoped observations, test method, and residual gaps |
 
-WASM requirements and 18 implementation tasks are recorded in the existing change. An opt-in Rust worker and narrow Java/TypeScript/TSX single-file feedback paths now exist; Python is an additional pinned, Rust-loadable asset candidate without CLI fallback. Project-wide native-first routing, qualified grammar ranges, capability-matched task closure, and host integrations remain incomplete; design examples are not current command output.
+WASM requirements and 18 implementation tasks are recorded in the existing change. An opt-in Rust worker and narrow Java/TypeScript/TSX single-file feedback paths and a Python Ruff-unavailable candidate path now exist. All four grammars remain unqualified. Project-wide native-first routing, qualified grammar ranges, capability-matched task closure, and host integrations remain incomplete; design examples are not current command output.
 
 ## 2. Architectural drivers
 
@@ -241,7 +241,7 @@ A completed native violation never selects fallback to obtain a clean result. A 
 
 Reuse pinned CodeGraph grammar WASM artifacts and applicable upstream licenses, source references, patches and corpus cases. Do not copy CodeGraph's graph extraction or source-blanking heuristics into a syntax verdict. CodeGraph's `src/extraction/grammars.ts` loads language artifacts through `web-tree-sitter`; successful loading there does not prove compatibility with Codeguard's Rust runtime. The local source review on 2026-09-28 found modified grammar artifacts and about 65 MB of grammar files, so a live directory is not a release input.
 
-The read-only `codeguard grammar status` command now projects a [pinned CodeGraph coverage inventory](../grammars/codegraph-coverage.json): 30 vendored WASM files and two dependency-provided grammars, with Java, Python, TypeScript and TSX as CodeGuard asset candidates and none qualified for release. Python has no CLI fallback route. This inventory is deliberately separate from the pinned [candidate asset manifest](../grammars/manifest.json). In particular, the COBOL source file exceeds the current loader's 8 MiB input limit. Inventory rows never trigger loading or count as supported parser capability.
+The read-only `codeguard grammar status` command now projects a [pinned CodeGraph coverage inventory](../grammars/codegraph-coverage.json): 30 vendored WASM files and two dependency-provided grammars, with Java, Python, TypeScript and TSX as CodeGuard asset candidates and none qualified for release. Python has a narrow source-build-only fallback for unavailable or undeclared Ruff, with native results taking priority and no delivery approval. This inventory is deliberately separate from the pinned [candidate asset manifest](../grammars/manifest.json). In particular, the COBOL source file exceeds the current loader's 8 MiB input limit. Inventory rows never trigger loading or count as supported parser capability.
 
 ```text
 grammars/                         # proposed release assets, not project state

@@ -66,7 +66,7 @@ pub(crate) fn prepare(
         "affected_paths":[relative],"source_sha256":format!("{:x}",Sha256::digest(bytes))}),
     )
 }
-#[cfg(unix)]
+#[cfg(all(unix, feature = "wasm-precheck"))]
 pub(crate) fn prepare_with_syntax(
     root: &Path,
     args: &EslintLintArguments,

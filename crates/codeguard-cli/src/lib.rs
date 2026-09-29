@@ -148,6 +148,8 @@ pub(crate) mod python_cve_task_recheck;
 pub mod python_lint_command;
 #[cfg(unix)]
 pub mod python_lint_scan;
+#[cfg(all(unix, feature = "wasm-precheck"))]
+mod python_syntax_precheck;
 pub mod quality_policy_candidate;
 #[cfg(unix)]
 mod report_export;

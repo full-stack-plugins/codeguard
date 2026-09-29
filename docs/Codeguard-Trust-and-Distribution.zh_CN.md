@@ -71,7 +71,7 @@ Git 联合入口现进一步核对每跳已签名基线的原生祖先关系（�
 
 npm 已发布 macOS arm64 0.1.0；Node 只转发到打包的 Rust 二进制，无检测或解析逻辑，无安装生命周期脚本。默认本地 private 打包与显式 public 模式分开。当前缺不可变源码/tag 绑定，多平台支持不能由打包器分支或交叉编译推断。使用方式归 [README](../README.zh-CN.md#npm-安装与一次性调用)。
 
-目前已有[候选资产清单](../grammars/manifest.json)及固定提交的 Java、Python、TypeScript、TSX WASM，保留 CodeGraph 和上游 MIT 许可证；[Rust 校验器](../crates/codeguard-adapters/src/grammar_asset_manifest.rs)核对来源字段和原始字节。四份资产的 Rust 离线加载及基本解析测试已通过；语言版本、方言、完整语料、完整调度和 MSRV 实编仍未验收，所以资产仍标记为 `candidate_unvalidated`。详见[局部验收](../tests/acceptance/grammar-asset-candidates.md)、[Python 资产验收](../tests/acceptance/python-grammar-asset-candidate.md)和 [TSX 纠错验收](../tests/acceptance/tsx-grammar-candidate.md)。可选源码构建仅有 Java/TypeScript/TSX 的局部单文件兜底，Python 尚无 CLI 路由；公开 npm 包仍不含这些字节或检查路径。
+目前已有[候选资产清单](../grammars/manifest.json)及固定提交的 Java、Python、TypeScript、TSX WASM，保留 CodeGraph 和上游 MIT 许可证；[Rust 校验器](../crates/codeguard-adapters/src/grammar_asset_manifest.rs)核对来源字段和原始字节。四份资产的 Rust 离线加载及基本解析测试已通过；语言版本、方言、完整语料、完整调度和 MSRV 实编仍未验收，所以资产仍标记为 `candidate_unvalidated`。详见[局部验收](../tests/acceptance/grammar-asset-candidates.md)、[Python 资产验收](../tests/acceptance/python-grammar-asset-candidate.md)和 [TSX 纠错验收](../tests/acceptance/tsx-grammar-candidate.md)。可选源码构建已有 Java/TypeScript/TSX 的局部单文件兜底及 Python Ruff 不可用/未声明配置时的候选路径；公开 npm 包仍不含这些字节或检查路径。
 
 CodeGraph 使用 JavaScript `web-tree-sitter` 加载 grammar WASM，初始 ABI 观察也沿用该加载器。CodeGuard 的 Rust [WasmGrammar](../crates/codeguard-runtime/src/wasm_grammar.rs) 已使用 Tree-sitter `WasmStore` 加载**同一固定字节**并在测试中解析 Java、Python、TypeScript、TSX。这里复用的是 grammar 资产，不是 JavaScript 加载器；Node 仅负责 npm 命令转发。Rust 加载成功只证明该加载路径的有限兼容性，不证明语法判定准确，也不代表 OpenSpec 14.2 的全部验收完成。
 

@@ -105,11 +105,60 @@ pub fn run(args: &[String]) -> ExitCode {
         feedback["scan_scope"] = Value::String("discovered_python".into());
         feedback["requested_paths"] = Value::Null;
     }
-    let request_cancelled = codeguard_runtime::sigint_cancellation_requested()
+    let cancellation_observed = codeguard_runtime::sigint_cancellation_requested()
         || feedback["incomplete_reasons"]
             .as_array()
             .is_some_and(|reasons| reasons.iter().any(|reason| reason == "request_cancelled"));
+    #[cfg(feature = "wasm-precheck")]
+    let mut request_cancelled = cancellation_observed;
+    #[cfg(not(feature = "wasm-precheck"))]
+    let request_cancelled = cancellation_observed;
     if request_cancelled {
+        feedback["command_status"] = Value::String("cancelled".into());
+        feedback["exit_code"] = Value::from(130);
+        if let Some(reasons) = feedback["incomplete_reasons"].as_array_mut() {
+            if !reasons.iter().any(|reason| reason == "request_cancelled") {
+                reasons.push(Value::String("request_cancelled".into()));
+            }
+        }
+    }
+    #[cfg(feature = "wasm-precheck")]
+    if !request_cancelled {
+        if let Some(precheck) = crate::python_syntax_precheck::observe(&root, &feedback, deadline) {
+            feedback["schema_version"] = Value::String("0.14.0".into());
+            feedback["scope"] = Value::String("local_native_and_candidate_syntax_scan".into());
+            feedback["execution_budget"]["enforcement"] =
+                Value::String("native_and_bounded_syntax_worker".into());
+            let native_reasons: std::collections::BTreeSet<&str> = feedback["files"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .filter_map(|file| file["reason"].as_str())
+                .collect();
+            let native_reason = if native_reasons.len() == 1 {
+                native_reasons
+                    .iter()
+                    .next()
+                    .copied()
+                    .unwrap_or("native_context_unavailable")
+            } else {
+                "multiple_native_incomplete_reasons"
+            };
+            feedback["native"] = serde_json::json!({"status":"incomplete","reason":native_reason});
+            feedback["setup"] = serde_json::json!({"requirement":"required","reason":"native_confirmation_needed","task_id":null});
+            feedback["next_action"] = Value::String(
+                if precheck["observations"].as_array().is_some_and(|rows| !rows.is_empty()) {
+                    "核对 Python 疑似语法位置，确认项目要求的原生检查器及配置，再以适用的 Python 原生语法能力复检；勿凭候选初检修改源码或关闭任务"
+                } else {
+                    "候选 Python grammar 版本尚未验收；确认项目要求的原生检查器及配置后复检，不把零恢复节点当作通过"
+                }.into(),
+            );
+            feedback["syntax_precheck"] = precheck;
+        }
+    }
+    #[cfg(feature = "wasm-precheck")]
+    if !request_cancelled && codeguard_runtime::sigint_cancellation_requested() {
+        request_cancelled = true;
         feedback["command_status"] = Value::String("cancelled".into());
         feedback["exit_code"] = Value::from(130);
         if let Some(reasons) = feedback["incomplete_reasons"].as_array_mut() {
@@ -632,7 +681,7 @@ fn create_scratch(run_id: &str) -> std::io::Result<PrivateScratch> {
 }
 
 fn print_human(feedback: &Value) {
-    println!("CodeGuard Python lint：局部原生检查；完整质量门禁尚未评估");
+    println!("CodeGuard Python lint：局部检查；完整质量门禁尚未评估");
     println!(
         "本轮范围：{}；目标：{}",
         feedback["scan_scope"].as_str().unwrap_or("unknown"),
@@ -731,6 +780,32 @@ fn print_human(feedback: &Value) {
                 );
             }
         }
+    }
+    if feedback["syntax_precheck"].is_object() {
+        let precheck = &feedback["syntax_precheck"];
+        println!(
+            "内置 Python 语法候选初检：已检查 {} / {}，疑似位置 {}，状态 incomplete；候选涉及文件的原生 Ruff 未运行。",
+            precheck["checked_files"],
+            precheck["selected_files"],
+            precheck["observations"].as_array().map_or(0, Vec::len)
+        );
+        for row in precheck["observations"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .take(8)
+        {
+            println!(
+                "疑似语法 {}:{}:{} {}；须由原生工具确认。",
+                row["path"], row["start_line"], row["start_column"], row["kind"]
+            );
+        }
+        println!(
+            "下一步：{}",
+            feedback["next_action"]
+                .as_str()
+                .unwrap_or("复查原生检查条件")
+        );
     }
     println!("本命令尚无批准策略与完整义务，交付判定：not_evaluated");
 }
