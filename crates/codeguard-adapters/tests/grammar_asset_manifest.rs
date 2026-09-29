@@ -1,7 +1,18 @@
 use codeguard_adapters::{
-    adapt_legacy_dylink, adapt_zig_wasm, bundled_grammar_candidates, parse_grammar_asset_manifest,
-    verify_grammar_asset,
+    adapt_legacy_dylink, adapt_zig_wasm, bundled_grammar_candidate, bundled_grammar_candidates,
+    parse_grammar_asset_manifest, verify_grammar_asset,
 };
+
+#[test]
+fn selected_candidate_matches_full_manifest_without_promoting_unknown_language() {
+    let full = bundled_grammar_candidates().expect("all bundled assets");
+    for asset in &full.assets {
+        let (selected, wasm) = bundled_grammar_candidate(&asset.language).expect("selected asset");
+        assert_eq!(&selected, asset);
+        assert_eq!(wasm.len(), asset.bytes);
+    }
+    assert!(bundled_grammar_candidate("unknown").is_err());
+}
 use serde_json::Value;
 
 #[test]

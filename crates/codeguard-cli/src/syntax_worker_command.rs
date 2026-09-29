@@ -2,7 +2,7 @@
 
 use crate::syntax_worker_envelope::SyntaxWorkerEnvelope;
 use crate::syntax_worker_recovery::SyntaxWorkerRecovery;
-use codeguard_adapters::bundled_grammar_candidates;
+use codeguard_adapters::bundled_grammar_candidate;
 use codeguard_runtime::{WasmGrammar, scan_wasm_recoveries};
 use sha2::{Digest, Sha256};
 use std::io::Read;
@@ -54,33 +54,10 @@ pub fn run(args: &[String]) -> ExitCode {
 }
 
 fn observe(language: &str, source: &[u8]) -> Result<SyntaxWorkerEnvelope, String> {
-    let manifest = bundled_grammar_candidates()?;
-    let asset = manifest
-        .assets
-        .iter()
-        .find(|asset| asset.language == language)
-        .ok_or("不支持的 grammar 语种")?;
+    let (asset, wasm) = bundled_grammar_candidate(language)?;
     if asset.codeguard_runtime_validation != "rust_loader_smoke_passed" {
         return Err("grammar 与当前 Rust WASM 运行时不兼容".into());
     }
-    let wasm = match language {
-        "c" => include_bytes!("../../../grammars/c/parser.wasm").as_slice(),
-        "cpp" => include_bytes!("../../../grammars/cpp/parser.wasm").as_slice(),
-        "csharp" => include_bytes!("../../../grammars/csharp/parser.wasm").as_slice(),
-        "go" => include_bytes!("../../../grammars/go/parser.wasm").as_slice(),
-        "javascript" => include_bytes!("../../../grammars/javascript/parser.wasm").as_slice(),
-        "lua" => include_bytes!("../../../grammars/lua/parser.wasm").as_slice(),
-        "luau" => include_bytes!("../../../grammars/luau/parser.wasm").as_slice(),
-        "java" => include_bytes!("../../../grammars/java/parser.wasm").as_slice(),
-        "python" => include_bytes!("../../../grammars/python/parser.wasm").as_slice(),
-        "typescript" => include_bytes!("../../../grammars/typescript/parser.wasm").as_slice(),
-        "tsx" => include_bytes!("../../../grammars/tsx/parser.wasm").as_slice(),
-        "zig" => include_bytes!("../../../grammars/zig/parser.wasm").as_slice(),
-        "objc" => include_bytes!("../../../grammars/objc/parser.wasm").as_slice(),
-        "solidity" => include_bytes!("../../../grammars/solidity/parser.wasm").as_slice(),
-        "rust" => include_bytes!("../../../grammars/rust/parser.wasm").as_slice(),
-        _ => return Err("不支持的 grammar 语种".into()),
-    };
     let mut grammar = WasmGrammar::load(
         asset.loader_symbol.as_deref().unwrap_or(language),
         wasm,

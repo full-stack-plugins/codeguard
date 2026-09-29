@@ -93,10 +93,39 @@ pub struct GrammarAsset {
 /// 读取仓内固定清单，并检查来源、许可证及候选资产字节。
 pub fn bundled_grammar_candidates() -> Result<GrammarAssetManifest, String> {
     let manifest = parse_grammar_asset_manifest(include_bytes!("../../../grammars/manifest.json"))?;
-    let codegraph_license = include_bytes!("../../../grammars/LICENSE.codegraph");
-    if digest(codegraph_license) != CODEGRAPH_LICENSE_SHA256 {
+    verify_codegraph_license()?;
+    verify_dependency_license(&manifest)?;
+    for asset in &manifest.assets {
+        verify_bundled_asset(asset)?;
+    }
+    Ok(manifest)
+}
+
+/// 只核对指定内置 grammar 的字节与许可，供按需加载的语法工作进程使用。
+/// 参数为固定语言 ID；返回清单身份和静态 WASM 字节，未知语言返回错误。
+pub fn bundled_grammar_candidate(language: &str) -> Result<(GrammarAsset, &'static [u8]), String> {
+    let manifest = parse_grammar_asset_manifest(include_bytes!("../../../grammars/manifest.json"))?;
+    let asset = manifest
+        .assets
+        .iter()
+        .find(|asset| asset.language == language)
+        .ok_or("不支持的 grammar 语种")?;
+    verify_codegraph_license()?;
+    if matches!(language, "objc" | "solidity") {
+        verify_dependency_license(&manifest)?;
+    }
+    let wasm = verify_bundled_asset(asset)?;
+    Ok((asset.clone(), wasm))
+}
+
+fn verify_codegraph_license() -> Result<(), String> {
+    if digest(include_bytes!("../../../grammars/LICENSE.codegraph")) != CODEGRAPH_LICENSE_SHA256 {
         return Err("CodeGraph 许可证字节与固定来源不符".into());
     }
+    Ok(())
+}
+
+fn verify_dependency_license(manifest: &GrammarAssetManifest) -> Result<(), String> {
     if digest(include_bytes!(
         "../../../grammars/LICENSE.tree-sitter-wasms"
     )) != manifest
@@ -106,90 +135,92 @@ pub fn bundled_grammar_candidates() -> Result<GrammarAssetManifest, String> {
     {
         return Err("依赖包许可证字节与固定来源不符".into());
     }
-    for asset in &manifest.assets {
-        let (wasm, license) = match asset.language.as_str() {
-            "c" => (
-                include_bytes!("../../../grammars/c/parser.wasm").as_slice(),
-                include_bytes!("../../../grammars/c/LICENSE").as_slice(),
-            ),
-            "cpp" => (
-                include_bytes!("../../../grammars/cpp/parser.wasm").as_slice(),
-                include_bytes!("../../../grammars/cpp/LICENSE").as_slice(),
-            ),
-            "csharp" => (
-                include_bytes!("../../../grammars/csharp/parser.wasm").as_slice(),
-                include_bytes!("../../../grammars/csharp/LICENSE").as_slice(),
-            ),
-            "go" => (
-                include_bytes!("../../../grammars/go/parser.wasm").as_slice(),
-                include_bytes!("../../../grammars/go/LICENSE").as_slice(),
-            ),
-            "javascript" => (
-                include_bytes!("../../../grammars/javascript/parser.wasm").as_slice(),
-                include_bytes!("../../../grammars/javascript/LICENSE").as_slice(),
-            ),
-            "lua" => (
-                include_bytes!("../../../grammars/lua/parser.wasm").as_slice(),
-                include_bytes!("../../../grammars/lua/LICENSE").as_slice(),
-            ),
-            "luau" => (
-                include_bytes!("../../../grammars/luau/parser.wasm").as_slice(),
-                include_bytes!("../../../grammars/luau/LICENSE").as_slice(),
-            ),
-            "java" => (
-                include_bytes!("../../../grammars/java/parser.wasm").as_slice(),
-                include_bytes!("../../../grammars/java/LICENSE").as_slice(),
-            ),
-            "typescript" => (
-                include_bytes!("../../../grammars/typescript/parser.wasm").as_slice(),
-                include_bytes!("../../../grammars/typescript/LICENSE").as_slice(),
-            ),
-            "python" => (
-                include_bytes!("../../../grammars/python/parser.wasm").as_slice(),
-                include_bytes!("../../../grammars/python/LICENSE").as_slice(),
-            ),
-            "tsx" => (
-                include_bytes!("../../../grammars/tsx/parser.wasm").as_slice(),
-                include_bytes!("../../../grammars/typescript/LICENSE").as_slice(),
-            ),
-            "zig" => (
-                include_bytes!("../../../grammars/zig/parser.wasm").as_slice(),
-                include_bytes!("../../../grammars/zig/LICENSE").as_slice(),
-            ),
-            "objc" => (
-                include_bytes!("../../../grammars/objc/parser.wasm").as_slice(),
-                include_bytes!("../../../grammars/objc/LICENSE").as_slice(),
-            ),
-            "solidity" => (
-                include_bytes!("../../../grammars/solidity/parser.wasm").as_slice(),
-                include_bytes!("../../../grammars/solidity/LICENSE").as_slice(),
-            ),
-            "rust" => (
-                include_bytes!("../../../grammars/rust/parser.wasm").as_slice(),
-                include_bytes!("../../../grammars/rust/LICENSE").as_slice(),
-            ),
-            _ => return Err("候选语言未知".into()),
+    Ok(())
+}
+
+fn verify_bundled_asset(asset: &GrammarAsset) -> Result<&'static [u8], String> {
+    let (wasm, license) = match asset.language.as_str() {
+        "c" => (
+            include_bytes!("../../../grammars/c/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/c/LICENSE").as_slice(),
+        ),
+        "cpp" => (
+            include_bytes!("../../../grammars/cpp/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/cpp/LICENSE").as_slice(),
+        ),
+        "csharp" => (
+            include_bytes!("../../../grammars/csharp/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/csharp/LICENSE").as_slice(),
+        ),
+        "go" => (
+            include_bytes!("../../../grammars/go/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/go/LICENSE").as_slice(),
+        ),
+        "javascript" => (
+            include_bytes!("../../../grammars/javascript/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/javascript/LICENSE").as_slice(),
+        ),
+        "lua" => (
+            include_bytes!("../../../grammars/lua/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/lua/LICENSE").as_slice(),
+        ),
+        "luau" => (
+            include_bytes!("../../../grammars/luau/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/luau/LICENSE").as_slice(),
+        ),
+        "java" => (
+            include_bytes!("../../../grammars/java/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/java/LICENSE").as_slice(),
+        ),
+        "typescript" => (
+            include_bytes!("../../../grammars/typescript/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/typescript/LICENSE").as_slice(),
+        ),
+        "python" => (
+            include_bytes!("../../../grammars/python/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/python/LICENSE").as_slice(),
+        ),
+        "tsx" => (
+            include_bytes!("../../../grammars/tsx/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/typescript/LICENSE").as_slice(),
+        ),
+        "zig" => (
+            include_bytes!("../../../grammars/zig/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/zig/LICENSE").as_slice(),
+        ),
+        "objc" => (
+            include_bytes!("../../../grammars/objc/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/objc/LICENSE").as_slice(),
+        ),
+        "solidity" => (
+            include_bytes!("../../../grammars/solidity/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/solidity/LICENSE").as_slice(),
+        ),
+        "rust" => (
+            include_bytes!("../../../grammars/rust/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/rust/LICENSE").as_slice(),
+        ),
+        _ => return Err("候选语言未知".into()),
+    };
+    verify_grammar_asset(asset, wasm, license)?;
+    if asset.language == "zig"
+        && crate::adapt_zig_wasm(include_bytes!("../../../grammars/zig/source.wasm"))? != wasm
+    {
+        return Err("Zig grammar 来源适配关系不符".into());
+    }
+    if matches!(asset.language.as_str(), "objc" | "solidity") {
+        let source = if asset.language == "objc" {
+            include_bytes!("../../../grammars/objc/source.wasm").as_slice()
+        } else {
+            include_bytes!("../../../grammars/solidity/source.wasm").as_slice()
         };
-        verify_grammar_asset(asset, wasm, license)?;
-        if asset.language == "zig"
-            && crate::adapt_zig_wasm(include_bytes!("../../../grammars/zig/source.wasm"))? != wasm
+        if asset.source_sha256.as_deref() != Some(digest(source).as_str())
+            || crate::adapt_legacy_dylink(&asset.language, source)? != wasm
         {
-            return Err("Zig grammar 来源适配关系不符".into());
-        }
-        if matches!(asset.language.as_str(), "objc" | "solidity") {
-            let source = if asset.language == "objc" {
-                include_bytes!("../../../grammars/objc/source.wasm").as_slice()
-            } else {
-                include_bytes!("../../../grammars/solidity/source.wasm").as_slice()
-            };
-            if asset.source_sha256.as_deref() != Some(digest(source).as_str())
-                || crate::adapt_legacy_dylink(&asset.language, source)? != wasm
-            {
-                return Err("依赖 grammar 来源适配关系不符".into());
-            }
+            return Err("依赖 grammar 来源适配关系不符".into());
         }
     }
-    Ok(manifest)
+    Ok(wasm)
 }
 
 /// 解析来源固定的候选清单；拒绝重复字段、漂移来源和伪造的已验收状态。
