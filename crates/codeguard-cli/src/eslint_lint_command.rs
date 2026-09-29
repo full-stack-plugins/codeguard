@@ -55,15 +55,11 @@ pub fn run(args: &[String]) -> ExitCode {
                 native_args.node = Some(node);
                 observe_with_preparation(&native_args, deadline)
             } else {
-                let mut report = observe_with_preparation(&args, deadline);
-                if report["reason"] == "eslint_execution_context_missing"
-                    && report["workbench"]["next"]["repair_brief"]["step"].is_null()
-                {
-                    report["next_action"] = json!(
-                        "项目本地 ESLint 候选和配置已发现；当前未解析到 Node，请提供 Node 路径并执行原生检查。候选尚未通过探测，不能认定 lint 已完成"
-                    );
-                }
-                report
+                observe_with_preparation_reason(
+                    &args,
+                    deadline,
+                    Some("eslint_node_runtime_unresolved"),
+                )
             };
             if args.json {
                 println!("{report}");
@@ -97,7 +93,22 @@ pub fn run(args: &[String]) -> ExitCode {
     })
 }
 pub(crate) fn observe_with_preparation(args: &EslintLintArguments, deadline: Instant) -> Value {
+    observe_with_preparation_reason(args, deadline, None)
+}
+fn observe_with_preparation_reason(
+    args: &EslintLintArguments,
+    deadline: Instant,
+    missing_context_reason: Option<&str>,
+) -> Value {
     let mut report = observe(args, deadline);
+    if report["reason"] == "eslint_execution_context_missing"
+        && missing_context_reason == Some("eslint_node_runtime_unresolved")
+    {
+        report["reason"] = json!("eslint_node_runtime_unresolved");
+        report["next_action"] = json!(
+            "项目本地 ESLint 候选与原配置已发现；当前未解析到 Node。核对项目运行时并提供受控 Node 路径后原生复检，不重复安装 ESLint 或修改无依据源码"
+        );
+    }
     // 早期上下文失败也进入环境待办；取消、外部目标或不支持范围不能制造源码任务。
     if let (Some(workspace), Some(reason)) = (
         &args.workspace,
@@ -266,6 +277,7 @@ fn observe_captured(
 fn feedback(reason: &str) -> Value {
     json!({"schema_version":"0.2.0","report_type":"eslint_local_feedback","status":"incomplete","local_coherent":false,"coverage_proven":false,"delivery_decision":"not_evaluated","reason":reason,"findings":[],"suppressed_count":0,"workbench_status":"not_connected","workbench":null,"next_action":match reason {
         "eslint_execution_context_missing"=>"提供显式 Node、原 ESLint JS 入口、具体版本、原工作目录与项目原 flat config 后复检；不安装或替换规则",
+        "eslint_node_runtime_unresolved"=>"项目本地 ESLint 候选已发现；提供受控 Node 路径后原生复检，不重复安装 ESLint 或修改无依据源码",
         "eslint_scope_requires_explicit_file"=>"当前入口需显式单文件；项目目录与完整源集调度尚未接通，不将目录标为已检查",
         "request_cancelled"|"request_deadline_exceeded"=>"重新安排原工具检查预算；中断不要求修改源码",
         _=>"核对原配置、parser/插件与本轮规则；按原生发现修复后用同一入口和配置复检，抑制及未知覆盖需核查，任务不能自行关闭",

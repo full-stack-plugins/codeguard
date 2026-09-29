@@ -142,6 +142,7 @@ pub(crate) fn valid_reason(reason: &str) -> bool {
     matches!(
         reason,
         "eslint_execution_context_missing"
+            | "eslint_node_runtime_unresolved"
             | "eslint_input_unavailable"
             | "eslint_private_workspace_unavailable"
             | "request_deadline_exceeded"
@@ -292,5 +293,10 @@ pub(crate) fn guidance(root: &Path, fact: &Value) -> Value {
     {
         return fallback;
     }
-    json!({"disposition":"actionable","step":"核对最新ESLint前置诊断、原配置、parser/插件和运行条件；解析或抑制先复现根因，恢复原检查后复扫，不修改无关源码","diagnostic_reason":report["diagnostic_reason"],"run_id":run,"report_sha256":sha})
+    let step = if report["diagnostic_reason"] == "eslint_node_runtime_unresolved" {
+        "项目本地 ESLint 候选与原配置已发现；核对并提供受控 Node 路径后执行原生复检，不重复安装 ESLint 或修改无依据源码"
+    } else {
+        "核对最新ESLint前置诊断、原配置、parser/插件和运行条件；解析或抑制先复现根因，恢复原检查后复扫，不修改无关源码"
+    };
+    json!({"disposition":"actionable","step":step,"diagnostic_reason":report["diagnostic_reason"],"run_id":run,"report_sha256":sha})
 }
