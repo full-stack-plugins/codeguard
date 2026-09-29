@@ -18,7 +18,7 @@ mod eslint_effective_settings;
 mod eslint_lint_arguments;
 #[cfg(unix)]
 pub mod eslint_lint_command;
-#[cfg(feature = "wasm-precheck")]
+#[cfg(all(feature = "wasm-precheck", unix))]
 mod eslint_native_first_candidate;
 mod eslint_preparation;
 pub mod eslint_probe;
