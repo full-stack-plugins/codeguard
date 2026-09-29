@@ -1,11 +1,14 @@
 //! ESLint 原生确认任务中的脱敏 WASM 疑似位置；只具待核实证据权威。
 
 use codeguard_adapters::bundled_grammar_candidates;
-use serde_json::{Value, json};
+use serde_json::Value;
+#[cfg(feature = "wasm-precheck")]
+use serde_json::json;
 use sha2::{Digest, Sha256};
 
 /// 从当轮候选反馈提取有界坐标，不保存源码片段或语法节点文本。
 /// 参数为初检反馈、工作区相对路径和当前源码字节；返回绑定固定 grammar 的疑似证据。
+#[cfg(feature = "wasm-precheck")]
 pub(crate) fn project(precheck: &Value, scope: &str, source: &[u8]) -> Result<Value, &'static str> {
     let observations = precheck["observations"]
         .as_array()

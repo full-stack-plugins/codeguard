@@ -28,6 +28,7 @@ pub(crate) fn connect_preparation(root: &Path, args: &EslintLintArguments, reaso
         Err(reason) => json!({"status":reason}),
     }
 }
+#[cfg(feature = "wasm-precheck")]
 pub(crate) fn connect_syntax_preparation(
     root: &Path,
     args: &EslintLintArguments,

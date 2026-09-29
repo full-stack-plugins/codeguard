@@ -94,9 +94,9 @@ cargo build --locked -p codeguard-cli
 
 版本输出包含 `cli_version`、`target` 和协议信息。发现与 init 预览返回观察及未知项。Dry-run 不创建 `AGENTS.md` 或项目数据目录。仅在依赖已缓存时为 Cargo 添加 `--offline`。
 
-工作区要求 `std`。可选 `wasm-precheck` 构建特性已用固定的 Java、TypeScript、TSX grammar 候选资产与有界 Rust worker，为缺少显式原生上下文的 `lint java`、`lint typescript` 单文件请求提供疑似语法观察；`.tsx` 使用独立 grammar。公开 npm `0.1.2` 不含该路径。不声称 `no_std`、已完成项目级 WASM 兜底、零 unsafe 或性能最快。运行层系统调用需要安全审查，当前不宣称已完成整体安全审计。
+工作区要求 `std`。可选 `wasm-precheck` 构建特性已用固定的 Java、Python、TypeScript、TSX grammar 候选资产与有界 Rust worker。Java 和 TypeScript/TSX 有局部单文件兜底；`lint python` 在 Ruff 不可用或项目未声明 Ruff 配置时可报告有界疑似语法位置，原生 Ruff 结果优先。公开 npm `0.1.2` 不含该路径。不声称 `no_std`、已完成项目级 WASM 兜底、零 unsafe 或性能最快。运行层系统调用需要安全审查，当前不宣称已完成整体安全审计。
 
-当前源码构建的 CLI 可用 `codeguard grammar status --format=json` 只读展示来源覆盖缺口，不加载 grammar 或运行 lint：固定 CodeGraph 来源含 30 份随仓 WASM，另有两种独立 grammar 从其依赖取得；CodeGuard 当前有 Java、Python、TypeScript、TSX 四份未验收资产候选，已发行语法能力为零。Python 已固定并通过 Rust 加载试验，但尚未接入 CLI 兜底。[覆盖库存](grammars/codegraph-coverage.json)不是已批准资产清单。COBOL 来源资产约 16.4 MB，还超过当前 Rust 加载器的 8 MiB 限额。
+当前源码构建的 CLI 可用 `codeguard grammar status --format=json` 只读展示来源覆盖缺口，不加载 grammar 或运行 lint：固定 CodeGraph 来源含 30 份随仓 WASM，另有两种独立 grammar 从其依赖取得；CodeGuard 当前有 Java、Python、TypeScript、TSX 四份未验收资产候选，已发行语法能力为零。Python 已有仅限源码可选构建的 CLI 候选兜底，结果保持不完整，不能批准交付。[覆盖库存](grammars/codegraph-coverage.json)不是已批准资产清单。COBOL 来源资产约 16.4 MB，还超过当前 Rust 加载器的 8 MiB 限额。
 
 ### npm 安装与一次性调用
 
@@ -180,7 +180,7 @@ Python 编辑快反馈可执行 `codeguard lint python . --file src/changed.py -
 
 **公开 `0.1.2` 尚未实现内置 WASM 兜底或自动对话交付。** 保留已有命令作为统一入口；当前仍须满足各原生适配器的参数和前置条件：
 
-可选源码构建已有 Java/TypeScript 单文件候选路径。TypeScript 项目若有可见的本地 ESLint 10 入口和唯一 flat config，会先尝试从 `PATH` 解析 Node 并运行既有有界原生探针；缺 Node 时报告准备缺口；仅本地 ESLint 包未观察到时才提供 TypeScript/TSX 疑似语法初检。入口、包身份或配置不可信时保留具体环境阻塞。Java 候选仍须原生确认，所有内置 grammar 的版本/方言尚未验收，原生局部观察和初检都不能批准交付。默认及公开二进制沿用既有原生上下文路径，见 [Java 局部验收](tests/acceptance/java-syntax-fallback-candidate.md)、[TypeScript 局部验收](tests/acceptance/typescript-syntax-fallback-candidate.md)与[原生优先局部验收](tests/acceptance/native-first-eslint-candidate.md)。
+可选源码构建已有 Java/TypeScript 单文件候选路径。TypeScript 项目若有可见的本地 ESLint 10 入口和唯一 flat config，会先尝试从 `PATH` 解析 Node 并运行既有有界原生探针；缺 Node 时报告准备缺口；仅本地 ESLint 包未观察到时才提供 TypeScript/TSX 疑似语法初检。入口、包身份或配置不可信时保留具体环境阻塞。Java 候选仍须原生确认。Python `lint` 先保留 Ruff 结果，在 Ruff 缺失或项目未声明配置时补充疑似位置；损坏的 Ruff 配置仍是环境阻塞。所有内置 grammar 的版本/方言尚未验收，原生局部观察和初检都不能批准交付。默认及公开二进制沿用既有原生上下文路径，见 [Java 局部验收](tests/acceptance/java-syntax-fallback-candidate.md)、[TypeScript 局部验收](tests/acceptance/typescript-syntax-fallback-candidate.md)与[原生优先局部验收](tests/acceptance/native-first-eslint-candidate.md)。
 
 已初始化工作区使用 `--workspace` 时，TypeScript/TSX 候选回退在同步后返回真实且稳定的原生确认任务 ID；反复 WASM 扫描不会自行关闭任务。版本化本地报告已按源码与 grammar 身份保存有界疑似位置；能力匹配的原生关闭仍待实现，见[局部验收](tests/acceptance/typescript-syntax-confirmation-task.md)。
 

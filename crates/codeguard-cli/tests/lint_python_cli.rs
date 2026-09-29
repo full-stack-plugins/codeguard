@@ -173,6 +173,7 @@ fn selected_file_runs_native_ruff_without_importing_partial_backlog() {
     assert_eq!(report["files"][0]["path"], "changed.py");
     assert_eq!(report["files"][0]["run_status"], "findings");
     assert_eq!(report["files"][0]["findings"][0]["rule_id"], "F401");
+    assert!(report.get("syntax_precheck").is_none());
     assert_eq!(report["backlog_status"], "not_synced_scoped");
     assert_eq!(fs::read_dir(reports_dir).unwrap().count(), before_reports);
     assert_eq!(report["delivery_decision"], "not_evaluated");
@@ -391,6 +392,9 @@ fn initialized_lint_report_binds_the_existing_workspace_identity() {
         serde_json::from_slice(&fs::read(project.0.join(".codeguard/workspace.json")).unwrap())
             .unwrap();
     let (_, report) = run(&project, &["--ruff-tool", "/nonexistent/ruff"]);
+    #[cfg(feature = "wasm-precheck")]
+    assert_eq!(report["schema_version"], "0.14.0");
+    #[cfg(not(feature = "wasm-precheck"))]
     assert_eq!(report["schema_version"], "0.13.0");
     assert_eq!(report["execution_budget"]["timeout_ms"], 1_800_000);
     assert_eq!(report["execution_budget"]["source"], "builtin_default");
