@@ -66,6 +66,26 @@ pub(crate) fn prepare(
         "affected_paths":[relative],"source_sha256":format!("{:x}",Sha256::digest(bytes))}),
     )
 }
+#[cfg(unix)]
+pub(crate) fn prepare_with_syntax(
+    root: &Path,
+    args: &EslintLintArguments,
+    precheck: &Value,
+) -> Result<Value, &'static str> {
+    let mut report = prepare(root, args, "eslint_syntax_confirmation_needed")?;
+    let source = read_bounded_regular_file(&args.source, 16 * 1024 * 1024)
+        .map_err(|_| "eslint_source_unavailable")?;
+    if report["source_sha256"] != format!("{:x}", Sha256::digest(&source)) {
+        return Err("syntax_evidence_source_changed");
+    }
+    let scope = report["scope"]
+        .as_str()
+        .ok_or("preparation_scope_invalid")?;
+    let evidence = crate::eslint_syntax_evidence::project(precheck, scope, &source)?;
+    report["schema_version"] = json!("0.2.0");
+    report["syntax_evidence"] = evidence;
+    Ok(report)
+}
 pub(crate) fn fingerprint(workspace: &str, scope: &str) -> String {
     let mut hash = Sha256::new();
     for part in [
@@ -104,10 +124,20 @@ pub(crate) fn valid_report(report: &Value, workspace: &str) -> bool {
         return false;
     };
     let fp = fingerprint(workspace, scope);
-    report
-        .as_object()
-        .is_some_and(|m| m.len() == keys.len() && keys.iter().all(|k| m.contains_key(*k)))
-        && report["schema_version"] == "0.1.0"
+    let version_valid = match report["schema_version"].as_str() {
+        Some("0.1.0") => report.as_object().is_some_and(|m| m.len() == keys.len()),
+        Some("0.2.0") => {
+            report
+                .as_object()
+                .is_some_and(|m| m.len() == keys.len() + 1 && m.contains_key("syntax_evidence"))
+                && report["diagnostic_reason"] == "eslint_syntax_confirmation_needed"
+        }
+        _ => false,
+    };
+    version_valid
+        && report
+            .as_object()
+            .is_some_and(|m| keys.iter().all(|k| m.contains_key(*k)))
         && report["report_type"] == "eslint_preparation_observation"
         && report["workspace_binding"] == "bound"
         && report["workspace_id"] == workspace
@@ -296,10 +326,19 @@ pub(crate) fn guidance(root: &Path, fact: &Value) -> Value {
         return fallback;
     }
     let source = root.join(scope);
-    if source.canonicalize().ok().as_deref() != Some(source.as_path())
-        || read_bounded_regular_file(&source, 16 * 1024 * 1024)
-            .ok()
-            .is_none_or(|b| report["source_sha256"] != format!("{:x}", Sha256::digest(b)))
+    if source.canonicalize().ok().as_deref() != Some(source.as_path()) {
+        return fallback;
+    }
+    let Ok(source_bytes) = read_bounded_regular_file(&source, 16 * 1024 * 1024) else {
+        return fallback;
+    };
+    if report["source_sha256"] != format!("{:x}", Sha256::digest(&source_bytes))
+        || (report["schema_version"] == "0.2.0"
+            && !crate::eslint_syntax_evidence::valid(
+                &report["syntax_evidence"],
+                scope,
+                &source_bytes,
+            ))
     {
         return fallback;
     }
@@ -333,5 +372,12 @@ pub(crate) fn guidance(root: &Path, fact: &Value) -> Value {
             "核对最新ESLint前置诊断、原配置、parser/插件和运行条件；解析或抑制先复现根因，恢复原检查后复扫，不修改无关源码"
         }
     };
-    json!({"disposition":"actionable","step":step,"diagnostic_reason":report["diagnostic_reason"],"run_id":run,"report_sha256":sha})
+    let mut guidance = json!({"disposition":"actionable","step":step,"diagnostic_reason":report["diagnostic_reason"],"run_id":run,"report_sha256":sha});
+    if report["schema_version"] == "0.2.0" {
+        guidance["suspected_positions"] = report["syntax_evidence"]["observations"].clone();
+        guidance["source_sha256"] = report["source_sha256"].clone();
+        guidance["grammar_sha256"] = report["syntax_evidence"]["grammar_sha256"].clone();
+        guidance["evidence_authority"] = json!("local_unverified_suspected");
+    }
+    guidance
 }

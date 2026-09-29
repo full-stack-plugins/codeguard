@@ -106,6 +106,13 @@ fn connect_syntax_confirmation(args: &EslintLintArguments, report: &mut Value) {
         "eslint_syntax_precheck_unavailable"
     };
     report["workbench"] = match workspace.canonicalize() {
+        Ok(root) if root == *workspace && reason == "eslint_syntax_confirmation_needed" => {
+            crate::eslint_workbench::connect_syntax_preparation(
+                &root,
+                args,
+                &report["syntax_precheck"],
+            )
+        }
         Ok(root) if root == *workspace => {
             crate::eslint_workbench::connect_preparation(&root, args, reason)
         }

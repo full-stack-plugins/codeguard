@@ -197,12 +197,22 @@ pub(super) fn parse_preparation(
         .as_str()
         .ok_or("preparation_scope_invalid")?;
     let source = root.join(relative);
-    if source.canonicalize().ok().as_deref() != Some(source.as_path())
-        || read_bounded_regular_file(&source, 16 * 1024 * 1024)
-            .ok()
-            .is_none_or(|bytes| report["source_sha256"] != format!("{:x}", Sha256::digest(bytes)))
-    {
+    if source.canonicalize().ok().as_deref() != Some(source.as_path()) {
         return Err("eslint_preparation_source_changed");
+    }
+    let source_bytes = read_bounded_regular_file(&source, 16 * 1024 * 1024)
+        .map_err(|_| "eslint_preparation_source_changed")?;
+    if report["source_sha256"] != format!("{:x}", Sha256::digest(&source_bytes)) {
+        return Err("eslint_preparation_source_changed");
+    }
+    if report["schema_version"] == "0.2.0"
+        && !crate::eslint_syntax_evidence::valid(
+            &report["syntax_evidence"],
+            relative,
+            &source_bytes,
+        )
+    {
+        return Err("eslint_syntax_evidence_invalid");
     }
     Ok(ReportInput {
         workspace_id: workspace.into(),
