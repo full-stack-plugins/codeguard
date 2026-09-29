@@ -8,4 +8,8 @@
 
 此入口在同一 Rust 进程调用已存在的事件执行器。它从至多 1 MiB 的 Claude JSON 选择事件类型、工具名、cwd 和绝对文件路径；校验项目内普通文件，拒绝重复 JSON 键、超预算、缺失/越界/符号链接目标及缺少成功响应的输入。反馈只投影安全文件名、原生规则 ID、诊断数量和未完成状态，最多 1200 字符。宿主进程退出 0 表示软反馈返回，不能作为源码检查通过或交付许可。
 
-本次只通过模拟 Claude JSON 与真实 Ruff 进程验证 CLI 候选，**没有在已安装 Claude Code 中触发插件 Hook**。独立 `codeguard-plugin` 尚未绑定本次 Rust 二进制；SessionStart、失败写入、Stop、提交/推送/CI、其它宿主与缓存身份去重均未接线。因此 S11.17 及宿主验收仍未完成。
+后续增量把 `session-start`、`post-tool-use-failure` 和 `stop` 映射到同一 Rust 事件执行器。测试先因入口不支持而失败：启动事件不应执行 lint，失败写入不应运行源码检查或回显任意错误文字；Stop 无待办只提示完整检查，有稳定任务才给首次一次继续指引，`stop_hook_active=true` 不再唤醒，也不读取可编辑 Markdown 或模型结尾文本为指令。实现后候选组 10 项通过、1 项真实 Ruff 用例保留显式 ignored；原 `hook_execute_cli` 17 项通过、2 项 ignored。
+
+扩展后完整工作区 `cargo test --workspace --all-features -- --test-threads=1 -q` 退出 0，显式设置本机 Ruff 路径后再次运行被默认忽略的真实保存事件 F401 测试，1 项通过。全目标 Clippy、三个改动 Rust 文件的 rustfmt 检查、OpenSpec 严格校验与 `git diff --check` 通过。整仓 `cargo fmt --all -- --check` 仍会报告其它未改文件的历史格式差异，本轮未扩大格式修改范围。
+
+本次只通过模拟 Claude JSON 与真实 Ruff 进程验证 CLI 候选，**没有在已安装 Claude Code 中触发插件 Hook**。独立 `codeguard-plugin` 尚未绑定本次 Rust 二进制；提交/推送/CI、其它宿主与缓存身份去重均未接线。因此 S11.17 及宿主验收仍未完成。

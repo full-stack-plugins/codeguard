@@ -317,7 +317,7 @@ sequenceDiagram
 
 `hook execute PATH --timeout DURATION --format=json` 消费同一版本化宿主事件。会话启动只读发现；Stop 只读本地有界下一步，不调用检查器；确认成功且全为 Python 的有界编辑范围调用 Ruff 快检。Stop 最多检查 64 个 finding 和 64 份报告，报告字节总预算为 8 MiB；超出后返回 `guidance_scope_exceeded`，检查仍为未运行。`repair_ready` 先将单任务历史限制在 128 项和 1 MiB，读取稳定任务事实，再经有界子进程复用现有 `task verify`，只返回原检查器观察和本地事件是否保存的摘要；不关闭任务、不批准交付。显式提供 `--git-tool ABS_PATH` 后，`pre_commit` 在事件总截止时间内观察本轮真实暂存 index（含 `GIT_INDEX_FILE`），报告路径违规与对象核验状态，绝不拿编辑快检结果充作提交门禁。缺工具或 index 观察不稳定仍是不完整。混合语言、未知/失败写入、推送和 CI 保持显式 `not_run`。`hook_execution_feedback` 0.4 仍仅是候选证据，历史 0.1–0.3 schema 保留。提示事件缺少可信意图上下文，仍未接通指引；插件 Hook、缓存复用和完整 Git/CI 质量门禁尚未接通。
 
-Rust CLI 另有 Claude Code `PostToolUse` 的候选软入口：只消费成功文件工具事件，核对绝对文件路径、项目根、普通文件与宿主事件身份，再复用上述执行器。它向对话注入至多 1200 字符的结构化摘要，拒绝把源码内容或原工具消息当指令；非法/超预算输入显示未运行。宿主退出 0 仅表示软反馈已返回，不是质量通过。独立 `codeguard-plugin` 尚未绑定该 CLI，也未自动调用此入口；见[局部验收](../tests/acceptance/claude-post-tool-hook-candidate.md)。
+Rust CLI 另有 Claude Code `SessionStart`、`PostToolUse`、`PostToolUseFailure`、`Stop` 候选软入口。启动只读发现；成功编辑核对绝对路径、项目根及普通文件后复用同一执行器；失败编辑走不检查源码的路由，不把错误文本当指令；Stop 有界读取已有任务事实，不运行检查器，仅在首次 Stop 发现稳定任务时给一次 `additionalContext` 继续指引，`stop_hook_active=true` 或无任务时只显示提示而不反复唤醒。全部反馈有界，排除源码、原工具错误及可编辑任务正文；非法/超预算输入显示未运行。宿主退出 0 仅表示软反馈已返回，不是质量通过。独立 `codeguard-plugin` 尚未绑定该 CLI，也未自动调用这些入口；见[局部验收](../tests/acceptance/claude-post-tool-hook-candidate.md)。
 
 ```mermaid
 flowchart LR

@@ -119,6 +119,14 @@ Stop 事件 MAY 从已存在的本地任务事实生成有界、只读的下一�
 - **WHEN** 事件过大、类型不匹配、路径缺失/越界、符号链接逃逸或读取时文件已消失
 - **THEN** 说明范围未确定并保持本次源码检查未运行；不从宿主自由文本猜测其它文件，不以宿主 Hook 退出码冒充 Rust 门禁结论
 
+#### Scenario: Claude Code startup and failed edit use distinct low-cost routes
+- **WHEN** SessionStart 带有效来源和项目工作目录，或 PostToolUseFailure 带失败的文件工具与任意错误文本
+- **THEN** 前者只读发现项目和检查器配置，后者走不检查源码的失败路由；两者均不转发宿主自由文本，不启动完整 lint 或签发交付结论
+
+#### Scenario: Claude Code Stop offers a bounded single repair continuation
+- **WHEN** 首次 Stop 从本地稳定任务事实取得待处理 ID，或 `stop_hook_active=true` 表示已由 Stop 指引继续
+- **THEN** 首次只投影安全任务 ID 和下一步命令到 `additionalContext`，再次 Stop 仅显示状态不继续唤醒；无任务时提醒完整检查，不把可编辑任务正文当指令或把任务清空当作通过
+
 #### Scenario: Successful bulk edit exceeds fast-feedback budget
 - **WHEN** 一次成功编辑涉及的不同路径数量或路径字节总量超过快检预算
 - **THEN** 计划返回明确的超预算原因并转为有界批量范围检查，不截断成部分逐文件目标；提交时仍独立取得真实 Git 范围

@@ -33,7 +33,7 @@ fn main() -> ExitCode {
                 "局部事件执行：hook execute PATH --timeout DURATION --format=json [--ruff-tool ABS_PATH] [--git-tool ABS_PATH] 从 stdin 读取同一事件协议；启动只发现、Stop 有界只读提示、repair_ready 复用 task verify 原工具复检、确认 Python 编辑调用 Ruff 局部快检、显式 Git 工具的 pre_commit 观察真实 index；完整交付始终 not_evaluated。"
             );
             println!(
-                "Claude 候选软 Hook：hook claude post-tool-use PATH --timeout DURATION --format=json [--ruff-tool ABS_PATH] 从 stdin 读取成功文件工具事件，规范化项目内路径后复用 Rust 局部执行器；输出有界 additionalContext，宿主退出 0 不表示检查或交付通过。插件尚未自动接线。"
+                "Claude 候选软 Hook：hook claude <session-start|post-tool-use|post-tool-use-failure|stop> PATH --timeout DURATION --format=json [--ruff-tool ABS_PATH] 从 stdin 读取宿主事件；启动只读发现，成功保存局部 Ruff，失败保存不检查，Stop 有界读取下一步；输出脱敏反馈，宿主退出 0 不表示检查或交付通过。插件尚未自动接线。"
             );
             println!(
                 "check all 的 Python CVE 节点可用 --pip-audit-tool ABS_PATH --pip-audit-version VERSION；逐构建根反馈原生结果或锁文件/工具阻塞，不签发零漏洞结论。"

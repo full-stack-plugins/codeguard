@@ -571,6 +571,7 @@
   - Stop 增量：从现有本地事实生成有界只读下一步，最多预检 64 个 finding、64 份报告与 8 MiB 报告字节；超限明确未运行。反馈当时升为 0.3，保留 0.1/0.2 历史 schema；没有任务仍要求新鲜完整检查。目标测试先红后绿，见同一[局部验收](../../../tests/acceptance/hook-execute-python-candidate.md)。提示事件缺可信意图上下文，插件宿主自动接线和交付门禁尚缺，11.17 不勾选。
   - 修复复检增量：`repair_ready` 先核对稳定任务事实，再在有界子进程中复用 `task verify` 原工具链，反馈 0.4 仅投影脱敏观察及事件持久化状态，历史 0.3 保留。真实 Ruff F401 修复后诊断消失仍返回 `candidate_absent_unverified_policy`，任务保持 open；见同一[局部验收](../../../tests/acceptance/hook-execute-python-candidate.md)。其它原生检查器的宿主实测、提示事件、插件 Hook 接线和完整 Git/CI 门禁仍缺，11.17 不勾选。
   - Claude 保存事件候选：`hook claude post-tool-use PATH --timeout DURATION --format=json` 由 Rust 直接读取宿主 JSON，将成功 Write/Edit/MultiEdit 的项目内普通文件转为同一 `hook execute` 事件；重复键、超预算、缺失/越界/链接目标均只给未运行提示。输出有界 `additionalContext`，不回显宿主源码或原工具消息；本机现有 Ruff 0.16.8 的 F401 诊断已通过真实原生工具测试。见[局部验收](../../../tests/acceptance/claude-post-tool-hook-candidate.md)。插件尚未绑定/调用该二进制，且其它事件、宿主和严格门禁未接线，11.17 不勾选。
+  - Claude 生命周期候选增量：同一入口扩展 `session-start` 只读发现、`post-tool-use-failure` 失败不检查、`stop` 有界下一步。Stop 仅在首次发现稳定待办时给一次 `additionalContext`，`stop_hook_active=true` 与空任务只展示状态；错误文本、模型输出和任务 Markdown 不进入反馈。模拟宿主反例与原 `hook execute` 回归见同一[局部验收](../../../tests/acceptance/claude-post-tool-hook-candidate.md)。插件绑定、提示意图、修复复检宿主接线、严格交付与其它宿主仍缺，11.17 不勾选。
 
 ## 12. S12 质量评测与验收
 

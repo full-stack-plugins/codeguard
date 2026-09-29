@@ -159,7 +159,7 @@ codeguard task verify "$TASK_ID" . --format json
 | `tools list / verify`、`doctor` | 查看工具和有限环境探测 | 显式 Ruff doctor 探测；`tools install --apply` 受阻 |
 | `plan CATEGORY LANGUAGE` | 预览选择和缺口 | 不是已认证执行计划 |
 | `hook execute` | 启动只读发现、Stop 有界下一步、按任务原工具复检、Python 编辑局部反馈及显式 Git 工具的提交面安全预览 | 必须给超时；复检不自动关闭任务，推送/CI 仍未接线，不构成宿主交付门禁 |
-| `hook claude post-tool-use` | 将 Claude Code 成功文件工具事件转换为有界 Rust 编辑反馈 | 候选软 Hook；尚无插件二进制绑定或交付门禁 |
+| `hook claude <session-start\|post-tool-use\|post-tool-use-failure\|stop>` | 将 Claude Code 生命周期事件映射为只读发现、局部编辑反馈、失败不检查或本地下一步指引 | 候选软 Hook；Stop 最多引导一次继续；尚无插件二进制绑定或交付门禁 |
 | `lint python / java / typescript / go` | 执行已接入原生检查 | 参数和范围因适配器而异 |
 | `comments rust`、`build rust` | 文档与类型检查 | build 不运行项目测试 |
 | `cve rust / python / typescript` | 原生漏洞公告观察 | 漏洞库身份、时效及完整覆盖仍有限 |
