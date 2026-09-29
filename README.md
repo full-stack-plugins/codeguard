@@ -100,7 +100,7 @@ The current source-built CLI's `codeguard grammar status --format=json` reports 
 
 ### npm installation and one-off use
 
-In a source build with `--features wasm-precheck`, `codeguard grammar probe <language> <file> --format=json` can explicitly run any of the 32 pinned candidates in an isolated worker. It always exits 3 and reports `precheck.status=incomplete`, `native.status=not_run`, and `delivery_decision=not_evaluated`; recovery anchors are suspected observations only. This diagnostic command does not yet connect all grammars to native-first `lint/check` or to the published npm package.
+In a source build with `--features wasm-precheck`, `codeguard grammar probe <language> <file> --format=json` can explicitly run any of the 32 pinned candidates in an isolated worker. It always exits 3 with `status=incomplete`, `native.status=not_run`, and `delivery_decision=not_evaluated`; a completed parse also has `precheck.status=incomplete`. Input or worker failures use the same [closed JSON schema](schemas/grammar-probe-v0.1.schema.json). Recovery anchors are suspected observations only. This diagnostic command does not yet connect all grammars to native-first `lint/check` or to the published npm package.
 
 On Apple Silicon macOS, the published `0.1.2` package was verified with a fresh npm cache:
 

@@ -21,17 +21,17 @@ pub fn run(args: &[String]) -> ExitCode {
             return ExitCode::from(2);
         }
     };
-    if bundled_grammar_candidate(language).is_err() {
-        eprintln!("不支持或无法核验的 grammar 语种");
-        return ExitCode::from(3);
+    if let Err(reason) = bundled_grammar_candidate(language) {
+        if reason == "不支持的 grammar 语种" {
+            eprintln!("不支持的 grammar 语种");
+            return ExitCode::from(2);
+        }
+        return emit_incomplete(language, source_path, &reason);
     }
     let path = PathBuf::from(source_path);
     let source = match read_plain_source(&path) {
         Ok(source) => source,
-        Err(reason) => {
-            eprintln!("语法候选观察未完成：{reason}");
-            return ExitCode::from(3);
-        }
+        Err(reason) => return emit_incomplete(language, source_path, reason),
     };
     let executable = match std::env::current_exe() {
         Ok(path) => path,
@@ -40,7 +40,7 @@ pub fn run(args: &[String]) -> ExitCode {
     let deadline = Instant::now() + Duration::from_secs(90);
     let relative_name = match path.file_name().and_then(|name| name.to_str()) {
         Some(name) => name,
-        None => return ExitCode::from(3),
+        None => return emit_incomplete(language, source_path, "source_path_invalid"),
     };
     let result = run_syntax_worker_candidate(
         &executable,
@@ -57,6 +57,7 @@ pub fn run(args: &[String]) -> ExitCode {
                 json!({
                     "schema_version":"0.1.0",
                     "report_type":"grammar_candidate_probe",
+                    "status":"incomplete",
                     "language":language,
                     "path":source_path,
                     "source_sha256":observation.source_sha256,
@@ -75,23 +76,25 @@ pub fn run(args: &[String]) -> ExitCode {
             );
             ExitCode::from(3)
         }
-        Err(reason) => {
-            println!(
-                "{}",
-                json!({
-                    "schema_version":"0.1.0",
-                    "report_type":"grammar_candidate_probe",
-                    "language":language,
-                    "path":source_path,
-                    "status":"incomplete",
-                    "reason":reason,
-                    "native":{"status":"not_run","reason":"explicit_candidate_probe"},
-                    "delivery_decision":"not_evaluated"
-                })
-            );
-            ExitCode::from(3)
-        }
+        Err(reason) => emit_incomplete(language, source_path, &reason),
     }
+}
+
+fn emit_incomplete(language: &str, source_path: &str, reason: &str) -> ExitCode {
+    println!(
+        "{}",
+        json!({
+            "schema_version":"0.1.0",
+            "report_type":"grammar_candidate_probe",
+            "language":language,
+            "path":source_path,
+            "status":"incomplete",
+            "reason":reason,
+            "native":{"status":"not_run","reason":"explicit_candidate_probe"},
+            "delivery_decision":"not_evaluated"
+        })
+    );
+    ExitCode::from(3)
 }
 
 fn read_plain_source(path: &Path) -> Result<Vec<u8>, &'static str> {

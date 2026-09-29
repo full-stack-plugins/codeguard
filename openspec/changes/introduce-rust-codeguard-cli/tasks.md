@@ -1065,3 +1065,5 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 14.1 / 14.2 / 14.4 / 14.19 全来源资产候选增量：CFML、CFQuery、CFScript、COBOL、Scala、Swift、VB.NET 七份 CodeGraph WASM 已固定来源字节、许可证、上游提交或发行包及适用补丁；Rust 离线加载和隔离 worker 的窄范围正反例通过。清单累计 32/32 份候选，已发行语法能力仍为 0。COBOL 通过受限 20 MiB 输入和固定 `COBOL` 导出名加载，但冷启动/内存成本高，固定/自由格式尚未验收；CFQuery 漏掉 `SELECT FROM`，VB.NET 对合法未缩进类方法体产生 `MISSING`，均不得发布为违规检测。CFML 嵌入语境、逐语言版本/方言语料、原生工具对照、公开原生优先 `lint/check`、任务/宿主反馈、资源预算和发行包验收仍缺；14.1–14.19 不因资产凑齐而勾选。见[七份局部验收](../../../tests/acceptance/final-seven-grammar-candidates.md)。
 
 14.4 / 14.7 候选诊断增量：源码构建的 `grammar probe <language> <file> --format=json` 明确调用固定资产与隔离 worker，保留摘要、恢复锚点和未完成状态；该手动诊断不是原生优先 `lint/check`、宿主自动触发或已发行支持。32 份候选已具备内部 worker 路径，仍需各语种正反语料、原生对照和统一路由验收，父任务不勾选。
+
+14.7 协议增量：为显式 `grammar probe` 增加 0.1.0 封闭 JSON Schema，语言枚举与 32 份固定资产清单同步；成功观察、文件缺失均保持 `incomplete`/原生未运行/交付未评估，已用 Draft 2020-12 校验真实输出并确认伪造 `clean` 和额外字段被拒。该协议只覆盖手动单文件候选，不能代替 S14 的统一多文件报告与未知 major 消费端验收，14.7 不勾选。

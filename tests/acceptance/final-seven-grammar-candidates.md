@@ -10,4 +10,6 @@ Rust 离线加载实测 CFML/CFQuery/CFScript/Scala/Swift/VB.NET 为 ABI 15，CO
 
 源码构建新增 `grammar probe <language> <file> --format=json`，显式调用同一隔离 worker；Python、TSX 干净样例与 Java 缺失括号样例的 CLI 测试均保持 `incomplete`、原生未运行、交付未评估。完整工作区测试日志包含 183 个结果段、1156 通过、0 失败、106 忽略；此次数值不把被忽略的原生工具验收算作通过。Clippy、默认构建检查、OpenSpec 严格验证及清单 JSON Schema 验证通过。
 
+公开候选诊断补齐 [0.1.0 封闭报告 Schema](../../schemas/grammar-probe-v0.1.schema.json)：32 种语言枚举与资产清单由测试对齐；干净 Python 样例及缺失文件样例的真实输出均通过 Draft 2020-12 验证，伪造 `clean` 或额外字段被拒。输入失败也返回版本化 JSON 与退出码 3，不把缺失文件作为源码违规。此 Schema 只服务显式单文件诊断，仍不具备原生 lint 或交付权威。
+
 剩余工作包括逐语言版本/方言独立语料、原生工具对照、误报漏报评估、原生优先统一 `lint/check` 路由、任务/对话反馈、COBOL 成本优化、发行包离线实装及宿主验证。未满足这些条件前，32 份候选只能提供显式诊断或局部受控观察，不能签发通过或关闭原生检查义务。

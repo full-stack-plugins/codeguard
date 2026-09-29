@@ -157,7 +157,7 @@ fn coverage_report() -> Result<Value, String> {
         "gate_effect":"none",
         "execution":"not_run",
         "delivery_decision":"not_evaluated",
-        "next_action":"固定各缺口资产的上游来源与许可证，逐语言验证 Rust 加载、版本语料及原生对照；不得凭此库存跳过原生 lint。",
+        "next_action":"按语言完成独立版本与方言语料、原生工具对照和误报评测，接入原生优先 lint/check 与任务反馈，并验收发行包；不得凭候选库存跳过原生 lint。",
         "assets":assets,
     }))
 }

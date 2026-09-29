@@ -19,6 +19,13 @@ fn codegraph_coverage_is_explicit_and_never_claims_parser_or_gate_completion() {
     assert_eq!(report["gate_effect"], "none");
     assert_eq!(report["execution"], "not_run");
     assert_eq!(report["delivery_decision"], "not_evaluated");
+    assert!(report["next_action"].as_str().unwrap().contains("原生优先"));
+    assert!(
+        !report["next_action"]
+            .as_str()
+            .unwrap()
+            .contains("补齐缺口资产")
+    );
     let assets = report["assets"].as_array().unwrap();
     assert_eq!(assets.len(), 32);
     for asset in assets {

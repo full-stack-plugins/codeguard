@@ -100,7 +100,7 @@ cargo build --locked -p codeguard-cli
 
 ### npm 安装与一次性调用
 
-源码以 `--features wasm-precheck` 构建后，可显式运行 `codeguard grammar probe <language> <file> --format=json`，由隔离 worker 调用 32 份固定候选中的任意一份。命令始终以退出码 3 返回，并标记 `precheck.status=incomplete`、`native.status=not_run`、`delivery_decision=not_evaluated`；恢复锚点只是疑似观察。此诊断入口尚未把全部语种接入原生优先的 `lint/check`，也尚未进入已发布 npm 包。
+源码以 `--features wasm-precheck` 构建后，可显式运行 `codeguard grammar probe <language> <file> --format=json`，由隔离 worker 调用 32 份固定候选中的任意一份。命令始终以退出码 3 返回，并标记 `status=incomplete`、`native.status=not_run`、`delivery_decision=not_evaluated`；解析完成时还标记 `precheck.status=incomplete`。输入或 worker 失败也遵守同一份[封闭 JSON Schema](schemas/grammar-probe-v0.1.schema.json)。恢复锚点只是疑似观察。此诊断入口尚未把全部语种接入原生优先的 `lint/check`，也尚未进入已发布 npm 包。
 
 已在 Apple Silicon macOS 上通过全新 npm 缓存验证公开 `0.1.2` 包：
 
