@@ -2072,3 +2072,5 @@ TDD 先复现报告漏洞：把源码 finding 的主定位、原生身份及白�
 `repository_content_safety` 新增纯 Rust 的未加密 OpenSSH Ed25519 私钥结构判定：要求成对 PEM 标记、合法 base64、完整 OpenSSH 封装、公私钥字段一致、checkints 和填充格式。`git_index_safety` 只在受控 `git cat-file` 取回并独立核对 OID 的普通暂存 blob 上调用；命中只投影路径与稳定规则 ID，不公开密钥字节。`.codeguard/findings` 与普通文件同样受此入库观察。预览协议升至 0.3.0，0.2.0 schema 留存；命令仍固定退出 3/incomplete/not_evaluated。
 
 目标集成测试先因无内容违规失败，接线后 Core 2/2、真实 Git/CLI 15/15 通过。额外使用本机 `ssh-keygen` 生成的真实 Ed25519 私钥暂存到普通 `notes.md`：首次执行发现合法零填充格式漏报，修正后同一暂存对象命中 `repository_policy.unencrypted_openssh_ed25519_private_key`，且不回显内容。`cargo fmt --all --check`、`git diff --check` 通过。全工作区测试在可用空间降至 801 MiB 时被中断，不作为通过证据；清理仅限本仓 Cargo dev 构建产物后可用空间约 20 GiB。完整 CI 仍待本次变更远端验证。其他私钥格式、签发工具身份、完整交付义务、Git Hook/pre-push/CI 与三宿主真实接入仍缺，3.5/4.6/11.5/12.12 等总体任务不勾选。
+
+首轮 [PR #5 CI](https://github.com/full-stack-plugins/codeguard/actions/runs/36517224229) 编译及 Linux WASM 资源边界通过，但全量测试在 crate 依赖契约处失败：白名单未记录新引入的 base64 纯解码依赖。已将其限定为 core 正式依赖及 CLI 测试夹具依赖，补充“其它 crate/依赖种类仍禁止”的反例；待后续 CI 证明整体回归。不能以首轮红灯宣称全工作区通过。
