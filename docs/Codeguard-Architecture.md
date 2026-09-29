@@ -478,14 +478,19 @@ Current deployment is a locally built binary plus independently prepared native 
 
 ```mermaid
 flowchart LR
-    Build[Explicit Rust release build] --> Verify[Check binary version and host target]
-    Verify --> Pack[Local platform-tagged npm tarball]
+    Build[Explicit Rust build] --> Verify[Check binary version and host target]
+    Verify --> Wasm{WASM package requested?}
+    Wasm -->|yes| Probe[Match 32 pinned identities and run Zig worker]
+    Wasm -->|no, local private only| Pack[Local platform-tagged npm tarball]
+    Probe --> Pack
     Pack --> Node[Node bin: codeguard]
     Node --> Rust[Bundled Rust executable]
     Rust --> Native[Selected native analyzers]
 ```
 
 The default local package is marked private and contains no npm install hook. Its `bin` entry is [npm/codeguard.cjs](../npm/codeguard.cjs); [scripts/pack-npm-local.mjs](../scripts/pack-npm-local.mjs) builds it from an existing binary. The `--public` packaging mode produced the published `@partme.ai/codeguard@0.1.2`, restricted to Apple Silicon macOS. Fresh-cache registry execution and matching package/binary hashes are recorded in [npm 0.1.2 acceptance evidence](../tests/acceptance/npm-0.1.2-candidate.md). Broad registry distribution still needs approved platform coverage, a trusted artifact manifest, matching versions and hashes, and a release process. CodeGraph's Node entry and platform package layout informed this design; its optional network fallback is not part of Codeguard's current installation path.
+
+For a new candidate-WASM package, `--require-wasm` and `--public` both reject a binary lacking the worker. The packer compares its inventory against the 32 pinned manifest identities and executes a Zig worker probe before writing a tarball; [local offline npm acceptance](../tests/acceptance/npm-wasm-local-package.md) additionally runs Zig and Dart from the package. This does not retroactively add WASM to published `0.1.2`, nor does it qualify all languages for lint or certify a public release.
 
 For upgrades: record binary/schema versions, preserve workbench data, preview managed changes, rerun a bounded check, and validate report consumption before adopting the new binary. Downgrade must respect supported schemas; never rewrite historical files into an older shape merely to make parsing pass.
 
