@@ -2,16 +2,70 @@ use codeguard_adapters::{
     adapt_legacy_dylink, adapt_zig_wasm, bundled_grammar_candidates, parse_grammar_asset_manifest,
     verify_grammar_asset,
 };
+use serde_json::Value;
+
+#[test]
+fn published_schema_covers_every_current_candidate_and_field() {
+    let schema: Value = serde_json::from_str(include_str!(
+        "../../../schemas/grammar-asset-manifest.schema.json"
+    ))
+    .unwrap();
+    let manifest: Value =
+        serde_json::from_str(include_str!("../../../grammars/manifest.json")).unwrap();
+    let assets = manifest["assets"].as_array().unwrap();
+    assert!(assets.len() >= schema["properties"]["assets"]["minItems"].as_u64().unwrap() as usize);
+    assert!(assets.len() <= schema["properties"]["assets"]["maxItems"].as_u64().unwrap() as usize);
+    assert_eq!(
+        schema["properties"]["build_tool"]["const"],
+        manifest["build_tool"]
+    );
+    let root_fields = schema["properties"].as_object().unwrap();
+    for name in manifest.as_object().unwrap().keys() {
+        assert!(
+            root_fields.contains_key(name),
+            "schema missing root field {name}"
+        );
+    }
+    let asset_fields = schema["$defs"]["asset"]["properties"].as_object().unwrap();
+    let languages = schema["$defs"]["asset"]["properties"]["language"]["enum"]
+        .as_array()
+        .unwrap();
+    for asset in assets {
+        assert!(
+            languages.contains(&asset["language"]),
+            "schema missing {}",
+            asset["language"]
+        );
+        for name in asset.as_object().unwrap().keys() {
+            assert!(
+                asset_fields.contains_key(name),
+                "schema missing asset field {name}"
+            );
+        }
+    }
+    assert_eq!(
+        schema["$defs"]["asset"]["properties"]["release_status"]["const"],
+        "candidate_unvalidated"
+    );
+}
 
 #[test]
 fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support() {
     let manifest = bundled_grammar_candidates().expect("bundled manifest");
-    assert_eq!(manifest.assets.len(), 11);
+    assert_eq!(manifest.assets.len(), 15);
     for asset in &manifest.assets {
         let (wasm, license) = match asset.language.as_str() {
             "c" => (
                 include_bytes!("../../../grammars/c/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/c/LICENSE").as_slice(),
+            ),
+            "cpp" => (
+                include_bytes!("../../../grammars/cpp/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/cpp/LICENSE").as_slice(),
+            ),
+            "csharp" => (
+                include_bytes!("../../../grammars/csharp/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/csharp/LICENSE").as_slice(),
             ),
             "go" => (
                 include_bytes!("../../../grammars/go/parser.wasm").as_slice(),
@@ -20,6 +74,14 @@ fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support(
             "javascript" => (
                 include_bytes!("../../../grammars/javascript/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/javascript/LICENSE").as_slice(),
+            ),
+            "lua" => (
+                include_bytes!("../../../grammars/lua/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/lua/LICENSE").as_slice(),
+            ),
+            "luau" => (
+                include_bytes!("../../../grammars/luau/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/luau/LICENSE").as_slice(),
             ),
             "java" => (
                 include_bytes!("../../../grammars/java/parser.wasm").as_slice(),
@@ -109,6 +171,12 @@ fn missing_provenance_duplicate_fields_and_unknown_languages_are_rejected() {
     assert!(parse_grammar_asset_manifest(duplicate.as_bytes()).is_err());
     let unknown = original.replacen("\"language\": \"java\"", "\"language\": \"unknown\"", 1);
     assert!(parse_grammar_asset_manifest(unknown.as_bytes()).is_err());
+    let wrong_symbol = original.replacen(
+        "\"loader_symbol\": \"c_sharp\"",
+        "\"loader_symbol\": \"csharp\"",
+        1,
+    );
+    assert!(parse_grammar_asset_manifest(wrong_symbol.as_bytes()).is_err());
 }
 
 #[test]

@@ -96,7 +96,7 @@ cargo build --locked -p codeguard-cli
 
 工作区要求 `std`。可选 `wasm-precheck` 构建特性已用固定的 Java、Python、TypeScript、TSX grammar 候选资产与有界 Rust worker。Java 和 TypeScript/TSX 有局部单文件兜底；`lint python` 在 Ruff 不可用或项目未声明 Ruff 配置时可报告有界疑似语法位置，原生 Ruff 结果优先。公开 npm `0.1.2` 不含该路径。不声称 `no_std`、已完成项目级 WASM 兜底、零 unsafe 或性能最快。运行层系统调用需要安全审查，当前不宣称已完成整体安全审计。
 
-当前源码构建的 CLI 可用 `codeguard grammar status --format=json` 只读展示来源覆盖缺口，不加载 grammar 或运行 lint：固定 CodeGraph 来源含 30 份随仓 WASM，另有两种独立 grammar 从其依赖取得；CodeGuard 当前有 C、Go、Java、JavaScript、Objective-C、Python、Rust、Solidity、TypeScript、TSX、Zig 十一份未验收资产候选，已发行语法能力为零。C、Go、JavaScript、Rust 已作为固定字节的 Rust worker 候选接入，但没有公开 lint 路由或发行验收。Objective-C 与 Solidity 的依赖包原始字节、许可证和固定散列的 `dylink` 元数据转换已入库，可作为 Rust 隔离 worker 的候选观察，但没有公开 lint 路由或发行验收；Zig 也仍是未验收候选。Python 已有仅限源码可选构建的 CLI 候选兜底，结果保持不完整，不能批准交付。[覆盖库存](grammars/codegraph-coverage.json)不是已批准资产清单。COBOL 来源资产约 16.4 MB，还超过当前 Rust 加载器的 8 MiB 限额。
+当前源码构建的 CLI 可用 `codeguard grammar status --format=json` 只读展示来源覆盖缺口，不加载 grammar 或运行 lint：固定 CodeGraph 来源含 30 份随仓 WASM，另有两种独立 grammar 从其依赖取得；CodeGuard 当前有 C、C++、C#、Go、Java、JavaScript、Lua、Luau、Objective-C、Python、Rust、Solidity、TypeScript、TSX、Zig 十五份未验收资产候选，已发行语法能力为零。C、C++、C#、Go、JavaScript、Lua、Luau、Rust 已作为固定字节的 Rust worker 候选接入，但没有公开 lint 路由或发行验收。Objective-C 与 Solidity 的依赖包原始字节、许可证和固定散列的 `dylink` 元数据转换已入库，可作为 Rust 隔离 worker 的候选观察，但没有公开 lint 路由或发行验收；Zig 也仍是未验收候选。Python 已有仅限源码可选构建的 CLI 候选兜底，结果保持不完整，不能批准交付。[覆盖库存](grammars/codegraph-coverage.json)不是已批准资产清单。COBOL 来源资产约 16.4 MB，还超过当前 Rust 加载器的 8 MiB 限额。
 
 ### npm 安装与一次性调用
 

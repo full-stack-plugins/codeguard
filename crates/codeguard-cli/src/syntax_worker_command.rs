@@ -65,8 +65,12 @@ fn observe(language: &str, source: &[u8]) -> Result<SyntaxWorkerEnvelope, String
     }
     let wasm = match language {
         "c" => include_bytes!("../../../grammars/c/parser.wasm").as_slice(),
+        "cpp" => include_bytes!("../../../grammars/cpp/parser.wasm").as_slice(),
+        "csharp" => include_bytes!("../../../grammars/csharp/parser.wasm").as_slice(),
         "go" => include_bytes!("../../../grammars/go/parser.wasm").as_slice(),
         "javascript" => include_bytes!("../../../grammars/javascript/parser.wasm").as_slice(),
+        "lua" => include_bytes!("../../../grammars/lua/parser.wasm").as_slice(),
+        "luau" => include_bytes!("../../../grammars/luau/parser.wasm").as_slice(),
         "java" => include_bytes!("../../../grammars/java/parser.wasm").as_slice(),
         "python" => include_bytes!("../../../grammars/python/parser.wasm").as_slice(),
         "typescript" => include_bytes!("../../../grammars/typescript/parser.wasm").as_slice(),
@@ -77,7 +81,12 @@ fn observe(language: &str, source: &[u8]) -> Result<SyntaxWorkerEnvelope, String
         "rust" => include_bytes!("../../../grammars/rust/parser.wasm").as_slice(),
         _ => return Err("不支持的 grammar 语种".into()),
     };
-    let mut grammar = WasmGrammar::load(language, wasm, &asset.sha256, asset.abi_version as usize)?;
+    let mut grammar = WasmGrammar::load(
+        asset.loader_symbol.as_deref().unwrap_or(language),
+        wasm,
+        &asset.sha256,
+        asset.abi_version as usize,
+    )?;
     let tree = grammar.parse(source)?;
     let scanned = scan_wasm_recoveries(&tree, MAX_RECOVERIES)?;
     let recoveries = scanned

@@ -134,6 +134,37 @@ fn mainstream_grammars_run_in_worker_without_claiming_clean() {
 }
 
 #[test]
+fn cpp_csharp_lua_and_luau_run_in_worker_without_claiming_clean() {
+    for (language, path, source) in [
+        (
+            "cpp",
+            "src/main.cpp",
+            b"int main() { return 0; }".as_slice(),
+        ),
+        (
+            "csharp",
+            "src/C.cs",
+            b"class C { static int F() { return 1; } }".as_slice(),
+        ),
+        ("lua", "src/main.lua", b"local x = 1\n".as_slice()),
+        ("luau", "src/main.luau", b"local x: number = 1\n".as_slice()),
+    ] {
+        let result = run_syntax_worker_candidate(
+            env!("CARGO_BIN_EXE_codeguard").as_ref(),
+            language,
+            path,
+            source,
+            Instant::now() + Duration::from_secs(60),
+            &AtomicBool::new(false),
+        )
+        .expect("grammar worker candidate");
+        assert!(result.recoveries.is_empty(), "{language}");
+        assert_eq!(result.precheck.status, SyntaxPrecheckStatus::Incomplete);
+        assert!(!result.grammar_qualified);
+    }
+}
+
+#[test]
 fn invalid_input_and_cancellation_cannot_yield_observations() {
     let exe = env!("CARGO_BIN_EXE_codeguard").as_ref();
     assert!(
