@@ -70,6 +70,10 @@ fn main() -> ExitCode {
             println!(
                 "显式候选语法观察：grammar probe <language> <file> [--format=json]；隔离加载 32 份固定资产之一，始终返回未完成和退出码 3，不代替原生 lint。"
             );
+            #[cfg(all(feature = "wasm-precheck", unix))]
+            println!(
+                "Zig 原生优先局部检查：lint zig FILE [--zig-tool ABS_PATH] [--format=json]；显式 Zig 0.16.0 使用 ast-check，未提供工具时使用未验收 WASM 候选；始终不签发完整 lint 或交付通过。"
+            );
             println!(
                 "检查预算：check all 支持 --jobs 1–64 和 CODEGUARD_JOBS；--timeout 优先于 CODEGUARD_TIMEOUT，默认 30m。项目默认值见 .codeguard/runtime.json 1.1；当前仅原生执行受截止时间约束。"
             );
@@ -163,6 +167,17 @@ fn main() -> ExitCode {
         [command, rest @ ..] if command == "lint" => {
             if rest.first().is_some_and(|language| language == "java") {
                 codeguard_cli::java_lint_dispatch::run(&rest[1..])
+            } else if cfg!(feature = "wasm-precheck")
+                && rest.first().is_some_and(|language| language == "zig")
+            {
+                #[cfg(feature = "wasm-precheck")]
+                {
+                    codeguard_cli::zig_lint_command::run(&rest[1..])
+                }
+                #[cfg(not(feature = "wasm-precheck"))]
+                {
+                    ExitCode::from(2)
+                }
             } else if rest
                 .first()
                 .is_some_and(|language| language == "typescript")

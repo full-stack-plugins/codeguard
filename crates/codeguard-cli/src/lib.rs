@@ -199,6 +199,8 @@ mod whitelist_correction_projection;
 pub mod work_sync;
 pub mod workspace_refresh;
 pub mod workspace_view_command;
+#[cfg(all(feature = "wasm-precheck", unix))]
+pub mod zig_lint_command;
 
 mod cargo_module_graph;
 mod module_graph;

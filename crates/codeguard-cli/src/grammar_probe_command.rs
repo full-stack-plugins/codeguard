@@ -97,7 +97,7 @@ fn emit_incomplete(language: &str, source_path: &str, reason: &str) -> ExitCode 
     ExitCode::from(3)
 }
 
-fn read_plain_source(path: &Path) -> Result<Vec<u8>, &'static str> {
+pub(crate) fn read_plain_source(path: &Path) -> Result<Vec<u8>, &'static str> {
     if path
         .components()
         .any(|component| matches!(component, Component::ParentDir))
