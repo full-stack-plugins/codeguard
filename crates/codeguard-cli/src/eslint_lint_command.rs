@@ -43,21 +43,38 @@ pub fn run(args: &[String]) -> ExitCode {
     }
     #[cfg(feature = "wasm-precheck")]
     if crate::typescript_syntax_precheck::eligible(&args) {
-        if crate::eslint_native_first_candidate::observed_candidate(&args.source) {
-            let mut report = observe_with_preparation(&args, deadline);
-            if report["reason"] == "eslint_execution_context_missing"
-                && report["workbench"]["next"]["repair_brief"]["step"].is_null()
-            {
-                report["next_action"] = json!(
-                    "项目本地 ESLint 候选和配置已发现；先核对 Node 路径、ESLint 版本与原配置并执行原生检查。候选尚未通过探测，不能认定 lint 已完成"
-                );
-            }
+        if let Some(candidate) =
+            crate::eslint_native_first_candidate::observed_candidate(&args.source)
+        {
+            let mut native_args = args.clone();
+            native_args.entry = Some(candidate.entry);
+            native_args.config = Some(candidate.config);
+            native_args.cwd = Some(candidate.root);
+            native_args.version = Some(candidate.version);
+            let report = if let Some(node) = crate::eslint_native_first_candidate::node_on_path() {
+                native_args.node = Some(node);
+                observe_with_preparation(&native_args, deadline)
+            } else {
+                let mut report = observe_with_preparation(&args, deadline);
+                if report["reason"] == "eslint_execution_context_missing"
+                    && report["workbench"]["next"]["repair_brief"]["step"].is_null()
+                {
+                    report["next_action"] = json!(
+                        "项目本地 ESLint 候选和配置已发现；当前未解析到 Node，请提供 Node 路径并执行原生检查。候选尚未通过探测，不能认定 lint 已完成"
+                    );
+                }
+                report
+            };
             if args.json {
                 println!("{report}");
             } else {
                 print_feedback(&report);
             }
-            return ExitCode::from(3);
+            return ExitCode::from(if report["reason"] == "request_cancelled" {
+                130
+            } else {
+                3
+            });
         }
         let report = crate::typescript_syntax_precheck::observe(&args, deadline);
         if args.json {

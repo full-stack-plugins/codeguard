@@ -185,7 +185,7 @@ flowchart LR
 
 这些是目标语义字段，尚非已发行的项目级 lint/check 报告。局部的[候选初检 schema](../schemas/syntax-precheck-candidate.schema.json) 与 [Rust 严格读者](../crates/codeguard-adapters/src/syntax_precheck_candidate_report.rs)已绑定源码 SHA-256、固定 grammar 身份和文件方言，重新计算状态，并拒绝未知版本及伪造的 `clean`。可选 CLI 的 [TypeScript](../schemas/eslint-local-feedback-v0.3.schema.json)、[TSX](../schemas/eslint-local-feedback-v0.4.schema.json) 与 [Java](../schemas/java-syntax-precheck-feedback-v0.1.schema.json) 单文件生产端已提供恢复位置和准备指引；宿主渲染与持久任务引用仍缺。内置 grammar 仍是未验收候选，因此不能返回 `clean`。保持既有退出语义：必需原生执行缺失仍为未完成（`3`）；解析器疑似问题本身不是已确认违规（`1`）。若未来增加独立语法操作，其成功必须限定为语法初检；本文不宣称已有 `syntax` 命令。
 
-可选特性构建的 CLI 在 `.ts/.mts/.cts` 完全未提供原生执行上下文时输出 [ESLint 反馈 0.3.0](../schemas/eslint-local-feedback-v0.3.schema.json)，`.tsx` 则使用独立 grammar 输出 [0.4.0](../schemas/eslint-local-feedback-v0.4.schema.json)，避免普通 TypeScript grammar 把有效 JSX 标为疑似异常。两者保留 `native=not_run`、`delivery=not_evaluated`，恢复节点只作为 Unicode 位置的疑似观察；即使零恢复节点也保持总体未完成。部分原生上下文或符号链接不触发候选路径，已配置的原生执行继续走原路径。这只是一个局部统一入口，不代表逐模块原生优先调度或宿主自动对话已完成。
+可选特性构建的 CLI 在无显式原生上下文的 TypeScript 单文件请求中，先核对本地 ESLint 10 包及唯一普通 flat config。若从 `PATH` 解析到可执行 Node，就调用既有有界原生版本与报告探针；缺 Node 时报告准备缺口，不让 WASM 抢跑。没有可见本地入口时，`.ts/.mts/.cts` 输出 [ESLint 反馈 0.3.0](../schemas/eslint-local-feedback-v0.3.schema.json)，`.tsx` 用独立 grammar 输出 [0.4.0](../schemas/eslint-local-feedback-v0.4.schema.json)。候选初检保留 `native=not_run`、`delivery=not_evaluated`，即使零恢复节点也保持未完成。部分显式上下文或符号链接不触发该路径。该增量不证明项目脚本参数等价、逐模块调度或宿主对话交付，见[原生优先局部验收](../tests/acceptance/native-first-eslint-candidate.md)。
 
 ### 5.4 Grammar 引入与运行生命周期——目标
 

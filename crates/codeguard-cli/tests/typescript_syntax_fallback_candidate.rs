@@ -112,8 +112,19 @@ fn observed_project_local_eslint_candidate_is_not_treated_as_missing_native_lint
     )
     .unwrap();
 
-    let (status, report) = project.lint("app.ts");
-    assert_eq!(status, 3);
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "lint",
+            "typescript",
+            project.0.join("app.ts").to_str().unwrap(),
+            "--format",
+            "json",
+        ])
+        .env("PATH", "")
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    let report: Value = serde_json::from_slice(&output.stdout).unwrap();
     assert_eq!(report["reason"], "eslint_execution_context_missing");
     assert!(report.get("syntax_precheck").is_none());
     assert!(
@@ -123,6 +134,89 @@ fn observed_project_local_eslint_candidate_is_not_treated_as_missing_native_lint
             .contains("项目本地 ESLint 候选")
     );
     assert_eq!(report["delivery_decision"], "not_evaluated");
+}
+
+#[test]
+fn available_project_local_eslint_runs_before_wasm_and_preserves_native_finding() {
+    use std::os::unix::fs::PermissionsExt;
+
+    let project = Project::new();
+    let source = project.0.join("app.ts");
+    fs::write(&source, "debugger;\n").unwrap();
+    fs::write(
+        project.0.join("package.json"),
+        r#"{"devDependencies":{"eslint":"10.0.0"}}"#,
+    )
+    .unwrap();
+    fs::write(
+        project.0.join("eslint.config.cjs"),
+        "module.exports = [];\n",
+    )
+    .unwrap();
+    fs::create_dir_all(project.0.join("node_modules/eslint/bin")).unwrap();
+    fs::write(
+        project.0.join("node_modules/eslint/package.json"),
+        r#"{"name":"eslint","version":"10.0.0","bin":{"eslint":"bin/eslint.js"}}"#,
+    )
+    .unwrap();
+    fs::write(
+        project.0.join("node_modules/eslint/bin/eslint.js"),
+        "local entry fixture\n",
+    )
+    .unwrap();
+    let native = serde_json::json!([{
+        "filePath": source.canonicalize().unwrap(),
+        "messages": [{"ruleId":"no-debugger","severity":2,"message":"private native text","line":1,"column":1}],
+        "suppressedMessages":[],"errorCount":1,"warningCount":0,"fatalErrorCount":0,
+        "fixableErrorCount":0,"fixableWarningCount":0
+    }]);
+    let node = project.0.join("node");
+    fs::write(
+        &node,
+        format!(
+            "#!/bin/sh\nfor arg in \"$@\"; do if [ \"$arg\" = --version ]; then printf 'v10.0.0\\n'; exit 0; fi; done\nwhile [ \"$#\" -gt 0 ]; do if [ \"$1\" = --output-file ]; then shift; report=$1; fi; shift; done\nprintf '%s' '{}' > \"$report\"\nexit 1\n",
+            native
+        ),
+    )
+    .unwrap();
+    fs::set_permissions(&node, fs::Permissions::from_mode(0o700)).unwrap();
+
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "lint",
+            "typescript",
+            source.to_str().unwrap(),
+            "--format",
+            "json",
+        ])
+        .env("PATH", &project.0)
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    let report: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(report["local_coherent"], true, "{report}");
+    assert_eq!(report["findings"][0]["rule_id"], "no-debugger");
+    assert!(report.get("syntax_precheck").is_none());
+    assert_eq!(report["delivery_decision"], "not_evaluated");
+    assert!(!String::from_utf8_lossy(&output.stdout).contains("private native text"));
+
+    fs::write(&node, "#!/bin/sh\nprintf 'v10.0.1\\n'\n").unwrap();
+    let mismatch = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "lint",
+            "typescript",
+            source.to_str().unwrap(),
+            "--format",
+            "json",
+        ])
+        .env("PATH", &project.0)
+        .output()
+        .unwrap();
+    assert_eq!(mismatch.status.code(), Some(3));
+    let mismatch: Value = serde_json::from_slice(&mismatch.stdout).unwrap();
+    assert_eq!(mismatch["reason"], "eslint_version_mismatch");
+    assert_eq!(mismatch["local_coherent"], false);
+    assert!(mismatch.get("syntax_precheck").is_none());
 }
 
 #[test]
