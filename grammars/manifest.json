@@ -43,6 +43,24 @@
       "release_status": "candidate_unvalidated"
     },
     {
+      "language": "python",
+      "dialect": "python",
+      "grammar_repository": "https://github.com/tree-sitter/tree-sitter-python",
+      "grammar_commit": "bffb65a8cfe4e46290331dfef0dbf0ef3679de11",
+      "grammar_version": "v0.23.6",
+      "path": "python/parser.wasm",
+      "sha256": "a7fdc587e77bd729b9f5b783c659be23c896e305a2c374472bed7114d9e01fac",
+      "bytes": 456131,
+      "license": "python/LICENSE",
+      "license_sha256": "d724405ce238a22c0d35769c5a36b386ad5958192efe8bbb304fb2896254575f",
+      "abi_version": 14,
+      "codegraph_runtime": "web-tree-sitter 0.25.3",
+      "codeguard_runtime_validation": "rust_loader_smoke_passed",
+      "language_versions": [],
+      "known_limitations": ["Rust loader smoke passed; Python language versions, dialects, isolation and syntax corpus are not yet validated"],
+      "release_status": "candidate_unvalidated"
+    },
+    {
       "language": "tsx",
       "dialect": "tsx",
       "grammar_repository": "https://github.com/tree-sitter/tree-sitter-typescript",

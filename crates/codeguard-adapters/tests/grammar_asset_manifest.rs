@@ -5,12 +5,16 @@ use codeguard_adapters::{
 #[test]
 fn bundled_candidates_pin_source_bytes_license_and_abi_without_claiming_support() {
     let manifest = bundled_grammar_candidates().expect("bundled manifest");
-    assert_eq!(manifest.assets.len(), 3);
+    assert_eq!(manifest.assets.len(), 4);
     for asset in &manifest.assets {
         let (wasm, license) = match asset.language.as_str() {
             "java" => (
                 include_bytes!("../../../grammars/java/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/java/LICENSE").as_slice(),
+            ),
+            "python" => (
+                include_bytes!("../../../grammars/python/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/python/LICENSE").as_slice(),
             ),
             "typescript" => (
                 include_bytes!("../../../grammars/typescript/parser.wasm").as_slice(),
@@ -64,4 +68,17 @@ fn changed_wasm_license_or_abi_never_qualifies_a_candidate() {
     assert!(verify_grammar_asset(&asset, wasm, license).is_err());
     asset.sha256 = "0".repeat(64);
     assert!(verify_grammar_asset(&asset, wasm, license).is_err());
+
+    let python = manifest
+        .assets
+        .iter()
+        .find(|asset| asset.language == "python")
+        .expect("Python candidate");
+    let python_wasm = include_bytes!("../../../grammars/python/parser.wasm");
+    let python_license = include_bytes!("../../../grammars/python/LICENSE");
+    assert!(verify_grammar_asset(python, python_wasm, python_license).is_ok());
+    let mut altered_python = python_wasm.to_vec();
+    altered_python[64] ^= 1;
+    assert!(verify_grammar_asset(python, &altered_python, python_license).is_err());
+    assert!(verify_grammar_asset(python, python_wasm, license).is_err());
 }

@@ -9,6 +9,7 @@ const CODEGRAPH_LICENSE_SHA256: &str =
     "e6d98f98c666bebe065ac2492a0a19232cc318d4d67bac3ca42ffb77bacc8809";
 const JAVA_COMMIT: &str = "94703d5a6bed02b98e438d7cad1136c01a60ba2c";
 const TYPESCRIPT_COMMIT: &str = "f975a621f4e7f532fe322e13c4f79495e0a7b2e7";
+const PYTHON_COMMIT: &str = "bffb65a8cfe4e46290331dfef0dbf0ef3679de11";
 
 /// 代码来源、许可和每份候选 grammar 的固定身份。
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
@@ -68,7 +69,7 @@ pub struct GrammarAsset {
     pub release_status: String,
 }
 
-/// 读取仓内固定清单，并检查 CodeGraph 许可证及三份资产的原始字节。
+/// 读取仓内固定清单，并检查 CodeGraph 许可证及四份资产的原始字节。
 pub fn bundled_grammar_candidates() -> Result<GrammarAssetManifest, String> {
     let manifest = parse_grammar_asset_manifest(include_bytes!("../../../grammars/manifest.json"))?;
     let codegraph_license = include_bytes!("../../../grammars/LICENSE.codegraph");
@@ -84,6 +85,10 @@ pub fn bundled_grammar_candidates() -> Result<GrammarAssetManifest, String> {
             "typescript" => (
                 include_bytes!("../../../grammars/typescript/parser.wasm").as_slice(),
                 include_bytes!("../../../grammars/typescript/LICENSE").as_slice(),
+            ),
+            "python" => (
+                include_bytes!("../../../grammars/python/parser.wasm").as_slice(),
+                include_bytes!("../../../grammars/python/LICENSE").as_slice(),
             ),
             "tsx" => (
                 include_bytes!("../../../grammars/tsx/parser.wasm").as_slice(),
@@ -110,7 +115,7 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
         || manifest.codegraph_license != "LICENSE.codegraph"
         || manifest.codegraph_license_sha256 != CODEGRAPH_LICENSE_SHA256
         || manifest.build_tool != "tree-sitter-cli 0.25.10 build --wasm"
-        || manifest.assets.len() != 3
+        || manifest.assets.len() != 4
     {
         return Err("grammar 清单版本、来源或资产数量不符".into());
     }
@@ -119,7 +124,7 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
         .iter()
         .map(|asset| asset.language.as_str())
         .collect();
-    if languages != BTreeSet::from(["java", "typescript", "tsx"]) {
+    if languages != BTreeSet::from(["java", "python", "typescript", "tsx"]) {
         return Err("grammar 语言资产缺失或重复".into());
     }
     for asset in &manifest.assets {
@@ -134,6 +139,16 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
                     414653,
                     "java/LICENSE",
                     "52ed137b039cd9c46409bc22e89938af911c95b157feae2d040b51e6084369a7",
+                ),
+                "python" => (
+                    "https://github.com/tree-sitter/tree-sitter-python",
+                    PYTHON_COMMIT,
+                    "v0.23.6",
+                    "python/parser.wasm",
+                    "a7fdc587e77bd729b9f5b783c659be23c896e305a2c374472bed7114d9e01fac",
+                    456131,
+                    "python/LICENSE",
+                    "d724405ce238a22c0d35769c5a36b386ad5958192efe8bbb304fb2896254575f",
                 ),
                 "typescript" => (
                     "https://github.com/tree-sitter/tree-sitter-typescript",

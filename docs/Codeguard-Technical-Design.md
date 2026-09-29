@@ -14,7 +14,7 @@ The existing [OpenSpec change](../openspec/changes/introduce-rust-codeguard-cli/
 
 Current source is the authority for callable behavior. Target contracts are labelled as such. The product priority is configuration discovery → native results → useful repair guidance. Internal consistency checks support this experience; they are not a demand for users to manually construct execution certificates.
 
-WASM requirements and 18 implementation tasks are recorded in the existing change. Candidate Rust worker, pinned Java/TypeScript/TSX assets, and narrow single-file reports now exist behind an opt-in feature; project-wide native-first routing, qualified grammar ranges, and host integrations remain incomplete. Design examples are not current command output.
+WASM requirements and 18 implementation tasks are recorded in the existing change. Candidate Rust worker and narrow Java/TypeScript/TSX single-file reports now exist behind an opt-in feature; Python is pinned and Rust-loadable but has no CLI fallback. Project-wide native-first routing, qualified grammar ranges, and host integrations remain incomplete. Design examples are not current command output.
 
 ## 2. Technology choices and trade-offs
 
@@ -191,7 +191,7 @@ The opt-in CLI build first checks for a local ESLint 10 package and a single ord
 
 Import only pinned WASM bytes with upstream license, commit/patch provenance, SHA-256, ABI, tested runtime and language/dialect ranges, corpus reference and known gaps. Verify each copied CodeGraph artifact in the selected Rust Tree-sitter runtime; do not copy TypeScript extraction logic or assume CodeGraph support equals syntax acceptance. A release manifest belongs to distribution assets, not writable `.codeguard/` project state.
 
-Use `codeguard grammar status --format=json` to query the separate source coverage inventory. It reports 32 distinct CodeGraph grammar assets, three CodeGuard candidates, and zero released capabilities without running a parser. The two dependency-provided assets lack pinned bytes, and COBOL exceeds the current 8 MiB loader limit; these remain explicit gaps before any per-language qualification.
+Use `codeguard grammar status --format=json` to query the separate source coverage inventory. It reports 32 distinct CodeGraph grammar assets, four CodeGuard asset candidates, and zero released capabilities without running a parser. Python is Rust-loadable but has no CLI lint fallback. The two dependency-provided assets lack pinned bytes, and COBOL exceeds the current 8 MiB loader limit; these remain explicit gaps before any per-language qualification.
 
 Use a parent-controlled parser worker with a total deadline, per-file input bound, memory/process limit and capped diagnostics. Lazy-load selected grammars, parse without general network/filesystem imports, and terminate a stuck worker without losing native results from other modules. Host-specific enforcement and Rust MSRV compatibility must be tested; numeric production budgets remain measurement-driven rather than invented promises.
 
