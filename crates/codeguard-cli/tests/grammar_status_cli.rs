@@ -12,13 +12,20 @@ fn codegraph_coverage_is_explicit_and_never_claims_parser_or_gate_completion() {
     assert_eq!(report["report_type"], "grammar_coverage_inventory");
     assert_eq!(report["codegraph_grammar_count"], 32);
     assert_eq!(report["codegraph_vendored_count"], 30);
-    assert_eq!(report["candidate_count"], 23);
+    assert_eq!(report["candidate_count"], 32);
     assert_eq!(report["released_count"], 0);
     assert_eq!(report["authority"], "source_inventory_only");
     assert_eq!(report["parser_capability"], "unverified");
     assert_eq!(report["gate_effect"], "none");
     assert_eq!(report["execution"], "not_run");
     assert_eq!(report["delivery_decision"], "not_evaluated");
+    assert!(report["next_action"].as_str().unwrap().contains("原生优先"));
+    assert!(
+        !report["next_action"]
+            .as_str()
+            .unwrap()
+            .contains("补齐缺口资产")
+    );
     let assets = report["assets"].as_array().unwrap();
     assert_eq!(assets.len(), 32);
     for asset in assets {
@@ -28,9 +35,14 @@ fn codegraph_coverage_is_explicit_and_never_claims_parser_or_gate_completion() {
     for language in [
         "arkts",
         "c",
+        "cfml",
+        "cfquery",
+        "cfscript",
+        "cobol",
         "cpp",
         "csharp",
         "dart",
+        "erlang",
         "go",
         "java",
         "javascript",
@@ -39,15 +51,19 @@ fn codegraph_coverage_is_explicit_and_never_claims_parser_or_gate_completion() {
         "luau",
         "nix",
         "objc",
+        "pascal",
         "php",
         "python",
         "r",
         "ruby",
         "rust",
+        "scala",
         "solidity",
+        "swift",
         "terraform",
         "typescript",
         "tsx",
+        "vbnet",
         "zig",
     ] {
         let asset = assets
@@ -61,7 +77,7 @@ fn codegraph_coverage_is_explicit_and_never_claims_parser_or_gate_completion() {
         .iter()
         .find(|row| row["language"] == "cobol")
         .unwrap();
-    assert_eq!(cobol["gap"], "current_loader_size_limit");
+    assert_eq!(cobol["gap"], "language_qualification_and_release_pending");
     assert!(cobol["source_bytes"].as_u64().unwrap() > 8 * 1024 * 1024);
     let dart = assets.iter().find(|row| row["language"] == "dart").unwrap();
     assert_eq!(dart["integration_status"], "candidate_unvalidated");

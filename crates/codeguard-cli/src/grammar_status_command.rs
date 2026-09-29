@@ -137,7 +137,7 @@ fn coverage_report() -> Result<Value, String> {
                 "runtime_observation":candidate.map(|item| item.codeguard_runtime_validation.as_str()),
                 "released":false,
                 "gap":if candidate.is_some_and(|item| item.codeguard_runtime_validation == "rust_loader_incompatible") {"rust_loader_incompatible"}
-                    else if asset.bytes.is_some_and(|bytes| bytes > 8 * 1024 * 1024) {"current_loader_size_limit"}
+                    else if asset.bytes.is_some_and(|bytes| bytes > 20 * 1024 * 1024) {"current_loader_size_limit"}
                     else if candidate.is_some() {"language_qualification_and_release_pending"}
                     else {"asset_provenance_license_and_loader_validation_pending"},
             })
@@ -157,7 +157,7 @@ fn coverage_report() -> Result<Value, String> {
         "gate_effect":"none",
         "execution":"not_run",
         "delivery_decision":"not_evaluated",
-        "next_action":"固定各缺口资产的上游来源与许可证，逐语言验证 Rust 加载、版本语料及原生对照；不得凭此库存跳过原生 lint。",
+        "next_action":"按语言完成独立版本与方言语料、原生工具对照和误报评测，接入原生优先 lint/check 与任务反馈，并验收发行包；不得凭候选库存跳过原生 lint。",
         "assets":assets,
     }))
 }

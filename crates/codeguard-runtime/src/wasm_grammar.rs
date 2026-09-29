@@ -4,6 +4,9 @@ use tree_sitter::{
     wasmtime::{Config, Engine},
 };
 
+// COBOL 固定来源资产约 16 MiB；20 MiB 仍限制非清单输入的尺寸。
+const MAX_GRAMMAR_WASM_BYTES: usize = 20 * 1024 * 1024;
+
 /// 经调用方固定清单校验的 Tree-sitter WASM grammar 的 Rust 加载与解析器。
 /// 仅提供语法树；是否属于源码违规由上层规则和原生检查结果决定。
 pub struct WasmGrammar {
@@ -25,11 +28,11 @@ impl WasmGrammar {
         if name.is_empty()
             || !name
                 .bytes()
-                .all(|byte| byte.is_ascii_lowercase() || byte == b'-' || byte == b'_')
+                .all(|byte| byte.is_ascii_alphabetic() || byte == b'-' || byte == b'_')
         {
             return Err("无效的 grammar 名称".into());
         }
-        if wasm.len() < 8 || wasm.len() > 8 * 1024 * 1024 || !wasm.starts_with(b"\0asm") {
+        if wasm.len() < 8 || wasm.len() > MAX_GRAMMAR_WASM_BYTES || !wasm.starts_with(b"\0asm") {
             return Err("WASM 字节无效或超过大小上限".into());
         }
         if expected_sha256.len() != 64

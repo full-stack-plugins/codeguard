@@ -11,7 +11,7 @@
     "source_commit": {"$ref": "#/$defs/commit"},
     "codegraph_license": {"const": "LICENSE.codegraph"},
     "codegraph_license_sha256": {"$ref": "#/$defs/sha256"},
-    "build_tool": {"const": "tree-sitter-cli 0.25.10 build --wasm; Zig: tree-sitter-cli 0.27.0 generate --abi 15 + Zig 0.16.0 wasm32-wasi; Dart: pinned parser.c/scanner.c + Zig 0.16.0 wasm32-wasi; ArkTS/Terraform: pinned npm prebuilt WASM"},
+    "build_tool": {"const": "tree-sitter-cli 0.25.10 build --wasm; Zig: tree-sitter-cli 0.27.0 generate --abi 15 + Zig 0.16.0 wasm32-wasi; Dart: pinned parser.c/scanner.c + Zig 0.16.0 wasm32-wasi; CFML: tree-sitter-cli 0.26.9; Scala: v0.26.2 release WASM; Swift: crate 0.7.3 sources; VB.NET/COBOL: CodeGraph-patched upstream; ArkTS/Terraform: pinned npm prebuilt WASM"},
     "dependency_package_integrity": {"type": "string", "pattern": "^tree-sitter-wasms@0\\.1\\.13 sha512-[A-Za-z0-9+/]+=*$"},
     "dependency_package_license": {"const": "LICENSE.tree-sitter-wasms"},
     "dependency_package_license_sha256": {"$ref": "#/$defs/sha256"},
@@ -27,7 +27,7 @@
       "properties": {
         "language": {"enum": ["arkts", "c", "cfml", "cfquery", "cfscript", "cobol", "cpp", "csharp", "dart", "erlang", "go", "java", "javascript", "kotlin", "lua", "luau", "nix", "objc", "pascal", "php", "python", "r", "ruby", "rust", "scala", "solidity", "swift", "terraform", "tsx", "typescript", "vbnet", "zig"]},
         "dialect": {"type": "string", "minLength": 1},
-        "loader_symbol": {"const": "c_sharp"},
+        "loader_symbol": {"enum": ["c_sharp", "COBOL"]},
         "grammar_repository": {"type": "string", "pattern": "^https://github\\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"},
         "grammar_commit": {"$ref": "#/$defs/commit"},
         "grammar_version": {"type": "string", "minLength": 1, "maxLength": 128},

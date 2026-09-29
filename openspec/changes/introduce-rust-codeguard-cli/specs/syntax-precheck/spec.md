@@ -14,6 +14,10 @@
 - **WHEN** 前端具备有效 ESLint 而 Java 模块缺少 JDK
 - **THEN** 前端运行原生 lint，Java 模块提供语法初检；两者的范围、来源和准备状态分别保留
 
+#### Scenario: Explicit Zig 0.16 source check takes precedence over the candidate grammar
+- **WHEN** `lint zig` 收到可核对的 Zig 0.16.0 工具与普通 `.zig` 文件
+- **THEN** 优先以受控进程运行原生 `zig ast-check`；原生诊断必须保留，不能因 WASM 观察覆盖。只有该原生工具未提供或不可运行时，才可返回未验收 WASM 候选观察，并始终保持整体未完成；`ast-check` 不等于全部 Zig lint、测试或构建。
+
 #### Scenario: A local checker is absent from PATH
 - **WHEN** 项目声明的本地原生工具已可按受支持方式定位
 - **THEN** 核对其配置和版本后优先运行，不创建错误的安装任务
@@ -69,6 +73,12 @@
 CodeGuard MUST 提供只读的来源覆盖清单，区分 CodeGraph 随仓 WASM、由依赖包提供但尚未固定字节的 grammar、CodeGuard 已复制候选及已验收发行能力。覆盖清单或 `grammar status` 的存在 MUST NOT 自动改变原生检查义务、加载未经批准的字节，或把来源资产数量说成已支持语言数量。来源资产超过当前加载预算时 MUST 明示预算缺口，不能静默跳过。
 
 目标范围 MUST 包含当前固定 CodeGraph 来源的 32 份独立 grammar，并包含 Zig；`jsx` 与 `javascript` 共用同一份 grammar，不重复计数。每份 grammar 都须分别完成合法再分发来源、许可、字节与 ABI、Rust 离线加载、版本/方言正反语料、原生工具对照、统一 `lint/check` 的原生优先路由、任务/对话反馈及发行包实装验收。部分候选或来源库存不能充当全部接入。若上游 WASM 与 Rust 运行时导入不兼容，适配 MUST 固定原始和派生字节、限定变换范围并以正反解析样本复验；不能回退到已知产生误报的旧 grammar 来制造可加载状态。
+
+在正式 `lint/check` 路由验收之前，CLI MAY 暴露显式的单文件 `grammar probe` 候选观察。该命令 MUST 通过与正式路径相同的固定资产核验及隔离 worker，报告源码与 grammar 摘要、恢复锚点、未验收状态及原生确认需求；无论有无恢复节点，MUST 返回未完成，不能产生已确认违规、任务关闭或交付通过。有效语种的输入/worker 失败 MUST 使用同一版本化封闭 JSON 协议报告具体未完成原因，未知语种属于参数错误。它不能自动代替已配置的原生工具执行。
+
+#### Scenario: Explicit candidate probe uses one of the 32 assets
+- **WHEN** 用户明确对受支持语种和普通 UTF-8 文件执行 `grammar probe`
+- **THEN** 固定 WASM 在隔离 worker 中解析该文件并返回候选观察；语法正常仍为未完成，恢复锚点只提示原生确认
 
 #### Scenario: Zig source grammar fixes a known false positive but needs a runtime adapter
 

@@ -1057,3 +1057,19 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 14.1 / 14.19 Dart 重建增量：固定 CodeGraph 来源提交所对应的 `UserNobody14/tree-sitter-dart@d4d8f3e337d8be23be27ffc35a0aef972343cd54`，将 `parser.c`、真实 `scanner.c`、头文件与 MIT 许可证逐字节和上游核对。Zig 0.16.0 离线重建生成原始 WASM，固定 SHA-256 与适配后 SHA-256；受控 Rust 适配只更改 import section 中同签名的 `__main_argc_argv` 名称，未修改 scanner 或语法表。重建脚本重复产出相同字节，Rust 加载实测 ABI 15、注释/字符串插值正反例和隔离 worker 候选观察通过。当前 23/32 份候选、9 份未入候选、发行验收仍为 0。`grammar status` 分别显示 CodeGraph 原资产与重建/适配候选摘要。尚缺 Dart SDK 原生对照、版本/方言语料、公开原生优先 `lint dart`、任务与对话反馈和发行包验收；14.1、14.19 不勾选。见[Dart 重建局部验收](../../../tests/acceptance/dart-grammar-rebuild-candidate.md)。
 
 14.4 / 14.19 Dart 语料与性能局部增量：固定上游 15 份 corpus 共 150 例（预期正常 146、预期错误 4），Rust WASM 的错误分类全部匹配。父进程按语言选择并验证目标资产，不再为单文件 worker 全量散列 23 份 WASM；13 项隔离 worker 测试在并行执行下通过。该语料仍来自同一 grammar 仓库，不是独立 Dart SDK oracle；性能只有单次回归观察，逐版本独立语料、原生对照及冷暖启动预算仍缺，14.4、14.17、14.19 均不勾选。
+
+14.1 / 14.4 / 14.19 Erlang 增量：固定 CodeGraph `1072f82ce24db3d133258d30165cef6b74d108b2` 中的 Erlang WASM 原始字节，并固定 WhatsApp `tree-sitter-erlang` 标签 `0.19` 对应的提交与许可证；Rust 离线加载实测 ABI 14，基本合法/非法语法与隔离 worker 候选状态通过。当前累计 24/32 份候选、8 份未入候选、0 项发行验收。尚未独立重建出与 CodeGraph 相同的 WASM、没有版本/方言语料、原生 Erlang 检查器对照、误报漏报评估、统一命令原生优先路由和发行包实装；14.1、14.4、14.17、14.19 不勾选。见[Erlang 局部验收](../../../tests/acceptance/erlang-grammar-candidate.md)。
+
+14.1 / 14.4 / 14.19 Pascal 增量：固定 CodeGraph 来源 WASM 字节与原项目锁定的 `Isopod/tree-sitter-pascal@042119eca2e18a60e56317fb06ee3ba5c32cb447` 许可证，Rust 离线加载实测 ABI 14，基本合法/非法程序和隔离 worker 候选状态通过。当前累计 25/32 份候选、7 份未入候选、0 项发行验收。缺逐版本 Delphi/FreePascal 语料、原生对照、误报漏报评估、统一命令原生优先路由、宿主反馈、资源预算与发行包实装；14.1、14.4、14.17、14.19 不勾选。见[Pascal 局部验收](../../../tests/acceptance/pascal-grammar-candidate.md)。
+
+14.1 / 14.2 / 14.4 / 14.19 全来源资产候选增量：CFML、CFQuery、CFScript、COBOL、Scala、Swift、VB.NET 七份 CodeGraph WASM 已固定来源字节、许可证、上游提交或发行包及适用补丁；Rust 离线加载和隔离 worker 的窄范围正反例通过。清单累计 32/32 份候选，已发行语法能力仍为 0。COBOL 通过受限 20 MiB 输入和固定 `COBOL` 导出名加载，但冷启动/内存成本高，固定/自由格式尚未验收；CFQuery 漏掉 `SELECT FROM`，VB.NET 对合法未缩进类方法体产生 `MISSING`，均不得发布为违规检测。CFML 嵌入语境、逐语言版本/方言语料、原生工具对照、公开原生优先 `lint/check`、任务/宿主反馈、资源预算和发行包验收仍缺；14.1–14.19 不因资产凑齐而勾选。见[七份局部验收](../../../tests/acceptance/final-seven-grammar-candidates.md)。
+
+14.4 / 14.7 候选诊断增量：源码构建的 `grammar probe <language> <file> --format=json` 明确调用固定资产与隔离 worker，保留摘要、恢复锚点和未完成状态；该手动诊断不是原生优先 `lint/check`、宿主自动触发或已发行支持。32 份候选已具备内部 worker 路径，仍需各语种正反语料、原生对照和统一路由验收，父任务不勾选。
+
+14.7 协议增量：为显式 `grammar probe` 增加 0.1.0 封闭 JSON Schema，语言枚举与 32 份固定资产清单同步；成功观察、文件缺失均保持 `incomplete`/原生未运行/交付未评估，已用 Draft 2020-12 校验真实输出并确认伪造 `clean` 和额外字段被拒。该协议只覆盖手动单文件候选，不能代替 S14 的统一多文件报告与未知 major 消费端验收，14.7 不勾选。
+
+14.6 / 14.7 Zig 原生优先局部增量：源码可选 WASM 构建中的 `lint zig FILE --zig-tool ABS_PATH` 先核对 Zig 0.16.0，再以受控 stdin 执行原生 `ast-check`；原生诊断存在时保留位置且不运行 WASM。未提供或工具版本不合时，使用固定 Zig grammar 返回未验收候选；两条路径均不签发完整 lint 或交付通过。真实本机 Zig 0.16.0 正反例、伪工具优先级测试、缺工具回退与 0.1.0 报告 Schema 验证通过。尚缺项目本地/PATH 工具准备发现、多模块统一路由、版本语料、任务和宿主反馈、发行验收，14.6/14.7/14.19 不勾选。
+
+14.6 / 14.7 / 14.19 全项目候选路由增量：源码可选构建中的 `check all` 现先执行原生节点，再按方言把已发现源码送入固定隔离 worker；TSX、JavaScript、CFScript 分路由，CFQuery 只从完整标签体提取，歧义 `.h` 和普通 `.sql` 不猜测。四个有界项目的真实 `check all` 样例合计调用全部 32 份资产，输出 0.32.0 封闭候选字段并保持原生阻塞、退出码 3、交付未完成。单项目 31 文件的早期样例在 macOS 45 秒预算内仅 26/32、90 秒约 54 秒可完成；Linux CI 在 90 秒内仍为 26/32，因此跨平台验收改为分批项目，预算超限范围明确保持未完成。64 文件/64 片段上限不放宽。逐语种原生选择/版本语料、误报漏报对照、任务宿主反馈、发行验收仍缺；14.6/14.7/14.17/14.19 不勾选。见[32 份路由局部验收](../../../tests/acceptance/check-all-32-grammar-candidates.md)。
+
+14.6 / 14.7 逐文件原生优先局部增量：源码可选构建中的 `check all` 现只在 Ruff 本轮完整检查同一路径、工具/配置摘要存在且源码 SHA-256 与候选阶段重新读取的字节一致时，对该 Python 文件跳过重复 WASM；`findings` 原生诊断仍原样保留，混合项目的 Zig 文件继续跑固定 worker，整体仍为退出码 3 和 `incomplete`。封闭协议升至 0.33.0，0.32.0 单独归档，新增 `native_preferred_count`；未完成扫描、路径错配或源码变化不得跳过。见[Python 原生优先局部验收](../../../tests/acceptance/check-all-native-preferred-python.md)。尚未覆盖其它 31 种 grammar 的逐模块原生能力判定、独立语法 oracle、任务/宿主反馈及发行验收；14.6/14.7/14.19 保持未完成。

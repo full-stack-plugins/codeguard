@@ -238,6 +238,79 @@ fn rebuilt_dart_runs_in_worker_without_claiming_clean() {
 }
 
 #[test]
+fn erlang_candidate_runs_in_worker_without_claiming_clean() {
+    let result = run_syntax_worker_candidate(
+        env!("CARGO_BIN_EXE_codeguard").as_ref(),
+        "erlang",
+        "src/hello.erl",
+        b"-module(hello).\nhello() -> ok.\n",
+        Instant::now() + Duration::from_secs(60),
+        &AtomicBool::new(false),
+    )
+    .expect("Erlang grammar candidate");
+    assert!(result.recoveries.is_empty());
+    assert_eq!(result.precheck.status, SyntaxPrecheckStatus::Incomplete);
+    assert!(!result.grammar_qualified);
+}
+
+#[test]
+fn pascal_candidate_runs_in_worker_without_claiming_clean() {
+    let result = run_syntax_worker_candidate(
+        env!("CARGO_BIN_EXE_codeguard").as_ref(),
+        "pascal",
+        "src/hello.pas",
+        b"program Hello;\nbegin\n  writeln('Hi');\nend.\n",
+        Instant::now() + Duration::from_secs(60),
+        &AtomicBool::new(false),
+    )
+    .expect("Pascal grammar candidate");
+    assert!(result.recoveries.is_empty());
+    assert_eq!(result.precheck.status, SyntaxPrecheckStatus::Incomplete);
+    assert!(!result.grammar_qualified);
+}
+
+#[test]
+fn remaining_source_grammars_run_in_worker_without_claiming_clean() {
+    for (language, path, source) in [
+        ("cfml", "web/index.cfm", b"<cfset x = 1>".as_slice()),
+        ("cfquery", "web/query.sql", b"SELECT #x# FROM users".as_slice()),
+        ("cfscript", "web/component.cfs", b"component { function f() { return 1; } }".as_slice()),
+        ("scala", "src/Main.scala", b"object Main { def f(x: Int): Int = x + 1 }".as_slice()),
+        ("swift", "Sources/Main.swift", b"func f() -> Int { return 1 }".as_slice()),
+        ("vbnet", "src/C.vb", b"Public Class C\n    Public Function F() As Integer\n        Return 1\n    End Function\nEnd Class\n".as_slice()),
+    ] {
+        let result = run_syntax_worker_candidate(
+            env!("CARGO_BIN_EXE_codeguard").as_ref(),
+            language,
+            path,
+            source,
+            Instant::now() + Duration::from_secs(60),
+            &AtomicBool::new(false),
+        )
+        .unwrap_or_else(|reason| panic!("{language} candidate: {reason}"));
+        assert!(result.recoveries.is_empty(), "{language}");
+        assert_eq!(result.precheck.status, SyntaxPrecheckStatus::Incomplete);
+        assert!(!result.grammar_qualified);
+    }
+}
+
+#[test]
+fn cobol_candidate_runs_in_worker_without_claiming_clean() {
+    let result = run_syntax_worker_candidate(
+        env!("CARGO_BIN_EXE_codeguard").as_ref(),
+        "cobol",
+        "src/HELLO.cbl",
+        b"       IDENTIFICATION DIVISION.\n       PROGRAM-ID. HELLO.\n",
+        Instant::now() + Duration::from_secs(90),
+        &AtomicBool::new(false),
+    )
+    .expect("COBOL candidate");
+    assert!(result.recoveries.is_empty());
+    assert_eq!(result.precheck.status, SyntaxPrecheckStatus::Incomplete);
+    assert!(!result.grammar_qualified);
+}
+
+#[test]
 fn invalid_input_and_cancellation_cannot_yield_observations() {
     let exe = env!("CARGO_BIN_EXE_codeguard").as_ref();
     assert!(

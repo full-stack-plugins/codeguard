@@ -27,6 +27,13 @@ const RUBY_COMMIT: &str = "71bd32fb7607035768799732addba884a37a6210";
 const PHP_COMMIT: &str = "5b5627faaa290d89eb3d01b9bf47c3bb9e797dea";
 const KOTLIN_COMMIT: &str = "e1a2d5ad1f61f5740677183cd4125bb071cd2f30";
 const DART_COMMIT: &str = "d4d8f3e337d8be23be27ffc35a0aef972343cd54";
+const ERLANG_COMMIT: &str = "836aa2b6c3af2c7cef3f84049b0ed6d44485a870";
+const PASCAL_COMMIT: &str = "042119eca2e18a60e56317fb06ee3ba5c32cb447";
+const CFML_COMMIT: &str = "5279bde9b31d54efa68efb77a4b18ee9508518e4";
+const COBOL_COMMIT: &str = "e99dbdc3d800d5fa2796476efd60af91f6b43d93";
+const SCALA_COMMIT: &str = "b931fcc338390925eb893d70ad070033f5856ccf";
+const SWIFT_COMMIT: &str = "31d17fe7e818a2048c808b5c6fdc2dc792f4f5b5";
+const VBNET_COMMIT: &str = "538b7087bf80e86004531b392fe1186379c0a2b5";
 
 /// 代码来源、许可和每份候选 grammar 的固定身份。
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
@@ -158,6 +165,22 @@ fn verify_bundled_asset(asset: &GrammarAsset) -> Result<&'static [u8], String> {
             include_bytes!("../../../grammars/c/parser.wasm").as_slice(),
             include_bytes!("../../../grammars/c/LICENSE").as_slice(),
         ),
+        "cfml" => (
+            include_bytes!("../../../grammars/cfml/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/cfml/LICENSE").as_slice(),
+        ),
+        "cfquery" => (
+            include_bytes!("../../../grammars/cfquery/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/cfquery/LICENSE").as_slice(),
+        ),
+        "cfscript" => (
+            include_bytes!("../../../grammars/cfscript/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/cfscript/LICENSE").as_slice(),
+        ),
+        "cobol" => (
+            include_bytes!("../../../grammars/cobol/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/cobol/LICENSE").as_slice(),
+        ),
         "cpp" => (
             include_bytes!("../../../grammars/cpp/parser.wasm").as_slice(),
             include_bytes!("../../../grammars/cpp/LICENSE").as_slice(),
@@ -205,6 +228,26 @@ fn verify_bundled_asset(asset: &GrammarAsset) -> Result<&'static [u8], String> {
         "dart" => (
             include_bytes!("../../../grammars/dart/parser.wasm").as_slice(),
             include_bytes!("../../../grammars/dart/LICENSE").as_slice(),
+        ),
+        "erlang" => (
+            include_bytes!("../../../grammars/erlang/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/erlang/LICENSE").as_slice(),
+        ),
+        "pascal" => (
+            include_bytes!("../../../grammars/pascal/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/pascal/LICENSE").as_slice(),
+        ),
+        "scala" => (
+            include_bytes!("../../../grammars/scala/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/scala/LICENSE").as_slice(),
+        ),
+        "swift" => (
+            include_bytes!("../../../grammars/swift/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/swift/LICENSE").as_slice(),
+        ),
+        "vbnet" => (
+            include_bytes!("../../../grammars/vbnet/parser.wasm").as_slice(),
+            include_bytes!("../../../grammars/vbnet/LICENSE").as_slice(),
         ),
         "java" => (
             include_bytes!("../../../grammars/java/parser.wasm").as_slice(),
@@ -258,6 +301,18 @@ fn verify_bundled_asset(asset: &GrammarAsset) -> Result<&'static [u8], String> {
             return Err("Dart grammar 重建来源适配关系不符".into());
         }
     }
+    if asset.language == "vbnet"
+        && digest(include_bytes!("../../../grammars/vbnet/source.patch"))
+            != "33963ebe3ba60929fb58d90efd54f206f98a54ea13ae325d784732c828b7b93a"
+    {
+        return Err("VB.NET grammar 来源补丁字节不符".into());
+    }
+    if asset.language == "cobol"
+        && digest(include_bytes!("../../../grammars/cobol/source.patch"))
+            != "04fe11a51243ddf7d31e0b6378068c725a51463534218c43c7021761c69701e5"
+    {
+        return Err("COBOL grammar 来源补丁字节不符".into());
+    }
     if matches!(asset.language.as_str(), "objc" | "solidity") {
         let source = if asset.language == "objc" {
             include_bytes!("../../../grammars/objc/source.wasm").as_slice()
@@ -287,7 +342,7 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
         || manifest.codegraph_license != "LICENSE.codegraph"
         || manifest.codegraph_license_sha256 != CODEGRAPH_LICENSE_SHA256
         || manifest.build_tool
-            != "tree-sitter-cli 0.25.10 build --wasm; Zig: tree-sitter-cli 0.27.0 generate --abi 15 + Zig 0.16.0 wasm32-wasi; Dart: pinned parser.c/scanner.c + Zig 0.16.0 wasm32-wasi; ArkTS/Terraform: pinned npm prebuilt WASM"
+            != "tree-sitter-cli 0.25.10 build --wasm; Zig: tree-sitter-cli 0.27.0 generate --abi 15 + Zig 0.16.0 wasm32-wasi; Dart: pinned parser.c/scanner.c + Zig 0.16.0 wasm32-wasi; CFML: tree-sitter-cli 0.26.9; Scala: v0.26.2 release WASM; Swift: crate 0.7.3 sources; VB.NET/COBOL: CodeGraph-patched upstream; ArkTS/Terraform: pinned npm prebuilt WASM"
         || manifest.dependency_package_integrity.as_deref()
             != Some(
                 "tree-sitter-wasms@0.1.13 sha512-wT+cR6DwaIz80/vho3AvSF0N4txuNx/5bcRKoXouOfClpxh/qqrF4URNLQXbbt8MaAxeksZcZd1j8gcGjc+QxQ==",
@@ -295,7 +350,7 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
         || manifest.dependency_package_license.as_deref() != Some("LICENSE.tree-sitter-wasms")
         || manifest.dependency_package_license_sha256.as_deref()
             != Some("6b0382b16279f26ff69014300541967a356a666eb0b91b422f6862f6b7dad17e")
-        || manifest.assets.len() != 23
+        || manifest.assets.len() != 32
     {
         return Err("grammar 清单版本、来源或资产数量不符".into());
     }
@@ -307,10 +362,15 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
     if languages
         != BTreeSet::from([
             "c",
+            "cfml",
+            "cfquery",
+            "cfscript",
+            "cobol",
             "arkts",
             "cpp",
             "csharp",
             "dart",
+            "erlang",
             "go",
             "java",
             "javascript",
@@ -319,15 +379,19 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
             "luau",
             "nix",
             "objc",
+            "pascal",
             "php",
             "python",
             "r",
             "ruby",
             "rust",
+            "scala",
             "solidity",
+            "swift",
             "terraform",
             "typescript",
             "tsx",
+            "vbnet",
             "zig",
         ])
     {
@@ -355,6 +419,46 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
                     625716,
                     "c/LICENSE",
                     "2e0110e07abef7c2548b26ec9d6969775617ca539a0dc8dbeeb14d6452c711d1",
+                ),
+                "cfml" => (
+                    "https://github.com/cfmleditor/tree-sitter-cfml",
+                    CFML_COMMIT,
+                    "v0.26.29",
+                    "cfml/parser.wasm",
+                    "17aeb294c58dd47045b470fc082ccceac3100c8e548b13764d4f3987a062322f",
+                    2700518,
+                    "cfml/LICENSE",
+                    "7e17ba5e26b0438ca04ebf2d9e7931da3080509da6625e117f6feb943ecf767a",
+                ),
+                "cfquery" => (
+                    "https://github.com/cfmleditor/tree-sitter-cfml",
+                    CFML_COMMIT,
+                    "v0.26.29",
+                    "cfquery/parser.wasm",
+                    "9d4eaaec46eec7e6400d4b8d6c85fac7dfe33867ed5b4e5c218dfa7851c32558",
+                    2411407,
+                    "cfquery/LICENSE",
+                    "7e17ba5e26b0438ca04ebf2d9e7931da3080509da6625e117f6feb943ecf767a",
+                ),
+                "cfscript" => (
+                    "https://github.com/cfmleditor/tree-sitter-cfml",
+                    CFML_COMMIT,
+                    "v0.26.29",
+                    "cfscript/parser.wasm",
+                    "e381db5d2b8a7744fc7d8e51b0a14ff03f86c8ff497cdfe32d1da467f19d4096",
+                    2162812,
+                    "cfscript/LICENSE",
+                    "7e17ba5e26b0438ca04ebf2d9e7931da3080509da6625e117f6feb943ecf767a",
+                ),
+                "cobol" => (
+                    "https://github.com/yutaro-sakamoto/tree-sitter-cobol",
+                    COBOL_COMMIT,
+                    "CodeGraph-patched-e99dbdc",
+                    "cobol/parser.wasm",
+                    "65b98799f92e831d8b5ed8cd811464c71fac31c4beabf66990a545a4f65e02f1",
+                    16355286,
+                    "cobol/LICENSE",
+                    "d724405ce238a22c0d35769c5a36b386ad5958192efe8bbb304fb2896254575f",
                 ),
                 "cpp" => (
                     "https://github.com/tree-sitter/tree-sitter-cpp",
@@ -385,6 +489,26 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
                     989323,
                     "dart/LICENSE",
                     "d270cb3a4985d75033bd77d875ccebff1d66e32788a3f727891e28d76132dd46",
+                ),
+                "erlang" => (
+                    "https://github.com/WhatsApp/tree-sitter-erlang",
+                    ERLANG_COMMIT,
+                    "0.19",
+                    "erlang/parser.wasm",
+                    "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+                    421639,
+                    "erlang/LICENSE",
+                    "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+                ),
+                "pascal" => (
+                    "https://github.com/Isopod/tree-sitter-pascal",
+                    PASCAL_COMMIT,
+                    "0.10.2",
+                    "pascal/parser.wasm",
+                    "be3634fca99c19f5e1035a1a9c7d93d6ee82b35e6d5024f02be4883b71329c3e",
+                    716886,
+                    "pascal/LICENSE",
+                    "2e2fcc500eacb15b76c11fd2229aebf0a5b4c8ed476f068447c6dce778a17ac9",
                 ),
                 "go" => (
                     "https://github.com/tree-sitter/tree-sitter-go",
@@ -556,6 +680,36 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
                     "solidity/LICENSE",
                     "8844f0cc9b76b9c8a9d0251904eb7536b6bb9976e0ec577e8f27ab96d42523ef",
                 ),
+                "scala" => (
+                    "https://github.com/tree-sitter/tree-sitter-scala",
+                    SCALA_COMMIT,
+                    "v0.26.2",
+                    "scala/parser.wasm",
+                    "37d7fe5a91ca98941dc05493b0c05a0df0f36df5035890fa00b02497c68aaac3",
+                    3973559,
+                    "scala/LICENSE",
+                    "1f95ed26e1f4074074c9c7083e61c0a9e4c3b9f435745044995f3beb4ed28575",
+                ),
+                "swift" => (
+                    "https://github.com/alex-pinkus/tree-sitter-swift",
+                    SWIFT_COMMIT,
+                    "crate-0.7.3",
+                    "swift/parser.wasm",
+                    "cc77a63b8487956270e2f385e29a03ba0773ba532a3c8a8844a26b4c98793843",
+                    3726622,
+                    "swift/LICENSE",
+                    "3533cec129bb4bba015c0d61d86dd7c3b7e82110e4d2ff7837a01eff5bad5ccc",
+                ),
+                "vbnet" => (
+                    "https://github.com/govindbanura/tree-sitter-vbnet",
+                    VBNET_COMMIT,
+                    "CodeGraph-patched-538b708",
+                    "vbnet/parser.wasm",
+                    "e38a09e1826c7ec06340c0531a98bbb5ee79bdd710bba3d3349b79a19721e844",
+                    6477499,
+                    "vbnet/LICENSE",
+                    "fa7ab39bcf92c216d429e8aa8be8a5a40db85bfbe4ff14a7bb0ecbbcca937454",
+                ),
                 "terraform" => (
                     "https://github.com/tree-sitter-grammars/tree-sitter-hcl",
                     TERRAFORM_COMMIT,
@@ -580,10 +734,10 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
                     _ => None,
                 }
             || asset.loader_symbol.as_deref()
-                != if asset.language == "csharp" {
-                    Some("c_sharp")
-                } else {
-                    None
+                != match asset.language.as_str() {
+                    "csharp" => Some("c_sharp"),
+                    "cobol" => Some("COBOL"),
+                    _ => None,
                 }
             || (match asset.language.as_str() {
                 "objc" => {
@@ -620,7 +774,21 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
             || asset.abi_version
                 != if matches!(
                     asset.language.as_str(),
-                    "zig" | "c" | "csharp" | "javascript" | "lua" | "rust" | "nix" | "php" | "dart"
+                    "zig"
+                        | "c"
+                        | "csharp"
+                        | "javascript"
+                        | "lua"
+                        | "rust"
+                        | "nix"
+                        | "php"
+                        | "dart"
+                        | "cfml"
+                        | "cfquery"
+                        | "cfscript"
+                        | "scala"
+                        | "swift"
+                        | "vbnet"
                 ) {
                     15
                 } else {

@@ -27,6 +27,143 @@ const PHP: &[u8] = include_bytes!("../../../grammars/php/parser.wasm");
 const KOTLIN: &[u8] = include_bytes!("../../../grammars/kotlin/parser.wasm");
 const DART: &[u8] = include_bytes!("../../../grammars/dart/parser.wasm");
 const DART_REBUILT_SOURCE: &[u8] = include_bytes!("../../../grammars/dart/source.wasm");
+const ERLANG: &[u8] = include_bytes!("../../../grammars/erlang/parser.wasm");
+const PASCAL: &[u8] = include_bytes!("../../../grammars/pascal/parser.wasm");
+const COBOL: &[u8] = include_bytes!("../../../grammars/cobol/parser.wasm");
+const CFML: &[u8] = include_bytes!("../../../grammars/cfml/parser.wasm");
+const CFQUERY: &[u8] = include_bytes!("../../../grammars/cfquery/parser.wasm");
+const CFSCRIPT: &[u8] = include_bytes!("../../../grammars/cfscript/parser.wasm");
+const SCALA: &[u8] = include_bytes!("../../../grammars/scala/parser.wasm");
+const SWIFT: &[u8] = include_bytes!("../../../grammars/swift/parser.wasm");
+const VBNET: &[u8] = include_bytes!("../../../grammars/vbnet/parser.wasm");
+
+#[test]
+fn final_source_grammars_load_offline_and_separate_basic_syntax() {
+    for (name, wasm, sha, valid, invalid) in [
+        (
+            "cfml",
+            CFML,
+            "17aeb294c58dd47045b470fc082ccceac3100c8e548b13764d4f3987a062322f",
+            b"<cfset x = 1>".as_slice(),
+            b"<cfif>".as_slice(),
+        ),
+        (
+            "cfquery",
+            CFQUERY,
+            "9d4eaaec46eec7e6400d4b8d6c85fac7dfe33867ed5b4e5c218dfa7851c32558",
+            b"SELECT * FROM users".as_slice(),
+            b"SELECT #unclosed".as_slice(),
+        ),
+        (
+            "cfscript",
+            CFSCRIPT,
+            "e381db5d2b8a7744fc7d8e51b0a14ff03f86c8ff497cdfe32d1da467f19d4096",
+            b"component { function f() { return 1; } }".as_slice(),
+            b"component { function f( {".as_slice(),
+        ),
+        (
+            "scala",
+            SCALA,
+            "37d7fe5a91ca98941dc05493b0c05a0df0f36df5035890fa00b02497c68aaac3",
+            b"object Main { def f(x: Int): Int = x + 1 }".as_slice(),
+            b"object Main { def f( = }".as_slice(),
+        ),
+        (
+            "swift",
+            SWIFT,
+            "cc77a63b8487956270e2f385e29a03ba0773ba532a3c8a8844a26b4c98793843",
+            b"func f() -> Int { return 1 }".as_slice(),
+            b"func f( {".as_slice(),
+        ),
+        (
+            "vbnet",
+            VBNET,
+            "e38a09e1826c7ec06340c0531a98bbb5ee79bdd710bba3d3349b79a19721e844",
+            b"Public Class C\n    Public Function F() As Integer\n        Return 1\n    End Function\nEnd Class\n"
+                .as_slice(),
+            b"Public Class C\nPublic Function F(\n".as_slice(),
+        ),
+    ] {
+        let mut grammar = WasmGrammar::load(name, wasm, sha, 15)
+            .unwrap_or_else(|reason| panic!("{name} offline load: {reason}"));
+        assert!(
+            !grammar.parse(valid).unwrap().root_node().has_error(),
+            "{name} valid"
+        );
+        assert!(
+            grammar.parse(invalid).unwrap().root_node().has_error(),
+            "{name} invalid"
+        );
+    }
+}
+
+#[test]
+fn pinned_cobol_asset_loads_with_its_original_export_name() {
+    let mut grammar = WasmGrammar::load(
+        "COBOL",
+        COBOL,
+        "65b98799f92e831d8b5ed8cd811464c71fac31c4beabf66990a545a4f65e02f1",
+        14,
+    )
+    .expect("pinned COBOL grammar under bounded worker input");
+    assert!(
+        !grammar
+            .parse(b"       IDENTIFICATION DIVISION.\n       PROGRAM-ID. HELLO.\n")
+            .unwrap()
+            .root_node()
+            .has_error()
+    );
+}
+
+#[test]
+fn pascal_grammar_loads_offline_and_separates_basic_syntax() {
+    let mut grammar = WasmGrammar::load(
+        "pascal",
+        PASCAL,
+        "be3634fca99c19f5e1035a1a9c7d93d6ee82b35e6d5024f02be4883b71329c3e",
+        14,
+    )
+    .expect("pinned Pascal grammar");
+    assert!(
+        !grammar
+            .parse(b"program Hello;\nbegin\n  writeln('Hi');\nend.\n")
+            .unwrap()
+            .root_node()
+            .has_error()
+    );
+    assert!(
+        grammar
+            .parse(b"program Hello;\nbegin\n  writeln('Hi');\n")
+            .unwrap()
+            .root_node()
+            .has_error()
+    );
+}
+
+#[test]
+fn erlang_grammar_loads_offline_and_separates_basic_syntax() {
+    let mut grammar = WasmGrammar::load(
+        "erlang",
+        ERLANG,
+        "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+        14,
+    )
+    .expect("pinned Erlang grammar");
+    assert!(
+        !grammar
+            .parse(b"-module(hello).\nhello() -> ok.\n")
+            .unwrap()
+            .root_node()
+            .has_error()
+    );
+    assert!(
+        grammar
+            .parse(b"-module(hello).\nhello( -> ok.\n")
+            .unwrap()
+            .root_node()
+            .has_error()
+    );
+}
 
 #[test]
 fn rebuilt_dart_grammar_loads_with_real_scanner_and_rejects_broken_source() {
