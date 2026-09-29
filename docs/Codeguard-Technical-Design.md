@@ -168,6 +168,8 @@ flowchart LR
 
 If the language has no supported native confirmation adapter, return that specific capability gap and an actionable environment/decision task. Do not repeatedly recommend a nonexistent tool. “Require installation” also includes restoring the correct runtime, project dependency or configuration; use project-declared versions and package manager, and perform modifications within the user's existing authorization.
 
+Core now has a local pure setup-action selector taking an upstream-verified native blocker, the full precheck aggregate and any existing required native obligation. It recommends an optional tool only for a nonempty, complete, qualified clean precheck; invalid configuration and failed execution lead to distinct recovery actions instead of repeated installation advice. This selector is not yet connected to real tool discovery, CLI feedback or durable tasks. See the [candidate acceptance record](../tests/acceptance/syntax-setup-guidance-candidate.md).
+
 | Design field | Meaning |
 | :--- | :--- |
 | `backend` | `native` or `wasm_precheck`; source of this observation |
