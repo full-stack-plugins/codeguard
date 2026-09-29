@@ -111,6 +111,14 @@ Stop 事件 MAY 从已存在的本地任务事实生成有界、只读的下一�
 - **WHEN** 宿主确认写入失败
 - **THEN** 不因该事件启动源码检查；既有交付义务不因此被免除
 
+#### Scenario: Claude Code PostToolUse is mapped without reading tool output as instructions
+- **WHEN** Claude Code 的成功文件工具事件携带绝对目标路径、工作目录和任意源码内容
+- **THEN** Rust 宿主适配入口只采信事件种类与受限路径字段，核对目标处于指定项目根内后调用同一事件执行器；输出有界的 `PostToolUse` 对话摘要，不转发源码内容或原生消息，也不把局部快检转成交付通过
+
+#### Scenario: Claude Code event cannot establish a safe edited file
+- **WHEN** 事件过大、类型不匹配、路径缺失/越界、符号链接逃逸或读取时文件已消失
+- **THEN** 说明范围未确定并保持本次源码检查未运行；不从宿主自由文本猜测其它文件，不以宿主 Hook 退出码冒充 Rust 门禁结论
+
 #### Scenario: Successful bulk edit exceeds fast-feedback budget
 - **WHEN** 一次成功编辑涉及的不同路径数量或路径字节总量超过快检预算
 - **THEN** 计划返回明确的超预算原因并转为有界批量范围检查，不截断成部分逐文件目标；提交时仍独立取得真实 Git 范围

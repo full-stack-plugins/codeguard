@@ -421,6 +421,8 @@ gate 与 check 使用同一个义务/适配器/报告内核，差异是权威内
 
 现有局部执行入口 `codeguard hook execute PATH --timeout DURATION --format=json [--ruff-tool ABS_PATH] [--git-tool ABS_PATH]` 从 stdin 接收同一 `hook_trigger_request` 1.0.0。超时必须显式提供且不超过 120s。启动事件只读发现；Stop 只读最多 64 个 finding 和 64 份报告，报告字节总预算为 8 MiB，返回不调用检查器的 `hook_next_guidance`。记录超预算返回 `not_run/guidance_scope_exceeded`，需要显式执行 `codeguard next PATH --format=json`；无任务时要求新鲜完整检查，不能视作通过。`repair_ready` 先将单任务历史限制在 128 项和 1 MiB，再按稳定任务 ID 复用现有 `task verify`，通过有界子进程按原检查器复检；任务缺失、历史超限或子进程失败保留未完成。对话仅返回任务/检查器身份、观察结果、事件是否保存及有界原因，原生完整报告仍在既有本地复检路径中。`task verify` 的显式工具参数可传给 `hook execute`，其它事件收到这些参数会拒绝。确认成功且目标全为 Python 的编辑事件执行局部 Ruff。显式给出 Git 二进制后，`pre_commit` 读取本轮真实暂存 index（含替代 `GIT_INDEX_FILE`），Git 观察本身的截止时间取传入预算与 15s 较小值；`hook_git_index_summary` 给出 index 身份、违规总数、最多 32 个且每个至多 512 字节的路径、截断状态与对象状态，同时 `source_check=not_run`，不证明完整质量覆盖。Git 缺失或 index 观察失败仍为 `not_run`。失败/未知写入、混合语言、推送和 CI 仍保持 `not_run`。外层 `hook_execution_feedback` 升为 0.4，历史 0.1–0.3 schema 保留；即使宿主声称可阻断，也固定 `host_blocking_verified=false`、`delivery_decision=not_evaluated`。该命令还没有被插件 Hook 自动调用，不能代替严格门禁。
 
+Claude Code 候选软适配入口为 `codeguard hook claude post-tool-use PATH --timeout DURATION --format=json [--ruff-tool ABS_PATH]`。它从 stdin 读取至多 1 MiB 的成功 `PostToolUse` JSON，只接受 Write/Edit/MultiEdit 的项目内普通文件，并在同一 Rust 进程复用编辑执行器。输出 Claude `hookSpecificOutput.additionalContext`（至多 1200 字符），宿主退出 0 只表示返回了软反馈，并不表示检查通过。重复键、超预算、路径缺失或逃逸、未知工具均明确提示未运行。独立插件尚未调用此候选入口，见[局部验收](../tests/acceptance/claude-post-tool-hook-candidate.md)。
+
 ### C34 — mcp serve
 
 - **语法与价值**：`codeguard mcp serve`；初版通过stdio提供结构化工具入口，供支持MCP的宿主复用统一内核。

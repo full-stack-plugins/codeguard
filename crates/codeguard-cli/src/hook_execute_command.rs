@@ -9,7 +9,7 @@ use crate::python_lint_command::{
     annotate_conversation_budget, scan_selected_report_with_deadline,
 };
 use codeguard_adapters::legacy_registry;
-use codeguard_core::{HookTriggerAction, plan_hook_trigger};
+use codeguard_core::{HookTriggerAction, HookTriggerInput, plan_hook_trigger};
 use codeguard_runtime::{NativeObservation, ProcessSpec, Termination, run_process};
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
@@ -72,16 +72,34 @@ pub fn run(args: &[String]) -> ExitCode {
             return ExitCode::from(2);
         }
     };
-    let plan = match plan_hook_trigger(&input) {
-        Ok(plan) => plan,
+    let (report, exit_code) = match execute_parsed(&arguments, &input) {
+        Ok(result) => result,
         Err(reason) => {
             eprintln!("无效 hook 事件：{reason}");
             return ExitCode::from(2);
         }
     };
+    println!("{report}");
+    ExitCode::from(exit_code)
+}
+
+/// 使用同一事件执行器处理已由宿主适配器规范化的输入。
+/// 参数为原 `hook execute` 选项和受限事件；返回原始 Rust 报告与其 CLI 退出码。
+pub(crate) fn execute_host_input(
+    args: &[String],
+    input: &HookTriggerInput,
+) -> Result<(Value, u8), String> {
+    let arguments = parse_args(args)?;
+    execute_parsed(&arguments, input).map_err(str::to_owned)
+}
+
+fn execute_parsed(
+    arguments: &Arguments,
+    input: &HookTriggerInput,
+) -> Result<(Value, u8), &'static str> {
+    let plan = plan_hook_trigger(input)?;
     if plan.action != HookTriggerAction::VerifyTask && !arguments.verify_options.is_empty() {
-        eprintln!("任务复检参数仅用于 repair_ready 事件");
-        return ExitCode::from(2);
+        return Err("任务复检参数仅用于 repair_ready 事件");
     }
     let root = arguments
         .root
@@ -103,7 +121,7 @@ pub fn run(args: &[String]) -> ExitCode {
         },
         (HookTriggerAction::VerifyTask, Some(root)) => {
             let task_id = plan.task_id.as_deref().expect("核心已校验任务 ID");
-            match task_verification_summary(root, task_id, &arguments) {
+            match task_verification_summary(root, task_id, arguments) {
                 Ok(feedback) => ("task_verification", None, feedback, 3),
                 Err((reason, exit_code)) => ("not_run", Some(reason), Value::Null, exit_code),
             }
@@ -207,16 +225,15 @@ pub fn run(args: &[String]) -> ExitCode {
         ) => ("not_run", Some("delivery_gate_not_wired"), Value::Null, 3),
         (_, Some(_)) => ("not_run", Some("action_not_wired"), Value::Null, 3),
     };
-    println!(
-        "{}",
+    Ok((
         json!({
             "schema_version":"0.4.0", "report_type":"hook_execution_feedback",
             "plan":plan, "execution":execution, "reason":reason,
             "local_feedback":feedback, "delivery_decision":"not_evaluated",
             "host_blocking_verified":false, "soft_result_reused":false
-        })
-    );
-    ExitCode::from(exit_code)
+        }),
+        exit_code,
+    ))
 }
 
 fn task_verification_summary(

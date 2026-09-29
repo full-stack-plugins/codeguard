@@ -570,6 +570,7 @@
   - 后续增量：显式 Git 工具下的 `pre_commit` 已按真实暂存 index（含 `GIT_INDEX_FILE`）执行有界只读路径安全观察，报告升级为 `hook_execution_feedback` 0.2，历史 0.1 保留；仍固定 `source_check=not_run` 与交付未评估。真实仓库测试覆盖暂存/未暂存、替代 index 和缺工具，见同一[局部验收](../../../tests/acceptance/hook-execute-python-candidate.md)。这不是完整质量门禁，宿主接线和 Git/CI 全义务仍缺，11.17 不勾选。
   - Stop 增量：从现有本地事实生成有界只读下一步，最多预检 64 个 finding、64 份报告与 8 MiB 报告字节；超限明确未运行。反馈当时升为 0.3，保留 0.1/0.2 历史 schema；没有任务仍要求新鲜完整检查。目标测试先红后绿，见同一[局部验收](../../../tests/acceptance/hook-execute-python-candidate.md)。提示事件缺可信意图上下文，插件宿主自动接线和交付门禁尚缺，11.17 不勾选。
   - 修复复检增量：`repair_ready` 先核对稳定任务事实，再在有界子进程中复用 `task verify` 原工具链，反馈 0.4 仅投影脱敏观察及事件持久化状态，历史 0.3 保留。真实 Ruff F401 修复后诊断消失仍返回 `candidate_absent_unverified_policy`，任务保持 open；见同一[局部验收](../../../tests/acceptance/hook-execute-python-candidate.md)。其它原生检查器的宿主实测、提示事件、插件 Hook 接线和完整 Git/CI 门禁仍缺，11.17 不勾选。
+  - Claude 保存事件候选：`hook claude post-tool-use PATH --timeout DURATION --format=json` 由 Rust 直接读取宿主 JSON，将成功 Write/Edit/MultiEdit 的项目内普通文件转为同一 `hook execute` 事件；重复键、超预算、缺失/越界/链接目标均只给未运行提示。输出有界 `additionalContext`，不回显宿主源码或原工具消息；本机现有 Ruff 0.16.8 的 F401 诊断已通过真实原生工具测试。见[局部验收](../../../tests/acceptance/claude-post-tool-hook-candidate.md)。插件尚未绑定/调用该二进制，且其它事件、宿主和严格门禁未接线，11.17 不勾选。
 
 ## 12. S12 质量评测与验收
 

@@ -84,6 +84,8 @@ pub mod checkstyle_probe_request;
 pub mod checkstyle_probe_result;
 mod checkstyle_task_recheck;
 mod checkstyle_workbench;
+#[cfg(unix)]
+pub mod claude_hook_command;
 pub mod config_command;
 pub mod conversation_feedback;
 pub mod corpus;
@@ -93,25 +95,11 @@ pub mod false_positive_decision;
 pub mod git_index_safety;
 #[cfg(unix)]
 pub mod git_index_safety_command;
-pub mod hook_plan_command;
-#[cfg(unix)]
-pub mod hook_execute_command;
-#[cfg(feature = "wasm-precheck")]
-pub mod syntax_worker_command;
-#[cfg(feature = "wasm-precheck")]
-pub mod syntax_worker_runner;
-#[cfg(feature = "wasm-precheck")]
-mod syntax_worker_envelope;
-#[cfg(feature = "wasm-precheck")]
-mod syntax_worker_recovery;
-#[cfg(feature = "wasm-precheck")]
-mod syntax_worker_candidate_observation;
-#[cfg(feature = "wasm-precheck")]
-mod typescript_syntax_precheck;
-#[cfg(feature = "wasm-precheck")]
-mod java_syntax_precheck;
 #[cfg(unix)]
 pub mod go_lint_command;
+#[cfg(unix)]
+pub mod hook_execute_command;
+pub mod hook_plan_command;
 pub mod init_command;
 mod java_checker_config_status;
 pub mod java_checkstyle_command;
@@ -128,6 +116,8 @@ pub mod java_lint_dispatch;
 #[cfg(unix)]
 pub mod java_p3c_command;
 mod java_p3c_scan;
+#[cfg(feature = "wasm-precheck")]
+mod java_syntax_precheck;
 pub mod legacy_v1_protocol;
 #[cfg(unix)]
 mod maven_dependency_probe;
@@ -174,6 +164,16 @@ pub mod rustdoc_repair_brief;
 #[cfg(unix)]
 pub(crate) mod rustdoc_task_recheck;
 pub mod sarif_feedback;
+#[cfg(feature = "wasm-precheck")]
+mod syntax_worker_candidate_observation;
+#[cfg(feature = "wasm-precheck")]
+pub mod syntax_worker_command;
+#[cfg(feature = "wasm-precheck")]
+mod syntax_worker_envelope;
+#[cfg(feature = "wasm-precheck")]
+mod syntax_worker_recovery;
+#[cfg(feature = "wasm-precheck")]
+pub mod syntax_worker_runner;
 #[cfg(unix)]
 pub mod task_attempt_command;
 #[cfg(unix)]
@@ -181,6 +181,8 @@ pub mod task_lease_command;
 pub mod task_verify_command;
 pub mod tool_identity;
 pub mod tool_lock;
+#[cfg(feature = "wasm-precheck")]
+mod typescript_syntax_precheck;
 pub mod whitelist_command;
 mod whitelist_correction_command;
 mod whitelist_correction_projection;

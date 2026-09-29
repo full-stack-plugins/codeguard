@@ -20,6 +20,8 @@ The current partial execution entry is `codeguard hook execute PATH --timeout DU
 
 Current `detect` 0.4.0 reports local ESLint and Maven Wrapper candidates separately from checker configuration. It skips `node_modules` during ordinary source discovery while observing fixed tool paths without following links. A candidate never means the native tool was executed or approved; `check_feedback` carries this discovery under version 0.31.0.
 
+The candidate Claude Code soft adapter is `codeguard hook claude post-tool-use PATH --timeout DURATION --format=json [--ruff-tool ABS_PATH]`. It reads at most 1 MiB of successful `PostToolUse` JSON on stdin, accepts only Write/Edit/MultiEdit with a regular file under the chosen project root, then calls the same Rust edit executor in-process. It returns Claude `hookSpecificOutput.additionalContext` (at most 1200 characters) and host exit 0; this host exit does not mean a check passed. Duplicate keys, oversized input, missing or escaping paths and unrecognized tools yield an explicit unrun message. The separate plugin does not invoke this candidate yet. See the [candidate acceptance record](../tests/acceptance/claude-post-tool-hook-candidate.md).
+
 ## 2. Command responsibilities
 
 | ID | Target command | Responsibility and success boundary |
