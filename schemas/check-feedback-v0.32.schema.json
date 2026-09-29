@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:codeguard:schema:check-feedback:0.33.0",
+  "$id": "urn:codeguard:schema:check-feedback:0.32.0",
   "title": "CodeGuard partial project or language check feedback",
   "$defs": {
     "rust_cve": {
@@ -3370,7 +3370,7 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "0.33.0"
+      "const": "0.32.0"
     },
     "export": {
       "type": "object",
@@ -5512,17 +5512,16 @@
     "syntax_candidates": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status", "reason", "execution_phase", "authority", "delivery_decision", "source_file_count", "skipped_count", "unrouted_count", "native_preferred_count", "observations", "next_action"],
+      "required": ["status", "reason", "execution_phase", "authority", "delivery_decision", "source_file_count", "skipped_count", "unrouted_count", "observations", "next_action"],
       "properties": {
         "status": {"enum": ["not_run", "attempted_incomplete", "observed_partial"]},
-        "reason": {"enum": ["source_or_scope_changed", "request_cancelled", "worker_executable_unavailable", "bounded_scope", "unrouted_source", "candidate_unavailable", "candidate_unqualified", "native_preferred", "binary_without_wasm_precheck"]},
+        "reason": {"enum": ["source_or_scope_changed", "request_cancelled", "worker_executable_unavailable", "bounded_scope", "unrouted_source", "candidate_unavailable", "candidate_unqualified", "binary_without_wasm_precheck"]},
         "execution_phase": {"const": "after_native"},
         "authority": {"const": "candidate_unqualified"},
         "delivery_decision": {"const": "incomplete"},
         "source_file_count": {"type": "integer", "minimum": 0},
         "skipped_count": {"type": "integer", "minimum": 0},
         "unrouted_count": {"type": "integer", "minimum": 0},
-        "native_preferred_count": {"type": "integer", "minimum": 0},
         "next_action": {"type": "string", "minLength": 1},
         "observations": {
           "type": "array", "maxItems": 64,

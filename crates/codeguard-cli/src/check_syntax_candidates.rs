@@ -5,6 +5,7 @@ use crate::grammar_probe_command::read_plain_source;
 use crate::grammar_route::route_source;
 use crate::syntax_worker_runner::run_syntax_worker_candidate;
 use serde_json::{Value, json};
+use sha2::{Digest, Sha256};
 use std::collections::BTreeSet;
 use std::path::Path;
 use std::sync::atomic::AtomicBool;
@@ -19,6 +20,7 @@ const MAX_VISIBLE_RECOVERIES: usize = 8;
 pub fn observe(
     root: &Path,
     discovery: &DiscoveryReport,
+    python_lint: &Value,
     java_only: bool,
     deadline: Instant,
     skip_reason: Option<&str>,
@@ -33,12 +35,14 @@ pub fn observe(
     let mut observations = Vec::new();
     let mut skipped_count = 0;
     let mut unrouted_count = 0;
+    let mut native_preferred_count = 0;
     if let Some(reason) = skip_reason {
         return report(
             "not_run",
             reason,
             source_file_count,
             source_file_count,
+            0,
             0,
             observations,
         );
@@ -51,6 +55,7 @@ pub fn observe(
                 "worker_executable_unavailable",
                 source_file_count,
                 source_file_count,
+                0,
                 0,
                 observations,
             );
@@ -78,6 +83,10 @@ pub fn observe(
                 continue;
             }
         };
+        if native_python_covers(python_lint, relative, &source) {
+            native_preferred_count += 1;
+            continue;
+        }
         let routes = route_source(relative, &source);
         if routes.is_empty() {
             unrouted_count += 1;
@@ -146,6 +155,8 @@ pub fn observe(
         "unrouted_source"
     } else if !observed && !observations.is_empty() {
         "candidate_unavailable"
+    } else if native_preferred_count > 0 && observations.is_empty() {
+        "native_preferred"
     } else {
         "candidate_unqualified"
     };
@@ -155,8 +166,29 @@ pub fn observe(
         source_file_count,
         skipped_count,
         unrouted_count,
+        native_preferred_count,
         observations,
     )
+}
+
+// 仅本轮 Ruff 已完整扫描同一份 Python 字节时跳过重复解析；配置发现不算执行。
+fn native_python_covers(python_lint: &Value, relative: &str, source: &[u8]) -> bool {
+    if !relative.ends_with(".py") {
+        return false;
+    }
+    let digest = format!("{:x}", Sha256::digest(source));
+    python_lint["files"].as_array().is_some_and(|files| {
+        files.iter().any(|file| {
+            file["path"] == relative
+                && matches!(
+                    file["run_status"].as_str(),
+                    Some("passed" | "findings" | "suppressed")
+                )
+                && file["source_sha256"] == digest
+                && file["tool_sha256"].as_str().is_some()
+                && file["config_sha256"].as_str().is_some()
+        })
+    })
 }
 
 fn report(
@@ -165,13 +197,40 @@ fn report(
     source_file_count: usize,
     skipped_count: usize,
     unrouted_count: usize,
+    native_preferred_count: usize,
     observations: Vec<Value>,
 ) -> Value {
     json!({
         "status":status,"reason":reason,"execution_phase":"after_native",
         "authority":"candidate_unqualified","delivery_decision":"incomplete",
         "source_file_count":source_file_count,"skipped_count":skipped_count,
-        "unrouted_count":unrouted_count,"observations":observations,
+        "unrouted_count":unrouted_count,"native_preferred_count":native_preferred_count,"observations":observations,
         "next_action":"核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过"
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::native_python_covers;
+    use serde_json::json;
+    use sha2::{Digest, Sha256};
+
+    #[test]
+    fn only_completed_matching_native_python_scan_preempts_candidate() {
+        let source = b"import os\n";
+        let digest = format!("{:x}", Sha256::digest(source));
+        for status in ["passed", "findings", "suppressed"] {
+            let native = json!({"files":[{"path":"app.py","run_status":status,
+                "source_sha256":digest,"tool_sha256":"tool","config_sha256":"config"}]});
+            assert!(native_python_covers(&native, "app.py", source));
+            assert!(!native_python_covers(&native, "other.py", source));
+            assert!(!native_python_covers(&native, "app.rs", source));
+            assert!(!native_python_covers(&native, "app.py", b"changed\n"));
+        }
+        for status in ["incomplete", "not_run"] {
+            let native = json!({"files":[{"path":"app.py","run_status":status,
+                "source_sha256":digest,"tool_sha256":"tool","config_sha256":"config"}]});
+            assert!(!native_python_covers(&native, "app.py", source));
+        }
+    }
 }

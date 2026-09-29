@@ -219,7 +219,7 @@ fn missing_p3c_configuration_is_reported_without_running_maven() {
     fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
     let report = project.check(&["--maven-tool", tool.to_str().unwrap()]);
     assert!(!marker.exists());
-    assert_eq!(report["schema_version"], "0.32.0");
+    assert_eq!(report["schema_version"], "0.33.0");
     assert_eq!(report["execution_tasks"][0]["id"], "java.p3c");
     assert_eq!(report["execution_tasks"][0]["status"], "native_incomplete");
     let java = &report["native_results"]["java_p3c"];

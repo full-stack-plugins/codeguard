@@ -5,6 +5,61 @@ use std::fs;
 use std::process::Command;
 
 #[test]
+fn completed_native_ruff_preempts_only_its_matching_python_file() {
+    use std::os::unix::fs::PermissionsExt;
+    let root = std::env::temp_dir()
+        .canonicalize()
+        .unwrap()
+        .join(format!("codeguard-native-preferred-{}", std::process::id()));
+    fs::create_dir_all(&root).unwrap();
+    fs::write(root.join("app.py"), "import os\n").unwrap();
+    fs::write(root.join("main.zig"), "const Empty = struct {};\n").unwrap();
+    fs::write(root.join("ruff.toml"), "[lint]\nselect = ['F401']\n").unwrap();
+    let tool = root.join("fake-ruff");
+    fs::write(&tool, "#!/bin/sh\nif [ \"$1\" = '--version' ]; then echo 'ruff 0.16.8'; exit 0; fi\nif [ \"$2\" = '--show-files' ]; then echo \"$3\"; exit 0; fi\nif [ \"$2\" = '--show-settings' ]; then printf 'linter.rules.enabled = [\\n\\tunused-import (F401),\\n]\\nlinter.per_file_ignores = {}\\n'; exit 0; fi\nif [ \"$2\" = '--no-cache' ]; then if [ \"$3\" = '--ignore-noqa' ]; then source=$6; else source=$5; fi; printf '[{\"code\":\"F401\",\"message\":\"unused\",\"filename\":\"%s\",\"location\":{\"row\":1,\"column\":1},\"severity\":\"error\"}]\\n' \"$source\"; exit 1; fi\nexit 2\n").unwrap();
+    fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["check", "all"])
+        .arg(&root)
+        .args([
+            "--ruff-tool",
+            tool.to_str().unwrap(),
+            "--format=json",
+            "--timeout",
+            "40s",
+        ])
+        .output()
+        .unwrap();
+    fs::remove_dir_all(&root).unwrap();
+    assert_eq!(
+        output.status.code(),
+        Some(3),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(
+        report["native_results"]["python_lint"]["files"][0]["run_status"], "findings",
+        "{report}"
+    );
+    assert_eq!(
+        report["native_results"]["python_lint"]["files"][0]["findings"][0]["rule_id"],
+        "F401"
+    );
+    assert_eq!(report["syntax_candidates"]["native_preferred_count"], 1);
+    let observations = report["syntax_candidates"]["observations"]
+        .as_array()
+        .unwrap();
+    assert!(!observations.iter().any(|row| row["path"] == "app.py"));
+    assert!(
+        observations
+            .iter()
+            .any(|row| row["path"] == "main.zig" && row["status"] == "candidate_observed")
+    );
+    assert_eq!(report["delivery_decision"], "incomplete");
+}
+
+#[test]
 fn check_all_routes_distinct_dialects_after_native_without_claiming_clean() {
     let root = std::env::temp_dir()
         .canonicalize()
@@ -37,7 +92,7 @@ fn check_all_routes_distinct_dialects_after_native_without_claiming_clean() {
         String::from_utf8_lossy(&output.stderr)
     );
     let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
-    assert_eq!(report["schema_version"], "0.32.0");
+    assert_eq!(report["schema_version"], "0.33.0");
     assert_eq!(report["delivery_decision"], "incomplete");
     let observations = report["syntax_candidates"]["observations"]
         .as_array()

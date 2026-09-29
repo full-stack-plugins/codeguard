@@ -1455,6 +1455,7 @@ pub fn run(args: &[String]) -> ExitCode {
     let syntax_candidates = crate::check_syntax_candidates::observe(
         &root,
         &discovery,
+        &python_lint,
         parsed.selection == Selection::Java,
         deadline,
         if request_cancelled {
@@ -1470,11 +1471,11 @@ pub fn run(args: &[String]) -> ExitCode {
         "status":"not_run","reason":"binary_without_wasm_precheck","execution_phase":"after_native",
         "authority":"candidate_unqualified","delivery_decision":"incomplete",
         "source_file_count":discovery.languages.values().map(|item| item.source_files.len()).sum::<usize>(),
-        "skipped_count":0,"unrouted_count":0,"observations":[],
+        "skipped_count":0,"unrouted_count":0,"native_preferred_count":0,"observations":[],
         "next_action":"使用包含固定语法资产的发行包运行候选初检，并完成适用原生检查"
     });
     let report = json!({
-        "schema_version":"0.32.0", "report_type":"check_feedback",
+        "schema_version":"0.33.0", "report_type":"check_feedback",
         "operation":"check", "selection":parsed.selection.as_str(), "command_status":if request_cancelled { "cancelled" } else { "incomplete" },
         "exit_code":if request_cancelled { 130 } else { 3 }, "delivery_decision":if parsed.selection == Selection::All { "incomplete" } else { "not_evaluated" }, "authority":"local_unverified",
         "reason":if request_cancelled { "request_cancelled" } else if parsed.selection == Selection::All { "full_project_obligations_and_trusted_policy_unavailable" } else { "java_selection_obligations_and_trusted_policy_unavailable" },
@@ -1854,10 +1855,17 @@ pub fn run(args: &[String]) -> ExitCode {
         }
         if let Some(observations) = report["syntax_candidates"]["observations"].as_array() {
             if report["syntax_candidates"]["status"] == "not_run" {
-                println!(
-                    "候选语法初检未运行：{}；仍需适用原生检查。",
-                    report["syntax_candidates"]["reason"]
-                );
+                if report["syntax_candidates"]["reason"] == "native_preferred" {
+                    println!(
+                        "候选语法初检未运行：{} 个文件已由本轮原生工具检查；其余交付义务仍待核验。",
+                        report["syntax_candidates"]["native_preferred_count"]
+                    );
+                } else {
+                    println!(
+                        "候选语法初检未运行：{}；仍需适用原生检查。",
+                        report["syntax_candidates"]["reason"]
+                    );
+                }
             } else {
                 let suspected = observations
                     .iter()
@@ -1868,12 +1876,13 @@ pub fn run(args: &[String]) -> ExitCode {
                     })
                     .count();
                 println!(
-                    "候选语法初检：{} 个片段已观察，{} 个存在待原生确认的恢复节点，{} 个范围未执行；仍未完成完整检查。",
+                    "候选语法初检：{} 个片段已观察，{} 个存在待原生确认的恢复节点，{} 个文件由原生检查覆盖，{} 个范围未执行；仍未完成完整检查。",
                     observations
                         .iter()
                         .filter(|item| item["status"] == "candidate_observed")
                         .count(),
                     suspected,
+                    report["syntax_candidates"]["native_preferred_count"],
                     report["syntax_candidates"]["skipped_count"]
                 );
                 for item in observations

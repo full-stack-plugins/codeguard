@@ -59,7 +59,16 @@ fn check_feedback_schema_cannot_encode_allow() {
     .unwrap();
     assert_eq!(previous["properties"]["schema_version"]["const"], "0.30.0");
     assert_eq!(schema["additionalProperties"], false);
-    assert_eq!(schema["properties"]["schema_version"]["const"], "0.32.0");
+    assert_eq!(schema["properties"]["schema_version"]["const"], "0.33.0");
+    let archived: Value = serde_json::from_str(include_str!(
+        "../../../schemas/check-feedback-v0.32.schema.json"
+    ))
+    .unwrap();
+    assert_eq!(archived["properties"]["schema_version"]["const"], "0.32.0");
+    assert_eq!(
+        schema["properties"]["syntax_candidates"]["properties"]["native_preferred_count"]["type"],
+        "integer"
+    );
     assert_eq!(
         schema["properties"]["syntax_candidates"]["properties"]["observations"]["items"]["properties"]
             ["grammar_qualified"]["const"],
@@ -221,7 +230,7 @@ fn check_all_keeps_local_checker_candidate_separate_from_execution() {
 
     let (exit, report) = project.check(&[]);
     assert_eq!(exit, 3);
-    assert_eq!(report["schema_version"], "0.32.0");
+    assert_eq!(report["schema_version"], "0.33.0");
     assert_eq!(report["discovery"]["schema_version"], "0.4.0");
     let candidates = report["discovery"]["native_tool_candidates"]
         .as_array()
@@ -537,7 +546,7 @@ fn rust_only_project_keeps_categories_as_candidates_without_inventing_policy_obl
     let (exit, report) = project.check(&[]);
     assert_eq!(exit, 3);
     assert_eq!(report["report_type"], "check_feedback");
-    assert_eq!(report["schema_version"], "0.32.0");
+    assert_eq!(report["schema_version"], "0.33.0");
     assert_eq!(report["execution_budget"]["timeout_ms"], 1_800_000);
     assert_eq!(report["execution_budget"]["source"], "builtin_default");
     assert_eq!(
@@ -1069,6 +1078,17 @@ fn original_ruff_finding_survives_check_all_partial_result() {
             .iter()
             .any(|finding| finding["rule_id"] == "F401")
     }));
+    #[cfg(feature = "wasm-precheck")]
+    {
+        assert_eq!(report["syntax_candidates"]["native_preferred_count"], 1);
+        assert!(
+            !report["syntax_candidates"]["observations"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|item| item["path"] == "app.py")
+        );
+    }
     assert!(
         report["category_candidates"]
             .as_array()
