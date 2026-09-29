@@ -2074,3 +2074,7 @@ TDD 先复现报告漏洞：把源码 finding 的主定位、原生身份及白�
 目标集成测试先因无内容违规失败，接线后 Core 2/2、真实 Git/CLI 15/15 通过。额外使用本机 `ssh-keygen` 生成的真实 Ed25519 私钥暂存到普通 `notes.md`：首次执行发现合法零填充格式漏报，修正后同一暂存对象命中 `repository_policy.unencrypted_openssh_ed25519_private_key`，且不回显内容。`cargo fmt --all --check`、`git diff --check` 通过。全工作区测试在可用空间降至 801 MiB 时被中断，不作为通过证据；清理仅限本仓 Cargo dev 构建产物后可用空间约 20 GiB。完整 CI 仍待本次变更远端验证。其他私钥格式、签发工具身份、完整交付义务、Git Hook/pre-push/CI 与三宿主真实接入仍缺，3.5/4.6/11.5/12.12 等总体任务不勾选。
 
 首轮 [PR #5 CI](https://github.com/full-stack-plugins/codeguard/actions/runs/36517224229) 编译及 Linux WASM 资源边界通过，但全量测试在 crate 依赖契约处失败：白名单未记录新引入的 base64 纯解码依赖。已将其限定为 core 正式依赖及 CLI 测试夹具依赖，补充“其它 crate/依赖种类仍禁止”的反例。第二轮 [CI 36517569232](https://github.com/full-stack-plugins/codeguard/actions/runs/36517569232) 的 workspace build、Linux WASM 资源边界与完整 `cargo test --workspace --all-targets` 全部通过；分层脚本也通过。它证明当前 PR 的全量回归，不扩展为多平台或真实宿主门禁验收。
+
+## 2026-09-29 暂存对象部分失败保留发现
+
+`git_index_safety` 以前在任一暂存 blob 超过读取预算时丢弃所有内容观察。真实 Git 混合样本先红后绿：超 8 MiB 对象单独 unresolved，同一 index 中已核对 OID 的 `.codeguard/findings` 私钥 finding 仍出现在本地与公开 JSON；执行保持 3/incomplete/not_evaluated。受控 Git 65 个不同 OID 的第二批坏响应证明前 64 个已独立核对证据保留，第 65 个未完成。目标 Git 契约 17/17 通过，宿主事件契约 18 通过、2 项因本机 Ruff 条件跳过；CLI Clippy `-D warnings`、fmt 与 OpenSpec strict 通过。[PR #6](https://github.com/full-stack-plugins/codeguard/pull/6) 的最终 [CI 36518917839](https://github.com/full-stack-plugins/codeguard/actions/runs/36518917839) 全部通过，合并提交 `0940b028cfdd4d71a3c77390bea9a7f4f10b0d8a`。完整快照、其它坏响应组合、正式 Git/CI 门禁和跨平台验收仍缺，2.3/3.5/11.5 不勾选。
