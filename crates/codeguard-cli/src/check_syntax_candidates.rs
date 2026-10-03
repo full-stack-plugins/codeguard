@@ -22,6 +22,7 @@ const MAX_CONCURRENT_WORKERS: usize = 2;
 
 /// 本轮已执行的原生语法相关结果及显式工具；仅用于判断同一源码是否可避免重复解析。
 pub struct NativeCoverage<'a> {
+    pub node_lint: &'a Value,
     pub python_lint: &'a Value,
     pub go_lint: &'a Value,
     pub go_tool: Option<&'a Path>,
@@ -62,6 +63,27 @@ pub fn observe(
     if !java_only {
         paths.extend(discovery.ambiguous_source_files.iter());
     }
+    observe_selected(
+        root,
+        &paths.into_iter().cloned().collect(),
+        native,
+        jobs_limit,
+        deadline,
+        skip_reason,
+    )
+}
+
+/// 仅观察调用方已验证的工作区相对文件；不遍历项目，不扩大编辑范围。
+/// 参数沿用原生覆盖与共同预算，返回相同候选报告。
+pub(crate) fn observe_selected(
+    root: &Path,
+    selected: &BTreeSet<String>,
+    native: NativeCoverage<'_>,
+    jobs_limit: usize,
+    deadline: Instant,
+    skip_reason: Option<&str>,
+) -> Value {
+    let paths: BTreeSet<&String> = selected.iter().collect();
     let source_file_count = paths.len();
     let observations = Vec::new();
     let mut skipped_count = 0;
@@ -108,18 +130,19 @@ pub fn observe(
     };
     let candidate_deadline = deadline.min(Instant::now() + Duration::from_secs(90));
     let cancelled = AtomicBool::new(false);
-    let native_go_files = if java_only || !discovery.languages.contains_key("go") {
-        BTreeMap::new()
-    } else {
-        selected_sources_for_candidate(
-            root,
-            native.go_tool,
-            native.go_lint,
-            candidate_deadline,
-            &cancelled,
-        )
-        .unwrap_or_default()
-    };
+    let native_go_files =
+        if !selected.iter().any(|path| path.ends_with(".go")) || native.go_lint.is_null() {
+            BTreeMap::new()
+        } else {
+            selected_sources_for_candidate(
+                root,
+                native.go_tool,
+                native.go_lint,
+                candidate_deadline,
+                &cancelled,
+            )
+            .unwrap_or_default()
+        };
     let mut planned = Vec::new();
     for (index, relative) in paths.into_iter().enumerate() {
         if index >= MAX_FILES
@@ -142,7 +165,8 @@ pub fn observe(
                 continue;
             }
         };
-        if native_python_covers(native.python_lint, relative, &source)
+        if crate::check_eslint_scan::covers(native.node_lint, relative, &source)
+            || native_python_covers(native.python_lint, relative, &source)
             || native_go_covers(&native_go_files, relative, &source)
         {
             native_preferred_count += 1;
@@ -299,6 +323,8 @@ fn candidate_result(
                 .next()
                 .map_or(0, <[u8]>::len);
             let recovery_count = observation.recoveries.len();
+            let incomplete_reason =
+                (observation.precheck.truncated_files > 0).then_some("syntax_recovery_incomplete");
             let recoveries: Vec<Value> = observation.recoveries.iter().take(MAX_VISIBLE_RECOVERIES).map(|recovery| {
                 json!({
                     "kind":recovery.kind,
@@ -313,7 +339,7 @@ fn candidate_result(
             }).collect();
             json!({
                 "path":job.relative,"language":job.language,"scope":job.scope,"byte_offset":job.byte_offset,
-                "status":"candidate_observed","reason":null,"grammar_qualified":false,
+                "status":"candidate_observed","reason":incomplete_reason,"grammar_qualified":false,
                 "source_sha256":observation.source_sha256,"grammar_sha256":observation.grammar_sha256,
                 "recovery_count":recovery_count,"recoveries":recoveries,
                 "known_limitations":job.known_limitations

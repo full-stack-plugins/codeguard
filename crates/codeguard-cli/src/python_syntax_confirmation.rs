@@ -206,7 +206,7 @@ pub(crate) fn valid_report(root: &Path, workspace: &str, report: &Value) -> bool
         })
 }
 
-fn fingerprint(workspace: &str, scope: &str) -> String {
+pub(crate) fn fingerprint(workspace: &str, scope: &str) -> String {
     let mut hasher = Sha256::new();
     for part in [
         "codeguard-python-syntax-confirmation-v1",

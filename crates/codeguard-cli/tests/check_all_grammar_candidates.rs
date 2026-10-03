@@ -5,6 +5,46 @@ use std::fs;
 use std::process::Command;
 
 #[test]
+fn hidden_kotlin_recovery_is_visible_in_project_feedback() {
+    let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
+        "codeguard-kotlin-hidden-project-{}",
+        std::process::id()
+    ));
+    fs::create_dir_all(&root).unwrap();
+    fs::write(root.join("Main.kt"), "fun f(x: ) = x\n").unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["check", "all"])
+        .arg(&root)
+        .arg("--format=json")
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let observations = report["syntax_candidates"]["observations"]
+        .as_array()
+        .unwrap();
+    let kotlin = observations
+        .iter()
+        .find(|item| item["language"] == "kotlin")
+        .expect("Kotlin candidate observation");
+    assert_eq!(kotlin["recovery_count"], 0);
+    assert_eq!(kotlin["reason"], "syntax_recovery_incomplete");
+    assert_eq!(report["delivery_decision"], "incomplete");
+    let text_output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["check", "all"])
+        .arg(&root)
+        .output()
+        .unwrap();
+    assert_eq!(text_output.status.code(), Some(3));
+    assert!(
+        String::from_utf8_lossy(&text_output.stdout).contains("grammar 报告错误但恢复位置不完整"),
+        "{}",
+        String::from_utf8_lossy(&text_output.stdout)
+    );
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
 fn completed_native_ruff_preempts_only_its_matching_python_file() {
     use std::os::unix::fs::PermissionsExt;
     let root = std::env::temp_dir()
@@ -98,7 +138,7 @@ fn check_all_routes_distinct_dialects_after_native_without_claiming_clean() {
         String::from_utf8_lossy(&output.stderr)
     );
     let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
-    assert_eq!(report["schema_version"], "0.34.0");
+    assert_eq!(report["schema_version"], "0.35.0");
     assert_eq!(report["execution_budget"]["jobs_limit"], 1);
     assert_eq!(report["delivery_decision"], "incomplete");
     let observations = report["syntax_candidates"]["observations"]
@@ -343,6 +383,11 @@ fn check_all_invokes_all_32_pinned_candidates_across_bounded_projects() {
                 observation["recovery_count"], 0,
                 "group {group_index}: unexpected recovery in valid sample: {observation}"
             );
+            assert_eq!(
+                observation["reason"],
+                serde_json::Value::Null,
+                "group {group_index}: valid sample has an incomplete parse: {observation}"
+            );
             assert!(
                 !observation["known_limitations"]
                     .as_array()
@@ -426,6 +471,10 @@ fn one_mixed_project_observes_all_32_candidates_within_the_existing_budget() {
             .iter()
             .all(|item| item["grammar_qualified"] == false)
     );
+    assert!(
+        observations.iter().all(|item| item["reason"].is_null()),
+        "a valid sample was not fully parsed: {observations:?}"
+    );
 }
 
 #[test]
@@ -461,4 +510,85 @@ fn oversized_source_is_an_explicit_candidate_gap() {
         report["syntax_candidates"]["observations"][0]["grammar_sha256"],
         serde_json::Value::Null
     );
+}
+
+#[test]
+fn edited_file_hooks_invoke_all_32_candidates_without_scanning_untouched_files() {
+    use std::io::Write;
+    use std::process::Stdio;
+    let root = std::env::temp_dir()
+        .canonicalize()
+        .unwrap()
+        .join(format!("codeguard-hook-32-{}", std::process::id()));
+    fs::create_dir(&root).unwrap();
+    let mut languages = BTreeSet::new();
+    for (index, group) in grammar_samples().chunks(8).enumerate() {
+        let project = root.join(format!("group-{index}"));
+        fs::create_dir(&project).unwrap();
+        fs::write(project.join("untouched.js"), "const = ;").unwrap();
+        let paths: Vec<&str> = group
+            .iter()
+            .map(|(name, source)| {
+                fs::write(project.join(name), source).unwrap();
+                *name
+            })
+            .collect();
+        let payload = serde_json::json!({"schema_version":"1.0.0","report_type":"hook_trigger_request",
+            "input":{"event":"file_changed","changed_paths":paths,"task_id":null,
+                "write_outcome":"confirmed","host_claims_blocking":false}});
+        let mut child = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(["hook", "execute"])
+            .arg(&project)
+            .args(["--format=json", "--timeout=120s"])
+            .env("PATH", &project)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .unwrap();
+        child
+            .stdin
+            .take()
+            .unwrap()
+            .write_all(&serde_json::to_vec(&payload).unwrap())
+            .unwrap();
+        let result = child.wait_with_output().unwrap();
+        assert_eq!(
+            result.status.code(),
+            Some(3),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
+        let report: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+        let feedback = &report["local_feedback"];
+        assert_eq!(feedback["requested_paths"], serde_json::json!(paths));
+        assert_eq!(
+            feedback["syntax_candidates"]["skipped_count"], 0,
+            "{feedback}"
+        );
+        assert_eq!(feedback["syntax_candidates"]["unrouted_count"], 0);
+        for row in feedback["syntax_candidates"]["observations"]
+            .as_array()
+            .unwrap()
+        {
+            assert_ne!(row["path"], "untouched.js");
+            assert_eq!(row["status"], "candidate_observed", "{row}");
+            assert_eq!(row["recovery_count"], 0, "{row}");
+            assert!(row["reason"].is_null(), "{row}");
+            assert_eq!(row["grammar_qualified"], false);
+            languages.insert(row["language"].as_str().unwrap().to_owned());
+        }
+        assert_eq!(feedback["delivery_decision"], "not_evaluated");
+    }
+    fs::remove_dir_all(root).unwrap();
+    let manifest: serde_json::Value =
+        serde_json::from_str(include_str!("../../../grammars/manifest.json")).unwrap();
+    let expected: BTreeSet<String> = manifest["assets"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|a| a["language"].as_str().unwrap().to_owned())
+        .collect();
+    assert_eq!(languages, expected);
+    assert_eq!(languages.len(), 32);
 }

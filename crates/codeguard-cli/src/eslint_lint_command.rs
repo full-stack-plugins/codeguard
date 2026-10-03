@@ -307,7 +307,7 @@ fn observe_captured(
     }
     report
 }
-fn feedback(reason: &str) -> Value {
+pub(crate) fn feedback(reason: &str) -> Value {
     json!({"schema_version":"0.2.0","report_type":"eslint_local_feedback","status":"incomplete","local_coherent":false,"coverage_proven":false,"delivery_decision":"not_evaluated","reason":reason,"findings":[],"suppressed_count":0,"workbench_status":"not_connected","workbench":null,"next_action":match reason {
         "eslint_execution_context_missing"=>"提供显式 Node、原 ESLint JS 入口、具体版本、原工作目录与项目原 flat config 后复检；不安装或替换规则",
         "eslint_node_runtime_unresolved"=>"项目本地 ESLint 候选已发现；提供受控 Node 路径后原生复检，不重复安装 ESLint 或修改无依据源码",

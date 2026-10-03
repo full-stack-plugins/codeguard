@@ -3,9 +3,7 @@
 use crate::syntax_worker_runner::run_syntax_worker_candidate;
 use codeguard_adapters::bundled_grammar_candidate;
 use serde_json::json;
-use std::fs::File;
-use std::io::Read;
-use std::path::{Component, Path, PathBuf};
+use std::path::PathBuf;
 use std::process::ExitCode;
 use std::sync::atomic::AtomicBool;
 use std::time::{Duration, Instant};
@@ -97,40 +95,4 @@ fn emit_incomplete(language: &str, source_path: &str, reason: &str) -> ExitCode 
     ExitCode::from(3)
 }
 
-pub(crate) fn read_plain_source(path: &Path) -> Result<Vec<u8>, &'static str> {
-    if path
-        .components()
-        .any(|component| matches!(component, Component::ParentDir))
-    {
-        return Err("source_path_parent_component_disallowed");
-    }
-    let absolute = if path.is_absolute() {
-        path.to_path_buf()
-    } else {
-        std::env::current_dir()
-            .map_err(|_| "source_cwd_unavailable")?
-            .join(path)
-    };
-    let mut prefix = PathBuf::new();
-    for component in absolute.components() {
-        prefix.push(component);
-        let metadata = std::fs::symlink_metadata(&prefix).map_err(|_| "source_path_unavailable")?;
-        if metadata.file_type().is_symlink() {
-            return Err("source_path_symlink_disallowed");
-        }
-    }
-    let metadata = std::fs::metadata(&absolute).map_err(|_| "source_unavailable")?;
-    if !metadata.is_file() || metadata.len() > 1024 * 1024 {
-        return Err("source_not_regular_or_too_large");
-    }
-    let mut source = Vec::new();
-    File::open(&absolute)
-        .map_err(|_| "source_unreadable")?
-        .take(1024 * 1024 + 1)
-        .read_to_end(&mut source)
-        .map_err(|_| "source_unreadable")?;
-    if source.len() > 1024 * 1024 || std::str::from_utf8(&source).is_err() {
-        return Err("source_size_or_encoding_invalid");
-    }
-    Ok(source)
-}
+pub(crate) use crate::plain_syntax_source::read_plain_source;

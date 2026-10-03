@@ -13,6 +13,30 @@ fn java_grammar() -> WasmGrammar {
 }
 
 #[test]
+fn hidden_kotlin_missing_tokens_do_not_look_clean() {
+    let mut grammar = WasmGrammar::load(
+        "kotlin",
+        include_bytes!("../../../grammars/kotlin/parser.wasm"),
+        "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+        14,
+    )
+    .unwrap();
+    for source in ["fun f(x: ) = x\n", "object C { val value = 1 }\n"] {
+        let tree = grammar.parse(source.as_bytes()).unwrap();
+        assert!(tree.root_node().has_error());
+        let scan = scan_wasm_recoveries(&tree, 128).unwrap();
+        assert!(
+            scan.truncated,
+            "hidden grammar error must remain incomplete"
+        );
+    }
+    let clean = grammar.parse(b"class C {}\n").unwrap();
+    let scan = scan_wasm_recoveries(&clean, 128).unwrap();
+    assert!(scan.recoveries.is_empty());
+    assert!(!scan.truncated);
+}
+
+#[test]
 fn error_and_missing_recoveries_keep_byte_positions() {
     let mut grammar = java_grammar();
     let clean = grammar

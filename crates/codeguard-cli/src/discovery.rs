@@ -145,32 +145,7 @@ pub fn discover<P: ObservationPort>(
         })
         .cloned()
         .collect();
-    let mut report = DiscoveryReport {
-        root: root.to_string_lossy().into_owned(),
-        observation_complete: true,
-        languages: BTreeMap::new(),
-        ambiguous_source_files: BTreeSet::new(),
-        build_roots: BTreeMap::new(),
-        declared_versions: BTreeMap::new(),
-        maven_module_models: BTreeMap::new(),
-        cargo_module_models: BTreeMap::new(),
-        manifest_sha256: BTreeMap::new(),
-        lock_sha256: BTreeMap::new(),
-        checker_config_sha256: BTreeMap::new(),
-        lockfiles: BTreeSet::new(),
-        checker_configurations: Vec::new(),
-        native_tool_candidates: Vec::new(),
-        tool_hint_paths: BTreeSet::new(),
-        ruff_config_files: BTreeSet::new(),
-        eslint_config_files: BTreeSet::new(),
-        source_set_candidates: BTreeSet::new(),
-        blocked_paths: Vec::new(),
-        unknown_conditions: Vec::new(),
-        observed_entries: 0,
-        dot_prefix_roots_excluded: 0,
-        configuration_exception_files_observed: 0,
-        dependency_roots_excluded: 0,
-    };
+    let mut report = empty_report(root);
     if !matches!(observation.classify(root), Ok(ObservedPathKind::Directory)) {
         report.observation_complete = false;
         report.blocked_paths.push(".".into());
@@ -323,6 +298,41 @@ pub fn discover<P: ObservationPort>(
     report
 }
 
+/// 建立尚未观察任何路径的发现结果；完成度只适用于调用方选择的范围。
+pub(crate) fn empty_report(root: &Path) -> DiscoveryReport {
+    DiscoveryReport {
+        root: root.to_string_lossy().into_owned(),
+        observation_complete: true,
+        languages: BTreeMap::new(),
+        ambiguous_source_files: BTreeSet::new(),
+        build_roots: BTreeMap::new(),
+        declared_versions: BTreeMap::new(),
+        maven_module_models: BTreeMap::new(),
+        cargo_module_models: BTreeMap::new(),
+        manifest_sha256: BTreeMap::new(),
+        lock_sha256: BTreeMap::new(),
+        checker_config_sha256: BTreeMap::new(),
+        lockfiles: BTreeSet::new(),
+        checker_configurations: Vec::new(),
+        native_tool_candidates: Vec::new(),
+        tool_hint_paths: BTreeSet::new(),
+        ruff_config_files: BTreeSet::new(),
+        eslint_config_files: BTreeSet::new(),
+        source_set_candidates: BTreeSet::new(),
+        blocked_paths: Vec::new(),
+        unknown_conditions: Vec::new(),
+        observed_entries: 0,
+        dot_prefix_roots_excluded: 0,
+        configuration_exception_files_observed: 0,
+        dependency_roots_excluded: 0,
+    }
+}
+
+/// 登记不可读取的 Ruff 候选，确保祖先配置不能越过该阻塞悄悄回退。
+pub(crate) fn record_unavailable_ruff_config(report: &mut DiscoveryReport, relative: &str) {
+    report.ruff_config_files.insert(relative.into());
+}
+
 fn managed_workspace_artifact(relative: &str) -> bool {
     if relative == "AGENTS.md" {
         return true;
@@ -358,7 +368,7 @@ fn block(report: &mut DiscoveryReport, root: &Path, path: &Path) {
         .push(relative_path(root, path).unwrap_or_else(|| "<non-utf8-or-outside-root>".into()));
 }
 
-fn observe_file<P: ObservationPort>(
+pub(crate) fn observe_file<P: ObservationPort>(
     report: &mut DiscoveryReport,
     registry: &LegacyRegistry,
     observation: &P,
@@ -566,7 +576,7 @@ pub(crate) fn is_standard_python_lock_name(name: &str) -> bool {
         .is_some_and(|variant| !variant.is_empty() && !variant.contains('.'))
 }
 
-fn inspect_python_ruff<P: ObservationPort>(
+pub(crate) fn inspect_python_ruff<P: ObservationPort>(
     root: &Path,
     observation: &P,
     report: &mut DiscoveryReport,

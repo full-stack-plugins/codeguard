@@ -9,3 +9,7 @@
 后续需要修复或更新固定 grammar，保留原始与派生字节、许可证和来源，再以同一反例及更多语言版本/方言语料复测；还须完成统一原生优先路由、误报/漏报率、资源预算及发行包验收。只更新已知限制不能消除漏检。
 
 [Linux CI 运行](https://github.com/full-stack-plugins/codeguard/actions/runs/37115529650) 对提交 `1623cf9` 的 Kotlin 固定回归、项目已知限制、单项目 32/32、npm 包与完整工作区测试均通过。WASM 集成步骤中的候选测试文件 8/8 通过，用时约 174 秒；这不是单个 Kotlin 文件的性能测量。原生 kotlinc 对照仍只在上述本机显式执行。
+
+后续定位发现更具体的扫描器缺口：旧 grammar 对上述缺类型样例及合法 `object C { val value = 1 }` 均令根节点 `has_error=true`，S-expression 含 `MISSING`，但 Rust 树遍历看不到该缺失 token，原扫描器返回零恢复。现已让这类无法定位的错误标记 `truncated=true`、初检 `incomplete`；项目 JSON 候选观察给出 `syntax_recovery_incomplete`，终端文本提示运行原生工具。差分测试也不再将零恢复自动解释为有效：13 例中这两例明确列为未解析，其余 11 例须与原生分类一致。运行时、隔离 CLI 和项目反馈均有回归；这只防止“零恢复”误导智能体，不等于修好 Kotlin grammar。`object` 是潜在误报，缺类型是漏检，两者均需原生确认。
+
+评估了 [Kotlin LSP 随附 WASM](https://github.com/Kotlin/kotlin-lsp/tree/e89317e303708ad4d90ab4829a98ce63d8f9ec67/vscode-language-kotlin/grammars)（SHA-256 `7bf452758684c40d84304db3eb51ae4ad61f22465d6130aa964cb683e2fea5a0`，ABI 14；[来源说明](https://github.com/Kotlin/kotlin-lsp/blob/e89317e303708ad4d90ab4829a98ce63d8f9ec67/vscode-language-kotlin/grammars/README.md) 指向 exoego fork）。该版本在原 13 份窄语料上无分歧，但扩展样例中仍将原生可编译的 `fun interface`、嵌套类报错，且对原生拒绝的无名顶层函数未给出解析错误。以上三个分歧已由本机 `kotlinc-jvm 2.4.10` 确认。候选未替换仓内资产，也未进入发行；仍需独立、可重复的更大语料和 grammar 修复。

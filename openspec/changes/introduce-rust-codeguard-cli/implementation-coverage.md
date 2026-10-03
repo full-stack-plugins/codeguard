@@ -345,3 +345,5 @@ Rust 实现与本 change 归本仓；宿主实现归独立 codeguard-plugin 仓�
 | SP11 | [syntax-precheck](specs/syntax-precheck/spec.md) / Fallback rollout SHALL preserve command and delivery compatibility | 14.7,14.9,14.18 |
 | SP12 | [syntax-precheck](specs/syntax-precheck/spec.md) / Syntax support claims SHALL have per-language and per-host evaluation evidence | 14.14,14.15,14.16,14.17,14.18 |
 | BD12 | [binary-distribution](specs/binary-distribution/spec.md) / npm launchers SHALL delegate checks to the matching Rust binary | 13.4.1,14.18 |
+
+2026-10-04：SP07/SP08 与 HP 编辑快检继续由 11.17、14.9–14.11 管理。新增通用候选确认报告复用现有工作台和 Python/ESLint 身份，不创建第二套状态清单；原生能力匹配关闭仍由未完成的 14.11 管理。

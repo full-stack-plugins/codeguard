@@ -212,6 +212,36 @@ pub fn scan_python_lint(
             .incomplete_reasons
             .push("discovery_incomplete".into());
     }
+    if request
+        .discovery
+        .unknown_conditions
+        .iter()
+        .any(|reason| reason == "selected_discovery_deadline_exceeded")
+    {
+        output
+            .incomplete_reasons
+            .push("request_deadline_exceeded".into());
+    }
+    if let Some(selected) = request.selected_paths {
+        if selected.is_empty() {
+            output
+                .incomplete_reasons
+                .push("selected_scope_empty".into());
+            return output;
+        }
+        for target in selected {
+            if !request
+                .discovery
+                .languages
+                .get("python")
+                .is_some_and(|python| python.source_files.contains(target))
+            {
+                output
+                    .incomplete_reasons
+                    .push(format!("target_not_discovered:{target}"));
+            }
+        }
+    }
     let Some(python) = request.discovery.languages.get("python") else {
         output.incomplete_reasons.push("no_python_sources".into());
         return output;
@@ -221,19 +251,6 @@ pub fn scan_python_lint(
         return output;
     }
     let sources: Vec<&String> = if let Some(selected) = request.selected_paths {
-        if selected.is_empty() {
-            output
-                .incomplete_reasons
-                .push("selected_scope_empty".into());
-            return output;
-        }
-        for target in selected {
-            if !python.source_files.contains(target) {
-                output
-                    .incomplete_reasons
-                    .push(format!("target_not_discovered:{target}"));
-            }
-        }
         python
             .source_files
             .iter()

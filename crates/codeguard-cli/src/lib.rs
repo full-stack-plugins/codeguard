@@ -18,7 +18,7 @@ mod eslint_effective_settings;
 mod eslint_lint_arguments;
 #[cfg(unix)]
 pub mod eslint_lint_command;
-#[cfg(all(feature = "wasm-precheck", unix))]
+#[cfg(unix)]
 mod eslint_native_first_candidate;
 mod eslint_preparation;
 pub mod eslint_probe;
@@ -78,6 +78,8 @@ pub mod cargo_build_repair_brief;
 pub mod check_budget;
 #[cfg(unix)]
 pub mod check_command;
+#[cfg(unix)]
+mod check_eslint_scan;
 pub mod check_plan;
 pub mod check_request;
 #[cfg(all(unix, feature = "wasm-precheck"))]
@@ -104,11 +106,12 @@ pub mod git_index_safety_command;
 pub mod go_lint_command;
 #[cfg(feature = "wasm-precheck")]
 pub mod grammar_probe_command;
-#[cfg(feature = "wasm-precheck")]
 pub mod grammar_route;
 pub mod grammar_status_command;
 #[cfg(unix)]
 pub mod hook_execute_command;
+#[cfg(unix)]
+mod hook_fast_scan;
 pub mod hook_plan_command;
 pub mod init_command;
 mod java_checker_config_status;
@@ -154,6 +157,8 @@ pub(crate) mod python_cve_task_recheck;
 pub mod python_lint_command;
 #[cfg(unix)]
 pub mod python_lint_scan;
+#[cfg(unix)]
+mod python_selected_discovery;
 #[cfg(unix)]
 mod python_syntax_confirmation;
 #[cfg(all(unix, feature = "wasm-precheck"))]
@@ -204,7 +209,7 @@ mod whitelist_correction_projection;
 pub mod work_sync;
 pub mod workspace_refresh;
 pub mod workspace_view_command;
-#[cfg(all(feature = "wasm-precheck", unix))]
+#[cfg(unix)]
 pub mod zig_lint_command;
 
 mod cargo_module_graph;
@@ -249,3 +254,28 @@ mod signed_distribution_download_request;
 mod npm_task_recheck;
 
 mod npm_check_scan;
+
+#[cfg(unix)]
+mod syntax_confirmation;
+
+#[cfg(unix)]
+mod syntax_task_recheck;
+#[cfg(unix)]
+mod zig_syntax_probe;
+
+#[cfg(unix)]
+mod plain_syntax_source;
+
+#[cfg(unix)]
+mod task_lifecycle_store;
+#[cfg(unix)]
+mod task_resolution_service;
+#[cfg(unix)]
+mod zig_task_resolution_request;
+#[cfg(unix)]
+pub use task_resolution_service::verify_zig_task_resolution;
+#[cfg(unix)]
+pub use zig_task_resolution_request::ZigTaskResolutionRequest;
+
+#[cfg(unix)]
+mod task_resolution_evidence_shape;

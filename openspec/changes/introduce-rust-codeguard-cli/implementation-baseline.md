@@ -41,3 +41,16 @@ cargo test --offline -p codeguard-cli \
 ```
 
 npm 发布证据为此前已执行记录，本轮没有重新发布或运行远程安装。
+
+## 当前聚合 ESLint 接线
+
+`check all` 的模块本地 ESLint 原生阶段、相同源码免重复 WASM、串行同步稳定任务和聚合 next 已接通。对应 7.3、14.6、14.10，证据集中维护在 [check-all-eslint](../../../tests/acceptance/check-all-eslint.md)。受控工具测试证明编排与任务契约；本次未执行真实 ESLint 或宿主安装验收。父任务还包含其它包管理器、语言及完整闭环，不据此整体勾选。
+
+
+## 2026-10-04 原生语法确认任务接线
+
+源码已支持记录在已有工作台中的 Zig 确认任务原生复检，复用 task verify 的租约、attempt 和追加事件。诊断指导当前源码修复，工具/版本/输入失败保留未完成；next 返回原生报告引用、当前位置和复检 argv，repair_ready 可接入。原生 AST 零诊断仍待策略/覆盖，不能关闭问题。通用简报 0.3、复检外层 0.12、局部 syntax_task_recheck 0.1；旧 schema 原件留存。内置 grammar 校验只复用进程内不可变数据，外部字节仍重新核验。详细测试与范围见[验收](../../../tests/acceptance/syntax-native-task-verification.md)。父任务、其它语言 adapter 和宿主/正式关闭仍未完成。
+
+## 2026-10-04 限定任务解决与复发
+
+源码 SDK `verify_zig_task_resolution` 可在宿主独立固定的信任上下文下验签限定 Zig 语法策略，重放原始反例和当前输入、追加解决或待核验事件；普通 task verify 已可追加同一任务的原生复发。源事实不改写，本地查询不签发关闭或交付授权，所有收据仍为 not_evaluated。实现、反例、协议和未接入范围见 [任务生命周期验收](../../../tests/acceptance/task-resolution-lifecycle.md)。当前尚无公开 CLI/默认插件的可信策略提供者；不改变完整工作流、全语言精度和门禁的未完成状态。

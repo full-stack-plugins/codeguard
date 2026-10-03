@@ -14,6 +14,14 @@
 - **WHEN** 前端具备有效 ESLint 而 Java 模块缺少 JDK
 - **THEN** 前端运行原生 lint，Java 模块提供语法初检；两者的范围、来源和准备状态分别保留
 
+#### Scenario: Aggregate checks discover module-local ESLint
+- **WHEN** `check all` 发现 JavaScript/TypeScript/TSX 源码及其项目本地受支持 ESLint、单一 flat config 和可用 Node
+- **THEN** 在统一任务图和截止时间内逐文件调用既有原生适配器，保留原规则发现；仅对本轮完整原生检查且源码字节未变的文件跳过重复 WASM。缺配置、被忽略、工具故障和其它模块仍分别保留阻塞与降级初检。已初始化工作区串行同步原生任务，重复扫描复用稳定任务；聚合报告、终端和 next 均可取得修复指引。
+
+#### Scenario: Source discovery alone does not establish a required installation
+- **WHEN** 聚合原生阶段发现 JS/TS 源码，但未观察到本地 ESLint 上下文
+- **THEN** 报告工具上下文缺口，不能仅凭源码存在生成阻断性安装任务或抢占 next；后续准备动作由项目原生义务或语法初检确认需求决定
+
 #### Scenario: Explicit Zig 0.16 source check takes precedence over the candidate grammar
 - **WHEN** `lint zig` 收到可核对的 Zig 0.16.0 工具与普通 `.zig` 文件
 - **THEN** 优先以受控进程运行原生 `zig ast-check`；原生诊断必须保留，不能因 WASM 观察覆盖。只有该原生工具未提供或不可运行时，才可返回未验收 WASM 候选观察，并始终保持整体未完成；`ast-check` 不等于全部 Zig lint、测试或构建。
@@ -143,6 +151,8 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 
 解析 MUST 同时识别 ERROR/MISSING 恢复，并按同一恢复原因归并级联节点；诊断 MUST 保留原文件位置、必要的有界脱敏上下文及 grammar 身份。不确定版本/方言、模板、宏、嵌入语言 MUST 明示覆盖限制。CodeGraph 用于提取符号的源码遮盖/启发式 MUST NOT 静默移入语法判定。仅凭恢复节点不得猜测具体缺失 token 或自动授予源码修改范围。
 
+若语法树标记错误但可遍历节点中无法定位任何对应 ERROR/MISSING，MUST 将该文件标为初检未完成，并保留原生检查义务；不得将零恢复节点当成语法有效或制造没有位置依据的源码 finding。
+
 同一语言族有独立 grammar 的方言 MUST 按实际文件类型选择和报告；尤其 `.tsx` MUST 使用 TSX grammar，不能拿普通 TypeScript grammar 的恢复节点当作 JSX 源码异常。候选报告读者 MUST 核对 grammar 方言与源文件扩展名一致；不匹配视为报告无效，不生成源码 finding。
 
 多语言共用后缀 MUST 保留歧义：`.m` 可能属于 Objective-C 或 MATLAB，`.sc` 可能属于 Scala 或 SuperCollider。没有可核对的语言证据时，自动检查 MUST 不调用猜测的 grammar、不把恢复节点记为源码问题，并保持范围未完成；用户显式指定 `grammar probe` 的语种仍可作候选诊断。
@@ -166,6 +176,11 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 #### Scenario: One unmatched delimiter produces many recovery nodes
 - **WHEN** 同一恢复原因造成重复或级联节点
 - **THEN** 归并为可处理观察并保留受影响范围，不创建大量同义任务
+
+#### Scenario: Grammar hides a missing token from node traversal
+
+- **WHEN** grammar 的根节点 `has_error=true` 且 S-expression 含缺失 token，但运行时的可遍历子节点不能定位该 token
+- **THEN** 初检标为 incomplete，保留未完成计数并请求原生确认；零恢复节点不得升级为 clean
 
 #### Scenario: A template includes unsupported embedded syntax
 - **WHEN** 只支持文件中一部分语言区域
@@ -215,9 +230,24 @@ human/结构化报告及宿主渲染 MUST 按结论、方式/范围、原生状�
 - **WHEN** 原生工具安装或恢复成功但尚未检查原目标
 - **THEN** 环境探测可更新，确认任务仍未解决
 
+#### Scenario: Multiple edited grammar candidates need native confirmation
+- **WHEN** initialized workspace edit feedback contains bounded recovery evidence for one or more bundled grammar languages
+- **THEN** import a versioned, source-and-grammar-bound observation into the existing task store, keeping one confirmation identity per workspace, file and language; Python and ESLint scopes reuse their existing preparation identities
+- **AND** preserve raw byte locations as suspected evidence, never source violations; complete zero-recovery observations create no new mandatory task and cannot close previous tasks
+- **AND** unavailable native confirmation adapters yield a concrete pending capability decision, never a Python fallback command for another language; persistence failure preserves feedback and exposes no fictitious task reference
+
 #### Scenario: Style-only checker returns zero diagnostics
 - **WHEN** 该检查器不能确认疑似语法所需能力
 - **THEN** 不关闭任务、不判 grammar 误报，指出所需的适用确认工具
+
+#### Scenario: A Zig confirmation task replays the native AST checker
+- **WHEN** task verify receives an explicit applicable Zig 0.16.0 tool for a recorded Zig candidate scope
+- **THEN** feed the current bounded source bytes to native ast-check under the existing task lease and deadline, bind the source/tool identities, and retain the observation and attempt association
+- **AND** distinguish native diagnostics, zero diagnostics, unavailable tools and changed inputs; zero diagnostics alone cannot grant formal resolution or project delivery
+
+#### Scenario: A native syntax confirmation observation becomes stale
+- **WHEN** the source or tool changes after a recorded native syntax observation
+- **THEN** next and task show require a fresh native confirmation and preserve historical evidence; they cannot recommend a stale source repair or pretend the old zero-diagnostic observation still applies
 
 #### Scenario: Native syntax confirmation contradicts the parser
 - **WHEN** 当前同输入、范围和方言的适用原生检查完整正常
@@ -226,6 +256,10 @@ human/结构化报告及宿主渲染 MUST 按结论、方式/范围、原生状�
 #### Scenario: Source changes or task files are removed
 - **WHEN** 复检前输入变化或智能体删除/勾选任务文件
 - **THEN** 旧观察不作为当前关闭依据，真实检查义务不因任务文件操作消失
+
+#### Scenario: The agent repeats native confirmation through repair-ready feedback
+- **WHEN** 已初始化任务的 Zig 原生观察已记录可用工具路径，智能体修复后触发 repair_ready
+- **THEN** next MUST 提供可复用的 task verify argv，Hook MUST 接受同任务的显式 Zig 工具并复用原有租约、尝试和共享截止时间；错误语言、陈旧字节或工具身份不得使旧诊断成为当前修复依据
 
 ### Requirement: Grammar false-positive dispositions SHALL be precise and preserve native obligations
 
@@ -242,6 +276,8 @@ human/结构化报告及宿主渲染 MUST 按结论、方式/范围、原生状�
 ### Requirement: Syntax caches SHALL bind inputs and retain historical observations on invalidation
 
 缓存 MUST 绑定源码字节、语言/方言画像、grammar/runtime、规则/查询版本及相关范围/配置身份。部分结果、取消、未支持范围 MUST NOT 作为 clean 重用。资产更新/回滚须核对版本清单并使相关缓存与处置失效；删除缓存不能删除问题历史或签发解决。相同 mtime/大小不构成身份相同。
+
+编译入同一二进制的不可变清单、WASM 与许可证 MAY 在进程内复用已经完整核验的资产结果；外部清单、源码、配置与原生工具 MUST NOT 因此省略当前身份复核，此资产复用不得作为检查结果或完整覆盖缓存。
 
 #### Scenario: Source changes without mtime or size change
 - **WHEN** 源码字节不同但时间和大小相同

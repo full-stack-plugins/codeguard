@@ -2084,3 +2084,73 @@ TDD 先复现报告漏洞：把源码 finding 的主定位、原生身份及白�
 已初始化工作区的单文件 `lint python` 候选报告使用 0.15.0 对话协议，将固定 Python grammar、当前源码摘要与脱敏疑似位置写入独立 0.1.0 本地报告，并经现有 work sync 形成按工作区和源码范围稳定归并的 `python_syntax_confirmation_needed` 阻塞任务。未初始化工作区继续使用 0.14.0 且任务 ID 为空。重扫同一源码及源码改为零恢复节点后，任务仍为 `open`；报告目录不可用时，对话保留候选结果，标明持久化原因而不伪造任务引用。导入拒绝 grammar 摘要篡改、越界坐标和重复 JSON 键；报告不含源码文本。
 
 开发验证：新增 Python 端到端 8/8、相关 Python 原生路径 16/16（5 项真实工具用例默认忽略）、TypeScript 候选回归 14/14；本机 Ruff 0.16.8 的额外原生优先用例及 `task verify` 用例分别通过，后者记录观察而不关闭任务。实际 0.15.0 与本地 0.1.0 报告通过 JSON Schema，伪造同步成功状态被拒绝。先构建特性版产生报告，再用默认二进制执行 `work sync`，`failed_reports=0`。默认工作区测试通过，特性版 Clippy `-D warnings`、格式、分层检查及 OpenSpec strict 通过。能力匹配的原生复检关闭、多文件任务和真实宿主对话仍未完成，14.10 及相关总任务不勾选。
+
+## 2026-10-03 编辑事件原生优先、32 份 WASM 与任务对话
+
+针对 `fast_scope_not_wired` 断点，先补 JS 编辑红测，再将 Hook 选中文件接到共享 Ruff/ESLint 原生路径和固定 WASM 路由。ESLint 同步后反馈稳定任务，重复扫描新增发现为 0；任务摘要缺失的红测随后修正，Claude 候选摘要包含 task show/verify，保存失败保留原生规则并提示同步未完成。外层 Hook 协议 0.6.0，旧 0.5 schema 与上一提交逐字节一致。32 grammar 编辑事件实际执行测试分四批检查指定文件，覆盖集合等于 manifest，未选坏文件不被扫描。详见 [验收记录](../../../tests/acceptance/hook-fast-native-wasm.md)。
+
+最终默认工作区 `cargo test --workspace --all-targets` 退出 0：1106 通过、0 失败、105 忽略；日志 `/tmp/codeguard-hook-workspace-final.log`。WASM 构建下 check_all_eslint、hook_execute_cli、claude_hook_cli 合计 42 通过、0 失败、3 忽略，日志 `/tmp/codeguard-hook-fast-wasm-final.log`；check_all_grammar_candidates 独占运行 10/10 通过，155.67 秒，含新增全部 32 grammar 编辑事件和既有聚合路由回归，日志 `/tmp/codeguard-hook-32.log`。CLI 全目标含 WASM Clippy `-D warnings`、fmt、分层检查、OpenSpec strict、diff 空白和新增文档链接校验均通过。166 份 schema 定义有效，实际 Hook WASM JSON 通过当前 schema，三个伪造通过/覆盖变体均被拒。
+
+本轮 ESLint 编排使用受控替身，未安装工具；真实 WASM 运行与实际宿主触发明确分开。默认插件尚未切换，发布包没有更新；其它语言原生 Hook 快检、候选任务自动同步/关闭、Python 元数据发现效率和全 I/O 硬预算仍缺。S11.17、S14 及完整目标继续未完成。上一源码 c6a3676 的 CI 37131837212 已成功，本轮源码的 CI 须按新提交另行核验。
+
+## 2026-10-04 指定 Python 发现与通用候选确认任务
+
+Python 选中文件检查不再通过全项目元数据 walk 发现配置；只观察所选源码及祖先 Ruff 配置，保持最近 `.ruff.toml` 优先级，最近配置链接/不可读时为 unknown，不能退回父配置。旁支链接配置导致 discovery_incomplete 的旧反例先 RED 后 GREEN；5 项端口测试禁止目录枚举并覆盖链接祖先和已过期预算。这是协作式文件观察预算，不是全部 I/O 的硬中断保证。
+
+先写 Zig 编辑任务和持久化失败两项端到端反例：旧反馈没有 syntax_tasks，两项实际 RED；接线后使用版本化 syntax_confirmation_observation 0.1 导入既有工作台。当前 Hook 外层 0.7、局部 0.2；通用 next 简报 0.2，原有检查器仍 0.1；原 Hook 0.6 和简报 0.1 schema 与 HEAD 原件逐字节相同。Python/ESLint 复用旧任务身份，其余语言按工作区/文件/语言归并原生确认阻塞。零恢复不新增必需任务、不关闭旧任务；任务有证据、规则、允许范围、步骤、复检、历史与关闭条件。未接入原生确认 adapter 的 task verify 明确返回 native_syntax_confirmation_adapter_unavailable，不落到其它语言检查，也不签发关闭。
+
+默认全工作区全目标测试：1112 通过、0 失败、105 忽略，退出 0。指定范围相关四组 CLI 回归：55 通过、0 失败、13 忽略；WASM Hook/ESLint/Python 五组回归：52 通过、0 失败、4 忽略（当时新增任务测试为两项），之后扩展的 hook_syntax_tasks 六项全部通过。新增六项覆盖 Zig 稳定身份、零恢复不关闭、保存失败无虚构 ID、Python 已有确认身份复用、JS/TS/TSX 稳定准备身份、篡改 grammar/越界坐标/重复 JSON 键拒绝，以及真实 CLI 消费 Claude 形状的有界上下文。本机 Ruff 0.16.8 的额外原生指定文件验收 1/1 通过。实际 CLI Hook 0.7、候选报告 0.1、next 0.2 三份 JSON 通过 schema；三份伪造交付/阻断/grammar 资格变体被 schema 拒绝。169 份 schema 定义有效。
+
+实际 JSON：`/tmp/codeguard-syntax-task-schema-actual.json`。日志身份：
+- `/tmp/codeguard-syntax-tasks-workspace.log`：SHA-256 `50b587e7a16dd19f10442620108fa9f89a74cc0c34444dbb53b44319c6e201c8`。
+- `/tmp/codeguard-hook-syntax-tasks-final.log`：SHA-256 `8833b94fcee571f03b6c9a19a8f07369541942731b8892e700dba6c35fc6e6bc`。
+- `/tmp/codeguard-selected-final-cli.log`：SHA-256 `e66f334188ba8322dcdc49d39446da5c97b816808d4e7eba29e4b45b48cfb369`。
+- `/tmp/codeguard-syntax-task-regression.log`：SHA-256 `d449f69cfd7ad57b2a88225fb8ab8d7b5f10b48151edad4f67bda5f93df625f4`。
+- `/tmp/codeguard-syntax-tasks-native-ruff.log`：SHA-256 `9686456c76b74e43de38dfbb0718b0085f6d151a319d7db4609a19d943da7fd6`。
+
+代码审阅、WASM 特性全目标 Clippy -D warnings、fmt、crate 分层、OpenSpec strict 和 git diff --check 通过。上一提交 911aa47 的 CI 37133517765 已成功；当前变更远端 CI 必须按新提交另行核验。默认插件、真实安装宿主自动触发、全语言原生确认和可信关闭、完整 I/O 硬预算/性能/误报评测仍缺，11.17、14.9–14.11 及总体目标不勾选。此次未发布 npm 或修改插件锁。
+
+
+## 2026-10-04 Zig 确认任务原生复检与完整局部回归
+
+当前工作树将通用 WASM 确认任务的 Zig 原生 AST 复检接入既有租约、稳定任务和尝试历史。next 0.3.0 提供当前诊断位置、报告引用/摘要和可复用工具 argv；repair_ready 接受显式 Zig 工具，错误、环境/版本失败和输入变化分开投影。原生零诊断仍记录 candidate_absent_unverified_policy，不能关闭任务或签发 allow。原生 lint zig 路径不依赖 WASM 特性。固定内置 grammar 校验结果仅作进程内不可变资产复用，不缓存项目检查结果，也不省略外部字节验证。
+
+验收：[原生确认与任务证据](../../../tests/acceptance/syntax-native-task-verification.md)。相关特性九组 83 passed/0 failed/14 ignored；明确运行真实 Zig 对照 1 passed；资产反例 11 passed。默认工作区最终顺序运行 1113 passed/0 failed/105 ignored、201 组；早先默认/特性并发构建干扰报告版本的失败记录保留，不计作通过。实际默认构建能够复检特性版生成的任务。172 个 schema 元定义、实际 CLI 输出及四项伪造负例通过，历史 schema 两份逐字节保留；Clippy -D warnings、fmt、分层、OpenSpec strict 与 diff 检查通过。最新简报证据/预算保护回归 14 passed/0 failed/1 ignored，见 /tmp/codeguard-native-syntax-last-guard.log；当前全目标特性 Clippy -D warnings 再次通过。
+
+上一提交 e506319 的 CI 37136788881 已成功；本轮新提交需按新 SHA 等待 CI。默认插件、其它通用原生 adapter、真实宿主、正式关闭/复发重开和全语言低误报评测仍缺，S09/S11/S14 父任务保持未完成；未发布新的 npm 制品或修改插件锁。
+
+## 2026-10-04 限定任务关闭、失败保留与原生复发
+
+受保护宿主 SDK `verify_zig_task_resolution` 接通 Zig 0.16.0 原始反例与当前源码对照，严格绑定签名策略、首次任务报告、工作区/范围、grammar、工具、宿主制品及批准期限。原样本有有效原生诊断且当前字节修复后无诊断，才返回限定 `code_fixed`；同字节或原样本原生合法进入误报调查；工具消失、原生故障、无效坐标或并发输入变化保留待核验。首次 finding 不改写，生命周期按明确父链读取，普通 `task verify` 检出匹配原工具的复发可追加 `reopened`，重复确认不生成重复生命周期事件。ready-to-verify 尝试与借用租约继续沿用既有流程。
+
+新增反例暴露并修正了 next 沿用旧准备步骤、成功复检未消费待核验尝试、公开复检没有重开、关闭归因被改写以及 not_run 证据被本地读者误判为损坏的问题。RED 记录与能力边界见 [限定任务验收](../../../tests/acceptance/task-resolution-lifecycle.md)。本地历史始终不能代替宿主信任来源或交付决策；SDK 的签名密钥和时钟来源测试是夹具，不是生产宿主证明。
+
+最终顺序验证：
+
+- core task_resolution_contract：7 passed、0 failed。
+- WASM 特性下 task_resolution_service 与 syntax_task_verify：17 passed、0 failed、2 ignored；明确运行本机真实 Zig 对照：1 passed、0 failed。真实工具用例不重复计入默认测试。
+- 默认全工作区全目标：203 组、1122 passed、0 failed、105 ignored，退出 0；忽略项不计验收通过。
+- WASM 特性全工作区全目标 Clippy `-D warnings` 退出 0；fmt、crate 分层、OpenSpec strict 与 diff 检查通过。
+- 176 个 schema 元定义有效，29 份实际/文档示例通过，6 类伪造变体被拒；四份新协议独立版本，现有消费者协议未覆盖。
+
+日志身份：
+- `/tmp/codeguard-resolution-core-final.log`：SHA-256 `00a9182b89267287b8d254e24d628f83059fe7108050513c662ba2211a6a5d74`。
+- `/tmp/codeguard-resolution-complete-final.log`：SHA-256 `298cea24d47a2333f6d160f282be42d03ab75f518d8ee303cd1bd28709af8c86`。
+- `/tmp/codeguard-resolution-real-zig-final.log`：SHA-256 `da58a6f398b85db943f4dbadd496599da95ebd0308b2c4182037056000090d0d`。
+- `/tmp/codeguard-resolution-workspace-final.log`：SHA-256 `f1dab883f6bf992833595f8ee1241b40e3a69ce15edff60e45921e77f60eca4e`。
+- `/tmp/codeguard-resolution-clippy-final.log`：SHA-256 `232438360b0e3a621857d3db7c2e1e1a7027663d3ca3c106c3fc512e9d5062c0`。
+- `/tmp/codeguard-resolution-schemas-final.log`：SHA-256 `15f1b959f89def12836da2d6cd90f0d7700edc0c2d8934e126ffcb66f48fb0d2`。
+
+中英文架构、技术方案、README 与修复工作流已同步。SDK 仅覆盖限定 Zig 语法任务；默认插件/公开 CLI 的可信策略提供者、其它原生适配器、环境/依赖/政策处置、白名单裁定、跨机器/Windows、完整门禁和全语言精度/性能仍缺。9.7/9.10/9.11/14.10 等父任务保持未完成；没有发布 npm 或修改插件锁。此前提交 4585d8f 的 CI 37140830716 已成功，新提交 CI 须按新 SHA 独立核验。
+
+## 2026-10-04 离线 npm 安装后的编辑与任务复检
+
+通过新 binary-distribution 场景和独立 `npm_pack_repair.test.mjs` 验证安装后的 Node 入口保留 stdin、参数、工作目录及退出码。公开旧 0.1.3 经固定摘要核对后运行新链路测试真实 RED：编辑事件没有语法任务；当前源码的私有离线包 GREEN，1 passed/0 failed/0 skipped，62.4 秒。重复编辑、Claude 形状上下文、原生诊断指导、源码变化失效、修复零诊断不自闭、WASM 零恢复不关闭及同问题同任务均实际运行；受控原生工具与真实宿主边界见 [安装链路验收](../../../tests/acceptance/npm-repair-local-package.md)。9 份版本化实际报告通过 schema，三个伪造变体拒绝；记录保留旧包失败和测试参数修正失败，不混计成功。
+
+CI 顺序接入该离线测试。本批仅增加验收、文档和 CI；Rust 产品源码未再修改，前段全工作区结果仍适用于同一产品源码。公开制品/插件默认接线未改变，11.17/13.4/14.18 和整体目标保持未完成。a688292 的 CI 37147462608 已失败：SDK 7 项均报 task_resolution_adapter_unavailable，npm 和全量步骤未运行；不能用本机成功替代此结果。
+
+Linux CI 失败处理：宿主制品读取仍限制 256 MiB，不因测试失败扩大产品上限。测试夹具现先断言实际宿主程序大小，CI 设置 `CARGO_PROFILE_TEST_DEBUG=0` 去掉完整调试符号、保留 debug assertions；本机相同 profile 下宿主程序 101062368 字节，SDK 9 passed/0 failed/1 ignored（89.6 秒）。原 Linux 失败与新提交远端结果分开，当前根因指向调试制品预算，Linux 修正尚待新 CI 证明。
+- `/tmp/codeguard-a688292-ci-failure.log`：SHA-256 `25faca123f505251cca14d688e774131a438503960adb20126b52ae7a5b6b670`。
+- `/tmp/codeguard-resolution-ci-profile-local.log`：SHA-256 `d37c052e9fc23eeb7a3de0bba741024d42bd92a9b933fb0ae9d66b2827a20253`。
+
+本批新增测试与 CI 配置最终通过 CLI 特性全目标 Clippy `-D warnings`、fmt、分层、OpenSpec strict、Node 语法和差异检查；CLI Clippy 日志 SHA-256 `07302979ebe5e9d95fc0a9419217173dbf32fd669f3d956c322890e9920b5318`。

@@ -695,3 +695,28 @@ fn initialized_native_finding_returns_next_brief_in_same_cli_response() {
     assert_eq!(report["next"]["disposition"], "actionable");
     assert_eq!(report["next"]["delivery_decision"], "not_evaluated");
 }
+
+#[test]
+fn unrelated_symlink_configuration_does_not_pollute_selected_discovery() {
+    let project = Project::new();
+    fs::write(project.0.join("changed.py"), "pass\n").unwrap();
+    fs::write(project.0.join("ruff.toml"), "[lint]\nselect = ['F401']\n").unwrap();
+    fs::create_dir(project.0.join("unrelated")).unwrap();
+    fs::write(project.0.join("unrelated/untouched.py"), "pass\n").unwrap();
+    std::os::unix::fs::symlink("../ruff.toml", project.0.join("unrelated/ruff.toml")).unwrap();
+    let (exit, report) = run(&project, &["--file", "changed.py"]);
+    assert_eq!(exit, 3);
+    assert!(
+        !report["incomplete_reasons"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|r| r == "discovery_incomplete"),
+        "{report}"
+    );
+    assert_eq!(report["files"].as_array().unwrap().len(), 1);
+    assert_eq!(
+        report["checker_configurations"].as_array().unwrap().len(),
+        1
+    );
+}

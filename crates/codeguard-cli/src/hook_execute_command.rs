@@ -5,9 +5,6 @@ use crate::discovery::discover;
 use crate::git_index_safety::observe_index_safety_with_deadline;
 use crate::hook_plan_command::parse_request;
 use crate::next_command::{read_local_brief, read_task_brief};
-use crate::python_lint_command::{
-    annotate_conversation_budget, scan_selected_report_with_deadline,
-};
 use codeguard_adapters::legacy_registry;
 use codeguard_core::{HookTriggerAction, HookTriggerInput, plan_hook_trigger};
 use codeguard_runtime::{NativeObservation, ProcessSpec, Termination, run_process};
@@ -98,7 +95,12 @@ fn execute_parsed(
     input: &HookTriggerInput,
 ) -> Result<(Value, u8), &'static str> {
     let plan = plan_hook_trigger(input)?;
-    if plan.action != HookTriggerAction::VerifyTask && !arguments.verify_options.is_empty() {
+    if plan.action != HookTriggerAction::VerifyTask
+        && arguments
+            .verify_options
+            .keys()
+            .any(|key| plan.action != HookTriggerAction::FastFileCheck || key != "--node-tool")
+    {
         return Err("任务复检参数仅用于 repair_ready 事件");
     }
     let root = arguments
@@ -136,42 +138,22 @@ fn execute_parsed(
                 Err((reason, exit_code)) => ("not_run", Some(reason), Value::Null, exit_code),
             }
         }
-        (HookTriggerAction::FastFileCheck, Some(root))
-            if plan.target_paths.iter().all(|path| path.ends_with(".py")) =>
-        {
+        (HookTriggerAction::FastFileCheck, Some(root)) => {
             let deadline = Instant::now() + Duration::from_millis(arguments.timeout_ms);
-            match scan_selected_report_with_deadline(
+            let feedback = crate::hook_fast_scan::observe(
                 root,
-                arguments.ruff_tool.as_deref(),
                 &plan.target_paths,
+                arguments.ruff_tool.as_deref(),
+                arguments.verify_options.get("--node-tool").map(Path::new),
                 deadline,
-                &AtomicBool::new(false),
-            ) {
-                Ok(mut feedback) => {
-                    annotate_conversation_budget(&mut feedback, arguments.timeout_ms, "cli");
-                    feedback["schema_version"] = Value::String("0.13.0".into());
-                    let cancelled = codeguard_runtime::sigint_cancellation_requested()
-                        || feedback["incomplete_reasons"]
-                            .as_array()
-                            .is_some_and(|reasons| {
-                                reasons.iter().any(|reason| reason == "request_cancelled")
-                            });
-                    if cancelled {
-                        feedback["command_status"] = Value::String("cancelled".into());
-                        feedback["exit_code"] = Value::from(130);
-                    }
-                    (
-                        "local_observation",
-                        cancelled.then_some("request_cancelled"),
-                        feedback,
-                        if cancelled { 130 } else { 3 },
-                    )
-                }
-                Err(_) => ("not_run", Some("adapter_unavailable"), Value::Null, 4),
-            }
-        }
-        (HookTriggerAction::FastFileCheck, Some(_)) => {
-            ("not_run", Some("fast_scope_not_wired"), Value::Null, 3)
+            );
+            let cancelled = codeguard_runtime::sigint_cancellation_requested();
+            (
+                "local_observation",
+                cancelled.then_some("request_cancelled"),
+                feedback,
+                if cancelled { 130 } else { 3 },
+            )
         }
         (HookTriggerAction::NoCheck, Some(_)) => ("not_run", Some("write_failed"), Value::Null, 3),
         (HookTriggerAction::ResolveChangedScope, Some(_)) => {
@@ -236,7 +218,7 @@ fn execute_parsed(
     };
     Ok((
         json!({
-            "schema_version":"0.5.0", "report_type":"hook_execution_feedback",
+            "schema_version":"0.7.0", "report_type":"hook_execution_feedback",
             "plan":plan, "execution":execution, "reason":reason,
             "local_feedback":feedback, "delivery_decision":"not_evaluated",
             "host_blocking_verified":false, "soft_result_reused":false
@@ -408,6 +390,7 @@ fn verify_option_matches_checker(key: &str, checker_id: &str) -> bool {
         ),
         "python.pip_audit" => matches!(key, "--pip-audit-tool" | "--pip-audit-version"),
         "go.vet" => key == "--go-tool",
+        "syntax.native_confirmation" => key == "--zig-tool",
         "rust.cargo_clippy" | "rust.cargo_check" | "rust.cargo_rustdoc" => key == "--cargo-tool",
         "rust.cargo_audit" => matches!(key, "--cargo-audit-tool" | "--rustsec-db"),
         "java.checkstyle" | "java.checkstyle.preparation" => {
@@ -563,6 +546,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
             | "--pip-audit-tool"
             | "--pip-audit-version"
             | "--go-tool"
+            | "--zig-tool"
             | "--maven-tool"
             | "--java-home"
             | "--java-tool"
@@ -592,6 +576,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                         | "--rustsec-db"
                         | "--pip-audit-tool"
                         | "--go-tool"
+                        | "--zig-tool"
                         | "--maven-tool"
                         | "--java-home"
                         | "--java-tool"

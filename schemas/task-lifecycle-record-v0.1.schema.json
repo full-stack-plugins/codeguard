@@ -1,0 +1,234 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeguard.dev/schemas/task-lifecycle-record-v0.1.schema.json",
+  "title": "追加式生命周期记录；不提供本地关闭或 CI 门禁权威",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "report_type": {
+      "const": "task_lifecycle_record"
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "type": "string",
+          "pattern": "^event-[0-9a-f]{64}$"
+        },
+        "parent_event_id": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^event-[0-9a-f]{64}$"
+            }
+          ]
+        },
+        "identity": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "workspace_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.:-]{1,128}$"
+            },
+            "task_id": {
+              "type": "string",
+              "pattern": "^CG-B-[0-9a-f]{32}$"
+            },
+            "checker_id": {
+              "const": "syntax.native_confirmation"
+            },
+            "scope": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096,
+              "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))[^\\\\:\\x00-\\x1f\\x7f]+$"
+            }
+          },
+          "required": [
+            "workspace_id",
+            "task_id",
+            "checker_id",
+            "scope"
+          ]
+        },
+        "kind": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "event": {
+                  "const": "observed"
+                }
+              },
+              "required": [
+                "event"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "event": {
+                  "const": "reopened"
+                }
+              },
+              "required": [
+                "event"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "event": {
+                  "const": "resolved"
+                },
+                "cause": {
+                  "const": "code_fixed"
+                },
+                "evidence_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              },
+              "required": [
+                "event",
+                "cause",
+                "evidence_sha256"
+              ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "event": {
+                  "const": "verification_required"
+                },
+                "evidence_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "reason_code": {
+                  "enum": [
+                    "inputs_stale",
+                    "native_incomplete",
+                    "false_positive_review_required",
+                    "resolution_evidence_incomplete",
+                    "resolution_history_binding_changed"
+                  ]
+                }
+              },
+              "required": [
+                "event",
+                "evidence_sha256",
+                "reason_code"
+              ]
+            }
+          ]
+        }
+      },
+      "required": [
+        "event_id",
+        "parent_event_id",
+        "identity",
+        "kind"
+      ]
+    },
+    "original_report_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "evidence_sha256": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "policy_sha256": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "report_type",
+    "event",
+    "original_report_sha256",
+    "evidence_sha256",
+    "policy_sha256"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "event": {
+            "properties": {
+              "parent_event_id": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "event": {
+            "properties": {
+              "kind": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "event": {
+                    "const": "observed"
+                  }
+                },
+                "required": [
+                  "event"
+                ]
+              }
+            }
+          },
+          "evidence_sha256": {
+            "type": "null"
+          },
+          "policy_sha256": {
+            "type": "null"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "evidence_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "policy_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    }
+  ]
+}
