@@ -1079,3 +1079,5 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 14.4 / 14.17 / 14.19 Zig 原生差分局部增量：固定本机 Zig 0.16.0 `ast-check` 作为独立 oracle，公开隔离 worker 对同一 11 份合法/破损源码的恢复分类逐例一致，真实原生显式测试 1/1 通过；候选仍未验收且交付未评估。仅覆盖此版本的 7 个正例、4 个反例，不代表完整误报率、其他语种、版本/方言或发行资格；见[Zig 原生差分验收](../../../tests/acceptance/zig-native-differential.md)。14.4、14.17、14.19 不勾选。
 
 14.4 / 14.17 / 14.19 CFQuery 标记边界纠错：RED 证实 CFML 注释中的示例查询被错误送入 worker，以及属性值或开标签内注释中的 `>` 截断查询体。核对 Adobe 官方语义后修正早期假设：HTML 注释中的 CFML 标签仍需保留。现跳过可嵌套 CFML 注释、普通标签属性与明确 CFScript 体，保留 HTML 注释及正文中的查询；5 项路由测试、4 项真实 `check all` 回归及全 32 份分批调用均通过，见[局部验收](../../../tests/acceptance/cfquery-markup-boundary.md)。CFQuery 自身的 `SELECT FROM` 漏检、VB.NET 误报和逐语言原生对照仍在，三项任务不勾选。
+
+14.4 / 14.17 / 14.19 Go 原生差分局部增量：固定本机 Go 1.23.4 `gofmt -e` 作为独立语法 oracle，同一 8 份合法和 5 份破损源码经公开隔离 Go worker 逐例恢复分类一致，显式原生测试 1/1 与可由 CI 常规运行的 WASM 语料回归 1/1 通过；候选仍未验收且交付未评估。此对照不覆盖类型/语义、`go vet`、其他版本和构建标签或系统误报漏报率；见[Go 原生差分验收](../../../tests/acceptance/go-native-differential.md)。14.4、14.17、14.19 不勾选。
