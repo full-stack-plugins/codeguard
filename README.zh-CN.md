@@ -106,6 +106,8 @@ cargo build --locked -p codeguard-cli
 
 同一源码构建现在会在既有原生检查之后，从 `codeguard check all . --format=json` 执行有界候选初检。[检查反馈 0.34.0](schemas/check-feedback.schema.json)中的 `syntax_candidates` 附带有界的已知 grammar 限制，并区分 TSX、JavaScript、CFScript 和明确嵌入的 CFQuery，同时保留原生阻塞与未执行范围。Ruff 已对相同源码完成原生扫描的 Python 文件跳过重复 WASM，并计入 `native_preferred_count`；其余未确认语法能力的文件仍运行候选初检。四个有界集成样例经此入口合计调用了 32 种固定 grammar。观察仍未验收，命令保持退出码 3；候选阶段限 64 文件、64 片段、90 秒。这尚非逐语言验收的原生兜底；已发布 npm `0.1.3` 包含该候选路径，但 0.34.0 的已知限制投影目前只存在于源码构建；见[验收记录](tests/acceptance/check-all-32-grammar-candidates.md)。[C11 与 Apple Clang 21 差分](tests/acceptance/c-native-differential.md)、[Rust 2021 与 rustfmt 1.9.0 差分](tests/acceptance/rust-native-differential.md)和[Ruby 2.6.10 差分](tests/acceptance/ruby-native-differential.md)各在 13 个窄范围语法样例上一致，但不代表对应语言的原生 lint 已验收。[Swift 6.4 差分](tests/acceptance/swift-native-differential.md)发现一处原生拒绝而 Swift WASM 漏检的源码，因此 Swift 仍未验收。
 
+源码构建的验收测试还把 31 个源码文件作为一个混合语言项目：候选阶段最多同时运行两个隔离 worker，并服从 `--jobs`；报告顺序、源码复读与 90 秒总截止时间不变。本机单次运行观察到全部 32 种候选且无跳过片段；源码提交 `ff60184` 的 Linux WASM 集成步骤已通过同一单项目测试；完整 CI 已通过。这仍是候选覆盖，不是已验收的 lint。
+
 源码构建的 Unix CLI 还提供局部 Zig 入口：`codeguard lint zig FILE --zig-tool /absolute/path/to/zig --format=json`。显式提供且报告 Zig 0.16.0、执行前后字节摘要一致的工具优先运行原生 `ast-check`，仅输出诊断位置，不回显源码；未显式提供工具时，固定 Zig WASM 给出未验收候选观察。两条路径都保持未完成，因为 `ast-check` 仅覆盖局部 AST 错误，不等于完整 lint、构建或测试。见 [Zig 报告 Schema](schemas/zig-lint-feedback-v0.1.schema.json)。
 
 已在 Apple Silicon macOS 上通过全新 npm 缓存验证公开 `0.1.3` 候选包：
