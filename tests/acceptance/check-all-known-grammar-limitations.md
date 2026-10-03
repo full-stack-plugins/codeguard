@@ -6,6 +6,6 @@
 
 聚合 `check_feedback` 从 0.33.0 升至封闭的 0.34.0；旧 Schema 独立归档。新字段要求数组最多 8 项、每项 1–1024 字符，仍要求 `grammar_qualified=false`、`delivery_decision=incomplete`。清单元数据无效时候选阶段报告 `grammar_manifest_invalid`，不继续解析或签发通过。真实双文件报告有 VB.NET、CFML、CFQuery 三条候选记录，VB.NET 和 CFQuery 都携带具体限制；无论某条 worker 观察是否完成，都不把恢复节点或零恢复当作原生判定。
 
-目标回归先因缺字段失败，修复后 1/1 通过；六项候选路由测试 6/6、聚合契约测试 18/18（另 3 项按原标记忽略）。本机已有 `/opt/anaconda3/bin/python3` 的 Draft 2020-12 校验器接受真实 0.34.0 报告，拒绝旧 0.33.0 Schema、超长限制和伪造 `delivery_decision=allow`。Python 只用于独立协议验收，不属于 Rust 产品运行路径。
+目标回归先因缺字段失败，修复后 1/1 通过；六项候选路由测试 6/6、聚合契约测试 18/18（另 3 项按原标记忽略）。分批调用全部 32 份候选的真实 CLI 测试还逐观察核对非空已知限制，目标用例 1/1 通过。本机已有 `/opt/anaconda3/bin/python3` 的 Draft 2020-12 校验器接受真实 0.34.0 报告，拒绝旧 0.33.0 Schema、超长限制和伪造 `delivery_decision=allow`。Python 只用于独立协议验收，不属于 Rust 产品运行路径。
 
 这一增量只改善报告中的可见限制。已发布 npm 0.1.3 仍嵌入旧协议；插件自动读取、对话渲染、原生对照、系统误报率与逐语言发行验收仍缺，父任务不勾选。

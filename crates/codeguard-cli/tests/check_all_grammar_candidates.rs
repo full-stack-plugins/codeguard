@@ -310,6 +310,13 @@ fn check_all_invokes_all_32_pinned_candidates_across_bounded_projects() {
                 observation["recovery_count"], 0,
                 "group {group_index}: unexpected recovery in valid sample: {observation}"
             );
+            assert!(
+                !observation["known_limitations"]
+                    .as_array()
+                    .unwrap()
+                    .is_empty(),
+                "group {group_index}: candidate lacks its fixed known limits: {observation}"
+            );
         }
         for language in observations
             .iter()
