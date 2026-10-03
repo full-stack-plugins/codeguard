@@ -383,6 +383,11 @@ fn check_all_invokes_all_32_pinned_candidates_across_bounded_projects() {
                 observation["recovery_count"], 0,
                 "group {group_index}: unexpected recovery in valid sample: {observation}"
             );
+            assert_eq!(
+                observation["reason"],
+                serde_json::Value::Null,
+                "group {group_index}: valid sample has an incomplete parse: {observation}"
+            );
             assert!(
                 !observation["known_limitations"]
                     .as_array()
@@ -465,6 +470,10 @@ fn one_mixed_project_observes_all_32_candidates_within_the_existing_budget() {
         observations
             .iter()
             .all(|item| item["grammar_qualified"] == false)
+    );
+    assert!(
+        observations.iter().all(|item| item["reason"].is_null()),
+        "a valid sample was not fully parsed: {observations:?}"
     );
 }
 
