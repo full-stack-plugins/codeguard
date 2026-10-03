@@ -1906,6 +1906,17 @@ pub fn run(args: &[String]) -> ExitCode {
                 }
                 for item in observations
                     .iter()
+                    .filter(|item| item["reason"] == "syntax_recovery_incomplete")
+                    .take(8)
+                {
+                    println!(
+                        "  {} [{}] grammar 报告错误但恢复位置不完整；初检未完成，需适用原生工具确认。",
+                        item["path"].as_str().unwrap_or("?"),
+                        item["language"].as_str().unwrap_or("unknown")
+                    );
+                }
+                for item in observations
+                    .iter()
                     .filter(|item| item["known_limitations"][0].is_string())
                     .take(8)
                 {

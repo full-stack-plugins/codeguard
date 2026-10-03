@@ -30,7 +30,7 @@ fn corpus() -> [(&'static str, &'static str, bool); 13] {
     ]
 }
 
-fn candidate_is_valid(root: &Path, name: &str, source: &str) -> bool {
+fn candidate_validity(root: &Path, name: &str, source: &str) -> Option<bool> {
     let file = root.join(format!("{name}.kt"));
     fs::write(&file, source).unwrap();
     let candidate = Command::new(env!("CARGO_BIN_EXE_codeguard"))
@@ -48,7 +48,35 @@ fn candidate_is_valid(root: &Path, name: &str, source: &str) -> bool {
         serde_json::Value::Null,
         "{name}: {report}"
     );
-    report["recoveries"].as_array().unwrap().is_empty()
+    if report["precheck"]["truncated_files"].as_u64().unwrap() > 0 {
+        None
+    } else {
+        Some(report["recoveries"].as_array().unwrap().is_empty())
+    }
+}
+
+#[test]
+fn hidden_kotlin_recovery_is_reported_as_incomplete() {
+    let root = std::env::temp_dir()
+        .canonicalize()
+        .unwrap()
+        .join(format!("codeguard-kotlin-hidden-{}", std::process::id()));
+    fs::create_dir_all(&root).unwrap();
+    let file = root.join("missing_type.kt");
+    fs::write(&file, "fun f(x: ) = x\n").unwrap();
+    let candidate = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["grammar", "probe", "kotlin"])
+        .arg(&file)
+        .arg("--format=json")
+        .output()
+        .unwrap();
+    assert_eq!(candidate.status.code(), Some(3));
+    let report: serde_json::Value = serde_json::from_slice(&candidate.stdout).unwrap();
+    assert!(report["recoveries"].as_array().unwrap().is_empty());
+    assert_eq!(report["precheck"]["truncated_files"], 1);
+    assert_eq!(report["precheck"]["status"], "incomplete");
+    fs::remove_file(file).unwrap();
+    fs::remove_dir(root).unwrap();
 }
 
 #[test]
@@ -59,13 +87,17 @@ fn kotlin_worker_preserves_native_labeled_syntax_corpus() {
         .join(format!("codeguard-kotlin-corpus-{}", std::process::id()));
     fs::create_dir_all(&root).unwrap();
     let mut mismatches = Vec::new();
+    let mut unresolved = Vec::new();
     for (name, source, expected_valid) in corpus() {
-        if candidate_is_valid(&root, name, source) != expected_valid {
-            mismatches.push(name);
+        match candidate_validity(&root, name, source) {
+            Some(valid) if valid != expected_valid => mismatches.push(name),
+            None => unresolved.push(name),
+            _ => {}
         }
     }
     fs::remove_dir_all(root).unwrap();
-    assert_eq!(mismatches, ["missing_parameter_type"]);
+    assert!(mismatches.is_empty(), "{mismatches:?}");
+    assert_eq!(unresolved, ["object", "missing_parameter_type"]);
 }
 
 #[test]
@@ -90,6 +122,7 @@ fn pinned_kotlin_worker_matches_native_kotlinc_on_syntax_corpus() {
     ));
     fs::create_dir_all(&root).unwrap();
     let mut mismatches = Vec::new();
+    let mut unresolved = Vec::new();
     for (name, source, expected_valid) in corpus() {
         let file = root.join(format!("{name}.kt"));
         fs::write(&file, source).unwrap();
@@ -112,10 +145,13 @@ fn pinned_kotlin_worker_matches_native_kotlinc_on_syntax_corpus() {
             String::from_utf8_lossy(&native.stderr)
         );
         assert_eq!(fs::read_to_string(&file).unwrap(), source);
-        if candidate_is_valid(&root, name, source) != native.status.success() {
-            mismatches.push(name);
+        match candidate_validity(&root, name, source) {
+            Some(valid) if valid != native.status.success() => mismatches.push(name),
+            None => unresolved.push(name),
+            _ => {}
         }
     }
     fs::remove_dir_all(root).unwrap();
-    assert_eq!(mismatches, ["missing_parameter_type"]);
+    assert!(mismatches.is_empty(), "{mismatches:?}");
+    assert_eq!(unresolved, ["object", "missing_parameter_type"]);
 }

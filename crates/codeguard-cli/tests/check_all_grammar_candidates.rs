@@ -5,6 +5,46 @@ use std::fs;
 use std::process::Command;
 
 #[test]
+fn hidden_kotlin_recovery_is_visible_in_project_feedback() {
+    let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
+        "codeguard-kotlin-hidden-project-{}",
+        std::process::id()
+    ));
+    fs::create_dir_all(&root).unwrap();
+    fs::write(root.join("Main.kt"), "fun f(x: ) = x\n").unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["check", "all"])
+        .arg(&root)
+        .arg("--format=json")
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let observations = report["syntax_candidates"]["observations"]
+        .as_array()
+        .unwrap();
+    let kotlin = observations
+        .iter()
+        .find(|item| item["language"] == "kotlin")
+        .expect("Kotlin candidate observation");
+    assert_eq!(kotlin["recovery_count"], 0);
+    assert_eq!(kotlin["reason"], "syntax_recovery_incomplete");
+    assert_eq!(report["delivery_decision"], "incomplete");
+    let text_output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["check", "all"])
+        .arg(&root)
+        .output()
+        .unwrap();
+    assert_eq!(text_output.status.code(), Some(3));
+    assert!(
+        String::from_utf8_lossy(&text_output.stdout).contains("grammar 报告错误但恢复位置不完整"),
+        "{}",
+        String::from_utf8_lossy(&text_output.stdout)
+    );
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
 fn completed_native_ruff_preempts_only_its_matching_python_file() {
     use std::os::unix::fs::PermissionsExt;
     let root = std::env::temp_dir()

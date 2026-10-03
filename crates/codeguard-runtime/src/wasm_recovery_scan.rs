@@ -8,7 +8,7 @@ use crate::WasmRecovery;
 pub struct WasmRecoveryScan {
     /// 保留的 ERROR/MISSING 原始恢复节点。
     pub recoveries: Vec<WasmRecovery>,
-    /// 诊断数量或遍历预算耗尽；消费者须标记初检不完整。
+    /// 诊断数量、遍历预算耗尽，或语法树错误无法定位；消费者须标记初检不完整。
     pub truncated: bool,
 }
 
@@ -24,6 +24,7 @@ pub fn scan_wasm_recoveries(tree: &Tree, max_records: usize) -> Result<WasmRecov
     let mut recoveries = Vec::new();
     let mut seen = BTreeSet::new();
     let mut truncated = false;
+    let mut unlocated_error = false;
     while let Some((node, ancestor_error_group)) = stack.pop() {
         visited += 1;
         if visited > 200_000 {
@@ -68,11 +69,13 @@ pub fn scan_wasm_recoveries(tree: &Tree, max_records: usize) -> Result<WasmRecov
         } else {
             ancestor_error_group
         };
+        let mut visible_error_child = false;
         for index in (0..node.child_count()).rev() {
             let Some(child) = node.child(index) else {
                 continue;
             };
             if child.has_error() || child.is_error() || child.is_missing() {
+                visible_error_child = true;
                 stack.push((child, child_error_group));
                 if stack.len() > 200_000 {
                     truncated = true;
@@ -80,13 +83,18 @@ pub fn scan_wasm_recoveries(tree: &Tree, max_records: usize) -> Result<WasmRecov
                 }
             }
         }
+        // 部分 grammar 的 MISSING token 只体现在 has_error 与 S-expression，
+        // 不会成为可遍历子节点。此时不能把零恢复节点解释成语法有效。
+        if node.has_error() && !node.is_error() && !node.is_missing() && !visible_error_child {
+            unlocated_error = true;
+        }
         if truncated {
             break;
         }
     }
     Ok(WasmRecoveryScan {
         recoveries,
-        truncated,
+        truncated: truncated || unlocated_error,
     })
 }
 

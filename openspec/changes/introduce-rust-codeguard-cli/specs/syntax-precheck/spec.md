@@ -143,6 +143,8 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 
 解析 MUST 同时识别 ERROR/MISSING 恢复，并按同一恢复原因归并级联节点；诊断 MUST 保留原文件位置、必要的有界脱敏上下文及 grammar 身份。不确定版本/方言、模板、宏、嵌入语言 MUST 明示覆盖限制。CodeGraph 用于提取符号的源码遮盖/启发式 MUST NOT 静默移入语法判定。仅凭恢复节点不得猜测具体缺失 token 或自动授予源码修改范围。
 
+若语法树标记错误但可遍历节点中无法定位任何对应 ERROR/MISSING，MUST 将该文件标为初检未完成，并保留原生检查义务；不得将零恢复节点当成语法有效或制造没有位置依据的源码 finding。
+
 同一语言族有独立 grammar 的方言 MUST 按实际文件类型选择和报告；尤其 `.tsx` MUST 使用 TSX grammar，不能拿普通 TypeScript grammar 的恢复节点当作 JSX 源码异常。候选报告读者 MUST 核对 grammar 方言与源文件扩展名一致；不匹配视为报告无效，不生成源码 finding。
 
 多语言共用后缀 MUST 保留歧义：`.m` 可能属于 Objective-C 或 MATLAB，`.sc` 可能属于 Scala 或 SuperCollider。没有可核对的语言证据时，自动检查 MUST 不调用猜测的 grammar、不把恢复节点记为源码问题，并保持范围未完成；用户显式指定 `grammar probe` 的语种仍可作候选诊断。
@@ -166,6 +168,11 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 #### Scenario: One unmatched delimiter produces many recovery nodes
 - **WHEN** 同一恢复原因造成重复或级联节点
 - **THEN** 归并为可处理观察并保留受影响范围，不创建大量同义任务
+
+#### Scenario: Grammar hides a missing token from node traversal
+
+- **WHEN** grammar 的根节点 `has_error=true` 且 S-expression 含缺失 token，但运行时的可遍历子节点不能定位该 token
+- **THEN** 初检标为 incomplete，保留未完成计数并请求原生确认；零恢复节点不得升级为 clean
 
 #### Scenario: A template includes unsupported embedded syntax
 - **WHEN** 只支持文件中一部分语言区域

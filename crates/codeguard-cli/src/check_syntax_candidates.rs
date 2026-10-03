@@ -299,6 +299,8 @@ fn candidate_result(
                 .next()
                 .map_or(0, <[u8]>::len);
             let recovery_count = observation.recoveries.len();
+            let incomplete_reason =
+                (observation.precheck.truncated_files > 0).then_some("syntax_recovery_incomplete");
             let recoveries: Vec<Value> = observation.recoveries.iter().take(MAX_VISIBLE_RECOVERIES).map(|recovery| {
                 json!({
                     "kind":recovery.kind,
@@ -313,7 +315,7 @@ fn candidate_result(
             }).collect();
             json!({
                 "path":job.relative,"language":job.language,"scope":job.scope,"byte_offset":job.byte_offset,
-                "status":"candidate_observed","reason":null,"grammar_qualified":false,
+                "status":"candidate_observed","reason":incomplete_reason,"grammar_qualified":false,
                 "source_sha256":observation.source_sha256,"grammar_sha256":observation.grammar_sha256,
                 "recovery_count":recovery_count,"recoveries":recoveries,
                 "known_limitations":job.known_limitations
