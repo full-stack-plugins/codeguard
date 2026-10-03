@@ -35,6 +35,7 @@ struct Arguments {
     root: PathBuf,
     ruff_tool: Option<PathBuf>,
     zig_tool: Option<PathBuf>,
+    erl_tool: Option<PathBuf>,
     cargo_tool: Option<PathBuf>,
     cargo_audit_tool: Option<PathBuf>,
     rustsec_db: Option<PathBuf>,
@@ -87,9 +88,22 @@ pub fn run(args: &[String]) -> ExitCode {
         Err(reason) => return print_unavailable(&parsed, reason),
     };
     let syntax_task = brief["checker_id"] == "syntax.native_confirmation";
-    if parsed.zig_tool.is_some() && !syntax_task {
-        eprintln!("--zig-tool 仅用于对应的原生语法确认任务");
+    if (parsed.zig_tool.is_some() || parsed.erl_tool.is_some()) && !syntax_task {
+        eprintln!("语法工具参数仅用于对应的原生语法确认任务");
         return ExitCode::from(2);
+    }
+    // 语言与工具在租约及原生启动前核对，不能先取得租约再发现错参。
+    if syntax_task && (parsed.zig_tool.is_some() || parsed.erl_tool.is_some()) {
+        let original = match crate::syntax_task_recheck::original(&root, &brief) {
+            Ok(original) => original,
+            Err(reason) => return print_unavailable(&parsed, reason),
+        };
+        if (parsed.zig_tool.is_some() && original["language"] != "zig")
+            || (parsed.erl_tool.is_some() && original["language"] != "erlang")
+        {
+            eprintln!("原生语法工具不匹配任务语言");
+            return ExitCode::from(2);
+        }
     }
     let npm_task = brief["checker_id"] == "node.npm.audit";
     if !npm_task && !parsed.npm_options.is_empty() {
@@ -189,7 +203,13 @@ pub fn run(args: &[String]) -> ExitCode {
         None
     };
     let mut scan = if syntax_task {
-        match crate::syntax_task_recheck::run(&root, &brief, parsed.zig_tool.as_deref(), deadline) {
+        match crate::syntax_task_recheck::run(
+            &root,
+            &brief,
+            parsed.zig_tool.as_deref(),
+            parsed.erl_tool.as_deref(),
+            deadline,
+        ) {
             Ok(report) => report,
             Err(reason) => {
                 let release = finish_verification(&root, &parsed.task_id, &lease);
@@ -573,7 +593,11 @@ pub fn run(args: &[String]) -> ExitCode {
         "next_actions":["inspect_native_recheck_and_policy_before_closure"]
     });
     if syntax_task {
-        report["schema_version"] = json!("0.12.0");
+        report["schema_version"] = json!(if report["native_scan"]["schema_version"] == "0.2.0" {
+            "0.13.0"
+        } else {
+            "0.12.0"
+        });
         report["next_actions"] = json!([
             "inspect_native_syntax_observation",
             "repair_only_current_native_diagnostics",
@@ -713,8 +737,15 @@ pub fn run(args: &[String]) -> ExitCode {
                     .flatten()
                 {
                     println!(
-                        "原生规则 {}；行 {}，字节列 {}",
-                        position["rule_id"], position["line"], position["column"]
+                        "原生规则 {}；行 {}，{} {}",
+                        position["rule_id"],
+                        position["line"],
+                        if report["native_scan"]["target"]["language"] == "erlang" {
+                            "字符列"
+                        } else {
+                            "字节列"
+                        },
+                        position["column"]
                     );
                 }
             }
@@ -1287,6 +1318,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
     let mut npm_options = std::collections::BTreeMap::new();
     let mut ruff_tool = None;
     let mut zig_tool = None;
+    let mut erl_tool = None;
     let mut cargo_tool = None;
     let mut cargo_audit_tool = None;
     let mut rustsec_db = None;
@@ -1324,6 +1356,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                 | "--format"
                 | "--ruff-tool"
                 | "--zig-tool"
+                | "--erl-tool"
                 | "--cargo-tool"
                 | "--cargo-audit-tool"
                 | "--rustsec-db"
@@ -1358,6 +1391,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                 }
                 "--ruff-tool" if ruff_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--zig-tool" if zig_tool.replace(PathBuf::from(value)).is_none() => {}
+                "--erl-tool" if erl_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--cargo-tool" if cargo_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--cargo-audit-tool"
                     if cargo_audit_tool.replace(PathBuf::from(value)).is_none() => {}
@@ -1390,6 +1424,9 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
     }
     if zig_tool.as_ref().is_some_and(|tool| !tool.is_absolute()) {
         return Err("--zig-tool 必须是绝对路径".into());
+    }
+    if erl_tool.as_ref().is_some_and(|tool| !tool.is_absolute()) {
+        return Err("--erl-tool 必须是绝对路径".into());
     }
     if ruff_tool.as_ref().is_some_and(|tool| !tool.is_absolute()) {
         return Err("--ruff-tool 必须是绝对路径".into());
@@ -1469,6 +1506,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
         root: root.unwrap_or_else(|| PathBuf::from(".")),
         ruff_tool,
         zig_tool,
+        erl_tool,
         cargo_tool,
         cargo_audit_tool,
         rustsec_db,

@@ -179,7 +179,8 @@ fn runtime_mutation_during_native_validate_invalidates_local_evidence() {
             environment,
             evidence_dir: fixture.0.join("evidence"),
             run_id: "mutating-runtime".into(),
-            deadline: Instant::now() + Duration::from_secs(2),
+            // 本例验证执行后的身份变更，沿用普通探针夹具的调度预算；超时由独立 100ms 用例覆盖。
+            deadline: Instant::now() + Duration::from_secs(20),
         },
     )
     .expect("matching artifacts before execution");
@@ -225,7 +226,8 @@ fn delegated_bundle_mutation_during_validate_invalidates_local_evidence() {
             environment,
             evidence_dir: fixture.0.join("evidence"),
             run_id: "mutating-bundle".into(),
-            deadline: Instant::now() + Duration::from_secs(2),
+            // 保留原生成功及 bundle 变更断言，不让调度延迟先于目标变更使测试失去意义。
+            deadline: Instant::now() + Duration::from_secs(20),
         },
     )
     .expect("matching artifacts before execution");

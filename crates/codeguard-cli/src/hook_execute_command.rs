@@ -9,6 +9,7 @@ use codeguard_adapters::legacy_registry;
 use codeguard_core::{HookTriggerAction, HookTriggerInput, plan_hook_trigger};
 use codeguard_runtime::{NativeObservation, ProcessSpec, Termination, run_process};
 use serde_json::{Value, json};
+use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use std::env;
 use std::ffi::OsString;
@@ -218,7 +219,7 @@ fn execute_parsed(
     };
     Ok((
         json!({
-            "schema_version":"0.7.0", "report_type":"hook_execution_feedback",
+            "schema_version":if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.2.0" {"0.8.0"} else {"0.7.0"}, "report_type":"hook_execution_feedback",
             "plan":plan, "execution":execution, "reason":reason,
             "local_feedback":feedback, "delivery_decision":"not_evaluated",
             "host_blocking_verified":false, "soft_result_reused":false
@@ -309,8 +310,8 @@ fn task_verification_summary(
         Termination::OutputLimit => return Err(("verification_output_exceeded", 3)),
         _ => return Err(("verification_process_failed", 4)),
     }
-    let report: Value =
-        serde_json::from_slice(&outcome.stdout).map_err(|_| ("verification_report_invalid", 4))?;
+    let report = codeguard_adapters::parse_unique_json(&outcome.stdout)
+        .map_err(|_| ("verification_report_invalid", 4))?;
     if report["report_type"] != "task_verification_preview"
         || report["operation"] != "task_verify"
         || report["task_id"] != task_id
@@ -329,13 +330,81 @@ fn task_verification_summary(
     if !report["reason"].is_null() && reason.is_none() {
         return Err(("verification_report_invalid", 4));
     }
-    Ok(json!({
+    let mut summary = json!({
         "schema_version":"0.1.0", "report_type":"hook_task_verification_summary",
         "task_id":task_id, "checker_id":checker_id,
         "observation":observation, "event_persisted":report["event_persisted"],
         "reason":reason, "scan_report_available":report["native_scan"].is_object(),
         "authority":"local_unverified", "delivery_decision":"not_evaluated"
-    }))
+    });
+    let scan = &report["native_scan"];
+    if checker_id == "syntax.native_confirmation" && scan["target"]["language"] == "erlang" {
+        if report["schema_version"] != "0.13.0" || scan["schema_version"] != "0.2.0" {
+            return Err(("verification_report_invalid", 4));
+        }
+        let current =
+            scan["input_stable"] == true && crate::syntax_task_recheck::inputs_current(root, scan);
+        let mut history = scan.clone();
+        if !current {
+            history["input_stable"] = json!(false);
+        }
+        if !crate::syntax_task_recheck::valid_shape(root, &history) {
+            return Err(("verification_report_invalid", 4));
+        }
+        summary["schema_version"] = json!("0.2.0");
+        summary["native_confirmation_status"] = if current {
+            scan["native"]["status"].clone()
+        } else {
+            json!("stale")
+        };
+        summary["native_confirmation_reason"] = if current {
+            scan["native"]["reason"].clone()
+        } else {
+            json!("syntax_confirmation_inputs_changed")
+        };
+        summary["native_column_unit"] = json!("unicode_scalar");
+        summary["native_diagnostic_positions"] =
+            if current && scan["native"]["status"] == "diagnostics_observed" {
+                scan["native"]["diagnostics"].clone()
+            } else {
+                json!([])
+            };
+        summary["native_confirmation_ref"] = if report["event_persisted"] == true {
+            persisted_syntax_ref(root, scan).unwrap_or(Value::Null)
+        } else {
+            Value::Null
+        };
+        if !current {
+            summary["observation"] = json!("incomplete");
+        }
+    }
+    Ok(summary)
+}
+
+/// 仅给出已写入且已消费的原生报告引用；持久化失败或字节变化时不构造虚拟证据。
+fn persisted_syntax_ref(root: &Path, scan: &Value) -> Option<Value> {
+    let run = scan["run_id"].as_str()?;
+    let reference = format!(".codeguard/reports/{run}.json");
+    let bytes =
+        codeguard_runtime::read_bounded_regular_file(&root.join(&reference), 1024 * 1024).ok()?;
+    if codeguard_adapters::parse_unique_json(&bytes).ok().as_ref() != Some(scan) {
+        return None;
+    }
+    let sha = format!("{:x}", Sha256::digest(&bytes));
+    let marker = codeguard_runtime::read_bounded_regular_file(
+        &root.join(format!(".codeguard/state/consumed/{run}.json")),
+        4096,
+    )
+    .ok()
+    .and_then(|b| codeguard_adapters::parse_unique_json(&b).ok())?;
+    if marker["schema_version"] != "0.1.0"
+        || marker["run_id"] != run
+        || marker["workspace_id"] != scan["workspace_id"]
+        || marker["report_sha256"] != sha
+    {
+        return None;
+    }
+    Some(json!({"run_id":run,"report_ref":reference,"report_sha256":sha}))
 }
 
 fn check_verification_history_budget(root: &Path, task_id: &str) -> Result<(), (&'static str, u8)> {
@@ -390,7 +459,7 @@ fn verify_option_matches_checker(key: &str, checker_id: &str) -> bool {
         ),
         "python.pip_audit" => matches!(key, "--pip-audit-tool" | "--pip-audit-version"),
         "go.vet" => key == "--go-tool",
-        "syntax.native_confirmation" => key == "--zig-tool",
+        "syntax.native_confirmation" => matches!(key, "--zig-tool" | "--erl-tool"),
         "rust.cargo_clippy" | "rust.cargo_check" | "rust.cargo_rustdoc" => key == "--cargo-tool",
         "rust.cargo_audit" => matches!(key, "--cargo-audit-tool" | "--rustsec-db"),
         "java.checkstyle" | "java.checkstyle.preparation" => {
@@ -547,6 +616,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
             | "--pip-audit-version"
             | "--go-tool"
             | "--zig-tool"
+            | "--erl-tool"
             | "--maven-tool"
             | "--java-home"
             | "--java-tool"
@@ -577,6 +647,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                         | "--pip-audit-tool"
                         | "--go-tool"
                         | "--zig-tool"
+                        | "--erl-tool"
                         | "--maven-tool"
                         | "--java-home"
                         | "--java-tool"

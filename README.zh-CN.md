@@ -28,6 +28,8 @@ Codeguard：发现 -> 选择 -> 原生工具 -> 解释结果
 
 源码构建现支持 `codeguard lint erlang FILE --erl-tool /absolute/path/to/erl --timeout 10s --format=json`。OTP 28 原生扫描/解析优先，能检出固定 WASM 的缺句点反例；宏与预处理保持未知。未提供显式工具时仍可作可选 WASM 初检并保留已知限制。这只是单文件 forms 观察，不能批准项目交付；已发布 npm 0.1.4 尚不含新命令。见[原生优先证据](tests/acceptance/erlang-native-first.md)。
 
+源码构建现支持 `codeguard task verify TASK_ID . --erl-tool /absolute/path/to/erl --format=json`，复检已有 Erlang WASM 确认任务。`next` 保留当前原生位置、具体未完成原因和可复用工具命令；`repair_ready` 复用原租约和尝试历史。OTP 28 宏/预处理覆盖仍未完成，零诊断不自动关闭任务。公开 npm 0.1.4 尚不包含本轮扩展，见 [Erlang 修复闭环验收](tests/acceptance/erlang-native-task-verification.md)。
+
 ## 1. 用途与边界
 
 - 识别语言、构建根、声明版本、检查配置和可静态观察的模块关系。

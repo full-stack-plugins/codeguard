@@ -25,6 +25,8 @@ Codeguard: discover -> select -> native tools -> interpret
 * SARIF is supported by selected check output paths.
 ```
 
+Source builds also support `codeguard task verify TASK_ID . --erl-tool /absolute/path/to/erl --format=json` for existing Erlang WASM confirmation tasks. `next` retains current native positions, concrete unresolved reasons and reusable tool argv; `repair_ready` shares the existing lease and attempt history. OTP 28 macro/preprocessor coverage remains unresolved, and zero diagnostics cannot close the task. These changes are absent from public npm 0.1.4. See [Erlang repair-loop acceptance](tests/acceptance/erlang-native-task-verification.md).
+
 ## 1. Purpose and boundaries
 
 - Discover languages, build roots, declared versions, checker configuration, and statically observable module relationships.

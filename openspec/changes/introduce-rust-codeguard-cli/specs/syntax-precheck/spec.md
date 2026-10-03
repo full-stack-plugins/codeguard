@@ -259,6 +259,12 @@ human/结构化报告及宿主渲染 MUST 按结论、方式/范围、原生状�
 - **WHEN** the source or tool changes after a recorded native syntax observation
 - **THEN** next and task show require a fresh native confirmation and preserve historical evidence; they cannot recommend a stale source repair or pretend the old zero-diagnostic observation still applies
 
+#### Scenario: An Erlang confirmation task uses its native forms parser
+- **WHEN** task verify or repair_ready receives an explicit OTP 28 erl tool for an existing Erlang candidate task
+- **THEN** run the same controlled native scanner/parser as lint erlang on the current task scope, under the existing lease, attempt association and shared deadline
+- **AND** retain versioned source/tool-bound observations and native positions; next provides reusable --erl-tool argv only while the tool identity is current
+- **AND** preprocessing, unknown output, tool failure and input changes remain incomplete with concrete reasons; native zero diagnostics alone cannot close the task, and Erlang options on another language are rejected before acquiring a lease or starting a tool
+
 #### Scenario: Native syntax confirmation contradicts the parser
 - **WHEN** 当前同输入、范围和方言的适用原生检查完整正常
 - **THEN** 记录限定范围反证和解析器误报调查；不自动扩大白名单

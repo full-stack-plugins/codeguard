@@ -754,7 +754,7 @@ Source builds can now verify a persisted Zig WASM confirmation task with `codegu
 
 The pinned Zig 0.16.0 probe runs `version` and `ast-check --color off` against the exact source bytes under one deadline. A current native diagnostic changes the brief to source repair; missing tools, unsupported versions and execution failures retain environment/decision guidance. Fresh `next` briefs carry the unchanged tool path in their recheck argv. Changes to source or tool bytes invalidate old diagnostic guidance. Reports and attempts are retained under the existing workbench instead of a second task store.
 
-The native observation is `syntax_task_recheck` 0.1.0, wrapped by `task_verification_preview` 0.12.0. Generic repair briefs are 0.3.0; old 0.2.0 briefs and 0.11.0 verification schemas remain available unchanged. Zero native AST diagnostics are `candidate_absent_unverified_policy`: they end the pending local verification step, but do not close the task or certify project lint, build or delivery. Other generic languages still lack native confirmation adapters. See [the acceptance record](../tests/acceptance/syntax-native-task-verification.md).
+The native observation is `syntax_task_recheck` 0.1.0, wrapped by `task_verification_preview` 0.12.0. Generic repair briefs are 0.3.0; old 0.2.0 briefs and 0.11.0 verification schemas remain available unchanged. Zero native AST diagnostics are `candidate_absent_unverified_policy`: they end the pending local verification step, but do not close the task or certify project lint, build or delivery. Erlang now has the same workbench integration through explicit OTP 28; [Erlang task acceptance](../tests/acceptance/erlang-native-task-verification.md) records its separate protocol versions. Remaining generic languages still lack native confirmation adapters. See [the acceptance record](../tests/acceptance/syntax-native-task-verification.md).
 
 The following fields come from an actual Zig recheck, not a complete report; the task ID belongs to a temporary acceptance workspace.
 
@@ -919,3 +919,80 @@ This complete structural example comes from an actual missing-period report, wit
 ```
 
 The tool hash binds the explicit launcher, not the whole OTP runtime/standard-library supply chain; this result cannot grant trusted task closure. Thirteen native classifications agree with independent erlc labels, and the additional macro/startup cases pass. Version-wide precision, modules, tasks and actual hosts remain open; see [acceptance](../tests/acceptance/erlang-native-first.md).
+
+
+### Erlang confirmation tasks and native repair guidance (current source)
+
+`codeguard task verify TASK_ID . --erl-tool /absolute/path/to/erl --format=json` and the `repair_ready` event of `hook execute . --erl-tool /absolute/path/to/erl` now reuse the existing `.codeguard/` task, lease, finished attempt and shared deadline. They call the same OTP 28 forms parser as `lint erlang`. Task language and tool options are checked before acquiring a lease or launching a tool; project source, macro expansion and parse transforms are not executed.
+
+```mermaid
+flowchart LR
+    A[Suspected edited syntax] --> B[Stable workspace/file/language task]
+    B --> C[task verify / repair_ready]
+    C --> D[Explicit native OTP 28 parser]
+    D -->|Current diagnostics| E[next positions and repair argv]
+    E --> F[Repair and record attempt]
+    F --> C
+    D -->|Preprocessing or tool fault| G[next concrete blocking reason]
+    G --> H[Restore project context or matched tool]
+    H --> C
+    D -->|Zero diagnostics| I[Retain evidence pending closure verification]
+```
+
+Erlang observations use `syntax_task_recheck` 0.2.0, verification feedback 0.13.0 and post-verification `next` briefs 0.4.0. Zig and historical schemas remain unchanged. `native_confirmation_reason` identifies missing tools or preprocessing gaps; guidance names OTP 28 preparation or project-native preprocessing/compilation. Source changes invalidate diagnostic guidance; changed tools lose their stored argv. Only a byte-current tool already observed as OTP 28 can be reused as ready.
+
+Zero diagnostics remain `candidate_absent_unverified_policy`: they consume the linked pending verification, but cannot close the task or approve delivery. Two no-progress attempts use the existing decision budget. The protected closure API still supports only Zig; full Erlang project lint/preprocessing, native-finding lifecycle, automatic tool discovery and installed-host releases remain open. Public npm 0.1.4 does not include this extension. [Acceptance and protocols](../tests/acceptance/erlang-native-task-verification.md).
+
+
+### Actual complete Erlang repair_ready feedback
+
+This JSON was captured from an OTP 28 native recheck. Task/run IDs and report references belong to a temporary acceptance workspace, not the reader’s project. It exposes native positions, Unicode column units and a persisted report reference instead of only reporting “still blocked”. The Hook is 0.8.0 with a 0.2.0 local summary; installed-host conversation acceptance remains open.
+
+```json
+{
+  "delivery_decision": "not_evaluated",
+  "execution": "task_verification",
+  "host_blocking_verified": false,
+  "local_feedback": {
+    "authority": "local_unverified",
+    "checker_id": "syntax.native_confirmation",
+    "delivery_decision": "not_evaluated",
+    "event_persisted": true,
+    "native_column_unit": "unicode_scalar",
+    "native_confirmation_reason": "erlang_native_syntax_diagnostics",
+    "native_confirmation_ref": {
+      "report_ref": ".codeguard/reports/syntax-native-88734-1791066158885814000.json",
+      "report_sha256": "f529b3d472381a5d7cdf2d655d1d18a0000264d1e71ecb45856c17a01fd9ec45",
+      "run_id": "syntax-native-88734-1791066158885814000"
+    },
+    "native_confirmation_status": "diagnostics_observed",
+    "native_diagnostic_positions": [
+      {
+        "column": 4,
+        "line": 2,
+        "rule_id": "erlang.syntax.error"
+      }
+    ],
+    "observation": "still_blocked",
+    "reason": null,
+    "report_type": "hook_task_verification_summary",
+    "scan_report_available": true,
+    "schema_version": "0.2.0",
+    "task_id": "CG-B-b2b940bb04fde9437c1c303ca785c1ca"
+  },
+  "plan": {
+    "action": "verify_task",
+    "host_blocking_claimed": false,
+    "may_claim_delivery": false,
+    "requires_git_snapshot": false,
+    "scope_resolution_reason": null,
+    "soft_result_reuse_candidate": false,
+    "target_paths": [],
+    "task_id": "CG-B-b2b940bb04fde9437c1c303ca785c1ca"
+  },
+  "reason": null,
+  "report_type": "hook_execution_feedback",
+  "schema_version": "0.8.0",
+  "soft_result_reused": false
+}
+```

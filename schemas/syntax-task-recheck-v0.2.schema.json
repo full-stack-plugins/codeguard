@@ -1,0 +1,409 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:syntax-task-recheck:0.2.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "workspace_binding",
+    "checker_id",
+    "authority",
+    "coverage_proven",
+    "delivery_decision",
+    "workspace_id",
+    "run_id",
+    "task_id",
+    "input_stable",
+    "tool_path",
+    "native",
+    "target",
+    "original_report"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.2.0"
+    },
+    "report_type": {
+      "const": "syntax_task_recheck"
+    },
+    "operation": {
+      "const": "task_verify"
+    },
+    "workspace_binding": {
+      "const": "bound"
+    },
+    "checker_id": {
+      "const": "syntax.native_confirmation"
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "workspace_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^syntax-native-[0-9]+-[0-9]+$"
+    },
+    "task_id": {
+      "type": "string",
+      "pattern": "^CG-B-[0-9a-f]{32}$"
+    },
+    "input_stable": {
+      "type": "boolean"
+    },
+    "tool_path": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^/"
+    },
+    "native": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason",
+        "version",
+        "tool_sha256",
+        "diagnostics",
+        "diagnostics_truncated",
+        "preprocessing_unresolved"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "not_run",
+            "incomplete",
+            "completed",
+            "diagnostics_observed"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "pattern": "^[a-z_]{1,128}$"
+        },
+        "version": {
+          "enum": [
+            null,
+            "OTP 28"
+          ]
+        },
+        "tool_sha256": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/digest"
+            }
+          ]
+        },
+        "diagnostics": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/diagnostic"
+          }
+        },
+        "diagnostics_truncated": {
+          "type": "boolean"
+        },
+        "preprocessing_unresolved": {
+          "type": "boolean"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "completed",
+                  "diagnostics_observed"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "version": {
+                "const": "OTP 28"
+              },
+              "tool_sha256": {
+                "$ref": "#/$defs/digest"
+              },
+              "diagnostics_truncated": {
+                "const": false
+              },
+              "preprocessing_unresolved": {
+                "const": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "diagnostics": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "diagnostics_observed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "diagnostics": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "not_run"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "version": {
+                "type": "null"
+              },
+              "tool_sha256": {
+                "type": "null"
+              },
+              "diagnostics": {
+                "maxItems": 0
+              },
+              "diagnostics_truncated": {
+                "const": false
+              },
+              "preprocessing_unresolved": {
+                "const": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "const": "erlang_native_forms_no_diagnostics"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "diagnostics_observed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "const": "erlang_native_syntax_diagnostics"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "preprocessing_unresolved": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "const": "incomplete"
+              },
+              "reason": {
+                "const": "erlang_preprocessing_unresolved"
+              },
+              "diagnostics": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "diagnostics_truncated": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "const": "incomplete"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "language",
+        "source_sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "language": {
+          "const": "erlang"
+        },
+        "source_sha256": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          ]
+        }
+      }
+    },
+    "original_report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_id",
+        "sha256",
+        "source_sha256",
+        "grammar_sha256"
+      ],
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "pattern": "^syntax-confirm-[0-9]+-[0-9]+$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "grammar_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "diagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "line",
+        "column",
+        "rule_id"
+      ],
+      "properties": {
+        "line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "column": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "rule_id": {
+          "const": "erlang.syntax.error"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "native": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "completed",
+                  "diagnostics_observed"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "tool_path": {
+            "type": "string",
+            "pattern": "^/"
+          },
+          "target": {
+            "properties": {
+              "language": {
+                "const": "erlang"
+              },
+              "source_sha256": {
+                "$ref": "#/$defs/digest"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

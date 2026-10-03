@@ -7,12 +7,13 @@ use std::{
     time::{Instant, SystemTime, UNIX_EPOCH},
 };
 
-/// 在原工作区和已有任务范围内运行适用语法工具；参数含显式 Zig 和共同截止时间。
+/// 在原工作区和已有任务范围内运行适用语法工具；参数含显式 Zig/OTP 和共同截止时间。
 /// 返回绑定当前字节的观察，缺工具/adapter 同样保留报告，便于记录失败尝试。
 pub(crate) fn run(
     root: &Path,
     brief: &Value,
     zig: Option<&Path>,
+    erl: Option<&Path>,
     deadline: Instant,
 ) -> Result<Value, &'static str> {
     let original = original(root, brief)?;
@@ -22,6 +23,9 @@ pub(crate) fn run(
         .ok_or("syntax_language_invalid")?;
     if zig.is_some() && language != "zig" {
         return Err("zig_tool_does_not_match_confirmation_language");
+    }
+    if erl.is_some() && language != "erlang" {
+        return Err("erl_tool_does_not_match_confirmation_language");
     }
     let source = source_bytes(root, path);
     let native = if let Some(bytes) = source.as_ref() {
@@ -34,19 +38,27 @@ pub(crate) fn run(
                         "explicit_zig_tool_not_provided"
                     })
                 })
+        } else if language == "erlang" {
+            erl.map(|tool| crate::erlang_syntax_probe::observe(tool, bytes, deadline))
+                .unwrap_or_else(|| unavailable("explicit_erl_tool_not_provided"))
         } else {
             unavailable("native_syntax_confirmation_adapter_unavailable")
         }
     } else {
         unavailable("native_syntax_source_unavailable")
     };
-    let tool_path = zig.and_then(|p| p.canonicalize().ok());
+    let mut native = native;
+    if language == "erlang" && native["status"] == "not_run" {
+        native["diagnostics_truncated"] = json!(false);
+        native["preprocessing_unresolved"] = json!(false);
+    }
+    let tool_path = zig.or(erl).and_then(|p| p.canonicalize().ok());
     let target_sha = source.as_ref().map(|b| digest(b));
     let nanos = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map_err(|_| "clock_unavailable")?
         .as_nanos();
-    let mut report = json!({"schema_version":"0.1.0","report_type":"syntax_task_recheck","operation":"task_verify",
+    let mut report = json!({"schema_version":if language == "erlang" {"0.2.0"} else {"0.1.0"},"report_type":"syntax_task_recheck","operation":"task_verify",
         "workspace_binding":"bound","workspace_id":original["workspace_id"],"run_id":format!("syntax-native-{}-{nanos}",std::process::id()),
         "checker_id":"syntax.native_confirmation","task_id":brief["task_id"],"authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated",
         "target":{"path":path,"language":language,"source_sha256":target_sha},"original_report":{"run_id":original["run_id"],"sha256":brief["evidence_ref"]["first_report_sha256"],"source_sha256":original["observations"][0]["source_sha256"],"grammar_sha256":original["observations"][0]["grammar_sha256"]},
@@ -203,7 +215,7 @@ fn valid_history_shape(root: &Path, report: &Value) -> bool {
     if !report
         .as_object()
         .is_some_and(|o| o.len() == keys.len() && keys.iter().all(|k| o.contains_key(*k)))
-        || report["schema_version"] != "0.1.0"
+        || !matches!(report["schema_version"].as_str(), Some("0.1.0" | "0.2.0"))
         || report["report_type"] != "syntax_task_recheck"
         || report["operation"] != "task_verify"
         || report["workspace_binding"] != "bound"
@@ -267,6 +279,38 @@ fn valid_history_shape(root: &Path, report: &Value) -> bool {
 }
 
 fn native_shape(root: &Path, report: &Value) -> bool {
+    if report["schema_version"] == "0.2.0" {
+        let current = report["target"]["path"]
+            .as_str()
+            .and_then(|p| source_bytes(root, p))
+            .filter(|b| report["target"]["source_sha256"] == digest(b));
+        return report["target"]["language"] == "erlang"
+            && report["target"].as_object().is_some_and(|o| {
+                o.len() == 3
+                    && ["path", "language", "source_sha256"]
+                        .iter()
+                        .all(|k| o.contains_key(*k))
+            })
+            && (report["target"]["source_sha256"].is_null()
+                || report["target"]["source_sha256"]
+                    .as_str()
+                    .is_some_and(valid_sha))
+            && (report["tool_path"].is_null()
+                || report["tool_path"]
+                    .as_str()
+                    .is_some_and(|s| Path::new(s).is_absolute()))
+            && (!matches!(
+                report["native"]["status"].as_str(),
+                Some("completed" | "diagnostics_observed")
+            ) || (report["target"]["source_sha256"]
+                .as_str()
+                .is_some_and(valid_sha)
+                && !report["tool_path"].is_null()))
+            && crate::erlang_syntax_probe::valid_native_observation(
+                &report["native"],
+                current.as_deref(),
+            );
+    }
     let native = &report["native"];
     let Some(status) = native["status"].as_str() else {
         return false;
@@ -437,7 +481,11 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
     } else if classify(&report) == "still_blocked" {
         (
             "actionable",
-            "当前源码已有原生 Zig AST 诊断；核对报告中有界原生位置并修复，然后使用同一工具复检；不要反复安装工具或关闭检查",
+            if report["target"]["language"] == "erlang" {
+                "当前源码已有原生 Erlang 语法诊断；核对报告中有界原生位置并修复，然后使用同一工具复检；不要反复安装工具或关闭检查"
+            } else {
+                "当前源码已有原生 Zig AST 诊断；核对报告中有界原生位置并修复，然后使用同一工具复检；不要反复安装工具或关闭检查"
+            },
         )
     } else if classify(&report) == "candidate_absent_unverified_policy" {
         (
@@ -447,10 +495,29 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
     } else {
         (
             "needs_decision",
-            "原生语法确认仍未完成；查看原工具诊断、语言能力或版本缺口，恢复对应前置，不修改无关源码",
+            if report["target"]["language"] == "erlang"
+                && report["native"]["reason"] == "erlang_preprocessing_unresolved"
+            {
+                "Erlang 文件需要宏、条件编译或 include 上下文；当前 forms 解析不能完成确认，先恢复项目原生编译或预处理，不据此修改无关源码"
+            } else if report["target"]["language"] == "erlang"
+                && report["native"]["reason"] == "explicit_erl_tool_not_provided"
+            {
+                "未提供 Erlang 原生工具；先定位已安装的 OTP 28 erl，或按项目要求安装匹配工具，再用 --erl-tool 绝对路径复检，不修改无关源码"
+            } else {
+                "原生语法确认仍未完成；查看原工具诊断、语言能力或版本缺口，恢复对应前置，不修改无关源码"
+            },
         )
     };
     let mut guidance = json!({"disposition":disposition,"step":step,"native_confirmation_status":if inputs_current(root,&report) {report["native"]["status"].clone()} else {json!("stale")}});
+    if report["target"]["language"] == "erlang" {
+        guidance["schema_version"] = json!("0.4.0");
+        guidance["native_column_unit"] = json!("unicode_scalar");
+        guidance["native_confirmation_reason"] = if inputs_current(root, &report) {
+            report["native"]["reason"].clone()
+        } else {
+            json!("syntax_confirmation_inputs_changed")
+        };
+    }
     guidance["native_confirmation_ref"] = json!({"run_id":report["run_id"],"report_ref":format!(".codeguard/reports/{}.json", report["run_id"].as_str()?),"report_sha256":report_sha256});
     guidance["native_diagnostic_positions"] =
         if inputs_current(root, &report) && classify(&report) == "still_blocked" {
@@ -459,7 +526,12 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
             json!([])
         };
     // 源码修复后仍可复用未改变的工具；工具字节变化则不得携带旧工具身份。
-    if report["target"]["language"] == "zig" && tool_current(&report) {
+    if matches!(
+        report["target"]["language"].as_str(),
+        Some("zig" | "erlang")
+    ) && tool_current(&report)
+        && (report["target"]["language"] != "erlang" || report["native"]["version"] == "OTP 28")
+    {
         guidance["recheck_argv"] = json!([
             "codeguard",
             "task",
@@ -468,7 +540,11 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
             ".",
             "--format",
             "json",
-            "--zig-tool",
+            if report["target"]["language"] == "erlang" {
+                "--erl-tool"
+            } else {
+                "--zig-tool"
+            },
             report["tool_path"]
         ]);
     }

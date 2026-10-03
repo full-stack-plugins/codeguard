@@ -2174,3 +2174,17 @@ Swift 差分纠正先以状态断言暴露旧清单文案的红测，再按真�
 
 
 本轮最终验证（2026-10-04）：默认全工作区全目标 1132 passed、0 failed、106 ignored，204 个结果组，退出 0；最终 Erlang/库存特性目标 13 passed、0 failed、1 ignored；显式 OTP 28 的 13 例编译器对照与 7 例预处理/启动边界分别各 1 passed，显式 Swift 6.4 对照 1 passed（12 可判定一致、1 未解析）。CLI 全目标 WASM Clippy -D warnings、fmt、分层、OpenSpec strict、全部 schema 元定义、4 份真实 Erlang 报告/12 个伪造通过反例、2 份中英文完整示例及文档链接校验通过。工具依赖的忽略项没有当作通过，父任务未勾选。最终日志：`/tmp/codeguard-erlang-swift-workspace-final.log` SHA-256 `9d2d0b3a4291478b2acdd6fc31410c643081e545b46ef0f5cda349491ad35ad3`；`/tmp/codeguard-erlang-final-guard-suite-corrected.log` SHA-256 `750a219d900646abaa713ceb9c2de4f80378909205a8c85877b9b372af2fdd44`。远端 CI 须按本轮新提交独立核验；公开 npm/插件版本未改变。
+
+
+## 2026-10-04 Erlang 任务原生复检与对话证据
+
+Erlang 显式 OTP 28 复用原任务/租约/尝试/deadline，next 提供原生位置、具体未完成原因和当前可复用工具；repair_ready 0.8 的有界内层摘要直接回传原生证据。前置错语言在租约前拒绝，源码/工具变化不继续给出旧诊断，预处理不当违规，零诊断不自动关闭。新协议 0.2 / 0.13 / 0.4 / Hook 0.8 独立保存，历史四份 schema 字节不变。[验收记录](../../../tests/acceptance/erlang-native-task-verification.md)包含初始 6 项 RED、Hook 证据与字符列标签的 RED、严格导入 10 个反例、尝试/租约和无进展预算。
+
+八组相关特性 84 passed、0 failed、17 ignored；显式真实 OTP 目标 1 passed。不带 WASM 的默认构建复检实际既有任务，completed/event_persisted=true，仍为 candidate_absent_unverified_policy/open。182 个 schema 元定义、20 份实际报告/双语完整示例及 15 个伪造变体通过验证；CLI 特性全目标 Clippy -D warnings、fmt、分层、严格规格及文档链接通过。
+
+首次全工作区失败保留：两项既有 Maven 身份变更夹具的 2 秒预算先耗尽，得到版本超时而不是目标身份变更。原目标独立 9/9 通过；仅对齐两项非超时夹具的 20 秒预算、保留精确变更/原生成功断言和独立 100ms 超时测试，修正目标 9/9 与目标 Clippy 通过。最终全量/新提交 CI 尚需独立终态，不凭目标通过替代。原提交 4e6e763 的 CI 37156807034 已成功，新变更需新 SHA 结果。
+
+完整 Erlang 项目 lint/预处理/注释、原生发现生命周期和可信关闭、自动工具发现、默认插件/实际宿主、发行平台/精度及完整交付门禁仍缺，8.134/S09/11.17/14.10–14.11 与总体目标保持开放。公开 npm 制品与插件锁未改变。
+
+
+最终全工作区终态：2026-10-04，`cargo test --workspace --all-targets --locked --offline` 205 组、1132 passed、0 failed、106 ignored，退出 0；日志 `/tmp/codeguard-erlang-task-workspace-corrected.log` 的 SHA-256 为 `d81ec1374f9c3de8c521b57d4cb7e200d945abffeca28b26b699c17450238e52`。首次失败日志保留，不改写为通过。已完成代码审阅、Clippy、fmt、分层、严格规格和文档链接/示例校验；源码新提交的远端 CI 与公开发行仍需分别核验。

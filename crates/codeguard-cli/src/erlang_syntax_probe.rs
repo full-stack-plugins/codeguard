@@ -193,6 +193,105 @@ fn validate(parsed: &Value, source: &[u8]) -> bool {
     })
 }
 
+/// 校验已保存原生观察的严格身份与可用范围；当前字节存在时核对 Unicode 列坐标。
+/// 历史源码已变化时只保留有界记录，不能把它当作当前修复或关闭依据。
+pub(crate) fn valid_native_observation(native: &Value, current: Option<&[u8]>) -> bool {
+    let keys = [
+        "status",
+        "reason",
+        "version",
+        "tool_sha256",
+        "diagnostics",
+        "diagnostics_truncated",
+        "preprocessing_unresolved",
+    ];
+    if !native
+        .as_object()
+        .is_some_and(|o| o.len() == keys.len() && keys.iter().all(|k| o.contains_key(*k)))
+        || !matches!(
+            native["status"].as_str(),
+            Some("not_run" | "incomplete" | "completed" | "diagnostics_observed")
+        )
+        || !native["reason"].as_str().is_some_and(|s| {
+            !s.is_empty()
+                && s.len() <= 128
+                && s.bytes().all(|b| b.is_ascii_lowercase() || b == b'_')
+        })
+        || !(native["version"].is_null() || native["version"] == "OTP 28")
+        || !(native["tool_sha256"].is_null()
+            || native["tool_sha256"].as_str().is_some_and(|s| {
+                s.len() == 64
+                    && s.bytes()
+                        .all(|b| b.is_ascii_hexdigit() && !b.is_ascii_uppercase())
+            }))
+        || !native["diagnostics_truncated"].is_boolean()
+        || !native["preprocessing_unresolved"].is_boolean()
+    {
+        return false;
+    }
+    let Some(rows) = native["diagnostics"].as_array().filter(|r| r.len() <= 32) else {
+        return false;
+    };
+    match native["status"].as_str() {
+        Some("completed" | "diagnostics_observed") => {
+            if native["version"] != "OTP 28"
+                || native["tool_sha256"].is_null()
+                || native["diagnostics_truncated"] != false
+                || native["preprocessing_unresolved"] != false
+                || (native["status"] == "completed"
+                    && (!rows.is_empty()
+                        || native["reason"] != "erlang_native_forms_no_diagnostics"))
+                || (native["status"] == "diagnostics_observed"
+                    && (rows.is_empty() || native["reason"] != "erlang_native_syntax_diagnostics"))
+            {
+                return false;
+            }
+        }
+        Some("not_run")
+            if !rows.is_empty()
+                || !native["tool_sha256"].is_null()
+                || !native["version"].is_null()
+                || native["diagnostics_truncated"] != false
+                || native["preprocessing_unresolved"] != false =>
+        {
+            return false;
+        }
+        _ => {}
+    }
+    if native["preprocessing_unresolved"] == true
+        && (!rows.is_empty()
+            || native["status"] != "incomplete"
+            || native["reason"] != "erlang_preprocessing_unresolved")
+    {
+        return false;
+    }
+    if native["diagnostics_truncated"] == true && native["status"] != "incomplete" {
+        return false;
+    }
+    rows.iter().all(|r| {
+        r.as_object().is_some_and(|o| {
+            o.len() == 3
+                && ["line", "column", "rule_id"]
+                    .iter()
+                    .all(|k| o.contains_key(*k))
+        }) && r["rule_id"] == "erlang.syntax.error"
+            && r["line"]
+                .as_u64()
+                .is_some_and(|n| n > 0 && n <= u32::MAX as u64)
+            && r["column"]
+                .as_u64()
+                .is_some_and(|n| n > 0 && n <= 1024 * 1024 + 1)
+            && current.is_none_or(|bytes| {
+                std::str::from_utf8(bytes)
+                    .ok()
+                    .and_then(|s| s.split('\n').nth(r["line"].as_u64().unwrap() as usize - 1))
+                    .is_some_and(|line| {
+                        r["column"].as_u64().unwrap() <= line.chars().count() as u64 + 1
+                    })
+            })
+    })
+}
+
 fn execution_reason(termination: Termination) -> &'static str {
     match termination {
         Termination::TimedOut | Termination::DeadlineBeforeStart => "request_deadline_exceeded",

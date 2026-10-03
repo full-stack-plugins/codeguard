@@ -1170,3 +1170,8 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 当前源码新增 `lint erlang FILE --erl-tool ABS_PATH [--timeout DURATION] --format=json`，由 Rust 受控进程调用 OTP 28 原生 scanner/parser，固定 cwd、禁用项目 `.erlang`、stdin 原字节、版本及工具/源码前后摘要。原生 13 例与独立 erlc 标签一致，缺句点给出原生诊断；宏/条件编译保持具体未完成，不执行源码、预处理或 parse_transform。原生显式故障不转到 PATH 或 WASM，未提供工具时仍有固定候选初检。新版本化报告与实际 JSON/伪造通过变体验证见[局部验收](../../../tests/acceptance/erlang-native-first.md)。8.134、14.5–14.9、14.17、14.19 仍因完整项目工具/注释/任务/宿主与发行缺口保持开放，Erlang grammar 原始漏检没有被删除或声称修好。
 
 Swift 差分纠正先以状态断言暴露旧清单文案的红测，再按真实 `truncated_files` 分类：13 例中 12 例可判定一致，缺类型 1 例未知；真实 Swift 6.4 对照通过，源码字节未变。Kotlin 已有对应运行时防护，其清单也纠正为 11 例可判定一致、2 例未知。未知仍保留在总语料分母，不按空诊断数组算作通过、分类一致、误报或漏报。新增 Swift 运行时回归及 CI 固定语料接线，见[差分记录](../../../tests/acceptance/swift-native-differential.md)。未提升任何 grammar 资格，14.4/14.17/14.19 父任务仍未完成，公开 npm 0.1.4 不含本轮改动。
+
+
+## 2026-10-04 Erlang 原生任务复检与对话证据接线（进行中）
+
+对应 8.134、9.9–9.14、11.17、14.10–14.11：显式 OTP 28 接入已有确认任务、租约、尝试与共享 deadline；next 提供当前原生位置、具体阻塞原因和可复用 --erl-tool argv，repair_ready 直接投影有界原生证据与真实报告引用。错语言参数在租约和执行前拒绝；预处理保留具体前置，原生零诊断仍等待关闭核验，两次无进展沿用已有预算。四份新版本 schema 不改历史协议，Erlang 字符列不误标字节列。见 [Erlang 任务验收](../../../tests/acceptance/erlang-native-task-verification.md)。完整项目适配、可信关闭/复发、默认插件/实际宿主与发行仍缺，父任务不勾选；公开 npm 0.1.4 未改变。

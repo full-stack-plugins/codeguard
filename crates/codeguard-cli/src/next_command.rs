@@ -1104,6 +1104,12 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
     }
     if checker_id == "syntax.native_confirmation" {
         if let Some(guidance) = crate::syntax_task_recheck::guidance(root, &brief) {
+            if guidance["schema_version"] == "0.4.0" {
+                brief["schema_version"] = json!("0.4.0");
+                brief["native_confirmation_reason"] =
+                    guidance["native_confirmation_reason"].clone();
+                brief["native_column_unit"] = guidance["native_column_unit"].clone();
+            }
             brief["disposition"] = guidance["disposition"].clone();
             brief["step"] = guidance["step"].clone();
             for key in [
@@ -1701,7 +1707,7 @@ fn run_sequence(run_id: &str) -> Option<u128> {
 
 fn view(disposition: &str, reason: &str, brief: Value, actions: Value) -> Value {
     json!({
-        "schema_version":if brief["checker_id"] == "syntax.native_confirmation" {"0.3.0"} else {"0.1.0"}, "report_type":"repair_brief_preview",
+        "schema_version":if brief["checker_id"] == "syntax.native_confirmation" {brief["schema_version"].clone()} else {json!("0.1.0")}, "report_type":"repair_brief_preview",
         "operation":"next", "command_status":"complete", "exit_code":0,
         "disposition":disposition, "reason":reason,
         "repair_brief":brief, "next_actions":actions,

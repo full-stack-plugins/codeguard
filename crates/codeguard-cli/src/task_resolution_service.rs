@@ -135,7 +135,7 @@ fn execute(
         .unwrap_or_else(|| json!({"status":"not_run","reason":"zig_tool_unavailable_or_untrusted","version":null,"tool_sha256":null,"diagnostics":[]}));
     before_deadline(request.deadline)?;
     let current_report =
-        crate::syntax_task_recheck::run(root, &brief, Some(tool), request.deadline)?;
+        crate::syntax_task_recheck::run(root, &brief, Some(tool), None, request.deadline)?;
     let current_native = current_report["native"].clone();
     let _guard = crate::task_lease_command::lock_verification(root, request.task_id, lease)?;
     before_deadline(request.deadline)?;

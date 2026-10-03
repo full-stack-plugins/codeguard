@@ -754,7 +754,7 @@ Python 所选文件的配置发现只观察源码路径及祖先配置，不枚�
 
 固定 Zig 0.16.0 探针在共同截止时间内执行 `version` 与 `ast-check --color off`，以 stdin 检查本轮原始源码字节。当前原生诊断使简报指向源码修复；工具缺失、版本不支持和执行失败仍指向环境恢复或具体决策。新鲜的 `next` 简报在复检 argv 中携带未改变的工具路径；源码或工具字节变化使旧诊断指引失效。报告与尝试继续保存在既有工作台，不另建任务系统。
 
-原生观察协议为 `syntax_task_recheck` 0.1.0，外层 `task_verification_preview` 为 0.12.0；通用修复简报为 0.3.0，原 0.2.0 简报与 0.11.0 复检 schema 原件保留。原生 AST 零诊断记录为 `candidate_absent_unverified_policy`：解除本地尝试的待复检状态，但不关闭任务，不认证项目 lint、构建或交付。其它通用语言的原生确认 adapter 仍缺。见[验收记录](../tests/acceptance/syntax-native-task-verification.md)。
+原生观察协议为 `syntax_task_recheck` 0.1.0，外层 `task_verification_preview` 为 0.12.0；通用修复简报为 0.3.0，原 0.2.0 简报与 0.11.0 复检 schema 原件保留。原生 AST 零诊断记录为 `candidate_absent_unverified_policy`：解除本地尝试的待复检状态，但不关闭任务，不认证项目 lint、构建或交付。Erlang 现通过显式 OTP 28 接入同一工作台，独立协议版本见 [Erlang 任务验收](../tests/acceptance/erlang-native-task-verification.md)；其余通用语言的原生确认 adapter 仍缺。见[验收记录](../tests/acceptance/syntax-native-task-verification.md)。
 
 以下为真实 Zig 复检输出的字段摘录，不是完整协议；任务 ID 属于临时验收工作区。
 
@@ -919,3 +919,80 @@ flowchart LR
 ```
 
 工具摘要只绑定显式 launcher，并非整个 OTP runtime/标准库的供应链证明；本轮不授予可信关闭。原生 13 例分类与独立 erlc 标签一致，额外宏与启动文件用例也通过；全版本精度和多模块/任务/宿主仍未验收。见[局部验收](../tests/acceptance/erlang-native-first.md)。
+
+
+### Erlang 确认任务与原生修复指引（当前源码）
+
+`codeguard task verify TASK_ID . --erl-tool /absolute/path/to/erl --format=json` 和 `hook execute . --erl-tool /absolute/path/to/erl` 的 `repair_ready` 事件现复用已有 `.codeguard/` 任务、租约、尝试记录与共享截止时间，执行与 `lint erlang` 相同的 OTP 28 原生 forms 解析。工具和任务语言在租约或启动进程前核对，不启动项目源码、宏展开或 parse_transform。
+
+```mermaid
+flowchart LR
+    A[编辑初检疑似位置] --> B[同工作区/文件/语言稳定任务]
+    B --> C[task verify / repair_ready]
+    C --> D[显式 OTP 28 原生解析]
+    D -->|当前语法诊断| E[next 原生位置与修复命令]
+    E --> F[修复并记录 attempt]
+    F --> C
+    D -->|宏/预处理或工具故障| G[next 具体阻塞原因]
+    G --> H[恢复项目上下文或匹配工具]
+    H --> C
+    D -->|零诊断| I[保留证据，等待关闭条件核验]
+```
+
+Erlang 原生观察使用 `syntax_task_recheck` 0.2.0，复检反馈为 `task_verification_preview` 0.13.0，复检后的 `next` 简报为 0.4.0；Zig 和历史 schema 原件不变。简报新增 `native_confirmation_reason`，缺工具给出明确 OTP 28 准备动作；宏/条件编译给出项目原生预处理/编译需求。源码变化会清空当前诊断并要求复检；工具改变会移除旧工具 argv。只有版本已观察为 OTP 28 且摘要仍一致的工具可复用，过旧工具不能被建议为已就绪工具。
+
+原生零诊断记录为 `candidate_absent_unverified_policy`，解除关联尝试的待复检状态，但不关闭任务或签发交付许可；两次无进展沿用既有预算，转为具体决策而不是重复修复。当前限定可信关闭 API 仍只支持 Zig；Erlang 项目完整 lint/预处理、原生发现的完整生命周期、自动工具发现及实际宿主发行尚未完成。公开 npm 0.1.4 不含此扩展。[验收与协议](../tests/acceptance/erlang-native-task-verification.md)。
+
+
+### Erlang repair_ready 的实际完整反馈
+
+下列 JSON 来自本机 OTP 28 原生复检；任务/运行 ID 与报告引用属于临时验收工作区，不是用户项目现存文件。它直接给出原生位置、字符列单位和报告引用，而非仅返回“仍存在”。协议为 Hook 0.8.0 / 内层摘要 0.2.0；实际安装宿主对话验收仍待完成。
+
+```json
+{
+  "delivery_decision": "not_evaluated",
+  "execution": "task_verification",
+  "host_blocking_verified": false,
+  "local_feedback": {
+    "authority": "local_unverified",
+    "checker_id": "syntax.native_confirmation",
+    "delivery_decision": "not_evaluated",
+    "event_persisted": true,
+    "native_column_unit": "unicode_scalar",
+    "native_confirmation_reason": "erlang_native_syntax_diagnostics",
+    "native_confirmation_ref": {
+      "report_ref": ".codeguard/reports/syntax-native-88734-1791066158885814000.json",
+      "report_sha256": "f529b3d472381a5d7cdf2d655d1d18a0000264d1e71ecb45856c17a01fd9ec45",
+      "run_id": "syntax-native-88734-1791066158885814000"
+    },
+    "native_confirmation_status": "diagnostics_observed",
+    "native_diagnostic_positions": [
+      {
+        "column": 4,
+        "line": 2,
+        "rule_id": "erlang.syntax.error"
+      }
+    ],
+    "observation": "still_blocked",
+    "reason": null,
+    "report_type": "hook_task_verification_summary",
+    "scan_report_available": true,
+    "schema_version": "0.2.0",
+    "task_id": "CG-B-b2b940bb04fde9437c1c303ca785c1ca"
+  },
+  "plan": {
+    "action": "verify_task",
+    "host_blocking_claimed": false,
+    "may_claim_delivery": false,
+    "requires_git_snapshot": false,
+    "scope_resolution_reason": null,
+    "soft_result_reuse_candidate": false,
+    "target_paths": [],
+    "task_id": "CG-B-b2b940bb04fde9437c1c303ca785c1ca"
+  },
+  "reason": null,
+  "report_type": "hook_execution_feedback",
+  "schema_version": "0.8.0",
+  "soft_result_reused": false
+}
+```
