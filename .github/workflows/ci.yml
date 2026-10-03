@@ -12,6 +12,10 @@ jobs:
   gate:
     # ubuntu-latest 预装稳定版 Rust；Cargo.toml 声明 rust-version = 1.85 / edition = 2024。
     runs-on: ubuntu-latest
+    env:
+      # Linux 完整 DWARF 测试制品会超出 SDK 的 256 MiB 宿主制品读取预算。
+      # 仅去掉测试调试符号；保留 debug assertions 和产品读取上限。
+      CARGO_PROFILE_TEST_DEBUG: "0"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -46,6 +50,9 @@ jobs:
           CODEGUARD_NO_WASM_BIN="$RUNNER_TEMP/codeguard-no-wasm" \
           CODEGUARD_WASM_BIN="$PWD/target/debug/codeguard" \
           node --test tests/npm_pack_wasm.test.mjs
+          # 独占打包输出与 npm 缓存，不与上面的全量 grammar 包测试并发。
+          CODEGUARD_WASM_BIN="$PWD/target/debug/codeguard" \
+          node --test tests/npm_pack_repair.test.mjs
 
       - name: Run test suite
         run: cargo test --workspace --all-targets

@@ -395,3 +395,5 @@ Briefs also expose the latest native report reference/digest and current diagnos
 `verify_zig_task_resolution` lets a protected host verify a task-specific signed policy, compare the original counterexample and current bytes with the same Zig 0.16.0, and append resolution, investigation or recurrence events. Ordinary `task verify` can record recurrence with the matching tool and reopen the same task; existing leases and attempt receipts remain in use.
 
 The default plugin and public CLI still lack the trusted policy provider, and npm 0.1.3 does not include this API. Editing task state or reading a local closure file cannot close an issue or approve delivery. See the [technical design](docs/Codeguard-Technical-Design.md) for the API, execution graph and full report, and [lifecycle acceptance](tests/acceptance/task-resolution-lifecycle.md) for its current scope.
+
+The current source also passes an offline npm package edit/task-recheck flow through the installed Node launcher; [acceptance evidence](tests/acceptance/npm-repair-local-package.md) distinguishes this from the published 0.1.3 package and actual host automation.

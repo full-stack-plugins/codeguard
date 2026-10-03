@@ -394,3 +394,5 @@ Cargo 声明 `Apache-2.0`；当前工作树已有仓库级 `LICENSE` 与 `NOTICE
 源码现提供 `verify_zig_task_resolution`：受保护宿主验签限定任务策略，使用同一 Zig 0.16.0 对原始反例与当前源码做原生对照，再追加关闭、调查或复发事件。普通 `task verify` 能记录匹配原工具的复发并重开同一任务；失败尝试沿用现有租约与验证收据。
 
 它尚未接入默认插件或公开 CLI 的可信策略来源，也未发布到 npm 0.1.3。手工修改任务或读取本地关闭文件仍不能关闭问题或放行交付。API、执行图与完整报告示例见[技术方案](docs/Codeguard-Technical-Design.zh_CN.md)，当前验收范围见[任务生命周期记录](tests/acceptance/task-resolution-lifecycle.md)。
+
+当前源码另已通过离线 npm 包的编辑与任务复检链路，实际经安装后的 Node 入口运行；[验收记录](tests/acceptance/npm-repair-local-package.md)区分本地包、公开 0.1.3 和真实宿主自动触发。

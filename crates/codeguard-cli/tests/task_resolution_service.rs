@@ -35,6 +35,13 @@ impl Drop for Project {
 }
 impl Project {
     fn new() -> Self {
+        let host_size = fs::metadata(std::env::current_exe().unwrap())
+            .unwrap()
+            .len();
+        assert!(
+            host_size <= 256 * 1024 * 1024,
+            "SDK test host exceeds the product artifact budget: {host_size} bytes; use CARGO_PROFILE_TEST_DEBUG=0 without widening the product limit"
+        );
         let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
             "cg-resolution-{}-{}",
             std::process::id(),

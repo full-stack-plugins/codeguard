@@ -2142,3 +2142,15 @@ Python 选中文件检查不再通过全项目元数据 walk 发现配置；只�
 - `/tmp/codeguard-resolution-schemas-final.log`：SHA-256 `15f1b959f89def12836da2d6cd90f0d7700edc0c2d8934e126ffcb66f48fb0d2`。
 
 中英文架构、技术方案、README 与修复工作流已同步。SDK 仅覆盖限定 Zig 语法任务；默认插件/公开 CLI 的可信策略提供者、其它原生适配器、环境/依赖/政策处置、白名单裁定、跨机器/Windows、完整门禁和全语言精度/性能仍缺。9.7/9.10/9.11/14.10 等父任务保持未完成；没有发布 npm 或修改插件锁。此前提交 4585d8f 的 CI 37140830716 已成功，新提交 CI 须按新 SHA 独立核验。
+
+## 2026-10-04 离线 npm 安装后的编辑与任务复检
+
+通过新 binary-distribution 场景和独立 `npm_pack_repair.test.mjs` 验证安装后的 Node 入口保留 stdin、参数、工作目录及退出码。公开旧 0.1.3 经固定摘要核对后运行新链路测试真实 RED：编辑事件没有语法任务；当前源码的私有离线包 GREEN，1 passed/0 failed/0 skipped，62.4 秒。重复编辑、Claude 形状上下文、原生诊断指导、源码变化失效、修复零诊断不自闭、WASM 零恢复不关闭及同问题同任务均实际运行；受控原生工具与真实宿主边界见 [安装链路验收](../../../tests/acceptance/npm-repair-local-package.md)。9 份版本化实际报告通过 schema，三个伪造变体拒绝；记录保留旧包失败和测试参数修正失败，不混计成功。
+
+CI 顺序接入该离线测试。本批仅增加验收、文档和 CI；Rust 产品源码未再修改，前段全工作区结果仍适用于同一产品源码。公开制品/插件默认接线未改变，11.17/13.4/14.18 和整体目标保持未完成。a688292 的 CI 37147462608 已失败：SDK 7 项均报 task_resolution_adapter_unavailable，npm 和全量步骤未运行；不能用本机成功替代此结果。
+
+Linux CI 失败处理：宿主制品读取仍限制 256 MiB，不因测试失败扩大产品上限。测试夹具现先断言实际宿主程序大小，CI 设置 `CARGO_PROFILE_TEST_DEBUG=0` 去掉完整调试符号、保留 debug assertions；本机相同 profile 下宿主程序 101062368 字节，SDK 9 passed/0 failed/1 ignored（89.6 秒）。原 Linux 失败与新提交远端结果分开，当前根因指向调试制品预算，Linux 修正尚待新 CI 证明。
+- `/tmp/codeguard-a688292-ci-failure.log`：SHA-256 `25faca123f505251cca14d688e774131a438503960adb20126b52ae7a5b6b670`。
+- `/tmp/codeguard-resolution-ci-profile-local.log`：SHA-256 `d37c052e9fc23eeb7a3de0bba741024d42bd92a9b933fb0ae9d66b2827a20253`。
+
+本批新增测试与 CI 配置最终通过 CLI 特性全目标 Clippy `-D warnings`、fmt、分层、OpenSpec strict、Node 语法和差异检查；CLI Clippy 日志 SHA-256 `07302979ebe5e9d95fc0a9419217173dbf32fd669f3d956c322890e9920b5318`。

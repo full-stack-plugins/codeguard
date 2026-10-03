@@ -220,3 +220,7 @@ The npm package SHALL provide `npx @partme.ai/codeguard` through a minimal Node 
 #### Scenario: A package declares all pinned grammar candidates
 - **WHEN** the packer is asked to prepare an artifact containing the 32 candidate grammars
 - **THEN** it rejects a binary without the WASM worker or with a missing, duplicated or digest-mismatched candidate before creating the artifact; an accepted local artifact runs at least one pinned grammar offline through the installed Node launcher and reports an incomplete candidate rather than a qualified lint result
+
+#### Scenario: An installed npm candidate carries repair feedback across commands
+- **WHEN** a local WASM candidate package is invoked offline through npm on an initialized workspace, an edit produces a syntax confirmation task, and the same task is rechecked through its explicit native tool
+- **THEN** the installed launcher preserves host stdin, stable task identity, evidence and exit status across hook/next/task verify; repeated edits update the same task, native diagnostics guide repair, changed inputs invalidate old positions, and zero native diagnostics without a protected policy retain an open task and unevaluated delivery
