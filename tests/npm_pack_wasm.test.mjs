@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -30,6 +31,15 @@ test('本地离线 npm 包实际运行固定 Zig 与 Dart WASM', () => {
   assert.ok(tarball.endsWith('.tgz'));
   const scratch = realpathSync(mkdtempSync(path.join(os.tmpdir(), 'codeguard-npm-wasm-')));
   try {
+    const extracted = spawnSync('tar', ['-xzf', tarball, '-C', scratch], { encoding: 'utf8', timeout: 30_000 });
+    assert.equal(extracted.status, 0, extracted.stderr);
+    const manifest = JSON.parse(readFileSync(path.join(root, 'grammars', 'manifest.json')));
+    const codegraphLicense = readFileSync(path.join(scratch, 'package', 'grammar-licenses', manifest.codegraph_license));
+    assert.equal(createHash('sha256').update(codegraphLicense).digest('hex'), manifest.codegraph_license_sha256);
+    for (const asset of manifest.assets) {
+      const license = readFileSync(path.join(scratch, 'package', 'grammar-licenses', asset.license));
+      assert.equal(createHash('sha256').update(license).digest('hex'), asset.license_sha256, asset.language);
+    }
     const inventory = spawnSync('npm', [
       'exec', '--offline', '--yes', '--cache', path.join(scratch, 'cache'),
       '--package', tarball, '--', 'codeguard', 'grammar', 'status', '--format=json',
@@ -56,7 +66,6 @@ test('本地离线 npm 包实际运行固定 Zig 与 Dart WASM', () => {
       assert.equal(report.grammar_qualified, false);
       assert.equal(report.native.status, 'not_run');
       assert.equal(report.delivery_decision, 'not_evaluated');
-      const manifest = JSON.parse(readFileSync(path.join(root, 'grammars', 'manifest.json')));
       assert.equal(report.grammar_sha256, manifest.assets.find(asset => asset.language === language).sha256);
     }
   } finally {

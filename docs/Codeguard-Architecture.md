@@ -2,7 +2,7 @@
 
 > **Purpose:** explain system ownership, component contracts, repair flow, and the gap between current implementation and target behavior.
 >
-> **Document version:** 1.2.2 · **Updated:** 2026-09-29 · **Source baseline:** current checkout and the [implementation evidence](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md); software version `0.1.2`.
+> **Document version:** 1.2.3 · **Updated:** 2026-10-03 · **Source baseline:** current checkout and the [implementation evidence](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md); software version `0.1.3`.
 
 [简体中文](Codeguard-Architecture.zh_CN.md) · [README](../README.md) · [Technical design](Codeguard-Technical-Design.md)
 

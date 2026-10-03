@@ -36,6 +36,7 @@ for (const argument of process.argv.slice(2)) {
 }
 const publishable = options.has('--public');
 const requireWasm = publishable || options.has('--require-wasm');
+const grammarLicenses = new Map();
 if (publishable && host !== 'darwin-arm64') {
   throw new Error(`The first @partme.ai/codeguard release is certified only for darwin-arm64, not ${host}`);
 }
@@ -76,6 +77,25 @@ if (requireWasm) {
   const expected = new Map(manifest.assets.map(asset => [asset.language, asset.sha256]));
   if (expected.size !== 32 || manifest.assets.length !== 32) {
     throw new Error('WASM capability probe failed: local manifest must contain 32 distinct assets');
+  }
+  const licenseEntries = [
+    [manifest.codegraph_license, manifest.codegraph_license_sha256],
+    ...manifest.assets.map(asset => [asset.license, asset.license_sha256]),
+  ];
+  for (const [relativePath, expectedSha256] of licenseEntries) {
+    if (typeof relativePath !== 'string' ||
+        !/^(?:LICENSE\.codegraph|[a-z0-9_-]+\/LICENSE)$/.test(relativePath) ||
+        typeof expectedSha256 !== 'string' || !/^[a-f0-9]{64}$/.test(expectedSha256)) {
+      throw new Error('WASM license gate failed: invalid manifest license identity');
+    }
+    if (grammarLicenses.has(relativePath) && grammarLicenses.get(relativePath) !== expectedSha256) {
+      throw new Error(`WASM license gate failed: conflicting hash for ${relativePath}`);
+    }
+    const source = path.join(root, 'grammars', relativePath);
+    if (!existsSync(source) || createHash('sha256').update(readFileSync(source)).digest('hex') !== expectedSha256) {
+      throw new Error(`WASM license gate failed: missing or changed ${relativePath}`);
+    }
+    grammarLicenses.set(relativePath, expectedSha256);
   }
   const inventory = spawnSync(binary, ['grammar', 'status', '--format=json'], {
     cwd: root, encoding: 'utf8', timeout: 30_000, maxBuffer: 1024 * 1024, shell: false,
@@ -122,6 +142,13 @@ try {
     copyFileSync(path.join(root, 'LICENSE'), path.join(stage, 'LICENSE'));
     copyFileSync(path.join(root, 'NOTICE'), path.join(stage, 'NOTICE'));
   }
+  if (requireWasm) {
+    for (const relativePath of grammarLicenses.keys()) {
+      const destination = path.join(stage, 'grammar-licenses', relativePath);
+      mkdirSync(path.dirname(destination), { recursive: true });
+      copyFileSync(path.join(root, 'grammars', relativePath), destination);
+    }
+  }
   const nativeName = process.platform === 'win32' ? 'codeguard.exe' : 'codeguard';
   const packagedBinary = path.join(stage, 'native', nativeName);
   copyFileSync(binary, packagedBinary);
@@ -137,7 +164,11 @@ try {
     cpu: [process.arch],
     engines: { node: '>=18' },
     bin: { codeguard: './codeguard.cjs' },
-    files: publishable ? ['codeguard.cjs', `native/${nativeName}`, 'README.md', 'LICENSE', 'NOTICE'] : ['codeguard.cjs', `native/${nativeName}`],
+    files: [
+      'codeguard.cjs', `native/${nativeName}`,
+      ...(requireWasm ? ['grammar-licenses/**'] : []),
+      ...(publishable ? ['README.md', 'LICENSE', 'NOTICE'] : []),
+    ],
   }, null, 2) + '\n');
   chmodSync(path.join(stage, 'codeguard.cjs'), 0o755);
   mkdirSync(outDir, { recursive: true });
@@ -154,6 +185,11 @@ try {
   const [{ filename, files }] = JSON.parse(pack.stdout);
   if (!files.some(file => file.path === `native/${nativeName}`)) {
     throw new Error('npm tarball omitted the Rust executable');
+  }
+  for (const relativePath of grammarLicenses.keys()) {
+    if (!files.some(file => file.path === `grammar-licenses/${relativePath}`)) {
+      throw new Error(`npm tarball omitted grammar license ${relativePath}`);
+    }
   }
   const finalName = `codeguard-${publishable ? 'public-' : ''}${identity.cli_version}-${host}.tgz`;
   const finalPath = path.join(outDir, finalName);

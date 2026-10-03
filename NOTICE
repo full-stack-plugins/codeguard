@@ -2,3 +2,8 @@ Codeguard
 Copyright 2026 Full Stack Skills / PartMe.AI
 
 Licensed under the Apache License, Version 2.0. See LICENSE.
+
+The optional Tree-sitter grammar candidates retain their upstream licenses.
+For npm distributions, see grammar-licenses/ in the package; for source builds,
+see grammars/*/LICENSE and grammars/LICENSE.codegraph. The pinned source and
+license digests are recorded in grammars/manifest.json.
