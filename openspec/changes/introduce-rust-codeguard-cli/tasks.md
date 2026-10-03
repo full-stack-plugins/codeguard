@@ -1125,3 +1125,5 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 14.4 / 14.7 / 14.17 Kotlin 隐藏恢复增量：固定 Kotlin grammar 对缺类型和合法 `object` 均报告树错误，但缺失 token 不可由 Rust 子节点枚举；原恢复扫描器的零结果会隐瞒解析器错误。现在 `has_error` 无可见错误子节点时将观察标为 `truncated`，使初检保持 `incomplete`；`check all` JSON 以 `syntax_recovery_incomplete` 标记，默认文本反馈提示原生确认。运行时 4/4、隔离 Kotlin CLI 常规 2/2、显式 `kotlinc-jvm 2.4.10` 差分 1/1、32 份单项目候选所在目标文件 9/9 测试通过。13 例差分现如实记为 11 例可判定且与原生一致、2 例未解析。Kotlin LSP 附带的新 WASM 在原 13 例虽消除了分歧，但扩展样例仍有两项原生合法误报和一项原生非法漏报，故未替换固定资产或升格 32 份中的任何语种。详见[差分证据](../../../tests/acceptance/kotlin-native-differential.md)；系统精度与原生优先路由仍缺，父任务不勾选。
 
 14.4 / 14.17 / 14.19 32 份最小合法样例验收收紧：四个有界项目和单项目的既有回归，除零恢复节点外，现逐观察要求 `reason=null`，防止 WASM 在语法树上含隐藏错误却被 32/32 路由数量掩盖；本机目标文件 9/9 通过。真实项目语料、原生差分、误报/漏报率及发行仍缺，父任务不勾选；见[局部验收](../../../tests/acceptance/check-all-32-grammar-candidates.md)。
+
+14.4 / 14.17 / 14.19 Erlang OTP 28 原生差分：8 份合法、5 份故意破损源码经本机 `erlc` 独立确认；固定 Erlang WASM 隔离 worker 对 13 例有 12 例分类一致、0 例未解析。缺少函数最终句点的源码被原生拒绝，WASM 零恢复，确认漏检。常规候选语料及显式原生差分目标测试各 1/1 通过；清单已知限制与 Linux CI 候选测试同步。需修 grammar、扩展版本/方言语料及完成原生优先统一命令和发行验收，父任务不勾选；见[局部证据](../../../tests/acceptance/erlang-native-differential.md)。

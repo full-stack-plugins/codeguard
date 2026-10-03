@@ -403,7 +403,7 @@
       "codegraph_runtime": "web-tree-sitter 0.25.3",
       "codeguard_runtime_validation": "rust_loader_smoke_passed",
       "language_versions": [],
-      "known_limitations": ["Pinned CodeGraph WASM and upstream 0.19 license; only narrow Rust syntax samples; native differential, language versions, public lint route and release remain unqualified"],
+      "known_limitations": ["OTP 28 erlc rejects a missing final function period in `f() -> ok`, but this pinned WASM returns zero recoveries; 12/13 narrow native syntax cases agree. Other Erlang versions, systematic precision, public native-first lint route and release remain unqualified"],
       "release_status": "candidate_unvalidated"
     },
     {
