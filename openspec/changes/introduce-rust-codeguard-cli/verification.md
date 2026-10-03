@@ -2188,3 +2188,16 @@ Erlang 显式 OTP 28 复用原任务/租约/尝试/deadline，next 提供原生�
 
 
 最终全工作区终态：2026-10-04，`cargo test --workspace --all-targets --locked --offline` 205 组、1132 passed、0 failed、106 ignored，退出 0；日志 `/tmp/codeguard-erlang-task-workspace-corrected.log` 的 SHA-256 为 `d81ec1374f9c3de8c521b57d4cb7e200d945abffeca28b26b699c17450238e52`。首次失败日志保留，不改写为通过。已完成代码审阅、Clippy、fmt、分层、严格规格和文档链接/示例校验；源码新提交的远端 CI 与公开发行仍需分别核验。
+
+
+### 2026-10-04 Erlang 源文件终止符 RED 与工具前置
+
+原提交 695497c 的 Linux CI 37159461269 已 completed/success，WASM、npm 包与全工作区步骤全部成功。本轮新增 24 个原生独立标签与 source-forms 补丁草稿，37 例候选回归有 10 个终止符差异；[待重建验收](../../../tests/acceptance/erlang-source-forms-rebuild.md)记录 RED、来源和完成条件。工具下载须依用户提供的 AGENTS.md 获确认，当前尚未授权或执行。没有改已发布制品，未标父任务完成。
+
+
+## 2026-10-04 Erlang 原生工具自动发现局部增量
+
+8.134 / 14.5–14.9 / 14.17 / 14.19：未指定 --erl-tool 时从 PATH 绝对目录选首个可执行 erl，规范路径冻结并复用既有 OTP 28/字节核验；显式错误或已选工具失败不换工具/候选洗白。新增 0.2 选择反馈与实际双语 JSON，0.1 Schema 原件不改。五组相关特性 52 passed/0 failed/6 ignored，显式真实自动发现和原启动/宏边界各 1 passed，183 Schema、6 实际报告/2 双语完整例子和13矛盾反例通过；CLI 特性全目标 Clippy 通过。全工作区终态另记。见[局部验收](../../../tests/acceptance/erlang-native-discovery.md)。完整项目、任务/Hook 自动发现、可信关闭、宿主及发行仍缺；37例 grammar RED 草稿和工具授权待办保持，不勾选父任务。
+
+
+最终默认全工作区终态：206 组、1137 passed、0 failed、107 ignored，退出 0；`/tmp/codeguard-erlang-discovery-workspace.log` SHA-256 `e0b40be56639a4f83008281e3bc017bf47366c4d4597650b1133de9671a26f1b`。这是默认特性回归，不覆盖单独保留的 37 例 WASM grammar RED 草稿；相关特性目标及显式 OTP 验收分别见上文。

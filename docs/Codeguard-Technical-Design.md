@@ -860,7 +860,7 @@ The following complete receipt comes from a controlled local integration fixture
 
 ### Erlang native forms observation (current source)
 
-The unified entry `codeguard lint erlang sample.erl --erl-tool /absolute/path/to/erl --timeout 10s --format=json` gives OTP 28 scanner/parser results priority. It uses the original bytes, a fixed non-project cwd, disabled project startup and a cleared environment; it never expands macros or executes compile/parse_transform. Macro/preprocessor coverage stays unknown, and explicit native failures are not replaced by WASM. Without a tool, the pinned candidate can provide an initial report and a native confirmation command. Native forms results do not replace full project lint, compilation or tests.
+The unified entry `codeguard lint erlang sample.erl --timeout 10s --format=json` gives OTP 28 scanner/parser results priority; `--erl-tool /absolute/path/to/erl` overrides automatic discovery. It uses the original bytes, a fixed non-project cwd, disabled project startup and a cleared environment; it never expands macros or executes compile/parse_transform. Macro/preprocessor coverage stays unknown, and explicit native failures are not replaced by WASM. Without an explicit tool, absolute PATH directories are searched for the first executable erl. Its canonical path, version and bytes are checked; its failure never silently selects a later tool. Only absence of an executable enables the pinned candidate and preparation guidance. Native forms results do not replace full project lint, compilation or tests.
 
 ```mermaid
 flowchart LR
@@ -871,11 +871,14 @@ flowchart LR
     E -->|Diagnostics| F[Keep native locations and repair guidance]
     E -->|Macro or execution failure| G[Keep the blocker and request recovery]
     E -->|Locally normal| H[Continue project lint / compile / tests]
-    B -->|Absent| I[Pinned WASM candidate]
+    B -->|Absent| P[Find erl in absolute PATH directories]
+    P --> Q{Ordinary executable found}
+    Q -->|Yes| C
+    Q -->|No| I[Pinned WASM candidate]
     I --> J[Known limits and native confirmation command]
 ```
 
-This complete structural example comes from an actual missing-period report, with a relative example path and the budget source matching the explicit CLI argument. It validates against the [0.1.0 schema](../schemas/erlang-lint-feedback-v0.1.schema.json). Public npm 0.1.4 does not yet contain this command.
+This complete structural example comes from an actual missing-period report with PATH tool selection, with a relative example path and the budget source matching the explicit CLI argument. It validates against the [0.2.0 schema](../schemas/erlang-lint-feedback-v0.2.schema.json); the historical 0.1.0 schema remains unchanged. Public npm 0.1.4 does not yet contain this command.
 
 ```json
 {
@@ -906,15 +909,19 @@ This complete structural example comes from an actual missing-period report, wit
     "tool_sha256": "cd03d938d7547ef608076a58a49f5284931b43f39090087baf35efc1665dd5d6",
     "version": "OTP 28"
   },
-  "next_action": "核对并修复原生 Erlang 语法诊断，再执行同一 --erl-tool 命令；还需项目完整 lint、编译和测试",
+  "next_action": "核对并修复原生 Erlang 语法诊断，复用 tool_selection.executable 作为 --erl-tool 再检查；还需项目完整 lint、编译和测试",
   "operation": "lint",
   "path": "sample.erl",
   "report_type": "erlang_lint_feedback",
-  "schema_version": "0.1.0",
+  "schema_version": "0.2.0",
   "scope": "single_file_forms_without_preprocessing",
   "source_sha256": "d66c937c29e3eba8063b468f2744f995cd24cee2399b5f63018935876f5fc9a3",
   "status": "incomplete",
-  "syntax_precheck": null
+  "syntax_precheck": null,
+  "tool_selection": {
+    "executable": "/opt/homebrew/Cellar/erlang/28.5/lib/erlang/bin/erl",
+    "source": "path"
+  }
 }
 ```
 

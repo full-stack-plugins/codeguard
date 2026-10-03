@@ -18,7 +18,7 @@ fn cli(root: &Path, extra: &[&str]) -> std::process::Output {
         .args(["lint", "erlang"])
         .arg(root.join("sample.erl"));
     command.args(extra).arg("--format=json");
-    command.env_remove("CODEGUARD_TIMEOUT");
+    command.env_remove("CODEGUARD_TIMEOUT").env("PATH", "");
     command.output().unwrap()
 }
 

@@ -1,0 +1,122 @@
+[
+  {
+    "name": "multi_clause",
+    "source": "-module(sample).\nf(0) -> zero;\nf(_) -> other.",
+    "valid": true
+  },
+  {
+    "name": "multiple_functions",
+    "source": "-module(sample).\nf() -> ok.\ng() -> f().",
+    "valid": true
+  },
+  {
+    "name": "final_comment",
+    "source": "-module(sample).\nf() -> ok. % final comment without newline",
+    "valid": true
+  },
+  {
+    "name": "comment_before_period",
+    "source": "-module(sample).\nf() -> ok % intervening comment\n.",
+    "valid": true
+  },
+  {
+    "name": "dot_in_string",
+    "source": "-module(sample).\nf() -> \"value.with.dot\".",
+    "valid": true
+  },
+  {
+    "name": "dot_in_float",
+    "source": "-module(sample).\nf() -> 1.25.",
+    "valid": true
+  },
+  {
+    "name": "dot_character",
+    "source": "-module(sample).\nf() -> $. .",
+    "valid": true
+  },
+  {
+    "name": "quoted_atom_dot",
+    "source": "-module(sample).\nf() -> 'atom.with.dot'.",
+    "valid": true
+  },
+  {
+    "name": "unicode_crlf",
+    "source": "-module(sample).\nf() -> \"中文\".\r\n",
+    "valid": true
+  },
+  {
+    "name": "nested_fun",
+    "source": "-module(sample).\nf() -> fun(X) -> X end.",
+    "valid": true
+  },
+  {
+    "name": "spec",
+    "source": "-module(sample).\n-spec f(integer()) -> integer().\nf(X) -> X.",
+    "valid": true
+  },
+  {
+    "name": "macro",
+    "source": "-module(sample).\n-define(V, ok).\nf() -> ?V.",
+    "valid": true
+  },
+  {
+    "name": "conditional_forms",
+    "source": "-module(sample).\n-ifdef(TEST).\nf() -> one.\n-else.\nf() -> two.\n-endif.",
+    "valid": true
+  },
+  {
+    "name": "missing_period_eof",
+    "source": "-module(sample).\nf() -> ok",
+    "valid": false
+  },
+  {
+    "name": "missing_period_comment",
+    "source": "-module(sample).\nf() -> ok % comment with .",
+    "valid": false
+  },
+  {
+    "name": "missing_period_unicode_crlf",
+    "source": "-module(sample).\nf() -> \"中文\"\r\n",
+    "valid": false
+  },
+  {
+    "name": "missing_period_after_float",
+    "source": "-module(sample).\nf() -> 1.25",
+    "valid": false
+  },
+  {
+    "name": "missing_period_after_dot_character",
+    "source": "-module(sample).\nf() -> $.",
+    "valid": false
+  },
+  {
+    "name": "missing_period_after_string",
+    "source": "-module(sample).\nf() -> \"ends.with.dot.\"",
+    "valid": false
+  },
+  {
+    "name": "final_semicolon",
+    "source": "-module(sample).\nf() -> ok;",
+    "valid": false
+  },
+  {
+    "name": "multi_clause_final_semicolon",
+    "source": "-module(sample).\nf(0) -> zero;\nf(_) -> other;",
+    "valid": false
+  },
+  {
+    "name": "missing_middle_period",
+    "source": "-module(sample).\nf() -> ok\ng() -> ok.",
+    "valid": false
+  },
+  {
+    "name": "bare_expression",
+    "source": "-module(sample).\nok.",
+    "valid": false
+  },
+  {
+    "name": "bare_call",
+    "source": "-module(sample).\nlists:reverse([]).",
+    "valid": false
+  }
+]

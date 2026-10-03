@@ -32,6 +32,17 @@
 - **AND** 原生结果优先于候选 WASM，缺句点诊断和原生故障分别保留；宏、预处理指令或无法解释的位置保持未完成，不当作已确认源码违规，也不以 WASM 洗白；该阶段只观察单文件 forms，不替代项目 lint、编译或测试
 - **AND** 工具未提供时可以附加未验收 WASM 初检，报告其已知缺句点漏检并给出原生确认命令；显式无效工具不能静默改用 PATH 中的同名工具
 
+#### Scenario: A source-file grammar distinguishes function terminators from editor fragments
+- **WHEN** Erlang grammar 的原生差分发现源文件函数缺句点、末尾分号或中间缺分隔符被当作零恢复
+- **THEN** 修复必须固定原始 grammar、源码模式补丁、真实 external scanner、生成器/编译器版本及原始/派生 WASM 字节；不能通过字符串末尾匹配、伪造 ERROR/MISSING 或忽略差分制造通过
+- **AND** 使用同一普通、Unicode/CRLF、注释、字符串/字符/浮点数内句点、多子句、宏与条件编译正反语料，由独立原生工具确认标签；预处理和语言版本的未覆盖范围必须保留，窄语料通过不授予整语言资格
+
+#### Scenario: An Erlang checker is available on the invoking process PATH
+- **WHEN** 单文件 `lint erlang` 未指定 `--erl-tool`，且调用进程 PATH 的绝对目录可定位普通可执行 `erl`
+- **THEN** 固定所选工具的规范路径，以同一预算核对 OTP 28 版本与工具字节，并优先执行原生 scanner/parser；报告必须区分显式选择、PATH 选择和未找到工具
+- **AND** 显式错误工具不能改用 PATH；PATH 首个可执行工具的版本/执行失败也不能被后面的同名工具或 WASM 洗白。空/相对 PATH 条目和不可执行文件不作为自动工具；真正没有工具时保留候选初检与准备指引
+- **AND** 工具选择不授予原生完整覆盖或可信权威；单文件无预处理 forms 的范围及交付未评估保持不变
+
 #### Scenario: Go vet excludes a file under build constraints
 - **WHEN** 本轮 Go 1.23.4 `go vet` 完成，受控 `go list` 证明部分源码进入默认构建，而另一份 `.go` 源码被构建标签排除
 - **THEN** 仅对同一源码字节且进入原生包清单的文件跳过重复 WASM；被排除文件继续候选初检，并保持平台/构建标签覆盖未完成

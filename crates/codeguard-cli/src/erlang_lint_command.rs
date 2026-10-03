@@ -1,6 +1,9 @@
-//! Erlang 原生单文件 forms 解析优先，工具未提供时附加未验收 WASM 初检。
+//! Erlang 原生单文件 forms 解析优先；显式或 PATH 工具均不可用时附加候选初检。
 
-use crate::{erlang_lint_arguments::ErlangLintArguments, plain_syntax_source::read_plain_source};
+use crate::{
+    erlang_lint_arguments::ErlangLintArguments, erlang_tool_selection::ErlangToolSelection,
+    plain_syntax_source::read_plain_source,
+};
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::{
@@ -24,12 +27,13 @@ pub fn run(args: &[String]) -> ExitCode {
         return ExitCode::from(4);
     }
     let mut report = json!({
-        "schema_version":"0.1.0", "report_type":"erlang_lint_feedback",
+        "schema_version":"0.2.0", "report_type":"erlang_lint_feedback",
+        "tool_selection":null,
         "operation":"lint", "language":"erlang", "path":args.source,
         "status":"incomplete", "coverage_proven":false, "delivery_decision":"not_evaluated",
         "authority":"local_unverified", "scope":"single_file_forms_without_preprocessing",
         "source_sha256":null, "execution_budget":crate::check_budget::budget_record(args.timeout.0,args.timeout.1),
-        "native":{"status":"not_run","reason":"explicit_erl_tool_not_provided",
+        "native":{"status":"not_run","reason":"erlang_tool_not_found_on_path",
             "version":null,"tool_sha256":null,"diagnostics":[],"diagnostics_truncated":false,"preprocessing_unresolved":false},
         "syntax_precheck":null,
         "known_limitations":codeguard_adapters::bundled_grammar_candidate("erlang").ok().map(|(asset,_)|asset.known_limitations.clone()).unwrap_or_default(),
@@ -45,15 +49,17 @@ pub fn run(args: &[String]) -> ExitCode {
         }
         let source = read_plain_source(&args.source)?;
         report["source_sha256"] = json!(format!("{:x}", Sha256::digest(&source)));
-        if let Some(tool) = args.erl_tool.as_deref() {
+        let selection = ErlangToolSelection::discover(args.erl_tool.clone());
+        report["tool_selection"] = selection.report();
+        if let Some(tool) = selection.tool() {
             report["native"] = crate::erlang_syntax_probe::observe(tool, &source, deadline);
             report["next_action"] = json!(match report["native"]["status"].as_str() {
                 Some("diagnostics_observed") =>
-                    "核对并修复原生 Erlang 语法诊断，再执行同一 --erl-tool 命令；还需项目完整 lint、编译和测试",
+                    "核对并修复原生 Erlang 语法诊断，复用 tool_selection.executable 作为 --erl-tool 再检查；还需项目完整 lint、编译和测试",
                 Some("completed") =>
                     "原生 Erlang 单文件 forms 解析没有诊断；还需项目完整 lint、预处理、编译和测试",
                 _ =>
-                    "先解决原生工具、预处理或执行阻塞，再执行同一 --erl-tool 命令；不要据此反复修改无关源码",
+                    "先解决所选原生工具、预处理或执行阻塞，再执行同一原生检查；不要据此反复修改无关源码",
             });
         } else {
             #[cfg(feature = "wasm-precheck")]
@@ -128,6 +134,15 @@ fn emit(report: &Value, json_format: bool) {
         report["native"]["reason"].as_str().unwrap_or("unresolved"),
         report["next_action"].as_str().unwrap_or("运行适用原生工具")
     );
+    if let Some(source) = report["tool_selection"]["source"].as_str() {
+        println!(
+            "  工具选择：{}；{}",
+            source,
+            report["tool_selection"]["executable"]
+                .as_str()
+                .unwrap_or("未定位可复用工具")
+        );
+    }
     if !report["syntax_precheck"].is_null() {
         println!("  内置 grammar 已知可能漏掉函数末尾句点；即使零恢复节点，也需原生确认");
     }

@@ -4,7 +4,7 @@ use std::path::PathBuf;
 pub(crate) struct ErlangLintArguments {
     /// 普通源码文件。
     pub source: PathBuf,
-    /// 显式 OTP 28 erl 工具，不从 PATH 猜测。
+    /// 显式 OTP 28 erl 工具；未提供时由命令在当前 PATH 的绝对目录定位。
     pub erl_tool: Option<PathBuf>,
     /// 是否输出封闭 JSON 反馈。
     pub json: bool,

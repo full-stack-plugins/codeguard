@@ -14,6 +14,8 @@ pub mod erlang_lint_command;
 #[cfg(unix)]
 mod erlang_syntax_probe;
 #[cfg(unix)]
+mod erlang_tool_selection;
+#[cfg(unix)]
 mod eslint_config_map;
 #[cfg(unix)]
 mod eslint_directory;

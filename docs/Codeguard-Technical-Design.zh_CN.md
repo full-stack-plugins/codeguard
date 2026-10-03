@@ -860,7 +860,7 @@ let receipt = codeguard_cli::verify_zig_task_resolution(
 
 ### Erlang 单文件原生 forms 观察（当前源码）
 
-统一入口 `codeguard lint erlang sample.erl --erl-tool /absolute/path/to/erl --timeout 10s --format=json` 优先调用 OTP 28 原生扫描/解析。该阶段使用原字节、固定 cwd、禁用项目启动文件和清空的环境，不展开宏或执行 compile/parse_transform。宏与预处理保持未知，显式原生故障不被 WASM 覆盖。未提供工具时可以展示固定候选初检和原生确认指引；原生结果也不能替代完整项目 lint、编译与测试。
+统一入口 `codeguard lint erlang sample.erl --timeout 10s --format=json` 优先调用 OTP 28 原生扫描/解析；`--erl-tool /absolute/path/to/erl` 可显式覆盖自动发现。该阶段使用原字节、固定 cwd、禁用项目启动文件和清空的环境，不展开宏或执行 compile/parse_transform。宏与预处理保持未知，显式原生故障不被 WASM 覆盖。未提供显式工具时从 PATH 的绝对目录定位首个可执行 erl，并核对其规范路径、版本和字节；首个工具失败不换工具。只有未找到工具时展示固定候选初检和原生确认指引；原生结果也不能替代完整项目 lint、编译与测试。
 
 ```mermaid
 flowchart LR
@@ -871,11 +871,14 @@ flowchart LR
     E -->|有诊断| F[保留原生位置与修复指引]
     E -->|宏或运行故障| G[保留具体阻塞并要求恢复]
     E -->|局部正常| H[继续项目 lint / 编译 / 测试]
-    B -->|未提供| I[固定 WASM 候选初检]
+    B -->|未提供| P[从 PATH 绝对目录定位 erl]
+    P --> Q{找到普通可执行工具}
+    Q -->|找到| C
+    Q -->|未找到| I[固定 WASM 候选初检]
     I --> J[展示已知漏检与原生确认命令]
 ```
 
-以下为真实缺句点报告的完整结构示例，路径改为相对示例名，预算来源采用对应的显式 CLI 参数；字段由[0.1.0 Schema](../schemas/erlang-lint-feedback-v0.1.schema.json)校验。该命令尚未包含于公开 npm 0.1.4。
+以下为实际 PATH 自动选择工具时的缺句点报告，路径改为相对示例名，预算来源采用对应的显式 CLI 参数；字段由[0.2.0 Schema](../schemas/erlang-lint-feedback-v0.2.schema.json)校验；历史 0.1.0 Schema 原件保留。该命令尚未包含于公开 npm 0.1.4。
 
 ```json
 {
@@ -906,15 +909,19 @@ flowchart LR
     "tool_sha256": "cd03d938d7547ef608076a58a49f5284931b43f39090087baf35efc1665dd5d6",
     "version": "OTP 28"
   },
-  "next_action": "核对并修复原生 Erlang 语法诊断，再执行同一 --erl-tool 命令；还需项目完整 lint、编译和测试",
+  "next_action": "核对并修复原生 Erlang 语法诊断，复用 tool_selection.executable 作为 --erl-tool 再检查；还需项目完整 lint、编译和测试",
   "operation": "lint",
   "path": "sample.erl",
   "report_type": "erlang_lint_feedback",
-  "schema_version": "0.1.0",
+  "schema_version": "0.2.0",
   "scope": "single_file_forms_without_preprocessing",
   "source_sha256": "d66c937c29e3eba8063b468f2744f995cd24cee2399b5f63018935876f5fc9a3",
   "status": "incomplete",
-  "syntax_precheck": null
+  "syntax_precheck": null,
+  "tool_selection": {
+    "executable": "/opt/homebrew/Cellar/erlang/28.5/lib/erlang/bin/erl",
+    "source": "path"
+  }
 }
 ```
 

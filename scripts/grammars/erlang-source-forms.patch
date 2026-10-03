@@ -1,0 +1,15 @@
+--- a/grammar.js
++++ b/grammar.js
+@@ -226,4 +226,2 @@
+-        source_file: $ => choice(
+-            field('forms_only', repeat($._form)),
+-            field('exprs', repeat(seq($._expr, optional("."))))
+-        ),
++        // CodeGuard checks source forms, not the upstream editor expression fragments.
++        source_file: $ => field('forms_only', repeat($._form)),
+@@ -519,0 +518 @@
++        // A complete Erlang function ends in a period; only inner clauses use semicolons.
+@@ -522 +521,2 @@
+-            optional($._fun_clause_separator),
++            repeat(seq(';', field("clause", $._function_or_macro_clause))),
++            '.',
