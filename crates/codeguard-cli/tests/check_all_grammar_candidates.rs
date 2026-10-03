@@ -192,6 +192,7 @@ fn known_grammar_precision_limits_reach_project_feedback() {
         "<cfquery name=\"q\">SELECT FROM users</cfquery>\n",
     )
     .unwrap();
+    fs::write(root.join("broken.kt"), "fun f(x: ) = x\n").unwrap();
     let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
         .args(["check", "all"])
         .arg(&root)
@@ -207,6 +208,7 @@ fn known_grammar_precision_limits_reach_project_feedback() {
     for (language, expected) in [
         ("vbnet", "known grammar false positive"),
         ("cfquery", "does not validate full SQL semantics"),
+        ("kotlin", "native compiler rejects missing parameter type"),
     ] {
         let observation = observations
             .iter()
@@ -220,6 +222,9 @@ fn known_grammar_precision_limits_reach_project_feedback() {
             "{language}: {observation}"
         );
         assert_eq!(observation["grammar_qualified"], false);
+        if language == "kotlin" {
+            assert_eq!(observation["recovery_count"], 0);
+        }
     }
     assert_eq!(report["delivery_decision"], "incomplete");
 }

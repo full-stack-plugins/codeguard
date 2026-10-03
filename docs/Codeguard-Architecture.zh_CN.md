@@ -38,6 +38,8 @@ WASM 的规范与 19 项实施任务已纳入既有 change；可选 Rust worker 
 
 [Java 17 原生差分](../tests/acceptance/java-native-differential.md)给 Java grammar 增加了 13 例 javac 21 独立 oracle。它只是局部精度证据，Java 仍是未验收候选。
 
+[Kotlin 原生差分](../tests/acceptance/kotlin-native-differential.md)在 13 例中发现一处漏检：参数类型缺失被 `kotlinc` 拒绝，却没有触发固定 WASM 的恢复节点。该语法仍未验收，具体限制投影到状态和项目反馈。
+
 ```mermaid
 flowchart LR
     A[check all 静态发现] --> B[原生适配器及环境阻塞]

@@ -218,6 +218,8 @@ flowchart LR
 
 Java 的 [javac 21 `--release 17` 对照](../tests/acceptance/java-native-differential.md)接受 8 例合法、拒绝 5 例破损语法源码，与隔离 WASM worker 分类一致。该测试仅固定窄范围分类；项目级原生路由、版本覆盖和误报率仍待验收。
 
+[Kotlin 2.4.10 差分](../tests/acceptance/kotlin-native-differential.md)记录 12/13 分类一致，并固定反例：`fun f(x: ) = x` 被原生拒绝而 WASM 零恢复。`grammar status` 和 `check all` 将其作为有界已知限制展示；零恢复不能关闭原生确认义务。
+
 可选特性构建的 CLI 在无显式原生上下文的 TypeScript 单文件请求中，先核对本地 ESLint 10 包及唯一普通 flat config。若从 `PATH` 解析到可执行 Node，就调用既有有界原生版本与报告探针；缺 Node 时报告准备缺口，不让 WASM 抢跑。仅未观察到本地 ESLint 包时，`.ts/.mts/.cts` 输出 [ESLint 反馈 0.3.0](../schemas/eslint-local-feedback-v0.3.schema.json)，`.tsx` 用独立 grammar 输出 [0.4.0](../schemas/eslint-local-feedback-v0.4.schema.json)。候选初检保留 `native=not_run`、`delivery=not_evaluated`，即使零恢复节点也保持未完成。配置选择歧义、本地路径不可信或包身份损坏时保留环境阻塞而不启动 WASM；部分显式上下文也沿用原路径。该增量不证明项目脚本参数等价、逐模块调度或宿主对话交付，见[原生优先局部验收](../tests/acceptance/native-first-eslint-candidate.md)。
 
 ### 5.4 Grammar 引入与运行生命周期——目标

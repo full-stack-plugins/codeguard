@@ -38,6 +38,8 @@ The source-built candidate scheduler now prepares bounded fragments in stable pa
 
 The [Java 17 native differential](../tests/acceptance/java-native-differential.md) adds a 13-case javac 21 oracle for one grammar. It is local precision evidence only; Java remains an unqualified candidate.
 
+A separate [Kotlin native differential](../tests/acceptance/kotlin-native-differential.md) found one false negative in 13 samples: a missing parameter type is rejected by `kotlinc` but invisible to the pinned WASM. The route keeps this grammar unqualified and projects the limitation to status and project feedback.
+
 ```mermaid
 flowchart LR
     A[check all discovery] --> B[Native adapters and blockers]

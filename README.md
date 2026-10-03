@@ -110,6 +110,8 @@ The source-build acceptance test also runs the 31-file mixed-language fixture as
 
 Java now also has a narrow [javac 21 / Java 17 differential](tests/acceptance/java-native-differential.md): 8 valid and 5 invalid syntax samples agree with the pinned WASM. This does not qualify Java lint, other language versions, or project-wide native-first routing.
 
+A [Kotlin 2.4.10 differential](tests/acceptance/kotlin-native-differential.md) found a concrete false negative: `kotlinc` rejects `fun f(x: ) = x` while the pinned WASM emits no recovery. The candidate and delivery remain incomplete; install or run the applicable native checker for confirmation.
+
 The source-built Unix CLI also has a narrow Zig route: `codeguard lint zig FILE --zig-tool /absolute/path/to/zig --format=json`. An explicitly supplied tool reporting Zig 0.16.0 and retaining the same byte digest runs native `ast-check` first; its source positions are retained without exposing source snippets. Without an explicit tool, the pinned Zig WASM provides an unqualified observation. Both paths remain incomplete because `ast-check` covers only local AST errors, not full lint, build or tests. See the [Zig feedback schema](schemas/zig-lint-feedback-v0.1.schema.json).
 
 On Apple Silicon macOS, the published `0.1.3` candidate package was verified with a fresh npm cache:

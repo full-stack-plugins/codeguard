@@ -110,6 +110,8 @@ cargo build --locked -p codeguard-cli
 
 Java 另有一组窄范围的 [javac 21 / Java 17 差分](tests/acceptance/java-native-differential.md)：8 份合法、5 份非法语法样例与固定 WASM 一致。这不代表 Java lint、其它语言版本或项目级原生优先路由已验收。
 
+[Kotlin 2.4.10 差分](tests/acceptance/kotlin-native-differential.md)发现具体漏检：`kotlinc` 拒绝 `fun f(x: ) = x`，固定 WASM 却没有恢复节点。候选与交付仍保持未完成，必须由适用原生检查器确认。
+
 源码构建的 Unix CLI 还提供局部 Zig 入口：`codeguard lint zig FILE --zig-tool /absolute/path/to/zig --format=json`。显式提供且报告 Zig 0.16.0、执行前后字节摘要一致的工具优先运行原生 `ast-check`，仅输出诊断位置，不回显源码；未显式提供工具时，固定 Zig WASM 给出未验收候选观察。两条路径都保持未完成，因为 `ast-check` 仅覆盖局部 AST 错误，不等于完整 lint、构建或测试。见 [Zig 报告 Schema](schemas/zig-lint-feedback-v0.1.schema.json)。
 
 已在 Apple Silicon macOS 上通过全新 npm 缓存验证公开 `0.1.3` 候选包：
