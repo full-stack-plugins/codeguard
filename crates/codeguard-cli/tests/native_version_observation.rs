@@ -79,15 +79,29 @@ fn unsupported_version_stderr_and_nonzero_exit_are_distinct() {
 #[test]
 fn timeout_cancellation_and_exhausted_budget_keep_native_failure_kind() {
     for variant in 0..3 {
-        let fixture = Fixture::new();
-        let mut request = fixture.request("exec /bin/sleep 1");
-        let cancelled = AtomicBool::new(variant == 1);
-        request.process.deadline = if variant == 2 {
-            Instant::now()
-        } else {
-            Instant::now() + Duration::from_millis(30)
-        };
-        let result = observe_native_version(&request, &cancelled);
+        let mut result = None;
+        for attempt in 0..3 {
+            let fixture = Fixture::new();
+            let mut request = fixture.request("exec /bin/sleep 2");
+            let cancelled = AtomicBool::new(variant == 1);
+            request.process.deadline = if variant == 2 {
+                Instant::now()
+            } else {
+                Instant::now() + Duration::from_millis(500)
+            };
+            let observed = observe_native_version(&request, &cancelled);
+            // 并行 CI 偶发进程配额耗尽时，重新创建私有样例；只有真实超时才满足本用例。
+            if variant == 0
+                && observed.termination == Some(Termination::SpawnFailure)
+                && attempt < 2
+            {
+                std::thread::sleep(Duration::from_millis(20));
+                continue;
+            }
+            result = Some(observed);
+            break;
+        }
+        let result = result.unwrap();
         let (termination, reason) = match variant {
             0 => (Termination::TimedOut, "version_timed_out"),
             1 => (Termination::Cancelled, "request_cancelled"),

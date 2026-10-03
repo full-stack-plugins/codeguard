@@ -1113,3 +1113,5 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 14.7 / 14.17 / 14.19 项目报告限制投影：`check all` 的 0.34.0 封闭协议逐候选附带固定清单的有界 `known_limitations`，VB.NET 已知误报与 CFQuery SQL 覆盖缺口不再只存在于独立库存命令；0.33.0 Schema 归档，清单解析失败时保持未完成。真实双文件目标测试先 RED 后 GREEN，六项候选回归与 18 项聚合契约通过，分批 32 份真实候选测试逐观察确认非空限制，真实 JSON 通过 Draft 2020-12、旧 Schema/伪造放行被拒。默认宿主自动对话渲染、原生对照、系统精度和发行仍缺，父任务不勾选；见[局部验收](../../../tests/acceptance/check-all-known-grammar-limitations.md)。
 
 14.7 / 14.19 文本反馈局部增量：`check all` 默认终端输出现在有界显示候选的固定已知限制，VB.NET 误报样例先 RED 后 GREEN，目标测试 1/1 通过，源码行未回显。显式 CLI 输出可由调用方转发，插件默认 Hook 的自动触发与宿主对话渲染仍未验收，父任务不勾选；见[同一局部验收](../../../tests/acceptance/check-all-known-grammar-limitations.md)。
+
+5.2 / 5.6 Linux CI 版本探测测试稳定性：旧 30ms 超时夹具在并行负载下实际返回 `SpawnFailure`，不能误报为运行时超时。现在使用 500ms 预算与 2 秒睡眠，仅在瞬时启动失败时创建新夹具重试，最终仍严格要求 `TimedOut`；本机定向 1/1、完整文件 7/7 通过。远端复验仍待本次 PR CI，父任务保持未完成；见[原生版本诊断验收](../../../tests/acceptance/native-version-diagnostics.md)。
