@@ -36,14 +36,15 @@ pub fn route_source<'a>(relative_path: &str, source: &'a [u8]) -> Vec<GrammarRou
         Some("lua") => "lua",
         Some("luau") => "luau",
         Some("nix") => "nix",
-        Some("m" | "mm") => "objc",
+        Some("m") if has_objc_marker(source) => "objc",
+        Some("mm") => "objc",
         Some("pas" | "dpr" | "dpk" | "lpr") => "pascal",
         Some("php") => "php",
         Some("py") => "python",
         Some("r") => "r",
         Some("rb") => "ruby",
         Some("rs") => "rust",
-        Some("scala" | "sc") => "scala",
+        Some("scala") => "scala",
         Some("sol") => "solidity",
         Some("swift") => "swift",
         Some("tf" | "tfvars" | "tofu") => "terraform",
@@ -92,6 +93,30 @@ pub fn route_source<'a>(relative_path: &str, source: &'a [u8]) -> Vec<GrammarRou
         }
     }
     routes
+}
+
+// `.m` 也用于 MATLAB；只在源码具有 Objective-C 专属词法标记时自动解析。
+// `.sc` 同时用于 Scala 脚本与 SuperCollider，缺少项目上下文时不猜测。
+fn has_objc_marker(source: &[u8]) -> bool {
+    let markers: &[&[u8]] = &[
+        b"@interface".as_slice(),
+        b"@implementation",
+        b"@protocol",
+        b"@class",
+        b"@property",
+        b"@synthesize",
+        b"@autoreleasepool",
+        b"#import",
+    ];
+    source.split(|byte| *byte == b'\n').any(|line| {
+        let line = line.trim_ascii_start();
+        markers.iter().any(|marker| {
+            line.starts_with(marker)
+                && line.get(marker.len()).is_some_and(|next| {
+                    next.is_ascii_whitespace() || matches!(next, b'(' | b'{' | b'<' | b'"')
+                })
+        })
+    })
 }
 
 fn find_bytes(haystack: &[u8], needle: &[u8]) -> Option<usize> {

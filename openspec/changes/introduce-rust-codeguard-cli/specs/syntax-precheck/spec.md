@@ -138,6 +138,12 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 
 同一语言族有独立 grammar 的方言 MUST 按实际文件类型选择和报告；尤其 `.tsx` MUST 使用 TSX grammar，不能拿普通 TypeScript grammar 的恢复节点当作 JSX 源码异常。候选报告读者 MUST 核对 grammar 方言与源文件扩展名一致；不匹配视为报告无效，不生成源码 finding。
 
+多语言共用后缀 MUST 保留歧义：`.m` 可能属于 Objective-C 或 MATLAB，`.sc` 可能属于 Scala 或 SuperCollider。没有可核对的语言证据时，自动检查 MUST 不调用猜测的 grammar、不把恢复节点记为源码问题，并保持范围未完成；用户显式指定 `grammar probe` 的语种仍可作候选诊断。
+
+#### Scenario: Shared extension would produce a speculative syntax finding
+- **WHEN** 项目包含无 Objective-C 专属标记的 MATLAB `.m` 源码，或 SuperCollider `.sc` 源码
+- **THEN** 自动候选路由不把它们交给 Objective-C/Scala WASM；歧义范围保持未完成，不能用资产数量或其它文件的检查结果代替该范围
+
 #### Scenario: Valid JSX is parsed with a TypeScript-only grammar
 
 - **WHEN** `.tsx` 文件含合法 JSX，而普通 TypeScript grammar 会产生恢复节点

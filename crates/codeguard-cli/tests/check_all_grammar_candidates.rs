@@ -69,6 +69,12 @@ fn check_all_routes_distinct_dialects_after_native_without_claiming_clean() {
     fs::write(root.join("component.tsx"), "const C = () => <div />;\n").unwrap();
     fs::write(root.join("script.js"), "const x = 1;\n").unwrap();
     fs::write(
+        root.join("plot.m"),
+        "title('@interface Foo');\nplot(1:3);\n",
+    )
+    .unwrap();
+    fs::write(root.join("synth.sc"), "{ SinOsc.ar(440) }.play;\n").unwrap();
+    fs::write(
         root.join("component.cfs"),
         "component { function f() { return 1; } }\n",
     )
@@ -103,6 +109,9 @@ fn check_all_routes_distinct_dialects_after_native_without_claiming_clean() {
             "{language}: {observations:?}"
         );
     }
+    assert!(!observations.iter().any(|item| item["path"] == "plot.m"));
+    assert!(!observations.iter().any(|item| item["path"] == "synth.sc"));
+    assert_eq!(report["syntax_candidates"]["unrouted_count"], 2);
     assert_eq!(
         observations
             .iter()

@@ -39,7 +39,12 @@ fn routes_every_pinned_grammar_without_merging_dialects() {
     ];
     let mut observed = BTreeSet::new();
     for (language, path) in cases {
-        let routes = route_source(path, b"source");
+        let source: &[u8] = if path == "a.m" {
+            b"@interface Foo : NSObject\n@end\n"
+        } else {
+            b"source"
+        };
+        let routes = route_source(path, source);
         assert_eq!(routes.len(), 1, "{path}");
         assert_eq!(routes[0].language, language, "{path}");
         observed.insert(language);
@@ -60,6 +65,23 @@ fn routes_every_pinned_grammar_without_merging_dialects() {
 fn ambiguous_and_embedded_sources_do_not_get_speculative_routes() {
     assert!(route_source("a.h", b"int x;").is_empty());
     assert!(route_source("a.sql", b"SELECT 1").is_empty());
+    assert!(route_source("plot.m", b"x = [1, 2, 3];\nplot(x);\n").is_empty());
+    assert!(
+        route_source(
+            "plot.m",
+            b"title('@interface Foo');\n% #import is only an example\n"
+        )
+        .is_empty()
+    );
+    assert!(route_source("synth.sc", b"{ SinOsc.ar(440) }.play;\n").is_empty());
+    assert_eq!(
+        route_source("model.m", b"@implementation Model\n@end\n")[0].language,
+        "objc"
+    );
+    assert_eq!(
+        route_source("script.scala", b"object App {}\n")[0].language,
+        "scala"
+    );
     assert!(
         route_source("a.cfm", b"<cfquery>SELECT 1")
             .iter()
