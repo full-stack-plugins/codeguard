@@ -1085,3 +1085,5 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 14.4 / 14.17 / 14.19 JavaScript 原生差分局部增量：固定本机 Node 24.18.0 模块语法检查作为独立 oracle，同一 8 份合法和 5 份破损源码经公开隔离 JavaScript worker 逐例恢复分类一致，显式原生测试 1/1 与常规 CI 语料回归 1/1 通过。此对照不覆盖 ESLint、TypeScript/JSX、其它方言或系统误报漏报率；见[JavaScript 原生差分验收](../../../tests/acceptance/javascript-native-differential.md)。三项任务仍不勾选。
 
 14.6 / 14.7 / 14.19 Go 原生优先局部增量：`check all` 现在按模块一次运行受控 `go list`，仅在本轮 Go 1.23.4 vet 已完成、工具/模块/源码摘要与默认包清单均匹配时跳过被选中 Go 文件的重复 WASM；构建标签排除的破损源码仍进入隔离候选，原生 `printf` 发现保留。真实 Go 测试先 RED 后 1/1 通过，伪造越界包清单常规回归 1/1 通过，全 32 份候选分批路由 4/4 保持通过，见[Go 原生优先局部验收](../../../tests/acceptance/check-all-native-preferred-go.md)。平台/标签覆盖、其它 31 种 grammar、任务/宿主反馈和发行仍缺，父任务不勾选。
+
+14.4 / 14.17 / 14.19 Ruby 与 Swift 原生差分增量：Ruby 2.6.10 `ruby -c` 和隔离 Ruby worker 的 13 例分类一致，显式原生测试与常规 worker 语料均 1/1 通过；见[Ruby 局部验收](../../../tests/acceptance/ruby-native-differential.md)。Swift 6.4 `swiftc -frontend -parse` 对 13 例中 12 例与 WASM 一致，但缺参数类型的 `func f(_ x: ) {}` 被原生拒绝而 WASM 零恢复，确认为漏检；显式测试 1/1 通过仅表示成功捕获这一差异，不表示语法验收，见[Swift 精度阻塞](../../../tests/acceptance/swift-native-differential.md)。须修 grammar、固定重建产物并以原生对照复验；三项父任务不勾选。

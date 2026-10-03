@@ -529,7 +529,7 @@
       "codegraph_runtime": "web-tree-sitter 0.25.3",
       "codeguard_runtime_validation": "rust_loader_smoke_passed",
       "language_versions": [],
-      "known_limitations": ["Pinned CodeGraph asset; only narrow syntax fixtures; native differential, language and dialect ranges, public lint route, resource budget and release remain unqualified"],
+      "known_limitations": ["Swift 6.4 native parse rejects missing parameter type in `func f(_ x: ) {}` but this WASM emits no recovery; 12/13 narrow differential cases agree; language and dialect ranges, public native-first lint route, resource budget and release remain unqualified"],
       "release_status": "candidate_unvalidated"
     },
     {
@@ -583,7 +583,7 @@
       "codegraph_runtime": "web-tree-sitter 0.25.3",
       "codeguard_runtime_validation": "rust_loader_smoke_passed",
       "language_versions": [],
-      "known_limitations": ["Rust loader and narrow fixtures passed; Ruby language versions, dialect corpus, native differential, isolation and release remain unqualified"],
+      "known_limitations": ["Ruby 2.6.10 native syntax differential agrees on 13 narrow cases; other versions, dialect corpus, systematic precision, native-first lint route and release remain unqualified"],
       "release_status": "candidate_unvalidated"
     },
     {

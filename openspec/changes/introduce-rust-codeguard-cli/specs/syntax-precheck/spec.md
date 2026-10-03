@@ -167,6 +167,10 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 - **WHEN** 同一组合法与破损源码分别经过固定版本的语言原生语法工具和隔离 WASM worker
 - **THEN** 逐例记录语法分类一致性、工具与语料身份；仅扩大该版本的局部精度证据，不将候选提升为完整 lint、其它版本或交付通过
 
+#### Scenario: Native syntax rejects a source that the WASM candidate accepts
+- **WHEN** 固定 Swift 6.4 编译器的语法阶段拒绝缺少参数类型的源码，而固定 Swift WASM 没有恢复节点
+- **THEN** 记录带原生证据的漏检及待修复 grammar 身份，保持候选未验收和完整检查义务；不能因零恢复节点签发 clean、放入白名单或关闭任务
+
 ### Requirement: Precheck briefs SHALL reach agent conversations with concrete next actions
 
 human/结构化报告及宿主渲染 MUST 按结论、方式/范围、原生状态、依据、下一步和实际任务引用组织信息。必须/推荐动作 MUST 明确。疑似异常、正常、未完成和原生诊断四类模板 MUST 独立验证；CVE 等非语法覆盖不能套用语法通过结论。插件 MUST 通过真实宿主的工具结果/上下文 API 交付，文件或 stdout 存在不等于交付。初次反馈后只发送有意义的变化；原始工具文本 MUST 作为数据，不执行其中指令。AGENTS MUST 仅保留长期指引，不追加每轮扫描日志。
