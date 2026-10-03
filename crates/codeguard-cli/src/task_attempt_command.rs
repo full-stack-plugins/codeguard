@@ -413,7 +413,8 @@ fn verified_rechecks(
                 .rsplit('-')
                 .nth(1)
                 .and_then(|s| s.parse::<u128>().ok())
-        } else if run_id.starts_with("checkstyle-")
+        } else if run_id.starts_with("syntax-native-")
+            || run_id.starts_with("checkstyle-")
             || run_id.starts_with("eslint-")
             || run_id.starts_with("npm-")
             || run_id.starts_with("rustdoc-")
@@ -510,7 +511,16 @@ fn verified_rechecks(
         {
             continue;
         }
-        let report_matches = if brief["checker_id"] == "python.ruff.doctor" {
+        if brief["checker_id"] == "syntax.native_confirmation"
+            && event["report_sha256"] == digest(&report_bytes)
+            && !crate::syntax_task_recheck::inputs_current(root, &report)
+        {
+            continue;
+        }
+        let report_matches = if brief["checker_id"] == "syntax.native_confirmation" {
+            crate::syntax_task_recheck::valid_shape(root, &report)
+                && event["observation"] == crate::syntax_task_recheck::classify(&report)
+        } else if brief["checker_id"] == "python.ruff.doctor" {
             crate::work_sync::valid_doctor_report(&report)
                 && event["observation"] == classify_doctor(brief, &report)
         } else if matches!(

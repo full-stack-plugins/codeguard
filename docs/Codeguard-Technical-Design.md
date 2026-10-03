@@ -721,7 +721,7 @@ Source builds now provide native-first edit feedback through `hook execute` / `h
 
 Selected Python discovery observes only source paths and ancestor configuration candidates, without directory enumeration. An unavailable nearest configuration does not silently fall back to a parent. Full filesystem I/O hard deadlines and large-project latency remain unaccepted.
 
-Source edit feedback now imports recovery-bearing pinned WASM candidates into the existing `.codeguard/` workbench. Confirmation identities remain stable per workspace/file/language; Python and JS/TS reuse existing confirmation/preparation identities. Reports bind the grammar, source SHA-256, known limitations and suspected byte positions; imports reject mismatched identities/coordinates and duplicate JSON keys. Task IDs appear only after successful synchronization. Zero-recovery observations create no new mandatory task and cannot close existing tasks. Dialogue includes `task show` / `task verify`; missing native confirmation adapters report an explicit capability gap. Outer Hook feedback is 0.7.0, local feedback is 0.2.0, and generic `next` briefs use 0.2.0 while existing checkers retain 0.1.0. Default plugin Hooks, capability-matched closure and actual-host acceptance remain incomplete.
+Source edit feedback now imports recovery-bearing pinned WASM candidates into the existing `.codeguard/` workbench. Confirmation identities remain stable per workspace/file/language; Python and JS/TS reuse existing confirmation/preparation identities. Reports bind the grammar, source SHA-256, known limitations and suspected byte positions; imports reject mismatched identities/coordinates and duplicate JSON keys. Task IDs appear only after successful synchronization. Zero-recovery observations create no new mandatory task and cannot close existing tasks. Dialogue includes `task show` / `task verify`; missing native confirmation adapters report an explicit capability gap. Outer Hook feedback is 0.7.0, local feedback is 0.2.0, and generic `next` briefs use 0.3.0 while existing checkers retain 0.1.0. Default plugin Hooks, capability-matched closure and actual-host acceptance remain incomplete.
 
 ### Current edit-confirmation feedback example
 
@@ -746,3 +746,46 @@ The following fields are extracted from actual CLI output, rather than a complet
   }
 }
 ```
+
+
+### Native verification of a Zig confirmation task
+
+Source builds can now verify a persisted Zig WASM confirmation task with `codeguard task verify TASK_ID . --zig-tool /absolute/path/to/zig --format=json`. The same explicit tool option is accepted by `hook execute` for `repair_ready`, using the existing lease and finished-attempt binding. `lint zig` can run the native tool without building the optional WASM feature; fallback without that feature reports its absence.
+
+The pinned Zig 0.16.0 probe runs `version` and `ast-check --color off` against the exact source bytes under one deadline. A current native diagnostic changes the brief to source repair; missing tools, unsupported versions and execution failures retain environment/decision guidance. Fresh `next` briefs carry the unchanged tool path in their recheck argv. Changes to source or tool bytes invalidate old diagnostic guidance. Reports and attempts are retained under the existing workbench instead of a second task store.
+
+The native observation is `syntax_task_recheck` 0.1.0, wrapped by `task_verification_preview` 0.12.0. Generic repair briefs are 0.3.0; old 0.2.0 briefs and 0.11.0 verification schemas remain available unchanged. Zero native AST diagnostics are `candidate_absent_unverified_policy`: they end the pending local verification step, but do not close the task or certify project lint, build or delivery. Other generic languages still lack native confirmation adapters. See [the acceptance record](../tests/acceptance/syntax-native-task-verification.md).
+
+The following fields come from an actual Zig recheck, not a complete report; the task ID belongs to a temporary acceptance workspace.
+
+```json
+{
+  "schema_version": "0.12.0",
+  "report_type": "task_verification_preview",
+  "task_id": "CG-B-eb509056a023765826d547a33df030ed",
+  "observation": "still_blocked",
+  "event_persisted": true,
+  "authority": "local_unverified",
+  "delivery_decision": "not_evaluated",
+  "native_scan": {
+    "report_type": "syntax_task_recheck",
+    "input_stable": true,
+    "native": {
+      "diagnostic_count": 1,
+      "diagnostics": [
+        {
+          "column": 19,
+          "line": 1,
+          "rule_id": "zig.ast_check.error"
+        }
+      ],
+      "reason": "ast_check_diagnostics",
+      "status": "diagnostics_observed",
+      "tool_sha256": "71cc3995a7586753ebf82c66dfb8bef43df446517550678781834586a960f8c9",
+      "version": "0.16.0"
+    }
+  }
+}
+```
+
+Briefs also expose the latest native report reference/digest and current diagnostic positions; stale inputs suppress those positions. Only immutable grammars compiled into the binary reuse validated asset identities within a process; external manifests, source and native tools still require current-byte checks.

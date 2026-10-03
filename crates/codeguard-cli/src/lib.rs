@@ -209,7 +209,7 @@ mod whitelist_correction_projection;
 pub mod work_sync;
 pub mod workspace_refresh;
 pub mod workspace_view_command;
-#[cfg(all(feature = "wasm-precheck", unix))]
+#[cfg(unix)]
 pub mod zig_lint_command;
 
 mod cargo_module_graph;
@@ -257,3 +257,11 @@ mod npm_check_scan;
 
 #[cfg(unix)]
 mod syntax_confirmation;
+
+#[cfg(unix)]
+mod syntax_task_recheck;
+#[cfg(unix)]
+mod zig_syntax_probe;
+
+#[cfg(unix)]
+mod plain_syntax_source;

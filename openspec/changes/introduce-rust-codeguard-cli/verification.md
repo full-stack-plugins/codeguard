@@ -2109,3 +2109,12 @@ Python 选中文件检查不再通过全项目元数据 walk 发现配置；只�
 - `/tmp/codeguard-syntax-tasks-native-ruff.log`：SHA-256 `9686456c76b74e43de38dfbb0718b0085f6d151a319d7db4609a19d943da7fd6`。
 
 代码审阅、WASM 特性全目标 Clippy -D warnings、fmt、crate 分层、OpenSpec strict 和 git diff --check 通过。上一提交 911aa47 的 CI 37133517765 已成功；当前变更远端 CI 必须按新提交另行核验。默认插件、真实安装宿主自动触发、全语言原生确认和可信关闭、完整 I/O 硬预算/性能/误报评测仍缺，11.17、14.9–14.11 及总体目标不勾选。此次未发布 npm 或修改插件锁。
+
+
+## 2026-10-04 Zig 确认任务原生复检与完整局部回归
+
+当前工作树将通用 WASM 确认任务的 Zig 原生 AST 复检接入既有租约、稳定任务和尝试历史。next 0.3.0 提供当前诊断位置、报告引用/摘要和可复用工具 argv；repair_ready 接受显式 Zig 工具，错误、环境/版本失败和输入变化分开投影。原生零诊断仍记录 candidate_absent_unverified_policy，不能关闭任务或签发 allow。原生 lint zig 路径不依赖 WASM 特性。固定内置 grammar 校验结果仅作进程内不可变资产复用，不缓存项目检查结果，也不省略外部字节验证。
+
+验收：[原生确认与任务证据](../../../tests/acceptance/syntax-native-task-verification.md)。相关特性九组 83 passed/0 failed/14 ignored；明确运行真实 Zig 对照 1 passed；资产反例 11 passed。默认工作区最终顺序运行 1113 passed/0 failed/105 ignored、201 组；早先默认/特性并发构建干扰报告版本的失败记录保留，不计作通过。实际默认构建能够复检特性版生成的任务。172 个 schema 元定义、实际 CLI 输出及四项伪造负例通过，历史 schema 两份逐字节保留；Clippy -D warnings、fmt、分层、OpenSpec strict 与 diff 检查通过。最新简报证据/预算保护回归 14 passed/0 failed/1 ignored，见 /tmp/codeguard-native-syntax-last-guard.log；当前全目标特性 Clippy -D warnings 再次通过。
+
+上一提交 e506319 的 CI 37136788881 已成功；本轮新提交需按新 SHA 等待 CI。默认插件、其它通用原生 adapter、真实宿主、正式关闭/复发重开和全语言低误报评测仍缺，S09/S11/S14 父任务保持未完成；未发布新的 npm 制品或修改插件锁。

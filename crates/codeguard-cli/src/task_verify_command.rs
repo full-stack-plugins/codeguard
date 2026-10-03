@@ -34,6 +34,7 @@ struct Arguments {
     npm_options: std::collections::BTreeMap<String, String>,
     root: PathBuf,
     ruff_tool: Option<PathBuf>,
+    zig_tool: Option<PathBuf>,
     cargo_tool: Option<PathBuf>,
     cargo_audit_tool: Option<PathBuf>,
     rustsec_db: Option<PathBuf>,
@@ -85,8 +86,10 @@ pub fn run(args: &[String]) -> ExitCode {
         Ok(brief) => brief,
         Err(reason) => return print_unavailable(&parsed, reason),
     };
-    if brief["checker_id"] == "syntax.native_confirmation" {
-        return print_unavailable(&parsed, "native_syntax_confirmation_adapter_unavailable");
+    let syntax_task = brief["checker_id"] == "syntax.native_confirmation";
+    if parsed.zig_tool.is_some() && !syntax_task {
+        eprintln!("--zig-tool 仅用于对应的原生语法确认任务");
+        return ExitCode::from(2);
     }
     let npm_task = brief["checker_id"] == "node.npm.audit";
     if !npm_task && !parsed.npm_options.is_empty() {
@@ -185,7 +188,15 @@ pub fn run(args: &[String]) -> ExitCode {
     } else {
         None
     };
-    let mut scan = if npm_task {
+    let mut scan = if syntax_task {
+        match crate::syntax_task_recheck::run(&root, &brief, parsed.zig_tool.as_deref(), deadline) {
+            Ok(report) => report,
+            Err(reason) => {
+                let release = finish_verification(&root, &parsed.task_id, &lease);
+                return print_unavailable(&parsed, release.err().unwrap_or(reason));
+            }
+        }
+    } else if npm_task {
         let mut options = parsed.npm_options.clone();
         options.extend(parsed.eslint_options.clone());
         match crate::npm_task_recheck::run(&root, &brief, &options, deadline) {
@@ -519,7 +530,9 @@ pub fn run(args: &[String]) -> ExitCode {
     let outcome = if Instant::now() >= deadline || scan["task_input_stable"] == false {
         "incomplete"
     } else {
-        if npm_task {
+        if syntax_task {
+            crate::syntax_task_recheck::classify(&scan)
+        } else if npm_task {
             crate::npm_task_recheck::classify(&root, &brief, &scan)
         } else if eslint_task {
             crate::eslint_task_recheck::classify(&brief, &scan)
@@ -559,6 +572,14 @@ pub fn run(args: &[String]) -> ExitCode {
         "execution_budget":budget_record(parsed.timeout_ms, parsed.timeout_source),
         "next_actions":["inspect_native_recheck_and_policy_before_closure"]
     });
+    if syntax_task {
+        report["schema_version"] = json!("0.12.0");
+        report["next_actions"] = json!([
+            "inspect_native_syntax_observation",
+            "repair_only_current_native_diagnostics",
+            "verify_policy_and_capability_before_closure"
+        ]);
+    }
     if npm_task {
         report["next_actions"] = json!([
             "inspect_npm_native_diagnostic",
@@ -585,7 +606,10 @@ pub fn run(args: &[String]) -> ExitCode {
         match lock_verification(&root, &parsed.task_id, &lease) {
             Ok(_guard) => match latest_ready_attempt(&root, &parsed.task_id) {
                 Ok(current) if current == bound_attempt => {
-                    if (npm_task && !crate::npm_task_recheck::inputs_current(&root, &scan))
+                    if (syntax_task
+                        && scan["input_stable"] == true
+                        && !crate::syntax_task_recheck::inputs_current(&root, &scan))
+                        || (npm_task && !crate::npm_task_recheck::inputs_current(&root, &scan))
                         || (brief["checker_id"] == "rust.cargo_check"
                             && scan["input_stable"] == true
                             && !crate::rust_build_task_recheck::inputs_current(&root, &scan))
@@ -621,7 +645,11 @@ pub fn run(args: &[String]) -> ExitCode {
     if let Err(reason) = persist {
         if reason == "source_changed_before_verification_record" {
             report["observation"] = json!("incomplete");
-            report["native_scan"]["task_input_stable"] = json!(false);
+            report["native_scan"][if syntax_task {
+                "input_stable"
+            } else {
+                "task_input_stable"
+            }] = json!(false);
         }
         report["reason"] = json!(reason);
     } else {
@@ -669,6 +697,27 @@ pub fn run(args: &[String]) -> ExitCode {
         }
         if !report["reason"].is_null() {
             println!("记录原因：{}", report["reason"]);
+        }
+        if syntax_task {
+            println!(
+                "原生语法说明：{}；报告引用：.codeguard/reports/{}.json",
+                report["native_scan"]["native"]["reason"],
+                report["native_scan"]["run_id"]
+                    .as_str()
+                    .unwrap_or("unknown")
+            );
+            if report["native_scan"]["input_stable"] == true {
+                for position in report["native_scan"]["native"]["diagnostics"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                {
+                    println!(
+                        "原生规则 {}；行 {}，字节列 {}",
+                        position["rule_id"], position["line"], position["column"]
+                    );
+                }
+            }
         }
         if npm_task {
             println!(
@@ -1236,6 +1285,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
     let mut eslint_options = std::collections::BTreeMap::new();
     let mut npm_options = std::collections::BTreeMap::new();
     let mut ruff_tool = None;
+    let mut zig_tool = None;
     let mut cargo_tool = None;
     let mut cargo_audit_tool = None;
     let mut rustsec_db = None;
@@ -1272,6 +1322,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                 | "--cwd"
                 | "--format"
                 | "--ruff-tool"
+                | "--zig-tool"
                 | "--cargo-tool"
                 | "--cargo-audit-tool"
                 | "--rustsec-db"
@@ -1305,6 +1356,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                     timeout_seen = true;
                 }
                 "--ruff-tool" if ruff_tool.replace(PathBuf::from(value)).is_none() => {}
+                "--zig-tool" if zig_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--cargo-tool" if cargo_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--cargo-audit-tool"
                     if cargo_audit_tool.replace(PathBuf::from(value)).is_none() => {}
@@ -1334,6 +1386,9 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
             root = Some(PathBuf::from(arg));
         }
         index += 1;
+    }
+    if zig_tool.as_ref().is_some_and(|tool| !tool.is_absolute()) {
+        return Err("--zig-tool 必须是绝对路径".into());
     }
     if ruff_tool.as_ref().is_some_and(|tool| !tool.is_absolute()) {
         return Err("--ruff-tool 必须是绝对路径".into());
@@ -1412,6 +1467,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
         npm_options,
         root: root.unwrap_or_else(|| PathBuf::from(".")),
         ruff_tool,
+        zig_tool,
         cargo_tool,
         cargo_audit_tool,
         rustsec_db,

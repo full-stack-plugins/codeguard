@@ -460,7 +460,11 @@ fn import_one(
     }
     if matches!(
         value["report_type"].as_str(),
-        Some("python_syntax_confirmation_observation" | "syntax_confirmation_observation")
+        Some(
+            "python_syntax_confirmation_observation"
+                | "syntax_confirmation_observation"
+                | "syntax_task_recheck"
+        )
     ) {
         codeguard_adapters::parse_unique_json(&bytes)
             .map_err(|_| "python_syntax_confirmation_duplicate_or_invalid_json")?;
@@ -481,6 +485,7 @@ fn import_one(
                 | "python_cve_workbench_observation"
                 | "python_syntax_confirmation_observation"
                 | "syntax_confirmation_observation"
+                | "syntax_task_recheck"
         )
     ) {
         let run = value["run_id"]
@@ -563,6 +568,25 @@ fn parse_report(
     report: &Value,
     digest: String,
 ) -> Result<ReportInput, &'static str> {
+    if report["report_type"] == "syntax_task_recheck" {
+        if !crate::syntax_task_recheck::valid_shape(root, report)
+            || report["workspace_id"] != workspace_id
+        {
+            return Err("syntax_task_recheck_invalid");
+        }
+        let run = report["run_id"].as_str().ok_or("report_run_id_invalid")?;
+        if path.file_stem().and_then(|p| p.to_str()) != Some(run) {
+            return Err("report_run_id_invalid");
+        }
+        return Ok(ReportInput {
+            workspace_id: workspace_id.into(),
+            run_id: run.into(),
+            digest,
+            findings: Vec::new(),
+            blockers: Vec::new(),
+            historical_findings: 0,
+        });
+    }
     if report["report_type"] == "syntax_confirmation_observation" {
         return syntax_confirmation_report::parse(root, workspace_id, path, report, digest);
     }

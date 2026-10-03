@@ -390,6 +390,7 @@ fn verify_option_matches_checker(key: &str, checker_id: &str) -> bool {
         ),
         "python.pip_audit" => matches!(key, "--pip-audit-tool" | "--pip-audit-version"),
         "go.vet" => key == "--go-tool",
+        "syntax.native_confirmation" => key == "--zig-tool",
         "rust.cargo_clippy" | "rust.cargo_check" | "rust.cargo_rustdoc" => key == "--cargo-tool",
         "rust.cargo_audit" => matches!(key, "--cargo-audit-tool" | "--rustsec-db"),
         "java.checkstyle" | "java.checkstyle.preparation" => {
@@ -545,6 +546,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
             | "--pip-audit-tool"
             | "--pip-audit-version"
             | "--go-tool"
+            | "--zig-tool"
             | "--maven-tool"
             | "--java-home"
             | "--java-tool"
@@ -574,6 +576,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                         | "--rustsec-db"
                         | "--pip-audit-tool"
                         | "--go-tool"
+                        | "--zig-tool"
                         | "--maven-tool"
                         | "--java-home"
                         | "--java-tool"

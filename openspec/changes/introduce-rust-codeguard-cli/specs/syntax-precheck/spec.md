@@ -240,6 +240,15 @@ human/结构化报告及宿主渲染 MUST 按结论、方式/范围、原生状�
 - **WHEN** 该检查器不能确认疑似语法所需能力
 - **THEN** 不关闭任务、不判 grammar 误报，指出所需的适用确认工具
 
+#### Scenario: A Zig confirmation task replays the native AST checker
+- **WHEN** task verify receives an explicit applicable Zig 0.16.0 tool for a recorded Zig candidate scope
+- **THEN** feed the current bounded source bytes to native ast-check under the existing task lease and deadline, bind the source/tool identities, and retain the observation and attempt association
+- **AND** distinguish native diagnostics, zero diagnostics, unavailable tools and changed inputs; zero diagnostics alone cannot grant formal resolution or project delivery
+
+#### Scenario: A native syntax confirmation observation becomes stale
+- **WHEN** the source or tool changes after a recorded native syntax observation
+- **THEN** next and task show require a fresh native confirmation and preserve historical evidence; they cannot recommend a stale source repair or pretend the old zero-diagnostic observation still applies
+
 #### Scenario: Native syntax confirmation contradicts the parser
 - **WHEN** 当前同输入、范围和方言的适用原生检查完整正常
 - **THEN** 记录限定范围反证和解析器误报调查；不自动扩大白名单
@@ -247,6 +256,10 @@ human/结构化报告及宿主渲染 MUST 按结论、方式/范围、原生状�
 #### Scenario: Source changes or task files are removed
 - **WHEN** 复检前输入变化或智能体删除/勾选任务文件
 - **THEN** 旧观察不作为当前关闭依据，真实检查义务不因任务文件操作消失
+
+#### Scenario: The agent repeats native confirmation through repair-ready feedback
+- **WHEN** 已初始化任务的 Zig 原生观察已记录可用工具路径，智能体修复后触发 repair_ready
+- **THEN** next MUST 提供可复用的 task verify argv，Hook MUST 接受同任务的显式 Zig 工具并复用原有租约、尝试和共享截止时间；错误语言、陈旧字节或工具身份不得使旧诊断成为当前修复依据
 
 ### Requirement: Grammar false-positive dispositions SHALL be precise and preserve native obligations
 
@@ -263,6 +276,8 @@ human/结构化报告及宿主渲染 MUST 按结论、方式/范围、原生状�
 ### Requirement: Syntax caches SHALL bind inputs and retain historical observations on invalidation
 
 缓存 MUST 绑定源码字节、语言/方言画像、grammar/runtime、规则/查询版本及相关范围/配置身份。部分结果、取消、未支持范围 MUST NOT 作为 clean 重用。资产更新/回滚须核对版本清单并使相关缓存与处置失效；删除缓存不能删除问题历史或签发解决。相同 mtime/大小不构成身份相同。
+
+编译入同一二进制的不可变清单、WASM 与许可证 MAY 在进程内复用已经完整核验的资产结果；外部清单、源码、配置与原生工具 MUST NOT 因此省略当前身份复核，此资产复用不得作为检查结果或完整覆盖缓存。
 
 #### Scenario: Source changes without mtime or size change
 - **WHEN** 源码字节不同但时间和大小相同

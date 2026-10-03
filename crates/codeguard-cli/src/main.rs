@@ -171,17 +171,8 @@ fn main() -> ExitCode {
         [command, rest @ ..] if command == "lint" => {
             if rest.first().is_some_and(|language| language == "java") {
                 codeguard_cli::java_lint_dispatch::run(&rest[1..])
-            } else if cfg!(feature = "wasm-precheck")
-                && rest.first().is_some_and(|language| language == "zig")
-            {
-                #[cfg(feature = "wasm-precheck")]
-                {
-                    codeguard_cli::zig_lint_command::run(&rest[1..])
-                }
-                #[cfg(not(feature = "wasm-precheck"))]
-                {
-                    ExitCode::from(2)
-                }
+            } else if rest.first().is_some_and(|language| language == "zig") {
+                codeguard_cli::zig_lint_command::run(&rest[1..])
             } else if rest
                 .first()
                 .is_some_and(|language| language == "typescript")

@@ -1,14 +1,13 @@
 //! Zig 0.16 单文件原生 AST 检查优先；缺少可核对工具时才作候选 WASM 初检。
 
-use crate::grammar_probe_command::read_plain_source;
+use crate::plain_syntax_source::read_plain_source;
+#[cfg(feature = "wasm-precheck")]
 use crate::syntax_worker_runner::run_syntax_worker_candidate;
-use codeguard_runtime::{ProcessSpec, Termination, read_bounded_regular_file, run_process};
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
-use std::collections::BTreeMap;
-use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
+#[cfg(feature = "wasm-precheck")]
 use std::sync::atomic::AtomicBool;
 use std::time::{Duration, Instant};
 
@@ -78,146 +77,60 @@ pub fn run(args: &[String]) -> ExitCode {
             report["native"]["reason"] = json!("zig_tool_unavailable_or_untrusted");
         }
     }
-    let name = args
-        .source
-        .file_name()
-        .and_then(|name| name.to_str())
-        .unwrap_or("source.zig");
-    match std::env::current_exe() {
-        Ok(executable) => match run_syntax_worker_candidate(
-            &executable,
-            "zig",
-            name,
-            &source,
-            deadline,
-            &AtomicBool::new(false),
-        ) {
-            Ok(observation) => {
-                report["syntax_precheck"] = json!({
-                    "status":"incomplete",
-                    "grammar_qualified":false,
-                    "grammar_sha256":observation.grammar_sha256,
-                    "precheck":observation.precheck,
-                    "recoveries":observation.recoveries
-                });
-                report["next_action"] = json!(if report["syntax_precheck"]["recoveries"]
-                    .as_array()
-                    .is_some_and(|items| !items.is_empty())
-                {
-                    "先用匹配 Zig 版本的原生语法检查确认疑似位置；不要仅凭 WASM 修改源码或关闭任务"
-                } else {
-                    "候选语法初检未见恢复节点；仍需配置并运行原生 Zig 检查"
-                });
+    #[cfg(feature = "wasm-precheck")]
+    {
+        let name = args
+            .source
+            .file_name()
+            .and_then(|name| name.to_str())
+            .unwrap_or("source.zig");
+        match std::env::current_exe() {
+            Ok(executable) => match run_syntax_worker_candidate(
+                &executable,
+                "zig",
+                name,
+                &source,
+                deadline,
+                &AtomicBool::new(false),
+            ) {
+                Ok(observation) => {
+                    report["syntax_precheck"] = json!({
+                        "status":"incomplete",
+                        "grammar_qualified":false,
+                        "grammar_sha256":observation.grammar_sha256,
+                        "precheck":observation.precheck,
+                        "recoveries":observation.recoveries
+                    });
+                    report["next_action"] = json!(if report["syntax_precheck"]["recoveries"]
+                        .as_array()
+                        .is_some_and(|items| !items.is_empty())
+                    {
+                        "先用匹配 Zig 版本的原生语法检查确认疑似位置；不要仅凭 WASM 修改源码或关闭任务"
+                    } else {
+                        "候选语法初检未见恢复节点；仍需配置并运行原生 Zig 检查"
+                    });
+                }
+                Err(reason) => {
+                    report["syntax_precheck"] = json!({"status":"incomplete","reason":reason});
+                }
+            },
+            Err(_) => {
+                report["syntax_precheck"] =
+                    json!({"status":"incomplete","reason":"worker_executable_unavailable"});
             }
-            Err(reason) => {
-                report["syntax_precheck"] = json!({"status":"incomplete","reason":reason});
-            }
-        },
-        Err(_) => {
-            report["syntax_precheck"] =
-                json!({"status":"incomplete","reason":"worker_executable_unavailable"});
         }
+    }
+    #[cfg(not(feature = "wasm-precheck"))]
+    {
+        report["syntax_precheck"] =
+            json!({"status":"incomplete","reason":"wasm_feature_not_built"});
     }
     emit(&report, args.json);
     ExitCode::from(3)
 }
 
 fn observe_native(tool: &Path, source: &[u8], deadline: Instant) -> Option<Value> {
-    if !tool.is_absolute() {
-        return None;
-    }
-    let executable = tool.canonicalize().ok()?;
-    if !executable.is_file() {
-        return None;
-    }
-    let tool_sha256 = format!(
-        "{:x}",
-        Sha256::digest(read_bounded_regular_file(&executable, 64 * 1024 * 1024).ok()?)
-    );
-    let cancelled = AtomicBool::new(false);
-    let version = run_process(
-        &ProcessSpec {
-            executable: executable.clone(),
-            args: vec![OsString::from("version")],
-            cwd: std::env::current_dir().ok()?,
-            env: BTreeMap::new(),
-            stdin: None,
-            deadline,
-            output_limit_bytes: 1024,
-        },
-        &cancelled,
-    );
-    if version.termination != Termination::Exited(0)
-        || std::str::from_utf8(&version.stdout).ok()?.trim() != "0.16.0"
-    {
-        return Some(
-            json!({"status":"incomplete","reason":"zig_version_unverified_or_unsupported","version":null,"tool_sha256":tool_sha256,"diagnostics":[]}),
-        );
-    }
-    let outcome = run_process(
-        &ProcessSpec {
-            executable: executable.clone(),
-            args: vec![
-                OsString::from("ast-check"),
-                OsString::from("--color"),
-                OsString::from("off"),
-            ],
-            cwd: std::env::current_dir().ok()?,
-            env: BTreeMap::new(),
-            stdin: Some(source.to_vec()),
-            deadline,
-            output_limit_bytes: 64 * 1024,
-        },
-        &cancelled,
-    );
-    let current_tool_sha256 = read_bounded_regular_file(&executable, 64 * 1024 * 1024)
-        .ok()
-        .map(|bytes| format!("{:x}", Sha256::digest(bytes)));
-    if current_tool_sha256.as_deref() != Some(tool_sha256.as_str()) {
-        return Some(
-            json!({"status":"incomplete","reason":"zig_tool_changed_during_check","version":"0.16.0","tool_sha256":tool_sha256,"diagnostics":[]}),
-        );
-    }
-    let diagnostics = parse_diagnostic_positions(&outcome.stderr);
-    Some(json!({
-        "status":match outcome.termination {
-            Termination::Exited(0) if outcome.stderr.is_empty() => "completed",
-            Termination::Exited(1) if !diagnostics.is_empty() => "diagnostics_observed",
-            _ => "incomplete",
-        },
-        "reason":match outcome.termination {
-            Termination::Exited(0) if outcome.stderr.is_empty() => "ast_check_no_diagnostics",
-            Termination::Exited(1) if !diagnostics.is_empty() => "ast_check_diagnostics",
-            _ => "zig_ast_check_incomplete",
-        },
-        "version":"0.16.0",
-        "tool_sha256":tool_sha256,
-        "diagnostic_count":diagnostics.len(),
-        "diagnostics":diagnostics
-    }))
-}
-
-fn parse_diagnostic_positions(raw: &[u8]) -> Vec<Value> {
-    let Ok(text) = std::str::from_utf8(raw) else {
-        return Vec::new();
-    };
-    text.lines()
-        .filter_map(|line| {
-            let rest = line.strip_prefix("<stdin>:")?;
-            let (row, rest) = rest.split_once(':')?;
-            let (column, rest) = rest.split_once(':')?;
-            if !rest.trim_start().starts_with("error:") {
-                return None;
-            }
-            let row = row.parse::<u32>().ok()?;
-            let column = column.parse::<u32>().ok()?;
-            if row == 0 || column == 0 {
-                return None;
-            }
-            Some(json!({"line":row,"column":column,"rule_id":"zig.ast_check.error"}))
-        })
-        .take(32)
-        .collect()
+    crate::zig_syntax_probe::observe(tool, source, &std::env::current_dir().ok()?, deadline)
 }
 
 fn parse_args(args: &[String]) -> Result<Args, &'static str> {

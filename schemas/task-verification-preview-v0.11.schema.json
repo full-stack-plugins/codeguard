@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:codeguard:schema:task-verification-preview:0.12.0",
+  "$id": "urn:codeguard:schema:task-verification-preview:0.11.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -28,8 +28,7 @@
         "0.8.0",
         "0.9.0",
         "0.10.0",
-        "0.11.0",
-        "0.12.0"
+        "0.11.0"
       ]
     },
     "execution_budget": {
@@ -980,9 +979,6 @@
         },
         {
           "$ref": "rust-cve-workbench-observation.schema.json"
-        },
-        {
-          "$ref": "syntax-task-recheck.schema.json"
         }
       ]
     },
@@ -1720,30 +1716,6 @@
     {
       "if": {"properties": {"native_scan": {"type": "object", "properties": {"report_type": {"const": "python_cve_workbench_observation"}}, "required": ["report_type"]}}},
       "then": {"properties": {"schema_version": {"const": "0.11.0"}}}
-    },
-    {
-      "if": {
-        "properties": {
-          "native_scan": {
-            "type": "object",
-            "properties": {
-              "report_type": {
-                "const": "syntax_task_recheck"
-              }
-            },
-            "required": [
-              "report_type"
-            ]
-          }
-        }
-      },
-      "then": {
-        "properties": {
-          "schema_version": {
-            "const": "0.12.0"
-          }
-        }
-      }
     }
   ]
 }

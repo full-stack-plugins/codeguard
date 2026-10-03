@@ -1132,3 +1132,8 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 14.4 / 14.17 / 14.19 Erlang OTP 28 原生差分：8 份合法、5 份故意破损源码经本机 `erlc` 独立确认；固定 Erlang WASM 隔离 worker 对 13 例有 12 例分类一致、0 例未解析。缺少函数最终句点的源码被原生拒绝，WASM 零恢复，确认漏检。常规候选语料及显式原生差分目标测试各 1/1 通过；清单已知限制与 Linux CI 候选测试同步。需修 grammar、扩展版本/方言语料及完成原生优先统一命令和发行验收，父任务不勾选；见[局部证据](../../../tests/acceptance/erlang-native-differential.md)。
 
 2026-10-04 S11.17 / S14.9 / S14.10 接线增量：编辑候选恢复按文件/语言导入既有工作台，Python/ESLint 复用旧身份，其他语言有通用原生确认任务与明确 adapter 缺口。完整零恢复只推荐安装，不新增必需任务，也不关闭旧任务。指定 Python 发现不再遍历旁支；最近链接配置保留 unknown。对应 `hook_syntax_tasks`、`python_selected_discovery` 和更新后的[局部验收](../../../tests/acceptance/hook-fast-native-wasm.md)。能力匹配关闭、全部原生适配、失败尝试完整闭环、默认插件和实际宿主仍缺，父任务保持未完成。
+
+
+## 2026-10-04 Zig 原生确认与修复事件接线（进行中）
+
+对应 9.9–9.14、11.17、14.10–14.11：已将通用确认任务的 Zig 原生复检接入既有租约、报告、消费标记和尝试历史，next 携带可复用工具 argv，repair_ready 接受显式 Zig 工具；原生诊断指导源码修复，环境失败保持未完成，源码/工具变化使指引失效。原生零诊断仍待正式策略与覆盖核验，不关闭任务。其它通用语言 adapter、正式关闭/复发重开及真实宿主验收仍缺，不勾选父任务。见[验收记录](../../../tests/acceptance/syntax-native-task-verification.md)。

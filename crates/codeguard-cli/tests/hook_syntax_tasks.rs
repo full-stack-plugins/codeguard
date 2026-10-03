@@ -132,7 +132,7 @@ fn recovery_tasks_are_stable_and_clean_candidates_cannot_close_them() {
     assert_eq!(o.status.code(), Some(3));
     let verify: Value = serde_json::from_slice(&o.stdout).unwrap();
     assert_eq!(
-        verify["reason"], "native_syntax_confirmation_adapter_unavailable",
+        verify["native_scan"]["native"]["reason"], "explicit_zig_tool_not_provided",
         "{verify}"
     );
 }

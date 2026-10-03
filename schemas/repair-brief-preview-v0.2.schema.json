@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:codeguard:schema:repair-brief-preview:0.3.0",
+  "$id": "urn:codeguard:schema:repair-brief-preview:0.2.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -18,11 +18,7 @@
   ],
   "properties": {
     "schema_version": {
-      "enum": [
-        "0.1.0",
-        "0.2.0",
-        "0.3.0"
-      ]
+      "enum": ["0.1.0", "0.2.0"]
     },
     "report_type": {
       "const": "repair_brief_preview"
@@ -69,10 +65,7 @@
         {
           "$ref": "#/$defs/python_cve_brief"
         },
-        {"$ref":"#/$defs/syntax_brief"},
-        {
-          "$ref": "#/$defs/syntax_recheck_brief"
-        }
+        {"$ref":"#/$defs/syntax_brief"}
       ]
     },
     "next_actions": {
@@ -649,216 +642,11 @@
           ]
         }
       }
-    },
-    "syntax_recheck_brief": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "schema_version",
-        "task_id",
-        "kind",
-        "checker_id",
-        "evidence_ref",
-        "recheck_argv",
-        "history",
-        "action_id",
-        "authority",
-        "closure_condition",
-        "scope",
-        "build_root",
-        "affected_paths",
-        "reason_code",
-        "constraints",
-        "step",
-        "disposition"
-      ],
-      "properties": {
-        "schema_version": {
-          "const": "0.3.0"
-        },
-        "task_id": {
-          "type": "string",
-          "pattern": "^CG-B-[0-9a-f]{32}$"
-        },
-        "kind": {
-          "const": "blocker"
-        },
-        "checker_id": {
-          "const": "syntax.native_confirmation"
-        },
-        "evidence_ref": {
-          "$ref": "#/$defs/evidence"
-        },
-        "recheck_argv": {
-          "oneOf": [
-            {
-              "type": "array",
-              "prefixItems": [
-                {
-                  "const": "codeguard"
-                },
-                {
-                  "const": "task"
-                },
-                {
-                  "const": "verify"
-                },
-                {
-                  "type": "string",
-                  "pattern": "^CG-B-[0-9a-f]{32}$"
-                },
-                {
-                  "const": "."
-                },
-                {
-                  "const": "--format"
-                },
-                {
-                  "const": "json"
-                }
-              ],
-              "items": false,
-              "minItems": 7
-            },
-            {
-              "type": "array",
-              "prefixItems": [
-                {
-                  "const": "codeguard"
-                },
-                {
-                  "const": "task"
-                },
-                {
-                  "const": "verify"
-                },
-                {
-                  "type": "string",
-                  "pattern": "^CG-B-[0-9a-f]{32}$"
-                },
-                {
-                  "const": "."
-                },
-                {
-                  "const": "--format"
-                },
-                {
-                  "const": "json"
-                },
-                {
-                  "const": "--zig-tool"
-                },
-                {
-                  "type": "string",
-                  "pattern": "^/",
-                  "minLength": 2
-                }
-              ],
-              "items": false,
-              "minItems": 9
-            }
-          ]
-        },
-        "history": {
-          "type": [
-            "string",
-            "object"
-          ]
-        },
-        "action_id": {
-          "enum": [
-            "restore-checker-environment",
-            "repair-source"
-          ]
-        },
-        "authority": {
-          "const": "local_unverified"
-        },
-        "closure_condition": {
-          "type": "string",
-          "minLength": 1
-        },
-        "scope": {
-          "type": "string",
-          "minLength": 1
-        },
-        "build_root": {
-          "const": "."
-        },
-        "affected_paths": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 1,
-          "items": {
-            "type": "string"
-          }
-        },
-        "reason_code": {
-          "const": "native_syntax_confirmation_needed"
-        },
-        "constraints": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "step": {
-          "type": "string",
-          "minLength": 1
-        },
-        "disposition": {
-          "enum": [
-            "needs_decision",
-            "verification_required",
-            "waiting",
-            "actionable"
-          ]
-        },
-        "native_confirmation_status": {
-          "enum": [
-            "stale",
-            "diagnostics_observed",
-            "completed",
-            "not_run",
-            "incomplete"
-          ]
-        },
-        "native_confirmation_ref": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "run_id",
-            "report_ref",
-            "report_sha256"
-          ],
-          "properties": {
-            "run_id": {
-              "type": "string",
-              "pattern": "^syntax-native-[0-9]+-[0-9]+$"
-            },
-            "report_ref": {
-              "type": "string",
-              "pattern": "^\\.codeguard/reports/syntax-native-[0-9]+-[0-9]+\\.json$"
-            },
-            "report_sha256": {
-              "type": "string",
-              "pattern": "^[0-9a-f]{64}$"
-            }
-          }
-        },
-        "native_diagnostic_positions": {
-          "type": "array",
-          "maxItems": 32,
-          "items": {
-            "$ref": "syntax-task-recheck.schema.json#/$defs/diagnostic"
-          }
-        }
-      }
     }
   },
   "allOf": [
-    {
-      "if": {
+  {
+    "if": {
       "properties": {
         "repair_brief": {
           "type": "object",
@@ -876,85 +664,20 @@
         "repair_brief"
       ]
     },
-      "then": {
-        "properties": {
-          "schema_version": {
-            "enum": [
-              "0.2.0",
-              "0.3.0"
-            ]
-          }
+    "then": {
+      "properties": {
+        "schema_version": {
+          "const": "0.2.0"
         }
-      },
-      "else": {
+      }
+    },
+    "else": {
       "properties": {
         "schema_version": {
           "const": "0.1.0"
         }
       }
     }
-    },
-    {
-      "if": {
-        "properties": {
-          "repair_brief": {
-            "type": "object",
-            "properties": {
-              "checker_id": {
-                "const": "syntax.native_confirmation"
-              },
-              "schema_version": {
-                "const": "0.2.0"
-              }
-            },
-            "required": [
-              "checker_id",
-              "schema_version"
-            ]
-          }
-        },
-        "required": [
-          "repair_brief"
-        ]
-      },
-      "then": {
-        "properties": {
-          "schema_version": {
-            "const": "0.2.0"
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "repair_brief": {
-            "type": "object",
-            "properties": {
-              "checker_id": {
-                "const": "syntax.native_confirmation"
-              },
-              "schema_version": {
-                "const": "0.3.0"
-              }
-            },
-            "required": [
-              "checker_id",
-              "schema_version"
-            ]
-          }
-        },
-        "required": [
-          "repair_brief"
-        ]
-      },
-      "then": {
-        "properties": {
-          "schema_version": {
-            "const": "0.3.0"
-          }
-        }
-      }
-    }
-  ]
+  }
+]
 }

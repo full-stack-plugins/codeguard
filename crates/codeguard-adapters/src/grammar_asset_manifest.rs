@@ -3,6 +3,7 @@
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
 use std::collections::BTreeSet;
+use std::sync::OnceLock;
 
 const CODEGRAPH_COMMIT: &str = "1072f82ce24db3d133258d30165cef6b74d108b2";
 const CODEGRAPH_LICENSE_SHA256: &str =
@@ -109,6 +110,12 @@ pub struct GrammarAsset {
 
 /// 读取仓内固定清单，并检查来源、许可证及候选资产字节。
 pub fn bundled_grammar_candidates() -> Result<GrammarAssetManifest, String> {
+    // include_bytes! 的资产在进程生命周期内不可变；缓存不包含项目或外部工具观察。
+    static VERIFIED: OnceLock<Result<GrammarAssetManifest, String>> = OnceLock::new();
+    VERIFIED.get_or_init(verify_bundled_candidates).clone()
+}
+
+fn verify_bundled_candidates() -> Result<GrammarAssetManifest, String> {
     let manifest = parse_grammar_asset_manifest(include_bytes!("../../../grammars/manifest.json"))?;
     verify_codegraph_license()?;
     verify_dependency_license(&manifest)?;

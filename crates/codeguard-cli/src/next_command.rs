@@ -490,7 +490,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         json!(["codeguard", "lint", "python", "."])
     };
     let mut brief = json!({
-        "schema_version":if checker_id == "syntax.native_confirmation" {"0.2.0"} else {"0.1.0"}, "task_id":id, "kind":kind,
+        "schema_version":if checker_id == "syntax.native_confirmation" {"0.3.0"} else {"0.1.0"}, "task_id":id, "kind":kind,
         "checker_id":checker_id, "evidence_ref":{
             "first_run_id":first_run, "first_report_sha256":report_sha
         },
@@ -782,7 +782,11 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             priority = 2;
         }
     }
-    let verification_observation = latest_verification_observation(root, id, fact, &brief)?;
+    let verification_observation = if checker_id == "syntax.native_confirmation" {
+        None
+    } else {
+        latest_verification_observation(root, id, fact, &brief)?
+    };
     if let Some(observation) = verification_observation.as_ref() {
         let outcome = observation.outcome.as_str();
         brief["verification_run_id"] = json!(observation.run_id);
@@ -1098,6 +1102,29 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             0
         };
     }
+    if checker_id == "syntax.native_confirmation" {
+        if let Some(guidance) = crate::syntax_task_recheck::guidance(root, &brief) {
+            brief["disposition"] = guidance["disposition"].clone();
+            brief["step"] = guidance["step"].clone();
+            for key in [
+                "native_confirmation_status",
+                "native_confirmation_ref",
+                "native_diagnostic_positions",
+            ] {
+                if !guidance[key].is_null() {
+                    brief[key] = guidance[key].clone();
+                }
+            }
+            if guidance["recheck_argv"].is_array() {
+                brief["recheck_argv"] = guidance["recheck_argv"].clone();
+            }
+            priority = if brief["disposition"] == "actionable" {
+                2
+            } else {
+                0
+            };
+        }
+    }
     let action_id = canonical_action_id(&brief)?;
     brief["action_id"] = json!(action_id);
     #[cfg(unix)]
@@ -1233,6 +1260,12 @@ fn finding_repair_step(rule: &str) -> &'static str {
 pub(crate) fn canonical_action_id(brief: &Value) -> Result<&'static str, &'static str> {
     match brief["kind"].as_str() {
         Some("finding") => Ok("repair-source"),
+        Some("blocker")
+            if brief["checker_id"] == "syntax.native_confirmation"
+                && brief["native_confirmation_status"] == "diagnostics_observed" =>
+        {
+            Ok("repair-source")
+        }
         Some("blocker")
             if brief["reason_code"] == "project_ruff_config_not_found"
                 || brief["reason_code"] == "p3c_configuration_not_confirmed" =>
@@ -1653,7 +1686,7 @@ fn run_sequence(run_id: &str) -> Option<u128> {
 
 fn view(disposition: &str, reason: &str, brief: Value, actions: Value) -> Value {
     json!({
-        "schema_version":if brief["checker_id"] == "syntax.native_confirmation" {"0.2.0"} else {"0.1.0"}, "report_type":"repair_brief_preview",
+        "schema_version":if brief["checker_id"] == "syntax.native_confirmation" {"0.3.0"} else {"0.1.0"}, "report_type":"repair_brief_preview",
         "operation":"next", "command_status":"complete", "exit_code":0,
         "disposition":disposition, "reason":reason,
         "repair_brief":brief, "next_actions":actions,
