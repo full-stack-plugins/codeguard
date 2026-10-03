@@ -230,6 +230,12 @@ human/结构化报告及宿主渲染 MUST 按结论、方式/范围、原生状�
 - **WHEN** 原生工具安装或恢复成功但尚未检查原目标
 - **THEN** 环境探测可更新，确认任务仍未解决
 
+#### Scenario: Multiple edited grammar candidates need native confirmation
+- **WHEN** initialized workspace edit feedback contains bounded recovery evidence for one or more bundled grammar languages
+- **THEN** import a versioned, source-and-grammar-bound observation into the existing task store, keeping one confirmation identity per workspace, file and language; Python and ESLint scopes reuse their existing preparation identities
+- **AND** preserve raw byte locations as suspected evidence, never source violations; complete zero-recovery observations create no new mandatory task and cannot close previous tasks
+- **AND** unavailable native confirmation adapters yield a concrete pending capability decision, never a Python fallback command for another language; persistence failure preserves feedback and exposes no fictitious task reference
+
 #### Scenario: Style-only checker returns zero diagnostics
 - **WHEN** 该检查器不能确认疑似语法所需能力
 - **THEN** 不关闭任务、不判 grammar 误报，指出所需的适用确认工具

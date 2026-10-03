@@ -218,7 +218,7 @@ fn execute_parsed(
     };
     Ok((
         json!({
-            "schema_version":"0.6.0", "report_type":"hook_execution_feedback",
+            "schema_version":"0.7.0", "report_type":"hook_execution_feedback",
             "plan":plan, "execution":execution, "reason":reason,
             "local_feedback":feedback, "delivery_decision":"not_evaluated",
             "host_blocking_verified":false, "soft_result_reused":false

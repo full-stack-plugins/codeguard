@@ -277,7 +277,8 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         .filter(|checker| {
             matches!(
                 *checker,
-                "node.eslint"
+                "syntax.native_confirmation"
+                    | "node.eslint"
                     | "node.eslint.preparation"
                     | "node.npm.audit"
                     | "python.ruff"
@@ -306,7 +307,9 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         .as_str()
         .filter(|sha| valid_sha256(sha))
         .ok_or("finding_report_invalid")?;
-    let recheck = if matches!(checker_id, "node.eslint" | "node.eslint.preparation") {
+    let recheck = if checker_id == "syntax.native_confirmation" {
+        json!(["codeguard", "task", "verify", id, ".", "--format", "json"])
+    } else if matches!(checker_id, "node.eslint" | "node.eslint.preparation") {
         // 当前原生上下文失效时仍指向 ESLint；占位参数要求重新核验，不能猜测工具身份。
         json!([
             "codeguard",
@@ -487,7 +490,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         json!(["codeguard", "lint", "python", "."])
     };
     let mut brief = json!({
-        "schema_version":"0.1.0", "task_id":id, "kind":kind,
+        "schema_version":if checker_id == "syntax.native_confirmation" {"0.2.0"} else {"0.1.0"}, "task_id":id, "kind":kind,
         "checker_id":checker_id, "evidence_ref":{
             "first_run_id":first_run, "first_report_sha256":report_sha
         },
@@ -530,9 +533,13 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         brief["build_root"] = json!(build_root);
         brief["affected_paths"] = json!(paths);
         brief["constraints"] = json!(["先恢复检查完整性", "不得关闭检查器或修改无关源码"]);
-        let (priority, disposition, step) = if checker_id == "python.ruff"
-            && reason == "python_syntax_confirmation_needed"
-        {
+        let (priority, disposition, step) = if checker_id == "syntax.native_confirmation" {
+            (
+                1,
+                "needs_decision",
+                "查看固定 grammar 与当前源码的疑似证据；准备适用原生 lint/编译器并确认语法能力。当前原生确认 adapter 尚未接入，不能改用 Python 或凭 WASM 零恢复关闭任务",
+            )
+        } else if checker_id == "python.ruff" && reason == "python_syntax_confirmation_needed" {
             (
                 1,
                 "actionable",
@@ -1622,7 +1629,7 @@ fn run_sequence(run_id: &str) -> Option<u128> {
     if run_id.starts_with("eslint-") || run_id.starts_with("npm-") {
         return run_id.rsplit('-').next()?.parse().ok();
     }
-    if run_id.starts_with("checkstyle-") {
+    if run_id.starts_with("checkstyle-") || run_id.starts_with("syntax-confirm-") {
         return run_id.rsplit('-').next()?.parse().ok();
     }
     if let Some(value) = run_id
@@ -1646,7 +1653,7 @@ fn run_sequence(run_id: &str) -> Option<u128> {
 
 fn view(disposition: &str, reason: &str, brief: Value, actions: Value) -> Value {
     json!({
-        "schema_version":"0.1.0", "report_type":"repair_brief_preview",
+        "schema_version":if brief["checker_id"] == "syntax.native_confirmation" {"0.2.0"} else {"0.1.0"}, "report_type":"repair_brief_preview",
         "operation":"next", "command_status":"complete", "exit_code":0,
         "disposition":disposition, "reason":reason,
         "repair_brief":brief, "next_actions":actions,

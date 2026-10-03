@@ -333,7 +333,16 @@ fn scan_local_report_scoped_with_deadline(
     cancelled: &AtomicBool,
 ) -> Result<Value, &'static str> {
     let registry = legacy_registry().map_err(|_| "registry_invalid")?;
-    let discovery = discover(root, &registry, &NativeObservation);
+    let discovery = match selected_paths {
+        Some(paths) => crate::python_selected_discovery::discover_selected(
+            root,
+            paths,
+            &registry,
+            &NativeObservation,
+            deadline,
+        ),
+        None => discover(root, &registry, &NativeObservation),
+    };
     let run_id = run_id();
     let configured = selected_paths.map_or_else(
         || {

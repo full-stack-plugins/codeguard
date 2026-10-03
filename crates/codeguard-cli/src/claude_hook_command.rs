@@ -348,6 +348,22 @@ fn summarize(path: &str, report: &Value) -> String {
         .as_array()
         .map_or(0, Vec::len);
     let mut repair = String::new();
+    for task in feedback["syntax_tasks"]["tasks"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .take(2)
+    {
+        if let Some(id) = task["task_id"].as_str().filter(|id| {
+            id.strip_prefix("CG-B-")
+                .is_some_and(|s| s.len() == 32 && s.bytes().all(|b| b.is_ascii_hexdigit()))
+        }) {
+            repair.push_str(&format!("原生确认任务 {id}：codeguard task show {id} . --format=json；完成原生确认后 codeguard task verify {id} . --format=json。"));
+        }
+    }
+    if feedback["syntax_tasks"]["status"] == "incomplete" {
+        repair.push_str("候选任务同步未完成；保留疑似证据，先核对工作区和保存失败原因。");
+    }
     for native in [&feedback["python_lint"], &feedback["node_lint"]] {
         if let Some(id) = native["next"]["repair_brief"]["task_id"]
             .as_str()

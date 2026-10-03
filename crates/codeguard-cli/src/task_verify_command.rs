@@ -85,6 +85,9 @@ pub fn run(args: &[String]) -> ExitCode {
         Ok(brief) => brief,
         Err(reason) => return print_unavailable(&parsed, reason),
     };
+    if brief["checker_id"] == "syntax.native_confirmation" {
+        return print_unavailable(&parsed, "native_syntax_confirmation_adapter_unavailable");
+    }
     let npm_task = brief["checker_id"] == "node.npm.audit";
     if !npm_task && !parsed.npm_options.is_empty() {
         eprintln!("npm 参数仅用于对应任务");

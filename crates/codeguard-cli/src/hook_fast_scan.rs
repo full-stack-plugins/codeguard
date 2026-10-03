@@ -57,6 +57,7 @@ pub(crate) fn observe(
     );
     #[cfg(not(feature = "wasm-precheck"))]
     let syntax = json!({"status":"not_run","reason":"wasm_feature_not_built","observations":[]});
+    let syntax_tasks = crate::syntax_confirmation::persist(root, &syntax, deadline);
     let native_unwired: Vec<&String> = selected
         .iter()
         .filter(|p| !p.ends_with(".py") && !is_source(p))
@@ -85,9 +86,9 @@ pub(crate) fn observe(
         "review_native_results_and_resolve_incomplete_checks"
     };
     json!({
-        "schema_version":"0.1.0","report_type":"hook_fast_feedback",
+        "schema_version":"0.2.0","report_type":"hook_fast_feedback",
         "scan_scope":"selected_files","requested_paths":requested,
-        "python_lint":python_lint,"node_lint":node_lint,"syntax_candidates":syntax,
+        "python_lint":python_lint,"node_lint":node_lint,"syntax_candidates":syntax,"syntax_tasks":syntax_tasks,
         "unavailable_files":unavailable,"native_unwired_files":native_unwired,
         "candidate_recovery_count":recoveries,"next_action":next_action,
         "delivery_decision":"not_evaluated","coverage_proven":false

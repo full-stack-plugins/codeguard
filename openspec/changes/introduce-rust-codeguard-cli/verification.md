@@ -2092,3 +2092,20 @@ TDD 先复现报告漏洞：把源码 finding 的主定位、原生身份及白�
 最终默认工作区 `cargo test --workspace --all-targets` 退出 0：1106 通过、0 失败、105 忽略；日志 `/tmp/codeguard-hook-workspace-final.log`。WASM 构建下 check_all_eslint、hook_execute_cli、claude_hook_cli 合计 42 通过、0 失败、3 忽略，日志 `/tmp/codeguard-hook-fast-wasm-final.log`；check_all_grammar_candidates 独占运行 10/10 通过，155.67 秒，含新增全部 32 grammar 编辑事件和既有聚合路由回归，日志 `/tmp/codeguard-hook-32.log`。CLI 全目标含 WASM Clippy `-D warnings`、fmt、分层检查、OpenSpec strict、diff 空白和新增文档链接校验均通过。166 份 schema 定义有效，实际 Hook WASM JSON 通过当前 schema，三个伪造通过/覆盖变体均被拒。
 
 本轮 ESLint 编排使用受控替身，未安装工具；真实 WASM 运行与实际宿主触发明确分开。默认插件尚未切换，发布包没有更新；其它语言原生 Hook 快检、候选任务自动同步/关闭、Python 元数据发现效率和全 I/O 硬预算仍缺。S11.17、S14 及完整目标继续未完成。上一源码 c6a3676 的 CI 37131837212 已成功，本轮源码的 CI 须按新提交另行核验。
+
+## 2026-10-04 指定 Python 发现与通用候选确认任务
+
+Python 选中文件检查不再通过全项目元数据 walk 发现配置；只观察所选源码及祖先 Ruff 配置，保持最近 `.ruff.toml` 优先级，最近配置链接/不可读时为 unknown，不能退回父配置。旁支链接配置导致 discovery_incomplete 的旧反例先 RED 后 GREEN；5 项端口测试禁止目录枚举并覆盖链接祖先和已过期预算。这是协作式文件观察预算，不是全部 I/O 的硬中断保证。
+
+先写 Zig 编辑任务和持久化失败两项端到端反例：旧反馈没有 syntax_tasks，两项实际 RED；接线后使用版本化 syntax_confirmation_observation 0.1 导入既有工作台。当前 Hook 外层 0.7、局部 0.2；通用 next 简报 0.2，原有检查器仍 0.1；原 Hook 0.6 和简报 0.1 schema 与 HEAD 原件逐字节相同。Python/ESLint 复用旧任务身份，其余语言按工作区/文件/语言归并原生确认阻塞。零恢复不新增必需任务、不关闭旧任务；任务有证据、规则、允许范围、步骤、复检、历史与关闭条件。未接入原生确认 adapter 的 task verify 明确返回 native_syntax_confirmation_adapter_unavailable，不落到其它语言检查，也不签发关闭。
+
+默认全工作区全目标测试：1112 通过、0 失败、105 忽略，退出 0。指定范围相关四组 CLI 回归：55 通过、0 失败、13 忽略；WASM Hook/ESLint/Python 五组回归：52 通过、0 失败、4 忽略（当时新增任务测试为两项），之后扩展的 hook_syntax_tasks 六项全部通过。新增六项覆盖 Zig 稳定身份、零恢复不关闭、保存失败无虚构 ID、Python 已有确认身份复用、JS/TS/TSX 稳定准备身份、篡改 grammar/越界坐标/重复 JSON 键拒绝，以及真实 CLI 消费 Claude 形状的有界上下文。本机 Ruff 0.16.8 的额外原生指定文件验收 1/1 通过。实际 CLI Hook 0.7、候选报告 0.1、next 0.2 三份 JSON 通过 schema；三份伪造交付/阻断/grammar 资格变体被 schema 拒绝。169 份 schema 定义有效。
+
+实际 JSON：`/tmp/codeguard-syntax-task-schema-actual.json`。日志身份：
+- `/tmp/codeguard-syntax-tasks-workspace.log`：SHA-256 `50b587e7a16dd19f10442620108fa9f89a74cc0c34444dbb53b44319c6e201c8`。
+- `/tmp/codeguard-hook-syntax-tasks-final.log`：SHA-256 `8833b94fcee571f03b6c9a19a8f07369541942731b8892e700dba6c35fc6e6bc`。
+- `/tmp/codeguard-selected-final-cli.log`：SHA-256 `e66f334188ba8322dcdc49d39446da5c97b816808d4e7eba29e4b45b48cfb369`。
+- `/tmp/codeguard-syntax-task-regression.log`：SHA-256 `d449f69cfd7ad57b2a88225fb8ab8d7b5f10b48151edad4f67bda5f93df625f4`。
+- `/tmp/codeguard-syntax-tasks-native-ruff.log`：SHA-256 `9686456c76b74e43de38dfbb0718b0085f6d151a319d7db4609a19d943da7fd6`。
+
+代码审阅、WASM 特性全目标 Clippy -D warnings、fmt、crate 分层、OpenSpec strict 和 git diff --check 通过。上一提交 911aa47 的 CI 37133517765 已成功；当前变更远端 CI 必须按新提交另行核验。默认插件、真实安装宿主自动触发、全语言原生确认和可信关闭、完整 I/O 硬预算/性能/误报评测仍缺，11.17、14.9–14.11 及总体目标不勾选。此次未发布 npm 或修改插件锁。

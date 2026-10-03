@@ -29,6 +29,7 @@ mod python_syntax_confirmation_report;
 mod rust_build_report;
 mod rust_cve_report;
 mod rustdoc_report;
+mod syntax_confirmation_report;
 static NEXT_WRITE: AtomicU64 = AtomicU64::new(0);
 
 struct Arguments {
@@ -457,7 +458,10 @@ fn import_one(
         codeguard_adapters::parse_unique_json(&bytes)
             .map_err(|_| "eslint_preparation_duplicate_or_invalid_json")?;
     }
-    if value["report_type"] == "python_syntax_confirmation_observation" {
+    if matches!(
+        value["report_type"].as_str(),
+        Some("python_syntax_confirmation_observation" | "syntax_confirmation_observation")
+    ) {
         codeguard_adapters::parse_unique_json(&bytes)
             .map_err(|_| "python_syntax_confirmation_duplicate_or_invalid_json")?;
     }
@@ -476,6 +480,7 @@ fn import_one(
                 | "rust_cve_workbench_observation"
                 | "python_cve_workbench_observation"
                 | "python_syntax_confirmation_observation"
+                | "syntax_confirmation_observation"
         )
     ) {
         let run = value["run_id"]
@@ -558,6 +563,9 @@ fn parse_report(
     report: &Value,
     digest: String,
 ) -> Result<ReportInput, &'static str> {
+    if report["report_type"] == "syntax_confirmation_observation" {
+        return syntax_confirmation_report::parse(root, workspace_id, path, report, digest);
+    }
     if report["report_type"] == "python_syntax_confirmation_observation" {
         return python_syntax_confirmation_report::parse(root, workspace_id, path, report, digest);
     }
@@ -2010,6 +2018,12 @@ fn persist_local_blocker_observation(
 }
 
 fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
+    if blocker.checker_id == "syntax.native_confirmation" {
+        return format!(
+            "# {} 原生语法确认待处理\n\n- 问题证据：范围 `{}`；报告 `.codeguard/reports/{}.json`，摘要 `{}`，含固定 grammar、源码身份和原字节疑似位置。\n- 规则依据：候选 ERROR/MISSING 恢复不是已确认源码违规。\n- 允许修改范围：对应原生工具、版本和适用项目配置；原生确认前不要修改无关源码或关闭检查。\n- 修复步骤：查看原报告语言及已知限制，准备适用 lint/编译器，确认其语法能力和同一源码范围；原生诊断成立后修复，反证进入 grammar 误报调查。\n- 复检命令：codeguard task verify {} . --format=json；当前未接入该语言的原生确认 adapter，将明确反馈能力缺口，不能以其它语言的工具替代。\n- 历史尝试：首次 run {}；追加事件和尝试保存于同一任务。\n- 关闭条件：当前输入与适用原生语法能力确认，并满足既有关闭策略；安装、WASM 零恢复或任务勾选均不能关闭。\n",
+            blocker.id, blocker.scope, report.run_id, report.digest, blocker.id, report.run_id
+        );
+    }
     if blocker.checker_id == "python.pip_audit" {
         return format!(
             "# {} Python CVE 检查待处理\n\n- 问题证据：构建根 `{}`；本轮诊断 `{}`；报告摘要 `{}`，首次 run `{}`。原生 advisory 在脱敏本地报告中，数据库身份及时效未核验。\n- 规则依据：pip-audit 原生 advisory、标准 pylock 解析版本归属与可信漏洞源；本地任务没有白名单批准权威。\n- 允许范围：该构建根的 pyproject.toml、标准 pylock、审计工具和依赖版本；不得改动无关源码或关闭检查来消除问题。\n- 修复步骤：先恢复明确的工具、版本和锁输入；核对环境/依赖组及逐 advisory 归属，真实漏洞升级依赖，误报提出精确待审候选。\n- 复检命令：codeguard task verify {} . --pip-audit-tool <已核验绝对路径> --pip-audit-version <已核验版本> --format json。\n- 历史尝试：后续原生观察与复检记录在同一任务；首次任务文字不是完整历史。\n- 关闭条件：原工具复检及可信漏洞源、项目依赖范围和策略覆盖均核验；局部零漏洞或任务勾选不能关闭。\n",

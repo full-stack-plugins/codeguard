@@ -715,8 +715,34 @@ cargo run --locked -p codeguard-cli --example gen_capability_docs -- --check
 
 ---
 
-**文档版本：**1.2.0 · **创建日期：**2026-09-28 · **最后更新：**2026-09-29 · **文档状态：**待评审；实现及完整验收仍未完成。
+**文档版本：**1.2.0 · **创建日期：**2026-09-28 · **最后更新：**2026-10-04 · **文档状态：**待评审；实现及完整验收仍未完成。
 
-源码新增编辑事件原生优先快检：`hook execute` / `hook claude post-tool-use` 只检查事件明确指定的普通文件，Python 用 Ruff、JS/TS 用模块本地 ESLint 10；同字节完整原生结果不重复解析。未覆盖文件可调用固定 WASM 候选，混合语言仍保留局部结果、原生未接线范围和失败原因。疑似恢复节点要求安装或修复原生工具并确认；完整零恢复候选只建议安装，不代表完整通过。共享事件截止时间，最多 8 文件、2 个 WASM worker；未构建 WASM 明确报告缺口。外层反馈 0.6.0，局部 `hook_fast_feedback` 0.1.0。默认插件 Hook 尚未切换，候选同步/自动关闭和真实宿主验收未完成。见[编辑快检验收](../tests/acceptance/hook-fast-native-wasm.md)。
+源码新增编辑事件原生优先快检：`hook execute` / `hook claude post-tool-use` 只检查事件明确指定的普通文件，Python 用 Ruff、JS/TS 用模块本地 ESLint 10；同字节完整原生结果不重复解析。未覆盖文件可调用固定 WASM 候选，混合语言仍保留局部结果、原生未接线范围和失败原因。疑似恢复节点要求安装或修复原生工具并确认；完整零恢复候选只建议安装，不代表完整通过。共享事件截止时间，最多 8 文件、2 个 WASM worker；未构建 WASM 明确报告缺口。外层反馈 0.7.0，局部 `hook_fast_feedback` 0.2.0。候选任务已接入现有工作台；默认插件 Hook、能力匹配自动关闭和真实宿主验收未完成。见[编辑快检验收](../tests/acceptance/hook-fast-native-wasm.md)。
 
-复用的 Python 路径仍通过只读项目元数据遍历发现配置；全部文件系统 I/O 的硬截止时间和大型项目延迟尚未验收。
+Python 所选文件的配置发现只观察源码路径及祖先配置，不枚举目录；最近配置不可用时不静默退回父配置。全部文件系统 I/O 的硬截止时间和大型项目延迟尚未验收。
+
+源码编辑快检现将有恢复节点的固定 WASM 候选同步到既有 `.codeguard/` 工作台：按工作区/文件/语言稳定归并，Python 与 JS/TS 复用原有确认或准备身份。报告保存固定 grammar、源码 SHA-256、已知限制和原字节疑似位置；导入拒绝身份或坐标失配、重复 JSON 键。只有实际同步成功才给出任务 ID；零恢复不创建新的必需任务，也不能关闭旧任务。对话提供 `task show` / `task verify`，缺原生确认 adapter 明确反馈能力缺口。外层 Hook 协议为 0.7.0，局部为 0.2.0；通用 `next` 简报用 0.2.0，已有检查器仍返回 0.1.0。默认插件 Hook、能力匹配关闭和真实宿主验收仍未完成。
+
+### 当前编辑确认反馈示例
+
+下列为实际 CLI 反馈的字段节选，不是完整报告；完整协议见 `hook-execution-feedback.schema.json`。任务 ID 属于本次临时验收工作区。
+
+```json
+{
+  "schema_version": "0.2.0",
+  "report_type": "hook_fast_feedback",
+  "next_action": "require_native_lint_confirmation",
+  "syntax_tasks": {
+    "failures": [],
+    "new_blockers": 1,
+    "status": "synced_partial",
+    "tasks": [
+      {
+        "language": "zig",
+        "path": "app.zig",
+        "task_id": "CG-B-e8b667ce9c1f5d939af37205b976d0a9"
+      }
+    ]
+  }
+}
+```

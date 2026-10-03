@@ -106,7 +106,6 @@ pub mod git_index_safety_command;
 pub mod go_lint_command;
 #[cfg(feature = "wasm-precheck")]
 pub mod grammar_probe_command;
-#[cfg(feature = "wasm-precheck")]
 pub mod grammar_route;
 pub mod grammar_status_command;
 #[cfg(unix)]
@@ -158,6 +157,8 @@ pub(crate) mod python_cve_task_recheck;
 pub mod python_lint_command;
 #[cfg(unix)]
 pub mod python_lint_scan;
+#[cfg(unix)]
+mod python_selected_discovery;
 #[cfg(unix)]
 mod python_syntax_confirmation;
 #[cfg(all(unix, feature = "wasm-precheck"))]
@@ -253,3 +254,6 @@ mod signed_distribution_download_request;
 mod npm_task_recheck;
 
 mod npm_check_scan;
+
+#[cfg(unix)]
+mod syntax_confirmation;

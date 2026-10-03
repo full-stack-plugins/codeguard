@@ -152,3 +152,8 @@ Stop 事件 MAY 从已存在的本地任务事实生成有界、只读的下一�
 - **WHEN** native lint is unavailable or not wired for the edited file
 - **THEN** candidate recovery nodes require native lint/compiler installation or repair and confirmation, whereas complete zero-recovery candidates recommend native lint; unavailable or partial prechecks never imply success
 - **AND** host dialogue summarizes bounded rule identifiers and candidate counts without forwarding source or native free-text messages; failed writes still execute no checker
+
+#### Scenario: Python edit discovery avoids unrelated project traversal
+- **WHEN** Python fast feedback selects bounded workspace-relative files and unrelated directories contain unreadable or linked checker configuration
+- **THEN** configuration discovery observes only those files and ancestor Ruff configuration candidates within the workspace; it performs no directory enumeration, keeps nearest configuration priority and cannot be made incomplete by an unrelated subtree
+- **AND** missing targets, unsafe ancestor paths, inaccessible configuration and expired discovery deadlines remain explicit; this local discovery cannot prove project-wide completeness

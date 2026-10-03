@@ -715,8 +715,34 @@ This document uses the full-stack-doc Rust README, complete architecture/runtime
 
 ---
 
-**Document version:** 1.2.0 · **Created:** 2026-09-28 · **Updated:** 2026-09-29 · **Status:** ready for review; implementation and full acceptance remain incomplete.
+**Document version:** 1.2.0 · **Created:** 2026-09-28 · **Updated:** 2026-10-04 · **Status:** ready for review; implementation and full acceptance remain incomplete.
 
-Source builds now provide native-first edit feedback through `hook execute` / `hook claude post-tool-use`: only explicit ordinary files are selected; Python uses Ruff and JS/TS uses module-local ESLint 10. Coherent same-byte native results avoid duplicate parsing. Uncovered files may use pinned WASM candidates; mixed scopes retain native results, unwired native scopes and failures. Recovery nodes require native-tool setup/repair and confirmation; complete zero-recovery candidates only recommend native lint, never full acceptance. One deadline bounds at most eight files and two WASM workers; builds without WASM report that gap. The outer feedback is 0.6.0 with local `hook_fast_feedback` 0.1.0. Default plugin Hooks, candidate-task sync/closure and real-host acceptance remain incomplete. See [edit-feedback acceptance](../tests/acceptance/hook-fast-native-wasm.md).
+Source builds now provide native-first edit feedback through `hook execute` / `hook claude post-tool-use`: only explicit ordinary files are selected; Python uses Ruff and JS/TS uses module-local ESLint 10. Coherent same-byte native results avoid duplicate parsing. Uncovered files may use pinned WASM candidates; mixed scopes retain native results, unwired native scopes and failures. Recovery nodes require native-tool setup/repair and confirmation; complete zero-recovery candidates only recommend native lint, never full acceptance. One deadline bounds at most eight files and two WASM workers; builds without WASM report that gap. The outer feedback is 0.7.0 with local `hook_fast_feedback` 0.2.0. Candidate task synchronization is connected; default plugin Hooks, capability-matched closure and real-host acceptance remain incomplete. See [edit-feedback acceptance](../tests/acceptance/hook-fast-native-wasm.md).
 
-The reused Python path still discovers project configuration through a read-only metadata walk; full filesystem I/O deadlines and large-project latency are not yet accepted.
+Selected Python discovery observes only source paths and ancestor configuration candidates, without directory enumeration. An unavailable nearest configuration does not silently fall back to a parent. Full filesystem I/O hard deadlines and large-project latency remain unaccepted.
+
+Source edit feedback now imports recovery-bearing pinned WASM candidates into the existing `.codeguard/` workbench. Confirmation identities remain stable per workspace/file/language; Python and JS/TS reuse existing confirmation/preparation identities. Reports bind the grammar, source SHA-256, known limitations and suspected byte positions; imports reject mismatched identities/coordinates and duplicate JSON keys. Task IDs appear only after successful synchronization. Zero-recovery observations create no new mandatory task and cannot close existing tasks. Dialogue includes `task show` / `task verify`; missing native confirmation adapters report an explicit capability gap. Outer Hook feedback is 0.7.0, local feedback is 0.2.0, and generic `next` briefs use 0.2.0 while existing checkers retain 0.1.0. Default plugin Hooks, capability-matched closure and actual-host acceptance remain incomplete.
+
+### Current edit-confirmation feedback example
+
+The following fields are extracted from actual CLI output, rather than a complete report. The full protocol is `hook-execution-feedback.schema.json`; this task ID belongs to a temporary acceptance workspace.
+
+```json
+{
+  "schema_version": "0.2.0",
+  "report_type": "hook_fast_feedback",
+  "next_action": "require_native_lint_confirmation",
+  "syntax_tasks": {
+    "failures": [],
+    "new_blockers": 1,
+    "status": "synced_partial",
+    "tasks": [
+      {
+        "language": "zig",
+        "path": "app.zig",
+        "task_id": "CG-B-e8b667ce9c1f5d939af37205b976d0a9"
+      }
+    ]
+  }
+}
+```

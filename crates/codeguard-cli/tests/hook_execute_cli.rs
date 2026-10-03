@@ -191,7 +191,7 @@ fn prompt_submitted_only_returns_non_blocking_intent_guidance() {
     fs::write(project.0.join("broken.py"), "import os\n").unwrap();
     let (exit, report) = run(&project, &request("prompt_submitted", &[], "unknown"));
     assert_eq!(exit, 3);
-    assert_eq!(report["schema_version"], "0.6.0");
+    assert_eq!(report["schema_version"], "0.7.0");
     assert_eq!(report["plan"]["action"], "show_intent_guidance");
     assert_eq!(report["execution"], "read_only_intent_guidance");
     assert_eq!(
@@ -215,7 +215,7 @@ fn prompt_submitted_only_returns_non_blocking_intent_guidance() {
         "../../../schemas/hook-execution-feedback-v0.4.schema.json"
     ))
     .unwrap();
-    assert_eq!(current["properties"]["schema_version"]["const"], "0.6.0");
+    assert_eq!(current["properties"]["schema_version"]["const"], "0.7.0");
     assert_eq!(previous["properties"]["schema_version"]["const"], "0.4.0");
     assert_eq!(
         current["$defs"]["intent_guidance"]["properties"]["source_check"]["const"],

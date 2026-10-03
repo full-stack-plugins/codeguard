@@ -1130,3 +1130,5 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 14.4 / 14.17 / 14.19 32 份最小合法样例验收收紧：四个有界项目和单项目的既有回归，除零恢复节点外，现逐观察要求 `reason=null`，防止 WASM 在语法树上含隐藏错误却被 32/32 路由数量掩盖；本机目标文件 9/9 通过。真实项目语料、原生差分、误报/漏报率及发行仍缺，父任务不勾选；见[局部验收](../../../tests/acceptance/check-all-32-grammar-candidates.md)。
 
 14.4 / 14.17 / 14.19 Erlang OTP 28 原生差分：8 份合法、5 份故意破损源码经本机 `erlc` 独立确认；固定 Erlang WASM 隔离 worker 对 13 例有 12 例分类一致、0 例未解析。缺少函数最终句点的源码被原生拒绝，WASM 零恢复，确认漏检。常规候选语料及显式原生差分目标测试各 1/1 通过；清单已知限制与 Linux CI 候选测试同步。需修 grammar、扩展版本/方言语料及完成原生优先统一命令和发行验收，父任务不勾选；见[局部证据](../../../tests/acceptance/erlang-native-differential.md)。
+
+2026-10-04 S11.17 / S14.9 / S14.10 接线增量：编辑候选恢复按文件/语言导入既有工作台，Python/ESLint 复用旧身份，其他语言有通用原生确认任务与明确 adapter 缺口。完整零恢复只推荐安装，不新增必需任务，也不关闭旧任务。指定 Python 发现不再遍历旁支；最近链接配置保留 unknown。对应 `hook_syntax_tasks`、`python_selected_discovery` 和更新后的[局部验收](../../../tests/acceptance/hook-fast-native-wasm.md)。能力匹配关闭、全部原生适配、失败尝试完整闭环、默认插件和实际宿主仍缺，父任务保持未完成。
