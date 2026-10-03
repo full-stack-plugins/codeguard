@@ -1199,7 +1199,7 @@ pub(crate) fn classify(brief: &Value, scan: &Value) -> &'static str {
     }
 }
 
-fn persist_observation(
+pub(crate) fn persist_observation(
     root: &Path,
     brief: &Value,
     scan: &Value,
@@ -1237,7 +1237,8 @@ fn persist_observation(
         &event,
         &state,
     )
-    .map_err(|_| "verification_event_write_failed")
+    .map_err(|_| "verification_event_write_failed")?;
+    crate::task_lifecycle_store::record_native_recurrence(root, brief, scan)
 }
 
 fn real_directory(path: &Path) -> bool {

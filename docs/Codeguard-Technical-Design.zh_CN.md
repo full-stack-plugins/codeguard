@@ -789,3 +789,65 @@ Python 所选文件的配置发现只观察源码路径及祖先配置，不枚�
 ```
 
 简报同时提供最新原生报告引用/摘要和当前诊断位置；输入失效后不再投影这些位置。编译入二进制的不可变 grammar 校验结果仅在进程内复用，外部清单、源码和原生工具仍按当前字节复核。
+
+
+### 限定任务的可信关闭与复发重开（源码 SDK）
+
+当前源码提供 `verify_zig_task_resolution`，面向受保护宿主核验 **Zig 原生语法确认任务**。宿主独立固定验签密钥、工作区、策略修订、代码基线、可信时间和防回滚序号，并提供摘要绑定的原始反例；这些输入不能从项目自选公钥、候选策略或任务 Markdown 中取得。该入口尚未接入默认插件或公开 CLI 的可信策略提供者，也未包含在已发布的 npm 0.1.3 中。
+
+处理器在既有任务租约下使用同一批准的 Zig 0.16.0，先检查原始字节，再检查当前文件；两次检查共享请求截止时间，并受批准到期时间限制。只有原样本有原生诊断、当前源码已改变且零诊断，工具/宿主制品/grammar/任务/策略身份一致时，才追加 `code_fixed` 解决事件。原样本同样零诊断进入误报调查；环境失败或输入变化进入待核验，不记为代码修复。适用能力仅为语法，不代替完整 lint、类型、安全或 CVE 检查。
+
+生命周期事件按明确父关系重放；重复复检不重复追加同一解决事件。普通 `task verify` 再次取得匹配原工具的当前原生诊断时追加 `reopened`，保留首次事实与解决历史，并重新提供当前原生修复指引。父节点缺失、分叉、重复身份、证据丢失或摘要变化须核对，不能按时间最新覆盖。关闭处理器复用既有原生观察/尝试收据，解除对应 `awaiting_verification`，借用租约不被释放。
+
+`.codeguard/findings/<id>/events/lifecycle-*.json` 是脱敏追加记录；对照证据位于默认忽略的 `.codeguard/state/resolution_evidence/`。首次 `finding.json` 不改写。本地 `next/task show/status` 不持有可信策略，因此不把历史声明升级为当前关闭或交付许可；关闭历史给出复核步骤，复发则沿用当前原生诊断。每份宿主收据的 `delivery_decision` 均为 `not_evaluated`。
+
+完整范围仍缺其它检查器的可信关闭、环境/依赖/删除目标/政策处置、实际宿主策略来源、跨机器证据恢复及正式交付门禁。见[限定任务验收](../tests/acceptance/task-resolution-lifecycle.md)。
+
+
+源码 SDK 示例；所有 `host_*` 值由宿主独立核验，不是新增 CLI 参数：
+
+```rust
+let receipt = codeguard_cli::verify_zig_task_resolution(
+    &codeguard_cli::ZigTaskResolutionRequest {
+        root: host_workspace,
+        task_id: host_task_id,
+        tool: host_zig,
+        original_source: host_original_bytes,
+        policy_bytes: host_policy_bytes,
+        envelope_bytes: host_signed_envelope,
+        trust: host_trust_key,
+        context: host_approval_context,
+        deadline: host_request_deadline,
+        borrowed_lease: None,
+    },
+)?;
+```
+
+以下是本地受控集成测试的完整收据示例；签名密钥来源为测试夹具，不是生产宿主批准证明。策略、记录、证据和收据分别使用独立封闭 schema；记录/收据文件本身不能证明来源。
+
+```json
+{
+  "authority": "host_context_verified",
+  "delivery_decision": "not_evaluated",
+  "event_ref": ".codeguard/findings/CG-B-1a46d41b4d912927dd646df9c79dd779/events/lifecycle-event-503da1b5644bac1bbf5d82625e0668d5a26a4aa426fb572402dc5dd3145add6d.json",
+  "evidence_ref": ".codeguard/state/resolution_evidence/f79f40ee3ebaf383c3dad1804999cd05ee50bf14a863bc6f6ec33a9d911241e9.json",
+  "evidence_sha256": "f79f40ee3ebaf383c3dad1804999cd05ee50bf14a863bc6f6ec33a9d911241e9",
+  "identity": {
+    "checker_id": "syntax.native_confirmation",
+    "scope": "app.zig",
+    "task_id": "CG-B-1a46d41b4d912927dd646df9c79dd779",
+    "workspace_id": "ws-34904a4fec61187f6fef2a8157ea8617"
+  },
+  "outcome": "code_fixed",
+  "policy_revision": "p1",
+  "policy_sha256": "1128cecb4d352cbb412a75c89c6baedece580651b24090b257f57775a841b866",
+  "report_type": "task_resolution_receipt",
+  "schema_version": "0.1.0",
+  "state": "resolved"
+}
+```
+
+- [Policy 1.0](../schemas/task-resolution-policy-v1.0.schema.json)
+- [Lifecycle record 0.1](../schemas/task-lifecycle-record-v0.1.schema.json)
+- [Comparison evidence 0.1](../schemas/task-resolution-evidence-v0.1.schema.json)
+- [Host receipt 0.1](../schemas/task-resolution-receipt-v0.1.schema.json)

@@ -110,6 +110,15 @@ RunReport 与准备诊断 PrerequisiteReport MUST 使用 workspace_id + run_id �
 
 正式 resolved MUST 由真实复检或有批准依据的 target_removed/policy_resolved 事件产生，并绑定问题、内容、规则/工具、策略和覆盖身份。代码修复、依赖修复、环境恢复、政策处置 MUST 分开归因。手工勾选、编辑状态、删除记录、增加忽略或未完成报告中不再出现 MUST NOT 关闭问题或改变 gate。例外 MUST 保留未解决事实。
 
+#### Scenario: A protected host verifies a resolution policy and runs the original checker
+- **WHEN** 受保护宿主独立固定信任根与策略上下文，验证限定任务的策略签名，并以固定原生工具复检当前范围
+- **THEN** 关闭处理器 MUST 核对原问题/范围、当前源码、原规则执行覆盖、工具/适配器/规则包与批准策略身份；匹配且问题消失时才追加限定任务的解决事件，不授予全项目 allow
+- **AND** 项目文件、CLI 参数自选的公钥、候选策略或未经复核的历史事件 MUST NOT 作为可信关闭输入；同字节原生反证进入误报调查，不记为代码修复
+
+#### Scenario: Resolution history is merged out of order or forks
+- **WHEN** 事件文件顺序改变、父节点缺失、出现循环或分叉关闭事件
+- **THEN** 单一有效链 MUST 按父关系重放；缺失、循环、冲突或重复身份 MUST 返回 reconciliation_required，不能选择时间最新的关闭事件；有效复发事件重开并保留关闭历史
+
 #### Scenario: Agent checks a task as done without verification
 - **WHEN** 任务 Markdown 被标为完成但无有效复检
 - **THEN** 正式状态仍待验证，交付判定不变

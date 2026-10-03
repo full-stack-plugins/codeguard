@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeguard.dev/schemas/task-resolution-receipt-v0.1.schema.json",
+  "title": "宿主当前核验上下文中的限定任务收据；文件不能作为可信批准",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "report_type": {
+      "const": "task_resolution_receipt"
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "workspace_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.:-]{1,128}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^CG-B-[0-9a-f]{32}$"
+        },
+        "checker_id": {
+          "const": "syntax.native_confirmation"
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))[^\\\\:\\x00-\\x1f\\x7f]+$"
+        }
+      },
+      "required": [
+        "workspace_id",
+        "task_id",
+        "checker_id",
+        "scope"
+      ]
+    },
+    "state": {
+      "enum": [
+        "open",
+        "resolved",
+        "verification_required"
+      ]
+    },
+    "outcome": {
+      "enum": [
+        "code_fixed",
+        "still_present",
+        "inputs_stale",
+        "native_incomplete",
+        "false_positive_review_required",
+        "resolution_evidence_incomplete",
+        "resolution_history_binding_changed"
+      ]
+    },
+    "authority": {
+      "const": "host_context_verified"
+    },
+    "policy_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "policy_revision": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.:-]{1,128}$"
+    },
+    "event_ref": {
+      "type": "string",
+      "pattern": "^\\.codeguard/findings/CG-B-[0-9a-f]{32}/events/lifecycle-event-[0-9a-f]{64}\\.json$"
+    },
+    "evidence_ref": {
+      "type": "string",
+      "pattern": "^\\.codeguard/state/resolution_evidence/[0-9a-f]{64}\\.json$"
+    },
+    "evidence_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    }
+  },
+  "required": [
+    "schema_version",
+    "report_type",
+    "identity",
+    "state",
+    "outcome",
+    "authority",
+    "policy_sha256",
+    "policy_revision",
+    "event_ref",
+    "evidence_ref",
+    "evidence_sha256",
+    "delivery_decision"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "outcome": {
+            "const": "code_fixed"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "state": {
+            "const": "resolved"
+          }
+        }
+      },
+      "else": {
+        "if": {
+          "properties": {
+            "outcome": {
+              "const": "still_present"
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "state": {
+              "const": "open"
+            }
+          }
+        },
+        "else": {
+          "properties": {
+            "state": {
+              "const": "verification_required"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

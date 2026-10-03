@@ -265,3 +265,17 @@ mod zig_syntax_probe;
 
 #[cfg(unix)]
 mod plain_syntax_source;
+
+#[cfg(unix)]
+mod task_lifecycle_store;
+#[cfg(unix)]
+mod task_resolution_service;
+#[cfg(unix)]
+mod zig_task_resolution_request;
+#[cfg(unix)]
+pub use task_resolution_service::verify_zig_task_resolution;
+#[cfg(unix)]
+pub use zig_task_resolution_request::ZigTaskResolutionRequest;
+
+#[cfg(unix)]
+mod task_resolution_evidence_shape;

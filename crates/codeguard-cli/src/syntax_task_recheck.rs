@@ -77,7 +77,7 @@ fn source_bytes(root: &Path, path: &str) -> Option<Vec<u8>> {
     }
     read_bounded_regular_file(&p, 1024 * 1024).ok()
 }
-fn original(root: &Path, brief: &Value) -> Result<Value, &'static str> {
+pub(crate) fn original(root: &Path, brief: &Value) -> Result<Value, &'static str> {
     let run = brief["evidence_ref"]["first_run_id"]
         .as_str()
         .ok_or("syntax_original_report_missing")?;

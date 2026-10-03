@@ -1125,6 +1125,21 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             };
         }
     }
+    #[cfg(unix)]
+    if checker_id == "syntax.native_confirmation" {
+        if let Some(guidance) = crate::task_lifecycle_store::guidance(
+            root,
+            &brief,
+            fact["workspace_id"]
+                .as_str()
+                .ok_or("workspace_identity_unavailable")?,
+        ) {
+            brief["disposition"] = guidance["disposition"].clone();
+            brief["step"] = guidance["step"].clone();
+            brief["native_diagnostic_positions"] = json!([]);
+            priority = 0;
+        }
+    }
     let action_id = canonical_action_id(&brief)?;
     brief["action_id"] = json!(action_id);
     #[cfg(unix)]

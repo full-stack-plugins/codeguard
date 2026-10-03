@@ -110,3 +110,27 @@ mod preparation_plan;
 pub use preparation_plan::PreparationPlan;
 mod preparation_planner;
 pub use preparation_planner::plan_preparation;
+
+mod resolution_cause;
+mod resolution_evidence;
+mod resolution_outcome;
+mod task_identity;
+mod task_lifecycle_event;
+mod task_lifecycle_kind;
+mod task_lifecycle_state;
+mod task_lifecycle_view;
+mod task_resolution;
+pub use resolution_cause::ResolutionCause;
+pub use resolution_evidence::ResolutionEvidence;
+pub use resolution_outcome::ResolutionOutcome;
+pub use task_identity::TaskIdentity;
+pub use task_lifecycle_event::TaskLifecycleEvent;
+pub use task_lifecycle_kind::TaskLifecycleKind;
+pub use task_lifecycle_state::TaskLifecycleState;
+pub use task_lifecycle_view::TaskLifecycleView;
+pub use task_resolution::{evaluate_resolution, reduce_task_lifecycle};
+
+mod task_resolution_policy;
+pub use task_resolution_policy::TaskResolutionPolicy;
+mod task_lifecycle_record;
+pub use task_lifecycle_record::TaskLifecycleRecord;

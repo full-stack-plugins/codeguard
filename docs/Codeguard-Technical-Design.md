@@ -789,3 +789,65 @@ The following fields come from an actual Zig recheck, not a complete report; the
 ```
 
 Briefs also expose the latest native report reference/digest and current diagnostic positions; stale inputs suppress those positions. Only immutable grammars compiled into the binary reuse validated asset identities within a process; external manifests, source and native tools still require current-byte checks.
+
+
+### Verified closure and recurrence for one task (source SDK)
+
+The source exposes `verify_zig_task_resolution` for a protected host to verify a **Zig native syntax-confirmation task**. The host independently pins its verification key, workspace, policy revision, code baseline, trusted time and rollback floor, and supplies the hash-bound original counterexample. Project-selected keys, policy candidates and task Markdown cannot provide that authority. The default plugin and public CLI still lack a trusted policy provider; this API is absent from published npm 0.1.3.
+
+Under the existing task lease, the handler runs the same approved Zig 0.16.0 against the original bytes and current file. Both runs share the request deadline, capped by approval expiry. A `code_fixed` event requires original native diagnostics, changed current source with no diagnostics, and matching tool, host artifact, grammar, task and policy identities. A native-clean original becomes a false-positive investigation; environment failure or changing input requires verification. This proves syntax for the specified task, not full lint, types, security or CVE coverage.
+
+Events replay through explicit parent links. Repeating the same verified result preserves its existing event. Ordinary `task verify` can append `reopened` when matching native diagnostics recur on current input, retaining the original fact and repair history and restoring native repair guidance. Missing parents, forks, duplicate identities, absent evidence or changed hashes require reconciliation. The handler also writes the existing native attempt receipt, clears matching `awaiting_verification`, and preserves a borrowed lease.
+
+Sanitized events live in `.codeguard/findings/<id>/events/lifecycle-*.json`; comparison evidence is ignored under `.codeguard/state/resolution_evidence/`. The first `finding.json` is immutable. Local `next/task show/status` have no trusted policy context and cannot elevate historical claims into current closure or delivery approval. All host receipts retain `delivery_decision=not_evaluated`.
+
+Other checker closures, environment/dependency/target/policy dispositions, actual host trust providers, cross-machine evidence recovery and the delivery gate remain open. See [task lifecycle acceptance](../tests/acceptance/task-resolution-lifecycle.md).
+
+
+Source SDK example: all `host_*` values are independently established by the host, not new CLI flags:
+
+```rust
+let receipt = codeguard_cli::verify_zig_task_resolution(
+    &codeguard_cli::ZigTaskResolutionRequest {
+        root: host_workspace,
+        task_id: host_task_id,
+        tool: host_zig,
+        original_source: host_original_bytes,
+        policy_bytes: host_policy_bytes,
+        envelope_bytes: host_signed_envelope,
+        trust: host_trust_key,
+        context: host_approval_context,
+        deadline: host_request_deadline,
+        borrowed_lease: None,
+    },
+)?;
+```
+
+The following complete receipt comes from a controlled local integration fixture. Its signing key is a test fixture, not proof of a production host approval. Policy, record, evidence and receipt each have a closed schema; stored files do not authenticate their origin.
+
+```json
+{
+  "authority": "host_context_verified",
+  "delivery_decision": "not_evaluated",
+  "event_ref": ".codeguard/findings/CG-B-1a46d41b4d912927dd646df9c79dd779/events/lifecycle-event-503da1b5644bac1bbf5d82625e0668d5a26a4aa426fb572402dc5dd3145add6d.json",
+  "evidence_ref": ".codeguard/state/resolution_evidence/f79f40ee3ebaf383c3dad1804999cd05ee50bf14a863bc6f6ec33a9d911241e9.json",
+  "evidence_sha256": "f79f40ee3ebaf383c3dad1804999cd05ee50bf14a863bc6f6ec33a9d911241e9",
+  "identity": {
+    "checker_id": "syntax.native_confirmation",
+    "scope": "app.zig",
+    "task_id": "CG-B-1a46d41b4d912927dd646df9c79dd779",
+    "workspace_id": "ws-34904a4fec61187f6fef2a8157ea8617"
+  },
+  "outcome": "code_fixed",
+  "policy_revision": "p1",
+  "policy_sha256": "1128cecb4d352cbb412a75c89c6baedece580651b24090b257f57775a841b866",
+  "report_type": "task_resolution_receipt",
+  "schema_version": "0.1.0",
+  "state": "resolved"
+}
+```
+
+- [Policy 1.0](../schemas/task-resolution-policy-v1.0.schema.json)
+- [Lifecycle record 0.1](../schemas/task-lifecycle-record-v0.1.schema.json)
+- [Comparison evidence 0.1](../schemas/task-resolution-evidence-v0.1.schema.json)
+- [Host receipt 0.1](../schemas/task-resolution-receipt-v0.1.schema.json)

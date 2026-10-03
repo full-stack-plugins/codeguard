@@ -388,3 +388,10 @@ The pinned Zig 0.16.0 probe runs `version` and `ast-check --color off` against t
 The native observation is `syntax_task_recheck` 0.1.0, wrapped by `task_verification_preview` 0.12.0. Generic repair briefs are 0.3.0; old 0.2.0 briefs and 0.11.0 verification schemas remain available unchanged. Zero native AST diagnostics are `candidate_absent_unverified_policy`: they end the pending local verification step, but do not close the task or certify project lint, build or delivery. Other generic languages still lack native confirmation adapters. See [the acceptance record](tests/acceptance/syntax-native-task-verification.md).
 
 Briefs also expose the latest native report reference/digest and current diagnostic positions; stale inputs suppress those positions. Only immutable grammars compiled into the binary reuse validated asset identities within a process; external manifests, source and native tools still require current-byte checks.
+
+
+### Source SDK: task closure after native verification
+
+`verify_zig_task_resolution` lets a protected host verify a task-specific signed policy, compare the original counterexample and current bytes with the same Zig 0.16.0, and append resolution, investigation or recurrence events. Ordinary `task verify` can record recurrence with the matching tool and reopen the same task; existing leases and attempt receipts remain in use.
+
+The default plugin and public CLI still lack the trusted policy provider, and npm 0.1.3 does not include this API. Editing task state or reading a local closure file cannot close an issue or approve delivery. See the [technical design](docs/Codeguard-Technical-Design.md) for the API, execution graph and full report, and [lifecycle acceptance](tests/acceptance/task-resolution-lifecycle.md) for its current scope.

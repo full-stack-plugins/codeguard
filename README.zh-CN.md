@@ -387,3 +387,10 @@ Cargo 声明 `Apache-2.0`；当前工作树已有仓库级 `LICENSE` 与 `NOTICE
 原生观察协议为 `syntax_task_recheck` 0.1.0，外层 `task_verification_preview` 为 0.12.0；通用修复简报为 0.3.0，原 0.2.0 简报与 0.11.0 复检 schema 原件保留。原生 AST 零诊断记录为 `candidate_absent_unverified_policy`：解除本地尝试的待复检状态，但不关闭任务，不认证项目 lint、构建或交付。其它通用语言的原生确认 adapter 仍缺。见[验收记录](tests/acceptance/syntax-native-task-verification.md)。
 
 简报同时提供最新原生报告引用/摘要和当前诊断位置；输入失效后不再投影这些位置。编译入二进制的不可变 grammar 校验结果仅在进程内复用，外部清单、源码和原生工具仍按当前字节复核。
+
+
+### 源码 SDK：原生复检后的限定任务关闭
+
+源码现提供 `verify_zig_task_resolution`：受保护宿主验签限定任务策略，使用同一 Zig 0.16.0 对原始反例与当前源码做原生对照，再追加关闭、调查或复发事件。普通 `task verify` 能记录匹配原工具的复发并重开同一任务；失败尝试沿用现有租约与验证收据。
+
+它尚未接入默认插件或公开 CLI 的可信策略来源，也未发布到 npm 0.1.3。手工修改任务或读取本地关闭文件仍不能关闭问题或放行交付。API、执行图与完整报告示例见[技术方案](docs/Codeguard-Technical-Design.zh_CN.md)，当前验收范围见[任务生命周期记录](tests/acceptance/task-resolution-lifecycle.md)。

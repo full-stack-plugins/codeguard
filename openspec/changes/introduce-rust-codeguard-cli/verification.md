@@ -2118,3 +2118,27 @@ Python 选中文件检查不再通过全项目元数据 walk 发现配置；只�
 验收：[原生确认与任务证据](../../../tests/acceptance/syntax-native-task-verification.md)。相关特性九组 83 passed/0 failed/14 ignored；明确运行真实 Zig 对照 1 passed；资产反例 11 passed。默认工作区最终顺序运行 1113 passed/0 failed/105 ignored、201 组；早先默认/特性并发构建干扰报告版本的失败记录保留，不计作通过。实际默认构建能够复检特性版生成的任务。172 个 schema 元定义、实际 CLI 输出及四项伪造负例通过，历史 schema 两份逐字节保留；Clippy -D warnings、fmt、分层、OpenSpec strict 与 diff 检查通过。最新简报证据/预算保护回归 14 passed/0 failed/1 ignored，见 /tmp/codeguard-native-syntax-last-guard.log；当前全目标特性 Clippy -D warnings 再次通过。
 
 上一提交 e506319 的 CI 37136788881 已成功；本轮新提交需按新 SHA 等待 CI。默认插件、其它通用原生 adapter、真实宿主、正式关闭/复发重开和全语言低误报评测仍缺，S09/S11/S14 父任务保持未完成；未发布新的 npm 制品或修改插件锁。
+
+## 2026-10-04 限定任务关闭、失败保留与原生复发
+
+受保护宿主 SDK `verify_zig_task_resolution` 接通 Zig 0.16.0 原始反例与当前源码对照，严格绑定签名策略、首次任务报告、工作区/范围、grammar、工具、宿主制品及批准期限。原样本有有效原生诊断且当前字节修复后无诊断，才返回限定 `code_fixed`；同字节或原样本原生合法进入误报调查；工具消失、原生故障、无效坐标或并发输入变化保留待核验。首次 finding 不改写，生命周期按明确父链读取，普通 `task verify` 检出匹配原工具的复发可追加 `reopened`，重复确认不生成重复生命周期事件。ready-to-verify 尝试与借用租约继续沿用既有流程。
+
+新增反例暴露并修正了 next 沿用旧准备步骤、成功复检未消费待核验尝试、公开复检没有重开、关闭归因被改写以及 not_run 证据被本地读者误判为损坏的问题。RED 记录与能力边界见 [限定任务验收](../../../tests/acceptance/task-resolution-lifecycle.md)。本地历史始终不能代替宿主信任来源或交付决策；SDK 的签名密钥和时钟来源测试是夹具，不是生产宿主证明。
+
+最终顺序验证：
+
+- core task_resolution_contract：7 passed、0 failed。
+- WASM 特性下 task_resolution_service 与 syntax_task_verify：17 passed、0 failed、2 ignored；明确运行本机真实 Zig 对照：1 passed、0 failed。真实工具用例不重复计入默认测试。
+- 默认全工作区全目标：203 组、1122 passed、0 failed、105 ignored，退出 0；忽略项不计验收通过。
+- WASM 特性全工作区全目标 Clippy `-D warnings` 退出 0；fmt、crate 分层、OpenSpec strict 与 diff 检查通过。
+- 176 个 schema 元定义有效，29 份实际/文档示例通过，6 类伪造变体被拒；四份新协议独立版本，现有消费者协议未覆盖。
+
+日志身份：
+- `/tmp/codeguard-resolution-core-final.log`：SHA-256 `00a9182b89267287b8d254e24d628f83059fe7108050513c662ba2211a6a5d74`。
+- `/tmp/codeguard-resolution-complete-final.log`：SHA-256 `298cea24d47a2333f6d160f282be42d03ab75f518d8ee303cd1bd28709af8c86`。
+- `/tmp/codeguard-resolution-real-zig-final.log`：SHA-256 `da58a6f398b85db943f4dbadd496599da95ebd0308b2c4182037056000090d0d`。
+- `/tmp/codeguard-resolution-workspace-final.log`：SHA-256 `f1dab883f6bf992833595f8ee1241b40e3a69ce15edff60e45921e77f60eca4e`。
+- `/tmp/codeguard-resolution-clippy-final.log`：SHA-256 `232438360b0e3a621857d3db7c2e1e1a7027663d3ca3c106c3fc512e9d5062c0`。
+- `/tmp/codeguard-resolution-schemas-final.log`：SHA-256 `15f1b959f89def12836da2d6cd90f0d7700edc0c2d8934e126ffcb66f48fb0d2`。
+
+中英文架构、技术方案、README 与修复工作流已同步。SDK 仅覆盖限定 Zig 语法任务；默认插件/公开 CLI 的可信策略提供者、其它原生适配器、环境/依赖/政策处置、白名单裁定、跨机器/Windows、完整门禁和全语言精度/性能仍缺。9.7/9.10/9.11/14.10 等父任务保持未完成；没有发布 npm 或修改插件锁。此前提交 4585d8f 的 CI 37140830716 已成功，新提交 CI 须按新 SHA 独立核验。

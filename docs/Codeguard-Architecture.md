@@ -544,3 +544,33 @@ The pinned Zig 0.16.0 probe runs `version` and `ast-check --color off` against t
 The native observation is `syntax_task_recheck` 0.1.0, wrapped by `task_verification_preview` 0.12.0. Generic repair briefs are 0.3.0; old 0.2.0 briefs and 0.11.0 verification schemas remain available unchanged. Zero native AST diagnostics are `candidate_absent_unverified_policy`: they end the pending local verification step, but do not close the task or certify project lint, build or delivery. Other generic languages still lack native confirmation adapters. See [the acceptance record](../tests/acceptance/syntax-native-task-verification.md).
 
 Briefs also expose the latest native report reference/digest and current diagnostic positions; stale inputs suppress those positions. Only immutable grammars compiled into the binary reuse validated asset identities within a process; external manifests, source and native tools still require current-byte checks.
+
+
+### Verified closure and recurrence for one task (source SDK)
+
+The source exposes `verify_zig_task_resolution` for a protected host to verify a **Zig native syntax-confirmation task**. The host independently pins its verification key, workspace, policy revision, code baseline, trusted time and rollback floor, and supplies the hash-bound original counterexample. Project-selected keys, policy candidates and task Markdown cannot provide that authority. The default plugin and public CLI still lack a trusted policy provider; this API is absent from published npm 0.1.3.
+
+Under the existing task lease, the handler runs the same approved Zig 0.16.0 against the original bytes and current file. Both runs share the request deadline, capped by approval expiry. A `code_fixed` event requires original native diagnostics, changed current source with no diagnostics, and matching tool, host artifact, grammar, task and policy identities. A native-clean original becomes a false-positive investigation; environment failure or changing input requires verification. This proves syntax for the specified task, not full lint, types, security or CVE coverage.
+
+Events replay through explicit parent links. Repeating the same verified result preserves its existing event. Ordinary `task verify` can append `reopened` when matching native diagnostics recur on current input, retaining the original fact and repair history and restoring native repair guidance. Missing parents, forks, duplicate identities, absent evidence or changed hashes require reconciliation. The handler also writes the existing native attempt receipt, clears matching `awaiting_verification`, and preserves a borrowed lease.
+
+Sanitized events live in `.codeguard/findings/<id>/events/lifecycle-*.json`; comparison evidence is ignored under `.codeguard/state/resolution_evidence/`. The first `finding.json` is immutable. Local `next/task show/status` have no trusted policy context and cannot elevate historical claims into current closure or delivery approval. All host receipts retain `delivery_decision=not_evaluated`.
+
+Other checker closures, environment/dependency/target/policy dispositions, actual host trust providers, cross-machine evidence recovery and the delivery gate remain open. See [task lifecycle acceptance](../tests/acceptance/task-resolution-lifecycle.md).
+
+
+```mermaid
+flowchart TD
+    A[Protected host pins policy and trust context] --> B[Verify signature and original task identity]
+    B --> C[Acquire or borrow existing lease]
+    C --> D[Same Zig checks original counterexample]
+    D --> E[Check current bytes and revalidate identities]
+    E --> F{Native result and input}
+    F -->|Original invalid and current repaired| G[Append resolution evidence and parent event]
+    F -->|Original also native-clean| H[False-positive investigation]
+    F -->|Tool failed or input changed| I[Preserve failed observation]
+    G --> J[Ordinary task verify native recheck]
+    J -->|Issue recurs| K[Reopen same task with history]
+    G --> L[Independent complete delivery check]
+    K --> J
+```

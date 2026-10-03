@@ -60,3 +60,16 @@ Native-first routing may create one stable setup task for a missing tool plus su
 A syntax-capable native result may refute a parser suspicion for the exact source/version/scope; a style-only lint result cannot. Preserve that contradiction for parser regression evaluation. Host injection must include coverage, missing native capabilities, next action and persistence failures, not just a red/green label. The existing selected CLI output is not proof that any host conversation integration works.
 
 Detailed current adapter/task slices and retained historical edge cases are listed in the [Chinese companion](Codeguard-Remediation-Workflow.zh_CN.md); shared report examples live in the [technical design](Codeguard-Technical-Design.md#73-conversation-report-examples--target-presentation).
+
+
+### Verified closure and recurrence for one task (source SDK)
+
+The source exposes `verify_zig_task_resolution` for a protected host to verify a **Zig native syntax-confirmation task**. The host independently pins its verification key, workspace, policy revision, code baseline, trusted time and rollback floor, and supplies the hash-bound original counterexample. Project-selected keys, policy candidates and task Markdown cannot provide that authority. The default plugin and public CLI still lack a trusted policy provider; this API is absent from published npm 0.1.3.
+
+Under the existing task lease, the handler runs the same approved Zig 0.16.0 against the original bytes and current file. Both runs share the request deadline, capped by approval expiry. A `code_fixed` event requires original native diagnostics, changed current source with no diagnostics, and matching tool, host artifact, grammar, task and policy identities. A native-clean original becomes a false-positive investigation; environment failure or changing input requires verification. This proves syntax for the specified task, not full lint, types, security or CVE coverage.
+
+Events replay through explicit parent links. Repeating the same verified result preserves its existing event. Ordinary `task verify` can append `reopened` when matching native diagnostics recur on current input, retaining the original fact and repair history and restoring native repair guidance. Missing parents, forks, duplicate identities, absent evidence or changed hashes require reconciliation. The handler also writes the existing native attempt receipt, clears matching `awaiting_verification`, and preserves a borrowed lease.
+
+Sanitized events live in `.codeguard/findings/<id>/events/lifecycle-*.json`; comparison evidence is ignored under `.codeguard/state/resolution_evidence/`. The first `finding.json` is immutable. Local `next/task show/status` have no trusted policy context and cannot elevate historical claims into current closure or delivery approval. All host receipts retain `delivery_decision=not_evaluated`.
+
+Other checker closures, environment/dependency/target/policy dispositions, actual host trust providers, cross-machine evidence recovery and the delivery gate remain open. See [task lifecycle acceptance](../tests/acceptance/task-resolution-lifecycle.md).
