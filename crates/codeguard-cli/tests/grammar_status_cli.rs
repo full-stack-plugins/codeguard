@@ -111,6 +111,7 @@ fn codegraph_coverage_is_explicit_and_never_claims_parser_or_gate_completion() {
     for (language, evidence) in [
         ("c", "C11 Apple clang 21 differential"),
         ("go", "Go 1.23.4 gofmt differential"),
+        ("java", "Java 17 syntax corpus of 8 valid and 5 invalid"),
         ("javascript", "Node 24.18.0 module syntax differential"),
         ("rust", "Rust 2021 rustfmt 1.9.0 differential"),
         ("zig", "Zig 0.16.0 ast-check differential"),

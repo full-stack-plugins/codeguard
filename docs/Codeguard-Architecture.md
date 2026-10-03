@@ -36,6 +36,8 @@ The source-built `check all` now runs a bounded candidate pass after its existin
 
 The source-built candidate scheduler now prepares bounded fragments in stable path order and runs up to `min(--jobs, 2)` isolated workers concurrently. It emits observations in that same order and rereads each source before accepting a worker result. A local 31-file, one-project fixture observed all 32 candidates within the unchanged 90-second pass; the Linux WASM integration step for source commit `ff60184` passed the same one-project test; the complete CI run passed. This changes candidate throughput, not its authority.
 
+The [Java 17 native differential](../tests/acceptance/java-native-differential.md) adds a 13-case javac 21 oracle for one grammar. It is local precision evidence only; Java remains an unqualified candidate.
+
 ```mermaid
 flowchart LR
     A[check all discovery] --> B[Native adapters and blockers]

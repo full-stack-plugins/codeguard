@@ -216,6 +216,8 @@ flowchart LR
 
 对于单个混合语言项目，候选阶段最多规划 64 个片段，再按不超过 `--jobs` 且最多两个隔离 worker 的批次执行。所有 worker 共用原 90 秒候选截止时间，成功结果若在出报告前发现源码变化就作废。本机 31 文件样例观察到全部 32 种固定候选且未跳过片段；源码提交 `ff60184` 的 Linux WASM 集成步骤已通过同一单项目测试；完整 CI 已通过，资源画像仍待验收。
 
+Java 的 [javac 21 `--release 17` 对照](../tests/acceptance/java-native-differential.md)接受 8 例合法、拒绝 5 例破损语法源码，与隔离 WASM worker 分类一致。该测试仅固定窄范围分类；项目级原生路由、版本覆盖和误报率仍待验收。
+
 可选特性构建的 CLI 在无显式原生上下文的 TypeScript 单文件请求中，先核对本地 ESLint 10 包及唯一普通 flat config。若从 `PATH` 解析到可执行 Node，就调用既有有界原生版本与报告探针；缺 Node 时报告准备缺口，不让 WASM 抢跑。仅未观察到本地 ESLint 包时，`.ts/.mts/.cts` 输出 [ESLint 反馈 0.3.0](../schemas/eslint-local-feedback-v0.3.schema.json)，`.tsx` 用独立 grammar 输出 [0.4.0](../schemas/eslint-local-feedback-v0.4.schema.json)。候选初检保留 `native=not_run`、`delivery=not_evaluated`，即使零恢复节点也保持未完成。配置选择歧义、本地路径不可信或包身份损坏时保留环境阻塞而不启动 WASM；部分显式上下文也沿用原路径。该增量不证明项目脚本参数等价、逐模块调度或宿主对话交付，见[原生优先局部验收](../tests/acceptance/native-first-eslint-candidate.md)。
 
 ### 5.4 Grammar 引入与运行生命周期——目标

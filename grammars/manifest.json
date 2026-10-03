@@ -103,7 +103,8 @@
       "codeguard_runtime_validation": "rust_loader_smoke_passed",
       "language_versions": [],
       "known_limitations": [
-        "Rust loader smoke passed; MSRV build, dialect versions, isolation and syntax corpus are not yet validated"
+        "A narrow Java 17 syntax corpus of 8 valid and 5 invalid samples matched javac 21 --release 17; other language versions, dialects and systematic false-positive rates remain unqualified",
+        "Project-native javac/P3C/Javadoc selection, MSRV and release qualification remain open"
       ],
       "release_status": "candidate_unvalidated"
     },
