@@ -477,7 +477,7 @@ fn check_all_observes_each_python_build_root_without_allowing_delivery() {
     let tool = project.native_tool();
     let (exit, report) = project.check_all(Some(&tool));
     assert_eq!(exit, 3);
-    assert_eq!(report["schema_version"], "0.34.0");
+    assert_eq!(report["schema_version"], "0.35.0");
     assert_eq!(report["delivery_decision"], "incomplete");
     let scans = report["native_results"]["python_cve"].as_array().unwrap();
     assert_eq!(scans.len(), 2);

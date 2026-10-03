@@ -22,9 +22,11 @@
 
 [已验收实现切片](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md)跟踪当前局部能力；[tasks](../openspec/changes/introduce-rust-codeguard-cli/tasks.md)独占完成状态。WASM 的完整统一入口仍为 S14 待办。可选 `codeguard-cli/wasm-precheck` 构建处理 `lint typescript <显式单文件>` 时，若观察到本地 ESLint 10 入口与唯一 flat config，会优先用 `PATH` 中可执行 Node 调用既有有界原生探针；缺 Node 则返回准备缺口。仅未观察到本地 ESLint 包时才输出 [TypeScript 0.3.0 候选反馈](../schemas/eslint-local-feedback-v0.3.schema.json)或 TSX 0.4.0。本地入口、包身份或配置不可信时保留具体环境阻塞，不启动 WASM。`lint java <显式单文件>` 仍输出 [Java 0.1.0 候选反馈](../schemas/java-syntax-precheck-feedback-v0.1.schema.json)。这些局部路径均不批准交付并保持退出 3；部分显式参数、Javadoc/Checkstyle 和符号链接沿用原路径，默认及已发布二进制也不含这项自动调度。见[原生优先局部验收](../tests/acceptance/native-first-eslint-candidate.md)与技术方案 5.3–5.4；后文未标当前的语法、退出0/1与闭环承诺均为目标契约。
 
-同一源码构建现在也会在 `check all` 的原生节点之后输出有界 `syntax_candidates`。[反馈 0.34.0](../schemas/check-feedback.schema.json)让 32 份固定 grammar 均能经统一入口分批被选用，同时保留原生阻塞、有界已知 grammar 限制（终端输出也限制条数）、未执行范围和未完成结论；Ruff 已完整覆盖的同摘要 Python 文件计入 `native_preferred_count`，不重复运行 WASM；`.tsx`、JavaScript、`.cfs` 与明确的 CFQuery 标签体分别路由。这仍是候选观察，不等于逐语言验收的原生兜底或自动宿主反馈，见[32 份验收](../tests/acceptance/check-all-32-grammar-candidates.md)。
+同一源码构建现在也会在 `check all` 的原生节点之后输出有界 `syntax_candidates`。[反馈 0.35.0](../schemas/check-feedback.schema.json)让 32 份固定 grammar 均能经统一入口分批被选用，同时保留原生阻塞、有界已知 grammar 限制（终端输出也限制条数）、未执行范围和未完成结论；Ruff 已完整覆盖的同摘要 Python 文件计入 `native_preferred_count`，不重复运行 WASM；`.tsx`、JavaScript、`.cfs` 与明确的 CFQuery 标签体分别路由。这仍是候选观察，不等于逐语言验收的原生兜底或自动宿主反馈，见[32 份验收](../tests/acceptance/check-all-32-grammar-candidates.md)。
 
 对已初始化且使用规范绝对路径的 `--workspace`，TypeScript/TSX 候选回退改用[反馈 0.5.0](../schemas/eslint-local-feedback-v0.5.schema.json)：按源码范围保存同一张 ESLint 原生确认阻塞任务，仅同步成功时返回真实 `setup.task_id`。重复扫描和后续 WASM 无恢复节点不关闭任务。版本化本地报告已通过报告摘要关联有界疑似位置；能力匹配原生复检仍未接通，见[局部验收](../tests/acceptance/typescript-syntax-confirmation-task.md)。
+
+源码构建已把 ESLint 接入 `check all` 的 `node.lint` 任务图节点，与其它原生检查共用并发与截止时间。按发现的 JS/TS/TSX 文件选择最近的模块清单、本地 ESLint 10、唯一 flat config 和 Node；搜索不越过受检根。检查阶段收集报告，汇总阶段串行同步工作台，重复发现复用同一任务。每个完整且字节匹配的原生文件可免去重复 WASM；被忽略、配置错误或工具失败的文件仍保留降级与原生原因。协议为 `check_feedback` 0.35.0、`check_aborted` 0.12.0，原协议归档；`native_results.node_lint` 提供逐文件反馈、未执行文件、同步结果及下一步。见[验收范围](../tests/acceptance/check-all-eslint.md)。这不提升 grammar 资质或代替真实宿主验收。
 
 ## 1. 命令体系与协作路线
 

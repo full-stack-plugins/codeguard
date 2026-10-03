@@ -138,7 +138,7 @@ fn check_all_routes_distinct_dialects_after_native_without_claiming_clean() {
         String::from_utf8_lossy(&output.stderr)
     );
     let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
-    assert_eq!(report["schema_version"], "0.34.0");
+    assert_eq!(report["schema_version"], "0.35.0");
     assert_eq!(report["execution_budget"]["jobs_limit"], 1);
     assert_eq!(report["delivery_decision"], "incomplete");
     let observations = report["syntax_candidates"]["observations"]

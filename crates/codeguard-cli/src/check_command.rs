@@ -162,6 +162,12 @@ pub fn run(args: &[String]) -> ExitCode {
         .map(|evidence| &evidence.source_files);
     let rust_present =
         parsed.selection == Selection::All && rust_sources.is_some_and(|files| !files.is_empty());
+    let node_sources = if parsed.selection == Selection::All {
+        crate::check_eslint_scan::sources(&discovery)
+    } else {
+        BTreeSet::new()
+    };
+    let node_present = !node_sources.is_empty();
     let go_present = parsed.selection == Selection::All
         && discovery
             .languages
@@ -258,6 +264,7 @@ pub fn run(args: &[String]) -> ExitCode {
     let mut rust_comments_outcome = None;
     let mut rust_build_outcome = None;
     let mut rust_cve_outcome = None;
+    let mut node_task_outcome = None;
     let mut go_task_outcome = None;
     let mut java_task_outcome = None;
     let mut javadoc_task_outcome = None;
@@ -268,13 +275,15 @@ pub fn run(args: &[String]) -> ExitCode {
     let mut rust_comments = Value::Null;
     let mut rust_build = Value::Null;
     let mut rust_cve = Value::Null;
+    let mut node_lint = Value::Null;
     let mut go_lint = Value::Null;
     let mut java_p3c = Value::Null;
     let mut java_javadoc = Value::Null;
     let mut java_dependencies = Value::Null;
     let mut java_cve = Value::Null;
     let empty_java_sources = BTreeSet::new();
-    if python_present
+    if node_present
+        || python_present
         || rust_present
         || go_present
         || java_present
@@ -284,6 +293,13 @@ pub fn run(args: &[String]) -> ExitCode {
         || !python_cve_roots.is_empty()
     {
         let mut nodes = Vec::new();
+        if node_present {
+            nodes.push(TaskNode {
+                id: "node.lint".into(),
+                dependencies: Vec::new(),
+                resources: vec!["node.eslint".into()],
+            });
+        }
         if python_present {
             nodes.push(TaskNode {
                 id: "python.lint".into(),
@@ -369,6 +385,7 @@ pub fn run(args: &[String]) -> ExitCode {
         let rust_comments_slot = Mutex::new(None);
         let rust_build_slot = Mutex::new(None);
         let rust_cve_slot = Mutex::new(None);
+        let node_slot = Mutex::new(None::<crate::check_eslint_scan::CheckEslintScan>);
         let go_slot = Mutex::new(None);
         let java_slot = Mutex::new(None);
         let javadoc_slot = Mutex::new(None);
@@ -453,6 +470,28 @@ pub fn run(args: &[String]) -> ExitCode {
                         .lock()
                         .expect("npm结果槽未中毒")
                         .insert(id.id.clone(), report);
+                    outcome
+                } else if id.id == "node.lint" {
+                    let scan = crate::check_eslint_scan::CheckEslintScan::run(
+                        &root,
+                        &node_sources,
+                        parsed
+                            .npm_options
+                            .get("--node-tool")
+                            .map(std::path::Path::new),
+                        deadline,
+                        flag,
+                    );
+                    let outcome = if scan.feedback["reason"] == "request_cancelled" {
+                        TaskExecution::Cancelled
+                    } else if scan.feedback["reason"] == "request_deadline_exceeded" {
+                        TaskExecution::TimedOut
+                    } else if scan.feedback["status"] == "local_observation" {
+                        TaskExecution::Succeeded
+                    } else {
+                        TaskExecution::Failed
+                    };
+                    *node_slot.lock().expect("ESLint结果槽未中毒") = Some(scan);
                     outcome
                 } else if id.id == "go.lint" {
                     let report = observe_go_vet(&root, parsed.go_tool.as_deref(), deadline, flag);
@@ -734,6 +773,7 @@ pub fn run(args: &[String]) -> ExitCode {
                 "rust_comments":snapshot_native_slot(&rust_comments_slot),
                 "rust_build":snapshot_native_slot(&rust_build_slot),
                 "rust_cve":snapshot_native_slot(&rust_cve_slot),
+                "node_lint":node_slot.lock().unwrap_or_else(std::sync::PoisonError::into_inner).as_ref().map(|scan|scan.feedback.clone()).unwrap_or(Value::Null),
                 "go_lint":snapshot_native_slot(&go_slot),
                 "java_p3c":snapshot_native_slot(&java_slot),
                 "java_javadoc":snapshot_native_slot(&javadoc_slot),
@@ -765,6 +805,15 @@ pub fn run(args: &[String]) -> ExitCode {
                 println!("{}", report["native_results"]);
             }
             return ExitCode::from(if cancelled_with_failure { 130 } else { 4 });
+        }
+        if node_present {
+            let outcome = *outcomes.get("node.lint").expect("ESLint任务结果完整");
+            node_task_outcome = Some(outcome);
+            execution_tasks.push(json!({"id":"node.lint","status":task_status(outcome)}));
+            if let Some(mut scan) = node_slot.into_inner().expect("ESLint结果槽未中毒") {
+                scan.sync(&root, deadline);
+                node_lint = scan.feedback;
+            }
         }
         let mut npm_reports = npm_slots.into_inner().expect("npm结果槽未中毒");
         let mut python_cve_reports = python_cve_slots
@@ -1206,6 +1255,22 @@ pub fn run(args: &[String]) -> ExitCode {
                     "checker_configuration_unresolved"
                 });
             }
+            if category == "lint"
+                && node_sources
+                    .iter()
+                    .any(|path| evidence.source_files.contains(path))
+            {
+                candidate["checker_id"] = json!("node.eslint");
+                candidate["status"] = json!(if node_lint["status"] == "local_observation" {
+                    "observed_unverified"
+                } else {
+                    "native_incomplete"
+                });
+                candidate["reason"] = json!("eslint_project_coverage_unverified");
+                candidate["next_action"] = json!(
+                    "读取逐文件 ESLint 原生发现与准备原因，按项目原配置复检；缺工具或配置的模块继续语法初检"
+                );
+            }
             candidates.push(candidate);
         }
     }
@@ -1216,6 +1281,9 @@ pub fn run(args: &[String]) -> ExitCode {
     ]
     .into_iter()
     .collect();
+    if node_present && node_task_outcome != Some(TaskOutcome::Succeeded) {
+        unresolved.insert("node_lint_incomplete".into());
+    }
     if let Some(reason) = scope_recheck {
         unresolved.insert(reason.into());
     }
@@ -1337,6 +1405,7 @@ pub fn run(args: &[String]) -> ExitCode {
         })
         || codeguard_runtime::sigint_cancellation_requested()
         || [
+            node_task_outcome,
             python_task_outcome,
             rust_task_outcome,
             rust_comments_outcome,
@@ -1410,6 +1479,12 @@ pub fn run(args: &[String]) -> ExitCode {
                 .filter(|value| !value.is_null())
                 .cloned()
         })
+        .or_else(|| {
+            node_lint
+                .get("next")
+                .filter(|value| !value.is_null())
+                .cloned()
+        })
         .unwrap_or_else(|| {
             if npm_cve
                 .iter()
@@ -1427,6 +1502,7 @@ pub fn run(args: &[String]) -> ExitCode {
             }
         });
     let started_native_task_count = [
+        node_task_outcome,
         python_task_outcome,
         rust_task_outcome,
         rust_comments_outcome,
@@ -1456,6 +1532,7 @@ pub fn run(args: &[String]) -> ExitCode {
         &root,
         &discovery,
         crate::check_syntax_candidates::NativeCoverage {
+            node_lint: &node_lint,
             python_lint: &python_lint,
             go_lint: &go_lint,
             go_tool: parsed.go_tool.as_deref(),
@@ -1480,18 +1557,18 @@ pub fn run(args: &[String]) -> ExitCode {
         "next_action":"使用包含固定语法资产的发行包运行候选初检，并完成适用原生检查"
     });
     let report = json!({
-        "schema_version":"0.34.0", "report_type":"check_feedback",
+        "schema_version":"0.35.0", "report_type":"check_feedback",
         "operation":"check", "selection":parsed.selection.as_str(), "command_status":if request_cancelled { "cancelled" } else { "incomplete" },
         "exit_code":if request_cancelled { 130 } else { 3 }, "delivery_decision":if parsed.selection == Selection::All { "incomplete" } else { "not_evaluated" }, "authority":"local_unverified",
         "reason":if request_cancelled { "request_cancelled" } else if parsed.selection == Selection::All { "full_project_obligations_and_trusted_policy_unavailable" } else { "java_selection_obligations_and_trusted_policy_unavailable" },
         "discovery":discovery.to_json(),
-        "native_results":{"python_lint":python_lint,"python_cve":python_cve,"rust_lint":rust_lint,"rust_comments":rust_comments,"rust_build":rust_build,"rust_cve":rust_cve,"go_lint":go_lint,"java_p3c":java_p3c,"java_javadoc":java_javadoc,"java_dependencies":java_dependencies,"java_cve":java_cve,"npm_cve":npm_cve}, "execution_tasks":execution_tasks,
+        "native_results":{"node_lint":node_lint,"python_lint":python_lint,"python_cve":python_cve,"rust_lint":rust_lint,"rust_comments":rust_comments,"rust_build":rust_build,"rust_cve":rust_cve,"go_lint":go_lint,"java_p3c":java_p3c,"java_javadoc":java_javadoc,"java_dependencies":java_dependencies,"java_cve":java_cve,"npm_cve":npm_cve}, "execution_tasks":execution_tasks,
         "obligation_status":"unresolved", "required_obligations":null,
         "category_candidates":candidates, "unresolved_conditions":unresolved,
         "syntax_candidates":syntax_candidates,
         "execution_budget":check_budget_record(
             parsed.timeout_ms, parsed.timeout_source, parsed.jobs_limit, parsed.jobs_source,
-            usize::from(python_present) + python_cve_roots.len() + 4 * usize::from(rust_present) + usize::from(go_present) + usize::from(java_present) + usize::from(javadoc_configured) + usize::from(dependency_configured) + usize::from(cve_configured) + npm_roots.len(), started_native_task_count
+            usize::from(node_present) + usize::from(python_present) + python_cve_roots.len() + 4 * usize::from(rust_present) + usize::from(go_present) + usize::from(java_present) + usize::from(javadoc_configured) + usize::from(dependency_configured) + usize::from(cve_configured) + npm_roots.len(), started_native_task_count
         ),
         "next":next,
         "export":{"status":"not_requested","reason_code":null}
@@ -1858,6 +1935,29 @@ pub fn run(args: &[String]) -> ExitCode {
         for task in &execution_tasks {
             println!("执行任务 {}: {}", task["id"], task["status"]);
         }
+        if let Some(files) = report["native_results"]["node_lint"]["files"].as_array() {
+            for file in files {
+                println!(
+                    "ESLint 文件：{}；原因：{}",
+                    file["path"], file["feedback"]["reason"]
+                );
+                for finding in file["feedback"]["findings"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                {
+                    println!(
+                        "原生规则 {}，行 {}，列 {}，严重度 {}",
+                        finding["rule_id"], finding["line"], finding["column"], finding["severity"]
+                    );
+                }
+                println!("下一步：{}", file["feedback"]["next_action"]);
+            }
+            println!(
+                "ESLint 工作台：{}",
+                report["native_results"]["node_lint"]["backlog_status"]
+            );
+        }
         if let Some(observations) = report["syntax_candidates"]["observations"].as_array() {
             if report["syntax_candidates"]["status"] == "not_run" {
                 if report["syntax_candidates"]["reason"] == "native_preferred" {
@@ -2098,6 +2198,9 @@ fn aborted_task_report(
     mut native_results: Value,
     cancelled: bool,
 ) -> Value {
+    if native_results.get("node_lint").is_none() {
+        native_results["node_lint"] = Value::Null;
+    }
     if native_results.get("rust_cve").is_none() {
         native_results["rust_cve"] = Value::Null;
     }
@@ -2120,7 +2223,7 @@ fn aborted_task_report(
         .map(|(id, outcome)| json!({"id":id,"status":task_status(*outcome)}))
         .collect();
     json!({
-        "schema_version":"0.11.0", "report_type":"check_aborted",
+        "schema_version":"0.12.0", "report_type":"check_aborted",
         "operation":"check", "selection":selection.as_str(),
         "command_status":if cancelled { "cancelled" } else { "internal_error" },
         "exit_code":if cancelled { 130 } else { 4 },

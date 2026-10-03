@@ -41,3 +41,7 @@ cargo test --offline -p codeguard-cli \
 ```
 
 npm 发布证据为此前已执行记录，本轮没有重新发布或运行远程安装。
+
+## 当前聚合 ESLint 接线
+
+`check all` 的模块本地 ESLint 原生阶段、相同源码免重复 WASM、串行同步稳定任务和聚合 next 已接通。对应 7.3、14.6、14.10，证据集中维护在 [check-all-eslint](../../../tests/acceptance/check-all-eslint.md)。受控工具测试证明编排与任务契约；本次未执行真实 ESLint 或宿主安装验收。父任务还包含其它包管理器、语言及完整闭环，不据此整体勾选。

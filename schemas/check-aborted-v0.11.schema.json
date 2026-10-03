@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:codeguard:schema:check-aborted:0.12.0",
+  "$id": "urn:codeguard:schema:check-aborted:0.11.0",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -21,7 +21,7 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "0.12.0"
+      "const": "0.11.0"
     },
     "report_type": {
       "const": "check_aborted"
@@ -118,8 +118,7 @@
         "npm_cve",
         "rust_comments",
         "rust_build",
-        "rust_cve",
-        "node_lint"
+        "rust_cve"
       ],
       "properties": {
         "python_lint": {
@@ -133,27 +132,13 @@
           "maxItems": 1000,
           "items": {
             "type": "object",
-            "required": [
-              "reason",
-              "native_report_valid",
-              "findings"
-            ],
+            "required": ["reason", "native_report_valid", "findings"],
             "properties": {
-              "reason": {
-                "type": "string"
-              },
-              "native_report_valid": {
-                "type": "boolean"
-              },
-              "findings": {
-                "type": "array"
-              },
-              "delivery_decision": {
-                "const": "not_evaluated"
-              },
-              "coverage_proven": {
-                "const": false
-              }
+              "reason": {"type": "string"},
+              "native_report_valid": {"type": "boolean"},
+              "findings": {"type": "array"},
+              "delivery_decision": {"const": "not_evaluated"},
+              "coverage_proven": {"const": false}
             }
           }
         },
@@ -1768,269 +1753,6 @@
           "type": [
             "object",
             "null"
-          ]
-        },
-        "node_lint": {
-          "oneOf": [
-            {
-              "type": "null"
-            },
-            {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "status",
-                "reason",
-                "coverage_proven",
-                "delivery_decision",
-                "files",
-                "unexecuted_files",
-                "backlog_status",
-                "new_findings",
-                "new_blockers",
-                "next"
-              ],
-              "properties": {
-                "status": {
-                  "enum": [
-                    "local_observation",
-                    "incomplete"
-                  ]
-                },
-                "reason": {
-                  "type": "string"
-                },
-                "coverage_proven": {
-                  "const": false
-                },
-                "delivery_decision": {
-                  "const": "not_evaluated"
-                },
-                "files": {
-                  "type": "array",
-                  "maxItems": 10000,
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                      "path",
-                      "source_sha256",
-                      "feedback"
-                    ],
-                    "properties": {
-                      "path": {
-                        "type": "string"
-                      },
-                      "source_sha256": {
-                        "type": [
-                          "string",
-                          "null"
-                        ],
-                        "pattern": "^[0-9a-f]{64}$"
-                      },
-                      "feedback": {
-                        "title": "ESLint局部未批准反馈",
-                        "type": "object",
-                        "additionalProperties": false,
-                        "required": [
-                          "schema_version",
-                          "report_type",
-                          "status",
-                          "local_coherent",
-                          "coverage_proven",
-                          "delivery_decision",
-                          "reason",
-                          "findings",
-                          "suppressed_count",
-                          "workbench_status",
-                          "next_action",
-                          "workbench"
-                        ],
-                        "properties": {
-                          "schema_version": {
-                            "const": "0.2.0"
-                          },
-                          "report_type": {
-                            "const": "eslint_local_feedback"
-                          },
-                          "status": {
-                            "enum": [
-                              "incomplete",
-                              "local_observation"
-                            ]
-                          },
-                          "local_coherent": {
-                            "type": "boolean"
-                          },
-                          "coverage_proven": {
-                            "const": false
-                          },
-                          "delivery_decision": {
-                            "const": "not_evaluated"
-                          },
-                          "reason": {
-                            "type": "string",
-                            "minLength": 1
-                          },
-                          "findings": {
-                            "type": "array",
-                            "items": {
-                              "type": "object",
-                              "additionalProperties": false,
-                              "required": [
-                                "path",
-                                "rule_id",
-                                "severity",
-                                "line",
-                                "column",
-                                "message_sha256"
-                              ],
-                              "properties": {
-                                "path": {
-                                  "type": "string",
-                                  "minLength": 1
-                                },
-                                "rule_id": {
-                                  "type": "string",
-                                  "minLength": 1
-                                },
-                                "severity": {
-                                  "enum": [
-                                    1,
-                                    2
-                                  ]
-                                },
-                                "line": {
-                                  "type": "integer",
-                                  "minimum": 1
-                                },
-                                "column": {
-                                  "type": "integer",
-                                  "minimum": 1
-                                },
-                                "message_sha256": {
-                                  "type": "string",
-                                  "pattern": "^[a-f0-9]{64}$"
-                                }
-                              }
-                            }
-                          },
-                          "suppressed_count": {
-                            "type": "integer",
-                            "minimum": 0
-                          },
-                          "workbench_status": {
-                            "type": "string",
-                            "minLength": 1
-                          },
-                          "next_action": {
-                            "type": "string",
-                            "minLength": 1
-                          },
-                          "workbench": {
-                            "anyOf": [
-                              {
-                                "type": "null"
-                              },
-                              {
-                                "type": "object",
-                                "required": [
-                                  "status"
-                                ],
-                                "additionalProperties": false,
-                                "properties": {
-                                  "status": {
-                                    "type": "string"
-                                  },
-                                  "new_findings": {
-                                    "type": "integer",
-                                    "minimum": 0
-                                  },
-                                  "new_blockers": {
-                                    "type": "integer",
-                                    "minimum": 0
-                                  },
-                                  "failed_reports": {
-                                    "type": "integer",
-                                    "minimum": 0
-                                  },
-                                  "next": {
-                                    "type": [
-                                      "object",
-                                      "null"
-                                    ]
-                                  },
-                                  "next_error": {
-                                    "type": [
-                                      "string",
-                                      "null"
-                                    ]
-                                  }
-                                }
-                              }
-                            ]
-                          }
-                        },
-                        "allOf": [
-                          {
-                            "if": {
-                              "properties": {
-                                "local_coherent": {
-                                  "const": true
-                                }
-                              }
-                            },
-                            "then": {
-                              "properties": {
-                                "status": {
-                                  "const": "local_observation"
-                                }
-                              }
-                            },
-                            "else": {
-                              "properties": {
-                                "status": {
-                                  "const": "incomplete"
-                                }
-                              }
-                            }
-                          }
-                        ]
-                      }
-                    }
-                  }
-                },
-                "unexecuted_files": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "backlog_status": {
-                  "enum": [
-                    "not_connected",
-                    "deadline_or_cancelled",
-                    "backlog_update_failed",
-                    "synced_partial",
-                    "sync_incomplete"
-                  ]
-                },
-                "new_findings": {
-                  "type": "integer",
-                  "minimum": 0
-                },
-                "new_blockers": {
-                  "type": "integer",
-                  "minimum": 0
-                },
-                "next": {
-                  "type": [
-                    "object",
-                    "null"
-                  ]
-                }
-              }
-            }
           ]
         }
       }

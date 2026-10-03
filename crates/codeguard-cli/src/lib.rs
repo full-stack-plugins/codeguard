@@ -18,7 +18,7 @@ mod eslint_effective_settings;
 mod eslint_lint_arguments;
 #[cfg(unix)]
 pub mod eslint_lint_command;
-#[cfg(all(feature = "wasm-precheck", unix))]
+#[cfg(unix)]
 mod eslint_native_first_candidate;
 mod eslint_preparation;
 pub mod eslint_probe;
@@ -78,6 +78,8 @@ pub mod cargo_build_repair_brief;
 pub mod check_budget;
 #[cfg(unix)]
 pub mod check_command;
+#[cfg(unix)]
+mod check_eslint_scan;
 pub mod check_plan;
 pub mod check_request;
 #[cfg(all(unix, feature = "wasm-precheck"))]

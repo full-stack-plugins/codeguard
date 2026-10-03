@@ -14,6 +14,14 @@
 - **WHEN** 前端具备有效 ESLint 而 Java 模块缺少 JDK
 - **THEN** 前端运行原生 lint，Java 模块提供语法初检；两者的范围、来源和准备状态分别保留
 
+#### Scenario: Aggregate checks discover module-local ESLint
+- **WHEN** `check all` 发现 JavaScript/TypeScript/TSX 源码及其项目本地受支持 ESLint、单一 flat config 和可用 Node
+- **THEN** 在统一任务图和截止时间内逐文件调用既有原生适配器，保留原规则发现；仅对本轮完整原生检查且源码字节未变的文件跳过重复 WASM。缺配置、被忽略、工具故障和其它模块仍分别保留阻塞与降级初检。已初始化工作区串行同步原生任务，重复扫描复用稳定任务；聚合报告、终端和 next 均可取得修复指引。
+
+#### Scenario: Source discovery alone does not establish a required installation
+- **WHEN** 聚合原生阶段发现 JS/TS 源码，但未观察到本地 ESLint 上下文
+- **THEN** 报告工具上下文缺口，不能仅凭源码存在生成阻断性安装任务或抢占 next；后续准备动作由项目原生义务或语法初检确认需求决定
+
 #### Scenario: Explicit Zig 0.16 source check takes precedence over the candidate grammar
 - **WHEN** `lint zig` 收到可核对的 Zig 0.16.0 工具与普通 `.zig` 文件
 - **THEN** 优先以受控进程运行原生 `zig ast-check`；原生诊断必须保留，不能因 WASM 观察覆盖。只有该原生工具未提供或不可运行时，才可返回未验收 WASM 候选观察，并始终保持整体未完成；`ast-check` 不等于全部 Zig lint、测试或构建。

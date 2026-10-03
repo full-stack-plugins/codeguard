@@ -22,6 +22,7 @@ const MAX_CONCURRENT_WORKERS: usize = 2;
 
 /// 本轮已执行的原生语法相关结果及显式工具；仅用于判断同一源码是否可避免重复解析。
 pub struct NativeCoverage<'a> {
+    pub node_lint: &'a Value,
     pub python_lint: &'a Value,
     pub go_lint: &'a Value,
     pub go_tool: Option<&'a Path>,
@@ -142,7 +143,8 @@ pub fn observe(
                 continue;
             }
         };
-        if native_python_covers(native.python_lint, relative, &source)
+        if crate::check_eslint_scan::covers(native.node_lint, relative, &source)
+            || native_python_covers(native.python_lint, relative, &source)
             || native_go_covers(&native_go_files, relative, &source)
         {
             native_preferred_count += 1;

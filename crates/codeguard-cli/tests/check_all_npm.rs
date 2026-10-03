@@ -124,7 +124,14 @@ fn check_all_runs_each_npm_root_and_syncs_without_claiming_vulnerability_coverag
             assert_eq!(scan["backlog_status"], "synced_partial", "{scan}");
             assert_eq!(scan["feedback"]["advisory_coverage"], "not_evaluated");
         }
-        assert_eq!(report["execution_tasks"].as_array().unwrap().len(), 2);
+        assert_eq!(report["execution_tasks"].as_array().unwrap().len(), 3);
+        assert!(
+            report["execution_tasks"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|task| task["id"] == "node.lint")
+        );
         assert_eq!(
             fs::read_dir(fixture.0.join(".codeguard/tasks"))
                 .unwrap()
@@ -342,6 +349,9 @@ fn check_all_runs_each_npm_root_and_syncs_without_claiming_vulnerability_coverag
             .as_array()
             .unwrap()
             .iter()
+            .filter(|task| task["id"]
+                .as_str()
+                .is_some_and(|id| id.starts_with("npm.cve.")))
             .all(|task| matches!(
                 task["status"].as_str(),
                 Some("deadline_exceeded" | "deadline_before_start")
@@ -411,7 +421,7 @@ fn real_npm_audit_enters_check_all_workbench() {
         String::from_utf8_lossy(&out.stderr)
     );
     let report: Value = serde_json::from_slice(&out.stdout).unwrap();
-    assert_eq!(report["schema_version"], "0.34.0");
+    assert_eq!(report["schema_version"], "0.35.0");
     assert_eq!(
         report["native_results"]["npm_cve"][0]["feedback"]["local_coherent"], true,
         "{report}"
