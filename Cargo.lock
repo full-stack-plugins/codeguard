@@ -145,7 +145,7 @@ dependencies = [
 
 [[package]]
 name = "codeguard-adapters"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "codeguard-core",
  "roxmltree",
@@ -158,7 +158,7 @@ dependencies = [
 
 [[package]]
 name = "codeguard-cli"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "base64",
  "codeguard-adapters",
@@ -175,7 +175,7 @@ dependencies = [
 
 [[package]]
 name = "codeguard-core"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "base64",
  "serde",
@@ -183,7 +183,7 @@ dependencies = [
 
 [[package]]
 name = "codeguard-runtime"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "codeguard-core",
  "flate2",
