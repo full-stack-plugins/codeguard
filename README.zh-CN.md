@@ -180,8 +180,8 @@ codeguard task verify "$TASK_ID" . --format json
 | `config validate / explain`、`rules list` | 查看配置和规则来源 | 候选不构成策略批准 |
 | `tools list / verify`、`doctor` | 查看工具和有限环境探测 | 显式 Ruff doctor 探测；`tools install --apply` 受阻 |
 | `plan CATEGORY LANGUAGE` | 预览选择和缺口 | 不是已认证执行计划 |
-| `hook execute` | 启动只读发现、Stop 有界下一步、按任务原工具复检、Python 编辑局部反馈及显式 Git 工具的提交面安全预览 | 必须给超时；复检不自动关闭任务，推送/CI 仍未接线，不构成宿主交付门禁 |
-| `hook claude <session-start\|post-tool-use\|post-tool-use-failure\|stop>` | 将 Claude Code 生命周期事件映射为只读发现、局部编辑反馈、失败不检查或本地下一步指引 | 候选软 Hook；Stop 最多引导一次继续；尚无插件二进制绑定或交付门禁 |
+| `hook execute` | 启动只读发现、Stop 有界下一步、按任务原工具复检、Python/Ruff、JS/TS/ESLint 与可选 WASM 编辑反馈及显式 Git 工具的提交面安全预览 | 必须给超时；复检不自动关闭任务，推送/CI 仍未接线，不构成宿主交付门禁 |
+| `hook claude <session-start\|post-tool-use\|post-tool-use-failure\|stop>` | 将 Claude Code 生命周期事件映射为只读发现、局部编辑反馈、失败不检查或本地下一步指引 | 候选软 Hook；Stop 最多引导一次继续；默认 Hook 与交付门禁仍未接通 |
 | `lint python / java / typescript / go` | 执行已接入原生检查 | 参数和范围因适配器而异 |
 | `comments rust`、`build rust` | 文档与类型检查 | build 不运行项目测试 |
 | `cve rust / python / typescript` | 原生漏洞公告观察 | 漏洞库身份、时效及完整覆盖仍有限 |
@@ -372,3 +372,5 @@ cargo run --locked -p codeguard-cli --example validate_corpus -- \
 贡献应保持原生规则语义、补齐正反例、区分环境失败与发现，并同步双语文档和受影响 schema。非敏感缺陷可提交 [GitHub Issues](https://github.com/full-stack-plugins/codeguard/issues)。专门的安全披露政策尚未建立。
 
 Cargo 声明 `Apache-2.0`；当前工作树已有仓库级 `LICENSE` 与 `NOTICE`，公开 npm 包也包含两者。不提供未经核实的 crates.io 或 CI 徽章。
+
+源码新增编辑事件原生优先快检：`hook execute` / `hook claude post-tool-use` 只检查事件明确指定的普通文件，Python 用 Ruff、JS/TS 用模块本地 ESLint 10；同字节完整原生结果不重复解析。未覆盖文件可调用固定 WASM 候选，混合语言仍保留局部结果、原生未接线范围和失败原因。疑似恢复节点要求安装或修复原生工具并确认；完整零恢复候选只建议安装，不代表完整通过。共享事件截止时间，最多 8 文件、2 个 WASM worker；未构建 WASM 明确报告缺口。外层反馈 0.6.0，局部 `hook_fast_feedback` 0.1.0。默认插件 Hook 尚未切换，候选同步/自动关闭和真实宿主验收未完成。见[编辑快检验收](tests/acceptance/hook-fast-native-wasm.md)。

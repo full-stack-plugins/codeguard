@@ -243,3 +243,151 @@ fn source_presence_alone_does_not_enqueue_required_lint_installation() {
         assert_eq!(scan["next"], Value::Null);
     }
 }
+
+fn edited_hook(p: &Project, paths: &[&str], claude: bool) -> Value {
+    use std::io::Write;
+    use std::process::Stdio;
+    let mut command = Command::new(env!("CARGO_BIN_EXE_codeguard"));
+    command.arg("hook");
+    let payload = if claude {
+        command.args(["claude", "post-tool-use"]);
+        serde_json::json!({"hook_event_name":"PostToolUse","cwd":p.0,
+            "tool_name":"Edit","tool_input":{"file_path":p.0.join(paths[0])},
+            "tool_response":{"success":true}})
+    } else {
+        command.arg("execute");
+        serde_json::json!({"schema_version":"1.0.0","report_type":"hook_trigger_request",
+            "input":{"event":"file_changed","changed_paths":paths,"task_id":null,
+            "write_outcome":"confirmed","host_claims_blocking":false}})
+    };
+    let mut child = command
+        .arg(&p.0)
+        .arg("--node-tool")
+        .arg(p.0.join("node"))
+        .args(["--timeout=60s", "--format=json"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(&serde_json::to_vec(&payload).unwrap())
+        .unwrap();
+    let output = child.wait_with_output().unwrap();
+    assert_eq!(
+        output.status.code(),
+        Some(if claude { 0 } else { 3 }),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    serde_json::from_slice(&output.stdout).unwrap()
+}
+
+#[test]
+fn edited_javascript_uses_native_result_and_safe_dialogue() {
+    let p = Project::new("hook-native");
+    let init = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .arg("init")
+        .arg(&p.0)
+        .arg("--apply")
+        .output()
+        .unwrap();
+    assert_eq!(init.status.code(), Some(3));
+    let report = edited_hook(&p, &["frontend/app.js"], false);
+    let feedback = &report["local_feedback"];
+    assert_eq!(feedback["node_lint"]["files"].as_array().unwrap().len(), 1);
+    assert_eq!(
+        feedback["node_lint"]["files"][0]["feedback"]["findings"][0]["rule_id"],
+        "no-debugger"
+    );
+    #[cfg(feature = "wasm-precheck")]
+    assert_eq!(feedback["syntax_candidates"]["native_preferred_count"], 1);
+    assert_eq!(feedback["node_lint"]["new_findings"], 1);
+    let second = edited_hook(&p, &["frontend/app.js"], false);
+    assert_eq!(second["local_feedback"]["node_lint"]["new_findings"], 0);
+    let host = edited_hook(&p, &["frontend/app.js"], true);
+    let context = host["hookSpecificOutput"]["additionalContext"]
+        .as_str()
+        .unwrap();
+    assert!(context.contains("no-debugger"), "{context}");
+    assert!(context.contains("CG-"), "{context}");
+    assert!(context.contains("task show"), "{context}");
+    assert!(context.contains("交付未评估"));
+    assert!(!context.contains("fixture"));
+}
+
+#[test]
+fn edited_symlink_does_not_execute_native_tool_or_expand_scope() {
+    let p = Project::new("hook-symlink");
+    std::os::unix::fs::symlink("frontend", p.0.join("linked")).unwrap();
+    let report = edited_hook(&p, &["linked/app.js"], false);
+    let feedback = &report["local_feedback"];
+    assert_eq!(feedback["unavailable_files"][0]["path"], "linked/app.js");
+    assert!(
+        feedback["node_lint"]["files"]
+            .as_array()
+            .unwrap()
+            .is_empty()
+    );
+}
+
+#[cfg(feature = "wasm-precheck")]
+#[test]
+fn edited_missing_lint_uses_wasm_and_distinguishes_required_from_recommended() {
+    let p = Project::new("hook-fallback");
+    fs::remove_dir_all(p.0.join("frontend/node_modules")).unwrap();
+    let report = edited_hook(&p, &["frontend/app.js"], false);
+    assert_eq!(
+        report["local_feedback"]["next_action"],
+        "recommend_native_lint"
+    );
+    assert_eq!(
+        report["local_feedback"]["syntax_candidates"]["observations"]
+            .as_array()
+            .unwrap()
+            .len(),
+        1
+    );
+    fs::write(p.0.join("frontend/app.js"), "const = ;\n").unwrap();
+    let report = edited_hook(&p, &["frontend/app.js"], false);
+    assert!(
+        report["local_feedback"]["candidate_recovery_count"]
+            .as_u64()
+            .unwrap()
+            > 0
+    );
+    assert_eq!(
+        report["local_feedback"]["next_action"],
+        "require_native_lint_confirmation"
+    );
+    let host = edited_hook(&p, &["frontend/app.js"], true);
+    let context = host["hookSpecificOutput"]["additionalContext"]
+        .as_str()
+        .unwrap();
+    assert!(context.contains("必须安装"), "{context}");
+    assert!(!context.contains("const ="));
+}
+
+#[test]
+fn edited_native_sync_failure_remains_visible_in_dialogue() {
+    let p = Project::new("hook-sync-failed");
+    let init = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .arg("init")
+        .arg(&p.0)
+        .arg("--apply")
+        .output()
+        .unwrap();
+    assert_eq!(init.status.code(), Some(3));
+    fs::remove_dir_all(p.0.join(".codeguard/reports")).unwrap();
+    fs::write(p.0.join(".codeguard/reports"), "occupied").unwrap();
+    let host = edited_hook(&p, &["frontend/app.js"], true);
+    let context = host["hookSpecificOutput"]["additionalContext"]
+        .as_str()
+        .unwrap();
+    assert!(context.contains("no-debugger"), "{context}");
+    assert!(context.contains("任务同步未完成"), "{context}");
+    assert!(!context.contains("task show"));
+}

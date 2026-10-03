@@ -109,16 +109,22 @@ fn confirmed_python_edit_runs_native_ruff_only_for_selected_file() {
     assert_eq!(exit, 3);
     assert_eq!(report["execution"], "local_observation");
     assert_eq!(
-        report["local_feedback"]["files"].as_array().unwrap().len(),
+        report["local_feedback"]["python_lint"]["files"]
+            .as_array()
+            .unwrap()
+            .len(),
         1
     );
-    assert_eq!(report["local_feedback"]["files"][0]["path"], "changed.py");
     assert_eq!(
-        report["local_feedback"]["files"][0]["run_status"],
+        report["local_feedback"]["python_lint"]["files"][0]["path"],
+        "changed.py"
+    );
+    assert_eq!(
+        report["local_feedback"]["python_lint"]["files"][0]["run_status"],
         "findings"
     );
     assert_eq!(
-        report["local_feedback"]["files"][0]["findings"][0]["rule_id"],
+        report["local_feedback"]["python_lint"]["files"][0]["findings"][0]["rule_id"],
         "F401"
     );
     assert_eq!(report["delivery_decision"], "not_evaluated");
@@ -143,10 +149,16 @@ fn confirmed_python_edit_routes_to_only_selected_native_feedback() {
         json!(["changed.py"])
     );
     assert_eq!(
-        report["local_feedback"]["files"].as_array().unwrap().len(),
+        report["local_feedback"]["python_lint"]["files"]
+            .as_array()
+            .unwrap()
+            .len(),
         1
     );
-    assert_eq!(report["local_feedback"]["files"][0]["path"], "changed.py");
+    assert_eq!(
+        report["local_feedback"]["python_lint"]["files"][0]["path"],
+        "changed.py"
+    );
     assert_eq!(report["delivery_decision"], "not_evaluated");
     assert_eq!(report["host_blocking_verified"], false);
 }
@@ -179,7 +191,7 @@ fn prompt_submitted_only_returns_non_blocking_intent_guidance() {
     fs::write(project.0.join("broken.py"), "import os\n").unwrap();
     let (exit, report) = run(&project, &request("prompt_submitted", &[], "unknown"));
     assert_eq!(exit, 3);
-    assert_eq!(report["schema_version"], "0.5.0");
+    assert_eq!(report["schema_version"], "0.6.0");
     assert_eq!(report["plan"]["action"], "show_intent_guidance");
     assert_eq!(report["execution"], "read_only_intent_guidance");
     assert_eq!(
@@ -203,7 +215,7 @@ fn prompt_submitted_only_returns_non_blocking_intent_guidance() {
         "../../../schemas/hook-execution-feedback-v0.4.schema.json"
     ))
     .unwrap();
-    assert_eq!(current["properties"]["schema_version"]["const"], "0.5.0");
+    assert_eq!(current["properties"]["schema_version"]["const"], "0.6.0");
     assert_eq!(previous["properties"]["schema_version"]["const"], "0.4.0");
     assert_eq!(
         current["$defs"]["intent_guidance"]["properties"]["source_check"]["const"],
@@ -529,7 +541,7 @@ fn failed_or_unknown_write_never_starts_source_check() {
 }
 
 #[test]
-fn mixed_or_unimplemented_scope_is_visible_and_never_partially_scanned() {
+fn mixed_scope_preserves_native_results_and_explicit_unwired_scope() {
     let project = Project::new();
     fs::write(project.0.join("app.py"), "import os\n").unwrap();
     fs::write(project.0.join("App.java"), "class App {}\n").unwrap();
@@ -539,9 +551,15 @@ fn mixed_or_unimplemented_scope_is_visible_and_never_partially_scanned() {
     );
     assert_eq!(exit, 3);
     assert_eq!(report["plan"]["action"], "fast_file_check");
-    assert_eq!(report["execution"], "not_run");
-    assert_eq!(report["reason"], "fast_scope_not_wired");
-    assert!(report["local_feedback"].is_null());
+    assert_eq!(report["execution"], "local_observation");
+    assert_eq!(
+        report["local_feedback"]["python_lint"]["files"][0]["path"],
+        "app.py"
+    );
+    assert_eq!(
+        report["local_feedback"]["native_unwired_files"],
+        json!(["App.java"])
+    );
 }
 
 #[test]
@@ -773,4 +791,33 @@ fn malformed_event_or_unbounded_timeout_is_rejected_without_feedback() {
         .unwrap();
     assert_eq!(output.status.code(), Some(2));
     assert!(output.stdout.is_empty());
+}
+
+#[test]
+fn javascript_edit_receives_selected_fast_feedback() {
+    let project = Project::new();
+    fs::write(project.0.join("changed.js"), "const n = 1;\n").unwrap();
+    fs::write(project.0.join("untouched.js"), "const = ;\n").unwrap();
+    let (exit, report) = run(
+        &project,
+        &request("file_changed", &["changed.js"], "confirmed"),
+    );
+    assert_eq!(exit, 3);
+    assert_eq!(report["execution"], "local_observation");
+    assert_eq!(
+        report["local_feedback"]["report_type"],
+        "hook_fast_feedback"
+    );
+    assert_eq!(
+        report["local_feedback"]["requested_paths"],
+        json!(["changed.js"])
+    );
+    assert_eq!(
+        report["local_feedback"]["node_lint"]["files"][0]["path"],
+        "changed.js"
+    );
+    assert_eq!(
+        report["local_feedback"]["delivery_decision"],
+        "not_evaluated"
+    );
 }

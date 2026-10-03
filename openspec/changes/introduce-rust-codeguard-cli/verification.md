@@ -2084,3 +2084,11 @@ TDD 先复现报告漏洞：把源码 finding 的主定位、原生身份及白�
 已初始化工作区的单文件 `lint python` 候选报告使用 0.15.0 对话协议，将固定 Python grammar、当前源码摘要与脱敏疑似位置写入独立 0.1.0 本地报告，并经现有 work sync 形成按工作区和源码范围稳定归并的 `python_syntax_confirmation_needed` 阻塞任务。未初始化工作区继续使用 0.14.0 且任务 ID 为空。重扫同一源码及源码改为零恢复节点后，任务仍为 `open`；报告目录不可用时，对话保留候选结果，标明持久化原因而不伪造任务引用。导入拒绝 grammar 摘要篡改、越界坐标和重复 JSON 键；报告不含源码文本。
 
 开发验证：新增 Python 端到端 8/8、相关 Python 原生路径 16/16（5 项真实工具用例默认忽略）、TypeScript 候选回归 14/14；本机 Ruff 0.16.8 的额外原生优先用例及 `task verify` 用例分别通过，后者记录观察而不关闭任务。实际 0.15.0 与本地 0.1.0 报告通过 JSON Schema，伪造同步成功状态被拒绝。先构建特性版产生报告，再用默认二进制执行 `work sync`，`failed_reports=0`。默认工作区测试通过，特性版 Clippy `-D warnings`、格式、分层检查及 OpenSpec strict 通过。能力匹配的原生复检关闭、多文件任务和真实宿主对话仍未完成，14.10 及相关总任务不勾选。
+
+## 2026-10-03 编辑事件原生优先、32 份 WASM 与任务对话
+
+针对 `fast_scope_not_wired` 断点，先补 JS 编辑红测，再将 Hook 选中文件接到共享 Ruff/ESLint 原生路径和固定 WASM 路由。ESLint 同步后反馈稳定任务，重复扫描新增发现为 0；任务摘要缺失的红测随后修正，Claude 候选摘要包含 task show/verify，保存失败保留原生规则并提示同步未完成。外层 Hook 协议 0.6.0，旧 0.5 schema 与上一提交逐字节一致。32 grammar 编辑事件实际执行测试分四批检查指定文件，覆盖集合等于 manifest，未选坏文件不被扫描。详见 [验收记录](../../../tests/acceptance/hook-fast-native-wasm.md)。
+
+最终默认工作区 `cargo test --workspace --all-targets` 退出 0：1106 通过、0 失败、105 忽略；日志 `/tmp/codeguard-hook-workspace-final.log`。WASM 构建下 check_all_eslint、hook_execute_cli、claude_hook_cli 合计 42 通过、0 失败、3 忽略，日志 `/tmp/codeguard-hook-fast-wasm-final.log`；check_all_grammar_candidates 独占运行 10/10 通过，155.67 秒，含新增全部 32 grammar 编辑事件和既有聚合路由回归，日志 `/tmp/codeguard-hook-32.log`。CLI 全目标含 WASM Clippy `-D warnings`、fmt、分层检查、OpenSpec strict、diff 空白和新增文档链接校验均通过。166 份 schema 定义有效，实际 Hook WASM JSON 通过当前 schema，三个伪造通过/覆盖变体均被拒。
+
+本轮 ESLint 编排使用受控替身，未安装工具；真实 WASM 运行与实际宿主触发明确分开。默认插件尚未切换，发布包没有更新；其它语言原生 Hook 快检、候选任务自动同步/关闭、Python 元数据发现效率和全 I/O 硬预算仍缺。S11.17、S14 及完整目标继续未完成。上一源码 c6a3676 的 CI 37131837212 已成功，本轮源码的 CI 须按新提交另行核验。

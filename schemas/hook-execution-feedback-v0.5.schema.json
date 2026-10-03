@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:codeguard:schema:hook-execution-feedback:0.6.0",
+  "$id": "urn:codeguard:schema:hook-execution-feedback:0.5.0",
   "title": "Candidate host-event execution; never a delivery gate",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema_version", "report_type", "plan", "execution", "reason", "local_feedback", "delivery_decision", "host_blocking_verified", "soft_result_reused"],
   "properties": {
-    "schema_version": {"const": "0.6.0"},
+    "schema_version": {"const": "0.5.0"},
     "report_type": {"const": "hook_execution_feedback"},
     "plan": {
       "type": "object",
@@ -37,105 +37,11 @@
     {"if": {"properties": {"execution": {"const": "read_only_guidance"}}, "required": ["execution"]}, "then": {"properties": {"plan": {"properties": {"action": {"const": "show_summary"}}}, "reason": {"type": "null"}, "local_feedback": {"$ref": "#/$defs/next_guidance"}}}},
     {"if": {"properties": {"execution": {"const": "task_verification"}}, "required": ["execution"]}, "then": {"properties": {"plan": {"properties": {"action": {"const": "verify_task"}}}, "reason": {"type": "null"}, "local_feedback": {"$ref": "#/$defs/task_verification_summary"}}}},
     {"if": {"properties": {"execution": {"const": "local_observation"}}, "required": ["execution"]}, "then": {"oneOf": [
-      {"properties": {"plan": {"properties": {"action": {"const": "fast_file_check"}}}, "reason": {"enum": [null, "request_cancelled"]}, "local_feedback": {"$ref":"#/$defs/fast_feedback"}}},
+      {"properties": {"plan": {"properties": {"action": {"const": "fast_file_check"}}}, "reason": {"enum": [null, "request_cancelled"]}, "local_feedback": {"type": "object", "required": ["schema_version", "report_type", "scan_scope", "delivery_decision"], "properties": {"schema_version": {"const": "0.13.0"}, "report_type": {"const": "python_lint_feedback"}, "scan_scope": {"const": "selected_files"}, "delivery_decision": {"const": "not_evaluated"}}}}},
       {"properties": {"plan": {"properties": {"action": {"const": "commit_gate"}}}, "reason": {"type": "null"}, "local_feedback": {"$ref": "#/$defs/git_index_summary"}}}
     ]}}
   ],
   "$defs": {
-    "fast_feedback": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "schema_version",
-        "report_type",
-        "scan_scope",
-        "requested_paths",
-        "python_lint",
-        "node_lint",
-        "syntax_candidates",
-        "unavailable_files",
-        "native_unwired_files",
-        "candidate_recovery_count",
-        "next_action",
-        "delivery_decision",
-        "coverage_proven"
-      ],
-      "properties": {
-        "schema_version": {
-          "const": "0.1.0"
-        },
-        "report_type": {
-          "const": "hook_fast_feedback"
-        },
-        "scan_scope": {
-          "const": "selected_files"
-        },
-        "requested_paths": {
-          "type": "array",
-          "maxItems": 8,
-          "uniqueItems": true,
-          "items": {
-            "type": "string",
-            "maxLength": 512
-          }
-        },
-        "python_lint": {
-          "type": [
-            "object",
-            "null"
-          ]
-        },
-        "node_lint": {"type":"object","additionalProperties":false,"required":["status","reason","coverage_proven","delivery_decision","files","unexecuted_files","backlog_status","new_findings","new_blockers","next"],"properties":{"status":{"enum":["local_observation","incomplete"]},"reason":{"type":"string"},"coverage_proven":{"const":false},"delivery_decision":{"const":"not_evaluated"},"files":{"type":"array","maxItems":10000,"items":{"type":"object","additionalProperties":false,"required":["path","source_sha256","feedback"],"properties":{"path":{"type":"string"},"source_sha256":{"type":["string","null"],"pattern":"^[0-9a-f]{64}$"},"feedback":{"title":"ESLint局部未批准反馈","type":"object","additionalProperties":false,"required":["schema_version","report_type","status","local_coherent","coverage_proven","delivery_decision","reason","findings","suppressed_count","workbench_status","next_action","workbench"],"properties":{"schema_version":{"const":"0.2.0"},"report_type":{"const":"eslint_local_feedback"},"status":{"enum":["incomplete","local_observation"]},"local_coherent":{"type":"boolean"},"coverage_proven":{"const":false},"delivery_decision":{"const":"not_evaluated"},"reason":{"type":"string","minLength":1},"findings":{"type":"array","items":{"type":"object","additionalProperties":false,"required":["path","rule_id","severity","line","column","message_sha256"],"properties":{"path":{"type":"string","minLength":1},"rule_id":{"type":"string","minLength":1},"severity":{"enum":[1,2]},"line":{"type":"integer","minimum":1},"column":{"type":"integer","minimum":1},"message_sha256":{"type":"string","pattern":"^[a-f0-9]{64}$"}}}},"suppressed_count":{"type":"integer","minimum":0},"workbench_status":{"type":"string","minLength":1},"next_action":{"type":"string","minLength":1},"workbench":{"anyOf":[{"type":"null"},{"type":"object","required":["status"],"additionalProperties":false,"properties":{"status":{"type":"string"},"new_findings":{"type":"integer","minimum":0},"new_blockers":{"type":"integer","minimum":0},"failed_reports":{"type":"integer","minimum":0},"next":{"type":["object","null"]},"next_error":{"type":["string","null"]}}}]}},"allOf":[{"if":{"properties":{"local_coherent":{"const":true}}},"then":{"properties":{"status":{"const":"local_observation"}}},"else":{"properties":{"status":{"const":"incomplete"}}}}]}}}},"unexecuted_files":{"type":"array","items":{"type":"string"}},"backlog_status":{"enum":["not_connected","deadline_or_cancelled","backlog_update_failed","synced_partial","sync_incomplete"]},"new_findings":{"type":"integer","minimum":0},"new_blockers":{"type":"integer","minimum":0},"next":{"type":["object","null"]}}},
-        "syntax_candidates": {"oneOf":[{"type":"object","additionalProperties":false,"required":["status","reason","execution_phase","authority","delivery_decision","source_file_count","skipped_count","unrouted_count","native_preferred_count","observations","next_action"],"properties":{"status":{"enum":["not_run","attempted_incomplete","observed_partial"]},"reason":{"enum":["source_or_scope_changed","request_cancelled","worker_executable_unavailable","grammar_manifest_invalid","bounded_scope","unrouted_source","candidate_unavailable","candidate_unqualified","native_preferred","binary_without_wasm_precheck"]},"execution_phase":{"const":"after_native"},"authority":{"const":"candidate_unqualified"},"delivery_decision":{"const":"incomplete"},"source_file_count":{"type":"integer","minimum":0},"skipped_count":{"type":"integer","minimum":0},"unrouted_count":{"type":"integer","minimum":0},"native_preferred_count":{"type":"integer","minimum":0},"next_action":{"type":"string","minLength":1},"observations":{"type":"array","maxItems":64,"items":{"type":"object","additionalProperties":false,"required":["path","language","scope","byte_offset","status","reason","grammar_qualified","source_sha256","grammar_sha256","recovery_count","recoveries","known_limitations"],"properties":{"path":{"type":"string","minLength":1},"language":{"type":["string","null"]},"scope":{"enum":["whole_file","cfquery_body"]},"byte_offset":{"type":"integer","minimum":0},"status":{"enum":["candidate_observed","candidate_unavailable"]},"reason":{"type":["string","null"]},"grammar_qualified":{"const":false},"source_sha256":{"type":["string","null"],"pattern":"^[0-9a-f]{64}$"},"grammar_sha256":{"type":["string","null"],"pattern":"^[0-9a-f]{64}$"},"recovery_count":{"type":"integer","minimum":0},"known_limitations":{"type":"array","maxItems":8,"items":{"type":"string","minLength":1,"maxLength":1024}},"recoveries":{"type":"array","maxItems":8,"items":{"type":"object","additionalProperties":false,"required":["kind","syntax_kind","start_byte","end_byte","start_row","start_column_byte","end_row","end_column_byte"],"properties":{"kind":{"enum":["ERROR","MISSING"]},"syntax_kind":{"type":"string","minLength":1},"start_byte":{"type":"integer","minimum":0},"end_byte":{"type":"integer","minimum":0},"start_row":{"type":"integer","minimum":0},"start_column_byte":{"type":"integer","minimum":0},"end_row":{"type":"integer","minimum":0},"end_column_byte":{"type":"integer","minimum":0}}}}}}}}},{"type":"object","additionalProperties":false,"required":["status","reason","observations"],"properties":{"status":{"const":"not_run"},"reason":{"const":"wasm_feature_not_built"},"observations":{"type":"array","maxItems":0}}}]},
-        "unavailable_files": {
-          "type": "array",
-          "maxItems": 8,
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "path",
-              "reason"
-            ],
-            "properties": {
-              "path": {
-                "type": "string"
-              },
-              "reason": {
-                "enum": [
-                  "source_path_unavailable_or_unsafe",
-                  "request_deadline_exceeded"
-                ]
-              }
-            }
-          }
-        },
-        "native_unwired_files": {
-          "type": "array",
-          "maxItems": 8,
-          "items": {
-            "type": "string"
-          }
-        },
-        "candidate_recovery_count": {
-          "type": "integer",
-          "minimum": 0
-        },
-        "next_action": {
-          "enum": [
-            "require_native_lint_confirmation",
-            "recommend_native_lint",
-            "review_native_results_and_resolve_incomplete_checks"
-          ]
-        },
-        "delivery_decision": {
-          "const": "not_evaluated"
-        },
-        "coverage_proven": {
-          "const": false
-        }
-      }
-    },
     "intent_guidance": {
       "type": "object", "additionalProperties": false,
       "required": ["schema_version", "report_type", "source_check", "delivery_decision", "next_action"],

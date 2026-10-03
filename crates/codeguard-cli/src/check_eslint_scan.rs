@@ -24,19 +24,22 @@ pub(crate) fn sources(discovery: &DiscoveryReport) -> BTreeSet<String> {
         .languages
         .values()
         .flat_map(|item| item.source_files.iter())
-        .filter(|path| {
-            Path::new(path)
-                .extension()
-                .and_then(|e| e.to_str())
-                .is_some_and(|ext| {
-                    matches!(
-                        ext,
-                        "js" | "jsx" | "mjs" | "cjs" | "ts" | "tsx" | "mts" | "cts"
-                    )
-                })
-        })
+        .filter(|path| is_source(path))
         .cloned()
         .collect()
+}
+
+/// 判断明确的 JavaScript/TypeScript 方言后缀。
+pub(crate) fn is_source(path: &str) -> bool {
+    Path::new(path)
+        .extension()
+        .and_then(|e| e.to_str())
+        .is_some_and(|ext| {
+            matches!(
+                ext,
+                "js" | "jsx" | "mjs" | "cjs" | "ts" | "tsx" | "mts" | "cts"
+            )
+        })
 }
 
 impl CheckEslintScan {

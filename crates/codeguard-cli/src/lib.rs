@@ -111,6 +111,8 @@ pub mod grammar_route;
 pub mod grammar_status_command;
 #[cfg(unix)]
 pub mod hook_execute_command;
+#[cfg(unix)]
+mod hook_fast_scan;
 pub mod hook_plan_command;
 pub mod init_command;
 mod java_checker_config_status;

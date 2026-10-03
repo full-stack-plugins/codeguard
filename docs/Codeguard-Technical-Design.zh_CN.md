@@ -716,3 +716,7 @@ cargo run --locked -p codeguard-cli --example gen_capability_docs -- --check
 ---
 
 **文档版本：**1.2.0 · **创建日期：**2026-09-28 · **最后更新：**2026-09-29 · **文档状态：**待评审；实现及完整验收仍未完成。
+
+源码新增编辑事件原生优先快检：`hook execute` / `hook claude post-tool-use` 只检查事件明确指定的普通文件，Python 用 Ruff、JS/TS 用模块本地 ESLint 10；同字节完整原生结果不重复解析。未覆盖文件可调用固定 WASM 候选，混合语言仍保留局部结果、原生未接线范围和失败原因。疑似恢复节点要求安装或修复原生工具并确认；完整零恢复候选只建议安装，不代表完整通过。共享事件截止时间，最多 8 文件、2 个 WASM worker；未构建 WASM 明确报告缺口。外层反馈 0.6.0，局部 `hook_fast_feedback` 0.1.0。默认插件 Hook 尚未切换，候选同步/自动关闭和真实宿主验收未完成。见[编辑快检验收](../tests/acceptance/hook-fast-native-wasm.md)。
+
+复用的 Python 路径仍通过只读项目元数据遍历发现配置；全部文件系统 I/O 的硬截止时间和大型项目延迟尚未验收。

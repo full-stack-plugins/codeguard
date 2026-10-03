@@ -716,3 +716,7 @@ This document uses the full-stack-doc Rust README, complete architecture/runtime
 ---
 
 **Document version:** 1.2.0 · **Created:** 2026-09-28 · **Updated:** 2026-09-29 · **Status:** ready for review; implementation and full acceptance remain incomplete.
+
+Source builds now provide native-first edit feedback through `hook execute` / `hook claude post-tool-use`: only explicit ordinary files are selected; Python uses Ruff and JS/TS uses module-local ESLint 10. Coherent same-byte native results avoid duplicate parsing. Uncovered files may use pinned WASM candidates; mixed scopes retain native results, unwired native scopes and failures. Recovery nodes require native-tool setup/repair and confirmation; complete zero-recovery candidates only recommend native lint, never full acceptance. One deadline bounds at most eight files and two WASM workers; builds without WASM report that gap. The outer feedback is 0.6.0 with local `hook_fast_feedback` 0.1.0. Default plugin Hooks, candidate-task sync/closure and real-host acceptance remain incomplete. See [edit-feedback acceptance](../tests/acceptance/hook-fast-native-wasm.md).
+
+The reused Python path still discovers project configuration through a read-only metadata walk; full filesystem I/O deadlines and large-project latency are not yet accepted.

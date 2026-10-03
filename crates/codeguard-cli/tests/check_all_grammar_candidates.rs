@@ -511,3 +511,84 @@ fn oversized_source_is_an_explicit_candidate_gap() {
         serde_json::Value::Null
     );
 }
+
+#[test]
+fn edited_file_hooks_invoke_all_32_candidates_without_scanning_untouched_files() {
+    use std::io::Write;
+    use std::process::Stdio;
+    let root = std::env::temp_dir()
+        .canonicalize()
+        .unwrap()
+        .join(format!("codeguard-hook-32-{}", std::process::id()));
+    fs::create_dir(&root).unwrap();
+    let mut languages = BTreeSet::new();
+    for (index, group) in grammar_samples().chunks(8).enumerate() {
+        let project = root.join(format!("group-{index}"));
+        fs::create_dir(&project).unwrap();
+        fs::write(project.join("untouched.js"), "const = ;").unwrap();
+        let paths: Vec<&str> = group
+            .iter()
+            .map(|(name, source)| {
+                fs::write(project.join(name), source).unwrap();
+                *name
+            })
+            .collect();
+        let payload = serde_json::json!({"schema_version":"1.0.0","report_type":"hook_trigger_request",
+            "input":{"event":"file_changed","changed_paths":paths,"task_id":null,
+                "write_outcome":"confirmed","host_claims_blocking":false}});
+        let mut child = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(["hook", "execute"])
+            .arg(&project)
+            .args(["--format=json", "--timeout=120s"])
+            .env("PATH", &project)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .unwrap();
+        child
+            .stdin
+            .take()
+            .unwrap()
+            .write_all(&serde_json::to_vec(&payload).unwrap())
+            .unwrap();
+        let result = child.wait_with_output().unwrap();
+        assert_eq!(
+            result.status.code(),
+            Some(3),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
+        let report: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+        let feedback = &report["local_feedback"];
+        assert_eq!(feedback["requested_paths"], serde_json::json!(paths));
+        assert_eq!(
+            feedback["syntax_candidates"]["skipped_count"], 0,
+            "{feedback}"
+        );
+        assert_eq!(feedback["syntax_candidates"]["unrouted_count"], 0);
+        for row in feedback["syntax_candidates"]["observations"]
+            .as_array()
+            .unwrap()
+        {
+            assert_ne!(row["path"], "untouched.js");
+            assert_eq!(row["status"], "candidate_observed", "{row}");
+            assert_eq!(row["recovery_count"], 0, "{row}");
+            assert!(row["reason"].is_null(), "{row}");
+            assert_eq!(row["grammar_qualified"], false);
+            languages.insert(row["language"].as_str().unwrap().to_owned());
+        }
+        assert_eq!(feedback["delivery_decision"], "not_evaluated");
+    }
+    fs::remove_dir_all(root).unwrap();
+    let manifest: serde_json::Value =
+        serde_json::from_str(include_str!("../../../grammars/manifest.json")).unwrap();
+    let expected: BTreeSet<String> = manifest["assets"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|a| a["language"].as_str().unwrap().to_owned())
+        .collect();
+    assert_eq!(languages, expected);
+    assert_eq!(languages.len(), 32);
+}

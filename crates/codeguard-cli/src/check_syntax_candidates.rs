@@ -63,6 +63,27 @@ pub fn observe(
     if !java_only {
         paths.extend(discovery.ambiguous_source_files.iter());
     }
+    observe_selected(
+        root,
+        &paths.into_iter().cloned().collect(),
+        native,
+        jobs_limit,
+        deadline,
+        skip_reason,
+    )
+}
+
+/// 仅观察调用方已验证的工作区相对文件；不遍历项目，不扩大编辑范围。
+/// 参数沿用原生覆盖与共同预算，返回相同候选报告。
+pub(crate) fn observe_selected(
+    root: &Path,
+    selected: &BTreeSet<String>,
+    native: NativeCoverage<'_>,
+    jobs_limit: usize,
+    deadline: Instant,
+    skip_reason: Option<&str>,
+) -> Value {
+    let paths: BTreeSet<&String> = selected.iter().collect();
     let source_file_count = paths.len();
     let observations = Vec::new();
     let mut skipped_count = 0;
@@ -109,18 +130,19 @@ pub fn observe(
     };
     let candidate_deadline = deadline.min(Instant::now() + Duration::from_secs(90));
     let cancelled = AtomicBool::new(false);
-    let native_go_files = if java_only || !discovery.languages.contains_key("go") {
-        BTreeMap::new()
-    } else {
-        selected_sources_for_candidate(
-            root,
-            native.go_tool,
-            native.go_lint,
-            candidate_deadline,
-            &cancelled,
-        )
-        .unwrap_or_default()
-    };
+    let native_go_files =
+        if !selected.iter().any(|path| path.ends_with(".go")) || native.go_lint.is_null() {
+            BTreeMap::new()
+        } else {
+            selected_sources_for_candidate(
+                root,
+                native.go_tool,
+                native.go_lint,
+                candidate_deadline,
+                &cancelled,
+            )
+            .unwrap_or_default()
+        };
     let mut planned = Vec::new();
     for (index, relative) in paths.into_iter().enumerate() {
         if index >= MAX_FILES
