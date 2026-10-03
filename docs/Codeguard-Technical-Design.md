@@ -2,7 +2,7 @@
 
 > **Purpose:** turn the architecture into concrete implementation contracts, command responsibilities, extension steps, and observable acceptance criteria.
 >
-> **Document version:** 1.2.3 · **Updated:** 2026-10-03 · **Source baseline:** current checkout and the [implementation evidence](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md); software version `0.1.3`.
+> **Document version:** 1.2.4 · **Updated:** 2026-10-04 · **Source baseline:** current checkout and the [implementation evidence](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md); software version `0.1.4`.
 
 [简体中文](Codeguard-Technical-Design.zh_CN.md) · [Architecture](Codeguard-Architecture.md) · [README](../README.md)
 
@@ -851,3 +851,8 @@ The following complete receipt comes from a controlled local integration fixture
 - [Lifecycle record 0.1](../schemas/task-lifecycle-record-v0.1.schema.json)
 - [Comparison evidence 0.1](../schemas/task-resolution-evidence-v0.1.schema.json)
 - [Host receipt 0.1](../schemas/task-resolution-receipt-v0.1.schema.json)
+
+
+### Current public candidate: 0.1.4
+
+`@partme.ai/codeguard@0.1.4` is published for Apple Silicon macOS from clean source `1cd458f6e01a44a74388243e964e3f45290ac18e`. It includes all 32 runnable, unqualified grammars, bounded edited-file checks, stable native-confirmation tasks, native rechecks and `next` guidance. Registry hashes, a fresh-cache npx invocation, the actual public-package repair loop with Zig 0.16.0, and the source commit's Linux CI passed. Ordinary CLI clean output cannot close a task without trusted policy. The protected Zig SDK is a source integration API; npm does not expose a self-approval command. Plugin activation, installed-host acceptance, full precision, other platforms and complete gates remain open. Earlier 0.1.3 evidence is historical. See [0.1.4 acceptance](../tests/acceptance/npm-0.1.4-candidate.md).

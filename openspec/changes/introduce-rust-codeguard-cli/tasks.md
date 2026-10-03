@@ -1153,3 +1153,13 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 ## 2026-10-04 0.1.4 候选制品准备（进行中）
 
 13.4 / 14.18 准备将当前编辑/任务/复检能力装入新 macOS arm64 npm 候选，版本与四个 crate 锁一致。必须核对干净源码身份、同一提交的 Linux CI、公开打包约束、包内全 32 grammar 及修复链路、注册表摘要和全新缓存调用；完成前不标发布。默认插件、受保护宿主来源、多平台及完整精度验收仍缺，父任务保持未完成。
+
+
+## 2026-10-04 0.1.4 公开候选发行完成（局部验收）
+
+来源 `1cd458f6e01a44a74388243e964e3f45290ac18e` 的 Linux CI、4 项包测试、注册表/本地摘要、新缓存 npx、真实公开包 Zig 修复反馈及 GitHub prerelease/tag/asset 身份已核对；见 [公开发行验收](../../../tests/acceptance/npm-0.1.4-candidate.md)。此前“尚未发布”的本批记录是发行前快照。插件 lock/默认 Hook、真实宿主、多平台、完整精度和门禁仍缺，13.4/14.18/11.17 不勾选。库存输出 schema 缺口保留，不能称全部公开报告 schema 已验收。
+
+
+## 2026-10-04 库存输出 schema 补齐
+
+`grammar_coverage_inventory` 1.1.0 的封闭输出 schema 已补，真实 0.1.4 release 程序输出与 4 项正反例开发验收通过；新增制品不改变已发布程序字节。逐语言、provider、候选计数及未知权威/allow 伪造被拒。见 [库存协议验收](../../../tests/acceptance/grammar-inventory-schema.md)。此前发行验收中缺 schema 是当时快照；完整 S14.7 不勾选。
