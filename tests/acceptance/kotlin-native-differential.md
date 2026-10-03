@@ -7,3 +7,5 @@
 分歧样例是 `fun f(x: ) = x`。原生编译器在参数冒号后报告 `Type expected` 与 `Incomplete code`；固定 WASM 返回零恢复节点。这是**漏检**，不能因候选零恢复而宣称语法有效或建议跳过原生工具。常规语料测试明确要求仅该样例保留分歧，显式原生测试再次确认 12/13 和源码未变；两项均各 1/1 通过。`grammar status` 与 `check all` 的 `known_limitations` 现在显示具体漏检，项目样例还断言该候选零恢复、整体交付仍为 `incomplete`。Linux CI 运行无需 `kotlinc` 的固定回归；原生对照默认忽略，需显式提供 `CODEGUARD_KOTLINC_BIN` 且版本为 2.4.10。
 
 后续需要修复或更新固定 grammar，保留原始与派生字节、许可证和来源，再以同一反例及更多语言版本/方言语料复测；还须完成统一原生优先路由、误报/漏报率、资源预算及发行包验收。只更新已知限制不能消除漏检。
+
+[Linux CI 运行](https://github.com/full-stack-plugins/codeguard/actions/runs/37115529650) 对提交 `1623cf9` 的 Kotlin 固定回归、项目已知限制、单项目 32/32、npm 包与完整工作区测试均通过。WASM 集成步骤中的候选测试文件 8/8 通过，用时约 174 秒；这不是单个 Kotlin 文件的性能测量。原生 kotlinc 对照仍只在上述本机显式执行。

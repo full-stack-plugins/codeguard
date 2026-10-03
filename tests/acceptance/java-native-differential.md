@@ -7,3 +7,5 @@
 独立原生 oracle 使用本机现有 `/usr/bin/javac` 21.0.12.1，对每例运行 `--release 17 -proc:none -Xlint:none`，编译产物写入各自隔离目录；13/13 的原生接受/拒绝与候选 worker 分类一致，且源文件未被修改。常规候选测试 1/1、显式原生差分测试 1/1 通过。Linux CI 执行无需 javac 的普通语料回归；原生差分用例默认忽略，必须显式提供 `CODEGUARD_JAVAC_BIN` 且版本为 21.x 才运行。
 
 此证据只覆盖 Java 17 的 13 个窄范围样例。其它语言版本、语义诊断、真实项目原生检查范围、系统误报/漏报率、`check all` 的 Java 原生优先路由、任务与宿主反馈、MSRV 及发行包精度均未验收；不能把一次差分一致说成完整 lint 或批准交付。
+
+[Linux CI 运行](https://github.com/full-stack-plugins/codeguard/actions/runs/37114988502) 对提交 `729978d` 的普通 Java WASM 语料和完整工作区测试均通过；原生 javac 对照仍只在上述本机显式执行，不能以 CI 绿色替代跨平台 javac 差分。
