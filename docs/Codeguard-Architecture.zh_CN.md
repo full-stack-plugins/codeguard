@@ -32,7 +32,7 @@ WASM 的规范与 19 项实施任务已纳入既有 change；可选 Rust worker 
 
 源码以 `--features wasm-precheck` 构建后，可通过 `codeguard grammar probe <language> <file> --format=json` 显式调用全部 32 份固定候选资产。命令使用隔离 Rust worker，以退出码 3 报告未经语言验收的观察，不能作为 lint 或交付结论。成功观察与有效语种的输入失败都遵守[0.1.0 封闭 JSON Schema](../schemas/grammar-probe-v0.1.schema.json)，保持未完成。原生优先 `lint/check`、语言/方言验收、任务/宿主反馈及发行仍需独立完成；现有发现清单还把 JavaScript/TSX 归入 TypeScript，并未为 CFQuery/CFScript 建立独立源码映射。
 
-源码构建的 `check all` 现会在既有原生检查之后执行有界候选初检。[语法路由](../crates/codeguard-cli/src/grammar_route.rs)区分 `.tsx`、JavaScript 和 `.cfs`，只对完整的 `<cfquery>...</cfquery>` 标签体选用 CFQuery；普通 `.sql`、有歧义的 `.h` 不猜测语种。共用后缀的 `.m` 要求 Objective-C 行首标记，`.sc` 在缺项目证据时不猜成 Scala；见[歧义回归](../tests/acceptance/ambiguous-grammar-extensions.md)。四个有界真实 CLI 样例合计逐份调用了 32 种固定 worker。[检查反馈 0.33.0](../schemas/check-feedback.schema.json)记录方言、源码及 grammar 摘要、原文件位置、未执行范围和未完成状态；Ruff 本轮完整检查且摘要匹配的 Python 文件跳过重复 WASM；P3C 等规范检查不视为语法确认。候选观察不生成已确认违规或交付许可。候选阶段限 64 文件、64 片段、90 秒，本机四批 32 语种样例约 54 秒；Linux 单次 31 文件检查在 90 秒上限内完成 26/32。当前只是候选路由，尚非逐语言验收的原生兜底、任务/宿主接线或已发布 npm 能力；见[验收记录](../tests/acceptance/check-all-32-grammar-candidates.md)。
+源码构建的 `check all` 现会在既有原生检查之后执行有界候选初检。[语法路由](../crates/codeguard-cli/src/grammar_route.rs)区分 `.tsx`、JavaScript 和 `.cfs`，只对完整的 `<cfquery>...</cfquery>` 标签体选用 CFQuery；普通 `.sql`、有歧义的 `.h` 不猜测语种。共用后缀的 `.m` 要求 Objective-C 行首标记，`.sc` 在缺项目证据时不猜成 Scala；见[歧义回归](../tests/acceptance/ambiguous-grammar-extensions.md)。四个有界真实 CLI 样例合计逐份调用了 32 种固定 worker。[检查反馈 0.33.0](../schemas/check-feedback.schema.json)记录方言、源码及 grammar 摘要、原文件位置、未执行范围和未完成状态；Ruff 本轮完整检查且摘要匹配的 Python 文件跳过重复 WASM；P3C 等规范检查不视为语法确认。候选观察不生成已确认违规或交付许可。候选阶段限 64 文件、64 片段、90 秒，本机四批 32 语种样例约 54 秒；Linux 单次 31 文件检查在 90 秒上限内完成 26/32。当前只是候选路由，尚非逐语言验收的原生兜底或任务/宿主接线；npm 0.1.3 仅将其作为未验收候选分发；见[验收记录](../tests/acceptance/check-all-32-grammar-candidates.md)。
 
 ```mermaid
 flowchart LR
@@ -93,7 +93,7 @@ CLI 不承担模型供应商、聊天传输、IDE UI、RAG 存储、分布式调
 | 修复 | 稳定任务、本地尝试、部分原工具复检 | 可靠的验证关闭、复发处理、完整事件协调 |
 | 误报例外 | 候选查询/提案、精确匹配和签名相关基础能力 | 可信批准来源、生命周期接线和可用生效流程 |
 | 质量门禁 | 核心判定逻辑；公开扫描仍局部；index 路径安全 | 针对实际工作树/index/ref/CI 内容的端到端检查 |
-| 分发 | 源码构建、Apple Silicon macOS npm 0.1.2；制品核验、下载和安装基础能力 | 可支持的二进制发行、平台测试和宿主运行时绑定 |
+| 分发 | 源码构建、Apple Silicon macOS npm 0.1.3；制品核验、下载和安装基础能力 | 可支持的二进制发行、平台测试和宿主运行时绑定 |
 
 当前 `check all` 已包含 Rust 构建调度和持久化，[构建复检](../tests/acceptance/rust-build-task-verification.md)也已存在。旧记录中“完全没有这些接线”的描述不能用作当前状态；完整构建组合和正式关闭仍待完成。
 
@@ -214,7 +214,7 @@ flowchart LR
 
 ### 8.1 原生优先与内置 WASM 初检路径——目标
 
-**本节是新增设计，公开的 `0.1.2` 包尚未实现。** 保留统一入口，调用者选择语言或项目，不选择解析器后端：
+**本节目标契约仅在公开 `0.1.3` 候选包中局部实现。** 保留统一入口，调用者选择语言或项目，不选择解析器后端：
 
 ```bash
 codeguard lint java .
@@ -474,7 +474,7 @@ CLI 返回命令专属的版本化 JSON、可读投影及部分 SARIF。[Schema 
 
 ## 15. 部署、升级与集成
 
-当前部署形态是本地构建二进制加独立准备的原生工具链。`@partme.ai/codeguard@0.1.2` npm 包通过 Node 命令入口携带 Apple Silicon macOS 二进制；Node 层只转发参数、工作目录、环境、输出与退出状态。该平台的发布、全新缓存 `npx` 版本检查及注册表/本地制品字节核对已通过。二进制回报候选源码提交，但这不证明签名来源、可复现构建、多平台发行或完整质量门禁。公开 `tools install` apply 仍受阻，内部包核验、下载和安装基础能力已有测试。
+当前部署形态是本地构建二进制加独立准备的原生工具链。`@partme.ai/codeguard@0.1.3` npm 包通过 Node 命令入口携带 Apple Silicon macOS 二进制；Node 层只转发参数、工作目录、环境、输出与退出状态。该平台的发布、全新缓存 `npx` 版本检查及注册表/本地制品字节核对已通过。二进制回报候选源码提交，但这不证明签名来源、可复现构建、多平台发行或完整质量门禁。公开 `tools install` apply 仍受阻，内部包核验、下载和安装基础能力已有测试。
 
 ```mermaid
 flowchart LR
@@ -482,15 +482,16 @@ flowchart LR
     Verify --> Wasm{要求包含 WASM?}
     Wasm -->|是| Probe[核对 32 份固定身份并运行 Zig worker]
     Wasm -->|否，仅本地私有包| Pack[本地带平台标识的 npm 包]
-    Probe --> Pack
+    Probe --> Licenses[核对固定上游许可证]
+    Licenses --> Pack
     Pack --> Node[Node bin: codeguard]
     Node --> Rust[包内 Rust 可执行文件]
     Rust --> Native[选定的原生检查器]
 ```
 
-默认本地包标记为 private，不含 npm 安装钩子。`bin` 入口见 [npm/codeguard.cjs](../npm/codeguard.cjs)，[scripts/pack-npm-local.mjs](../scripts/pack-npm-local.mjs)使用已构建二进制打包。`--public` 模式已产出公开的 `@partme.ai/codeguard@0.1.2`，仅覆盖 Apple Silicon macOS；全新缓存运行和包/二进制摘要核对见[npm 0.1.2 验收记录](../tests/acceptance/npm-0.1.2-candidate.md)。扩大分发范围还需平台覆盖、可信制品清单、版本与摘要绑定及发行流程。CodeGraph 的 Node 入口和平台包布局为此设计提供参考；其可选网络回退不属于 Codeguard 当前安装路径。
+默认本地包标记为 private，不含 npm 安装钩子。`bin` 入口见 [npm/codeguard.cjs](../npm/codeguard.cjs)，[scripts/pack-npm-local.mjs](../scripts/pack-npm-local.mjs)使用已构建二进制打包。`--public` 模式已产出公开的 `@partme.ai/codeguard@0.1.3`，仅覆盖 Apple Silicon macOS；全新缓存运行和包/二进制摘要核对见[npm 0.1.3 验收记录](../tests/acceptance/npm-0.1.3-wasm-candidate.md)。扩大分发范围还需平台覆盖、可信制品清单、版本与摘要绑定及发行流程。CodeGraph 的 Node 入口和平台包布局为此设计提供参考；其可选网络回退不属于 Codeguard 当前安装路径。
 
-新的 WASM 候选包使用 `--require-wasm` 或 `--public` 时，打包器会拒绝没有 worker 的二进制，核对固定清单的 32 份资产身份，并在写包前执行 Zig worker；[本地离线 npm 验收](../tests/acceptance/npm-wasm-local-package.md)另从包内运行 Zig、Dart。该检查不会让已发布 `0.1.2` 自动获得 WASM，也不证明全部语言的 lint 精度或公开发行已验收。
+已发布的 0.1.3 WASM 候选包使用 `--require-wasm` 或 `--public` 时，打包器会拒绝没有 worker 的二进制，核对固定清单的 32 份资产身份，并在写包前执行 Zig worker；[本地离线 npm 验收](../tests/acceptance/npm-wasm-local-package.md)另从包内运行 Zig、Dart。打包器还核对并分发全部固定上游许可证；公开 0.1.3 包与注册表字节一致。这不会让旧版 0.1.2 自动获得 WASM，也不证明任何语言的 lint 精度；见[公开候选验收](../tests/acceptance/npm-0.1.3-wasm-candidate.md)。
 
 升级时记录二进制/schema 版本，保留工作区，预览受管变更，重跑有限检查，再核对报告消费。降级必须服从已有 schema 读取范围，不能为了通过解析而改写历史记录成旧格式。
 

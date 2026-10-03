@@ -1091,3 +1091,5 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 14.4 / 14.6 / 14.19 共享后缀误报收敛：自动路由不再把任意 `.m` 当 Objective-C，也不再把 `.sc` 当 Scala；`.m` 需行首 Objective-C 专属标记，`.scala` 与 `.mm` 路由保留。MATLAB 字符串/注释中的标记及 SuperCollider 正例不进入错误 grammar；32 份候选的明确样例仍需完整回归。现有静态发现仍可能将共享后缀归入旧语言目录，缺少项目级方言裁决和逐文件未路由解释，父任务保持未完成；见[局部验收](../../../tests/acceptance/ambiguous-grammar-extensions.md)。
 
 14.4 / 14.6 / 14.19 后续发现层补齐：默认构建的只读 `detect` 与可选 WASM 路由共用受限 Objective-C 标记判断；MATLAB `.m`、SuperCollider `.sc` 不再被列成 Objective-C/Scala，`unknown_conditions` 保留歧义相对路径，`check all` 的候选范围仍计入并报告未路由数量。真实 `detect` 与 `check all` 回归通过；项目级 `.sc` 方言裁决、无标记 Objective-C `.m`、更强的词法证据、逐文件结构化歧义协议及完整语言验收仍缺，父任务不勾选。见[局部验收](../../../tests/acceptance/ambiguous-grammar-extensions.md)。
+
+13.4 / 14.18 / 14.19 公开候选发行增量：`@partme.ai/codeguard@0.1.3` 在 `darwin-arm64` 从干净提交 `7900a1a` 构建并发布，32 份固定 grammar 候选均可经包内 Rust worker 和有界 `check all` 调用。打包器校验并分发全部上游许可证，Linux CI、本地离线 npm 全量路由、注册表/本地包与二进制摘要及新缓存 `npx` 均通过；见[公开包局部验收](../../../tests/acceptance/npm-0.1.3-wasm-candidate.md)。插件显式候选运行时仍锁 0.1.2，并用旧包成员及大小上限校验，不能直接接收 0.1.3；默认 Hook 仍为 Python。候选保持不完整，`released_count=0`；语言精度/版本、完整原生优先、任务及宿主反馈、多平台和可信来源未验收，三个父任务继续保持未完成。
