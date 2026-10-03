@@ -2,7 +2,7 @@
 
 日期：2026-09-29。对应 OpenSpec S14.6、14.7、14.17、14.19 的局部进展，父任务均未完成。
 
-源码以 `--features wasm-precheck` 构建后，`check all` 先运行现有原生节点，再对发现的普通源码执行有界候选阶段。新增路由按文件后缀选择 30 份直接 grammar，并对 `.cfs` 选 CFScript、完整 `<cfquery>...</cfquery>` 标签体选 CFQuery；`.tsx` 使用 TSX、`.js` 使用 JavaScript。`.h` 与普通 `.sql` 不凭后缀猜测。跨平台测试把 31 个源码文件分为四个有界项目，四次真实 `check all` 的报告合计出现 32 个 `candidate_observed`，语言并集与固定资产清单完全相同。每次保持退出码 3、`delivery_decision=incomplete`、`grammar_qualified=false`、`skipped_count=0`。
+源码以 `--features wasm-precheck` 构建后，`check all` 先运行现有原生节点，再对发现的普通源码执行有界候选阶段。新增路由按文件后缀选择 30 份直接 grammar，并对 `.cfs` 选 CFScript、完整 `<cfquery>...</cfquery>` 标签体选 CFQuery；`.tsx` 使用 TSX、`.js` 使用 JavaScript。`.h` 与普通 `.sql` 不凭后缀猜测。跨平台测试把 31 个源码文件分为四个有界项目，四次真实 `check all` 的报告合计出现 32 个 `candidate_observed`，语言并集与固定资产清单完全相同。2026-10-03 增加逐观察断言：这批最小合法样例的 `recovery_count` 全部为 0；目标测试 1/1 通过。每次保持退出码 3、`delivery_decision=incomplete`、`grammar_qualified=false`、`skipped_count=0`。这只证明固定最小样例没有恢复节点，不证明实际项目、语言版本或方言的误报率。
 
 最初 macOS 单项目 31 文件样例在 45 秒预算内只完成 26 种，Swift 超时，后续 5 文件被跳过；预算调至 90 秒后，同机 54.09 秒完成 32 种。Linux CI 对同一单项目样例在 90 秒内仍只完成 26/32，故正式跨平台测试改为四个有界项目；本机四次调用合计 54.48 秒。该时间包括既有原生节点、每份资产的隔离进程及高成本 COBOL；不是冷暖启动统计、性能承诺或所有平台的内存验收。候选阶段限制 64 个文件、64 个片段，每个 worker 限 1 MiB 源码和 64 KiB 输出；未观察范围与原生阻塞保持未完成。
 

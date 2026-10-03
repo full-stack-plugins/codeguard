@@ -256,6 +256,12 @@ fn check_all_invokes_all_32_pinned_candidates_across_bounded_projects() {
         let observations = report["syntax_candidates"]["observations"]
             .as_array()
             .unwrap();
+        for observation in observations {
+            assert_eq!(
+                observation["recovery_count"], 0,
+                "group {group_index}: unexpected recovery in valid sample: {observation}"
+            );
+        }
         for language in observations
             .iter()
             .filter(|item| item["status"] == "candidate_observed")
