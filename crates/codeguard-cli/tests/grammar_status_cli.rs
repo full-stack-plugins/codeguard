@@ -108,6 +108,27 @@ fn codegraph_coverage_is_explicit_and_never_claims_parser_or_gate_completion() {
             .unwrap()
             .contains("known grammar false positive")
     );
+    for (language, evidence) in [
+        ("c", "C11 Apple clang 21 differential"),
+        ("go", "Go 1.23.4 gofmt differential"),
+        ("javascript", "Node 24.18.0 module syntax differential"),
+        ("rust", "Rust 2021 rustfmt 1.9.0 differential"),
+        ("zig", "Zig 0.16.0 ast-check differential"),
+        ("cfquery", "does not validate full SQL semantics"),
+    ] {
+        let asset = assets
+            .iter()
+            .find(|row| row["language"] == language)
+            .unwrap();
+        assert!(
+            asset["known_limitations"][0]
+                .as_str()
+                .unwrap()
+                .contains(evidence),
+            "{language}: {asset}"
+        );
+        assert_eq!(asset["released"], false);
+    }
     for language in ["objc", "solidity"] {
         let asset = assets
             .iter()

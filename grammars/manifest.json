@@ -22,7 +22,7 @@
       "codeguard_runtime_validation": "rust_loader_smoke_passed",
       "language_versions": [],
       "known_limitations": [
-        "Rust loader smoke and narrow fixtures passed; language versions, dialect corpus, native differential, resource isolation and release remain unqualified"
+        "C11 Apple clang 21 differential agrees on 13 narrow syntax cases; other C versions, systematic precision, native-first lint route, resource budgets and release remain unqualified"
       ],
       "release_status": "candidate_unvalidated"
     },
@@ -83,7 +83,7 @@
       "codeguard_runtime_validation": "rust_loader_smoke_passed",
       "language_versions": [],
       "known_limitations": [
-        "Rust loader smoke and narrow fixtures passed; language versions, dialect corpus, native differential, resource isolation and release remain unqualified"
+        "Go 1.23.4 gofmt differential agrees on 13 narrow syntax cases; build tags, other versions, systematic precision, complete native-first lint coverage and release remain unqualified"
       ],
       "release_status": "candidate_unvalidated"
     },
@@ -123,7 +123,7 @@
       "codeguard_runtime_validation": "rust_loader_smoke_passed",
       "language_versions": [],
       "known_limitations": [
-        "Rust loader smoke and narrow fixtures passed; language versions, dialect corpus, native differential, resource isolation and release remain unqualified"
+        "Node 24.18.0 module syntax differential agrees on 13 narrow cases; script mode, other versions, systematic precision, complete native-first lint route and release remain unqualified"
       ],
       "release_status": "candidate_unvalidated"
     },
@@ -225,7 +225,7 @@
       "codeguard_runtime_validation": "rust_loader_smoke_passed",
       "language_versions": [],
       "known_limitations": [
-        "Rust loader smoke and narrow fixtures passed; language versions, dialect corpus, native differential, resource isolation and release remain unqualified"
+        "Rust 2021 rustfmt 1.9.0 differential agrees on 13 narrow syntax cases; other editions, systematic precision, complete native-first Clippy coverage and release remain unqualified"
       ],
       "release_status": "candidate_unvalidated"
     },
@@ -307,7 +307,7 @@
       "codeguard_runtime_validation": "rust_loader_smoke_passed",
       "language_versions": [],
       "known_limitations": [
-        "Rust loader smoke passed with byte-pinned import adaptation; Zig versions, corpus differential, resource isolation and release are not yet qualified"
+        "Zig 0.16.0 ast-check differential agrees on 11 narrow syntax cases; other versions, systematic precision, complete native-first lint route and release remain unqualified"
       ],
       "release_status": "candidate_unvalidated"
     },
@@ -456,7 +456,9 @@
       "codegraph_runtime": "web-tree-sitter 0.25.3",
       "codeguard_runtime_validation": "rust_loader_smoke_passed",
       "language_versions": [],
-      "known_limitations": ["Pinned CodeGraph asset; only narrow syntax fixtures; native differential, language and dialect ranges, public lint route, resource budget and release remain unqualified"],
+      "known_limitations": [
+        "SELECT FROM inside a CFQuery fragment yields zero recovery despite missing SQL select list; this grammar does not validate full SQL semantics. Native dialect comparison, systematic precision, public lint route, resource budget and release remain unqualified"
+      ],
       "release_status": "candidate_unvalidated"
     },
     {
