@@ -299,6 +299,27 @@ fn missing_provenance_duplicate_fields_and_unknown_languages_are_rejected() {
 }
 
 #[test]
+fn candidate_limitations_are_bounded_before_dialog_projection() {
+    let original: serde_json::Value =
+        serde_json::from_str(include_str!("../../../grammars/manifest.json")).unwrap();
+    for limitations in [
+        serde_json::json!(["x".repeat(1025)]),
+        serde_json::json!(vec!["x"; 9]),
+        serde_json::json!(["line one\nline two"]),
+    ] {
+        let mut manifest = original.clone();
+        let vbnet = manifest["assets"]
+            .as_array_mut()
+            .unwrap()
+            .iter_mut()
+            .find(|asset| asset["language"] == "vbnet")
+            .unwrap();
+        vbnet["known_limitations"] = limitations;
+        assert!(parse_grammar_asset_manifest(manifest.to_string().as_bytes()).is_err());
+    }
+}
+
+#[test]
 fn changed_wasm_license_or_abi_never_qualifies_a_candidate() {
     let manifest = bundled_grammar_candidates().unwrap();
     let mut asset = manifest

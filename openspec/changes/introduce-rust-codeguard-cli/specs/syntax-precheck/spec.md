@@ -76,6 +76,8 @@
 
 CodeGuard MUST 提供只读的来源覆盖清单，区分 CodeGraph 随仓 WASM、由依赖包提供但尚未固定字节的 grammar、CodeGuard 已复制候选及已验收发行能力。覆盖清单或 `grammar status` 的存在 MUST NOT 自动改变原生检查义务、加载未经批准的字节，或把来源资产数量说成已支持语言数量。来源资产超过当前加载预算时 MUST 明示预算缺口，不能静默跳过。
 
+`grammar status` 的逐语言候选行 MUST 投影固定清单中的已知限制，且只能来自受控、非空、长度有界的文本；已知误报不得被泛化的“待验收”状态掩盖。该投影仍为只读风险提示，不是原生对照、违规确认或白名单决定。
+
 目标范围 MUST 包含当前固定 CodeGraph 来源的 32 份独立 grammar，并包含 Zig；`jsx` 与 `javascript` 共用同一份 grammar，不重复计数。每份 grammar 都须分别完成合法再分发来源、许可、字节与 ABI、Rust 离线加载、版本/方言正反语料、原生工具对照、统一 `lint/check` 的原生优先路由、任务/对话反馈及发行包实装验收。部分候选或来源库存不能充当全部接入。若上游 WASM 与 Rust 运行时导入不兼容，适配 MUST 固定原始和派生字节、限定变换范围并以正反解析样本复验；不能回退到已知产生误报的旧 grammar 来制造可加载状态。
 
 在正式 `lint/check` 路由验收之前，CLI MAY 暴露显式的单文件 `grammar probe` 候选观察。该命令 MUST 通过与正式路径相同的固定资产核验及隔离 worker，报告源码与 grammar 摘要、恢复锚点、未验收状态及原生确认需求；无论有无恢复节点，MUST 返回未完成，不能产生已确认违规、任务关闭或交付通过。有效语种的输入/worker 失败 MUST 使用同一版本化封闭 JSON 协议报告具体未完成原因，未知语种属于参数错误。它不能自动代替已配置的原生工具执行。
@@ -103,6 +105,11 @@ CodeGuard MUST 提供只读的来源覆盖清单，区分 CodeGraph 随仓 WASM�
 
 - **WHEN** 查询固定 CodeGraph 来源中的 grammar 覆盖状态
 - **THEN** 列出其来源身份、CodeGuard 集成状态及下一项缺口；不运行解析器、不签发质量或交付通过
+
+#### Scenario: A candidate grammar has a known false positive
+
+- **WHEN** 固定资产清单记录 VB.NET 等语种的具体已知误报
+- **THEN** `grammar status` 的该语种行显示有界的已知限制，并继续报告未验收、零发行和原生确认需求
 
 #### Scenario: CodeGraph can load a copied grammar but Rust cannot
 - **WHEN** Rust 运行时拒绝 ABI 或外部扫描器组合

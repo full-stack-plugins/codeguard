@@ -1097,3 +1097,5 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 2026-10-03 后续增量：上段插件 0.1.2 状态是 CLI 0.1.3 初发时的快照。插件仓本地提交 `7bfb07a` 已升级显式候选锁和安装器，支持 0.1.3 的 38 个成员及 32 份许可证，增加 `exec check all ABS_PROJECT`；插件候选测试 5/5，本仓离线 npm 包 32 语种统一检查回归 1/1 通过。插件仓仍需 PR、受保护 CI、tag、市场同步；默认 Python Hook、逐语言精度、任务自动复检和真实宿主反馈仍缺，13.4、14.18、14.19 不勾选。详见[更新的发行局部验收](../../../tests/acceptance/npm-0.1.3-wasm-candidate.md)。
 
 14.4 / 14.17 / 14.19 VB.NET 精度复现：0.1.3 固定 WASM 对未缩进类方法返回一处 `MISSING ":"`，仅缩进变化的样例为零恢复；两者保持候选未验收和交付未评估。复现输入、坐标与资产身份见[局部证据](../../../tests/acceptance/vbnet-unindented-method-false-positive.md)。本机无 .NET 原生编译器，grammar 修复、原生差分与误报统计未完成，父任务不勾选。
+
+14.1 / 14.7 / 14.17 / 14.19 已知限制投影：`grammar status` 逐候选返回来自固定清单的有界 `known_limitations`，VB.NET 的具体误报不再被通用待验收状态遮盖；清单解析拒绝超长、控制字符和过多条目。两项目标测试先 RED 后 GREEN，见[局部验收](../../../tests/acceptance/grammar-known-limitations-projection.md)。这不修 grammar，不证明原生对照或逐语言精度，父任务不勾选。

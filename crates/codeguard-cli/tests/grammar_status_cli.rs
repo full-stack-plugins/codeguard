@@ -10,6 +10,7 @@ fn codegraph_coverage_is_explicit_and_never_claims_parser_or_gate_completion() {
     assert_eq!(output.status.code(), Some(3));
     let report: Value = serde_json::from_slice(&output.stdout).expect("JSON report");
     assert_eq!(report["report_type"], "grammar_coverage_inventory");
+    assert_eq!(report["schema_version"], "1.1.0");
     assert_eq!(report["codegraph_grammar_count"], 32);
     assert_eq!(report["codegraph_vendored_count"], 30);
     assert_eq!(report["candidate_count"], 32);
@@ -31,6 +32,7 @@ fn codegraph_coverage_is_explicit_and_never_claims_parser_or_gate_completion() {
     for asset in assets {
         assert_eq!(asset["released"], false);
         assert!(!asset["gap"].as_str().unwrap().is_empty());
+        assert!(!asset["known_limitations"].as_array().unwrap().is_empty());
     }
     for language in [
         "arkts",
@@ -96,6 +98,16 @@ fn codegraph_coverage_is_explicit_and_never_claims_parser_or_gate_completion() {
     );
     let zig = assets.iter().find(|row| row["language"] == "zig").unwrap();
     assert_eq!(zig["gap"], "language_qualification_and_release_pending");
+    let vbnet = assets
+        .iter()
+        .find(|row| row["language"] == "vbnet")
+        .unwrap();
+    assert!(
+        vbnet["known_limitations"][0]
+            .as_str()
+            .unwrap()
+            .contains("known grammar false positive")
+    );
     for language in ["objc", "solidity"] {
         let asset = assets
             .iter()

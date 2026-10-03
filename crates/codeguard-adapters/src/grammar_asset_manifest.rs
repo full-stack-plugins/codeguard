@@ -798,7 +798,12 @@ pub fn parse_grammar_asset_manifest(raw: &[u8]) -> Result<GrammarAssetManifest, 
             || asset.codeguard_runtime_validation != "rust_loader_smoke_passed"
             || !asset.language_versions.is_empty()
             || asset.known_limitations.is_empty()
-            || asset.known_limitations.iter().any(String::is_empty)
+            || asset.known_limitations.len() > 8
+            || asset.known_limitations.iter().any(|limitation| {
+                limitation.is_empty()
+                    || limitation.len() > 1024
+                    || limitation.chars().any(char::is_control)
+            })
             || asset.release_status != "candidate_unvalidated"
         {
             return Err(format!("{} grammar 来源或验收状态不符", asset.language));
