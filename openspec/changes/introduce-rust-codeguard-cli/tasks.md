@@ -1105,3 +1105,5 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 14.4 / 14.17 / 14.19 Rust 原生差分局部增量：固定本机 rustfmt 1.9.0 与 Rust 2021 的 8 份合法、5 份破损语料，经公开隔离 Rust worker 对照，13/13 分类一致；普通语料测试和显式原生差分测试均 1/1 通过。原生未闭合字符串的退出 101 须伴随语法错误诊断，不将崩溃冒充拒绝。仅证明窄范围局部一致，完整编译/Clippy、其它 edition、系统误报率与发行/宿主验收仍缺，父任务不勾选；见[局部验收](../../../tests/acceptance/rust-native-differential.md)。
 
 14.4 / 14.17 / 14.19 全量最小正例收紧：分批 `check all` 运行 32 份固定 grammar 的既有样例，现在逐观察要求 `recovery_count=0`；本机目标测试 1/1 通过，确保路由虽成功却对合法样例产生恢复节点时不能假装验收成功。该语料规模很小，不等于逐语言原生 oracle、版本/方言覆盖或系统误报率，父任务不勾选；见[局部验收](../../../tests/acceptance/check-all-32-grammar-candidates.md)。
+
+14.4 / 14.17 / 14.19 C11 原生差分局部增量：Apple Clang 21 `-fsyntax-only` 与隔离 C worker 在 8 份合法、5 份语法破损样例上 13/13 分类一致；普通语料和显式原生差分测试各 1/1 通过。初版语料中的返回类型错误是语义诊断，已改为纯语法缺失初始化表达式，不把语义拒绝当成 grammar 漏检。其它 C 版本、系统误报率、完整原生 lint/路由、发行与宿主验收仍缺，父任务不勾选；见[局部验收](../../../tests/acceptance/c-native-differential.md)。
