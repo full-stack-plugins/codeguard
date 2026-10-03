@@ -147,6 +147,14 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 - **WHEN** 只支持文件中一部分语言区域
 - **THEN** 通过位置映射返回已检/未覆盖区域，不报告整个文件 clean
 
+#### Scenario: A CFQuery tag appears inside different comment forms
+- **WHEN** CFML 文件的可嵌套 `<!--- ... --->` 注释、普通 HTML 注释和标记正文中各含完整的 `<cfquery>...</cfquery>` 标签
+- **THEN** 跳过被 ColdFusion 移除的 CFML 注释内标签，保留仍由 ColdFusion 处理的 HTML 注释内标签及正文标签；候选整体仍不获得原生 lint 或交付权威
+
+#### Scenario: A CFML comment appears inside a query opening tag
+- **WHEN** 合法 `<cfquery>` 开标签的属性之间含可嵌套 CFML 注释，其文本带有 `>`
+- **THEN** 跳过注释后定位真正的开标签结束位置，查询体范围与原文件字节偏移保持一致
+
 #### Scenario: A newer dialect is outside the validated range
 - **WHEN** 文件使用未验收语言版本或方言
 - **THEN** 保留兼容性限制和原生确认动作，不直接断言合法源码违规

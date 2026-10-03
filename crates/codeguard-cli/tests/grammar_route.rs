@@ -69,3 +69,44 @@ fn ambiguous_and_embedded_sources_do_not_get_speculative_routes() {
     assert_eq!(routes.len(), 1);
     assert_eq!(routes[0].language, "tsx");
 }
+
+#[test]
+fn cfquery_route_keeps_html_comment_tags_but_skips_nested_cfml_comments() {
+    let source = b"<!-- <cfquery>SELECT #html# FROM users</cfquery> -->\n<!--- outer <!--- inner ---> <cfquery>SELECT #broken</cfquery> --->\n<cfquery name=\"real\">SELECT #id# FROM users</cfquery>";
+    let routes = route_source("page.cfm", source);
+    let query_routes: Vec<_> = routes
+        .iter()
+        .filter(|route| route.language == "cfquery")
+        .collect();
+    assert_eq!(query_routes.len(), 2);
+    assert_eq!(query_routes[0].source, b"SELECT #html# FROM users");
+    assert_eq!(query_routes[1].source, b"SELECT #id# FROM users");
+    assert_eq!(
+        &source[query_routes[1].byte_offset
+            ..query_routes[1].byte_offset + query_routes[1].source.len()],
+        query_routes[1].source
+    );
+}
+
+#[test]
+fn cfquery_route_uses_quote_aware_tag_boundary_and_skips_non_markup_contexts() {
+    let source = b"<cfset text=\"<cfquery>SELECT #bad</cfquery>\">\n<cfscript>var text = \"<cfquery>SELECT #bad</cfquery>\";</cfscript>\n<cfquery name=\"a>b\">SELECT #id# FROM users</cfquery>";
+    let routes = route_source("page.cfm", source);
+    let queries: Vec<_> = routes
+        .iter()
+        .filter(|route| route.language == "cfquery")
+        .collect();
+    assert_eq!(queries.len(), 1);
+    assert_eq!(queries[0].source, b"SELECT #id# FROM users");
+}
+
+#[test]
+fn cfquery_route_ignores_nested_cfml_comment_inside_open_tag() {
+    let source = b"<cfquery <!--- note > <!--- nested ---> more ---> name=\"q\">SELECT #id# FROM users</cfquery>";
+    let routes = route_source("page.cfm", source);
+    let query = routes
+        .iter()
+        .find(|route| route.language == "cfquery")
+        .unwrap();
+    assert_eq!(query.source, b"SELECT #id# FROM users");
+}

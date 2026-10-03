@@ -224,6 +224,8 @@ flowchart LR
 
 R、Ruby、PHP、Kotlin 也已固定 CodeGraph 字节、许可证和 Rust 实测 ABI，并通过隔离 worker 的窄范围正反例；PHP 样例覆盖 HTML/PHP 混合内容，仍仅为未验收候选。CodeGraph 原 Dart WASM 仍不能由 Rust 直接加载；CodeGuard 现以固定上游 C 源码和真实外部 scanner 经 Zig 可重复构建，再做固定 WASI 导入适配。Rust 加载与隔离 worker 的窄范围测试通过，但公开 lint 与发行仍未验收；见[Dart 重建局部验收](../tests/acceptance/dart-grammar-rebuild-candidate.md)。Erlang 也已固定 CodeGraph 字节、上游 0.19 许可证及 ABI 14，Rust 与隔离 worker 的窄范围样例通过；原生对照和公开 lint 路由尚缺，见[Erlang 候选局部验收](../tests/acceptance/erlang-grammar-candidate.md)。Pascal 已固定 CodeGraph 字节、原始 Isopod 依赖提交和许可证，ABI 14 及窄范围 worker 样例通过；原生对照和公开 lint 尚缺，见[Pascal 候选局部验收](../tests/acceptance/pascal-grammar-candidate.md)。其余七份 CFML/CFQuery/CFScript/COBOL/Scala/Swift/VB.NET 来源 WASM 也已固定并由 Rust worker 加载，累计 32/32 份候选、0 项已发行。CFQuery 漏掉 `SELECT FROM`，VB.NET 对合法未缩进方法体误报，COBOL 成本高；都不能发布为 lint，见[七份局部验收](../tests/acceptance/final-seven-grammar-candidates.md)。
 
+CFQuery 源码路由现跳过嵌套 CFML 注释、普通标签属性与明确 CFScript 体中的假标签；HTML 注释中的 CFML 标签仍保留，因为 [Adobe 的 CFML 注释语义](https://helpx.adobe.com/coldfusion/developing-applications/the-cfml-programming-language/elements-of-cfml/comments.html)不把普通 HTML 注释当作服务端屏蔽。真实开标签属性中的 `>` 和开标签内的嵌套 CFML 注释也不再截断查询体。此修复避免一类误路由，同时不隐藏可能执行的 CFML 标签；CFQuery grammar 对 SQL 的漏检仍存在，见[标记边界回归](../tests/acceptance/cfquery-markup-boundary.md)。
+
 由父进程控制解析工作进程，设置总截止时间、单文件输入上限、内存/进程限制及诊断数量上限。按需加载 grammar，不提供通用网络/文件系统导入；终止卡住的进程时保留其它模块的原生结果。宿主约束执行和 Rust MSRV 兼容性须测试，生产数值预算须经测量后确定，不编造性能承诺。
 
 可选构建特性下，Rust CLI 现在有私有[候选工作进程](../crates/codeguard-cli/src/syntax_worker_command.rs)与[父进程核验器](../crates/codeguard-cli/src/syntax_worker_runner.rs)。Unix 路径复用现有进程组执行内核，源码输入上限 1 MiB、输出上限 64 KiB，沿用调用方截止时间和取消，并重新核对源码/grammar 摘要与恢复位置。这只是已测试的局部契约：经目标平台实测的内存上限、跨平台强制约束、正式 lint/check 路由与发行打包仍缺；候选 grammar 即使无恢复节点也保持 `incomplete`。

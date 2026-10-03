@@ -75,7 +75,7 @@ fn check_all_routes_distinct_dialects_after_native_without_claiming_clean() {
     .unwrap();
     fs::write(
         root.join("page.cfm"),
-        "<cfquery name=\"q\">SELECT #x# FROM users</cfquery>\n",
+        "<!-- <cfquery>SELECT #html# FROM users</cfquery> -->\n<!--- <cfquery>SELECT #broken</cfquery> --->\n<cfquery <!--- note > ---> name=\"q\">SELECT #x# FROM users</cfquery>\n",
     )
     .unwrap();
     let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
@@ -103,6 +103,14 @@ fn check_all_routes_distinct_dialects_after_native_without_claiming_clean() {
             "{language}: {observations:?}"
         );
     }
+    assert_eq!(
+        observations
+            .iter()
+            .filter(|item| item["language"] == "cfquery")
+            .count(),
+        2,
+        "HTML-comment CFML executes; only CFML-comment query is excluded"
+    );
     assert!(
         observations
             .iter()
