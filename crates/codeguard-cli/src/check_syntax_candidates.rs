@@ -1,12 +1,13 @@
 //! 全项目原生检查之后的有界候选语法观察；永不产生已确认违规或通过。
 
 use crate::discovery::DiscoveryReport;
+use crate::go_lint_command::selected_sources_for_candidate;
 use crate::grammar_probe_command::read_plain_source;
 use crate::grammar_route::route_source;
 use crate::syntax_worker_runner::run_syntax_worker_candidate;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 use std::sync::atomic::AtomicBool;
 use std::time::{Duration, Instant};
@@ -15,12 +16,19 @@ const MAX_FILES: usize = 64;
 const MAX_FRAGMENTS: usize = 64;
 const MAX_VISIBLE_RECOVERIES: usize = 8;
 
+/// 本轮已执行的原生语法相关结果及显式工具；仅用于判断同一源码是否可避免重复解析。
+pub struct NativeCoverage<'a> {
+    pub python_lint: &'a Value,
+    pub go_lint: &'a Value,
+    pub go_tool: Option<&'a Path>,
+}
+
 /// 对已发现源码按方言选择固定资产，受文件、片段和剩余时间限制。
 /// 参数为项目根、静态发现、语言选择、共同截止时间及范围稳定状态；返回不具门禁权威的报告。
 pub fn observe(
     root: &Path,
     discovery: &DiscoveryReport,
-    python_lint: &Value,
+    native: NativeCoverage<'_>,
     java_only: bool,
     deadline: Instant,
     skip_reason: Option<&str>,
@@ -63,6 +71,18 @@ pub fn observe(
     };
     let candidate_deadline = deadline.min(Instant::now() + Duration::from_secs(90));
     let cancelled = AtomicBool::new(false);
+    let native_go_files = if java_only || !discovery.languages.contains_key("go") {
+        BTreeMap::new()
+    } else {
+        selected_sources_for_candidate(
+            root,
+            native.go_tool,
+            native.go_lint,
+            candidate_deadline,
+            &cancelled,
+        )
+        .unwrap_or_default()
+    };
     for (index, relative) in paths.into_iter().enumerate() {
         if index >= MAX_FILES
             || observations.len() >= MAX_FRAGMENTS
@@ -83,7 +103,9 @@ pub fn observe(
                 continue;
             }
         };
-        if native_python_covers(python_lint, relative, &source) {
+        if native_python_covers(native.python_lint, relative, &source)
+            || native_go_covers(&native_go_files, relative, &source)
+        {
             native_preferred_count += 1;
             continue;
         }
@@ -169,6 +191,13 @@ pub fn observe(
         native_preferred_count,
         observations,
     )
+}
+
+fn native_go_covers(files: &BTreeMap<String, String>, relative: &str, source: &[u8]) -> bool {
+    relative.ends_with(".go")
+        && files
+            .get(relative)
+            .is_some_and(|digest| *digest == format!("{:x}", Sha256::digest(source)))
 }
 
 // 仅本轮 Ruff 已完整扫描同一份 Python 字节时跳过重复解析；配置发现不算执行。

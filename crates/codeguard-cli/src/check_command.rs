@@ -1455,7 +1455,11 @@ pub fn run(args: &[String]) -> ExitCode {
     let syntax_candidates = crate::check_syntax_candidates::observe(
         &root,
         &discovery,
-        &python_lint,
+        crate::check_syntax_candidates::NativeCoverage {
+            python_lint: &python_lint,
+            go_lint: &go_lint,
+            go_tool: parsed.go_tool.as_deref(),
+        },
         parsed.selection == Selection::Java,
         deadline,
         if request_cancelled {

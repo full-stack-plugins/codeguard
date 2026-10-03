@@ -18,6 +18,10 @@
 - **WHEN** `lint zig` 收到可核对的 Zig 0.16.0 工具与普通 `.zig` 文件
 - **THEN** 优先以受控进程运行原生 `zig ast-check`；原生诊断必须保留，不能因 WASM 观察覆盖。只有该原生工具未提供或不可运行时，才可返回未验收 WASM 候选观察，并始终保持整体未完成；`ast-check` 不等于全部 Zig lint、测试或构建。
 
+#### Scenario: Go vet excludes a file under build constraints
+- **WHEN** 本轮 Go 1.23.4 `go vet` 完成，受控 `go list` 证明部分源码进入默认构建，而另一份 `.go` 源码被构建标签排除
+- **THEN** 仅对同一源码字节且进入原生包清单的文件跳过重复 WASM；被排除文件继续候选初检，并保持平台/构建标签覆盖未完成
+
 #### Scenario: A local checker is absent from PATH
 - **WHEN** 项目声明的本地原生工具已可按受支持方式定位
 - **THEN** 核对其配置和版本后优先运行，不创建错误的安装任务
