@@ -98,7 +98,7 @@ fn check_all_routes_distinct_dialects_after_native_without_claiming_clean() {
         String::from_utf8_lossy(&output.stderr)
     );
     let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
-    assert_eq!(report["schema_version"], "0.33.0");
+    assert_eq!(report["schema_version"], "0.34.0");
     assert_eq!(report["delivery_decision"], "incomplete");
     let observations = report["syntax_candidates"]["observations"]
         .as_array()
@@ -172,6 +172,55 @@ fn ambiguous_only_project_remains_an_explicit_unrouted_scope() {
             .unwrap()
             .is_empty()
     );
+}
+
+#[test]
+fn known_grammar_precision_limits_reach_project_feedback() {
+    let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
+        "codeguard-known-grammar-limits-{}",
+        std::process::id()
+    ));
+    fs::create_dir_all(&root).unwrap();
+    fs::write(
+        root.join("class.vb"),
+        "Public Class C\nPublic Function F() As Integer\nReturn 1\nEnd Function\nEnd Class\n",
+    )
+    .unwrap();
+    fs::write(
+        root.join("query.cfm"),
+        "<cfquery name=\"q\">SELECT FROM users</cfquery>\n",
+    )
+    .unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["check", "all"])
+        .arg(&root)
+        .args(["--format=json", "--timeout", "45s"])
+        .output()
+        .unwrap();
+    fs::remove_dir_all(&root).unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let observations = report["syntax_candidates"]["observations"]
+        .as_array()
+        .unwrap();
+    for (language, expected) in [
+        ("vbnet", "known grammar false positive"),
+        ("cfquery", "does not validate full SQL semantics"),
+    ] {
+        let observation = observations
+            .iter()
+            .find(|item| item["language"] == language)
+            .unwrap();
+        assert!(
+            observation["known_limitations"][0]
+                .as_str()
+                .unwrap()
+                .contains(expected),
+            "{language}: {observation}"
+        );
+        assert_eq!(observation["grammar_qualified"], false);
+    }
+    assert_eq!(report["delivery_decision"], "incomplete");
 }
 
 #[test]

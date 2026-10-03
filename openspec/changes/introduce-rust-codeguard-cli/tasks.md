@@ -1109,3 +1109,5 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 14.4 / 14.17 / 14.19 C11 原生差分局部增量：Apple Clang 21 `-fsyntax-only` 与隔离 C worker 在 8 份合法、5 份语法破损样例上 13/13 分类一致；普通语料和显式原生差分测试各 1/1 通过。初版语料中的返回类型错误是语义诊断，已改为纯语法缺失初始化表达式，不把语义拒绝当成 grammar 漏检。其它 C 版本、系统误报率、完整原生 lint/路由、发行与宿主验收仍缺，父任务不勾选；见[局部验收](../../../tests/acceptance/c-native-differential.md)。
 
 14.1 / 14.7 / 14.17 / 14.19 状态证据校正：固定清单的 C、Go、JavaScript、Rust、Zig 已知限制同步窄范围原生差分事实，CFQuery 明确提示 SQL 片段漏检；只读 `grammar status` 测试逐项断言说明且仍 `released=false`。这只是源码状态投影，已发布包未更新，也未消除系统精度和原生 lint 缺口；见[局部验收](../../../tests/acceptance/grammar-known-limitations-projection.md)。
+
+14.7 / 14.17 / 14.19 项目报告限制投影：`check all` 的 0.34.0 封闭协议逐候选附带固定清单的有界 `known_limitations`，VB.NET 已知误报与 CFQuery SQL 覆盖缺口不再只存在于独立库存命令；0.33.0 Schema 归档，清单解析失败时保持未完成。真实双文件目标测试先 RED 后 GREEN，六项候选回归与 18 项聚合契约通过，真实 JSON 通过 Draft 2020-12、旧 Schema/伪造放行被拒。默认宿主自动对话渲染、原生对照、系统精度和发行仍缺，父任务不勾选；见[局部验收](../../../tests/acceptance/check-all-known-grammar-limitations.md)。

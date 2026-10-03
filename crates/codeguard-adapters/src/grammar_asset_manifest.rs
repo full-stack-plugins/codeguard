@@ -118,6 +118,11 @@ pub fn bundled_grammar_candidates() -> Result<GrammarAssetManifest, String> {
     Ok(manifest)
 }
 
+/// 只读取并校验内置 grammar 清单元数据，供报告投影已知限制；不代替选中资产的字节验证。
+pub fn bundled_grammar_metadata() -> Result<GrammarAssetManifest, String> {
+    parse_grammar_asset_manifest(include_bytes!("../../../grammars/manifest.json"))
+}
+
 /// 只核对指定内置 grammar 的字节与许可，供按需加载的语法工作进程使用。
 /// 参数为固定语言 ID；返回清单身份和静态 WASM 字节，未知语言返回错误。
 pub fn bundled_grammar_candidate(language: &str) -> Result<(GrammarAsset, &'static [u8]), String> {

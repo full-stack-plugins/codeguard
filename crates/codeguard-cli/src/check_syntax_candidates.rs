@@ -5,6 +5,7 @@ use crate::go_lint_command::selected_sources_for_candidate;
 use crate::grammar_probe_command::read_plain_source;
 use crate::grammar_route::route_source;
 use crate::syntax_worker_runner::run_syntax_worker_candidate;
+use codeguard_adapters::bundled_grammar_metadata;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
@@ -58,6 +59,20 @@ pub fn observe(
             observations,
         );
     }
+    let manifest = match bundled_grammar_metadata() {
+        Ok(manifest) => manifest,
+        Err(_) => {
+            return report(
+                "not_run",
+                "grammar_manifest_invalid",
+                source_file_count,
+                source_file_count,
+                0,
+                0,
+                observations,
+            );
+        }
+    };
     let executable = match std::env::current_exe() {
         Ok(executable) => executable,
         Err(_) => {
@@ -101,7 +116,8 @@ pub fn observe(
                 observations.push(json!({
                     "path":relative,"language":null,"scope":"whole_file","byte_offset":0,
                     "status":"candidate_unavailable","reason":reason,"grammar_qualified":false,
-                    "source_sha256":null,"grammar_sha256":null,"recovery_count":0,"recoveries":[]
+                    "source_sha256":null,"grammar_sha256":null,"recovery_count":0,"recoveries":[],
+                    "known_limitations":[]
                 }));
                 continue;
             }
@@ -117,6 +133,12 @@ pub fn observe(
             unrouted_count += 1;
         }
         for route in routes {
+            let known_limitations = manifest
+                .assets
+                .iter()
+                .find(|asset| asset.language == route.language)
+                .map(|asset| asset.known_limitations.as_slice())
+                .unwrap_or(&[]);
             if observations.len() >= MAX_FRAGMENTS || Instant::now() >= candidate_deadline {
                 skipped_count += 1;
                 continue;
@@ -129,7 +151,8 @@ pub fn observe(
                         observations.push(json!({
                             "path":relative,"language":route.language,"scope":route.scope,"byte_offset":route.byte_offset,
                             "status":"candidate_unavailable","reason":"source_changed_during_precheck","grammar_qualified":false,
-                            "source_sha256":null,"grammar_sha256":null,"recovery_count":0,"recoveries":[]
+                            "source_sha256":null,"grammar_sha256":null,"recovery_count":0,"recoveries":[],
+                            "known_limitations":known_limitations
                         }));
                         continue;
                     }
@@ -153,13 +176,15 @@ pub fn observe(
                         "path":relative,"language":route.language,"scope":route.scope,"byte_offset":route.byte_offset,
                         "status":"candidate_observed","reason":null,"grammar_qualified":false,
                         "source_sha256":observation.source_sha256,"grammar_sha256":observation.grammar_sha256,
-                        "recovery_count":recovery_count,"recoveries":recoveries
+                        "recovery_count":recovery_count,"recoveries":recoveries,
+                        "known_limitations":known_limitations
                     }));
                 }
                 Err(reason) => observations.push(json!({
                     "path":relative,"language":route.language,"scope":route.scope,"byte_offset":route.byte_offset,
                     "status":"candidate_unavailable","reason":reason,"grammar_qualified":false,
-                    "source_sha256":null,"grammar_sha256":null,"recovery_count":0,"recoveries":[]
+                    "source_sha256":null,"grammar_sha256":null,"recovery_count":0,"recoveries":[],
+                    "known_limitations":known_limitations
                 })),
             }
         }
