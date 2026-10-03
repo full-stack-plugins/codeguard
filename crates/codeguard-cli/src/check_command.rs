@@ -1461,6 +1461,7 @@ pub fn run(args: &[String]) -> ExitCode {
             go_tool: parsed.go_tool.as_deref(),
         },
         parsed.selection == Selection::Java,
+        parsed.jobs_limit,
         deadline,
         if request_cancelled {
             Some("request_cancelled")

@@ -87,7 +87,7 @@ fn check_all_routes_distinct_dialects_after_native_without_claiming_clean() {
     let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
         .args(["check", "all"])
         .arg(&root)
-        .args(["--format=json", "--timeout", "90s"])
+        .args(["--format=json", "--timeout", "90s", "--jobs=1"])
         .output()
         .unwrap();
     fs::remove_dir_all(&root).unwrap();
@@ -99,6 +99,7 @@ fn check_all_routes_distinct_dialects_after_native_without_claiming_clean() {
     );
     let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
     assert_eq!(report["schema_version"], "0.34.0");
+    assert_eq!(report["execution_budget"]["jobs_limit"], 1);
     assert_eq!(report["delivery_decision"], "incomplete");
     let observations = report["syntax_candidates"]["observations"]
         .as_array()
@@ -249,14 +250,8 @@ fn human_feedback_names_known_candidate_false_positive() {
     assert!(!text.contains("Return 1"), "{text}");
 }
 
-#[test]
-fn check_all_invokes_all_32_pinned_candidates_across_bounded_projects() {
-    let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
-        "codeguard-check-all-grammars-{}",
-        std::process::id()
-    ));
-    fs::create_dir_all(&root).unwrap();
-    for (index, (name, source)) in [
+fn grammar_samples() -> [(&'static str, &'static str); 31] {
+    [
         ("a.ets", "@Component struct C { build() { Text('hi') } }"),
         ("a.c", "int main(void) { return 0; }"),
         (
@@ -298,9 +293,16 @@ fn check_all_invokes_all_32_pinned_candidates_across_bounded_projects() {
         ),
         ("a.zig", "const Empty = struct {};\n"),
     ]
-    .into_iter()
-    .enumerate()
-    {
+}
+
+#[test]
+fn check_all_invokes_all_32_pinned_candidates_across_bounded_projects() {
+    let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
+        "codeguard-check-all-grammars-{}",
+        std::process::id()
+    ));
+    fs::create_dir_all(&root).unwrap();
+    for (index, (name, source)) in grammar_samples().into_iter().enumerate() {
         let group = root.join(format!("group-{}", index / 8));
         fs::create_dir_all(&group).unwrap();
         fs::write(group.join(name), source).unwrap();
@@ -362,6 +364,63 @@ fn check_all_invokes_all_32_pinned_candidates_across_bounded_projects() {
             .map(|asset| asset["language"].as_str().unwrap().to_owned())
             .collect::<BTreeSet<_>>();
     assert_eq!(languages, expected);
+}
+
+#[test]
+fn one_mixed_project_observes_all_32_candidates_within_the_existing_budget() {
+    let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
+        "codeguard-single-project-grammars-{}",
+        std::process::id()
+    ));
+    fs::create_dir_all(&root).unwrap();
+    for (name, source) in grammar_samples() {
+        fs::write(root.join(name), source).unwrap();
+    }
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["check", "all"])
+        .arg(&root)
+        .args(["--format=json", "--timeout", "120s"])
+        .output()
+        .unwrap();
+    fs::remove_dir_all(&root).unwrap();
+    assert_eq!(
+        output.status.code(),
+        Some(3),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(report["syntax_candidates"]["skipped_count"], 0);
+    assert_eq!(report["syntax_candidates"]["source_file_count"], 31);
+    assert_eq!(report["delivery_decision"], "incomplete");
+    let observations = report["syntax_candidates"]["observations"]
+        .as_array()
+        .unwrap();
+    assert_eq!(observations.len(), 32);
+    assert!(
+        observations
+            .windows(2)
+            .all(|pair| { pair[0]["path"].as_str().unwrap() <= pair[1]["path"].as_str().unwrap() })
+    );
+    let observed = observations
+        .iter()
+        .filter(|item| item["status"] == "candidate_observed")
+        .filter_map(|item| item["language"].as_str())
+        .collect::<BTreeSet<_>>();
+    let manifest: serde_json::Value =
+        serde_json::from_str(include_str!("../../../grammars/manifest.json")).unwrap();
+    let expected = manifest["assets"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|asset| asset["language"].as_str().unwrap())
+        .collect::<BTreeSet<_>>();
+    assert_eq!(observed, expected, "{observations:?}");
+    assert!(
+        observations
+            .iter()
+            .all(|item| item["grammar_qualified"] == false)
+    );
 }
 
 #[test]

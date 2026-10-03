@@ -4,18 +4,21 @@ use crate::discovery::DiscoveryReport;
 use crate::go_lint_command::selected_sources_for_candidate;
 use crate::grammar_probe_command::read_plain_source;
 use crate::grammar_route::route_source;
+use crate::syntax_worker_candidate_observation::SyntaxWorkerCandidateObservation;
 use crate::syntax_worker_runner::run_syntax_worker_candidate;
 use codeguard_adapters::bundled_grammar_metadata;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
+use std::sync::Arc;
 use std::sync::atomic::AtomicBool;
 use std::time::{Duration, Instant};
 
 const MAX_FILES: usize = 64;
 const MAX_FRAGMENTS: usize = 64;
 const MAX_VISIBLE_RECOVERIES: usize = 8;
+const MAX_CONCURRENT_WORKERS: usize = 2;
 
 /// 本轮已执行的原生语法相关结果及显式工具；仅用于判断同一源码是否可避免重复解析。
 pub struct NativeCoverage<'a> {
@@ -24,13 +27,29 @@ pub struct NativeCoverage<'a> {
     pub go_tool: Option<&'a Path>,
 }
 
+struct CandidateJob {
+    relative: String,
+    source: Arc<Vec<u8>>,
+    language: &'static str,
+    scope: &'static str,
+    byte_offset: usize,
+    end_byte: usize,
+    known_limitations: Vec<String>,
+}
+
+enum PlannedObservation {
+    Immediate(Value),
+    Worker(CandidateJob),
+}
+
 /// 对已发现源码按方言选择固定资产，受文件、片段和剩余时间限制。
-/// 参数为项目根、静态发现、语言选择、共同截止时间及范围稳定状态；返回不具门禁权威的报告。
+/// 参数为项目根、静态发现、语言选择、全局并发上限、共同截止时间及范围稳定状态；返回不具门禁权威的报告。
 pub fn observe(
     root: &Path,
     discovery: &DiscoveryReport,
     native: NativeCoverage<'_>,
     java_only: bool,
+    jobs_limit: usize,
     deadline: Instant,
     skip_reason: Option<&str>,
 ) -> Value {
@@ -44,7 +63,7 @@ pub fn observe(
         paths.extend(discovery.ambiguous_source_files.iter());
     }
     let source_file_count = paths.len();
-    let mut observations = Vec::new();
+    let observations = Vec::new();
     let mut skipped_count = 0;
     let mut unrouted_count = 0;
     let mut native_preferred_count = 0;
@@ -101,9 +120,10 @@ pub fn observe(
         )
         .unwrap_or_default()
     };
+    let mut planned = Vec::new();
     for (index, relative) in paths.into_iter().enumerate() {
         if index >= MAX_FILES
-            || observations.len() >= MAX_FRAGMENTS
+            || planned.len() >= MAX_FRAGMENTS
             || Instant::now() >= candidate_deadline
             || codeguard_runtime::sigint_cancellation_requested()
         {
@@ -113,12 +133,12 @@ pub fn observe(
         let source = match read_plain_source(&root.join(relative)) {
             Ok(source) => source,
             Err(reason) => {
-                observations.push(json!({
+                planned.push(PlannedObservation::Immediate(json!({
                     "path":relative,"language":null,"scope":"whole_file","byte_offset":0,
                     "status":"candidate_unavailable","reason":reason,"grammar_qualified":false,
                     "source_sha256":null,"grammar_sha256":null,"recovery_count":0,"recoveries":[],
                     "known_limitations":[]
-                }));
+                })));
                 continue;
             }
         };
@@ -128,67 +148,99 @@ pub fn observe(
             native_preferred_count += 1;
             continue;
         }
-        let routes = route_source(relative, &source);
+        let routes = route_source(relative, &source)
+            .into_iter()
+            .map(|route| {
+                (
+                    route.language,
+                    route.scope,
+                    route.byte_offset,
+                    route.byte_offset + route.source.len(),
+                )
+            })
+            .collect::<Vec<_>>();
         if routes.is_empty() {
             unrouted_count += 1;
         }
-        for route in routes {
-            let known_limitations = manifest
-                .assets
-                .iter()
-                .find(|asset| asset.language == route.language)
-                .map(|asset| asset.known_limitations.as_slice())
-                .unwrap_or(&[]);
-            if observations.len() >= MAX_FRAGMENTS || Instant::now() >= candidate_deadline {
+        let source = Arc::new(source);
+        for (language, scope, byte_offset, end_byte) in routes {
+            if planned.len() >= MAX_FRAGMENTS || Instant::now() >= candidate_deadline {
                 skipped_count += 1;
                 continue;
             }
-            match run_syntax_worker_candidate(
-                &executable, route.language, relative, route.source, candidate_deadline, &cancelled,
-            ) {
-                Ok(observation) => {
-                    if read_plain_source(&root.join(relative)).as_deref() != Ok(source.as_slice()) {
-                        observations.push(json!({
-                            "path":relative,"language":route.language,"scope":route.scope,"byte_offset":route.byte_offset,
-                            "status":"candidate_unavailable","reason":"source_changed_during_precheck","grammar_qualified":false,
-                            "source_sha256":null,"grammar_sha256":null,"recovery_count":0,"recoveries":[],
-                            "known_limitations":known_limitations
-                        }));
-                        continue;
-                    }
-                    // 嵌入片段的 worker 坐标以片段为起点，公开报告还原为文件坐标。
-                    let base_row = source[..route.byte_offset].iter().filter(|byte| **byte == b'\n').count();
-                    let base_column = source[..route.byte_offset].rsplit(|byte| *byte == b'\n').next().map_or(0, <[u8]>::len);
-                    let recovery_count = observation.recoveries.len();
-                    let recoveries: Vec<Value> = observation.recoveries.iter().take(MAX_VISIBLE_RECOVERIES).map(|recovery| {
-                        json!({
-                            "kind":recovery.kind,
-                            "syntax_kind":recovery.syntax_kind,
-                            "start_byte":route.byte_offset + recovery.start_byte,
-                            "end_byte":route.byte_offset + recovery.end_byte,
-                            "start_row":base_row + recovery.start_row,
-                            "start_column_byte":if recovery.start_row == 0 { base_column + recovery.start_column_byte } else { recovery.start_column_byte },
-                            "end_row":base_row + recovery.end_row,
-                            "end_column_byte":if recovery.end_row == 0 { base_column + recovery.end_column_byte } else { recovery.end_column_byte },
-                        })
-                    }).collect();
-                    observations.push(json!({
-                        "path":relative,"language":route.language,"scope":route.scope,"byte_offset":route.byte_offset,
-                        "status":"candidate_observed","reason":null,"grammar_qualified":false,
-                        "source_sha256":observation.source_sha256,"grammar_sha256":observation.grammar_sha256,
-                        "recovery_count":recovery_count,"recoveries":recoveries,
-                        "known_limitations":known_limitations
-                    }));
-                }
-                Err(reason) => observations.push(json!({
-                    "path":relative,"language":route.language,"scope":route.scope,"byte_offset":route.byte_offset,
-                    "status":"candidate_unavailable","reason":reason,"grammar_qualified":false,
-                    "source_sha256":null,"grammar_sha256":null,"recovery_count":0,"recoveries":[],
-                    "known_limitations":known_limitations
-                })),
-            }
+            let known_limitations = manifest
+                .assets
+                .iter()
+                .find(|asset| asset.language == language)
+                .map(|asset| asset.known_limitations.clone())
+                .unwrap_or_default();
+            planned.push(PlannedObservation::Worker(CandidateJob {
+                relative: relative.clone(),
+                source: Arc::clone(&source),
+                language,
+                scope,
+                byte_offset,
+                end_byte,
+                known_limitations,
+            }));
         }
     }
+    let mut completed: Vec<Option<Value>> = vec![None; planned.len()];
+    let worker_indices = planned
+        .iter()
+        .enumerate()
+        .filter_map(|(index, item)| matches!(item, PlannedObservation::Worker(_)).then_some(index))
+        .collect::<Vec<_>>();
+    for batch in worker_indices.chunks(jobs_limit.clamp(1, MAX_CONCURRENT_WORKERS)) {
+        if Instant::now() >= candidate_deadline
+            || codeguard_runtime::sigint_cancellation_requested()
+        {
+            skipped_count += batch.len();
+            continue;
+        }
+        let results = std::thread::scope(|scope| {
+            let handles = batch
+                .iter()
+                .map(|index| {
+                    let PlannedObservation::Worker(job) = &planned[*index] else {
+                        unreachable!("worker index must refer to a prepared job")
+                    };
+                    scope.spawn(|| {
+                        run_syntax_worker_candidate(
+                            &executable,
+                            job.language,
+                            &job.relative,
+                            &job.source[job.byte_offset..job.end_byte],
+                            candidate_deadline,
+                            &cancelled,
+                        )
+                    })
+                })
+                .collect::<Vec<_>>();
+            handles
+                .into_iter()
+                .map(|handle| {
+                    handle
+                        .join()
+                        .unwrap_or_else(|_| Err("syntax_worker_parent_panic".into()))
+                })
+                .collect::<Vec<_>>()
+        });
+        for (index, result) in batch.iter().copied().zip(results) {
+            let PlannedObservation::Worker(job) = &planned[index] else {
+                unreachable!("worker result must match a prepared job")
+            };
+            completed[index] = Some(candidate_result(root, job, result));
+        }
+    }
+    let observations = planned
+        .into_iter()
+        .zip(completed)
+        .filter_map(|(item, result)| match item {
+            PlannedObservation::Immediate(value) => Some(value),
+            PlannedObservation::Worker(_) => result,
+        })
+        .collect::<Vec<_>>();
     let observed = observations
         .iter()
         .any(|item| item["status"] == "candidate_observed");
@@ -219,6 +271,61 @@ pub fn observe(
         native_preferred_count,
         observations,
     )
+}
+
+fn candidate_result(
+    root: &Path,
+    job: &CandidateJob,
+    result: Result<SyntaxWorkerCandidateObservation, String>,
+) -> Value {
+    match result {
+        Ok(observation) => {
+            if read_plain_source(&root.join(&job.relative)).as_deref() != Ok(job.source.as_slice())
+            {
+                return json!({
+                    "path":job.relative,"language":job.language,"scope":job.scope,"byte_offset":job.byte_offset,
+                    "status":"candidate_unavailable","reason":"source_changed_during_precheck","grammar_qualified":false,
+                    "source_sha256":null,"grammar_sha256":null,"recovery_count":0,"recoveries":[],
+                    "known_limitations":job.known_limitations
+                });
+            }
+            // 嵌入片段的 worker 坐标以片段为起点，公开报告还原为文件坐标。
+            let base_row = job.source[..job.byte_offset]
+                .iter()
+                .filter(|byte| **byte == b'\n')
+                .count();
+            let base_column = job.source[..job.byte_offset]
+                .rsplit(|byte| *byte == b'\n')
+                .next()
+                .map_or(0, <[u8]>::len);
+            let recovery_count = observation.recoveries.len();
+            let recoveries: Vec<Value> = observation.recoveries.iter().take(MAX_VISIBLE_RECOVERIES).map(|recovery| {
+                json!({
+                    "kind":recovery.kind,
+                    "syntax_kind":recovery.syntax_kind,
+                    "start_byte":job.byte_offset + recovery.start_byte,
+                    "end_byte":job.byte_offset + recovery.end_byte,
+                    "start_row":base_row + recovery.start_row,
+                    "start_column_byte":if recovery.start_row == 0 { base_column + recovery.start_column_byte } else { recovery.start_column_byte },
+                    "end_row":base_row + recovery.end_row,
+                    "end_column_byte":if recovery.end_row == 0 { base_column + recovery.end_column_byte } else { recovery.end_column_byte },
+                })
+            }).collect();
+            json!({
+                "path":job.relative,"language":job.language,"scope":job.scope,"byte_offset":job.byte_offset,
+                "status":"candidate_observed","reason":null,"grammar_qualified":false,
+                "source_sha256":observation.source_sha256,"grammar_sha256":observation.grammar_sha256,
+                "recovery_count":recovery_count,"recoveries":recoveries,
+                "known_limitations":job.known_limitations
+            })
+        }
+        Err(reason) => json!({
+            "path":job.relative,"language":job.language,"scope":job.scope,"byte_offset":job.byte_offset,
+            "status":"candidate_unavailable","reason":reason,"grammar_qualified":false,
+            "source_sha256":null,"grammar_sha256":null,"recovery_count":0,"recoveries":[],
+            "known_limitations":job.known_limitations
+        }),
+    }
 }
 
 fn native_go_covers(files: &BTreeMap<String, String>, relative: &str, source: &[u8]) -> bool {
