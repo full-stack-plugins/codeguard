@@ -17,24 +17,30 @@ fn pinned_zig_worker_matches_native_ast_check_on_syntax_corpus() {
         .join(format!("codeguard-zig-differential-{}", std::process::id()));
     fs::create_dir_all(&root).unwrap();
     let mut compared = 0;
-    for (name, source) in [
-        ("empty_struct", "const S = struct {};\n"),
-        ("empty_enum", "const E = enum {};\n"),
-        ("empty_union", "const U = union(enum) {};\n"),
-        ("empty_opaque", "const O = opaque {};\n"),
-        ("function", "fn add(a: i32, b: i32) i32 { return a + b; }\n"),
-        ("unicode_string", "const label = \"你好 Zig\";\n"),
+    for (name, source, expected_valid) in [
+        ("empty_struct", "const S = struct {};\n", true),
+        ("empty_enum", "const E = enum {};\n", true),
+        ("empty_union", "const U = union(enum) {};\n", true),
+        ("empty_opaque", "const O = opaque {};\n", true),
+        (
+            "function",
+            "fn add(a: i32, b: i32) i32 { return a + b; }\n",
+            true,
+        ),
+        ("unicode_string", "const label = \"你好 Zig\";\n", true),
         (
             "nested_container",
             "const S = struct { const Inner = struct {}; };\n",
+            true,
         ),
-        ("missing_brace", "const S = struct {\n"),
+        ("missing_brace", "const S = struct {\n", false),
         (
             "missing_paren",
             "fn add(a: i32, b: i32 i32 { return a + b; }\n",
+            false,
         ),
-        ("unterminated_string", "const label = \"hello;\n"),
-        ("missing_initializer", "const value = ;\n"),
+        ("unterminated_string", "const label = \"hello;\n", false),
+        ("missing_initializer", "const value = ;\n", false),
     ] {
         let mut native = Command::new(&zig)
             .arg("ast-check")
@@ -53,6 +59,12 @@ fn pinned_zig_worker_matches_native_ast_check_on_syntax_corpus() {
         assert!(
             matches!(native.status.code(), Some(0 | 1)),
             "{name}: {native:?}"
+        );
+        assert_eq!(
+            native.status.success(),
+            expected_valid,
+            "{name}: native oracle disagrees with the pinned corpus label: {}",
+            String::from_utf8_lossy(&native.stderr)
         );
         let file = root.join(format!("{name}.zig"));
         fs::write(&file, source).unwrap();
