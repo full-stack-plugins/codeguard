@@ -43,7 +43,7 @@
         "codegraph_runtime": {"const": "web-tree-sitter 0.25.3"},
         "codeguard_runtime_validation": {"const": "rust_loader_smoke_passed"},
         "language_versions": {"type": "array", "maxItems": 0},
-        "known_limitations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "known_limitations": {"type": "array", "minItems": 1, "maxItems": 8, "items": {"type": "string", "minLength": 1, "maxLength": 1024}},
         "release_status": {"const": "candidate_unvalidated"}
       }
     }

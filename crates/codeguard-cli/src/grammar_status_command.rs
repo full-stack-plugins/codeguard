@@ -135,6 +135,7 @@ fn coverage_report() -> Result<Value, String> {
                 "candidate_input_sha256":candidate.and_then(|item| item.source_sha256.as_deref()),
                 "integration_status":candidate.map_or("not_integrated", |item| item.release_status.as_str()),
                 "runtime_observation":candidate.map(|item| item.codeguard_runtime_validation.as_str()),
+                "known_limitations":candidate.map(|item| item.known_limitations.as_slice()).unwrap_or(&[]),
                 "released":false,
                 "gap":if candidate.is_some_and(|item| item.codeguard_runtime_validation == "rust_loader_incompatible") {"rust_loader_incompatible"}
                     else if asset.bytes.is_some_and(|bytes| bytes > 20 * 1024 * 1024) {"current_loader_size_limit"}
@@ -144,7 +145,7 @@ fn coverage_report() -> Result<Value, String> {
         })
         .collect::<Vec<_>>();
     Ok(json!({
-        "schema_version":"1.0.0",
+        "schema_version":"1.1.0",
         "report_type":"grammar_coverage_inventory",
         "source_repository":inventory.source_repository,
         "source_commit":inventory.source_commit,

@@ -1074,4 +1074,50 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 
 14.6 / 14.7 逐文件原生优先局部增量：源码可选构建中的 `check all` 现只在 Ruff 本轮完整检查同一路径、工具/配置摘要存在且源码 SHA-256 与候选阶段重新读取的字节一致时，对该 Python 文件跳过重复 WASM；`findings` 原生诊断仍原样保留，混合项目的 Zig 文件继续跑固定 worker，整体仍为退出码 3 和 `incomplete`。封闭协议升至 0.33.0，0.32.0 单独归档，新增 `native_preferred_count`；未完成扫描、路径错配或源码变化不得跳过。见[Python 原生优先局部验收](../../../tests/acceptance/check-all-native-preferred-python.md)。尚未覆盖其它 31 种 grammar 的逐模块原生能力判定、独立语法 oracle、任务/宿主反馈及发行验收；14.6/14.7/14.19 保持未完成。
 
-14.18 / 14.19 本地 npm 打包增量：打包器现可用 `--require-wasm` 核对二进制内 32 份候选身份和固定 SHA-256，实跑 Zig worker；`--public` 自动启用该门禁。无 WASM 特性的默认二进制在出包前被拒。本机 private tarball 经离线 `npm exec` 读到 32 份清单并实际运行 Zig、Dart 候选 worker，仍返回退出码 3、未验收且交付未评估；见[本地 npm 包局部验收](../../../tests/acceptance/npm-wasm-local-package.md)。Linux CI 的同一测试待本次提交运行；已发布 `0.1.2` 不含此能力，尚无新版本公开发行、所有 32 份包内逐一正反例、逐语言原生对照或宿主反馈。14.18、14.19 不勾选。
+14.18 / 14.19 本地 npm 打包增量：打包器现可用 `--require-wasm` 核对二进制内 32 份候选身份和固定 SHA-256，实跑 Zig worker；`--public` 自动启用该门禁。无 WASM 特性的默认二进制在出包前被拒。本机 private tarball 经离线 `npm exec` 读到 32 份清单并实际运行 Zig、Dart 候选 worker；安装后 `check all` 分四个有界项目调用全部 32 份，候选并集与清单一致，每组跳过 0、退出码 3、交付未完成。Linux CI [37094165607](https://github.com/full-stack-plugins/codeguard/actions/runs/37094165607) 的新增全量包内测试与完整工作区测试通过；见[本地 npm 包局部验收](../../../tests/acceptance/npm-wasm-local-package.md)。已发布 `0.1.2` 不含此能力，尚无新版本公开发行、所有 32 份包内逐一正反例、逐语言原生对照或宿主反馈。14.18、14.19 不勾选。
+
+14.4 / 14.17 / 14.19 Zig 原生差分局部增量：固定本机 Zig 0.16.0 `ast-check` 作为独立 oracle，公开隔离 worker 对同一 11 份合法/破损源码的恢复分类逐例一致，真实原生显式测试 1/1 通过；候选仍未验收且交付未评估。仅覆盖此版本的 7 个正例、4 个反例，不代表完整误报率、其他语种、版本/方言或发行资格；见[Zig 原生差分验收](../../../tests/acceptance/zig-native-differential.md)。14.4、14.17、14.19 不勾选。
+
+14.4 / 14.17 / 14.19 CFQuery 标记边界纠错：RED 证实 CFML 注释中的示例查询被错误送入 worker，以及属性值或开标签内注释中的 `>` 截断查询体。核对 Adobe 官方语义后修正早期假设：HTML 注释中的 CFML 标签仍需保留。现跳过可嵌套 CFML 注释、普通标签属性与明确 CFScript 体，保留 HTML 注释及正文中的查询；5 项路由测试、4 项真实 `check all` 回归及全 32 份分批调用均通过，见[局部验收](../../../tests/acceptance/cfquery-markup-boundary.md)。CFQuery 自身的 `SELECT FROM` 漏检、VB.NET 误报和逐语言原生对照仍在，三项任务不勾选。
+
+14.4 / 14.17 / 14.19 Go 原生差分局部增量：固定本机 Go 1.23.4 `gofmt -e` 作为独立语法 oracle，同一 8 份合法和 5 份破损源码经公开隔离 Go worker 逐例恢复分类一致，显式原生测试 1/1 与可由 CI 常规运行的 WASM 语料回归 1/1 通过；候选仍未验收且交付未评估。此对照不覆盖类型/语义、`go vet`、其他版本和构建标签或系统误报漏报率；见[Go 原生差分验收](../../../tests/acceptance/go-native-differential.md)。14.4、14.17、14.19 不勾选。
+
+14.4 / 14.17 / 14.19 JavaScript 原生差分局部增量：固定本机 Node 24.18.0 模块语法检查作为独立 oracle，同一 8 份合法和 5 份破损源码经公开隔离 JavaScript worker 逐例恢复分类一致，显式原生测试 1/1 与常规 CI 语料回归 1/1 通过。此对照不覆盖 ESLint、TypeScript/JSX、其它方言或系统误报漏报率；见[JavaScript 原生差分验收](../../../tests/acceptance/javascript-native-differential.md)。三项任务仍不勾选。
+
+14.6 / 14.7 / 14.19 Go 原生优先局部增量：`check all` 现在按模块一次运行受控 `go list`，仅在本轮 Go 1.23.4 vet 已完成、工具/模块/源码摘要与默认包清单均匹配时跳过被选中 Go 文件的重复 WASM；构建标签排除的破损源码仍进入隔离候选，原生 `printf` 发现保留。真实 Go 测试先 RED 后 1/1 通过，伪造越界包清单常规回归 1/1 通过，全 32 份候选分批路由 4/4 保持通过，见[Go 原生优先局部验收](../../../tests/acceptance/check-all-native-preferred-go.md)。平台/标签覆盖、其它 31 种 grammar、任务/宿主反馈和发行仍缺，父任务不勾选。
+
+14.4 / 14.17 / 14.19 Ruby 与 Swift 原生差分增量：Ruby 2.6.10 `ruby -c` 和隔离 Ruby worker 的 13 例分类一致，显式原生测试与常规 worker 语料均 1/1 通过；见[Ruby 局部验收](../../../tests/acceptance/ruby-native-differential.md)。Swift 6.4 `swiftc -frontend -parse` 对 13 例中 12 例与 WASM 一致，但缺参数类型的 `func f(_ x: ) {}` 被原生拒绝而 WASM 零恢复，确认为漏检；显式测试 1/1 通过仅表示成功捕获这一差异，不表示语法验收，见[Swift 精度阻塞](../../../tests/acceptance/swift-native-differential.md)。须修 grammar、固定重建产物并以原生对照复验；三项父任务不勾选。
+
+14.4 / 14.6 / 14.19 共享后缀误报收敛：自动路由不再把任意 `.m` 当 Objective-C，也不再把 `.sc` 当 Scala；`.m` 需行首 Objective-C 专属标记，`.scala` 与 `.mm` 路由保留。MATLAB 字符串/注释中的标记及 SuperCollider 正例不进入错误 grammar；32 份候选的明确样例仍需完整回归。现有静态发现仍可能将共享后缀归入旧语言目录，缺少项目级方言裁决和逐文件未路由解释，父任务保持未完成；见[局部验收](../../../tests/acceptance/ambiguous-grammar-extensions.md)。
+
+14.4 / 14.6 / 14.19 后续发现层补齐：默认构建的只读 `detect` 与可选 WASM 路由共用受限 Objective-C 标记判断；MATLAB `.m`、SuperCollider `.sc` 不再被列成 Objective-C/Scala，`unknown_conditions` 保留歧义相对路径，`check all` 的候选范围仍计入并报告未路由数量。真实 `detect` 与 `check all` 回归通过；项目级 `.sc` 方言裁决、无标记 Objective-C `.m`、更强的词法证据、逐文件结构化歧义协议及完整语言验收仍缺，父任务不勾选。见[局部验收](../../../tests/acceptance/ambiguous-grammar-extensions.md)。
+
+13.4 / 14.18 / 14.19 公开候选发行增量：`@partme.ai/codeguard@0.1.3` 在 `darwin-arm64` 从干净提交 `7900a1a` 构建并发布，32 份固定 grammar 候选均可经包内 Rust worker 和有界 `check all` 调用。打包器校验并分发全部上游许可证，Linux CI、本地离线 npm 全量路由、注册表/本地包与二进制摘要及新缓存 `npx` 均通过；见[公开包局部验收](../../../tests/acceptance/npm-0.1.3-wasm-candidate.md)。插件显式候选运行时仍锁 0.1.2，并用旧包成员、tarball/下载流 8 MiB 与二进制 32 MiB 上限校验，不能直接接收 0.1.3；默认 Hook 仍为 Python。候选保持不完整，`released_count=0`；语言精度/版本、完整原生优先、任务及宿主反馈、多平台和可信来源未验收，三个父任务继续保持未完成。
+
+2026-10-03 后续增量：上段插件 0.1.2 状态是 CLI 0.1.3 初发时的快照。插件仓本地提交 `7bfb07a` 已升级显式候选锁和安装器，支持 0.1.3 的 38 个成员及 32 份许可证，增加 `exec check all ABS_PROJECT`；插件候选测试 5/5，本仓离线 npm 包 32 语种统一检查回归 1/1 通过。插件仓仍需 PR、受保护 CI、tag、市场同步；默认 Python Hook、逐语言精度、任务自动复检和真实宿主反馈仍缺，13.4、14.18、14.19 不勾选。详见[更新的发行局部验收](../../../tests/acceptance/npm-0.1.3-wasm-candidate.md)。
+
+14.4 / 14.17 / 14.19 VB.NET 精度复现：0.1.3 固定 WASM 对未缩进类方法返回一处 `MISSING ":"`，仅缩进变化的样例为零恢复；两者保持候选未验收和交付未评估。复现输入、坐标与资产身份见[局部证据](../../../tests/acceptance/vbnet-unindented-method-false-positive.md)。本机无 .NET 原生编译器，grammar 修复、原生差分与误报统计未完成，父任务不勾选。
+
+14.1 / 14.7 / 14.17 / 14.19 已知限制投影：`grammar status` 逐候选返回来自固定清单的有界 `known_limitations`，VB.NET 的具体误报不再被通用待验收状态遮盖；清单解析拒绝超长、控制字符和过多条目。两项目标测试先 RED 后 GREEN，见[局部验收](../../../tests/acceptance/grammar-known-limitations-projection.md)。这不修 grammar，不证明原生对照或逐语言精度，父任务不勾选。
+
+14.4 / 14.6 / 14.19 MATLAB 块注释误路由局部修复：`.m` 内 `%{ ... %}` 的行首 `#import` / `@interface` 不再作为 Objective-C 证据；块外真实标记保留。先 RED 后修复的候选路由、默认发现和真实 `check all` 回归通过，歧义范围继续报告未完成；见[共享后缀局部验收](../../../tests/acceptance/ambiguous-grammar-extensions.md)。完整 MATLAB 词法和逐项目方言选择尚缺，父任务不勾选。
+
+14.4 / 14.17 / 14.19 Rust 原生差分局部增量：固定本机 rustfmt 1.9.0 与 Rust 2021 的 8 份合法、5 份破损语料，经公开隔离 Rust worker 对照，13/13 分类一致；普通语料测试和显式原生差分测试均 1/1 通过。原生未闭合字符串的退出 101 须伴随语法错误诊断，不将崩溃冒充拒绝。仅证明窄范围局部一致，完整编译/Clippy、其它 edition、系统误报率与发行/宿主验收仍缺，父任务不勾选；见[局部验收](../../../tests/acceptance/rust-native-differential.md)。
+
+14.4 / 14.17 / 14.19 全量最小正例收紧：分批 `check all` 运行 32 份固定 grammar 的既有样例，现在逐观察要求 `recovery_count=0`；本机目标测试 1/1 通过，确保路由虽成功却对合法样例产生恢复节点时不能假装验收成功。该语料规模很小，不等于逐语言原生 oracle、版本/方言覆盖或系统误报率，父任务不勾选；见[局部验收](../../../tests/acceptance/check-all-32-grammar-candidates.md)。
+
+14.4 / 14.17 / 14.19 C11 原生差分局部增量：Apple Clang 21 `-fsyntax-only` 与隔离 C worker 在 8 份合法、5 份语法破损样例上 13/13 分类一致；普通语料和显式原生差分测试各 1/1 通过。初版语料中的返回类型错误是语义诊断，已改为纯语法缺失初始化表达式，不把语义拒绝当成 grammar 漏检。其它 C 版本、系统误报率、完整原生 lint/路由、发行与宿主验收仍缺，父任务不勾选；见[局部验收](../../../tests/acceptance/c-native-differential.md)。
+
+14.1 / 14.7 / 14.17 / 14.19 状态证据校正：固定清单的 C、Go、JavaScript、Rust、Zig 已知限制同步窄范围原生差分事实，CFQuery 明确提示 SQL 片段漏检；只读 `grammar status` 测试逐项断言说明且仍 `released=false`。这只是源码状态投影，已发布包未更新，也未消除系统精度和原生 lint 缺口；见[局部验收](../../../tests/acceptance/grammar-known-limitations-projection.md)。
+
+14.7 / 14.17 / 14.19 项目报告限制投影：`check all` 的 0.34.0 封闭协议逐候选附带固定清单的有界 `known_limitations`，VB.NET 已知误报与 CFQuery SQL 覆盖缺口不再只存在于独立库存命令；0.33.0 Schema 归档，清单解析失败时保持未完成。真实双文件目标测试先 RED 后 GREEN，六项候选回归与 18 项聚合契约通过，分批 32 份真实候选测试逐观察确认非空限制，真实 JSON 通过 Draft 2020-12、旧 Schema/伪造放行被拒。默认宿主自动对话渲染、原生对照、系统精度和发行仍缺，父任务不勾选；见[局部验收](../../../tests/acceptance/check-all-known-grammar-limitations.md)。
+
+14.7 / 14.19 文本反馈局部增量：`check all` 默认终端输出现在有界显示候选的固定已知限制，VB.NET 误报样例先 RED 后 GREEN，目标测试 1/1 通过，源码行未回显。显式 CLI 输出可由调用方转发，插件默认 Hook 的自动触发与宿主对话渲染仍未验收，父任务不勾选；见[同一局部验收](../../../tests/acceptance/check-all-known-grammar-limitations.md)。
+
+5.2 / 5.6 Linux CI 版本探测测试稳定性：旧 30ms 超时夹具在并行负载下实际返回 `SpawnFailure`，不能误报为运行时超时。现在使用 500ms 预算与 2 秒睡眠，仅在瞬时启动失败时创建新夹具重试，最终仍严格要求 `TimedOut`；本机定向 1/1、完整文件 7/7 通过。远端复验仍待本次 PR CI，父任务保持未完成；见[原生版本诊断验收](../../../tests/acceptance/native-version-diagnostics.md)。
+
+14.4 / 14.6 / 14.19 单项目预算局部增量：候选阶段按固定顺序准备有界源码片段，使用 `min(--jobs, 2)` 个隔离 worker 批量并行，报告仍按路径顺序；成功结果复读源码，所有任务共享原有 90 秒候选截止时间。本机 31 文件单项目可观察全部 32 种候选，约 41.54 秒、跳过 0，仍退出 3 且不作语言验收或交付许可。源码提交 `ff60184` 的 Linux CI WASM 集成步骤已通过单项目回归；完整 CI 已通过，长期资源与冷暖启动验收尚待确认；逐语言精度、原生优先、任务及宿主反馈也未完成，父任务不勾选。见[32 份路由局部验收](../../../tests/acceptance/check-all-32-grammar-candidates.md)。
+
+14.4 / 14.17 / 14.19 Java 17 原生差分局部增量：本机现有 javac 21.0.12.1 以 `--release 17` 接受 8 份合法、拒绝 5 份纯语法破损样例，固定 Java WASM 隔离 worker 对 13 例的恢复分类与之全部一致。常规语料及显式原生差分目标测试各 1/1 通过，提交 `729978d` 的 Linux CI 普通语料与全套测试通过；清单已把原来笼统的“语料未验收”更正为窄范围事实。其它 Java 版本/方言、系统误报率、统一命令原生优先与完整发行验收仍缺，父任务不勾选；见[局部验收](../../../tests/acceptance/java-native-differential.md)。
+
+14.4 / 14.17 / 14.19 Kotlin 精度阻塞：本机 `kotlinc-jvm 2.4.10` 与固定 Kotlin WASM 对 13 份语法样例仅 12/13 分类一致。`fun f(x: ) = x` 被原生以缺类型拒绝，WASM 却零恢复，确认漏检。普通语料与显式原生差分测试各 1/1 通过并固定此唯一分歧；提交 `1623cf9` 的 Linux CI 普通回归、单项目 32/32、npm 与完整测试亦通过。清单、`grammar status` 和 `check all` 逐候选已知限制显示反例，项目报告仍不完整。需修 grammar 并补充版本语料、原生优先路由与发行验收；三项父任务不勾选。见[局部证据](../../../tests/acceptance/kotlin-native-differential.md)。

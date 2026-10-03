@@ -178,6 +178,7 @@ pub mod rustdoc_repair_brief;
 #[cfg(unix)]
 pub(crate) mod rustdoc_task_recheck;
 pub mod sarif_feedback;
+mod source_language_hint;
 #[cfg(feature = "wasm-precheck")]
 mod syntax_worker_candidate_observation;
 #[cfg(feature = "wasm-precheck")]

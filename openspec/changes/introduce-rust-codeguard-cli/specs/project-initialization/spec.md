@@ -8,6 +8,12 @@
 
 init MUST 识别指定项目边界、各构建根、语言/方言、项目版本、语言目标、构建器/包管理器、框架、源集、现有质量配置及检查前置条件。声明、锁定/解析、本机安装版本 MUST 分开；每项附来源和内容身份，未观察到的事实 MUST 标 unknown，不从主语言或本机版本猜测其它模块。读取范围 MUST 遵循批准扫描与配置发现政策。
 
+共享源码后缀的语言归类 MUST 使用可核对的文件或项目证据；仅靠 `.m` 或 `.sc` 后缀不得宣称 Objective-C 或 Scala。证据不足的普通文件 MUST 保留为明确的未判定范围，不得从后续检查范围中静默消失；只读发现不能为消除歧义执行项目脚本或 WASM。
+
+#### Scenario: Source extension belongs to multiple languages
+- **WHEN** `detect` 遇到无 Objective-C 专属行首标记的 MATLAB `.m` 或 SuperCollider `.sc`
+- **THEN** 语言清单不把它们记为 Objective-C/Scala，报告保留相对路径与语言未判定条件；明确的 Objective-C `.m` 和 `.scala` 仍按证据列示
+
 #### Scenario: Multiple build roots use different languages
 - **WHEN** 一个项目含 Java、TypeScript 和 Python 构建根
 - **THEN** 逐根保留语言、版本及构建配置，不以主语言覆盖其它根

@@ -18,6 +18,10 @@
 - **WHEN** `lint zig` 收到可核对的 Zig 0.16.0 工具与普通 `.zig` 文件
 - **THEN** 优先以受控进程运行原生 `zig ast-check`；原生诊断必须保留，不能因 WASM 观察覆盖。只有该原生工具未提供或不可运行时，才可返回未验收 WASM 候选观察，并始终保持整体未完成；`ast-check` 不等于全部 Zig lint、测试或构建。
 
+#### Scenario: Go vet excludes a file under build constraints
+- **WHEN** 本轮 Go 1.23.4 `go vet` 完成，受控 `go list` 证明部分源码进入默认构建，而另一份 `.go` 源码被构建标签排除
+- **THEN** 仅对同一源码字节且进入原生包清单的文件跳过重复 WASM；被排除文件继续候选初检，并保持平台/构建标签覆盖未完成
+
 #### Scenario: A local checker is absent from PATH
 - **WHEN** 项目声明的本地原生工具已可按受支持方式定位
 - **THEN** 核对其配置和版本后优先运行，不创建错误的安装任务
@@ -72,6 +76,8 @@
 
 CodeGuard MUST 提供只读的来源覆盖清单，区分 CodeGraph 随仓 WASM、由依赖包提供但尚未固定字节的 grammar、CodeGuard 已复制候选及已验收发行能力。覆盖清单或 `grammar status` 的存在 MUST NOT 自动改变原生检查义务、加载未经批准的字节，或把来源资产数量说成已支持语言数量。来源资产超过当前加载预算时 MUST 明示预算缺口，不能静默跳过。
 
+`grammar status` 的逐语言候选行 MUST 投影固定清单中的已知限制，且只能来自受控、非空、长度有界的文本；已知误报不得被泛化的“待验收”状态掩盖。该投影仍为只读风险提示，不是原生对照、违规确认或白名单决定。
+
 目标范围 MUST 包含当前固定 CodeGraph 来源的 32 份独立 grammar，并包含 Zig；`jsx` 与 `javascript` 共用同一份 grammar，不重复计数。每份 grammar 都须分别完成合法再分发来源、许可、字节与 ABI、Rust 离线加载、版本/方言正反语料、原生工具对照、统一 `lint/check` 的原生优先路由、任务/对话反馈及发行包实装验收。部分候选或来源库存不能充当全部接入。若上游 WASM 与 Rust 运行时导入不兼容，适配 MUST 固定原始和派生字节、限定变换范围并以正反解析样本复验；不能回退到已知产生误报的旧 grammar 来制造可加载状态。
 
 在正式 `lint/check` 路由验收之前，CLI MAY 暴露显式的单文件 `grammar probe` 候选观察。该命令 MUST 通过与正式路径相同的固定资产核验及隔离 worker，报告源码与 grammar 摘要、恢复锚点、未验收状态及原生确认需求；无论有无恢复节点，MUST 返回未完成，不能产生已确认违规、任务关闭或交付通过。有效语种的输入/worker 失败 MUST 使用同一版本化封闭 JSON 协议报告具体未完成原因，未知语种属于参数错误。它不能自动代替已配置的原生工具执行。
@@ -99,6 +105,11 @@ CodeGuard MUST 提供只读的来源覆盖清单，区分 CodeGraph 随仓 WASM�
 
 - **WHEN** 查询固定 CodeGraph 来源中的 grammar 覆盖状态
 - **THEN** 列出其来源身份、CodeGuard 集成状态及下一项缺口；不运行解析器、不签发质量或交付通过
+
+#### Scenario: A candidate grammar has a known false positive
+
+- **WHEN** 固定资产清单记录 VB.NET 等语种的具体已知误报
+- **THEN** `grammar status` 的该语种行显示有界的已知限制，并继续报告未验收、零发行和原生确认需求
 
 #### Scenario: CodeGraph can load a copied grammar but Rust cannot
 - **WHEN** Rust 运行时拒绝 ABI 或外部扫描器组合
@@ -134,6 +145,19 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 
 同一语言族有独立 grammar 的方言 MUST 按实际文件类型选择和报告；尤其 `.tsx` MUST 使用 TSX grammar，不能拿普通 TypeScript grammar 的恢复节点当作 JSX 源码异常。候选报告读者 MUST 核对 grammar 方言与源文件扩展名一致；不匹配视为报告无效，不生成源码 finding。
 
+多语言共用后缀 MUST 保留歧义：`.m` 可能属于 Objective-C 或 MATLAB，`.sc` 可能属于 Scala 或 SuperCollider。没有可核对的语言证据时，自动检查 MUST 不调用猜测的 grammar、不把恢复节点记为源码问题，并保持范围未完成；用户显式指定 `grammar probe` 的语种仍可作候选诊断。
+
+`.m` 文件中 MATLAB 块注释 `%{ ... %}` 内的行首 `#import` 或 `@interface` 只是注释数据，MUST NOT 作为 Objective-C 证据；块注释外的明确 Objective-C 专属标记仍可用于候选路由。发现与检查 MUST 使用同一判别，避免一个入口报告未知而另一个入口执行错误 grammar。
+
+#### Scenario: Shared extension would produce a speculative syntax finding
+- **WHEN** 项目包含无 Objective-C 专属标记的 MATLAB `.m` 源码，或 SuperCollider `.sc` 源码
+- **THEN** 自动候选路由不把它们交给 Objective-C/Scala WASM；歧义范围保持未完成，不能用资产数量或其它文件的检查结果代替该范围
+
+#### Scenario: An Objective-C marker appears only in a MATLAB block comment
+
+- **WHEN** `.m` 文件的 `%{ ... %}` 块注释内含行首 `#import`，块注释外只有 MATLAB 语句
+- **THEN** `detect` 与 `check all` 均保持该文件为未解析的歧义范围，不调用 Objective-C grammar；块注释外的真实 Objective-C 标记仍可路由
+
 #### Scenario: Valid JSX is parsed with a TypeScript-only grammar
 
 - **WHEN** `.tsx` 文件含合法 JSX，而普通 TypeScript grammar 会产生恢复节点
@@ -147,9 +171,25 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 - **WHEN** 只支持文件中一部分语言区域
 - **THEN** 通过位置映射返回已检/未覆盖区域，不报告整个文件 clean
 
+#### Scenario: A CFQuery tag appears inside different comment forms
+- **WHEN** CFML 文件的可嵌套 `<!--- ... --->` 注释、普通 HTML 注释和标记正文中各含完整的 `<cfquery>...</cfquery>` 标签
+- **THEN** 跳过被 ColdFusion 移除的 CFML 注释内标签，保留仍由 ColdFusion 处理的 HTML 注释内标签及正文标签；候选整体仍不获得原生 lint 或交付权威
+
+#### Scenario: A CFML comment appears inside a query opening tag
+- **WHEN** 合法 `<cfquery>` 开标签的属性之间含可嵌套 CFML 注释，其文本带有 `>`
+- **THEN** 跳过注释后定位真正的开标签结束位置，查询体范围与原文件字节偏移保持一致
+
 #### Scenario: A newer dialect is outside the validated range
 - **WHEN** 文件使用未验收语言版本或方言
 - **THEN** 保留兼容性限制和原生确认动作，不直接断言合法源码违规
+
+#### Scenario: A candidate grammar matches a narrow native syntax corpus
+- **WHEN** 同一组合法与破损源码分别经过固定版本的语言原生语法工具和隔离 WASM worker
+- **THEN** 逐例记录语法分类一致性、工具与语料身份；仅扩大该版本的局部精度证据，不将候选提升为完整 lint、其它版本或交付通过
+
+#### Scenario: Native syntax rejects a source that the WASM candidate accepts
+- **WHEN** 固定 Swift 6.4 编译器的语法阶段拒绝缺少参数类型的源码，而固定 Swift WASM 没有恢复节点
+- **THEN** 记录带原生证据的漏检及待修复 grammar 身份，保持候选未验收和完整检查义务；不能因零恢复节点签发 clean、放入白名单或关闭任务
 
 ### Requirement: Precheck briefs SHALL reach agent conversations with concrete next actions
 

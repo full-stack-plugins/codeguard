@@ -69,19 +69,25 @@ fn check_all_routes_distinct_dialects_after_native_without_claiming_clean() {
     fs::write(root.join("component.tsx"), "const C = () => <div />;\n").unwrap();
     fs::write(root.join("script.js"), "const x = 1;\n").unwrap();
     fs::write(
+        root.join("plot.m"),
+        "title('@interface Foo');\n%{\n#import <NotObjectiveC.h>\n@interface Fake\n%}\nplot(1:3);\n",
+    )
+    .unwrap();
+    fs::write(root.join("synth.sc"), "{ SinOsc.ar(440) }.play;\n").unwrap();
+    fs::write(
         root.join("component.cfs"),
         "component { function f() { return 1; } }\n",
     )
     .unwrap();
     fs::write(
         root.join("page.cfm"),
-        "<cfquery name=\"q\">SELECT #x# FROM users</cfquery>\n",
+        "<!-- <cfquery>SELECT #html# FROM users</cfquery> -->\n<!--- <cfquery>SELECT #broken</cfquery> --->\n<cfquery <!--- note > ---> name=\"q\">SELECT #x# FROM users</cfquery>\n",
     )
     .unwrap();
     let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
         .args(["check", "all"])
         .arg(&root)
-        .args(["--format=json", "--timeout", "90s"])
+        .args(["--format=json", "--timeout", "90s", "--jobs=1"])
         .output()
         .unwrap();
     fs::remove_dir_all(&root).unwrap();
@@ -92,7 +98,8 @@ fn check_all_routes_distinct_dialects_after_native_without_claiming_clean() {
         String::from_utf8_lossy(&output.stderr)
     );
     let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
-    assert_eq!(report["schema_version"], "0.33.0");
+    assert_eq!(report["schema_version"], "0.34.0");
+    assert_eq!(report["execution_budget"]["jobs_limit"], 1);
     assert_eq!(report["delivery_decision"], "incomplete");
     let observations = report["syntax_candidates"]["observations"]
         .as_array()
@@ -103,6 +110,28 @@ fn check_all_routes_distinct_dialects_after_native_without_claiming_clean() {
             "{language}: {observations:?}"
         );
     }
+    assert!(!observations.iter().any(|item| item["path"] == "plot.m"));
+    assert!(!observations.iter().any(|item| item["path"] == "synth.sc"));
+    assert_eq!(report["syntax_candidates"]["unrouted_count"], 2);
+    let unknown = report["discovery"]["unknown_conditions"]
+        .as_array()
+        .unwrap();
+    for path in ["plot.m", "synth.sc"] {
+        assert!(
+            unknown
+                .iter()
+                .any(|item| item == &format!("ambiguous_language_suffix:{path}")),
+            "{path}: {unknown:?}"
+        );
+    }
+    assert_eq!(
+        observations
+            .iter()
+            .filter(|item| item["language"] == "cfquery")
+            .count(),
+        2,
+        "HTML-comment CFML executes; only CFML-comment query is excluded"
+    );
     assert!(
         observations
             .iter()
@@ -116,13 +145,118 @@ fn check_all_routes_distinct_dialects_after_native_without_claiming_clean() {
 }
 
 #[test]
-fn check_all_invokes_all_32_pinned_candidates_across_bounded_projects() {
+fn ambiguous_only_project_remains_an_explicit_unrouted_scope() {
+    let root = std::env::temp_dir()
+        .canonicalize()
+        .unwrap()
+        .join(format!("codeguard-ambiguous-only-{}", std::process::id()));
+    fs::create_dir_all(&root).unwrap();
+    fs::write(root.join("plot.m"), "plot(1:3);\n").unwrap();
+    fs::write(root.join("synth.sc"), "{ SinOsc.ar(440) }.play;\n").unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["check", "all"])
+        .arg(&root)
+        .args(["--format=json", "--timeout", "30s"])
+        .output()
+        .unwrap();
+    fs::remove_dir_all(&root).unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(report["syntax_candidates"]["source_file_count"], 2);
+    assert_eq!(report["syntax_candidates"]["unrouted_count"], 2);
+    assert_eq!(report["syntax_candidates"]["status"], "not_run");
+    assert_eq!(report["syntax_candidates"]["reason"], "unrouted_source");
+    assert_eq!(report["delivery_decision"], "incomplete");
+    assert!(
+        report["syntax_candidates"]["observations"]
+            .as_array()
+            .unwrap()
+            .is_empty()
+    );
+}
+
+#[test]
+fn known_grammar_precision_limits_reach_project_feedback() {
     let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
-        "codeguard-check-all-grammars-{}",
+        "codeguard-known-grammar-limits-{}",
         std::process::id()
     ));
     fs::create_dir_all(&root).unwrap();
-    for (index, (name, source)) in [
+    fs::write(
+        root.join("class.vb"),
+        "Public Class C\nPublic Function F() As Integer\nReturn 1\nEnd Function\nEnd Class\n",
+    )
+    .unwrap();
+    fs::write(
+        root.join("query.cfm"),
+        "<cfquery name=\"q\">SELECT FROM users</cfquery>\n",
+    )
+    .unwrap();
+    fs::write(root.join("broken.kt"), "fun f(x: ) = x\n").unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["check", "all"])
+        .arg(&root)
+        .args(["--format=json", "--timeout", "45s"])
+        .output()
+        .unwrap();
+    fs::remove_dir_all(&root).unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let observations = report["syntax_candidates"]["observations"]
+        .as_array()
+        .unwrap();
+    for (language, expected) in [
+        ("vbnet", "known grammar false positive"),
+        ("cfquery", "does not validate full SQL semantics"),
+        ("kotlin", "native compiler rejects missing parameter type"),
+    ] {
+        let observation = observations
+            .iter()
+            .find(|item| item["language"] == language)
+            .unwrap();
+        assert!(
+            observation["known_limitations"][0]
+                .as_str()
+                .unwrap()
+                .contains(expected),
+            "{language}: {observation}"
+        );
+        assert_eq!(observation["grammar_qualified"], false);
+        if language == "kotlin" {
+            assert_eq!(observation["recovery_count"], 0);
+        }
+    }
+    assert_eq!(report["delivery_decision"], "incomplete");
+}
+
+#[test]
+fn human_feedback_names_known_candidate_false_positive() {
+    let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
+        "codeguard-known-limit-human-{}",
+        std::process::id()
+    ));
+    fs::create_dir_all(&root).unwrap();
+    fs::write(
+        root.join("class.vb"),
+        "Public Class C\nPublic Function F() As Integer\nReturn 1\nEnd Function\nEnd Class\n",
+    )
+    .unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["check", "all"])
+        .arg(&root)
+        .args(["--timeout", "45s"])
+        .output()
+        .unwrap();
+    fs::remove_dir_all(&root).unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    let text = String::from_utf8(output.stdout).unwrap();
+    assert!(text.contains("已知 grammar 限制"), "{text}");
+    assert!(text.contains("known grammar false positive"), "{text}");
+    assert!(!text.contains("Return 1"), "{text}");
+}
+
+fn grammar_samples() -> [(&'static str, &'static str); 31] {
+    [
         ("a.ets", "@Component struct C { build() { Text('hi') } }"),
         ("a.c", "int main(void) { return 0; }"),
         (
@@ -164,9 +298,16 @@ fn check_all_invokes_all_32_pinned_candidates_across_bounded_projects() {
         ),
         ("a.zig", "const Empty = struct {};\n"),
     ]
-    .into_iter()
-    .enumerate()
-    {
+}
+
+#[test]
+fn check_all_invokes_all_32_pinned_candidates_across_bounded_projects() {
+    let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
+        "codeguard-check-all-grammars-{}",
+        std::process::id()
+    ));
+    fs::create_dir_all(&root).unwrap();
+    for (index, (name, source)) in grammar_samples().into_iter().enumerate() {
         let group = root.join(format!("group-{}", index / 8));
         fs::create_dir_all(&group).unwrap();
         fs::write(group.join(name), source).unwrap();
@@ -197,6 +338,19 @@ fn check_all_invokes_all_32_pinned_candidates_across_bounded_projects() {
         let observations = report["syntax_candidates"]["observations"]
             .as_array()
             .unwrap();
+        for observation in observations {
+            assert_eq!(
+                observation["recovery_count"], 0,
+                "group {group_index}: unexpected recovery in valid sample: {observation}"
+            );
+            assert!(
+                !observation["known_limitations"]
+                    .as_array()
+                    .unwrap()
+                    .is_empty(),
+                "group {group_index}: candidate lacks its fixed known limits: {observation}"
+            );
+        }
         for language in observations
             .iter()
             .filter(|item| item["status"] == "candidate_observed")
@@ -215,6 +369,63 @@ fn check_all_invokes_all_32_pinned_candidates_across_bounded_projects() {
             .map(|asset| asset["language"].as_str().unwrap().to_owned())
             .collect::<BTreeSet<_>>();
     assert_eq!(languages, expected);
+}
+
+#[test]
+fn one_mixed_project_observes_all_32_candidates_within_the_existing_budget() {
+    let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
+        "codeguard-single-project-grammars-{}",
+        std::process::id()
+    ));
+    fs::create_dir_all(&root).unwrap();
+    for (name, source) in grammar_samples() {
+        fs::write(root.join(name), source).unwrap();
+    }
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["check", "all"])
+        .arg(&root)
+        .args(["--format=json", "--timeout", "120s"])
+        .output()
+        .unwrap();
+    fs::remove_dir_all(&root).unwrap();
+    assert_eq!(
+        output.status.code(),
+        Some(3),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(report["syntax_candidates"]["skipped_count"], 0);
+    assert_eq!(report["syntax_candidates"]["source_file_count"], 31);
+    assert_eq!(report["delivery_decision"], "incomplete");
+    let observations = report["syntax_candidates"]["observations"]
+        .as_array()
+        .unwrap();
+    assert_eq!(observations.len(), 32);
+    assert!(
+        observations
+            .windows(2)
+            .all(|pair| { pair[0]["path"].as_str().unwrap() <= pair[1]["path"].as_str().unwrap() })
+    );
+    let observed = observations
+        .iter()
+        .filter(|item| item["status"] == "candidate_observed")
+        .filter_map(|item| item["language"].as_str())
+        .collect::<BTreeSet<_>>();
+    let manifest: serde_json::Value =
+        serde_json::from_str(include_str!("../../../grammars/manifest.json")).unwrap();
+    let expected = manifest["assets"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|asset| asset["language"].as_str().unwrap())
+        .collect::<BTreeSet<_>>();
+    assert_eq!(observed, expected, "{observations:?}");
+    assert!(
+        observations
+            .iter()
+            .all(|item| item["grammar_qualified"] == false)
+    );
 }
 
 #[test]

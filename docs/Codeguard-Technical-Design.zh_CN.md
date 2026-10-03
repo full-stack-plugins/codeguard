@@ -2,7 +2,7 @@
 
 > **文档说明：**将架构落实为实现契约、命令职责、扩展步骤和可观察的验收标准。
 >
-> **文档版本：**1.2.2 · **最后更新：**2026-09-29 · **源码基线：**当前检出版本与[实施证据](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md)；软件版本 `0.1.2`。
+> **文档版本：**1.2.3 · **最后更新：**2026-10-03 · **源码基线：**当前检出版本与[实施证据](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md)；软件版本 `0.1.3`。
 
 [English](Codeguard-Technical-Design.md) · [架构设计](Codeguard-Architecture.zh_CN.md) · [README](../README.zh-CN.md)
 
@@ -19,6 +19,8 @@ WASM 的规范与 19 项实施任务已纳入既有 change；可选特性下的 
 源码以 `--features wasm-precheck` 构建后，可通过 `codeguard grammar probe <language> <file> --format=json` 显式调用全部 32 份固定候选资产。命令使用隔离 Rust worker，以退出码 3 报告未经语言验收的观察，不能作为 lint 或交付结论。成功观察与有效语种的输入失败都遵守[0.1.0 封闭 JSON Schema](../schemas/grammar-probe-v0.1.schema.json)，保持未完成。原生优先 `lint/check`、语言/方言验收、任务/宿主反馈及发行仍需独立完成；现有发现清单还把 JavaScript/TSX 归入 TypeScript，并未为 CFQuery/CFScript 建立独立源码映射。
 
 首个局部原生优先入口为 Zig：`lint zig FILE --zig-tool ABS_PATH --format=json` 对选定源码字节先运行版本报告为 Zig 0.16.0 且字节保持一致的 `ast-check`；原生错误只暴露行列位置，不回显源码。未提供显式工具时，固定 Zig grammar 作为未验收候选兜底。两种结果都保持未完成，因为 AST 检查范围小于完整 lint、构建和测试；见 [0.1.0 报告 Schema](../schemas/zig-lint-feedback-v0.1.schema.json)。
+
+固定 Zig worker 现还有真实 Zig 0.16.0 差分测试：7 份合法、4 份破损源码分别送入原生 `ast-check` 和公开隔离 `grammar probe` 路径。本机 11 份分类全部一致；这只是窄范围[精度记录](../tests/acceptance/zig-native-differential.md)，不是误报率估计或语种验收。
 
 ## 2. 技术选型与权衡
 
@@ -149,7 +151,7 @@ CachePort.lookup(validated_identity) -> VerifiedCacheEntry | Miss
 
 ### 5.3 原生优先与语法兜底选择——目标，尚未发行
 
-拟议路径扩展已有的 `codeguard lint java .`、`codeguard lint typescript .` 和 `codeguard check all .`，不要求调用者选择 WASM。在实现和验收前，仍须使用当前适配器参数/前置条件；公开 `0.1.2` 不含此兜底。架构文档 **8.1–8.3** 负责组件边界与执行图，本节定义算法。
+拟议路径扩展已有的 `codeguard lint java .`、`codeguard lint typescript .` 和 `codeguard check all .`，不要求调用者选择 WASM。在实现和验收前，仍须使用当前适配器参数/前置条件；公开 `0.1.3` 仅包含有界、未验收的候选路径；`0.1.2` 不含。架构文档 **8.1–8.3** 负责组件边界与执行图，本节定义算法。
 
 ```mermaid
 flowchart LR
@@ -189,11 +191,11 @@ flowchart LR
 
 这些是目标语义字段，尚非已发行的项目级 lint/check 报告。局部的[候选初检 schema](../schemas/syntax-precheck-candidate.schema.json) 与 [Rust 严格读者](../crates/codeguard-adapters/src/syntax_precheck_candidate_report.rs)已绑定源码 SHA-256、固定 grammar 身份和文件方言，重新计算状态，并拒绝未知版本及伪造的 `clean`。可选 CLI 的 [TypeScript](../schemas/eslint-local-feedback-v0.3.schema.json)、[TSX](../schemas/eslint-local-feedback-v0.4.schema.json) 与 [Java](../schemas/java-syntax-precheck-feedback-v0.1.schema.json) 单文件生产端已提供恢复位置和准备指引。TypeScript/TSX 在已初始化工作区改用[反馈 0.5.0](../schemas/eslint-local-feedback-v0.5.schema.json)，按源码范围关联一张稳定的原生确认任务；[0.2.0 准备报告](../schemas/eslint-preparation-observation-v0.2.schema.json)以源码和 grammar 身份保存有界疑似位置，并通过报告摘要关联到任务；宿主渲染和能力匹配原生关闭仍未接通。内置 grammar 仍是未验收候选，因此不能返回 `clean`。保持既有退出语义：必需原生执行缺失仍为未完成（`3`）；解析器疑似问题本身不是已确认违规（`1`）。若未来增加独立语法操作，其成功必须限定为语法初检；本文不宣称已有 `syntax` 命令。
 
-源码构建的 `check all` 现另有较窄的真实项目报告：先执行原生适配器，再由[有界源码路由](../crates/codeguard-cli/src/check_syntax_candidates.rs)选择固定 worker 候选。[0.33.0 封闭 Schema](../schemas/check-feedback.schema.json)增加逐文件原生优先计数；[0.32.0](../schemas/check-feedback-v0.32.schema.json) 保留为历史协议。只有 Ruff 对同一 Python 源码摘要返回完整扫描状态时才跳过该文件的重复 WASM；P3C 等规范检查不能冒充语法确认。下面仅摘录字段，不是完整 `check_feedback` 实例：
+源码构建的 `check all` 现另有较窄的真实项目报告：先执行原生适配器，再由[有界源码路由](../crates/codeguard-cli/src/check_syntax_candidates.rs)选择固定 worker 候选。[0.34.0 封闭 Schema](../schemas/check-feedback.schema.json)包含逐文件原生优先计数和所选 grammar 的有界已知限制；[0.33.0](../schemas/check-feedback-v0.33.schema.json) 保留为历史协议。只有 Ruff 对同一 Python 源码摘要返回完整扫描状态时才跳过该文件的重复 WASM；P3C 等规范检查不能冒充语法确认。默认终端输出也最多显示 8 条候选的固定已知限制；宿主自动交付仍待完成。下面仅摘录字段，不是完整 `check_feedback` 实例：
 
 ```json
 {
-  "schema_version": "0.33.0",
+  "schema_version": "0.34.0",
   "command_status": "incomplete",
   "delivery_decision": "incomplete",
   "syntax_candidates": {
@@ -203,14 +205,20 @@ flowchart LR
     "delivery_decision": "incomplete",
     "native_preferred_count": 1,
     "observations": [
-      {"path": "src/view.tsx", "language": "tsx", "status": "candidate_observed", "grammar_qualified": false, "recovery_count": 0}
+      {"path": "src/view.tsx", "language": "tsx", "status": "candidate_observed", "grammar_qualified": false, "recovery_count": 0, "known_limitations": ["Rust loader smoke passed; TSX language versions, JSX dialects, isolation and syntax corpus are not yet validated"]}
     ],
     "next_action": "交付前运行适用的原生检查器"
   }
 }
 ```
 
-实际报告还包含原生结果、源码与 grammar 摘要、片段偏移、有界原文件恢复坐标、未执行数量和未解决义务。完整 `<cfquery>` 标签体可作嵌入候选；普通 SQL 和有歧义的 C/C++ 头文件不猜测。本机四批 32 份 grammar 的 CLI 样例约 54 秒；Linux 单次 31 文件检查在 90 秒内完成 26/32；语言版本语料、原生差分对照、任务同步、宿主交付和发行包验收仍待完成。
+实际报告还包含原生结果、源码与 grammar 摘要、片段偏移、有界原文件恢复坐标、未执行数量和未解决义务。完整 `<cfquery>` 标签体可作嵌入候选；普通 SQL 和有歧义的 C/C++ 头文件不猜测。自动 `.m` 路由要求 Objective-C 行首标记，`.sc` 与 SuperCollider 共用后缀，缺少项目证据时保持未解析。只读发现现在使用相同的有界 `.m` 证据，把共享后缀的未判定路径记入 `unknown_conditions`；`check all` 仍将其计入未路由数量。共享判别器现跳过 MATLAB `%{ ... %}` 块注释内看似 Objective-C 的行首标记，未闭合块也不猜测，同时保留块外真实标记。这消除一类误路由，但不是完整 MATLAB 词法器。项目级方言依据及逐文件结构化歧义报告仍待完善。本机四批 32 份 grammar 的 CLI 样例约 54 秒；此前串行实现的 Linux 单次 31 文件检查在 90 秒内完成 26/32；语言版本语料、原生差分对照、任务同步、宿主交付和发行包验收仍待完成。
+
+对于单个混合语言项目，候选阶段最多规划 64 个片段，再按不超过 `--jobs` 且最多两个隔离 worker 的批次执行。所有 worker 共用原 90 秒候选截止时间，成功结果若在出报告前发现源码变化就作废。本机 31 文件样例观察到全部 32 种固定候选且未跳过片段；源码提交 `ff60184` 的 Linux WASM 集成步骤已通过同一单项目测试；完整 CI 已通过，资源画像仍待验收。
+
+Java 的 [javac 21 `--release 17` 对照](../tests/acceptance/java-native-differential.md)接受 8 例合法、拒绝 5 例破损语法源码，与隔离 WASM worker 分类一致。该测试仅固定窄范围分类；项目级原生路由、版本覆盖和误报率仍待验收。
+
+[Kotlin 2.4.10 差分](../tests/acceptance/kotlin-native-differential.md)记录 12/13 分类一致，并固定反例：`fun f(x: ) = x` 被原生拒绝而 WASM 零恢复。`grammar status` 和 `check all` 将其作为有界已知限制展示；零恢复不能关闭原生确认义务。
 
 可选特性构建的 CLI 在无显式原生上下文的 TypeScript 单文件请求中，先核对本地 ESLint 10 包及唯一普通 flat config。若从 `PATH` 解析到可执行 Node，就调用既有有界原生版本与报告探针；缺 Node 时报告准备缺口，不让 WASM 抢跑。仅未观察到本地 ESLint 包时，`.ts/.mts/.cts` 输出 [ESLint 反馈 0.3.0](../schemas/eslint-local-feedback-v0.3.schema.json)，`.tsx` 用独立 grammar 输出 [0.4.0](../schemas/eslint-local-feedback-v0.4.schema.json)。候选初检保留 `native=not_run`、`delivery=not_evaluated`，即使零恢复节点也保持未完成。配置选择歧义、本地路径不可信或包身份损坏时保留环境阻塞而不启动 WASM；部分显式上下文也沿用原路径。该增量不证明项目脚本参数等价、逐模块调度或宿主对话交付，见[原生优先局部验收](../tests/acceptance/native-first-eslint-candidate.md)。
 
@@ -221,6 +229,22 @@ flowchart LR
 可用 `codeguard grammar status --format=json` 查询独立的来源覆盖库存。它只读报告 CodeGraph 32 种独立 grammar、CodeGuard 三十二份资产候选（ArkTS、C、C++、C#、Go、Java、JavaScript、Lua、Luau、Objective-C、Python、Rust、Solidity、TypeScript、TSX、Zig、Nix、Terraform、R、Ruby、PHP、Kotlin、Dart、Erlang、Pascal、CFML、CFQuery、CFScript、COBOL、Scala、Swift、VB.NET）和零项已发行能力，不运行解析器；Python 已有源码可选构建中的局部 `lint` 兜底，结果不能视为通过。已绑定工作区的单文件反馈使用 [0.15.0 协议](../schemas/python-lint-feedback-v0.15.schema.json)，并通过现有 work sync 保存 [0.1.0 确认观察](../schemas/python-syntax-confirmation-observation-v0.1.schema.json)。任务身份绑定工作区和源码范围；导入前核对当前源码 SHA-256 与固定 grammar。能力匹配的原生关闭仍未完成。C、C++、C#、Go、JavaScript、Lua、Luau、Rust 的随仓字节和上游许可证已固定，完成窄范围 Rust worker 解析验证，尚无逐语言验收的独立 lint 路由或语言验收。ArkTS、Nix、Terraform 的来源、许可证、字节及 Rust 正反例也已固定，仅为候选，尚无逐语言验收的独立 lint 路由或发行验收；见[局部验收](../tests/acceptance/arkts-nix-terraform-grammar-candidates.md)。依赖提供的 Objective-C 与 Solidity 已固定原始和适配后字节、许可证及依赖包完整性，但仍未验收语言版本或公开 lint 路由；COBOL 现可在 20 MiB 输入限额下加载，但冷启动与内存预算未验收。
 
 R、Ruby、PHP、Kotlin 也已固定 CodeGraph 字节、许可证和 Rust 实测 ABI，并通过隔离 worker 的窄范围正反例；PHP 样例覆盖 HTML/PHP 混合内容，仍仅为未验收候选。CodeGraph 原 Dart WASM 仍不能由 Rust 直接加载；CodeGuard 现以固定上游 C 源码和真实外部 scanner 经 Zig 可重复构建，再做固定 WASI 导入适配。Rust 加载与隔离 worker 的窄范围测试通过，但公开 lint 与发行仍未验收；见[Dart 重建局部验收](../tests/acceptance/dart-grammar-rebuild-candidate.md)。Erlang 也已固定 CodeGraph 字节、上游 0.19 许可证及 ABI 14，Rust 与隔离 worker 的窄范围样例通过；原生对照和公开 lint 路由尚缺，见[Erlang 候选局部验收](../tests/acceptance/erlang-grammar-candidate.md)。Pascal 已固定 CodeGraph 字节、原始 Isopod 依赖提交和许可证，ABI 14 及窄范围 worker 样例通过；原生对照和公开 lint 尚缺，见[Pascal 候选局部验收](../tests/acceptance/pascal-grammar-candidate.md)。其余七份 CFML/CFQuery/CFScript/COBOL/Scala/Swift/VB.NET 来源 WASM 也已固定并由 Rust worker 加载，累计 32/32 份候选、0 项已发行。CFQuery 漏掉 `SELECT FROM`，VB.NET 对合法未缩进方法体误报，COBOL 成本高；都不能发布为 lint，见[七份局部验收](../tests/acceptance/final-seven-grammar-candidates.md)。
+
+当前源码构建的 `grammar status` 报告协议升级为 1.1.0，逐候选投影固定清单中有界的 `known_limitations`，包括[VB.NET 误报复现](../tests/acceptance/vbnet-unindented-method-false-positive.md)。清单校验会在文本进入智能体反馈前拒绝过长、过多或包含控制字符的条目。这仍是只读风险提示，不能把恢复节点升级为源码违规或关闭原生确认任务。见[投影局部验收](../tests/acceptance/grammar-known-limitations-projection.md)。
+
+CFQuery 源码路由现跳过嵌套 CFML 注释、普通标签属性与明确 CFScript 体中的假标签；HTML 注释中的 CFML 标签仍保留，因为 [Adobe 的 CFML 注释语义](https://helpx.adobe.com/coldfusion/developing-applications/the-cfml-programming-language/elements-of-cfml/comments.html)不把普通 HTML 注释当作服务端屏蔽。真实开标签属性中的 `>` 和开标签内的嵌套 CFML 注释也不再截断查询体。此修复避免一类误路由，同时不隐藏可能执行的 CFML 标签；CFQuery grammar 对 SQL 的漏检仍存在，见[标记边界回归](../tests/acceptance/cfquery-markup-boundary.md)。
+
+Go 1.23.4 原生 `gofmt -e` 差分语料现将 8 份合法、5 份破损源码与隔离 Go WASM worker 逐例比较，本机 13 份语法分类一致。这只是窄范围语法 oracle，不代表类型检查、`go vet`、总体误报率测量或 grammar 已验收；见[Go 差分验收](../tests/acceptance/go-native-differential.md)。
+
+JavaScript 模块语料也用 Node 24.18.0 `--check --input-type=module` 与隔离 JavaScript worker 对照 8 份合法、5 份破损源码，本机 13 份分类一致。固定 worker 语料可进入常规 CI；原生对照因宿主 Node 版本不同而需显式运行。这不验收 JSX、TypeScript、ESLint 规则或整个 JavaScript 生态；见[JavaScript 差分验收](../tests/acceptance/javascript-native-differential.md)。
+
+`check all` 的 Go 路径现仅在 Go 1.23.4 `go vet` 完成、受控 `go list -json ./...` 证明文件进入同一默认构建范围，且源码、模块与工具身份均匹配时，跳过该文件的重复 WASM。构建标签排除的文件仍进入候选 worker；包清单越界或输入变化不能触发跳过。真实 Go 集成与伪造范围回归已覆盖边界，但整体交付仍未完成；见[Go 原生优先验收](../tests/acceptance/check-all-native-preferred-go.md)。
+
+Rust 2021 的 `rustfmt 1.9.0 --emit stdout` 与隔离 Rust worker 对 8 份合法和 5 份破损语法样例分类一致；这份有界的[Rust 差分记录](../tests/acceptance/rust-native-differential.md)不等于 Clippy、完整编译或其它 edition 已验收。
+
+C11 的 `Apple clang 21 -fsyntax-only` 与隔离 C worker 对 8 份合法和 5 份语法破损样例分类一致。初版语料曾误把返回类型错误当成语法错误，现已改成缺失初始化表达式；这份有界的[C 差分记录](../tests/acceptance/c-native-differential.md)不等于语义诊断、C lint 或其它语言版本已验收。
+
+Ruby 2.6.10 `ruby -c` 与隔离 Ruby worker 在 13 例窄范围语料上分类一致，固定 worker 语料进入常规 CI；这不等于 Ruby lint 或其它版本验收。相反，Apple Swift 6.4 `swiftc -frontend -parse` 把 `func f(_ x: ) {}` 判为缺少参数类型，固定 Swift WASM 却没有恢复节点。Swift 13 例差分中 12 例一致、1 例漏检，候选仍不可签发语法通过；见[Ruby](../tests/acceptance/ruby-native-differential.md)与[Swift](../tests/acceptance/swift-native-differential.md)局部记录。
 
 由父进程控制解析工作进程，设置总截止时间、单文件输入上限、内存/进程限制及诊断数量上限。按需加载 grammar，不提供通用网络/文件系统导入；终止卡住的进程时保留其它模块的原生结果。宿主约束执行和 Rust MSRV 兼容性须测试，生产数值预算须经测量后确定，不编造性能承诺。
 
@@ -273,7 +297,7 @@ flowchart TD
 | 下一步 | 修源码、推荐/要求准备原生工具并确认、恢复配置、重扫，还是提出具体决策？ |
 | 交付 | 只是局部观察，还是完整评估的交付结果？ |
 
-[RunReport 解析](../crates/codeguard-cli/src/run_report.rs)支持通用结构化契约，[检查编排](../crates/codeguard-cli/src/check_command.rs)当前输出 `check_feedback` `0.33.0`，适配器另有专属版本化局部观察。消费者必须按协议身份与版本分派，不能假定统一 JSON 形状。当前 human 输出以中文为主，英文文档不代表运行时消息已有英文国际化。
+[RunReport 解析](../crates/codeguard-cli/src/run_report.rs)支持通用结构化契约，[检查编排](../crates/codeguard-cli/src/check_command.rs)当前输出 `check_feedback` `0.34.0`，适配器另有专属版本化局部观察。消费者必须按协议身份与版本分派，不能假定统一 JSON 形状。当前 human 输出以中文为主，英文文档不代表运行时消息已有英文国际化。
 
 ### 7.3 对话报告示例——目标呈现
 
@@ -445,7 +469,7 @@ Codeguard：1 个暂存路径需要处理
 
 ### 7.5 协议版本与身份闭包
 
-当前通用 `RunReport` 为 `1.4`，聚合 `check_feedback` 为 `0.33.0`，`check_aborted` 为 `0.11.0`；适配器局部观察另有版本。版本属于具体协议，不能因为软件是 `0.1.0` 而统一改写。上面的对话/JSON 简报是目标示例，不是这三个协议的完整实例。
+当前通用 `RunReport` 为 `1.4`，聚合 `check_feedback` 为 `0.34.0`，`check_aborted` 为 `0.11.0`；适配器局部观察另有版本。版本属于具体协议，不能因为软件是 `0.1.0` 而统一改写。上面的对话/JSON 简报是目标示例，不是这三个协议的完整实例。
 
 目标证据链关联 workspace/request/run/obligation/finding/task/attempt；源码定位使用可逆路径表示与内容身份，依赖定位使用组件、解析版本、图和 advisory。非 UTF-8 路径不能经有损显示字符串参与匹配。摘要只能绑定字节，不能证明字节来源已批准。报告升级保留旧字段的版本语义，不将旧空 findings 升格为完整通过。
 
@@ -576,9 +600,9 @@ CLI/runtime 部分模块已实现制品签名、包摘要、布局、解压和�
 
 Node 路径支持已发布的 macOS arm64 包和本地打包。本地打包流程为：显式构建 Rust 二进制，核对 `--version --format json` 报告的平台与版本，生成带本机标识的 tarball，通过 npm 安装或一次性执行。包包含 `codeguard.cjs` 和原生程序，声明 npm `os`/`cpu`，不含安装生命周期脚本。本地包默认标记为 private；`--public` 包为公开包。Node 入口不实现检测，也不静默下载工具。[README](../README.zh-CN.md)给出已实测的指令。这条路径与按另一套信任契约准备外部检查器的 `tools install` 分开。
 
-`--public` 打包模式已产出仅适用于 `darwin-arm64` 的 `@partme.ai/codeguard@0.1.2`；npm `os`/`cpu` 限制会拒绝其它宿主。npm 仓库发布、Apple Silicon macOS 上全新缓存运行 `npx --yes @partme.ai/codeguard@0.1.2 --version --format json`、注册表/本地 tarball 及二进制 SHA-256 对比均通过。干净 checkout 构建身份回报候选源码提交，但不证明可复现构建或签名来源，也不代表 S13 发行证据已完成，见[验收记录](../tests/acceptance/npm-0.1.2-candidate.md)。扩大分发范围可参考 CodeGraph 的精简入口加平台包模式，但须先满足 S13 发行证据：为每个通过验收的平台发布版本一致的包，再提供含精确可选平台依赖的公开命令包。缺对应平台包时应给出清晰错误；如需网络补包，下载前必须遵循 Codeguard 的签名选择与独立宿主授权。
+`--public` 打包模式已产出仅适用于 `darwin-arm64` 的 `@partme.ai/codeguard@0.1.3`；npm `os`/`cpu` 限制会拒绝其它宿主。npm 仓库发布、Apple Silicon macOS 上全新缓存运行 `npx --yes @partme.ai/codeguard@0.1.3 --version --format json`、注册表/本地 tarball 及二进制 SHA-256 对比均通过。干净 checkout 构建身份回报候选源码提交，但不证明可复现构建或签名来源，也不代表 S13 发行证据已完成，见[验收记录](../tests/acceptance/npm-0.1.3-wasm-candidate.md)。扩大分发范围可参考 CodeGraph 的精简入口加平台包模式，但须先满足 S13 发行证据：为每个通过验收的平台发布版本一致的包，再提供含精确可选平台依赖的公开命令包。缺对应平台包时应给出清晰错误；如需网络补包，下载前必须遵循 Codeguard 的签名选择与独立宿主授权。
 
-后续 WASM 候选包使用 `--require-wasm`，打包前将二进制报告的 32 份身份逐一与固定清单核对，拒绝无 worker 的默认构建，并实际执行 Zig grammar 探针。`--public` 自动启用该门禁，同时保留干净源码和构建身份核对。本地 private tarball 再经离线 `npm exec` 运行；Zig、Dart 探针证明 Node 入口能够调用内置 Rust worker。见[本地打包验收](../tests/acceptance/npm-wasm-local-package.md)。这不是注册表发行或逐语言语法验收。已发布的 `0.1.2` 早于该门禁，不含 WASM 兜底；未来公开版本须升级版本号，补齐平台、许可证和 S14 剩余验收。
+已发布的 0.1.3 WASM 候选包使用 `--require-wasm`，打包前将二进制报告的 32 份身份逐一与固定清单核对，拒绝无 worker 的默认构建，并实际执行 Zig grammar 探针。`--public` 自动启用该门禁，同时保留干净源码和构建身份核对。本地 private tarball 再经离线 `npm exec` 运行；Zig、Dart 探针证明 Node 入口能够调用内置 Rust worker，四个有界项目的包内 `check all` 实际调用全部 32 份候选。这份[本地打包证据](../tests/acceptance/npm-wasm-local-package.md)已由[注册表实装和字节一致性证据](../tests/acceptance/npm-0.1.3-wasm-candidate.md)补充。打包器核对并包含固定上游许可证；公开候选仍不构成逐语言语法验收，其它平台与 S14 剩余验收仍待完成。
 
 ## 12. 测试与评估方案
 

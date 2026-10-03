@@ -44,6 +44,8 @@ pub struct DiscoveryReport {
     pub root: String,
     pub observation_complete: bool,
     pub languages: BTreeMap<String, LanguageEvidence>,
+    /// 后缀不足以判定语言的源码；仍须进入候选范围的未路由计数。
+    pub(crate) ambiguous_source_files: BTreeSet<String>,
     pub build_roots: BTreeMap<String, BTreeSet<String>>,
     pub declared_versions: BTreeMap<String, String>,
     /// 与同次清单字节摘要绑定的 Maven 直接模块声明。
@@ -147,6 +149,7 @@ pub fn discover<P: ObservationPort>(
         root: root.to_string_lossy().into_owned(),
         observation_complete: true,
         languages: BTreeMap::new(),
+        ambiguous_source_files: BTreeSet::new(),
         build_roots: BTreeMap::new(),
         declared_versions: BTreeMap::new(),
         maven_module_models: BTreeMap::new(),
@@ -403,6 +406,31 @@ fn observe_file<P: ObservationPort>(
             Err(_) => {
                 report.observation_complete = false;
                 report.blocked_paths.push(relative.into());
+            }
+        }
+    }
+    if name.ends_with(".sc") {
+        report.ambiguous_source_files.insert(relative.into());
+        report
+            .unknown_conditions
+            .push(format!("ambiguous_language_suffix:{relative}"));
+        return;
+    }
+    if name.ends_with(".m") {
+        match observation.read_bounded(path, 1024 * 1024) {
+            Ok(source) if crate::source_language_hint::has_objc_marker(&source) => {}
+            Ok(_) => {
+                report.ambiguous_source_files.insert(relative.into());
+                report
+                    .unknown_conditions
+                    .push(format!("ambiguous_language_suffix:{relative}"));
+                return;
+            }
+            Err(_) => {
+                report.observation_complete = false;
+                report.blocked_paths.push(relative.into());
+                report.ambiguous_source_files.insert(relative.into());
+                return;
             }
         }
     }

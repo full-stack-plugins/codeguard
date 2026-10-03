@@ -19,3 +19,5 @@ CODEGUARD_RUFF_BIN=/opt/anaconda3/bin/ruff cargo test -p codeguard-cli --test ru
 7 项探测中的真实 Ruff 用例仅证明版本诊断。默认目标及 runtime process/private log/边界共 43 项通过；另外明确设置 CODEGUARD_RUFF_BIN，补跑两套各 5 项 ignored 真实扫描回归，10 项全部通过。这些扫描验证现有局部 Ruff 配置/范围/报告，不证明完整门禁。all-target Clippy、格式、OpenSpec strict 与 diff 检查通过。
 
 完整 doctor、可信工具锁、原生兼容与运行环境、其它适配器复用、准备报告持久化/同步仍缺；5.2/5.6 不勾选，完整计划保持进行中。
+
+2026-10-03 的 [CI 37112015676](https://github.com/full-stack-plugins/codeguard/actions/runs/37112015676) 在 30ms 超时样例中得到 `SpawnFailure` 而非 `TimedOut`。运行时正确保留了独立的启动失败类别；失败点是测试在并行 Linux 负载下未能真正启动睡眠进程。测试现给启动过程 500ms，令受测进程睡眠 2 秒，并仅对瞬时 `SpawnFailure` 使用新的私有夹具重试最多两次；最终仍必须观察到真正的 `TimedOut`，不能把启动失败当成超时通过。本机定向测试 1/1、该文件全部 7/7 通过，远端重新验收待最新 PR CI 完成。

@@ -70,7 +70,7 @@ mod zig_wasm_compat;
 pub use dart_wasm_compat::adapt_dart_wasm;
 pub use grammar_asset_manifest::{
     GrammarAsset, GrammarAssetManifest, bundled_grammar_candidate, bundled_grammar_candidates,
-    parse_grammar_asset_manifest, verify_grammar_asset,
+    bundled_grammar_metadata, parse_grammar_asset_manifest, verify_grammar_asset,
 };
 pub use legacy_dylink_compat::adapt_legacy_dylink;
 pub use zig_wasm_compat::adapt_zig_wasm;

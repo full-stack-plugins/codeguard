@@ -1455,8 +1455,13 @@ pub fn run(args: &[String]) -> ExitCode {
     let syntax_candidates = crate::check_syntax_candidates::observe(
         &root,
         &discovery,
-        &python_lint,
+        crate::check_syntax_candidates::NativeCoverage {
+            python_lint: &python_lint,
+            go_lint: &go_lint,
+            go_tool: parsed.go_tool.as_deref(),
+        },
         parsed.selection == Selection::Java,
+        parsed.jobs_limit,
         deadline,
         if request_cancelled {
             Some("request_cancelled")
@@ -1470,12 +1475,12 @@ pub fn run(args: &[String]) -> ExitCode {
     let syntax_candidates = json!({
         "status":"not_run","reason":"binary_without_wasm_precheck","execution_phase":"after_native",
         "authority":"candidate_unqualified","delivery_decision":"incomplete",
-        "source_file_count":discovery.languages.values().map(|item| item.source_files.len()).sum::<usize>(),
+        "source_file_count":discovery.languages.values().map(|item| item.source_files.len()).sum::<usize>() + discovery.ambiguous_source_files.len(),
         "skipped_count":0,"unrouted_count":0,"native_preferred_count":0,"observations":[],
         "next_action":"使用包含固定语法资产的发行包运行候选初检，并完成适用原生检查"
     });
     let report = json!({
-        "schema_version":"0.33.0", "report_type":"check_feedback",
+        "schema_version":"0.34.0", "report_type":"check_feedback",
         "operation":"check", "selection":parsed.selection.as_str(), "command_status":if request_cancelled { "cancelled" } else { "incomplete" },
         "exit_code":if request_cancelled { 130 } else { 3 }, "delivery_decision":if parsed.selection == Selection::All { "incomplete" } else { "not_evaluated" }, "authority":"local_unverified",
         "reason":if request_cancelled { "request_cancelled" } else if parsed.selection == Selection::All { "full_project_obligations_and_trusted_policy_unavailable" } else { "java_selection_obligations_and_trusted_policy_unavailable" },
@@ -1898,6 +1903,20 @@ pub fn run(args: &[String]) -> ExitCode {
                         "  {} [{}] 候选恢复 {} 处；先运行适用原生工具确认。",
                         item["path"], item["language"], item["recovery_count"]
                     );
+                }
+                for item in observations
+                    .iter()
+                    .filter(|item| item["known_limitations"][0].is_string())
+                    .take(8)
+                {
+                    if let Some(limitation) = item["known_limitations"][0].as_str() {
+                        println!(
+                            "  {} [{}] 已知 grammar 限制：{}；仍需适用原生工具确认。",
+                            item["path"].as_str().unwrap_or("?"),
+                            item["language"].as_str().unwrap_or("unknown"),
+                            limitation
+                        );
+                    }
                 }
             }
         }

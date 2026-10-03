@@ -72,7 +72,7 @@ fn main() -> ExitCode {
             );
             #[cfg(all(feature = "wasm-precheck", unix))]
             println!(
-                "check all 会在原生节点之后按源码方言有界执行 32 份固定 WASM 的候选初检；check_feedback 0.33.0 的 syntax_candidates 保留疑似位置、原生优先计数和未执行范围，始终不能代替原生义务或放行交付。"
+                "check all 会在原生节点之后按源码方言有界执行 32 份固定 WASM 的候选初检；check_feedback 0.34.0 的 syntax_candidates 保留疑似位置、已知限制、原生优先计数和未执行范围，始终不能代替原生义务或放行交付。"
             );
             #[cfg(all(feature = "wasm-precheck", unix))]
             println!(

@@ -465,6 +465,124 @@ pub(crate) fn current_source_snapshot_sha256(root: &Path) -> Option<String> {
     source_snapshot(root).map(|snapshot| snapshot_sha256(&snapshot))
 }
 
+/// 返回本轮原生 vet 与默认包清单共同确认的源码摘要；任一身份或范围不完整则不跳过 WASM。
+#[cfg(feature = "wasm-precheck")]
+pub(crate) fn selected_sources_for_candidate(
+    root: &Path,
+    tool: Option<&Path>,
+    scan: &Value,
+    deadline: Instant,
+    cancelled: &AtomicBool,
+) -> Option<BTreeMap<String, String>> {
+    let tool = tool?.canonicalize().ok()?;
+    let before = source_snapshot(root)?;
+    let tool_sha = file_sha256(&tool, 128 * 1024 * 1024)?;
+    let identities = before
+        .modules
+        .iter()
+        .map(|(module, identity)| {
+            (
+                module.clone(),
+                json!({"manifest_sha256":identity.manifest_sha256,"go_sum_sha256":identity.sum_sha256}),
+            )
+        })
+        .collect::<BTreeMap<_, _>>();
+    if scan["root"] != root.to_string_lossy().as_ref()
+        || scan["native_tool_version"] != "go1.23.4"
+        || !matches!(
+            scan["native_status"].as_str(),
+            Some("clean_observed_unverified" | "findings_observed_unverified")
+        )
+        || scan["tool_sha256"] != tool_sha
+        || scan["source_snapshot_sha256"] != snapshot_sha256(&before)
+        || scan["source_file_count"] != before.hashes.len()
+        || scan["module_count"] != before.modules.len()
+        || scan["modules_completed"] != before.modules.len()
+        || scan["module_identities"] != json!(identities)
+        || scan["module_results"].as_array().is_none_or(|results| {
+            let roots = results
+                .iter()
+                .filter(|result| {
+                    matches!(
+                        result["status"].as_str(),
+                        Some("clean_observed_unverified" | "findings_observed_unverified")
+                    )
+                })
+                .filter_map(|result| result["root"].as_str())
+                .collect::<BTreeSet<_>>();
+            results.len() != before.modules.len()
+                || roots
+                    != before
+                        .modules
+                        .keys()
+                        .map(String::as_str)
+                        .collect::<BTreeSet<_>>()
+        })
+    {
+        return None;
+    }
+    let scratch = private_scratch()?;
+    let environment = go_environment(&scratch, &tool);
+    let mut selected = BTreeMap::new();
+    for module in before.modules.keys() {
+        let directory = if module == "." {
+            root.to_path_buf()
+        } else {
+            root.join(module)
+        };
+        let outcome = run_process(
+            &ProcessSpec {
+                executable: tool.clone(),
+                args: ["list", "-json", "./..."]
+                    .into_iter()
+                    .map(OsString::from)
+                    .collect(),
+                cwd: directory.clone(),
+                env: environment.clone(),
+                stdin: None,
+                deadline,
+                output_limit_bytes: 8 * 1024 * 1024,
+            },
+            cancelled,
+        );
+        if outcome.termination != Termination::Exited(0) || !outcome.stderr.is_empty() {
+            return None;
+        }
+        let listed = codeguard_adapters::parse_go_list_scope(&directory, &outcome.stdout).ok()?;
+        for path in listed.active_files.iter().chain(&listed.ignored_files) {
+            let path = if module == "." {
+                path.clone()
+            } else {
+                format!("{module}/{path}")
+            };
+            if !before.hashes.contains_key(&path)
+                || owner_module(&path, &before.modules) != Some(module.as_str())
+            {
+                return None;
+            }
+        }
+        for path in listed.active_files {
+            let path = if module == "." {
+                path
+            } else {
+                format!("{module}/{path}")
+            };
+            if selected
+                .insert(path.clone(), before.hashes[&path].clone())
+                .is_some()
+            {
+                return None;
+            }
+        }
+    }
+    if source_snapshot(root).as_ref() != Some(&before)
+        || file_sha256(&tool, 128 * 1024 * 1024).as_deref() != Some(tool_sha.as_str())
+    {
+        return None;
+    }
+    Some(selected)
+}
+
 fn snapshot_sha256(snapshot: &GoSourceSnapshot) -> String {
     format!(
         "{:x}",
