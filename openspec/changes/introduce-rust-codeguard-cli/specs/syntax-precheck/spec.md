@@ -147,9 +147,16 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 
 多语言共用后缀 MUST 保留歧义：`.m` 可能属于 Objective-C 或 MATLAB，`.sc` 可能属于 Scala 或 SuperCollider。没有可核对的语言证据时，自动检查 MUST 不调用猜测的 grammar、不把恢复节点记为源码问题，并保持范围未完成；用户显式指定 `grammar probe` 的语种仍可作候选诊断。
 
+`.m` 文件中 MATLAB 块注释 `%{ ... %}` 内的行首 `#import` 或 `@interface` 只是注释数据，MUST NOT 作为 Objective-C 证据；块注释外的明确 Objective-C 专属标记仍可用于候选路由。发现与检查 MUST 使用同一判别，避免一个入口报告未知而另一个入口执行错误 grammar。
+
 #### Scenario: Shared extension would produce a speculative syntax finding
 - **WHEN** 项目包含无 Objective-C 专属标记的 MATLAB `.m` 源码，或 SuperCollider `.sc` 源码
 - **THEN** 自动候选路由不把它们交给 Objective-C/Scala WASM；歧义范围保持未完成，不能用资产数量或其它文件的检查结果代替该范围
+
+#### Scenario: An Objective-C marker appears only in a MATLAB block comment
+
+- **WHEN** `.m` 文件的 `%{ ... %}` 块注释内含行首 `#import`，块注释外只有 MATLAB 语句
+- **THEN** `detect` 与 `check all` 均保持该文件为未解析的歧义范围，不调用 Objective-C grammar；块注释外的真实 Objective-C 标记仍可路由
 
 #### Scenario: Valid JSX is parsed with a TypeScript-only grammar
 

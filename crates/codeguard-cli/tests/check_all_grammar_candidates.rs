@@ -70,7 +70,7 @@ fn check_all_routes_distinct_dialects_after_native_without_claiming_clean() {
     fs::write(root.join("script.js"), "const x = 1;\n").unwrap();
     fs::write(
         root.join("plot.m"),
-        "title('@interface Foo');\nplot(1:3);\n",
+        "title('@interface Foo');\n%{\n#import <NotObjectiveC.h>\n@interface Fake\n%}\nplot(1:3);\n",
     )
     .unwrap();
     fs::write(root.join("synth.sc"), "{ SinOsc.ar(440) }.play;\n").unwrap();

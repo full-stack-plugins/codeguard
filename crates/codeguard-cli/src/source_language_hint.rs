@@ -13,8 +13,19 @@ pub(crate) fn has_objc_marker(source: &[u8]) -> bool {
         b"@autoreleasepool",
         b"#import",
     ];
+    let mut matlab_block_comment = false;
     source.split(|byte| *byte == b'\n').any(|line| {
         let line = line.trim_ascii_start();
+        if matlab_block_comment {
+            if line.starts_with(b"%}") {
+                matlab_block_comment = false;
+            }
+            return false;
+        }
+        if line.starts_with(b"%{") {
+            matlab_block_comment = true;
+            return false;
+        }
         markers.iter().any(|marker| {
             line.starts_with(marker)
                 && line.get(marker.len()).is_some_and(|next| {

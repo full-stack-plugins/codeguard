@@ -73,6 +73,22 @@ fn ambiguous_and_embedded_sources_do_not_get_speculative_routes() {
         )
         .is_empty()
     );
+    assert!(
+        route_source(
+            "plot.m",
+            b"%{\n#import <NotObjectiveC.h>\n@interface Fake\n%}\nplot(1:3);\n"
+        )
+        .is_empty()
+    );
+    assert!(route_source("plot.m", b"%{\n#import <NotObjectiveC.h>\n").is_empty());
+    assert_eq!(
+        route_source(
+            "model.m",
+            b"%{\n#import <Ignored.h>\n%}\n#import <Real.h>\n"
+        )[0]
+        .language,
+        "objc"
+    );
     assert!(route_source("synth.sc", b"{ SinOsc.ar(440) }.play;\n").is_empty());
     assert_eq!(
         route_source("model.m", b"@implementation Model\n@end\n")[0].language,

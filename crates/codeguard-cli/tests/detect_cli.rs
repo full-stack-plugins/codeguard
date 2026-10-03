@@ -12,7 +12,7 @@ fn detect_keeps_shared_m_and_sc_suffixes_ambiguous_without_false_languages() {
     let project = TempProject::new();
     fs::write(
         project.0.join("plot.m"),
-        "title('@interface Foo');\nplot(1:3);\n",
+        "title('@interface Foo');\n%{\n#import <NotObjectiveC.h>\n@interface Fake\n%}\nplot(1:3);\n",
     )
     .unwrap();
     fs::write(project.0.join("synth.sc"), "{ SinOsc.ar(440) }.play;\n").unwrap();
