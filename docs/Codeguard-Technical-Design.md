@@ -20,6 +20,8 @@ A source build with `--features wasm-precheck` now exposes `codeguard grammar pr
 
 A first narrow native-first route is now available for Zig: `lint zig FILE --zig-tool ABS_PATH --format=json` runs a Zig 0.16.0 `ast-check` executable with stable bytes on the selected source bytes before considering WASM. Native AST positions remain visible without source snippets; when no explicit tool is supplied, the pinned Zig grammar remains an unqualified fallback. Both outcomes stay incomplete because AST checking is narrower than full lint, build and tests. See the [0.1.0 feedback schema](../schemas/zig-lint-feedback-v0.1.schema.json).
 
+The pinned Zig worker now also has an explicit, real Zig 0.16.0 differential test: seven valid and four malformed sources are sent independently to native `ast-check` and the public isolated `grammar probe` path. All eleven classifications matched on the tested host; this is a narrow [precision record](../tests/acceptance/zig-native-differential.md), not an error-rate estimate or language qualification.
+
 ## 2. Technology choices and trade-offs
 
 | Concern | Selected technology / current evidence | Consequence and alternative |
