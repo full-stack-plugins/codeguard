@@ -1,6 +1,8 @@
 # Erlang OTP 28 原生差分与固定 grammar 漏检
 
-日期：2026-10-03。对应 OpenSpec 14.4、14.17、14.19 的局部精度验收，Erlang 仍为未验收候选。
+初始日期：2026-10-03；更新：2026-10-04。对应 OpenSpec 14.4、14.17、14.19 的局部精度验收，Erlang 仍为未验收候选。
+
+2026-10-04 新增同一组 13 例的 `lint erlang --erl-tool` 原生 forms 检查。全部分类与独立 `erlc` 标签一致，缺句点返回真实原生位置；显式原生结果不被 WASM 覆盖。以下 WASM 12/13 历史测量仍成立，grammar 本身没有修好。新入口、宏/预处理未知及运行边界见[原生优先验收](erlang-native-first.md)。
 
 本机现有 `erlc`（OTP 28）逐一编译 13 份独立的 `sample.erl`：8 份合法、5 份故意破损。固定 CodeGuard Erlang WASM（SHA-256 `dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491`，ABI 14）通过隔离 `grammar probe erlang` 对同一字节解析。12/13 的有效/无效分类与原生一致，没有初检未完成项；唯一分歧为缺少最终句点的 `-module(sample).\nf() -> ok`：`erlc` 拒绝，WASM 却返回零恢复。
 

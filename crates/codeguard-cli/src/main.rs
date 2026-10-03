@@ -78,6 +78,10 @@ fn main() -> ExitCode {
             println!(
                 "Zig 原生优先局部检查：lint zig FILE [--zig-tool ABS_PATH] [--format=json]；显式 Zig 0.16.0 使用 ast-check，未提供工具时使用未验收 WASM 候选；始终不签发完整 lint 或交付通过。"
             );
+            #[cfg(unix)]
+            println!(
+                "Erlang 原生优先局部检查：lint erlang FILE [--erl-tool ABS_PATH] [--timeout DURATION] [--format human|json]；显式 OTP 28 使用原生 forms 扫描/解析，宏与预处理保持未完成；不签发完整 lint 或交付通过。"
+            );
             println!(
                 "检查预算：check all 支持 --jobs 1–64 和 CODEGUARD_JOBS；--timeout 优先于 CODEGUARD_TIMEOUT，默认 30m。项目默认值见 .codeguard/runtime.json 1.1；当前仅原生执行受截止时间约束。"
             );
@@ -173,6 +177,8 @@ fn main() -> ExitCode {
                 codeguard_cli::java_lint_dispatch::run(&rest[1..])
             } else if rest.first().is_some_and(|language| language == "zig") {
                 codeguard_cli::zig_lint_command::run(&rest[1..])
+            } else if rest.first().is_some_and(|language| language == "erlang") {
+                codeguard_cli::erlang_lint_command::run(&rest[1..])
             } else if rest
                 .first()
                 .is_some_and(|language| language == "typescript")

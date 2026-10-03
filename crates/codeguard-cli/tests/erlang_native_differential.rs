@@ -124,6 +124,27 @@ fn pinned_erlang_worker_matches_native_compiler() {
             String::from_utf8_lossy(&native.stderr)
         );
         assert_eq!(fs::read_to_string(&file).unwrap(), source);
+        let lint = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(["lint", "erlang"])
+            .arg(&file)
+            .args(["--erl-tool", &erl, "--format=json"])
+            .env_remove("CODEGUARD_TIMEOUT")
+            .output()
+            .unwrap();
+        assert_eq!(lint.status.code(), Some(3), "{name}: {lint:?}");
+        let feedback: serde_json::Value = serde_json::from_slice(&lint.stdout).unwrap();
+        assert_eq!(
+            feedback["native"]["status"],
+            if expected_valid {
+                "completed"
+            } else {
+                "diagnostics_observed"
+            },
+            "{name}: {feedback}"
+        );
+        assert_eq!(feedback["syntax_precheck"], serde_json::Value::Null);
+        assert_eq!(feedback["delivery_decision"], "not_evaluated");
+        assert_eq!(fs::read_to_string(&file).unwrap(), source);
         match candidate_validity(&root, source) {
             Some(valid) if valid != native.status.success() => disagreements.push(name),
             None => unresolved.push(name),

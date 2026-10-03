@@ -26,6 +26,12 @@
 - **WHEN** `lint zig` 收到可核对的 Zig 0.16.0 工具与普通 `.zig` 文件
 - **THEN** 优先以受控进程运行原生 `zig ast-check`；原生诊断必须保留，不能因 WASM 观察覆盖。只有该原生工具未提供或不可运行时，才可返回未验收 WASM 候选观察，并始终保持整体未完成；`ast-check` 不等于全部 Zig lint、测试或构建。
 
+#### Scenario: Explicit OTP 28 syntax parsing detects a missing form terminator
+- **WHEN** `lint erlang` 收到可核对的 OTP 28 `erl` 工具与普通 `.erl` 或 `.hrl` 文件
+- **THEN** 以固定参数和共同截止时间调用原生 `io:scan_erl_form` 与 `erl_parse:parse_form`，读取当前原字节、不展开预处理或执行项目编译插件；检查每项扫描/解析结果，不能把进程正常退出直接解释为零错误
+- **AND** 原生结果优先于候选 WASM，缺句点诊断和原生故障分别保留；宏、预处理指令或无法解释的位置保持未完成，不当作已确认源码违规，也不以 WASM 洗白；该阶段只观察单文件 forms，不替代项目 lint、编译或测试
+- **AND** 工具未提供时可以附加未验收 WASM 初检，报告其已知缺句点漏检并给出原生确认命令；显式无效工具不能静默改用 PATH 中的同名工具
+
 #### Scenario: Go vet excludes a file under build constraints
 - **WHEN** 本轮 Go 1.23.4 `go vet` 完成，受控 `go list` 证明部分源码进入默认构建，而另一份 `.go` 源码被构建标签排除
 - **THEN** 仅对同一源码字节且进入原生包清单的文件跳过重复 WASM；被排除文件继续候选初检，并保持平台/构建标签覆盖未完成
@@ -203,8 +209,12 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 - **THEN** 逐例记录语法分类一致性、工具与语料身份；仅扩大该版本的局部精度证据，不将候选提升为完整 lint、其它版本或交付通过
 
 #### Scenario: Native syntax rejects a source that the WASM candidate accepts
-- **WHEN** 固定 Swift 6.4 编译器的语法阶段拒绝缺少参数类型的源码，而固定 Swift WASM 没有恢复节点
+- **WHEN** 固定 OTP 28 编译器拒绝函数缺少最终句点的源码，而固定 Erlang WASM 完整恢复扫描没有节点
 - **THEN** 记录带原生证据的漏检及待修复 grammar 身份，保持候选未验收和完整检查义务；不能因零恢复节点签发 clean、放入白名单或关闭任务
+
+#### Scenario: Differential evaluation receives an incomplete zero-diagnostic scan
+- **WHEN** Swift 或 Kotlin 固定样例返回空恢复数组，但隐藏错误使扫描未完成
+- **THEN** 该样例保留在总语料分母并单独计为未知覆盖；不能计作合法、非法、一致、误报或漏报，且不能删除该样例来提高精度指标
 
 ### Requirement: Precheck briefs SHALL reach agent conversations with concrete next actions
 

@@ -10,6 +10,9 @@ Topic owners: [commands](Codeguard-Command-Reference.md), [initialization](Codeg
 
 The source build wires ESLint into the `node.lint` task in `check all`, sharing native concurrency and the request deadline. Discovered JS/TS/TSX files select their nearest module manifest, local ESLint 10, unique flat config and Node without searching above the selected root. Execution collects reports; aggregation synchronizes the workbench serially and reuses stable tasks. Only completed native results for identical source bytes suppress duplicate WASM; ignored files, configuration errors and tool failures retain both their reasons and fallback. Protocols are `check_feedback` 0.35.0 and `check_aborted` 0.12.0, with older schemas archived. `native_results.node_lint` carries per-file feedback, unexecuted paths, synchronization status and next action. See [acceptance scope](../tests/acceptance/check-all-eslint.md). This does not qualify grammars or replace real host acceptance.
 
+
+The source-built Erlang slice now applies native-first selection through `lint erlang FILE --erl-tool ABS_PATH`: fixed OTP 28 scanner/parser calls operate on stdin bytes, with a non-project cwd and project startup disabled. Native diagnostics take precedence; preprocessing/macro coverage remains unresolved. Without an explicit tool the pinned WASM candidate can still run. No task closure, complete project lint or release qualification follows from this local result; see [acceptance](../tests/acceptance/erlang-native-first.md).
+
 ## 1. Reading contract and evidence
 
 This is the architecture of the Rust **Codeguard CLI repository**, not the implementation manual for the existing Python host plugin. It addresses adapter authors, CLI/runtime maintainers, agent integrators, and reviewers.
@@ -40,7 +43,7 @@ The source-built candidate scheduler now prepares bounded fragments in stable pa
 
 The [Java 17 native differential](../tests/acceptance/java-native-differential.md) adds a 13-case javac 21 oracle for one grammar. It is local precision evidence only; Java remains an unqualified candidate.
 
-A separate [Kotlin native differential](../tests/acceptance/kotlin-native-differential.md) found one false negative in 13 samples: a missing parameter type is rejected by `kotlinc` but invisible to the pinned WASM. The route keeps this grammar unqualified and projects the limitation to status and project feedback.
+The [Kotlin native differential](../tests/acceptance/kotlin-native-differential.md) now records 11 decidable agreements and two unresolved hidden-error cases, one native-invalid and one native-valid. Swift similarly has 12 decidable agreements and one unresolved case. Incomplete scans cannot become valid/invalid labels merely because their recovery arrays are empty; unknown coverage is reported separately and both grammars remain unqualified.
 
 ```mermaid
 flowchart LR

@@ -6,6 +6,9 @@
 
 The source build wires ESLint into the `node.lint` task in `check all`, sharing native concurrency and the request deadline. Discovered JS/TS/TSX files select their nearest module manifest, local ESLint 10, unique flat config and Node without searching above the selected root. Execution collects reports; aggregation synchronizes the workbench serially and reuses stable tasks. Only completed native results for identical source bytes suppress duplicate WASM; ignored files, configuration errors and tool failures retain both their reasons and fallback. Protocols are `check_feedback` 0.35.0 and `check_aborted` 0.12.0, with older schemas archived. `native_results.node_lint` carries per-file feedback, unexecuted paths, synchronization status and next action. See [acceptance scope](../tests/acceptance/check-all-eslint.md). This does not qualify grammars or replace real host acceptance.
 
+
+Source-only Erlang entry: `codeguard lint erlang FILE [--erl-tool ABS_PATH] [--timeout DURATION] [--format human|json]`. Ordinary `.erl`/`.hrl` files are supported; explicit OTP 28 scanning/parsing precedes optional WASM. Native faults and macro/preprocessor limits stay unresolved; all results remain partial with exit 3 (cancellation 130). The report uses [erlang_lint_feedback 0.1.0](../schemas/erlang-lint-feedback-v0.1.schema.json); [acceptance](../tests/acceptance/erlang-native-first.md) distinguishes it from the unchanged public 0.1.4 package.
+
 ## 1. Reading this reference
 
 The command catalog below defines responsibility, not availability. Current dispatch is authoritative: [main.rs](../crates/codeguard-cli/src/main.rs), [README command guide](../README.md#6-command-guide). The Chinese companion preserves the detailed C01–C36 input/output, side-effect and failure contracts; the same IDs below provide an English navigation and behavioral contract. OpenSpec remains the single task ledger.

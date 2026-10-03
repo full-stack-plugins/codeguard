@@ -532,7 +532,7 @@
       "codegraph_runtime": "web-tree-sitter 0.25.3",
       "codeguard_runtime_validation": "rust_loader_smoke_passed",
       "language_versions": [],
-      "known_limitations": ["Swift 6.4 native parse rejects missing parameter type in `func f(_ x: ) {}` but this WASM emits no recovery; 12/13 narrow differential cases agree; language and dialect ranges, public native-first lint route, resource budget and release remain unqualified"],
+      "known_limitations": ["Swift 6.4 native parse rejects missing parameter type in `func f(_ x: ) {}`. The grammar has a hidden MISSING type token; Rust marks zero-record recovery scans incomplete. In the 13-case differential, 12 decidable cases agree and the missing-type case remains unresolved; language versions, systematic precision, native-first lint and release remain unqualified"],
       "release_status": "candidate_unvalidated"
     },
     {
@@ -622,7 +622,7 @@
       "codegraph_runtime": "web-tree-sitter 0.25.3",
       "codeguard_runtime_validation": "rust_loader_smoke_passed",
       "language_versions": [],
-      "known_limitations": ["Kotlin 2.4.10 native compiler rejects missing parameter type in `fun f(x: ) = x` but this WASM emits no recovery; 12/13 narrow differential cases agree. Zero recoveries cannot establish valid Kotlin syntax", "Other Kotlin versions, dialects, public native-first lint route, resource budget and release remain unqualified"],
+      "known_limitations": ["Kotlin 2.4.10 native compiler rejects missing parameter type in `fun f(x: ) = x`. Hidden MISSING tokens also occur in valid `object C { val value = 1 }`; Rust marks both zero-record scans incomplete. Eleven decidable cases agree with native labels and two remain unresolved. Zero recoveries cannot establish valid Kotlin syntax", "Other Kotlin versions, dialects, public native-first lint route, resource budget and release remain unqualified"],
       "release_status": "candidate_unvalidated"
     }
   ],

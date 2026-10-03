@@ -220,7 +220,7 @@ flowchart LR
 
 Java 的 [javac 21 `--release 17` 对照](../tests/acceptance/java-native-differential.md)接受 8 例合法、拒绝 5 例破损语法源码，与隔离 WASM worker 分类一致。该测试仅固定窄范围分类；项目级原生路由、版本覆盖和误报率仍待验收。
 
-[Kotlin 2.4.10 差分](../tests/acceptance/kotlin-native-differential.md)记录 12/13 分类一致，并固定反例：`fun f(x: ) = x` 被原生拒绝而 WASM 零恢复。`grammar status` 和 `check all` 将其作为有界已知限制展示；零恢复不能关闭原生确认义务。
+当前 [Kotlin 2.4.10 差分](../tests/acceptance/kotlin-native-differential.md)记录 11 例可判定的一致结果与 2 例隐藏错误导致的未知。`fun f(x: ) = x` 和合法 `object C { val value = 1 }` 都没有可枚举恢复节点，但扫描未完成。`grammar status` 与 `check all` 保留有界限制；未知样例留在语料总分母中并单独报告，不能计作通过、一致或已确认源码违规。
 
 可选特性构建的 CLI 在无显式原生上下文的 TypeScript 单文件请求中，先核对本地 ESLint 10 包及唯一普通 flat config。若从 `PATH` 解析到可执行 Node，就调用既有有界原生版本与报告探针；缺 Node 时报告准备缺口，不让 WASM 抢跑。仅未观察到本地 ESLint 包时，`.ts/.mts/.cts` 输出 [ESLint 反馈 0.3.0](../schemas/eslint-local-feedback-v0.3.schema.json)，`.tsx` 用独立 grammar 输出 [0.4.0](../schemas/eslint-local-feedback-v0.4.schema.json)。候选初检保留 `native=not_run`、`delivery=not_evaluated`，即使零恢复节点也保持未完成。配置选择歧义、本地路径不可信或包身份损坏时保留环境阻塞而不启动 WASM；部分显式上下文也沿用原路径。该增量不证明项目脚本参数等价、逐模块调度或宿主对话交付，见[原生优先局部验收](../tests/acceptance/native-first-eslint-candidate.md)。
 
@@ -246,7 +246,7 @@ Rust 2021 的 `rustfmt 1.9.0 --emit stdout` 与隔离 Rust worker 对 8 份合�
 
 C11 的 `Apple clang 21 -fsyntax-only` 与隔离 C worker 对 8 份合法和 5 份语法破损样例分类一致。初版语料曾误把返回类型错误当成语法错误，现已改成缺失初始化表达式；这份有界的[C 差分记录](../tests/acceptance/c-native-differential.md)不等于语义诊断、C lint 或其它语言版本已验收。
 
-Ruby 2.6.10 `ruby -c` 与隔离 Ruby worker 在 13 例窄范围语料上分类一致，固定 worker 语料进入常规 CI；这不等于 Ruby lint 或其它版本验收。相反，Apple Swift 6.4 `swiftc -frontend -parse` 把 `func f(_ x: ) {}` 判为缺少参数类型，固定 Swift WASM 却没有恢复节点。Swift 13 例差分中 12 例一致、1 例漏检，候选仍不可签发语法通过；见[Ruby](../tests/acceptance/ruby-native-differential.md)与[Swift](../tests/acceptance/swift-native-differential.md)局部记录。
+Ruby 2.6.10 `ruby -c` 与隔离 Ruby worker 在 13 例窄范围语料上分类一致，固定 worker 语料进入常规 CI；这不等于 Ruby lint 或其它版本验收。相反，Apple Swift 6.4 `swiftc -frontend -parse` 把 `func f(_ x: ) {}` 判为缺少参数类型，固定 Swift WASM 却没有恢复节点。纠正后的 Swift 13 例差分为 12 例可判定的一致结果与 1 例隐藏错误导致的未知；缺类型样例保持未完成，不按空恢复数组分类，候选仍不可签发语法通过；见[Ruby](../tests/acceptance/ruby-native-differential.md)与[Swift](../tests/acceptance/swift-native-differential.md)局部记录。
 
 由父进程控制解析工作进程，设置总截止时间、单文件输入上限、内存/进程限制及诊断数量上限。按需加载 grammar，不提供通用网络/文件系统导入；终止卡住的进程时保留其它模块的原生结果。宿主约束执行和 Rust MSRV 兼容性须测试，生产数值预算须经测量后确定，不编造性能承诺。
 
@@ -856,3 +856,66 @@ let receipt = codeguard_cli::verify_zig_task_resolution(
 ### 当前公开候选：0.1.4
 
 `@partme.ai/codeguard@0.1.4` 已从干净源码 `1cd458f6e01a44a74388243e964e3f45290ac18e` 发布，限 Apple Silicon macOS。包含全部 32 份可执行但未验收的 grammar、指定编辑文件检查、稳定原生确认任务、原生复检与 next 指引。注册表摘要、新缓存 npx、公开包真实 Zig 0.16.0 修复链路及相同源码 Linux CI 已通过。普通 CLI 的零诊断不能在缺可信策略时关闭任务；限定 Zig SDK 是源码集成 API，npm 不暴露自批命令。插件启用、真实宿主、完整精度、多平台与完整门禁仍未完成。此前 0.1.3 证据保留为历史快照。见 [0.1.4 验收](../tests/acceptance/npm-0.1.4-candidate.md)。
+
+
+### Erlang 单文件原生 forms 观察（当前源码）
+
+统一入口 `codeguard lint erlang sample.erl --erl-tool /absolute/path/to/erl --timeout 10s --format=json` 优先调用 OTP 28 原生扫描/解析。该阶段使用原字节、固定 cwd、禁用项目启动文件和清空的环境，不展开宏或执行 compile/parse_transform。宏与预处理保持未知，显式原生故障不被 WASM 覆盖。未提供工具时可以展示固定候选初检和原生确认指引；原生结果也不能替代完整项目 lint、编译与测试。
+
+```mermaid
+flowchart LR
+    A[lint erlang 单文件] --> B{显式原生工具}
+    B -->|已提供| C[核对 OTP 28 与工具字节]
+    C --> D[原生 scanner / parser]
+    D --> E{结果与覆盖}
+    E -->|有诊断| F[保留原生位置与修复指引]
+    E -->|宏或运行故障| G[保留具体阻塞并要求恢复]
+    E -->|局部正常| H[继续项目 lint / 编译 / 测试]
+    B -->|未提供| I[固定 WASM 候选初检]
+    I --> J[展示已知漏检与原生确认命令]
+```
+
+以下为真实缺句点报告的完整结构示例，路径改为相对示例名，预算来源采用对应的显式 CLI 参数；字段由[0.1.0 Schema](../schemas/erlang-lint-feedback-v0.1.schema.json)校验。该命令尚未包含于公开 npm 0.1.4。
+
+```json
+{
+  "authority": "local_unverified",
+  "coverage_proven": false,
+  "delivery_decision": "not_evaluated",
+  "execution_budget": {
+    "enforcement": "native_execution_only",
+    "source": "cli",
+    "timeout_ms": 10000
+  },
+  "known_limitations": [
+    "OTP 28 erlc rejects a missing final function period in `f() -> ok`, but this pinned WASM returns zero recoveries; 12/13 narrow native syntax cases agree. Other Erlang versions, systematic precision, public native-first lint route and release remain unqualified"
+  ],
+  "language": "erlang",
+  "native": {
+    "diagnostics": [
+      {
+        "column": 8,
+        "line": 2,
+        "rule_id": "erlang.syntax.error"
+      }
+    ],
+    "diagnostics_truncated": false,
+    "preprocessing_unresolved": false,
+    "reason": "erlang_native_syntax_diagnostics",
+    "status": "diagnostics_observed",
+    "tool_sha256": "cd03d938d7547ef608076a58a49f5284931b43f39090087baf35efc1665dd5d6",
+    "version": "OTP 28"
+  },
+  "next_action": "核对并修复原生 Erlang 语法诊断，再执行同一 --erl-tool 命令；还需项目完整 lint、编译和测试",
+  "operation": "lint",
+  "path": "sample.erl",
+  "report_type": "erlang_lint_feedback",
+  "schema_version": "0.1.0",
+  "scope": "single_file_forms_without_preprocessing",
+  "source_sha256": "d66c937c29e3eba8063b468f2744f995cd24cee2399b5f63018935876f5fc9a3",
+  "status": "incomplete",
+  "syntax_precheck": null
+}
+```
+
+工具摘要只绑定显式 launcher，并非整个 OTP runtime/标准库的供应链证明；本轮不授予可信关闭。原生 13 例分类与独立 erlc 标签一致，额外宏与启动文件用例也通过；全版本精度和多模块/任务/宿主仍未验收。见[局部验收](../tests/acceptance/erlang-native-first.md)。

@@ -2164,3 +2164,13 @@ Linux CI 失败处理：宿主制品读取仍限制 256 MiB，不因测试失败
 ## 2026-10-04 库存输出 schema 补齐
 
 `grammar_coverage_inventory` 1.1.0 的封闭输出 schema 已补，真实 0.1.4 release 程序输出与 4 项正反例开发验收通过；新增制品不改变已发布程序字节。逐语言、provider、候选计数及未知权威/allow 伪造被拒。见 [库存协议验收](../../../tests/acceptance/grammar-inventory-schema.md)。此前发行验收中缺 schema 是当时快照；完整 S14.7 不勾选。
+
+
+## 2026-10-04 Erlang 原生优先与隐藏错误统计纠正
+
+当前源码新增 `lint erlang FILE --erl-tool ABS_PATH [--timeout DURATION] --format=json`，由 Rust 受控进程调用 OTP 28 原生 scanner/parser，固定 cwd、禁用项目 `.erlang`、stdin 原字节、版本及工具/源码前后摘要。原生 13 例与独立 erlc 标签一致，缺句点给出原生诊断；宏/条件编译保持具体未完成，不执行源码、预处理或 parse_transform。原生显式故障不转到 PATH 或 WASM，未提供工具时仍有固定候选初检。新版本化报告与实际 JSON/伪造通过变体验证见[局部验收](../../../tests/acceptance/erlang-native-first.md)。8.134、14.5–14.9、14.17、14.19 仍因完整项目工具/注释/任务/宿主与发行缺口保持开放，Erlang grammar 原始漏检没有被删除或声称修好。
+
+Swift 差分纠正先以状态断言暴露旧清单文案的红测，再按真实 `truncated_files` 分类：13 例中 12 例可判定一致，缺类型 1 例未知；真实 Swift 6.4 对照通过，源码字节未变。Kotlin 已有对应运行时防护，其清单也纠正为 11 例可判定一致、2 例未知。未知仍保留在总语料分母，不按空诊断数组算作通过、分类一致、误报或漏报。新增 Swift 运行时回归及 CI 固定语料接线，见[差分记录](../../../tests/acceptance/swift-native-differential.md)。未提升任何 grammar 资格，14.4/14.17/14.19 父任务仍未完成，公开 npm 0.1.4 不含本轮改动。
+
+
+本轮最终验证（2026-10-04）：默认全工作区全目标 1132 passed、0 failed、106 ignored，204 个结果组，退出 0；最终 Erlang/库存特性目标 13 passed、0 failed、1 ignored；显式 OTP 28 的 13 例编译器对照与 7 例预处理/启动边界分别各 1 passed，显式 Swift 6.4 对照 1 passed（12 可判定一致、1 未解析）。CLI 全目标 WASM Clippy -D warnings、fmt、分层、OpenSpec strict、全部 schema 元定义、4 份真实 Erlang 报告/12 个伪造通过反例、2 份中英文完整示例及文档链接校验通过。工具依赖的忽略项没有当作通过，父任务未勾选。最终日志：`/tmp/codeguard-erlang-swift-workspace-final.log` SHA-256 `9d2d0b3a4291478b2acdd6fc31410c643081e545b46ef0f5cda349491ad35ad3`；`/tmp/codeguard-erlang-final-guard-suite-corrected.log` SHA-256 `750a219d900646abaa713ceb9c2de4f80378909205a8c85877b9b372af2fdd44`。远端 CI 须按本轮新提交独立核验；公开 npm/插件版本未改变。

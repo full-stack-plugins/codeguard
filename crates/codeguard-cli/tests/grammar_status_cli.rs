@@ -119,6 +119,10 @@ fn codegraph_coverage_is_explicit_and_never_claims_parser_or_gate_completion() {
         ),
         ("rust", "Rust 2021 rustfmt 1.9.0 differential"),
         ("zig", "Zig 0.16.0 ast-check differential"),
+        (
+            "swift",
+            "12 decidable cases agree and the missing-type case remains unresolved",
+        ),
         ("cfquery", "does not validate full SQL semantics"),
     ] {
         let asset = assets

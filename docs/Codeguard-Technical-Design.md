@@ -220,7 +220,7 @@ For one mixed-language project, the candidate pass plans at most 64 fragments, t
 
 For Java, [javac 21 with `--release 17`](../tests/acceptance/java-native-differential.md) accepted eight valid and rejected five malformed syntax fixtures, matching the isolated WASM worker. The test pins only that narrow classification; project-level native routing, version coverage and false-positive rates remain open.
 
-The [Kotlin 2.4.10 differential](../tests/acceptance/kotlin-native-differential.md) records a 12/13 classification agreement and pins the disagreement: `fun f(x: ) = x` is native-rejected but has zero WASM recoveries. `grammar status` and `check all` expose this as a bounded known limitation; zero recoveries cannot close a native confirmation obligation.
+The current [Kotlin 2.4.10 differential](../tests/acceptance/kotlin-native-differential.md) records 11 decidable agreements and two unresolved hidden-error cases. Both `fun f(x: ) = x` and valid `object C { val value = 1 }` have no enumerable recoveries but an incomplete scan. `grammar status` and `check all` retain these bounded limitations. Unknown samples stay in the corpus denominator and are reported separately, never counted as clean, agreement or a confirmed source violation.
 
 The opt-in CLI build first checks for a local ESLint 10 package and a single ordinary flat config on single-file TypeScript requests without explicit native context. With an executable Node resolved from `PATH`, it invokes the existing bounded native version/report probe; without Node it reports the preparation gap rather than running WASM first. Only when no project-local ESLint package is observed does the CLI emit [ESLint feedback 0.3.0](../schemas/eslint-local-feedback-v0.3.schema.json) for `.ts/.mts/.cts` or [0.4.0](../schemas/eslint-local-feedback-v0.4.schema.json) for `.tsx`. TSX uses its own pinned grammar. Candidate prechecks preserve `native=not_run` and `delivery=not_evaluated`, and remain incomplete even with zero recoveries. An ambiguous config, untrusted local path or invalid package identity remains a setup blocker and does not trigger WASM; a partial explicit context also retains its existing path. This is a single-file slice, not project script equivalence, per-module orchestration or automatic host feedback; see the [native-first acceptance](../tests/acceptance/native-first-eslint-candidate.md).
 
@@ -246,7 +246,7 @@ Rust 2021 `rustfmt 1.9.0 --emit stdout` and the isolated Rust worker classify th
 
 C11 `Apple clang 21 -fsyntax-only` and the isolated C worker classify eight valid and five syntax-broken samples consistently. The initial corpus mistakenly treated a return-type error as a syntax error, so it was replaced with a missing initializer expression; the bounded [C differential record](../tests/acceptance/c-native-differential.md) does not qualify semantic diagnostics, C lint or other language versions.
 
-Ruby 2.6.10 `ruby -c` agrees with the isolated Ruby worker on a narrow 13-case corpus, with the fixed worker corpus running in ordinary CI; this does not qualify Ruby lint or other versions. By contrast, Apple Swift 6.4 `swiftc -frontend -parse` rejects `func f(_ x: ) {}` as a missing parameter type while the fixed Swift WASM emits no recovery. The 13-case Swift differential has 12 agreements and this one false negative. The candidate remains unqualified and cannot claim a clean syntax result; see the [Ruby](../tests/acceptance/ruby-native-differential.md) and [Swift](../tests/acceptance/swift-native-differential.md) records.
+Ruby 2.6.10 `ruby -c` agrees with the isolated Ruby worker on a narrow 13-case corpus, with the fixed worker corpus running in ordinary CI; this does not qualify Ruby lint or other versions. By contrast, Apple Swift 6.4 `swiftc -frontend -parse` rejects `func f(_ x: ) {}` as a missing parameter type while the fixed Swift WASM emits no recovery. The corrected 13-case Swift differential has 12 decidable agreements and one unresolved hidden-error case; the native-rejected missing type remains incomplete instead of being classified by its empty recovery array. The candidate remains unqualified and cannot claim a clean syntax result; see the [Ruby](../tests/acceptance/ruby-native-differential.md) and [Swift](../tests/acceptance/swift-native-differential.md) records.
 
 Use a parent-controlled parser worker with a total deadline, per-file input bound, memory/process limit and capped diagnostics. Lazy-load selected grammars, parse without general network/filesystem imports, and terminate a stuck worker without losing native results from other modules. Host-specific enforcement and Rust MSRV compatibility must be tested; numeric production budgets remain measurement-driven rather than invented promises.
 
@@ -856,3 +856,66 @@ The following complete receipt comes from a controlled local integration fixture
 ### Current public candidate: 0.1.4
 
 `@partme.ai/codeguard@0.1.4` is published for Apple Silicon macOS from clean source `1cd458f6e01a44a74388243e964e3f45290ac18e`. It includes all 32 runnable, unqualified grammars, bounded edited-file checks, stable native-confirmation tasks, native rechecks and `next` guidance. Registry hashes, a fresh-cache npx invocation, the actual public-package repair loop with Zig 0.16.0, and the source commit's Linux CI passed. Ordinary CLI clean output cannot close a task without trusted policy. The protected Zig SDK is a source integration API; npm does not expose a self-approval command. Plugin activation, installed-host acceptance, full precision, other platforms and complete gates remain open. Earlier 0.1.3 evidence is historical. See [0.1.4 acceptance](../tests/acceptance/npm-0.1.4-candidate.md).
+
+
+### Erlang native forms observation (current source)
+
+The unified entry `codeguard lint erlang sample.erl --erl-tool /absolute/path/to/erl --timeout 10s --format=json` gives OTP 28 scanner/parser results priority. It uses the original bytes, a fixed non-project cwd, disabled project startup and a cleared environment; it never expands macros or executes compile/parse_transform. Macro/preprocessor coverage stays unknown, and explicit native failures are not replaced by WASM. Without a tool, the pinned candidate can provide an initial report and a native confirmation command. Native forms results do not replace full project lint, compilation or tests.
+
+```mermaid
+flowchart LR
+    A[lint erlang single file] --> B{Explicit native tool}
+    B -->|Provided| C[Verify OTP 28 and tool bytes]
+    C --> D[Native scanner / parser]
+    D --> E{Result and coverage}
+    E -->|Diagnostics| F[Keep native locations and repair guidance]
+    E -->|Macro or execution failure| G[Keep the blocker and request recovery]
+    E -->|Locally normal| H[Continue project lint / compile / tests]
+    B -->|Absent| I[Pinned WASM candidate]
+    I --> J[Known limits and native confirmation command]
+```
+
+This complete structural example comes from an actual missing-period report, with a relative example path and the budget source matching the explicit CLI argument. It validates against the [0.1.0 schema](../schemas/erlang-lint-feedback-v0.1.schema.json). Public npm 0.1.4 does not yet contain this command.
+
+```json
+{
+  "authority": "local_unverified",
+  "coverage_proven": false,
+  "delivery_decision": "not_evaluated",
+  "execution_budget": {
+    "enforcement": "native_execution_only",
+    "source": "cli",
+    "timeout_ms": 10000
+  },
+  "known_limitations": [
+    "OTP 28 erlc rejects a missing final function period in `f() -> ok`, but this pinned WASM returns zero recoveries; 12/13 narrow native syntax cases agree. Other Erlang versions, systematic precision, public native-first lint route and release remain unqualified"
+  ],
+  "language": "erlang",
+  "native": {
+    "diagnostics": [
+      {
+        "column": 8,
+        "line": 2,
+        "rule_id": "erlang.syntax.error"
+      }
+    ],
+    "diagnostics_truncated": false,
+    "preprocessing_unresolved": false,
+    "reason": "erlang_native_syntax_diagnostics",
+    "status": "diagnostics_observed",
+    "tool_sha256": "cd03d938d7547ef608076a58a49f5284931b43f39090087baf35efc1665dd5d6",
+    "version": "OTP 28"
+  },
+  "next_action": "核对并修复原生 Erlang 语法诊断，再执行同一 --erl-tool 命令；还需项目完整 lint、编译和测试",
+  "operation": "lint",
+  "path": "sample.erl",
+  "report_type": "erlang_lint_feedback",
+  "schema_version": "0.1.0",
+  "scope": "single_file_forms_without_preprocessing",
+  "source_sha256": "d66c937c29e3eba8063b468f2744f995cd24cee2399b5f63018935876f5fc9a3",
+  "status": "incomplete",
+  "syntax_precheck": null
+}
+```
+
+The tool hash binds the explicit launcher, not the whole OTP runtime/standard-library supply chain; this result cannot grant trusted task closure. Thirteen native classifications agree with independent erlc labels, and the additional macro/startup cases pass. Version-wide precision, modules, tasks and actual hosts remain open; see [acceptance](../tests/acceptance/erlang-native-first.md).

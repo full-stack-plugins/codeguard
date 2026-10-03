@@ -8,6 +8,12 @@ pub mod doctor_command;
 #[cfg(unix)]
 mod doctor_scratch;
 #[cfg(unix)]
+mod erlang_lint_arguments;
+#[cfg(unix)]
+pub mod erlang_lint_command;
+#[cfg(unix)]
+mod erlang_syntax_probe;
+#[cfg(unix)]
 mod eslint_config_map;
 #[cfg(unix)]
 mod eslint_directory;

@@ -10,6 +10,9 @@
 
 源码构建已把 ESLint 接入 `check all` 的 `node.lint` 任务图节点，与其它原生检查共用并发与截止时间。按发现的 JS/TS/TSX 文件选择最近的模块清单、本地 ESLint 10、唯一 flat config 和 Node；搜索不越过受检根。检查阶段收集报告，汇总阶段串行同步工作台，重复发现复用同一任务。每个完整且字节匹配的原生文件可免去重复 WASM；被忽略、配置错误或工具失败的文件仍保留降级与原生原因。协议为 `check_feedback` 0.35.0、`check_aborted` 0.12.0，原协议归档；`native_results.node_lint` 提供逐文件反馈、未执行文件、同步结果及下一步。见[验收范围](../tests/acceptance/check-all-eslint.md)。这不提升 grammar 资质或代替真实宿主验收。
 
+
+Erlang 源码局部入口现通过 `lint erlang FILE --erl-tool ABS_PATH` 原生优先选择：固定 OTP 28 扫描/解析调用读取 stdin 字节，使用非项目 cwd 并禁止项目启动文件。原生诊断优先，预处理与宏覆盖保持未知；未提供显式工具时可运行固定 WASM 候选。局部结果不授予任务关闭、项目完整 lint 或发行验收；见[验收](../tests/acceptance/erlang-native-first.md)。
+
 ## 1. 阅读契约与证据
 
 本文描述 Rust **Codeguard CLI 仓库**的架构，不是既有 Python 宿主插件的实现手册。读者包括适配器作者、CLI/runtime 维护者、智能体集成者和评审者。
@@ -40,7 +43,7 @@ WASM 的规范与 19 项实施任务已纳入既有 change；可选 Rust worker 
 
 [Java 17 原生差分](../tests/acceptance/java-native-differential.md)给 Java grammar 增加了 13 例 javac 21 独立 oracle。它只是局部精度证据，Java 仍是未验收候选。
 
-[Kotlin 原生差分](../tests/acceptance/kotlin-native-differential.md)在 13 例中发现一处漏检：参数类型缺失被 `kotlinc` 拒绝，却没有触发固定 WASM 的恢复节点。该语法仍未验收，具体限制投影到状态和项目反馈。
+[Kotlin 原生差分](../tests/acceptance/kotlin-native-differential.md)现记录 11 例可判定的一致结果与 2 例隐藏错误导致的未知，分别对应原生非法和原生合法源码。Swift 为 12 例可判定的一致结果与 1 例未知。未完成扫描不能仅凭恢复数组为空归入合法/非法标签；未知覆盖单独报告，两份 grammar 均未验收。
 
 ```mermaid
 flowchart LR
