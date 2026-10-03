@@ -224,6 +224,32 @@ fn known_grammar_precision_limits_reach_project_feedback() {
 }
 
 #[test]
+fn human_feedback_names_known_candidate_false_positive() {
+    let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
+        "codeguard-known-limit-human-{}",
+        std::process::id()
+    ));
+    fs::create_dir_all(&root).unwrap();
+    fs::write(
+        root.join("class.vb"),
+        "Public Class C\nPublic Function F() As Integer\nReturn 1\nEnd Function\nEnd Class\n",
+    )
+    .unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["check", "all"])
+        .arg(&root)
+        .args(["--timeout", "45s"])
+        .output()
+        .unwrap();
+    fs::remove_dir_all(&root).unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    let text = String::from_utf8(output.stdout).unwrap();
+    assert!(text.contains("已知 grammar 限制"), "{text}");
+    assert!(text.contains("known grammar false positive"), "{text}");
+    assert!(!text.contains("Return 1"), "{text}");
+}
+
+#[test]
 fn check_all_invokes_all_32_pinned_candidates_across_bounded_projects() {
     let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
         "codeguard-check-all-grammars-{}",

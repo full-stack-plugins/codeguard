@@ -1903,6 +1903,20 @@ pub fn run(args: &[String]) -> ExitCode {
                         item["path"], item["language"], item["recovery_count"]
                     );
                 }
+                for item in observations
+                    .iter()
+                    .filter(|item| item["known_limitations"][0].is_string())
+                    .take(8)
+                {
+                    if let Some(limitation) = item["known_limitations"][0].as_str() {
+                        println!(
+                            "  {} [{}] 已知 grammar 限制：{}；仍需适用原生工具确认。",
+                            item["path"].as_str().unwrap_or("?"),
+                            item["language"].as_str().unwrap_or("unknown"),
+                            limitation
+                        );
+                    }
+                }
             }
         }
         if report["unresolved_conditions"]
