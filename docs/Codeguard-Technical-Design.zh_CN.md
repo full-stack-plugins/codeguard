@@ -578,7 +578,7 @@ Node 路径支持已发布的 macOS arm64 包和本地打包。本地打包流�
 
 `--public` 打包模式已产出仅适用于 `darwin-arm64` 的 `@partme.ai/codeguard@0.1.2`；npm `os`/`cpu` 限制会拒绝其它宿主。npm 仓库发布、Apple Silicon macOS 上全新缓存运行 `npx --yes @partme.ai/codeguard@0.1.2 --version --format json`、注册表/本地 tarball 及二进制 SHA-256 对比均通过。干净 checkout 构建身份回报候选源码提交，但不证明可复现构建或签名来源，也不代表 S13 发行证据已完成，见[验收记录](../tests/acceptance/npm-0.1.2-candidate.md)。扩大分发范围可参考 CodeGraph 的精简入口加平台包模式，但须先满足 S13 发行证据：为每个通过验收的平台发布版本一致的包，再提供含精确可选平台依赖的公开命令包。缺对应平台包时应给出清晰错误；如需网络补包，下载前必须遵循 Codeguard 的签名选择与独立宿主授权。
 
-后续 WASM 候选包使用 `--require-wasm`，打包前将二进制报告的 32 份身份逐一与固定清单核对，拒绝无 worker 的默认构建，并实际执行 Zig grammar 探针。`--public` 自动启用该门禁，同时保留干净源码和构建身份核对。本地 private tarball 再经离线 `npm exec` 运行；Zig、Dart 探针证明 Node 入口能够调用内置 Rust worker。见[本地打包验收](../tests/acceptance/npm-wasm-local-package.md)。这不是注册表发行或逐语言语法验收。已发布的 `0.1.2` 早于该门禁，不含 WASM 兜底；未来公开版本须升级版本号，补齐平台、许可证和 S14 剩余验收。
+后续 WASM 候选包使用 `--require-wasm`，打包前将二进制报告的 32 份身份逐一与固定清单核对，拒绝无 worker 的默认构建，并实际执行 Zig grammar 探针。`--public` 自动启用该门禁，同时保留干净源码和构建身份核对。本地 private tarball 再经离线 `npm exec` 运行；Zig、Dart 探针证明 Node 入口能够调用内置 Rust worker，四个有界项目的包内 `check all` 实际调用全部 32 份候选。见[本地打包验收](../tests/acceptance/npm-wasm-local-package.md)。这不是注册表发行或逐语言语法验收。已发布的 `0.1.2` 早于该门禁，不含 WASM 兜底；未来公开版本须升级版本号，补齐平台、许可证和 S14 剩余验收。
 
 ## 12. 测试与评估方案
 
