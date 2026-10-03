@@ -39,6 +39,9 @@ pub fn observe(
             paths.extend(evidence.source_files.iter());
         }
     }
+    if !java_only {
+        paths.extend(discovery.ambiguous_source_files.iter());
+    }
     let source_file_count = paths.len();
     let mut observations = Vec::new();
     let mut skipped_count = 0;

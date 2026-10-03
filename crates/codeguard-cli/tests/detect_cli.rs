@@ -7,6 +7,44 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 static NEXT: AtomicU64 = AtomicU64::new(0);
 
+#[test]
+fn detect_keeps_shared_m_and_sc_suffixes_ambiguous_without_false_languages() {
+    let project = TempProject::new();
+    fs::write(
+        project.0.join("plot.m"),
+        "title('@interface Foo');\nplot(1:3);\n",
+    )
+    .unwrap();
+    fs::write(project.0.join("synth.sc"), "{ SinOsc.ar(440) }.play;\n").unwrap();
+    fs::write(
+        project.0.join("model.m"),
+        "@interface Model : NSObject\n@end\n",
+    )
+    .unwrap();
+    fs::write(project.0.join("main.scala"), "object Main {}\n").unwrap();
+    let report = detect_json(&project);
+    let languages = report["languages"].as_array().unwrap();
+    let objc = languages.iter().find(|item| item["id"] == "objc").unwrap();
+    let scala = languages.iter().find(|item| item["id"] == "scala").unwrap();
+    assert_eq!(objc["source_files"], serde_json::json!(["model.m"]));
+    assert_eq!(scala["source_files"], serde_json::json!(["main.scala"]));
+    assert!(report["observation_complete"].as_bool().unwrap());
+    assert!(
+        report["unknown_conditions"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|item| item == "ambiguous_language_suffix:plot.m")
+    );
+    assert!(
+        report["unknown_conditions"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|item| item == "ambiguous_language_suffix:synth.sc")
+    );
+}
+
 struct TempProject(PathBuf);
 
 impl TempProject {

@@ -1474,7 +1474,7 @@ pub fn run(args: &[String]) -> ExitCode {
     let syntax_candidates = json!({
         "status":"not_run","reason":"binary_without_wasm_precheck","execution_phase":"after_native",
         "authority":"candidate_unqualified","delivery_decision":"incomplete",
-        "source_file_count":discovery.languages.values().map(|item| item.source_files.len()).sum::<usize>(),
+        "source_file_count":discovery.languages.values().map(|item| item.source_files.len()).sum::<usize>() + discovery.ambiguous_source_files.len(),
         "skipped_count":0,"unrouted_count":0,"native_preferred_count":0,"observations":[],
         "next_action":"使用包含固定语法资产的发行包运行候选初检，并完成适用原生检查"
     });

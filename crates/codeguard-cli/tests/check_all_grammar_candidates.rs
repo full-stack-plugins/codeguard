@@ -112,6 +112,17 @@ fn check_all_routes_distinct_dialects_after_native_without_claiming_clean() {
     assert!(!observations.iter().any(|item| item["path"] == "plot.m"));
     assert!(!observations.iter().any(|item| item["path"] == "synth.sc"));
     assert_eq!(report["syntax_candidates"]["unrouted_count"], 2);
+    let unknown = report["discovery"]["unknown_conditions"]
+        .as_array()
+        .unwrap();
+    for path in ["plot.m", "synth.sc"] {
+        assert!(
+            unknown
+                .iter()
+                .any(|item| item == &format!("ambiguous_language_suffix:{path}")),
+            "{path}: {unknown:?}"
+        );
+    }
     assert_eq!(
         observations
             .iter()
@@ -129,6 +140,37 @@ fn check_all_routes_distinct_dialects_after_native_without_claiming_clean() {
     assert_eq!(
         report["syntax_candidates"]["execution_phase"],
         "after_native"
+    );
+}
+
+#[test]
+fn ambiguous_only_project_remains_an_explicit_unrouted_scope() {
+    let root = std::env::temp_dir()
+        .canonicalize()
+        .unwrap()
+        .join(format!("codeguard-ambiguous-only-{}", std::process::id()));
+    fs::create_dir_all(&root).unwrap();
+    fs::write(root.join("plot.m"), "plot(1:3);\n").unwrap();
+    fs::write(root.join("synth.sc"), "{ SinOsc.ar(440) }.play;\n").unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["check", "all"])
+        .arg(&root)
+        .args(["--format=json", "--timeout", "30s"])
+        .output()
+        .unwrap();
+    fs::remove_dir_all(&root).unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(report["syntax_candidates"]["source_file_count"], 2);
+    assert_eq!(report["syntax_candidates"]["unrouted_count"], 2);
+    assert_eq!(report["syntax_candidates"]["status"], "not_run");
+    assert_eq!(report["syntax_candidates"]["reason"], "unrouted_source");
+    assert_eq!(report["delivery_decision"], "incomplete");
+    assert!(
+        report["syntax_candidates"]["observations"]
+            .as_array()
+            .unwrap()
+            .is_empty()
     );
 }
 

@@ -1,5 +1,7 @@
 //! 按源码后缀和明确的嵌入边界选择候选 grammar；不推断项目语言版本。
 
+use crate::source_language_hint::has_objc_marker;
+
 /// 一段可独立解析的候选源码；嵌入片段的位置相对于原文件的字节起点。
 #[derive(Clone, Debug)]
 pub struct GrammarRoute<'a> {
@@ -93,30 +95,6 @@ pub fn route_source<'a>(relative_path: &str, source: &'a [u8]) -> Vec<GrammarRou
         }
     }
     routes
-}
-
-// `.m` 也用于 MATLAB；只在源码具有 Objective-C 专属词法标记时自动解析。
-// `.sc` 同时用于 Scala 脚本与 SuperCollider，缺少项目上下文时不猜测。
-fn has_objc_marker(source: &[u8]) -> bool {
-    let markers: &[&[u8]] = &[
-        b"@interface".as_slice(),
-        b"@implementation",
-        b"@protocol",
-        b"@class",
-        b"@property",
-        b"@synthesize",
-        b"@autoreleasepool",
-        b"#import",
-    ];
-    source.split(|byte| *byte == b'\n').any(|line| {
-        let line = line.trim_ascii_start();
-        markers.iter().any(|marker| {
-            line.starts_with(marker)
-                && line.get(marker.len()).is_some_and(|next| {
-                    next.is_ascii_whitespace() || matches!(next, b'(' | b'{' | b'<' | b'"')
-                })
-        })
-    })
 }
 
 fn find_bytes(haystack: &[u8], needle: &[u8]) -> Option<usize> {

@@ -1089,3 +1089,5 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 14.4 / 14.17 / 14.19 Ruby 与 Swift 原生差分增量：Ruby 2.6.10 `ruby -c` 和隔离 Ruby worker 的 13 例分类一致，显式原生测试与常规 worker 语料均 1/1 通过；见[Ruby 局部验收](../../../tests/acceptance/ruby-native-differential.md)。Swift 6.4 `swiftc -frontend -parse` 对 13 例中 12 例与 WASM 一致，但缺参数类型的 `func f(_ x: ) {}` 被原生拒绝而 WASM 零恢复，确认为漏检；显式测试 1/1 通过仅表示成功捕获这一差异，不表示语法验收，见[Swift 精度阻塞](../../../tests/acceptance/swift-native-differential.md)。须修 grammar、固定重建产物并以原生对照复验；三项父任务不勾选。
 
 14.4 / 14.6 / 14.19 共享后缀误报收敛：自动路由不再把任意 `.m` 当 Objective-C，也不再把 `.sc` 当 Scala；`.m` 需行首 Objective-C 专属标记，`.scala` 与 `.mm` 路由保留。MATLAB 字符串/注释中的标记及 SuperCollider 正例不进入错误 grammar；32 份候选的明确样例仍需完整回归。现有静态发现仍可能将共享后缀归入旧语言目录，缺少项目级方言裁决和逐文件未路由解释，父任务保持未完成；见[局部验收](../../../tests/acceptance/ambiguous-grammar-extensions.md)。
+
+14.4 / 14.6 / 14.19 后续发现层补齐：默认构建的只读 `detect` 与可选 WASM 路由共用受限 Objective-C 标记判断；MATLAB `.m`、SuperCollider `.sc` 不再被列成 Objective-C/Scala，`unknown_conditions` 保留歧义相对路径，`check all` 的候选范围仍计入并报告未路由数量。真实 `detect` 与 `check all` 回归通过；项目级 `.sc` 方言裁决、无标记 Objective-C `.m`、更强的词法证据、逐文件结构化歧义协议及完整语言验收仍缺，父任务不勾选。见[局部验收](../../../tests/acceptance/ambiguous-grammar-extensions.md)。
