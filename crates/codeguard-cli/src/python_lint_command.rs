@@ -597,8 +597,10 @@ fn prepare_tool(
     if Instant::now() >= deadline {
         return unavailable("request_deadline_exceeded");
     }
-    let Some(path) = resolve_tool(requested) else {
-        return unavailable("ruff_tool_not_found");
+    let path = match crate::ruff_tool_selection::resolve_ruff_tool(root, requested) {
+        Ok(Some(path)) => path,
+        Ok(None) => return unavailable("ruff_tool_not_found"),
+        Err(reason) => return unavailable(reason),
     };
     let Ok(content) = read_bounded_regular_file(&path, 128 * 1024 * 1024) else {
         return unavailable("ruff_tool_unreadable");
@@ -652,30 +654,6 @@ fn prepare_tool(
         unavailable_reason: "ruff_tool_not_found",
         scratch: Some(scratch),
     }
-}
-
-fn resolve_tool(requested: Option<&Path>) -> Option<PathBuf> {
-    if let Some(path) = requested {
-        return path
-            .canonicalize()
-            .ok()
-            .filter(|path| is_executable_file(path));
-    }
-    let path = std::env::var_os("PATH")?;
-    std::env::split_paths(&path)
-        .filter(|directory| directory.is_absolute())
-        .map(|directory| directory.join("ruff"))
-        .find_map(|candidate| {
-            candidate
-                .canonicalize()
-                .ok()
-                .filter(|path| is_executable_file(path))
-        })
-}
-
-fn is_executable_file(path: &Path) -> bool {
-    fs::metadata(path)
-        .is_ok_and(|metadata| metadata.is_file() && metadata.permissions().mode() & 0o111 != 0)
 }
 
 fn valid_ruff_version(version: &str) -> bool {

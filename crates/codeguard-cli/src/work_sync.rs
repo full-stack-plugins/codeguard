@@ -2225,6 +2225,12 @@ fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
             blocker.id, blocker.reason, report.digest, step, recheck, report.run_id
         );
     }
+    if blocker.checker_id == "python.ruff" && blocker.reason == "ruff_local_tool_invalid" {
+        return format!(
+            "# {} Ruff本地环境修复任务\n\n- 问题证据：本地工具观察失败 `{}`，首次报告摘要 `{}`。\n- 规则依据：原生工具入口完整性，不是源码违规。\n- 允许范围：受检根 `.venv/bin/ruff`、普通父目录、执行权限与原工具字节；不修改无关源码。\n- 修复步骤：核对目录链接、损坏入口或执行权限，恢复原本地环境；不删除环境以换用全局工具绕过，确需改变工具选择时明确指定原检查上下文并复核。\n- 复检命令：codeguard task verify {} . --format json；自动发现恢复后的同根原生入口。\n- 历史尝试：首次run `{}`，后续观察和失败尝试保留在同一任务；首张文档不代表完整历史。\n- 关闭条件：原受阻检查恢复并完成有效原工具复检及策略/覆盖核验；仅安装、同步、勾选或局部零发现不能关闭。\n",
+            blocker.id, blocker.reason, report.digest, blocker.id, report.run_id
+        );
+    }
     if blocker.checker_id == "python.ruff" && blocker.reason == "python_syntax_confirmation_needed"
     {
         return format!(

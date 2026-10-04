@@ -185,6 +185,8 @@ pub mod quality_policy_candidate;
 mod report_export;
 #[cfg(unix)]
 pub mod ruff_probe;
+#[cfg(unix)]
+mod ruff_tool_selection;
 mod ruff_verification_configuration;
 pub mod rules_list_command;
 pub mod run_report;

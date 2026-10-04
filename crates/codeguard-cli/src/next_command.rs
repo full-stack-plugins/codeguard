@@ -642,6 +642,12 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                 "needs_decision",
                 "确认项目是否要求 Ruff；若要求则按批准策略配置，若不要求则修订策略",
             )
+        } else if checker_id == "python.ruff" && reason == "ruff_local_tool_invalid" {
+            (
+                1,
+                "actionable",
+                "核对受检根 .venv/bin/ruff 的普通父目录、可执行入口和目标字节；恢复原本地环境后由同一入口复检，不删除环境绕过、不修改无关源码",
+            )
         } else if reason.starts_with("ruff_tool_") || reason == "tool_identity_mismatch" {
             (
                 1,

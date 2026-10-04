@@ -1248,3 +1248,10 @@ Swift 差分纠正先以状态断言暴露旧清单文案的红测，再按真�
 7.1 / 9.3 / 14.5 / 14.6 / 14.10：当前Clippy/rustdoc/check及原任务复检从调用方绝对PATH选择首个Cargo，显式坏工具和首选执行失败不换工具；保留最终代理入口名、RUSTUP_TOOLCHAIN并强制RUSTUP_AUTO_INSTALL=0。原实现七项受控测试2通过/5失败，修复后七项通过；本机实际已安装及缺失自定义工具链的两项另显式通过。真实PATH三检查、重复扫描同一finding/新增0、still_present复检、空PATH及未安装工具链报告已归档。完整工具链/配置/项目范围、其它语言自动选择、可信关闭与实际宿主仍缺，父任务保持开放，见 [Cargo自动发现验收](../../../tests/acceptance/cargo-native-discovery.md)。
 
 本批默认workspace/all-targets 218组、1220 passed/0 failed/112 ignored；受影响WASM CLI library+九集成目标10组、143 passed/0 failed/24 ignored，显式真实Cargo目标9 passed/0 failed/0 ignored（与受控/普通测试有重叠，不相加）。默认及特性全目标Clippy -D warnings、201 schema元定义与六实际报告/18伪造反例、格式/分层/OpenSpec strict/双语架构命名通过；历史schema不改。没有完整WASM suite或358例重跑，不更改grammar、插件锁及公开包；原有Erlang RED草稿保持未提交。完整目标继续未完成。
+
+
+## 2026-10-04 受检根本地 Ruff 与环境修复指引
+
+7.1 / 9.3 / 14.5 / 14.6 / 14.10：已有PATH发现保留，已配置受检根新增显式入口 > 普通`.venv/bin/ruff` > 绝对PATH的选择。显式坏工具或所选版本/执行失败不换工具；目录链接/损坏/不可执行本地入口返回ruff_local_tool_invalid，不生成源码违规。重复阻塞更新同一任务，简报及任务文档指明本地路径、环境修复范围、原工具复检、历史及关闭条件。没有配置不启动工具，指定编辑Hook只检查目标文件。首批入口3通过/6失败、任务指引1失败先RED，再通过14个受控及1个真实Ruff 0.16.8用例；实际零诊断仍是待核验，不自动关闭。逐模块环境管理器、可信关闭、完整覆盖/精度与实际宿主仍缺，父任务保持开放，见 [本地Ruff验收](../../../tests/acceptance/ruff-local-discovery.md)。
+
+最终默认workspace/all-targets 219组、1234 passed/0 failed/113 ignored；受影响WASM library+九集成目标10组、149 passed/0 failed/30 ignored，显式专用原生目标15 passed/0 failed/0 ignored（与受控/普通测试有重叠，不相加）。默认/特性全目标Clippy -D warnings、格式/分层/OpenSpec strict/架构命名及201 schema元定义通过，12份实际完整报告/36伪造反例通过；旧schema不改。实际原生发现、重复任务、Hook、修复待核验、再次出现、环境阻塞及复检原始输出已归档。没有完整WASM suite、独立精度或358例重跑；grammar、公开包、插件锁不变，预先Erlang RED草稿保持未提交。完整目标继续未完成。

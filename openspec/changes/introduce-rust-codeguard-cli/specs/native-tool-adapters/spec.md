@@ -122,6 +122,11 @@ Rustdoc逐问题反馈 MUST 提供问题证据、规则依据、允许修改的�
 - **WHEN** `tools verify` 读取本地工具锁候选并核对当前平台的入口、可选运行时及目录包字节
 - **THEN** 逐项反馈匹配、缺失、不可读、摘要失配或不可执行及恢复动作；不启动 wrapper、安装或联网，不把结构合法/字节匹配解释为可信批准、可启动或规则已执行。本地来源未获核验时整体未完成、readiness=unknown、无门禁效力；坏锁或链接锁不生成源码 finding
 
+#### Scenario: A configured root-local Ruff remains the original execution context
+- **WHEN** 已配置Python受检根有普通`.venv/bin`目录内的原生Ruff，或其本地环境损坏
+- **THEN** 没有显式工具时优先本地入口，沿原版本/工具/源码/config校验执行；已选入口失败不换全局工具。损坏本地上下文返回ruff_local_tool_invalid并同步同一环境任务，下一步及任务文档明确本地路径、权限/目录调查和原工具复检，不建议修改无关源码或用删除环境绕过
+- **AND** 无适用配置不启动；确实没有本地入口才保留已有PATH发现。本轮观察不证明其它模块虚拟环境、环境管理器或正式覆盖/批准；原生零诊断仍不能自动关闭任务
+
 #### Scenario: Doctor diagnoses an explicitly selected Ruff binary
 - **WHEN** doctor 观察项目配置并收到显式绝对路径的 Ruff 原生入口
 - **THEN** 在私有目录以固定版本参数、清空继承环境、共同预算及单探测上限执行版本诊断；不运行源码扫描或项目 wrapper。未选择工具不冒充工具缺失，脚本入口在无法隔离时启动前未完成；原生成功仅形成未核验来源的局部版本观察，不能给 readiness 或质量门禁签发通过，必须反馈其它诊断缺口及下一步
