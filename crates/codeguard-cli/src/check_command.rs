@@ -38,7 +38,7 @@ use crate::python_lint_command::{
     annotate_conversation_budget, scan_and_sync_report_with_deadline,
 };
 use crate::report_export::export_report;
-use crate::rust_lint_scan::observe_cargo_clippy;
+use crate::rust_lint_scan::observe_cargo_clippy_with_coverage;
 use crate::work_sync::{save_local_report, sync_local_workspace};
 
 struct Args {
@@ -284,6 +284,8 @@ pub fn run(args: &[String]) -> ExitCode {
     let mut cve_task_outcome = None;
     let mut python_lint = Value::Null;
     let mut rust_lint = Value::Null;
+    let mut _rust_syntax_coverage =
+        crate::rust_native_syntax_coverage::RustNativeSyntaxCoverage::default();
     let mut rust_comments = Value::Null;
     let mut rust_build = Value::Null;
     let mut rust_cve = Value::Null;
@@ -403,6 +405,7 @@ pub fn run(args: &[String]) -> ExitCode {
         let cancelled = AtomicBool::new(false);
         let python_slot = Mutex::new(None);
         let rust_slot = Mutex::new(None);
+        let rust_coverage_slot = Mutex::new(None);
         let rust_comments_slot = Mutex::new(None);
         let rust_build_slot = Mutex::new(None);
         let rust_cve_slot = Mutex::new(None);
@@ -623,7 +626,7 @@ pub fn run(args: &[String]) -> ExitCode {
                     *rust_comments_slot.lock().expect("Rust文档结果槽未中毒") = Some(report);
                     outcome
                 } else if id.id == "rust.lint" {
-                    let report = observe_cargo_clippy(
+                    let (report, coverage) = observe_cargo_clippy_with_coverage(
                         &root,
                         rust_sources.expect("Rust 任务具备源码范围"),
                         parsed.cargo_tool.as_deref(),
@@ -643,6 +646,7 @@ pub fn run(args: &[String]) -> ExitCode {
                         TaskExecution::Failed
                     };
                     *rust_slot.lock().expect("Rust 结果槽位未中毒") = Some(report);
+                    *rust_coverage_slot.lock().expect("Rust源码覆盖槽位未中毒") = Some(coverage);
                     outcome
                 } else if id.id == "java.javadoc" {
                     let report = observe_javadoc_project(
@@ -945,6 +949,10 @@ pub fn run(args: &[String]) -> ExitCode {
                 .into_inner()
                 .expect("Rust 结果槽位未中毒")
                 .unwrap_or(Value::Null);
+            _rust_syntax_coverage = rust_coverage_slot
+                .into_inner()
+                .expect("Rust源码覆盖槽位未中毒")
+                .unwrap_or_default();
         }
         if erlang_present {
             let outcome = *outcomes.get("erlang.lint").expect("Erlang任务结果完整");
@@ -1592,6 +1600,7 @@ pub fn run(args: &[String]) -> ExitCode {
             python_lint: &python_lint,
             go_lint: &go_lint,
             erlang_lint: &erlang_lint,
+            rust_targets: &_rust_syntax_coverage,
             go_tool: parsed.go_tool.as_deref(),
         },
         parsed.selection == Selection::Java,

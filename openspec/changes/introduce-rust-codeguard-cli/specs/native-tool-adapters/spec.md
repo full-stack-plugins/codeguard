@@ -65,6 +65,10 @@ Rustdoc逐问题反馈 MUST 提供问题证据、规则依据、允许修改的�
 - **WHEN** 同一输入和工具字节下已有有效原生诊断，随后原生报告损坏或执行不完整
 - **THEN** 保留可归属的已观察诊断与未完成原因；不能因报告部分失败丢掉全部发现，也不能签发完整检查或交付通过
 
+#### Scenario: Clippy repeats a source diagnostic across native targets
+- **WHEN** 库、二进制或测试目标在同轮机器流重复报告同一文件、规则、行和列的问题
+- **THEN** 原生观察与工作台只投影一个该定位的 finding；同定位级别不同时保留 error 优先于 warning，原生执行失败仍独立保留。不同定位不得被归并，重复扫描复用原稳定任务而不是以目标次数新增序号身份；历史重复任务不据此自动关闭
+
 #### Scenario: Concurrent Clippy tasks observe identical clock timestamps
 - **WHEN** 同进程两个原生检查的时钟值相同
 - **THEN** 以独立序号及 create-exclusive 目录分配隔离 scratch，不因相同时间戳相互覆盖或误报目录不可用；只清理各自拥有的目录

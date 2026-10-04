@@ -196,6 +196,8 @@ pub(crate) mod rust_cve_task_recheck;
 mod rust_lint_inputs;
 #[cfg(unix)]
 pub mod rust_lint_scan;
+#[cfg(unix)]
+mod rust_native_syntax_coverage;
 pub mod rustdoc_repair_brief;
 #[cfg(unix)]
 pub(crate) mod rustdoc_task_recheck;

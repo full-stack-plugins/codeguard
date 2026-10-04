@@ -50,6 +50,7 @@ pub(crate) fn observe(
             python_lint: &python_lint,
             go_lint: &Value::Null,
             erlang_lint: &Value::Null,
+            rust_targets: &crate::rust_native_syntax_coverage::RustNativeSyntaxCoverage::default(),
             go_tool: None,
         },
         2,

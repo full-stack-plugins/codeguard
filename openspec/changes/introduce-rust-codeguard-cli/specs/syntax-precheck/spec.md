@@ -53,6 +53,11 @@
 - **WHEN** 本轮 Go 1.23.4 `go vet` 完成，受控 `go list` 证明部分源码进入默认构建，而另一份 `.go` 源码被构建标签排除
 - **THEN** 仅对同一源码字节且进入原生包清单的文件跳过重复 WASM；被排除文件继续候选初检，并保持平台/构建标签覆盖未完成
 
+#### Scenario: Clippy completes a current Rust target before candidate parsing
+- **WHEN** 聚合检查的锁定离线 Clippy 完成，机器流中的非缓存 compiler-artifact 将目标入口绑定到本轮已观察源码及原根 Cargo 清单
+- **THEN** 仅对启动前字节与当前字节一致的该目标入口跳过重复 WASM；终端和 JSON 保留原生发现、原生优先计数及其它文件初检。完整运行无有效 artifact、失败/截断/取消、重复 JSON 键、结束记录后新增事件、工具/输入改变不得产生此覆盖
+- **AND** Cargo 的 all-targets、零诊断或 artifact 入口不能证明目录里所有 `.rs` 已参与解析；未被证明的模块、条件排除源码、其它清单目标继续初检，完整 workspace/features/targets、语法资格与交付义务保持未完成。覆盖仅在本次进程内传递，不能从可编辑本地报告导入作为跳过依据
+
 #### Scenario: A local checker is absent from PATH
 - **WHEN** 项目声明的本地原生工具已可按受支持方式定位
 - **THEN** 核对其配置和版本后优先运行，不创建错误的安装任务

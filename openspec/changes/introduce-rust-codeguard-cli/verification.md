@@ -2326,3 +2326,10 @@ Clippy 现在在原生执行前冻结已观察源码及根配置/锁的字节或
 先复现输入、锁、指引、代理与取消反例，再通过目标及真实 Cargo 测试。三份实际公开反馈、任务详情与真实 Clippy 过期源码观察已归档；正式结果及历史失败见 [Cargo 输入验收](../../../tests/acceptance/rust-clippy-input-stability.md)。本批不改变 grammar、插件锁或公开包，不提供完整 Cargo 模型/沙箱/可信关闭，父任务保持开放。
 
 本批最终默认workspace/all-targets回归216组、1213 passed/0 failed/110 ignored，完整目标WASM Clippy -D warnings通过；显式已安装Cargo三项原生验证通过。201 schema元定义、3实际公开反馈/12伪造反例、格式/分层/OpenSpec strict/双语架构命名均通过；日志、历史失败和完整范围见本批验收。没有运行已知Erlang RED的全套WASM测试，不更新grammar资格或公开包。远端CI按新提交另核验，完整目标与父任务保持未完成。
+
+
+## 2026-10-04 Rust 原生目标免重复解析与重复诊断归并
+
+7.1 / 9.3 / 14.6 / 14.10：聚合 Clippy 以本轮非缓存 artifact 的原根清单和启动前源码摘要绑定目标入口，WASM 只对当前字节相同的入口免重复；覆盖不从本地报告恢复，未证明模块/条件排除源码继续检查。同规则同文件同定位的库/测试诊断只同步一项 finding，error 优先；不同位置与执行阻塞保留，重复扫描更新原任务。四项目标反例先 RED 后实现，真实公开 Cargo 检查/重复任务/缺工具/部分失败已存档。完整覆盖、历史重复任务治理和宿主/发布仍缺，父任务保持开放；最终测试/日志见 [Rust 原生优先验收](../../../tests/acceptance/check-all-native-preferred-rust.md)。
+
+本批最终默认workspace/all-targets 217组、1213 passed/0 failed/110 ignored；受影响WASM library+8集成目标9组、105 passed/0 failed/7 ignored，显式真实Cargo1 passed。默认/特性全目标Clippy -D warnings、格式/分层/OpenSpec strict/双语架构命名、201 schema与4实际反馈/任务详情及10伪造变体通过；旧schema不改。完整命令范围、实际终端/任务/重复扫描、保留的失败与日志摘要见本批验收。完整grammar、真实宿主和发布仍未完成。
