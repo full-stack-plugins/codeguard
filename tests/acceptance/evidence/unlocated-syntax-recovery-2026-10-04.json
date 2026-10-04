@@ -1,0 +1,1701 @@
+{
+  "captured_at": "2026-10-04",
+  "binary_sha256_before": "834da6d1dddbb63671bcac0e75d03314feb9c7f49a85924ff65c1973b0580213",
+  "binary_sha256_after": "834da6d1dddbb63671bcac0e75d03314feb9c7f49a85924ff65c1973b0580213",
+  "product_precision_evaluated": false,
+  "actual_host_evaluated": false,
+  "grammar_qualification_changed": false,
+  "cases": [
+    {
+      "label": "three_real_unlocated_observations",
+      "first_check": {
+        "authority": "local_unverified",
+        "category_candidates": [
+          {
+            "capability_status": "gap",
+            "category": "lint",
+            "checker_id": null,
+            "language": "kotlin",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "comments",
+            "checker_id": null,
+            "language": "kotlin",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "dependencies",
+            "checker_id": null,
+            "language": "kotlin",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "cve",
+            "checker_id": null,
+            "language": "kotlin",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "security",
+            "checker_id": null,
+            "language": "kotlin",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "build",
+            "checker_id": null,
+            "language": "kotlin",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "lint",
+            "checker_id": null,
+            "language": "swift",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "comments",
+            "checker_id": null,
+            "language": "swift",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "dependencies",
+            "checker_id": null,
+            "language": "swift",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "cve",
+            "checker_id": null,
+            "language": "swift",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "security",
+            "checker_id": null,
+            "language": "swift",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "build",
+            "checker_id": null,
+            "language": "swift",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          }
+        ],
+        "command_status": "incomplete",
+        "delivery_decision": "incomplete",
+        "discovery": {
+          "blocked_paths": [],
+          "build_roots": [],
+          "checker_configurations": [],
+          "declared_versions": {},
+          "languages": [
+            {
+              "id": "kotlin",
+              "manifests": [],
+              "source_files": [
+                "bad.kt",
+                "unknown.kt"
+              ]
+            },
+            {
+              "id": "swift",
+              "manifests": [],
+              "source_files": [
+                "bad.swift"
+              ]
+            }
+          ],
+          "lockfiles": [],
+          "manifest_sha256": {},
+          "native_tool_candidates": [],
+          "observation_complete": true,
+          "observed_entries": 4,
+          "report_type": "discovery",
+          "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-unlocated-capture-nv6hxs4_/observed",
+          "schema_version": "0.4.0",
+          "scope_summary": {
+            "configuration_exception_files_observed": 0,
+            "dependency_roots_excluded": 0,
+            "dot_prefix_roots_excluded": 1,
+            "git_safety_status": "not_evaluated",
+            "ordinary_scan_policy": "project_sources_default_v2"
+          },
+          "source_set_candidates": [],
+          "unknown_conditions": [
+            "source_sets_not_fully_classified",
+            "dialects_not_classified"
+          ]
+        },
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "jobs_limit": 4,
+          "jobs_source": "builtin_default",
+          "native_task_count": 0,
+          "source": "cli",
+          "started_native_task_count": 0,
+          "timeout_ms": 60000
+        },
+        "execution_tasks": [],
+        "exit_code": 3,
+        "export": {
+          "reason_code": null,
+          "status": "not_requested"
+        },
+        "native_results": {
+          "erlang_lint": null,
+          "go_lint": null,
+          "java_cve": null,
+          "java_dependencies": null,
+          "java_javadoc": null,
+          "java_p3c": null,
+          "node_lint": null,
+          "npm_cve": [],
+          "python_cve": [],
+          "python_lint": null,
+          "rust_build": null,
+          "rust_comments": null,
+          "rust_cve": null,
+          "rust_lint": null
+        },
+        "next": {
+          "authority": "local_unverified",
+          "command_status": "complete",
+          "delivery_decision": "not_evaluated",
+          "disposition": "needs_decision",
+          "exit_code": 0,
+          "next_actions": [],
+          "operation": "next",
+          "reason": "local_task_selected",
+          "repair_brief": {
+            "action_id": "restore-checker-environment",
+            "affected_paths": [
+              "unknown.kt"
+            ],
+            "authority": "local_unverified",
+            "build_root": ".",
+            "checker_id": "syntax.native_confirmation",
+            "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+            "constraints": [
+              "先恢复检查完整性",
+              "不得关闭检查器或修改无关源码"
+            ],
+            "disposition": "needs_decision",
+            "evidence_ref": {
+              "first_report_sha256": "44b9843f31f5715f1ce2471d34b38085caf4a8624e7b1e4c57e1803a238cd3ae",
+              "first_run_id": "syntax-confirm-366-1791103827641043000"
+            },
+            "history": {
+              "attempt_count": 0,
+              "awaiting_verification": false,
+              "budget": 2,
+              "no_progress_count": 0,
+              "open_attempt_id": null,
+              "recent": []
+            },
+            "kind": "blocker",
+            "reason_code": "native_syntax_confirmation_needed",
+            "recheck_argv": [
+              "codeguard",
+              "task",
+              "verify",
+              "CG-B-25a787d91aada0ac49353ed844805eba",
+              ".",
+              "--format",
+              "json"
+            ],
+            "schema_version": "0.3.0",
+            "scope": "unknown.kt",
+            "step": "固定 grammar 的恢复扫描未完成或错误无法定位；核对语言版本、grammar 限制并恢复适用原生 lint/编译器或提出具体能力决策。原生确认前不得修改源码，不虚构错误位置，不凭零恢复关闭任务",
+            "task_id": "CG-B-25a787d91aada0ac49353ed844805eba"
+          },
+          "report_type": "repair_brief_preview",
+          "schema_version": "0.3.0"
+        },
+        "obligation_status": "unresolved",
+        "operation": "check",
+        "reason": "full_project_obligations_and_trusted_policy_unavailable",
+        "report_type": "check_feedback",
+        "required_obligations": null,
+        "schema_version": "0.38.0",
+        "selection": "all",
+        "syntax_candidates": {
+          "authority": "candidate_unqualified",
+          "delivery_decision": "incomplete",
+          "execution_phase": "after_native",
+          "native_preferred_count": 0,
+          "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+          "observations": [
+            {
+              "byte_offset": 0,
+              "grammar_qualified": false,
+              "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+              "known_limitations": [
+                "Kotlin 2.4.10 native compiler rejects missing parameter type in `fun f(x: ) = x`. Hidden MISSING tokens also occur in valid `object C { val value = 1 }`; Rust marks both zero-record scans incomplete. Eleven decidable cases agree with native labels and two remain unresolved. Zero recoveries cannot establish valid Kotlin syntax",
+                "Other Kotlin versions, dialects, public native-first lint route, resource budget and release remain unqualified"
+              ],
+              "language": "kotlin",
+              "path": "bad.kt",
+              "reason": "syntax_recovery_incomplete",
+              "recoveries": [],
+              "recovery_count": 0,
+              "scope": "whole_file",
+              "source_sha256": "87fbb71a8f650a302ff4bdf216bc8a9835350f3b864b2b1c6a0d0fe5f3cdf9b5",
+              "status": "candidate_observed"
+            },
+            {
+              "byte_offset": 0,
+              "grammar_qualified": false,
+              "grammar_sha256": "cc77a63b8487956270e2f385e29a03ba0773ba532a3c8a8844a26b4c98793843",
+              "known_limitations": [
+                "Swift 6.4 native parse rejects missing parameter type in `func f(_ x: ) {}`. The grammar has a hidden MISSING type token; Rust marks zero-record recovery scans incomplete. In the 13-case differential, 12 decidable cases agree and the missing-type case remains unresolved; language versions, systematic precision, native-first lint and release remain unqualified"
+              ],
+              "language": "swift",
+              "path": "bad.swift",
+              "reason": "syntax_recovery_incomplete",
+              "recoveries": [],
+              "recovery_count": 0,
+              "scope": "whole_file",
+              "source_sha256": "6f44da8b1f1db95bf1948aa134b683e1066a0c9ad8941138dc2de09e70958f03",
+              "status": "candidate_observed"
+            },
+            {
+              "byte_offset": 0,
+              "grammar_qualified": false,
+              "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+              "known_limitations": [
+                "Kotlin 2.4.10 native compiler rejects missing parameter type in `fun f(x: ) = x`. Hidden MISSING tokens also occur in valid `object C { val value = 1 }`; Rust marks both zero-record scans incomplete. Eleven decidable cases agree with native labels and two remain unresolved. Zero recoveries cannot establish valid Kotlin syntax",
+                "Other Kotlin versions, dialects, public native-first lint route, resource budget and release remain unqualified"
+              ],
+              "language": "kotlin",
+              "path": "unknown.kt",
+              "reason": "syntax_recovery_incomplete",
+              "recoveries": [],
+              "recovery_count": 0,
+              "scope": "whole_file",
+              "source_sha256": "9a40dcd89c137534d57763addbb8d45368fed76bd046c5198c4fd3a016e6414a",
+              "status": "candidate_observed"
+            }
+          ],
+          "reason": "candidate_unqualified",
+          "skipped_count": 0,
+          "source_file_count": 3,
+          "status": "observed_partial",
+          "unrouted_count": 0
+        },
+        "syntax_tasks": {
+          "failures": [],
+          "new_blockers": 3,
+          "status": "synced_partial",
+          "tasks": [
+            {
+              "language": "kotlin",
+              "path": "bad.kt",
+              "task_id": "CG-B-57a8f742c3305e57aa54d1b193f1f65d"
+            },
+            {
+              "language": "swift",
+              "path": "bad.swift",
+              "task_id": "CG-B-e3a236c78352145f0c3146ee1e8a7022"
+            },
+            {
+              "language": "kotlin",
+              "path": "unknown.kt",
+              "task_id": "CG-B-25a787d91aada0ac49353ed844805eba"
+            }
+          ]
+        },
+        "unresolved_conditions": [
+          "dialects_not_classified",
+          "required_obligations_unresolved",
+          "source_sets_not_fully_classified",
+          "tool_lock_unverified",
+          "trusted_policy_unavailable"
+        ]
+      },
+      "repeat_check": {
+        "authority": "local_unverified",
+        "category_candidates": [
+          {
+            "capability_status": "gap",
+            "category": "lint",
+            "checker_id": null,
+            "language": "kotlin",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "comments",
+            "checker_id": null,
+            "language": "kotlin",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "dependencies",
+            "checker_id": null,
+            "language": "kotlin",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "cve",
+            "checker_id": null,
+            "language": "kotlin",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "security",
+            "checker_id": null,
+            "language": "kotlin",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "build",
+            "checker_id": null,
+            "language": "kotlin",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "lint",
+            "checker_id": null,
+            "language": "swift",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "comments",
+            "checker_id": null,
+            "language": "swift",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "dependencies",
+            "checker_id": null,
+            "language": "swift",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "cve",
+            "checker_id": null,
+            "language": "swift",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "security",
+            "checker_id": null,
+            "language": "swift",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "build",
+            "checker_id": null,
+            "language": "swift",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          }
+        ],
+        "command_status": "incomplete",
+        "delivery_decision": "incomplete",
+        "discovery": {
+          "blocked_paths": [],
+          "build_roots": [],
+          "checker_configurations": [],
+          "declared_versions": {},
+          "languages": [
+            {
+              "id": "kotlin",
+              "manifests": [],
+              "source_files": [
+                "bad.kt",
+                "unknown.kt"
+              ]
+            },
+            {
+              "id": "swift",
+              "manifests": [],
+              "source_files": [
+                "bad.swift"
+              ]
+            }
+          ],
+          "lockfiles": [],
+          "manifest_sha256": {},
+          "native_tool_candidates": [],
+          "observation_complete": true,
+          "observed_entries": 4,
+          "report_type": "discovery",
+          "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-unlocated-capture-nv6hxs4_/observed",
+          "schema_version": "0.4.0",
+          "scope_summary": {
+            "configuration_exception_files_observed": 0,
+            "dependency_roots_excluded": 0,
+            "dot_prefix_roots_excluded": 1,
+            "git_safety_status": "not_evaluated",
+            "ordinary_scan_policy": "project_sources_default_v2"
+          },
+          "source_set_candidates": [],
+          "unknown_conditions": [
+            "source_sets_not_fully_classified",
+            "dialects_not_classified"
+          ]
+        },
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "jobs_limit": 4,
+          "jobs_source": "builtin_default",
+          "native_task_count": 0,
+          "source": "cli",
+          "started_native_task_count": 0,
+          "timeout_ms": 60000
+        },
+        "execution_tasks": [],
+        "exit_code": 3,
+        "export": {
+          "reason_code": null,
+          "status": "not_requested"
+        },
+        "native_results": {
+          "erlang_lint": null,
+          "go_lint": null,
+          "java_cve": null,
+          "java_dependencies": null,
+          "java_javadoc": null,
+          "java_p3c": null,
+          "node_lint": null,
+          "npm_cve": [],
+          "python_cve": [],
+          "python_lint": null,
+          "rust_build": null,
+          "rust_comments": null,
+          "rust_cve": null,
+          "rust_lint": null
+        },
+        "next": {
+          "authority": "local_unverified",
+          "command_status": "complete",
+          "delivery_decision": "not_evaluated",
+          "disposition": "needs_decision",
+          "exit_code": 0,
+          "next_actions": [],
+          "operation": "next",
+          "reason": "local_task_selected",
+          "repair_brief": {
+            "action_id": "restore-checker-environment",
+            "affected_paths": [
+              "unknown.kt"
+            ],
+            "authority": "local_unverified",
+            "build_root": ".",
+            "checker_id": "syntax.native_confirmation",
+            "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+            "constraints": [
+              "先恢复检查完整性",
+              "不得关闭检查器或修改无关源码"
+            ],
+            "disposition": "needs_decision",
+            "evidence_ref": {
+              "first_report_sha256": "44b9843f31f5715f1ce2471d34b38085caf4a8624e7b1e4c57e1803a238cd3ae",
+              "first_run_id": "syntax-confirm-366-1791103827641043000"
+            },
+            "history": {
+              "attempt_count": 0,
+              "awaiting_verification": false,
+              "budget": 2,
+              "no_progress_count": 0,
+              "open_attempt_id": null,
+              "recent": []
+            },
+            "kind": "blocker",
+            "reason_code": "native_syntax_confirmation_needed",
+            "recheck_argv": [
+              "codeguard",
+              "task",
+              "verify",
+              "CG-B-25a787d91aada0ac49353ed844805eba",
+              ".",
+              "--format",
+              "json"
+            ],
+            "schema_version": "0.3.0",
+            "scope": "unknown.kt",
+            "step": "固定 grammar 的恢复扫描未完成或错误无法定位；核对语言版本、grammar 限制并恢复适用原生 lint/编译器或提出具体能力决策。原生确认前不得修改源码，不虚构错误位置，不凭零恢复关闭任务",
+            "task_id": "CG-B-25a787d91aada0ac49353ed844805eba"
+          },
+          "report_type": "repair_brief_preview",
+          "schema_version": "0.3.0"
+        },
+        "obligation_status": "unresolved",
+        "operation": "check",
+        "reason": "full_project_obligations_and_trusted_policy_unavailable",
+        "report_type": "check_feedback",
+        "required_obligations": null,
+        "schema_version": "0.38.0",
+        "selection": "all",
+        "syntax_candidates": {
+          "authority": "candidate_unqualified",
+          "delivery_decision": "incomplete",
+          "execution_phase": "after_native",
+          "native_preferred_count": 0,
+          "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+          "observations": [
+            {
+              "byte_offset": 0,
+              "grammar_qualified": false,
+              "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+              "known_limitations": [
+                "Kotlin 2.4.10 native compiler rejects missing parameter type in `fun f(x: ) = x`. Hidden MISSING tokens also occur in valid `object C { val value = 1 }`; Rust marks both zero-record scans incomplete. Eleven decidable cases agree with native labels and two remain unresolved. Zero recoveries cannot establish valid Kotlin syntax",
+                "Other Kotlin versions, dialects, public native-first lint route, resource budget and release remain unqualified"
+              ],
+              "language": "kotlin",
+              "path": "bad.kt",
+              "reason": "syntax_recovery_incomplete",
+              "recoveries": [],
+              "recovery_count": 0,
+              "scope": "whole_file",
+              "source_sha256": "87fbb71a8f650a302ff4bdf216bc8a9835350f3b864b2b1c6a0d0fe5f3cdf9b5",
+              "status": "candidate_observed"
+            },
+            {
+              "byte_offset": 0,
+              "grammar_qualified": false,
+              "grammar_sha256": "cc77a63b8487956270e2f385e29a03ba0773ba532a3c8a8844a26b4c98793843",
+              "known_limitations": [
+                "Swift 6.4 native parse rejects missing parameter type in `func f(_ x: ) {}`. The grammar has a hidden MISSING type token; Rust marks zero-record recovery scans incomplete. In the 13-case differential, 12 decidable cases agree and the missing-type case remains unresolved; language versions, systematic precision, native-first lint and release remain unqualified"
+              ],
+              "language": "swift",
+              "path": "bad.swift",
+              "reason": "syntax_recovery_incomplete",
+              "recoveries": [],
+              "recovery_count": 0,
+              "scope": "whole_file",
+              "source_sha256": "6f44da8b1f1db95bf1948aa134b683e1066a0c9ad8941138dc2de09e70958f03",
+              "status": "candidate_observed"
+            },
+            {
+              "byte_offset": 0,
+              "grammar_qualified": false,
+              "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+              "known_limitations": [
+                "Kotlin 2.4.10 native compiler rejects missing parameter type in `fun f(x: ) = x`. Hidden MISSING tokens also occur in valid `object C { val value = 1 }`; Rust marks both zero-record scans incomplete. Eleven decidable cases agree with native labels and two remain unresolved. Zero recoveries cannot establish valid Kotlin syntax",
+                "Other Kotlin versions, dialects, public native-first lint route, resource budget and release remain unqualified"
+              ],
+              "language": "kotlin",
+              "path": "unknown.kt",
+              "reason": "syntax_recovery_incomplete",
+              "recoveries": [],
+              "recovery_count": 0,
+              "scope": "whole_file",
+              "source_sha256": "9a40dcd89c137534d57763addbb8d45368fed76bd046c5198c4fd3a016e6414a",
+              "status": "candidate_observed"
+            }
+          ],
+          "reason": "candidate_unqualified",
+          "skipped_count": 0,
+          "source_file_count": 3,
+          "status": "observed_partial",
+          "unrouted_count": 0
+        },
+        "syntax_tasks": {
+          "failures": [],
+          "new_blockers": 0,
+          "status": "synced_partial",
+          "tasks": [
+            {
+              "language": "kotlin",
+              "path": "bad.kt",
+              "task_id": "CG-B-57a8f742c3305e57aa54d1b193f1f65d"
+            },
+            {
+              "language": "swift",
+              "path": "bad.swift",
+              "task_id": "CG-B-e3a236c78352145f0c3146ee1e8a7022"
+            },
+            {
+              "language": "kotlin",
+              "path": "unknown.kt",
+              "task_id": "CG-B-25a787d91aada0ac49353ed844805eba"
+            }
+          ]
+        },
+        "unresolved_conditions": [
+          "dialects_not_classified",
+          "required_obligations_unresolved",
+          "source_sets_not_fully_classified",
+          "tool_lock_unverified",
+          "trusted_policy_unavailable"
+        ]
+      },
+      "hook": {
+        "delivery_decision": "not_evaluated",
+        "execution": "local_observation",
+        "host_blocking_verified": false,
+        "local_feedback": {
+          "candidate_recovery_count": 0,
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "native_unwired_files": [
+            "bad.swift"
+          ],
+          "next_action": "require_native_lint_confirmation",
+          "node_lint": {
+            "backlog_status": "not_connected",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "files": [],
+            "new_blockers": 0,
+            "new_findings": 0,
+            "next": null,
+            "reason": "eslint_files_incomplete",
+            "status": "incomplete",
+            "unexecuted_files": []
+          },
+          "python_lint": null,
+          "report_type": "hook_fast_feedback",
+          "requested_paths": [
+            "bad.swift"
+          ],
+          "scan_scope": "selected_files",
+          "schema_version": "0.2.0",
+          "syntax_candidates": {
+            "authority": "candidate_unqualified",
+            "delivery_decision": "incomplete",
+            "execution_phase": "after_native",
+            "native_preferred_count": 0,
+            "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+            "observations": [
+              {
+                "byte_offset": 0,
+                "grammar_qualified": false,
+                "grammar_sha256": "cc77a63b8487956270e2f385e29a03ba0773ba532a3c8a8844a26b4c98793843",
+                "known_limitations": [
+                  "Swift 6.4 native parse rejects missing parameter type in `func f(_ x: ) {}`. The grammar has a hidden MISSING type token; Rust marks zero-record recovery scans incomplete. In the 13-case differential, 12 decidable cases agree and the missing-type case remains unresolved; language versions, systematic precision, native-first lint and release remain unqualified"
+                ],
+                "language": "swift",
+                "path": "bad.swift",
+                "reason": "syntax_recovery_incomplete",
+                "recoveries": [],
+                "recovery_count": 0,
+                "scope": "whole_file",
+                "source_sha256": "6f44da8b1f1db95bf1948aa134b683e1066a0c9ad8941138dc2de09e70958f03",
+                "status": "candidate_observed"
+              }
+            ],
+            "reason": "candidate_unqualified",
+            "skipped_count": 0,
+            "source_file_count": 1,
+            "status": "observed_partial",
+            "unrouted_count": 0
+          },
+          "syntax_tasks": {
+            "failures": [],
+            "new_blockers": 0,
+            "status": "synced_partial",
+            "tasks": [
+              {
+                "language": "swift",
+                "path": "bad.swift",
+                "task_id": "CG-B-e3a236c78352145f0c3146ee1e8a7022"
+              }
+            ]
+          },
+          "unavailable_files": []
+        },
+        "plan": {
+          "action": "fast_file_check",
+          "host_blocking_claimed": false,
+          "may_claim_delivery": false,
+          "requires_git_snapshot": false,
+          "scope_resolution_reason": null,
+          "soft_result_reuse_candidate": true,
+          "target_paths": [
+            "bad.swift"
+          ],
+          "task_id": null
+        },
+        "reason": null,
+        "report_type": "hook_execution_feedback",
+        "schema_version": "0.7.0",
+        "soft_result_reused": false
+      },
+      "next": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "disposition": "needs_decision",
+        "exit_code": 0,
+        "next_actions": [],
+        "operation": "next",
+        "reason": "local_task_selected",
+        "repair_brief": {
+          "action_id": "restore-checker-environment",
+          "affected_paths": [
+            "unknown.kt"
+          ],
+          "authority": "local_unverified",
+          "build_root": ".",
+          "checker_id": "syntax.native_confirmation",
+          "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+          "constraints": [
+            "先恢复检查完整性",
+            "不得关闭检查器或修改无关源码"
+          ],
+          "disposition": "needs_decision",
+          "evidence_ref": {
+            "first_report_sha256": "44b9843f31f5715f1ce2471d34b38085caf4a8624e7b1e4c57e1803a238cd3ae",
+            "first_run_id": "syntax-confirm-366-1791103827641043000"
+          },
+          "history": {
+            "attempt_count": 0,
+            "awaiting_verification": false,
+            "budget": 2,
+            "no_progress_count": 0,
+            "open_attempt_id": null,
+            "recent": []
+          },
+          "kind": "blocker",
+          "reason_code": "native_syntax_confirmation_needed",
+          "recheck_argv": [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-25a787d91aada0ac49353ed844805eba",
+            ".",
+            "--format",
+            "json"
+          ],
+          "schema_version": "0.3.0",
+          "scope": "unknown.kt",
+          "step": "固定 grammar 的恢复扫描未完成或错误无法定位；核对语言版本、grammar 限制并恢复适用原生 lint/编译器或提出具体能力决策。原生确认前不得修改源码，不虚构错误位置，不凭零恢复关闭任务",
+          "task_id": "CG-B-25a787d91aada0ac49353ed844805eba"
+        },
+        "report_type": "repair_brief_preview",
+        "schema_version": "0.3.0"
+      },
+      "task_show": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "event_chain_status": "unverified",
+        "evidence_freshness": "unverified",
+        "exit_code": 0,
+        "next_actions": [
+          [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-e3a236c78352145f0c3146ee1e8a7022",
+            "."
+          ]
+        ],
+        "operation": "task_show",
+        "report_type": "task_show_preview",
+        "request_id": "view-5651-1791103847958615000",
+        "schema_version": "0.1.0",
+        "state": "open",
+        "task": {
+          "action_id": "restore-checker-environment",
+          "affected_paths": [
+            "bad.swift"
+          ],
+          "authority": "local_unverified",
+          "build_root": ".",
+          "checker_id": "syntax.native_confirmation",
+          "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+          "constraints": [
+            "先恢复检查完整性",
+            "不得关闭检查器或修改无关源码"
+          ],
+          "disposition": "needs_decision",
+          "evidence_ref": {
+            "first_report_sha256": "ddb9f47a8db572a456e7752fc425b46b74f06a8d0e232538ea644c3bd549ad93",
+            "first_run_id": "syntax-confirm-366-1791103827594107000"
+          },
+          "history": {
+            "attempt_count": 0,
+            "awaiting_verification": false,
+            "budget": 2,
+            "no_progress_count": 0,
+            "open_attempt_id": null,
+            "recent": []
+          },
+          "kind": "blocker",
+          "reason_code": "native_syntax_confirmation_needed",
+          "recheck_argv": [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-e3a236c78352145f0c3146ee1e8a7022",
+            ".",
+            "--format",
+            "json"
+          ],
+          "schema_version": "0.3.0",
+          "scope": "bad.swift",
+          "step": "固定 grammar 的恢复扫描未完成或错误无法定位；核对语言版本、grammar 限制并恢复适用原生 lint/编译器或提出具体能力决策。原生确认前不得修改源码，不虚构错误位置，不凭零恢复关闭任务",
+          "task_id": "CG-B-e3a236c78352145f0c3146ee1e8a7022"
+        },
+        "task_id": "CG-B-e3a236c78352145f0c3146ee1e8a7022"
+      },
+      "task_verify": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "delivery_decision": "not_evaluated",
+        "event_persisted": true,
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "source": "builtin_default",
+          "timeout_ms": 1800000
+        },
+        "exit_code": 3,
+        "kind": "blocker",
+        "native_scan": {
+          "authority": "local_unverified",
+          "checker_id": "syntax.native_confirmation",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "input_stable": true,
+          "native": {
+            "diagnostics": [],
+            "reason": "native_syntax_confirmation_adapter_unavailable",
+            "status": "not_run",
+            "tool_sha256": null,
+            "version": null
+          },
+          "operation": "task_verify",
+          "original_report": {
+            "grammar_sha256": "cc77a63b8487956270e2f385e29a03ba0773ba532a3c8a8844a26b4c98793843",
+            "run_id": "syntax-confirm-366-1791103827594107000",
+            "sha256": "ddb9f47a8db572a456e7752fc425b46b74f06a8d0e232538ea644c3bd549ad93",
+            "source_sha256": "6f44da8b1f1db95bf1948aa134b683e1066a0c9ad8941138dc2de09e70958f03"
+          },
+          "report_type": "syntax_task_recheck",
+          "run_id": "syntax-native-5652-1791103850698425000",
+          "schema_version": "0.1.0",
+          "target": {
+            "language": "swift",
+            "path": "bad.swift",
+            "source_sha256": "6f44da8b1f1db95bf1948aa134b683e1066a0c9ad8941138dc2de09e70958f03"
+          },
+          "task_id": "CG-B-e3a236c78352145f0c3146ee1e8a7022",
+          "tool_path": null,
+          "workspace_binding": "bound",
+          "workspace_id": "ws-b6c45859146b9e3e4e704b954ffc5d3f"
+        },
+        "next_actions": [
+          "inspect_native_syntax_observation",
+          "repair_only_current_native_diagnostics",
+          "verify_policy_and_capability_before_closure"
+        ],
+        "observation": "incomplete",
+        "operation": "task_verify",
+        "reason": null,
+        "report_type": "task_verification_preview",
+        "schema_version": "0.12.0",
+        "task_id": "CG-B-e3a236c78352145f0c3146ee1e8a7022"
+      },
+      "context": {
+        "hookSpecificOutput": {
+          "additionalContext": "CodeGuard：bad.swift 局部检查反馈：原生诊断 0 项；规则 ；WASM 候选 1 项、疑似恢复节点 0 项、恢复扫描未完成 1 项；不可检查文件 0 项、原生快检未接线 1 项。必须准备或修复适用的原生 lint/编译器，再确认疑似问题或恢复未完成检查；不要仅凭候选结果修改源码。原生确认任务 CG-B-e3a236c78352145f0c3146ee1e8a7022：codeguard task show CG-B-e3a236c78352145f0c3146ee1e8a7022 . --format=json；完成原生确认后 codeguard task verify CG-B-e3a236c78352145f0c3146ee1e8a7022 . --format=json。候选语法能力尚未完整验收，完整项目与交付未评估。",
+          "hookEventName": "PostToolUse"
+        },
+        "systemMessage": "CodeGuard 局部检查反馈"
+      },
+      "clean_hook": {
+        "delivery_decision": "not_evaluated",
+        "execution": "local_observation",
+        "host_blocking_verified": false,
+        "local_feedback": {
+          "candidate_recovery_count": 0,
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "native_unwired_files": [
+            "bad.swift"
+          ],
+          "next_action": "recommend_native_lint",
+          "node_lint": {
+            "backlog_status": "not_connected",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "files": [],
+            "new_blockers": 0,
+            "new_findings": 0,
+            "next": null,
+            "reason": "eslint_files_incomplete",
+            "status": "incomplete",
+            "unexecuted_files": []
+          },
+          "python_lint": null,
+          "report_type": "hook_fast_feedback",
+          "requested_paths": [
+            "bad.swift"
+          ],
+          "scan_scope": "selected_files",
+          "schema_version": "0.2.0",
+          "syntax_candidates": {
+            "authority": "candidate_unqualified",
+            "delivery_decision": "incomplete",
+            "execution_phase": "after_native",
+            "native_preferred_count": 0,
+            "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+            "observations": [
+              {
+                "byte_offset": 0,
+                "grammar_qualified": false,
+                "grammar_sha256": "cc77a63b8487956270e2f385e29a03ba0773ba532a3c8a8844a26b4c98793843",
+                "known_limitations": [
+                  "Swift 6.4 native parse rejects missing parameter type in `func f(_ x: ) {}`. The grammar has a hidden MISSING type token; Rust marks zero-record recovery scans incomplete. In the 13-case differential, 12 decidable cases agree and the missing-type case remains unresolved; language versions, systematic precision, native-first lint and release remain unqualified"
+                ],
+                "language": "swift",
+                "path": "bad.swift",
+                "reason": null,
+                "recoveries": [],
+                "recovery_count": 0,
+                "scope": "whole_file",
+                "source_sha256": "c8b5c7f8d1396e03d98a7704dcfe46b69f6aae0f9504c5eb838fbcba58cd3ab8",
+                "status": "candidate_observed"
+              }
+            ],
+            "reason": "candidate_unqualified",
+            "skipped_count": 0,
+            "source_file_count": 1,
+            "status": "observed_partial",
+            "unrouted_count": 0
+          },
+          "syntax_tasks": {
+            "failures": [],
+            "new_blockers": 0,
+            "status": "synced_partial",
+            "tasks": []
+          },
+          "unavailable_files": []
+        },
+        "plan": {
+          "action": "fast_file_check",
+          "host_blocking_claimed": false,
+          "may_claim_delivery": false,
+          "requires_git_snapshot": false,
+          "scope_resolution_reason": null,
+          "soft_result_reuse_candidate": true,
+          "target_paths": [
+            "bad.swift"
+          ],
+          "task_id": null
+        },
+        "reason": null,
+        "report_type": "hook_execution_feedback",
+        "schema_version": "0.7.0",
+        "soft_result_reused": false
+      },
+      "visible_hook": {
+        "delivery_decision": "not_evaluated",
+        "execution": "local_observation",
+        "host_blocking_verified": false,
+        "local_feedback": {
+          "candidate_recovery_count": 1,
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "native_unwired_files": [
+            "bad.swift"
+          ],
+          "next_action": "require_native_lint_confirmation",
+          "node_lint": {
+            "backlog_status": "not_connected",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "files": [],
+            "new_blockers": 0,
+            "new_findings": 0,
+            "next": null,
+            "reason": "eslint_files_incomplete",
+            "status": "incomplete",
+            "unexecuted_files": []
+          },
+          "python_lint": null,
+          "report_type": "hook_fast_feedback",
+          "requested_paths": [
+            "bad.swift"
+          ],
+          "scan_scope": "selected_files",
+          "schema_version": "0.2.0",
+          "syntax_candidates": {
+            "authority": "candidate_unqualified",
+            "delivery_decision": "incomplete",
+            "execution_phase": "after_native",
+            "native_preferred_count": 0,
+            "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+            "observations": [
+              {
+                "byte_offset": 0,
+                "grammar_qualified": false,
+                "grammar_sha256": "cc77a63b8487956270e2f385e29a03ba0773ba532a3c8a8844a26b4c98793843",
+                "known_limitations": [
+                  "Swift 6.4 native parse rejects missing parameter type in `func f(_ x: ) {}`. The grammar has a hidden MISSING type token; Rust marks zero-record recovery scans incomplete. In the 13-case differential, 12 decidable cases agree and the missing-type case remains unresolved; language versions, systematic precision, native-first lint and release remain unqualified"
+                ],
+                "language": "swift",
+                "path": "bad.swift",
+                "reason": null,
+                "recoveries": [
+                  {
+                    "end_byte": 11,
+                    "end_column_byte": 0,
+                    "end_row": 1,
+                    "kind": "ERROR",
+                    "start_byte": 0,
+                    "start_column_byte": 0,
+                    "start_row": 0,
+                    "syntax_kind": "ERROR"
+                  }
+                ],
+                "recovery_count": 1,
+                "scope": "whole_file",
+                "source_sha256": "09830c8060e72b4f08e8b4d1f98dacde74c53625b5eb9d1c702dbaeb5f4dba56",
+                "status": "candidate_observed"
+              }
+            ],
+            "reason": "candidate_unqualified",
+            "skipped_count": 0,
+            "source_file_count": 1,
+            "status": "observed_partial",
+            "unrouted_count": 0
+          },
+          "syntax_tasks": {
+            "failures": [],
+            "new_blockers": 0,
+            "status": "synced_partial",
+            "tasks": [
+              {
+                "language": "swift",
+                "path": "bad.swift",
+                "task_id": "CG-B-e3a236c78352145f0c3146ee1e8a7022"
+              }
+            ]
+          },
+          "unavailable_files": []
+        },
+        "plan": {
+          "action": "fast_file_check",
+          "host_blocking_claimed": false,
+          "may_claim_delivery": false,
+          "requires_git_snapshot": false,
+          "scope_resolution_reason": null,
+          "soft_result_reuse_candidate": true,
+          "target_paths": [
+            "bad.swift"
+          ],
+          "task_id": null
+        },
+        "reason": null,
+        "report_type": "hook_execution_feedback",
+        "schema_version": "0.7.0",
+        "soft_result_reused": false
+      },
+      "task_markdown": "# CG-B-e3a236c78352145f0c3146ee1e8a7022 语法检查能力恢复任务\n\n- 问题证据：范围 `bad.swift`；报告 `.codeguard/reports/syntax-confirm-366-1791103827594107000.json`，摘要 `ddb9f47a8db572a456e7752fc425b46b74f06a8d0e232538ea644c3bd549ad93`；固定 grammar 的恢复扫描未完成或错误无法定位，恢复节点数组为空；报告保留源码和 grammar 身份，没有可用的源码错误位置。\n- 规则依据：初检完整性与原生确认要求；零恢复不能代表语法通过，本任务不是已确认源码违规。\n- 允许修改范围：适用检查工具、语言版本和 grammar 配置；原生确认前不得修改源码，不关闭检查器，不伪造定位。\n- 修复步骤：核对原报告的语言、版本与已知限制，恢复适用原生 lint/编译器或调查 grammar；确认 adapter 缺失时提出具体能力决策，不重复无依据的源码修补。\n- 复检命令：codeguard task verify CG-B-e3a236c78352145f0c3146ee1e8a7022 . --format=json；codeguard next . --format=json 显示当前能力缺口，恢复检查后再对同一范围复扫。\n- 历史尝试：首次 run syntax-confirm-366-1791103827594107000；后续扫描和失败尝试保留在同一任务，正文不代表完整历史。\n- 关闭条件：同一源码范围的有效原生确认、完整覆盖及既有关闭策略均满足；安装、WASM 零恢复或勾选均不能关闭。\n",
+      "human_show": {
+        "exit_code": 0,
+        "stdout": "任务 CG-B-e3a236c78352145f0c3146ee1e8a7022：\"verification_required\"；范围 \"bad.swift\"；步骤 \"源码或原生工具在语法复检后已变化；先运行当前输入的原生确认，不沿用旧修复或零诊断\"；复检 [\"codeguard\",\"task\",\"verify\",\"CG-B-e3a236c78352145f0c3146ee1e8a7022\",\".\",\"--format\",\"json\"]。正式门禁未评估。\n"
+      },
+      "open_fact_after_clean": {
+        "authority": "local_unverified",
+        "build_root": ".",
+        "checker_id": "syntax.native_confirmation",
+        "delivery_decision": "not_evaluated",
+        "fingerprint": "e3a236c78352145f0c3146ee1e8a702298a76c7b44cc5d0ada63d72d7e001bdf",
+        "first_affected_paths": [
+          "bad.swift"
+        ],
+        "first_diagnostic_reason": "syntax_recovery_incomplete",
+        "first_report_sha256": "ddb9f47a8db572a456e7752fc425b46b74f06a8d0e232538ea644c3bd549ad93",
+        "first_run_id": "syntax-confirm-366-1791103827594107000",
+        "id": "CG-B-e3a236c78352145f0c3146ee1e8a7022",
+        "kind": "blocker",
+        "reason_code": "native_syntax_confirmation_needed",
+        "schema_version": "0.1.0",
+        "scope": "bad.swift",
+        "state": "open",
+        "workspace_id": "ws-b6c45859146b9e3e4e704b954ffc5d3f"
+      }
+    },
+    {
+      "label": "aggregate_persistence_failure",
+      "check": {
+        "authority": "local_unverified",
+        "category_candidates": [
+          {
+            "capability_status": "gap",
+            "category": "lint",
+            "checker_id": null,
+            "language": "swift",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "comments",
+            "checker_id": null,
+            "language": "swift",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "dependencies",
+            "checker_id": null,
+            "language": "swift",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "cve",
+            "checker_id": null,
+            "language": "swift",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "security",
+            "checker_id": null,
+            "language": "swift",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "build",
+            "checker_id": null,
+            "language": "swift",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          }
+        ],
+        "command_status": "incomplete",
+        "delivery_decision": "incomplete",
+        "discovery": {
+          "blocked_paths": [],
+          "build_roots": [],
+          "checker_configurations": [],
+          "declared_versions": {},
+          "languages": [
+            {
+              "id": "swift",
+              "manifests": [],
+              "source_files": [
+                "bad.swift"
+              ]
+            }
+          ],
+          "lockfiles": [],
+          "manifest_sha256": {},
+          "native_tool_candidates": [],
+          "observation_complete": true,
+          "observed_entries": 2,
+          "report_type": "discovery",
+          "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-unlocated-capture-nv6hxs4_/unwritable",
+          "schema_version": "0.4.0",
+          "scope_summary": {
+            "configuration_exception_files_observed": 0,
+            "dependency_roots_excluded": 0,
+            "dot_prefix_roots_excluded": 1,
+            "git_safety_status": "not_evaluated",
+            "ordinary_scan_policy": "project_sources_default_v2"
+          },
+          "source_set_candidates": [],
+          "unknown_conditions": [
+            "source_sets_not_fully_classified",
+            "dialects_not_classified"
+          ]
+        },
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "jobs_limit": 4,
+          "jobs_source": "builtin_default",
+          "native_task_count": 0,
+          "source": "cli",
+          "started_native_task_count": 0,
+          "timeout_ms": 30000
+        },
+        "execution_tasks": [],
+        "exit_code": 3,
+        "export": {
+          "reason_code": null,
+          "status": "not_requested"
+        },
+        "native_results": {
+          "erlang_lint": null,
+          "go_lint": null,
+          "java_cve": null,
+          "java_dependencies": null,
+          "java_javadoc": null,
+          "java_p3c": null,
+          "node_lint": null,
+          "npm_cve": [],
+          "python_cve": [],
+          "python_lint": null,
+          "rust_build": null,
+          "rust_comments": null,
+          "rust_cve": null,
+          "rust_lint": null
+        },
+        "next": null,
+        "obligation_status": "unresolved",
+        "operation": "check",
+        "reason": "full_project_obligations_and_trusted_policy_unavailable",
+        "report_type": "check_feedback",
+        "required_obligations": null,
+        "schema_version": "0.38.0",
+        "selection": "all",
+        "syntax_candidates": {
+          "authority": "candidate_unqualified",
+          "delivery_decision": "incomplete",
+          "execution_phase": "after_native",
+          "native_preferred_count": 0,
+          "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+          "observations": [
+            {
+              "byte_offset": 0,
+              "grammar_qualified": false,
+              "grammar_sha256": "cc77a63b8487956270e2f385e29a03ba0773ba532a3c8a8844a26b4c98793843",
+              "known_limitations": [
+                "Swift 6.4 native parse rejects missing parameter type in `func f(_ x: ) {}`. The grammar has a hidden MISSING type token; Rust marks zero-record recovery scans incomplete. In the 13-case differential, 12 decidable cases agree and the missing-type case remains unresolved; language versions, systematic precision, native-first lint and release remain unqualified"
+              ],
+              "language": "swift",
+              "path": "bad.swift",
+              "reason": "syntax_recovery_incomplete",
+              "recoveries": [],
+              "recovery_count": 0,
+              "scope": "whole_file",
+              "source_sha256": "6f44da8b1f1db95bf1948aa134b683e1066a0c9ad8941138dc2de09e70958f03",
+              "status": "candidate_observed"
+            }
+          ],
+          "reason": "candidate_unqualified",
+          "skipped_count": 0,
+          "source_file_count": 1,
+          "status": "observed_partial",
+          "unrouted_count": 0
+        },
+        "syntax_tasks": {
+          "failures": [
+            {
+              "language": "swift",
+              "path": "bad.swift",
+              "reason": "reports_directory_unavailable"
+            }
+          ],
+          "new_blockers": 0,
+          "status": "incomplete",
+          "tasks": []
+        },
+        "unresolved_conditions": [
+          "dialects_not_classified",
+          "required_obligations_unresolved",
+          "source_sets_not_fully_classified",
+          "syntax_task_sync_incomplete",
+          "tool_lock_unverified",
+          "trusted_policy_unavailable"
+        ]
+      }
+    }
+  ],
+  "confirmation_reports": [
+    {
+      "affected_paths": [
+        "bad.kt"
+      ],
+      "authority": "local_unverified",
+      "blocker_id": "CG-B-57a8f742c3305e57aa54d1b193f1f65d",
+      "build_root": ".",
+      "checker_id": "syntax.native_confirmation",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "execution": "incomplete",
+      "fingerprint": "57a8f742c3305e57aa54d1b193f1f65d6683e324b88f7e9089c1f976d17deb6b",
+      "language": "kotlin",
+      "observations": [
+        {
+          "byte_offset": 0,
+          "grammar_qualified": false,
+          "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+          "known_limitations": [
+            "Kotlin 2.4.10 native compiler rejects missing parameter type in `fun f(x: ) = x`. Hidden MISSING tokens also occur in valid `object C { val value = 1 }`; Rust marks both zero-record scans incomplete. Eleven decidable cases agree with native labels and two remain unresolved. Zero recoveries cannot establish valid Kotlin syntax",
+            "Other Kotlin versions, dialects, public native-first lint route, resource budget and release remain unqualified"
+          ],
+          "language": "kotlin",
+          "path": "bad.kt",
+          "reason": "syntax_recovery_incomplete",
+          "recoveries": [],
+          "recovery_count": 0,
+          "scope": "whole_file",
+          "source_sha256": "87fbb71a8f650a302ff4bdf216bc8a9835350f3b864b2b1c6a0d0fe5f3cdf9b5",
+          "status": "candidate_observed"
+        }
+      ],
+      "reason_code": "native_syntax_confirmation_needed",
+      "report_type": "syntax_confirmation_observation",
+      "run_id": "syntax-confirm-1930-1791103833179680000",
+      "schema_version": "0.3.0",
+      "scope": "bad.kt",
+      "workspace_binding": "bound",
+      "workspace_id": "ws-b6c45859146b9e3e4e704b954ffc5d3f"
+    },
+    {
+      "affected_paths": [
+        "bad.swift"
+      ],
+      "authority": "local_unverified",
+      "blocker_id": "CG-B-e3a236c78352145f0c3146ee1e8a7022",
+      "build_root": ".",
+      "checker_id": "syntax.native_confirmation",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "execution": "incomplete",
+      "fingerprint": "e3a236c78352145f0c3146ee1e8a702298a76c7b44cc5d0ada63d72d7e001bdf",
+      "language": "swift",
+      "observations": [
+        {
+          "byte_offset": 0,
+          "grammar_qualified": false,
+          "grammar_sha256": "cc77a63b8487956270e2f385e29a03ba0773ba532a3c8a8844a26b4c98793843",
+          "known_limitations": [
+            "Swift 6.4 native parse rejects missing parameter type in `func f(_ x: ) {}`. The grammar has a hidden MISSING type token; Rust marks zero-record recovery scans incomplete. In the 13-case differential, 12 decidable cases agree and the missing-type case remains unresolved; language versions, systematic precision, native-first lint and release remain unqualified"
+          ],
+          "language": "swift",
+          "path": "bad.swift",
+          "reason": "syntax_recovery_incomplete",
+          "recoveries": [],
+          "recovery_count": 0,
+          "scope": "whole_file",
+          "source_sha256": "6f44da8b1f1db95bf1948aa134b683e1066a0c9ad8941138dc2de09e70958f03",
+          "status": "candidate_observed"
+        }
+      ],
+      "reason_code": "native_syntax_confirmation_needed",
+      "report_type": "syntax_confirmation_observation",
+      "run_id": "syntax-confirm-1930-1791103835933688000",
+      "schema_version": "0.3.0",
+      "scope": "bad.swift",
+      "workspace_binding": "bound",
+      "workspace_id": "ws-b6c45859146b9e3e4e704b954ffc5d3f"
+    },
+    {
+      "affected_paths": [
+        "unknown.kt"
+      ],
+      "authority": "local_unverified",
+      "blocker_id": "CG-B-25a787d91aada0ac49353ed844805eba",
+      "build_root": ".",
+      "checker_id": "syntax.native_confirmation",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "execution": "incomplete",
+      "fingerprint": "25a787d91aada0ac49353ed844805eba4f09e7bbdc0e2a92b27c42c707f7550b",
+      "language": "kotlin",
+      "observations": [
+        {
+          "byte_offset": 0,
+          "grammar_qualified": false,
+          "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+          "known_limitations": [
+            "Kotlin 2.4.10 native compiler rejects missing parameter type in `fun f(x: ) = x`. Hidden MISSING tokens also occur in valid `object C { val value = 1 }`; Rust marks both zero-record scans incomplete. Eleven decidable cases agree with native labels and two remain unresolved. Zero recoveries cannot establish valid Kotlin syntax",
+            "Other Kotlin versions, dialects, public native-first lint route, resource budget and release remain unqualified"
+          ],
+          "language": "kotlin",
+          "path": "unknown.kt",
+          "reason": "syntax_recovery_incomplete",
+          "recoveries": [],
+          "recovery_count": 0,
+          "scope": "whole_file",
+          "source_sha256": "9a40dcd89c137534d57763addbb8d45368fed76bd046c5198c4fd3a016e6414a",
+          "status": "candidate_observed"
+        }
+      ],
+      "reason_code": "native_syntax_confirmation_needed",
+      "report_type": "syntax_confirmation_observation",
+      "run_id": "syntax-confirm-1930-1791103835955543000",
+      "schema_version": "0.3.0",
+      "scope": "unknown.kt",
+      "workspace_binding": "bound",
+      "workspace_id": "ws-b6c45859146b9e3e4e704b954ffc5d3f"
+    },
+    {
+      "affected_paths": [
+        "bad.swift"
+      ],
+      "authority": "local_unverified",
+      "blocker_id": "CG-B-e3a236c78352145f0c3146ee1e8a7022",
+      "build_root": ".",
+      "checker_id": "syntax.native_confirmation",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "execution": "incomplete",
+      "fingerprint": "e3a236c78352145f0c3146ee1e8a702298a76c7b44cc5d0ada63d72d7e001bdf",
+      "language": "swift",
+      "observations": [
+        {
+          "byte_offset": 0,
+          "grammar_qualified": false,
+          "grammar_sha256": "cc77a63b8487956270e2f385e29a03ba0773ba532a3c8a8844a26b4c98793843",
+          "known_limitations": [
+            "Swift 6.4 native parse rejects missing parameter type in `func f(_ x: ) {}`. The grammar has a hidden MISSING type token; Rust marks zero-record recovery scans incomplete. In the 13-case differential, 12 decidable cases agree and the missing-type case remains unresolved; language versions, systematic precision, native-first lint and release remain unqualified"
+          ],
+          "language": "swift",
+          "path": "bad.swift",
+          "reason": "syntax_recovery_incomplete",
+          "recoveries": [],
+          "recovery_count": 0,
+          "scope": "whole_file",
+          "source_sha256": "6f44da8b1f1db95bf1948aa134b683e1066a0c9ad8941138dc2de09e70958f03",
+          "status": "candidate_observed"
+        }
+      ],
+      "reason_code": "native_syntax_confirmation_needed",
+      "report_type": "syntax_confirmation_observation",
+      "run_id": "syntax-confirm-2775-1791103839745187000",
+      "schema_version": "0.3.0",
+      "scope": "bad.swift",
+      "workspace_binding": "bound",
+      "workspace_id": "ws-b6c45859146b9e3e4e704b954ffc5d3f"
+    },
+    {
+      "affected_paths": [
+        "bad.kt"
+      ],
+      "authority": "local_unverified",
+      "blocker_id": "CG-B-57a8f742c3305e57aa54d1b193f1f65d",
+      "build_root": ".",
+      "checker_id": "syntax.native_confirmation",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "execution": "incomplete",
+      "fingerprint": "57a8f742c3305e57aa54d1b193f1f65d6683e324b88f7e9089c1f976d17deb6b",
+      "language": "kotlin",
+      "observations": [
+        {
+          "byte_offset": 0,
+          "grammar_qualified": false,
+          "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+          "known_limitations": [
+            "Kotlin 2.4.10 native compiler rejects missing parameter type in `fun f(x: ) = x`. Hidden MISSING tokens also occur in valid `object C { val value = 1 }`; Rust marks both zero-record scans incomplete. Eleven decidable cases agree with native labels and two remain unresolved. Zero recoveries cannot establish valid Kotlin syntax",
+            "Other Kotlin versions, dialects, public native-first lint route, resource budget and release remain unqualified"
+          ],
+          "language": "kotlin",
+          "path": "bad.kt",
+          "reason": "syntax_recovery_incomplete",
+          "recoveries": [],
+          "recovery_count": 0,
+          "scope": "whole_file",
+          "source_sha256": "87fbb71a8f650a302ff4bdf216bc8a9835350f3b864b2b1c6a0d0fe5f3cdf9b5",
+          "status": "candidate_observed"
+        }
+      ],
+      "reason_code": "native_syntax_confirmation_needed",
+      "report_type": "syntax_confirmation_observation",
+      "run_id": "syntax-confirm-366-1791103824772035000",
+      "schema_version": "0.3.0",
+      "scope": "bad.kt",
+      "workspace_binding": "bound",
+      "workspace_id": "ws-b6c45859146b9e3e4e704b954ffc5d3f"
+    },
+    {
+      "affected_paths": [
+        "bad.swift"
+      ],
+      "authority": "local_unverified",
+      "blocker_id": "CG-B-e3a236c78352145f0c3146ee1e8a7022",
+      "build_root": ".",
+      "checker_id": "syntax.native_confirmation",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "execution": "incomplete",
+      "fingerprint": "e3a236c78352145f0c3146ee1e8a702298a76c7b44cc5d0ada63d72d7e001bdf",
+      "language": "swift",
+      "observations": [
+        {
+          "byte_offset": 0,
+          "grammar_qualified": false,
+          "grammar_sha256": "cc77a63b8487956270e2f385e29a03ba0773ba532a3c8a8844a26b4c98793843",
+          "known_limitations": [
+            "Swift 6.4 native parse rejects missing parameter type in `func f(_ x: ) {}`. The grammar has a hidden MISSING type token; Rust marks zero-record recovery scans incomplete. In the 13-case differential, 12 decidable cases agree and the missing-type case remains unresolved; language versions, systematic precision, native-first lint and release remain unqualified"
+          ],
+          "language": "swift",
+          "path": "bad.swift",
+          "reason": "syntax_recovery_incomplete",
+          "recoveries": [],
+          "recovery_count": 0,
+          "scope": "whole_file",
+          "source_sha256": "6f44da8b1f1db95bf1948aa134b683e1066a0c9ad8941138dc2de09e70958f03",
+          "status": "candidate_observed"
+        }
+      ],
+      "reason_code": "native_syntax_confirmation_needed",
+      "report_type": "syntax_confirmation_observation",
+      "run_id": "syntax-confirm-366-1791103827594107000",
+      "schema_version": "0.3.0",
+      "scope": "bad.swift",
+      "workspace_binding": "bound",
+      "workspace_id": "ws-b6c45859146b9e3e4e704b954ffc5d3f"
+    },
+    {
+      "affected_paths": [
+        "unknown.kt"
+      ],
+      "authority": "local_unverified",
+      "blocker_id": "CG-B-25a787d91aada0ac49353ed844805eba",
+      "build_root": ".",
+      "checker_id": "syntax.native_confirmation",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "execution": "incomplete",
+      "fingerprint": "25a787d91aada0ac49353ed844805eba4f09e7bbdc0e2a92b27c42c707f7550b",
+      "language": "kotlin",
+      "observations": [
+        {
+          "byte_offset": 0,
+          "grammar_qualified": false,
+          "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+          "known_limitations": [
+            "Kotlin 2.4.10 native compiler rejects missing parameter type in `fun f(x: ) = x`. Hidden MISSING tokens also occur in valid `object C { val value = 1 }`; Rust marks both zero-record scans incomplete. Eleven decidable cases agree with native labels and two remain unresolved. Zero recoveries cannot establish valid Kotlin syntax",
+            "Other Kotlin versions, dialects, public native-first lint route, resource budget and release remain unqualified"
+          ],
+          "language": "kotlin",
+          "path": "unknown.kt",
+          "reason": "syntax_recovery_incomplete",
+          "recoveries": [],
+          "recovery_count": 0,
+          "scope": "whole_file",
+          "source_sha256": "9a40dcd89c137534d57763addbb8d45368fed76bd046c5198c4fd3a016e6414a",
+          "status": "candidate_observed"
+        }
+      ],
+      "reason_code": "native_syntax_confirmation_needed",
+      "report_type": "syntax_confirmation_observation",
+      "run_id": "syntax-confirm-366-1791103827641043000",
+      "schema_version": "0.3.0",
+      "scope": "unknown.kt",
+      "workspace_binding": "bound",
+      "workspace_id": "ws-b6c45859146b9e3e4e704b954ffc5d3f"
+    }
+  ],
+  "native_swift_observation": {
+    "compiler_path": "/usr/bin/swiftc",
+    "compiler_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+    "version": "Apple Swift version 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)\nTarget: arm64-apple-macosx27.0.0\n",
+    "invalid": {
+      "source": "func f(_ x: ) {}\n",
+      "exit_code": 1,
+      "stderr": "/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-unlocated-capture-nv6hxs4_/observed/bad.swift:1:13: error: expected parameter type following ':'\n1 | func f(_ x: ) {}\n  |             `- error: expected parameter type following ':'\n2 | \n"
+    },
+    "fixed": {
+      "source": "func f(_ x: Int) {}\n",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    "scope": "two single-file parse checks; no type/build or full grammar qualification"
+  }
+}

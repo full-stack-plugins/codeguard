@@ -348,3 +348,10 @@ Rust 实现与本 change 归本仓；宿主实现归独立 codeguard-plugin 仓�
 | BD12 | [binary-distribution](specs/binary-distribution/spec.md) / npm launchers SHALL delegate checks to the matching Rust binary | 13.4.1,14.18 |
 
 2026-10-04：SP07/SP08 与 HP 编辑快检继续由 11.17、14.9–14.11 管理。新增通用候选确认报告复用现有工作台和 Python/ESLint 身份，不创建第二套状态清单；原生能力匹配关闭仍由未完成的 14.11 管理。
+
+
+## 2026-10-04 无定位观察进入检查恢复任务
+
+syntax-precheck的隐藏token场景→9.3/9.9/14.7/14.10/14.11/14.19：check all/java与确认写入Hook共用稳定语法任务同步；check_feedback 0.38及本地确认0.3协议分别保留失败任务范围和无位置未完成证据。实际实现位于syntax_confirmation/check_command/hook_fast_scan，next/work_sync保留检查环境范围及原生确认前不得修改源码，syntax_task_recheck接受原0.3首次证据并记录缺adapter失败。验收与证据：[无定位语法检查恢复](../../../tests/acceptance/unlocated-syntax-recovery-tasks.md)。这些是既有父任务的已验证增量，重命名/跨工具身份、完整attempt、原生adapter和正式关闭/宿主验收仍缺，不新建或勾选第二份任务。
+
+本批终态：默认 workspace/all-targets 1234 passed/0 failed/113 ignored；受影响 WASM 16 组 210 passed/0 failed/30 ignored；默认及 WASM Clippy -D warnings、fmt、分层和 OpenSpec strict 通过。203 schema 元定义、16 份真实报告与 48 个伪造变体通过；新增开发协议回归 4 passed。实际报告揭露聚合 next 仅支持旧简报的 schema 缺口，新的 0.38 已引用完整既有简报版本而非放宽任意对象，旧 schema 字节不改。固定二进制实际捕获任务和复检；Swift 两例原生 parse 对照不提升资格。完整日志摘要及运行限制见[本批验收](../../../tests/acceptance/unlocated-syntax-recovery-tasks.md)。父任务不勾选，未重跑完整 WASM suite/358 例语料，公开发行和真实宿主未改变。

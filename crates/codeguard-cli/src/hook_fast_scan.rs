@@ -71,7 +71,13 @@ pub(crate) fn observe(
         .map(|row| row["recovery_count"].as_u64().unwrap_or(0))
         .sum::<u64>();
     let candidate_count = syntax["observations"].as_array().map_or(0, Vec::len);
-    let next_action = if recoveries > 0 {
+    let next_action = if recoveries > 0
+        || syntax["observations"].as_array().is_some_and(|rows| {
+            rows.iter().any(|row| {
+                row["status"] == "candidate_observed"
+                    && row["reason"] == "syntax_recovery_incomplete"
+            })
+        }) {
         "require_native_lint_confirmation"
     } else if unavailable.is_empty()
         && candidate_count > 0

@@ -117,7 +117,7 @@ pub(crate) fn original(root: &Path, brief: &Value) -> Result<Value, &'static str
     let valid_origin = if report["schema_version"] == "0.2.0" {
         crate::native_syntax_confirmation::valid_history_report(root, &workspace, &report)
     } else {
-        report["schema_version"] == "0.1.0"
+        matches!(report["schema_version"].as_str(), Some("0.1.0" | "0.3.0"))
             && report["language"].as_str().is_some_and(|lang| {
                 codeguard_adapters::bundled_grammar_candidates()
                     .ok()

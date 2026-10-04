@@ -33,6 +33,12 @@ pub(super) fn parse(
             diagnostic_reason: Some(
                 if report["schema_version"] == "0.2.0" {
                     "erlang_native_first_observation"
+                } else if report["observations"].as_array().is_some_and(|rows| {
+                    rows.iter().any(|row| {
+                        row["recovery_count"] == 0 && row["reason"] == "syntax_recovery_incomplete"
+                    })
+                }) {
+                    "syntax_recovery_incomplete"
                 } else if report["checker_id"] == "node.eslint.preparation" {
                     "eslint_syntax_confirmation_needed"
                 } else {

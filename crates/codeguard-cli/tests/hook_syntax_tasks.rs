@@ -307,3 +307,281 @@ fn claude_edit_context_contains_real_confirmation_task_and_bounded_guidance() {
     assert!(context.contains("codeguard task show"));
     assert!(context.chars().count() <= 1200);
 }
+
+#[test]
+fn unlocated_recoveries_become_stable_environment_tasks_without_source_positions() {
+    let p = Project::new("unlocated");
+    fs::remove_file(p.0.join("app.zig")).unwrap();
+    for (path, source) in [
+        ("bad.swift", "func f(_ x: ) {}\n"),
+        ("bad.kt", "fun f(x: ) = x\n"),
+        ("unknown.kt", "object C { val value = 1 }\n"),
+    ] {
+        fs::write(p.0.join(path), source).unwrap();
+    }
+    let paths = ["bad.swift", "bad.kt", "unknown.kt"];
+    let a = p.hook_paths(&paths);
+    let local = &a["local_feedback"];
+    assert_eq!(local["candidate_recovery_count"], 0, "{a}");
+    assert_eq!(local["next_action"], "require_native_lint_confirmation");
+    let tasks = local["syntax_tasks"]["tasks"].as_array().unwrap();
+    assert_eq!(tasks.len(), 3, "{a}");
+    assert_eq!(local["syntax_tasks"]["new_blockers"], 3);
+    let b = p.hook_paths(&paths);
+    assert_eq!(b["local_feedback"]["syntax_tasks"]["tasks"], json!(tasks));
+    assert_eq!(b["local_feedback"]["syntax_tasks"]["new_blockers"], 0);
+    for task in tasks {
+        let id = task["task_id"].as_str().unwrap();
+        let fact: Value = serde_json::from_slice(
+            &fs::read(p.0.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(fact["kind"], "blocker");
+        assert_eq!(
+            fact["first_diagnostic_reason"],
+            "syntax_recovery_incomplete"
+        );
+        assert_eq!(fact["state"], "open");
+        let body = fs::read_to_string(p.0.join(format!(".codeguard/tasks/{id}.md"))).unwrap();
+        for field in [
+            "问题证据",
+            "规则依据",
+            "允许修改范围",
+            "修复步骤",
+            "复检命令",
+            "历史尝试",
+            "关闭条件",
+            "无法定位",
+            "不得修改源码",
+        ] {
+            assert!(body.contains(field), "{field}: {body}");
+        }
+        let show = p
+            .command()
+            .args(["task", "show", id])
+            .arg(&p.0)
+            .arg("--format=json")
+            .output()
+            .unwrap();
+        assert_eq!(show.status.code(), Some(0), "{show:?}");
+        let brief: Value = serde_json::from_slice(&show.stdout).unwrap();
+        let step = brief["task"]["step"].as_str().unwrap();
+        assert!(
+            step.contains("无法定位") && step.contains("不得修改源码"),
+            "{brief}"
+        );
+        assert!(
+            brief["task"]["native_diagnostic_positions"].is_null()
+                || brief["task"]["native_diagnostic_positions"] == json!([])
+        );
+    }
+}
+
+#[test]
+fn unlocated_task_retains_identity_when_a_visible_recovery_later_appears() {
+    let p = Project::new("unlocated-transition");
+    fs::write(p.0.join("bad.swift"), "func f(_ x: ) {}\n").unwrap();
+    let first = p.hook_paths(&["bad.swift"]);
+    let id = first["local_feedback"]["syntax_tasks"]["tasks"][0]["task_id"]
+        .as_str()
+        .expect("unlocated task");
+    let verify = p
+        .command()
+        .args(["task", "verify", id])
+        .arg(&p.0)
+        .arg("--format=json")
+        .output()
+        .unwrap();
+    assert_eq!(verify.status.code(), Some(3));
+    let report: Value = serde_json::from_slice(&verify.stdout).unwrap();
+    assert_eq!(
+        report["native_scan"]["native"]["reason"], "native_syntax_confirmation_adapter_unavailable",
+        "{report}"
+    );
+    assert_eq!(report["observation"], "incomplete", "{report}");
+    fs::write(p.0.join("bad.swift"), "func f() {\n").unwrap();
+    let visible = p.hook_paths(&["bad.swift"]);
+    assert!(
+        visible["local_feedback"]["candidate_recovery_count"]
+            .as_u64()
+            .unwrap()
+            > 0
+    );
+    assert_eq!(
+        visible["local_feedback"]["syntax_tasks"]["tasks"][0]["task_id"],
+        id
+    );
+    assert_eq!(visible["local_feedback"]["syntax_tasks"]["new_blockers"], 0);
+    fs::write(p.0.join("bad.swift"), "func f(_ x: Int) {}\n").unwrap();
+    let clean = p.hook_paths(&["bad.swift"]);
+    assert_eq!(
+        clean["local_feedback"]["next_action"],
+        "recommend_native_lint"
+    );
+    assert_eq!(clean["local_feedback"]["syntax_tasks"]["tasks"], json!([]));
+    let fact: Value = serde_json::from_slice(
+        &fs::read(p.0.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(fact["state"], "open");
+}
+
+#[test]
+fn unlocated_import_rejects_clean_zero_counts_and_forged_identity() {
+    let p = Project::new("unlocated-forged");
+    fs::write(p.0.join("bad.swift"), "func f(_ x: ) {}\n").unwrap();
+    let first = p.hook_paths(&["bad.swift"]);
+    let id = first["local_feedback"]["syntax_tasks"]["tasks"][0]["task_id"]
+        .as_str()
+        .expect("unlocated task");
+    let dir = p.0.join(".codeguard/reports");
+    let original = fs::read_dir(&dir)
+        .unwrap()
+        .map(|e| e.unwrap().path())
+        .find(|p| {
+            p.file_name()
+                .unwrap()
+                .to_string_lossy()
+                .starts_with("syntax-confirm-")
+        })
+        .unwrap();
+    let base: Value = serde_json::from_slice(&fs::read(original).unwrap()).unwrap();
+    assert_eq!(base["schema_version"], "0.3.0");
+    for (i, (pointer, value)) in [
+        ("/observations/0/reason", Value::Null),
+        ("/schema_version", json!("0.1.0")),
+        ("/schema_version", json!("9.0.0")),
+        ("/observations/0/source_sha256", json!("0".repeat(64))),
+        ("/observations/0/grammar_sha256", json!("0".repeat(64))),
+        ("/observations/0/grammar_qualified", json!(true)),
+        ("/observations/0/recovery_count", json!(1)),
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        let mut fake = base.clone();
+        let run = format!("syntax-confirm-1-{}", i + 1);
+        fake["run_id"] = json!(run);
+        *fake.pointer_mut(pointer).unwrap() = value;
+        fs::write(dir.join(format!("{run}.json")), fake.to_string()).unwrap();
+    }
+    let output = p
+        .command()
+        .args(["work", "sync"])
+        .arg(&p.0)
+        .arg("--format=json")
+        .output()
+        .unwrap();
+    let result: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(result["failed_reports"], 7, "{result}");
+    assert_eq!(result["new_blockers"], 0);
+    assert_eq!(
+        fs::read_dir(p.0.join(format!(".codeguard/findings/{id}/events")))
+            .unwrap()
+            .count(),
+        1
+    );
+}
+
+#[test]
+fn unlocated_persistence_failure_retains_observation_without_fake_task() {
+    let p = Project::new("unlocated-save");
+    fs::write(p.0.join("bad.swift"), "func f(_ x: ) {}\n").unwrap();
+    fs::remove_dir(p.0.join(".codeguard/reports")).unwrap();
+    fs::write(p.0.join(".codeguard/reports"), "occupied").unwrap();
+    let result = p.hook_paths(&["bad.swift"]);
+    assert_eq!(
+        result["local_feedback"]["syntax_candidates"]["observations"][0]["reason"],
+        "syntax_recovery_incomplete"
+    );
+    assert_eq!(
+        result["local_feedback"]["syntax_tasks"]["status"],
+        "incomplete"
+    );
+    assert_eq!(result["local_feedback"]["syntax_tasks"]["tasks"], json!([]));
+    assert_eq!(
+        result["local_feedback"]["syntax_tasks"]["failures"][0]["reason"],
+        "reports_directory_unavailable"
+    );
+}
+
+#[test]
+fn unlocated_project_check_and_edit_hook_share_the_same_task_and_next_step() {
+    let p = Project::new("unlocated-check");
+    fs::remove_file(p.0.join("app.zig")).unwrap();
+    fs::write(p.0.join("bad.swift"), "func f(_ x: ) {}\n").unwrap();
+    let output = p
+        .command()
+        .args(["check", "all"])
+        .arg(&p.0)
+        .args(["--format=json", "--timeout", "30s"])
+        .env("PATH", &p.0)
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    let report: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(
+        report["syntax_tasks"]["status"], "synced_partial",
+        "{report}"
+    );
+    assert_eq!(report["schema_version"], "0.38.0");
+    let id = report["syntax_tasks"]["tasks"][0]["task_id"]
+        .as_str()
+        .unwrap();
+    assert_eq!(report["next"]["repair_brief"]["task_id"], id);
+    let hook = p.hook_paths(&["bad.swift"]);
+    assert_eq!(
+        hook["local_feedback"]["syntax_tasks"]["tasks"][0]["task_id"],
+        id
+    );
+    assert_eq!(hook["local_feedback"]["syntax_tasks"]["new_blockers"], 0);
+    let human = p
+        .command()
+        .args(["check", "all"])
+        .arg(&p.0)
+        .args(["--timeout", "30s"])
+        .env("PATH", &p.0)
+        .output()
+        .unwrap();
+    assert!(
+        String::from_utf8_lossy(&human.stdout).contains(id),
+        "{human:?}"
+    );
+}
+
+#[test]
+fn unlocated_claude_context_explains_zero_positions_and_real_recovery_task() {
+    let p = Project::new("unlocated-context");
+    fs::write(p.0.join("bad.swift"), "func f(_ x: ) {}\n").unwrap();
+    let mut c = p.command();
+    c.args(["hook", "claude", "post-tool-use"])
+        .arg(&p.0)
+        .args(["--timeout=30s", "--format=json"])
+        .env("PATH", &p.0)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped());
+    let mut child = c.spawn().unwrap();
+    let event = json!({"hook_event_name":"PostToolUse", "cwd":p.0, "tool_name":"Edit", "tool_input":{"file_path":p.0.join("bad.swift"), "old_string":"old", "new_string":"new"}, "tool_response":{"success":true}});
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(event.to_string().as_bytes())
+        .unwrap();
+    let output = child.wait_with_output().unwrap();
+    assert_eq!(output.status.code(), Some(0));
+    let report: Value = serde_json::from_slice(&output.stdout).unwrap();
+    let context = report["hookSpecificOutput"]["additionalContext"]
+        .as_str()
+        .unwrap();
+    assert!(
+        context.contains("疑似恢复节点 0 项") && context.contains("恢复扫描未完成 1 项"),
+        "{context}"
+    );
+    assert!(
+        context.contains("原生确认任务 CG-B-") && context.contains("codeguard task show"),
+        "{context}"
+    );
+    assert!(!context.contains("建议安装适用原生 lint"), "{context}");
+    assert!(context.chars().count() <= 1200);
+}

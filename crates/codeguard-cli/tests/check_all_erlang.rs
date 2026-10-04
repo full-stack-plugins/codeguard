@@ -53,7 +53,7 @@ fn native_path_diagnostic_is_retained_with_original_tool_guidance() {
     let p = Project::new("path");
     let tool = p.fake("OTP 28", false, "");
     let report = p.check(&["--format=json"]);
-    assert_eq!(report["schema_version"], "0.36.0");
+    assert_eq!(report["schema_version"], "0.38.0");
     let native = &report["native_results"]["erlang_lint"];
     assert_eq!(native["tool_selection"]["source"], "path");
     assert_eq!(

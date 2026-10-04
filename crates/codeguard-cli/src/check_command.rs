@@ -1500,7 +1500,7 @@ pub fn run(args: &[String]) -> ExitCode {
         unresolved.insert("java_target_absent_or_unobserved".into());
     }
     unresolved.extend(discovery.unknown_conditions.iter().cloned());
-    let next = (parsed.selection == Selection::All)
+    let mut next = (parsed.selection == Selection::All)
         .then(|| rust_lint.get("next").filter(|value| !value.is_null()))
         .flatten()
         .cloned()
@@ -1626,8 +1626,24 @@ pub fn run(args: &[String]) -> ExitCode {
         "skipped_count":0,"unrouted_count":0,"native_preferred_count":0,"observations":[],
         "next_action":"使用包含固定语法资产的发行包运行候选初检，并完成适用原生检查"
     });
+    let syntax_tasks = crate::syntax_confirmation::persist(&root, &syntax_candidates, deadline);
+    if syntax_tasks["status"] == "incomplete" {
+        unresolved.insert("syntax_task_sync_incomplete".into());
+    }
+    if next.is_null()
+        && syntax_tasks["tasks"]
+            .as_array()
+            .is_some_and(|tasks| !tasks.is_empty())
+    {
+        match read_local_brief(&root) {
+            Ok(brief) => next = brief,
+            Err(reason) => {
+                unresolved.insert(format!("syntax_next_unavailable:{reason}"));
+            }
+        }
+    }
     let report = json!({
-        "schema_version":if erlang_lint["schema_version"] == "0.2.0" {"0.37.0"} else {"0.36.0"}, "report_type":"check_feedback",
+        "schema_version":"0.38.0", "report_type":"check_feedback",
         "operation":"check", "selection":parsed.selection.as_str(), "command_status":if request_cancelled { "cancelled" } else { "incomplete" },
         "exit_code":if request_cancelled { 130 } else { 3 }, "delivery_decision":if parsed.selection == Selection::All { "incomplete" } else { "not_evaluated" }, "authority":"local_unverified",
         "reason":if request_cancelled { "request_cancelled" } else if parsed.selection == Selection::All { "full_project_obligations_and_trusted_policy_unavailable" } else { "java_selection_obligations_and_trusted_policy_unavailable" },
@@ -1636,6 +1652,7 @@ pub fn run(args: &[String]) -> ExitCode {
         "obligation_status":"unresolved", "required_obligations":null,
         "category_candidates":candidates, "unresolved_conditions":unresolved,
         "syntax_candidates":syntax_candidates,
+        "syntax_tasks":syntax_tasks,
         "execution_budget":check_budget_record(
             parsed.timeout_ms, parsed.timeout_source, parsed.jobs_limit, parsed.jobs_source,
             usize::from(node_present) + usize::from(python_present) + python_cve_roots.len() + 4 * usize::from(rust_present) + usize::from(go_present) + usize::from(erlang_present) + usize::from(java_present) + usize::from(javadoc_configured) + usize::from(dependency_configured) + usize::from(cve_configured) + npm_roots.len(), started_native_task_count
@@ -2133,6 +2150,19 @@ pub fn run(args: &[String]) -> ExitCode {
                     }
                 }
             }
+        }
+        if let Some(tasks) = report["syntax_tasks"]["tasks"].as_array() {
+            for task in tasks.iter().take(8) {
+                println!(
+                    "  原生确认/检查恢复任务 {}：{} [{}]；运行 codeguard task show {} . --format=json 查看证据与下一步。",
+                    task["task_id"], task["path"], task["language"], task["task_id"]
+                );
+            }
+        }
+        if report["syntax_tasks"]["status"] == "incomplete" {
+            println!(
+                "候选任务同步未完成；当前语法观察仍保留，先核对逐文件保存失败原因，不能假定任务已生成。"
+            );
         }
         if report["unresolved_conditions"]
             .as_array()

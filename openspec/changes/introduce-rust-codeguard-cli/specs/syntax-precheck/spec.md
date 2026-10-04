@@ -219,6 +219,8 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 
 - **WHEN** grammar 的根节点 `has_error=true` 且 S-expression 含缺失 token，但运行时的可遍历子节点不能定位该 token
 - **THEN** 初检标为 incomplete，保留未完成计数并请求原生确认；零恢复节点不得升级为 clean
+- **AND** 已初始化工作区的 check/确认写入 Hook 将这种已绑定源码与 grammar 的观察同步为同一稳定检查恢复任务，保留无位置证据及检查未完成原因；next、可读任务和对话上下文要求恢复适用原生能力或调查 grammar，原生确认前不授予源码修改范围。重复扫描不新增同义任务，完整零恢复观察不新建该任务、不关闭已有任务；保存失败保留原报告且不返回虚假任务 ID
+- **AND** 没有该语言原生确认 adapter 时，task verify 记录具体能力缺口，任务保持开放，不能换用其它语言工具或伪造关闭；未知报告版本、零恢复且无未完成原因、错源码/grammar 身份或虚假定位均不可导入
 
 #### Scenario: A template includes unsupported embedded syntax
 - **WHEN** 只支持文件中一部分语言区域

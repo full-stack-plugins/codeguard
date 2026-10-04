@@ -252,7 +252,7 @@ fn check_all_keeps_local_checker_candidate_separate_from_execution() {
 
     let (exit, report) = project.check(&[]);
     assert_eq!(exit, 3);
-    assert_eq!(report["schema_version"], "0.36.0");
+    assert_eq!(report["schema_version"], "0.38.0");
     assert_eq!(report["discovery"]["schema_version"], "0.4.0");
     let candidates = report["discovery"]["native_tool_candidates"]
         .as_array()
@@ -568,7 +568,7 @@ fn rust_only_project_keeps_categories_as_candidates_without_inventing_policy_obl
     let (exit, report) = project.check(&[]);
     assert_eq!(exit, 3);
     assert_eq!(report["report_type"], "check_feedback");
-    assert_eq!(report["schema_version"], "0.36.0");
+    assert_eq!(report["schema_version"], "0.38.0");
     assert_eq!(report["execution_budget"]["timeout_ms"], 1_800_000);
     assert_eq!(report["execution_budget"]["source"], "builtin_default");
     assert_eq!(

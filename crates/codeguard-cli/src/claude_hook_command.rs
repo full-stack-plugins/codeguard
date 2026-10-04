@@ -334,9 +334,16 @@ fn summarize(path: &str, report: &Value) -> String {
     let candidates = feedback["syntax_candidates"]["observations"]
         .as_array()
         .map_or(0, Vec::len);
+    let incomplete_recoveries = feedback["syntax_candidates"]["observations"]
+        .as_array()
+        .map_or(0, |rows| {
+            rows.iter()
+                .filter(|row| row["reason"] == "syntax_recovery_incomplete")
+                .count()
+        });
     let guidance = match feedback["next_action"].as_str() {
         Some("require_native_lint_confirmation") => {
-            "必须安装或修复适用的原生 lint/编译器，再确认疑似问题；不要仅凭候选结果修改源码"
+            "必须准备或修复适用的原生 lint/编译器，再确认疑似问题或恢复未完成检查；不要仅凭候选结果修改源码"
         }
         Some("recommend_native_lint") => {
             "初检未发现恢复节点，建议安装适用原生 lint；这不表示完整检查通过"
@@ -385,7 +392,7 @@ fn summarize(path: &str, report: &Value) -> String {
         }
     }
     let summary = format!(
-        "CodeGuard：{label} 局部检查反馈：原生诊断 {count} 项；规则 {}；WASM 候选 {candidates} 项、疑似恢复节点 {recoveries} 项；不可检查文件 {unavailable} 项、原生快检未接线 {unwired} 项。{guidance}。{repair}候选语法能力尚未完整验收，完整项目与交付未评估。",
+        "CodeGuard：{label} 局部检查反馈：原生诊断 {count} 项；规则 {}；WASM 候选 {candidates} 项、疑似恢复节点 {recoveries} 项、恢复扫描未完成 {incomplete_recoveries} 项；不可检查文件 {unavailable} 项、原生快检未接线 {unwired} 项。{guidance}。{repair}候选语法能力尚未完整验收，完整项目与交付未评估。",
         rules.join(", ")
     );
     summary.chars().take(MAX_CONTEXT_CHARS).collect()

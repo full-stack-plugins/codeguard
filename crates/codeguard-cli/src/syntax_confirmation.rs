@@ -10,11 +10,13 @@ use std::{
 };
 
 /// 同步工作区 root 下本轮 syntax 候选，沿用 deadline；返回真实任务引用和失败范围。
-/// 零恢复不创建新阻塞，持久化故障不能伪造任务。
+/// 完整零恢复不创建新阻塞；无法定位的未完成观察需要恢复检查能力，持久化故障不能伪造任务。
 pub(crate) fn persist(root: &Path, syntax: &Value, deadline: Instant) -> Value {
     let mut groups = BTreeMap::<(String, String), Vec<Value>>::new();
     for row in syntax["observations"].as_array().into_iter().flatten() {
-        if row["status"] != "candidate_observed" || row["recovery_count"].as_u64().unwrap_or(0) == 0
+        if row["status"] != "candidate_observed"
+            || (row["recovery_count"].as_u64().unwrap_or(0) == 0
+                && row["reason"] != "syntax_recovery_incomplete")
         {
             continue;
         }
@@ -45,7 +47,13 @@ pub(crate) fn persist(root: &Path, syntax: &Value, deadline: Instant) -> Value {
                 .duration_since(UNIX_EPOCH)
                 .map_err(|_| "clock_unavailable")?
                 .as_nanos();
-            let report = json!({"schema_version":"0.1.0", "report_type":"syntax_confirmation_observation",
+            // 新版只扩展无位置的未完成观察；旧有可定位观察仍使用原协议和稳定身份。
+            let schema_version = if rows.iter().any(|row| row["recovery_count"] == 0) {
+                "0.3.0"
+            } else {
+                "0.1.0"
+            };
+            let report = json!({"schema_version":schema_version, "report_type":"syntax_confirmation_observation",
                 "workspace_binding":"bound", "workspace_id":workspace, "run_id":format!("syntax-confirm-{}-{nanos}", std::process::id()),
                 "authority":"local_unverified", "coverage_proven":false, "delivery_decision":"not_evaluated", "execution":"incomplete",
                 "checker_id":checker, "reason_code":reason, "blocker_id":id, "fingerprint":fingerprint,
@@ -115,7 +123,7 @@ pub(crate) fn valid_report(root: &Path, workspace: &str, report: &Value) -> bool
         return false;
     };
     let (checker, reason, fingerprint) = identity(workspace, path, language);
-    if report["schema_version"] != "0.1.0"
+    if !matches!(report["schema_version"].as_str(), Some("0.1.0" | "0.3.0"))
         || report["report_type"] != "syntax_confirmation_observation"
         || report["workspace_binding"] != "bound"
         || report["workspace_id"] != workspace
@@ -202,10 +210,12 @@ pub(crate) fn valid_report(root: &Path, workspace: &str, report: &Value) -> bool
         if !offsets.insert(route.byte_offset) {
             return false;
         }
-        let Some(count) = row["recovery_count"]
-            .as_u64()
-            .filter(|c| *c > 0 && *c <= 4096)
-        else {
+        let Some(count) = row["recovery_count"].as_u64().filter(|c| {
+            *c <= 4096
+                && (*c > 0
+                    || (report["schema_version"] == "0.3.0"
+                        && row["reason"] == "syntax_recovery_incomplete"))
+        }) else {
             return false;
         };
         let Some(recoveries) = row["recoveries"]
