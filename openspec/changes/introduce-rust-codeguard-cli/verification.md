@@ -2227,3 +2227,24 @@ Erlang 显式 OTP 28 复用原任务/租约/尝试/deadline，next 提供原生�
 - `/tmp/codeguard-check-erlang-real-final2.log`：SHA-256 `8078ab60eea7b34eb393d893a0d82b807a3f062e551ab6d3b3868d7b145a64cf`。
 - `/tmp/codeguard-check-erlang-clippy-final2.log`：SHA-256 `9b23e4bbb00a4ba2e626f0dcf14d53b2429f0e02e6a20bf69a6bbb72c769e2ef`。
 - `/tmp/codeguard-check-erlang-schema-final3.log`：SHA-256 `4cffa0740cac6d5f40fc50a28f7012c63dd2d821019dfc70e1a4c30dad9a986c`。
+
+
+## 2026-10-04 全 32 grammar 固定开发评测与标签权威隔离
+
+Rust 开发入口复用现有隔离 worker 和 Core 统计，启动前核对清单/源码/语言全集/重复键；全部 32 份 grammar 的 186 例顺序实际回放及原始脱敏报告已归档。终态相对回归标签为 48 TP、1 FP、10 FN、123 TN，3 例未知，1 个 CFQuery SQL 临时标签不入指标。统一语料中 20 种语言只有合法控制样本，Dart 上游等独立测试不混计；见 [验收](../../../tests/acceptance/grammar-regression-evaluation.md)及[双语评测专题](../../../docs/Codeguard-Grammar-Evaluation.zh_CN.md)。
+
+新增 Regression oracle 类型与独立计数，开发标签不能并入独立裁定数量；足够数量和区间也不能自动成为验收达标。目标模块和类型/字段分别先 RED，再实现并验证。最终 Core 全目标 9 组、56 passed/0 failed/0 ignored；相关默认 CLI 四组 17 passed/0 failed/0 ignored；WASM 目标 6 passed/0 failed/1 ignored（该独立完整回放随后显式执行）；完整 186 例回放测试 1 passed/0 failed/0 ignored。阶段重叠，不合计为独立全量测试。此前 1148 个全工作区测试属于上一产品源码，本轮未重跑全部工作区；新提交远端 CI 单独等待。
+
+188 份 schema 元定义有效，真实语料和终态报告有效，9 类伪造权威/原生/holdout/交付通过/资格/语言数量拒绝；跨字段分母与固定摘要独立核对。workspace 全目标 WASM Clippy -D warnings、fmt、分层、OpenSpec strict 与双语新链接通过。最终归档报告 SHA-256 `11bc1989d9401f395a717fa348496e4af0a00629ad379df94491755a453a71cc`，按新的程序身份重跑取得；阶段一报告仍保留于临时日志，不手工改写终态计数或耗时。
+
+原提交 79663d6 的 [Linux CI](https://github.com/full-stack-plugins/codeguard/actions/runs/37164734474) 已 completed/success。本轮不改 grammar、npm 制品或插件锁，不把回放链路测试成功当作 grammar 质量通过。已知 Erlang/VB.NET/隐藏恢复差异、待批准重建工具、MSRV、多平台、原生 holdout、真实宿主和完整门禁仍缺；12.10/12.11/14.2/14.17/14.19 父任务及总体目标保持未完成。Erlang 未提交 RED 草稿保持。
+
+日志身份：
+- `/tmp/codeguard-grammar-evaluation-red.log`：SHA-256 `093ec169e2098e99ab8d974079628baf5e65d9f2d09daa931635d26dfe49365d`。
+- `/tmp/codeguard-grammar-evaluation-label-red.log`：SHA-256 `6a50c1f995ac881a05047259f3e98c781aca3517ccc1db37f935e79d376ee2bc`。
+- `/tmp/codeguard-grammar-evaluation-core-final.log`：SHA-256 `1851e761fcbeb391785d4401005a664b225360c2be9370555c8d9eee9431ae94`。
+- `/tmp/codeguard-grammar-evaluation-default-final.log`：SHA-256 `ce3fe764f7e5a0987964af741a3012cae99860b0ff2fea2295463a80833632be`。
+- `/tmp/codeguard-grammar-evaluation-archive-final.log`：SHA-256 `1a93e303f83e8fd7c6259519e784ba83bd635d369e28f270fea23ae474ff176d`。
+- `/tmp/codeguard-grammar-evaluation-full-final.log`：SHA-256 `12ef03b8e785b620d6eb05a4776526c5972918d9445a32bbab3fd53d4abd6213`。
+- `/tmp/codeguard-grammar-evaluation-core-all.log`：SHA-256 `49e89b05b5817adeed30c551aa34541ab66dfcdff0a02d7073edbbeb2b3af643`。
+- `/tmp/codeguard-grammar-evaluation-clippy-final.log`：SHA-256 `825f75b77eb1fa05f635f57bf86a861f93ac6db2b84b894a186571c8c12bfbc0`。

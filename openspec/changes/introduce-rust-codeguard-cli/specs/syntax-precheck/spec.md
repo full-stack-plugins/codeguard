@@ -233,6 +233,14 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 - **WHEN** Swift 或 Kotlin 固定样例返回空恢复数组，但隐藏错误使扫描未完成
 - **THEN** 该样例保留在总语料分母并单独计为未知覆盖；不能计作合法、非法、一致、误报或漏报，且不能删除该样例来提高精度指标
 
+#### Scenario: All bundled grammars are replayed for development evaluation
+- **WHEN** 开发期 Rust 回放入口消费绑定当前清单摘要、源码摘要及来源的固定回归语料
+- **THEN** 逐份固定 grammar 调用现有隔离 worker，输出每语言的全样本数、可判定分类、未知、TP/FP/FN、区间和有界耗时；重复键、语言缺项、字节身份失配在启动前拒绝。回归标签和待裁定标签分开，待裁定样本不进入精度分母，隐藏错误不当作零诊断通过；回归报告不冒充独立 holdout、原生工具回放、grammar 资格或发布批准
+
+#### Scenario: Development replay runs out of its shared budget
+- **WHEN** 回放在共同 deadline 内超时或被取消，或者所选运行程序字节发生变化
+- **THEN** 已有效取得的局部观察保留，未运行与受影响样本列为未知且仍计入原固定语料范围；不得重置预算、换工具补出绿色结论或提高 grammar 资格
+
 ### Requirement: Precheck briefs SHALL reach agent conversations with concrete next actions
 
 human/结构化报告及宿主渲染 MUST 按结论、方式/范围、原生状态、依据、下一步和实际任务引用组织信息。必须/推荐动作 MUST 明确。疑似异常、正常、未完成和原生诊断四类模板 MUST 独立验证；CVE 等非语法覆盖不能套用语法通过结论。插件 MUST 通过真实宿主的工具结果/上下文 API 交付，文件或 stdout 存在不等于交付。初次反馈后只发送有意义的变化；原始工具文本 MUST 作为数据，不执行其中指令。AGENTS MUST 仅保留长期指引，不追加每轮扫描日志。

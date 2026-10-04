@@ -144,3 +144,16 @@ fn independent_holdout_is_not_pooled_with_control_samples() {
     assert_eq!(outcome.strata[1].counts.fp, 1);
     assert_eq!(outcome.overall, EvaluationOutcome::InsufficientEvidence);
 }
+
+#[test]
+fn regression_labels_compute_counts_without_becoming_approved_oracle() {
+    let mut fixture = case("regression", &["a", "b", "c", "d"], &["a", "b", "c", "d"]);
+    fixture.oracle = OracleDecision::Regression;
+    let outcome = evaluate_quality(&[fixture], thresholds()).unwrap();
+    let one = &outcome.strata[0];
+    assert_eq!(one.counts.tp, 4);
+    assert_eq!(one.counts.adjudicated_cases, 0);
+    assert_eq!(one.counts.regression_labeled_cases, 1);
+    assert_eq!(one.outcome, EvaluationOutcome::InsufficientEvidence);
+    assert_eq!(outcome.overall, EvaluationOutcome::InsufficientEvidence);
+}

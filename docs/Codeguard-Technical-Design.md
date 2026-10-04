@@ -1094,3 +1094,7 @@ This is a complete embedded `erlang_forms_scan` example captured from actual OTP
   "unobserved_count": 0
 }
 ```
+
+### All-grammar replay protocol (2026-10-04)
+
+The new development-only `grammar_regression` / `grammar_regression_evaluation` 0.1 protocols reject duplicate keys, missing languages and changed hashes before execution. Reports retain all 32 language denominators, sample-level TP/FP/FN/TN, Wilson intervals, unknowns and cold-worker wall time, with zero qualified grammars and unevaluated delivery. Pending labels stay outside precision; incomplete or changed inputs cannot become valid classifications. See [evaluation technical guide](Codeguard-Grammar-Evaluation.md) for the fields and actual report.

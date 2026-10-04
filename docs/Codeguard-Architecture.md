@@ -635,3 +635,7 @@ flowchart TD
     H --> I
     I --> J[Human / JSON / conservative SARIF]
 ```
+
+### All-grammar development evaluation boundary (2026-10-04)
+
+The `evaluate_grammars` development entry reuses the same isolated Rust workers and Core statistics across all 32 grammars and 186 fixed regression cases. It binds manifest/source/program identities and separates fixture classifications, unknowns and pending labels. It provides neither a project quality gate nor independent holdout evidence. See [unified grammar evaluation](Codeguard-Grammar-Evaluation.md) for the execution path and actual remaining gaps.

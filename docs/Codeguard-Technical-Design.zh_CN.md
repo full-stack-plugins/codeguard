@@ -1094,3 +1094,7 @@ flowchart TD
   "unobserved_count": 0
 }
 ```
+
+### 全 grammar 回放协议（2026-10-04）
+
+新增独立开发协议 `grammar_regression` / `grammar_regression_evaluation` 0.1；重复键、缺语言和摘要失配在启动前拒绝。报告保留 32 语言全分母、样本级 TP/FP/FN/TN、Wilson 区间、未知及冷 worker 墙钟时间，资格固定为零、交付未评估。pending 标签不入精度分母，源码与程序变化或未完成不会生成虚假正常分类。完整运行方式、字段边界及原始实际报告见 [评测技术专题](Codeguard-Grammar-Evaluation.zh_CN.md)。

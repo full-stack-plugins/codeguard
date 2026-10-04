@@ -114,6 +114,9 @@ pub mod git_index_safety;
 pub mod git_index_safety_command;
 #[cfg(unix)]
 pub mod go_lint_command;
+pub mod grammar_evaluation;
+mod grammar_evaluation_case;
+mod grammar_evaluation_corpus;
 #[cfg(feature = "wasm-precheck")]
 pub mod grammar_probe_command;
 pub mod grammar_route;

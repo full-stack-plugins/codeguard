@@ -635,3 +635,7 @@ flowchart TD
     H --> I
     I --> J[Human / JSON / conservative SARIF]
 ```
+
+### 全 grammar 开发评测边界（2026-10-04）
+
+开发期 `evaluate_grammars` 复用同一 Rust 隔离 worker 与 Core 分层计算，固定全部 32 份 grammar 和 186 例回归语料。它绑定清单/源码/程序身份并分别保留回归分类、未知和待裁定标签；不成为项目质量门禁或独立 holdout。执行路径、逐语言统计与实际剩余缺口见 [统一 grammar 评测](Codeguard-Grammar-Evaluation.zh_CN.md)。

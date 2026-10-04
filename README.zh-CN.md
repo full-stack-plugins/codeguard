@@ -419,3 +419,7 @@ codeguard check all . --erl-tool /absolute/path/to/erl --timeout 30s --jobs 2 --
 只有完整、非预处理、源码与工具字节都匹配的 forms 观察才跳过重复 WASM。工具缺失保留候选初检；所选工具失败仍可伴随补充候选观察，但原生阻塞不会被洗成成功。宏/条件编译继续未完成。源码或工具变化会撤回受影响文件的当前定位和可复用 argv。项目范围变化设置 `scope_stable: false` 并保留仍与当前字节匹配的单文件诊断，同时撤回整体范围完整性。SIGINT 保持退出 130；JSON、human 和保守 SARIF 保留原生发现，不签发项目通过。
 
 协议分别为 `check_feedback` **0.36.0**、`check_aborted` **0.13.0** 和内嵌 `erlang_forms_scan` **0.1.0**；旧聚合 Schema 逐字节保留。forms 局部完整不等于项目 lint、构建和测试完整。原生发现的任务持久化与可信关闭仍未实现，报告明确 `task_id: null`，不伪造任务。已有 WASM 来源的 Erlang 确认任务继续使用独立 `task verify` 流程。公开 npm 0.1.4 不含本轮聚合能力。见[验收记录](tests/acceptance/check-all-erlang.md)。
+
+### 全部 32 份 grammar 的开发评测
+
+Rust 开发入口 `evaluate_grammars` 用现有隔离 worker 回放 186 个固定样本，统一输出全部 32 语言、回归标签的 TP/FP/FN、Wilson 区间、未知样本和顺序冷 worker 耗时。语料、源码及程序身份绑定；隐藏错误、取消和预算耗尽不能当作样本通过，待裁定标签不进入精度分母。它不执行原生 oracle 或独立 holdout，不提升 grammar 资格或批准发布。运行方式与指标边界见 [grammar 评测](docs/Codeguard-Grammar-Evaluation.zh_CN.md)。

@@ -597,6 +597,7 @@
 - [ ] 12.9 按 C01–C36 建立逐命令验收矩阵；验收：合法/非法参数、格式、操作退出码、副作用、未初始化、取消/重放/恢复及核心服务复用均有证据，MCP请求失败与服务生命周期分离。
 - [ ] 12.10 实现分层评测计算与证据不足判定；依赖1.4、12.2的语料/阈值冻结产物；验收：TP/FP/FN、Wilson区间、零分母、争议样本和覆盖差异有已知期望值，不能以零finding报100%准确。进行中：相邻 Rust Core 已实现纯分层计算与相关正反例，见 `codeguard-cli/tests/acceptance/quality-evaluation-baseline.md`；尚未接入经批准冻结的 oracle/阈值与真实回放，不能勾选。
 - [ ] 12.11 建立并执行确定性离线回归、独立holdout与真实工具/漏洞库评测的分离入口和报告归档；依赖12.2、12.10；验收：按语言/类别公布n/TP/FP/FN/区间及库身份/freshness/日期，网络波动不污染离线oracle，性能比较先证明发现/覆盖等价，不自动创建云定时任务。
+  2026-10-04 全 grammar 开发回放：Rust `evaluate_grammars` 已绑定清单/源码/程序摘要，复用隔离 worker 顺序实际执行全部 32 份资产、186 例固定回归；逐语言报告包括样本级 TP/FP/FN/TN、Wilson 区间、未知与冷 worker 耗时。回归标签不冒充独立 holdout，CFQuery SQL 临时标签不入精度分母，取消/预算/程序变化不删除未知分母；实际报告与逐语言缺口见 [验收](../../../tests/acceptance/grammar-regression-evaluation.md)。尚缺批准冻结配置、独立 holdout、真实原生/漏洞库独立入口与同覆盖性能，12.10/12.11/14.17/14.19 父任务仍开放。
 - [ ] 12.12 完成误报白名单正反例与全格式门禁验收；验收：用户指出误判后能沿同一稳定 finding 完成原工具复核、候选、独立批准、再次检查与对话反馈；精确命中为 allow_with_exceptions、真实阻断为 deny、工具/覆盖未完成为 incomplete；过期/错文件/错内容/错版本/自批/原生 suppression 均不放行，原始 finding、审批引用及到期提示在 CLI/MCP/Hook/SARIF 一致。
 
 ## 13. S13 发布、文档与规格收敛

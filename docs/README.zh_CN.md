@@ -20,6 +20,7 @@
 | [原生适配器契约](Codeguard-Adapter-Contracts.zh_CN.md) | 原生配置与报告、Java/CVE/安全边界 |
 | [信任与分发](Codeguard-Trust-and-Distribution.zh_CN.md) | 签名、修订链、工具包、npm 与 grammar 资产 |
 | [验收与发布](Codeguard-Validation-and-Rollout.zh_CN.md) | 语言矩阵、F01–F26、精度目标、宿主与发布证据 |
+| [grammar 开发评测](Codeguard-Grammar-Evaluation.zh_CN.md) | 固定 32 语言回放、逐样本差异、未知及回归标签统计 |
 | [旧协议兼容](Codeguard-Legacy-Compatibility.zh_CN.md) | 旧 CLI/MCP/Hook 映射与 2026-09-24 审计 |
 
 ## 当前、目标和历史
