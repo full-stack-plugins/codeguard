@@ -1,0 +1,144 @@
+{
+  "evidence_type": "source_cli_fresh_native_confirmation_guidance",
+  "evidence_version": "0.1.0",
+  "development_base_commit": "4d620f7e2e4c668f52b2e1083fba4e1c14b526d2",
+  "development_source_has_uncommitted_guidance_fix": true,
+  "program_sha256": "6a3e3b43353ff2251694b2f2172195074f1e6e37b4ff54526498b9d3065ba12b",
+  "program_stable": true,
+  "host_event_replay_not_actual_host": true,
+  "hook_response": {
+    "hookSpecificOutput": {
+      "additionalContext": "CodeGuard：app.zig 局部检查反馈：原生诊断 0 项；规则 ；WASM 候选 1 项、疑似恢复节点 1 项、恢复扫描未完成 0 项；不可检查文件 0 项、原生快检未接线 1 项。必须准备或修复适用的原生 lint/编译器，再确认疑似问题或恢复未完成检查；不要仅凭候选结果修改源码。原生确认任务 CG-B-295a43635719dd9e154851ac21f61386：codeguard task show CG-B-295a43635719dd9e154851ac21f61386 . --format=json；完成原生确认后 codeguard task verify CG-B-295a43635719dd9e154851ac21f61386 . --format=json。候选语法能力尚未完整验收，完整项目与交付未评估。",
+      "hookEventName": "PostToolUse"
+    },
+    "systemMessage": "CodeGuard 局部检查反馈"
+  },
+  "next": {
+    "authority": "local_unverified",
+    "command_status": "complete",
+    "delivery_decision": "not_evaluated",
+    "disposition": "verification_required",
+    "exit_code": 0,
+    "next_actions": [],
+    "operation": "next",
+    "reason": "local_task_selected",
+    "repair_brief": {
+      "action_id": "restore-checker-environment",
+      "affected_paths": [
+        "app.zig"
+      ],
+      "authority": "local_unverified",
+      "build_root": ".",
+      "checker_id": "syntax.native_confirmation",
+      "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+      "constraints": [
+        "先恢复检查完整性",
+        "不得关闭检查器或修改无关源码"
+      ],
+      "disposition": "verification_required",
+      "evidence_ref": {
+        "first_report_sha256": "7bcdfa22432096ac487331cb8edb0ec96064a3f520a9522b986e402b162a6d79",
+        "first_run_id": "syntax-confirm-27576-1791114967907382000"
+      },
+      "history": {
+        "attempt_count": 0,
+        "awaiting_verification": false,
+        "budget": 2,
+        "no_progress_count": 0,
+        "open_attempt_id": null,
+        "recent": []
+      },
+      "kind": "blocker",
+      "reason_code": "native_syntax_confirmation_needed",
+      "recheck_argv": [
+        "codeguard",
+        "task",
+        "verify",
+        "CG-B-295a43635719dd9e154851ac21f61386",
+        ".",
+        "--format",
+        "json",
+        "--zig-tool",
+        "<已核验 Zig 0.16.0 工具绝对路径>"
+      ],
+      "schema_version": "0.3.0",
+      "scope": "app.zig",
+      "step": "先核对固定 grammar 与当前源码的疑似证据。已接入 Zig 0.16.0 ast-check 语法确认 adapter，但本地工具是否就绪尚未核验；先核对已安装的适用工具，缺失时再准备。通过 --zig-tool 选择已核验绝对路径后运行同一任务的原生复检；原生确认前不得修改源码，不凭安装或 WASM 零恢复关闭任务",
+      "task_id": "CG-B-295a43635719dd9e154851ac21f61386"
+    },
+    "report_type": "repair_brief_preview",
+    "schema_version": "0.3.0"
+  },
+  "task_show": {
+    "authority": "local_unverified",
+    "command_status": "complete",
+    "delivery_decision": "not_evaluated",
+    "event_chain_status": "unverified",
+    "evidence_freshness": "unverified",
+    "exit_code": 0,
+    "next_actions": [
+      [
+        "codeguard",
+        "task",
+        "verify",
+        "CG-B-295a43635719dd9e154851ac21f61386",
+        "."
+      ]
+    ],
+    "operation": "task_show",
+    "report_type": "task_show_preview",
+    "request_id": "view-30837-1791115001990164000",
+    "schema_version": "0.1.0",
+    "state": "open",
+    "task": {
+      "action_id": "restore-checker-environment",
+      "affected_paths": [
+        "app.zig"
+      ],
+      "authority": "local_unverified",
+      "build_root": ".",
+      "checker_id": "syntax.native_confirmation",
+      "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+      "constraints": [
+        "先恢复检查完整性",
+        "不得关闭检查器或修改无关源码"
+      ],
+      "disposition": "verification_required",
+      "evidence_ref": {
+        "first_report_sha256": "7bcdfa22432096ac487331cb8edb0ec96064a3f520a9522b986e402b162a6d79",
+        "first_run_id": "syntax-confirm-27576-1791114967907382000"
+      },
+      "history": {
+        "attempt_count": 0,
+        "awaiting_verification": false,
+        "budget": 2,
+        "no_progress_count": 0,
+        "open_attempt_id": null,
+        "recent": []
+      },
+      "kind": "blocker",
+      "reason_code": "native_syntax_confirmation_needed",
+      "recheck_argv": [
+        "codeguard",
+        "task",
+        "verify",
+        "CG-B-295a43635719dd9e154851ac21f61386",
+        ".",
+        "--format",
+        "json",
+        "--zig-tool",
+        "<已核验 Zig 0.16.0 工具绝对路径>"
+      ],
+      "schema_version": "0.3.0",
+      "scope": "app.zig",
+      "step": "先核对固定 grammar 与当前源码的疑似证据。已接入 Zig 0.16.0 ast-check 语法确认 adapter，但本地工具是否就绪尚未核验；先核对已安装的适用工具，缺失时再准备。通过 --zig-tool 选择已核验绝对路径后运行同一任务的原生复检；原生确认前不得修改源码，不凭安装或 WASM 零恢复关闭任务",
+      "task_id": "CG-B-295a43635719dd9e154851ac21f61386"
+    },
+    "task_id": "CG-B-295a43635719dd9e154851ac21f61386"
+  },
+  "finding_state": "open",
+  "original_report_sha256": "7bcdfa22432096ac487331cb8edb0ec96064a3f520a9522b986e402b162a6d79",
+  "native_recheck_executed": false,
+  "task_closed": false,
+  "delivery_decision": "not_evaluated"
+}

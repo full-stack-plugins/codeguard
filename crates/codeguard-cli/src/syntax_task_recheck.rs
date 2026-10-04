@@ -531,7 +531,9 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
         }
         _ => {}
     }
-    let (_, report, report_sha256) = latest?;
+    let Some((_, report, report_sha256)) = latest else {
+        return initial_guidance(root, brief);
+    };
     let (disposition, step) = if !inputs_current(root, &report) {
         (
             "verification_required",
@@ -637,4 +639,50 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
         ]);
     }
     Some(guidance)
+}
+
+// 首次候选尚无原生历史时，按已绑定原报告给出实际能力；工具就绪与 adapter 接入是两件事。
+fn initial_guidance(root: &Path, brief: &Value) -> Option<Value> {
+    let original = original(root, brief).ok()?;
+    // 0.3 的候选协议专门保留无法定位的恢复，不把任务归并 reason_code 当作节点原因。
+    let location = if original["schema_version"] == "0.3.0" {
+        "固定 grammar 的恢复扫描未完成或错误无法定位；不虚构源码位置。"
+    } else {
+        "先核对固定 grammar 与当前源码的疑似证据。"
+    };
+    let language = original["language"].as_str()?;
+    let (version, option, path, checker) = match language {
+        "zig" => (
+            "Zig 0.16.0",
+            "--zig-tool",
+            "<已核验 Zig 0.16.0 工具绝对路径>",
+            "ast-check",
+        ),
+        "erlang" => (
+            "OTP 28",
+            "--erl-tool",
+            "<已核验 OTP 28 erl 绝对路径>",
+            "原生扫描与语法解析",
+        ),
+        "swift" => (
+            "Apple Swift 6.4",
+            "--swift-tool",
+            "<已核验 Apple Swift 6.4 swiftc 绝对路径>",
+            "frontend parse",
+        ),
+        _ => {
+            return Some(json!({
+                "disposition":"needs_decision",
+                "step":format!("{location}当前尚未接入 {language} 的原生语法确认 adapter；提出该语言的具体能力决策，不换用其它语言工具。原生确认前不得修改源码，不凭安装或 WASM 零恢复关闭任务")
+            }));
+        }
+    };
+    Some(json!({
+        "schema_version":"0.7.0",
+        "native_adapter":{"language":language,"supported_tool_version":if language == "zig" {"0.16.0"} else {version},"tool_option":option},
+        "tool_readiness":"not_evaluated",
+        "disposition":"verification_required",
+        "step":format!("{location}已接入 {version} {checker} 语法确认 adapter，但本地工具是否就绪尚未核验；先核对已安装的适用工具，缺失时再准备。通过 {option} 选择已核验绝对路径后运行同一任务的原生复检；原生确认前不得修改源码，不凭安装或 WASM 零恢复关闭任务"),
+        "recheck_argv":["codeguard","task","verify",brief["task_id"],".","--format","json",option,path]
+    }))
 }

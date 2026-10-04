@@ -1,0 +1,371 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:repair-brief-preview:0.7.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "command_status",
+    "exit_code",
+    "disposition",
+    "reason",
+    "repair_brief",
+    "next_actions",
+    "authority",
+    "delivery_decision"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.7.0"
+    },
+    "report_type": {
+      "const": "repair_brief_preview"
+    },
+    "operation": {
+      "const": "next"
+    },
+    "command_status": {
+      "enum": [
+        "complete",
+        "incomplete"
+      ]
+    },
+    "exit_code": {
+      "enum": [
+        0,
+        3
+      ]
+    },
+    "disposition": {
+      "enum": [
+        "actionable",
+        "waiting",
+        "needs_decision",
+        "verification_required",
+        "no_applicable_work"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repair_brief": {
+      "$ref": "#/$defs/syntax_preparation_brief"
+    },
+    "next_actions": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "failed_reports": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "run_id",
+          "reason",
+          "report_ref"
+        ],
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,120}$"
+          },
+          "reason": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]{1,80}$"
+          },
+          "report_ref": {
+            "type": "string",
+            "pattern": "^\\.codeguard/reports/[A-Za-z0-9_-]{1,120}\\.json$"
+          }
+        }
+      }
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    }
+  },
+  "$defs": {
+    "syntax_preparation_brief": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "task_id",
+        "kind",
+        "checker_id",
+        "evidence_ref",
+        "recheck_argv",
+        "history",
+        "action_id",
+        "authority",
+        "closure_condition",
+        "scope",
+        "build_root",
+        "affected_paths",
+        "reason_code",
+        "constraints",
+        "step",
+        "disposition",
+        "native_adapter",
+        "tool_readiness"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "0.7.0"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^CG-B-[0-9a-f]{32}$"
+        },
+        "kind": {
+          "const": "blocker"
+        },
+        "checker_id": {
+          "const": "syntax.native_confirmation"
+        },
+        "evidence_ref": {
+          "$ref": "repair-brief-preview.schema.json#/$defs/evidence"
+        },
+        "recheck_argv": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": "codeguard"
+            },
+            {
+              "const": "task"
+            },
+            {
+              "const": "verify"
+            },
+            {
+              "type": "string",
+              "pattern": "^CG-B-[0-9a-f]{32}$"
+            },
+            {
+              "const": "."
+            },
+            {
+              "const": "--format"
+            },
+            {
+              "const": "json"
+            },
+            {
+              "enum": [
+                "--zig-tool",
+                "--erl-tool",
+                "--swift-tool"
+              ]
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ],
+          "items": false,
+          "minItems": 9,
+          "maxItems": 9
+        },
+        "history": {
+          "type": [
+            "string",
+            "object"
+          ]
+        },
+        "action_id": {
+          "const": "restore-checker-environment"
+        },
+        "authority": {
+          "const": "local_unverified"
+        },
+        "closure_condition": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "build_root": {
+          "const": "."
+        },
+        "affected_paths": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "reason_code": {
+          "const": "native_syntax_confirmation_needed"
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "step": {
+          "type": "string",
+          "minLength": 1
+        },
+        "disposition": {
+          "enum": [
+            "needs_decision",
+            "verification_required",
+            "waiting"
+          ]
+        },
+        "native_adapter": {
+          "oneOf": [
+            {
+              "const": {
+                "language": "zig",
+                "supported_tool_version": "0.16.0",
+                "tool_option": "--zig-tool"
+              }
+            },
+            {
+              "const": {
+                "language": "erlang",
+                "supported_tool_version": "OTP 28",
+                "tool_option": "--erl-tool"
+              }
+            },
+            {
+              "const": {
+                "language": "swift",
+                "supported_tool_version": "Apple Swift 6.4",
+                "tool_option": "--swift-tool"
+              }
+            }
+          ]
+        },
+        "tool_readiness": {
+          "const": "not_evaluated"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "native_adapter": {
+                "properties": {
+                  "language": {
+                    "const": "zig"
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "recheck_argv": {
+                "prefixItems": [
+                  {},
+                  {},
+                  {},
+                  {},
+                  {},
+                  {},
+                  {},
+                  {
+                    "const": "--zig-tool"
+                  },
+                  {
+                    "const": "<已核验 Zig 0.16.0 工具绝对路径>"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "native_adapter": {
+                "properties": {
+                  "language": {
+                    "const": "erlang"
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "recheck_argv": {
+                "prefixItems": [
+                  {},
+                  {},
+                  {},
+                  {},
+                  {},
+                  {},
+                  {},
+                  {
+                    "const": "--erl-tool"
+                  },
+                  {
+                    "const": "<已核验 OTP 28 erl 绝对路径>"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "native_adapter": {
+                "properties": {
+                  "language": {
+                    "const": "swift"
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "recheck_argv": {
+                "prefixItems": [
+                  {},
+                  {},
+                  {},
+                  {},
+                  {},
+                  {},
+                  {},
+                  {
+                    "const": "--swift-tool"
+                  },
+                  {
+                    "const": "<已核验 Apple Swift 6.4 swiftc 绝对路径>"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

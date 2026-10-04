@@ -3,6 +3,7 @@ use serde_json::{Value, json};
 use std::{
     fs,
     io::Write,
+    os::unix::fs::PermissionsExt,
     path::PathBuf,
     process::{Command, Stdio},
 };
@@ -135,6 +136,170 @@ fn recovery_tasks_are_stable_and_clean_candidates_cannot_close_them() {
         verify["native_scan"]["native"]["reason"], "explicit_zig_tool_not_provided",
         "{verify}"
     );
+}
+
+#[test]
+fn fresh_confirmation_guidance_matches_the_implemented_adapter_before_recheck() {
+    for (label, file, source, option, version) in [
+        (
+            "fresh-zig",
+            "app.zig",
+            "const broken = ;\n",
+            "--zig-tool",
+            "Zig 0.16.0",
+        ),
+        (
+            "fresh-erlang",
+            "app.erl",
+            "-module(app).\nf( -> ok.\n",
+            "--erl-tool",
+            "OTP 28",
+        ),
+        (
+            "fresh-swift",
+            "app.swift",
+            "func f(_ x: ) {}\n",
+            "--swift-tool",
+            "Apple Swift 6.4",
+        ),
+    ] {
+        let p = Project::new(label);
+        fs::remove_file(p.0.join("app.zig")).unwrap();
+        fs::write(p.0.join(file), source).unwrap();
+        let report = p.hook_paths(&[file]);
+        let id = report["local_feedback"]["syntax_tasks"]["tasks"][0]["task_id"]
+            .as_str()
+            .unwrap_or_else(|| panic!("{report}"));
+        // 只读查询即使能发现本地同名工具，也不得执行探测或安装。
+        for tool in ["zig", "erl", "swiftc"] {
+            let path = p.0.join(tool);
+            fs::write(
+                &path,
+                "#!/bin/sh\nprintf executed > checker-executed\nexit 1\n",
+            )
+            .unwrap();
+            fs::set_permissions(path, fs::Permissions::from_mode(0o700)).unwrap();
+        }
+        for command in [vec!["next"], vec!["task", "show", id]] {
+            let output = p
+                .command()
+                .args(command)
+                .arg(&p.0)
+                .env("PATH", &p.0)
+                .current_dir(&p.0)
+                .arg("--format=json")
+                .output()
+                .unwrap();
+            assert_eq!(output.status.code(), Some(0));
+            let value: Value = serde_json::from_slice(&output.stdout).unwrap();
+            let brief = if value["repair_brief"].is_object() {
+                &value["repair_brief"]
+            } else {
+                &value["task"]
+            };
+            assert_eq!(brief["task_id"], id, "{value}");
+            assert_eq!(brief["schema_version"], "0.7.0", "{value}");
+            assert_eq!(brief["tool_readiness"], "not_evaluated", "{value}");
+            assert_eq!(brief["native_adapter"]["tool_option"], option, "{value}");
+            assert_eq!(brief["disposition"], "verification_required", "{value}");
+            let step = brief["step"].as_str().unwrap();
+            assert!(
+                step.contains(version) && step.contains("已接入") && step.contains("原生确认前"),
+                "{value}"
+            );
+            assert!(!step.contains("adapter 尚未接入"), "{value}");
+            let argv = brief["recheck_argv"].as_array().unwrap();
+            assert!(argv.iter().any(|v| v == option), "{value}");
+            if value["operation"] == "task_show" {
+                assert_eq!(value["next_actions"][0], brief["recheck_argv"], "{value}");
+            }
+            assert!(
+                brief["native_confirmation_ref"].is_null(),
+                "未执行原生复检不能伪造证据: {value}"
+            );
+        }
+        let fact: Value = serde_json::from_slice(
+            &fs::read(p.0.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(fact["state"], "open");
+        assert!(!p.0.join("checker-executed").exists());
+    }
+}
+
+#[test]
+fn fresh_unimplemented_confirmation_adapter_keeps_the_capability_decision() {
+    let p = Project::new("fresh-java");
+    fs::remove_file(p.0.join("app.zig")).unwrap();
+    fs::write(p.0.join("Broken.java"), "class Broken { void f( }\n").unwrap();
+    let report = p.hook_paths(&["Broken.java"]);
+    let id = report["local_feedback"]["syntax_tasks"]["tasks"][0]["task_id"]
+        .as_str()
+        .unwrap_or_else(|| panic!("{report}"));
+    let output = p
+        .command()
+        .arg("next")
+        .arg(&p.0)
+        .arg("--format=json")
+        .output()
+        .unwrap();
+    let next: Value = serde_json::from_slice(&output.stdout).unwrap();
+    let brief = &next["repair_brief"];
+    assert_eq!(brief["task_id"], id, "{next}");
+    assert_eq!(brief["disposition"], "needs_decision", "{next}");
+    assert!(
+        brief["step"]
+            .as_str()
+            .unwrap()
+            .contains("java 的原生语法确认 adapter"),
+        "{next}"
+    );
+    assert!(
+        !brief["recheck_argv"].to_string().contains("--zig-tool"),
+        "{next}"
+    );
+    assert!(
+        !brief["recheck_argv"].to_string().contains("--erl-tool"),
+        "{next}"
+    );
+    assert!(
+        !brief["recheck_argv"].to_string().contains("--swift-tool"),
+        "{next}"
+    );
+    assert!(brief["native_confirmation_ref"].is_null(), "{next}");
+}
+
+#[test]
+fn changed_original_candidate_cannot_supply_fresh_adapter_guidance() {
+    let p = Project::new("fresh-changed-report");
+    let report = p.hook();
+    let id = report["local_feedback"]["syntax_tasks"]["tasks"][0]["task_id"]
+        .as_str()
+        .unwrap_or_else(|| panic!("{report}"));
+    let fact: Value = serde_json::from_slice(
+        &fs::read(p.0.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
+    )
+    .unwrap();
+    let original = p.0.join(format!(
+        ".codeguard/reports/{}.json",
+        fact["first_run_id"].as_str().unwrap()
+    ));
+    let mut bytes = fs::read(&original).unwrap();
+    bytes.push(b' ');
+    fs::write(original, bytes).unwrap();
+    let output = p
+        .command()
+        .arg("next")
+        .arg(&p.0)
+        .arg("--format=json")
+        .output()
+        .unwrap();
+    let next: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(output.status.code(), Some(3), "{next}");
+    assert_eq!(next["command_status"], "incomplete", "{next}");
+    assert_eq!(next["reason"], "consumed_marker_invalid", "{next}");
+    assert!(next["repair_brief"].is_null(), "{next}");
+    assert_eq!(next["delivery_decision"], "not_evaluated", "{next}");
 }
 
 #[test]
@@ -524,7 +689,8 @@ fn unlocated_project_check_and_edit_hook_share_the_same_task_and_next_step() {
         report["syntax_tasks"]["status"], "synced_partial",
         "{report}"
     );
-    assert_eq!(report["schema_version"], "0.38.0");
+    assert_eq!(report["schema_version"], "0.40.0");
+    assert_eq!(report["next"]["schema_version"], "0.7.0");
     let id = report["syntax_tasks"]["tasks"][0]["task_id"]
         .as_str()
         .unwrap();

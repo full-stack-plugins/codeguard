@@ -1297,3 +1297,13 @@ Swift 差分纠正先以状态断言暴露旧清单文案的红测，再按真�
 本批默认全目标 1238 passed/0 failed/113 ignored，后续最低版本 patch 边界及方向目标默认/WASM 各 9 passed；CLI WASM 定向 32 passed、runtime 18 passed，结果重叠不相加。更新依赖的全 32 grammar/358 例/35 来源组实际回放完成，707.51 秒；新原始报告通过 0.2 schema，仍保留 73/1/10/269 的分组混淆计数、3 unknown、2 pending、资格零。证据归入同一[最低版本验收](../../../tests/acceptance/rust-msrv-dependency-compatibility.md)，不能升级为完整语言、最低编译器或平台验收。
 
 本批最终默认/WASM Clippy、fmt、分层、OpenSpec strict、schema/实际报告及文档校验通过。Swift 提交 15a91a7 的远端 CI 37195556160 已终态 success，包括先前失败的安装验收；本批新的依赖锁与真实 1.85 job 必须按新提交核验，不能借用该旧锁成功结果。
+
+## 2026-10-04 实际 Claude 保存与原生复检、首次指引纠偏
+
+延续 11.2/11.4/11.17/14.10/14.11/14.19。实际 Claude Code 2.1.273 会话内加载插件源码 dec5f9d，私有缓存准备锁定公开 0.1.4；两次会话的 14 个 Rust 生命周期反馈覆盖成功/重复保存、真实文件系统 EACCES 写入失败和 Stop 首次继续/重入。Edit 参数预检失败没有调度失败 Hook，不冒充该分支验收。宿主实际调用同一 Zig 0.16.0 复检，诊断 1→0，观察 still_blocked→candidate_absent_unverified_policy，最终仅一张任务且 open、交付未评估。另有四个原 Bash legacy Hook，不计为 Rust Git 门禁。身份、脱敏实际事件及模型回复见[宿主验收](../../../tests/acceptance/claude-host-prepared-runtime.md)。
+
+实测发现公开包首次 next/任务文案误称 Zig adapter 缺失，模型因此认为无法复检。当前源码可读任务已经纠正；本批修正首次 next/task show，从已绑定原报告区分实际 Zig/OTP/Swift adapter 与未核验工具就绪，并给出对应参数；未知语言保留具体能力决策。查询不执行或安装工具，不接受可编辑执行路径；已有原生历史仍优先。新增正例先失败；无定位 Swift 的旧回归又捕获新提示覆盖无法定位约束，修正后 Hook 任务目标 15 passed/0 failed/0 ignored。原报告被修改时原机制拒绝整个投影，不为了保留任务显示削弱校验。最终后续回归与终态追加于 verification。
+
+源码首次指引有独立实际 CLI/schema 证据；它不是本次宿主运行的公开 0.1.4，也未更新插件锁或市场。完整宿主、可信关闭、全部语言/精度、平台与项目门禁父任务仍开放，不因部分实测勾选。
+
+本批首次准备简报 0.7.0 与聚合反馈 0.40.0 正式分版本；task show 外层动作保留同一工具参数。最终 WASM 两目标 22 passed、另五目标 44 passed/5 ignored；默认两目标 11 passed，与同名契约重叠不相加。默认/WASM 全目标 Clippy、fmt、分层、strict 验证通过；210 schema 元定义、208 历史字节、13 开发协议测试与 705 本地链接通过。旧非法报告只留 RED 证据；原生条件未运行不当作通过。实际宿主公开包与开发修正版本分开，日志身份见[本批验收](../../../tests/acceptance/claude-host-prepared-runtime.md)。4d620f7 远端 CI 37198192252 已 success，本批新修改不借用该成功。完整父任务、grammar 资格、其它宿主、可信关闭及发行继续未完成，未新增勾选。

@@ -311,6 +311,13 @@ human/结构化报告及宿主渲染 MUST 按结论、方式/范围、原生状�
 - **THEN** feed the current bounded source bytes to native ast-check under the existing task lease and deadline, bind the source/tool identities, and retain the observation and attempt association
 - **AND** distinguish native diagnostics, zero diagnostics, unavailable tools and changed inputs; zero diagnostics alone cannot grant formal resolution or project delivery
 
+#### Scenario: A fresh confirmation task already has an applicable native adapter
+- **WHEN** a verified original candidate report identifies Zig, Erlang or Swift and no native recheck has yet been recorded
+- **THEN** next and task show describe the actual available adapter and its supported version, distinguish unknown local tool readiness from an unavailable adapter, and provide the applicable native tool selection argument
+- **AND** the read-only query does not run or install a tool, does not take executable paths from editable task text or historical candidate data, and does not authorize source repair or task closure before native confirmation
+- **AND** languages without an implemented confirmation adapter retain the concrete capability decision; zero WASM recovery does not remove the obligation
+- **AND** structured preparation guidance uses a versioned contract that binds language, supported version, tool selection parameter and explicitly unassessed local readiness; it does not invent a native execution status or evidence reference, and aggregate consumers accept that exact version while historical schemas remain unchanged
+
 #### Scenario: A native syntax confirmation observation becomes stale
 - **WHEN** the source or tool changes after a recorded native syntax observation
 - **THEN** next and task show require a fresh native confirmation and preserve historical evidence; they cannot recommend a stale source repair or pretend the old zero-diagnostic observation still applies

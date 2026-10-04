@@ -45,3 +45,7 @@
 - `/tmp/codeguard-msrv-openspec-final.log`：SHA-256 `cf3ec12601576e4a3dd335699d867edc30029dd07ee9fdcd6396379524b1fa4b`。
 
 Swift 源提交 `15a91a7b9291837e816f41d7934d68b4d083677e` 的[远端 CI](https://github.com/full-stack-plugins/codeguard/actions/runs/37195556160)已成功，包括全量语法回放、npm 安装及默认测试。该 CI 对应旧依赖锁；不能代替本批新锁和新最低工具链 job 的远端结果。
+
+## 2026-10-04 远端终态补证
+
+提交 `4d620f7e2e4c668f52b2e1083fba4e1c14b526d2` 的 [CI 37198192252](https://github.com/full-stack-plugins/codeguard/actions/runs/37198192252) 已终态成功。Linux 实际 Rust 1.85.0 默认及 WASM 全目标 locked check、完整语法回放和安装验收均完成；固定元数据与日志摘要见[公开证据](evidence/rust-msrv-linux-ci-2026-10-04.json)。本证据不包含当前未提交的首次原生指引修正，也不证明完整产品、全部平台或 grammar 资格验收。

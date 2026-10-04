@@ -2384,3 +2384,13 @@ Clippy 现在在原生执行前冻结已观察源码及根配置/锁的字节或
 本批默认全目标 1238 passed/0 failed/113 ignored，后续最低版本 patch 边界及方向目标默认/WASM 各 9 passed；CLI WASM 定向 32 passed、runtime 18 passed，结果重叠不相加。更新依赖的全 32 grammar/358 例/35 来源组实际回放完成，707.51 秒；新原始报告通过 0.2 schema，仍保留 73/1/10/269 的分组混淆计数、3 unknown、2 pending、资格零。证据归入同一[最低版本验收](../../../tests/acceptance/rust-msrv-dependency-compatibility.md)，不能升级为完整语言、最低编译器或平台验收。
 
 本批最终默认/WASM Clippy、fmt、分层、OpenSpec strict、schema/实际报告及文档校验通过。Swift 提交 15a91a7 的远端 CI 37195556160 已终态 success，包括先前失败的安装验收；本批新的依赖锁与真实 1.85 job 必须按新提交核验，不能借用该旧锁成功结果。
+
+## 2026-10-04 Claude 实际编辑/失败/原生复检与首次指引修正
+
+真实 Claude 2.1.273 在私有缓存准备插件 dec5f9d 锁定的公开 0.1.4，两次会话共 14 个 Rust 生命周期反馈、4 个独立 legacy Bash Hook；全部自动 Hook 返回成功。真实 EACCES 写入触发 PostToolUseFailure 并说明源码未检查；Edit 参数预检失败发生在执行前，不计为失败 Hook。宿主 Bash 实际调用同一 Zig 0.16.0，坏源码诊断 1 项、修复后 0 项，原生输入身份稳定、事件保存；最终同一稳定任务仍 open，实际模型明示策略/覆盖未完成和交付未评估。公开证据区分安全原始 Hook stdout、模型脱敏回复、规范化 JSON 摘要与真实原生 report 字节摘要，见[实测](../../../tests/acceptance/claude-host-prepared-runtime.md)。
+
+实测公开包首次 adapter 缺失指引与实际可执行 Zig 复检矛盾。开发源码新增 bound-original 的首次指导，区分已接入能力、工具就绪未知与真实 adapter 缺口；正例实际先 RED。无定位旧回归实际再 RED，改从 0.3 候选协议保留无法定位与禁止源码修补约束，最终 Hook 任务目标 15 passed/0 failed/0 ignored。篡改原报告本来会拒绝整个投影，新增测试先误期望仍有 task，再改为核对原 consumed-marker 拒绝，未放宽机制。被中断的六目标回归没有终态，不计为全套通过；已结束的组和最终完整回归独立登记。
+
+208 schema 元定义、真实宿主两份原生 wrapper 与内部 native scan 通过历史协议；Swift 5 项、无定位 4 项开发 schema 回归通过。当前开发二进制的独立首次 next/task show 捕获明确不是实际宿主新版本安装；公开包、插件锁、grammar 字节/资格不变。完整目标与父任务仍开放。
+
+本批首次准备简报 0.7.0 与聚合反馈 0.40.0 正式分版本；task show 外层动作保留同一工具参数。最终 WASM 两目标 22 passed、另五目标 44 passed/5 ignored；默认两目标 11 passed，与同名契约重叠不相加。默认/WASM 全目标 Clippy、fmt、分层、strict 验证通过；210 schema 元定义、208 历史字节、13 开发协议测试与 705 本地链接通过。旧非法报告只留 RED 证据；原生条件未运行不当作通过。实际宿主公开包与开发修正版本分开，日志身份见[本批验收](../../../tests/acceptance/claude-host-prepared-runtime.md)。4d620f7 远端 CI 37198192252 已 success，本批新修改不借用该成功。完整父任务、grammar 资格、其它宿主、可信关闭及发行继续未完成，未新增勾选。

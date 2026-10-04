@@ -541,7 +541,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                 if fact["first_diagnostic_reason"] == "syntax_recovery_incomplete" {
                     "固定 grammar 的恢复扫描未完成或错误无法定位；核对语言版本、grammar 限制并恢复适用原生 lint/编译器或提出具体能力决策。原生确认前不得修改源码，不虚构错误位置，不凭零恢复关闭任务"
                 } else {
-                    "查看固定 grammar 与当前源码的疑似证据；准备适用原生 lint/编译器并确认语法能力。当前原生确认 adapter 尚未接入，不能改用 Python 或凭 WASM 零恢复关闭任务"
+                    "查看固定 grammar 与当前源码的疑似证据；通过同一任务的原生复检核对适用语法能力，工具或 adapter 缺失时提出具体恢复或能力决策，不能改用 Python 或凭 WASM 零恢复关闭任务"
                 },
             )
         } else if checker_id == "python.ruff" && reason == "python_syntax_confirmation_needed" {
@@ -1119,7 +1119,11 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
     }
     if checker_id == "syntax.native_confirmation" {
         if let Some(guidance) = crate::syntax_task_recheck::guidance(root, &brief) {
-            if matches!(
+            if guidance["schema_version"] == "0.7.0" {
+                brief["schema_version"] = json!("0.7.0");
+                brief["native_adapter"] = guidance["native_adapter"].clone();
+                brief["tool_readiness"] = guidance["tool_readiness"].clone();
+            } else if matches!(
                 guidance["schema_version"].as_str(),
                 Some("0.4.0" | "0.5.0" | "0.6.0")
             ) {

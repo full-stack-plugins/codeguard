@@ -1,0 +1,313 @@
+{
+  "evidence_type": "actual_claude_host_prepared_runtime_lifecycle_observation",
+  "evidence_version": "0.1.0",
+  "captured_at": "2026-10-04",
+  "host_version": "Claude Code 2.1.273",
+  "codeguard_development_base_commit": "4d620f7e2e4c668f52b2e1083fba4e1c14b526d2",
+  "plugin_source_commit": "dec5f9d1361eefff493e120b4278939a243814a9",
+  "runtime_package_version": "0.1.4",
+  "runtime_source_commit": "1cd458f6e01a44a74388243e964e3f45290ac18e",
+  "runtime_binary_sha256": "34c2490ff4ccaa04bce9e91efd6ccabff6d679e97b08966b1edba9b6aec37266",
+  "registry_tarball_sha256": "a0d605f4a102e78d42766afaef61c6bd002556ccc5d16881c7553a91d6e20c80",
+  "installation_scope": "private_temporary_cache",
+  "plugin_sources_sha256": {
+    "hooks/hooks.json": "a9d9e5b2ae25258ed4dcd7fca44964e700ac75fb1e838aa6d63e246b01183584",
+    "hooks/rust_runtime_dispatch.cjs": "31edfd17640232fdce3d61cd05e10c05d2ecd82207c3358c5bf73f9ff4af3de2",
+    "runtime/codeguard_runtime.cjs": "71c8fee06d30b68e4473be150a0fc1749b07eb630be32c05372b5034822c7767",
+    "runtime/codeguard.lock.json": "80e32859722dff4644fd2a5efec3ba95886640bb848c1ea96b4c9e67f41f77b1"
+  },
+  "observations": [
+    {
+      "phase": "save_validation_failure_repair_repeat",
+      "host_exit_code": 0,
+      "host_duration_ms": 37051,
+      "plugin_selection": "session_local_inline_source",
+      "enabled_tools": [
+        "Edit",
+        "Read",
+        "Write"
+      ],
+      "tool_sequence": [
+        "Write",
+        "Read",
+        "Edit",
+        "Read",
+        "Edit",
+        "Write",
+        "Read",
+        "Read",
+        "Read",
+        "Read",
+        "Read",
+        "Read"
+      ],
+      "tool_failures": [
+        {
+          "tool": "Edit",
+          "reason": "edit_preflight_string_not_found",
+          "is_error": true,
+          "source_mutated": false
+        }
+      ],
+      "hook_responses": [
+        {
+          "hook_name": "SessionStart:startup",
+          "hook_event": "SessionStart",
+          "stdout": "{\"hookSpecificOutput\":{\"additionalContext\":\"CodeGuard：会话启动只读发现完成；语言 未识别，检查器配置观察 0 项。源码检查未运行，交付未评估。\",\"hookEventName\":\"SessionStart\"},\"systemMessage\":\"CodeGuard 项目发现反馈\"}\n",
+          "stderr": "",
+          "exit_code": 0,
+          "outcome": "success"
+        },
+        {
+          "hook_name": "UserPromptSubmit",
+          "hook_event": "UserPromptSubmit",
+          "stdout": "{\"hookSpecificOutput\":{\"additionalContext\":\"CodeGuard：本事件只提供检查时机提示；代码变更后执行局部检查，真实提交或 CI 时执行完整门禁。源码检查未运行，交付未评估。\",\"hookEventName\":\"UserPromptSubmit\"},\"systemMessage\":\"CodeGuard 检查时机提示\"}\n",
+          "stderr": "",
+          "exit_code": 0,
+          "outcome": "success"
+        },
+        {
+          "hook_name": "PostToolUse:Write",
+          "hook_event": "PostToolUse",
+          "stdout": "{\"hookSpecificOutput\":{\"additionalContext\":\"CodeGuard：bad.zig 局部检查反馈：原生诊断 0 项；规则 ；WASM 候选 1 项、疑似恢复节点 1 项；不可检查文件 0 项、原生快检未接线 1 项。必须安装或修复适用的原生 lint/编译器，再确认疑似问题；不要仅凭候选结果修改源码。原生确认任务 CG-B-6c3dda0684454f604dc4b43c0942deca：codeguard task show CG-B-6c3dda0684454f604dc4b43c0942deca . --format=json；完成原生确认后 codeguard task verify CG-B-6c3dda0684454f604dc4b43c0942deca . --format=json。候选语法能力尚未完整验收，完整项目与交付未评估。\",\"hookEventName\":\"PostToolUse\"},\"systemMessage\":\"CodeGuard 局部检查反馈\"}\n",
+          "stderr": "",
+          "exit_code": 0,
+          "outcome": "success"
+        },
+        {
+          "hook_name": "PostToolUse:Edit",
+          "hook_event": "PostToolUse",
+          "stdout": "{\"hookSpecificOutput\":{\"additionalContext\":\"CodeGuard：bad.zig 局部检查反馈：原生诊断 0 项；规则 ；WASM 候选 1 项、疑似恢复节点 0 项；不可检查文件 0 项、原生快检未接线 1 项。初检未发现恢复节点，建议安装适用原生 lint；这不表示完整检查通过。候选语法能力尚未完整验收，完整项目与交付未评估。\",\"hookEventName\":\"PostToolUse\"},\"systemMessage\":\"CodeGuard 局部检查反馈\"}\n",
+          "stderr": "",
+          "exit_code": 0,
+          "outcome": "success"
+        },
+        {
+          "hook_name": "PostToolUse:Write",
+          "hook_event": "PostToolUse",
+          "stdout": "{\"hookSpecificOutput\":{\"additionalContext\":\"CodeGuard：bad.zig 局部检查反馈：原生诊断 0 项；规则 ；WASM 候选 1 项、疑似恢复节点 0 项；不可检查文件 0 项、原生快检未接线 1 项。初检未发现恢复节点，建议安装适用原生 lint；这不表示完整检查通过。候选语法能力尚未完整验收，完整项目与交付未评估。\",\"hookEventName\":\"PostToolUse\"},\"systemMessage\":\"CodeGuard 局部检查反馈\"}\n",
+          "stderr": "",
+          "exit_code": 0,
+          "outcome": "success"
+        },
+        {
+          "hook_name": "Stop",
+          "hook_event": "Stop",
+          "stdout": "{\"hookSpecificOutput\":{\"additionalContext\":\"CodeGuard：待处理任务 CG-B-6c3dda0684454f604dc4b43c0942deca；请读取 codeguard next . --format=json 并按原检查器复检。结束指引不运行源码检查，交付未评估。\",\"hookEventName\":\"Stop\"},\"systemMessage\":\"CodeGuard 待处理任务指引\"}\n",
+          "stderr": "",
+          "exit_code": 0,
+          "outcome": "success"
+        },
+        {
+          "hook_name": "Stop",
+          "hook_event": "Stop",
+          "stdout": "{\"systemMessage\":\"CodeGuard：待处理任务 CG-B-6c3dda0684454f604dc4b43c0942deca；本轮已在 Stop 后继续，避免重复唤醒。结束指引不运行源码检查，交付未评估。\"}\n",
+          "stderr": "",
+          "exit_code": 0,
+          "outcome": "success"
+        }
+      ],
+      "native_verifications": [],
+      "stdout_sha256": "777fc8e3419f0a99b45eccf846d85dc1a26be8fb01c37caa9faec68c48349792",
+      "stderr_sha256": "9a08d2e57983f1a3f9cf6d7c5f1b83b294d798c8b79b2c6bf711046181a1a707",
+      "conversation_result": {
+        "subtype": "success",
+        "is_error": false,
+        "result": "Stop-hook instruction received and acted on within my allowed tools. Report follows.\n\n## Stop instruction\n\n> 待处理任务 CG-B-6c3dda0684454f604dc4b43c0942deca；请读取 codeguard next . --format=json 并按原检查器复检。结束指引不运行源码检查，交付未评估。\n\n## What I could and could not do\n\n- **`codeguard next . --format=json`** — ❌ not run. It is a shell command; I'm restricted to Read/Write/Edit. I probed for a stored backing file (`.codeguard/next.json`, `.codeguard/next.md`) — neither exists; the output is computed by the CLI.\n- **Recheck with the original checker** — ❌ not possible. It requires the native confirmation adapter, which the task record states is not wired for this language, and installing/repairing tooling is outside my permitted actions.\n- **Read-only inspection** — ✅ done, via Read on the task record and its evidence report. Nothing was modified.\n\n## Unresolved limitation (from `.codeguard` evidence, read-only)\n\nEvidence report `syntax-confirm-29266-1791113472696020000.json`:\n\n- **Language:** zig · **checker:** `syntax.native_confirmation` · **authority:** `local_unverified` · **execution:** `incomplete` · **coverage_proven:** `false`\n- **Decision:** `delivery_decision: not_evaluated` · **reason:** `native_syntax_confirmation_needed`\n- **Observation:** `status: candidate_observed` — one `ERROR` recovery at bytes 13–14, row 0, `grammar_qualified: false`, against source_sha256 `2177bff6…`\n- **Declared limitation:** \"Zig 0.16.0 ast-check differential agrees on 11 narrow syntax cases; other versions, systematic precision, complete native-first lint route and release remain unqualified\"\n\nThe task record's close condition remains unmet: **no native confirmation adapter exists for Zig here**, installation / WASM zero-recovery / task checkmark explicitly cannot close it, and another language's tool cannot substitute. The captured evidence is from the original bad source; the post-fix hook reruns showed suspected recovery nodes drop to 0 but still 1 WASM candidate — however no native re-verification was run, so the task evidence was not updated and the candidate is neither natively confirmed nor refuted.\n\n## Stage status (unchanged, restated accurately)\n\n- **File mutation:** ✅ succeeded (final content `const Fixed = struct {};`)\n- **Syntax precheck:** candidate-only, capability not fully accepted (1 WASM candidate persists)\n- **Native recheck:** ❌ not run — no adapter, fast-check unwired\n- **Task closure:** ❌ open — `CG-B-6c3dda0684454f604dc4b43c0942deca` pending native confirmation\n- **Project delivery:** ❌ not evaluated\n\nNo installs, no settings changes, no `.codeguard` record edits were made. I make no claim that native verification or delivery passed.",
+        "num_turns": 13,
+        "total_cost_usd": 0.248796
+      }
+    },
+    {
+      "phase": "filesystem_failure_native_repair",
+      "host_exit_code": 0,
+      "host_duration_ms": 37865,
+      "plugin_selection": "session_local_inline_source",
+      "enabled_tools": [
+        "Bash",
+        "Edit",
+        "Read",
+        "Write"
+      ],
+      "tool_sequence": [
+        "Write",
+        "Read",
+        "Write",
+        "Bash",
+        "Read",
+        "Edit",
+        "Bash",
+        "Bash",
+        "Read",
+        "Bash"
+      ],
+      "tool_failures": [
+        {
+          "tool": "Write",
+          "reason": "filesystem_write_permission_denied",
+          "is_error": true,
+          "source_mutated": false
+        }
+      ],
+      "hook_responses": [
+        {
+          "hook_name": "SessionStart:startup",
+          "hook_event": "SessionStart",
+          "stdout": "{\"hookSpecificOutput\":{\"additionalContext\":\"CodeGuard：会话启动只读发现完成；语言 zig，检查器配置观察 0 项。源码检查未运行，交付未评估。\",\"hookEventName\":\"SessionStart\"},\"systemMessage\":\"CodeGuard 项目发现反馈\"}\n",
+          "stderr": "",
+          "exit_code": 0,
+          "outcome": "success"
+        },
+        {
+          "hook_name": "UserPromptSubmit",
+          "hook_event": "UserPromptSubmit",
+          "stdout": "{\"hookSpecificOutput\":{\"additionalContext\":\"CodeGuard：本事件只提供检查时机提示；代码变更后执行局部检查，真实提交或 CI 时执行完整门禁。源码检查未运行，交付未评估。\",\"hookEventName\":\"UserPromptSubmit\"},\"systemMessage\":\"CodeGuard 检查时机提示\"}\n",
+          "stderr": "",
+          "exit_code": 0,
+          "outcome": "success"
+        },
+        {
+          "hook_name": "PostToolUseFailure:Write",
+          "hook_event": "PostToolUseFailure",
+          "stdout": "{\"hookSpecificOutput\":{\"additionalContext\":\"CodeGuard：写入失败，本次源码检查未运行；请先处理工具错误，交付未评估。\",\"hookEventName\":\"PostToolUseFailure\"},\"systemMessage\":\"CodeGuard 写入失败反馈\"}\n",
+          "stderr": "",
+          "exit_code": 0,
+          "outcome": "success"
+        },
+        {
+          "hook_name": "PostToolUse:Write",
+          "hook_event": "PostToolUse",
+          "stdout": "{\"hookSpecificOutput\":{\"additionalContext\":\"CodeGuard：bad.zig 局部检查反馈：原生诊断 0 项；规则 ；WASM 候选 1 项、疑似恢复节点 1 项；不可检查文件 0 项、原生快检未接线 1 项。必须安装或修复适用的原生 lint/编译器，再确认疑似问题；不要仅凭候选结果修改源码。原生确认任务 CG-B-6c3dda0684454f604dc4b43c0942deca：codeguard task show CG-B-6c3dda0684454f604dc4b43c0942deca . --format=json；完成原生确认后 codeguard task verify CG-B-6c3dda0684454f604dc4b43c0942deca . --format=json。候选语法能力尚未完整验收，完整项目与交付未评估。\",\"hookEventName\":\"PostToolUse\"},\"systemMessage\":\"CodeGuard 局部检查反馈\"}\n",
+          "stderr": "",
+          "exit_code": 0,
+          "outcome": "success"
+        },
+        {
+          "hook_name": "PreToolUse:Bash",
+          "hook_event": "PreToolUse",
+          "stdout": "",
+          "stderr": "",
+          "exit_code": 0,
+          "outcome": "success"
+        },
+        {
+          "hook_name": "PostToolUse:Edit",
+          "hook_event": "PostToolUse",
+          "stdout": "{\"hookSpecificOutput\":{\"additionalContext\":\"CodeGuard：bad.zig 局部检查反馈：原生诊断 0 项；规则 ；WASM 候选 1 项、疑似恢复节点 0 项；不可检查文件 0 项、原生快检未接线 1 项。初检未发现恢复节点，建议安装适用原生 lint；这不表示完整检查通过。候选语法能力尚未完整验收，完整项目与交付未评估。\",\"hookEventName\":\"PostToolUse\"},\"systemMessage\":\"CodeGuard 局部检查反馈\"}\n",
+          "stderr": "",
+          "exit_code": 0,
+          "outcome": "success"
+        },
+        {
+          "hook_name": "PreToolUse:Bash",
+          "hook_event": "PreToolUse",
+          "stdout": "",
+          "stderr": "",
+          "exit_code": 0,
+          "outcome": "success"
+        },
+        {
+          "hook_name": "PreToolUse:Bash",
+          "hook_event": "PreToolUse",
+          "stdout": "",
+          "stderr": "",
+          "exit_code": 0,
+          "outcome": "success"
+        },
+        {
+          "hook_name": "Stop",
+          "hook_event": "Stop",
+          "stdout": "{\"hookSpecificOutput\":{\"additionalContext\":\"CodeGuard：待处理任务 CG-B-6c3dda0684454f604dc4b43c0942deca；请读取 codeguard next . --format=json 并按原检查器复检。结束指引不运行源码检查，交付未评估。\",\"hookEventName\":\"Stop\"},\"systemMessage\":\"CodeGuard 待处理任务指引\"}\n",
+          "stderr": "",
+          "exit_code": 0,
+          "outcome": "success"
+        },
+        {
+          "hook_name": "PreToolUse:Bash",
+          "hook_event": "PreToolUse",
+          "stdout": "",
+          "stderr": "",
+          "exit_code": 0,
+          "outcome": "success"
+        },
+        {
+          "hook_name": "Stop",
+          "hook_event": "Stop",
+          "stdout": "{\"systemMessage\":\"CodeGuard：待处理任务 CG-B-6c3dda0684454f604dc4b43c0942deca；本轮已在 Stop 后继续，避免重复唤醒。结束指引不运行源码检查，交付未评估。\"}\n",
+          "stderr": "",
+          "exit_code": 0,
+          "outcome": "success"
+        }
+      ],
+      "native_verifications": [
+        {
+          "native_report_sha256": "0dc589433669edd760927ec4222676aa4fd6d66a08f4b9d5c3bb3a5ad41454d6",
+          "report_sha256": "0f46c4d7771cbbd2320511189967fdcf1b4074a6ed75a376d6a80be88fb76f8f",
+          "report_digest_kind": "sorted_json_projection_not_raw_bytes",
+          "task_id": "CG-B-6c3dda0684454f604dc4b43c0942deca",
+          "schema_version": "0.12.0",
+          "observation": "still_blocked",
+          "event_persisted": true,
+          "authority": "local_unverified",
+          "native_coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "source_sha256": "2177bff62d47bc48c4cbc97cce938e986154a2f1e124612b43c664b5dc86ae43",
+          "input_stable": true,
+          "native_status": "diagnostics_observed",
+          "native_version": "0.16.0",
+          "tool_sha256": "71cc3995a7586753ebf82c66dfb8bef43df446517550678781834586a960f8c9",
+          "diagnostics": [
+            {
+              "column": 16,
+              "line": 1,
+              "rule_id": "zig.ast_check.error"
+            }
+          ]
+        },
+        {
+          "native_report_sha256": "a5debb45a4baa564c50aa5f646ff3a7e79a20818bfaf1343788a1d0cacfd4dbe",
+          "report_sha256": "788b61b3d93863c997b2ca08681e847abccfdb9bf4aca024aff3c6800c4b8dc5",
+          "report_digest_kind": "sorted_json_projection_not_raw_bytes",
+          "task_id": "CG-B-6c3dda0684454f604dc4b43c0942deca",
+          "schema_version": "0.12.0",
+          "observation": "candidate_absent_unverified_policy",
+          "event_persisted": true,
+          "authority": "local_unverified",
+          "native_coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "source_sha256": "d8b8bd395aab289d256320d2c7218d59255badbaa999966c640e617cd325b256",
+          "input_stable": true,
+          "native_status": "completed",
+          "native_version": "0.16.0",
+          "tool_sha256": "71cc3995a7586753ebf82c66dfb8bef43df446517550678781834586a960f8c9",
+          "diagnostics": []
+        }
+      ],
+      "stdout_sha256": "d32c9eec628284031ca52ef727795aea5b8f4c1eea518d2bef5dab8688ef5427",
+      "stderr_sha256": "9a08d2e57983f1a3f9cf6d7c5f1b83b294d798c8b79b2c6bf711046181a1a707",
+      "conversation_result": {
+        "subtype": "success",
+        "is_error": false,
+        "result": "I issued the same allowed `next` command once, as instructed. It returned an identical result — `disposition: \"verification_required\"`, `reason_code: \"native_syntax_confirmation_needed\"`, `native_confirmation_status: \"completed\"` with zero diagnostic positions, no new attempt opened (`attempt_count: 0`), and the same repair brief.\n\n## Remaining policy limitation\n\nThe task cannot be closed or brought to acceptance from this session, for structural reasons:\n\n- **Closure requires the native checker under the same controlled policy** — the brief's closure condition states the native tool must fully re-verify and confirm resolution, and explicitly that \"局部查询不能关闭任务\" (local queries cannot close the task). `next` is a routing query only; it can never itself satisfy closure.\n- **Coverage and policy are unproven** — every report shows `coverage_proven: false` and `authority: \"local_unverified\"`, so even a clean native recheck (0 diagnostics) yields `candidate_absent_unverified_policy`, not acceptance.\n- **The fixture's allowed command set is exhausted** — only the `exec next` / `task verify` invocations were permitted. Running another verify with identical flags would repeat the same observation without changing the protocol state, and installing/fixing checker wiring is out of scope (\"不重复源码修复或安装工具，也不自动关闭\").\n\nBottom line: the expected failure and repair lifecycle executed as designed — failed-write hook delivered, native diagnostic 1 → 0 before/after repair — but the task remains open and verified no further; **delivery was never evaluated** (`delivery_decision: \"not_evaluated\"`). I claim no full acceptance and close nothing; the remaining step (\"恢复检查完整性\" / formal policy coverage confirmation) belongs to the checker-environment side, not to this session.",
+        "num_turns": 11,
+        "total_cost_usd": 0.207339
+      }
+    }
+  ],
+  "final_state": {
+    "source_sha256": "d8b8bd395aab289d256320d2c7218d59255badbaa999966c640e617cd325b256",
+    "source_fixed": true,
+    "failed_write_target_absent": true,
+    "task_count": 1,
+    "task_id": "CG-B-6c3dda0684454f604dc4b43c0942deca",
+    "finding_state": "open",
+    "finding_sha256": "a656faf55e6150a96d655a71a3fa9ac31fe3f7fbddc72fad393d4adc57674e14"
+  },
+  "known_guidance_defect": "fresh Zig candidate says adapter unavailable before native history despite applicable task verify support; development source correction is separately tested and not in locked 0.1.4",
+  "full_host_acceptance": false,
+  "marketplace_installation_verified": false,
+  "trusted_task_closure_verified": false,
+  "project_gate_verified": false,
+  "grammar_qualified_count": 0,
+  "delivery_decision": "not_evaluated"
+}
