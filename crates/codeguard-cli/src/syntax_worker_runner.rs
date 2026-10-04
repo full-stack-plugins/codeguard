@@ -56,15 +56,26 @@ pub fn run_syntax_worker_candidate(
         ));
     }
     let value = codeguard_adapters::parse_unique_json(&process.stdout).map_err(str::to_owned)?;
+    if value["schema_version"] == "1.0.0" && value.get("structural_observations").is_some() {
+        return Err("syntax_worker_version_fields_mismatch".into());
+    }
     let report: SyntaxWorkerEnvelope =
         serde_json::from_value(value).map_err(|_| "syntax_worker_report_invalid")?;
-    if report.schema_version != "1.0.0"
+    if !matches!(report.schema_version.as_str(), "1.0.0" | "1.1.0")
+        || (report.schema_version == "1.0.0" && !report.structural_observations.is_empty())
+        || (report.schema_version == "1.1.0"
+            && (language != "python" || report.structural_observations.is_empty()))
         || report.report_type != "syntax_worker_candidate"
         || report.language != language
         || report.grammar_sha256 != asset.sha256
         || report.grammar_abi_version != asset.abi_version
         || report.source_sha256 != expected_sha
         || report.recoveries.len() > 128
+        || report.recoveries.len() + report.structural_observations.len() > 128
+        || report
+            .structural_observations
+            .iter()
+            .any(|row| !row.valid(language, source))
     {
         return Err("syntax_worker_identity_mismatch".into());
     }
@@ -104,6 +115,7 @@ pub fn run_syntax_worker_candidate(
         grammar_sha256: asset.sha256.clone(),
         grammar_qualified: false,
         recoveries: report.recoveries,
+        structural_observations: report.structural_observations,
         precheck,
     })
 }

@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashSet};
 
 mod capability_validation;
+mod python_suite_rule;
+pub use python_suite_rule::{is_required_python_suite_parent, python_suite_rule_sha256};
 mod cargo_audit;
 mod cargo_build;
 pub use cargo_audit::{

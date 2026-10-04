@@ -356,6 +356,9 @@ mod hook_native_tools;
 #[cfg(all(feature = "wasm-precheck", unix))]
 pub mod grammar_native_differential;
 
+#[cfg(feature = "wasm-precheck")]
+pub mod syntax_worker_structure;
+
 #[cfg(all(feature = "wasm-precheck", unix))]
 mod grammar_native_checker;
 #[cfg(all(feature = "wasm-precheck", unix))]

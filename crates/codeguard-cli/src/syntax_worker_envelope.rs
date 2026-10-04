@@ -22,4 +22,7 @@ pub struct SyntaxWorkerEnvelope {
     pub truncated: bool,
     /// ERROR/MISSING 恢复锚点。
     pub recoveries: Vec<SyntaxWorkerRecovery>,
+    /// 1.1协议的独立结构观察；历史1.0中不存在该字段。
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub structural_observations: Vec<crate::syntax_worker_structure::SyntaxWorkerStructure>,
 }

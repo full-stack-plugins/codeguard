@@ -13,6 +13,8 @@ pub struct SyntaxWorkerCandidateObservation {
     pub grammar_qualified: bool,
     /// 已校验原始位置的恢复锚点。
     pub recoveries: Vec<SyntaxWorkerRecovery>,
+    /// 独立的结构规则观察，不混入原始恢复数组。
+    pub structural_observations: Vec<crate::syntax_worker_structure::SyntaxWorkerStructure>,
     /// 初检状态聚合；当前候选资产不能成为 clean。
     pub precheck: SyntaxPrecheckOutcome,
 }

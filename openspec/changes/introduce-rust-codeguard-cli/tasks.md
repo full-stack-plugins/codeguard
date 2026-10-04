@@ -1432,3 +1432,7 @@ Zig本批终态：受影响WASM八目标52通过/0失败/6条件忽略，Hook另
 ### 2026-10-05 WASM 空block结构事实（接线未完成）
 
 runtime新增独立的全树空block事实扫描，记录父节点及原始字节位置；不受has_error裁剪，不伪造ERROR/MISSING或全语言违规。Python合法suite与Rust合法空块、记录/遍历预算的实际WASM测试见[验收](../../../tests/acceptance/wasm-empty-block-facts.md)。原始加载/恢复及新扫描共21通过；worker/公开报告/语言规则/任务未接线，Python两项漏检仍保留，14.4/14.17/14.19不勾选。
+
+### 2026-10-05 Python独立结构观察进入私有worker与显式探针
+
+已有空block事实扫描现接入固定Python required_suite候选规则、私有1.1协议和公开grammar probe 0.2协议；原始ERROR/MISSING数组与计数保持原始来源，结构观察另含规则配置摘要和坐标，资格仍0、交付未评估。三类缺语句块正例与五类合法反例、身份和位置拒绝、真实报告schema均验证，见[局部验收](../../../tests/acceptance/python-structure-probe.md)。统一lint/聚合报告、任务与原生复检尚未接线；Python历史两项FN及14.4/14.7/14.17/14.19父任务继续未完成，不覆盖历史差分证据。

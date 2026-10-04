@@ -3,7 +3,7 @@
 use crate::syntax_worker_envelope::SyntaxWorkerEnvelope;
 use crate::syntax_worker_recovery::SyntaxWorkerRecovery;
 use codeguard_adapters::bundled_grammar_candidate;
-use codeguard_runtime::{WasmGrammar, scan_wasm_recoveries};
+use codeguard_runtime::{WasmGrammar, scan_wasm_empty_blocks, scan_wasm_recoveries};
 use sha2::{Digest, Sha256};
 use std::io::Read;
 use std::process::ExitCode;
@@ -66,6 +66,34 @@ fn observe(language: &str, source: &[u8]) -> Result<SyntaxWorkerEnvelope, String
     )?;
     let tree = grammar.parse(source)?;
     let scanned = scan_wasm_recoveries(&tree, MAX_RECOVERIES)?;
+    let mut structural_observations = Vec::new();
+    let mut structural_truncated = false;
+    if language == "python" {
+        let blocks = scan_wasm_empty_blocks(&tree, MAX_RECOVERIES)?;
+        structural_truncated = blocks.truncated;
+        for block in blocks.blocks {
+            if !codeguard_adapters::is_required_python_suite_parent(&block.parent_syntax_kind) {
+                continue;
+            }
+            if scanned.recoveries.len() + structural_observations.len() == MAX_RECOVERIES {
+                structural_truncated = true;
+                break;
+            }
+            structural_observations.push(crate::syntax_worker_structure::SyntaxWorkerStructure {
+                basis: "codeguard_structure_rule".into(),
+                rule_id: "codeguard.python.required_suite".into(),
+                rule_version: "1.0.0".into(),
+                rule_sha256: codeguard_adapters::python_suite_rule_sha256(),
+                parent_syntax_kind: block.parent_syntax_kind,
+                start_byte: block.start_byte,
+                end_byte: block.end_byte,
+                start_row: block.start_row,
+                start_column_byte: block.start_column_byte,
+                end_row: block.end_row,
+                end_column_byte: block.end_column_byte,
+            });
+        }
+    }
     let recoveries = scanned
         .recoveries
         .into_iter()
@@ -82,13 +110,19 @@ fn observe(language: &str, source: &[u8]) -> Result<SyntaxWorkerEnvelope, String
         })
         .collect();
     Ok(SyntaxWorkerEnvelope {
-        schema_version: "1.0.0".into(),
+        schema_version: if structural_observations.is_empty() {
+            "1.0.0"
+        } else {
+            "1.1.0"
+        }
+        .into(),
         report_type: "syntax_worker_candidate".into(),
         language: language.into(),
         grammar_sha256: asset.sha256.clone(),
         grammar_abi_version: asset.abi_version,
         source_sha256: format!("{:x}", Sha256::digest(source)),
-        truncated: scanned.truncated,
+        truncated: scanned.truncated || structural_truncated,
         recoveries,
+        structural_observations,
     })
 }

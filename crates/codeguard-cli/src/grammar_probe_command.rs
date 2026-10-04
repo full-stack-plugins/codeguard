@@ -50,28 +50,33 @@ pub fn run(args: &[String]) -> ExitCode {
     );
     match result {
         Ok(observation) => {
-            println!(
-                "{}",
-                json!({
-                    "schema_version":"0.1.0",
-                    "report_type":"grammar_candidate_probe",
-                    "status":"incomplete",
-                    "language":language,
-                    "path":source_path,
-                    "source_sha256":observation.source_sha256,
-                    "grammar_sha256":observation.grammar_sha256,
-                    "grammar_qualified":false,
-                    "precheck":observation.precheck,
-                    "recoveries":observation.recoveries,
-                    "native":{"status":"not_run","reason":"explicit_candidate_probe"},
-                    "delivery_decision":"not_evaluated",
-                    "next_action":if observation.recoveries.is_empty() {
-                        "run_or_configure_applicable_native_lint_before_delivery"
-                    } else {
-                        "confirm_suspected_recoveries_with_applicable_native_tool"
-                    }
-                })
-            );
+            let mut report = json!({
+                "schema_version":"0.1.0",
+                "report_type":"grammar_candidate_probe",
+                "status":"incomplete",
+                "language":language,
+                "path":source_path,
+                "source_sha256":observation.source_sha256,
+                "grammar_sha256":observation.grammar_sha256,
+                "grammar_qualified":false,
+                "precheck":observation.precheck,
+                "recoveries":observation.recoveries,
+                "native":{"status":"not_run","reason":"explicit_candidate_probe"},
+                "delivery_decision":"not_evaluated",
+                "next_action":if observation.recoveries.is_empty() && observation.structural_observations.is_empty() {
+                    "run_or_configure_applicable_native_lint_before_delivery"
+                } else {
+                    "confirm_suspected_recoveries_with_applicable_native_tool"
+                }
+            });
+            if !observation.structural_observations.is_empty() {
+                report["schema_version"] = json!("0.2.0");
+                report["precheck_scope"] = json!("raw_parser_recoveries_and_observation_budgets");
+                report["next_action"] =
+                    json!("confirm_candidate_structure_with_applicable_native_tool");
+                report["structural_observations"] = json!(observation.structural_observations);
+            }
+            println!("{report}");
             ExitCode::from(3)
         }
         Err(reason) => emit_incomplete(language, source_path, &reason),
