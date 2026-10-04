@@ -41,6 +41,8 @@ Codeguard：发现 -> 选择 -> 原生工具 -> 解释结果
 
 CLI 不内置大模型或向量数据库，也不使用 Rust 重写 P3C/Maven 检查。原生工具仍可能需要 JVM、Node.js、Python、Go 或 Rust 工具链。Python 参考夹具属于测试材料，不是第二套 Codeguard 运行内核。
 
+当前源码的原生 P3C 单文件 lint 可连接最近已初始化的工作台，也可显式指定 `--workspace ROOT`。使用 `codeguard lint java FILE --checker p3c` 并提供既有 Maven/JDK/离线仓库参数；仅检查所选文件及最近 POM 可静态确认的规则子集，`check java` 和 `task verify` 复用同一稳定任务。显式选择 P3C 不会静默切换 WASM。这是局部反馈，完整 P3C 覆盖及自动关闭仍待验收。见[修复流程](docs/Codeguard-Native-Repair-Workflow.zh_CN.md#p3c-单文件项目绑定)和[验收记录](tests/acceptance/java-p3c-file-workbench.md)。公开 npm 0.1.4 未更新。
+
 ## 2. 能力与成熟度
 
 | 领域 | 当前实现 | 边界与证据 |

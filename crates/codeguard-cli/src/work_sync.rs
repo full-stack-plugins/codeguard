@@ -2300,6 +2300,10 @@ fn render_task(report: &ReportInput, finding: &FindingInput) -> String {
             "lint",
             "java",
             finding.path.as_str(),
+            "--checker",
+            "p3c",
+            "--workspace",
+            ".",
             "--maven-tool",
             "<绝对路径>",
             "--java-home",
@@ -2311,7 +2315,7 @@ fn render_task(report: &ReportInput, finding: &FindingInput) -> String {
         ])
         .expect("复检参数可编码");
         return format!(
-            "# {} 待修复\n\n- 问题证据：原生 P3C/PMD 命名规则 `{}`，首次行号 {}；报告摘要 `{}`。\n- 规则依据：P3C 2.1.1 命名规则集；工具与规则批准、完整覆盖尚未核验。\n- 允许范围：仅下列项目内源码，不得靠关闭规则或修改无关文件消除诊断。\n\n    {}\n\n- 修复步骤：核对原生规则与命名语义后修复该文件；若确为误报，提出精确白名单候选并等待独立裁定。\n- 复检 argv（占位值替换为已核验绝对路径与摘要）：\n\n    {}\n\n- 历史尝试：尚无记录；首次 run `{}`。\n- 关闭条件：同一原生规则、工具和范围复检确认该发现消失，完整质量策略另行核验。\n\n> 本地待处理记录，不是交付通过证明。\n",
+            "# {} 待修复\n\n- 问题证据：原生 P3C/PMD 规则 `{}`，首次行号 {}；报告摘要 `{}`。\n- 规则依据：P3C 2.1.1 本轮已声明的规则子集；工具与规则批准、完整覆盖尚未核验。\n- 允许范围：仅下列项目内源码，不得靠关闭规则或修改无关文件消除诊断。\n\n    {}\n\n- 修复步骤：核对具体原生规则及其语义后修复该文件；若确为误报，提出精确白名单候选并等待独立裁定。\n- 复检 argv（占位值替换为已核验绝对路径与摘要）：\n\n    {}\n\n- 历史尝试：尚无记录；首次 run `{}`。\n- 关闭条件：同一原生规则、工具和范围复检确认该发现消失，完整质量策略另行核验。\n\n> 本地待处理记录，不是交付通过证明。\n",
             finding.id, finding.rule_id, finding.line, report.digest, path, recheck, report.run_id
         );
     }

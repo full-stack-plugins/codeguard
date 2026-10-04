@@ -639,3 +639,7 @@ flowchart TD
 ### 全 grammar 开发评测边界（2026-10-04）
 
 开发期 `evaluate_grammars` 复用同一 Rust 隔离 worker 与 Core 分层计算，固定全部 32 份 grammar 和 358 例语料。0.2 协议将仓库回归、Dart 上游回归和待裁定预期分成 35 个语言×来源组；每组计算分类与区间，多来源语言汇总只加计数、不混算精度。Rust 导入器保留源码字节、上游预期及来源摘要；旧 0.1 语料/报告不改写。清单/源码/程序身份、未知和 pending 均保留，不成为项目质量门禁或独立 holdout。执行路径、逐组统计与缺口见 [统一 grammar 评测](Codeguard-Grammar-Evaluation.zh_CN.md)。
+
+## P3C 单文件应用服务
+
+原生单文件 lint 与聚合检查共用 P3C 保存/同步、稳定 finding 身份和原工具复检。单文件路径读取祖先 POM，执行范围仅限所选文件。见[修复流程](Codeguard-Native-Repair-Workflow.zh_CN.md#p3c-单文件项目绑定)。完整生效模型覆盖和可信关闭仍待完成。

@@ -4,6 +4,21 @@
 
 ## ADDED Requirements
 
+### Requirement: Bound single-file P3C lint SHALL reuse project remediation identity
+`lint java FILE` 显式选择 P3C 原生入口或提供原生上下文时，在最近已存在的 `.codeguard/` 或显式 `--workspace ROOT` 中 SHALL 复用项目 P3C 观察、稳定 finding 和原工具复检路径，只检查所选文件。SHALL 按最近 POM 的可静态确认规则子集执行；未配置、未知配置及不适用规则不得被默认十个规则集替代。最近损坏的工作台不得跳过、重建或退回未绑定探针。未绑定的既有局部报告保持兼容；源码越界或符号链接 SHALL 在原生启动前拒绝。
+
+#### Scenario: Single-file and project P3C discover the same rule violation
+- **WHEN** 已初始化工作区中的单文件 lint 和 check java 观察同一源码锚点及原生规则
+- **THEN** 更新同一个稳定任务并通过现有 task verify 原生服务复检，不重复执行一次单文件原生探针来同步结果；局部零诊断不证明完整规则覆盖或授权关闭
+
+#### Scenario: Closest module does not configure P3C
+- **WHEN** 父 POM 配置 P3C 而目标文件最近的子 POM 未配置或配置未知
+- **THEN** 返回该子构建根的配置阻塞和可读修复指引，不使用父规则或隔离默认规则伪造源码违规
+
+#### Scenario: Single-file P3C persistence fails
+- **WHEN** 原生诊断有效但工作台报告无法保存或同步失败
+- **THEN** 诊断仍反馈到 human/JSON，给出实际存储或同步失败原因；下一步和任务引用不得伪造，不能声称自动修复流程已经接通
+
 ### Requirement: npm remediation tasks SHALL recheck through their original native audit service
 npm持久任务 SHALL 支持 task verify，结构化任务根决定原生cwd，显式原工具上下文、共享预算与任务租约保护复检和持久化。结果 SHALL 反馈原生诊断及下一步，不从零漏洞推导完整覆盖或关闭。
 

@@ -178,3 +178,31 @@ codeguard task verify TASK_ID . --erl-tool /absolute/path/to/erl --format=json
 ```
 
 公开 npm 0.1.4 不含本批实现。当前源码的私有包已通过隔离缓存离线安装后的原生首次 lint/check/next/task verify/repair_ready：受控协议与真实 OTP 28 两组分开运行，26 份实际报告经 schema 校验。修复后没有可信策略仍保留 open，持久化失败保留位置且不伪造任务。该证据不代表公开版本已升级；实际宿主自动显示与插件发布仍需独立验收。见[原生链路验收](../tests/acceptance/erlang-native-first-workbench.md)和[安装后验收](../tests/acceptance/npm-erlang-native-repair.md)。
+
+## P3C 单文件项目绑定
+
+原生 `lint java FILE --checker p3c` 选择最近已有工作台，或显式 `--workspace ROOT`。仅检查所选文件及最近 POM 可静态确认的规则子集。子模块缺失/未知配置会遮蔽父 POM，不以默认十个规则集替代。显式 P3C 保留原生准备阻塞；默认无上下文 WASM 是独立的候选路径。
+
+```mermaid
+flowchart LR
+    A[P3C 原生单文件请求] --> B[已有工作台与最近 POM]
+    B --> C[所选规则的一次原生探针]
+    C --> D[保存既有项目观察]
+    D --> E[共用同步与稳定任务]
+    E --> F[next / task verify]
+    F --> G[原 P3C 工具复检]
+    G --> H[记录结果并保留覆盖缺口]
+```
+
+```bash
+codeguard lint java src/main/java/Example.java --checker p3c --workspace . \
+  --maven-tool /absolute/path/to/mvn --java-home /absolute/path/to/jdk \
+  --maven-repo /absolute/path/to/offline-repository --repo-sha256 REPOSITORY_TREE_SHA256 \
+  --format json
+codeguard next . --format json
+codeguard task verify TASK_ID . --maven-tool /absolute/path/to/mvn \
+  --java-home /absolute/path/to/jdk --maven-repo /absolute/path/to/offline-repository \
+  --repo-sha256 REPOSITORY_TREE_SHA256 --format json
+```
+
+将示例路径、仓库身份和任务 ID 替换为实际选择的上下文。已绑定反馈为 [0.1](../schemas/java-p3c-file-feedback-0.1.schema.json)，内部项目观察仍为 0.2，未绑定反馈仍为 0.2。单文件路径只读取祖先 POM，不发现兄弟源码；复用聚合检查的保存/同步服务和既有原工具任务复检。工作台损坏、源码越界、源码或父目录链接均在 Maven 启动前阻止该路径。保存失败保留原生诊断与具体原因，不伪造下一步。零诊断在规则覆盖未证明时保留任务 open。公开 npm 0.1.4 不含此变更。[受控协议验收](../tests/acceptance/java-p3c-file-workbench.md) 不证明完整 P3C、生效模型覆盖或真实宿主安装。

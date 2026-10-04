@@ -142,6 +142,7 @@ pub mod java_lint_dispatch;
 #[cfg(unix)]
 pub mod java_p3c_command;
 mod java_p3c_scan;
+mod java_p3c_workbench;
 #[cfg(feature = "wasm-precheck")]
 mod java_syntax_precheck;
 pub mod legacy_v1_protocol;

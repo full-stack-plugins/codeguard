@@ -1100,3 +1100,7 @@ This is a complete embedded `erlang_forms_scan` example captured from actual OTP
 ### All-grammar replay protocol (2026-10-04)
 
 The development-only `grammar_regression` / `grammar_regression_evaluation` protocols support legacy 0.1 and explicit-cohort 0.2. Duplicate keys, missing languages, cohort/version conflicts and changed hashes are rejected before execution. The 358-case corpus uses a Rust importer preserving 150 Dart source/expectation cases while rejecting empty trees and missing separators that swallow cases. Reports retain 32 languages and 35 source cohorts, selected valid/invalid labels, sample-level TP/FP/FN/TN, Wilson intervals, unknowns and cold-worker timings. Mixed-source summaries use `metric_aggregation=not_pooled` with null precision/recall. Pending labels stay outside metrics; qualified count stays zero and delivery unevaluated. Legacy schemas/reports remain intact. See [evaluation technical guide](Codeguard-Grammar-Evaluation.md).
+
+## Bound P3C file feedback protocol
+
+`java_p3c_file_feedback` 0.1 wraps existing project observation 0.2 and actual workbench/next results. Its [schema](../schemas/java-p3c-file-feedback-0.1.schema.json) restricts source selection, native authority and failure/task combinations; explicit `--checker p3c` preserves native blockers rather than silently selecting WASM. Unbound native feedback 0.2 remains compatible. See [acceptance](../tests/acceptance/java-p3c-file-workbench.md); controlled protocol tests do not prove actual rule precision.

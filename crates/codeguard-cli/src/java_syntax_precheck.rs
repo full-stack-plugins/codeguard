@@ -12,7 +12,8 @@ use std::time::Instant;
 /// 仅无原生参数且目标是普通 Java 单文件时启用候选解析。
 /// 参数为已经通过原生入口解析的请求；返回是否有资格补充非权威语法观察。
 pub(crate) fn eligible(args: &Args) -> bool {
-    args.maven_tool.is_none()
+    args.workspace.is_none()
+        && args.maven_tool.is_none()
         && args.java_home.is_none()
         && args.maven_repo.is_none()
         && args.repo_sha256.is_none()

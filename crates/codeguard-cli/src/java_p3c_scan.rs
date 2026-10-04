@@ -83,6 +83,7 @@ pub(crate) fn observe_project(
         } else {
             let args = Args {
                 source: root.join(relative),
+                workspace: None,
                 maven_tool: context.maven_tool.map(Path::to_path_buf),
                 java_home: context.java_home.map(Path::to_path_buf),
                 maven_repo: context.maven_repo.map(Path::to_path_buf),

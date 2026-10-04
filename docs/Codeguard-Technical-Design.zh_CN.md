@@ -1100,3 +1100,7 @@ flowchart TD
 ### 全 grammar 回放协议（2026-10-04）
 
 开发协议 `grammar_regression` / `grammar_regression_evaluation` 现支持历史 0.1 和显式 cohort 的 0.2；重复键、缺语言、来源组版本冲突和摘要失配在启动前拒绝。当前固定 358 例，Rust corpus 导入器保留 Dart 150 例的源字节与预期 ERROR/MISSING，拒绝空树和吞样例的缺分隔符。报告保留 32 语言、35 来源组、已选合法/非法预期、TP/FP/FN/TN、Wilson 区间、未知及冷 worker 墙钟时间；混合来源汇总设置 `metric_aggregation=not_pooled`、precision/recall=null。pending 不入指标，资格为零、交付未评估；旧 schema/报告不改写。运行方式、字段边界及实际报告见 [评测技术专题](Codeguard-Grammar-Evaluation.zh_CN.md)。
+
+## 已绑定 P3C 单文件反馈协议
+
+`java_p3c_file_feedback` 0.1 包装既有项目观察 0.2 和实际工作台/next 结果。[Schema](../schemas/java-p3c-file-feedback-0.1.schema.json) 限制所选源码、原生权威和失败/任务组合；显式 `--checker p3c` 保留原生阻塞，不静默切换 WASM。未绑定原生反馈 0.2 保持兼容。见[验收记录](../tests/acceptance/java-p3c-file-workbench.md)；受控协议测试不证明真实规则精度。

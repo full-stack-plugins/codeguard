@@ -321,6 +321,7 @@ Rust 实现与本 change 归本仓；宿主实现归独立 codeguard-plugin 仓�
 | RW18 | [remediation-workflow](specs/remediation-workflow/spec.md) / ESLint incomplete prerequisites SHALL create investigation tasks | 7.3,9.3,9.24,12.7 |
 | RW19 | [remediation-workflow](specs/remediation-workflow/spec.md) / ESLint task verification SHALL retain native observations | 7.3,9.7,9.13,12.7 |
 | RW20 | [remediation-workflow](specs/remediation-workflow/spec.md) / npm local audit observations SHALL enter persistent coverage repair tasks | 7.3,9.3,9.4,9.13,12.7 |
+| RW21 | [remediation-workflow](specs/remediation-workflow/spec.md) / Bound single-file P3C lint SHALL reuse project remediation identity | 6.2,9.3,9.4,9.7,9.13,12.7 |
 | UC12 | [unified-cli-contract](specs/unified-cli-contract/spec.md) / check all SHALL orchestrate npm roots through the shared native runtime | 2.3,3.4,7.3,7.5,9.13,12.9 |
 | UC13 | [unified-cli-contract](specs/unified-cli-contract/spec.md) / Install previews SHALL distinguish bound layout declarations from verified package contents | 2.7,11.2,12.9 |
 | UC14 | [unified-cli-contract](specs/unified-cli-contract/spec.md) / npm public CVE feedback SHALL preserve local observation boundaries | 2.5,7.3,7.5,11.16,12.9 |

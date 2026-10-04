@@ -178,3 +178,31 @@ These are complete native-first and `next` outputs from a local OTP 28 run. Path
 ```
 
 Public npm 0.1.4 does not include this batch. A private source-built package passed offline installation in an isolated cache and native-first lint/check/next/task verify/repair_ready flows. Controlled protocol and real OTP 28 runs remain separate; 26 actual reports passed their schemas. A clean recheck without trusted policy keeps the task open; persistence failure retains diagnostics without inventing a task. This does not upgrade the public version. Installed-host display and plugin release require separate acceptance. See [native workflow acceptance](../tests/acceptance/erlang-native-first-workbench.md) and [installed-package acceptance](../tests/acceptance/npm-erlang-native-repair.md).
+
+## P3C single-file project binding
+
+Native `lint java FILE --checker p3c` selects the nearest existing workspace, or explicit `--workspace ROOT`. Only the selected file and the nearest POM’s statically confirmed rule subset are checked. A missing/unknown child configuration shadows the parent; default ten-rule-set probes cannot substitute for it. Explicit P3C selection retains native preparation blockers; default context-free WASM remains a separate candidate path.
+
+```mermaid
+flowchart LR
+    A[Native P3C single-file request] --> B[Existing workspace and closest POM]
+    B --> C[One native probe with selected rules]
+    C --> D[Save existing project observation]
+    D --> E[Shared sync and stable task]
+    E --> F[next / task verify]
+    F --> G[Original native P3C recheck]
+    G --> H[Record result; retain coverage gaps]
+```
+
+```bash
+codeguard lint java src/main/java/Example.java --checker p3c --workspace . \
+  --maven-tool /absolute/path/to/mvn --java-home /absolute/path/to/jdk \
+  --maven-repo /absolute/path/to/offline-repository --repo-sha256 REPOSITORY_TREE_SHA256 \
+  --format json
+codeguard next . --format json
+codeguard task verify TASK_ID . --maven-tool /absolute/path/to/mvn \
+  --java-home /absolute/path/to/jdk --maven-repo /absolute/path/to/offline-repository \
+  --repo-sha256 REPOSITORY_TREE_SHA256 --format json
+```
+
+Replace example paths, repository identity and task ID with the actual selected context. Bound feedback is [0.1](../schemas/java-p3c-file-feedback-0.1.schema.json), nesting existing project observation 0.2; unbound feedback stays 0.2. The single-file path reads ancestor POM candidates without discovering sibling sources. It reuses the aggregate persistence/sync service and existing native task verification. Damaged workspaces, outside sources and source/parent links stop before Maven. Persistence failure preserves native diagnostics and its actual reason, without a next task. Zero diagnostics leave the task open while rule coverage remains unproven. This change is absent from public npm 0.1.4. [Controlled protocol acceptance](../tests/acceptance/java-p3c-file-workbench.md) does not certify complete P3C/effective-model coverage or real-host installation.

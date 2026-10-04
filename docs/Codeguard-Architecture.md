@@ -639,3 +639,7 @@ flowchart TD
 ### All-grammar development evaluation boundary (2026-10-04)
 
 The `evaluate_grammars` development entry reuses the same isolated Rust workers and Core statistics across all 32 grammars and 358 fixed cases. Protocol 0.2 separates repository, Dart upstream and provisional expectations into 35 language×source cohorts; mixed-source summaries sum counts without pooling precision. The Rust importer preserves source bytes, upstream expectations and origins; legacy 0.1 corpora/reports remain unchanged. Manifest/source/program identities, unknowns and pending labels remain explicit. This provides neither a project quality gate nor independent holdout evidence. See [unified grammar evaluation](Codeguard-Grammar-Evaluation.md).
+
+## P3C single-file application service
+
+Native file lint and aggregate checks share P3C persistence/synchronization, stable finding identity and original-tool verification. File lint reads ancestor POMs and limits execution to one selected source. See [workflow](Codeguard-Native-Repair-Workflow.md#p3c-single-file-project-binding). Full effective-model coverage and trusted closure remain pending.
