@@ -1,0 +1,130 @@
+{
+  "events": [
+    {
+      "event": {
+        "event_id": "event-be6f7ccecfce1ab3b113ad59df2195e2aeeeabe6d7ba7cc205fe8c4b330da64a",
+        "identity": {
+          "checker_id": "syntax.native_confirmation",
+          "scope": "App.kt",
+          "task_id": "CG-B-0eba564680c4a5aedd4a406e7a49a62d",
+          "workspace_id": "ws-2ff50295f3b571511914189a54e20221"
+        },
+        "kind": {
+          "event": "observed"
+        },
+        "parent_event_id": null
+      },
+      "evidence_sha256": null,
+      "original_report_sha256": "c2057693639e4cd2b222723576bd009b21dee8cbaf3d1f693e18208b0b42aefd",
+      "policy_sha256": null,
+      "report_type": "task_lifecycle_record",
+      "schema_version": "0.1.0"
+    },
+    {
+      "event": {
+        "event_id": "event-4863ffbc6b0a49699309dc211e8b8a8f0dcd6bd11a8fdeace38c5f158acf13f0",
+        "identity": {
+          "checker_id": "syntax.native_confirmation",
+          "scope": "App.kt",
+          "task_id": "CG-B-0eba564680c4a5aedd4a406e7a49a62d",
+          "workspace_id": "ws-2ff50295f3b571511914189a54e20221"
+        },
+        "kind": {
+          "cause": "code_fixed",
+          "event": "resolved",
+          "evidence_sha256": "fb7d93bc6939d866f2631ba05db046418d6eb25e4d1cdceb94e5fb8b2b3a26a2"
+        },
+        "parent_event_id": "event-be6f7ccecfce1ab3b113ad59df2195e2aeeeabe6d7ba7cc205fe8c4b330da64a"
+      },
+      "evidence_sha256": "fb7d93bc6939d866f2631ba05db046418d6eb25e4d1cdceb94e5fb8b2b3a26a2",
+      "original_report_sha256": "c2057693639e4cd2b222723576bd009b21dee8cbaf3d1f693e18208b0b42aefd",
+      "policy_sha256": "6748c0943917ccf6098c8f399c4382af913e7b9ea773e924deed64b36ec2d8a1",
+      "report_type": "task_lifecycle_record",
+      "schema_version": "0.1.0"
+    }
+  ],
+  "evidence": {
+    "adapter_sha256": "da7de00995e4df24461c6e4b1b3700f1efee2cb039d42445d95f730345f912ef",
+    "current_native": {
+      "context_diagnostics": [],
+      "diagnostics": [],
+      "reason": "kotlin_native_single_file_no_diagnostics",
+      "status": "completed",
+      "tool_identity_scope": "launcher_only",
+      "tool_sha256": "827f1613736c1f457474103af722f517a627d9534d884d1773f49b7026f45f56",
+      "version": "kotlinc-jvm 2.4.10"
+    },
+    "current_source_sha256": "4112f6381a777e93b27383b8d019a862b7e2d20fcb8637dff6001c0fb44e34b7",
+    "grammar_sha256": null,
+    "identity": {
+      "checker_id": "syntax.native_confirmation",
+      "scope": "App.kt",
+      "task_id": "CG-B-0eba564680c4a5aedd4a406e7a49a62d",
+      "workspace_id": "ws-2ff50295f3b571511914189a54e20221"
+    },
+    "original_native": {
+      "context_diagnostics": [],
+      "diagnostics": [
+        {
+          "column_byte": 10,
+          "column_utf16": 10,
+          "line": 1,
+          "rule_id": "kotlin.syntax"
+        }
+      ],
+      "reason": "kotlin_native_syntax_diagnostics",
+      "status": "diagnostics_observed",
+      "tool_identity_scope": "launcher_only",
+      "tool_sha256": "827f1613736c1f457474103af722f517a627d9534d884d1773f49b7026f45f56",
+      "version": "kotlinc-jvm 2.4.10"
+    },
+    "original_report_sha256": "c2057693639e4cd2b222723576bd009b21dee8cbaf3d1f693e18208b0b42aefd",
+    "original_source_sha256": "87fbb71a8f650a302ff4bdf216bc8a9835350f3b864b2b1c6a0d0fe5f3cdf9b5",
+    "outcome": "code_fixed",
+    "policy_revision": "p1",
+    "policy_sha256": "6748c0943917ccf6098c8f399c4382af913e7b9ea773e924deed64b36ec2d8a1",
+    "report_type": "task_resolution_evidence",
+    "schema_version": "0.4.0",
+    "tool_sha256": "827f1613736c1f457474103af722f517a627d9534d884d1773f49b7026f45f56"
+  },
+  "evidence_type": "actual_kotlin_scoped_resolution_with_fixture_host_trust",
+  "full_project_acceptance": false,
+  "installed_marketplace_host": false,
+  "policy": {
+    "adapter_sha256": "da7de00995e4df24461c6e4b1b3700f1efee2cb039d42445d95f730345f912ef",
+    "grammar_sha256": null,
+    "identity": {
+      "checker_id": "syntax.native_confirmation",
+      "scope": "App.kt",
+      "task_id": "CG-B-0eba564680c4a5aedd4a406e7a49a62d",
+      "workspace_id": "ws-2ff50295f3b571511914189a54e20221"
+    },
+    "native_rule_id": "kotlin.syntax",
+    "native_version": "kotlinc-jvm 2.4.10",
+    "original_report_sha256": "c2057693639e4cd2b222723576bd009b21dee8cbaf3d1f693e18208b0b42aefd",
+    "original_source_sha256": "87fbb71a8f650a302ff4bdf216bc8a9835350f3b864b2b1c6a0d0fe5f3cdf9b5",
+    "policy_revision": "p1",
+    "report_type": "task_resolution_policy",
+    "schema_version": "1.3.0",
+    "tool_sha256": "827f1613736c1f457474103af722f517a627d9534d884d1773f49b7026f45f56"
+  },
+  "receipt": {
+    "authority": "host_context_verified",
+    "delivery_decision": "not_evaluated",
+    "event_ref": ".codeguard/findings/CG-B-0eba564680c4a5aedd4a406e7a49a62d/events/lifecycle-event-4863ffbc6b0a49699309dc211e8b8a8f0dcd6bd11a8fdeace38c5f158acf13f0.json",
+    "evidence_ref": ".codeguard/state/resolution_evidence/fb7d93bc6939d866f2631ba05db046418d6eb25e4d1cdceb94e5fb8b2b3a26a2.json",
+    "evidence_sha256": "fb7d93bc6939d866f2631ba05db046418d6eb25e4d1cdceb94e5fb8b2b3a26a2",
+    "identity": {
+      "checker_id": "syntax.native_confirmation",
+      "scope": "App.kt",
+      "task_id": "CG-B-0eba564680c4a5aedd4a406e7a49a62d",
+      "workspace_id": "ws-2ff50295f3b571511914189a54e20221"
+    },
+    "outcome": "code_fixed",
+    "policy_revision": "p1",
+    "policy_sha256": "6748c0943917ccf6098c8f399c4382af913e7b9ea773e924deed64b36ec2d8a1",
+    "report_type": "task_resolution_receipt",
+    "schema_version": "0.1.0",
+    "state": "resolved"
+  }
+}

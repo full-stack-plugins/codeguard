@@ -40,6 +40,14 @@ pub fn verify_swift_task_resolution(
     verify_task_resolution(request, TaskResolutionChecker::Swift)
 }
 
+/// 验签 Kotlin 限定语法任务，沿用同一原反例/当前字节对照与关闭父链。
+/// 参数为宿主固定的工具和批准上下文，返回限定收据；上下文未完成不批准关闭。
+pub fn verify_kotlin_task_resolution(
+    request: &crate::KotlinTaskResolutionRequest<'_>,
+) -> Result<Value, &'static str> {
+    verify_task_resolution(request, TaskResolutionChecker::Kotlin)
+}
+
 fn verify_task_resolution(
     request: &SyntaxTaskResolutionRequest<'_>,
     checker: TaskResolutionChecker,
@@ -151,8 +159,11 @@ fn original_binding_matches(
     policy: &TaskResolutionPolicyInput,
     checker: TaskResolutionChecker,
 ) -> bool {
-    if matches!(original["schema_version"].as_str(), Some("0.2.0" | "0.5.0")) {
-        matches!(checker.language(), "erlang" | "swift")
+    if matches!(
+        original["schema_version"].as_str(),
+        Some("0.2.0" | "0.4.0" | "0.5.0")
+    ) {
+        matches!(checker.language(), "erlang" | "swift" | "kotlin")
             && policy.grammar_sha256.is_none()
             && original["native_evidence"]["target"]["source_sha256"]
                 == policy.original_source_sha256
@@ -214,26 +225,15 @@ fn execute(
         current_native["status"].as_str(),
         Some("completed" | "diagnostics_observed")
     );
-    let original_completed = matches!(
-        original_native["status"].as_str(),
-        Some("completed" | "diagnostics_observed")
-    ) && original_native["diagnostics"]
-        .as_array()
-        .is_some_and(|rows| {
-            rows.iter().all(|row| {
-                let line = row["line"].as_u64().unwrap_or(0) as usize;
-                let column = row["column"].as_u64().unwrap_or(0) as usize;
-                line > 0
-                    && column > 0
-                    && request
-                        .original_source
-                        .split(|b| *b == b'\n')
-                        .nth(line - 1)
-                        .is_some_and(|bytes| column <= bytes.len() + 1)
-            })
-        });
+    let original_completed = checker.original_completed(&original_native, request.original_source);
+    let current_issue_present = current_native["status"] == "diagnostics_observed"
+        || (checker.language() == "kotlin"
+            && crate::task_resolution_evidence_shape::kotlin_syntax_present(&current_native));
     let mut outcome = if !inputs_current {
         "inputs_stale"
+    } else if checker.language() == "kotlin" && native_bound && current_issue_present {
+        // 语法正向证据不因另一个上下文阻塞而消失；完整性仍保留为 false。
+        "still_present"
     } else if !native_bound || !current_completed || !original_completed {
         "native_incomplete"
     } else if current_native["status"] == "diagnostics_observed" {
@@ -266,7 +266,7 @@ fn execute(
         target_covered: true,
         inputs_current,
         policy_verified: true,
-        issue_still_present: current_native["status"] == "diagnostics_observed",
+        issue_still_present: current_issue_present,
         suppression_changed: false,
         target_removed: false,
         cause: ResolutionCause::CodeFixed,

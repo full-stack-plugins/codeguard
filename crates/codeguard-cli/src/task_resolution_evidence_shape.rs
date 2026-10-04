@@ -33,8 +33,10 @@ pub(crate) fn valid(record: &TaskLifecycleRecord, value: &Value) -> bool {
         .iter()
         .all(|key| value[*key].as_str().is_some_and(digest))
         || !(value["grammar_sha256"].as_str().is_some_and(digest)
-            || (matches!(value["schema_version"].as_str(), Some("0.2.0" | "0.3.0"))
-                && value["grammar_sha256"].is_null()))
+            || (matches!(
+                value["schema_version"].as_str(),
+                Some("0.2.0" | "0.3.0" | "0.4.0")
+            ) && value["grammar_sha256"].is_null()))
         || !native_for_version(value, "original_native")
         || !native_for_version(value, "current_native")
     {
@@ -52,7 +54,9 @@ pub(crate) fn valid(record: &TaskLifecycleRecord, value: &Value) -> bool {
         }
         TaskLifecycleKind::Observed | TaskLifecycleKind::Reopened => {
             outcome == "still_present"
-                && value["current_native"]["status"] == "diagnostics_observed"
+                && (value["current_native"]["status"] == "diagnostics_observed"
+                    || (value["schema_version"] == "0.4.0"
+                        && kotlin_syntax_present(&value["current_native"])))
                 && native_bound(value)
         }
         TaskLifecycleKind::VerificationRequired { reason_code, .. } => {
@@ -68,11 +72,20 @@ pub(crate) fn valid(record: &TaskLifecycleRecord, value: &Value) -> bool {
         }
     }
 }
+/// Kotlin 未完成上下文中的已定位语法诊断仍是正向问题证据，不证明零诊断或关闭。
+/// 参数为严格原生观察；返回是否存在有效、非空的语法诊断。
+pub(crate) fn kotlin_syntax_present(native: &Value) -> bool {
+    codeguard_adapters::valid_kotlin_native_observation(native, None)
+        && native["diagnostics"]
+            .as_array()
+            .is_some_and(|rows| !rows.is_empty())
+}
 fn native_bound(value: &Value) -> bool {
     let version = match value["schema_version"].as_str() {
         Some("0.1.0") => "0.16.0",
         Some("0.2.0") => "OTP 28",
         Some("0.3.0") => "Apple Swift 6.4",
+        Some("0.4.0") => "kotlinc-jvm 2.4.10",
         _ => return false,
     };
     ["original_native", "current_native"].iter().all(|k| {
@@ -84,6 +97,7 @@ fn native_for_version(evidence: &Value, key: &str) -> bool {
         Some("0.1.0") => native(&evidence[key]),
         Some("0.2.0") => crate::erlang_syntax_probe::valid_native_observation(&evidence[key], None),
         Some("0.3.0") => crate::swift_syntax_probe::valid_native_observation(&evidence[key], None),
+        Some("0.4.0") => codeguard_adapters::valid_kotlin_native_observation(&evidence[key], None),
         _ => false,
     }
 }

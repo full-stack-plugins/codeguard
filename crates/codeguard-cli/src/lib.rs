@@ -295,6 +295,8 @@ mod plain_syntax_source;
 #[cfg(unix)]
 mod erlang_task_resolution_request;
 #[cfg(unix)]
+mod kotlin_task_resolution_request;
+#[cfg(unix)]
 mod swift_task_resolution_request;
 #[cfg(unix)]
 mod syntax_task_resolution_request;
@@ -311,10 +313,13 @@ mod zig_task_resolution_request;
 #[cfg(unix)]
 pub use erlang_task_resolution_request::ErlangTaskResolutionRequest;
 #[cfg(unix)]
+pub use kotlin_task_resolution_request::KotlinTaskResolutionRequest;
+#[cfg(unix)]
 pub use swift_task_resolution_request::SwiftTaskResolutionRequest;
 #[cfg(unix)]
 pub use task_resolution_service::{
-    verify_erlang_task_resolution, verify_swift_task_resolution, verify_zig_task_resolution,
+    verify_erlang_task_resolution, verify_kotlin_task_resolution, verify_swift_task_resolution,
+    verify_zig_task_resolution,
 };
 #[cfg(unix)]
 pub use zig_task_resolution_request::ZigTaskResolutionRequest;

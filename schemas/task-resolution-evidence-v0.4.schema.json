@@ -1,0 +1,379 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeguard.dev/schemas/task-resolution-evidence-v0.4.schema.json",
+  "title": "Kotlin 原反例与当前源码的原生语法及上下文对照证据",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.4.0"
+    },
+    "report_type": {
+      "const": "task_resolution_evidence"
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "workspace_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.:-]{1,128}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^CG-B-[0-9a-f]{32}$"
+        },
+        "checker_id": {
+          "const": "syntax.native_confirmation"
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))[^\\\\:\\x00-\\x1f\\x7f]+$"
+        }
+      },
+      "required": [
+        "workspace_id",
+        "task_id",
+        "checker_id",
+        "scope"
+      ]
+    },
+    "original_report_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "original_source_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "current_source_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "grammar_sha256": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "tool_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "adapter_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "policy_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "policy_revision": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.:-]{1,128}$"
+    },
+    "original_native": {
+      "$ref": "#/$defs/native"
+    },
+    "current_native": {
+      "$ref": "#/$defs/native"
+    },
+    "outcome": {
+      "enum": [
+        "code_fixed",
+        "still_present",
+        "inputs_stale",
+        "native_incomplete",
+        "false_positive_review_required",
+        "resolution_evidence_incomplete",
+        "resolution_history_binding_changed"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "report_type",
+    "identity",
+    "original_report_sha256",
+    "original_source_sha256",
+    "current_source_sha256",
+    "grammar_sha256",
+    "tool_sha256",
+    "adapter_sha256",
+    "policy_sha256",
+    "policy_revision",
+    "original_native",
+    "current_native",
+    "outcome"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "outcome": {
+            "const": "code_fixed"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "original_native": {
+            "properties": {
+              "status": {
+                "const": "diagnostics_observed"
+              }
+            }
+          },
+          "current_native": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "diagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule_id",
+        "line",
+        "column_byte",
+        "column_utf16"
+      ],
+      "properties": {
+        "rule_id": {
+          "type": "string",
+          "pattern": "^kotlin\\.(syntax|context\\.[A-Z0-9_]+)$"
+        },
+        "line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "column_byte": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "column_utf16": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "native": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason",
+        "version",
+        "tool_sha256",
+        "tool_identity_scope",
+        "diagnostics",
+        "context_diagnostics"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "incomplete",
+            "completed",
+            "diagnostics_observed"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "pattern": "^[a-z_]{1,128}$"
+        },
+        "version": {
+          "enum": [
+            null,
+            "kotlinc-jvm 2.4.10"
+          ]
+        },
+        "tool_sha256": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          ]
+        },
+        "tool_identity_scope": {
+          "const": "launcher_only"
+        },
+        "diagnostics": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/diagnostic"
+              },
+              {
+                "properties": {
+                  "rule_id": {
+                    "const": "kotlin.syntax"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "context_diagnostics": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/diagnostic"
+              },
+              {
+                "properties": {
+                  "rule_id": {
+                    "pattern": "^kotlin\\.context\\.[A-Z0-9_]+$"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "version": {
+                "const": "kotlinc-jvm 2.4.10"
+              },
+              "tool_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "diagnostics": {
+                "minItems": 0,
+                "maxItems": 0
+              },
+              "context_diagnostics": {
+                "maxItems": 0
+              },
+              "reason": {
+                "const": "kotlin_native_single_file_no_diagnostics"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "diagnostics_observed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "version": {
+                "const": "kotlinc-jvm 2.4.10"
+              },
+              "tool_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "diagnostics": {
+                "minItems": 1,
+                "maxItems": 32
+              },
+              "context_diagnostics": {
+                "maxItems": 0
+              },
+              "reason": {
+                "const": "kotlin_native_syntax_diagnostics"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "context_diagnostics": {
+                "minItems": 1
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "const": "incomplete"
+              },
+              "reason": {
+                "const": "kotlin_project_context_unresolved"
+              },
+              "version": {
+                "const": "kotlinc-jvm 2.4.10"
+              },
+              "tool_sha256": {
+                "$ref": "#/$defs/digest"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "reason": {
+                "const": "kotlin_project_context_unresolved"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "context_diagnostics": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "incomplete"
+              },
+              "context_diagnostics": {
+                "maxItems": 0
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "diagnostics": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

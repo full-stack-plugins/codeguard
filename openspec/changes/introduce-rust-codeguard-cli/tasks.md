@@ -1388,3 +1388,9 @@ CI 37214829667 的 npm 全候选验收继承 Kotlin/Swift 工具，使原生优�
 9.7/9.10/9.11、12.7、14.10/14.11：受保护宿主 Swift SDK 复用同一限定语法关闭服务、签名校验、原反例/当前字节对照、租约及父链。策略1.2.0/证据0.3.0分语言，原生首次grammar=null；普通task verify原工具复发可重开。接口缺失和旧分流scope mismatch分别RED，默认受控关闭/幂等/复发/反证/工具与批准身份边界已通过。真实原生、共享服务兼容回归和最终校验另行追加；默认插件可信提供者、真实宿主、全语言/完整SwiftLint/项目构建、平台与发行仍缺，不勾选父任务。见[Swift闭环验收](../../../tests/acceptance/swift-task-resolution-lifecycle.md)。
 
 Swift闭环本批终态：默认受影响6通过/1条件忽略，WASM六目标52通过/0失败/4条件忽略；真实Apple Swift6.4显式1通过，原错误→修复→复发链路成功。4实际输出协议/身份与负例、239 schema元定义/237历史原字节、默认/WASM全目标严格Clippy、fmt、分层、OpenSpec strict与新增链接通过。完整默认suite未重跑，旧1288不当成本批全套；新提交CI另核验。未改变公开npm、插件锁或完整父任务状态。
+
+### 2026-10-05 Kotlin 限定语法闭环与混合复发（父任务未完成）
+
+9.7/9.10/9.11、12.7、14.10/14.11：Kotlin宿主SDK接入同一原工具对照/签名/租约/父链；1.3策略/0.4证据、原生首次grammar=null、双坐标校验。原列读取和混合未完成复发不重开分别RED，修正后5默认受控通过；真实kotlinc-jvm2.4.10修复resolved、上下文verification_required、混合语法复发open，同一任务且1显式真实测试通过。4实际协议/状态负例通过；受影响WASM和静态终态另追加。CI新增Erlang/Swift/Kotlin SDK WASM目标，保留条件忽略与原生单独验收。完整工具链/项目能力、默认宿主可信提供者与发行仍缺，不勾选父任务，见[验收](../../../tests/acceptance/kotlin-task-resolution-lifecycle.md)。
+
+Kotlin闭环本批终态：受影响WASM八目标65通过/0失败/4条件忽略；真实编译器另1显式通过。默认/WASM全目标严格Clippy、241 schema元定义/239历史字节保留、Kotlin4实际协议与Swift4历史协议、fmt、分层、OpenSpec strict、12新增链接通过。本批不借用旧1288的完整默认结果，远端CI按新提交核验；完整父任务、发行和默认宿主仍未完成。

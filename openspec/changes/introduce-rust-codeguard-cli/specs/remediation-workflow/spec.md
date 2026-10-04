@@ -152,6 +152,11 @@ RunReport 与准备诊断 PrerequisiteReport MUST 使用 workspace_id + run_id �
 - **THEN** 原反例有合法字节位置的 parse 诊断、当前源码变化且原工具完整零诊断时 SHALL 追加 code_fixed；重复复检幂等，普通原工具复检再次检出时重开同一任务父链。未完成、错误版本、工具/输入变化不关闭，原反例原生合法转误报调查
 - **AND** 原生首次任务的 grammar_sha256 SHALL 保持 null；Swift 使用独立策略和证据版本，不能消费 Zig/Erlang 身份；此入口不证明 SwiftLint、类型检查、项目构建或项目交付
 
+#### Scenario: Protected Kotlin native syntax resolution preserves project context blockers
+- **WHEN** 受保护宿主验签 kotlinc-jvm 2.4.10 的限定语法任务策略并对照原反例与当前源码
+- **THEN** 原反例有已核对 UTF-16/UTF-8 坐标的语法诊断，当前源码变化且同工具完整零诊断时 SHALL 记录 code_fixed；单独或混合项目上下文诊断、未知输出、超时、工具/输入变化 MUST NOT 证明修复
+- **AND** 当前原工具再次检出同一语法问题时 SHALL 保留发现并重开原父链，即使另有项目上下文未完成；只有上下文诊断时不得伪造语法复发。Kotlin 使用独立策略/证据版本，原生首次 grammar=null，不批准全项目 lint、类型或交付
+
 #### Scenario: Rehashed lifecycle evidence cannot change the original language
 - **WHEN** 本地关闭证据和父链记录被重算摘要，但证据协议、语言或 grammar 与已同步的首次任务事实不同
 - **THEN** 历史读取 SHALL 在原生执行前拒绝身份矛盾，并由 next 提供核对决策，不将本地文件当作可信关闭
