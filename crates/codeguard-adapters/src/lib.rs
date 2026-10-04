@@ -385,3 +385,10 @@ mod go_finding_identity;
 pub use go_finding_identity::go_finding_record;
 mod rustdoc_finding_identity;
 pub use rustdoc_finding_identity::rustdoc_finding_record;
+
+mod kotlin_diagnostic;
+mod kotlin_diagnostics;
+mod kotlin_parsed;
+pub use kotlin_diagnostic::KotlinDiagnostic;
+pub use kotlin_diagnostics::parse_kotlin_diagnostics;
+pub use kotlin_parsed::KotlinParsed;

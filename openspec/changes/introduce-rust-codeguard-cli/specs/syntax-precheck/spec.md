@@ -395,3 +395,16 @@ WASM fallback MUST 通过明确版本的协议加入既有统一命令，不静�
 #### Scenario: False positives disappear through exclusions
 - **WHEN** 扩大排除导致表面误报数下降
 - **THEN** 评测仍保留原始分母、排除和未完成覆盖，不能据此声称准确率提高
+
+#### Scenario: Kotlin native confirmation distinguishes syntax from missing project context
+- **WHEN** an explicit installed Kotlin/JVM 2.4.10 compiler checks a frozen ordinary `.kt` file in a private directory
+- **THEN** invoke its native compilation command without project build scripts, response files, compiler plugins or script execution; bind current source bytes and retain bounded compiler diagnostics
+- **AND** classify `[SYNTAX]` as native syntax evidence while unresolved references and other semantic diagnostics remain project-context limitations, not fabricated syntax violations; preserve syntax evidence when both coexist
+- **AND** only accept diagnostics belonging to the frozen input, translate verified native UTF-16 columns to UTF-8 byte positions, and reject unknown output, contradictory exit codes, truncated output, timeouts and changed input/tool identities
+- **AND** this single-file observation does not implement full Kotlin lint/comments, prove whole-project coverage, qualify its WASM or authorize trusted task closure; missing tools require preparation, never implicit installation
+
+#### Scenario: Kotlin selects native tooling before candidate fallback
+- **WHEN** a caller supplies an explicit compiler or invoking absolute PATH contains `kotlinc`
+- **THEN** retain that first selected tool and its failures without silently replacing it; only tool absence enables candidate WASM
+- **AND** missing backends, incomplete native checks or candidate recoveries/hidden errors require further native confirmation; complete observable candidate zero-recovery may recommend native installation without granting delivery
+- **AND** human feedback includes verified native rule and source positions, while JSON preserves bounded evidence and unresolved obligations

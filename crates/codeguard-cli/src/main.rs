@@ -80,6 +80,9 @@ fn main() -> ExitCode {
             );
             #[cfg(unix)]
             println!(
+                "Kotlin 原生优先局部检查：lint kotlin FILE [--kotlinc-tool ABS_PATH] [--timeout DURATION] [--format human|json]；优先显式工具或 PATH 的首个 kotlinc，当前支持 JVM 2.4.10；工具缺失时 WASM 初检，工具失败不跳过；单文件观察不签发完整项目通过。"
+            );
+            println!(
                 "Erlang 原生优先局部检查：lint erlang FILE [--erl-tool ABS_PATH] [--timeout DURATION] [--format human|json]；显式 OTP 28 使用原生 forms 扫描/解析，宏与预处理保持未完成；不签发完整 lint 或交付通过。 已有 Erlang 语法确认任务可用 task verify ID PATH --erl-tool ABS_PATH，repair_ready 接受同参数；复用原任务与尝试历史，零诊断不自动关闭。"
             );
             #[cfg(unix)]
@@ -181,6 +184,8 @@ fn main() -> ExitCode {
                 codeguard_cli::java_lint_dispatch::run(&rest[1..])
             } else if rest.first().is_some_and(|language| language == "zig") {
                 codeguard_cli::zig_lint_command::run(&rest[1..])
+            } else if rest.first().is_some_and(|language| language == "kotlin") {
+                codeguard_cli::kotlin_lint_command::run(&rest[1..])
             } else if rest.first().is_some_and(|language| language == "erlang") {
                 codeguard_cli::erlang_lint_command::run(&rest[1..])
             } else if rest

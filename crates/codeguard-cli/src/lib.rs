@@ -315,3 +315,9 @@ pub use zig_task_resolution_request::ZigTaskResolutionRequest;
 
 #[cfg(unix)]
 mod task_resolution_evidence_shape;
+
+#[cfg(unix)]
+pub mod kotlin_lint_command;
+
+#[cfg(unix)]
+mod kotlin_tool_selection;

@@ -1,0 +1,358 @@
+{
+  "evidence_type": "source_cli_kotlin_native_single_file",
+  "development_base_commit": "04a2d1b963fbc6188ef773297d0bf0b8297cbf27",
+  "source_has_uncommitted_kotlin_adapter": true,
+  "program_sha256": "394ad364836cc85cb5cc5840b5ad91dfd23acc337954c48d41c46d606b5d1978",
+  "compiler_version": "kotlinc-jvm 2.4.10",
+  "compiler_identity_scope": "launcher_only",
+  "cases": [
+    {
+      "case": "missing_type",
+      "exit": 3,
+      "source": "fun f(x: ) = x\n",
+      "source_stable": true,
+      "report_sha256": "54aae6cd7c1a03e6432dd2a09986a226ea6d5b06516912688716e9c114f12324",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "exit_code": 3,
+        "input_stable": true,
+        "language": "kotlin",
+        "native": {
+          "context_diagnostics": [],
+          "diagnostics": [
+            {
+              "column_byte": 10,
+              "column_utf16": 10,
+              "line": 1,
+              "rule_id": "kotlin.syntax"
+            }
+          ],
+          "reason": "kotlin_native_syntax_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_identity_scope": "launcher_only",
+          "tool_sha256": "827f1613736c1f457474103af722f517a627d9534d884d1773f49b7026f45f56",
+          "version": "kotlinc-jvm 2.4.10"
+        },
+        "next_actions": [
+          "核对已安装 Kotlin/JVM 2.4.10 工具；用 --kotlinc-tool 绝对路径原生复检，不自动安装",
+          "按语法诊断核对当前源码；上下文诊断需完整项目编译确认，零诊断不证明完整 lint、注释、安全或交付通过"
+        ],
+        "operation": "lint",
+        "report_type": "kotlin_lint_feedback",
+        "schema_version": "0.1.0",
+        "scope": "single_frozen_kt_file",
+        "setup": {
+          "automatic_installation": false,
+          "full_project_checks_required": true,
+          "native_confirmation_required": false
+        },
+        "source_path": "/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-kotlin-current-sdyyihqg/missing_type.kt",
+        "source_sha256": "87fbb71a8f650a302ff4bdf216bc8a9835350f3b864b2b1c6a0d0fe5f3cdf9b5",
+        "syntax_precheck": null,
+        "tool_selection": {
+          "executable": "/opt/homebrew/bin/kotlinc",
+          "source": "explicit"
+        }
+      }
+    },
+    {
+      "case": "valid_object",
+      "exit": 3,
+      "source": "object C { val value = 1 }\n",
+      "source_stable": true,
+      "report_sha256": "5588d40e49b45ffd003f17ffa1d76419e944aafb0ad53a95e75beae7bfd2151e",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "exit_code": 3,
+        "input_stable": true,
+        "language": "kotlin",
+        "native": {
+          "context_diagnostics": [],
+          "diagnostics": [],
+          "reason": "kotlin_native_single_file_no_diagnostics",
+          "status": "completed",
+          "tool_identity_scope": "launcher_only",
+          "tool_sha256": "827f1613736c1f457474103af722f517a627d9534d884d1773f49b7026f45f56",
+          "version": "kotlinc-jvm 2.4.10"
+        },
+        "next_actions": [
+          "核对已安装 Kotlin/JVM 2.4.10 工具；用 --kotlinc-tool 绝对路径原生复检，不自动安装",
+          "按语法诊断核对当前源码；上下文诊断需完整项目编译确认，零诊断不证明完整 lint、注释、安全或交付通过"
+        ],
+        "operation": "lint",
+        "report_type": "kotlin_lint_feedback",
+        "schema_version": "0.1.0",
+        "scope": "single_frozen_kt_file",
+        "setup": {
+          "automatic_installation": false,
+          "full_project_checks_required": true,
+          "native_confirmation_required": false
+        },
+        "source_path": "/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-kotlin-current-sdyyihqg/valid_object.kt",
+        "source_sha256": "9a40dcd89c137534d57763addbb8d45368fed76bd046c5198c4fd3a016e6414a",
+        "syntax_precheck": null,
+        "tool_selection": {
+          "executable": "/opt/homebrew/bin/kotlinc",
+          "source": "path"
+        }
+      }
+    },
+    {
+      "case": "unresolved_type",
+      "exit": 3,
+      "source": "fun f(x: Missing): Missing = x\n",
+      "source_stable": true,
+      "report_sha256": "6343fab9e5642f6e8ed85162fef7d2d72c4d76fe3ec5502ceef78f76f89b89d4",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "exit_code": 3,
+        "input_stable": true,
+        "language": "kotlin",
+        "native": {
+          "context_diagnostics": [
+            {
+              "column_byte": 10,
+              "column_utf16": 10,
+              "line": 1,
+              "rule_id": "kotlin.context.UNRESOLVED_REFERENCE"
+            },
+            {
+              "column_byte": 20,
+              "column_utf16": 20,
+              "line": 1,
+              "rule_id": "kotlin.context.UNRESOLVED_REFERENCE"
+            }
+          ],
+          "diagnostics": [],
+          "reason": "kotlin_project_context_unresolved",
+          "status": "incomplete",
+          "tool_identity_scope": "launcher_only",
+          "tool_sha256": "827f1613736c1f457474103af722f517a627d9534d884d1773f49b7026f45f56",
+          "version": "kotlinc-jvm 2.4.10"
+        },
+        "next_actions": [
+          "核对已安装 Kotlin/JVM 2.4.10 工具；用 --kotlinc-tool 绝对路径原生复检，不自动安装",
+          "按语法诊断核对当前源码；上下文诊断需完整项目编译确认，零诊断不证明完整 lint、注释、安全或交付通过"
+        ],
+        "operation": "lint",
+        "report_type": "kotlin_lint_feedback",
+        "schema_version": "0.1.0",
+        "scope": "single_frozen_kt_file",
+        "setup": {
+          "automatic_installation": false,
+          "full_project_checks_required": true,
+          "native_confirmation_required": true
+        },
+        "source_path": "/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-kotlin-current-sdyyihqg/unresolved_type.kt",
+        "source_sha256": "64adfc98f5e2f9e78f5b0c0c6c453ee7254ac8ae88242664ff3147a52635cf15",
+        "syntax_precheck": null,
+        "tool_selection": {
+          "executable": "/opt/homebrew/bin/kotlinc",
+          "source": "explicit"
+        }
+      }
+    },
+    {
+      "case": "unicode_missing_expression",
+      "exit": 3,
+      "source": "fun f() { val s = \"😀\"; val x = }\n",
+      "source_stable": true,
+      "report_sha256": "93da3a6e3c97e0330a49e92dabf153d87e7c60bb56d4a2e1caf64d693fe34035",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "exit_code": 3,
+        "input_stable": true,
+        "language": "kotlin",
+        "native": {
+          "context_diagnostics": [
+            {
+              "column_byte": 31,
+              "column_utf16": 29,
+              "line": 1,
+              "rule_id": "kotlin.context.VARIABLE_WITH_NO_TYPE_NO_INITIALIZER"
+            }
+          ],
+          "diagnostics": [
+            {
+              "column_byte": 34,
+              "column_utf16": 32,
+              "line": 1,
+              "rule_id": "kotlin.syntax"
+            }
+          ],
+          "reason": "kotlin_project_context_unresolved",
+          "status": "incomplete",
+          "tool_identity_scope": "launcher_only",
+          "tool_sha256": "827f1613736c1f457474103af722f517a627d9534d884d1773f49b7026f45f56",
+          "version": "kotlinc-jvm 2.4.10"
+        },
+        "next_actions": [
+          "核对已安装 Kotlin/JVM 2.4.10 工具；用 --kotlinc-tool 绝对路径原生复检，不自动安装",
+          "按语法诊断核对当前源码；上下文诊断需完整项目编译确认，零诊断不证明完整 lint、注释、安全或交付通过"
+        ],
+        "operation": "lint",
+        "report_type": "kotlin_lint_feedback",
+        "schema_version": "0.1.0",
+        "scope": "single_frozen_kt_file",
+        "setup": {
+          "automatic_installation": false,
+          "full_project_checks_required": true,
+          "native_confirmation_required": true
+        },
+        "source_path": "/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-kotlin-current-sdyyihqg/unicode_missing_expression.kt",
+        "source_sha256": "06e8bb003635977eff8e0c4769804d7633b10a6104c809d050856938d1f06959",
+        "syntax_precheck": null,
+        "tool_selection": {
+          "executable": "/opt/homebrew/bin/kotlinc",
+          "source": "explicit"
+        }
+      }
+    },
+    {
+      "case": "missing_tool_hidden",
+      "exit": 3,
+      "source": "fun f(x: ) = x\n",
+      "source_stable": true,
+      "report_sha256": "b2ed78ac0b51b1d342a1a0242b9c04f93bcfbe433248c1058e71a88b202c56e5",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "exit_code": 3,
+        "input_stable": true,
+        "language": "kotlin",
+        "native": {
+          "context_diagnostics": [],
+          "diagnostics": [],
+          "reason": "kotlin_tool_not_found",
+          "status": "incomplete",
+          "tool_identity_scope": "launcher_only",
+          "tool_sha256": null,
+          "version": null
+        },
+        "next_actions": [
+          "核对已安装 Kotlin/JVM 2.4.10 工具；用 --kotlinc-tool 绝对路径原生复检，不自动安装",
+          "按语法诊断核对当前源码；上下文诊断需完整项目编译确认，零诊断不证明完整 lint、注释、安全或交付通过"
+        ],
+        "operation": "lint",
+        "report_type": "kotlin_lint_feedback",
+        "schema_version": "0.1.0",
+        "scope": "single_frozen_kt_file",
+        "setup": {
+          "automatic_installation": false,
+          "full_project_checks_required": true,
+          "native_confirmation_required": true
+        },
+        "source_path": "/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-kotlin-current-sdyyihqg/missing_tool_hidden.kt",
+        "source_sha256": "87fbb71a8f650a302ff4bdf216bc8a9835350f3b864b2b1c6a0d0fe5f3cdf9b5",
+        "syntax_precheck": {
+          "grammar_qualified": false,
+          "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+          "precheck": {
+            "cancelled": false,
+            "checked_files": 1,
+            "incomplete_files": 0,
+            "scope_complete": true,
+            "selected_files": 1,
+            "status": "incomplete",
+            "suspected_recoveries": 0,
+            "truncated_files": 1,
+            "unqualified_files": 1,
+            "unsupported_files": 0
+          },
+          "recoveries": [],
+          "status": "incomplete"
+        },
+        "tool_selection": {
+          "executable": null,
+          "source": "not_found"
+        }
+      }
+    },
+    {
+      "case": "missing_tool_zero",
+      "exit": 3,
+      "source": "class C {}\n",
+      "source_stable": true,
+      "report_sha256": "450d6dad026efedce761b95c098f67187ca77f46b38d830242178972f150e830",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "exit_code": 3,
+        "input_stable": true,
+        "language": "kotlin",
+        "native": {
+          "context_diagnostics": [],
+          "diagnostics": [],
+          "reason": "kotlin_tool_not_found",
+          "status": "incomplete",
+          "tool_identity_scope": "launcher_only",
+          "tool_sha256": null,
+          "version": null
+        },
+        "next_actions": [
+          "核对已安装 Kotlin/JVM 2.4.10 工具；用 --kotlinc-tool 绝对路径原生复检，不自动安装",
+          "按语法诊断核对当前源码；上下文诊断需完整项目编译确认，零诊断不证明完整 lint、注释、安全或交付通过"
+        ],
+        "operation": "lint",
+        "report_type": "kotlin_lint_feedback",
+        "schema_version": "0.1.0",
+        "scope": "single_frozen_kt_file",
+        "setup": {
+          "automatic_installation": false,
+          "full_project_checks_required": true,
+          "native_confirmation_required": false
+        },
+        "source_path": "/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-kotlin-current-sdyyihqg/missing_tool_zero.kt",
+        "source_sha256": "8a7eaee3a2ed1ded2f10c111143f7629820f78b4e63210aebe6b9986850db4ac",
+        "syntax_precheck": {
+          "grammar_qualified": false,
+          "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+          "precheck": {
+            "cancelled": false,
+            "checked_files": 1,
+            "incomplete_files": 0,
+            "scope_complete": true,
+            "selected_files": 1,
+            "status": "incomplete",
+            "suspected_recoveries": 0,
+            "truncated_files": 0,
+            "unqualified_files": 1,
+            "unsupported_files": 0
+          },
+          "recoveries": [],
+          "status": "incomplete"
+        },
+        "tool_selection": {
+          "executable": null,
+          "source": "not_found"
+        }
+      }
+    }
+  ],
+  "grammar_qualified_count": 0,
+  "full_language_acceptance": false,
+  "trusted_task_closure": false,
+  "full_host_acceptance": false
+}
