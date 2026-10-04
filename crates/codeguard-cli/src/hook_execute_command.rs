@@ -101,7 +101,7 @@ fn execute_parsed(
             plan.action != HookTriggerAction::FastFileCheck
                 || !matches!(
                     key.as_str(),
-                    "--node-tool" | "--kotlinc-tool" | "--swift-tool"
+                    "--node-tool" | "--kotlinc-tool" | "--swift-tool" | "--zig-tool"
                 )
         })
     {
@@ -147,13 +147,16 @@ fn execute_parsed(
             let feedback = crate::hook_fast_scan::observe(
                 root,
                 &plan.target_paths,
-                arguments.ruff_tool.as_deref(),
-                arguments.verify_options.get("--node-tool").map(Path::new),
-                arguments
-                    .verify_options
-                    .get("--kotlinc-tool")
-                    .map(Path::new),
-                arguments.verify_options.get("--swift-tool").map(Path::new),
+                crate::hook_native_tools::HookNativeTools {
+                    ruff: arguments.ruff_tool.as_deref(),
+                    node: arguments.verify_options.get("--node-tool").map(Path::new),
+                    kotlinc: arguments
+                        .verify_options
+                        .get("--kotlinc-tool")
+                        .map(Path::new),
+                    swift: arguments.verify_options.get("--swift-tool").map(Path::new),
+                    zig: arguments.verify_options.get("--zig-tool").map(Path::new),
+                },
                 deadline,
             );
             let cancelled = codeguard_runtime::sigint_cancellation_requested();
@@ -227,7 +230,7 @@ fn execute_parsed(
     };
     Ok((
         json!({
-            "schema_version":if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.5.0" {"0.13.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.4.0" {"0.12.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.3.0" {"0.11.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.4.0" {"0.10.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.2.0" {"0.8.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.3.0" {"0.9.0"} else {"0.7.0"}, "report_type":"hook_execution_feedback",
+            "schema_version":if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.6.0" {"0.14.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.5.0" {"0.13.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.4.0" {"0.12.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.3.0" {"0.11.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.4.0" {"0.10.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.2.0" {"0.8.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.3.0" {"0.9.0"} else {"0.7.0"}, "report_type":"hook_execution_feedback",
             "plan":plan, "execution":execution, "reason":reason,
             "local_feedback":feedback, "delivery_decision":"not_evaluated",
             "host_blocking_verified":false, "soft_result_reused":false

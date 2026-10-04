@@ -10,10 +10,7 @@ use std::{collections::BTreeSet, path::Path, sync::atomic::AtomicBool, time::Ins
 pub(crate) fn observe(
     root: &Path,
     requested: &[String],
-    ruff: Option<&Path>,
-    node: Option<&Path>,
-    kotlinc: Option<&Path>,
-    swift: Option<&Path>,
+    tools: crate::hook_native_tools::HookNativeTools<'_>,
     deadline: Instant,
 ) -> Value {
     let mut selected = BTreeSet::new();
@@ -36,11 +33,11 @@ pub(crate) fn observe(
     let python_lint = if python.is_empty() {
         Value::Null
     } else {
-        scan_selected_report_with_deadline(root, ruff, &python, deadline, &cancelled)
+        scan_selected_report_with_deadline(root, tools.ruff, &python, deadline, &cancelled)
             .unwrap_or_else(|_| json!({"status":"incomplete","reason":"adapter_unavailable"}))
     };
     let javascript = selected.iter().filter(|p| is_source(p)).cloned().collect();
-    let mut node_scan = CheckEslintScan::run(root, &javascript, node, deadline, &cancelled);
+    let mut node_scan = CheckEslintScan::run(root, &javascript, tools.node, deadline, &cancelled);
     node_scan.sync(root, deadline);
     let node_lint = node_scan.feedback;
     let kotlin_paths = selected
@@ -54,7 +51,7 @@ pub(crate) fn observe(
         crate::check_kotlin_scan::observe(
             root,
             &kotlin_paths,
-            kotlinc.map(Path::to_path_buf),
+            tools.kotlinc.map(Path::to_path_buf),
             deadline,
             &cancelled,
         )
@@ -74,7 +71,7 @@ pub(crate) fn observe(
         crate::check_swift_scan::observe(
             root,
             &swift_paths,
-            swift.map(Path::to_path_buf),
+            tools.swift.map(Path::to_path_buf),
             deadline,
             &cancelled,
         )
@@ -82,6 +79,22 @@ pub(crate) fn observe(
     if swift_lint.is_object() {
         crate::native_syntax_confirmation::connect(root, &mut swift_lint, deadline);
     }
+    let zig_paths = selected
+        .iter()
+        .filter(|p| p.ends_with(".zig"))
+        .cloned()
+        .collect::<BTreeSet<_>>();
+    let mut zig_lint = if zig_paths.is_empty() {
+        Value::Null
+    } else {
+        crate::check_zig_scan::observe(
+            root,
+            &zig_paths,
+            tools.zig.map(Path::to_path_buf),
+            deadline,
+            &cancelled,
+        )
+    };
     #[cfg(feature = "wasm-precheck")]
     let syntax = crate::check_syntax_candidates::observe_selected(
         root,
@@ -93,6 +106,7 @@ pub(crate) fn observe(
             erlang_lint: &Value::Null,
             kotlin_lint: &kotlin_lint,
             swift_lint: &swift_lint,
+            zig_lint: &zig_lint,
             rust_targets: &crate::rust_native_syntax_coverage::RustNativeSyntaxCoverage::default(),
             go_tool: None,
         },
@@ -106,10 +120,17 @@ pub(crate) fn observe(
     if swift_lint.is_object() {
         crate::check_swift_scan::refresh(root, &mut swift_lint, deadline);
     }
+    if zig_lint.is_object() {
+        crate::check_zig_scan::refresh(root, &mut zig_lint, deadline);
+    }
     let native_unwired: Vec<&String> = selected
         .iter()
         .filter(|p| {
-            !p.ends_with(".py") && !p.ends_with(".kt") && !p.ends_with(".swift") && !is_source(p)
+            !p.ends_with(".zig")
+                && !p.ends_with(".py")
+                && !p.ends_with(".kt")
+                && !p.ends_with(".swift")
+                && !is_source(p)
         })
         .collect();
     let recoveries = syntax["observations"]
@@ -127,12 +148,14 @@ pub(crate) fn observe(
             })
         }) {
         "require_native_lint_confirmation"
-    } else if swift_lint["files"].as_array().is_some_and(|files| {
-        files.iter().any(|f| {
-            f["current"] == true
-                && f["native"]["diagnostics"]
-                    .as_array()
-                    .is_some_and(|d| !d.is_empty())
+    } else if [&swift_lint, &zig_lint].iter().any(|report| {
+        report["files"].as_array().is_some_and(|files| {
+            files.iter().any(|f| {
+                f["current"] == true
+                    && f["native"]["diagnostics"]
+                        .as_array()
+                        .is_some_and(|d| !d.is_empty())
+            })
         })
     }) {
         "repair_native_source"
@@ -151,18 +174,21 @@ pub(crate) fn observe(
         "review_native_results_and_resolve_incomplete_checks"
     };
     let mut feedback = json!({
-        "schema_version":if swift_lint["schema_version"] == "0.2.0" {"0.5.0"} else if swift_lint.is_object(){"0.4.0"}else if kotlin_lint.is_object(){"0.3.0"}else{"0.2.0"},"report_type":"hook_fast_feedback",
+        "schema_version":if zig_lint.is_object(){"0.6.0"}else if swift_lint["schema_version"] == "0.2.0" {"0.5.0"} else if swift_lint.is_object(){"0.4.0"}else if kotlin_lint.is_object(){"0.3.0"}else{"0.2.0"},"report_type":"hook_fast_feedback",
         "scan_scope":"selected_files","requested_paths":requested,
         "python_lint":python_lint,"node_lint":node_lint,"syntax_candidates":syntax,"syntax_tasks":syntax_tasks,
         "unavailable_files":unavailable,"native_unwired_files":native_unwired,
         "candidate_recovery_count":recoveries,"next_action":next_action,
         "delivery_decision":"not_evaluated","coverage_proven":false
     });
-    if kotlin_lint.is_object() || swift_lint.is_object() {
+    if kotlin_lint.is_object() || swift_lint.is_object() || zig_lint.is_object() {
         feedback["kotlin_lint"] = kotlin_lint;
     }
-    if swift_lint.is_object() {
+    if swift_lint.is_object() || zig_lint.is_object() {
         feedback["swift_lint"] = swift_lint;
+    }
+    if zig_lint.is_object() {
+        feedback["zig_lint"] = zig_lint;
     }
     feedback
 }

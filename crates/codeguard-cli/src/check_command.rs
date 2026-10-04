@@ -56,6 +56,7 @@ struct Args {
     erl_tool: Option<PathBuf>,
     kotlinc_tool: Option<PathBuf>,
     swift_tool: Option<PathBuf>,
+    zig_tool: Option<PathBuf>,
     maven_tool: Option<PathBuf>,
     java_home: Option<PathBuf>,
     maven_repo: Option<PathBuf>,
@@ -348,6 +349,34 @@ pub fn run(args: &[String]) -> ExitCode {
             &AtomicBool::new(false),
         );
         execution_tasks.push(json!({"id":"swift.lint","status":if report["local_parse_complete"]==true {"native_observed_unverified"} else {"native_incomplete"}}));
+        report
+    };
+    let zig_sources = if parsed.selection.includes("zig") {
+        discovery
+            .languages
+            .get("zig")
+            .map(|e| {
+                e.source_files
+                    .iter()
+                    .filter(|p| p.ends_with(".zig"))
+                    .cloned()
+                    .collect()
+            })
+            .unwrap_or_default()
+    } else {
+        BTreeSet::new()
+    };
+    let mut zig_lint = if zig_sources.is_empty() {
+        Value::Null
+    } else {
+        let report = crate::check_zig_scan::observe(
+            &root,
+            &zig_sources,
+            parsed.zig_tool.clone(),
+            deadline,
+            &AtomicBool::new(false),
+        );
+        execution_tasks.push(json!({"id":"zig.lint","status":if report["local_parse_complete"]==true {"native_observed_unverified"}else{"native_incomplete"}}));
         report
     };
     let mut java_p3c = Value::Null;
@@ -869,7 +898,7 @@ pub fn run(args: &[String]) -> ExitCode {
                         TaskOutcome::Cancelled | TaskOutcome::CancelledBeforeStart
                     )
                 });
-            let native_results = json!({
+            let mut native_results = json!({
                 "python_lint":python_slot.lock()
                     .unwrap_or_else(std::sync::PoisonError::into_inner)
                     .as_ref().and_then(|result| result.as_ref().ok()).cloned().unwrap_or(Value::Null),
@@ -887,6 +916,10 @@ pub fn run(args: &[String]) -> ExitCode {
                 "java_cve":snapshot_native_slot(&cve_slot),
                 "npm_cve":npm_slots.lock().unwrap_or_else(std::sync::PoisonError::into_inner).values().cloned().collect::<Vec<_>>()
             });
+            if zig_lint.is_object() {
+                crate::check_zig_scan::refresh(&root, &mut zig_lint, deadline);
+                native_results["zig_lint"] = zig_lint.clone();
+            }
             let report = aborted_task_report(
                 parsed.selection.clone(),
                 discovery.to_json(),
@@ -1205,6 +1238,12 @@ pub fn run(args: &[String]) -> ExitCode {
         Ok(None) => None,
         Err(reason) => Some(reason),
     };
+    if zig_lint.is_object() {
+        if source_recheck.or(scope_recheck).is_some() {
+            zig_lint["scope_stable"] = json!(false);
+        }
+        crate::check_zig_scan::refresh(&root, &mut zig_lint, deadline);
+    }
     if kotlin_lint.is_object() {
         if source_recheck.or(scope_recheck).is_some() {
             kotlin_lint["scope_stable"] = json!(false);
@@ -1336,6 +1375,18 @@ pub fn run(args: &[String]) -> ExitCode {
                 candidate["reason"] = json!("kotlin_single_file_project_checks_unverified");
                 candidate["next_action"] = json!(
                     "读取 native_results.kotlin_lint 的当前语法位置、上下文诊断、环境阻塞和稳定任务；单文件编译不代替项目 lint 与完整构建"
+                );
+            }
+            if language == "zig" && category == "lint" && zig_lint.is_object() {
+                candidate["checker_id"] = json!("zig.ast_check");
+                candidate["status"] = json!(if zig_lint["local_parse_complete"] == true {
+                    "observed_unverified"
+                } else {
+                    "native_incomplete"
+                });
+                candidate["reason"] = json!("zig_single_file_project_checks_unverified");
+                candidate["next_action"] = json!(
+                    "读取 native_results.zig_lint 当前原生位置和环境阻塞；修复后原工具复检，并继续完整项目 lint 与构建"
                 );
             }
             if language == "swift" && category == "lint" && swift_lint.is_object() {
@@ -1512,6 +1563,13 @@ pub fn run(args: &[String]) -> ExitCode {
             Some("failed" | "sync_incomplete")
         ) {
             unresolved.insert("kotlin_task_sync_incomplete".into());
+        }
+    }
+    if zig_lint.is_object() {
+        unresolved.insert("zig_project_lint_and_build_coverage_unverified".into());
+        unresolved.insert("zig_native_first_task_connection_unavailable".into());
+        if zig_lint["local_parse_complete"] != true {
+            unresolved.insert("zig_native_scan_incomplete".into());
         }
     }
     if swift_lint.is_object() {
@@ -1770,6 +1828,12 @@ pub fn run(args: &[String]) -> ExitCode {
                 .as_array()
                 .is_some_and(|files| files.iter().any(|f| f["native"]["tool_sha256"].is_string())),
         );
+    let started_native_task_count = started_native_task_count
+        + usize::from(
+            zig_lint["files"]
+                .as_array()
+                .is_some_and(|files| files.iter().any(|f| f["native"]["tool_sha256"].is_string())),
+        );
     #[cfg(feature = "wasm-precheck")]
     let syntax_candidates = crate::check_syntax_candidates::observe(
         &root,
@@ -1781,6 +1845,7 @@ pub fn run(args: &[String]) -> ExitCode {
             erlang_lint: &erlang_lint,
             kotlin_lint: &kotlin_lint,
             swift_lint: &swift_lint,
+            zig_lint: &zig_lint,
             rust_targets: &_rust_syntax_coverage,
             go_tool: parsed.go_tool.as_deref(),
         },
@@ -1830,8 +1895,11 @@ pub fn run(args: &[String]) -> ExitCode {
             }
         }
     }
+    if zig_lint.is_object() {
+        crate::check_zig_scan::refresh(&root, &mut zig_lint, deadline);
+    }
     let mut report = json!({
-        "schema_version":if matches!(parsed.selection, Selection::Language(_)) {"0.45.0"} else if swift_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.11.0" {"0.44.0"} else if swift_lint.is_object() {"0.43.0"} else if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
+        "schema_version":if zig_lint.is_object() {"0.46.0"} else if matches!(parsed.selection, Selection::Language(_)) {"0.45.0"} else if swift_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.11.0" {"0.44.0"} else if swift_lint.is_object() {"0.43.0"} else if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
         "operation":"check", "selection":parsed.selection.as_str(), "command_status":if request_cancelled { "cancelled" } else { "incomplete" },
         "exit_code":if request_cancelled { 130 } else { 3 }, "delivery_decision":if parsed.selection == Selection::All { "incomplete" } else { "not_evaluated" }, "authority":"local_unverified",
         "reason":if request_cancelled { "request_cancelled" } else if parsed.selection == Selection::All { "full_project_obligations_and_trusted_policy_unavailable" } else if parsed.selection == Selection::Java { "java_selection_obligations_and_trusted_policy_unavailable" } else { "language_selection_obligations_and_trusted_policy_unavailable" },
@@ -1843,15 +1911,18 @@ pub fn run(args: &[String]) -> ExitCode {
         "syntax_tasks":syntax_tasks,
         "execution_budget":check_budget_record(
             parsed.timeout_ms, parsed.timeout_source, parsed.jobs_limit, parsed.jobs_source,
-            usize::from(node_present) + usize::from(python_present) + python_cve_roots.len() + 4 * usize::from(rust_present) + usize::from(go_present) + usize::from(erlang_present) + usize::from(java_present) + usize::from(javadoc_configured) + usize::from(dependency_configured) + usize::from(cve_configured) + npm_roots.len() + usize::from(kotlin_lint.is_object()) + usize::from(swift_lint.is_object()), started_native_task_count
+            usize::from(node_present) + usize::from(python_present) + python_cve_roots.len() + 4 * usize::from(rust_present) + usize::from(go_present) + usize::from(erlang_present) + usize::from(java_present) + usize::from(javadoc_configured) + usize::from(dependency_configured) + usize::from(cve_configured) + npm_roots.len() + usize::from(kotlin_lint.is_object()) + usize::from(swift_lint.is_object()) + usize::from(zig_lint.is_object()), started_native_task_count
         ),
         "next":next,
         "export":{"status":"not_requested","reason_code":null}
     });
+    if zig_lint.is_object() {
+        report["native_results"]["zig_lint"] = zig_lint.clone();
+    }
     // 历史报告维持封闭协议；只有新 Kotlin 报告携带新增原生字段。
     if !matches!(
         report["schema_version"].as_str(),
-        Some("0.42.0" | "0.43.0" | "0.44.0" | "0.45.0")
+        Some("0.42.0" | "0.43.0" | "0.44.0" | "0.45.0" | "0.46.0")
     ) {
         if let Some(native) = report["native_results"].as_object_mut() {
             native.remove("kotlin_lint");
@@ -1859,7 +1930,7 @@ pub fn run(args: &[String]) -> ExitCode {
     }
     if !matches!(
         report["schema_version"].as_str(),
-        Some("0.43.0" | "0.44.0" | "0.45.0")
+        Some("0.43.0" | "0.44.0" | "0.45.0" | "0.46.0")
     ) {
         if let Some(native) = report["native_results"].as_object_mut() {
             native.remove("swift_lint");
@@ -2032,6 +2103,25 @@ pub fn run(args: &[String]) -> ExitCode {
                         "cargo clippy --locked --offline --all-targets --message-format=json"
                     )
             );
+        }
+        if let Some(files) = report["native_results"]["zig_lint"]["files"].as_array() {
+            println!("Zig 原生单文件 AST 检查；完整 lint、构建与首次任务接线仍待完成");
+            for file in files {
+                println!(
+                    "  {}：{}；{}",
+                    file["path"], file["native"]["reason"], file["next_action"]
+                );
+                for row in file["native"]["diagnostics"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                {
+                    println!(
+                        "  {}:{}:{} {}",
+                        file["path"], row["line"], row["column"], row["rule_id"]
+                    );
+                }
+            }
         }
         if let Some(files) = report["native_results"]["swift_lint"]["files"].as_array() {
             println!("Swift 原生冻结单文件 parse；完整 lint、类型、构建和任务同步仍待完成");
@@ -2618,12 +2708,15 @@ fn aborted_task_report(
         .filter(|(_, outcome)| **outcome == TaskOutcome::InternalFailure)
         .map(|(id, _)| id.clone())
         .collect();
-    let execution_tasks: Vec<_> = outcomes
+    let mut execution_tasks: Vec<_> = outcomes
         .iter()
         .map(|(id, outcome)| json!({"id":id,"status":task_status(*outcome)}))
         .collect();
+    if native_results["zig_lint"].is_object() {
+        execution_tasks.push(json!({"id":"zig.lint","status":if native_results["zig_lint"]["local_parse_complete"]==true {"native_observed_unverified"}else{"native_incomplete"}}));
+    }
     json!({
-        "schema_version":if matches!(selection, Selection::Language(_)) {"0.14.0"} else {"0.13.0"}, "report_type":"check_aborted",
+        "schema_version":if native_results["zig_lint"].is_object() {"0.15.0"}else if matches!(selection, Selection::Language(_)) {"0.14.0"} else {"0.13.0"}, "report_type":"check_aborted",
         "operation":"check", "selection":selection.as_str(),
         "command_status":if cancelled { "cancelled" } else { "internal_error" },
         "exit_code":if cancelled { 130 } else { 4 },
@@ -2649,6 +2742,7 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
     let mut erl_tool = None;
     let mut kotlinc_tool = None;
     let mut swift_tool = None;
+    let mut zig_tool = None;
     let mut maven_tool = None;
     let mut java_home = None;
     let mut maven_repo = None;
@@ -2739,6 +2833,15 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
                     .is_some()
                 {
                     return Err("--kotlinc-tool 重复".into());
+                }
+            }
+            "--zig-tool" => {
+                index += 1;
+                if zig_tool
+                    .replace(PathBuf::from(args.get(index).ok_or("缺少 Zig 工具路径")?))
+                    .is_some()
+                {
+                    return Err("--zig-tool 重复".into());
                 }
             }
             "--swift-tool" => {
@@ -2907,6 +3010,9 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
     if kotlinc_tool.as_ref().is_some_and(|p| !p.is_absolute()) {
         return Err("--kotlinc-tool 必须是绝对路径".into());
     }
+    if zig_tool.as_ref().is_some_and(|path| !path.is_absolute()) {
+        return Err("--zig-tool 必须是绝对路径".into());
+    }
     if swift_tool.as_ref().is_some_and(|path| !path.is_absolute()) {
         return Err("--swift-tool 必须是绝对路径".into());
     }
@@ -2923,6 +3029,7 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
         || (!selection.includes("erlang") && erl_tool.is_some())
         || (!selection.includes("kotlin") && kotlinc_tool.is_some())
         || (!selection.includes("swift") && swift_tool.is_some())
+        || (!selection.includes("zig") && zig_tool.is_some())
         || (!selection.includes("java")
             && (maven_tool.is_some()
                 || java_home.is_some()
@@ -2977,6 +3084,7 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
         erl_tool,
         kotlinc_tool,
         swift_tool,
+        zig_tool,
         maven_tool,
         java_home,
         maven_repo,
@@ -3073,6 +3181,33 @@ mod tests {
         assert_eq!(
             report["native_results"]["python_lint"]["files"][0]["findings"][0]["rule_id"],
             "F401"
+        );
+    }
+    #[test]
+    fn aborted_report_preserves_previously_observed_zig_and_marks_incomplete() {
+        let packet: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../tests/acceptance/evidence/zig-aggregate-2026-10-05.json"
+        ))
+        .unwrap();
+        let zig = packet["broken"]["native_results"]["zig_lint"].clone();
+        let outcomes = BTreeMap::from([("python.lint".into(), TaskOutcome::InternalFailure)]);
+        let report = aborted_task_report(
+            Selection::All,
+            json!({}),
+            &outcomes,
+            json!({"zig_lint":zig}),
+            false,
+        );
+        assert_eq!(report["schema_version"], "0.15.0");
+        assert_eq!(report["native_results"]["zig_lint"], zig);
+        assert_eq!(report["execution_tasks"][1]["id"], "zig.lint");
+        assert_eq!(report["exit_code"], 4);
+        assert_eq!(
+            crate::partial_sarif_feedback::partial_check_sarif(&report)["runs"][0]["results"]
+                .as_array()
+                .unwrap()
+                .len(),
+            1
         );
     }
 }

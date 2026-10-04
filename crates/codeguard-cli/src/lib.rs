@@ -346,3 +346,9 @@ mod swift_tool_selection;
 
 #[cfg(unix)]
 mod check_swift_scan;
+
+#[cfg(unix)]
+mod check_zig_scan;
+
+#[cfg(unix)]
+mod hook_native_tools;

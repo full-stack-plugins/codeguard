@@ -816,3 +816,18 @@ flowchart LR
 ### Kotlin 限定语法关闭与上下文分流（开发源码）
 
 `verify_kotlin_task_resolution` 复用共享宿主 SDK，以 kotlinc-jvm 2.4.10 对照原反例及当前源码；策略 1.3.0 / 证据 0.4.0 独立于其它语言，原生首次 grammar=null。原反例的 UTF-16 与 UTF-8 字节坐标须同时有效，源码已改变且原工具完整零诊断才追加 `code_fixed`。仅上下文诊断保留待验证；混合上下文未完成和已确认语法诊断时，保留原问题并支持普通 `task verify --kotlinc-tool` 重开同一父链，不因 `incomplete` 丢弃正向发现。签名来源由宿主独立固定；当前只绑定 launcher，不证明完整 JAR/JDK/项目构建身份。默认插件可信关闭、完整 lint/类型及发行仍未完成。详见[验收](../tests/acceptance/kotlin-task-resolution-lifecycle.md)。
+
+
+2026-10-05 开发源码 Zig 原生路由：`check all`、`check zig` 与限定编辑文件现在复用冻结的 Zig 0.16.0 AST 探针。显式/PATH 选择后优先原生；选定工具失败保留未完成观察，不改用 WASM 绕过。缺工具时保留候选回退。源码或工具入口变化撤回旧位置；共同截止时间内最多观察64文件，其余范围明确保留。新增 check 0.46 / 中止反馈0.15 / Hook 0.14 独立协议，无 Zig 的报告沿用历史版本。Claude 摘要包含有界原生规则、位置和原工具复检指令。Zig 原生首次任务生成仍为缺口，报告不伪造任务ID，AST零诊断不关闭历史任务，也不证明完整lint/build。公开npm0.1.4和插件锁未更新。
+
+```mermaid
+flowchart TD
+    A[check all / check zig / 已确认编辑] --> B{选中显式或PATH Zig工具?}
+    B -->|是| C[冻结输入并执行原生ast-check]
+    B -->|否| D[候选WASM与工具准备指引]
+    C --> E{输入当前且观察有效?}
+    E -->|否| F[保留未完成并撤回过时位置]
+    E -->|原生诊断| G[修复当前源码并用原工具复检]
+    E -->|零诊断| H[继续项目lint与构建]
+    G --> I[原生首次任务接线仍待完成]
+```

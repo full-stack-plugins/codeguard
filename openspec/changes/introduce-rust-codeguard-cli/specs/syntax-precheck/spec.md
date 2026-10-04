@@ -450,3 +450,7 @@ WASM fallback MUST 通过明确版本的协议加入既有统一命令，不静�
 - **WHEN** an initialized workspace observes current Swift native diagnostics or a selected-tool blocker
 - **THEN** the project/save scan records native-first evidence without fabricated grammar identity, updates one stable source-scope task, provides current repair/environment guidance and supports original-parser task verification
 - **AND** a subsequent clean observation records evidence but cannot auto-close; absent tools still use candidate confirmation, and failed persistence retains diagnostics with an explicit task gap.
+
+#### Scenario: Aggregate checks and edit feedback prefer the invoking Zig checker
+- **WHEN** check all, check zig or selected-file editing observes ordinary Zig files and an explicit or invoking-PATH Zig tool
+- **THEN** reuse the frozen native AST probe under the shared deadline; report original diagnostics, selected-tool failures, changed input and unobserved files without substituting WASM after a selected-tool failure. Missing tools retain candidate fallback and preparation guidance. Project lint/build and trusted closure remain independent obligations; no native diagnostic may disappear because the candidate grammar reports no recovery.

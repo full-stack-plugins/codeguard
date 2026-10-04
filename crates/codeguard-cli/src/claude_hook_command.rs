@@ -329,7 +329,13 @@ fn summarize(path: &str, report: &Value) -> String {
                 .into_iter()
                 .flatten()
         });
-    for finding in python.chain(node).chain(swift) {
+    let zig = feedback["zig_lint"]["files"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter(|f| f["current"] == true)
+        .flat_map(|f| f["native"]["diagnostics"].as_array().into_iter().flatten());
+    for finding in python.chain(node).chain(swift).chain(zig) {
         count += 1;
         if let Some(rule) = finding["rule_id"].as_str().filter(|r| {
             r.len() <= 96
@@ -369,6 +375,29 @@ fn summarize(path: &str, report: &Value) -> String {
         .as_array()
         .map_or(0, Vec::len);
     let mut repair = String::new();
+    if feedback["zig_lint"].is_object() {
+        for file in feedback["zig_lint"]["files"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .take(3)
+        {
+            if file["current"] != true {
+                continue;
+            }
+            for row in file["native"]["diagnostics"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .take(3)
+            {
+                if let (Some(line), Some(column)) = (row["line"].as_u64(), row["column"].as_u64()) {
+                    repair.push_str(&format!("Zig 当前原生位置 {line}:{column}；"));
+                }
+            }
+        }
+        repair.push_str("Zig 修复后运行 codeguard lint zig <当前文件> --format=json；核对原工具和完整项目检查。原生首次任务尚未接线，不凭零诊断关闭历史任务。");
+    }
     if feedback["swift_lint"].is_object() {
         for file in feedback["swift_lint"]["files"]
             .as_array()

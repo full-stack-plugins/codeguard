@@ -816,3 +816,18 @@ A protected host can call `verify_swift_task_resolution` to compare the original
 ### Scoped Kotlin resolution and context blockers (development source)
 
 `verify_kotlin_task_resolution` reuses the host SDK with kotlinc-jvm 2.4.10. Policy 1.3.0 and evidence 0.4.0 are language-specific; native-first tasks keep a null grammar identity. The original diagnostic must have coherent UTF-16 and UTF-8 coordinates. Changed source and a complete clean recheck permit a scoped `code_fixed` event. Context-only errors remain pending verification. Mixed syntax and context errors retain the known finding and allow ordinary `task verify --kotlinc-tool` recurrence to reopen the same parent chain even when completion is incomplete. The host supplies independent trust. Tool identity currently covers the launcher, with full JAR/JDK/project identity, default plugin closure, lint/type coverage, and publication still pending. See [acceptance](../tests/acceptance/kotlin-task-resolution-lifecycle.md).
+
+
+Development-source Zig native routing (2026-10-05): `check all`, `check zig` and selected-file editing now reuse the frozen Zig 0.16.0 AST probe. Explicit/PATH selection runs native first; selected-tool failures retain an incomplete observation without switching to WASM. Missing tools retain candidate fallback. Source or tool-entry changes withdraw old positions; at most 64 files are observed under the shared deadline, with remaining scope visible. Check feedback 0.46, aborted feedback 0.15 and Hook feedback 0.14 are separate protocols; reports without Zig keep previous versions. Claude feedback includes bounded native rule IDs, positions and the original recheck instruction. First-native Zig task creation is still a gap: native reports do not invent task IDs, and clean AST observations do not close historical tasks or prove complete lint/build. Public npm 0.1.4 and the plugin lock are unchanged.
+
+```mermaid
+flowchart TD
+    A[check all / check zig / confirmed edit] --> B{Explicit or PATH Zig selected?}
+    B -->|Yes| C[Frozen native ast-check]
+    B -->|No| D[Candidate WASM and setup guidance]
+    C --> E{Current input and successful observation?}
+    E -->|No| F[Keep incomplete; withdraw stale positions]
+    E -->|Native diagnostics| G[Repair current source and recheck original tool]
+    E -->|Zero diagnostics| H[Continue project lint and build]
+    G --> I[Native-first task connection still pending]
+```

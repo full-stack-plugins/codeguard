@@ -1,0 +1,3467 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:check-aborted:0.15.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "selection",
+    "command_status",
+    "exit_code",
+    "delivery_decision",
+    "authority",
+    "reason",
+    "failed_task_ids",
+    "execution_tasks",
+    "discovery",
+    "native_results",
+    "export"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.15.0"
+    },
+    "report_type": {
+      "const": "check_aborted"
+    },
+    "operation": {
+      "const": "check"
+    },
+    "selection": {
+      "const": "all"
+    },
+    "command_status": {
+      "enum": [
+        "internal_error",
+        "cancelled"
+      ]
+    },
+    "exit_code": {
+      "enum": [
+        4,
+        130
+      ]
+    },
+    "delivery_decision": {
+      "enum": [
+        "incomplete",
+        "not_evaluated"
+      ]
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "reason": {
+      "enum": [
+        "native_task_internal_failure",
+        "request_cancelled"
+      ]
+    },
+    "failed_task_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "execution_tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": [
+              "native_observed_unverified",
+              "native_incomplete",
+              "cancelled",
+              "deadline_exceeded",
+              "dependency_failed",
+              "cancelled_before_start",
+              "deadline_before_start",
+              "internal_failure"
+            ]
+          }
+        }
+      }
+    },
+    "discovery": {
+      "type": "object"
+    },
+    "native_results": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "python_lint",
+        "python_cve",
+        "rust_lint",
+        "go_lint",
+        "java_p3c",
+        "java_javadoc",
+        "java_dependencies",
+        "java_cve",
+        "npm_cve",
+        "rust_comments",
+        "rust_build",
+        "rust_cve",
+        "node_lint",
+        "erlang_lint",
+        "zig_lint"
+      ],
+      "properties": {
+        "python_lint": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "python_cve": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "type": "object",
+            "required": [
+              "reason",
+              "native_report_valid",
+              "findings"
+            ],
+            "properties": {
+              "reason": {
+                "type": "string"
+              },
+              "native_report_valid": {
+                "type": "boolean"
+              },
+              "findings": {
+                "type": "array"
+              },
+              "delivery_decision": {
+                "const": "not_evaluated"
+              },
+              "coverage_proven": {
+                "const": false
+              }
+            }
+          }
+        },
+        "rust_lint": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "go_lint": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "java_p3c": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "java_javadoc": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "java_dependencies": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "java_cve": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "npm_cve": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "build_root",
+              "feedback",
+              "observation",
+              "backlog_status"
+            ],
+            "properties": {
+              "build_root": {
+                "type": "string",
+                "minLength": 1
+              },
+              "feedback": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "title": "npm局部CVE反馈0.1/0.2/0.3；持久任务不授权门禁",
+                    "oneOf": [
+                      {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "title": "npm局部CVE反馈，不能自证库或门禁权威",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "schema_version",
+                          "report_type",
+                          "status",
+                          "reason",
+                          "local_coherent",
+                          "configuration",
+                          "dependency_total",
+                          "findings",
+                          "advisory_coverage",
+                          "tool_approval",
+                          "delivery_decision",
+                          "workbench_status",
+                          "next_action"
+                        ],
+                        "properties": {
+                          "schema_version": {
+                            "const": "0.1.0"
+                          },
+                          "report_type": {
+                            "const": "npm_cve_feedback"
+                          },
+                          "status": {
+                            "enum": [
+                              "incomplete",
+                              "local_observation"
+                            ]
+                          },
+                          "reason": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "local_coherent": {
+                            "type": "boolean"
+                          },
+                          "configuration": {
+                            "oneOf": [
+                              {
+                                "type": "null"
+                              },
+                              {
+                                "type": "object",
+                                "required": [
+                                  "build_root",
+                                  "checker_id",
+                                  "category",
+                                  "configuration",
+                                  "configuration_ref",
+                                  "reason",
+                                  "next_action"
+                                ],
+                                "additionalProperties": false,
+                                "properties": {
+                                  "build_root": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "checker_id": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "category": {
+                                    "enum": [
+                                      "lint",
+                                      "comments",
+                                      "dependencies",
+                                      "cve",
+                                      "security",
+                                      "build"
+                                    ]
+                                  },
+                                  "configuration": {
+                                    "enum": [
+                                      "configured",
+                                      "missing",
+                                      "invalid",
+                                      "unknown"
+                                    ]
+                                  },
+                                  "configuration_ref": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "reason": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "next_action": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  }
+                                }
+                              }
+                            ]
+                          },
+                          "dependency_total": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ],
+                            "minimum": 0
+                          },
+                          "findings": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "component_ref",
+                                "severity",
+                                "advisory_sources",
+                                "nodes"
+                              ],
+                              "properties": {
+                                "component_ref": {
+                                  "type": "string",
+                                  "pattern": "^[a-f0-9]{64}$"
+                                },
+                                "severity": {
+                                  "enum": [
+                                    "info",
+                                    "low",
+                                    "moderate",
+                                    "high",
+                                    "critical"
+                                  ]
+                                },
+                                "advisory_sources": {
+                                  "type": "array",
+                                  "uniqueItems": true,
+                                  "items": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                  }
+                                },
+                                "nodes": {
+                                  "type": "array",
+                                  "minItems": 1,
+                                  "items": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                      "node_ref",
+                                      "resolved_version"
+                                    ],
+                                    "properties": {
+                                      "node_ref": {
+                                        "type": "string",
+                                        "pattern": "^[a-f0-9]{64}$"
+                                      },
+                                      "resolved_version": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "maxLength": 256
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "advisory_coverage": {
+                            "const": "not_evaluated"
+                          },
+                          "tool_approval": {
+                            "const": "unverified"
+                          },
+                          "delivery_decision": {
+                            "const": "not_evaluated"
+                          },
+                          "workbench_status": {
+                            "const": "not_connected"
+                          },
+                          "next_action": {
+                            "type": "string",
+                            "minLength": 1
+                          }
+                        },
+                        "allOf": [
+                          {
+                            "if": {
+                              "properties": {
+                                "local_coherent": {
+                                  "const": true
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "status": {
+                                  "const": "local_observation"
+                                },
+                                "dependency_total": {
+                                  "type": "integer"
+                                },
+                                "configuration": {
+                                  "type": "object",
+                                  "required": [
+                                    "build_root",
+                                    "checker_id",
+                                    "category",
+                                    "configuration",
+                                    "configuration_ref",
+                                    "reason",
+                                    "next_action"
+                                  ],
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "build_root": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "checker_id": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "category": {
+                                      "enum": [
+                                        "lint",
+                                        "comments",
+                                        "dependencies",
+                                        "cve",
+                                        "security",
+                                        "build"
+                                      ]
+                                    },
+                                    "configuration": {
+                                      "enum": [
+                                        "configured",
+                                        "missing",
+                                        "invalid",
+                                        "unknown"
+                                      ]
+                                    },
+                                    "configuration_ref": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "reason": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "next_action": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "else": {
+                              "properties": {
+                                "status": {
+                                  "const": "incomplete"
+                                },
+                                "findings": {
+                                  "maxItems": 0
+                                },
+                                "dependency_total": {
+                                  "type": "null"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "title": "npm局部CVE反馈，不能自证库或门禁权威",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "schema_version",
+                          "report_type",
+                          "status",
+                          "reason",
+                          "local_coherent",
+                          "configuration",
+                          "dependency_total",
+                          "findings",
+                          "advisory_coverage",
+                          "tool_approval",
+                          "delivery_decision",
+                          "workbench_status",
+                          "next_action",
+                          "execution_budget"
+                        ],
+                        "properties": {
+                          "schema_version": {
+                            "const": "0.2.0"
+                          },
+                          "report_type": {
+                            "const": "npm_cve_feedback"
+                          },
+                          "status": {
+                            "enum": [
+                              "incomplete",
+                              "local_observation"
+                            ]
+                          },
+                          "reason": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "local_coherent": {
+                            "type": "boolean"
+                          },
+                          "configuration": {
+                            "oneOf": [
+                              {
+                                "type": "null"
+                              },
+                              {
+                                "type": "object",
+                                "required": [
+                                  "build_root",
+                                  "checker_id",
+                                  "category",
+                                  "configuration",
+                                  "configuration_ref",
+                                  "reason",
+                                  "next_action"
+                                ],
+                                "additionalProperties": false,
+                                "properties": {
+                                  "build_root": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "checker_id": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "category": {
+                                    "enum": [
+                                      "lint",
+                                      "comments",
+                                      "dependencies",
+                                      "cve",
+                                      "security",
+                                      "build"
+                                    ]
+                                  },
+                                  "configuration": {
+                                    "enum": [
+                                      "configured",
+                                      "missing",
+                                      "invalid",
+                                      "unknown"
+                                    ]
+                                  },
+                                  "configuration_ref": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "reason": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "next_action": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  }
+                                }
+                              }
+                            ]
+                          },
+                          "dependency_total": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ],
+                            "minimum": 0
+                          },
+                          "findings": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "component_ref",
+                                "severity",
+                                "advisory_sources",
+                                "nodes"
+                              ],
+                              "properties": {
+                                "component_ref": {
+                                  "type": "string",
+                                  "pattern": "^[a-f0-9]{64}$"
+                                },
+                                "severity": {
+                                  "enum": [
+                                    "info",
+                                    "low",
+                                    "moderate",
+                                    "high",
+                                    "critical"
+                                  ]
+                                },
+                                "advisory_sources": {
+                                  "type": "array",
+                                  "uniqueItems": true,
+                                  "items": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                  }
+                                },
+                                "nodes": {
+                                  "type": "array",
+                                  "minItems": 1,
+                                  "items": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                      "node_ref",
+                                      "resolved_version"
+                                    ],
+                                    "properties": {
+                                      "node_ref": {
+                                        "type": "string",
+                                        "pattern": "^[a-f0-9]{64}$"
+                                      },
+                                      "resolved_version": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "maxLength": 256
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "advisory_coverage": {
+                            "const": "not_evaluated"
+                          },
+                          "tool_approval": {
+                            "const": "unverified"
+                          },
+                          "delivery_decision": {
+                            "const": "not_evaluated"
+                          },
+                          "workbench_status": {
+                            "const": "not_connected"
+                          },
+                          "next_action": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "execution_budget": {
+                            "oneOf": [
+                              {
+                                "type": "null"
+                              },
+                              {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": [
+                                  "timeout_ms",
+                                  "source",
+                                  "enforcement"
+                                ],
+                                "properties": {
+                                  "timeout_ms": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 86400000
+                                  },
+                                  "source": {
+                                    "enum": [
+                                      "cli",
+                                      "registered_environment",
+                                      "project_default",
+                                      "builtin_default"
+                                    ]
+                                  },
+                                  "enforcement": {
+                                    "const": "native_execution_only"
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        "allOf": [
+                          {
+                            "if": {
+                              "properties": {
+                                "local_coherent": {
+                                  "const": true
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "status": {
+                                  "const": "local_observation"
+                                },
+                                "dependency_total": {
+                                  "type": "integer"
+                                },
+                                "configuration": {
+                                  "type": "object",
+                                  "required": [
+                                    "build_root",
+                                    "checker_id",
+                                    "category",
+                                    "configuration",
+                                    "configuration_ref",
+                                    "reason",
+                                    "next_action"
+                                  ],
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "build_root": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "checker_id": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "category": {
+                                      "enum": [
+                                        "lint",
+                                        "comments",
+                                        "dependencies",
+                                        "cve",
+                                        "security",
+                                        "build"
+                                      ]
+                                    },
+                                    "configuration": {
+                                      "enum": [
+                                        "configured",
+                                        "missing",
+                                        "invalid",
+                                        "unknown"
+                                      ]
+                                    },
+                                    "configuration_ref": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "reason": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "next_action": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "else": {
+                              "properties": {
+                                "status": {
+                                  "const": "incomplete"
+                                },
+                                "findings": {
+                                  "maxItems": 0
+                                },
+                                "dependency_total": {
+                                  "type": "null"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "title": "npm局部CVE反馈，不能自证库或门禁权威",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "schema_version",
+                          "report_type",
+                          "status",
+                          "reason",
+                          "local_coherent",
+                          "configuration",
+                          "dependency_total",
+                          "findings",
+                          "advisory_coverage",
+                          "tool_approval",
+                          "delivery_decision",
+                          "workbench_status",
+                          "next_action",
+                          "execution_budget",
+                          "workbench"
+                        ],
+                        "properties": {
+                          "schema_version": {
+                            "const": "0.3.0"
+                          },
+                          "report_type": {
+                            "const": "npm_cve_feedback"
+                          },
+                          "status": {
+                            "enum": [
+                              "incomplete",
+                              "local_observation"
+                            ]
+                          },
+                          "reason": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "local_coherent": {
+                            "type": "boolean"
+                          },
+                          "configuration": {
+                            "oneOf": [
+                              {
+                                "type": "null"
+                              },
+                              {
+                                "type": "object",
+                                "required": [
+                                  "build_root",
+                                  "checker_id",
+                                  "category",
+                                  "configuration",
+                                  "configuration_ref",
+                                  "reason",
+                                  "next_action"
+                                ],
+                                "additionalProperties": false,
+                                "properties": {
+                                  "build_root": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "checker_id": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "category": {
+                                    "enum": [
+                                      "lint",
+                                      "comments",
+                                      "dependencies",
+                                      "cve",
+                                      "security",
+                                      "build"
+                                    ]
+                                  },
+                                  "configuration": {
+                                    "enum": [
+                                      "configured",
+                                      "missing",
+                                      "invalid",
+                                      "unknown"
+                                    ]
+                                  },
+                                  "configuration_ref": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "reason": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "next_action": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  }
+                                }
+                              }
+                            ]
+                          },
+                          "dependency_total": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ],
+                            "minimum": 0
+                          },
+                          "findings": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "component_ref",
+                                "severity",
+                                "advisory_sources",
+                                "nodes"
+                              ],
+                              "properties": {
+                                "component_ref": {
+                                  "type": "string",
+                                  "pattern": "^[a-f0-9]{64}$"
+                                },
+                                "severity": {
+                                  "enum": [
+                                    "info",
+                                    "low",
+                                    "moderate",
+                                    "high",
+                                    "critical"
+                                  ]
+                                },
+                                "advisory_sources": {
+                                  "type": "array",
+                                  "uniqueItems": true,
+                                  "items": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                  }
+                                },
+                                "nodes": {
+                                  "type": "array",
+                                  "minItems": 1,
+                                  "items": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                      "node_ref",
+                                      "resolved_version"
+                                    ],
+                                    "properties": {
+                                      "node_ref": {
+                                        "type": "string",
+                                        "pattern": "^[a-f0-9]{64}$"
+                                      },
+                                      "resolved_version": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "maxLength": 256
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "advisory_coverage": {
+                            "const": "not_evaluated"
+                          },
+                          "tool_approval": {
+                            "const": "unverified"
+                          },
+                          "delivery_decision": {
+                            "const": "not_evaluated"
+                          },
+                          "workbench_status": {
+                            "type": "string",
+                            "pattern": "^[a-z][a-z0-9_]*$"
+                          },
+                          "next_action": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "execution_budget": {
+                            "oneOf": [
+                              {
+                                "type": "null"
+                              },
+                              {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": [
+                                  "timeout_ms",
+                                  "source",
+                                  "enforcement"
+                                ],
+                                "properties": {
+                                  "timeout_ms": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "maximum": 86400000
+                                  },
+                                  "source": {
+                                    "enum": [
+                                      "cli",
+                                      "registered_environment",
+                                      "project_default",
+                                      "builtin_default"
+                                    ]
+                                  },
+                                  "enforcement": {
+                                    "const": "native_execution_only"
+                                  }
+                                }
+                              }
+                            ]
+                          },
+                          "workbench": {
+                            "oneOf": [
+                              {
+                                "type": "null"
+                              },
+                              {
+                                "type": "object",
+                                "additionalProperties": false,
+                                "required": [
+                                  "status"
+                                ],
+                                "properties": {
+                                  "status": {
+                                    "type": "string",
+                                    "pattern": "^[a-z][a-z0-9_]*$"
+                                  },
+                                  "new_blockers": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                  },
+                                  "failed_reports": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                  }
+                                },
+                                "allOf": [
+                                  {
+                                    "if": {
+                                      "properties": {
+                                        "status": {
+                                          "enum": [
+                                            "synced_partial",
+                                            "sync_incomplete"
+                                          ]
+                                        }
+                                      }
+                                    },
+                                    "then": {
+                                      "required": [
+                                        "new_blockers",
+                                        "failed_reports"
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        },
+                        "allOf": [
+                          {
+                            "if": {
+                              "properties": {
+                                "local_coherent": {
+                                  "const": true
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "status": {
+                                  "const": "local_observation"
+                                },
+                                "dependency_total": {
+                                  "type": "integer"
+                                },
+                                "configuration": {
+                                  "type": "object",
+                                  "required": [
+                                    "build_root",
+                                    "checker_id",
+                                    "category",
+                                    "configuration",
+                                    "configuration_ref",
+                                    "reason",
+                                    "next_action"
+                                  ],
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "build_root": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "checker_id": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "category": {
+                                      "enum": [
+                                        "lint",
+                                        "comments",
+                                        "dependencies",
+                                        "cve",
+                                        "security",
+                                        "build"
+                                      ]
+                                    },
+                                    "configuration": {
+                                      "enum": [
+                                        "configured",
+                                        "missing",
+                                        "invalid",
+                                        "unknown"
+                                      ]
+                                    },
+                                    "configuration_ref": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "reason": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    },
+                                    "next_action": {
+                                      "type": "string",
+                                      "minLength": 1
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "else": {
+                              "properties": {
+                                "status": {
+                                  "const": "incomplete"
+                                },
+                                "findings": {
+                                  "maxItems": 0
+                                },
+                                "dependency_total": {
+                                  "type": "null"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              "observation": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "title": "npm工作台观察0.1/0.2与输入状态准备观察0.3；不授予覆盖",
+                    "oneOf": [
+                      {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "title": "npm局部CVE工作台观察，不能自证漏洞或关闭",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "schema_version",
+                          "report_type",
+                          "workspace_binding",
+                          "workspace_id",
+                          "run_id",
+                          "authority",
+                          "coverage_proven",
+                          "delivery_decision",
+                          "checker_id",
+                          "build_root",
+                          "manifest_sha256",
+                          "lock_sha256",
+                          "diagnostic_reason",
+                          "component_count",
+                          "advisories"
+                        ],
+                        "properties": {
+                          "schema_version": {
+                            "const": "0.1.0"
+                          },
+                          "report_type": {
+                            "const": "npm_cve_workbench_observation"
+                          },
+                          "workspace_binding": {
+                            "const": "bound"
+                          },
+                          "workspace_id": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "run_id": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9_-]{1,120}$"
+                          },
+                          "authority": {
+                            "const": "local_unverified"
+                          },
+                          "coverage_proven": {
+                            "const": false
+                          },
+                          "delivery_decision": {
+                            "const": "not_evaluated"
+                          },
+                          "checker_id": {
+                            "const": "node.npm.audit"
+                          },
+                          "build_root": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "manifest_sha256": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          },
+                          "lock_sha256": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          },
+                          "diagnostic_reason": {
+                            "type": "string",
+                            "pattern": "^[a-z0-9_]{1,80}$"
+                          },
+                          "component_count": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 10000
+                          },
+                          "advisories": {
+                            "type": "array",
+                            "maxItems": 10000,
+                            "items": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "component_ref",
+                                "severity",
+                                "advisory_sources",
+                                "nodes"
+                              ],
+                              "properties": {
+                                "component_ref": {
+                                  "type": "string",
+                                  "pattern": "^[a-f0-9]{64}$"
+                                },
+                                "severity": {
+                                  "enum": [
+                                    "info",
+                                    "low",
+                                    "moderate",
+                                    "high",
+                                    "critical"
+                                  ]
+                                },
+                                "advisory_sources": {
+                                  "type": "array",
+                                  "uniqueItems": true,
+                                  "items": {
+                                    "type": "integer",
+                                    "minimum": 1
+                                  }
+                                },
+                                "nodes": {
+                                  "type": "array",
+                                  "minItems": 1,
+                                  "items": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": [
+                                      "node_ref",
+                                      "resolved_version"
+                                    ],
+                                    "properties": {
+                                      "node_ref": {
+                                        "type": "string",
+                                        "pattern": "^[a-f0-9]{64}$"
+                                      },
+                                      "resolved_version": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "maxLength": 256
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "allOf": [
+                          {
+                            "if": {
+                              "properties": {
+                                "diagnostic_reason": {
+                                  "enum": [
+                                    "npm_execution_context_missing",
+                                    "npm_manifest_invalid",
+                                    "npm_scripts_invalid"
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "diagnostic_reason"
+                              ]
+                            },
+                            "then": {
+                              "properties": {
+                                "component_count": {
+                                  "const": 0
+                                },
+                                "advisories": {
+                                  "maxItems": 0
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "not": {
+                              "properties": {
+                                "diagnostic_reason": {
+                                  "const": "npm_lock_missing"
+                                }
+                              },
+                              "required": [
+                                "diagnostic_reason"
+                              ]
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "title": "npm缺锁准备观察；未启动工具且没有漏洞结果",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "schema_version",
+                          "report_type",
+                          "workspace_binding",
+                          "workspace_id",
+                          "run_id",
+                          "authority",
+                          "coverage_proven",
+                          "delivery_decision",
+                          "checker_id",
+                          "build_root",
+                          "manifest_sha256",
+                          "lock_sha256",
+                          "diagnostic_reason",
+                          "component_count",
+                          "advisories",
+                          "lock_state"
+                        ],
+                        "properties": {
+                          "schema_version": {
+                            "const": "0.2.0"
+                          },
+                          "report_type": {
+                            "const": "npm_cve_workbench_observation"
+                          },
+                          "workspace_binding": {
+                            "const": "bound"
+                          },
+                          "workspace_id": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "run_id": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9_-]{1,120}$"
+                          },
+                          "authority": {
+                            "const": "local_unverified"
+                          },
+                          "coverage_proven": {
+                            "const": false
+                          },
+                          "delivery_decision": {
+                            "const": "not_evaluated"
+                          },
+                          "checker_id": {
+                            "const": "node.npm.audit"
+                          },
+                          "build_root": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "manifest_sha256": {
+                            "type": "string",
+                            "pattern": "^[a-f0-9]{64}$"
+                          },
+                          "lock_sha256": {
+                            "type": "null"
+                          },
+                          "diagnostic_reason": {
+                            "const": "npm_lock_missing"
+                          },
+                          "component_count": {
+                            "const": 0
+                          },
+                          "advisories": {
+                            "type": "array",
+                            "maxItems": 0
+                          },
+                          "lock_state": {
+                            "const": "missing"
+                          }
+                        }
+                      },
+                      {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "title": "npm输入不可用的准备观察0.3；无原生漏洞结果",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "schema_version",
+                          "report_type",
+                          "workspace_binding",
+                          "workspace_id",
+                          "run_id",
+                          "authority",
+                          "coverage_proven",
+                          "delivery_decision",
+                          "checker_id",
+                          "build_root",
+                          "manifest_sha256",
+                          "lock_sha256",
+                          "diagnostic_reason",
+                          "component_count",
+                          "advisories",
+                          "manifest_state",
+                          "lock_state"
+                        ],
+                        "properties": {
+                          "schema_version": {
+                            "const": "0.3.0"
+                          },
+                          "report_type": {
+                            "const": "npm_cve_workbench_observation"
+                          },
+                          "workspace_binding": {
+                            "const": "bound"
+                          },
+                          "workspace_id": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "run_id": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9_-]{1,120}$"
+                          },
+                          "authority": {
+                            "const": "local_unverified"
+                          },
+                          "coverage_proven": {
+                            "const": false
+                          },
+                          "delivery_decision": {
+                            "const": "not_evaluated"
+                          },
+                          "checker_id": {
+                            "const": "node.npm.audit"
+                          },
+                          "build_root": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "manifest_sha256": {
+                            "oneOf": [
+                              {
+                                "type": "null"
+                              },
+                              {
+                                "type": "string",
+                                "pattern": "^[a-f0-9]{64}$"
+                              }
+                            ]
+                          },
+                          "lock_sha256": {
+                            "oneOf": [
+                              {
+                                "type": "null"
+                              },
+                              {
+                                "type": "string",
+                                "pattern": "^[a-f0-9]{64}$"
+                              }
+                            ]
+                          },
+                          "diagnostic_reason": {
+                            "enum": [
+                              "npm_manifest_missing",
+                              "npm_manifest_not_regular",
+                              "npm_manifest_path_alias",
+                              "npm_manifest_unavailable",
+                              "npm_lock_missing",
+                              "npm_lock_not_regular",
+                              "npm_lock_path_alias",
+                              "npm_lock_unavailable"
+                            ]
+                          },
+                          "component_count": {
+                            "const": 0
+                          },
+                          "advisories": {
+                            "type": "array",
+                            "maxItems": 0
+                          },
+                          "manifest_state": {
+                            "enum": [
+                              "present",
+                              "missing",
+                              "not_regular",
+                              "path_alias",
+                              "unavailable"
+                            ]
+                          },
+                          "lock_state": {
+                            "enum": [
+                              "present",
+                              "missing",
+                              "not_regular",
+                              "path_alias",
+                              "unavailable"
+                            ]
+                          }
+                        },
+                        "allOf": [
+                          {
+                            "if": {
+                              "properties": {
+                                "manifest_state": {
+                                  "const": "present"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "manifest_sha256": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "else": {
+                              "properties": {
+                                "manifest_sha256": {
+                                  "type": "null"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "lock_state": {
+                                  "const": "present"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "lock_sha256": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "else": {
+                              "properties": {
+                                "lock_sha256": {
+                                  "type": "null"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "not": {
+                              "properties": {
+                                "manifest_state": {
+                                  "const": "present"
+                                },
+                                "lock_state": {
+                                  "const": "present"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "manifest_state": {
+                                  "const": "missing"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "diagnostic_reason": {
+                                  "const": "npm_manifest_missing"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "manifest_state": {
+                                  "const": "present"
+                                },
+                                "lock_state": {
+                                  "const": "missing"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "diagnostic_reason": {
+                                  "const": "npm_lock_missing"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "manifest_state": {
+                                  "const": "not_regular"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "diagnostic_reason": {
+                                  "const": "npm_manifest_not_regular"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "manifest_state": {
+                                  "const": "present"
+                                },
+                                "lock_state": {
+                                  "const": "not_regular"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "diagnostic_reason": {
+                                  "const": "npm_lock_not_regular"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "manifest_state": {
+                                  "const": "path_alias"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "diagnostic_reason": {
+                                  "const": "npm_manifest_path_alias"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "manifest_state": {
+                                  "const": "present"
+                                },
+                                "lock_state": {
+                                  "const": "path_alias"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "diagnostic_reason": {
+                                  "const": "npm_lock_path_alias"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "manifest_state": {
+                                  "const": "unavailable"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "diagnostic_reason": {
+                                  "const": "npm_manifest_unavailable"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "if": {
+                              "properties": {
+                                "manifest_state": {
+                                  "const": "present"
+                                },
+                                "lock_state": {
+                                  "const": "unavailable"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "diagnostic_reason": {
+                                  "const": "npm_lock_unavailable"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              "backlog_status": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,127}$"
+              }
+            }
+          }
+        },
+        "rust_comments": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/rust_comments"
+            }
+          ]
+        },
+        "rust_build": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "rust_cve": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "node_lint": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "reason",
+                "coverage_proven",
+                "delivery_decision",
+                "files",
+                "unexecuted_files",
+                "backlog_status",
+                "new_findings",
+                "new_blockers",
+                "next"
+              ],
+              "properties": {
+                "status": {
+                  "enum": [
+                    "local_observation",
+                    "incomplete"
+                  ]
+                },
+                "reason": {
+                  "type": "string"
+                },
+                "coverage_proven": {
+                  "const": false
+                },
+                "delivery_decision": {
+                  "const": "not_evaluated"
+                },
+                "files": {
+                  "type": "array",
+                  "maxItems": 10000,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "path",
+                      "source_sha256",
+                      "feedback"
+                    ],
+                    "properties": {
+                      "path": {
+                        "type": "string"
+                      },
+                      "source_sha256": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "pattern": "^[0-9a-f]{64}$"
+                      },
+                      "feedback": {
+                        "title": "ESLint局部未批准反馈",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "schema_version",
+                          "report_type",
+                          "status",
+                          "local_coherent",
+                          "coverage_proven",
+                          "delivery_decision",
+                          "reason",
+                          "findings",
+                          "suppressed_count",
+                          "workbench_status",
+                          "next_action",
+                          "workbench"
+                        ],
+                        "properties": {
+                          "schema_version": {
+                            "const": "0.2.0"
+                          },
+                          "report_type": {
+                            "const": "eslint_local_feedback"
+                          },
+                          "status": {
+                            "enum": [
+                              "incomplete",
+                              "local_observation"
+                            ]
+                          },
+                          "local_coherent": {
+                            "type": "boolean"
+                          },
+                          "coverage_proven": {
+                            "const": false
+                          },
+                          "delivery_decision": {
+                            "const": "not_evaluated"
+                          },
+                          "reason": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "findings": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "additionalProperties": false,
+                              "required": [
+                                "path",
+                                "rule_id",
+                                "severity",
+                                "line",
+                                "column",
+                                "message_sha256"
+                              ],
+                              "properties": {
+                                "path": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "rule_id": {
+                                  "type": "string",
+                                  "minLength": 1
+                                },
+                                "severity": {
+                                  "enum": [
+                                    1,
+                                    2
+                                  ]
+                                },
+                                "line": {
+                                  "type": "integer",
+                                  "minimum": 1
+                                },
+                                "column": {
+                                  "type": "integer",
+                                  "minimum": 1
+                                },
+                                "message_sha256": {
+                                  "type": "string",
+                                  "pattern": "^[a-f0-9]{64}$"
+                                }
+                              }
+                            }
+                          },
+                          "suppressed_count": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "workbench_status": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "next_action": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "workbench": {
+                            "anyOf": [
+                              {
+                                "type": "null"
+                              },
+                              {
+                                "type": "object",
+                                "required": [
+                                  "status"
+                                ],
+                                "additionalProperties": false,
+                                "properties": {
+                                  "status": {
+                                    "type": "string"
+                                  },
+                                  "new_findings": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                  },
+                                  "new_blockers": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                  },
+                                  "failed_reports": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                  },
+                                  "next": {
+                                    "type": [
+                                      "object",
+                                      "null"
+                                    ]
+                                  },
+                                  "next_error": {
+                                    "type": [
+                                      "string",
+                                      "null"
+                                    ]
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        "allOf": [
+                          {
+                            "if": {
+                              "properties": {
+                                "local_coherent": {
+                                  "const": true
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "status": {
+                                  "const": "local_observation"
+                                }
+                              }
+                            },
+                            "else": {
+                              "properties": {
+                                "status": {
+                                  "const": "incomplete"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                "unexecuted_files": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "backlog_status": {
+                  "enum": [
+                    "not_connected",
+                    "deadline_or_cancelled",
+                    "backlog_update_failed",
+                    "synced_partial",
+                    "sync_incomplete"
+                  ]
+                },
+                "new_findings": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "new_blockers": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "next": {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "erlang_lint": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/erlangFormsScan"
+            }
+          ]
+        },
+        "zig_lint": {
+          "$ref": "zig-ast-scan-v0.1.schema.json"
+        }
+      }
+    },
+    "export": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason_code"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "not_requested",
+            "saved",
+            "failed"
+          ]
+        },
+        "reason_code": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "failed"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "reason_code": {
+                "enum": [
+                  "output_parent_unavailable",
+                  "output_not_regular_file",
+                  "output_existing_file_is_not_codeguard_report",
+                  "output_identity_unavailable",
+                  "output_temp_create_failed",
+                  "output_temp_write_failed",
+                  "output_replace_failed",
+                  "output_existing_read_failed",
+                  "output_existing_too_large"
+                ]
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "reason_code": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "selection": {
+            "const": "all"
+          }
+        },
+        "required": [
+          "selection"
+        ]
+      },
+      "then": {
+        "properties": {
+          "delivery_decision": {
+            "const": "incomplete"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "delivery_decision": {
+            "const": "not_evaluated"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "command_status": {
+            "const": "cancelled"
+          }
+        },
+        "required": [
+          "command_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "exit_code": {
+            "const": 130
+          },
+          "reason": {
+            "const": "request_cancelled"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "exit_code": {
+            "const": 4
+          },
+          "reason": {
+            "const": "native_task_internal_failure"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "rust_comments": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "title": "Unverified selected Cargo rustdoc library observation",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "report_type",
+        "operation",
+        "language",
+        "command_status",
+        "exit_code",
+        "delivery_decision",
+        "authority",
+        "checker_id",
+        "scope",
+        "rule_selection",
+        "local_scan_complete",
+        "coverage_proven",
+        "reason",
+        "tool_sha256",
+        "manifest_sha256",
+        "lock_sha256",
+        "findings",
+        "backlog_status",
+        "execution_budget",
+        "next_actions",
+        "recheck_argv",
+        "workspace_binding",
+        "workspace_id",
+        "run_id",
+        "backlog_sync"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "0.4.0"
+        },
+        "report_type": {
+          "const": "rustdoc_local_observation"
+        },
+        "operation": {
+          "const": "comments"
+        },
+        "language": {
+          "const": "rust"
+        },
+        "command_status": {
+          "enum": [
+            "incomplete",
+            "cancelled"
+          ]
+        },
+        "exit_code": {
+          "enum": [
+            3,
+            130
+          ]
+        },
+        "delivery_decision": {
+          "const": "not_evaluated"
+        },
+        "authority": {
+          "const": "local_unverified"
+        },
+        "checker_id": {
+          "const": "rust.cargo_rustdoc"
+        },
+        "scope": {
+          "const": "selected_root_library_default_features"
+        },
+        "rule_selection": {
+          "const": "explicit_probe_not_approved_project_policy"
+        },
+        "local_scan_complete": {
+          "type": "boolean"
+        },
+        "coverage_proven": {
+          "const": false
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tool_sha256": {
+          "$ref": "#/$defs/rust_comments/$defs/hash"
+        },
+        "manifest_sha256": {
+          "$ref": "#/$defs/rust_comments/$defs/hash"
+        },
+        "lock_sha256": {
+          "$ref": "#/$defs/rust_comments/$defs/hash"
+        },
+        "backlog_status": {
+          "enum": [
+            "not_integrated",
+            "queued",
+            "synced",
+            "sync_incomplete",
+            "failed"
+          ]
+        },
+        "execution_budget": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "timeout_ms",
+            "source",
+            "enforcement"
+          ],
+          "properties": {
+            "timeout_ms": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 86400000
+            },
+            "source": {
+              "enum": [
+                "cli",
+                "registered_environment",
+                "project_default",
+                "builtin_default"
+              ]
+            },
+            "enforcement": {
+              "const": "native_execution_only"
+            }
+          }
+        },
+        "next_actions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "recheck_argv": {
+          "const": [
+            "cargo",
+            "rustdoc",
+            "--lib",
+            "--locked",
+            "--offline",
+            "--message-format=json",
+            "--",
+            "--warn",
+            "missing_docs",
+            "--warn",
+            "rustdoc::broken_intra_doc_links"
+          ]
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "finding_id",
+              "finding_fingerprint",
+              "source_sha256",
+              "rule_id",
+              "level",
+              "path",
+              "line",
+              "column",
+              "classification",
+              "byte_start",
+              "byte_end",
+              "native_range_sha256",
+              "identity_status",
+              "repair_brief",
+              "target_path"
+            ],
+            "properties": {
+              "finding_id": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^CG-[0-9a-f]{32}$"
+              },
+              "finding_fingerprint": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "source_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "rule_id": {
+                "enum": [
+                  "missing_docs",
+                  "rustdoc::broken_intra_doc_links"
+                ]
+              },
+              "level": {
+                "enum": [
+                  "warning",
+                  "error"
+                ]
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "line": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "column": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "classification": {
+                "const": "observed_unverified"
+              },
+              "byte_start": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "byte_end": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "native_range_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "identity_status": {
+                "enum": [
+                  "unique_candidate",
+                  "ambiguous"
+                ]
+              },
+              "repair_brief": {
+                "$ref": "#/$defs/rust_comments/$defs/repair_brief"
+              },
+              "target_path": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "identity_status": {
+                      "const": "ambiguous"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "finding_id": {
+                      "type": "null"
+                    },
+                    "repair_brief": {
+                      "properties": {
+                        "status": {
+                          "const": "investigation_required"
+                        }
+                      }
+                    }
+                  }
+                },
+                "else": {
+                  "properties": {
+                    "finding_id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "workspace_binding": {
+          "enum": [
+            "bound",
+            "uninitialized",
+            "invalid",
+            "legacy_unbound"
+          ]
+        },
+        "workspace_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "run_id": {
+          "type": "string",
+          "pattern": "^rustdoc-[0-9]+-[0-9]+$"
+        },
+        "backlog_sync": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      },
+      "$defs": {
+        "hash": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "repair_brief": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "evidence",
+            "rule_basis",
+            "allowed_paths",
+            "steps",
+            "recheck_argv",
+            "working_directory",
+            "tool_requirement",
+            "attempt_history",
+            "history_status",
+            "closure_conditions"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "repair_guidance",
+                "investigation_required"
+              ]
+            },
+            "evidence": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "finding_id",
+                "finding_fingerprint",
+                "path",
+                "source_sha256",
+                "byte_start",
+                "byte_end",
+                "rule_id",
+                "observation_reason"
+              ],
+              "properties": {
+                "finding_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "pattern": "^CG-[0-9a-f]{32}$"
+                },
+                "finding_fingerprint": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "source_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "byte_start": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "byte_end": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "rule_id": {
+                  "enum": [
+                    "missing_docs",
+                    "rustdoc::broken_intra_doc_links"
+                  ]
+                },
+                "observation_reason": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "rule_basis": {
+              "type": "string",
+              "minLength": 1
+            },
+            "allowed_paths": {
+              "type": "array",
+              "maxItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "steps": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "recheck_argv": {
+              "const": [
+                "cargo",
+                "rustdoc",
+                "--lib",
+                "--locked",
+                "--offline",
+                "--message-format=json",
+                "--",
+                "--warn",
+                "missing_docs",
+                "--warn",
+                "rustdoc::broken_intra_doc_links"
+              ]
+            },
+            "working_directory": {
+              "const": "selected_project_root"
+            },
+            "tool_requirement": {
+              "type": "string",
+              "minLength": 1
+            },
+            "attempt_history": {
+              "const": []
+            },
+            "history_status": {
+              "const": "not_integrated"
+            },
+            "closure_conditions": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "investigation_required"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "allowed_paths": {
+                    "maxItems": 0
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "allowed_paths": {
+                    "minItems": 1
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "command_status": {
+                "const": "cancelled"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "exit_code": {
+                "const": 130
+              },
+              "reason": {
+                "const": "request_cancelled"
+              },
+              "local_scan_complete": {
+                "const": false
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "exit_code": {
+                "const": 3
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "local_scan_complete": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "const": "native_observed_unverified"
+              },
+              "tool_sha256": {
+                "type": "string"
+              },
+              "manifest_sha256": {
+                "type": "string"
+              },
+              "lock_sha256": {
+                "type": "string"
+              },
+              "findings": {
+                "items": {
+                  "properties": {
+                    "identity_status": {
+                      "const": "unique_candidate"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "local_scan_complete": {
+                "const": false
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "findings": {
+                "items": {
+                  "properties": {
+                    "repair_brief": {
+                      "properties": {
+                        "status": {
+                          "const": "investigation_required"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "workspace_binding": {
+                "const": "bound"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "workspace_id": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "workspace_id": {
+                "type": "null"
+              },
+              "backlog_status": {
+                "const": "not_integrated"
+              },
+              "backlog_sync": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "erlangFormsScan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "report_type",
+        "tool_selection",
+        "scope",
+        "authority",
+        "coverage_proven",
+        "delivery_decision",
+        "local_forms_complete",
+        "reason",
+        "source_file_count",
+        "unobserved_count",
+        "files",
+        "task_status",
+        "task_id",
+        "scope_stable"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "0.1.0"
+        },
+        "report_type": {
+          "const": "erlang_forms_scan"
+        },
+        "tool_selection": {
+          "$ref": "#/$defs/erlangFormsScan/$defs/tool_selection"
+        },
+        "scope": {
+          "const": "single_file_forms_without_preprocessing"
+        },
+        "authority": {
+          "const": "local_unverified"
+        },
+        "coverage_proven": {
+          "const": false
+        },
+        "delivery_decision": {
+          "const": "not_evaluated"
+        },
+        "local_forms_complete": {
+          "type": "boolean"
+        },
+        "reason": {
+          "enum": [
+            "erlang_native_scan_incomplete",
+            "erlang_forms_observed_unverified_project_coverage"
+          ]
+        },
+        "source_file_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unobserved_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "files": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "source_sha256",
+              "current",
+              "native",
+              "findings",
+              "recheck_argv",
+              "next_action"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_sha256": {
+                "anyOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/$defs/erlangFormsScan/$defs/digest"
+                  }
+                ]
+              },
+              "current": {
+                "type": "boolean"
+              },
+              "native": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "status",
+                  "reason",
+                  "version",
+                  "tool_sha256",
+                  "diagnostics",
+                  "diagnostics_truncated",
+                  "preprocessing_unresolved"
+                ],
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "not_run",
+                      "incomplete",
+                      "completed",
+                      "diagnostics_observed"
+                    ]
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "version": {
+                    "enum": [
+                      null,
+                      "OTP 28"
+                    ]
+                  },
+                  "tool_sha256": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "$ref": "#/$defs/erlangFormsScan/$defs/digest"
+                      }
+                    ]
+                  },
+                  "diagnostics": {
+                    "type": "array",
+                    "maxItems": 32,
+                    "items": {
+                      "$ref": "#/$defs/erlangFormsScan/$defs/diagnostic"
+                    }
+                  },
+                  "diagnostics_truncated": {
+                    "type": "boolean"
+                  },
+                  "preprocessing_unresolved": {
+                    "type": "boolean"
+                  }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "completed",
+                            "diagnostics_observed"
+                          ]
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "version": {
+                          "const": "OTP 28"
+                        },
+                        "tool_sha256": {
+                          "$ref": "#/$defs/erlangFormsScan/$defs/digest"
+                        },
+                        "diagnostics_truncated": {
+                          "const": false
+                        },
+                        "preprocessing_unresolved": {
+                          "const": false
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "status": {
+                          "const": "completed"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "diagnostics": {
+                          "maxItems": 0
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "status": {
+                          "const": "diagnostics_observed"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "diagnostics": {
+                          "minItems": 1
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "status": {
+                          "const": "completed"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "reason": {
+                          "const": "erlang_native_forms_no_diagnostics"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "status": {
+                          "const": "diagnostics_observed"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "reason": {
+                          "const": "erlang_native_syntax_diagnostics"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "status": {
+                          "const": "not_run"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "version": {
+                          "type": "null"
+                        },
+                        "tool_sha256": {
+                          "type": "null"
+                        },
+                        "diagnostics": {
+                          "maxItems": 0
+                        },
+                        "diagnostics_truncated": {
+                          "const": false
+                        },
+                        "preprocessing_unresolved": {
+                          "const": false
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              "findings": {
+                "type": "array",
+                "maxItems": 32,
+                "items": {
+                  "$ref": "#/$defs/erlangFormsScan/$defs/diagnostic"
+                }
+              },
+              "recheck_argv": {
+                "anyOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "array",
+                    "minItems": 7,
+                    "maxItems": 7,
+                    "prefixItems": [
+                      {
+                        "const": "codeguard"
+                      },
+                      {
+                        "const": "lint"
+                      },
+                      {
+                        "const": "erlang"
+                      },
+                      {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "^/"
+                      },
+                      {
+                        "const": "--erl-tool"
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^/"
+                      },
+                      {
+                        "const": "--format=json"
+                      }
+                    ],
+                    "items": false
+                  }
+                ]
+              },
+              "next_action": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "current": {
+                      "const": false
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "native": {
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "incomplete",
+                            "not_run"
+                          ]
+                        },
+                        "diagnostics": {
+                          "maxItems": 0
+                        }
+                      }
+                    },
+                    "findings": {
+                      "maxItems": 0
+                    },
+                    "recheck_argv": {
+                      "type": "null"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "native": {
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "completed",
+                            "diagnostics_observed"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "current": {
+                      "const": true
+                    },
+                    "source_sha256": {
+                      "$ref": "#/$defs/erlangFormsScan/$defs/digest"
+                    },
+                    "recheck_argv": {
+                      "type": "array"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "native": {
+                      "properties": {
+                        "status": {
+                          "const": "completed"
+                        }
+                      }
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "findings": {
+                      "maxItems": 0
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "native": {
+                      "properties": {
+                        "status": {
+                          "const": "diagnostics_observed"
+                        }
+                      }
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "findings": {
+                      "minItems": 1
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "native": {
+                      "properties": {
+                        "preprocessing_unresolved": {
+                          "const": true
+                        }
+                      }
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "findings": {
+                      "maxItems": 0
+                    },
+                    "recheck_argv": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "task_status": {
+          "const": "native_findings_not_integrated"
+        },
+        "task_id": {
+          "type": "null"
+        },
+        "scope_stable": {
+          "type": "boolean"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "local_forms_complete": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "const": "erlang_forms_observed_unverified_project_coverage"
+              },
+              "unobserved_count": {
+                "const": 0
+              },
+              "files": {
+                "minItems": 1,
+                "items": {
+                  "properties": {
+                    "current": {
+                      "const": true
+                    },
+                    "native": {
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "completed",
+                            "diagnostics_observed"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "scope_stable": {
+                "const": true
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "local_forms_complete": {
+                "const": false
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "const": "erlang_native_scan_incomplete"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "tool_selection": {
+                "properties": {
+                  "source": {
+                    "const": "not_found"
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "local_forms_complete": {
+                "const": false
+              },
+              "files": {
+                "items": {
+                  "properties": {
+                    "native": {
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "not_run",
+                            "incomplete"
+                          ]
+                        },
+                        "version": {
+                          "type": "null"
+                        },
+                        "tool_sha256": {
+                          "type": "null"
+                        },
+                        "diagnostics": {
+                          "maxItems": 0
+                        }
+                      }
+                    },
+                    "findings": {
+                      "maxItems": 0
+                    },
+                    "recheck_argv": {
+                      "type": "null"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "files": {
+                "contains": {
+                  "properties": {
+                    "native": {
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "completed",
+                            "diagnostics_observed"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tool_selection": {
+                "properties": {
+                  "source": {
+                    "enum": [
+                      "explicit",
+                      "path"
+                    ]
+                  },
+                  "executable": {
+                    "type": "string",
+                    "pattern": "^/"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "$defs": {
+        "digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "diagnostic": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "line",
+            "column",
+            "rule_id"
+          ],
+          "properties": {
+            "line": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "column": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "rule_id": {
+              "const": "erlang.syntax.error"
+            }
+          }
+        },
+        "tool_selection": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source",
+            "executable"
+          ],
+          "properties": {
+            "source": {
+              "enum": [
+                "explicit",
+                "path",
+                "not_found"
+              ]
+            },
+            "executable": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^/"
+                }
+              ]
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "source": {
+                    "const": "path"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "executable": {
+                    "type": "string",
+                    "pattern": "^/"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "source": {
+                    "const": "not_found"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "executable": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
