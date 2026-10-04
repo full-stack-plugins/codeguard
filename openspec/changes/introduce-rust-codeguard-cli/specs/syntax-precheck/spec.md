@@ -472,3 +472,7 @@ WASM fallback MUST 通过明确版本的协议加入既有统一命令，不静�
 #### Scenario: Python native grammar comparison excludes ordinary lint and project configuration
 - **WHEN** an explicit installed Ruff is used as the Python syntax observer in development native/WASM comparison
 - **THEN** freeze the tool/version and target dialect, feed the same source through isolated stdin with fixes/cache/project configuration and noqa suppression disabled, classify only consistent located `invalid-syntax` reports, retain other rules, wrong-source reports, tool failure or contradictory exit/JSON as incomplete, and do not extend trusted task-closing or project-delivery authority
+
+#### Scenario: Structural empty blocks remain distinct from parser recoveries
+- **WHEN** an application scans a grammar tree for empty `block` nodes that contain no non-comment named statement
+- **THEN** traverse even branches without `has_error`, retain the direct parent kind and original byte positions with explicit record/traversal budget exhaustion, and do not label these structural facts as parser ERROR/MISSING or language violations; legal empty blocks in other languages require independent language interpretation

@@ -1428,3 +1428,7 @@ Zig本批终态：受影响WASM八目标52通过/0失败/6条件忽略，Hook另
 ### 2026-10-05 Python 隔离原生语法差分（父任务未完成）
 
 显式Ruff0.16.8 / py312固定stdin和隔离规则，只消费一致的invalid-syntax，不把F401等普通lint、上下文或工具故障当语法违规。新增开发checker不扩大可信关闭服务，0.2报告独立于历史0.1；32库存保留，18例真实回放发现empty_body/bad_indent两个WASM漏检，未修复且资格0。见[验收](../../../tests/acceptance/python-native-grammar-differential.md)；12.11/14.17/14.19及Python完整能力仍未完成。
+
+### 2026-10-05 WASM 空block结构事实（接线未完成）
+
+runtime新增独立的全树空block事实扫描，记录父节点及原始字节位置；不受has_error裁剪，不伪造ERROR/MISSING或全语言违规。Python合法suite与Rust合法空块、记录/遍历预算的实际WASM测试见[验收](../../../tests/acceptance/wasm-empty-block-facts.md)。原始加载/恢复及新扫描共21通过；worker/公开报告/语言规则/任务未接线，Python两项漏检仍保留，14.4/14.17/14.19不勾选。

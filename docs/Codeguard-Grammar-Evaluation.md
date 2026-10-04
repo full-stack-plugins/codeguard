@@ -99,3 +99,8 @@ The Rust `evaluate_native_grammars` example selects samples for explicitly suppl
 ### Isolated Python native syntax comparison
 
 Development replay now accepts explicit Ruff0.16.8 with the Python3.12 target. Frozen stdin, `--isolated --select E9 --ignore-noqa --no-cache` excludes project configuration and ordinary lint. Only consistent located `invalid-syntax` diagnostics classify syntax errors; F401, wrong paths/positions, changed versions or contradictory reports remain incomplete. Report0.2 preserves historical0.1 bytes and does not expand trusted task-closing authority. The18-case actual replay found two WASM false negatives: an empty function suite and incorrect indentation. Python remains unqualified; see [Python native differential acceptance](../tests/acceptance/python-native-grammar-differential.md).
+
+
+### Empty-block structural facts (integration pending)
+
+Rust runtime now provides `scan_wasm_empty_blocks`, traversing the full tree for blocks with no non-comment named statement and retaining parent kinds, byte positions and exhausted budgets. These facts are distinct from raw ERROR/MISSING and cannot authorize a language violation: a legal empty Rust function also produces a fact. Worker, public-report and repair-task integration remains incomplete; the two Python WASM false negatives remain open. See [structural-fact acceptance](../tests/acceptance/wasm-empty-block-facts.md).

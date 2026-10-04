@@ -16,6 +16,15 @@ mod wasm_recovery_scan;
 #[cfg(feature = "wasm-precheck")]
 pub use wasm_recovery_scan::{WasmRecoveryScan, scan_wasm_recoveries};
 
+#[cfg(feature = "wasm-precheck")]
+mod wasm_empty_block;
+#[cfg(feature = "wasm-precheck")]
+pub use wasm_empty_block::WasmEmptyBlock;
+#[cfg(feature = "wasm-precheck")]
+mod wasm_empty_block_scan;
+#[cfg(feature = "wasm-precheck")]
+pub use wasm_empty_block_scan::{WasmEmptyBlockScan, scan_wasm_empty_blocks};
+
 #[cfg(unix)]
 mod installed_artifact;
 #[cfg(unix)]
