@@ -44,16 +44,29 @@ impl Project {
     fn command(&self) -> Command {
         let mut c = Command::new(env!("CARGO_BIN_EXE_codeguard"));
         c.env_remove("CODEGUARD_TIMEOUT")
-            .env_remove("CODEGUARD_JOBS");
+            .env_remove("CODEGUARD_JOBS")
+            .env("PATH", self.0.join("empty-path"));
         c
     }
     fn hook(&self, event: &str, task: Option<&str>, tool: Option<&Path>) -> Value {
+        self.hook_with_path(event, task, tool, None)
+    }
+    fn hook_with_path(
+        &self,
+        event: &str,
+        task: Option<&str>,
+        tool: Option<&Path>,
+        path: Option<&std::ffi::OsStr>,
+    ) -> Value {
         let mut c = self.command();
         c.args(["hook", "execute"])
             .arg(&self.0)
             .args(["--timeout", "30s", "--format=json"]);
         if let Some(t) = tool {
             c.arg("--erl-tool").arg(t);
+        }
+        if let Some(path) = path {
+            c.env("PATH", path);
         }
         c.stdin(Stdio::piped())
             .stdout(Stdio::piped())
@@ -109,6 +122,28 @@ impl Project {
                 .unwrap(),
         )
     }
+    fn verify_with_path(&self, id: &str, path: &std::ffi::OsStr, tool: Option<&Path>) -> Value {
+        let mut c = self.command();
+        c.args(["task", "verify", id])
+            .arg(&self.0)
+            .args(["--format=json", "--timeout", "30s"])
+            .env("PATH", path)
+            .current_dir(&self.0);
+        if let Some(tool) = tool {
+            c.arg("--erl-tool").arg(tool);
+        }
+        let output = c.output().unwrap();
+        assert_eq!(output.status.code(), Some(3), "{output:?}");
+        decode(&output)
+    }
+    fn path_tool(&self, directory: &str, version: &str, body: &str) -> PathBuf {
+        let directory = self.0.join(directory);
+        fs::create_dir_all(&directory).unwrap();
+        let tool = directory.join("erl");
+        fs::write(&tool, format!("#!/bin/sh\ncase \"$*\" in *system_info*) printf '%s\\n' '{version}'; exit 0;; esac\n{body}\n")).unwrap();
+        fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
+        tool
+    }
     fn operation(&self, args: &[&str]) -> Value {
         let split = if args[1] == "attempt" { 4 } else { 3 };
         let out = self
@@ -132,6 +167,131 @@ fn decode(out: &Output) -> Value {
         .unwrap_or_else(|_| panic!("{}", String::from_utf8_lossy(&out.stderr)))
 }
 const PARSE_BY_SOURCE: &str = "input=$(/bin/cat)\ncase \"$input\" in *'f( ->'*) printf '%s' '{\"schema_version\":\"0.1.0\",\"forms\":2,\"preprocessing\":false,\"diagnostics_truncated\":false,\"diagnostics\":[{\"line\":2,\"column\":4,\"rule_id\":\"erlang.syntax.error\"}]}';; *) printf '%s' '{\"schema_version\":\"0.1.0\",\"forms\":2,\"preprocessing\":false,\"diagnostics_truncated\":false,\"diagnostics\":[]}';; esac";
+
+#[test]
+fn path_recheck_finds_native_diagnostics_and_retains_original_tool_in_next() {
+    let (p, id) = Project::new();
+    let tool = p.path_tool("first", "OTP 28", PARSE_BY_SOURCE);
+    let report = p.verify_with_path(&id, tool.parent().unwrap().as_os_str(), None);
+    assert_eq!(report["event_persisted"], true, "{report}");
+    assert_eq!(report["observation"], "still_blocked");
+    assert_eq!(report["native_scan"]["tool_path"], tool.to_str().unwrap());
+    let next = p.next();
+    assert_eq!(next["repair_brief"]["disposition"], "actionable");
+    let argv = next["repair_brief"]["recheck_argv"].as_array().unwrap();
+    assert_eq!(argv[argv.len() - 2], "--erl-tool");
+    assert_eq!(argv[argv.len() - 1], tool.to_str().unwrap());
+    fs::write(p.0.join("app.erl"), "-module(app).\nf() -> ok.\n").unwrap();
+    let other = p.path_tool("other", "OTP 29", "exit 9");
+    let fixed = p.verify_with_path(&id, other.parent().unwrap().as_os_str(), Some(&tool));
+    assert_eq!(fixed["observation"], "candidate_absent_unverified_policy");
+    assert_eq!(fixed["native_scan"]["tool_path"], tool.to_str().unwrap());
+    let fact: Value = serde_json::from_slice(
+        &fs::read(p.0.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(fact["state"], "open");
+}
+
+#[test]
+fn path_recheck_does_not_replace_explicit_bad_or_unsupported_first_tool() {
+    let (p, id) = Project::new();
+    let marker = p.0.join("second-started");
+    let second = p.path_tool(
+        "second",
+        "OTP 28",
+        &format!("/usr/bin/touch '{}'\n{PARSE_BY_SOURCE}", marker.display()),
+    );
+    let absent = p.0.join("absent");
+    let explicit = p.verify_with_path(&id, second.parent().unwrap().as_os_str(), Some(&absent));
+    assert_eq!(explicit["observation"], "incomplete");
+    assert_eq!(
+        explicit["native_scan"]["native"]["reason"],
+        "erlang_tool_unavailable_or_untrusted"
+    );
+    assert!(!marker.exists());
+    let first = p.path_tool("first", "OTP 29", "exit 9");
+    let path = std::env::join_paths([first.parent().unwrap(), second.parent().unwrap()]).unwrap();
+    let unsupported = p.verify_with_path(&id, &path, None);
+    assert_eq!(unsupported["event_persisted"], true);
+    assert_eq!(
+        unsupported["native_scan"]["tool_path"],
+        first.to_str().unwrap()
+    );
+    assert_eq!(
+        unsupported["native_scan"]["native"]["reason"],
+        "erlang_version_unverified_or_unsupported"
+    );
+    assert!(!marker.exists());
+}
+
+#[test]
+fn path_recheck_keeps_selected_execution_failure_and_ignores_unsafe_entries() {
+    let (p, id) = Project::new();
+    let first = p.path_tool("first", "OTP 28", "exit 9");
+    let second = p.path_tool("second", "OTP 28", PARSE_BY_SOURCE);
+    let path = std::env::join_paths([first.parent().unwrap(), second.parent().unwrap()]).unwrap();
+    let failed = p.verify_with_path(&id, &path, None);
+    assert_eq!(failed["event_persisted"], true);
+    assert_eq!(failed["observation"], "incomplete");
+    assert_eq!(failed["native_scan"]["tool_path"], first.to_str().unwrap());
+    fs::set_permissions(&second, fs::Permissions::from_mode(0o600)).unwrap();
+    let unsafe_path =
+        std::env::join_paths([Path::new(""), Path::new("first"), second.parent().unwrap()])
+            .unwrap();
+    let absent = p.verify_with_path(&id, &unsafe_path, None);
+    assert_eq!(absent["event_persisted"], true);
+    assert_eq!(absent["native_scan"]["tool_path"], Value::Null);
+    assert_eq!(
+        absent["native_scan"]["native"]["reason"],
+        "erlang_tool_not_found_on_path"
+    );
+}
+
+#[test]
+fn repair_ready_discovers_path_erlang_and_records_native_verification() {
+    let (p, id) = Project::new();
+    let tool = p.path_tool("hook-bin", "OTP 28", PARSE_BY_SOURCE);
+    let hook = p.hook_with_path(
+        "repair_ready",
+        Some(&id),
+        None,
+        Some(tool.parent().unwrap().as_os_str()),
+    );
+    let report = &hook["local_feedback"];
+    assert_eq!(report["event_persisted"], true, "{hook}");
+    assert_eq!(report["observation"], "still_blocked");
+    assert_eq!(report["native_confirmation_status"], "diagnostics_observed");
+    let reference = report["native_confirmation_ref"]["report_ref"]
+        .as_str()
+        .unwrap();
+    let saved: Value = serde_json::from_slice(&fs::read(p.0.join(reference)).unwrap()).unwrap();
+    assert_eq!(saved["tool_path"], tool.to_str().unwrap());
+    assert_eq!(saved["task_id"], id);
+    assert_eq!(p.next()["repair_brief"]["disposition"], "actionable");
+}
+
+#[test]
+#[ignore = "requires existing OTP 28 via CODEGUARD_ERL_BIN"]
+fn actual_path_otp_rechecks_candidate_task_then_repaired_source_without_flag() {
+    let (p, id) = Project::new();
+    let tool = PathBuf::from(std::env::var("CODEGUARD_ERL_BIN").unwrap());
+    let bin = p.0.join("real-bin");
+    fs::create_dir(&bin).unwrap();
+    std::os::unix::fs::symlink(tool, bin.join("erl")).unwrap();
+    let bad = p.verify_with_path(&id, bin.as_os_str(), None);
+    assert_eq!(bad["event_persisted"], true, "{bad}");
+    assert_eq!(bad["observation"], "still_blocked");
+    assert_eq!(bad["native_scan"]["native"]["version"], "OTP 28");
+    fs::write(p.0.join("app.erl"), "-module(app).\nf() -> ok.\n").unwrap();
+    let good = p.verify_with_path(&id, bin.as_os_str(), None);
+    assert_eq!(good["event_persisted"], true, "{good}");
+    assert_eq!(good["observation"], "candidate_absent_unverified_policy");
+    assert_eq!(
+        good["native_scan"]["tool_path"],
+        bad["native_scan"]["tool_path"]
+    );
+}
 
 #[test]
 fn erlang_native_diagnostics_guide_repair_and_preserve_stable_task_and_history() {
@@ -188,7 +348,7 @@ fn missing_erlang_tool_records_failed_observation_without_source_repair() {
     assert_eq!(r["event_persisted"], true, "{r}");
     assert_eq!(
         r["native_scan"]["native"]["reason"],
-        "explicit_erl_tool_not_provided"
+        "erlang_tool_not_found_on_path"
     );
     assert_eq!(
         p.next()["repair_brief"]["action_id"],
@@ -196,7 +356,7 @@ fn missing_erlang_tool_records_failed_observation_without_source_repair() {
     );
     assert_eq!(
         p.next()["repair_brief"]["native_confirmation_reason"],
-        "explicit_erl_tool_not_provided"
+        "erlang_tool_not_found_on_path"
     );
 }
 

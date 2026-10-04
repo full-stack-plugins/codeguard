@@ -2356,3 +2356,10 @@ Clippy 现在在原生执行前冻结已观察源码及根配置/锁的字节或
 初始四项红测与独立聚合红测均已复现；整个Hook工作台目标12 passed/0 failed/0 ignored。具体证据与最终回归见[验收](../../../tests/acceptance/unlocated-syntax-recovery-tasks.md)。没有改变grammar字节、已知精度差异、资格、插件锁或公开npm；正式原生adapter、关闭/覆盖/批准与真实宿主仍缺，父任务不勾选。
 
 本批终态：默认 workspace/all-targets 1234 passed/0 failed/113 ignored；受影响 WASM 16 组 210 passed/0 failed/30 ignored；默认及 WASM Clippy -D warnings、fmt、分层和 OpenSpec strict 通过。203 schema 元定义、16 份真实报告与 48 个伪造变体通过；新增开发协议回归 4 passed。实际报告揭露聚合 next 仅支持旧简报的 schema 缺口，新的 0.38 已引用完整既有简报版本而非放宽任意对象，旧 schema 字节不改。固定二进制实际捕获任务和复检；Swift 两例原生 parse 对照不提升资格。完整日志摘要及运行限制见[本批验收](../../../tests/acceptance/unlocated-syntax-recovery-tasks.md)。父任务不勾选，未重跑完整 WASM suite/358 例语料，公开发行和真实宿主未改变。
+
+
+## 2026-10-04 Erlang 任务复检与工具自动发现（进行中）
+
+对应既有 9.9、9.10、14.10、14.11、14.19；不创建第二份规格。现有 lint/check 能发现调用方 PATH 中的 erl，但 task verify 仅显式参数，导致已安装工具被误报未提供。新增场景和三个先失败的反例后，复检复用原工具选择服务；显式及首选失败不换工具，实际 next 固定工具路径，空/相对/不可执行来源仍未完成。候选/原生首次任务及 repair-ready 的共同入口、原协议、租约/事件和不自动关闭继续保持；完整原生确认与宿主关闭父任务仍开放。实际终态及证据补入[本批验收](../../../tests/acceptance/erlang-recheck-discovery.md)。
+
+本批终态：默认全工作区 1235 passed/0 failed/113 ignored；其后仅历史指引文案变化，最终默认工作台定向 12 passed/0 failed/1 ignored。最终 WASM 16 组 199 passed/0 failed/25 ignored；显式 OTP 28 实测新增目标 1 passed，最终二进制两来源实际复放。默认/WASM Clippy、fmt、分层和 OpenSpec strict 通过；旧 schema 未改，父任务未勾选。前批 4afa8bc 的 Linux CI 因旧对话文案断言失败，已重现并修改行为断言，本批远端结果独立确认。详情及固定日志见[本批验收](../../../tests/acceptance/erlang-recheck-discovery.md)。

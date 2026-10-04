@@ -49,6 +49,12 @@
 - **AND** only current, byte-matching files with complete non-preprocessed native forms observations may skip duplicate WASM; absent tools, unresolved preprocessing, truncated diagnostics, source/tool changes and execution failures remain visible and cannot become native or project success
 - **AND** files beyond the native budget remain explicitly unobserved; Java-only selection must not start Erlang, cancellation retains its exit semantics, and useful sibling results remain available. Changed project scope withdraws scope completeness but retains byte-current single-file diagnostics; stale file positions and argv are withdrawn. Forms parsing does not fulfill complete Erlang lint, compilation, tests or trusted task closure
 
+#### Scenario: Task verification finds an already installed Erlang checker
+- **WHEN** 已有 Erlang 语法确认或原生首次发现任务执行 `task verify`，未提供显式 `--erl-tool`
+- **THEN** 复用扫描入口的工具选择规则，在调用方 PATH 的绝对目录选择首个普通可执行 erl；用共享截止时间核对 OTP 28 版本、工具字节和当前任务源码，记录真实原生复检事件，而不是仅因缺参数报告工具未提供
+- **AND** 显式坏工具、所选版本或执行失败不改用后续工具；空、相对或不可执行 PATH 不产生自动工具。任务 next 保留所选原工具的有界复检 argv，后续 PATH 变化不能悄悄替换该明确入口；缺工具仍为环境恢复，不指示源码修改或自动安装
+- **AND** 候选与原生首次来源保持原协议和稳定任务身份；repair-ready Hook 复用相同复检入口，局部零诊断不授予可信关闭、完整 lint 或项目通过
+
 #### Scenario: Go vet excludes a file under build constraints
 - **WHEN** 本轮 Go 1.23.4 `go vet` 完成，受控 `go list` 证明部分源码进入默认构建，而另一份 `.go` 源码被构建标签排除
 - **THEN** 仅对同一源码字节且进入原生包清单的文件跳过重复 WASM；被排除文件继续候选初检，并保持平台/构建标签覆盖未完成

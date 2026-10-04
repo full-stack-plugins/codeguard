@@ -7,7 +7,7 @@ use std::{
     time::{Instant, SystemTime, UNIX_EPOCH},
 };
 
-/// 在原工作区和已有任务范围内运行适用语法工具；参数含显式 Zig/OTP 和共同截止时间。
+/// 在原工作区和已有任务范围内运行适用语法工具；Zig 使用显式入口，OTP 复用显式/PATH 选择和共同截止时间。
 /// 返回绑定当前字节的观察，缺工具/adapter 同样保留报告，便于记录失败尝试。
 pub(crate) fn run(
     root: &Path,
@@ -27,6 +27,13 @@ pub(crate) fn run(
     if erl.is_some() && language != "erlang" {
         return Err("erl_tool_does_not_match_confirmation_language");
     }
+    // 只从调用方工具来源选择，不从可编辑历史报告执行旧路径；next 会绑定本轮实际工具。
+    let erlang_selection = (language == "erlang").then(|| {
+        crate::erlang_tool_selection::ErlangToolSelection::discover(erl.map(Path::to_path_buf))
+    });
+    let selected_erl = erlang_selection
+        .as_ref()
+        .and_then(|selection| selection.tool());
     let source = source_bytes(root, path);
     let native = if let Some(bytes) = source.as_ref() {
         if language == "zig" {
@@ -39,8 +46,9 @@ pub(crate) fn run(
                     })
                 })
         } else if language == "erlang" {
-            erl.map(|tool| crate::erlang_syntax_probe::observe(tool, bytes, deadline))
-                .unwrap_or_else(|| unavailable("explicit_erl_tool_not_provided"))
+            selected_erl
+                .map(|tool| crate::erlang_syntax_probe::observe(tool, bytes, deadline))
+                .unwrap_or_else(|| unavailable("erlang_tool_not_found_on_path"))
         } else {
             unavailable("native_syntax_confirmation_adapter_unavailable")
         }
@@ -52,7 +60,7 @@ pub(crate) fn run(
         native["diagnostics_truncated"] = json!(false);
         native["preprocessing_unresolved"] = json!(false);
     }
-    let tool_path = zig.or(erl).and_then(|p| p.canonicalize().ok());
+    let tool_path = zig.or(selected_erl).and_then(|p| p.canonicalize().ok());
     let target_sha = source.as_ref().map(|b| digest(b));
     let nanos = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -534,7 +542,7 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
                     Some("explicit_erl_tool_not_provided" | "erlang_tool_not_found_on_path")
                 )
             {
-                "未提供 Erlang 原生工具；先定位已安装的 OTP 28 erl，或按项目要求安装匹配工具，再用 --erl-tool 绝对路径复检，不修改无关源码"
+                "上次复检未从调用方绝对 PATH 或显式参数取得可执行 Erlang 工具；先定位已安装的 OTP 28，把其普通可执行入口加入调用方绝对 PATH 或使用 --erl-tool 绝对路径复检。确实缺工具才按项目要求准备，不修改无关源码"
             } else {
                 "原生语法确认仍未完成；查看原工具诊断、语言能力或版本缺口，恢复对应前置，不修改无关源码"
             },

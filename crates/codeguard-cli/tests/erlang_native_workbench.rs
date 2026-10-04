@@ -162,6 +162,50 @@ fn native_first_scan_creates_one_task_and_supports_original_tool_recheck() {
 }
 
 #[test]
+fn native_first_task_recheck_discovers_path_and_preserves_origin_protocol() {
+    let p = Project::new();
+    let tool = p.tool();
+    let first = p.check(&tool);
+    let id = first["native_results"]["erlang_lint"]["files"][0]["task_id"]
+        .as_str()
+        .unwrap();
+    let bin = p.0.join("path-bin");
+    fs::create_dir(&bin).unwrap();
+    std::os::unix::fs::symlink(&tool, bin.join("erl")).unwrap();
+    let verify = || {
+        decode(
+            &p.command()
+                .args(["task", "verify", id])
+                .arg(&p.0)
+                .args(["--timeout", "30s", "--format=json"])
+                .env("PATH", &bin)
+                .output()
+                .unwrap(),
+        )
+    };
+    let bad = verify();
+    assert_eq!(bad["schema_version"], "0.14.0");
+    assert_eq!(bad["native_scan"]["schema_version"], "0.3.0");
+    assert_eq!(bad["event_persisted"], true, "{bad}");
+    assert_eq!(bad["native_scan"]["tool_path"], tool.to_str().unwrap());
+    assert_eq!(bad["observation"], "still_blocked");
+    assert_eq!(p.next()["repair_brief"]["task_id"], id);
+    fs::write(p.0.join("app.erl"), "-module(app).\nf() -> ok.\n").unwrap();
+    let good = verify();
+    assert_eq!(good["observation"], "candidate_absent_unverified_policy");
+    assert_eq!(good["event_persisted"], true, "{good}");
+    assert_eq!(
+        fs::read_dir(p.0.join(".codeguard/tasks")).unwrap().count(),
+        1
+    );
+    let fact: Value = serde_json::from_slice(
+        &fs::read(p.0.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(fact["state"], "open");
+}
+
+#[test]
 fn missing_native_tool_creates_environment_task_without_source_positions() {
     let p = Project::new();
     let out = p

@@ -249,3 +249,10 @@ This native-first receipt came from installed OTP 28. The signing root and clock
 ```
 
 The original [receipt](../tests/acceptance/evidence/otp28-native-first-resolved-2026-10-04.json), [evidence](../tests/acceptance/evidence/otp28-native-first-resolved-2026-10-04-evidence.json) and [recurrence receipt](../tests/acceptance/evidence/otp28-native-first-reopened-2026-10-04.json) retain their emitted bytes.
+
+
+### Automatic native Erlang discovery for task rechecks (current source)
+
+`codeguard task verify "$TASK_ID" . --format=json` (with `TASK_ID` set to the actual `task_id` returned by `next`) reuses lint/check selection for existing Erlang syntax tasks: explicit `--erl-tool` takes priority; otherwise the first executable erl in an absolute invoking-PATH directory is fixed. Rechecks verify OTP 28, current source and tool bytes while retaining leases, budgets, events and existing report versions. Both candidate-origin and native-first tasks can be rechecked; repair-ready Hooks use the same entry.
+
+Only an absent tool produces `erlang_tool_not_found_on_path`; empty/relative PATH entries and non-executable files are ignored. An invalid explicit tool, unsupported selected version or execution failure never selects a later tool or installs one. After a valid observation, `next` supplies explicit recheck argv for the actual tool so later PATH changes cannot replace that entry. Local zero diagnostics still do not close tasks automatically; preprocessing, trusted policy and complete project capability remain separate obligations. See [recheck discovery acceptance](../tests/acceptance/erlang-recheck-discovery.md). Public npm 0.1.4 does not contain this batch.

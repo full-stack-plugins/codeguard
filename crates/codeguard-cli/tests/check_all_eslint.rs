@@ -367,7 +367,8 @@ fn edited_missing_lint_uses_wasm_and_distinguishes_required_from_recommended() {
     let context = host["hookSpecificOutput"]["additionalContext"]
         .as_str()
         .unwrap();
-    assert!(context.contains("必须安装"), "{context}");
+    assert!(context.contains("必须准备或修复适用的原生"), "{context}");
+    assert!(context.contains("不要仅凭候选结果修改源码"), "{context}");
     assert!(!context.contains("const ="));
 }
 
