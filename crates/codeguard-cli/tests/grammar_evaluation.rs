@@ -54,6 +54,27 @@ fn hidden_or_unavailable_recovery_never_looks_like_valid_source() {
 }
 
 #[test]
+fn versioned_cohorts_are_explicit_and_cannot_claim_approved_holdout() {
+    let legacy = corpus();
+    assert!(validate(&legacy));
+    let mut modern = legacy.clone();
+    modern["schema_version"] = json!("0.2.0");
+    for case in modern["cases"].as_array_mut().unwrap() {
+        case["cohort"] = json!("upstream_grammar_regression");
+    }
+    assert!(validate(&modern));
+    let mut bad = modern.clone();
+    bad["cases"][0]["cohort"] = json!("approved_native_holdout");
+    assert!(!validate(&bad));
+    let mut bad = modern.clone();
+    bad["cases"][0].as_object_mut().unwrap().remove("cohort");
+    assert!(!validate(&bad));
+    let mut bad = legacy;
+    bad["cases"][0]["cohort"] = json!("repository_regression");
+    assert!(!validate(&bad));
+}
+
+#[test]
 fn checked_in_regression_corpus_includes_all_languages_and_known_gaps() {
     let bytes = include_bytes!("../../../tests/fixtures/grammar_regression.json");
     validate_corpus(bytes).unwrap();
@@ -73,6 +94,239 @@ fn checked_in_regression_corpus_includes_all_languages_and_known_gaps() {
                 .any(|c| c["id"] == id && c["language"] == language)
         );
     }
+}
+
+#[test]
+fn expanded_corpus_preserves_each_language_and_upstream_label_provenance() {
+    let corpus = validate_corpus(include_bytes!(
+        "../../../tests/fixtures/grammar_regression_v0_2.json"
+    ))
+    .unwrap();
+    assert_eq!(corpus.schema_version, "0.2.0");
+    assert_eq!(corpus.cases.len(), 358);
+    let languages: std::collections::BTreeSet<&str> = corpus
+        .cases
+        .iter()
+        .map(|case| case.language.as_str())
+        .collect();
+    assert_eq!(languages.len(), 32);
+    for language in languages {
+        let cases: Vec<_> = corpus
+            .cases
+            .iter()
+            .filter(|c| c.language == language)
+            .collect();
+        assert!(cases.iter().any(|c| c.expected_valid), "{language}");
+        assert!(cases.iter().any(|c| !c.expected_valid), "{language}");
+    }
+    let dart: Vec<_> = corpus
+        .cases
+        .iter()
+        .filter(|c| c.cohort == "upstream_grammar_regression")
+        .collect();
+    assert_eq!(dart.len(), 150);
+    assert_eq!(dart.iter().filter(|c| !c.expected_valid).count(), 4);
+    assert!(dart.iter().all(|c| c.language == "dart"
+        && c.label == "regression"
+        && c.origin.starts_with("grammars/dart/corpus/")
+        && c.origin.contains("#sha256=")));
+    let pending: Vec<_> = corpus
+        .cases
+        .iter()
+        .filter(|c| c.label == "pending")
+        .collect();
+    assert_eq!(pending.len(), 2);
+    assert!(pending.iter().all(|c| c.cohort == "provisional_syntax"));
+    assert!(pending.iter().any(|c| c.language == "cobol"));
+}
+
+fn assert_separate_cohort_counts(report: &Value) {
+    assert_eq!(report["schema_version"], "0.2.0");
+    assert_eq!(report["sample_count"], 358);
+    assert_eq!(report["language_count"], 32);
+    assert_eq!(report["cohort_count"], 35);
+    assert_eq!(
+        report["cohort_policy"],
+        "separate_sources_no_pooled_precision"
+    );
+    let rows = report["cases"].as_array().unwrap();
+    let languages = report["languages"].as_array().unwrap();
+    assert_eq!(rows.len(), 358);
+    assert_eq!(languages.len(), 32);
+    assert_eq!(
+        languages
+            .iter()
+            .map(|l| l["cohorts"].as_array().unwrap().len())
+            .sum::<usize>(),
+        35
+    );
+    assert_eq!(
+        languages
+            .iter()
+            .map(|l| l["sample_count"].as_u64().unwrap())
+            .sum::<u64>(),
+        358
+    );
+    for language in languages {
+        let groups = language["cohorts"].as_array().unwrap();
+        assert!(!groups.is_empty());
+        if groups.len() > 1 {
+            assert_eq!(language["metric_aggregation"], "not_pooled");
+            assert!(language["precision"].is_null());
+            assert!(language["recall"].is_null());
+        } else {
+            assert_eq!(language["metric_aggregation"], "single_cohort");
+            assert_eq!(language["precision"], groups[0]["precision"]);
+        }
+        for group in groups {
+            let local: Vec<_> = rows
+                .iter()
+                .filter(|c| c["language"] == language["language"] && c["cohort"] == group["cohort"])
+                .collect();
+            assert_eq!(group["sample_count"].as_u64().unwrap(), local.len() as u64);
+            let unknown = local
+                .iter()
+                .filter(|c| c["classification"] == "unknown")
+                .count();
+            assert_eq!(group["unknown_count"].as_u64().unwrap(), unknown as u64);
+            assert_eq!(
+                group["decidable_count"].as_u64().unwrap(),
+                (local.len() - unknown) as u64
+            );
+            assert_eq!(
+                group["selected_valid_count"].as_u64().unwrap(),
+                local.iter().filter(|c| c["expected_valid"] == true).count() as u64
+            );
+            assert_eq!(
+                group["selected_invalid_count"].as_u64().unwrap(),
+                local
+                    .iter()
+                    .filter(|c| c["expected_valid"] == false)
+                    .count() as u64
+            );
+            assert_eq!(
+                group["pending_label_count"].as_u64().unwrap(),
+                local.iter().filter(|c| c["label"] == "pending").count() as u64
+            );
+            let eligible: Vec<_> = local
+                .iter()
+                .filter(|c| c["label"] == "regression" && c["classification"] != "unknown")
+                .collect();
+            assert_eq!(
+                group["evaluated_count"].as_u64().unwrap(),
+                eligible.len() as u64
+            );
+            for (key, valid, classification) in [
+                ("tp", false, "invalid"),
+                ("fp", true, "invalid"),
+                ("fn", false, "valid"),
+                ("tn", true, "valid"),
+            ] {
+                assert_eq!(
+                    group[key].as_u64().unwrap(),
+                    eligible
+                        .iter()
+                        .filter(|c| c["expected_valid"] == valid
+                            && c["classification"] == classification)
+                        .count() as u64
+                );
+            }
+            assert_eq!(group["grammar_qualified"], false);
+        }
+        for key in [
+            "sample_count",
+            "selected_valid_count",
+            "selected_invalid_count",
+            "decidable_count",
+            "unknown_count",
+            "pending_label_count",
+            "evaluated_count",
+            "tp",
+            "fp",
+            "fn",
+            "tn",
+        ] {
+            assert_eq!(
+                language[key].as_u64().unwrap(),
+                groups.iter().map(|c| c[key].as_u64().unwrap()).sum::<u64>()
+            );
+        }
+    }
+    assert_eq!(report["native_oracle_executed"], false);
+    assert_eq!(report["independent_holdout"], false);
+    assert_eq!(report["grammar_qualified_count"], 0);
+    assert_eq!(report["delivery_decision"], "not_evaluated");
+}
+
+#[test]
+fn archived_expanded_report_binds_cases_and_preserves_cohort_denominators() {
+    let report: Value = serde_json::from_slice(include_bytes!(
+        "../../../tests/acceptance/evidence/grammar-cohorts-2026-10-04.json"
+    ))
+    .unwrap();
+    assert_separate_cohort_counts(&report);
+    let bytes = include_bytes!("../../../tests/fixtures/grammar_regression_v0_2.json");
+    let corpus = validate_corpus(bytes).unwrap();
+    assert_eq!(
+        report["corpus_sha256"],
+        format!("{:x}", Sha256::digest(bytes))
+    );
+    assert_eq!(report["manifest_sha256"], corpus.manifest_sha256);
+    for (actual, expected) in report["cases"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .zip(&corpus.cases)
+    {
+        assert_eq!(actual["id"], expected.id);
+        assert_eq!(actual["source_sha256"], expected.source_sha256);
+        assert_eq!(actual["cohort"], expected.cohort);
+        assert_eq!(actual["label"], expected.label);
+        assert_eq!(actual["expected_valid"], expected.expected_valid);
+    }
+}
+
+#[cfg(all(feature = "wasm-precheck", unix))]
+#[test]
+fn expired_cohort_replay_preserves_label_coverage_without_pooling() {
+    let report = codeguard_cli::grammar_evaluation::replay_corpus(
+        std::path::Path::new(env!("CARGO_BIN_EXE_codeguard")),
+        include_bytes!("../../../tests/fixtures/grammar_regression_v0_2.json"),
+        std::time::Instant::now(),
+        &std::sync::atomic::AtomicBool::new(false),
+    )
+    .unwrap();
+    assert_separate_cohort_counts(&report);
+    assert!(
+        report["cases"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .all(|c| c["classification"] == "unknown" && c["attempted"] == false)
+    );
+}
+
+#[cfg(all(feature = "wasm-precheck", unix))]
+#[test]
+#[ignore = "full fixed 358-case replay, run explicitly and sequentially with WASM"]
+fn replay_expanded_cohorts_and_archive_current_evidence() {
+    let report = codeguard_cli::grammar_evaluation::replay_corpus(
+        std::path::Path::new(env!("CARGO_BIN_EXE_codeguard")),
+        include_bytes!("../../../tests/fixtures/grammar_regression_v0_2.json"),
+        std::time::Instant::now() + std::time::Duration::from_secs(1200),
+        &std::sync::atomic::AtomicBool::new(false),
+    )
+    .unwrap();
+    assert_separate_cohort_counts(&report);
+    assert_eq!(report["program_stable"], true);
+    for row in report["cases"].as_array().unwrap() {
+        assert_eq!(row["attempted"], true, "{row}");
+        assert!(
+            row["reason"].is_null() || row["reason"] == "syntax_recovery_incomplete",
+            "{row}"
+        );
+    }
+    println!("GRAMMAR_COHORT_EVALUATION_REPORT={report}");
 }
 
 #[test]

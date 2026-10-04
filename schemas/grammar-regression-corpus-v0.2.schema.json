@@ -1,0 +1,551 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "corpus_type",
+    "manifest_sha256",
+    "cases"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.2.0"
+    },
+    "corpus_type": {
+      "const": "grammar_regression"
+    },
+    "manifest_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 32,
+      "maxItems": 4096,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "language",
+          "source",
+          "source_sha256",
+          "expected_valid",
+          "label",
+          "origin",
+          "cohort"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]{1,128}$"
+          },
+          "language": {
+            "enum": [
+              "arkts",
+              "c",
+              "cfml",
+              "cfquery",
+              "cfscript",
+              "cobol",
+              "cpp",
+              "csharp",
+              "dart",
+              "erlang",
+              "go",
+              "java",
+              "javascript",
+              "kotlin",
+              "lua",
+              "luau",
+              "nix",
+              "objc",
+              "pascal",
+              "php",
+              "python",
+              "r",
+              "ruby",
+              "rust",
+              "scala",
+              "solidity",
+              "swift",
+              "terraform",
+              "tsx",
+              "typescript",
+              "vbnet",
+              "zig"
+            ]
+          },
+          "source": {
+            "type": "string",
+            "maxLength": 1048576
+          },
+          "source_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "expected_valid": {
+            "type": "boolean"
+          },
+          "label": {
+            "enum": [
+              "regression",
+              "pending"
+            ]
+          },
+          "origin": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "cohort": {
+            "enum": [
+              "repository_regression",
+              "upstream_grammar_regression",
+              "provisional_syntax"
+            ]
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "cohort": {
+                  "const": "provisional_syntax"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "label": {
+                  "const": "pending"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "allOf": [
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "arkts"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "c"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "cfml"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "cfquery"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "cfscript"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "cobol"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "cpp"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "csharp"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "dart"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "erlang"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "go"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "java"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "javascript"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "kotlin"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "lua"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "luau"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "nix"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "objc"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "pascal"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "php"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "python"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "r"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "ruby"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "rust"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "scala"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "solidity"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "swift"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "terraform"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "tsx"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "typescript"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "vbnet"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "zig"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1
+        }
+      ]
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeguard.dev/schemas/grammar-regression-corpus-v0.2.json",
+  "title": "Versioned development grammar corpus with separate upstream, repository and provisional cohorts"
+}

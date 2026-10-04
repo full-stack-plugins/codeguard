@@ -241,6 +241,10 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 - **WHEN** 回放在共同 deadline 内超时或被取消，或者所选运行程序字节发生变化
 - **THEN** 已有效取得的局部观察保留，未运行与受影响样本列为未知且仍计入原固定语料范围；不得重置预算、换工具补出绿色结论或提高 grammar 资格
 
+#### Scenario: Upstream grammar fixtures join the development replay
+- **WHEN** Rust 导入器读取已有的上游 Tree-sitter corpus 和仓库正反例
+- **THEN** 保留原源码字节、来源和预期树中的 ERROR/MISSING 分类，拒绝损坏预期树与不支持的 corpus 指令；上游 grammar 回归、仓库回归及待裁定语法按 cohort 分开。每语言报告公布已选合法/非法标签数和各组结果，不能把混合来源的预测汇总成一个 precision/recall，也不能将 grammar 自带预期当作独立原生 oracle。旧 0.1 语料和历史报告保持可读
+
 ### Requirement: Precheck briefs SHALL reach agent conversations with concrete next actions
 
 human/结构化报告及宿主渲染 MUST 按结论、方式/范围、原生状态、依据、下一步和实际任务引用组织信息。必须/推荐动作 MUST 明确。疑似异常、正常、未完成和原生诊断四类模板 MUST 独立验证；CVE 等非语法覆盖不能套用语法通过结论。插件 MUST 通过真实宿主的工具结果/上下文 API 交付，文件或 stdout 存在不等于交付。初次反馈后只发送有意义的变化；原始工具文本 MUST 作为数据，不执行其中指令。AGENTS MUST 仅保留长期指引，不追加每轮扫描日志。

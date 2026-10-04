@@ -1097,4 +1097,4 @@ flowchart TD
 
 ### 全 grammar 回放协议（2026-10-04）
 
-新增独立开发协议 `grammar_regression` / `grammar_regression_evaluation` 0.1；重复键、缺语言和摘要失配在启动前拒绝。报告保留 32 语言全分母、样本级 TP/FP/FN/TN、Wilson 区间、未知及冷 worker 墙钟时间，资格固定为零、交付未评估。pending 标签不入精度分母，源码与程序变化或未完成不会生成虚假正常分类。完整运行方式、字段边界及原始实际报告见 [评测技术专题](Codeguard-Grammar-Evaluation.zh_CN.md)。
+开发协议 `grammar_regression` / `grammar_regression_evaluation` 现支持历史 0.1 和显式 cohort 的 0.2；重复键、缺语言、来源组版本冲突和摘要失配在启动前拒绝。当前固定 358 例，Rust corpus 导入器保留 Dart 150 例的源字节与预期 ERROR/MISSING，拒绝空树和吞样例的缺分隔符。报告保留 32 语言、35 来源组、已选合法/非法预期、TP/FP/FN/TN、Wilson 区间、未知及冷 worker 墙钟时间；混合来源汇总设置 `metric_aggregation=not_pooled`、precision/recall=null。pending 不入指标，资格为零、交付未评估；旧 schema/报告不改写。运行方式、字段边界及实际报告见 [评测技术专题](Codeguard-Grammar-Evaluation.zh_CN.md)。

@@ -6,7 +6,7 @@ use serde::Deserialize;
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct GrammarEvaluationCorpus {
-    /// 当前唯一支持的语料协议版本。
+    /// 0.1 历史语料或 0.2 显式分来源语料协议版本。
     pub schema_version: String,
     /// grammar_regression 明确限制此入口的用途。
     pub corpus_type: String,

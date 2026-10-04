@@ -19,4 +19,11 @@ pub struct GrammarEvaluationCase {
     pub label: String,
     /// 可供复核的仓库内来源说明。
     pub origin: String,
+    /// 0.2 明确分离上游、仓库和待裁定语料；0.1 固定为仓库回归。
+    #[serde(default = "legacy_cohort")]
+    pub cohort: String,
+}
+
+fn legacy_cohort() -> String {
+    "repository_regression".into()
 }

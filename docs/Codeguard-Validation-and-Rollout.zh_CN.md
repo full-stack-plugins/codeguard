@@ -201,4 +201,8 @@ WASM 评测将误报、漏报和未支持覆盖分开；必须包括合法新版
 
 ### 2026-10-04 开发固定回放
 
-现有 Rust 隔离 worker 已统一回放 32 份 grammar、186 个固定回归样本，保留逐语言和逐样本 JSON。实际 183 例可判定、3 例未知；相对回归标签有 10 FN、1 FP，另有 1 个 CFQuery 临时标签不入混淆计数。本轮统一语料中 20 种语言只有一个合法控制样本，证据仍不足；Dart 上游等独立测试尚未并入。此数据不表示独立原生 oracle、holdout、完整率门禁或低误报已经达标；具体协议、运行路径及证据见 [评测专题](Codeguard-Grammar-Evaluation.zh_CN.md)。
+前一版 0.1 的 Rust 隔离 worker 回放为 32 份 grammar、186 个固定回归样本，保留逐语言和逐样本 JSON。实际 183 例可判定、3 例未知；相对回归标签有 10 FN、1 FP，另有 1 个 CFQuery 临时标签不入混淆计数。本轮统一语料中 20 种语言只有一个合法控制样本，证据仍不足；Dart 上游等独立测试尚未并入。此数据不表示独立原生 oracle、holdout、完整率门禁或低误报已经达标；具体协议、运行路径及证据见 [评测专题](Codeguard-Grammar-Evaluation.zh_CN.md)。
+
+## 2026-10-04 分来源回放增量（0.2）
+
+当前固定语料扩展为 358 例、32 语言、35 个来源组，已实际完整回放；Dart 上游 150 例按独立来源组与原预期一致。355 例可判定、3 例未知；CFQuery/COBOL 两例 pending 不计指标。原 Erlang 10 FN、VB.NET 1 FP 未修复，不混算来源组精度，也不提高语言资格。旧 0.1 语料和报告保持。详见 [0.2 实际验收](../tests/acceptance/grammar-cohort-regression-evaluation.md)。

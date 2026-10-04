@@ -422,4 +422,4 @@ codeguard check all . --erl-tool /absolute/path/to/erl --timeout 30s --jobs 2 --
 
 ### 全部 32 份 grammar 的开发评测
 
-Rust 开发入口 `evaluate_grammars` 用现有隔离 worker 回放 186 个固定样本，统一输出全部 32 语言、回归标签的 TP/FP/FN、Wilson 区间、未知样本和顺序冷 worker 耗时。语料、源码及程序身份绑定；隐藏错误、取消和预算耗尽不能当作样本通过，待裁定标签不进入精度分母。它不执行原生 oracle 或独立 holdout，不提升 grammar 资格或批准发布。运行方式与指标边界见 [grammar 评测](docs/Codeguard-Grammar-Evaluation.zh_CN.md)。
+Rust 开发入口 `evaluate_grammars` 用现有隔离 worker 回放 358 个固定样本，覆盖全部 32 语言、35 个语言×来源组；其中 Dart 上游 150 例按独立来源组统计。报告保留逐组 TP/FP/FN、Wilson 区间、未知、待裁定和顺序冷 worker 耗时，混合来源的语言汇总不混算 precision/recall。语料、源码及程序身份绑定；COBOL/CFQuery 待裁定标签不进入精度分母。0.1 历史输入与报告保持可读；此入口不执行原生 oracle 或独立 holdout，不提升 grammar 资格或批准发布。运行方式与指标边界见 [grammar 评测](docs/Codeguard-Grammar-Evaluation.zh_CN.md)。

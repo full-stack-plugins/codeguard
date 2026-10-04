@@ -67,4 +67,8 @@ The [OpenSpec implementation coverage](../openspec/changes/introduce-rust-codegu
 
 ### Fixed development replay on 2026-10-04
 
-The Rust worker pipeline replayed all 32 grammars on 186 fixed regression cases, retaining per-language and per-case JSON. There were 183 decidable cases and 3 unknowns, with 10 FN and 1 FP against regression labels; one provisional CFQuery label remains outside confusion counts. Within this unified corpus, twenty languages have only one valid control sample; separate tests such as the Dart upstream corpus are not pooled into this report. This is not independent native oracle, holdout, project completion or low-false-positive qualification evidence. See [the evaluation guide](Codeguard-Grammar-Evaluation.md).
+The earlier version 0.1 Rust worker pipeline replayed all 32 grammars on 186 fixed regression cases, retaining per-language and per-case JSON. There were 183 decidable cases and 3 unknowns, with 10 FN and 1 FP against regression labels; one provisional CFQuery label remains outside confusion counts. Within this unified corpus, twenty languages have only one valid control sample; separate tests such as the Dart upstream corpus are not pooled into this report. This is not independent native oracle, holdout, project completion or low-false-positive qualification evidence. See [the evaluation guide](Codeguard-Grammar-Evaluation.md).
+
+## 2026-10-04 cohort replay increment (0.2)
+
+The fixed corpus now has 358 cases, 32 languages and 35 source cohorts, all actually replayed. The 150 Dart upstream cases match their own expectations in a separate cohort. There are 355 decidable cases and 3 unknowns; two CFQuery/COBOL pending labels stay outside metrics. Existing Erlang 10 FN and VB.NET 1 FP remain unresolved. Precision is not pooled and no grammar qualification changes. Legacy 0.1 corpora/reports remain intact. See [actual version 0.2 acceptance](../tests/acceptance/grammar-cohort-regression-evaluation.md).

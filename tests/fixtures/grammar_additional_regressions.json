@@ -1,0 +1,222 @@
+[
+  {
+    "id": "arkts-structural_negative",
+    "language": "arkts",
+    "source": "@Component struct C { build( {",
+    "source_sha256": "aed956c9b4d020e1c85d5e28577c023d75f71d6cd182a46c21a22bd8314e37a5",
+    "expected_valid": false,
+    "label": "regression",
+    "cohort": "repository_regression",
+    "origin": "crates/codeguard-runtime/tests/wasm_grammar_load.rs"
+  },
+  {
+    "id": "cfml-structural_negative",
+    "language": "cfml",
+    "source": "<cfif>",
+    "source_sha256": "a384a22201ea8faa27f6e581fcb5e099c165a6324fc25e261c141cb3880c7182",
+    "expected_valid": false,
+    "label": "regression",
+    "cohort": "repository_regression",
+    "origin": "crates/codeguard-runtime/tests/wasm_grammar_load.rs"
+  },
+  {
+    "id": "cfquery-structural_negative",
+    "language": "cfquery",
+    "source": "SELECT #unclosed",
+    "source_sha256": "83ff99dc734a197784bb02e62c9fca93a1c42080c5149d469248890dfc9b50e2",
+    "expected_valid": false,
+    "label": "regression",
+    "cohort": "repository_regression",
+    "origin": "crates/codeguard-runtime/tests/wasm_grammar_load.rs"
+  },
+  {
+    "id": "cfscript-structural_negative",
+    "language": "cfscript",
+    "source": "component { function f( {",
+    "source_sha256": "406084d802f2ecd80ef13f28e48cc705f7c33a43cca657542016fb73f82bcb80",
+    "expected_valid": false,
+    "label": "regression",
+    "cohort": "repository_regression",
+    "origin": "crates/codeguard-runtime/tests/wasm_grammar_load.rs"
+  },
+  {
+    "id": "cobol-structural_negative",
+    "language": "cobol",
+    "source": "       IDENTIFICATION DIVISION.\n       PROGRAM-ID.\n",
+    "source_sha256": "d7a68a266a719564e6343785b7a990347a8f262ef4b2a0b864e8c1fc45f60bdc",
+    "expected_valid": false,
+    "label": "pending",
+    "cohort": "provisional_syntax",
+    "origin": "OpenSpec S14.17 provisional missing COBOL program-name; native oracle pending"
+  },
+  {
+    "id": "cpp-structural_negative",
+    "language": "cpp",
+    "source": "int main() {",
+    "source_sha256": "775b36031c81d0d71f6c4f6b390810ed0583cd5a6b3263f402f29c801657d957",
+    "expected_valid": false,
+    "label": "regression",
+    "cohort": "repository_regression",
+    "origin": "crates/codeguard-runtime/tests/wasm_grammar_load.rs"
+  },
+  {
+    "id": "csharp-structural_negative",
+    "language": "csharp",
+    "source": "class C {",
+    "source_sha256": "1c347a11f8d6ab916c3a9361926f562e23967756a4a3e405bf3c79d2d224950a",
+    "expected_valid": false,
+    "label": "regression",
+    "cohort": "repository_regression",
+    "origin": "crates/codeguard-runtime/tests/wasm_grammar_load.rs"
+  },
+  {
+    "id": "dart-structural_negative",
+    "language": "dart",
+    "source": "void main( {",
+    "source_sha256": "ced6c587213b2c25887a462e53cf200159c5e3d5cf19128c8db668cf8e1a77a2",
+    "expected_valid": false,
+    "label": "regression",
+    "cohort": "repository_regression",
+    "origin": "crates/codeguard-runtime/tests/wasm_grammar_load.rs"
+  },
+  {
+    "id": "lua-structural_negative",
+    "language": "lua",
+    "source": "local =\n",
+    "source_sha256": "64216e062649be1337a7ed2fd7b7613ee01bc3c80676691f3de111800859d3c8",
+    "expected_valid": false,
+    "label": "regression",
+    "cohort": "repository_regression",
+    "origin": "crates/codeguard-runtime/tests/wasm_grammar_load.rs"
+  },
+  {
+    "id": "luau-structural_negative",
+    "language": "luau",
+    "source": "local x: =\n",
+    "source_sha256": "ce35e34a04931805559bbc3081fece155f75ffbb1e2cfd04e9a9c4b093dca4fd",
+    "expected_valid": false,
+    "label": "regression",
+    "cohort": "repository_regression",
+    "origin": "crates/codeguard-runtime/tests/wasm_grammar_load.rs"
+  },
+  {
+    "id": "nix-structural_negative",
+    "language": "nix",
+    "source": "let x = ; in x",
+    "source_sha256": "9adfae78cd135584fb9ad6dc0f8dce580d76cca89532c973dd06d53180afa0d6",
+    "expected_valid": false,
+    "label": "regression",
+    "cohort": "repository_regression",
+    "origin": "crates/codeguard-runtime/tests/wasm_grammar_load.rs"
+  },
+  {
+    "id": "objc-structural_negative",
+    "language": "objc",
+    "source": "@interface Foo : NSObject\n",
+    "source_sha256": "4e30732af54dc86d0240922552417e29c2b12e72d5be87b0580d88a6babffa42",
+    "expected_valid": false,
+    "label": "regression",
+    "cohort": "repository_regression",
+    "origin": "crates/codeguard-runtime/tests/wasm_grammar_load.rs"
+  },
+  {
+    "id": "pascal-structural_negative",
+    "language": "pascal",
+    "source": "program Hello;\nbegin\n  writeln('Hi');\n",
+    "source_sha256": "cf8620b8529a02f4ca04bd1129d7191dbf5076f5133b317110e01413acece3ab",
+    "expected_valid": false,
+    "label": "regression",
+    "cohort": "repository_regression",
+    "origin": "crates/codeguard-runtime/tests/wasm_grammar_load.rs"
+  },
+  {
+    "id": "php-structural_negative",
+    "language": "php",
+    "source": "<?php function f( {",
+    "source_sha256": "d69d8bb5450533c918fc635d1c01f495eff5b37131822343f10105f9d33d824b",
+    "expected_valid": false,
+    "label": "regression",
+    "cohort": "repository_regression",
+    "origin": "crates/codeguard-runtime/tests/wasm_grammar_load.rs"
+  },
+  {
+    "id": "python-structural_negative",
+    "language": "python",
+    "source": "def greet(\n",
+    "source_sha256": "1a72f9f55ed924d74f950b831f10b1ab60fb37d716d34efae4235fb064d8eda1",
+    "expected_valid": false,
+    "label": "regression",
+    "cohort": "repository_regression",
+    "origin": "crates/codeguard-runtime/tests/wasm_grammar_load.rs"
+  },
+  {
+    "id": "r-structural_negative",
+    "language": "r",
+    "source": "x <- \n",
+    "source_sha256": "95a6cff416c8029372d0b901aa623b43883cbb83b47576affcf9115ba48128f6",
+    "expected_valid": false,
+    "label": "regression",
+    "cohort": "repository_regression",
+    "origin": "crates/codeguard-runtime/tests/wasm_grammar_load.rs"
+  },
+  {
+    "id": "scala-structural_negative",
+    "language": "scala",
+    "source": "object Main { def f( = }",
+    "source_sha256": "6f6706bbec285f15fc9c7e8d9ee7d82dabaf8a4846606cb423d3e3b964e4b6e0",
+    "expected_valid": false,
+    "label": "regression",
+    "cohort": "repository_regression",
+    "origin": "crates/codeguard-runtime/tests/wasm_grammar_load.rs"
+  },
+  {
+    "id": "solidity-structural_negative",
+    "language": "solidity",
+    "source": "contract Vault {\n",
+    "source_sha256": "f7b97f6721c93837c5ca78280ba83dd1808af48ebf87a9bff5b67039e707d806",
+    "expected_valid": false,
+    "label": "regression",
+    "cohort": "repository_regression",
+    "origin": "crates/codeguard-runtime/tests/wasm_grammar_load.rs"
+  },
+  {
+    "id": "terraform-structural_negative",
+    "language": "terraform",
+    "source": "resource \"x\" {",
+    "source_sha256": "eb4f4d4384f743ce019aa350a60d5957f2d29d77a2099efa1522bda69d7ec8c4",
+    "expected_valid": false,
+    "label": "regression",
+    "cohort": "repository_regression",
+    "origin": "crates/codeguard-runtime/tests/wasm_grammar_load.rs"
+  },
+  {
+    "id": "tsx-structural_negative",
+    "language": "tsx",
+    "source": "const node = <div title=></div>;",
+    "source_sha256": "7fd660d52a4b79a3a305d66824b65318e545f168ecda5900ba6c2bc2b1de297c",
+    "expected_valid": false,
+    "label": "regression",
+    "cohort": "repository_regression",
+    "origin": "crates/codeguard-runtime/tests/wasm_grammar_load.rs"
+  },
+  {
+    "id": "typescript-structural_negative",
+    "language": "typescript",
+    "source": "const value: number = ;",
+    "source_sha256": "44e37194b3938713a6921f1d83d954bca7e05b52e582b856b2bd4002e01eef65",
+    "expected_valid": false,
+    "label": "regression",
+    "cohort": "repository_regression",
+    "origin": "crates/codeguard-runtime/tests/wasm_recovery_scan.rs"
+  },
+  {
+    "id": "vbnet-structural_negative",
+    "language": "vbnet",
+    "source": "Public Class C\nPublic Function F(\n",
+    "source_sha256": "9e0f5d5d105be35eae081f57e8726d4d7160a10d8359c64e0e004322e16ff149",
+    "expected_valid": false,
+    "label": "regression",
+    "cohort": "repository_regression",
+    "origin": "crates/codeguard-runtime/tests/wasm_grammar_load.rs"
+  }
+]

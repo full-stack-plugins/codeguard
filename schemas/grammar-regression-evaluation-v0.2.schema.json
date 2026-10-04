@@ -1,0 +1,1456 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "authority",
+    "native_oracle_executed",
+    "independent_holdout",
+    "metric_scope",
+    "status",
+    "delivery_decision",
+    "grammar_qualified_count",
+    "manifest_sha256",
+    "corpus_sha256",
+    "program_sha256",
+    "program_stable",
+    "sample_count",
+    "language_count",
+    "fixture_outcome",
+    "thresholds",
+    "languages",
+    "cases",
+    "cohort_count",
+    "cohort_policy"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.2.0"
+    },
+    "report_type": {
+      "const": "grammar_regression_evaluation"
+    },
+    "authority": {
+      "const": "repository_regression_only"
+    },
+    "native_oracle_executed": {
+      "const": false
+    },
+    "independent_holdout": {
+      "const": false
+    },
+    "metric_scope": {
+      "const": "sample_level_syntax_classification"
+    },
+    "status": {
+      "const": "incomplete"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "grammar_qualified_count": {
+      "const": 0
+    },
+    "manifest_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "corpus_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "program_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "program_stable": {
+      "type": "boolean"
+    },
+    "sample_count": {
+      "type": "integer",
+      "minimum": 32,
+      "maximum": 4096
+    },
+    "language_count": {
+      "const": 32
+    },
+    "fixture_outcome": {
+      "enum": [
+        "fails_fixture_threshold",
+        "insufficient_evidence"
+      ]
+    },
+    "thresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minimum_observed_findings",
+        "precision_wilson_lower_bound",
+        "max_false_negatives",
+        "approval"
+      ],
+      "properties": {
+        "minimum_observed_findings": {
+          "const": 200
+        },
+        "precision_wilson_lower_bound": {
+          "const": 0.98
+        },
+        "max_false_negatives": {
+          "const": 0
+        },
+        "approval": {
+          "const": "not_verified"
+        }
+      }
+    },
+    "languages": {
+      "type": "array",
+      "minItems": 32,
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "language",
+          "grammar_sha256",
+          "sample_count",
+          "decidable_count",
+          "unknown_count",
+          "pending_label_count",
+          "evaluated_count",
+          "tp",
+          "fp",
+          "fn",
+          "tn",
+          "fixture_false_clean_count",
+          "precision",
+          "recall",
+          "completion_rate",
+          "fixture_outcome",
+          "grammar_qualified",
+          "performance",
+          "next_action",
+          "selected_valid_count",
+          "selected_invalid_count",
+          "metric_aggregation",
+          "cohorts"
+        ],
+        "properties": {
+          "language": {
+            "enum": [
+              "arkts",
+              "c",
+              "cfml",
+              "cfquery",
+              "cfscript",
+              "cobol",
+              "cpp",
+              "csharp",
+              "dart",
+              "erlang",
+              "go",
+              "java",
+              "javascript",
+              "kotlin",
+              "lua",
+              "luau",
+              "nix",
+              "objc",
+              "pascal",
+              "php",
+              "python",
+              "r",
+              "ruby",
+              "rust",
+              "scala",
+              "solidity",
+              "swift",
+              "terraform",
+              "tsx",
+              "typescript",
+              "vbnet",
+              "zig"
+            ]
+          },
+          "grammar_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "sample_count": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "decidable_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "unknown_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "pending_label_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "evaluated_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "tp": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "fp": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "fn": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "tn": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "fixture_false_clean_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "precision": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "point",
+                  "lower_95",
+                  "upper_95"
+                ],
+                "properties": {
+                  "point": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "lower_95": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "upper_95": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                }
+              }
+            ]
+          },
+          "recall": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            ]
+          },
+          "completion_rate": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "fixture_outcome": {
+            "enum": [
+              "fails_fixture_threshold",
+              "insufficient_evidence"
+            ]
+          },
+          "grammar_qualified": {
+            "const": false
+          },
+          "performance": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "scope",
+              "measured_count",
+              "p50_us",
+              "p95_us"
+            ],
+            "properties": {
+              "scope": {
+                "const": "sequential_cold_worker_wall_time"
+              },
+              "measured_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "p50_us": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "p95_us": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "next_action": {
+            "const": "resolve_disagreements_and_unknowns_then_collect_independent_native_holdout"
+          },
+          "selected_valid_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "selected_invalid_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "metric_aggregation": {
+            "enum": [
+              "single_cohort",
+              "not_pooled"
+            ]
+          },
+          "cohorts": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "language",
+                "grammar_sha256",
+                "sample_count",
+                "decidable_count",
+                "unknown_count",
+                "pending_label_count",
+                "evaluated_count",
+                "tp",
+                "fp",
+                "fn",
+                "tn",
+                "fixture_false_clean_count",
+                "precision",
+                "recall",
+                "completion_rate",
+                "fixture_outcome",
+                "grammar_qualified",
+                "performance",
+                "next_action",
+                "selected_valid_count",
+                "selected_invalid_count",
+                "cohort"
+              ],
+              "properties": {
+                "language": {
+                  "enum": [
+                    "arkts",
+                    "c",
+                    "cfml",
+                    "cfquery",
+                    "cfscript",
+                    "cobol",
+                    "cpp",
+                    "csharp",
+                    "dart",
+                    "erlang",
+                    "go",
+                    "java",
+                    "javascript",
+                    "kotlin",
+                    "lua",
+                    "luau",
+                    "nix",
+                    "objc",
+                    "pascal",
+                    "php",
+                    "python",
+                    "r",
+                    "ruby",
+                    "rust",
+                    "scala",
+                    "solidity",
+                    "swift",
+                    "terraform",
+                    "tsx",
+                    "typescript",
+                    "vbnet",
+                    "zig"
+                  ]
+                },
+                "grammar_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "sample_count": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "decidable_count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "unknown_count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "pending_label_count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "evaluated_count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "tp": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "fp": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "fn": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "tn": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "fixture_false_clean_count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "precision": {
+                  "anyOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "point",
+                        "lower_95",
+                        "upper_95"
+                      ],
+                      "properties": {
+                        "point": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1
+                        },
+                        "lower_95": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1
+                        },
+                        "upper_95": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1
+                        }
+                      }
+                    }
+                  ]
+                },
+                "recall": {
+                  "anyOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    }
+                  ]
+                },
+                "completion_rate": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "fixture_outcome": {
+                  "enum": [
+                    "fails_fixture_threshold",
+                    "insufficient_evidence"
+                  ]
+                },
+                "grammar_qualified": {
+                  "const": false
+                },
+                "performance": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "scope",
+                    "measured_count",
+                    "p50_us",
+                    "p95_us"
+                  ],
+                  "properties": {
+                    "scope": {
+                      "const": "sequential_cold_worker_wall_time"
+                    },
+                    "measured_count": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "p50_us": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "p95_us": {
+                      "anyOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "next_action": {
+                  "const": "resolve_disagreements_and_unknowns_then_collect_independent_native_holdout"
+                },
+                "selected_valid_count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "selected_invalid_count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "cohort": {
+                  "enum": [
+                    "repository_regression",
+                    "upstream_grammar_regression",
+                    "provisional_syntax"
+                  ]
+                }
+              }
+            },
+            "allOf": [
+              {
+                "contains": {
+                  "properties": {
+                    "cohort": {
+                      "const": "repository_regression"
+                    }
+                  },
+                  "required": [
+                    "cohort"
+                  ]
+                },
+                "minContains": 0,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "cohort": {
+                      "const": "upstream_grammar_regression"
+                    }
+                  },
+                  "required": [
+                    "cohort"
+                  ]
+                },
+                "minContains": 0,
+                "maxContains": 1
+              },
+              {
+                "contains": {
+                  "properties": {
+                    "cohort": {
+                      "const": "provisional_syntax"
+                    }
+                  },
+                  "required": [
+                    "cohort"
+                  ]
+                },
+                "minContains": 0,
+                "maxContains": 1
+              }
+            ]
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "metric_aggregation": {
+                  "const": "not_pooled"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "precision": {
+                  "type": "null"
+                },
+                "recall": {
+                  "type": "null"
+                },
+                "cohorts": {
+                  "minItems": 2
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "metric_aggregation": {
+                  "const": "single_cohort"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "cohorts": {
+                  "maxItems": 1
+                }
+              }
+            }
+          }
+        ]
+      },
+      "allOf": [
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "arkts"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "c"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "cfml"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "cfquery"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "cfscript"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "cobol"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "cpp"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "csharp"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "dart"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "erlang"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "go"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "java"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "javascript"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "kotlin"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "lua"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "luau"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "nix"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "objc"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "pascal"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "php"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "python"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "r"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "ruby"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "rust"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "scala"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "solidity"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "swift"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "terraform"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "tsx"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "typescript"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "vbnet"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "zig"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        }
+      ]
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 32,
+      "maxItems": 4096,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "language",
+          "source_sha256",
+          "label",
+          "origin",
+          "expected_valid",
+          "classification",
+          "recovery_count",
+          "reason",
+          "attempted",
+          "elapsed_us",
+          "cohort"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]{1,128}$"
+          },
+          "language": {
+            "enum": [
+              "arkts",
+              "c",
+              "cfml",
+              "cfquery",
+              "cfscript",
+              "cobol",
+              "cpp",
+              "csharp",
+              "dart",
+              "erlang",
+              "go",
+              "java",
+              "javascript",
+              "kotlin",
+              "lua",
+              "luau",
+              "nix",
+              "objc",
+              "pascal",
+              "php",
+              "python",
+              "r",
+              "ruby",
+              "rust",
+              "scala",
+              "solidity",
+              "swift",
+              "terraform",
+              "tsx",
+              "typescript",
+              "vbnet",
+              "zig"
+            ]
+          },
+          "source_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "label": {
+            "enum": [
+              "regression",
+              "pending"
+            ]
+          },
+          "origin": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "expected_valid": {
+            "type": "boolean"
+          },
+          "classification": {
+            "enum": [
+              "valid",
+              "invalid",
+              "unknown"
+            ]
+          },
+          "recovery_count": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string",
+                "minLength": 1
+              }
+            ]
+          },
+          "attempted": {
+            "type": "boolean"
+          },
+          "elapsed_us": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "cohort": {
+            "enum": [
+              "repository_regression",
+              "upstream_grammar_regression",
+              "provisional_syntax"
+            ]
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "classification": {
+                  "const": "valid"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "recovery_count": {
+                  "const": 0
+                },
+                "reason": {
+                  "type": "null"
+                },
+                "attempted": {
+                  "const": true
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "classification": {
+                  "const": "invalid"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "recovery_count": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "reason": {
+                  "type": "null"
+                },
+                "attempted": {
+                  "const": true
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "classification": {
+                  "const": "unknown"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "attempted": {
+                  "const": false
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "classification": {
+                  "const": "unknown"
+                },
+                "recovery_count": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "cohort": {
+                  "const": "provisional_syntax"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "label": {
+                  "const": "pending"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "cohort_count": {
+      "type": "integer",
+      "minimum": 32,
+      "maximum": 96
+    },
+    "cohort_policy": {
+      "const": "separate_sources_no_pooled_precision"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeguard.dev/schemas/grammar-regression-evaluation-v0.2.json",
+  "title": "Development grammar evaluation with separate source cohorts; no pooled precision or release qualification",
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "program_stable": {
+            "const": false
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "fixture_outcome": {
+            "const": "insufficient_evidence"
+          },
+          "cases": {
+            "items": {
+              "properties": {
+                "classification": {
+                  "const": "unknown"
+                },
+                "recovery_count": {
+                  "type": "null"
+                },
+                "reason": {
+                  "const": "grammar_evaluation_program_changed"
+                }
+              }
+            }
+          },
+          "languages": {
+            "items": {
+              "properties": {
+                "decidable_count": {
+                  "const": 0
+                },
+                "evaluated_count": {
+                  "const": 0
+                },
+                "tp": {
+                  "const": 0
+                },
+                "fp": {
+                  "const": 0
+                },
+                "fn": {
+                  "const": 0
+                },
+                "tn": {
+                  "const": 0
+                },
+                "fixture_false_clean_count": {
+                  "const": 0
+                },
+                "completion_rate": {
+                  "const": 0
+                },
+                "precision": {
+                  "type": "null"
+                },
+                "recall": {
+                  "type": "null"
+                },
+                "fixture_outcome": {
+                  "const": "insufficient_evidence"
+                },
+                "cohorts": {
+                  "items": {
+                    "properties": {
+                      "decidable_count": {
+                        "const": 0
+                      },
+                      "evaluated_count": {
+                        "const": 0
+                      },
+                      "tp": {
+                        "const": 0
+                      },
+                      "fp": {
+                        "const": 0
+                      },
+                      "fn": {
+                        "const": 0
+                      },
+                      "tn": {
+                        "const": 0
+                      },
+                      "fixture_false_clean_count": {
+                        "const": 0
+                      },
+                      "completion_rate": {
+                        "const": 0
+                      },
+                      "precision": {
+                        "type": "null"
+                      },
+                      "recall": {
+                        "type": "null"
+                      },
+                      "fixture_outcome": {
+                        "const": "insufficient_evidence"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

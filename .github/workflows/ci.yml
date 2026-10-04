@@ -48,9 +48,10 @@ jobs:
         run: |
           cargo test --locked -p codeguard-cli --features wasm-precheck --test grammar_evaluation
           # 此测试确认全部 worker 实际运行并保留逐语言 JSON；已知语法差异保留为数据，
-          # 不断言成正确行为，也不把工具不可用的 186 项 unknown 当回放成功。
+          # 不断言成正确行为，也不把工具不可用的 358 项 unknown 当回放成功。
+          # 0.1 协议与历史报告由上面的普通测试保留兼容；当前回放显式分离语料来源。
           cargo test --locked -p codeguard-cli --features wasm-precheck --test grammar_evaluation \
-            replay_every_bundled_language_and_archive_current_evidence -- \
+            replay_expanded_cohorts_and_archive_current_evidence -- \
             --ignored --exact --nocapture --test-threads=1
 
       - name: Verify the local npm package contains a running WASM worker

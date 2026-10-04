@@ -15,9 +15,18 @@ pub fn validate_corpus(bytes: &[u8]) -> Result<GrammarEvaluationCorpus, String> 
         return Err("grammar_evaluation_corpus_too_large".into());
     }
     let value = parse_unique_json(bytes).map_err(str::to_owned)?;
+    let modern = value["schema_version"] == "0.2.0";
+    if let Some(cases) = value["cases"].as_array() {
+        if cases
+            .iter()
+            .any(|case| case.get("cohort").is_some() != modern)
+        {
+            return Err("grammar_evaluation_cohort_version_mismatch".into());
+        }
+    }
     let corpus: GrammarEvaluationCorpus =
         serde_json::from_value(value).map_err(|_| "grammar_evaluation_corpus_shape_invalid")?;
-    if corpus.schema_version != "0.1.0"
+    if !matches!(corpus.schema_version.as_str(), "0.1.0" | "0.2.0")
         || corpus.corpus_type != "grammar_regression"
         || corpus.manifest_sha256 != digest(MANIFEST)
         || corpus.cases.is_empty()
@@ -41,6 +50,11 @@ pub fn validate_corpus(bytes: &[u8]) -> Result<GrammarEvaluationCorpus, String> 
             || case.source.len() > 1024 * 1024
             || case.source_sha256 != digest(case.source.as_bytes())
             || !matches!(case.label.as_str(), "regression" | "pending")
+            || !matches!(
+                case.cohort.as_str(),
+                "repository_regression" | "upstream_grammar_regression" | "provisional_syntax"
+            )
+            || (case.cohort == "provisional_syntax" && case.label != "pending")
             || case.origin.is_empty()
             || case.origin.len() > 512
             || case.origin.chars().any(char::is_control)
@@ -144,7 +158,7 @@ mod replay {
             let finding = format!("{}:syntax", case.id);
             evaluations.push(EvaluationCase {
                 id: case.id.clone(),
-                cohort: "repository_regression".into(),
+                cohort: case.cohort.clone(),
                 language: case.language.clone(),
                 category: "lint".into(),
                 adapter_id: "wasm.syntax.candidate".into(),
@@ -172,6 +186,10 @@ mod replay {
                 "label":case.label,"origin":case.origin,"expected_valid":case.expected_valid,
                 "classification":classification_name(classification),"recovery_count":recovery_count,
                 "reason":reason,"attempted":attempted,"elapsed_us":started.elapsed().as_micros().min(u64::MAX as u128) as u64}));
+            if corpus.schema_version == "0.2.0" {
+                rows.last_mut().ok_or("grammar_evaluation_row_missing")?["cohort"] =
+                    json!(case.cohort);
+            }
         }
         let program_stable = hash_program(executable).is_ok_and(|current| current == program_sha);
         if !program_stable {
@@ -198,6 +216,7 @@ mod replay {
             let local: Vec<&Value> = rows
                 .iter()
                 .filter(|row| row["language"] == stratum.language)
+                .filter(|row| corpus.schema_version == "0.1.0" || row["cohort"] == stratum.cohort)
                 .collect();
             let asset = manifest["assets"]
                 .as_array()
@@ -236,17 +255,109 @@ mod replay {
                 "performance":{"scope":"sequential_cold_worker_wall_time","measured_count":times.len(),
                     "p50_us":percentile(&times,50),"p95_us":percentile(&times,95)},
                 "next_action":"resolve_disagreements_and_unknowns_then_collect_independent_native_holdout"}));
+            if corpus.schema_version == "0.2.0" {
+                let row = languages
+                    .last_mut()
+                    .ok_or("grammar_evaluation_language_missing")?;
+                row["cohort"] = json!(stratum.cohort);
+                let valid = local.iter().filter(|c| c["expected_valid"] == true).count();
+                row["selected_valid_count"] = json!(valid);
+                row["selected_invalid_count"] = json!(n - valid);
+            }
         }
-        Ok(
-            json!({"schema_version":"0.1.0","report_type":"grammar_regression_evaluation",
+        let cohort_count = languages.len();
+        if corpus.schema_version == "0.2.0" {
+            languages = separate_cohorts(&languages, &rows)?;
+        }
+        let mut report = json!({"schema_version":corpus.schema_version,"report_type":"grammar_regression_evaluation",
             "authority":"repository_regression_only","native_oracle_executed":false,"independent_holdout":false,
             "metric_scope":"sample_level_syntax_classification","status":"incomplete","delivery_decision":"not_evaluated",
             "grammar_qualified_count":0,"manifest_sha256":corpus.manifest_sha256,"corpus_sha256":digest(corpus_bytes),
             "program_sha256":program_sha,"program_stable":program_stable,"sample_count":rows.len(),
             "language_count":languages.len(),"fixture_outcome":outcome_name(quality.overall),
             "thresholds":{"minimum_observed_findings":200,"precision_wilson_lower_bound":0.98,"max_false_negatives":0,"approval":"not_verified"},
-            "languages":languages,"cases":rows}),
-        )
+            "languages":languages,"cases":rows});
+        if corpus.schema_version == "0.2.0" {
+            report["cohort_count"] = json!(cohort_count);
+            report["cohort_policy"] = json!("separate_sources_no_pooled_precision");
+        }
+        Ok(report)
+    }
+
+    fn separate_cohorts(cohorts: &[Value], rows: &[Value]) -> Result<Vec<Value>, String> {
+        let languages: std::collections::BTreeSet<&str> = cohorts
+            .iter()
+            .filter_map(|c| c["language"].as_str())
+            .collect();
+        let mut result = Vec::new();
+        for language in languages {
+            let groups: Vec<Value> = cohorts
+                .iter()
+                .filter(|c| c["language"] == language)
+                .cloned()
+                .collect();
+            let mut summary = groups
+                .first()
+                .cloned()
+                .ok_or("grammar_evaluation_cohort_missing")?;
+            summary
+                .as_object_mut()
+                .ok_or("grammar_evaluation_summary_invalid")?
+                .remove("cohort");
+            for key in [
+                "sample_count",
+                "selected_valid_count",
+                "selected_invalid_count",
+                "decidable_count",
+                "unknown_count",
+                "pending_label_count",
+                "evaluated_count",
+                "tp",
+                "fp",
+                "fn",
+                "tn",
+                "fixture_false_clean_count",
+            ] {
+                summary[key] = json!(groups.iter().filter_map(|c| c[key].as_u64()).sum::<u64>());
+            }
+            let n = summary["sample_count"]
+                .as_u64()
+                .ok_or("grammar_evaluation_sample_count_invalid")?;
+            summary["completion_rate"] = json!(
+                summary["decidable_count"]
+                    .as_u64()
+                    .ok_or("grammar_evaluation_count_invalid")? as f64
+                    / n as f64
+            );
+            summary["fixture_outcome"] = json!(if groups
+                .iter()
+                .any(|c| c["fixture_outcome"] == "fails_fixture_threshold")
+            {
+                "fails_fixture_threshold"
+            } else {
+                "insufficient_evidence"
+            });
+            summary["metric_aggregation"] = json!(if groups.len() == 1 {
+                "single_cohort"
+            } else {
+                "not_pooled"
+            });
+            if groups.len() > 1 {
+                summary["precision"] = Value::Null;
+                summary["recall"] = Value::Null;
+            }
+            let mut times: Vec<u64> = rows
+                .iter()
+                .filter(|r| r["language"] == language && r["attempted"] == true)
+                .filter_map(|r| r["elapsed_us"].as_u64())
+                .collect();
+            times.sort_unstable();
+            summary["performance"] = json!({"scope":"sequential_cold_worker_wall_time","measured_count":times.len(),
+                "p50_us":percentile(&times,50),"p95_us":percentile(&times,95)});
+            summary["cohorts"] = json!(groups);
+            result.push(summary);
+        }
+        Ok(result)
     }
 
     fn hash_program(path: &Path) -> Result<String, String> {

@@ -12,7 +12,7 @@
 cargo build --locked -p codeguard-cli --features wasm-precheck
 cargo run --locked -p codeguard-cli --features wasm-precheck \
   --example evaluate_grammars -- \
-  "$PWD/target/debug/codeguard" tests/fixtures/grammar_regression.json 600 \
+  "$PWD/target/debug/codeguard" tests/fixtures/grammar_regression_v0_2.json 1200 \
   > /tmp/codeguard-grammar-regression.json
 ```
 
@@ -22,33 +22,51 @@ cargo run --locked -p codeguard-cli --features wasm-precheck \
 
 ```mermaid
 flowchart LR
-    A[固定 186 个样本与清单摘要] --> B[启动前校验语言全集及源码摘要]
+    A[固定 358 个样本与清单摘要] --> B[启动前校验语言全集及源码摘要]
     B --> C[共享 deadline 顺序调用 Rust 隔离 worker]
     C --> D{恢复扫描完整?}
     D -->|是| E[样本分类 valid / invalid]
     D -->|否或失败| F[unknown 保留在原分母]
-    E --> G[按语言与标签分别统计]
+    E --> G[按语言、cohort 与标签分别统计]
     F --> G
-    G --> H[32 行结果与逐样本证据]
+    G --> H[32 语言、35 来源组与逐样本证据]
     H --> I[修复差异并收集独立原生 holdout]
 ```
 
-固定语料位于 [grammar_regression.json](../tests/fixtures/grammar_regression.json)。186 个样本包括已有十种语言的窄范围标签、Erlang 扩展终止符样本、全部 grammar 的路由控制样本，以及已知 VB.NET / CFQuery 边界。`manifest_sha256`、每个 `source_sha256` 和唯一 ID 在启动前检查；少一语言、重复键、未知字段、错误摘要和自行声明的批准标签都拒绝。
+当前固定语料位于 [grammar_regression_v0_2.json](../tests/fixtures/grammar_regression_v0_2.json)，共 358 例、32 语言、35 个语言×来源组。它完整保留历史 186 例，追加 22 例结构反例，并导入 Dart 上游 150 例。每种语言都有已选合法与非法预期；COBOL 的新增非法预期仍待裁定，不能声称全部反例均已由原生工具确认。少一语言、重复键、未知字段、错误清单/源码摘要和自行声明的批准标签在运行前拒绝。
 
-`regression` 是仓库内开发回归标签，**不是本轮执行的原生 oracle，也不是独立批准的 holdout**。`pending` 的临时预期只帮助调查，不进入 TP/FP/FN。CFQuery 缺 SQL 选择列表的样本使用 `pending`，因为该 grammar 的结构接受不能证明完整 SQL 方言检查。
+| `cohort` | 样本数 | 标签权威 |
+|---|---:|---|
+| `repository_regression` | 206 | 已有仓库回归预期；本轮不执行原生 oracle |
+| `upstream_grammar_regression` | 150 | Dart grammar 自带 corpus，其中 4 例预期 ERROR/MISSING；不是独立原生标签 |
+| `provisional_syntax` | 2 | CFQuery、COBOL 待裁定预期，`label=pending`，不计 TP/FP/FN/TN |
+
+Rust [build_grammar_corpus](../crates/codeguard-cli/examples/build_grammar_corpus.rs) 在开发期构建新语料：
+
+```bash
+cargo run --locked -p codeguard-cli --example build_grammar_corpus -- \
+  tests/fixtures/grammar_regression.json \
+  tests/fixtures/grammar_additional_regressions.json \
+  > /tmp/codeguard-grammar-corpus.json
+cmp /tmp/codeguard-grammar-corpus.json tests/fixtures/grammar_regression_v0_2.json
+```
+
+导入器保留 CRLF、空行和最后一棵预期树，来源绑定上游文件摘要和样例名称；拒绝缺分隔符、空节点、损坏预期树及不支持的 corpus 指令。上游预期树只生成 grammar 回归标签，不提升为独立裁定。历史 [0.1 语料](../tests/fixtures/grammar_regression.json)、schema 和 186 例实际报告仍保留，旧输入继续按旧形状输出。
 
 ## 报告含义
 
-报告协议为 [grammar_regression_evaluation 0.1](../schemas/grammar-regression-evaluation-v0.1.schema.json)，语料协议为 [grammar_regression 0.1](../schemas/grammar-regression-corpus-v0.1.schema.json)。结果逐语言列出：
+当前报告协议为 [grammar_regression_evaluation 0.2](../schemas/grammar-regression-evaluation-v0.2.schema.json)，语料协议为 [grammar_regression 0.2](../schemas/grammar-regression-corpus-v0.2.schema.json)。结果逐语言及其 `cohorts` 列出：
 
 | 字段 | 含义 |
 |---|---|
+| `selected_valid_count` / `selected_invalid_count` | 已选合法/非法预期数，含 pending，不代表独立确认 |
 | `sample_count` | 原语料分母，失败与未知样本仍在其中 |
 | `decidable_count` / `unknown_count` | 恢复扫描可判定与不可判定数量，不受临时标签影响 |
 | `pending_label_count` | 未裁定标签数量，不与未知解析数量相加当作互斥分组 |
 | `evaluated_count` | 有回归标签且可判定的样本数量 |
 | `tp` / `fp` / `fn` / `tn` | 样本级“是否存在语法异常”的混淆计数，不是精确规则实例召回率 |
-| `precision` / `recall` | 仅相对于开发回归标签；precision 附 95% Wilson 区间，零分母为 null |
+| `precision` / `recall` | 来源组内相对于回归标签计算；混合来源的语言汇总固定 null，零分母也为 null |
+| `metric_aggregation` | 单组为 `single_cohort`；多组为 `not_pooled`，计数可加但不混算精度 |
 | `fixture_false_clean_count` | 非法回归样本被完整解析为无恢复节点；不是项目门禁已经错误放行的次数 |
 | `completion_rate` | 可判定解析数 / 全部样本数，不代表检查覆盖或源码正确率 |
 | `performance` | 顺序冷 worker 的墙钟时间 p50/p95；不证明热启动、内存或同覆盖性能达标 |
@@ -58,3 +76,29 @@ flowchart LR
 根报告固定 `authority=repository_regression_only`、`native_oracle_executed=false`、`independent_holdout=false`、`grammar_qualified_count=0`、`delivery_decision=not_evaluated`。统计门槛保持 Wilson 下界 0.98、零漏报；当前最低预测数量 200 仅用于保守开发计算，`approval=not_verified`。即使回归分类一致，也没有原生标签、版本/方言、真实宿主、热启动/内存和发布批准的自动升级。
 
 本轮实际回放与剩余差异见 [验收记录](../tests/acceptance/grammar-regression-evaluation.md)。独立 holdout、真实原生工具回放和漏洞库评测必须继续单独实现；这些父任务保持未完成。
+
+## 分来源报告片段
+
+以下为协议形状说明，省略其它必需字段，不是完整运行证据：
+
+```json
+{
+  "schema_version": "0.2.0",
+  "cohort_policy": "separate_sources_no_pooled_precision",
+  "language_count": 32,
+  "cohort_count": 35,
+  "languages": [{
+    "language": "dart",
+    "sample_count": 152,
+    "metric_aggregation": "not_pooled",
+    "precision": null,
+    "recall": null,
+    "cohorts": [
+      {"cohort": "repository_regression", "sample_count": 2},
+      {"cohort": "upstream_grammar_regression", "sample_count": 150}
+    ]
+  }]
+}
+```
+
+Dart 的 150 例不能盖过其它语言的证据缺口，也不能与仓库两例合并出一个看似充分的 Wilson 区间。所有来源组均未取得独立 holdout 批准，资格仍为零。358 例实际回放和逐来源差异另见 [0.2 验收记录](../tests/acceptance/grammar-cohort-regression-evaluation.md)。

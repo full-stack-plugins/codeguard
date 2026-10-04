@@ -2248,3 +2248,27 @@ Rust 开发入口复用现有隔离 worker 和 Core 统计，启动前核对清�
 - `/tmp/codeguard-grammar-evaluation-full-final.log`：SHA-256 `12ef03b8e785b620d6eb05a4776526c5972918d9445a32bbab3fd53d4abd6213`。
 - `/tmp/codeguard-grammar-evaluation-core-all.log`：SHA-256 `49e89b05b5817adeed30c551aa34541ab66dfcdff0a02d7073edbbeb2b3af643`。
 - `/tmp/codeguard-grammar-evaluation-clippy-final.log`：SHA-256 `825f75b77eb1fa05f635f57bf86a861f93ac6db2b84b894a186571c8c12bfbc0`。
+
+## 2026-10-04 分来源语料与 358 例实际回放终态
+
+沿用同一 OpenSpec change 的 syntax-precheck 场景，不新增第二份计划。Rust 导入与 0.2 协议已实现：仓库回归 206、上游 grammar 回归 150、pending 2，分为 35 个语言×来源组。358 例、32 grammar 全部实际启动，355 可判定、3 unknown、353 有标签且可评样本；TP/FP/FN/TN 仅逐组计算，计数合计 73/1/10/269，不生成全体混合精度。Dart 上游 4 TP/146 TN，只证明与 grammar 自带预期一致。源字节、来源摘要和末尾预期树保留；未知、pending、旧报告和已知缺陷不抹掉。
+
+空预期节点及缺分隔符吞下一例的失败测试已复现；添加来源组覆盖数之前的协议测试也失败，修复后相关默认 CLI 7 passed、语料全字节复现 example 1 passed、adapters 4 passed；WASM 普通目标 10 passed/0 failed/2 ignored，358 例完整回放另显式 1 passed/0 failed/0 ignored（395.12 秒）。普通/完整/历史测试有重叠，不合计为全工作区测试规模。完整 186 例旧回放保留为可显式运行测试，本轮未重复该旧回放。
+
+190 schema 元定义、两份 0.2 实际数据、16 类伪造或矛盾反例及跨字段计数/摘要通过；旧 0.1 schema 两份、旧语料、旧原始报告和 grammar 清单五份文件与本批 HEAD 逐字节一致。workspace 全目标 WASM Clippy -D warnings、fmt、分层、OpenSpec strict 和修改文档链接通过。上一提交 c2b8e27 的 [Linux CI](https://github.com/full-stack-plugins/codeguard/actions/runs/37166875292) 已 completed/success；本批新提交的远端 CI 单独跟踪，不借旧提交称当前全工作区验收。
+
+原始报告和剩余范围见 [实际验收](../../../tests/acceptance/grammar-cohort-regression-evaluation.md)。Erlang 10 FN、VB.NET 1 FP、Kotlin/Swift 2/1 unknown、pending 原生裁定、独立 holdout、真实宿主、MSRV、多平台和完整门禁仍未完成。没有安装新工具、没有改动发布制品或插件仓，保留未提交的 Erlang RED 草稿；12.11/14.17/14.19 及整体目标不勾选完成。
+
+日志身份（本轮具体执行，不是历史全工作区）：
+
+- `/tmp/codeguard-grammar-corpus-malformed-red.log`：SHA-256 `5a973acf19cd9151fa15be81ba3b6634dd3dd768c8ac8de2d0e192286f818e41`。
+- `/tmp/codeguard-grammar-corpus-malformed-green.log`：SHA-256 `ebf643c4425d5a77118fcd4f0f501b85056dc4ae990cefef41946bc9a8e15ef1`。
+- `/tmp/codeguard-grammar-cohorts-counts-red.log`：SHA-256 `fa333ded86bf77ce4cccdb1f88b7c2790cd46fecaaef9179059d58a3e32a493f`。
+- `/tmp/codeguard-grammar-cohorts-default-final.log`：SHA-256 `48c7b7ad30fb3c3d6a8b5acb87dc892590fb12104d9d39a5596a11673085ed58`。
+- `/tmp/codeguard-grammar-cohorts-adapters-final.log`：SHA-256 `96a63f0a2c853910a7cbf6b7e92d3bef972d94b05bb8219f1c0ff0fc759a1085`。
+- `/tmp/codeguard-grammar-cohorts-feature-final.log`：SHA-256 `30940831212bb856232c9da1ac712c216e02a7ae8a22be21222600e08e44995c`。
+- `/tmp/codeguard-grammar-cohorts-full.log`：SHA-256 `bb1ee91a5b50ee01e859c5302b0568d9c6af9652def67df15e65cacf5eb906ba`。
+- `/tmp/codeguard-grammar-cohorts-clippy-final.log`：SHA-256 `32cd1cc2307521e54e48ac6514227b6cbc5e64e71091ebc4feebbcd91c628f04`。
+- `/tmp/codeguard-grammar-cohorts-schema-final.log`：SHA-256 `6076751be24d233d39bf1177716734b14beca1d80a29c73d90d18b720145e49b`。
+
+补充依赖方向验收：`crate_boundaries` 当前 7 passed/0 failed/0 ignored；日志 `/tmp/codeguard-grammar-cohorts-boundaries-final.log` SHA-256 `078f67a27d10f7e9b5d729940bebd7c897fcb94a8bde6b7bf28c8c3a5f5c351d`。新增 corpus 解析/样本对象仅在 adapters，未引入 runtime 依赖。

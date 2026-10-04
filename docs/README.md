@@ -20,7 +20,7 @@ This is the documentation entry for Rust Codeguard. The eleven former `rust-cli/
 | [Native adapter contracts](Codeguard-Adapter-Contracts.md) | Native configuration/reports and Java/CVE/security boundaries |
 | [Trust and distribution](Codeguard-Trust-and-Distribution.md) | Signatures, revision chains, tool packages, npm and grammar assets |
 | [Validation and rollout](Codeguard-Validation-and-Rollout.md) | Language matrix, F01–F26, precision targets, host/release evidence |
-| [Grammar development evaluation](Codeguard-Grammar-Evaluation.md) | Fixed 32-language replay, per-case disagreements, unknowns and fixture-only metrics |
+| [Grammar development evaluation](Codeguard-Grammar-Evaluation.md) | Fixed 358-case, 32-language, 35-cohort replay with separate fixture metrics and unknowns |
 | [Legacy compatibility](Codeguard-Legacy-Compatibility.md) | Old CLI/MCP/hook mapping and the dated 2026-09-24 audit |
 
 ## Current, target and historical evidence
