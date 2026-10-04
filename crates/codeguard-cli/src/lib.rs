@@ -352,3 +352,6 @@ mod check_zig_scan;
 
 #[cfg(unix)]
 mod hook_native_tools;
+
+#[cfg(all(feature = "wasm-precheck", unix))]
+pub mod grammar_native_differential;

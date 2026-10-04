@@ -60,7 +60,7 @@ jobs:
 
       - name: Replay every fixed grammar and retain per-language evidence
         run: |
-          cargo test --locked -p codeguard-cli --features wasm-precheck --test grammar_evaluation
+          cargo test --locked -p codeguard-cli --features wasm-precheck --test grammar_evaluation --test grammar_native_differential
           # 此测试确认全部 worker 实际运行并保留逐语言 JSON；已知语法差异保留为数据，
           # 不断言成正确行为，也不把工具不可用的 358 项 unknown 当回放成功。
           # 0.1 协议与历史报告由上面的普通测试保留兼容；当前回放显式分离语料来源。

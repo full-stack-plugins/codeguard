@@ -102,3 +102,7 @@ cmp /tmp/codeguard-grammar-corpus.json tests/fixtures/grammar_regression_v0_2.js
 ```
 
 Dart 的 150 例不能盖过其它语言的证据缺口，也不能与仓库两例合并出一个看似充分的 Wilson 区间。所有来源组均未取得独立 holdout 批准，资格仍为零。358 例实际回放和逐来源差异另见 [0.2 验收记录](../tests/acceptance/grammar-cohort-regression-evaluation.md)。
+
+## 显式原生差分开发回放
+
+新增 Rust 示例 `evaluate_native_grammars`：从同一32语言固定语料选择已显式提供 Zig0.16.0、OTP28、Apple Swift6.4 与 kotlinc-jvm2.4.10 的样本，逐例复用原生适配器和既有WASM worker。库存仍保留32语言；未选工具、无适配器、原生未完成及WASM隐藏恢复不被补成通过。只在双方语法可判定时统计TP/FP/FN/TN；Kotlin混合上下文阻塞保留已定位语法正向证据，但执行仍未完成。工具/入口或程序变化撤回对应分类。回放固定 incomplete/资格0，不创建任务或批准白名单。原生适配器复用、回归语料和入口制品摘要不证明独立holdout或完整工具链身份。使用方式和实际证据见[原生差分验收](../tests/acceptance/native-grammar-differential.md)。

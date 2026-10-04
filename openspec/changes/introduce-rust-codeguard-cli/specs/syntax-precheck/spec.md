@@ -463,3 +463,8 @@ WASM fallback MUST 通过明确版本的协议加入既有统一命令，不静�
 #### Scenario: Zig native output cannot create false completion or invalid repair coordinates
 - **WHEN** the Zig AST process exits zero with unexpected stdout, or a diagnostic position exceeds the frozen source line/byte bounds
 - **THEN** its observation remains incomplete and invalid positions are withdrawn; neither a clean result nor actionable coordinates may be inferred from the exit code alone
+
+
+#### Scenario: Explicit native grammar differential retains unknown and unselected coverage
+- **WHEN** the development evaluator compares frozen corpus bytes through explicitly installed native tools and the existing WASM worker
+- **THEN** reject invalid selections before process execution, retain all 32 languages in inventory, compare only jointly decidable syntax samples, keep context-only native blockers or hidden WASM recovery as unknown, preserve strictly located Kotlin syntax diagnostics even when mixed context blockers leave execution incomplete, withdraw classifications after tool/program identity changes, and do not promote reused-adapter regression evidence to independent holdout, grammar qualification or delivery permission
