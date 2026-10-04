@@ -321,3 +321,6 @@ pub mod kotlin_lint_command;
 
 #[cfg(unix)]
 mod kotlin_tool_selection;
+
+#[cfg(unix)]
+mod check_kotlin_scan;

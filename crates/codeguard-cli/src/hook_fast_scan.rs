@@ -12,6 +12,7 @@ pub(crate) fn observe(
     requested: &[String],
     ruff: Option<&Path>,
     node: Option<&Path>,
+    kotlinc: Option<&Path>,
     deadline: Instant,
 ) -> Value {
     let mut selected = BTreeSet::new();
@@ -41,6 +42,26 @@ pub(crate) fn observe(
     let mut node_scan = CheckEslintScan::run(root, &javascript, node, deadline, &cancelled);
     node_scan.sync(root, deadline);
     let node_lint = node_scan.feedback;
+    let kotlin_paths = selected
+        .iter()
+        .filter(|p| p.ends_with(".kt"))
+        .cloned()
+        .collect::<BTreeSet<_>>();
+    let mut kotlin_lint = if kotlin_paths.is_empty() {
+        Value::Null
+    } else {
+        crate::check_kotlin_scan::observe(
+            root,
+            &kotlin_paths,
+            kotlinc.map(Path::to_path_buf),
+            deadline,
+            &cancelled,
+        )
+    };
+    if kotlin_lint.is_object() {
+        crate::native_syntax_confirmation::connect(root, &mut kotlin_lint, deadline);
+        crate::check_kotlin_scan::refresh(root, &mut kotlin_lint, deadline);
+    }
     #[cfg(feature = "wasm-precheck")]
     let syntax = crate::check_syntax_candidates::observe_selected(
         root,
@@ -50,6 +71,7 @@ pub(crate) fn observe(
             python_lint: &python_lint,
             go_lint: &Value::Null,
             erlang_lint: &Value::Null,
+            kotlin_lint: &kotlin_lint,
             rust_targets: &crate::rust_native_syntax_coverage::RustNativeSyntaxCoverage::default(),
             go_tool: None,
         },
@@ -62,7 +84,7 @@ pub(crate) fn observe(
     let syntax_tasks = crate::syntax_confirmation::persist(root, &syntax, deadline);
     let native_unwired: Vec<&String> = selected
         .iter()
-        .filter(|p| !p.ends_with(".py") && !is_source(p))
+        .filter(|p| !p.ends_with(".py") && !p.ends_with(".kt") && !is_source(p))
         .collect();
     let recoveries = syntax["observations"]
         .as_array()
@@ -93,14 +115,18 @@ pub(crate) fn observe(
     } else {
         "review_native_results_and_resolve_incomplete_checks"
     };
-    json!({
-        "schema_version":"0.2.0","report_type":"hook_fast_feedback",
+    let mut feedback = json!({
+        "schema_version":if kotlin_lint.is_object(){"0.3.0"}else{"0.2.0"},"report_type":"hook_fast_feedback",
         "scan_scope":"selected_files","requested_paths":requested,
         "python_lint":python_lint,"node_lint":node_lint,"syntax_candidates":syntax,"syntax_tasks":syntax_tasks,
         "unavailable_files":unavailable,"native_unwired_files":native_unwired,
         "candidate_recovery_count":recoveries,"next_action":next_action,
         "delivery_decision":"not_evaluated","coverage_proven":false
-    })
+    });
+    if kotlin_lint.is_object() {
+        feedback["kotlin_lint"] = kotlin_lint;
+    }
+    feedback
 }
 
 fn safe_file(root: &Path, relative: &str) -> bool {

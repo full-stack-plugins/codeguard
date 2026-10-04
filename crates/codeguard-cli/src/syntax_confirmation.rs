@@ -89,7 +89,7 @@ pub(crate) fn persist(root: &Path, syntax: &Value, deadline: Instant) -> Value {
 
 /// 校验候选任务的工作区、固定 grammar、原字节位置和当前源码；不验证质量批准。
 pub(crate) fn valid_report(root: &Path, workspace: &str, report: &Value) -> bool {
-    if report["schema_version"] == "0.2.0" {
+    if matches!(report["schema_version"].as_str(), Some("0.2.0" | "0.4.0")) {
         return crate::native_syntax_confirmation::valid_history_report(root, workspace, report)
             && crate::syntax_task_recheck::inputs_current(root, &report["native_evidence"]);
     }

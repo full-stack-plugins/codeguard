@@ -415,3 +415,9 @@ WASM fallback MUST 通过明确版本的协议加入既有统一命令，不静�
 - **AND** reject wrong-language or relative tool arguments before acquiring a lease or starting a process
 - **AND** expose current syntax positions separately from unresolved project-context diagnostics, including mixed observations; changed source/tool identities withdraw stale positions
 - **AND** native zero diagnostics does not by itself prove policy/coverage or close the task; initial tool guidance must preserve the Kotlin selection option in task show and next
+
+#### Scenario: Kotlin first observation prefers a selected native compiler
+- **WHEN** check all or a confirmed file_changed event observes ordinary Kotlin files
+- **THEN** invoke the selected explicit or first absolute-PATH compiler before candidate parsing, within the shared deadline and requested scope
+- **AND** retain native syntax and context observations in a stable task without fabricating a WASM origin; selected-tool failure must not switch to a candidate parser
+- **AND** tool absence enables WASM, complete native zero diagnostics creates no new task, and repeated scans reuse existing identity and current evidence

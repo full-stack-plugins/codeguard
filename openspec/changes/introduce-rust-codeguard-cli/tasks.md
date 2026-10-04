@@ -1315,3 +1315,7 @@ Swift 差分纠正先以状态断言暴露旧清单文案的红测，再按真�
 ## 2026-10-04 Kotlin 稳定任务原生复检与反馈（已验证切片）
 
 对应9.9/9.10、14.4/14.10/14.19：已有Kotlin确认任务接通task verify/repair_ready、显式及PATH原工具选择、原报告绑定、租约与追加验证事件。next/task show不再误称adapter缺失；源码变化撤销旧位置，语法与上下文混合时保留repair-source及独立上下文，零诊断不重复修复、不自动关闭。真实Kotlin2.4.10完整任务链路、3项错参租约前拒绝、任务3项、历史形状2项及5项新schema校验通过；相邻Erlang13/Swift7/通用8项通过。默认/WASM入口和严格Clippy、fmt、分层、OpenSpec严格校验通过，211旧schema原字节保留。详见[验收](../../../tests/acceptance/kotlin-native-task-confirmation.md)。首次check/file_changed的原生优先调度、完整项目lint/注释、JAR/JDK身份、独立精度、正式关闭及实际宿主/发行仍缺，父任务不勾选。
+
+### 2026-10-04 Kotlin 首次原生扫描局部进展（父任务未完成）
+
+在既有 syntax-precheck 场景下接通 `check all` / 确认 `file_changed` 的 Kotlin 原生优先观察、显式参数与 PATH 选择，原生来源事实、稳定任务同步、`next` / `task show`、原工具复检及 human 规则位置。普通 `.kt` 与 `.kts` 分开；已选工具失败和超出原生范围的未观察文件不通过 WASM 隐藏。新增协议不改旧 schema 字节，原生来源不伪造 grammar SHA。详细证据见[局部验收](../../../tests/acceptance/kotlin-native-first.md)。完整 Kotlin lint/注释/项目构建、可信工具链、可信关闭、多宿主、逐语言质量与发行仍有缺口，未勾选完整语言、修复或发行父任务。

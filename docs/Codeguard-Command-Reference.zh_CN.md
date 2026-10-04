@@ -710,3 +710,5 @@ Rust 读取并复核有界源码字节，通过冻结 stdin、固定 `/` cwd、�
 新增协议分别为 `syntax_task_recheck` 0.4.0、`task_verification_preview` 0.15.0、`repair_brief_preview` 0.6.0、Hook 反馈 0.9.0（任务摘要 0.3.0）。聚合 `check` 的 `next` 含 Swift 原生简报时用 0.39.0，其他路径保留 0.38.0；旧 schema 原件不改。具体实测和完整报告见 [Swift 原生确认验收](../tests/acceptance/swift-native-task-confirmation.md)。
 
 开发源码中，已有 Kotlin 语法确认任务还可用 `codeguard task verify TASK_ID . --kotlinc-tool ABS_PATH --format=json`；`repair_ready` 接受相同参数，保留稳定任务和历史。混合诊断分别给出可修复语法位置及上下文阻塞。见 [任务复检验收](../tests/acceptance/kotlin-native-task-confirmation.md)。
+
+开发源码：`check all . --kotlinc-tool ABS_PATH` 与确认保存事件的 `hook execute . --kotlinc-tool ABS_PATH` 优先选择 Kotlin 原生工具；repair_ready 也接受该参数。已选工具失败保留阻塞，只有工具缺失才回退 WASM。

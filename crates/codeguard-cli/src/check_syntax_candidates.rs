@@ -26,6 +26,7 @@ pub struct NativeCoverage<'a> {
     pub python_lint: &'a Value,
     pub go_lint: &'a Value,
     pub erlang_lint: &'a Value,
+    pub kotlin_lint: &'a Value,
     pub rust_targets: &'a crate::rust_native_syntax_coverage::RustNativeSyntaxCoverage,
     pub go_tool: Option<&'a Path>,
 }
@@ -168,7 +169,8 @@ pub(crate) fn observe_selected(
                 continue;
             }
         };
-        if crate::check_eslint_scan::covers(native.node_lint, relative, &source)
+        if crate::check_kotlin_scan::prefers(native.kotlin_lint, relative)
+            || crate::check_eslint_scan::covers(native.node_lint, relative, &source)
             || native_python_covers(native.python_lint, relative, &source)
             || native_go_covers(&native_go_files, relative, &source)
             || native.rust_targets.covers(relative, &source)

@@ -53,6 +53,7 @@ struct Args {
     rustsec_db: Option<PathBuf>,
     go_tool: Option<PathBuf>,
     erl_tool: Option<PathBuf>,
+    kotlinc_tool: Option<PathBuf>,
     maven_tool: Option<PathBuf>,
     java_home: Option<PathBuf>,
     maven_repo: Option<PathBuf>,
@@ -296,6 +297,34 @@ pub fn run(args: &[String]) -> ExitCode {
     let mut node_lint = Value::Null;
     let mut go_lint = Value::Null;
     let mut erlang_lint = Value::Null;
+    let kotlin_sources = if parsed.selection == Selection::All {
+        discovery
+            .languages
+            .get("kotlin")
+            .map(|e| {
+                e.source_files
+                    .iter()
+                    .filter(|p| p.ends_with(".kt"))
+                    .cloned()
+                    .collect()
+            })
+            .unwrap_or_default()
+    } else {
+        BTreeSet::new()
+    };
+    let mut kotlin_lint = if kotlin_sources.is_empty() {
+        Value::Null
+    } else {
+        let report = crate::check_kotlin_scan::observe(
+            &root,
+            &kotlin_sources,
+            parsed.kotlinc_tool.clone(),
+            deadline,
+            &AtomicBool::new(false),
+        );
+        execution_tasks.push(json!({"id":"kotlin.lint","status":if report["local_compile_complete"]==true {"native_observed_unverified"} else {"native_incomplete"}}));
+        report
+    };
     let mut java_p3c = Value::Null;
     let mut java_javadoc = Value::Null;
     let mut java_dependencies = Value::Null;
@@ -1151,6 +1180,14 @@ pub fn run(args: &[String]) -> ExitCode {
         Ok(None) => None,
         Err(reason) => Some(reason),
     };
+    if kotlin_lint.is_object() {
+        if source_recheck.or(scope_recheck).is_some() {
+            kotlin_lint["scope_stable"] = json!(false);
+        }
+        crate::check_kotlin_scan::refresh(&root, &mut kotlin_lint, deadline);
+        crate::native_syntax_confirmation::connect(&root, &mut kotlin_lint, deadline);
+        crate::check_kotlin_scan::refresh(&root, &mut kotlin_lint, deadline);
+    }
     if erlang_lint.is_object() {
         if source_recheck.or(scope_recheck).is_some() {
             crate::check_erlang_scan::invalidate_scope(&mut erlang_lint);
@@ -1260,6 +1297,14 @@ pub fn run(args: &[String]) -> ExitCode {
                 "status": if observed { "observed_unverified" } else if npm_selected || python_lint_selected || rust_lint_selected || rust_comments_selected || rust_build_selected || rust_cve_selected || go_lint_selected || java_lint_selected || java_comments_selected || (language == "java" && category == "dependencies" && dependency_configured) || (cve_scope_configured) { "native_incomplete" } else if language == "java" && category == "comments" { if javadoc_configuration_unresolved { "configuration_unresolved" } else { "not_configured" } } else if let Some(candidate) = java_checker.as_ref() { candidate.status } else { "not_integrated" },
                 "reason": if rust_cve_selected { if observed { "rust_cve_database_freshness_unverified" } else { "rust_cve_native_incomplete" } } else if npm_selected { "npm_advisory_coverage_and_freshness_unverified" } else if planned_language { "planned_language_adapter_gap" } else if observed { "trusted_policy_and_coverage_unavailable" } else if java_lint_selected && java_p3c["local_observation_complete"] == true { "p3c_declared_rulesets_unverified_coverage" } else if java_comments_selected && java_javadoc["maven_multifile_probes"].as_array().is_some_and(|probes| probes.iter().any(|probe| matches!(probe["observation"]["native_status"].as_str(), Some("findings_observed_untrusted" | "clean_log_unverified")))) { "javadoc_multifile_probe_unverified_project_coverage" } else if java_comments_selected && java_javadoc["local_probe_complete"] == true { "javadoc_single_file_probe_unverified_coverage" } else if language == "java" && category == "dependencies" && java_dependencies["observed_graph_count"].as_u64().is_some_and(|count| count > 0) { "dependency_graph_observed_unverified_coverage" } else if cve_scope_configured && java_cve["observed_report_count"].as_u64().is_some_and(|count| count > 0) { "cve_report_observed_database_unverified" } else if (language == "java" && category == "dependencies" && dependency_configured) || cve_scope_configured || python_lint_selected || rust_lint_selected || rust_comments_selected || rust_build_selected || go_lint_selected || java_lint_selected || java_comments_selected { "native_scan_incomplete" } else if language == "java" && category == "comments" { if javadoc_configuration_unresolved { "javadoc_configuration_unresolved" } else { "not_configured" } } else if let Some(candidate) = java_checker.as_ref() { candidate.reason } else { "native_adapter_not_integrated" }
             });
+            if language == "kotlin" && category == "lint" && kotlin_lint.is_object() {
+                candidate["checker_id"] = json!("kotlin.jvm.compiler");
+                candidate["status"] = json!("native_incomplete");
+                candidate["reason"] = json!("kotlin_single_file_project_checks_unverified");
+                candidate["next_action"] = json!(
+                    "读取 native_results.kotlin_lint 的当前语法位置、上下文诊断、环境阻塞和稳定任务；单文件编译不代替项目 lint 与完整构建"
+                );
+            }
             if language == "erlang" && category == "lint" && erlang_present {
                 candidate["checker_id"] = json!("erlang.otp.forms");
                 candidate["status"] = json!("native_incomplete");
@@ -1415,6 +1460,18 @@ pub fn run(args: &[String]) -> ExitCode {
     }
     if rust_present && rust_task_outcome != Some(TaskOutcome::Succeeded) {
         unresolved.insert("rust_lint_task_incomplete".into());
+    }
+    if kotlin_lint.is_object() {
+        unresolved.insert("kotlin_project_lint_and_build_coverage_unverified".into());
+        if kotlin_lint["local_compile_complete"] != true {
+            unresolved.insert("kotlin_native_scan_incomplete".into());
+        }
+        if matches!(
+            kotlin_lint["task_status"].as_str(),
+            Some("failed" | "sync_incomplete")
+        ) {
+            unresolved.insert("kotlin_task_sync_incomplete".into());
+        }
     }
     if erlang_present {
         unresolved.insert("erlang_project_lint_preprocessing_and_build_coverage_unverified".into());
@@ -1594,7 +1651,12 @@ pub fn run(args: &[String]) -> ExitCode {
                 | TaskOutcome::DependencyFailed
         )
     })
-    .count();
+    .count()
+        + usize::from(
+            kotlin_lint["files"]
+                .as_array()
+                .is_some_and(|files| files.iter().any(|f| f["native"]["tool_sha256"].is_string())),
+        );
     #[cfg(feature = "wasm-precheck")]
     let syntax_candidates = crate::check_syntax_candidates::observe(
         &root,
@@ -1604,6 +1666,7 @@ pub fn run(args: &[String]) -> ExitCode {
             python_lint: &python_lint,
             go_lint: &go_lint,
             erlang_lint: &erlang_lint,
+            kotlin_lint: &kotlin_lint,
             rust_targets: &_rust_syntax_coverage,
             go_tool: parsed.go_tool.as_deref(),
         },
@@ -1642,24 +1705,30 @@ pub fn run(args: &[String]) -> ExitCode {
             }
         }
     }
-    let report = json!({
-        "schema_version":if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
+    let mut report = json!({
+        "schema_version":if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
         "operation":"check", "selection":parsed.selection.as_str(), "command_status":if request_cancelled { "cancelled" } else { "incomplete" },
         "exit_code":if request_cancelled { 130 } else { 3 }, "delivery_decision":if parsed.selection == Selection::All { "incomplete" } else { "not_evaluated" }, "authority":"local_unverified",
         "reason":if request_cancelled { "request_cancelled" } else if parsed.selection == Selection::All { "full_project_obligations_and_trusted_policy_unavailable" } else { "java_selection_obligations_and_trusted_policy_unavailable" },
         "discovery":discovery.to_json(),
-        "native_results":{"node_lint":node_lint,"python_lint":python_lint,"python_cve":python_cve,"rust_lint":rust_lint,"rust_comments":rust_comments,"rust_build":rust_build,"rust_cve":rust_cve,"go_lint":go_lint,"erlang_lint":erlang_lint,"java_p3c":java_p3c,"java_javadoc":java_javadoc,"java_dependencies":java_dependencies,"java_cve":java_cve,"npm_cve":npm_cve}, "execution_tasks":execution_tasks,
+        "native_results":{"node_lint":node_lint,"python_lint":python_lint,"python_cve":python_cve,"rust_lint":rust_lint,"rust_comments":rust_comments,"rust_build":rust_build,"rust_cve":rust_cve,"go_lint":go_lint,"erlang_lint":erlang_lint,"kotlin_lint":kotlin_lint,"java_p3c":java_p3c,"java_javadoc":java_javadoc,"java_dependencies":java_dependencies,"java_cve":java_cve,"npm_cve":npm_cve}, "execution_tasks":execution_tasks,
         "obligation_status":"unresolved", "required_obligations":null,
         "category_candidates":candidates, "unresolved_conditions":unresolved,
         "syntax_candidates":syntax_candidates,
         "syntax_tasks":syntax_tasks,
         "execution_budget":check_budget_record(
             parsed.timeout_ms, parsed.timeout_source, parsed.jobs_limit, parsed.jobs_source,
-            usize::from(node_present) + usize::from(python_present) + python_cve_roots.len() + 4 * usize::from(rust_present) + usize::from(go_present) + usize::from(erlang_present) + usize::from(java_present) + usize::from(javadoc_configured) + usize::from(dependency_configured) + usize::from(cve_configured) + npm_roots.len(), started_native_task_count
+            usize::from(node_present) + usize::from(python_present) + python_cve_roots.len() + 4 * usize::from(rust_present) + usize::from(go_present) + usize::from(erlang_present) + usize::from(java_present) + usize::from(javadoc_configured) + usize::from(dependency_configured) + usize::from(cve_configured) + npm_roots.len() + usize::from(kotlin_lint.is_object()), started_native_task_count
         ),
         "next":next,
         "export":{"status":"not_requested","reason_code":null}
     });
+    // 历史报告维持封闭协议；只有新 Kotlin 报告携带新增原生字段。
+    if report["schema_version"] != "0.42.0" {
+        if let Some(native) = report["native_results"].as_object_mut() {
+            native.remove("kotlin_lint");
+        }
+    }
     if parsed.format != OutputFormat::Human {
         emit_structured(&report, &parsed);
     } else {
@@ -1825,6 +1894,44 @@ pub fn run(args: &[String]) -> ExitCode {
                         "cargo clippy --locked --offline --all-targets --message-format=json"
                     )
             );
+        }
+        if let Some(files) = report["native_results"]["kotlin_lint"]["files"].as_array() {
+            println!("Kotlin 原生单文件编译；完整项目 lint 和构建仍待核验");
+            for file in files {
+                println!(
+                    "  {}：{}；{}",
+                    file["path"], file["native"]["reason"], file["next_action"]
+                );
+                for category in ["diagnostics", "context_diagnostics"] {
+                    for finding in file["native"][category].as_array().into_iter().flatten() {
+                        println!(
+                            "  {} {}:{}:{}；规则 {}；原生 UTF-16 列 {}",
+                            if category == "diagnostics" {
+                                "语法诊断"
+                            } else {
+                                "上下文诊断"
+                            },
+                            file["path"],
+                            finding["line"],
+                            finding["column_byte"],
+                            finding["rule_id"],
+                            finding["column_utf16"]
+                        );
+                    }
+                }
+                if !file["recheck_argv"].is_null() {
+                    println!("  复检 argv：{}", file["recheck_argv"]);
+                }
+                if !file["task_id"].is_null() {
+                    println!(
+                        "  稳定修复任务：{}；运行 codeguard next 获取当前动作",
+                        file["task_id"]
+                    );
+                }
+                if let Some(reason) = file["task_sync_reason"].as_str() {
+                    println!("  任务同步未完成：{reason}");
+                }
+            }
         }
         if let Some(files) = report["native_results"]["erlang_lint"]["files"].as_array() {
             println!("Erlang 原生 forms；项目完整 lint、预处理、编译和测试仍待核验");
@@ -2387,6 +2494,7 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
     let mut rustsec_db = None;
     let mut go_tool = None;
     let mut erl_tool = None;
+    let mut kotlinc_tool = None;
     let mut maven_tool = None;
     let mut java_home = None;
     let mut maven_repo = None;
@@ -2466,6 +2574,17 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
                     .is_some()
                 {
                     return Err("--rustsec-db 重复".into());
+                }
+            }
+            "--kotlinc-tool" => {
+                index += 1;
+                if kotlinc_tool
+                    .replace(PathBuf::from(
+                        args.get(index).ok_or("缺少 Kotlin 工具路径")?,
+                    ))
+                    .is_some()
+                {
+                    return Err("--kotlinc-tool 重复".into());
                 }
             }
             "--erl-tool" => {
@@ -2622,6 +2741,9 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
     {
         return Err("Rust CVE 工具和数据库必须是绝对路径".into());
     }
+    if kotlinc_tool.as_ref().is_some_and(|p| !p.is_absolute()) {
+        return Err("--kotlinc-tool 必须是绝对路径".into());
+    }
     if erl_tool.as_ref().is_some_and(|path| !path.is_absolute()) {
         return Err("--erl-tool 必须是绝对路径".into());
     }
@@ -2635,7 +2757,8 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
             || cargo_audit_tool.is_some()
             || rustsec_db.is_some()
             || go_tool.is_some()
-            || erl_tool.is_some())
+            || erl_tool.is_some()
+            || kotlinc_tool.is_some())
     {
         return Err("check java 不接受其它语言的原生工具参数".into());
     }
@@ -2681,6 +2804,7 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
         rustsec_db,
         go_tool,
         erl_tool,
+        kotlinc_tool,
         maven_tool,
         java_home,
         maven_repo,

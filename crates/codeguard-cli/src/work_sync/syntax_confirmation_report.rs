@@ -31,7 +31,9 @@ pub(super) fn parse(
             fingerprint: report["fingerprint"].as_str().unwrap().into(),
             reason: report["reason_code"].as_str().unwrap().into(),
             diagnostic_reason: Some(
-                if report["schema_version"] == "0.2.0" {
+                if report["schema_version"] == "0.4.0" {
+                    "kotlin_native_first_observation"
+                } else if report["schema_version"] == "0.2.0" {
                     "erlang_native_first_observation"
                 } else if report["observations"].as_array().is_some_and(|rows| {
                     rows.iter().any(|row| {
