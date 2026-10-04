@@ -2272,7 +2272,7 @@ fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
     if blocker.checker_id == "python.ruff" && blocker.reason == "python_syntax_confirmation_needed"
     {
         return format!(
-            "# {} Python 语法原生确认任务\n\n- 问题证据：源码范围 `{}` 的候选 WASM 初检尚未验收；脱敏疑似位置、源码及 grammar 摘要在 `.codeguard/reports/{}.json`，报告 SHA-256 `{}`。疑似位置不是已确认源码违规。\n- 规则依据：Tree-sitter 恢复节点只提示待核实位置，须用适用的 Python 原生语法能力和项目原配置确认。\n- 允许范围：只核对本源码、对应构建根、原生工具及配置；不得凭候选观察修改无关源码或增加白名单。\n- 修复步骤：查看同 run 的位置，再恢复原生检查；若原生反证，保留证据并调查 grammar 误报。\n- 复检命令：codeguard task verify {} . --ruff-tool <已核验绝对路径> --format json。\n- 历史尝试：首次 run `{}`；后续候选观察归并到同一任务。\n- 关闭条件：当前输入、范围与语法能力匹配的原生复检和可信策略核验完成；安装工具、任务勾选或后续 WASM 零恢复节点都不能关闭。\n",
+            "# {} Python 语法原生确认任务\n\n- 问题证据：源码范围 `{}` 的候选 WASM 初检尚未验收；脱敏疑似位置、源码及 grammar 摘要在 `.codeguard/reports/{}.json`，报告 SHA-256 `{}`。疑似位置不是已确认源码违规。\n- 规则依据：原始 Tree-sitter ERROR/MISSING 与独立 codeguard.python.required_suite 结构观察分别保留来源；结构观察的规则版本、配置摘要、父节点和零基字节坐标见报告。两者均须用适用的 Python 原生语法能力和项目原配置确认，不能将候选结构规则当作原生违规。\n- 允许范围：只核对本源码、对应构建根、原生工具及配置；不得凭候选观察修改无关源码或增加白名单。\n- 修复步骤：查看同 run 的位置，再恢复原生检查；若原生反证，保留证据并调查 grammar 误报。\n- 复检命令：codeguard task verify {} . --ruff-tool <已核验绝对路径> --format json。\n- 历史尝试：首次 run `{}`；后续候选观察归并到同一任务。\n- 关闭条件：当前输入、范围与语法能力匹配的原生复检和可信策略核验完成；安装工具、任务勾选或后续 WASM 零恢复节点都不能关闭。\n",
             blocker.id, blocker.scope, report.run_id, report.digest, blocker.id, report.run_id
         );
     }

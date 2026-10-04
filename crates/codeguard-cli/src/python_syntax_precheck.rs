@@ -45,6 +45,7 @@ pub(crate) fn observe(root: &Path, feedback: &Value, deadline: Instant) -> Optio
     });
     let executable = std::env::current_exe().ok();
     let mut observations = Vec::new();
+    let mut structural_observations = Vec::new();
     let mut checked = Vec::new();
     let mut unavailable = Vec::new();
     let mut truncated = false;
@@ -109,13 +110,23 @@ pub(crate) fn observe(root: &Path, feedback: &Value, deadline: Instant) -> Optio
         checked.push(json!({"path":path,"source_sha256":source_sha,"grammar_sha256":asset.sha256}));
         truncated |= result.precheck.truncated_files > 0;
         for mut row in mapped {
-            if observations.len() >= MAX_OBSERVATIONS {
+            if observations.len() + structural_observations.len() >= MAX_OBSERVATIONS {
                 truncated = true;
                 break;
             }
             row["path"] = json!(path);
             row["source_sha256"] = json!(source_sha);
             observations.push(row);
+        }
+        for row in result.structural_observations {
+            if observations.len() + structural_observations.len() >= MAX_OBSERVATIONS {
+                truncated = true;
+                break;
+            }
+            let mut row = serde_json::to_value(row).expect("结构观察可序列化");
+            row["path"] = json!(path);
+            row["source_sha256"] = json!(source_sha);
+            structural_observations.push(row);
         }
     }
     let reason = if !unavailable.is_empty() {
@@ -125,7 +136,7 @@ pub(crate) fn observe(root: &Path, feedback: &Value, deadline: Instant) -> Optio
     } else {
         "grammar_version_unqualified"
     };
-    Some(json!({
+    let mut report = json!({
         "backend":"bundled_tree_sitter_wasm_candidate",
         "language":"python",
         "status":"incomplete",
@@ -138,7 +149,11 @@ pub(crate) fn observe(root: &Path, feedback: &Value, deadline: Instant) -> Optio
         "unavailable":unavailable,
         "truncated":truncated,
         "observations":observations,
-    }))
+    });
+    if !structural_observations.is_empty() {
+        report["structural_observations"] = json!(structural_observations);
+    }
+    Some(report)
 }
 
 fn safe_python_path(value: &str) -> bool {

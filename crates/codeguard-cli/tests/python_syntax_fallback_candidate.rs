@@ -105,6 +105,91 @@ fn valid_python_does_not_turn_unqualified_grammar_into_clean() {
 }
 
 #[test]
+fn empty_python_suite_keeps_structure_evidence_and_stable_confirmation_task() {
+    let project = Project::new();
+    fs::write(project.0.join("broken.py"), "def run():\n").unwrap();
+    let init = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "init",
+            project.0.to_str().unwrap(),
+            "--apply",
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(init.status.code(), Some(3));
+    let first = project.lint(&["--file", "broken.py"]);
+    assert_eq!(first["schema_version"], "0.17.0");
+    assert_eq!(
+        first["syntax_precheck"]["observations"],
+        serde_json::json!([])
+    );
+    let rows = first["syntax_precheck"]["structural_observations"]
+        .as_array()
+        .unwrap();
+    assert_eq!(rows[0]["rule_id"], "codeguard.python.required_suite");
+    assert_eq!(rows[0]["path"], "broken.py");
+    let id = first["setup"]["task_id"].as_str().unwrap();
+    let confirmation: Value = fs::read_dir(project.0.join(".codeguard/reports"))
+        .unwrap()
+        .filter_map(|entry| {
+            serde_json::from_slice::<Value>(&fs::read(entry.ok()?.path()).ok()?).ok()
+        })
+        .find(|report| report["report_type"] == "python_syntax_confirmation_observation")
+        .unwrap();
+    assert_eq!(confirmation["schema_version"], "0.2.0");
+    assert_eq!(
+        confirmation["structural_observations"],
+        first["syntax_precheck"]["structural_observations"]
+    );
+    let reports = project.0.join(".codeguard/reports");
+    for (number, field, value) in [
+        (1, "rule_sha256", Value::String("0".repeat(64))),
+        (2, "start_byte", Value::from(999)),
+    ] {
+        let mut forged = confirmation.clone();
+        forged["run_id"] = Value::String(format!("python-syntax-999-{number}"));
+        forged["structural_observations"][0][field] = value;
+        fs::write(
+            reports.join(format!("python-syntax-999-{number}.json")),
+            serde_json::to_vec(&forged).unwrap(),
+        )
+        .unwrap();
+    }
+    let sync = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["work", "sync", project.0.to_str().unwrap(), "--format=json"])
+        .output()
+        .unwrap();
+    let report: Value = serde_json::from_slice(&sync.stdout).unwrap();
+    assert_eq!(report["failed_reports"], 2);
+    assert_eq!(report["new_blockers"], 0);
+    for number in [1, 2] {
+        fs::remove_file(reports.join(format!("python-syntax-999-{number}.json"))).unwrap();
+    }
+    assert_eq!(
+        project.lint(&["--file", "broken.py"])["setup"]["task_id"],
+        id
+    );
+    fs::write(project.0.join("broken.py"), "def run():\n    pass\n").unwrap();
+    assert_eq!(
+        project.lint(&["--file", "broken.py"])["setup"]["task_id"],
+        id
+    );
+    let fact: Value = serde_json::from_slice(
+        &fs::read(
+            project
+                .0
+                .join(".codeguard/findings")
+                .join(id)
+                .join("finding.json"),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(fact["state"], "open");
+}
+
+#[test]
 fn undeclared_ruff_still_provides_bounded_syntax_observation_without_claiming_ruff_missing() {
     let project = Project::new();
     fs::write(project.0.join("broken.py"), "def broken(\n").unwrap();
@@ -332,6 +417,70 @@ fn native_ruff_task_verify_records_an_attempt_without_closing_candidate_task() {
     )
     .unwrap();
     assert_eq!(fact["state"], "open");
+}
+
+#[test]
+#[ignore = "requires native Ruff 0.16.8 via CODEGUARD_RUFF_BIN"]
+fn actual_ruff_confirms_empty_suite_and_preserves_unapproved_task() {
+    let tool = std::env::var("CODEGUARD_RUFF_BIN").unwrap();
+    let project = Project::new();
+    fs::write(project.0.join("ruff.toml"), "[lint]\nselect = ['F401']\n").unwrap();
+    fs::write(project.0.join("broken.py"), "def run():\n").unwrap();
+    let init = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "init",
+            project.0.to_str().unwrap(),
+            "--apply",
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(init.status.code(), Some(3));
+    let first = project.lint(&["--file", "broken.py"]);
+    let id = first["setup"]["task_id"].as_str().unwrap();
+    for (source, expect_findings) in [
+        ("def run():\n", true),
+        ("if True:\npass\n", true),
+        ("def run():\n    pass\n", false),
+    ] {
+        fs::write(project.0.join("broken.py"), source).unwrap();
+        let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args([
+                "task",
+                "verify",
+                id,
+                project.0.to_str().unwrap(),
+                "--ruff-tool",
+                &tool,
+                "--format=json",
+            ])
+            .output()
+            .unwrap();
+        assert_eq!(output.status.code(), Some(3));
+        let report: Value = serde_json::from_slice(&output.stdout).unwrap();
+        assert_eq!(report["task_id"], id);
+        assert_eq!(report["native_scan"]["files"][0]["path"], "broken.py");
+        assert_eq!(
+            !report["native_scan"]["files"][0]["findings"]
+                .as_array()
+                .unwrap()
+                .is_empty(),
+            expect_findings,
+            "{report}"
+        );
+        let fact: Value = serde_json::from_slice(
+            &fs::read(
+                project
+                    .0
+                    .join(".codeguard/findings")
+                    .join(id)
+                    .join("finding.json"),
+            )
+            .unwrap(),
+        )
+        .unwrap();
+        assert_eq!(fact["state"], "open", "原生局部结果不能代替可信关闭策略");
+    }
 }
 
 #[test]

@@ -125,7 +125,11 @@ pub fn run(args: &[String]) -> ExitCode {
     #[cfg(feature = "wasm-precheck")]
     if !request_cancelled {
         if let Some(precheck) = crate::python_syntax_precheck::observe(&root, &feedback, deadline) {
-            feedback["schema_version"] = Value::String("0.14.0".into());
+            let has_structure = precheck["structural_observations"]
+                .as_array()
+                .is_some_and(|rows| !rows.is_empty());
+            feedback["schema_version"] =
+                Value::String(if has_structure { "0.16.0" } else { "0.14.0" }.into());
             feedback["scope"] = Value::String("local_native_and_candidate_syntax_scan".into());
             feedback["execution_budget"]["enforcement"] =
                 Value::String("native_and_bounded_syntax_worker".into());
@@ -147,7 +151,9 @@ pub fn run(args: &[String]) -> ExitCode {
             feedback["native"] = serde_json::json!({"status":"incomplete","reason":native_reason});
             feedback["setup"] = serde_json::json!({"requirement":"required","reason":"native_confirmation_needed","task_id":null});
             feedback["next_action"] = Value::String(
-                if precheck["observations"].as_array().is_some_and(|rows| !rows.is_empty()) {
+                if has_structure {
+                    "核对 codeguard.python.required_suite 候选结构规则观察，恢复项目原生检查器及配置并复检；结构观察不是原生违规或完成证据"
+                } else if precheck["observations"].as_array().is_some_and(|rows| !rows.is_empty()) {
                     "核对 Python 疑似语法位置，确认项目要求的原生检查器及配置，再以适用的 Python 原生语法能力复检；勿凭候选初检修改源码或关闭任务"
                 } else {
                     "候选 Python grammar 版本尚未验收；确认项目要求的原生检查器及配置后复检，不把零恢复节点当作通过"
@@ -155,7 +161,8 @@ pub fn run(args: &[String]) -> ExitCode {
             );
             if feedback["workspace_binding"] == "bound" {
                 let task = crate::python_syntax_confirmation::persist(&root, &precheck, deadline);
-                feedback["schema_version"] = Value::String("0.15.0".into());
+                feedback["schema_version"] =
+                    Value::String(if has_structure { "0.17.0" } else { "0.15.0" }.into());
                 match task {
                     Ok(id) => {
                         feedback["setup"]["task_id"] = Value::String(id);
@@ -808,6 +815,21 @@ fn print_human(feedback: &Value) {
                 .as_str()
                 .unwrap_or("复查原生检查条件")
         );
+        for row in precheck["structural_observations"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .take(8)
+        {
+            println!(
+                "候选结构 {}：{}；父节点 {}；原始零基字节位置 {}:{}；须由原生工具确认。",
+                row["path"],
+                row["rule_id"],
+                row["parent_syntax_kind"],
+                row["start_row"],
+                row["start_column_byte"]
+            );
+        }
         if let Some(id) = feedback["setup"]["task_id"].as_str() {
             println!("原生确认任务：{id}");
         } else if let Some(reason) = feedback["task_persistence"]["reason"].as_str() {

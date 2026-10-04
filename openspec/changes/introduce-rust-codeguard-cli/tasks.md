@@ -1436,3 +1436,7 @@ runtime新增独立的全树空block事实扫描，记录父节点及原始字�
 ### 2026-10-05 Python独立结构观察进入私有worker与显式探针
 
 已有空block事实扫描现接入固定Python required_suite候选规则、私有1.1协议和公开grammar probe 0.2协议；原始ERROR/MISSING数组与计数保持原始来源，结构观察另含规则配置摘要和坐标，资格仍0、交付未评估。三类缺语句块正例与五类合法反例、身份和位置拒绝、真实报告schema均验证，见[局部验收](../../../tests/acceptance/python-structure-probe.md)。统一lint/聚合报告、任务与原生复检尚未接线；Python历史两项FN及14.4/14.7/14.17/14.19父任务继续未完成，不覆盖历史差分证据。
+
+### 2026-10-05 Python结构规则进入lint、工作台与实际原生复检
+
+单文件Python兜底现将独立required_suite规则、父节点、配置摘要和原始坐标保存到反馈0.16/0.17及确认报告0.2；历史原始恢复协议不改。重复扫描同一任务，合法pass不假关闭；伪造规则摘要/越界坐标同步失败，human与任务文档有规则依据。实际Ruff三轮确认缺函数体、错误缩进与合法pass，保留原生发现/尝试，但可信关闭尚缺。见[验收](../../../tests/acceptance/python-structure-lint-task.md)。聚合检查、语言资格及14.11能力匹配可信关闭仍未完成；原始grammar FN2保持历史事实，父任务不勾选。

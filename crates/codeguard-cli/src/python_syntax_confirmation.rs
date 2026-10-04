@@ -78,7 +78,7 @@ pub(crate) fn persist(
         .duration_since(UNIX_EPOCH)
         .map_err(|_| "clock_unavailable")?
         .as_nanos();
-    let report = json!({
+    let mut report = json!({
         "schema_version":"0.1.0",
         "report_type":"python_syntax_confirmation_observation",
         "workspace_binding":"bound",
@@ -99,6 +99,13 @@ pub(crate) fn persist(
         "grammar_sha256":grammar_sha,
         "observations":observations,
     });
+    if let Some(rows) = precheck["structural_observations"]
+        .as_array()
+        .filter(|rows| !rows.is_empty())
+    {
+        report["schema_version"] = json!("0.2.0");
+        report["structural_observations"] = json!(rows);
+    }
     if !valid_report(root, workspace, &report) {
         return Err("syntax_confirmation_report_invalid");
     }
@@ -123,7 +130,7 @@ pub(crate) fn persist(
 
 /// 校验本地候选报告身份、源码快照和有界位置；仅允许生成待确认任务。
 pub(crate) fn valid_report(root: &Path, workspace: &str, report: &Value) -> bool {
-    let keys = [
+    let mut keys = vec![
         "schema_version",
         "report_type",
         "workspace_binding",
@@ -144,6 +151,10 @@ pub(crate) fn valid_report(root: &Path, workspace: &str, report: &Value) -> bool
         "grammar_sha256",
         "observations",
     ];
+    let has_structure = report["schema_version"] == "0.2.0";
+    if has_structure {
+        keys.push("structural_observations");
+    }
     let Some(scope) = report["scope"]
         .as_str()
         .filter(|scope| safe_python_path(scope))
@@ -170,7 +181,7 @@ pub(crate) fn valid_report(root: &Path, workspace: &str, report: &Value) -> bool
     report
         .as_object()
         .is_some_and(|map| map.len() == keys.len() && keys.iter().all(|key| map.contains_key(*key)))
-        && report["schema_version"] == "0.1.0"
+        && (report["schema_version"] == "0.1.0" || has_structure)
         && report["report_type"] == "python_syntax_confirmation_observation"
         && report["workspace_binding"] == "bound"
         && report["workspace_id"] == workspace
@@ -204,6 +215,31 @@ pub(crate) fn valid_report(root: &Path, workspace: &str, report: &Value) -> bool
                     .iter()
                     .all(|row| valid_observation(row, scope, bytes.as_deref().unwrap_or_default()))
         })
+        && (!has_structure
+            || report["structural_observations"]
+                .as_array()
+                .is_some_and(|rows| {
+                    !rows.is_empty()
+                        && rows.len() + observations.map_or(0, Vec::len) <= MAX_OBSERVATIONS
+                        && rows.iter().all(|row| {
+                            valid_structure(row, scope, bytes.as_deref().unwrap_or_default())
+                        })
+                }))
+}
+
+fn valid_structure(row: &Value, scope: &str, source: &[u8]) -> bool {
+    if row["path"] != scope || row["source_sha256"] != format!("{:x}", Sha256::digest(source)) {
+        return false;
+    }
+    let Some(mut object) = row.as_object().cloned() else {
+        return false;
+    };
+    object.remove("path");
+    object.remove("source_sha256");
+    serde_json::from_value::<crate::syntax_worker_structure::SyntaxWorkerStructure>(Value::Object(
+        object,
+    ))
+    .is_ok_and(|row| row.valid("python", source))
 }
 
 pub(crate) fn fingerprint(workspace: &str, scope: &str) -> String {

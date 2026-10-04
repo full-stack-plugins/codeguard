@@ -562,3 +562,7 @@ Claude Code 2.1.273 已有会话内插件源码加载的实际证据，覆盖成
 ### Python 隔离原生语法对照
 
 开发差分新增显式 Ruff0.16.8 / Python3.12 观察，固定 stdin、`--isolated --select E9 --ignore-noqa --no-cache`，不读取项目配置或执行用户源码。只消费合法定位的 `invalid-syntax`；普通 F401、坏路径/位置、版本变化或矛盾报告不判源码语法失败。新增0.2报告，0.1历史字节保持不变；扩展开发工具选择不扩大可信任务关闭权限。18例实际对照发现缺少函数体、错误缩进2个WASM漏检，仍为未验收候选；见[Python原生差分验收](tests/acceptance/python-native-grammar-differential.md)。
+
+### Python独立结构观察与稳定确认任务
+
+源码构建的Python兜底路径现保留独立 `codeguard.python.required_suite` 结构规则证据，不将其伪装为ERROR/MISSING。单文件lint未初始化反馈0.16、初始化反馈0.17，工作台确认报告0.2绑定源码、固定规则配置和grammar摘要；重复扫描保持同一任务，后续合法初检也不关闭。实际Ruff可确认缺函数体和错误缩进；局部零发现仍不足以证明可信关闭。历史grammar漏检报告、原生优先、资格零及交付未评估均保留；聚合与可信关闭仍缺。见[验收记录](tests/acceptance/python-structure-lint-task.md)。
