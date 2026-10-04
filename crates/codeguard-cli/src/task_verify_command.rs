@@ -611,6 +611,7 @@ pub fn run(args: &[String]) -> ExitCode {
     });
     if syntax_task {
         report["schema_version"] = json!(match report["native_scan"]["schema_version"].as_str() {
+            Some("0.8.0") => "0.19.0",
             Some("0.7.0") => "0.18.0",
             Some("0.6.0") => "0.17.0",
             Some("0.5.0") => "0.16.0",

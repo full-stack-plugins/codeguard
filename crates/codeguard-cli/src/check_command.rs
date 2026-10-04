@@ -1243,6 +1243,8 @@ pub fn run(args: &[String]) -> ExitCode {
             zig_lint["scope_stable"] = json!(false);
         }
         crate::check_zig_scan::refresh(&root, &mut zig_lint, deadline);
+        crate::native_syntax_confirmation::connect(&root, &mut zig_lint, deadline);
+        crate::check_zig_scan::refresh(&root, &mut zig_lint, deadline);
     }
     if kotlin_lint.is_object() {
         if source_recheck.or(scope_recheck).is_some() {
@@ -1567,7 +1569,12 @@ pub fn run(args: &[String]) -> ExitCode {
     }
     if zig_lint.is_object() {
         unresolved.insert("zig_project_lint_and_build_coverage_unverified".into());
-        unresolved.insert("zig_native_first_task_connection_unavailable".into());
+        if zig_lint["task_status"] == "not_connected" {
+            unresolved.insert("zig_native_task_workspace_not_connected".into());
+        }
+        if zig_lint["task_status"] == "incomplete" {
+            unresolved.insert("zig_native_task_sync_incomplete".into());
+        }
         if zig_lint["local_parse_complete"] != true {
             unresolved.insert("zig_native_scan_incomplete".into());
         }
@@ -1777,7 +1784,7 @@ pub fn run(args: &[String]) -> ExitCode {
             }
         }
         if next.is_null() {
-            let ids = [&erlang_lint, &kotlin_lint, &swift_lint]
+            let ids = [&erlang_lint, &kotlin_lint, &swift_lint, &zig_lint]
                 .into_iter()
                 .flat_map(|report| report["files"].as_array().into_iter().flatten())
                 .filter_map(|file| file["task_id"].as_str().map(str::to_owned))
@@ -1899,7 +1906,7 @@ pub fn run(args: &[String]) -> ExitCode {
         crate::check_zig_scan::refresh(&root, &mut zig_lint, deadline);
     }
     let mut report = json!({
-        "schema_version":if zig_lint.is_object() {"0.46.0"} else if matches!(parsed.selection, Selection::Language(_)) {"0.45.0"} else if swift_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.11.0" {"0.44.0"} else if swift_lint.is_object() {"0.43.0"} else if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
+        "schema_version":if zig_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.12.0" {"0.47.0"}else if zig_lint.is_object() {"0.46.0"} else if matches!(parsed.selection, Selection::Language(_)) {"0.45.0"} else if swift_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.11.0" {"0.44.0"} else if swift_lint.is_object() {"0.43.0"} else if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
         "operation":"check", "selection":parsed.selection.as_str(), "command_status":if request_cancelled { "cancelled" } else { "incomplete" },
         "exit_code":if request_cancelled { 130 } else { 3 }, "delivery_decision":if parsed.selection == Selection::All { "incomplete" } else { "not_evaluated" }, "authority":"local_unverified",
         "reason":if request_cancelled { "request_cancelled" } else if parsed.selection == Selection::All { "full_project_obligations_and_trusted_policy_unavailable" } else if parsed.selection == Selection::Java { "java_selection_obligations_and_trusted_policy_unavailable" } else { "language_selection_obligations_and_trusted_policy_unavailable" },
@@ -1916,13 +1923,13 @@ pub fn run(args: &[String]) -> ExitCode {
         "next":next,
         "export":{"status":"not_requested","reason_code":null}
     });
-    if zig_lint.is_object() {
+    if zig_lint.is_object() || report["schema_version"] == "0.47.0" {
         report["native_results"]["zig_lint"] = zig_lint.clone();
     }
     // 历史报告维持封闭协议；只有新 Kotlin 报告携带新增原生字段。
     if !matches!(
         report["schema_version"].as_str(),
-        Some("0.42.0" | "0.43.0" | "0.44.0" | "0.45.0" | "0.46.0")
+        Some("0.42.0" | "0.43.0" | "0.44.0" | "0.45.0" | "0.46.0" | "0.47.0")
     ) {
         if let Some(native) = report["native_results"].as_object_mut() {
             native.remove("kotlin_lint");
@@ -1930,7 +1937,7 @@ pub fn run(args: &[String]) -> ExitCode {
     }
     if !matches!(
         report["schema_version"].as_str(),
-        Some("0.43.0" | "0.44.0" | "0.45.0" | "0.46.0")
+        Some("0.43.0" | "0.44.0" | "0.45.0" | "0.46.0" | "0.47.0")
     ) {
         if let Some(native) = report["native_results"].as_object_mut() {
             native.remove("swift_lint");
@@ -2105,7 +2112,9 @@ pub fn run(args: &[String]) -> ExitCode {
             );
         }
         if let Some(files) = report["native_results"]["zig_lint"]["files"].as_array() {
-            println!("Zig 原生单文件 AST 检查；完整 lint、构建与首次任务接线仍待完成");
+            println!(
+                "Zig 原生单文件 AST 检查；原生诊断任务按实际同步结果提供；完整 lint 与构建仍待完成"
+            );
             for file in files {
                 println!(
                     "  {}：{}；{}",

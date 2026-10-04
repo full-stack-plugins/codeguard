@@ -385,6 +385,12 @@ fn summarize(path: &str, report: &Value) -> String {
             if file["current"] != true {
                 continue;
             }
+            if let Some(id) = file["task_id"].as_str().filter(|id| {
+                id.strip_prefix("CG-B-")
+                    .is_some_and(|s| s.len() == 32 && s.bytes().all(|b| b.is_ascii_hexdigit()))
+            }) {
+                repair.push_str(&format!("Zig 原生任务 {id}：codeguard task show {id} . --format=json；修复后 codeguard task verify {id} . --zig-tool <已核验绝对路径> --format=json。"));
+            }
             for row in file["native"]["diagnostics"]
                 .as_array()
                 .into_iter()
@@ -396,7 +402,7 @@ fn summarize(path: &str, report: &Value) -> String {
                 }
             }
         }
-        repair.push_str("Zig 修复后运行 codeguard lint zig <当前文件> --format=json；核对原工具和完整项目检查。原生首次任务尚未接线，不凭零诊断关闭历史任务。");
+        repair.push_str("Zig 修复后运行 codeguard lint zig <当前文件> --format=json；核对原工具和完整项目检查。只使用实际同步的任务ID；不凭零诊断关闭历史任务。");
     }
     if feedback["swift_lint"].is_object() {
         for file in feedback["swift_lint"]["files"]

@@ -1,0 +1,440 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:zig-ast-scan:0.2.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "scope",
+    "tool_selection",
+    "source_file_count",
+    "unobserved_count",
+    "scope_stable",
+    "local_parse_complete",
+    "files",
+    "task_status",
+    "authority",
+    "coverage_proven",
+    "delivery_decision"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.2.0"
+    },
+    "report_type": {
+      "const": "zig_ast_scan"
+    },
+    "scope": {
+      "const": "single_frozen_zig_files"
+    },
+    "tool_selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "executable"
+      ],
+      "properties": {
+        "source": {
+          "enum": [
+            "explicit",
+            "path",
+            "not_found"
+          ]
+        },
+        "executable": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "source_file_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "unobserved_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "scope_stable": {
+      "type": "boolean"
+    },
+    "local_parse_complete": {
+      "type": "boolean"
+    },
+    "files": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "source_sha256",
+          "current",
+          "tool_path",
+          "native",
+          "task_id",
+          "task_sync_reason",
+          "recheck_argv",
+          "next_action"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "pattern": ".*\\.zig$"
+          },
+          "source_sha256": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "current": {
+            "type": "boolean"
+          },
+          "tool_path": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^/"
+          },
+          "native": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "reason",
+              "version",
+              "tool_sha256",
+              "diagnostics"
+            ],
+            "properties": {
+              "status": {
+                "enum": [
+                  "not_run",
+                  "incomplete",
+                  "completed",
+                  "diagnostics_observed"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "version": {
+                "enum": [
+                  null,
+                  "0.16.0"
+                ]
+              },
+              "tool_sha256": {
+                "anyOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/$defs/digest"
+                  }
+                ]
+              },
+              "diagnostic_count": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 32
+              },
+              "diagnostics": {
+                "type": "array",
+                "maxItems": 32,
+                "items": {
+                  "$ref": "#/$defs/diagnostic"
+                }
+              }
+            }
+          },
+          "task_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^CG-B-[0-9a-f]{32}$"
+          },
+          "task_sync_reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "minLength": 1
+          },
+          "recheck_argv": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "next_action": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "current": {
+                  "const": true
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "source_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "current": {
+                  "const": false
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "native": {
+                  "properties": {
+                    "diagnostics": {
+                      "maxItems": 0
+                    },
+                    "context_diagnostics": {
+                      "maxItems": 0
+                    }
+                  }
+                },
+                "recheck_argv": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "current": {
+                  "const": false
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "native": {
+                  "properties": {
+                    "diagnostics": {
+                      "maxItems": 0
+                    }
+                  }
+                },
+                "recheck_argv": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "native": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "diagnostics_observed"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "current": {
+                  "const": true
+                },
+                "source_sha256": {
+                  "$ref": "#/$defs/digest"
+                },
+                "tool_path": {
+                  "type": "string",
+                  "pattern": "^/"
+                },
+                "native": {
+                  "required": [
+                    "diagnostic_count"
+                  ],
+                  "properties": {
+                    "version": {
+                      "const": "0.16.0"
+                    },
+                    "tool_sha256": {
+                      "$ref": "#/$defs/digest"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "native": {
+                  "properties": {
+                    "status": {
+                      "const": "completed"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "native": {
+                  "properties": {
+                    "diagnostic_count": {
+                      "const": 0
+                    },
+                    "diagnostics": {
+                      "maxItems": 0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "native": {
+                  "properties": {
+                    "status": {
+                      "const": "diagnostics_observed"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "native": {
+                  "properties": {
+                    "diagnostic_count": {
+                      "minimum": 1
+                    },
+                    "diagnostics": {
+                      "minItems": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "task_status": {
+      "enum": [
+        "synced_partial",
+        "incomplete"
+      ]
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "local_parse_complete": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "scope_stable": {
+            "const": true
+          },
+          "unobserved_count": {
+            "const": 0
+          },
+          "files": {
+            "minItems": 1,
+            "items": {
+              "properties": {
+                "current": {
+                  "const": true
+                },
+                "native": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "diagnostics_observed"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "diagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "line",
+        "column",
+        "rule_id"
+      ],
+      "properties": {
+        "line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "column": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "rule_id": {
+          "const": "zig.ast_check.error"
+        }
+      }
+    }
+  }
+}

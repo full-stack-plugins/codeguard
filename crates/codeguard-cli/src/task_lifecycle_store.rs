@@ -161,7 +161,7 @@ fn origin_matches_evidence(original: &serde_json::Value, evidence: &serde_json::
     }
     if matches!(
         original["schema_version"].as_str(),
-        Some("0.2.0" | "0.4.0" | "0.5.0")
+        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0")
     ) {
         evidence["grammar_sha256"].is_null()
             && evidence["original_source_sha256"]
@@ -257,7 +257,7 @@ pub(crate) fn guidance(
             // 只从严格绑定的首次报告区分来源；原生任务没有可归咎的 grammar。
             if matches!(
                 original["schema_version"].as_str(),
-                Some("0.2.0" | "0.4.0" | "0.5.0")
+                Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0")
             ) {
                 "原样本的原生反证未检出语法诊断；核对首次原生诊断与反证运行的输入、工具及环境差异，保留误报调查证据并提交限定范围纠错请求，不继续修改已合法源码或自行白名单放行"
             } else {

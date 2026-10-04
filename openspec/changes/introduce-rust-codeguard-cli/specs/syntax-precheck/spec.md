@@ -454,3 +454,7 @@ WASM fallback MUST 通过明确版本的协议加入既有统一命令，不静�
 #### Scenario: Aggregate checks and edit feedback prefer the invoking Zig checker
 - **WHEN** check all, check zig or selected-file editing observes ordinary Zig files and an explicit or invoking-PATH Zig tool
 - **THEN** reuse the frozen native AST probe under the shared deadline; report original diagnostics, selected-tool failures, changed input and unobserved files without substituting WASM after a selected-tool failure. Missing tools retain candidate fallback and preparation guidance. Project lint/build and trusted closure remain independent obligations; no native diagnostic may disappear because the candidate grammar reports no recovery.
+
+#### Scenario: First-native Zig observations retain one actionable confirmation task
+- **WHEN** an initialized workspace receives a current Zig AST diagnostic or selected-tool failure from lint, aggregate checking or a confirmed edit
+- **THEN** import a language-versioned native-first report with no grammar identity into the existing stable task, synchronize once per bounded scan, retain original-tool guidance and real report references, and reuse the same ID on repeated observations. A new complete clean observation creates no task; an existing task records the observation but requires independently authorized capability-matching verification before closure.

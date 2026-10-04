@@ -98,6 +98,11 @@ pub fn run(args: &[String]) -> ExitCode {
                     } else {
                         "Zig ast-check 未发现局部语法错误；仍需执行项目完整 lint、构建和测试"
                     });
+                crate::native_syntax_confirmation::connect_file(
+                    &args.source,
+                    &mut report,
+                    deadline,
+                );
                 emit(&report, args.json);
                 return ExitCode::from(3);
             }
@@ -165,6 +170,9 @@ pub fn run(args: &[String]) -> ExitCode {
         report["next_action"] =
             json!("候选初检期间源码变化；重新读取当前源码和原工具，不沿用旧观察");
     }
+    if selection.tool().is_some() && report["source_current"] == true {
+        crate::native_syntax_confirmation::connect_file(&args.source, &mut report, deadline);
+    }
     emit(&report, args.json);
     ExitCode::from(3)
 }
@@ -220,6 +228,11 @@ fn emit(report: &Value, json_format: bool) {
                 .as_str()
                 .unwrap_or("核对原生 Zig 结果")
         );
+        if let Some(id) = report["task_id"].as_str() {
+            println!(
+                "原生任务 {id}；读取 codeguard task show {id} . --format=json，修复后用原工具 task verify"
+            );
+        }
         for diagnostic in report["native"]["diagnostics"]
             .as_array()
             .into_iter()

@@ -24,8 +24,8 @@ pub(crate) fn connect_file(source: &Path, report: &mut Value, deadline: Instant)
     let Some(relative) = absolute.strip_prefix(root).ok().and_then(Path::to_str) else {
         return;
     };
-    let mut scan = json!({"tool_selection":report["tool_selection"],"files":[{
-        "path":relative,"source_sha256":report["source_sha256"],"current":true,"native":report["native"]}]});
+    let mut scan = json!({"report_type":if report["language"] == "zig" {"zig_ast_scan"}else{"erlang_forms_scan"},"tool_selection":report["tool_selection"],"files":[{
+        "path":relative,"source_sha256":report["source_sha256"],"current":true,"tool_path":report["tool_selection"]["executable"].as_str().and_then(|p| Path::new(p).canonicalize().ok()),"native":report["native"]}]});
     connect(root, &mut scan, deadline);
     report["schema_version"] = json!("0.3.0");
     report["workspace_binding"] = json!(if scan["schema_version"] == "0.2.0" {
@@ -54,7 +54,9 @@ pub(crate) fn connect(root: &Path, scan: &mut Value, deadline: Instant) {
     else {
         return;
     };
-    let language = if scan["report_type"] == "swift_parse_scan" {
+    let language = if scan["report_type"] == "zig_ast_scan" {
+        "zig"
+    } else if scan["report_type"] == "swift_parse_scan" {
         "swift"
     } else if scan["report_type"] == "kotlin_compile_scan" {
         "kotlin"
@@ -87,11 +89,13 @@ pub(crate) fn connect(root: &Path, scan: &mut Value, deadline: Instant) {
             let id = format!("CG-B-{}", &fingerprint[..32]);
             // 新的原生零诊断不创建待办；已有任务仍保存当前观察，不据此关闭。
             if (file["native"]["status"] == "completed"
-                || (matches!(language, "kotlin" | "swift")
+                || (matches!(language, "kotlin" | "swift" | "zig")
                     && cfg!(feature = "wasm-precheck")
                     && matches!(
                         file["native"]["reason"].as_str(),
-                        Some("kotlin_tool_not_found" | "swift_tool_not_found")
+                        Some(
+                            "kotlin_tool_not_found" | "swift_tool_not_found" | "zig_tool_not_found"
+                        )
                     )))
                 && !root
                     .join(format!(".codeguard/findings/{id}/finding.json"))
@@ -106,13 +110,13 @@ pub(crate) fn connect(root: &Path, scan: &mut Value, deadline: Instant) {
                 .duration_since(UNIX_EPOCH)
                 .map_err(|_| "clock_unavailable")?
                 .as_nanos();
-            let report = json!({"schema_version":if language=="swift" {"0.5.0"}else if language=="kotlin" {"0.4.0"}else{"0.2.0"},"report_type":"syntax_confirmation_observation",
+            let report = json!({"schema_version":if language=="zig" {"0.6.0"}else if language=="swift" {"0.5.0"}else if language=="kotlin" {"0.4.0"}else{"0.2.0"},"report_type":"syntax_confirmation_observation",
                 "workspace_binding":"bound","workspace_id":workspace,"run_id":format!("syntax-confirm-{}-{nanos}",std::process::id()),
                 "authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated","execution":"incomplete",
                 "checker_id":checker,"reason_code":reason,"blocker_id":id,"fingerprint":fingerprint,
                 "build_root":".","scope":path,"language":language,"affected_paths":[path],"observations":[],
                 "native_evidence":{"target":{"path":path,"language":language,"source_sha256":file["source_sha256"]},
-                    "tool_path":if matches!(language,"kotlin"|"swift") {file["tool_path"].clone()}else{tool.clone()},"native":file["native"]}});
+                    "tool_path":if matches!(language,"kotlin"|"swift"|"zig") {file["tool_path"].clone()}else{tool.clone()},"native":file["native"]}});
             if !valid_history_report(root, &workspace, &report)
                 || !crate::syntax_task_recheck::inputs_current(root, &report["native_evidence"])
             {
@@ -212,7 +216,9 @@ pub(crate) fn valid_history_report(root: &Path, workspace: &str, report: &Value)
     let Some(path) = report["scope"].as_str().filter(|p| safe_path(p)) else {
         return false;
     };
-    let language = if report["schema_version"] == "0.5.0" {
+    let language = if report["schema_version"] == "0.6.0" {
+        "zig"
+    } else if report["schema_version"] == "0.5.0" {
         "swift"
     } else if report["schema_version"] == "0.4.0" {
         "kotlin"
@@ -220,7 +226,9 @@ pub(crate) fn valid_history_report(root: &Path, workspace: &str, report: &Value)
         "erlang"
     };
     if !Path::new(path).extension().is_some_and(|e| {
-        if language == "swift" {
+        if language == "zig" {
+            e == "zig"
+        } else if language == "swift" {
             e == "swift"
         } else if language == "kotlin" {
             e == "kt"
@@ -234,7 +242,7 @@ pub(crate) fn valid_history_report(root: &Path, workspace: &str, report: &Value)
         crate::syntax_confirmation::identity(workspace, path, language);
     if !matches!(
         report["schema_version"].as_str(),
-        Some("0.2.0" | "0.4.0" | "0.5.0")
+        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0")
     ) || report["report_type"] != "syntax_confirmation_observation"
         || report["workspace_binding"] != "bound"
         || report["workspace_id"] != workspace
@@ -278,7 +286,9 @@ pub(crate) fn valid_history_report(root: &Path, workspace: &str, report: &Value)
     let current = read_bounded_regular_file(&root.join(path), 1024 * 1024)
         .ok()
         .filter(|b| evidence["target"]["source_sha256"] == digest(b));
-    if language == "swift" {
+    if language == "zig" {
+        crate::syntax_task_recheck::valid_zig_evidence(root, evidence)
+    } else if language == "swift" {
         crate::swift_syntax_probe::valid_native_observation(&evidence["native"], current.as_deref())
     } else if language == "kotlin" {
         codeguard_adapters::valid_kotlin_native_observation(&evidence["native"], current.as_deref())
@@ -297,7 +307,7 @@ pub(crate) fn latest(
 ) -> Result<Option<(u128, Value, String)>, &'static str> {
     if !matches!(
         crate::syntax_task_recheck::original(root, brief)?["language"].as_str(),
-        Some("erlang" | "kotlin" | "swift")
+        Some("erlang" | "kotlin" | "swift" | "zig")
     ) {
         return Ok(None);
     }
@@ -334,7 +344,7 @@ pub(crate) fn latest(
             codeguard_adapters::parse_unique_json(&bytes).map_err(|_| "native_history_invalid")?;
         if !matches!(
             report["schema_version"].as_str(),
-            Some("0.2.0" | "0.4.0" | "0.5.0")
+            Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0")
         ) || report["blocker_id"] != id
         {
             continue;
@@ -381,7 +391,7 @@ fn safe_path(path: &str) -> bool {
             .all(|c| matches!(c, Component::Normal(_)))
         && Path::new(path)
             .extension()
-            .is_some_and(|e| e == "erl" || e == "hrl" || e == "kt" || e == "swift")
+            .is_some_and(|e| e == "erl" || e == "hrl" || e == "kt" || e == "swift" || e == "zig")
 }
 fn exact(v: &Value, keys: &[&str]) -> bool {
     v.as_object()

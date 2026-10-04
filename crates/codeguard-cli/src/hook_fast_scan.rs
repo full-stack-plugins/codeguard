@@ -95,6 +95,10 @@ pub(crate) fn observe(
             &cancelled,
         )
     };
+    if zig_lint.is_object() {
+        crate::native_syntax_confirmation::connect(root, &mut zig_lint, deadline);
+        crate::check_zig_scan::refresh(root, &mut zig_lint, deadline);
+    }
     #[cfg(feature = "wasm-precheck")]
     let syntax = crate::check_syntax_candidates::observe_selected(
         root,
@@ -174,7 +178,7 @@ pub(crate) fn observe(
         "review_native_results_and_resolve_incomplete_checks"
     };
     let mut feedback = json!({
-        "schema_version":if zig_lint.is_object(){"0.6.0"}else if swift_lint["schema_version"] == "0.2.0" {"0.5.0"} else if swift_lint.is_object(){"0.4.0"}else if kotlin_lint.is_object(){"0.3.0"}else{"0.2.0"},"report_type":"hook_fast_feedback",
+        "schema_version":if zig_lint["schema_version"] == "0.2.0" {"0.7.0"}else if zig_lint.is_object(){"0.6.0"}else if swift_lint["schema_version"] == "0.2.0" {"0.5.0"} else if swift_lint.is_object(){"0.4.0"}else if kotlin_lint.is_object(){"0.3.0"}else{"0.2.0"},"report_type":"hook_fast_feedback",
         "scan_scope":"selected_files","requested_paths":requested,
         "python_lint":python_lint,"node_lint":node_lint,"syntax_candidates":syntax,"syntax_tasks":syntax_tasks,
         "unavailable_files":unavailable,"native_unwired_files":native_unwired,

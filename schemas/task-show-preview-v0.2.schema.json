@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:task-show-preview:0.2.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "request_id",
+    "command_status",
+    "exit_code",
+    "task",
+    "next_actions",
+    "authority",
+    "delivery_decision"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.2.0"
+    },
+    "report_type": {
+      "const": "task_show_preview"
+    },
+    "operation": {
+      "const": "task_show"
+    },
+    "request_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "command_status": {
+      "enum": [
+        "complete",
+        "incomplete",
+        "invalid_request"
+      ]
+    },
+    "exit_code": {
+      "enum": [
+        0,
+        2,
+        3
+      ]
+    },
+    "reason": {
+      "type": "string"
+    },
+    "task_id": {
+      "type": "string",
+      "pattern": "^CG-(B-)?[0-9a-f]{32}$"
+    },
+    "task": {
+      "$ref": "repair-brief-preview-v0.12.schema.json#/$defs/zig_syntax_recheck_brief"
+    },
+    "state": {
+      "const": "open"
+    },
+    "evidence_freshness": {
+      "const": "unverified"
+    },
+    "event_chain_status": {
+      "const": "unverified"
+    },
+    "next_actions": {
+      "type": "array"
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    }
+  }
+}
