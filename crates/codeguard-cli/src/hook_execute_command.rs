@@ -99,7 +99,10 @@ fn execute_parsed(
     if plan.action != HookTriggerAction::VerifyTask
         && arguments.verify_options.keys().any(|key| {
             plan.action != HookTriggerAction::FastFileCheck
-                || !matches!(key.as_str(), "--node-tool" | "--kotlinc-tool")
+                || !matches!(
+                    key.as_str(),
+                    "--node-tool" | "--kotlinc-tool" | "--swift-tool"
+                )
         })
     {
         return Err("任务复检参数仅用于 repair_ready 事件");
@@ -150,6 +153,7 @@ fn execute_parsed(
                     .verify_options
                     .get("--kotlinc-tool")
                     .map(Path::new),
+                arguments.verify_options.get("--swift-tool").map(Path::new),
                 deadline,
             );
             let cancelled = codeguard_runtime::sigint_cancellation_requested();
@@ -223,7 +227,7 @@ fn execute_parsed(
     };
     Ok((
         json!({
-            "schema_version":if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.3.0" {"0.11.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.4.0" {"0.10.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.2.0" {"0.8.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.3.0" {"0.9.0"} else {"0.7.0"}, "report_type":"hook_execution_feedback",
+            "schema_version":if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.4.0" {"0.12.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.3.0" {"0.11.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.4.0" {"0.10.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.2.0" {"0.8.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.3.0" {"0.9.0"} else {"0.7.0"}, "report_type":"hook_execution_feedback",
             "plan":plan, "execution":execution, "reason":reason,
             "local_feedback":feedback, "delivery_decision":"not_evaluated",
             "host_blocking_verified":false, "soft_result_reused":false

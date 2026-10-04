@@ -318,7 +318,18 @@ fn summarize(path: &str, report: &Value) -> String {
                 .into_iter()
                 .flatten()
         });
-    for finding in python.chain(node) {
+    let swift = feedback["swift_lint"]["files"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter(|file| file["current"] == true)
+        .flat_map(|file| {
+            file["native"]["diagnostics"]
+                .as_array()
+                .into_iter()
+                .flatten()
+        });
+    for finding in python.chain(node).chain(swift) {
         count += 1;
         if let Some(rule) = finding["rule_id"].as_str().filter(|r| {
             r.len() <= 96
@@ -342,6 +353,9 @@ fn summarize(path: &str, report: &Value) -> String {
                 .count()
         });
     let guidance = match feedback["next_action"].as_str() {
+        Some("repair_native_source") => {
+            "按当前原生字节位置修复语法，再使用原工具复检；完整 lint、类型和项目构建仍须检查"
+        }
         Some("require_native_lint_confirmation") => {
             "必须准备或修复适用的原生 lint/编译器，再确认疑似问题或恢复未完成检查；不要仅凭候选结果修改源码"
         }
@@ -355,6 +369,29 @@ fn summarize(path: &str, report: &Value) -> String {
         .as_array()
         .map_or(0, Vec::len);
     let mut repair = String::new();
+    if feedback["swift_lint"].is_object() {
+        for file in feedback["swift_lint"]["files"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter(|f| f["current"] == true)
+        {
+            for row in file["native"]["diagnostics"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .take(2)
+            {
+                if let (Some(line), Some(column)) = (row["line"].as_u64(), row["column"].as_u64()) {
+                    repair.push_str(&format!("Swift {line}:{column}（UTF-8 字节列）；"));
+                }
+            }
+        }
+        repair.push_str(
+            "Swift 原生任务同步尚未接线；当前诊断可按原工具复检，不假定已有任务或完成关闭。",
+        );
+    }
+
     for task in feedback["syntax_tasks"]["tasks"]
         .as_array()
         .into_iter()

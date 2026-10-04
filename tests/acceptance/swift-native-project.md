@@ -29,7 +29,7 @@ flowchart LR
 
 ## 保留缺口
 
-项目原生结果尚未连接稳定任务，`task_status=not_connected`、task_id=null，聚合未完成条件明确 `swift_native_task_connection_not_implemented`。缺原生工具时仍由既有候选任务路径处理，不能用该路径冒充原生任务接线。保存 Hook 的首次原生扫描、SwiftLint、注释、类型/依赖/安全、跨模块构建、完整资格及发行验收仍待实施。单文件已有 task verify 不等于本项目首次发现已形成修复闭环。父任务保持未完成；本轮不更改公开 npm0.1.4、插件锁或 grammar 字节。
+项目原生结果尚未连接稳定任务，`task_status=not_connected`、task_id=null，聚合未完成条件明确 `swift_native_task_connection_not_implemented`。缺原生工具时仍由既有候选任务路径处理，不能用该路径冒充原生任务接线。保存 Hook 首次原生观察已见[后续局部验收](swift-native-hook.md)；原生任务连接、SwiftLint、注释、类型/依赖/安全、跨模块构建、完整资格及发行验收仍待实施。单文件已有 task verify 不等于本项目首次发现已形成修复闭环。父任务保持未完成；本轮不更改公开 npm0.1.4、插件锁或 grammar 字节。
 
 本地串行回归：32grammar项目10 passed / 0 failed / 0 ignored；Hook执行19 passed / 0 failed / 2 ignored。Hook任务首轮14通过、1失败，失败是该项目测试仍断言旧聚合0.40版本；现改为0.43并增加缺原生选择和任务连接未完成断言，原稳定ID/next/重复扫描断言全部保留，单独复跑结果追加。
 

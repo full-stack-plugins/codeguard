@@ -13,6 +13,7 @@ pub(crate) fn observe(
     ruff: Option<&Path>,
     node: Option<&Path>,
     kotlinc: Option<&Path>,
+    swift: Option<&Path>,
     deadline: Instant,
 ) -> Value {
     let mut selected = BTreeSet::new();
@@ -62,6 +63,22 @@ pub(crate) fn observe(
         crate::native_syntax_confirmation::connect(root, &mut kotlin_lint, deadline);
         crate::check_kotlin_scan::refresh(root, &mut kotlin_lint, deadline);
     }
+    let swift_paths = selected
+        .iter()
+        .filter(|p| p.ends_with(".swift"))
+        .cloned()
+        .collect::<BTreeSet<_>>();
+    let mut swift_lint = if swift_paths.is_empty() {
+        Value::Null
+    } else {
+        crate::check_swift_scan::observe(
+            root,
+            &swift_paths,
+            swift.map(Path::to_path_buf),
+            deadline,
+            &cancelled,
+        )
+    };
     #[cfg(feature = "wasm-precheck")]
     let syntax = crate::check_syntax_candidates::observe_selected(
         root,
@@ -72,7 +89,7 @@ pub(crate) fn observe(
             go_lint: &Value::Null,
             erlang_lint: &Value::Null,
             kotlin_lint: &kotlin_lint,
-            swift_lint: &Value::Null,
+            swift_lint: &swift_lint,
             rust_targets: &crate::rust_native_syntax_coverage::RustNativeSyntaxCoverage::default(),
             go_tool: None,
         },
@@ -83,9 +100,14 @@ pub(crate) fn observe(
     #[cfg(not(feature = "wasm-precheck"))]
     let syntax = json!({"status":"not_run","reason":"wasm_feature_not_built","observations":[]});
     let syntax_tasks = crate::syntax_confirmation::persist(root, &syntax, deadline);
+    if swift_lint.is_object() {
+        crate::check_swift_scan::refresh(root, &mut swift_lint, deadline);
+    }
     let native_unwired: Vec<&String> = selected
         .iter()
-        .filter(|p| !p.ends_with(".py") && !p.ends_with(".kt") && !is_source(p))
+        .filter(|p| {
+            !p.ends_with(".py") && !p.ends_with(".kt") && !p.ends_with(".swift") && !is_source(p)
+        })
         .collect();
     let recoveries = syntax["observations"]
         .as_array()
@@ -102,6 +124,15 @@ pub(crate) fn observe(
             })
         }) {
         "require_native_lint_confirmation"
+    } else if swift_lint["files"].as_array().is_some_and(|files| {
+        files.iter().any(|f| {
+            f["current"] == true
+                && f["native"]["diagnostics"]
+                    .as_array()
+                    .is_some_and(|d| !d.is_empty())
+        })
+    }) {
+        "repair_native_source"
     } else if unavailable.is_empty()
         && candidate_count > 0
         && syntax["status"] == "observed_partial"
@@ -117,15 +148,18 @@ pub(crate) fn observe(
         "review_native_results_and_resolve_incomplete_checks"
     };
     let mut feedback = json!({
-        "schema_version":if kotlin_lint.is_object(){"0.3.0"}else{"0.2.0"},"report_type":"hook_fast_feedback",
+        "schema_version":if swift_lint.is_object(){"0.4.0"}else if kotlin_lint.is_object(){"0.3.0"}else{"0.2.0"},"report_type":"hook_fast_feedback",
         "scan_scope":"selected_files","requested_paths":requested,
         "python_lint":python_lint,"node_lint":node_lint,"syntax_candidates":syntax,"syntax_tasks":syntax_tasks,
         "unavailable_files":unavailable,"native_unwired_files":native_unwired,
         "candidate_recovery_count":recoveries,"next_action":next_action,
         "delivery_decision":"not_evaluated","coverage_proven":false
     });
-    if kotlin_lint.is_object() {
+    if kotlin_lint.is_object() || swift_lint.is_object() {
         feedback["kotlin_lint"] = kotlin_lint;
+    }
+    if swift_lint.is_object() {
+        feedback["swift_lint"] = swift_lint;
     }
     feedback
 }

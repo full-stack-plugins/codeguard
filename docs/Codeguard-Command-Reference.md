@@ -215,3 +215,5 @@ Development source: `check all . --kotlinc-tool ABS_PATH` and `hook execute . --
 Development source: `lint swift FILE.swift [--swift-tool ABS_PATH] --format=json` provides native-first syntax-only feedback; task verify/repair_ready remain separate existing paths. Project lint, types and build are incomplete.
 
 Development source: `check all . --swift-tool ABS_PATH` adds Swift native parse under the shared deadline. Only absent tools keep candidate fallback; selected failure does not. Full lint and project-native task connection remain open.
+
+Development source: confirmed file_changed accepts `hook execute . --swift-tool ABS_PATH` for selected Swift parsing; omission discovers invoking PATH. Other non-verification/non-save events reject the tool option. CLI Claude summaries preserve native positions and task-connection gaps.
