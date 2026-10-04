@@ -52,7 +52,7 @@ fn fixture(candidate_expiry: u64) -> Fixture {
 
 #[test]
 fn signed_candidate_binding_preserves_exact_metadata_without_granting_authority() {
-    for (candidate_expiry, effective_expiry) in [(300, 200), (180, 180)] {
+    for (candidate_expiry, effective_expiry) in [(200, 200), (180, 180)] {
         let f = fixture(candidate_expiry);
         let identity = parse_false_positive_decision_candidate(&f.candidate)
             .unwrap()
@@ -100,7 +100,7 @@ fn signed_candidate_binding_preserves_exact_metadata_without_granting_authority(
 
 #[test]
 fn candidate_or_observation_drift_and_expired_or_revoked_signature_cannot_make_a_bound_preview() {
-    let f = fixture(300);
+    let f = fixture(200);
     let identity = parse_false_positive_decision_candidate(&f.candidate)
         .unwrap()
         .identity;
@@ -176,7 +176,7 @@ fn bound_preview_never_auto_approves_and_final_gate_honors_signed_expiry_and_pol
         NativeCheckerBinding, ObligationEvidence, ObligationResult, ObligationSpec,
         evaluate_delivery,
     };
-    let f = fixture(300);
+    let f = fixture(200);
     let identity = parse_false_positive_decision_candidate(&f.candidate)
         .unwrap()
         .identity;
@@ -255,5 +255,25 @@ fn bound_preview_never_auto_approves_and_final_gate_honors_signed_expiry_and_pol
     assert_eq!(
         evaluate_delivery(&input).decision,
         DeliveryDecision::Incomplete
+    );
+}
+
+#[test]
+fn signed_candidate_outside_signature_is_rejected_instead_of_clamped() {
+    let f = fixture(300);
+    let identity = parse_false_positive_decision_candidate(&f.candidate)
+        .unwrap()
+        .identity;
+    let result = bind_signed_false_positive_preview(
+        &f.candidate,
+        &identity,
+        &f.snapshot,
+        &f.envelope,
+        &f.trust,
+        &context(),
+    );
+    assert_eq!(
+        result.err().unwrap(),
+        "approval_candidate_lifetime_outside_signature"
     );
 }

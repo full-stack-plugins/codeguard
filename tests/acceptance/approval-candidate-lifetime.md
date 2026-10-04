@@ -30,3 +30,7 @@
 - `/tmp/codeguard-approval-expiry-wasm-clippy.log`：`0d8700d190339d21c7aa58a2763c0c5f6b98be9ca6d9758d130f5d6537133add`。
 - `/tmp/codeguard-approval-expiry-openspec.log`：`cf3ec12601576e4a3dd335699d867edc30029dd07ee9fdcd6396379524b1fa4b`。
 - `/tmp/codeguard-approval-expiry-layering.log`：`280c626d05d03e0944fca548fce5a1e9039200ab2cdd1f3d68f64c12e236de36`。
+
+## 全套回归发现的旧处置断言
+
+2026-10-05 完整默认套件揭露 signed_disposition_binding_contract 的旧正例仍期望把越界候选裁剪后接受。修正正例为合法期限，并新增越界拒绝断言；身份漂移/撤销/过期负例也使用合法候选，避免被期限拒绝短路。生产安全规则不放宽。该目标4 passed；完整重跑单独验收，见[契约回归记录](contract-regression-drift.md)。

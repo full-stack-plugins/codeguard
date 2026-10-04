@@ -1357,3 +1357,9 @@ Swift check all 与成功保存 Hook 在初始化工作区同步稳定原生任�
 CI 37214829667 的 npm 全候选验收继承 Kotlin/Swift 工具，使原生优先路径取代 WASM，测试错误要求全部候选。包测试改为仅暴露 Node 的 PATH，产品选择策略不改；修复后验收结果另行记录，不以改动存在声称通过。
 
 本批最终受影响 WASM 八目标 58 passed / 0 failed / 4 ignored，默认 Swift 三目标 12 passed；默认/WASM 全目标 Clippy、236 schema 元定义与229历史字节保留、四项真实协议测试、fmt/分层/OpenSpec strict/本地文档链接通过。离线 npm 全32候选实际包调用在隔离 Node+sh PATH 后1 passed，未重跑另外两项包测试；原生策略不改。完整语料精度、实际安装宿主、可信关闭、多平台及公开发行仍未完成，不能勾选父任务。
+
+### 2026-10-05 全套回归的契约漂移收敛
+
+完整默认 suite 对15dcbbd在第172组以签名处置2失败中止（累计962 passed/2 failed/97 ignored），不记全套通过。合法签名正例改为200/180，新增300越界明确拒绝；漂移/撤销/过期反例改用合法期限，避免被无关拒绝短路。Linux37217854535的Swift初始化Hook旧协议断言已本机RED，修正为0.44/synced_partial且缺编译器不伪造原生任务；WASM任务引用一致性保留。两目标19 passed/0 failed/0 ignored，完整重跑待终态。见[回归验收](../../../tests/acceptance/contract-regression-drift.md)。
+
+9.5的缺失任务Markdown恢复场景已细化进remediation-workflow规格，尚未实现；保持原事实、事件、消费标记、租约/预算及gate不变，普通备注不覆盖，链接/目录/坏事实拒绝。父任务不勾选。

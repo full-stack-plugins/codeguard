@@ -470,3 +470,18 @@ ESLint 原生发现投影 MUST 使用工作区相对路径、原生规则、源�
 #### Scenario: Profile refresh cannot erase recorded npm remediation scope
 - **WHEN** 当前画像刷新后不再包含清单不可用的npm根，但本工作区仍有同一稳定完整性问题的本地事实记录
 - **THEN** 默认check all MUST 保留该物理构建根的准备范围；严格核验工作区、检查器、稳定身份、范围和事实结构，不能由可编辑任务附件的勾选或删除消除检查。事实只提供本地未验证范围线索，不授权原生执行、批准、关闭或覆盖；当前清单恢复后重新发现。损坏或跨工作区记录 MUST 明示范围恢复未完成，不扩展到越界路径或吞掉当前发现的其它根
+
+### Requirement: Missing task projections SHALL be recovered without changing facts
+`work sync` SHALL 在现有工作区锁内检查已持久结构化事实，为缺失的 Markdown 投影生成当前只读 RepairBrief 投影。SHALL 核验工作区、事实身份、证据及历史，不从删除或手工勾选推断关闭。现有普通任务文件 MUST 保持原字节，包括用户备注；符号链接、目录冲突、坏事实或未核验来源 MUST 明示失败，不覆盖其它路径。恢复不执行原生工具、不生成新问题或 observed/verification 事件、不改消费游标、租约、尝试预算或 gate。
+
+#### Scenario: Consumed finding survives deleted task markdown
+- **WHEN** 报告已消费、结构化事实与历史有效，用户删除 Markdown 后再次 work sync
+- **THEN** 恢复同一任务 ID 的七项可读指引，报告恢复数量；事实、历史事件及消费标记保持原字节，next 仍要求原工具复检，不签发关闭
+
+#### Scenario: Existing notes and conflicting projections
+- **WHEN** 投影包含用户备注或勾选，或缺失投影路径被符号链接/目录占用
+- **THEN** 普通文件原字节不变；路径冲突明确未完成，不跟随链接，不把文件存在视作修复证据
+
+#### Scenario: Invalid fact cannot generate repair instructions
+- **WHEN** 待恢复任务事实属于另一工作区、伪造稳定身份或证据不合法
+- **THEN** 在写入投影前拒绝恢复并保留事实，不能生成错误源码修改范围或调用原生工具
