@@ -201,7 +201,7 @@ fn clippy_config_is_observed_without_equating_manifest_with_checker_configuratio
     let visible = String::from_utf8(human.stdout).unwrap();
     assert!(visible.contains("Rust/Cargo Clippy 配置: configured"));
     assert!(visible.contains("cargo_tool_not_selected"));
-    assert!(visible.contains("复检: cargo clippy --offline --all-targets"));
+    assert!(visible.contains("复检: cargo clippy --locked --offline --all-targets"));
 }
 
 #[test]
@@ -697,4 +697,48 @@ fn real_cargo_clippy_rechecks_a_persistent_task() {
         changed["repair_brief"]["disposition"],
         "verification_required"
     );
+}
+
+#[test]
+fn missing_clippy_lock_creates_preparation_task_with_locked_recheck() {
+    let fixture = Fixture::new();
+    let init = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "init",
+            fixture.0.to_str().unwrap(),
+            "--apply",
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(init.status.code(), Some(3));
+    fs::remove_file(fixture.0.join("Cargo.lock")).unwrap();
+    let tool = fixture.tool("printf '%s\\n' executed > native-marker");
+    let (_, report) = fixture.check(&["--cargo-tool", tool.to_str().unwrap()]);
+    let scan = &report["native_results"]["rust_lint"];
+    assert_eq!(scan["reason"], "cargo_lock_unavailable");
+    assert_eq!(scan["backlog_sync"]["new_blockers"], 1);
+    assert!(!fixture.0.join("native-marker").exists());
+    let id = fs::read_dir(fixture.0.join(".codeguard/findings"))
+        .unwrap()
+        .find_map(|e| {
+            let p = e.unwrap().path().join("finding.json");
+            let fact: Value = serde_json::from_slice(&fs::read(p).unwrap()).unwrap();
+            (fact["checker_id"] == "rust.cargo_clippy")
+                .then(|| fact["id"].as_str().unwrap().to_owned())
+        })
+        .expect("Clippy 准备任务");
+    let brief = codeguard_cli::next_command::read_task_brief(&fixture.0, &id).unwrap();
+    assert_eq!(brief["kind"], "blocker");
+    assert!(brief["step"].as_str().unwrap().contains("Cargo.lock"));
+    assert!(
+        brief["recheck_argv"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|v| v == "--locked")
+    );
+    let task = fs::read_to_string(fixture.0.join(format!(".codeguard/tasks/{id}.md"))).unwrap();
+    assert!(task.contains("Cargo.lock") && task.contains("--locked"));
+    assert!(!fixture.0.join("Cargo.lock").exists());
 }

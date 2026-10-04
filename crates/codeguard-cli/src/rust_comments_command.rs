@@ -171,11 +171,11 @@ fn observe(
     let Some(tool) = tool else {
         return;
     };
-    let Ok(tool) = tool.canonicalize() else {
+    let Ok(resolved_tool) = tool.canonicalize() else {
         report["reason"] = json!("cargo_tool_unavailable");
         return;
     };
-    let Ok(tool_before) = read_bounded_regular_file(&tool, 128 * 1024 * 1024) else {
+    let Ok(tool_before) = read_bounded_regular_file(&resolved_tool, 128 * 1024 * 1024) else {
         report["reason"] = json!("cargo_tool_unavailable");
         return;
     };
@@ -236,7 +236,8 @@ fn observe(
     environment.insert(OsString::from("CARGO_NET_OFFLINE"), OsString::from("true"));
     let result = run_process(
         &ProcessSpec {
-            executable: tool.clone(),
+            // 保留 Cargo 代理入口名；直接运行解析后的 rustup 会改变命令语义。
+            executable: tool.to_path_buf(),
             args: [
                 "rustdoc",
                 "--lib",
@@ -343,8 +344,11 @@ fn observe(
         "request_cancelled"
     } else if !unchanged {
         "inputs_changed_during_scan"
-    } else if !read_bounded_regular_file(&tool, 128 * 1024 * 1024)
-        .is_ok_and(|bytes| bytes == tool_before)
+    } else if !tool
+        .canonicalize()
+        .is_ok_and(|after| after == resolved_tool)
+        || !read_bounded_regular_file(&resolved_tool, 128 * 1024 * 1024)
+            .is_ok_and(|bytes| bytes == tool_before)
     {
         "tool_changed_during_scan"
     } else if outside {

@@ -16,6 +16,7 @@ use std::time::{Instant, SystemTime, UNIX_EPOCH};
 use crate::workspace_refresh::read_workspace_baseline;
 
 static NEXT_RUN: AtomicU64 = AtomicU64::new(0);
+static NEXT_SCRATCH: AtomicU64 = AtomicU64::new(0);
 
 struct Scratch(PathBuf);
 
@@ -81,7 +82,7 @@ fn observe_cargo_clippy_inner(
         "local_scan_complete":false, "reason":"cargo_tool_not_selected",
         "tool_sha256":null, "manifest_sha256":null, "findings":[], "scope":"default_features_all_targets",
         "coverage_proven":false, "authority":"local_unverified",
-        "recheck_command":"cargo clippy --offline --all-targets --message-format=json"
+        "recheck_command":"cargo clippy --locked --offline --all-targets --message-format=json"
     });
     if let Some(rule) = force_warn_rule {
         if !rule.strip_prefix("clippy::").is_some_and(|name| {
@@ -95,7 +96,7 @@ fn observe_cargo_clippy_inner(
             return report;
         }
         report["recheck_command"] = json!(format!(
-            "cargo clippy --offline --all-targets --message-format=json -- --force-warn {rule}"
+            "cargo clippy --locked --offline --all-targets --message-format=json -- --force-warn {rule}"
         ));
     }
     let manifest = root.join("Cargo.toml");
@@ -139,6 +140,19 @@ fn observe_cargo_clippy_inner(
         return report;
     };
     report["tool_sha256"] = json!(format!("{:x}", Sha256::digest(&tool_bytes)));
+    let Ok(inputs) = crate::rust_lint_inputs::RustLintInputs::capture(root, source_files) else {
+        report["reason"] = json!("rust_inputs_unavailable");
+        return report;
+    };
+    if inputs.source("Cargo.toml") != Some(before_manifest.as_slice()) {
+        report["reason"] = json!("manifest_changed_during_scan");
+        return report;
+    }
+    if inputs.source("Cargo.lock").is_none() {
+        // 检查不得隐式生成锁文件；项目需先明确准备依赖，再按原锁复检。
+        report["reason"] = json!("cargo_lock_unavailable");
+        return report;
+    }
     let Some(scratch) = private_scratch() else {
         report["reason"] = json!("private_workspace_unavailable");
         return report;
@@ -156,6 +170,7 @@ fn observe_cargo_clippy_inner(
     environment.insert(OsString::from("CARGO_NET_OFFLINE"), OsString::from("true"));
     let mut args: Vec<OsString> = [
         "clippy",
+        "--locked",
         "--offline",
         "--all-targets",
         "--message-format=json",
@@ -202,8 +217,7 @@ fn observe_cargo_clippy_inner(
                 finding_paths_valid = false;
                 return None;
             }
-            let Ok(bytes) = read_bounded_regular_file(&root.join(&finding.path), 16 * 1024 * 1024)
-            else {
+            let Some(bytes) = inputs.source(&finding.path) else {
                 source_identity_valid = false;
                 return None;
             };
@@ -236,7 +250,7 @@ fn observe_cargo_clippy_inner(
             Some(json!({
                 "finding_id":format!("CG-{}", &fingerprint[..32]),
                 "finding_fingerprint":fingerprint,
-                "source_sha256":format!("{:x}", Sha256::digest(&bytes)),
+                "source_sha256":format!("{:x}", Sha256::digest(bytes)),
                 "rule_id":finding.rule_id,
                 "path":finding.path,
                 "line":finding.line,
@@ -248,8 +262,24 @@ fn observe_cargo_clippy_inner(
     report["findings"] = json!(findings);
     let manifest_unchanged = read_bounded_regular_file(&manifest, 256 * 1024)
         .is_ok_and(|after| after == before_manifest);
-    let reason = if !manifest_unchanged {
+    let inputs_unchanged = inputs.unchanged(root);
+    let tool_unchanged = tool
+        .canonicalize()
+        .is_ok_and(|after| after == resolved_tool)
+        && read_bounded_regular_file(&resolved_tool, 128 * 1024 * 1024)
+            .is_ok_and(|after| after == tool_bytes);
+    if !inputs_unchanged || !tool_unchanged {
+        // 陈旧诊断不能绑定到新源码，也不能产生新的源码修复任务；局部阻塞仍保留。
+        report["findings"] = json!([]);
+    }
+    let reason = if outcome.termination == Termination::Cancelled {
+        "request_cancelled"
+    } else if !manifest_unchanged {
         "manifest_changed_during_scan"
+    } else if !inputs_unchanged {
+        "rust_inputs_changed_during_scan"
+    } else if !tool_unchanged {
+        "cargo_tool_changed_during_scan"
     } else if !finding_paths_valid {
         "native_finding_outside_observed_scope"
     } else if !source_identity_valid {
@@ -296,10 +326,26 @@ fn private_scratch() -> Option<Scratch> {
         .duration_since(UNIX_EPOCH)
         .ok()?
         .as_nanos();
+    private_scratch_with_nonce(nonce)
+}
+
+fn private_scratch_with_nonce(nonce: u128) -> Option<Scratch> {
     let path = std::env::temp_dir().join(format!(
-        "codeguard-rust-clippy-{}-{nonce}",
-        std::process::id()
+        "codeguard-rust-clippy-{}-{nonce}-{}",
+        std::process::id(),
+        NEXT_SCRATCH.fetch_add(1, Ordering::Relaxed)
     ));
     fs::DirBuilder::new().mode(0o700).create(&path).ok()?;
     Some(Scratch(path))
+}
+
+#[cfg(test)]
+mod scratch_contract {
+    #[test]
+    fn identical_clock_values_do_not_collide_between_native_tasks() {
+        let first = super::private_scratch_with_nonce(0).unwrap();
+        let second =
+            super::private_scratch_with_nonce(0).expect("同进程相同时间戳必须仍分配独立私有目录");
+        assert_ne!(first.0, second.0);
+    }
 }

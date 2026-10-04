@@ -2318,3 +2318,11 @@ config validate/explain 0.3 已接通有界原生静态观察，保留来源摘�
 没有更换 grammar、安装工具或改插件锁；原有 Erlang 37 例 RED 草稿保持未提交。当前扩展仍非完整规则/suppression/批准来源解析，父任务及总体目标继续未完成。远端 CI 按新提交另行核验，不使用旧提交证明当前批次。
 
 详细事实及日志身份见[配置验收](../../../tests/acceptance/config-native-observation.md)。4.1/4.2/4.7/5.10 保持开放，同一 OpenSpec change 延续；当前新增场景覆盖配置声明、不执行动态配置、输出预算及重复旧键。
+
+## 2026-10-04 Cargo 输入稳定性与代理调用
+
+Clippy 现在在原生执行前冻结已观察源码及根配置/锁的字节或不存在状态，诊断绑定原字节，输入或工具改变撤回本轮发现。普通及抑制对照采用锁定离线命令，缺锁同步为具体环境准备任务；稳定部分诊断仍保留，取消保持优先级。Rustdoc/build 核验解析后字节但保留 Cargo 代理入口名执行，改指同字节目标也不认定完成；私有 Clippy 目录以独立序号避免同时间戳碰撞。
+
+先复现输入、锁、指引、代理与取消反例，再通过目标及真实 Cargo 测试。三份实际公开反馈、任务详情与真实 Clippy 过期源码观察已归档；正式结果及历史失败见 [Cargo 输入验收](../../../tests/acceptance/rust-clippy-input-stability.md)。本批不改变 grammar、插件锁或公开包，不提供完整 Cargo 模型/沙箱/可信关闭，父任务保持开放。
+
+本批最终默认workspace/all-targets回归216组、1213 passed/0 failed/110 ignored，完整目标WASM Clippy -D warnings通过；显式已安装Cargo三项原生验证通过。201 schema元定义、3实际公开反馈/12伪造反例、格式/分层/OpenSpec strict/双语架构命名均通过；日志、历史失败和完整范围见本批验收。没有运行已知Erlang RED的全套WASM测试，不更新grammar资格或公开包。远端CI按新提交另核验，完整目标与父任务保持未完成。

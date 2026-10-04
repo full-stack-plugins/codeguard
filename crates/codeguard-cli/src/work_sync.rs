@@ -1757,7 +1757,11 @@ fn parse_rust_report(
             reason: reason.into(),
             build_root: ".".into(),
             scope: ".".into(),
-            affected_paths: vec!["Cargo.toml".into()],
+            affected_paths: if reason == "cargo_lock_unavailable" {
+                vec!["Cargo.toml".into(), "Cargo.lock".into()]
+            } else {
+                vec!["Cargo.toml".into()]
+            },
         }]
     };
     Ok(ReportInput {
@@ -2202,17 +2206,23 @@ fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
         );
     }
     if blocker.checker_id == "rust.cargo_clippy" {
+        let step = if blocker.reason == "cargo_lock_unavailable" {
+            "恢复项目原 Cargo.lock 或按项目依赖流程准备锁文件，再执行锁定离线检查；检查器不隐式生成锁，不修改无关源码。"
+        } else {
+            "按原因准备原生工具、配置或稳定输入并重跑锁定离线检查；若工具版本或规则不适用，提交策略决策。"
+        };
         let recheck = serde_json::to_string(&[
             "cargo",
             "clippy",
+            "--locked",
             "--offline",
             "--all-targets",
             "--message-format=json",
         ])
         .expect("复检参数可编码");
         return format!(
-            "# {} 环境/配置待处理\n\n- 阻塞证据：Cargo Clippy 本轮未完成；原因 `{}`；首次报告摘要 `{}`。\n- 规则依据：原生检查完整性要求；不是源码违规。\n- 允许范围：项目根；优先恢复 Cargo、Clippy、配置或稳定输入，不得关闭检查器。\n- 修复步骤：按原因准备原生工具并重跑检查；若工具版本或规则不适用，提交策略决策。\n- 复检 argv（项目根执行）：\n\n    {}\n\n- 历史尝试：尚无记录；首次 run `{}`。\n- 关闭条件：原检查器完成同范围复检；若产生发现，应继续处理。\n\n> 本地待处理记录，不是交付通过证明。\n",
-            blocker.id, blocker.reason, report.digest, recheck, report.run_id
+            "# {} 环境/配置待处理\n\n- 阻塞证据：Cargo Clippy 本轮未完成；原因 `{}`；首次报告摘要 `{}`。\n- 规则依据：原生检查完整性要求；不是源码违规。\n- 允许范围：项目根；优先恢复 Cargo、Clippy、配置或稳定输入，不得关闭检查器。\n- 修复步骤：{}\n- 复检 argv（项目根执行）：\n\n    {}\n\n- 历史尝试：尚无记录；首次 run `{}`。\n- 关闭条件：原检查器完成同范围复检；若产生发现，应继续处理。\n\n> 本地待处理记录，不是交付通过证明。\n",
+            blocker.id, blocker.reason, report.digest, step, recheck, report.run_id
         );
     }
     if blocker.checker_id == "python.ruff" && blocker.reason == "python_syntax_confirmation_needed"
@@ -2334,6 +2344,7 @@ fn render_task(report: &ReportInput, finding: &FindingInput) -> String {
         let recheck = serde_json::to_string(&[
             "cargo",
             "clippy",
+            "--locked",
             "--offline",
             "--all-targets",
             "--message-format=json",

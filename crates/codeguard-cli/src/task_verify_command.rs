@@ -1127,6 +1127,11 @@ pub(crate) fn classify_rust(brief: &Value, scan: &Value) -> &'static str {
         let audit = &scan["suppression_probe"];
         let probe = &audit["forced_scan"];
         let expected_command = format!(
+            "cargo clippy --locked --offline --all-targets --message-format=json -- --force-warn {}",
+            brief["native_rule_id"].as_str().unwrap_or("")
+        );
+        // 历史局部报告保持可读取；两个精确已知命令均不能签发可信关闭。
+        let legacy_command = format!(
             "cargo clippy --offline --all-targets --message-format=json -- --force-warn {}",
             brief["native_rule_id"].as_str().unwrap_or("")
         );
@@ -1145,7 +1150,8 @@ pub(crate) fn classify_rust(brief: &Value, scan: &Value) -> &'static str {
             || probe["tool_sha256"] != scan["tool_sha256"]
             || probe["manifest_sha256"] != scan["manifest_sha256"]
             || probe["scope"] != scan["scope"]
-            || probe["recheck_command"] != expected_command
+            || (probe["recheck_command"] != expected_command
+                && probe["recheck_command"] != legacy_command)
         {
             return "incomplete";
         }

@@ -395,6 +395,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         json!([
             "cargo",
             "clippy",
+            "--locked",
             "--offline",
             "--all-targets",
             "--message-format=json"
@@ -629,7 +630,11 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             (
                 1,
                 "actionable",
-                "恢复 Cargo Clippy 工具、配置或稳定输入，再运行原生检查",
+                if reason == "cargo_lock_unavailable" {
+                    "先恢复项目原 Cargo.lock 或按项目依赖流程准备锁文件，再执行锁定离线 Clippy；不修改无关源码，不由检查器隐式生成锁"
+                } else {
+                    "恢复 Cargo Clippy 工具、配置或稳定输入，再运行锁定离线原生检查"
+                },
             )
         } else if reason == "project_ruff_config_not_found" {
             (

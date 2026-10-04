@@ -1791,7 +1791,9 @@ pub fn run(args: &[String]) -> ExitCode {
                 "复检: {}",
                 report["native_results"]["rust_lint"]["recheck_command"]
                     .as_str()
-                    .unwrap_or("cargo clippy --offline --all-targets --message-format=json")
+                    .unwrap_or(
+                        "cargo clippy --locked --offline --all-targets --message-format=json"
+                    )
             );
         }
         if let Some(files) = report["native_results"]["erlang_lint"]["files"].as_array() {

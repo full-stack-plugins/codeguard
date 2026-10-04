@@ -193,6 +193,8 @@ pub(crate) mod rust_build_task_recheck;
 pub mod rust_comments_command;
 pub(crate) mod rust_cve_task_recheck;
 #[cfg(unix)]
+mod rust_lint_inputs;
+#[cfg(unix)]
 pub mod rust_lint_scan;
 pub mod rustdoc_repair_brief;
 #[cfg(unix)]

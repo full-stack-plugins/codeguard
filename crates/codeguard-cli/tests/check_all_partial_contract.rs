@@ -944,6 +944,12 @@ fn check_all_cancelled_native_task_returns_130_and_keeps_discovery() {
         "[package]\nname='cancel-sample'\nversion='0.1.0'\nedition='2021'\n",
     )
     .unwrap();
+    // 此用例验证运行中的取消及兄弟任务诊断，需先满足锁定原生启动前提。
+    fs::write(
+        project.0.join("Cargo.lock"),
+        "version = 4\n[[package]]\nname=\"cancel-sample\"\nversion=\"0.1.0\"\n",
+    )
+    .unwrap();
     let ready = project.0.join("native-ready");
     let rust_ready = project.0.join("rust-ready");
     let late = project.0.join("native-late-write");
@@ -962,7 +968,7 @@ fn check_all_cancelled_native_task_returns_130_and_keeps_discovery() {
     fs::write(
         &cargo_tool,
         format!(
-            "#!/bin/sh\nsleep 2.2\nprintf '%s\\n' '{{\"reason\":\"compiler-message\",\"message\":{{\"level\":\"warning\",\"code\":{{\"code\":\"clippy::needless_return\"}},\"message\":\"unneeded return\",\"spans\":[{{\"file_name\":\"src/lib.rs\",\"line_start\":1,\"column_start\":1,\"is_primary\":true}}]}}}}' '{{\"reason\":\"build-finished\",\"success\":true}}'\n/usr/bin/touch '{}'\n",
+            "#!/bin/sh\nif [ \"$1\" != clippy ]; then printf '%s\\n' '{{\"reason\":\"build-finished\",\"success\":true}}'; exit 0; fi\nprintf '%s\\n' '{{\"reason\":\"compiler-message\",\"message\":{{\"level\":\"warning\",\"code\":{{\"code\":\"clippy::needless_return\"}},\"message\":\"unneeded return\",\"spans\":[{{\"file_name\":\"src/lib.rs\",\"line_start\":1,\"column_start\":1,\"is_primary\":true}}]}}}}' '{{\"reason\":\"build-finished\",\"success\":true}}'\n/usr/bin/touch '{}'\n",
             rust_ready.display()
         ),
     )
