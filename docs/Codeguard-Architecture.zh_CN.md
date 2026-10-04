@@ -299,6 +299,8 @@ grammars/                         # 规划中的发行资产，不是项目状�
 
 保留四 crate 的依赖方向：适配器解释观察，由 CLI 组合 runtime。WASM 工作进程接收有界源码字节，不提供通用文件系统/网络导入。父进程截止时间、终止、内存和输出上限须逐宿主验证，不能仅凭 WASM 名称声称资源已隔离。运行时与 grammar 版本还须符合声明的 Rust MSRV，否则应明确变更兼容契约。Rust 的 [Tree-sitter WasmStore](https://docs.rs/tree-sitter/latest/tree_sitter/struct.WasmStore.html)提供加载接口，不保证复制来的每个 grammar 均兼容（参考核对日期：2026-09-28）。
 
+S14.2 Rust加载器的离线固定资产、损坏/散列/ABI拒绝及Rust1.85检查已验收；32份候选可加载与已验收语法能力0并不冲突。语言精度、来源治理、隔离和发行由各自未完成任务继续承担，见[加载器核验](../tests/acceptance/rust-wasm-loader-completion.md)。
+
 ### 8.3 智能体反馈与验证闭环——目标
 
 分别报告初检、原生执行及交付状态。`clean` 仅表示未观察到语法异常；`suspected_issue` 需要确认；`incomplete` 和 `unsupported` 说明覆盖缺口。必须识别 Tree-sitter 的 `ERROR` 和 `MISSING` 恢复，归并相关节点并保留源码位置。版本/方言不确定性属于诊断上下文，不是源码错误证明。见 [Tree-sitter 查询语法](https://tree-sitter.github.io/tree-sitter/using-parsers/queries/1-syntax.html)。

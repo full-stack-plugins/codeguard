@@ -299,6 +299,8 @@ For each artifact, record language/dialect, upstream commit and patch identity, 
 
 Retain the four-crate dependency direction: adapters interpret observations; CLI composes them with runtime. WASM workers receive bounded source bytes without general filesystem/network imports. Parent-owned deadlines, process termination, memory limits and output bounds must be verified on each supported host; “WASM” alone does not prove resource isolation. Runtime and grammar versions must also fit the declared Rust MSRV or follow an explicit compatibility change. Rust's [Tree-sitter WasmStore](https://docs.rs/tree-sitter/latest/tree_sitter/struct.WasmStore.html) provides a loading API, not a guarantee that every copied grammar is compatible (reference checked 2026-09-28).
 
+S14.2 Rust-loader acceptance covers offline fixed assets, malformed/hash/ABI rejection and actual Rust1.85 checks. All32 candidates being loadable does not change the zero-qualified-grammar count. Precision, provenance governance, isolation and release remain separate unfinished tasks; see [loader verification](../tests/acceptance/rust-wasm-loader-completion.md).
+
 ### 8.3 Agent feedback and verification lifecycle — target
 
 Report precheck status separately from native execution and delivery. `clean` means only no observed syntax anomaly; `suspected_issue` needs confirmation; `incomplete` and `unsupported` identify missing coverage. Detect both Tree-sitter `ERROR` and `MISSING` recovery, group related recovery nodes and preserve source spans. Version/dialect uncertainty is diagnostic context, not proof of a source defect. See [Tree-sitter query syntax](https://tree-sitter.github.io/tree-sitter/using-parsers/queries/1-syntax.html).

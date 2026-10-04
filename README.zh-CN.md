@@ -93,6 +93,8 @@ codeguard/
 
 WASM 依赖已约束 `tree-sitter-language=0.1.7`，避免传递更新突破声明的 Rust 1.85 基线。锁定 metadata 回归与显式 1.85 CI 检查是不同层级的证据，完整目标/MSRV 验收仍开放；见[兼容验收](tests/acceptance/rust-msrv-dependency-compatibility.md)。
 
+S14.2 加载器已按指定条件验收：32份固定候选离线加载及坏字节/散列/ABI负例通过，8ca3bb1的真实Rust1.85 CI default/WASM检查成功。它不批准语言精度、资产发行或完整平台矩阵，详见[加载器核验](tests/acceptance/rust-wasm-loader-completion.md)。
+
 ```bash
 git clone https://github.com/full-stack-plugins/codeguard.git
 cd codeguard

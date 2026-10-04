@@ -42,6 +42,8 @@ WASM 的规范与 19 项实施任务已纳入既有 change；可选特性下的 
 
 当前源码固定 WASM 伴随依赖 `tree-sitter-language=0.1.7`；0.1.8 声明 Rust 1.90，与工作区基线冲突。新增按目标/特性绑定的锁定 metadata 回归，以及独立真实 Rust 1.85 CI job，分别执行静态与编译检查。无最低版本声明依赖、完整平台/MSRV 运行验收仍未解决，见[证据](../tests/acceptance/rust-msrv-dependency-compatibility.md)。
 
+8ca3bb1已通过真实Rust1.85的default/WASM全目标静态编译检查；32份候选的离线加载和坏字节/散列/ABI负例通过，S14.2加载器任务据此关闭。完整平台运行、精度和资产发行继续未验收；见[加载器核验](../tests/acceptance/rust-wasm-loader-completion.md)。
+
 
 精确依赖版本见 [Cargo.lock](../Cargo.lock)，依赖声明见四个 crate 清单。工作区当前没有公开 feature 选择矩阵、数据库服务、Web UI 或守护进程，这些模板模式不属于产品既定需求。
 

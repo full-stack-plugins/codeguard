@@ -42,6 +42,8 @@ The pinned Zig worker now also has an explicit, real Zig 0.16.0 differential tes
 
 Current source pins the WASM companion `tree-sitter-language=0.1.7`; 0.1.8 declares Rust 1.90 and conflicts with the workspace baseline. A target/feature-bound locked metadata regression and an independent actual Rust 1.85 CI job now enforce separate static/build checks. Missing dependency declarations and complete platform/MSRV runtime acceptance remain unresolved; see [evidence](../tests/acceptance/rust-msrv-dependency-compatibility.md).
 
+Commit8ca3bb1 passed actual Rust1.85 default/WASM all-target checks. Offline loading of32 candidates and malformed/hash/ABI rejection passed, closing S14.2 loader acceptance. Platform runtime, precision and asset-release acceptance remain open; see [loader verification](../tests/acceptance/rust-wasm-loader-completion.md).
+
 Exact versions are in [Cargo.lock](../Cargo.lock); dependency declarations are in the four crate manifests. The workspace currently has no public feature-selection matrix, database service, web UI, or daemon. Those template patterns are not product requirements.
 
 ## 3. Command responsibility contract

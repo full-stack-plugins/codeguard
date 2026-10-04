@@ -90,6 +90,8 @@ Use a toolchain supporting Rust edition 2024. Declaring MSRV `1.85` does not pro
 
 The WASM dependency is constrained to `tree-sitter-language=0.1.7` to preserve the declared Rust 1.85 baseline. The locked metadata regression and an explicit 1.85 CI check cover different evidence levels; full target/MSRV acceptance remains open. See [compatibility evidence](tests/acceptance/rust-msrv-dependency-compatibility.md).
 
+S14.2 loader acceptance is complete: all32 fixed candidates load offline, malformed/hash/ABI negative cases pass, and actual Rust1.85 default/WASM checks succeeded for8ca3bb1. This does not approve language precision, asset release or the full platform matrix; see [loader verification](tests/acceptance/rust-wasm-loader-completion.md).
+
 ```bash
 git clone https://github.com/full-stack-plugins/codeguard.git
 cd codeguard
