@@ -176,3 +176,9 @@ Rust RunReport 1.4 schema/结构解析及对话摘要 0.2 已加入该决策值�
 ## 原生抑制与当前复检
 
 Ruff 的 show-settings/ignore-noqa、Clippy/Rustdoc 的 force-warn、ESLint 的 print-config、Checkstyle 的首次配置身份仅是各自局部对照。未启用原规则、配置改变或抑制出现时要求复核；两轮均无诊断也只得到候选消失，不代表可信批准。CVE 还必须确认组件/解析版本/图/advisory 与数据库时效，公开脱敏标识不能反向作为私有组件身份。详细适配边界见 [适配器契约](Codeguard-Adapter-Contracts.zh_CN.md)。
+
+### 签名批准期限边界（2026-10-04 开发源码）
+
+普通候选和替代链每一跳均核对 `candidate.expires_at <= signed.expires_at`，并核对候选完整有效期不超过该跳宿主固定的 `max_lifetime_seconds`。快照中更宽松的期限不扩大这些上限。超限返回 `approval_candidate_lifetime_outside_signature`；签名正确、摘要匹配且当前尚未过期也不能绕过。候选创建早于签发并不自行构成错误，合法的较短期限仍可绑定。
+
+这是受保护宿主 SDK 的绑定约束，不替代审批来源、当前原生身份和完整门禁验证；本地候选仍无放行效力。测试证据见[期限边界验收](../tests/acceptance/approval-candidate-lifetime.md)。

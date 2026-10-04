@@ -56,3 +56,9 @@ Cargo-audit can compare advisories with current lockfile package/version/source/
 Snapshots, revisions, signatures, Git ancestry and current host clock are detailed in [trust and distribution](Codeguard-Trust-and-Distribution.md). Project `approved=true`, locally computed hashes and filenames under decisions are not authority. Final gate matching requires host-frozen workspace/baseline/policy/checker mapping and current time; missing or mismatched context preserves the active finding and unresolved state.
 
 Track raw findings, adjudicated false positives, accepted risks, matches, expired entries and false negatives separately. Growing whitelist volume triggers rule/adapter root-cause review, not broader matching. Matched findings remain in evaluation datasets and denominators. The [Chinese field and lifecycle specification](Codeguard-False-Positive-Governance.zh_CN.md) retains the detailed binding and correction examples.
+
+### Signed approval lifetime boundary (2026-10-04 development source)
+
+Ordinary candidates and every replacement-chain hop enforce `candidate.expires_at <= signed.expires_at` and a candidate lifetime no longer than that hop's host-fixed `max_lifetime_seconds`. A more permissive snapshot cannot expand either limit. Violations return `approval_candidate_lifetime_outside_signature`, even with a valid signature, matching digest and currently valid clock. Candidate creation before signature issuance is not itself rejected; valid shorter lifetimes remain bindable.
+
+This protected-host SDK constraint does not establish approval provenance, current native identity or a complete delivery gate. Local candidates still cannot authorize delivery. See [lifetime acceptance](../tests/acceptance/approval-candidate-lifetime.md).

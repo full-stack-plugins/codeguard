@@ -33,6 +33,7 @@ pub fn verify_and_bind_replacement_chain(
     }
     let current = crate::verify_signed_approval(envelope_bytes, snapshot_bytes, trust, context)?;
     check_signed_snapshot_revision(snapshot_bytes, current.policy_revision())?;
+    check_signed_candidate_lifetime(candidate_bytes, &current, context)?;
     let mut child_sequence = current.revision_sequence();
     let mut child_issued = current.issued_at();
     let mut pins = Vec::with_capacity(priors.len());
@@ -47,6 +48,7 @@ pub fn verify_and_bind_replacement_chain(
             &prior.context,
         )?;
         check_signed_snapshot_revision(prior.snapshot_bytes, verified.policy_revision())?;
+        check_signed_candidate_lifetime(prior.decision_bytes, &verified, &prior.context)?;
         if verified.revision_sequence() >= child_sequence
             || verified.issued_at() > child_issued
             || prior
@@ -86,6 +88,26 @@ pub fn verify_and_bind_replacement_chain(
     ))
 }
 
+// 快照中较宽松的期限不能扩大该跳已核验的签名窗口或宿主上限。
+fn check_signed_candidate_lifetime(
+    bytes: &[u8],
+    verified: &crate::VerifiedApprovalSnapshot,
+    context: &crate::ApprovalVerificationContext<'_>,
+) -> Result<(), &'static str> {
+    // 非法候选仍由严格绑定器返回原有 InvalidCandidate，不提升其身份。
+    if let Ok(candidate) = parse_false_positive_decision_candidate(bytes) {
+        if candidate.expires_at > verified.expires_at()
+            || candidate
+                .expires_at
+                .checked_sub(candidate.created_at)
+                .is_none_or(|lifetime| lifetime > context.max_lifetime_seconds)
+        {
+            return Err("approval_candidate_lifetime_outside_signature");
+        }
+    }
+    Ok(())
+}
+
 fn check_signed_snapshot_revision(bytes: &[u8], revision: &str) -> Result<(), &'static str> {
     let snapshot: ApprovalSnapshot =
         serde_json::from_slice(bytes).map_err(|_| "approval_snapshot_invalid")?;
@@ -112,6 +134,7 @@ pub fn verify_and_bind_candidate(
 ) -> Result<SnapshotResolution, &'static str> {
     let verified = crate::verify_signed_approval(envelope_bytes, snapshot_bytes, trust, context)?;
     check_signed_snapshot_revision(snapshot_bytes, verified.policy_revision())?;
+    check_signed_candidate_lifetime(candidate_bytes, &verified, context)?;
     Ok(bind_candidate_to_snapshot(
         candidate_bytes,
         observed,

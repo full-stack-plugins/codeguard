@@ -55,3 +55,9 @@ CodeGraph loads grammar WASM with JavaScript `web-tree-sitter`, which was also u
 Full WASM distribution still requires pinned patches, compatibility ranges and corpora. Copying an active build directory is not a release contract. Users should not require tree-sitter-cli. The Rust parser host needs memory/time limits, safe loading, integrity verification and explicit unsupported/error status.
 
 Retain release/grammar manifests for rollback and invalidate observations affected by changed identities. Preserve historical workbench records; rollback cannot erase findings or required native checks. Detailed retained snapshot and package edge cases are in the [Chinese companion](Codeguard-Trust-and-Distribution.zh_CN.md).
+
+### Signed approval lifetime boundary (2026-10-04 development source)
+
+Ordinary candidates and every replacement-chain hop enforce `candidate.expires_at <= signed.expires_at` and a candidate lifetime no longer than that hop's host-fixed `max_lifetime_seconds`. A more permissive snapshot cannot expand either limit. Violations return `approval_candidate_lifetime_outside_signature`, even with a valid signature, matching digest and currently valid clock. Candidate creation before signature issuance is not itself rejected; valid shorter lifetimes remain bindable.
+
+This protected-host SDK constraint does not establish approval provenance, current native identity or a complete delivery gate. Local candidates still cannot authorize delivery. See [lifetime acceptance](../tests/acceptance/approval-candidate-lifetime.md).

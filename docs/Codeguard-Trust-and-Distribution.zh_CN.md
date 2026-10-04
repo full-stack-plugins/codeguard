@@ -78,3 +78,9 @@ CodeGraph 使用 JavaScript `web-tree-sitter` 加载 grammar WASM，初始 ABI �
 完整 WASM 发行仍须固定补丁、兼容范围及语料，不得复制活动目录或运行时取 latest。包内资产应离线可用，按需加载；取消或部分覆盖不缓存 clean。升级/回滚重新核验资产和缓存身份，保留历史观察与白名单失效记录。完整生产声明还需平台、宿主、原生工具和质量评测分别验收。
 
 回滚不得静默回到旧 Python fail-open。只能恢复兼容严格契约的已验证版本；只能使用 legacy 观察时，交付继续未认证。
+
+### 签名批准期限边界（2026-10-04 开发源码）
+
+普通候选和替代链每一跳均核对 `candidate.expires_at <= signed.expires_at`，并核对候选完整有效期不超过该跳宿主固定的 `max_lifetime_seconds`。快照中更宽松的期限不扩大这些上限。超限返回 `approval_candidate_lifetime_outside_signature`；签名正确、摘要匹配且当前尚未过期也不能绕过。候选创建早于签发并不自行构成错误，合法的较短期限仍可绑定。
+
+这是受保护宿主 SDK 的绑定约束，不替代审批来源、当前原生身份和完整门禁验证；本地候选仍无放行效力。测试证据见[期限边界验收](../tests/acceptance/approval-candidate-lifetime.md)。

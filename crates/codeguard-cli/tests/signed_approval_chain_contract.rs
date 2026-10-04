@@ -443,3 +443,27 @@ fn native_git_binding_rejects_signed_but_unrelated_prior_baselines() {
     );
     fs::remove_dir_all(root).unwrap();
 }
+
+#[test]
+fn every_replacement_candidate_respects_its_own_signed_expiry() {
+    for (index, excess_window) in (0..3).flat_map(|i| [(i, true), (i, false)]) {
+        let mut chain = Chain::new();
+        let mut candidate: Value = serde_json::from_slice(&chain.decisions[index]).unwrap();
+        candidate["created_at"] =
+            json!((index + 1) * 100 + usize::from(excess_window) - usize::from(!excess_window));
+        candidate["expires_at"] = json!((index + 2) * 100 + usize::from(excess_window));
+        chain.decisions[index] = serde_json::to_vec(&candidate).unwrap();
+        let mut snapshot: Value = serde_json::from_slice(&chain.snapshots[index]).unwrap();
+        snapshot["max_lifetime_seconds"] = json!(101);
+        snapshot["decisions"][0]["sha256"] =
+            json!(format!("{:x}", Sha256::digest(&chain.decisions[index])));
+        chain.snapshots[index] = serde_json::to_vec(&snapshot).unwrap();
+        let pair = Ed25519KeyPair::from_seed_unchecked(&[7; 32]).unwrap();
+        chain.envelopes[index] = sign(&pair, &chain.snapshots[index], index, None);
+        assert_eq!(
+            chain.bind(&[chain.prior(1), chain.prior(0)]),
+            Err("approval_candidate_lifetime_outside_signature"),
+            "hop {index}"
+        );
+    }
+}
