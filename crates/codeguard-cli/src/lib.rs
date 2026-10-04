@@ -268,6 +268,7 @@ mod npm_task_recheck;
 
 mod npm_check_scan;
 
+mod native_syntax_confirmation;
 #[cfg(unix)]
 mod syntax_confirmation;
 

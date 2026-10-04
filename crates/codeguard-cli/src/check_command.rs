@@ -1169,6 +1169,8 @@ pub fn run(args: &[String]) -> ExitCode {
             crate::check_erlang_scan::invalidate_scope(&mut erlang_lint);
         }
         crate::check_erlang_scan::refresh(&root, &mut erlang_lint, deadline);
+        crate::native_syntax_confirmation::connect(&root, &mut erlang_lint, deadline);
+        crate::check_erlang_scan::refresh(&root, &mut erlang_lint, deadline);
     }
     let python_doc_observed = python_lint["files"].as_array().is_some_and(|files| {
         files.iter().any(|file| {
@@ -1637,7 +1639,7 @@ pub fn run(args: &[String]) -> ExitCode {
         "next_action":"使用包含固定语法资产的发行包运行候选初检，并完成适用原生检查"
     });
     let report = json!({
-        "schema_version":"0.36.0", "report_type":"check_feedback",
+        "schema_version":if erlang_lint["schema_version"] == "0.2.0" {"0.37.0"} else {"0.36.0"}, "report_type":"check_feedback",
         "operation":"check", "selection":parsed.selection.as_str(), "command_status":if request_cancelled { "cancelled" } else { "incomplete" },
         "exit_code":if request_cancelled { 130 } else { 3 }, "delivery_decision":if parsed.selection == Selection::All { "incomplete" } else { "not_evaluated" }, "authority":"local_unverified",
         "reason":if request_cancelled { "request_cancelled" } else if parsed.selection == Selection::All { "full_project_obligations_and_trusted_policy_unavailable" } else { "java_selection_obligations_and_trusted_policy_unavailable" },
@@ -1836,6 +1838,15 @@ pub fn run(args: &[String]) -> ExitCode {
                 }
                 if !file["recheck_argv"].is_null() {
                     println!("  复检 argv：{}", file["recheck_argv"]);
+                }
+                if !file["task_id"].is_null() {
+                    println!(
+                        "  稳定修复任务：{}；运行 codeguard next 获取当前动作",
+                        file["task_id"]
+                    );
+                }
+                if let Some(reason) = file["task_sync_reason"].as_str() {
+                    println!("  任务同步未完成：{reason}；原生观察仍保留");
                 }
             }
         }

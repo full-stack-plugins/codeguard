@@ -593,10 +593,10 @@ pub fn run(args: &[String]) -> ExitCode {
         "next_actions":["inspect_native_recheck_and_policy_before_closure"]
     });
     if syntax_task {
-        report["schema_version"] = json!(if report["native_scan"]["schema_version"] == "0.2.0" {
-            "0.13.0"
-        } else {
-            "0.12.0"
+        report["schema_version"] = json!(match report["native_scan"]["schema_version"].as_str() {
+            Some("0.3.0") => "0.14.0",
+            Some("0.2.0") => "0.13.0",
+            _ => "0.12.0",
         });
         report["next_actions"] = json!([
             "inspect_native_syntax_observation",

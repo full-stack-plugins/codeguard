@@ -1197,3 +1197,9 @@ Swift 差分纠正先以状态断言暴露旧清单文案的红测，再按真�
 对应 12.11、14.17、14.19：保留历史 186 例，Rust 导入器加入 22 例结构反例与 Dart 上游 150 例，当前固定 358 例/32 语言/35 个语言×来源组。全部 worker 实际运行，355 可判定、3 unknown；Dart 上游组相对自身预期 4 TP、146 TN、无差异。CFQuery/COBOL 两例 pending 独立列组，不计指标；Erlang 10 FN、VB.NET 1 FP 仍未修复。0.2 保留逐组分母、选定合法/非法预期、来源摘要和原始报告，多来源汇总只加计数、不混算 precision/recall；0.1 schema/语料/旧证据不改写。
 
 解析器空树、缺分隔符吞样例与报告缺来源组覆盖计数分别有 RED→GREEN；全字节语料复现、版本拒绝、取消/期限、程序变化和归档不变量有目标回归。见 [0.2 实际验收](../../../tests/acceptance/grammar-cohort-regression-evaluation.md)。未引入 Python 产品运行时、不改变 grammar、npm 或插件锁。本切片不是独立原生 oracle、批准 holdout、语言精度或宿主验收，父任务与完整目标仍未完成。既有 Erlang 37 例 RED 草稿继续保留；不删除失败样例换取验收。
+
+## 2026-10-04 原生首次发现的任务接线（已验证切片）
+
+8.134 / 9.4 / 9.10 / 14.10–14.11：已初始化 `check all` 与最近工作台的 `lint erlang FILE` 直接持久当前原生诊断或环境/预处理阻塞，首次报告不伪造 WASM。重复扫描和历史 WASM 来源共享一个文件/语言任务；每批工作台同步一次。next 比较已消费扫描/复检证据，源码/工具变化撤回位置；repair_ready 原工具复检返回真实保存引用。初次零诊断不建待办，已有任务零诊断不自闭，保存失败保留诊断和具体原因。
+
+原始任务缺失、缺工具任务缺失、单文件接线各有 RED→GREEN，严格导入 10 个反例、特性工作台 11 passed / 1 ignored 和显式真实 OTP 1 passed；197 schema、11 实际输出与16伪造协议拒绝、190 历史 schema 字节一致。见[验收](../../../tests/acceptance/erlang-native-first-workbench.md)。完整项目原生检查、可信关闭/复发、全语言、实际宿主与发行仍缺；父任务不勾选。37例 Erlang grammar RED 草稿和公开 npm/插件状态保持。

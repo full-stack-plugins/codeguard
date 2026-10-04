@@ -2272,3 +2272,13 @@ Rust 开发入口复用现有隔离 worker 和 Core 统计，启动前核对清�
 - `/tmp/codeguard-grammar-cohorts-schema-final.log`：SHA-256 `6076751be24d233d39bf1177716734b14beca1d80a29c73d90d18b720145e49b`。
 
 补充依赖方向验收：`crate_boundaries` 当前 7 passed/0 failed/0 ignored；日志 `/tmp/codeguard-grammar-cohorts-boundaries-final.log` SHA-256 `078f67a27d10f7e9b5d729940bebd7c897fcb94a8bde6b7bf28c8c3a5f5c351d`。新增 corpus 解析/样本对象仅在 adapters，未引入 runtime 依赖。
+
+## 2026-10-04 Erlang 原生首次发现到稳定修复任务
+
+原生结果不再必须依赖一次 WASM recovery 才能建任务。初始化工作区的聚合检查与最近已有工作台的单文件 lint 复用同一 file/language 身份、当前源码和所选工具证据，缺工具/预处理进入环境任务，批次只同步一次。首次原生报告明确无 WASM 数据；next 引用最新实际扫描或复检，不伪造 task_verify 事件。历史 WASM 来源和新来源共用任务、租约、尝试、原工具复检与 Hook；零诊断仍不自闭。
+
+实际 RED、导入反例、默认35/特性69目标结果、最终工作台11和显式OTP1、197 schema/11实际输出/16伪造反例、190旧schema字节一致均见[本批验收](../../../tests/acceptance/erlang-native-first-workbench.md)。目标组有重叠，忽略项不当通过。workspace全目标特性Clippy、fmt、分层和严格OpenSpec已通过；全工作区终态和新SHA远端结果另记。语法资产、公开npm及插件锁未改；完整项目、可信关闭、真实宿主和全语言资格仍缺，父任务与整个目标保持开放。
+
+本批最终默认全工作区 212 组、1172 passed / 0 failed / 109 ignored，退出0；日志摘要和模板审查的实际RED见本批验收。源码新提交CI和完整产品验收仍独立核验，不凭本地默认全量认定已知WASM语法缺陷解决。
+
+模板修正后的最终相关特性目标51 passed / 0 failed / 4 ignored，两个显式真实OTP目标分别各1 passed，workspace/all-targets/WASM Clippy -D warnings退出0；完整命令与日志摘要见本批验收。现有纯准备策略仅允许非空、完整、合格的clean降为推荐；未验收grammar的零恢复仍未完成。未关闭父任务，未提升语言资格，未更改公开发行制品。

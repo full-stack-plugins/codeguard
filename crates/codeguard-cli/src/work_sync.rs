@@ -2042,9 +2042,17 @@ fn persist_local_blocker_observation(
 }
 
 fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
+    if blocker.checker_id == "syntax.native_confirmation"
+        && blocker.diagnostic_reason.as_deref() == Some("erlang_native_first_observation")
+    {
+        return format!(
+            "# {} Erlang 原生检查发现待处理\n\n- 问题证据：范围 `{}`；报告 `.codeguard/reports/{}.json`，摘要 `{}`，记录当前源码、工具身份和原生诊断或环境阻塞；首次证据不含 WASM 观察。\n- 规则依据：OTP 28 原生 scanner/parser；局部语法诊断与缺工具、版本、预处理阻塞分别处理，不视为完整项目 lint 结论。\n- 允许修改范围：当前原生诊断成立时仅修复该范围源码；环境阻塞仅恢复原工具、版本和项目预处理上下文，不修改无关源码或关闭检查。\n- 修复步骤：先运行 codeguard next . --format=json 核对最新证据和允许动作，再按当前原生位置修复或恢复具体环境；源码或工具改变先复检，旧位置不能沿用。\n- 复检命令：codeguard task verify {} . --erl-tool <next 建议或已核验的绝对路径> --format=json；复用原生工具，不因已有诊断重复安装。\n- 历史尝试：首次 run {}；后续扫描、尝试和复检追加在同一任务，任务正文不是完整历史。\n- 关闭条件：原工具复检、可信项目策略与覆盖及正式关闭流程均满足；局部零诊断、任务勾选或安装完成不能自行关闭。\n",
+            blocker.id, blocker.scope, report.run_id, report.digest, blocker.id, report.run_id
+        );
+    }
     if blocker.checker_id == "syntax.native_confirmation" {
         return format!(
-            "# {} 原生语法确认待处理\n\n- 问题证据：范围 `{}`；报告 `.codeguard/reports/{}.json`，摘要 `{}`，含固定 grammar、源码身份和原字节疑似位置。\n- 规则依据：候选 ERROR/MISSING 恢复不是已确认源码违规。\n- 允许修改范围：对应原生工具、版本和适用项目配置；原生确认前不要修改无关源码或关闭检查。\n- 修复步骤：查看原报告语言及已知限制，准备适用 lint/编译器，确认其语法能力和同一源码范围；原生诊断成立后修复，反证进入 grammar 误报调查。\n- 复检命令：codeguard task verify {} . --format=json；当前未接入该语言的原生确认 adapter，将明确反馈能力缺口，不能以其它语言的工具替代。\n- 历史尝试：首次 run {}；追加事件和尝试保存于同一任务。\n- 关闭条件：当前输入与适用原生语法能力确认，并满足既有关闭策略；安装、WASM 零恢复或任务勾选均不能关闭。\n",
+            "# {} 原生语法确认待处理\n\n- 问题证据：范围 `{}`；报告 `.codeguard/reports/{}.json`，摘要 `{}`，含固定 grammar、源码身份和原字节疑似位置。\n- 规则依据：候选 ERROR/MISSING 恢复不是已确认源码违规。\n- 允许修改范围：对应原生工具、版本和适用项目配置；原生确认前不要修改无关源码或关闭检查。\n- 修复步骤：查看原报告语言及已知限制，准备适用 lint/编译器，确认其语法能力和同一源码范围；原生诊断成立后修复，反证进入 grammar 误报调查。\n- 复检命令：codeguard task verify {} . --format=json；先用 codeguard next 查看适用原生 adapter 和工具参数；能力缺口会明确反馈，不能以其它语言的工具替代。\n- 历史尝试：首次 run {}；追加事件和尝试保存于同一任务。\n- 关闭条件：当前输入与适用原生语法能力确认，并满足既有关闭策略；安装、WASM 零恢复或任务勾选均不能关闭。\n",
             blocker.id, blocker.scope, report.run_id, report.digest, blocker.id, report.run_id
         );
     }

@@ -1104,8 +1104,8 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
     }
     if checker_id == "syntax.native_confirmation" {
         if let Some(guidance) = crate::syntax_task_recheck::guidance(root, &brief) {
-            if guidance["schema_version"] == "0.4.0" {
-                brief["schema_version"] = json!("0.4.0");
+            if matches!(guidance["schema_version"].as_str(), Some("0.4.0" | "0.5.0")) {
+                brief["schema_version"] = guidance["schema_version"].clone();
                 brief["native_confirmation_reason"] =
                     guidance["native_confirmation_reason"].clone();
                 brief["native_column_unit"] = guidance["native_column_unit"].clone();

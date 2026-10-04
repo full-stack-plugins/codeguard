@@ -31,7 +31,9 @@ pub(super) fn parse(
             fingerprint: report["fingerprint"].as_str().unwrap().into(),
             reason: report["reason_code"].as_str().unwrap().into(),
             diagnostic_reason: Some(
-                if report["checker_id"] == "node.eslint.preparation" {
+                if report["schema_version"] == "0.2.0" {
+                    "erlang_native_first_observation"
+                } else if report["checker_id"] == "node.eslint.preparation" {
                     "eslint_syntax_confirmation_needed"
                 } else {
                     "native_syntax_confirmation_needed"

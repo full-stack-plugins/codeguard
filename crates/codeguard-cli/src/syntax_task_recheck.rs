@@ -58,10 +58,11 @@ pub(crate) fn run(
         .duration_since(UNIX_EPOCH)
         .map_err(|_| "clock_unavailable")?
         .as_nanos();
-    let mut report = json!({"schema_version":if language == "erlang" {"0.2.0"} else {"0.1.0"},"report_type":"syntax_task_recheck","operation":"task_verify",
+    let native_first = original["schema_version"] == "0.2.0";
+    let mut report = json!({"schema_version":if native_first {"0.3.0"} else if language == "erlang" {"0.2.0"} else {"0.1.0"},"report_type":"syntax_task_recheck","operation":"task_verify",
         "workspace_binding":"bound","workspace_id":original["workspace_id"],"run_id":format!("syntax-native-{}-{nanos}",std::process::id()),
         "checker_id":"syntax.native_confirmation","task_id":brief["task_id"],"authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated",
-        "target":{"path":path,"language":language,"source_sha256":target_sha},"original_report":{"run_id":original["run_id"],"sha256":brief["evidence_ref"]["first_report_sha256"],"source_sha256":original["observations"][0]["source_sha256"],"grammar_sha256":original["observations"][0]["grammar_sha256"]},
+        "target":{"path":path,"language":language,"source_sha256":target_sha},"original_report":original_reference(&original,&brief["evidence_ref"]["first_report_sha256"]),
         "tool_path":tool_path,"native":native,"input_stable":false});
     report["input_stable"] = json!(source.is_some() && inputs_current(root, &report));
     Ok(report)
@@ -113,23 +114,28 @@ pub(crate) fn original(root: &Path, brief: &Value) -> Result<Value, &'static str
         .flatten()
         .and_then(|b| b.workspace_id().map(str::to_owned))
         .ok_or("workspace_invalid")?;
-    if report["schema_version"] != "0.1.0"
+    let valid_origin = if report["schema_version"] == "0.2.0" {
+        crate::native_syntax_confirmation::valid_history_report(root, &workspace, &report)
+    } else {
+        report["schema_version"] == "0.1.0"
+            && report["language"].as_str().is_some_and(|lang| {
+                codeguard_adapters::bundled_grammar_candidates()
+                    .ok()
+                    .is_some_and(|m| {
+                        m.assets.iter().any(|a| {
+                            a.language == lang
+                                && report["observations"][0]["grammar_sha256"] == a.sha256
+                        })
+                    })
+            })
+    };
+    if !valid_origin
         || report["report_type"] != "syntax_confirmation_observation"
         || report["workspace_id"] != workspace
         || report["run_id"] != run
         || report["blocker_id"] != brief["task_id"]
         || report["checker_id"] != "syntax.native_confirmation"
         || report["scope"] != brief["scope"]
-        || !report["language"].as_str().is_some_and(|lang| {
-            codeguard_adapters::bundled_grammar_candidates()
-                .ok()
-                .is_some_and(|m| {
-                    m.assets.iter().any(|a| {
-                        a.language == lang
-                            && report["observations"][0]["grammar_sha256"] == a.sha256
-                    })
-                })
-        })
     {
         return Err("syntax_original_report_invalid");
     }
@@ -149,6 +155,14 @@ pub(crate) fn original(root: &Path, brief: &Value) -> Result<Value, &'static str
         return Err("syntax_original_report_not_synced");
     }
     Ok(report)
+}
+
+// 原生首次证据没有 grammar 身份，明确保留 null；历史 WASM 来源保持原协议。
+fn original_reference(original: &Value, sha: &Value) -> Value {
+    let native_first = original["schema_version"] == "0.2.0";
+    json!({"run_id":original["run_id"],"sha256":sha,
+        "source_sha256":if native_first {original["native_evidence"]["target"]["source_sha256"].clone()} else {original["observations"][0]["source_sha256"].clone()},
+        "grammar_sha256":if native_first {Value::Null} else {original["observations"][0]["grammar_sha256"].clone()}})
 }
 
 /// 保存或投影前重新核对当前源文件和已观察工具身份；不验证策略或完整覆盖。
@@ -215,7 +229,10 @@ fn valid_history_shape(root: &Path, report: &Value) -> bool {
     if !report
         .as_object()
         .is_some_and(|o| o.len() == keys.len() && keys.iter().all(|k| o.contains_key(*k)))
-        || !matches!(report["schema_version"].as_str(), Some("0.1.0" | "0.2.0"))
+        || !matches!(
+            report["schema_version"].as_str(),
+            Some("0.1.0" | "0.2.0" | "0.3.0")
+        )
         || report["report_type"] != "syntax_task_recheck"
         || report["operation"] != "task_verify"
         || report["workspace_binding"] != "bound"
@@ -268,10 +285,10 @@ fn valid_history_shape(root: &Path, report: &Value) -> bool {
         return false;
     };
     report["workspace_id"] == old["workspace_id"]
+        && ((report["schema_version"] == "0.3.0") == (old["schema_version"] == "0.2.0"))
         && report["target"]["path"] == old["scope"]
         && report["target"]["language"] == old["language"]
-        && report["original_report"]
-            == json!({"run_id":old["run_id"],"sha256":fact["first_report_sha256"],"source_sha256":old["observations"][0]["source_sha256"],"grammar_sha256":old["observations"][0]["grammar_sha256"]})
+        && report["original_report"] == original_reference(&old, &fact["first_report_sha256"])
         && matches!(
             report["native"]["status"].as_str(),
             Some("not_run" | "incomplete" | "completed" | "diagnostics_observed")
@@ -279,7 +296,7 @@ fn valid_history_shape(root: &Path, report: &Value) -> bool {
 }
 
 fn native_shape(root: &Path, report: &Value) -> bool {
-    if report["schema_version"] == "0.2.0" {
+    if matches!(report["schema_version"].as_str(), Some("0.2.0" | "0.3.0")) {
         let current = report["target"]["path"]
             .as_str()
             .and_then(|p| source_bytes(root, p))
@@ -472,6 +489,18 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
         }
         latest = Some((sequence, report, digest(&bytes)));
     }
+    // 同轮原生扫描是独立事实，不伪造 task verify 事件；按实际观察时间选择最新证据。
+    match crate::native_syntax_confirmation::latest(root, brief) {
+        Ok(Some(candidate)) if latest.as_ref().is_none_or(|(n, _, _)| candidate.0 > *n) => {
+            latest = Some(candidate);
+        }
+        Err(_) => {
+            return Some(
+                json!({"disposition":"verification_required","step":"原生扫描历史无法核验；先诊断证据记录，不沿用旧位置或零诊断","native_confirmation_status":"stale","native_diagnostic_positions":[]}),
+            );
+        }
+        _ => {}
+    }
     let (_, report, report_sha256) = latest?;
     let (disposition, step) = if !inputs_current(root, &report) {
         (
@@ -500,7 +529,10 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
             {
                 "Erlang 文件需要宏、条件编译或 include 上下文；当前 forms 解析不能完成确认，先恢复项目原生编译或预处理，不据此修改无关源码"
             } else if report["target"]["language"] == "erlang"
-                && report["native"]["reason"] == "explicit_erl_tool_not_provided"
+                && matches!(
+                    report["native"]["reason"].as_str(),
+                    Some("explicit_erl_tool_not_provided" | "erlang_tool_not_found_on_path")
+                )
             {
                 "未提供 Erlang 原生工具；先定位已安装的 OTP 28 erl，或按项目要求安装匹配工具，再用 --erl-tool 绝对路径复检，不修改无关源码"
             } else {
@@ -510,7 +542,14 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
     };
     let mut guidance = json!({"disposition":disposition,"step":step,"native_confirmation_status":if inputs_current(root,&report) {report["native"]["status"].clone()} else {json!("stale")}});
     if report["target"]["language"] == "erlang" {
-        guidance["schema_version"] = json!("0.4.0");
+        guidance["schema_version"] = json!(if report["run_id"]
+            .as_str()
+            .is_some_and(|r| r.starts_with("syntax-confirm-"))
+        {
+            "0.5.0"
+        } else {
+            "0.4.0"
+        });
         guidance["native_column_unit"] = json!("unicode_scalar");
         guidance["native_confirmation_reason"] = if inputs_current(root, &report) {
             report["native"]["reason"].clone()

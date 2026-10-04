@@ -8,7 +8,7 @@
 
 专题入口：[命令](Codeguard-Command-Reference.zh_CN.md)、[初始化](Codeguard-Project-Initialization.zh_CN.md)、[修复](Codeguard-Remediation-Workflow.zh_CN.md)、[误报治理](Codeguard-False-Positive-Governance.zh_CN.md)、[适配器](Codeguard-Adapter-Contracts.zh_CN.md)、[信任与分发](Codeguard-Trust-and-Distribution.zh_CN.md)、[验收](Codeguard-Validation-and-Rollout.zh_CN.md)、[旧协议](Codeguard-Legacy-Compatibility.zh_CN.md)。独立细节由专题维护，规格与任务由 OpenSpec 维护。
 
-源码构建已把 ESLint 接入 `check all` 的 `node.lint` 任务图节点，与其它原生检查共用并发与截止时间。按发现的 JS/TS/TSX 文件选择最近的模块清单、本地 ESLint 10、唯一 flat config 和 Node；搜索不越过受检根。检查阶段收集报告，汇总阶段串行同步工作台，重复发现复用同一任务。每个完整且字节匹配的原生文件可免去重复 WASM；被忽略、配置错误或工具失败的文件仍保留降级与原生原因。协议为 `check_feedback` 0.36.0、`check_aborted` 0.13.0，原协议归档；`native_results.node_lint` 提供逐文件反馈、未执行文件、同步结果及下一步。见[验收范围](../tests/acceptance/check-all-eslint.md)。这不提升 grammar 资质或代替真实宿主验收。
+源码构建已把 ESLint 接入 `check all` 的 `node.lint` 任务图节点，与其它原生检查共用并发与截止时间。按发现的 JS/TS/TSX 文件选择最近的模块清单、本地 ESLint 10、唯一 flat config 和 Node；搜索不越过受检根。检查阶段收集报告，汇总阶段串行同步工作台，重复发现复用同一任务。每个完整且字节匹配的原生文件可免去重复 WASM；被忽略、配置错误或工具失败的文件仍保留降级与原生原因。协议为未绑定检查 `check_feedback` 0.36.0 / 已初始化原生任务检查 0.37.0、`check_aborted` 0.13.0，原协议归档；`native_results.node_lint` 提供逐文件反馈、未执行文件、同步结果及下一步。见[验收范围](../tests/acceptance/check-all-eslint.md)。这不提升 grammar 资质或代替真实宿主验收。
 
 ## 1. 范围与规格归属
 
@@ -299,7 +299,7 @@ flowchart TD
 | 下一步 | 修源码、推荐/要求准备原生工具并确认、恢复配置、重扫，还是提出具体决策？ |
 | 交付 | 只是局部观察，还是完整评估的交付结果？ |
 
-[RunReport 解析](../crates/codeguard-cli/src/run_report.rs)支持通用结构化契约，[检查编排](../crates/codeguard-cli/src/check_command.rs)当前输出 `check_feedback` `0.36.0`，适配器另有专属版本化局部观察。消费者必须按协议身份与版本分派，不能假定统一 JSON 形状。当前 human 输出以中文为主，英文文档不代表运行时消息已有英文国际化。
+[RunReport 解析](../crates/codeguard-cli/src/run_report.rs)支持通用结构化契约，[检查编排](../crates/codeguard-cli/src/check_command.rs)当前按工作区绑定输出 `check_feedback` `0.36.0` / `0.37.0`，适配器另有专属版本化局部观察。消费者必须按协议身份与版本分派，不能假定统一 JSON 形状。当前 human 输出以中文为主，英文文档不代表运行时消息已有英文国际化。
 
 ### 7.3 对话报告示例——目标呈现
 
@@ -471,7 +471,7 @@ Codeguard：1 个暂存路径需要处理
 
 ### 7.5 协议版本与身份闭包
 
-当前通用 `RunReport` 为 `1.4`，聚合 `check_feedback` 为 `0.36.0`，`check_aborted` 为 `0.13.0`；适配器局部观察另有版本。版本属于具体协议，不能因为软件是 `0.1.0` 而统一改写。上面的对话/JSON 简报是目标示例，不是这三个协议的完整实例。
+当前通用 `RunReport` 为 `1.4`，聚合 `check_feedback` 为未绑定 `0.36.0` / 已初始化原生任务 `0.37.0`，`check_aborted` 为 `0.13.0`；适配器局部观察另有版本。版本属于具体协议，不能因为软件是 `0.1.0` 而统一改写。上面的对话/JSON 简报是目标示例，不是这三个协议的完整实例。
 
 目标证据链关联 workspace/request/run/obligation/finding/task/attempt；源码定位使用可逆路径表示与内容身份，依赖定位使用组件、解析版本、图和 advisory。非 UTF-8 路径不能经有损显示字符串参与匹配。摘要只能绑定字节，不能证明字节来源已批准。报告升级保留旧字段的版本语义，不将旧空 findings 升格为完整通过。
 
@@ -1015,7 +1015,7 @@ codeguard check all . --erl-tool /absolute/path/to/erl --timeout 30s --jobs 2 --
 
 只有完整、非预处理、源码与工具字节都匹配的 forms 观察才跳过重复 WASM。工具缺失保留候选初检；所选工具失败仍可伴随补充候选观察，但原生阻塞不会被洗成成功。宏/条件编译继续未完成。源码或工具变化会撤回受影响文件的当前定位和可复用 argv。项目范围变化设置 `scope_stable: false` 并保留仍与当前字节匹配的单文件诊断，同时撤回整体范围完整性。SIGINT 保持退出 130；JSON、human 和保守 SARIF 保留原生发现，不签发项目通过。
 
-协议分别为 `check_feedback` **0.36.0**、`check_aborted` **0.13.0** 和内嵌 `erlang_forms_scan` **0.1.0**；旧聚合 Schema 逐字节保留。forms 局部完整不等于项目 lint、构建和测试完整。原生发现的任务持久化与可信关闭仍未实现，报告明确 `task_id: null`，不伪造任务。已有 WASM 来源的 Erlang 确认任务继续使用独立 `task verify` 流程。公开 npm 0.1.4 不含本轮聚合能力。见[验收记录](../tests/acceptance/check-all-erlang.md)。
+已初始化工作区的原生发现现在直接进入稳定任务，不要求先有 WASM 错误：聚合反馈为 `check_feedback` **0.37.0**，内嵌 scan **0.2.0**，逐文件返回真实 `task_id` 或 `task_sync_reason`；`lint erlang FILE` 自动绑定最近已有工作台，反馈为 **0.3.0**。重复扫描和历史 WASM 来源复用同一任务，缺工具与预处理进入环境任务。未初始化检查保留旧版本，`check_aborted` 仍为 **0.13.0**，历史 schema 字节不改。可信关闭、复发重开和完整项目检查仍缺；公开 npm 0.1.4 不含本批实现。见[原生发现到修复指引](Codeguard-Native-Repair-Workflow.zh_CN.md)及[实际验收](../tests/acceptance/erlang-native-first-workbench.md)。
 
 ```mermaid
 flowchart TD
@@ -1032,7 +1032,7 @@ flowchart TD
     I --> J[Human / JSON / conservative SARIF]
 ```
 
-以下是实际 OTP 28 执行取得的完整内嵌 `erlang_forms_scan` 示例，不是完整聚合报告；任务引用为空是当前能力边界。工具摘要只绑定所选启动程序，不证明整个 OTP runtime 供应链。
+以下是实际 OTP 28 执行取得的完整内嵌 `erlang_forms_scan` 示例，不是完整聚合报告；逐文件任务引用经实际保存和同步取得。根级 task_id 为 null，因为一个批次可有多张任务。工具摘要只绑定所选启动程序，不证明整个 OTP runtime 供应链。
 
 ```json
 {
@@ -1044,7 +1044,7 @@ flowchart TD
       "current": true,
       "findings": [
         {
-          "column": 8,
+          "column": 4,
           "line": 2,
           "rule_id": "erlang.syntax.error"
         }
@@ -1052,7 +1052,7 @@ flowchart TD
       "native": {
         "diagnostics": [
           {
-            "column": 8,
+            "column": 4,
             "line": 2,
             "rule_id": "erlang.syntax.error"
           }
@@ -1065,28 +1065,30 @@ flowchart TD
         "version": "OTP 28"
       },
       "next_action": "按当前原生语法位置修复并执行 recheck_argv；仍需项目完整 lint、预处理、编译和测试",
-      "path": "sample.erl",
+      "path": "app.erl",
       "recheck_argv": [
         "codeguard",
         "lint",
         "erlang",
-        "/private/tmp/codeguard-check-erlang-reports/project/sample.erl",
+        "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-native-work-evidence-sriqn9fb/project/app.erl",
         "--erl-tool",
         "/opt/homebrew/Cellar/erlang/28.5/lib/erlang/bin/erl",
         "--format=json"
       ],
-      "source_sha256": "d66c937c29e3eba8063b468f2744f995cd24cee2399b5f63018935876f5fc9a3"
+      "source_sha256": "22b202c1303137676dc8dbf46be3c26771f4faa453a223f1b607aecd2087c9e0",
+      "task_id": "CG-B-8a1ca1e0c61f9964d131d876588ba6d9",
+      "task_sync_reason": null
     }
   ],
   "local_forms_complete": true,
   "reason": "erlang_forms_observed_unverified_project_coverage",
   "report_type": "erlang_forms_scan",
-  "schema_version": "0.1.0",
+  "schema_version": "0.2.0",
   "scope": "single_file_forms_without_preprocessing",
   "scope_stable": true,
   "source_file_count": 1,
   "task_id": null,
-  "task_status": "native_findings_not_integrated",
+  "task_status": "synced_partial",
   "tool_selection": {
     "executable": "/opt/homebrew/Cellar/erlang/28.5/lib/erlang/bin/erl",
     "source": "explicit"

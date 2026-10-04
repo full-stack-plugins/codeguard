@@ -81,6 +81,10 @@ pub(crate) fn persist(root: &Path, syntax: &Value, deadline: Instant) -> Value {
 
 /// 校验候选任务的工作区、固定 grammar、原字节位置和当前源码；不验证质量批准。
 pub(crate) fn valid_report(root: &Path, workspace: &str, report: &Value) -> bool {
+    if report["schema_version"] == "0.2.0" {
+        return crate::native_syntax_confirmation::valid_history_report(root, workspace, report)
+            && crate::syntax_task_recheck::inputs_current(root, &report["native_evidence"]);
+    }
     let keys = [
         "schema_version",
         "report_type",
@@ -269,7 +273,11 @@ fn safe_path(p: &str) -> bool {
             .components()
             .all(|c| matches!(c, Component::Normal(_)))
 }
-fn identity(workspace: &str, path: &str, language: &str) -> (&'static str, &'static str, String) {
+pub(crate) fn identity(
+    workspace: &str,
+    path: &str,
+    language: &str,
+) -> (&'static str, &'static str, String) {
     if language == "python" {
         return (
             "python.ruff",

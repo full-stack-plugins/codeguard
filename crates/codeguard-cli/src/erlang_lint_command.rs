@@ -104,6 +104,8 @@ pub fn run(args: &[String]) -> ExitCode {
     })();
     if let Err(reason) = checked {
         report["native"]["reason"] = json!(reason);
+    } else if !codeguard_runtime::sigint_cancellation_requested() {
+        crate::native_syntax_confirmation::connect_file(&args.source, &mut report, deadline);
     }
     let cancelled = codeguard_runtime::sigint_cancellation_requested();
     if cancelled {
@@ -145,6 +147,15 @@ fn emit(report: &Value, json_format: bool) {
     }
     if !report["syntax_precheck"].is_null() {
         println!("  内置 grammar 已知可能漏掉函数末尾句点；即使零恢复节点，也需原生确认");
+    }
+    if !report["task_id"].is_null() {
+        println!(
+            "  修复任务：{}；使用 codeguard next PROJECT --format=json 获取当前指引",
+            report["task_id"]
+        );
+    }
+    if let Some(reason) = report["task_sync_reason"].as_str() {
+        println!("  任务同步未完成：{reason}；原生观察仍保留");
     }
     for diagnostic in report["native"]["diagnostics"]
         .as_array()

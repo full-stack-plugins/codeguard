@@ -339,7 +339,13 @@ fn task_verification_summary(
     });
     let scan = &report["native_scan"];
     if checker_id == "syntax.native_confirmation" && scan["target"]["language"] == "erlang" {
-        if report["schema_version"] != "0.13.0" || scan["schema_version"] != "0.2.0" {
+        if !matches!(
+            (
+                report["schema_version"].as_str(),
+                scan["schema_version"].as_str()
+            ),
+            (Some("0.13.0"), Some("0.2.0")) | (Some("0.14.0"), Some("0.3.0"))
+        ) {
             return Err(("verification_report_invalid", 4));
         }
         let current =
