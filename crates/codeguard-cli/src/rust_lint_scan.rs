@@ -166,7 +166,8 @@ fn observe_cargo_clippy_inner(
             }
         }
     }
-    let Some(tool) = cargo_tool else {
+    let selected_tool = crate::cargo_tool_selection::resolve_cargo_tool(cargo_tool);
+    let Some(tool) = selected_tool.as_deref() else {
         return (report, Default::default());
     };
     let Ok(resolved_tool) = tool.canonicalize() else {
@@ -196,7 +197,13 @@ fn observe_cargo_clippy_inner(
         return (report, Default::default());
     };
     let mut environment = BTreeMap::new();
-    for name in ["PATH", "HOME", "CARGO_HOME", "RUSTUP_HOME"] {
+    for name in [
+        "PATH",
+        "HOME",
+        "CARGO_HOME",
+        "RUSTUP_HOME",
+        "RUSTUP_TOOLCHAIN",
+    ] {
         if let Some(value) = std::env::var_os(name) {
             environment.insert(OsString::from(name), value);
         }
@@ -206,6 +213,8 @@ fn observe_cargo_clippy_inner(
         scratch.0.as_os_str().to_os_string(),
     );
     environment.insert(OsString::from("CARGO_NET_OFFLINE"), OsString::from("true"));
+    // Cargo 的离线选项不约束 rustup；检查不得自动安装缺失工具链。
+    environment.insert(OsString::from("RUSTUP_AUTO_INSTALL"), OsString::from("0"));
     let mut args: Vec<OsString> = [
         "clippy",
         "--locked",

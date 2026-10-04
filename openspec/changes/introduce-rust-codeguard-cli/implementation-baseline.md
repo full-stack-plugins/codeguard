@@ -102,3 +102,10 @@ Clippy 现在在原生执行前冻结已观察源码及根配置/锁的字节或
 7.1 / 9.3 / 14.6 / 14.10：聚合 Clippy 以本轮非缓存 artifact 的原根清单和启动前源码摘要绑定目标入口，WASM 只对当前字节相同的入口免重复；覆盖不从本地报告恢复，未证明模块/条件排除源码继续检查。同规则同文件同定位的库/测试诊断只同步一项 finding，error 优先；不同位置与执行阻塞保留，重复扫描更新原任务。四项目标反例先 RED 后实现，真实公开 Cargo 检查/重复任务/缺工具/部分失败已存档。完整覆盖、历史重复任务治理和宿主/发布仍缺，父任务保持开放；最终测试/日志见 [Rust 原生优先验收](../../../tests/acceptance/check-all-native-preferred-rust.md)。
 
 本批最终默认workspace/all-targets 217组、1213 passed/0 failed/110 ignored；受影响WASM library+8集成目标9组、105 passed/0 failed/7 ignored，显式真实Cargo1 passed。默认/特性全目标Clippy -D warnings、格式/分层/OpenSpec strict/双语架构命名、201 schema与4实际反馈/任务详情及10伪造变体通过；旧schema不改。完整命令范围、实际终端/任务/重复扫描、保留的失败与日志摘要见本批验收。完整grammar、真实宿主和发布仍未完成。
+
+
+## 2026-10-04 Cargo 自动发现与禁止隐式安装
+
+7.1 / 9.3 / 14.5 / 14.6 / 14.10：当前Clippy/rustdoc/check及原任务复检从调用方绝对PATH选择首个Cargo，显式坏工具和首选执行失败不换工具；保留最终代理入口名、RUSTUP_TOOLCHAIN并强制RUSTUP_AUTO_INSTALL=0。原实现七项受控测试2通过/5失败，修复后七项通过；本机实际已安装及缺失自定义工具链的两项另显式通过。真实PATH三检查、重复扫描同一finding/新增0、still_present复检、空PATH及未安装工具链报告已归档。完整工具链/配置/项目范围、其它语言自动选择、可信关闭与实际宿主仍缺，父任务保持开放，见 [Cargo自动发现验收](../../../tests/acceptance/cargo-native-discovery.md)。
+
+本批默认workspace/all-targets 218组、1220 passed/0 failed/112 ignored；受影响WASM CLI library+九集成目标10组、143 passed/0 failed/24 ignored，显式真实Cargo目标9 passed/0 failed/0 ignored（与受控/普通测试有重叠，不相加）。默认及特性全目标Clippy -D warnings、201 schema元定义与六实际报告/18伪造反例、格式/分层/OpenSpec strict/双语架构命名通过；历史schema不改。没有完整WASM suite或358例重跑，不更改grammar、插件锁及公开包；原有Erlang RED草稿保持未提交。完整目标继续未完成。

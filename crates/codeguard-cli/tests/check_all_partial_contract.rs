@@ -27,6 +27,14 @@ impl Project {
         let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
             .args(["check", "all", self.0.to_str().unwrap(), "--format=json"])
             .args(extra)
+            .env(
+                "PATH",
+                if self.0.join("Cargo.toml").is_file() && !extra.contains(&"--cargo-tool") {
+                    std::ffi::OsString::new()
+                } else {
+                    std::env::var_os("PATH").unwrap_or_default()
+                },
+            )
             .env_remove("CODEGUARD_TIMEOUT")
             .env_remove("CODEGUARD_JOBS")
             .output()

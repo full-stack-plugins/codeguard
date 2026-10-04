@@ -49,6 +49,14 @@ impl Fixture {
         let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
             .args(["check", "all", self.0.to_str().unwrap(), "--format=json"])
             .args(extra)
+            .env(
+                "PATH",
+                if extra.contains(&"--cargo-tool") {
+                    std::env::var_os("PATH").unwrap_or_default()
+                } else {
+                    std::ffi::OsString::new()
+                },
+            )
             .env_remove("CODEGUARD_TIMEOUT")
             .env_remove("CODEGUARD_JOBS")
             .output()
@@ -196,6 +204,7 @@ fn clippy_config_is_observed_without_equating_manifest_with_checker_configuratio
             fixture.0.to_str().unwrap(),
             "--format=human",
         ])
+        .env("PATH", "")
         .output()
         .unwrap();
     let visible = String::from_utf8(human.stdout).unwrap();

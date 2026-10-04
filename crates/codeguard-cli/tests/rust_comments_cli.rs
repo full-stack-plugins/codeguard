@@ -45,6 +45,14 @@ impl Fixture {
                 "--format=json",
             ])
             .args(extra)
+            .env(
+                "PATH",
+                if extra.contains(&"--cargo-tool") {
+                    std::env::var_os("PATH").unwrap_or_default()
+                } else {
+                    std::ffi::OsString::new()
+                },
+            )
             .env_remove("CODEGUARD_TIMEOUT")
             .output()
             .unwrap();

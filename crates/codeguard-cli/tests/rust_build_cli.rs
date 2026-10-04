@@ -58,6 +58,14 @@ impl Fixture {
         let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
             .args(["build", "rust", self.0.to_str().unwrap(), "--format=json"])
             .args(args)
+            .env(
+                "PATH",
+                if args.contains(&"--cargo-tool") {
+                    std::env::var_os("PATH").unwrap_or_default()
+                } else {
+                    std::ffi::OsString::new()
+                },
+            )
             .env_remove("CODEGUARD_TIMEOUT")
             .output()
             .unwrap();

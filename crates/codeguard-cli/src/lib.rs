@@ -4,6 +4,8 @@ pub mod agents_block;
 pub mod approval_snapshot;
 mod bound_false_positive_disposition;
 #[cfg(unix)]
+mod cargo_tool_selection;
+#[cfg(unix)]
 mod check_erlang_scan;
 #[cfg(unix)]
 pub mod doctor_command;

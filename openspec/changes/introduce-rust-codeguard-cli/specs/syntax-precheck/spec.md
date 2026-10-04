@@ -58,6 +58,11 @@
 - **THEN** 仅对启动前字节与当前字节一致的该目标入口跳过重复 WASM；终端和 JSON 保留原生发现、原生优先计数及其它文件初检。完整运行无有效 artifact、失败/截断/取消、重复 JSON 键、结束记录后新增事件、工具/输入改变不得产生此覆盖
 - **AND** Cargo 的 all-targets、零诊断或 artifact 入口不能证明目录里所有 `.rs` 已参与解析；未被证明的模块、条件排除源码、其它清单目标继续初检，完整 workspace/features/targets、语法资格与交付义务保持未完成。覆盖仅在本次进程内传递，不能从可编辑本地报告导入作为跳过依据
 
+#### Scenario: Cargo is already available on the invoking PATH
+- **WHEN** Rust 聚合、comments/build 或原生任务复检没有显式 Cargo 参数，调用进程 PATH 的绝对目录存在普通可执行 Cargo 或 Cargo 代理
+- **THEN** 选择首个适用入口，保留 `cargo` 名称运行原生工具；显式无效入口、首个已选择入口的版本/执行失败不能静默改用其它 Cargo。相对或空 PATH 目录、不可执行文件不作为自动工具
+- **AND** 子进程保留调用方 RUSTUP_TOOLCHAIN，同时强制 RUSTUP_AUTO_INSTALL=0；项目或调用方工具链缺失应反馈环境未完成，不通过检查隐式下载或安装。工具字节、输入稳定性、锁定离线及原工具复检约束仍适用；发现入口不证明工具/规则批准或完整项目覆盖
+
 #### Scenario: A local checker is absent from PATH
 - **WHEN** 项目声明的本地原生工具已可按受支持方式定位
 - **THEN** 核对其配置和版本后优先运行，不创建错误的安装任务

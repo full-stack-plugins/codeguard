@@ -59,6 +59,8 @@ impl Fixture {
         ]);
         if let Some(tool) = tool {
             command.arg("--cargo-tool").arg(tool);
+        } else {
+            command.env("PATH", "");
         }
         let output = command
             .env_remove("CODEGUARD_TIMEOUT")

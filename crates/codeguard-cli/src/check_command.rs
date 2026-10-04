@@ -163,6 +163,10 @@ pub fn run(args: &[String]) -> ExitCode {
         .map(|evidence| &evidence.source_files);
     let rust_present =
         parsed.selection == Selection::All && rust_sources.is_some_and(|files| !files.is_empty());
+    if rust_present {
+        parsed.cargo_tool =
+            crate::cargo_tool_selection::resolve_cargo_tool(parsed.cargo_tool.as_deref());
+    }
     let node_sources = if parsed.selection == Selection::All {
         crate::check_eslint_scan::sources(&discovery)
     } else {
