@@ -421,3 +421,7 @@ WASM fallback MUST 通过明确版本的协议加入既有统一命令，不静�
 - **THEN** invoke the selected explicit or first absolute-PATH compiler before candidate parsing, within the shared deadline and requested scope
 - **AND** retain native syntax and context observations in a stable task without fabricating a WASM origin; selected-tool failure must not switch to a candidate parser
 - **AND** tool absence enables WASM, complete native zero diagnostics creates no new task, and repeated scans reuse existing identity and current evidence
+
+#### Scenario: Incomplete native history retains unlocated recovery guidance
+- **WHEN** a stable task originated from incomplete or unlocated candidate recovery and a later native observation still cannot confirm source diagnostics
+- **THEN** next and task show retain the unlocated limitation, forbid source edits before native confirmation, and provide concrete native-environment recovery guidance; a missing tool must not erase the original limitation or fabricate positions

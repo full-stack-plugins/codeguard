@@ -539,6 +539,28 @@ fn unlocated_recoveries_become_stable_environment_tasks_without_source_positions
             brief["task"]["native_diagnostic_positions"].is_null()
                 || brief["task"]["native_diagnostic_positions"] == json!([])
         );
+        if brief["task"]["affected_paths"][0]
+            .as_str()
+            .is_some_and(|path| path.ends_with(".kt"))
+        {
+            let path = brief["task"]["affected_paths"][0].as_str().unwrap();
+            fs::write(p.0.join(path), "object Changed {}\n").unwrap();
+            let changed = p
+                .command()
+                .args(["task", "show", id])
+                .arg(&p.0)
+                .arg("--format=json")
+                .output()
+                .unwrap();
+            assert_eq!(changed.status.code(), Some(0));
+            let stale: Value = serde_json::from_slice(&changed.stdout).unwrap();
+            let step = stale["task"]["step"].as_str().unwrap();
+            assert!(
+                step.contains("无法定位") && step.contains("不得修改源码"),
+                "{stale}"
+            );
+            assert_eq!(stale["task"]["native_diagnostic_positions"], json!([]));
+        }
     }
 }
 

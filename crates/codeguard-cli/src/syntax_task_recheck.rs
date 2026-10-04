@@ -620,6 +620,18 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
         )
     };
     let mut guidance = json!({"disposition":disposition,"step":step,"native_confirmation_status":if inputs_current(root,&report) {report["native"]["status"].clone()} else {json!("stale")}});
+    // 新的环境失败或过期观察不能抹掉首次未定位恢复的源码修复约束。
+    if (!inputs_current(root, &report)
+        || !matches!(
+            classify(&report),
+            "still_blocked" | "candidate_absent_unverified_policy"
+        ))
+        && original(root, brief).is_ok_and(|original| original["schema_version"] == "0.3.0")
+    {
+        guidance["step"] = json!(format!(
+            "候选恢复扫描未完成或错误无法定位；原生确认前不得修改源码，不虚构错误位置。{step}"
+        ));
+    }
     if report["target"]["language"] == "erlang" {
         guidance["schema_version"] = json!(if report["run_id"]
             .as_str()

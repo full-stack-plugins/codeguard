@@ -1,0 +1,515 @@
+{
+  "evidence_type": "actual_missing_native_and_stale_unlocated_guidance",
+  "base_commit": "22c6a56ec858bcff9d269215dc0a3000e7918702",
+  "uncommitted_guidance_fix": true,
+  "program_sha256": "f2f86a26ace23c7a197f6cc89b9834005bb91614421ec9569650e6f1f2e36e51",
+  "reports": {
+    "init": {
+      "exit": 3,
+      "report_sha256": "1e6ef0a0c0f64b18d24044a7276552c9d3fb9e7cc986edf0fd1196a5e795d48d",
+      "report": {
+        "changed_directories": [
+          ".codeguard",
+          ".codeguard/findings",
+          ".codeguard/tasks",
+          ".codeguard/decisions",
+          ".codeguard/reports",
+          ".codeguard/runs",
+          ".codeguard/cache",
+          ".codeguard/worktrees",
+          ".codeguard/state"
+        ],
+        "changed_files": [
+          ".codeguard/.gitignore",
+          ".codeguard/README.md",
+          ".codeguard/project.json",
+          ".codeguard/module-graph.json",
+          ".codeguard/architecture.md",
+          "AGENTS.md",
+          ".codeguard/workspace.json"
+        ],
+        "conflict_file": null,
+        "delivery_decision": "not_evaluated",
+        "init_status": "partial",
+        "mode": "apply",
+        "next_actions": [
+          "review_project_profile",
+          "complete_init_readiness",
+          "run_doctor_and_check_when_available"
+        ],
+        "observation_complete": true,
+        "operation": "init",
+        "planned_files": [
+          ".codeguard/.gitignore",
+          ".codeguard/README.md",
+          ".codeguard/project.json",
+          ".codeguard/module-graph.json",
+          ".codeguard/architecture.md",
+          ".codeguard/workspace.json",
+          "AGENTS.md"
+        ],
+        "profile_stale": null,
+        "profile_summary": {
+          "architecture": "unknown",
+          "build_model": "not_resolved",
+          "build_roots": [],
+          "checker_inventory": "partial",
+          "checkers": [],
+          "installed_versions": "not_probed",
+          "language_targets": [],
+          "languages": [
+            {
+              "id": "kotlin",
+              "manifest_count": 0,
+              "source_file_count": 1
+            }
+          ],
+          "unknown_conditions": [
+            "source_sets_not_fully_classified",
+            "dialects_not_classified"
+          ]
+        },
+        "readiness": "unknown",
+        "report_type": "init_plan",
+        "schema_version": "0.5.0",
+        "unresolved": [
+          "profile_refresh_partial",
+          "approved_quality_policy_not_bound",
+          "tool_readiness_not_probed"
+        ],
+        "workspace_id": "ws-198c62506d90196f3b86eb0fdfd41b6d"
+      }
+    },
+    "first_hook": {
+      "exit": 3,
+      "report_sha256": "4d9e31da3c33aae8e2975e504f59d4d90b3f673e782b266025174d69b4e23b7a",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "execution": "local_observation",
+        "host_blocking_verified": false,
+        "local_feedback": {
+          "candidate_recovery_count": 0,
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "kotlin_lint": {
+            "authority": "local_unverified",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "files": [
+              {
+                "current": true,
+                "native": {
+                  "context_diagnostics": [],
+                  "diagnostics": [],
+                  "reason": "kotlin_tool_not_found",
+                  "status": "incomplete",
+                  "tool_identity_scope": "launcher_only",
+                  "tool_sha256": null,
+                  "version": null
+                },
+                "next_action": "读取候选初检；疑似异常需要原生确认，完整零恢复时推荐准备原生工具",
+                "path": "App.kt",
+                "recheck_argv": null,
+                "source_sha256": "87fbb71a8f650a302ff4bdf216bc8a9835350f3b864b2b1c6a0d0fe5f3cdf9b5",
+                "task_id": null,
+                "task_sync_reason": null,
+                "tool_path": null
+              }
+            ],
+            "local_compile_complete": false,
+            "report_type": "kotlin_compile_scan",
+            "schema_version": "0.2.0",
+            "scope": "single_frozen_kt_files",
+            "scope_stable": true,
+            "source_file_count": 1,
+            "task_status": "synced_partial",
+            "tool_selection": {
+              "executable": null,
+              "source": "not_found"
+            },
+            "unobserved_count": 0
+          },
+          "native_unwired_files": [],
+          "next_action": "require_native_lint_confirmation",
+          "node_lint": {
+            "backlog_status": "not_connected",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "files": [],
+            "new_blockers": 0,
+            "new_findings": 0,
+            "next": null,
+            "reason": "eslint_files_incomplete",
+            "status": "incomplete",
+            "unexecuted_files": []
+          },
+          "python_lint": null,
+          "report_type": "hook_fast_feedback",
+          "requested_paths": [
+            "App.kt"
+          ],
+          "scan_scope": "selected_files",
+          "schema_version": "0.3.0",
+          "syntax_candidates": {
+            "authority": "candidate_unqualified",
+            "delivery_decision": "incomplete",
+            "execution_phase": "after_native",
+            "native_preferred_count": 0,
+            "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+            "observations": [
+              {
+                "byte_offset": 0,
+                "grammar_qualified": false,
+                "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+                "known_limitations": [
+                  "Kotlin 2.4.10 native compiler rejects missing parameter type in `fun f(x: ) = x`. Hidden MISSING tokens also occur in valid `object C { val value = 1 }`; Rust marks both zero-record scans incomplete. Eleven decidable cases agree with native labels and two remain unresolved. Zero recoveries cannot establish valid Kotlin syntax",
+                  "Other Kotlin versions, dialects, public native-first lint route, resource budget and release remain unqualified"
+                ],
+                "language": "kotlin",
+                "path": "App.kt",
+                "reason": "syntax_recovery_incomplete",
+                "recoveries": [],
+                "recovery_count": 0,
+                "scope": "whole_file",
+                "source_sha256": "87fbb71a8f650a302ff4bdf216bc8a9835350f3b864b2b1c6a0d0fe5f3cdf9b5",
+                "status": "candidate_observed"
+              }
+            ],
+            "reason": "candidate_unqualified",
+            "skipped_count": 0,
+            "source_file_count": 1,
+            "status": "observed_partial",
+            "unrouted_count": 0
+          },
+          "syntax_tasks": {
+            "failures": [],
+            "new_blockers": 1,
+            "status": "synced_partial",
+            "tasks": [
+              {
+                "language": "kotlin",
+                "path": "App.kt",
+                "task_id": "CG-B-855592e967988e8897b01cadbb4c0f6d"
+              }
+            ]
+          },
+          "unavailable_files": []
+        },
+        "plan": {
+          "action": "fast_file_check",
+          "host_blocking_claimed": false,
+          "may_claim_delivery": false,
+          "requires_git_snapshot": false,
+          "scope_resolution_reason": null,
+          "soft_result_reuse_candidate": true,
+          "target_paths": [
+            "App.kt"
+          ],
+          "task_id": null
+        },
+        "reason": null,
+        "report_type": "hook_execution_feedback",
+        "schema_version": "0.11.0",
+        "soft_result_reused": false
+      }
+    },
+    "repeat_hook": {
+      "exit": 3,
+      "report_sha256": "cc66e497891b4c1f82f011334b55f7e9f482329c6198b4954787366bab40986a",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "execution": "local_observation",
+        "host_blocking_verified": false,
+        "local_feedback": {
+          "candidate_recovery_count": 0,
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "kotlin_lint": {
+            "authority": "local_unverified",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "files": [
+              {
+                "current": true,
+                "native": {
+                  "context_diagnostics": [],
+                  "diagnostics": [],
+                  "reason": "kotlin_tool_not_found",
+                  "status": "incomplete",
+                  "tool_identity_scope": "launcher_only",
+                  "tool_sha256": null,
+                  "version": null
+                },
+                "next_action": "读取候选初检；疑似异常需要原生确认，完整零恢复时推荐准备原生工具",
+                "path": "App.kt",
+                "recheck_argv": null,
+                "source_sha256": "87fbb71a8f650a302ff4bdf216bc8a9835350f3b864b2b1c6a0d0fe5f3cdf9b5",
+                "task_id": "CG-B-855592e967988e8897b01cadbb4c0f6d",
+                "task_sync_reason": null,
+                "tool_path": null
+              }
+            ],
+            "local_compile_complete": false,
+            "report_type": "kotlin_compile_scan",
+            "schema_version": "0.2.0",
+            "scope": "single_frozen_kt_files",
+            "scope_stable": true,
+            "source_file_count": 1,
+            "task_status": "synced_partial",
+            "tool_selection": {
+              "executable": null,
+              "source": "not_found"
+            },
+            "unobserved_count": 0
+          },
+          "native_unwired_files": [],
+          "next_action": "require_native_lint_confirmation",
+          "node_lint": {
+            "backlog_status": "not_connected",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "files": [],
+            "new_blockers": 0,
+            "new_findings": 0,
+            "next": null,
+            "reason": "eslint_files_incomplete",
+            "status": "incomplete",
+            "unexecuted_files": []
+          },
+          "python_lint": null,
+          "report_type": "hook_fast_feedback",
+          "requested_paths": [
+            "App.kt"
+          ],
+          "scan_scope": "selected_files",
+          "schema_version": "0.3.0",
+          "syntax_candidates": {
+            "authority": "candidate_unqualified",
+            "delivery_decision": "incomplete",
+            "execution_phase": "after_native",
+            "native_preferred_count": 0,
+            "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+            "observations": [
+              {
+                "byte_offset": 0,
+                "grammar_qualified": false,
+                "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+                "known_limitations": [
+                  "Kotlin 2.4.10 native compiler rejects missing parameter type in `fun f(x: ) = x`. Hidden MISSING tokens also occur in valid `object C { val value = 1 }`; Rust marks both zero-record scans incomplete. Eleven decidable cases agree with native labels and two remain unresolved. Zero recoveries cannot establish valid Kotlin syntax",
+                  "Other Kotlin versions, dialects, public native-first lint route, resource budget and release remain unqualified"
+                ],
+                "language": "kotlin",
+                "path": "App.kt",
+                "reason": "syntax_recovery_incomplete",
+                "recoveries": [],
+                "recovery_count": 0,
+                "scope": "whole_file",
+                "source_sha256": "87fbb71a8f650a302ff4bdf216bc8a9835350f3b864b2b1c6a0d0fe5f3cdf9b5",
+                "status": "candidate_observed"
+              }
+            ],
+            "reason": "candidate_unqualified",
+            "skipped_count": 0,
+            "source_file_count": 1,
+            "status": "observed_partial",
+            "unrouted_count": 0
+          },
+          "syntax_tasks": {
+            "failures": [],
+            "new_blockers": 0,
+            "status": "synced_partial",
+            "tasks": [
+              {
+                "language": "kotlin",
+                "path": "App.kt",
+                "task_id": "CG-B-855592e967988e8897b01cadbb4c0f6d"
+              }
+            ]
+          },
+          "unavailable_files": []
+        },
+        "plan": {
+          "action": "fast_file_check",
+          "host_blocking_claimed": false,
+          "may_claim_delivery": false,
+          "requires_git_snapshot": false,
+          "scope_resolution_reason": null,
+          "soft_result_reuse_candidate": true,
+          "target_paths": [
+            "App.kt"
+          ],
+          "task_id": null
+        },
+        "reason": null,
+        "report_type": "hook_execution_feedback",
+        "schema_version": "0.11.0",
+        "soft_result_reused": false
+      }
+    },
+    "missing_show": {
+      "exit": 0,
+      "report_sha256": "de1078a644f35c95ebf79d8fc78312d128977025406737d82058c4aaf6374b58",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "event_chain_status": "unverified",
+        "evidence_freshness": "unverified",
+        "exit_code": 0,
+        "next_actions": [
+          [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-855592e967988e8897b01cadbb4c0f6d",
+            ".",
+            "--format",
+            "json"
+          ]
+        ],
+        "operation": "task_show",
+        "report_type": "task_show_preview",
+        "request_id": "view-39350-1791126672164039000",
+        "schema_version": "0.1.0",
+        "state": "open",
+        "task": {
+          "action_id": "restore-checker-environment",
+          "affected_paths": [
+            "App.kt"
+          ],
+          "authority": "local_unverified",
+          "build_root": ".",
+          "checker_id": "syntax.native_confirmation",
+          "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+          "constraints": [
+            "先恢复检查完整性",
+            "不得关闭检查器或修改无关源码"
+          ],
+          "disposition": "needs_decision",
+          "evidence_ref": {
+            "first_report_sha256": "6cd4037a6ebb782a210802ca70f7513049be5fc58e347117bf5b89e5f5234738",
+            "first_run_id": "syntax-confirm-37097-1791126657015607000"
+          },
+          "history": {
+            "attempt_count": 0,
+            "awaiting_verification": false,
+            "budget": 2,
+            "no_progress_count": 0,
+            "open_attempt_id": null,
+            "recent": []
+          },
+          "kind": "blocker",
+          "native_column_unit": "utf8_byte",
+          "native_confirmation_reason": "kotlin_tool_not_found",
+          "native_confirmation_ref": {
+            "report_ref": ".codeguard/reports/syntax-confirm-38736-1791126661323067000.json",
+            "report_sha256": "93fe3b7781ce2bf7bfc3a1c37e502f73e70335ff3029713e98f93f5f9d99a1e2",
+            "run_id": "syntax-confirm-38736-1791126661323067000"
+          },
+          "native_confirmation_status": "incomplete",
+          "native_context_diagnostics": [],
+          "native_diagnostic_positions": [],
+          "reason_code": "native_syntax_confirmation_needed",
+          "recheck_argv": [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-855592e967988e8897b01cadbb4c0f6d",
+            ".",
+            "--format",
+            "json"
+          ],
+          "schema_version": "0.10.0",
+          "scope": "App.kt",
+          "step": "候选恢复扫描未完成或错误无法定位；原生确认前不得修改源码，不虚构错误位置。Kotlin 原生确认仍未完成；核对已安装的 Kotlin/JVM 2.4.10、JDK、原生上下文诊断及项目依赖，使用 --kotlinc-tool 绝对路径复检；不根据上下文阻塞修改无关源码",
+          "task_id": "CG-B-855592e967988e8897b01cadbb4c0f6d"
+        },
+        "task_id": "CG-B-855592e967988e8897b01cadbb4c0f6d"
+      }
+    },
+    "stale_show": {
+      "exit": 0,
+      "report_sha256": "5f986cd319a6c6a7e64f4a032ef2014f1c4512ea527d8f3e146e7bc06bdd1e14",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "event_chain_status": "unverified",
+        "evidence_freshness": "unverified",
+        "exit_code": 0,
+        "next_actions": [
+          [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-855592e967988e8897b01cadbb4c0f6d",
+            ".",
+            "--format",
+            "json"
+          ]
+        ],
+        "operation": "task_show",
+        "report_type": "task_show_preview",
+        "request_id": "view-39451-1791126676334423000",
+        "schema_version": "0.1.0",
+        "state": "open",
+        "task": {
+          "action_id": "restore-checker-environment",
+          "affected_paths": [
+            "App.kt"
+          ],
+          "authority": "local_unverified",
+          "build_root": ".",
+          "checker_id": "syntax.native_confirmation",
+          "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+          "constraints": [
+            "先恢复检查完整性",
+            "不得关闭检查器或修改无关源码"
+          ],
+          "disposition": "verification_required",
+          "evidence_ref": {
+            "first_report_sha256": "6cd4037a6ebb782a210802ca70f7513049be5fc58e347117bf5b89e5f5234738",
+            "first_run_id": "syntax-confirm-37097-1791126657015607000"
+          },
+          "history": {
+            "attempt_count": 0,
+            "awaiting_verification": false,
+            "budget": 2,
+            "no_progress_count": 0,
+            "open_attempt_id": null,
+            "recent": []
+          },
+          "kind": "blocker",
+          "native_column_unit": "utf8_byte",
+          "native_confirmation_reason": "syntax_confirmation_inputs_changed",
+          "native_confirmation_ref": {
+            "report_ref": ".codeguard/reports/syntax-confirm-38736-1791126661323067000.json",
+            "report_sha256": "93fe3b7781ce2bf7bfc3a1c37e502f73e70335ff3029713e98f93f5f9d99a1e2",
+            "run_id": "syntax-confirm-38736-1791126661323067000"
+          },
+          "native_confirmation_status": "stale",
+          "native_context_diagnostics": [],
+          "native_diagnostic_positions": [],
+          "reason_code": "native_syntax_confirmation_needed",
+          "recheck_argv": [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-855592e967988e8897b01cadbb4c0f6d",
+            ".",
+            "--format",
+            "json"
+          ],
+          "schema_version": "0.10.0",
+          "scope": "App.kt",
+          "step": "候选恢复扫描未完成或错误无法定位；原生确认前不得修改源码，不虚构错误位置。源码或原生工具在语法复检后已变化；先运行当前输入的原生确认，不沿用旧修复或零诊断",
+          "task_id": "CG-B-855592e967988e8897b01cadbb4c0f6d"
+        },
+        "task_id": "CG-B-855592e967988e8897b01cadbb4c0f6d"
+      }
+    }
+  },
+  "native_tool_executed": false,
+  "trusted_closure": false,
+  "marketplace_host_acceptance": false
+}
