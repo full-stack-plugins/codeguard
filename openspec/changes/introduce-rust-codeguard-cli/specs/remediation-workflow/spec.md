@@ -507,3 +507,8 @@ ESLint 原生发现投影 MUST 使用工作区相对路径、原生规则、源�
 #### Scenario: Invalid fact cannot generate repair instructions
 - **WHEN** 待恢复任务事实属于另一工作区、伪造稳定身份或证据不合法
 - **THEN** 在写入投影前拒绝恢复并保留事实，不能生成错误源码修改范围或调用原生工具
+
+
+#### Scenario: Trusted native-first Zig resolution preserves provenance and recurrence
+- **WHEN** an initialized Zig native-first task is rechecked with its original fixed tool under an independently signed, task-bound policy
+- **THEN** grammar identity remains null; only a diagnosed original sample, changed current source and complete clean same-tool recheck may close that scoped task; native failure or changed identity cannot close it; an ordinary same-tool positive recheck reopens the same parent chain without project delivery permission

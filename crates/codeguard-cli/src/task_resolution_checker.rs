@@ -47,9 +47,14 @@ impl TaskResolutionChecker {
             Self::Kotlin => "1.3.0",
         }
     }
-    /// 返回该语言专用的脱敏证据版本。
-    pub(crate) fn evidence_version(self) -> &'static str {
+    /// 核对入口允许的签名策略版本；Zig 原生首次策略与旧 WASM 来源策略分开。
+    pub(crate) fn accepts_policy_version(self, version: &str) -> bool {
+        version == self.policy_version() || (matches!(self, Self::Zig) && version == "1.4.0")
+    }
+    /// 返回该语言专用的脱敏证据版本；参数保留 Zig 原生首次来源与旧来源的区别。
+    pub(crate) fn evidence_version(self, policy_version: &str) -> &'static str {
         match self {
+            Self::Zig if policy_version == "1.4.0" => "0.5.0",
             Self::Zig => "0.1.0",
             Self::Erlang => "0.2.0",
             Self::Swift => "0.3.0",

@@ -35,11 +35,14 @@ pub(crate) fn valid(record: &TaskLifecycleRecord, value: &Value) -> bool {
         || !(value["grammar_sha256"].as_str().is_some_and(digest)
             || (matches!(
                 value["schema_version"].as_str(),
-                Some("0.2.0" | "0.3.0" | "0.4.0")
+                Some("0.2.0" | "0.3.0" | "0.4.0" | "0.5.0")
             ) && value["grammar_sha256"].is_null()))
         || !native_for_version(value, "original_native")
         || !native_for_version(value, "current_native")
     {
+        return false;
+    }
+    if value["schema_version"] == "0.5.0" && !value["grammar_sha256"].is_null() {
         return false;
     }
     let outcome = value["outcome"].as_str().unwrap_or("");
@@ -82,7 +85,7 @@ pub(crate) fn kotlin_syntax_present(native: &Value) -> bool {
 }
 fn native_bound(value: &Value) -> bool {
     let version = match value["schema_version"].as_str() {
-        Some("0.1.0") => "0.16.0",
+        Some("0.1.0" | "0.5.0") => "0.16.0",
         Some("0.2.0") => "OTP 28",
         Some("0.3.0") => "Apple Swift 6.4",
         Some("0.4.0") => "kotlinc-jvm 2.4.10",
@@ -94,7 +97,7 @@ fn native_bound(value: &Value) -> bool {
 }
 fn native_for_version(evidence: &Value, key: &str) -> bool {
     match evidence["schema_version"].as_str() {
-        Some("0.1.0") => native(&evidence[key]),
+        Some("0.1.0" | "0.5.0") => native(&evidence[key]),
         Some("0.2.0") => crate::erlang_syntax_probe::valid_native_observation(&evidence[key], None),
         Some("0.3.0") => crate::swift_syntax_probe::valid_native_observation(&evidence[key], None),
         Some("0.4.0") => codeguard_adapters::valid_kotlin_native_observation(&evidence[key], None),

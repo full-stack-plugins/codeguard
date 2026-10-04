@@ -1,0 +1,18 @@
+{
+  "adapter_sha256": "b87d26a81c1917c2030a2de9bcd30ca7c266aa4b18392c80c242da27d21e35b4",
+  "grammar_sha256": null,
+  "identity": {
+    "checker_id": "syntax.native_confirmation",
+    "scope": "app.zig",
+    "task_id": "CG-B-87366328aa5ba51195b10c72d3e62227",
+    "workspace_id": "ws-a99b18aa9beddc80ca15a7b8b6c83a02"
+  },
+  "native_rule_id": "zig.ast_check.error",
+  "native_version": "0.16.0",
+  "original_report_sha256": "585406c8975cdcef235954a3ae7464f7b5550d7d457337237f0d4675cab64ef6",
+  "original_source_sha256": "a8ee3cd373dab58c194f1e476577f7c851ab1f2f3e0631db6508bddec0f5bbe9",
+  "policy_revision": "p1",
+  "report_type": "task_resolution_policy",
+  "schema_version": "1.4.0",
+  "tool_sha256": "71cc3995a7586753ebf82c66dfb8bef43df446517550678781834586a960f8c9"
+}

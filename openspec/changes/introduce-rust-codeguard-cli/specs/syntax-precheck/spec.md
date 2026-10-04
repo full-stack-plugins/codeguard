@@ -458,3 +458,8 @@ WASM fallback MUST 通过明确版本的协议加入既有统一命令，不静�
 #### Scenario: First-native Zig observations retain one actionable confirmation task
 - **WHEN** an initialized workspace receives a current Zig AST diagnostic or selected-tool failure from lint, aggregate checking or a confirmed edit
 - **THEN** import a language-versioned native-first report with no grammar identity into the existing stable task, synchronize once per bounded scan, retain original-tool guidance and real report references, and reuse the same ID on repeated observations. A new complete clean observation creates no task; an existing task records the observation but requires independently authorized capability-matching verification before closure.
+
+
+#### Scenario: Zig native output cannot create false completion or invalid repair coordinates
+- **WHEN** the Zig AST process exits zero with unexpected stdout, or a diagnostic position exceeds the frozen source line/byte bounds
+- **THEN** its observation remains incomplete and invalid positions are withdrawn; neither a clean result nor actionable coordinates may be inferred from the exit code alone

@@ -84,7 +84,7 @@ fn verify_task_resolution(
     }
     let policy: TaskResolutionPolicyInput =
         serde_json::from_value(raw).map_err(|_| "task_resolution_policy_invalid")?;
-    if policy.schema_version != checker.policy_version()
+    if !checker.accepts_policy_version(&policy.schema_version)
         || policy.report_type != "task_resolution_policy"
         || policy.policy_revision != approved.policy_revision()
         || policy.identity.workspace_id != request.context.workspace_id
@@ -161,19 +161,23 @@ fn original_binding_matches(
 ) -> bool {
     if matches!(
         original["schema_version"].as_str(),
-        Some("0.2.0" | "0.4.0" | "0.5.0")
+        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0")
     ) {
-        matches!(checker.language(), "erlang" | "swift" | "kotlin")
+        (matches!(checker.language(), "erlang" | "swift" | "kotlin")
+            || (checker.language() == "zig"
+                && policy.schema_version == "1.4.0"
+                && original["schema_version"] == "0.6.0"))
             && policy.grammar_sha256.is_none()
             && original["native_evidence"]["target"]["source_sha256"]
                 == policy.original_source_sha256
             && original["native_evidence"]["native"]["tool_sha256"] == policy.tool_sha256
             && original["native_evidence"]["native"]["version"] == policy.native_version
     } else {
-        policy.grammar_sha256.as_ref().is_some_and(|grammar| {
-            original["observations"][0]["source_sha256"] == policy.original_source_sha256
-                && original["observations"][0]["grammar_sha256"] == *grammar
-        })
+        policy.schema_version != "1.4.0"
+            && policy.grammar_sha256.as_ref().is_some_and(|grammar| {
+                original["observations"][0]["source_sha256"] == policy.original_source_sha256
+                    && original["observations"][0]["grammar_sha256"] == *grammar
+            })
     }
 }
 fn execute(
@@ -290,7 +294,7 @@ fn execute(
     {
         outcome = "resolution_history_binding_changed";
     }
-    let raw_evidence=serde_json::to_vec_pretty(&json!({"schema_version":checker.evidence_version(),"report_type":"task_resolution_evidence","identity":policy.identity,"original_report_sha256":policy.original_report_sha256,"original_source_sha256":policy.original_source_sha256,"current_source_sha256":digest(&current),"grammar_sha256":policy.grammar_sha256,"tool_sha256":policy.tool_sha256,"adapter_sha256":policy.adapter_sha256,"policy_sha256":policy_sha,"policy_revision":policy.policy_revision,"original_native":original_native,"current_native":current_native,"outcome":outcome})).map_err(|_|"task_resolution_encoding_failed")?;
+    let raw_evidence=serde_json::to_vec_pretty(&json!({"schema_version":checker.evidence_version(&policy.schema_version),"report_type":"task_resolution_evidence","identity":policy.identity,"original_report_sha256":policy.original_report_sha256,"original_source_sha256":policy.original_source_sha256,"current_source_sha256":digest(&current),"grammar_sha256":policy.grammar_sha256,"tool_sha256":policy.tool_sha256,"adapter_sha256":policy.adapter_sha256,"policy_sha256":policy_sha,"policy_revision":policy.policy_revision,"original_native":original_native,"current_native":current_native,"outcome":outcome})).map_err(|_|"task_resolution_encoding_failed")?;
     let evidence_sha = digest(&raw_evidence);
     let same = previous.filter(|r| r.evidence_sha256.as_deref() == Some(&evidence_sha));
     if outcome == "code_fixed"

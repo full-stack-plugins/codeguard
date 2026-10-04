@@ -63,15 +63,29 @@ pub(crate) fn observe(tool: &Path, source: &[u8], cwd: &Path, deadline: Instant)
             json!({"status":"incomplete","reason":"zig_tool_changed_during_check","version":"0.16.0","tool_sha256":tool_sha256,"diagnostics":[]}),
         );
     }
-    let diagnostics = parse_diagnostic_positions(&outcome.stderr);
+    let mut diagnostics = parse_diagnostic_positions(&outcome.stderr);
+    // 原生列是 UTF-8 字节偏移；越界位置或非诊断 stdout 不得变为可修复证据。
+    let positions_valid = diagnostics.iter().all(|position| {
+        let row = position["line"].as_u64().unwrap_or(0) as usize;
+        let column = position["column"].as_u64().unwrap_or(0) as usize;
+        row > 0
+            && column > 0
+            && source
+                .split(|b| *b == b'\n')
+                .nth(row - 1)
+                .is_some_and(|line| column <= line.len() + 1)
+    });
+    if !positions_valid || !outcome.stdout.is_empty() {
+        diagnostics.clear();
+    }
     Some(json!({
         "status":match outcome.termination {
-            Termination::Exited(0) if outcome.stderr.is_empty() => "completed",
+            Termination::Exited(0) if outcome.stderr.is_empty() && outcome.stdout.is_empty() => "completed",
             Termination::Exited(1) if !diagnostics.is_empty() => "diagnostics_observed",
             _ => "incomplete",
         },
         "reason":match outcome.termination {
-            Termination::Exited(0) if outcome.stderr.is_empty() => "ast_check_no_diagnostics",
+            Termination::Exited(0) if outcome.stderr.is_empty() && outcome.stdout.is_empty() => "ast_check_no_diagnostics",
             Termination::Exited(1) if !diagnostics.is_empty() => "ast_check_diagnostics",
             _ => "zig_ast_check_incomplete",
         },
