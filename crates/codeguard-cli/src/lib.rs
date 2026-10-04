@@ -282,13 +282,23 @@ mod zig_syntax_probe;
 mod plain_syntax_source;
 
 #[cfg(unix)]
+mod erlang_task_resolution_request;
+#[cfg(unix)]
+mod syntax_task_resolution_request;
+#[cfg(unix)]
 mod task_lifecycle_store;
+#[cfg(unix)]
+mod task_resolution_checker;
+#[cfg(unix)]
+mod task_resolution_policy_input;
 #[cfg(unix)]
 mod task_resolution_service;
 #[cfg(unix)]
 mod zig_task_resolution_request;
 #[cfg(unix)]
-pub use task_resolution_service::verify_zig_task_resolution;
+pub use erlang_task_resolution_request::ErlangTaskResolutionRequest;
+#[cfg(unix)]
+pub use task_resolution_service::{verify_erlang_task_resolution, verify_zig_task_resolution};
 #[cfg(unix)]
 pub use zig_task_resolution_request::ZigTaskResolutionRequest;
 

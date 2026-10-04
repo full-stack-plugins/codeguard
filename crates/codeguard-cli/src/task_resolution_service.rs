@@ -1,13 +1,16 @@
 //! 受保护宿主的真实原生关闭/重开处理器；项目历史不提供策略权威。
 use crate::{
-    ZigTaskResolutionRequest,
+    ErlangTaskResolutionRequest, ZigTaskResolutionRequest,
+    syntax_task_resolution_request::SyntaxTaskResolutionRequest,
     task_lifecycle_store::{digest, load, safe_directory, save},
+    task_resolution_checker::TaskResolutionChecker,
+    task_resolution_policy_input::TaskResolutionPolicyInput,
 };
+use codeguard_core::TaskLifecycleRecord;
 use codeguard_core::{
     ResolutionCause, ResolutionEvidence, ResolutionOutcome, TaskLifecycleEvent, TaskLifecycleKind,
     TaskLifecycleState, evaluate_resolution, reduce_task_lifecycle,
 };
-use codeguard_core::{TaskLifecycleRecord, TaskResolutionPolicy};
 use codeguard_runtime::read_bounded_regular_file;
 use serde_json::{Value, json};
 use std::{path::Path, time::Instant};
@@ -17,6 +20,21 @@ use std::{path::Path, time::Instant};
 /// 宿主必须独立保证密钥/上下文来源；本 API 不接受项目自选的公钥作为信任依据。
 pub fn verify_zig_task_resolution(
     request: &ZigTaskResolutionRequest<'_>,
+) -> Result<Value, &'static str> {
+    verify_task_resolution(request, TaskResolutionChecker::Zig)
+}
+
+/// 验签 OTP 28 的限定语法任务，复用原样本/当前样本复检和关闭/复发父链。
+/// 参数须由受保护宿主提供可信上下文；返回限定任务收据，不签发项目 allow。
+pub fn verify_erlang_task_resolution(
+    request: &ErlangTaskResolutionRequest<'_>,
+) -> Result<Value, &'static str> {
+    verify_task_resolution(request, TaskResolutionChecker::Erlang)
+}
+
+fn verify_task_resolution(
+    request: &SyntaxTaskResolutionRequest<'_>,
+    checker: TaskResolutionChecker,
 ) -> Result<Value, &'static str> {
     let started = Instant::now();
     before_deadline(request.deadline)?;
@@ -38,23 +56,26 @@ pub fn verify_zig_task_resolution(
     let expiration = started
         .checked_add(std::time::Duration::from_secs(remaining))
         .ok_or("approval_lifetime_invalid")?;
-    let bounded = ZigTaskResolutionRequest {
+    let bounded = SyntaxTaskResolutionRequest {
         deadline: request.deadline.min(expiration),
         ..*request
     };
     let request = &bounded;
     let raw = codeguard_adapters::parse_unique_json(request.policy_bytes)
         .map_err(|_| "task_resolution_policy_invalid")?;
-    let policy: TaskResolutionPolicy =
+    if raw.get("grammar_sha256").is_none() {
+        return Err("task_resolution_policy_invalid");
+    }
+    let policy: TaskResolutionPolicyInput =
         serde_json::from_value(raw).map_err(|_| "task_resolution_policy_invalid")?;
-    if policy.schema_version != "1.0.0"
+    if policy.schema_version != checker.policy_version()
         || policy.report_type != "task_resolution_policy"
         || policy.policy_revision != approved.policy_revision()
         || policy.identity.workspace_id != request.context.workspace_id
         || policy.identity.task_id != request.task_id
         || policy.identity.checker_id != "syntax.native_confirmation"
-        || policy.native_rule_id != "zig.ast_check.error"
-        || policy.native_version != "0.16.0"
+        || policy.native_rule_id != checker.rule()
+        || policy.native_version != checker.version()
         || request.original_source.len() > 1024 * 1024
         || std::str::from_utf8(request.original_source).is_err()
         || digest(request.original_source) != policy.original_source_sha256
@@ -75,9 +96,8 @@ pub fn verify_zig_task_resolution(
     }
     let original = crate::syntax_task_recheck::original(&root, &brief)?;
     if original["workspace_id"] != policy.identity.workspace_id
-        || original["language"] != "zig"
-        || original["observations"][0]["source_sha256"] != policy.original_source_sha256
-        || original["observations"][0]["grammar_sha256"] != policy.grammar_sha256
+        || original["language"] != checker.language()
+        || !original_binding_matches(&original, &policy, checker)
     {
         return Err("task_resolution_original_identity_mismatch");
     }
@@ -104,7 +124,7 @@ pub fn verify_zig_task_resolution(
         request.borrowed_lease,
     )?;
     let result = execute(
-        request,
+        (request, checker),
         &root,
         &tool,
         &executable,
@@ -118,24 +138,42 @@ pub fn verify_zig_task_resolution(
         (value, Ok(())) => value,
     }
 }
+fn original_binding_matches(
+    original: &Value,
+    policy: &TaskResolutionPolicyInput,
+    checker: TaskResolutionChecker,
+) -> bool {
+    if original["schema_version"] == "0.2.0" {
+        checker.language() == "erlang"
+            && policy.grammar_sha256.is_none()
+            && original["native_evidence"]["target"]["source_sha256"]
+                == policy.original_source_sha256
+            && original["native_evidence"]["native"]["tool_sha256"] == policy.tool_sha256
+            && original["native_evidence"]["native"]["version"] == policy.native_version
+    } else {
+        policy.grammar_sha256.as_ref().is_some_and(|grammar| {
+            original["observations"][0]["source_sha256"] == policy.original_source_sha256
+                && original["observations"][0]["grammar_sha256"] == *grammar
+        })
+    }
+}
 fn execute(
-    request: &ZigTaskResolutionRequest<'_>,
+    input: (&SyntaxTaskResolutionRequest<'_>, TaskResolutionChecker),
     root: &Path,
     tool: &Path,
     executable: &Path,
-    policy: &TaskResolutionPolicy,
+    policy: &TaskResolutionPolicyInput,
     policy_sha: &str,
     lease: &crate::task_lease_command::VerificationLease,
 ) -> Result<Value, &'static str> {
+    let (request, checker) = input;
     let bound_attempt = crate::task_attempt_command::latest_ready_attempt(root, request.task_id)?;
     let brief = crate::next_command::read_task_brief(root, request.task_id)?;
     let source_path = root.join(&policy.identity.scope);
     let current = crate::plain_syntax_source::read_plain_source(&source_path)?;
-    let original_native = crate::zig_syntax_probe::observe(tool, request.original_source, root, request.deadline)
-        .unwrap_or_else(|| json!({"status":"not_run","reason":"zig_tool_unavailable_or_untrusted","version":null,"tool_sha256":null,"diagnostics":[]}));
+    let original_native = checker.observe(tool, request.original_source, root, request.deadline);
     before_deadline(request.deadline)?;
-    let current_report =
-        crate::syntax_task_recheck::run(root, &brief, Some(tool), None, request.deadline)?;
+    let current_report = checker.recheck(root, &brief, tool, request.deadline)?;
     let current_native = current_report["native"].clone();
     let _guard = crate::task_lease_command::lock_verification(root, request.task_id, lease)?;
     before_deadline(request.deadline)?;
@@ -208,7 +246,11 @@ fn execute(
         native_report_sha256: native_sha,
         tool_sha256: policy.tool_sha256.clone(),
         adapter_sha256: policy.adapter_sha256.clone(),
-        rulepack_sha256: policy.grammar_sha256.clone(),
+        // 原生首次任务的规则身份来自已批准策略字节；不用伪造 grammar 摘要填充证据。
+        rulepack_sha256: policy
+            .grammar_sha256
+            .clone()
+            .unwrap_or_else(|| policy_sha.into()),
         policy_sha256: policy_sha.into(),
         policy_revision: policy.policy_revision.clone(),
         native_completed: current_completed && original_completed && native_bound,
@@ -240,7 +282,7 @@ fn execute(
     {
         outcome = "resolution_history_binding_changed";
     }
-    let raw_evidence=serde_json::to_vec_pretty(&json!({"schema_version":"0.1.0","report_type":"task_resolution_evidence","identity":policy.identity,"original_report_sha256":policy.original_report_sha256,"original_source_sha256":policy.original_source_sha256,"current_source_sha256":digest(&current),"grammar_sha256":policy.grammar_sha256,"tool_sha256":policy.tool_sha256,"adapter_sha256":policy.adapter_sha256,"policy_sha256":policy_sha,"policy_revision":policy.policy_revision,"original_native":original_native,"current_native":current_native,"outcome":outcome})).map_err(|_|"task_resolution_encoding_failed")?;
+    let raw_evidence=serde_json::to_vec_pretty(&json!({"schema_version":checker.evidence_version(),"report_type":"task_resolution_evidence","identity":policy.identity,"original_report_sha256":policy.original_report_sha256,"original_source_sha256":policy.original_source_sha256,"current_source_sha256":digest(&current),"grammar_sha256":policy.grammar_sha256,"tool_sha256":policy.tool_sha256,"adapter_sha256":policy.adapter_sha256,"policy_sha256":policy_sha,"policy_revision":policy.policy_revision,"original_native":original_native,"current_native":current_native,"outcome":outcome})).map_err(|_|"task_resolution_encoding_failed")?;
     let evidence_sha = digest(&raw_evidence);
     let same = previous.filter(|r| r.evidence_sha256.as_deref() == Some(&evidence_sha));
     if outcome == "code_fixed"

@@ -427,3 +427,12 @@ codeguard check all . --erl-tool /absolute/path/to/erl --timeout 30s --jobs 2 --
 ### 全部 32 份 grammar 的开发评测
 
 Rust 开发入口 `evaluate_grammars` 用现有隔离 worker 回放 358 个固定样本，覆盖全部 32 语言、35 个语言×来源组；其中 Dart 上游 150 例按独立来源组统计。报告保留逐组 TP/FP/FN、Wilson 区间、未知、待裁定和顺序冷 worker 耗时，混合来源的语言汇总不混算 precision/recall。语料、源码及程序身份绑定；COBOL/CFQuery 待裁定标签不进入精度分母。0.1 历史输入与报告保持可读；此入口不执行原生 oracle 或独立 holdout，不提升 grammar 资格或批准发布。运行方式与指标边界见 [grammar 评测](docs/Codeguard-Grammar-Evaluation.zh_CN.md)。
+
+
+### Erlang 限定任务关闭与复发（当前源码 SDK）
+
+`verify_erlang_task_resolution` 复用 Zig 的签名核验、共享截止时间、租约、尝试交接和追加父链服务。受保护宿主独立固定信任根、工作区、策略修订、基线和可信时钟；项目文件不提供批准权威。OTP 28 对首次反例和当前字节分别执行 scanner/parser：首次有原生诊断、当前字节改变且完整无诊断，才能记录 `code_fixed`。宏/include、空 forms、截断或执行失败保留待核验；原样本合法进入误报调查。
+
+支持 WASM 首次和原生首次两种任务来源。Erlang 策略 1.1.0、证据 0.2.0 与旧 Zig 1.0.0/0.1.0 独立；原生首次的 `grammar_sha256` 必须为 null，首次工具身份也须一致。内部规则身份使用实际批准策略字节摘要，不伪造 grammar 摘要。历史读取核对首次报告语言、源码和 grammar，重算本地摘要不能跨语言套用。普通 `task verify --erl-tool` 可在同一工具下追加复发重开；没有可信策略仍不能关闭。
+
+这仍是源码 SDK，尚未接入默认插件的可信策略提供者，公开 npm 0.1.4 不含本批扩展；限定语法任务收据不是完整 lint、安全或项目门禁许可。原生工具摘要绑定 launcher，宿主仍须独立保护 OTP 运行环境。执行路径与实际测试见 [Erlang 生命周期验收](tests/acceptance/erlang-task-resolution-lifecycle.md)。

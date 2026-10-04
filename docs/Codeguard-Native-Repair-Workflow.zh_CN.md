@@ -36,7 +36,7 @@ codeguard task verify TASK_ID . --erl-tool /absolute/path/to/erl --format=json
 - `next` 比较扫描与复检的实际报告时间，返回最新已消费报告引用。初始扫描不伪造 `task_verify` 操作或验证事件。
 - 缺工具、版本不匹配和预处理未展开进入环境指引，不能形成源码违规。诊断列为 `unicode_scalar`。
 - 报告保存或同步失败保留原生诊断，任务 ID 为 null，并返回 `task_sync_reason`。源码或工具变化撤回当前修复位置。
-- 首次零诊断不创建修复任务；已有任务的零诊断保留观察、仍为 open。可信关闭、复发重开及完整项目 lint/预处理/注释仍需完成；本切片不提升 grammar 资格。
+- 首次零诊断不创建修复任务；已有任务的零诊断保留观察、仍为 open。默认宿主的可信关闭及完整项目 lint/预处理/注释仍需完成；源码 SDK 已接入限定 Erlang 关闭与复发；本切片不提升 grammar 资格。
 
 ## 版本化协议
 
@@ -211,3 +211,41 @@ codeguard task verify TASK_ID . --maven-tool /absolute/path/to/mvn \
 将示例路径、仓库身份和任务 ID 替换为实际选择的上下文。已绑定反馈为 [0.1](../schemas/java-p3c-file-feedback-0.1.schema.json)，内部项目观察仍为 0.2，未绑定反馈仍为 0.2。单文件路径只读取祖先 POM，不发现兄弟源码；复用聚合检查的保存/同步服务和既有原工具任务复检。工作台损坏、源码越界、源码或父目录链接均在 Maven 启动前阻止该路径。保存失败保留原生诊断与具体原因，不伪造下一步。零诊断在规则覆盖未证明时保留任务 open。公开 npm 0.1.4 不含此变更。[受控协议验收](../tests/acceptance/java-p3c-file-workbench.md) 不证明完整 P3C、生效模型覆盖或真实宿主安装。
 
 项目观察 0.2 在局部状态 `incomplete`、原因 `native_execution_failed` 时，保留非空且已核对的原生诊断。源码/规则/位置投影沿用成功诊断的当前字节和配置检查；同步同时导入源码 finding 与执行阻塞，`observed_file_count` 不增加。原工具复检再次匹配问题为 `still_present`；部分零诊断为 `incomplete`，阻塞复检仍为 `still_blocked`。没有平铺投影的历史 0.2 报告保持只导入阻塞的解释；不增加 schema 字段或批准语义。见[验收](../tests/acceptance/java-p3c-partial-execution.md)。
+
+
+### Erlang 限定任务关闭与复发（当前源码 SDK）
+
+`verify_erlang_task_resolution` 复用 Zig 的签名核验、共享截止时间、租约、尝试交接和追加父链服务。受保护宿主独立固定信任根、工作区、策略修订、基线和可信时钟；项目文件不提供批准权威。OTP 28 对首次反例和当前字节分别执行 scanner/parser：首次有原生诊断、当前字节改变且完整无诊断，才能记录 `code_fixed`。宏/include、空 forms、截断或执行失败保留待核验；原样本合法进入误报调查。
+
+支持 WASM 首次和原生首次两种任务来源。Erlang 策略 1.1.0、证据 0.2.0 与旧 Zig 1.0.0/0.1.0 独立；原生首次的 `grammar_sha256` 必须为 null，首次工具身份也须一致。内部规则身份使用实际批准策略字节摘要，不伪造 grammar 摘要。历史读取核对首次报告语言、源码和 grammar，重算本地摘要不能跨语言套用。普通 `task verify --erl-tool` 可在同一工具下追加复发重开；没有可信策略仍不能关闭。
+
+这仍是源码 SDK，尚未接入默认插件的可信策略提供者，公开 npm 0.1.4 不含本批扩展；限定语法任务收据不是完整 lint、安全或项目门禁许可。原生工具摘要绑定 launcher，宿主仍须独立保护 OTP 运行环境。执行路径与实际测试见 [Erlang 生命周期验收](../tests/acceptance/erlang-task-resolution-lifecycle.md)。
+
+
+#### 实际收据示例
+
+以下来自已安装 OTP 28 的原生首次任务测试；信任根和时钟是签名夹具，`host_context_verified` 仅对该测试上下文成立，不代表默认插件已取得批准。`resolved` 只指这一项语法任务，交付仍未评估。
+
+```json
+{
+  "authority": "host_context_verified",
+  "delivery_decision": "not_evaluated",
+  "event_ref": ".codeguard/findings/CG-B-adbe0d18568c875773065066871ea3ae/events/lifecycle-event-fb3b032308cacd1f0ac441e5b3cf0634b54d4ec2719dfed22cdee6dbca9e8c96.json",
+  "evidence_ref": ".codeguard/state/resolution_evidence/be49a29789222b17f49c539f9e0527faad9f9d0c9726ae874e3506ae8d050ecb.json",
+  "evidence_sha256": "be49a29789222b17f49c539f9e0527faad9f9d0c9726ae874e3506ae8d050ecb",
+  "identity": {
+    "checker_id": "syntax.native_confirmation",
+    "scope": "app.erl",
+    "task_id": "CG-B-adbe0d18568c875773065066871ea3ae",
+    "workspace_id": "ws-61c7cac666cd3addf981def0b69429cb"
+  },
+  "outcome": "code_fixed",
+  "policy_revision": "p1",
+  "policy_sha256": "78518f40ca4579bb414a8cac0ac216bebb0a2df14227142402b6aa4ef43e4d0f",
+  "report_type": "task_resolution_receipt",
+  "schema_version": "0.1.0",
+  "state": "resolved"
+}
+```
+
+完整 [收据](../tests/acceptance/evidence/otp28-native-first-resolved-2026-10-04.json)、[证据](../tests/acceptance/evidence/otp28-native-first-resolved-2026-10-04-evidence.json) 和 [复发收据](../tests/acceptance/evidence/otp28-native-first-reopened-2026-10-04.json) 保留原始字节。

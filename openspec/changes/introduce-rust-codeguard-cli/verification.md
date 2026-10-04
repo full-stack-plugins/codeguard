@@ -2295,3 +2295,15 @@ Rust 开发入口复用现有隔离 worker 和 Core 统计，启动前核对清�
 最终默认 workspace/all-targets 213 组/1193 passed/0 failed/109 ignored，随后相关特性七组89 passed/0 failed/20 ignored；全工作区全目标 WASM Clippy -D warnings、fmt、分层、OpenSpec strict、198 schema元定义、28实际单文件反馈/12伪造反例、687条修改文档局部链接均通过。日志、摘要、实际节选和不计原生精度的边界见[验收](../../../tests/acceptance/java-p3c-partial-execution.md)。
 
 只证明本次原生协议与任务路径修复，不证明完整语言/规则/覆盖、可信关闭、真实宿主或公开发布；父任务保持未完成。Erlang RED 草稿没有变更或提交。远端CI按新提交另行核验，不借用旧提交成功。
+
+
+## 2026-10-04 Erlang 限定原生关闭与复发（已验证切片）
+
+对应 RW21、9.7、9.10、9.11、12.7、14.10、14.11。SDK 复用既有 Zig 服务，新增 OTP 28 固定规则/版本的签名策略与证据；WASM 首次和原生首次均可按原样本诊断、当前改变且完整零诊断关闭，普通同工具 task verify 检出复发可追加同一父链重开。原生首次 grammar=null，禁止伪造资产或替换原始工具；重算跨语言历史在原生执行前拒绝。宏、空 forms、截断、失败、原样本合法和输入变化仍保留待核验/误报调查。旧 Zig API 构造及 schema 保持兼容。
+
+三项 RED（入口缺失、null 策略拒绝、跨语言历史未提前绑定）后实现并验证。相关五组 47 passed/0 failed/5 ignored，显式真实 OTP 28 和 Zig 0.16.0 各1 passed；真实工具与签名夹具权威分开。200 schema 元定义、67 实际报告及12矛盾反例通过；最终全工作区/Clippy结果另按实际日志补录。[验收与实际报告](../../../tests/acceptance/erlang-task-resolution-lifecycle.md)。
+
+默认宿主的受保护策略提供者、全检查器关闭、完整项目 lint/门禁、真实宿主、多平台及独立精度验收仍缺，父任务不勾选；公开 npm 0.1.4 不含本批，不更改 grammar 资格或 Erlang 漏检 RED 草稿。
+
+
+本批最终默认 workspace/all-targets 214 组、1193 passed/0 failed/109 ignored，完整目标 WASM Clippy -D warnings 退出0；真实 OTP/Zig 各1 passed，相关特性47 passed/5 ignored。完整命令、日志摘要、原生首次 grammar=null 的实际收据和边界见本批生命周期验收。该证据未完成默认宿主可信策略接线、全语言精度或发布，父任务继续开放。

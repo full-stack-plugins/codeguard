@@ -1220,3 +1220,15 @@ Swift 差分纠正先以状态断言暴露旧清单文案的红测，再按真�
 2.3 / 6.2 / 9.3 / 9.4 / 9.7 / 9.13 / 12.7：有效原生诊断后异常退出的 RED 已复现，修复项目投影遗漏；新鲜范围/规则/当前输入核对后的非空诊断同步为稳定源码问题，同时保留执行阻塞，失败文件完整计数为零。再次正向复检为 still_present，失败零诊断与阻塞分别为 incomplete/still_blocked；next 简报消费同一事件，不关闭任务。坏 XML、范围/输入变化和伪造投影不建当前问题；历史无投影 0.2 报告仍按阻塞读取。human 明示原生状态和原因。
 
 新增八个目标测试；默认全工作区 213 组/1193 passed/0 failed/109 ignored，相关特性七组89 passed/0 failed/20 ignored；28实际单文件反馈/12伪造协议反例、198 schema、fmt/分层/OpenSpec strict通过。见[验收](../../../tests/acceptance/java-p3c-partial-execution.md)。本批为受控原生协议，不证明完整 P3C 规则精度、生效模型、可信关闭、宿主或发行；父任务不勾选。已有 Erlang RED 草稿不提交。
+
+
+## 2026-10-04 Erlang 限定原生关闭与复发（已验证切片）
+
+对应 RW21、9.7、9.10、9.11、12.7、14.10、14.11。SDK 复用既有 Zig 服务，新增 OTP 28 固定规则/版本的签名策略与证据；WASM 首次和原生首次均可按原样本诊断、当前改变且完整零诊断关闭，普通同工具 task verify 检出复发可追加同一父链重开。原生首次 grammar=null，禁止伪造资产或替换原始工具；重算跨语言历史在原生执行前拒绝。宏、空 forms、截断、失败、原样本合法和输入变化仍保留待核验/误报调查。旧 Zig API 构造及 schema 保持兼容。
+
+三项 RED（入口缺失、null 策略拒绝、跨语言历史未提前绑定）后实现并验证。相关五组 47 passed/0 failed/5 ignored，显式真实 OTP 28 和 Zig 0.16.0 各1 passed；真实工具与签名夹具权威分开。200 schema 元定义、67 实际报告及12矛盾反例通过；最终全工作区/Clippy结果另按实际日志补录。[验收与实际报告](../../../tests/acceptance/erlang-task-resolution-lifecycle.md)。
+
+默认宿主的受保护策略提供者、全检查器关闭、完整项目 lint/门禁、真实宿主、多平台及独立精度验收仍缺，父任务不勾选；公开 npm 0.1.4 不含本批，不更改 grammar 资格或 Erlang 漏检 RED 草稿。
+
+
+本批最终默认 workspace/all-targets 214 组、1193 passed/0 failed/109 ignored，完整目标 WASM Clippy -D warnings 退出0；真实 OTP/Zig 各1 passed，相关特性47 passed/5 ignored。完整命令、日志摘要、原生首次 grammar=null 的实际收据和边界见本批生命周期验收。该证据未完成默认宿主可信策略接线、全语言精度或发布，父任务继续开放。

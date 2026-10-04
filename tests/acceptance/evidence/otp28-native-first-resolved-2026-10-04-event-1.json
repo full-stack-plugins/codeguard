@@ -1,0 +1,22 @@
+{
+  "event": {
+    "event_id": "event-fb3b032308cacd1f0ac441e5b3cf0634b54d4ec2719dfed22cdee6dbca9e8c96",
+    "identity": {
+      "checker_id": "syntax.native_confirmation",
+      "scope": "app.erl",
+      "task_id": "CG-B-adbe0d18568c875773065066871ea3ae",
+      "workspace_id": "ws-61c7cac666cd3addf981def0b69429cb"
+    },
+    "kind": {
+      "cause": "code_fixed",
+      "event": "resolved",
+      "evidence_sha256": "be49a29789222b17f49c539f9e0527faad9f9d0c9726ae874e3506ae8d050ecb"
+    },
+    "parent_event_id": "event-260d3ad2e6e02126f9b9cacf915d0364547473f752e2a9613220dbb598f81f89"
+  },
+  "evidence_sha256": "be49a29789222b17f49c539f9e0527faad9f9d0c9726ae874e3506ae8d050ecb",
+  "original_report_sha256": "c3d08854a57f31baec9ce2e5c64e4902d6d0a7b3b20c44a73ae4641bbe7b43c5",
+  "policy_sha256": "78518f40ca4579bb414a8cac0ac216bebb0a2df14227142402b6aa4ef43e4d0f",
+  "report_type": "task_lifecycle_record",
+  "schema_version": "0.1.0"
+}

@@ -138,6 +138,19 @@ RunReport 与准备诊断 PrerequisiteReport MUST 使用 workspace_id + run_id �
 - **THEN** 关闭处理器 MUST 核对原问题/范围、当前源码、原规则执行覆盖、工具/适配器/规则包与批准策略身份；匹配且问题消失时才追加限定任务的解决事件，不授予全项目 allow
 - **AND** 项目文件、CLI 参数自选的公钥、候选策略或未经复核的历史事件 MUST NOT 作为可信关闭输入；同字节原生反证进入误报调查，不记为代码修复
 
+#### Scenario: Protected Erlang native syntax resolution uses the same lifecycle service
+- **WHEN** 受保护宿主验签 OTP 28 的限定语法任务策略，并以同一固定工具重放首次原样本和当前源码
+- **THEN** 仅原样本确有语法诊断、当前源码已变化且完整 forms 检查无诊断时 SHALL 记录 code_fixed；重复复检幂等，普通原工具复检检出复发时重开同一父链任务。宏/include、无 form、截断、超时、错误工具或身份变化 MUST NOT 关闭；原样本原生合法进入误报调查
+- **AND** 旧 Zig 策略及证据协议保持兼容，Erlang 使用独立版本且禁止跨语言消费；此收据只证明限定语法任务，不批准全语言 lint 或项目交付
+
+#### Scenario: Native-first Erlang task resolution has no grammar identity
+- **WHEN** 首次任务来自已同步的 OTP 28 原生诊断而非 WASM，受保护宿主批准同一原工具、规则、源码与首次报告身份
+- **THEN** 策略和脱敏证据 SHALL 保留 grammar_sha256=null，以原生规则的批准策略摘要绑定规则身份；原样本诊断、当前源码变化和完整零诊断可关闭，普通同工具复检检出复发可重开。不存在的 grammar、缺字段或替换首次工具 MUST 在原生执行前拒绝
+
+#### Scenario: Rehashed lifecycle evidence cannot change the original language
+- **WHEN** 本地关闭证据和父链记录被重算摘要，但证据协议、语言或 grammar 与已同步的首次任务事实不同
+- **THEN** 历史读取 SHALL 在原生执行前拒绝身份矛盾，并由 next 提供核对决策，不将本地文件当作可信关闭
+
 #### Scenario: Resolution history is merged out of order or forks
 - **WHEN** 事件文件顺序改变、父节点缺失、出现循环或分叉关闭事件
 - **THEN** 单一有效链 MUST 按父关系重放；缺失、循环、冲突或重复身份 MUST 返回 reconciliation_required，不能选择时间最新的关闭事件；有效复发事件重开并保留关闭历史

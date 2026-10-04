@@ -26,15 +26,16 @@ pub(crate) fn valid(record: &TaskLifecycleRecord, value: &Value) -> bool {
             "original_report_sha256",
             "original_source_sha256",
             "current_source_sha256",
-            "grammar_sha256",
             "tool_sha256",
             "adapter_sha256",
             "policy_sha256",
         ]
         .iter()
         .all(|key| value[*key].as_str().is_some_and(digest))
-        || !native(&value["original_native"])
-        || !native(&value["current_native"])
+        || !(value["grammar_sha256"].as_str().is_some_and(digest)
+            || (value["schema_version"] == "0.2.0" && value["grammar_sha256"].is_null()))
+        || !native_for_version(value, "original_native")
+        || !native_for_version(value, "current_native")
     {
         return false;
     }
@@ -67,10 +68,23 @@ pub(crate) fn valid(record: &TaskLifecycleRecord, value: &Value) -> bool {
     }
 }
 fn native_bound(value: &Value) -> bool {
+    let version = match value["schema_version"].as_str() {
+        Some("0.1.0") => "0.16.0",
+        Some("0.2.0") => "OTP 28",
+        _ => return false,
+    };
     ["original_native", "current_native"].iter().all(|k| {
-        value[*k]["tool_sha256"] == value["tool_sha256"] && value[*k]["version"] == "0.16.0"
+        value[*k]["tool_sha256"] == value["tool_sha256"] && value[*k]["version"] == version
     })
 }
+fn native_for_version(evidence: &Value, key: &str) -> bool {
+    match evidence["schema_version"].as_str() {
+        Some("0.1.0") => native(&evidence[key]),
+        Some("0.2.0") => crate::erlang_syntax_probe::valid_native_observation(&evidence[key], None),
+        _ => false,
+    }
+}
+
 fn native(value: &Value) -> bool {
     let base = ["status", "reason", "version", "tool_sha256", "diagnostics"];
     if !value.as_object().is_some_and(|o| {

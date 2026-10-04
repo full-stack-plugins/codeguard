@@ -64,3 +64,15 @@ npm 发布证据为此前已执行记录，本轮没有重新发布或运行远�
 ### 2026-10-04 P3C 混合诊断与执行失败修复
 
 RW21 与 verdict-integrity 的双维结果要求现覆盖原生有效诊断后异常退出：稳定 finding 与执行阻塞同时同步，完整计数不增加；正向复检、空失败、坏范围/身份、历史 0.2 兼容及 human 反馈有目标回归。证据：[部分执行验收](../../../tests/acceptance/java-p3c-partial-execution.md)。完整语言/规则/策略/宿主验收仍未完成，不更新父任务完成状态。
+
+
+## 2026-10-04 Erlang 限定原生关闭与复发（已验证切片）
+
+对应 RW21、9.7、9.10、9.11、12.7、14.10、14.11。SDK 复用既有 Zig 服务，新增 OTP 28 固定规则/版本的签名策略与证据；WASM 首次和原生首次均可按原样本诊断、当前改变且完整零诊断关闭，普通同工具 task verify 检出复发可追加同一父链重开。原生首次 grammar=null，禁止伪造资产或替换原始工具；重算跨语言历史在原生执行前拒绝。宏、空 forms、截断、失败、原样本合法和输入变化仍保留待核验/误报调查。旧 Zig API 构造及 schema 保持兼容。
+
+三项 RED（入口缺失、null 策略拒绝、跨语言历史未提前绑定）后实现并验证。相关五组 47 passed/0 failed/5 ignored，显式真实 OTP 28 和 Zig 0.16.0 各1 passed；真实工具与签名夹具权威分开。200 schema 元定义、67 实际报告及12矛盾反例通过；最终全工作区/Clippy结果另按实际日志补录。[验收与实际报告](../../../tests/acceptance/erlang-task-resolution-lifecycle.md)。
+
+默认宿主的受保护策略提供者、全检查器关闭、完整项目 lint/门禁、真实宿主、多平台及独立精度验收仍缺，父任务不勾选；公开 npm 0.1.4 不含本批，不更改 grammar 资格或 Erlang 漏检 RED 草稿。
+
+
+本批最终默认 workspace/all-targets 214 组、1193 passed/0 failed/109 ignored，完整目标 WASM Clippy -D warnings 退出0；真实 OTP/Zig 各1 passed，相关特性47 passed/5 ignored。完整命令、日志摘要、原生首次 grammar=null 的实际收据和边界见本批生命周期验收。该证据未完成默认宿主可信策略接线、全语言精度或发布，父任务继续开放。

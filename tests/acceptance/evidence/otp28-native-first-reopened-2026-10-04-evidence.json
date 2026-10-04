@@ -1,0 +1,49 @@
+{
+  "adapter_sha256": "f6d18bad3950f25018d8736660f2a292874d46a01c5e74f4ef22ba675a72c1af",
+  "current_native": {
+    "diagnostics": [
+      {
+        "column": 4,
+        "line": 2,
+        "rule_id": "erlang.syntax.error"
+      }
+    ],
+    "diagnostics_truncated": false,
+    "preprocessing_unresolved": false,
+    "reason": "erlang_native_syntax_diagnostics",
+    "status": "diagnostics_observed",
+    "tool_sha256": "cd03d938d7547ef608076a58a49f5284931b43f39090087baf35efc1665dd5d6",
+    "version": "OTP 28"
+  },
+  "current_source_sha256": "c93016685874aea157536b407fe261479573844ba69124194a71a3b2940074cd",
+  "grammar_sha256": null,
+  "identity": {
+    "checker_id": "syntax.native_confirmation",
+    "scope": "app.erl",
+    "task_id": "CG-B-adbe0d18568c875773065066871ea3ae",
+    "workspace_id": "ws-61c7cac666cd3addf981def0b69429cb"
+  },
+  "original_native": {
+    "diagnostics": [
+      {
+        "column": 4,
+        "line": 2,
+        "rule_id": "erlang.syntax.error"
+      }
+    ],
+    "diagnostics_truncated": false,
+    "preprocessing_unresolved": false,
+    "reason": "erlang_native_syntax_diagnostics",
+    "status": "diagnostics_observed",
+    "tool_sha256": "cd03d938d7547ef608076a58a49f5284931b43f39090087baf35efc1665dd5d6",
+    "version": "OTP 28"
+  },
+  "original_report_sha256": "c3d08854a57f31baec9ce2e5c64e4902d6d0a7b3b20c44a73ae4641bbe7b43c5",
+  "original_source_sha256": "c93016685874aea157536b407fe261479573844ba69124194a71a3b2940074cd",
+  "outcome": "still_present",
+  "policy_revision": "p1",
+  "policy_sha256": "78518f40ca4579bb414a8cac0ac216bebb0a2df14227142402b6aa4ef43e4d0f",
+  "report_type": "task_resolution_evidence",
+  "schema_version": "0.2.0",
+  "tool_sha256": "cd03d938d7547ef608076a58a49f5284931b43f39090087baf35efc1665dd5d6"
+}

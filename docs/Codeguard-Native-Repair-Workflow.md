@@ -36,7 +36,7 @@ codeguard task verify TASK_ID . --erl-tool /absolute/path/to/erl --format=json
 - `next` compares actual scan and recheck report timestamps and references the latest consumed report. A first scan never invents a `task_verify` operation or verification event.
 - Missing tools, unsupported versions and unresolved preprocessing produce environment guidance, not source violations. Columns use `unicode_scalar`.
 - Persistence failures retain native diagnostics and return a null task ID with `task_sync_reason`. Source/tool changes withdraw current repair positions.
-- A clean initial observation creates no task. A clean observation for an existing task records evidence but leaves it open. Trusted closure, recurrence reopening and full project lint/preprocessing/comments remain incomplete; this slice does not qualify grammars.
+- A clean initial observation creates no task. A clean observation for an existing task records evidence but leaves it open. Default-host trusted closure and full project lint/preprocessing/comments remain incomplete; the source SDK now supports limited Erlang resolution and recurrence; this slice does not qualify grammars.
 
 ## Versioned protocols
 
@@ -211,3 +211,41 @@ codeguard task verify TASK_ID . --maven-tool /absolute/path/to/mvn \
 Replace example paths, repository identity and task ID with the actual selected context. Bound feedback is [0.1](../schemas/java-p3c-file-feedback-0.1.schema.json), nesting existing project observation 0.2; unbound feedback stays 0.2. The single-file path reads ancestor POM candidates without discovering sibling sources. It reuses the aggregate persistence/sync service and existing native task verification. Damaged workspaces, outside sources and source/parent links stop before Maven. Persistence failure preserves native diagnostics and its actual reason, without a next task. Zero diagnostics leave the task open while rule coverage remains unproven. This change is absent from public npm 0.1.4. [Controlled protocol acceptance](../tests/acceptance/java-p3c-file-workbench.md) does not certify complete P3C/effective-model coverage or real-host installation.
 
 Project observation 0.2 preserves nonempty validated diagnostics when local status is `incomplete` and reason is `native_execution_failed`. The source/rule/location projection undergoes the same current-byte and configuration checks as successful diagnostic reports. Sync imports both the source finding and execution blocker; `observed_file_count` stays unchanged. A matching positive recheck is `still_present`; partial zero results are `incomplete`, and blocker verification remains `still_blocked`. Legacy 0.2 reports without flat projections retain their blocker-only interpretation. No schema fields or approval semantics change. See [acceptance](../tests/acceptance/java-p3c-partial-execution.md).
+
+
+### Erlang task resolution and recurrence (current source SDK)
+
+`verify_erlang_task_resolution` reuses Zig's signed-policy verification, shared deadline, lease, attempt handoff and append-only parent chain. The protected host independently fixes the trust root, workspace, policy revision, baseline and trusted clock; project files cannot grant approval. OTP 28 scans/parses the original counterexample and current bytes separately. Only an original native diagnostic, changed source and a complete clean current result can record `code_fixed`. Macros/includes, empty forms, truncation and execution failures require verification; an originally valid sample requires false-positive investigation.
+
+Both WASM-first and native-first tasks are supported. Erlang policy 1.1.0/evidence 0.2.0 stay separate from Zig 1.0.0/0.1.0. Native-first evidence requires `grammar_sha256=null` and the original tool identity. The internal rule identity uses the actual approved policy-byte digest instead of inventing a grammar digest. History checks bind the language, source and grammar to the first report; rehashing local files cannot switch languages. Ordinary `task verify --erl-tool` can append recurrence with the matching tool, but cannot close a task without trusted policy.
+
+This remains a source SDK without the default plugin's trusted policy provider. Public npm 0.1.4 lacks this extension; syntax receipts do not certify complete lint, security or project delivery. The tool digest binds the launcher; the host must independently protect the OTP environment. See [Erlang lifecycle acceptance](../tests/acceptance/erlang-task-resolution-lifecycle.md) for the execution path and actual results.
+
+
+#### Actual receipt example
+
+This native-first receipt came from installed OTP 28. The signing root and clock are test fixtures: `host_context_verified` applies only to that context, not default-plugin approval. `resolved` covers one syntax task; delivery remains unevaluated.
+
+```json
+{
+  "authority": "host_context_verified",
+  "delivery_decision": "not_evaluated",
+  "event_ref": ".codeguard/findings/CG-B-adbe0d18568c875773065066871ea3ae/events/lifecycle-event-fb3b032308cacd1f0ac441e5b3cf0634b54d4ec2719dfed22cdee6dbca9e8c96.json",
+  "evidence_ref": ".codeguard/state/resolution_evidence/be49a29789222b17f49c539f9e0527faad9f9d0c9726ae874e3506ae8d050ecb.json",
+  "evidence_sha256": "be49a29789222b17f49c539f9e0527faad9f9d0c9726ae874e3506ae8d050ecb",
+  "identity": {
+    "checker_id": "syntax.native_confirmation",
+    "scope": "app.erl",
+    "task_id": "CG-B-adbe0d18568c875773065066871ea3ae",
+    "workspace_id": "ws-61c7cac666cd3addf981def0b69429cb"
+  },
+  "outcome": "code_fixed",
+  "policy_revision": "p1",
+  "policy_sha256": "78518f40ca4579bb414a8cac0ac216bebb0a2df14227142402b6aa4ef43e4d0f",
+  "report_type": "task_resolution_receipt",
+  "schema_version": "0.1.0",
+  "state": "resolved"
+}
+```
+
+The original [receipt](../tests/acceptance/evidence/otp28-native-first-resolved-2026-10-04.json), [evidence](../tests/acceptance/evidence/otp28-native-first-resolved-2026-10-04-evidence.json) and [recurrence receipt](../tests/acceptance/evidence/otp28-native-first-reopened-2026-10-04.json) retain their emitted bytes.

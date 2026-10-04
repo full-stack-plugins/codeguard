@@ -26,6 +26,7 @@ pub(crate) fn load(
     let directory = root.join(format!(".codeguard/findings/{}/events", identity.task_id));
     safe_directory(&directory)?;
     let mut records = Vec::new();
+    let mut origin = None;
     let mut count = 0;
     for entry in fs::read_dir(&directory).map_err(|_| "task_lifecycle_history_unreadable")? {
         count += 1;
@@ -76,11 +77,21 @@ pub(crate) fn load(
                     .map_err(|_| "task_lifecycle_evidence_invalid")?;
                 let identity_value =
                     serde_json::to_value(identity).map_err(|_| "task_lifecycle_encoding_failed")?;
-                if value["schema_version"] != "0.1.0"
+                if !matches!(value["schema_version"].as_str(), Some("0.1.0" | "0.2.0"))
                     || value["report_type"] != "task_resolution_evidence"
                     || value["identity"] != identity_value
                     || value["original_report_sha256"] != original_sha
                     || value["policy_sha256"] != *policy
+                {
+                    return Err("task_lifecycle_evidence_binding_invalid");
+                }
+                // 证据版本不能自行决定语言；核对首次事实与已同步的原报告，再重放历史。
+                if origin.is_none() {
+                    origin = Some(original_task_report(root, identity, original_sha)?);
+                }
+                if !origin
+                    .as_ref()
+                    .is_some_and(|original| origin_matches_evidence(original, &value))
                 {
                     return Err("task_lifecycle_evidence_binding_invalid");
                 }
@@ -105,6 +116,53 @@ pub(crate) fn load(
         }
     }
     Ok(records)
+}
+fn original_task_report(
+    root: &Path,
+    identity: &TaskIdentity,
+    sha: &str,
+) -> Result<serde_json::Value, &'static str> {
+    let bytes = read_bounded_regular_file(
+        &root.join(format!(
+            ".codeguard/findings/{}/finding.json",
+            identity.task_id
+        )),
+        1024 * 1024,
+    )
+    .map_err(|_| "task_lifecycle_evidence_binding_invalid")?;
+    let fact = codeguard_adapters::parse_unique_json(&bytes)
+        .map_err(|_| "task_lifecycle_evidence_binding_invalid")?;
+    if fact["id"] != identity.task_id
+        || fact["workspace_id"] != identity.workspace_id
+        || fact["checker_id"] != identity.checker_id
+        || fact["scope"] != identity.scope
+        || fact["first_report_sha256"] != sha
+    {
+        return Err("task_lifecycle_evidence_binding_invalid");
+    }
+    let brief = serde_json::json!({"task_id":identity.task_id,"scope":identity.scope,"evidence_ref":{"first_run_id":fact["first_run_id"],"first_report_sha256":sha}});
+    crate::syntax_task_recheck::original(root, &brief)
+        .map_err(|_| "task_lifecycle_evidence_binding_invalid")
+}
+fn origin_matches_evidence(original: &serde_json::Value, evidence: &serde_json::Value) -> bool {
+    if !matches!(
+        (
+            original["language"].as_str(),
+            evidence["schema_version"].as_str()
+        ),
+        (Some("zig"), Some("0.1.0")) | (Some("erlang"), Some("0.2.0"))
+    ) {
+        return false;
+    }
+    if original["schema_version"] == "0.2.0" {
+        evidence["grammar_sha256"].is_null()
+            && evidence["original_source_sha256"]
+                == original["native_evidence"]["target"]["source_sha256"]
+            && evidence["tool_sha256"] == original["native_evidence"]["native"]["tool_sha256"]
+    } else {
+        evidence["grammar_sha256"] == original["observations"][0]["grammar_sha256"]
+            && evidence["original_source_sha256"] == original["observations"][0]["source_sha256"]
+    }
 }
 pub(crate) fn save(root: &Path, record: &mut TaskLifecycleRecord) -> Result<String, &'static str> {
     record.event.event_id = event_id(record)?;
@@ -243,7 +301,14 @@ pub(crate) fn record_native_recurrence(
         .map_err(|_| "task_lifecycle_evidence_invalid")?;
     // 更换原生制品或原语法资产只要求重新核验；不把另一个工具的输出归为原任务复发。
     if scan["native"]["tool_sha256"] != evidence["tool_sha256"]
-        || scan["native"]["version"] != "0.16.0"
+        || scan["native"]["version"] != evidence["original_native"]["version"]
+        || !matches!(
+            (
+                evidence["schema_version"].as_str(),
+                scan["target"]["language"].as_str()
+            ),
+            (Some("0.1.0"), Some("zig")) | (Some("0.2.0"), Some("erlang"))
+        )
         || scan["original_report"]["sha256"] != original_sha
         || scan["original_report"]["grammar_sha256"] != evidence["grammar_sha256"]
     {
