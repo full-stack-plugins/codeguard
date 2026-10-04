@@ -803,3 +803,8 @@ flowchart LR
  E --> F[task show / next 当前修复指引]
  F --> G[原工具复检 关闭条件仍需验收]
 ```
+
+
+## 独立源码任务的下一步
+
+当next原优先项是等待执行者或预算耗尽的源码问题，且没有前置blocker，CLI会检查是否另有不同物理源码范围的可修复/待复检finding。证明独立后推荐该项，同时在next_actions及human输出保留延后任务的只读task show入口。原问题、预算、租约和门禁保持不变。重叠、别名、范围未知、坏事实或失败报告不被绕过；完整跨模块依赖图仍未完成，非Unix保留原选择。详见[实际验收及完整报告示例](../tests/acceptance/next-independent-source-work.md)。

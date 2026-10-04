@@ -75,6 +75,13 @@ pub fn run(args: &[String]) -> ExitCode {
         } else {
             println!("建议：{}", report["next_actions"]);
         }
+        if report["repair_brief"].is_object()
+            && report["next_actions"]
+                .as_array()
+                .is_some_and(|actions| !actions.is_empty())
+        {
+            println!("保留待处理任务的只读查询：{}", report["next_actions"]);
+        }
         println!("本命令只读取本地待办，交付门禁未评估。");
     }
     ExitCode::SUCCESS
@@ -260,7 +267,19 @@ fn build_view(root: &Path, checker_id: Option<&str>) -> Result<Value, &'static s
             .cmp(&right.priority)
             .then(left.id.cmp(&right.id))
     });
-    let selected = candidates.remove(0);
+    let selected_index = independent_source_task_index(root, &candidates).unwrap_or(0);
+    let deferred_queries = if selected_index == 0 {
+        json!([])
+    } else {
+        Value::Array(
+            candidates
+                .iter()
+                .filter(|candidate| deferred_source_finding(candidate))
+                .map(|candidate| json!(["codeguard", "task", "show", candidate.id, "."]))
+                .collect(),
+        )
+    };
+    let selected = candidates.remove(selected_index);
     let disposition = selected.brief["disposition"]
         .as_str()
         .ok_or("brief_disposition_invalid")?
@@ -269,8 +288,79 @@ fn build_view(root: &Path, checker_id: Option<&str>) -> Result<Value, &'static s
         &disposition,
         "local_task_selected",
         selected.brief,
-        json!([]),
+        deferred_queries,
     ))
+}
+
+// 仅在原首项是等待/待决策的源码问题时推进独立源码；完整依赖图未建立，
+// 因此前置 blocker 或无法证明物理范围独立时保持原选择，不扩展修改授权。
+fn deferred_source_finding(candidate: &Candidate) -> bool {
+    candidate.brief["kind"] == "finding"
+        && matches!(
+            candidate.brief["disposition"].as_str(),
+            Some("waiting" | "needs_decision")
+        )
+}
+
+fn independent_source_task_index(root: &Path, candidates: &[Candidate]) -> Option<usize> {
+    if !candidates.first().is_some_and(deferred_source_finding)
+        || candidates
+            .iter()
+            .any(|candidate| candidate.brief["kind"] == "blocker")
+    {
+        return None;
+    }
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::MetadataExt;
+        // 每个范围只读取一次；规范路径和 dev/ino 同时排除目录重叠、链接及硬链接别名。
+        let scopes: Vec<_> = candidates
+            .iter()
+            .map(|candidate| {
+                let scope = candidate.brief["scope"].as_str()?;
+                let path = root.join(scope).canonicalize().ok()?;
+                if !path.starts_with(root) {
+                    return None;
+                }
+                let metadata = fs::metadata(&path).ok()?;
+                metadata
+                    .is_file()
+                    .then_some((path, metadata.dev(), metadata.ino()))
+            })
+            .collect();
+        candidates
+            .iter()
+            .enumerate()
+            .skip(1)
+            .find_map(|(index, candidate)| {
+                if candidate.brief["kind"] != "finding"
+                    || !matches!(
+                        candidate.brief["disposition"].as_str(),
+                        Some("actionable" | "verification_required")
+                    )
+                {
+                    return None;
+                }
+                let source = scopes[index].as_ref()?;
+                let independent = candidates
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, other)| deferred_source_finding(other))
+                    .all(|(other_index, _)| {
+                        scopes[other_index].as_ref().is_some_and(|other| {
+                            !source.0.starts_with(&other.0)
+                                && !other.0.starts_with(&source.0)
+                                && (source.1, source.2) != (other.1, other.2)
+                        })
+                    });
+                independent.then_some(index)
+            })
+    }
+    #[cfg(not(unix))]
+    {
+        let _ = root;
+        None
+    }
 }
 
 fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static str> {

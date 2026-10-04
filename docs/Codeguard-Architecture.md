@@ -803,3 +803,8 @@ flowchart LR
  E --> F[task show / next current repair guidance]
  F --> G[Native recheck with closure still requiring acceptance]
 ```
+
+
+## Next steps for independent source findings
+
+When the first source finding is waiting for its owner or has exhausted its retry budget, and no prerequisite blocker exists, next can select another actionable or verification-required finding on a proven independent physical source. next_actions and human output retain read-only task show references for deferred findings. Their facts, budgets, leases and gate effects remain unchanged. Overlapping targets, aliases, unknown scope, invalid facts and failed reports retain conservative handling. The complete module dependency graph remains incomplete; non-Unix keeps the original selection. See the [actual acceptance evidence and full report example](../tests/acceptance/next-independent-source-work.md).

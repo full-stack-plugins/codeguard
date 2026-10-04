@@ -483,10 +483,11 @@
   持久边界补充验收：Ruff finding 的任务、fact、本地观察、事件四阶段及 Ruff 环境 blocker 的 fact 阶段均用独立工作区恢复；重放后缺失记录恢复、原字节不变、事件仅一条、消费标记最后出现。此阶段是磁盘中间态重建，实际进程退出验收见下条；磁盘故障和完整多类别事务矩阵仍缺，9.4 不勾选。
   实际进程退出补充：仅单元测试编译的子进程在 Ruff finding 的事件已持久化、消费标记未写时直接退出，父进程复查磁盘并重试，事件不重复且游标恢复；生产构建无故障注入入口。其它阶段、磁盘故障、跨类别多记录强杀与完整 RunReport 仍缺，9.4 不勾选。
   临时写入恢复补充：旧 PID/计数命名的 staging 文件残留曾使 `write_once` 直接失败；现有界换用新的 `create_new` 名字，残留文件原字节不变，目标记录完成。仍未证明磁盘错误/断电和完整事务，9.4 不勾选。
-- [ ] 9.5 实现 append-only 事件、父关系、状态机与可重建 Markdown 投影；验收：手改勾选无复检不关闭，缺父/分支冲突触发协调。进行中：Ruff 与 Rust Clippy 初见 finding 写固定 `observed` 事件和任务投影，重复报告不改 tracked 文件；其余事件、父关系校验、完整状态机及投影重建尚未实现，不勾选。
+- [ ] 9.5 实现 append-only 事件、父关系、状态机与可重建 Markdown 投影；验收：手改勾选无复检不关闭，缺父/分支冲突触发协调。进行中：Ruff 与 Rust Clippy 初见 finding 写固定 `observed` 事件和任务投影，重复报告不改 tracked 文件；缺失受支持任务的Markdown投影现由9.5.1恢复；其余事件、父关系校验、完整状态机及分支协调仍缺，不勾选。
 - [x] 9.5.1 恢复受支持本地事实的缺失可读任务投影：同一锁内核对已消费来源、事实及当前指引，仅补缺失Markdown；既有备注不覆盖，坏事实/来源/链接拒绝，不执行检查器，不改变任务状态、事实/事件/消费标记、租约或预算。证据：[投影恢复验收](../../../tests/acceptance/task-projection-recovery.md)，实际Swift重复同步与七项任务内容、Ruff源码/工具阻塞和活跃租约尝试均验证；默认工作区1283通过、示例1通过，相关WASM63通过，忽略项不计通过。完整9.5状态机、跨平台故障与安全矩阵保持未完成。
 - [ ] 9.6 实现任务依赖与 blocker 归并；验收：多个模块共缺 JDK 形成一个前置任务，各义务仍完整可见。进行中：Rust `work sync` 已将同一 Ruff 构建根、同一不完整原因的多个受影响文件归并成一个 `kind=blocker` 任务，分别保留原路径与观察事件；不同构建根不误合并，见 `codeguard-cli/tests/acceptance/work-sync-ruff-blockers.md`。JDK 跨模块公共前置任务、义务依赖边及跨检查器归并尚缺，不勾选。
-- [ ] 9.7 实现 status/next/show 与 RepairBrief/版本化 recipe；验收：给出修复目标、范围、步骤和复检条件，诊断中的指令不可执行。进行中：Python Ruff 局部反馈给出有界修复提示；初版 sync 生成脱敏 Markdown 任务。Rust `next` 已从本地结构化 Ruff fact 生成只读简报，含范围、静态步骤、复检与关闭条件；任务 Markdown 指令不进入简报，缺工具/配置优先指向准备工作。尚无完整 status/show、真实尝试历史、版本化 recipe、租约与复检关闭，因此不勾选，见 `codeguard-cli/tests/acceptance/next-local-brief-preview.md`。
+- [ ] 9.7 实现 status/next/show 与 RepairBrief/版本化 recipe；验收：给出修复目标、范围、步骤和复检条件，诊断中的指令不可执行。进行中：Python Ruff 局部反馈给出有界修复提示；初版 sync 生成脱敏 Markdown 任务。Rust `next` 已从本地结构化 Ruff fact 生成只读简报，含范围、静态步骤、复检与关闭条件；任务 Markdown 指令不进入简报，缺工具/配置优先指向准备工作。已有本地status/show、Unix尝试/租约历史及多检查器原工具复检切片；完整版本化recipe、可信关闭、跨宿主与全部平台仍缺，因此不勾选，见 `codeguard-cli/tests/acceptance/next-local-brief-preview.md` 及后续分项验收。
+- [x] 9.7.2 让等待/预算耗尽的源码finding不饿死不同物理范围的独立任务：核对路径与dev/ino，保留前置blocker和未知范围的原分流；next_actions/human给出延后任务的只读查询，不改预算、租约、事实或门禁。验收：[独立源码任务](../../../tests/acceptance/next-independent-source-work.md)，Ruff0.16.8真实双F401及两次no-change、全findings/state JSON摘要保持；同路径/硬链接/前置阻塞反例，默认all-targets1288通过/113忽略、相关WASM97通过/13忽略。仅Unix物理源码选择，完整依赖图、跨平台与可信关闭仍属9.7/9.9/9.26，不替代父任务。
   doctor 复检进展：task verify 已重用原版本诊断和任务租约/尝试一致性，持久化摘要绑定收据；next 与尝试账本识别 doctor 身份。失败仍受阻、未选择未完成，真实 Ruff 恢复仅 environment_restored_unverified_policy，next 指向批准前置及原受阻质量检查，任务仍 open。65 项相关回归及实际协议验收通过；可信义务/正式关闭未实现，不勾选，见相邻 tests/acceptance/doctor-task-verification.md。
   Java/CVE blocker 现也有本地 Markdown 任务和 `java_cve.next` 只读简报，给出构建根、漏洞库/工具检查步骤及带占位参数的复检命令；原生 advisory 未被当作已确认漏洞或白名单批准。`task verify` 可重跑原生 OWASP 并保留局部观察，但正式关闭/重开尚未实现，9.7 不勾选。
   新增局部 `status` 与 `task show` 只读视图：前者从当前受限事实汇总开放任务、待同步报告和下一步，后者复用事实/事件核对展示指定任务的证据、范围、约束、历史和复检，不读取 Markdown 指令。画像/检查 freshness 固定未核验，空任务不称通过；缺完整事件父关系、历史 gate 收据、依赖、关闭状态与版本化 recipe，9.7 仍不勾选。见相邻 `codeguard-cli/tests/acceptance/status-show-local-preview.md`。
@@ -1376,3 +1377,8 @@ CI 37214829667 的 npm 全候选验收继承 Kotlin/Swift 工具，使原生优�
 2026-10-05 验收推进：任务投影恢复仅处理合法 CG-/CG-B-身份，非任务目录仍由 next/status 明示异常，不阻断独立有效原生报告导入；默认相关四目标60 passed、0 failed、7 ignored。WASM Ruff 取消夹具原来的未启动判断已由脚本 trace 及退出后 ready/late 文件反证；改为 shell 内建同步信号，保持真实后台 shell/sleep、2秒预算、130退出码及取消后无迟写断言，并新增非取消正对照。相关 WASM 五目标63 passed、0 failed、7 ignored；237 schema元定义、236历史schema不变、OpenSpec strict及分层检查通过。实际Swift恢复证据更新，任务仍open，原事实/事件/消费标记不变。完整默认测试仍在运行，不勾选9.5、3.3等父任务，不以局部通过代替全部平台/状态机/宿主与发行验收。
 
 当前源码完整默认测试已正常退出0（1283 passed/0 failed/113 ignored），示例目标另1 passed/0 failed；9.5.1受支持投影恢复切片已验收，父任务及完整目标仍开放。
+
+
+2026-10-05 独立源码任务调度进展：RED复现预算耗尽的finding占据next首项，使另一份可修复源码得不到指引。现仅在没有前置blocker、原首项为waiting/needs_decision源码finding时，核对物理路径/dev/ino并推荐不同范围的可修复或待复检finding；范围重叠/未知、别名、坏事实及失败报告保留原分流。延后任务由next_actions及human提供只读task show引用，不改事实、预算、租约或门禁。默认相关六目标62通过/12忽略，WASM十目标97通过/13忽略；真实Ruff0.16.8双F401及两次no-change后独立选择通过，原记录摘要不变。4项实际schema/状态不变量验收、OpenSpec strict和分层检查通过；当前完整all-targets测试在运行，未取得终态，不勾选9.7/9.9/9.26父任务，不代表完整依赖图、跨平台或已安装宿主。见[独立源码任务验收](../../../tests/acceptance/next-independent-source-work.md)。
+
+独立源码调度最终验收：完整默认all-targets退出0（1288 passed/0 failed/113 ignored），默认及WASM all-targets Clippy -D warnings通过。237历史schema原件不变、4项实际协议/状态不变量验收及790条本地链接检查通过。实际后补采集使用显式60秒预算并验证findings/state JSON摘要；10秒预算触限不作为成功证据、不改产品默认预算，也不声称性能目标达标。9.7.2切片完成，父任务保持开放。

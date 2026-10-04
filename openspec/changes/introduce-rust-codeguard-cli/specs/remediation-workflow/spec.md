@@ -189,6 +189,14 @@ MUST 提供 attempt 开始/结束协议，受控 fix apply 自动登记，自由
 - **WHEN** 同一问题和补丁连续无进展达到预算
 - **THEN** 停止相同自动尝试，保留阻断并给出下一步诊断，不推荐跳过规则
 
+#### Scenario: One source finding is waiting or exhausted while another source can progress
+- **WHEN** next原优先任务是等待已有执行者或预算耗尽的源码finding，另有不同物理源码范围的actionable或verification_required finding，且没有未解决前置blocker
+- **THEN** 推荐可继续的独立源码任务，保留原任务及其预算/租约/待决策状态，next_actions提供原任务的只读task show引用，不降低任何门禁
+
+#### Scenario: A waiting source task overlaps the available repair target
+- **WHEN** 待执行源码任务与开放attempt的物理源码范围相同、互相包含或存在文件别名，或无法确认范围独立
+- **THEN** 不绕过等待任务推荐重叠修改；前置blocker及坏事实仍按原规则明示，不因选择另一任务消失
+
 #### Scenario: Tool output contains an instruction
 - **WHEN** 诊断文本要求执行 Shell 或关闭规则
 - **THEN** 仅作为证据数据展示，不升级为动作授权

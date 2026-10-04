@@ -1,0 +1,645 @@
+{
+  "schema_version": "0.1.0",
+  "base_commit": "15ea2e6541affac216c820b15fc77e8ffd981651",
+  "uncommitted_selection_change": true,
+  "program_sha256": "5ba80feaf62be044f4b70bd9d6cb81e4ad4044a48dd03d5228efc80a2e11dbb6",
+  "native_tool_version": "ruff 0.16.8",
+  "native_tool_sha256": "71f417319c8c4d45562034b44a4ff08e5a1b3dddab5b5c42d5df9800e86a6084",
+  "deferred_task_id": "CG-51d2afe0f8e8b55fe53db2ca33214220",
+  "selected_task_id": "CG-9759c061d6dc3a6d2cad6e2ab9308a7f",
+  "original_record_sha256": {
+    ".codeguard/findings/CG-9759c061d6dc3a6d2cad6e2ab9308a7f/finding.json": "591d91075f44f36fba50369dc4a3d033a098ab4afd6417d256171779c6946069",
+    ".codeguard/findings/CG-51d2afe0f8e8b55fe53db2ca33214220/finding.json": "e29c14d5716b340b05b8a333c11ff51aab9c9382995f1a14e0a64b7a371d8606",
+    ".codeguard/findings/CG-51d2afe0f8e8b55fe53db2ca33214220/events/attempt-CG-A-4ab6f0127f68fa31841a7f4c73b1746d-finish.json": "d9e9dfa1e9d857fc73bbfa80b1b4e63fc6c0c2bce283a641385954d7c3752530",
+    ".codeguard/findings/CG-51d2afe0f8e8b55fe53db2ca33214220/events/lint-86465-1791140315875962000.json": "25a0c33b1c482c2d7c4b4c037300fd62f5b4e4986db296c46f16645d4fdba0b7",
+    ".codeguard/findings/CG-51d2afe0f8e8b55fe53db2ca33214220/events/attempt-CG-A-4ab6f0127f68fa31841a7f4c73b1746d-start.json": "88e9accfc195ee064589dd05e5fbac5db69c0dd32138113e56c65ca963d16be1",
+    ".codeguard/findings/CG-51d2afe0f8e8b55fe53db2ca33214220/events/attempt-CG-A-289e4fec1cf20c26b549fc55d9b25b27-start.json": "3b196dbca4434c996700062d4fdac283453d1f22c0a0ae6d584d6faeb146d5e1",
+    ".codeguard/findings/CG-51d2afe0f8e8b55fe53db2ca33214220/events/attempt-CG-A-289e4fec1cf20c26b549fc55d9b25b27-finish.json": "c7a00a7edc7ed0a165edf27391f4e39b56ba4336eca14e1c3101ba37f65dc475",
+    ".codeguard/findings/CG-9759c061d6dc3a6d2cad6e2ab9308a7f/events/lint-86465-1791140315875962000.json": "2b9436f1cbf72f0186e386046f5a2cb13b149dbbdfbdff7b28763949dc909608",
+    ".codeguard/state/consumed/lint-86465-1791140315875962000.json": "bbfbbc7dc2cbfac4489f424fa3b30d52a6ecee2fa8ab23efa83df369e7d76f9a",
+    ".codeguard/state/leases/CG-51d2afe0f8e8b55fe53db2ca33214220.json": "d813053aedc55998b42a5175fd16b8a6b947a26d9121590d6c566f1f7e3e03e4",
+    ".codeguard/state/observations/CG-9759c061d6dc3a6d2cad6e2ab9308a7f/lint-86465-1791140315875962000.json": "72382096e1b395f4467166002d4d4fe04a463a2f4fc1ace711d50201d042a42e",
+    ".codeguard/state/observations/CG-51d2afe0f8e8b55fe53db2ca33214220/lint-86465-1791140315875962000.json": "24902e5a2cfa146e1e6f489376b208d3af95d66cd9118cf9bf65087ac7fd5997"
+  },
+  "after_query_record_sha256": {
+    ".codeguard/findings/CG-9759c061d6dc3a6d2cad6e2ab9308a7f/finding.json": "591d91075f44f36fba50369dc4a3d033a098ab4afd6417d256171779c6946069",
+    ".codeguard/findings/CG-51d2afe0f8e8b55fe53db2ca33214220/finding.json": "e29c14d5716b340b05b8a333c11ff51aab9c9382995f1a14e0a64b7a371d8606",
+    ".codeguard/findings/CG-51d2afe0f8e8b55fe53db2ca33214220/events/attempt-CG-A-4ab6f0127f68fa31841a7f4c73b1746d-finish.json": "d9e9dfa1e9d857fc73bbfa80b1b4e63fc6c0c2bce283a641385954d7c3752530",
+    ".codeguard/findings/CG-51d2afe0f8e8b55fe53db2ca33214220/events/lint-86465-1791140315875962000.json": "25a0c33b1c482c2d7c4b4c037300fd62f5b4e4986db296c46f16645d4fdba0b7",
+    ".codeguard/findings/CG-51d2afe0f8e8b55fe53db2ca33214220/events/attempt-CG-A-4ab6f0127f68fa31841a7f4c73b1746d-start.json": "88e9accfc195ee064589dd05e5fbac5db69c0dd32138113e56c65ca963d16be1",
+    ".codeguard/findings/CG-51d2afe0f8e8b55fe53db2ca33214220/events/attempt-CG-A-289e4fec1cf20c26b549fc55d9b25b27-start.json": "3b196dbca4434c996700062d4fdac283453d1f22c0a0ae6d584d6faeb146d5e1",
+    ".codeguard/findings/CG-51d2afe0f8e8b55fe53db2ca33214220/events/attempt-CG-A-289e4fec1cf20c26b549fc55d9b25b27-finish.json": "c7a00a7edc7ed0a165edf27391f4e39b56ba4336eca14e1c3101ba37f65dc475",
+    ".codeguard/findings/CG-9759c061d6dc3a6d2cad6e2ab9308a7f/events/lint-86465-1791140315875962000.json": "2b9436f1cbf72f0186e386046f5a2cb13b149dbbdfbdff7b28763949dc909608",
+    ".codeguard/state/consumed/lint-86465-1791140315875962000.json": "bbfbbc7dc2cbfac4489f424fa3b30d52a6ecee2fa8ab23efa83df369e7d76f9a",
+    ".codeguard/state/leases/CG-51d2afe0f8e8b55fe53db2ca33214220.json": "d813053aedc55998b42a5175fd16b8a6b947a26d9121590d6c566f1f7e3e03e4",
+    ".codeguard/state/observations/CG-9759c061d6dc3a6d2cad6e2ab9308a7f/lint-86465-1791140315875962000.json": "72382096e1b395f4467166002d4d4fe04a463a2f4fc1ace711d50201d042a42e",
+    ".codeguard/state/observations/CG-51d2afe0f8e8b55fe53db2ca33214220/lint-86465-1791140315875962000.json": "24902e5a2cfa146e1e6f489376b208d3af95d66cd9118cf9bf65087ac7fd5997"
+  },
+  "reports": {
+    "init": {
+      "exit_code": 3,
+      "report": {
+        "changed_directories": [
+          ".codeguard",
+          ".codeguard/findings",
+          ".codeguard/tasks",
+          ".codeguard/decisions",
+          ".codeguard/reports",
+          ".codeguard/runs",
+          ".codeguard/cache",
+          ".codeguard/worktrees",
+          ".codeguard/state"
+        ],
+        "changed_files": [
+          ".codeguard/.gitignore",
+          ".codeguard/README.md",
+          ".codeguard/project.json",
+          ".codeguard/module-graph.json",
+          ".codeguard/architecture.md",
+          "AGENTS.md",
+          ".codeguard/workspace.json"
+        ],
+        "conflict_file": null,
+        "delivery_decision": "not_evaluated",
+        "init_status": "partial",
+        "mode": "apply",
+        "next_actions": [
+          "review_project_profile",
+          "complete_init_readiness",
+          "run_doctor_and_check_when_available"
+        ],
+        "observation_complete": true,
+        "operation": "init",
+        "planned_files": [
+          ".codeguard/.gitignore",
+          ".codeguard/README.md",
+          ".codeguard/project.json",
+          ".codeguard/module-graph.json",
+          ".codeguard/architecture.md",
+          ".codeguard/workspace.json",
+          "AGENTS.md"
+        ],
+        "profile_stale": null,
+        "profile_summary": {
+          "architecture": "unknown",
+          "build_model": "not_resolved",
+          "build_roots": [],
+          "checker_inventory": "partial",
+          "checkers": [
+            {
+              "build_root": ".",
+              "category": "lint",
+              "checker_id": "python.ruff",
+              "configuration": "configured",
+              "configuration_ref": "ruff.toml",
+              "execution": "not_run",
+              "gate_effect": "none",
+              "next_action": "用原生 Ruff 核对生效规则、扫描范围和诊断",
+              "reason": "explicit_ruff_lint_configuration",
+              "required_by_policy": null
+            },
+            {
+              "build_root": ".",
+              "category": "cve",
+              "checker_id": "python.pip_audit",
+              "configuration": "unknown",
+              "configuration_ref": ".",
+              "execution": "not_run",
+              "gate_effect": "none",
+              "next_action": "定位当前 Python 项目的依赖清单或锁文件，再配置并运行原生漏洞检查",
+              "reason": "python_dependency_input_not_found",
+              "required_by_policy": null
+            }
+          ],
+          "installed_versions": "not_probed",
+          "language_targets": [],
+          "languages": [
+            {
+              "id": "python",
+              "manifest_count": 0,
+              "source_file_count": 2
+            },
+            {
+              "id": "toml",
+              "manifest_count": 0,
+              "source_file_count": 1
+            }
+          ],
+          "unknown_conditions": [
+            "source_sets_not_fully_classified",
+            "dialects_not_classified"
+          ]
+        },
+        "readiness": "unknown",
+        "report_type": "init_plan",
+        "schema_version": "0.5.0",
+        "unresolved": [
+          "profile_refresh_partial",
+          "approved_quality_policy_not_bound",
+          "tool_readiness_not_probed"
+        ],
+        "workspace_id": "ws-5a2c6ba03a2e6f3732837d8317aac463"
+      }
+    },
+    "native": {
+      "exit_code": 3,
+      "report": {
+        "adapter_sha256": "5ba80feaf62be044f4b70bd9d6cb81e4ad4044a48dd03d5228efc80a2e11dbb6",
+        "backlog_status": "synced_partial",
+        "backlog_sync": {
+          "failed_reports": 0,
+          "historical_findings": 0,
+          "imported_reports": 1,
+          "new_blockers": 0,
+          "new_findings": 2
+        },
+        "checker_configurations": [
+          {
+            "build_root": ".",
+            "checker_id": "python.ruff",
+            "configuration": "configured",
+            "configuration_ref": "ruff.toml",
+            "next_action": "用原生 Ruff 核对生效规则、扫描范围和诊断"
+          }
+        ],
+        "command_status": "incomplete",
+        "delivery_decision": "not_evaluated",
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "source": "cli",
+          "timeout_ms": 60000
+        },
+        "exit_code": 3,
+        "files": [
+          {
+            "config_sha256": "baabd40ce17830767eb47845ea31d03172d8609cb7ecf8f9e2e15a67d9616444",
+            "configuration_ref": "ruff.toml",
+            "findings": [
+              {
+                "codeguard_rule_id": "python.ruff.F401",
+                "column": 8,
+                "finding_fingerprint": "51d2afe0f8e8b55fe53db2ca33214220bb1f1e0cea3b528c8e70f5d61dfc0bbc",
+                "finding_id": "CG-51d2afe0f8e8b55fe53db2ca33214220",
+                "line": 1,
+                "next_action": "核对原生规则与源码，修复后执行复检命令",
+                "path": "app.py",
+                "repair_hint": {
+                  "allowed_path": "app.py",
+                  "closure_condition": "对相同源码范围重新执行原生检查，并确认该规则发现消失",
+                  "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+                  "status": "bounded_repair_candidate",
+                  "step": "核对该导入是否确实未被使用；仅在确认后移除该导入"
+                },
+                "rule_id": "F401",
+                "rule_summary": "导入未使用",
+                "rulepack_sha256": "3afdb985ec6dcdfa770cd903e4ea142170b37472b2a80f91939db1d05931a608",
+                "rulepack_status": "candidate_unapproved"
+              }
+            ],
+            "path": "app.py",
+            "reason": null,
+            "recheck_argv": [
+              "ruff",
+              "check",
+              "app.py"
+            ],
+            "recheck_cwd": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-next-independent-66aiamxg",
+            "rule_settings": {
+              "coverage_proven": false,
+              "globally_enabled_mapped_rules": [
+                "F401"
+              ],
+              "per_file_ignores_present": false,
+              "settings_sha256": "2b90fa38be0313d28992bcf4fe9c32a776f63e5960d74554aafb11c662ca6b10"
+            },
+            "run_status": "findings",
+            "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+            "suppression_audit": {
+              "audit_sha256": "05a1a7613cd2d4eca55e499c331a1d36ac24ddf85c17dad363ea340ee8a151e0",
+              "scope": "source_comments_only",
+              "suppressed_diagnostic_count": 0,
+              "suppressed_rule_ids": []
+            },
+            "tool_sha256": "71f417319c8c4d45562034b44a4ff08e5a1b3dddab5b5c42d5df9800e86a6084"
+          },
+          {
+            "config_sha256": "baabd40ce17830767eb47845ea31d03172d8609cb7ecf8f9e2e15a67d9616444",
+            "configuration_ref": "ruff.toml",
+            "findings": [
+              {
+                "codeguard_rule_id": "python.ruff.F401",
+                "column": 8,
+                "finding_fingerprint": "9759c061d6dc3a6d2cad6e2ab9308a7fbfd277dd8231bca9414461a40603d69c",
+                "finding_id": "CG-9759c061d6dc3a6d2cad6e2ab9308a7f",
+                "line": 1,
+                "next_action": "核对原生规则与源码，修复后执行复检命令",
+                "path": "other.py",
+                "repair_hint": {
+                  "allowed_path": "other.py",
+                  "closure_condition": "对相同源码范围重新执行原生检查，并确认该规则发现消失",
+                  "source_sha256": "c517577851c489e45abae2591256c40404a05c6d19cd4d5ae7fd22b0084cec6c",
+                  "status": "bounded_repair_candidate",
+                  "step": "核对该导入是否确实未被使用；仅在确认后移除该导入"
+                },
+                "rule_id": "F401",
+                "rule_summary": "导入未使用",
+                "rulepack_sha256": "3afdb985ec6dcdfa770cd903e4ea142170b37472b2a80f91939db1d05931a608",
+                "rulepack_status": "candidate_unapproved"
+              }
+            ],
+            "path": "other.py",
+            "reason": null,
+            "recheck_argv": [
+              "ruff",
+              "check",
+              "other.py"
+            ],
+            "recheck_cwd": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-next-independent-66aiamxg",
+            "rule_settings": {
+              "coverage_proven": false,
+              "globally_enabled_mapped_rules": [
+                "F401"
+              ],
+              "per_file_ignores_present": false,
+              "settings_sha256": "8f0fa6cf8a2cacfaabcc07fd99c47f51985cc6c43738ed0f5eacad39b3b1fe4d"
+            },
+            "run_status": "findings",
+            "source_sha256": "c517577851c489e45abae2591256c40404a05c6d19cd4d5ae7fd22b0084cec6c",
+            "suppression_audit": {
+              "audit_sha256": "58b58f6bb479f86dbc06d276e4c3057deb94a2a6fdd33e625ce7562790789b32",
+              "scope": "source_comments_only",
+              "suppressed_diagnostic_count": 0,
+              "suppressed_rule_ids": []
+            },
+            "tool_sha256": "71f417319c8c4d45562034b44a4ff08e5a1b3dddab5b5c42d5df9800e86a6084"
+          }
+        ],
+        "incomplete_reasons": [],
+        "language": "python",
+        "local_scan_complete": true,
+        "native_tool_version": "ruff 0.16.8",
+        "next": {
+          "authority": "local_unverified",
+          "command_status": "complete",
+          "delivery_decision": "not_evaluated",
+          "disposition": "actionable",
+          "exit_code": 0,
+          "next_actions": [],
+          "operation": "next",
+          "reason": "local_task_selected",
+          "repair_brief": {
+            "action_id": "repair-source",
+            "authority": "local_unverified",
+            "checker_id": "python.ruff",
+            "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+            "constraints": [
+              "仅修改目标源码",
+              "不得忽略规则或将任务勾选当作复检"
+            ],
+            "disposition": "actionable",
+            "evidence_ref": {
+              "first_report_sha256": "0787f86ed37a049b5f8864d56481bde646c33bac2297b54b8c66448771890046",
+              "first_run_id": "lint-86465-1791140315875962000"
+            },
+            "history": {
+              "attempt_count": 0,
+              "awaiting_verification": false,
+              "budget": 2,
+              "no_progress_count": 0,
+              "open_attempt_id": null,
+              "recent": []
+            },
+            "kind": "finding",
+            "native_rule_id": "F401",
+            "recheck_argv": [
+              "codeguard",
+              "lint",
+              "python",
+              "."
+            ],
+            "schema_version": "0.1.0",
+            "scope": "app.py",
+            "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+            "step": "核对导入是否仍被使用；确认后仅修改目标文件导入",
+            "task_id": "CG-51d2afe0f8e8b55fe53db2ca33214220"
+          },
+          "report_type": "repair_brief_preview",
+          "schema_version": "0.1.0"
+        },
+        "operation": "lint",
+        "repair_brief_reason": null,
+        "repair_brief_status": "available",
+        "report_type": "python_lint_feedback",
+        "requested_paths": null,
+        "rulepack_approval": "unverified",
+        "run_id": "lint-86465-1791140315875962000",
+        "scan_scope": "discovered_python",
+        "schema_version": "0.13.0",
+        "scope": "local_native_scan_only",
+        "tool_approval": "unverified",
+        "workspace_binding": "bound",
+        "workspace_id": "ws-5a2c6ba03a2e6f3732837d8317aac463"
+      }
+    },
+    "next_before": {
+      "exit_code": 0,
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "disposition": "actionable",
+        "exit_code": 0,
+        "next_actions": [],
+        "operation": "next",
+        "reason": "local_task_selected",
+        "repair_brief": {
+          "action_id": "repair-source",
+          "authority": "local_unverified",
+          "checker_id": "python.ruff",
+          "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+          "constraints": [
+            "仅修改目标源码",
+            "不得忽略规则或将任务勾选当作复检"
+          ],
+          "disposition": "actionable",
+          "evidence_ref": {
+            "first_report_sha256": "0787f86ed37a049b5f8864d56481bde646c33bac2297b54b8c66448771890046",
+            "first_run_id": "lint-86465-1791140315875962000"
+          },
+          "history": {
+            "attempt_count": 0,
+            "awaiting_verification": false,
+            "budget": 2,
+            "no_progress_count": 0,
+            "open_attempt_id": null,
+            "recent": []
+          },
+          "kind": "finding",
+          "native_rule_id": "F401",
+          "recheck_argv": [
+            "codeguard",
+            "lint",
+            "python",
+            "."
+          ],
+          "schema_version": "0.1.0",
+          "scope": "app.py",
+          "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+          "step": "核对导入是否仍被使用；确认后仅修改目标文件导入",
+          "task_id": "CG-51d2afe0f8e8b55fe53db2ca33214220"
+        },
+        "report_type": "repair_brief_preview",
+        "schema_version": "0.1.0"
+      }
+    },
+    "claim": {
+      "exit_code": 0,
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "exit_code": 0,
+        "expires_at": 1791140630,
+        "generation": 1,
+        "operation": "task_claim",
+        "reason": null,
+        "report_type": "task_lease",
+        "schema_version": "0.1.0",
+        "status": "active",
+        "task_id": "CG-51d2afe0f8e8b55fe53db2ca33214220"
+      }
+    },
+    "start_0": {
+      "exit_code": 0,
+      "report": {
+        "action_fingerprint": "bbeaee82fba74501f9e09363e6ecc9cfbb442045675f889b68af069f4a66e4fd",
+        "action_id": "repair-source",
+        "attempt_id": "CG-A-289e4fec1cf20c26b549fc55d9b25b27",
+        "authority": "local_unverified",
+        "before_sha256": "9c4cda53d969a7569d66f2753c8b8314230021b8e70d4140871b7469a123e29a",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "exit_code": 0,
+        "operation": "attempt_start",
+        "reason": null,
+        "report_type": "task_attempt",
+        "schema_version": "0.1.0",
+        "task_id": "CG-51d2afe0f8e8b55fe53db2ca33214220"
+      }
+    },
+    "finish_0": {
+      "exit_code": 0,
+      "report": {
+        "after_sha256": "9c4cda53d969a7569d66f2753c8b8314230021b8e70d4140871b7469a123e29a",
+        "attempt_id": "CG-A-289e4fec1cf20c26b549fc55d9b25b27",
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "exit_code": 0,
+        "note_code": "no_change",
+        "observed_change": false,
+        "operation": "attempt_finish",
+        "outcome": "no-change",
+        "reason": null,
+        "report_type": "task_attempt",
+        "schema_version": "0.1.0",
+        "task_id": "CG-51d2afe0f8e8b55fe53db2ca33214220"
+      }
+    },
+    "start_1": {
+      "exit_code": 0,
+      "report": {
+        "action_fingerprint": "bbeaee82fba74501f9e09363e6ecc9cfbb442045675f889b68af069f4a66e4fd",
+        "action_id": "repair-source",
+        "attempt_id": "CG-A-4ab6f0127f68fa31841a7f4c73b1746d",
+        "authority": "local_unverified",
+        "before_sha256": "9c4cda53d969a7569d66f2753c8b8314230021b8e70d4140871b7469a123e29a",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "exit_code": 0,
+        "operation": "attempt_start",
+        "reason": null,
+        "report_type": "task_attempt",
+        "schema_version": "0.1.0",
+        "task_id": "CG-51d2afe0f8e8b55fe53db2ca33214220"
+      }
+    },
+    "finish_1": {
+      "exit_code": 0,
+      "report": {
+        "after_sha256": "9c4cda53d969a7569d66f2753c8b8314230021b8e70d4140871b7469a123e29a",
+        "attempt_id": "CG-A-4ab6f0127f68fa31841a7f4c73b1746d",
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "exit_code": 0,
+        "note_code": "no_change",
+        "observed_change": false,
+        "operation": "attempt_finish",
+        "outcome": "no-change",
+        "reason": null,
+        "report_type": "task_attempt",
+        "schema_version": "0.1.0",
+        "task_id": "CG-51d2afe0f8e8b55fe53db2ca33214220"
+      }
+    },
+    "next_after": {
+      "exit_code": 0,
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "disposition": "actionable",
+        "exit_code": 0,
+        "next_actions": [
+          [
+            "codeguard",
+            "task",
+            "show",
+            "CG-51d2afe0f8e8b55fe53db2ca33214220",
+            "."
+          ]
+        ],
+        "operation": "next",
+        "reason": "local_task_selected",
+        "repair_brief": {
+          "action_id": "repair-source",
+          "authority": "local_unverified",
+          "checker_id": "python.ruff",
+          "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+          "constraints": [
+            "仅修改目标源码",
+            "不得忽略规则或将任务勾选当作复检"
+          ],
+          "disposition": "actionable",
+          "evidence_ref": {
+            "first_report_sha256": "0787f86ed37a049b5f8864d56481bde646c33bac2297b54b8c66448771890046",
+            "first_run_id": "lint-86465-1791140315875962000"
+          },
+          "history": {
+            "attempt_count": 0,
+            "awaiting_verification": false,
+            "budget": 2,
+            "no_progress_count": 0,
+            "open_attempt_id": null,
+            "recent": []
+          },
+          "kind": "finding",
+          "native_rule_id": "F401",
+          "recheck_argv": [
+            "codeguard",
+            "lint",
+            "python",
+            "."
+          ],
+          "schema_version": "0.1.0",
+          "scope": "other.py",
+          "source_sha256": "c517577851c489e45abae2591256c40404a05c6d19cd4d5ae7fd22b0084cec6c",
+          "step": "核对导入是否仍被使用；确认后仅修改目标文件导入",
+          "task_id": "CG-9759c061d6dc3a6d2cad6e2ab9308a7f"
+        },
+        "report_type": "repair_brief_preview",
+        "schema_version": "0.1.0"
+      }
+    },
+    "deferred_show": {
+      "exit_code": 0,
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "event_chain_status": "unverified",
+        "evidence_freshness": "unverified",
+        "exit_code": 0,
+        "next_actions": [
+          [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-51d2afe0f8e8b55fe53db2ca33214220",
+            "."
+          ]
+        ],
+        "operation": "task_show",
+        "report_type": "task_show_preview",
+        "request_id": "view-87939-1791140330703455000",
+        "schema_version": "0.1.0",
+        "state": "open",
+        "task": {
+          "action_id": "repair-source",
+          "authority": "local_unverified",
+          "checker_id": "python.ruff",
+          "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+          "constraints": [
+            "仅修改目标源码",
+            "不得忽略规则或将任务勾选当作复检"
+          ],
+          "disposition": "needs_decision",
+          "evidence_ref": {
+            "first_report_sha256": "0787f86ed37a049b5f8864d56481bde646c33bac2297b54b8c66448771890046",
+            "first_run_id": "lint-86465-1791140315875962000"
+          },
+          "history": {
+            "attempt_count": 2,
+            "awaiting_verification": false,
+            "budget": 2,
+            "no_progress_count": 2,
+            "open_attempt_id": null,
+            "recent": [
+              {
+                "action_id": "repair-source",
+                "attempt_id": "CG-A-4ab6f0127f68fa31841a7f4c73b1746d",
+                "note_code": "no_change",
+                "observed_change": false,
+                "outcome": "no-change"
+              },
+              {
+                "action_id": "repair-source",
+                "attempt_id": "CG-A-289e4fec1cf20c26b549fc55d9b25b27",
+                "note_code": "no_change",
+                "observed_change": false,
+                "outcome": "no-change"
+              }
+            ]
+          },
+          "kind": "finding",
+          "native_rule_id": "F401",
+          "recheck_argv": [
+            "codeguard",
+            "lint",
+            "python",
+            "."
+          ],
+          "schema_version": "0.1.0",
+          "scope": "app.py",
+          "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+          "step": "同一输入与动作连续无进展；检查原生诊断、工具配置和失败记录，提出具体修复或策略决策",
+          "task_id": "CG-51d2afe0f8e8b55fe53db2ca33214220"
+        },
+        "task_id": "CG-51d2afe0f8e8b55fe53db2ca33214220"
+      }
+    },
+    "release": {
+      "exit_code": 0,
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "exit_code": 0,
+        "expires_at": 1791140630,
+        "generation": 1,
+        "operation": "task_release",
+        "reason": null,
+        "report_type": "task_lease",
+        "schema_version": "0.1.0",
+        "status": "released",
+        "task_id": "CG-51d2afe0f8e8b55fe53db2ca33214220"
+      }
+    }
+  },
+  "human_next": "CodeGuard 下一步：actionable；local_task_selected\n任务 \"CG-9759c061d6dc3a6d2cad6e2ab9308a7f\"：\"核对导入是否仍被使用；确认后仅修改目标文件导入\"；范围 \"other.py\"；复检 [\"codeguard\",\"lint\",\"python\",\".\"]\n保留待处理任务的只读查询：[[\"codeguard\",\"task\",\"show\",\"CG-51d2afe0f8e8b55fe53db2ca33214220\",\".\"]]\n本命令只读取本地待办，交付门禁未评估。\n",
+  "delivery_decision": "not_evaluated",
+  "native_capture_budget_seconds": 60,
+  "trusted_closure": false,
+  "actual_installed_host": false
+}
