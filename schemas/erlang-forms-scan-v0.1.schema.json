@@ -1,0 +1,704 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "tool_selection",
+    "scope",
+    "authority",
+    "coverage_proven",
+    "delivery_decision",
+    "local_forms_complete",
+    "reason",
+    "source_file_count",
+    "unobserved_count",
+    "files",
+    "task_status",
+    "task_id",
+    "scope_stable"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "report_type": {
+      "const": "erlang_forms_scan"
+    },
+    "tool_selection": {
+      "$ref": "#/$defs/tool_selection"
+    },
+    "scope": {
+      "const": "single_file_forms_without_preprocessing"
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "local_forms_complete": {
+      "type": "boolean"
+    },
+    "reason": {
+      "enum": [
+        "erlang_native_scan_incomplete",
+        "erlang_forms_observed_unverified_project_coverage"
+      ]
+    },
+    "source_file_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "unobserved_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "files": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "source_sha256",
+          "current",
+          "native",
+          "findings",
+          "recheck_argv",
+          "next_action"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_sha256": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/$defs/digest"
+              }
+            ]
+          },
+          "current": {
+            "type": "boolean"
+          },
+          "native": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "reason",
+              "version",
+              "tool_sha256",
+              "diagnostics",
+              "diagnostics_truncated",
+              "preprocessing_unresolved"
+            ],
+            "properties": {
+              "status": {
+                "enum": [
+                  "not_run",
+                  "incomplete",
+                  "completed",
+                  "diagnostics_observed"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "version": {
+                "enum": [
+                  null,
+                  "OTP 28"
+                ]
+              },
+              "tool_sha256": {
+                "anyOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/$defs/digest"
+                  }
+                ]
+              },
+              "diagnostics": {
+                "type": "array",
+                "maxItems": 32,
+                "items": {
+                  "$ref": "#/$defs/diagnostic"
+                }
+              },
+              "diagnostics_truncated": {
+                "type": "boolean"
+              },
+              "preprocessing_unresolved": {
+                "type": "boolean"
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "diagnostics_observed"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "version": {
+                      "const": "OTP 28"
+                    },
+                    "tool_sha256": {
+                      "$ref": "#/$defs/digest"
+                    },
+                    "diagnostics_truncated": {
+                      "const": false
+                    },
+                    "preprocessing_unresolved": {
+                      "const": false
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "status": {
+                      "const": "completed"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "diagnostics": {
+                      "maxItems": 0
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "status": {
+                      "const": "diagnostics_observed"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "diagnostics": {
+                      "minItems": 1
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "status": {
+                      "const": "completed"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "reason": {
+                      "const": "erlang_native_forms_no_diagnostics"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "status": {
+                      "const": "diagnostics_observed"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "reason": {
+                      "const": "erlang_native_syntax_diagnostics"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "status": {
+                      "const": "not_run"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "version": {
+                      "type": "null"
+                    },
+                    "tool_sha256": {
+                      "type": "null"
+                    },
+                    "diagnostics": {
+                      "maxItems": 0
+                    },
+                    "diagnostics_truncated": {
+                      "const": false
+                    },
+                    "preprocessing_unresolved": {
+                      "const": false
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "$ref": "#/$defs/diagnostic"
+            }
+          },
+          "recheck_argv": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "array",
+                "minItems": 7,
+                "maxItems": 7,
+                "prefixItems": [
+                  {
+                    "const": "codeguard"
+                  },
+                  {
+                    "const": "lint"
+                  },
+                  {
+                    "const": "erlang"
+                  },
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^/"
+                  },
+                  {
+                    "const": "--erl-tool"
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^/"
+                  },
+                  {
+                    "const": "--format=json"
+                  }
+                ],
+                "items": false
+              }
+            ]
+          },
+          "next_action": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "current": {
+                  "const": false
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "native": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "incomplete",
+                        "not_run"
+                      ]
+                    },
+                    "diagnostics": {
+                      "maxItems": 0
+                    }
+                  }
+                },
+                "findings": {
+                  "maxItems": 0
+                },
+                "recheck_argv": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "native": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "diagnostics_observed"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "current": {
+                  "const": true
+                },
+                "source_sha256": {
+                  "$ref": "#/$defs/digest"
+                },
+                "recheck_argv": {
+                  "type": "array"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "native": {
+                  "properties": {
+                    "status": {
+                      "const": "completed"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "findings": {
+                  "maxItems": 0
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "native": {
+                  "properties": {
+                    "status": {
+                      "const": "diagnostics_observed"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "findings": {
+                  "minItems": 1
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "native": {
+                  "properties": {
+                    "preprocessing_unresolved": {
+                      "const": true
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "findings": {
+                  "maxItems": 0
+                },
+                "recheck_argv": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "task_status": {
+      "const": "native_findings_not_integrated"
+    },
+    "task_id": {
+      "type": "null"
+    },
+    "scope_stable": {
+      "type": "boolean"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "local_forms_complete": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "reason": {
+            "const": "erlang_forms_observed_unverified_project_coverage"
+          },
+          "unobserved_count": {
+            "const": 0
+          },
+          "files": {
+            "minItems": 1,
+            "items": {
+              "properties": {
+                "current": {
+                  "const": true
+                },
+                "native": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "diagnostics_observed"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "scope_stable": {
+            "const": true
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "local_forms_complete": {
+            "const": false
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "reason": {
+            "const": "erlang_native_scan_incomplete"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "tool_selection": {
+            "properties": {
+              "source": {
+                "const": "not_found"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "local_forms_complete": {
+            "const": false
+          },
+          "files": {
+            "items": {
+              "properties": {
+                "native": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "not_run",
+                        "incomplete"
+                      ]
+                    },
+                    "version": {
+                      "type": "null"
+                    },
+                    "tool_sha256": {
+                      "type": "null"
+                    },
+                    "diagnostics": {
+                      "maxItems": 0
+                    }
+                  }
+                },
+                "findings": {
+                  "maxItems": 0
+                },
+                "recheck_argv": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "files": {
+            "contains": {
+              "properties": {
+                "native": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "completed",
+                        "diagnostics_observed"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "tool_selection": {
+            "properties": {
+              "source": {
+                "enum": [
+                  "explicit",
+                  "path"
+                ]
+              },
+              "executable": {
+                "type": "string",
+                "pattern": "^/"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:erlang-forms-scan:0.1.0",
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "diagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "line",
+        "column",
+        "rule_id"
+      ],
+      "properties": {
+        "line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "column": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "rule_id": {
+          "const": "erlang.syntax.error"
+        }
+      }
+    },
+    "tool_selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "executable"
+      ],
+      "properties": {
+        "source": {
+          "enum": [
+            "explicit",
+            "path",
+            "not_found"
+          ]
+        },
+        "executable": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^/"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "source": {
+                "const": "path"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "executable": {
+                "type": "string",
+                "pattern": "^/"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "source": {
+                "const": "not_found"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "executable": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

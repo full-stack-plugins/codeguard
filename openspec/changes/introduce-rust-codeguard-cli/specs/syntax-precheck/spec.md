@@ -43,6 +43,12 @@
 - **AND** 显式错误工具不能改用 PATH；PATH 首个可执行工具的版本/执行失败也不能被后面的同名工具或 WASM 洗白。空/相对 PATH 条目和不可执行文件不作为自动工具；真正没有工具时保留候选初检与准备指引
 - **AND** 工具选择不授予原生完整覆盖或可信权威；单文件无预处理 forms 的范围及交付未评估保持不变
 
+#### Scenario: Aggregate checking observes Erlang forms before candidate parsing
+- **WHEN** `check all` discovers ordinary Erlang source files and resolves an explicit `--erl-tool` or an executable `erl` from absolute PATH directories
+- **THEN** schedule a bounded native forms task under the shared deadline and jobs limit, retain per-file diagnostics, tool-selection identity, source hashes and actionable original-tool recheck argv in human/JSON/SARIF feedback
+- **AND** only current, byte-matching files with complete non-preprocessed native forms observations may skip duplicate WASM; absent tools, unresolved preprocessing, truncated diagnostics, source/tool changes and execution failures remain visible and cannot become native or project success
+- **AND** files beyond the native budget remain explicitly unobserved; Java-only selection must not start Erlang, cancellation retains its exit semantics, and useful sibling results remain available. Changed project scope withdraws scope completeness but retains byte-current single-file diagnostics; stale file positions and argv are withdrawn. Forms parsing does not fulfill complete Erlang lint, compilation, tests or trusted task closure
+
 #### Scenario: Go vet excludes a file under build constraints
 - **WHEN** 本轮 Go 1.23.4 `go vet` 完成，受控 `go list` 证明部分源码进入默认构建，而另一份 `.go` 源码被构建标签排除
 - **THEN** 仅对同一源码字节且进入原生包清单的文件跳过重复 WASM；被排除文件继续候选初检，并保持平台/构建标签覆盖未完成

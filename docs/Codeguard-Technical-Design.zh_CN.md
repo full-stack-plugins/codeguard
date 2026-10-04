@@ -8,7 +8,7 @@
 
 专题入口：[命令](Codeguard-Command-Reference.zh_CN.md)、[初始化](Codeguard-Project-Initialization.zh_CN.md)、[修复](Codeguard-Remediation-Workflow.zh_CN.md)、[误报治理](Codeguard-False-Positive-Governance.zh_CN.md)、[适配器](Codeguard-Adapter-Contracts.zh_CN.md)、[信任与分发](Codeguard-Trust-and-Distribution.zh_CN.md)、[验收](Codeguard-Validation-and-Rollout.zh_CN.md)、[旧协议](Codeguard-Legacy-Compatibility.zh_CN.md)。独立细节由专题维护，规格与任务由 OpenSpec 维护。
 
-源码构建已把 ESLint 接入 `check all` 的 `node.lint` 任务图节点，与其它原生检查共用并发与截止时间。按发现的 JS/TS/TSX 文件选择最近的模块清单、本地 ESLint 10、唯一 flat config 和 Node；搜索不越过受检根。检查阶段收集报告，汇总阶段串行同步工作台，重复发现复用同一任务。每个完整且字节匹配的原生文件可免去重复 WASM；被忽略、配置错误或工具失败的文件仍保留降级与原生原因。协议为 `check_feedback` 0.35.0、`check_aborted` 0.12.0，原协议归档；`native_results.node_lint` 提供逐文件反馈、未执行文件、同步结果及下一步。见[验收范围](../tests/acceptance/check-all-eslint.md)。这不提升 grammar 资质或代替真实宿主验收。
+源码构建已把 ESLint 接入 `check all` 的 `node.lint` 任务图节点，与其它原生检查共用并发与截止时间。按发现的 JS/TS/TSX 文件选择最近的模块清单、本地 ESLint 10、唯一 flat config 和 Node；搜索不越过受检根。检查阶段收集报告，汇总阶段串行同步工作台，重复发现复用同一任务。每个完整且字节匹配的原生文件可免去重复 WASM；被忽略、配置错误或工具失败的文件仍保留降级与原生原因。协议为 `check_feedback` 0.36.0、`check_aborted` 0.13.0，原协议归档；`native_results.node_lint` 提供逐文件反馈、未执行文件、同步结果及下一步。见[验收范围](../tests/acceptance/check-all-eslint.md)。这不提升 grammar 资质或代替真实宿主验收。
 
 ## 1. 范围与规格归属
 
@@ -193,11 +193,11 @@ flowchart LR
 
 这些是目标语义字段，尚非已发行的项目级 lint/check 报告。局部的[候选初检 schema](../schemas/syntax-precheck-candidate.schema.json) 与 [Rust 严格读者](../crates/codeguard-adapters/src/syntax_precheck_candidate_report.rs)已绑定源码 SHA-256、固定 grammar 身份和文件方言，重新计算状态，并拒绝未知版本及伪造的 `clean`。可选 CLI 的 [TypeScript](../schemas/eslint-local-feedback-v0.3.schema.json)、[TSX](../schemas/eslint-local-feedback-v0.4.schema.json) 与 [Java](../schemas/java-syntax-precheck-feedback-v0.1.schema.json) 单文件生产端已提供恢复位置和准备指引。TypeScript/TSX 在已初始化工作区改用[反馈 0.5.0](../schemas/eslint-local-feedback-v0.5.schema.json)，按源码范围关联一张稳定的原生确认任务；[0.2.0 准备报告](../schemas/eslint-preparation-observation-v0.2.schema.json)以源码和 grammar 身份保存有界疑似位置，并通过报告摘要关联到任务；宿主渲染和能力匹配原生关闭仍未接通。内置 grammar 仍是未验收候选，因此不能返回 `clean`。保持既有退出语义：必需原生执行缺失仍为未完成（`3`）；解析器疑似问题本身不是已确认违规（`1`）。若未来增加独立语法操作，其成功必须限定为语法初检；本文不宣称已有 `syntax` 命令。
 
-源码构建的 `check all` 现另有较窄的真实项目报告：先执行原生适配器，再由[有界源码路由](../crates/codeguard-cli/src/check_syntax_candidates.rs)选择固定 worker 候选。[0.35.0 封闭 Schema](../schemas/check-feedback.schema.json)包含逐文件原生优先计数和所选 grammar 的有界已知限制；[0.33.0](../schemas/check-feedback-v0.33.schema.json) 保留为历史协议。Ruff、已确认包范围的 Go vet 和本地 ESLint 仅在本轮原生检查完整且源码摘要匹配时跳过该文件的重复 WASM；P3C 等规范检查不能冒充语法确认。默认终端输出也最多显示 8 条候选的固定已知限制；宿主自动交付仍待完成。下面仅摘录字段，不是完整 `check_feedback` 实例：
+源码构建的 `check all` 现另有较窄的真实项目报告：先执行原生适配器，再由[有界源码路由](../crates/codeguard-cli/src/check_syntax_candidates.rs)选择固定 worker 候选。[0.36.0 封闭 Schema](../schemas/check-feedback.schema.json)包含逐文件原生优先计数和所选 grammar 的有界已知限制；[0.33.0](../schemas/check-feedback-v0.33.schema.json) 保留为历史协议。Ruff、已确认包范围的 Go vet 和本地 ESLint 仅在本轮原生检查完整且源码摘要匹配时跳过该文件的重复 WASM；P3C 等规范检查不能冒充语法确认。默认终端输出也最多显示 8 条候选的固定已知限制；宿主自动交付仍待完成。下面仅摘录字段，不是完整 `check_feedback` 实例：
 
 ```json
 {
-  "schema_version": "0.35.0",
+  "schema_version": "0.36.0",
   "command_status": "incomplete",
   "delivery_decision": "incomplete",
   "syntax_candidates": {
@@ -299,7 +299,7 @@ flowchart TD
 | 下一步 | 修源码、推荐/要求准备原生工具并确认、恢复配置、重扫，还是提出具体决策？ |
 | 交付 | 只是局部观察，还是完整评估的交付结果？ |
 
-[RunReport 解析](../crates/codeguard-cli/src/run_report.rs)支持通用结构化契约，[检查编排](../crates/codeguard-cli/src/check_command.rs)当前输出 `check_feedback` `0.35.0`，适配器另有专属版本化局部观察。消费者必须按协议身份与版本分派，不能假定统一 JSON 形状。当前 human 输出以中文为主，英文文档不代表运行时消息已有英文国际化。
+[RunReport 解析](../crates/codeguard-cli/src/run_report.rs)支持通用结构化契约，[检查编排](../crates/codeguard-cli/src/check_command.rs)当前输出 `check_feedback` `0.36.0`，适配器另有专属版本化局部观察。消费者必须按协议身份与版本分派，不能假定统一 JSON 形状。当前 human 输出以中文为主，英文文档不代表运行时消息已有英文国际化。
 
 ### 7.3 对话报告示例——目标呈现
 
@@ -471,7 +471,7 @@ Codeguard：1 个暂存路径需要处理
 
 ### 7.5 协议版本与身份闭包
 
-当前通用 `RunReport` 为 `1.4`，聚合 `check_feedback` 为 `0.35.0`，`check_aborted` 为 `0.12.0`；适配器局部观察另有版本。版本属于具体协议，不能因为软件是 `0.1.0` 而统一改写。上面的对话/JSON 简报是目标示例，不是这三个协议的完整实例。
+当前通用 `RunReport` 为 `1.4`，聚合 `check_feedback` 为 `0.36.0`，`check_aborted` 为 `0.13.0`；适配器局部观察另有版本。版本属于具体协议，不能因为软件是 `0.1.0` 而统一改写。上面的对话/JSON 简报是目标示例，不是这三个协议的完整实例。
 
 目标证据链关联 workspace/request/run/obligation/finding/task/attempt；源码定位使用可逆路径表示与内容身份，依赖定位使用组件、解析版本、图和 advisory。非 UTF-8 路径不能经有损显示字符串参与匹配。摘要只能绑定字节，不能证明字节来源已批准。报告升级保留旧字段的版本语义，不将旧空 findings 升格为完整通过。
 
@@ -1001,5 +1001,96 @@ Erlang 原生观察使用 `syntax_task_recheck` 0.2.0，复检反馈为 `task_ve
   "report_type": "hook_execution_feedback",
   "schema_version": "0.8.0",
   "soft_result_reused": false
+}
+```
+
+### 统一入口的 Erlang 原生优先检查（当前源码）
+
+```bash
+codeguard check all . --format=json
+codeguard check all . --erl-tool /absolute/path/to/erl --timeout 30s --jobs 2 --format=json
+```
+
+`erlang.lint` 节点选择显式工具或 PATH 绝对目录中的首个可执行 `erl`，复用已有受控 OTP 28 scanner/parser。每轮最多观察 64 个普通 UTF-8 文件，每文件不超过 1 MiB，沿用请求总截止时间和任务图并发预算。`native_results.erlang_lint` 提供当前源码摘要、诊断位置、工具选择、逐文件下一步及采用绝对源码路径的原工具复检 argv，可从项目外直接重放；超出原生预算的范围明确计入未观察数。
+
+只有完整、非预处理、源码与工具字节都匹配的 forms 观察才跳过重复 WASM。工具缺失保留候选初检；所选工具失败仍可伴随补充候选观察，但原生阻塞不会被洗成成功。宏/条件编译继续未完成。源码或工具变化会撤回受影响文件的当前定位和可复用 argv。项目范围变化设置 `scope_stable: false` 并保留仍与当前字节匹配的单文件诊断，同时撤回整体范围完整性。SIGINT 保持退出 130；JSON、human 和保守 SARIF 保留原生发现，不签发项目通过。
+
+协议分别为 `check_feedback` **0.36.0**、`check_aborted` **0.13.0** 和内嵌 `erlang_forms_scan` **0.1.0**；旧聚合 Schema 逐字节保留。forms 局部完整不等于项目 lint、构建和测试完整。原生发现的任务持久化与可信关闭仍未实现，报告明确 `task_id: null`，不伪造任务。已有 WASM 来源的 Erlang 确认任务继续使用独立 `task verify` 流程。公开 npm 0.1.4 不含本轮聚合能力。见[验收记录](../tests/acceptance/check-all-erlang.md)。
+
+```mermaid
+flowchart TD
+    A[check all: Erlang files] --> B{Explicit tool or PATH erl}
+    B -->|Available| C[OTP 28 version and tool identity]
+    C --> D[Bounded per-file forms parsing]
+    D --> E{Current and complete without preprocessing?}
+    E -->|Yes| F[Retain native diagnostics and recheck argv]
+    F --> G[Skip duplicate WASM for matching bytes]
+    E -->|No| H[Retain native blockers and any candidate observation]
+    B -->|Absent| H
+    G --> I[Project lint/build/tests remain incomplete]
+    H --> I
+    I --> J[Human / JSON / conservative SARIF]
+```
+
+以下是实际 OTP 28 执行取得的完整内嵌 `erlang_forms_scan` 示例，不是完整聚合报告；任务引用为空是当前能力边界。工具摘要只绑定所选启动程序，不证明整个 OTP runtime 供应链。
+
+```json
+{
+  "authority": "local_unverified",
+  "coverage_proven": false,
+  "delivery_decision": "not_evaluated",
+  "files": [
+    {
+      "current": true,
+      "findings": [
+        {
+          "column": 8,
+          "line": 2,
+          "rule_id": "erlang.syntax.error"
+        }
+      ],
+      "native": {
+        "diagnostics": [
+          {
+            "column": 8,
+            "line": 2,
+            "rule_id": "erlang.syntax.error"
+          }
+        ],
+        "diagnostics_truncated": false,
+        "preprocessing_unresolved": false,
+        "reason": "erlang_native_syntax_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "cd03d938d7547ef608076a58a49f5284931b43f39090087baf35efc1665dd5d6",
+        "version": "OTP 28"
+      },
+      "next_action": "按当前原生语法位置修复并执行 recheck_argv；仍需项目完整 lint、预处理、编译和测试",
+      "path": "sample.erl",
+      "recheck_argv": [
+        "codeguard",
+        "lint",
+        "erlang",
+        "/private/tmp/codeguard-check-erlang-reports/project/sample.erl",
+        "--erl-tool",
+        "/opt/homebrew/Cellar/erlang/28.5/lib/erlang/bin/erl",
+        "--format=json"
+      ],
+      "source_sha256": "d66c937c29e3eba8063b468f2744f995cd24cee2399b5f63018935876f5fc9a3"
+    }
+  ],
+  "local_forms_complete": true,
+  "reason": "erlang_forms_observed_unverified_project_coverage",
+  "report_type": "erlang_forms_scan",
+  "schema_version": "0.1.0",
+  "scope": "single_file_forms_without_preprocessing",
+  "scope_stable": true,
+  "source_file_count": 1,
+  "task_id": null,
+  "task_status": "native_findings_not_integrated",
+  "tool_selection": {
+    "executable": "/opt/homebrew/Cellar/erlang/28.5/lib/erlang/bin/erl",
+    "source": "explicit"
+  },
+  "unobserved_count": 0
 }
 ```

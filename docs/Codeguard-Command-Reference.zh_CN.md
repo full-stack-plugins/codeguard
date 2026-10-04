@@ -22,11 +22,11 @@
 
 [已验收实现切片](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md)跟踪当前局部能力；[tasks](../openspec/changes/introduce-rust-codeguard-cli/tasks.md)独占完成状态。WASM 的完整统一入口仍为 S14 待办。可选 `codeguard-cli/wasm-precheck` 构建处理 `lint typescript <显式单文件>` 时，若观察到本地 ESLint 10 入口与唯一 flat config，会优先用 `PATH` 中可执行 Node 调用既有有界原生探针；缺 Node 则返回准备缺口。仅未观察到本地 ESLint 包时才输出 [TypeScript 0.3.0 候选反馈](../schemas/eslint-local-feedback-v0.3.schema.json)或 TSX 0.4.0。本地入口、包身份或配置不可信时保留具体环境阻塞，不启动 WASM。`lint java <显式单文件>` 仍输出 [Java 0.1.0 候选反馈](../schemas/java-syntax-precheck-feedback-v0.1.schema.json)。这些局部路径均不批准交付并保持退出 3；部分显式参数、Javadoc/Checkstyle 和符号链接沿用原路径，默认构建是否包含此项取决于 WASM 特性，发布包能力须以对应版本验收为准。见[原生优先局部验收](../tests/acceptance/native-first-eslint-candidate.md)与技术方案 5.3–5.4；后文未标当前的语法、退出0/1与闭环承诺均为目标契约。
 
-同一源码构建现在也会在 `check all` 的原生节点之后输出有界 `syntax_candidates`。[反馈 0.35.0](../schemas/check-feedback.schema.json)让 32 份固定 grammar 均能经统一入口分批被选用，同时保留原生阻塞、有界已知 grammar 限制（终端输出也限制条数）、未执行范围和未完成结论；Ruff 已完整覆盖的同摘要 Python 文件计入 `native_preferred_count`，不重复运行 WASM；`.tsx`、JavaScript、`.cfs` 与明确的 CFQuery 标签体分别路由。这仍是候选观察，不等于逐语言验收的原生兜底或自动宿主反馈，见[32 份验收](../tests/acceptance/check-all-32-grammar-candidates.md)。
+同一源码构建现在也会在 `check all` 的原生节点之后输出有界 `syntax_candidates`。[反馈 0.36.0](../schemas/check-feedback.schema.json)让 32 份固定 grammar 均能经统一入口分批被选用，同时保留原生阻塞、有界已知 grammar 限制（终端输出也限制条数）、未执行范围和未完成结论；Ruff 已完整覆盖的同摘要 Python 文件计入 `native_preferred_count`，不重复运行 WASM；`.tsx`、JavaScript、`.cfs` 与明确的 CFQuery 标签体分别路由。这仍是候选观察，不等于逐语言验收的原生兜底或自动宿主反馈，见[32 份验收](../tests/acceptance/check-all-32-grammar-candidates.md)。
 
 对已初始化且使用规范绝对路径的 `--workspace`，TypeScript/TSX 候选回退改用[反馈 0.5.0](../schemas/eslint-local-feedback-v0.5.schema.json)：按源码范围保存同一张 ESLint 原生确认阻塞任务，仅同步成功时返回真实 `setup.task_id`。重复扫描和后续 WASM 无恢复节点不关闭任务。版本化本地报告已通过报告摘要关联有界疑似位置；能力匹配原生复检仍未接通，见[局部验收](../tests/acceptance/typescript-syntax-confirmation-task.md)。
 
-源码构建已把 ESLint 接入 `check all` 的 `node.lint` 任务图节点，与其它原生检查共用并发与截止时间。按发现的 JS/TS/TSX 文件选择最近的模块清单、本地 ESLint 10、唯一 flat config 和 Node；搜索不越过受检根。检查阶段收集报告，汇总阶段串行同步工作台，重复发现复用同一任务。每个完整且字节匹配的原生文件可免去重复 WASM；被忽略、配置错误或工具失败的文件仍保留降级与原生原因。协议为 `check_feedback` 0.35.0、`check_aborted` 0.12.0，原协议归档；`native_results.node_lint` 提供逐文件反馈、未执行文件、同步结果及下一步。见[验收范围](../tests/acceptance/check-all-eslint.md)。这不提升 grammar 资质或代替真实宿主验收。
+源码构建已把 ESLint 接入 `check all` 的 `node.lint` 任务图节点，与其它原生检查共用并发与截止时间。按发现的 JS/TS/TSX 文件选择最近的模块清单、本地 ESLint 10、唯一 flat config 和 Node；搜索不越过受检根。检查阶段收集报告，汇总阶段串行同步工作台，重复发现复用同一任务。每个完整且字节匹配的原生文件可免去重复 WASM；被忽略、配置错误或工具失败的文件仍保留降级与原生原因。协议为 `check_feedback` 0.36.0、`check_aborted` 0.13.0，原协议归档；`native_results.node_lint` 提供逐文件反馈、未执行文件、同步结果及下一步。见[验收范围](../tests/acceptance/check-all-eslint.md)。这不提升 grammar 资质或代替真实宿主验收。
 
 
 仅当前源码支持的 Erlang 入口：`codeguard lint erlang FILE [--erl-tool ABS_PATH] [--timeout DURATION] [--format human|json]`。支持普通 `.erl`/`.hrl` 文件；OTP 28 原生扫描/解析优先于可选 WASM；显式工具优先，否则从 PATH 绝对目录选择首个普通可执行 `erl`。所选工具的版本或执行失败不改变选择。原生故障及宏/预处理缺口保持未完成；整体退出 3，取消 130。报告使用[erlang_lint_feedback 0.2.0](../schemas/erlang-lint-feedback-v0.2.schema.json)，[验收](../tests/acceptance/erlang-native-first.md)明确区分当前源码与未包含本轮命令的公开 0.1.4 包。
@@ -645,3 +645,16 @@ Erlang 原生观察使用 `syntax_task_recheck` 0.2.0，复检反馈为 `task_ve
 原生零诊断记录为 `candidate_absent_unverified_policy`，解除关联尝试的待复检状态，但不关闭任务或签发交付许可；两次无进展沿用既有预算，转为具体决策而不是重复修复。当前限定可信关闭 API 仍只支持 Zig；Erlang 项目完整 lint/预处理、原生发现的完整生命周期、自动工具发现及实际宿主发行尚未完成。公开 npm 0.1.4 不含此扩展。[验收与协议](../tests/acceptance/erlang-native-task-verification.md)。
 
 Erlang `repair_ready` 使用 Hook 0.8.0 / 内层摘要 0.2.0，直接包含当前原生位置、具体未完成原因、Unicode 字符列单位和已保存报告引用；其他 Hook 版本保持不变，实际安装宿主对话交付尚未验收。
+
+### 统一入口的 Erlang 原生优先检查（当前源码）
+
+```bash
+codeguard check all . --format=json
+codeguard check all . --erl-tool /absolute/path/to/erl --timeout 30s --jobs 2 --format=json
+```
+
+`erlang.lint` 节点选择显式工具或 PATH 绝对目录中的首个可执行 `erl`，复用已有受控 OTP 28 scanner/parser。每轮最多观察 64 个普通 UTF-8 文件，每文件不超过 1 MiB，沿用请求总截止时间和任务图并发预算。`native_results.erlang_lint` 提供当前源码摘要、诊断位置、工具选择、逐文件下一步及采用绝对源码路径的原工具复检 argv，可从项目外直接重放；超出原生预算的范围明确计入未观察数。
+
+只有完整、非预处理、源码与工具字节都匹配的 forms 观察才跳过重复 WASM。工具缺失保留候选初检；所选工具失败仍可伴随补充候选观察，但原生阻塞不会被洗成成功。宏/条件编译继续未完成。源码或工具变化会撤回受影响文件的当前定位和可复用 argv。项目范围变化设置 `scope_stable: false` 并保留仍与当前字节匹配的单文件诊断，同时撤回整体范围完整性。SIGINT 保持退出 130；JSON、human 和保守 SARIF 保留原生发现，不签发项目通过。
+
+协议分别为 `check_feedback` **0.36.0**、`check_aborted` **0.13.0** 和内嵌 `erlang_forms_scan` **0.1.0**；旧聚合 Schema 逐字节保留。forms 局部完整不等于项目 lint、构建和测试完整。原生发现的任务持久化与可信关闭仍未实现，报告明确 `task_id: null`，不伪造任务。已有 WASM 来源的 Erlang 确认任务继续使用独立 `task verify` 流程。公开 npm 0.1.4 不含本轮聚合能力。见[验收记录](../tests/acceptance/check-all-erlang.md)。

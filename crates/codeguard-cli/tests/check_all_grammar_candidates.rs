@@ -138,7 +138,7 @@ fn check_all_routes_distinct_dialects_after_native_without_claiming_clean() {
         String::from_utf8_lossy(&output.stderr)
     );
     let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
-    assert_eq!(report["schema_version"], "0.35.0");
+    assert_eq!(report["schema_version"], "0.36.0");
     assert_eq!(report["execution_budget"]["jobs_limit"], 1);
     assert_eq!(report["delivery_decision"], "incomplete");
     let observations = report["syntax_candidates"]["observations"]
@@ -358,6 +358,7 @@ fn check_all_invokes_all_32_pinned_candidates_across_bounded_projects() {
             .args(["check", "all"])
             .arg(root.join(format!("group-{group_index}")))
             .args(["--format=json", "--timeout", "120s"])
+            .env("PATH", "") // 固定无原生工具，验收全部候选资产路由。
             .output()
             .unwrap();
         assert_eq!(
@@ -430,6 +431,7 @@ fn one_mixed_project_observes_all_32_candidates_within_the_existing_budget() {
         .args(["check", "all"])
         .arg(&root)
         .args(["--format=json", "--timeout", "120s"])
+        .env("PATH", "") // 原生优先另有验收，此处要求实际调用全部 WASM。
         .output()
         .unwrap();
     fs::remove_dir_all(&root).unwrap();

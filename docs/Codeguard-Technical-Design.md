@@ -8,7 +8,7 @@
 
 Topic owners: [commands](Codeguard-Command-Reference.md), [initialization](Codeguard-Project-Initialization.md), [remediation](Codeguard-Remediation-Workflow.md), [false positives](Codeguard-False-Positive-Governance.md), [adapters](Codeguard-Adapter-Contracts.md), [trust/distribution](Codeguard-Trust-and-Distribution.md), [acceptance](Codeguard-Validation-and-Rollout.md) and [legacy compatibility](Codeguard-Legacy-Compatibility.md). Detailed contracts live in these guides; OpenSpec owns requirements and tasks.
 
-The source build wires ESLint into the `node.lint` task in `check all`, sharing native concurrency and the request deadline. Discovered JS/TS/TSX files select their nearest module manifest, local ESLint 10, unique flat config and Node without searching above the selected root. Execution collects reports; aggregation synchronizes the workbench serially and reuses stable tasks. Only completed native results for identical source bytes suppress duplicate WASM; ignored files, configuration errors and tool failures retain both their reasons and fallback. Protocols are `check_feedback` 0.35.0 and `check_aborted` 0.12.0, with older schemas archived. `native_results.node_lint` carries per-file feedback, unexecuted paths, synchronization status and next action. See [acceptance scope](../tests/acceptance/check-all-eslint.md). This does not qualify grammars or replace real host acceptance.
+The source build wires ESLint into the `node.lint` task in `check all`, sharing native concurrency and the request deadline. Discovered JS/TS/TSX files select their nearest module manifest, local ESLint 10, unique flat config and Node without searching above the selected root. Execution collects reports; aggregation synchronizes the workbench serially and reuses stable tasks. Only completed native results for identical source bytes suppress duplicate WASM; ignored files, configuration errors and tool failures retain both their reasons and fallback. Protocols are `check_feedback` 0.36.0 and `check_aborted` 0.13.0, with older schemas archived. `native_results.node_lint` carries per-file feedback, unexecuted paths, synchronization status and next action. See [acceptance scope](../tests/acceptance/check-all-eslint.md). This does not qualify grammars or replace real host acceptance.
 
 ## 1. Scope and specification ownership
 
@@ -193,11 +193,11 @@ When some files have suspected issues and others are unresolved, use overall `in
 
 These are the target semantic fields, not a shipped project-wide lint/check report. A narrow [candidate precheck schema](../schemas/syntax-precheck-candidate.schema.json) and [strict Rust reader](../crates/codeguard-adapters/src/syntax_precheck_candidate_report.rs) bind source SHA-256, pinned grammar identity and file dialect, recalculate status, and reject unknown versions or forged `clean`. Optional CLI single-file [TypeScript](../schemas/eslint-local-feedback-v0.3.schema.json), [TSX](../schemas/eslint-local-feedback-v0.4.schema.json) and [Java](../schemas/java-syntax-precheck-feedback-v0.1.schema.json) producers include recovery positions and setup guidance. With an initialized workspace, TypeScript/TSX now uses [feedback 0.5.0](../schemas/eslint-local-feedback-v0.5.schema.json) and attaches one stable native-confirmation task to the source scope; the [0.2.0 preparation report](../schemas/eslint-preparation-observation-v0.2.schema.json) stores bounded suspected positions with source and grammar identities and links them by digest to the task. Host rendering and capability-matched native closure remain absent. The bundled grammars remain unvalidated, so these reports cannot return `clean`. Missing required native execution remains incomplete (`3`); a suspected parser issue alone is not a confirmed violation (`1`). If a dedicated syntax-only operation is later introduced, its success must be explicitly scoped to syntax; no new `syntax` command is claimed here.
 
-The source-built `check all` now adds a narrower actual project report: native adapters run first, then a [bounded source router](../crates/codeguard-cli/src/check_syntax_candidates.rs) selects pinned worker candidates. The closed [0.35.0 schema](../schemas/check-feedback.schema.json) counts files preempted by native checks and projects each selected grammar's bounded known limitations; [0.33.0](../schemas/check-feedback-v0.33.schema.json) remains archived for older readers. Completed Ruff, selected Go vet and module-local ESLint results skip duplicate WASM only for matching source bytes. A style checker such as P3C is not syntax confirmation. Default terminal output also shows up to eight fixed limitations from candidate observations; automatic host delivery remains pending. The following is an excerpt, not a complete `check_feedback` instance:
+The source-built `check all` now adds a narrower actual project report: native adapters run first, then a [bounded source router](../crates/codeguard-cli/src/check_syntax_candidates.rs) selects pinned worker candidates. The closed [0.36.0 schema](../schemas/check-feedback.schema.json) counts files preempted by native checks and projects each selected grammar's bounded known limitations; [0.33.0](../schemas/check-feedback-v0.33.schema.json) remains archived for older readers. Completed Ruff, selected Go vet and module-local ESLint results skip duplicate WASM only for matching source bytes. A style checker such as P3C is not syntax confirmation. Default terminal output also shows up to eight fixed limitations from candidate observations; automatic host delivery remains pending. The following is an excerpt, not a complete `check_feedback` instance:
 
 ```json
 {
-  "schema_version": "0.35.0",
+  "schema_version": "0.36.0",
   "command_status": "incomplete",
   "delivery_decision": "incomplete",
   "syntax_candidates": {
@@ -299,7 +299,7 @@ Do not infer pass/fail from generic words such as `error`, `warning`, or `BUILD 
 | Next action | Repair source, recommend/require native setup and confirmation, restore configuration, rescan, or obtain a concrete decision? |
 | Delivery | Is this only a local observation or a fully evaluated delivery result? |
 
-[RunReport parsing](../crates/codeguard-cli/src/run_report.rs) supports a common structured contract; [check orchestration](../crates/codeguard-cli/src/check_command.rs) currently emits `check_feedback` `0.35.0`. Adapters also emit their own versioned local observations. Consumers must dispatch by protocol identity/version rather than assume a universal JSON shape. Human output is currently primarily Chinese; English documentation does not imply localized runtime messages.
+[RunReport parsing](../crates/codeguard-cli/src/run_report.rs) supports a common structured contract; [check orchestration](../crates/codeguard-cli/src/check_command.rs) currently emits `check_feedback` `0.36.0`. Adapters also emit their own versioned local observations. Consumers must dispatch by protocol identity/version rather than assume a universal JSON shape. Human output is currently primarily Chinese; English documentation does not imply localized runtime messages.
 
 ### 7.3 Conversation report examples — target presentation
 
@@ -471,7 +471,7 @@ Report review rules apply across all maintained documents: distinguish installed
 
 ### 7.5 Protocol versions and identity closure
 
-The current common `RunReport` is `1.4`, aggregate `check_feedback` is `0.35.0`, and `check_aborted` is `0.12.0`; adapter-local observations have separate versions. Protocol versions must not be rewritten to match software `0.1.0`. The conversation/JSON briefs above are target examples, not complete instances of these three protocols.
+The current common `RunReport` is `1.4`, aggregate `check_feedback` is `0.36.0`, and `check_aborted` is `0.13.0`; adapter-local observations have separate versions. Protocol versions must not be rewritten to match software `0.1.0`. The conversation/JSON briefs above are target examples, not complete instances of these three protocols.
 
 The target evidence chain correlates workspace/request/run/obligation/finding/task/attempt. Source locations use reversible paths and content identities; dependency locations use component, resolved version, graph and advisory identities. Lossy rendering of non-UTF-8 paths cannot participate in matching. Digests bind bytes, not approval authority. Upgrades preserve version semantics and never turn old empty findings into complete passes.
 
@@ -1001,5 +1001,96 @@ This JSON was captured from an OTP 28 native recheck. Task/run IDs and report re
   "report_type": "hook_execution_feedback",
   "schema_version": "0.8.0",
   "soft_result_reused": false
+}
+```
+
+### Aggregate Erlang native-first checking (current source)
+
+```bash
+codeguard check all . --format=json
+codeguard check all . --erl-tool /absolute/path/to/erl --timeout 30s --jobs 2 --format=json
+```
+
+The `erlang.lint` task selects explicit Erlang or the first executable `erl` from absolute PATH directories, then uses the existing controlled OTP 28 scanner/parser. It observes at most 64 ordinary UTF-8 files, each at most 1 MiB, under the request deadline and scheduler concurrency. `native_results.erlang_lint` carries current source hashes, positions, tool selection, per-file next actions and original-tool recheck argv with an absolute source path, reusable outside the project directory. Files beyond the native budget are counted as unobserved.
+
+Only complete, non-preprocessed forms observations for matching source and tool bytes skip duplicate WASM. Missing tools retain candidate observations; selected-tool failures stay visible alongside any supplementary candidate observation. Macro/preprocessor coverage remains unresolved. Source or tool changes withdraw affected positions and reusable argv. Project-scope changes set `scope_stable: false` and retain still-current single-file diagnostics; whole-scope completeness is withdrawn. SIGINT remains exit 130; JSON, human and conservative SARIF retain native findings without claiming project success.
+
+Protocols are `check_feedback` **0.36.0**, `check_aborted` **0.13.0**, and the embedded `erlang_forms_scan` **0.1.0**. Earlier aggregate schemas are preserved byte-for-byte. Forms completeness is distinct from full lint/build/test coverage. Native-finding task persistence and trusted closure are still unimplemented; the report exposes `task_id: null` rather than inventing a task. Existing WASM-origin Erlang confirmation tasks retain their separate `task verify` workflow. Public npm 0.1.4 does not include this new aggregate path. See [acceptance](../tests/acceptance/check-all-erlang.md).
+
+```mermaid
+flowchart TD
+    A[check all: Erlang files] --> B{Explicit tool or PATH erl}
+    B -->|Available| C[OTP 28 version and tool identity]
+    C --> D[Bounded per-file forms parsing]
+    D --> E{Current and complete without preprocessing?}
+    E -->|Yes| F[Retain native diagnostics and recheck argv]
+    F --> G[Skip duplicate WASM for matching bytes]
+    E -->|No| H[Retain native blockers and any candidate observation]
+    B -->|Absent| H
+    G --> I[Project lint/build/tests remain incomplete]
+    H --> I
+    I --> J[Human / JSON / conservative SARIF]
+```
+
+This is a complete embedded `erlang_forms_scan` example captured from actual OTP 28 execution, not a complete aggregate report. Its zero task reference is intentional. The tool hash identifies the selected launcher, not the entire OTP runtime supply chain.
+
+```json
+{
+  "authority": "local_unverified",
+  "coverage_proven": false,
+  "delivery_decision": "not_evaluated",
+  "files": [
+    {
+      "current": true,
+      "findings": [
+        {
+          "column": 8,
+          "line": 2,
+          "rule_id": "erlang.syntax.error"
+        }
+      ],
+      "native": {
+        "diagnostics": [
+          {
+            "column": 8,
+            "line": 2,
+            "rule_id": "erlang.syntax.error"
+          }
+        ],
+        "diagnostics_truncated": false,
+        "preprocessing_unresolved": false,
+        "reason": "erlang_native_syntax_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "cd03d938d7547ef608076a58a49f5284931b43f39090087baf35efc1665dd5d6",
+        "version": "OTP 28"
+      },
+      "next_action": "按当前原生语法位置修复并执行 recheck_argv；仍需项目完整 lint、预处理、编译和测试",
+      "path": "sample.erl",
+      "recheck_argv": [
+        "codeguard",
+        "lint",
+        "erlang",
+        "/private/tmp/codeguard-check-erlang-reports/project/sample.erl",
+        "--erl-tool",
+        "/opt/homebrew/Cellar/erlang/28.5/lib/erlang/bin/erl",
+        "--format=json"
+      ],
+      "source_sha256": "d66c937c29e3eba8063b468f2744f995cd24cee2399b5f63018935876f5fc9a3"
+    }
+  ],
+  "local_forms_complete": true,
+  "reason": "erlang_forms_observed_unverified_project_coverage",
+  "report_type": "erlang_forms_scan",
+  "schema_version": "0.1.0",
+  "scope": "single_file_forms_without_preprocessing",
+  "scope_stable": true,
+  "source_file_count": 1,
+  "task_id": null,
+  "task_status": "native_findings_not_integrated",
+  "tool_selection": {
+    "executable": "/opt/homebrew/Cellar/erlang/28.5/lib/erlang/bin/erl",
+    "source": "explicit"
+  },
+  "unobserved_count": 0
 }
 ```

@@ -52,6 +52,7 @@ struct Args {
     cargo_audit_tool: Option<PathBuf>,
     rustsec_db: Option<PathBuf>,
     go_tool: Option<PathBuf>,
+    erl_tool: Option<PathBuf>,
     maven_tool: Option<PathBuf>,
     java_home: Option<PathBuf>,
     maven_repo: Option<PathBuf>,
@@ -173,6 +174,16 @@ pub fn run(args: &[String]) -> ExitCode {
             .languages
             .get("go")
             .is_some_and(|evidence| !evidence.source_files.is_empty());
+    let erlang_sources = if parsed.selection == Selection::All {
+        discovery
+            .languages
+            .get("erlang")
+            .map(|evidence| evidence.source_files.clone())
+            .unwrap_or_default()
+    } else {
+        BTreeSet::new()
+    };
+    let erlang_present = !erlang_sources.is_empty();
     let java_sources = discovery
         .languages
         .get("java")
@@ -266,6 +277,7 @@ pub fn run(args: &[String]) -> ExitCode {
     let mut rust_cve_outcome = None;
     let mut node_task_outcome = None;
     let mut go_task_outcome = None;
+    let mut erlang_task_outcome = None;
     let mut java_task_outcome = None;
     let mut javadoc_task_outcome = None;
     let mut dependency_task_outcome = None;
@@ -277,6 +289,7 @@ pub fn run(args: &[String]) -> ExitCode {
     let mut rust_cve = Value::Null;
     let mut node_lint = Value::Null;
     let mut go_lint = Value::Null;
+    let mut erlang_lint = Value::Null;
     let mut java_p3c = Value::Null;
     let mut java_javadoc = Value::Null;
     let mut java_dependencies = Value::Null;
@@ -286,6 +299,7 @@ pub fn run(args: &[String]) -> ExitCode {
         || python_present
         || rust_present
         || go_present
+        || erlang_present
         || java_present
         || dependency_configured
         || cve_configured
@@ -334,6 +348,13 @@ pub fn run(args: &[String]) -> ExitCode {
                 id: "go.lint".into(),
                 dependencies: Vec::new(),
                 resources: vec!["go.vet".into()],
+            });
+        }
+        if erlang_present {
+            nodes.push(TaskNode {
+                id: "erlang.lint".into(),
+                dependencies: Vec::new(),
+                resources: vec!["erlang.otp.forms".into()],
             });
         }
         if java_present {
@@ -387,6 +408,7 @@ pub fn run(args: &[String]) -> ExitCode {
         let rust_cve_slot = Mutex::new(None);
         let node_slot = Mutex::new(None::<crate::check_eslint_scan::CheckEslintScan>);
         let go_slot = Mutex::new(None);
+        let erlang_slot = Mutex::new(None);
         let java_slot = Mutex::new(None);
         let javadoc_slot = Mutex::new(None);
         let dependency_slot = Mutex::new(None);
@@ -492,6 +514,27 @@ pub fn run(args: &[String]) -> ExitCode {
                         TaskExecution::Failed
                     };
                     *node_slot.lock().expect("ESLint结果槽未中毒") = Some(scan);
+                    outcome
+                } else if id.id == "erlang.lint" {
+                    let report = crate::check_erlang_scan::observe(
+                        &root,
+                        &erlang_sources,
+                        parsed.erl_tool.clone(),
+                        deadline,
+                        flag,
+                    );
+                    let outcome = if flag.load(Ordering::Relaxed)
+                        || codeguard_runtime::sigint_cancellation_requested()
+                    {
+                        TaskExecution::Cancelled
+                    } else if Instant::now() >= deadline {
+                        TaskExecution::TimedOut
+                    } else if report["local_forms_complete"] == true {
+                        TaskExecution::Succeeded
+                    } else {
+                        TaskExecution::Failed
+                    };
+                    *erlang_slot.lock().expect("Erlang结果槽未中毒") = Some(report);
                     outcome
                 } else if id.id == "go.lint" {
                     let report = observe_go_vet(&root, parsed.go_tool.as_deref(), deadline, flag);
@@ -775,6 +818,7 @@ pub fn run(args: &[String]) -> ExitCode {
                 "rust_cve":snapshot_native_slot(&rust_cve_slot),
                 "node_lint":node_slot.lock().unwrap_or_else(std::sync::PoisonError::into_inner).as_ref().map(|scan|scan.feedback.clone()).unwrap_or(Value::Null),
                 "go_lint":snapshot_native_slot(&go_slot),
+                "erlang_lint":snapshot_native_slot(&erlang_slot),
                 "java_p3c":snapshot_native_slot(&java_slot),
                 "java_javadoc":snapshot_native_slot(&javadoc_slot),
                 "java_dependencies":snapshot_native_slot(&dependency_slot),
@@ -900,6 +944,15 @@ pub fn run(args: &[String]) -> ExitCode {
             rust_lint = rust_slot
                 .into_inner()
                 .expect("Rust 结果槽位未中毒")
+                .unwrap_or(Value::Null);
+        }
+        if erlang_present {
+            let outcome = *outcomes.get("erlang.lint").expect("Erlang任务结果完整");
+            erlang_task_outcome = Some(outcome);
+            execution_tasks.push(json!({"id":"erlang.lint", "status":task_status(outcome)}));
+            erlang_lint = erlang_slot
+                .into_inner()
+                .expect("Erlang结果槽未中毒")
                 .unwrap_or(Value::Null);
         }
         if go_present {
@@ -1111,6 +1164,12 @@ pub fn run(args: &[String]) -> ExitCode {
         Ok(None) => None,
         Err(reason) => Some(reason),
     };
+    if erlang_lint.is_object() {
+        if source_recheck.or(scope_recheck).is_some() {
+            crate::check_erlang_scan::invalidate_scope(&mut erlang_lint);
+        }
+        crate::check_erlang_scan::refresh(&root, &mut erlang_lint, deadline);
+    }
     let python_doc_observed = python_lint["files"].as_array().is_some_and(|files| {
         files.iter().any(|file| {
             file["run_status"] == "findings"
@@ -1212,6 +1271,17 @@ pub fn run(args: &[String]) -> ExitCode {
                 "status": if observed { "observed_unverified" } else if npm_selected || python_lint_selected || rust_lint_selected || rust_comments_selected || rust_build_selected || rust_cve_selected || go_lint_selected || java_lint_selected || java_comments_selected || (language == "java" && category == "dependencies" && dependency_configured) || (cve_scope_configured) { "native_incomplete" } else if language == "java" && category == "comments" { if javadoc_configuration_unresolved { "configuration_unresolved" } else { "not_configured" } } else if let Some(candidate) = java_checker.as_ref() { candidate.status } else { "not_integrated" },
                 "reason": if rust_cve_selected { if observed { "rust_cve_database_freshness_unverified" } else { "rust_cve_native_incomplete" } } else if npm_selected { "npm_advisory_coverage_and_freshness_unverified" } else if planned_language { "planned_language_adapter_gap" } else if observed { "trusted_policy_and_coverage_unavailable" } else if java_lint_selected && java_p3c["local_observation_complete"] == true { "p3c_declared_rulesets_unverified_coverage" } else if java_comments_selected && java_javadoc["maven_multifile_probes"].as_array().is_some_and(|probes| probes.iter().any(|probe| matches!(probe["observation"]["native_status"].as_str(), Some("findings_observed_untrusted" | "clean_log_unverified")))) { "javadoc_multifile_probe_unverified_project_coverage" } else if java_comments_selected && java_javadoc["local_probe_complete"] == true { "javadoc_single_file_probe_unverified_coverage" } else if language == "java" && category == "dependencies" && java_dependencies["observed_graph_count"].as_u64().is_some_and(|count| count > 0) { "dependency_graph_observed_unverified_coverage" } else if cve_scope_configured && java_cve["observed_report_count"].as_u64().is_some_and(|count| count > 0) { "cve_report_observed_database_unverified" } else if (language == "java" && category == "dependencies" && dependency_configured) || cve_scope_configured || python_lint_selected || rust_lint_selected || rust_comments_selected || rust_build_selected || go_lint_selected || java_lint_selected || java_comments_selected { "native_scan_incomplete" } else if language == "java" && category == "comments" { if javadoc_configuration_unresolved { "javadoc_configuration_unresolved" } else { "not_configured" } } else if let Some(candidate) = java_checker.as_ref() { candidate.reason } else { "native_adapter_not_integrated" }
             });
+            if language == "erlang" && category == "lint" && erlang_present {
+                candidate["checker_id"] = json!("erlang.otp.forms");
+                candidate["status"] = json!("native_incomplete");
+                candidate["reason"] = erlang_lint
+                    .get("reason")
+                    .cloned()
+                    .unwrap_or(json!("erlang_native_task_not_started"));
+                candidate["next_action"] = json!(
+                    "读取 native_results.erlang_lint 的逐文件诊断、阻塞和原工具复检指令；单文件 forms 不代替项目完整 lint、预处理、编译和测试"
+                );
+            }
             if python_comments_selected {
                 candidate["checker_id"] = json!("python.ruff");
                 candidate["next_action"] = json!(
@@ -1357,6 +1427,14 @@ pub fn run(args: &[String]) -> ExitCode {
     if rust_present && rust_task_outcome != Some(TaskOutcome::Succeeded) {
         unresolved.insert("rust_lint_task_incomplete".into());
     }
+    if erlang_present {
+        unresolved.insert("erlang_project_lint_preprocessing_and_build_coverage_unverified".into());
+        if erlang_task_outcome != Some(TaskOutcome::Succeeded)
+            || erlang_lint["local_forms_complete"] != true
+        {
+            unresolved.insert("erlang_lint_task_incomplete".into());
+        }
+    }
     if go_present && go_task_outcome != Some(TaskOutcome::Succeeded) {
         unresolved.insert("go_lint_task_incomplete".into());
     }
@@ -1412,6 +1490,7 @@ pub fn run(args: &[String]) -> ExitCode {
             rust_build_outcome,
             rust_cve_outcome,
             go_task_outcome,
+            erlang_task_outcome,
             java_task_outcome,
             javadoc_task_outcome,
             dependency_task_outcome,
@@ -1535,6 +1614,7 @@ pub fn run(args: &[String]) -> ExitCode {
             node_lint: &node_lint,
             python_lint: &python_lint,
             go_lint: &go_lint,
+            erlang_lint: &erlang_lint,
             go_tool: parsed.go_tool.as_deref(),
         },
         parsed.selection == Selection::Java,
@@ -1557,18 +1637,18 @@ pub fn run(args: &[String]) -> ExitCode {
         "next_action":"使用包含固定语法资产的发行包运行候选初检，并完成适用原生检查"
     });
     let report = json!({
-        "schema_version":"0.35.0", "report_type":"check_feedback",
+        "schema_version":"0.36.0", "report_type":"check_feedback",
         "operation":"check", "selection":parsed.selection.as_str(), "command_status":if request_cancelled { "cancelled" } else { "incomplete" },
         "exit_code":if request_cancelled { 130 } else { 3 }, "delivery_decision":if parsed.selection == Selection::All { "incomplete" } else { "not_evaluated" }, "authority":"local_unverified",
         "reason":if request_cancelled { "request_cancelled" } else if parsed.selection == Selection::All { "full_project_obligations_and_trusted_policy_unavailable" } else { "java_selection_obligations_and_trusted_policy_unavailable" },
         "discovery":discovery.to_json(),
-        "native_results":{"node_lint":node_lint,"python_lint":python_lint,"python_cve":python_cve,"rust_lint":rust_lint,"rust_comments":rust_comments,"rust_build":rust_build,"rust_cve":rust_cve,"go_lint":go_lint,"java_p3c":java_p3c,"java_javadoc":java_javadoc,"java_dependencies":java_dependencies,"java_cve":java_cve,"npm_cve":npm_cve}, "execution_tasks":execution_tasks,
+        "native_results":{"node_lint":node_lint,"python_lint":python_lint,"python_cve":python_cve,"rust_lint":rust_lint,"rust_comments":rust_comments,"rust_build":rust_build,"rust_cve":rust_cve,"go_lint":go_lint,"erlang_lint":erlang_lint,"java_p3c":java_p3c,"java_javadoc":java_javadoc,"java_dependencies":java_dependencies,"java_cve":java_cve,"npm_cve":npm_cve}, "execution_tasks":execution_tasks,
         "obligation_status":"unresolved", "required_obligations":null,
         "category_candidates":candidates, "unresolved_conditions":unresolved,
         "syntax_candidates":syntax_candidates,
         "execution_budget":check_budget_record(
             parsed.timeout_ms, parsed.timeout_source, parsed.jobs_limit, parsed.jobs_source,
-            usize::from(node_present) + usize::from(python_present) + python_cve_roots.len() + 4 * usize::from(rust_present) + usize::from(go_present) + usize::from(java_present) + usize::from(javadoc_configured) + usize::from(dependency_configured) + usize::from(cve_configured) + npm_roots.len(), started_native_task_count
+            usize::from(node_present) + usize::from(python_present) + python_cve_roots.len() + 4 * usize::from(rust_present) + usize::from(go_present) + usize::from(erlang_present) + usize::from(java_present) + usize::from(javadoc_configured) + usize::from(dependency_configured) + usize::from(cve_configured) + npm_roots.len(), started_native_task_count
         ),
         "next":next,
         "export":{"status":"not_requested","reason_code":null}
@@ -1736,6 +1816,28 @@ pub fn run(args: &[String]) -> ExitCode {
                     .as_str()
                     .unwrap_or("cargo clippy --offline --all-targets --message-format=json")
             );
+        }
+        if let Some(files) = report["native_results"]["erlang_lint"]["files"].as_array() {
+            println!("Erlang 原生 forms；项目完整 lint、预处理、编译和测试仍待核验");
+            for file in files {
+                println!(
+                    "  {}：{}；{}",
+                    file["path"].as_str().unwrap_or("未知路径"),
+                    file["native"]["reason"].as_str().unwrap_or("未观察"),
+                    file["next_action"].as_str().unwrap_or("重跑原工具")
+                );
+                for finding in file["findings"].as_array().into_iter().flatten() {
+                    println!(
+                        "  原生语法错误：{}:{}:{}",
+                        file["path"].as_str().unwrap_or("未知路径"),
+                        finding["line"],
+                        finding["column"]
+                    );
+                }
+                if !file["recheck_argv"].is_null() {
+                    println!("  复检 argv：{}", file["recheck_argv"]);
+                }
+            }
         }
         if let Some(findings) = report["native_results"]["go_lint"]["findings"].as_array() {
             println!(
@@ -2198,6 +2300,9 @@ fn aborted_task_report(
     mut native_results: Value,
     cancelled: bool,
 ) -> Value {
+    if native_results.get("erlang_lint").is_none() {
+        native_results["erlang_lint"] = Value::Null;
+    }
     if native_results.get("node_lint").is_none() {
         native_results["node_lint"] = Value::Null;
     }
@@ -2223,7 +2328,7 @@ fn aborted_task_report(
         .map(|(id, outcome)| json!({"id":id,"status":task_status(*outcome)}))
         .collect();
     json!({
-        "schema_version":"0.12.0", "report_type":"check_aborted",
+        "schema_version":"0.13.0", "report_type":"check_aborted",
         "operation":"check", "selection":selection.as_str(),
         "command_status":if cancelled { "cancelled" } else { "internal_error" },
         "exit_code":if cancelled { 130 } else { 4 },
@@ -2250,6 +2355,7 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
     let mut cargo_audit_tool = None;
     let mut rustsec_db = None;
     let mut go_tool = None;
+    let mut erl_tool = None;
     let mut maven_tool = None;
     let mut java_home = None;
     let mut maven_repo = None;
@@ -2329,6 +2435,17 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
                     .is_some()
                 {
                     return Err("--rustsec-db 重复".into());
+                }
+            }
+            "--erl-tool" => {
+                index += 1;
+                if erl_tool
+                    .replace(PathBuf::from(
+                        args.get(index).ok_or("缺少 Erlang 工具路径")?,
+                    ))
+                    .is_some()
+                {
+                    return Err("--erl-tool 重复".into());
                 }
             }
             "--go-tool" => {
@@ -2474,6 +2591,9 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
     {
         return Err("Rust CVE 工具和数据库必须是绝对路径".into());
     }
+    if erl_tool.as_ref().is_some_and(|path| !path.is_absolute()) {
+        return Err("--erl-tool 必须是绝对路径".into());
+    }
     if go_tool.as_ref().is_some_and(|path| !path.is_absolute()) {
         return Err("--go-tool 必须是绝对路径".into());
     }
@@ -2483,7 +2603,8 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
             || cargo_tool.is_some()
             || cargo_audit_tool.is_some()
             || rustsec_db.is_some()
-            || go_tool.is_some())
+            || go_tool.is_some()
+            || erl_tool.is_some())
     {
         return Err("check java 不接受其它语言的原生工具参数".into());
     }
@@ -2528,6 +2649,7 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
         cargo_audit_tool,
         rustsec_db,
         go_tool,
+        erl_tool,
         maven_tool,
         java_home,
         maven_repo,

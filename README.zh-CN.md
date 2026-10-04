@@ -111,7 +111,7 @@ cargo build --locked -p codeguard-cli
 
 源码构建的 `check all` 现自动按 JS/TS/TSX 源码最近的项目清单选择本地 ESLint 10 和单一 flat config；`--node-tool` 优先，否则查找 PATH 中的 Node。原生结果进入 `native_results.node_lint`，已初始化工作区自动同步稳定任务并返回 `next`。完整且源码摘要匹配的原生文件跳过重复 WASM；缺配置、原生忽略或故障的文件保留原因并继续候选初检。此接线也适用于未启用 WASM 的构建；已包含在 npm 0.1.4，不覆盖 pnpm 链接包、ESLint 旧版或所有配置组合。见[聚合 ESLint 验收](tests/acceptance/check-all-eslint.md)。
 
-同一源码构建现在会在既有原生检查之后，从 `codeguard check all . --format=json` 执行有界候选初检。[检查反馈 0.35.0](schemas/check-feedback.schema.json)中的 `syntax_candidates` 附带有界的已知 grammar 限制，并区分 TSX、JavaScript、CFScript 和明确嵌入的 CFQuery，同时保留原生阻塞与未执行范围。Ruff 已对相同源码完成原生扫描的 Python 文件跳过重复 WASM，并计入 `native_preferred_count`；其余未确认语法能力的文件仍运行候选初检。四个有界集成样例经此入口合计调用了 32 种固定 grammar。观察仍未验收，命令保持退出码 3；候选阶段限 64 文件、64 片段、90 秒。这尚非逐语言验收的原生兜底；已发布 npm `0.1.3` 包含该候选路径，0.35.0 的已知限制投影已包含于 0.1.4；见[验收记录](tests/acceptance/check-all-32-grammar-candidates.md)。[C11 与 Apple Clang 21 差分](tests/acceptance/c-native-differential.md)、[Rust 2021 与 rustfmt 1.9.0 差分](tests/acceptance/rust-native-differential.md)和[Ruby 2.6.10 差分](tests/acceptance/ruby-native-differential.md)各在 13 个窄范围语法样例上一致，但不代表对应语言的原生 lint 已验收。[Swift 6.4 差分](tests/acceptance/swift-native-differential.md)现区分 12 例可判定的一致结果与 1 例隐藏错误导致的未完成；Swift 仍未验收。
+同一源码构建现在会在既有原生检查之后，从 `codeguard check all . --format=json` 执行有界候选初检。[检查反馈 0.36.0](schemas/check-feedback.schema.json)中的 `syntax_candidates` 附带有界的已知 grammar 限制，并区分 TSX、JavaScript、CFScript 和明确嵌入的 CFQuery，同时保留原生阻塞与未执行范围。Ruff 已对相同源码完成原生扫描的 Python 文件跳过重复 WASM，并计入 `native_preferred_count`；其余未确认语法能力的文件仍运行候选初检。四个有界集成样例经此入口合计调用了 32 种固定 grammar。观察仍未验收，命令保持退出码 3；候选阶段限 64 文件、64 片段、90 秒。这尚非逐语言验收的原生兜底；已发布 npm `0.1.3` 包含该候选路径，0.35.0 的已知限制投影已包含于 0.1.4；见[验收记录](tests/acceptance/check-all-32-grammar-candidates.md)。[C11 与 Apple Clang 21 差分](tests/acceptance/c-native-differential.md)、[Rust 2021 与 rustfmt 1.9.0 差分](tests/acceptance/rust-native-differential.md)和[Ruby 2.6.10 差分](tests/acceptance/ruby-native-differential.md)各在 13 个窄范围语法样例上一致，但不代表对应语言的原生 lint 已验收。[Swift 6.4 差分](tests/acceptance/swift-native-differential.md)现区分 12 例可判定的一致结果与 1 例隐藏错误导致的未完成；Swift 仍未验收。
 
 源码构建的验收测试还把 31 个源码文件作为一个混合语言项目：候选阶段最多同时运行两个隔离 worker，并服从 `--jobs`；报告顺序、源码复读与 90 秒总截止时间不变。本机单次运行观察到全部 32 种候选且无跳过片段；源码提交 `ff60184` 的 Linux WASM 集成步骤已通过同一单项目测试；完整 CI 已通过。这仍是候选覆盖，不是已验收的 lint。
 
@@ -406,3 +406,16 @@ Cargo 声明 `Apache-2.0`；当前工作树已有仓库级 `LICENSE` 与 `NOTICE
 ### 当前公开候选：0.1.4
 
 `@partme.ai/codeguard@0.1.4` 已从干净源码 `1cd458f6e01a44a74388243e964e3f45290ac18e` 发布，限 Apple Silicon macOS。包含全部 32 份可执行但未验收的 grammar、指定编辑文件检查、稳定原生确认任务、原生复检与 next 指引。注册表摘要、新缓存 npx、公开包真实 Zig 0.16.0 修复链路及相同源码 Linux CI 已通过。普通 CLI 的零诊断不能在缺可信策略时关闭任务；限定 Zig SDK 是源码集成 API，npm 不暴露自批命令。插件启用、真实宿主、完整精度、多平台与完整门禁仍未完成。此前 0.1.3 证据保留为历史快照。见 [0.1.4 验收](tests/acceptance/npm-0.1.4-candidate.md)。
+
+### 统一入口的 Erlang 原生优先检查（当前源码）
+
+```bash
+codeguard check all . --format=json
+codeguard check all . --erl-tool /absolute/path/to/erl --timeout 30s --jobs 2 --format=json
+```
+
+`erlang.lint` 节点选择显式工具或 PATH 绝对目录中的首个可执行 `erl`，复用已有受控 OTP 28 scanner/parser。每轮最多观察 64 个普通 UTF-8 文件，每文件不超过 1 MiB，沿用请求总截止时间和任务图并发预算。`native_results.erlang_lint` 提供当前源码摘要、诊断位置、工具选择、逐文件下一步及采用绝对源码路径的原工具复检 argv，可从项目外直接重放；超出原生预算的范围明确计入未观察数。
+
+只有完整、非预处理、源码与工具字节都匹配的 forms 观察才跳过重复 WASM。工具缺失保留候选初检；所选工具失败仍可伴随补充候选观察，但原生阻塞不会被洗成成功。宏/条件编译继续未完成。源码或工具变化会撤回受影响文件的当前定位和可复用 argv。项目范围变化设置 `scope_stable: false` 并保留仍与当前字节匹配的单文件诊断，同时撤回整体范围完整性。SIGINT 保持退出 130；JSON、human 和保守 SARIF 保留原生发现，不签发项目通过。
+
+协议分别为 `check_feedback` **0.36.0**、`check_aborted` **0.13.0** 和内嵌 `erlang_forms_scan` **0.1.0**；旧聚合 Schema 逐字节保留。forms 局部完整不等于项目 lint、构建和测试完整。原生发现的任务持久化与可信关闭仍未实现，报告明确 `task_id: null`，不伪造任务。已有 WASM 来源的 Erlang 确认任务继续使用独立 `task verify` 流程。公开 npm 0.1.4 不含本轮聚合能力。见[验收记录](tests/acceptance/check-all-erlang.md)。

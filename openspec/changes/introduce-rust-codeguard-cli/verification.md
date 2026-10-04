@@ -2201,3 +2201,29 @@ Erlang 显式 OTP 28 复用原任务/租约/尝试/deadline，next 提供原生�
 
 
 最终默认全工作区终态：206 组、1137 passed、0 failed、107 ignored，退出 0；`/tmp/codeguard-erlang-discovery-workspace.log` SHA-256 `e0b40be56639a4f83008281e3bc017bf47366c4d4597650b1133de9671a26f1b`。这是默认特性回归，不覆盖单独保留的 37 例 WASM grammar RED 草稿；相关特性目标及显式 OTP 验收分别见上文。
+
+
+## 2026-10-04 check all 的 Erlang 原生 forms 接线与跨目录复检
+
+`check all` 的 erlang.lint 节点复用显式/PATH 选择及 OTP 28 原生 scanner/parser，最多64文件、每文件1 MiB，沿用共享 deadline/jobs；逐文件诊断、原工具复检 argv 和环境/预处理阻塞进入 human/JSON/SARIF。完整同字节 forms 观察才跳过重复 WASM，过期源码/工具撤回当前位置；范围变化保留仍有效的文件发现但撤回范围完整性。复检 argv 的源码路径改为绝对路径，项目外调用与重放实际通过。协议0.36/0.13与内嵌scan0.1独立保存旧schema；见[局部验收](../../../tests/acceptance/check-all-erlang.md)。
+
+初始入口6项RED、范围漂移反例RED和跨目录复检RED分别保留。首次全工作区还暴露测试在默认无WASM构建下错误要求WASM取消原因；仅按特性区分该局部原因，保持根取消130、not_run、交付未完成和子孙回收断言。修正后的最终默认全工作区207组、1148 passed/0 failed/108 ignored，退出0；日志workspace-final2。忽略项不计通过。
+
+五组相关特性53 passed/0 failed/6 ignored；该阶段在最后绝对复检路径修正之前，随后当前源码的Erlang目标文件11 passed/0 failed/1 ignored、真实OTP双文件目标1 passed/0 failed/0 ignored及特性全目标Clippy -D warnings重新通过。32份候选路由的目标文件10/10通过，所在四组阶段36 passed/0 failed/2 ignored；其后范围/跨目录修正没有改候选资产或路由选择，已另由原生优先目标和默认全量覆盖。阶段存在重叠，不合计为独立测试总数。
+
+186份schema元定义、3份实际聚合/内嵌报告及2份双语完整scan示例有效，12类矛盾结果拒绝；历史0.35/0.12 schema与本批开始前Git版本逐字节相同。fmt、crate分层、OpenSpec strict、文档链接及diff检查通过。开发环境误用缺jsonschema的默认Python只影响一次辅助校验；改用已有Anaconda环境后完成，没有安装新工具或加入Python产品运行时。
+
+原提交1c66782的[Linux CI](https://github.com/full-stack-plugins/codeguard/actions/runs/37161739477)已成功。新提交CI需独立核验；公开npm0.1.4/插件锁/发行资产不变。完整Erlang项目lint、预处理、注释、原生发现任务持久化/可信关闭、实际宿主和全语言精度仍缺；37例grammar RED草稿依然失败且未提交，父任务及整个目标保持开放。
+
+日志身份：
+- `/tmp/codeguard-check-erlang-red.log`：SHA-256 `de76db135da017ba3ad68386977a118bbd9638ea28db9937e8801c20b1430882`。
+- `/tmp/codeguard-check-erlang-scope-red.log`：SHA-256 `aa1a6621d07c8fd6071c1efac62569f491aee42f13267ee37639b3966ec24495`。
+- `/tmp/codeguard-check-erlang-cwd-red.log`：SHA-256 `f84d25c06591c4b2597e60cf074d3160815978ccd86de17fb63dde0ed11cedbd`。
+- `/tmp/codeguard-check-erlang-cwd-green.log`：SHA-256 `ff8b4db628b7c8ee163bdc87a4e8443f951d894f7b594fbd2d30f5a384313dd5`。
+- `/tmp/codeguard-check-erlang-feature-final.log`：SHA-256 `dc1e3bc6b8360257a003a45fe7cbd68040a5398a4476ba8d7cc258dbd4df1adf`。
+- `/tmp/codeguard-check-erlang-routing.log`：SHA-256 `3a196c14485b766904801f7ae7b9eb267f2775677d43bbd5addaaf5f38bc03db`。
+- `/tmp/codeguard-check-erlang-workspace-final2.log`：SHA-256 `5894d50453d54b57fb51c388570391f68c5b2c2e38e96e4be0d569c3c5b01b1d`。
+- `/tmp/codeguard-check-erlang-final-native2.log`：SHA-256 `a25b424afe6de58f1b618d47d750d6807ca6e42a4d63e7351b83025a3bf53704`。
+- `/tmp/codeguard-check-erlang-real-final2.log`：SHA-256 `8078ab60eea7b34eb393d893a0d82b807a3f062e551ab6d3b3868d7b145a64cf`。
+- `/tmp/codeguard-check-erlang-clippy-final2.log`：SHA-256 `9b23e4bbb00a4ba2e626f0dcf14d53b2429f0e02e6a20bf69a6bbb72c769e2ef`。
+- `/tmp/codeguard-check-erlang-schema-final3.log`：SHA-256 `4cffa0740cac6d5f40fc50a28f7012c63dd2d821019dfc70e1a4c30dad9a986c`。

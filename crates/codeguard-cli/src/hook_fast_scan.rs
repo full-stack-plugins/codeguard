@@ -49,6 +49,7 @@ pub(crate) fn observe(
             node_lint: &node_lint,
             python_lint: &python_lint,
             go_lint: &Value::Null,
+            erlang_lint: &Value::Null,
             go_tool: None,
         },
         2,

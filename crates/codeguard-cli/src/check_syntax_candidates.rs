@@ -25,6 +25,7 @@ pub struct NativeCoverage<'a> {
     pub node_lint: &'a Value,
     pub python_lint: &'a Value,
     pub go_lint: &'a Value,
+    pub erlang_lint: &'a Value,
     pub go_tool: Option<&'a Path>,
 }
 
@@ -143,6 +144,7 @@ pub(crate) fn observe_selected(
             )
             .unwrap_or_default()
         };
+    let native_erlang_files = crate::check_erlang_scan::covered_sources(native.erlang_lint);
     let mut planned = Vec::new();
     for (index, relative) in paths.into_iter().enumerate() {
         if index >= MAX_FILES
@@ -168,6 +170,10 @@ pub(crate) fn observe_selected(
         if crate::check_eslint_scan::covers(native.node_lint, relative, &source)
             || native_python_covers(native.python_lint, relative, &source)
             || native_go_covers(&native_go_files, relative, &source)
+            || ((relative.ends_with(".erl") || relative.ends_with(".hrl"))
+                && native_erlang_files
+                    .get(relative)
+                    .is_some_and(|digest| *digest == format!("{:x}", Sha256::digest(&source))))
         {
             native_preferred_count += 1;
             continue;
