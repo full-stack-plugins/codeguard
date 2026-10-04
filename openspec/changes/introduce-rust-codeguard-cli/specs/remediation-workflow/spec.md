@@ -161,6 +161,10 @@ RunReport 与准备诊断 PrerequisiteReport MUST 使用 workspace_id + run_id �
 - **WHEN** 本地关闭证据和父链记录被重算摘要，但证据协议、语言或 grammar 与已同步的首次任务事实不同
 - **THEN** 历史读取 SHALL 在原生执行前拒绝身份矛盾，并由 next 提供核对决策，不将本地文件当作可信关闭
 
+#### Scenario: Counterexample guidance preserves the first observation source
+- **WHEN** 本地读者投影原反例原生合法的误报调查历史
+- **THEN** 原生首次任务 SHALL 指向首次原生诊断、输入/工具/环境差异与限定纠错请求，不归咎于不存在的 grammar；WASM 首次任务 SHALL 指向首次语法资产与原生对照差异，不将疑似原因直接写为已确认 grammar 缺陷。next/task show 与可读简报保持同一来源，查询不运行检查器、不改预算/租约/事件、不得自动白名单或关闭
+
 #### Scenario: Resolution history is merged out of order or forks
 - **WHEN** 事件文件顺序改变、父节点缺失、出现循环或分叉关闭事件
 - **THEN** 单一有效链 MUST 按父关系重放；缺失、循环、冲突或重复身份 MUST 返回 reconciliation_required，不能选择时间最新的关闭事件；有效复发事件重开并保留关闭历史

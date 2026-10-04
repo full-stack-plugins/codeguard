@@ -268,3 +268,8 @@ A protected host can call `verify_swift_task_resolution` to compare the original
 ### Scoped Kotlin resolution and context blockers (development source)
 
 `verify_kotlin_task_resolution` reuses the host SDK with kotlinc-jvm 2.4.10. Policy 1.3.0 and evidence 0.4.0 are language-specific; native-first tasks keep a null grammar identity. The original diagnostic must have coherent UTF-16 and UTF-8 coordinates. Changed source and a complete clean recheck permit a scoped `code_fixed` event. Context-only errors remain pending verification. Mixed syntax and context errors retain the known finding and allow ordinary `task verify --kotlinc-tool` recurrence to reopen the same parent chain even when completion is incomplete. The host supplies independent trust. Tool identity currently covers the launcher, with full JAR/JDK/project identity, default plugin closure, lint/type coverage, and publication still pending. See [acceptance](../tests/acceptance/kotlin-task-resolution-lifecycle.md).
+
+
+### Source-aware false-positive investigation
+
+`next` and `task show` derive the same investigation step from the bound first report. Native-first tasks compare native diagnostics, input, tool and environment; WASM-first tasks compare grammar assets, language versions and native observations. A native counterexample with no diagnostics does not establish a grammar defect. These queries do not execute checkers, mutate leases, budgets or history, approve an exception, or close a task. See the [scoped acceptance record](../tests/acceptance/counterexample-source-guidance.md).

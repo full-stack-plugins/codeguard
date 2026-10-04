@@ -1394,3 +1394,6 @@ Swift闭环本批终态：默认受影响6通过/1条件忽略，WASM六目标52
 9.7/9.10/9.11、12.7、14.10/14.11：Kotlin宿主SDK接入同一原工具对照/签名/租约/父链；1.3策略/0.4证据、原生首次grammar=null、双坐标校验。原列读取和混合未完成复发不重开分别RED，修正后5默认受控通过；真实kotlinc-jvm2.4.10修复resolved、上下文verification_required、混合语法复发open，同一任务且1显式真实测试通过。4实际协议/状态负例通过；受影响WASM和静态终态另追加。CI新增Erlang/Swift/Kotlin SDK WASM目标，保留条件忽略与原生单独验收。完整工具链/项目能力、默认宿主可信提供者与发行仍缺，不勾选父任务，见[验收](../../../tests/acceptance/kotlin-task-resolution-lifecycle.md)。
 
 Kotlin闭环本批终态：受影响WASM八目标65通过/0失败/4条件忽略；真实编译器另1显式通过。默认/WASM全目标严格Clippy、241 schema元定义/239历史字节保留、Kotlin4实际协议与Swift4历史协议、fmt、分层、OpenSpec strict、12新增链接通过。本批不借用旧1288的完整默认结果，远端CI按新提交核验；完整父任务、发行和默认宿主仍未完成。
+
+
+2026-10-05 误报来源指引修复：对应9.7/9.10/14.12既有任务和新增反例来源场景。原生首次不再提示grammar误报，WASM首次保留资产对照但不确认缺陷；来源不可核对则needs_decision。Kotlin/Swift实际CLI三种读取输出一致且不改变检查器调用、事件或租约；Erlang覆盖WASM首次。受影响WASM五目标48通过/0失败/4忽略，默认反例2通过。协议、审批和关闭规则不变，完整父任务不勾选。见[局部验收](../../../tests/acceptance/counterexample-source-guidance.md)。

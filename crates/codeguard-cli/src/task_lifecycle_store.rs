@@ -247,7 +247,22 @@ pub(crate) fn guidance(
         Some(TaskLifecycleKind::VerificationRequired { reason_code, .. })
             if reason_code == "false_positive_review_required" =>
         {
-            "原样本的原生反证未检出语法诊断；调查 grammar 误报并提交限定范围的纠错请求，不继续修改已合法源码或自行白名单放行"
+            let original = match original_task_report(root, &identity, original_sha) {
+                Ok(original) => original,
+                Err(reason) => {
+                    return Some(serde_json::json!({"disposition":"needs_decision",
+                        "step":format!("首次观察来源需要核对（{reason}）；保留原反例及历史，不推断误报原因或自行关闭任务")}));
+                }
+            };
+            // 只从严格绑定的首次报告区分来源；原生任务没有可归咎的 grammar。
+            if matches!(
+                original["schema_version"].as_str(),
+                Some("0.2.0" | "0.4.0" | "0.5.0")
+            ) {
+                "原样本的原生反证未检出语法诊断；核对首次原生诊断与反证运行的输入、工具及环境差异，保留误报调查证据并提交限定范围纠错请求，不继续修改已合法源码或自行白名单放行"
+            } else {
+                "原样本的原生反证未检出语法诊断；核对首次 WASM 观察、grammar 语言版本与原生对照差异，保留误报调查证据并提交限定范围纠错请求，不直接认定 grammar 缺陷或自行白名单放行"
+            }
         }
         _ => {
             "生命周期已有原生观察；先核对当前输入与原工具证据，不沿用旧 WASM 疑似位置重复修复或重新安装工具"

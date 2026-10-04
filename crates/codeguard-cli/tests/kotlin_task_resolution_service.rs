@@ -377,6 +377,51 @@ fn kotlin_original_counterexample_and_incomplete_native_observation_do_not_close
                 .iter()
                 .any(|e| e["event"]["kind"]["event"] == "resolved")
         );
+        if mode == "clean" {
+            let brief = codeguard_cli::next_command::read_task_brief(&p.root, &p.id).unwrap();
+            let step = brief["step"].as_str().unwrap();
+            assert!(step.contains("首次原生"), "{brief}");
+            assert!(!step.contains("grammar"), "{brief}");
+            let calls = fs::read(tool.with_extension("calls")).unwrap();
+            let records = p.events();
+            let lease_path = p
+                .root
+                .join(format!(".codeguard/state/leases/{}.json", p.id));
+            let lease = fs::read(&lease_path).unwrap();
+            for operation in ["next", "task-show-json", "task-show-human"] {
+                let mut command = Command::new(env!("CARGO_BIN_EXE_codeguard"));
+                if operation == "next" {
+                    command.arg("next").arg(&p.root).arg("--format=json");
+                } else {
+                    command.args(["task", "show", &p.id]).arg(&p.root).arg(
+                        if operation == "task-show-json" {
+                            "--format=json"
+                        } else {
+                            "--format=human"
+                        },
+                    );
+                }
+                let o = command.output().unwrap();
+                assert!(matches!(o.status.code(), Some(0 | 3)), "{o:?}");
+                if operation == "task-show-human" {
+                    let text = String::from_utf8(o.stdout).unwrap();
+                    assert!(text.contains(step), "{text}");
+                    assert!(!text.contains("grammar 误报"), "{text}");
+                } else {
+                    let r: Value = serde_json::from_slice(&o.stdout).unwrap();
+                    let projected = if operation == "next" {
+                        &r["repair_brief"]
+                    } else {
+                        &r["task"]
+                    };
+                    assert_eq!(projected["step"], step, "{r}");
+                    assert_eq!(projected["disposition"], "verification_required");
+                }
+            }
+            assert_eq!(fs::read(tool.with_extension("calls")).unwrap(), calls);
+            assert_eq!(p.events(), records);
+            assert_eq!(fs::read(lease_path).unwrap(), lease);
+        }
     }
 }
 

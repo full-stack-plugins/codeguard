@@ -324,6 +324,13 @@ fn erlang_original_native_counterexample_requires_false_positive_review() {
     export(&p, &receipt, &policy, "fixture-counterexample");
     let brief = codeguard_cli::next_command::read_task_brief(&p.root, &p.id).unwrap();
     assert!(brief["step"].as_str().unwrap().contains("误报"));
+    assert!(brief["step"].as_str().unwrap().contains("首次 WASM"));
+    assert!(
+        brief["step"]
+            .as_str()
+            .unwrap()
+            .contains("不直接认定 grammar 缺陷")
+    );
 }
 
 #[test]

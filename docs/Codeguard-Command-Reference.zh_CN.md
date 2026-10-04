@@ -769,3 +769,8 @@ Rust 读取并复核有界源码字节，通过冻结 stdin、固定 `/` cwd、�
 ### Kotlin 限定语法关闭与上下文分流（开发源码）
 
 `verify_kotlin_task_resolution` 复用共享宿主 SDK，以 kotlinc-jvm 2.4.10 对照原反例及当前源码；策略 1.3.0 / 证据 0.4.0 独立于其它语言，原生首次 grammar=null。原反例的 UTF-16 与 UTF-8 字节坐标须同时有效，源码已改变且原工具完整零诊断才追加 `code_fixed`。仅上下文诊断保留待验证；混合上下文未完成和已确认语法诊断时，保留原问题并支持普通 `task verify --kotlinc-tool` 重开同一父链，不因 `incomplete` 丢弃正向发现。签名来源由宿主独立固定；当前只绑定 launcher，不证明完整 JAR/JDK/项目构建身份。默认插件可信关闭、完整 lint/类型及发行仍未完成。详见[验收](../tests/acceptance/kotlin-task-resolution-lifecycle.md)。
+
+
+### 误报调查的来源指引
+
+`next` 和 `task show` 从绑定的首次报告生成同一调查步骤。原生首次任务核对原生诊断、输入、工具和环境差异；WASM 首次任务核对语法资产、语言版本和原生对照差异。原反例未检出原生诊断不等于已确认 grammar 缺陷。查询不执行检查器或修改租约、预算与历史，也不批准白名单或关闭。见[局部验收](../tests/acceptance/counterexample-source-guidance.md)。
