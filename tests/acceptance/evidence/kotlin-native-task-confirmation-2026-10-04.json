@@ -1,0 +1,1544 @@
+{
+  "evidence_type": "actual_kotlin_task_recheck_and_repair_ready",
+  "development_base_commit": "e6413aba529d051338c6ff618728438f8957e661",
+  "source_has_uncommitted_task_wiring": true,
+  "program_sha256": "930c93ab0404c84bded3601e6da2b3b293b7689e75fd25658ad263d80a2db00c",
+  "compiler_version": "kotlinc-jvm 2.4.10",
+  "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf",
+  "reports": {
+    "init": {
+      "exit": 3,
+      "report_sha256": "f283378e416f23c50a045e9a1876caebd6080807f698d6e9fce706643ed4a151",
+      "report": {
+        "changed_directories": [
+          ".codeguard",
+          ".codeguard/findings",
+          ".codeguard/tasks",
+          ".codeguard/decisions",
+          ".codeguard/reports",
+          ".codeguard/runs",
+          ".codeguard/cache",
+          ".codeguard/worktrees",
+          ".codeguard/state"
+        ],
+        "changed_files": [
+          ".codeguard/.gitignore",
+          ".codeguard/README.md",
+          ".codeguard/project.json",
+          ".codeguard/module-graph.json",
+          ".codeguard/architecture.md",
+          "AGENTS.md",
+          ".codeguard/workspace.json"
+        ],
+        "conflict_file": null,
+        "delivery_decision": "not_evaluated",
+        "init_status": "partial",
+        "mode": "apply",
+        "next_actions": [
+          "review_project_profile",
+          "complete_init_readiness",
+          "run_doctor_and_check_when_available"
+        ],
+        "observation_complete": true,
+        "operation": "init",
+        "planned_files": [
+          ".codeguard/.gitignore",
+          ".codeguard/README.md",
+          ".codeguard/project.json",
+          ".codeguard/module-graph.json",
+          ".codeguard/architecture.md",
+          ".codeguard/workspace.json",
+          "AGENTS.md"
+        ],
+        "profile_stale": null,
+        "profile_summary": {
+          "architecture": "unknown",
+          "build_model": "not_resolved",
+          "build_roots": [],
+          "checker_inventory": "partial",
+          "checkers": [],
+          "installed_versions": "not_probed",
+          "language_targets": [],
+          "languages": [
+            {
+              "id": "kotlin",
+              "manifest_count": 0,
+              "source_file_count": 1
+            }
+          ],
+          "unknown_conditions": [
+            "source_sets_not_fully_classified",
+            "dialects_not_classified"
+          ]
+        },
+        "readiness": "unknown",
+        "report_type": "init_plan",
+        "schema_version": "0.5.0",
+        "unresolved": [
+          "profile_refresh_partial",
+          "approved_quality_policy_not_bound",
+          "tool_readiness_not_probed"
+        ],
+        "workspace_id": "ws-f01ad6a398f570d0aa005195dd9d29fc"
+      }
+    },
+    "first_hook": {
+      "exit": 3,
+      "report_sha256": "ea5e141247cba0f1866b77b390a3f7e47b68d05c680073f32da5884fd8f407cc",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "execution": "local_observation",
+        "host_blocking_verified": false,
+        "local_feedback": {
+          "candidate_recovery_count": 0,
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "native_unwired_files": [
+            "App.kt"
+          ],
+          "next_action": "require_native_lint_confirmation",
+          "node_lint": {
+            "backlog_status": "not_connected",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "files": [],
+            "new_blockers": 0,
+            "new_findings": 0,
+            "next": null,
+            "reason": "eslint_files_incomplete",
+            "status": "incomplete",
+            "unexecuted_files": []
+          },
+          "python_lint": null,
+          "report_type": "hook_fast_feedback",
+          "requested_paths": [
+            "App.kt"
+          ],
+          "scan_scope": "selected_files",
+          "schema_version": "0.2.0",
+          "syntax_candidates": {
+            "authority": "candidate_unqualified",
+            "delivery_decision": "incomplete",
+            "execution_phase": "after_native",
+            "native_preferred_count": 0,
+            "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+            "observations": [
+              {
+                "byte_offset": 0,
+                "grammar_qualified": false,
+                "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+                "known_limitations": [
+                  "Kotlin 2.4.10 native compiler rejects missing parameter type in `fun f(x: ) = x`. Hidden MISSING tokens also occur in valid `object C { val value = 1 }`; Rust marks both zero-record scans incomplete. Eleven decidable cases agree with native labels and two remain unresolved. Zero recoveries cannot establish valid Kotlin syntax",
+                  "Other Kotlin versions, dialects, public native-first lint route, resource budget and release remain unqualified"
+                ],
+                "language": "kotlin",
+                "path": "App.kt",
+                "reason": "syntax_recovery_incomplete",
+                "recoveries": [],
+                "recovery_count": 0,
+                "scope": "whole_file",
+                "source_sha256": "87fbb71a8f650a302ff4bdf216bc8a9835350f3b864b2b1c6a0d0fe5f3cdf9b5",
+                "status": "candidate_observed"
+              }
+            ],
+            "reason": "candidate_unqualified",
+            "skipped_count": 0,
+            "source_file_count": 1,
+            "status": "observed_partial",
+            "unrouted_count": 0
+          },
+          "syntax_tasks": {
+            "failures": [],
+            "new_blockers": 1,
+            "status": "synced_partial",
+            "tasks": [
+              {
+                "language": "kotlin",
+                "path": "App.kt",
+                "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf"
+              }
+            ]
+          },
+          "unavailable_files": []
+        },
+        "plan": {
+          "action": "fast_file_check",
+          "host_blocking_claimed": false,
+          "may_claim_delivery": false,
+          "requires_git_snapshot": false,
+          "scope_resolution_reason": null,
+          "soft_result_reuse_candidate": true,
+          "target_paths": [
+            "App.kt"
+          ],
+          "task_id": null
+        },
+        "reason": null,
+        "report_type": "hook_execution_feedback",
+        "schema_version": "0.7.0",
+        "soft_result_reused": false
+      }
+    },
+    "initial_next": {
+      "exit": 0,
+      "report_sha256": "892d226aaaefe8e126c121ad1ab196a7312dcfef0a8d8d98aae7cc10c0154c98",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "disposition": "verification_required",
+        "exit_code": 0,
+        "next_actions": [],
+        "operation": "next",
+        "reason": "local_task_selected",
+        "repair_brief": {
+          "action_id": "restore-checker-environment",
+          "affected_paths": [
+            "App.kt"
+          ],
+          "authority": "local_unverified",
+          "build_root": ".",
+          "checker_id": "syntax.native_confirmation",
+          "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+          "constraints": [
+            "先恢复检查完整性",
+            "不得关闭检查器或修改无关源码"
+          ],
+          "disposition": "verification_required",
+          "evidence_ref": {
+            "first_report_sha256": "6590e45fdad7d23ad6149f58ec6dc8c675aa0e0b048d92760e5d60118cc1b4dc",
+            "first_run_id": "syntax-confirm-30793-1791122287749526000"
+          },
+          "history": {
+            "attempt_count": 0,
+            "awaiting_verification": false,
+            "budget": 2,
+            "no_progress_count": 0,
+            "open_attempt_id": null,
+            "recent": []
+          },
+          "kind": "blocker",
+          "native_adapter": {
+            "language": "kotlin",
+            "supported_tool_version": "kotlinc-jvm 2.4.10",
+            "tool_option": "--kotlinc-tool"
+          },
+          "reason_code": "native_syntax_confirmation_needed",
+          "recheck_argv": [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf",
+            ".",
+            "--format",
+            "json",
+            "--kotlinc-tool",
+            "<已核验 Kotlin/JVM 2.4.10 kotlinc 绝对路径>"
+          ],
+          "schema_version": "0.9.0",
+          "scope": "App.kt",
+          "step": "固定 grammar 的恢复扫描未完成或错误无法定位；不虚构源码位置。已接入 kotlinc-jvm 2.4.10 冻结单文件编译 语法确认 adapter，但本地工具是否就绪尚未核验；先核对已安装的适用工具，缺失时再准备。通过 --kotlinc-tool 选择已核验绝对路径后运行同一任务的原生复检；原生确认前不得修改源码，不凭安装或 WASM 零恢复关闭任务",
+          "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf",
+          "tool_readiness": "not_evaluated"
+        },
+        "report_type": "repair_brief_preview",
+        "schema_version": "0.9.0"
+      }
+    },
+    "initial_show": {
+      "exit": 0,
+      "report_sha256": "286342acdab7e024d0b89133f1113e61ca58911dc29cb8abe982a8af38f9f7d7",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "event_chain_status": "unverified",
+        "evidence_freshness": "unverified",
+        "exit_code": 0,
+        "next_actions": [
+          [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf",
+            ".",
+            "--format",
+            "json",
+            "--kotlinc-tool",
+            "<已核验 Kotlin/JVM 2.4.10 kotlinc 绝对路径>"
+          ]
+        ],
+        "operation": "task_show",
+        "report_type": "task_show_preview",
+        "request_id": "view-32206-1791122298895791000",
+        "schema_version": "0.1.0",
+        "state": "open",
+        "task": {
+          "action_id": "restore-checker-environment",
+          "affected_paths": [
+            "App.kt"
+          ],
+          "authority": "local_unverified",
+          "build_root": ".",
+          "checker_id": "syntax.native_confirmation",
+          "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+          "constraints": [
+            "先恢复检查完整性",
+            "不得关闭检查器或修改无关源码"
+          ],
+          "disposition": "verification_required",
+          "evidence_ref": {
+            "first_report_sha256": "6590e45fdad7d23ad6149f58ec6dc8c675aa0e0b048d92760e5d60118cc1b4dc",
+            "first_run_id": "syntax-confirm-30793-1791122287749526000"
+          },
+          "history": {
+            "attempt_count": 0,
+            "awaiting_verification": false,
+            "budget": 2,
+            "no_progress_count": 0,
+            "open_attempt_id": null,
+            "recent": []
+          },
+          "kind": "blocker",
+          "native_adapter": {
+            "language": "kotlin",
+            "supported_tool_version": "kotlinc-jvm 2.4.10",
+            "tool_option": "--kotlinc-tool"
+          },
+          "reason_code": "native_syntax_confirmation_needed",
+          "recheck_argv": [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf",
+            ".",
+            "--format",
+            "json",
+            "--kotlinc-tool",
+            "<已核验 Kotlin/JVM 2.4.10 kotlinc 绝对路径>"
+          ],
+          "schema_version": "0.9.0",
+          "scope": "App.kt",
+          "step": "固定 grammar 的恢复扫描未完成或错误无法定位；不虚构源码位置。已接入 kotlinc-jvm 2.4.10 冻结单文件编译 语法确认 adapter，但本地工具是否就绪尚未核验；先核对已安装的适用工具，缺失时再准备。通过 --kotlinc-tool 选择已核验绝对路径后运行同一任务的原生复检；原生确认前不得修改源码，不凭安装或 WASM 零恢复关闭任务",
+          "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf",
+          "tool_readiness": "not_evaluated"
+        },
+        "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf"
+      }
+    },
+    "bad": {
+      "exit": 3,
+      "report_sha256": "43ade92e2babf4599cefc079d7195a4ca914b0ae921671577399badd40ff829e",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "delivery_decision": "not_evaluated",
+        "event_persisted": true,
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "source": "cli",
+          "timeout_ms": 30000
+        },
+        "exit_code": 3,
+        "kind": "blocker",
+        "native_scan": {
+          "authority": "local_unverified",
+          "checker_id": "syntax.native_confirmation",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "input_stable": true,
+          "native": {
+            "context_diagnostics": [],
+            "diagnostics": [
+              {
+                "column_byte": 10,
+                "column_utf16": 10,
+                "line": 1,
+                "rule_id": "kotlin.syntax"
+              }
+            ],
+            "reason": "kotlin_native_syntax_diagnostics",
+            "status": "diagnostics_observed",
+            "tool_identity_scope": "launcher_only",
+            "tool_sha256": "827f1613736c1f457474103af722f517a627d9534d884d1773f49b7026f45f56",
+            "version": "kotlinc-jvm 2.4.10"
+          },
+          "operation": "task_verify",
+          "original_report": {
+            "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+            "run_id": "syntax-confirm-30793-1791122287749526000",
+            "sha256": "6590e45fdad7d23ad6149f58ec6dc8c675aa0e0b048d92760e5d60118cc1b4dc",
+            "source_sha256": "87fbb71a8f650a302ff4bdf216bc8a9835350f3b864b2b1c6a0d0fe5f3cdf9b5"
+          },
+          "report_type": "syntax_task_recheck",
+          "run_id": "syntax-native-33892-1791122309205371000",
+          "schema_version": "0.5.0",
+          "target": {
+            "language": "kotlin",
+            "path": "App.kt",
+            "source_sha256": "87fbb71a8f650a302ff4bdf216bc8a9835350f3b864b2b1c6a0d0fe5f3cdf9b5"
+          },
+          "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf",
+          "tool_path": "/opt/homebrew/Cellar/kotlin/2.4.10/bin/kotlinc",
+          "workspace_binding": "bound",
+          "workspace_id": "ws-f01ad6a398f570d0aa005195dd9d29fc"
+        },
+        "next_actions": [
+          "inspect_native_syntax_observation",
+          "repair_only_current_native_diagnostics",
+          "verify_policy_and_capability_before_closure"
+        ],
+        "observation": "still_blocked",
+        "operation": "task_verify",
+        "reason": null,
+        "report_type": "task_verification_preview",
+        "schema_version": "0.16.0",
+        "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf"
+      }
+    },
+    "next_bad": {
+      "exit": 0,
+      "report_sha256": "43eb8789f5231b85f0f10ad6d0ce521f7cca7e38e0a19915dbae23c653bbc03e",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "disposition": "actionable",
+        "exit_code": 0,
+        "next_actions": [],
+        "operation": "next",
+        "reason": "local_task_selected",
+        "repair_brief": {
+          "action_id": "repair-source",
+          "affected_paths": [
+            "App.kt"
+          ],
+          "authority": "local_unverified",
+          "build_root": ".",
+          "checker_id": "syntax.native_confirmation",
+          "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+          "constraints": [
+            "先恢复检查完整性",
+            "不得关闭检查器或修改无关源码"
+          ],
+          "disposition": "actionable",
+          "evidence_ref": {
+            "first_report_sha256": "6590e45fdad7d23ad6149f58ec6dc8c675aa0e0b048d92760e5d60118cc1b4dc",
+            "first_run_id": "syntax-confirm-30793-1791122287749526000"
+          },
+          "history": {
+            "attempt_count": 0,
+            "awaiting_verification": false,
+            "budget": 2,
+            "no_progress_count": 0,
+            "open_attempt_id": null,
+            "recent": []
+          },
+          "kind": "blocker",
+          "native_column_unit": "utf8_byte",
+          "native_confirmation_reason": "kotlin_native_syntax_diagnostics",
+          "native_confirmation_ref": {
+            "report_ref": ".codeguard/reports/syntax-native-33892-1791122309205371000.json",
+            "report_sha256": "2d48bb91ade8adb0ffd7b40beb96accaa8c5cac0a59a21c63320bff6fd2f1cb3",
+            "run_id": "syntax-native-33892-1791122309205371000"
+          },
+          "native_confirmation_status": "diagnostics_observed",
+          "native_context_diagnostics": [],
+          "native_diagnostic_positions": [
+            {
+              "column_byte": 10,
+              "column_utf16": 10,
+              "line": 1,
+              "rule_id": "kotlin.syntax"
+            }
+          ],
+          "reason_code": "native_syntax_confirmation_needed",
+          "recheck_argv": [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf",
+            ".",
+            "--format",
+            "json",
+            "--kotlinc-tool",
+            "/opt/homebrew/Cellar/kotlin/2.4.10/bin/kotlinc"
+          ],
+          "schema_version": "0.8.0",
+          "scope": "App.kt",
+          "step": "当前源码已有原生 Kotlin 语法诊断；核对字节列与 UTF-16 原列后修复，并复用原工具复检；完整项目 lint 和上下文仍需检查",
+          "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf"
+        },
+        "report_type": "repair_brief_preview",
+        "schema_version": "0.8.0"
+      }
+    },
+    "stale": {
+      "exit": 0,
+      "report_sha256": "83ab2ccd0c3316f71deac1a0af78d4b9854f685803ba5517a3d90de8f66657f1",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "disposition": "verification_required",
+        "exit_code": 0,
+        "next_actions": [],
+        "operation": "next",
+        "reason": "local_task_selected",
+        "repair_brief": {
+          "action_id": "restore-checker-environment",
+          "affected_paths": [
+            "App.kt"
+          ],
+          "authority": "local_unverified",
+          "build_root": ".",
+          "checker_id": "syntax.native_confirmation",
+          "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+          "constraints": [
+            "先恢复检查完整性",
+            "不得关闭检查器或修改无关源码"
+          ],
+          "disposition": "verification_required",
+          "evidence_ref": {
+            "first_report_sha256": "6590e45fdad7d23ad6149f58ec6dc8c675aa0e0b048d92760e5d60118cc1b4dc",
+            "first_run_id": "syntax-confirm-30793-1791122287749526000"
+          },
+          "history": {
+            "attempt_count": 0,
+            "awaiting_verification": false,
+            "budget": 2,
+            "no_progress_count": 0,
+            "open_attempt_id": null,
+            "recent": []
+          },
+          "kind": "blocker",
+          "native_column_unit": "utf8_byte",
+          "native_confirmation_reason": "syntax_confirmation_inputs_changed",
+          "native_confirmation_ref": {
+            "report_ref": ".codeguard/reports/syntax-native-33892-1791122309205371000.json",
+            "report_sha256": "2d48bb91ade8adb0ffd7b40beb96accaa8c5cac0a59a21c63320bff6fd2f1cb3",
+            "run_id": "syntax-native-33892-1791122309205371000"
+          },
+          "native_confirmation_status": "stale",
+          "native_context_diagnostics": [],
+          "native_diagnostic_positions": [],
+          "reason_code": "native_syntax_confirmation_needed",
+          "recheck_argv": [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf",
+            ".",
+            "--format",
+            "json",
+            "--kotlinc-tool",
+            "/opt/homebrew/Cellar/kotlin/2.4.10/bin/kotlinc"
+          ],
+          "schema_version": "0.8.0",
+          "scope": "App.kt",
+          "step": "源码或原生工具在语法复检后已变化；先运行当前输入的原生确认，不沿用旧修复或零诊断",
+          "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf"
+        },
+        "report_type": "repair_brief_preview",
+        "schema_version": "0.8.0"
+      }
+    },
+    "fixed": {
+      "exit": 3,
+      "report_sha256": "801bfddc18cdc6ea931337a548393460bdddca7f816a04b8ee19d73cc65c7f91",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "delivery_decision": "not_evaluated",
+        "event_persisted": true,
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "source": "cli",
+          "timeout_ms": 30000
+        },
+        "exit_code": 3,
+        "kind": "blocker",
+        "native_scan": {
+          "authority": "local_unverified",
+          "checker_id": "syntax.native_confirmation",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "input_stable": true,
+          "native": {
+            "context_diagnostics": [],
+            "diagnostics": [],
+            "reason": "kotlin_native_single_file_no_diagnostics",
+            "status": "completed",
+            "tool_identity_scope": "launcher_only",
+            "tool_sha256": "827f1613736c1f457474103af722f517a627d9534d884d1773f49b7026f45f56",
+            "version": "kotlinc-jvm 2.4.10"
+          },
+          "operation": "task_verify",
+          "original_report": {
+            "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+            "run_id": "syntax-confirm-30793-1791122287749526000",
+            "sha256": "6590e45fdad7d23ad6149f58ec6dc8c675aa0e0b048d92760e5d60118cc1b4dc",
+            "source_sha256": "87fbb71a8f650a302ff4bdf216bc8a9835350f3b864b2b1c6a0d0fe5f3cdf9b5"
+          },
+          "report_type": "syntax_task_recheck",
+          "run_id": "syntax-native-35344-1791122323661975000",
+          "schema_version": "0.5.0",
+          "target": {
+            "language": "kotlin",
+            "path": "App.kt",
+            "source_sha256": "8a7eaee3a2ed1ded2f10c111143f7629820f78b4e63210aebe6b9986850db4ac"
+          },
+          "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf",
+          "tool_path": "/opt/homebrew/Cellar/kotlin/2.4.10/bin/kotlinc",
+          "workspace_binding": "bound",
+          "workspace_id": "ws-f01ad6a398f570d0aa005195dd9d29fc"
+        },
+        "next_actions": [
+          "inspect_native_syntax_observation",
+          "repair_only_current_native_diagnostics",
+          "verify_policy_and_capability_before_closure"
+        ],
+        "observation": "candidate_absent_unverified_policy",
+        "operation": "task_verify",
+        "reason": null,
+        "report_type": "task_verification_preview",
+        "schema_version": "0.16.0",
+        "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf"
+      }
+    },
+    "next_fixed": {
+      "exit": 0,
+      "report_sha256": "869756324e6feca37fc1f10102c3919e01318325cab18b32d2ce5ec3933d9cc2",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "disposition": "verification_required",
+        "exit_code": 0,
+        "next_actions": [],
+        "operation": "next",
+        "reason": "local_task_selected",
+        "repair_brief": {
+          "action_id": "restore-checker-environment",
+          "affected_paths": [
+            "App.kt"
+          ],
+          "authority": "local_unverified",
+          "build_root": ".",
+          "checker_id": "syntax.native_confirmation",
+          "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+          "constraints": [
+            "先恢复检查完整性",
+            "不得关闭检查器或修改无关源码"
+          ],
+          "disposition": "verification_required",
+          "evidence_ref": {
+            "first_report_sha256": "6590e45fdad7d23ad6149f58ec6dc8c675aa0e0b048d92760e5d60118cc1b4dc",
+            "first_run_id": "syntax-confirm-30793-1791122287749526000"
+          },
+          "history": {
+            "attempt_count": 0,
+            "awaiting_verification": false,
+            "budget": 2,
+            "no_progress_count": 0,
+            "open_attempt_id": null,
+            "recent": []
+          },
+          "kind": "blocker",
+          "native_column_unit": "utf8_byte",
+          "native_confirmation_reason": "kotlin_native_single_file_no_diagnostics",
+          "native_confirmation_ref": {
+            "report_ref": ".codeguard/reports/syntax-native-35344-1791122323661975000.json",
+            "report_sha256": "85494d44934480dc85a3d02a17120fbffca3b2564bd7084c5a9664dac661a8b1",
+            "run_id": "syntax-native-35344-1791122323661975000"
+          },
+          "native_confirmation_status": "completed",
+          "native_context_diagnostics": [],
+          "native_diagnostic_positions": [],
+          "reason_code": "native_syntax_confirmation_needed",
+          "recheck_argv": [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf",
+            ".",
+            "--format",
+            "json",
+            "--kotlinc-tool",
+            "/opt/homebrew/Cellar/kotlin/2.4.10/bin/kotlinc"
+          ],
+          "schema_version": "0.8.0",
+          "scope": "App.kt",
+          "step": "原生语法复检未发现诊断；核对原输入的反证或修复归因及正式策略/覆盖，保留证据，不重复源码修复或安装工具，也不自动关闭",
+          "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf"
+        },
+        "report_type": "repair_brief_preview",
+        "schema_version": "0.8.0"
+      }
+    },
+    "repair_ready": {
+      "exit": 3,
+      "report_sha256": "16df6ff5b903ec8f7e8914aa5351fcb1cc6a37ccfe41e65dfa95db77794a524f",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "execution": "task_verification",
+        "host_blocking_verified": false,
+        "local_feedback": {
+          "authority": "local_unverified",
+          "checker_id": "syntax.native_confirmation",
+          "delivery_decision": "not_evaluated",
+          "event_persisted": true,
+          "native_column_unit": "utf8_byte",
+          "native_confirmation_reason": "kotlin_native_single_file_no_diagnostics",
+          "native_confirmation_ref": {
+            "report_ref": ".codeguard/reports/syntax-native-36253-1791122338021174000.json",
+            "report_sha256": "89c68176e42e17eff8e9b0a36086e4dca0d88d35a5d90c9f0f2809669ab6daa4",
+            "run_id": "syntax-native-36253-1791122338021174000"
+          },
+          "native_confirmation_status": "completed",
+          "native_context_diagnostics": [],
+          "native_diagnostic_positions": [],
+          "observation": "candidate_absent_unverified_policy",
+          "reason": null,
+          "report_type": "hook_task_verification_summary",
+          "scan_report_available": true,
+          "schema_version": "0.4.0",
+          "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf"
+        },
+        "plan": {
+          "action": "verify_task",
+          "host_blocking_claimed": false,
+          "may_claim_delivery": false,
+          "requires_git_snapshot": false,
+          "scope_resolution_reason": null,
+          "soft_result_reuse_candidate": false,
+          "target_paths": [],
+          "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf"
+        },
+        "reason": null,
+        "report_type": "hook_execution_feedback",
+        "schema_version": "0.10.0",
+        "soft_result_reused": false
+      }
+    },
+    "context": {
+      "exit": 3,
+      "report_sha256": "39a248f57632ed78031a41f2b4bd5b9c38db4cdd581a444a2402ae2ec129a134",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "delivery_decision": "not_evaluated",
+        "event_persisted": true,
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "source": "cli",
+          "timeout_ms": 30000
+        },
+        "exit_code": 3,
+        "kind": "blocker",
+        "native_scan": {
+          "authority": "local_unverified",
+          "checker_id": "syntax.native_confirmation",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "input_stable": true,
+          "native": {
+            "context_diagnostics": [
+              {
+                "column_byte": 10,
+                "column_utf16": 10,
+                "line": 1,
+                "rule_id": "kotlin.context.UNRESOLVED_REFERENCE"
+              },
+              {
+                "column_byte": 20,
+                "column_utf16": 20,
+                "line": 1,
+                "rule_id": "kotlin.context.UNRESOLVED_REFERENCE"
+              }
+            ],
+            "diagnostics": [],
+            "reason": "kotlin_project_context_unresolved",
+            "status": "incomplete",
+            "tool_identity_scope": "launcher_only",
+            "tool_sha256": "827f1613736c1f457474103af722f517a627d9534d884d1773f49b7026f45f56",
+            "version": "kotlinc-jvm 2.4.10"
+          },
+          "operation": "task_verify",
+          "original_report": {
+            "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+            "run_id": "syntax-confirm-30793-1791122287749526000",
+            "sha256": "6590e45fdad7d23ad6149f58ec6dc8c675aa0e0b048d92760e5d60118cc1b4dc",
+            "source_sha256": "87fbb71a8f650a302ff4bdf216bc8a9835350f3b864b2b1c6a0d0fe5f3cdf9b5"
+          },
+          "report_type": "syntax_task_recheck",
+          "run_id": "syntax-native-36836-1791122344663182000",
+          "schema_version": "0.5.0",
+          "target": {
+            "language": "kotlin",
+            "path": "App.kt",
+            "source_sha256": "64adfc98f5e2f9e78f5b0c0c6c453ee7254ac8ae88242664ff3147a52635cf15"
+          },
+          "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf",
+          "tool_path": "/opt/homebrew/Cellar/kotlin/2.4.10/bin/kotlinc",
+          "workspace_binding": "bound",
+          "workspace_id": "ws-f01ad6a398f570d0aa005195dd9d29fc"
+        },
+        "next_actions": [
+          "inspect_native_syntax_observation",
+          "repair_only_current_native_diagnostics",
+          "verify_policy_and_capability_before_closure"
+        ],
+        "observation": "incomplete",
+        "operation": "task_verify",
+        "reason": null,
+        "report_type": "task_verification_preview",
+        "schema_version": "0.16.0",
+        "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf"
+      }
+    },
+    "next_context": {
+      "exit": 0,
+      "report_sha256": "9f069cf91dcfde7e232993740e566ab247f8e7c4bcf5bb9805e83b387a940272",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "disposition": "needs_decision",
+        "exit_code": 0,
+        "next_actions": [],
+        "operation": "next",
+        "reason": "local_task_selected",
+        "repair_brief": {
+          "action_id": "restore-checker-environment",
+          "affected_paths": [
+            "App.kt"
+          ],
+          "authority": "local_unverified",
+          "build_root": ".",
+          "checker_id": "syntax.native_confirmation",
+          "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+          "constraints": [
+            "先恢复检查完整性",
+            "不得关闭检查器或修改无关源码"
+          ],
+          "disposition": "needs_decision",
+          "evidence_ref": {
+            "first_report_sha256": "6590e45fdad7d23ad6149f58ec6dc8c675aa0e0b048d92760e5d60118cc1b4dc",
+            "first_run_id": "syntax-confirm-30793-1791122287749526000"
+          },
+          "history": {
+            "attempt_count": 0,
+            "awaiting_verification": false,
+            "budget": 2,
+            "no_progress_count": 0,
+            "open_attempt_id": null,
+            "recent": []
+          },
+          "kind": "blocker",
+          "native_column_unit": "utf8_byte",
+          "native_confirmation_reason": "kotlin_project_context_unresolved",
+          "native_confirmation_ref": {
+            "report_ref": ".codeguard/reports/syntax-native-36836-1791122344663182000.json",
+            "report_sha256": "5da0cc7df714f6761f1af7865c8a8f79ad72b53f83cb7eda10c7d9266c397e98",
+            "run_id": "syntax-native-36836-1791122344663182000"
+          },
+          "native_confirmation_status": "incomplete",
+          "native_context_diagnostics": [
+            {
+              "column_byte": 10,
+              "column_utf16": 10,
+              "line": 1,
+              "rule_id": "kotlin.context.UNRESOLVED_REFERENCE"
+            },
+            {
+              "column_byte": 20,
+              "column_utf16": 20,
+              "line": 1,
+              "rule_id": "kotlin.context.UNRESOLVED_REFERENCE"
+            }
+          ],
+          "native_diagnostic_positions": [],
+          "reason_code": "native_syntax_confirmation_needed",
+          "recheck_argv": [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf",
+            ".",
+            "--format",
+            "json",
+            "--kotlinc-tool",
+            "/opt/homebrew/Cellar/kotlin/2.4.10/bin/kotlinc"
+          ],
+          "schema_version": "0.8.0",
+          "scope": "App.kt",
+          "step": "Kotlin 原生确认仍未完成；核对已安装的 Kotlin/JVM 2.4.10、JDK、原生上下文诊断及项目依赖，使用 --kotlinc-tool 绝对路径复检；不根据上下文阻塞修改无关源码",
+          "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf"
+        },
+        "report_type": "repair_brief_preview",
+        "schema_version": "0.8.0"
+      }
+    },
+    "mixed": {
+      "exit": 3,
+      "report_sha256": "52de0096cc9e6b993bbb7bc01dc5acdd9cb0e679afbeecb6f1f71879de259de7",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "delivery_decision": "not_evaluated",
+        "event_persisted": true,
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "source": "cli",
+          "timeout_ms": 30000
+        },
+        "exit_code": 3,
+        "kind": "blocker",
+        "native_scan": {
+          "authority": "local_unverified",
+          "checker_id": "syntax.native_confirmation",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "input_stable": true,
+          "native": {
+            "context_diagnostics": [
+              {
+                "column_byte": 31,
+                "column_utf16": 29,
+                "line": 1,
+                "rule_id": "kotlin.context.VARIABLE_WITH_NO_TYPE_NO_INITIALIZER"
+              }
+            ],
+            "diagnostics": [
+              {
+                "column_byte": 34,
+                "column_utf16": 32,
+                "line": 1,
+                "rule_id": "kotlin.syntax"
+              }
+            ],
+            "reason": "kotlin_project_context_unresolved",
+            "status": "incomplete",
+            "tool_identity_scope": "launcher_only",
+            "tool_sha256": "827f1613736c1f457474103af722f517a627d9534d884d1773f49b7026f45f56",
+            "version": "kotlinc-jvm 2.4.10"
+          },
+          "operation": "task_verify",
+          "original_report": {
+            "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+            "run_id": "syntax-confirm-30793-1791122287749526000",
+            "sha256": "6590e45fdad7d23ad6149f58ec6dc8c675aa0e0b048d92760e5d60118cc1b4dc",
+            "source_sha256": "87fbb71a8f650a302ff4bdf216bc8a9835350f3b864b2b1c6a0d0fe5f3cdf9b5"
+          },
+          "report_type": "syntax_task_recheck",
+          "run_id": "syntax-native-36871-1791122355028600000",
+          "schema_version": "0.5.0",
+          "target": {
+            "language": "kotlin",
+            "path": "App.kt",
+            "source_sha256": "06e8bb003635977eff8e0c4769804d7633b10a6104c809d050856938d1f06959"
+          },
+          "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf",
+          "tool_path": "/opt/homebrew/Cellar/kotlin/2.4.10/bin/kotlinc",
+          "workspace_binding": "bound",
+          "workspace_id": "ws-f01ad6a398f570d0aa005195dd9d29fc"
+        },
+        "next_actions": [
+          "inspect_native_syntax_observation",
+          "repair_only_current_native_diagnostics",
+          "verify_policy_and_capability_before_closure"
+        ],
+        "observation": "still_blocked",
+        "operation": "task_verify",
+        "reason": null,
+        "report_type": "task_verification_preview",
+        "schema_version": "0.16.0",
+        "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf"
+      }
+    },
+    "next_mixed": {
+      "exit": 0,
+      "report_sha256": "49c80bfe3807e3419a84adfa4acb820e1367bece4bec6cf46ed387cc72e7c7e5",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "disposition": "actionable",
+        "exit_code": 0,
+        "next_actions": [],
+        "operation": "next",
+        "reason": "local_task_selected",
+        "repair_brief": {
+          "action_id": "repair-source",
+          "affected_paths": [
+            "App.kt"
+          ],
+          "authority": "local_unverified",
+          "build_root": ".",
+          "checker_id": "syntax.native_confirmation",
+          "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+          "constraints": [
+            "先恢复检查完整性",
+            "不得关闭检查器或修改无关源码"
+          ],
+          "disposition": "actionable",
+          "evidence_ref": {
+            "first_report_sha256": "6590e45fdad7d23ad6149f58ec6dc8c675aa0e0b048d92760e5d60118cc1b4dc",
+            "first_run_id": "syntax-confirm-30793-1791122287749526000"
+          },
+          "history": {
+            "attempt_count": 0,
+            "awaiting_verification": false,
+            "budget": 2,
+            "no_progress_count": 0,
+            "open_attempt_id": null,
+            "recent": []
+          },
+          "kind": "blocker",
+          "native_column_unit": "utf8_byte",
+          "native_confirmation_reason": "kotlin_project_context_unresolved",
+          "native_confirmation_ref": {
+            "report_ref": ".codeguard/reports/syntax-native-36871-1791122355028600000.json",
+            "report_sha256": "724736abeb79e78c6ab6e968ac959d0edf58bff737c279f8b5e54033a8d355f2",
+            "run_id": "syntax-native-36871-1791122355028600000"
+          },
+          "native_confirmation_status": "incomplete",
+          "native_context_diagnostics": [
+            {
+              "column_byte": 31,
+              "column_utf16": 29,
+              "line": 1,
+              "rule_id": "kotlin.context.VARIABLE_WITH_NO_TYPE_NO_INITIALIZER"
+            }
+          ],
+          "native_diagnostic_positions": [
+            {
+              "column_byte": 34,
+              "column_utf16": 32,
+              "line": 1,
+              "rule_id": "kotlin.syntax"
+            }
+          ],
+          "reason_code": "native_syntax_confirmation_needed",
+          "recheck_argv": [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf",
+            ".",
+            "--format",
+            "json",
+            "--kotlinc-tool",
+            "/opt/homebrew/Cellar/kotlin/2.4.10/bin/kotlinc"
+          ],
+          "schema_version": "0.8.0",
+          "scope": "App.kt",
+          "step": "当前源码已有原生 Kotlin 语法诊断；核对字节列与 UTF-16 原列后修复，并复用原工具复检；完整项目 lint 和上下文仍需检查",
+          "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf"
+        },
+        "report_type": "repair_brief_preview",
+        "schema_version": "0.8.0"
+      }
+    },
+    "mixed_hook": {
+      "exit": 3,
+      "report_sha256": "cd6b2681478a6460c075b8b3154fbb3256d8bbdd689538a17c29d7ae69dd59a9",
+      "report": {
+        "delivery_decision": "not_evaluated",
+        "execution": "task_verification",
+        "host_blocking_verified": false,
+        "local_feedback": {
+          "authority": "local_unverified",
+          "checker_id": "syntax.native_confirmation",
+          "delivery_decision": "not_evaluated",
+          "event_persisted": true,
+          "native_column_unit": "utf8_byte",
+          "native_confirmation_reason": "kotlin_project_context_unresolved",
+          "native_confirmation_ref": {
+            "report_ref": ".codeguard/reports/syntax-native-38321-1791122369402848000.json",
+            "report_sha256": "4c402b64b8e4e644c66caf1b125804a9f7888d0f249a4f456b8508cc13854379",
+            "run_id": "syntax-native-38321-1791122369402848000"
+          },
+          "native_confirmation_status": "incomplete",
+          "native_context_diagnostics": [
+            {
+              "column_byte": 31,
+              "column_utf16": 29,
+              "line": 1,
+              "rule_id": "kotlin.context.VARIABLE_WITH_NO_TYPE_NO_INITIALIZER"
+            }
+          ],
+          "native_diagnostic_positions": [
+            {
+              "column_byte": 34,
+              "column_utf16": 32,
+              "line": 1,
+              "rule_id": "kotlin.syntax"
+            }
+          ],
+          "observation": "still_blocked",
+          "reason": null,
+          "report_type": "hook_task_verification_summary",
+          "scan_report_available": true,
+          "schema_version": "0.4.0",
+          "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf"
+        },
+        "plan": {
+          "action": "verify_task",
+          "host_blocking_claimed": false,
+          "may_claim_delivery": false,
+          "requires_git_snapshot": false,
+          "scope_resolution_reason": null,
+          "soft_result_reuse_candidate": false,
+          "target_paths": [],
+          "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf"
+        },
+        "reason": null,
+        "report_type": "hook_execution_feedback",
+        "schema_version": "0.10.0",
+        "soft_result_reused": false
+      }
+    },
+    "aggregate": {
+      "exit": 3,
+      "report_sha256": "f23487e5959c194c25286b69795bf312ec72951e3ce586e008340dafb2478e97",
+      "report": {
+        "authority": "local_unverified",
+        "category_candidates": [
+          {
+            "capability_status": "gap",
+            "category": "lint",
+            "checker_id": null,
+            "language": "kotlin",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "comments",
+            "checker_id": null,
+            "language": "kotlin",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "dependencies",
+            "checker_id": null,
+            "language": "kotlin",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "cve",
+            "checker_id": null,
+            "language": "kotlin",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "security",
+            "checker_id": null,
+            "language": "kotlin",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "build",
+            "checker_id": null,
+            "language": "kotlin",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          }
+        ],
+        "command_status": "incomplete",
+        "delivery_decision": "incomplete",
+        "discovery": {
+          "blocked_paths": [],
+          "build_roots": [],
+          "checker_configurations": [],
+          "declared_versions": {},
+          "languages": [
+            {
+              "id": "kotlin",
+              "manifests": [],
+              "source_files": [
+                "App.kt"
+              ]
+            }
+          ],
+          "lockfiles": [],
+          "manifest_sha256": {},
+          "native_tool_candidates": [],
+          "observation_complete": true,
+          "observed_entries": 2,
+          "report_type": "discovery",
+          "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-kotlin-task-actual-la_1j2dx",
+          "schema_version": "0.4.0",
+          "scope_summary": {
+            "configuration_exception_files_observed": 0,
+            "dependency_roots_excluded": 0,
+            "dot_prefix_roots_excluded": 1,
+            "git_safety_status": "not_evaluated",
+            "ordinary_scan_policy": "project_sources_default_v2"
+          },
+          "source_set_candidates": [],
+          "unknown_conditions": [
+            "source_sets_not_fully_classified",
+            "dialects_not_classified"
+          ]
+        },
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "jobs_limit": 4,
+          "jobs_source": "builtin_default",
+          "native_task_count": 0,
+          "source": "cli",
+          "started_native_task_count": 0,
+          "timeout_ms": 30000
+        },
+        "execution_tasks": [],
+        "exit_code": 3,
+        "export": {
+          "reason_code": null,
+          "status": "not_requested"
+        },
+        "native_results": {
+          "erlang_lint": null,
+          "go_lint": null,
+          "java_cve": null,
+          "java_dependencies": null,
+          "java_javadoc": null,
+          "java_p3c": null,
+          "node_lint": null,
+          "npm_cve": [],
+          "python_cve": [],
+          "python_lint": null,
+          "rust_build": null,
+          "rust_comments": null,
+          "rust_cve": null,
+          "rust_lint": null
+        },
+        "next": {
+          "authority": "local_unverified",
+          "command_status": "complete",
+          "delivery_decision": "not_evaluated",
+          "disposition": "actionable",
+          "exit_code": 0,
+          "next_actions": [],
+          "operation": "next",
+          "reason": "local_task_selected",
+          "repair_brief": {
+            "action_id": "repair-source",
+            "affected_paths": [
+              "App.kt"
+            ],
+            "authority": "local_unverified",
+            "build_root": ".",
+            "checker_id": "syntax.native_confirmation",
+            "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+            "constraints": [
+              "先恢复检查完整性",
+              "不得关闭检查器或修改无关源码"
+            ],
+            "disposition": "actionable",
+            "evidence_ref": {
+              "first_report_sha256": "6590e45fdad7d23ad6149f58ec6dc8c675aa0e0b048d92760e5d60118cc1b4dc",
+              "first_run_id": "syntax-confirm-30793-1791122287749526000"
+            },
+            "history": {
+              "attempt_count": 0,
+              "awaiting_verification": false,
+              "budget": 2,
+              "no_progress_count": 0,
+              "open_attempt_id": null,
+              "recent": []
+            },
+            "kind": "blocker",
+            "native_column_unit": "utf8_byte",
+            "native_confirmation_reason": "kotlin_project_context_unresolved",
+            "native_confirmation_ref": {
+              "report_ref": ".codeguard/reports/syntax-native-38321-1791122369402848000.json",
+              "report_sha256": "4c402b64b8e4e644c66caf1b125804a9f7888d0f249a4f456b8508cc13854379",
+              "run_id": "syntax-native-38321-1791122369402848000"
+            },
+            "native_confirmation_status": "incomplete",
+            "native_context_diagnostics": [
+              {
+                "column_byte": 31,
+                "column_utf16": 29,
+                "line": 1,
+                "rule_id": "kotlin.context.VARIABLE_WITH_NO_TYPE_NO_INITIALIZER"
+              }
+            ],
+            "native_diagnostic_positions": [
+              {
+                "column_byte": 34,
+                "column_utf16": 32,
+                "line": 1,
+                "rule_id": "kotlin.syntax"
+              }
+            ],
+            "reason_code": "native_syntax_confirmation_needed",
+            "recheck_argv": [
+              "codeguard",
+              "task",
+              "verify",
+              "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf",
+              ".",
+              "--format",
+              "json",
+              "--kotlinc-tool",
+              "/opt/homebrew/Cellar/kotlin/2.4.10/bin/kotlinc"
+            ],
+            "schema_version": "0.8.0",
+            "scope": "App.kt",
+            "step": "当前源码已有原生 Kotlin 语法诊断；核对字节列与 UTF-16 原列后修复，并复用原工具复检；完整项目 lint 和上下文仍需检查",
+            "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf"
+          },
+          "report_type": "repair_brief_preview",
+          "schema_version": "0.8.0"
+        },
+        "obligation_status": "unresolved",
+        "operation": "check",
+        "reason": "full_project_obligations_and_trusted_policy_unavailable",
+        "report_type": "check_feedback",
+        "required_obligations": null,
+        "schema_version": "0.41.0",
+        "selection": "all",
+        "syntax_candidates": {
+          "authority": "candidate_unqualified",
+          "delivery_decision": "incomplete",
+          "execution_phase": "after_native",
+          "native_preferred_count": 0,
+          "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+          "observations": [
+            {
+              "byte_offset": 0,
+              "grammar_qualified": false,
+              "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+              "known_limitations": [
+                "Kotlin 2.4.10 native compiler rejects missing parameter type in `fun f(x: ) = x`. Hidden MISSING tokens also occur in valid `object C { val value = 1 }`; Rust marks both zero-record scans incomplete. Eleven decidable cases agree with native labels and two remain unresolved. Zero recoveries cannot establish valid Kotlin syntax",
+                "Other Kotlin versions, dialects, public native-first lint route, resource budget and release remain unqualified"
+              ],
+              "language": "kotlin",
+              "path": "App.kt",
+              "reason": null,
+              "recoveries": [
+                {
+                  "end_byte": 33,
+                  "end_column_byte": 33,
+                  "end_row": 0,
+                  "kind": "ERROR",
+                  "start_byte": 32,
+                  "start_column_byte": 32,
+                  "start_row": 0,
+                  "syntax_kind": "ERROR"
+                }
+              ],
+              "recovery_count": 1,
+              "scope": "whole_file",
+              "source_sha256": "06e8bb003635977eff8e0c4769804d7633b10a6104c809d050856938d1f06959",
+              "status": "candidate_observed"
+            }
+          ],
+          "reason": "candidate_unqualified",
+          "skipped_count": 0,
+          "source_file_count": 1,
+          "status": "observed_partial",
+          "unrouted_count": 0
+        },
+        "syntax_tasks": {
+          "failures": [],
+          "new_blockers": 0,
+          "status": "synced_partial",
+          "tasks": [
+            {
+              "language": "kotlin",
+              "path": "App.kt",
+              "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf"
+            }
+          ]
+        },
+        "unresolved_conditions": [
+          "dialects_not_classified",
+          "required_obligations_unresolved",
+          "source_sets_not_fully_classified",
+          "tool_lock_unverified",
+          "trusted_policy_unavailable"
+        ]
+      }
+    },
+    "missing": {
+      "exit": 3,
+      "report_sha256": "4920a9f249bfda774f642d1521f874cc6834c98bddeae58c74a09c8a8fab74e8",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "delivery_decision": "not_evaluated",
+        "event_persisted": true,
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "source": "cli",
+          "timeout_ms": 30000
+        },
+        "exit_code": 3,
+        "kind": "blocker",
+        "native_scan": {
+          "authority": "local_unverified",
+          "checker_id": "syntax.native_confirmation",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "input_stable": true,
+          "native": {
+            "context_diagnostics": [],
+            "diagnostics": [],
+            "reason": "kotlin_tool_not_found",
+            "status": "incomplete",
+            "tool_identity_scope": "launcher_only",
+            "tool_sha256": null,
+            "version": null
+          },
+          "operation": "task_verify",
+          "original_report": {
+            "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+            "run_id": "syntax-confirm-30793-1791122287749526000",
+            "sha256": "6590e45fdad7d23ad6149f58ec6dc8c675aa0e0b048d92760e5d60118cc1b4dc",
+            "source_sha256": "87fbb71a8f650a302ff4bdf216bc8a9835350f3b864b2b1c6a0d0fe5f3cdf9b5"
+          },
+          "report_type": "syntax_task_recheck",
+          "run_id": "syntax-native-40502-1791122379388371000",
+          "schema_version": "0.5.0",
+          "target": {
+            "language": "kotlin",
+            "path": "App.kt",
+            "source_sha256": "06e8bb003635977eff8e0c4769804d7633b10a6104c809d050856938d1f06959"
+          },
+          "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf",
+          "tool_path": null,
+          "workspace_binding": "bound",
+          "workspace_id": "ws-f01ad6a398f570d0aa005195dd9d29fc"
+        },
+        "next_actions": [
+          "inspect_native_syntax_observation",
+          "repair_only_current_native_diagnostics",
+          "verify_policy_and_capability_before_closure"
+        ],
+        "observation": "incomplete",
+        "operation": "task_verify",
+        "reason": null,
+        "report_type": "task_verification_preview",
+        "schema_version": "0.16.0",
+        "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf"
+      }
+    },
+    "next_missing": {
+      "exit": 0,
+      "report_sha256": "c1e8c1516a9d1e1d33bd67ea088b115a7cf4a43841bcd7c233ffd780150932ea",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "disposition": "needs_decision",
+        "exit_code": 0,
+        "next_actions": [],
+        "operation": "next",
+        "reason": "local_task_selected",
+        "repair_brief": {
+          "action_id": "restore-checker-environment",
+          "affected_paths": [
+            "App.kt"
+          ],
+          "authority": "local_unverified",
+          "build_root": ".",
+          "checker_id": "syntax.native_confirmation",
+          "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+          "constraints": [
+            "先恢复检查完整性",
+            "不得关闭检查器或修改无关源码"
+          ],
+          "disposition": "needs_decision",
+          "evidence_ref": {
+            "first_report_sha256": "6590e45fdad7d23ad6149f58ec6dc8c675aa0e0b048d92760e5d60118cc1b4dc",
+            "first_run_id": "syntax-confirm-30793-1791122287749526000"
+          },
+          "history": {
+            "attempt_count": 0,
+            "awaiting_verification": false,
+            "budget": 2,
+            "no_progress_count": 0,
+            "open_attempt_id": null,
+            "recent": []
+          },
+          "kind": "blocker",
+          "native_column_unit": "utf8_byte",
+          "native_confirmation_reason": "kotlin_tool_not_found",
+          "native_confirmation_ref": {
+            "report_ref": ".codeguard/reports/syntax-native-40502-1791122379388371000.json",
+            "report_sha256": "f75f862d853d751c3931de3ee63a27e097b46147cea02e08143c62f45aac6747",
+            "run_id": "syntax-native-40502-1791122379388371000"
+          },
+          "native_confirmation_status": "incomplete",
+          "native_context_diagnostics": [],
+          "native_diagnostic_positions": [],
+          "reason_code": "native_syntax_confirmation_needed",
+          "recheck_argv": [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf",
+            ".",
+            "--format",
+            "json"
+          ],
+          "schema_version": "0.8.0",
+          "scope": "App.kt",
+          "step": "Kotlin 原生确认仍未完成；核对已安装的 Kotlin/JVM 2.4.10、JDK、原生上下文诊断及项目依赖，使用 --kotlinc-tool 绝对路径复检；不根据上下文阻塞修改无关源码",
+          "task_id": "CG-B-9d6a61fb57bb2a40e5de96edfb526dbf"
+        },
+        "report_type": "repair_brief_preview",
+        "schema_version": "0.8.0"
+      }
+    }
+  },
+  "argument_rejections": [
+    {
+      "case": "relative",
+      "exit": 2,
+      "lease_unchanged": true,
+      "stderr_sha256": "8fb26979d17579508916477fab0c5484dfade343ab7c6882d193cda6b959b3c2"
+    },
+    {
+      "case": "wrong_language",
+      "exit": 2,
+      "lease_unchanged": true,
+      "stderr_sha256": "9b43b6b9466a750b8dd73d2517cc4fb429fc931e8f0b5c6610d230d37dbb3649"
+    },
+    {
+      "case": "duplicate",
+      "exit": 2,
+      "lease_unchanged": true,
+      "stderr_sha256": "5cdf792a87650c86017a5d183101e631e533536ebcd13d19870e5a746514e0ae"
+    }
+  ],
+  "task_state": "open",
+  "full_language_acceptance": false,
+  "trusted_closure": false,
+  "marketplace_host_acceptance": false
+}

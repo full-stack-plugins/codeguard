@@ -219,7 +219,7 @@ fn execute_parsed(
     };
     Ok((
         json!({
-            "schema_version":if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.2.0" {"0.8.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.3.0" {"0.9.0"} else {"0.7.0"}, "report_type":"hook_execution_feedback",
+            "schema_version":if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.4.0" {"0.10.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.2.0" {"0.8.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.3.0" {"0.9.0"} else {"0.7.0"}, "report_type":"hook_execution_feedback",
             "plan":plan, "execution":execution, "reason":reason,
             "local_feedback":feedback, "delivery_decision":"not_evaluated",
             "host_blocking_verified":false, "soft_result_reused":false
@@ -341,7 +341,7 @@ fn task_verification_summary(
     if checker_id == "syntax.native_confirmation"
         && matches!(
             scan["target"]["language"].as_str(),
-            Some("erlang" | "swift")
+            Some("erlang" | "swift" | "kotlin")
         )
     {
         if !matches!(
@@ -352,6 +352,7 @@ fn task_verification_summary(
             (Some("0.13.0"), Some("0.2.0"))
                 | (Some("0.14.0"), Some("0.3.0"))
                 | (Some("0.15.0"), Some("0.4.0"))
+                | (Some("0.16.0"), Some("0.5.0"))
         ) {
             return Err(("verification_report_invalid", 4));
         }
@@ -364,7 +365,9 @@ fn task_verification_summary(
         if !crate::syntax_task_recheck::valid_shape(root, &history) {
             return Err(("verification_report_invalid", 4));
         }
-        summary["schema_version"] = json!(if scan["target"]["language"] == "swift" {
+        summary["schema_version"] = json!(if scan["target"]["language"] == "kotlin" {
+            "0.4.0"
+        } else if scan["target"]["language"] == "swift" {
             "0.3.0"
         } else {
             "0.2.0"
@@ -379,17 +382,27 @@ fn task_verification_summary(
         } else {
             json!("syntax_confirmation_inputs_changed")
         };
-        summary["native_column_unit"] = json!(if scan["target"]["language"] == "swift" {
+        summary["native_column_unit"] = json!(if matches!(
+            scan["target"]["language"].as_str(),
+            Some("swift" | "kotlin")
+        ) {
             "utf8_byte"
         } else {
             "unicode_scalar"
         });
         summary["native_diagnostic_positions"] =
-            if current && scan["native"]["status"] == "diagnostics_observed" {
+            if current && crate::syntax_task_recheck::classify(scan) == "still_blocked" {
                 scan["native"]["diagnostics"].clone()
             } else {
                 json!([])
             };
+        if scan["target"]["language"] == "kotlin" {
+            summary["native_context_diagnostics"] = if current {
+                scan["native"]["context_diagnostics"].clone()
+            } else {
+                json!([])
+            };
+        }
         summary["native_confirmation_ref"] = if report["event_persisted"] == true {
             persisted_syntax_ref(root, scan).unwrap_or(Value::Null)
         } else {
@@ -480,7 +493,10 @@ fn verify_option_matches_checker(key: &str, checker_id: &str) -> bool {
         ),
         "python.pip_audit" => matches!(key, "--pip-audit-tool" | "--pip-audit-version"),
         "go.vet" => key == "--go-tool",
-        "syntax.native_confirmation" => matches!(key, "--zig-tool" | "--erl-tool" | "--swift-tool"),
+        "syntax.native_confirmation" => matches!(
+            key,
+            "--zig-tool" | "--erl-tool" | "--swift-tool" | "--kotlinc-tool"
+        ),
         "rust.cargo_clippy" | "rust.cargo_check" | "rust.cargo_rustdoc" => key == "--cargo-tool",
         "rust.cargo_audit" => matches!(key, "--cargo-audit-tool" | "--rustsec-db"),
         "java.checkstyle" | "java.checkstyle.preparation" => {
@@ -639,6 +655,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
             | "--zig-tool"
             | "--erl-tool"
             | "--swift-tool"
+            | "--kotlinc-tool"
             | "--maven-tool"
             | "--java-home"
             | "--java-tool"
@@ -671,6 +688,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                         | "--zig-tool"
                         | "--erl-tool"
                         | "--swift-tool"
+                        | "--kotlinc-tool"
                         | "--maven-tool"
                         | "--java-home"
                         | "--java-tool"

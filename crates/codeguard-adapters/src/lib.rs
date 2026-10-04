@@ -392,3 +392,6 @@ mod kotlin_parsed;
 pub use kotlin_diagnostic::KotlinDiagnostic;
 pub use kotlin_diagnostics::parse_kotlin_diagnostics;
 pub use kotlin_parsed::KotlinParsed;
+
+mod kotlin_native_observation;
+pub use kotlin_native_observation::valid_kotlin_native_observation;

@@ -1119,13 +1119,13 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
     }
     if checker_id == "syntax.native_confirmation" {
         if let Some(guidance) = crate::syntax_task_recheck::guidance(root, &brief) {
-            if guidance["schema_version"] == "0.7.0" {
-                brief["schema_version"] = json!("0.7.0");
+            if matches!(guidance["schema_version"].as_str(), Some("0.7.0" | "0.9.0")) {
+                brief["schema_version"] = guidance["schema_version"].clone();
                 brief["native_adapter"] = guidance["native_adapter"].clone();
                 brief["tool_readiness"] = guidance["tool_readiness"].clone();
             } else if matches!(
                 guidance["schema_version"].as_str(),
-                Some("0.4.0" | "0.5.0" | "0.6.0")
+                Some("0.4.0" | "0.5.0" | "0.6.0" | "0.8.0")
             ) {
                 brief["schema_version"] = guidance["schema_version"].clone();
                 brief["native_confirmation_reason"] =
@@ -1138,6 +1138,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                 "native_confirmation_status",
                 "native_confirmation_ref",
                 "native_diagnostic_positions",
+                "native_context_diagnostics",
             ] {
                 if !guidance[key].is_null() {
                     brief[key] = guidance[key].clone();
@@ -1305,7 +1306,11 @@ pub(crate) fn canonical_action_id(brief: &Value) -> Result<&'static str, &'stati
         Some("finding") => Ok("repair-source"),
         Some("blocker")
             if brief["checker_id"] == "syntax.native_confirmation"
-                && brief["native_confirmation_status"] == "diagnostics_observed" =>
+                && (brief["native_confirmation_status"] == "diagnostics_observed"
+                    || (brief["schema_version"] == "0.8.0"
+                        && brief["native_diagnostic_positions"]
+                            .as_array()
+                            .is_some_and(|r| !r.is_empty()))) =>
         {
             Ok("repair-source")
         }

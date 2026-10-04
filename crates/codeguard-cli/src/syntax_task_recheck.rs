@@ -15,6 +15,7 @@ pub(crate) fn run(
     zig: Option<&Path>,
     erl: Option<&Path>,
     swift: Option<&Path>,
+    kotlinc: Option<&Path>,
     deadline: Instant,
 ) -> Result<Value, &'static str> {
     let original = original(root, brief)?;
@@ -31,6 +32,9 @@ pub(crate) fn run(
     if swift.is_some() && language != "swift" {
         return Err("swift_tool_does_not_match_confirmation_language");
     }
+    if kotlinc.is_some() && language != "kotlin" {
+        return Err("kotlinc_tool_does_not_match_confirmation_language");
+    }
     // 只从调用方工具来源选择，不从可编辑历史报告执行旧路径；next 会绑定本轮实际工具。
     let erlang_selection = (language == "erlang").then(|| {
         crate::erlang_tool_selection::ErlangToolSelection::discover(erl.map(Path::to_path_buf))
@@ -38,6 +42,10 @@ pub(crate) fn run(
     let selected_erl = erlang_selection
         .as_ref()
         .and_then(|selection| selection.tool());
+    let kotlin_selection = (language == "kotlin").then(|| {
+        crate::kotlin_tool_selection::KotlinToolSelection::discover(kotlinc.map(Path::to_path_buf))
+    });
+    let selected_kotlinc = kotlin_selection.as_ref().and_then(|s| s.tool());
     let source = source_bytes(root, path);
     let native = if let Some(bytes) = source.as_ref() {
         if language == "zig" {
@@ -57,13 +65,21 @@ pub(crate) fn run(
             swift
                 .map(|tool| crate::swift_syntax_probe::observe(tool, bytes, deadline))
                 .unwrap_or_else(|| unavailable("explicit_swift_tool_not_provided"))
+        } else if language == "kotlin" {
+            selected_kotlinc
+                .map(|tool| crate::kotlin_lint_command::observe(tool, bytes, deadline))
+                .unwrap_or_else(|| crate::kotlin_lint_command::unavailable("kotlin_tool_not_found"))
         } else {
             unavailable("native_syntax_confirmation_adapter_unavailable")
         }
     } else {
         unavailable("native_syntax_source_unavailable")
     };
-    let mut native = native;
+    let mut native = if language == "kotlin" && source.is_none() {
+        crate::kotlin_lint_command::unavailable("native_syntax_source_unavailable")
+    } else {
+        native
+    };
     if language == "erlang" && native["status"] == "not_run" {
         native["diagnostics_truncated"] = json!(false);
         native["preprocessing_unresolved"] = json!(false);
@@ -71,6 +87,7 @@ pub(crate) fn run(
     let tool_path = zig
         .or(selected_erl)
         .or(swift)
+        .or(selected_kotlinc)
         .and_then(|p| p.canonicalize().ok());
     let target_sha = source.as_ref().map(|b| digest(b));
     let nanos = SystemTime::now()
@@ -78,7 +95,7 @@ pub(crate) fn run(
         .map_err(|_| "clock_unavailable")?
         .as_nanos();
     let native_first = original["schema_version"] == "0.2.0";
-    let mut report = json!({"schema_version":if language == "swift" {"0.4.0"} else if native_first {"0.3.0"} else if language == "erlang" {"0.2.0"} else {"0.1.0"},"report_type":"syntax_task_recheck","operation":"task_verify",
+    let mut report = json!({"schema_version":if language == "kotlin" {"0.5.0"} else if language == "swift" {"0.4.0"} else if native_first {"0.3.0"} else if language == "erlang" {"0.2.0"} else {"0.1.0"},"report_type":"syntax_task_recheck","operation":"task_verify",
         "workspace_binding":"bound","workspace_id":original["workspace_id"],"run_id":format!("syntax-native-{}-{nanos}",std::process::id()),
         "checker_id":"syntax.native_confirmation","task_id":brief["task_id"],"authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated",
         "target":{"path":path,"language":language,"source_sha256":target_sha},"original_report":original_reference(&original,&brief["evidence_ref"]["first_report_sha256"]),
@@ -211,6 +228,12 @@ fn tool_current(report: &Value) -> bool {
 pub(crate) fn classify(report: &Value) -> &'static str {
     if report["input_stable"] != true {
         "incomplete"
+    } else if report["target"]["language"] == "kotlin"
+        && report["native"]["diagnostics"]
+            .as_array()
+            .is_some_and(|r| !r.is_empty())
+    {
+        "still_blocked"
     } else {
         match report["native"]["status"].as_str() {
             Some("diagnostics_observed") => "still_blocked",
@@ -250,7 +273,7 @@ fn valid_history_shape(root: &Path, report: &Value) -> bool {
         .is_some_and(|o| o.len() == keys.len() && keys.iter().all(|k| o.contains_key(*k)))
         || !matches!(
             report["schema_version"].as_str(),
-            Some("0.1.0" | "0.2.0" | "0.3.0" | "0.4.0")
+            Some("0.1.0" | "0.2.0" | "0.3.0" | "0.4.0" | "0.5.0")
         )
         || report["report_type"] != "syntax_task_recheck"
         || report["operation"] != "task_verify"
@@ -317,14 +340,22 @@ fn valid_history_shape(root: &Path, report: &Value) -> bool {
 fn native_shape(root: &Path, report: &Value) -> bool {
     if matches!(
         report["schema_version"].as_str(),
-        Some("0.2.0" | "0.3.0" | "0.4.0")
+        Some("0.2.0" | "0.3.0" | "0.4.0" | "0.5.0")
     ) {
         let current = report["target"]["path"]
             .as_str()
             .and_then(|p| source_bytes(root, p))
             .filter(|b| report["target"]["source_sha256"] == digest(b));
+        let kotlin = report["schema_version"] == "0.5.0";
         let swift = report["schema_version"] == "0.4.0";
-        return report["target"]["language"] == if swift { "swift" } else { "erlang" }
+        return report["target"]["language"]
+            == if kotlin {
+                "kotlin"
+            } else if swift {
+                "swift"
+            } else {
+                "erlang"
+            }
             && report["target"].as_object().is_some_and(|o| {
                 o.len() == 3
                     && ["path", "language", "source_sha256"]
@@ -346,7 +377,12 @@ fn native_shape(root: &Path, report: &Value) -> bool {
                 .as_str()
                 .is_some_and(valid_sha)
                 && !report["tool_path"].is_null()))
-            && if swift {
+            && if kotlin {
+                codeguard_adapters::valid_kotlin_native_observation(
+                    &report["native"],
+                    current.as_deref(),
+                )
+            } else if swift {
                 crate::swift_syntax_probe::valid_native_observation(
                     &report["native"],
                     current.as_deref(),
@@ -546,6 +582,8 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
                 "当前源码已有原生 Erlang 语法诊断；核对报告中有界原生位置并修复，然后使用同一工具复检；不要反复安装工具或关闭检查"
             } else if report["target"]["language"] == "swift" {
                 "当前源码已有原生 Swift parse 语法诊断；核对有界原生位置和 UTF-8 字节列并修复，然后使用同一编译器复检；项目类型检查、构建和 lint 仍需完成"
+            } else if report["target"]["language"] == "kotlin" {
+                "当前源码已有原生 Kotlin 语法诊断；核对字节列与 UTF-16 原列后修复，并复用原工具复检；完整项目 lint 和上下文仍需检查"
             } else {
                 "当前源码已有原生 Zig AST 诊断；核对报告中有界原生位置并修复，然后使用同一工具复检；不要反复安装工具或关闭检查"
             },
@@ -573,6 +611,8 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
                 && report["native"]["reason"] == "explicit_swift_tool_not_provided"
             {
                 "先定位已安装的 Apple Swift 6.4 编译器，以 --swift-tool 绝对路径复检；确实缺工具才按项目要求准备，不根据 WASM 未定位观察修改无关源码"
+            } else if report["target"]["language"] == "kotlin" {
+                "Kotlin 原生确认仍未完成；核对已安装的 Kotlin/JVM 2.4.10、JDK、原生上下文诊断及项目依赖，使用 --kotlinc-tool 绝对路径复检；不根据上下文阻塞修改无关源码"
             } else {
                 "原生语法确认仍未完成；查看原工具诊断、语言能力或版本缺口，恢复对应前置，不修改无关源码"
             },
@@ -604,6 +644,20 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
             json!("syntax_confirmation_inputs_changed")
         };
     }
+    if report["target"]["language"] == "kotlin" {
+        guidance["schema_version"] = json!("0.8.0");
+        guidance["native_column_unit"] = json!("utf8_byte");
+        guidance["native_confirmation_reason"] = if inputs_current(root, &report) {
+            report["native"]["reason"].clone()
+        } else {
+            json!("syntax_confirmation_inputs_changed")
+        };
+        guidance["native_context_diagnostics"] = if inputs_current(root, &report) {
+            report["native"]["context_diagnostics"].clone()
+        } else {
+            json!([])
+        };
+    }
     guidance["native_confirmation_ref"] = json!({"run_id":report["run_id"],"report_ref":format!(".codeguard/reports/{}.json", report["run_id"].as_str()?),"report_sha256":report_sha256});
     guidance["native_diagnostic_positions"] =
         if inputs_current(root, &report) && classify(&report) == "still_blocked" {
@@ -614,11 +668,13 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
     // 源码修复后仍可复用未改变的工具；工具字节变化则不得携带旧工具身份。
     if matches!(
         report["target"]["language"].as_str(),
-        Some("zig" | "erlang" | "swift")
+        Some("zig" | "erlang" | "swift" | "kotlin")
     ) && tool_current(&report)
         && (report["target"]["language"] != "erlang" || report["native"]["version"] == "OTP 28")
         && (report["target"]["language"] != "swift"
             || report["native"]["version"] == "Apple Swift 6.4")
+        && (report["target"]["language"] != "kotlin"
+            || report["native"]["version"] == "kotlinc-jvm 2.4.10")
     {
         guidance["recheck_argv"] = json!([
             "codeguard",
@@ -632,6 +688,8 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
                 "--erl-tool"
             } else if report["target"]["language"] == "swift" {
                 "--swift-tool"
+            } else if report["target"]["language"] == "kotlin" {
+                "--kotlinc-tool"
             } else {
                 "--zig-tool"
             },
@@ -670,6 +728,12 @@ fn initial_guidance(root: &Path, brief: &Value) -> Option<Value> {
             "<已核验 Apple Swift 6.4 swiftc 绝对路径>",
             "frontend parse",
         ),
+        "kotlin" => (
+            "kotlinc-jvm 2.4.10",
+            "--kotlinc-tool",
+            "<已核验 Kotlin/JVM 2.4.10 kotlinc 绝对路径>",
+            "冻结单文件编译",
+        ),
         _ => {
             return Some(json!({
                 "disposition":"needs_decision",
@@ -678,7 +742,7 @@ fn initial_guidance(root: &Path, brief: &Value) -> Option<Value> {
         }
     };
     Some(json!({
-        "schema_version":"0.7.0",
+        "schema_version":if language == "kotlin" {"0.9.0"} else {"0.7.0"},
         "native_adapter":{"language":language,"supported_tool_version":if language == "zig" {"0.16.0"} else {version},"tool_option":option},
         "tool_readiness":"not_evaluated",
         "disposition":"verification_required",

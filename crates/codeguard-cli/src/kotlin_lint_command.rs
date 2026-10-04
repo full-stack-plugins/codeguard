@@ -169,10 +169,10 @@ fn invalid(reason: &str) -> ExitCode {
 fn digest(bytes: &[u8]) -> String {
     format!("{:x}", Sha256::digest(bytes))
 }
-fn unavailable(reason: &str) -> Value {
+pub(crate) fn unavailable(reason: &str) -> Value {
     json!({"status":"incomplete","reason":reason,"version":null,"tool_sha256":null,"tool_identity_scope":"launcher_only","diagnostics":[],"context_diagnostics":[]})
 }
-fn observe(tool: &std::path::Path, source: &[u8], deadline: Instant) -> Value {
+pub(crate) fn observe(tool: &std::path::Path, source: &[u8], deadline: Instant) -> Value {
     let mut report = unavailable("kotlin_tool_unavailable_or_untrusted");
     let Ok(executable) = tool.canonicalize() else {
         return report;

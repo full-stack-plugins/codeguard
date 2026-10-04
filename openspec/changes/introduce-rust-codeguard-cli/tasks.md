@@ -1311,3 +1311,7 @@ Swift 差分纠正先以状态断言暴露旧清单文案的红测，再按真�
 ## 2026-10-04 Kotlin 原生优先独立入口（已验证切片）
 
 对应8.7/8.8、9.9、14.4/14.10/14.19：新增 Rust `lint kotlin`、Kotlin/JVM2.4.10有界私有编译、显式/PATH首工具选择以及缺工具WASM候选。语法与上下文分离，原生UTF-16列转UTF-8字节列；版本失败、未知输出、入口重定向、源码变化不换工具、不假通过。真实六场景报告、默认/WASM各9入口测试、4解析、7边界、11相邻和双构建严格Clippy已验证。缺后端或未完成必须进一步确认，human输出定位已修正。详见[验收](../../../tests/acceptance/kotlin-native-single-file.md)。仅独立入口，聚合/Hook/稳定任务复检尚未接线，完整lint/注释、JAR/JDK身份、独立精度和发行仍缺；父任务不勾选。
+
+## 2026-10-04 Kotlin 稳定任务原生复检与反馈（已验证切片）
+
+对应9.9/9.10、14.4/14.10/14.19：已有Kotlin确认任务接通task verify/repair_ready、显式及PATH原工具选择、原报告绑定、租约与追加验证事件。next/task show不再误称adapter缺失；源码变化撤销旧位置，语法与上下文混合时保留repair-source及独立上下文，零诊断不重复修复、不自动关闭。真实Kotlin2.4.10完整任务链路、3项错参租约前拒绝、任务3项、历史形状2项及5项新schema校验通过；相邻Erlang13/Swift7/通用8项通过。默认/WASM入口和严格Clippy、fmt、分层、OpenSpec严格校验通过，211旧schema原字节保留。详见[验收](../../../tests/acceptance/kotlin-native-task-confirmation.md)。首次check/file_changed的原生优先调度、完整项目lint/注释、JAR/JDK身份、独立精度、正式关闭及实际宿主/发行仍缺，父任务不勾选。

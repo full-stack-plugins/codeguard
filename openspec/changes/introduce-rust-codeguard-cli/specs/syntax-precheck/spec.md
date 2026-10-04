@@ -408,3 +408,10 @@ WASM fallback MUST 通过明确版本的协议加入既有统一命令，不静�
 - **THEN** retain that first selected tool and its failures without silently replacing it; only tool absence enables candidate WASM
 - **AND** missing backends, incomplete native checks or candidate recoveries/hidden errors require further native confirmation; complete observable candidate zero-recovery may recommend native installation without granting delivery
 - **AND** human feedback includes verified native rule and source positions, while JSON preserves bounded evidence and unresolved obligations
+
+#### Scenario: Existing Kotlin confirmation task uses the native compiler
+- **WHEN** task verify or repair_ready targets a bound Kotlin confirmation task
+- **THEN** use the same explicit/PATH native-tool selection and frozen-source observation as lint, append verification evidence to the existing stable task and preserve lease/attempt handling
+- **AND** reject wrong-language or relative tool arguments before acquiring a lease or starting a process
+- **AND** expose current syntax positions separately from unresolved project-context diagnostics, including mixed observations; changed source/tool identities withdraw stale positions
+- **AND** native zero diagnostics does not by itself prove policy/coverage or close the task; initial tool guidance must preserve the Kotlin selection option in task show and next

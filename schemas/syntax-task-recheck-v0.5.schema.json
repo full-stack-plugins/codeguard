@@ -1,0 +1,198 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:syntax-task-recheck:0.5.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "workspace_binding",
+    "checker_id",
+    "authority",
+    "coverage_proven",
+    "delivery_decision",
+    "workspace_id",
+    "run_id",
+    "task_id",
+    "input_stable",
+    "tool_path",
+    "native",
+    "target",
+    "original_report"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.5.0"
+    },
+    "report_type": {
+      "const": "syntax_task_recheck"
+    },
+    "operation": {
+      "const": "task_verify"
+    },
+    "workspace_binding": {
+      "const": "bound"
+    },
+    "checker_id": {
+      "const": "syntax.native_confirmation"
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "workspace_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^syntax-native-[0-9]+-[0-9]+$"
+    },
+    "task_id": {
+      "type": "string",
+      "pattern": "^CG-B-[0-9a-f]{32}$"
+    },
+    "input_stable": {
+      "type": "boolean"
+    },
+    "tool_path": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^/"
+    },
+    "native": {
+      "$ref": "kotlin-lint-feedback-v0.1.schema.json#/$defs/native"
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "language",
+        "source_sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "language": {
+          "const": "kotlin"
+        },
+        "source_sha256": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          ]
+        }
+      }
+    },
+    "original_report": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_id",
+        "sha256",
+        "source_sha256",
+        "grammar_sha256"
+      ],
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "pattern": "^syntax-confirm-[0-9]+-[0-9]+$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "grammar_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "diagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "line",
+        "column",
+        "rule_id"
+      ],
+      "properties": {
+        "line": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        },
+        "column": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1048577
+        },
+        "rule_id": {
+          "const": "swift.parse.error"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "native": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "completed",
+                  "diagnostics_observed"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "tool_path": {
+            "type": "string",
+            "pattern": "^/"
+          },
+          "target": {
+            "properties": {
+              "language": {
+                "const": "kotlin"
+              },
+              "source_sha256": {
+                "$ref": "#/$defs/digest"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
