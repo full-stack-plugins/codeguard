@@ -15,7 +15,7 @@
 | doctor | 当前 `doctor [path] --ruff-tool ...`，不是目标 `doctor all .` 的完整多工具形式；已可保存/同步局部准备报告 |
 | lint | python/java/typescript/go 与源码可选构建的 Zig 有局部入口；没有公开 lint rust，Clippy 通过 check all |
 | comments/build | 当前公开 rust；Java Javadoc 走 `lint java FILE --checker javadoc`，不是 comments java |
-| cve/check | rust/python/typescript CVE 与 check all/java；完整策略和交付仍未评估 |
+| cve/check | rust/python/typescript CVE 与 check all/注册表规范语言ID；完整策略和交付仍未评估 |
 | 工作台 | sync/status/next/show/lease/attempt/部分 verify；不正式关闭、重开或自批 |
 | gate | 仅 pre-commit 路径安全预览；不是完整内容门禁 |
 | fix/pre-push/ci/mcp/compat/dependencies/security | 目标通用入口未实现，不能复制目标例子直接使用 |
@@ -774,3 +774,10 @@ Rust 读取并复核有界源码字节，通过冻结 stdin、固定 `/` cwd、�
 ### 误报调查的来源指引
 
 `next` 和 `task show` 从绑定的首次报告生成同一调查步骤。原生首次任务核对原生诊断、输入、工具和环境差异；WASM 首次任务核对语法资产、语言版本和原生对照差异。原反例未检出原生诊断不等于已确认 grammar 缺陷。查询不执行检查器或修改租约、预算与历史，也不批准白名单或关闭。见[局部验收](../tests/acceptance/counterexample-source-guidance.md)。
+
+
+### 按语言执行项目检查
+
+`codeguard check <规范语言ID> . --format=json` 现在接受注册表全部57个ID。它按选择复用已接入的原生服务、共同预算及WASM回退；未接入的检查仍报告缺口。Java/all保持原报告协议，其他语言使用check_feedback 0.45、内部故障使用check_aborted 0.14。局部结果delivery_decision固定not_evaluated，空目标不算全项目通过。显式工具参数必须属于该语言；JavaScript/TypeScript共享npm构建根检查。未登记别名仍拒绝，不猜测语言。
+
+例如：`codeguard check python . --ruff-tool /absolute/path/to/ruff --format=json`。同一个混合项目中的Java/Maven和Rust/Cargo不会被此请求调度；原生检查缺失时，包含WASM能力的二进制只对选定语言运行候选初检。

@@ -91,7 +91,7 @@ pub fn run(args: &[String]) -> ExitCode {
 ///
 /// 参数 `root` 是已规范化项目根；返回值仍为本地未验证视图，不包含交付许可。
 pub fn read_local_brief(root: &Path) -> Result<Value, &'static str> {
-    build_view(root, None)
+    build_view(root, None, None)
 }
 
 /// 读取指定原生检查器的下一步；其它检查器的任务仍校验，但不会被推荐给局部检查。
@@ -99,7 +99,18 @@ pub(crate) fn read_local_brief_for_checker(
     root: &Path,
     checker_id: &str,
 ) -> Result<Value, &'static str> {
-    build_view(root, Some(checker_id))
+    build_view(root, Some(checker_id), None)
+}
+
+/// 从本轮已同步的任务身份读取下一步；返回既有 next 协议，不扩大到其它历史任务。
+pub(crate) fn read_local_brief_for_tasks(
+    root: &Path,
+    ids: &std::collections::BTreeSet<String>,
+) -> Result<Value, &'static str> {
+    if ids.is_empty() {
+        return Ok(Value::Null);
+    }
+    build_view(root, None, Some(ids))
 }
 
 /// 读取指定本地任务的受限事实简报，供原工具复检确定范围。
@@ -162,7 +173,11 @@ fn read_task_brief_inner(
     Ok(candidate(root, id, &fact)?.brief)
 }
 
-fn build_view(root: &Path, checker_id: Option<&str>) -> Result<Value, &'static str> {
+fn build_view(
+    root: &Path,
+    checker_id: Option<&str>,
+    task_ids: Option<&std::collections::BTreeSet<String>>,
+) -> Result<Value, &'static str> {
     let baseline = read_workspace_baseline(root).map_err(|reason| {
         if reason == "legacy_workspace_requires_manual_migration" {
             "legacy_workspace_requires_manual_migration"
@@ -237,7 +252,9 @@ fn build_view(root: &Path, checker_id: Option<&str>) -> Result<Value, &'static s
             return Err("finding_fact_conflict");
         }
         let candidate = candidate(root, &id, &fact)?;
-        if checker_id.is_none_or(|checker| candidate.brief["checker_id"] == checker) {
+        if checker_id.is_none_or(|checker| candidate.brief["checker_id"] == checker)
+            && task_ids.is_none_or(|ids| ids.contains(&candidate.id))
+        {
             candidates.push(candidate);
         }
     }

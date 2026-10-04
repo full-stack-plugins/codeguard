@@ -1,0 +1,298 @@
+{
+  "authority": "local_unverified",
+  "category_candidates": [
+    {
+      "capability_status": "gap",
+      "category": "lint",
+      "checker_id": null,
+      "language": "python",
+      "legacy_status": "stable",
+      "next_action": null,
+      "reason": "trusted_policy_and_coverage_unavailable",
+      "status": "observed_unverified"
+    },
+    {
+      "capability_status": "gap",
+      "category": "comments",
+      "checker_id": null,
+      "language": "python",
+      "legacy_status": "stable",
+      "next_action": null,
+      "reason": "native_adapter_not_integrated",
+      "status": "not_integrated"
+    },
+    {
+      "capability_status": "gap",
+      "category": "dependencies",
+      "checker_id": null,
+      "language": "python",
+      "legacy_status": "stable",
+      "next_action": null,
+      "reason": "native_adapter_not_integrated",
+      "status": "not_integrated"
+    },
+    {
+      "capability_status": "gap",
+      "category": "cve",
+      "checker_id": "python.pip_audit",
+      "language": "python",
+      "legacy_status": "stable",
+      "next_action": "查看逐 Python 构建根的原生结果与锁文件缺口；核验依赖组、环境和漏洞数据库身份及时效后复检",
+      "reason": "checker_configuration_unresolved",
+      "status": "configuration_unresolved"
+    },
+    {
+      "capability_status": "gap",
+      "category": "security",
+      "checker_id": null,
+      "language": "python",
+      "legacy_status": "stable",
+      "next_action": null,
+      "reason": "native_adapter_not_integrated",
+      "status": "not_integrated"
+    },
+    {
+      "capability_status": "gap",
+      "category": "build",
+      "checker_id": null,
+      "language": "python",
+      "legacy_status": "stable",
+      "next_action": null,
+      "reason": "native_adapter_not_integrated",
+      "status": "not_integrated"
+    }
+  ],
+  "command_status": "incomplete",
+  "delivery_decision": "not_evaluated",
+  "discovery": {
+    "blocked_paths": [],
+    "build_roots": [],
+    "checker_configurations": [
+      {
+        "build_root": ".",
+        "category": "lint",
+        "checker_id": "python.ruff",
+        "configuration": "configured",
+        "configuration_ref": "ruff.toml",
+        "next_action": "用原生 Ruff 核对生效规则、扫描范围和诊断",
+        "reason": "explicit_ruff_lint_configuration"
+      },
+      {
+        "build_root": ".",
+        "category": "cve",
+        "checker_id": "python.pip_audit",
+        "configuration": "unknown",
+        "configuration_ref": ".",
+        "next_action": "定位当前 Python 项目的依赖清单或锁文件，再配置并运行原生漏洞检查",
+        "reason": "python_dependency_input_not_found"
+      }
+    ],
+    "declared_versions": {},
+    "languages": [
+      {
+        "id": "java",
+        "manifests": [],
+        "source_files": [
+          "Main.java"
+        ]
+      },
+      {
+        "id": "python",
+        "manifests": [],
+        "source_files": [
+          "main.py"
+        ]
+      },
+      {
+        "id": "toml",
+        "manifests": [],
+        "source_files": [
+          "ruff.toml"
+        ]
+      }
+    ],
+    "lockfiles": [],
+    "manifest_sha256": {},
+    "native_tool_candidates": [],
+    "observation_complete": true,
+    "observed_entries": 3,
+    "report_type": "discovery",
+    "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-language-selection-13861-0",
+    "schema_version": "0.4.0",
+    "scope_summary": {
+      "configuration_exception_files_observed": 0,
+      "dependency_roots_excluded": 0,
+      "dot_prefix_roots_excluded": 0,
+      "git_safety_status": "not_evaluated",
+      "ordinary_scan_policy": "project_sources_default_v2"
+    },
+    "source_set_candidates": [],
+    "unknown_conditions": [
+      "source_sets_not_fully_classified",
+      "dialects_not_classified"
+    ]
+  },
+  "execution_budget": {
+    "enforcement": "native_execution_only",
+    "jobs_limit": 4,
+    "jobs_source": "builtin_default",
+    "native_task_count": 1,
+    "source": "cli",
+    "started_native_task_count": 1,
+    "timeout_ms": 60000
+  },
+  "execution_tasks": [
+    {
+      "id": "python.lint",
+      "status": "native_observed_unverified"
+    }
+  ],
+  "exit_code": 3,
+  "export": {
+    "reason_code": null,
+    "status": "not_requested"
+  },
+  "native_results": {
+    "erlang_lint": null,
+    "go_lint": null,
+    "java_cve": null,
+    "java_dependencies": null,
+    "java_javadoc": null,
+    "java_p3c": null,
+    "kotlin_lint": null,
+    "node_lint": null,
+    "npm_cve": [],
+    "python_cve": [],
+    "python_lint": {
+      "adapter_sha256": null,
+      "backlog_status": "not_initialized",
+      "backlog_sync": null,
+      "checker_configurations": [
+        {
+          "build_root": ".",
+          "checker_id": "python.ruff",
+          "configuration": "configured",
+          "configuration_ref": "ruff.toml",
+          "next_action": "用原生 Ruff 核对生效规则、扫描范围和诊断"
+        }
+      ],
+      "command_status": "incomplete",
+      "delivery_decision": "not_evaluated",
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "source": "cli",
+        "timeout_ms": 60000
+      },
+      "exit_code": 3,
+      "files": [
+        {
+          "config_sha256": "b1d5e0d71d4726d679e7963000d0b8f278ebe2cbd34923cb0c9c15fad6062f44",
+          "configuration_ref": "ruff.toml",
+          "findings": [
+            {
+              "codeguard_rule_id": "python.ruff.F401",
+              "column": 8,
+              "finding_fingerprint": "8a749d94d83919a1c0117ddbc17c8465e1065396b3d947d3790d2674daf2597d",
+              "finding_id": "CG-8a749d94d83919a1c0117ddbc17c8465",
+              "line": 1,
+              "next_action": "核对原生规则与源码，修复后执行复检命令",
+              "path": "main.py",
+              "repair_hint": {
+                "allowed_path": "main.py",
+                "closure_condition": "对相同源码范围重新执行原生检查，并确认该规则发现消失",
+                "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+                "status": "bounded_repair_candidate",
+                "step": "核对该导入是否确实未被使用；仅在确认后移除该导入"
+              },
+              "rule_id": "F401",
+              "rule_summary": "导入未使用",
+              "rulepack_sha256": "3afdb985ec6dcdfa770cd903e4ea142170b37472b2a80f91939db1d05931a608",
+              "rulepack_status": "candidate_unapproved"
+            }
+          ],
+          "path": "main.py",
+          "reason": null,
+          "recheck_argv": [
+            "ruff",
+            "check",
+            "main.py"
+          ],
+          "recheck_cwd": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-language-selection-13861-0",
+          "rule_settings": {
+            "coverage_proven": false,
+            "globally_enabled_mapped_rules": [
+              "F401"
+            ],
+            "per_file_ignores_present": false,
+            "settings_sha256": "ab0210d6070286831e7c5fd9b56e3f2dbba860ca4f0124db529804f641021dd3"
+          },
+          "run_status": "findings",
+          "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+          "suppression_audit": {
+            "audit_sha256": "bbab2506add45e8c5253a13dd97584fb9413f66ff8953e6c914ffcc755653ff5",
+            "scope": "source_comments_only",
+            "suppressed_diagnostic_count": 0,
+            "suppressed_rule_ids": []
+          },
+          "tool_sha256": "71f417319c8c4d45562034b44a4ff08e5a1b3dddab5b5c42d5df9800e86a6084"
+        }
+      ],
+      "incomplete_reasons": [],
+      "language": "python",
+      "local_scan_complete": true,
+      "native_tool_version": "ruff 0.16.8",
+      "next": null,
+      "operation": "lint",
+      "repair_brief_reason": "not_initialized",
+      "repair_brief_status": "unavailable",
+      "report_type": "python_lint_feedback",
+      "rulepack_approval": "unverified",
+      "run_id": "lint-13862-1791145592484535000",
+      "schema_version": "0.12.0",
+      "scope": "local_native_scan_only",
+      "tool_approval": "unverified",
+      "workspace_binding": "uninitialized",
+      "workspace_id": null
+    },
+    "rust_build": null,
+    "rust_comments": null,
+    "rust_cve": null,
+    "rust_lint": null,
+    "swift_lint": null
+  },
+  "next": null,
+  "obligation_status": "unresolved",
+  "operation": "check",
+  "reason": "language_selection_obligations_and_trusted_policy_unavailable",
+  "report_type": "check_feedback",
+  "required_obligations": null,
+  "schema_version": "0.45.0",
+  "selection": "python",
+  "syntax_candidates": {
+    "authority": "candidate_unqualified",
+    "delivery_decision": "incomplete",
+    "execution_phase": "after_native",
+    "native_preferred_count": 1,
+    "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+    "observations": [],
+    "reason": "native_preferred",
+    "skipped_count": 0,
+    "source_file_count": 1,
+    "status": "not_run",
+    "unrouted_count": 0
+  },
+  "syntax_tasks": {
+    "failures": [],
+    "new_blockers": 0,
+    "status": "synced_partial",
+    "tasks": []
+  },
+  "unresolved_conditions": [
+    "dialects_not_classified",
+    "python_cve_dependency_graph_and_native_checker_unverified",
+    "required_obligations_unresolved",
+    "source_sets_not_fully_classified",
+    "tool_lock_unverified",
+    "trusted_policy_unavailable"
+  ]
+}

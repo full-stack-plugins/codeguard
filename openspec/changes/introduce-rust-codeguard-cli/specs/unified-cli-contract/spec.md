@@ -37,6 +37,10 @@ Rust CLI MUST 提供 `lint/comments/dependencies/cve/security/build/check <langu
 
 交付聚合 MUST 对照由可信策略与完整发现独立冻结的应有义务 ID 清单和实际计划的义务清单；任一清单漏项、重复或额外项均不能签发 allow。计划和冻结清单若都来自同一未经核验的项目可写输入，数量一致仍不构成可信来源证明。无适用义务的完整空项目仍按 not_applicable 处理。
 
+#### Scenario: Registered language check is scoped before native execution
+- **WHEN** 调用 check 的注册表规范语言 ID，并在混合项目中发现多个语言
+- **THEN** 入口 SHALL 接受全部已登记 ID，按选择仅调度该语言适用的已接入原生检查与候选语法观察；共享构建根检查可用于其适用语言，但不能运行无关语言工具。报告明示 selection，缺适配器或空目标不授予全项目通过，未知 ID 或不相干工具参数在原生进程与持久化前拒绝。别名未登记时不自行猜测
+
 #### Scenario: Java lint succeeds in a mixed project
 - **WHEN** Java lint 完成，但项目仍有 Python、安全或 CVE 义务未在该请求执行
 - **THEN** 请求可成功，交付状态为 not_evaluated，不能宣称全项目通过

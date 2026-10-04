@@ -196,7 +196,7 @@ Supply the original checker's required tool/configuration options to `task verif
 | `lint python / java / typescript / go` | Run selected native checks | Adapter-specific options and scope |
 | `comments rust`, `build rust` | Documentation and type checking | Build does not run project tests |
 | `cve rust / python / typescript` | Native advisory observations | Database identity/freshness and full coverage remain limited |
-| `check all / java` | Aggregate integrated checks and repair feedback | Delivery remains `not_evaluated` |
+| `check all / <canonical-language-id>` | Aggregate integrated checks and repair feedback | Full project: `incomplete`; scoped request: `not_evaluated` |
 | `work sync`, `status`, `next`, `task show` | Persist and inspect repair work | Task files are not a gate |
 | `task claim / heartbeat / release`, `task attempt start / finish` | Local ownership and attempt history | Unix local coordination, not distributed locking |
 | `task verify` | Repeat selected original checkers | Formal closure/reopening pending |
@@ -552,3 +552,5 @@ A protected host can call `verify_swift_task_resolution` to compare the original
 ### Scoped Kotlin resolution and context blockers (development source)
 
 `verify_kotlin_task_resolution` reuses the host SDK with kotlinc-jvm 2.4.10. Policy 1.3.0 and evidence 0.4.0 are language-specific; native-first tasks keep a null grammar identity. The original diagnostic must have coherent UTF-16 and UTF-8 coordinates. Changed source and a complete clean recheck permit a scoped `code_fixed` event. Context-only errors remain pending verification. Mixed syntax and context errors retain the known finding and allow ordinary `task verify --kotlinc-tool` recurrence to reopen the same parent chain even when completion is incomplete. The host supplies independent trust. Tool identity currently covers the launcher, with full JAR/JDK/project identity, default plugin closure, lint/type coverage, and publication still pending. See [acceptance](tests/acceptance/kotlin-task-resolution-lifecycle.md).
+
+Current development source accepts all 57 canonical registry IDs for `check`, reusing integrated native services and scoped WASM fallback. Missing adapters remain gaps. New scoped feedback 0.45 and aborted feedback 0.14 are separately versioned; Java/all retain compatibility. Public npm 0.1.4 and the plugin lock do not contain this increment. See [language-selection acceptance](tests/acceptance/check-language-selection.md).

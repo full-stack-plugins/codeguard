@@ -273,3 +273,10 @@ A protected host can call `verify_swift_task_resolution` to compare the original
 ### Source-aware false-positive investigation
 
 `next` and `task show` derive the same investigation step from the bound first report. Native-first tasks compare native diagnostics, input, tool and environment; WASM-first tasks compare grammar assets, language versions and native observations. A native counterexample with no diagnostics does not establish a grammar defect. These queries do not execute checkers, mutate leases, budgets or history, approve an exception, or close a task. See the [scoped acceptance record](../tests/acceptance/counterexample-source-guidance.md).
+
+
+### Run a project check for a selected language
+
+`codeguard check <canonical-language-id> . --format=json` accepts all 57 IDs in the registry. It scopes existing native services, shared budgets and WASM fallback to the selection; missing adapters remain explicit gaps. Java/all retain their existing report versions. Other languages use check_feedback 0.45 and check_aborted 0.14 for internal failures, with delivery_decision=not_evaluated. An empty target cannot certify the project. Explicit tools must belong to the selected ecosystem; JavaScript/TypeScript share npm root checks. Unregistered aliases are rejected.
+
+For example, `codeguard check python . --ruff-tool /absolute/path/to/ruff --format=json` does not schedule Java/Maven or Rust/Cargo in a mixed project. With native checks unavailable, a WASM-enabled binary observes only selected-language candidates.

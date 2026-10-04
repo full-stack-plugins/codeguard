@@ -53,18 +53,18 @@ pub fn observe(
     root: &Path,
     discovery: &DiscoveryReport,
     native: NativeCoverage<'_>,
-    java_only: bool,
+    selection: Option<&str>,
     jobs_limit: usize,
     deadline: Instant,
     skip_reason: Option<&str>,
 ) -> Value {
     let mut paths = BTreeSet::new();
     for (language, evidence) in &discovery.languages {
-        if !java_only || language == "java" {
+        if selection.is_none_or(|selected| selected == language) {
             paths.extend(evidence.source_files.iter());
         }
     }
-    if !java_only {
+    if selection.is_none() {
         paths.extend(discovery.ambiguous_source_files.iter());
     }
     observe_selected(

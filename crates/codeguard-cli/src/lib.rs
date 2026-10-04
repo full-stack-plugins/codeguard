@@ -96,6 +96,7 @@ pub mod check_command;
 mod check_eslint_scan;
 pub mod check_plan;
 pub mod check_request;
+mod check_selection;
 #[cfg(all(unix, feature = "wasm-precheck"))]
 mod check_syntax_candidates;
 mod checkstyle_preparation;

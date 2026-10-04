@@ -196,7 +196,7 @@ codeguard task verify "$TASK_ID" . --format json
 | `lint python / java / typescript / go` | 执行已接入原生检查 | 参数和范围因适配器而异 |
 | `comments rust`、`build rust` | 文档与类型检查 | build 不运行项目测试 |
 | `cve rust / python / typescript` | 原生漏洞公告观察 | 漏洞库身份、时效及完整覆盖仍有限 |
-| `check all / java` | 汇总已接入检查与修复反馈 | 交付仍为 `not_evaluated` |
+| `check all / <规范语言ID>` | 汇总已接入检查与修复反馈 | 全项目 `incomplete`；局部 `not_evaluated` |
 | `work sync`、`status`、`next`、`task show` | 持久化及查看修复工作 | 任务文件不是门禁 |
 | `task claim / heartbeat / release`、`task attempt start / finish` | 本地占用与尝试历史 | Unix 本地协作，不保证分布式锁 |
 | `task verify` | 重跑部分原检查器 | 正式关闭与重开待完成 |
@@ -534,3 +534,5 @@ Claude Code 2.1.273 已有会话内插件源码加载的实际证据，覆盖成
 ### Kotlin 限定语法关闭与上下文分流（开发源码）
 
 `verify_kotlin_task_resolution` 复用共享宿主 SDK，以 kotlinc-jvm 2.4.10 对照原反例及当前源码；策略 1.3.0 / 证据 0.4.0 独立于其它语言，原生首次 grammar=null。原反例的 UTF-16 与 UTF-8 字节坐标须同时有效，源码已改变且原工具完整零诊断才追加 `code_fixed`。仅上下文诊断保留待验证；混合上下文未完成和已确认语法诊断时，保留原问题并支持普通 `task verify --kotlinc-tool` 重开同一父链，不因 `incomplete` 丢弃正向发现。签名来源由宿主独立固定；当前只绑定 launcher，不证明完整 JAR/JDK/项目构建身份。默认插件可信关闭、完整 lint/类型及发行仍未完成。详见[验收](tests/acceptance/kotlin-task-resolution-lifecycle.md)。
+
+当前开发源码支持 `check` 的全部57个规范语言ID，按选择复用已有原生适配器和WASM回退，不调度无关语言工具；缺适配器仍明确报告。新增局部反馈0.45与内部故障0.14独立版本化，Java/all保持历史兼容。公开npm0.1.4和插件锁尚未包含此增量。详见[语言选择验收](tests/acceptance/check-language-selection.md)。
