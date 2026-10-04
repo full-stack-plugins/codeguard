@@ -2286,3 +2286,12 @@ Rust 开发入口复用现有隔离 worker 和 Core 统计，启动前核对清�
 ## 2026-10-04 npm 安装后原生首次修复链路
 
 旧公开0.1.4相同摘要程序经过真实私有打包/离线安装，在新Erlang入口退出2，作为发行能力差异RED。当前源码同一安装路径的受控协议和真实OTP28两组通过（runner3 passed，含1父测试），覆盖首次原生任务、同一聚合身份、next实际证据、源码变化、零诊断保持open、再次发现、repair_ready stdin和保存失败。未指定真实工具的CI路径2 passed/1 skipped，真实验收不偷换为夹具。26实际报告通过schema，14伪造/矛盾变体拒绝；初次测试缓存范围污染修正为项目外缓存，不当产品缺陷。完整命令/日志与未完成范围见[安装后验收](../../../tests/acceptance/npm-erlang-native-repair.md)。本批不改Rust产品实现和公开制品，Linux新目标须按对应提交单独核验，完整目标保持开放。
+
+
+## 2026-10-04 P3C 部分执行的正向诊断保留
+
+对应 2.3 / 6.2 / 9.3 / 9.4 / 9.7 / 9.13 / 12.7、RW21。先复现稳定问题投影遗漏和 human 原生状态缺失，再接通诊断/阻塞双维导入与原工具正向复检；历史无投影报告保留兼容。
+
+最终默认 workspace/all-targets 213 组/1193 passed/0 failed/109 ignored，随后相关特性七组89 passed/0 failed/20 ignored；全工作区全目标 WASM Clippy -D warnings、fmt、分层、OpenSpec strict、198 schema元定义、28实际单文件反馈/12伪造反例、687条修改文档局部链接均通过。日志、摘要、实际节选和不计原生精度的边界见[验收](../../../tests/acceptance/java-p3c-partial-execution.md)。
+
+只证明本次原生协议与任务路径修复，不证明完整语言/规则/覆盖、可信关闭、真实宿主或公开发布；父任务保持未完成。Erlang RED 草稿没有变更或提交。远端CI按新提交另行核验，不借用旧提交成功。

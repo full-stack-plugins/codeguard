@@ -1104,3 +1104,5 @@ flowchart TD
 ## 已绑定 P3C 单文件反馈协议
 
 `java_p3c_file_feedback` 0.1 包装既有项目观察 0.2 和实际工作台/next 结果。[Schema](../schemas/java-p3c-file-feedback-0.1.schema.json) 限制所选源码、原生权威和失败/任务组合；显式 `--checker p3c` 保留原生阻塞，不静默切换 WASM。未绑定原生反馈 0.2 保持兼容。见[验收记录](../tests/acceptance/java-p3c-file-workbench.md)；受控协议测试不证明真实规则精度。
+
+项目观察 0.2 在局部状态 `incomplete`、原因 `native_execution_failed` 时，保留非空且已核对的原生诊断。源码/规则/位置投影沿用成功诊断的当前字节和配置检查；同步同时导入源码 finding 与执行阻塞，`observed_file_count` 不增加。原工具复检再次匹配问题为 `still_present`；部分零诊断为 `incomplete`，阻塞复检仍为 `still_blocked`。没有平铺投影的历史 0.2 报告保持只导入阻塞的解释；不增加 schema 字段或批准语义。见[验收](../tests/acceptance/java-p3c-partial-execution.md)。

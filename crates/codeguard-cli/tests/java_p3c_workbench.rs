@@ -463,3 +463,325 @@ fn comment_rule_tasks_do_not_instruct_the_agent_to_fix_naming() {
     }
     assert!(task.contains("p3c"));
 }
+
+#[test]
+fn validated_diagnostic_survives_failed_native_execution_as_a_stable_task() {
+    let project = Project::new();
+    project.init();
+    let script = fs::read_to_string(project.tools.join("mvn")).unwrap();
+    fs::write(project.tools.join("mvn"), format!("{script}exit 1\n")).unwrap();
+    let source = project.root.join("src/main/java/Bad_Name.java");
+    let first = project.lint(source.to_str().unwrap());
+    let observation = &first["project_observation"];
+    assert_eq!(observation["finding_count"], 1);
+    assert_eq!(observation["observed_file_count"], 0);
+    assert_eq!(observation["local_observation_complete"], false);
+    assert_eq!(
+        observation["files"][0]["observation"]["reason"],
+        "native_execution_failed"
+    );
+    // 本次执行未完成不应丢掉已经核对过范围、规则和源码的正向诊断。
+    assert_eq!(observation["findings"].as_array().unwrap().len(), 1);
+    assert_eq!(first["workbench"]["status"], "synced_partial");
+    let id = observation["findings"][0]["finding_id"].as_str().unwrap();
+    assert!(
+        project
+            .root
+            .join(format!(".codeguard/tasks/{id}.md"))
+            .exists()
+    );
+    assert_eq!(
+        fs::read_dir(project.root.join(".codeguard/tasks"))
+            .unwrap()
+            .count(),
+        2
+    );
+    let second = project.lint(source.to_str().unwrap());
+    assert_eq!(
+        second["project_observation"]["findings"][0]["finding_id"],
+        id
+    );
+    assert_eq!(
+        fs::read_dir(project.root.join(".codeguard/tasks"))
+            .unwrap()
+            .count(),
+        2
+    );
+    let verify = project.json(
+        &["task", "verify", id, project.root.to_str().unwrap()],
+        true,
+    );
+    assert_eq!(verify["observation"], "still_present");
+    assert_eq!(verify["event_persisted"], true);
+    assert_eq!(verify["delivery_decision"], "not_evaluated");
+    let brief = codeguard_cli::next_command::read_task_brief(&project.root, id).unwrap();
+    assert_eq!(brief["verification_observation"], "still_present");
+    project.tool("ClassNamingShouldBeCamelRule", "AlibabaJavaNaming");
+    let recovered = project.lint(source.to_str().unwrap());
+    assert_eq!(
+        recovered["project_observation"]["findings"][0]["finding_id"],
+        id
+    );
+}
+
+#[test]
+fn failed_native_execution_cannot_restore_blocker_or_prove_finding_absence() {
+    let project = Project::new();
+    project.init();
+    let source = project.root.join("src/main/java/Bad_Name.java");
+    let first = project.lint(source.to_str().unwrap());
+    let id = first["project_observation"]["findings"][0]["finding_id"]
+        .as_str()
+        .unwrap();
+    fs::write(project.tools.join("mvn"), "#!/bin/sh\nmkdir -p target\nprintf '%s\\n' '<pmd xmlns=\"http://pmd.sourceforge.net/report/2.0.0\" version=\"6.15.0\"></pmd>' > target/pmd.xml\nexit 1\n").unwrap();
+    let failed = project.lint(source.to_str().unwrap());
+    assert_eq!(
+        failed["project_observation"]["findings"],
+        serde_json::json!([])
+    );
+    assert_eq!(failed["project_observation"]["observed_file_count"], 0);
+    let verify = project.json(
+        &["task", "verify", id, project.root.to_str().unwrap()],
+        true,
+    );
+    assert_eq!(verify["observation"], "incomplete");
+    let blocker = fs::read_dir(project.root.join(".codeguard/tasks"))
+        .unwrap()
+        .map(|entry| entry.unwrap().path())
+        .find(|path| {
+            path.file_stem()
+                .unwrap()
+                .to_str()
+                .unwrap()
+                .starts_with("CG-B-")
+        })
+        .unwrap();
+    let blocker_id = blocker.file_stem().unwrap().to_str().unwrap();
+    let verify = project.json(
+        &["task", "verify", blocker_id, project.root.to_str().unwrap()],
+        true,
+    );
+    assert_eq!(verify["observation"], "still_blocked");
+    let fact: Value = serde_json::from_slice(
+        &fs::read(
+            project
+                .root
+                .join(format!(".codeguard/findings/{id}/finding.json")),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(fact["state"], "open");
+}
+
+#[test]
+fn failed_native_reports_with_bad_scope_or_xml_do_not_create_source_tasks() {
+    for suffix in ["<", "<file name=\"/outside/Other.java\"/></pmd>"] {
+        let project = Project::new();
+        project.init();
+        let script = fs::read_to_string(project.tools.join("mvn")).unwrap();
+        let script = if suffix == "<" {
+            format!("{script}printf '<' >> target/pmd.xml\nexit 1\n")
+        } else {
+            script.replace("</pmd>", suffix) + "exit 1\n"
+        };
+        fs::write(project.tools.join("mvn"), script).unwrap();
+        let report = project.lint(
+            project
+                .root
+                .join("src/main/java/Bad_Name.java")
+                .to_str()
+                .unwrap(),
+        );
+        assert_eq!(
+            report["project_observation"]["files"][0]["observation"]["reason"],
+            "native_report_invalid_or_out_of_scope"
+        );
+        assert_eq!(
+            report["project_observation"]["findings"],
+            serde_json::json!([])
+        );
+        assert_eq!(report["project_observation"]["observed_file_count"], 0);
+        assert_eq!(
+            report["project_observation"]["backlog_sync"]["new_findings"],
+            0
+        );
+        assert_eq!(
+            report["project_observation"]["backlog_sync"]["new_blockers"],
+            1
+        );
+    }
+}
+
+#[test]
+fn failed_native_execution_with_changed_source_or_configuration_rejects_positive_projection() {
+    for changed in ["source", "configuration", "tool"] {
+        let project = Project::new();
+        project.init();
+        let script = fs::read_to_string(project.tools.join("mvn")).unwrap();
+        let mutation = match changed {
+            "source" => format!(
+                "printf 'class Changed {{}}\\n' > '{}'",
+                project.root.join("src/main/java/Bad_Name.java").display()
+            ),
+            "configuration" => format!(
+                "printf '<project/>\\n' > '{}'",
+                project.root.join("pom.xml").display()
+            ),
+            _ => "printf '# changed\\n' >> \"$0\"".to_owned(),
+        };
+        fs::write(
+            project.tools.join("mvn"),
+            format!("{script}{mutation}\nexit 1\n"),
+        )
+        .unwrap();
+        let report = project.lint(
+            project
+                .root
+                .join("src/main/java/Bad_Name.java")
+                .to_str()
+                .unwrap(),
+        );
+        assert_eq!(
+            report["project_observation"]["findings"],
+            serde_json::json!([]),
+            "{changed}: {report}"
+        );
+        assert_eq!(report["project_observation"]["observed_file_count"], 0);
+        assert_eq!(
+            report["project_observation"]["backlog_sync"]["new_findings"],
+            0
+        );
+        assert_eq!(
+            report["project_observation"]["backlog_sync"]["new_blockers"],
+            1
+        );
+    }
+}
+
+#[test]
+fn project_check_preserves_both_completed_and_failed_file_findings() {
+    let project = Project::new();
+    project.init();
+    fs::write(
+        project.root.join("src/main/java/Other_Name.java"),
+        "class Other_Name {}\n",
+    )
+    .unwrap();
+    let script = fs::read_to_string(project.tools.join("mvn")).unwrap();
+    fs::write(
+        project.tools.join("mvn"),
+        script
+            .replace("Bad_Name.java", "Other_Name.java")
+            .replace(
+                "mkdir -p target",
+                "name=$(basename src/main/java/*.java)\nmkdir -p target",
+            )
+            .replace("Other_Name.java", "$name")
+            + "if [ \"$name\" = 'Other_Name.java' ]; then exit 1; fi\n",
+    )
+    .unwrap();
+    let report = project.json(&["check", "java", project.root.to_str().unwrap()], true);
+    let scan = &report["native_results"]["java_p3c"];
+    assert_eq!(scan["source_file_count"], 2);
+    assert_eq!(scan["observed_file_count"], 1);
+    assert_eq!(scan["finding_count"], 2);
+    assert_eq!(scan["findings"].as_array().unwrap().len(), 2);
+    assert_eq!(scan["local_observation_complete"], false);
+    assert_eq!(scan["backlog_sync"]["new_findings"], 2);
+    assert_eq!(scan["backlog_sync"]["new_blockers"], 1);
+    assert_eq!(report["delivery_decision"], "not_evaluated");
+}
+
+#[test]
+fn legacy_failed_report_without_projection_remains_readable_as_a_blocker() {
+    let project = Project::new();
+    project.init();
+    let script = fs::read_to_string(project.tools.join("mvn")).unwrap();
+    fs::write(project.tools.join("mvn"), format!("{script}exit 1\n")).unwrap();
+    let report = project.lint(
+        project
+            .root
+            .join("src/main/java/Bad_Name.java")
+            .to_str()
+            .unwrap(),
+    );
+    let mut old = report["project_observation"].clone();
+    old["run_id"] = serde_json::json!("legacy-p3c-partial");
+    old["findings"] = serde_json::json!([]);
+    fs::write(
+        project
+            .root
+            .join(".codeguard/reports/legacy-p3c-partial.json"),
+        serde_json::to_vec(&old).unwrap(),
+    )
+    .unwrap();
+    let sync = project.json(&["work", "sync", project.root.to_str().unwrap()], false);
+    assert_eq!(sync["failed_reports"], 0, "{sync}");
+    assert_eq!(sync["imported_reports"], 1);
+    assert_eq!(sync["new_findings"], 0);
+}
+
+#[test]
+fn partial_projection_with_unsupported_reason_or_changed_identity_is_rejected() {
+    for variant in ["reason", "identity", "count", "rule"] {
+        let project = Project::new();
+        project.init();
+        let script = fs::read_to_string(project.tools.join("mvn")).unwrap();
+        fs::write(project.tools.join("mvn"), format!("{script}exit 1\n")).unwrap();
+        let report = project.lint(
+            project
+                .root
+                .join("src/main/java/Bad_Name.java")
+                .to_str()
+                .unwrap(),
+        );
+        let mut bad = report["project_observation"].clone();
+        bad["run_id"] = serde_json::json!(format!("invalid-partial-{variant}"));
+        match variant {
+            "reason" => {
+                bad["files"][0]["observation"]["reason"] =
+                    serde_json::json!("native_report_invalid_or_out_of_scope")
+            }
+            "identity" => {
+                bad["findings"][0]["finding_fingerprint"] = serde_json::json!("b".repeat(64))
+            }
+            "count" => bad["observed_file_count"] = serde_json::json!(1),
+            _ => {
+                bad["files"][0]["observation"]["findings"][0]["rule_id"] =
+                    serde_json::json!("UnknownRule")
+            }
+        }
+        fs::write(
+            project
+                .root
+                .join(format!(".codeguard/reports/invalid-partial-{variant}.json")),
+            serde_json::to_vec(&bad).unwrap(),
+        )
+        .unwrap();
+        let sync = project.json(&["work", "sync", project.root.to_str().unwrap()], false);
+        assert_eq!(sync["failed_reports"], 1, "{variant}: {sync}");
+        assert_eq!(sync["new_findings"], 0);
+    }
+}
+
+#[test]
+fn human_partial_feedback_explains_execution_failure_and_retained_diagnostics() {
+    let project = Project::new();
+    project.init();
+    let script = fs::read_to_string(project.tools.join("mvn")).unwrap();
+    fs::write(project.tools.join("mvn"), format!("{script}exit 1\n")).unwrap();
+    let source = project.root.join("src/main/java/Bad_Name.java");
+    let output = project.execute(
+        &["lint", "java", source.to_str().unwrap(), "--format=human"],
+        true,
+    );
+    assert_eq!(output.status.code(), Some(3));
+    let human = String::from_utf8(output.stdout).unwrap();
+    assert!(
+        human.contains("原生执行：incomplete；原因：native_execution_failed"),
+        "{human}"
+    );
+    assert!(human.contains("ClassNamingShouldBeCamelRule"));
+    assert!(human.contains("不能签发质量通过"));
+}

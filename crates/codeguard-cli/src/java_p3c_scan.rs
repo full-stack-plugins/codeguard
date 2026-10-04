@@ -11,7 +11,7 @@ use codeguard_runtime::read_bounded_regular_file;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 
-use crate::java_p3c_command::{Args, observe};
+use crate::java_p3c_command::{Args, has_projectable_findings, observe};
 use crate::workspace_refresh::read_workspace_baseline;
 
 static NEXT_RUN: AtomicU64 = AtomicU64::new(0);
@@ -109,16 +109,18 @@ pub(crate) fn observe_project(
                 continue;
             }
             let status = report["local_status"].as_str().unwrap_or("incomplete");
-            if matches!(
+            let completed = matches!(
                 status,
                 "findings_observed_untrusted" | "clean_scope_unproven"
-            ) {
+            );
+            if completed {
                 observed_file_count += 1;
             }
             let raw_count = report["findings"].as_array().map_or(0, Vec::len);
             finding_count += raw_count;
             let before = findings.len();
-            if status == "findings_observed_untrusted" {
+            let projectable = has_projectable_findings(&report);
+            if projectable {
                 let source = read_bounded_regular_file(&root.join(relative), 16 * 1024 * 1024);
                 if let Ok(bytes) = source {
                     let source_sha = format!("{:x}", Sha256::digest(&bytes));
@@ -133,9 +135,11 @@ pub(crate) fn observe_project(
                     }
                 }
             }
-            if status == "findings_observed_untrusted" && findings.len() - before != raw_count {
+            if projectable && findings.len() - before != raw_count {
                 findings.truncate(before);
-                observed_file_count -= 1;
+                if completed {
+                    observed_file_count -= 1;
+                }
                 ("finding_projection_incomplete", report)
             } else {
                 ("native_probe_returned", report)

@@ -19,6 +19,14 @@
 - **WHEN** 原生诊断有效但工作台报告无法保存或同步失败
 - **THEN** 诊断仍反馈到 human/JSON，给出实际存储或同步失败原因；下一步和任务引用不得伪造，不能声称自动修复流程已经接通
 
+#### Scenario: P3C emits valid findings before execution fails
+- **WHEN** 原生工具异常退出但新鲜报告、所选规则、文件范围和当前源码身份已经核对，有可定位的诊断
+- **THEN** 单文件与项目入口 SHALL 同时同步同一稳定源码问题和执行阻塞；原生复检再次观察该问题时为 still_present，但完整观察计数不增加、阻塞不恢复、任务不关闭。重复扫描不得生成重复任务
+
+#### Scenario: Failed P3C execution cannot prove absence
+- **WHEN** 异常退出后的报告为空、无效、越界，或源码、工具、配置身份变化
+- **THEN** 空或不合格诊断 SHALL NOT 成为问题消失、环境恢复或修复完成；无效报告不得投影为当前源码问题，本次检查继续未完成并保留阻塞
+
 ### Requirement: npm remediation tasks SHALL recheck through their original native audit service
 npm持久任务 SHALL 支持 task verify，结构化任务根决定原生cwd，显式原工具上下文、共享预算与任务租约保护复检和持久化。结果 SHALL 反馈原生诊断及下一步，不从零漏洞推导完整覆盖或关闭。
 

@@ -43,6 +43,8 @@ CLI 不内置大模型或向量数据库，也不使用 Rust 重写 P3C/Maven �
 
 当前源码的原生 P3C 单文件 lint 可连接最近已初始化的工作台，也可显式指定 `--workspace ROOT`。使用 `codeguard lint java FILE --checker p3c` 并提供既有 Maven/JDK/离线仓库参数；仅检查所选文件及最近 POM 可静态确认的规则子集，`check java` 和 `task verify` 复用同一稳定任务。显式选择 P3C 不会静默切换 WASM。这是局部反馈，完整 P3C 覆盖及自动关闭仍待验收。见[修复流程](docs/Codeguard-Native-Repair-Workflow.zh_CN.md#p3c-单文件项目绑定)和[验收记录](tests/acceptance/java-p3c-file-workbench.md)。公开 npm 0.1.4 未更新。
 
+P3C 执行失败时，已经核对且仍匹配当前源码的诊断也会进入稳定源码任务，同时保留执行阻塞；不会增加完整观察计数，不能证明问题消失。见[部分执行验收](tests/acceptance/java-p3c-partial-execution.md)。
+
 ## 2. 能力与成熟度
 
 | 领域 | 当前实现 | 边界与证据 |

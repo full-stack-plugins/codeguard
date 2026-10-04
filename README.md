@@ -40,6 +40,8 @@ The CLI contains no LLM or vector database. It does not reimplement P3C/Maven ch
 
 Source builds connect native P3C single-file lint to the nearest initialized workspace, or an explicit `--workspace ROOT`. Use `codeguard lint java FILE --checker p3c` with the existing explicit Maven/JDK/offline-repository arguments. Only the selected file and the nearest POM’s statically confirmed rule subset are checked; `check java` and `task verify` reuse the same stable task. Explicit P3C selection does not silently switch to WASM. This is local feedback, not complete P3C coverage or automatic task closure. See [workflow](docs/Codeguard-Native-Repair-Workflow.md#p3c-single-file-project-binding) and [acceptance](tests/acceptance/java-p3c-file-workbench.md). Public npm 0.1.4 is unchanged.
 
+A failed P3C execution can still contribute validated, current diagnostics to stable source tasks while retaining its execution blocker. This does not increase completed-file counts or prove absence. See [partial-execution acceptance](tests/acceptance/java-p3c-partial-execution.md).
+
 ## 2. Capabilities and maturity
 
 | Area | Current implementation | Boundary and evidence |

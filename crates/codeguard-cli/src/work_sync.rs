@@ -14,7 +14,7 @@ use codeguard_runtime::TaskFileLock;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 
-use crate::java_p3c_command::render_pom;
+use crate::java_p3c_command::{has_projectable_findings, render_pom};
 use crate::java_p3c_scan::finding_record;
 use crate::workspace_refresh::read_workspace_baseline;
 
@@ -1179,11 +1179,19 @@ fn parse_java_report(
                     .insert(relative.into());
                 continue;
             }
-            if matches!(
+            let completed = matches!(
                 status,
                 "findings_observed_untrusted" | "clean_scope_unproven"
-            ) {
-                observed_count += 1;
+            );
+            // 旧 0.2 报告只在嵌套观察中保留失败诊断，没有平铺投影；仍按阻塞导入。
+            let projected_partial = has_projectable_findings(native)
+                && flat
+                    .get(flat_index)
+                    .is_some_and(|finding| finding["path"] == relative);
+            if completed || projected_partial {
+                if completed {
+                    observed_count += 1;
+                }
                 let source_sha = native["source_sha256"]
                     .as_str()
                     .filter(|sha| valid_sha256(sha))
@@ -1267,7 +1275,9 @@ fn parse_java_report(
                         .or_default()
                         .insert(relative.into());
                 }
-                continue;
+                if completed {
+                    continue;
+                }
             }
             blocker_reason = reason;
         } else if configuration == "configured" && file_reason == "p3c_configuration_not_confirmed"

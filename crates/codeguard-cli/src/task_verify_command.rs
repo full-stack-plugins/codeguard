@@ -18,6 +18,7 @@ use crate::java_cve_attribution::attach_candidates;
 use crate::java_cve_scan::{
     NativeContext as CveNativeContext, observe_project as observe_cve_project,
 };
+use crate::java_p3c_command::has_projectable_findings;
 use crate::java_p3c_scan::{NativeContext, observe_project};
 use crate::next_command::read_task_brief;
 use crate::python_lint_command::scan_local_report_with_deadline;
@@ -940,7 +941,13 @@ pub(crate) fn classify_java(brief: &Value, scan: &Value) -> &'static str {
     let Some(path) = brief["scope"].as_str() else {
         return "incomplete";
     };
-    if !valid_file(path) {
+    let partial_positive = files.iter().any(|file| {
+        file["path"] == path
+            && file["configuration"] == "configured"
+            && file["reason"] == "native_probe_returned"
+            && has_projectable_findings(&file["observation"])
+    });
+    if !valid_file(path) && !partial_positive {
         return "incomplete";
     }
     if scan["findings"].as_array().is_some_and(|findings| {
@@ -951,8 +958,10 @@ pub(crate) fn classify_java(brief: &Value, scan: &Value) -> &'static str {
         })
     }) {
         "still_present"
-    } else {
+    } else if valid_file(path) {
         "rule_coverage_requires_review"
+    } else {
+        "incomplete"
     }
 }
 

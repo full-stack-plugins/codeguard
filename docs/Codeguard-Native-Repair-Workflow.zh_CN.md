@@ -187,8 +187,11 @@ codeguard task verify TASK_ID . --erl-tool /absolute/path/to/erl --format=json
 flowchart LR
     A[P3C 原生单文件请求] --> B[已有工作台与最近 POM]
     B --> C[所选规则的一次原生探针]
-    C --> D[保存既有项目观察]
+    C --> V[核对新鲜报告、规则和当前输入]
+    V --> D[保留有效诊断]
+    V --> X[保留执行失败阻塞]
     D --> E[共用同步与稳定任务]
+    X --> E
     E --> F[next / task verify]
     F --> G[原 P3C 工具复检]
     G --> H[记录结果并保留覆盖缺口]
@@ -206,3 +209,5 @@ codeguard task verify TASK_ID . --maven-tool /absolute/path/to/mvn \
 ```
 
 将示例路径、仓库身份和任务 ID 替换为实际选择的上下文。已绑定反馈为 [0.1](../schemas/java-p3c-file-feedback-0.1.schema.json)，内部项目观察仍为 0.2，未绑定反馈仍为 0.2。单文件路径只读取祖先 POM，不发现兄弟源码；复用聚合检查的保存/同步服务和既有原工具任务复检。工作台损坏、源码越界、源码或父目录链接均在 Maven 启动前阻止该路径。保存失败保留原生诊断与具体原因，不伪造下一步。零诊断在规则覆盖未证明时保留任务 open。公开 npm 0.1.4 不含此变更。[受控协议验收](../tests/acceptance/java-p3c-file-workbench.md) 不证明完整 P3C、生效模型覆盖或真实宿主安装。
+
+项目观察 0.2 在局部状态 `incomplete`、原因 `native_execution_failed` 时，保留非空且已核对的原生诊断。源码/规则/位置投影沿用成功诊断的当前字节和配置检查；同步同时导入源码 finding 与执行阻塞，`observed_file_count` 不增加。原工具复检再次匹配问题为 `still_present`；部分零诊断为 `incomplete`，阻塞复检仍为 `still_blocked`。没有平铺投影的历史 0.2 报告保持只导入阻塞的解释；不增加 schema 字段或批准语义。见[验收](../tests/acceptance/java-p3c-partial-execution.md)。

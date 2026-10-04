@@ -643,3 +643,5 @@ The `evaluate_grammars` development entry reuses the same isolated Rust workers 
 ## P3C single-file application service
 
 Native file lint and aggregate checks share P3C persistence/synchronization, stable finding identity and original-tool verification. File lint reads ancestor POMs and limits execution to one selected source. See [workflow](Codeguard-Native-Repair-Workflow.md#p3c-single-file-project-binding). Full effective-model coverage and trusted closure remain pending.
+
+Findings and execution completeness remain independent through native parsing, project projection, sync and verification. A validated P3C diagnostic survives abnormal termination as a stable finding; the failed file contributes zero completed observations and retains its execution blocker. Empty, invalid, out-of-scope or changed-input reports cannot establish absence. See [partial-execution acceptance](../tests/acceptance/java-p3c-partial-execution.md).

@@ -219,6 +219,15 @@ pub(crate) fn print_feedback(report: &Value) {
     let scan = &report["project_observation"];
     for file in scan["files"].as_array().into_iter().flatten() {
         println!("配置：{}；观察：{}", file["configuration"], file["reason"]);
+        if file["observation"].is_object() {
+            println!(
+                "原生执行：{}；原因：{}",
+                file["observation"]["local_status"]
+                    .as_str()
+                    .unwrap_or("incomplete"),
+                file["observation"]["reason"].as_str().unwrap_or("unknown")
+            );
+        }
         for finding in file["observation"]["findings"]
             .as_array()
             .into_iter()

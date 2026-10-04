@@ -187,8 +187,11 @@ Native `lint java FILE --checker p3c` selects the nearest existing workspace, or
 flowchart LR
     A[Native P3C single-file request] --> B[Existing workspace and closest POM]
     B --> C[One native probe with selected rules]
-    C --> D[Save existing project observation]
-    D --> E[Shared sync and stable task]
+    C --> V[Validate fresh report, rules and current input]
+    V --> D[Preserve usable diagnostics]
+    V --> X[Retain failed execution blocker]
+    D --> E[Shared sync and stable tasks]
+    X --> E
     E --> F[next / task verify]
     F --> G[Original native P3C recheck]
     G --> H[Record result; retain coverage gaps]
@@ -206,3 +209,5 @@ codeguard task verify TASK_ID . --maven-tool /absolute/path/to/mvn \
 ```
 
 Replace example paths, repository identity and task ID with the actual selected context. Bound feedback is [0.1](../schemas/java-p3c-file-feedback-0.1.schema.json), nesting existing project observation 0.2; unbound feedback stays 0.2. The single-file path reads ancestor POM candidates without discovering sibling sources. It reuses the aggregate persistence/sync service and existing native task verification. Damaged workspaces, outside sources and source/parent links stop before Maven. Persistence failure preserves native diagnostics and its actual reason, without a next task. Zero diagnostics leave the task open while rule coverage remains unproven. This change is absent from public npm 0.1.4. [Controlled protocol acceptance](../tests/acceptance/java-p3c-file-workbench.md) does not certify complete P3C/effective-model coverage or real-host installation.
+
+Project observation 0.2 preserves nonempty validated diagnostics when local status is `incomplete` and reason is `native_execution_failed`. The source/rule/location projection undergoes the same current-byte and configuration checks as successful diagnostic reports. Sync imports both the source finding and execution blocker; `observed_file_count` stays unchanged. A matching positive recheck is `still_present`; partial zero results are `incomplete`, and blocker verification remains `still_blocked`. Legacy 0.2 reports without flat projections retain their blocker-only interpretation. No schema fields or approval semantics change. See [acceptance](../tests/acceptance/java-p3c-partial-execution.md).
