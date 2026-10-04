@@ -22,6 +22,18 @@
 - **WHEN** 项目提供结构正确的策略候选，且其摘要恰好匹配同一工作树的工具锁
 - **THEN** config 只能报告本地引用相符及批准来源未核验，不生成有效策略、白名单授权或交付通过
 
+#### Scenario: Configuration inspection observes native declarations without executing them
+- **WHEN** config validate/explain 检查具有 Maven P3C、Ruff 或动态 ESLint 配置的多构建根项目
+- **THEN** 复用静态发现，按构建根显示 configured/missing/invalid/unknown、来源、原因、准备动作和已读取字节的摘要；不执行项目配置或工具、不写工作台。缺失 P3C 错误处理声明和动态 ESLint 生效模型仍为 unknown，静态观察不冒充生效规则、suppression、批准策略或质量通过
+
+#### Scenario: Native configuration details exceed the feedback budget
+- **WHEN** 已观察检查器、构建根、来源摘要或诊断超过公开配置反馈上限，或必要目录无法观察
+- **THEN** 返回有界明细和完整观察计数；截断/范围阻塞标记静态观察 incomplete，终端给出来源与下一步，不能用被截断的配置列表证明覆盖完整
+
+#### Scenario: Duplicate legacy fields attempt to hide weakened configuration
+- **WHEN** 旧 codeguard.json 在根或嵌套对象重复 exclude、java.commands 等键
+- **THEN** 配置观察拒绝该 JSON，不使用最后一个键掩盖先前排除或命令；本地配置始终不能自行取得门禁权威
+
 ### Requirement: Rulepacks and toolchains SHALL be versioned and locked
 
 rulepack MUST 有版本、规则来源/许可、稳定规则映射、内容摘要及工具兼容范围。检查 MUST 验证工具/运行时/配置/规则锁；扫描 MUST NOT 隐式安装、升级或改写项目配置。安装 MUST 是单独显式动作，离线检查 MUST 不联网。

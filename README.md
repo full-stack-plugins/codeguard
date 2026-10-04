@@ -201,6 +201,8 @@ Supply the original checker's required tool/configuration options to `task verif
 | `rules whitelist list / explain / propose` | Inspect/propose false-positive dispositions and corrections | No public approval or activation |
 | `gate pre-commit` | Git-index path/object observation and narrow OpenSSH Ed25519 key detection | Incomplete preview; not a full content/security gate |
 
+Current source `config validate/explain` returns version 0.3 static native configuration observations per build root, including source hashes, unresolved conditions and preparation steps. It never runs JS configuration or native checkers; effective rules and suppressions remain unresolved. See [configuration acceptance](tests/acceptance/config-native-observation.md). This extension is not included in public npm 0.1.4.
+
 For Python edit feedback, run `codeguard lint python . --file src/changed.py --format json`. `--file` is repeatable with a limit of eight distinct paths, 512 bytes per path and 2 KiB combined. The response declares `scan_scope=selected_files` and observes only those files; it is not imported as a full workspace scan and cannot approve delivery. Without `--file`, the existing command still scans discovered Python files and synchronizes its local report.
 
 Generic `dependencies`, generic `security`, arbitrary category/language combinations, `fix`, `gate pre-push`, `gate ci`, `mcp serve`, and the legacy compatibility dispatcher are target-design surfaces, not available commands in this baseline.

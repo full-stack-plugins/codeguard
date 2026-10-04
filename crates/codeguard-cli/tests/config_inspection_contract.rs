@@ -49,7 +49,7 @@ fn legacy_exclusion_and_commands_are_observed_but_never_authorized() {
     let (exit, report) = project.inspect("validate");
     assert_eq!(exit, 3);
     assert_eq!(report["report_type"], "config_inspection");
-    assert_eq!(report["schema_version"], "0.2.0");
+    assert_eq!(report["schema_version"], "0.3.0");
     assert!(
         report["request_id"]
             .as_str()

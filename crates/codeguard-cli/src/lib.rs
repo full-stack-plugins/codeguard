@@ -104,6 +104,7 @@ mod checkstyle_workbench;
 #[cfg(unix)]
 pub mod claude_hook_command;
 pub mod config_command;
+mod config_project_observation;
 pub mod conversation_feedback;
 pub mod corpus;
 pub mod discovery;

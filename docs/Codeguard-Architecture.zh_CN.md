@@ -13,6 +13,8 @@
 
 Erlang 源码局部入口现通过 `lint erlang FILE --erl-tool ABS_PATH` 原生优先选择：固定 OTP 28 扫描/解析调用读取 stdin 字节，使用非项目 cwd 并禁止项目启动文件。原生诊断优先，预处理与宏覆盖保持未知；未提供显式工具时，`lint erlang` 从 PATH 的绝对目录定位一次工具，并在 0.2 报告中记录规范路径；仅未找到可执行工具时进入固定 WASM 候选，已选择工具的失败保持未完成。局部结果不授予任务关闭、项目完整 lint 或发行验收；见[验收](../tests/acceptance/erlang-native-first.md)。
 
+源码配置入口现通过有界投影复用发现服务，不再仅查看旧配置文件。`config validate/explain` 0.3 将检查器声明状态及来源摘要与生效规则、抑制和批准分开；终端指出来源、原因及下一步。不执行检查器、不修改项目状态，截断保持未完成。见[证据及边界](../tests/acceptance/config-native-observation.md)。
+
 ## 1. 阅读契约与证据
 
 本文描述 Rust **Codeguard CLI 仓库**的架构，不是既有 Python 宿主插件的实现手册。读者包括适配器作者、CLI/runtime 维护者、智能体集成者和评审者。

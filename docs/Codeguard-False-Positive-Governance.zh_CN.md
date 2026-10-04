@@ -95,7 +95,7 @@ flowchart LR
 ## 申请、批准与复查
 
 1. `work sync` 将疑似误报保留为 finding，并创建“误报调查”任务；智能体收集最小复现、原生规则、目标身份和建议修订，不自行关闭问题。
-2. 目标 `codeguard rules whitelist propose <finding-id> [path] --format json` 在证据完整时只生成**候选**，不改变门禁。当前已实现 `rules whitelist list/explain --candidate FILE` 的显式文件只读查询，以及 `propose` 的本地观察预览：它只使用最新已同步报告中仍存在、且源码与配置内容一致的 finding；未同步、损坏或新扫描问题消失时不回退旧证据。调用者可加 `--ruff-tool /绝对路径/ruff`，预览会按当前普通文件字节复核报告里的工具摘要；不一致或工具不可读取时隐去旧观察并要求重新扫描。它不执行工具，也不证明工具获得批准。`explain` 可额外指定 `--observed-identity FILE` 解释两个未核验身份是否精确匹配。匹配成功也不能判断候选已批准、未过期或观察文件来自本轮原生检查，始终无门禁效果。现有 `config validate/explain` 仅静态观察旧项目配置和工具锁，固定 `authority=unverified`，不验证白名单批准、期限或本轮原生身份。后续须接入可信策略与完整配置差异；`propose` 的完整候选生成仍未实现。
+2. 目标 `codeguard rules whitelist propose <finding-id> [path] --format json` 在证据完整时只生成**候选**，不改变门禁。当前已实现 `rules whitelist list/explain --candidate FILE` 的显式文件只读查询，以及 `propose` 的本地观察预览：它只使用最新已同步报告中仍存在、且源码与配置内容一致的 finding；未同步、损坏或新扫描问题消失时不回退旧证据。调用者可加 `--ruff-tool /绝对路径/ruff`，预览会按当前普通文件字节复核报告里的工具摘要；不一致或工具不可读取时隐去旧观察并要求重新扫描。它不执行工具，也不证明工具获得批准。`explain` 可额外指定 `--observed-identity FILE` 解释两个未核验身份是否精确匹配。匹配成功也不能判断候选已批准、未过期或观察文件来自本轮原生检查，始终无门禁效果。现有 `config validate/explain` 0.3 静态观察旧配置、工具锁及逐构建根原生配置声明，生效规则和原生抑制仍未解析，固定 `authority=unverified`，不验证白名单批准、期限或本轮原生身份。后续须接入可信策略与完整配置差异；`propose` 的完整候选生成仍未实现。
 
 Ruff 局部报告现在只在确有原生 finding 且还有检查预算时记录本次 CodeGuard 可执行制品的 SHA-256 作为**适配器观察摘要**；无摘要时仍报告具体缺口。候选入口读取已同步报告后再次哈希当前二进制，若发生变化，即使本地报告和同步标记被一起改写也拒绝沿用旧观察。这补齐一个可核对字段，不代表二进制发行来源、rulepack 或误报裁定已获独立批准；`candidate` 仍为 `null`，门禁不变。
 

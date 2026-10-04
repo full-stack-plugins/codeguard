@@ -31,6 +31,8 @@
 
 仅当前源码支持的 Erlang 入口：`codeguard lint erlang FILE [--erl-tool ABS_PATH] [--timeout DURATION] [--format human|json]`。支持普通 `.erl`/`.hrl` 文件；OTP 28 原生扫描/解析优先于可选 WASM；显式工具优先，否则从 PATH 绝对目录选择首个普通可执行 `erl`。所选工具的版本或执行失败不改变选择。原生故障及宏/预处理缺口保持未完成；整体退出 3，取消 130。报告使用[erlang_lint_feedback 0.2.0](../schemas/erlang-lint-feedback-v0.2.schema.json)，[验收](../tests/acceptance/erlang-native-first.md)明确区分当前源码与未包含本轮命令的公开 0.1.4 包。
 
+当前源码：`codeguard config validate|explain [path] [--policy-candidate FILE] --format json` 返回 `config_inspection` 0.3，按构建根静态观察原生配置，保留 `configuration_ref`、`reason`、`next_action` 及来源摘要。Maven P3C 须明确制品/规则集/错误处理声明，动态 ESLint 保持 unknown；终端最多展示 12 行检查器的来源及动作。两命令只读、退出 3，`effective_rules/suppressions=unresolved`、`native_execution=not_run`、`effective_policy=null`、`quality_decision=not_evaluated`。见[实际报告与边界](../tests/acceptance/config-native-observation.md)，公开 npm 0.1.4 尚不包含此扩展。
+
 ## 1. 命令体系与协作路线
 
 ```mermaid

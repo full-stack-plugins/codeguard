@@ -4,6 +4,8 @@
 
 [简体中文](Codeguard-False-Positive-Governance.zh_CN.md) · [Documentation](README.md) · [Architecture](Codeguard-Architecture.md) · [Technical design](Codeguard-Technical-Design.md)
 
+Current `config validate/explain` 0.3 observes native declarations and source hashes alongside legacy configuration and tool locks. Effective rules and suppressions stay unresolved; no project configuration is executed and no exception receives authority. See [configuration acceptance](../tests/acceptance/config-native-observation.md).
+
 ## 1. Classify before proposing an exception
 
 | Root cause | Correct remedy | Gate meaning |

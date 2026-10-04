@@ -76,3 +76,14 @@ RW21 与 verdict-integrity 的双维结果要求现覆盖原生有效诊断后�
 
 
 本批最终默认 workspace/all-targets 214 组、1193 passed/0 failed/109 ignored，完整目标 WASM Clippy -D warnings 退出0；真实 OTP/Zig 各1 passed，相关特性47 passed/5 ignored。完整命令、日志摘要、原生首次 grammar=null 的实际收据和边界见本批生命周期验收。该证据未完成默认宿主可信策略接线、全语言精度或发布，父任务继续开放。
+
+
+## 2026-10-04 原生配置观察与修复指引
+
+config validate/explain 0.3 已接通有界原生静态观察，保留来源摘要、状态、原因和下一步；生效规则、suppression 及受保护批准仍未解析。重复旧 JSON 键拒绝、有界读取、截断/范围阻塞不完整已验证。首轮 6 项 RED 后发现正例缺错误处理声明，修正夹具并保持未知反例；终端来源动作另先 RED 后补。目标 5 组 58 passed，非全生态验收。
+
+默认 workspace 回归已终态退出 0：214 组、1199 passed/0 failed/109 ignored；109 条件项未执行，不算原生或平台验收。全工作区 all-targets、wasm-precheck Clippy -D warnings 通过；fmt、分层、OpenSpec strict、665 条本轮修改文档本地链接通过。201 份 schema 元定义、实际 0.3 原始输出、六组计数一致性及 12 类伪造/矛盾反例通过；旧 0.2 schema 与 HEAD 字节一致，历史 0.2 结构仍可验证。实际默认二进制的 human 来源/动作和 explain/范围阻塞 validate JSON 也已核验，前后项目文件字节一致。
+
+没有更换 grammar、安装工具或改插件锁；原有 Erlang 37 例 RED 草稿保持未提交。当前扩展仍非完整规则/suppression/批准来源解析，父任务及总体目标继续未完成。远端 CI 按新提交另行核验，不使用旧提交证明当前批次。
+
+详细事实及日志身份见[配置验收](../../../tests/acceptance/config-native-observation.md)。4.1/4.2/4.7/5.10 保持开放，同一 OpenSpec change 延续；当前新增场景覆盖配置声明、不执行动态配置、输出预算及重复旧键。

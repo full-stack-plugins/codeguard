@@ -201,6 +201,8 @@ codeguard task verify "$TASK_ID" . --format json
 | `rules whitelist list / explain / propose` | 查询或提出误报处置与纠错 | 无公开批准或生效入口 |
 | `gate pre-commit` | Git index 路径、对象及未加密 OpenSSH Ed25519 私钥局部观察 | 仍是不完整预览，尚非完整内容或安全门禁 |
 
+当前源码的 `config validate/explain` 以 0.3 协议按构建根返回原生配置静态观察，包含来源摘要、未解析条件和准备动作。不执行 JS 配置或原生工具；生效规则及抑制仍未解析。见[配置验收记录](tests/acceptance/config-native-observation.md)。公开 npm 0.1.4 尚不包含此扩展。
+
 Python 编辑快反馈可执行 `codeguard lint python . --file src/changed.py --format json`；`--file` 可重复，最多 8 个不同路径，单路径 512 字节、总计 2 KiB。报告标明 `scan_scope=selected_files`，只观察选中文件；局部反馈不导入完整工作台，也不代表全项目或交付通过。原有不带 `--file` 的命令仍扫描发现到的 Python 文件并同步局部报告。
 
 通用 `dependencies`、通用 `security`、任意类别/语言组合、`fix`、`gate pre-push`、`gate ci`、`mcp serve` 和旧协议兼容调度均属目标设计，在本基线中不能作为已实现命令调用。

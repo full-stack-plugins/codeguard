@@ -10,6 +10,8 @@
 
 源码构建已把 ESLint 接入 `check all` 的 `node.lint` 任务图节点，与其它原生检查共用并发与截止时间。按发现的 JS/TS/TSX 文件选择最近的模块清单、本地 ESLint 10、唯一 flat config 和 Node；搜索不越过受检根。检查阶段收集报告，汇总阶段串行同步工作台，重复发现复用同一任务。每个完整且字节匹配的原生文件可免去重复 WASM；被忽略、配置错误或工具失败的文件仍保留降级与原生原因。协议为未绑定检查 `check_feedback` 0.36.0 / 已初始化原生任务检查 0.37.0、`check_aborted` 0.13.0，原协议归档；`native_results.node_lint` 提供逐文件反馈、未执行文件、同步结果及下一步。见[验收范围](../tests/acceptance/check-all-eslint.md)。这不提升 grammar 资质或代替真实宿主验收。
 
+当前 `config_inspection` [0.3 schema](../schemas/config-inspection-v0.3.schema.json) 增加 `project_configuration`：静态发现依据、逐构建根检查器状态、来源 SHA-256、范围阻塞和未解析条件。投影上限为 64 个构建根、256 行检查器、每个摘要表 256 项、每个诊断列表 32 项，保留实际观察总数；截断不得标记观察完整。旧 0.2 schema 保持原字节。旧 JSON 递归拒绝重复键，并由 runtime 有界普通文件读取。生效规则/抑制仍未解析，本命令不执行配置。见[验收](../tests/acceptance/config-native-observation.md)。
+
 ## 1. 范围与规格归属
 
 既有 [OpenSpec 规范与任务](../openspec/changes/introduce-rust-codeguard-cli/proposal.md) 已整体迁入本 Rust 仓，是唯一规格与任务事实源。已实现切片和剩余工作分别记录，本文不维护第二份可独立勾选的任务。

@@ -13,6 +13,8 @@ The source build wires ESLint into the `node.lint` task in `check all`, sharing 
 
 The source-built Erlang slice now applies native-first selection through `lint erlang FILE --erl-tool ABS_PATH`: fixed OTP 28 scanner/parser calls operate on stdin bytes, with a non-project cwd and project startup disabled. Native diagnostics take precedence; preprocessing/macro coverage remains unresolved. Without an explicit tool, `lint erlang` searches absolute PATH directories once and records the selected canonical executable in 0.2 feedback. Only absence of an executable enables the pinned WASM candidate; a selected tool failure remains unresolved. No task closure, complete project lint or release qualification follows from this local result; see [acceptance](../tests/acceptance/erlang-native-first.md).
 
+The source configuration entry now reuses the discovery service through a bounded projection instead of inspecting only legacy files. `config validate/explain` 0.3 keeps checker declaration states and source hashes separate from effective rules, suppressions and approval. Human feedback identifies the source, reason and next action. This does not execute a checker or change project state; truncation remains incomplete. [Evidence and limits](../tests/acceptance/config-native-observation.md).
+
 ## 1. Reading contract and evidence
 
 This is the architecture of the Rust **Codeguard CLI repository**, not the implementation manual for the existing Python host plugin. It addresses adapter authors, CLI/runtime maintainers, agent integrators, and reviewers.

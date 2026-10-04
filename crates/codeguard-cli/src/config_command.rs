@@ -45,6 +45,36 @@ pub fn run(args: &[String]) -> ExitCode {
             "质量策略：{}；本地排除、命令和白名单引用不能自行放行。",
             report["quality_policy"]["status"]
         );
+        println!("原生配置为静态观察；生效规则与抑制未解析，工具未执行。");
+        let project = &report["project_configuration"];
+        println!(
+            "构建根：{}；检查器配置：{}；观察状态：{}",
+            project["build_root_count"], project["checker_count"], project["observation_status"]
+        );
+        for row in project["checker_configurations"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .take(12)
+        {
+            // JSON 字符串显示会转义路径中的控制字符，不让项目名称改变终端结构。
+            println!(
+                "配置观察：{} / {} / {}",
+                row["build_root"], row["checker_id"], row["configuration"]
+            );
+            println!(
+                "  来源：{}；原因：{}",
+                row["configuration_ref"], row["reason"]
+            );
+            println!("  下一步：{}", row["next_action"]);
+        }
+        if project["checker_count"].as_u64().unwrap_or(0) > 12 || project["truncated"] == true {
+            println!("配置摘要已截断；JSON 保留有界明细和完整观察计数，不能据此认定覆盖完整。");
+        }
+        println!(
+            "观察阻塞：{}；未解析条件：{}",
+            project["blocked_path_count"], project["unknown_condition_count"]
+        );
         for diagnostic in report["diagnostics"].as_array().into_iter().flatten() {
             println!("待处理：{}", diagnostic.as_str().unwrap_or("unknown"));
         }
@@ -209,7 +239,7 @@ fn inspect(args: &Args) -> Value {
         vec!["approved_quality_policy_unbound"]
     };
     json!({
-        "schema_version":"0.2.0",
+        "schema_version":"0.3.0",
         "report_type":"config_inspection",
         "operation":args.operation,
         "request_id":request_id,
@@ -219,6 +249,7 @@ fn inspect(args: &Args) -> Value {
         "authority":"unverified",
         "gate_effect":"none",
         "quality_decision":"not_evaluated",
+        "project_configuration":crate::config_project_observation::observe(&args.root),
         "legacy_config":legacy_config,
         "tool_lock":tool_lock,
         "quality_policy":quality_policy,
@@ -226,7 +257,7 @@ fn inspect(args: &Args) -> Value {
         "effective_policy":null,
         "diagnostics":diagnostics,
         "warnings":warnings,
-        "next_actions":["migrate_legacy_configuration_explicitly","bind_protected_quality_policy_and_tool_lock","review_exact_whitelist_candidates_outside_project_writable_state"]
+        "next_actions":["review_static_native_configuration_sources","resolve_effective_native_rules_and_suppressions_with_original_tools","migrate_legacy_configuration_explicitly","bind_protected_quality_policy_and_tool_lock","review_exact_whitelist_candidates_outside_project_writable_state"]
     })
 }
 
@@ -239,11 +270,14 @@ fn read_local_file(path: &Path) -> Result<Option<Vec<u8>>, &'static str> {
     if !metadata.file_type().is_file() || metadata.len() > MAX_CONFIG_BYTES {
         return Err("config_not_bounded_regular_file");
     }
-    fs::read(path).map(Some).map_err(|_| "config_read_failed")
+    codeguard_runtime::read_bounded_regular_file(path, MAX_CONFIG_BYTES)
+        .map(Some)
+        .map_err(|_| "config_read_failed")
 }
 
 fn inspect_legacy_config(bytes: &[u8]) -> Result<Value, &'static str> {
-    let value: Value = serde_json::from_slice(bytes).map_err(|_| "legacy_config_invalid_json")?;
+    let value =
+        codeguard_adapters::parse_unique_json(bytes).map_err(|_| "legacy_config_invalid_json")?;
     let root = value.as_object().ok_or("legacy_config_not_object")?;
     for key in root.keys() {
         if !["extensions", "exclude", "gate_scope", "java"].contains(&key.as_str()) {
