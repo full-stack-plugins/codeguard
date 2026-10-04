@@ -79,6 +79,9 @@ impl Project {
         if let Some(tool) = tool {
             c.arg("--zig-tool").arg(tool);
         }
+        if tool.is_none() {
+            c.env("PATH", "");
+        }
         let o = c.output().unwrap();
         (
             o.status.code().unwrap(),
@@ -220,7 +223,7 @@ fn missing_tool_still_records_a_failed_native_confirmation_observation() {
     assert_eq!(r["observation"], "incomplete");
     assert_eq!(
         r["native_scan"]["native"]["reason"],
-        "explicit_zig_tool_not_provided"
+        "zig_tool_not_found_on_path"
     );
 }
 
@@ -424,8 +427,84 @@ fn real_native_zig_rechecks_broken_then_repaired_source() {
         bad["native_scan"]["native"]["status"],
         "diagnostics_observed"
     );
+    let bin = p.0.join("bin");
+    fs::create_dir(&bin).unwrap();
+    std::os::unix::fs::symlink(&zig, bin.join("zig")).unwrap();
+    let path_verify = || {
+        let o = p
+            .command()
+            .args(["task", "verify", &id])
+            .arg(&p.0)
+            .args(["--format=json", "--timeout", "30s"])
+            .env("PATH", &bin)
+            .output()
+            .unwrap();
+        assert_eq!(
+            o.status.code(),
+            Some(3),
+            "{}",
+            String::from_utf8_lossy(&o.stderr)
+        );
+        serde_json::from_slice::<Value>(&o.stdout).unwrap()
+    };
+    let path_bad = path_verify();
+    assert_eq!(
+        path_bad["native_scan"]["native"]["status"],
+        "diagnostics_observed"
+    );
+    assert_eq!(
+        path_bad["native_scan"]["tool_path"],
+        bad["native_scan"]["tool_path"]
+    );
     fs::write(p.0.join("app.zig"), "pub fn main() void {}\n").unwrap();
     let (_, good) = p.verify(&id, Some(&zig));
     assert_eq!(good["event_persisted"], true, "{good}");
     assert_eq!(good["observation"], "candidate_absent_unverified_policy");
+    let path_good = path_verify();
+    assert_eq!(
+        path_good["observation"],
+        "candidate_absent_unverified_policy"
+    );
+    assert_eq!(
+        path_good["native_scan"]["tool_path"],
+        good["native_scan"]["tool_path"]
+    );
+    let fact: Value = serde_json::from_slice(
+        &fs::read(p.0.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(fact["state"], "open");
+    if let Ok(path) = std::env::var("CODEGUARD_ZIG_TASK_DISCOVERY_REPORT") {
+        fs::write(path,serde_json::to_vec_pretty(&json!({"explicit_broken":bad,"path_broken":path_bad,"explicit_fixed":good,"path_fixed":path_good,"fact_state":fact["state"]})).unwrap()).unwrap();
+    }
+}
+
+#[test]
+fn installed_zig_from_invoking_path_rechecks_the_existing_task() {
+    let (p, id) = Project::new();
+    let tool = p.tool("while IFS= read -r line; do :; done\nprintf '<stdin>:1:13: error: expected token\\n' >&2\nexit 1");
+    let path_tool = p.0.join("zig");
+    fs::rename(tool, &path_tool).unwrap();
+    let o = p
+        .command()
+        .args(["task", "verify", &id])
+        .arg(&p.0)
+        .args(["--format=json", "--timeout", "30s"])
+        .env("PATH", &p.0)
+        .output()
+        .unwrap();
+    assert_eq!(
+        o.status.code(),
+        Some(3),
+        "{}",
+        String::from_utf8_lossy(&o.stderr)
+    );
+    let r: Value = serde_json::from_slice(&o.stdout).unwrap();
+    assert_eq!(r["event_persisted"], true, "{r}");
+    assert_eq!(
+        r["native_scan"]["native"]["status"], "diagnostics_observed",
+        "{r}"
+    );
+    assert_eq!(r["native_scan"]["tool_path"], serde_json::json!(path_tool));
+    assert_eq!(r["observation"], "still_blocked");
 }

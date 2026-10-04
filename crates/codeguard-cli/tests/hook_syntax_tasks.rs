@@ -128,12 +128,13 @@ fn recovery_tasks_are_stable_and_clean_candidates_cannot_close_them() {
         .args(["task", "verify", id])
         .arg(&p.0)
         .arg("--format=json")
+        .env("PATH", "")
         .output()
         .unwrap();
     assert_eq!(o.status.code(), Some(3));
     let verify: Value = serde_json::from_slice(&o.stdout).unwrap();
     assert_eq!(
-        verify["native_scan"]["native"]["reason"], "explicit_zig_tool_not_provided",
+        verify["native_scan"]["native"]["reason"], "zig_tool_not_found_on_path",
         "{verify}"
     );
 }

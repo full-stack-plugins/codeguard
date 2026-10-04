@@ -781,3 +781,8 @@ Rust 读取并复核有界源码字节，通过冻结 stdin、固定 `/` cwd、�
 `codeguard check <规范语言ID> . --format=json` 现在接受注册表全部57个ID。它按选择复用已接入的原生服务、共同预算及WASM回退；未接入的检查仍报告缺口。Java/all保持原报告协议，其他语言使用check_feedback 0.45、内部故障使用check_aborted 0.14。局部结果delivery_decision固定not_evaluated，空目标不算全项目通过。显式工具参数必须属于该语言；JavaScript/TypeScript共享npm构建根检查。未登记别名仍拒绝，不猜测语言。
 
 例如：`codeguard check python . --ruff-tool /absolute/path/to/ruff --format=json`。同一个混合项目中的Java/Maven和Rust/Cargo不会被此请求调度；原生检查缺失时，包含WASM能力的二进制只对选定语言运行候选初检。
+
+
+### Zig 工具发现与当前输入
+
+源码构建的 `lint zig FILE` 与 Zig 任务的 `task verify` 共用显式/PATH 选择：显式工具优先，否则取绝对PATH目录中第一个普通可执行zig；忽略空、相对目录和不可执行入口。选中工具失败不换到后面的编译器；未验收的补充WASM观察保留原生阻塞。单文件反馈0.2显示选择来源和source_current，源码或入口目标变化撤回旧原生位置；源码变化也撤回旧字节WASM。局部零诊断不关闭任务或放行项目，完整Zig lint/构建与聚合原生优先仍未完成。

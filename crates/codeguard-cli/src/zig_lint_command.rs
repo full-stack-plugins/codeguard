@@ -3,6 +3,7 @@
 use crate::plain_syntax_source::read_plain_source;
 #[cfg(feature = "wasm-precheck")]
 use crate::syntax_worker_runner::run_syntax_worker_candidate;
+use crate::zig_tool_selection::ZigToolSelection;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::path::{Path, PathBuf};
@@ -28,13 +29,16 @@ pub fn run(args: &[String]) -> ExitCode {
         }
     };
     let deadline = Instant::now() + Duration::from_secs(30);
+    let selection = ZigToolSelection::discover(args.zig_tool.clone());
+    let selected_target = selection.tool().and_then(|p| p.canonicalize().ok());
     let mut report = json!({
-        "schema_version":"0.1.0", "report_type":"zig_lint_feedback",
+        "schema_version":"0.2.0", "report_type":"zig_lint_feedback",
+        "tool_selection":selection.report(), "source_current":false,
         "operation":"lint", "language":"zig", "path":args.source,
         "status":"incomplete", "coverage_proven":false,
         "delivery_decision":"not_evaluated", "authority":"local_unverified",
         "source_sha256":null,
-        "native":{"status":"not_run","reason":"explicit_zig_tool_not_provided","version":null,"tool_sha256":null,"diagnostics":[]},
+        "native":{"status":"not_run","reason":"zig_tool_not_found_on_path","version":null,"tool_sha256":null,"diagnostics":[]},
         "syntax_precheck":null,
         "next_action":"提供适用的 Zig 0.16.0 原生工具并运行 ast-check；候选语法初检不能代替完整 lint、编译或测试"
     });
@@ -56,8 +60,32 @@ pub fn run(args: &[String]) -> ExitCode {
         }
     };
     report["source_sha256"] = json!(format!("{:x}", Sha256::digest(&source)));
-    if let Some(tool) = args.zig_tool.as_deref() {
-        if let Some(native) = observe_native(tool, &source, deadline) {
+    report["source_current"] = json!(true);
+    if let Some(tool) = selection.tool() {
+        if let Some(mut native) = selected_target
+            .as_deref()
+            .and_then(|frozen| observe_native(frozen, &source, deadline))
+        {
+            let source_current =
+                read_plain_source(&args.source).is_ok_and(|current| current == source);
+            report["source_current"] = json!(source_current);
+            let target_current = tool.canonicalize().ok() == selected_target;
+            if !source_current || !target_current {
+                native["status"] = json!("incomplete");
+                native["reason"] = json!(if !source_current {
+                    "zig_source_changed_during_check"
+                } else {
+                    "zig_tool_target_changed_during_check"
+                });
+                native["diagnostics"] = json!([]);
+                native["diagnostic_count"] = json!(0);
+                report["native"] = native;
+                report["next_action"] = json!(
+                    "当前源码或选定工具入口已变化；保留检查阻塞，核对输入和原工具后重新检查，不沿用旧位置修复"
+                );
+                emit(&report, args.json);
+                return ExitCode::from(3);
+            }
             let completed = matches!(
                 native["status"].as_str(),
                 Some("completed" | "diagnostics_observed")
@@ -125,6 +153,18 @@ pub fn run(args: &[String]) -> ExitCode {
         report["syntax_precheck"] =
             json!({"status":"incomplete","reason":"wasm_feature_not_built"});
     }
+    if read_plain_source(&args.source).is_ok_and(|current| current == source) {
+        report["source_current"] = json!(true);
+    } else {
+        report["source_current"] = json!(false);
+        report["native"]["status"] = json!("incomplete");
+        report["native"]["reason"] = json!("zig_source_changed_during_precheck");
+        report["native"]["diagnostics"] = json!([]);
+        report["native"]["diagnostic_count"] = json!(0);
+        report["syntax_precheck"] = Value::Null;
+        report["next_action"] =
+            json!("候选初检期间源码变化；重新读取当前源码和原工具，不沿用旧观察");
+    }
     emit(&report, args.json);
     ExitCode::from(3)
 }
@@ -155,6 +195,9 @@ fn parse_args(args: &[String]) -> Result<Args, &'static str> {
             _ => return Err("lint zig 参数无效"),
         }
         index += 1;
+    }
+    if zig_tool.as_ref().is_some_and(|path| !path.is_absolute()) {
+        return Err("--zig-tool 必须是绝对路径");
     }
     Ok(Args {
         source: source.ok_or("lint zig 缺少源码文件")?,

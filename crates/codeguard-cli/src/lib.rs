@@ -289,6 +289,8 @@ mod syntax_confirmation;
 mod syntax_task_recheck;
 #[cfg(unix)]
 mod zig_syntax_probe;
+#[cfg(unix)]
+mod zig_tool_selection;
 
 #[cfg(unix)]
 mod plain_syntax_source;

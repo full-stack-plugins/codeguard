@@ -536,3 +536,5 @@ Claude Code 2.1.273 已有会话内插件源码加载的实际证据，覆盖成
 `verify_kotlin_task_resolution` 复用共享宿主 SDK，以 kotlinc-jvm 2.4.10 对照原反例及当前源码；策略 1.3.0 / 证据 0.4.0 独立于其它语言，原生首次 grammar=null。原反例的 UTF-16 与 UTF-8 字节坐标须同时有效，源码已改变且原工具完整零诊断才追加 `code_fixed`。仅上下文诊断保留待验证；混合上下文未完成和已确认语法诊断时，保留原问题并支持普通 `task verify --kotlinc-tool` 重开同一父链，不因 `incomplete` 丢弃正向发现。签名来源由宿主独立固定；当前只绑定 launcher，不证明完整 JAR/JDK/项目构建身份。默认插件可信关闭、完整 lint/类型及发行仍未完成。详见[验收](tests/acceptance/kotlin-task-resolution-lifecycle.md)。
 
 当前开发源码支持 `check` 的全部57个规范语言ID，按选择复用已有原生适配器和WASM回退，不调度无关语言工具；缺适配器仍明确报告。新增局部反馈0.45与内部故障0.14独立版本化，Java/all保持历史兼容。公开npm0.1.4和插件锁尚未包含此增量。详见[语言选择验收](tests/acceptance/check-language-selection.md)。
+
+源码构建的Zig单文件lint和任务复检现在共用显式/PATH工具选择，0.2单文件反馈记录来源与当前源码，输入变化撤回旧位置；实际Zig0.16.0的显式/PATH正反例已复测。完整Zig聚合检查、lint/build、发行仍未完成，公开包未更新。见[验收](tests/acceptance/zig-native-discovery.md)。

@@ -26,6 +26,11 @@
 - **WHEN** `lint zig` 收到可核对的 Zig 0.16.0 工具与普通 `.zig` 文件
 - **THEN** 优先以受控进程运行原生 `zig ast-check`；原生诊断必须保留，不能因 WASM 观察覆盖。只有该原生工具未提供或不可运行时，才可返回未验收 WASM 候选观察，并始终保持整体未完成；`ast-check` 不等于全部 Zig lint、测试或构建。
 
+#### Scenario: Zig lint and task verification share invoking tool discovery
+- **WHEN** Zig lint or a recorded Zig confirmation task is invoked without an explicit tool
+- **THEN** select the first ordinary executable zig from absolute invoking PATH directories, ignoring empty/relative entries and non-executable candidates; explicit tools take precedence and a selected failure never switches to another compiler. Bind the selected tool and current source bytes to native observations, retain failure and candidate authority, and do not install tools
+- **AND** lint reports selection provenance in a separately versioned feedback; source changes or selected-entry target changes withdraw stale native coordinates, and changed source cannot retain an old-byte WASM observation. A read-only next query does not discover or execute a compiler
+
 #### Scenario: Explicit OTP 28 syntax parsing detects a missing form terminator
 - **WHEN** `lint erlang` 收到可核对的 OTP 28 `erl` 工具与普通 `.erl` 或 `.hrl` 文件
 - **THEN** 以固定参数和共同截止时间调用原生 `io:scan_erl_form` 与 `erl_parse:parse_form`，读取当前原字节、不展开预处理或执行项目编译插件；检查每项扫描/解析结果，不能把进程正常退出直接解释为零错误

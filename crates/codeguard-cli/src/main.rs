@@ -78,7 +78,7 @@ fn main() -> ExitCode {
             );
             #[cfg(all(feature = "wasm-precheck", unix))]
             println!(
-                "Zig 原生优先局部检查：lint zig FILE [--zig-tool ABS_PATH] [--format=json]；显式 Zig 0.16.0 使用 ast-check，未提供工具时使用未验收 WASM 候选；始终不签发完整 lint 或交付通过。"
+                "Zig 原生优先局部检查：lint zig FILE [--zig-tool ABS_PATH] [--format=json]；显式/PATH选择 Zig 0.16.0 使用 ast-check，缺工具时提供未验收 WASM 候选；0.2反馈显示选择来源和当前源码状态；始终不签发完整 lint 或交付通过。"
             );
             #[cfg(unix)]
             println!(

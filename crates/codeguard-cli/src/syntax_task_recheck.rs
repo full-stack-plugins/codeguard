@@ -7,7 +7,7 @@ use std::{
     time::{Instant, SystemTime, UNIX_EPOCH},
 };
 
-/// 在原工作区和已有任务范围内运行适用语法工具；Zig 使用显式入口，OTP 复用显式/PATH 选择和共同截止时间。
+/// 在原工作区和已有任务范围内运行适用语法工具；Zig 复用显式/PATH 选择，OTP 复用显式/PATH 选择和共同截止时间。
 /// 返回绑定当前字节的观察，缺工具/adapter 同样保留报告，便于记录失败尝试。
 pub(crate) fn run(
     root: &Path,
@@ -36,6 +36,12 @@ pub(crate) fn run(
         return Err("kotlinc_tool_does_not_match_confirmation_language");
     }
     // 只从调用方工具来源选择，不从可编辑历史报告执行旧路径；next 会绑定本轮实际工具。
+    let zig_selection = (language == "zig")
+        .then(|| crate::zig_tool_selection::ZigToolSelection::discover(zig.map(Path::to_path_buf)));
+    let selected_zig = zig_selection
+        .as_ref()
+        .and_then(|selection| selection.tool());
+    let zig_target = selected_zig.and_then(|p| p.canonicalize().ok());
     let erlang_selection = (language == "erlang").then(|| {
         crate::erlang_tool_selection::ErlangToolSelection::discover(erl.map(Path::to_path_buf))
     });
@@ -54,12 +60,14 @@ pub(crate) fn run(
     let source = source_bytes(root, path);
     let native = if let Some(bytes) = source.as_ref() {
         if language == "zig" {
-            zig.and_then(|tool| crate::zig_syntax_probe::observe(tool, bytes, root, deadline))
+            zig_target
+                .as_deref()
+                .and_then(|tool| crate::zig_syntax_probe::observe(tool, bytes, root, deadline))
                 .unwrap_or_else(|| {
-                    unavailable(if zig.is_some() {
+                    unavailable(if selected_zig.is_some() {
                         "zig_tool_unavailable_or_untrusted"
                     } else {
-                        "explicit_zig_tool_not_provided"
+                        "zig_tool_not_found_on_path"
                     })
                 })
         } else if language == "erlang" {
@@ -91,11 +99,18 @@ pub(crate) fn run(
     } else {
         native
     };
+    if language == "zig" && selected_zig.and_then(|p| p.canonicalize().ok()) != zig_target {
+        native["status"] = json!("incomplete");
+        native["reason"] = json!("zig_tool_target_changed_during_check");
+        native["diagnostics"] = json!([]);
+        native["diagnostic_count"] = json!(0);
+    }
     if language == "erlang" && native["status"] == "not_run" {
         native["diagnostics_truncated"] = json!(false);
         native["preprocessing_unresolved"] = json!(false);
     }
-    let tool_path = zig
+    let tool_path = zig_target
+        .as_deref()
         .or(selected_erl)
         .or(selected_swift)
         .or(selected_kotlinc)

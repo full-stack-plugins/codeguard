@@ -280,3 +280,8 @@ A protected host can call `verify_swift_task_resolution` to compare the original
 `codeguard check <canonical-language-id> . --format=json` accepts all 57 IDs in the registry. It scopes existing native services, shared budgets and WASM fallback to the selection; missing adapters remain explicit gaps. Java/all retain their existing report versions. Other languages use check_feedback 0.45 and check_aborted 0.14 for internal failures, with delivery_decision=not_evaluated. An empty target cannot certify the project. Explicit tools must belong to the selected ecosystem; JavaScript/TypeScript share npm root checks. Unregistered aliases are rejected.
 
 For example, `codeguard check python . --ruff-tool /absolute/path/to/ruff --format=json` does not schedule Java/Maven or Rust/Cargo in a mixed project. With native checks unavailable, a WASM-enabled binary observes only selected-language candidates.
+
+
+### Zig tool discovery and current inputs
+
+Development-source `lint zig FILE` and Zig `task verify` share explicit/PATH selection. An explicit tool takes precedence; otherwise, the first ordinary executable zig in an absolute PATH directory is selected. Empty/relative entries and non-executable files are ignored. A selected failure does not switch to a later compiler; supplemental unqualified WASM observations retain native blockers. Single-file feedback 0.2 exposes selection provenance and source_current. Changed source or entry targets withdraw stale native positions; changed source also withdraws old-byte WASM observations. Zero diagnostics cannot close a task or certify the project. Full Zig lint/build and aggregate native-first coverage remain incomplete.
