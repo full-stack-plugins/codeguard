@@ -224,3 +224,8 @@ The npm package SHALL provide `npx @partme.ai/codeguard` through a minimal Node 
 #### Scenario: An installed npm candidate carries repair feedback across commands
 - **WHEN** a local WASM candidate package is invoked offline through npm on an initialized workspace, an edit produces a syntax confirmation task, and the same task is rechecked through its explicit native tool
 - **THEN** the installed launcher preserves host stdin, stable task identity, evidence and exit status across hook/next/task verify; repeated edits update the same task, native diagnostics guide repair, changed inputs invalidate old positions, and zero native diagnostics without a protected policy retain an open task and unevaluated delivery
+
+#### Scenario: Installed native-first diagnostics do not require a preceding WASM task
+- **WHEN** an installed candidate observes an Erlang source file through its explicitly selected OTP 28 tool in an initialized workspace, with no earlier candidate parsing task
+- **THEN** lint and aggregate checking preserve the same actual task and native evidence; next and original-tool verification refer to saved reports without inventing a grammar identity, changed source withdraws old positions, and repair_ready forwards the current native result through the launcher stdin
+- **AND** persistence failure retains native diagnostics with a null task reference and a concrete synchronization reason; controlled protocol fixtures and explicitly executed real OTP acceptance remain separate evidence

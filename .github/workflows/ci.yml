@@ -63,6 +63,9 @@ jobs:
           # 独占打包输出与 npm 缓存，不与上面的全量 grammar 包测试并发。
           CODEGUARD_WASM_BIN="$PWD/target/debug/codeguard" \
           node --test tests/npm_pack_repair.test.mjs
+          # 安装后的原生首次发现不依赖 WASM 任务；真实 OTP 目标须显式选择。
+          CODEGUARD_WASM_BIN="$PWD/target/debug/codeguard" \
+          node --test tests/npm_pack_erlang_repair.test.mjs
 
       - name: Run test suite
         run: cargo test --workspace --all-targets

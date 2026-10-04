@@ -177,4 +177,4 @@ These are complete native-first and `next` outputs from a local OTP 28 run. Path
 }
 ```
 
-Public npm 0.1.4 does not include this batch. Installed-host display and plugin release require separate acceptance. See [batch acceptance](../tests/acceptance/erlang-native-first-workbench.md).
+Public npm 0.1.4 does not include this batch. A private source-built package passed offline installation in an isolated cache and native-first lint/check/next/task verify/repair_ready flows. Controlled protocol and real OTP 28 runs remain separate; 26 actual reports passed their schemas. A clean recheck without trusted policy keeps the task open; persistence failure retains diagnostics without inventing a task. This does not upgrade the public version. Installed-host display and plugin release require separate acceptance. See [native workflow acceptance](../tests/acceptance/erlang-native-first-workbench.md) and [installed-package acceptance](../tests/acceptance/npm-erlang-native-repair.md).

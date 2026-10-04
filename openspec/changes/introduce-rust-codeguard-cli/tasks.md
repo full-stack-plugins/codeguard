@@ -1203,3 +1203,7 @@ Swift 差分纠正先以状态断言暴露旧清单文案的红测，再按真�
 8.134 / 9.4 / 9.10 / 14.10–14.11：已初始化 `check all` 与最近工作台的 `lint erlang FILE` 直接持久当前原生诊断或环境/预处理阻塞，首次报告不伪造 WASM。重复扫描和历史 WASM 来源共享一个文件/语言任务；每批工作台同步一次。next 比较已消费扫描/复检证据，源码/工具变化撤回位置；repair_ready 原工具复检返回真实保存引用。初次零诊断不建待办，已有任务零诊断不自闭，保存失败保留诊断和具体原因。
 
 原始任务缺失、缺工具任务缺失、单文件接线各有 RED→GREEN，严格导入 10 个反例、特性工作台 11 passed / 1 ignored 和显式真实 OTP 1 passed；197 schema、11 实际输出与16伪造协议拒绝、190 历史 schema 字节一致。见[验收](../../../tests/acceptance/erlang-native-first-workbench.md)。完整项目原生检查、可信关闭/复发、全语言、实际宿主与发行仍缺；父任务不勾选。37例 Erlang grammar RED 草稿和公开 npm/插件状态保持。
+
+## 2026-10-04 npm 安装后的原生修复链路验收
+
+8.134 / 11.17 / 13.4 / 14.18：通过私有包的离线 npm 安装，原生首次 lint、聚合检查、next、原工具复检及 repair_ready 保持同一任务/真实引用；当前证据指导修复，陈旧位置撤回，零诊断无可信策略仍 open，保存失败不伪造 ID。受控协议与显式真实 OTP 两组各实际运行，Node runner3 passed（含1父测试）；未选择真实工具路径2 passed/1 skipped，未将跳过当验收。26份实际报告与14伪造反例通过 schema 校验，旧0.1.4程序实际拒绝 Erlang lint，不能声称公开已支持。见[安装后验收](../../../tests/acceptance/npm-erlang-native-repair.md)。CI新增同一目标，源码Rust不变、公开npm/插件锁不变；完整父任务继续开放。

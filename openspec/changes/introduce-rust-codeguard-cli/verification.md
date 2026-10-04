@@ -2282,3 +2282,7 @@ Rust 开发入口复用现有隔离 worker 和 Core 统计，启动前核对清�
 本批最终默认全工作区 212 组、1172 passed / 0 failed / 109 ignored，退出0；日志摘要和模板审查的实际RED见本批验收。源码新提交CI和完整产品验收仍独立核验，不凭本地默认全量认定已知WASM语法缺陷解决。
 
 模板修正后的最终相关特性目标51 passed / 0 failed / 4 ignored，两个显式真实OTP目标分别各1 passed，workspace/all-targets/WASM Clippy -D warnings退出0；完整命令与日志摘要见本批验收。现有纯准备策略仅允许非空、完整、合格的clean降为推荐；未验收grammar的零恢复仍未完成。未关闭父任务，未提升语言资格，未更改公开发行制品。
+
+## 2026-10-04 npm 安装后原生首次修复链路
+
+旧公开0.1.4相同摘要程序经过真实私有打包/离线安装，在新Erlang入口退出2，作为发行能力差异RED。当前源码同一安装路径的受控协议和真实OTP28两组通过（runner3 passed，含1父测试），覆盖首次原生任务、同一聚合身份、next实际证据、源码变化、零诊断保持open、再次发现、repair_ready stdin和保存失败。未指定真实工具的CI路径2 passed/1 skipped，真实验收不偷换为夹具。26实际报告通过schema，14伪造/矛盾变体拒绝；初次测试缓存范围污染修正为项目外缓存，不当产品缺陷。完整命令/日志与未完成范围见[安装后验收](../../../tests/acceptance/npm-erlang-native-repair.md)。本批不改Rust产品实现和公开制品，Linux新目标须按对应提交单独核验，完整目标保持开放。

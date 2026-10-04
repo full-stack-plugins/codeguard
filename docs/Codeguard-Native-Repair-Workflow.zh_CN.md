@@ -177,4 +177,4 @@ codeguard task verify TASK_ID . --erl-tool /absolute/path/to/erl --format=json
 }
 ```
 
-公开 npm 0.1.4 不含本批实现。实际宿主自动显示与插件发布仍需独立验收。见[本批验收](../tests/acceptance/erlang-native-first-workbench.md)。
+公开 npm 0.1.4 不含本批实现。当前源码的私有包已通过隔离缓存离线安装后的原生首次 lint/check/next/task verify/repair_ready：受控协议与真实 OTP 28 两组分开运行，26 份实际报告经 schema 校验。修复后没有可信策略仍保留 open，持久化失败保留位置且不伪造任务。该证据不代表公开版本已升级；实际宿主自动显示与插件发布仍需独立验收。见[原生链路验收](../tests/acceptance/erlang-native-first-workbench.md)和[安装后验收](../tests/acceptance/npm-erlang-native-repair.md)。
