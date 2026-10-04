@@ -37,4 +37,27 @@ class NativeDifferential(unittest.TestCase):
         changed=self.report();row=next(r for r in changed['cases'] if r['native_classification']!='unknown');row['native_identity_current']=False
         self.assertFalse(validator('native-grammar-differential-v0.1.schema.json').is_valid(changed))
 
+    def test_python_actual_syntax_only_protocol_and_rejections(self):
+        report=json.loads((ROOT/'tests/acceptance/evidence/python-native-grammar-differential-2026-10-05.json').read_text())
+        schema=validator('native-grammar-differential-v0.2.schema.json')
+        schema.validate(report)
+        self.assertFalse(validator('native-grammar-differential-v0.1.schema.json').is_valid(report))
+        self.assertEqual(report['sample_count'],18)
+        self.assertEqual(report['language_count'],32)
+        for row in report['cases']:
+            self.assertEqual(row['language'],'python')
+            self.assertEqual(row['native']['target_version'],'py312')
+            self.assertFalse(row['fixture_native_disagreement'])
+        for case_id in ['python-unused_import','python-unresolved_name']:
+            row=next(r for r in report['cases'] if r['id']==case_id)
+            self.assertEqual(row['native_classification'],'valid')
+        row=next(r for r in report['cases'] if r['id']=='python-noqa_cannot_hide')
+        self.assertEqual(row['native_classification'],'invalid')
+        changed=copy.deepcopy(report);changed['cases'][0]['language']='zig'
+        self.assertFalse(schema.is_valid(changed))
+        changed=copy.deepcopy(report);changed['cases'][0]['native']['status']='incomplete'
+        self.assertFalse(schema.is_valid(changed))
+        changed=copy.deepcopy(report);row=next(r for r in changed['cases'] if r['native']['diagnostics']);row['native']['diagnostics'][0]['rule_id']='F401'
+        self.assertFalse(schema.is_valid(changed))
+
 if __name__=='__main__':unittest.main()

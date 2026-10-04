@@ -1424,3 +1424,7 @@ Zig本批终态：受影响WASM八目标52通过/0失败/6条件忽略，Hook另
 开发入口复用原生适配器及已有worker，对显式选择语言提供原生/WASM共同可判定差分，全部32语言库存和未知保留；不冒充独立holdout、资格或交付授权。参数拒绝、预算/取消及制品变更撤回的受控反例见[验收](../../../tests/acceptance/native-grammar-differential.md)。32语言独立原生标签、语言/版本/性能/宿主/发行及已知grammar修复仍缺；12.11/14.17/14.19 不勾选。
 
 实际四工具78例已重跑并保存原始报告：73例双方可判定、5例unknown，Erlang10漏检仍存在；Kotlin混合上下文结果保留严格定位语法证据而执行incomplete。受影响两目标13通过/0失败/2忽略、实际协议2通过、261schema有效且260历史字节不变、双构建严格Clippy等检查见上述验收；没有声称独立holdout或完整workspace验收。
+
+### 2026-10-05 Python 隔离原生语法差分（父任务未完成）
+
+显式Ruff0.16.8 / py312固定stdin和隔离规则，只消费一致的invalid-syntax，不把F401等普通lint、上下文或工具故障当语法违规。新增开发checker不扩大可信关闭服务，0.2报告独立于历史0.1；32库存保留，18例真实回放发现empty_body/bad_indent两个WASM漏检，未修复且资格0。见[验收](../../../tests/acceptance/python-native-grammar-differential.md)；12.11/14.17/14.19及Python完整能力仍未完成。

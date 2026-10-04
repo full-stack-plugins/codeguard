@@ -51,6 +51,79 @@ fn invalid_or_empty_native_selection_is_rejected_before_processes() {
 }
 
 #[test]
+fn python_syntax_replay_uses_isolated_ruff_without_other_lint_or_project_config() {
+    use std::{fs, os::unix::fs::PermissionsExt, time::Duration};
+    let root = std::env::temp_dir()
+        .canonicalize()
+        .unwrap()
+        .join(format!("cg-python-differential-{}", std::process::id()));
+    fs::create_dir(&root).unwrap();
+    let tool = root.join("ruff");
+    fs::write(&tool, "#!/bin/sh\nif [ \"$1\" = --version ]; then printf 'ruff 0.16.8\\n'; exit 0; fi\n[ \"$*\" = 'check --isolated --no-cache --ignore-noqa --select E9 --target-version py312 --output-format json --stdin-filename codeguard_input.py -' ] || exit 2\ninput=$(/bin/cat)\ncase \"$input\" in 'x = 1'*) printf '[]\\n'; exit 0;; esac\nprintf '[{\"code\":\"invalid-syntax\",\"message\":\"expected token\",\"filename\":\"/codeguard_input.py\",\"severity\":\"error\",\"location\":{\"row\":1,\"column\":1}}]\\n'\nexit 1\n").unwrap();
+    fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
+    let report = replay_native_corpus(
+        &PathBuf::from(env!("CARGO_BIN_EXE_codeguard")),
+        include_bytes!("../../../tests/fixtures/grammar_regression_v0_2.json"),
+        &BTreeMap::from([("python".into(), tool.clone())]),
+        Instant::now() + Duration::from_secs(30),
+        &AtomicBool::new(false),
+    )
+    .expect("Python must have an explicit native syntax adapter");
+    assert_eq!(report["schema_version"], "0.2.0");
+    assert_eq!(report["language_count"], 32);
+    assert_eq!(report["sample_count"], 2);
+    assert_eq!(report["cases"][0]["comparison"], "true_negative");
+    assert_eq!(report["cases"][1]["comparison"], "true_positive");
+    assert_eq!(
+        report["cases"][1]["native"]["diagnostics"][0]["rule_id"],
+        "invalid-syntax"
+    );
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+#[ignore = "requires explicit installed Ruff 0.16.8 via CODEGUARD_RUFF_SYNTAX_BIN"]
+fn actual_python_syntax_corpus_keeps_non_syntax_lint_out_of_comparison() {
+    use std::{fs, time::Duration};
+    let tool =
+        PathBuf::from(std::env::var("CODEGUARD_RUFF_SYNTAX_BIN").expect("explicit Ruff tool"));
+    let mut corpus: serde_json::Value = serde_json::from_slice(include_bytes!(
+        "../../../tests/fixtures/grammar_regression_v0_2.json"
+    ))
+    .unwrap();
+    let additional: serde_json::Value = serde_json::from_slice(include_bytes!(
+        "../../../tests/fixtures/python_syntax_regression.json"
+    ))
+    .unwrap();
+    corpus["cases"]
+        .as_array_mut()
+        .unwrap()
+        .extend(additional["cases"].as_array().unwrap().iter().cloned());
+    let report = replay_native_corpus(
+        &PathBuf::from(env!("CARGO_BIN_EXE_codeguard")),
+        &serde_json::to_vec(&corpus).unwrap(),
+        &BTreeMap::from([("python".into(), tool)]),
+        Instant::now() + Duration::from_secs(180),
+        &AtomicBool::new(false),
+    )
+    .unwrap();
+    assert_eq!(report["schema_version"], "0.2.0");
+    assert_eq!(report["sample_count"], 18);
+    assert_eq!(report["program_stable"], true);
+    for case in report["cases"].as_array().unwrap() {
+        assert_eq!(case["native_identity_current"], true, "{case}");
+        assert_eq!(case["fixture_native_disagreement"], false, "{case}");
+        assert_ne!(case["native_classification"], "unknown", "{case}");
+    }
+    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+    fs::write(
+        root.join("tests/acceptance/evidence/python-native-grammar-differential-2026-10-05.json"),
+        serde_json::to_vec(&report).unwrap(),
+    )
+    .unwrap();
+}
+
+#[test]
 fn controlled_native_replay_retains_full_inventory_and_does_not_touch_workbench() {
     use sha2::{Digest, Sha256};
     use std::{fs, os::unix::fs::PermissionsExt, time::Duration};

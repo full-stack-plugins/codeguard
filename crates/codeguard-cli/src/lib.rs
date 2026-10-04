@@ -355,3 +355,8 @@ mod hook_native_tools;
 
 #[cfg(all(feature = "wasm-precheck", unix))]
 pub mod grammar_native_differential;
+
+#[cfg(all(feature = "wasm-precheck", unix))]
+mod grammar_native_checker;
+#[cfg(all(feature = "wasm-precheck", unix))]
+mod python_syntax_probe;

@@ -1,7 +1,7 @@
 //! 开发期原生/WASM 差分回放；复用原生适配器，不授予独立 holdout 或语言资格。
 use crate::grammar_evaluation::{classify_probe, validate_corpus};
+use crate::grammar_native_checker::GrammarNativeChecker;
 use crate::syntax_worker_runner::run_syntax_worker_candidate;
-use crate::task_resolution_checker::TaskResolutionChecker;
 use codeguard_runtime::read_bounded_regular_file;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
@@ -177,20 +177,14 @@ pub fn replay_native_corpus(
         }
     }
     Ok(
-        json!({"schema_version":"0.1.0","report_type":"native_grammar_differential","status":"incomplete","delivery_decision":"not_evaluated",
+        json!({"schema_version":if tools.contains_key("python") {"0.2.0"}else{"0.1.0"},"report_type":"native_grammar_differential","status":"incomplete","delivery_decision":"not_evaluated",
         "authority":"development_native_differential_only","native_adapter_reused":true,"independent_holdout":false,"grammar_qualified_count":0,
         "corpus_sha256":digest(corpus_bytes),"manifest_sha256":corpus.manifest_sha256,"program_sha256":program_sha,"program_stable":program_stable,
         "language_count":inventory.len(),"selected_language_count":frozen.len(),"sample_count":cases.len(),"languages":inventory,"cases":cases}),
     )
 }
-fn checker(language: &str) -> Option<TaskResolutionChecker> {
-    match language {
-        "zig" => Some(TaskResolutionChecker::Zig),
-        "erlang" => Some(TaskResolutionChecker::Erlang),
-        "swift" => Some(TaskResolutionChecker::Swift),
-        "kotlin" => Some(TaskResolutionChecker::Kotlin),
-        _ => None,
-    }
+fn checker(language: &str) -> Option<GrammarNativeChecker> {
+    GrammarNativeChecker::for_language(language)
 }
 fn digest(bytes: &[u8]) -> String {
     format!("{:x}", Sha256::digest(bytes))

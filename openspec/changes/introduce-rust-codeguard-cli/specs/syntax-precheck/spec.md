@@ -468,3 +468,7 @@ WASM fallback MUST 通过明确版本的协议加入既有统一命令，不静�
 #### Scenario: Explicit native grammar differential retains unknown and unselected coverage
 - **WHEN** the development evaluator compares frozen corpus bytes through explicitly installed native tools and the existing WASM worker
 - **THEN** reject invalid selections before process execution, retain all 32 languages in inventory, compare only jointly decidable syntax samples, keep context-only native blockers or hidden WASM recovery as unknown, preserve strictly located Kotlin syntax diagnostics even when mixed context blockers leave execution incomplete, withdraw classifications after tool/program identity changes, and do not promote reused-adapter regression evidence to independent holdout, grammar qualification or delivery permission
+
+#### Scenario: Python native grammar comparison excludes ordinary lint and project configuration
+- **WHEN** an explicit installed Ruff is used as the Python syntax observer in development native/WASM comparison
+- **THEN** freeze the tool/version and target dialect, feed the same source through isolated stdin with fixes/cache/project configuration and noqa suppression disabled, classify only consistent located `invalid-syntax` reports, retain other rules, wrong-source reports, tool failure or contradictory exit/JSON as incomplete, and do not extend trusted task-closing or project-delivery authority
