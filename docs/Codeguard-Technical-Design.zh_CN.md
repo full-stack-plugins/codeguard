@@ -40,6 +40,9 @@ WASM 的规范与 19 项实施任务已纳入既有 change；可选特性下的 
 | 持久化 | JSON 事实/事件及 Markdown 投影 | 本地状态可审查，事务和跨机器协作需专门实现 |
 | 智能体接入 | CLI human/JSON、部分 SARIF | 无模型依赖，宿主插件/MCP 接线独立推进 |
 
+当前源码固定 WASM 伴随依赖 `tree-sitter-language=0.1.7`；0.1.8 声明 Rust 1.90，与工作区基线冲突。新增按目标/特性绑定的锁定 metadata 回归，以及独立真实 Rust 1.85 CI job，分别执行静态与编译检查。无最低版本声明依赖、完整平台/MSRV 运行验收仍未解决，见[证据](../tests/acceptance/rust-msrv-dependency-compatibility.md)。
+
+
 精确依赖版本见 [Cargo.lock](../Cargo.lock)，依赖声明见四个 crate 清单。工作区当前没有公开 feature 选择矩阵、数据库服务、Web UI 或守护进程，这些模板模式不属于产品既定需求。
 
 ## 3. 命令职责契约

@@ -9,6 +9,16 @@ permissions:
   contents: read
 
 jobs:
+  msrv:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install the declared minimum Rust in this CI runner
+        run: rustup toolchain install 1.85.0 --profile minimal
+      - name: Check default and WASM targets with actual Rust 1.85
+        run: |
+          cargo +1.85.0 check --locked --workspace --all-targets
+          cargo +1.85.0 check --locked --workspace --all-targets --features wasm-precheck
   gate:
     # ubuntu-latest 预装稳定版 Rust；Cargo.toml 声明 rust-version = 1.85 / edition = 2024。
     runs-on: ubuntu-latest
@@ -38,6 +48,7 @@ jobs:
 
       - name: Verify Linux WASM worker resource boundary
         run: |
+          cargo test --locked -p codeguard-cli --features wasm-precheck --test workspace_msrv --test crate_boundaries
           cargo test -p codeguard-runtime --features wasm-precheck --test process_contract
           cargo test -p codeguard-runtime --features wasm-precheck --test wasm_grammar_load --test wasm_recovery_scan --test dart_upstream_corpus
           cargo test -p codeguard-cli --features wasm-precheck --test syntax_worker_candidate --test grammar_probe_cli --test grammar_route --test zig_lint_cli --test typescript_syntax_fallback_candidate --test java_syntax_fallback_candidate --test java_native_differential --test kotlin_native_differential --test erlang_native_differential --test erlang_lint_cli --test erlang_native_discovery --test check_all_erlang --test erlang_syntax_task_verify --test erlang_native_workbench --test swift_native_differential --test swift_syntax_task_verify --test check_all_eslint --test hook_execute_cli --test claude_hook_cli --test hook_syntax_tasks --test syntax_task_verify --test zig_native_cli --test task_resolution_service

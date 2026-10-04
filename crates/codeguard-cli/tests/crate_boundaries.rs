@@ -20,6 +20,7 @@ fn allowed(package: &str, dependency: &str, kind: &str) -> bool {
                             | "futures-util"
                             | "idna_adapter"
                             | "tree-sitter"
+                            | "tree-sitter-language"
                     ))
         }
         "codeguard-adapters" => {
@@ -145,6 +146,10 @@ fn forbidden_edges_stay_forbidden_under_alias_build_and_target_variants() {
         ("codeguard-adapters", "tree-sitter", "normal"),
         ("codeguard-cli", "tree-sitter", "normal"),
         ("codeguard-runtime", "tree-sitter", "dev"),
+        ("codeguard-core", "tree-sitter-language", "normal"),
+        ("codeguard-adapters", "tree-sitter-language", "normal"),
+        ("codeguard-cli", "tree-sitter-language", "normal"),
+        ("codeguard-runtime", "tree-sitter-language", "dev"),
         ("codeguard-cli", "ring", "normal"),
         ("codeguard-cli", "ring", "build"),
         ("codeguard-core", "ring", "normal"),

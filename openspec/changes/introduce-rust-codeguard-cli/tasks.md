@@ -1285,3 +1285,15 @@ Swift 差分纠正先以状态断言暴露旧清单文案的红测，再按真�
 最终默认220组1237 passed/0 failed/113 ignored；受影响WASM14组173 passed/0 failed/23 ignored，随后Swift上下文修正后最终library36 passed/0 failed/1 ignored、Swift目标8 passed/0 failed/0 ignored。默认/WASM Clippy、fmt、分层和OpenSpec strict通过；208 schema、50实际报告、150伪造变体和5开发协议测试通过。Linux旧提交安装验收的0.37陈旧断言已重现，精确更新0.38并增加不重复造WASM任务断言；同一固定程序私有离线安装的受控和真实OTP28目标runner3 passed，远端新提交独立核验。
 
 证据、历史失败与边界见[Swift验收](../../../tests/acceptance/swift-native-task-confirmation.md)。没有重跑358例全量语料或已知Erlang RED全套，grammar资格、公开包和插件锁未变，预先Erlang草稿保持。父任务及完整目标仍开放。
+
+## 2026-10-04 实际 Claude 缺运行时分支
+
+延续 11.2/11.4/11.17/14.19，插件源码 dec5f9d 在实际已安装 Claude Code 2.1.273 中会话内加载。首次隔离认证来源时退出 1，虽有两个真实 Hook 成功但不算对话验收；保留现有认证环境后退出 0，SessionStart/UserPromptSubmit/Stop 三事件自动返回有界未完成反馈，实际模型明确指出 runtime_unavailable、源码未检查、交付未评估。两次 tools=[]、项目/缓存均保持空，没有下载或原生检查。原始 stdout/stderr 摘要、固定插件输入及脱敏实际事件/回复归档于[宿主验收](../../../tests/acceptance/claude-host-missing-runtime.md)。这不是市场安装、成功/失败保存、完整修复循环或其他宿主验收，父任务保持开放。
+
+## 2026-10-04 Rust 最低版本传递依赖修复
+
+延续 1.2/11.1/12 的最低编译基线；新增回归在原锁发现 tree-sitter-language 0.1.8 要求 Rust 1.90，实际先失败。固定兼容的 0.1.7 并保持其它依赖和 grammar 字节，217 个活动节点的已声明最低版本回归转绿，45 个无声明节点不自批相容。CI 新增真实 1.85.0 的默认/WASM 全目标 locked check，本机未安装该工具链；远端与完整平台证据仍须继续核验。验收见[最低版本兼容](../../../tests/acceptance/rust-msrv-dependency-compatibility.md)，总体父任务保持开放。
+
+本批默认全目标 1238 passed/0 failed/113 ignored，后续最低版本 patch 边界及方向目标默认/WASM 各 9 passed；CLI WASM 定向 32 passed、runtime 18 passed，结果重叠不相加。更新依赖的全 32 grammar/358 例/35 来源组实际回放完成，707.51 秒；新原始报告通过 0.2 schema，仍保留 73/1/10/269 的分组混淆计数、3 unknown、2 pending、资格零。证据归入同一[最低版本验收](../../../tests/acceptance/rust-msrv-dependency-compatibility.md)，不能升级为完整语言、最低编译器或平台验收。
+
+本批最终默认/WASM Clippy、fmt、分层、OpenSpec strict、schema/实际报告及文档校验通过。Swift 提交 15a91a7 的远端 CI 37195556160 已终态 success，包括先前失败的安装验收；本批新的依赖锁与真实 1.85 job 必须按新提交核验，不能借用该旧锁成功结果。

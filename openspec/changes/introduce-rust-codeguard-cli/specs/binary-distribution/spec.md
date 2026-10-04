@@ -180,6 +180,12 @@
 
 stable 发布 MUST 分别提供真实工具、平台、Git/CI、宿主安装与运行验收；不以编译、mock 测试、tag 或市场清单替代。全语言完成声明 MUST 满足语言迁移要求。回滚 MUST 不降低已确认的交付契约。
 
+最低 Rust 版本声明 MUST 同时覆盖默认与 WASM 特性。活动锁定依赖声明的最低版本不得高于工作区基线；无版本声明的依赖保持未证明，静态 metadata 相容不能替代该最低工具链上的实际编译。CI MUST 使用声明的最低 Rust 对两种特性的所有目标执行锁定构建检查，不只使用 runner 的最新 stable。
+
+#### Scenario: A transitive dependency raises the Rust minimum
+- **WHEN** WASM 的传递依赖要求的 Rust 版本高于已声明的工作区基线
+- **THEN** 兼容检查失败；约束兼容依赖并在原最低工具链上重新检查默认及 WASM 目标，不能仅凭新编译器成功声称兼容
+
 #### Scenario: Release artifact exists but host cannot run it
 - **WHEN** GitHub release 有二进制但某宿主无法启动
 - **THEN** 该宿主验收保持未完成，不宣称已交付

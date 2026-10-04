@@ -1,0 +1,41 @@
+{
+  "evidence_type": "declared_dependency_msrv_regression",
+  "evidence_version": "0.1.0",
+  "captured_at": "2026-10-04",
+  "target": "aarch64-apple-darwin",
+  "workspace_minimum": "1.85",
+  "features": [
+    "wasm-precheck"
+  ],
+  "before": {
+    "source_commit": "15a91a7b9291837e816f41d7934d68b4d083677e",
+    "active_nodes": 217,
+    "incompatible_declared_dependencies": [
+      {
+        "name": "tree-sitter-language",
+        "version": "0.1.8",
+        "rust_version": "1.90"
+      }
+    ],
+    "regression_passed": false,
+    "log_sha256": "b31e47b6405edd7a5bfeeffaad4eee621809218c2989fc3ed2f79b1a321cb937"
+  },
+  "after": {
+    "active_nodes": 217,
+    "rust_version_undeclared": 45,
+    "incompatible_declared_dependencies": [],
+    "selected_package": {
+      "name": "tree-sitter-language",
+      "version": "0.1.7",
+      "rust_version": "1.77",
+      "registry_checksum": "009994f150cc0cd50ff54917d5bc8bffe8cad10ca10d81c34da2ec421ae61782"
+    },
+    "metadata_regression_passed": true,
+    "log_sha256": "4db541210acd67df30d7bdbb2b14163c5801987d29a28cae89eb55b283ea6467"
+  },
+  "actual_rust_1_85_local_execution": false,
+  "remote_msrv_job_state": "not_dispatched_for_this_change",
+  "all_platform_acceptance": false,
+  "grammar_qualification_changed": false,
+  "delivery_decision": "not_evaluated"
+}

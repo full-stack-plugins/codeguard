@@ -91,6 +91,8 @@ codeguard/
 
 使用支持 Rust edition 2024 的工具链。声明 MSRV `1.85` 不代表全部依赖和平台组合均在该版本实测。原生执行和本地协作使用 Unix 代码；已核对的运行证据来自 macOS ARM64，其它候选平台不是已认证支持矩阵。
 
+WASM 依赖已约束 `tree-sitter-language=0.1.7`，避免传递更新突破声明的 Rust 1.85 基线。锁定 metadata 回归与显式 1.85 CI 检查是不同层级的证据，完整目标/MSRV 验收仍开放；见[兼容验收](tests/acceptance/rust-msrv-dependency-compatibility.md)。
+
 ```bash
 git clone https://github.com/full-stack-plugins/codeguard.git
 cd codeguard

@@ -88,6 +88,8 @@ Repository: `codeguard`. Binary: `codeguard`. Cargo package: `codeguard-cli`. A 
 
 Use a toolchain supporting Rust edition 2024. Declaring MSRV `1.85` does not prove every dependency/target combination on that version. Native execution and local coordination use Unix-specific code. Reviewed execution evidence is from macOS ARM64; the other candidate platforms are not a certified support matrix.
 
+The WASM dependency is constrained to `tree-sitter-language=0.1.7` to preserve the declared Rust 1.85 baseline. The locked metadata regression and an explicit 1.85 CI check cover different evidence levels; full target/MSRV acceptance remains open. See [compatibility evidence](tests/acceptance/rust-msrv-dependency-compatibility.md).
+
 ```bash
 git clone https://github.com/full-stack-plugins/codeguard.git
 cd codeguard
