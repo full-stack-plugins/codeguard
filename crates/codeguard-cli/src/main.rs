@@ -82,6 +82,10 @@ fn main() -> ExitCode {
             println!(
                 "Erlang 原生优先局部检查：lint erlang FILE [--erl-tool ABS_PATH] [--timeout DURATION] [--format human|json]；显式 OTP 28 使用原生 forms 扫描/解析，宏与预处理保持未完成；不签发完整 lint 或交付通过。 已有 Erlang 语法确认任务可用 task verify ID PATH --erl-tool ABS_PATH，repair_ready 接受同参数；复用原任务与尝试历史，零诊断不自动关闭。"
             );
+            #[cfg(unix)]
+            println!(
+                "Swift 原生任务确认：task verify ID PATH --swift-tool ABS_PATH；Apple Swift 6.4 仅 frontend parse，返回 UTF-8 字节列和局部诊断，repair_ready 同参数，不自动关闭。"
+            );
             println!(
                 "检查预算：check all 支持 --jobs 1–64 和 CODEGUARD_JOBS；--timeout 优先于 CODEGUARD_TIMEOUT，默认 30m。项目默认值见 .codeguard/runtime.json 1.1；当前仅原生执行受截止时间约束。"
             );

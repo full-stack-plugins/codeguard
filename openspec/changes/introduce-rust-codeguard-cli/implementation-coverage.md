@@ -362,3 +362,8 @@ syntax-precheck的隐藏token场景→9.3/9.9/14.7/14.10/14.11/14.19：check all
 对应既有 9.9、9.10、14.10、14.11、14.19；不创建第二份规格。现有 lint/check 能发现调用方 PATH 中的 erl，但 task verify 仅显式参数，导致已安装工具被误报未提供。新增场景和三个先失败的反例后，复检复用原工具选择服务；显式及首选失败不换工具，实际 next 固定工具路径，空/相对/不可执行来源仍未完成。候选/原生首次任务及 repair-ready 的共同入口、原协议、租约/事件和不自动关闭继续保持；完整原生确认与宿主关闭父任务仍开放。实际终态及证据补入[本批验收](../../../tests/acceptance/erlang-recheck-discovery.md)。
 
 本批终态：默认全工作区 1235 passed/0 failed/113 ignored；其后仅历史指引文案变化，最终默认工作台定向 12 passed/0 failed/1 ignored。最终 WASM 16 组 199 passed/0 failed/25 ignored；显式 OTP 28 实测新增目标 1 passed，最终二进制两来源实际复放。默认/WASM Clippy、fmt、分层和 OpenSpec strict 通过；旧 schema 未改，父任务未勾选。前批 4afa8bc 的 Linux CI 因旧对话文案断言失败，已重现并修改行为断言，本批远端结果独立确认。详情及固定日志见[本批验收](../../../tests/acceptance/erlang-recheck-discovery.md)。
+
+
+## Swift 原生确认增量（2026-10-04）
+
+9.9/9.10/14.10/14.11/14.19：既有 Swift 无定位 WASM 确认任务复用 Rust 原生 parse、追加观察与 next/repair_ready，绑定源字节/工具并核对 UTF-8 字节列；缺工具给具体恢复步骤、零诊断不自动关闭。实际 Apple Swift 6.4 与受控边界证据见 [验收](../../../tests/acceptance/swift-native-task-confirmation.md)。Swift 全项目原生优先、可信关闭 SDK、真实宿主及语言资格仍缺，父任务未完成。

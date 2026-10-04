@@ -59,6 +59,8 @@ mod npm_workbench;
 mod npm_workspace_scope;
 mod python_dependency_discovery;
 mod signed_disposition_binding;
+#[cfg(unix)]
+mod swift_syntax_probe;
 pub mod tools_command;
 pub use bound_false_positive_disposition::BoundFalsePositiveDisposition;
 pub use signed_disposition_binding::bind_signed_false_positive_preview;

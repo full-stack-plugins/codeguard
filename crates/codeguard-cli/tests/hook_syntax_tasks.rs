@@ -395,7 +395,7 @@ fn unlocated_task_retains_identity_when_a_visible_recovery_later_appears() {
     assert_eq!(verify.status.code(), Some(3));
     let report: Value = serde_json::from_slice(&verify.stdout).unwrap();
     assert_eq!(
-        report["native_scan"]["native"]["reason"], "native_syntax_confirmation_adapter_unavailable",
+        report["native_scan"]["native"]["reason"], "explicit_swift_tool_not_provided",
         "{report}"
     );
     assert_eq!(report["observation"], "incomplete", "{report}");

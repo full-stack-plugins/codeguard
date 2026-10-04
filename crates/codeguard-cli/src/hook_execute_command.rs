@@ -219,7 +219,7 @@ fn execute_parsed(
     };
     Ok((
         json!({
-            "schema_version":if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.2.0" {"0.8.0"} else {"0.7.0"}, "report_type":"hook_execution_feedback",
+            "schema_version":if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.2.0" {"0.8.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.3.0" {"0.9.0"} else {"0.7.0"}, "report_type":"hook_execution_feedback",
             "plan":plan, "execution":execution, "reason":reason,
             "local_feedback":feedback, "delivery_decision":"not_evaluated",
             "host_blocking_verified":false, "soft_result_reused":false
@@ -338,13 +338,20 @@ fn task_verification_summary(
         "authority":"local_unverified", "delivery_decision":"not_evaluated"
     });
     let scan = &report["native_scan"];
-    if checker_id == "syntax.native_confirmation" && scan["target"]["language"] == "erlang" {
+    if checker_id == "syntax.native_confirmation"
+        && matches!(
+            scan["target"]["language"].as_str(),
+            Some("erlang" | "swift")
+        )
+    {
         if !matches!(
             (
                 report["schema_version"].as_str(),
                 scan["schema_version"].as_str()
             ),
-            (Some("0.13.0"), Some("0.2.0")) | (Some("0.14.0"), Some("0.3.0"))
+            (Some("0.13.0"), Some("0.2.0"))
+                | (Some("0.14.0"), Some("0.3.0"))
+                | (Some("0.15.0"), Some("0.4.0"))
         ) {
             return Err(("verification_report_invalid", 4));
         }
@@ -357,7 +364,11 @@ fn task_verification_summary(
         if !crate::syntax_task_recheck::valid_shape(root, &history) {
             return Err(("verification_report_invalid", 4));
         }
-        summary["schema_version"] = json!("0.2.0");
+        summary["schema_version"] = json!(if scan["target"]["language"] == "swift" {
+            "0.3.0"
+        } else {
+            "0.2.0"
+        });
         summary["native_confirmation_status"] = if current {
             scan["native"]["status"].clone()
         } else {
@@ -368,7 +379,11 @@ fn task_verification_summary(
         } else {
             json!("syntax_confirmation_inputs_changed")
         };
-        summary["native_column_unit"] = json!("unicode_scalar");
+        summary["native_column_unit"] = json!(if scan["target"]["language"] == "swift" {
+            "utf8_byte"
+        } else {
+            "unicode_scalar"
+        });
         summary["native_diagnostic_positions"] =
             if current && scan["native"]["status"] == "diagnostics_observed" {
                 scan["native"]["diagnostics"].clone()
@@ -465,7 +480,7 @@ fn verify_option_matches_checker(key: &str, checker_id: &str) -> bool {
         ),
         "python.pip_audit" => matches!(key, "--pip-audit-tool" | "--pip-audit-version"),
         "go.vet" => key == "--go-tool",
-        "syntax.native_confirmation" => matches!(key, "--zig-tool" | "--erl-tool"),
+        "syntax.native_confirmation" => matches!(key, "--zig-tool" | "--erl-tool" | "--swift-tool"),
         "rust.cargo_clippy" | "rust.cargo_check" | "rust.cargo_rustdoc" => key == "--cargo-tool",
         "rust.cargo_audit" => matches!(key, "--cargo-audit-tool" | "--rustsec-db"),
         "java.checkstyle" | "java.checkstyle.preparation" => {
@@ -623,6 +638,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
             | "--go-tool"
             | "--zig-tool"
             | "--erl-tool"
+            | "--swift-tool"
             | "--maven-tool"
             | "--java-home"
             | "--java-tool"
@@ -654,6 +670,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                         | "--go-tool"
                         | "--zig-tool"
                         | "--erl-tool"
+                        | "--swift-tool"
                         | "--maven-tool"
                         | "--java-home"
                         | "--java-tool"

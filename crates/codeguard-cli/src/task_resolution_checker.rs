@@ -67,9 +67,11 @@ impl TaskResolutionChecker {
         deadline: Instant,
     ) -> Result<Value, &'static str> {
         match self {
-            Self::Zig => crate::syntax_task_recheck::run(root, brief, Some(tool), None, deadline),
+            Self::Zig => {
+                crate::syntax_task_recheck::run(root, brief, Some(tool), None, None, deadline)
+            }
             Self::Erlang => {
-                crate::syntax_task_recheck::run(root, brief, None, Some(tool), deadline)
+                crate::syntax_task_recheck::run(root, brief, None, Some(tool), None, deadline)
             }
         }
     }

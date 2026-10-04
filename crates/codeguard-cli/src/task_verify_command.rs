@@ -37,6 +37,7 @@ struct Arguments {
     ruff_tool: Option<PathBuf>,
     zig_tool: Option<PathBuf>,
     erl_tool: Option<PathBuf>,
+    swift_tool: Option<PathBuf>,
     cargo_tool: Option<PathBuf>,
     cargo_audit_tool: Option<PathBuf>,
     rustsec_db: Option<PathBuf>,
@@ -89,18 +90,23 @@ pub fn run(args: &[String]) -> ExitCode {
         Err(reason) => return print_unavailable(&parsed, reason),
     };
     let syntax_task = brief["checker_id"] == "syntax.native_confirmation";
-    if (parsed.zig_tool.is_some() || parsed.erl_tool.is_some()) && !syntax_task {
+    if (parsed.zig_tool.is_some() || parsed.erl_tool.is_some() || parsed.swift_tool.is_some())
+        && !syntax_task
+    {
         eprintln!("语法工具参数仅用于对应的原生语法确认任务");
         return ExitCode::from(2);
     }
     // 语言与工具在租约及原生启动前核对，不能先取得租约再发现错参。
-    if syntax_task && (parsed.zig_tool.is_some() || parsed.erl_tool.is_some()) {
+    if syntax_task
+        && (parsed.zig_tool.is_some() || parsed.erl_tool.is_some() || parsed.swift_tool.is_some())
+    {
         let original = match crate::syntax_task_recheck::original(&root, &brief) {
             Ok(original) => original,
             Err(reason) => return print_unavailable(&parsed, reason),
         };
         if (parsed.zig_tool.is_some() && original["language"] != "zig")
             || (parsed.erl_tool.is_some() && original["language"] != "erlang")
+            || (parsed.swift_tool.is_some() && original["language"] != "swift")
         {
             eprintln!("原生语法工具不匹配任务语言");
             return ExitCode::from(2);
@@ -209,6 +215,7 @@ pub fn run(args: &[String]) -> ExitCode {
             &brief,
             parsed.zig_tool.as_deref(),
             parsed.erl_tool.as_deref(),
+            parsed.swift_tool.as_deref(),
             deadline,
         ) {
             Ok(report) => report,
@@ -595,6 +602,7 @@ pub fn run(args: &[String]) -> ExitCode {
     });
     if syntax_task {
         report["schema_version"] = json!(match report["native_scan"]["schema_version"].as_str() {
+            Some("0.4.0") => "0.15.0",
             Some("0.3.0") => "0.14.0",
             Some("0.2.0") => "0.13.0",
             _ => "0.12.0",
@@ -1334,6 +1342,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
     let mut ruff_tool = None;
     let mut zig_tool = None;
     let mut erl_tool = None;
+    let mut swift_tool = None;
     let mut cargo_tool = None;
     let mut cargo_audit_tool = None;
     let mut rustsec_db = None;
@@ -1372,6 +1381,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                 | "--ruff-tool"
                 | "--zig-tool"
                 | "--erl-tool"
+                | "--swift-tool"
                 | "--cargo-tool"
                 | "--cargo-audit-tool"
                 | "--rustsec-db"
@@ -1407,6 +1417,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                 "--ruff-tool" if ruff_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--zig-tool" if zig_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--erl-tool" if erl_tool.replace(PathBuf::from(value)).is_none() => {}
+                "--swift-tool" if swift_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--cargo-tool" if cargo_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--cargo-audit-tool"
                     if cargo_audit_tool.replace(PathBuf::from(value)).is_none() => {}
@@ -1442,6 +1453,9 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
     }
     if erl_tool.as_ref().is_some_and(|tool| !tool.is_absolute()) {
         return Err("--erl-tool 必须是绝对路径".into());
+    }
+    if swift_tool.as_ref().is_some_and(|tool| !tool.is_absolute()) {
+        return Err("--swift-tool 必须是绝对路径".into());
     }
     if ruff_tool.as_ref().is_some_and(|tool| !tool.is_absolute()) {
         return Err("--ruff-tool 必须是绝对路径".into());
@@ -1522,6 +1536,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
         ruff_tool,
         zig_tool,
         erl_tool,
+        swift_tool,
         cargo_tool,
         cargo_audit_tool,
         rustsec_db,

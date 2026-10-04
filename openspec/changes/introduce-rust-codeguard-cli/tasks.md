@@ -1271,3 +1271,17 @@ Swift 差分纠正先以状态断言暴露旧清单文案的红测，再按真�
 对应既有 9.9、9.10、14.10、14.11、14.19；不创建第二份规格。现有 lint/check 能发现调用方 PATH 中的 erl，但 task verify 仅显式参数，导致已安装工具被误报未提供。新增场景和三个先失败的反例后，复检复用原工具选择服务；显式及首选失败不换工具，实际 next 固定工具路径，空/相对/不可执行来源仍未完成。候选/原生首次任务及 repair-ready 的共同入口、原协议、租约/事件和不自动关闭继续保持；完整原生确认与宿主关闭父任务仍开放。实际终态及证据补入[本批验收](../../../tests/acceptance/erlang-recheck-discovery.md)。
 
 本批终态：默认全工作区 1235 passed/0 failed/113 ignored；其后仅历史指引文案变化，最终默认工作台定向 12 passed/0 failed/1 ignored。最终 WASM 16 组 199 passed/0 failed/25 ignored；显式 OTP 28 实测新增目标 1 passed，最终二进制两来源实际复放。默认/WASM Clippy、fmt、分层和 OpenSpec strict 通过；旧 schema 未改，父任务未勾选。前批 4afa8bc 的 Linux CI 因旧对话文案断言失败，已重现并修改行为断言，本批远端结果独立确认。详情及固定日志见[本批验收](../../../tests/acceptance/erlang-recheck-discovery.md)。
+
+
+## 2026-10-04 Swift 无定位恢复的原生确认（进行中）
+
+延续 9.9/9.10/14.10/14.11/14.19。将已有 Swift 原生 parse 对照接入当前稳定任务、next 和 repair_ready，保存有界位置与 UTF-8 字节列。原生仅单文件 parse，不提升 grammar 资格，不自动关闭或替代 lint/构建；历史协议原件保留，新反馈单独版本化。目标红测、实际工具与受影响回归验证后补证据，父任务保持开放。
+
+
+## 2026-10-04 Swift 无定位恢复的原生确认（已验证切片）
+
+9.9/9.10/14.10/14.11/14.19 延续同一规格：显式 Apple Swift 6.4 frontend parse 接入稳定任务、next/task show 和 repair_ready；源码/工具身份和 UTF-8 字节边界复核，正常 driver banner 与同源 note 不误报为工具异常。原生13例基础对照（8合法/5非法）与多字节反例实测，零诊断仍保留 open，完整原生优先/项目范围、可信关闭和实际宿主仍未完成。
+
+最终默认220组1237 passed/0 failed/113 ignored；受影响WASM14组173 passed/0 failed/23 ignored，随后Swift上下文修正后最终library36 passed/0 failed/1 ignored、Swift目标8 passed/0 failed/0 ignored。默认/WASM Clippy、fmt、分层和OpenSpec strict通过；208 schema、50实际报告、150伪造变体和5开发协议测试通过。Linux旧提交安装验收的0.37陈旧断言已重现，精确更新0.38并增加不重复造WASM任务断言；同一固定程序私有离线安装的受控和真实OTP28目标runner3 passed，远端新提交独立核验。
+
+证据、历史失败与边界见[Swift验收](../../../tests/acceptance/swift-native-task-confirmation.md)。没有重跑358例全量语料或已知Erlang RED全套，grammar资格、公开包和插件锁未变，预先Erlang草稿保持。父任务及完整目标仍开放。

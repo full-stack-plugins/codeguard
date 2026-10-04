@@ -371,6 +371,12 @@ WASM fallback MUST 通过明确版本的协议加入既有统一命令，不静�
 - **WHEN** 用户安装不含此能力的版本
 - **THEN** 文档与支持矩阵不宣称自动初检已可用，不用设计示例冒充运行记录
 
+#### Scenario: Swift hidden recovery receives native parse confirmation
+- **WHEN** 已消费 Swift WASM 确认任务包含无法定位的恢复异常，调用方提供已安装的 Apple Swift 6.4 原生编译器绝对入口
+- **THEN** Rust 以冻结 stdin、固定非项目 cwd 和共同截止时间调用 frontend parse；不构建、类型检查、加载项目插件或运行源码
+- **AND** 只把可核对 UTF-8 字节边界的原生错误位置写入同一任务的追加历史；next 和 repair_ready 返回脱敏原生位置、字节列单位和实际复检入口
+- **AND** 缺工具、版本不匹配、异常输出、超时及输入变化保留未完成；零诊断仅表示局部语法未观察到问题，不自动关闭或替代完整 lint、构建和交付
+
 ### Requirement: Syntax support claims SHALL have per-language and per-host evaluation evidence
 
 验收 MUST 分别记录合法/非法语料、ERROR/MISSING、语言版本/方言、模板位置映射、原生对照、误报/漏报、未知覆盖及白名单处置。每个声明支持的语言/宿主 MUST 有独立证据；CodeGraph 的支持清单不自动继承为 Codeguard 能力。冷/热启动、包大小、内存/并发及异常退出预算须实测后固化，不编造精度或性能数值。三个宿主的实际对话交付应分别验证，任一个通过不能替代另两个。

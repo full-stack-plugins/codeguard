@@ -14,6 +14,7 @@ pub(crate) fn run(
     brief: &Value,
     zig: Option<&Path>,
     erl: Option<&Path>,
+    swift: Option<&Path>,
     deadline: Instant,
 ) -> Result<Value, &'static str> {
     let original = original(root, brief)?;
@@ -26,6 +27,9 @@ pub(crate) fn run(
     }
     if erl.is_some() && language != "erlang" {
         return Err("erl_tool_does_not_match_confirmation_language");
+    }
+    if swift.is_some() && language != "swift" {
+        return Err("swift_tool_does_not_match_confirmation_language");
     }
     // 只从调用方工具来源选择，不从可编辑历史报告执行旧路径；next 会绑定本轮实际工具。
     let erlang_selection = (language == "erlang").then(|| {
@@ -49,6 +53,10 @@ pub(crate) fn run(
             selected_erl
                 .map(|tool| crate::erlang_syntax_probe::observe(tool, bytes, deadline))
                 .unwrap_or_else(|| unavailable("erlang_tool_not_found_on_path"))
+        } else if language == "swift" {
+            swift
+                .map(|tool| crate::swift_syntax_probe::observe(tool, bytes, deadline))
+                .unwrap_or_else(|| unavailable("explicit_swift_tool_not_provided"))
         } else {
             unavailable("native_syntax_confirmation_adapter_unavailable")
         }
@@ -60,14 +68,17 @@ pub(crate) fn run(
         native["diagnostics_truncated"] = json!(false);
         native["preprocessing_unresolved"] = json!(false);
     }
-    let tool_path = zig.or(selected_erl).and_then(|p| p.canonicalize().ok());
+    let tool_path = zig
+        .or(selected_erl)
+        .or(swift)
+        .and_then(|p| p.canonicalize().ok());
     let target_sha = source.as_ref().map(|b| digest(b));
     let nanos = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map_err(|_| "clock_unavailable")?
         .as_nanos();
     let native_first = original["schema_version"] == "0.2.0";
-    let mut report = json!({"schema_version":if native_first {"0.3.0"} else if language == "erlang" {"0.2.0"} else {"0.1.0"},"report_type":"syntax_task_recheck","operation":"task_verify",
+    let mut report = json!({"schema_version":if language == "swift" {"0.4.0"} else if native_first {"0.3.0"} else if language == "erlang" {"0.2.0"} else {"0.1.0"},"report_type":"syntax_task_recheck","operation":"task_verify",
         "workspace_binding":"bound","workspace_id":original["workspace_id"],"run_id":format!("syntax-native-{}-{nanos}",std::process::id()),
         "checker_id":"syntax.native_confirmation","task_id":brief["task_id"],"authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated",
         "target":{"path":path,"language":language,"source_sha256":target_sha},"original_report":original_reference(&original,&brief["evidence_ref"]["first_report_sha256"]),
@@ -239,7 +250,7 @@ fn valid_history_shape(root: &Path, report: &Value) -> bool {
         .is_some_and(|o| o.len() == keys.len() && keys.iter().all(|k| o.contains_key(*k)))
         || !matches!(
             report["schema_version"].as_str(),
-            Some("0.1.0" | "0.2.0" | "0.3.0")
+            Some("0.1.0" | "0.2.0" | "0.3.0" | "0.4.0")
         )
         || report["report_type"] != "syntax_task_recheck"
         || report["operation"] != "task_verify"
@@ -304,12 +315,16 @@ fn valid_history_shape(root: &Path, report: &Value) -> bool {
 }
 
 fn native_shape(root: &Path, report: &Value) -> bool {
-    if matches!(report["schema_version"].as_str(), Some("0.2.0" | "0.3.0")) {
+    if matches!(
+        report["schema_version"].as_str(),
+        Some("0.2.0" | "0.3.0" | "0.4.0")
+    ) {
         let current = report["target"]["path"]
             .as_str()
             .and_then(|p| source_bytes(root, p))
             .filter(|b| report["target"]["source_sha256"] == digest(b));
-        return report["target"]["language"] == "erlang"
+        let swift = report["schema_version"] == "0.4.0";
+        return report["target"]["language"] == if swift { "swift" } else { "erlang" }
             && report["target"].as_object().is_some_and(|o| {
                 o.len() == 3
                     && ["path", "language", "source_sha256"]
@@ -331,10 +346,17 @@ fn native_shape(root: &Path, report: &Value) -> bool {
                 .as_str()
                 .is_some_and(valid_sha)
                 && !report["tool_path"].is_null()))
-            && crate::erlang_syntax_probe::valid_native_observation(
-                &report["native"],
-                current.as_deref(),
-            );
+            && if swift {
+                crate::swift_syntax_probe::valid_native_observation(
+                    &report["native"],
+                    current.as_deref(),
+                )
+            } else {
+                crate::erlang_syntax_probe::valid_native_observation(
+                    &report["native"],
+                    current.as_deref(),
+                )
+            };
     }
     let native = &report["native"];
     let Some(status) = native["status"].as_str() else {
@@ -520,6 +542,8 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
             "actionable",
             if report["target"]["language"] == "erlang" {
                 "当前源码已有原生 Erlang 语法诊断；核对报告中有界原生位置并修复，然后使用同一工具复检；不要反复安装工具或关闭检查"
+            } else if report["target"]["language"] == "swift" {
+                "当前源码已有原生 Swift parse 语法诊断；核对有界原生位置和 UTF-8 字节列并修复，然后使用同一编译器复检；项目类型检查、构建和 lint 仍需完成"
             } else {
                 "当前源码已有原生 Zig AST 诊断；核对报告中有界原生位置并修复，然后使用同一工具复检；不要反复安装工具或关闭检查"
             },
@@ -543,6 +567,10 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
                 )
             {
                 "上次复检未从调用方绝对 PATH 或显式参数取得可执行 Erlang 工具；先定位已安装的 OTP 28，把其普通可执行入口加入调用方绝对 PATH 或使用 --erl-tool 绝对路径复检。确实缺工具才按项目要求准备，不修改无关源码"
+            } else if report["target"]["language"] == "swift"
+                && report["native"]["reason"] == "explicit_swift_tool_not_provided"
+            {
+                "先定位已安装的 Apple Swift 6.4 编译器，以 --swift-tool 绝对路径复检；确实缺工具才按项目要求准备，不根据 WASM 未定位观察修改无关源码"
             } else {
                 "原生语法确认仍未完成；查看原工具诊断、语言能力或版本缺口，恢复对应前置，不修改无关源码"
             },
@@ -565,6 +593,15 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
             json!("syntax_confirmation_inputs_changed")
         };
     }
+    if report["target"]["language"] == "swift" {
+        guidance["schema_version"] = json!("0.6.0");
+        guidance["native_column_unit"] = json!("utf8_byte");
+        guidance["native_confirmation_reason"] = if inputs_current(root, &report) {
+            report["native"]["reason"].clone()
+        } else {
+            json!("syntax_confirmation_inputs_changed")
+        };
+    }
     guidance["native_confirmation_ref"] = json!({"run_id":report["run_id"],"report_ref":format!(".codeguard/reports/{}.json", report["run_id"].as_str()?),"report_sha256":report_sha256});
     guidance["native_diagnostic_positions"] =
         if inputs_current(root, &report) && classify(&report) == "still_blocked" {
@@ -575,9 +612,11 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
     // 源码修复后仍可复用未改变的工具；工具字节变化则不得携带旧工具身份。
     if matches!(
         report["target"]["language"].as_str(),
-        Some("zig" | "erlang")
+        Some("zig" | "erlang" | "swift")
     ) && tool_current(&report)
         && (report["target"]["language"] != "erlang" || report["native"]["version"] == "OTP 28")
+        && (report["target"]["language"] != "swift"
+            || report["native"]["version"] == "Apple Swift 6.4")
     {
         guidance["recheck_argv"] = json!([
             "codeguard",
@@ -589,6 +628,8 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
             "json",
             if report["target"]["language"] == "erlang" {
                 "--erl-tool"
+            } else if report["target"]["language"] == "swift" {
+                "--swift-tool"
             } else {
                 "--zig-tool"
             },
