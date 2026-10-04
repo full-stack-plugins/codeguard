@@ -6,6 +6,7 @@ use std::{path::Path, time::Instant};
 pub(crate) enum TaskResolutionChecker {
     Zig,
     Erlang,
+    Swift,
 }
 
 impl TaskResolutionChecker {
@@ -14,6 +15,7 @@ impl TaskResolutionChecker {
         match self {
             Self::Zig => "zig",
             Self::Erlang => "erlang",
+            Self::Swift => "swift",
         }
     }
     /// 返回允许复检的原生语法规则标识。
@@ -21,6 +23,7 @@ impl TaskResolutionChecker {
         match self {
             Self::Zig => "zig.ast_check.error",
             Self::Erlang => "erlang.syntax.error",
+            Self::Swift => "swift.parse.error",
         }
     }
     /// 返回验收范围内的固定原生版本。
@@ -28,6 +31,7 @@ impl TaskResolutionChecker {
         match self {
             Self::Zig => "0.16.0",
             Self::Erlang => "OTP 28",
+            Self::Swift => "Apple Swift 6.4",
         }
     }
     /// 返回该语言必须使用的批准策略版本。
@@ -35,6 +39,7 @@ impl TaskResolutionChecker {
         match self {
             Self::Zig => "1.0.0",
             Self::Erlang => "1.1.0",
+            Self::Swift => "1.2.0",
         }
     }
     /// 返回该语言专用的脱敏证据版本。
@@ -42,6 +47,7 @@ impl TaskResolutionChecker {
         match self {
             Self::Zig => "0.1.0",
             Self::Erlang => "0.2.0",
+            Self::Swift => "0.3.0",
         }
     }
     /// 将指定源码字节交给固定工具，返回有界原生观察；各次调用共用截止时间。
@@ -56,6 +62,7 @@ impl TaskResolutionChecker {
             Self::Zig => crate::zig_syntax_probe::observe(tool, source, root, deadline)
                 .unwrap_or_else(|| json!({"status":"not_run","reason":"zig_tool_unavailable_or_untrusted","version":null,"tool_sha256":null,"diagnostics":[]})),
             Self::Erlang => crate::erlang_syntax_probe::observe(tool, source, deadline),
+            Self::Swift => crate::swift_syntax_probe::observe(tool, source, deadline),
         }
     }
     /// 复检已有任务当前源码，返回原报告绑定的观察或失败原因。
@@ -72,6 +79,9 @@ impl TaskResolutionChecker {
             }
             Self::Erlang => {
                 crate::syntax_task_recheck::run(root, brief, None, Some(tool), None, None, deadline)
+            }
+            Self::Swift => {
+                crate::syntax_task_recheck::run(root, brief, None, None, Some(tool), None, deadline)
             }
         }
     }

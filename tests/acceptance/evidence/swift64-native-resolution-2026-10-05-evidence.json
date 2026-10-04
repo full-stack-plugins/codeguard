@@ -1,0 +1,39 @@
+{
+  "adapter_sha256": "579e561d12878d2977d93206b4154b55f20c55003806f3b7df85f41199418d6f",
+  "current_native": {
+    "diagnostics": [],
+    "reason": "swift_native_parse_no_diagnostics",
+    "status": "completed",
+    "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+    "version": "Apple Swift 6.4"
+  },
+  "current_source_sha256": "c8b5c7f8d1396e03d98a7704dcfe46b69f6aae0f9504c5eb838fbcba58cd3ab8",
+  "grammar_sha256": null,
+  "identity": {
+    "checker_id": "syntax.native_confirmation",
+    "scope": "App.swift",
+    "task_id": "CG-B-49118a2bacd4f36544899d233c7a8be2",
+    "workspace_id": "ws-147a2750ff412c3c3ac43a9a1233db95"
+  },
+  "original_native": {
+    "diagnostics": [
+      {
+        "column": 13,
+        "line": 1,
+        "rule_id": "swift.parse.error"
+      }
+    ],
+    "reason": "swift_native_parse_diagnostics",
+    "status": "diagnostics_observed",
+    "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+    "version": "Apple Swift 6.4"
+  },
+  "original_report_sha256": "bba7787c1aabd9204bfa23bb1bd3a227c1a89be97fb08ef615b0e9cb268101f4",
+  "original_source_sha256": "6f44da8b1f1db95bf1948aa134b683e1066a0c9ad8941138dc2de09e70958f03",
+  "outcome": "code_fixed",
+  "policy_revision": "p1",
+  "policy_sha256": "d1651cbaa6ffe37bd9c1dbf86a312523fb3d08abee590bab9c5d1f0495ee7f99",
+  "report_type": "task_resolution_evidence",
+  "schema_version": "0.3.0",
+  "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2"
+}

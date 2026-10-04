@@ -32,6 +32,14 @@ pub fn verify_erlang_task_resolution(
     verify_task_resolution(request, TaskResolutionChecker::Erlang)
 }
 
+/// 验证宿主批准的 Swift 语法修复；返回限定任务收据，不签发项目许可。
+/// 参数包括固定工具、原反例和可信上下文，返回值可能要求继续复检。
+pub fn verify_swift_task_resolution(
+    request: &crate::SwiftTaskResolutionRequest<'_>,
+) -> Result<Value, &'static str> {
+    verify_task_resolution(request, TaskResolutionChecker::Swift)
+}
+
 fn verify_task_resolution(
     request: &SyntaxTaskResolutionRequest<'_>,
     checker: TaskResolutionChecker,
@@ -143,8 +151,8 @@ fn original_binding_matches(
     policy: &TaskResolutionPolicyInput,
     checker: TaskResolutionChecker,
 ) -> bool {
-    if original["schema_version"] == "0.2.0" {
-        checker.language() == "erlang"
+    if matches!(original["schema_version"].as_str(), Some("0.2.0" | "0.5.0")) {
+        matches!(checker.language(), "erlang" | "swift")
             && policy.grammar_sha256.is_none()
             && original["native_evidence"]["target"]["source_sha256"]
                 == policy.original_source_sha256

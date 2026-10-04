@@ -1,0 +1,19 @@
+{
+  "authority": "host_context_verified",
+  "delivery_decision": "not_evaluated",
+  "event_ref": ".codeguard/findings/CG-B-49118a2bacd4f36544899d233c7a8be2/events/lifecycle-event-bae71e1f33391ec700991af082c622f4e1466f8069f3a9fed8bbecfe075d2ad8.json",
+  "evidence_ref": ".codeguard/state/resolution_evidence/7a6761ae8dc7cda1455a104b83c6f43edd4bdb8a2b7974db7c36dca50d6fecf2.json",
+  "evidence_sha256": "7a6761ae8dc7cda1455a104b83c6f43edd4bdb8a2b7974db7c36dca50d6fecf2",
+  "identity": {
+    "checker_id": "syntax.native_confirmation",
+    "scope": "App.swift",
+    "task_id": "CG-B-49118a2bacd4f36544899d233c7a8be2",
+    "workspace_id": "ws-147a2750ff412c3c3ac43a9a1233db95"
+  },
+  "outcome": "code_fixed",
+  "policy_revision": "p1",
+  "policy_sha256": "d1651cbaa6ffe37bd9c1dbf86a312523fb3d08abee590bab9c5d1f0495ee7f99",
+  "report_type": "task_resolution_receipt",
+  "schema_version": "0.1.0",
+  "state": "resolved"
+}

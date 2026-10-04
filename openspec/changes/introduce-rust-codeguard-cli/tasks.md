@@ -1382,3 +1382,9 @@ CI 37214829667 的 npm 全候选验收继承 Kotlin/Swift 工具，使原生优�
 2026-10-05 独立源码任务调度进展：RED复现预算耗尽的finding占据next首项，使另一份可修复源码得不到指引。现仅在没有前置blocker、原首项为waiting/needs_decision源码finding时，核对物理路径/dev/ino并推荐不同范围的可修复或待复检finding；范围重叠/未知、别名、坏事实及失败报告保留原分流。延后任务由next_actions及human提供只读task show引用，不改事实、预算、租约或门禁。默认相关六目标62通过/12忽略，WASM十目标97通过/13忽略；真实Ruff0.16.8双F401及两次no-change后独立选择通过，原记录摘要不变。4项实际schema/状态不变量验收、OpenSpec strict和分层检查通过；当前完整all-targets测试在运行，未取得终态，不勾选9.7/9.9/9.26父任务，不代表完整依赖图、跨平台或已安装宿主。见[独立源码任务验收](../../../tests/acceptance/next-independent-source-work.md)。
 
 独立源码调度最终验收：完整默认all-targets退出0（1288 passed/0 failed/113 ignored），默认及WASM all-targets Clippy -D warnings通过。237历史schema原件不变、4项实际协议/状态不变量验收及790条本地链接检查通过。实际后补采集使用显式60秒预算并验证findings/state JSON摘要；10秒预算触限不作为成功证据、不改产品默认预算，也不声称性能目标达标。9.7.2切片完成，父任务保持开放。
+
+### 2026-10-05 Swift 限定任务闭环接线（父任务未完成）
+
+9.7/9.10/9.11、12.7、14.10/14.11：受保护宿主 Swift SDK 复用同一限定语法关闭服务、签名校验、原反例/当前字节对照、租约及父链。策略1.2.0/证据0.3.0分语言，原生首次grammar=null；普通task verify原工具复发可重开。接口缺失和旧分流scope mismatch分别RED，默认受控关闭/幂等/复发/反证/工具与批准身份边界已通过。真实原生、共享服务兼容回归和最终校验另行追加；默认插件可信提供者、真实宿主、全语言/完整SwiftLint/项目构建、平台与发行仍缺，不勾选父任务。见[Swift闭环验收](../../../tests/acceptance/swift-task-resolution-lifecycle.md)。
+
+Swift闭环本批终态：默认受影响6通过/1条件忽略，WASM六目标52通过/0失败/4条件忽略；真实Apple Swift6.4显式1通过，原错误→修复→复发链路成功。4实际输出协议/身份与负例、239 schema元定义/237历史原字节、默认/WASM全目标严格Clippy、fmt、分层、OpenSpec strict与新增链接通过。完整默认suite未重跑，旧1288不当成本批全套；新提交CI另核验。未改变公开npm、插件锁或完整父任务状态。

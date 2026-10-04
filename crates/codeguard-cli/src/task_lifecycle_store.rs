@@ -77,8 +77,10 @@ pub(crate) fn load(
                     .map_err(|_| "task_lifecycle_evidence_invalid")?;
                 let identity_value =
                     serde_json::to_value(identity).map_err(|_| "task_lifecycle_encoding_failed")?;
-                if !matches!(value["schema_version"].as_str(), Some("0.1.0" | "0.2.0"))
-                    || value["report_type"] != "task_resolution_evidence"
+                if !matches!(
+                    value["schema_version"].as_str(),
+                    Some("0.1.0" | "0.2.0" | "0.3.0")
+                ) || value["report_type"] != "task_resolution_evidence"
                     || value["identity"] != identity_value
                     || value["original_report_sha256"] != original_sha
                     || value["policy_sha256"] != *policy
@@ -150,11 +152,13 @@ fn origin_matches_evidence(original: &serde_json::Value, evidence: &serde_json::
             original["language"].as_str(),
             evidence["schema_version"].as_str()
         ),
-        (Some("zig"), Some("0.1.0")) | (Some("erlang"), Some("0.2.0"))
+        (Some("zig"), Some("0.1.0"))
+            | (Some("erlang"), Some("0.2.0"))
+            | (Some("swift"), Some("0.3.0"))
     ) {
         return false;
     }
-    if original["schema_version"] == "0.2.0" {
+    if matches!(original["schema_version"].as_str(), Some("0.2.0" | "0.5.0")) {
         evidence["grammar_sha256"].is_null()
             && evidence["original_source_sha256"]
                 == original["native_evidence"]["target"]["source_sha256"]
@@ -307,7 +311,9 @@ pub(crate) fn record_native_recurrence(
                 evidence["schema_version"].as_str(),
                 scan["target"]["language"].as_str()
             ),
-            (Some("0.1.0"), Some("zig")) | (Some("0.2.0"), Some("erlang"))
+            (Some("0.1.0"), Some("zig"))
+                | (Some("0.2.0"), Some("erlang"))
+                | (Some("0.3.0"), Some("swift"))
         )
         || scan["original_report"]["sha256"] != original_sha
         || scan["original_report"]["grammar_sha256"] != evidence["grammar_sha256"]

@@ -147,6 +147,11 @@ RunReport 与准备诊断 PrerequisiteReport MUST 使用 workspace_id + run_id �
 - **WHEN** 首次任务来自已同步的 OTP 28 原生诊断而非 WASM，受保护宿主批准同一原工具、规则、源码与首次报告身份
 - **THEN** 策略和脱敏证据 SHALL 保留 grammar_sha256=null，以原生规则的批准策略摘要绑定规则身份；原样本诊断、当前源码变化和完整零诊断可关闭，普通同工具复检检出复发可重开。不存在的 grammar、缺字段或替换首次工具 MUST 在原生执行前拒绝
 
+#### Scenario: Protected Swift native syntax resolution reuses the lifecycle service
+- **WHEN** 受保护宿主验签 Apple Swift 6.4 的限定 parse 任务策略，并用首次固定工具对照原反例与当前源码
+- **THEN** 原反例有合法字节位置的 parse 诊断、当前源码变化且原工具完整零诊断时 SHALL 追加 code_fixed；重复复检幂等，普通原工具复检再次检出时重开同一任务父链。未完成、错误版本、工具/输入变化不关闭，原反例原生合法转误报调查
+- **AND** 原生首次任务的 grammar_sha256 SHALL 保持 null；Swift 使用独立策略和证据版本，不能消费 Zig/Erlang 身份；此入口不证明 SwiftLint、类型检查、项目构建或项目交付
+
 #### Scenario: Rehashed lifecycle evidence cannot change the original language
 - **WHEN** 本地关闭证据和父链记录被重算摘要，但证据协议、语言或 grammar 与已同步的首次任务事实不同
 - **THEN** 历史读取 SHALL 在原生执行前拒绝身份矛盾，并由 next 提供核对决策，不将本地文件当作可信关闭

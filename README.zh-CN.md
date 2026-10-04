@@ -526,3 +526,7 @@ Claude Code 2.1.273 已有会话内插件源码加载的实际证据，覆盖成
 恢复只创建可读任务，含问题证据、规则依据、允许范围、步骤、复检 argv、历史及关闭条件。复检参数中的本机绝对路径脱敏为待核验占位；通过 `task show` 查询当前真实指引。恢复不关闭问题，不改原事实、事件、消费标记或尝试历史，也不代表门禁通过。仅恢复发生时使用 `work_sync_preview` 0.3.0，并返回正整数 `restored_task_projections`；无恢复时保留 0.2.0。
 
 `next`可继续处理与等待/预算耗尽源码任务物理范围独立的另一项finding，同时保留原任务的只读查询及全部预算/租约状态。前置blocker与无法证明独立的范围不绕过；见[验收](tests/acceptance/next-independent-source-work.md)。
+
+### Swift 限定语法任务闭环（开发源码）
+
+受保护宿主可调用 `verify_swift_task_resolution`，以 Apple Swift 6.4 对照首次反例与当前源码。策略 1.2.0、脱敏证据 0.3.0 与 Zig/Erlang 分版本；原生首次任务的 grammar 保持 null。原反例确有 parse 诊断、当前源码改变且同工具完整无诊断时追加 `code_fixed`，重复验证幂等；普通 `task verify --swift-tool` 检出同工具复发时重开同一父链。原反例合法转误报调查，工具异常或身份变化不关闭。签名和信任根由独立宿主提供，项目记录不提供关闭权威。此接口尚未接入默认插件或公开发行，不代替 SwiftLint、类型检查、项目构建和完整交付验收。详见[闭环验收](tests/acceptance/swift-task-resolution-lifecycle.md)。

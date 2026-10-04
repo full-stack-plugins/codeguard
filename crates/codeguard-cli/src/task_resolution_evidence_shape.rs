@@ -33,7 +33,8 @@ pub(crate) fn valid(record: &TaskLifecycleRecord, value: &Value) -> bool {
         .iter()
         .all(|key| value[*key].as_str().is_some_and(digest))
         || !(value["grammar_sha256"].as_str().is_some_and(digest)
-            || (value["schema_version"] == "0.2.0" && value["grammar_sha256"].is_null()))
+            || (matches!(value["schema_version"].as_str(), Some("0.2.0" | "0.3.0"))
+                && value["grammar_sha256"].is_null()))
         || !native_for_version(value, "original_native")
         || !native_for_version(value, "current_native")
     {
@@ -71,6 +72,7 @@ fn native_bound(value: &Value) -> bool {
     let version = match value["schema_version"].as_str() {
         Some("0.1.0") => "0.16.0",
         Some("0.2.0") => "OTP 28",
+        Some("0.3.0") => "Apple Swift 6.4",
         _ => return false,
     };
     ["original_native", "current_native"].iter().all(|k| {
@@ -81,6 +83,7 @@ fn native_for_version(evidence: &Value, key: &str) -> bool {
     match evidence["schema_version"].as_str() {
         Some("0.1.0") => native(&evidence[key]),
         Some("0.2.0") => crate::erlang_syntax_probe::valid_native_observation(&evidence[key], None),
+        Some("0.3.0") => crate::swift_syntax_probe::valid_native_observation(&evidence[key], None),
         _ => false,
     }
 }

@@ -1,0 +1,18 @@
+{
+  "adapter_sha256": "579e561d12878d2977d93206b4154b55f20c55003806f3b7df85f41199418d6f",
+  "grammar_sha256": null,
+  "identity": {
+    "checker_id": "syntax.native_confirmation",
+    "scope": "App.swift",
+    "task_id": "CG-B-49118a2bacd4f36544899d233c7a8be2",
+    "workspace_id": "ws-147a2750ff412c3c3ac43a9a1233db95"
+  },
+  "native_rule_id": "swift.parse.error",
+  "native_version": "Apple Swift 6.4",
+  "original_report_sha256": "bba7787c1aabd9204bfa23bb1bd3a227c1a89be97fb08ef615b0e9cb268101f4",
+  "original_source_sha256": "6f44da8b1f1db95bf1948aa134b683e1066a0c9ad8941138dc2de09e70958f03",
+  "policy_revision": "p1",
+  "report_type": "task_resolution_policy",
+  "schema_version": "1.2.0",
+  "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2"
+}
