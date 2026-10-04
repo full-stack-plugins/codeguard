@@ -324,3 +324,8 @@ mod kotlin_tool_selection;
 
 #[cfg(unix)]
 mod check_kotlin_scan;
+
+#[cfg(unix)]
+pub mod swift_lint_command;
+#[cfg(unix)]
+mod swift_tool_selection;

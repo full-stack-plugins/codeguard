@@ -425,3 +425,8 @@ WASM fallback MUST 通过明确版本的协议加入既有统一命令，不静�
 #### Scenario: Incomplete native history retains unlocated recovery guidance
 - **WHEN** a stable task originated from incomplete or unlocated candidate recovery and a later native observation still cannot confirm source diagnostics
 - **THEN** next and task show retain the unlocated limitation, forbid source edits before native confirmation, and provide concrete native-environment recovery guidance; a missing tool must not erase the original limitation or fabricate positions
+
+#### Scenario: Swift standalone checking selects native parsing before candidates
+- **WHEN** lint swift receives an ordinary Swift file and an explicit compiler or the first executable swiftc in absolute invoking PATH
+- **THEN** reuse bounded frozen-source frontend parsing, preserve validated UTF-8 byte positions, and retain selected-tool failure without selecting another compiler or WASM
+- **AND** only tool absence enables bundled candidate parsing; incomplete/hidden recovery requires native confirmation, complete zero recovery recommends native setup without granting project lint or delivery success

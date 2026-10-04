@@ -13,6 +13,8 @@ fn hidden_kotlin_recovery_is_visible_in_project_feedback() {
     fs::create_dir_all(&root).unwrap();
     fs::write(root.join("Main.kt"), "fun f(x: ) = x\n").unwrap();
     let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        // 固定缺原生工具分支，避免宿主 kotlinc 抢占候选观察。
+        .env("PATH", &root)
         .args(["check", "all"])
         .arg(&root)
         .arg("--format=json")
@@ -31,6 +33,8 @@ fn hidden_kotlin_recovery_is_visible_in_project_feedback() {
     assert_eq!(kotlin["reason"], "syntax_recovery_incomplete");
     assert_eq!(report["delivery_decision"], "incomplete");
     let text_output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        // 固定缺原生工具分支，避免宿主 kotlinc 抢占候选观察。
+        .env("PATH", &root)
         .args(["check", "all"])
         .arg(&root)
         .output()
@@ -234,6 +238,8 @@ fn known_grammar_precision_limits_reach_project_feedback() {
     .unwrap();
     fs::write(root.join("broken.kt"), "fun f(x: ) = x\n").unwrap();
     let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        // 固定缺原生工具分支，避免宿主 kotlinc 抢占候选观察。
+        .env("PATH", &root)
         .args(["check", "all"])
         .arg(&root)
         .args(["--format=json", "--timeout", "45s"])

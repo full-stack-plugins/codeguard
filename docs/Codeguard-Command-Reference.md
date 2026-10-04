@@ -211,3 +211,5 @@ New protocols are `syntax_task_recheck` 0.4.0, `task_verification_preview` 0.15.
 Development source also supports existing Kotlin confirmation tasks through `codeguard task verify TASK_ID . --kotlinc-tool ABS_PATH --format=json`. `repair_ready` accepts the same option and preserves the stable task/history. Mixed observations separate actionable syntax positions from unresolved context. See [task-recheck acceptance](../tests/acceptance/kotlin-native-task-confirmation.md).
 
 Development source: `check all . --kotlinc-tool ABS_PATH` and `hook execute . --kotlinc-tool ABS_PATH` for confirmed file_changed select native Kotlin first; the option is also accepted for repair_ready. Selected failures remain visible; only tool absence enables WASM fallback.
+
+Development source: `lint swift FILE.swift [--swift-tool ABS_PATH] --format=json` provides native-first syntax-only feedback; task verify/repair_ready remain separate existing paths. Project lint, types and build are incomplete.

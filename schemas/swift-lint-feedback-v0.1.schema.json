@@ -1,0 +1,623 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:swift-lint-feedback:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "language",
+    "command_status",
+    "exit_code",
+    "source_path",
+    "scope",
+    "source_sha256",
+    "input_stable",
+    "native",
+    "syntax_precheck",
+    "setup",
+    "coverage_proven",
+    "authority",
+    "delivery_decision",
+    "next_actions",
+    "tool_selection",
+    "native_identity_scope"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "report_type": {
+      "const": "swift_lint_feedback"
+    },
+    "operation": {
+      "const": "lint"
+    },
+    "language": {
+      "const": "swift"
+    },
+    "command_status": {
+      "enum": [
+        "incomplete",
+        "cancelled"
+      ]
+    },
+    "exit_code": {
+      "enum": [
+        3,
+        130
+      ]
+    },
+    "source_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "scope": {
+      "const": "single_frozen_swift_file"
+    },
+    "source_sha256": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "input_stable": {
+      "type": "boolean"
+    },
+    "native": {
+      "$ref": "#/$defs/native"
+    },
+    "syntax_precheck": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "zig-lint-feedback-v0.1.schema.json#/$defs/candidate"
+        }
+      ]
+    },
+    "setup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "native_confirmation_required",
+        "automatic_installation",
+        "full_project_checks_required"
+      ],
+      "properties": {
+        "native_confirmation_required": {
+          "type": "boolean"
+        },
+        "automatic_installation": {
+          "const": false
+        },
+        "full_project_checks_required": {
+          "const": true
+        }
+      }
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "next_actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "tool_selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "executable"
+      ],
+      "properties": {
+        "source": {
+          "enum": [
+            "explicit",
+            "path",
+            "not_found"
+          ]
+        },
+        "executable": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "native_identity_scope": {
+      "const": "compiler_entry_only"
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "diagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "line",
+        "column",
+        "rule_id"
+      ],
+      "properties": {
+        "line": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        },
+        "column": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1048577
+        },
+        "rule_id": {
+          "const": "swift.parse.error"
+        }
+      }
+    },
+    "native": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason",
+        "version",
+        "tool_sha256",
+        "diagnostics"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "not_run",
+            "incomplete",
+            "completed",
+            "diagnostics_observed"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "pattern": "^[a-z_]{1,128}$"
+        },
+        "version": {
+          "enum": [
+            null,
+            "Apple Swift 6.4"
+          ]
+        },
+        "tool_sha256": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/digest"
+            }
+          ]
+        },
+        "diagnostics": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/diagnostic"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "completed",
+                  "diagnostics_observed"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "version": {
+                "const": "Apple Swift 6.4"
+              },
+              "tool_sha256": {
+                "$ref": "#/$defs/digest"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "diagnostics": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "diagnostics_observed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "diagnostics": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "not_run"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "version": {
+                "type": "null"
+              },
+              "tool_sha256": {
+                "type": "null"
+              },
+              "diagnostics": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "const": "swift_native_parse_no_diagnostics"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "diagnostics_observed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "const": "swift_native_parse_diagnostics"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "incomplete"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "diagnostics": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "exit_code": {
+            "const": 3
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "command_status": {
+            "const": "incomplete"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "exit_code": {
+            "const": 130
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "command_status": {
+            "const": "cancelled"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "native": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "completed",
+                  "diagnostics_observed"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "input_stable": {
+            "const": true
+          },
+          "source_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "syntax_precheck": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "syntax_precheck": {
+            "type": "object",
+            "required": [
+              "precheck"
+            ],
+            "properties": {
+              "precheck": {
+                "properties": {
+                  "truncated_files": {
+                    "const": 1
+                  }
+                },
+                "required": [
+                  "truncated_files"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "setup": {
+            "properties": {
+              "native_confirmation_required": {
+                "const": true
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "syntax_precheck": {
+            "type": "object",
+            "required": [
+              "recoveries"
+            ],
+            "properties": {
+              "recoveries": {
+                "type": "array",
+                "minItems": 1
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "setup": {
+            "properties": {
+              "native_confirmation_required": {
+                "const": true
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "syntax_precheck": {
+            "type": "object",
+            "required": [
+              "reason"
+            ],
+            "properties": {
+              "reason": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "setup": {
+            "properties": {
+              "native_confirmation_required": {
+                "const": true
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "native": {
+            "properties": {
+              "status": {
+                "const": "incomplete"
+              },
+              "reason": {
+                "not": {
+                  "const": "swift_tool_not_found"
+                }
+              }
+            },
+            "required": [
+              "status",
+              "reason"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "setup": {
+            "properties": {
+              "native_confirmation_required": {
+                "const": true
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "tool_selection": {
+            "properties": {
+              "source": {
+                "enum": [
+                  "explicit",
+                  "path"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "syntax_precheck": {
+            "type": "null"
+          },
+          "tool_selection": {
+            "properties": {
+              "executable": {
+                "type": "string",
+                "pattern": "^/"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "tool_selection": {
+            "properties": {
+              "source": {
+                "const": "not_found"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "tool_selection": {
+            "properties": {
+              "executable": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "input_stable": {
+            "const": false
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "native": {
+            "properties": {
+              "diagnostics": {
+                "maxItems": 0
+              }
+            }
+          },
+          "syntax_precheck": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  ]
+}
