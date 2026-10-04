@@ -387,9 +387,23 @@ fn summarize(path: &str, report: &Value) -> String {
                 }
             }
         }
-        repair.push_str(
-            "Swift 原生任务同步尚未接线；当前诊断可按原工具复检，不假定已有任务或完成关闭。",
-        );
+        let scan = &feedback["swift_lint"];
+        if scan["task_status"] == "not_connected" {
+            repair.push_str("Swift 原生任务工作台未连接；保留当前诊断，不假定已有任务。");
+        } else {
+            for file in scan["files"].as_array().into_iter().flatten().take(2) {
+                if let Some(id) = file["task_id"].as_str().filter(|id| {
+                    id.strip_prefix("CG-B-")
+                        .is_some_and(|s| s.len() == 32 && s.bytes().all(|b| b.is_ascii_hexdigit()))
+                }) {
+                    repair.push_str(&format!("Swift 原生任务 {id}：codeguard task show {id} . --format=json；修复后 codeguard task verify {id} . --swift-tool <已核验绝对路径> --format=json。"));
+                }
+            }
+            if scan["task_status"] == "incomplete" {
+                repair
+                    .push_str("Swift 原生任务同步未完成；保留诊断并核对工作台，不能伪造任务引用。");
+            }
+        }
     }
 
     for task in feedback["syntax_tasks"]["tasks"]

@@ -2063,6 +2063,14 @@ fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
         );
     }
     if blocker.checker_id == "syntax.native_confirmation"
+        && blocker.diagnostic_reason.as_deref() == Some("swift_native_first_observation")
+    {
+        return format!(
+            "# {} Swift 原生检查任务\n\n- 问题证据：报告 `.codeguard/reports/{}.json`，摘要 `{}`，当前范围 `{}`；首次来源为原生 compiler，没有 WASM 观察。\n- 规则依据：Apple Swift 6.4 冻结单文件 frontend parse，语法诊断与工具/预算阻塞分别保留；类型与构建尚未检查。\n- 允许修改范围：仅当前原生语法位置对应源码；上下文或工具阻塞先恢复检查环境，不改无关源码。\n- 修复步骤：运行 next 核对最新证据，按语法位置修复或恢复项目上下文，保留历史尝试。\n- 复检命令：codeguard task verify {} . --swift-tool <已核验绝对路径> --format=json。\n- 历史尝试：首次 run {}，后续扫描和复检追加在原任务。\n- 关闭条件：有效原工具复检、正式策略及完整项目覆盖满足；局部零诊断或勾选不自动关闭。\n",
+            blocker.id, report.run_id, report.digest, blocker.scope, blocker.id, report.run_id
+        );
+    }
+    if blocker.checker_id == "syntax.native_confirmation"
         && blocker.diagnostic_reason.as_deref() == Some("kotlin_native_first_observation")
     {
         return format!(

@@ -46,6 +46,11 @@ pub(crate) fn run(
         crate::kotlin_tool_selection::KotlinToolSelection::discover(kotlinc.map(Path::to_path_buf))
     });
     let selected_kotlinc = kotlin_selection.as_ref().and_then(|s| s.tool());
+    let swift_selection =
+        (language == "swift" && original["schema_version"] == "0.5.0").then(|| {
+            crate::swift_tool_selection::SwiftToolSelection::discover(swift.map(Path::to_path_buf))
+        });
+    let selected_swift = swift_selection.as_ref().and_then(|s| s.tool()).or(swift);
     let source = source_bytes(root, path);
     let native = if let Some(bytes) = source.as_ref() {
         if language == "zig" {
@@ -62,9 +67,15 @@ pub(crate) fn run(
                 .map(|tool| crate::erlang_syntax_probe::observe(tool, bytes, deadline))
                 .unwrap_or_else(|| unavailable("erlang_tool_not_found_on_path"))
         } else if language == "swift" {
-            swift
+            selected_swift
                 .map(|tool| crate::swift_syntax_probe::observe(tool, bytes, deadline))
-                .unwrap_or_else(|| unavailable("explicit_swift_tool_not_provided"))
+                .unwrap_or_else(|| {
+                    if original["schema_version"] == "0.5.0" {
+                        crate::swift_lint_command::unavailable("swift_tool_not_found")
+                    } else {
+                        unavailable("explicit_swift_tool_not_provided")
+                    }
+                })
         } else if language == "kotlin" {
             selected_kotlinc
                 .map(|tool| crate::kotlin_lint_command::observe(tool, bytes, deadline))
@@ -86,7 +97,7 @@ pub(crate) fn run(
     }
     let tool_path = zig
         .or(selected_erl)
-        .or(swift)
+        .or(selected_swift)
         .or(selected_kotlinc)
         .and_then(|p| p.canonicalize().ok());
     let target_sha = source.as_ref().map(|b| digest(b));
@@ -94,8 +105,11 @@ pub(crate) fn run(
         .duration_since(UNIX_EPOCH)
         .map_err(|_| "clock_unavailable")?
         .as_nanos();
-    let native_first = matches!(original["schema_version"].as_str(), Some("0.2.0" | "0.4.0"));
-    let mut report = json!({"schema_version":if language == "kotlin" && native_first {"0.6.0"} else if language == "kotlin" {"0.5.0"} else if language == "swift" {"0.4.0"} else if native_first {"0.3.0"} else if language == "erlang" {"0.2.0"} else {"0.1.0"},"report_type":"syntax_task_recheck","operation":"task_verify",
+    let native_first = matches!(
+        original["schema_version"].as_str(),
+        Some("0.2.0" | "0.4.0" | "0.5.0")
+    );
+    let mut report = json!({"schema_version":if language == "kotlin" && native_first {"0.6.0"} else if language == "kotlin" {"0.5.0"} else if language == "swift" && native_first {"0.7.0"} else if language == "swift" {"0.4.0"} else if native_first {"0.3.0"} else if language == "erlang" {"0.2.0"} else {"0.1.0"},"report_type":"syntax_task_recheck","operation":"task_verify",
         "workspace_binding":"bound","workspace_id":original["workspace_id"],"run_id":format!("syntax-native-{}-{nanos}",std::process::id()),
         "checker_id":"syntax.native_confirmation","task_id":brief["task_id"],"authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated",
         "target":{"path":path,"language":language,"source_sha256":target_sha},"original_report":original_reference(&original,&brief["evidence_ref"]["first_report_sha256"]),
@@ -150,7 +164,10 @@ pub(crate) fn original(root: &Path, brief: &Value) -> Result<Value, &'static str
         .flatten()
         .and_then(|b| b.workspace_id().map(str::to_owned))
         .ok_or("workspace_invalid")?;
-    let valid_origin = if matches!(report["schema_version"].as_str(), Some("0.2.0" | "0.4.0")) {
+    let valid_origin = if matches!(
+        report["schema_version"].as_str(),
+        Some("0.2.0" | "0.4.0" | "0.5.0")
+    ) {
         crate::native_syntax_confirmation::valid_history_report(root, &workspace, &report)
     } else {
         matches!(report["schema_version"].as_str(), Some("0.1.0" | "0.3.0"))
@@ -195,7 +212,10 @@ pub(crate) fn original(root: &Path, brief: &Value) -> Result<Value, &'static str
 
 // 原生首次证据没有 grammar 身份，明确保留 null；历史 WASM 来源保持原协议。
 fn original_reference(original: &Value, sha: &Value) -> Value {
-    let native_first = matches!(original["schema_version"].as_str(), Some("0.2.0" | "0.4.0"));
+    let native_first = matches!(
+        original["schema_version"].as_str(),
+        Some("0.2.0" | "0.4.0" | "0.5.0")
+    );
     json!({"run_id":original["run_id"],"sha256":sha,
         "source_sha256":if native_first {original["native_evidence"]["target"]["source_sha256"].clone()} else {original["observations"][0]["source_sha256"].clone()},
         "grammar_sha256":if native_first {Value::Null} else {original["observations"][0]["grammar_sha256"].clone()}})
@@ -273,7 +293,7 @@ fn valid_history_shape(root: &Path, report: &Value) -> bool {
         .is_some_and(|o| o.len() == keys.len() && keys.iter().all(|k| o.contains_key(*k)))
         || !matches!(
             report["schema_version"].as_str(),
-            Some("0.1.0" | "0.2.0" | "0.3.0" | "0.4.0" | "0.5.0" | "0.6.0")
+            Some("0.1.0" | "0.2.0" | "0.3.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.7.0")
         )
         || report["report_type"] != "syntax_task_recheck"
         || report["operation"] != "task_verify"
@@ -329,6 +349,7 @@ fn valid_history_shape(root: &Path, report: &Value) -> bool {
     report["workspace_id"] == old["workspace_id"]
         && ((report["schema_version"] == "0.3.0") == (old["schema_version"] == "0.2.0"))
         && ((report["schema_version"] == "0.6.0") == (old["schema_version"] == "0.4.0"))
+        && ((report["schema_version"] == "0.7.0") == (old["schema_version"] == "0.5.0"))
         && report["target"]["path"] == old["scope"]
         && report["target"]["language"] == old["language"]
         && report["original_report"] == original_reference(&old, &fact["first_report_sha256"])
@@ -341,14 +362,14 @@ fn valid_history_shape(root: &Path, report: &Value) -> bool {
 fn native_shape(root: &Path, report: &Value) -> bool {
     if matches!(
         report["schema_version"].as_str(),
-        Some("0.2.0" | "0.3.0" | "0.4.0" | "0.5.0" | "0.6.0")
+        Some("0.2.0" | "0.3.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.7.0")
     ) {
         let current = report["target"]["path"]
             .as_str()
             .and_then(|p| source_bytes(root, p))
             .filter(|b| report["target"]["source_sha256"] == digest(b));
         let kotlin = matches!(report["schema_version"].as_str(), Some("0.5.0" | "0.6.0"));
-        let swift = report["schema_version"] == "0.4.0";
+        let swift = matches!(report["schema_version"].as_str(), Some("0.4.0" | "0.7.0"));
         return report["target"]["language"]
             == if kotlin {
                 "kotlin"
@@ -609,7 +630,10 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
             {
                 "上次复检未从调用方绝对 PATH 或显式参数取得可执行 Erlang 工具；先定位已安装的 OTP 28，把其普通可执行入口加入调用方绝对 PATH 或使用 --erl-tool 绝对路径复检。确实缺工具才按项目要求准备，不修改无关源码"
             } else if report["target"]["language"] == "swift"
-                && report["native"]["reason"] == "explicit_swift_tool_not_provided"
+                && matches!(
+                    report["native"]["reason"].as_str(),
+                    Some("explicit_swift_tool_not_provided" | "swift_tool_not_found")
+                )
             {
                 "先定位已安装的 Apple Swift 6.4 编译器，以 --swift-tool 绝对路径复检；确实缺工具才按项目要求准备，不根据 WASM 未定位观察修改无关源码"
             } else if report["target"]["language"] == "kotlin" {
@@ -649,7 +673,14 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
         };
     }
     if report["target"]["language"] == "swift" {
-        guidance["schema_version"] = json!("0.6.0");
+        guidance["schema_version"] = json!(if report["run_id"]
+            .as_str()
+            .is_some_and(|r| r.starts_with("syntax-confirm-"))
+        {
+            "0.11.0"
+        } else {
+            "0.6.0"
+        });
         guidance["native_column_unit"] = json!("utf8_byte");
         guidance["native_confirmation_reason"] = if inputs_current(root, &report) {
             report["native"]["reason"].clone()

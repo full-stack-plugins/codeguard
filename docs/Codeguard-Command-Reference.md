@@ -217,3 +217,11 @@ Development source: `lint swift FILE.swift [--swift-tool ABS_PATH] --format=json
 Development source: `check all . --swift-tool ABS_PATH` adds Swift native parse under the shared deadline. Only absent tools keep candidate fallback; selected failure does not. Full lint and project-native task connection remain open.
 
 Development source: confirmed file_changed accepts `hook execute . --swift-tool ABS_PATH` for selected Swift parsing; omission discovers invoking PATH. Other non-verification/non-save events reject the tool option. CLI Claude summaries preserve native positions and task-connection gaps.
+
+### Swift native-first repair workbench (development source)
+
+In an initialized `.codeguard/` workspace, `check all` and a confirmed successful-save `hook execute file_changed` synchronize Swift native syntax findings or environment blockers into stable tasks. Repeated observations reuse the same task. `next` and `task show` expose evidence, rule basis, allowed scope, repair steps, recheck commands, history and closure conditions. An uninitialized workspace reports a disconnected workbench; synchronization failures remain blockers. Standalone `lint swift` does not create tasks yet.
+
+`codeguard task verify TASK_ID . [--swift-tool ABS_PATH] --format=json` selects an explicit tool or discovers one in the invoking PATH for native-first tasks. Existing WASM-origin tasks retain their explicit-tool contract; editable historical paths are not executed. Diagnostics request source repair. Zero diagnostics records `candidate_absent_unverified_policy`; the same task stays open pending full lint, type, build and delivery checks.
+
+Native-first protocols use observation 0.5, scan 0.2, check 0.44, initial brief 0.11, save Hook fast 0.5 / outer 0.13, and recheck inner 0.7 / outer 0.18. Existing verification briefs retain 0.6, and historical schemas remain unchanged. Actual Apple Swift 6.4 executions verified stable task references across repeated scans, saves and rechecks before and after repair. This is not installed-host or trusted-closure acceptance and is excluded from public npm 0.1.4.

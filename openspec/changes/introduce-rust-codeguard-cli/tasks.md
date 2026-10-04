@@ -1349,3 +1349,11 @@ Swift项目增量回归：32grammar10项、Hook执行19项通过（2项条件忽
 8.11/14.7/14.9/14.14/14.19 已让确认file_changed复用Swift原生项目scanner，显式/PATH工具优先且只检查选中路径。新外层0.12/局部0.4反馈进入CLI Claude有界摘要，保留当前字节位置，不回显工具文本或制造原生任务引用。混合范围候选疑似保持“必须原生确认”优先级。初始3项和混合范围1项分别RED；最终WASM6项、默认5项新测试及4项实际协议测试通过，已有Claude/Hook/Kotlin回归通过。真实Swift6.4三份直接Hook与两份CLI适配摘要见[保存反馈验收](../../../tests/acceptance/swift-native-hook.md)。输入由开发构造，不替代真实宿主安装触发验收；Swift原生稳定任务、可信闭环、完整语言和发行验收仍未完成，不勾选父任务。
 
 最终本地检查：默认与WASM all-targets严格Clippy通过；fmt、分层和OpenSpec strict通过；229份schema元定义有效，228份旧schema字节不变，相关中英文文档本地链接有效。新远端结果待验证。
+
+### 2026-10-05 Swift 原生首次任务与包验收环境修正
+
+Swift check all 与成功保存 Hook 在初始化工作区同步稳定原生任务，首次来源无 grammar 摘要；重复检查更新同一任务，next/task show 保留原工具 argv，原生来源 verify 支持显式/调用 PATH，旧 WASM 来源保持显式契约。修复后零诊断仍 open，不冒充完整 lint/类型/构建通过。真实 Apple Swift 6.4 运行证据及协议边界见 [工作台验收](../../../tests/acceptance/swift-native-workbench.md)。父任务不勾选。
+
+CI 37214829667 的 npm 全候选验收继承 Kotlin/Swift 工具，使原生优先路径取代 WASM，测试错误要求全部候选。包测试改为仅暴露 Node 的 PATH，产品选择策略不改；修复后验收结果另行记录，不以改动存在声称通过。
+
+本批最终受影响 WASM 八目标 58 passed / 0 failed / 4 ignored，默认 Swift 三目标 12 passed；默认/WASM 全目标 Clippy、236 schema 元定义与229历史字节保留、四项真实协议测试、fmt/分层/OpenSpec strict/本地文档链接通过。离线 npm 全32候选实际包调用在隔离 Node+sh PATH 后1 passed，未重跑另外两项包测试；原生策略不改。完整语料精度、实际安装宿主、可信关闭、多平台及公开发行仍未完成，不能勾选父任务。

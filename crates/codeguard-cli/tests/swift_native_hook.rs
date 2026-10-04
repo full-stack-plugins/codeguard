@@ -104,7 +104,7 @@ fn claude_swift_context_contains_native_positions_and_task_gap_without_tool_mess
         "{text}"
     );
     assert!(
-        text.contains("原生任务同步尚未接线") && text.contains("交付未评估"),
+        text.contains("原生任务工作台未连接") && text.contains("交付未评估"),
         "{text}"
     );
     assert!(!text.contains("expected type"));

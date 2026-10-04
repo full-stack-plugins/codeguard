@@ -440,3 +440,8 @@ WASM fallback MUST 通过明确版本的协议加入既有统一命令，不静�
 - **WHEN** a confirmed `file_changed` event selects Swift sources
 - **THEN** the Hook uses the same explicit/PATH native parser selection within the shared deadline and checks only selected sources, without replacing selected native failures with candidates
 - **AND** bounded host feedback includes current native counts and byte positions, never raw tool messages, and explicitly preserves missing task connection and full-project obligations.
+
+#### Scenario: Swift native first observations join a stable repair task
+- **WHEN** an initialized workspace observes current Swift native diagnostics or a selected-tool blocker
+- **THEN** the project/save scan records native-first evidence without fabricated grammar identity, updates one stable source-scope task, provides current repair/environment guidance and supports original-parser task verification
+- **AND** a subsequent clean observation records evidence but cannot auto-close; absent tools still use candidate confirmation, and failed persistence retains diagnostics with an explicit task gap.

@@ -1125,7 +1125,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                 brief["tool_readiness"] = guidance["tool_readiness"].clone();
             } else if matches!(
                 guidance["schema_version"].as_str(),
-                Some("0.4.0" | "0.5.0" | "0.6.0" | "0.8.0" | "0.10.0")
+                Some("0.4.0" | "0.5.0" | "0.6.0" | "0.8.0" | "0.10.0" | "0.11.0")
             ) {
                 brief["schema_version"] = guidance["schema_version"].clone();
                 brief["native_confirmation_reason"] =

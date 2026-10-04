@@ -150,7 +150,7 @@ fn missing_swift_compiler_retains_candidate_fallback_and_explicit_task_gap() {
             .as_array()
             .unwrap()
             .iter()
-            .any(|v| v == "swift_native_task_connection_not_implemented")
+            .any(|v| v == "swift_native_task_workspace_not_connected")
     );
     #[cfg(feature = "wasm-precheck")]
     assert!(
