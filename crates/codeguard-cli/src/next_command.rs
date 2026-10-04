@@ -99,6 +99,19 @@ pub(crate) fn read_local_brief_for_checker(
 ///
 /// 参数 `id` 只能是稳定 CG 身份；返回值不从可编辑 Markdown 提取指令。
 pub fn read_task_brief(root: &Path, id: &str) -> Result<Value, &'static str> {
+    read_task_brief_inner(root, id, false)
+}
+
+/// 为缺失的可读投影读取结构化指引；只豁免文件不存在，不豁免事实或链接校验。
+pub(crate) fn read_task_brief_for_projection(root: &Path, id: &str) -> Result<Value, &'static str> {
+    read_task_brief_inner(root, id, true)
+}
+
+fn read_task_brief_inner(
+    root: &Path,
+    id: &str,
+    allow_missing_projection: bool,
+) -> Result<Value, &'static str> {
     if !safe_id(id) {
         return Err("task_id_invalid");
     }
@@ -119,10 +132,11 @@ pub fn read_task_brief(root: &Path, id: &str) -> Result<Value, &'static str> {
         return Err("workspace_records_unavailable");
     }
     let directory = facts.join(id);
-    if !real_directory(&directory)
-        || !fs::symlink_metadata(tasks.join(format!("{id}.md")))
-            .is_ok_and(|metadata| metadata.file_type().is_file())
-    {
+    let projection_valid = match fs::symlink_metadata(tasks.join(format!("{id}.md"))) {
+        Ok(metadata) => metadata.file_type().is_file(),
+        Err(error) => allow_missing_projection && error.kind() == std::io::ErrorKind::NotFound,
+    };
+    if !real_directory(&directory) || !projection_valid {
         return Err("task_record_unavailable");
     }
     let fact: Value = serde_json::from_slice(&read_bounded(
@@ -1833,7 +1847,8 @@ fn real_directory(path: &Path) -> bool {
     fs::symlink_metadata(path).is_ok_and(|metadata| metadata.file_type().is_dir())
 }
 
-fn safe_id(value: &str) -> bool {
+/// 校验本地任务身份的封闭格式；格式有效不代表证据或权限已核验。
+pub(crate) fn safe_id(value: &str) -> bool {
     let suffix = value
         .strip_prefix("CG-B-")
         .or_else(|| value.strip_prefix("CG-"));

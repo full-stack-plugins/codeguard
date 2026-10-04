@@ -726,3 +726,33 @@ Rust 读取并复核有界源码字节，通过冻结 stdin、固定 `/` cwd、�
 `codeguard task verify TASK_ID . [--swift-tool ABS_PATH] --format=json` 对首次原生来源任务支持显式工具或调用环境 PATH 发现。已有 WASM 来源任务保留显式工具契约；不执行历史记录中未经核对的路径。复检有诊断时要求修复源码；零诊断记录 `candidate_absent_unverified_policy`，原任务仍 open，后续完整 lint、类型、构建与交付检查仍待完成。
 
 首次原生来源协议为 observation 0.5、scan 0.2、check 0.44、首次 brief 0.11、保存 Hook fast 0.5 / 外层 0.13、复检内层 0.7 / 外层 0.18。已有复检简报继续使用 0.6；旧 schema 保持原件。实际 Apple Swift 6.4 执行验证了重复扫描、保存和修复前后复检的同一任务引用。本轮没有真实安装宿主或可信关闭验收，也不在公开 npm 0.1.4 中。
+
+### 缺失任务投影恢复
+
+`codeguard work sync . --format=json` 现在在工作区同步锁内恢复已提交事实对应的缺失 Markdown，再导入新报告并复核缺失投影。恢复读取结构化事实、当前 RepairBrief、原报告摘要和消费标记，不执行检查器；现有普通任务文件原字节保留，包括用户备注和勾选。链接、目录冲突、坏事实、来源摘要变化及未提交来源明确未完成。最多检查 1000 条事实，避免无界恢复。
+
+恢复只创建可读任务，含问题证据、规则依据、允许范围、步骤、复检 argv、历史及关闭条件。复检参数中的本机绝对路径脱敏为待核验占位；通过 `task show` 查询当前真实指引。恢复不关闭问题，不改原事实、事件、消费标记或尝试历史，也不代表门禁通过。仅恢复发生时使用 `work_sync_preview` 0.3.0，并返回正整数 `restored_task_projections`；无恢复时保留 0.2.0。
+
+实际恢复反馈示例（仅局部同步，不是交付通过）：
+
+```json
+{
+  "already_consumed_reports": 1,
+  "command_status": "partial",
+  "delivery_decision": "not_evaluated",
+  "failed_reports": 0,
+  "historical_findings": 0,
+  "imported_reports": 0,
+  "new_blockers": 0,
+  "new_findings": 0,
+  "next_actions": [
+    "inspect_findings_and_tasks",
+    "implement_native_reverification_and_full_gate"
+  ],
+  "operation": "work_sync",
+  "report_type": "work_sync_preview",
+  "restored_task_projections": 1,
+  "schema_version": "0.3.0",
+  "workspace_id": "ws-f734e620fead976b3bb5826be2fb3341"
+}
+```

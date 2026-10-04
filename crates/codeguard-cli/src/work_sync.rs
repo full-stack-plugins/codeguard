@@ -30,6 +30,7 @@ mod rust_build_report;
 mod rust_cve_report;
 mod rustdoc_report;
 mod syntax_confirmation_report;
+mod task_projection;
 static NEXT_WRITE: AtomicU64 = AtomicU64::new(0);
 
 struct Arguments {
@@ -76,6 +77,7 @@ pub struct SyncSummary {
     pub new_blockers: u64,
     pub historical_findings: u64,
     pub failed_reports: u64,
+    pub restored_task_projections: u64,
 }
 
 /// 将当前 CLI 的脱敏报告写入已初始化工作区的本地报告队列。
@@ -119,7 +121,7 @@ pub fn run(args: &[String]) -> ExitCode {
         Ok(summary) => summary,
         Err(reason) => return print_unavailable(parsed.json, reason),
     };
-    let report = json!({
+    let mut report = json!({
         "schema_version":"0.2.0",
         "report_type":"work_sync_preview",
         "operation":"work_sync",
@@ -134,6 +136,10 @@ pub fn run(args: &[String]) -> ExitCode {
         "delivery_decision":"not_evaluated",
         "next_actions":["inspect_findings_and_tasks", "implement_native_reverification_and_full_gate"]
     });
+    if summary.restored_task_projections > 0 {
+        report["schema_version"] = json!("0.3.0");
+        report["restored_task_projections"] = json!(summary.restored_task_projections);
+    }
     if parsed.json {
         println!("{report}");
     } else {
@@ -144,6 +150,12 @@ pub fn run(args: &[String]) -> ExitCode {
             summary.imported_reports,
             summary.failed_reports
         );
+        if summary.restored_task_projections > 0 {
+            println!(
+                "已恢复 {} 份任务投影；原事实和关闭条件保持不变",
+                summary.restored_task_projections
+            );
+        }
     }
     ExitCode::from(3)
 }
@@ -178,6 +190,7 @@ pub fn sync_local_workspace(root: &Path) -> Result<SyncSummary, &'static str> {
     if fs::create_dir(&consumed).is_err() && !real_directory(&consumed) {
         return Err("consumed_state_unavailable");
     }
+    let restored_before_import = task_projection::recover_missing(root, true)?;
     let Ok(entries) = fs::read_dir(&reports) else {
         return Err("reports_unreadable");
     };
@@ -230,6 +243,8 @@ pub fn sync_local_workspace(root: &Path) -> Result<SyncSummary, &'static str> {
     if receipt_error {
         return Err("import_failure_receipt_write_failed");
     }
+    let restored_task_projections =
+        restored_before_import + task_projection::recover_missing(root, false)?;
     Ok(SyncSummary {
         workspace_id,
         imported_reports: imported,
@@ -238,6 +253,7 @@ pub fn sync_local_workspace(root: &Path) -> Result<SyncSummary, &'static str> {
         new_blockers,
         historical_findings,
         failed_reports: failures,
+        restored_task_projections,
     })
 }
 

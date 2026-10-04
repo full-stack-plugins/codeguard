@@ -823,3 +823,69 @@ fn environment_blocker_can_be_claimed_for_repair() {
         0
     );
 }
+
+#[test]
+fn projection_recovery_keeps_live_lease_attempt_and_budget_unchanged() {
+    fn snapshot(
+        path: &std::path::Path,
+        root: &std::path::Path,
+        records: &mut std::collections::BTreeMap<PathBuf, Vec<u8>>,
+    ) {
+        for entry in fs::read_dir(path).unwrap() {
+            let path = entry.unwrap().path();
+            if path.is_dir() {
+                snapshot(&path, root, records);
+            } else if path
+                .extension()
+                .is_some_and(|extension| extension == "json")
+            {
+                records.insert(
+                    path.strip_prefix(root).unwrap().to_owned(),
+                    fs::read(path).unwrap(),
+                );
+            }
+        }
+    }
+    let p = Project::new();
+    let action = p.next()["repair_brief"]["action_id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+    let (_, lease) = p.run("claim", "projection-owner", None);
+    let token = lease["lease_token"].as_str().unwrap();
+    assert_eq!(
+        p.attempt(
+            "start",
+            "projection-owner",
+            token,
+            &["--action-id", &action]
+        )
+        .0,
+        0
+    );
+    let history = p.next()["repair_brief"]["history"].clone();
+    assert!(history["open_attempt_id"].is_string());
+    let mut before = std::collections::BTreeMap::new();
+    snapshot(&p.root.join(".codeguard/state"), &p.root, &mut before);
+    snapshot(&p.root.join(".codeguard/findings"), &p.root, &mut before);
+    fs::remove_file(p.root.join(format!(".codeguard/tasks/{}.md", p.task_id))).unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["work", "sync"])
+        .arg(&p.root)
+        .arg("--format=json")
+        .output()
+        .unwrap();
+    let response: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(response["restored_task_projections"], 1, "{response}");
+    let mut after = std::collections::BTreeMap::new();
+    snapshot(&p.root.join(".codeguard/state"), &p.root, &mut after);
+    snapshot(&p.root.join(".codeguard/findings"), &p.root, &mut after);
+    assert_eq!(after, before);
+    let next = p.next();
+    assert_eq!(next["repair_brief"]["history"], history);
+    assert_eq!(next["repair_brief"]["disposition"], "waiting");
+    assert_eq!(
+        p.run("release", "projection-owner", Some(token)).1["reason"],
+        "attempt_still_open"
+    );
+}

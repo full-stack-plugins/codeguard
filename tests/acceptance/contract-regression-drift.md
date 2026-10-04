@@ -20,3 +20,9 @@ cargo test --workspace --all-targets
 - `/tmp/codeguard-15dcbbd-workspace-default.log`：`19efc1641af940a1f3f0685993784a74f73eb766484247310c54b3cd98b42e4d`。
 - `/tmp/codeguard-15dcbbd-hook-protocol-red.log`：`fcb4d5a33c20987ec6b2efcd196df57337ec6a495c5b2849e5f0f2ba74f4ab98`。
 - `/tmp/codeguard-contract-drift-green.log`：`909f5506ea8a6c39790623b3d56eb5025f3b3557a6a1d353be1a070902a0ef88`。
+
+## 修正后的完整默认终态
+
+0a3e6a3 对应修正后默认 workspace/all-targets 的实际重跑已退出0：230组、1278 passed / 0 failed / 113 ignored。日志 `/tmp/codeguard-contract-drift-workspace-default.log`。此结果属于投影恢复实现之前，不用于证明后续源码改动已通过全套。忽略项仍未验收，完整 WASM suite、语法资格、真实宿主、可信关闭及公开发行不因此完成。
+
+2026-10-05 实时核验：[CI 37218637535](https://github.com/full-stack-plugins/codeguard/actions/runs/37218637535) 的 headSha 为 `0a3e6a3e3c90f213e84ad43f4189d20cf94cb1bc`，gate 与 msrv 均 completed/success。Linux WASM 资源边界、32 grammar 回放、离线 npm 包验收和完整测试步骤均成功；Rust 1.85 默认及 WASM targets 实编成功。该结果不覆盖当前未提交的任务投影恢复改动，也不升级 grammar 资格或真实宿主验收。
