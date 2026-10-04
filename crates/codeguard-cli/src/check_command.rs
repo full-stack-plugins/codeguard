@@ -54,6 +54,7 @@ struct Args {
     go_tool: Option<PathBuf>,
     erl_tool: Option<PathBuf>,
     kotlinc_tool: Option<PathBuf>,
+    swift_tool: Option<PathBuf>,
     maven_tool: Option<PathBuf>,
     java_home: Option<PathBuf>,
     maven_repo: Option<PathBuf>,
@@ -323,6 +324,34 @@ pub fn run(args: &[String]) -> ExitCode {
             &AtomicBool::new(false),
         );
         execution_tasks.push(json!({"id":"kotlin.lint","status":if report["local_compile_complete"]==true {"native_observed_unverified"} else {"native_incomplete"}}));
+        report
+    };
+    let swift_sources = if parsed.selection == Selection::All {
+        discovery
+            .languages
+            .get("swift")
+            .map(|e| {
+                e.source_files
+                    .iter()
+                    .filter(|p| p.ends_with(".swift"))
+                    .cloned()
+                    .collect()
+            })
+            .unwrap_or_default()
+    } else {
+        BTreeSet::new()
+    };
+    let mut swift_lint = if swift_sources.is_empty() {
+        Value::Null
+    } else {
+        let report = crate::check_swift_scan::observe(
+            &root,
+            &swift_sources,
+            parsed.swift_tool.clone(),
+            deadline,
+            &AtomicBool::new(false),
+        );
+        execution_tasks.push(json!({"id":"swift.lint","status":if report["local_parse_complete"]==true {"native_observed_unverified"} else {"native_incomplete"}}));
         report
     };
     let mut java_p3c = Value::Null;
@@ -1188,6 +1217,12 @@ pub fn run(args: &[String]) -> ExitCode {
         crate::native_syntax_confirmation::connect(&root, &mut kotlin_lint, deadline);
         crate::check_kotlin_scan::refresh(&root, &mut kotlin_lint, deadline);
     }
+    if swift_lint.is_object() {
+        if source_recheck.or(scope_recheck).is_some() {
+            swift_lint["scope_stable"] = json!(false);
+        }
+        crate::check_swift_scan::refresh(&root, &mut swift_lint, deadline);
+    }
     if erlang_lint.is_object() {
         if source_recheck.or(scope_recheck).is_some() {
             crate::check_erlang_scan::invalidate_scope(&mut erlang_lint);
@@ -1303,6 +1338,14 @@ pub fn run(args: &[String]) -> ExitCode {
                 candidate["reason"] = json!("kotlin_single_file_project_checks_unverified");
                 candidate["next_action"] = json!(
                     "读取 native_results.kotlin_lint 的当前语法位置、上下文诊断、环境阻塞和稳定任务；单文件编译不代替项目 lint 与完整构建"
+                );
+            }
+            if language == "swift" && category == "lint" && swift_lint.is_object() {
+                candidate["checker_id"] = json!("swift.frontend.parse");
+                candidate["status"] = json!("native_incomplete");
+                candidate["reason"] = json!("swift_single_file_project_checks_unverified");
+                candidate["next_action"] = json!(
+                    "读取 native_results.swift_lint 的当前语法位置、环境阻塞；任务同步尚未接线，单文件 parse不代替项目 lint 与完整构建"
                 );
             }
             if language == "erlang" && category == "lint" && erlang_present {
@@ -1471,6 +1514,13 @@ pub fn run(args: &[String]) -> ExitCode {
             Some("failed" | "sync_incomplete")
         ) {
             unresolved.insert("kotlin_task_sync_incomplete".into());
+        }
+    }
+    if swift_lint.is_object() {
+        unresolved.insert("swift_project_lint_and_build_coverage_unverified".into());
+        unresolved.insert("swift_native_task_connection_not_implemented".into());
+        if swift_lint["local_parse_complete"] != true {
+            unresolved.insert("swift_native_scan_incomplete".into());
         }
     }
     if erlang_present {
@@ -1657,6 +1707,12 @@ pub fn run(args: &[String]) -> ExitCode {
                 .as_array()
                 .is_some_and(|files| files.iter().any(|f| f["native"]["tool_sha256"].is_string())),
         );
+    let started_native_task_count = started_native_task_count
+        + usize::from(
+            swift_lint["files"]
+                .as_array()
+                .is_some_and(|files| files.iter().any(|f| f["native"]["tool_sha256"].is_string())),
+        );
     #[cfg(feature = "wasm-precheck")]
     let syntax_candidates = crate::check_syntax_candidates::observe(
         &root,
@@ -1667,6 +1723,7 @@ pub fn run(args: &[String]) -> ExitCode {
             go_lint: &go_lint,
             erlang_lint: &erlang_lint,
             kotlin_lint: &kotlin_lint,
+            swift_lint: &swift_lint,
             rust_targets: &_rust_syntax_coverage,
             go_tool: parsed.go_tool.as_deref(),
         },
@@ -1706,27 +1763,32 @@ pub fn run(args: &[String]) -> ExitCode {
         }
     }
     let mut report = json!({
-        "schema_version":if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
+        "schema_version":if swift_lint.is_object() {"0.43.0"} else if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
         "operation":"check", "selection":parsed.selection.as_str(), "command_status":if request_cancelled { "cancelled" } else { "incomplete" },
         "exit_code":if request_cancelled { 130 } else { 3 }, "delivery_decision":if parsed.selection == Selection::All { "incomplete" } else { "not_evaluated" }, "authority":"local_unverified",
         "reason":if request_cancelled { "request_cancelled" } else if parsed.selection == Selection::All { "full_project_obligations_and_trusted_policy_unavailable" } else { "java_selection_obligations_and_trusted_policy_unavailable" },
         "discovery":discovery.to_json(),
-        "native_results":{"node_lint":node_lint,"python_lint":python_lint,"python_cve":python_cve,"rust_lint":rust_lint,"rust_comments":rust_comments,"rust_build":rust_build,"rust_cve":rust_cve,"go_lint":go_lint,"erlang_lint":erlang_lint,"kotlin_lint":kotlin_lint,"java_p3c":java_p3c,"java_javadoc":java_javadoc,"java_dependencies":java_dependencies,"java_cve":java_cve,"npm_cve":npm_cve}, "execution_tasks":execution_tasks,
+        "native_results":{"node_lint":node_lint,"python_lint":python_lint,"python_cve":python_cve,"rust_lint":rust_lint,"rust_comments":rust_comments,"rust_build":rust_build,"rust_cve":rust_cve,"go_lint":go_lint,"erlang_lint":erlang_lint,"kotlin_lint":kotlin_lint,"swift_lint":swift_lint,"java_p3c":java_p3c,"java_javadoc":java_javadoc,"java_dependencies":java_dependencies,"java_cve":java_cve,"npm_cve":npm_cve}, "execution_tasks":execution_tasks,
         "obligation_status":"unresolved", "required_obligations":null,
         "category_candidates":candidates, "unresolved_conditions":unresolved,
         "syntax_candidates":syntax_candidates,
         "syntax_tasks":syntax_tasks,
         "execution_budget":check_budget_record(
             parsed.timeout_ms, parsed.timeout_source, parsed.jobs_limit, parsed.jobs_source,
-            usize::from(node_present) + usize::from(python_present) + python_cve_roots.len() + 4 * usize::from(rust_present) + usize::from(go_present) + usize::from(erlang_present) + usize::from(java_present) + usize::from(javadoc_configured) + usize::from(dependency_configured) + usize::from(cve_configured) + npm_roots.len() + usize::from(kotlin_lint.is_object()), started_native_task_count
+            usize::from(node_present) + usize::from(python_present) + python_cve_roots.len() + 4 * usize::from(rust_present) + usize::from(go_present) + usize::from(erlang_present) + usize::from(java_present) + usize::from(javadoc_configured) + usize::from(dependency_configured) + usize::from(cve_configured) + npm_roots.len() + usize::from(kotlin_lint.is_object()) + usize::from(swift_lint.is_object()), started_native_task_count
         ),
         "next":next,
         "export":{"status":"not_requested","reason_code":null}
     });
     // 历史报告维持封闭协议；只有新 Kotlin 报告携带新增原生字段。
-    if report["schema_version"] != "0.42.0" {
+    if !matches!(report["schema_version"].as_str(), Some("0.42.0" | "0.43.0")) {
         if let Some(native) = report["native_results"].as_object_mut() {
             native.remove("kotlin_lint");
+        }
+    }
+    if report["schema_version"] != "0.43.0" {
+        if let Some(native) = report["native_results"].as_object_mut() {
+            native.remove("swift_lint");
         }
     }
     if parsed.format != OutputFormat::Human {
@@ -1894,6 +1956,25 @@ pub fn run(args: &[String]) -> ExitCode {
                         "cargo clippy --locked --offline --all-targets --message-format=json"
                     )
             );
+        }
+        if let Some(files) = report["native_results"]["swift_lint"]["files"].as_array() {
+            println!("Swift 原生冻结单文件 parse；完整 lint、类型、构建和任务同步仍待完成");
+            for file in files {
+                println!(
+                    "  {}：{}；{}",
+                    file["path"], file["native"]["reason"], file["next_action"]
+                );
+                for row in file["native"]["diagnostics"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                {
+                    println!(
+                        "  {}:{}:{} {}（UTF-8 字节列）",
+                        file["path"], row["line"], row["column"], row["rule_id"]
+                    );
+                }
+            }
         }
         if let Some(files) = report["native_results"]["kotlin_lint"]["files"].as_array() {
             println!("Kotlin 原生单文件编译；完整项目 lint 和构建仍待核验");
@@ -2495,6 +2576,7 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
     let mut go_tool = None;
     let mut erl_tool = None;
     let mut kotlinc_tool = None;
+    let mut swift_tool = None;
     let mut maven_tool = None;
     let mut java_home = None;
     let mut maven_repo = None;
@@ -2585,6 +2667,15 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
                     .is_some()
                 {
                     return Err("--kotlinc-tool 重复".into());
+                }
+            }
+            "--swift-tool" => {
+                index += 1;
+                if swift_tool
+                    .replace(PathBuf::from(args.get(index).ok_or("缺少 Swift 工具路径")?))
+                    .is_some()
+                {
+                    return Err("--swift-tool 重复".into());
                 }
             }
             "--erl-tool" => {
@@ -2744,6 +2835,9 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
     if kotlinc_tool.as_ref().is_some_and(|p| !p.is_absolute()) {
         return Err("--kotlinc-tool 必须是绝对路径".into());
     }
+    if swift_tool.as_ref().is_some_and(|path| !path.is_absolute()) {
+        return Err("--swift-tool 必须是绝对路径".into());
+    }
     if erl_tool.as_ref().is_some_and(|path| !path.is_absolute()) {
         return Err("--erl-tool 必须是绝对路径".into());
     }
@@ -2758,7 +2852,8 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
             || rustsec_db.is_some()
             || go_tool.is_some()
             || erl_tool.is_some()
-            || kotlinc_tool.is_some())
+            || kotlinc_tool.is_some()
+            || swift_tool.is_some())
     {
         return Err("check java 不接受其它语言的原生工具参数".into());
     }
@@ -2805,6 +2900,7 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
         go_tool,
         erl_tool,
         kotlinc_tool,
+        swift_tool,
         maven_tool,
         java_home,
         maven_repo,

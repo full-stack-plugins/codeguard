@@ -163,7 +163,7 @@ fn invalid(reason: &str) -> ExitCode {
 fn digest(bytes: &[u8]) -> String {
     format!("{:x}", Sha256::digest(bytes))
 }
-fn unavailable(reason: &str) -> Value {
+pub(crate) fn unavailable(reason: &str) -> Value {
     json!({"status":"incomplete","reason":reason,"version":null,"tool_sha256":null,"diagnostics":[]})
 }
 fn launcher_current(

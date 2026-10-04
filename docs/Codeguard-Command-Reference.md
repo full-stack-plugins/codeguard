@@ -213,3 +213,5 @@ Development source also supports existing Kotlin confirmation tasks through `cod
 Development source: `check all . --kotlinc-tool ABS_PATH` and `hook execute . --kotlinc-tool ABS_PATH` for confirmed file_changed select native Kotlin first; the option is also accepted for repair_ready. Selected failures remain visible; only tool absence enables WASM fallback.
 
 Development source: `lint swift FILE.swift [--swift-tool ABS_PATH] --format=json` provides native-first syntax-only feedback; task verify/repair_ready remain separate existing paths. Project lint, types and build are incomplete.
+
+Development source: `check all . --swift-tool ABS_PATH` adds Swift native parse under the shared deadline. Only absent tools keep candidate fallback; selected failure does not. Full lint and project-native task connection remain open.

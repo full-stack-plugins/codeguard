@@ -1335,3 +1335,11 @@ Swift 差分纠正先以状态断言暴露旧清单文案的红测，再按真�
 最新远端运行 37212223616 的 Kotlin 候选反馈两例因继承宿主 PATH 失败；候选专用测试改为固定缺原生环境，原生优先独立测试保持。修复后本地与远端结果追加，不将旧失败表述为通过。
 
 本地修复验证：`check_all_grammar_candidates` 10 passed / 0 failed / 0 ignored，`kotlin_native_first` 5 passed / 0 failed / 0 ignored；225 份旧 schema 字节不变，新协议后共 226 份元定义有效，文档链接、fmt、分层与 OpenSpec strict 通过。远端新提交待验证。
+
+### 2026-10-04 Swift 项目原生观察（父任务未完成）
+
+8.11/14.7/14.19 已接通 `check all . --swift-tool ABS_PATH`，显式/调用方 PATH 原生入口优先，最多64普通 Swift 文件共用截止时间；已选工具失败不切换 WASM，超范围仍未观察。当前原生字节位置及原工具复检 argv 进入聚合0.43报告，源码/工具变化撤回位置。默认/WASM各5个项目测试、各9个独立入口回归及4个实际协议测试通过；Apple Swift6.4错误/合法与缺工具三份实际报告见[项目观察验收](../../../tests/acceptance/swift-native-project.md)。项目原生任务连接明确 not_connected、无伪造ID；保存Hook、完整SwiftLint/类型/注释/安全与可信闭环仍未完成，不勾选父任务。
+
+Swift项目增量回归：32grammar10项、Hook执行19项通过（2项条件忽略）。Hook任务14项通过、1项旧聚合版本断言失败；升级到0.43并保留稳定任务与next断言，增加原生缺失/任务未连接断言。上轮远端37213692814另有Swift模拟器未读stdin导致的2例未完成反馈，当前只修正模拟器输入消费，不将产品失败降级。修正后测试和新远端终态另记。
+
+修正后终态：旧版本断言目标1 passed / 0 failed；消费stdin的Swift项目默认/WASM各5项、独立入口各9项通过；最终WASM all-targets严格Clippy通过，默认严格Clippy本轮已通过。4项实际协议测试、228份schema元定义、226份旧schema字节不变、分层及OpenSpec strict已验证。新Linux终态仍待验证。

@@ -72,6 +72,7 @@ pub(crate) fn observe(
             go_lint: &Value::Null,
             erlang_lint: &Value::Null,
             kotlin_lint: &kotlin_lint,
+            swift_lint: &Value::Null,
             rust_targets: &crate::rust_native_syntax_coverage::RustNativeSyntaxCoverage::default(),
             go_tool: None,
         },

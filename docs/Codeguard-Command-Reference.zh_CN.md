@@ -714,3 +714,5 @@ Rust 读取并复核有界源码字节，通过冻结 stdin、固定 `/` cwd、�
 开发源码：`check all . --kotlinc-tool ABS_PATH` 与确认保存事件的 `hook execute . --kotlinc-tool ABS_PATH` 优先选择 Kotlin 原生工具；repair_ready 也接受该参数。已选工具失败保留阻塞，只有工具缺失才回退 WASM。
 
 开发源码：`lint swift FILE.swift [--swift-tool ABS_PATH] --format=json` 提供原生优先的单文件语法反馈；已有 task verify/repair_ready 为独立路径。完整项目 lint、类型和构建仍未完成。
+
+开发源码：`check all . --swift-tool ABS_PATH` 增加共享截止时间的 Swift 原生 parse；缺工具回退候选，已选工具失败不回退；完整 lint 与项目原生任务连接仍未完成。

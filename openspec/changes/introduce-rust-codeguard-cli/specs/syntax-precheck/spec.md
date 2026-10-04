@@ -430,3 +430,8 @@ WASM fallback MUST 通过明确版本的协议加入既有统一命令，不静�
 - **WHEN** lint swift receives an ordinary Swift file and an explicit compiler or the first executable swiftc in absolute invoking PATH
 - **THEN** reuse bounded frozen-source frontend parsing, preserve validated UTF-8 byte positions, and retain selected-tool failure without selecting another compiler or WASM
 - **AND** only tool absence enables bundled candidate parsing; incomplete/hidden recovery requires native confirmation, complete zero recovery recommends native setup without granting project lint or delivery success
+
+#### Scenario: Swift project observation preserves native preference and scope gaps
+- **WHEN** `check all` discovers ordinary Swift sources
+- **THEN** it selects the explicit Swift tool or first executable invoking PATH entry before candidates, parses at most 64 frozen files under the shared deadline, reports unobserved sources and current byte positions, and never changes a selected failing compiler into a WASM success
+- **AND** missing tools retain candidate fallback, source or tool changes withdraw positions, and project lint, task connection and delivery gaps remain visible until independently implemented and verified.

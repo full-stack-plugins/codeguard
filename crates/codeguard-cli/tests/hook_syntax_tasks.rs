@@ -711,7 +711,15 @@ fn unlocated_project_check_and_edit_hook_share_the_same_task_and_next_step() {
         report["syntax_tasks"]["status"], "synced_partial",
         "{report}"
     );
-    assert_eq!(report["schema_version"], "0.40.0");
+    assert_eq!(report["schema_version"], "0.43.0");
+    assert_eq!(
+        report["native_results"]["swift_lint"]["tool_selection"]["source"],
+        "not_found"
+    );
+    assert_eq!(
+        report["native_results"]["swift_lint"]["task_status"],
+        "not_connected"
+    );
     assert_eq!(report["next"]["schema_version"], "0.7.0");
     let id = report["syntax_tasks"]["tasks"][0]["task_id"]
         .as_str()

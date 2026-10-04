@@ -27,7 +27,7 @@ impl Project {
     }
     fn tool(&self, body: &str, version: &str) -> PathBuf {
         let p = self.0.join("swiftc");
-        fs::write(&p,format!("#!/bin/sh\nif [ \"$1\" = --version ]; then echo 'Apple Swift version {version} (fixture)'; exit 0; fi\n{body}\n")).unwrap();
+        fs::write(&p,format!("#!/bin/sh\nif [ \"$1\" = --version ]; then echo 'Apple Swift version {version} (fixture)'; exit 0; fi\n/bin/cat >/dev/null\n{body}\n")).unwrap();
         fs::set_permissions(&p, fs::Permissions::from_mode(0o700)).unwrap();
         p
     }
