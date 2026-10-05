@@ -124,7 +124,13 @@ fn public_go_package_candidate_reuses_one_task_across_checks_and_save() {
     assert!(text.contains("package"), "{text}");
     assert!(text.contains("原生"));
     let initial = codeguard_cli::next_command::read_task_brief(&root, &task).unwrap();
-    assert_eq!(initial["schema_version"], "0.14.0", "{initial}");
+    assert_eq!(initial["schema_version"], "0.18.0", "{initial}");
+    assert!(
+        initial["native_confirmation_ref"]["run_id"]
+            .as_str()
+            .unwrap()
+            .starts_with("syntax-confirm-")
+    );
     assert!(initial["step"].as_str().unwrap().contains("Go"));
     assert!(!initial["step"].as_str().unwrap().contains("尚未接入"));
     let unavailable = command(&["task", "verify", &task, path, "--format=json"], None);

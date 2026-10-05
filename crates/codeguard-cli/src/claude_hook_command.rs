@@ -341,6 +341,12 @@ fn summarize(path: &str, report: &Value) -> String {
         .flatten()
         .filter(|f| f["current"] == true)
         .flat_map(|f| f["native"]["diagnostics"].as_array().into_iter().flatten());
+    let go = feedback["go_syntax"]["files"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter(|f| f["current"] == true)
+        .flat_map(|f| f["native"]["diagnostics"].as_array().into_iter().flatten());
     let shell = feedback["shell_lint"]["files"]
         .as_array()
         .into_iter()
@@ -352,6 +358,7 @@ fn summarize(path: &str, report: &Value) -> String {
         .chain(swift)
         .chain(zig)
         .chain(ruby)
+        .chain(go)
         .chain(shell)
     {
         count += 1;
@@ -474,6 +481,44 @@ fn summarize(path: &str, report: &Value) -> String {
             repair.push_str("Shell 任务工作台未连接或同步未完成；保留当前观察，不假定已有任务。");
         }
         repair.push_str("缺工具时安装适用ShellCheck；未知或不支持方言先核对实际方言与检查器，不反复重装。当前没有Shell内置WASM，检查不完整；不凭零诊断关闭任务。");
+    }
+    if feedback["go_syntax"].is_object() {
+        let scan = &feedback["go_syntax"];
+        for file in scan["files"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter(|f| f["current"] == true)
+            .take(2)
+        {
+            for row in file["native"]["diagnostics"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .take(2)
+            {
+                if let Some(line) = row["line"].as_u64() {
+                    if let Some(column) = row["column"].as_u64() {
+                        repair.push_str(&format!("Go 第 {line} 行、第 {column} 列（UTF-8字节）；"));
+                    }
+                }
+            }
+            if let Some(id) = file["task_id"].as_str().filter(|id| {
+                id.strip_prefix("CG-B-")
+                    .is_some_and(|s| s.len() == 32 && s.bytes().all(|b| b.is_ascii_hexdigit()))
+            }) {
+                repair.push_str(&format!("Go 原生任务 {id}：codeguard task show {id} . --format=json；修复后 codeguard task verify {id} . --go-tool <已核验绝对路径> --format=json。"));
+            }
+        }
+        if scan["task_status"] == "not_connected" {
+            repair.push_str("Go 原生任务工作台未连接；保留当前诊断，不假定已有任务。");
+        }
+        if scan["task_status"] == "incomplete" {
+            repair.push_str("Go 原生任务同步未完成；核对工作台，不伪造任务引用。");
+        }
+        repair.push_str(
+            "核对Go1.23.4与同目录gofmt；继续go vet、类型与依赖检查，不凭零诊断关闭任务。",
+        );
     }
     if feedback["ruby_lint"].is_object() {
         let scan = &feedback["ruby_lint"];

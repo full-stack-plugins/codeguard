@@ -757,3 +757,24 @@ The [acceptance record](tests/acceptance/shellcheck-hook-baseline.md) distinguis
 CFQuery SQL comparisons require a database dialect. PostgreSQL accepts an empty SELECT list but rejects its DISTINCT variant; the fixed WASM reports zero recoveries for both. The isolated native evidence does not promote generic pending labels. See [dialect evidence](docs/CFQuery-SQL-Dialect-Evidence.md); project SQL adaptation and grammar repair remain open.
 
 Failed-write routing also accepts registered Go/Cargo/Maven and other checker configuration options, returning `not_run/write_failed` without starting tools or creating a workbench. Ownership/lease, unknown and malformed arguments remain rejected. This exception only applies to failed writes and does not silently enable unwired tools on confirmed edits. See [acceptance](tests/acceptance/hook-failed-write-options.md).
+
+## Go native syntax feedback after edits (local acceptance)
+
+`hook execute . --go-tool /absolute/path/go --timeout 30s --format=json` prefers the companion gofmt from the fixed Go1.23.4 SDK for selected confirmed edits. It checks frozen stdin and revalidates both artifacts and source bytes without running source, installing dependencies or executing project-wide go vet. Missing tools retain WASM candidates; selected failures, missing companions, unverified versions and `//line` position remapping remain incomplete without switching checkers. Project language versions and all build conditions remain unaccepted.
+
+```mermaid
+flowchart LR
+    E[Confirmed Go edit] --> S{SDK selected?}
+    S -->|Yes| G[Same SDK gofmt on frozen stdin]
+    G -->|Diagnostics| T[Update one stable syntax task]
+    G -->|Failure| B[Keep environment blocker and diagnosis]
+    S -->|No| W[Bundled WASM precheck]
+    W -->|Candidate or incomplete| R[Require native confirmation]
+    W -->|Complete zero recovery| I[Recommend native lint preparation]
+    T --> V[task verify --go-tool original SDK]
+    V --> O[Record attempt and evidence; unapproved task stays open]
+```
+
+Edit feedback uses outer0.22/inner0.12 and native-first observations0.10; historical schemas remain intact. Native and candidate observations share workspace/path/language task identity. Claude-shaped feedback exposes current Go rules, UTF-8 byte positions and actual task recheck guidance without source or free-text messages. Zero native diagnostics do not authorize closure: project go vet, types, dependencies, security and complete checks still apply. See [Go Hook acceptance](tests/acceptance/go-native-hook.md).
+
+Go native-first task guidance uses `repair_brief_preview` 0.18 with a `syntax-confirm-` observation reference. Actual task-recheck guidance retains 0.14 with a `syntax-native-` reference; existing schemas are unchanged. Final affected regressions: WASM 78 passed / 5 conditionally ignored, default 15 passed / 0 ignored. The earlier 1,461-pass full default run predates this final protocol correction.

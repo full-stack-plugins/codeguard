@@ -1359,6 +1359,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                         | "0.12.0"
                         | "0.14.0"
                         | "0.15.0"
+                        | "0.18.0"
                 )
             ) {
                 brief["schema_version"] = guidance["schema_version"].clone();
@@ -1368,7 +1369,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             }
             if matches!(
                 guidance["schema_version"].as_str(),
-                Some("0.14.0" | "0.15.0")
+                Some("0.14.0" | "0.15.0" | "0.18.0")
             ) {
                 brief["native_confirmation_ref"] = guidance["native_confirmation_ref"].clone();
             }

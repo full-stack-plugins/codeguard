@@ -137,9 +137,18 @@ fn failed_write_still_rejects_ownership_and_malformed_arguments() {
     }
 }
 #[test]
-fn confirmed_edit_does_not_silently_ignore_unwired_go_tool() {
+fn confirmed_edit_reports_selected_go_failure_without_ignoring_it() {
     let p = Project::new();
     let out = p.invoke(&[("--go-tool", "/missing/go")], "confirmed");
-    assert_eq!(out.status.code(), Some(2), "{out:?}");
+    assert_eq!(out.status.code(), Some(3), "{out:?}");
+    let report: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(
+        report["local_feedback"]["go_syntax"]["tool_selection"]["source"],
+        "explicit"
+    );
+    assert_eq!(
+        report["local_feedback"]["go_syntax"]["files"][0]["native"]["status"],
+        "incomplete"
+    );
     assert!(!p.0.join(".codeguard").exists());
 }

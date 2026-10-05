@@ -1549,3 +1549,24 @@ flowchart LR
 CFQuery的SQL语法对照必须绑定数据库方言：PostgreSQL可接受空SELECT列表，却拒绝DISTINCT空列表。当前隔离原生验证揭示固定WASM对两者均零恢复，不能将无方言样例升级为已确认错误。详见[方言证据](CFQuery-SQL-Dialect-Evidence.zh_CN.md)；项目SQL原生适配与grammar修复仍开放。
 
 失败写入的通用分流进一步允许已登记的 Go/Cargo/Maven 等检查器配置参数，直接返回 `not_run/write_failed`，不启动工具或创建工作台；租约/所有权、未知或格式错误参数仍拒绝。此例外仅用于失败写入，不将未接线工具静默启用于确认编辑。见[验收](../tests/acceptance/hook-failed-write-options.md)。
+
+## Go 编辑原生语法快检（局部验收）
+
+`hook execute . --go-tool /绝对路径/go --timeout 30s --format=json` 对确认编辑中的选中文件优先调用固定 Go1.23.4 SDK 的同目录 gofmt；入口、辅助工具和源码字节分别复核，不运行源码、依赖安装或项目级 go vet。缺工具保留 WASM 候选；选定工具失败、辅助工具缺失、未知版本及 `//line` 位置重映射保持未完成，不静默切换检查器。当前仅固定 SDK 语法观察，项目语言版本与全部构建条件尚未验收。
+
+```mermaid
+flowchart LR
+    E[确认 Go 文件编辑] --> S{SDK 已选择?}
+    S -->|是| G[同 SDK gofmt 检查冻结 stdin]
+    G -->|诊断| T[更新同一稳定语法任务]
+    G -->|失败| B[保留环境阻塞与具体诊断需求]
+    S -->|否| W[内置 WASM 初检]
+    W -->|疑似异常或未完成| R[要求原生确认]
+    W -->|完整零恢复| I[推荐准备原生 lint]
+    T --> V[task verify --go-tool 原 SDK]
+    V --> O[记录尝试与证据，保持未批准任务开放]
+```
+
+编辑外层协议0.22/内层0.12、新原生首次观察0.10；历史版本保留。原生诊断与候选沿用相同工作区/路径/语言任务身份；Claude格式仅显示当前Go规则、UTF-8字节位置及实际任务复检指引，排除源码/自由文本。原 SDK 复检零诊断不等于可信关闭，仍须go vet、类型、依赖、安全及完整项目检查。证据见[Go Hook验收](../tests/acceptance/go-native-hook.md)。
+
+Go首次原生观察的任务指引使用 `repair_brief_preview` 0.18和 `syntax-confirm-` 引用；实际任务复检继续使用0.14和 `syntax-native-` 引用，历史schema保持不变。最终受影响回归：WASM 78通过/5条件忽略，默认15通过/0忽略。此前1461通过的默认全量结果早于这次末尾协议修正。

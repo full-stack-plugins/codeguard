@@ -1,0 +1,31 @@
+{
+  "delivery_decision": "not_evaluated",
+  "execution": "task_verification",
+  "host_blocking_verified": false,
+  "local_feedback": {
+    "authority": "local_unverified",
+    "checker_id": "syntax.native_confirmation",
+    "delivery_decision": "not_evaluated",
+    "event_persisted": true,
+    "observation": "still_blocked",
+    "reason": null,
+    "report_type": "hook_task_verification_summary",
+    "scan_report_available": true,
+    "schema_version": "0.1.0",
+    "task_id": "CG-B-374e645c8d56728554421f6a427974bc"
+  },
+  "plan": {
+    "action": "verify_task",
+    "host_blocking_claimed": false,
+    "may_claim_delivery": false,
+    "requires_git_snapshot": false,
+    "scope_resolution_reason": null,
+    "soft_result_reuse_candidate": false,
+    "target_paths": [],
+    "task_id": "CG-B-374e645c8d56728554421f6a427974bc"
+  },
+  "reason": null,
+  "report_type": "hook_execution_feedback",
+  "schema_version": "0.7.0",
+  "soft_result_reused": false
+}

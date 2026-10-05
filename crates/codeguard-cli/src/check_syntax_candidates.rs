@@ -136,19 +136,21 @@ pub(crate) fn observe_selected(
     };
     let candidate_deadline = deadline.min(Instant::now() + Duration::from_secs(90));
     let cancelled = AtomicBool::new(false);
-    let native_go_files =
-        if !selected.iter().any(|path| path.ends_with(".go")) || native.go_lint.is_null() {
-            BTreeMap::new()
-        } else {
-            selected_sources_for_candidate(
-                root,
-                native.go_tool,
-                native.go_lint,
-                candidate_deadline,
-                &cancelled,
-            )
-            .unwrap_or_default()
-        };
+    let native_go_files = if !selected.iter().any(|path| path.ends_with(".go"))
+        || native.go_lint.is_null()
+        || native.go_lint["report_type"] == "go_syntax_scan"
+    {
+        BTreeMap::new()
+    } else {
+        selected_sources_for_candidate(
+            root,
+            native.go_tool,
+            native.go_lint,
+            candidate_deadline,
+            &cancelled,
+        )
+        .unwrap_or_default()
+    };
     let native_erlang_files = crate::check_erlang_scan::covered_sources(native.erlang_lint);
     let mut planned = Vec::new();
     for (index, relative) in paths.into_iter().enumerate() {
@@ -172,7 +174,8 @@ pub(crate) fn observe_selected(
                 continue;
             }
         };
-        if crate::check_zig_scan::prefers(native.zig_lint, relative)
+        if crate::check_go_syntax_scan::prefers(native.go_lint, relative)
+            || crate::check_zig_scan::prefers(native.zig_lint, relative)
             || crate::check_swift_scan::prefers(native.swift_lint, relative)
             || crate::check_ruby_scan::prefers(native.ruby_lint, relative)
             || crate::check_kotlin_scan::prefers(native.kotlin_lint, relative)
