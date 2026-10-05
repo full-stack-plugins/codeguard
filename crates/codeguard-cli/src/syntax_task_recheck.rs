@@ -148,7 +148,9 @@ fn run_with_tools(
                 .unwrap_or_else(|| crate::ruby_lint_command::unavailable("ruby_tool_not_found"))
         } else if language == "go" {
             go.map(|tool| {
-                crate::go_syntax_probe::observe(
+                crate::go_project_version::observe(
+                    root,
+                    &root.join(path),
                     tool,
                     bytes,
                     deadline,
@@ -327,6 +329,11 @@ pub(crate) fn inputs_current(root: &Path, report: &Value) -> bool {
             || report["target"]["path"]
                 .as_str()
                 .is_some_and(|p| crate::ruby_project_version::compatible(root, &root.join(p))))
+        && (report["target"]["language"] != "go"
+            || report["native"]["status"] == "incomplete"
+            || report["target"]["path"]
+                .as_str()
+                .is_some_and(|p| crate::go_project_version::compatible(root, &root.join(p))))
         && (report["target"]["language"] != "go"
             || report["native"]["companion_binding_sha256"].is_null()
             || report["tool_path"].as_str().is_some_and(|tool| {
