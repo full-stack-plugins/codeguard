@@ -142,3 +142,8 @@ Python 语法确认任务的当前原生观察为 `still_present` 且未因源�
 ### TypeScript 模块源码的统一范围
 
 `detect`、`check all` / `check typescript` 和 `file_changed` Hook 现在将 `.mts/.cts` 及 `.d.mts/.d.cts` 纳入既有 TypeScript 范围，使用同一固定 TypeScript grammar，不误用 TSX。同文件已有完整原生 ESLint 观察时仍原生优先；其他构建根缺上下文的文件独立执行候选初检。重复疑似更新同一确认任务，合法声明不创建新语法阻塞；编辑 Hook 仅检查确认写入的文件。后缀识别不证明模块解析、类型检查、grammar 资格或交付通过。见[模块后缀验收](../../../tests/acceptance/typescript-module-extension-routing.md)。
+
+
+### 内置资产复用与源码结果缓存的边界
+
+同一进程对固定内置grammar的成功字节/许可证核验现按语种复用，元数据也只解析一次；最多缓存当前清单列出的固定资产，未知语种不占缓存项。并发选择只完成一次核验，返回的元数据是独立副本。显式传入的WASM、许可证和资产身份仍每次核对，源码、配置、原生工具、任务历史及门禁都不在此缓存中。进程重启或更新二进制会重建缓存；这不实现跨命令源码结果缓存，也不把候选零恢复升级为clean。见[资产复用验收](../../../tests/acceptance/selected-grammar-asset-reuse.md)。

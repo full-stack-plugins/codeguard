@@ -2,8 +2,11 @@
 
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
-use std::collections::BTreeSet;
-use std::sync::OnceLock;
+use std::collections::{BTreeMap, BTreeSet};
+use std::sync::{Mutex, OnceLock};
+
+/// 内置固定资产的成功核验项；不包含外部源码或执行结果。
+type VerifiedSelectedAssets = BTreeMap<String, (GrammarAsset, &'static [u8])>;
 
 const CODEGRAPH_COMMIT: &str = "1072f82ce24db3d133258d30165cef6b74d108b2";
 const CODEGRAPH_LICENSE_SHA256: &str =
@@ -127,13 +130,28 @@ fn verify_bundled_candidates() -> Result<GrammarAssetManifest, String> {
 
 /// 只读取并校验内置 grammar 清单元数据，供报告投影已知限制；不代替选中资产的字节验证。
 pub fn bundled_grammar_metadata() -> Result<GrammarAssetManifest, String> {
-    parse_grammar_asset_manifest(include_bytes!("../../../grammars/manifest.json"))
+    // 清单原字节编译入当前程序；返回独立克隆，调用者不能污染共享元数据。
+    static METADATA: OnceLock<Result<GrammarAssetManifest, String>> = OnceLock::new();
+    METADATA
+        .get_or_init(|| {
+            parse_grammar_asset_manifest(include_bytes!("../../../grammars/manifest.json"))
+        })
+        .clone()
 }
 
 /// 只核对指定内置 grammar 的字节与许可，供按需加载的语法工作进程使用。
 /// 参数为固定语言 ID；返回清单身份和静态 WASM 字节，未知语言返回错误。
 pub fn bundled_grammar_candidate(language: &str) -> Result<(GrammarAsset, &'static [u8]), String> {
-    let manifest = parse_grammar_asset_manifest(include_bytes!("../../../grammars/manifest.json"))?;
+    // 仅缓存成功核验的固定语种，未知输入不分配缓存项；上限由内置资产清单决定。
+    static VERIFIED: OnceLock<Mutex<VerifiedSelectedAssets>> = OnceLock::new();
+    let mut verified = VERIFIED
+        .get_or_init(|| Mutex::new(BTreeMap::new()))
+        .lock()
+        .map_err(|_| "内置 grammar 核验缓存不可用")?;
+    if let Some(candidate) = verified.get(language) {
+        return Ok(candidate.clone());
+    }
+    let manifest = bundled_grammar_metadata()?;
     let asset = manifest
         .assets
         .iter()
@@ -143,8 +161,12 @@ pub fn bundled_grammar_candidate(language: &str) -> Result<(GrammarAsset, &'stat
     if matches!(language, "objc" | "solidity") {
         verify_dependency_license(&manifest)?;
     }
+    #[cfg(test)]
+    SELECTED_ASSET_VERIFICATIONS.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
     let wasm = verify_bundled_asset(asset)?;
-    Ok((asset.clone(), wasm))
+    let candidate = (asset.clone(), wasm);
+    verified.insert(language.to_owned(), candidate.clone());
+    Ok(candidate)
 }
 
 fn verify_codegraph_license() -> Result<(), String> {
@@ -830,7 +852,7 @@ pub fn verify_grammar_asset(
     wasm: &[u8],
     license: &[u8],
 ) -> Result<(), String> {
-    let manifest = parse_grammar_asset_manifest(include_bytes!("../../../grammars/manifest.json"))?;
+    let manifest = bundled_grammar_metadata()?;
     if !manifest.assets.iter().any(|known| known == asset) {
         return Err("grammar 身份未列入固定清单".into());
     }
@@ -847,4 +869,69 @@ pub fn verify_grammar_asset(
 
 fn digest(bytes: &[u8]) -> String {
     format!("{:x}", Sha256::digest(bytes))
+}
+
+#[cfg(test)]
+static SELECTED_ASSET_VERIFICATIONS: std::sync::atomic::AtomicUsize =
+    std::sync::atomic::AtomicUsize::new(0);
+
+#[cfg(test)]
+mod selected_asset_cache_tests {
+    use super::{
+        SELECTED_ASSET_VERIFICATIONS, bundled_grammar_candidate, bundled_grammar_metadata,
+        verify_grammar_asset,
+    };
+    use std::sync::atomic::Ordering;
+
+    #[test]
+    fn fixed_asset_reuse_does_not_memoize_mutable_caller_bytes() {
+        let before = SELECTED_ASSET_VERIFICATIONS.load(Ordering::SeqCst);
+        let (asset, wasm) = bundled_grammar_candidate("java").unwrap();
+        let after_first = SELECTED_ASSET_VERIFICATIONS.load(Ordering::SeqCst);
+        assert_eq!(after_first - before, 1);
+        for _ in 0..8 {
+            let (again, bytes) = bundled_grammar_candidate("java").unwrap();
+            assert_eq!(again, asset);
+            assert!(std::ptr::eq(bytes, wasm));
+        }
+        assert_eq!(
+            SELECTED_ASSET_VERIFICATIONS.load(Ordering::SeqCst),
+            after_first
+        );
+        let handles: Vec<_> = (0..8)
+            .map(|_| std::thread::spawn(|| bundled_grammar_candidate("javascript").unwrap()))
+            .collect();
+        let selected: Vec<_> = handles
+            .into_iter()
+            .map(|handle| handle.join().unwrap())
+            .collect();
+        assert!(selected.iter().all(|entry| entry == &selected[0]));
+        assert_eq!(
+            SELECTED_ASSET_VERIFICATIONS.load(Ordering::SeqCst),
+            after_first + 1
+        );
+        assert_eq!(selected[0].0.language, "javascript");
+        assert_ne!(selected[0].0.sha256, asset.sha256);
+        let after_concurrent = SELECTED_ASSET_VERIFICATIONS.load(Ordering::SeqCst);
+        let license = include_bytes!("../../../grammars/java/LICENSE");
+        verify_grammar_asset(&asset, wasm, license).unwrap();
+        let mut changed = wasm.to_vec();
+        let last = changed.len() - 1;
+        changed[last] ^= 1;
+        assert!(verify_grammar_asset(&asset, &changed, license).is_err());
+        assert!(verify_grammar_asset(&asset, wasm, b"changed license").is_err());
+        let mut changed_identity = asset.clone();
+        changed_identity.sha256 = "0".repeat(64);
+        assert!(verify_grammar_asset(&changed_identity, wasm, license).is_err());
+        let mut metadata = bundled_grammar_metadata().unwrap();
+        metadata.assets.clear();
+        assert_eq!(bundled_grammar_metadata().unwrap().assets.len(), 32);
+        for language in ["missing", "JAVA", "../java", ""] {
+            assert!(bundled_grammar_candidate(language).is_err());
+        }
+        assert_eq!(
+            SELECTED_ASSET_VERIFICATIONS.load(Ordering::SeqCst),
+            after_concurrent
+        );
+    }
 }

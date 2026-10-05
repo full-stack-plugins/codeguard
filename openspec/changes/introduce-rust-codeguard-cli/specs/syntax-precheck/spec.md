@@ -369,6 +369,12 @@ human/结构化报告及宿主渲染 MUST 按结论、方式/范围、原生状�
 
 编译入同一二进制的不可变清单、WASM 与许可证 MAY 在进程内复用已经完整核验的资产结果；外部清单、源码、配置与原生工具 MUST NOT 因此省略当前身份复核，此资产复用不得作为检查结果或完整覆盖缓存。
 
+#### Scenario: Concurrent selections reuse only verified immutable assets
+
+- **WHEN** 同一进程反复或并发选择固定内置grammar
+- **THEN** 每个固定语种只需成功核验一次内置字节和许可证，未知语种不增加缓存项；返回独立元数据副本，调用方修改不污染后续选择
+- **AND** 外部传入WASM、许可证及身份仍逐次核验，不能因对应内置语种已缓存而接受篡改字节；该复用不是源码结果、配置、原生工具或交付认证缓存
+
 #### Scenario: Source changes without mtime or size change
 - **WHEN** 源码字节不同但时间和大小相同
 - **THEN** 缓存失效并重新检查
