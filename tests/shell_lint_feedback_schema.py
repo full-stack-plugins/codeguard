@@ -74,6 +74,36 @@ class ShellFeedback(unittest.TestCase):
         fact=json.loads((prefix/'shell-task-2026-10-06-fact.json').read_text())
         self.assertEqual(fact['state'],'open')
 
+    def test_task_bound_shell_guidance_and_failed_attempts(self):
+        prefix=ROOT/'tests/acceptance/evidence'
+        for name in ['initial','after-0','after-1']:
+            data=json.loads((prefix/f'shell-next-2026-10-06-{name}.json').read_text())
+            v=validator('repair-brief-preview-v0.17.schema.json');v.validate(data)
+            argv=data['repair_brief']['recheck_argv']
+            self.assertEqual(argv[:4],['codeguard','task','verify',data['repair_brief']['task_id']])
+            self.assertFalse(validator('repair-brief-preview-v0.16.schema.json').is_valid(data))
+            bad=copy.deepcopy(data);bad['repair_brief']['recheck_argv'][1]='lint';self.assertFalse(v.is_valid(bad))
+            bad=copy.deepcopy(data);bad['repair_brief']['recheck_argv'][4]='.';self.assertFalse(v.is_valid(bad))
+            if name=='after-1':
+                self.assertEqual(data['disposition'],'needs_decision')
+                self.assertEqual(data['repair_brief']['history']['no_progress_count'],2)
+        for i in range(2):
+            event=json.loads((prefix/f'shell-next-2026-10-06-event-{i}.json').read_text())
+            validator('task-verification-event.schema.json').validate(event)
+            self.assertIsInstance(event['attempt_id'],str)
+            data=json.loads((prefix/f'shell-next-2026-10-06-verify-{i}.json').read_text())
+            validator('task-verification-preview-v0.24.schema.json').validate(data)
+            self.assertEqual(data['native_scan']['run_id'],event['run_id'])
+            self.assertEqual(data['observation'],'still_present')
+        denied=json.loads((prefix/'shell-next-2026-10-06-retry-denied.json').read_text())
+        validator('task-attempt-response.schema.json').validate(denied)
+        self.assertEqual(denied['reason'],'no_progress_budget_exhausted')
+        shown=json.loads((prefix/'shell-next-2026-10-06-show.json').read_text())
+        validator('task-show-preview-v0.3.schema.json').validate(shown)
+        self.assertEqual(shown['next_actions'][0],shown['task']['recheck_argv'])
+        fact=json.loads((prefix/'shell-next-2026-10-06-fact.json').read_text())
+        self.assertEqual(fact['state'],'open')
+
     def test_help_compatibility(self):
         data = json.loads((ROOT / 'tests/acceptance/evidence/command-help-shell-2026-10-06-default.json').read_text())
         validator('command-help-v0.4.schema.json').validate(data)

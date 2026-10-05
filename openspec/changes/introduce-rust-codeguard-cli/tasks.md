@@ -1646,3 +1646,7 @@ Rust受控调用ShellCheck0.11.0 json1，固定方言、stdin、入口摘要、�
 ## 2026-10-06 ShellCheck原工具任务复检（局部验收）
 
 单文件Shell规则组接入 `task verify --shellcheck-tool`，绑定首次报告摘要、方言、范围、显式rc与SC规则；复用租约、失败尝试及next历史读取。真实ShellCheck0.11.0四次观察区分still_present、rule_coverage_requires_review、suppression_requires_review、candidate_absent_unverified_policy，最终任务仍open；没有可信政策/覆盖时不能关闭。错传--ruff-tool反例先失败后修复为租约前参数拒绝，首次不存在的规则组不得导入。协议0.24/私有0.1、双语文档和实际记录见 `tests/acceptance/shellcheck-task-recheck-baseline.md`。next专用复检指引、完整Shell检查、可信关闭/复发、跨平台和发行仍缺；7.4、S09父任务继续开放。
+
+## 2026-10-06 Shell任务统一复检指引与无进展验收
+
+next 0.17/task show 0.3和新Markdown统一提供绑定任务ID的task verify，原方言/显式rc由首次证据读取。task show丢失工具参数反例先失败后修复。受控及真实ShellCheck0.11.0都验证两次ready-to-verify尝试分别绑定失败复检事件，next转needs_decision，第三次同动作no_progress_budget_exhausted，原任务仍open。保留0.16历史schema/报告，不覆盖已有用户Markdown。next专用复检指引和限定Shell失败尝试链路已有验收；可信关闭/复发、全语言工作流和7.4/S09完整范围仍开放。

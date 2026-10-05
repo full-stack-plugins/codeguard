@@ -2101,7 +2101,7 @@ fn persist_local_blocker_observation(
 fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
     if blocker.checker_id == "shell.shellcheck" {
         return format!(
-            "# {} ShellCheck 环境恢复任务\n\n- 问题证据：报告 .codeguard/reports/{}.json，摘要 {}；范围 {}；原因 {}。\n- 规则依据：原生检查能力必须完整，环境故障不是源码违规。\n- 允许范围：仅检查环境、方言及原配置；不修改无关源码。\n- 修复步骤：核对原工具版本、source依赖、rc及输入稳定性，恢复后复扫；zsh/fish需要专用原生能力。\n- 复检命令：codeguard lint shell <目标源码> --dialect <原方言> --shellcheck-tool <已核验绝对路径> --format=json。\n- 历史尝试：首次run {}，后续不同阻塞原因仍归同一任务；完整尝试流程尚待接线。\n- 关闭条件：恢复原检查且正式复检流程通过；安装、勾选和零诊断不能自行关闭。\n",
+            "# {} ShellCheck 环境恢复任务\n\n- 问题证据：报告 .codeguard/reports/{}.json，摘要 {}；范围 {}；原因 {}。\n- 规则依据：原生检查能力必须完整，环境故障不是源码违规。\n- 允许范围：仅检查环境、方言及原配置；不修改无关源码。\n- 修复步骤：核对原工具版本、source依赖、rc及输入稳定性，恢复后复扫；zsh/fish需要专用原生能力。\n- 复检命令：codeguard task verify {} . --shellcheck-tool <已核验绝对路径> --format=json。\n- 历史尝试：首次run {}，后续不同阻塞原因仍归同一任务；通过task attempt记录尝试，原工具复检绑定结果；task show/next查询当前历史。\n- 关闭条件：恢复原检查且正式复检流程通过；安装、勾选和零诊断不能自行关闭。\n",
             blocker.id,
             report.run_id,
             report.digest,
@@ -2110,6 +2110,7 @@ fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
                 .diagnostic_reason
                 .as_deref()
                 .unwrap_or(&blocker.reason),
+            blocker.id,
             report.run_id
         );
     }
@@ -2350,7 +2351,7 @@ fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
 fn render_task(report: &ReportInput, finding: &FindingInput) -> String {
     if finding.checker_id == "shell.shellcheck" {
         return format!(
-            "# {} ShellCheck 规则组修复任务\n\n- 问题证据：原生 {}，首次行 {}；原报告 .codeguard/reports/{}.json，摘要 {}；同文件同方言同规则的多个位置作为一组，原位置在报告中保留。\n- 规则依据：https://www.shellcheck.net/wiki/{}；原项目rc与可信策略分开。\n- 允许范围：仅目标源码 {}；先核对当前证据，不能按历史位置修改。\n- 修复步骤：按原规则修复引用、展开或可移植性，保留行为；不关闭规则代替修复。\n- 复检命令：codeguard lint shell <目标源码> --dialect <原方言> --shellcheck-tool <已核验绝对路径> --format=json；同一原配置。\n- 历史尝试：首次run {}；后续扫描追加在同一任务。尝试与正式关闭尚待接线。\n- 关闭条件：稳定输入的原工具复检、完整策略和正式关闭流程；零诊断、配置抑制、同步或勾选不能关闭。\n",
+            "# {} ShellCheck 规则组修复任务\n\n- 问题证据：原生 {}，首次行 {}；原报告 .codeguard/reports/{}.json，摘要 {}；同文件同方言同规则的多个位置作为一组，原位置在报告中保留。\n- 规则依据：https://www.shellcheck.net/wiki/{}；原项目rc与可信策略分开。\n- 允许范围：仅目标源码 {}；先核对当前证据，不能按历史位置修改。\n- 修复步骤：按原规则修复引用、展开或可移植性，保留行为；不关闭规则代替修复。\n- 复检命令：codeguard task verify {} . --shellcheck-tool <已核验绝对路径> --format=json；方言和显式rc由首次报告绑定。\n- 历史尝试：首次run {}；后续扫描追加在同一任务。task attempt记录失败及无进展，task show/next查询当前历史；可信关闭仍待验收。\n- 关闭条件：稳定输入的原工具复检、完整策略和正式关闭流程；零诊断、配置抑制、同步或勾选不能关闭。\n",
             finding.id,
             finding.rule_id,
             finding.line,
@@ -2358,6 +2359,7 @@ fn render_task(report: &ReportInput, finding: &FindingInput) -> String {
             report.digest,
             finding.rule_id,
             serde_json::to_string(&finding.path).unwrap(),
+            finding.id,
             report.run_id
         );
     }
