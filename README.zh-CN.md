@@ -597,3 +597,8 @@ Ruff正常与忽略noqa的两轮结果中一致的`invalid-syntax`现在保留�
 Python语法确认任务新增宿主SDK限定关闭：独立签名策略1.5绑定原样本、明确lint目标、项目配置和Ruff制品；原始/当前原生对照完整且输入稳定才记录代码修复。普通`task verify`可在同一绑定下记录复发重开，不能凭本地历史批准新关闭。此能力尚未代表生产宿主接入、全部语言或项目门禁验收；见[局部验收](tests/acceptance/python-task-resolution-lifecycle.md)。
 
 Python原生误报反证现同步到`next`：保留合法源码并调查grammar版本差异；当前源码或配置变化时优先要求重新复检，不沿用旧反证放行。见[反证验收](tests/acceptance/python-template-string-counterevidence.md)。
+
+
+### 语法确认动作与无进展预算
+
+Python 语法确认任务的当前原生观察为 `still_present` 且未因源码或配置变化失效时，受控动作是 `repair-source`；缺工具、未完成或失效观察不能据旧位置要求修改源码。同一语法确认任务、同一前置输入下，`restore-checker-environment` 与 `repair-source` 共享既有无进展预算，动作切换不能清空历史失败。旧追加事件保留原动作与指纹；其他任务仍按既有动作规则计数，新输入与已核验进展按既有规则处理。预算耗尽仍要求具体诊断或决策，不自动关闭、不降低门禁。

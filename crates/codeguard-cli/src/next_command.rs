@@ -1473,6 +1473,15 @@ pub(crate) fn canonical_action_id(brief: &Value) -> Result<&'static str, &'stati
     match brief["kind"].as_str() {
         Some("finding") => Ok("repair-source"),
         Some("blocker")
+            if brief["checker_id"] == "python.ruff"
+                && brief["reason_code"] == "python_syntax_confirmation_needed"
+                && brief["verification_observation"] == "still_present"
+                && !brief["verification_invalidated_reason"].is_string() =>
+        {
+            Ok("repair-source")
+        }
+
+        Some("blocker")
             if brief["checker_id"] == "syntax.native_confirmation"
                 && (brief["native_confirmation_status"] == "diagnostics_observed"
                     || (matches!(brief["schema_version"].as_str(), Some("0.8.0" | "0.10.0"))
@@ -2108,5 +2117,44 @@ fn parse_format(value: &str) -> Result<bool, String> {
         "json" => Ok(true),
         "human" => Ok(false),
         _ => Err(format!("不支持的格式：{value}")),
+    }
+}
+
+#[cfg(test)]
+mod python_action_tests {
+    use super::canonical_action_id;
+    use serde_json::json;
+    #[test]
+    fn native_syntax_evidence_controls_action_even_when_budget_requires_decision() {
+        let mut brief = json!({"kind":"blocker","checker_id":"python.ruff","reason_code":"python_syntax_confirmation_needed","verification_observation":"still_present","disposition":"actionable"});
+        assert_eq!(canonical_action_id(&brief), Ok("repair-source"));
+        brief["disposition"] = json!("needs_decision");
+        assert_eq!(canonical_action_id(&brief), Ok("repair-source"));
+        brief["verification_invalidated_reason"] = json!("source_input_changed_or_unavailable");
+        assert_eq!(
+            canonical_action_id(&brief),
+            Ok("restore-checker-environment")
+        );
+        brief
+            .as_object_mut()
+            .unwrap()
+            .remove("verification_invalidated_reason");
+        for outcome in [
+            "still_blocked",
+            "candidate_absent_unverified_policy",
+            "incomplete",
+        ] {
+            brief["verification_observation"] = json!(outcome);
+            assert_eq!(
+                canonical_action_id(&brief),
+                Ok("restore-checker-environment")
+            );
+        }
+        brief["verification_observation"] = json!("still_present");
+        brief["reason_code"] = json!("ruff_tool_not_found");
+        assert_eq!(
+            canonical_action_id(&brief),
+            Ok("restore-checker-environment")
+        );
     }
 }

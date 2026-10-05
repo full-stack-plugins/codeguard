@@ -192,6 +192,9 @@ fn actual_python_resolution_closes_idempotently_and_reopens_both_original_famili
         let policy = p.policy(&tool);
         let still = p.verify(&tool, &policy, false).unwrap();
         assert_eq!(still["outcome"], "still_present");
+        let brief = codeguard_cli::next_command::read_task_brief(&p.root, &p.id).unwrap();
+        assert_eq!(brief["task_id"], p.id, "{brief}");
+        assert_eq!(brief["action_id"], "repair-source", "{brief}");
         fs::write(p.root.join("app.py"), GOOD).unwrap();
         let fixed = p.verify(&tool, &policy, false).unwrap();
         assert_eq!(fixed["outcome"], "code_fixed");

@@ -169,7 +169,13 @@ fn execute(args: &Args) -> Result<Value, &'static str> {
             if awaiting_verification(&ledger, &rechecks, &before_or_after) {
                 return Err("verification_required_before_retry");
             }
-            let history = history_from_ledger(&ledger, &rechecks, action_id, &before_or_after);
+            let history = history_from_ledger(
+                &ledger,
+                &rechecks,
+                action_id,
+                &before_or_after,
+                confirmation_action_budget(&brief),
+            );
             if history.no_progress_count >= NO_PROGRESS_BUDGET {
                 return Err("no_progress_budget_exhausted");
             }
@@ -269,7 +275,13 @@ pub(crate) fn attempt_history(root: &Path, id: &str, brief: &Value) -> Result<Va
     let rechecks = verified_rechecks(root, id, brief, &ledger)?;
     let action = canonical_action_id(brief)?;
     let input = input_digest(root, brief)?;
-    let history = history_from_ledger(&ledger, &rechecks, action, &input);
+    let history = history_from_ledger(
+        &ledger,
+        &rechecks,
+        action,
+        &input,
+        confirmation_action_budget(brief),
+    );
     let mut recent: Vec<_> = ledger.starts.values().collect();
     recent.sort_by_key(|start| start.sequence);
     let recent: Vec<Value> = recent
@@ -301,11 +313,21 @@ fn history_from_ledger(
     rechecks: &BTreeMap<String, String>,
     action: &str,
     input: &str,
+    confirmation_actions: bool,
 ) -> History {
     let mut matching: Vec<_> = ledger
         .starts
         .values()
-        .filter(|start| start.action_id == action && start.before_sha256 == input)
+        .filter(|start| {
+            start.before_sha256 == input
+                && (start.action_id == action
+                    || (confirmation_actions
+                        && matches!(
+                            start.action_id.as_str(),
+                            "repair-source" | "restore-checker-environment"
+                        )
+                        && matches!(action, "repair-source" | "restore-checker-environment")))
+        })
         .collect();
     matching.sort_by_key(|start| start.sequence);
     let attempt_count = matching.len();
@@ -985,4 +1007,114 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
         note_code,
         json,
     })
+}
+
+/// 语法确认任务在工具恢复与源码修复间切换时共享同输入重试预算。
+/// 其他任务保留既有按动作区分的历史，不因这项兼容规则扩大关联范围。
+fn confirmation_action_budget(brief: &Value) -> bool {
+    brief["kind"] == "blocker"
+        && (brief["checker_id"] == "syntax.native_confirmation"
+            || (brief["checker_id"] == "python.ruff"
+                && brief["reason_code"] == "python_syntax_confirmation_needed"))
+}
+
+#[cfg(test)]
+mod confirmation_budget_tests {
+    use super::{
+        AttemptFinish, AttemptLedger, AttemptStart, action_fingerprint, confirmation_action_budget,
+        history_from_ledger,
+    };
+    use serde_json::json;
+    use std::collections::BTreeMap;
+    fn ledger() -> AttemptLedger {
+        let mut starts = BTreeMap::new();
+        let mut finishes = BTreeMap::new();
+        for (index, action) in [
+            "restore-checker-environment",
+            "restore-checker-environment",
+            "repair-source",
+        ]
+        .iter()
+        .enumerate()
+        {
+            let id = format!("CG-A-{index:032x}");
+            starts.insert(
+                id.clone(),
+                AttemptStart {
+                    schema_version: "0.1.0".into(),
+                    task_id: format!("CG-B-{}", "a".repeat(32)),
+                    attempt_id: id.clone(),
+                    action_id: (*action).into(),
+                    action_fingerprint: action_fingerprint("task", action),
+                    owner: "worker".into(),
+                    token_sha256: "a".repeat(64),
+                    generation: 1,
+                    sequence: index as u64 + 1,
+                    before_sha256: "b".repeat(64),
+                    started_at: 100,
+                },
+            );
+            finishes.insert(
+                id.clone(),
+                AttemptFinish {
+                    schema_version: "0.1.0".into(),
+                    task_id: format!("CG-B-{}", "a".repeat(32)),
+                    attempt_id: id,
+                    owner: "worker".into(),
+                    token_sha256: "a".repeat(64),
+                    generation: 1,
+                    outcome: "no-change".into(),
+                    note_code: "no_change".into(),
+                    after_sha256: "b".repeat(64),
+                    observed_change: false,
+                    finished_at: 101,
+                },
+            );
+        }
+        AttemptLedger { starts, finishes }
+    }
+    #[test]
+    fn action_transition_cannot_reset_confirmation_budget() {
+        let ledger = ledger();
+        let rechecks = BTreeMap::new();
+        let input = "b".repeat(64);
+        for action in ["repair-source", "restore-checker-environment"] {
+            let history = history_from_ledger(&ledger, &rechecks, action, &input, true);
+            assert_eq!(history.attempt_count, 3);
+            assert_eq!(history.no_progress_count, 3);
+        }
+        assert_eq!(
+            history_from_ledger(&ledger, &rechecks, "repair-source", &input, false)
+                .no_progress_count,
+            1
+        );
+        assert_eq!(
+            history_from_ledger(&ledger, &rechecks, "repair-source", &"c".repeat(64), true)
+                .no_progress_count,
+            0
+        );
+    }
+    #[test]
+    fn complete_progress_retains_existing_budget_reset_semantics() {
+        let mut ledger = ledger();
+        let id = format!("CG-A-{:032x}", 2);
+        ledger.finishes.get_mut(&id).unwrap().outcome = "ready-to-verify".into();
+        let rechecks = BTreeMap::from([(id, "candidate_absent_unverified_policy".into())]);
+        assert_eq!(
+            history_from_ledger(&ledger, &rechecks, "repair-source", &"b".repeat(64), true)
+                .no_progress_count,
+            0
+        );
+    }
+    #[test]
+    fn sharing_is_limited_to_confirmation_tasks() {
+        let mut brief = json!({"kind":"blocker","checker_id":"python.ruff","reason_code":"python_syntax_confirmation_needed"});
+        assert!(confirmation_action_budget(&brief));
+        brief["reason_code"] = json!("ruff_tool_not_found");
+        assert!(!confirmation_action_budget(&brief));
+        brief["checker_id"] = json!("syntax.native_confirmation");
+        assert!(confirmation_action_budget(&brief));
+        brief["kind"] = json!("finding");
+        assert!(!confirmation_action_budget(&brief));
+    }
 }

@@ -1472,3 +1472,8 @@ check python/all现通过0.48反馈保留独立结构计数和原始坐标，原
 
 
 9.10/14.11/14.12 Python原生反证next纠偏：固定grammar在Python3.14模板字符串上的实际误报被Ruff明确目标反证；两类SDK报告进入误报调查后，next新增同一任务生命周期读取。当前源码/配置失效优先，不沿用旧反证修复或放行；报告首次来源不按全局版本号猜测。RED与终态见[局部验收](../../../tests/acceptance/python-template-string-counterevidence.md)。grammar重建与全部语言/宿主/门禁仍缺，父任务未完成。
+
+
+### 2026-10-05 原生语法动作与重试预算收敛
+
+9.9/9.10/14.10：真实Python原生still_present简报动作先RED后修为repair-source，输入失效/不完整不授予旧位置修复。语法确认任务同输入的环境恢复和源码修复共享预算，原始事件不重写；纯历史计数先RED，持久化动作切换后第三次尝试仍拒绝。默认lib54通过/3忽略，受影响WASM五目标96通过/6忽略，真实Ruff两来源链路1通过160.44秒，持久化预算增强目标1通过46.05秒。完整patch/环境身份、跨平台、默认宿主和全语言父任务仍开放，见[局部验收](../../../tests/acceptance/python-native-action-budget.md)。

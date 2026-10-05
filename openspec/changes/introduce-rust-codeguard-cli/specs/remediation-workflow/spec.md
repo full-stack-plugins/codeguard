@@ -545,3 +545,18 @@ Python专用SDK入口 MUST 验证宿主独立选择的信任根、时间、基�
 #### Scenario: 当前Python输入失效优先于历史误报指引
 - **WHEN** 已记录原生反证后源码或项目配置发生变化
 - **THEN** next保留source_input_changed_or_unavailable或configuration_input_changed_or_unavailable与原生复检指引，不以旧反证声称新输入合法
+
+
+### Requirement: Syntax confirmation action transitions SHALL preserve no-progress accounting
+
+Python确认任务的当前原生结果为still_present且输入未失效时 MUST 使用repair-source；不完整、缺工具或失效观察 MUST NOT 据旧位置授权源码修复。同一语法确认任务、同一前置输入的restore-checker-environment和repair-source MUST 共享无进展预算，保留旧事件原动作和指纹；其他任务的动作统计规则不得扩大。
+
+#### Scenario: Legacy restoration attempts remain counted after native confirmation
+- **GIVEN** 同一确认任务和输入已有两次无进展环境恢复尝试
+- **WHEN** 原生确认仍有语法错误并转为repair-source
+- **THEN** 历史无进展次数仍为二，下一次尝试因预算耗尽拒绝，旧事件不重写
+
+#### Scenario: Stale Python native diagnostics cannot request source edits
+- **GIVEN** Python语法确认曾有原生诊断
+- **WHEN** 当前源码或配置绑定已失效
+- **THEN** 撤销旧源码修复动作，要求重新核验，不能用旧位置指导修改

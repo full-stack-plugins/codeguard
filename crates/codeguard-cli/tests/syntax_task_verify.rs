@@ -398,6 +398,47 @@ fn repeated_no_change_native_repairs_stop_with_a_specific_decision() {
     ]);
     assert_eq!(exit, 3);
     assert_eq!(start["reason"], "no_progress_budget_exhausted");
+
+    // 原工具环境失败会切换动作，但不能抹掉同一输入的源码修复失败。
+    let tool = p.tool(
+        "while IFS= read -r line; do :; done\nprintf 'tool environment failed\\n' >&2\nexit 1",
+    );
+    let (_, observed) = p.task_operation(&[
+        "task",
+        "verify",
+        &id,
+        "--owner",
+        "agent-a",
+        "--lease-token",
+        token,
+        "--zig-tool",
+        tool.to_str().unwrap(),
+    ]);
+    assert_eq!(observed["event_persisted"], true, "{observed}");
+    assert_eq!(observed["observation"], "incomplete", "{observed}");
+    let next = p.next();
+    assert_eq!(
+        next["repair_brief"]["action_id"], "restore-checker-environment",
+        "{next}"
+    );
+    assert_eq!(
+        next["repair_brief"]["history"]["no_progress_count"], 2,
+        "{next}"
+    );
+    let (exit, denied) = p.task_operation(&[
+        "task",
+        "attempt",
+        "start",
+        &id,
+        "--owner",
+        "agent-a",
+        "--lease-token",
+        token,
+        "--action-id",
+        "restore-checker-environment",
+    ]);
+    assert_eq!(exit, 3, "{denied}");
+    assert_eq!(denied["reason"], "no_progress_budget_exhausted", "{denied}");
 }
 
 #[test]
