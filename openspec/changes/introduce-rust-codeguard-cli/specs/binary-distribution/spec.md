@@ -235,3 +235,8 @@ The npm package SHALL provide `npx @partme.ai/codeguard` through a minimal Node 
 - **WHEN** an installed candidate observes an Erlang source file through its explicitly selected OTP 28 tool in an initialized workspace, with no earlier candidate parsing task
 - **THEN** lint and aggregate checking preserve the same actual task and native evidence; next and original-tool verification refer to saved reports without inventing a grammar identity, changed source withdraws old positions, and repair_ready forwards the current native result through the launcher stdin
 - **AND** persistence failure retains native diagnostics with a null task reference and a concrete synchronization reason; controlled protocol fixtures and explicitly executed real OTP acceptance remain separate evidence
+
+#### Scenario: Installed Ruby edit feedback preserves line-only repair evidence
+- **WHEN** an offline installed candidate receives a confirmed Ruby edit and later repair_ready through launcher stdin using an explicit fixed-version native tool
+- **THEN** edit, lint, project check, next and recheck refer to the same actual task, inspect only their declared scope, and preserve line-only evidence without guessed columns; bounded host context contains current positions and safe task references without source/tool-message echoes
+- **AND** changed source invalidates old positions, zero diagnostics retain an open task without approved coverage, and recurrence updates the same identity; controlled protocol fixtures do not claim real Ruby precision or installed-host acceptance

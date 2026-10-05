@@ -157,3 +157,9 @@ Stop 事件 MAY 从已存在的本地任务事实生成有界、只读的下一�
 - **WHEN** Python fast feedback selects bounded workspace-relative files and unrelated directories contain unreadable or linked checker configuration
 - **THEN** configuration discovery observes only those files and ancestor Ruff configuration candidates within the workspace; it performs no directory enumeration, keeps nearest configuration priority and cannot be made incomplete by an unrelated subtree
 - **AND** missing targets, unsafe ancestor paths, inaccessible configuration and expired discovery deadlines remain explicit; this local discovery cannot prove project-wide completeness
+
+#### Scenario: Ruby edits and repair-ready events share current line-only native evidence
+- **WHEN** a confirmed Ruby edit selects an explicit absolute tool or the caller's absolute PATH entry, or repair_ready refers to its saved syntax task
+- **THEN** the fixed-version Ruby stdin parser runs only for selected files using the event deadline; selected failures never switch to WASM, absence retains bundled candidate feedback, and native diagnostics reuse the same task as lint/check
+- **AND** dialogue shows only current line positions and safe task IDs, with project-version verification and original-tool recheck guidance; it does not invent columns, echo tool messages, execute source/gems, or close tasks from zero diagnostics
+- **AND** repair_ready preserves saved report references and stale-input handling through a versioned line-only summary; failed writes do not run any parser

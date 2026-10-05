@@ -99,6 +99,26 @@ pub(crate) fn observe(
         crate::native_syntax_confirmation::connect(root, &mut zig_lint, deadline);
         crate::check_zig_scan::refresh(root, &mut zig_lint, deadline);
     }
+    let ruby_paths = selected
+        .iter()
+        .filter(|p| p.ends_with(".rb"))
+        .cloned()
+        .collect::<BTreeSet<_>>();
+    let mut ruby_lint = if ruby_paths.is_empty() {
+        Value::Null
+    } else {
+        crate::check_ruby_scan::observe(
+            root,
+            &ruby_paths,
+            tools.ruby.map(Path::to_path_buf),
+            deadline,
+            &cancelled,
+        )
+    };
+    if ruby_lint.is_object() {
+        crate::native_syntax_confirmation::connect(root, &mut ruby_lint, deadline);
+        crate::check_ruby_scan::refresh(root, &mut ruby_lint, deadline);
+    }
     #[cfg(feature = "wasm-precheck")]
     let syntax = crate::check_syntax_candidates::observe_selected(
         root,
@@ -110,7 +130,7 @@ pub(crate) fn observe(
             erlang_lint: &Value::Null,
             kotlin_lint: &kotlin_lint,
             swift_lint: &swift_lint,
-            ruby_lint: &Value::Null,
+            ruby_lint: &ruby_lint,
             zig_lint: &zig_lint,
             rust_targets: &crate::rust_native_syntax_coverage::RustNativeSyntaxCoverage::default(),
             go_tool: None,
@@ -128,10 +148,14 @@ pub(crate) fn observe(
     if zig_lint.is_object() {
         crate::check_zig_scan::refresh(root, &mut zig_lint, deadline);
     }
+    if ruby_lint.is_object() {
+        crate::check_ruby_scan::refresh(root, &mut ruby_lint, deadline);
+    }
     let native_unwired: Vec<&String> = selected
         .iter()
         .filter(|p| {
-            !p.ends_with(".zig")
+            !p.ends_with(".rb")
+                && !p.ends_with(".zig")
                 && !p.ends_with(".py")
                 && !p.ends_with(".kt")
                 && !p.ends_with(".swift")
@@ -160,7 +184,7 @@ pub(crate) fn observe(
             })
         }) {
         "require_native_lint_confirmation"
-    } else if [&swift_lint, &zig_lint].iter().any(|report| {
+    } else if [&swift_lint, &zig_lint, &ruby_lint].iter().any(|report| {
         report["files"].as_array().is_some_and(|files| {
             files.iter().any(|f| {
                 f["current"] == true
@@ -186,7 +210,7 @@ pub(crate) fn observe(
         "review_native_results_and_resolve_incomplete_checks"
     };
     let mut feedback = json!({
-        "schema_version":if structures > 0 && syntax["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.9.0"} else if structures > 0 {"0.8.0"} else if zig_lint["schema_version"] == "0.2.0" {"0.7.0"}else if zig_lint.is_object(){"0.6.0"}else if swift_lint["schema_version"] == "0.2.0" {"0.5.0"} else if swift_lint.is_object(){"0.4.0"}else if kotlin_lint.is_object(){"0.3.0"}else{"0.2.0"},"report_type":"hook_fast_feedback",
+        "schema_version":if ruby_lint.is_object(){"0.10.0"}else if structures > 0 && syntax["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.9.0"} else if structures > 0 {"0.8.0"} else if zig_lint["schema_version"] == "0.2.0" {"0.7.0"}else if zig_lint.is_object(){"0.6.0"}else if swift_lint["schema_version"] == "0.2.0" {"0.5.0"} else if swift_lint.is_object(){"0.4.0"}else if kotlin_lint.is_object(){"0.3.0"}else{"0.2.0"},"report_type":"hook_fast_feedback",
         "scan_scope":"selected_files","requested_paths":requested,
         "python_lint":python_lint,"node_lint":node_lint,"syntax_candidates":syntax,"syntax_tasks":syntax_tasks,
         "unavailable_files":unavailable,"native_unwired_files":native_unwired,
@@ -196,14 +220,22 @@ pub(crate) fn observe(
     if structures > 0 {
         feedback["candidate_structure_count"] = json!(structures);
     }
-    if structures > 0 || kotlin_lint.is_object() || swift_lint.is_object() || zig_lint.is_object() {
+    if ruby_lint.is_object()
+        || structures > 0
+        || kotlin_lint.is_object()
+        || swift_lint.is_object()
+        || zig_lint.is_object()
+    {
         feedback["kotlin_lint"] = kotlin_lint;
     }
-    if structures > 0 || swift_lint.is_object() || zig_lint.is_object() {
+    if ruby_lint.is_object() || structures > 0 || swift_lint.is_object() || zig_lint.is_object() {
         feedback["swift_lint"] = swift_lint;
     }
-    if structures > 0 || zig_lint.is_object() {
+    if ruby_lint.is_object() || structures > 0 || zig_lint.is_object() {
         feedback["zig_lint"] = zig_lint;
+    }
+    if ruby_lint.is_object() {
+        feedback["ruby_lint"] = ruby_lint;
     }
     feedback
 }

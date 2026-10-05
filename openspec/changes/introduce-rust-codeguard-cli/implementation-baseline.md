@@ -144,3 +144,10 @@ Clippy 现在在原生执行前冻结已观察源码及根配置/锁的字节或
 check ruby/all新增--ruby-tool并复用固定版本有界语法扫描；64文件/共享deadline/失效定位撤回/原生选择失败不转WASM/缺工具候选与稳定任务接线完成局部验收。默认全workspace1395通过，WASM受影响58通过及32grammar/语言选择26通过；新聚合0.51保存精确封闭报告，默认/WASM实际工具状态分开捕获。详见[局部验收](../../../tests/acceptance/ruby-project-native-scan.md)；RuboCop等完整语言规则、资格及发行不借用本批证据计完成。
 
 远端状态更正：87c94b3的CI 37320629796默认lib Go伴随工具变化反例失败（version_unverified而非tool_changed）。本批保留原断言，补充仅测试构建的阶段/终止类型/spawn错误诊断；本机默认lib67通过，Linux根因与远端回归仍待确认，不宣称CI已修复。
+
+
+## 2026-10-05 Ruby Hook 原生优先与对话投影
+
+已补齐Ruby编辑Hook的实际未接线缺口，复用限定原生扫描/稳定任务，支持--ruby-tool及绝对PATH，repair_ready保留当前行号及真实报告引用。对话不猜列号或回显工具消息；原生失败不换WASM，零诊断不自闭任务。8份实际CLI报告与封闭协议回归通过；最终安装和受影响回归见[验收](../../../tests/acceptance/ruby-native-hook.md)。真实宿主触发和公开发行不以形状重放计完成。
+
+Ruby Hook本批终态：默认完整1404通过/0失败/125忽略，WASM受影响85通过/0失败/4忽略；默认/WASM严格Clippy、fmt、分层、OpenSpec strict通过。离线npm安装链路1通过、8份实际Hook报告及9份结构化安装报告协议回归通过。前一aaa3879的Linux CI 37324440688全成功，此前Go失败未复现但根因未确认；本批远端结果须独立核验。详见tests/acceptance/ruby-native-hook.md，不勾选完整语言、真实宿主或发行父任务。

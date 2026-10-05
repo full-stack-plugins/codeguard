@@ -335,7 +335,13 @@ fn summarize(path: &str, report: &Value) -> String {
         .flatten()
         .filter(|f| f["current"] == true)
         .flat_map(|f| f["native"]["diagnostics"].as_array().into_iter().flatten());
-    for finding in python.chain(node).chain(swift).chain(zig) {
+    let ruby = feedback["ruby_lint"]["files"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter(|f| f["current"] == true)
+        .flat_map(|f| f["native"]["diagnostics"].as_array().into_iter().flatten());
+    for finding in python.chain(node).chain(swift).chain(zig).chain(ruby) {
         count += 1;
         if let Some(rule) = finding["rule_id"].as_str().filter(|r| {
             r.len() <= 96
@@ -365,6 +371,9 @@ fn summarize(path: &str, report: &Value) -> String {
                 .count()
         });
     let guidance = match feedback["next_action"].as_str() {
+        Some("repair_native_source") if feedback["ruby_lint"].is_object() => {
+            "先核对项目 Ruby 版本适用性，再按报告已有行号确认和修复语法；继续原工具复检及完整项目检查"
+        }
         Some("repair_native_source") => {
             "按当前原生字节位置修复语法，再使用原工具复检；完整 lint、类型和项目构建仍须检查"
         }
@@ -409,6 +418,42 @@ fn summarize(path: &str, report: &Value) -> String {
             }
         }
         repair.push_str("Zig 修复后运行 codeguard lint zig <当前文件> --format=json；核对原工具和完整项目检查。只使用实际同步的任务ID；不凭零诊断关闭历史任务。");
+    }
+    if feedback["ruby_lint"].is_object() {
+        let scan = &feedback["ruby_lint"];
+        for file in scan["files"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter(|f| f["current"] == true)
+            .take(2)
+        {
+            for row in file["native"]["diagnostics"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .take(2)
+            {
+                if let Some(line) = row["line"].as_u64() {
+                    repair.push_str(&format!("Ruby 第 {line} 行（列号不可用）；"));
+                }
+            }
+            if let Some(id) = file["task_id"].as_str().filter(|id| {
+                id.strip_prefix("CG-B-")
+                    .is_some_and(|s| s.len() == 32 && s.bytes().all(|b| b.is_ascii_hexdigit()))
+            }) {
+                repair.push_str(&format!("Ruby 原生任务 {id}：codeguard task show {id} . --format=json；修复后 codeguard task verify {id} . --ruby-tool <已核验绝对路径> --format=json。"));
+            }
+        }
+        if scan["task_status"] == "not_connected" {
+            repair.push_str("Ruby 原生任务工作台未连接；保留当前诊断，不假定已有任务。");
+        }
+        if scan["task_status"] == "incomplete" {
+            repair.push_str("Ruby 原生任务同步未完成；核对工作台，不伪造任务引用。");
+        }
+        repair.push_str(
+            "先核对项目Ruby版本是否适用；继续RuboCop及完整项目检查，不凭零诊断关闭任务。",
+        );
     }
     if feedback["swift_lint"].is_object() {
         for file in feedback["swift_lint"]["files"]

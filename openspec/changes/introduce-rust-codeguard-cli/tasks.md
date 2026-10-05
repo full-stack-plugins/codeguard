@@ -1618,3 +1618,10 @@ check python/all现通过0.48反馈保留独立结构计数和原始坐标，原
 
 
 本批终态：默认全workspace1395通过/0失败/125忽略，WASM受影响6目标58通过/0失败/3忽略；32grammar/语言选择3目标26通过/0失败/1忽略；默认/WASM严格Clippy、fmt、分层、OpenSpec通过，实际两构建8份报告与schema3项验收见tests/acceptance/ruby-project-native-scan.md。未修改用户Erlang草稿、旧schema或grammar资产；完整语言资格和发行父任务仍开放。
+
+
+## 2026-10-05 Ruby 编辑与修复 Hook 接线
+
+对应既有9.3/9.9、11.17、14.6/14.7/14.9/14.10/14.11/14.14/14.18；不新建change、不勾选完整宿主或语言父任务。原生Ruby编辑只检查实际选择文件，显式工具或绝对PATH优先，缺工具候选、选定失败不回退；CLAUDE形状反馈使用当前行号、安全任务与复检命令，不回显源码/消息或猜列号。repair_ready记录真实报告引用与零诊断仍open。初始4项RED，接线后GREEN，追加缺工具和失败写入反例。新Hook外层0.19/0.20与内层0.10/0.6闭合schema通过8份真实CLI观察（含/usr/bin/ruby及默认构建缺WASM）及伪造字段反例，旧schema不修改。安装后链路、默认/WASM最终回归及Clippy证据见tests/acceptance/ruby-native-hook.md；真实宿主、完整Ruby能力与发行仍未验收。
+
+Ruby Hook本批终态：默认完整1404通过/0失败/125忽略，WASM受影响85通过/0失败/4忽略；默认/WASM严格Clippy、fmt、分层、OpenSpec strict通过。离线npm安装链路1通过、8份实际Hook报告及9份结构化安装报告协议回归通过。前一aaa3879的Linux CI 37324440688全成功，此前Go失败未复现但根因未确认；本批远端结果须独立核验。详见tests/acceptance/ruby-native-hook.md，不勾选完整语言、真实宿主或发行父任务。
