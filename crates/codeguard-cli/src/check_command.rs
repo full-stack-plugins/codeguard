@@ -7,9 +7,7 @@ use std::time::{Duration, Instant};
 
 use codeguard_adapters::{capability_row, legacy_registry};
 use codeguard_core::{CHECK_CATEGORIES, TaskGraph, TaskNode};
-use codeguard_runtime::{
-    NativeObservation, SourceSnapshot, TaskExecution, TaskOutcome, run_task_graph,
-};
+use codeguard_runtime::{NativeObservation, SourceSnapshot, TaskExecution, TaskOutcome, run_task_graph};
 use serde_json::{Value, json};
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -23,9 +21,7 @@ use crate::discovery::{DiscoveryReport, discover};
 use crate::go_lint_command::observe_for_check as observe_go_vet;
 use crate::java_checker_config_status::{checker_for_category, summarize};
 use crate::java_cve_attribution::attach_candidates;
-use crate::java_cve_scan::{
-    NativeContext as CveNativeContext, observe_project as observe_cve_project,
-};
+use crate::java_cve_scan::{NativeContext as CveNativeContext, observe_project as observe_cve_project};
 use crate::java_dependency_scan::{
     NativeContext as DependencyNativeContext, observe_project as observe_dependency_project,
 };
@@ -35,9 +31,7 @@ use crate::java_javadoc_scan::{
 use crate::java_p3c_scan::{NativeContext, observe_project};
 use crate::next_command::{read_local_brief, read_local_brief_for_checker};
 use crate::partial_sarif_feedback::partial_check_sarif;
-use crate::python_lint_command::{
-    annotate_conversation_budget, scan_and_sync_report_with_deadline,
-};
+use crate::python_lint_command::{annotate_conversation_budget, scan_and_sync_report_with_deadline};
 use crate::report_export::export_report;
 use crate::rust_lint_scan::observe_cargo_clippy_with_coverage;
 use crate::work_sync::{save_local_report, sync_local_workspace};
@@ -2014,7 +2008,7 @@ pub fn run(args: &[String]) -> ExitCode {
         crate::check_shell_scan::refresh(&root, &mut shell_lint, deadline);
     }
     let mut report = json!({
-        "schema_version":if shell_lint.is_object() || next["schema_version"]=="0.17.0" {"0.52.0"}else if ruby_lint.is_object() || next["schema_version"] == "0.15.0" {"0.51.0"} else if next["schema_version"] == "0.14.0" {"0.50.0"} else if next["schema_version"] == "0.13.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.49.0"} else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row.get("structural_observations").is_some())) {"0.48.0"} else if zig_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.12.0" {"0.47.0"}else if zig_lint.is_object() {"0.46.0"} else if matches!(parsed.selection, Selection::Language(_)) {"0.45.0"} else if swift_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.11.0" {"0.44.0"} else if swift_lint.is_object() {"0.43.0"} else if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
+        "schema_version":if syntax_candidates["observations"].as_array().is_some_and(|rows|rows.iter().any(|row|row["language"]=="cfquery")) {"0.53.0"}else if shell_lint.is_object() || next["schema_version"]=="0.17.0" {"0.52.0"}else if ruby_lint.is_object() || next["schema_version"] == "0.15.0" {"0.51.0"} else if next["schema_version"] == "0.14.0" {"0.50.0"} else if next["schema_version"] == "0.13.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.49.0"} else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row.get("structural_observations").is_some())) {"0.48.0"} else if zig_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.12.0" {"0.47.0"}else if zig_lint.is_object() {"0.46.0"} else if matches!(parsed.selection, Selection::Language(_)) {"0.45.0"} else if swift_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.11.0" {"0.44.0"} else if swift_lint.is_object() {"0.43.0"} else if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
         "operation":"check", "selection":parsed.selection.as_str(), "command_status":if request_cancelled { "cancelled" } else { "incomplete" },
         "exit_code":if request_cancelled { 130 } else { 3 }, "delivery_decision":if parsed.selection == Selection::All { "incomplete" } else { "not_evaluated" }, "authority":"local_unverified",
         "reason":if request_cancelled { "request_cancelled" } else if parsed.selection == Selection::All { "full_project_obligations_and_trusted_policy_unavailable" } else if parsed.selection == Selection::Java { "java_selection_obligations_and_trusted_policy_unavailable" } else { "language_selection_obligations_and_trusted_policy_unavailable" },
@@ -2034,7 +2028,7 @@ pub fn run(args: &[String]) -> ExitCode {
     if zig_lint.is_object()
         || matches!(
             report["schema_version"].as_str(),
-            Some("0.47.0" | "0.48.0" | "0.49.0" | "0.50.0" | "0.51.0" | "0.52.0")
+            Some("0.47.0" | "0.48.0" | "0.49.0" | "0.50.0" | "0.51.0" | "0.52.0" | "0.53.0")
         )
     {
         report["native_results"]["zig_lint"] = zig_lint.clone();
@@ -2054,6 +2048,7 @@ pub fn run(args: &[String]) -> ExitCode {
                 | "0.50.0"
                 | "0.51.0"
                 | "0.52.0"
+                | "0.53.0"
         )
     ) {
         if let Some(native) = report["native_results"].as_object_mut() {
@@ -2073,16 +2068,20 @@ pub fn run(args: &[String]) -> ExitCode {
                 | "0.50.0"
                 | "0.51.0"
                 | "0.52.0"
+                | "0.53.0"
         )
     ) {
         if let Some(native) = report["native_results"].as_object_mut() {
             native.remove("swift_lint");
         }
     }
-    if matches!(report["schema_version"].as_str(), Some("0.51.0" | "0.52.0")) {
+    if matches!(
+        report["schema_version"].as_str(),
+        Some("0.51.0" | "0.52.0" | "0.53.0")
+    ) {
         report["native_results"]["ruby_lint"] = ruby_lint.clone();
     }
-    if report["schema_version"] == "0.52.0" {
+    if matches!(report["schema_version"].as_str(), Some("0.52.0" | "0.53.0")) {
         report["native_results"]["shell_lint"] = shell_lint.clone();
     }
     if parsed.format != OutputFormat::Human {

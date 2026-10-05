@@ -265,8 +265,10 @@ pub(crate) fn original(root: &Path, brief: &Value) -> Result<Value, &'static str
     } else {
         matches!(
             report["schema_version"].as_str(),
-            Some("0.1.0" | "0.3.0" | "0.8.0")
+            Some("0.1.0" | "0.3.0" | "0.8.0" | "0.11.0")
         ) && (report["schema_version"] != "0.8.0" || go_structure_history(&report))
+            && (report["schema_version"] != "0.11.0"
+                || crate::syntax_confirmation::valid_report(root, &workspace, &report))
             && report["language"].as_str().is_some_and(|lang| {
                 codeguard_adapters::bundled_grammar_candidates()
                     .ok()
@@ -1011,6 +1013,10 @@ fn initial_guidance(root: &Path, brief: &Value) -> Option<Value> {
         "先核对固定 grammar 与当前源码的疑似证据。"
     };
     let language = original["language"].as_str()?;
+    if language == "cfquery" {
+        return Some(json!({"disposition":"needs_decision",
+            "step":"CFQuery 仅有静态 SQL 关键词结构候选；先明确 datasource、数据库方言/版本、模板插值及 schema 上下文，再选择隔离的原生 SQL 语法确认。当前 task verify 尚未接入 CFQuery 原生 adapter，不自动连接项目数据库、不安装其它语言工具，不凭候选修改源码或关闭任务"}));
+    }
     if language == "ruby" {
         return Some(
             json!({"schema_version":"0.15.0","disposition":"verification_required",

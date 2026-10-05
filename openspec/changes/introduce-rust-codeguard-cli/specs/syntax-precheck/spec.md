@@ -723,3 +723,13 @@ CFQuery grammar evaluation SHALL NOT promote provisional generic SQL labels to c
 #### Scenario: PostgreSQL empty projection disagrees with a generic SQL assumption
 - **WHEN** a fixed isolated PostgreSQL parser accepts `SELECT FROM users` and rejects `SELECT DISTINCT FROM users`, while the pinned CFQuery grammar reports zero recoveries for both
 - **THEN** retain the generic empty-projection case as pending, record the distinct-query disagreement with PostgreSQL context, preserve both sources and tool identities, and keep grammar qualification and delivery approval false
+
+### Requirement: CFQuery keyword candidates SHALL preserve native dialect uncertainty
+
+Fixed CFQuery grammar direct AST keyword sequence SELECT/DISTINCT/FROM MAY produce a separately versioned structural candidate with fixed rule digest. Quotes, identifiers, interpolation and other AST nodes MUST interrupt the sequence; comments MAY be ignored. SELECT/FROM without DISTINCT MUST NOT be flagged by this rule. ERROR/MISSING, asset identities and historical grammar metrics MUST remain unchanged. Candidate reports, selected-file feedback and stable confirmation tasks MUST bind whole-file identity and restore embedded fragment coordinates; neither candidate absence nor task deletion grants delivery permission. Dynamic templates and database dialect/schema context MUST be resolved by applicable native confirmation, not by guessing source edits.
+
+#### Scenario: PostgreSQL rejects DISTINCT with no projection
+
+- **WHEN** the same frozen SELECT DISTINCT FROM users has zero raw grammar recovery and PostgreSQL18.6 PREPARE returns SQLSTATE42601
+- **THEN** the public probe and selected-file check show an independent structure candidate and require applicable native confirmation; repeated scans share one task, while raw grammar observations remain zero
+- **AND** quoted literals, interpolated projection and the PostgreSQL-accepted SELECT FROM users do not match this rule

@@ -215,3 +215,8 @@ pub use package_download::{
 };
 #[cfg(test)]
 mod download_test_server;
+
+#[cfg(feature = "wasm-precheck")]
+mod wasm_keyword_sequence;
+#[cfg(feature = "wasm-precheck")]
+pub use wasm_keyword_sequence::{WasmKeywordSequence, scan_wasm_keyword_sequence};

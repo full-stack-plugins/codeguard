@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0.0",
+  "rule_id": "codeguard.cfquery.distinct_projection",
+  "rule_version": "1.0.0",
+  "qualification": "candidate_unqualified",
+  "basis": "codeguard_structure_rule",
+  "language": "cfquery",
+  "root_kind": "program",
+  "keyword_kind": "query_keyword",
+  "direct_keyword_sequence": ["SELECT", "DISTINCT", "FROM"],
+  "ignored_direct_kind": "comment",
+  "native_counterevidence": "postgresql_18_6_prepare_sqlstate_42601",
+  "source_scope": "static_cfquery_sql_candidate",
+  "dynamic_interpolation": "breaks_keyword_sequence",
+  "empty_projection_without_distinct": "not_flagged"
+}

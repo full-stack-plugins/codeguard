@@ -1,0 +1,270 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:grammar-probe:0.4.0",
+  "title": "Static CFQuery DISTINCT projection candidate, separate from raw grammar recovery",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "status",
+    "language",
+    "path",
+    "native",
+    "delivery_decision",
+    "source_sha256",
+    "grammar_sha256",
+    "grammar_qualified",
+    "precheck",
+    "recoveries",
+    "next_action",
+    "precheck_scope",
+    "structural_observations",
+    "source_scope"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.4.0"
+    },
+    "report_type": {
+      "const": "grammar_candidate_probe"
+    },
+    "status": {
+      "const": "incomplete"
+    },
+    "language": {
+      "const": "cfquery"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_sha256": {
+      "$ref": "#/$defs/digest"
+    },
+    "grammar_sha256": {
+      "$ref": "#/$defs/digest"
+    },
+    "grammar_qualified": {
+      "const": false
+    },
+    "precheck": {
+      "$ref": "#/$defs/precheck"
+    },
+    "recoveries": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "$ref": "#/$defs/recovery"
+      }
+    },
+    "native": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason"
+      ],
+      "properties": {
+        "status": {
+          "const": "not_run"
+        },
+        "reason": {
+          "const": "explicit_candidate_probe"
+        }
+      }
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "next_action": {
+      "const": "confirm_candidate_structure_with_applicable_native_tool"
+    },
+    "precheck_scope": {
+      "const": "raw_parser_recoveries_and_observation_budgets"
+    },
+    "structural_observations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 128,
+      "items": {
+        "$ref": "#/$defs/structure"
+      }
+    },
+    "source_scope": {
+      "const": "static_cfquery_sql_candidate"
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "precheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "scope_complete",
+        "cancelled",
+        "selected_files",
+        "checked_files",
+        "incomplete_files",
+        "unsupported_files",
+        "unqualified_files",
+        "truncated_files",
+        "suspected_recoveries"
+      ],
+      "properties": {
+        "status": {
+          "const": "incomplete"
+        },
+        "scope_complete": {
+          "type": "boolean"
+        },
+        "cancelled": {
+          "const": false
+        },
+        "selected_files": {
+          "const": 1
+        },
+        "checked_files": {
+          "const": 1
+        },
+        "incomplete_files": {
+          "const": 0
+        },
+        "unsupported_files": {
+          "const": 0
+        },
+        "unqualified_files": {
+          "const": 1
+        },
+        "truncated_files": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "suspected_recoveries": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 128
+        }
+      }
+    },
+    "recovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "group_id",
+        "syntax_kind",
+        "start_byte",
+        "end_byte",
+        "start_row",
+        "start_column_byte",
+        "end_row",
+        "end_column_byte"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "ERROR",
+            "MISSING"
+          ]
+        },
+        "group_id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "syntax_kind": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "start_byte": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_byte": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "start_row": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "start_column_byte": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_row": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_column_byte": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "structure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "basis",
+        "rule_id",
+        "rule_version",
+        "rule_sha256",
+        "parent_syntax_kind",
+        "start_byte",
+        "end_byte",
+        "start_row",
+        "start_column_byte",
+        "end_row",
+        "end_column_byte"
+      ],
+      "properties": {
+        "basis": {
+          "const": "codeguard_structure_rule"
+        },
+        "rule_id": {
+          "const": "codeguard.cfquery.distinct_projection"
+        },
+        "rule_version": {
+          "const": "1.0.0"
+        },
+        "rule_sha256": {
+          "const": "03652b60616a695c6343b1a39efcf2ea8f469838c6df13bb94ab3d0138b4ea03"
+        },
+        "parent_syntax_kind": {
+          "const": "program"
+        },
+        "start_byte": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_byte": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "start_row": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "start_column_byte": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_row": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_column_byte": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}
