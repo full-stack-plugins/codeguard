@@ -19,7 +19,7 @@ pub(crate) fn valid(record: &TaskLifecycleRecord, value: &Value) -> bool {
         "current_native",
         "outcome",
     ];
-    if value["schema_version"] == "0.8.0" {
+    if matches!(value["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {
         expected.push("edition_context");
         if !valid_rust_binding(value) {
             return false;
@@ -112,13 +112,13 @@ fn native_bound(value: &Value) -> bool {
         Some("0.4.0") => "kotlinc-jvm 2.4.10",
         Some("0.6.0") => "ruff 0.16.8",
         Some("0.7.0") => "go1.23.4",
-        Some("0.8.0") => "rustfmt 1.9.0-stable",
+        Some("0.8.0" | "0.9.0") => "rustfmt 1.9.0-stable",
         _ => return false,
     };
     ["original_native", "current_native"].iter().all(|k| {
         value[*k]["tool_sha256"] == value["tool_sha256"]
             && value[*k]["version"] == version
-            && (value["schema_version"] != "0.8.0"
+            && (!matches!(value["schema_version"].as_str(), Some("0.8.0" | "0.9.0"))
                 || value[*k]["edition_context"] == value["edition_context"])
             && (value["schema_version"] != "0.7.0"
                 || (value[*k]["gofmt_sha256"] == value["gofmt_sha256"]
@@ -128,7 +128,7 @@ fn native_bound(value: &Value) -> bool {
 fn native_for_version(evidence: &Value, key: &str) -> bool {
     match evidence["schema_version"].as_str() {
         Some("0.1.0" | "0.5.0") => native(&evidence[key]),
-        Some("0.8.0") => crate::rust_syntax_evidence::valid(&evidence[key], None),
+        Some("0.8.0" | "0.9.0") => crate::rust_syntax_evidence::valid(&evidence[key], None),
         Some("0.7.0") => crate::go_syntax_probe::valid_observation(&evidence[key], None),
         Some("0.6.0") => crate::python_syntax_probe::valid_native_observation(&evidence[key], None),
         Some("0.2.0") => crate::erlang_syntax_probe::valid_native_observation(&evidence[key], None),
@@ -273,7 +273,9 @@ pub(crate) fn valid_python_binding(value: &Value) -> bool {
 /// 参数为脱敏生命周期证据；结构有效仍须由宿主核验签名和当前字节。
 pub(crate) fn valid_rust_binding(value: &Value) -> bool {
     value["identity"]["checker_id"] == "syntax.native_confirmation"
-        && value["grammar_sha256"].is_null()
+        && ((value["schema_version"] == "0.8.0" && value["grammar_sha256"].is_null())
+            || (value["schema_version"] == "0.9.0"
+                && value["grammar_sha256"].as_str().is_some_and(digest)))
         && value["edition_context"].is_object()
         && ["original_native", "current_native"]
             .iter()

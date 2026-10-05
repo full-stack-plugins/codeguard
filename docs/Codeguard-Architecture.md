@@ -1139,4 +1139,23 @@ Rust edit feedback now reports safe lines, stable tasks and original Rustfmt rec
 
 Rust edit dialogue now provides an executable post-batch Clippy command and explicitly states that project lint did not run during editing. Original-task repair-ready retains current rule/line feedback and withdraws changed-input guidance; this is not a background queue or authoritative closure. See [project lint follow-up](Rust-Project-Lint-Followup.md).
 
-Native-first Rust syntax tasks now have a scoped protected-host SDK resolution and same-tool recurrence path, binding the original counterexample and Cargo edition provenance. Production host approval integration and WASM-first Rust resolution remain pending; this does not qualify Clippy or project delivery. See [scoped acceptance](../tests/acceptance/rust-task-resolution.md).
+Native-first and WASM-first Rust syntax tasks now share a protected-host SDK confirmation, scoped resolution and same-tool recurrence path. Native-first policy1.7/evidence0.8 retain grammar=null; WASM-first policy1.8/evidence0.9 retain the original grammar digest. Both bind the original counterexample and approved Cargo edition provenance; a native counterexample requests investigation, and incomplete or changed inputs cannot resolve. Production host approval integration remains pending; this does not qualify Clippy or project delivery. See [scoped acceptance](../tests/acceptance/rust-task-resolution.md).
+
+See [WASM-first acceptance](../tests/acceptance/rust-wasm-task-resolution.md) for the actual execution path, protocols and counterexample routing.
+
+
+```mermaid
+flowchart LR
+    A[First syntax task] --> B{Original evidence}
+    B -->|Native| C["Bind original tool and edition provenance<br/>Policy1.7 / evidence0.8 / grammar=null"]
+    B -->|WASM| D["Bind original grammar and approved edition<br/>Policy1.8 / evidence0.9"]
+    C --> E[Same-tool counterexample and current-source rechecks]
+    D --> E
+    E -->|Original diagnosed and current fixed| F[Resolve scoped task]
+    E -->|Original has no native diagnosis| G[Investigate possible false positive]
+    E -->|Incomplete or changed inputs| H[Require verification]
+    F --> I[Ordinary native recheck observes recurrence]
+    I --> J[Reopen the same lifecycle chain]
+```
+
+This diagram describes the implemented source-level host-approved SDK path. Production automatic host approval integration remains pending; editable local history cannot grant project delivery permission.

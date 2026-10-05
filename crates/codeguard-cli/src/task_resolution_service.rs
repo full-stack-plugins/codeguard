@@ -56,7 +56,7 @@ pub fn verify_go_task_resolution(
     verify_task_resolution(request, TaskResolutionChecker::Go)
 }
 
-/// 验签宿主固定的Rust原生首次任务策略，并在同一Cargo edition下对照原反例与当前源码。
+/// 验签宿主固定的Rust原生首次或WASM首次任务策略，并在同一Cargo edition下对照原反例与当前源码。
 /// 参数来自受保护宿主；返回限定任务收据，不替代Clippy或全项目交付门禁。
 pub fn verify_rust_task_resolution(
     request: &crate::RustTaskResolutionRequest<'_>,
@@ -208,6 +208,14 @@ fn original_binding_matches(
     checker: TaskResolutionChecker,
 ) -> bool {
     if checker.language() == "rust" {
+        if policy.schema_version == "1.8.0" {
+            return matches!(original["schema_version"].as_str(), Some("0.1.0" | "0.7.0"))
+                && original["native_evidence"].is_null()
+                && policy.grammar_sha256.as_ref().is_some_and(|grammar| {
+                    original["observations"][0]["source_sha256"] == policy.original_source_sha256
+                        && original["observations"][0]["grammar_sha256"] == *grammar
+                });
+        }
         return original["schema_version"] == "0.12.0"
             && policy.grammar_sha256.is_none()
             && original["native_evidence"]["target"]["source_sha256"]
@@ -428,7 +436,10 @@ pub(crate) fn commit_resolution(
         "current_native",
         "outcome",
     ];
-    if raw_evidence["schema_version"] == "0.8.0" {
+    if matches!(
+        raw_evidence["schema_version"].as_str(),
+        Some("0.8.0" | "0.9.0")
+    ) {
         keys.push("edition_context");
         if !crate::task_resolution_evidence_shape::valid_rust_binding(&raw_evidence) {
             return Err("task_resolution_evidence_binding_invalid");
@@ -454,7 +465,9 @@ pub(crate) fn commit_resolution(
         object.len() == keys.len() && keys.iter().all(|key| object.contains_key(*key))
     }) || !matches!(
         raw_evidence["schema_version"].as_str(),
-        Some("0.1.0" | "0.2.0" | "0.3.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.7.0" | "0.8.0")
+        Some(
+            "0.1.0" | "0.2.0" | "0.3.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.7.0" | "0.8.0" | "0.9.0"
+        )
     ) {
         return Err("task_resolution_evidence_binding_invalid");
     }

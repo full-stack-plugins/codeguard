@@ -28,6 +28,7 @@ struct Project {
     original_report: String,
     edition_context: Value,
     tool: PathBuf,
+    grammar: Option<String>,
 }
 impl Drop for Project {
     fn drop(&mut self) {
@@ -36,6 +37,9 @@ impl Drop for Project {
 }
 impl Project {
     fn new() -> Self {
+        Self::new_with_origin(false)
+    }
+    fn new_with_origin(wasm_first: bool) -> Self {
         let host_size = fs::metadata(std::env::current_exe().unwrap())
             .unwrap()
             .len();
@@ -70,12 +74,20 @@ impl Project {
             .output()
             .unwrap();
         assert_eq!(o.status.code(), Some(3));
-        let mut child = Command::new(env!("CARGO_BIN_EXE_codeguard"))
-            .args(["hook", "execute"])
-            .arg(&root)
-            .args(["--format=json", "--timeout", "30s", "--rustfmt-tool"])
-            .arg(&tool)
-            .env("PATH", &root)
+        let mut command = Command::new(env!("CARGO_BIN_EXE_codeguard"));
+        if !wasm_first {
+            command
+                .arg("hook")
+                .arg("execute")
+                .arg(&root)
+                .arg("--rustfmt-tool")
+                .arg(&tool);
+        } else {
+            command.arg("hook").arg("execute").arg(&root);
+        }
+        let mut child = command
+            .args(["--format=json", "--timeout", "30s"])
+            .env("PATH", "")
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .spawn()
@@ -83,14 +95,13 @@ impl Project {
         child.stdin.take().unwrap().write_all(json!({"schema_version":"1.0.0","report_type":"hook_trigger_request","input":{"event":"file_changed","changed_paths":["app.rs"],"task_id":null,"write_outcome":"confirmed","host_claims_blocking":false}}).to_string().as_bytes()).unwrap();
         let o = child.wait_with_output().unwrap();
         let r: Value = serde_json::from_slice(&o.stdout).unwrap();
-        assert!(
-            r["local_feedback"]["rust_syntax"]["files"][0]["task_id"].is_string(),
-            "{r}"
-        );
-        let id = r["local_feedback"]["rust_syntax"]["files"][0]["task_id"]
-            .as_str()
-            .unwrap()
-            .to_owned();
+        let task_id = if wasm_first {
+            &r["local_feedback"]["syntax_tasks"]["tasks"][0]["task_id"]
+        } else {
+            &r["local_feedback"]["rust_syntax"]["files"][0]["task_id"]
+        };
+        assert!(task_id.is_string(), "{r}");
+        let id = task_id.as_str().unwrap().to_owned();
         let fact: Value = serde_json::from_slice(
             &fs::read(root.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
         )
@@ -103,12 +114,19 @@ impl Project {
             .unwrap(),
         )
         .unwrap();
+        let edition_context =
+            codeguard_cli::rust_project_edition::RustProjectEdition::capture(&root, "app.rs")
+                .unwrap()
+                .report();
         Self {
             root,
             id,
             workspace: fact["workspace_id"].as_str().unwrap().into(),
             original_report: fact["first_report_sha256"].as_str().unwrap().into(),
-            edition_context: original["native_evidence"]["native"]["edition_context"].clone(),
+            edition_context,
+            grammar: original["observations"][0]["grammar_sha256"]
+                .as_str()
+                .map(str::to_owned),
             tool,
         }
     }
@@ -116,7 +134,7 @@ impl Project {
         self.tool.clone()
     }
     fn policy(&self, tool: &Path) -> Value {
-        json!({"schema_version":"1.7.0","report_type":"task_resolution_policy","identity":{"workspace_id":self.workspace,"task_id":self.id,"checker_id":"syntax.native_confirmation","scope":"app.rs"},"policy_revision":"p1","original_report_sha256":self.original_report,"original_source_sha256":sha(BAD),"grammar_sha256":null,"tool_sha256":sha(&fs::read(tool).unwrap()),"adapter_sha256":sha(&fs::read(std::env::current_exe().unwrap()).unwrap()),"native_rule_id":"rust.syntax","native_version":"rustfmt 1.9.0-stable","edition_context":self.edition_context})
+        json!({"schema_version":if self.grammar.is_some(){"1.8.0"}else{"1.7.0"},"report_type":"task_resolution_policy","identity":{"workspace_id":self.workspace,"task_id":self.id,"checker_id":"syntax.native_confirmation","scope":"app.rs"},"policy_revision":"p1","original_report_sha256":self.original_report,"original_source_sha256":sha(BAD),"grammar_sha256":self.grammar,"tool_sha256":sha(&fs::read(tool).unwrap()),"adapter_sha256":sha(&fs::read(std::env::current_exe().unwrap()).unwrap()),"native_rule_id":"rust.syntax","native_version":"rustfmt 1.9.0-stable","edition_context":self.edition_context})
     }
 
     fn verify(&self, tool: &Path, policy: &Value) -> Result<Value, &'static str> {
@@ -361,4 +379,140 @@ fn real_rustfmt_resolution_and_recurrence() {
 
 fn policy_value(raw: &[u8]) -> Value {
     serde_json::from_slice(raw).unwrap()
+}
+
+#[cfg(feature = "wasm-precheck")]
+#[test]
+fn wasm_first_rust_task_confirms_resolves_and_reopens_with_original_grammar() {
+    let p = Project::new_with_origin(true);
+    let tool = p.normal_tool();
+    let policy = p.policy(&tool);
+    assert!(p.grammar.is_some());
+    assert_eq!(policy["schema_version"], "1.8.0");
+    let still = p.verify(&tool, &policy).unwrap();
+    assert_eq!(still["state"], "open");
+    assert_eq!(still["outcome"], "still_present");
+    fs::write(p.root.join("app.rs"), GOOD).unwrap();
+    let fixed = p.verify(&tool, &policy).unwrap();
+    assert_eq!(fixed["state"], "resolved");
+    assert_eq!(
+        fixed["event_ref"],
+        p.verify(&tool, &policy).unwrap()["event_ref"]
+    );
+    fs::write(p.root.join("app.rs"), BAD).unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["task", "verify", &p.id])
+        .arg(&p.root)
+        .arg("--rustfmt-tool")
+        .arg(&tool)
+        .arg("--format=json")
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(3), "{out:?}");
+    assert!(
+        p.events()
+            .iter()
+            .any(|e| e["event"]["kind"]["event"] == "reopened")
+    );
+    assert_eq!(p.verify(&tool, &policy).unwrap()["state"], "open");
+}
+
+#[cfg(feature = "wasm-precheck")]
+#[test]
+fn wasm_first_grammar_origin_and_edition_are_bound_before_native_execution() {
+    let p = Project::new_with_origin(true);
+    let tool = p.normal_tool();
+    let policy = p.policy(&tool);
+    for grammar in [Value::Null, json!("0".repeat(64))] {
+        let mut wrong = policy.clone();
+        wrong["grammar_sha256"] = grammar;
+        assert_eq!(
+            p.verify(&tool, &wrong),
+            Err("task_resolution_original_identity_mismatch")
+        );
+    }
+    let mut missing = policy.clone();
+    missing.as_object_mut().unwrap().remove("grammar_sha256");
+    assert_eq!(
+        p.verify(&tool, &missing),
+        Err("task_resolution_policy_invalid")
+    );
+    let mut origin = policy.clone();
+    origin["schema_version"] = json!("1.7.0");
+    origin["grammar_sha256"] = Value::Null;
+    assert_eq!(
+        p.verify(&tool, &origin),
+        Err("task_resolution_original_identity_mismatch")
+    );
+    let mut tool_changed = policy.clone();
+    tool_changed["tool_sha256"] = json!("0".repeat(64));
+    assert_eq!(
+        p.verify(&tool, &tool_changed),
+        Err("task_resolution_tool_mismatch")
+    );
+    assert!(p.events().is_empty());
+    fs::write(
+        p.root.join("Cargo.toml"),
+        "[package]\nname='sample'\nversion='0.1.0'\nedition='2024'\n",
+    )
+    .unwrap();
+    assert_eq!(
+        p.verify(&tool, &policy),
+        Err("task_resolution_edition_context_mismatch")
+    );
+    assert!(p.events().is_empty());
+}
+#[cfg(feature = "wasm-precheck")]
+#[test]
+fn wasm_first_native_counterexample_requires_grammar_review_in_next() {
+    assert!(
+        std::env::var("CODEGUARD_RUST_RESOLUTION_TOOL").is_err(),
+        "controlled counterexample only"
+    );
+    let p = Project::new_with_origin(true);
+    let tool = p.normal_tool();
+    let policy = p.policy(&tool);
+    fs::write(p.root.join("probe-mode"), "zero").unwrap();
+    let review = p.verify(&tool, &policy).unwrap();
+    assert_eq!(review["state"], "verification_required");
+    assert_eq!(review["outcome"], "false_positive_review_required");
+    let evidence: Value = serde_json::from_slice(
+        &fs::read(p.root.join(review["evidence_ref"].as_str().unwrap())).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(evidence["schema_version"], "0.9.0");
+    assert_eq!(evidence["grammar_sha256"], policy["grammar_sha256"]);
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .arg("next")
+        .arg(&p.root)
+        .arg("--format=json")
+        .output()
+        .unwrap();
+    let next: Value = serde_json::from_slice(&out.stdout).unwrap();
+    let brief = codeguard_cli::next_command::read_task_brief(&p.root, &p.id).unwrap();
+    assert_eq!(brief["disposition"], "verification_required");
+    assert!(
+        brief["step"].as_str().unwrap().contains("首次 WASM"),
+        "{brief}"
+    );
+    assert!(
+        brief["step"]
+            .as_str()
+            .unwrap()
+            .contains("不直接认定 grammar 缺陷"),
+        "{brief}"
+    );
+    assert_eq!(next["repair_brief"]["task_id"], p.id, "{next}");
+    assert!(
+        !p.events()
+            .iter()
+            .any(|e| e["event"]["kind"]["event"] == "resolved")
+    );
+}
+#[cfg(feature = "wasm-precheck")]
+#[test]
+#[ignore = "需要已安装直接Rustfmt1.9.0-stable；信任根仍为测试宿主夹具"]
+fn real_rustfmt_wasm_first_resolution_and_recurrence() {
+    assert!(std::env::var("CODEGUARD_RUST_RESOLUTION_TOOL").is_ok());
+    wasm_first_rust_task_confirms_resolves_and_reopens_with_original_grammar();
 }

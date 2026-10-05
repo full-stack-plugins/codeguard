@@ -162,6 +162,11 @@ RunReport 与准备诊断 PrerequisiteReport MUST 使用 workspace_id + run_id �
 - **THEN** 仅原反例在同一 edition 下确有语法诊断、当前源码已变化且原工具完整零诊断时 SHALL 关闭限定任务；重复验证幂等，同 edition 和同工具普通复检检出复发 SHALL 重开原父链
 - **AND** edition/清单来源变化、超时、工具变化、签名失效、原反例无诊断 MUST NOT 关闭。Rust 使用独立策略和证据版本，grammar=null；收据不证明 Clippy、类型、构建或项目交付
 
+#### Scenario: Rust WASM-first tasks require native counterexample verification
+- **WHEN** Rust任务首次来自固定WASM观察，受保护宿主批准原任务/原反例/grammar和已解析Cargo edition来源，并选择固定Rustfmt1.9.0-stable
+- **THEN** 同一任务 SHALL 用该edition的原生原反例/当前源码对照完成确认、限定关闭和普通复检复发重开；原反例原生无诊断 SHALL 转误报调查，不把WASM恢复节点当成已确认违规，也不把安装原生工具当成修复
+- **AND** WASM首次使用独立policy1.8/evidence0.9并保留真实grammar摘要；原生首次policy1.7/evidence0.8保持grammar=null。替换来源、缺/错grammar、清单变化或未完成 MUST NOT 关闭；批准edition不推断为WASM首次已观察的历史上下文
+
 #### Scenario: Rehashed lifecycle evidence cannot change the original language
 - **WHEN** 本地关闭证据和父链记录被重算摘要，但证据协议、语言或 grammar 与已同步的首次任务事实不同
 - **THEN** 历史读取 SHALL 在原生执行前拒绝身份矛盾，并由 next 提供核对决策，不将本地文件当作可信关闭
