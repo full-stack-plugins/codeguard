@@ -1492,3 +1492,9 @@ check python/all现通过0.48反馈保留独立结构计数和原始坐标，原
 ### 2026-10-05 固定资产按语种复用核验
 
 14.13/14.19：内置selected资产核验先RED（重复九次核验），成功缓存后同语种一次；并发第二语种也只核验一次，未知语种不增加缓存项，修改元数据副本不污染固定清单。外部传入字节/许可证/身份仍逐次核对并拒绝篡改。资产层19通过，CLI实际32份项目/编辑Hook及worker/历史边界45通过、2条件忽略；不保存源码结论、不跳过原生义务、不完成14.13跨命令结果缓存，父任务仍开放。见[验收](../../../tests/acceptance/selected-grammar-asset-reuse.md)。
+
+
+## 2026-10-05 R/C++ 后缀及原生差分 CI 绑定修复
+
+- 显式接入 `.R` 和六种 C++ 后缀，保留大小写语义及 `.h` 的候选歧义；真实八文件 check all 和既有 32 grammar 项目/Hook 回归通过。见 `tests/acceptance/r-cpp-extension-routing.md`。14.4、14.6、14.19 仍需完整验收。
+- 原生差分回归显式重绑定当前清单、核对历史及 cases 不变，旧身份仍拒绝；修正 Ruff 隔离替身的过期 argv。见 `tests/acceptance/native-corpus-current-binding.md`。14.17、14.19 保持开放，远端完整 CI 尚待新提交。

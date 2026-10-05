@@ -769,3 +769,57 @@ fn typescript_module_tasks_are_stable_and_edit_hook_keeps_changed_scope() {
     assert!(first_ids.contains(tasks[0]["task_id"].as_str().unwrap()));
     fs::remove_dir_all(root).unwrap();
 }
+
+#[test]
+fn project_check_observes_r_and_cpp_explicit_suffixes() {
+    let root = std::env::temp_dir()
+        .canonicalize()
+        .unwrap()
+        .join(format!("codeguard-r-cpp-suffixes-{}", std::process::id()));
+    fs::create_dir_all(&root).unwrap();
+    let cases = [
+        ("upper.R", "r", "x <- (\n", true),
+        ("lower.r", "r", "x <- 1\n", false),
+        ("upper.C", "cpp", "int value = ;\n", true),
+        ("short.cp", "cpp", "int value = ;\n", true),
+        ("upper.CPP", "cpp", "int value = ;\n", true),
+        ("plus.c++", "cpp", "int value = ;\n", true),
+        ("source.cxx", "cpp", "int value = ;\n", true),
+        ("header.hxx", "cpp", "struct Value {};\n", false),
+    ];
+    for (name, _, source, _) in cases {
+        fs::write(root.join(name), source).unwrap();
+    }
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        // 隔离原生工具，实际执行随包 grammar 的候选分支。
+        .env("PATH", &root)
+        .args(["check", "all"])
+        .arg(&root)
+        .args(["--format=json", "--timeout", "60s"])
+        .output()
+        .unwrap();
+    fs::remove_dir_all(&root).unwrap();
+    assert_eq!(
+        output.status.code(),
+        Some(3),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let observations = report["syntax_candidates"]["observations"]
+        .as_array()
+        .unwrap();
+    assert_eq!(observations.len(), cases.len(), "{report}");
+    for (name, language, _, invalid) in cases {
+        let row = observations.iter().find(|row| row["path"] == name).unwrap();
+        assert_eq!(row["language"], language, "{row}");
+        assert_eq!(row["status"], "candidate_observed", "{row}");
+        assert_eq!(
+            row["recovery_count"].as_u64().unwrap() > 0,
+            invalid,
+            "{row}"
+        );
+        assert_eq!(row["grammar_qualified"], false, "{row}");
+    }
+    assert_eq!(report["delivery_decision"], "incomplete");
+}

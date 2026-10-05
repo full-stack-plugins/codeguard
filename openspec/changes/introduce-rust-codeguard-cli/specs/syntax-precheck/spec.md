@@ -594,3 +594,11 @@ Ruff正常与忽略noqa的检查若返回相同的invalid-syntax错误，Codegua
 #### Scenario: Metadata changes invalidate current corpus identity without rewriting history
 - **WHEN** grammar已知限制元数据改变当前清单摘要
 - **THEN** 原语料只能按原清单验证，不能直接启动当前worker；另行生成的新绑定输入可以回放相同样本并记录真实当前身份，历史报告保持原摘要
+
+### Requirement: Explicit R and C++ source suffixes SHALL reach project checking
+
+发现与候选路由 MUST 一致接纳 R 的 `.R`/`.r` 和 C++ 的 `.C`/`.cp`/`.CPP`/`.c++`/`.cxx`/`.hxx`，保留已有后缀。不得统一转小写导致 `.C` 被当作 C，也不得把共享 `.h` 或 R Markdown 猜作这些 grammar。缺原生工具时仍提供候选观察与未完成反馈，不授予 grammar 质量验收或门禁通过。
+
+#### Scenario: A project uses conventional source suffixes without native tools
+- **WHEN** 工作区存在上述后缀的源码，原生工具不可用
+- **THEN** detect 保留准确文件身份，check all 用对应固定 grammar 产生观察；非法源码的恢复信息仍为候选，整体保持 incomplete

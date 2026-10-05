@@ -31,7 +31,7 @@ fn native_incomplete_is_unknown_and_context_diagnostics_are_not_clean() {
 
 #[test]
 fn invalid_or_empty_native_selection_is_rejected_before_processes() {
-    let corpus = include_bytes!("../../../tests/fixtures/grammar_regression_v0_2.json");
+    let corpus = current_corpus_bytes();
     for tools in [
         BTreeMap::new(),
         BTreeMap::from([("vbnet".into(), PathBuf::from("/not-a-tool"))]),
@@ -40,7 +40,7 @@ fn invalid_or_empty_native_selection_is_rejected_before_processes() {
         assert!(
             replay_native_corpus(
                 &PathBuf::from(env!("CARGO_BIN_EXE_codeguard")),
-                corpus,
+                &corpus,
                 &tools,
                 Instant::now(),
                 &AtomicBool::new(false)
@@ -59,11 +59,11 @@ fn python_syntax_replay_uses_isolated_ruff_without_other_lint_or_project_config(
         .join(format!("cg-python-differential-{}", std::process::id()));
     fs::create_dir(&root).unwrap();
     let tool = root.join("ruff");
-    fs::write(&tool, "#!/bin/sh\nif [ \"$1\" = --version ]; then printf 'ruff 0.16.8\\n'; exit 0; fi\n[ \"$*\" = 'check --isolated --no-cache --ignore-noqa --select E9 --target-version py312 --output-format json --stdin-filename codeguard_input.py -' ] || exit 2\ninput=$(/bin/cat)\ncase \"$input\" in 'x = 1'*) printf '[]\\n'; exit 0;; esac\nprintf '[{\"code\":\"invalid-syntax\",\"message\":\"expected token\",\"filename\":\"/codeguard_input.py\",\"severity\":\"error\",\"location\":{\"row\":1,\"column\":1}}]\\n'\nexit 1\n").unwrap();
+    fs::write(&tool, "#!/bin/sh\nif [ \"$1\" = --version ]; then printf 'ruff 0.16.8\\n'; exit 0; fi\n[ \"$*\" = 'check --no-cache --ignore-noqa --select E9 --target-version py312 --output-format json --stdin-filename /codeguard_input.py --isolated -' ] || exit 2\ninput=$(/bin/cat)\ncase \"$input\" in 'x = 1'*) printf '[]\\n'; exit 0;; esac\nprintf '[{\"code\":\"invalid-syntax\",\"message\":\"expected token\",\"filename\":\"/codeguard_input.py\",\"severity\":\"error\",\"location\":{\"row\":1,\"column\":1}}]\\n'\nexit 1\n").unwrap();
     fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
     let report = replay_native_corpus(
         &PathBuf::from(env!("CARGO_BIN_EXE_codeguard")),
-        include_bytes!("../../../tests/fixtures/grammar_regression_v0_2.json"),
+        &current_corpus_bytes(),
         &BTreeMap::from([("python".into(), tool.clone())]),
         Instant::now() + Duration::from_secs(30),
         &AtomicBool::new(false),
@@ -72,7 +72,10 @@ fn python_syntax_replay_uses_isolated_ruff_without_other_lint_or_project_config(
     assert_eq!(report["schema_version"], "0.2.0");
     assert_eq!(report["language_count"], 32);
     assert_eq!(report["sample_count"], 2);
-    assert_eq!(report["cases"][0]["comparison"], "true_negative");
+    assert_eq!(
+        report["cases"][0]["comparison"], "true_negative",
+        "{report}"
+    );
     assert_eq!(report["cases"][1]["comparison"], "true_positive");
     assert_eq!(
         report["cases"][1]["native"]["diagnostics"][0]["rule_id"],
@@ -87,10 +90,7 @@ fn actual_python_syntax_corpus_keeps_non_syntax_lint_out_of_comparison() {
     use std::{fs, time::Duration};
     let tool =
         PathBuf::from(std::env::var("CODEGUARD_RUFF_SYNTAX_BIN").expect("explicit Ruff tool"));
-    let mut corpus: serde_json::Value = serde_json::from_slice(include_bytes!(
-        "../../../tests/fixtures/grammar_regression_v0_2.json"
-    ))
-    .unwrap();
+    let mut corpus: serde_json::Value = serde_json::from_slice(&current_corpus_bytes()).unwrap();
     let additional: serde_json::Value = serde_json::from_slice(include_bytes!(
         "../../../tests/fixtures/python_syntax_regression.json"
     ))
@@ -117,7 +117,7 @@ fn actual_python_syntax_corpus_keeps_non_syntax_lint_out_of_comparison() {
     }
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
     fs::write(
-        root.join("tests/acceptance/evidence/python-native-grammar-differential-2026-10-05.json"),
+        root.join("tests/acceptance/evidence/python-native-grammar-differential-current-manifest-2026-10-05.json"),
         serde_json::to_vec(&report).unwrap(),
     )
     .unwrap();
@@ -135,10 +135,7 @@ fn controlled_native_replay_retains_full_inventory_and_does_not_touch_workbench(
     let tool = root.join("zig");
     fs::write(&tool,"#!/bin/sh\nprintf x >> \"$0.calls\"\nif [ \"$1\" = version ]; then printf '0.16.0\\n'; exit 0; fi\ninput=$(/bin/cat)\ncase \"$input\" in *'const Empty'*) exit 0;; esac\nprintf '<stdin>:1:10: error: expected token\\n' >&2\nexit 1\n").unwrap();
     fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
-    let mut corpus: serde_json::Value = serde_json::from_slice(include_bytes!(
-        "../../../tests/fixtures/grammar_regression_v0_2.json"
-    ))
-    .unwrap();
+    let mut corpus: serde_json::Value = serde_json::from_slice(&current_corpus_bytes()).unwrap();
     corpus["cases"]
         .as_array_mut()
         .unwrap()
@@ -167,7 +164,10 @@ fn controlled_native_replay_retains_full_inventory_and_does_not_touch_workbench(
     assert_eq!(report["selected_language_count"], 1);
     assert_eq!(report["independent_holdout"], false);
     assert_eq!(report["grammar_qualified_count"], 0);
-    assert_eq!(report["cases"][0]["comparison"], "true_negative");
+    assert_eq!(
+        report["cases"][0]["comparison"], "true_negative",
+        "{report}"
+    );
     assert_eq!(report["cases"][1]["comparison"], "true_positive");
     assert!(!root.join(".codeguard").exists());
     let calls = fs::read(tool.with_extension("calls")).unwrap();
@@ -200,4 +200,41 @@ fn controlled_native_replay_retains_full_inventory_and_does_not_touch_workbench(
             .all(|case| case["native_classification"] == "unknown")
     );
     fs::remove_dir_all(root).unwrap();
+}
+
+// 原生差分同样必须先验证历史，再显式生成当前身份，不能绕过生产清单检查。
+fn current_corpus_bytes() -> Vec<u8> {
+    use codeguard_cli::grammar_evaluation::{validate_corpus, validate_corpus_against_manifest};
+    use sha2::{Digest, Sha256};
+    let archived = include_bytes!("../../../tests/fixtures/grammar_regression_v0_2.json");
+    validate_corpus_against_manifest(
+        archived,
+        include_bytes!("../../../tests/fixtures/grammar_manifests/manifest_2026_10_04.json"),
+    )
+    .unwrap();
+    let mut corpus: serde_json::Value = serde_json::from_slice(archived).unwrap();
+    let cases = corpus["cases"].clone();
+    corpus["manifest_sha256"] = json!(format!(
+        "{:x}",
+        Sha256::digest(include_bytes!("../../../grammars/manifest.json"))
+    ));
+    assert_eq!(corpus["cases"], cases);
+    let bytes = serde_json::to_vec(&corpus).unwrap();
+    validate_corpus(&bytes).unwrap();
+    bytes
+}
+
+#[test]
+fn historical_native_corpus_is_rejected_before_tool_execution() {
+    let result = replay_native_corpus(
+        &PathBuf::from(env!("CARGO_BIN_EXE_codeguard")),
+        include_bytes!("../../../tests/fixtures/grammar_regression_v0_2.json"),
+        &BTreeMap::from([("python".into(), PathBuf::from("/does-not-exist/ruff"))]),
+        Instant::now(),
+        &AtomicBool::new(false),
+    );
+    assert_eq!(
+        result.unwrap_err(),
+        "grammar_evaluation_corpus_identity_invalid"
+    );
 }

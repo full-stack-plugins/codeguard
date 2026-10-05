@@ -161,3 +161,22 @@ fn typescript_module_extensions_keep_the_typescript_grammar() {
     assert!(route_source("module.mtsx", b"export default <div />;").is_empty());
     assert!(route_source("module.ctsx", b"export default <div />;").is_empty());
 }
+
+#[test]
+fn r_and_cpp_explicit_suffixes_keep_case_sensitive_routes() {
+    for name in ["analysis.R", "analysis.r"] {
+        let routes = route_source(name, b"x <- 1\n");
+        assert_eq!(routes.len(), 1, "{name}");
+        assert_eq!(routes[0].language, "r");
+    }
+    for suffix in ["C", "cp", "CPP", "c++", "cxx", "hxx"] {
+        let name = format!("module.{suffix}");
+        let routes = route_source(&name, b"int value = 1;\n");
+        assert_eq!(routes.len(), 1, "{name}");
+        assert_eq!(routes[0].language, "cpp");
+    }
+    assert_eq!(route_source("module.c", b"int value;\n")[0].language, "c");
+    for name in ["module.h", "analysis.Rmd", "module.CXX"] {
+        assert!(route_source(name, b"source").is_empty(), "{name}");
+    }
+}

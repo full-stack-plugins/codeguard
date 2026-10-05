@@ -1236,3 +1236,46 @@ fn detect_includes_typescript_module_sources_without_package_manifest() {
         "{report}"
     );
 }
+
+#[test]
+fn detect_includes_r_and_cpp_explicit_suffixes_without_guessing_shared_headers() {
+    let project = TempProject::new();
+    for name in [
+        "upper.R",
+        "lower.r",
+        "upper.C",
+        "short.cp",
+        "upper.CPP",
+        "plus.c++",
+        "source.cxx",
+        "header.hxx",
+    ] {
+        fs::write(project.0.join(name), "source\n").unwrap();
+    }
+    fs::write(project.0.join("plain.c"), "int value;\n").unwrap();
+    fs::write(project.0.join("shared.h"), "int value;\n").unwrap();
+    let report = detect_json(&project);
+    for (id, expected) in [
+        ("r", serde_json::json!(["lower.r", "upper.R"])),
+        (
+            "cpp",
+            serde_json::json!([
+                "header.hxx",
+                "plus.c++",
+                "short.cp",
+                "source.cxx",
+                "upper.C",
+                "upper.CPP"
+            ]),
+        ),
+        ("c", serde_json::json!(["plain.c", "shared.h"])),
+    ] {
+        let language = report["languages"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|item| item["id"] == id)
+            .unwrap_or_else(|| panic!("missing {id}: {report}"));
+        assert_eq!(language["source_files"], expected, "{report}");
+    }
+}
