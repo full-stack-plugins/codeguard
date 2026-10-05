@@ -1722,3 +1722,7 @@ Rust输入补录终态：实际原生lint修复及原工具任务复检1通过�
 ## 2026-10-06 SP19 当前版本 32 grammar 全量回放与缺陷定位
 
 对应 S12.11 / 14.17 / 14.19。当前源码 9208b43 实际重跑 358 例、32 语言、35 来源组，1 passed / 0 failed / 0 ignored，317.87 秒。新增字节绑定语料和逐例报告，归档测试核对源身份及不确定性，保留旧记录。明确保留 Erlang 十例漏检、VB.NET 一例误报、Kotlin/Swift 三例未知和 CFQuery 一例待裁定，不冒充当前原生对照或独立 holdout。详见[当前回放缺陷清单](../../../tests/acceptance/grammar-current-full-replay-2026-10-06.md)。全部 grammar 仍未正式验收，父任务不勾选。
+
+## 2026-10-06 SP20 恢复扫描正常兄弟节点访问预算
+
+对应3.2 / 14.5。真实Java WASM宽树回归先因正常兄弟未计费而RED，恢复扫描现以逆向游标顺序检查，节点弹出和每次子节点检查均计入二十万次访问上限；预算耗尽标未完成，不伪造恢复位置。新增runtime与隔离worker回归，保留Kotlin/Swift隐藏错误语义及原协议。见[扫描预算验收](../../../tests/acceptance/wasm-recovery-sibling-budget.md)。其它结构扫描/平台隔离、grammar差异和完整语言验收仍缺，父任务不勾选。

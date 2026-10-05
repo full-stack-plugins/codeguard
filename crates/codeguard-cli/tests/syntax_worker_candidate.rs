@@ -54,6 +54,23 @@ fn clean_candidate_cannot_be_promoted_to_clean() {
 }
 
 #[test]
+fn wide_normal_siblings_preserve_worker_incomplete_status() {
+    let source = format!("class A {{ {} int x = ; }}", ";".repeat(200_010));
+    let result = run_syntax_worker_candidate(
+        env!("CARGO_BIN_EXE_codeguard").as_ref(),
+        "java",
+        "src/A.java",
+        source.as_bytes(),
+        deadline(),
+        &AtomicBool::new(false),
+    )
+    .expect("bounded wide-tree worker observation");
+    assert_eq!(result.precheck.status, SyntaxPrecheckStatus::Incomplete);
+    assert_eq!(result.precheck.truncated_files, 1);
+    assert!(!result.grammar_qualified);
+}
+
+#[test]
 fn go_whole_file_rule_stays_separate_and_forged_worker_frames_are_rejected() {
     use std::io::Write;
     use std::process::{Command, Stdio};
