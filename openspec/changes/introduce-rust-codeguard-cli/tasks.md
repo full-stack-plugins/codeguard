@@ -1686,3 +1686,9 @@ Go Hook本批终态：首次观察next误用复检0.14的schema反例先RED，�
 CFQuery本批终态：结构集成4通过、全32路由14通过及旧提示断言修正后的单项1通过；实际命令八份捕获与协议正反例4通过。当前提示纠正普通空投影的PostgreSQL合法性，历史资产/语料/精度数据保留。片段摘要修正前共享五目标32通过/2条件忽略仅为基线；不宣称最终全workspace或完整语言资格。
 
 最终default/WASM两构建workspace/all-targets严格Clippy均通过（包含当前manifest提示修正）。用户Erlang草稿摘要保持不变，未执行、未纳入提交。
+
+## 2026-10-06 Clippy源码集合与嵌套清单变化（局部验收）
+
+3.7/7.1与execution-kernel：原生执行中新增Rust文件仍称局部完成的反例先RED。共享静态发现清单加前后集合复核，全部已观察Rust源码/嵌套Cargo.toml与Cargo.lock纳入字节快照；集合或字节变化撤回定位及原生覆盖。默认32项、WASM33项测试通过，覆盖单元1通过，实际Clippy两个输入变化测试通过；受保护Erlang草稿不修改/不执行。范围变化不算源码违规，工作台记录不误使扫描失效。外部依赖/动态目标/完整配置/沙箱/编辑原生快检仍未完成，父任务不勾选；见[验收](../../../tests/acceptance/rust-clippy-input-stability.md)。
+
+Rust输入补录终态：实际原生lint修复及原工具任务复检1通过，双构建严格Clippy、分层、OpenSpec严格验证及diff检查通过。已有任务/报告协议不变，完整父任务继续开放。

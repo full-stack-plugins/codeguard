@@ -219,6 +219,8 @@ pub(crate) mod rust_cve_task_recheck;
 #[cfg(unix)]
 mod rust_lint_inputs;
 #[cfg(unix)]
+mod rust_input_inventory;
+#[cfg(unix)]
 pub mod rust_lint_scan;
 #[cfg(unix)]
 mod rust_native_syntax_coverage;
