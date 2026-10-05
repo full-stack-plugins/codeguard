@@ -60,8 +60,10 @@ jobs:
 
       - name: Replay every fixed grammar and retain per-language evidence
         run: |
-          cargo test --locked -p codeguard-cli --features wasm-precheck --test grammar_evaluation --test grammar_native_differential --test javascript_native_differential --test ruby_native_differential
+          cargo test --locked -p codeguard-cli --features wasm-precheck --test grammar_evaluation --test grammar_native_differential --test javascript_native_differential --test ruby_native_differential --test go_native_differential
           cargo test --locked -p codeguard-cli --features wasm-precheck --lib python_syntax_probe
+          # Go双制品、整文件与取消反例使用受控SDK；真实版本需显式选择。
+          cargo test --locked -p codeguard-cli --features wasm-precheck --lib go_syntax_probe
           # Ruby 固定版本的真实对照需显式工具；普通输出边界反例在 Linux 运行。
           cargo test --locked -p codeguard-cli --features wasm-precheck --lib ruby_syntax_probe
           # Node 版本不匹配时不借用宿主版本；受控隔离/执行中取消反例仍在 Linux 实际运行。

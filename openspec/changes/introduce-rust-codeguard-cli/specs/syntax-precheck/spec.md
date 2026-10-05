@@ -500,6 +500,11 @@ WASM fallback MUST 通过明确版本的协议加入既有统一命令，不静�
 - **THEN** 冻结UTF-8 stdin与请求入口/制品，清空环境、使用隔离cwd、禁用gems并仅调用版本与`-c -`，共享截止时间和取消令牌；BEGIN、END、require及普通源码不得执行
 - **AND** 仅消费一致的Syntax OK或绑定原始stdin行号的有界语法诊断；普通警告、未知输出、错路径、坏位置、矛盾退出、版本/入口变化和截断保持unknown；新增报告版本保留旧协议、32语言库存和未选覆盖，不授予项目Rubocop、任务关闭、独立holdout或grammar发行资格
 
+#### Scenario: Go development comparison binds both SDK tools and uses whole-file syntax
+- **WHEN** 显式选择已安装Go1.23.4 SDK入口执行开发期原生/WASM差分
+- **THEN** 只使用请求SDK入口同目录的gofmt，冻结两个制品及入口绑定，核对Go版本和gofmt构建版本；清空环境并禁用自动工具链/模块下载，冻结UTF-8 stdin，用`gofmt -e /dev/stdin`整文件解析，不能以无文件参数的片段模式证明完整源码语法
+- **AND** 共享截止时间/取消，版本或解析过程中任一入口/制品变化停止后继动作并撤回对应批次比较；仅消费一致的原生退出和原始stdin有界字节定位，位置重映射未解析、未知/矛盾输出及执行失败保持unknown；版本化报告保留32库存、旧协议、原始/组合分母，不把formatter语法观察作为项目lint、可信任务关闭或发行资格
+
 #### Scenario: Structural empty blocks remain distinct from parser recoveries
 - **WHEN** an application scans a grammar tree for empty `block` nodes that contain no non-comment named statement
 - **THEN** traverse even branches without `has_error`, retain the direct parent kind and original byte positions with explicit record/traversal budget exhaustion, and do not label these structural facts as parser ERROR/MISSING or language violations; legal empty blocks in other languages require independent language interpretation
@@ -509,7 +514,7 @@ WASM fallback MUST 通过明确版本的协议加入既有统一命令，不静�
 - **THEN** Node 观察使用同一取消令牌终止进程组，保留样本与 unknown 比较，不等待工具自行完成或将取消视为合法源码
 
 #### Scenario: Every selected native differential shares in-flight cancellation
-- **WHEN** 对已支持的Zig/Erlang/Swift/Kotlin/Python/JavaScript/Ruby显式原生差分，在版本探测或源码检查实际启动后取消
+- **WHEN** 对已支持的Zig/Erlang/Swift/Kotlin/Python/JavaScript/Ruby/Go显式原生差分，在版本探测或源码检查实际启动后取消
 - **THEN** 观察器必须传递同一个请求令牌至runtime，停止当前进程组且不启动后继调用；保持样本、真实失败和unknown比较，不将工具自行退出当作取消完成
 
 #### Scenario: Native differential entry changes during version observation

@@ -150,3 +150,7 @@ Kotlin版本阶段结束后，原生观察器在编译前后核对私有源码�
 ## Ruby 原生对照接入统一差分入口
 
 开发验收新增固定 Ruby 2.6.10p210 的受控 `-c -` 观察：冻结 UTF-8 stdin、清空环境、禁用 gems、共享截止时间和取消，并核验入口与制品连续性。完整一致输出才可分类；错路径、普通警告、坏位置、未知输出或运行故障保留 unknown。0.5 报告支持七种显式观察器，保留旧协议及所有未选语言。18 例实际 Ruby 对照为 5TP/0FP/0FN/13TN；BEGIN/END/require/shebang 样本验证检查不执行源码。这是开发回归证据，公开 Ruby lint、独立 holdout、可信任务关闭和发行资格仍未完成。见[验收](../tests/acceptance/ruby-isolated-native-differential.md)。
+
+## Go SDK 的整文件原生对照
+
+开发差分新增显式Go1.23.4 SDK与同目录gofmt，冻结两个制品及请求入口，核对SDK/辅助构建版本，并在批次末撤回辅助变化后的旧比较。`gofmt -e /dev/stdin`按整文件语法检查，避免默认stdin片段模式把缺package内容视为合法；不写源码、不解析导入或执行init，格式变化不算违规。0.6报告保留旧协议与32库存。实际20例为5TP/0FP/2FN/12TN及1未知：EOF锚点已修复，缺package两例WASM漏检与未解析逻辑位置继续保留，资格仍0。该开发观察不替代公开go vet或可信任务关闭。见[验收](../tests/acceptance/go-isolated-native-differential.md)。

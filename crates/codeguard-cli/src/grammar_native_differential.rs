@@ -60,16 +60,19 @@ pub fn replay_native_corpus(
             return Err("native_grammar_tool_unavailable".into());
         }
         let sha = artifact_hash(&path, checker.artifact_budget())?;
-        frozen.insert(language.clone(), (checker, path, sha));
+        let companion = checker.companion_identity(tool)?;
+        frozen.insert(language.clone(), (checker, path, sha, companion));
     }
     let manifest: Value = serde_json::from_slice(include_bytes!("../../../grammars/manifest.json"))
         .map_err(|_| "native_grammar_manifest_invalid")?;
     let javascript_selected = tools.contains_key("javascript");
     let ruby_selected = tools.contains_key("ruby");
-    let measure_structure = tools.contains_key("python") || javascript_selected || ruby_selected;
+    let go_selected = tools.contains_key("go");
+    let measure_structure =
+        tools.contains_key("python") || javascript_selected || ruby_selected || go_selected;
     let mut cases = Vec::new();
     for case in &corpus.cases {
-        let Some((checker, tool, tool_sha)) = frozen.get(&case.language) else {
+        let Some((checker, tool, tool_sha, companion)) = frozen.get(&case.language) else {
             continue;
         };
         let admitted = !cancelled.load(Ordering::Relaxed) && Instant::now() < deadline;
@@ -80,7 +83,10 @@ pub fn replay_native_corpus(
                 .get(&case.language)
                 .and_then(|input| input.canonicalize().ok())
                 .as_ref()
-                == Some(tool);
+                == Some(tool)
+            && checker
+                .companion_identity(&tools[&case.language])
+                .is_ok_and(|current| current == *companion);
         let native_attempted = admitted
             && tool_ready
             && !cancelled.load(Ordering::Relaxed)
@@ -101,7 +107,13 @@ pub fn replay_native_corpus(
         let tool_current = artifact_hash(tool, checker.artifact_budget())
             .is_ok_and(|s| s == *tool_sha)
             && native["tool_sha256"] == *tool_sha
-            && native["version"] == checker.version();
+            && native["version"] == checker.version()
+            && companion
+                .as_ref()
+                .is_none_or(|expected| native["companion_binding_sha256"] == *expected)
+            && checker
+                .companion_identity(&tools[&case.language])
+                .is_ok_and(|current| current == *companion);
         let native_class = tool_current.then(|| classify_native(&native)).flatten();
         let wasm_started = Instant::now();
         let observation =
@@ -163,14 +175,17 @@ pub fn replay_native_corpus(
         let language = asset["language"]
             .as_str()
             .ok_or("native_grammar_manifest_invalid")?;
-        if let Some((checker, tool, sha)) = frozen.get(language) {
+        if let Some((checker, tool, sha, companion)) = frozen.get(language) {
             let stable = artifact_hash(tool, checker.artifact_budget())
                 .is_ok_and(|current| current == *sha)
                 && tools
                     .get(language)
                     .and_then(|input| input.canonicalize().ok())
                     .as_ref()
-                    == Some(tool);
+                    == Some(tool)
+                && checker
+                    .companion_identity(&tools[language])
+                    .is_ok_and(|current| current == *companion);
             for row in cases.iter_mut().filter(|c| c["language"] == language) {
                 // 批次结束时撤回已更换制品或入口的原生分类；失败样本保留在分母。
                 if !stable {
@@ -220,8 +235,8 @@ pub fn replay_native_corpus(
             inventory.push(json!({"language":language,"grammar_sha256":asset["sha256"],"native_selected":false,"reason":if checker(language).is_some(){"explicit_native_tool_not_selected"}else{"native_differential_adapter_unavailable"},"grammar_qualified":false}));
         }
     }
-    let mut report = json!({"schema_version":if ruby_selected {"0.5.0"}else if javascript_selected {"0.4.0"}else if measure_structure {"0.3.0"}else{"0.1.0"},"report_type":"native_grammar_differential","status":"incomplete","delivery_decision":"not_evaluated",
-        "authority":"development_native_differential_only","native_adapter_reused":!(javascript_selected || ruby_selected),"independent_holdout":false,"grammar_qualified_count":0,
+    let mut report = json!({"schema_version":if go_selected {"0.6.0"}else if ruby_selected {"0.5.0"}else if javascript_selected {"0.4.0"}else if measure_structure {"0.3.0"}else{"0.1.0"},"report_type":"native_grammar_differential","status":"incomplete","delivery_decision":"not_evaluated",
+        "authority":"development_native_differential_only","native_adapter_reused":!(javascript_selected || ruby_selected || go_selected),"independent_holdout":false,"grammar_qualified_count":0,
         "corpus_sha256":digest(corpus_bytes),"manifest_sha256":corpus.manifest_sha256,"program_sha256":program_sha,"program_stable":program_stable,
         "language_count":inventory.len(),"selected_language_count":frozen.len(),"sample_count":cases.len(),"languages":inventory,"cases":cases});
     if measure_structure {

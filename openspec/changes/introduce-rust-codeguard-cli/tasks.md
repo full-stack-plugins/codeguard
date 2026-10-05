@@ -1552,3 +1552,11 @@ check python/all现通过0.48反馈保留独立结构计数和原始坐标，原
 12.11/14.17/14.19：既有 Ruby 直接 Command 样本未接统一受控回放，受控入口反例先 RED（native_grammar_language_unsupported）；新增固定 Ruby2.6.10p210 语法观察、0.5 版本协议及七语言选择。原始恢复与组合候选分层、32库存、未知分母及资格0保持，旧0.1—0.4报告不改。实际Ruby18例5TP/0FP/0FN/13TN，增加BEGIN/END/require/shebang不执行与UTF-8样本；七语言共同批次及检查结果见[验收](../../../tests/acceptance/ruby-isolated-native-differential.md)。公开Ruby项目lint、可信任务关闭、独立holdout、完整语言/平台/资源/发行仍未完成，父任务不勾选。
 
 本切片最终本地验证：WASM单元70通过/3条件忽略，四目标差分25通过/6条件忽略，显式实际Ruby18例1通过；真实七工具132例34TP/0FP/14FN/79TN及5unknown，原六语言114例分类不变。协议11项、strict OpenSpec、分层、定向格式、严格Clippy双配置和diff检查通过。未重复完整default workspace和32 grammar全量回放；远端CI与所有父任务保持独立未完成状态。
+
+## 2026-10-05 Go SDK 整文件原生开发差分（局部验收）
+
+12.11/14.17/14.19：原统一入口不支持Go，反例RED后加入固定Go1.23.4/同SDK目录gofmt双制品观察。用整文件`-e /dev/stdin`而非允许片段的默认stdin，清空环境并禁自动工具链/模块下载；0.6协议不改旧0.1—0.5报告。辅助制品批次变化的反事实RED后恢复末尾复核，撤回旧比较；8语言16阶段取消及16入口变化、Go辅助变化/辅助版本取消另验。实际20例初轮暴露3个EOF定位误拒绝，保留旧报告；EOF单元RED后修复为原始换行字节锚点，最终5TP/0FP/2FN/12TN及1逻辑位置未知，未丢源码或标签。两个缺package的WASM漏检继续保留。完整公开Go能力、独立holdout、逻辑位置映射、grammar/结构纠偏、资源/发行及宿主闭环仍未完成，父任务不勾选。见[验收](../../../tests/acceptance/go-isolated-native-differential.md)。
+
+本切片最终本地记录：WASM单元75通过/3条件忽略，五个差分/语料目标28通过/8条件忽略，显式Go20例实际测试1通过；环境旗标强化受控目标另1通过。八工具152例39TP/0FP/16FN/91TN及6unknown，旧七语言132例分类不变。协议17项、严格规格/分层/定向格式及diff检查通过；未重复default全workspace与32 grammar全回放。完整父任务及新远端CI未完成，严格Clippy和后续交付证据独立记录。
+
+严格Clippy默认/WASM两配置均通过；前序1e80a15的完整CI37286928365已success。Go变更的远端CI仍需独立验收，不据前序结果关闭任何父任务。
