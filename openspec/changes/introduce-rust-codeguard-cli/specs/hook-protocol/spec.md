@@ -202,3 +202,17 @@ Current native diagnostics and environment failures SHALL reuse stable Rust synt
 #### Scenario: Missing tool and selected tool failure differ
 - **WHEN** no Rustfmt entry exists, or an explicit selected tool fails/has unverified version or project edition is unresolved
 - **THEN** only true absence enables the WASM initial scan; selected failure or unresolved edition produces concrete preparation/decision feedback without source-edit instructions or a quality pass
+
+### Requirement: Rust project lint follow-up SHALL remain executable and current
+
+Rust edit dialogue SHALL identify project Clippy as not executed and provide an executable Codeguard lint follow-up after the editing batch. This instruction SHALL NOT claim that project lint is queued, executed or passed. Project lint remains outside selected-file editing and Stop execution; ordinary edits SHALL NOT start Cargo compilation.
+
+Clippy repair-ready SHALL reuse task-bound Cargo verification and preserve bounded rule/line feedback only for the original finding. Source/configuration inventory SHALL be captured before child verification and rechecked before projection. Changed source, Cargo lock/configuration or selected tool SHALL withdraw positions and report incomplete. No raw tool message, source content, inferred column unit or task closure SHALL be emitted.
+
+#### Scenario: Rust syntax success still requires project lint
+- **WHEN** selected-file Rust parsing completes with no diagnostics
+- **THEN** dialogue provides `codeguard lint rust . --format=json`, identifies Clippy as not run, and retains complete project obligations
+
+#### Scenario: Original Clippy finding remains after repair-ready
+- **WHEN** a current same-task Cargo recheck reports the original rule and source identity
+- **THEN** repair feedback carries only validated rule and line; input changes withdraw positions, and local absence does not close the task

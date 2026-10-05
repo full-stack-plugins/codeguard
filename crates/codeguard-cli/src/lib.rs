@@ -450,3 +450,6 @@ mod shell_task_recheck;
 
 #[cfg(unix)]
 mod check_shell_scan;
+
+#[cfg(unix)]
+mod clippy_hook_feedback;

@@ -793,3 +793,5 @@ Rust 开发重放现支持显式选择 Rustfmt1.9.0-stable：冻结 stdin、私�
 Rust选中文件解析前置现从有界包/工作区声明确定Cargo edition，并在原生调用之间复核声明与源码连续性。Unix库服务已保留真实2015/2021/2024反例；选中文件编辑Hook、稳定确认任务与原工具复检已连接；完整项目与实际宿主验收仍开放。见[项目edition契约](docs/Rust-Project-Edition-Syntax.zh_CN.md)。
 
 Rust编辑反馈现保留安全行号、稳定任务与原Rustfmt复检指引，Clippy/类型/构建义务继续保留。见[局部链路验收](tests/acceptance/rust-native-hook.md)。
+
+Rust编辑后现提供可执行的批次后Clippy指令，明确编辑阶段未运行项目lint。原任务repair_ready保留当前规则/行号并撤回输入变化后的指引；这不是后台队列或可信关闭。见[项目lint后续流程](docs/Rust-Project-Lint-Followup.zh_CN.md)。

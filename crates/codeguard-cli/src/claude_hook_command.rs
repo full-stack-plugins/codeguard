@@ -551,7 +551,7 @@ fn summarize(path: &str, report: &Value) -> String {
         if scan["task_status"] == "not_connected" || scan["task_status"] == "incomplete" {
             repair.push_str("Rust 任务工作台未连接或同步未完成；保留当前观察，不假定已有任务。");
         }
-        repair.push_str("Rustfmt 仅提供语法解析观察；继续 Clippy、类型和完整构建检查，零诊断不自动关闭任务或允许交付。");
+        repair.push_str("Rustfmt 仅提供语法解析观察，本次未运行项目级 Clippy；完成编辑批次后执行 codeguard lint rust . --format=json，按返回任务使用原 Cargo 复检；类型和完整构建检查继续保留，零诊断不自动关闭任务或允许交付。");
     }
     if feedback["go_syntax"].is_object() {
         let scan = &feedback["go_syntax"];
