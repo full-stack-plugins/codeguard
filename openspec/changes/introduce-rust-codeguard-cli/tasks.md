@@ -1706,3 +1706,7 @@ Rust输入补录终态：实际原生lint修复及原工具任务复检1通过�
 ## 当前进展 SP15：Rust 编辑与原生语法修复链路
 
 对应9.3/9.9、11.17、14.6/14.9，不新建change、不勾选完整父任务。确认编辑现按Cargo edition复用原生解析，显式/PATH入口优先，真正缺失才保留WASM候选；选定故障不回退。稳定任务、next、task verify与repair_ready接线，零诊断仍open。Claude格式诊断漏计先RED后修正，安全行号和原工具复检注入对话；edition变化撤回位置，失败写入不执行。封闭新协议和受控实际报告回归已新增，本机真实Rustfmt链路另验收。完整Cargo上下文、Clippy编辑调度、可信关闭、真实宿主与发行仍缺；见[验收](../../../tests/acceptance/rust-native-hook.md)。
+
+## 当前进展 SP16：Rust项目lint后续指引与Clippy修复反馈
+
+对应9.3/9.9、11.17，继续原change。编辑快检不运行项目编译，现给出批次后可执行lint指令；不伪称持久队列。Clippy repair_ready同任务规则/行号遗漏先RED后修复，父输入快照跨复检子进程复核源码/配置/锁及选定工具，变化撤回位置；零诊断仍open，复发复用任务。Hook0.26/摘要0.8保留旧协议，实际受控及真实工具验收见[记录](../../../tests/acceptance/clippy-hook-feedback.md)。后台调度、完整Cargo动态模型、可信关闭、实际宿主与发行仍未完成，不勾选父任务。

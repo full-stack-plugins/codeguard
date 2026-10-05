@@ -45,6 +45,23 @@ test('离线npm安装后Rust编辑、next与原SDK复检共用稳定任务', () 
     writeFileSync(tool,`#!/bin/sh\n/usr/bin/touch ${quote}\nexit 7\n`);
     const failedEvent=event();failedEvent.input.write_outcome='failed';const failed=invoke(['hook','execute',project,'--rustfmt-tool',tool,'--timeout','30s'],failedEvent);
     assert.equal(failed.execution,'not_run');assert.equal(failed.reason,'write_failed');assert.equal(existsSync(marker),false);
-    if(process.env.CODEGUARD_NPM_RUST_ARTIFACT)writeFileSync(process.env.CODEGUARD_NPM_RUST_ARTIFACT,JSON.stringify({initialized,first,repeat,next,conversation,present,repaired,recurrence,failed},null,2));
+    // 安装后的项目 lint 与 task-bound Clippy 复检；不在编辑事件中执行构建。
+    writeFileSync(path.join(project,'Cargo.lock'),"version=4\n[[package]]\nname='sample'\nversion='0.1.0'\n");
+    const cargo=path.join(scratch,'cargo');
+    const warning=JSON.stringify({reason:'compiler-message',message:{level:'warning',code:{code:'clippy::needless_return'},spans:[{file_name:'app.rs',line_start:1,column_start:20,is_primary:true}]}});
+    writeFileSync(cargo,`#!/bin/sh\n[ "$1" = clippy ] || exit 29\nif /usr/bin/grep -q 'return 42' app.rs; then printf '%s\\n' '${warning}'; fi\nprintf '%s\\n' '{"reason":"build-finished","success":true}'\n`,{mode:0o700});
+    writeFileSync(source,'pub fn answer() -> i32 { return 42; }\n');
+    const clippy=invoke(['lint','rust',project,'--cargo-tool',cargo]);
+    const clippyId=clippy.next.repair_brief.task_id;
+    const clippyRecheck=()=>invoke(['hook','execute',project,'--cargo-tool',cargo,'--timeout','30s'],event('repair_ready',clippyId));
+    const clippyPresent=clippyRecheck();
+    assert.equal(clippyPresent.schema_version,'0.26.0');
+    assert.deepEqual(clippyPresent.local_feedback.native_diagnostic_positions,[{line:1,rule_id:'clippy::needless_return'}]);
+    writeFileSync(source,'pub fn answer() -> i32 { 42 }\n');
+    const clippyRepaired=clippyRecheck();
+    assert.equal(clippyRepaired.local_feedback.observation,'candidate_absent_unverified_policy');
+    assert.deepEqual(clippyRepaired.local_feedback.native_diagnostic_positions,[]);
+    assert.equal(JSON.parse(readFileSync(path.join(project,'.codeguard/findings',clippyId,'finding.json'))).state,'open');
+    if(process.env.CODEGUARD_NPM_RUST_ARTIFACT)writeFileSync(process.env.CODEGUARD_NPM_RUST_ARTIFACT,JSON.stringify({initialized,first,repeat,next,conversation,present,repaired,recurrence,failed,clippy,clippyPresent,clippyRepaired},null,2));
   } finally { rmSync(scratch,{recursive:true,force:true}); }
 });

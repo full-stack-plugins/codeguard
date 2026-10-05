@@ -34,7 +34,11 @@ impl Project {
     fn run(&self, args: &[&str], input: Option<Value>, exit: i32) -> Value {
         let mut child = Command::new(env!("CARGO_BIN_EXE_codeguard"))
             .args(args)
-            .env("PATH", &self.0)
+            .env(
+                "PATH",
+                std::env::var_os("CODEGUARD_CLIPPY_HOOK_PATH")
+                    .unwrap_or_else(|| self.0.as_os_str().to_owned()),
+            )
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
@@ -336,4 +340,167 @@ fn missing_rustfmt_retains_precheck_and_requires_native_confirmation() {
             id
         );
     }
+}
+
+#[test]
+fn rust_dialogue_defers_project_clippy_with_an_executable_command() {
+    let p = Project::new();
+    let tool = p.tool();
+    fs::write(p.0.join("src/lib.rs"), "pub fn f() {}\n").unwrap();
+    let output = p.run(
+        &[
+            "hook",
+            "claude",
+            "post-tool-use",
+            p.0.to_str().unwrap(),
+            "--timeout=30s",
+            "--format=json",
+            "--rustfmt-tool",
+            tool.to_str().unwrap(),
+        ],
+        Some(json!({"hook_event_name":"PostToolUse", "cwd":p.0,
+          "tool_name":"Write", "tool_input":{"file_path":p.0.join("src/lib.rs")},
+          "tool_response":{"success":true}})),
+        0,
+    );
+    let context = output["hookSpecificOutput"]["additionalContext"]
+        .as_str()
+        .unwrap();
+    assert!(
+        context.contains("codeguard lint rust . --format=json"),
+        "{context}"
+    );
+    assert!(context.contains("未运行项目级"), "{context}");
+}
+
+#[test]
+fn clippy_repair_ready_keeps_current_rule_and_line_in_dialogue_feedback() {
+    let p = Project::new();
+    fs::write(p.0.join("src/lib.rs"), "pub fn f() -> i32 { return 42; }\n").unwrap();
+    fs::write(
+        p.0.join("Cargo.lock"),
+        "version = 4\n[[package]]\nname='sample'\nversion='0.1.0'\n",
+    )
+    .unwrap();
+    p.init();
+    let cargo = std::env::var_os("CODEGUARD_CLIPPY_HOOK_CARGO")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| p.0.join("cargo"));
+    let warning = json!({"reason":"compiler-message","message":{"level":"warning","code":{"code":"clippy::needless_return"},"spans":[{"file_name":"src/lib.rs","line_start":1,"column_start":20,"is_primary":true}]}});
+    if std::env::var_os("CODEGUARD_CLIPPY_HOOK_CARGO").is_none() {
+        fs::write(&cargo, format!("#!/bin/sh\n[ \"$1\" = clippy ] || exit 29\nif /usr/bin/grep -q 'return 42' src/lib.rs; then printf '%s\\n' '{}'; fi\nprintf '%s\\n' '{{\"reason\":\"build-finished\",\"success\":true}}'\n",warning)).unwrap();
+        fs::set_permissions(&cargo, fs::Permissions::from_mode(0o700)).unwrap();
+    }
+    let lint = p.run(
+        &[
+            "lint",
+            "rust",
+            p.0.to_str().unwrap(),
+            "--cargo-tool",
+            cargo.to_str().unwrap(),
+            "--format=json",
+        ],
+        None,
+        3,
+    );
+    let id = lint["next"]["repair_brief"]["task_id"].as_str().unwrap();
+    let recheck = p.run(
+        &[
+            "hook",
+            "execute",
+            p.0.to_str().unwrap(),
+            "--timeout=30s",
+            "--cargo-tool",
+            cargo.to_str().unwrap(),
+            "--format=json",
+        ],
+        Some(p.event("repair_ready", Some(id))),
+        3,
+    );
+    assert_eq!(
+        recheck["local_feedback"]["native_diagnostic_positions"][0]["rule_id"],
+        "clippy::needless_return",
+        "{recheck}"
+    );
+    assert_eq!(
+        recheck["local_feedback"]["native_diagnostic_positions"][0]["line"],
+        1
+    );
+    fs::write(p.0.join("src/lib.rs"), "pub fn f() -> i32 { 42 }\n").unwrap();
+    let repaired = p.run(
+        &[
+            "hook",
+            "execute",
+            p.0.to_str().unwrap(),
+            "--timeout=30s",
+            "--cargo-tool",
+            cargo.to_str().unwrap(),
+            "--format=json",
+        ],
+        Some(p.event("repair_ready", Some(id))),
+        3,
+    );
+    assert_eq!(
+        repaired["local_feedback"]["observation"], "candidate_absent_unverified_policy",
+        "{repaired}"
+    );
+    assert_eq!(
+        repaired["local_feedback"]["native_diagnostic_positions"],
+        json!([])
+    );
+    assert_eq!(
+        repaired["local_feedback"]["native_confirmation_status"],
+        "completed"
+    );
+    let fact: Value = serde_json::from_slice(
+        &fs::read(p.0.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(fact["state"], "open");
+    fs::write(p.0.join("src/lib.rs"), "pub fn f() -> i32 { return 42; }\n").unwrap();
+    let recurrence = p.run(
+        &[
+            "lint",
+            "rust",
+            p.0.to_str().unwrap(),
+            "--cargo-tool",
+            cargo.to_str().unwrap(),
+            "--format=json",
+        ],
+        None,
+        3,
+    );
+    assert_eq!(recurrence["next"]["repair_brief"]["task_id"], id);
+    if std::env::var_os("CODEGUARD_CLIPPY_HOOK_CARGO").is_none() {
+        fs::write(&cargo, format!("#!/bin/sh\n[ \"$1\" = clippy ] || exit 29\nprintf '%s\\n' '{}' '{{\"reason\":\"build-finished\",\"success\":true}}'\nprintf '\\n# concurrent mutation\\n' >> Cargo.lock\n",warning)).unwrap();
+        let stale = p.run(
+            &[
+                "hook",
+                "execute",
+                p.0.to_str().unwrap(),
+                "--timeout=30s",
+                "--cargo-tool",
+                cargo.to_str().unwrap(),
+                "--format=json",
+            ],
+            Some(p.event("repair_ready", Some(id))),
+            3,
+        );
+        assert_eq!(
+            stale["local_feedback"]["native_confirmation_status"], "stale",
+            "{stale}"
+        );
+        assert_eq!(
+            stale["local_feedback"]["native_diagnostic_positions"],
+            json!([])
+        );
+        assert_eq!(stale["local_feedback"]["observation"], "incomplete");
+    }
+}
+
+#[test]
+#[ignore = "requires installed Cargo/Clippy via CODEGUARD_CLIPPY_HOOK_CARGO and CODEGUARD_CLIPPY_HOOK_PATH"]
+fn real_clippy_repair_ready_preserves_original_task_diagnostic() {
+    assert!(std::env::var_os("CODEGUARD_CLIPPY_HOOK_CARGO").is_some());
+    clippy_repair_ready_keeps_current_rule_and_line_in_dialogue_feedback();
 }

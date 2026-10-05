@@ -252,7 +252,7 @@ fn execute_parsed(
     };
     Ok((
         json!({
-            "schema_version":if feedback["schema_version"]=="0.7.0" && feedback["report_type"]=="hook_task_verification_summary" {"0.25.0"}else if feedback["schema_version"]=="0.14.0" && feedback["report_type"]=="hook_fast_feedback" {"0.24.0"} else if feedback["schema_version"]=="0.13.0" && feedback["report_type"]=="hook_fast_feedback" {"0.23.0"} else if feedback["schema_version"] == "0.12.0" && feedback["report_type"] == "hook_fast_feedback" {"0.22.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.11.0" {"0.21.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.10.0" {"0.19.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.6.0" {"0.20.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.9.0" {"0.18.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.8.0" {"0.17.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.7.0" {"0.16.0"}else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.5.0" {"0.15.0"}else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.6.0" {"0.14.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.5.0" {"0.13.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.4.0" {"0.12.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.3.0" {"0.11.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.4.0" {"0.10.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.2.0" {"0.8.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.3.0" {"0.9.0"} else {"0.7.0"}, "report_type":"hook_execution_feedback",
+            "schema_version":if feedback["schema_version"]=="0.8.0" && feedback["report_type"]=="hook_task_verification_summary" {"0.26.0"}else if feedback["schema_version"]=="0.7.0" && feedback["report_type"]=="hook_task_verification_summary" {"0.25.0"}else if feedback["schema_version"]=="0.14.0" && feedback["report_type"]=="hook_fast_feedback" {"0.24.0"} else if feedback["schema_version"]=="0.13.0" && feedback["report_type"]=="hook_fast_feedback" {"0.23.0"} else if feedback["schema_version"] == "0.12.0" && feedback["report_type"] == "hook_fast_feedback" {"0.22.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.11.0" {"0.21.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.10.0" {"0.19.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.6.0" {"0.20.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.9.0" {"0.18.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.8.0" {"0.17.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.7.0" {"0.16.0"}else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.5.0" {"0.15.0"}else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.6.0" {"0.14.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.5.0" {"0.13.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.4.0" {"0.12.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.3.0" {"0.11.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.4.0" {"0.10.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.2.0" {"0.8.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.3.0" {"0.9.0"} else {"0.7.0"}, "report_type":"hook_execution_feedback",
             "plan":plan, "execution":execution, "reason":reason,
             "local_feedback":feedback, "delivery_decision":"not_evaluated",
             "host_blocking_verified":false, "soft_result_reused":false
@@ -281,6 +281,18 @@ fn task_verification_summary(
     {
         return Err(("verification_arguments_invalid", 3));
     }
+    let clippy_tool = if checker_id == "rust.cargo_clippy" {
+        crate::cargo_tool_selection::resolve_cargo_tool(
+            arguments.verify_options.get("--cargo-tool").map(Path::new),
+        )
+    } else {
+        None
+    };
+    let clippy_inputs = if checker_id == "rust.cargo_clippy" {
+        crate::clippy_hook_feedback::capture(root)
+    } else {
+        None
+    };
     let executable = env::current_exe().map_err(|_| ("verification_process_failed", 4))?;
     let remaining_ms = deadline
         .saturating_duration_since(Instant::now())
@@ -313,6 +325,7 @@ fn task_verification_summary(
         "TMPDIR",
         "CARGO_HOME",
         "RUSTUP_HOME",
+        "RUSTUP_TOOLCHAIN",
         "JAVA_HOME",
     ] {
         if let Some(value) = env::var_os(key) {
@@ -371,6 +384,27 @@ fn task_verification_summary(
         "authority":"local_unverified", "delivery_decision":"not_evaluated"
     });
     let scan = &report["native_scan"];
+    if checker_id == "rust.cargo_clippy" {
+        let projected = crate::clippy_hook_feedback::project(
+            root,
+            &brief,
+            scan,
+            clippy_inputs.as_ref(),
+            clippy_tool.as_deref(),
+            deadline,
+        )
+        .map_err(|reason| (reason, 3))?;
+        if projected["native_confirmation_status"] == "stale" {
+            summary["observation"] = json!("incomplete");
+            summary["reason"] = projected["native_confirmation_reason"].clone();
+        }
+        for (key, value) in projected
+            .as_object()
+            .ok_or(("verification_report_invalid", 4))?
+        {
+            summary[key] = value.clone();
+        }
+    }
     if checker_id == "shell.shellcheck" && scan.is_object() {
         if report["schema_version"] != "0.24.0"
             || scan["schema_version"] != "0.1.0"
