@@ -755,3 +755,5 @@ Edit feedback uses outer protocol 0.21 and inner 0.11, preserving earlier schema
 The [acceptance record](tests/acceptance/shellcheck-hook-baseline.md) distinguishes real ShellCheck output, controlled fixtures, offline npm installation, and live host sessions. Claude-shaped replay does not prove acceptance in a real installed host or a complete project delivery gate.
 
 CFQuery SQL comparisons require a database dialect. PostgreSQL accepts an empty SELECT list but rejects its DISTINCT variant; the fixed WASM reports zero recoveries for both. The isolated native evidence does not promote generic pending labels. See [dialect evidence](docs/CFQuery-SQL-Dialect-Evidence.md); project SQL adaptation and grammar repair remain open.
+
+Failed-write routing also accepts registered Go/Cargo/Maven and other checker configuration options, returning `not_run/write_failed` without starting tools or creating a workbench. Ownership/lease, unknown and malformed arguments remain rejected. This exception only applies to failed writes and does not silently enable unwired tools on confirmed edits. See [acceptance](tests/acceptance/hook-failed-write-options.md).

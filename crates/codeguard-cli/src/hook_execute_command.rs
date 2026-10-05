@@ -98,18 +98,21 @@ fn execute_parsed(
     let plan = plan_hook_trigger(input)?;
     if plan.action != HookTriggerAction::VerifyTask
         && arguments.verify_options.keys().any(|key| {
-            !matches!(
-                plan.action,
-                HookTriggerAction::FastFileCheck | HookTriggerAction::NoCheck
-            ) || !matches!(
-                key.as_str(),
-                "--node-tool"
-                    | "--kotlinc-tool"
-                    | "--swift-tool"
-                    | "--zig-tool"
-                    | "--ruby-tool"
-                    | "--shellcheck-tool"
-            )
+            // 写入失败不消费检查器配置；租约与任务所有权仍只属于复检入口。
+            // 确认编辑仅允许已接线的工具，避免把尚未支持的原生检查静默忽略。
+            if plan.action == HookTriggerAction::NoCheck {
+                return matches!(key.as_str(), "--owner" | "--lease-token");
+            }
+            plan.action != HookTriggerAction::FastFileCheck
+                || !matches!(
+                    key.as_str(),
+                    "--node-tool"
+                        | "--kotlinc-tool"
+                        | "--swift-tool"
+                        | "--zig-tool"
+                        | "--ruby-tool"
+                        | "--shellcheck-tool"
+                )
         })
     {
         return Err("任务复检参数仅用于 repair_ready 事件");
