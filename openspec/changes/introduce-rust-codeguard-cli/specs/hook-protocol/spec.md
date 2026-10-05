@@ -169,3 +169,9 @@ Stop 事件 MAY 从已存在的本地任务事实生成有界、只读的下一�
 - **THEN** only selected files are checked using the common event deadline, observed file dialect and project rc; native failures remain incomplete and no absent Shell WASM is invented
 - **AND** current SC rules and Unicode scalar positions, actual saved task IDs and original-tool recheck guidance appear in bounded dialogue; source text and tool messages are excluded
 - **AND** repair_ready calls the existing original-rule task verifier, preserves event persistence and absence-versus-suppression outcomes, and never closes a task from zero diagnostics; failed writes run no check and ignore preconfigured native-tool selections instead of reporting repair-ready argument errors
+
+#### Scenario: Failed write retains preconfigured checker options without executing them
+- **WHEN** a validated failed-write event carries registered checker/tool configuration options
+- **THEN** the no-check route ignores those options, returns `not_run/write_failed`, and starts no process or workbench mutation
+- **AND** unknown, duplicate, empty, relative-path and over-budget arguments remain invalid; task ownership and lease options remain restricted to task verification
+- **AND** this exception does not silently enable an unwired checker on a confirmed edit

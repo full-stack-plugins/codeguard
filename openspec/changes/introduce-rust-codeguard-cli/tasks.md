@@ -1664,3 +1664,7 @@ Shell Hook最终源码验证：默认全workspace262目标1452通过/0失败/126
 ## 2026-10-06 CFQuery明确数据库方言的原生反证
 
 对应12.11、14.4/14.17/14.19。已有固定PostgreSQL18.6镜像在无网络/tmpfs夹具下PREPARE接受SELECT FROM users、拒绝SELECT DISTINCT FROM users（42601），固定CFQuery WASM均零恢复。Rust受控原生重放与同字节worker观察3项通过；原无方言case保留pending且原本不计已裁定指标，不改冻结语料、清单或历史报告。新schema、双语独立证据文档和主文档引用见[验收](../../../tests/acceptance/cfquery-postgres-dialect.md)。没有修复grammar或新增项目SQL适配器，不勾选语言/宿主/发行父任务。
+
+## 2026-10-06 失败写入的全检查器配置分流修正
+
+对应9.3/11.17与hook-protocol，不新建change、不勾选父任务。Go/Cargo/Maven等预配置参数在失败写入时被误报为任务复检错参，反例先RED后修复。NoCheck忽略已登记检查器配置、不启动工具、不创建工作台，参数语法及租约/所有权边界保留；确认编辑仍只允许已接线工具。Go/Rust编辑原生优先接线尚未完成，本次不宣称实现。验收见[记录](../../../tests/acceptance/hook-failed-write-options.md)。
