@@ -181,3 +181,9 @@ Stop 事件 MAY 从已存在的本地任务事实生成有界、只读的下一�
 - **THEN** only selected files are passed as frozen stdin to the same SDK's verified gofmt under one deadline; no project code, go vet or dependency installation executes
 - **AND** selected tool failures remain incomplete without WASM fallback; missing tools retain candidate feedback and confirmation requirements
 - **AND** native observations reuse stable syntax tasks and original-SDK task verification; zero diagnostics do not close tasks or prove project lint coverage
+
+#### Scenario: Fixed Go syntax SDK does not satisfy project version declarations
+
+- **WHEN** a selected Go source belongs to a nearest `go.mod` or enclosing `go.work` declaring a minimum Go version or suggested toolchain newer than the supported syntax SDK, or the relevant declarations cannot be read unambiguously
+- **THEN** editing and original-tool task verification return an environment observation without invoking the incompatible SDK, generating source diagnostics, or silently switching to WASM; declarations are read statically with bounded input, and changes during observation withdraw prior diagnostics
+- **AND** saved guidance withdraws source positions when current declarations become incompatible; absence of a declaration is still only an unapproved local syntax observation, never full language-version or project acceptance

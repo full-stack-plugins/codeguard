@@ -239,3 +239,179 @@ fn go_missing_companion_and_logical_positions_are_environment_incomplete() {
         json!([])
     );
 }
+
+#[test]
+fn incompatible_go_module_is_environment_blocker_without_invoking_sdk() {
+    let p = Project::new();
+    p.init();
+    let tool = p.tool();
+    let marker = p.0.join("invoked");
+    fs::write(
+        &tool,
+        format!(
+            "#!/bin/sh\nprintf x > '{}'\nprintf 'go version go1.23.4 fixture/fixture\\n'\n",
+            marker.display()
+        ),
+    )
+    .unwrap();
+    fs::write(
+        p.0.join("go.mod"),
+        "module example.invalid/sample\ngo 1.24.0\n",
+    )
+    .unwrap();
+    let report = p.hook(Some(&tool));
+    let native = &report["local_feedback"]["go_syntax"]["files"][0]["native"];
+    assert_eq!(native["status"], "incomplete", "{report}");
+    assert_eq!(native["reason"], "go_project_version_mismatch", "{report}");
+    assert_eq!(native["diagnostics"], json!([]));
+    assert!(!marker.exists(), "incompatible SDK must not be executed");
+    assert_eq!(
+        report["local_feedback"]["syntax_candidates"]["observations"]
+            .as_array()
+            .unwrap()
+            .len(),
+        0
+    );
+}
+
+#[test]
+fn nearest_module_and_workspace_have_separate_version_boundaries() {
+    let p = Project::new();
+    p.init();
+    let tool = p.tool();
+    fs::create_dir(p.0.join("child")).unwrap();
+    fs::write(p.0.join("child/app.go"), "package main\nfunc main( {\n").unwrap();
+    fs::write(p.0.join("go.mod"), "module parent\ngo 1.24.0\n").unwrap();
+    fs::write(
+        p.0.join("child/go.mod"),
+        "module child\ngo 1.22\ntoolchain go1.23.4\n",
+    )
+    .unwrap();
+    let observe = || {
+        let mut event = p.event("file_changed", None);
+        event["input"]["changed_paths"] = json!(["child/app.go"]);
+        p.run(
+            &[
+                "hook",
+                "execute",
+                p.0.to_str().unwrap(),
+                "--go-tool",
+                tool.to_str().unwrap(),
+                "--format=json",
+                "--timeout",
+                "30s",
+            ],
+            Some(event),
+            3,
+        )
+    };
+    assert_eq!(
+        observe()["local_feedback"]["go_syntax"]["files"][0]["native"]["status"],
+        "diagnostics_observed"
+    );
+    fs::write(p.0.join("go.work"), "go 1.24\nuse ./child\n").unwrap();
+    assert_eq!(
+        observe()["local_feedback"]["go_syntax"]["files"][0]["native"]["reason"],
+        "go_project_version_mismatch"
+    );
+    fs::write(p.0.join("child/go.work"), "go 1.23\nuse .\n").unwrap();
+    assert_eq!(
+        observe()["local_feedback"]["go_syntax"]["files"][0]["native"]["status"],
+        "diagnostics_observed"
+    );
+}
+
+#[test]
+fn duplicate_unreadable_and_newer_toolchain_declarations_do_not_create_source_diagnostics() {
+    let p = Project::new();
+    p.init();
+    let tool = p.tool();
+    for (text, reason) in [
+        (
+            "module sample\ngo 1.23\ngo 1.22\n",
+            "go_project_version_unresolved",
+        ),
+        (
+            "module sample\ngo 1.23\ntoolchain go1.24.0\n",
+            "go_project_toolchain_mismatch",
+        ),
+        (
+            "module sample\ngo 1.23rc1\n",
+            "go_project_version_unresolved",
+        ),
+    ] {
+        fs::write(p.0.join("go.mod"), text).unwrap();
+        let report = p.hook(Some(&tool));
+        let native = &report["local_feedback"]["go_syntax"]["files"][0]["native"];
+        assert_eq!(native["reason"], reason, "{report}");
+        assert_eq!(native["diagnostics"], json!([]));
+    }
+    fs::remove_file(p.0.join("go.mod")).unwrap();
+    std::os::unix::fs::symlink(p.0.join("app.go"), p.0.join("go.mod")).unwrap();
+    assert_eq!(
+        p.hook(Some(&tool))["local_feedback"]["go_syntax"]["files"][0]["native"]["reason"],
+        "go_project_version_unreadable"
+    );
+}
+
+#[test]
+fn changed_go_version_withdraws_observation_and_saved_repair_positions() {
+    let p = Project::new();
+    p.init();
+    let tool = p.tool();
+    fs::write(p.0.join("go.mod"), "module sample\ngo 1.23\n").unwrap();
+    let first = p.hook(Some(&tool));
+    let id = first["local_feedback"]["go_syntax"]["files"][0]["task_id"]
+        .as_str()
+        .unwrap();
+    fs::write(p.0.join("go.mod"), "module sample\ngo 1.24\n").unwrap();
+    let next = p.run(&["next", p.0.to_str().unwrap(), "--format=json"], None, 0);
+    assert_ne!(
+        next["repair_brief"]["native_confirmation_status"], "diagnostics_observed",
+        "{next}"
+    );
+    let verify = p.run(
+        &[
+            "hook",
+            "execute",
+            p.0.to_str().unwrap(),
+            "--go-tool",
+            tool.to_str().unwrap(),
+            "--format=json",
+            "--timeout",
+            "30s",
+        ],
+        Some(p.event("repair_ready", Some(id))),
+        3,
+    );
+    assert_eq!(
+        verify["local_feedback"]["observation"], "incomplete",
+        "{verify}"
+    );
+    let brief = p.run(&["next", p.0.to_str().unwrap(), "--format=json"], None, 0);
+    assert!(
+        brief.to_string().contains("go_project_version_mismatch"),
+        "{brief}"
+    );
+    fs::write(p.0.join("go.mod"), "module sample\ngo 1.23\n").unwrap();
+    let script = fs::read_to_string(&tool).unwrap();
+    fs::write(
+        &tool,
+        script.replacen(
+            "#!/bin/sh\n",
+            &format!(
+                "#!/bin/sh\nprintf 'module sample\\ngo 1.24\\n' > '{}'\n",
+                p.0.join("go.mod").display()
+            ),
+            1,
+        ),
+    )
+    .unwrap();
+    let mutated = p.hook(Some(&tool));
+    let native = &mutated["local_feedback"]["go_syntax"]["files"][0]["native"];
+    assert_eq!(
+        native["reason"], "go_project_version_changed_during_check",
+        "{mutated}"
+    );
+    assert_eq!(native["diagnostics"], json!([]));
+}

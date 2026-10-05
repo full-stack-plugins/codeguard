@@ -51,4 +51,25 @@ class GoHookFeedback(unittest.TestCase):
         self.assertEqual(data['failed']['reason'],'write_failed')
         self.assertNotIn('PRIVATE_MESSAGE',data['conversation']['hookSpecificOutput']['additionalContext'])
 
+    def test_actual_sdk_project_version_boundary(self):
+        bundle=json.loads((ROOT/'tests/acceptance/evidence/go-project-version-2026-10-06.json').read_text())
+        rows=bundle['records']
+        self.assertEqual([row['case'] for row in rows],['compatible','minimum_newer','toolchain_newer','duplicate'])
+        ids=[]
+        expected={'minimum_newer':'go_project_version_mismatch','toolchain_newer':'go_project_toolchain_mismatch','duplicate':'go_project_version_unresolved'}
+        for row in rows:
+            data=row['report'];v=validator('hook-execution-feedback-v0.22.schema.json');v.validate(data)
+            scan=data['local_feedback']['go_syntax'];native=scan['files'][0]['native']
+            self.assertEqual(scan['source_file_count'],1)
+            ids.append(scan['files'][0]['task_id'])
+            self.assertEqual(data['local_feedback']['syntax_candidates']['observations'],[])
+            if row['case']=='compatible':
+                self.assertEqual(native['status'],'diagnostics_observed');self.assertEqual(native['version'],'go1.23.4')
+            else:
+                self.assertEqual(native['status'],'incomplete');self.assertEqual(native['reason'],expected[row['case']])
+                self.assertEqual(native['diagnostics'],[]);self.assertIsNone(native['tool_sha256'])
+                bad=copy.deepcopy(data);bad['local_feedback']['go_syntax']['files'][0]['native']['diagnostics']=[{'line':2,'column':12,'rule_id':'go.syntax','column_unit':'utf8_byte'}]
+                self.assertFalse(v.is_valid(bad))
+        self.assertTrue(ids[0]);self.assertEqual(len(set(ids)),1)
+
 if __name__=='__main__':unittest.main()

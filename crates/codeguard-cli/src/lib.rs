@@ -398,6 +398,7 @@ mod check_ruby_scan;
 mod check_go_syntax_scan;
 #[cfg(unix)]
 mod go_syntax_probe;
+mod go_project_version;
 #[cfg(unix)]
 mod go_tool_selection;
 #[cfg(unix)]

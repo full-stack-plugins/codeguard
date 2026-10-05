@@ -44,7 +44,14 @@ pub(crate) fn observe(
         file["source_sha256"] = json!(digest(&source));
         file["current"] = json!(true);
         if let Some(tool) = selection.tool() {
-            file["native"] = crate::go_syntax_probe::observe(tool, &source, deadline, cancelled);
+            file["native"] = crate::go_project_version::observe(
+                root,
+                &root.join(relative),
+                tool,
+                &source,
+                deadline,
+                cancelled,
+            );
             let has_syntax = file["native"]["diagnostics"]
                 .as_array()
                 .is_some_and(|r| !r.is_empty());
@@ -78,6 +85,14 @@ pub(crate) fn refresh(root: &Path, report: &mut Value, deadline: Instant) {
         }
         let reason = if Instant::now() >= deadline {
             Some("request_deadline_exceeded")
+        } else if matches!(
+            file["native"]["status"].as_str(),
+            Some("completed" | "diagnostics_observed")
+        ) && file["path"]
+            .as_str()
+            .is_none_or(|p| !crate::go_project_version::compatible(root, &root.join(p)))
+        {
+            Some("go_project_version_changed_after_check")
         } else if file["tool_path"]
             .as_str()
             .is_some_and(|p| resolved.as_deref() != Some(Path::new(p)))
