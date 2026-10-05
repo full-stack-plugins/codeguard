@@ -406,6 +406,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                     | "python.ruff.doctor"
                     | "python.pip_audit"
                     | "go.vet"
+                    | "shell.shellcheck"
                     | "rust.cargo_clippy"
                     | "rust.cargo_rustdoc"
                     | "rust.cargo_check"
@@ -455,6 +456,39 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             "--cwd",
             "<已核验原工作目录绝对路径>"
         ])
+    } else if checker_id == "shell.shellcheck" {
+        let packet = read_bounded(
+            &root.join(format!(".codeguard/reports/{first_run}.json")),
+            128 * 1024,
+        )
+        .ok()
+        .filter(|b| format!("{:x}", Sha256::digest(b)) == report_sha)
+        .and_then(|b| codeguard_adapters::parse_unique_json(&b).ok());
+        let dialect = packet
+            .as_ref()
+            .and_then(|r| r["dialect"].as_str())
+            .unwrap_or("<需核验原方言>");
+        let source = fact["path"]
+            .as_str()
+            .or_else(|| fact["scope"].as_str())
+            .unwrap_or("<目标源码>");
+        let mut argv = json!([
+            "codeguard",
+            "lint",
+            "shell",
+            root.join(source),
+            "--dialect",
+            dialect,
+            "--shellcheck-tool",
+            "<已核验的绝对路径>",
+            "--format=json"
+        ]);
+        if let Some(config) = packet.as_ref().and_then(|p| p["requested_config"].as_str()) {
+            argv.as_array_mut()
+                .unwrap()
+                .extend([json!("--shellcheck-config"), json!(config)]);
+        }
+        argv
     } else if checker_id == "python.ruff.doctor" {
         json!([
             "codeguard",
@@ -612,7 +646,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         json!(["codeguard", "lint", "python", "."])
     };
     let mut brief = json!({
-        "schema_version":if checker_id == "syntax.native_confirmation" {"0.3.0"} else {"0.1.0"}, "task_id":id, "kind":kind,
+        "schema_version":if checker_id == "shell.shellcheck" {"0.16.0"} else if checker_id == "syntax.native_confirmation" {"0.3.0"} else {"0.1.0"}, "task_id":id, "kind":kind,
         "checker_id":checker_id, "evidence_ref":{
             "first_run_id":first_run, "first_report_sha256":report_sha
         },
@@ -834,8 +868,33 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             },
         )
     };
+    if checker_id == "shell.shellcheck" {
+        brief["step"] = json!(if kind == "blocker" {
+            "核对原报告的ShellCheck版本、方言、source依赖和rc；先恢复检查能力，不修改无关源码。后续原生零诊断和配置抑制不能关闭此任务。"
+        } else {
+            "按当前原生SC规则和位置组修复目标源码，保持行为；源码变化后先重跑同方言同原配置检查，不关闭规则代替修复，任务正式复检关闭尚待接线。"
+        });
+    }
     brief["disposition"] = json!(disposition);
     let mut priority = priority;
+    #[cfg(unix)]
+    if checker_id == "shell.shellcheck" && kind == "finding" {
+        let current = read_bounded(
+            &root.join(format!(".codeguard/reports/{first_run}.json")),
+            128 * 1024,
+        )
+        .ok()
+        .filter(|b| format!("{:x}", Sha256::digest(b)) == report_sha)
+        .and_then(|b| codeguard_adapters::parse_unique_json(&b).ok())
+        .is_some_and(|r| crate::work_sync::shell_report::current(root, &r));
+        if !current {
+            brief["disposition"] = json!("verification_required");
+            brief["step"] = json!(
+                "Shell源码或原rc已经变化；先按同方言和原工具重新检查当前规则适用性，不按旧位置直接修改。配置抑制和零诊断不是已修复，任务正式关闭仍须复检流程。"
+            );
+            priority = 3;
+        }
+    }
     if checker_id == "rust.cargo_check" && kind == "finding" {
         brief["disposition"] = json!("verification_required");
         brief["step"] = json!(
@@ -1936,7 +1995,7 @@ fn run_sequence(run_id: &str) -> Option<u128> {
 
 fn view(disposition: &str, reason: &str, brief: Value, actions: Value) -> Value {
     json!({
-        "schema_version":if brief["checker_id"] == "go.vet" {json!("0.13.0")} else if brief["checker_id"] == "syntax.native_confirmation" {brief["schema_version"].clone()} else {json!("0.1.0")}, "report_type":"repair_brief_preview",
+        "schema_version":if brief["checker_id"] == "shell.shellcheck" {json!("0.16.0")} else if brief["checker_id"] == "go.vet" {json!("0.13.0")} else if brief["checker_id"] == "syntax.native_confirmation" {brief["schema_version"].clone()} else {json!("0.1.0")}, "report_type":"repair_brief_preview",
         "operation":"next", "command_status":"complete", "exit_code":0,
         "disposition":disposition, "reason":reason,
         "repair_brief":brief, "next_actions":actions,

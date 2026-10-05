@@ -1,0 +1,16 @@
+{
+  "authority": "local_unverified",
+  "checker_id": "shell.shellcheck",
+  "delivery_decision": "not_evaluated",
+  "fingerprint": "9e3be727dbf76c8e55a5ca543cc215068b4e0101f5e1539d33b8f650f12e4be9",
+  "first_report_sha256": "25ba841911043022e4ae319fa04e6ca3499a6b3b7c3379376eb39f1bf0cd8914",
+  "first_run_id": "shellcheck-1791217900908529000-67383-0",
+  "first_source_sha256": "00400e6bf65ec46ff1d85a7494ac3f11a3ca09d56c5e0792941ff5ba67908968",
+  "id": "CG-9e3be727dbf76c8e55a5ca543cc21506",
+  "kind": "finding",
+  "native_rule_id": "SC2086",
+  "path": "app.sh",
+  "schema_version": "0.1.0",
+  "state": "open",
+  "workspace_id": "ws-2cfa6c4094ffd2fdfd3fbae6d76b796f"
+}

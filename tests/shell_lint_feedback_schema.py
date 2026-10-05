@@ -36,6 +36,29 @@ class ShellFeedback(unittest.TestCase):
                 bad = copy.deepcopy(data); bad['native']['version'] = None
                 self.assertFalse(v.is_valid(bad))
 
+    def test_real_workbench_captures(self):
+        prefix=ROOT/'tests/acceptance/evidence'
+        v=validator('shell-lint-feedback-v0.2.schema.json')
+        first=None
+        for name in ['first','repeat','suppressed','clean']:
+            data=json.loads((prefix/f'shell-workbench-2026-10-06-{name}.json').read_text());v.validate(data)
+            self.assertEqual(data['workbench']['status'],'synced_partial')
+            self.assertFalse(validator('shell-lint-feedback-v0.1.schema.json').is_valid(data))
+            if name=='first':first=data['workbench']['task_ids'];self.assertEqual(len(first),1)
+            if name=='repeat':self.assertEqual(data['workbench']['task_ids'],first)
+            bad=copy.deepcopy(data);bad['task_workflow_status']='completed';self.assertFalse(v.is_valid(bad))
+            bad=copy.deepcopy(data);bad['delivery_decision']='allow';self.assertFalse(v.is_valid(bad))
+        for name in ['next-suppressed','next-clean']:
+            data=json.loads((prefix/f'shell-workbench-2026-10-06-{name}.json').read_text())
+            validator('repair-brief-preview-v0.16.schema.json').validate(data)
+            self.assertEqual(data['disposition'],'verification_required')
+            self.assertEqual(data['repair_brief']['checker_id'],'shell.shellcheck')
+            self.assertFalse(validator('repair-brief-preview-v0.15.schema.json').is_valid(data))
+        for i in range(4):
+            data=json.loads((prefix/f'shell-workbench-2026-10-06-observation-{i}.json').read_text())
+            validator('shellcheck-workbench-observation-v0.1.schema.json').validate(data)
+        fact=json.loads((prefix/'shell-workbench-2026-10-06-fact.json').read_text());self.assertEqual(fact['state'],'open')
+
     def test_help_compatibility(self):
         data = json.loads((ROOT / 'tests/acceptance/evidence/command-help-shell-2026-10-06-default.json').read_text())
         validator('command-help-v0.4.schema.json').validate(data)

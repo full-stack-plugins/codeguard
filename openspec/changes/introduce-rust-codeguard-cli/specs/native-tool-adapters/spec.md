@@ -4,6 +4,14 @@
 
 ## ADDED Requirements
 
+### Requirement: Shell native rule groups SHALL persist without treating suppressions as repairs
+
+Shell单文件局部观察 MUST 在已初始化工作台复用脱敏报告消费、事实和追加事件；未初始化不得自动创建工作台。稳定任务单位 MUST 明确文件/方言/原SC规则位置组，全部位置保留，不能把同规则不同文件或方言混合；不声称组内多个位置是同一语义缺陷。环境原因变化 MUST 更新同一文件/方言环境任务，具体原因保留在原始本轮报告。源码或原配置过期 MUST 撤回直接修复指引；坏报告不得生成发现，当前源码范围必须位于绑定根内。零诊断、原生disable、任务投影或同步 MUST NOT 关闭任务；专用原工具复检和正式关闭流程必须独立完成。已持久化反馈 MUST 版本化提供真实任务引用和失败状态；next MUST 保留原方言及原显式rc，工具入口需要重新核验。
+
+#### Scenario: A rule is disabled after a native observation
+- **WHEN** 原SC2086规则组已经落盘，随后原rc变为disable=SC2086且原生零诊断
+- **THEN** 原任务仍开放，next要求核对当前规则适用性及原生复扫，不按历史位置修改或声称代码已修复
+
 ### Requirement: Native ShellCheck feedback SHALL preserve dialect, rc and original-rule evidence
 
 ShellCheck单文件入口 MUST 明确方言和工具兼容版本，冻结有界UTF8源码并通过受控stdin调用json1，不执行受检脚本、不应用原生fix。已知zsh/fish声明或文件名 MUST 保留未支持，不强制按bash制造诊断。显式rc或最近祖先配置与更近缺项 MUST 在调用前后核对；不加载的全局配置 MUST 公开说明，未知外部source范围 MUST 保留阻塞。环境规则与源发现 MUST 分开，保留部分有效诊断但不能判完整。json1位置 MUST 按其Unicode字符及tab语义核验；未知字段、重复键、异源文件、越界位置、退出与报告矛盾 MUST 未完成。原生自由文本及fix替换不得作为智能体指令。修复简报 MUST 包含七要素；未接持久历史时明确not_integrated，未完成证据不得授权源码修改或关闭任务。原生零诊断不得替代项目门禁。

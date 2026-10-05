@@ -1,0 +1,32 @@
+{
+  "authority": "local_unverified",
+  "coverage_proven": false,
+  "delivery_decision": "not_evaluated",
+  "dialect": "bash",
+  "input_stable": true,
+  "native": {
+    "configuration_mode": "builtin_without_global_rc",
+    "diagnostics": [],
+    "environment_codes": [],
+    "reason": "shellcheck_no_diagnostics",
+    "report_valid": true,
+    "status": "completed",
+    "tool_sha256": "68b842bed0fa9af12b3c63d0d99b5bbbfe33cb13f911179913020da2041ce1f5",
+    "version": "0.11.0"
+  },
+  "path": "app.sh",
+  "project_configuration": {
+    "global_configuration": "not_loaded",
+    "reason": null,
+    "sha256": null,
+    "source_path": null,
+    "status": "missing"
+  },
+  "report_type": "shellcheck_workbench_observation",
+  "requested_config": null,
+  "run_id": "shellcheck-1791217902266965000-67434-0",
+  "schema_version": "0.1.0",
+  "source_sha256": "77190c368ce9e84805d1cfa0293555f56d6ae4df6345b86e587a4afbd54eb8ff",
+  "workspace_binding": "bound",
+  "workspace_id": "ws-2cfa6c4094ffd2fdfd3fbae6d76b796f"
+}
