@@ -81,6 +81,9 @@ fn same_shell_rule_group_updates_one_task_and_zero_diagnostics_never_closes_it()
     assert_eq!(first["workbench"]["status"], "synced_partial");
     let ids = p.tasks();
     assert_eq!(ids.len(), 1);
+    let projection = fs::read_to_string(p.0.join(".codeguard/tasks").join(&ids[0])).unwrap();
+    assert!(projection.contains(&format!("task verify {}", ids[0].trim_end_matches(".md"))));
+
     let second = p.lint(true);
     assert_eq!(
         second["workbench"]["task_ids"],
@@ -88,6 +91,33 @@ fn same_shell_rule_group_updates_one_task_and_zero_diagnostics_never_closes_it()
     );
     assert_eq!(p.tasks(), ids);
     let next = p.run(&["next", p.0.to_str().unwrap(), "--format=json"]);
+    assert_eq!(next["schema_version"], "0.17.0");
+    assert_eq!(next["repair_brief"]["recheck_argv"][1], "task");
+    assert_eq!(next["repair_brief"]["recheck_argv"][2], "verify");
+    assert_eq!(
+        next["repair_brief"]["recheck_argv"][3],
+        first["workbench"]["task_ids"][0]
+    );
+    assert_eq!(
+        next["repair_brief"]["recheck_argv"][4],
+        p.0.to_str().unwrap()
+    );
+    let shown = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "task",
+            "show",
+            first["workbench"]["task_ids"][0].as_str().unwrap(),
+            p.0.to_str().unwrap(),
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(shown.status.code(), Some(0));
+    let shown: Value = serde_json::from_slice(&shown.stdout).unwrap();
+    assert_eq!(
+        shown["next_actions"][0],
+        next["repair_brief"]["recheck_argv"]
+    );
     let text = next.to_string();
     assert!(text.contains("shell.shellcheck"));
     assert!(text.contains("SC2086"));
@@ -243,4 +273,126 @@ fn shell_recheck_cannot_import_a_rule_absent_from_the_original_report() {
     let sync = p.run(&["work", "sync", p.0.to_str().unwrap(), "--format=json"]);
     assert_eq!(sync["failed_reports"], 1, "{sync}");
     assert_eq!(p.tasks().len(), 1);
+}
+
+#[test]
+fn failed_original_shell_rechecks_bind_attempts_and_exhaust_the_same_action() {
+    let p = Project::new();
+    let first = p.lint(true);
+    let id = first["workbench"]["task_ids"][0].as_str().unwrap();
+    let invoke = |args: &[&str], expected: i32| -> Value {
+        let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(args)
+            .env("PATH", &p.0)
+            .output()
+            .unwrap();
+        assert_eq!(out.status.code(), Some(expected), "{out:?}");
+        serde_json::from_slice(&out.stdout).unwrap()
+    };
+    let lease = invoke(
+        &[
+            "task",
+            "claim",
+            id,
+            p.0.to_str().unwrap(),
+            "--owner",
+            "agent-shell",
+            "--format=json",
+        ],
+        0,
+    );
+    let token = lease["lease_token"].as_str().unwrap();
+    let mut action = String::new();
+    for _ in 0..2 {
+        let next = p.run(&["next", p.0.to_str().unwrap(), "--format=json"]);
+        action = next["repair_brief"]["action_id"]
+            .as_str()
+            .unwrap()
+            .to_owned();
+        let start = invoke(
+            &[
+                "task",
+                "attempt",
+                "start",
+                id,
+                p.0.to_str().unwrap(),
+                "--owner",
+                "agent-shell",
+                "--lease-token",
+                token,
+                "--action-id",
+                &action,
+                "--format=json",
+            ],
+            0,
+        );
+        let attempt = start["attempt_id"].as_str().unwrap();
+        invoke(
+            &[
+                "task",
+                "attempt",
+                "finish",
+                id,
+                p.0.to_str().unwrap(),
+                "--owner",
+                "agent-shell",
+                "--lease-token",
+                token,
+                "--attempt-id",
+                attempt,
+                "--outcome",
+                "ready-to-verify",
+                "--note-code",
+                "source_edit",
+                "--format=json",
+            ],
+            0,
+        );
+        let result = invoke(
+            &[
+                "task",
+                "verify",
+                id,
+                p.0.to_str().unwrap(),
+                "--owner",
+                "agent-shell",
+                "--lease-token",
+                token,
+                "--shellcheck-tool",
+                p.0.join("shellcheck").to_str().unwrap(),
+                "--format=json",
+            ],
+            3,
+        );
+        assert_eq!(result["observation"], "still_present");
+        assert_eq!(result["event_persisted"], true);
+        let run = result["native_scan"]["run_id"].as_str().unwrap();
+        let event: Value = serde_json::from_slice(
+            &fs::read(p.0.join(format!(".codeguard/findings/{id}/events/verify-{run}.json")))
+                .unwrap(),
+        )
+        .unwrap();
+        assert_eq!(event["attempt_id"], attempt);
+    }
+    let next = p.run(&["next", p.0.to_str().unwrap(), "--format=json"]);
+    assert_eq!(next["disposition"], "needs_decision", "{next}");
+    assert_eq!(next["repair_brief"]["history"]["no_progress_count"], 2);
+    let denied = invoke(
+        &[
+            "task",
+            "attempt",
+            "start",
+            id,
+            p.0.to_str().unwrap(),
+            "--owner",
+            "agent-shell",
+            "--lease-token",
+            token,
+            "--action-id",
+            &action,
+            "--format=json",
+        ],
+        3,
+    );
+    assert_eq!(denied["reason"], "no_progress_budget_exhausted");
 }

@@ -27,4 +27,26 @@
 
 ## 尚未完成
 
-当前next 0.16指引仍提供原方言/rc的lint复扫，用户可显式执行task verify；自动选择专用复检的指引仍需完善。可信政策/覆盖的关闭、复发、项目全范围调度、zsh/fish专用工具、Dockerfile/IaC、跨平台、完整宿主和发行仍开放。父任务7.4与S09不勾选。
+next专用复检和task show工具参数保留已在下面的指引增量验收中完成。可信政策/覆盖的关闭、复发、项目全范围调度、zsh/fish专用工具、Dockerfile/IaC、跨平台、完整宿主和发行仍开放。父任务7.4与S09不勾选。
+
+## 任务指引与无进展增量验收
+
+next协议0.17、task show协议0.3和新Markdown任务提供task verify，不要求智能体自行重建原方言/rc。保留0.16schema及历史报告。已有Markdown不覆盖，task show/next提供当前可读指引。
+
+新next反例先因0.16/lint命令失败（`/private/tmp/codeguard-shell-next-red.log`）；Markdown仍指向lint的反例失败（shell-projection-red.log）；task show外层动作丢失工具参数反例失败（shell-show-red.log）。修复后受影响回归通过。
+
+真实ShellCheck0.11.0执行两次ready-to-verify尝试，原SC2086均存在，两个verification_observed事件分别绑定attempt_id。next从actionable变needs_decision，no_progress_count=2，第三次attempt start为no_progress_budget_exhausted。原finding仍open。这是保留原输入、没有有效修复的负例，不声称源码已改或环境已恢复。证据为 `evidence/shell-next-2026-10-06-{initial,after-0,after-1,verify-0,verify-1,event-0,event-1,retry-denied,fact}.json`；另一个临时工作区的show.json验证task show外层和任务内argv一致。
+
+```mermaid
+flowchart LR
+    A[原生发现与稳定任务] --> B[next或task show]
+    B --> C[claim与attempt start]
+    C --> D[修复并finish ready-to-verify]
+    D --> E[绑定原任务的task verify]
+    E -->|原规则仍存在| F[追加绑定尝试的失败事件]
+    F -->|未耗尽同动作预算| B
+    F -->|两次同动作无进展| G[needs_decision并拒绝第三次]
+    E -->|候选消失| H[保留问题等待可信政策和覆盖核验]
+```
+
+本增量不实现可信关闭/复发，7.4/S09完整任务保持开放。本增量default相关六目标68通过/0失败/12忽略（guidance-targets.log与status-show.log）；WASM同六目标68通过/0失败/12忽略（guidance-wasm.log）；default/WASM workspace all-targets strict Clippy均通过。五项实际报告schema验收、layering、OpenSpec strict和差异检查通过。上一轮1433项全workspace通过记录保留为上一源码基线，本轮执行与next、task show、投影和尝试历史有关的回归，不借旧结果证明当前全workspace。

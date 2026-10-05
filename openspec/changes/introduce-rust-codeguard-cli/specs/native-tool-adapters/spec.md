@@ -14,7 +14,7 @@ Shell单文件局部观察 MUST 在已初始化工作台复用脱敏报告消费
 
 ### Requirement: Shell task verification SHALL bind the original rule and reject unrelated tools
 
-Shell任务复检 MUST 从首次报告摘要绑定范围、方言、显式rc及原SC规则；复检不得导入首次报告没有的规则组。非Shell工具参数 MUST 在租约及原生启动前拒绝。已知zsh/fish文件名和声明 MUST 与首次检查使用同一支持边界。配置变化或疑似disable注释 MUST 明确需要覆盖或抑制审查；注释文本观察不是有效抑制证明。局部零诊断 MUST 仅记录candidate_absent，不能关闭任务或签发allow。复检报告 MUST 接入既有失败尝试、租约和历史读取协议，不允许因新增报告类型绕过重复无进展预算。
+Shell任务复检 MUST 从首次报告摘要绑定范围、方言、显式rc及原SC规则；复检不得导入首次报告没有的规则组。非Shell工具参数 MUST 在租约及原生启动前拒绝。已知zsh/fish文件名和声明 MUST 与首次检查使用同一支持边界。配置变化或疑似disable注释 MUST 明确需要覆盖或抑制审查；注释文本观察不是有效抑制证明。局部零诊断 MUST 仅记录candidate_absent，不能关闭任务或签发allow。复检报告 MUST 接入既有失败尝试、租约和历史读取协议，不允许因新增报告类型绕过重复无进展预算。next MUST 推荐绑定任务ID及工作区的task verify，不要求智能体自行重建原方言或rc；工具入口占位要求核验。
 
 #### Scenario: A foreign tool parameter is supplied to a Shell task
 - **WHEN** Shell任务复检收到--ruff-tool参数
@@ -23,6 +23,10 @@ Shell任务复检 MUST 从首次报告摘要绑定范围、方言、显式rc及�
 #### Scenario: Original rule is absent under a changed rc
 - **WHEN** 首次发现SC2086后rc被修改，复检零诊断
 - **THEN** 记录rule_coverage_requires_review，任务保持开放
+
+#### Scenario: Two unchanged repairs fail the original Shell rule
+- **WHEN** 同一任务两次ready-to-verify尝试经原工具确认原SC规则仍存在
+- **THEN** 历史记录分别绑定尝试与复检，next提供needs_decision且停止同动作重复尝试；任务不能关闭
 
 ### Requirement: Native ShellCheck feedback SHALL preserve dialect, rc and original-rule evidence
 
