@@ -99,7 +99,7 @@ pub(crate) fn persist(root: &Path, syntax: &Value, deadline: Instant) -> Value {
 pub(crate) fn valid_report(root: &Path, workspace: &str, report: &Value) -> bool {
     if matches!(
         report["schema_version"].as_str(),
-        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.9.0" | "0.10.0")
+        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.9.0" | "0.10.0" | "0.12.0")
     ) {
         return crate::native_syntax_confirmation::valid_history_report(root, workspace, report)
             && crate::syntax_task_recheck::inputs_current(root, &report["native_evidence"]);

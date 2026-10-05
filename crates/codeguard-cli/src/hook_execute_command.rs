@@ -107,6 +107,7 @@ fn execute_parsed(
                 || !matches!(
                     key.as_str(),
                     "--go-tool"
+                        | "--rustfmt-tool"
                         | "--node-tool"
                         | "--kotlinc-tool"
                         | "--swift-tool"
@@ -159,6 +160,10 @@ fn execute_parsed(
                 root,
                 &plan.target_paths,
                 crate::hook_native_tools::HookNativeTools {
+                    rustfmt: arguments
+                        .verify_options
+                        .get("--rustfmt-tool")
+                        .map(Path::new),
                     go: arguments.verify_options.get("--go-tool").map(Path::new),
                     ruff: arguments.ruff_tool.as_deref(),
                     node: arguments.verify_options.get("--node-tool").map(Path::new),
@@ -247,7 +252,7 @@ fn execute_parsed(
     };
     Ok((
         json!({
-            "schema_version":if feedback["schema_version"]=="0.13.0" && feedback["report_type"]=="hook_fast_feedback" {"0.23.0"} else if feedback["schema_version"] == "0.12.0" && feedback["report_type"] == "hook_fast_feedback" {"0.22.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.11.0" {"0.21.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.10.0" {"0.19.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.6.0" {"0.20.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.9.0" {"0.18.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.8.0" {"0.17.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.7.0" {"0.16.0"}else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.5.0" {"0.15.0"}else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.6.0" {"0.14.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.5.0" {"0.13.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.4.0" {"0.12.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.3.0" {"0.11.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.4.0" {"0.10.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.2.0" {"0.8.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.3.0" {"0.9.0"} else {"0.7.0"}, "report_type":"hook_execution_feedback",
+            "schema_version":if feedback["schema_version"]=="0.7.0" && feedback["report_type"]=="hook_task_verification_summary" {"0.25.0"}else if feedback["schema_version"]=="0.14.0" && feedback["report_type"]=="hook_fast_feedback" {"0.24.0"} else if feedback["schema_version"]=="0.13.0" && feedback["report_type"]=="hook_fast_feedback" {"0.23.0"} else if feedback["schema_version"] == "0.12.0" && feedback["report_type"] == "hook_fast_feedback" {"0.22.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.11.0" {"0.21.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.10.0" {"0.19.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.6.0" {"0.20.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.9.0" {"0.18.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.8.0" {"0.17.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.7.0" {"0.16.0"}else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.5.0" {"0.15.0"}else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.6.0" {"0.14.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.5.0" {"0.13.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.4.0" {"0.12.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.3.0" {"0.11.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.4.0" {"0.10.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.2.0" {"0.8.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.3.0" {"0.9.0"} else {"0.7.0"}, "report_type":"hook_execution_feedback",
             "plan":plan, "execution":execution, "reason":reason,
             "local_feedback":feedback, "delivery_decision":"not_evaluated",
             "host_blocking_verified":false, "soft_result_reused":false
@@ -381,7 +386,7 @@ fn task_verification_summary(
     if checker_id == "syntax.native_confirmation"
         && (matches!(
             scan["target"]["language"].as_str(),
-            Some("erlang" | "swift" | "kotlin" | "ruby")
+            Some("rust" | "erlang" | "swift" | "kotlin" | "ruby")
         ) || (scan["target"]["language"] == "zig" && scan["schema_version"] == "0.8.0"))
     {
         if !matches!(
@@ -397,6 +402,7 @@ fn task_verification_summary(
                 | (Some("0.18.0"), Some("0.7.0"))
                 | (Some("0.19.0"), Some("0.8.0"))
                 | (Some("0.23.0"), Some("0.10.0"))
+                | (Some("0.25.0"), Some("0.11.0"))
         ) {
             return Err(("verification_report_invalid", 4));
         }
@@ -409,7 +415,9 @@ fn task_verification_summary(
         if !crate::syntax_task_recheck::valid_shape(root, &history) {
             return Err(("verification_report_invalid", 4));
         }
-        summary["schema_version"] = json!(if scan["target"]["language"] == "ruby" {
+        summary["schema_version"] = json!(if scan["target"]["language"] == "rust" {
+            "0.7.0"
+        } else if scan["target"]["language"] == "ruby" {
             "0.6.0"
         } else if scan["target"]["language"] == "zig" {
             "0.5.0"
@@ -430,7 +438,10 @@ fn task_verification_summary(
         } else {
             json!("syntax_confirmation_inputs_changed")
         };
-        summary["native_column_unit"] = json!(if scan["target"]["language"] == "ruby" {
+        summary["native_column_unit"] = json!(if matches!(
+            scan["target"]["language"].as_str(),
+            Some("rust" | "ruby")
+        ) {
             "unavailable"
         } else if matches!(
             scan["target"]["language"].as_str(),
@@ -547,6 +558,7 @@ fn verify_option_matches_checker(key: &str, checker_id: &str) -> bool {
         "syntax.native_confirmation" => matches!(
             key,
             "--go-tool"
+                | "--rustfmt-tool"
                 | "--zig-tool"
                 | "--erl-tool"
                 | "--swift-tool"
@@ -702,7 +714,8 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                 }
                 git_tool = Some(path);
             }
-            "--cargo-tool"
+            "--rustfmt-tool"
+            | "--cargo-tool"
             | "--cargo-audit-tool"
             | "--rustsec-db"
             | "--pip-audit-tool"
@@ -738,7 +751,8 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
             {
                 if matches!(
                     key,
-                    "--cargo-tool"
+                    "--rustfmt-tool"
+                        | "--cargo-tool"
                         | "--cargo-audit-tool"
                         | "--rustsec-db"
                         | "--pip-audit-tool"

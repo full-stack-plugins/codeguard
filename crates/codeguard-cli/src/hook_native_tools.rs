@@ -2,6 +2,7 @@ use std::path::Path;
 
 /// 编辑快检的显式原生入口；来源：OpenSpec 限定范围与调用方工具选择契约。
 pub(crate) struct HookNativeTools<'a> {
+    pub(crate) rustfmt: Option<&'a Path>,
     pub(crate) go: Option<&'a Path>,
     pub(crate) ruff: Option<&'a Path>,
     pub(crate) node: Option<&'a Path>,

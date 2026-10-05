@@ -347,6 +347,12 @@ fn summarize(path: &str, report: &Value) -> String {
         .flatten()
         .filter(|f| f["current"] == true)
         .flat_map(|f| f["native"]["diagnostics"].as_array().into_iter().flatten());
+    let rust = feedback["rust_syntax"]["files"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter(|f| f["current"] == true)
+        .flat_map(|f| f["native"]["diagnostics"].as_array().into_iter().flatten());
     let shell = feedback["shell_lint"]["files"]
         .as_array()
         .into_iter()
@@ -359,6 +365,7 @@ fn summarize(path: &str, report: &Value) -> String {
         .chain(zig)
         .chain(ruby)
         .chain(go)
+        .chain(rust)
         .chain(shell)
     {
         count += 1;
@@ -417,6 +424,9 @@ fn summarize(path: &str, report: &Value) -> String {
                 .count()
         });
     let guidance = match feedback["next_action"].as_str() {
+        Some("repair_native_source") if feedback["rust_syntax"].is_object() => {
+            "按项目 edition 和已核对行号确认语法；继续原工具复检、Clippy、类型与项目构建检查"
+        }
         Some("repair_native_source") if feedback["shell_lint"].is_object() => {
             "按当前 SC 规则及 Unicode 标量位置修复；继续原 ShellCheck 任务复检和完整项目检查"
         }
@@ -508,6 +518,40 @@ fn summarize(path: &str, report: &Value) -> String {
             repair.push_str("Shell 任务工作台未连接或同步未完成；保留当前观察，不假定已有任务。");
         }
         repair.push_str("缺工具时安装适用ShellCheck；未知或不支持方言先核对实际方言与检查器，不反复重装。当前没有Shell内置WASM，检查不完整；不凭零诊断关闭任务。");
+    }
+    if feedback["rust_syntax"].is_object() {
+        let scan = &feedback["rust_syntax"];
+        for file in scan["files"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter(|f| f["current"] == true)
+            .take(2)
+        {
+            for row in file["native"]["diagnostics"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .take(2)
+            {
+                if let Some(line) = row["line"].as_u64() {
+                    repair.push_str(&format!("Rust 第 {line} 行（列号不可用）；"));
+                }
+            }
+            if let Some(id) = file["task_id"].as_str().filter(|id| {
+                id.strip_prefix("CG-B-")
+                    .is_some_and(|s| s.len() == 32 && s.bytes().all(|b| b.is_ascii_hexdigit()))
+            }) {
+                repair.push_str(&format!("Rust 原生任务 {id}：codeguard task show {id} . --format=json；修复后 codeguard task verify {id} . --rustfmt-tool <已核验绝对路径> --format=json。"));
+            }
+            if file["native"]["status"] == "incomplete" {
+                repair.push_str("Rust 原生观察未完成；先核对项目 edition、工具版本和环境，再复检，避免修改无关源码。");
+            }
+        }
+        if scan["task_status"] == "not_connected" || scan["task_status"] == "incomplete" {
+            repair.push_str("Rust 任务工作台未连接或同步未完成；保留当前观察，不假定已有任务。");
+        }
+        repair.push_str("Rustfmt 仅提供语法解析观察；继续 Clippy、类型和完整构建检查，零诊断不自动关闭任务或允许交付。");
     }
     if feedback["go_syntax"].is_object() {
         let scan = &feedback["go_syntax"];

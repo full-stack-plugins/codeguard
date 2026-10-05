@@ -165,10 +165,36 @@ pub(crate) fn observe(
         crate::native_syntax_confirmation::connect(root, &mut go_syntax, deadline);
         crate::check_go_syntax_scan::refresh(root, &mut go_syntax, deadline);
     }
+    let rust_paths = selected
+        .iter()
+        .filter(|p| p.ends_with(".rs"))
+        .cloned()
+        .collect::<BTreeSet<_>>();
+    let mut rust_syntax = if rust_paths.is_empty() {
+        Value::Null
+    } else {
+        crate::check_rust_syntax_scan::observe(
+            root,
+            &rust_paths,
+            tools.rustfmt.map(Path::to_path_buf),
+            deadline,
+            &cancelled,
+        )
+    };
+    if rust_syntax.is_object() {
+        crate::native_syntax_confirmation::connect(root, &mut rust_syntax, deadline);
+    }
+    // 所选原生入口故障不能以WASM掩盖；确实缺入口才允许候选初检。
+    #[cfg(feature = "wasm-precheck")]
+    let syntax_selected = selected
+        .iter()
+        .filter(|p| !p.ends_with(".rs") || rust_syntax["tool_selection"]["source"] == "not_found")
+        .cloned()
+        .collect::<BTreeSet<_>>();
     #[cfg(feature = "wasm-precheck")]
     let syntax = crate::check_syntax_candidates::observe_selected(
         root,
-        &selected,
+        &syntax_selected,
         crate::check_syntax_candidates::NativeCoverage {
             node_lint: &node_lint,
             python_lint: &python_lint,
@@ -206,7 +232,8 @@ pub(crate) fn observe(
     let native_unwired: Vec<&String> = selected
         .iter()
         .filter(|p| {
-            !p.ends_with(".go")
+            !p.ends_with(".rs")
+                && !p.ends_with(".go")
                 && !shell_paths.contains(*p)
                 && !p.ends_with(".rb")
                 && !p.ends_with(".zig")
@@ -245,7 +272,7 @@ pub(crate) fn observe(
                     .as_array()
                     .is_some_and(|d| !d.is_empty())
         })
-    }) || [&go_syntax, &swift_lint, &zig_lint, &ruby_lint]
+    }) || [&rust_syntax, &go_syntax, &swift_lint, &zig_lint, &ruby_lint]
         .iter()
         .any(|report| {
             report["files"].as_array().is_some_and(|files| {
@@ -277,17 +304,18 @@ pub(crate) fn observe(
         .as_array()
         .is_some_and(|rows| rows.iter().any(|r| r["language"] == "cfquery"));
     let mut feedback = json!({
-        "schema_version":if cfquery {"0.13.0"}else if go_syntax.is_object(){"0.12.0"}else if shell_lint.is_object(){"0.11.0"}else if ruby_lint.is_object(){"0.10.0"}else if structures > 0 && syntax["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.9.0"} else if cfquery || structures > 0 {"0.8.0"} else if zig_lint["schema_version"] == "0.2.0" {"0.7.0"}else if zig_lint.is_object(){"0.6.0"}else if swift_lint["schema_version"] == "0.2.0" {"0.5.0"} else if swift_lint.is_object(){"0.4.0"}else if kotlin_lint.is_object(){"0.3.0"}else{"0.2.0"},"report_type":"hook_fast_feedback",
+        "schema_version":if rust_syntax.is_object(){"0.14.0"}else if cfquery {"0.13.0"}else if go_syntax.is_object(){"0.12.0"}else if shell_lint.is_object(){"0.11.0"}else if ruby_lint.is_object(){"0.10.0"}else if structures > 0 && syntax["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.9.0"} else if cfquery || structures > 0 {"0.8.0"} else if zig_lint["schema_version"] == "0.2.0" {"0.7.0"}else if zig_lint.is_object(){"0.6.0"}else if swift_lint["schema_version"] == "0.2.0" {"0.5.0"} else if swift_lint.is_object(){"0.4.0"}else if kotlin_lint.is_object(){"0.3.0"}else{"0.2.0"},"report_type":"hook_fast_feedback",
         "scan_scope":"selected_files","requested_paths":requested,
         "python_lint":python_lint,"node_lint":node_lint,"syntax_candidates":syntax,"syntax_tasks":syntax_tasks,
         "unavailable_files":unavailable,"native_unwired_files":native_unwired,
         "candidate_recovery_count":recoveries,"next_action":next_action,
         "delivery_decision":"not_evaluated","coverage_proven":false
     });
-    if cfquery || structures > 0 {
+    if rust_syntax.is_object() || cfquery || structures > 0 {
         feedback["candidate_structure_count"] = json!(structures);
     }
-    if cfquery
+    if rust_syntax.is_object()
+        || cfquery
         || go_syntax.is_object()
         || shell_lint.is_object()
         || ruby_lint.is_object()
@@ -298,7 +326,8 @@ pub(crate) fn observe(
     {
         feedback["kotlin_lint"] = kotlin_lint;
     }
-    if cfquery
+    if rust_syntax.is_object()
+        || cfquery
         || go_syntax.is_object()
         || shell_lint.is_object()
         || ruby_lint.is_object()
@@ -308,7 +337,8 @@ pub(crate) fn observe(
     {
         feedback["swift_lint"] = swift_lint;
     }
-    if cfquery
+    if rust_syntax.is_object()
+        || cfquery
         || go_syntax.is_object()
         || shell_lint.is_object()
         || ruby_lint.is_object()
@@ -317,14 +347,22 @@ pub(crate) fn observe(
     {
         feedback["zig_lint"] = zig_lint;
     }
-    if cfquery || go_syntax.is_object() || shell_lint.is_object() || ruby_lint.is_object() {
+    if rust_syntax.is_object()
+        || cfquery
+        || go_syntax.is_object()
+        || shell_lint.is_object()
+        || ruby_lint.is_object()
+    {
         feedback["ruby_lint"] = ruby_lint;
     }
-    if cfquery || go_syntax.is_object() || shell_lint.is_object() {
+    if rust_syntax.is_object() || cfquery || go_syntax.is_object() || shell_lint.is_object() {
         feedback["shell_lint"] = shell_lint;
     }
-    if cfquery || go_syntax.is_object() {
+    if rust_syntax.is_object() || cfquery || go_syntax.is_object() {
         feedback["go_syntax"] = go_syntax;
+    }
+    if rust_syntax.is_object() {
+        feedback["rust_syntax"] = rust_syntax;
     }
     feedback
 }

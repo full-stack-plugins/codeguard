@@ -200,7 +200,7 @@ fn run_with_tools(
         .as_nanos();
     let native_first = matches!(
         original["schema_version"].as_str(),
-        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.9.0" | "0.10.0")
+        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.9.0" | "0.10.0" | "0.12.0")
     );
     let mut report = json!({"schema_version":if language == "ruby" {"0.10.0"} else if language == "go" {"0.9.0"} else if language == "zig" && native_first {"0.8.0"}else if language == "kotlin" && native_first {"0.6.0"} else if language == "kotlin" {"0.5.0"} else if language == "swift" && native_first {"0.7.0"} else if language == "swift" {"0.4.0"} else if native_first {"0.3.0"} else if language == "erlang" {"0.2.0"} else {"0.1.0"},"report_type":"syntax_task_recheck","operation":"task_verify",
         "workspace_binding":"bound","workspace_id":original["workspace_id"],"run_id":format!("syntax-native-{}-{nanos}",std::process::id()),
@@ -259,7 +259,7 @@ pub(crate) fn original(root: &Path, brief: &Value) -> Result<Value, &'static str
         .ok_or("workspace_invalid")?;
     let valid_origin = if matches!(
         report["schema_version"].as_str(),
-        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.9.0" | "0.10.0")
+        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.9.0" | "0.10.0" | "0.12.0")
     ) {
         crate::native_syntax_confirmation::valid_history_report(root, &workspace, &report)
     } else {
@@ -309,10 +309,10 @@ pub(crate) fn original(root: &Path, brief: &Value) -> Result<Value, &'static str
 }
 
 // 原生首次证据没有 grammar 身份，明确保留 null；历史 WASM 来源保持原协议。
-fn original_reference(original: &Value, sha: &Value) -> Value {
+pub(crate) fn original_reference(original: &Value, sha: &Value) -> Value {
     let native_first = matches!(
         original["schema_version"].as_str(),
-        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.9.0" | "0.10.0")
+        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.9.0" | "0.10.0" | "0.12.0")
     );
     json!({"run_id":original["run_id"],"sha256":sha,
         "source_sha256":if native_first {original["native_evidence"]["target"]["source_sha256"].clone()} else {original["observations"][0]["source_sha256"].clone()},
@@ -326,6 +326,10 @@ pub(crate) fn inputs_current(root: &Path, report: &Value) -> bool {
         .and_then(|p| source_bytes(root, p))
         .is_some_and(|b| report["target"]["source_sha256"] == digest(&b))
         && (report["native"]["tool_sha256"].is_null() || tool_current(report))
+        && (report["target"]["language"] != "rust"
+            || report["target"]["path"].as_str().is_some_and(|p| {
+                crate::rust_syntax_evidence::context_current(root, p, &report["native"])
+            }))
         && (report["target"]["language"] != "ruby"
             || report["native"]["status"] == "incomplete"
             || report["target"]["path"]
@@ -417,6 +421,7 @@ fn valid_history_shape(root: &Path, report: &Value) -> bool {
                     | "0.8.0"
                     | "0.9.0"
                     | "0.10.0"
+                    | "0.11.0"
             )
         )
         || report["report_type"] != "syntax_task_recheck"
@@ -471,6 +476,7 @@ fn valid_history_shape(root: &Path, report: &Value) -> bool {
         return false;
     };
     report["workspace_id"] == old["workspace_id"]
+        && ((report["schema_version"] == "0.11.0") == (old["language"] == "rust"))
         && ((report["schema_version"] == "0.10.0") == (old["language"] == "ruby"))
         && ((report["schema_version"] == "0.9.0") == (old["language"] == "go"))
         && ((report["schema_version"] == "0.3.0") == (old["schema_version"] == "0.2.0"))
@@ -497,6 +503,9 @@ pub(crate) fn valid_zig_evidence(root: &Path, evidence: &Value) -> bool {
 }
 
 fn native_shape(root: &Path, report: &Value) -> bool {
+    if report["schema_version"] == "0.11.0" {
+        return crate::rust_syntax_evidence::valid_evidence(root, report);
+    }
     if report["schema_version"] == "0.10.0" {
         let current = report["target"]["path"]
             .as_str()
@@ -795,7 +804,9 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
     } else if classify(&report) == "still_blocked" {
         (
             "actionable",
-            if report["target"]["language"] == "erlang" {
+            if report["target"]["language"] == "rust" {
+                "当前选中文件已有edition适用的Rustfmt解析诊断；核对原生行号及实际模块/宏上下文后修复，以同一 --rustfmt-tool 复检。格式差异不算语法错误；Cargo Clippy、类型和构建仍待完成"
+            } else if report["target"]["language"] == "erlang" {
                 "当前源码已有原生 Erlang 语法诊断；核对报告中有界原生位置并修复，然后使用同一工具复检；不要反复安装工具或关闭检查"
             } else if report["target"]["language"] == "swift" {
                 "当前源码已有原生 Swift parse 语法诊断；核对有界原生位置和 UTF-8 字节列并修复，然后使用同一编译器复检；项目类型检查、构建和 lint 仍需完成"
@@ -839,6 +850,8 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
                 "Kotlin 原生确认仍未完成；核对已安装的 Kotlin/JVM 2.4.10、JDK、原生上下文诊断及项目依赖，使用 --kotlinc-tool 绝对路径复检；不根据上下文阻塞修改无关源码"
             } else if report["target"]["language"] == "ruby" {
                 "Ruby原生确认未完成；核对项目声明版本和已安装工具，只对已验证的Ruby2.6.10p210使用 --ruby-tool 复检；新版本缺口不靠改写源码绕过，确实缺工具才准备"
+            } else if report["target"]["language"] == "rust" {
+                "Rust原生确认未完成；核对当前Cargo edition声明、源码归属和已安装Rustfmt1.9.0-stable，以 --rustfmt-tool 绝对路径复检；代理或版本失败先诊断，确实缺工具才准备，不修改无关源码"
             } else if report["target"]["language"] == "go" {
                 "Go整文件原生语法确认未完成；核对已安装的Go1.23.4及同目录gofmt，用 --go-tool 绝对路径复检；逻辑行映射或版本未知先诊断，不修改无关源码"
             } else {
@@ -858,6 +871,15 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
         guidance["step"] = json!(format!(
             "候选恢复扫描未完成或错误无法定位；原生确认前不得修改源码，不虚构错误位置。{step}"
         ));
+    }
+    if report["target"]["language"] == "rust" {
+        guidance["schema_version"] = json!("0.19.0");
+        guidance["native_column_unit"] = json!("unavailable");
+        guidance["native_confirmation_reason"] = if inputs_current(root, &report) {
+            report["native"]["reason"].clone()
+        } else {
+            json!("syntax_confirmation_inputs_changed")
+        };
     }
     if report["target"]["language"] == "ruby" {
         guidance["schema_version"] = json!("0.15.0");
@@ -961,7 +983,7 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
     // 源码修复后仍可复用未改变的工具；工具字节变化则不得携带旧工具身份。
     if matches!(
         report["target"]["language"].as_str(),
-        Some("zig" | "erlang" | "swift" | "kotlin" | "go" | "ruby")
+        Some("rust" | "zig" | "erlang" | "swift" | "kotlin" | "go" | "ruby")
     ) && tool_current(&report)
         && (report["target"]["language"] != "go"
             || (report["native"]["version"] == "go1.23.4"
@@ -984,7 +1006,9 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
             ".",
             "--format",
             "json",
-            if report["target"]["language"] == "erlang" {
+            if report["target"]["language"] == "rust" {
+                "--rustfmt-tool"
+            } else if report["target"]["language"] == "erlang" {
                 "--erl-tool"
             } else if report["target"]["language"] == "swift" {
                 "--swift-tool"
@@ -1013,6 +1037,11 @@ fn initial_guidance(root: &Path, brief: &Value) -> Option<Value> {
         "先核对固定 grammar 与当前源码的疑似证据。"
     };
     let language = original["language"].as_str()?;
+    if language == "rust" {
+        return Some(
+            json!({"schema_version":"0.19.0","disposition":"verification_required","step":"Rust候选需要匹配Cargo edition与完整文件上下文；定位已安装Rustfmt1.9.0-stable真实制品，以 --rustfmt-tool 复检；缺工具才准备，不以WASM候选改写源码或关闭任务，Clippy/类型/构建义务保留","native_column_unit":"unavailable","native_confirmation_status":"incomplete","native_confirmation_reason":"rustfmt_tool_not_found","native_confirmation_ref":null,"native_diagnostic_positions":[],"recheck_argv":["codeguard","task","verify",brief["task_id"],".","--format","json"]}),
+        );
+    }
     if language == "cfquery" {
         return Some(json!({"disposition":"needs_decision",
             "step":"CFQuery 仅有静态 SQL 关键词结构候选；先明确 datasource、数据库方言/版本、模板插值及 schema 上下文，再选择隔离的原生 SQL 语法确认。当前 task verify 尚未接入 CFQuery 原生 adapter，不自动连接项目数据库、不安装其它语言工具，不凭候选修改源码或关闭任务"}));

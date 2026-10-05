@@ -14,12 +14,16 @@ pub(crate) fn examples(command: &str) -> &'static [&'static str] {
             "codeguard lint typescript file.ts --node-tool /absolute/node --eslint-entry /absolute/eslint/bin/eslint.js --eslint-version VERSION --config /absolute/eslint.config.js --cwd /absolute/project --format json",
         ],
         "task verify" => &[
+            "codeguard task verify TASK_ID . --rustfmt-tool /absolute/toolchain/bin/rustfmt --format json",
             "codeguard task verify TASK_ID . --go-tool /absolute/sdk/bin/go --format json",
             "codeguard task verify TASK_ID . --erl-tool /absolute/erl --format json",
             "codeguard task verify TASK_ID . --swift-tool /absolute/swift --format json",
             "codeguard task verify TASK_ID . --kotlinc-tool /absolute/kotlinc --format json",
             "codeguard task verify TASK_ID . --zig-tool /absolute/zig --format json",
             "codeguard task verify TASK_ID . --ruff-tool /absolute/ruff --format json",
+        ],
+        "hook execute" => &[
+            "codeguard hook execute . --rustfmt-tool /absolute/toolchain/bin/rustfmt --timeout 30s --format json",
         ],
         "check" => &[
             "codeguard check all . --timeout 60s --jobs 1 --format json",
