@@ -163,3 +163,9 @@ Stop 事件 MAY 从已存在的本地任务事实生成有界、只读的下一�
 - **THEN** the fixed-version Ruby stdin parser runs only for selected files using the event deadline; selected failures never switch to WASM, absence retains bundled candidate feedback, and native diagnostics reuse the same task as lint/check
 - **AND** dialogue shows only current line positions and safe task IDs, with project-version verification and original-tool recheck guidance; it does not invent columns, echo tool messages, execute source/gems, or close tasks from zero diagnostics
 - **AND** repair_ready preserves saved report references and stale-input handling through a versioned line-only summary; failed writes do not run any parser
+
+#### Scenario: Shell edits and repair-ready events share original ShellCheck tasks
+- **WHEN** a confirmed Shell edit selects an explicit absolute ShellCheck tool or a caller PATH entry, or repair_ready references a persisted shell.shellcheck task
+- **THEN** only selected files are checked using the common event deadline, observed file dialect and project rc; native failures remain incomplete and no absent Shell WASM is invented
+- **AND** current SC rules and Unicode scalar positions, actual saved task IDs and original-tool recheck guidance appear in bounded dialogue; source text and tool messages are excluded
+- **AND** repair_ready calls the existing original-rule task verifier, preserves event persistence and absence-versus-suppression outcomes, and never closes a task from zero diagnostics; failed writes run no check and ignore preconfigured native-tool selections instead of reporting repair-ready argument errors

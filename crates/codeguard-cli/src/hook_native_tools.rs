@@ -6,6 +6,7 @@ pub(crate) struct HookNativeTools<'a> {
     pub(crate) node: Option<&'a Path>,
     pub(crate) kotlinc: Option<&'a Path>,
     pub(crate) swift: Option<&'a Path>,
+    pub(crate) shellcheck: Option<&'a Path>,
     pub(crate) ruby: Option<&'a Path>,
     pub(crate) zig: Option<&'a Path>,
 }

@@ -1526,3 +1526,22 @@ flowchart LR
 ```
 
 证据见 [项目Shell验收](../tests/acceptance/shellcheck-project-baseline.md)。
+
+### Shell 编辑与修复事件
+
+Rust `hook execute` 和 Claude 格式适配器现在把已确认的 Shell 编辑路由到同一 ShellCheck 逐文件路径，接受 `--shellcheck-tool /absolute/path`；仅检查事件选择的文件，共享事件超时，不运行完整项目构建。任务 ID 与 `lint shell` / `check shell` 保持一致，未初始化工作区不自动创建任务。
+
+```mermaid
+flowchart LR
+    A[确认 Shell 编辑] --> B[选中文件及实际方言]
+    B --> C[原生 ShellCheck 与当前输入复核]
+    C --> D[更新同一任务及脱敏对话摘要]
+    D --> E[智能体修复]
+    E --> F[repair_ready 绑定任务]
+    F --> G[原规则 task verify]
+    G --> H[记录观察 仍须核验关闭条件]
+```
+
+编辑反馈外层协议0.21、内层0.11，旧协议保留。对话仅显示当前 SC 规则、Unicode 标量位置、实际已同步任务 ID 及复检命令，排除源码和原生自由文本。缺工具、不支持方言、工具失败和工作台保存失败保持未完成；当前不存在 Shell 内置 WASM，不虚构兜底。失败写入不检查；`repair_ready` 复用既有任务复检，零诊断不关闭问题。
+
+[验收记录](../tests/acceptance/shellcheck-hook-baseline.md)区分真实 ShellCheck 报告、受控工具测试、npm 离线安装及实际宿主会话。Claude 形状重放通过不代表真实已安装宿主或完整项目门禁已验收。

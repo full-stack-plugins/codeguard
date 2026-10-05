@@ -98,15 +98,18 @@ fn execute_parsed(
     let plan = plan_hook_trigger(input)?;
     if plan.action != HookTriggerAction::VerifyTask
         && arguments.verify_options.keys().any(|key| {
-            plan.action != HookTriggerAction::FastFileCheck
-                || !matches!(
-                    key.as_str(),
-                    "--node-tool"
-                        | "--kotlinc-tool"
-                        | "--swift-tool"
-                        | "--zig-tool"
-                        | "--ruby-tool"
-                )
+            !matches!(
+                plan.action,
+                HookTriggerAction::FastFileCheck | HookTriggerAction::NoCheck
+            ) || !matches!(
+                key.as_str(),
+                "--node-tool"
+                    | "--kotlinc-tool"
+                    | "--swift-tool"
+                    | "--zig-tool"
+                    | "--ruby-tool"
+                    | "--shellcheck-tool"
+            )
         })
     {
         return Err("任务复检参数仅用于 repair_ready 事件");
@@ -159,6 +162,10 @@ fn execute_parsed(
                         .get("--kotlinc-tool")
                         .map(Path::new),
                     swift: arguments.verify_options.get("--swift-tool").map(Path::new),
+                    shellcheck: arguments
+                        .verify_options
+                        .get("--shellcheck-tool")
+                        .map(Path::new),
                     ruby: arguments.verify_options.get("--ruby-tool").map(Path::new),
                     zig: arguments.verify_options.get("--zig-tool").map(Path::new),
                 },
@@ -235,7 +242,7 @@ fn execute_parsed(
     };
     Ok((
         json!({
-            "schema_version":if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.10.0" {"0.19.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.6.0" {"0.20.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.9.0" {"0.18.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.8.0" {"0.17.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.7.0" {"0.16.0"}else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.5.0" {"0.15.0"}else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.6.0" {"0.14.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.5.0" {"0.13.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.4.0" {"0.12.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.3.0" {"0.11.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.4.0" {"0.10.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.2.0" {"0.8.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.3.0" {"0.9.0"} else {"0.7.0"}, "report_type":"hook_execution_feedback",
+            "schema_version":if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.11.0" {"0.21.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.10.0" {"0.19.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.6.0" {"0.20.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.9.0" {"0.18.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.8.0" {"0.17.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.7.0" {"0.16.0"}else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.5.0" {"0.15.0"}else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.6.0" {"0.14.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.5.0" {"0.13.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.4.0" {"0.12.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.3.0" {"0.11.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.4.0" {"0.10.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.2.0" {"0.8.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.3.0" {"0.9.0"} else {"0.7.0"}, "report_type":"hook_execution_feedback",
             "plan":plan, "execution":execution, "reason":reason,
             "local_feedback":feedback, "delivery_decision":"not_evaluated",
             "host_blocking_verified":false, "soft_result_reused":false
@@ -354,6 +361,18 @@ fn task_verification_summary(
         "authority":"local_unverified", "delivery_decision":"not_evaluated"
     });
     let scan = &report["native_scan"];
+    if checker_id == "shell.shellcheck" && scan.is_object() {
+        if report["schema_version"] != "0.24.0"
+            || scan["schema_version"] != "0.1.0"
+            || !crate::shell_task_recheck::valid_shape(root, scan)
+        {
+            return Err(("verification_report_invalid", 4));
+        }
+        if scan["input_stable"] != true || !crate::shell_task_recheck::inputs_current(root, scan) {
+            summary["observation"] = json!("incomplete");
+            summary["reason"] = json!("shell_confirmation_inputs_changed");
+        }
+    }
     if checker_id == "syntax.native_confirmation"
         && (matches!(
             scan["target"]["language"].as_str(),
@@ -504,6 +523,7 @@ fn verify_option_matches_checker(key: &str, checker_id: &str) -> bool {
         return true;
     }
     match checker_id {
+        "shell.shellcheck" => key == "--shellcheck-tool",
         "node.eslint" | "node.eslint.preparation" => matches!(
             key,
             "--node-tool" | "--eslint-entry" | "--eslint-version" | "--config" | "--cwd"
@@ -683,6 +703,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
             | "--swift-tool"
             | "--kotlinc-tool"
             | "--ruby-tool"
+            | "--shellcheck-tool"
             | "--maven-tool"
             | "--java-home"
             | "--java-tool"
@@ -717,6 +738,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                         | "--swift-tool"
                         | "--kotlinc-tool"
                         | "--ruby-tool"
+                        | "--shellcheck-tool"
                         | "--maven-tool"
                         | "--java-home"
                         | "--java-tool"

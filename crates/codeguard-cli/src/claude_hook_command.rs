@@ -341,7 +341,19 @@ fn summarize(path: &str, report: &Value) -> String {
         .flatten()
         .filter(|f| f["current"] == true)
         .flat_map(|f| f["native"]["diagnostics"].as_array().into_iter().flatten());
-    for finding in python.chain(node).chain(swift).chain(zig).chain(ruby) {
+    let shell = feedback["shell_lint"]["files"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter(|f| f["input_stable"] == true)
+        .flat_map(|f| f["native"]["diagnostics"].as_array().into_iter().flatten());
+    for finding in python
+        .chain(node)
+        .chain(swift)
+        .chain(zig)
+        .chain(ruby)
+        .chain(shell)
+    {
         count += 1;
         if let Some(rule) = finding["rule_id"].as_str().filter(|r| {
             r.len() <= 96
@@ -371,6 +383,9 @@ fn summarize(path: &str, report: &Value) -> String {
                 .count()
         });
     let guidance = match feedback["next_action"].as_str() {
+        Some("repair_native_source") if feedback["shell_lint"].is_object() => {
+            "按当前 SC 规则及 Unicode 标量位置修复；继续原 ShellCheck 任务复检和完整项目检查"
+        }
         Some("repair_native_source") if feedback["ruby_lint"].is_object() => {
             "先核对项目 Ruby 版本适用性，再按报告已有行号确认和修复语法；继续原工具复检及完整项目检查"
         }
@@ -418,6 +433,47 @@ fn summarize(path: &str, report: &Value) -> String {
             }
         }
         repair.push_str("Zig 修复后运行 codeguard lint zig <当前文件> --format=json；核对原工具和完整项目检查。只使用实际同步的任务ID；不凭零诊断关闭历史任务。");
+    }
+    if feedback["shell_lint"].is_object() {
+        let scan = &feedback["shell_lint"];
+        for file in scan["files"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter(|f| f["input_stable"] == true)
+            .take(2)
+        {
+            for row in file["native"]["diagnostics"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .take(2)
+            {
+                if let (Some(line), Some(column)) = (row["line"].as_u64(), row["column"].as_u64()) {
+                    repair.push_str(&format!(
+                        "Shell 第 {line} 行，第 {column} 列（Unicode 标量）；"
+                    ));
+                }
+            }
+            for id in file["workbench"]["task_ids"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .filter_map(Value::as_str)
+                .filter(|id| {
+                    id.strip_prefix("CG-B-")
+                        .or_else(|| id.strip_prefix("CG-"))
+                        .is_some_and(|s| s.len() == 32 && s.bytes().all(|b| b.is_ascii_hexdigit()))
+                })
+                .take(2)
+            {
+                repair.push_str(&format!("Shell 原生任务 {id}：codeguard task show {id} . --format=json；修复后 codeguard task verify {id} . --shellcheck-tool <已核验绝对路径> --format=json。"));
+            }
+        }
+        if scan["task_status"] != "synced_partial" {
+            repair.push_str("Shell 任务工作台未连接或同步未完成；保留当前观察，不假定已有任务。");
+        }
+        repair.push_str("缺工具时安装适用ShellCheck；未知或不支持方言先核对实际方言与检查器，不反复重装。当前没有Shell内置WASM，检查不完整；不凭零诊断关闭任务。");
     }
     if feedback["ruby_lint"].is_object() {
         let scan = &feedback["ruby_lint"];
