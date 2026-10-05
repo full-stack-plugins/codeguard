@@ -1660,3 +1660,7 @@ check shell/all接入ShellCheck0.11.0，按shebang/文件声明或显式默认�
 对应7.4、9.3/9.9、11.17、14.9/14.10及hook-protocol。确认编辑只选择实际文件，显式ShellCheck或PATH优先；任务与原生lint/check复用，实际方言优先，共享截止时间。repair_ready识别shell.shellcheck、调用原SC规则复检，复核输入并保持零诊断不关闭。Claude形状返回安全规则、Unicode位置与真实任务，拒绝源码/工具自由文本。初始四项RED，接线后六项default/WASM通过；失败写入夹具补齐必需timeout后验证不检查。新0.21/0.11封闭协议、真实ShellCheck及npm安装链路见[验收](../../../tests/acceptance/shellcheck-hook-baseline.md)。完整宿主、Shell覆盖、签名关闭/复发与发行父任务仍开放。
 
 Shell Hook最终源码验证：默认全workspace262目标1452通过/0失败/126忽略，WASM相关7目标64通过/0失败/3忽略，两种配置严格Clippy通过。已修复携带预配置工具的失败写入被误报为复检错参，实际输出为not_run/write_failed；npm执行标记验证不启动检查。没有改变可信关闭或全语言验收标准。
+
+## 2026-10-06 CFQuery明确数据库方言的原生反证
+
+对应12.11、14.4/14.17/14.19。已有固定PostgreSQL18.6镜像在无网络/tmpfs夹具下PREPARE接受SELECT FROM users、拒绝SELECT DISTINCT FROM users（42601），固定CFQuery WASM均零恢复。Rust受控原生重放与同字节worker观察3项通过；原无方言case保留pending且原本不计已裁定指标，不改冻结语料、清单或历史报告。新schema、双语独立证据文档和主文档引用见[验收](../../../tests/acceptance/cfquery-postgres-dialect.md)。没有修复grammar或新增项目SQL适配器，不勾选语言/宿主/发行父任务。

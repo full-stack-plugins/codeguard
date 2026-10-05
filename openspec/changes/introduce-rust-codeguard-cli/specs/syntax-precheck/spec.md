@@ -716,3 +716,10 @@ Go syntax-confirmation task resolution SHALL use host-verified approval policy 1
 #### Scenario: Companion changes or native counterevidence prevent closure
 - **WHEN** gofmt content/path differs from approval, changes during verification, or the original bytes have no native diagnostics
 - **THEN** approval mismatch is rejected before native execution or current-input/native-incomplete evidence is preserved; zero original diagnostics requires false-positive review rather than code-fixed closure
+
+### Requirement: SQL grammar disagreements SHALL retain explicit database dialect context
+CFQuery grammar evaluation SHALL NOT promote provisional generic SQL labels to confirmed invalid source or language qualification without an applicable database dialect and native context. Explicit dialect counterevidence SHALL be archived separately from frozen generic corpora, preserving undecided labels and original metrics. Native SQL syntax evidence SHALL identify the engine version and fixture identity; fixture query preparation SHALL NOT be presented as executing project queries or proving full CFML/project lint.
+
+#### Scenario: PostgreSQL empty projection disagrees with a generic SQL assumption
+- **WHEN** a fixed isolated PostgreSQL parser accepts `SELECT FROM users` and rejects `SELECT DISTINCT FROM users`, while the pinned CFQuery grammar reports zero recoveries for both
+- **THEN** retain the generic empty-projection case as pending, record the distinct-query disagreement with PostgreSQL context, preserve both sources and tool identities, and keep grammar qualification and delivery approval false
