@@ -341,6 +341,7 @@ Rust 实现与本 change 归本仓；宿主实现归独立 codeguard-plugin 仓�
 | SP06 | [syntax-precheck](specs/syntax-precheck/spec.md) / Syntax observations SHALL preserve grammar fidelity and source positions | 14.4,14.17 |
 | SP07 | [syntax-precheck](specs/syntax-precheck/spec.md) / Precheck briefs SHALL reach agent conversations with concrete next actions | 14.9,14.14,14.15,14.16 |
 | SP08 | [syntax-precheck](specs/syntax-precheck/spec.md) / Suspected syntax tasks SHALL require capability-matched native verification | 14.10,14.11 |
+| SP08.Go | [syntax-precheck](specs/syntax-precheck/spec.md) / Go limited resolution binds the complete syntax tool pair | 9.10,14.11,14.12 |
 | SP09 | [syntax-precheck](specs/syntax-precheck/spec.md) / Grammar false-positive dispositions SHALL be precise and preserve native obligations | 14.12 |
 | SP10 | [syntax-precheck](specs/syntax-precheck/spec.md) / Syntax caches SHALL bind inputs and retain historical observations on invalidation | 14.13 |
 | SP11 | [syntax-precheck](specs/syntax-precheck/spec.md) / Fallback rollout SHALL preserve command and delivery compatibility | 14.7,14.9,14.18 |

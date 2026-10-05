@@ -180,3 +180,51 @@ fn r_and_cpp_explicit_suffixes_keep_case_sensitive_routes() {
         assert!(route_source(name, b"source").is_empty(), "{name}");
     }
 }
+
+#[test]
+fn cfquery_close_inside_server_comment_does_not_truncate_the_query_region() {
+    let source = b"<cfquery>SELECT 1 <!--- </cfquery> <!--- nested ---> ---> FROM users</cfquery>";
+    let routes = route_source("page.cfm", source);
+    let query = routes.iter().find(|r| r.language == "cfquery").unwrap();
+    assert_eq!(
+        query.source,
+        b"SELECT 1 <!--- </cfquery> <!--- nested ---> ---> FROM users"
+    );
+    assert_eq!(
+        &source[query.byte_offset..query.byte_offset + query.source.len()],
+        query.source
+    );
+}
+#[test]
+fn unclosed_server_comment_cannot_supply_a_query_closing_boundary() {
+    let source = b"<cfquery>SELECT 1 <!--- </cfquery>";
+    let routes = route_source("page.cfm", source);
+    assert_eq!(
+        routes.len(),
+        1,
+        "an incomplete embedding retains the whole-file CFML route"
+    );
+    assert_eq!(routes[0].language, "cfml");
+}
+#[test]
+fn cfquery_region_after_unicode_preserves_all_bytes_and_following_queries() {
+    let source="中文\r\n<CFQUERY>SELECT 1 <!--- fake </CFQUERY> ---> FROM users</CFQUERY><cfquery>SELECT 2</cfquery>".as_bytes();
+    let routes = route_source("page.cfm", source);
+    let queries = routes
+        .iter()
+        .filter(|r| r.language == "cfquery")
+        .collect::<Vec<_>>();
+    assert_eq!(queries.len(), 2);
+    assert_eq!(
+        queries[0].source,
+        b"SELECT 1 <!--- fake </CFQUERY> ---> FROM users"
+    );
+    assert_eq!(queries[0].byte_offset, "中文\r\n<CFQUERY>".len());
+    assert_eq!(queries[1].source, b"SELECT 2");
+    for query in queries {
+        assert_eq!(
+            &source[query.byte_offset..query.byte_offset + query.source.len()],
+            query.source
+        );
+    }
+}

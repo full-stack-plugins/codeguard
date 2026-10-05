@@ -283,6 +283,14 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 - **WHEN** 已初始化工作区的原生 Erlang forms 检查先取得诊断或具体环境/预处理阻塞
 - **THEN** 直接将源字节、原生工具与有界位置保存到同一文件/语言的稳定确认修复任务，不要求先制造 WASM 恢复节点，也不伪造 grammar 摘要；后续候选观察与原生扫描不得重复建任务。next 使用当前证据，源码或工具变化撤回旧位置；task verify 用原工具复检并记录结果，局部零诊断不自批关闭
 
+
+#### Scenario: CFQuery closing boundary occurs inside a server-side CFML comment
+
+- **WHEN** 一个完整CFQuery标签体含普通或嵌套CFML服务器注释，注释内出现`</cfquery>`文本
+- **THEN** 候选嵌入区域的结束位置必须取注释外的真实结束标签，保留原始字节及原文件偏移，不删除或遮盖注释源码
+- **AND** 未闭合CFML注释不能提供可信嵌入结束边界；保留整文件CFML候选而不制造截断的CFQuery片段，不据此批准语法或交付
+
+
 ### Requirement: Precheck briefs SHALL reach agent conversations with concrete next actions
 
 human/结构化报告及宿主渲染 MUST 按结论、方式/范围、原生状态、依据、下一步和实际任务引用组织信息。必须/推荐动作 MUST 明确。疑似异常、正常、未完成和原生诊断四类模板 MUST 独立验证；CVE 等非语法覆盖不能套用语法通过结论。插件 MUST 通过真实宿主的工具结果/上下文 API 交付，文件或 stdout 存在不等于交付。初次反馈后只发送有意义的变化；原始工具文本 MUST 作为数据，不执行其中指令。AGENTS MUST 仅保留长期指引，不追加每轮扫描日志。

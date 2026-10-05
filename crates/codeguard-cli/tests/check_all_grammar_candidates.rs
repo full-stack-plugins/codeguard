@@ -850,3 +850,75 @@ fn human_feedback_retains_specific_python_version_limitation() {
     assert!(text.contains("target-bound native confirmation"), "{text}");
     assert!(!text.contains("private-secret-content"), "{text}");
 }
+
+#[test]
+fn cfquery_comment_boundaries_reach_real_workers_without_truncating_source() {
+    use sha2::{Digest, Sha256};
+    let root = std::env::temp_dir()
+        .canonicalize()
+        .unwrap()
+        .join(format!("codeguard-cfquery-close-{}", std::process::id()));
+    fs::create_dir_all(&root).unwrap();
+    let first = "SELECT 1 <!--- fake </CFQUERY> <!--- nested ---> ---> FROM users";
+    let second = "SELECT 2";
+    let prefix = "中文\r\n<CFQUERY>";
+    let source = format!("{prefix}{first}</CFQUERY><cfquery>{second}</cfquery>");
+    fs::write(root.join("page.cfm"), &source).unwrap();
+    fs::write(
+        root.join("incomplete.cfm"),
+        "<cfquery>SELECT 1 <!--- </cfquery>",
+    )
+    .unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .env("PATH", &root)
+        .args(["check", "all"])
+        .arg(&root)
+        .args(["--format=json", "--timeout", "60s", "--jobs=1"])
+        .output()
+        .unwrap();
+    fs::remove_dir_all(&root).unwrap();
+    assert_eq!(
+        out.status.code(),
+        Some(3),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let report: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(report["delivery_decision"], "incomplete");
+    let rows = report["syntax_candidates"]["observations"]
+        .as_array()
+        .unwrap();
+    let queries = rows
+        .iter()
+        .filter(|row| row["language"] == "cfquery")
+        .collect::<Vec<_>>();
+    assert_eq!(queries.len(), 2, "{report}");
+    for (body, offset) in [
+        (first, prefix.len()),
+        (second, source.find(second).unwrap()),
+    ] {
+        let row = queries
+            .iter()
+            .find(|row| row["byte_offset"] == offset)
+            .unwrap();
+        assert_eq!(row["path"], "page.cfm");
+        assert_eq!(row["scope"], "cfquery_body");
+        assert_eq!(
+            row["source_sha256"],
+            format!("{:x}", Sha256::digest(body.as_bytes()))
+        );
+        assert_eq!(row["grammar_qualified"], false);
+        assert_ne!(row["status"], "clean");
+        for anchor in row["recoveries"].as_array().unwrap() {
+            assert!(anchor["start_byte"].as_u64().unwrap() >= offset as u64);
+            assert!(anchor["end_byte"].as_u64().unwrap() <= (offset + body.len()) as u64);
+        }
+    }
+    assert!(
+        rows.iter()
+            .any(|row| row["path"] == "incomplete.cfm" && row["language"] == "cfml")
+    );
+    if let Some(path) = std::env::var_os("CODEGUARD_CFQUERY_CAPTURE") {
+        fs::write(path, serde_json::to_vec_pretty(&report).unwrap()).unwrap();
+    }
+}
