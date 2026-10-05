@@ -427,3 +427,6 @@ mod shell_lint_workbench;
 
 #[cfg(unix)]
 mod shell_task_recheck;
+
+#[cfg(unix)]
+mod check_shell_scan;

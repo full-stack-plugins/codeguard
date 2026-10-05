@@ -57,6 +57,8 @@ struct Args {
     kotlinc_tool: Option<PathBuf>,
     swift_tool: Option<PathBuf>,
     ruby_tool: Option<PathBuf>,
+    shellcheck_tool: Option<PathBuf>,
+    shell_dialect: Option<String>,
     zig_tool: Option<PathBuf>,
     maven_tool: Option<PathBuf>,
     java_home: Option<PathBuf>,
@@ -378,6 +380,29 @@ pub fn run(args: &[String]) -> ExitCode {
             &AtomicBool::new(false),
         );
         execution_tasks.push(json!({"id":"ruby.lint","status":if report["local_parse_complete"]==true {"native_observed_unverified"} else {"native_incomplete"}}));
+        report
+    };
+    let shell_sources = if parsed.selection.includes("shell") {
+        discovery
+            .languages
+            .get("shell")
+            .map(|e| e.source_files.clone())
+            .unwrap_or_default()
+    } else {
+        BTreeSet::new()
+    };
+    let mut shell_lint = if shell_sources.is_empty() {
+        Value::Null
+    } else {
+        let report = crate::check_shell_scan::observe(
+            &root,
+            &shell_sources,
+            parsed.shellcheck_tool.clone(),
+            parsed.shell_dialect.as_deref(),
+            deadline,
+            &AtomicBool::new(false),
+        );
+        execution_tasks.push(json!({"id":"shell.lint","status":if report["local_check_complete"]==true{"native_observed_unverified"}else{"native_incomplete"}}));
         report
     };
     let zig_sources = if parsed.selection.includes("zig") {
@@ -1274,6 +1299,14 @@ pub fn run(args: &[String]) -> ExitCode {
         crate::native_syntax_confirmation::connect(&root, &mut ruby_lint, deadline);
         crate::check_ruby_scan::refresh(&root, &mut ruby_lint, deadline);
     }
+    if shell_lint.is_object() {
+        if source_recheck.or(scope_recheck).is_some() {
+            shell_lint["scope_stable"] = json!(false);
+        }
+        crate::check_shell_scan::refresh(&root, &mut shell_lint, deadline);
+        crate::check_shell_scan::connect(&root, &mut shell_lint, deadline);
+        crate::check_shell_scan::refresh(&root, &mut shell_lint, deadline);
+    }
     if erlang_lint.is_object() {
         if source_recheck.or(scope_recheck).is_some() {
             crate::check_erlang_scan::invalidate_scope(&mut erlang_lint);
@@ -1409,6 +1442,15 @@ pub fn run(args: &[String]) -> ExitCode {
                 candidate["reason"] = json!("swift_single_file_project_checks_unverified");
                 candidate["next_action"] = json!(
                     "读取 native_results.swift_lint 的当前语法位置、环境阻塞；核对逐文件任务同步结果，单文件 parse不代替项目 lint 与完整构建"
+                );
+            }
+            if language == "shell" && category == "lint" && shell_lint.is_object() {
+                candidate["checker_id"] = json!("shell.shellcheck");
+                candidate["status"] = json!("native_incomplete");
+                candidate["reason"] =
+                    json!("shell_project_obligations_and_source_coverage_unverified");
+                candidate["next_action"] = json!(
+                    "读取shell_lint逐文件SC规则与环境阻塞，使用原任务复检；source依赖、其它检查族及可信覆盖仍需核验"
                 );
             }
             if language == "ruby" && category == "lint" && ruby_lint.is_object() {
@@ -1623,6 +1665,15 @@ pub fn run(args: &[String]) -> ExitCode {
             unresolved.insert("ruby_native_scan_incomplete".into());
         }
     }
+    if shell_lint.is_object() {
+        unresolved.insert("shell_project_obligations_and_source_coverage_unverified".into());
+        if shell_lint["local_check_complete"] != true {
+            unresolved.insert("shell_native_scan_incomplete".into());
+        }
+        if shell_lint["task_status"] != "synced_partial" {
+            unresolved.insert("shell_native_tasks_not_fully_connected".into());
+        }
+    }
     if erlang_present {
         unresolved.insert("erlang_project_lint_preprocessing_and_build_coverage_unverified".into());
         if erlang_task_outcome != Some(TaskOutcome::Succeeded)
@@ -1787,6 +1838,9 @@ pub fn run(args: &[String]) -> ExitCode {
                 Value::Null
             }
         });
+    if next.is_null() && shell_lint["task_status"] == "synced_partial" {
+        next = read_local_brief_for_checker(&root, "shell.shellcheck").unwrap_or(Value::Null);
+    }
     if let Selection::Language(language) = &parsed.selection {
         let checkers: &[&str] = match language.as_str() {
             "python" => &["python.ruff", "python.ruff.doctor", "python.pip_audit"],
@@ -1797,6 +1851,7 @@ pub fn run(args: &[String]) -> ExitCode {
                 "rust.cargo_audit",
             ],
             "go" => &["go.vet"],
+            "shell" => &["shell.shellcheck"],
             "javascript" | "typescript" => {
                 &["node.eslint", "node.eslint.preparation", "node.npm.audit"]
             }
@@ -1885,6 +1940,8 @@ pub fn run(args: &[String]) -> ExitCode {
                 .as_array()
                 .is_some_and(|files| files.iter().any(|f| f["native"]["tool_sha256"].is_string())),
         );
+    let started_native_task_count =
+        started_native_task_count + usize::from(shell_lint["native_task_started"] == true);
     #[cfg(feature = "wasm-precheck")]
     let syntax_candidates = crate::check_syntax_candidates::observe(
         &root,
@@ -1953,8 +2010,11 @@ pub fn run(args: &[String]) -> ExitCode {
     if ruby_lint.is_object() {
         crate::check_ruby_scan::refresh(&root, &mut ruby_lint, deadline);
     }
+    if shell_lint.is_object() {
+        crate::check_shell_scan::refresh(&root, &mut shell_lint, deadline);
+    }
     let mut report = json!({
-        "schema_version":if ruby_lint.is_object() || next["schema_version"] == "0.15.0" {"0.51.0"} else if next["schema_version"] == "0.14.0" {"0.50.0"} else if next["schema_version"] == "0.13.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.49.0"} else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row.get("structural_observations").is_some())) {"0.48.0"} else if zig_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.12.0" {"0.47.0"}else if zig_lint.is_object() {"0.46.0"} else if matches!(parsed.selection, Selection::Language(_)) {"0.45.0"} else if swift_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.11.0" {"0.44.0"} else if swift_lint.is_object() {"0.43.0"} else if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
+        "schema_version":if shell_lint.is_object() || next["schema_version"]=="0.17.0" {"0.52.0"}else if ruby_lint.is_object() || next["schema_version"] == "0.15.0" {"0.51.0"} else if next["schema_version"] == "0.14.0" {"0.50.0"} else if next["schema_version"] == "0.13.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.49.0"} else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row.get("structural_observations").is_some())) {"0.48.0"} else if zig_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.12.0" {"0.47.0"}else if zig_lint.is_object() {"0.46.0"} else if matches!(parsed.selection, Selection::Language(_)) {"0.45.0"} else if swift_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.11.0" {"0.44.0"} else if swift_lint.is_object() {"0.43.0"} else if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
         "operation":"check", "selection":parsed.selection.as_str(), "command_status":if request_cancelled { "cancelled" } else { "incomplete" },
         "exit_code":if request_cancelled { 130 } else { 3 }, "delivery_decision":if parsed.selection == Selection::All { "incomplete" } else { "not_evaluated" }, "authority":"local_unverified",
         "reason":if request_cancelled { "request_cancelled" } else if parsed.selection == Selection::All { "full_project_obligations_and_trusted_policy_unavailable" } else if parsed.selection == Selection::Java { "java_selection_obligations_and_trusted_policy_unavailable" } else { "language_selection_obligations_and_trusted_policy_unavailable" },
@@ -1966,7 +2026,7 @@ pub fn run(args: &[String]) -> ExitCode {
         "syntax_tasks":syntax_tasks,
         "execution_budget":check_budget_record(
             parsed.timeout_ms, parsed.timeout_source, parsed.jobs_limit, parsed.jobs_source,
-            usize::from(node_present) + usize::from(python_present) + python_cve_roots.len() + 4 * usize::from(rust_present) + usize::from(go_present) + usize::from(erlang_present) + usize::from(java_present) + usize::from(javadoc_configured) + usize::from(dependency_configured) + usize::from(cve_configured) + npm_roots.len() + usize::from(kotlin_lint.is_object()) + usize::from(swift_lint.is_object()) + usize::from(zig_lint.is_object()) + usize::from(ruby_lint.is_object()), started_native_task_count
+            usize::from(node_present) + usize::from(python_present) + python_cve_roots.len() + 4 * usize::from(rust_present) + usize::from(go_present) + usize::from(erlang_present) + usize::from(java_present) + usize::from(javadoc_configured) + usize::from(dependency_configured) + usize::from(cve_configured) + npm_roots.len() + usize::from(kotlin_lint.is_object()) + usize::from(swift_lint.is_object()) + usize::from(zig_lint.is_object()) + usize::from(ruby_lint.is_object()) + usize::from(shell_lint.is_object()), started_native_task_count
         ),
         "next":next,
         "export":{"status":"not_requested","reason_code":null}
@@ -1974,7 +2034,7 @@ pub fn run(args: &[String]) -> ExitCode {
     if zig_lint.is_object()
         || matches!(
             report["schema_version"].as_str(),
-            Some("0.47.0" | "0.48.0" | "0.49.0" | "0.50.0" | "0.51.0")
+            Some("0.47.0" | "0.48.0" | "0.49.0" | "0.50.0" | "0.51.0" | "0.52.0")
         )
     {
         report["native_results"]["zig_lint"] = zig_lint.clone();
@@ -1993,6 +2053,7 @@ pub fn run(args: &[String]) -> ExitCode {
                 | "0.49.0"
                 | "0.50.0"
                 | "0.51.0"
+                | "0.52.0"
         )
     ) {
         if let Some(native) = report["native_results"].as_object_mut() {
@@ -2011,14 +2072,18 @@ pub fn run(args: &[String]) -> ExitCode {
                 | "0.49.0"
                 | "0.50.0"
                 | "0.51.0"
+                | "0.52.0"
         )
     ) {
         if let Some(native) = report["native_results"].as_object_mut() {
             native.remove("swift_lint");
         }
     }
-    if report["schema_version"] == "0.51.0" {
+    if matches!(report["schema_version"].as_str(), Some("0.51.0" | "0.52.0")) {
         report["native_results"]["ruby_lint"] = ruby_lint.clone();
+    }
+    if report["schema_version"] == "0.52.0" {
+        report["native_results"]["shell_lint"] = shell_lint.clone();
     }
     if parsed.format != OutputFormat::Human {
         emit_structured(&report, &parsed);
@@ -2224,6 +2289,25 @@ pub fn run(args: &[String]) -> ExitCode {
                     println!(
                         "  {}:{}:{} {}（UTF-8 字节列）",
                         file["path"], row["line"], row["column"], row["rule_id"]
+                    );
+                }
+            }
+        }
+        if let Some(files) = report["native_results"]["shell_lint"]["files"].as_array() {
+            println!("Shell原生逐文件观察，source依赖和完整项目覆盖待核验");
+            for file in files {
+                println!(
+                    "  {}：{}；方言 {}；输入当前 {}",
+                    file["path"], file["native"]["reason"], file["dialect"], file["input_stable"]
+                );
+                for d in file["native"]["diagnostics"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                {
+                    println!(
+                        "  {}:{}:{} {}（Unicode标量列）",
+                        file["path"], d["line"], d["column"], d["rule_id"]
                     );
                 }
             }
@@ -2877,6 +2961,8 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
     let mut kotlinc_tool = None;
     let mut swift_tool = None;
     let mut ruby_tool = None;
+    let mut shellcheck_tool = None;
+    let mut shell_dialect = None;
     let mut zig_tool = None;
     let mut maven_tool = None;
     let mut java_home = None;
@@ -2986,6 +3072,24 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
                     .is_some()
                 {
                     return Err("--swift-tool 重复".into());
+                }
+            }
+            "--shellcheck-tool" => {
+                index += 1;
+                if shellcheck_tool
+                    .replace(PathBuf::from(args.get(index).ok_or("缺少ShellCheck路径")?))
+                    .is_some()
+                {
+                    return Err("--shellcheck-tool重复".into());
+                }
+            }
+            "--shell-dialect" => {
+                index += 1;
+                if shell_dialect
+                    .replace(args.get(index).ok_or("缺少Shell方言")?.clone())
+                    .is_some()
+                {
+                    return Err("--shell-dialect重复".into());
                 }
             }
             "--ruby-tool" => {
@@ -3157,6 +3261,15 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
     if zig_tool.as_ref().is_some_and(|path| !path.is_absolute()) {
         return Err("--zig-tool 必须是绝对路径".into());
     }
+    if shellcheck_tool.as_ref().is_some_and(|p| !p.is_absolute()) {
+        return Err("--shellcheck-tool必须是绝对路径".into());
+    }
+    if shell_dialect
+        .as_ref()
+        .is_some_and(|s| s.is_empty() || s.len() > 16 || !s.bytes().all(|b| b.is_ascii_lowercase()))
+    {
+        return Err("--shell-dialect必须是小写方言ID".into());
+    }
     if ruby_tool.as_ref().is_some_and(|path| !path.is_absolute()) {
         return Err("--ruby-tool 必须是绝对路径".into());
     }
@@ -3177,6 +3290,7 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
         || (!selection.includes("kotlin") && kotlinc_tool.is_some())
         || (!selection.includes("swift") && swift_tool.is_some())
         || (!selection.includes("ruby") && ruby_tool.is_some())
+        || (!selection.includes("shell") && (shellcheck_tool.is_some() || shell_dialect.is_some()))
         || (!selection.includes("zig") && zig_tool.is_some())
         || (!selection.includes("java")
             && (maven_tool.is_some()
@@ -3233,6 +3347,8 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
         kotlinc_tool,
         swift_tool,
         ruby_tool,
+        shellcheck_tool,
+        shell_dialect,
         zig_tool,
         maven_tool,
         java_home,

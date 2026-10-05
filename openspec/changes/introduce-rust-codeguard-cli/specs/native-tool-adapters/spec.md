@@ -28,6 +28,18 @@ Shell任务复检 MUST 从首次报告摘要绑定范围、方言、显式rc及�
 - **WHEN** 同一任务两次ready-to-verify尝试经原工具确认原SC规则仍存在
 - **THEN** 历史记录分别绑定尝试与复检，next提供needs_decision且停止同动作重复尝试；任务不能关闭
 
+### Requirement: Project Shell checks SHALL retain bounded per-file native observations
+
+check shell/all MUST 从静态发现的Shell范围调用原生ShellCheck，不执行受检脚本。每个文件 MUST 保留方言依据、原rc、源码身份、原SC位置和环境阻塞；未知方言不得猜作bash。未知或不支持方言的任务指引 MUST 直接请求具体方言/检查器决策，不重复安装同一不适用工具。显式项目方言 MUST 保持已知zsh/fish和不适用shebang的未支持状态。每次调用共享请求截止时间和取消状态；超过文件预算 MUST 标明未检查数量，不能判项目覆盖完整。源码/范围/配置/工具变化 MUST 撤回当前定位权限，保留局部历史证据。已初始化工作台 MUST 绑定请求根，不能被子目录另一工作台劫持；未初始化不得自动创建。原生逐文件观察成功 MUST NOT 代替完整项目义务、依赖source覆盖、安全或交付allow。
+
+#### Scenario: Two Shell files expose the same SC rule
+- **WHEN** 项目内两文件各有SC2086
+- **THEN** 分别保留本文件诊断和稳定任务，重复check更新原任务，next推荐原任务复检
+
+#### Scenario: ShellCheck is missing
+- **WHEN** 项目发现Shell文件但原生工具不可用
+- **THEN** 每个文件保留具体阻塞、整体未完成，没有Shell WASM时不得伪造通过；不初始化未授权的工作台
+
 ### Requirement: Native ShellCheck feedback SHALL preserve dialect, rc and original-rule evidence
 
 ShellCheck单文件入口 MUST 明确方言和工具兼容版本，冻结有界UTF8源码并通过受控stdin调用json1，不执行受检脚本、不应用原生fix。已知zsh/fish声明或文件名 MUST 保留未支持，不强制按bash制造诊断。显式rc或最近祖先配置与更近缺项 MUST 在调用前后核对；不加载的全局配置 MUST 公开说明，未知外部source范围 MUST 保留阻塞。环境规则与源发现 MUST 分开，保留部分有效诊断但不能判完整。json1位置 MUST 按其Unicode字符及tab语义核验；未知字段、重复键、异源文件、越界位置、退出与报告矛盾 MUST 未完成。原生自由文本及fix替换不得作为智能体指令。修复简报 MUST 包含七要素；未接持久历史时明确not_integrated，未完成证据不得授权源码修改或关闭任务。原生零诊断不得替代项目门禁。

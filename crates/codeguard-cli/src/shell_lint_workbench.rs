@@ -28,9 +28,29 @@ pub(crate) fn connect(
     else {
         return;
     };
+    connect_in_workspace(root, &absolute, requested, report, deadline);
+}
+/// 在项目检查指定根内保存观察，子工作台不改变任务归属；未初始化不创建目录。
+pub(crate) fn connect_in_workspace(
+    root: &Path,
+    source: &Path,
+    requested: Option<&Path>,
+    report: &mut Value,
+    deadline: Instant,
+) {
+    if std::fs::symlink_metadata(root.join(".codeguard")).is_err() {
+        return;
+    }
+    let Ok(absolute) = source.canonicalize() else {
+        return;
+    };
     report["schema_version"] = json!("0.2.0");
     report["task_workflow_status"] = json!("partial");
     report["workbench"] = json!({"status":"incomplete","reason":"shell_workspace_unavailable","workspace_id":null,"run_id":null,"task_ids":[],"sync":null});
+    if report["native"]["reason"] == "request_cancelled" {
+        report["workbench"]["reason"] = json!("request_cancelled");
+        return;
+    }
     let Some(workspace_id) = read_workspace_baseline(root)
         .ok()
         .flatten()

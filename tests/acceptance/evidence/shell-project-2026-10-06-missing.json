@@ -1,0 +1,336 @@
+{
+  "authority": "local_unverified",
+  "category_candidates": [
+    {
+      "capability_status": "gap",
+      "category": "lint",
+      "checker_id": "shell.shellcheck",
+      "language": "shell",
+      "legacy_status": "stable",
+      "next_action": "读取shell_lint逐文件SC规则与环境阻塞，使用原任务复检；source依赖、其它检查族及可信覆盖仍需核验",
+      "reason": "shell_project_obligations_and_source_coverage_unverified",
+      "status": "native_incomplete"
+    },
+    {
+      "capability_status": "gap",
+      "category": "comments",
+      "checker_id": null,
+      "language": "shell",
+      "legacy_status": "stable",
+      "next_action": null,
+      "reason": "native_adapter_not_integrated",
+      "status": "not_integrated"
+    },
+    {
+      "capability_status": "gap",
+      "category": "dependencies",
+      "checker_id": null,
+      "language": "shell",
+      "legacy_status": "stable",
+      "next_action": null,
+      "reason": "native_adapter_not_integrated",
+      "status": "not_integrated"
+    },
+    {
+      "capability_status": "gap",
+      "category": "cve",
+      "checker_id": null,
+      "language": "shell",
+      "legacy_status": "stable",
+      "next_action": null,
+      "reason": "native_adapter_not_integrated",
+      "status": "not_integrated"
+    },
+    {
+      "capability_status": "gap",
+      "category": "security",
+      "checker_id": null,
+      "language": "shell",
+      "legacy_status": "stable",
+      "next_action": null,
+      "reason": "native_adapter_not_integrated",
+      "status": "not_integrated"
+    },
+    {
+      "capability_status": "gap",
+      "category": "build",
+      "checker_id": null,
+      "language": "shell",
+      "legacy_status": "stable",
+      "next_action": null,
+      "reason": "native_adapter_not_integrated",
+      "status": "not_integrated"
+    }
+  ],
+  "command_status": "incomplete",
+  "delivery_decision": "not_evaluated",
+  "discovery": {
+    "blocked_paths": [],
+    "build_roots": [],
+    "checker_configurations": [],
+    "declared_versions": {},
+    "languages": [
+      {
+        "id": "shell",
+        "manifests": [],
+        "source_files": [
+          "a.sh",
+          "b.sh"
+        ]
+      }
+    ],
+    "lockfiles": [],
+    "manifest_sha256": {},
+    "native_tool_candidates": [],
+    "observation_complete": true,
+    "observed_entries": 3,
+    "report_type": "discovery",
+    "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-shell-project-gxd2e9dj",
+    "schema_version": "0.4.0",
+    "scope_summary": {
+      "configuration_exception_files_observed": 0,
+      "dependency_roots_excluded": 0,
+      "dot_prefix_roots_excluded": 1,
+      "git_safety_status": "not_evaluated",
+      "ordinary_scan_policy": "project_sources_default_v2"
+    },
+    "source_set_candidates": [],
+    "unknown_conditions": [
+      "source_sets_not_fully_classified",
+      "dialects_not_classified"
+    ]
+  },
+  "execution_budget": {
+    "enforcement": "native_execution_only",
+    "jobs_limit": 4,
+    "jobs_source": "builtin_default",
+    "native_task_count": 1,
+    "source": "cli",
+    "started_native_task_count": 0,
+    "timeout_ms": 30000
+  },
+  "execution_tasks": [
+    {
+      "id": "shell.lint",
+      "status": "native_incomplete"
+    }
+  ],
+  "exit_code": 3,
+  "export": {
+    "reason_code": null,
+    "status": "not_requested"
+  },
+  "native_results": {
+    "erlang_lint": null,
+    "go_lint": null,
+    "java_cve": null,
+    "java_dependencies": null,
+    "java_javadoc": null,
+    "java_p3c": null,
+    "kotlin_lint": null,
+    "node_lint": null,
+    "npm_cve": [],
+    "python_cve": [],
+    "python_lint": null,
+    "ruby_lint": null,
+    "rust_build": null,
+    "rust_comments": null,
+    "rust_cve": null,
+    "rust_lint": null,
+    "shell_lint": {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "files": [
+        {
+          "dialect": "bash",
+          "input_stable": true,
+          "native": {
+            "configuration_mode": "not_applied",
+            "diagnostics": [],
+            "environment_codes": [],
+            "reason": "shellcheck_tool_not_found",
+            "report_valid": false,
+            "status": "incomplete",
+            "tool_sha256": null,
+            "version": null
+          },
+          "path": "a.sh",
+          "project_configuration": {
+            "global_configuration": "not_loaded",
+            "reason": null,
+            "sha256": null,
+            "source_path": null,
+            "status": "missing"
+          },
+          "schema_version": "0.2.0",
+          "source_sha256": "00400e6bf65ec46ff1d85a7494ac3f11a3ca09d56c5e0792941ff5ba67908968",
+          "task_workflow_status": "partial",
+          "workbench": {
+            "reason": null,
+            "run_id": "shellcheck-1791223564343199000-32162-0",
+            "status": "synced_partial",
+            "sync": {
+              "already_consumed_reports": 6,
+              "historical_findings": 0,
+              "imported_reports": 1,
+              "new_blockers": 1,
+              "new_findings": 0
+            },
+            "task_ids": [
+              "CG-B-3add5d8e193bc92b1df4259f34c7b19a"
+            ],
+            "workspace_id": "ws-994725cd9833fc71f618aa58a4d3cf1d"
+          }
+        },
+        {
+          "dialect": "bash",
+          "input_stable": true,
+          "native": {
+            "configuration_mode": "not_applied",
+            "diagnostics": [],
+            "environment_codes": [],
+            "reason": "shellcheck_tool_not_found",
+            "report_valid": false,
+            "status": "incomplete",
+            "tool_sha256": null,
+            "version": null
+          },
+          "path": "b.sh",
+          "project_configuration": {
+            "global_configuration": "not_loaded",
+            "reason": null,
+            "sha256": null,
+            "source_path": null,
+            "status": "missing"
+          },
+          "schema_version": "0.2.0",
+          "source_sha256": "00400e6bf65ec46ff1d85a7494ac3f11a3ca09d56c5e0792941ff5ba67908968",
+          "task_workflow_status": "partial",
+          "workbench": {
+            "reason": null,
+            "run_id": "shellcheck-1791223564392937000-32162-1",
+            "status": "synced_partial",
+            "sync": {
+              "already_consumed_reports": 7,
+              "historical_findings": 0,
+              "imported_reports": 1,
+              "new_blockers": 1,
+              "new_findings": 0
+            },
+            "task_ids": [
+              "CG-B-8b4c4cf8686268be3793e3683f6f47ee"
+            ],
+            "workspace_id": "ws-994725cd9833fc71f618aa58a4d3cf1d"
+          }
+        }
+      ],
+      "local_check_complete": false,
+      "native_task_started": false,
+      "report_type": "shell_native_scan",
+      "schema_version": "0.1.0",
+      "scope": "bounded_discovered_shell_files",
+      "scope_stable": true,
+      "source_file_count": 2,
+      "task_status": "synced_partial",
+      "tool_selection": {
+        "executable": null,
+        "resolved": null,
+        "source": "not_found"
+      },
+      "unobserved_count": 0
+    },
+    "swift_lint": null,
+    "zig_lint": null
+  },
+  "next": {
+    "authority": "local_unverified",
+    "command_status": "complete",
+    "delivery_decision": "not_evaluated",
+    "disposition": "actionable",
+    "exit_code": 0,
+    "next_actions": [],
+    "operation": "next",
+    "reason": "local_task_selected",
+    "repair_brief": {
+      "action_id": "restore-checker-environment",
+      "affected_paths": [
+        "a.sh"
+      ],
+      "authority": "local_unverified",
+      "build_root": ".",
+      "checker_id": "shell.shellcheck",
+      "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+      "constraints": [
+        "先恢复检查完整性",
+        "不得关闭检查器或修改无关源码"
+      ],
+      "disposition": "actionable",
+      "evidence_ref": {
+        "first_report_sha256": "1fe6ce26cc637752bec2ab9d8bb55a11072f46d192fba411e33599d48c43c9db",
+        "first_run_id": "shellcheck-1791223564343199000-32162-0"
+      },
+      "history": {
+        "attempt_count": 0,
+        "awaiting_verification": false,
+        "budget": 2,
+        "no_progress_count": 0,
+        "open_attempt_id": null,
+        "recent": []
+      },
+      "kind": "blocker",
+      "reason_code": "shell_check_incomplete",
+      "recheck_argv": [
+        "codeguard",
+        "task",
+        "verify",
+        "CG-B-3add5d8e193bc92b1df4259f34c7b19a",
+        "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-shell-project-gxd2e9dj",
+        "--shellcheck-tool",
+        "<已核验的绝对路径>",
+        "--format=json"
+      ],
+      "schema_version": "0.17.0",
+      "scope": "a.sh",
+      "step": "核对原报告的ShellCheck版本、方言、source依赖和rc；先恢复检查能力，不修改无关源码。后续原生零诊断和配置抑制不能关闭此任务。",
+      "task_id": "CG-B-3add5d8e193bc92b1df4259f34c7b19a"
+    },
+    "report_type": "repair_brief_preview",
+    "schema_version": "0.17.0"
+  },
+  "obligation_status": "unresolved",
+  "operation": "check",
+  "reason": "language_selection_obligations_and_trusted_policy_unavailable",
+  "report_type": "check_feedback",
+  "required_obligations": null,
+  "schema_version": "0.52.0",
+  "selection": "shell",
+  "syntax_candidates": {
+    "authority": "candidate_unqualified",
+    "delivery_decision": "incomplete",
+    "execution_phase": "after_native",
+    "native_preferred_count": 0,
+    "next_action": "使用包含固定语法资产的发行包运行候选初检，并完成适用原生检查",
+    "observations": [],
+    "reason": "binary_without_wasm_precheck",
+    "skipped_count": 0,
+    "source_file_count": 2,
+    "status": "not_run",
+    "unrouted_count": 0
+  },
+  "syntax_tasks": {
+    "failures": [],
+    "new_blockers": 0,
+    "status": "synced_partial",
+    "tasks": []
+  },
+  "unresolved_conditions": [
+    "dialects_not_classified",
+    "required_obligations_unresolved",
+    "shell_native_scan_incomplete",
+    "shell_project_obligations_and_source_coverage_unverified",
+    "source_sets_not_fully_classified",
+    "tool_lock_unverified",
+    "trusted_policy_unavailable"
+  ]
+}

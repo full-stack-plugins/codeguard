@@ -1,0 +1,71 @@
+{
+  "$schema": "https://docs.oasis-open.org/sarif/sarif/v2.1.0/os/schemas/sarif-schema-2.1.0.json",
+  "runs": [
+    {
+      "invocations": [
+        {
+          "executionSuccessful": false,
+          "toolExecutionNotifications": [
+            {
+              "level": "error",
+              "message": {
+                "text": "CodeGuard has not completed a trusted project check; inspect the structured report and private evidence."
+              }
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "codeguardCommandStatus": "incomplete",
+        "codeguardDeliveryDecision": "not_evaluated",
+        "codeguardExitCode": 3,
+        "codeguardExportReason": null,
+        "codeguardExportStatus": "not_requested",
+        "codeguardObligationStatus": "unresolved",
+        "codeguardReportType": "check_feedback",
+        "codeguardSourceTrust": "local_unverified",
+        "locationsVisibility": "private_evidence_only",
+        "nativeFindingCount": 2
+      },
+      "results": [
+        {
+          "level": "warning",
+          "message": {
+            "text": "CodeGuard observed a native diagnostic; project attribution and policy coverage remain unverified."
+          },
+          "partialFingerprints": {
+            "codeguardFindingId": "66cf4583a81d214bb51f27e39d7fd8a71512bf361b68b043cd69377b0eb92dad"
+          },
+          "properties": {
+            "codeguardFingerprintStability": "current_run_only",
+            "codeguardObservation": "native_finding_unverified",
+            "nativeMessageVisibility": "private_evidence_only"
+          },
+          "ruleId": "CG-NATIVE-de15c94b026cef93"
+        },
+        {
+          "level": "warning",
+          "message": {
+            "text": "CodeGuard observed a native diagnostic; project attribution and policy coverage remain unverified."
+          },
+          "partialFingerprints": {
+            "codeguardFindingId": "9ec250b34fe0135eefe60ebb073f7d1ab2ab6138705079f678ebbdb246508cef"
+          },
+          "properties": {
+            "codeguardFingerprintStability": "current_run_only",
+            "codeguardObservation": "native_finding_unverified",
+            "nativeMessageVisibility": "private_evidence_only"
+          },
+          "ruleId": "CG-NATIVE-de15c94b026cef93"
+        }
+      ],
+      "tool": {
+        "driver": {
+          "name": "CodeGuard",
+          "version": "0.1.4"
+        }
+      }
+    }
+  ],
+  "version": "2.1.0"
+}

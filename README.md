@@ -701,3 +701,24 @@ The stable unit is a workspace-relative file, explicit dialect and native SC rul
 `next` supplies 0.17.0 Shell guidance and `task show` supplies 0.3.0. Both preserve the Shell tool parameter in task verify argv bound to the task ID and absolute workspace. The initial report binds dialect and explicit rc; the tool entry must be revalidated. Source or original rc changes withdraw direct repair instructions and require a native rescan. Suppression, synchronization and zero diagnostics cannot close existing tasks. Shell-specific `task verify CG-… . --shellcheck-tool /absolute/shellcheck --format json` now provides a 0.24.0 local recheck through existing leases and failed-attempt history, binding the initial dialect, explicit rc and SC rule group. Outcomes distinguish still_present, rule_coverage_requires_review after a configuration change, suppression_requires_review for a possible disable comment, and candidate_absent_unverified_policy after a clean repair. Comment observation does not prove effective suppression. Trusted closure, recurrence and project-wide coverage remain unaccepted under 7.4. Editing or deleting Markdown cannot remove persisted facts.
 
 Shell attempts use task claim/attempt/verify. Two unchanged attempts with the original rule still present yield needs_decision and reject a third same-action attempt; the finding remains. Existing Markdown is preserved; task show/next provide current guidance. See [acceptance evidence](tests/acceptance/shellcheck-task-recheck-baseline.md).
+
+## Native checks over discovered project Shell files
+
+`codeguard check shell . --shellcheck-tool /absolute/shellcheck --format json` and `check all` now run ShellCheck 0.11.0 over discovered Shell files under one deadline. Feedback 0.52.0 exposes `native_results.shell_lint`, a 0.1.0 shell_native_scan with per-file source hashes, dialects, original rc, native SC rules/scalar positions, input stability and workbench status. Human output shows native positions; SARIF projects current observations while keeping locations and native messages private.
+
+Shebangs and explicit filename conventions supply dialect evidence. `--shell-dialect bash` supplies a default for undeclared files and cannot override zsh/fish declarations. Unknown or unsupported dialects stay incomplete; next requests a concrete dialect/checker decision rather than repeating an unsuitable installation. At most 64 files are checked; unobserved_count exposes overflow. local_check_complete describes these isolated native observations and proves no project source-dependency, category or policy coverage.
+
+An initialized scan binds its requested root despite nested workbenches; an uninitialized scan creates no workspace. Repeated file/dialect/SC rule observations update stable tasks. Configuration or environment failures remain blockers. Source, scope, rc or tool changes withdraw current location authority. No Shell WASM fallback is fabricated. check shell still returns 3/not_evaluated, and check all remains incomplete. Security, CVE, sourced dependencies, trusted closure/recurrence, dedicated zsh/fish tools, Dockerfile/IaC and platform acceptance remain open.
+
+```mermaid
+flowchart LR
+    A[Discovered Shell files] --> B[Per-file dialect and rc]
+    B --> C[Native ShellCheck and shared deadline]
+    C --> D[Recheck source scope config and tool]
+    D --> E[Stable tasks bound to requested root]
+    E --> F[next and task verify]
+    C --> G[Per-file diagnostics and blockers]
+    G --> H[Partial human JSON and SARIF feedback]
+```
+
+See [project Shell acceptance](tests/acceptance/shellcheck-project-baseline.md).
