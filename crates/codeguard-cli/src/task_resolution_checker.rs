@@ -1,5 +1,5 @@
 use serde_json::{Value, json};
-use std::{path::Path, time::Instant};
+use std::{path::Path, sync::atomic::AtomicBool, time::Instant};
 
 /// 限定任务服务支持的原生语法检查器；语言与协议由宿主入口固定，不读项目自选类型。
 #[derive(Clone, Copy)]
@@ -69,12 +69,23 @@ impl TaskResolutionChecker {
         root: &Path,
         deadline: Instant,
     ) -> Value {
+        self.observe_with_cancellation(tool, source, root, deadline, &AtomicBool::new(false))
+    }
+    /// 传递同一请求取消令牌，不在原生观察器中创建独立令牌。
+    pub(crate) fn observe_with_cancellation(
+        self,
+        tool: &Path,
+        source: &[u8],
+        root: &Path,
+        deadline: Instant,
+        cancelled: &AtomicBool,
+    ) -> Value {
         match self {
-            Self::Zig => crate::zig_syntax_probe::observe(tool, source, root, deadline)
+            Self::Zig => crate::zig_syntax_probe::observe_with_cancellation(tool, source, root, deadline, cancelled)
                 .unwrap_or_else(|| json!({"status":"not_run","reason":"zig_tool_unavailable_or_untrusted","version":null,"tool_sha256":null,"diagnostics":[]})),
-            Self::Erlang => crate::erlang_syntax_probe::observe(tool, source, deadline),
-            Self::Swift => crate::swift_syntax_probe::observe(tool, source, deadline),
-            Self::Kotlin => crate::kotlin_lint_command::observe(tool, source, deadline),
+            Self::Erlang => crate::erlang_syntax_probe::observe_with_cancellation(tool, source, deadline, cancelled),
+            Self::Swift => crate::swift_syntax_probe::observe_with_cancellation(tool, source, deadline, cancelled),
+            Self::Kotlin => crate::kotlin_lint_command::observe_with_cancellation(tool, source, deadline, cancelled),
         }
     }
     /// 核对原反例完成状态及位置；Kotlin 同时验证 UTF-16 列与 UTF-8 字节列。

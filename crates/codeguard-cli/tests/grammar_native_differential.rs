@@ -154,7 +154,7 @@ fn actual_python_syntax_corpus_keeps_non_syntax_lint_out_of_comparison() {
     }
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
     fs::write(
-        root.join("tests/acceptance/evidence/python-native-structure-differential-node-extension-2026-10-05.json"),
+        root.join("tests/acceptance/evidence/python-native-structure-differential-cancellation-2026-10-05.json"),
         serde_json::to_vec(&report).unwrap(),
     )
     .unwrap();
@@ -440,4 +440,86 @@ fn python_structure_measurement_preserves_raw_false_negatives_and_unknowns() {
         assert_eq!(row["combined_candidate_comparison"], "unknown");
     }
     fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+fn in_flight_native_cancellation_preserves_unknown_sample_and_denominator() {
+    use std::{
+        fs,
+        os::unix::fs::PermissionsExt,
+        sync::{Arc, atomic::Ordering},
+        thread,
+        time::Duration,
+    };
+    let root = std::env::temp_dir()
+        .canonicalize()
+        .unwrap()
+        .join(format!("cg-native-replay-cancel-{}", std::process::id()));
+    fs::create_dir(&root).unwrap();
+    let tool = root.join("ruff");
+    fs::write(&tool,"#!/bin/sh\nif [ \"$1\" = --version ]; then printf 'ruff 0.16.8\\n'; exit 0; fi\nprintf started > \"$0.started\"\nexec /bin/sleep 2\n").unwrap();
+    fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
+    let mut corpus: serde_json::Value = serde_json::from_slice(&current_corpus_bytes()).unwrap();
+    let mut selected = false;
+    corpus["cases"].as_array_mut().unwrap().retain(|row| {
+        if row["language"] != "python" {
+            return true;
+        }
+        if selected {
+            return false;
+        }
+        selected = true;
+        true
+    });
+    assert!(selected);
+    let bytes = serde_json::to_vec(&corpus).unwrap();
+    let cancelled = Arc::new(AtomicBool::new(false));
+    let trigger = Arc::clone(&cancelled);
+    let marker = tool.with_extension("started");
+    let watcher = thread::spawn(move || {
+        let end = Instant::now() + Duration::from_secs(5);
+        while !marker.exists() && Instant::now() < end {
+            thread::sleep(Duration::from_millis(5));
+        }
+        let started = marker.exists();
+        trigger.store(true, Ordering::Relaxed);
+        started
+    });
+    let report = replay_native_corpus(
+        &PathBuf::from(env!("CARGO_BIN_EXE_codeguard")),
+        &bytes,
+        &BTreeMap::from([("python".into(), tool)]),
+        Instant::now() + Duration::from_secs(10),
+        &cancelled,
+    )
+    .unwrap();
+    assert!(watcher.join().unwrap());
+    fs::remove_dir_all(root).unwrap();
+    assert_eq!(report["sample_count"], 1);
+    assert_eq!(report["language_count"], 32);
+    assert_eq!(report["cases"][0]["native_attempted"], true);
+    assert_eq!(report["cases"][0]["native"]["status"], "incomplete");
+    assert_eq!(
+        report["cases"][0]["native"]["reason"],
+        "python_syntax_execution_incomplete"
+    );
+    for field in [
+        "native_classification",
+        "wasm_classification",
+        "comparison",
+        "combined_candidate_classification",
+        "combined_candidate_comparison",
+    ] {
+        assert_eq!(report["cases"][0][field], "unknown");
+    }
+    let py = report["languages"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["language"] == "python")
+        .unwrap();
+    assert_eq!(py["compared_count"], 0);
+    assert_eq!(py["combined_candidate"]["unknown_count"], 1);
+    assert_eq!(report["grammar_qualified_count"], 0);
+    assert_eq!(report["delivery_decision"], "not_evaluated");
 }

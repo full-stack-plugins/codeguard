@@ -45,6 +45,16 @@ halt().
 /// 调用显式原生工具并核对返回位置、工具前后摘要和共享预算。
 /// 参数为 erl 工具、本轮 UTF-8 字节和绝对截止时间；固定 cwd 不加载项目模块。
 pub(crate) fn observe(tool: &Path, source: &[u8], deadline: Instant) -> Value {
+    observe_with_cancellation(tool, source, deadline, &AtomicBool::new(false))
+}
+
+/// 使用调用方取消令牌观察同一冻结输入；版本探测与源码检查共用令牌和截止时间。
+pub(crate) fn observe_with_cancellation(
+    tool: &Path,
+    source: &[u8],
+    deadline: Instant,
+    cancelled: &AtomicBool,
+) -> Value {
     let mut report = json!({
         "status":"incomplete", "reason":"erlang_tool_unavailable_or_untrusted",
         "version":null, "tool_sha256":null, "diagnostics":[],
@@ -61,7 +71,6 @@ pub(crate) fn observe(tool: &Path, source: &[u8], deadline: Instant) -> Value {
     };
     let tool_sha = format!("{:x}", Sha256::digest(bytes));
     report["tool_sha256"] = json!(tool_sha);
-    let cancelled = AtomicBool::new(false);
     let invoke = |eval: &str, stdin| {
         run_process(
             &ProcessSpec {
@@ -84,7 +93,7 @@ pub(crate) fn observe(tool: &Path, source: &[u8], deadline: Instant) -> Value {
                 deadline,
                 output_limit_bytes: 64 * 1024,
             },
-            &cancelled,
+            cancelled,
         )
     };
     let version = invoke(

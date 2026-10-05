@@ -140,3 +140,5 @@ Python隔离原生探针现于版本探测后、检查前核验请求入口与�
 
 
 开发导入器默认严格核对当前清单；历史输入必须显式提供 `--base-manifest` 且摘要与原输入匹配，不自动寻找历史清单。输出只写 stdout，生成新的当前绑定语料，不覆盖历史文件；现有全部样本、源码与来源通过逐项回归核对，不能用原历史文件做字节 `cmp`，因为清单身份已改变。缺失或错误清单在读取追加输入前拒绝，最终输出仍接受当前生产校验。见[全工作区验收与导入器修复](../tests/acceptance/workspace-regression-importer-binding.md)。
+
+原生开发差分现把同一取消令牌传入Zig、Erlang、Swift、Kotlin、Python、JavaScript观察器的版本和源码阶段；执行中取消保留样本与unknown，不改变grammar资格。同步摘要I/O仍无硬中断保障；见[取消验收](../tests/acceptance/native-differential-shared-cancellation.md)。

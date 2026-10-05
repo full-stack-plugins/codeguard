@@ -624,3 +624,7 @@ Ruff正常与忽略noqa的检查若返回相同的invalid-syntax错误，Codegua
 #### Scenario: Explicit JavaScript native differential is cancelled while checking
 - **WHEN** 版本已核验且原生语法检查正在执行时请求取消
 - **THEN** Node 观察使用同一取消令牌终止进程组，保留样本与 unknown 比较，不等待工具自行完成或将取消视为合法源码
+
+#### Scenario: Every selected native differential shares in-flight cancellation
+- **WHEN** 对已支持的Zig/Erlang/Swift/Kotlin/Python/JavaScript显式原生差分，在版本探测或源码检查实际启动后取消
+- **THEN** 观察器必须传递同一个请求令牌至runtime，停止当前进程组且不启动后继调用；保持样本、真实失败和unknown比较，不将工具自行退出当作取消完成

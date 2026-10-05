@@ -1414,3 +1414,5 @@ Python 语法确认任务的当前原生观察为 `still_present` 且未因源�
 ### grammar 限制的有界输出
 
 聚合 human 每个候选最多三条限制、每条512字符、最多八项候选。Claude 摘要从本程序固定元数据选择最后追加的限制，每语言180字符、最多两种语言、重复归并；不取用户源码、路径或报告任意字符串。该投影不增加 worker 执行。1200字符总预算为末尾未验收/未评估说明预留空间。报告版本、发现、任务及门禁不变，见[验收](../tests/acceptance/grammar-limitation-conversation-feedback.md)。
+
+原生开发差分现把同一取消令牌传入Zig、Erlang、Swift、Kotlin、Python、JavaScript观察器的版本和源码阶段；执行中取消保留样本与unknown，不改变grammar资格。同步摘要I/O仍无硬中断保障；见[取消验收](../tests/acceptance/native-differential-shared-cancellation.md)。

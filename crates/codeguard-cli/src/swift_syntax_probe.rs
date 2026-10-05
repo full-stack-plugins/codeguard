@@ -9,6 +9,16 @@ use std::{
 /// 核对调用方编译器并解析冻结的 UTF-8 stdin；返回有界错误位置或具体未完成原因。
 /// 参数为绝对工具路径、源字节和共同截止时间；返回值不证明项目覆盖或交付许可。
 pub(crate) fn observe(tool: &Path, source: &[u8], deadline: Instant) -> Value {
+    observe_with_cancellation(tool, source, deadline, &AtomicBool::new(false))
+}
+
+/// 使用调用方取消令牌观察同一冻结输入；版本探测与源码检查共用令牌和截止时间。
+pub(crate) fn observe_with_cancellation(
+    tool: &Path,
+    source: &[u8],
+    deadline: Instant,
+    cancelled: &AtomicBool,
+) -> Value {
     let mut report = json!({"status":"incomplete","reason":"swift_tool_unavailable_or_untrusted","version":null,"tool_sha256":null,"diagnostics":[]});
     if !tool.is_absolute() || std::str::from_utf8(source).is_err() {
         return report;
@@ -21,7 +31,6 @@ pub(crate) fn observe(tool: &Path, source: &[u8], deadline: Instant) -> Value {
     };
     let sha = digest(&bytes);
     report["tool_sha256"] = json!(sha);
-    let cancelled = AtomicBool::new(false);
     let invoke = |args: &[&str], stdin| {
         run_process(
             &ProcessSpec {
@@ -33,7 +42,7 @@ pub(crate) fn observe(tool: &Path, source: &[u8], deadline: Instant) -> Value {
                 deadline,
                 output_limit_bytes: 64 * 1024,
             },
-            &cancelled,
+            cancelled,
         )
     };
     let version = invoke(&["--version"], None);

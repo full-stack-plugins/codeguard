@@ -173,6 +173,16 @@ pub(crate) fn unavailable(reason: &str) -> Value {
     json!({"status":"incomplete","reason":reason,"version":null,"tool_sha256":null,"tool_identity_scope":"launcher_only","diagnostics":[],"context_diagnostics":[]})
 }
 pub(crate) fn observe(tool: &std::path::Path, source: &[u8], deadline: Instant) -> Value {
+    observe_with_cancellation(tool, source, deadline, &AtomicBool::new(false))
+}
+
+/// 使用调用方取消令牌观察同一冻结输入；版本探测与源码检查共用令牌和截止时间。
+pub(crate) fn observe_with_cancellation(
+    tool: &std::path::Path,
+    source: &[u8],
+    deadline: Instant,
+    cancelled: &AtomicBool,
+) -> Value {
     let mut report = unavailable("kotlin_tool_unavailable_or_untrusted");
     let Ok(executable) = tool.canonicalize() else {
         return report;
@@ -208,7 +218,6 @@ pub(crate) fn observe(tool: &std::path::Path, source: &[u8], deadline: Instant) 
     {
         env.insert(OsString::from("JAVA_HOME"), home.into_os_string());
     }
-    let cancelled = AtomicBool::new(false);
     let invoke = |args| {
         run_process(
             &ProcessSpec {
@@ -220,7 +229,7 @@ pub(crate) fn observe(tool: &std::path::Path, source: &[u8], deadline: Instant) 
                 deadline,
                 output_limit_bytes: 64 * 1024,
             },
-            &cancelled,
+            cancelled,
         )
     };
     let version = invoke(vec![OsString::from("-version")]);

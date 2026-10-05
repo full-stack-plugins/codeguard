@@ -8,6 +8,17 @@ use std::{
 
 /// 用已提供工具检查指定原字节；参数含受控 cwd 与共享 deadline，返回有界原生观察。
 pub(crate) fn observe(tool: &Path, source: &[u8], cwd: &Path, deadline: Instant) -> Option<Value> {
+    observe_with_cancellation(tool, source, cwd, deadline, &AtomicBool::new(false))
+}
+
+/// 使用调用方取消令牌观察同一冻结输入；版本探测与源码检查共用令牌和截止时间。
+pub(crate) fn observe_with_cancellation(
+    tool: &Path,
+    source: &[u8],
+    cwd: &Path,
+    deadline: Instant,
+    cancelled: &AtomicBool,
+) -> Option<Value> {
     if !tool.is_absolute() {
         return None;
     }
@@ -19,7 +30,6 @@ pub(crate) fn observe(tool: &Path, source: &[u8], cwd: &Path, deadline: Instant)
         "{:x}",
         Sha256::digest(read_bounded_regular_file(&executable, 64 * 1024 * 1024).ok()?)
     );
-    let cancelled = AtomicBool::new(false);
     let version = run_process(
         &ProcessSpec {
             executable: executable.clone(),
@@ -30,7 +40,7 @@ pub(crate) fn observe(tool: &Path, source: &[u8], cwd: &Path, deadline: Instant)
             deadline,
             output_limit_bytes: 1024,
         },
-        &cancelled,
+        cancelled,
     );
     if version.termination != Termination::Exited(0)
         || std::str::from_utf8(&version.stdout).ok()?.trim() != "0.16.0"
@@ -53,7 +63,7 @@ pub(crate) fn observe(tool: &Path, source: &[u8], cwd: &Path, deadline: Instant)
             deadline,
             output_limit_bytes: 64 * 1024,
         },
-        &cancelled,
+        cancelled,
     );
     let current_tool_sha256 = read_bounded_regular_file(&executable, 64 * 1024 * 1024)
         .ok()

@@ -1413,3 +1413,5 @@ Project discovery and WASM candidate routing include `.R`/`.r` and C++ `.C`/`.cp
 ### Bounded grammar limitation output
 
 Aggregate human output includes at most three limitations per candidate, 512 characters each, for eight candidates. Claude takes the last appended limitation from pinned metadata, at most 180 characters for each of two deduplicated languages. It does not use user source, paths or arbitrary report text, and adds no worker invocation. The 1200-character context budget reserves space for the final unqualified/unevaluated boundary. Report versions, findings, tasks and gates remain unchanged. See [acceptance](../tests/acceptance/grammar-limitation-conversation-feedback.md).
+
+The native development differential now passes the same request cancellation token through version and source phases for Zig, Erlang, Swift, Kotlin, Python and JavaScript. In-flight cancellation retains samples and unknown comparisons without granting grammar qualification; synchronous digest I/O still has no hard interruption guarantee. See [cancellation acceptance](../tests/acceptance/native-differential-shared-cancellation.md).

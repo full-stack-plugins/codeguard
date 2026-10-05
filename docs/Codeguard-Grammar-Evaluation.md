@@ -128,3 +128,5 @@ Native differential replay follows the same history/current identity boundary: v
 
 
 The developer importer validates current identity by default. Historical input requires an explicit matching `--base-manifest`; it never searches for historical metadata automatically. It writes new current-bound input to stdout, preserving historical files. Regression checks retain every sample, source and origin; a byte-level `cmp` against the historical file is inappropriate because manifest identity changes. Missing or wrong manifests fail before additional input is read, and final output still passes current validation. See [workspace acceptance and importer repair](../tests/acceptance/workspace-regression-importer-binding.md).
+
+The native development differential now passes the same request cancellation token through version and source phases for Zig, Erlang, Swift, Kotlin, Python and JavaScript. In-flight cancellation retains samples and unknown comparisons without granting grammar qualification; synchronous digest I/O still has no hard interruption guarantee. See [cancellation acceptance](../tests/acceptance/native-differential-shared-cancellation.md).

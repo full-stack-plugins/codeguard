@@ -31,7 +31,7 @@ pub fn classify_native(native: &Value) -> Option<bool> {
 
 /// 在完整固定语料中回放显式选中的原生工具及对应 WASM；未选语言保留在库存。
 /// 参数为固定程序、语料字节、语言到绝对工具路径、总截止时间和取消标记。
-/// 返回脱敏差分报告；只在样本准入时检查取消，不能声称原生运行中即时取消。
+/// 返回脱敏差分报告；原生进程和WASM worker共用请求取消令牌，文件摘要I/O仍无硬中断保障。
 pub fn replay_native_corpus(
     executable: &Path,
     corpus_bytes: &[u8],

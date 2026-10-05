@@ -254,13 +254,13 @@ fn pinned_javascript_worker_matches_native_node_check_on_syntax_corpus() {
     use sha2::Digest;
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
     fs::write(
-        root.join("tests/acceptance/evidence/javascript-native-grammar-input-2026-10-05.json"),
+        root.join("tests/acceptance/evidence/javascript-native-grammar-input-cancellation-2026-10-05.json"),
         &bytes,
     )
     .unwrap();
     fs::write(
         root.join(
-            "tests/acceptance/evidence/javascript-native-grammar-differential-2026-10-05.json",
+            "tests/acceptance/evidence/javascript-native-grammar-differential-cancellation-2026-10-05.json",
         ),
         serde_json::to_vec(&report).unwrap(),
     )

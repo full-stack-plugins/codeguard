@@ -51,10 +51,94 @@ impl GrammarNativeChecker {
         cancelled: &AtomicBool,
     ) -> Value {
         match self {
-            Self::Existing(checker) => checker.observe(tool, source, root, deadline),
-            Self::Python => crate::python_syntax_probe::observe(tool, source, deadline),
+            Self::Existing(checker) => {
+                checker.observe_with_cancellation(tool, source, root, deadline, cancelled)
+            }
+            Self::Python => crate::python_syntax_probe::observe(tool, source, deadline, cancelled),
             Self::Javascript => {
                 crate::javascript_syntax_probe::observe(tool, source, deadline, cancelled)
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::GrammarNativeChecker;
+    use std::{
+        fs,
+        os::unix::fs::PermissionsExt,
+        sync::{
+            Arc,
+            atomic::{AtomicBool, Ordering},
+        },
+        thread,
+        time::{Duration, Instant},
+    };
+
+    #[test]
+    fn every_native_observer_cancels_version_and_scan_in_flight() {
+        for language in ["zig", "erlang", "swift", "kotlin", "python", "javascript"] {
+            for phase in ["version", "scan"] {
+                let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
+                    "cg-native-cancel-{}-{language}-{phase}",
+                    std::process::id()
+                ));
+                fs::create_dir(&root).unwrap();
+                let tool = root.join("tool");
+                let version = match language {
+                    "zig" => "printf '0.16.0\\n'",
+                    "erlang" => "printf 'OTP 28\\n'",
+                    "swift" => "printf 'Apple Swift version 6.4 (fixture)\\n'",
+                    "kotlin" => "printf 'info: kotlinc-jvm 2.4.10 (JRE fixture)\\n' >&2",
+                    "python" => "printf 'ruff 0.16.8\\n'",
+                    _ => "printf 'v24.18.0\\n'",
+                };
+                let block = "printf started > \"$0.started\"; exec /bin/sleep 2";
+                let version_body = if phase == "version" { block } else { version };
+                let script = format!(
+                    "#!/bin/sh\ncase \"$*\" in version|--version|-version|*system_info*) {version_body}; exit 0;; esac\n{block}\n"
+                );
+                fs::write(&tool, script).unwrap();
+                fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
+                let cancelled = Arc::new(AtomicBool::new(false));
+                let trigger = Arc::clone(&cancelled);
+                let marker = tool.with_extension("started");
+                let watcher = thread::spawn(move || {
+                    let deadline = Instant::now() + Duration::from_secs(4);
+                    while !marker.exists() && Instant::now() < deadline {
+                        thread::sleep(Duration::from_millis(5));
+                    }
+                    let started = marker.exists();
+                    trigger.store(true, Ordering::Relaxed);
+                    started
+                });
+                let started = Instant::now();
+                let report = GrammarNativeChecker::for_language(language)
+                    .unwrap()
+                    .observe(
+                        &tool,
+                        b"x\n",
+                        &root,
+                        started + Duration::from_secs(5),
+                        &cancelled,
+                    );
+                let actual_start = watcher.join().unwrap();
+                let elapsed = started.elapsed();
+                fs::remove_dir_all(root).unwrap();
+                assert!(actual_start, "{language}/{phase}: 原生调用必须实际启动");
+                assert_eq!(
+                    report["status"], "incomplete",
+                    "{language}/{phase}: {report}"
+                );
+                assert!(
+                    elapsed < Duration::from_secs(1),
+                    "{language}/{phase}: 不能等待工具自行完成，耗时{elapsed:?}"
+                );
+                assert!(
+                    report["diagnostics"].as_array().unwrap().is_empty(),
+                    "取消不能伪造语法发现"
+                );
             }
         }
     }

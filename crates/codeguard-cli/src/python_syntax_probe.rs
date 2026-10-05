@@ -10,20 +10,32 @@ use std::{
 /// 返回固定 Ruff 0.16.8 / Python 3.12 的局部语法观察。
 /// 参数为绝对工具路径、源码字节和总截止时间；没有项目、规则或交付授权。
 #[cfg(any(feature = "wasm-precheck", test))]
-pub(crate) fn observe(tool: &Path, source: &[u8], deadline: Instant) -> Value {
-    observe_for_target(tool, source, "py312", deadline)
+pub(crate) fn observe(
+    tool: &Path,
+    source: &[u8],
+    deadline: Instant,
+    cancelled: &AtomicBool,
+) -> Value {
+    observe_with_context(tool, source, "py312", None, deadline, cancelled)
 }
 
 /// 对冻结源码按明确目标Python版本执行隔离语法检查。
 /// 参数为绝对工具路径、源码、宿主已核对目标及截止时间；返回局部观察，不推断项目目标或批准关闭。
-#[cfg(any(feature = "wasm-precheck", test))]
+#[cfg(test)]
 pub(crate) fn observe_for_target(
     tool: &Path,
     source: &[u8],
     target: &str,
     deadline: Instant,
 ) -> Value {
-    observe_with_context(tool, source, target, None, deadline)
+    observe_with_context(
+        tool,
+        source,
+        target,
+        None,
+        deadline,
+        &AtomicBool::new(false),
+    )
 }
 
 /// 对原始stdin按批准的项目配置与明确目标复检，绝不改写当前源码。
@@ -36,7 +48,14 @@ pub(crate) fn observe_configured(
     path: &Path,
     deadline: Instant,
 ) -> Value {
-    observe_with_context(tool, source, target, Some((config, path)), deadline)
+    observe_with_context(
+        tool,
+        source,
+        target,
+        Some((config, path)),
+        deadline,
+        &AtomicBool::new(false),
+    )
 }
 
 fn observe_with_context(
@@ -45,6 +64,7 @@ fn observe_with_context(
     target: &str,
     context: Option<(&Path, &Path)>,
     deadline: Instant,
+    cancelled: &AtomicBool,
 ) -> Value {
     let mut report = json!({"status":"incomplete","reason":"python_syntax_target_unverified","version":null,"tool_sha256":null,"target_version":null,"diagnostics":[]});
     // 目标作为独立argv使用，版本集合固定于已验收Ruff，不接受自由参数或默认为项目版本。
@@ -78,7 +98,7 @@ fn observe_with_context(
                 deadline,
                 output_limit_bytes: 64 * 1024,
             },
-            &AtomicBool::new(false),
+            cancelled,
         )
     };
     let version = invoke(&["--version"], None);
@@ -366,7 +386,12 @@ mod tests {
             (b"def run():\n".as_slice(), "diagnostics_observed"),
             (b"if True:\npass\n".as_slice(), "diagnostics_observed"),
         ] {
-            let report = super::observe(&tool, source, deadline);
+            let report = super::observe(
+                &tool,
+                source,
+                deadline,
+                &std::sync::atomic::AtomicBool::new(false),
+            );
             assert_eq!(report["status"], expected, "{report}");
             assert_eq!(report["version"], "ruff 0.16.8");
             assert_eq!(report["target_version"], "py312");
@@ -396,7 +421,12 @@ mod tests {
         fs::set_permissions(&original, fs::Permissions::from_mode(0o700)).unwrap();
         let alias = root.join("ruff.original.alias");
         symlink(&original, &alias).unwrap();
-        let report = super::observe(&alias, b"x = 1\n", Instant::now() + Duration::from_secs(5));
+        let report = super::observe(
+            &alias,
+            b"x = 1\n",
+            Instant::now() + Duration::from_secs(5),
+            &std::sync::atomic::AtomicBool::new(false),
+        );
         assert_eq!(report["status"], "incomplete");
         assert_eq!(report["reason"], "python_syntax_tool_changed");
         assert!(!root.join("ruff.original.executed").exists());
@@ -428,7 +458,12 @@ mod tests {
         .unwrap();
         fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
         fs::set_permissions(&replacement, fs::Permissions::from_mode(0o700)).unwrap();
-        let report = super::observe(&tool, b"x = 1\n", Instant::now() + Duration::from_secs(5));
+        let report = super::observe(
+            &tool,
+            b"x = 1\n",
+            Instant::now() + Duration::from_secs(5),
+            &std::sync::atomic::AtomicBool::new(false),
+        );
         assert_eq!(report["status"], "incomplete");
         assert_eq!(report["reason"], "python_syntax_tool_changed");
         assert!(
