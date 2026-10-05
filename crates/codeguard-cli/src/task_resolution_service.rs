@@ -48,6 +48,14 @@ pub fn verify_kotlin_task_resolution(
     verify_task_resolution(request, TaskResolutionChecker::Kotlin)
 }
 
+/// 以签名策略绑定Go与同SDK gofmt，对原反例和当前源码复检并维护同一任务父链。
+/// 参数来自受保护宿主；返回限定任务收据，原生反证和工具变化不能批准关闭。
+pub fn verify_go_task_resolution(
+    request: &crate::GoTaskResolutionRequest<'_>,
+) -> Result<Value, &'static str> {
+    verify_task_resolution(request, TaskResolutionChecker::Go)
+}
+
 fn verify_task_resolution(
     request: &SyntaxTaskResolutionRequest<'_>,
     checker: TaskResolutionChecker,
@@ -80,6 +88,21 @@ fn verify_task_resolution(
     let raw = codeguard_adapters::parse_unique_json(request.policy_bytes)
         .map_err(|_| "task_resolution_policy_invalid")?;
     if raw.get("grammar_sha256").is_none() {
+        return Err("task_resolution_policy_invalid");
+    }
+    let go_policy = matches!(checker, TaskResolutionChecker::Go);
+    let companion_fields = ["gofmt_sha256", "companion_binding_sha256"];
+    if (go_policy
+        && !companion_fields.iter().all(|key| {
+            raw[*key].as_str().is_some_and(|sha| {
+                sha.len() == 64
+                    && sha
+                        .bytes()
+                        .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+            })
+        }))
+        || (!go_policy && companion_fields.iter().any(|key| raw.get(*key).is_some()))
+    {
         return Err("task_resolution_policy_invalid");
     }
     let policy: TaskResolutionPolicyInput =
@@ -123,6 +146,9 @@ fn verify_task_resolution(
         .map_err(|_| "task_resolution_tool_unavailable")?;
     if !request.tool.is_absolute() || tool_hash(&tool)? != policy.tool_sha256 {
         return Err("task_resolution_tool_mismatch");
+    }
+    if go_policy && !go_companion_matches(&tool, &policy) {
+        return Err("task_resolution_companion_mismatch");
     }
     let executable = std::env::current_exe()
         .map_err(|_| "task_resolution_adapter_unavailable")?
@@ -206,7 +232,8 @@ fn execute(
     let inputs_current = crate::plain_syntax_source::read_plain_source(&source_path)
         .is_ok_and(|b| b == current)
         && tool_hash(tool).is_ok_and(|s| s == policy.tool_sha256)
-        && artifact_hash(executable).is_ok_and(|s| s == policy.adapter_sha256);
+        && artifact_hash(executable).is_ok_and(|s| s == policy.adapter_sha256)
+        && (checker.language() != "go" || go_companion_matches(tool, policy));
     let brief = crate::next_command::read_task_brief(root, request.task_id)?;
     let original = crate::syntax_task_recheck::original(root, &brief)?;
     if brief["evidence_ref"]["first_report_sha256"] != policy.original_report_sha256
@@ -222,13 +249,21 @@ fn execute(
         bound_attempt.as_deref(),
     )?;
     before_deadline(request.deadline)?;
-    let native_bound = [&original_native, &current_native]
-        .iter()
-        .all(|r| r["version"] == policy.native_version && r["tool_sha256"] == policy.tool_sha256);
+    let native_bound = [&original_native, &current_native].iter().all(|r| {
+        r["version"] == policy.native_version
+            && r["tool_sha256"] == policy.tool_sha256
+            && (checker.language() != "go"
+                || (r["gofmt_sha256"].as_str() == policy.gofmt_sha256.as_deref()
+                    && r["companion_binding_sha256"].as_str()
+                        == policy.companion_binding_sha256.as_deref()))
+    });
     let current_completed = matches!(
         current_native["status"].as_str(),
         Some("completed" | "diagnostics_observed")
     );
+    let current_completed = current_completed
+        && (checker.language() != "go"
+            || crate::go_syntax_probe::valid_observation(&current_native, Some(&current)));
     let original_completed = checker.original_completed(&original_native, request.original_source);
     let current_issue_present = current_native["status"] == "diagnostics_observed"
         || (checker.language() == "kotlin"
@@ -281,12 +316,17 @@ fn execute(
     {
         outcome = "resolution_evidence_incomplete";
     }
+    let mut raw_evidence = json!({"schema_version":checker.evidence_version(&policy.schema_version),"report_type":"task_resolution_evidence","identity":policy.identity,"original_report_sha256":policy.original_report_sha256,"original_source_sha256":policy.original_source_sha256,"current_source_sha256":digest(&current),"grammar_sha256":policy.grammar_sha256,"tool_sha256":policy.tool_sha256,"adapter_sha256":policy.adapter_sha256,"policy_sha256":policy_sha,"policy_revision":policy.policy_revision,"original_native":original_native,"current_native":current_native,"outcome":outcome});
+    if checker.language() == "go" {
+        raw_evidence["gofmt_sha256"] = json!(policy.gofmt_sha256);
+        raw_evidence["companion_binding_sha256"] = json!(policy.companion_binding_sha256);
+    }
     commit_resolution(
         root,
         request.task_id,
         &policy.original_report_sha256,
         &evidence,
-        json!({"schema_version":checker.evidence_version(&policy.schema_version),"report_type":"task_resolution_evidence","identity":policy.identity,"original_report_sha256":policy.original_report_sha256,"original_source_sha256":policy.original_source_sha256,"current_source_sha256":digest(&current),"grammar_sha256":policy.grammar_sha256,"tool_sha256":policy.tool_sha256,"adapter_sha256":policy.adapter_sha256,"policy_sha256":policy_sha,"policy_revision":policy.policy_revision,"original_native":original_native,"current_native":current_native,"outcome":outcome}),
+        raw_evidence,
         outcome,
     )
 }
@@ -318,6 +358,12 @@ pub(crate) fn commit_resolution(
         "current_native",
         "outcome",
     ];
+    if raw_evidence["schema_version"] == "0.7.0" {
+        keys.extend(["gofmt_sha256", "companion_binding_sha256"]);
+        if !crate::task_resolution_evidence_shape::valid_go_binding(&raw_evidence) {
+            return Err("task_resolution_evidence_binding_invalid");
+        }
+    }
     if raw_evidence["schema_version"] == "0.6.0" {
         keys.extend([
             "target_version",
@@ -332,7 +378,7 @@ pub(crate) fn commit_resolution(
         object.len() == keys.len() && keys.iter().all(|key| object.contains_key(*key))
     }) || !matches!(
         raw_evidence["schema_version"].as_str(),
-        Some("0.1.0" | "0.2.0" | "0.3.0" | "0.4.0" | "0.5.0" | "0.6.0")
+        Some("0.1.0" | "0.2.0" | "0.3.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.7.0")
     ) {
         return Err("task_resolution_evidence_binding_invalid");
     }
@@ -488,6 +534,15 @@ pub(crate) fn commit_resolution(
     );
     Ok(
         json!({"schema_version":"0.1.0","report_type":"task_resolution_receipt","identity":evidence.identity,"state":view.state,"outcome":outcome,"authority":"host_context_verified","policy_sha256":policy_sha,"policy_revision":evidence.policy_revision,"event_ref":format!(".codeguard/findings/{}/events/lifecycle-{}.json",task_id,record.event.event_id),"evidence_ref":evidence_ref,"evidence_sha256":evidence_sha,"delivery_decision":"not_evaluated"}),
+    )
+}
+fn go_companion_matches(tool: &Path, policy: &TaskResolutionPolicyInput) -> bool {
+    crate::go_syntax_probe::companion_current(
+        tool,
+        &json!({
+            "gofmt_sha256":policy.gofmt_sha256,
+            "companion_binding_sha256":policy.companion_binding_sha256
+        }),
     )
 }
 fn before_deadline(deadline: Instant) -> Result<(), &'static str> {

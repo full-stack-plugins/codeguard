@@ -694,3 +694,17 @@ Go候选确认任务 MUST 接受显式 `--go-tool`，复用固定SDK与同目录
 #### Scenario: Native tool is selected or candidate coverage is incomplete
 - **WHEN** 显式或绝对PATH选择了Go，或候选范围超过预算/读取失败/取消
 - **THEN** 所选工具优先执行且失败保留；未选工具时范围不完整不能报告初检无候选或推荐级工具准备
+
+
+### Requirement: Go limited resolution binds the complete syntax tool pair
+
+Go syntax-confirmation task resolution SHALL use host-verified approval policy 1.6.0 and evidence 0.7.0. Approval SHALL bind the original task/report/source/grammar, host adapter, Go1.23.4 executable, same-SDK gofmt executable SHA-256 and canonical companion-path binding. Old policy versions SHALL reject companion fields. Project-local records SHALL NOT supply approval authority.
+
+#### Scenario: Fixed whole-file source closes only the limited task
+- **WHEN** a trusted host approves the original Go candidate and both fixed tool artifacts, original bytes produce native diagnostics, current bytes produce no native diagnostics, and all inputs remain current
+- **THEN** the same task records code-fixed evidence; repeated verification is idempotent and later native recurrence reopens that task
+- **AND** the project delivery remains not_evaluated
+
+#### Scenario: Companion changes or native counterevidence prevent closure
+- **WHEN** gofmt content/path differs from approval, changes during verification, or the original bytes have no native diagnostics
+- **THEN** approval mismatch is rejected before native execution or current-input/native-incomplete evidence is preserved; zero original diagnostics requires false-positive review rather than code-fixed closure

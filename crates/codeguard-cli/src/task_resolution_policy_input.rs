@@ -20,6 +20,10 @@ pub(crate) struct TaskResolutionPolicyInput {
     pub grammar_sha256: Option<String>,
     /// 批准的原生可执行制品摘要。
     pub tool_sha256: String,
+    /// Go专用策略绑定的同SDK格式器制品摘要；旧版本不得携带此字段。
+    pub gofmt_sha256: Option<String>,
+    /// Go辅助制品规范路径与字节的联合摘要；项目不能自行替换批准身份。
+    pub companion_binding_sha256: Option<String>,
     /// 宿主可执行制品摘要，包含本次适配实现。
     pub adapter_sha256: String,
     /// 允许复检的原生语法规则。

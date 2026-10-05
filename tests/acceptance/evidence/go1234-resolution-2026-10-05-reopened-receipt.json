@@ -1,0 +1,19 @@
+{
+  "authority": "host_context_verified",
+  "delivery_decision": "not_evaluated",
+  "event_ref": ".codeguard/findings/CG-B-875b1ae220798b5e6689391844d7da2f/events/lifecycle-event-bd0881c793b4ca9d1a0fbc7a2934c532e5633afb61e0e8126421d3459c8e521e.json",
+  "evidence_ref": ".codeguard/state/resolution_evidence/0274d085ca874f776f50e5a420d4232d63d82a644131bb08ae7ec16350f61bb9.json",
+  "evidence_sha256": "0274d085ca874f776f50e5a420d4232d63d82a644131bb08ae7ec16350f61bb9",
+  "identity": {
+    "checker_id": "syntax.native_confirmation",
+    "scope": "app.go",
+    "task_id": "CG-B-875b1ae220798b5e6689391844d7da2f",
+    "workspace_id": "ws-b41c3cb5e98d81f4b5606ea52008494c"
+  },
+  "outcome": "still_present",
+  "policy_revision": "p1",
+  "policy_sha256": "b13a650a0ea74dfd3d74ed375475d1cb8ed2f3816eedd154f4772cf70612f68f",
+  "report_type": "task_resolution_receipt",
+  "schema_version": "0.1.0",
+  "state": "open"
+}

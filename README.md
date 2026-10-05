@@ -29,7 +29,7 @@ Source builds also support `codeguard task verify TASK_ID . --erl-tool /absolute
 
 ## 1. Purpose and boundaries
 
-Source builds now detect a missing Go whole-file `package` declaration through a separate AST rule. `grammar probe go FILE`, `check go/all`, and confirmed save hooks preserve raw parser recoveries and reuse one native-confirmation task. Adding the declaration removes the candidate without closing the task. Native Go vet remains responsible for `lint go`; Go confirmation-task native recheck/closure and grammar qualification remain incomplete. These changes are not in public npm0.1.4. See [acceptance](tests/acceptance/go-package-structure.md).
+Source builds now detect a missing Go whole-file `package` declaration through a separate AST rule. `grammar probe go FILE`, `check go/all`, and confirmed save hooks preserve raw parser recoveries and reuse one native-confirmation task. Adding the declaration removes the candidate without closing the task. Native Go vet remains responsible for `lint go`; Go confirmation tasks support native rechecks and limited host-SDK resolution; default-host approval integration and grammar qualification remain incomplete. These changes are not in public npm0.1.4. See [acceptance](tests/acceptance/go-package-structure.md).
 
 - Discover languages, build roots, declared versions, checker configuration, and statically observable module relationships.
 - Unify code-style, documentation, dependency, vulnerability, security, and build checks as native adapters become available.
@@ -645,3 +645,8 @@ Go candidate tasks can now run `codeguard task verify <task-id> . --go-tool /abs
 ### Native-first Go lint with missing-tool candidates
 
 Source-built `codeguard lint go . --format json` prefers explicit `--go-tool`, then executable Go from absolute caller PATH entries. Selected tool/version/execution failures remain native failures. When no native tool exists, the built-in WASM produces bounded whole-file recovery and structure candidates. Candidates or incomplete prechecks require a project-appropriate native tool; zero candidates in the completely observed bounded scope only recommend preparation. Native obligations remain incomplete and exit3 is retained. Builds without WASM report that capability gap. Repeated lint/check reuse the confirmation task; adding a package declaration does not close it. Public npm0.1.4 is unchanged. See [limited acceptance](tests/acceptance/go-lint-fallback.md).
+
+
+### Limited Go task resolution by a protected host
+
+The Unix SDK exposes `verify_go_task_resolution(&GoTaskResolutionRequest)`. Independently signed [policy1.6.0](schemas/task-resolution-policy-v1.6.schema.json) binds Go1.23.4, same-SDK gofmt bytes and canonical companion-path digest. Original native diagnostics, current zero diagnostics and stable inputs are all required to close the same task; an ordinary original-tool recheck records recurrence and reopens it. Companion changes, native counterevidence and missing/tampered history cannot close it. [Evidence0.7.0](schemas/task-resolution-evidence-v0.7.schema.json) never grants project delivery. The real Go pair was locally verified using a test host trust fixture; default production host integration remains open. See [acceptance](tests/acceptance/go-task-resolution-lifecycle.md).

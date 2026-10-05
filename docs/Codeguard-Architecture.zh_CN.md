@@ -936,7 +936,7 @@ flowchart LR
     J --> K[原工具复检及关闭策略]
 ```
 
-probe、聚合检查和保存反馈已携带该候选；Go确认任务已接入显式SDK原生复检，可信关闭仍待完成。修复指引要求原生确认前保留源码，零候选复扫继续保留任务。见[验收](../tests/acceptance/go-package-structure.md)。
+probe、聚合检查和保存反馈已携带该候选；Go确认任务已接入显式SDK原生复检及受签名策略限定的SDK关闭；默认宿主可信上下文仍待完成。修复指引要求原生确认前保留源码，零候选复扫继续保留任务。见[验收](../tests/acceptance/go-package-structure.md)。
 
 Go候选任务复检现接受 `--go-tool /absolute/sdk/bin/go`，对冻结整文件字节调用固定SDK同目录 `gofmt -e /dev/stdin`。复检0.9/任务反馈0.22保留原生诊断、主/辅助制品身份、首次报告收据和失败尝试；修复后当前源码不会使原候选历史被误判损坏。局部零诊断继续保留open任务，等待批准政策与覆盖。见[验收](../tests/acceptance/go-package-structure.md)。
 
@@ -957,3 +957,8 @@ flowchart LR
   H --> J[Native obligations remain incomplete]
   I --> J
 ```
+
+
+### Go受保护宿主的限定任务关闭
+
+Unix SDK提供 `verify_go_task_resolution(&GoTaskResolutionRequest)`，以独立签名的[策略1.6.0](../schemas/task-resolution-policy-v1.6.schema.json)同时绑定Go1.23.4、同SDK gofmt及其规范路径联合摘要。原反例有诊断、当前源码无诊断且输入稳定才关闭同一任务；普通原工具复检发现复发会重开。辅助工具变化、原生反证、缺失/篡改历史不能关闭；[证据0.7.0](../schemas/task-resolution-evidence-v0.7.schema.json)不签发项目许可。真实Go链路已局部验证，批准密钥仍为测试夹具，默认宿主集成尚未完成。见[验收](../tests/acceptance/go-task-resolution-lifecycle.md)。

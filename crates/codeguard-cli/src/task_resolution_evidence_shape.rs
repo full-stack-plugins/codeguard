@@ -19,6 +19,12 @@ pub(crate) fn valid(record: &TaskLifecycleRecord, value: &Value) -> bool {
         "current_native",
         "outcome",
     ];
+    if value["schema_version"] == "0.7.0" {
+        expected.extend(["gofmt_sha256", "companion_binding_sha256"]);
+        if !valid_go_binding(value) {
+            return false;
+        }
+    }
     if value["schema_version"] == "0.6.0" {
         expected.extend([
             "target_version",
@@ -99,15 +105,21 @@ fn native_bound(value: &Value) -> bool {
         Some("0.3.0") => "Apple Swift 6.4",
         Some("0.4.0") => "kotlinc-jvm 2.4.10",
         Some("0.6.0") => "ruff 0.16.8",
+        Some("0.7.0") => "go1.23.4",
         _ => return false,
     };
     ["original_native", "current_native"].iter().all(|k| {
-        value[*k]["tool_sha256"] == value["tool_sha256"] && value[*k]["version"] == version
+        value[*k]["tool_sha256"] == value["tool_sha256"]
+            && value[*k]["version"] == version
+            && (value["schema_version"] != "0.7.0"
+                || (value[*k]["gofmt_sha256"] == value["gofmt_sha256"]
+                    && value[*k]["companion_binding_sha256"] == value["companion_binding_sha256"]))
     })
 }
 fn native_for_version(evidence: &Value, key: &str) -> bool {
     match evidence["schema_version"].as_str() {
         Some("0.1.0" | "0.5.0") => native(&evidence[key]),
+        Some("0.7.0") => crate::go_syntax_probe::valid_observation(&evidence[key], None),
         Some("0.6.0") => crate::python_syntax_probe::valid_native_observation(&evidence[key], None),
         Some("0.2.0") => crate::erlang_syntax_probe::valid_native_observation(&evidence[key], None),
         Some("0.3.0") => crate::swift_syntax_probe::valid_native_observation(&evidence[key], None),
@@ -199,6 +211,19 @@ fn token(value: &str) -> bool {
         && value
             .bytes()
             .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'-' | b'_' | b'.' | b':'))
+}
+
+/// 核对Go专用协议与批准辅助制品字段；输入失效证据仍保留实际工具身份。
+/// 完成和重开结果另由native_bound核对双制品，结构校验本身不提供批准权威。
+pub(crate) fn valid_go_binding(value: &Value) -> bool {
+    value["identity"]["checker_id"] == "syntax.native_confirmation"
+        && value["grammar_sha256"].as_str().is_some_and(digest)
+        && ["gofmt_sha256", "companion_binding_sha256"]
+            .iter()
+            .all(|key| value[*key].as_str().is_some_and(digest))
+        && ["original_native", "current_native"]
+            .iter()
+            .all(|key| crate::go_syntax_probe::valid_observation(&value[*key], None))
 }
 
 /// 核对Python专用版本的配置、目标及原生观察绑定；不授予批准权威。

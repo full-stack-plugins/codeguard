@@ -79,7 +79,7 @@ pub(crate) fn load(
                     serde_json::to_value(identity).map_err(|_| "task_lifecycle_encoding_failed")?;
                 if !matches!(
                     value["schema_version"].as_str(),
-                    Some("0.1.0" | "0.2.0" | "0.3.0" | "0.4.0" | "0.5.0" | "0.6.0")
+                    Some("0.1.0" | "0.2.0" | "0.3.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.7.0")
                 ) || value["report_type"] != "task_resolution_evidence"
                     || value["identity"] != identity_value
                     || value["original_report_sha256"] != original_sha
@@ -198,6 +198,7 @@ fn origin_matches_evidence(original: &serde_json::Value, evidence: &serde_json::
             | (Some("erlang"), Some("0.2.0"))
             | (Some("swift"), Some("0.3.0"))
             | (Some("kotlin"), Some("0.4.0"))
+            | (Some("go"), Some("0.7.0"))
     ) {
         return false;
     }
@@ -381,7 +382,12 @@ pub(crate) fn record_native_recurrence(
                 | (Some("0.2.0"), Some("erlang"))
                 | (Some("0.3.0"), Some("swift"))
                 | (Some("0.4.0"), Some("kotlin"))
+                | (Some("0.7.0"), Some("go"))
         )
+        || (evidence["schema_version"] == "0.7.0"
+            && (scan["native"]["gofmt_sha256"] != evidence["gofmt_sha256"]
+                || scan["native"]["companion_binding_sha256"]
+                    != evidence["companion_binding_sha256"]))
         || scan["original_report"]["sha256"] != original_sha
         || scan["original_report"]["grammar_sha256"] != evidence["grammar_sha256"]
     {
