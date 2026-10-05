@@ -375,5 +375,7 @@ pub mod syntax_worker_structure;
 mod grammar_native_checker;
 #[cfg(all(feature = "wasm-precheck", unix))]
 mod javascript_syntax_probe;
+#[cfg(all(feature = "wasm-precheck", unix))]
+mod ruby_syntax_probe;
 #[cfg(unix)]
 mod python_syntax_probe;

@@ -495,6 +495,11 @@ WASM fallback MUST 通过明确版本的协议加入既有统一命令，不静�
 - **THEN** use bounded frozen UTF-8 stdin, explicit module input and syntax-check-only arguments with a cleared environment, isolated cwd and shared deadline; verify requested entry and artifact continuity before and after execution, retaining a bounded Node-specific artifact budget without increasing other checker budgets
 - **AND** only consistent empty successful output or a syntax diagnostic bound to the original stdin line may classify native syntax; unexpected stdout, runtime/fatal errors, output/identity/version changes or malformed diagnostics remain unknown. Retain the source goal as module rather than infer project CommonJS/ESM settings; the versioned report cannot replace project ESLint, authorize task closure or certify grammar qualification
 
+#### Scenario: Ruby development comparison uses an isolated explicit syntax observer
+- **WHEN** 显式选择已安装Ruby2.6.10p210执行开发期原生/WASM差分
+- **THEN** 冻结UTF-8 stdin与请求入口/制品，清空环境、使用隔离cwd、禁用gems并仅调用版本与`-c -`，共享截止时间和取消令牌；BEGIN、END、require及普通源码不得执行
+- **AND** 仅消费一致的Syntax OK或绑定原始stdin行号的有界语法诊断；普通警告、未知输出、错路径、坏位置、矛盾退出、版本/入口变化和截断保持unknown；新增报告版本保留旧协议、32语言库存和未选覆盖，不授予项目Rubocop、任务关闭、独立holdout或grammar发行资格
+
 #### Scenario: Structural empty blocks remain distinct from parser recoveries
 - **WHEN** an application scans a grammar tree for empty `block` nodes that contain no non-comment named statement
 - **THEN** traverse even branches without `has_error`, retain the direct parent kind and original byte positions with explicit record/traversal budget exhaustion, and do not label these structural facts as parser ERROR/MISSING or language violations; legal empty blocks in other languages require independent language interpretation
@@ -504,11 +509,11 @@ WASM fallback MUST 通过明确版本的协议加入既有统一命令，不静�
 - **THEN** Node 观察使用同一取消令牌终止进程组，保留样本与 unknown 比较，不等待工具自行完成或将取消视为合法源码
 
 #### Scenario: Every selected native differential shares in-flight cancellation
-- **WHEN** 对已支持的Zig/Erlang/Swift/Kotlin/Python/JavaScript显式原生差分，在版本探测或源码检查实际启动后取消
+- **WHEN** 对已支持的Zig/Erlang/Swift/Kotlin/Python/JavaScript/Ruby显式原生差分，在版本探测或源码检查实际启动后取消
 - **THEN** 观察器必须传递同一个请求令牌至runtime，停止当前进程组且不启动后继调用；保持样本、真实失败和unknown比较，不将工具自行退出当作取消完成
 
 #### Scenario: Native differential entry changes during version observation
-- **WHEN** 六种已接入原生观察器的版本调用改变请求别名或替换冻结入口字节
+- **WHEN** 已接入原生观察器的版本调用改变请求别名或替换冻结入口字节
 - **THEN** 在源码调用前复核请求物理入口与制品摘要并拒绝执行后继调用；源码调用后同样复核，变化不能提供原生确认、关闭任务或比较资格
 
 ### Requirement: Python隔离原生探针的入口连续性

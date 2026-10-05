@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:ruby-native-syntax:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "reason",
+    "version",
+    "tool_sha256",
+    "diagnostics"
+  ],
+  "properties": {
+    "status": {
+      "enum": [
+        "incomplete",
+        "completed",
+        "diagnostics_observed"
+      ]
+    },
+    "reason": {
+      "enum": [
+        "ruby_syntax_input_invalid",
+        "ruby_syntax_tool_unavailable",
+        "ruby_syntax_tool_changed",
+        "ruby_syntax_version_unverified",
+        "ruby_syntax_execution_incomplete",
+        "ruby_syntax_report_invalid",
+        "ruby_native_syntax_no_diagnostics",
+        "ruby_native_syntax_diagnostics"
+      ]
+    },
+    "version": {
+      "enum": [
+        null,
+        "ruby 2.6.10p210"
+      ]
+    },
+    "tool_sha256": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "diagnostics": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "line",
+          "rule_id"
+        ],
+        "properties": {
+          "line": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "rule_id": {
+            "const": "ruby.syntax"
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "completed"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "reason": {
+            "const": "ruby_native_syntax_no_diagnostics"
+          },
+          "version": {
+            "const": "ruby 2.6.10p210"
+          },
+          "tool_sha256": {
+            "type": "string"
+          },
+          "diagnostics": {
+            "maxItems": 0
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "diagnostics_observed"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "reason": {
+            "const": "ruby_native_syntax_diagnostics"
+          },
+          "version": {
+            "const": "ruby 2.6.10p210"
+          },
+          "tool_sha256": {
+            "type": "string"
+          },
+          "diagnostics": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "incomplete"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "reason": {
+            "enum": [
+              "ruby_syntax_input_invalid",
+              "ruby_syntax_tool_unavailable",
+              "ruby_syntax_tool_changed",
+              "ruby_syntax_version_unverified",
+              "ruby_syntax_execution_incomplete",
+              "ruby_syntax_report_invalid"
+            ]
+          },
+          "diagnostics": {
+            "const": []
+          }
+        }
+      }
+    }
+  ]
+}

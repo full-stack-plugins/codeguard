@@ -11,6 +11,8 @@ pub(crate) enum GrammarNativeChecker {
     Python,
     /// Node 的显式 ESM 语法观察，不推断项目模块类型。
     Javascript,
+    /// Ruby 的显式隔离语法观察，不执行用户源码。
+    Ruby,
 }
 
 impl GrammarNativeChecker {
@@ -23,6 +25,7 @@ impl GrammarNativeChecker {
             "kotlin" => Some(Self::Existing(TaskResolutionChecker::Kotlin)),
             "python" => Some(Self::Python),
             "javascript" => Some(Self::Javascript),
+            "ruby" => Some(Self::Ruby),
             _ => None,
         }
     }
@@ -32,6 +35,7 @@ impl GrammarNativeChecker {
             Self::Existing(checker) => checker.version(),
             Self::Python => "ruff 0.16.8",
             Self::Javascript => "v24.18.0",
+            Self::Ruby => "ruby 2.6.10p210",
         }
     }
     /// 返回对应原生制品的有界字节预算；Node 独立预算不扩张其它工具权限。
@@ -55,6 +59,7 @@ impl GrammarNativeChecker {
                 checker.observe_with_cancellation(tool, source, root, deadline, cancelled)
             }
             Self::Python => crate::python_syntax_probe::observe(tool, source, deadline, cancelled),
+            Self::Ruby => crate::ruby_syntax_probe::observe(tool, source, deadline, cancelled),
             Self::Javascript => {
                 crate::javascript_syntax_probe::observe(tool, source, deadline, cancelled)
             }
@@ -78,7 +83,15 @@ mod tests {
 
     #[test]
     fn every_native_observer_cancels_version_and_scan_in_flight() {
-        for language in ["zig", "erlang", "swift", "kotlin", "python", "javascript"] {
+        for language in [
+            "zig",
+            "erlang",
+            "swift",
+            "kotlin",
+            "python",
+            "javascript",
+            "ruby",
+        ] {
             for phase in ["version", "scan"] {
                 let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
                     "cg-native-cancel-{}-{language}-{phase}",
@@ -92,6 +105,7 @@ mod tests {
                     "swift" => "printf 'Apple Swift version 6.4 (fixture)\\n'",
                     "kotlin" => "printf 'info: kotlinc-jvm 2.4.10 (JRE fixture)\\n' >&2",
                     "python" => "printf 'ruff 0.16.8\\n'",
+                    "ruby" => "printf 'ruby 2.6.10p210 (fixture) [fixture]\\n'",
                     _ => "printf 'v24.18.0\\n'",
                 };
                 let block = "printf started > \"$0.started\"; exec /bin/sleep 30";
@@ -144,7 +158,15 @@ mod tests {
     }
     #[test]
     fn every_observer_stops_before_scan_when_version_changes_entry() {
-        for language in ["zig", "erlang", "swift", "kotlin", "python", "javascript"] {
+        for language in [
+            "zig",
+            "erlang",
+            "swift",
+            "kotlin",
+            "python",
+            "javascript",
+            "ruby",
+        ] {
             for mode in ["alias", "replace"] {
                 let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
                     "cg-native-entry-{}-{language}-{mode}",
@@ -166,6 +188,7 @@ mod tests {
                     "swift" => "printf 'Apple Swift version 6.4 (fixture)\\n'",
                     "kotlin" => "printf 'info: kotlinc-jvm 2.4.10 (JRE fixture)\\n' >&2",
                     "python" => "printf 'ruff 0.16.8\\n'",
+                    "ruby" => "printf 'ruby 2.6.10p210 (fixture) [fixture]\\n'",
                     _ => "printf 'v24.18.0\\n'",
                 };
                 let action = if mode == "alias" {

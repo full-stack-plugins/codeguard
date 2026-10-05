@@ -1546,3 +1546,9 @@ check python/all现通过0.48反馈保留独立结构计数和原始坐标，原
 3.7/5.4/12.11/14.17/14.19：Kotlin版本改副本、Zig异常版本stderr仍执行后继动作，两实际标记反例RED；前置输入/输出校验后GREEN，WASM CLI单元68通过/3条件忽略。原生差分三场景归属移动，不改内容/标准；真实Zig/Kotlin26例及相关回归进行中，既有14FN/5unknown报告保留。前序cbac625远端CI已success，父任务仍开放，见[验收](../../../tests/acceptance/native-version-input-continuity.md)。
 
 最终真实Zig/Kotlin26例对照保持24可比较、2unknown，原分类与114例报告对应子集一致；原报告不覆盖、不消除其14FN。受影响六目标40通过/3条件忽略、协议1通过，双配置严格Clippy及规格/格式/分层通过。新CI待本次提交，完整父任务仍开放。
+
+## 2026-10-05 Ruby 统一原生开发差分（局部验收）
+
+12.11/14.17/14.19：既有 Ruby 直接 Command 样本未接统一受控回放，受控入口反例先 RED（native_grammar_language_unsupported）；新增固定 Ruby2.6.10p210 语法观察、0.5 版本协议及七语言选择。原始恢复与组合候选分层、32库存、未知分母及资格0保持，旧0.1—0.4报告不改。实际Ruby18例5TP/0FP/0FN/13TN，增加BEGIN/END/require/shebang不执行与UTF-8样本；七语言共同批次及检查结果见[验收](../../../tests/acceptance/ruby-isolated-native-differential.md)。公开Ruby项目lint、可信任务关闭、独立holdout、完整语言/平台/资源/发行仍未完成，父任务不勾选。
+
+本切片最终本地验证：WASM单元70通过/3条件忽略，四目标差分25通过/6条件忽略，显式实际Ruby18例1通过；真实七工具132例34TP/0FP/14FN/79TN及5unknown，原六语言114例分类不变。协议11项、strict OpenSpec、分层、定向格式、严格Clippy双配置和diff检查通过。未重复完整default workspace和32 grammar全量回放；远端CI与所有父任务保持独立未完成状态。

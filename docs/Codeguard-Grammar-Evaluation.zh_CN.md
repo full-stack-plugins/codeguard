@@ -146,3 +146,7 @@ Python隔离原生探针现于版本探测后、检查前核验请求入口与�
 Zig、Erlang、Swift原生观察现于版本返回后、源码调用前及调用后复核原请求别名、规范入口和制品摘要；变化时停止后继调用，保持未完成。六语言别名/制品替换反例见[入口复核验收](../tests/acceptance/native-version-entry-binding.md)。核验与spawn间的完整TOCTOU和工具链闭包仍未解决。
 
 Kotlin版本阶段结束后，原生观察器在编译前后核对私有源码副本与冻结输入；Zig版本探测异常stderr会停止AST调用。两者均保持工具/输入未完成，不生成源码违规，见[阶段输入验收](../tests/acceptance/native-version-input-continuity.md)。
+
+## Ruby 原生对照接入统一差分入口
+
+开发验收新增固定 Ruby 2.6.10p210 的受控 `-c -` 观察：冻结 UTF-8 stdin、清空环境、禁用 gems、共享截止时间和取消，并核验入口与制品连续性。完整一致输出才可分类；错路径、普通警告、坏位置、未知输出或运行故障保留 unknown。0.5 报告支持七种显式观察器，保留旧协议及所有未选语言。18 例实际 Ruby 对照为 5TP/0FP/0FN/13TN；BEGIN/END/require/shebang 样本验证检查不执行源码。这是开发回归证据，公开 Ruby lint、独立 holdout、可信任务关闭和发行资格仍未完成。见[验收](../tests/acceptance/ruby-isolated-native-differential.md)。
