@@ -476,3 +476,15 @@ WASM fallback MUST 通过明确版本的协议加入既有统一命令，不静�
 #### Scenario: Structural empty blocks remain distinct from parser recoveries
 - **WHEN** an application scans a grammar tree for empty `block` nodes that contain no non-comment named statement
 - **THEN** traverse even branches without `has_error`, retain the direct parent kind and original byte positions with explicit record/traversal budget exhaustion, and do not label these structural facts as parser ERROR/MISSING or language violations; legal empty blocks in other languages require independent language interpretation
+
+### Requirement: Python隔离原生探针的入口连续性
+
+Python隔离语法探针 MUST 在版本探测后、语法执行前核验请求入口仍解析为冻结的规范化制品，并核验字节摘要；变化 MUST 返回具体未完成原因，不启动第二次调用。语法执行后 MUST 再次核验相同身份，变化后的结果不得按完整原生观察消费。该约束不授予项目版本、批准策略或任务关闭权威。
+
+#### Scenario: 版本命令替换自身制品
+- **WHEN** Ruff版本探测输出看似有效，但执行中替换了原入口文件
+- **THEN** 探针返回python_syntax_tool_changed及incomplete，不执行替换后的程序，不输出已确认违规或成功
+
+#### Scenario: 版本命令重定向请求别名
+- **WHEN** 版本命令把请求路径的符号链接改指其它入口，即使原规范化制品字节未变
+- **THEN** 探针在语法执行前拒绝继续，并保留原生检查未完成；不得仅执行原规范化路径而忽略请求入口变化
