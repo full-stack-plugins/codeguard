@@ -386,6 +386,8 @@ mod javascript_syntax_probe;
 #[cfg(unix)]
 mod ruby_syntax_probe;
 #[cfg(unix)]
+mod ruby_project_version;
+#[cfg(unix)]
 pub mod ruby_lint_command;
 #[cfg(unix)]
 mod ruby_tool_selection;

@@ -1625,3 +1625,10 @@ check python/all现通过0.48反馈保留独立结构计数和原始坐标，原
 对应既有9.3/9.9、11.17、14.6/14.7/14.9/14.10/14.11/14.14/14.18；不新建change、不勾选完整宿主或语言父任务。原生Ruby编辑只检查实际选择文件，显式工具或绝对PATH优先，缺工具候选、选定失败不回退；CLAUDE形状反馈使用当前行号、安全任务与复检命令，不回显源码/消息或猜列号。repair_ready记录真实报告引用与零诊断仍open。初始4项RED，接线后GREEN，追加缺工具和失败写入反例。新Hook外层0.19/0.20与内层0.10/0.6闭合schema通过8份真实CLI观察（含/usr/bin/ruby及默认构建缺WASM）及伪造字段反例，旧schema不修改。安装后链路、默认/WASM最终回归及Clippy证据见tests/acceptance/ruby-native-hook.md；真实宿主、完整Ruby能力与发行仍未验收。
 
 Ruby Hook本批终态：默认完整1404通过/0失败/125忽略，WASM受影响85通过/0失败/4忽略；默认/WASM严格Clippy、fmt、分层、OpenSpec strict通过。离线npm安装链路1通过、8份实际Hook报告及9份结构化安装报告协议回归通过。前一aaa3879的Linux CI 37324440688全成功，此前Go失败未复现但根因未确认；本批远端结果须独立核验。详见tests/acceptance/ruby-native-hook.md，不勾选完整语言、真实宿主或发行父任务。
+
+
+## 2026-10-05 Ruby 项目版本声明约束（局部验收）
+
+对应既有5.4、8.*、9.9、14.19：固定Ruby2.6误解析其它声明版本、运行期配置变化及嵌套Gemfile遮蔽工作区pin反例先RED；统一有界最近声明约束后GREEN。不匹配、歧义及链接返回环境未完成、不启动旧Ruby或回退WASM；源码/编辑/复检共用，next撤回不适用位置，无声明仍未批准。新增9项/default受影响63项/WASM受影响90项通过，真实Ruby两份报告通过封闭schema，双构建严格Clippy及既有Hook协议/分层/strict规格验证通过。完整项目版本探测、Gemfile/JRuby/RVM、全语言门禁与发行未完成，父任务不勾选。证据见[验收](../../../tests/acceptance/ruby-project-version.md)。默认全工作区及远端CI分别追加核验。
+
+最终默认全工作区/all-targets 256 个结果目标：1413 通过、0 失败、125 忽略，日志 `/private/tmp/codeguard-ruby-version-workspace-v2.log`。这是本批源码的默认构建验收；WASM 仅执行上述受影响目标，远端 CI 仍须按本次提交独立核验。

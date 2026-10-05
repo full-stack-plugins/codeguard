@@ -136,7 +136,9 @@ fn run_with_tools(
         } else if language == "ruby" {
             selected_ruby
                 .map(|tool| {
-                    crate::ruby_syntax_probe::observe(
+                    crate::ruby_project_version::observe(
+                        root,
+                        &root.join(path),
                         tool,
                         bytes,
                         deadline,
@@ -320,6 +322,11 @@ pub(crate) fn inputs_current(root: &Path, report: &Value) -> bool {
         .and_then(|p| source_bytes(root, p))
         .is_some_and(|b| report["target"]["source_sha256"] == digest(&b))
         && (report["native"]["tool_sha256"].is_null() || tool_current(report))
+        && (report["target"]["language"] != "ruby"
+            || report["native"]["status"] == "incomplete"
+            || report["target"]["path"]
+                .as_str()
+                .is_some_and(|p| crate::ruby_project_version::compatible(root, &root.join(p))))
         && (report["target"]["language"] != "go"
             || report["native"]["companion_binding_sha256"].is_null()
             || report["tool_path"].as_str().is_some_and(|tool| {

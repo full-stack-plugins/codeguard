@@ -80,9 +80,22 @@ pub fn run(args: &[String]) -> ExitCode {
     let source = read_bounded_regular_file(&file, 1024 * 1024).ok();
     let valid_source = source.as_ref().filter(|b| std::str::from_utf8(b).is_ok());
     let mut native = match (valid_source, selected) {
-        (Some(bytes), Some(tool)) => {
-            crate::ruby_syntax_probe::observe(tool, bytes, deadline, &AtomicBool::new(false))
-        }
+        (Some(bytes), Some(tool)) => crate::ruby_project_version::source_root(&file)
+            .map(|root| {
+                crate::ruby_project_version::observe(
+                    &root,
+                    &if file.is_absolute() {
+                        file.clone()
+                    } else {
+                        std::env::current_dir().unwrap_or_default().join(&file)
+                    },
+                    tool,
+                    bytes,
+                    deadline,
+                    &AtomicBool::new(false),
+                )
+            })
+            .unwrap_or_else(|| unavailable("ruby_project_version_unresolved")),
         (Some(_), None) => unavailable("ruby_tool_not_found"),
         _ => unavailable("ruby_source_unavailable_or_invalid"),
     };

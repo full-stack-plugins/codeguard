@@ -28,6 +28,22 @@ class RubyHookFeedback(unittest.TestCase):
                 self.assertFalse(validator('hook-execution-feedback-v0.18.schema.json').is_valid(data))
                 bad=copy.deepcopy(data);bad['local_feedback']['syntax_candidates']['status']='completed';self.assertFalse(v.is_valid(bad))
 
+    def test_project_version_reports_preserve_environment_and_line_only_evidence(self):
+        for label in ('mismatch', 'matching'):
+            path=ROOT/'tests/acceptance/evidence'/f'ruby-project-version-2026-10-05-{label}.json'
+            data=json.loads(path.read_text())
+            v=validator('check-feedback-v0.51.schema.json');v.validate(data)
+            native=data['native_results']['ruby_lint']['files'][0]['native']
+            if label=='mismatch':
+                self.assertEqual(native['status'],'incomplete')
+                self.assertEqual(native['reason'],'ruby_project_version_mismatch')
+                self.assertEqual(native['diagnostics'],[])
+            else:
+                self.assertEqual(native['status'],'diagnostics_observed')
+                self.assertGreater(len(native['diagnostics']),0)
+                self.assertTrue(all('column' not in row for row in native['diagnostics']))
+            bad=copy.deepcopy(data);bad['delivery_decision']='allow';self.assertFalse(v.is_valid(bad))
+
     def test_installed_package_reports_and_host_shape(self):
         reports=json.loads((ROOT/'tests/acceptance/evidence/ruby-npm-repair-2026-10-05.json').read_text())
         mapping={'initialized':'init-plan.schema.json','first':'hook-execution-feedback-v0.19.schema.json','recurrence':'hook-execution-feedback-v0.19.schema.json','aggregate':'check-feedback-v0.51.schema.json','lint':'ruby-lint-feedback-v0.3.schema.json','next':'repair-brief-preview-v0.15.schema.json','stale':'repair-brief-preview-v0.15.schema.json','present':'hook-execution-feedback-v0.20.schema.json','repaired':'hook-execution-feedback-v0.20.schema.json'}
