@@ -1726,3 +1726,7 @@ Rust输入补录终态：实际原生lint修复及原工具任务复检1通过�
 ## 2026-10-06 SP20 恢复扫描正常兄弟节点访问预算
 
 对应3.2 / 14.5。真实Java WASM宽树回归先因正常兄弟未计费而RED，恢复扫描现以逆向游标顺序检查，节点弹出和每次子节点检查均计入二十万次访问上限；预算耗尽标未完成，不伪造恢复位置。新增runtime与隔离worker回归，保留Kotlin/Swift隐藏错误语义及原协议。见[扫描预算验收](../../../tests/acceptance/wasm-recovery-sibling-budget.md)。其它结构扫描/平台隔离、grammar差异和完整语言验收仍缺，父任务不勾选。
+
+## 2026-10-06 SP21 结构扫描子节点访问预算与局部保留
+
+对应3.2 / 14.5。真实Python WASM六万条pass宽树目标因子节点工作未计费而RED；空块扫描现对节点取出、普通/命名子节点检查统一计费并用游标保留顺序。判空中途超限不生成该块事实，保留其它已发现观察；隔离worker明确truncated/incomplete。runtime15项、CLI23项实际通过，均无忽略；见[结构扫描预算验收](../../../tests/acceptance/wasm-structural-child-budget.md)。语法资格、其它平台隔离、实际宿主和发行仍缺，父任务不勾选。

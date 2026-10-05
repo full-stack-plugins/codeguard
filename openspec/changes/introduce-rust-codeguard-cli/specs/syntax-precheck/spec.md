@@ -196,6 +196,10 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 - **WHEN** 恢复扫描为定位错误检查宽语法树中的正常子节点
 - **THEN** 每次子节点检查同样消耗遍历预算；不得只统计进入错误分支的节点。超过预算保留已有观察并报告扫描未完成，不伪称完整或增加无位置依据的恢复节点；兄弟遍历避免反复按索引从头查找
 
+#### Scenario: Structural scanning exhausts its child-inspection budget
+- **WHEN** 空语句块扫描检查子节点或为判断块是否为空而检查命名子节点
+- **THEN** 子节点检查与节点取出均消耗访问预算；超限保留已经取得的结构事实并标记扫描未完成，不根据未遍历完的块生成空块事实；正常规模合法语句、注释及其它语言的空块仍只按原规则观察
+
 #### Scenario: A host cannot enforce a declared bound
 - **WHEN** 平台无法提供声明的隔离/预算能力
 - **THEN** 如实登记缺口，不将该平台标为已通过运行验收

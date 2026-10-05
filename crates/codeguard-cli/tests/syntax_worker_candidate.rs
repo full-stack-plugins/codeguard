@@ -71,6 +71,28 @@ fn wide_normal_siblings_preserve_worker_incomplete_status() {
 }
 
 #[test]
+fn structural_visit_budget_preserves_worker_facts_and_incomplete_status() {
+    let source = format!("def missing():\n{}", "pass\n".repeat(60_000));
+    let result = run_syntax_worker_candidate(
+        env!("CARGO_BIN_EXE_codeguard").as_ref(),
+        "python",
+        "src/app.py",
+        source.as_bytes(),
+        deadline(),
+        &AtomicBool::new(false),
+    )
+    .expect("bounded structural worker observation");
+    assert_eq!(result.precheck.status, SyntaxPrecheckStatus::Incomplete);
+    assert_eq!(result.precheck.truncated_files, 1);
+    assert!(!result.grammar_qualified);
+    assert_eq!(result.structural_observations.len(), 1);
+    assert_eq!(
+        result.structural_observations[0].rule_id,
+        "codeguard.python.required_suite"
+    );
+}
+
+#[test]
 fn go_whole_file_rule_stays_separate_and_forged_worker_frames_are_rejected() {
     use std::io::Write;
     use std::process::{Command, Stdio};
