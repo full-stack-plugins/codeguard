@@ -1730,3 +1730,9 @@ Rust输入补录终态：实际原生lint修复及原工具任务复检1通过�
 ## 2026-10-06 SP21 结构扫描子节点访问预算与局部保留
 
 对应3.2 / 14.5。真实Python WASM六万条pass宽树目标因子节点工作未计费而RED；空块扫描现对节点取出、普通/命名子节点检查统一计费并用游标保留顺序。判空中途超限不生成该块事实，保留其它已发现观察；隔离worker明确truncated/incomplete。runtime15项、CLI23项实际通过，均无忽略；见[结构扫描预算验收](../../../tests/acceptance/wasm-structural-child-budget.md)。语法资格、其它平台隔离、实际宿主和发行仍缺，父任务不勾选。
+
+## 2026-10-06 SP22 grammar 库存 CI 断言与早期验证
+
+对应12.1 / 14.1 / 14.9。两轮远端默认suite因CFQuery旧泛SQL文案断言失败，当前源码本地复现同一RED；修正为当前PostgreSQL方言证据，并核对全部32行限制与固定清单一致，保留零资格/只读/未执行权威。CI在解析器及npm检查前运行default/WASM库存，不删除完整suite。默认2项及WASM三个目标8项通过，Docker原生对照1项条件忽略；见[库存CI纠正验收](../../../tests/acceptance/grammar-inventory-ci-correction.md)。语言精度、完整宿主和发行仍缺，父任务不勾选。
+
+SP22完整默认终态：当前源码workspace all-targets 1500 passed / 0 failed / 132 ignored，库存Schema4项通过。未启用WASM及未执行用户Erlang草稿；跨平台/宿主/语言资格/发行与远端新提交CI仍需独立验收，不勾选父任务。

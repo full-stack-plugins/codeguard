@@ -29,10 +29,23 @@ fn codegraph_coverage_is_explicit_and_never_claims_parser_or_gate_completion() {
     );
     let assets = report["assets"].as_array().unwrap();
     assert_eq!(assets.len(), 32);
+    let manifest: Value =
+        serde_json::from_str(include_str!("../../../grammars/manifest.json")).unwrap();
     for asset in assets {
         assert_eq!(asset["released"], false);
         assert!(!asset["gap"].as_str().unwrap().is_empty());
         assert!(!asset["known_limitations"].as_array().unwrap().is_empty());
+        let declared = manifest["assets"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row["language"] == asset["language"])
+            .unwrap();
+        assert_eq!(
+            asset["known_limitations"], declared["known_limitations"],
+            "inventory must preserve the pinned manifest limitations: {}",
+            asset["language"]
+        );
     }
     for language in [
         "arkts",
@@ -136,7 +149,7 @@ fn codegraph_coverage_is_explicit_and_never_claims_parser_or_gate_completion() {
             "swift",
             "12 decidable cases agree and the missing-type case remains unresolved",
         ),
-        ("cfquery", "does not validate full SQL semantics"),
+        ("cfquery", "rejected by PostgreSQL 18.6"),
     ] {
         let asset = assets
             .iter()
@@ -150,6 +163,22 @@ fn codegraph_coverage_is_explicit_and_never_claims_parser_or_gate_completion() {
             "{language}: {asset}"
         );
         assert_eq!(asset["released"], false);
+    }
+    let cfquery = assets
+        .iter()
+        .find(|row| row["language"] == "cfquery")
+        .unwrap();
+    let limitation = cfquery["known_limitations"][0].as_str().unwrap();
+    for fact in [
+        "SELECT DISTINCT FROM users",
+        "SELECT FROM users is accepted by that dialect",
+        "applicable native confirmation",
+        "Other dialects, systematic precision and release remain unqualified",
+    ] {
+        assert!(
+            limitation.contains(fact),
+            "CFQuery dialect fact missing: {fact}"
+        );
     }
     for language in ["objc", "solidity"] {
         let asset = assets

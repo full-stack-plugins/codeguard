@@ -46,6 +46,13 @@ jobs:
       - name: Preserve the binary without WASM for package rejection
         run: cp target/debug/codeguard "$RUNNER_TEMP/codeguard-no-wasm"
 
+      - name: Verify grammar inventory before parser and package checks
+        run: |
+          # 清单文案及来源投影错误先报告，避免到完整 suite 末段才失败。
+          # 两种构建均须保留零资格、未执行和真实方言限制；不放宽资格或原生义务。
+          cargo test --locked -p codeguard-cli --test grammar_status_cli
+          cargo test --locked -p codeguard-cli --features wasm-precheck --test grammar_status_cli
+
       - name: Verify Linux WASM worker resource boundary
         run: |
           # 帮助目录须保留当前构建特性；默认 suite 无法证明 WASM 入口状态。
