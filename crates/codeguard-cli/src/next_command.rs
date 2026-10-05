@@ -874,6 +874,28 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             priority = 3;
         }
     }
+    if checker_id == "shell.shellcheck" && kind == "blocker" {
+        let reason = read_bounded(
+            &root.join(format!(".codeguard/reports/{first_run}.json")),
+            128 * 1024,
+        )
+        .ok()
+        .filter(|b| format!("{:x}", Sha256::digest(b)) == report_sha)
+        .and_then(|b| codeguard_adapters::parse_unique_json(&b).ok())
+        .and_then(|r| r["native"]["reason"].as_str().map(str::to_owned));
+        if matches!(
+            reason.as_deref(),
+            Some("shell_dialect_unresolved" | "shell_dialect_unsupported")
+        ) {
+            brief["disposition"] = json!("needs_decision");
+            brief["step"] = json!(if reason.as_deref() == Some("shell_dialect_unresolved") {
+                "原任务缺少已核验Shell方言；先确认shebang、文件约定或check --shell-dialect所代表的项目默认方言，再按确认的语境检查。不要猜成bash、重复安装或直接关闭旧任务。"
+            } else {
+                "原方言或文件声明不适用ShellCheck；确认实际方言和专用原生检查器，保留能力缺口。重复安装ShellCheck或强制改成bash不能恢复此检查。"
+            });
+            priority = 0;
+        }
+    }
     if checker_id == "rust.cargo_check" && kind == "finding" {
         brief["disposition"] = json!("verification_required");
         brief["step"] = json!(

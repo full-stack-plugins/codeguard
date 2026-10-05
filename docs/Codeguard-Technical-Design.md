@@ -1504,3 +1504,24 @@ flowchart LR
     F -->|Two unchanged attempts| G[needs_decision and reject third attempt]
     E -->|Candidate absent| H[Await trusted policy and coverage]
 ```
+
+## Native checks over discovered project Shell files
+
+`codeguard check shell . --shellcheck-tool /absolute/shellcheck --format json` and `check all` now run ShellCheck 0.11.0 over discovered Shell files under one deadline. Feedback 0.52.0 exposes `native_results.shell_lint`, a 0.1.0 shell_native_scan with per-file source hashes, dialects, original rc, native SC rules/scalar positions, input stability and workbench status. Human output shows native positions; SARIF projects current observations while keeping locations and native messages private.
+
+Shebangs and explicit filename conventions supply dialect evidence. `--shell-dialect bash` supplies a default for undeclared files and cannot override zsh/fish declarations. Unknown or unsupported dialects stay incomplete; next requests a concrete dialect/checker decision rather than repeating an unsuitable installation. At most 64 files are checked; unobserved_count exposes overflow. local_check_complete describes these isolated native observations and proves no project source-dependency, category or policy coverage.
+
+An initialized scan binds its requested root despite nested workbenches; an uninitialized scan creates no workspace. Repeated file/dialect/SC rule observations update stable tasks. Configuration or environment failures remain blockers. Source, scope, rc or tool changes withdraw current location authority. No Shell WASM fallback is fabricated. check shell still returns 3/not_evaluated, and check all remains incomplete. Security, CVE, sourced dependencies, trusted closure/recurrence, dedicated zsh/fish tools, Dockerfile/IaC and platform acceptance remain open.
+
+```mermaid
+flowchart LR
+    A[Discovered Shell files] --> B[Per-file dialect and rc]
+    B --> C[Native ShellCheck and shared deadline]
+    C --> D[Recheck source scope config and tool]
+    D --> E[Stable tasks bound to requested root]
+    E --> F[next and task verify]
+    C --> G[Per-file diagnostics and blockers]
+    G --> H[Partial human JSON and SARIF feedback]
+```
+
+See [project Shell acceptance](../tests/acceptance/shellcheck-project-baseline.md).

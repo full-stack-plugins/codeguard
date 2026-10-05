@@ -9,14 +9,15 @@ pub fn partial_check_sarif(report: &Value) -> Value {
     let mut results = Vec::new();
     if let Some(checkers) = report["native_results"].as_object() {
         for (checker, value) in checkers {
-            if checker == "zig_lint" {
+            if matches!(checker.as_str(), "zig_lint" | "shell_lint") {
                 // 原生语法探针使用 diagnostics；仅投影当前输入的定位，不遗失真实发现或输出旧坐标。
-                for file in value["files"]
-                    .as_array()
-                    .into_iter()
-                    .flatten()
-                    .filter(|f| f["current"] == true)
-                {
+                for file in value["files"].as_array().into_iter().flatten().filter(|f| {
+                    if checker == "shell_lint" {
+                        f["input_stable"] == true
+                    } else {
+                        f["current"] == true
+                    }
+                }) {
                     for diagnostic in file["native"]["diagnostics"]
                         .as_array()
                         .into_iter()
@@ -117,6 +118,18 @@ fn digest(value: &[u8]) -> String {
 mod tests {
     use super::partial_check_sarif;
     use serde_json::json;
+
+    #[test]
+    fn shell_diagnostics_keep_current_observations_without_exposing_paths() {
+        let source = json!({"report_type":"check_feedback","command_status":"incomplete","delivery_decision":"incomplete","exit_code":3,
+        "native_results":{"shell_lint":{"files":[
+            {"path":"secret-source.sh","input_stable":true,"native":{"diagnostics":[{"rule_id":"SC2086"}]}},
+            {"path":"stale.sh","input_stable":false,"native":{"diagnostics":[{"rule_id":"SC2000"}]}}
+        ]}}});
+        let sarif = partial_check_sarif(&source);
+        assert_eq!(sarif["runs"][0]["results"].as_array().unwrap().len(), 1);
+        assert!(!sarif.to_string().contains("secret-source.sh"));
+    }
 
     #[test]
     fn aborted_report_keeps_sibling_findings_without_claiming_success() {

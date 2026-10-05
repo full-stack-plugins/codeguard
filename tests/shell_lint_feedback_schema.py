@@ -104,6 +104,29 @@ class ShellFeedback(unittest.TestCase):
         fact=json.loads((prefix/'shell-next-2026-10-06-fact.json').read_text())
         self.assertEqual(fact['state'],'open')
 
+    def test_real_shell_project_reports(self):
+        prefix=ROOT/'tests/acceptance/evidence'
+        v=validator('check-feedback-v0.52.schema.json')
+        for name in ['first','repeat','all','missing','unknown-dialect','unsupported']:
+            data=json.loads((prefix/f'shell-project-2026-10-06-{name}.json').read_text());v.validate(data)
+            scan=data['native_results']['shell_lint']
+            self.assertEqual(scan['source_file_count'],2)
+            self.assertFalse(scan['coverage_proven'])
+            bad=copy.deepcopy(data);bad['authority']='trusted';self.assertFalse(v.is_valid(bad))
+            bad=copy.deepcopy(data);bad['delivery_decision']='allow';self.assertFalse(v.is_valid(bad))
+            bad=copy.deepcopy(data);bad['native_results']['shell_lint']['files'][0]['unexpected']=True;self.assertFalse(v.is_valid(bad))
+            if name in ['first','repeat','all']:
+                self.assertTrue(scan['local_check_complete'])
+                self.assertEqual(scan['files'][0]['native']['diagnostics'][0]['rule_id'],'SC2086')
+                bad=copy.deepcopy(data);bad['native_results']['shell_lint']['files'][0]['input_stable']=False;self.assertFalse(v.is_valid(bad))
+            if name=='missing':self.assertEqual(scan['files'][0]['native']['reason'],'shellcheck_tool_not_found')
+            if name in ['missing','unknown-dialect','unsupported']:self.assertFalse(scan['local_check_complete'])
+            if name in ['unknown-dialect','unsupported']:self.assertEqual(data['next']['disposition'],'needs_decision')
+        sarif=json.loads((prefix/'shell-project-2026-10-06-sarif.json').read_text())
+        self.assertEqual(sarif['runs'][0]['properties']['nativeFindingCount'],2)
+        self.assertFalse(sarif['runs'][0]['invocations'][0]['executionSuccessful'])
+        self.assertFalse(any(r.get('locations') for r in sarif['runs'][0]['results']))
+
     def test_help_compatibility(self):
         data = json.loads((ROOT / 'tests/acceptance/evidence/command-help-shell-2026-10-06-default.json').read_text())
         validator('command-help-v0.4.schema.json').validate(data)

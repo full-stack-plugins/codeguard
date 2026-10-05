@@ -696,3 +696,24 @@ SC1071/1090/1091/1092/1134/1144/1145 分类为环境或依赖阻塞；可同时�
 `next` 为Shell提供0.17.0指引，`task show` 为0.3.0，两者推荐绑定任务ID及绝对工作区的task verify，保留Shell工具参数；原方言/显式rc由首次报告绑定，工具入口仍需重新核验。源码或原rc变化会撤回直接修改指引，先要求原生复扫；配置抑制、同步成功或零诊断不关闭已有任务。Shell专用 `task verify CG-… . --shellcheck-tool /absolute/shellcheck --format json` 已接入0.24.0局部复检、既有租约和失败尝试历史，绑定首次方言、原显式rc及SC规则组。原规则仍存在为still_present；配置改变后零诊断为rule_coverage_requires_review；疑似disable注释为suppression_requires_review；修复后零诊断为candidate_absent_unverified_policy。注释观察不证明实际抑制。受信任关闭、复发和项目全范围尚未验收，7.4继续开放。任务勾选或删除Markdown不能消除事实。
 
 Shell失败尝试使用task claim/attempt/verify记录，两次同动作原规则仍存在后next为needs_decision，第三次被拒绝；问题仍保留。历史Markdown保留原内容，task show/next提供当前指引。见 [验收记录](tests/acceptance/shellcheck-task-recheck-baseline.md)。
+
+## Shell 项目发现范围的原生检查
+
+`codeguard check shell . --shellcheck-tool /absolute/shellcheck --format json` 和 `check all` 现在对静态发现的Shell文件逐项调用ShellCheck0.11.0，共享总deadline。0.52.0反馈的 `native_results.shell_lint` 为0.1.0 `shell_native_scan`，保存每个文件的源码摘要、方言、原rc、SC规则/Unicode标量位置、输入稳定性及工作台状态。human显示原规则位置；SARIF只投影当前观察，位置和原生消息仍留私有证据。
+
+方言优先来自shebang及明确扩展名；无声明的文件可显式提供 `--shell-dialect bash` 作为默认值，不能覆盖已有zsh/fish声明。未知或不适用方言保持未完成，next提出具体方言/检查器决策，不重复安装不适用工具。每次最多64文件，超限显示unobserved_count；local_check_complete仅说明这批冻结单文件原生观察完成，不能证明项目source依赖、所有检查族或可信覆盖。
+
+已初始化时绑定请求项目根，子工作台不改变归属；未初始化不创建目录。相同文件/方言/SC规则更新原任务；环境和配置故障保留阻塞。源码、范围、工具或rc变化撤回当前定位权限。Shell没有WASM资产时不伪造初检。check shell仍退出3/not_evaluated，check all仍为incomplete；安全、CVE、source依赖、可信关闭/复发、zsh/fish专用能力、Dockerfile/IaC和跨平台验收继续开放。
+
+```mermaid
+flowchart LR
+    A[静态发现Shell文件] --> B[逐文件方言与rc]
+    B --> C[原生ShellCheck与共享deadline]
+    C --> D[复核源码 范围 配置 工具]
+    D --> E[绑定请求根的稳定任务]
+    E --> F[next与task verify]
+    C --> G[逐文件诊断和环境阻塞]
+    G --> H[human JSON SARIF局部反馈]
+```
+
+证据见 [项目Shell验收](tests/acceptance/shellcheck-project-baseline.md)。

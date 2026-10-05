@@ -1650,3 +1650,7 @@ Rust受控调用ShellCheck0.11.0 json1，固定方言、stdin、入口摘要、�
 ## 2026-10-06 Shell任务统一复检指引与无进展验收
 
 next 0.17/task show 0.3和新Markdown统一提供绑定任务ID的task verify，原方言/显式rc由首次证据读取。task show丢失工具参数反例先失败后修复。受控及真实ShellCheck0.11.0都验证两次ready-to-verify尝试分别绑定失败复检事件，next转needs_decision，第三次同动作no_progress_budget_exhausted，原任务仍open。保留0.16历史schema/报告，不覆盖已有用户Markdown。next专用复检指引和限定Shell失败尝试链路已有验收；可信关闭/复发、全语言工作流和7.4/S09完整范围仍开放。
+
+## 2026-10-06 Shell逐文件项目入口接线（局部验收）
+
+check shell/all接入ShellCheck0.11.0，按shebang/文件声明或显式默认方言逐项观察；最多64文件，共享总deadline，超限明示。原rc、SC规则和环境原因逐文件保存，绑定请求工作区根，子工作台不劫持归属，重复任务稳定。未知/不适用方言直接needs_decision；运行期间源修改撤回当前定位，SARIF保留当前局部诊断且不公开路径。新check反馈0.52与shell_native_scan0.1；旧报告协议不变。真实工具记录、范围/预算/错误参数/嵌套工作台反例见tests/acceptance/shellcheck-project-baseline.md。没有Shell WASM，不伪造fallback；完整source依赖、各检查族、可信关闭/复发、Dockerfile/IaC、专用zsh/fish和平台验收仍缺，7.4/S09不勾选。
