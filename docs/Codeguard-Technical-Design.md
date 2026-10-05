@@ -1617,3 +1617,5 @@ Rust selected-file parser preparation now resolves Cargo edition from bounded pa
 Rust edit feedback now reports safe lines, stable tasks and original Rustfmt recheck guidance while retaining Clippy/type/build obligations. See [scoped chain acceptance](../tests/acceptance/rust-native-hook.md).
 
 Rust edit dialogue now provides an executable post-batch Clippy command and explicitly states that project lint did not run during editing. Original-task repair-ready retains current rule/line feedback and withdraws changed-input guidance; this is not a background queue or authoritative closure. See [project lint follow-up](Rust-Project-Lint-Followup.md).
+
+Native-first Rust syntax tasks now have a scoped protected-host SDK resolution and same-tool recurrence path, binding the original counterexample and Cargo edition provenance. Production host approval integration and WASM-first Rust resolution remain pending; this does not qualify Clippy or project delivery. See [scoped acceptance](../tests/acceptance/rust-task-resolution.md).

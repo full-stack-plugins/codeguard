@@ -1618,3 +1618,5 @@ Rust选中文件解析前置现从有界包/工作区声明确定Cargo edition�
 Rust编辑反馈现保留安全行号、稳定任务与原Rustfmt复检指引，Clippy/类型/构建义务继续保留。见[局部链路验收](../tests/acceptance/rust-native-hook.md)。
 
 Rust编辑后现提供可执行的批次后Clippy指令，明确编辑阶段未运行项目lint。原任务repair_ready保留当前规则/行号并撤回输入变化后的指引；这不是后台队列或可信关闭。见[项目lint后续流程](Rust-Project-Lint-Followup.zh_CN.md)。
+
+Rust 原生首次语法任务现有受保护宿主 SDK 关闭与同工具复发重开路径；固定 Cargo edition 来源与原反例，未完成或输入变化不能关闭。生产宿主批准接线和 WASM 首次任务仍待完成，不能替代 Clippy/项目门禁。详见 [限定验收](../tests/acceptance/rust-task-resolution.md)。
