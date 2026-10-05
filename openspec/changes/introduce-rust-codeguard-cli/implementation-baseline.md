@@ -137,3 +137,10 @@ Clippy 现在在原生执行前冻结已观察源码及根配置/锁的字节或
 ## 2026-10-05 Ruby原生优先与稳定任务局部链路
 
 源码新增lint ruby单文件、绝对PATH/显式原生选择与有界WASM缺工具初检。固定Ruby2.6.10p210以stdin进行-c，不执行源码/gems；项目版本未知、无列号、原生失败不回退等边界明确。WASM候选与原生首次观察复用稳定任务；next/原工具task verify保存证据，零诊断仍不关闭。真实/usr/bin/ruby完成发现→修复→复检，报告和尝试协议留证；完整语言lint、原生聚合、可信关闭与公开发行不借用这条链路作为证明。见[局部验收](../../../tests/acceptance/ruby-native-entry.md)。
+
+
+## 2026-10-05 Ruby项目原生优先接线
+
+check ruby/all新增--ruby-tool并复用固定版本有界语法扫描；64文件/共享deadline/失效定位撤回/原生选择失败不转WASM/缺工具候选与稳定任务接线完成局部验收。默认全workspace1395通过，WASM受影响58通过及32grammar/语言选择26通过；新聚合0.51保存精确封闭报告，默认/WASM实际工具状态分开捕获。详见[局部验收](../../../tests/acceptance/ruby-project-native-scan.md)；RuboCop等完整语言规则、资格及发行不借用本批证据计完成。
+
+远端状态更正：87c94b3的CI 37320629796默认lib Go伴随工具变化反例失败（version_unverified而非tool_changed）。本批保留原断言，补充仅测试构建的阶段/终止类型/spawn错误诊断；本机默认lib67通过，Linux根因与远端回归仍待确认，不宣称CI已修复。

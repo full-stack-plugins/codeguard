@@ -56,6 +56,7 @@ struct Args {
     erl_tool: Option<PathBuf>,
     kotlinc_tool: Option<PathBuf>,
     swift_tool: Option<PathBuf>,
+    ruby_tool: Option<PathBuf>,
     zig_tool: Option<PathBuf>,
     maven_tool: Option<PathBuf>,
     java_home: Option<PathBuf>,
@@ -349,6 +350,34 @@ pub fn run(args: &[String]) -> ExitCode {
             &AtomicBool::new(false),
         );
         execution_tasks.push(json!({"id":"swift.lint","status":if report["local_parse_complete"]==true {"native_observed_unverified"} else {"native_incomplete"}}));
+        report
+    };
+    let ruby_sources = if parsed.selection.includes("ruby") {
+        discovery
+            .languages
+            .get("ruby")
+            .map(|e| {
+                e.source_files
+                    .iter()
+                    .filter(|p| p.ends_with(".rb"))
+                    .cloned()
+                    .collect()
+            })
+            .unwrap_or_default()
+    } else {
+        BTreeSet::new()
+    };
+    let mut ruby_lint = if ruby_sources.is_empty() {
+        Value::Null
+    } else {
+        let report = crate::check_ruby_scan::observe(
+            &root,
+            &ruby_sources,
+            parsed.ruby_tool.clone(),
+            deadline,
+            &AtomicBool::new(false),
+        );
+        execution_tasks.push(json!({"id":"ruby.lint","status":if report["local_parse_complete"]==true {"native_observed_unverified"} else {"native_incomplete"}}));
         report
     };
     let zig_sources = if parsed.selection.includes("zig") {
@@ -1237,6 +1266,14 @@ pub fn run(args: &[String]) -> ExitCode {
         crate::native_syntax_confirmation::connect(&root, &mut swift_lint, deadline);
         crate::check_swift_scan::refresh(&root, &mut swift_lint, deadline);
     }
+    if ruby_lint.is_object() {
+        if source_recheck.or(scope_recheck).is_some() {
+            ruby_lint["scope_stable"] = json!(false);
+        }
+        crate::check_ruby_scan::refresh(&root, &mut ruby_lint, deadline);
+        crate::native_syntax_confirmation::connect(&root, &mut ruby_lint, deadline);
+        crate::check_ruby_scan::refresh(&root, &mut ruby_lint, deadline);
+    }
     if erlang_lint.is_object() {
         if source_recheck.or(scope_recheck).is_some() {
             crate::check_erlang_scan::invalidate_scope(&mut erlang_lint);
@@ -1372,6 +1409,14 @@ pub fn run(args: &[String]) -> ExitCode {
                 candidate["reason"] = json!("swift_single_file_project_checks_unverified");
                 candidate["next_action"] = json!(
                     "读取 native_results.swift_lint 的当前语法位置、环境阻塞；核对逐文件任务同步结果，单文件 parse不代替项目 lint 与完整构建"
+                );
+            }
+            if language == "ruby" && category == "lint" && ruby_lint.is_object() {
+                candidate["checker_id"] = json!("ruby.syntax");
+                candidate["status"] = json!("native_incomplete");
+                candidate["reason"] = json!("ruby_single_file_project_checks_unverified");
+                candidate["next_action"] = json!(
+                    "读取 native_results.ruby_lint 的当前语法位置、环境阻塞；核对逐文件任务同步结果，单文件Ruby2.6.10p210语法观察不代替项目 lint 与完整构建"
                 );
             }
             if language == "erlang" && category == "lint" && erlang_present {
@@ -1564,6 +1609,18 @@ pub fn run(args: &[String]) -> ExitCode {
         }
         if swift_lint["local_parse_complete"] != true {
             unresolved.insert("swift_native_scan_incomplete".into());
+        }
+    }
+    if ruby_lint.is_object() {
+        unresolved.insert("ruby_project_lint_and_build_coverage_unverified".into());
+        if ruby_lint["task_status"] == "not_connected" {
+            unresolved.insert("ruby_native_task_workspace_not_connected".into());
+        }
+        if ruby_lint["task_status"] == "incomplete" {
+            unresolved.insert("ruby_native_task_sync_incomplete".into());
+        }
+        if ruby_lint["local_parse_complete"] != true {
+            unresolved.insert("ruby_native_scan_incomplete".into());
         }
     }
     if erlang_present {
@@ -1759,11 +1816,17 @@ pub fn run(args: &[String]) -> ExitCode {
             }
         }
         if next.is_null() {
-            let ids = [&erlang_lint, &kotlin_lint, &swift_lint, &zig_lint]
-                .into_iter()
-                .flat_map(|report| report["files"].as_array().into_iter().flatten())
-                .filter_map(|file| file["task_id"].as_str().map(str::to_owned))
-                .collect();
+            let ids = [
+                &erlang_lint,
+                &kotlin_lint,
+                &swift_lint,
+                &zig_lint,
+                &ruby_lint,
+            ]
+            .into_iter()
+            .flat_map(|report| report["files"].as_array().into_iter().flatten())
+            .filter_map(|file| file["task_id"].as_str().map(str::to_owned))
+            .collect();
             next = match crate::next_command::read_local_brief_for_tasks(&root, &ids) {
                 Ok(brief) => brief,
                 Err(reason) => {
@@ -1816,6 +1879,12 @@ pub fn run(args: &[String]) -> ExitCode {
                 .as_array()
                 .is_some_and(|files| files.iter().any(|f| f["native"]["tool_sha256"].is_string())),
         );
+    let started_native_task_count = started_native_task_count
+        + usize::from(
+            ruby_lint["files"]
+                .as_array()
+                .is_some_and(|files| files.iter().any(|f| f["native"]["tool_sha256"].is_string())),
+        );
     #[cfg(feature = "wasm-precheck")]
     let syntax_candidates = crate::check_syntax_candidates::observe(
         &root,
@@ -1827,6 +1896,7 @@ pub fn run(args: &[String]) -> ExitCode {
             erlang_lint: &erlang_lint,
             kotlin_lint: &kotlin_lint,
             swift_lint: &swift_lint,
+            ruby_lint: &ruby_lint,
             zig_lint: &zig_lint,
             rust_targets: &_rust_syntax_coverage,
             go_tool: parsed.go_tool.as_deref(),
@@ -1880,8 +1950,11 @@ pub fn run(args: &[String]) -> ExitCode {
     if zig_lint.is_object() {
         crate::check_zig_scan::refresh(&root, &mut zig_lint, deadline);
     }
+    if ruby_lint.is_object() {
+        crate::check_ruby_scan::refresh(&root, &mut ruby_lint, deadline);
+    }
     let mut report = json!({
-        "schema_version":if next["schema_version"] == "0.14.0" {"0.50.0"} else if next["schema_version"] == "0.13.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.49.0"} else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row.get("structural_observations").is_some())) {"0.48.0"} else if zig_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.12.0" {"0.47.0"}else if zig_lint.is_object() {"0.46.0"} else if matches!(parsed.selection, Selection::Language(_)) {"0.45.0"} else if swift_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.11.0" {"0.44.0"} else if swift_lint.is_object() {"0.43.0"} else if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
+        "schema_version":if ruby_lint.is_object() || next["schema_version"] == "0.15.0" {"0.51.0"} else if next["schema_version"] == "0.14.0" {"0.50.0"} else if next["schema_version"] == "0.13.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.49.0"} else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row.get("structural_observations").is_some())) {"0.48.0"} else if zig_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.12.0" {"0.47.0"}else if zig_lint.is_object() {"0.46.0"} else if matches!(parsed.selection, Selection::Language(_)) {"0.45.0"} else if swift_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.11.0" {"0.44.0"} else if swift_lint.is_object() {"0.43.0"} else if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
         "operation":"check", "selection":parsed.selection.as_str(), "command_status":if request_cancelled { "cancelled" } else { "incomplete" },
         "exit_code":if request_cancelled { 130 } else { 3 }, "delivery_decision":if parsed.selection == Selection::All { "incomplete" } else { "not_evaluated" }, "authority":"local_unverified",
         "reason":if request_cancelled { "request_cancelled" } else if parsed.selection == Selection::All { "full_project_obligations_and_trusted_policy_unavailable" } else if parsed.selection == Selection::Java { "java_selection_obligations_and_trusted_policy_unavailable" } else { "language_selection_obligations_and_trusted_policy_unavailable" },
@@ -1893,7 +1966,7 @@ pub fn run(args: &[String]) -> ExitCode {
         "syntax_tasks":syntax_tasks,
         "execution_budget":check_budget_record(
             parsed.timeout_ms, parsed.timeout_source, parsed.jobs_limit, parsed.jobs_source,
-            usize::from(node_present) + usize::from(python_present) + python_cve_roots.len() + 4 * usize::from(rust_present) + usize::from(go_present) + usize::from(erlang_present) + usize::from(java_present) + usize::from(javadoc_configured) + usize::from(dependency_configured) + usize::from(cve_configured) + npm_roots.len() + usize::from(kotlin_lint.is_object()) + usize::from(swift_lint.is_object()) + usize::from(zig_lint.is_object()), started_native_task_count
+            usize::from(node_present) + usize::from(python_present) + python_cve_roots.len() + 4 * usize::from(rust_present) + usize::from(go_present) + usize::from(erlang_present) + usize::from(java_present) + usize::from(javadoc_configured) + usize::from(dependency_configured) + usize::from(cve_configured) + npm_roots.len() + usize::from(kotlin_lint.is_object()) + usize::from(swift_lint.is_object()) + usize::from(zig_lint.is_object()) + usize::from(ruby_lint.is_object()), started_native_task_count
         ),
         "next":next,
         "export":{"status":"not_requested","reason_code":null}
@@ -1901,7 +1974,7 @@ pub fn run(args: &[String]) -> ExitCode {
     if zig_lint.is_object()
         || matches!(
             report["schema_version"].as_str(),
-            Some("0.47.0" | "0.48.0" | "0.49.0" | "0.50.0")
+            Some("0.47.0" | "0.48.0" | "0.49.0" | "0.50.0" | "0.51.0")
         )
     {
         report["native_results"]["zig_lint"] = zig_lint.clone();
@@ -1919,6 +1992,7 @@ pub fn run(args: &[String]) -> ExitCode {
                 | "0.48.0"
                 | "0.49.0"
                 | "0.50.0"
+                | "0.51.0"
         )
     ) {
         if let Some(native) = report["native_results"].as_object_mut() {
@@ -1927,11 +2001,24 @@ pub fn run(args: &[String]) -> ExitCode {
     }
     if !matches!(
         report["schema_version"].as_str(),
-        Some("0.43.0" | "0.44.0" | "0.45.0" | "0.46.0" | "0.47.0" | "0.48.0" | "0.49.0" | "0.50.0")
+        Some(
+            "0.43.0"
+                | "0.44.0"
+                | "0.45.0"
+                | "0.46.0"
+                | "0.47.0"
+                | "0.48.0"
+                | "0.49.0"
+                | "0.50.0"
+                | "0.51.0"
+        )
     ) {
         if let Some(native) = report["native_results"].as_object_mut() {
             native.remove("swift_lint");
         }
+    }
+    if report["schema_version"] == "0.51.0" {
+        report["native_results"]["ruby_lint"] = ruby_lint.clone();
     }
     if parsed.format != OutputFormat::Human {
         emit_structured(&report, &parsed);
@@ -2137,6 +2224,25 @@ pub fn run(args: &[String]) -> ExitCode {
                     println!(
                         "  {}:{}:{} {}（UTF-8 字节列）",
                         file["path"], row["line"], row["column"], row["rule_id"]
+                    );
+                }
+            }
+        }
+        if let Some(files) = report["native_results"]["ruby_lint"]["files"].as_array() {
+            println!("Ruby 原生冻结单文件语法观察；完整 lint、类型、构建和任务同步仍待完成");
+            for file in files {
+                println!(
+                    "  {}：{}；{}",
+                    file["path"], file["native"]["reason"], file["next_action"]
+                );
+                for row in file["native"]["diagnostics"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                {
+                    println!(
+                        "  {}:{} {}（仅行号，项目Ruby版本适用性待核对）",
+                        file["path"], row["line"], row["rule_id"]
                     );
                 }
             }
@@ -2770,6 +2876,7 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
     let mut erl_tool = None;
     let mut kotlinc_tool = None;
     let mut swift_tool = None;
+    let mut ruby_tool = None;
     let mut zig_tool = None;
     let mut maven_tool = None;
     let mut java_home = None;
@@ -2879,6 +2986,15 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
                     .is_some()
                 {
                     return Err("--swift-tool 重复".into());
+                }
+            }
+            "--ruby-tool" => {
+                index += 1;
+                if ruby_tool
+                    .replace(PathBuf::from(args.get(index).ok_or("缺少 Ruby 工具路径")?))
+                    .is_some()
+                {
+                    return Err("--ruby-tool 重复".into());
                 }
             }
             "--erl-tool" => {
@@ -3041,6 +3157,9 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
     if zig_tool.as_ref().is_some_and(|path| !path.is_absolute()) {
         return Err("--zig-tool 必须是绝对路径".into());
     }
+    if ruby_tool.as_ref().is_some_and(|path| !path.is_absolute()) {
+        return Err("--ruby-tool 必须是绝对路径".into());
+    }
     if swift_tool.as_ref().is_some_and(|path| !path.is_absolute()) {
         return Err("--swift-tool 必须是绝对路径".into());
     }
@@ -3057,6 +3176,7 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
         || (!selection.includes("erlang") && erl_tool.is_some())
         || (!selection.includes("kotlin") && kotlinc_tool.is_some())
         || (!selection.includes("swift") && swift_tool.is_some())
+        || (!selection.includes("ruby") && ruby_tool.is_some())
         || (!selection.includes("zig") && zig_tool.is_some())
         || (!selection.includes("java")
             && (maven_tool.is_some()
@@ -3112,6 +3232,7 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
         erl_tool,
         kotlinc_tool,
         swift_tool,
+        ruby_tool,
         zig_tool,
         maven_tool,
         java_home,

@@ -662,3 +662,10 @@ Rust npm审计适配 MUST 核对具体原工具版本、auditReportVersion、冻
 #### Scenario: Public native finding disappears after a same-configuration repair
 - **WHEN** 原生工具先检出规则，再用相同原配置检查已修复文件而零诊断
 - **THEN** 对话分别展示原发现及局部零诊断，仍明确完整项目覆盖和策略未核验；未接持久任务时不虚构关闭事件
+
+
+#### Scenario: Ruby project checks reuse bounded native syntax observations
+- **WHEN** check ruby or check all discovers Ruby files
+- **THEN** Codeguard selects an explicit or absolute-PATH Ruby entry before WASM; observing at most64 frozen files with one shared deadline retains unobserved files and incomplete scope
+- **AND** selected tool failures never fall back to WASM, missing tools retain candidate fallback, invalidated source/tool identities withdraw old positions, and initialized workspaces reuse stable tasks and original-tool rechecks
+- **AND** fixed Ruby2.6.10p210 syntax observations have line-only evidence and never imply RuboCop, project-version compatibility, complete project lint or delivery approval.

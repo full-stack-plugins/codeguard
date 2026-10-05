@@ -113,6 +113,14 @@ pub(crate) fn observe(
         || !version.stderr.is_empty()
         || !verified_version(&version.stdout)
     {
+        #[cfg(test)]
+        eprintln!(
+            "Go version probe incomplete: termination={:?}, spawn_os_error={:?}, stdout_bytes={}, stderr_bytes={}",
+            version.termination,
+            version.spawn_os_error,
+            version.stdout.len(),
+            version.stderr.len()
+        );
         report["reason"] = json!("go_syntax_version_unverified");
         return report;
     }
@@ -131,6 +139,14 @@ pub(crate) fn observe(
         || !fmt_version.stderr.is_empty()
         || fmt_version.stdout != expected
     {
+        #[cfg(test)]
+        eprintln!(
+            "Go companion version probe incomplete: termination={:?}, spawn_os_error={:?}, stdout_bytes={}, stderr_bytes={}",
+            fmt_version.termination,
+            fmt_version.spawn_os_error,
+            fmt_version.stdout.len(),
+            fmt_version.stderr.len()
+        );
         report["reason"] = json!("go_syntax_version_unverified");
         return report;
     }
@@ -379,7 +395,10 @@ mod tests {
                     Instant::now() + Duration::from_secs(5),
                     &AtomicBool::new(false),
                 );
-                assert_eq!(report["reason"], "go_syntax_tool_changed");
+                assert_eq!(
+                    report["reason"], "go_syntax_tool_changed",
+                    "phase={phase}, mode={mode}, report={report}"
+                );
                 assert_eq!(report["diagnostics"], serde_json::json!([]));
                 assert!(!real.with_extension("called").exists());
                 assert!(!other.with_extension("called").exists());

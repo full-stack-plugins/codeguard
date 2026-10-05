@@ -78,6 +78,7 @@ fn observe(root: &Path, deadline: Instant) -> Value {
             kotlin_lint: &Value::Null,
             zig_lint: &Value::Null,
             swift_lint: &Value::Null,
+            ruby_lint: &Value::Null,
             rust_targets: &crate::rust_native_syntax_coverage::RustNativeSyntaxCoverage::default(),
             go_tool: None,
         },

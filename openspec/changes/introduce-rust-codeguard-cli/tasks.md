@@ -1608,3 +1608,13 @@ check python/all现通过0.48反馈保留独立结构计数和原始坐标，原
 
 
 本批终态：默认全workspace1387通过/0失败/125忽略；共享任务WASM11目标87通过/0失败/7忽略；追加反例后Ruby目标默认11/WASM12通过，各1真实测试忽略，显式真实Ruby目标另行1通过。schema5通过；默认/WASM严格Clippy、分层、fmt、OpenSpec通过，最终证据见tests/acceptance/ruby-native-entry.md。受保护的用户Erlang草稿散列不变，未纳入提交。本批不勾选全语言/全工作流父任务。
+
+
+## 2026-10-05 Ruby项目原生扫描接线（局部验收）
+
+对应既有8.*、9.3/9.9、14.7/14.10/14.11/14.19；不增加第二个change、不勾选全语言父任务。check ruby/all接受 --ruby-tool 绝对路径，显式或绝对PATH原生优先，固定Ruby2.6.10p210单文件-c语法观察，64文件上限/共同截止时间/源码及工具复核；未观察范围不靠WASM伪装完成。缺工具保留WASM候选，选定工具故障不回退。原生扫描复用独立lint的任务和next指引，项目Ruby版本、RuboCop、完整项目义务与可信关闭继续未评估。
+
+初始4项测试因缺入口/结果失败；接线后4项通过，再增加源码变化撤回及65文件上限反例。WASM受影响6目标58通过/0失败/3忽略；本机真实工具产生缺工具、原生诊断、无效显式工具和修复后零诊断报告。新反馈0.51和Ruby扫描0.1/0.2封闭schema补齐执行项、原因枚举和无结构候选的合法空列表；旧0.50等schema保持原件。最终默认全workspace和严格Clippy结果见tests/acceptance/ruby-project-native-scan.md。
+
+
+本批终态：默认全workspace1395通过/0失败/125忽略，WASM受影响6目标58通过/0失败/3忽略；32grammar/语言选择3目标26通过/0失败/1忽略；默认/WASM严格Clippy、fmt、分层、OpenSpec通过，实际两构建8份报告与schema3项验收见tests/acceptance/ruby-project-native-scan.md。未修改用户Erlang草稿、旧schema或grammar资产；完整语言资格和发行父任务仍开放。
