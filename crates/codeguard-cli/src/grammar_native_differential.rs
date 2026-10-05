@@ -68,8 +68,12 @@ pub fn replay_native_corpus(
     let javascript_selected = tools.contains_key("javascript");
     let ruby_selected = tools.contains_key("ruby");
     let go_selected = tools.contains_key("go");
-    let measure_structure =
-        tools.contains_key("python") || javascript_selected || ruby_selected || go_selected;
+    let rust_selected = tools.contains_key("rust");
+    let measure_structure = tools.contains_key("python")
+        || javascript_selected
+        || ruby_selected
+        || go_selected
+        || rust_selected;
     let mut cases = Vec::new();
     for case in &corpus.cases {
         let Some((checker, tool, tool_sha, companion)) = frozen.get(&case.language) else {
@@ -235,8 +239,8 @@ pub fn replay_native_corpus(
             inventory.push(json!({"language":language,"grammar_sha256":asset["sha256"],"native_selected":false,"reason":if checker(language).is_some(){"explicit_native_tool_not_selected"}else{"native_differential_adapter_unavailable"},"grammar_qualified":false}));
         }
     }
-    let mut report = json!({"schema_version":if go_selected {"0.7.0"}else if ruby_selected {"0.5.0"}else if javascript_selected {"0.4.0"}else if measure_structure {"0.3.0"}else{"0.1.0"},"report_type":"native_grammar_differential","status":"incomplete","delivery_decision":"not_evaluated",
-        "authority":"development_native_differential_only","native_adapter_reused":!(javascript_selected || ruby_selected || go_selected),"independent_holdout":false,"grammar_qualified_count":0,
+    let mut report = json!({"schema_version":if rust_selected {"0.8.0"}else if go_selected {"0.7.0"}else if ruby_selected {"0.5.0"}else if javascript_selected {"0.4.0"}else if measure_structure {"0.3.0"}else{"0.1.0"},"report_type":"native_grammar_differential","status":"incomplete","delivery_decision":"not_evaluated",
+        "authority":"development_native_differential_only","native_adapter_reused":!(javascript_selected || ruby_selected || go_selected || rust_selected),"independent_holdout":false,"grammar_qualified_count":0,
         "corpus_sha256":digest(corpus_bytes),"manifest_sha256":corpus.manifest_sha256,"program_sha256":program_sha,"program_stable":program_stable,
         "language_count":inventory.len(),"selected_language_count":frozen.len(),"sample_count":cases.len(),"languages":inventory,"cases":cases});
     if measure_structure {

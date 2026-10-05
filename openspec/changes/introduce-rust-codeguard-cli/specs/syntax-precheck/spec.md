@@ -733,3 +733,21 @@ Fixed CFQuery grammar direct AST keyword sequence SELECT/DISTINCT/FROM MAY produ
 - **WHEN** the same frozen SELECT DISTINCT FROM users has zero raw grammar recovery and PostgreSQL18.6 PREPARE returns SQLSTATE42601
 - **THEN** the public probe and selected-file check show an independent structure candidate and require applicable native confirmation; repeated scans share one task, while raw grammar observations remain zero
 - **AND** quoted literals, interpolated projection and the PostgreSQL-accepted SELECT FROM users do not match this rule
+
+### Requirement: Rust formatter parser comparisons SHALL retain explicit syntax scope
+
+Development Rust differential replay SHALL accept an explicitly selected absolute Rustfmt 1.9.0-stable executable and frozen UTF-8 stdin using a private fixed edition2024 configuration, empty environment and the shared deadline/cancellation/output budget. It SHALL verify executable path/content and private configuration continuity before the second invocation and after parsing. It SHALL NOT use `--check` formatting differences as syntax violations, read project formatter configuration, install an SDK, write formatted source, or grant Clippy/build/project coverage. The fixed edition SHALL remain an explicit replay condition, not an inferred project edition.
+
+Diagnostics SHALL require a recognized error header and bounded positions referring to the same stdin. Exit101 alone SHALL NOT prove a source violation: located parser errors MAY be retained, while panic, foreign-file, unlocated, invalid-coordinate, unknown-version, timeout and changed-input observations SHALL remain incomplete. A bounded EOF coordinate exception SHALL be limited to the observed unclosed-delimiter/trailing-newline case. Public observations SHALL expose safe rule IDs and validated line numbers without raw source, arbitrary diagnostics or guessed columns. Grammar and combined structural metrics SHALL remain separate; historical corpora/reports SHALL remain immutable and replay SHALL NOT grant language qualification or task closure.
+
+#### Scenario: Valid unformatted Rust and external modules remain parser observations
+- **WHEN** frozen edition2024 source is valid but unformatted, or names an out-of-line module containing invalid code
+- **THEN** the controlled stdin parser returns no syntax diagnostics for the selected source without formatting files, reading the module as project coverage, or claiming lint/build completion
+
+#### Scenario: Located parser exit101 differs from a native crash
+- **WHEN** the fixed parser returns E0765 at a validated stdin location, or an unclosed delimiter at the bounded EOF location
+- **THEN** record the scoped syntax diagnostic without raw source; a panic, missing location or out-of-range coordinate remains incomplete
+
+#### Scenario: Tool or private configuration changes during version detection
+- **WHEN** the selected executable alias/content or private configuration changes after version observation
+- **THEN** reject the observation before invoking the parser and preserve incomplete evidence without replacement-tool fallback
