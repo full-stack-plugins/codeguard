@@ -71,6 +71,12 @@ pub(crate) fn observe_with_cancellation(
     };
     let tool_sha = format!("{:x}", Sha256::digest(bytes));
     report["tool_sha256"] = json!(tool_sha);
+    // 不仅复核字节，还要保留调用方别名的物理入口绑定。
+    let tool_current = || {
+        tool.canonicalize().ok().as_deref() == Some(executable.as_path())
+            && read_bounded_regular_file(&executable, 64 * 1024 * 1024)
+                .is_ok_and(|bytes| format!("{:x}", Sha256::digest(bytes)) == tool_sha)
+    };
     let invoke = |eval: &str, stdin| {
         run_process(
             &ProcessSpec {
@@ -100,6 +106,10 @@ pub(crate) fn observe_with_cancellation(
         "io:format(\"OTP ~s~n\", [erlang:system_info(otp_release)]), halt().",
         None,
     );
+    if !tool_current() {
+        report["reason"] = json!("erlang_tool_changed_during_check");
+        return report;
+    }
     if version.termination != Termination::Exited(0) {
         report["reason"] = json!(execution_reason(version.termination));
         return report;
@@ -112,10 +122,7 @@ pub(crate) fn observe_with_cancellation(
     }
     report["version"] = json!("OTP 28");
     let outcome = invoke(PARSE_FORMS, Some(source.to_vec()));
-    let current_sha = read_bounded_regular_file(&executable, 64 * 1024 * 1024)
-        .ok()
-        .map(|bytes| format!("{:x}", Sha256::digest(bytes)));
-    if current_sha.as_deref() != Some(tool_sha.as_str()) {
+    if !tool_current() {
         report["reason"] = json!("erlang_tool_changed_during_check");
         return report;
     }

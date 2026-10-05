@@ -30,6 +30,12 @@ pub(crate) fn observe_with_cancellation(
         "{:x}",
         Sha256::digest(read_bounded_regular_file(&executable, 64 * 1024 * 1024).ok()?)
     );
+    // 版本调用也可能改写制品或请求别名；源码调用前后都必须核对冻结入口。
+    let tool_current = || {
+        tool.canonicalize().ok().as_deref() == Some(executable.as_path())
+            && read_bounded_regular_file(&executable, 64 * 1024 * 1024)
+                .is_ok_and(|bytes| format!("{:x}", Sha256::digest(bytes)) == tool_sha256)
+    };
     let version = run_process(
         &ProcessSpec {
             executable: executable.clone(),
@@ -42,6 +48,11 @@ pub(crate) fn observe_with_cancellation(
         },
         cancelled,
     );
+    if !tool_current() {
+        return Some(
+            json!({"status":"incomplete","reason":"zig_tool_changed_during_check","version":null,"tool_sha256":tool_sha256,"diagnostics":[]}),
+        );
+    }
     if version.termination != Termination::Exited(0)
         || std::str::from_utf8(&version.stdout).ok()?.trim() != "0.16.0"
     {
@@ -65,10 +76,7 @@ pub(crate) fn observe_with_cancellation(
         },
         cancelled,
     );
-    let current_tool_sha256 = read_bounded_regular_file(&executable, 64 * 1024 * 1024)
-        .ok()
-        .map(|bytes| format!("{:x}", Sha256::digest(bytes)));
-    if current_tool_sha256.as_deref() != Some(tool_sha256.as_str()) {
+    if !tool_current() {
         return Some(
             json!({"status":"incomplete","reason":"zig_tool_changed_during_check","version":"0.16.0","tool_sha256":tool_sha256,"diagnostics":[]}),
         );

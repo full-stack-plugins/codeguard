@@ -94,7 +94,7 @@ mod tests {
                     "python" => "printf 'ruff 0.16.8\\n'",
                     _ => "printf 'v24.18.0\\n'",
                 };
-                let block = "printf started > \"$0.started\"; exec /bin/sleep 2";
+                let block = "printf started > \"$0.started\"; exec /bin/sleep 30";
                 let version_body = if phase == "version" { block } else { version };
                 let script = format!(
                     "#!/bin/sh\ncase \"$*\" in version|--version|-version|*system_info*) {version_body}; exit 0;; esac\n{block}\n"
@@ -120,7 +120,7 @@ mod tests {
                         &tool,
                         b"x\n",
                         &root,
-                        started + Duration::from_secs(5),
+                        started + Duration::from_secs(10),
                         &cancelled,
                     );
                 let actual_start = watcher.join().unwrap();
@@ -132,13 +132,73 @@ mod tests {
                     "{language}/{phase}: {report}"
                 );
                 assert!(
-                    elapsed < Duration::from_secs(1),
+                    elapsed < Duration::from_secs(5),
                     "{language}/{phase}: 不能等待工具自行完成，耗时{elapsed:?}"
                 );
                 assert!(
                     report["diagnostics"].as_array().unwrap().is_empty(),
                     "取消不能伪造语法发现"
                 );
+            }
+        }
+    }
+    #[test]
+    fn every_observer_stops_before_scan_when_version_changes_entry() {
+        for language in ["zig", "erlang", "swift", "kotlin", "python", "javascript"] {
+            for mode in ["alias", "replace"] {
+                let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
+                    "cg-native-entry-{}-{language}-{mode}",
+                    std::process::id()
+                ));
+                fs::create_dir(&root).unwrap();
+                let tool = root.join("tool");
+                let other = tool.with_extension("other");
+                let alias = tool.with_extension("alias");
+                fs::write(
+                    &other,
+                    "#!/bin/sh\nprintf reached >> \"$0.called\"\nexit 0\n",
+                )
+                .unwrap();
+                fs::set_permissions(&other, fs::Permissions::from_mode(0o700)).unwrap();
+                let version = match language {
+                    "zig" => "printf '0.16.0\\n'",
+                    "erlang" => "printf 'OTP 28\\n'",
+                    "swift" => "printf 'Apple Swift version 6.4 (fixture)\\n'",
+                    "kotlin" => "printf 'info: kotlinc-jvm 2.4.10 (JRE fixture)\\n' >&2",
+                    "python" => "printf 'ruff 0.16.8\\n'",
+                    _ => "printf 'v24.18.0\\n'",
+                };
+                let action = if mode == "alias" {
+                    "/bin/ln -sf \"$0.other\" \"$0.alias\""
+                } else {
+                    "/bin/mv \"$0.other\" \"$0\""
+                };
+                fs::write(&tool,format!("#!/bin/sh\ncase \"$*\" in version|--version|-version|*system_info*) {action}; {version}; exit 0;; esac\nprintf reached >> \"$0.called\"\nexit 0\n")).unwrap();
+                fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
+                std::os::unix::fs::symlink(&tool, &alias).unwrap();
+                let report = GrammarNativeChecker::for_language(language)
+                    .unwrap()
+                    .observe(
+                        &alias,
+                        b"x\n",
+                        &root,
+                        Instant::now() + Duration::from_secs(5),
+                        &AtomicBool::new(false),
+                    );
+                let mut redirected_marker = other.as_os_str().to_owned();
+                redirected_marker.push(".called");
+                let called = tool.with_extension("called").exists()
+                    || std::path::PathBuf::from(redirected_marker).exists();
+                fs::remove_dir_all(root).unwrap();
+                assert!(
+                    !called,
+                    "{language}/{mode}: 版本后的入口变化不得继续执行源码调用"
+                );
+                assert_eq!(
+                    report["status"], "incomplete",
+                    "{language}/{mode}: {report}"
+                );
+                assert!(report["diagnostics"].as_array().unwrap().is_empty());
             }
         }
     }

@@ -628,3 +628,7 @@ Ruff正常与忽略noqa的检查若返回相同的invalid-syntax错误，Codegua
 #### Scenario: Every selected native differential shares in-flight cancellation
 - **WHEN** 对已支持的Zig/Erlang/Swift/Kotlin/Python/JavaScript显式原生差分，在版本探测或源码检查实际启动后取消
 - **THEN** 观察器必须传递同一个请求令牌至runtime，停止当前进程组且不启动后继调用；保持样本、真实失败和unknown比较，不将工具自行退出当作取消完成
+
+#### Scenario: Native differential entry changes during version observation
+- **WHEN** 六种已接入原生观察器的版本调用改变请求别名或替换冻结入口字节
+- **THEN** 在源码调用前复核请求物理入口与制品摘要并拒绝执行后继调用；源码调用后同样复核，变化不能提供原生确认、关闭任务或比较资格

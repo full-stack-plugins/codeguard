@@ -31,6 +31,12 @@ pub(crate) fn observe_with_cancellation(
     };
     let sha = digest(&bytes);
     report["tool_sha256"] = json!(sha);
+    // 不仅复核字节，还要保留调用方别名的物理入口绑定。
+    let tool_current = || {
+        tool.canonicalize().ok().as_deref() == Some(executable.as_path())
+            && read_bounded_regular_file(&executable, 64 * 1024 * 1024)
+                .is_ok_and(|bytes| format!("{:x}", Sha256::digest(bytes)) == sha)
+    };
     let invoke = |args: &[&str], stdin| {
         run_process(
             &ProcessSpec {
@@ -46,6 +52,10 @@ pub(crate) fn observe_with_cancellation(
         )
     };
     let version = invoke(&["--version"], None);
+    if !tool_current() {
+        report["reason"] = json!("swift_tool_changed_during_check");
+        return report;
+    }
     if version.termination != Termination::Exited(0) {
         report["reason"] = json!(execution_reason(version.termination));
         return report;
@@ -88,12 +98,7 @@ pub(crate) fn observe_with_cancellation(
         ],
         Some(source.to_vec()),
     );
-    if read_bounded_regular_file(&executable, 64 * 1024 * 1024)
-        .ok()
-        .map(|b| digest(&b))
-        .as_deref()
-        != Some(&sha)
-    {
+    if !tool_current() {
         report["reason"] = json!("swift_tool_changed_during_check");
         return report;
     }
