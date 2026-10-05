@@ -9,3 +9,5 @@
 扩展反例还覆盖 9 条限制与换行控制字符。完整 manifest 测试 11/11、`grammar_status_cli` 2/2、受影响 crate 的 all-targets Clippy `-D warnings`、`cargo fmt --all --check`、OpenSpec strict 和 JSON Schema 对当前清单的校验均通过。已发布的 npm 0.1.3 由旧源码构建，不包含本次报告字段；此处只证明当前源码候选，不冒称已发布行为。
 
 2026-10-03 后续校正：C、Go、JavaScript、Rust、Zig 已有窄范围原生差分，清单不再错误声称这些语言完全缺原生对照；CFQuery 明确提示 `SELECT FROM` 无恢复节点且该 grammar 不验证完整 SQL 语义。`grammar_status_cli` 逐语种断言证据文字与 `released=false`，完整语言验收仍未完成。已发布 npm 0.1.3 的嵌入清单不会因源码文字修改而自动更新。
+
+2026-10-06 CFQuery原生方言反证：PostgreSQL允许空SELECT列表，使用DISTINCT则不允许。因此当前清单中的空列表描述不能单独作为已确认违规或已裁定漏检；泛SQL样例保持pending。实际固定镜像与同字节WASM证据见[方言对照](cfquery-postgres-dialect.md)，不修改冻结清单或借此批准grammar。

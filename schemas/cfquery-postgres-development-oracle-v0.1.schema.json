@@ -1,0 +1,270 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:cfquery-postgres-development-oracle:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "image_id",
+    "server_version",
+    "network",
+    "persistent_storage",
+    "authority",
+    "grammar_qualified",
+    "delivery_decision",
+    "independent_holdout",
+    "cases"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "report_type": {
+      "const": "cfquery_postgres_development_oracle"
+    },
+    "image_id": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "server_version": {
+      "const": "postgres (PostgreSQL) 18.6"
+    },
+    "network": {
+      "const": "none"
+    },
+    "persistent_storage": {
+      "const": false
+    },
+    "authority": {
+      "const": "development_only"
+    },
+    "grammar_qualified": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "independent_holdout": {
+      "const": false
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": false,
+      "prefixItems": [
+        {
+          "allOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "dialect",
+                "source",
+                "source_sha256",
+                "native_valid",
+                "native_exit_code",
+                "sqlstate",
+                "query_execution",
+                "isolated_relation"
+              ],
+              "properties": {
+                "id": {
+                  "enum": [
+                    "postgres-empty-select-list",
+                    "postgres-distinct-empty-select-list"
+                  ]
+                },
+                "dialect": {
+                  "const": "postgresql"
+                },
+                "source": {
+                  "enum": [
+                    "SELECT FROM users",
+                    "SELECT DISTINCT FROM users"
+                  ]
+                },
+                "source_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "native_valid": {
+                  "type": "boolean"
+                },
+                "native_exit_code": {
+                  "enum": [
+                    0,
+                    1
+                  ]
+                },
+                "sqlstate": {
+                  "enum": [
+                    null,
+                    "42601"
+                  ]
+                },
+                "query_execution": {
+                  "const": "not_executed_prepare_only"
+                },
+                "isolated_relation": {
+                  "const": "fixture_users"
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "native_valid": {
+                        "const": true
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "native_exit_code": {
+                        "const": 0
+                      },
+                      "sqlstate": {
+                        "type": "null"
+                      }
+                    }
+                  },
+                  "else": {
+                    "properties": {
+                      "native_exit_code": {
+                        "const": 1
+                      },
+                      "sqlstate": {
+                        "const": "42601"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "properties": {
+                "id": {
+                  "const": "postgres-empty-select-list"
+                },
+                "source": {
+                  "const": "SELECT FROM users"
+                },
+                "native_valid": {
+                  "const": true
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "dialect",
+                "source",
+                "source_sha256",
+                "native_valid",
+                "native_exit_code",
+                "sqlstate",
+                "query_execution",
+                "isolated_relation"
+              ],
+              "properties": {
+                "id": {
+                  "enum": [
+                    "postgres-empty-select-list",
+                    "postgres-distinct-empty-select-list"
+                  ]
+                },
+                "dialect": {
+                  "const": "postgresql"
+                },
+                "source": {
+                  "enum": [
+                    "SELECT FROM users",
+                    "SELECT DISTINCT FROM users"
+                  ]
+                },
+                "source_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "native_valid": {
+                  "type": "boolean"
+                },
+                "native_exit_code": {
+                  "enum": [
+                    0,
+                    1
+                  ]
+                },
+                "sqlstate": {
+                  "enum": [
+                    null,
+                    "42601"
+                  ]
+                },
+                "query_execution": {
+                  "const": "not_executed_prepare_only"
+                },
+                "isolated_relation": {
+                  "const": "fixture_users"
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "native_valid": {
+                        "const": true
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "native_exit_code": {
+                        "const": 0
+                      },
+                      "sqlstate": {
+                        "type": "null"
+                      }
+                    }
+                  },
+                  "else": {
+                    "properties": {
+                      "native_exit_code": {
+                        "const": 1
+                      },
+                      "sqlstate": {
+                        "const": "42601"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "properties": {
+                "id": {
+                  "const": "postgres-distinct-empty-select-list"
+                },
+                "source": {
+                  "const": "SELECT DISTINCT FROM users"
+                },
+                "native_valid": {
+                  "const": false
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
