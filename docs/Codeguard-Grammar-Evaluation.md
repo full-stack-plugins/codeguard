@@ -47,11 +47,11 @@ Build the new corpus using the Rust [developer importer](../crates/codeguard-cli
 cargo run --locked -p codeguard-cli --example build_grammar_corpus -- \
   tests/fixtures/grammar_regression.json \
   tests/fixtures/grammar_additional_regressions.json \
-  > /tmp/codeguard-grammar-corpus.json
-cmp /tmp/codeguard-grammar-corpus.json tests/fixtures/grammar_regression_v0_2.json
+  --base-manifest tests/fixtures/grammar_manifests/manifest_2026_10_04.json \
+  > /tmp/codeguard-grammar-current-corpus.json
 ```
 
-The importer retains CRLF, blank lines and the final expected tree. Origins bind the upstream file hash and sample name. Missing separators, empty nodes, malformed expectations and unsupported corpus directives are rejected. Grammar expectations remain grammar regression labels. The [legacy corpus](../tests/fixtures/grammar_regression.json), version 0.1 schemas and historical 186-case report remain intact; old input produces the old output shape.
+The importer retains CRLF, blank lines and the final expected tree. Origins bind the upstream file hash and sample name. Missing separators, empty nodes, malformed expectations and unsupported corpus directives are rejected. Grammar expectations remain grammar regression labels. The [legacy corpus](../tests/fixtures/grammar_regression.json), version 0.1 schemas and historical 186-case report remain intact; historical report readers retain their original protocol; current replay requires new input bound to the current manifest.
 
 The [report schema](../schemas/grammar-regression-evaluation-v0.2.schema.json) and [corpus schema](../schemas/grammar-regression-corpus-v0.2.schema.json) are version 0.2. Each language and nested `cohorts` row retains selected valid/invalid expectations, original sample count, decidable/unknown counts, pending labels, evaluated cases, TP/FP/FN/TN, Wilson intervals, recall and parsing completion rate. Selected-label counts include pending cases and do not assert native confirmation. Pending labels and unknown parsing may overlap.
 
@@ -121,3 +121,6 @@ Successful verification of bundled grammar bytes and licenses is now reused per 
 
 
 Native differential replay follows the same history/current identity boundary: validate the archived corpus against its saved manifest, then explicitly create current input by changing only the manifest digest while retaining source, labels and origins. Direct execution of old input remains rejected. Native tools must be supplied explicitly. The controlled Ruff fixture checks current isolated arguments exactly; actual comparison writes a separate current report, preserving historical evidence. See [acceptance](../tests/acceptance/native-corpus-current-binding.md).
+
+
+The developer importer validates current identity by default. Historical input requires an explicit matching `--base-manifest`; it never searches for historical metadata automatically. It writes new current-bound input to stdout, preserving historical files. Regression checks retain every sample, source and origin; a byte-level `cmp` against the historical file is inappropriate because manifest identity changes. Missing or wrong manifests fail before additional input is read, and final output still passes current validation. See [workspace acceptance and importer repair](../tests/acceptance/workspace-regression-importer-binding.md).

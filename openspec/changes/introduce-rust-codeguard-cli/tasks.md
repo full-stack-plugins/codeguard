@@ -1503,3 +1503,8 @@ check python/all现通过0.48反馈保留独立结构计数和原始坐标，原
 ## 2026-10-05 具体 grammar 限制的终端与对话反馈
 
 - 两个实际入口 RED 证明具体 Python 版本兼容限制被隐藏；有界补齐 human 与 Claude 摘要，固定元数据来源，不复制源码、不批准白名单；末尾未验收/未评估说明保留在1200字符预算内。见 `tests/acceptance/grammar-limitation-conversation-feedback.md`。14.7、14.8、14.19 保持开放，真实全宿主与正式语言精度仍待验收。
+
+
+## 2026-10-05 全工作区示例的历史语料导入修复
+
+- 默认全工作区回归在 Rust 语料导入示例发现真实身份失败；显式历史清单入口保留当前严格校验、原历史样本与 stdout 新输入，三项示例回归通过。双语命令示例改为当前可用参数，不覆盖历史字节。见 `tests/acceptance/workspace-regression-importer-binding.md`；12.11、14.17、14.19 的完整验收仍开放。

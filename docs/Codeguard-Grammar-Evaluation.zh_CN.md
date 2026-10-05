@@ -47,11 +47,11 @@ Rust [build_grammar_corpus](../crates/codeguard-cli/examples/build_grammar_corpu
 cargo run --locked -p codeguard-cli --example build_grammar_corpus -- \
   tests/fixtures/grammar_regression.json \
   tests/fixtures/grammar_additional_regressions.json \
-  > /tmp/codeguard-grammar-corpus.json
-cmp /tmp/codeguard-grammar-corpus.json tests/fixtures/grammar_regression_v0_2.json
+  --base-manifest tests/fixtures/grammar_manifests/manifest_2026_10_04.json \
+  > /tmp/codeguard-grammar-current-corpus.json
 ```
 
-导入器保留 CRLF、空行和最后一棵预期树，来源绑定上游文件摘要和样例名称；拒绝缺分隔符、空节点、损坏预期树及不支持的 corpus 指令。上游预期树只生成 grammar 回归标签，不提升为独立裁定。历史 [0.1 语料](../tests/fixtures/grammar_regression.json)、schema 和 186 例实际报告仍保留，旧输入继续按旧形状输出。
+导入器保留 CRLF、空行和最后一棵预期树，来源绑定上游文件摘要和样例名称；拒绝缺分隔符、空节点、损坏预期树及不支持的 corpus 指令。上游预期树只生成 grammar 回归标签，不提升为独立裁定。历史 [0.1 语料](../tests/fixtures/grammar_regression.json)、schema 和 186 例实际报告仍保留，历史报告读取保留原协议；当前回放须另行生成绑定当前清单的输入，不能直接执行旧身份。
 
 ## 报告含义
 
@@ -133,3 +133,6 @@ Python隔离原生探针现于版本探测后、检查前核验请求入口与�
 
 
 原生差分回放也遵循历史与当前身份分离：先按保存的旧清单核对原语料，再显式生成只变更清单摘要的当前输入，完整保留源码、标签和来源。旧输入直接执行仍拒绝；原生工具需要显式提供。Ruff 控制替身精确核对当前隔离参数，真实对照另存当前报告，不覆盖旧报告。见[验收记录](../tests/acceptance/native-corpus-current-binding.md)。
+
+
+开发导入器默认严格核对当前清单；历史输入必须显式提供 `--base-manifest` 且摘要与原输入匹配，不自动寻找历史清单。输出只写 stdout，生成新的当前绑定语料，不覆盖历史文件；现有全部样本、源码与来源通过逐项回归核对，不能用原历史文件做字节 `cmp`，因为清单身份已改变。缺失或错误清单在读取追加输入前拒绝，最终输出仍接受当前生产校验。见[全工作区验收与导入器修复](../tests/acceptance/workspace-regression-importer-binding.md)。
