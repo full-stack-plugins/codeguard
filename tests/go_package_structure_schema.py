@@ -20,6 +20,43 @@ class GoPackageStructure(unittest.TestCase):
         self.assertEqual(process.returncode, 3, process.stderr.decode())
         return json.loads(process.stdout)
 
+    def test_native_task_recheck_versions_and_evidence(self):
+        evidence = json.loads((ROOT / 'tests/acceptance/evidence/go-package-task-recheck-2026-10-05.json').read_text())
+        original = None
+        for observation, report in evidence.items():
+            validator('task-verification-preview-v0.22.schema.json').validate(report)
+            validator('syntax-task-recheck-v0.9.schema.json').validate(report['native_scan'])
+            self.assertFalse(validator('task-verification-preview-v0.19.schema.json').is_valid(report))
+            self.assertEqual(report['observation'], observation)
+            self.assertTrue(report['event_persisted'])
+            self.assertTrue(report['native_scan']['input_stable'])
+            if original is None:
+                original = report['native_scan']['original_report']
+            self.assertEqual(report['native_scan']['original_report'], original)
+            for field, value in [('input_type', 'fragment'), ('version', 'go1.99'), ('gofmt_sha256', None)]:
+                changed = copy.deepcopy(report)
+                changed['native_scan']['native'][field] = value
+                self.assertFalse(validator('task-verification-preview-v0.22.schema.json').is_valid(changed), field)
+
+    def test_actual_go_task_brief_keeps_go_tool_and_diagnostics(self):
+        evidence = json.loads((ROOT / 'tests/acceptance/evidence/go-package-task-guidance-2026-10-05.json').read_text())
+        for observation, brief in evidence.items():
+            report = {'schema_version':'0.14.0','report_type':'repair_brief_preview','operation':'next',
+                'command_status':'complete','exit_code':0,'disposition':brief['disposition'],
+                'reason':'selected_local_task','repair_brief':brief,'next_actions':[],
+                'authority':'local_unverified','delivery_decision':'not_evaluated'}
+            validator('repair-brief-preview-v0.14.schema.json').validate(report)
+            self.assertEqual(brief['recheck_argv'][7], '--go-tool')
+            self.assertNotIn('Zig', brief['step'])
+            if observation == 'still_blocked':
+                self.assertIn('Go', brief['step'])
+                self.assertTrue(brief['native_diagnostic_positions'])
+            else:
+                self.assertEqual(brief['native_diagnostic_positions'], [])
+            changed = copy.deepcopy(report)
+            changed['repair_brief']['recheck_argv'][7] = '--zig-tool'
+            self.assertFalse(validator('repair-brief-preview-v0.14.schema.json').is_valid(changed))
+
     def test_actual_public_versions_and_forged_imports(self):
         with tempfile.TemporaryDirectory(prefix='cg-go-package-schema-') as directory:
             root = pathlib.Path(directory).resolve()
@@ -40,9 +77,14 @@ class GoPackageStructure(unittest.TestCase):
                 changed = copy.deepcopy(probe); changed['structural_observations'][0][field] = value
                 self.assertFalse(probe_schema.is_valid(changed), field)
             report = self.command('check', 'go', str(root), '--format=json')
-            validator('repair-brief-preview-v0.13.schema.json').validate(report['next'])
+            task = report['syntax_tasks']['tasks'][0]['task_id']
+            unavailable = self.command('task', 'verify', task, str(root), '--format=json')
+            validator('task-verification-preview-v0.22.schema.json').validate(unavailable)
+            self.assertTrue(unavailable['event_persisted'])
+            self.assertEqual(unavailable['native_scan']['native']['status'], 'not_run')
+            validator(f"repair-brief-preview-v0.{report['next']['schema_version'].split('.')[1]}.schema.json").validate(report['next'])
             self.assertFalse(validator('repair-brief-preview-v0.1.schema.json').is_valid(report['next']))
-            aggregate_schema = validator('check-feedback-v0.49.schema.json')
+            aggregate_schema = validator(f"check-feedback-v0.{report['schema_version'].split('.')[1]}.schema.json")
             aggregate_schema.validate(report)
             self.assertFalse(validator('check-feedback-v0.48.schema.json').is_valid(report))
             task = next(row['task_id'] for row in report['syntax_tasks']['tasks'] if row['path'] == 'main.go')
@@ -82,7 +124,7 @@ class GoPackageStructure(unittest.TestCase):
             self.assertFalse(aggregate_schema.is_valid(changed))
             changed = copy.deepcopy(report['next'])
             changed['repair_brief']['recheck_argv'][2] = 'python'
-            self.assertFalse(validator('repair-brief-preview-v0.13.schema.json').is_valid(changed))
+            self.assertFalse(validator('repair-brief-preview-v0.14.schema.json').is_valid(changed))
 
     def test_new_native_report_preserves_old_raw_evidence(self):
         evidence = ROOT / 'tests/acceptance/evidence'

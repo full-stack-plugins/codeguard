@@ -670,3 +670,15 @@ Go完整文件缺package结构候选 MUST 进入私有worker的独立版本、�
 #### Scenario: Aggregate feedback selects an existing Go environment task
 - **WHEN** 同一检查产生Go原生环境任务和结构候选，next优先选择go.vet任务
 - **THEN** Go修复预览使用独立封闭版本并明确Go工具argv，不标为仅支持Python的旧预览；聚合协议接纳该版本，不放宽旧报告的checker或argv约束
+
+### Requirement: Go candidate tasks SHALL support bounded native syntax rechecks
+
+Go候选确认任务 MUST 接受显式 `--go-tool`，复用固定SDK与同目录gofmt的整文件只读检查；调用前后及保存前核对源码、主工具和辅助绑定。缺工具、未知版本、逻辑行重映射或身份变化 MUST 记录未完成尝试。首次结构报告已消费后的修复不得被误认为历史报告损坏；历史引用和消费收据仍必须匹配。原生诊断与零诊断分别反馈仍存在和候选消失，局部语法结果不能自动关闭任务或替代项目go vet、类型、依赖与CVE义务。
+
+#### Scenario: A Go package candidate is confirmed and repaired
+- **WHEN** 同一任务在缺package及补声明后以显式固定SDK执行task verify
+- **THEN** 分别记录绑定当前源码的原生诊断和局部零诊断，保留同一任务和首次报告引用，任务不因局部零诊断自动关闭
+
+#### Scenario: Tool arguments or history do not match
+- **WHEN** Go工具用于其它语言任务，或首次报告、消费收据或工具辅助绑定发生变化
+- **THEN** 错语言在启动前拒绝；损坏历史或变化输入不保存为完整观察，不伪造源码违规

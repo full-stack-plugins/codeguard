@@ -50,6 +50,25 @@ python3 tests/check_python_structure_schema.py
 
 ## 未完成内容（当前）
 
-公开候选及稳定任务已接通；Go确认任务的原生adapter/可信关闭、独立lint go的WASM回退、完整项目覆盖及独立误报验收尚未完成。真实SDK开发差分不等于该adapter已经接入task verify，也不证明类型/CVE/依赖、holdout、跨平台限制或发行资格；32份grammar资格仍为0。既有原生Go vet行为保留，公开npm0.1.4不含本轮变更。
+公开候选及稳定任务已接通；Go确认任务的可信关闭、独立lint go的WASM回退、完整项目覆盖及独立误报验收尚未完成。真实SDK开发差分不等于可信任务关闭已完成，也不证明类型/CVE/依赖、holdout、跨平台限制或发行资格；32份grammar资格仍为0。既有原生Go vet行为保留，公开npm0.1.4不含本轮变更。
 
 本轮默认构建的Go来源身份、lint和工作台回归12测试通过/4条件忽略；显式Go1.23.4原生发现→重复同步→修复→复扫工作台测试另1项通过（6.55秒），保持任务不因局部零诊断关闭。默认/WASM两配置严格Clippy通过；首次Clippy发现聚合版本选择的相同分支，合并等价条件后通过，没有扩大原生语法能力或修改语料。定向格式、strict OpenSpec、分层及diff检查通过。未执行本轮完整default工作区或32grammar全量回放；本轮新提交的远端CI仍需独立确认。
+
+## Go确认任务的原生复检接线
+
+后续真实task verify回归先RED：新0.8结构报告被旧首次历史读取器拒绝，返回syntax_original_report_invalid且没有失败尝试。修复后保留首次报告摘要、消费收据和固定Go结构身份，不用修复后的源码重演旧AST。缺显式Go工具现在保存not_run观察和失败尝试。新Go复检使用syntax_task_recheck0.9及task_verification_preview0.22，旧语言版本不变。
+
+显式使用既有Go1.23.4与同SDK gofmt，冻结stdin整文件，不执行源码、不读取项目构建脚本。真实原生测试（初次5.35秒，指引接线后7.28秒）在同一稳定任务上确认缺package，再补声明复检：分别still_blocked和candidate_absent_unverified_policy，两次event_persisted=true且input_stable=true，首次报告引用一致，任务仍open。见[实际任务证据](evidence/go-package-task-recheck-2026-10-05.json)。源码和主/辅助制品在保存前继续复核；新封闭协议明确UTF-8字节列，局部原生零诊断不替代批准政策或项目完整覆盖。
+
+```bash
+CODEGUARD_GO_TOOL=/usr/local/go/bin/go cargo test --locked -p codeguard-cli \
+  --features wasm-precheck --test check_go_package_structure \
+  actual_go_confirms_package_task_before_and_after_repair -- --ignored --exact
+codeguard task verify CG-B-<stable-id> . --go-tool /absolute/sdk/bin/go --format=json
+```
+
+可信关闭与Go完整义务、独立lint go回退、真实宿主及发行资格继续未完成；本节只证明原生语法复检已进入任务工作流。
+
+复检指引另发现Go结果误落到Zig默认提示，现采用专用修复预览0.14，保留Go整文件语法规则、字节列、诊断引用与 --go-tool；初次无原生观察不伪造报告引用。聚合在选中该简报时使用0.50，其余Go环境任务仍保留0.49/Go vet预览0.13。保存快速反馈旧协议不扩展。实际原生任务简报见[指引证据](evidence/go-package-task-guidance-2026-10-05.json)。
+
+最终局部验证：WASM单元76通过/3条件忽略，五个任务集成目标33通过/5条件忽略（Go、Zig、Erlang、Kotlin、Swift）；显式真实Go任务修复前后测试另1通过。新Go协议5测试及Python旧probe/check两测试通过。默认构建Go原生观察单元6通过，默认/WASM两配置workspace/all-targets严格Clippy通过；首次Clippy暴露源码模块被开发测试重复引用的未使用助手，加入实际助手边界断言后通过，默认构建曾缺Go模块接线，现Unix原生探针与WASM feature解耦。定向格式、strict OpenSpec、分层和diff校验通过。完整当前工作区/32grammar及当前提交远端CI仍须独立确认。

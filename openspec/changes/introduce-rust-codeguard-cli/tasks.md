@@ -1566,3 +1566,7 @@ check python/all现通过0.48反馈保留独立结构计数和原始坐标，原
 ## 2026-10-05 Go package候选进入公开检查及稳定任务（局部验收）
 
 12.11/14.17/14.19：公开反例RED后接入worker1.2/probe0.3/check0.49/确认0.8/保存Hook0.18，保留Python旧版本；Go vet预览误标Python0.1的协议缺陷由新0.13修正。三次check go/all和保存复用同一任务，补声明后任务仍open；私有伪造帧及工作台伪造报告拒绝。WASM单元75、七个集成目标37通过，另有条件忽略；Go20真实差分组合7TP/0FP/0FN/12TN及1unknown，原始FN2不改。八语言相同152例新回放原始39TP/0FP/16FN/91TN及6unknown，组合43TP/0FP/12FN/91TN及6unknown，其它七语言结果不变；全部32语言保留且资格0。新Go实际协议3与Python历史兼容协议2通过。Go确认任务原生复检/可信关闭、独立lint回退、系统精度/holdout及发行仍未完成，父任务不勾选。见[验收](../../../tests/acceptance/go-package-structure.md)。
+
+2026-10-05后续进展：Go结构候选task verify首次历史读取RED已修复；显式Go SDK/gofmt整文件原生复检接入稳定任务，缺工具记录失败尝试，同一任务修复前后实际原生回归通过，复检0.9/任务反馈0.22保持局部未批准。可信关闭、独立lint回退及父任务完整验收未完成，继续不勾选。证据见 `tests/acceptance/go-package-structure.md`。
+
+上述Go原生任务复检进一步接入专用next预览0.14及按需聚合0.50，修正默认Zig文案与旧工具参数；真实简报和闭合协议验收通过，旧语言任务回归及默认/WASM严格Clippy通过。未将候选消失或局部零诊断当作可信关闭，父任务仍未完成。

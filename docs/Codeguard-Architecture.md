@@ -936,4 +936,6 @@ flowchart LR
     J --> K[Original-tool recheck and closure policy]
 ```
 
-Probe, aggregate checking and save feedback now carry the Go candidate; the final Go confirmation-task adapter and trusted closure path remain pending. Repair instructions preserve source until native confirmation and keep the task open after a zero-candidate rescan. See [acceptance](../tests/acceptance/go-package-structure.md).
+Probe, aggregate checking and save feedback now carry the Go candidate; the Go confirmation-task native recheck now uses an explicit SDK; trusted closure remains pending. Repair instructions preserve source until native confirmation and keep the task open after a zero-candidate rescan. See [acceptance](../tests/acceptance/go-package-structure.md).
+
+Go candidate-task rechecks now accept `--go-tool /absolute/sdk/bin/go` and invoke the pinned SDK companion `gofmt -e /dev/stdin` on frozen whole-file bytes. Recheck0.9 / task feedback0.22 retain native diagnostics, tool and companion identities, first-report receipts and failed attempts. The repaired source can be observed without invalidating the original candidate history. Native zero diagnostics retain an open task pending approved policy and coverage. See [acceptance](../tests/acceptance/go-package-structure.md).

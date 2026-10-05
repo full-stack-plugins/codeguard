@@ -377,7 +377,7 @@ mod grammar_native_checker;
 mod javascript_syntax_probe;
 #[cfg(all(feature = "wasm-precheck", unix))]
 mod ruby_syntax_probe;
-#[cfg(all(feature = "wasm-precheck", unix))]
+#[cfg(unix)]
 mod go_syntax_probe;
 #[cfg(unix)]
 mod python_syntax_probe;

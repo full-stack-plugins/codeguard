@@ -115,7 +115,8 @@ pub fn run(args: &[String]) -> ExitCode {
         && (parsed.zig_tool.is_some()
             || parsed.erl_tool.is_some()
             || parsed.swift_tool.is_some()
-            || parsed.kotlinc_tool.is_some())
+            || parsed.kotlinc_tool.is_some()
+            || parsed.go_tool.is_some())
     {
         let original = match crate::syntax_task_recheck::original(&root, &brief) {
             Ok(original) => original,
@@ -125,6 +126,7 @@ pub fn run(args: &[String]) -> ExitCode {
             || (parsed.erl_tool.is_some() && original["language"] != "erlang")
             || (parsed.swift_tool.is_some() && original["language"] != "swift")
             || (parsed.kotlinc_tool.is_some() && original["language"] != "kotlin")
+            || (parsed.go_tool.is_some() && original["language"] != "go")
         {
             eprintln!("原生语法工具不匹配任务语言");
             return ExitCode::from(2);
@@ -159,7 +161,7 @@ pub fn run(args: &[String]) -> ExitCode {
         eprintln!("Checkstyle 参数仅用于相应任务复检");
         return ExitCode::from(2);
     }
-    if parsed.go_tool.is_some() && brief["checker_id"] != "go.vet" {
+    if parsed.go_tool.is_some() && brief["checker_id"] != "go.vet" && !syntax_task {
         eprintln!("--go-tool 仅用于 Go 任务复检");
         return ExitCode::from(2);
     }
@@ -228,15 +230,22 @@ pub fn run(args: &[String]) -> ExitCode {
         None
     };
     let mut scan = if syntax_task {
-        match crate::syntax_task_recheck::run(
-            &root,
-            &brief,
-            parsed.zig_tool.as_deref(),
-            parsed.erl_tool.as_deref(),
-            parsed.swift_tool.as_deref(),
-            parsed.kotlinc_tool.as_deref(),
-            deadline,
-        ) {
+        let recheck = if crate::syntax_task_recheck::original(&root, &brief)
+            .is_ok_and(|original| original["language"] == "go")
+        {
+            crate::syntax_task_recheck::run_go(&root, &brief, parsed.go_tool.as_deref(), deadline)
+        } else {
+            crate::syntax_task_recheck::run(
+                &root,
+                &brief,
+                parsed.zig_tool.as_deref(),
+                parsed.erl_tool.as_deref(),
+                parsed.swift_tool.as_deref(),
+                parsed.kotlinc_tool.as_deref(),
+                deadline,
+            )
+        };
+        match recheck {
             Ok(report) => report,
             Err(reason) => {
                 let release = finish_verification(&root, &parsed.task_id, &lease);
@@ -661,6 +670,7 @@ pub fn run(args: &[String]) -> ExitCode {
     });
     if syntax_task {
         report["schema_version"] = json!(match report["native_scan"]["schema_version"].as_str() {
+            Some("0.9.0") => "0.22.0",
             Some("0.8.0") => "0.19.0",
             Some("0.7.0") => "0.18.0",
             Some("0.6.0") => "0.17.0",

@@ -639,3 +639,5 @@ Project discovery and WASM candidate routing include `.R`/`.r` and C++ `.C`/`.cp
 
 
 Specific grammar compatibility limits appear in bounded terminal and Claude summaries, including older Python grammar behavior for 3.14 template strings. Feedback still requires native confirmation; source text is omitted and limitations are not allowlist decisions. See [conversation acceptance](tests/acceptance/grammar-limitation-conversation-feedback.md).
+
+Go candidate tasks can now run `codeguard task verify <task-id> . --go-tool /absolute/sdk/bin/go --format=json`. This performs a frozen whole-file native syntax recheck and records an attempt; it keeps the task open until approved closure requirements are met. See [acceptance](tests/acceptance/go-package-structure.md).

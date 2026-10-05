@@ -449,3 +449,157 @@ mod tests {
         assert_eq!(report["diagnostics"], serde_json::json!([]));
     }
 }
+
+/// 构造缺工具或源码的未执行观察；不产生语法诊断。
+pub(crate) fn unavailable(reason: &str) -> Value {
+    json!({"status":"not_run","reason":reason,"version":null,"tool_sha256":null,"gofmt_sha256":null,"companion_binding_sha256":null,"input_type":"whole_file","diagnostics":[]})
+}
+
+/// 核对整文件原生观察的封闭字段与原始坐标；不验证项目政策或工具批准。
+/// 当前源码可选，历史输入不可用时仍核对字段、数量、版本与位置上下界。
+pub(crate) fn valid_observation(native: &Value, source: Option<&[u8]>) -> bool {
+    let keys = [
+        "status",
+        "reason",
+        "version",
+        "tool_sha256",
+        "gofmt_sha256",
+        "companion_binding_sha256",
+        "input_type",
+        "diagnostics",
+    ];
+    let valid_sha = |v: &Value| {
+        v.as_str().is_some_and(|s| {
+            s.len() == 64
+                && s.bytes()
+                    .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+        })
+    };
+    if !native
+        .as_object()
+        .is_some_and(|o| o.len() == keys.len() && keys.iter().all(|k| o.contains_key(*k)))
+        || native["input_type"] != "whole_file"
+        || !native["reason"].as_str().is_some_and(|s| {
+            !s.is_empty()
+                && s.len() <= 128
+                && s.bytes().all(|b| b.is_ascii_lowercase() || b == b'_')
+        })
+        || !(native["version"].is_null() || native["version"] == "go1.23.4")
+        || !["tool_sha256", "gofmt_sha256", "companion_binding_sha256"]
+            .iter()
+            .all(|k| native[k].is_null() || valid_sha(&native[k]))
+    {
+        return false;
+    }
+    let Some(rows) = native["diagnostics"]
+        .as_array()
+        .filter(|rows| rows.len() <= 32)
+    else {
+        return false;
+    };
+    match native["status"].as_str() {
+        Some("not_run") => {
+            return rows.is_empty()
+                && native["version"].is_null()
+                && ["tool_sha256", "gofmt_sha256", "companion_binding_sha256"]
+                    .iter()
+                    .all(|k| native[k].is_null());
+        }
+        Some("incomplete") => return rows.is_empty(),
+        Some("completed" | "diagnostics_observed") => {}
+        _ => return false,
+    }
+    if native["version"] != "go1.23.4"
+        || !["tool_sha256", "gofmt_sha256", "companion_binding_sha256"]
+            .iter()
+            .all(|k| valid_sha(&native[k]))
+        || (native["status"] == "completed"
+            && (!rows.is_empty() || native["reason"] != "go_native_syntax_no_diagnostics"))
+        || (native["status"] == "diagnostics_observed"
+            && (rows.is_empty() || native["reason"] != "go_native_syntax_diagnostics"))
+    {
+        return false;
+    }
+    let mut positions = BTreeSet::new();
+    rows.iter().all(|row| {
+        let line = row["line"]
+            .as_u64()
+            .filter(|n| *n > 0 && *n <= u32::MAX as u64);
+        let column = row["column"]
+            .as_u64()
+            .filter(|n| *n > 0 && *n <= 1024 * 1024 + 1);
+        row.as_object().is_some_and(|o| {
+            o.len() == 4
+                && ["line", "column", "column_unit", "rule_id"]
+                    .iter()
+                    .all(|k| o.contains_key(*k))
+        }) && row["rule_id"] == "go.syntax"
+            && row["column_unit"] == "utf8_byte"
+            && line.zip(column).is_some_and(|(line, column)| {
+                positions.insert((line, column))
+                    && source.is_none_or(|bytes| {
+                        std::str::from_utf8(bytes).ok().is_some_and(|text| {
+                            let mut lines: Vec<&str> = text.split_inclusive('\n').collect();
+                            if lines.is_empty() {
+                                lines.push("");
+                            }
+                            lines.get(line as usize - 1).is_some_and(|text| {
+                                let offset = column as usize - 1;
+                                offset <= text.len()
+                                    && (offset < text.len() || line as usize == lines.len())
+                                    && text.is_char_boundary(offset)
+                            })
+                        })
+                    })
+            })
+    })
+}
+
+/// 保存前复核同SDK辅助制品及联合绑定；不从历史报告解析新工具路径。
+pub(crate) fn companion_current(tool: &Path, native: &Value) -> bool {
+    companion(tool).is_ok_and(|(_, _, sha)| native["gofmt_sha256"] == sha)
+        && companion_identity(tool)
+            .is_ok_and(|binding| native["companion_binding_sha256"] == binding)
+}
+
+#[cfg(test)]
+mod observation_tests {
+    use super::{companion_current, unavailable, valid_observation};
+    use serde_json::json;
+    #[test]
+    fn closed_observation_rejects_wrong_rule_duplicate_and_utf8_column() {
+        assert!(valid_observation(
+            &unavailable("go_syntax_tool_not_provided"),
+            None
+        ));
+        assert!(!companion_current(
+            std::path::Path::new("/missing/sdk/go"),
+            &unavailable("go_syntax_tool_not_provided")
+        ));
+        let source = "package p\nvar 名 =\n".as_bytes();
+        let good = json!({"status":"diagnostics_observed","reason":"go_native_syntax_diagnostics","version":"go1.23.4",
+            "tool_sha256":"a".repeat(64),"gofmt_sha256":"b".repeat(64),"companion_binding_sha256":"c".repeat(64),"input_type":"whole_file",
+            "diagnostics":[{"line":2,"column":5,"column_unit":"utf8_byte","rule_id":"go.syntax"}]});
+        assert!(valid_observation(&good, Some(source)));
+        for (field, value) in [
+            ("rule_id", json!("go.vet")),
+            ("column", json!(6)),
+            ("line", json!(3)),
+            ("column_unit", json!("character")),
+        ] {
+            let mut bad = good.clone();
+            bad["diagnostics"][0][field] = value;
+            assert!(!valid_observation(&bad, Some(source)), "{bad}");
+        }
+        let mut duplicate = good.clone();
+        duplicate["diagnostics"] = json!([good["diagnostics"][0], good["diagnostics"][0]]);
+        assert!(!valid_observation(&duplicate, Some(source)));
+        let mut clean = good.clone();
+        clean["status"] = json!("completed");
+        assert!(!valid_observation(&clean, Some(source)));
+        assert!(!valid_observation(
+            &json!({"status":"completed"}),
+            Some(source)
+        ));
+    }
+}

@@ -18,6 +18,26 @@ pub(crate) fn run(
     kotlinc: Option<&Path>,
     deadline: Instant,
 ) -> Result<Value, &'static str> {
+    run_with_tools(root, brief, [zig, erl, swift, kotlinc, None], deadline)
+}
+
+/// 对Go候选执行显式SDK语法复检；不提供项目覆盖或批准关闭。
+pub(crate) fn run_go(
+    root: &Path,
+    brief: &Value,
+    go: Option<&Path>,
+    deadline: Instant,
+) -> Result<Value, &'static str> {
+    run_with_tools(root, brief, [None, None, None, None, go], deadline)
+}
+
+fn run_with_tools(
+    root: &Path,
+    brief: &Value,
+    tools: [Option<&Path>; 5],
+    deadline: Instant,
+) -> Result<Value, &'static str> {
+    let [zig, erl, swift, kotlinc, go] = tools;
     let original = original(root, brief)?;
     let path = original["scope"].as_str().ok_or("syntax_scope_invalid")?;
     let language = original["language"]
@@ -34,6 +54,9 @@ pub(crate) fn run(
     }
     if kotlinc.is_some() && language != "kotlin" {
         return Err("kotlinc_tool_does_not_match_confirmation_language");
+    }
+    if go.is_some() && language != "go" {
+        return Err("go_tool_does_not_match_confirmation_language");
     }
     // 只从调用方工具来源选择，不从可编辑历史报告执行旧路径；next 会绑定本轮实际工具。
     let zig_selection = (language == "zig")
@@ -88,13 +111,27 @@ pub(crate) fn run(
             selected_kotlinc
                 .map(|tool| crate::kotlin_lint_command::observe(tool, bytes, deadline))
                 .unwrap_or_else(|| crate::kotlin_lint_command::unavailable("kotlin_tool_not_found"))
+        } else if language == "go" {
+            go.map(|tool| {
+                crate::go_syntax_probe::observe(
+                    tool,
+                    bytes,
+                    deadline,
+                    &std::sync::atomic::AtomicBool::new(
+                        codeguard_runtime::sigint_cancellation_requested(),
+                    ),
+                )
+            })
+            .unwrap_or_else(|| crate::go_syntax_probe::unavailable("go_syntax_tool_not_provided"))
         } else {
             unavailable("native_syntax_confirmation_adapter_unavailable")
         }
     } else {
         unavailable("native_syntax_source_unavailable")
     };
-    let mut native = if language == "kotlin" && source.is_none() {
+    let mut native = if language == "go" && source.is_none() {
+        crate::go_syntax_probe::unavailable("native_syntax_source_unavailable")
+    } else if language == "kotlin" && source.is_none() {
         crate::kotlin_lint_command::unavailable("native_syntax_source_unavailable")
     } else {
         native
@@ -114,6 +151,7 @@ pub(crate) fn run(
         .or(selected_erl)
         .or(selected_swift)
         .or(selected_kotlinc)
+        .or(go)
         .and_then(|p| p.canonicalize().ok());
     let target_sha = source.as_ref().map(|b| digest(b));
     let nanos = SystemTime::now()
@@ -124,7 +162,7 @@ pub(crate) fn run(
         original["schema_version"].as_str(),
         Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0")
     );
-    let mut report = json!({"schema_version":if language == "zig" && native_first {"0.8.0"}else if language == "kotlin" && native_first {"0.6.0"} else if language == "kotlin" {"0.5.0"} else if language == "swift" && native_first {"0.7.0"} else if language == "swift" {"0.4.0"} else if native_first {"0.3.0"} else if language == "erlang" {"0.2.0"} else {"0.1.0"},"report_type":"syntax_task_recheck","operation":"task_verify",
+    let mut report = json!({"schema_version":if language == "go" {"0.9.0"} else if language == "zig" && native_first {"0.8.0"}else if language == "kotlin" && native_first {"0.6.0"} else if language == "kotlin" {"0.5.0"} else if language == "swift" && native_first {"0.7.0"} else if language == "swift" {"0.4.0"} else if native_first {"0.3.0"} else if language == "erlang" {"0.2.0"} else {"0.1.0"},"report_type":"syntax_task_recheck","operation":"task_verify",
         "workspace_binding":"bound","workspace_id":original["workspace_id"],"run_id":format!("syntax-native-{}-{nanos}",std::process::id()),
         "checker_id":"syntax.native_confirmation","task_id":brief["task_id"],"authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated",
         "target":{"path":path,"language":language,"source_sha256":target_sha},"original_report":original_reference(&original,&brief["evidence_ref"]["first_report_sha256"]),
@@ -185,7 +223,10 @@ pub(crate) fn original(root: &Path, brief: &Value) -> Result<Value, &'static str
     ) {
         crate::native_syntax_confirmation::valid_history_report(root, &workspace, &report)
     } else {
-        matches!(report["schema_version"].as_str(), Some("0.1.0" | "0.3.0"))
+        matches!(
+            report["schema_version"].as_str(),
+            Some("0.1.0" | "0.3.0" | "0.8.0")
+        ) && (report["schema_version"] != "0.8.0" || go_structure_history(&report))
             && report["language"].as_str().is_some_and(|lang| {
                 codeguard_adapters::bundled_grammar_candidates()
                     .ok()
@@ -243,6 +284,11 @@ pub(crate) fn inputs_current(root: &Path, report: &Value) -> bool {
         .and_then(|p| source_bytes(root, p))
         .is_some_and(|b| report["target"]["source_sha256"] == digest(&b))
         && (report["native"]["tool_sha256"].is_null() || tool_current(report))
+        && (report["target"]["language"] != "go"
+            || report["native"]["companion_binding_sha256"].is_null()
+            || report["tool_path"].as_str().is_some_and(|tool| {
+                crate::go_syntax_probe::companion_current(Path::new(tool), &report["native"])
+            }))
 }
 
 fn tool_current(report: &Value) -> bool {
@@ -308,7 +354,17 @@ fn valid_history_shape(root: &Path, report: &Value) -> bool {
         .is_some_and(|o| o.len() == keys.len() && keys.iter().all(|k| o.contains_key(*k)))
         || !matches!(
             report["schema_version"].as_str(),
-            Some("0.1.0" | "0.2.0" | "0.3.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.7.0" | "0.8.0")
+            Some(
+                "0.1.0"
+                    | "0.2.0"
+                    | "0.3.0"
+                    | "0.4.0"
+                    | "0.5.0"
+                    | "0.6.0"
+                    | "0.7.0"
+                    | "0.8.0"
+                    | "0.9.0"
+            )
         )
         || report["report_type"] != "syntax_task_recheck"
         || report["operation"] != "task_verify"
@@ -362,6 +418,7 @@ fn valid_history_shape(root: &Path, report: &Value) -> bool {
         return false;
     };
     report["workspace_id"] == old["workspace_id"]
+        && ((report["schema_version"] == "0.9.0") == (old["language"] == "go"))
         && ((report["schema_version"] == "0.3.0") == (old["schema_version"] == "0.2.0"))
         && ((report["schema_version"] == "0.6.0") == (old["schema_version"] == "0.4.0"))
         && ((report["schema_version"] == "0.7.0") == (old["schema_version"] == "0.5.0"))
@@ -386,6 +443,35 @@ pub(crate) fn valid_zig_evidence(root: &Path, evidence: &Value) -> bool {
 }
 
 fn native_shape(root: &Path, report: &Value) -> bool {
+    if report["schema_version"] == "0.9.0" {
+        let current = report["target"]["path"]
+            .as_str()
+            .and_then(|path| source_bytes(root, path))
+            .filter(|bytes| report["target"]["source_sha256"] == digest(bytes));
+        return report["target"]["language"] == "go"
+            && report["target"].as_object().is_some_and(|o| {
+                o.len() == 3
+                    && ["path", "language", "source_sha256"]
+                        .iter()
+                        .all(|key| o.contains_key(*key))
+            })
+            && (report["target"]["source_sha256"].is_null()
+                || report["target"]["source_sha256"]
+                    .as_str()
+                    .is_some_and(valid_sha))
+            && (report["tool_path"].is_null()
+                || report["tool_path"]
+                    .as_str()
+                    .is_some_and(|p| Path::new(p).is_absolute()))
+            && (!matches!(
+                report["native"]["status"].as_str(),
+                Some("completed" | "diagnostics_observed")
+            ) || (!report["tool_path"].is_null()
+                && report["target"]["source_sha256"]
+                    .as_str()
+                    .is_some_and(valid_sha)))
+            && crate::go_syntax_probe::valid_observation(&report["native"], current.as_deref());
+    }
     if matches!(
         report["schema_version"].as_str(),
         Some("0.2.0" | "0.3.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.7.0")
@@ -632,6 +718,8 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
                 "当前源码已有原生 Swift parse 语法诊断；核对有界原生位置和 UTF-8 字节列并修复，然后使用同一编译器复检；项目类型检查、构建和 lint 仍需完成"
             } else if report["target"]["language"] == "kotlin" {
                 "当前源码已有原生 Kotlin 语法诊断；核对字节列与 UTF-16 原列后修复，并复用原工具复检；完整项目 lint 和上下文仍需检查"
+            } else if report["target"]["language"] == "go" {
+                "当前源码已有原生 Go 整文件语法诊断；核对 UTF-8 字节列后修复，并以同一SDK的 --go-tool 绝对路径复检；项目go vet、类型、依赖与CVE仍需完成"
             } else {
                 "当前源码已有原生 Zig AST 诊断；核对报告中有界原生位置并修复，然后使用同一工具复检；不要反复安装工具或关闭检查"
             },
@@ -664,6 +752,8 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
                 "先定位已安装的 Apple Swift 6.4 编译器，以 --swift-tool 绝对路径复检；确实缺工具才按项目要求准备，不根据 WASM 未定位观察修改无关源码"
             } else if report["target"]["language"] == "kotlin" {
                 "Kotlin 原生确认仍未完成；核对已安装的 Kotlin/JVM 2.4.10、JDK、原生上下文诊断及项目依赖，使用 --kotlinc-tool 绝对路径复检；不根据上下文阻塞修改无关源码"
+            } else if report["target"]["language"] == "go" {
+                "Go整文件原生语法确认未完成；核对已安装的Go1.23.4及同目录gofmt，用 --go-tool 绝对路径复检；逻辑行映射或版本未知先诊断，不修改无关源码"
             } else {
                 "原生语法确认仍未完成；查看原工具诊断、语言能力或版本缺口，恢复对应前置，不修改无关源码"
             },
@@ -681,6 +771,15 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
         guidance["step"] = json!(format!(
             "候选恢复扫描未完成或错误无法定位；原生确认前不得修改源码，不虚构错误位置。{step}"
         ));
+    }
+    if report["target"]["language"] == "go" {
+        guidance["schema_version"] = json!("0.14.0");
+        guidance["native_column_unit"] = json!("utf8_byte");
+        guidance["native_confirmation_reason"] = if inputs_current(root, &report) {
+            report["native"]["reason"].clone()
+        } else {
+            json!("syntax_confirmation_inputs_changed")
+        };
     }
     if report["target"]["language"] == "erlang" {
         guidance["schema_version"] = json!(if report["run_id"]
@@ -759,8 +858,13 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
     // 源码修复后仍可复用未改变的工具；工具字节变化则不得携带旧工具身份。
     if matches!(
         report["target"]["language"].as_str(),
-        Some("zig" | "erlang" | "swift" | "kotlin")
+        Some("zig" | "erlang" | "swift" | "kotlin" | "go")
     ) && tool_current(&report)
+        && (report["target"]["language"] != "go"
+            || (report["native"]["version"] == "go1.23.4"
+                && report["tool_path"].as_str().is_some_and(|p| {
+                    crate::go_syntax_probe::companion_current(Path::new(p), &report["native"])
+                })))
         && (report["target"]["language"] != "erlang" || report["native"]["version"] == "OTP 28")
         && (report["target"]["language"] != "swift"
             || report["native"]["version"] == "Apple Swift 6.4")
@@ -781,6 +885,8 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
                 "--swift-tool"
             } else if report["target"]["language"] == "kotlin" {
                 "--kotlinc-tool"
+            } else if report["target"]["language"] == "go" {
+                "--go-tool"
             } else {
                 "--zig-tool"
             },
@@ -800,6 +906,14 @@ fn initial_guidance(root: &Path, brief: &Value) -> Option<Value> {
         "先核对固定 grammar 与当前源码的疑似证据。"
     };
     let language = original["language"].as_str()?;
+    if language == "go" {
+        return Some(
+            json!({"schema_version":"0.14.0","disposition":"verification_required",
+            "step":"Go整文件语法确认已接入；先核对Go1.23.4与同目录gofmt，用 --go-tool 绝对路径复检原任务，缺工具时再准备；不凭WASM候选修改源码或关闭任务",
+            "native_column_unit":"utf8_byte","native_confirmation_status":"not_run","native_confirmation_reason":"go_syntax_tool_not_provided","native_confirmation_ref":null,"native_diagnostic_positions":[],
+            "recheck_argv":["codeguard","task","verify",brief["task_id"],".","--format","json"]}),
+        );
+    }
     let (version, option, path, checker) = match language {
         "zig" => (
             "Zig 0.16.0",
@@ -840,4 +954,35 @@ fn initial_guidance(root: &Path, brief: &Value) -> Option<Value> {
         "step":format!("{location}已接入 {version} {checker} 语法确认 adapter，但本地工具是否就绪尚未核验；先核对已安装的适用工具，缺失时再准备。通过 {option} 选择已核验绝对路径后运行同一任务的原生复检；原生确认前不得修改源码，不凭安装或 WASM 零恢复关闭任务"),
         "recheck_argv":["codeguard","task","verify",brief["task_id"],".","--format","json",option,path]
     }))
+}
+
+// 历史只是已消费的本地候选，不要求修复后的字节重演原始AST，也不提供批准权威。
+fn go_structure_history(report: &Value) -> bool {
+    let Some(rows) = report["observations"]
+        .as_array()
+        .filter(|rows| rows.len() == 1)
+    else {
+        return false;
+    };
+    let row = &rows[0];
+    let Some(structures) = row["structural_observations"]
+        .as_array()
+        .filter(|rows| rows.len() == 1)
+    else {
+        return false;
+    };
+    report["language"] == "go"
+        && report["authority"] == "local_unverified"
+        && report["coverage_proven"] == false
+        && report["delivery_decision"] == "not_evaluated"
+        && row["language"] == "go"
+        && row["path"] == report["scope"]
+        && row["scope"] == "whole_file"
+        && row["byte_offset"] == 0
+        && row["structural_observation_count"] == 1
+        && row["source_sha256"].as_str().is_some_and(valid_sha)
+        && serde_json::from_value::<crate::syntax_worker_structure::SyntaxWorkerStructure>(
+            structures[0].clone(),
+        )
+        .is_ok_and(|structure| structure.valid("go", b""))
 }

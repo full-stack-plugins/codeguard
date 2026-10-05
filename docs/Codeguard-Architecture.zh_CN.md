@@ -936,4 +936,6 @@ flowchart LR
     J --> K[原工具复检及关闭策略]
 ```
 
-probe、聚合检查和保存反馈已携带该候选；末端Go确认任务的原生adapter及可信关闭仍待完成。修复指引要求原生确认前保留源码，零候选复扫继续保留任务。见[验收](../tests/acceptance/go-package-structure.md)。
+probe、聚合检查和保存反馈已携带该候选；Go确认任务已接入显式SDK原生复检，可信关闭仍待完成。修复指引要求原生确认前保留源码，零候选复扫继续保留任务。见[验收](../tests/acceptance/go-package-structure.md)。
+
+Go候选任务复检现接受 `--go-tool /absolute/sdk/bin/go`，对冻结整文件字节调用固定SDK同目录 `gofmt -e /dev/stdin`。复检0.9/任务反馈0.22保留原生诊断、主/辅助制品身份、首次报告收据和失败尝试；修复后当前源码不会使原候选历史被误判损坏。局部零诊断继续保留open任务，等待批准政策与覆盖。见[验收](../tests/acceptance/go-package-structure.md)。

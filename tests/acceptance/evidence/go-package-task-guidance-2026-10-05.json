@@ -1,0 +1,121 @@
+{
+  "still_blocked": {
+    "action_id": "repair-source",
+    "affected_paths": [
+      "main.go"
+    ],
+    "authority": "local_unverified",
+    "build_root": ".",
+    "checker_id": "syntax.native_confirmation",
+    "closure_condition": "\u539f\u751f\u5de5\u5177\u6309\u76f8\u540c\u53d7\u63a7\u7b56\u7565\u5b8c\u6574\u590d\u68c0\u5e76\u786e\u8ba4\u95ee\u9898\u5df2\u89e3\u51b3\uff1b\u5c40\u90e8\u67e5\u8be2\u4e0d\u80fd\u5173\u95ed\u4efb\u52a1",
+    "constraints": [
+      "\u5148\u6062\u590d\u68c0\u67e5\u5b8c\u6574\u6027",
+      "\u4e0d\u5f97\u5173\u95ed\u68c0\u67e5\u5668\u6216\u4fee\u6539\u65e0\u5173\u6e90\u7801"
+    ],
+    "disposition": "actionable",
+    "evidence_ref": {
+      "first_report_sha256": "059c5132f903f031e1f4a9def747e8dc774258e71dc51cd30d9081caf08cf4f0",
+      "first_run_id": "syntax-confirm-65846-1791199044469943000"
+    },
+    "history": {
+      "attempt_count": 0,
+      "awaiting_verification": false,
+      "budget": 2,
+      "no_progress_count": 0,
+      "open_attempt_id": null,
+      "recent": []
+    },
+    "kind": "blocker",
+    "native_column_unit": "utf8_byte",
+    "native_confirmation_reason": "go_native_syntax_diagnostics",
+    "native_confirmation_ref": {
+      "report_ref": ".codeguard/reports/syntax-native-65849-1791199045473593000.json",
+      "report_sha256": "b91b5f36502d763cd9ad88c631f7a6f75fff30bd25ad88aa023adefab0c829a5",
+      "run_id": "syntax-native-65849-1791199045473593000"
+    },
+    "native_confirmation_status": "diagnostics_observed",
+    "native_diagnostic_positions": [
+      {
+        "column": 1,
+        "column_unit": "utf8_byte",
+        "line": 1,
+        "rule_id": "go.syntax"
+      },
+      {
+        "column": 7,
+        "column_unit": "utf8_byte",
+        "line": 1,
+        "rule_id": "go.syntax"
+      }
+    ],
+    "reason_code": "native_syntax_confirmation_needed",
+    "recheck_argv": [
+      "codeguard",
+      "task",
+      "verify",
+      "CG-B-28f7187ec18de3b2d7123bb0384720e3",
+      ".",
+      "--format",
+      "json",
+      "--go-tool",
+      "/usr/local/go/bin/go"
+    ],
+    "schema_version": "0.14.0",
+    "scope": "main.go",
+    "step": "\u5f53\u524d\u6e90\u7801\u5df2\u6709\u539f\u751f Go \u6574\u6587\u4ef6\u8bed\u6cd5\u8bca\u65ad\uff1b\u6838\u5bf9 UTF-8 \u5b57\u8282\u5217\u540e\u4fee\u590d\uff0c\u5e76\u4ee5\u540c\u4e00SDK\u7684 --go-tool \u7edd\u5bf9\u8def\u5f84\u590d\u68c0\uff1b\u9879\u76eego vet\u3001\u7c7b\u578b\u3001\u4f9d\u8d56\u4e0eCVE\u4ecd\u9700\u5b8c\u6210",
+    "task_id": "CG-B-28f7187ec18de3b2d7123bb0384720e3"
+  },
+  "candidate_absent_unverified_policy": {
+    "action_id": "restore-checker-environment",
+    "affected_paths": [
+      "main.go"
+    ],
+    "authority": "local_unverified",
+    "build_root": ".",
+    "checker_id": "syntax.native_confirmation",
+    "closure_condition": "\u539f\u751f\u5de5\u5177\u6309\u76f8\u540c\u53d7\u63a7\u7b56\u7565\u5b8c\u6574\u590d\u68c0\u5e76\u786e\u8ba4\u95ee\u9898\u5df2\u89e3\u51b3\uff1b\u5c40\u90e8\u67e5\u8be2\u4e0d\u80fd\u5173\u95ed\u4efb\u52a1",
+    "constraints": [
+      "\u5148\u6062\u590d\u68c0\u67e5\u5b8c\u6574\u6027",
+      "\u4e0d\u5f97\u5173\u95ed\u68c0\u67e5\u5668\u6216\u4fee\u6539\u65e0\u5173\u6e90\u7801"
+    ],
+    "disposition": "verification_required",
+    "evidence_ref": {
+      "first_report_sha256": "059c5132f903f031e1f4a9def747e8dc774258e71dc51cd30d9081caf08cf4f0",
+      "first_run_id": "syntax-confirm-65846-1791199044469943000"
+    },
+    "history": {
+      "attempt_count": 0,
+      "awaiting_verification": false,
+      "budget": 2,
+      "no_progress_count": 0,
+      "open_attempt_id": null,
+      "recent": []
+    },
+    "kind": "blocker",
+    "native_column_unit": "utf8_byte",
+    "native_confirmation_reason": "go_native_syntax_no_diagnostics",
+    "native_confirmation_ref": {
+      "report_ref": ".codeguard/reports/syntax-native-65861-1791199047851641000.json",
+      "report_sha256": "f86d9c2b3191bbac0d80a885d38b8b131925c8dbca05cbf9bd3e6a92e52dd32e",
+      "run_id": "syntax-native-65861-1791199047851641000"
+    },
+    "native_confirmation_status": "completed",
+    "native_diagnostic_positions": [],
+    "reason_code": "native_syntax_confirmation_needed",
+    "recheck_argv": [
+      "codeguard",
+      "task",
+      "verify",
+      "CG-B-28f7187ec18de3b2d7123bb0384720e3",
+      ".",
+      "--format",
+      "json",
+      "--go-tool",
+      "/usr/local/go/bin/go"
+    ],
+    "schema_version": "0.14.0",
+    "scope": "main.go",
+    "step": "\u539f\u751f\u8bed\u6cd5\u590d\u68c0\u672a\u53d1\u73b0\u8bca\u65ad\uff1b\u6838\u5bf9\u539f\u8f93\u5165\u7684\u53cd\u8bc1\u6216\u4fee\u590d\u5f52\u56e0\u53ca\u6b63\u5f0f\u7b56\u7565/\u8986\u76d6\uff0c\u4fdd\u7559\u8bc1\u636e\uff0c\u4e0d\u91cd\u590d\u6e90\u7801\u4fee\u590d\u6216\u5b89\u88c5\u5de5\u5177\uff0c\u4e5f\u4e0d\u81ea\u52a8\u5173\u95ed",
+    "task_id": "CG-B-28f7187ec18de3b2d7123bb0384720e3"
+  }
+}
