@@ -15,6 +15,8 @@ pub(crate) enum GrammarNativeChecker {
     Ruby,
     /// Go SDK 配对gofmt的整文件语法观察。
     Go,
+    /// 显式固定edition2024的Rustfmt解析；不是Clippy lint或项目编译。
+    Rust,
 }
 
 impl GrammarNativeChecker {
@@ -29,6 +31,7 @@ impl GrammarNativeChecker {
             "javascript" => Some(Self::Javascript),
             "ruby" => Some(Self::Ruby),
             "go" => Some(Self::Go),
+            "rust" => Some(Self::Rust),
             _ => None,
         }
     }
@@ -40,6 +43,7 @@ impl GrammarNativeChecker {
             Self::Javascript => "v24.18.0",
             Self::Ruby => "ruby 2.6.10p210",
             Self::Go => "go1.23.4",
+            Self::Rust => "rustfmt 1.9.0-stable",
         }
     }
     /// 返回对应原生制品的有界字节预算；Node 独立预算不扩张其它工具权限。
@@ -72,6 +76,7 @@ impl GrammarNativeChecker {
             Self::Python => crate::python_syntax_probe::observe(tool, source, deadline, cancelled),
             Self::Ruby => crate::ruby_syntax_probe::observe(tool, source, deadline, cancelled),
             Self::Go => crate::go_syntax_probe::observe(tool, source, deadline, cancelled),
+            Self::Rust => crate::rustfmt_syntax_probe::observe(tool, source, deadline, cancelled),
             Self::Javascript => {
                 crate::javascript_syntax_probe::observe(tool, source, deadline, cancelled)
             }
@@ -104,6 +109,7 @@ mod tests {
             "javascript",
             "ruby",
             "go",
+            "rust",
         ] {
             for phase in ["version", "scan"] {
                 let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
@@ -119,6 +125,7 @@ mod tests {
                     "kotlin" => "printf 'info: kotlinc-jvm 2.4.10 (JRE fixture)\\n' >&2",
                     "python" => "printf 'ruff 0.16.8\\n'",
                     "ruby" => "printf 'ruby 2.6.10p210 (fixture) [fixture]\\n'",
+                    "rust" => "printf 'rustfmt 1.9.0-stable (fixture)\\n'",
                     "go" => {
                         "if [ \"$#\" = 1 ]; then printf 'go version go1.23.4 fixture/fixture\\n'; else printf '%s: go1.23.4\\n' \"$2\"; fi"
                     }
@@ -192,6 +199,7 @@ mod tests {
             "javascript",
             "ruby",
             "go",
+            "rust",
         ] {
             for mode in ["alias", "replace"] {
                 let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
@@ -215,6 +223,7 @@ mod tests {
                     "kotlin" => "printf 'info: kotlinc-jvm 2.4.10 (JRE fixture)\\n' >&2",
                     "python" => "printf 'ruff 0.16.8\\n'",
                     "ruby" => "printf 'ruby 2.6.10p210 (fixture) [fixture]\\n'",
+                    "rust" => "printf 'rustfmt 1.9.0-stable (fixture)\\n'",
                     "go" => {
                         "if [ \"$#\" = 1 ]; then printf 'go version go1.23.4 fixture/fixture\\n'; else printf '%s: go1.23.4\\n' \"$2\"; fi"
                     }

@@ -1692,3 +1692,8 @@ CFQuery本批终态：结构集成4通过、全32路由14通过及旧提示断�
 3.7/7.1与execution-kernel：原生执行中新增Rust文件仍称局部完成的反例先RED。共享静态发现清单加前后集合复核，全部已观察Rust源码/嵌套Cargo.toml与Cargo.lock纳入字节快照；集合或字节变化撤回定位及原生覆盖。默认32项、WASM33项测试通过，覆盖单元1通过，实际Clippy两个输入变化测试通过；受保护Erlang草稿不修改/不执行。范围变化不算源码违规，工作台记录不误使扫描失效。外部依赖/动态目标/完整配置/沙箱/编辑原生快检仍未完成，父任务不勾选；见[验收](../../../tests/acceptance/rust-clippy-input-stability.md)。
 
 Rust输入补录终态：实际原生lint修复及原工具任务复检1通过，双构建严格Clippy、分层、OpenSpec严格验证及diff检查通过。已有任务/报告协议不变，完整父任务继续开放。
+
+
+## 2026-10-06 Rustfmt 原生解析开发对照（局部验收）
+
+对应12.11、14.17、14.19及syntax-precheck；不新建change、不勾选全语言或Hook父任务。显式固定Rustfmt1.9.0-stable在私有edition2024配置/空环境中解析冻结stdin，不用格式差异判语法失败。版本阶段制品/配置变化在第二调用前拒绝，共享预算与取消；实测EOF越界及E0765/退出101先失败后修正，有定位解析诊断与崩溃/无定位分开。历史语料/grammar/协议不改，新差分0.8、Rust观察0.1保留资格0和未评估交付。实际16例对照5TP/11TN/0FP/0FN/0unknown，只限14历史+2临时边界例、非独立holdout；Rust编辑Hook、项目edition、Clippy/完整项目及发行仍未完成。默认/WASM解析单测各4项、共享checker4项、四语言定向8项、协议2项及双构建严格Clippy通过；真实工具目标另1通过。证据见[局部验收](../../../tests/acceptance/rustfmt-controlled-native-differential.md)。CI新增受控重放与解析单测，远端结果须独立确认。

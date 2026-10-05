@@ -220,6 +220,10 @@ pub(crate) mod rust_cve_task_recheck;
 mod rust_lint_inputs;
 #[cfg(unix)]
 mod rust_input_inventory;
+#[cfg(all(unix, any(feature = "wasm-precheck", test)))]
+mod rustfmt_scratch;
+#[cfg(all(unix, any(feature = "wasm-precheck", test)))]
+mod rustfmt_syntax_probe;
 #[cfg(unix)]
 pub mod rust_lint_scan;
 #[cfg(unix)]
