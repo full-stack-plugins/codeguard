@@ -87,6 +87,8 @@
       "name": "TypeScript / JavaScript",
       "extensions": [
         ".ts",
+        ".mts",
+        ".cts",
         ".tsx",
         ".js",
         ".jsx",

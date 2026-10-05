@@ -63,6 +63,8 @@ fn completed_native_ruff_preempts_only_its_matching_python_file() {
     fs::write(&tool, "#!/bin/sh\nif [ \"$1\" = '--version' ]; then echo 'ruff 0.16.8'; exit 0; fi\nif [ \"$2\" = '--show-files' ]; then echo \"$3\"; exit 0; fi\nif [ \"$2\" = '--show-settings' ]; then printf 'linter.rules.enabled = [\\n\\tunused-import (F401),\\n]\\nlinter.per_file_ignores = {}\\n'; exit 0; fi\nif [ \"$2\" = '--no-cache' ]; then if [ \"$3\" = '--ignore-noqa' ]; then source=$6; else source=$5; fi; printf '[{\"code\":\"F401\",\"message\":\"unused\",\"filename\":\"%s\",\"location\":{\"row\":1,\"column\":1},\"severity\":\"error\"}]\\n' \"$source\"; exit 1; fi\nexit 2\n").unwrap();
     fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
     let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        // 显式 Ruff 仍可执行；隔离宿主 Zig 等工具，固定相邻文件的 WASM 分支。
+        .env("PATH", &root)
         .args(["check", "all"])
         .arg(&root)
         .args([
@@ -599,4 +601,171 @@ fn edited_file_hooks_invoke_all_32_candidates_without_scanning_untouched_files()
         .collect();
     assert_eq!(languages, expected);
     assert_eq!(languages.len(), 32);
+}
+
+#[test]
+fn project_check_observes_typescript_module_sources_with_pinned_grammar() {
+    let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
+        "codeguard-module-extensions-{}",
+        std::process::id()
+    ));
+    fs::create_dir_all(&root).unwrap();
+    for name in ["module.mts", "module.cts"] {
+        fs::write(root.join(name), "export const value: number = ;\n").unwrap();
+    }
+    for name in ["types.d.mts", "types.d.cts"] {
+        fs::write(root.join(name), "export declare const value: number;\n").unwrap();
+    }
+    fs::write(root.join("module.mtsx"), "export default <div />;").unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .env("PATH", &root)
+        .args(["check", "all"])
+        .arg(&root)
+        .args(["--format=json", "--timeout", "60s", "--jobs=2"])
+        .output()
+        .unwrap();
+    fs::remove_dir_all(&root).unwrap();
+    assert_eq!(
+        output.status.code(),
+        Some(3),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(
+        report["syntax_candidates"]["source_file_count"], 4,
+        "{report}"
+    );
+    let observations = report["syntax_candidates"]["observations"]
+        .as_array()
+        .unwrap();
+    assert_eq!(observations.len(), 4, "{report}");
+    for observation in observations {
+        assert_eq!(observation["language"], "typescript", "{observation}");
+        assert_eq!(observation["grammar_qualified"], false);
+        assert_eq!(observation["status"], "candidate_observed", "{observation}");
+        let name = observation["path"].as_str().unwrap();
+        if name.starts_with("types.") {
+            assert_eq!(observation["recovery_count"], 0, "{observation}");
+        } else {
+            assert!(
+                observation["recovery_count"].as_u64().unwrap() > 0,
+                "{observation}"
+            );
+        }
+    }
+    assert_eq!(report["delivery_decision"], "incomplete");
+}
+
+#[test]
+fn typescript_module_tasks_are_stable_and_edit_hook_keeps_changed_scope() {
+    use std::io::Write;
+    use std::process::Stdio;
+    let root = std::env::temp_dir()
+        .canonicalize()
+        .unwrap()
+        .join(format!("codeguard-module-workflow-{}", std::process::id()));
+    fs::create_dir_all(&root).unwrap();
+    for name in ["module.mts", "module.cts"] {
+        fs::write(root.join(name), "export const value: number = ;\n").unwrap();
+    }
+    fs::write(
+        root.join("types.d.mts"),
+        "export declare const value: number;\n",
+    )
+    .unwrap();
+    let init = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["init"])
+        .arg(&root)
+        .args(["--apply", "--format=json"])
+        .output()
+        .unwrap();
+    assert_eq!(
+        init.status.code(),
+        Some(3),
+        "{}",
+        String::from_utf8_lossy(&init.stderr)
+    );
+    let mut first_ids = BTreeSet::new();
+    for round in 0..2 {
+        let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .env("PATH", &root)
+            .args(["check", "typescript"])
+            .arg(&root)
+            .args(["--format=json", "--timeout", "60s"])
+            .output()
+            .unwrap();
+        assert_eq!(
+            output.status.code(),
+            Some(3),
+            "{}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+        assert_eq!(
+            report["syntax_candidates"]["observations"]
+                .as_array()
+                .unwrap()
+                .len(),
+            3,
+            "{report}"
+        );
+        assert_eq!(
+            report["syntax_tasks"]["status"], "synced_partial",
+            "{report}"
+        );
+        let tasks = report["syntax_tasks"]["tasks"].as_array().unwrap();
+        assert_eq!(tasks.len(), 2, "{report}");
+        let ids: BTreeSet<String> = tasks
+            .iter()
+            .map(|t| t["task_id"].as_str().unwrap().to_owned())
+            .collect();
+        if round == 0 {
+            first_ids = ids;
+        } else {
+            assert_eq!(ids, first_ids);
+        }
+    }
+    let payload = serde_json::json!({"schema_version":"1.0.0","report_type":"hook_trigger_request",
+        "input":{"event":"file_changed","changed_paths":["module.mts"],"task_id":null,
+            "write_outcome":"confirmed","host_claims_blocking":false}});
+    let mut child = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .env("PATH", &root)
+        .args(["hook", "execute"])
+        .arg(&root)
+        .args(["--format=json", "--timeout", "60s"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(&serde_json::to_vec(&payload).unwrap())
+        .unwrap();
+    let output = child.wait_with_output().unwrap();
+    assert_eq!(
+        output.status.code(),
+        Some(3),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let feedback = &report["local_feedback"];
+    assert_eq!(
+        feedback["requested_paths"],
+        serde_json::json!(["module.mts"])
+    );
+    let observations = feedback["syntax_candidates"]["observations"]
+        .as_array()
+        .unwrap();
+    assert_eq!(observations.len(), 1, "{report}");
+    assert_eq!(observations[0]["path"], "module.mts");
+    assert_eq!(observations[0]["language"], "typescript");
+    let tasks = feedback["syntax_tasks"]["tasks"].as_array().unwrap();
+    assert_eq!(tasks.len(), 1, "{report}");
+    assert!(first_ids.contains(tasks[0]["task_id"].as_str().unwrap()));
+    fs::remove_dir_all(root).unwrap();
 }

@@ -208,6 +208,12 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 
 `.m` 文件中 MATLAB 块注释 `%{ ... %}` 内的行首 `#import` 或 `@interface` 只是注释数据，MUST NOT 作为 Objective-C 证据；块注释外的明确 Objective-C 专属标记仍可用于候选路由。发现与检查 MUST 使用同一判别，避免一个入口报告未知而另一个入口执行错误 grammar。
 
+#### Scenario: TypeScript module extensions enter project discovery and syntax routing
+
+- **WHEN** 项目包含 `.mts`、`.cts` 或对应 `.d.mts`、`.d.cts` 声明文件
+- **THEN** 发现与聚合检查 MUST 将其归入 TypeScript 范围，缺原生时使用固定 TypeScript grammar，不能遗漏或交给 TSX grammar；非法语法仍仅作候选疑似，合法声明不证明完整 lint 或类型检查
+- **AND** `.mtsx`/`.ctsx` 等未知后缀不得因近似名称被猜测为 TSX
+
 #### Scenario: Shared extension would produce a speculative syntax finding
 - **WHEN** 项目包含无 Objective-C 专属标记的 MATLAB `.m` 源码，或 SuperCollider `.sc` 源码
 - **THEN** 自动候选路由不把它们交给 Objective-C/Scala WASM；歧义范围保持未完成，不能用资产数量或其它文件的检查结果代替该范围

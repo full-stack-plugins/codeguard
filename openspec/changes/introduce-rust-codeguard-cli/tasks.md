@@ -1477,3 +1477,8 @@ check python/all现通过0.48反馈保留独立结构计数和原始坐标，原
 ### 2026-10-05 原生语法动作与重试预算收敛
 
 9.9/9.10/14.10：真实Python原生still_present简报动作先RED后修为repair-source，输入失效/不完整不授予旧位置修复。语法确认任务同输入的环境恢复和源码修复共享预算，原始事件不重写；纯历史计数先RED，持久化动作切换后第三次尝试仍拒绝。默认lib54通过/3忽略，受影响WASM五目标96通过/6忽略，真实Ruff两来源链路1通过160.44秒，持久化预算增强目标1通过46.05秒。完整patch/环境身份、跨平台、默认宿主和全语言父任务仍开放，见[局部验收](../../../tests/acceptance/python-native-action-budget.md)。
+
+
+### 2026-10-05 TypeScript模块后缀发现与任务接线
+
+14.4/14.6/14.10/14.19：`.mts/.cts`与声明后缀在默认发现和聚合路由遗漏分别RED，统一注册表与固定TypeScript路由后实际四文件check all通过。重复check typescript保持两张疑似任务，合法声明不新建；单文件编辑Hook仅检查原范围。受控ESLint完整结果仍优先，另一构建根保持候选；七目标85通过，无忽略，默认/WASM严格Clippy及OpenSpec通过。未增加grammar资格或公开发行，父任务仍开放，见[验收](../../../tests/acceptance/typescript-module-extension-routing.md)。

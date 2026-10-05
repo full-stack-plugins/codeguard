@@ -51,7 +51,7 @@ pub fn route_source<'a>(relative_path: &str, source: &'a [u8]) -> Vec<GrammarRou
         Some("swift") => "swift",
         Some("tf" | "tfvars" | "tofu") => "terraform",
         Some("tsx") => "tsx",
-        Some("ts") => "typescript",
+        Some("ts" | "mts" | "cts") => "typescript",
         Some("vb") => "vbnet",
         Some("zig") => "zig",
         _ => return Vec::new(),

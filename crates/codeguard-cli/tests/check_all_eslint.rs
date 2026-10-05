@@ -392,3 +392,53 @@ fn edited_native_sync_failure_remains_visible_in_dialogue() {
     assert!(context.contains("任务同步未完成"), "{context}");
     assert!(!context.contains("task show"));
 }
+
+#[test]
+#[cfg(feature = "wasm-precheck")]
+fn module_extensions_keep_native_priority_and_independent_fallback_scope() {
+    let p = Project::new("module-extensions");
+    fs::create_dir(p.0.join("other")).unwrap();
+    for extension in ["mts", "cts"] {
+        fs::write(
+            p.0.join(format!("frontend/module.{extension}")),
+            "debugger;\n",
+        )
+        .unwrap();
+        fs::write(
+            p.0.join(format!("other/module.{extension}")),
+            "export const value: number = ;\n",
+        )
+        .unwrap();
+    }
+    let report = p.check();
+    let files = report["native_results"]["node_lint"]["files"]
+        .as_array()
+        .unwrap();
+    for extension in ["mts", "cts"] {
+        let path = format!("frontend/module.{extension}");
+        let file = files.iter().find(|f| f["path"] == path).unwrap();
+        assert_eq!(file["feedback"]["local_coherent"], true, "{file}");
+        assert_eq!(file["feedback"]["findings"][0]["rule_id"], "no-debugger");
+    }
+    assert_eq!(
+        report["syntax_candidates"]["native_preferred_count"], 4,
+        "{report}"
+    );
+    let rows = report["syntax_candidates"]["observations"]
+        .as_array()
+        .unwrap();
+    for extension in ["mts", "cts"] {
+        assert!(
+            !rows
+                .iter()
+                .any(|r| r["path"] == format!("frontend/module.{extension}"))
+        );
+        let row = rows
+            .iter()
+            .find(|r| r["path"] == format!("other/module.{extension}"))
+            .unwrap();
+        assert_eq!(row["language"], "typescript");
+        assert!(row["recovery_count"].as_u64().unwrap() > 0, "{row}");
+    }
+    assert_eq!(report["delivery_decision"], "incomplete");
+}

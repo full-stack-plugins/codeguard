@@ -148,3 +148,16 @@ fn cfquery_route_ignores_nested_cfml_comment_inside_open_tag() {
         .unwrap();
     assert_eq!(query.source, b"SELECT #id# FROM users");
 }
+
+#[test]
+fn typescript_module_extensions_keep_the_typescript_grammar() {
+    for name in ["module.mts", "module.cts", "types.d.mts", "types.d.cts"] {
+        let routes = route_source(name, b"export const value: number = 1;\n");
+        assert_eq!(routes.len(), 1, "{name}");
+        assert_eq!(routes[0].language, "typescript", "{name}");
+        assert_eq!(routes[0].scope, "whole_file");
+    }
+    // 不把模块后缀作为支持 JSX 或未知文件类型的依据。
+    assert!(route_source("module.mtsx", b"export default <div />;").is_empty());
+    assert!(route_source("module.ctsx", b"export default <div />;").is_empty());
+}

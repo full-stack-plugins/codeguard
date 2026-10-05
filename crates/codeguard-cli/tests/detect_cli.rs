@@ -1207,3 +1207,32 @@ fn standalone_node_source_without_package_returns_configuration_preparation() {
     assert_eq!(entry["configuration_ref"], "app.js");
     assert!(!project.0.join("package.json").exists());
 }
+
+#[test]
+fn detect_includes_typescript_module_sources_without_package_manifest() {
+    let project = TempProject::new();
+    for name in ["module.mts", "module.cts", "types.d.mts", "types.d.cts"] {
+        fs::write(project.0.join(name), "export const value: number = 1;\n").unwrap();
+    }
+    fs::write(project.0.join("module.mtsx"), "not a supported extension").unwrap();
+    let report = detect_json(&project);
+    let ts = report["languages"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|language| language["id"] == "typescript")
+        .expect("TypeScript language");
+    assert_eq!(
+        ts["source_files"],
+        serde_json::json!(["module.cts", "module.mts", "types.d.cts", "types.d.mts"])
+    );
+    assert!(
+        report["checker_configurations"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|entry| entry["checker_id"] == "node.eslint"
+                && entry["reason"] == "eslint_configuration_not_observed"),
+        "{report}"
+    );
+}
