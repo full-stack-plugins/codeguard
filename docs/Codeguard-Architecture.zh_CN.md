@@ -1092,3 +1092,35 @@ flowchart LR
 Go首次原生观察的任务指引使用 `repair_brief_preview` 0.18和 `syntax-confirm-` 引用；实际任务复检继续使用0.14和 `syntax-native-` 引用，历史schema保持不变。最终受影响回归：WASM 78通过/5条件忽略，默认15通过/0忽略。此前1461通过的默认全量结果早于这次末尾协议修正。
 
 Go固定1.23.4语法SDK现于编辑及原工具任务复检前静态检查最近 `go.mod` 和最近 `go.work`。最低版本或建议工具链超出支持范围、声明歧义或不可读时返回环境观察，不运行不适用SDK、不降级WASM；运行期间变化撤回诊断，当前声明不适用时撤回旧修复位置。该边界不代表通用工具链选择或语言版本验收。证据：[Go项目版本](../tests/acceptance/go-project-version.md)。
+
+### CFQuery 静态 DISTINCT 投影候选
+
+固定 CFQuery grammar 能识别 SQL token，不能完整验证 SQL 子句。Codeguard 对直接相邻的 AST 关键词 `SELECT DISTINCT FROM` 增加独立候选，原始 ERROR/MISSING 保持不变。字符串、引号标识符和 CFML 插值会打断匹配；注释可跳过。该规则不标记 `SELECT FROM users`，因为 PostgreSQL 允许未使用 DISTINCT 的空投影。
+
+```mermaid
+flowchart LR
+    A[CFQuery SQL fragment] --> B[Fixed WASM AST]
+    B --> C[Raw ERROR / MISSING]
+    B --> D[Adjacent SELECT DISTINCT FROM keywords]
+    D --> E[Independent unqualified candidate]
+    E --> F[Whole-file identity + fragment identity + file positions]
+    F --> G[One stable confirmation task]
+    G --> H[Resolve datasource, dialect, version and template context]
+    H --> I[Applicable native SQL confirmation required]
+```
+
+worker 使用1.3、显式probe 0.4、项目反馈0.53、编辑反馈0.23/0.13、持久候选0.11；历史schema及grammar资产不改。嵌入观察同时记录完整文件 `source_sha256` 和独立 `fragment_source_sha256`，坐标还原到文件。重复扫描复用同一任务；候选消失不关闭任务。`next` 明确要求确认datasource、数据库方言/版本、动态模板和schema上下文：CFQuery原生task verify adapter仍未接入，不自动连接项目数据库。
+
+```bash
+codeguard grammar probe cfquery query.sql --format=json
+codeguard check all . --format=json
+codeguard next . --format=json
+```
+
+报告示例（字段节选，不是完整schema）：
+
+```json
+{"language":"cfquery","recoveries":[],"structural_observations":[{"basis":"codeguard_structure_rule","rule_id":"codeguard.cfquery.distinct_projection","rule_version":"1.0.0","parent_syntax_kind":"program"}],"grammar_qualified":false,"status":"incomplete","delivery_decision":"not_evaluated","next_action":"confirm_candidate_structure_with_applicable_native_tool"}
+```
+
+本轮只在候选层纠正一个固定原生反例，不代表grammar取得资格、独立holdout精度、全部SQL方言、SQL注入安全或原生adapter/发行验收完成。证据：[CFQuery候选验收](../tests/acceptance/cfquery-structure.md)。

@@ -144,7 +144,7 @@ fn check_all_routes_distinct_dialects_after_native_without_claiming_clean() {
         String::from_utf8_lossy(&output.stderr)
     );
     let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
-    assert_eq!(report["schema_version"], "0.38.0");
+    assert_eq!(report["schema_version"], "0.53.0");
     assert_eq!(report["execution_budget"]["jobs_limit"], 1);
     assert_eq!(report["delivery_decision"], "incomplete");
     let observations = report["syntax_candidates"]["observations"]
@@ -255,7 +255,7 @@ fn known_grammar_precision_limits_reach_project_feedback() {
         .unwrap();
     for (language, expected) in [
         ("vbnet", "known grammar false positive"),
-        ("cfquery", "does not validate full SQL semantics"),
+        ("cfquery", "SELECT FROM users is accepted by that dialect"),
         ("kotlin", "native compiler rejects missing parameter type"),
     ] {
         let observation = observations
@@ -904,8 +904,12 @@ fn cfquery_comment_boundaries_reach_real_workers_without_truncating_source() {
         assert_eq!(row["path"], "page.cfm");
         assert_eq!(row["scope"], "cfquery_body");
         assert_eq!(
-            row["source_sha256"],
+            row["fragment_source_sha256"],
             format!("{:x}", Sha256::digest(body.as_bytes()))
+        );
+        assert_eq!(
+            row["source_sha256"],
+            format!("{:x}", Sha256::digest(source.as_bytes()))
         );
         assert_eq!(row["grammar_qualified"], false);
         assert_ne!(row["status"], "clean");

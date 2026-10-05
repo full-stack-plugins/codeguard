@@ -129,6 +129,35 @@ fn observe(language: &str, source: &[u8]) -> Result<SyntaxWorkerEnvelope, String
             Some(true) | None => structural_truncated = true,
         }
     }
+    if language == "cfquery" && tree.root_node().kind() == "program" {
+        let (facts, truncated) = codeguard_runtime::scan_wasm_keyword_sequence(
+            &tree,
+            source,
+            "query_keyword",
+            &["SELECT", "DISTINCT", "FROM"],
+            MAX_RECOVERIES,
+        )?;
+        structural_truncated |= truncated;
+        for fact in facts {
+            if scanned.recoveries.len() + structural_observations.len() == MAX_RECOVERIES {
+                structural_truncated = true;
+                break;
+            }
+            structural_observations.push(crate::syntax_worker_structure::SyntaxWorkerStructure {
+                basis: "codeguard_structure_rule".into(),
+                rule_id: "codeguard.cfquery.distinct_projection".into(),
+                rule_version: "1.0.0".into(),
+                rule_sha256: codeguard_adapters::cfquery_projection_rule_sha256(),
+                parent_syntax_kind: fact.root_syntax_kind,
+                start_byte: fact.start_byte,
+                end_byte: fact.end_byte,
+                start_row: fact.start_row,
+                start_column_byte: fact.start_column_byte,
+                end_row: fact.end_row,
+                end_column_byte: fact.end_column_byte,
+            });
+        }
+    }
     let recoveries = scanned
         .recoveries
         .into_iter()
@@ -147,6 +176,8 @@ fn observe(language: &str, source: &[u8]) -> Result<SyntaxWorkerEnvelope, String
     Ok(SyntaxWorkerEnvelope {
         schema_version: if structural_observations.is_empty() {
             "1.0.0"
+        } else if language == "cfquery" {
+            "1.3.0"
         } else if language == "go" {
             "1.2.0"
         } else {

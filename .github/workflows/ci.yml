@@ -49,7 +49,7 @@ jobs:
       - name: Verify Linux WASM worker resource boundary
         run: |
           # 帮助目录须保留当前构建特性；默认 suite 无法证明 WASM 入口状态。
-          cargo test --locked -p codeguard-cli --features wasm-precheck --test help_command_contract --test rules_list_cli --test version_cli --test rust_lint_cli --test ruby_lint_cli --test check_all_ruby --test ruby_native_hook --test ruby_project_version --test shell_lint_cli --test shell_workbench --test check_all_shell --test shell_native_hook --test hook_failed_write_options --test go_native_hook --test cfquery_postgres_dialect
+          cargo test --locked -p codeguard-cli --features wasm-precheck --test help_command_contract --test rules_list_cli --test version_cli --test rust_lint_cli --test ruby_lint_cli --test check_all_ruby --test ruby_native_hook --test ruby_project_version --test shell_lint_cli --test shell_workbench --test check_all_shell --test shell_native_hook --test hook_failed_write_options --test go_native_hook --test cfquery_postgres_dialect --test cfquery_structure
           cargo test --locked -p codeguard-cli --features wasm-precheck --test workspace_msrv --test crate_boundaries
           cargo test -p codeguard-runtime --features wasm-precheck --test process_contract
           cargo test -p codeguard-runtime --features wasm-precheck --test wasm_grammar_load --test wasm_recovery_scan --test wasm_empty_block_scan --test wasm_root_child_scan --test dart_upstream_corpus

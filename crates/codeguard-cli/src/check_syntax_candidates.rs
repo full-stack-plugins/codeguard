@@ -359,10 +359,13 @@ fn candidate_result(
             let mut report = json!({
                 "path":job.relative,"language":job.language,"scope":job.scope,"byte_offset":job.byte_offset,
                 "status":"candidate_observed","reason":incomplete_reason,"grammar_qualified":false,
-                "source_sha256":observation.source_sha256,"grammar_sha256":observation.grammar_sha256,
+                "source_sha256":if job.language == "cfquery" {format!("{:x}",Sha256::digest(job.source.as_slice()))} else {observation.source_sha256.clone()},"grammar_sha256":observation.grammar_sha256,
                 "recovery_count":recovery_count,"recoveries":recoveries,
                 "known_limitations":job.known_limitations
             });
+            if job.language == "cfquery" {
+                report["fragment_source_sha256"] = json!(observation.source_sha256);
+            }
             if !observation.structural_observations.is_empty() {
                 report["structural_observation_count"] =
                     json!(observation.structural_observations.len());
@@ -371,6 +374,20 @@ fn candidate_result(
                         .structural_observations
                         .iter()
                         .take(MAX_VISIBLE_RECOVERIES)
+                        .map(|original| {
+                            let mut row = original.clone();
+                            row.start_byte += job.byte_offset;
+                            row.end_byte += job.byte_offset;
+                            row.start_row += base_row;
+                            row.end_row += base_row;
+                            if original.start_row == 0 {
+                                row.start_column_byte += base_column;
+                            }
+                            if original.end_row == 0 {
+                                row.end_column_byte += base_column;
+                            }
+                            row
+                        })
                         .collect::<Vec<_>>()
                 );
             }

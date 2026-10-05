@@ -374,10 +374,37 @@ fn summarize(path: &str, report: &Value) -> String {
     }
     let recoveries = feedback["candidate_recovery_count"].as_u64().unwrap_or(0);
     let structures = feedback["candidate_structure_count"].as_u64().unwrap_or(0);
-    let structural_rule = if structures > 0 {
-        "；结构规则 codeguard.python.required_suite"
+    let structural_ids = feedback["syntax_candidates"]["observations"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .flat_map(|row| {
+            row["structural_observations"]
+                .as_array()
+                .into_iter()
+                .flatten()
+        })
+        .filter_map(|row| row["rule_id"].as_str())
+        .filter(|id| {
+            matches!(
+                *id,
+                "codeguard.python.required_suite"
+                    | "codeguard.go.required_package"
+                    | "codeguard.cfquery.distinct_projection"
+            )
+        })
+        .collect::<std::collections::BTreeSet<_>>();
+    let structural_rule = if structural_ids.is_empty() {
+        String::new()
     } else {
-        ""
+        format!(
+            "；结构规则 {}",
+            structural_ids
+                .into_iter()
+                .take(3)
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
     };
     let candidates = feedback["syntax_candidates"]["observations"]
         .as_array()

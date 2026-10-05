@@ -44,6 +44,14 @@ impl SyntaxWorkerStructure {
                     && self.start_byte == 0
                     && self.end_byte == 0
             }
+            "cfquery" => {
+                self.rule_id == "codeguard.cfquery.distinct_projection"
+                    && self.rule_sha256 == codeguard_adapters::cfquery_projection_rule_sha256()
+                    && self.parent_syntax_kind == "program"
+                    && source
+                        .get(self.start_byte..self.end_byte)
+                        .is_some_and(codeguard_adapters::cfquery_projection_span_valid)
+            }
             _ => false,
         };
         rule_valid

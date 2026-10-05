@@ -780,3 +780,35 @@ Edit feedback uses outer0.22/inner0.12 and native-first observations0.10; histor
 Go native-first task guidance uses `repair_brief_preview` 0.18 with a `syntax-confirm-` observation reference. Actual task-recheck guidance retains 0.14 with a `syntax-native-` reference; existing schemas are unchanged. Final affected regressions: WASM 78 passed / 5 conditionally ignored, default 15 passed / 0 ignored. The earlier 1,461-pass full default run predates this final protocol correction.
 
 Go's fixed 1.23.4 syntax SDK now statically checks the nearest `go.mod` and nearest `go.work` before editing or original-tool task verification. A newer minimum/suggested toolchain, ambiguous or unreadable declarations produce an environment observation without running that SDK or falling back to WASM. Changes during observation withdraw diagnostics; incompatible current declarations withdraw saved repair positions. This is a bounded compatibility guard, not general project toolchain or language-version acceptance. Evidence: [Go project version](tests/acceptance/go-project-version.md).
+
+### CFQuery static DISTINCT projection candidate
+
+The fixed CFQuery grammar tokenizes SQL without validating every SQL clause. Codeguard now reports adjacent AST `SELECT DISTINCT FROM` keywords as an independent candidate, preserving raw ERROR/MISSING observations. String/identifier literals and CFML interpolation interrupt the sequence; comments can be ignored. `SELECT FROM users` remains unflagged by this rule because PostgreSQL permits an empty projection without DISTINCT.
+
+```mermaid
+flowchart LR
+    A[CFQuery SQL fragment] --> B[Fixed WASM AST]
+    B --> C[Raw ERROR / MISSING]
+    B --> D[Adjacent SELECT DISTINCT FROM keywords]
+    D --> E[Independent unqualified candidate]
+    E --> F[Whole-file identity + fragment identity + file positions]
+    F --> G[One stable confirmation task]
+    G --> H[Resolve datasource, dialect, version and template context]
+    H --> I[Applicable native SQL confirmation required]
+```
+
+The worker uses 1.3, explicit probe 0.4, project feedback 0.53, editing feedback 0.23/0.13, and saved candidate observation 0.11. Historical schemas and grammar assets remain unchanged. Embedded observations carry whole-file `source_sha256`, separate `fragment_source_sha256`, and restored file positions. Repeat scans share a task; candidate disappearance does not close it. `next` explicitly asks for datasource, dialect/version and dynamic-template/schema context: the CFQuery native task-verification adapter is still unavailable, and no project database is contacted automatically.
+
+```bash
+codeguard grammar probe cfquery query.sql --format=json
+codeguard check all . --format=json
+codeguard next . --format=json
+```
+
+Report example (selected fields, not a complete schema):
+
+```json
+{"language":"cfquery","recoveries":[],"structural_observations":[{"basis":"codeguard_structure_rule","rule_id":"codeguard.cfquery.distinct_projection","rule_version":"1.0.0","parent_syntax_kind":"program"}],"grammar_qualified":false,"status":"incomplete","delivery_decision":"not_evaluated","next_action":"confirm_candidate_structure_with_applicable_native_tool"}
+```
+
+This addresses one fixed native-counterexample at the candidate layer. It does not qualify the grammar, measure an independent holdout, infer every SQL dialect, validate injection safety or prove native adapter/release acceptance. Evidence: [CFQuery candidate acceptance](tests/acceptance/cfquery-structure.md).

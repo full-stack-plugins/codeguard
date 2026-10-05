@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "basis",
+    "rule_id",
+    "rule_version",
+    "rule_sha256",
+    "parent_syntax_kind",
+    "start_byte",
+    "end_byte",
+    "start_row",
+    "start_column_byte",
+    "end_row",
+    "end_column_byte"
+  ],
+  "properties": {
+    "basis": {
+      "const": "codeguard_structure_rule"
+    },
+    "rule_id": {
+      "const": "codeguard.cfquery.distinct_projection"
+    },
+    "rule_version": {
+      "const": "1.0.0"
+    },
+    "rule_sha256": {
+      "const": "03652b60616a695c6343b1a39efcf2ea8f469838c6df13bb94ab3d0138b4ea03"
+    },
+    "parent_syntax_kind": {
+      "const": "program"
+    },
+    "start_byte": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "end_byte": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "start_row": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "start_column_byte": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "end_row": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "end_column_byte": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

@@ -49,7 +49,9 @@ pub(crate) fn persist(root: &Path, syntax: &Value, deadline: Instant) -> Value {
                 .map_err(|_| "clock_unavailable")?
                 .as_nanos();
             // 新版只扩展无位置的未完成观察；旧有可定位观察仍使用原协议和稳定身份。
-            let schema_version = if rows
+            let schema_version = if language == "cfquery" {
+                "0.11.0"
+            } else if rows
                 .iter()
                 .any(|row| row.get("structural_observations").is_some())
             {
@@ -153,9 +155,10 @@ pub(crate) fn valid_source_snapshot(workspace: &str, report: &Value, bytes: &[u8
     let (checker, reason, fingerprint) = identity(workspace, path, language);
     if !matches!(
         report["schema_version"].as_str(),
-        Some("0.1.0" | "0.3.0" | "0.7.0" | "0.8.0")
+        Some("0.1.0" | "0.3.0" | "0.7.0" | "0.8.0" | "0.11.0")
     ) || (report["schema_version"] == "0.7.0" && language != "python")
         || (report["schema_version"] == "0.8.0" && language != "go")
+        || (report["schema_version"] == "0.11.0" && language != "cfquery")
         || report["report_type"] != "syntax_confirmation_observation"
         || report["workspace_binding"] != "bound"
         || report["workspace_id"] != workspace
@@ -200,7 +203,9 @@ pub(crate) fn valid_source_snapshot(workspace: &str, report: &Value, bytes: &[u8
     };
     let mut offsets = std::collections::BTreeSet::new();
     rows.iter().all(|row| {
-        let structural = matches!(report["schema_version"].as_str(), Some("0.7.0" | "0.8.0"));
+        let structural = matches!(report["schema_version"].as_str(), Some("0.7.0" | "0.8.0"))
+            || (report["schema_version"] == "0.11.0"
+                && row.get("structural_observations").is_some());
         let mut row_keys = vec![
             "path",
             "language",
@@ -215,6 +220,9 @@ pub(crate) fn valid_source_snapshot(workspace: &str, report: &Value, bytes: &[u8
             "recoveries",
             "known_limitations",
         ];
+        if report["schema_version"] == "0.11.0" {
+            row_keys.push("fragment_source_sha256");
+        }
         if structural {
             row_keys.extend(["structural_observation_count", "structural_observations"]);
         }
@@ -235,6 +243,11 @@ pub(crate) fn valid_source_snapshot(workspace: &str, report: &Value, bytes: &[u8
         }) else {
             return false;
         };
+        if report["schema_version"] == "0.11.0"
+            && row["fragment_source_sha256"] != format!("{:x}", Sha256::digest(route.source))
+        {
+            return false;
+        }
         if !offsets.insert(route.byte_offset) {
             return false;
         }
@@ -251,13 +264,16 @@ pub(crate) fn valid_source_snapshot(workspace: &str, report: &Value, bytes: &[u8
             else {
                 return false;
             };
-            if route.byte_offset != 0
-                || route.source != bytes
+            if (language != "cfquery" && (route.byte_offset != 0 || route.source != bytes))
                 || !structures.iter().all(|value| {
                     serde_json::from_value::<crate::syntax_worker_structure::SyntaxWorkerStructure>(
                         value.clone(),
                     )
-                    .is_ok_and(|value| value.valid(language, bytes))
+                    .is_ok_and(|value| {
+                        value.valid(language, bytes)
+                            && value.start_byte >= route.byte_offset
+                            && value.end_byte <= route.byte_offset + route.source.len()
+                    })
                 })
             {
                 return false;
@@ -269,7 +285,7 @@ pub(crate) fn valid_source_snapshot(workspace: &str, report: &Value, bytes: &[u8
                     || *c + row["structural_observation_count"].as_u64().unwrap_or(129) <= 128)
                 && (*c > 0
                     || structural
-                    || (report["schema_version"] == "0.3.0"
+                    || (matches!(report["schema_version"].as_str(), Some("0.3.0" | "0.11.0"))
                         && row["reason"] == "syntax_recovery_incomplete"))
         }) else {
             return false;

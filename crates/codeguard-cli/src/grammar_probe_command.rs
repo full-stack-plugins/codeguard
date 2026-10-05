@@ -70,7 +70,16 @@ pub fn run(args: &[String]) -> ExitCode {
                 }
             });
             if !observation.structural_observations.is_empty() {
-                report["schema_version"] = json!(if language == "go" { "0.3.0" } else { "0.2.0" });
+                report["schema_version"] = json!(if language == "cfquery" {
+                    "0.4.0"
+                } else if language == "go" {
+                    "0.3.0"
+                } else {
+                    "0.2.0"
+                });
+                if language == "cfquery" {
+                    report["source_scope"] = json!("static_cfquery_sql_candidate");
+                }
                 if language == "go" {
                     report["source_scope"] = json!("whole_file");
                 }
