@@ -250,7 +250,11 @@ pub(crate) fn observe_with_cancellation(
         return report;
     }
     report["version"] = json!("kotlinc-jvm 2.4.10");
-    if !launcher_current(tool, &executable, &sha) {
+    // 版本调用可以写私有工作目录；冻结源码在编译前后都必须保持同字节。
+    let input_current = || {
+        read_bounded_regular_file(&input, 1024 * 1024).is_ok_and(|bytes| bytes.as_slice() == source)
+    };
+    if !launcher_current(tool, &executable, &sha) || !input_current() {
         report["reason"] = json!("kotlin_input_or_launcher_changed_during_check");
         return report;
     }
@@ -261,12 +265,7 @@ pub(crate) fn observe_with_cancellation(
         OsString::from("-d"),
         scratch.path().join("classes").into_os_string(),
     ]);
-    if !launcher_current(tool, &executable, &sha)
-        || read_bounded_regular_file(&input, 1024 * 1024)
-            .ok()
-            .as_deref()
-            != Some(source)
-    {
+    if !launcher_current(tool, &executable, &sha) || !input_current() {
         report["reason"] = json!("kotlin_input_or_launcher_changed_during_check");
         return report;
     }

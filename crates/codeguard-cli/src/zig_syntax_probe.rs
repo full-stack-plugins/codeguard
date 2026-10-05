@@ -54,6 +54,7 @@ pub(crate) fn observe_with_cancellation(
         );
     }
     if version.termination != Termination::Exited(0)
+        || !version.stderr.is_empty()
         || std::str::from_utf8(&version.stdout).ok()?.trim() != "0.16.0"
     {
         return Some(

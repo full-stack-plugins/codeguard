@@ -144,3 +144,5 @@ Python隔离原生探针现于版本探测后、检查前核验请求入口与�
 原生开发差分现把同一取消令牌传入Zig、Erlang、Swift、Kotlin、Python、JavaScript观察器的版本和源码阶段；执行中取消保留样本与unknown，不改变grammar资格。同步摘要I/O仍无硬中断保障；见[取消验收](../tests/acceptance/native-differential-shared-cancellation.md)。
 
 Zig、Erlang、Swift原生观察现于版本返回后、源码调用前及调用后复核原请求别名、规范入口和制品摘要；变化时停止后继调用，保持未完成。六语言别名/制品替换反例见[入口复核验收](../tests/acceptance/native-version-entry-binding.md)。核验与spawn间的完整TOCTOU和工具链闭包仍未解决。
+
+Kotlin版本阶段结束后，原生观察器在编译前后核对私有源码副本与冻结输入；Zig版本探测异常stderr会停止AST调用。两者均保持工具/输入未完成，不生成源码违规，见[阶段输入验收](../tests/acceptance/native-version-input-continuity.md)。

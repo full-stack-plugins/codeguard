@@ -499,6 +499,18 @@ WASM fallback MUST 通过明确版本的协议加入既有统一命令，不静�
 - **WHEN** an application scans a grammar tree for empty `block` nodes that contain no non-comment named statement
 - **THEN** traverse even branches without `has_error`, retain the direct parent kind and original byte positions with explicit record/traversal budget exhaustion, and do not label these structural facts as parser ERROR/MISSING or language violations; legal empty blocks in other languages require independent language interpretation
 
+#### Scenario: Explicit JavaScript native differential is cancelled while checking
+- **WHEN** 版本已核验且原生语法检查正在执行时请求取消
+- **THEN** Node 观察使用同一取消令牌终止进程组，保留样本与 unknown 比较，不等待工具自行完成或将取消视为合法源码
+
+#### Scenario: Every selected native differential shares in-flight cancellation
+- **WHEN** 对已支持的Zig/Erlang/Swift/Kotlin/Python/JavaScript显式原生差分，在版本探测或源码检查实际启动后取消
+- **THEN** 观察器必须传递同一个请求令牌至runtime，停止当前进程组且不启动后继调用；保持样本、真实失败和unknown比较，不将工具自行退出当作取消完成
+
+#### Scenario: Native differential entry changes during version observation
+- **WHEN** 六种已接入原生观察器的版本调用改变请求别名或替换冻结入口字节
+- **THEN** 在源码调用前复核请求物理入口与制品摘要并拒绝执行后继调用；源码调用后同样复核，变化不能提供原生确认、关闭任务或比较资格
+
 ### Requirement: Python隔离原生探针的入口连续性
 
 Python隔离语法探针 MUST 在版本探测后、语法执行前核验请求入口仍解析为冻结的规范化制品，并核验字节摘要；变化 MUST 返回具体未完成原因，不启动第二次调用。语法执行后 MUST 再次核验相同身份，变化后的结果不得按完整原生观察消费。该约束不授予项目版本、批准策略或任务关闭权威。
@@ -620,15 +632,3 @@ Ruff正常与忽略noqa的检查若返回相同的invalid-syntax错误，Codegua
 #### Scenario: Python template strings encounter an older grammar
 - **WHEN** 缺原生工具的本轮候选观察包含 Python，固定清单记载 Python 3.14 模板字符串兼容限制
 - **THEN** 终端及 Claude 摘要均能看到具体版本限制，仍要求适用目标的原生确认且不复制源码或凭候选改写合法代码
-
-#### Scenario: Explicit JavaScript native differential is cancelled while checking
-- **WHEN** 版本已核验且原生语法检查正在执行时请求取消
-- **THEN** Node 观察使用同一取消令牌终止进程组，保留样本与 unknown 比较，不等待工具自行完成或将取消视为合法源码
-
-#### Scenario: Every selected native differential shares in-flight cancellation
-- **WHEN** 对已支持的Zig/Erlang/Swift/Kotlin/Python/JavaScript显式原生差分，在版本探测或源码检查实际启动后取消
-- **THEN** 观察器必须传递同一个请求令牌至runtime，停止当前进程组且不启动后继调用；保持样本、真实失败和unknown比较，不将工具自行退出当作取消完成
-
-#### Scenario: Native differential entry changes during version observation
-- **WHEN** 六种已接入原生观察器的版本调用改变请求别名或替换冻结入口字节
-- **THEN** 在源码调用前复核请求物理入口与制品摘要并拒绝执行后继调用；源码调用后同样复核，变化不能提供原生确认、关闭任务或比较资格

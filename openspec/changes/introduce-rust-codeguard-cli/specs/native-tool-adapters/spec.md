@@ -45,6 +45,14 @@ Rustdoc发现候选身份 MUST 绑定原生主定位字节范围所对应的真�
 
 Rustdoc逐问题反馈 MUST 提供问题证据、规则依据、允许修改的范围、修复步骤、原工具复检命令、尝试历史状态和关闭条件。局部完成且身份唯一时可提供限定目标源码的修复指引；输入变化、歧义、取消或其它未完成状态 MUST 保留调查指引且不给源码修改范围。尚未接入持久任务时 MUST 明示历史未接通，不得把空历史伪装为无失败尝试。简报不能授权任务关闭、白名单批准或完整交付。
 
+#### Scenario: Kotlin version probing changes the frozen source copy
+- **WHEN** Kotlin版本探测改变私有源码副本，或源码副本不再满足有界普通文件/字节一致性
+- **THEN** 在源码编译调用前拒绝执行，保留input_changed未完成状态，不仅在编译后撤回结果；源码编译后继续复核
+
+#### Scenario: Zig version probing emits unexpected stderr
+- **WHEN** Zig版本动作虽退出0并输出目标版本，却同时产生非空stderr
+- **THEN** 版本未核验，停止AST调用并保持未完成；不能把错误输出解释为用户源码违规
+
 #### Scenario: Cargo launcher is a multicall proxy
 - **WHEN** 显式或自动发现的 Cargo 入口通过符号链接指向依入口名分派命令的代理
 - **THEN** 核验解析后工具字节但保留所选入口执行 Clippy、rustdoc 与构建；执行后核对解析目标和字节，入口改指另一目标即使字节相同也返回未完成；不得误把 rustup 的管理命令输出当作 Cargo 机器报告

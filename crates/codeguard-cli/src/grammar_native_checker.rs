@@ -202,4 +202,57 @@ mod tests {
             }
         }
     }
+    #[test]
+    fn kotlin_version_cannot_change_frozen_source_before_scan() {
+        let root = std::env::temp_dir()
+            .canonicalize()
+            .unwrap()
+            .join(format!("cg-kotlin-version-input-{}", std::process::id()));
+        fs::create_dir(&root).unwrap();
+        let tool = root.join("tool");
+        fs::write(&tool,"#!/bin/sh\nif [ \"$1\" = -version ]; then printf changed > Sample.kt; printf 'info: kotlinc-jvm 2.4.10 (JRE fixture)\\n' >&2; exit 0; fi\nprintf reached > \"$0.called\"\nexit 0\n").unwrap();
+        fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
+        let report = GrammarNativeChecker::for_language("kotlin")
+            .unwrap()
+            .observe(
+                &tool,
+                b"fun f() = 1\n",
+                &root,
+                Instant::now() + Duration::from_secs(5),
+                &AtomicBool::new(false),
+            );
+        let called = tool.with_extension("called").exists();
+        fs::remove_dir_all(root).unwrap();
+        assert!(!called, "冻结源码已改变时不得启动编译动作");
+        assert_eq!(report["status"], "incomplete");
+        assert_eq!(
+            report["reason"],
+            "kotlin_input_or_launcher_changed_during_check"
+        );
+        assert!(report["diagnostics"].as_array().unwrap().is_empty());
+    }
+
+    #[test]
+    fn zig_version_stderr_is_not_accepted_as_confirmed_version() {
+        let root = std::env::temp_dir()
+            .canonicalize()
+            .unwrap()
+            .join(format!("cg-zig-version-stderr-{}", std::process::id()));
+        fs::create_dir(&root).unwrap();
+        let tool = root.join("tool");
+        fs::write(&tool,"#!/bin/sh\nif [ \"$1\" = version ]; then printf '0.16.0\\n'; printf unexpected >&2; exit 0; fi\nprintf reached > \"$0.called\"\nexit 0\n").unwrap();
+        fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
+        let report = GrammarNativeChecker::for_language("zig").unwrap().observe(
+            &tool,
+            b"const x = 1;\n",
+            &root,
+            Instant::now() + Duration::from_secs(5),
+            &AtomicBool::new(false),
+        );
+        let called = tool.with_extension("called").exists();
+        fs::remove_dir_all(root).unwrap();
+        assert!(!called, "版本stderr非空不得启动AST调用");
+        assert_eq!(report["status"], "incomplete");
+        assert_eq!(report["reason"], "zig_version_unverified_or_unsupported");
+    }
 }
