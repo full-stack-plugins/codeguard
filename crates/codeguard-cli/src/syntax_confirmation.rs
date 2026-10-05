@@ -16,6 +16,7 @@ pub(crate) fn persist(root: &Path, syntax: &Value, deadline: Instant) -> Value {
     for row in syntax["observations"].as_array().into_iter().flatten() {
         if row["status"] != "candidate_observed"
             || (row["recovery_count"].as_u64().unwrap_or(0) == 0
+                && row["structural_observation_count"].as_u64().unwrap_or(0) == 0
                 && row["reason"] != "syntax_recovery_incomplete")
         {
             continue;
@@ -48,7 +49,12 @@ pub(crate) fn persist(root: &Path, syntax: &Value, deadline: Instant) -> Value {
                 .map_err(|_| "clock_unavailable")?
                 .as_nanos();
             // 新版只扩展无位置的未完成观察；旧有可定位观察仍使用原协议和稳定身份。
-            let schema_version = if rows.iter().any(|row| row["recovery_count"] == 0) {
+            let schema_version = if rows
+                .iter()
+                .any(|row| row.get("structural_observations").is_some())
+            {
+                "0.7.0"
+            } else if rows.iter().any(|row| row["recovery_count"] == 0) {
                 "0.3.0"
             } else {
                 "0.1.0"
@@ -126,7 +132,10 @@ pub(crate) fn valid_report(root: &Path, workspace: &str, report: &Value) -> bool
         return false;
     };
     let (checker, reason, fingerprint) = identity(workspace, path, language);
-    if !matches!(report["schema_version"].as_str(), Some("0.1.0" | "0.3.0"))
+    if !matches!(
+        report["schema_version"].as_str(),
+        Some("0.1.0" | "0.3.0" | "0.7.0")
+    ) || (report["schema_version"] == "0.7.0" && language != "python")
         || report["report_type"] != "syntax_confirmation_observation"
         || report["workspace_binding"] != "bound"
         || report["workspace_id"] != workspace
@@ -178,23 +187,26 @@ pub(crate) fn valid_report(root: &Path, workspace: &str, report: &Value) -> bool
     };
     let mut offsets = std::collections::BTreeSet::new();
     rows.iter().all(|row| {
-        if !exact_keys(
-            row,
-            &[
-                "path",
-                "language",
-                "scope",
-                "byte_offset",
-                "status",
-                "reason",
-                "grammar_qualified",
-                "source_sha256",
-                "grammar_sha256",
-                "recovery_count",
-                "recoveries",
-                "known_limitations",
-            ],
-        ) || row["path"] != path
+        let structural = report["schema_version"] == "0.7.0";
+        let mut row_keys = vec![
+            "path",
+            "language",
+            "scope",
+            "byte_offset",
+            "status",
+            "reason",
+            "grammar_qualified",
+            "source_sha256",
+            "grammar_sha256",
+            "recovery_count",
+            "recoveries",
+            "known_limitations",
+        ];
+        if structural {
+            row_keys.extend(["structural_observation_count", "structural_observations"]);
+        }
+        if !exact_keys(row, &row_keys)
+            || row["path"] != path
             || row["language"] != language
             || row["status"] != "candidate_observed"
             || row["grammar_qualified"] != false
@@ -213,9 +225,37 @@ pub(crate) fn valid_report(root: &Path, workspace: &str, report: &Value) -> bool
         if !offsets.insert(route.byte_offset) {
             return false;
         }
+        if structural {
+            let Some(count) = row["structural_observation_count"]
+                .as_u64()
+                .filter(|count| *count > 0 && *count <= 128)
+            else {
+                return false;
+            };
+            let Some(structures) = row["structural_observations"]
+                .as_array()
+                .filter(|rows| rows.len() == (count as usize).min(8))
+            else {
+                return false;
+            };
+            if route.byte_offset != 0
+                || route.source != bytes
+                || !structures.iter().all(|value| {
+                    serde_json::from_value::<crate::syntax_worker_structure::SyntaxWorkerStructure>(
+                        value.clone(),
+                    )
+                    .is_ok_and(|value| value.valid("python", &bytes))
+                })
+            {
+                return false;
+            }
+        }
         let Some(count) = row["recovery_count"].as_u64().filter(|c| {
             *c <= 4096
+                && (!structural
+                    || *c + row["structural_observation_count"].as_u64().unwrap_or(129) <= 128)
                 && (*c > 0
+                    || structural
                     || (report["schema_version"] == "0.3.0"
                         && row["reason"] == "syntax_recovery_incomplete"))
         }) else {

@@ -565,4 +565,8 @@ Claude Code 2.1.273 已有会话内插件源码加载的实际证据，覆盖成
 
 ### Python独立结构观察与稳定确认任务
 
-源码构建的Python兜底路径现保留独立 `codeguard.python.required_suite` 结构规则证据，不将其伪装为ERROR/MISSING。单文件lint未初始化反馈0.16、初始化反馈0.17，工作台确认报告0.2绑定源码、固定规则配置和grammar摘要；重复扫描保持同一任务，后续合法初检也不关闭。实际Ruff可确认缺函数体和错误缩进；局部零发现仍不足以证明可信关闭。历史grammar漏检报告、原生优先、资格零及交付未评估均保留；聚合与可信关闭仍缺。见[验收记录](tests/acceptance/python-structure-lint-task.md)。
+源码构建的Python兜底路径现保留独立 `codeguard.python.required_suite` 结构规则证据，不将其伪装为ERROR/MISSING。单文件lint未初始化反馈0.16、初始化反馈0.17，工作台确认报告0.2绑定源码、固定规则配置和grammar摘要；重复扫描保持同一任务，后续合法初检也不关闭。实际Ruff可确认缺函数体和错误缩进；局部零发现仍不足以证明可信关闭。历史grammar漏检报告、原生优先、资格零及交付未评估均保留；可信关闭仍缺，聚合接线见下方。见[验收记录](tests/acceptance/python-structure-lint-task.md)。
+
+`check python` / `check all` 现通过反馈0.48保留独立结构观察和真实计数，复用lint的稳定任务；通用确认报告0.7逐项核验规则配置及原字节坐标。合法候选结果不关闭旧任务，可信关闭仍未完成。见[聚合验收](tests/acceptance/check-python-structure.md)。
+
+编辑Hook的源码构建反馈0.17（局部0.8）也保留独立结构计数；存在结构观察时要求原生确认。Claude兼容摘要提供规则和数量；尚不证明实际安装宿主验收或已发布插件默认行为。

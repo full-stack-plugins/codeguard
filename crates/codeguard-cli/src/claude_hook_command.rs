@@ -348,6 +348,12 @@ fn summarize(path: &str, report: &Value) -> String {
         }
     }
     let recoveries = feedback["candidate_recovery_count"].as_u64().unwrap_or(0);
+    let structures = feedback["candidate_structure_count"].as_u64().unwrap_or(0);
+    let structural_rule = if structures > 0 {
+        "；结构规则 codeguard.python.required_suite"
+    } else {
+        ""
+    };
     let candidates = feedback["syntax_candidates"]["observations"]
         .as_array()
         .map_or(0, Vec::len);
@@ -478,7 +484,7 @@ fn summarize(path: &str, report: &Value) -> String {
         }
     }
     let summary = format!(
-        "CodeGuard：{label} 局部检查反馈：原生诊断 {count} 项；规则 {}；WASM 候选 {candidates} 项、疑似恢复节点 {recoveries} 项、恢复扫描未完成 {incomplete_recoveries} 项；不可检查文件 {unavailable} 项、原生快检未接线 {unwired} 项。{guidance}。{repair}候选语法能力尚未完整验收，完整项目与交付未评估。",
+        "CodeGuard：{label} 局部检查反馈：原生诊断 {count} 项；规则 {}{structural_rule}；WASM 候选 {candidates} 项、疑似恢复节点 {recoveries} 项、独立结构观察 {structures} 项、恢复扫描未完成 {incomplete_recoveries} 项；不可检查文件 {unavailable} 项、原生快检未接线 {unwired} 项。{guidance}。{repair}候选语法能力尚未完整验收，完整项目与交付未评估。",
         rules.join(", ")
     );
     summary.chars().take(MAX_CONTEXT_CHARS).collect()

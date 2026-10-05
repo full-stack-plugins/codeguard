@@ -144,7 +144,14 @@ pub(crate) fn observe(
         .map(|row| row["recovery_count"].as_u64().unwrap_or(0))
         .sum::<u64>();
     let candidate_count = syntax["observations"].as_array().map_or(0, Vec::len);
+    let structures = syntax["observations"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .map(|row| row["structural_observation_count"].as_u64().unwrap_or(0))
+        .sum::<u64>();
     let next_action = if recoveries > 0
+        || structures > 0
         || syntax["observations"].as_array().is_some_and(|rows| {
             rows.iter().any(|row| {
                 row["status"] == "candidate_observed"
@@ -178,20 +185,23 @@ pub(crate) fn observe(
         "review_native_results_and_resolve_incomplete_checks"
     };
     let mut feedback = json!({
-        "schema_version":if zig_lint["schema_version"] == "0.2.0" {"0.7.0"}else if zig_lint.is_object(){"0.6.0"}else if swift_lint["schema_version"] == "0.2.0" {"0.5.0"} else if swift_lint.is_object(){"0.4.0"}else if kotlin_lint.is_object(){"0.3.0"}else{"0.2.0"},"report_type":"hook_fast_feedback",
+        "schema_version":if structures > 0 {"0.8.0"} else if zig_lint["schema_version"] == "0.2.0" {"0.7.0"}else if zig_lint.is_object(){"0.6.0"}else if swift_lint["schema_version"] == "0.2.0" {"0.5.0"} else if swift_lint.is_object(){"0.4.0"}else if kotlin_lint.is_object(){"0.3.0"}else{"0.2.0"},"report_type":"hook_fast_feedback",
         "scan_scope":"selected_files","requested_paths":requested,
         "python_lint":python_lint,"node_lint":node_lint,"syntax_candidates":syntax,"syntax_tasks":syntax_tasks,
         "unavailable_files":unavailable,"native_unwired_files":native_unwired,
         "candidate_recovery_count":recoveries,"next_action":next_action,
         "delivery_decision":"not_evaluated","coverage_proven":false
     });
-    if kotlin_lint.is_object() || swift_lint.is_object() || zig_lint.is_object() {
+    if structures > 0 {
+        feedback["candidate_structure_count"] = json!(structures);
+    }
+    if structures > 0 || kotlin_lint.is_object() || swift_lint.is_object() || zig_lint.is_object() {
         feedback["kotlin_lint"] = kotlin_lint;
     }
-    if swift_lint.is_object() || zig_lint.is_object() {
+    if structures > 0 || swift_lint.is_object() || zig_lint.is_object() {
         feedback["swift_lint"] = swift_lint;
     }
-    if zig_lint.is_object() {
+    if structures > 0 || zig_lint.is_object() {
         feedback["zig_lint"] = zig_lint;
     }
     feedback

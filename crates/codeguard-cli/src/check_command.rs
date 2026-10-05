@@ -1906,7 +1906,7 @@ pub fn run(args: &[String]) -> ExitCode {
         crate::check_zig_scan::refresh(&root, &mut zig_lint, deadline);
     }
     let mut report = json!({
-        "schema_version":if zig_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.12.0" {"0.47.0"}else if zig_lint.is_object() {"0.46.0"} else if matches!(parsed.selection, Selection::Language(_)) {"0.45.0"} else if swift_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.11.0" {"0.44.0"} else if swift_lint.is_object() {"0.43.0"} else if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
+        "schema_version":if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row.get("structural_observations").is_some())) {"0.48.0"} else if zig_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.12.0" {"0.47.0"}else if zig_lint.is_object() {"0.46.0"} else if matches!(parsed.selection, Selection::Language(_)) {"0.45.0"} else if swift_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.11.0" {"0.44.0"} else if swift_lint.is_object() {"0.43.0"} else if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
         "operation":"check", "selection":parsed.selection.as_str(), "command_status":if request_cancelled { "cancelled" } else { "incomplete" },
         "exit_code":if request_cancelled { 130 } else { 3 }, "delivery_decision":if parsed.selection == Selection::All { "incomplete" } else { "not_evaluated" }, "authority":"local_unverified",
         "reason":if request_cancelled { "request_cancelled" } else if parsed.selection == Selection::All { "full_project_obligations_and_trusted_policy_unavailable" } else if parsed.selection == Selection::Java { "java_selection_obligations_and_trusted_policy_unavailable" } else { "language_selection_obligations_and_trusted_policy_unavailable" },
@@ -1923,13 +1923,15 @@ pub fn run(args: &[String]) -> ExitCode {
         "next":next,
         "export":{"status":"not_requested","reason_code":null}
     });
-    if zig_lint.is_object() || report["schema_version"] == "0.47.0" {
+    if zig_lint.is_object()
+        || matches!(report["schema_version"].as_str(), Some("0.47.0" | "0.48.0"))
+    {
         report["native_results"]["zig_lint"] = zig_lint.clone();
     }
     // 历史报告维持封闭协议；只有新 Kotlin 报告携带新增原生字段。
     if !matches!(
         report["schema_version"].as_str(),
-        Some("0.42.0" | "0.43.0" | "0.44.0" | "0.45.0" | "0.46.0" | "0.47.0")
+        Some("0.42.0" | "0.43.0" | "0.44.0" | "0.45.0" | "0.46.0" | "0.47.0" | "0.48.0")
     ) {
         if let Some(native) = report["native_results"].as_object_mut() {
             native.remove("kotlin_lint");
@@ -1937,7 +1939,7 @@ pub fn run(args: &[String]) -> ExitCode {
     }
     if !matches!(
         report["schema_version"].as_str(),
-        Some("0.43.0" | "0.44.0" | "0.45.0" | "0.46.0" | "0.47.0")
+        Some("0.43.0" | "0.44.0" | "0.45.0" | "0.46.0" | "0.47.0" | "0.48.0")
     ) {
         if let Some(native) = report["native_results"].as_object_mut() {
             native.remove("swift_lint");
@@ -2497,6 +2499,28 @@ pub fn run(args: &[String]) -> ExitCode {
                         item["path"].as_str().unwrap_or("?"),
                         item["language"].as_str().unwrap_or("unknown")
                     );
+                }
+                for item in observations
+                    .iter()
+                    .filter(|item| item.get("structural_observations").is_some())
+                    .take(8)
+                {
+                    for row in item["structural_observations"]
+                        .as_array()
+                        .into_iter()
+                        .flatten()
+                        .take(8)
+                    {
+                        println!(
+                            "  {} [{}] 候选结构 {}，父节点 {}；原始零基字节坐标 {}:{}；须用原生工具确认。",
+                            item["path"],
+                            item["language"],
+                            row["rule_id"],
+                            row["parent_syntax_kind"],
+                            row["start_row"],
+                            row["start_column_byte"]
+                        );
+                    }
                 }
                 for item in observations
                     .iter()

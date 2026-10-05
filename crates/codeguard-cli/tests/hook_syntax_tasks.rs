@@ -140,6 +140,59 @@ fn recovery_tasks_are_stable_and_clean_candidates_cannot_close_them() {
 }
 
 #[test]
+fn python_structure_requires_native_confirmation_in_edit_feedback() {
+    let p = Project::new("python-structure");
+    fs::write(p.0.join("app.py"), "def run():\n").unwrap();
+    let first = p.hook_paths(&["app.py"]);
+    assert_eq!(first["schema_version"], "0.17.0");
+    let local = &first["local_feedback"];
+    assert_eq!(local["schema_version"], "0.8.0");
+    assert_eq!(local["candidate_recovery_count"], 0);
+    assert_eq!(local["candidate_structure_count"], 1);
+    assert_eq!(local["next_action"], "require_native_lint_confirmation");
+    assert_eq!(
+        local["syntax_candidates"]["observations"][0]["structural_observations"][0]["rule_id"],
+        "codeguard.python.required_suite"
+    );
+    let id = local["syntax_tasks"]["tasks"][0]["task_id"]
+        .as_str()
+        .unwrap();
+    assert_eq!(
+        p.hook_paths(&["app.py"])["local_feedback"]["syntax_tasks"]["tasks"][0]["task_id"],
+        id
+    );
+    let mut child = p
+        .command()
+        .args(["hook", "claude", "post-tool-use"])
+        .arg(&p.0)
+        .args(["--timeout=30s", "--format=json"])
+        .env("PATH", &p.0)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .spawn()
+        .unwrap();
+    let event = json!({"hook_event_name":"PostToolUse", "cwd":p.0, "tool_name":"Edit", "tool_input":{"file_path":p.0.join("app.py"), "old_string":"old", "new_string":"new"}, "tool_response":{"success":true}});
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(event.to_string().as_bytes())
+        .unwrap();
+    let output = child.wait_with_output().unwrap();
+    assert_eq!(output.status.code(), Some(0));
+    let report: Value = serde_json::from_slice(&output.stdout).unwrap();
+    let context = report["hookSpecificOutput"]["additionalContext"]
+        .as_str()
+        .unwrap();
+    assert!(
+        context.contains("codeguard.python.required_suite"),
+        "{context}"
+    );
+    assert!(context.contains("独立结构观察 1 项"), "{context}");
+    assert!(context.contains("必须准备或修复"), "{context}");
+}
+
+#[test]
 fn fresh_confirmation_guidance_matches_the_implemented_adapter_before_recheck() {
     for (label, file, source, option, version) in [
         (

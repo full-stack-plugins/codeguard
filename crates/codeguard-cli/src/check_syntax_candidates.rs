@@ -351,13 +351,25 @@ fn candidate_result(
                     "end_column_byte":if recovery.end_row == 0 { base_column + recovery.end_column_byte } else { recovery.end_column_byte },
                 })
             }).collect();
-            json!({
+            let mut report = json!({
                 "path":job.relative,"language":job.language,"scope":job.scope,"byte_offset":job.byte_offset,
                 "status":"candidate_observed","reason":incomplete_reason,"grammar_qualified":false,
                 "source_sha256":observation.source_sha256,"grammar_sha256":observation.grammar_sha256,
                 "recovery_count":recovery_count,"recoveries":recoveries,
                 "known_limitations":job.known_limitations
-            })
+            });
+            if !observation.structural_observations.is_empty() {
+                report["structural_observation_count"] =
+                    json!(observation.structural_observations.len());
+                report["structural_observations"] = json!(
+                    observation
+                        .structural_observations
+                        .iter()
+                        .take(MAX_VISIBLE_RECOVERIES)
+                        .collect::<Vec<_>>()
+                );
+            }
+            report
         }
         Err(reason) => json!({
             "path":job.relative,"language":job.language,"scope":job.scope,"byte_offset":job.byte_offset,
