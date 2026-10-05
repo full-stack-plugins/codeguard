@@ -23,14 +23,26 @@ pub(crate) struct LocalEslintCandidate {
 
 /// 识别源码最近项目根的本地 ESLint 包、入口和单一 flat config。
 /// 参数为普通源码路径；返回 Ok(None) 仅表示本地入口未观察到，错误表示必须保留的环境阻塞。
+#[cfg(feature = "wasm-precheck")]
 pub(crate) fn observed_candidate(
     source: &Path,
+) -> Result<Option<LocalEslintCandidate>, &'static str> {
+    observed_candidate_within(source, Path::new("/"))
+}
+
+/// 按最近 package.json 选择工具，搜索不能越过用户选择的工作区边界。
+pub(crate) fn observed_candidate_within(
+    source: &Path,
+    boundary: &Path,
 ) -> Result<Option<LocalEslintCandidate>, &'static str> {
     let source = source
         .canonicalize()
         .map_err(|_| "eslint_source_unavailable")?;
     let parent = source.parent().ok_or("eslint_source_unavailable")?;
     for root in parent.ancestors() {
+        if !root.starts_with(boundary) {
+            break;
+        }
         let manifest = root.join("package.json");
         match std::fs::symlink_metadata(&manifest) {
             Err(error) if error.kind() == ErrorKind::NotFound => continue,

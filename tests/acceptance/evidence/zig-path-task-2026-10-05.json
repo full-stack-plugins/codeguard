@@ -1,0 +1,247 @@
+{
+  "explicit_broken": {
+    "authority": "local_unverified",
+    "command_status": "incomplete",
+    "delivery_decision": "not_evaluated",
+    "event_persisted": true,
+    "execution_budget": {
+      "enforcement": "native_execution_only",
+      "source": "cli",
+      "timeout_ms": 30000
+    },
+    "exit_code": 3,
+    "kind": "blocker",
+    "native_scan": {
+      "authority": "local_unverified",
+      "checker_id": "syntax.native_confirmation",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "input_stable": true,
+      "native": {
+        "diagnostic_count": 1,
+        "diagnostics": [
+          {
+            "column": 19,
+            "line": 1,
+            "rule_id": "zig.ast_check.error"
+          }
+        ],
+        "reason": "ast_check_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "71cc3995a7586753ebf82c66dfb8bef43df446517550678781834586a960f8c9",
+        "version": "0.16.0"
+      },
+      "operation": "task_verify",
+      "original_report": {
+        "grammar_sha256": "e8a3aa89cc07b59188122e6c1e0a812ca58cf85c9e191dcf2663a30b6b3b99e3",
+        "run_id": "syntax-confirm-66381-1791147653355727000",
+        "sha256": "efcc6d23b419c7f16103aad5692aaf37ae91228e3533ed64da2454de1606c4c9",
+        "source_sha256": "a8ee3cd373dab58c194f1e476577f7c851ab1f2f3e0631db6508bddec0f5bbe9"
+      },
+      "report_type": "syntax_task_recheck",
+      "run_id": "syntax-native-67559-1791147660108907000",
+      "schema_version": "0.1.0",
+      "target": {
+        "language": "zig",
+        "path": "app.zig",
+        "source_sha256": "a8ee3cd373dab58c194f1e476577f7c851ab1f2f3e0631db6508bddec0f5bbe9"
+      },
+      "task_id": "CG-B-549e2edba444bb608b37a3eba1744783",
+      "tool_path": "/opt/homebrew/Cellar/zig/0.16.0_1/bin/zig",
+      "workspace_binding": "bound",
+      "workspace_id": "ws-c9852fe7cb271eb16b69840e076e48df"
+    },
+    "next_actions": [
+      "inspect_native_syntax_observation",
+      "repair_only_current_native_diagnostics",
+      "verify_policy_and_capability_before_closure"
+    ],
+    "observation": "still_blocked",
+    "operation": "task_verify",
+    "reason": null,
+    "report_type": "task_verification_preview",
+    "schema_version": "0.12.0",
+    "task_id": "CG-B-549e2edba444bb608b37a3eba1744783"
+  },
+  "explicit_fixed": {
+    "authority": "local_unverified",
+    "command_status": "incomplete",
+    "delivery_decision": "not_evaluated",
+    "event_persisted": true,
+    "execution_budget": {
+      "enforcement": "native_execution_only",
+      "source": "cli",
+      "timeout_ms": 30000
+    },
+    "exit_code": 3,
+    "kind": "blocker",
+    "native_scan": {
+      "authority": "local_unverified",
+      "checker_id": "syntax.native_confirmation",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "input_stable": true,
+      "native": {
+        "diagnostic_count": 0,
+        "diagnostics": [],
+        "reason": "ast_check_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "71cc3995a7586753ebf82c66dfb8bef43df446517550678781834586a960f8c9",
+        "version": "0.16.0"
+      },
+      "operation": "task_verify",
+      "original_report": {
+        "grammar_sha256": "e8a3aa89cc07b59188122e6c1e0a812ca58cf85c9e191dcf2663a30b6b3b99e3",
+        "run_id": "syntax-confirm-66381-1791147653355727000",
+        "sha256": "efcc6d23b419c7f16103aad5692aaf37ae91228e3533ed64da2454de1606c4c9",
+        "source_sha256": "a8ee3cd373dab58c194f1e476577f7c851ab1f2f3e0631db6508bddec0f5bbe9"
+      },
+      "report_type": "syntax_task_recheck",
+      "run_id": "syntax-native-71388-1791147706718423000",
+      "schema_version": "0.1.0",
+      "target": {
+        "language": "zig",
+        "path": "app.zig",
+        "source_sha256": "56eb4ccc4adaee1049784c8ff7d06930c5a5ac8014ed8b836424c36ea346c04b"
+      },
+      "task_id": "CG-B-549e2edba444bb608b37a3eba1744783",
+      "tool_path": "/opt/homebrew/Cellar/zig/0.16.0_1/bin/zig",
+      "workspace_binding": "bound",
+      "workspace_id": "ws-c9852fe7cb271eb16b69840e076e48df"
+    },
+    "next_actions": [
+      "inspect_native_syntax_observation",
+      "repair_only_current_native_diagnostics",
+      "verify_policy_and_capability_before_closure"
+    ],
+    "observation": "candidate_absent_unverified_policy",
+    "operation": "task_verify",
+    "reason": null,
+    "report_type": "task_verification_preview",
+    "schema_version": "0.12.0",
+    "task_id": "CG-B-549e2edba444bb608b37a3eba1744783"
+  },
+  "fact_state": "open",
+  "path_broken": {
+    "authority": "local_unverified",
+    "command_status": "incomplete",
+    "delivery_decision": "not_evaluated",
+    "event_persisted": true,
+    "execution_budget": {
+      "enforcement": "native_execution_only",
+      "source": "cli",
+      "timeout_ms": 30000
+    },
+    "exit_code": 3,
+    "kind": "blocker",
+    "native_scan": {
+      "authority": "local_unverified",
+      "checker_id": "syntax.native_confirmation",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "input_stable": true,
+      "native": {
+        "diagnostic_count": 1,
+        "diagnostics": [
+          {
+            "column": 19,
+            "line": 1,
+            "rule_id": "zig.ast_check.error"
+          }
+        ],
+        "reason": "ast_check_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "71cc3995a7586753ebf82c66dfb8bef43df446517550678781834586a960f8c9",
+        "version": "0.16.0"
+      },
+      "operation": "task_verify",
+      "original_report": {
+        "grammar_sha256": "e8a3aa89cc07b59188122e6c1e0a812ca58cf85c9e191dcf2663a30b6b3b99e3",
+        "run_id": "syntax-confirm-66381-1791147653355727000",
+        "sha256": "efcc6d23b419c7f16103aad5692aaf37ae91228e3533ed64da2454de1606c4c9",
+        "source_sha256": "a8ee3cd373dab58c194f1e476577f7c851ab1f2f3e0631db6508bddec0f5bbe9"
+      },
+      "report_type": "syntax_task_recheck",
+      "run_id": "syntax-native-68288-1791147685832560000",
+      "schema_version": "0.1.0",
+      "target": {
+        "language": "zig",
+        "path": "app.zig",
+        "source_sha256": "a8ee3cd373dab58c194f1e476577f7c851ab1f2f3e0631db6508bddec0f5bbe9"
+      },
+      "task_id": "CG-B-549e2edba444bb608b37a3eba1744783",
+      "tool_path": "/opt/homebrew/Cellar/zig/0.16.0_1/bin/zig",
+      "workspace_binding": "bound",
+      "workspace_id": "ws-c9852fe7cb271eb16b69840e076e48df"
+    },
+    "next_actions": [
+      "inspect_native_syntax_observation",
+      "repair_only_current_native_diagnostics",
+      "verify_policy_and_capability_before_closure"
+    ],
+    "observation": "still_blocked",
+    "operation": "task_verify",
+    "reason": null,
+    "report_type": "task_verification_preview",
+    "schema_version": "0.12.0",
+    "task_id": "CG-B-549e2edba444bb608b37a3eba1744783"
+  },
+  "path_fixed": {
+    "authority": "local_unverified",
+    "command_status": "incomplete",
+    "delivery_decision": "not_evaluated",
+    "event_persisted": true,
+    "execution_budget": {
+      "enforcement": "native_execution_only",
+      "source": "cli",
+      "timeout_ms": 30000
+    },
+    "exit_code": 3,
+    "kind": "blocker",
+    "native_scan": {
+      "authority": "local_unverified",
+      "checker_id": "syntax.native_confirmation",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "input_stable": true,
+      "native": {
+        "diagnostic_count": 0,
+        "diagnostics": [],
+        "reason": "ast_check_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "71cc3995a7586753ebf82c66dfb8bef43df446517550678781834586a960f8c9",
+        "version": "0.16.0"
+      },
+      "operation": "task_verify",
+      "original_report": {
+        "grammar_sha256": "e8a3aa89cc07b59188122e6c1e0a812ca58cf85c9e191dcf2663a30b6b3b99e3",
+        "run_id": "syntax-confirm-66381-1791147653355727000",
+        "sha256": "efcc6d23b419c7f16103aad5692aaf37ae91228e3533ed64da2454de1606c4c9",
+        "source_sha256": "a8ee3cd373dab58c194f1e476577f7c851ab1f2f3e0631db6508bddec0f5bbe9"
+      },
+      "report_type": "syntax_task_recheck",
+      "run_id": "syntax-native-72119-1791147734007760000",
+      "schema_version": "0.1.0",
+      "target": {
+        "language": "zig",
+        "path": "app.zig",
+        "source_sha256": "56eb4ccc4adaee1049784c8ff7d06930c5a5ac8014ed8b836424c36ea346c04b"
+      },
+      "task_id": "CG-B-549e2edba444bb608b37a3eba1744783",
+      "tool_path": "/opt/homebrew/Cellar/zig/0.16.0_1/bin/zig",
+      "workspace_binding": "bound",
+      "workspace_id": "ws-c9852fe7cb271eb16b69840e076e48df"
+    },
+    "next_actions": [
+      "inspect_native_syntax_observation",
+      "repair_only_current_native_diagnostics",
+      "verify_policy_and_capability_before_closure"
+    ],
+    "observation": "candidate_absent_unverified_policy",
+    "operation": "task_verify",
+    "reason": null,
+    "report_type": "task_verification_preview",
+    "schema_version": "0.12.0",
+    "task_id": "CG-B-549e2edba444bb608b37a3eba1744783"
+  }
+}

@@ -5,6 +5,50 @@ use std::fs;
 use std::process::Command;
 
 #[test]
+fn hidden_kotlin_recovery_is_visible_in_project_feedback() {
+    let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
+        "codeguard-kotlin-hidden-project-{}",
+        std::process::id()
+    ));
+    fs::create_dir_all(&root).unwrap();
+    fs::write(root.join("Main.kt"), "fun f(x: ) = x\n").unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        // 固定缺原生工具分支，避免宿主 kotlinc 抢占候选观察。
+        .env("PATH", &root)
+        .args(["check", "all"])
+        .arg(&root)
+        .arg("--format=json")
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let observations = report["syntax_candidates"]["observations"]
+        .as_array()
+        .unwrap();
+    let kotlin = observations
+        .iter()
+        .find(|item| item["language"] == "kotlin")
+        .expect("Kotlin candidate observation");
+    assert_eq!(kotlin["recovery_count"], 0);
+    assert_eq!(kotlin["reason"], "syntax_recovery_incomplete");
+    assert_eq!(report["delivery_decision"], "incomplete");
+    let text_output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        // 固定缺原生工具分支，避免宿主 kotlinc 抢占候选观察。
+        .env("PATH", &root)
+        .args(["check", "all"])
+        .arg(&root)
+        .output()
+        .unwrap();
+    assert_eq!(text_output.status.code(), Some(3));
+    assert!(
+        String::from_utf8_lossy(&text_output.stdout).contains("grammar 报告错误但恢复位置不完整"),
+        "{}",
+        String::from_utf8_lossy(&text_output.stdout)
+    );
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
 fn completed_native_ruff_preempts_only_its_matching_python_file() {
     use std::os::unix::fs::PermissionsExt;
     let root = std::env::temp_dir()
@@ -19,6 +63,8 @@ fn completed_native_ruff_preempts_only_its_matching_python_file() {
     fs::write(&tool, "#!/bin/sh\nif [ \"$1\" = '--version' ]; then echo 'ruff 0.16.8'; exit 0; fi\nif [ \"$2\" = '--show-files' ]; then echo \"$3\"; exit 0; fi\nif [ \"$2\" = '--show-settings' ]; then printf 'linter.rules.enabled = [\\n\\tunused-import (F401),\\n]\\nlinter.per_file_ignores = {}\\n'; exit 0; fi\nif [ \"$2\" = '--no-cache' ]; then if [ \"$3\" = '--ignore-noqa' ]; then source=$6; else source=$5; fi; printf '[{\"code\":\"F401\",\"message\":\"unused\",\"filename\":\"%s\",\"location\":{\"row\":1,\"column\":1},\"severity\":\"error\"}]\\n' \"$source\"; exit 1; fi\nexit 2\n").unwrap();
     fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
     let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        // 显式 Ruff 仍可执行；隔离宿主 Zig 等工具，固定相邻文件的 WASM 分支。
+        .env("PATH", &root)
         .args(["check", "all"])
         .arg(&root)
         .args([
@@ -98,7 +144,7 @@ fn check_all_routes_distinct_dialects_after_native_without_claiming_clean() {
         String::from_utf8_lossy(&output.stderr)
     );
     let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
-    assert_eq!(report["schema_version"], "0.34.0");
+    assert_eq!(report["schema_version"], "0.38.0");
     assert_eq!(report["execution_budget"]["jobs_limit"], 1);
     assert_eq!(report["delivery_decision"], "incomplete");
     let observations = report["syntax_candidates"]["observations"]
@@ -194,6 +240,8 @@ fn known_grammar_precision_limits_reach_project_feedback() {
     .unwrap();
     fs::write(root.join("broken.kt"), "fun f(x: ) = x\n").unwrap();
     let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        // 固定缺原生工具分支，避免宿主 kotlinc 抢占候选观察。
+        .env("PATH", &root)
         .args(["check", "all"])
         .arg(&root)
         .args(["--format=json", "--timeout", "45s"])
@@ -318,6 +366,7 @@ fn check_all_invokes_all_32_pinned_candidates_across_bounded_projects() {
             .args(["check", "all"])
             .arg(root.join(format!("group-{group_index}")))
             .args(["--format=json", "--timeout", "120s"])
+            .env("PATH", "") // 固定无原生工具，验收全部候选资产路由。
             .output()
             .unwrap();
         assert_eq!(
@@ -342,6 +391,11 @@ fn check_all_invokes_all_32_pinned_candidates_across_bounded_projects() {
             assert_eq!(
                 observation["recovery_count"], 0,
                 "group {group_index}: unexpected recovery in valid sample: {observation}"
+            );
+            assert_eq!(
+                observation["reason"],
+                serde_json::Value::Null,
+                "group {group_index}: valid sample has an incomplete parse: {observation}"
             );
             assert!(
                 !observation["known_limitations"]
@@ -385,6 +439,7 @@ fn one_mixed_project_observes_all_32_candidates_within_the_existing_budget() {
         .args(["check", "all"])
         .arg(&root)
         .args(["--format=json", "--timeout", "120s"])
+        .env("PATH", "") // 原生优先另有验收，此处要求实际调用全部 WASM。
         .output()
         .unwrap();
     fs::remove_dir_all(&root).unwrap();
@@ -426,6 +481,10 @@ fn one_mixed_project_observes_all_32_candidates_within_the_existing_budget() {
             .iter()
             .all(|item| item["grammar_qualified"] == false)
     );
+    assert!(
+        observations.iter().all(|item| item["reason"].is_null()),
+        "a valid sample was not fully parsed: {observations:?}"
+    );
 }
 
 #[test]
@@ -461,4 +520,405 @@ fn oversized_source_is_an_explicit_candidate_gap() {
         report["syntax_candidates"]["observations"][0]["grammar_sha256"],
         serde_json::Value::Null
     );
+}
+
+#[test]
+fn edited_file_hooks_invoke_all_32_candidates_without_scanning_untouched_files() {
+    use std::io::Write;
+    use std::process::Stdio;
+    let root = std::env::temp_dir()
+        .canonicalize()
+        .unwrap()
+        .join(format!("codeguard-hook-32-{}", std::process::id()));
+    fs::create_dir(&root).unwrap();
+    let mut languages = BTreeSet::new();
+    for (index, group) in grammar_samples().chunks(8).enumerate() {
+        let project = root.join(format!("group-{index}"));
+        fs::create_dir(&project).unwrap();
+        fs::write(project.join("untouched.js"), "const = ;").unwrap();
+        let paths: Vec<&str> = group
+            .iter()
+            .map(|(name, source)| {
+                fs::write(project.join(name), source).unwrap();
+                *name
+            })
+            .collect();
+        let payload = serde_json::json!({"schema_version":"1.0.0","report_type":"hook_trigger_request",
+            "input":{"event":"file_changed","changed_paths":paths,"task_id":null,
+                "write_outcome":"confirmed","host_claims_blocking":false}});
+        let mut child = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(["hook", "execute"])
+            .arg(&project)
+            .args(["--format=json", "--timeout=120s"])
+            .env("PATH", &project)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .unwrap();
+        child
+            .stdin
+            .take()
+            .unwrap()
+            .write_all(&serde_json::to_vec(&payload).unwrap())
+            .unwrap();
+        let result = child.wait_with_output().unwrap();
+        assert_eq!(
+            result.status.code(),
+            Some(3),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
+        let report: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+        let feedback = &report["local_feedback"];
+        assert_eq!(feedback["requested_paths"], serde_json::json!(paths));
+        assert_eq!(
+            feedback["syntax_candidates"]["skipped_count"], 0,
+            "{feedback}"
+        );
+        assert_eq!(feedback["syntax_candidates"]["unrouted_count"], 0);
+        for row in feedback["syntax_candidates"]["observations"]
+            .as_array()
+            .unwrap()
+        {
+            assert_ne!(row["path"], "untouched.js");
+            assert_eq!(row["status"], "candidate_observed", "{row}");
+            assert_eq!(row["recovery_count"], 0, "{row}");
+            assert!(row["reason"].is_null(), "{row}");
+            assert_eq!(row["grammar_qualified"], false);
+            languages.insert(row["language"].as_str().unwrap().to_owned());
+        }
+        assert_eq!(feedback["delivery_decision"], "not_evaluated");
+    }
+    fs::remove_dir_all(root).unwrap();
+    let manifest: serde_json::Value =
+        serde_json::from_str(include_str!("../../../grammars/manifest.json")).unwrap();
+    let expected: BTreeSet<String> = manifest["assets"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|a| a["language"].as_str().unwrap().to_owned())
+        .collect();
+    assert_eq!(languages, expected);
+    assert_eq!(languages.len(), 32);
+}
+
+#[test]
+fn project_check_observes_typescript_module_sources_with_pinned_grammar() {
+    let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
+        "codeguard-module-extensions-{}",
+        std::process::id()
+    ));
+    fs::create_dir_all(&root).unwrap();
+    for name in ["module.mts", "module.cts"] {
+        fs::write(root.join(name), "export const value: number = ;\n").unwrap();
+    }
+    for name in ["types.d.mts", "types.d.cts"] {
+        fs::write(root.join(name), "export declare const value: number;\n").unwrap();
+    }
+    fs::write(root.join("module.mtsx"), "export default <div />;").unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .env("PATH", &root)
+        .args(["check", "all"])
+        .arg(&root)
+        .args(["--format=json", "--timeout", "60s", "--jobs=2"])
+        .output()
+        .unwrap();
+    fs::remove_dir_all(&root).unwrap();
+    assert_eq!(
+        output.status.code(),
+        Some(3),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(
+        report["syntax_candidates"]["source_file_count"], 4,
+        "{report}"
+    );
+    let observations = report["syntax_candidates"]["observations"]
+        .as_array()
+        .unwrap();
+    assert_eq!(observations.len(), 4, "{report}");
+    for observation in observations {
+        assert_eq!(observation["language"], "typescript", "{observation}");
+        assert_eq!(observation["grammar_qualified"], false);
+        assert_eq!(observation["status"], "candidate_observed", "{observation}");
+        let name = observation["path"].as_str().unwrap();
+        if name.starts_with("types.") {
+            assert_eq!(observation["recovery_count"], 0, "{observation}");
+        } else {
+            assert!(
+                observation["recovery_count"].as_u64().unwrap() > 0,
+                "{observation}"
+            );
+        }
+    }
+    assert_eq!(report["delivery_decision"], "incomplete");
+}
+
+#[test]
+fn typescript_module_tasks_are_stable_and_edit_hook_keeps_changed_scope() {
+    use std::io::Write;
+    use std::process::Stdio;
+    let root = std::env::temp_dir()
+        .canonicalize()
+        .unwrap()
+        .join(format!("codeguard-module-workflow-{}", std::process::id()));
+    fs::create_dir_all(&root).unwrap();
+    for name in ["module.mts", "module.cts"] {
+        fs::write(root.join(name), "export const value: number = ;\n").unwrap();
+    }
+    fs::write(
+        root.join("types.d.mts"),
+        "export declare const value: number;\n",
+    )
+    .unwrap();
+    let init = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["init"])
+        .arg(&root)
+        .args(["--apply", "--format=json"])
+        .output()
+        .unwrap();
+    assert_eq!(
+        init.status.code(),
+        Some(3),
+        "{}",
+        String::from_utf8_lossy(&init.stderr)
+    );
+    let mut first_ids = BTreeSet::new();
+    for round in 0..2 {
+        let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .env("PATH", &root)
+            .args(["check", "typescript"])
+            .arg(&root)
+            .args(["--format=json", "--timeout", "60s"])
+            .output()
+            .unwrap();
+        assert_eq!(
+            output.status.code(),
+            Some(3),
+            "{}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+        assert_eq!(
+            report["syntax_candidates"]["observations"]
+                .as_array()
+                .unwrap()
+                .len(),
+            3,
+            "{report}"
+        );
+        assert_eq!(
+            report["syntax_tasks"]["status"], "synced_partial",
+            "{report}"
+        );
+        let tasks = report["syntax_tasks"]["tasks"].as_array().unwrap();
+        assert_eq!(tasks.len(), 2, "{report}");
+        let ids: BTreeSet<String> = tasks
+            .iter()
+            .map(|t| t["task_id"].as_str().unwrap().to_owned())
+            .collect();
+        if round == 0 {
+            first_ids = ids;
+        } else {
+            assert_eq!(ids, first_ids);
+        }
+    }
+    let payload = serde_json::json!({"schema_version":"1.0.0","report_type":"hook_trigger_request",
+        "input":{"event":"file_changed","changed_paths":["module.mts"],"task_id":null,
+            "write_outcome":"confirmed","host_claims_blocking":false}});
+    let mut child = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .env("PATH", &root)
+        .args(["hook", "execute"])
+        .arg(&root)
+        .args(["--format=json", "--timeout", "60s"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(&serde_json::to_vec(&payload).unwrap())
+        .unwrap();
+    let output = child.wait_with_output().unwrap();
+    assert_eq!(
+        output.status.code(),
+        Some(3),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let feedback = &report["local_feedback"];
+    assert_eq!(
+        feedback["requested_paths"],
+        serde_json::json!(["module.mts"])
+    );
+    let observations = feedback["syntax_candidates"]["observations"]
+        .as_array()
+        .unwrap();
+    assert_eq!(observations.len(), 1, "{report}");
+    assert_eq!(observations[0]["path"], "module.mts");
+    assert_eq!(observations[0]["language"], "typescript");
+    let tasks = feedback["syntax_tasks"]["tasks"].as_array().unwrap();
+    assert_eq!(tasks.len(), 1, "{report}");
+    assert!(first_ids.contains(tasks[0]["task_id"].as_str().unwrap()));
+    fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+fn project_check_observes_r_and_cpp_explicit_suffixes() {
+    let root = std::env::temp_dir()
+        .canonicalize()
+        .unwrap()
+        .join(format!("codeguard-r-cpp-suffixes-{}", std::process::id()));
+    fs::create_dir_all(&root).unwrap();
+    let cases = [
+        ("upper.R", "r", "x <- (\n", true),
+        ("lower.r", "r", "x <- 1\n", false),
+        ("upper.C", "cpp", "int value = ;\n", true),
+        ("short.cp", "cpp", "int value = ;\n", true),
+        ("upper.CPP", "cpp", "int value = ;\n", true),
+        ("plus.c++", "cpp", "int value = ;\n", true),
+        ("source.cxx", "cpp", "int value = ;\n", true),
+        ("header.hxx", "cpp", "struct Value {};\n", false),
+    ];
+    for (name, _, source, _) in cases {
+        fs::write(root.join(name), source).unwrap();
+    }
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        // 隔离原生工具，实际执行随包 grammar 的候选分支。
+        .env("PATH", &root)
+        .args(["check", "all"])
+        .arg(&root)
+        .args(["--format=json", "--timeout", "60s"])
+        .output()
+        .unwrap();
+    fs::remove_dir_all(&root).unwrap();
+    assert_eq!(
+        output.status.code(),
+        Some(3),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let observations = report["syntax_candidates"]["observations"]
+        .as_array()
+        .unwrap();
+    assert_eq!(observations.len(), cases.len(), "{report}");
+    for (name, language, _, invalid) in cases {
+        let row = observations.iter().find(|row| row["path"] == name).unwrap();
+        assert_eq!(row["language"], language, "{row}");
+        assert_eq!(row["status"], "candidate_observed", "{row}");
+        assert_eq!(
+            row["recovery_count"].as_u64().unwrap() > 0,
+            invalid,
+            "{row}"
+        );
+        assert_eq!(row["grammar_qualified"], false, "{row}");
+    }
+    assert_eq!(report["delivery_decision"], "incomplete");
+}
+
+#[test]
+fn human_feedback_retains_specific_python_version_limitation() {
+    let root = std::env::temp_dir()
+        .canonicalize()
+        .unwrap()
+        .join(format!("cg-python-specific-limit-{}", std::process::id()));
+    fs::create_dir(&root).unwrap();
+    fs::write(
+        root.join("app.py"),
+        "message = t\"private-secret-content\"\n",
+    )
+    .unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .env("PATH", &root)
+        .args(["check", "python"])
+        .arg(&root)
+        .args(["--timeout", "30s"])
+        .output()
+        .unwrap();
+    fs::remove_dir_all(root).unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    let text = String::from_utf8(output.stdout).unwrap();
+    assert!(text.contains("Python 3.14 template strings"), "{text}");
+    assert!(text.contains("target-bound native confirmation"), "{text}");
+    assert!(!text.contains("private-secret-content"), "{text}");
+}
+
+#[test]
+fn cfquery_comment_boundaries_reach_real_workers_without_truncating_source() {
+    use sha2::{Digest, Sha256};
+    let root = std::env::temp_dir()
+        .canonicalize()
+        .unwrap()
+        .join(format!("codeguard-cfquery-close-{}", std::process::id()));
+    fs::create_dir_all(&root).unwrap();
+    let first = "SELECT 1 <!--- fake </CFQUERY> <!--- nested ---> ---> FROM users";
+    let second = "SELECT 2";
+    let prefix = "中文\r\n<CFQUERY>";
+    let source = format!("{prefix}{first}</CFQUERY><cfquery>{second}</cfquery>");
+    fs::write(root.join("page.cfm"), &source).unwrap();
+    fs::write(
+        root.join("incomplete.cfm"),
+        "<cfquery>SELECT 1 <!--- </cfquery>",
+    )
+    .unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .env("PATH", &root)
+        .args(["check", "all"])
+        .arg(&root)
+        .args(["--format=json", "--timeout", "60s", "--jobs=1"])
+        .output()
+        .unwrap();
+    fs::remove_dir_all(&root).unwrap();
+    assert_eq!(
+        out.status.code(),
+        Some(3),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let report: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(report["delivery_decision"], "incomplete");
+    let rows = report["syntax_candidates"]["observations"]
+        .as_array()
+        .unwrap();
+    let queries = rows
+        .iter()
+        .filter(|row| row["language"] == "cfquery")
+        .collect::<Vec<_>>();
+    assert_eq!(queries.len(), 2, "{report}");
+    for (body, offset) in [
+        (first, prefix.len()),
+        (second, source.find(second).unwrap()),
+    ] {
+        let row = queries
+            .iter()
+            .find(|row| row["byte_offset"] == offset)
+            .unwrap();
+        assert_eq!(row["path"], "page.cfm");
+        assert_eq!(row["scope"], "cfquery_body");
+        assert_eq!(
+            row["source_sha256"],
+            format!("{:x}", Sha256::digest(body.as_bytes()))
+        );
+        assert_eq!(row["grammar_qualified"], false);
+        assert_ne!(row["status"], "clean");
+        for anchor in row["recoveries"].as_array().unwrap() {
+            assert!(anchor["start_byte"].as_u64().unwrap() >= offset as u64);
+            assert!(anchor["end_byte"].as_u64().unwrap() <= (offset + body.len()) as u64);
+        }
+    }
+    assert!(
+        rows.iter()
+            .any(|row| row["path"] == "incomplete.cfm" && row["language"] == "cfml")
+    );
+    if let Some(path) = std::env::var_os("CODEGUARD_CFQUERY_CAPTURE") {
+        fs::write(path, serde_json::to_vec_pretty(&report).unwrap()).unwrap();
+    }
 }

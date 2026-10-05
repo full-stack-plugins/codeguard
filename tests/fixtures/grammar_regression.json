@@ -1,0 +1,1681 @@
+{
+  "schema_version": "0.1.0",
+  "corpus_type": "grammar_regression",
+  "manifest_sha256": "86547d2e5c038140a392f670a820335e3e7a7d251d75e9f958c30a9932fc1a4d",
+  "cases": [
+    {
+      "id": "arkts-routing_control",
+      "language": "arkts",
+      "source": "@Component struct C { build() { Text('hi') } }",
+      "source_sha256": "bd9463eee2509f397276f67d02b8bfa39dc18626f1ba1bc48194c1a24a928444",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "c-bad_declarator",
+      "language": "c",
+      "source": "int f( { return 1; }\n",
+      "source_sha256": "f11f99927226d3ebc8b6c8c49ab1379403f9232234c3c9f4c911c9c29bde474f",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/c_native_differential.rs"
+    },
+    {
+      "id": "c-compound_literal",
+      "language": "c",
+      "source": "struct P { int x; }; struct P p = (struct P){1};\n",
+      "source_sha256": "0262f0063ca13190d16558e60e8589a408abc64c2626d11f5f30bfc79bc09b30",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/c_native_differential.rs"
+    },
+    {
+      "id": "c-designated",
+      "language": "c",
+      "source": "struct P { int x; }; struct P p = {.x = 1};\n",
+      "source_sha256": "952e976574117940e84983d6c6f80d4f9ccca2f96171b696ddc578c700fcd39a",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/c_native_differential.rs"
+    },
+    {
+      "id": "c-enumeration",
+      "language": "c",
+      "source": "enum Color { RED, BLUE };\n",
+      "source_sha256": "dae545f9c672322cc57cab11dee9937773259c19b57296da966f92af81414422",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/c_native_differential.rs"
+    },
+    {
+      "id": "c-function",
+      "language": "c",
+      "source": "int main(void) { return 0; }\n",
+      "source_sha256": "2ad75d95660563887d8d3f1d0ae1dcf18c2379cbd83a5c72f5ab276351ee6949",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/c_native_differential.rs"
+    },
+    {
+      "id": "c-missing_brace",
+      "language": "c",
+      "source": "int main(void) { return 0;\n",
+      "source_sha256": "0bc3da61edcc941a330fc090fc3390a7ea28f7136fbc60e934fd2cc54c83f4a0",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/c_native_differential.rs"
+    },
+    {
+      "id": "c-missing_expr",
+      "language": "c",
+      "source": "int f(void) { int x = ; return x; }\n",
+      "source_sha256": "e1f3b4ab3ae6a0b2e7b60ba21a983545382a41487282a37c0eba1698250b5950",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/c_native_differential.rs"
+    },
+    {
+      "id": "c-missing_semicolon",
+      "language": "c",
+      "source": "int x = 1\n",
+      "source_sha256": "e7f9512d79642a7d530ad4765b233b53c5aec858ee408ad48fcadd7f639634f8",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/c_native_differential.rs"
+    },
+    {
+      "id": "c-pointer",
+      "language": "c",
+      "source": "int f(const int *x) { return *x; }\n",
+      "source_sha256": "cf6844dae4e58b7b5086281300686d9956587fd656cfc903b6ca4205ab8b05cf",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/c_native_differential.rs"
+    },
+    {
+      "id": "c-preprocessor",
+      "language": "c",
+      "source": "#define VALUE 1\nint f(void) { return VALUE; }\n",
+      "source_sha256": "26a62ddd5446e54b587276346a4ea2815d50ae217985691507b50889b06cf423",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/c_native_differential.rs"
+    },
+    {
+      "id": "c-routing_control",
+      "language": "c",
+      "source": "int main(void) { return 0; }",
+      "source_sha256": "65d2fad425e300ae19bd229a513aa7564086a7f0feb9405f806c70b2366ad59a",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "c-structure",
+      "language": "c",
+      "source": "struct Point { int x; int y; };\n",
+      "source_sha256": "ae291bd67be51e38548f08b410a8e7a2f5390fdf56b8fde16b439dcb0ddae9c6",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/c_native_differential.rs"
+    },
+    {
+      "id": "c-typedef",
+      "language": "c",
+      "source": "typedef unsigned long Count; Count n = 0;\n",
+      "source_sha256": "71a8c9fe077a5757900051c50d3d1584eec77fa9f1b40ec9a958ff90768f687c",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/c_native_differential.rs"
+    },
+    {
+      "id": "c-unclosed_string",
+      "language": "c",
+      "source": "char *s = \"oops;\n",
+      "source_sha256": "74a2152326de9077ec6bfd8f276986cda9d4b718701c2bb64a4dfad1df694c5a",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/c_native_differential.rs"
+    },
+    {
+      "id": "cfml-routing_control",
+      "language": "cfml",
+      "source": "<cfquery name=\"q\">SELECT #x# FROM users</cfquery>",
+      "source_sha256": "32491b7e640a3a0315eed68e47b0fb6a6924cfeb797422d1dde5a455540edbef",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "cfquery-missing_select_list",
+      "language": "cfquery",
+      "source": "SELECT FROM users",
+      "source_sha256": "40cfe2fef3dbbdb052f013c95d5601fabbf774ce3cf6a2df615c4e1e9529d409",
+      "expected_valid": false,
+      "label": "pending",
+      "origin": "tests/acceptance/grammar-known-limitations-projection.md"
+    },
+    {
+      "id": "cfquery-routing_control",
+      "language": "cfquery",
+      "source": "SELECT #x# FROM users",
+      "source_sha256": "d9fa4b9d99086aaad6139e49ea4626d0befc018bf6eaff060ad47267bd379915",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "cfscript-routing_control",
+      "language": "cfscript",
+      "source": "component { function f() { return 1; } }",
+      "source_sha256": "3e18909ebb8d775ac00a851ff1da49580f7b5e6bf2c0233f949680fe59854c74",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "cobol-routing_control",
+      "language": "cobol",
+      "source": "       IDENTIFICATION DIVISION.\n       PROGRAM-ID. HELLO.\n",
+      "source_sha256": "d540ed839caebff4cd99d42a6ee98fecf01bea18c33df5f51ea21033fa057ee6",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "cpp-routing_control",
+      "language": "cpp",
+      "source": "int main() { return 0; }",
+      "source_sha256": "80a7161009ffaf868641acac3f5e49bc5f86021ee1d177f3b1cbb47573513649",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "csharp-routing_control",
+      "language": "csharp",
+      "source": "class C { static int F() { return 1; } }",
+      "source_sha256": "d6941d373eb39ac9f56b2ee636002613b0af47025b68d133311dc61a6a75cdf9",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "dart-routing_control",
+      "language": "dart",
+      "source": "String greet(String name) => 'Hello $name';",
+      "source_sha256": "6ef7d384dfa66f6bdc9c06e2062159e731534e3a9d9dc185b9e5d6a6f6e56c9f",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "erlang-argument",
+      "language": "erlang",
+      "source": "-module(sample).\nf(X) -> X + 1.\n",
+      "source_sha256": "5ce30fb83affa9edbfaaf36ac502745fed12cedebf34cd1e7f8610ffc7ef421e",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/erlang_native_differential.rs"
+    },
+    {
+      "id": "erlang-bare_call",
+      "language": "erlang",
+      "source": "-module(sample).\nlists:reverse([]).",
+      "source_sha256": "fd8cc2c9100c4d96719ccf66d6b94552d80171c926a2224b784b5d053eea26af",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/erlang_source_forms.json"
+    },
+    {
+      "id": "erlang-bare_expression",
+      "language": "erlang",
+      "source": "-module(sample).\nok.",
+      "source_sha256": "36c59287e88cd915379892690029f5d22b12ab69841bba3194ebf2e9c1cc0b7c",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/erlang_source_forms.json"
+    },
+    {
+      "id": "erlang-case",
+      "language": "erlang",
+      "source": "-module(sample).\nf(X) -> case X of 1 -> one; _ -> other end.\n",
+      "source_sha256": "511a1b3497a7a796702701bef06eeb52c054b905db90d22d0c1183040f5124b5",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/erlang_native_differential.rs"
+    },
+    {
+      "id": "erlang-comment_before_period",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> ok % intervening comment\n.",
+      "source_sha256": "6d92aab08315efb129282a40f2f39a6d17a20d3307c9192b4d23c180a54c03f4",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/erlang_source_forms.json"
+    },
+    {
+      "id": "erlang-conditional_forms",
+      "language": "erlang",
+      "source": "-module(sample).\n-ifdef(TEST).\nf() -> one.\n-else.\nf() -> two.\n-endif.",
+      "source_sha256": "7c12dacdbfab1ab49e141bbcac2c2a72e30a3836ba05cb02cfead9c7e45cfbe1",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/erlang_source_forms.json"
+    },
+    {
+      "id": "erlang-dot_character",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> $. .",
+      "source_sha256": "02cacea6e51bb30fbaade41b13e22b3cd4ab2d6bde01313d88f7dafb021f065e",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/erlang_source_forms.json"
+    },
+    {
+      "id": "erlang-dot_in_float",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> 1.25.",
+      "source_sha256": "4187dd409b6b44ca73b60b3c55848ad561174b59809fba46ca28ec498989b65f",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/erlang_source_forms.json"
+    },
+    {
+      "id": "erlang-dot_in_string",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> \"value.with.dot\".",
+      "source_sha256": "8efbc565bab27ceb69eec9c2ec7ecaf76b684651394492958025376dcc12fdfa",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/erlang_source_forms.json"
+    },
+    {
+      "id": "erlang-final_comment",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> ok. % final comment without newline",
+      "source_sha256": "1519eaae49d90099eb428e0ab532641bfc7ec698ee8ef6f2a5e406dd01ee61f6",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/erlang_source_forms.json"
+    },
+    {
+      "id": "erlang-final_semicolon",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> ok;",
+      "source_sha256": "dc11f4e4b78c3bdff2d74710776f31e8bbdc3250761b5ae7fe7c801910a41542",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/erlang_source_forms.json"
+    },
+    {
+      "id": "erlang-guard",
+      "language": "erlang",
+      "source": "-module(sample).\nf(X) when is_integer(X) -> X.\n",
+      "source_sha256": "9e630dcfdf4eb71e725b1aba222a612aeaea31f4584b90bf2ab3b5af7e9a6ecc",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/erlang_native_differential.rs"
+    },
+    {
+      "id": "erlang-list",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> [1, 2, 3].\n",
+      "source_sha256": "152c45cc76bb7673fbb4e116b7df51e5d8280adbcd5227c5e3a3f211cc6af25b",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/erlang_native_differential.rs"
+    },
+    {
+      "id": "erlang-list_comprehension",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> [X * 2 || X <- [1, 2]].\n",
+      "source_sha256": "5a144d7b0d14d5e45bf5145c345bebb9e73b2579cbacbd658463fd845ad18f40",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/erlang_native_differential.rs"
+    },
+    {
+      "id": "erlang-macro",
+      "language": "erlang",
+      "source": "-module(sample).\n-define(V, ok).\nf() -> ?V.",
+      "source_sha256": "1829a3f619d996a3c650632fd3fe17ab9bc274f0773b8656363e4c957df15455",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/erlang_source_forms.json"
+    },
+    {
+      "id": "erlang-map",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> #{a => 1}.\n",
+      "source_sha256": "6856b124471414356d723243f85e036907a99d2cd2faa55b2a81fdeecf55a6ed",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/erlang_native_differential.rs"
+    },
+    {
+      "id": "erlang-missing_arrow",
+      "language": "erlang",
+      "source": "-module(sample).\nf() ok.\n",
+      "source_sha256": "73639d1c8110415347a74420d015f7268385c4fc8e7e4fbda7366fed51632d64",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/erlang_native_differential.rs"
+    },
+    {
+      "id": "erlang-missing_expression",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> .\n",
+      "source_sha256": "80de87d89c824f28cd3090dac18b67403e056ec3b9d50b0584e8c9efaee9854d",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/erlang_native_differential.rs"
+    },
+    {
+      "id": "erlang-missing_middle_period",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> ok\ng() -> ok.",
+      "source_sha256": "ed62d3ae3be170d8e7d928149a356a781899d322635e9e19a2d2b0bc3e81f599",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/erlang_source_forms.json"
+    },
+    {
+      "id": "erlang-missing_period",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> ok\n",
+      "source_sha256": "d66c937c29e3eba8063b468f2744f995cd24cee2399b5f63018935876f5fc9a3",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/erlang_native_differential.rs"
+    },
+    {
+      "id": "erlang-missing_period_after_dot_character",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> $.",
+      "source_sha256": "30df4cb83c16546441e207dcf5c3c311c84513e477323f10cbf5197aee4bb819",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/erlang_source_forms.json"
+    },
+    {
+      "id": "erlang-missing_period_after_float",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> 1.25",
+      "source_sha256": "3b934ea729c0fe0dbd64316e8b04a58f587ffe13793852077238b50a76613eb2",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/erlang_source_forms.json"
+    },
+    {
+      "id": "erlang-missing_period_after_string",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> \"ends.with.dot.\"",
+      "source_sha256": "b93065a0c4b98bc7103b7c3acfba5d558bf2a3e024f4d480b508feaf1006705a",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/erlang_source_forms.json"
+    },
+    {
+      "id": "erlang-missing_period_comment",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> ok % comment with .",
+      "source_sha256": "ae4925b99ad08110cbbd1a6a2e86ecf91ef93503d0d851d12acba93bd7e133c9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/erlang_source_forms.json"
+    },
+    {
+      "id": "erlang-missing_period_eof",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> ok",
+      "source_sha256": "8cad2f133c6b3f22870bc69be59a9c6c4cfee9208ba2202f05bbb57e99b0020e",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/erlang_source_forms.json"
+    },
+    {
+      "id": "erlang-missing_period_unicode_crlf",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> \"中文\"\r\n",
+      "source_sha256": "b81a25734cb617c6e964fdd565630b745a6e09e9869266effd0f1798f1aa9e8d",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/erlang_source_forms.json"
+    },
+    {
+      "id": "erlang-multi_clause",
+      "language": "erlang",
+      "source": "-module(sample).\nf(0) -> zero;\nf(_) -> other.",
+      "source_sha256": "467722312ce615bf23ab978310aafd039efa1f0c293afae2eaebb9b3790bf335",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/erlang_source_forms.json"
+    },
+    {
+      "id": "erlang-multi_clause_final_semicolon",
+      "language": "erlang",
+      "source": "-module(sample).\nf(0) -> zero;\nf(_) -> other;",
+      "source_sha256": "cfa7d9789c2681c96491970dd42b5f1998ee16399e3e9232a2027f43e3aee8d9",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "tests/fixtures/erlang_source_forms.json"
+    },
+    {
+      "id": "erlang-multiple_functions",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> ok.\ng() -> f().",
+      "source_sha256": "52fdecb8d0939ac60cd0c8e08127125fe647a0ad77136d81fcfd4446231366f5",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/erlang_source_forms.json"
+    },
+    {
+      "id": "erlang-nested_fun",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> fun(X) -> X end.",
+      "source_sha256": "04bc1168b063eb7a28852ed7df44932300f7e0e28a7aba76c1eb363954f54601",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/erlang_source_forms.json"
+    },
+    {
+      "id": "erlang-quoted_atom_dot",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> 'atom.with.dot'.",
+      "source_sha256": "253b1446dc58c6181f9041c2635901df7dac2700e33d52c5930ff9df8dcb8cfc",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/erlang_source_forms.json"
+    },
+    {
+      "id": "erlang-record",
+      "language": "erlang",
+      "source": "-module(sample).\n-record(user, {id}).\nf() -> #user{id = 1}.\n",
+      "source_sha256": "e87db9fd62e777d757cf0e98ac6bf65cc0cc0ccdcff912d1d4057d95a7e77e68",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/erlang_native_differential.rs"
+    },
+    {
+      "id": "erlang-routing_control",
+      "language": "erlang",
+      "source": "-module(hello).\nhello() -> ok.\n",
+      "source_sha256": "0a5831c023a812e0b43da3f08ac52511c62b5c666ffeb907f54992cd8cbca207",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "erlang-simple",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> ok.\n",
+      "source_sha256": "87baddfbb9db73cfb5f1323a6e3d5dfe993d1ab817e67b9edc91154eed06fa96",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/erlang_native_differential.rs"
+    },
+    {
+      "id": "erlang-spec",
+      "language": "erlang",
+      "source": "-module(sample).\n-spec f(integer()) -> integer().\nf(X) -> X.",
+      "source_sha256": "a9e010b53ce3311d2572b56ac56a4fe7d5f626c2cebd343ae0adfa8acea94dce",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/erlang_source_forms.json"
+    },
+    {
+      "id": "erlang-unclosed_list",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> [1, 2.\n",
+      "source_sha256": "1b8259844eda8105393a7ab9d20a78f53d90fd98bc16444cc992bd7507a05161",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/erlang_native_differential.rs"
+    },
+    {
+      "id": "erlang-unclosed_string",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> \"oops.\n",
+      "source_sha256": "bda26130cda7bae5d869019b908632318b10a980f4e8991aa8a45ee3d5a242da",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/erlang_native_differential.rs"
+    },
+    {
+      "id": "erlang-unicode_crlf",
+      "language": "erlang",
+      "source": "-module(sample).\nf() -> \"中文\".\r\n",
+      "source_sha256": "0378f007f2f8b3d18b40134c122af941d8dc2ce4e6f35687648acf5b4f4ffc9a",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/fixtures/erlang_source_forms.json"
+    },
+    {
+      "id": "go-bad_if",
+      "language": "go",
+      "source": "package p\nfunc f() { if { } }\n",
+      "source_sha256": "1e1668d914b252ec15008f3cd3b733174f8ec5cd07128ebaee5bfc02d6ff8bca",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/go_native_differential.rs"
+    },
+    {
+      "id": "go-composite",
+      "language": "go",
+      "source": "package p\ntype P struct { X int }\nvar p = P{X: 1}\n",
+      "source_sha256": "20f6ad47de3ed788e7c67db388b9b67c07530bdc589c96e3e603b41580ef3718",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/go_native_differential.rs"
+    },
+    {
+      "id": "go-empty",
+      "language": "go",
+      "source": "package main\nfunc main() {}\n",
+      "source_sha256": "15dfc4f51b4ed90211b566886f456d23d6984e1bb298460786c9740b01ac183e",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/go_native_differential.rs"
+    },
+    {
+      "id": "go-generics",
+      "language": "go",
+      "source": "package p\nfunc Id[T any](x T) T { return x }\n",
+      "source_sha256": "21fbcd4b5d97bde125a44e65b10235b10d0f44d9530c6c299b0ba3d095b1a9c5",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/go_native_differential.rs"
+    },
+    {
+      "id": "go-interface",
+      "language": "go",
+      "source": "package p\ntype I interface { F() error }\n",
+      "source_sha256": "3b32e2477eab8670227f9217a363cde36984252605a96ef2d6851a863a0e1040",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/go_native_differential.rs"
+    },
+    {
+      "id": "go-missing_brace",
+      "language": "go",
+      "source": "package p\nfunc f() {\n",
+      "source_sha256": "e78d59ee65c1a180c2bb23b9a45c270d8a88472823820d93dd7b57959885fce5",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/go_native_differential.rs"
+    },
+    {
+      "id": "go-missing_init",
+      "language": "go",
+      "source": "package p\nvar x =\n",
+      "source_sha256": "40e0cc9add941992f2505a9e62df2af79b4a333de47fdec38901b9615ff9adcd",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/go_native_differential.rs"
+    },
+    {
+      "id": "go-missing_paren",
+      "language": "go",
+      "source": "package p\nfunc f( { }\n",
+      "source_sha256": "8ae0e88f1495df84a2fa6932ddc18fa75ffff6c28e1fb92cf1128a8d6d1e60d2",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/go_native_differential.rs"
+    },
+    {
+      "id": "go-range_int",
+      "language": "go",
+      "source": "package p\nfunc f() { for i := range 3 { _ = i } }\n",
+      "source_sha256": "1b2cfcc39bada8b9a7a3c9936f25a0c8b64e6b929ef51e5af204cc3372c527ba",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/go_native_differential.rs"
+    },
+    {
+      "id": "go-raw_string",
+      "language": "go",
+      "source": "package p\nconst s = `hello\nworld`\n",
+      "source_sha256": "2ff9e8956ab7ec43115b92d8dad3845ffbf1d0e01760a074b82a2068a6317869",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/go_native_differential.rs"
+    },
+    {
+      "id": "go-routing_control",
+      "language": "go",
+      "source": "package main\nfunc main() {}\n",
+      "source_sha256": "15dfc4f51b4ed90211b566886f456d23d6984e1bb298460786c9740b01ac183e",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "go-switch",
+      "language": "go",
+      "source": "package p\nfunc f(x any) { switch x.(type) { case int: return; default: return } }\n",
+      "source_sha256": "6c03f6b3f3a1cf227a2aea5460285024fa8b2b9ad11a82f4fd194a3f3b25882b",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/go_native_differential.rs"
+    },
+    {
+      "id": "go-unicode",
+      "language": "go",
+      "source": "package p\nvar 世界 = \"ok\"\n",
+      "source_sha256": "d80073b5e35a4baf3f2970734ff35516ba6cfc5623a91fe69efd05bc12620b40",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/go_native_differential.rs"
+    },
+    {
+      "id": "go-unterminated_string",
+      "language": "go",
+      "source": "package p\nconst s = \"oops\n",
+      "source_sha256": "dd68b5c2a865730e167ca2ebe651560fc4556e0c5bb8ec6206dd3b04ec01e4cd",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/go_native_differential.rs"
+    },
+    {
+      "id": "java-empty_class",
+      "language": "java",
+      "source": "class C {}\n",
+      "source_sha256": "8a7eaee3a2ed1ded2f10c111143f7629820f78b4e63210aebe6b9986850db4ac",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/java_native_differential.rs"
+    },
+    {
+      "id": "java-enumeration",
+      "language": "java",
+      "source": "enum C { FIRST, SECOND }\n",
+      "source_sha256": "35a4f1c66f1cc712ec5b36875e7941ca1747e7b6992de0a063391706140fd4a4",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/java_native_differential.rs"
+    },
+    {
+      "id": "java-field",
+      "language": "java",
+      "source": "class C { int value = 1; }\n",
+      "source_sha256": "390220be379d4e7a595daf5ab5fcc1e5660589955273b5835fb2fc3562a9dd98",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/java_native_differential.rs"
+    },
+    {
+      "id": "java-generic",
+      "language": "java",
+      "source": "class C<T> { T value; C(T value) { this.value = value; } }\n",
+      "source_sha256": "b4438c509158e438197b929470fec1ff1ca817aecc88b4ce15598b418b1ebb69",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/java_native_differential.rs"
+    },
+    {
+      "id": "java-interface",
+      "language": "java",
+      "source": "interface C { void run(); }\n",
+      "source_sha256": "682658c460fdd6b0e8b40f370ee35b3351954ee125584d0f8affe6ab935fad2b",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/java_native_differential.rs"
+    },
+    {
+      "id": "java-lambda",
+      "language": "java",
+      "source": "class C { Runnable r = () -> { int value = 1; }; }\n",
+      "source_sha256": "b06d23fceb406f6e58066959c08fed9d49c940023864e20ef8cc73916d7ac920",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/java_native_differential.rs"
+    },
+    {
+      "id": "java-method",
+      "language": "java",
+      "source": "class C { int f(int x) { return x + 1; } }\n",
+      "source_sha256": "694fd5ace34acd653331d68b63beb7efccf3637c893c3a1c0892effecae98f08",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/java_native_differential.rs"
+    },
+    {
+      "id": "java-missing_brace",
+      "language": "java",
+      "source": "class C { void f() {}\n",
+      "source_sha256": "e44ac929458a3fb3530ba714de23baa66f46b1a2777a053c4cfa3d01172c2730",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/java_native_differential.rs"
+    },
+    {
+      "id": "java-missing_expression",
+      "language": "java",
+      "source": "class C { int value = ; }\n",
+      "source_sha256": "97e691248e52ebbb2b924649a9fc78c351fe998c1bac9a7d111c3839b847e715",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/java_native_differential.rs"
+    },
+    {
+      "id": "java-missing_parameter_type",
+      "language": "java",
+      "source": "class C { void f(value) {} }\n",
+      "source_sha256": "dcf0da935fe46eae3fdd9017d380745516d9acdecbc070b691a6518bdde40896",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/java_native_differential.rs"
+    },
+    {
+      "id": "java-missing_semicolon",
+      "language": "java",
+      "source": "class C { int value = 1 }\n",
+      "source_sha256": "6e24eb9c41aa295c280b1af9409027e4c4b146b526112674b51cabfc33aadd36",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/java_native_differential.rs"
+    },
+    {
+      "id": "java-record",
+      "language": "java",
+      "source": "record C(int value) {}\n",
+      "source_sha256": "75f3c41a2b3568b996d17eb6a1ca7c2a7e70a1320fa46c6d57111df5e2324139",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/java_native_differential.rs"
+    },
+    {
+      "id": "java-routing_control",
+      "language": "java",
+      "source": "class A {}",
+      "source_sha256": "107310d1668e0941284e7595573d77788d10959a91d6eb1a53c03b4faba0bc97",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "java-unclosed_string",
+      "language": "java",
+      "source": "class C { String value = \"oops; }\n",
+      "source_sha256": "e951c9c58740d224e869105e13083eaf0737bad0fea0424aa329ae59e5cd7ff5",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/java_native_differential.rs"
+    },
+    {
+      "id": "javascript-arrow",
+      "language": "javascript",
+      "source": "const f = (x) => x + 1;\n",
+      "source_sha256": "cd59e8211b78c23652f09709130bd80d8ea9e4d7dd71566534aa1d2894051bac",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/javascript_native_differential.rs"
+    },
+    {
+      "id": "javascript-async",
+      "language": "javascript",
+      "source": "async function f() { return await Promise.resolve(1); }\n",
+      "source_sha256": "00b2515702b3b09bf663453c2f081572ae9f71d40faaf83d4e9fdf99584ba62e",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/javascript_native_differential.rs"
+    },
+    {
+      "id": "javascript-await",
+      "language": "javascript",
+      "source": "await Promise.resolve(1);\n",
+      "source_sha256": "1fa5e6f7d74f68bada859d1c8fd0732fca584d7dd29c3fcc8937117e90720e6d",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/javascript_native_differential.rs"
+    },
+    {
+      "id": "javascript-bad_optional",
+      "language": "javascript",
+      "source": "const x = value?.;\n",
+      "source_sha256": "6d028afc94527948a2b7706686373be83fa6b690137b3e499e70bf9c8e091b4e",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/javascript_native_differential.rs"
+    },
+    {
+      "id": "javascript-class",
+      "language": "javascript",
+      "source": "class Box { #value = 1; get value() { return this.#value; } }\n",
+      "source_sha256": "0948a0ebece47f9143b807fd80fa9312420b48cb422aad3545d01c421e7cbbe6",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/javascript_native_differential.rs"
+    },
+    {
+      "id": "javascript-import",
+      "language": "javascript",
+      "source": "import { readFile } from \"node:fs/promises\";\n",
+      "source_sha256": "debaba638349ab0e90d4c79968777d98a17b305552b568ec07c362aa2097e7e7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/javascript_native_differential.rs"
+    },
+    {
+      "id": "javascript-missing_brace",
+      "language": "javascript",
+      "source": "function f() {\n",
+      "source_sha256": "77cdde91268480cb952e4b1373dbd3e2c539989ce65813c24015383caa83aa4a",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/javascript_native_differential.rs"
+    },
+    {
+      "id": "javascript-missing_init",
+      "language": "javascript",
+      "source": "const x = ;\n",
+      "source_sha256": "ad2c2013447045c4c3bce94975043cf6f968b07886931786e8d70217ba2958e1",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/javascript_native_differential.rs"
+    },
+    {
+      "id": "javascript-missing_paren",
+      "language": "javascript",
+      "source": "function f( { return 1; }\n",
+      "source_sha256": "340cdaa57012f8cc39a816d21c45866a26046798697767500beb1998bee72ff3",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/javascript_native_differential.rs"
+    },
+    {
+      "id": "javascript-optional",
+      "language": "javascript",
+      "source": "const x = value?.child ?? 0;\n",
+      "source_sha256": "cd178b8fbd049ee3760a7a4aa536f6ca8da674de938a461067d3bf5c0f324192",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/javascript_native_differential.rs"
+    },
+    {
+      "id": "javascript-plain",
+      "language": "javascript",
+      "source": "const x = 1;\n",
+      "source_sha256": "95befdd6e691d4d89031a2a2901cc74fc6242109980b060e08ddf87829924483",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/javascript_native_differential.rs"
+    },
+    {
+      "id": "javascript-routing_control",
+      "language": "javascript",
+      "source": "const value = 1;",
+      "source_sha256": "6118d2677ebc259474c94251df9d152ac9b368a20833f90eb3c95219c91f04c5",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "javascript-unicode",
+      "language": "javascript",
+      "source": "const 名称 = \"你好\";\n",
+      "source_sha256": "99dd2a41c2fe7be6fd444637edcc31783ab941768529d94952fa05a8a5154e8d",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/javascript_native_differential.rs"
+    },
+    {
+      "id": "javascript-unterminated",
+      "language": "javascript",
+      "source": "const s = \"oops;\n",
+      "source_sha256": "14251d61c22c6d712f717b26ebb6251a53d063ff0780d71714ecff6fe911f7c0",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/javascript_native_differential.rs"
+    },
+    {
+      "id": "kotlin-data_class",
+      "language": "kotlin",
+      "source": "data class C(val name: String)\n",
+      "source_sha256": "2073638dc9b3c8d59ec85a527435b3f0addd9ffbe1e472f1f0ebb0f79a884544",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/kotlin_native_differential.rs"
+    },
+    {
+      "id": "kotlin-empty_class",
+      "language": "kotlin",
+      "source": "class C {}\n",
+      "source_sha256": "8a7eaee3a2ed1ded2f10c111143f7629820f78b4e63210aebe6b9986850db4ac",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/kotlin_native_differential.rs"
+    },
+    {
+      "id": "kotlin-enumeration",
+      "language": "kotlin",
+      "source": "enum class C { A, B }\n",
+      "source_sha256": "95f1ac404d289b7d806fbe0b9b4c1eb693898f9756c1f9bffc552aa86c4a1507",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/kotlin_native_differential.rs"
+    },
+    {
+      "id": "kotlin-expression_function",
+      "language": "kotlin",
+      "source": "fun f(x: Int): Int = x + 1\n",
+      "source_sha256": "63514ee0d250bc42b93eb95607a0ab7970b843e05aaf25e889a3eb6c0e5e6720",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/kotlin_native_differential.rs"
+    },
+    {
+      "id": "kotlin-lambda",
+      "language": "kotlin",
+      "source": "fun f() { val g: (Int) -> Int = { it + 1 } }\n",
+      "source_sha256": "4360d5ea178c12007c3e9be0542814466c56079befe33e27ba663a06274ba4aa",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/kotlin_native_differential.rs"
+    },
+    {
+      "id": "kotlin-missing_class_brace",
+      "language": "kotlin",
+      "source": "class C {\n",
+      "source_sha256": "da0cf704e8dda945266761cedb1157098ef6f90d88b140fb30f1f93c4db311cf",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/kotlin_native_differential.rs"
+    },
+    {
+      "id": "kotlin-missing_expression",
+      "language": "kotlin",
+      "source": "val x =\n",
+      "source_sha256": "52ab971d0f47f5ea15e6eb1b40871aa941d57b81e8714576181eae9a144644c2",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/kotlin_native_differential.rs"
+    },
+    {
+      "id": "kotlin-missing_function_brace",
+      "language": "kotlin",
+      "source": "fun f(x: Int) { val a = 1\n",
+      "source_sha256": "921e9e77e15e5a62c85fcfc24ca0228ec8e4baf5f3057a171b874965d186277d",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/kotlin_native_differential.rs"
+    },
+    {
+      "id": "kotlin-missing_parameter_type",
+      "language": "kotlin",
+      "source": "fun f(x: ) = x\n",
+      "source_sha256": "87fbb71a8f650a302ff4bdf216bc8a9835350f3b864b2b1c6a0d0fe5f3cdf9b5",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/kotlin_native_differential.rs"
+    },
+    {
+      "id": "kotlin-nullable",
+      "language": "kotlin",
+      "source": "fun f(): Int? = null\n",
+      "source_sha256": "91c297fe68ef382155b3b21b333684d2654ebf7a8ee3dbf5bee60ccb19cc9306",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/kotlin_native_differential.rs"
+    },
+    {
+      "id": "kotlin-object",
+      "language": "kotlin",
+      "source": "object C { val value = 1 }\n",
+      "source_sha256": "9a40dcd89c137534d57763addbb8d45368fed76bd046c5198c4fd3a016e6414a",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/kotlin_native_differential.rs"
+    },
+    {
+      "id": "kotlin-primary_constructor",
+      "language": "kotlin",
+      "source": "class C(val value: Int)\n",
+      "source_sha256": "289fdf46753d82e0373fd14ccd7add8911b59f0aeb5a1dac81f60868da7ca9c1",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/kotlin_native_differential.rs"
+    },
+    {
+      "id": "kotlin-routing_control",
+      "language": "kotlin",
+      "source": "fun main() { val x = 1 }",
+      "source_sha256": "11680181684cd6bb84f691a9931519505f4caf563207573df3faff369117793b",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "kotlin-unclosed_string",
+      "language": "kotlin",
+      "source": "val x = \"oops\n",
+      "source_sha256": "08c1ba465dd65d64111139af60f22278d9d46c7bfe426944e1864e7144abd251",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/kotlin_native_differential.rs"
+    },
+    {
+      "id": "lua-routing_control",
+      "language": "lua",
+      "source": "local x = 1\n",
+      "source_sha256": "cb10b7c4faead32c3174f445124fb0c97664631763c118eb547cd1c5857f4497",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "luau-routing_control",
+      "language": "luau",
+      "source": "local x: number = 1\n",
+      "source_sha256": "92eacc9e11ac7960623458b90dbc406c48bfd0b5ef3233b844e990c5aea33fe8",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "nix-routing_control",
+      "language": "nix",
+      "source": "let x = 1; in x",
+      "source_sha256": "0652d2a6c9eec00267e6d6fb445cdfa8d4e2017b20e06d2ccf1f91b1325a01c6",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "objc-routing_control",
+      "language": "objc",
+      "source": "@interface Foo : NSObject\n@end\n",
+      "source_sha256": "32c4ef24b9ada9322f29e1fa1701ac49cf6be1c90822abea4d46897c4262d3db",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "pascal-routing_control",
+      "language": "pascal",
+      "source": "program Hello;\nbegin\n  writeln('Hi');\nend.\n",
+      "source_sha256": "f69db576f6968d60b356ce06a1ca41aa12933ffe015fb88d1e17c7325ae7e551",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "php-routing_control",
+      "language": "php",
+      "source": "<?php function f() { return 1; }",
+      "source_sha256": "d50eef9034008008bf124c7c03772278cf949eff2d09be74aa4367b4c13ed900",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "python-routing_control",
+      "language": "python",
+      "source": "x = 1\n",
+      "source_sha256": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "r-routing_control",
+      "language": "r",
+      "source": "x <- 1\n",
+      "source_sha256": "66b7dd2c95677966d7e30532fe17ac4642554f6ca9c4165274d8438fd9c5a283",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "ruby-bad_call",
+      "language": "ruby",
+      "source": "foo(1, 2\n",
+      "source_sha256": "aba3e496a5ff34ab4b9d6b6e087b27a2740abe44e5f97242965fbeeb562d63a8",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs"
+    },
+    {
+      "id": "ruby-bad_def",
+      "language": "ruby",
+      "source": "def f(\n  1\nend\n",
+      "source_sha256": "739efbce7caaccc74780a9754c65e1df7fee4322545d6cb7a97459cde2931ce1",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs"
+    },
+    {
+      "id": "ruby-block",
+      "language": "ruby",
+      "source": "[1, 2].map { |x| x + 1 }\n",
+      "source_sha256": "7ba246dcfeb6922bb0675bc4b6fd42e8bbb935b5613cec0a6de9af5174f3ec8f",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs"
+    },
+    {
+      "id": "ruby-class",
+      "language": "ruby",
+      "source": "class Box\n  def value\n    1\n  end\nend\n",
+      "source_sha256": "da1628da0157dd45694efca72acb136eeaa674b1dc7d14683400c8e1c173a71e",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs"
+    },
+    {
+      "id": "ruby-hash",
+      "language": "ruby",
+      "source": "h = { name: \"a\", count: 2 }\n",
+      "source_sha256": "f602bb55a5fbbdb4c0c7286d4e4fdb918b7673ebb1e7d3a809bb33b208f6ce14",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs"
+    },
+    {
+      "id": "ruby-heredoc",
+      "language": "ruby",
+      "source": "s = <<~TEXT\n  hello\nTEXT\n",
+      "source_sha256": "53f2a7f08242e2317aaf5ba199a3cd89c3e54c062ef878641566a0fc5381283a",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs"
+    },
+    {
+      "id": "ruby-interpolation",
+      "language": "ruby",
+      "source": "name = \"world\"\ns = \"hello #{name}\"\n",
+      "source_sha256": "6b478dde9564fee10b0e09a1d04ebe1c2234603f8b89e4cb02962389e6120ee9",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs"
+    },
+    {
+      "id": "ruby-missing_end",
+      "language": "ruby",
+      "source": "class Box\n  def value\n    1\n  end\n",
+      "source_sha256": "bbbcf874b739d2a39a1f99b4b7e2252c1930d23ac7d7cb1373fc3d21f92d7524",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs"
+    },
+    {
+      "id": "ruby-missing_expr",
+      "language": "ruby",
+      "source": "x =\n",
+      "source_sha256": "707e1b82e5553724dd4a6c1a3e3f5a4d1786442f26a7db4b0e785201603d7616",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs"
+    },
+    {
+      "id": "ruby-modifier",
+      "language": "ruby",
+      "source": "puts \"ok\" if true\n",
+      "source_sha256": "d9eb7dc0bb42c387b779d3cc5069c3bfb6fe0703d77680face9c4737ed00133d",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs"
+    },
+    {
+      "id": "ruby-module",
+      "language": "ruby",
+      "source": "module M\n  CONST = 1\nend\n",
+      "source_sha256": "8a7b5f2cf1a966c0352378942012d5cc10a6f3a54c97991d619ced14ecd46599",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs"
+    },
+    {
+      "id": "ruby-plain",
+      "language": "ruby",
+      "source": "x = 1\n",
+      "source_sha256": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs"
+    },
+    {
+      "id": "ruby-routing_control",
+      "language": "ruby",
+      "source": "def f; 1; end\n",
+      "source_sha256": "9c413f7a07711445f01e9c6b13b3d4333a0685059fc2923001a81839604b9298",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "ruby-unclosed_string",
+      "language": "ruby",
+      "source": "s = \"oops\n",
+      "source_sha256": "bf5c73a5e6e9694a0f23b0140fa931284ab562afaed4ce6d81c65e608be908cd",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs"
+    },
+    {
+      "id": "rust-async",
+      "language": "rust",
+      "source": "async fn fetch() -> u8 { 1 }\n",
+      "source_sha256": "1b7bbf36e1ea4c8528debb943a7f984a231ad6372edd5a7bd5de6dc7d3c2d5d9",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/rust_native_differential.rs"
+    },
+    {
+      "id": "rust-bad_match",
+      "language": "rust",
+      "source": "fn f(x: i32) { match x { => 1 } }\n",
+      "source_sha256": "d331642d2601103a24d3fa5279724025e6d76de1093248588e2fe5490ab9b986",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/rust_native_differential.rs"
+    },
+    {
+      "id": "rust-const_generic",
+      "language": "rust",
+      "source": "struct Buf<const N: usize>([u8; N]);\n",
+      "source_sha256": "94cf6be7c85fcfe566e0cec063661a9a57fef498e3608c3e778f55f19ffaea2d",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/rust_native_differential.rs"
+    },
+    {
+      "id": "rust-function",
+      "language": "rust",
+      "source": "fn main() {}\n",
+      "source_sha256": "536e506bb90914c243a12b397b9a998f85ae2cbd9ba02dfd03a9e155ca5ca0f4",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/rust_native_differential.rs"
+    },
+    {
+      "id": "rust-generic",
+      "language": "rust",
+      "source": "fn id<T>(x: T) -> T { x }\n",
+      "source_sha256": "70d76c7df3d5442352286c88a27d32765565d0ebea0bbf9e2f7522bfb8ed1337",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/rust_native_differential.rs"
+    },
+    {
+      "id": "rust-lifetime",
+      "language": "rust",
+      "source": "fn same<'a>(x: &'a str) -> &'a str { x }\n",
+      "source_sha256": "40c9ce7f1657bc1f36385ce68974754b4f4b04efbf12c26fb3321cb780ba8947",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/rust_native_differential.rs"
+    },
+    {
+      "id": "rust-macro",
+      "language": "rust",
+      "source": "macro_rules! one { () => { 1 }; }\n",
+      "source_sha256": "1d59c405ca84f6b45556a1d4e95c9cae37fa167dd1472164e693a3d53ba0edb0",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/rust_native_differential.rs"
+    },
+    {
+      "id": "rust-match_guard",
+      "language": "rust",
+      "source": "fn f(x: i32) -> i32 { match x { n if n > 0 => n, _ => 0 } }\n",
+      "source_sha256": "c5356c2ff125b4f6a1a37b4aaa6a06f40bd621c13bc0d167db2685dc3b2b91a7",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/rust_native_differential.rs"
+    },
+    {
+      "id": "rust-missing_brace",
+      "language": "rust",
+      "source": "fn main() {\n",
+      "source_sha256": "00b9eee91bc0b1a77b5f224fd6945f3dec234e5596b9475c90c5aec9e6ae20b5",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/rust_native_differential.rs"
+    },
+    {
+      "id": "rust-missing_expr",
+      "language": "rust",
+      "source": "fn f() { let x = ; }\n",
+      "source_sha256": "89590af4c5601a3376337e1ed483f95d70e78de4e5a55bf2ea9cbbbea7634b9d",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/rust_native_differential.rs"
+    },
+    {
+      "id": "rust-missing_paren",
+      "language": "rust",
+      "source": "fn f( { }\n",
+      "source_sha256": "ccfcb48d19172f53aa181ed7a7700d1b5b31174d2932006fa2b380c51143ee7e",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/rust_native_differential.rs"
+    },
+    {
+      "id": "rust-raw_string",
+      "language": "rust",
+      "source": "const S: &str = r#\"hello\"#;\n",
+      "source_sha256": "4f36014f7f381abda339af5c947fee7311c712f0823c9a26f1e6c83e69d32967",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/rust_native_differential.rs"
+    },
+    {
+      "id": "rust-routing_control",
+      "language": "rust",
+      "source": "fn main() { let x = 1; }",
+      "source_sha256": "7d05b9873dec21bcf36b3a86bc8abb220025cfa7a6e4e4f209a5e68d93a0126a",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "rust-unclosed_string",
+      "language": "rust",
+      "source": "const S: &str = \"oops;\n",
+      "source_sha256": "bc9252d6af6cd7816e9b76fc5aba8a64e056a9a1ab2b330c9d9035da963d0b4c",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/rust_native_differential.rs"
+    },
+    {
+      "id": "scala-routing_control",
+      "language": "scala",
+      "source": "object Main { def f(x: Int): Int = x + 1 }",
+      "source_sha256": "469b2dab44e5c24186ad463d5f1318e053b5371a3a8824be9d497a2c428fd3e8",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "solidity-routing_control",
+      "language": "solidity",
+      "source": "pragma solidity ^0.8.20;\ncontract Vault {}\n",
+      "source_sha256": "6fe240d0495cfa641c816be9be40c62d8854ea23eabdf18b426833a5dc6afd6c",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "swift-async",
+      "language": "swift",
+      "source": "func fetch() async throws -> Int { return 1 }\n",
+      "source_sha256": "5200396ae31f4713d857df6eed4f606faa056106eaa0f3975f488ee7c1d40ce4",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/swift_native_differential.rs"
+    },
+    {
+      "id": "swift-bad_call",
+      "language": "swift",
+      "source": "print(1, 2\n",
+      "source_sha256": "83152bc55734366364b0a32cd1cfc67e5890a062e6f5e996b4db9c61e9a9ad13",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/swift_native_differential.rs"
+    },
+    {
+      "id": "swift-bad_param",
+      "language": "swift",
+      "source": "func f(_ x: ) {}\n",
+      "source_sha256": "6f44da8b1f1db95bf1948aa134b683e1066a0c9ad8941138dc2de09e70958f03",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/swift_native_differential.rs"
+    },
+    {
+      "id": "swift-closure",
+      "language": "swift",
+      "source": "let double = { (x: Int) in x * 2 }\n",
+      "source_sha256": "9ff206ab7eac08c360b1d62d401ab763daf23e8f3177c003fece96327da20152",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/swift_native_differential.rs"
+    },
+    {
+      "id": "swift-enum",
+      "language": "swift",
+      "source": "enum Status { case ready, failed(String) }\n",
+      "source_sha256": "1111fd7846222ecc2d391411a82de25f2d7054b814bdb4e704ff610c9af758cf",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/swift_native_differential.rs"
+    },
+    {
+      "id": "swift-function",
+      "language": "swift",
+      "source": "func add(_ a: Int, _ b: Int) -> Int { a + b }\n",
+      "source_sha256": "dbb0125231c24a93a457c688ecb66c92be0728846ebcacb81f557ab90c3f3139",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/swift_native_differential.rs"
+    },
+    {
+      "id": "swift-interpolation",
+      "language": "swift",
+      "source": "let text = \"hello \\(1 + 2)\"\n",
+      "source_sha256": "87af8dcddfda653f4244c1feb8965db585ebd2e87137ab4860ed58aaaae03cb1",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/swift_native_differential.rs"
+    },
+    {
+      "id": "swift-missing_brace",
+      "language": "swift",
+      "source": "func f() {\n",
+      "source_sha256": "09830c8060e72b4f08e8b4d1f98dacde74c53625b5eb9d1c702dbaeb5f4dba56",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/swift_native_differential.rs"
+    },
+    {
+      "id": "swift-missing_expr",
+      "language": "swift",
+      "source": "let x =\n",
+      "source_sha256": "ac8702566c12f11476ad2808f7ef0e4646ba23226a5e7646a64d1a5f0652597f",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/swift_native_differential.rs"
+    },
+    {
+      "id": "swift-optional",
+      "language": "swift",
+      "source": "let name: String? = nil\n",
+      "source_sha256": "7d797901a945be7ebbf022c4cd0f51a3e176e804561e8da6ccaf30a8a975ccc2",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/swift_native_differential.rs"
+    },
+    {
+      "id": "swift-plain",
+      "language": "swift",
+      "source": "let value = 1\n",
+      "source_sha256": "ccdab916a2664126bae77709d63891fea8e32421e01f33fa9814de8abe9ba3e3",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/swift_native_differential.rs"
+    },
+    {
+      "id": "swift-routing_control",
+      "language": "swift",
+      "source": "func f() -> Int { return 1 }",
+      "source_sha256": "801ad1ca001cb1b9010b2726c88c082dfaf2b1cd6e7f2c837eaa7c575c6146fb",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "swift-struct",
+      "language": "swift",
+      "source": "struct Point { let x: Int; let y: Int }\n",
+      "source_sha256": "11e8c55552e6c33afa89255bb4ce4765f5841203a1d4f9edf7a0847bfaf4a69d",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/swift_native_differential.rs"
+    },
+    {
+      "id": "swift-unclosed_string",
+      "language": "swift",
+      "source": "let s = \"oops\n",
+      "source_sha256": "3e3d1ae76ad18d9872e5338b552d97c2883eab7ae26454acc3edced8ac41a1f8",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/swift_native_differential.rs"
+    },
+    {
+      "id": "terraform-routing_control",
+      "language": "terraform",
+      "source": "resource \"x\" \"y\" { foo = \"bar\" }",
+      "source_sha256": "0e417d8ad167a1c668a8bbdcfea221c964997b76595acf9f2c973ee7f39b96fb",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "tsx-routing_control",
+      "language": "tsx",
+      "source": "const C = () => <div />;",
+      "source_sha256": "83eab057ec4a1fd9c35b179000157110476b67bc7fcc84a569d6c64be640c703",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "typescript-routing_control",
+      "language": "typescript",
+      "source": "const value: number = 1;",
+      "source_sha256": "82aa312c87cb5de7738701636ed51e18ffaf408952690313f06390623c3397e9",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "vbnet-routing_control",
+      "language": "vbnet",
+      "source": "Public Class C\n    Public Function F() As Integer\n        Return 1\n    End Function\nEnd Class\n",
+      "source_sha256": "6610483f57f7278ccbbc4dac06db3e46c359ace7d498d9817b0d0af5b03894e8",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "vbnet-unindented_method",
+      "language": "vbnet",
+      "source": "Public Class C\nPublic Function F() As Integer\nReturn 1\nEnd Function\nEnd Class\n",
+      "source_sha256": "79c9fffb476cab9bcba2eb800fea0ff352bbd665dcd3844d17f6353a2818f7a8",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "tests/acceptance/vbnet-unindented-method-false-positive.md"
+    },
+    {
+      "id": "zig-empty_enum",
+      "language": "zig",
+      "source": "const E = enum {};\n",
+      "source_sha256": "9b6007663f861cb70b461f7f440f2225bf61a6f5ae59bb91540dda7e231f1cd1",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/zig_native_differential.rs"
+    },
+    {
+      "id": "zig-empty_opaque",
+      "language": "zig",
+      "source": "const O = opaque {};\n",
+      "source_sha256": "1cf046079ec2ed136cc35a05340af421ee3d008c824c068b6f25aeb7364c5f53",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/zig_native_differential.rs"
+    },
+    {
+      "id": "zig-empty_struct",
+      "language": "zig",
+      "source": "const S = struct {};\n",
+      "source_sha256": "7497bdc89d80de1356d699db795e5b41b4c5ca92ba1cce021f5404c09e0c5d27",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/zig_native_differential.rs"
+    },
+    {
+      "id": "zig-empty_union",
+      "language": "zig",
+      "source": "const U = union(enum) {};\n",
+      "source_sha256": "7d468904d15c50ddd7874c2a390249100be34ea25e3af17e8b366ca312862087",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/zig_native_differential.rs"
+    },
+    {
+      "id": "zig-function",
+      "language": "zig",
+      "source": "fn add(a: i32, b: i32) i32 { return a + b; }\n",
+      "source_sha256": "5aa432776125ce7292054ad6f70042a42305ffc44f39033262c16624594f71d5",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/zig_native_differential.rs"
+    },
+    {
+      "id": "zig-missing_brace",
+      "language": "zig",
+      "source": "const S = struct {\n",
+      "source_sha256": "ee324f7a5cf2fb0ddc198ee138c0c66780c101d284c462bbdf76e16d273dbcd8",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/zig_native_differential.rs"
+    },
+    {
+      "id": "zig-missing_initializer",
+      "language": "zig",
+      "source": "const value = ;\n",
+      "source_sha256": "d7cebf5313d0374fc4c489f794d144a9b78bf93f845e956878611329ef93d745",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/zig_native_differential.rs"
+    },
+    {
+      "id": "zig-missing_paren",
+      "language": "zig",
+      "source": "fn add(a: i32, b: i32 i32 { return a + b; }\n",
+      "source_sha256": "88553274a824bc7dfd4df81a47fffb927061ac4ce0e2c93f132cf9eaca1b36c5",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/zig_native_differential.rs"
+    },
+    {
+      "id": "zig-nested_container",
+      "language": "zig",
+      "source": "const S = struct { const Inner = struct {}; };\n",
+      "source_sha256": "a29827a59153bab9eb8bc0d80c4c28269169316104ef4fb63c72a413d33c7764",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/zig_native_differential.rs"
+    },
+    {
+      "id": "zig-routing_control",
+      "language": "zig",
+      "source": "const Empty = struct {};\n",
+      "source_sha256": "971f41f2fce93bfa4d874c28649d3ce3aa92fc0fe5946a47a23a3bd623272129",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs"
+    },
+    {
+      "id": "zig-unicode_string",
+      "language": "zig",
+      "source": "const label = \"你好 Zig\";\n",
+      "source_sha256": "3231ec7fa4b7445682c45b716c14729ac8620e75f835776e7e833c03dc87526c",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/zig_native_differential.rs"
+    },
+    {
+      "id": "zig-unterminated_string",
+      "language": "zig",
+      "source": "const label = \"hello;\n",
+      "source_sha256": "5509d6e9c5b34736e3d0ff209815466ce17c3077152fe3999b682feda0d25dd7",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "crates/codeguard-cli/tests/zig_native_differential.rs"
+    }
+  ]
+}

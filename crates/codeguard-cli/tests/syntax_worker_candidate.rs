@@ -54,6 +54,92 @@ fn clean_candidate_cannot_be_promoted_to_clean() {
 }
 
 #[test]
+fn go_whole_file_rule_stays_separate_and_forged_worker_frames_are_rejected() {
+    use std::io::Write;
+    use std::process::{Command, Stdio};
+    let source = b"func f() {}\n";
+    let executable = env!("CARGO_BIN_EXE_codeguard");
+    let mut child = Command::new(executable)
+        .args(["__syntax-worker", "go"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .spawn()
+        .unwrap();
+    child.stdin.take().unwrap().write_all(source).unwrap();
+    let out = child.wait_with_output().unwrap();
+    assert!(out.status.success());
+    let original: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(original["schema_version"], "1.2.0");
+    assert_eq!(original["recoveries"], serde_json::json!([]));
+    assert_eq!(
+        original["structural_observations"][0]["rule_id"],
+        "codeguard.go.required_package"
+    );
+    for edit in [
+        "old_version",
+        "wrong_rule",
+        "wrong_hash",
+        "position",
+        "duplicate",
+        "unknown_field",
+    ] {
+        let mut value = original.clone();
+        match edit {
+            "old_version" => value["schema_version"] = serde_json::json!("1.1.0"),
+            "wrong_rule" => {
+                value["structural_observations"][0]["rule_id"] =
+                    serde_json::json!("codeguard.python.required_suite")
+            }
+            "wrong_hash" => {
+                value["structural_observations"][0]["rule_sha256"] =
+                    serde_json::json!("0".repeat(64))
+            }
+            "position" => {
+                value["structural_observations"][0]["start_byte"] = serde_json::json!(1);
+                value["structural_observations"][0]["end_byte"] = serde_json::json!(1);
+                value["structural_observations"][0]["start_column_byte"] = serde_json::json!(1);
+                value["structural_observations"][0]["end_column_byte"] = serde_json::json!(1);
+            }
+            "duplicate" => {
+                let duplicate = value["structural_observations"][0].clone();
+                value["structural_observations"]
+                    .as_array_mut()
+                    .unwrap()
+                    .push(duplicate);
+            }
+            _ => value["approved"] = serde_json::json!(true),
+        }
+        let quoted = value.to_string().replace('\'', "'\\''");
+        let fake = fake_worker(&format!("printf '%s' '{quoted}'"));
+        assert!(
+            run_syntax_worker_candidate(
+                &fake,
+                "go",
+                "main.go",
+                source,
+                deadline(),
+                &AtomicBool::new(false)
+            )
+            .is_err(),
+            "{edit}"
+        );
+        fs::remove_file(fake).unwrap();
+    }
+    let valid = run_syntax_worker_candidate(
+        executable.as_ref(),
+        "go",
+        "main.go",
+        source,
+        deadline(),
+        &AtomicBool::new(false),
+    )
+    .unwrap();
+    assert_eq!(valid.structural_observations.len(), 1);
+    assert!(valid.recoveries.is_empty());
+    assert_eq!(valid.precheck.status, SyntaxPrecheckStatus::Incomplete);
+}
+
+#[test]
 fn adapted_zig_asset_preserves_candidate_status_and_empty_container_syntax() {
     let result = run_syntax_worker_candidate(
         env!("CARGO_BIN_EXE_codeguard").as_ref(),

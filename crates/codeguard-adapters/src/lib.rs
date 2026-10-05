@@ -5,6 +5,10 @@ use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashSet};
 
 mod capability_validation;
+mod python_suite_rule;
+pub use python_suite_rule::{is_required_python_suite_parent, python_suite_rule_sha256};
+mod go_package_rule;
+pub use go_package_rule::{go_package_rule_sha256, missing_go_package_candidate};
 mod cargo_audit;
 mod cargo_build;
 pub use cargo_audit::{
@@ -39,11 +43,15 @@ mod npm_audit_component;
 mod npm_audit_config;
 pub use npm_audit_command::NpmAuditCommand;
 pub use npm_audit_config::inspect_npm_audit_config;
+mod grammar_test_corpus;
+mod grammar_test_sample;
 mod npm_audit_json;
 mod npm_audit_observation;
 mod source_map;
 mod source_mapped_recovery;
 mod strict_json;
+pub use grammar_test_corpus::parse_grammar_test_corpus;
+pub use grammar_test_sample::GrammarTestSample;
 mod syntax_precheck_candidate_report;
 pub use eslint_config_state::EslintConfigState;
 pub use eslint_local_candidate::EslintLocalCandidate;
@@ -64,6 +72,10 @@ mod eslint_json;
 mod eslint_message_report;
 mod eslint_parsed;
 mod go_candidate;
+mod ruby_candidate;
+mod ruby_candidate_profile;
+mod ruby_candidate_slot;
+mod ruby_candidate_tool;
 mod grammar_asset_manifest;
 mod legacy_dylink_compat;
 mod zig_wasm_compat;
@@ -381,3 +393,25 @@ mod go_finding_identity;
 pub use go_finding_identity::go_finding_record;
 mod rustdoc_finding_identity;
 pub use rustdoc_finding_identity::rustdoc_finding_record;
+
+mod kotlin_diagnostic;
+mod kotlin_diagnostics;
+mod kotlin_parsed;
+pub use kotlin_diagnostic::KotlinDiagnostic;
+pub use kotlin_diagnostics::parse_kotlin_diagnostics;
+pub use kotlin_parsed::KotlinParsed;
+
+mod kotlin_native_observation;
+pub use kotlin_native_observation::valid_kotlin_native_observation;
+
+pub use ruby_candidate::{bundled_ruby_candidate_profile, parse_ruby_candidate_profile};
+pub use ruby_candidate_profile::RubyCandidateProfile;
+pub use ruby_candidate_slot::RubyCandidateSlot;
+pub use ruby_candidate_tool::RubyCandidateTool;
+
+mod shellcheck_diagnostic;
+mod shellcheck_parsed;
+mod shellcheck_json;
+pub use shellcheck_diagnostic::ShellCheckDiagnostic;
+pub use shellcheck_parsed::ShellCheckParsed;
+pub use shellcheck_json::parse_shellcheck_json1;

@@ -1,0 +1,19 @@
+{
+  "authority": "host_context_verified",
+  "delivery_decision": "not_evaluated",
+  "event_ref": ".codeguard/findings/CG-B-875b1ae220798b5e6689391844d7da2f/events/lifecycle-event-094e852cc9144bcc0ba195dfdc046b02502b25e41a5791a23dc92de5806d4503.json",
+  "evidence_ref": ".codeguard/state/resolution_evidence/135fd052353e4df7d7baa545ac9c754f396a97cef4bee41b2a8b9c2791b8f640.json",
+  "evidence_sha256": "135fd052353e4df7d7baa545ac9c754f396a97cef4bee41b2a8b9c2791b8f640",
+  "identity": {
+    "checker_id": "syntax.native_confirmation",
+    "scope": "app.go",
+    "task_id": "CG-B-875b1ae220798b5e6689391844d7da2f",
+    "workspace_id": "ws-b41c3cb5e98d81f4b5606ea52008494c"
+  },
+  "outcome": "code_fixed",
+  "policy_revision": "p1",
+  "policy_sha256": "b13a650a0ea74dfd3d74ed375475d1cb8ed2f3816eedd154f4772cf70612f68f",
+  "report_type": "task_resolution_receipt",
+  "schema_version": "0.1.0",
+  "state": "resolved"
+}

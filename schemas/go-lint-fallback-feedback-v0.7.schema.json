@@ -1,0 +1,694 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:go-lint-fallback-feedback:0.7.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "language",
+    "command_status",
+    "exit_code",
+    "authority",
+    "coverage_proven",
+    "delivery_decision",
+    "tool_selection",
+    "native_report",
+    "syntax_candidates",
+    "syntax_tasks",
+    "preliminary_result",
+    "native_tool_requirement",
+    "next_actions"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.7.0"
+    },
+    "report_type": {
+      "const": "go_lint_fallback_feedback"
+    },
+    "operation": {
+      "const": "lint"
+    },
+    "language": {
+      "const": "go"
+    },
+    "command_status": {
+      "const": "incomplete"
+    },
+    "exit_code": {
+      "const": 3
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "tool_selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "executable"
+      ],
+      "properties": {
+        "source": {
+          "const": "not_found"
+        },
+        "executable": {
+          "type": "null"
+        }
+      }
+    },
+    "native_report": {
+      "allOf": [
+        {
+          "$ref": "go-lint-local-feedback.schema.json"
+        },
+        {
+          "properties": {
+            "native_status": {
+              "const": "incomplete"
+            },
+            "reason": {
+              "const": "go_tool_not_selected"
+            },
+            "tool_sha256": {
+              "type": "null"
+            },
+            "schema_version": {
+              "const": "0.6.0"
+            },
+            "native_tool_version": {
+              "type": "null"
+            },
+            "native_diagnostic_count": {
+              "const": 0
+            },
+            "findings": {
+              "maxItems": 0
+            }
+          }
+        }
+      ]
+    },
+    "syntax_candidates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason",
+        "execution_phase",
+        "authority",
+        "delivery_decision",
+        "source_file_count",
+        "skipped_count",
+        "unrouted_count",
+        "native_preferred_count",
+        "observations",
+        "next_action"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "not_run",
+            "attempted_incomplete",
+            "observed_partial"
+          ]
+        },
+        "reason": {
+          "enum": [
+            "source_or_scope_changed",
+            "request_cancelled",
+            "worker_executable_unavailable",
+            "grammar_manifest_invalid",
+            "bounded_scope",
+            "unrouted_source",
+            "candidate_unavailable",
+            "candidate_unqualified",
+            "native_preferred",
+            "binary_without_wasm_precheck",
+            "wasm_feature_not_built",
+            "grammar_registry_unavailable",
+            "go_source_discovery_incomplete"
+          ]
+        },
+        "execution_phase": {
+          "const": "after_native"
+        },
+        "authority": {
+          "const": "candidate_unqualified"
+        },
+        "delivery_decision": {
+          "const": "incomplete"
+        },
+        "source_file_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "skipped_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unrouted_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "native_preferred_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "next_action": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observations": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "language",
+              "scope",
+              "byte_offset",
+              "status",
+              "reason",
+              "grammar_qualified",
+              "source_sha256",
+              "grammar_sha256",
+              "recovery_count",
+              "recoveries",
+              "known_limitations"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "language": {
+                "enum": [
+                  "go",
+                  null
+                ]
+              },
+              "scope": {
+                "const": "whole_file"
+              },
+              "byte_offset": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "status": {
+                "enum": [
+                  "candidate_observed",
+                  "candidate_unavailable"
+                ]
+              },
+              "reason": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "grammar_qualified": {
+                "const": false
+              },
+              "source_sha256": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "grammar_sha256": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "recovery_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "known_limitations": {
+                "type": "array",
+                "maxItems": 8,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024
+                }
+              },
+              "recoveries": {
+                "type": "array",
+                "maxItems": 8,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "kind",
+                    "syntax_kind",
+                    "start_byte",
+                    "end_byte",
+                    "start_row",
+                    "start_column_byte",
+                    "end_row",
+                    "end_column_byte"
+                  ],
+                  "properties": {
+                    "kind": {
+                      "enum": [
+                        "ERROR",
+                        "MISSING"
+                      ]
+                    },
+                    "syntax_kind": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "start_byte": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "end_byte": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "start_row": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "start_column_byte": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "end_row": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "end_column_byte": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                }
+              },
+              "structural_observation_count": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 128
+              },
+              "structural_observations": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 8,
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "basis",
+                        "rule_id",
+                        "rule_version",
+                        "rule_sha256",
+                        "parent_syntax_kind",
+                        "start_byte",
+                        "end_byte",
+                        "start_row",
+                        "start_column_byte",
+                        "end_row",
+                        "end_column_byte"
+                      ],
+                      "properties": {
+                        "basis": {
+                          "const": "codeguard_structure_rule"
+                        },
+                        "rule_id": {
+                          "const": "codeguard.python.required_suite"
+                        },
+                        "rule_version": {
+                          "const": "1.0.0"
+                        },
+                        "rule_sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "parent_syntax_kind": {
+                          "enum": [
+                            "function_definition",
+                            "class_definition",
+                            "if_statement",
+                            "elif_clause",
+                            "else_clause",
+                            "for_statement",
+                            "while_statement",
+                            "try_statement",
+                            "except_clause",
+                            "finally_clause",
+                            "with_statement",
+                            "match_statement",
+                            "case_clause"
+                          ]
+                        },
+                        "start_byte": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "end_byte": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "start_row": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "start_column_byte": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "end_row": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "end_column_byte": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      }
+                    },
+                    {
+                      "$ref": "grammar-probe-v0.3.schema.json#/$defs/structure"
+                    }
+                  ]
+                }
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "structural_observation_count"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "structural_observations"
+                      ]
+                    }
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "structural_observation_count",
+                    "structural_observations"
+                  ],
+                  "properties": {
+                    "language": {
+                      "enum": [
+                        "python",
+                        "go"
+                      ]
+                    },
+                    "scope": {
+                      "const": "whole_file"
+                    },
+                    "byte_offset": {
+                      "const": 0
+                    },
+                    "status": {
+                      "const": "candidate_observed"
+                    },
+                    "recovery_count": {
+                      "maximum": 128
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "language": {
+                      "const": "python"
+                    }
+                  },
+                  "required": [
+                    "language"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "structural_observations": {
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                          "basis",
+                          "rule_id",
+                          "rule_version",
+                          "rule_sha256",
+                          "parent_syntax_kind",
+                          "start_byte",
+                          "end_byte",
+                          "start_row",
+                          "start_column_byte",
+                          "end_row",
+                          "end_column_byte"
+                        ],
+                        "properties": {
+                          "basis": {
+                            "const": "codeguard_structure_rule"
+                          },
+                          "rule_id": {
+                            "const": "codeguard.python.required_suite"
+                          },
+                          "rule_version": {
+                            "const": "1.0.0"
+                          },
+                          "rule_sha256": {
+                            "type": "string",
+                            "pattern": "^[0-9a-f]{64}$"
+                          },
+                          "parent_syntax_kind": {
+                            "enum": [
+                              "function_definition",
+                              "class_definition",
+                              "if_statement",
+                              "elif_clause",
+                              "else_clause",
+                              "for_statement",
+                              "while_statement",
+                              "try_statement",
+                              "except_clause",
+                              "finally_clause",
+                              "with_statement",
+                              "match_statement",
+                              "case_clause"
+                            ]
+                          },
+                          "start_byte": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "end_byte": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "start_row": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "start_column_byte": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "end_row": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "end_column_byte": {
+                            "type": "integer",
+                            "minimum": 0
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "language": {
+                      "const": "go"
+                    }
+                  },
+                  "required": [
+                    "language"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "structural_observations": {
+                      "items": {
+                        "$ref": "grammar-probe-v0.3.schema.json#/$defs/structure"
+                      },
+                      "maxItems": 1
+                    },
+                    "structural_observation_count": {
+                      "const": 1
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "language": {
+                      "type": "null"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "status": {
+                      "const": "candidate_unavailable"
+                    },
+                    "source_sha256": {
+                      "type": "null"
+                    },
+                    "grammar_sha256": {
+                      "type": "null"
+                    },
+                    "recovery_count": {
+                      "const": 0
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "status": {
+                      "const": "candidate_observed"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "language": {
+                      "const": "go"
+                    },
+                    "source_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "grammar_sha256": {
+                      "const": "4eda5d91c99ca981e88bc7d3d33f0db166b4bab0a84d0021a9abf39b364c78ef"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "syntax_tasks": {
+      "$ref": "check-feedback-v0.46.schema.json#/properties/syntax_tasks"
+    },
+    "preliminary_result": {
+      "enum": [
+        "candidates_observed",
+        "no_candidates_observed",
+        "incomplete"
+      ]
+    },
+    "native_tool_requirement": {
+      "enum": [
+        "required",
+        "recommended"
+      ]
+    },
+    "next_actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "$defs": {},
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "preliminary_result": {
+            "const": "no_candidates_observed"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "native_tool_requirement": {
+            "const": "recommended"
+          },
+          "syntax_candidates": {
+            "properties": {
+              "status": {
+                "const": "observed_partial"
+              },
+              "source_file_count": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "skipped_count": {
+                "const": 0
+              },
+              "unrouted_count": {
+                "const": 0
+              },
+              "observations": {
+                "minItems": 1,
+                "items": {
+                  "properties": {
+                    "status": {
+                      "const": "candidate_observed"
+                    },
+                    "reason": {
+                      "type": "null"
+                    },
+                    "recovery_count": {
+                      "const": 0
+                    },
+                    "structural_observation_count": {
+                      "const": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "native_tool_requirement": {
+            "const": "required"
+          }
+        }
+      }
+    }
+  ]
+}

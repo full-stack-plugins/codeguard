@@ -18,6 +18,7 @@ use crate::java_cve_attribution::attach_candidates;
 use crate::java_cve_scan::{
     NativeContext as CveNativeContext, observe_project as observe_cve_project,
 };
+use crate::java_p3c_command::has_projectable_findings;
 use crate::java_p3c_scan::{NativeContext, observe_project};
 use crate::next_command::read_task_brief;
 use crate::python_lint_command::scan_local_report_with_deadline;
@@ -34,6 +35,11 @@ struct Arguments {
     npm_options: std::collections::BTreeMap<String, String>,
     root: PathBuf,
     ruff_tool: Option<PathBuf>,
+    zig_tool: Option<PathBuf>,
+    erl_tool: Option<PathBuf>,
+    swift_tool: Option<PathBuf>,
+    ruby_tool: Option<PathBuf>,
+    kotlinc_tool: Option<PathBuf>,
     cargo_tool: Option<PathBuf>,
     cargo_audit_tool: Option<PathBuf>,
     rustsec_db: Option<PathBuf>,
@@ -85,6 +91,51 @@ pub fn run(args: &[String]) -> ExitCode {
         Ok(brief) => brief,
         Err(reason) => return print_unavailable(&parsed, reason),
     };
+    let python_confirmation = brief["checker_id"] == "python.ruff"
+        && brief["reason_code"] == "python_syntax_confirmation_needed";
+    let python_original = if python_confirmation {
+        match crate::python_confirmation_recheck::original_reference(&root, &brief) {
+            Ok(reference) => Some(reference),
+            Err(reason) => return print_unavailable(&parsed, reason),
+        }
+    } else {
+        None
+    };
+    let syntax_task = brief["checker_id"] == "syntax.native_confirmation";
+    if (parsed.zig_tool.is_some()
+        || parsed.erl_tool.is_some()
+        || parsed.swift_tool.is_some()
+        || parsed.ruby_tool.is_some()
+        || parsed.kotlinc_tool.is_some())
+        && !syntax_task
+    {
+        eprintln!("语法工具参数仅用于对应的原生语法确认任务");
+        return ExitCode::from(2);
+    }
+    // 语言与工具在租约及原生启动前核对，不能先取得租约再发现错参。
+    if syntax_task
+        && (parsed.zig_tool.is_some()
+            || parsed.erl_tool.is_some()
+            || parsed.swift_tool.is_some()
+            || parsed.ruby_tool.is_some()
+            || parsed.kotlinc_tool.is_some()
+            || parsed.go_tool.is_some())
+    {
+        let original = match crate::syntax_task_recheck::original(&root, &brief) {
+            Ok(original) => original,
+            Err(reason) => return print_unavailable(&parsed, reason),
+        };
+        if (parsed.zig_tool.is_some() && original["language"] != "zig")
+            || (parsed.erl_tool.is_some() && original["language"] != "erlang")
+            || (parsed.swift_tool.is_some() && original["language"] != "swift")
+            || (parsed.ruby_tool.is_some() && original["language"] != "ruby")
+            || (parsed.kotlinc_tool.is_some() && original["language"] != "kotlin")
+            || (parsed.go_tool.is_some() && original["language"] != "go")
+        {
+            eprintln!("原生语法工具不匹配任务语言");
+            return ExitCode::from(2);
+        }
+    }
     let npm_task = brief["checker_id"] == "node.npm.audit";
     if !npm_task && !parsed.npm_options.is_empty() {
         eprintln!("npm 参数仅用于对应任务");
@@ -114,7 +165,7 @@ pub fn run(args: &[String]) -> ExitCode {
         eprintln!("Checkstyle 参数仅用于相应任务复检");
         return ExitCode::from(2);
     }
-    if parsed.go_tool.is_some() && brief["checker_id"] != "go.vet" {
+    if parsed.go_tool.is_some() && brief["checker_id"] != "go.vet" && !syntax_task {
         eprintln!("--go-tool 仅用于 Go 任务复检");
         return ExitCode::from(2);
     }
@@ -182,7 +233,39 @@ pub fn run(args: &[String]) -> ExitCode {
     } else {
         None
     };
-    let mut scan = if npm_task {
+    let mut scan = if syntax_task {
+        let recheck = if crate::syntax_task_recheck::original(&root, &brief)
+            .is_ok_and(|original| original["language"] == "go")
+        {
+            crate::syntax_task_recheck::run_go(&root, &brief, parsed.go_tool.as_deref(), deadline)
+        } else if crate::syntax_task_recheck::original(&root, &brief)
+            .is_ok_and(|original| original["language"] == "ruby")
+        {
+            crate::syntax_task_recheck::run_ruby(
+                &root,
+                &brief,
+                parsed.ruby_tool.as_deref(),
+                deadline,
+            )
+        } else {
+            crate::syntax_task_recheck::run(
+                &root,
+                &brief,
+                parsed.zig_tool.as_deref(),
+                parsed.erl_tool.as_deref(),
+                parsed.swift_tool.as_deref(),
+                parsed.kotlinc_tool.as_deref(),
+                deadline,
+            )
+        };
+        match recheck {
+            Ok(report) => report,
+            Err(reason) => {
+                let release = finish_verification(&root, &parsed.task_id, &lease);
+                return print_unavailable(&parsed, release.err().unwrap_or(reason));
+            }
+        }
+    } else if npm_task {
         let mut options = parsed.npm_options.clone();
         options.extend(parsed.eslint_options.clone());
         match crate::npm_task_recheck::run(&root, &brief, &options, deadline) {
@@ -420,6 +503,46 @@ pub fn run(args: &[String]) -> ExitCode {
                 return print_unavailable(&parsed, release.err().unwrap_or(reason));
             }
         }
+    } else if python_confirmation {
+        let path = brief["scope"].as_str().expect("已核验首次Python范围");
+        let source = root.join(path);
+        let before = if source.canonicalize().ok().as_deref() == Some(source.as_path()) {
+            read_bounded_regular_file(&source, 1024 * 1024).ok()
+        } else {
+            None
+        };
+        let Some(before) = before else {
+            let release = finish_verification(&root, &parsed.task_id, &lease);
+            return print_unavailable(
+                &parsed,
+                release
+                    .err()
+                    .unwrap_or("python_confirmation_source_unavailable"),
+            );
+        };
+        match crate::python_lint_command::scan_local_report_scoped_with_deadline(
+            &root,
+            parsed.ruff_tool.as_deref(),
+            Some(&[path.to_owned()]),
+            deadline,
+            &std::sync::atomic::AtomicBool::new(false),
+        ) {
+            Ok(mut report) => {
+                report["schema_version"] = json!("0.19.0");
+                report["task_scope"] = json!("single_python_confirmation_file");
+                report["task_binding"] = json!({"task_id":parsed.task_id,"path":path,
+                    "source_sha256":crate::python_confirmation_recheck::digest(&before),
+                    "original_report":python_original});
+                report["task_input_stable"] = json!(
+                    crate::python_confirmation_recheck::inputs_current(&root, &report)
+                );
+                report
+            }
+            Err(reason) => {
+                let release = finish_verification(&root, &parsed.task_id, &lease);
+                return print_unavailable(&parsed, release.err().unwrap_or(reason));
+            }
+        }
     } else if brief["checker_id"] == "python.ruff" {
         match scan_local_report_with_deadline(
             &root,
@@ -516,7 +639,9 @@ pub fn run(args: &[String]) -> ExitCode {
     let outcome = if Instant::now() >= deadline || scan["task_input_stable"] == false {
         "incomplete"
     } else {
-        if npm_task {
+        if syntax_task {
+            crate::syntax_task_recheck::classify(&scan)
+        } else if npm_task {
             crate::npm_task_recheck::classify(&root, &brief, &scan)
         } else if eslint_task {
             crate::eslint_task_recheck::classify(&brief, &scan)
@@ -556,6 +681,25 @@ pub fn run(args: &[String]) -> ExitCode {
         "execution_budget":budget_record(parsed.timeout_ms, parsed.timeout_source),
         "next_actions":["inspect_native_recheck_and_policy_before_closure"]
     });
+    if syntax_task {
+        report["schema_version"] = json!(match report["native_scan"]["schema_version"].as_str() {
+            Some("0.10.0") => "0.23.0",
+            Some("0.9.0") => "0.22.0",
+            Some("0.8.0") => "0.19.0",
+            Some("0.7.0") => "0.18.0",
+            Some("0.6.0") => "0.17.0",
+            Some("0.5.0") => "0.16.0",
+            Some("0.4.0") => "0.15.0",
+            Some("0.3.0") => "0.14.0",
+            Some("0.2.0") => "0.13.0",
+            _ => "0.12.0",
+        });
+        report["next_actions"] = json!([
+            "inspect_native_syntax_observation",
+            "repair_only_current_native_diagnostics",
+            "verify_policy_and_capability_before_closure"
+        ]);
+    }
     if npm_task {
         report["next_actions"] = json!([
             "inspect_npm_native_diagnostic",
@@ -572,7 +716,11 @@ pub fn run(args: &[String]) -> ExitCode {
     } else if brief["checker_id"] == "rust.cargo_rustdoc" {
         report["schema_version"] = json!("0.7.0");
     } else if brief["checker_id"] == "python.ruff" {
-        report["schema_version"] = json!("0.9.0");
+        report["schema_version"] = json!(if python_confirmation {
+            "0.21.0"
+        } else {
+            "0.9.0"
+        });
     }
     let persist = if codeguard_runtime::sigint_cancellation_requested() {
         Err("request_cancelled")
@@ -582,7 +730,16 @@ pub fn run(args: &[String]) -> ExitCode {
         match lock_verification(&root, &parsed.task_id, &lease) {
             Ok(_guard) => match latest_ready_attempt(&root, &parsed.task_id) {
                 Ok(current) if current == bound_attempt => {
-                    if (npm_task && !crate::npm_task_recheck::inputs_current(&root, &scan))
+                    if (python_confirmation
+                        && (!crate::python_confirmation_recheck::valid_binding(&root, &scan)
+                            || (scan["task_input_stable"] == true
+                                && !crate::python_confirmation_recheck::inputs_current(
+                                    &root, &scan,
+                                ))))
+                        || (syntax_task
+                            && scan["input_stable"] == true
+                            && !crate::syntax_task_recheck::inputs_current(&root, &scan))
+                        || (npm_task && !crate::npm_task_recheck::inputs_current(&root, &scan))
                         || (brief["checker_id"] == "rust.cargo_check"
                             && scan["input_stable"] == true
                             && !crate::rust_build_task_recheck::inputs_current(&root, &scan))
@@ -618,7 +775,11 @@ pub fn run(args: &[String]) -> ExitCode {
     if let Err(reason) = persist {
         if reason == "source_changed_before_verification_record" {
             report["observation"] = json!("incomplete");
-            report["native_scan"]["task_input_stable"] = json!(false);
+            report["native_scan"][if syntax_task {
+                "input_stable"
+            } else {
+                "task_input_stable"
+            }] = json!(false);
         }
         report["reason"] = json!(reason);
     } else {
@@ -666,6 +827,55 @@ pub fn run(args: &[String]) -> ExitCode {
         }
         if !report["reason"].is_null() {
             println!("记录原因：{}", report["reason"]);
+        }
+        if python_confirmation {
+            println!(
+                "复检范围：{}（仅首次Python确认文件）；首次报告：{}；输入一致：{}",
+                report["native_scan"]["task_binding"]["path"],
+                report["native_scan"]["task_binding"]["original_report"]["run_id"],
+                report["native_scan"]["task_input_stable"]
+            );
+            for file in report["native_scan"]["files"]
+                .as_array()
+                .into_iter()
+                .flatten()
+            {
+                println!("原生状态：{}；原因：{}", file["run_status"], file["reason"]);
+                for finding in file["findings"].as_array().into_iter().flatten().take(8) {
+                    println!(
+                        "原生规则 {}；行 {}，Ruff原生列 {}",
+                        finding["rule_id"], finding["line"], finding["column"]
+                    );
+                }
+            }
+        }
+        if syntax_task {
+            println!(
+                "原生语法说明：{}；报告引用：.codeguard/reports/{}.json",
+                report["native_scan"]["native"]["reason"],
+                report["native_scan"]["run_id"]
+                    .as_str()
+                    .unwrap_or("unknown")
+            );
+            if report["native_scan"]["input_stable"] == true {
+                for position in report["native_scan"]["native"]["diagnostics"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                {
+                    println!(
+                        "原生规则 {}；行 {}，{} {}",
+                        position["rule_id"],
+                        position["line"],
+                        if report["native_scan"]["target"]["language"] == "erlang" {
+                            "字符列"
+                        } else {
+                            "字节列"
+                        },
+                        position["column"]
+                    );
+                }
+            }
         }
         if npm_task {
             println!(
@@ -857,7 +1067,13 @@ pub(crate) fn classify_java(brief: &Value, scan: &Value) -> &'static str {
     let Some(path) = brief["scope"].as_str() else {
         return "incomplete";
     };
-    if !valid_file(path) {
+    let partial_positive = files.iter().any(|file| {
+        file["path"] == path
+            && file["configuration"] == "configured"
+            && file["reason"] == "native_probe_returned"
+            && has_projectable_findings(&file["observation"])
+    });
+    if !valid_file(path) && !partial_positive {
         return "incomplete";
     }
     if scan["findings"].as_array().is_some_and(|findings| {
@@ -868,8 +1084,10 @@ pub(crate) fn classify_java(brief: &Value, scan: &Value) -> &'static str {
         })
     }) {
         "still_present"
-    } else {
+    } else if valid_file(path) {
         "rule_coverage_requires_review"
+    } else {
+        "incomplete"
     }
 }
 
@@ -1035,6 +1253,11 @@ pub(crate) fn classify_rust(brief: &Value, scan: &Value) -> &'static str {
         let audit = &scan["suppression_probe"];
         let probe = &audit["forced_scan"];
         let expected_command = format!(
+            "cargo clippy --locked --offline --all-targets --message-format=json -- --force-warn {}",
+            brief["native_rule_id"].as_str().unwrap_or("")
+        );
+        // 历史局部报告保持可读取；两个精确已知命令均不能签发可信关闭。
+        let legacy_command = format!(
             "cargo clippy --offline --all-targets --message-format=json -- --force-warn {}",
             brief["native_rule_id"].as_str().unwrap_or("")
         );
@@ -1053,7 +1276,8 @@ pub(crate) fn classify_rust(brief: &Value, scan: &Value) -> &'static str {
             || probe["tool_sha256"] != scan["tool_sha256"]
             || probe["manifest_sha256"] != scan["manifest_sha256"]
             || probe["scope"] != scan["scope"]
-            || probe["recheck_command"] != expected_command
+            || (probe["recheck_command"] != expected_command
+                && probe["recheck_command"] != legacy_command)
         {
             return "incomplete";
         }
@@ -1080,9 +1304,38 @@ fn valid_sha256(value: &str) -> bool {
 }
 
 pub(crate) fn classify(brief: &Value, scan: &Value) -> &'static str {
+    if matches!(scan["schema_version"].as_str(), Some("0.18.0" | "0.19.0"))
+        && scan["task_input_stable"] != true
+    {
+        return "incomplete";
+    }
     let Some(files) = scan["files"].as_array() else {
         return "incomplete";
     };
+    if scan["schema_version"] == "0.19.0"
+        && brief["kind"] == "blocker"
+        && brief["checker_id"] == "python.ruff"
+        && brief["reason_code"] == "python_syntax_confirmation_needed"
+    {
+        let Some(file) = files.iter().find(|file| file["path"] == brief["scope"]) else {
+            return "still_blocked";
+        };
+        if !matches!(
+            file["run_status"].as_str(),
+            Some("passed" | "findings" | "suppressed")
+        ) || !file["source_sha256"].as_str().is_some_and(valid_sha256)
+        {
+            return "still_blocked";
+        }
+        return if file["findings"]
+            .as_array()
+            .is_some_and(|rows| rows.iter().any(|row| row["rule_id"] == "invalid-syntax"))
+        {
+            "still_present"
+        } else {
+            "candidate_absent_unverified_policy"
+        };
+    }
     if brief["kind"] == "finding" {
         let Some(path) = brief["scope"].as_str() else {
             return "incomplete";
@@ -1147,7 +1400,7 @@ pub(crate) fn classify(brief: &Value, scan: &Value) -> &'static str {
     }
 }
 
-fn persist_observation(
+pub(crate) fn persist_observation(
     root: &Path,
     brief: &Value,
     scan: &Value,
@@ -1185,7 +1438,8 @@ fn persist_observation(
         &event,
         &state,
     )
-    .map_err(|_| "verification_event_write_failed")
+    .map_err(|_| "verification_event_write_failed")?;
+    crate::task_lifecycle_store::record_native_recurrence(root, brief, scan)
 }
 
 fn real_directory(path: &Path) -> bool {
@@ -1233,6 +1487,11 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
     let mut eslint_options = std::collections::BTreeMap::new();
     let mut npm_options = std::collections::BTreeMap::new();
     let mut ruff_tool = None;
+    let mut zig_tool = None;
+    let mut erl_tool = None;
+    let mut swift_tool = None;
+    let mut ruby_tool = None;
+    let mut kotlinc_tool = None;
     let mut cargo_tool = None;
     let mut cargo_audit_tool = None;
     let mut rustsec_db = None;
@@ -1269,6 +1528,11 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                 | "--cwd"
                 | "--format"
                 | "--ruff-tool"
+                | "--zig-tool"
+                | "--erl-tool"
+                | "--swift-tool"
+                | "--ruby-tool"
+                | "--kotlinc-tool"
                 | "--cargo-tool"
                 | "--cargo-audit-tool"
                 | "--rustsec-db"
@@ -1302,6 +1566,11 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                     timeout_seen = true;
                 }
                 "--ruff-tool" if ruff_tool.replace(PathBuf::from(value)).is_none() => {}
+                "--zig-tool" if zig_tool.replace(PathBuf::from(value)).is_none() => {}
+                "--erl-tool" if erl_tool.replace(PathBuf::from(value)).is_none() => {}
+                "--swift-tool" if swift_tool.replace(PathBuf::from(value)).is_none() => {}
+                "--ruby-tool" if ruby_tool.replace(PathBuf::from(value)).is_none() => {}
+                "--kotlinc-tool" if kotlinc_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--cargo-tool" if cargo_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--cargo-audit-tool"
                     if cargo_audit_tool.replace(PathBuf::from(value)).is_none() => {}
@@ -1331,6 +1600,24 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
             root = Some(PathBuf::from(arg));
         }
         index += 1;
+    }
+    if zig_tool.as_ref().is_some_and(|tool| !tool.is_absolute()) {
+        return Err("--zig-tool 必须是绝对路径".into());
+    }
+    if erl_tool.as_ref().is_some_and(|tool| !tool.is_absolute()) {
+        return Err("--erl-tool 必须是绝对路径".into());
+    }
+    if kotlinc_tool
+        .as_ref()
+        .is_some_and(|tool| !tool.is_absolute())
+    {
+        return Err("--kotlinc-tool 必须是绝对路径".into());
+    }
+    if ruby_tool.as_ref().is_some_and(|tool| !tool.is_absolute()) {
+        return Err("Ruby工具必须为绝对路径".into());
+    }
+    if swift_tool.as_ref().is_some_and(|tool| !tool.is_absolute()) {
+        return Err("--swift-tool 必须是绝对路径".into());
     }
     if ruff_tool.as_ref().is_some_and(|tool| !tool.is_absolute()) {
         return Err("--ruff-tool 必须是绝对路径".into());
@@ -1409,6 +1696,11 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
         npm_options,
         root: root.unwrap_or_else(|| PathBuf::from(".")),
         ruff_tool,
+        zig_tool,
+        erl_tool,
+        swift_tool,
+        ruby_tool,
+        kotlinc_tool,
         cargo_tool,
         cargo_audit_tool,
         rustsec_db,
@@ -1437,5 +1729,35 @@ fn parse_format(value: &str) -> Result<bool, String> {
         "json" => Ok(true),
         "human" => Ok(false),
         _ => Err(format!("不支持的格式：{value}")),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::classify;
+    use serde_json::json;
+    #[test]
+    fn python_confirmation_distinguishes_syntax_from_environment_and_style() {
+        let brief = json!({"kind":"blocker","checker_id":"python.ruff","reason_code":"python_syntax_confirmation_needed",
+            "scope":"broken.py","affected_paths":["broken.py"]});
+        let mut scan = json!({"schema_version":"0.19.0","task_input_stable":true,
+            "files":[{"path":"broken.py","run_status":"findings","source_sha256":"a".repeat(64),
+                "findings":[{"rule_id":"invalid-syntax"}]}]});
+        assert_eq!(classify(&brief, &scan), "still_present");
+        let mut historical = scan.clone();
+        historical["schema_version"] = json!("0.18.0");
+        assert_eq!(
+            classify(&brief, &historical),
+            "environment_restored_unverified_policy"
+        );
+        scan["files"][0]["findings"][0]["rule_id"] = json!("F401");
+        assert_eq!(
+            classify(&brief, &scan),
+            "candidate_absent_unverified_policy"
+        );
+        scan["files"][0]["run_status"] = json!("incomplete");
+        assert_eq!(classify(&brief, &scan), "still_blocked");
+        scan["task_input_stable"] = json!(false);
+        assert_eq!(classify(&brief, &scan), "incomplete");
     }
 }

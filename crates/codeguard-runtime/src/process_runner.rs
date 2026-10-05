@@ -13,6 +13,8 @@ use std::time::{Duration, Instant};
 pub struct ProcessOutcome {
     /// 真实终止原因。
     pub termination: Termination,
+    /// 启动失败的操作系统错误码；其余结果为空，不能冒充原生输出。
+    pub spawn_os_error: Option<i32>,
     /// 截断到共同预算的原始 stdout。
     pub stdout: Vec<u8>,
     /// 截断到共同预算的原始 stderr。
@@ -25,6 +27,7 @@ impl ProcessOutcome {
     fn empty(termination: Termination, started: Instant) -> Self {
         Self {
             termination,
+            spawn_os_error: None,
             stdout: Vec::new(),
             stderr: Vec::new(),
             elapsed: started.elapsed(),
@@ -133,7 +136,11 @@ fn run_unix(
     let _ = memory_limit_bytes;
     let mut child = match command.spawn() {
         Ok(child) => child,
-        Err(_) => return ProcessOutcome::empty(Termination::SpawnFailure, started),
+        Err(error) => {
+            let mut outcome = ProcessOutcome::empty(Termination::SpawnFailure, started);
+            outcome.spawn_os_error = error.raw_os_error();
+            return outcome;
+        }
     };
     let stdout = child.stdout.take().expect("stdout 已配置 pipe");
     let stderr = child.stderr.take().expect("stderr 已配置 pipe");
@@ -218,6 +225,7 @@ fn run_unix(
     );
     ProcessOutcome {
         termination,
+        spawn_os_error: None,
         stdout: stdout_result.map_or_else(Vec::new, |result| result.bytes),
         stderr: stderr_result.map_or_else(Vec::new, |result| result.bytes),
         elapsed: started.elapsed(),

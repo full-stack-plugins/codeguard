@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0.0",
+  "rule_id": "codeguard.python.required_suite",
+  "rule_version": "1.0.0",
+  "qualification": "candidate_unqualified",
+  "basis": "codeguard_structure_rule",
+  "language": "python",
+  "node_kind": "block",
+  "ignored_named_child_kind": "comment",
+  "required_parent_kinds": [
+    "function_definition",
+    "class_definition",
+    "if_statement",
+    "elif_clause",
+    "else_clause",
+    "for_statement",
+    "while_statement",
+    "try_statement",
+    "except_clause",
+    "finally_clause",
+    "with_statement",
+    "match_statement",
+    "case_clause"
+  ]
+}

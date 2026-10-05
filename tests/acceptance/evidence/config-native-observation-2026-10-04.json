@@ -1,0 +1,196 @@
+{
+  "authority": "unverified",
+  "command_status": "incomplete",
+  "diagnostics": [
+    "legacy_config_missing_or_migration_needed",
+    "tool_lock_missing",
+    "approved_quality_policy_unbound",
+    "whitelist_authority_unverified"
+  ],
+  "effective_policy": null,
+  "exit_code": 3,
+  "gate_effect": "none",
+  "inspection_status": "incomplete",
+  "legacy_config": {
+    "custom_command_count": 0,
+    "exclusion_count": 0,
+    "extension_count": 0,
+    "gate_scope": null,
+    "status": "missing"
+  },
+  "next_actions": [
+    "review_static_native_configuration_sources",
+    "resolve_effective_native_rules_and_suppressions_with_original_tools",
+    "migrate_legacy_configuration_explicitly",
+    "bind_protected_quality_policy_and_tool_lock",
+    "review_exact_whitelist_candidates_outside_project_writable_state"
+  ],
+  "operation": "explain",
+  "project_configuration": {
+    "basis": "static_project_discovery",
+    "blocked_path_count": 0,
+    "blocked_paths": [],
+    "build_root_count": 2,
+    "build_roots": [
+      {
+        "manifests": [
+          "java/pom.xml"
+        ],
+        "path": "java"
+      },
+      {
+        "manifests": [
+          "node/package.json"
+        ],
+        "path": "node"
+      }
+    ],
+    "checker_config_count": 2,
+    "checker_config_sha256": {
+      "node/eslint.config.js": "37a73898ccaeec9ac5e4b9a9691cd0937c1ad2151da536bde8161711ec4ab5ab",
+      "python/.ruff.toml": "68c24eedf047b27f5f50afd7326e2b9e6c3f3d2d0b5f2f5e0dc1d84572e3ee20"
+    },
+    "checker_configurations": [
+      {
+        "build_root": "java",
+        "category": "lint",
+        "checker_id": "java.maven.pmd",
+        "configuration": "configured",
+        "configuration_ref": "java/pom.xml",
+        "next_action": "运行对应原生检查并读取诊断",
+        "reason": "plugin_declared_in_build_plugins"
+      },
+      {
+        "build_root": "java",
+        "category": "lint",
+        "checker_id": "java.maven.p3c",
+        "configuration": "configured",
+        "configuration_ref": "java/pom.xml",
+        "next_action": "运行原生 Maven PMD 并核对 P3C 规则加载、目标覆盖和诊断",
+        "reason": "p3c_artifact_ruleset_and_error_policy_declared"
+      },
+      {
+        "build_root": "java",
+        "category": "lint",
+        "checker_id": "java.maven.checkstyle",
+        "configuration": "missing",
+        "configuration_ref": "java/pom.xml",
+        "next_action": "在项目中配置对应原生检查器或明确采用其他检查命令",
+        "reason": "plugin_not_declared"
+      },
+      {
+        "build_root": "java",
+        "category": "comments",
+        "checker_id": "java.maven.javadoc",
+        "configuration": "missing",
+        "configuration_ref": "java/pom.xml",
+        "next_action": "在项目中配置对应原生检查器或明确采用其他检查命令",
+        "reason": "plugin_not_declared"
+      },
+      {
+        "build_root": "java",
+        "category": "dependencies",
+        "checker_id": "java.maven.dependency",
+        "configuration": "missing",
+        "configuration_ref": "java/pom.xml",
+        "next_action": "在项目中配置对应原生检查器或明确采用其他检查命令",
+        "reason": "plugin_not_declared"
+      },
+      {
+        "build_root": "java",
+        "category": "cve",
+        "checker_id": "java.maven.dependency_check",
+        "configuration": "missing",
+        "configuration_ref": "java/pom.xml",
+        "next_action": "在项目中配置对应原生检查器或明确采用其他检查命令",
+        "reason": "plugin_not_declared"
+      },
+      {
+        "build_root": "java",
+        "category": "security",
+        "checker_id": "java.maven.findsecbugs",
+        "configuration": "missing",
+        "configuration_ref": "java/pom.xml",
+        "next_action": "在项目中配置对应原生检查器或明确采用其他检查命令",
+        "reason": "plugin_not_declared"
+      },
+      {
+        "build_root": "python",
+        "category": "lint",
+        "checker_id": "python.ruff",
+        "configuration": "configured",
+        "configuration_ref": "python/.ruff.toml",
+        "next_action": "用原生 Ruff 核对生效规则、扫描范围和诊断",
+        "reason": "explicit_ruff_lint_configuration"
+      },
+      {
+        "build_root": ".",
+        "category": "cve",
+        "checker_id": "python.pip_audit",
+        "configuration": "unknown",
+        "configuration_ref": ".",
+        "next_action": "定位当前 Python 项目的依赖清单或锁文件，再配置并运行原生漏洞检查",
+        "reason": "python_dependency_input_not_found"
+      },
+      {
+        "build_root": "node",
+        "category": "lint",
+        "checker_id": "node.eslint",
+        "configuration": "unknown",
+        "configuration_ref": "node/eslint.config.js",
+        "next_action": "确认项目原 ESLint 版本、调用参数及选中配置；用原生工具核验逐文件规则、parser/插件与导入闭包，不套用默认规则或自动迁移配置",
+        "reason": "eslint_dynamic_configuration_not_evaluated"
+      },
+      {
+        "build_root": "node",
+        "category": "cve",
+        "checker_id": "node.npm.audit",
+        "configuration": "missing",
+        "configuration_ref": "node/package.json",
+        "next_action": "核对项目原npm审计调用、工具版本、锁文件、配置及漏洞数据时效；不执行清单中的任意脚本、不用缺工具解释源码违规",
+        "reason": "npm_audit_script_not_observed"
+      }
+    ],
+    "checker_count": 11,
+    "effective_rules": "unresolved",
+    "manifest_count": 2,
+    "manifest_sha256": {
+      "java/pom.xml": "c7c7a6e169ac15a88d5267571169e91ba02f87c6f25be625eef9c257b2a7983f",
+      "node/package.json": "5f18e654f0212cc63651d8554ec6d2586c7dab12b61642553055fb8d95f70660"
+    },
+    "native_execution": "not_run",
+    "observation_status": "complete",
+    "suppressions": "unresolved",
+    "truncated": false,
+    "unknown_condition_count": 5,
+    "unknown_conditions": [
+      "version_not_declared:node/package.json",
+      "build_model_not_evaluated",
+      "some_manifest_metadata_not_parsed",
+      "source_sets_not_fully_classified",
+      "dialects_not_classified"
+    ]
+  },
+  "quality_decision": "not_evaluated",
+  "quality_policy": {
+    "candidate_sha256": null,
+    "required_check_count": 0,
+    "source_exclusion_count": 0,
+    "status": "unbound",
+    "tool_lock_reference": "not_checked"
+  },
+  "report_type": "config_inspection",
+  "request_id": "config-68927-1791091929572160000",
+  "schema_version": "0.3.0",
+  "tool_lock": {
+    "status": "missing",
+    "tool_count": 0
+  },
+  "warnings": [
+    "approved_quality_policy_unbound"
+  ],
+  "whitelist": {
+    "candidate_effect": "none",
+    "status": "authority_unverified"
+  }
+}

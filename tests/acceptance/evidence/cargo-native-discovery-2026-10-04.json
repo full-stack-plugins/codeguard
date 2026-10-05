@@ -1,0 +1,2348 @@
+{
+  "record_type": "cargo_native_discovery_acceptance",
+  "date": "2026-10-04",
+  "binary_sha256": "9883cad7d9385d2206aa7e53f9c6058ce206542bb20f0f911ac27ee59a54e963",
+  "cargo_entry": "/opt/homebrew/opt/rustup/bin/cargo",
+  "cargo_resolved_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+  "cargo_version": "cargo 1.98.1 (797e8a9bc 2026-08-05)",
+  "selected_installed_toolchain": "stable-aarch64-apple-darwin",
+  "product_precision_evaluated": false,
+  "cases": [
+    {
+      "case": "installed_path_cargo",
+      "oracle": "actual_installed_cargo",
+      "check_feedback": {
+        "authority": "local_unverified",
+        "category_candidates": [
+          {
+            "capability_status": "gap",
+            "category": "lint",
+            "checker_id": null,
+            "language": "rust",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "trusted_policy_and_coverage_unavailable",
+            "status": "observed_unverified"
+          },
+          {
+            "capability_status": "gap",
+            "category": "comments",
+            "checker_id": "rust.cargo_rustdoc",
+            "language": "rust",
+            "legacy_status": "stable",
+            "next_action": "按文档原生规则修复或恢复锁定离线环境；读取稳定任务并用同一Cargo复检，核验原配置和完整目标范围",
+            "reason": "trusted_policy_and_coverage_unavailable",
+            "status": "observed_unverified"
+          },
+          {
+            "capability_status": "gap",
+            "category": "dependencies",
+            "checker_id": null,
+            "language": "rust",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "cve",
+            "checker_id": "rust.cargo_audit",
+            "language": "rust",
+            "legacy_status": "stable",
+            "next_action": "核对原生漏洞及解析版本；补齐离线数据库身份和时效、受批准工具与策略，再用原工具复检",
+            "reason": "rust_cve_native_incomplete",
+            "status": "native_incomplete"
+          },
+          {
+            "capability_status": "gap",
+            "category": "security",
+            "checker_id": null,
+            "language": "rust",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "build",
+            "checker_id": "rust.cargo_check",
+            "language": "rust",
+            "legacy_status": "stable",
+            "next_action": "核对原生编译错误与锁定输入，读取稳定任务并用同一Cargo复检；类型检查不执行测试，完整构建组合和策略仍须核验",
+            "reason": "trusted_policy_and_coverage_unavailable",
+            "status": "observed_unverified"
+          },
+          {
+            "capability_status": "gap",
+            "category": "lint",
+            "checker_id": null,
+            "language": "toml",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "comments",
+            "checker_id": null,
+            "language": "toml",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "dependencies",
+            "checker_id": null,
+            "language": "toml",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "cve",
+            "checker_id": null,
+            "language": "toml",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "security",
+            "checker_id": null,
+            "language": "toml",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "build",
+            "checker_id": null,
+            "language": "toml",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          }
+        ],
+        "command_status": "incomplete",
+        "delivery_decision": "incomplete",
+        "discovery": {
+          "blocked_paths": [],
+          "build_roots": [
+            {
+              "manifests": [
+                "Cargo.toml"
+              ],
+              "path": "."
+            }
+          ],
+          "checker_configurations": [],
+          "declared_versions": {
+            "Cargo.toml": "0.1.0"
+          },
+          "languages": [
+            {
+              "id": "rust",
+              "manifests": [
+                "Cargo.toml"
+              ],
+              "source_files": [
+                "src/lib.rs"
+              ]
+            },
+            {
+              "id": "toml",
+              "manifests": [],
+              "source_files": [
+                "Cargo.toml"
+              ]
+            }
+          ],
+          "lockfiles": [
+            "Cargo.lock"
+          ],
+          "manifest_sha256": {
+            "Cargo.toml": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146"
+          },
+          "native_tool_candidates": [],
+          "observation_complete": true,
+          "observed_entries": 5,
+          "report_type": "discovery",
+          "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-cargo-discovery-capture-awwe9jxj/installed",
+          "schema_version": "0.4.0",
+          "scope_summary": {
+            "configuration_exception_files_observed": 0,
+            "dependency_roots_excluded": 0,
+            "dot_prefix_roots_excluded": 1,
+            "git_safety_status": "not_evaluated",
+            "ordinary_scan_policy": "project_sources_default_v2"
+          },
+          "source_set_candidates": [],
+          "unknown_conditions": [
+            "build_model_not_evaluated",
+            "source_sets_not_fully_classified",
+            "dialects_not_classified",
+            "lock_contents_not_evaluated"
+          ]
+        },
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "jobs_limit": 1,
+          "jobs_source": "cli",
+          "native_task_count": 4,
+          "source": "cli",
+          "started_native_task_count": 4,
+          "timeout_ms": 60000
+        },
+        "execution_tasks": [
+          {
+            "id": "rust.cve",
+            "status": "native_incomplete"
+          },
+          {
+            "id": "rust.build",
+            "status": "native_observed_unverified"
+          },
+          {
+            "id": "rust.comments",
+            "status": "native_observed_unverified"
+          },
+          {
+            "id": "rust.lint",
+            "status": "native_observed_unverified"
+          }
+        ],
+        "exit_code": 3,
+        "export": {
+          "reason_code": null,
+          "status": "not_requested"
+        },
+        "native_results": {
+          "erlang_lint": null,
+          "go_lint": null,
+          "java_cve": null,
+          "java_dependencies": null,
+          "java_javadoc": null,
+          "java_p3c": null,
+          "node_lint": null,
+          "npm_cve": [],
+          "python_cve": [],
+          "python_lint": null,
+          "rust_build": {
+            "authority": "local_unverified",
+            "backlog_status": "synced",
+            "backlog_sync": {
+              "failed_reports": 0,
+              "new_blockers": 0,
+              "new_findings": 0
+            },
+            "build_level": "type_check",
+            "build_success": true,
+            "checker_id": "rust.cargo_check",
+            "command_status": "incomplete",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "execution_budget": {
+              "enforcement": "native_execution_only",
+              "source": "cli",
+              "timeout_ms": 60000
+            },
+            "exit_code": 3,
+            "findings": [],
+            "language": "rust",
+            "local_scan_complete": true,
+            "lock_sha256": "5d1647e1ee8815fa0716c6336f8b78f63bb7e07205d0df2d3af6c947eb5c69a5",
+            "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+            "next_actions": [
+              "核对原生项目构建规则与目标范围；局部零诊断不证明修复或批准白名单",
+              "原工具复检后仍须完整交付检查"
+            ],
+            "operation": "build",
+            "reason": "native_observed_unverified",
+            "recheck_argv": [
+              "cargo",
+              "check",
+              "--locked",
+              "--offline",
+              "--all-targets",
+              "--message-format=json"
+            ],
+            "report_type": "rust_build_local_observation",
+            "rule_selection": "explicit_probe_not_approved_project_policy",
+            "run_id": "cargo-build-20714-1791099821786783000",
+            "schema_version": "0.2.0",
+            "scope": "selected_root_all_targets_default_features",
+            "test_execution": false,
+            "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+            "workspace_binding": "bound",
+            "workspace_id": "ws-d20bc191feb39ef35c31847783009ec8"
+          },
+          "rust_comments": {
+            "authority": "local_unverified",
+            "backlog_status": "synced",
+            "backlog_sync": {
+              "failed_reports": 0,
+              "new_blockers": 0,
+              "new_findings": 2
+            },
+            "checker_id": "rust.cargo_rustdoc",
+            "command_status": "incomplete",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "execution_budget": {
+              "enforcement": "native_execution_only",
+              "source": "cli",
+              "timeout_ms": 60000
+            },
+            "exit_code": 3,
+            "findings": [
+              {
+                "byte_end": 35,
+                "byte_start": 0,
+                "classification": "observed_unverified",
+                "column": 1,
+                "finding_fingerprint": "378e426da0818d123fc77a1a6916aa2f8a644c36e509c04dfa5bdc4a1a63edbb",
+                "finding_id": "CG-378e426da0818d123fc77a1a6916aa2f",
+                "identity_status": "unique_candidate",
+                "level": "warning",
+                "line": 1,
+                "native_range_sha256": "40934e2f72fab9ab7788dbbcfd7b157b813a616ee0a9fd7dc9ff88aa3767e527",
+                "path": "src/lib.rs",
+                "repair_brief": {
+                  "allowed_paths": [
+                    "src/lib.rs"
+                  ],
+                  "attempt_history": [],
+                  "closure_conditions": [
+                    "原工具在输入稳定且原规则有效时复检，问题确实消失；改任务文字或新增抑制不算修复。",
+                    "由持久工作流记录复检与尝试证据，再核验完整项目策略；本简报不能关闭任务或批准白名单。"
+                  ],
+                  "evidence": {
+                    "byte_end": 35,
+                    "byte_start": 0,
+                    "finding_fingerprint": "378e426da0818d123fc77a1a6916aa2f8a644c36e509c04dfa5bdc4a1a63edbb",
+                    "finding_id": "CG-378e426da0818d123fc77a1a6916aa2f",
+                    "observation_reason": "native_observed_unverified",
+                    "path": "src/lib.rs",
+                    "rule_id": "missing_docs",
+                    "source_sha256": "bd624767c05e6e70f010d9bf37bcb56fd640876b6c7489a5d6f98de6cd36659b"
+                  },
+                  "history_status": "not_integrated",
+                  "recheck_argv": [
+                    "cargo",
+                    "rustdoc",
+                    "--lib",
+                    "--locked",
+                    "--offline",
+                    "--message-format=json",
+                    "--",
+                    "--warn",
+                    "missing_docs",
+                    "--warn",
+                    "rustdoc::broken_intra_doc_links"
+                  ],
+                  "rule_basis": "原生 missing_docs 检查公开接口的文档缺失；先核对目标是库、模块还是具体公开项。",
+                  "status": "repair_guidance",
+                  "steps": [
+                    "按原生范围定位公开项；库和模块使用内部文档 //!，公开项使用 ///。",
+                    "根据实际实现补充用途、参数、返回、错误或约束；不编造行为，不通过隐藏公开接口或关闭规则消除告警。",
+                    "使用同一 Cargo 工具和相同目标复检；原生抑制或配置改变需另行核查，不能当作修复完成。"
+                  ],
+                  "tool_requirement": "使用本轮 tool_sha256 对应的显式 Cargo 工具；argv 不代表可信工具选择或自动执行授权。",
+                  "working_directory": "selected_project_root"
+                },
+                "rule_id": "missing_docs",
+                "source_sha256": "bd624767c05e6e70f010d9bf37bcb56fd640876b6c7489a5d6f98de6cd36659b",
+                "target_path": "src/lib.rs"
+              },
+              {
+                "byte_end": 20,
+                "byte_start": 0,
+                "classification": "observed_unverified",
+                "column": 1,
+                "finding_fingerprint": "c71a4bec67fb63bd74bf5c480303319915ec169c34b8091d984fb8788851bec4",
+                "finding_id": "CG-c71a4bec67fb63bd74bf5c4803033199",
+                "identity_status": "unique_candidate",
+                "level": "warning",
+                "line": 1,
+                "native_range_sha256": "ea42fea3b288496fcb48e13601ee10e57a6bee1be75a5871d1470c2850cbdc5b",
+                "path": "src/lib.rs",
+                "repair_brief": {
+                  "allowed_paths": [
+                    "src/lib.rs"
+                  ],
+                  "attempt_history": [],
+                  "closure_conditions": [
+                    "原工具在输入稳定且原规则有效时复检，问题确实消失；改任务文字或新增抑制不算修复。",
+                    "由持久工作流记录复检与尝试证据，再核验完整项目策略；本简报不能关闭任务或批准白名单。"
+                  ],
+                  "evidence": {
+                    "byte_end": 20,
+                    "byte_start": 0,
+                    "finding_fingerprint": "c71a4bec67fb63bd74bf5c480303319915ec169c34b8091d984fb8788851bec4",
+                    "finding_id": "CG-c71a4bec67fb63bd74bf5c4803033199",
+                    "observation_reason": "native_observed_unverified",
+                    "path": "src/lib.rs",
+                    "rule_id": "missing_docs",
+                    "source_sha256": "bd624767c05e6e70f010d9bf37bcb56fd640876b6c7489a5d6f98de6cd36659b"
+                  },
+                  "history_status": "not_integrated",
+                  "recheck_argv": [
+                    "cargo",
+                    "rustdoc",
+                    "--lib",
+                    "--locked",
+                    "--offline",
+                    "--message-format=json",
+                    "--",
+                    "--warn",
+                    "missing_docs",
+                    "--warn",
+                    "rustdoc::broken_intra_doc_links"
+                  ],
+                  "rule_basis": "原生 missing_docs 检查公开接口的文档缺失；先核对目标是库、模块还是具体公开项。",
+                  "status": "repair_guidance",
+                  "steps": [
+                    "按原生范围定位公开项；库和模块使用内部文档 //!，公开项使用 ///。",
+                    "根据实际实现补充用途、参数、返回、错误或约束；不编造行为，不通过隐藏公开接口或关闭规则消除告警。",
+                    "使用同一 Cargo 工具和相同目标复检；原生抑制或配置改变需另行核查，不能当作修复完成。"
+                  ],
+                  "tool_requirement": "使用本轮 tool_sha256 对应的显式 Cargo 工具；argv 不代表可信工具选择或自动执行授权。",
+                  "working_directory": "selected_project_root"
+                },
+                "rule_id": "missing_docs",
+                "source_sha256": "bd624767c05e6e70f010d9bf37bcb56fd640876b6c7489a5d6f98de6cd36659b",
+                "target_path": "src/lib.rs"
+              }
+            ],
+            "language": "rust",
+            "local_scan_complete": true,
+            "lock_sha256": "5d1647e1ee8815fa0716c6336f8b78f63bb7e07205d0df2d3af6c947eb5c69a5",
+            "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+            "next_actions": [
+              "核对原生项目文档规则与目标范围；局部零诊断不证明修复或批准白名单",
+              "原工具复检后仍须完整交付检查"
+            ],
+            "operation": "comments",
+            "reason": "native_observed_unverified",
+            "recheck_argv": [
+              "cargo",
+              "rustdoc",
+              "--lib",
+              "--locked",
+              "--offline",
+              "--message-format=json",
+              "--",
+              "--warn",
+              "missing_docs",
+              "--warn",
+              "rustdoc::broken_intra_doc_links"
+            ],
+            "report_type": "rustdoc_local_observation",
+            "rule_selection": "explicit_probe_not_approved_project_policy",
+            "run_id": "rustdoc-20714-1791099822195198000",
+            "schema_version": "0.4.0",
+            "scope": "selected_root_library_default_features",
+            "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+            "workspace_binding": "bound",
+            "workspace_id": "ws-d20bc191feb39ef35c31847783009ec8"
+          },
+          "rust_cve": {
+            "authority": "local_unverified",
+            "checker_id": "rust.cargo_audit",
+            "command_status": "incomplete",
+            "coverage_proven": false,
+            "database_advisory_count": null,
+            "database_freshness": "unverified",
+            "database_last_commit": null,
+            "database_last_updated": null,
+            "delivery_decision": "not_evaluated",
+            "dependency_count": null,
+            "execution_budget": {
+              "enforcement": "native_execution_only",
+              "source": "cli",
+              "timeout_ms": 60000
+            },
+            "exit_code": 3,
+            "findings": [],
+            "language": "rust",
+            "local_scan_complete": false,
+            "lock_sha256": null,
+            "manifest_sha256": null,
+            "native_warnings_present": false,
+            "next_actions": [
+              "核对原生漏洞库来源、提交与时效；零漏洞不能证明安全",
+              "复核解析依赖及原生 advisory 后修复或提出精确误报候选"
+            ],
+            "operation": "cve",
+            "reason": "cargo_audit_tool_not_selected",
+            "report_type": "rust_cve_local_observation",
+            "schema_version": "0.1.0",
+            "tool_sha256": null
+          },
+          "rust_lint": {
+            "authority": "local_unverified",
+            "backlog_status": "synced_partial",
+            "backlog_sync": {
+              "failed_reports": 0,
+              "historical_findings": 0,
+              "imported_reports": 1,
+              "new_blockers": 0,
+              "new_findings": 1
+            },
+            "checker_id": "rust.cargo_clippy",
+            "command_status": "incomplete",
+            "configuration": "unknown",
+            "configuration_ref": null,
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "exit_code": 3,
+            "findings": [
+              {
+                "column": 24,
+                "finding_fingerprint": "c7fd7e3fc7a50d66f986dfa3885aa2fdc30bd05d442d2d651f08b740832e14b4",
+                "finding_id": "CG-c7fd7e3fc7a50d66f986dfa3885aa2fd",
+                "level": "warning",
+                "line": 1,
+                "path": "src/lib.rs",
+                "rule_id": "clippy::needless_return",
+                "source_sha256": "bd624767c05e6e70f010d9bf37bcb56fd640876b6c7489a5d6f98de6cd36659b"
+              }
+            ],
+            "language": "rust",
+            "local_scan_complete": true,
+            "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+            "next": {
+              "authority": "local_unverified",
+              "command_status": "complete",
+              "delivery_decision": "not_evaluated",
+              "disposition": "actionable",
+              "exit_code": 0,
+              "next_actions": [],
+              "operation": "next",
+              "reason": "local_task_selected",
+              "repair_brief": {
+                "action_id": "repair-source",
+                "authority": "local_unverified",
+                "checker_id": "rust.cargo_clippy",
+                "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+                "constraints": [
+                  "仅修改目标源码",
+                  "不得忽略规则或将任务勾选当作复检"
+                ],
+                "disposition": "actionable",
+                "evidence_ref": {
+                  "first_report_sha256": "f041ca84fa72eb4bf47cf182c3663c3d1a3aa2533e0f6224a5070b760756509e",
+                  "first_run_id": "rust-lint-20714-1791099822720827000-0"
+                },
+                "history": {
+                  "attempt_count": 0,
+                  "awaiting_verification": false,
+                  "budget": 2,
+                  "no_progress_count": 0,
+                  "open_attempt_id": null,
+                  "recent": []
+                },
+                "kind": "finding",
+                "native_rule_id": "clippy::needless_return",
+                "recheck_argv": [
+                  "cargo",
+                  "clippy",
+                  "--locked",
+                  "--offline",
+                  "--all-targets",
+                  "--message-format=json"
+                ],
+                "schema_version": "0.1.0",
+                "scope": "src/lib.rs",
+                "source_sha256": "bd624767c05e6e70f010d9bf37bcb56fd640876b6c7489a5d6f98de6cd36659b",
+                "step": "查阅原生规则与私有诊断，先确认根因再修复",
+                "task_id": "CG-c7fd7e3fc7a50d66f986dfa3885aa2fd"
+              },
+              "report_type": "repair_brief_preview",
+              "schema_version": "0.1.0"
+            },
+            "operation": "lint",
+            "reason": "native_observed_unverified",
+            "recheck_command": "cargo clippy --locked --offline --all-targets --message-format=json",
+            "report_type": "rust_clippy_local_observation",
+            "rulepack_approval": "unverified",
+            "run_id": "rust-lint-20714-1791099822720827000-0",
+            "schema_version": "0.2.0",
+            "scope": "default_features_all_targets",
+            "tool_approval": "unverified",
+            "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+            "workspace_binding": "bound",
+            "workspace_id": "ws-d20bc191feb39ef35c31847783009ec8"
+          }
+        },
+        "next": {
+          "authority": "local_unverified",
+          "command_status": "complete",
+          "delivery_decision": "not_evaluated",
+          "disposition": "actionable",
+          "exit_code": 0,
+          "next_actions": [],
+          "operation": "next",
+          "reason": "local_task_selected",
+          "repair_brief": {
+            "action_id": "repair-source",
+            "authority": "local_unverified",
+            "checker_id": "rust.cargo_clippy",
+            "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+            "constraints": [
+              "仅修改目标源码",
+              "不得忽略规则或将任务勾选当作复检"
+            ],
+            "disposition": "actionable",
+            "evidence_ref": {
+              "first_report_sha256": "f041ca84fa72eb4bf47cf182c3663c3d1a3aa2533e0f6224a5070b760756509e",
+              "first_run_id": "rust-lint-20714-1791099822720827000-0"
+            },
+            "history": {
+              "attempt_count": 0,
+              "awaiting_verification": false,
+              "budget": 2,
+              "no_progress_count": 0,
+              "open_attempt_id": null,
+              "recent": []
+            },
+            "kind": "finding",
+            "native_rule_id": "clippy::needless_return",
+            "recheck_argv": [
+              "cargo",
+              "clippy",
+              "--locked",
+              "--offline",
+              "--all-targets",
+              "--message-format=json"
+            ],
+            "schema_version": "0.1.0",
+            "scope": "src/lib.rs",
+            "source_sha256": "bd624767c05e6e70f010d9bf37bcb56fd640876b6c7489a5d6f98de6cd36659b",
+            "step": "查阅原生规则与私有诊断，先确认根因再修复",
+            "task_id": "CG-c7fd7e3fc7a50d66f986dfa3885aa2fd"
+          },
+          "report_type": "repair_brief_preview",
+          "schema_version": "0.1.0"
+        },
+        "obligation_status": "unresolved",
+        "operation": "check",
+        "reason": "full_project_obligations_and_trusted_policy_unavailable",
+        "report_type": "check_feedback",
+        "required_obligations": null,
+        "schema_version": "0.36.0",
+        "selection": "all",
+        "syntax_candidates": {
+          "authority": "candidate_unqualified",
+          "delivery_decision": "incomplete",
+          "execution_phase": "after_native",
+          "native_preferred_count": 1,
+          "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+          "observations": [],
+          "reason": "unrouted_source",
+          "skipped_count": 0,
+          "source_file_count": 2,
+          "status": "not_run",
+          "unrouted_count": 1
+        },
+        "unresolved_conditions": [
+          "build_model_not_evaluated",
+          "dialects_not_classified",
+          "lock_contents_not_evaluated",
+          "required_obligations_unresolved",
+          "rust_build_policy_and_coverage_unverified",
+          "rust_comments_policy_and_coverage_unverified",
+          "rust_cve_database_freshness_unverified",
+          "rust_cve_task_incomplete",
+          "source_sets_not_fully_classified",
+          "tool_lock_unverified",
+          "trusted_policy_unavailable"
+        ]
+      },
+      "repeat_check_feedback": {
+        "authority": "local_unverified",
+        "category_candidates": [
+          {
+            "capability_status": "gap",
+            "category": "lint",
+            "checker_id": null,
+            "language": "rust",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "trusted_policy_and_coverage_unavailable",
+            "status": "observed_unverified"
+          },
+          {
+            "capability_status": "gap",
+            "category": "comments",
+            "checker_id": "rust.cargo_rustdoc",
+            "language": "rust",
+            "legacy_status": "stable",
+            "next_action": "按文档原生规则修复或恢复锁定离线环境；读取稳定任务并用同一Cargo复检，核验原配置和完整目标范围",
+            "reason": "trusted_policy_and_coverage_unavailable",
+            "status": "observed_unverified"
+          },
+          {
+            "capability_status": "gap",
+            "category": "dependencies",
+            "checker_id": null,
+            "language": "rust",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "cve",
+            "checker_id": "rust.cargo_audit",
+            "language": "rust",
+            "legacy_status": "stable",
+            "next_action": "核对原生漏洞及解析版本；补齐离线数据库身份和时效、受批准工具与策略，再用原工具复检",
+            "reason": "rust_cve_native_incomplete",
+            "status": "native_incomplete"
+          },
+          {
+            "capability_status": "gap",
+            "category": "security",
+            "checker_id": null,
+            "language": "rust",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "build",
+            "checker_id": "rust.cargo_check",
+            "language": "rust",
+            "legacy_status": "stable",
+            "next_action": "核对原生编译错误与锁定输入，读取稳定任务并用同一Cargo复检；类型检查不执行测试，完整构建组合和策略仍须核验",
+            "reason": "trusted_policy_and_coverage_unavailable",
+            "status": "observed_unverified"
+          },
+          {
+            "capability_status": "gap",
+            "category": "lint",
+            "checker_id": null,
+            "language": "toml",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "comments",
+            "checker_id": null,
+            "language": "toml",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "dependencies",
+            "checker_id": null,
+            "language": "toml",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "cve",
+            "checker_id": null,
+            "language": "toml",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "security",
+            "checker_id": null,
+            "language": "toml",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "build",
+            "checker_id": null,
+            "language": "toml",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          }
+        ],
+        "command_status": "incomplete",
+        "delivery_decision": "incomplete",
+        "discovery": {
+          "blocked_paths": [],
+          "build_roots": [
+            {
+              "manifests": [
+                "Cargo.toml"
+              ],
+              "path": "."
+            }
+          ],
+          "checker_configurations": [],
+          "declared_versions": {
+            "Cargo.toml": "0.1.0"
+          },
+          "languages": [
+            {
+              "id": "rust",
+              "manifests": [
+                "Cargo.toml"
+              ],
+              "source_files": [
+                "src/lib.rs"
+              ]
+            },
+            {
+              "id": "toml",
+              "manifests": [],
+              "source_files": [
+                "Cargo.toml"
+              ]
+            }
+          ],
+          "lockfiles": [
+            "Cargo.lock"
+          ],
+          "manifest_sha256": {
+            "Cargo.toml": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146"
+          },
+          "native_tool_candidates": [],
+          "observation_complete": true,
+          "observed_entries": 5,
+          "report_type": "discovery",
+          "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-cargo-discovery-capture-awwe9jxj/installed",
+          "schema_version": "0.4.0",
+          "scope_summary": {
+            "configuration_exception_files_observed": 0,
+            "dependency_roots_excluded": 0,
+            "dot_prefix_roots_excluded": 1,
+            "git_safety_status": "not_evaluated",
+            "ordinary_scan_policy": "project_sources_default_v2"
+          },
+          "source_set_candidates": [],
+          "unknown_conditions": [
+            "build_model_not_evaluated",
+            "source_sets_not_fully_classified",
+            "dialects_not_classified",
+            "lock_contents_not_evaluated"
+          ]
+        },
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "jobs_limit": 1,
+          "jobs_source": "cli",
+          "native_task_count": 4,
+          "source": "cli",
+          "started_native_task_count": 4,
+          "timeout_ms": 60000
+        },
+        "execution_tasks": [
+          {
+            "id": "rust.cve",
+            "status": "native_incomplete"
+          },
+          {
+            "id": "rust.build",
+            "status": "native_observed_unverified"
+          },
+          {
+            "id": "rust.comments",
+            "status": "native_observed_unverified"
+          },
+          {
+            "id": "rust.lint",
+            "status": "native_observed_unverified"
+          }
+        ],
+        "exit_code": 3,
+        "export": {
+          "reason_code": null,
+          "status": "not_requested"
+        },
+        "native_results": {
+          "erlang_lint": null,
+          "go_lint": null,
+          "java_cve": null,
+          "java_dependencies": null,
+          "java_javadoc": null,
+          "java_p3c": null,
+          "node_lint": null,
+          "npm_cve": [],
+          "python_cve": [],
+          "python_lint": null,
+          "rust_build": {
+            "authority": "local_unverified",
+            "backlog_status": "synced",
+            "backlog_sync": {
+              "failed_reports": 0,
+              "new_blockers": 0,
+              "new_findings": 0
+            },
+            "build_level": "type_check",
+            "build_success": true,
+            "checker_id": "rust.cargo_check",
+            "command_status": "incomplete",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "execution_budget": {
+              "enforcement": "native_execution_only",
+              "source": "cli",
+              "timeout_ms": 60000
+            },
+            "exit_code": 3,
+            "findings": [],
+            "language": "rust",
+            "local_scan_complete": true,
+            "lock_sha256": "5d1647e1ee8815fa0716c6336f8b78f63bb7e07205d0df2d3af6c947eb5c69a5",
+            "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+            "next_actions": [
+              "核对原生项目构建规则与目标范围；局部零诊断不证明修复或批准白名单",
+              "原工具复检后仍须完整交付检查"
+            ],
+            "operation": "build",
+            "reason": "native_observed_unverified",
+            "recheck_argv": [
+              "cargo",
+              "check",
+              "--locked",
+              "--offline",
+              "--all-targets",
+              "--message-format=json"
+            ],
+            "report_type": "rust_build_local_observation",
+            "rule_selection": "explicit_probe_not_approved_project_policy",
+            "run_id": "cargo-build-21440-1791099823366805000",
+            "schema_version": "0.2.0",
+            "scope": "selected_root_all_targets_default_features",
+            "test_execution": false,
+            "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+            "workspace_binding": "bound",
+            "workspace_id": "ws-d20bc191feb39ef35c31847783009ec8"
+          },
+          "rust_comments": {
+            "authority": "local_unverified",
+            "backlog_status": "synced",
+            "backlog_sync": {
+              "failed_reports": 0,
+              "new_blockers": 0,
+              "new_findings": 0
+            },
+            "checker_id": "rust.cargo_rustdoc",
+            "command_status": "incomplete",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "execution_budget": {
+              "enforcement": "native_execution_only",
+              "source": "cli",
+              "timeout_ms": 60000
+            },
+            "exit_code": 3,
+            "findings": [
+              {
+                "byte_end": 35,
+                "byte_start": 0,
+                "classification": "observed_unverified",
+                "column": 1,
+                "finding_fingerprint": "378e426da0818d123fc77a1a6916aa2f8a644c36e509c04dfa5bdc4a1a63edbb",
+                "finding_id": "CG-378e426da0818d123fc77a1a6916aa2f",
+                "identity_status": "unique_candidate",
+                "level": "warning",
+                "line": 1,
+                "native_range_sha256": "40934e2f72fab9ab7788dbbcfd7b157b813a616ee0a9fd7dc9ff88aa3767e527",
+                "path": "src/lib.rs",
+                "repair_brief": {
+                  "allowed_paths": [
+                    "src/lib.rs"
+                  ],
+                  "attempt_history": [],
+                  "closure_conditions": [
+                    "原工具在输入稳定且原规则有效时复检，问题确实消失；改任务文字或新增抑制不算修复。",
+                    "由持久工作流记录复检与尝试证据，再核验完整项目策略；本简报不能关闭任务或批准白名单。"
+                  ],
+                  "evidence": {
+                    "byte_end": 35,
+                    "byte_start": 0,
+                    "finding_fingerprint": "378e426da0818d123fc77a1a6916aa2f8a644c36e509c04dfa5bdc4a1a63edbb",
+                    "finding_id": "CG-378e426da0818d123fc77a1a6916aa2f",
+                    "observation_reason": "native_observed_unverified",
+                    "path": "src/lib.rs",
+                    "rule_id": "missing_docs",
+                    "source_sha256": "bd624767c05e6e70f010d9bf37bcb56fd640876b6c7489a5d6f98de6cd36659b"
+                  },
+                  "history_status": "not_integrated",
+                  "recheck_argv": [
+                    "cargo",
+                    "rustdoc",
+                    "--lib",
+                    "--locked",
+                    "--offline",
+                    "--message-format=json",
+                    "--",
+                    "--warn",
+                    "missing_docs",
+                    "--warn",
+                    "rustdoc::broken_intra_doc_links"
+                  ],
+                  "rule_basis": "原生 missing_docs 检查公开接口的文档缺失；先核对目标是库、模块还是具体公开项。",
+                  "status": "repair_guidance",
+                  "steps": [
+                    "按原生范围定位公开项；库和模块使用内部文档 //!，公开项使用 ///。",
+                    "根据实际实现补充用途、参数、返回、错误或约束；不编造行为，不通过隐藏公开接口或关闭规则消除告警。",
+                    "使用同一 Cargo 工具和相同目标复检；原生抑制或配置改变需另行核查，不能当作修复完成。"
+                  ],
+                  "tool_requirement": "使用本轮 tool_sha256 对应的显式 Cargo 工具；argv 不代表可信工具选择或自动执行授权。",
+                  "working_directory": "selected_project_root"
+                },
+                "rule_id": "missing_docs",
+                "source_sha256": "bd624767c05e6e70f010d9bf37bcb56fd640876b6c7489a5d6f98de6cd36659b",
+                "target_path": "src/lib.rs"
+              },
+              {
+                "byte_end": 20,
+                "byte_start": 0,
+                "classification": "observed_unverified",
+                "column": 1,
+                "finding_fingerprint": "c71a4bec67fb63bd74bf5c480303319915ec169c34b8091d984fb8788851bec4",
+                "finding_id": "CG-c71a4bec67fb63bd74bf5c4803033199",
+                "identity_status": "unique_candidate",
+                "level": "warning",
+                "line": 1,
+                "native_range_sha256": "ea42fea3b288496fcb48e13601ee10e57a6bee1be75a5871d1470c2850cbdc5b",
+                "path": "src/lib.rs",
+                "repair_brief": {
+                  "allowed_paths": [
+                    "src/lib.rs"
+                  ],
+                  "attempt_history": [],
+                  "closure_conditions": [
+                    "原工具在输入稳定且原规则有效时复检，问题确实消失；改任务文字或新增抑制不算修复。",
+                    "由持久工作流记录复检与尝试证据，再核验完整项目策略；本简报不能关闭任务或批准白名单。"
+                  ],
+                  "evidence": {
+                    "byte_end": 20,
+                    "byte_start": 0,
+                    "finding_fingerprint": "c71a4bec67fb63bd74bf5c480303319915ec169c34b8091d984fb8788851bec4",
+                    "finding_id": "CG-c71a4bec67fb63bd74bf5c4803033199",
+                    "observation_reason": "native_observed_unverified",
+                    "path": "src/lib.rs",
+                    "rule_id": "missing_docs",
+                    "source_sha256": "bd624767c05e6e70f010d9bf37bcb56fd640876b6c7489a5d6f98de6cd36659b"
+                  },
+                  "history_status": "not_integrated",
+                  "recheck_argv": [
+                    "cargo",
+                    "rustdoc",
+                    "--lib",
+                    "--locked",
+                    "--offline",
+                    "--message-format=json",
+                    "--",
+                    "--warn",
+                    "missing_docs",
+                    "--warn",
+                    "rustdoc::broken_intra_doc_links"
+                  ],
+                  "rule_basis": "原生 missing_docs 检查公开接口的文档缺失；先核对目标是库、模块还是具体公开项。",
+                  "status": "repair_guidance",
+                  "steps": [
+                    "按原生范围定位公开项；库和模块使用内部文档 //!，公开项使用 ///。",
+                    "根据实际实现补充用途、参数、返回、错误或约束；不编造行为，不通过隐藏公开接口或关闭规则消除告警。",
+                    "使用同一 Cargo 工具和相同目标复检；原生抑制或配置改变需另行核查，不能当作修复完成。"
+                  ],
+                  "tool_requirement": "使用本轮 tool_sha256 对应的显式 Cargo 工具；argv 不代表可信工具选择或自动执行授权。",
+                  "working_directory": "selected_project_root"
+                },
+                "rule_id": "missing_docs",
+                "source_sha256": "bd624767c05e6e70f010d9bf37bcb56fd640876b6c7489a5d6f98de6cd36659b",
+                "target_path": "src/lib.rs"
+              }
+            ],
+            "language": "rust",
+            "local_scan_complete": true,
+            "lock_sha256": "5d1647e1ee8815fa0716c6336f8b78f63bb7e07205d0df2d3af6c947eb5c69a5",
+            "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+            "next_actions": [
+              "核对原生项目文档规则与目标范围；局部零诊断不证明修复或批准白名单",
+              "原工具复检后仍须完整交付检查"
+            ],
+            "operation": "comments",
+            "reason": "native_observed_unverified",
+            "recheck_argv": [
+              "cargo",
+              "rustdoc",
+              "--lib",
+              "--locked",
+              "--offline",
+              "--message-format=json",
+              "--",
+              "--warn",
+              "missing_docs",
+              "--warn",
+              "rustdoc::broken_intra_doc_links"
+            ],
+            "report_type": "rustdoc_local_observation",
+            "rule_selection": "explicit_probe_not_approved_project_policy",
+            "run_id": "rustdoc-21440-1791099823773705000",
+            "schema_version": "0.4.0",
+            "scope": "selected_root_library_default_features",
+            "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+            "workspace_binding": "bound",
+            "workspace_id": "ws-d20bc191feb39ef35c31847783009ec8"
+          },
+          "rust_cve": {
+            "authority": "local_unverified",
+            "checker_id": "rust.cargo_audit",
+            "command_status": "incomplete",
+            "coverage_proven": false,
+            "database_advisory_count": null,
+            "database_freshness": "unverified",
+            "database_last_commit": null,
+            "database_last_updated": null,
+            "delivery_decision": "not_evaluated",
+            "dependency_count": null,
+            "execution_budget": {
+              "enforcement": "native_execution_only",
+              "source": "cli",
+              "timeout_ms": 60000
+            },
+            "exit_code": 3,
+            "findings": [],
+            "language": "rust",
+            "local_scan_complete": false,
+            "lock_sha256": null,
+            "manifest_sha256": null,
+            "native_warnings_present": false,
+            "next_actions": [
+              "核对原生漏洞库来源、提交与时效；零漏洞不能证明安全",
+              "复核解析依赖及原生 advisory 后修复或提出精确误报候选"
+            ],
+            "operation": "cve",
+            "reason": "cargo_audit_tool_not_selected",
+            "report_type": "rust_cve_local_observation",
+            "schema_version": "0.1.0",
+            "tool_sha256": null
+          },
+          "rust_lint": {
+            "authority": "local_unverified",
+            "backlog_status": "synced_partial",
+            "backlog_sync": {
+              "failed_reports": 0,
+              "historical_findings": 0,
+              "imported_reports": 1,
+              "new_blockers": 0,
+              "new_findings": 0
+            },
+            "checker_id": "rust.cargo_clippy",
+            "command_status": "incomplete",
+            "configuration": "unknown",
+            "configuration_ref": null,
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "exit_code": 3,
+            "findings": [
+              {
+                "column": 24,
+                "finding_fingerprint": "c7fd7e3fc7a50d66f986dfa3885aa2fdc30bd05d442d2d651f08b740832e14b4",
+                "finding_id": "CG-c7fd7e3fc7a50d66f986dfa3885aa2fd",
+                "level": "warning",
+                "line": 1,
+                "path": "src/lib.rs",
+                "rule_id": "clippy::needless_return",
+                "source_sha256": "bd624767c05e6e70f010d9bf37bcb56fd640876b6c7489a5d6f98de6cd36659b"
+              }
+            ],
+            "language": "rust",
+            "local_scan_complete": true,
+            "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+            "next": {
+              "authority": "local_unverified",
+              "command_status": "complete",
+              "delivery_decision": "not_evaluated",
+              "disposition": "actionable",
+              "exit_code": 0,
+              "next_actions": [],
+              "operation": "next",
+              "reason": "local_task_selected",
+              "repair_brief": {
+                "action_id": "repair-source",
+                "authority": "local_unverified",
+                "checker_id": "rust.cargo_clippy",
+                "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+                "constraints": [
+                  "仅修改目标源码",
+                  "不得忽略规则或将任务勾选当作复检"
+                ],
+                "disposition": "actionable",
+                "evidence_ref": {
+                  "first_report_sha256": "f041ca84fa72eb4bf47cf182c3663c3d1a3aa2533e0f6224a5070b760756509e",
+                  "first_run_id": "rust-lint-20714-1791099822720827000-0"
+                },
+                "history": {
+                  "attempt_count": 0,
+                  "awaiting_verification": false,
+                  "budget": 2,
+                  "no_progress_count": 0,
+                  "open_attempt_id": null,
+                  "recent": []
+                },
+                "kind": "finding",
+                "native_rule_id": "clippy::needless_return",
+                "recheck_argv": [
+                  "cargo",
+                  "clippy",
+                  "--locked",
+                  "--offline",
+                  "--all-targets",
+                  "--message-format=json"
+                ],
+                "schema_version": "0.1.0",
+                "scope": "src/lib.rs",
+                "source_sha256": "bd624767c05e6e70f010d9bf37bcb56fd640876b6c7489a5d6f98de6cd36659b",
+                "step": "查阅原生规则与私有诊断，先确认根因再修复",
+                "task_id": "CG-c7fd7e3fc7a50d66f986dfa3885aa2fd"
+              },
+              "report_type": "repair_brief_preview",
+              "schema_version": "0.1.0"
+            },
+            "operation": "lint",
+            "reason": "native_observed_unverified",
+            "recheck_command": "cargo clippy --locked --offline --all-targets --message-format=json",
+            "report_type": "rust_clippy_local_observation",
+            "rulepack_approval": "unverified",
+            "run_id": "rust-lint-21440-1791099824309155000-0",
+            "schema_version": "0.2.0",
+            "scope": "default_features_all_targets",
+            "tool_approval": "unverified",
+            "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+            "workspace_binding": "bound",
+            "workspace_id": "ws-d20bc191feb39ef35c31847783009ec8"
+          }
+        },
+        "next": {
+          "authority": "local_unverified",
+          "command_status": "complete",
+          "delivery_decision": "not_evaluated",
+          "disposition": "actionable",
+          "exit_code": 0,
+          "next_actions": [],
+          "operation": "next",
+          "reason": "local_task_selected",
+          "repair_brief": {
+            "action_id": "repair-source",
+            "authority": "local_unverified",
+            "checker_id": "rust.cargo_clippy",
+            "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+            "constraints": [
+              "仅修改目标源码",
+              "不得忽略规则或将任务勾选当作复检"
+            ],
+            "disposition": "actionable",
+            "evidence_ref": {
+              "first_report_sha256": "f041ca84fa72eb4bf47cf182c3663c3d1a3aa2533e0f6224a5070b760756509e",
+              "first_run_id": "rust-lint-20714-1791099822720827000-0"
+            },
+            "history": {
+              "attempt_count": 0,
+              "awaiting_verification": false,
+              "budget": 2,
+              "no_progress_count": 0,
+              "open_attempt_id": null,
+              "recent": []
+            },
+            "kind": "finding",
+            "native_rule_id": "clippy::needless_return",
+            "recheck_argv": [
+              "cargo",
+              "clippy",
+              "--locked",
+              "--offline",
+              "--all-targets",
+              "--message-format=json"
+            ],
+            "schema_version": "0.1.0",
+            "scope": "src/lib.rs",
+            "source_sha256": "bd624767c05e6e70f010d9bf37bcb56fd640876b6c7489a5d6f98de6cd36659b",
+            "step": "查阅原生规则与私有诊断，先确认根因再修复",
+            "task_id": "CG-c7fd7e3fc7a50d66f986dfa3885aa2fd"
+          },
+          "report_type": "repair_brief_preview",
+          "schema_version": "0.1.0"
+        },
+        "obligation_status": "unresolved",
+        "operation": "check",
+        "reason": "full_project_obligations_and_trusted_policy_unavailable",
+        "report_type": "check_feedback",
+        "required_obligations": null,
+        "schema_version": "0.36.0",
+        "selection": "all",
+        "syntax_candidates": {
+          "authority": "candidate_unqualified",
+          "delivery_decision": "incomplete",
+          "execution_phase": "after_native",
+          "native_preferred_count": 1,
+          "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+          "observations": [],
+          "reason": "unrouted_source",
+          "skipped_count": 0,
+          "source_file_count": 2,
+          "status": "not_run",
+          "unrouted_count": 1
+        },
+        "unresolved_conditions": [
+          "build_model_not_evaluated",
+          "dialects_not_classified",
+          "lock_contents_not_evaluated",
+          "required_obligations_unresolved",
+          "rust_build_policy_and_coverage_unverified",
+          "rust_comments_policy_and_coverage_unverified",
+          "rust_cve_database_freshness_unverified",
+          "rust_cve_task_incomplete",
+          "source_sets_not_fully_classified",
+          "tool_lock_unverified",
+          "trusted_policy_unavailable"
+        ]
+      },
+      "task_verification": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "delivery_decision": "not_evaluated",
+        "event_persisted": true,
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "source": "cli",
+          "timeout_ms": 60000
+        },
+        "exit_code": 3,
+        "kind": "finding",
+        "native_scan": {
+          "authority": "local_unverified",
+          "checker_id": "rust.cargo_clippy",
+          "command_status": "incomplete",
+          "configuration": "unknown",
+          "configuration_ref": null,
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "exit_code": 3,
+          "findings": [
+            {
+              "column": 24,
+              "finding_fingerprint": "c7fd7e3fc7a50d66f986dfa3885aa2fdc30bd05d442d2d651f08b740832e14b4",
+              "finding_id": "CG-c7fd7e3fc7a50d66f986dfa3885aa2fd",
+              "level": "warning",
+              "line": 1,
+              "path": "src/lib.rs",
+              "rule_id": "clippy::needless_return",
+              "source_sha256": "bd624767c05e6e70f010d9bf37bcb56fd640876b6c7489a5d6f98de6cd36659b"
+            }
+          ],
+          "language": "rust",
+          "local_scan_complete": true,
+          "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+          "operation": "lint",
+          "reason": "native_observed_unverified",
+          "recheck_command": "cargo clippy --locked --offline --all-targets --message-format=json",
+          "report_type": "rust_clippy_local_observation",
+          "rulepack_approval": "unverified",
+          "run_id": "rust-lint-21466-1791099824888795000-0",
+          "schema_version": "0.2.0",
+          "scope": "default_features_all_targets",
+          "tool_approval": "unverified",
+          "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+          "workspace_binding": "bound",
+          "workspace_id": "ws-d20bc191feb39ef35c31847783009ec8"
+        },
+        "next_actions": [
+          "inspect_native_recheck_and_policy_before_closure"
+        ],
+        "observation": "still_present",
+        "operation": "task_verify",
+        "reason": null,
+        "report_type": "task_verification_preview",
+        "schema_version": "0.6.0",
+        "task_id": "CG-c7fd7e3fc7a50d66f986dfa3885aa2fd"
+      },
+      "task_show": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "event_chain_status": "unverified",
+        "evidence_freshness": "unverified",
+        "exit_code": 0,
+        "next_actions": [
+          [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-c7fd7e3fc7a50d66f986dfa3885aa2fd",
+            "."
+          ]
+        ],
+        "operation": "task_show",
+        "report_type": "task_show_preview",
+        "request_id": "view-21593-1791099825876380000",
+        "schema_version": "0.1.0",
+        "state": "open",
+        "task": {
+          "action_id": "repair-source",
+          "authority": "local_unverified",
+          "checker_id": "rust.cargo_clippy",
+          "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+          "constraints": [
+            "仅修改目标源码",
+            "不得忽略规则或将任务勾选当作复检"
+          ],
+          "disposition": "actionable",
+          "evidence_ref": {
+            "first_report_sha256": "f041ca84fa72eb4bf47cf182c3663c3d1a3aa2533e0f6224a5070b760756509e",
+            "first_run_id": "rust-lint-20714-1791099822720827000-0"
+          },
+          "history": {
+            "attempt_count": 0,
+            "awaiting_verification": false,
+            "budget": 2,
+            "no_progress_count": 0,
+            "open_attempt_id": null,
+            "recent": []
+          },
+          "kind": "finding",
+          "native_rule_id": "clippy::needless_return",
+          "recheck_argv": [
+            "cargo",
+            "clippy",
+            "--locked",
+            "--offline",
+            "--all-targets",
+            "--message-format=json"
+          ],
+          "schema_version": "0.1.0",
+          "scope": "src/lib.rs",
+          "source_sha256": "bd624767c05e6e70f010d9bf37bcb56fd640876b6c7489a5d6f98de6cd36659b",
+          "step": "查阅原生规则与私有诊断，先确认根因再修复",
+          "task_id": "CG-c7fd7e3fc7a50d66f986dfa3885aa2fd",
+          "verification_observation": "still_present",
+          "verification_report_sha256": "adde81ea1a91ad94e97b148fba9516432b4569f4a520ecae47d4d9b15171ad7d",
+          "verification_run_id": "rust-lint-21466-1791099824888795000-0"
+        },
+        "task_id": "CG-c7fd7e3fc7a50d66f986dfa3885aa2fd"
+      },
+      "human_feedback": {
+        "exit_code": 3,
+        "stdout": "CodeGuard 全项目检查未完成；已观察的原生结果与待确认类别如下：\nRust文档观察：\"native_observed_unverified\"；任务同步：\"synced\"；原配置与完整目标覆盖待核验\n原生文档规则 \"missing_docs\"：\"src/lib.rs\":1；\"原生 missing_docs 检查公开接口的文档缺失；先核对目标是库、模块还是具体公开项。\"\n原生文档规则 \"missing_docs\"：\"src/lib.rs\":1；\"原生 missing_docs 检查公开接口的文档缺失；先核对目标是库、模块还是具体公开项。\"\nRust原生类型检查：\"native_observed_unverified\"；任务同步：\"synced\"；测试执行：否；完整构建组合与策略待核验\nRust原生CVE观察：\"cargo_audit_tool_not_selected\"；漏洞库时效未核验\nRust/Cargo Clippy 配置: unknown；原生状态: native_observed_unverified\nRust/Cargo Clippy: 1 条原生诊断（尚未核验完整范围与策略）\n  \"src/lib.rs\":1 \"clippy::needless_return\"\n复检: cargo clippy --locked --offline --all-targets --message-format=json\n执行任务 \"rust.cve\": \"native_incomplete\"\n执行任务 \"rust.build\": \"native_observed_unverified\"\n执行任务 \"rust.comments\": \"native_observed_unverified\"\n执行任务 \"rust.lint\": \"native_observed_unverified\"\n候选语法初检未运行：\"unrouted_source\"；仍需适用原生检查。\n候选 rust / lint: observed_unverified（trusted_policy_and_coverage_unavailable）；下一步：核对该类别的项目配置和适配器能力\n候选 rust / comments (rust.cargo_rustdoc): observed_unverified（trusted_policy_and_coverage_unavailable）；下一步：按文档原生规则修复或恢复锁定离线环境；读取稳定任务并用同一Cargo复检，核验原配置和完整目标范围\n候选 rust / dependencies: not_integrated（native_adapter_not_integrated）；下一步：核对该类别的项目配置和适配器能力\n候选 rust / cve (rust.cargo_audit): native_incomplete（rust_cve_native_incomplete）；下一步：核对原生漏洞及解析版本；补齐离线数据库身份和时效、受批准工具与策略，再用原工具复检\n候选 rust / security: not_integrated（native_adapter_not_integrated）；下一步：核对该类别的项目配置和适配器能力\n候选 rust / build (rust.cargo_check): observed_unverified（trusted_policy_and_coverage_unavailable）；下一步：核对原生编译错误与锁定输入，读取稳定任务并用同一Cargo复检；类型检查不执行测试，完整构建组合和策略仍须核验\n候选 toml / lint: not_integrated（native_adapter_not_integrated）；下一步：核对该类别的项目配置和适配器能力\n候选 toml / comments: not_integrated（native_adapter_not_integrated）；下一步：核对该类别的项目配置和适配器能力\n候选 toml / dependencies: not_integrated（native_adapter_not_integrated）；下一步：核对该类别的项目配置和适配器能力\n候选 toml / cve: not_integrated（native_adapter_not_integrated）；下一步：核对该类别的项目配置和适配器能力\n候选 toml / security: not_integrated（native_adapter_not_integrated）；下一步：核对该类别的项目配置和适配器能力\n候选 toml / build: not_integrated（native_adapter_not_integrated）；下一步：核对该类别的项目配置和适配器能力\n下一步任务 \"CG-c7fd7e3fc7a50d66f986dfa3885aa2fd\"：\"查阅原生规则与私有诊断，先确认根因再修复\"；范围 \"src/lib.rs\"；复检 [\"cargo\",\"clippy\",\"--locked\",\"--offline\",\"--all-targets\",\"--message-format=json\"]\n候选类别：12；正式必需义务未确认；交付决策：incomplete\n"
+      }
+    },
+    {
+      "case": "missing_custom_toolchain",
+      "oracle": "actual_rustup_without_installed_custom_toolchain",
+      "check_feedback": {
+        "authority": "local_unverified",
+        "category_candidates": [
+          {
+            "capability_status": "gap",
+            "category": "lint",
+            "checker_id": null,
+            "language": "rust",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_scan_incomplete",
+            "status": "native_incomplete"
+          },
+          {
+            "capability_status": "gap",
+            "category": "comments",
+            "checker_id": "rust.cargo_rustdoc",
+            "language": "rust",
+            "legacy_status": "stable",
+            "next_action": "按文档原生规则修复或恢复锁定离线环境；读取稳定任务并用同一Cargo复检，核验原配置和完整目标范围",
+            "reason": "native_scan_incomplete",
+            "status": "native_incomplete"
+          },
+          {
+            "capability_status": "gap",
+            "category": "dependencies",
+            "checker_id": null,
+            "language": "rust",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "cve",
+            "checker_id": "rust.cargo_audit",
+            "language": "rust",
+            "legacy_status": "stable",
+            "next_action": "核对原生漏洞及解析版本；补齐离线数据库身份和时效、受批准工具与策略，再用原工具复检",
+            "reason": "rust_cve_native_incomplete",
+            "status": "native_incomplete"
+          },
+          {
+            "capability_status": "gap",
+            "category": "security",
+            "checker_id": null,
+            "language": "rust",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "build",
+            "checker_id": "rust.cargo_check",
+            "language": "rust",
+            "legacy_status": "stable",
+            "next_action": "核对原生编译错误与锁定输入，读取稳定任务并用同一Cargo复检；类型检查不执行测试，完整构建组合和策略仍须核验",
+            "reason": "native_scan_incomplete",
+            "status": "native_incomplete"
+          },
+          {
+            "capability_status": "gap",
+            "category": "lint",
+            "checker_id": null,
+            "language": "toml",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "comments",
+            "checker_id": null,
+            "language": "toml",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "dependencies",
+            "checker_id": null,
+            "language": "toml",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "cve",
+            "checker_id": null,
+            "language": "toml",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "security",
+            "checker_id": null,
+            "language": "toml",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "build",
+            "checker_id": null,
+            "language": "toml",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          }
+        ],
+        "command_status": "incomplete",
+        "delivery_decision": "incomplete",
+        "discovery": {
+          "blocked_paths": [],
+          "build_roots": [
+            {
+              "manifests": [
+                "Cargo.toml"
+              ],
+              "path": "."
+            }
+          ],
+          "checker_configurations": [],
+          "declared_versions": {
+            "Cargo.toml": "0.1.0"
+          },
+          "languages": [
+            {
+              "id": "rust",
+              "manifests": [
+                "Cargo.toml"
+              ],
+              "source_files": [
+                "src/lib.rs"
+              ]
+            },
+            {
+              "id": "toml",
+              "manifests": [],
+              "source_files": [
+                "Cargo.toml"
+              ]
+            }
+          ],
+          "lockfiles": [
+            "Cargo.lock"
+          ],
+          "manifest_sha256": {
+            "Cargo.toml": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146"
+          },
+          "native_tool_candidates": [],
+          "observation_complete": true,
+          "observed_entries": 4,
+          "report_type": "discovery",
+          "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-cargo-discovery-capture-awwe9jxj/missing_toolchain",
+          "schema_version": "0.4.0",
+          "scope_summary": {
+            "configuration_exception_files_observed": 0,
+            "dependency_roots_excluded": 0,
+            "dot_prefix_roots_excluded": 0,
+            "git_safety_status": "not_evaluated",
+            "ordinary_scan_policy": "project_sources_default_v2"
+          },
+          "source_set_candidates": [],
+          "unknown_conditions": [
+            "build_model_not_evaluated",
+            "source_sets_not_fully_classified",
+            "dialects_not_classified",
+            "lock_contents_not_evaluated"
+          ]
+        },
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "jobs_limit": 1,
+          "jobs_source": "cli",
+          "native_task_count": 4,
+          "source": "cli",
+          "started_native_task_count": 4,
+          "timeout_ms": 20000
+        },
+        "execution_tasks": [
+          {
+            "id": "rust.cve",
+            "status": "native_incomplete"
+          },
+          {
+            "id": "rust.build",
+            "status": "native_incomplete"
+          },
+          {
+            "id": "rust.comments",
+            "status": "native_incomplete"
+          },
+          {
+            "id": "rust.lint",
+            "status": "native_incomplete"
+          }
+        ],
+        "exit_code": 3,
+        "export": {
+          "reason_code": null,
+          "status": "not_requested"
+        },
+        "native_results": {
+          "erlang_lint": null,
+          "go_lint": null,
+          "java_cve": null,
+          "java_dependencies": null,
+          "java_javadoc": null,
+          "java_p3c": null,
+          "node_lint": null,
+          "npm_cve": [],
+          "python_cve": [],
+          "python_lint": null,
+          "rust_build": {
+            "authority": "local_unverified",
+            "backlog_status": "not_integrated",
+            "backlog_sync": null,
+            "build_level": "type_check",
+            "build_success": null,
+            "checker_id": "rust.cargo_check",
+            "command_status": "incomplete",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "execution_budget": {
+              "enforcement": "native_execution_only",
+              "source": "cli",
+              "timeout_ms": 20000
+            },
+            "exit_code": 3,
+            "findings": [],
+            "language": "rust",
+            "local_scan_complete": false,
+            "lock_sha256": "5d1647e1ee8815fa0716c6336f8b78f63bb7e07205d0df2d3af6c947eb5c69a5",
+            "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+            "next_actions": [
+              "核对原生项目构建规则与目标范围；局部零诊断不证明修复或批准白名单",
+              "原工具复检后仍须完整交付检查"
+            ],
+            "operation": "build",
+            "reason": "native_report_finish_missing",
+            "recheck_argv": [
+              "cargo",
+              "check",
+              "--locked",
+              "--offline",
+              "--all-targets",
+              "--message-format=json"
+            ],
+            "report_type": "rust_build_local_observation",
+            "rule_selection": "explicit_probe_not_approved_project_policy",
+            "run_id": "cargo-build-21665-1791099827481550000",
+            "schema_version": "0.2.0",
+            "scope": "selected_root_all_targets_default_features",
+            "test_execution": false,
+            "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+            "workspace_binding": "uninitialized",
+            "workspace_id": null
+          },
+          "rust_comments": {
+            "authority": "local_unverified",
+            "backlog_status": "not_integrated",
+            "backlog_sync": null,
+            "checker_id": "rust.cargo_rustdoc",
+            "command_status": "incomplete",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "execution_budget": {
+              "enforcement": "native_execution_only",
+              "source": "cli",
+              "timeout_ms": 20000
+            },
+            "exit_code": 3,
+            "findings": [],
+            "language": "rust",
+            "local_scan_complete": false,
+            "lock_sha256": "5d1647e1ee8815fa0716c6336f8b78f63bb7e07205d0df2d3af6c947eb5c69a5",
+            "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+            "next_actions": [
+              "核对原生项目文档规则与目标范围；局部零诊断不证明修复或批准白名单",
+              "原工具复检后仍须完整交付检查"
+            ],
+            "operation": "comments",
+            "reason": "native_report_finish_missing",
+            "recheck_argv": [
+              "cargo",
+              "rustdoc",
+              "--lib",
+              "--locked",
+              "--offline",
+              "--message-format=json",
+              "--",
+              "--warn",
+              "missing_docs",
+              "--warn",
+              "rustdoc::broken_intra_doc_links"
+            ],
+            "report_type": "rustdoc_local_observation",
+            "rule_selection": "explicit_probe_not_approved_project_policy",
+            "run_id": "rustdoc-21665-1791099827790998000",
+            "schema_version": "0.4.0",
+            "scope": "selected_root_library_default_features",
+            "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+            "workspace_binding": "uninitialized",
+            "workspace_id": null
+          },
+          "rust_cve": {
+            "authority": "local_unverified",
+            "checker_id": "rust.cargo_audit",
+            "command_status": "incomplete",
+            "coverage_proven": false,
+            "database_advisory_count": null,
+            "database_freshness": "unverified",
+            "database_last_commit": null,
+            "database_last_updated": null,
+            "delivery_decision": "not_evaluated",
+            "dependency_count": null,
+            "execution_budget": {
+              "enforcement": "native_execution_only",
+              "source": "cli",
+              "timeout_ms": 20000
+            },
+            "exit_code": 3,
+            "findings": [],
+            "language": "rust",
+            "local_scan_complete": false,
+            "lock_sha256": null,
+            "manifest_sha256": null,
+            "native_warnings_present": false,
+            "next_actions": [
+              "核对原生漏洞库来源、提交与时效；零漏洞不能证明安全",
+              "复核解析依赖及原生 advisory 后修复或提出精确误报候选"
+            ],
+            "operation": "cve",
+            "reason": "cargo_audit_tool_not_selected",
+            "report_type": "rust_cve_local_observation",
+            "schema_version": "0.1.0",
+            "tool_sha256": null
+          },
+          "rust_lint": {
+            "authority": "local_unverified",
+            "backlog_status": "not_initialized",
+            "backlog_sync": null,
+            "checker_id": "rust.cargo_clippy",
+            "command_status": "incomplete",
+            "configuration": "unknown",
+            "configuration_ref": null,
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "exit_code": 3,
+            "findings": [],
+            "language": "rust",
+            "local_scan_complete": false,
+            "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+            "next": null,
+            "operation": "lint",
+            "reason": "native_report_finish_missing_or_duplicate",
+            "recheck_command": "cargo clippy --locked --offline --all-targets --message-format=json",
+            "report_type": "rust_clippy_local_observation",
+            "rulepack_approval": "unverified",
+            "run_id": "rust-lint-21665-1791099828097222000-0",
+            "schema_version": "0.2.0",
+            "scope": "default_features_all_targets",
+            "tool_approval": "unverified",
+            "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+            "workspace_binding": "uninitialized",
+            "workspace_id": null
+          }
+        },
+        "next": null,
+        "obligation_status": "unresolved",
+        "operation": "check",
+        "reason": "full_project_obligations_and_trusted_policy_unavailable",
+        "report_type": "check_feedback",
+        "required_obligations": null,
+        "schema_version": "0.36.0",
+        "selection": "all",
+        "syntax_candidates": {
+          "authority": "candidate_unqualified",
+          "delivery_decision": "incomplete",
+          "execution_phase": "after_native",
+          "native_preferred_count": 0,
+          "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+          "observations": [
+            {
+              "byte_offset": 0,
+              "grammar_qualified": false,
+              "grammar_sha256": "206031e0f67fb41ecae505868ca3bb917df7375031aebafd2f97314a849713fe",
+              "known_limitations": [
+                "Rust 2021 rustfmt 1.9.0 differential agrees on 13 narrow syntax cases; other editions, systematic precision, complete native-first Clippy coverage and release remain unqualified"
+              ],
+              "language": "rust",
+              "path": "src/lib.rs",
+              "reason": null,
+              "recoveries": [],
+              "recovery_count": 0,
+              "scope": "whole_file",
+              "source_sha256": "bd624767c05e6e70f010d9bf37bcb56fd640876b6c7489a5d6f98de6cd36659b",
+              "status": "candidate_observed"
+            }
+          ],
+          "reason": "unrouted_source",
+          "skipped_count": 0,
+          "source_file_count": 2,
+          "status": "observed_partial",
+          "unrouted_count": 1
+        },
+        "unresolved_conditions": [
+          "build_model_not_evaluated",
+          "dialects_not_classified",
+          "lock_contents_not_evaluated",
+          "required_obligations_unresolved",
+          "rust_build_policy_and_coverage_unverified",
+          "rust_build_task_incomplete",
+          "rust_comments_policy_and_coverage_unverified",
+          "rust_comments_task_incomplete",
+          "rust_cve_database_freshness_unverified",
+          "rust_cve_task_incomplete",
+          "rust_lint_task_incomplete",
+          "source_sets_not_fully_classified",
+          "tool_lock_unverified",
+          "trusted_policy_unavailable"
+        ]
+      },
+      "toolchains_created": false
+    },
+    {
+      "case": "empty_path",
+      "oracle": "controlled_no_cargo_environment",
+      "check_feedback": {
+        "authority": "local_unverified",
+        "category_candidates": [
+          {
+            "capability_status": "gap",
+            "category": "lint",
+            "checker_id": null,
+            "language": "rust",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_scan_incomplete",
+            "status": "native_incomplete"
+          },
+          {
+            "capability_status": "gap",
+            "category": "comments",
+            "checker_id": "rust.cargo_rustdoc",
+            "language": "rust",
+            "legacy_status": "stable",
+            "next_action": "按文档原生规则修复或恢复锁定离线环境；读取稳定任务并用同一Cargo复检，核验原配置和完整目标范围",
+            "reason": "native_scan_incomplete",
+            "status": "native_incomplete"
+          },
+          {
+            "capability_status": "gap",
+            "category": "dependencies",
+            "checker_id": null,
+            "language": "rust",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "cve",
+            "checker_id": "rust.cargo_audit",
+            "language": "rust",
+            "legacy_status": "stable",
+            "next_action": "核对原生漏洞及解析版本；补齐离线数据库身份和时效、受批准工具与策略，再用原工具复检",
+            "reason": "rust_cve_native_incomplete",
+            "status": "native_incomplete"
+          },
+          {
+            "capability_status": "gap",
+            "category": "security",
+            "checker_id": null,
+            "language": "rust",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "build",
+            "checker_id": "rust.cargo_check",
+            "language": "rust",
+            "legacy_status": "stable",
+            "next_action": "核对原生编译错误与锁定输入，读取稳定任务并用同一Cargo复检；类型检查不执行测试，完整构建组合和策略仍须核验",
+            "reason": "native_scan_incomplete",
+            "status": "native_incomplete"
+          },
+          {
+            "capability_status": "gap",
+            "category": "lint",
+            "checker_id": null,
+            "language": "toml",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "comments",
+            "checker_id": null,
+            "language": "toml",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "dependencies",
+            "checker_id": null,
+            "language": "toml",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "cve",
+            "checker_id": null,
+            "language": "toml",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "security",
+            "checker_id": null,
+            "language": "toml",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "build",
+            "checker_id": null,
+            "language": "toml",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          }
+        ],
+        "command_status": "incomplete",
+        "delivery_decision": "incomplete",
+        "discovery": {
+          "blocked_paths": [],
+          "build_roots": [
+            {
+              "manifests": [
+                "Cargo.toml"
+              ],
+              "path": "."
+            }
+          ],
+          "checker_configurations": [],
+          "declared_versions": {
+            "Cargo.toml": "0.1.0"
+          },
+          "languages": [
+            {
+              "id": "rust",
+              "manifests": [
+                "Cargo.toml"
+              ],
+              "source_files": [
+                "src/lib.rs"
+              ]
+            },
+            {
+              "id": "toml",
+              "manifests": [],
+              "source_files": [
+                "Cargo.toml"
+              ]
+            }
+          ],
+          "lockfiles": [
+            "Cargo.lock"
+          ],
+          "manifest_sha256": {
+            "Cargo.toml": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146"
+          },
+          "native_tool_candidates": [],
+          "observation_complete": true,
+          "observed_entries": 4,
+          "report_type": "discovery",
+          "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-cargo-discovery-capture-awwe9jxj/absent_cargo",
+          "schema_version": "0.4.0",
+          "scope_summary": {
+            "configuration_exception_files_observed": 0,
+            "dependency_roots_excluded": 0,
+            "dot_prefix_roots_excluded": 0,
+            "git_safety_status": "not_evaluated",
+            "ordinary_scan_policy": "project_sources_default_v2"
+          },
+          "source_set_candidates": [],
+          "unknown_conditions": [
+            "build_model_not_evaluated",
+            "source_sets_not_fully_classified",
+            "dialects_not_classified",
+            "lock_contents_not_evaluated"
+          ]
+        },
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "jobs_limit": 1,
+          "jobs_source": "cli",
+          "native_task_count": 4,
+          "source": "cli",
+          "started_native_task_count": 4,
+          "timeout_ms": 20000
+        },
+        "execution_tasks": [
+          {
+            "id": "rust.cve",
+            "status": "native_incomplete"
+          },
+          {
+            "id": "rust.build",
+            "status": "native_incomplete"
+          },
+          {
+            "id": "rust.comments",
+            "status": "native_incomplete"
+          },
+          {
+            "id": "rust.lint",
+            "status": "native_incomplete"
+          }
+        ],
+        "exit_code": 3,
+        "export": {
+          "reason_code": null,
+          "status": "not_requested"
+        },
+        "native_results": {
+          "erlang_lint": null,
+          "go_lint": null,
+          "java_cve": null,
+          "java_dependencies": null,
+          "java_javadoc": null,
+          "java_p3c": null,
+          "node_lint": null,
+          "npm_cve": [],
+          "python_cve": [],
+          "python_lint": null,
+          "rust_build": {
+            "authority": "local_unverified",
+            "backlog_status": "not_integrated",
+            "backlog_sync": null,
+            "build_level": "type_check",
+            "build_success": null,
+            "checker_id": "rust.cargo_check",
+            "command_status": "incomplete",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "execution_budget": {
+              "enforcement": "native_execution_only",
+              "source": "cli",
+              "timeout_ms": 20000
+            },
+            "exit_code": 3,
+            "findings": [],
+            "language": "rust",
+            "local_scan_complete": false,
+            "lock_sha256": null,
+            "manifest_sha256": null,
+            "next_actions": [
+              "核对原生项目构建规则与目标范围；局部零诊断不证明修复或批准白名单",
+              "原工具复检后仍须完整交付检查"
+            ],
+            "operation": "build",
+            "reason": "cargo_tool_not_selected",
+            "recheck_argv": [
+              "cargo",
+              "check",
+              "--locked",
+              "--offline",
+              "--all-targets",
+              "--message-format=json"
+            ],
+            "report_type": "rust_build_local_observation",
+            "rule_selection": "explicit_probe_not_approved_project_policy",
+            "run_id": "cargo-build-21670-1791099828767761000",
+            "schema_version": "0.2.0",
+            "scope": "selected_root_all_targets_default_features",
+            "test_execution": false,
+            "tool_sha256": null,
+            "workspace_binding": "uninitialized",
+            "workspace_id": null
+          },
+          "rust_comments": {
+            "authority": "local_unverified",
+            "backlog_status": "not_integrated",
+            "backlog_sync": null,
+            "checker_id": "rust.cargo_rustdoc",
+            "command_status": "incomplete",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "execution_budget": {
+              "enforcement": "native_execution_only",
+              "source": "cli",
+              "timeout_ms": 20000
+            },
+            "exit_code": 3,
+            "findings": [],
+            "language": "rust",
+            "local_scan_complete": false,
+            "lock_sha256": null,
+            "manifest_sha256": null,
+            "next_actions": [
+              "核对原生项目文档规则与目标范围；局部零诊断不证明修复或批准白名单",
+              "原工具复检后仍须完整交付检查"
+            ],
+            "operation": "comments",
+            "reason": "cargo_tool_not_selected",
+            "recheck_argv": [
+              "cargo",
+              "rustdoc",
+              "--lib",
+              "--locked",
+              "--offline",
+              "--message-format=json",
+              "--",
+              "--warn",
+              "missing_docs",
+              "--warn",
+              "rustdoc::broken_intra_doc_links"
+            ],
+            "report_type": "rustdoc_local_observation",
+            "rule_selection": "explicit_probe_not_approved_project_policy",
+            "run_id": "rustdoc-21670-1791099828767864000",
+            "schema_version": "0.4.0",
+            "scope": "selected_root_library_default_features",
+            "tool_sha256": null,
+            "workspace_binding": "uninitialized",
+            "workspace_id": null
+          },
+          "rust_cve": {
+            "authority": "local_unverified",
+            "checker_id": "rust.cargo_audit",
+            "command_status": "incomplete",
+            "coverage_proven": false,
+            "database_advisory_count": null,
+            "database_freshness": "unverified",
+            "database_last_commit": null,
+            "database_last_updated": null,
+            "delivery_decision": "not_evaluated",
+            "dependency_count": null,
+            "execution_budget": {
+              "enforcement": "native_execution_only",
+              "source": "cli",
+              "timeout_ms": 20000
+            },
+            "exit_code": 3,
+            "findings": [],
+            "language": "rust",
+            "local_scan_complete": false,
+            "lock_sha256": null,
+            "manifest_sha256": null,
+            "native_warnings_present": false,
+            "next_actions": [
+              "核对原生漏洞库来源、提交与时效；零漏洞不能证明安全",
+              "复核解析依赖及原生 advisory 后修复或提出精确误报候选"
+            ],
+            "operation": "cve",
+            "reason": "cargo_audit_tool_not_selected",
+            "report_type": "rust_cve_local_observation",
+            "schema_version": "0.1.0",
+            "tool_sha256": null
+          },
+          "rust_lint": {
+            "authority": "local_unverified",
+            "backlog_status": "not_initialized",
+            "backlog_sync": null,
+            "checker_id": "rust.cargo_clippy",
+            "command_status": "incomplete",
+            "configuration": "unknown",
+            "configuration_ref": null,
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "exit_code": 3,
+            "findings": [],
+            "language": "rust",
+            "local_scan_complete": false,
+            "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+            "next": null,
+            "operation": "lint",
+            "reason": "cargo_tool_not_selected",
+            "recheck_command": "cargo clippy --locked --offline --all-targets --message-format=json",
+            "report_type": "rust_clippy_local_observation",
+            "rulepack_approval": "unverified",
+            "run_id": "rust-lint-21670-1791099828767964000-0",
+            "schema_version": "0.2.0",
+            "scope": "default_features_all_targets",
+            "tool_approval": "unverified",
+            "tool_sha256": null,
+            "workspace_binding": "uninitialized",
+            "workspace_id": null
+          }
+        },
+        "next": null,
+        "obligation_status": "unresolved",
+        "operation": "check",
+        "reason": "full_project_obligations_and_trusted_policy_unavailable",
+        "report_type": "check_feedback",
+        "required_obligations": null,
+        "schema_version": "0.36.0",
+        "selection": "all",
+        "syntax_candidates": {
+          "authority": "candidate_unqualified",
+          "delivery_decision": "incomplete",
+          "execution_phase": "after_native",
+          "native_preferred_count": 0,
+          "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+          "observations": [
+            {
+              "byte_offset": 0,
+              "grammar_qualified": false,
+              "grammar_sha256": "206031e0f67fb41ecae505868ca3bb917df7375031aebafd2f97314a849713fe",
+              "known_limitations": [
+                "Rust 2021 rustfmt 1.9.0 differential agrees on 13 narrow syntax cases; other editions, systematic precision, complete native-first Clippy coverage and release remain unqualified"
+              ],
+              "language": "rust",
+              "path": "src/lib.rs",
+              "reason": null,
+              "recoveries": [],
+              "recovery_count": 0,
+              "scope": "whole_file",
+              "source_sha256": "bd624767c05e6e70f010d9bf37bcb56fd640876b6c7489a5d6f98de6cd36659b",
+              "status": "candidate_observed"
+            }
+          ],
+          "reason": "unrouted_source",
+          "skipped_count": 0,
+          "source_file_count": 2,
+          "status": "observed_partial",
+          "unrouted_count": 1
+        },
+        "unresolved_conditions": [
+          "build_model_not_evaluated",
+          "dialects_not_classified",
+          "lock_contents_not_evaluated",
+          "required_obligations_unresolved",
+          "rust_build_policy_and_coverage_unverified",
+          "rust_build_task_incomplete",
+          "rust_comments_policy_and_coverage_unverified",
+          "rust_comments_task_incomplete",
+          "rust_cve_database_freshness_unverified",
+          "rust_cve_task_incomplete",
+          "rust_lint_task_incomplete",
+          "source_sets_not_fully_classified",
+          "tool_lock_unverified",
+          "trusted_policy_unavailable"
+        ]
+      }
+    }
+  ]
+}

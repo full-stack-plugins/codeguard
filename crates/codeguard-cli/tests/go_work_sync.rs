@@ -35,10 +35,17 @@ impl Project {
             .args(["--format", "json"]);
         if let Some(tool) = tool {
             c.args(["--go-tool", tool]);
+        } else {
+            c.env("PATH", "");
         }
         let out = c.output().unwrap();
         assert_eq!(out.status.code(), Some(3));
-        serde_json::from_slice(&out.stdout).unwrap()
+        let report: Value = serde_json::from_slice(&out.stdout).unwrap();
+        if report["report_type"] == "go_lint_fallback_feedback" {
+            report["native_report"].clone()
+        } else {
+            report
+        }
     }
     fn query(&self, args: &[&str]) -> Value {
         let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))

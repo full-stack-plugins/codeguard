@@ -180,6 +180,12 @@
 
 stable 发布 MUST 分别提供真实工具、平台、Git/CI、宿主安装与运行验收；不以编译、mock 测试、tag 或市场清单替代。全语言完成声明 MUST 满足语言迁移要求。回滚 MUST 不降低已确认的交付契约。
 
+最低 Rust 版本声明 MUST 同时覆盖默认与 WASM 特性。活动锁定依赖声明的最低版本不得高于工作区基线；无版本声明的依赖保持未证明，静态 metadata 相容不能替代该最低工具链上的实际编译。CI MUST 使用声明的最低 Rust 对两种特性的所有目标执行锁定构建检查，不只使用 runner 的最新 stable。
+
+#### Scenario: A transitive dependency raises the Rust minimum
+- **WHEN** WASM 的传递依赖要求的 Rust 版本高于已声明的工作区基线
+- **THEN** 兼容检查失败；约束兼容依赖并在原最低工具链上重新检查默认及 WASM 目标，不能仅凭新编译器成功声称兼容
+
 #### Scenario: Release artifact exists but host cannot run it
 - **WHEN** GitHub release 有二进制但某宿主无法启动
 - **THEN** 该宿主验收保持未完成，不宣称已交付
@@ -220,3 +226,17 @@ The npm package SHALL provide `npx @partme.ai/codeguard` through a minimal Node 
 #### Scenario: A package declares all pinned grammar candidates
 - **WHEN** the packer is asked to prepare an artifact containing the 32 candidate grammars
 - **THEN** it rejects a binary without the WASM worker or with a missing, duplicated or digest-mismatched candidate before creating the artifact; an accepted local artifact runs at least one pinned grammar offline through the installed Node launcher and reports an incomplete candidate rather than a qualified lint result
+
+#### Scenario: An installed npm candidate carries repair feedback across commands
+- **WHEN** a local WASM candidate package is invoked offline through npm on an initialized workspace, an edit produces a syntax confirmation task, and the same task is rechecked through its explicit native tool
+- **THEN** the installed launcher preserves host stdin, stable task identity, evidence and exit status across hook/next/task verify; repeated edits update the same task, native diagnostics guide repair, changed inputs invalidate old positions, and zero native diagnostics without a protected policy retain an open task and unevaluated delivery
+
+#### Scenario: Installed native-first diagnostics do not require a preceding WASM task
+- **WHEN** an installed candidate observes an Erlang source file through its explicitly selected OTP 28 tool in an initialized workspace, with no earlier candidate parsing task
+- **THEN** lint and aggregate checking preserve the same actual task and native evidence; next and original-tool verification refer to saved reports without inventing a grammar identity, changed source withdraws old positions, and repair_ready forwards the current native result through the launcher stdin
+- **AND** persistence failure retains native diagnostics with a null task reference and a concrete synchronization reason; controlled protocol fixtures and explicitly executed real OTP acceptance remain separate evidence
+
+#### Scenario: Installed Ruby edit feedback preserves line-only repair evidence
+- **WHEN** an offline installed candidate receives a confirmed Ruby edit and later repair_ready through launcher stdin using an explicit fixed-version native tool
+- **THEN** edit, lint, project check, next and recheck refer to the same actual task, inspect only their declared scope, and preserve line-only evidence without guessed columns; bounded host context contains current positions and safe task references without source/tool-message echoes
+- **AND** changed source invalidates old positions, zero diagnostics retain an open task without approved coverage, and recurrence updates the same identity; controlled protocol fixtures do not claim real Ruby precision or installed-host acceptance

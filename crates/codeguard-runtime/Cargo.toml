@@ -6,13 +6,15 @@ rust-version.workspace = true
 license.workspace = true
 
 [features]
-wasm-precheck = ["dep:tree-sitter"]
+wasm-precheck = ["dep:tree-sitter", "dep:tree-sitter-language"]
 
 [dependencies]
 codeguard-core = { path = "../codeguard-core" }
 libc = "0.2"
 ring.workspace = true
 tree-sitter = { version = "=0.25.10", features = ["wasm"], optional = true }
+# 0.1.8 将 MSRV 提升至 1.90；显式约束兼容版，防止传递依赖更新破坏 Rust 1.85。
+tree-sitter-language = { version = "=0.1.7", optional = true }
 tar = { version = "=0.4.46", default-features = false }
 zip = { version = "=6.0.0", default-features = false, features = ["deflate-flate2"] }
 flate2 = { version = "=1.1.10", default-features = false, features = ["rust_backend"] }

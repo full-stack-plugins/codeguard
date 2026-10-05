@@ -405,18 +405,23 @@ fn suppression_difference(
     let mut suppressed_count = 0_usize;
     let mut suppressed_rules = BTreeSet::new();
     for diagnostic in unsuppressed {
-        if diagnostic.code.is_empty()
-            || diagnostic.code.len() > 12
-            || !diagnostic
-                .code
-                .bytes()
-                .all(|byte| byte.is_ascii_uppercase() || byte.is_ascii_digit())
+        let syntax = diagnostic.code == "invalid-syntax" && diagnostic.severity == "error";
+        if !syntax
+            && (diagnostic.code.is_empty()
+                || diagnostic.code.len() > 12
+                || !diagnostic
+                    .code
+                    .bytes()
+                    .all(|byte| byte.is_ascii_uppercase() || byte.is_ascii_digit()))
         {
             return Err("suppression_audit_rule_invalid");
         }
         let entry = remaining.entry(key(diagnostic)).or_default();
         if *entry > 0 {
             *entry -= 1;
+        } else if syntax {
+            // 解析错误不作为源码注释抑制差额，必须与正常检查逐条一致。
+            return Err("suppression_audit_inconsistent");
         } else {
             suppressed_count += 1;
             suppressed_rules.insert(diagnostic.code.clone());
@@ -497,5 +502,61 @@ fn incomplete(reason: &'static str, parsed: Option<RuffParsed>) -> RuffProbeResu
         parsed,
         settings: None,
         suppression_audit: None,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::suppression_difference;
+    use codeguard_adapters::{RuffDiagnostic, RuffLocation};
+
+    fn diagnostic(code: &str) -> RuffDiagnostic {
+        RuffDiagnostic {
+            code: code.into(),
+            message: "native diagnostic".into(),
+            filename: "app.py".into(),
+            location: RuffLocation { row: 2, column: 1 },
+            severity: "error".into(),
+        }
+    }
+    #[test]
+    fn matched_native_syntax_errors_are_not_suppressions() {
+        let syntax = diagnostic("invalid-syntax");
+        assert_eq!(
+            suppression_difference(std::slice::from_ref(&syntax), std::slice::from_ref(&syntax)),
+            Ok((0, vec![]))
+        );
+        let style = diagnostic("F401");
+        assert_eq!(
+            suppression_difference(std::slice::from_ref(&syntax), &[syntax.clone(), style]),
+            Ok((1, vec!["F401".into()]))
+        );
+    }
+    #[test]
+    fn syntax_cannot_appear_only_in_one_audit_or_change_multiplicity() {
+        let syntax = diagnostic("invalid-syntax");
+        assert!(suppression_difference(&[], std::slice::from_ref(&syntax)).is_err());
+        assert!(suppression_difference(std::slice::from_ref(&syntax), &[]).is_err());
+        assert!(
+            suppression_difference(
+                std::slice::from_ref(&syntax),
+                &[syntax.clone(), syntax.clone()]
+            )
+            .is_err()
+        );
+    }
+    #[test]
+    fn unknown_lowercase_rules_and_nonerror_syntax_are_rejected() {
+        let unknown = diagnostic("arbitrary-lowercase");
+        assert!(
+            suppression_difference(
+                std::slice::from_ref(&unknown),
+                std::slice::from_ref(&unknown)
+            )
+            .is_err()
+        );
+        let mut warning = diagnostic("invalid-syntax");
+        warning.severity = "warning".into();
+        assert!(suppression_difference(&[warning.clone()], &[warning]).is_err());
     }
 }

@@ -1,0 +1,45 @@
+{
+  "description": "Fixed Node 24.18.0 module syntax and no-execution development cases; not project mode or independent holdout approval",
+  "cases": [
+    {
+      "id": "javascript-no_execution",
+      "language": "javascript",
+      "source": "console.log(\"must-not-execute\"); throw new Error(\"must-not-execute\");\n",
+      "source_sha256": "4421811bc0d37281adca22d1ffd00e7bdfa2aab99c355bef3e69612df41a30a8",
+      "expected_valid": true,
+      "label": "regression",
+      "cohort": "repository_regression",
+      "origin": "tests/fixtures/javascript_module_syntax_regression.json"
+    },
+    {
+      "id": "javascript-no_import_resolution",
+      "language": "javascript",
+      "source": "import \"codeguard-deliberately-unresolved\"; export const x = 1;\n",
+      "source_sha256": "8a4b2fb9f842d7d57be72a83afdf503f26bd331f6f8bd2325f314b0677fc45f5",
+      "expected_valid": true,
+      "label": "regression",
+      "cohort": "repository_regression",
+      "origin": "tests/fixtures/javascript_module_syntax_regression.json"
+    },
+    {
+      "id": "javascript-module_return",
+      "language": "javascript",
+      "source": "return 1;\n",
+      "source_sha256": "a4688a271f970bc9d4bd5ad3a736ff802730df3b5aa1024e49aa2b286ede3312",
+      "expected_valid": false,
+      "label": "regression",
+      "cohort": "repository_regression",
+      "origin": "tests/fixtures/javascript_module_syntax_regression.json"
+    },
+    {
+      "id": "javascript-duplicate_binding",
+      "language": "javascript",
+      "source": "const x = 1; const x = 2;\n",
+      "source_sha256": "fcd055ec602acf93583471d5efa13c941f31a983920520581e3defb15328da13",
+      "expected_valid": false,
+      "label": "regression",
+      "cohort": "repository_regression",
+      "origin": "tests/fixtures/javascript_module_syntax_regression.json"
+    }
+  ]
+}

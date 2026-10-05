@@ -16,6 +16,7 @@ use std::time::{Instant, SystemTime, UNIX_EPOCH};
 use crate::workspace_refresh::read_workspace_baseline;
 
 static NEXT_RUN: AtomicU64 = AtomicU64::new(0);
+static NEXT_SCRATCH: AtomicU64 = AtomicU64::new(0);
 
 struct Scratch(PathBuf);
 
@@ -33,7 +34,16 @@ pub fn observe_cargo_clippy(
     deadline: Instant,
     cancelled: &AtomicBool,
 ) -> Value {
-    observe_cargo_clippy_inner(root, source_files, cargo_tool, deadline, cancelled, None)
+    observe_cargo_clippy_inner(
+        root,
+        source_files,
+        cargo_tool,
+        deadline,
+        cancelled,
+        None,
+        false,
+    )
+    .0
 }
 
 /// 使用原生 `--force-warn` 对单条 Clippy 规则作抑制对照；结果只供本地复检裁定。
@@ -52,6 +62,31 @@ pub fn observe_cargo_clippy_force_warn(
         deadline,
         cancelled,
         Some(rule_id),
+        false,
+    )
+    .0
+}
+
+/// 供本轮聚合检查传递原生目标入口覆盖；不从持久报告恢复覆盖身份。
+/// 参数沿用原生 Clippy 入口，返回原报告与当前输入绑定的进程内覆盖。
+pub(crate) fn observe_cargo_clippy_with_coverage(
+    root: &Path,
+    source_files: &BTreeSet<String>,
+    cargo_tool: Option<&Path>,
+    deadline: Instant,
+    cancelled: &AtomicBool,
+) -> (
+    Value,
+    crate::rust_native_syntax_coverage::RustNativeSyntaxCoverage,
+) {
+    observe_cargo_clippy_inner(
+        root,
+        source_files,
+        cargo_tool,
+        deadline,
+        cancelled,
+        None,
+        true,
     )
 }
 
@@ -62,7 +97,11 @@ fn observe_cargo_clippy_inner(
     deadline: Instant,
     cancelled: &AtomicBool,
     force_warn_rule: Option<&str>,
-) -> Value {
+    collect_target_coverage: bool,
+) -> (
+    Value,
+    crate::rust_native_syntax_coverage::RustNativeSyntaxCoverage,
+) {
     let (workspace_binding, workspace_id) = match read_workspace_baseline(root) {
         Ok(Some(baseline)) => match baseline.workspace_id() {
             Some(id) => ("bound", json!(id)),
@@ -81,7 +120,7 @@ fn observe_cargo_clippy_inner(
         "local_scan_complete":false, "reason":"cargo_tool_not_selected",
         "tool_sha256":null, "manifest_sha256":null, "findings":[], "scope":"default_features_all_targets",
         "coverage_proven":false, "authority":"local_unverified",
-        "recheck_command":"cargo clippy --offline --all-targets --message-format=json"
+        "recheck_command":"cargo clippy --locked --offline --all-targets --message-format=json"
     });
     if let Some(rule) = force_warn_rule {
         if !rule.strip_prefix("clippy::").is_some_and(|name| {
@@ -92,16 +131,16 @@ fn observe_cargo_clippy_inner(
                     .all(|byte| byte.is_ascii_lowercase() || byte.is_ascii_digit() || byte == b'_')
         }) {
             report["reason"] = json!("force_warn_rule_invalid");
-            return report;
+            return (report, Default::default());
         }
         report["recheck_command"] = json!(format!(
-            "cargo clippy --offline --all-targets --message-format=json -- --force-warn {rule}"
+            "cargo clippy --locked --offline --all-targets --message-format=json -- --force-warn {rule}"
         ));
     }
     let manifest = root.join("Cargo.toml");
     let Ok(before_manifest) = read_bounded_regular_file(&manifest, 256 * 1024) else {
         report["reason"] = json!("root_cargo_manifest_unavailable");
-        return report;
+        return (report, Default::default());
     };
     report["manifest_sha256"] = json!(format!("{:x}", Sha256::digest(&before_manifest)));
     for name in ["clippy.toml", ".clippy.toml"] {
@@ -110,7 +149,7 @@ fn observe_cargo_clippy_inner(
             Ok(metadata) if metadata.file_type().is_file() => {
                 if read_bounded_regular_file(&path, 256 * 1024).is_err() {
                     report["reason"] = json!("clippy_config_unreadable");
-                    return report;
+                    return (report, Default::default());
                 }
                 report["configuration"] = json!("configured");
                 report["configuration_ref"] = json!(name);
@@ -118,33 +157,53 @@ fn observe_cargo_clippy_inner(
             }
             Ok(_) => {
                 report["reason"] = json!("clippy_config_not_regular");
-                return report;
+                return (report, Default::default());
             }
             Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
             Err(_) => {
                 report["reason"] = json!("clippy_config_unreadable");
-                return report;
+                return (report, Default::default());
             }
         }
     }
-    let Some(tool) = cargo_tool else {
-        return report;
+    let selected_tool = crate::cargo_tool_selection::resolve_cargo_tool(cargo_tool);
+    let Some(tool) = selected_tool.as_deref() else {
+        return (report, Default::default());
     };
     let Ok(resolved_tool) = tool.canonicalize() else {
         report["reason"] = json!("cargo_tool_unavailable");
-        return report;
+        return (report, Default::default());
     };
     let Ok(tool_bytes) = read_bounded_regular_file(&resolved_tool, 128 * 1024 * 1024) else {
         report["reason"] = json!("cargo_tool_unavailable");
-        return report;
+        return (report, Default::default());
     };
     report["tool_sha256"] = json!(format!("{:x}", Sha256::digest(&tool_bytes)));
+    let Ok(inputs) = crate::rust_lint_inputs::RustLintInputs::capture(root, source_files) else {
+        report["reason"] = json!("rust_inputs_unavailable");
+        return (report, Default::default());
+    };
+    if inputs.source("Cargo.toml") != Some(before_manifest.as_slice()) {
+        report["reason"] = json!("manifest_changed_during_scan");
+        return (report, Default::default());
+    }
+    if inputs.source("Cargo.lock").is_none() {
+        // 检查不得隐式生成锁文件；项目需先明确准备依赖，再按原锁复检。
+        report["reason"] = json!("cargo_lock_unavailable");
+        return (report, Default::default());
+    }
     let Some(scratch) = private_scratch() else {
         report["reason"] = json!("private_workspace_unavailable");
-        return report;
+        return (report, Default::default());
     };
     let mut environment = BTreeMap::new();
-    for name in ["PATH", "HOME", "CARGO_HOME", "RUSTUP_HOME"] {
+    for name in [
+        "PATH",
+        "HOME",
+        "CARGO_HOME",
+        "RUSTUP_HOME",
+        "RUSTUP_TOOLCHAIN",
+    ] {
         if let Some(value) = std::env::var_os(name) {
             environment.insert(OsString::from(name), value);
         }
@@ -154,8 +213,11 @@ fn observe_cargo_clippy_inner(
         scratch.0.as_os_str().to_os_string(),
     );
     environment.insert(OsString::from("CARGO_NET_OFFLINE"), OsString::from("true"));
+    // Cargo 的离线选项不约束 rustup；检查不得自动安装缺失工具链。
+    environment.insert(OsString::from("RUSTUP_AUTO_INSTALL"), OsString::from("0"));
     let mut args: Vec<OsString> = [
         "clippy",
+        "--locked",
         "--offline",
         "--all-targets",
         "--message-format=json",
@@ -188,12 +250,25 @@ fn observe_cargo_clippy_inner(
     let mut occurrences = BTreeMap::<String, u64>::new();
     let mut native_findings = parsed.findings.clone();
     native_findings.sort_by(|left, right| {
-        (&left.path, left.line, left.column, &left.rule_id).cmp(&(
-            &right.path,
-            right.line,
-            right.column,
-            &right.rule_id,
-        ))
+        (
+            &left.path,
+            left.line,
+            left.column,
+            &left.rule_id,
+            &left.level,
+        )
+            .cmp(&(
+                &right.path,
+                right.line,
+                right.column,
+                &right.rule_id,
+                &right.level,
+            ))
+    });
+    // Cargo 可按库/测试目标重复诊断；同规则同定位只建一个问题，error 排在 warning 前保留。
+    native_findings.dedup_by(|left, right| {
+        (&left.path, left.line, left.column, &left.rule_id)
+            == (&right.path, right.line, right.column, &right.rule_id)
     });
     let findings: Vec<Value> = native_findings
         .iter()
@@ -202,8 +277,7 @@ fn observe_cargo_clippy_inner(
                 finding_paths_valid = false;
                 return None;
             }
-            let Ok(bytes) = read_bounded_regular_file(&root.join(&finding.path), 16 * 1024 * 1024)
-            else {
+            let Some(bytes) = inputs.source(&finding.path) else {
                 source_identity_valid = false;
                 return None;
             };
@@ -236,7 +310,7 @@ fn observe_cargo_clippy_inner(
             Some(json!({
                 "finding_id":format!("CG-{}", &fingerprint[..32]),
                 "finding_fingerprint":fingerprint,
-                "source_sha256":format!("{:x}", Sha256::digest(&bytes)),
+                "source_sha256":format!("{:x}", Sha256::digest(bytes)),
                 "rule_id":finding.rule_id,
                 "path":finding.path,
                 "line":finding.line,
@@ -248,8 +322,24 @@ fn observe_cargo_clippy_inner(
     report["findings"] = json!(findings);
     let manifest_unchanged = read_bounded_regular_file(&manifest, 256 * 1024)
         .is_ok_and(|after| after == before_manifest);
-    let reason = if !manifest_unchanged {
+    let inputs_unchanged = inputs.unchanged(root);
+    let tool_unchanged = tool
+        .canonicalize()
+        .is_ok_and(|after| after == resolved_tool)
+        && read_bounded_regular_file(&resolved_tool, 128 * 1024 * 1024)
+            .is_ok_and(|after| after == tool_bytes);
+    if !inputs_unchanged || !tool_unchanged {
+        // 陈旧诊断不能绑定到新源码，也不能产生新的源码修复任务；局部阻塞仍保留。
+        report["findings"] = json!([]);
+    }
+    let reason = if outcome.termination == Termination::Cancelled {
+        "request_cancelled"
+    } else if !manifest_unchanged {
         "manifest_changed_during_scan"
+    } else if !inputs_unchanged {
+        "rust_inputs_changed_during_scan"
+    } else if !tool_unchanged {
+        "cargo_tool_changed_during_scan"
     } else if !finding_paths_valid {
         "native_finding_outside_observed_scope"
     } else if !source_identity_valid {
@@ -267,7 +357,23 @@ fn observe_cargo_clippy_inner(
     };
     report["reason"] = json!(reason);
     report["local_scan_complete"] = json!(reason == "native_observed_unverified");
-    report
+    #[cfg(feature = "wasm-precheck")]
+    let coverage = if collect_target_coverage && reason == "native_observed_unverified" {
+        crate::rust_native_syntax_coverage::RustNativeSyntaxCoverage::from_completed_stream(
+            root,
+            &inputs,
+            source_files,
+            &outcome.stdout,
+        )
+    } else {
+        Default::default()
+    };
+    #[cfg(not(feature = "wasm-precheck"))]
+    let coverage = {
+        let _ = collect_target_coverage;
+        Default::default()
+    };
+    (report, coverage)
 }
 
 fn run_id() -> String {
@@ -296,10 +402,26 @@ fn private_scratch() -> Option<Scratch> {
         .duration_since(UNIX_EPOCH)
         .ok()?
         .as_nanos();
+    private_scratch_with_nonce(nonce)
+}
+
+fn private_scratch_with_nonce(nonce: u128) -> Option<Scratch> {
     let path = std::env::temp_dir().join(format!(
-        "codeguard-rust-clippy-{}-{nonce}",
-        std::process::id()
+        "codeguard-rust-clippy-{}-{nonce}-{}",
+        std::process::id(),
+        NEXT_SCRATCH.fetch_add(1, Ordering::Relaxed)
     ));
     fs::DirBuilder::new().mode(0o700).create(&path).ok()?;
     Some(Scratch(path))
+}
+
+#[cfg(test)]
+mod scratch_contract {
+    #[test]
+    fn identical_clock_values_do_not_collide_between_native_tasks() {
+        let first = super::private_scratch_with_nonce(0).unwrap();
+        let second =
+            super::private_scratch_with_nonce(0).expect("同进程相同时间戳必须仍分配独立私有目录");
+        assert_ne!(first.0, second.0);
+    }
 }

@@ -277,3 +277,46 @@ fn signed_snapshot_still_requires_exact_candidate_revision_and_bytes() {
         Err("approval_snapshot_revision_mismatch")
     );
 }
+
+#[test]
+fn signed_binding_cannot_extend_candidate_beyond_approval_window() {
+    use codeguard_cli::approval_snapshot::verify_and_bind_candidate;
+    use codeguard_cli::false_positive_decision::parse_false_positive_decision_candidate;
+    let pair = key(7);
+    let trusted = anchor(&pair);
+    let mut candidate = json!({"schema_version":"1.0","kind":"false_positive","id":"FP-1",
+        "identity":{"finding_id":"CG-1","checker_id":"ruff","native_rule_id":"F401","category":"lint",
+            "target":{"kind":"source","path":"app.py","file_sha256":"a".repeat(64)},
+            "finding_fingerprint":"b".repeat(64),"tool_sha256":"c".repeat(64),"adapter_sha256":"d".repeat(64),"rulepack_sha256":"e".repeat(64)},
+        "reason_code":"native_false_positive","rationale":"复核","reproducer_ref":"case-1",
+        "approved_policy_revision":"policy-r2","approval_ref":"review-1","reviewer":"reviewer-1","created_at":100,"expires_at":201});
+    for (created, expires, expected) in [
+        (101, 201, false),
+        (99, 200, false),
+        (99, 199, true),
+        (100, 200, true),
+    ] {
+        candidate["created_at"] = json!(created);
+        candidate["expires_at"] = json!(expires);
+        let bytes = serde_json::to_vec(&candidate).unwrap();
+        let observed = parse_false_positive_decision_candidate(&bytes)
+            .unwrap()
+            .identity;
+        let snapshot = serde_json::to_vec(
+            &json!({"schema_version":"1.0","policy_revision":"policy-r2","max_lifetime_seconds":101,
+        "decisions":[{"id":"FP-1","sha256":format!("{:x}",Sha256::digest(&bytes))}]}),
+        )
+        .unwrap();
+        let signed = envelope(&pair, &payload(&snapshot));
+        let result =
+            verify_and_bind_candidate(&bytes, &observed, &snapshot, &signed, &trusted, &context());
+        if expected {
+            assert_eq!(
+                result,
+                Ok(codeguard_cli::approval_snapshot::SnapshotResolution::BoundToPinnedSnapshot)
+            );
+        } else {
+            assert_eq!(result, Err("approval_candidate_lifetime_outside_signature"));
+        }
+    }
+}

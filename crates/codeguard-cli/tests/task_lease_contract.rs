@@ -142,7 +142,12 @@ impl Project {
             .args(["next", self.root.to_str().unwrap(), "--format=json"])
             .output()
             .unwrap();
-        assert_eq!(output.status.code(), Some(0));
+        assert_eq!(
+            output.status.code(),
+            Some(0),
+            "{}",
+            String::from_utf8_lossy(&output.stdout)
+        );
         serde_json::from_slice(&output.stdout).unwrap()
     }
 }
@@ -276,6 +281,204 @@ fn attempt_requires_valid_lease_and_records_no_progress_without_closing_the_task
         1
     );
     assert_eq!(project.run("release", "agent-a", Some(token)).0, 0);
+}
+
+fn add_local_finding(project: &Project, path: &str) -> String {
+    if path != "app.py" && !project.root.join(path).exists() {
+        fs::write(project.root.join(path), "import sys\n").unwrap();
+    }
+    let mut report: Value = serde_json::from_slice(
+        &fs::read(project.root.join(".codeguard/reports/lint-1-100.json")).unwrap(),
+    )
+    .unwrap();
+    let fingerprint = "b".repeat(64);
+    let id = format!("CG-{}", &fingerprint[..32]);
+    report["run_id"] = json!("lint-2-200");
+    let file = &mut report["files"][0];
+    file["path"] = json!(path);
+    file["source_sha256"] = json!(format!(
+        "{:x}",
+        Sha256::digest(fs::read(project.root.join(path)).unwrap())
+    ));
+    file["recheck_argv"] = json!(["ruff", "check", path]);
+    file["findings"][0]["finding_id"] = json!(id);
+    file["findings"][0]["finding_fingerprint"] = json!(fingerprint);
+    file["findings"][0]["path"] = json!(path);
+    fs::write(
+        project.root.join(".codeguard/reports/lint-2-200.json"),
+        serde_json::to_vec_pretty(&report).unwrap(),
+    )
+    .unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "work",
+            "sync",
+            project.root.to_str().unwrap(),
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    let result: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(result["new_findings"], 1);
+    assert_eq!(result["failed_reports"], 0);
+    id
+}
+
+#[test]
+fn exhausted_source_finding_does_not_starve_a_disjoint_source_task() {
+    let project = Project::new();
+    let action = project.next()["repair_brief"]["action_id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+    let (_, lease) = project.run("claim", "agent-a", None);
+    let token = lease["lease_token"].as_str().unwrap();
+    for _ in 0..2 {
+        let (exit, start) = project.attempt("start", "agent-a", token, &["--action-id", &action]);
+        assert_eq!(exit, 0);
+        let (exit, _) = project.attempt(
+            "finish",
+            "agent-a",
+            token,
+            &[
+                "--attempt-id",
+                start["attempt_id"].as_str().unwrap(),
+                "--outcome",
+                "no-change",
+                "--note-code",
+                "no_change",
+            ],
+        );
+        assert_eq!(exit, 0);
+    }
+    let other = add_local_finding(&project, "other.py");
+    let before = fs::read(project.root.join(format!(
+        ".codeguard/findings/{}/finding.json",
+        project.task_id
+    )))
+    .unwrap();
+    let next = project.next();
+    assert_eq!(next["repair_brief"]["task_id"], other, "{next}");
+    assert_eq!(next["disposition"], "actionable");
+    assert_eq!(next["delivery_decision"], "not_evaluated");
+    assert_eq!(
+        next["next_actions"][0],
+        json!(["codeguard", "task", "show", project.task_id, "."])
+    );
+    assert_eq!(
+        fs::read(project.root.join(format!(
+            ".codeguard/findings/{}/finding.json",
+            project.task_id
+        )))
+        .unwrap(),
+        before
+    );
+    assert_eq!(
+        project
+            .attempt("start", "agent-a", token, &["--action-id", &action])
+            .0,
+        3
+    );
+}
+
+#[test]
+fn open_source_attempt_allows_disjoint_work_but_not_the_same_source() {
+    for path in ["other.py", "app.py"] {
+        let project = Project::new();
+        let action = project.next()["repair_brief"]["action_id"]
+            .as_str()
+            .unwrap()
+            .to_owned();
+        let (_, lease) = project.run("claim", "agent-a", None);
+        let token = lease["lease_token"].as_str().unwrap();
+        assert_eq!(
+            project
+                .attempt("start", "agent-a", token, &["--action-id", &action])
+                .0,
+            0
+        );
+        let other = add_local_finding(&project, path);
+        let next = project.next();
+        if path == "other.py" {
+            assert_eq!(next["repair_brief"]["task_id"], other, "{next}");
+            assert_eq!(next["disposition"], "actionable");
+        } else {
+            assert_eq!(next["repair_brief"]["task_id"], project.task_id);
+            assert_eq!(next["disposition"], "waiting");
+        }
+        assert_eq!(
+            project.run("release", "agent-a", Some(token)).1["reason"],
+            "attempt_still_open"
+        );
+        assert_eq!(next["delivery_decision"], "not_evaluated");
+    }
+}
+
+#[test]
+fn hardlinked_source_is_not_mistaken_for_independent_work() {
+    let project = Project::new();
+    let action = project.next()["repair_brief"]["action_id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+    let (_, lease) = project.run("claim", "agent-a", None);
+    let token = lease["lease_token"].as_str().unwrap();
+    assert_eq!(
+        project
+            .attempt("start", "agent-a", token, &["--action-id", &action])
+            .0,
+        0
+    );
+    fs::hard_link(project.root.join("app.py"), project.root.join("alias.py")).unwrap();
+    add_local_finding(&project, "alias.py");
+    // 既有 attempt 输入校验已拒绝硬链接；不能为调度优化放松该保护。
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["next", project.root.to_str().unwrap(), "--format=json"])
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    let next: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(next["reason"], "attempt_input_unreadable");
+    assert!(next["repair_brief"].is_null());
+    assert_eq!(next["delivery_decision"], "not_evaluated");
+}
+
+#[test]
+fn unresolved_prerequisite_blocker_prevents_independent_source_bypass() {
+    let project = Project::new();
+    let action = project.next()["repair_brief"]["action_id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+    let (_, lease) = project.run("claim", "agent-a", None);
+    let token = lease["lease_token"].as_str().unwrap();
+    assert_eq!(
+        project
+            .attempt("start", "agent-a", token, &["--action-id", &action])
+            .0,
+        0
+    );
+    add_local_finding(&project, "other.py");
+    fs::write(project.root.join("ruff.toml"), "[lint]\nselect=['F401']\n").unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "lint",
+            "python",
+            project.root.to_str().unwrap(),
+            "--ruff-tool",
+            "/nonexistent/codeguard-ruff",
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    let report: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert!(report["backlog_sync"]["new_blockers"].as_u64().unwrap() > 0);
+    let next = project.next();
+    assert_eq!(next["repair_brief"]["task_id"], project.task_id);
+    assert_eq!(next["disposition"], "waiting");
+    assert_eq!(next["delivery_decision"], "not_evaluated");
 }
 
 #[test]
@@ -821,5 +1024,71 @@ fn environment_blocker_can_be_claimed_for_repair() {
     assert_eq!(
         project.next()["repair_brief"]["history"]["no_progress_count"],
         0
+    );
+}
+
+#[test]
+fn projection_recovery_keeps_live_lease_attempt_and_budget_unchanged() {
+    fn snapshot(
+        path: &std::path::Path,
+        root: &std::path::Path,
+        records: &mut std::collections::BTreeMap<PathBuf, Vec<u8>>,
+    ) {
+        for entry in fs::read_dir(path).unwrap() {
+            let path = entry.unwrap().path();
+            if path.is_dir() {
+                snapshot(&path, root, records);
+            } else if path
+                .extension()
+                .is_some_and(|extension| extension == "json")
+            {
+                records.insert(
+                    path.strip_prefix(root).unwrap().to_owned(),
+                    fs::read(path).unwrap(),
+                );
+            }
+        }
+    }
+    let p = Project::new();
+    let action = p.next()["repair_brief"]["action_id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+    let (_, lease) = p.run("claim", "projection-owner", None);
+    let token = lease["lease_token"].as_str().unwrap();
+    assert_eq!(
+        p.attempt(
+            "start",
+            "projection-owner",
+            token,
+            &["--action-id", &action]
+        )
+        .0,
+        0
+    );
+    let history = p.next()["repair_brief"]["history"].clone();
+    assert!(history["open_attempt_id"].is_string());
+    let mut before = std::collections::BTreeMap::new();
+    snapshot(&p.root.join(".codeguard/state"), &p.root, &mut before);
+    snapshot(&p.root.join(".codeguard/findings"), &p.root, &mut before);
+    fs::remove_file(p.root.join(format!(".codeguard/tasks/{}.md", p.task_id))).unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["work", "sync"])
+        .arg(&p.root)
+        .arg("--format=json")
+        .output()
+        .unwrap();
+    let response: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(response["restored_task_projections"], 1, "{response}");
+    let mut after = std::collections::BTreeMap::new();
+    snapshot(&p.root.join(".codeguard/state"), &p.root, &mut after);
+    snapshot(&p.root.join(".codeguard/findings"), &p.root, &mut after);
+    assert_eq!(after, before);
+    let next = p.next();
+    assert_eq!(next["repair_brief"]["history"], history);
+    assert_eq!(next["repair_brief"]["disposition"], "waiting");
+    assert_eq!(
+        p.run("release", "projection-owner", Some(token)).1["reason"],
+        "attempt_still_open"
     );
 }

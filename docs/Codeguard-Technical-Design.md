@@ -2,11 +2,15 @@
 
 > **Purpose:** turn the architecture into concrete implementation contracts, command responsibilities, extension steps, and observable acceptance criteria.
 >
-> **Document version:** 1.2.3 · **Updated:** 2026-10-03 · **Source baseline:** current checkout and the [implementation evidence](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md); software version `0.1.3`.
+> **Document version:** 1.2.4 · **Updated:** 2026-10-04 · **Source baseline:** current checkout and the [implementation evidence](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md); software version `0.1.4`.
 
 [简体中文](Codeguard-Technical-Design.zh_CN.md) · [Architecture](Codeguard-Architecture.md) · [README](../README.md)
 
 Topic owners: [commands](Codeguard-Command-Reference.md), [initialization](Codeguard-Project-Initialization.md), [remediation](Codeguard-Remediation-Workflow.md), [false positives](Codeguard-False-Positive-Governance.md), [adapters](Codeguard-Adapter-Contracts.md), [trust/distribution](Codeguard-Trust-and-Distribution.md), [acceptance](Codeguard-Validation-and-Rollout.md) and [legacy compatibility](Codeguard-Legacy-Compatibility.md). Detailed contracts live in these guides; OpenSpec owns requirements and tasks.
+
+The source build wires ESLint into the `node.lint` task in `check all`, sharing native concurrency and the request deadline. Discovered JS/TS/TSX files select their nearest module manifest, local ESLint 10, unique flat config and Node without searching above the selected root. Execution collects reports; aggregation synchronizes the workbench serially and reuses stable tasks. Only completed native results for identical source bytes suppress duplicate WASM; ignored files, configuration errors and tool failures retain both their reasons and fallback. Protocols are current aggregate `check_feedback` 0.38.0 for both bound and unbound checks and `check_aborted` 0.13.0, with older schemas archived. `native_results.node_lint` carries per-file feedback, unexecuted paths, synchronization status and next action. See [acceptance scope](../tests/acceptance/check-all-eslint.md). This does not qualify grammars or replace real host acceptance.
+
+Current `config_inspection` [0.3 schema](../schemas/config-inspection-v0.3.schema.json) adds `project_configuration`: static discovery basis, per-root checker states, source SHA-256, blocked paths and unresolved conditions. Projection budgets are 64 build roots, 256 checker rows, 256 entries per hash map and 32 entries per diagnostic list; total observed counts remain available. A truncated projection cannot be complete. The 0.2 schema is retained unchanged. Legacy JSON rejects duplicate keys recursively and reads through the bounded regular-file runtime. Effective rules/suppressions stay unresolved; configuration is never executed by this command. [Acceptance](../tests/acceptance/config-native-observation.md).
 
 ## 1. Scope and specification ownership
 
@@ -35,6 +39,10 @@ The pinned Zig worker now also has an explicit, real Zig 0.16.0 differential tes
 | Package primitives | `ring`, archive crates, `reqwest` + Rustls/Tokio | Verification/download building blocks exist; public installation remains incomplete |
 | Persistence | JSON facts/events and Markdown projections | Reviewable local state; transactions and cross-machine coordination need explicit work |
 | Agent integration | CLI human/JSON and selected SARIF | No model dependency; host plugin/MCP integration remains separate work |
+
+Current source pins the WASM companion `tree-sitter-language=0.1.7`; 0.1.8 declares Rust 1.90 and conflicts with the workspace baseline. A target/feature-bound locked metadata regression and an independent actual Rust 1.85 CI job now enforce separate static/build checks. Missing dependency declarations and complete platform/MSRV runtime acceptance remain unresolved; see [evidence](../tests/acceptance/rust-msrv-dependency-compatibility.md).
+
+Commit8ca3bb1 passed actual Rust1.85 default/WASM all-target checks. Offline loading of32 candidates and malformed/hash/ABI rejection passed, closing S14.2 loader acceptance. Platform runtime, precision and asset-release acceptance remain open; see [loader verification](../tests/acceptance/rust-wasm-loader-completion.md).
 
 Exact versions are in [Cargo.lock](../Cargo.lock); dependency declarations are in the four crate manifests. The workspace currently has no public feature-selection matrix, database service, web UI, or daemon. Those template patterns are not product requirements.
 
@@ -191,11 +199,11 @@ When some files have suspected issues and others are unresolved, use overall `in
 
 These are the target semantic fields, not a shipped project-wide lint/check report. A narrow [candidate precheck schema](../schemas/syntax-precheck-candidate.schema.json) and [strict Rust reader](../crates/codeguard-adapters/src/syntax_precheck_candidate_report.rs) bind source SHA-256, pinned grammar identity and file dialect, recalculate status, and reject unknown versions or forged `clean`. Optional CLI single-file [TypeScript](../schemas/eslint-local-feedback-v0.3.schema.json), [TSX](../schemas/eslint-local-feedback-v0.4.schema.json) and [Java](../schemas/java-syntax-precheck-feedback-v0.1.schema.json) producers include recovery positions and setup guidance. With an initialized workspace, TypeScript/TSX now uses [feedback 0.5.0](../schemas/eslint-local-feedback-v0.5.schema.json) and attaches one stable native-confirmation task to the source scope; the [0.2.0 preparation report](../schemas/eslint-preparation-observation-v0.2.schema.json) stores bounded suspected positions with source and grammar identities and links them by digest to the task. Host rendering and capability-matched native closure remain absent. The bundled grammars remain unvalidated, so these reports cannot return `clean`. Missing required native execution remains incomplete (`3`); a suspected parser issue alone is not a confirmed violation (`1`). If a dedicated syntax-only operation is later introduced, its success must be explicitly scoped to syntax; no new `syntax` command is claimed here.
 
-The source-built `check all` now adds a narrower actual project report: native adapters run first, then a [bounded source router](../crates/codeguard-cli/src/check_syntax_candidates.rs) selects pinned worker candidates. The closed [0.34.0 schema](../schemas/check-feedback.schema.json) counts files preempted by native checks and projects each selected grammar's bounded known limitations; [0.33.0](../schemas/check-feedback-v0.33.schema.json) remains archived for older readers. Only a completed Ruff scan of matching Python source bytes skips duplicate WASM. A style checker such as P3C is not syntax confirmation. Default terminal output also shows up to eight fixed limitations from candidate observations; automatic host delivery remains pending. The following is an excerpt, not a complete `check_feedback` instance:
+The source-built `check all` now adds a narrower actual project report: native adapters run first, then a [bounded source router](../crates/codeguard-cli/src/check_syntax_candidates.rs) selects pinned worker candidates. The closed [0.38.0 schema](../schemas/check-feedback-v0.38.schema.json) counts files preempted by native checks and projects each selected grammar's bounded known limitations; [0.33.0](../schemas/check-feedback-v0.33.schema.json) remains archived for older readers. Completed Ruff, selected Go vet and module-local ESLint results skip duplicate WASM only for matching source bytes. A style checker such as P3C is not syntax confirmation. Default terminal output also shows up to eight fixed limitations from candidate observations; automatic host delivery remains pending. The following is an excerpt, not a complete `check_feedback` instance:
 
 ```json
 {
-  "schema_version": "0.34.0",
+  "schema_version": "0.38.0",
   "command_status": "incomplete",
   "delivery_decision": "incomplete",
   "syntax_candidates": {
@@ -218,7 +226,7 @@ For one mixed-language project, the candidate pass plans at most 64 fragments, t
 
 For Java, [javac 21 with `--release 17`](../tests/acceptance/java-native-differential.md) accepted eight valid and rejected five malformed syntax fixtures, matching the isolated WASM worker. The test pins only that narrow classification; project-level native routing, version coverage and false-positive rates remain open.
 
-The [Kotlin 2.4.10 differential](../tests/acceptance/kotlin-native-differential.md) records a 12/13 classification agreement and pins the disagreement: `fun f(x: ) = x` is native-rejected but has zero WASM recoveries. `grammar status` and `check all` expose this as a bounded known limitation; zero recoveries cannot close a native confirmation obligation.
+The current [Kotlin 2.4.10 differential](../tests/acceptance/kotlin-native-differential.md) records 11 decidable agreements and two unresolved hidden-error cases. Both `fun f(x: ) = x` and valid `object C { val value = 1 }` have no enumerable recoveries but an incomplete scan. `grammar status` and `check all` retain these bounded limitations. Unknown samples stay in the corpus denominator and are reported separately, never counted as clean, agreement or a confirmed source violation.
 
 The opt-in CLI build first checks for a local ESLint 10 package and a single ordinary flat config on single-file TypeScript requests without explicit native context. With an executable Node resolved from `PATH`, it invokes the existing bounded native version/report probe; without Node it reports the preparation gap rather than running WASM first. Only when no project-local ESLint package is observed does the CLI emit [ESLint feedback 0.3.0](../schemas/eslint-local-feedback-v0.3.schema.json) for `.ts/.mts/.cts` or [0.4.0](../schemas/eslint-local-feedback-v0.4.schema.json) for `.tsx`. TSX uses its own pinned grammar. Candidate prechecks preserve `native=not_run` and `delivery=not_evaluated`, and remain incomplete even with zero recoveries. An ambiguous config, untrusted local path or invalid package identity remains a setup blocker and does not trigger WASM; a partial explicit context also retains its existing path. This is a single-file slice, not project script equivalence, per-module orchestration or automatic host feedback; see the [native-first acceptance](../tests/acceptance/native-first-eslint-candidate.md).
 
@@ -244,7 +252,7 @@ Rust 2021 `rustfmt 1.9.0 --emit stdout` and the isolated Rust worker classify th
 
 C11 `Apple clang 21 -fsyntax-only` and the isolated C worker classify eight valid and five syntax-broken samples consistently. The initial corpus mistakenly treated a return-type error as a syntax error, so it was replaced with a missing initializer expression; the bounded [C differential record](../tests/acceptance/c-native-differential.md) does not qualify semantic diagnostics, C lint or other language versions.
 
-Ruby 2.6.10 `ruby -c` agrees with the isolated Ruby worker on a narrow 13-case corpus, with the fixed worker corpus running in ordinary CI; this does not qualify Ruby lint or other versions. By contrast, Apple Swift 6.4 `swiftc -frontend -parse` rejects `func f(_ x: ) {}` as a missing parameter type while the fixed Swift WASM emits no recovery. The 13-case Swift differential has 12 agreements and this one false negative. The candidate remains unqualified and cannot claim a clean syntax result; see the [Ruby](../tests/acceptance/ruby-native-differential.md) and [Swift](../tests/acceptance/swift-native-differential.md) records.
+Ruby 2.6.10 `ruby -c` agrees with the isolated Ruby worker on a narrow 13-case corpus, with the fixed worker corpus running in ordinary CI; this does not qualify Ruby lint or other versions. By contrast, Apple Swift 6.4 `swiftc -frontend -parse` rejects `func f(_ x: ) {}` as a missing parameter type while the fixed Swift WASM emits no recovery. The corrected 13-case Swift differential has 12 decidable agreements and one unresolved hidden-error case; the native-rejected missing type remains incomplete instead of being classified by its empty recovery array. The candidate remains unqualified and cannot claim a clean syntax result; see the [Ruby](../tests/acceptance/ruby-native-differential.md) and [Swift](../tests/acceptance/swift-native-differential.md) records.
 
 Use a parent-controlled parser worker with a total deadline, per-file input bound, memory/process limit and capped diagnostics. Lazy-load selected grammars, parse without general network/filesystem imports, and terminate a stuck worker without losing native results from other modules. Host-specific enforcement and Rust MSRV compatibility must be tested; numeric production budgets remain measurement-driven rather than invented promises.
 
@@ -297,7 +305,7 @@ Do not infer pass/fail from generic words such as `error`, `warning`, or `BUILD 
 | Next action | Repair source, recommend/require native setup and confirmation, restore configuration, rescan, or obtain a concrete decision? |
 | Delivery | Is this only a local observation or a fully evaluated delivery result? |
 
-[RunReport parsing](../crates/codeguard-cli/src/run_report.rs) supports a common structured contract; [check orchestration](../crates/codeguard-cli/src/check_command.rs) currently emits `check_feedback` `0.34.0`. Adapters also emit their own versioned local observations. Consumers must dispatch by protocol identity/version rather than assume a universal JSON shape. Human output is currently primarily Chinese; English documentation does not imply localized runtime messages.
+[RunReport parsing](../crates/codeguard-cli/src/run_report.rs) supports a common structured contract; [check orchestration](../crates/codeguard-cli/src/check_command.rs) currently emits `check_feedback` `0.38.0`, with workspace binding expressed separately. Adapters also emit their own versioned local observations. Consumers must dispatch by protocol identity/version rather than assume a universal JSON shape. Human output is currently primarily Chinese; English documentation does not imply localized runtime messages.
 
 ### 7.3 Conversation report examples — target presentation
 
@@ -469,7 +477,7 @@ Report review rules apply across all maintained documents: distinguish installed
 
 ### 7.5 Protocol versions and identity closure
 
-The current common `RunReport` is `1.4`, aggregate `check_feedback` is `0.34.0`, and `check_aborted` is `0.11.0`; adapter-local observations have separate versions. Protocol versions must not be rewritten to match software `0.1.0`. The conversation/JSON briefs above are target examples, not complete instances of these three protocols.
+The current common `RunReport` is `1.4`, aggregate `check_feedback` is `0.38.0` with separate workspace binding, and `check_aborted` is `0.13.0`; adapter-local observations have separate versions. Protocol versions must not be rewritten to match software `0.1.0`. The conversation/JSON briefs above are target examples, not complete instances of these three protocols.
 
 The target evidence chain correlates workspace/request/run/obligation/finding/task/attempt. Source locations use reversible paths and content identities; dependency locations use component, resolved version, graph and advisory identities. Lossy rendering of non-UTF-8 paths cannot participate in matching. Digests bind bytes, not approval authority. Upgrades preserve version semantics and never turn old empty findings into complete passes.
 
@@ -713,4 +721,764 @@ This document uses the full-stack-doc Rust README, complete architecture/runtime
 
 ---
 
-**Document version:** 1.2.0 · **Created:** 2026-09-28 · **Updated:** 2026-09-29 · **Status:** ready for review; implementation and full acceptance remain incomplete.
+**Document version:** 1.2.0 · **Created:** 2026-09-28 · **Updated:** 2026-10-04 · **Status:** ready for review; implementation and full acceptance remain incomplete.
+
+Source builds now provide native-first edit feedback through `hook execute` / `hook claude post-tool-use`: only explicit ordinary files are selected; Python uses Ruff and JS/TS uses module-local ESLint 10. Coherent same-byte native results avoid duplicate parsing. Uncovered files may use pinned WASM candidates; mixed scopes retain native results, unwired native scopes and failures. Recovery nodes require native-tool setup/repair and confirmation; complete zero-recovery candidates only recommend native lint, never full acceptance. One deadline bounds at most eight files and two WASM workers; builds without WASM report that gap. The outer feedback is 0.7.0 with local `hook_fast_feedback` 0.2.0. Candidate task synchronization is connected; default plugin Hooks, capability-matched closure and real-host acceptance remain incomplete. See [edit-feedback acceptance](../tests/acceptance/hook-fast-native-wasm.md).
+
+Selected Python discovery observes only source paths and ancestor configuration candidates, without directory enumeration. An unavailable nearest configuration does not silently fall back to a parent. Full filesystem I/O hard deadlines and large-project latency remain unaccepted.
+
+Source edit feedback now imports recovery-bearing pinned WASM candidates into the existing `.codeguard/` workbench. Confirmation identities remain stable per workspace/file/language; Python and JS/TS reuse existing confirmation/preparation identities. Reports bind the grammar, source SHA-256, known limitations and suspected byte positions; imports reject mismatched identities/coordinates and duplicate JSON keys. Task IDs appear only after successful synchronization. Complete zero-recovery observations create no new mandatory task; unlocated incomplete scans create check-recovery tasks. Neither closes existing tasks. Dialogue includes `task show` / `task verify`; missing native confirmation adapters report an explicit capability gap. Outer Hook feedback is 0.7.0, local feedback is 0.2.0, and generic `next` briefs use 0.3.0 while existing checkers retain 0.1.0. Default plugin Hooks, capability-matched closure and actual-host acceptance remain incomplete.
+
+### Current edit-confirmation feedback example
+
+The following fields are extracted from actual CLI output, rather than a complete report. The full protocol is `hook-execution-feedback.schema.json`; this task ID belongs to a temporary acceptance workspace.
+
+```json
+{
+  "schema_version": "0.2.0",
+  "report_type": "hook_fast_feedback",
+  "next_action": "require_native_lint_confirmation",
+  "syntax_tasks": {
+    "failures": [],
+    "new_blockers": 1,
+    "status": "synced_partial",
+    "tasks": [
+      {
+        "language": "zig",
+        "path": "app.zig",
+        "task_id": "CG-B-e8b667ce9c1f5d939af37205b976d0a9"
+      }
+    ]
+  }
+}
+```
+
+
+### Native verification of a Zig confirmation task
+
+Source builds can now verify a persisted Zig WASM confirmation task with `codeguard task verify TASK_ID . --zig-tool /absolute/path/to/zig --format=json`. The same explicit tool option is accepted by `hook execute` for `repair_ready`, using the existing lease and finished-attempt binding. `lint zig` can run the native tool without building the optional WASM feature; fallback without that feature reports its absence.
+
+The pinned Zig 0.16.0 probe runs `version` and `ast-check --color off` against the exact source bytes under one deadline. A current native diagnostic changes the brief to source repair; missing tools, unsupported versions and execution failures retain environment/decision guidance. Fresh `next` briefs carry the unchanged tool path in their recheck argv. Changes to source or tool bytes invalidate old diagnostic guidance. Reports and attempts are retained under the existing workbench instead of a second task store.
+
+The native observation is `syntax_task_recheck` 0.1.0, wrapped by `task_verification_preview` 0.12.0. Generic repair briefs are 0.3.0; old 0.2.0 briefs and 0.11.0 verification schemas remain available unchanged. Zero native AST diagnostics are `candidate_absent_unverified_policy`: they end the pending local verification step, but do not close the task or certify project lint, build or delivery. Erlang now has the same workbench integration through explicit OTP 28; [Erlang task acceptance](../tests/acceptance/erlang-native-task-verification.md) records its separate protocol versions. Swift also supports explicit Apple Swift 6.4 parse rechecks; see [Swift acceptance](../tests/acceptance/swift-native-task-confirmation.md). Generic confirmation adapters beyond Zig/Erlang/Swift remain absent. See [the acceptance record](../tests/acceptance/syntax-native-task-verification.md).
+
+The following fields come from an actual Zig recheck, not a complete report; the task ID belongs to a temporary acceptance workspace.
+
+```json
+{
+  "schema_version": "0.12.0",
+  "report_type": "task_verification_preview",
+  "task_id": "CG-B-eb509056a023765826d547a33df030ed",
+  "observation": "still_blocked",
+  "event_persisted": true,
+  "authority": "local_unverified",
+  "delivery_decision": "not_evaluated",
+  "native_scan": {
+    "report_type": "syntax_task_recheck",
+    "input_stable": true,
+    "native": {
+      "diagnostic_count": 1,
+      "diagnostics": [
+        {
+          "column": 19,
+          "line": 1,
+          "rule_id": "zig.ast_check.error"
+        }
+      ],
+      "reason": "ast_check_diagnostics",
+      "status": "diagnostics_observed",
+      "tool_sha256": "71cc3995a7586753ebf82c66dfb8bef43df446517550678781834586a960f8c9",
+      "version": "0.16.0"
+    }
+  }
+}
+```
+
+Briefs also expose the latest native report reference/digest and current diagnostic positions; stale inputs suppress those positions. Only immutable grammars compiled into the binary reuse validated asset identities within a process; external manifests, source and native tools still require current-byte checks.
+
+
+### Verified closure and recurrence for one task (source SDK)
+
+The source exposes `verify_zig_task_resolution` for a protected host to verify a **Zig native syntax-confirmation task**. The host independently pins its verification key, workspace, policy revision, code baseline, trusted time and rollback floor, and supplies the hash-bound original counterexample. Project-selected keys, policy candidates and task Markdown cannot provide that authority. The default plugin and public CLI still lack a trusted policy provider; this API is absent from published npm 0.1.3.
+
+Under the existing task lease, the handler runs the same approved Zig 0.16.0 against the original bytes and current file. Both runs share the request deadline, capped by approval expiry. A `code_fixed` event requires original native diagnostics, changed current source with no diagnostics, and matching tool, host artifact, grammar, task and policy identities. A native-clean original becomes a false-positive investigation; environment failure or changing input requires verification. This proves syntax for the specified task, not full lint, types, security or CVE coverage.
+
+Events replay through explicit parent links. Repeating the same verified result preserves its existing event. Ordinary `task verify` can append `reopened` when matching native diagnostics recur on current input, retaining the original fact and repair history and restoring native repair guidance. Missing parents, forks, duplicate identities, absent evidence or changed hashes require reconciliation. The handler also writes the existing native attempt receipt, clears matching `awaiting_verification`, and preserves a borrowed lease.
+
+Sanitized events live in `.codeguard/findings/<id>/events/lifecycle-*.json`; comparison evidence is ignored under `.codeguard/state/resolution_evidence/`. The first `finding.json` is immutable. Local `next/task show/status` have no trusted policy context and cannot elevate historical claims into current closure or delivery approval. All host receipts retain `delivery_decision=not_evaluated`.
+
+Other checker closures, environment/dependency/target/policy dispositions, actual host trust providers, cross-machine evidence recovery and the delivery gate remain open. See [task lifecycle acceptance](../tests/acceptance/task-resolution-lifecycle.md).
+
+
+Source SDK example: all `host_*` values are independently established by the host, not new CLI flags:
+
+```rust
+let receipt = codeguard_cli::verify_zig_task_resolution(
+    &codeguard_cli::ZigTaskResolutionRequest {
+        root: host_workspace,
+        task_id: host_task_id,
+        tool: host_zig,
+        original_source: host_original_bytes,
+        policy_bytes: host_policy_bytes,
+        envelope_bytes: host_signed_envelope,
+        trust: host_trust_key,
+        context: host_approval_context,
+        deadline: host_request_deadline,
+        borrowed_lease: None,
+    },
+)?;
+```
+
+The following complete receipt comes from a controlled local integration fixture. Its signing key is a test fixture, not proof of a production host approval. Policy, record, evidence and receipt each have a closed schema; stored files do not authenticate their origin.
+
+```json
+{
+  "authority": "host_context_verified",
+  "delivery_decision": "not_evaluated",
+  "event_ref": ".codeguard/findings/CG-B-1a46d41b4d912927dd646df9c79dd779/events/lifecycle-event-503da1b5644bac1bbf5d82625e0668d5a26a4aa426fb572402dc5dd3145add6d.json",
+  "evidence_ref": ".codeguard/state/resolution_evidence/f79f40ee3ebaf383c3dad1804999cd05ee50bf14a863bc6f6ec33a9d911241e9.json",
+  "evidence_sha256": "f79f40ee3ebaf383c3dad1804999cd05ee50bf14a863bc6f6ec33a9d911241e9",
+  "identity": {
+    "checker_id": "syntax.native_confirmation",
+    "scope": "app.zig",
+    "task_id": "CG-B-1a46d41b4d912927dd646df9c79dd779",
+    "workspace_id": "ws-34904a4fec61187f6fef2a8157ea8617"
+  },
+  "outcome": "code_fixed",
+  "policy_revision": "p1",
+  "policy_sha256": "1128cecb4d352cbb412a75c89c6baedece580651b24090b257f57775a841b866",
+  "report_type": "task_resolution_receipt",
+  "schema_version": "0.1.0",
+  "state": "resolved"
+}
+```
+
+- [Policy 1.0](../schemas/task-resolution-policy-v1.0.schema.json)
+- [Lifecycle record 0.1](../schemas/task-lifecycle-record-v0.1.schema.json)
+- [Comparison evidence 0.1](../schemas/task-resolution-evidence-v0.1.schema.json)
+- [Host receipt 0.1](../schemas/task-resolution-receipt-v0.1.schema.json)
+
+
+### Current public candidate: 0.1.4
+
+`@partme.ai/codeguard@0.1.4` is published for Apple Silicon macOS from clean source `1cd458f6e01a44a74388243e964e3f45290ac18e`. It includes all 32 runnable, unqualified grammars, bounded edited-file checks, stable native-confirmation tasks, native rechecks and `next` guidance. Registry hashes, a fresh-cache npx invocation, the actual public-package repair loop with Zig 0.16.0, and the source commit's Linux CI passed. Ordinary CLI clean output cannot close a task without trusted policy. The protected Zig SDK is a source integration API; npm does not expose a self-approval command. Plugin activation, installed-host acceptance, full precision, other platforms and complete gates remain open. Earlier 0.1.3 evidence is historical. See [0.1.4 acceptance](../tests/acceptance/npm-0.1.4-candidate.md).
+
+
+### Erlang native forms observation (current source)
+
+The unified entry `codeguard lint erlang sample.erl --timeout 10s --format=json` gives OTP 28 scanner/parser results priority; `--erl-tool /absolute/path/to/erl` overrides automatic discovery. It uses the original bytes, a fixed non-project cwd, disabled project startup and a cleared environment; it never expands macros or executes compile/parse_transform. Macro/preprocessor coverage stays unknown, and explicit native failures are not replaced by WASM. Without an explicit tool, absolute PATH directories are searched for the first executable erl. Its canonical path, version and bytes are checked; its failure never silently selects a later tool. Only absence of an executable enables the pinned candidate and preparation guidance. Native forms results do not replace full project lint, compilation or tests.
+
+```mermaid
+flowchart LR
+    A[lint erlang single file] --> B{Explicit native tool}
+    B -->|Provided| C[Verify OTP 28 and tool bytes]
+    C --> D[Native scanner / parser]
+    D --> E{Result and coverage}
+    E -->|Diagnostics| F[Keep native locations and repair guidance]
+    E -->|Macro or execution failure| G[Keep the blocker and request recovery]
+    E -->|Locally normal| H[Continue project lint / compile / tests]
+    B -->|Absent| P[Find erl in absolute PATH directories]
+    P --> Q{Ordinary executable found}
+    Q -->|Yes| C
+    Q -->|No| I[Pinned WASM candidate]
+    I --> J[Known limits and native confirmation command]
+```
+
+This complete structural example comes from an actual missing-period report with PATH tool selection, with a relative example path and the budget source matching the explicit CLI argument. It validates against the [0.2.0 schema](../schemas/erlang-lint-feedback-v0.2.schema.json); the historical 0.1.0 schema remains unchanged. Public npm 0.1.4 does not yet contain this command.
+
+```json
+{
+  "authority": "local_unverified",
+  "coverage_proven": false,
+  "delivery_decision": "not_evaluated",
+  "execution_budget": {
+    "enforcement": "native_execution_only",
+    "source": "cli",
+    "timeout_ms": 10000
+  },
+  "known_limitations": [
+    "OTP 28 erlc rejects a missing final function period in `f() -> ok`, but this pinned WASM returns zero recoveries; 12/13 narrow native syntax cases agree. Other Erlang versions, systematic precision, public native-first lint route and release remain unqualified"
+  ],
+  "language": "erlang",
+  "native": {
+    "diagnostics": [
+      {
+        "column": 8,
+        "line": 2,
+        "rule_id": "erlang.syntax.error"
+      }
+    ],
+    "diagnostics_truncated": false,
+    "preprocessing_unresolved": false,
+    "reason": "erlang_native_syntax_diagnostics",
+    "status": "diagnostics_observed",
+    "tool_sha256": "cd03d938d7547ef608076a58a49f5284931b43f39090087baf35efc1665dd5d6",
+    "version": "OTP 28"
+  },
+  "next_action": "核对并修复原生 Erlang 语法诊断，复用 tool_selection.executable 作为 --erl-tool 再检查；还需项目完整 lint、编译和测试",
+  "operation": "lint",
+  "path": "sample.erl",
+  "report_type": "erlang_lint_feedback",
+  "schema_version": "0.2.0",
+  "scope": "single_file_forms_without_preprocessing",
+  "source_sha256": "d66c937c29e3eba8063b468f2744f995cd24cee2399b5f63018935876f5fc9a3",
+  "status": "incomplete",
+  "syntax_precheck": null,
+  "tool_selection": {
+    "executable": "/opt/homebrew/Cellar/erlang/28.5/lib/erlang/bin/erl",
+    "source": "path"
+  }
+}
+```
+
+The tool hash binds the explicit launcher, not the whole OTP runtime/standard-library supply chain; this result cannot grant trusted task closure. Thirteen native classifications agree with independent erlc labels, and the additional macro/startup cases pass. Version-wide precision, modules, tasks and actual hosts remain open; see [acceptance](../tests/acceptance/erlang-native-first.md).
+
+
+### Erlang confirmation tasks and native repair guidance (current source)
+
+`codeguard task verify TASK_ID . --erl-tool /absolute/path/to/erl --format=json` and the `repair_ready` event of `hook execute . --erl-tool /absolute/path/to/erl` now reuse the existing `.codeguard/` task, lease, finished attempt and shared deadline. They call the same OTP 28 forms parser as `lint erlang`. Task language and tool options are checked before acquiring a lease or launching a tool; project source, macro expansion and parse transforms are not executed.
+
+```mermaid
+flowchart LR
+    A[Suspected edited syntax] --> B[Stable workspace/file/language task]
+    B --> C[task verify / repair_ready]
+    C --> D[Explicit native OTP 28 parser]
+    D -->|Current diagnostics| E[next positions and repair argv]
+    E --> F[Repair and record attempt]
+    F --> C
+    D -->|Preprocessing or tool fault| G[next concrete blocking reason]
+    G --> H[Restore project context or matched tool]
+    H --> C
+    D -->|Zero diagnostics| I[Retain evidence pending closure verification]
+```
+
+Erlang observations use `syntax_task_recheck` 0.2.0, verification feedback 0.13.0 and post-verification `next` briefs 0.4.0. Zig and historical schemas remain unchanged. `native_confirmation_reason` identifies missing tools or preprocessing gaps; guidance names OTP 28 preparation or project-native preprocessing/compilation. Source changes invalidate diagnostic guidance; changed tools lose their stored argv. Only a byte-current tool already observed as OTP 28 can be reused as ready.
+
+Zero diagnostics remain `candidate_absent_unverified_policy`: they consume the linked pending verification, but cannot close the task or approve delivery. Two no-progress attempts use the existing decision budget. The protected closure API now includes a task-scoped Erlang source SDK; full Erlang project lint/preprocessing, native-finding lifecycle, automatic tool discovery and installed-host releases remain open. Public npm 0.1.4 does not include this extension. [Acceptance and protocols](../tests/acceptance/erlang-native-task-verification.md).
+
+
+### Actual complete Erlang repair_ready feedback
+
+This JSON was captured from an OTP 28 native recheck. Task/run IDs and report references belong to a temporary acceptance workspace, not the reader’s project. It exposes native positions, Unicode column units and a persisted report reference instead of only reporting “still blocked”. The Hook is 0.8.0 with a 0.2.0 local summary; installed-host conversation acceptance remains open.
+
+```json
+{
+  "delivery_decision": "not_evaluated",
+  "execution": "task_verification",
+  "host_blocking_verified": false,
+  "local_feedback": {
+    "authority": "local_unverified",
+    "checker_id": "syntax.native_confirmation",
+    "delivery_decision": "not_evaluated",
+    "event_persisted": true,
+    "native_column_unit": "unicode_scalar",
+    "native_confirmation_reason": "erlang_native_syntax_diagnostics",
+    "native_confirmation_ref": {
+      "report_ref": ".codeguard/reports/syntax-native-88734-1791066158885814000.json",
+      "report_sha256": "f529b3d472381a5d7cdf2d655d1d18a0000264d1e71ecb45856c17a01fd9ec45",
+      "run_id": "syntax-native-88734-1791066158885814000"
+    },
+    "native_confirmation_status": "diagnostics_observed",
+    "native_diagnostic_positions": [
+      {
+        "column": 4,
+        "line": 2,
+        "rule_id": "erlang.syntax.error"
+      }
+    ],
+    "observation": "still_blocked",
+    "reason": null,
+    "report_type": "hook_task_verification_summary",
+    "scan_report_available": true,
+    "schema_version": "0.2.0",
+    "task_id": "CG-B-b2b940bb04fde9437c1c303ca785c1ca"
+  },
+  "plan": {
+    "action": "verify_task",
+    "host_blocking_claimed": false,
+    "may_claim_delivery": false,
+    "requires_git_snapshot": false,
+    "scope_resolution_reason": null,
+    "soft_result_reuse_candidate": false,
+    "target_paths": [],
+    "task_id": "CG-B-b2b940bb04fde9437c1c303ca785c1ca"
+  },
+  "reason": null,
+  "report_type": "hook_execution_feedback",
+  "schema_version": "0.8.0",
+  "soft_result_reused": false
+}
+```
+
+### Aggregate Erlang native-first checking (current source)
+
+```bash
+codeguard check all . --format=json
+codeguard check all . --erl-tool /absolute/path/to/erl --timeout 30s --jobs 2 --format=json
+```
+
+The `erlang.lint` task selects explicit Erlang or the first executable `erl` from absolute PATH directories, then uses the existing controlled OTP 28 scanner/parser. It observes at most 64 ordinary UTF-8 files, each at most 1 MiB, under the request deadline and scheduler concurrency. `native_results.erlang_lint` carries current source hashes, positions, tool selection, per-file next actions and original-tool recheck argv with an absolute source path, reusable outside the project directory. Files beyond the native budget are counted as unobserved.
+
+Only complete, non-preprocessed forms observations for matching source and tool bytes skip duplicate WASM. Missing tools retain candidate observations; selected-tool failures stay visible alongside any supplementary candidate observation. Macro/preprocessor coverage remains unresolved. Source or tool changes withdraw affected positions and reusable argv. Project-scope changes set `scope_stable: false` and retain still-current single-file diagnostics; whole-scope completeness is withdrawn. SIGINT remains exit 130; JSON, human and conservative SARIF retain native findings without claiming project success.
+
+Initialized workspaces now persist native-first observations directly, without a preceding WASM error: current `check_feedback` **0.38.0** embeds scan **0.2.0** with actual per-file `task_id` or `task_sync_reason`. `lint erlang FILE` binds the nearest existing workbench and emits **0.3.0**. Repeated scans and historical WASM evidence reuse one task; missing tools and preprocessing produce environment tasks. Unbound aggregate checks also use 0.38.0 and historical protocols remain available; `check_aborted` remains **0.13.0**, and prior schema bytes are unchanged. Default-host trusted closure and complete project checks remain open; the source SDK extension is described below. Public npm 0.1.4 does not contain this batch. See [native repair workflow](Codeguard-Native-Repair-Workflow.md) and [acceptance](../tests/acceptance/erlang-native-first-workbench.md).
+
+```mermaid
+flowchart TD
+    A[check all: Erlang files] --> B{Explicit tool or PATH erl}
+    B -->|Available| C[OTP 28 version and tool identity]
+    C --> D[Bounded per-file forms parsing]
+    D --> E{Current and complete without preprocessing?}
+    E -->|Yes| F[Retain native diagnostics and recheck argv]
+    F --> G[Skip duplicate WASM for matching bytes]
+    E -->|No| H[Retain native blockers and any candidate observation]
+    B -->|Absent| H
+    G --> I[Project lint/build/tests remain incomplete]
+    H --> I
+    I --> J[Human / JSON / conservative SARIF]
+```
+
+This is a complete embedded `erlang_forms_scan` example captured from actual OTP 28 execution, not a complete aggregate report. Per-file task references were saved and synchronized; the root task_id remains null because a batch can contain multiple tasks. The tool hash identifies the selected launcher, not the entire OTP runtime supply chain.
+
+```json
+{
+  "authority": "local_unverified",
+  "coverage_proven": false,
+  "delivery_decision": "not_evaluated",
+  "files": [
+    {
+      "current": true,
+      "findings": [
+        {
+          "column": 4,
+          "line": 2,
+          "rule_id": "erlang.syntax.error"
+        }
+      ],
+      "native": {
+        "diagnostics": [
+          {
+            "column": 4,
+            "line": 2,
+            "rule_id": "erlang.syntax.error"
+          }
+        ],
+        "diagnostics_truncated": false,
+        "preprocessing_unresolved": false,
+        "reason": "erlang_native_syntax_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "cd03d938d7547ef608076a58a49f5284931b43f39090087baf35efc1665dd5d6",
+        "version": "OTP 28"
+      },
+      "next_action": "按当前原生语法位置修复并执行 recheck_argv；仍需项目完整 lint、预处理、编译和测试",
+      "path": "app.erl",
+      "recheck_argv": [
+        "codeguard",
+        "lint",
+        "erlang",
+        "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-native-work-evidence-sriqn9fb/project/app.erl",
+        "--erl-tool",
+        "/opt/homebrew/Cellar/erlang/28.5/lib/erlang/bin/erl",
+        "--format=json"
+      ],
+      "source_sha256": "22b202c1303137676dc8dbf46be3c26771f4faa453a223f1b607aecd2087c9e0",
+      "task_id": "CG-B-8a1ca1e0c61f9964d131d876588ba6d9",
+      "task_sync_reason": null
+    }
+  ],
+  "local_forms_complete": true,
+  "reason": "erlang_forms_observed_unverified_project_coverage",
+  "report_type": "erlang_forms_scan",
+  "schema_version": "0.2.0",
+  "scope": "single_file_forms_without_preprocessing",
+  "scope_stable": true,
+  "source_file_count": 1,
+  "task_id": null,
+  "task_status": "synced_partial",
+  "tool_selection": {
+    "executable": "/opt/homebrew/Cellar/erlang/28.5/lib/erlang/bin/erl",
+    "source": "explicit"
+  },
+  "unobserved_count": 0
+}
+```
+
+### All-grammar replay protocol (2026-10-04)
+
+The development-only `grammar_regression` / `grammar_regression_evaluation` protocols support legacy 0.1 and explicit-cohort 0.2. Duplicate keys, missing languages, cohort/version conflicts and changed hashes are rejected before execution. The 358-case corpus uses a Rust importer preserving 150 Dart source/expectation cases while rejecting empty trees and missing separators that swallow cases. Reports retain 32 languages and 35 source cohorts, selected valid/invalid labels, sample-level TP/FP/FN/TN, Wilson intervals, unknowns and cold-worker timings. Mixed-source summaries use `metric_aggregation=not_pooled` with null precision/recall. Pending labels stay outside metrics; qualified count stays zero and delivery unevaluated. Legacy schemas/reports remain intact. See [evaluation technical guide](Codeguard-Grammar-Evaluation.md).
+
+## Bound P3C file feedback protocol
+
+`java_p3c_file_feedback` 0.1 wraps existing project observation 0.2 and actual workbench/next results. Its [schema](../schemas/java-p3c-file-feedback-0.1.schema.json) restricts source selection, native authority and failure/task combinations; explicit `--checker p3c` preserves native blockers rather than silently selecting WASM. Unbound native feedback 0.2 remains compatible. See [acceptance](../tests/acceptance/java-p3c-file-workbench.md); controlled protocol tests do not prove actual rule precision.
+
+Project observation 0.2 preserves nonempty validated diagnostics when local status is `incomplete` and reason is `native_execution_failed`. The source/rule/location projection undergoes the same current-byte and configuration checks as successful diagnostic reports. Sync imports both the source finding and execution blocker; `observed_file_count` stays unchanged. A matching positive recheck is `still_present`; partial zero results are `incomplete`, and blocker verification remains `still_blocked`. Legacy 0.2 reports without flat projections retain their blocker-only interpretation. No schema fields or approval semantics change. See [acceptance](../tests/acceptance/java-p3c-partial-execution.md).
+
+
+### Erlang task resolution and recurrence (current source SDK)
+
+`verify_erlang_task_resolution` reuses Zig's signed-policy verification, shared deadline, lease, attempt handoff and append-only parent chain. The protected host independently fixes the trust root, workspace, policy revision, baseline and trusted clock; project files cannot grant approval. OTP 28 scans/parses the original counterexample and current bytes separately. Only an original native diagnostic, changed source and a complete clean current result can record `code_fixed`. Macros/includes, empty forms, truncation and execution failures require verification; an originally valid sample requires false-positive investigation.
+
+Both WASM-first and native-first tasks are supported. Erlang policy 1.1.0/evidence 0.2.0 stay separate from Zig 1.0.0/0.1.0. Native-first evidence requires `grammar_sha256=null` and the original tool identity. The internal rule identity uses the actual approved policy-byte digest instead of inventing a grammar digest. History checks bind the language, source and grammar to the first report; rehashing local files cannot switch languages. Ordinary `task verify --erl-tool` can append recurrence with the matching tool, but cannot close a task without trusted policy.
+
+This remains a source SDK without the default plugin's trusted policy provider. Public npm 0.1.4 lacks this extension; syntax receipts do not certify complete lint, security or project delivery. The tool digest binds the launcher; the host must independently protect the OTP environment. See [Erlang lifecycle acceptance](../tests/acceptance/erlang-task-resolution-lifecycle.md) for the execution path and actual results.
+
+### Cargo input and proxy boundaries (current source)
+
+Normal Clippy scans and same-rule `--force-warn` comparisons use `cargo clippy --locked --offline --all-targets --message-format=json`. A missing root Cargo.lock returns `cargo_lock_unavailable` before native startup and does not create a lock. Source fingerprints come from a bounded pre-run snapshot. Changes to observed sources, the manifest, lock, root Clippy/Cargo/toolchain configuration or selected tool withdraw the current Clippy findings and retain preparation/recheck work. Valid partial diagnostics under stable inputs remain visible without claiming a complete report.
+
+For Cargo proxies such as rustup that dispatch by entry-point name, Clippy, rustdoc and build checks execute the selected Cargo path while validating the resolved bytes and post-run target identity. A separate sequence prevents private Clippy directories from colliding at identical timestamps. This protects observed inputs only; it does not prove the complete effective Cargo model, every build combination or a process sandbox. Local zero diagnostics still cannot close tasks automatically. Tests, failures and actual output are in the [Cargo input acceptance record](../tests/acceptance/rust-clippy-input-stability.md). Public npm 0.1.4 does not include this batch.
+
+
+After native aggregation, current source uses non-cached Clippy `compiler-artifact` records, the original root-manifest identity and pre-run source hashes to avoid duplicate WASM for byte-matching Rust target entry points. Coverage stays in the current process and cannot be restored from editable reports. Failures, changed inputs/tools, duplicate JSON keys or events after the finish record grant no coverage. `all-targets` does not establish that the entire directory was parsed: unproven modules and conditionally excluded files retain prechecks. Native warnings, stable tasks and complete delivery obligations remain. Diagnostics repeated across library/test targets at the same file/rule/line/column project one finding, preferring error over warning; distinct positions remain separate and historical duplicate tasks are not automatically closed. See [Rust native-first acceptance](../tests/acceptance/check-all-native-preferred-rust.md). Public npm 0.1.4 does not include this batch.
+
+
+### Existing Cargo discovery (current source)
+
+`check all`, `comments rust`, `build rust` and their Cargo task rechecks accept an optional `--cargo-tool`. Without it, they select the first regular executable `cargo` in an absolute invoking-PATH directory. Empty/relative directories and non-executable entries are skipped. An explicit invalid tool or selected native failure remains a concrete blocker; it never triggers a search for another Cargo. Aggregate Rust checks share the selected entry.
+
+The final `cargo` entry name is retained for rustup proxy dispatch; resolved bytes and target identity still undergo the existing checks. The child inherits `RUSTUP_TOOLCHAIN` and always receives `RUSTUP_AUTO_INSTALL=0`, even if the caller set it to `1`. Cargo `--locked --offline` alone does not prevent rustup from installing a missing toolchain; [rustup documents the separate control](https://rust-lang.github.io/rustup/environment-variables.html). A missing toolchain stays an environment failure, without a source violation or automatic installation. This does not qualify the entire toolchain, effective Cargo configuration, complete project coverage or trusted task closure.
+
+Controlled proxy/no-fallback cases and actual installed/missing-toolchain observations are recorded in [Cargo discovery acceptance](../tests/acceptance/cargo-native-discovery.md). Public npm 0.1.4 does not include this source change.
+
+
+### Project-root Ruff discovery (current source)
+
+For a configured Python scan, `lint python`, `check all`, selected-edit Hook execution and same-root task rechecks select an explicit `--ruff-tool` first, then the checked root's `.venv/bin/ruff`, then an executable in an absolute invoking-PATH directory. They do not activate a shell environment, enumerate installed packages or install Ruff. A root-local entry is version-probed and byte-bound through the existing native scan. Missing local directories/entry permit PATH discovery; linked/non-directory parents, broken or non-executable entries produce `ruff_local_tool_invalid` instead of silently switching to global Ruff. A chosen tool's version/execution failure never tries a different tool.
+
+An invalid local environment projects one stable preparation task with `.venv/bin/ruff` evidence, bounded environment repair, original Codeguard recheck, history and closure conditions. No applicable Ruff configuration means no tool startup. Ordinary local parents may contain an executable symlink: the resolved tool bytes are fixed and rechecked. Local success and repaired-source zero diagnostics still do not approve policy or close tasks automatically. This selection concerns the explicitly checked root; per-module virtual environments, uv/Poetry/Conda resolution, real host integration and complete coverage remain separate work. See [root-local Ruff acceptance](../tests/acceptance/ruff-local-discovery.md). Public npm 0.1.4 does not include this source change.
+
+
+### Recovery tasks for unlocated syntax observations (current source)
+
+`check all/java` and confirmed-write Hooks share syntax-task synchronization. Visible recovery nodes require native confirmation. A tree error with an incomplete recovery scan and no locatable nodes creates a check-capability recovery task: it retains an empty recovery array and `syntax_recovery_incomplete`, without a confirmed source violation or invented edit position. Complete zero-recovery observations recommend native checking without creating this task.
+
+The workspace/file/language identity remains stable across repeat checks, Hooks and later visible recoveries. `next` and task Markdown require restoring the checker, language version or grammar; source edits are forbidden before native confirmation. `task verify` records a missing native adapter while retaining the open task. Zero recoveries, installation and checkbox edits cannot close existing tasks. Persistence failures retain observations and per-file reasons without fabricated task IDs.
+
+Aggregate feedback uses `check_feedback` 0.38.0 with `syntax_tasks`; unlocated local confirmation reports use 0.3.0. Existing located 0.1.0 and native-first Erlang 0.2.0 reports and their schemas remain unchanged. Claude Hook command replay distinguishes recovery-node counts from incomplete recovery scans; actual-host and full-language acceptance remain open. Public npm 0.1.4 does not contain this batch. See [acceptance and actual reports](../tests/acceptance/unlocated-syntax-recovery-tasks.md).
+
+
+Feedback-field excerpt (a structural example, not a complete report; see the acceptance artifact for full actual reports):
+
+```json
+{
+  "schema_version": "0.38.0",
+  "report_type": "check_feedback",
+  "command_status": "incomplete",
+  "exit_code": 3,
+  "delivery_decision": "incomplete",
+  "syntax_candidates": {
+    "observations": [{
+      "path": "bad.swift",
+      "language": "swift",
+      "status": "candidate_observed",
+      "reason": "syntax_recovery_incomplete",
+      "grammar_qualified": false,
+      "recovery_count": 0,
+      "recoveries": []
+    }]
+  },
+  "syntax_tasks": {
+    "status": "synced_partial",
+    "new_blockers": 1,
+    "tasks": [{
+      "task_id": "CG-B-0123456789abcdef0123456789abcdef",
+      "path": "bad.swift",
+      "language": "swift"
+    }],
+    "failures": []
+  }
+}
+```
+
+The example task ID shows its format only; actual identity is derived from the workspace, path and language. Empty recoveries do not imply success, and a local task record is not a trusted delivery decision.
+
+
+### Automatic native Erlang discovery for task rechecks (current source)
+
+`codeguard task verify "$TASK_ID" . --format=json` (with `TASK_ID` set to the actual `task_id` returned by `next`) reuses lint/check selection for existing Erlang syntax tasks: explicit `--erl-tool` takes priority; otherwise the first executable erl in an absolute invoking-PATH directory is fixed. Rechecks verify OTP 28, current source and tool bytes while retaining leases, budgets, events and existing report versions. Both candidate-origin and native-first tasks can be rechecked; repair-ready Hooks use the same entry.
+
+Only an absent tool produces `erlang_tool_not_found_on_path`; empty/relative PATH entries and non-executable files are ignored. An invalid explicit tool, unsupported selected version or execution failure never selects a later tool or installs one. After a valid observation, `next` supplies explicit recheck argv for the actual tool so later PATH changes cannot replace that entry. Local zero diagnostics still do not close tasks automatically; preprocessing, trusted policy and complete project capability remain separate obligations. See [recheck discovery acceptance](../tests/acceptance/erlang-recheck-discovery.md). Public npm 0.1.4 does not contain this batch.
+
+### Native confirmation of unlocated Swift observations (current source)
+
+An existing Swift confirmation task now accepts `codeguard task verify "$TASK_ID" . --swift-tool /absolute/path/to/swiftc --format=json`, where `TASK_ID` comes from actual `next` output. `hook execute` accepts the same option for `repair_ready`. The caller supplies an installed Apple Swift 6.4 compiler; this path does not install tools or execute editable paths from historical reports. Missing tools receive an existing-compiler recovery action; unsupported versions and execution failures retain the task.
+
+Rust reads and rechecks bounded source bytes, then runs `swiftc -frontend -parse -diagnostic-style llvm -no-color-diagnostics -` with frozen stdin, `/` as cwd, a cleared environment and the shared deadline. Only native error rules and positions enter agent guidance; raw diagnostic text is not treated as an instruction. Columns are UTF-8 bytes and must fall on character boundaries. Unknown output, exit/diagnostic contradictions, timeout, invalid positions and tool changes remain incomplete. The tool digest binds the launcher, not the entire Swift installation.
+
+Native errors make the same task actionable for source repair. Source or tool changes withdraw old positions. A clean parse records `candidate_absent_unverified_policy` without automatically closing the task or satisfying project lint, type checking, macro/conditional-compilation context, build, security or delivery obligations. Existing no-progress budgets still apply. Swift grammar qualification and the 32-language precision conclusions are unchanged; public npm 0.1.4 does not contain this extension.
+
+New protocols are `syntax_task_recheck` 0.4.0, `task_verification_preview` 0.15.0, `repair_brief_preview` 0.6.0 and Hook feedback 0.9.0 (task summary 0.3.0). Aggregate `check` uses 0.39.0 when `next` contains a native Swift brief; other paths retain 0.38.0. Historical schemas remain unchanged. See [Swift native-confirmation acceptance](../tests/acceptance/swift-native-task-confirmation.md) for actual reports and limits.
+
+
+### Actual Claude lifecycle acceptance and fresh-task guidance
+
+Claude Code 2.1.273 now has actual session-local plugin-source evidence for confirmed saves, repeated saves, an execution-time filesystem write failure, native Zig 0.16.0 rechecks before/after repair, stable task identity and one Stop continuation followed by a reentry guard. The locked public runtime remains 0.1.4, independently of current development source. Native diagnostics changed from one to zero; the task stayed open and delivery remained not evaluated. Edit argument validation failed before execution and produced no failure Hook in this host; the separate EACCES write exercised PostToolUseFailure. This is not marketplace installation, trusted closure, complete native-first coverage or multi-host acceptance. See [actual host evidence](../tests/acceptance/claude-host-prepared-runtime.md).
+
+The actual session exposed incorrect first-task guidance claiming the Zig adapter was unavailable although its native recheck worked. Development `next` / `task show` now distinguish implemented Zig 0.16.0, OTP 28 and Apple Swift 6.4 adapters from unverified local tool readiness, using the bound original report and explicit tool arguments. Read-only guidance does not execute or install a checker, trust executable paths in editable task records, authorize source repair before native confirmation, or close a task. Unsupported languages retain a concrete capability decision; existing native history keeps precedence. This correction is not in the locked public 0.1.4.
+
+Fresh native-confirmation guidance uses `repair-brief-preview` 0.7.0 to bind the language, supported tool version, tool-selection option, and `tool_readiness: not_evaluated`. Aggregate checks use `check-feedback` 0.40.0; `task show` preserves the same recheck arguments in its outer action. The agent must replace the placeholder with a verified installed tool path. Preparation does not establish readiness or native execution. Historical schema definitions remain unchanged.
+
+### Native-first Kotlin single-file checking (development source)
+
+`codeguard lint kotlin FILE.kt [--kotlinc-tool ABS_PATH] [--timeout 30s] --format=json` selects an explicit tool first, otherwise the first `kotlinc` in absolute invoking PATH entries. The current adapter supports Kotlin/JVM 2.4.10. Only an absent tool uses bundled WASM; a selected native failure remains visible. Frozen ordinary `.kt` files are compiled privately, without `.kts`, project build scripts or compiler plugins.
+
+Only `[SYNTAX]` becomes `kotlin.syntax`; other diagnostics retain project-context limitations. Verified UTF-16 columns are also mapped to UTF-8 byte columns. Unknown output, redirected launchers, changed input and interrupted budgets cannot produce success. Missing backends or incomplete native checks require further native confirmation; an observable, complete zero-recovery WASM scan recommends native installation without granting project approval. The feedback schema is `kotlin-lint-feedback` 0.1.0.
+
+Existing stable tasks now support task verify and repair_ready; aggregate feedback projects their current guidance. Initial check/file_changed now selects Kotlin native compilation first and synchronizes stable tasks. Complete Kotlin lint/comments, compiler JAR/JDK identity, version coverage and release acceptance remain open. Public npm 0.1.4 excludes this increment. See [single-file acceptance](../tests/acceptance/kotlin-native-single-file.md).
+
+### Kotlin stable-task rechecks and agent feedback (development source)
+
+Existing Kotlin WASM confirmation tasks support `codeguard task verify TASK_ID . --kotlinc-tool ABS_PATH --format=json`; omission reuses the standalone PATH selection. `repair_ready` through `hook execute --kotlinc-tool ABS_PATH` retains the task, lease and attempt history. `next` and `task show` derive tool guidance from bound facts rather than executing editable task Markdown.
+
+Mixed native syntax and project-context diagnostics retain current syntax positions for repair while exposing unresolved context. Source or tool changes withdraw old positions. Native zero diagnostics advances to policy/coverage verification without repeated editing or installation. Rechecks do not automatically close tasks; Kotlin trusted closure remains unwired. Aggregate check feedback carries the current brief; initial check/file_changed now invokes the Kotlin native adapter for ordinary .kt files.
+
+Protocols are syntax recheck0.5.0, task preview0.16.0, historical brief0.8.0, initial preparation brief0.9.0, Hook feedback0.10.0 and aggregate feedback0.41.0. Previous schema bytes remain unchanged. See [Kotlin task-recheck acceptance](../tests/acceptance/kotlin-native-task-confirmation.md).
+
+### Kotlin first native observation (development source)
+
+`check all . --kotlinc-tool ABS_PATH` and confirmed `file_changed` accept the same explicit tool; omission discovers invoking PATH. A selected native failure stays visible and does not switch to WASM. Only an absent compiler uses the existing candidate fallback. At most 64 ordinary `.kt` files share the request deadline; `.kts` is not compiled by this path. Repeated observations update one stable task, and native zero diagnostics does not automatically close it.
+
+New reports use aggregate0.42.0, file-changed Hook0.11.0, scan0.1/0.2, native origin0.4.0, native-origin recheck0.6.0/task preview0.17.0 and first-native brief0.10.0. Existing WASM-origin rechecks retain their previous protocols. See [first-native acceptance](../tests/acceptance/kotlin-native-first.md). Full project lint, compiler/JDK identity, trusted closure and public release remain open.
+
+When the bound first report contains incomplete, unlocated recovery, later missing-tool or stale native history preserves the limitation in `next` / `task show`: do not edit source before native confirmation, and follow the concrete environment recovery steps. Current native syntax diagnostics remain actionable; current zero diagnostics still require policy and coverage verification. See [native-history guidance regression](../tests/acceptance/unlocated-native-history-guidance.md).
+
+### Native-first Swift single-file feedback (development source)
+
+`codeguard lint swift FILE.swift [--swift-tool ABS_PATH] [--timeout 30s] --format=json` selects an explicit compiler first, otherwise the first executable `swiftc` in absolute invoking PATH entries. The current adapter supports Apple Swift 6.4 frontend parsing of frozen stdin. Only tool absence enables the bundled WASM candidate; a selected compiler's failure stays visible. Verified positions use UTF-8 byte columns. Source changes or entry redirection withdraw diagnostics, and timeout/cancellation remain incomplete/cancelled rather than source violations.
+
+The `swift-lint-feedback`0.1.0 report distinguishes a required native confirmation for incomplete or hidden recovery from a recommendation after complete zero recovery. It never grants full lint or delivery approval: SwiftLint, comments, type checking, dependencies/security and project builds remain obligations. Compiler identity covers the selected entry, not the entire toolchain. Project-wide Swift native observation is now connected as described below; full language/release qualification remains open; initialized-workspace task connection is described below. Public npm0.1.4 excludes this increment. See [single-file acceptance](../tests/acceptance/swift-native-single-file.md).
+
+### Swift project native observation (development source)
+
+`check all . [--swift-tool ABS_PATH] --format=json` parses at most 64 ordinary Swift files under one shared deadline and reports unobserved files. Selected native failure never changes into a WASM result; only tool absence keeps candidate fallback. `check-feedback`0.43.0 / `swift-parse-scan`0.1.0 preserve current byte locations, selection and recheck argv. Source/tool changes withdraw positions; zero diagnostics do not prove SwiftLint, types or builds. This historical protocol describes an uninitialized workspace with `not_connected` task references; initialized-workspace task connection is described below. See [project observation acceptance](../tests/acceptance/swift-native-project.md).
+
+Confirmed saves through `hook execute . --swift-tool ABS_PATH` reuse the Swift scanner for selected paths only. Missing tools keep candidates; selected failures do not switch. `hook-execution-feedback`0.12.0 / `hook_fast_feedback`0.4.0 expose current native positions and the unconnected task state. The CLI Claude adapter emits bounded counts/byte positions without tool diagnostic text; mixed candidate errors still require native confirmation. Actual installed-host acceptance, stable native tasks and the full repair loop remain open. See [save feedback acceptance](../tests/acceptance/swift-native-hook.md).
+
+### Swift native-first repair workbench (development source)
+
+In an initialized `.codeguard/` workspace, `check all` and a confirmed successful-save `hook execute file_changed` synchronize Swift native syntax findings or environment blockers into stable tasks. Repeated observations reuse the same task. `next` and `task show` expose evidence, rule basis, allowed scope, repair steps, recheck commands, history and closure conditions. An uninitialized workspace reports a disconnected workbench; synchronization failures remain blockers. Standalone `lint swift` does not create tasks yet.
+
+`codeguard task verify TASK_ID . [--swift-tool ABS_PATH] --format=json` selects an explicit tool or discovers one in the invoking PATH for native-first tasks. Existing WASM-origin tasks retain their explicit-tool contract; editable historical paths are not executed. Diagnostics request source repair. Zero diagnostics records `candidate_absent_unverified_policy`; the same task stays open pending full lint, type, build and delivery checks.
+
+Native-first protocols use observation 0.5, scan 0.2, check 0.44, initial brief 0.11, save Hook fast 0.5 / outer 0.13, and recheck inner 0.7 / outer 0.18. Existing verification briefs retain 0.6, and historical schemas remain unchanged. Actual Apple Swift 6.4 executions verified stable task references across repeated scans, saves and rechecks before and after repair. This is not installed-host or trusted-closure acceptance and is excluded from public npm 0.1.4.
+
+### Recover missing task projections
+
+`codeguard work sync . --format=json` now restores missing Markdown for committed facts under the workspace sync lock, imports new reports, and rechecks missing projections. Recovery reads structured facts, the current RepairBrief, original report hashes and consumption markers. It does not run checkers. Existing regular task files, including notes and checkmarks, retain their exact bytes. Symlinks, directory conflicts, invalid facts, changed origin hashes and uncommitted origins remain incomplete. Recovery examines at most 1,000 facts.
+
+The readable task contains evidence, rule basis, allowed scope, steps, recheck argv, history and closure conditions. Local absolute paths in recheck arguments become verification placeholders; use `task show` for current instructions. Recovery never closes findings, changes original facts/events/consumption markers or attempt history, or grants delivery approval. Reports use `work_sync_preview` 0.3.0 with a positive `restored_task_projections` count only when recovery occurs; other runs retain 0.2.0.
+
+```mermaid
+flowchart LR
+ A[work sync workspace lock] --> B[Validate committed facts and origins]
+ B --> C[Recover missing projections and keep existing notes]
+ C --> D[Import new reports]
+ D --> E[Check remaining missing projections]
+ E --> F[task show / next current repair guidance]
+ F --> G[Native recheck with closure still requiring acceptance]
+```
+
+Actual recovery feedback (local synchronization, without delivery approval):
+
+```json
+{
+  "already_consumed_reports": 1,
+  "command_status": "partial",
+  "delivery_decision": "not_evaluated",
+  "failed_reports": 0,
+  "historical_findings": 0,
+  "imported_reports": 0,
+  "new_blockers": 0,
+  "new_findings": 0,
+  "next_actions": [
+    "inspect_findings_and_tasks",
+    "implement_native_reverification_and_full_gate"
+  ],
+  "operation": "work_sync",
+  "report_type": "work_sync_preview",
+  "restored_task_projections": 1,
+  "schema_version": "0.3.0",
+  "workspace_id": "ws-f734e620fead976b3bb5826be2fb3341"
+}
+```
+
+
+## Next steps for independent source findings
+
+When the first source finding is waiting for its owner or has exhausted its retry budget, and no prerequisite blocker exists, next can select another actionable or verification-required finding on a proven independent physical source. next_actions and human output retain read-only task show references for deferred findings. Their facts, budgets, leases and gate effects remain unchanged. Overlapping targets, aliases, unknown scope, invalid facts and failed reports retain conservative handling. The complete module dependency graph remains incomplete; non-Unix keeps the original selection. See the [actual acceptance evidence and full report example](../tests/acceptance/next-independent-source-work.md).
+
+### Scoped Swift syntax task lifecycle (development source)
+
+A protected host can call `verify_swift_task_resolution` to compare the original counterexample and current source with Apple Swift 6.4. Policy 1.2.0 and evidence 0.3.0 remain separate from Zig/Erlang protocols; native-first tasks retain a null grammar identity. An original parse diagnostic, changed source, and a complete clean recheck with the same tool permit a scoped `code_fixed` event. Repeated verification is idempotent; an ordinary `task verify --swift-tool` recheck reopens the same parent chain on recurrence. A valid original sample requires false-positive review; tool failures or identity changes cannot close the task. The host supplies independent trust and signatures. Default plugin integration and public distribution remain incomplete, as do SwiftLint, type checking, project builds, and full delivery acceptance. See [lifecycle acceptance](../tests/acceptance/swift-task-resolution-lifecycle.md).
+
+### Scoped Kotlin resolution and context blockers (development source)
+
+`verify_kotlin_task_resolution` reuses the host SDK with kotlinc-jvm 2.4.10. Policy 1.3.0 and evidence 0.4.0 are language-specific; native-first tasks keep a null grammar identity. The original diagnostic must have coherent UTF-16 and UTF-8 coordinates. Changed source and a complete clean recheck permit a scoped `code_fixed` event. Context-only errors remain pending verification. Mixed syntax and context errors retain the known finding and allow ordinary `task verify --kotlinc-tool` recurrence to reopen the same parent chain even when completion is incomplete. The host supplies independent trust. Tool identity currently covers the launcher, with full JAR/JDK/project identity, default plugin closure, lint/type coverage, and publication still pending. See [acceptance](../tests/acceptance/kotlin-task-resolution-lifecycle.md).
+
+
+Development-source Zig native routing (2026-10-05): `check all`, `check zig` and selected-file editing now reuse the frozen Zig 0.16.0 AST probe. Explicit/PATH selection runs native first; selected-tool failures retain an incomplete observation without switching to WASM. Missing tools retain candidate fallback. Source or tool-entry changes withdraw old positions; at most 64 files are observed under the shared deadline, with remaining scope visible. Check feedback 0.46, aborted feedback 0.15 and Hook feedback 0.14 are separate protocols; reports without Zig keep previous versions. Claude feedback includes bounded native rule IDs, positions and the original recheck instruction. First-native Zig task creation is now connected as described below: native reports expose only actually synchronized task IDs, and clean AST observations do not close historical tasks or prove complete lint/build. Public npm 0.1.4 and the plugin lock are unchanged.
+
+### Native-first Zig tasks (development source)
+
+In initialized workspaces, `check zig`, `check all`, `lint zig` and edit Hooks synchronize one stable task per workspace/source scope. A newly clean file creates no repair task. Clean rechecks of existing tasks record `candidate_absent_unverified_policy` and retain the open task. `next` and `task show` expose bounded native positions and original-tool arguments; `task verify TASK_ID . [--zig-tool ABS_PATH] --format=json` and repair_ready record native rechecks. Native-first grammar identity is null; native diagnostics must not request grammar edits.
+
+New protocols: observation 0.6, bound scan 0.2, aggregate 0.47, single-file 0.3, brief 0.12, task-show 0.2, recheck inner 0.8/outer 0.19, edit Hook 0.16 and recheck Hook 0.15. Historical schemas remain unchanged. Actual Zig 0.16.0 validated broken and repaired inputs. Trusted SDK closure for native-first Zig tasks is described below. Default installed-host integration, full lint/build and distribution remain incomplete. Public npm 0.1.4 is unchanged. See [acceptance](../tests/acceptance/zig-native-first-workbench.md).
+
+### Trusted native-first Zig resolution (development SDK)
+
+A protected host can call `verify_zig_task_resolution` with independently signed policy 1.4.0 for native-first observation 0.6.0. Grammar must be null; legacy WASM-origin policy 1.0.0 retains its scope. An original same-tool diagnostic, changed source and a complete clean same-tool recheck permit scoped `code_fixed` with evidence 0.5.0. Repeated verification is idempotent; ordinary `task verify --zig-tool` positive recurrence reopens the same parent chain. Valid original samples require false-positive review. Unexpected output, invalid positions, changed tools or missing trusted context cannot close the task. The host independently supplies trust. Default plugin/public npm integration of that provider remains incomplete; local task records do not authorize delivery. See [acceptance](../tests/acceptance/zig-native-first-resolution.md).
+
+## Explicit native differential development replay
+
+The Rust `evaluate_native_grammars` example selects samples for explicitly supplied Zig0.16.0, OTP28, Apple Swift6.4 and kotlinc-jvm2.4.10 from the same frozen 32-language corpus. It reuses native adapters and the existing WASM worker. All 32 languages remain in inventory; unselected tools, missing adapters, incomplete native observations and hidden WASM recovery stay unresolved. TP/FP/FN/TN include only jointly decidable syntax samples. Located Kotlin syntax diagnostics survive mixed context blockers while execution remains incomplete. Changed tools/entries or program bytes withdraw classifications. Reports remain incomplete with zero qualified grammars and create no tasks or whitelist approvals. Reused adapters, regression samples and entry-artifact hashes do not prove independent holdout or full toolchain identity. See [native differential acceptance](../tests/acceptance/native-grammar-differential.md) for commands and actual evidence.
+
+
+### Isolated Python native syntax comparison
+
+Development replay now accepts explicit Ruff0.16.8 with the Python3.12 target. Frozen stdin, `--isolated --select E9 --ignore-noqa --no-cache` excludes project configuration and ordinary lint. Only consistent located `invalid-syntax` diagnostics classify syntax errors; F401, wrong paths/positions, changed versions or contradictory reports remain incomplete. Report0.2 preserves historical0.1 bytes and does not expand trusted task-closing authority. The18-case actual replay found two WASM false negatives: an empty function suite and incorrect indentation. Python remains unqualified; see [Python native differential acceptance](../tests/acceptance/python-native-grammar-differential.md).
+
+Python development differential 0.3 measures raw grammar separately from the parser-plus-structure candidate. Existing `comparison` and TP/FP/FN/TN stay intact; verified rule identity and source positions, `combined_candidate_comparison` and a separate denominator are added. Truncation, cancellation and program changes never become clean candidates; native identity changes withdraw both comparisons. Candidates still require native confirmation, historical 0.1/0.2 reports remain unchanged, and neither qualification nor delivery authority expands. See [layered acceptance](../tests/acceptance/native-structure-differential.md).
+
+JavaScript development differential now uses fixed Node 24.18.0 with isolated `--check --input-type=module`, a cleared environment, frozen stdin, a shared deadline and entry/artifact checks before and after execution. Report 0.4 records the explicit module goal and only verified source-line locations; unknown output or tool changes remain incomplete. It neither infers project CommonJS/ESM settings nor replaces ESLint. Node has a separate 128 MiB artifact budget; other checker budgets stay at 64 MiB. See [JavaScript native acceptance](../tests/acceptance/javascript-isolated-native-differential.md). The actual 18-case module comparison retains 5 TP / 0 FP / 2 FN / 11 TN: top-level return and duplicate bindings remain missed, with 0/32 qualified grammars.
+
+
+### Empty-block structural facts (integration pending)
+
+Rust runtime now provides `scan_wasm_empty_blocks`, traversing the full tree for blocks with no non-comment named statement and retaining parent kinds, byte positions and exhausted budgets. These facts are distinct from raw ERROR/MISSING and cannot authorize a language violation: a legal empty Rust function also produces a fact. The fixed candidate Python required_suite rule now reaches the private worker, explicit probe and single-file lint/work sync confirmation task through separate versioned recovery and structure fields. Aggregate check now preserves structure evidence and the same task identity through feedback0.48 and generic confirmation0.7; trusted native closure remains incomplete; the two raw Python grammar false negatives remain open. See [structure task integration](../tests/acceptance/python-structure-lint-task.md). See [structural-fact acceptance](../tests/acceptance/wasm-empty-block-facts.md).
+
+See [aggregate structure acceptance](../tests/acceptance/check-python-structure.md); this does not certify grammar quality or the full delivery gate.
+
+The isolated Python native probe now rechecks the requested entry and frozen bytes after version detection and before syntax execution; changed entries do not trigger a second invocation. It also verifies continuity afterwards. See [native-entry acceptance](../tests/acceptance/python-native-tool-continuity.md). Trusted Python closure still requires stable task identity, original-report and approved target-version integration; the development py312 probe does not authorize project delivery.
+
+Python candidate confirmation shares a frozen-source validator while current import remains bound to the current file. Empty observations cannot bypass UTF-8 validation. This validator does not verify consumption receipts or approvals and cannot resolve tasks. See [acceptance](../tests/acceptance/python-confirmation-source-snapshot.md).
+
+Python candidate confirmation now rechecks only its original single-file scope through the existing project Ruff configuration and native execution chain. Feedback 0.18 and task preview 0.20 bind the consumed first report and current source; neither grants project coverage nor trusted task resolution. Missing or modified original receipts reject execution. See [acceptance](../tests/acceptance/python-confirmation-scoped-recheck.md).
+
+
+### Python native syntax repair feedback (0.19 / 0.21)
+
+Matching `invalid-syntax` diagnostics in Ruff normal and ignore-noqa runs remain native syntax errors instead of suppression-audit failures. An EOF diagnostic can use the preceding nonempty source as its stable task anchor without changing native coordinates. Single-file confirmation feedback 0.19 and task preview 0.21 distinguish remaining syntax errors as `still_present` and provide source-repair guidance. A complete recheck without syntax errors only yields `candidate_absent_unverified_policy`; it cannot close a task. Historical 0.18 reports retain their event semantics, and source or configuration changes withdraw current conclusions. See [native syntax feedback acceptance](../tests/acceptance/python-native-syntax-audit.md).
+
+
+### Python resolution prerequisites: original source and target version
+
+The read-only host API `validate_python_task_original_source(root, task_id, source)` checks both first-report families, consumed receipts, frozen bytes and recovery/structure positions. After repair, it still accepts the original bytes and rejects substituting current bytes. The isolated syntax probe can receive an explicit Python target and rejects invalid targets before tool resolution; the existing development differential retains py312. These prerequisites do not provide signed approval, project target provenance or trusted resolution. See [acceptance](../tests/acceptance/python-resolution-prerequisites.md).
+
+
+### Native Ruff lint target observation
+
+`RuffSettingsObservation::explicit_python_target()` returns only an explicit lint target observed in the pinned Ruff settings. It requires one `linter.unresolved_target_version` and an empty `linter.per_file_target_version`; implicit none, missing/duplicate fields, unknown versions and unresolved per-file targets return specific reasons. Formatter/analyze targets are not substitutes. This internal observation shares the native tool/source/configuration checks, leaves the public settings shape unchanged and does not authorize resolution. See [acceptance](../tests/acceptance/python-native-target-settings.md).
+
+
+### Shared event commit for scoped tasks
+
+Native syntax services now separate rechecks from `commit_resolution`. Before committing, domain evidence must match the redacted native pair for identity, original/current source, tool, adapter, grammar/approved policy and native-pair digest. Language entry points still verify signatures and execute native rechecks. Shared commit logic retains idempotency, policy-change reconciliation, parent-chain conflicts and recurrence, without granting project delivery. This prepares Python integration; Python trusted resolution is not implemented yet. See [acceptance](../tests/acceptance/task-resolution-commit-boundary.md).
+
+
+### Scoped Python native syntax resolution (policy 1.5 / evidence 0.6)
+
+The host SDK `verify_python_task_resolution` binds an independently signed policy to the task, consumed first report, original source, grammar, Ruff artifact, adapter, explicit lint target and project configuration digest. Rust invokes native Ruff against original stdin and the current scoped file. The current scan retains normal/ignore-noqa comparison and effective settings. Closure requires native syntax diagnostics on the original source, changed current source with complete zero syntax diagnostics, and stable inputs and policy bindings. Native counterevidence on the original enters false-positive investigation. Missing tools, unresolved targets, changed configuration and incomplete runs cannot close a task; formatter targets and implicit defaults cannot supply the lint target.
+
+Both first-report families retain one task and append-only lifecycle history. Closed evidence 0.6 leaves historical protocols unchanged. Repeated verification is idempotent; recurrence preserves the previous closure. Ordinary verification may reopen but cannot authorize a new closure using a historical policy. Independent signing fixtures do not certify production host trust integration, project delivery or grammar qualification. See the [scoped acceptance record](../tests/acceptance/python-task-resolution-lifecycle.md).
+
+
+Python3.14 template strings provide real native counterevidence: the pinned WASM reports ERROR while Ruff accepts identical bytes under explicit py314 and rejects them under py313. After scoped SDK false-positive review, next now reads the same Python confirmation task lifecycle and guides grammar/version investigation. Current source/configuration invalidation takes precedence over historical counterevidence. This does not approve a whitelist, close the task or rewrite historical corpus statistics. See the [native counterevidence acceptance](../tests/acceptance/python-template-string-counterevidence.md).
+
+
+### Syntax confirmation actions and retry budgets
+
+A Python syntax-confirmation task uses `repair-source` when its current native observation is `still_present` and source/configuration bindings remain valid. Missing tools, incomplete observations and stale inputs do not authorize source edits from historical positions. For the same syntax-confirmation task and unchanged input, `restore-checker-environment` and `repair-source` share the existing no-progress budget. Switching actions cannot erase failed attempts. Append-only events retain their original action and fingerprint; other task families keep their existing accounting. New inputs and verified progress follow existing reset rules. Exhaustion requires a concrete diagnosis or decision and grants neither closure nor gate acceptance.
+
+
+### Unified scope for TypeScript module sources
+
+`detect`, `check all` / `check typescript` and `file_changed` hooks now include `.mts/.cts` and `.d.mts/.d.cts` in the existing TypeScript scope. They use the pinned TypeScript grammar, never TSX. Complete same-file native ESLint observations retain priority; files in another build root without native context keep independent candidate fallback. Repeated suspected results update the same confirmation task; valid declarations create no new syntax blocker. Edit hooks check only confirmed changed files. Extension recognition does not certify module resolution, type checking, grammar qualification or delivery. See [module-extension acceptance](../tests/acceptance/typescript-module-extension-routing.md).
+
+
+### Historical manifests and current replay
+
+Historical corpora and reports retain their original manifest and corpus digests and are checked against preserved manifest bytes. Current replay still requires the current fixed manifest. Reusing samples requires an explicit newly bound input and its new corpus digest; archived reports are never rewritten. Read-only manifest validation grants neither execution permission nor release qualification. See [boundary acceptance](../tests/acceptance/grammar-manifest-history-binding.md).
+
+
+### Immutable asset reuse versus source-result caching
+
+Successful verification of bundled grammar bytes and licenses is now reused per language within one process, and immutable metadata is parsed once. Cache entries are bounded by the bundled manifest; unknown languages add no entry. Concurrent selection verifies an asset once and returns independent metadata copies. Caller-supplied WASM, licenses and identities are still checked on every call. Source, configuration, native tools, task history and gates are outside this cache. Restarting or updating the binary rebuilds it. This does not implement cross-command source-result caching or promote a zero-recovery candidate to clean. See [asset-reuse acceptance](../tests/acceptance/selected-grammar-asset-reuse.md).
+
+
+### Explicit R and C++ source suffixes
+
+Project discovery and WASM candidate routing include `.R`/`.r` and C++ `.C`/`.cp`/`.CPP`/`.c++`/`.cxx`/`.hxx`, retaining existing suffixes. Case remains significant: `.C` uses C++, while shared `.h` gets no speculative C++ grammar route. Missing native tools still produce actual candidate observations and `incomplete` delivery; suffix coverage does not qualify a grammar or grant acceptance. See [suffix acceptance](../tests/acceptance/r-cpp-extension-routing.md).
+
+
+### Bounded grammar limitation output
+
+Aggregate human output includes at most three limitations per candidate, 512 characters each, for eight candidates. Claude takes the last appended limitation from pinned metadata, at most 180 characters for each of two deduplicated languages. It does not use user source, paths or arbitrary report text, and adds no worker invocation. The 1200-character context budget reserves space for the final unqualified/unevaluated boundary. Report versions, findings, tasks and gates remain unchanged. See [acceptance](../tests/acceptance/grammar-limitation-conversation-feedback.md).
+
+The native development differential now passes the same request cancellation token through version and source phases for Zig, Erlang, Swift, Kotlin, Python and JavaScript. In-flight cancellation retains samples and unknown comparisons without granting grammar qualification; synchronous digest I/O still has no hard interruption guarantee. See [cancellation acceptance](../tests/acceptance/native-differential-shared-cancellation.md).
+
+Zig, Erlang and Swift native observers now revalidate the requested alias, canonical entry and artifact digest after version observation and around the source call. Changes stop subsequent execution and remain incomplete. See [entry-binding acceptance](../tests/acceptance/native-version-entry-binding.md) for six-language alias/replacement counterexamples; complete check-to-spawn TOCTOU and toolchain closure remain open.
+
+Kotlin observers verify the private source copy against frozen input before and after compilation, following version probing. Unexpected Zig version stderr stops the AST call. Both remain tool/input failures without creating source findings; see [phase-input acceptance](../tests/acceptance/native-version-input-continuity.md).
+### Go package candidate protocol and repair feedback
+
+The fixed `codeguard.go.required_package` rule uses `source_file` direct named children, not keyword search. Go worker1.2 reports one zero-width file-start structure observation with fixed rule/version/SHA; old worker1.1 remains Python-only. The parent rejects cross-language rules, changed hashes, duplicate Go records, unknown fields and nonzero anchors. Budget exhaustion stays incomplete.
+
+Probe0.3 declares `source_scope=whole_file`; aggregate0.49 permits correctly bound Python/Go structures and independently versioned Go vet preview0.13. Generic Go confirmation0.8 binds the frozen source, fixed grammar/rule, whole-file route and stable task identity. Save feedback0.18/fast0.9 uses the same report and task. Python and historical versions are unchanged. Native differential0.7 measures raw grammar and the combined candidate separately, preserving unknown samples and source identities. See [schemas](../schemas/grammar-probe-v0.3.schema.json) and [acceptance](../tests/acceptance/go-package-structure.md).
+
+The Go preview version corrects an existing mismatch where Go vet argv was labeled as a Python-only0.1 preview. Go native project lint still uses existing Go vet. The follow-up adds explicit Go task syntax rechecks; complete Go lint obligations and trusted closure remain pending, as do independent holdout and release qualification.
+
+Go candidate-task rechecks now accept `--go-tool /absolute/sdk/bin/go` and invoke the pinned SDK companion `gofmt -e /dev/stdin` on frozen whole-file bytes. Recheck0.9 / task feedback0.22 retain native diagnostics, tool and companion identities, first-report receipts and failed attempts. The repaired source can be observed without invalidating the original candidate history. Native zero diagnostics retain an open task pending approved policy and coverage. See [acceptance](../tests/acceptance/go-package-structure.md).
+
+Go-specific repair brief0.14 binds the native observation and `--go-tool`; initial feedback has no fabricated native report. Aggregate0.50 is selected only when it carries that brief. Existing Go vet brief0.13 / aggregate0.49 remain supported.
+
+### Native-first Go lint with missing-tool candidates
+
+Source-built `codeguard lint go . --format json` prefers explicit `--go-tool`, then executable Go from absolute caller PATH entries. Selected tool/version/execution failures remain native failures. When no native tool exists, the built-in WASM produces bounded whole-file recovery and structure candidates. Candidates or incomplete prechecks require a project-appropriate native tool; zero candidates in the completely observed bounded scope only recommend preparation. Native obligations remain incomplete and exit3 is retained. Builds without WASM report that capability gap. Repeated lint/check reuse the confirmation task; adding a package declaration does not close it. Public npm0.1.4 is unchanged. See [limited acceptance](../tests/acceptance/go-lint-fallback.md).
+
+Closed fallback protocol0.7 embeds the unchanged native0.6 report, `syntax_candidates`, `syntax_tasks`, `preliminary_result` and `native_tool_requirement`. Store native reports and candidate receipts independently; the outer conversation report does not prove native execution.
+
+
+### Limited Go task resolution by a protected host
+
+The Unix SDK exposes `verify_go_task_resolution(&GoTaskResolutionRequest)`. Independently signed [policy1.6.0](../schemas/task-resolution-policy-v1.6.schema.json) binds Go1.23.4, same-SDK gofmt bytes and canonical companion-path digest. Original native diagnostics, current zero diagnostics and stable inputs are all required to close the same task; an ordinary original-tool recheck records recurrence and reopens it. Companion changes, native counterevidence and missing/tampered history cannot close it. [Evidence0.7.0](../schemas/task-resolution-evidence-v0.7.schema.json) never grants project delivery. The real Go pair was locally verified using a test host trust fixture; default production host integration remains open. See [acceptance](../tests/acceptance/go-task-resolution-lifecycle.md).
+
+
+### Read-only current-source command support catalogue
+
+`codeguard help --format json` queries C01–C36 and additional public entries. `codeguard help task verify --format json` selects an exact command prefix. The command_help0.3 report separates implemented/partial/planned/unavailable_build and executable; executable means an entry exists, not that checking or installation completed. Grammar probe is unavailable without the WASM feature and remains unqualified with it. Unimplemented standalone MCP and other operations are explicitly planned.
+
+```bash
+codeguard help --format json
+codeguard help lint --format json
+codeguard task verify --help
+```
+
+Help does not inspect projects or start tools. Exit0 means the query completed, with delivery_decision still not_evaluated. Exact-prefix trailing help is supported; full language/path/tool-argument contextual help and complete parameter generation remain open. See [actual reports and acceptance](../tests/acceptance/command-help-current-support.md). Public npm0.1.4 does not contain this source increment.
+
+
+### Native-first standalone Rust lint
+
+The current source supports `codeguard lint rust . --cargo-tool /absolute/cargo --format json`. It reuses the aggregate check's locked/offline all-targets Clippy observation, input validation and workbench synchronization, executing only lint. Initialized workspaces retain one stable task per finding and return the next action. Recheck with `codeguard task verify TASK_ID . --cargo-tool /absolute/cargo --format json`; zero diagnostics still require rule/policy review and do not automatically close the task.
+
+When no explicit Cargo is selected and no executable is found on absolute PATH entries, WASM builds provide bounded candidate prechecks. Candidates or incomplete observations require native tool preparation; zero candidates across the complete bounded scope recommend it. Explicit tool errors or native failures do not trigger fallback or installation. The JSON protocol is `rust_lint_feedback` 0.1 with delivery unevaluated; help 0.2 adds Rust while preserving historical 0.1 schemas. Source integration does not imply public npm availability or complete Rust qualification.
+
+## Ruby single-file native syntax and task rechecks
+
+Source builds add `codeguard lint ruby FILE.rb --ruby-tool /absolute/path/to/ruby --format=json`. This only observes fixed Ruby2.6.10p210 `ruby -c` with gems disabled and frozen UTF-8 stdin; user source is never executed. Explicit tool failures and unsupported versions do not trigger WASM fallback. Missing native selection uses candidate prechecks in WASM builds; candidates/incomplete checks require native preparation, while zero candidates recommend it. The `ruby_lint_feedback`0.1 report preserves native line numbers without fabricated columns, leaves project-version compatibility unverified and requires RuboCop, documentation, security and full project checks. Help0.3 adds Ruby without changing historical help0.1/0.2 schemas. Initialized workspaces reuse one stable confirmation task across WASM candidates and native observations. `next` retains native line positions and the verified `--ruby-tool` recheck argument; `task verify` records attempts and leaves zero-diagnostic tasks open pending policy/coverage review. Ruby syntax feedback0.3, native history0.9, recheck0.10, task preview0.23 and repair brief0.15 preserve old protocol versions. `codeguard check ruby ROOT --ruby-tool /absolute/path/to/ruby --format=json` and `check all` now reuse the bounded native syntax scan and stable task connector; selected failures do not switch to WASM. The shared deadline and64-file cap retain incomplete scope; native observations withdraw positions when source/tool identity changes. Aggregate feedback0.51 supports Ruby scan0.1/0.2 and brief0.15 without modifying old schemas. Full RuboCop/project lint and trusted closure remain pending. Public npm0.1.4 is unchanged.
+
+
+Ruby edit feedback: source builds of `hook execute` / `hook claude post-tool-use` accept `--ruby-tool ABS_PATH` or select Ruby from the caller's absolute PATH entries. Only confirmed edited files are parsed under the event deadline. Selected failures do not fall back; absence retains WASM candidates. Bounded dialogue carries current line positions and real stable tasks without source/tool-message echoes or invented columns, and asks agents to verify project Ruby compatibility first. `repair_ready` rechecks using the selected tool and retains real evidence references; zero diagnostics do not close tasks. New closed protocols are edit feedback 0.19 (inner 0.10) and recheck feedback 0.20 (inner 0.6); old schemas are preserved. Actual installed-host triggering, complete RuboCop coverage, and public npm release remain unverified.
+
+Ruby version declaration guard: source builds read the nearest `.ruby-version` between the source and project root, bounded to 64 ancestor levels and 4096 bytes. Only `2.6.10`, `2.6.10p210` and their `ruby-` forms match the fixed parser. Other explicit versions yield `ruby_project_version_mismatch`; aliases/ambiguity yield `ruby_project_version_unresolved`; unsafe links/read failures yield `ruby_project_version_unreadable`. None starts the old Ruby or falls back to WASM. Declaration bytes and nearer missing declarations are rechecked after parsing; changes withdraw diagnostics. Saved positions are also withdrawn when a new declaration is incompatible. Standalone lint locates a `.codeguard` workspace before a Git root or Gemfile, so nested Gemfiles cannot hide the workspace pin; the nearest module version declaration remains authoritative. Absence retains an unapproved preliminary observation. Gemfile constraints, JRuby/RVM, complete project profiling and release remain pending. See [version guard acceptance](../tests/acceptance/ruby-project-version.md).
+
+The Ruby six-category candidate profile now records runtime dialects, project-lock version selection and conditional tool scopes. Native rules, full project coverage and platform qualification remain unverified. See [profile acceptance](../tests/acceptance/ruby-candidate-baseline.md).
+
+## Native ShellCheck single-file inspection (partial capability)
+
+`codeguard lint shell app.sh --dialect bash --shellcheck-tool /absolute/shellcheck --timeout 30s --format json` invokes ShellCheck 0.11.0 `json1` through Rust, preserving native SC rules, severities and ranges. Explicit sh/bash/dash/ksh/busybox are supported; zsh/fish declarations, shebangs and known filenames remain capability gaps. Missing tools produce setup guidance. No Shell WASM asset is available, so fallback remains explicitly unavailable.
+
+An explicit absolute `--shellcheck-config` or the nearest ancestor rc is frozen in a private run directory (automatic discovery is bounded to 64 ancestors). HOME/XDG global configuration is not loaded. Project configuration status is independent of native execution with built-in rules. Frozen stdin avoids executing the inspected script; source, entry bytes, rc bytes and nearer missing rc witnesses are rechecked across phases. Linked rc, invalid encoding and external-sources enablement are rejected. No fix is applied. Tool dependency closure and full platform isolation remain open.
+
+SC1071/1090/1091/1092/1134/1144/1145 represent environment/dependency blockers and may coexist with retained local SC2086 diagnostics. `json1` columns count Unicode scalar characters, with each tab counting one character. Invalid/partial reports cannot claim completeness. Free-text native messages and replacement payloads are not forwarded into repair instructions.
+
+Version 0.1.0 `shell_lint_feedback` includes seven-part repair guidance, original-tool recheck argv and official rule links. `task_workflow_status=not_integrated` and empty attempt history explicitly identify the missing persistence integration. Incomplete evidence yields investigation guidance without authorized source paths. Even native zero diagnostics leaves the overall command incomplete/exit 3 and delivery not evaluated. Project coverage, Dockerfile/IaC, security, trusted exceptions and task closure require independent implementation and acceptance. See the [partial acceptance record](../tests/acceptance/shellcheck-native-baseline.md).

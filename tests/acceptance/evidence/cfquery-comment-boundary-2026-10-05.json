@@ -1,0 +1,261 @@
+{
+  "authority": "local_unverified",
+  "category_candidates": [
+    {
+      "capability_status": "gap",
+      "category": "lint",
+      "checker_id": null,
+      "language": "cfml",
+      "legacy_status": "stable",
+      "next_action": null,
+      "reason": "native_adapter_not_integrated",
+      "status": "not_integrated"
+    },
+    {
+      "capability_status": "gap",
+      "category": "comments",
+      "checker_id": null,
+      "language": "cfml",
+      "legacy_status": "stable",
+      "next_action": null,
+      "reason": "native_adapter_not_integrated",
+      "status": "not_integrated"
+    },
+    {
+      "capability_status": "gap",
+      "category": "dependencies",
+      "checker_id": null,
+      "language": "cfml",
+      "legacy_status": "stable",
+      "next_action": null,
+      "reason": "native_adapter_not_integrated",
+      "status": "not_integrated"
+    },
+    {
+      "capability_status": "gap",
+      "category": "cve",
+      "checker_id": null,
+      "language": "cfml",
+      "legacy_status": "stable",
+      "next_action": null,
+      "reason": "native_adapter_not_integrated",
+      "status": "not_integrated"
+    },
+    {
+      "capability_status": "gap",
+      "category": "security",
+      "checker_id": null,
+      "language": "cfml",
+      "legacy_status": "stable",
+      "next_action": null,
+      "reason": "native_adapter_not_integrated",
+      "status": "not_integrated"
+    },
+    {
+      "capability_status": "gap",
+      "category": "build",
+      "checker_id": null,
+      "language": "cfml",
+      "legacy_status": "stable",
+      "next_action": null,
+      "reason": "native_adapter_not_integrated",
+      "status": "not_integrated"
+    }
+  ],
+  "command_status": "incomplete",
+  "delivery_decision": "incomplete",
+  "discovery": {
+    "blocked_paths": [],
+    "build_roots": [],
+    "checker_configurations": [],
+    "declared_versions": {},
+    "languages": [
+      {
+        "id": "cfml",
+        "manifests": [],
+        "source_files": [
+          "incomplete.cfm",
+          "page.cfm"
+        ]
+      }
+    ],
+    "lockfiles": [],
+    "manifest_sha256": {},
+    "native_tool_candidates": [],
+    "observation_complete": true,
+    "observed_entries": 2,
+    "report_type": "discovery",
+    "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-cfquery-close-51734",
+    "schema_version": "0.4.0",
+    "scope_summary": {
+      "configuration_exception_files_observed": 0,
+      "dependency_roots_excluded": 0,
+      "dot_prefix_roots_excluded": 0,
+      "git_safety_status": "not_evaluated",
+      "ordinary_scan_policy": "project_sources_default_v2"
+    },
+    "source_set_candidates": [],
+    "unknown_conditions": [
+      "source_sets_not_fully_classified",
+      "dialects_not_classified"
+    ]
+  },
+  "execution_budget": {
+    "enforcement": "native_execution_only",
+    "jobs_limit": 1,
+    "jobs_source": "cli",
+    "native_task_count": 0,
+    "source": "cli",
+    "started_native_task_count": 0,
+    "timeout_ms": 60000
+  },
+  "execution_tasks": [],
+  "exit_code": 3,
+  "export": {
+    "reason_code": null,
+    "status": "not_requested"
+  },
+  "native_results": {
+    "erlang_lint": null,
+    "go_lint": null,
+    "java_cve": null,
+    "java_dependencies": null,
+    "java_javadoc": null,
+    "java_p3c": null,
+    "node_lint": null,
+    "npm_cve": [],
+    "python_cve": [],
+    "python_lint": null,
+    "rust_build": null,
+    "rust_comments": null,
+    "rust_cve": null,
+    "rust_lint": null
+  },
+  "next": null,
+  "obligation_status": "unresolved",
+  "operation": "check",
+  "reason": "full_project_obligations_and_trusted_policy_unavailable",
+  "report_type": "check_feedback",
+  "required_obligations": null,
+  "schema_version": "0.38.0",
+  "selection": "all",
+  "syntax_candidates": {
+    "authority": "candidate_unqualified",
+    "delivery_decision": "incomplete",
+    "execution_phase": "after_native",
+    "native_preferred_count": 0,
+    "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+    "observations": [
+      {
+        "byte_offset": 0,
+        "grammar_qualified": false,
+        "grammar_sha256": "17aeb294c58dd47045b470fc082ccceac3100c8e548b13764d4f3987a062322f",
+        "known_limitations": [
+          "Pinned CodeGraph asset; only narrow syntax fixtures; native differential, language and dialect ranges, public lint route, resource budget and release remain unqualified"
+        ],
+        "language": "cfml",
+        "path": "incomplete.cfm",
+        "reason": null,
+        "recoveries": [],
+        "recovery_count": 0,
+        "scope": "whole_file",
+        "source_sha256": "79af0a215a906d44915919316c5840663cc9ba2e940178cd516f622d4bf2c33c",
+        "status": "candidate_observed"
+      },
+      {
+        "byte_offset": 0,
+        "grammar_qualified": false,
+        "grammar_sha256": "17aeb294c58dd47045b470fc082ccceac3100c8e548b13764d4f3987a062322f",
+        "known_limitations": [
+          "Pinned CodeGraph asset; only narrow syntax fixtures; native differential, language and dialect ranges, public lint route, resource budget and release remain unqualified"
+        ],
+        "language": "cfml",
+        "path": "page.cfm",
+        "reason": null,
+        "recoveries": [
+          {
+            "end_byte": 91,
+            "end_column_byte": 83,
+            "end_row": 1,
+            "kind": "ERROR",
+            "start_byte": 69,
+            "start_column_byte": 61,
+            "start_row": 1,
+            "syntax_kind": "ERROR"
+          },
+          {
+            "end_byte": 81,
+            "end_column_byte": 73,
+            "end_row": 1,
+            "kind": "ERROR",
+            "start_byte": 71,
+            "start_column_byte": 63,
+            "start_row": 1,
+            "syntax_kind": "ERROR"
+          }
+        ],
+        "recovery_count": 2,
+        "scope": "whole_file",
+        "source_sha256": "28578c757d2bf050981cf6feb63d35e47f12247aabfa132eddffc6d317112116",
+        "status": "candidate_observed"
+      },
+      {
+        "byte_offset": 17,
+        "grammar_qualified": false,
+        "grammar_sha256": "9d4eaaec46eec7e6400d4b8d6c85fac7dfe33867ed5b4e5c218dfa7851c32558",
+        "known_limitations": [
+          "SELECT FROM inside a CFQuery fragment yields zero recovery despite missing SQL select list; this grammar does not validate full SQL semantics. Native dialect comparison, systematic precision, public lint route, resource budget and release remain unqualified"
+        ],
+        "language": "cfquery",
+        "path": "page.cfm",
+        "reason": null,
+        "recoveries": [],
+        "recovery_count": 0,
+        "scope": "cfquery_body",
+        "source_sha256": "627829f32ad679afef7e3cfbdce608a01407386695543a702bf14fb900695ba3",
+        "status": "candidate_observed"
+      },
+      {
+        "byte_offset": 100,
+        "grammar_qualified": false,
+        "grammar_sha256": "9d4eaaec46eec7e6400d4b8d6c85fac7dfe33867ed5b4e5c218dfa7851c32558",
+        "known_limitations": [
+          "SELECT FROM inside a CFQuery fragment yields zero recovery despite missing SQL select list; this grammar does not validate full SQL semantics. Native dialect comparison, systematic precision, public lint route, resource budget and release remain unqualified"
+        ],
+        "language": "cfquery",
+        "path": "page.cfm",
+        "reason": null,
+        "recoveries": [],
+        "recovery_count": 0,
+        "scope": "cfquery_body",
+        "source_sha256": "ebbb5b332060a3ede7047bd7528883b0a560e729848f9feb8ff742145e909b01",
+        "status": "candidate_observed"
+      }
+    ],
+    "reason": "candidate_unqualified",
+    "skipped_count": 0,
+    "source_file_count": 2,
+    "status": "observed_partial",
+    "unrouted_count": 0
+  },
+  "syntax_tasks": {
+    "failures": [
+      {
+        "language": "cfml",
+        "path": "page.cfm",
+        "reason": "workspace_not_initialized"
+      }
+    ],
+    "new_blockers": 0,
+    "status": "incomplete",
+    "tasks": []
+  },
+  "unresolved_conditions": [
+    "dialects_not_classified",
+    "required_obligations_unresolved",
+    "source_sets_not_fully_classified",
+    "syntax_task_sync_incomplete",
+    "tool_lock_unverified",
+    "trusted_policy_unavailable"
+  ]
+}

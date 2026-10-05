@@ -2084,3 +2084,313 @@ TDD 先复现报告漏洞：把源码 finding 的主定位、原生身份及白�
 已初始化工作区的单文件 `lint python` 候选报告使用 0.15.0 对话协议，将固定 Python grammar、当前源码摘要与脱敏疑似位置写入独立 0.1.0 本地报告，并经现有 work sync 形成按工作区和源码范围稳定归并的 `python_syntax_confirmation_needed` 阻塞任务。未初始化工作区继续使用 0.14.0 且任务 ID 为空。重扫同一源码及源码改为零恢复节点后，任务仍为 `open`；报告目录不可用时，对话保留候选结果，标明持久化原因而不伪造任务引用。导入拒绝 grammar 摘要篡改、越界坐标和重复 JSON 键；报告不含源码文本。
 
 开发验证：新增 Python 端到端 8/8、相关 Python 原生路径 16/16（5 项真实工具用例默认忽略）、TypeScript 候选回归 14/14；本机 Ruff 0.16.8 的额外原生优先用例及 `task verify` 用例分别通过，后者记录观察而不关闭任务。实际 0.15.0 与本地 0.1.0 报告通过 JSON Schema，伪造同步成功状态被拒绝。先构建特性版产生报告，再用默认二进制执行 `work sync`，`failed_reports=0`。默认工作区测试通过，特性版 Clippy `-D warnings`、格式、分层检查及 OpenSpec strict 通过。能力匹配的原生复检关闭、多文件任务和真实宿主对话仍未完成，14.10 及相关总任务不勾选。
+
+## 2026-10-03 编辑事件原生优先、32 份 WASM 与任务对话
+
+针对 `fast_scope_not_wired` 断点，先补 JS 编辑红测，再将 Hook 选中文件接到共享 Ruff/ESLint 原生路径和固定 WASM 路由。ESLint 同步后反馈稳定任务，重复扫描新增发现为 0；任务摘要缺失的红测随后修正，Claude 候选摘要包含 task show/verify，保存失败保留原生规则并提示同步未完成。外层 Hook 协议 0.6.0，旧 0.5 schema 与上一提交逐字节一致。32 grammar 编辑事件实际执行测试分四批检查指定文件，覆盖集合等于 manifest，未选坏文件不被扫描。详见 [验收记录](../../../tests/acceptance/hook-fast-native-wasm.md)。
+
+最终默认工作区 `cargo test --workspace --all-targets` 退出 0：1106 通过、0 失败、105 忽略；日志 `/tmp/codeguard-hook-workspace-final.log`。WASM 构建下 check_all_eslint、hook_execute_cli、claude_hook_cli 合计 42 通过、0 失败、3 忽略，日志 `/tmp/codeguard-hook-fast-wasm-final.log`；check_all_grammar_candidates 独占运行 10/10 通过，155.67 秒，含新增全部 32 grammar 编辑事件和既有聚合路由回归，日志 `/tmp/codeguard-hook-32.log`。CLI 全目标含 WASM Clippy `-D warnings`、fmt、分层检查、OpenSpec strict、diff 空白和新增文档链接校验均通过。166 份 schema 定义有效，实际 Hook WASM JSON 通过当前 schema，三个伪造通过/覆盖变体均被拒。
+
+本轮 ESLint 编排使用受控替身，未安装工具；真实 WASM 运行与实际宿主触发明确分开。默认插件尚未切换，发布包没有更新；其它语言原生 Hook 快检、候选任务自动同步/关闭、Python 元数据发现效率和全 I/O 硬预算仍缺。S11.17、S14 及完整目标继续未完成。上一源码 c6a3676 的 CI 37131837212 已成功，本轮源码的 CI 须按新提交另行核验。
+
+## 2026-10-04 指定 Python 发现与通用候选确认任务
+
+Python 选中文件检查不再通过全项目元数据 walk 发现配置；只观察所选源码及祖先 Ruff 配置，保持最近 `.ruff.toml` 优先级，最近配置链接/不可读时为 unknown，不能退回父配置。旁支链接配置导致 discovery_incomplete 的旧反例先 RED 后 GREEN；5 项端口测试禁止目录枚举并覆盖链接祖先和已过期预算。这是协作式文件观察预算，不是全部 I/O 的硬中断保证。
+
+先写 Zig 编辑任务和持久化失败两项端到端反例：旧反馈没有 syntax_tasks，两项实际 RED；接线后使用版本化 syntax_confirmation_observation 0.1 导入既有工作台。当前 Hook 外层 0.7、局部 0.2；通用 next 简报 0.2，原有检查器仍 0.1；原 Hook 0.6 和简报 0.1 schema 与 HEAD 原件逐字节相同。Python/ESLint 复用旧任务身份，其余语言按工作区/文件/语言归并原生确认阻塞。零恢复不新增必需任务、不关闭旧任务；任务有证据、规则、允许范围、步骤、复检、历史与关闭条件。未接入原生确认 adapter 的 task verify 明确返回 native_syntax_confirmation_adapter_unavailable，不落到其它语言检查，也不签发关闭。
+
+默认全工作区全目标测试：1112 通过、0 失败、105 忽略，退出 0。指定范围相关四组 CLI 回归：55 通过、0 失败、13 忽略；WASM Hook/ESLint/Python 五组回归：52 通过、0 失败、4 忽略（当时新增任务测试为两项），之后扩展的 hook_syntax_tasks 六项全部通过。新增六项覆盖 Zig 稳定身份、零恢复不关闭、保存失败无虚构 ID、Python 已有确认身份复用、JS/TS/TSX 稳定准备身份、篡改 grammar/越界坐标/重复 JSON 键拒绝，以及真实 CLI 消费 Claude 形状的有界上下文。本机 Ruff 0.16.8 的额外原生指定文件验收 1/1 通过。实际 CLI Hook 0.7、候选报告 0.1、next 0.2 三份 JSON 通过 schema；三份伪造交付/阻断/grammar 资格变体被 schema 拒绝。169 份 schema 定义有效。
+
+实际 JSON：`/tmp/codeguard-syntax-task-schema-actual.json`。日志身份：
+- `/tmp/codeguard-syntax-tasks-workspace.log`：SHA-256 `50b587e7a16dd19f10442620108fa9f89a74cc0c34444dbb53b44319c6e201c8`。
+- `/tmp/codeguard-hook-syntax-tasks-final.log`：SHA-256 `8833b94fcee571f03b6c9a19a8f07369541942731b8892e700dba6c35fc6e6bc`。
+- `/tmp/codeguard-selected-final-cli.log`：SHA-256 `e66f334188ba8322dcdc49d39446da5c97b816808d4e7eba29e4b45b48cfb369`。
+- `/tmp/codeguard-syntax-task-regression.log`：SHA-256 `d449f69cfd7ad57b2a88225fb8ab8d7b5f10b48151edad4f67bda5f93df625f4`。
+- `/tmp/codeguard-syntax-tasks-native-ruff.log`：SHA-256 `9686456c76b74e43de38dfbb0718b0085f6d151a319d7db4609a19d943da7fd6`。
+
+代码审阅、WASM 特性全目标 Clippy -D warnings、fmt、crate 分层、OpenSpec strict 和 git diff --check 通过。上一提交 911aa47 的 CI 37133517765 已成功；当前变更远端 CI 必须按新提交另行核验。默认插件、真实安装宿主自动触发、全语言原生确认和可信关闭、完整 I/O 硬预算/性能/误报评测仍缺，11.17、14.9–14.11 及总体目标不勾选。此次未发布 npm 或修改插件锁。
+
+
+## 2026-10-04 Zig 确认任务原生复检与完整局部回归
+
+当前工作树将通用 WASM 确认任务的 Zig 原生 AST 复检接入既有租约、稳定任务和尝试历史。next 0.3.0 提供当前诊断位置、报告引用/摘要和可复用工具 argv；repair_ready 接受显式 Zig 工具，错误、环境/版本失败和输入变化分开投影。原生零诊断仍记录 candidate_absent_unverified_policy，不能关闭任务或签发 allow。原生 lint zig 路径不依赖 WASM 特性。固定内置 grammar 校验结果仅作进程内不可变资产复用，不缓存项目检查结果，也不省略外部字节验证。
+
+验收：[原生确认与任务证据](../../../tests/acceptance/syntax-native-task-verification.md)。相关特性九组 83 passed/0 failed/14 ignored；明确运行真实 Zig 对照 1 passed；资产反例 11 passed。默认工作区最终顺序运行 1113 passed/0 failed/105 ignored、201 组；早先默认/特性并发构建干扰报告版本的失败记录保留，不计作通过。实际默认构建能够复检特性版生成的任务。172 个 schema 元定义、实际 CLI 输出及四项伪造负例通过，历史 schema 两份逐字节保留；Clippy -D warnings、fmt、分层、OpenSpec strict 与 diff 检查通过。最新简报证据/预算保护回归 14 passed/0 failed/1 ignored，见 /tmp/codeguard-native-syntax-last-guard.log；当前全目标特性 Clippy -D warnings 再次通过。
+
+上一提交 e506319 的 CI 37136788881 已成功；本轮新提交需按新 SHA 等待 CI。默认插件、其它通用原生 adapter、真实宿主、正式关闭/复发重开和全语言低误报评测仍缺，S09/S11/S14 父任务保持未完成；未发布新的 npm 制品或修改插件锁。
+
+## 2026-10-04 限定任务关闭、失败保留与原生复发
+
+受保护宿主 SDK `verify_zig_task_resolution` 接通 Zig 0.16.0 原始反例与当前源码对照，严格绑定签名策略、首次任务报告、工作区/范围、grammar、工具、宿主制品及批准期限。原样本有有效原生诊断且当前字节修复后无诊断，才返回限定 `code_fixed`；同字节或原样本原生合法进入误报调查；工具消失、原生故障、无效坐标或并发输入变化保留待核验。首次 finding 不改写，生命周期按明确父链读取，普通 `task verify` 检出匹配原工具的复发可追加 `reopened`，重复确认不生成重复生命周期事件。ready-to-verify 尝试与借用租约继续沿用既有流程。
+
+新增反例暴露并修正了 next 沿用旧准备步骤、成功复检未消费待核验尝试、公开复检没有重开、关闭归因被改写以及 not_run 证据被本地读者误判为损坏的问题。RED 记录与能力边界见 [限定任务验收](../../../tests/acceptance/task-resolution-lifecycle.md)。本地历史始终不能代替宿主信任来源或交付决策；SDK 的签名密钥和时钟来源测试是夹具，不是生产宿主证明。
+
+最终顺序验证：
+
+- core task_resolution_contract：7 passed、0 failed。
+- WASM 特性下 task_resolution_service 与 syntax_task_verify：17 passed、0 failed、2 ignored；明确运行本机真实 Zig 对照：1 passed、0 failed。真实工具用例不重复计入默认测试。
+- 默认全工作区全目标：203 组、1122 passed、0 failed、105 ignored，退出 0；忽略项不计验收通过。
+- WASM 特性全工作区全目标 Clippy `-D warnings` 退出 0；fmt、crate 分层、OpenSpec strict 与 diff 检查通过。
+- 176 个 schema 元定义有效，29 份实际/文档示例通过，6 类伪造变体被拒；四份新协议独立版本，现有消费者协议未覆盖。
+
+日志身份：
+- `/tmp/codeguard-resolution-core-final.log`：SHA-256 `00a9182b89267287b8d254e24d628f83059fe7108050513c662ba2211a6a5d74`。
+- `/tmp/codeguard-resolution-complete-final.log`：SHA-256 `298cea24d47a2333f6d160f282be42d03ab75f518d8ee303cd1bd28709af8c86`。
+- `/tmp/codeguard-resolution-real-zig-final.log`：SHA-256 `da58a6f398b85db943f4dbadd496599da95ebd0308b2c4182037056000090d0d`。
+- `/tmp/codeguard-resolution-workspace-final.log`：SHA-256 `f1dab883f6bf992833595f8ee1241b40e3a69ce15edff60e45921e77f60eca4e`。
+- `/tmp/codeguard-resolution-clippy-final.log`：SHA-256 `232438360b0e3a621857d3db7c2e1e1a7027663d3ca3c106c3fc512e9d5062c0`。
+- `/tmp/codeguard-resolution-schemas-final.log`：SHA-256 `15f1b959f89def12836da2d6cd90f0d7700edc0c2d8934e126ffcb66f48fb0d2`。
+
+中英文架构、技术方案、README 与修复工作流已同步。SDK 仅覆盖限定 Zig 语法任务；默认插件/公开 CLI 的可信策略提供者、其它原生适配器、环境/依赖/政策处置、白名单裁定、跨机器/Windows、完整门禁和全语言精度/性能仍缺。9.7/9.10/9.11/14.10 等父任务保持未完成；没有发布 npm 或修改插件锁。此前提交 4585d8f 的 CI 37140830716 已成功，新提交 CI 须按新 SHA 独立核验。
+
+## 2026-10-04 离线 npm 安装后的编辑与任务复检
+
+通过新 binary-distribution 场景和独立 `npm_pack_repair.test.mjs` 验证安装后的 Node 入口保留 stdin、参数、工作目录及退出码。公开旧 0.1.3 经固定摘要核对后运行新链路测试真实 RED：编辑事件没有语法任务；当前源码的私有离线包 GREEN，1 passed/0 failed/0 skipped，62.4 秒。重复编辑、Claude 形状上下文、原生诊断指导、源码变化失效、修复零诊断不自闭、WASM 零恢复不关闭及同问题同任务均实际运行；受控原生工具与真实宿主边界见 [安装链路验收](../../../tests/acceptance/npm-repair-local-package.md)。9 份版本化实际报告通过 schema，三个伪造变体拒绝；记录保留旧包失败和测试参数修正失败，不混计成功。
+
+CI 顺序接入该离线测试。本批仅增加验收、文档和 CI；Rust 产品源码未再修改，前段全工作区结果仍适用于同一产品源码。公开制品/插件默认接线未改变，11.17/13.4/14.18 和整体目标保持未完成。a688292 的 CI 37147462608 已失败：SDK 7 项均报 task_resolution_adapter_unavailable，npm 和全量步骤未运行；不能用本机成功替代此结果。
+
+Linux CI 失败处理：宿主制品读取仍限制 256 MiB，不因测试失败扩大产品上限。测试夹具现先断言实际宿主程序大小，CI 设置 `CARGO_PROFILE_TEST_DEBUG=0` 去掉完整调试符号、保留 debug assertions；本机相同 profile 下宿主程序 101062368 字节，SDK 9 passed/0 failed/1 ignored（89.6 秒）。原 Linux 失败与新提交远端结果分开，当前根因指向调试制品预算，Linux 修正尚待新 CI 证明。
+- `/tmp/codeguard-a688292-ci-failure.log`：SHA-256 `25faca123f505251cca14d688e774131a438503960adb20126b52ae7a5b6b670`。
+- `/tmp/codeguard-resolution-ci-profile-local.log`：SHA-256 `d37c052e9fc23eeb7a3de0bba741024d42bd92a9b933fb0ae9d66b2827a20253`。
+
+本批新增测试与 CI 配置最终通过 CLI 特性全目标 Clippy `-D warnings`、fmt、分层、OpenSpec strict、Node 语法和差异检查；CLI Clippy 日志 SHA-256 `07302979ebe5e9d95fc0a9419217173dbf32fd669f3d956c322890e9920b5318`。
+
+
+## 2026-10-04 0.1.4 公开候选发行完成（局部验收）
+
+来源 `1cd458f6e01a44a74388243e964e3f45290ac18e` 的 Linux CI、4 项包测试、注册表/本地摘要、新缓存 npx、真实公开包 Zig 修复反馈及 GitHub prerelease/tag/asset 身份已核对；见 [公开发行验收](../../../tests/acceptance/npm-0.1.4-candidate.md)。此前“尚未发布”的本批记录是发行前快照。插件 lock/默认 Hook、真实宿主、多平台、完整精度和门禁仍缺，13.4/14.18/11.17 不勾选。库存输出 schema 缺口保留，不能称全部公开报告 schema 已验收。
+
+
+## 2026-10-04 库存输出 schema 补齐
+
+`grammar_coverage_inventory` 1.1.0 的封闭输出 schema 已补，真实 0.1.4 release 程序输出与 4 项正反例开发验收通过；新增制品不改变已发布程序字节。逐语言、provider、候选计数及未知权威/allow 伪造被拒。见 [库存协议验收](../../../tests/acceptance/grammar-inventory-schema.md)。此前发行验收中缺 schema 是当时快照；完整 S14.7 不勾选。
+
+
+## 2026-10-04 Erlang 原生优先与隐藏错误统计纠正
+
+当前源码新增 `lint erlang FILE --erl-tool ABS_PATH [--timeout DURATION] --format=json`，由 Rust 受控进程调用 OTP 28 原生 scanner/parser，固定 cwd、禁用项目 `.erlang`、stdin 原字节、版本及工具/源码前后摘要。原生 13 例与独立 erlc 标签一致，缺句点给出原生诊断；宏/条件编译保持具体未完成，不执行源码、预处理或 parse_transform。原生显式故障不转到 PATH 或 WASM，未提供工具时仍有固定候选初检。新版本化报告与实际 JSON/伪造通过变体验证见[局部验收](../../../tests/acceptance/erlang-native-first.md)。8.134、14.5–14.9、14.17、14.19 仍因完整项目工具/注释/任务/宿主与发行缺口保持开放，Erlang grammar 原始漏检没有被删除或声称修好。
+
+Swift 差分纠正先以状态断言暴露旧清单文案的红测，再按真实 `truncated_files` 分类：13 例中 12 例可判定一致，缺类型 1 例未知；真实 Swift 6.4 对照通过，源码字节未变。Kotlin 已有对应运行时防护，其清单也纠正为 11 例可判定一致、2 例未知。未知仍保留在总语料分母，不按空诊断数组算作通过、分类一致、误报或漏报。新增 Swift 运行时回归及 CI 固定语料接线，见[差分记录](../../../tests/acceptance/swift-native-differential.md)。未提升任何 grammar 资格，14.4/14.17/14.19 父任务仍未完成，公开 npm 0.1.4 不含本轮改动。
+
+
+本轮最终验证（2026-10-04）：默认全工作区全目标 1132 passed、0 failed、106 ignored，204 个结果组，退出 0；最终 Erlang/库存特性目标 13 passed、0 failed、1 ignored；显式 OTP 28 的 13 例编译器对照与 7 例预处理/启动边界分别各 1 passed，显式 Swift 6.4 对照 1 passed（12 可判定一致、1 未解析）。CLI 全目标 WASM Clippy -D warnings、fmt、分层、OpenSpec strict、全部 schema 元定义、4 份真实 Erlang 报告/12 个伪造通过反例、2 份中英文完整示例及文档链接校验通过。工具依赖的忽略项没有当作通过，父任务未勾选。最终日志：`/tmp/codeguard-erlang-swift-workspace-final.log` SHA-256 `9d2d0b3a4291478b2acdd6fc31410c643081e545b46ef0f5cda349491ad35ad3`；`/tmp/codeguard-erlang-final-guard-suite-corrected.log` SHA-256 `750a219d900646abaa713ceb9c2de4f80378909205a8c85877b9b372af2fdd44`。远端 CI 须按本轮新提交独立核验；公开 npm/插件版本未改变。
+
+
+## 2026-10-04 Erlang 任务原生复检与对话证据
+
+Erlang 显式 OTP 28 复用原任务/租约/尝试/deadline，next 提供原生位置、具体未完成原因和当前可复用工具；repair_ready 0.8 的有界内层摘要直接回传原生证据。前置错语言在租约前拒绝，源码/工具变化不继续给出旧诊断，预处理不当违规，零诊断不自动关闭。新协议 0.2 / 0.13 / 0.4 / Hook 0.8 独立保存，历史四份 schema 字节不变。[验收记录](../../../tests/acceptance/erlang-native-task-verification.md)包含初始 6 项 RED、Hook 证据与字符列标签的 RED、严格导入 10 个反例、尝试/租约和无进展预算。
+
+八组相关特性 84 passed、0 failed、17 ignored；显式真实 OTP 目标 1 passed。不带 WASM 的默认构建复检实际既有任务，completed/event_persisted=true，仍为 candidate_absent_unverified_policy/open。182 个 schema 元定义、20 份实际报告/双语完整示例及 15 个伪造变体通过验证；CLI 特性全目标 Clippy -D warnings、fmt、分层、严格规格及文档链接通过。
+
+首次全工作区失败保留：两项既有 Maven 身份变更夹具的 2 秒预算先耗尽，得到版本超时而不是目标身份变更。原目标独立 9/9 通过；仅对齐两项非超时夹具的 20 秒预算、保留精确变更/原生成功断言和独立 100ms 超时测试，修正目标 9/9 与目标 Clippy 通过。最终全量/新提交 CI 尚需独立终态，不凭目标通过替代。原提交 4e6e763 的 CI 37156807034 已成功，新变更需新 SHA 结果。
+
+完整 Erlang 项目 lint/预处理/注释、原生发现生命周期和可信关闭、自动工具发现、默认插件/实际宿主、发行平台/精度及完整交付门禁仍缺，8.134/S09/11.17/14.10–14.11 与总体目标保持开放。公开 npm 制品与插件锁未改变。
+
+
+最终全工作区终态：2026-10-04，`cargo test --workspace --all-targets --locked --offline` 205 组、1132 passed、0 failed、106 ignored，退出 0；日志 `/tmp/codeguard-erlang-task-workspace-corrected.log` 的 SHA-256 为 `d81ec1374f9c3de8c521b57d4cb7e200d945abffeca28b26b699c17450238e52`。首次失败日志保留，不改写为通过。已完成代码审阅、Clippy、fmt、分层、严格规格和文档链接/示例校验；源码新提交的远端 CI 与公开发行仍需分别核验。
+
+
+### 2026-10-04 Erlang 源文件终止符 RED 与工具前置
+
+原提交 695497c 的 Linux CI 37159461269 已 completed/success，WASM、npm 包与全工作区步骤全部成功。本轮新增 24 个原生独立标签与 source-forms 补丁草稿，37 例候选回归有 10 个终止符差异；[待重建验收](../../../tests/acceptance/erlang-source-forms-rebuild.md)记录 RED、来源和完成条件。工具下载须依用户提供的 AGENTS.md 获确认，当前尚未授权或执行。没有改已发布制品，未标父任务完成。
+
+
+## 2026-10-04 Erlang 原生工具自动发现局部增量
+
+8.134 / 14.5–14.9 / 14.17 / 14.19：未指定 --erl-tool 时从 PATH 绝对目录选首个可执行 erl，规范路径冻结并复用既有 OTP 28/字节核验；显式错误或已选工具失败不换工具/候选洗白。新增 0.2 选择反馈与实际双语 JSON，0.1 Schema 原件不改。五组相关特性 52 passed/0 failed/6 ignored，显式真实自动发现和原启动/宏边界各 1 passed，183 Schema、6 实际报告/2 双语完整例子和13矛盾反例通过；CLI 特性全目标 Clippy 通过。全工作区终态另记。见[局部验收](../../../tests/acceptance/erlang-native-discovery.md)。完整项目、任务/Hook 自动发现、可信关闭、宿主及发行仍缺；37例 grammar RED 草稿和工具授权待办保持，不勾选父任务。
+
+
+最终默认全工作区终态：206 组、1137 passed、0 failed、107 ignored，退出 0；`/tmp/codeguard-erlang-discovery-workspace.log` SHA-256 `e0b40be56639a4f83008281e3bc017bf47366c4d4597650b1133de9671a26f1b`。这是默认特性回归，不覆盖单独保留的 37 例 WASM grammar RED 草稿；相关特性目标及显式 OTP 验收分别见上文。
+
+
+## 2026-10-04 check all 的 Erlang 原生 forms 接线与跨目录复检
+
+`check all` 的 erlang.lint 节点复用显式/PATH 选择及 OTP 28 原生 scanner/parser，最多64文件、每文件1 MiB，沿用共享 deadline/jobs；逐文件诊断、原工具复检 argv 和环境/预处理阻塞进入 human/JSON/SARIF。完整同字节 forms 观察才跳过重复 WASM，过期源码/工具撤回当前位置；范围变化保留仍有效的文件发现但撤回范围完整性。复检 argv 的源码路径改为绝对路径，项目外调用与重放实际通过。协议0.36/0.13与内嵌scan0.1独立保存旧schema；见[局部验收](../../../tests/acceptance/check-all-erlang.md)。
+
+初始入口6项RED、范围漂移反例RED和跨目录复检RED分别保留。首次全工作区还暴露测试在默认无WASM构建下错误要求WASM取消原因；仅按特性区分该局部原因，保持根取消130、not_run、交付未完成和子孙回收断言。修正后的最终默认全工作区207组、1148 passed/0 failed/108 ignored，退出0；日志workspace-final2。忽略项不计通过。
+
+五组相关特性53 passed/0 failed/6 ignored；该阶段在最后绝对复检路径修正之前，随后当前源码的Erlang目标文件11 passed/0 failed/1 ignored、真实OTP双文件目标1 passed/0 failed/0 ignored及特性全目标Clippy -D warnings重新通过。32份候选路由的目标文件10/10通过，所在四组阶段36 passed/0 failed/2 ignored；其后范围/跨目录修正没有改候选资产或路由选择，已另由原生优先目标和默认全量覆盖。阶段存在重叠，不合计为独立测试总数。
+
+186份schema元定义、3份实际聚合/内嵌报告及2份双语完整scan示例有效，12类矛盾结果拒绝；历史0.35/0.12 schema与本批开始前Git版本逐字节相同。fmt、crate分层、OpenSpec strict、文档链接及diff检查通过。开发环境误用缺jsonschema的默认Python只影响一次辅助校验；改用已有Anaconda环境后完成，没有安装新工具或加入Python产品运行时。
+
+原提交1c66782的[Linux CI](https://github.com/full-stack-plugins/codeguard/actions/runs/37161739477)已成功。新提交CI需独立核验；公开npm0.1.4/插件锁/发行资产不变。完整Erlang项目lint、预处理、注释、原生发现任务持久化/可信关闭、实际宿主和全语言精度仍缺；37例grammar RED草稿依然失败且未提交，父任务及整个目标保持开放。
+
+日志身份：
+- `/tmp/codeguard-check-erlang-red.log`：SHA-256 `de76db135da017ba3ad68386977a118bbd9638ea28db9937e8801c20b1430882`。
+- `/tmp/codeguard-check-erlang-scope-red.log`：SHA-256 `aa1a6621d07c8fd6071c1efac62569f491aee42f13267ee37639b3966ec24495`。
+- `/tmp/codeguard-check-erlang-cwd-red.log`：SHA-256 `f84d25c06591c4b2597e60cf074d3160815978ccd86de17fb63dde0ed11cedbd`。
+- `/tmp/codeguard-check-erlang-cwd-green.log`：SHA-256 `ff8b4db628b7c8ee163bdc87a4e8443f951d894f7b594fbd2d30f5a384313dd5`。
+- `/tmp/codeguard-check-erlang-feature-final.log`：SHA-256 `dc1e3bc6b8360257a003a45fe7cbd68040a5398a4476ba8d7cc258dbd4df1adf`。
+- `/tmp/codeguard-check-erlang-routing.log`：SHA-256 `3a196c14485b766904801f7ae7b9eb267f2775677d43bbd5addaaf5f38bc03db`。
+- `/tmp/codeguard-check-erlang-workspace-final2.log`：SHA-256 `5894d50453d54b57fb51c388570391f68c5b2c2e38e96e4be0d569c3c5b01b1d`。
+- `/tmp/codeguard-check-erlang-final-native2.log`：SHA-256 `a25b424afe6de58f1b618d47d750d6807ca6e42a4d63e7351b83025a3bf53704`。
+- `/tmp/codeguard-check-erlang-real-final2.log`：SHA-256 `8078ab60eea7b34eb393d893a0d82b807a3f062e551ab6d3b3868d7b145a64cf`。
+- `/tmp/codeguard-check-erlang-clippy-final2.log`：SHA-256 `9b23e4bbb00a4ba2e626f0dcf14d53b2429f0e02e6a20bf69a6bbb72c769e2ef`。
+- `/tmp/codeguard-check-erlang-schema-final3.log`：SHA-256 `4cffa0740cac6d5f40fc50a28f7012c63dd2d821019dfc70e1a4c30dad9a986c`。
+
+
+## 2026-10-04 全 32 grammar 固定开发评测与标签权威隔离
+
+Rust 开发入口复用现有隔离 worker 和 Core 统计，启动前核对清单/源码/语言全集/重复键；全部 32 份 grammar 的 186 例顺序实际回放及原始脱敏报告已归档。终态相对回归标签为 48 TP、1 FP、10 FN、123 TN，3 例未知，1 个 CFQuery SQL 临时标签不入指标。统一语料中 20 种语言只有合法控制样本，Dart 上游等独立测试不混计；见 [验收](../../../tests/acceptance/grammar-regression-evaluation.md)及[双语评测专题](../../../docs/Codeguard-Grammar-Evaluation.zh_CN.md)。
+
+新增 Regression oracle 类型与独立计数，开发标签不能并入独立裁定数量；足够数量和区间也不能自动成为验收达标。目标模块和类型/字段分别先 RED，再实现并验证。最终 Core 全目标 9 组、56 passed/0 failed/0 ignored；相关默认 CLI 四组 17 passed/0 failed/0 ignored；WASM 目标 6 passed/0 failed/1 ignored（该独立完整回放随后显式执行）；完整 186 例回放测试 1 passed/0 failed/0 ignored。阶段重叠，不合计为独立全量测试。此前 1148 个全工作区测试属于上一产品源码，本轮未重跑全部工作区；新提交远端 CI 单独等待。
+
+188 份 schema 元定义有效，真实语料和终态报告有效，9 类伪造权威/原生/holdout/交付通过/资格/语言数量拒绝；跨字段分母与固定摘要独立核对。workspace 全目标 WASM Clippy -D warnings、fmt、分层、OpenSpec strict 与双语新链接通过。最终归档报告 SHA-256 `11bc1989d9401f395a717fa348496e4af0a00629ad379df94491755a453a71cc`，按新的程序身份重跑取得；阶段一报告仍保留于临时日志，不手工改写终态计数或耗时。
+
+原提交 79663d6 的 [Linux CI](https://github.com/full-stack-plugins/codeguard/actions/runs/37164734474) 已 completed/success。本轮不改 grammar、npm 制品或插件锁，不把回放链路测试成功当作 grammar 质量通过。已知 Erlang/VB.NET/隐藏恢复差异、待批准重建工具、MSRV、多平台、原生 holdout、真实宿主和完整门禁仍缺；12.10/12.11/14.2/14.17/14.19 父任务及总体目标保持未完成。Erlang 未提交 RED 草稿保持。
+
+日志身份：
+- `/tmp/codeguard-grammar-evaluation-red.log`：SHA-256 `093ec169e2098e99ab8d974079628baf5e65d9f2d09daa931635d26dfe49365d`。
+- `/tmp/codeguard-grammar-evaluation-label-red.log`：SHA-256 `6a50c1f995ac881a05047259f3e98c781aca3517ccc1db37f935e79d376ee2bc`。
+- `/tmp/codeguard-grammar-evaluation-core-final.log`：SHA-256 `1851e761fcbeb391785d4401005a664b225360c2be9370555c8d9eee9431ae94`。
+- `/tmp/codeguard-grammar-evaluation-default-final.log`：SHA-256 `ce3fe764f7e5a0987964af741a3012cae99860b0ff2fea2295463a80833632be`。
+- `/tmp/codeguard-grammar-evaluation-archive-final.log`：SHA-256 `1a93e303f83e8fd7c6259519e784ba83bd635d369e28f270fea23ae474ff176d`。
+- `/tmp/codeguard-grammar-evaluation-full-final.log`：SHA-256 `12ef03b8e785b620d6eb05a4776526c5972918d9445a32bbab3fd53d4abd6213`。
+- `/tmp/codeguard-grammar-evaluation-core-all.log`：SHA-256 `49e89b05b5817adeed30c551aa34541ab66dfcdff0a02d7073edbbeb2b3af643`。
+- `/tmp/codeguard-grammar-evaluation-clippy-final.log`：SHA-256 `825f75b77eb1fa05f635f57bf86a861f93ac6db2b84b894a186571c8c12bfbc0`。
+
+## 2026-10-04 分来源语料与 358 例实际回放终态
+
+沿用同一 OpenSpec change 的 syntax-precheck 场景，不新增第二份计划。Rust 导入与 0.2 协议已实现：仓库回归 206、上游 grammar 回归 150、pending 2，分为 35 个语言×来源组。358 例、32 grammar 全部实际启动，355 可判定、3 unknown、353 有标签且可评样本；TP/FP/FN/TN 仅逐组计算，计数合计 73/1/10/269，不生成全体混合精度。Dart 上游 4 TP/146 TN，只证明与 grammar 自带预期一致。源字节、来源摘要和末尾预期树保留；未知、pending、旧报告和已知缺陷不抹掉。
+
+空预期节点及缺分隔符吞下一例的失败测试已复现；添加来源组覆盖数之前的协议测试也失败，修复后相关默认 CLI 7 passed、语料全字节复现 example 1 passed、adapters 4 passed；WASM 普通目标 10 passed/0 failed/2 ignored，358 例完整回放另显式 1 passed/0 failed/0 ignored（395.12 秒）。普通/完整/历史测试有重叠，不合计为全工作区测试规模。完整 186 例旧回放保留为可显式运行测试，本轮未重复该旧回放。
+
+190 schema 元定义、两份 0.2 实际数据、16 类伪造或矛盾反例及跨字段计数/摘要通过；旧 0.1 schema 两份、旧语料、旧原始报告和 grammar 清单五份文件与本批 HEAD 逐字节一致。workspace 全目标 WASM Clippy -D warnings、fmt、分层、OpenSpec strict 和修改文档链接通过。上一提交 c2b8e27 的 [Linux CI](https://github.com/full-stack-plugins/codeguard/actions/runs/37166875292) 已 completed/success；本批新提交的远端 CI 单独跟踪，不借旧提交称当前全工作区验收。
+
+原始报告和剩余范围见 [实际验收](../../../tests/acceptance/grammar-cohort-regression-evaluation.md)。Erlang 10 FN、VB.NET 1 FP、Kotlin/Swift 2/1 unknown、pending 原生裁定、独立 holdout、真实宿主、MSRV、多平台和完整门禁仍未完成。没有安装新工具、没有改动发布制品或插件仓，保留未提交的 Erlang RED 草稿；12.11/14.17/14.19 及整体目标不勾选完成。
+
+日志身份（本轮具体执行，不是历史全工作区）：
+
+- `/tmp/codeguard-grammar-corpus-malformed-red.log`：SHA-256 `5a973acf19cd9151fa15be81ba3b6634dd3dd768c8ac8de2d0e192286f818e41`。
+- `/tmp/codeguard-grammar-corpus-malformed-green.log`：SHA-256 `ebf643c4425d5a77118fcd4f0f501b85056dc4ae990cefef41946bc9a8e15ef1`。
+- `/tmp/codeguard-grammar-cohorts-counts-red.log`：SHA-256 `fa333ded86bf77ce4cccdb1f88b7c2790cd46fecaaef9179059d58a3e32a493f`。
+- `/tmp/codeguard-grammar-cohorts-default-final.log`：SHA-256 `48c7b7ad30fb3c3d6a8b5acb87dc892590fb12104d9d39a5596a11673085ed58`。
+- `/tmp/codeguard-grammar-cohorts-adapters-final.log`：SHA-256 `96a63f0a2c853910a7cbf6b7e92d3bef972d94b05bb8219f1c0ff0fc759a1085`。
+- `/tmp/codeguard-grammar-cohorts-feature-final.log`：SHA-256 `30940831212bb856232c9da1ac712c216e02a7ae8a22be21222600e08e44995c`。
+- `/tmp/codeguard-grammar-cohorts-full.log`：SHA-256 `bb1ee91a5b50ee01e859c5302b0568d9c6af9652def67df15e65cacf5eb906ba`。
+- `/tmp/codeguard-grammar-cohorts-clippy-final.log`：SHA-256 `32cd1cc2307521e54e48ac6514227b6cbc5e64e71091ebc4feebbcd91c628f04`。
+- `/tmp/codeguard-grammar-cohorts-schema-final.log`：SHA-256 `6076751be24d233d39bf1177716734b14beca1d80a29c73d90d18b720145e49b`。
+
+补充依赖方向验收：`crate_boundaries` 当前 7 passed/0 failed/0 ignored；日志 `/tmp/codeguard-grammar-cohorts-boundaries-final.log` SHA-256 `078f67a27d10f7e9b5d729940bebd7c897fcb94a8bde6b7bf28c8c3a5f5c351d`。新增 corpus 解析/样本对象仅在 adapters，未引入 runtime 依赖。
+
+## 2026-10-04 Erlang 原生首次发现到稳定修复任务
+
+原生结果不再必须依赖一次 WASM recovery 才能建任务。初始化工作区的聚合检查与最近已有工作台的单文件 lint 复用同一 file/language 身份、当前源码和所选工具证据，缺工具/预处理进入环境任务，批次只同步一次。首次原生报告明确无 WASM 数据；next 引用最新实际扫描或复检，不伪造 task_verify 事件。历史 WASM 来源和新来源共用任务、租约、尝试、原工具复检与 Hook；零诊断仍不自闭。
+
+实际 RED、导入反例、默认35/特性69目标结果、最终工作台11和显式OTP1、197 schema/11实际输出/16伪造反例、190旧schema字节一致均见[本批验收](../../../tests/acceptance/erlang-native-first-workbench.md)。目标组有重叠，忽略项不当通过。workspace全目标特性Clippy、fmt、分层和严格OpenSpec已通过；全工作区终态和新SHA远端结果另记。语法资产、公开npm及插件锁未改；完整项目、可信关闭、真实宿主和全语言资格仍缺，父任务与整个目标保持开放。
+
+本批最终默认全工作区 212 组、1172 passed / 0 failed / 109 ignored，退出0；日志摘要和模板审查的实际RED见本批验收。源码新提交CI和完整产品验收仍独立核验，不凭本地默认全量认定已知WASM语法缺陷解决。
+
+模板修正后的最终相关特性目标51 passed / 0 failed / 4 ignored，两个显式真实OTP目标分别各1 passed，workspace/all-targets/WASM Clippy -D warnings退出0；完整命令与日志摘要见本批验收。现有纯准备策略仅允许非空、完整、合格的clean降为推荐；未验收grammar的零恢复仍未完成。未关闭父任务，未提升语言资格，未更改公开发行制品。
+
+## 2026-10-04 npm 安装后原生首次修复链路
+
+旧公开0.1.4相同摘要程序经过真实私有打包/离线安装，在新Erlang入口退出2，作为发行能力差异RED。当前源码同一安装路径的受控协议和真实OTP28两组通过（runner3 passed，含1父测试），覆盖首次原生任务、同一聚合身份、next实际证据、源码变化、零诊断保持open、再次发现、repair_ready stdin和保存失败。未指定真实工具的CI路径2 passed/1 skipped，真实验收不偷换为夹具。26实际报告通过schema，14伪造/矛盾变体拒绝；初次测试缓存范围污染修正为项目外缓存，不当产品缺陷。完整命令/日志与未完成范围见[安装后验收](../../../tests/acceptance/npm-erlang-native-repair.md)。本批不改Rust产品实现和公开制品，Linux新目标须按对应提交单独核验，完整目标保持开放。
+
+
+## 2026-10-04 P3C 部分执行的正向诊断保留
+
+对应 2.3 / 6.2 / 9.3 / 9.4 / 9.7 / 9.13 / 12.7、RW21。先复现稳定问题投影遗漏和 human 原生状态缺失，再接通诊断/阻塞双维导入与原工具正向复检；历史无投影报告保留兼容。
+
+最终默认 workspace/all-targets 213 组/1193 passed/0 failed/109 ignored，随后相关特性七组89 passed/0 failed/20 ignored；全工作区全目标 WASM Clippy -D warnings、fmt、分层、OpenSpec strict、198 schema元定义、28实际单文件反馈/12伪造反例、687条修改文档局部链接均通过。日志、摘要、实际节选和不计原生精度的边界见[验收](../../../tests/acceptance/java-p3c-partial-execution.md)。
+
+只证明本次原生协议与任务路径修复，不证明完整语言/规则/覆盖、可信关闭、真实宿主或公开发布；父任务保持未完成。Erlang RED 草稿没有变更或提交。远端CI按新提交另行核验，不借用旧提交成功。
+
+
+## 2026-10-04 Erlang 限定原生关闭与复发（已验证切片）
+
+对应 RW21、9.7、9.10、9.11、12.7、14.10、14.11。SDK 复用既有 Zig 服务，新增 OTP 28 固定规则/版本的签名策略与证据；WASM 首次和原生首次均可按原样本诊断、当前改变且完整零诊断关闭，普通同工具 task verify 检出复发可追加同一父链重开。原生首次 grammar=null，禁止伪造资产或替换原始工具；重算跨语言历史在原生执行前拒绝。宏、空 forms、截断、失败、原样本合法和输入变化仍保留待核验/误报调查。旧 Zig API 构造及 schema 保持兼容。
+
+三项 RED（入口缺失、null 策略拒绝、跨语言历史未提前绑定）后实现并验证。相关五组 47 passed/0 failed/5 ignored，显式真实 OTP 28 和 Zig 0.16.0 各1 passed；真实工具与签名夹具权威分开。200 schema 元定义、67 实际报告及12矛盾反例通过；最终全工作区/Clippy结果另按实际日志补录。[验收与实际报告](../../../tests/acceptance/erlang-task-resolution-lifecycle.md)。
+
+默认宿主的受保护策略提供者、全检查器关闭、完整项目 lint/门禁、真实宿主、多平台及独立精度验收仍缺，父任务不勾选；公开 npm 0.1.4 不含本批，不更改 grammar 资格或 Erlang 漏检 RED 草稿。
+
+
+本批最终默认 workspace/all-targets 214 组、1193 passed/0 failed/109 ignored，完整目标 WASM Clippy -D warnings 退出0；真实 OTP/Zig 各1 passed，相关特性47 passed/5 ignored。完整命令、日志摘要、原生首次 grammar=null 的实际收据和边界见本批生命周期验收。该证据未完成默认宿主可信策略接线、全语言精度或发布，父任务继续开放。
+
+
+## 2026-10-04 原生配置观察与修复指引
+
+config validate/explain 0.3 已接通有界原生静态观察，保留来源摘要、状态、原因和下一步；生效规则、suppression 及受保护批准仍未解析。重复旧 JSON 键拒绝、有界读取、截断/范围阻塞不完整已验证。首轮 6 项 RED 后发现正例缺错误处理声明，修正夹具并保持未知反例；终端来源动作另先 RED 后补。目标 5 组 58 passed，非全生态验收。
+
+默认 workspace 回归已终态退出 0：214 组、1199 passed/0 failed/109 ignored；109 条件项未执行，不算原生或平台验收。全工作区 all-targets、wasm-precheck Clippy -D warnings 通过；fmt、分层、OpenSpec strict、665 条本轮修改文档本地链接通过。201 份 schema 元定义、实际 0.3 原始输出、六组计数一致性及 12 类伪造/矛盾反例通过；旧 0.2 schema 与 HEAD 字节一致，历史 0.2 结构仍可验证。实际默认二进制的 human 来源/动作和 explain/范围阻塞 validate JSON 也已核验，前后项目文件字节一致。
+
+没有更换 grammar、安装工具或改插件锁；原有 Erlang 37 例 RED 草稿保持未提交。当前扩展仍非完整规则/suppression/批准来源解析，父任务及总体目标继续未完成。远端 CI 按新提交另行核验，不使用旧提交证明当前批次。
+
+详细事实及日志身份见[配置验收](../../../tests/acceptance/config-native-observation.md)。4.1/4.2/4.7/5.10 保持开放，同一 OpenSpec change 延续；当前新增场景覆盖配置声明、不执行动态配置、输出预算及重复旧键。
+
+## 2026-10-04 Cargo 输入稳定性与代理调用
+
+Clippy 现在在原生执行前冻结已观察源码及根配置/锁的字节或不存在状态，诊断绑定原字节，输入或工具改变撤回本轮发现。普通及抑制对照采用锁定离线命令，缺锁同步为具体环境准备任务；稳定部分诊断仍保留，取消保持优先级。Rustdoc/build 核验解析后字节但保留 Cargo 代理入口名执行，改指同字节目标也不认定完成；私有 Clippy 目录以独立序号避免同时间戳碰撞。
+
+先复现输入、锁、指引、代理与取消反例，再通过目标及真实 Cargo 测试。三份实际公开反馈、任务详情与真实 Clippy 过期源码观察已归档；正式结果及历史失败见 [Cargo 输入验收](../../../tests/acceptance/rust-clippy-input-stability.md)。本批不改变 grammar、插件锁或公开包，不提供完整 Cargo 模型/沙箱/可信关闭，父任务保持开放。
+
+本批最终默认workspace/all-targets回归216组、1213 passed/0 failed/110 ignored，完整目标WASM Clippy -D warnings通过；显式已安装Cargo三项原生验证通过。201 schema元定义、3实际公开反馈/12伪造反例、格式/分层/OpenSpec strict/双语架构命名均通过；日志、历史失败和完整范围见本批验收。没有运行已知Erlang RED的全套WASM测试，不更新grammar资格或公开包。远端CI按新提交另核验，完整目标与父任务保持未完成。
+
+
+## 2026-10-04 Rust 原生目标免重复解析与重复诊断归并
+
+7.1 / 9.3 / 14.6 / 14.10：聚合 Clippy 以本轮非缓存 artifact 的原根清单和启动前源码摘要绑定目标入口，WASM 只对当前字节相同的入口免重复；覆盖不从本地报告恢复，未证明模块/条件排除源码继续检查。同规则同文件同定位的库/测试诊断只同步一项 finding，error 优先；不同位置与执行阻塞保留，重复扫描更新原任务。四项目标反例先 RED 后实现，真实公开 Cargo 检查/重复任务/缺工具/部分失败已存档。完整覆盖、历史重复任务治理和宿主/发布仍缺，父任务保持开放；最终测试/日志见 [Rust 原生优先验收](../../../tests/acceptance/check-all-native-preferred-rust.md)。
+
+本批最终默认workspace/all-targets 217组、1213 passed/0 failed/110 ignored；受影响WASM library+8集成目标9组、105 passed/0 failed/7 ignored，显式真实Cargo1 passed。默认/特性全目标Clippy -D warnings、格式/分层/OpenSpec strict/双语架构命名、201 schema与4实际反馈/任务详情及10伪造变体通过；旧schema不改。完整命令范围、实际终端/任务/重复扫描、保留的失败与日志摘要见本批验收。完整grammar、真实宿主和发布仍未完成。
+
+
+## 2026-10-04 Cargo 自动发现与禁止隐式安装
+
+7.1 / 9.3 / 14.5 / 14.6 / 14.10：当前Clippy/rustdoc/check及原任务复检从调用方绝对PATH选择首个Cargo，显式坏工具和首选执行失败不换工具；保留最终代理入口名、RUSTUP_TOOLCHAIN并强制RUSTUP_AUTO_INSTALL=0。原实现七项受控测试2通过/5失败，修复后七项通过；本机实际已安装及缺失自定义工具链的两项另显式通过。真实PATH三检查、重复扫描同一finding/新增0、still_present复检、空PATH及未安装工具链报告已归档。完整工具链/配置/项目范围、其它语言自动选择、可信关闭与实际宿主仍缺，父任务保持开放，见 [Cargo自动发现验收](../../../tests/acceptance/cargo-native-discovery.md)。
+
+本批默认workspace/all-targets 218组、1220 passed/0 failed/112 ignored；受影响WASM CLI library+九集成目标10组、143 passed/0 failed/24 ignored，显式真实Cargo目标9 passed/0 failed/0 ignored（与受控/普通测试有重叠，不相加）。默认及特性全目标Clippy -D warnings、201 schema元定义与六实际报告/18伪造反例、格式/分层/OpenSpec strict/双语架构命名通过；历史schema不改。没有完整WASM suite或358例重跑，不更改grammar、插件锁及公开包；原有Erlang RED草稿保持未提交。完整目标继续未完成。
+
+
+## 2026-10-04 受检根本地 Ruff 与环境修复指引
+
+7.1 / 9.3 / 14.5 / 14.6 / 14.10：已有PATH发现保留，已配置受检根新增显式入口 > 普通`.venv/bin/ruff` > 绝对PATH的选择。显式坏工具或所选版本/执行失败不换工具；目录链接/损坏/不可执行本地入口返回ruff_local_tool_invalid，不生成源码违规。重复阻塞更新同一任务，简报及任务文档指明本地路径、环境修复范围、原工具复检、历史及关闭条件。没有配置不启动工具，指定编辑Hook只检查目标文件。首批入口3通过/6失败、任务指引1失败先RED，再通过14个受控及1个真实Ruff 0.16.8用例；实际零诊断仍是待核验，不自动关闭。逐模块环境管理器、可信关闭、完整覆盖/精度与实际宿主仍缺，父任务保持开放，见 [本地Ruff验收](../../../tests/acceptance/ruff-local-discovery.md)。
+
+最终默认workspace/all-targets 219组、1234 passed/0 failed/113 ignored；受影响WASM library+九集成目标10组、149 passed/0 failed/30 ignored，显式专用原生目标15 passed/0 failed/0 ignored（与受控/普通测试有重叠，不相加）。默认/特性全目标Clippy -D warnings、格式/分层/OpenSpec strict/架构命名及201 schema元定义通过，12份实际完整报告/36伪造反例通过；旧schema不改。实际原生发现、重复任务、Hook、修复待核验、再次出现、环境阻塞及复检原始输出已归档。没有完整WASM suite、独立精度或358例重跑；grammar、公开包、插件锁不变，预先Erlang RED草稿保持未提交。完整目标继续未完成。
+
+
+## 2026-10-04 无定位语法观察与聚合工作台接线
+
+同一change的9.3/9.9/14.7/14.10/14.11/14.19增量：固定Swift/Kotlin树的无定位错误原本只有incomplete提示，通用同步跳过零恢复，聚合WASM也未接通工作台。现在check all/java与确认写入Hook共用稳定任务；无定位且syntax_recovery_incomplete生成检查能力恢复任务，保留空位置、源码/grammar身份、环境范围及不修改源码约束。完整零恢复只推荐，不关闭历史任务；保存失败保留证据无假ID；缺adapter复检记录incomplete。聚合反馈0.38.0与新本地确认报告0.3.0，旧schema不改；原指纹与旧可定位/Erlang原生首次协议保留。
+
+初始四项红测与独立聚合红测均已复现；整个Hook工作台目标12 passed/0 failed/0 ignored。具体证据与最终回归见[验收](../../../tests/acceptance/unlocated-syntax-recovery-tasks.md)。没有改变grammar字节、已知精度差异、资格、插件锁或公开npm；正式原生adapter、关闭/覆盖/批准与真实宿主仍缺，父任务不勾选。
+
+本批终态：默认 workspace/all-targets 1234 passed/0 failed/113 ignored；受影响 WASM 16 组 210 passed/0 failed/30 ignored；默认及 WASM Clippy -D warnings、fmt、分层和 OpenSpec strict 通过。203 schema 元定义、16 份真实报告与 48 个伪造变体通过；新增开发协议回归 4 passed。实际报告揭露聚合 next 仅支持旧简报的 schema 缺口，新的 0.38 已引用完整既有简报版本而非放宽任意对象，旧 schema 字节不改。固定二进制实际捕获任务和复检；Swift 两例原生 parse 对照不提升资格。完整日志摘要及运行限制见[本批验收](../../../tests/acceptance/unlocated-syntax-recovery-tasks.md)。父任务不勾选，未重跑完整 WASM suite/358 例语料，公开发行和真实宿主未改变。
+
+
+## 2026-10-04 Erlang 任务复检与工具自动发现（进行中）
+
+对应既有 9.9、9.10、14.10、14.11、14.19；不创建第二份规格。现有 lint/check 能发现调用方 PATH 中的 erl，但 task verify 仅显式参数，导致已安装工具被误报未提供。新增场景和三个先失败的反例后，复检复用原工具选择服务；显式及首选失败不换工具，实际 next 固定工具路径，空/相对/不可执行来源仍未完成。候选/原生首次任务及 repair-ready 的共同入口、原协议、租约/事件和不自动关闭继续保持；完整原生确认与宿主关闭父任务仍开放。实际终态及证据补入[本批验收](../../../tests/acceptance/erlang-recheck-discovery.md)。
+
+本批终态：默认全工作区 1235 passed/0 failed/113 ignored；其后仅历史指引文案变化，最终默认工作台定向 12 passed/0 failed/1 ignored。最终 WASM 16 组 199 passed/0 failed/25 ignored；显式 OTP 28 实测新增目标 1 passed，最终二进制两来源实际复放。默认/WASM Clippy、fmt、分层和 OpenSpec strict 通过；旧 schema 未改，父任务未勾选。前批 4afa8bc 的 Linux CI 因旧对话文案断言失败，已重现并修改行为断言，本批远端结果独立确认。详情及固定日志见[本批验收](../../../tests/acceptance/erlang-recheck-discovery.md)。
+
+
+## 2026-10-04 Swift 无定位恢复的原生确认（已验证切片）
+
+9.9/9.10/14.10/14.11/14.19 延续同一规格：显式 Apple Swift 6.4 frontend parse 接入稳定任务、next/task show 和 repair_ready；源码/工具身份和 UTF-8 字节边界复核，正常 driver banner 与同源 note 不误报为工具异常。原生13例基础对照（8合法/5非法）与多字节反例实测，零诊断仍保留 open，完整原生优先/项目范围、可信关闭和实际宿主仍未完成。
+
+最终默认220组1237 passed/0 failed/113 ignored；受影响WASM14组173 passed/0 failed/23 ignored，随后Swift上下文修正后最终library36 passed/0 failed/1 ignored、Swift目标8 passed/0 failed/0 ignored。默认/WASM Clippy、fmt、分层和OpenSpec strict通过；208 schema、50实际报告、150伪造变体和5开发协议测试通过。Linux旧提交安装验收的0.37陈旧断言已重现，精确更新0.38并增加不重复造WASM任务断言；同一固定程序私有离线安装的受控和真实OTP28目标runner3 passed，远端新提交独立核验。
+
+证据、历史失败与边界见[Swift验收](../../../tests/acceptance/swift-native-task-confirmation.md)。没有重跑358例全量语料或已知Erlang RED全套，grammar资格、公开包和插件锁未变，预先Erlang草稿保持。父任务及完整目标仍开放。
+
+## 2026-10-04 实际 Claude 缺运行时证据
+
+延续 11.2/11.4/11.17/14.19，插件源码 dec5f9d 在实际已安装 Claude Code 2.1.273 中会话内加载。首次隔离认证来源时退出 1，虽有两个真实 Hook 成功但不算对话验收；保留现有认证环境后退出 0，SessionStart/UserPromptSubmit/Stop 三事件自动返回有界未完成反馈，实际模型明确指出 runtime_unavailable、源码未检查、交付未评估。两次 tools=[]、项目/缓存均保持空，没有下载或原生检查。原始 stdout/stderr 摘要、固定插件输入及脱敏实际事件/回复归档于[宿主验收](../../../tests/acceptance/claude-host-missing-runtime.md)。这不是市场安装、成功/失败保存、完整修复循环或其他宿主验收，父任务保持开放。
+
+## 2026-10-04 Rust 最低版本依赖证据
+
+延续 1.2/11.1/12 的最低编译基线；新增回归在原锁发现 tree-sitter-language 0.1.8 要求 Rust 1.90，实际先失败。固定兼容的 0.1.7 并保持其它依赖和 grammar 字节，217 个活动节点的已声明最低版本回归转绿，45 个无声明节点不自批相容。CI 新增真实 1.85.0 的默认/WASM 全目标 locked check，本机未安装该工具链；远端与完整平台证据仍须继续核验。验收见[最低版本兼容](../../../tests/acceptance/rust-msrv-dependency-compatibility.md)，总体父任务保持开放。
+
+本批默认全目标 1238 passed/0 failed/113 ignored，后续最低版本 patch 边界及方向目标默认/WASM 各 9 passed；CLI WASM 定向 32 passed、runtime 18 passed，结果重叠不相加。更新依赖的全 32 grammar/358 例/35 来源组实际回放完成，707.51 秒；新原始报告通过 0.2 schema，仍保留 73/1/10/269 的分组混淆计数、3 unknown、2 pending、资格零。证据归入同一[最低版本验收](../../../tests/acceptance/rust-msrv-dependency-compatibility.md)，不能升级为完整语言、最低编译器或平台验收。
+
+本批最终默认/WASM Clippy、fmt、分层、OpenSpec strict、schema/实际报告及文档校验通过。Swift 提交 15a91a7 的远端 CI 37195556160 已终态 success，包括先前失败的安装验收；本批新的依赖锁与真实 1.85 job 必须按新提交核验，不能借用该旧锁成功结果。
+
+## 2026-10-04 Claude 实际编辑/失败/原生复检与首次指引修正
+
+真实 Claude 2.1.273 在私有缓存准备插件 dec5f9d 锁定的公开 0.1.4，两次会话共 14 个 Rust 生命周期反馈、4 个独立 legacy Bash Hook；全部自动 Hook 返回成功。真实 EACCES 写入触发 PostToolUseFailure 并说明源码未检查；Edit 参数预检失败发生在执行前，不计为失败 Hook。宿主 Bash 实际调用同一 Zig 0.16.0，坏源码诊断 1 项、修复后 0 项，原生输入身份稳定、事件保存；最终同一稳定任务仍 open，实际模型明示策略/覆盖未完成和交付未评估。公开证据区分安全原始 Hook stdout、模型脱敏回复、规范化 JSON 摘要与真实原生 report 字节摘要，见[实测](../../../tests/acceptance/claude-host-prepared-runtime.md)。
+
+实测公开包首次 adapter 缺失指引与实际可执行 Zig 复检矛盾。开发源码新增 bound-original 的首次指导，区分已接入能力、工具就绪未知与真实 adapter 缺口；正例实际先 RED。无定位旧回归实际再 RED，改从 0.3 候选协议保留无法定位与禁止源码修补约束，最终 Hook 任务目标 15 passed/0 failed/0 ignored。篡改原报告本来会拒绝整个投影，新增测试先误期望仍有 task，再改为核对原 consumed-marker 拒绝，未放宽机制。被中断的六目标回归没有终态，不计为全套通过；已结束的组和最终完整回归独立登记。
+
+208 schema 元定义、真实宿主两份原生 wrapper 与内部 native scan 通过历史协议；Swift 5 项、无定位 4 项开发 schema 回归通过。当前开发二进制的独立首次 next/task show 捕获明确不是实际宿主新版本安装；公开包、插件锁、grammar 字节/资格不变。完整目标与父任务仍开放。
+
+本批首次准备简报 0.7.0 与聚合反馈 0.40.0 正式分版本；task show 外层动作保留同一工具参数。最终 WASM 两目标 22 passed、另五目标 44 passed/5 ignored；默认两目标 11 passed，与同名契约重叠不相加。默认/WASM 全目标 Clippy、fmt、分层、strict 验证通过；210 schema 元定义、208 历史字节、13 开发协议测试与 705 本地链接通过。旧非法报告只留 RED 证据；原生条件未运行不当作通过。实际宿主公开包与开发修正版本分开，日志身份见[本批验收](../../../tests/acceptance/claude-host-prepared-runtime.md)。4d620f7 远端 CI 37198192252 已 success，本批新修改不借用该成功。完整父任务、grammar 资格、其它宿主、可信关闭及发行继续未完成，未新增勾选。

@@ -8,6 +8,8 @@ use std::collections::{BTreeMap, BTreeSet};
 pub enum OracleDecision {
     /// 已由授权评审确定预期发现与完整性。
     Accepted,
+    /// 仓库开发回归标签；可计算差异，但没有独立裁定或批准权威。
+    Regression,
     /// 规则适用性或实际真值仍有争议。
     Disputed,
     /// 尚未完成独立裁定。
@@ -58,6 +60,8 @@ pub struct EvaluationThresholds {
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 pub struct EvaluationCounts {
     pub adjudicated_cases: u64,
+    /// 保留开发回归分母，不能并入独立裁定案例数量。
+    pub regression_labeled_cases: u64,
     pub evaluated_cases: u64,
     pub disputed_cases: u64,
     pub pending_cases: u64,
@@ -147,6 +151,7 @@ pub fn evaluate_quality(
                 continue;
             }
             OracleDecision::Accepted => counts.adjudicated_cases += 1,
+            OracleDecision::Regression => counts.regression_labeled_cases += 1,
         }
         if as_set(&case.expected_targets) != as_set(&case.observed_targets) {
             counts.coverage_mismatch_cases += 1;
@@ -187,6 +192,7 @@ pub fn evaluate_quality(
             {
                 EvaluationOutcome::FailsThreshold
             } else if counts.coverage_mismatch_cases > 0
+                || counts.regression_labeled_cases > 0
                 || counts.disputed_cases > 0
                 || counts.pending_cases > 0
                 || counts.incomplete_cases > 0

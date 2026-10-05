@@ -1,0 +1,733 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "selection",
+    "command_status",
+    "exit_code",
+    "delivery_decision",
+    "authority",
+    "reason",
+    "discovery",
+    "native_results",
+    "execution_tasks",
+    "obligation_status",
+    "required_obligations",
+    "category_candidates",
+    "syntax_candidates",
+    "unresolved_conditions",
+    "execution_budget",
+    "next",
+    "export",
+    "syntax_tasks"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "selection": {
+            "const": "all"
+          }
+        },
+        "required": [
+          "selection"
+        ]
+      },
+      "then": {
+        "properties": {
+          "delivery_decision": {
+            "const": "incomplete"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "delivery_decision": {
+            "const": "not_evaluated"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "command_status": {
+            "const": "cancelled"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "exit_code": {
+            "const": 130
+          },
+          "reason": {
+            "const": "request_cancelled"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "exit_code": {
+            "const": 3
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "selection": {
+                  "const": "all"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "reason": {
+                  "const": "full_project_obligations_and_trusted_policy_unavailable"
+                }
+              }
+            },
+            "else": {
+              "properties": {
+                "reason": {
+                  "enum": [
+                    "java_selection_obligations_and_trusted_policy_unavailable",
+                    "language_selection_obligations_and_trusted_policy_unavailable"
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "selection": {
+            "const": "zig"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "native_results": {
+            "properties": {
+              "python_cve": {
+                "type": "array",
+                "maxItems": 0
+              },
+              "go_lint": {
+                "type": "null"
+              },
+              "rust_lint": {
+                "type": "null"
+              },
+              "java_p3c": {
+                "type": "null"
+              },
+              "java_dependencies": {
+                "type": "null"
+              },
+              "java_cve": {
+                "type": "null"
+              },
+              "java_javadoc": {
+                "type": "null"
+              },
+              "python_lint": {
+                "type": "null"
+              },
+              "npm_cve": {
+                "type": "array",
+                "maxItems": 0
+              },
+              "rust_comments": {
+                "type": "null"
+              },
+              "rust_build": {
+                "type": "null"
+              },
+              "rust_cve": {
+                "type": "null"
+              },
+              "node_lint": {
+                "type": "null"
+              },
+              "erlang_lint": {
+                "type": "null"
+              },
+              "kotlin_lint": {
+                "type": "null"
+              },
+              "swift_lint": {
+                "type": "null"
+              }
+            }
+          },
+          "category_candidates": {
+            "items": {
+              "properties": {
+                "language": {
+                  "const": "zig"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$id": "urn:codeguard:schema:check-feedback:0.48.0",
+  "properties": {
+    "schema_version": {
+      "const": "0.48.0"
+    },
+    "export": {
+      "$ref": "check-feedback-v0.46.schema.json#/properties/export"
+    },
+    "execution_tasks": {
+      "$ref": "check-feedback-v0.46.schema.json#/properties/execution_tasks"
+    },
+    "execution_budget": {
+      "$ref": "check-feedback-v0.46.schema.json#/properties/execution_budget"
+    },
+    "report_type": {
+      "$ref": "check-feedback-v0.46.schema.json#/properties/report_type"
+    },
+    "operation": {
+      "$ref": "check-feedback-v0.46.schema.json#/properties/operation"
+    },
+    "selection": {
+      "enum": [
+        "all",
+        "java",
+        "rust",
+        "typescript",
+        "python",
+        "go",
+        "csharp",
+        "kotlin",
+        "swift",
+        "php",
+        "ruby",
+        "scala",
+        "shell",
+        "dockerfile",
+        "yaml",
+        "elixir",
+        "css",
+        "c",
+        "cpp",
+        "objc",
+        "dart",
+        "vue",
+        "svelte",
+        "astro",
+        "solidity",
+        "terraform",
+        "nix",
+        "html",
+        "sql",
+        "graphql",
+        "protobuf",
+        "markdown",
+        "toml",
+        "haskell",
+        "ocaml",
+        "fsharp",
+        "perl",
+        "groovy",
+        "clojure",
+        "powershell",
+        "zig",
+        "nim",
+        "crystal",
+        "julia",
+        "elm",
+        "lua",
+        "luau",
+        "pascal",
+        "r",
+        "cfml",
+        "cobol",
+        "vbnet",
+        "erlang",
+        "arkts",
+        "metal",
+        "liquid",
+        "cuda",
+        "ansible"
+      ]
+    },
+    "command_status": {
+      "$ref": "check-feedback-v0.46.schema.json#/properties/command_status"
+    },
+    "exit_code": {
+      "$ref": "check-feedback-v0.46.schema.json#/properties/exit_code"
+    },
+    "delivery_decision": {
+      "$ref": "check-feedback-v0.46.schema.json#/properties/delivery_decision"
+    },
+    "authority": {
+      "$ref": "check-feedback-v0.46.schema.json#/properties/authority"
+    },
+    "reason": {
+      "$ref": "check-feedback-v0.46.schema.json#/properties/reason"
+    },
+    "discovery": {
+      "$ref": "check-feedback-v0.46.schema.json#/properties/discovery"
+    },
+    "native_results": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "python_lint",
+        "python_cve",
+        "rust_lint",
+        "go_lint",
+        "java_p3c",
+        "java_javadoc",
+        "java_dependencies",
+        "java_cve",
+        "npm_cve",
+        "rust_comments",
+        "rust_build",
+        "rust_cve",
+        "node_lint",
+        "erlang_lint",
+        "kotlin_lint",
+        "swift_lint",
+        "zig_lint"
+      ],
+      "properties": {
+        "python_cve": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/python_cve"
+        },
+        "go_lint": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/go_lint"
+        },
+        "rust_lint": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/rust_lint"
+        },
+        "java_p3c": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/java_p3c"
+        },
+        "java_dependencies": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/java_dependencies"
+        },
+        "java_cve": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/java_cve"
+        },
+        "java_javadoc": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/java_javadoc"
+        },
+        "python_lint": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/python_lint"
+        },
+        "npm_cve": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/npm_cve"
+        },
+        "rust_comments": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/rust_comments"
+        },
+        "rust_build": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/rust_build"
+        },
+        "rust_cve": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/rust_cve"
+        },
+        "node_lint": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/node_lint"
+        },
+        "erlang_lint": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/erlang_lint"
+        },
+        "kotlin_lint": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/kotlin_lint"
+        },
+        "swift_lint": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/swift_lint"
+        },
+        "zig_lint": {
+          "anyOf": [
+            {
+              "$ref": "zig-ast-scan-v0.2.schema.json"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "obligation_status": {
+      "$ref": "check-feedback-v0.46.schema.json#/properties/obligation_status"
+    },
+    "required_obligations": {
+      "$ref": "check-feedback-v0.46.schema.json#/properties/required_obligations"
+    },
+    "category_candidates": {
+      "$ref": "check-feedback-v0.46.schema.json#/properties/category_candidates"
+    },
+    "syntax_candidates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason",
+        "execution_phase",
+        "authority",
+        "delivery_decision",
+        "source_file_count",
+        "skipped_count",
+        "unrouted_count",
+        "native_preferred_count",
+        "observations",
+        "next_action"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "not_run",
+            "attempted_incomplete",
+            "observed_partial"
+          ]
+        },
+        "reason": {
+          "enum": [
+            "source_or_scope_changed",
+            "request_cancelled",
+            "worker_executable_unavailable",
+            "grammar_manifest_invalid",
+            "bounded_scope",
+            "unrouted_source",
+            "candidate_unavailable",
+            "candidate_unqualified",
+            "native_preferred",
+            "binary_without_wasm_precheck"
+          ]
+        },
+        "execution_phase": {
+          "const": "after_native"
+        },
+        "authority": {
+          "const": "candidate_unqualified"
+        },
+        "delivery_decision": {
+          "const": "incomplete"
+        },
+        "source_file_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "skipped_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unrouted_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "native_preferred_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "next_action": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observations": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "language",
+              "scope",
+              "byte_offset",
+              "status",
+              "reason",
+              "grammar_qualified",
+              "source_sha256",
+              "grammar_sha256",
+              "recovery_count",
+              "recoveries",
+              "known_limitations"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "language": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "scope": {
+                "enum": [
+                  "whole_file",
+                  "cfquery_body"
+                ]
+              },
+              "byte_offset": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "status": {
+                "enum": [
+                  "candidate_observed",
+                  "candidate_unavailable"
+                ]
+              },
+              "reason": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "grammar_qualified": {
+                "const": false
+              },
+              "source_sha256": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "grammar_sha256": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "recovery_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "known_limitations": {
+                "type": "array",
+                "maxItems": 8,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024
+                }
+              },
+              "recoveries": {
+                "type": "array",
+                "maxItems": 8,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "kind",
+                    "syntax_kind",
+                    "start_byte",
+                    "end_byte",
+                    "start_row",
+                    "start_column_byte",
+                    "end_row",
+                    "end_column_byte"
+                  ],
+                  "properties": {
+                    "kind": {
+                      "enum": [
+                        "ERROR",
+                        "MISSING"
+                      ]
+                    },
+                    "syntax_kind": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "start_byte": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "end_byte": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "start_row": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "start_column_byte": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "end_row": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "end_column_byte": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                }
+              },
+              "structural_observation_count": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 128
+              },
+              "structural_observations": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 8,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "basis",
+                    "rule_id",
+                    "rule_version",
+                    "rule_sha256",
+                    "parent_syntax_kind",
+                    "start_byte",
+                    "end_byte",
+                    "start_row",
+                    "start_column_byte",
+                    "end_row",
+                    "end_column_byte"
+                  ],
+                  "properties": {
+                    "basis": {
+                      "const": "codeguard_structure_rule"
+                    },
+                    "rule_id": {
+                      "const": "codeguard.python.required_suite"
+                    },
+                    "rule_version": {
+                      "const": "1.0.0"
+                    },
+                    "rule_sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    },
+                    "parent_syntax_kind": {
+                      "enum": [
+                        "function_definition",
+                        "class_definition",
+                        "if_statement",
+                        "elif_clause",
+                        "else_clause",
+                        "for_statement",
+                        "while_statement",
+                        "try_statement",
+                        "except_clause",
+                        "finally_clause",
+                        "with_statement",
+                        "match_statement",
+                        "case_clause"
+                      ]
+                    },
+                    "start_byte": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "end_byte": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "start_row": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "start_column_byte": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "end_row": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "end_column_byte": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                }
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "structural_observation_count"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "structural_observations"
+                      ]
+                    }
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "structural_observation_count",
+                    "structural_observations"
+                  ],
+                  "properties": {
+                    "language": {
+                      "const": "python"
+                    },
+                    "scope": {
+                      "const": "whole_file"
+                    },
+                    "byte_offset": {
+                      "const": 0
+                    },
+                    "status": {
+                      "const": "candidate_observed"
+                    },
+                    "recovery_count": {
+                      "maximum": 128
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "contains": {
+            "required": [
+              "structural_observations"
+            ]
+          }
+        }
+      }
+    },
+    "unresolved_conditions": {
+      "$ref": "check-feedback-v0.46.schema.json#/properties/unresolved_conditions"
+    },
+    "next": {
+      "anyOf": [
+        {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/next"
+        },
+        {
+          "$ref": "repair-brief-preview-v0.12.schema.json"
+        }
+      ]
+    },
+    "syntax_tasks": {
+      "$ref": "check-feedback-v0.46.schema.json#/properties/syntax_tasks"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "authority": "host_context_verified",
+  "delivery_decision": "not_evaluated",
+  "event_ref": ".codeguard/findings/CG-B-87366328aa5ba51195b10c72d3e62227/events/lifecycle-event-f5da82438b362f25b3eef0d7c9ad3465988121028d0b193074e1caf6e817ed4e.json",
+  "evidence_ref": ".codeguard/state/resolution_evidence/7b6c4151815a34635b2ae1a2e4d75676ef93956e71d7ec3533fb4447786825f9.json",
+  "evidence_sha256": "7b6c4151815a34635b2ae1a2e4d75676ef93956e71d7ec3533fb4447786825f9",
+  "identity": {
+    "checker_id": "syntax.native_confirmation",
+    "scope": "app.zig",
+    "task_id": "CG-B-87366328aa5ba51195b10c72d3e62227",
+    "workspace_id": "ws-a99b18aa9beddc80ca15a7b8b6c83a02"
+  },
+  "outcome": "code_fixed",
+  "policy_revision": "p1",
+  "policy_sha256": "d91730bfe108b4d0b3880daa1538898d3446e2b7b4caa4d06ad223e4d9329091",
+  "report_type": "task_resolution_receipt",
+  "schema_version": "0.1.0",
+  "state": "resolved"
+}

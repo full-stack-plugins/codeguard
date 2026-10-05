@@ -1,0 +1,2130 @@
+[
+  {
+    "evidence_kind": "controlled_native_protocol",
+    "tarball_sha256": "feeaa64651519c6788373255f3005e9c0ee4595939a5f692380c2b2c65cafb95",
+    "installed_version": {
+      "build_identity": null,
+      "check_protocol_major": 1,
+      "cli_version": "0.1.4",
+      "report_type": "version",
+      "rulepack_compatibility": "unverified",
+      "schema_version": "0.1.0",
+      "target": "macos_arm64"
+    },
+    "initialized": {
+      "changed_directories": [
+        ".codeguard",
+        ".codeguard/findings",
+        ".codeguard/tasks",
+        ".codeguard/decisions",
+        ".codeguard/reports",
+        ".codeguard/runs",
+        ".codeguard/cache",
+        ".codeguard/worktrees",
+        ".codeguard/state"
+      ],
+      "changed_files": [
+        ".codeguard/.gitignore",
+        ".codeguard/README.md",
+        ".codeguard/project.json",
+        ".codeguard/module-graph.json",
+        ".codeguard/architecture.md",
+        "AGENTS.md",
+        ".codeguard/workspace.json"
+      ],
+      "conflict_file": null,
+      "delivery_decision": "not_evaluated",
+      "init_status": "partial",
+      "mode": "apply",
+      "next_actions": [
+        "review_project_profile",
+        "complete_init_readiness",
+        "run_doctor_and_check_when_available"
+      ],
+      "observation_complete": true,
+      "operation": "init",
+      "planned_files": [
+        ".codeguard/.gitignore",
+        ".codeguard/README.md",
+        ".codeguard/project.json",
+        ".codeguard/module-graph.json",
+        ".codeguard/architecture.md",
+        ".codeguard/workspace.json",
+        "AGENTS.md"
+      ],
+      "profile_stale": null,
+      "profile_summary": {
+        "architecture": "unknown",
+        "build_model": "not_resolved",
+        "build_roots": [],
+        "checker_inventory": "partial",
+        "checkers": [],
+        "installed_versions": "not_probed",
+        "language_targets": [],
+        "languages": [
+          {
+            "id": "erlang",
+            "manifest_count": 0,
+            "source_file_count": 1
+          }
+        ],
+        "unknown_conditions": [
+          "source_sets_not_fully_classified",
+          "dialects_not_classified"
+        ]
+      },
+      "readiness": "unknown",
+      "report_type": "init_plan",
+      "schema_version": "0.5.0",
+      "unresolved": [
+        "profile_refresh_partial",
+        "approved_quality_policy_not_bound",
+        "tool_readiness_not_probed"
+      ],
+      "workspace_id": "ws-6eb328da4516386bc1b5e139dea45f96"
+    },
+    "lint": {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "source": "cli",
+        "timeout_ms": 30000
+      },
+      "known_limitations": [
+        "OTP 28 erlc rejects a missing final function period in `f() -> ok`, but this pinned WASM returns zero recoveries; 12/13 narrow native syntax cases agree. Other Erlang versions, systematic precision, public native-first lint route and release remain unqualified"
+      ],
+      "language": "erlang",
+      "native": {
+        "diagnostics": [
+          {
+            "column": 4,
+            "line": 2,
+            "rule_id": "erlang.syntax.error"
+          }
+        ],
+        "diagnostics_truncated": false,
+        "preprocessing_unresolved": false,
+        "reason": "erlang_native_syntax_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "66d8f2783e502d67579a91339bea9f93f3145e500854b7667ea4171d2c3025f8",
+        "version": "OTP 28"
+      },
+      "next_action": "核对并修复原生 Erlang 语法诊断，复用 tool_selection.executable 作为 --erl-tool 再检查；还需项目完整 lint、编译和测试",
+      "operation": "lint",
+      "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-vfDieV/project/app.erl",
+      "report_type": "erlang_lint_feedback",
+      "schema_version": "0.3.0",
+      "scope": "single_file_forms_without_preprocessing",
+      "source_sha256": "22b202c1303137676dc8dbf46be3c26771f4faa453a223f1b607aecd2087c9e0",
+      "status": "incomplete",
+      "syntax_precheck": null,
+      "task_id": "CG-B-fc3a348885e1937e6c3ec6395e4dbcfe",
+      "task_status": "synced_partial",
+      "task_sync_reason": null,
+      "tool_selection": {
+        "executable": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-vfDieV/erl-tool",
+        "source": "explicit"
+      },
+      "workspace_binding": "bound"
+    },
+    "aggregate": {
+      "authority": "local_unverified",
+      "category_candidates": [
+        {
+          "capability_status": "gap",
+          "category": "lint",
+          "checker_id": "erlang.otp.forms",
+          "language": "erlang",
+          "legacy_status": "stable",
+          "next_action": "读取 native_results.erlang_lint 的逐文件诊断、阻塞和原工具复检指令；单文件 forms 不代替项目完整 lint、预处理、编译和测试",
+          "reason": "erlang_forms_observed_unverified_project_coverage",
+          "status": "native_incomplete"
+        },
+        {
+          "capability_status": "gap",
+          "category": "comments",
+          "checker_id": null,
+          "language": "erlang",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "dependencies",
+          "checker_id": null,
+          "language": "erlang",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "cve",
+          "checker_id": null,
+          "language": "erlang",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "security",
+          "checker_id": null,
+          "language": "erlang",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "build",
+          "checker_id": null,
+          "language": "erlang",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        }
+      ],
+      "command_status": "incomplete",
+      "delivery_decision": "incomplete",
+      "discovery": {
+        "blocked_paths": [],
+        "build_roots": [],
+        "checker_configurations": [],
+        "declared_versions": {},
+        "languages": [
+          {
+            "id": "erlang",
+            "manifests": [],
+            "source_files": [
+              "app.erl"
+            ]
+          }
+        ],
+        "lockfiles": [],
+        "manifest_sha256": {},
+        "native_tool_candidates": [],
+        "observation_complete": true,
+        "observed_entries": 2,
+        "report_type": "discovery",
+        "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-vfDieV/project",
+        "schema_version": "0.4.0",
+        "scope_summary": {
+          "configuration_exception_files_observed": 0,
+          "dependency_roots_excluded": 0,
+          "dot_prefix_roots_excluded": 1,
+          "git_safety_status": "not_evaluated",
+          "ordinary_scan_policy": "project_sources_default_v2"
+        },
+        "source_set_candidates": [],
+        "unknown_conditions": [
+          "source_sets_not_fully_classified",
+          "dialects_not_classified"
+        ]
+      },
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "jobs_limit": 4,
+        "jobs_source": "builtin_default",
+        "native_task_count": 1,
+        "source": "cli",
+        "started_native_task_count": 0,
+        "timeout_ms": 30000
+      },
+      "execution_tasks": [
+        {
+          "id": "erlang.lint",
+          "status": "native_observed_unverified"
+        }
+      ],
+      "exit_code": 3,
+      "export": {
+        "reason_code": null,
+        "status": "not_requested"
+      },
+      "native_results": {
+        "erlang_lint": {
+          "authority": "local_unverified",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "files": [
+            {
+              "current": true,
+              "findings": [
+                {
+                  "column": 4,
+                  "line": 2,
+                  "rule_id": "erlang.syntax.error"
+                }
+              ],
+              "native": {
+                "diagnostics": [
+                  {
+                    "column": 4,
+                    "line": 2,
+                    "rule_id": "erlang.syntax.error"
+                  }
+                ],
+                "diagnostics_truncated": false,
+                "preprocessing_unresolved": false,
+                "reason": "erlang_native_syntax_diagnostics",
+                "status": "diagnostics_observed",
+                "tool_sha256": "66d8f2783e502d67579a91339bea9f93f3145e500854b7667ea4171d2c3025f8",
+                "version": "OTP 28"
+              },
+              "next_action": "按当前原生语法位置修复并执行 recheck_argv；仍需项目完整 lint、预处理、编译和测试",
+              "path": "app.erl",
+              "recheck_argv": [
+                "codeguard",
+                "lint",
+                "erlang",
+                "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-vfDieV/project/app.erl",
+                "--erl-tool",
+                "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-vfDieV/erl-tool",
+                "--format=json"
+              ],
+              "source_sha256": "22b202c1303137676dc8dbf46be3c26771f4faa453a223f1b607aecd2087c9e0",
+              "task_id": "CG-B-fc3a348885e1937e6c3ec6395e4dbcfe",
+              "task_sync_reason": null
+            }
+          ],
+          "local_forms_complete": true,
+          "reason": "erlang_forms_observed_unverified_project_coverage",
+          "report_type": "erlang_forms_scan",
+          "schema_version": "0.2.0",
+          "scope": "single_file_forms_without_preprocessing",
+          "scope_stable": true,
+          "source_file_count": 1,
+          "task_id": null,
+          "task_status": "synced_partial",
+          "tool_selection": {
+            "executable": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-vfDieV/erl-tool",
+            "source": "explicit"
+          },
+          "unobserved_count": 0
+        },
+        "go_lint": null,
+        "java_cve": null,
+        "java_dependencies": null,
+        "java_javadoc": null,
+        "java_p3c": null,
+        "node_lint": null,
+        "npm_cve": [],
+        "python_cve": [],
+        "python_lint": null,
+        "rust_build": null,
+        "rust_comments": null,
+        "rust_cve": null,
+        "rust_lint": null
+      },
+      "next": null,
+      "obligation_status": "unresolved",
+      "operation": "check",
+      "reason": "full_project_obligations_and_trusted_policy_unavailable",
+      "report_type": "check_feedback",
+      "required_obligations": null,
+      "schema_version": "0.38.0",
+      "selection": "all",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 1,
+        "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+        "observations": [],
+        "reason": "native_preferred",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "not_run",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": {
+        "failures": [],
+        "new_blockers": 0,
+        "status": "synced_partial",
+        "tasks": []
+      },
+      "unresolved_conditions": [
+        "dialects_not_classified",
+        "erlang_project_lint_preprocessing_and_build_coverage_unverified",
+        "required_obligations_unresolved",
+        "source_sets_not_fully_classified",
+        "tool_lock_unverified",
+        "trusted_policy_unavailable"
+      ]
+    },
+    "native_first": {
+      "affected_paths": [
+        "app.erl"
+      ],
+      "authority": "local_unverified",
+      "blocker_id": "CG-B-fc3a348885e1937e6c3ec6395e4dbcfe",
+      "build_root": ".",
+      "checker_id": "syntax.native_confirmation",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "execution": "incomplete",
+      "fingerprint": "fc3a348885e1937e6c3ec6395e4dbcfe36c4985aa9a963a9ef44996bc26b5323",
+      "language": "erlang",
+      "native_evidence": {
+        "native": {
+          "diagnostics": [
+            {
+              "column": 4,
+              "line": 2,
+              "rule_id": "erlang.syntax.error"
+            }
+          ],
+          "diagnostics_truncated": false,
+          "preprocessing_unresolved": false,
+          "reason": "erlang_native_syntax_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "66d8f2783e502d67579a91339bea9f93f3145e500854b7667ea4171d2c3025f8",
+          "version": "OTP 28"
+        },
+        "target": {
+          "language": "erlang",
+          "path": "app.erl",
+          "source_sha256": "22b202c1303137676dc8dbf46be3c26771f4faa453a223f1b607aecd2087c9e0"
+        },
+        "tool_path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-vfDieV/erl-tool"
+      },
+      "observations": [],
+      "reason_code": "native_syntax_confirmation_needed",
+      "report_type": "syntax_confirmation_observation",
+      "run_id": "syntax-confirm-5937-1791109154548350000",
+      "schema_version": "0.2.0",
+      "scope": "app.erl",
+      "workspace_binding": "bound",
+      "workspace_id": "ws-6eb328da4516386bc1b5e139dea45f96"
+    },
+    "next": {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "actionable",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "repair-source",
+        "affected_paths": [
+          "app.erl"
+        ],
+        "authority": "local_unverified",
+        "build_root": ".",
+        "checker_id": "syntax.native_confirmation",
+        "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+        "constraints": [
+          "先恢复检查完整性",
+          "不得关闭检查器或修改无关源码"
+        ],
+        "disposition": "actionable",
+        "evidence_ref": {
+          "first_report_sha256": "61e6c71d61d3da0d03c95f3763a2a3693a7009e6698cab703869148d0ff541c4",
+          "first_run_id": "syntax-confirm-5903-1791109153509602000"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": []
+        },
+        "kind": "blocker",
+        "native_column_unit": "unicode_scalar",
+        "native_confirmation_reason": "erlang_native_syntax_diagnostics",
+        "native_confirmation_ref": {
+          "report_ref": ".codeguard/reports/syntax-confirm-5937-1791109154548350000.json",
+          "report_sha256": "07d514d86fc58749a7c90e8191db32e6ca8676c6a74fb2202a76ec0ee1c67619",
+          "run_id": "syntax-confirm-5937-1791109154548350000"
+        },
+        "native_confirmation_status": "diagnostics_observed",
+        "native_diagnostic_positions": [
+          {
+            "column": 4,
+            "line": 2,
+            "rule_id": "erlang.syntax.error"
+          }
+        ],
+        "reason_code": "native_syntax_confirmation_needed",
+        "recheck_argv": [
+          "codeguard",
+          "task",
+          "verify",
+          "CG-B-fc3a348885e1937e6c3ec6395e4dbcfe",
+          ".",
+          "--format",
+          "json",
+          "--erl-tool",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-vfDieV/erl-tool"
+        ],
+        "schema_version": "0.5.0",
+        "scope": "app.erl",
+        "step": "当前源码已有原生 Erlang 语法诊断；核对报告中有界原生位置并修复，然后使用同一工具复检；不要反复安装工具或关闭检查",
+        "task_id": "CG-B-fc3a348885e1937e6c3ec6395e4dbcfe"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.5.0"
+    },
+    "human": "Erlang 单文件原生语法发现诊断；先修复再复检（erlang_native_syntax_diagnostics）；核对并修复原生 Erlang 语法诊断，复用 tool_selection.executable 作为 --erl-tool 再检查；还需项目完整 lint、编译和测试\n  工具选择：explicit；/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-vfDieV/erl-tool\n  修复任务：\"CG-B-fc3a348885e1937e6c3ec6395e4dbcfe\"；使用 codeguard next PROJECT --format=json 获取当前指引\n  原生语法错误：2:4\n",
+    "present": {
+      "authority": "local_unverified",
+      "command_status": "incomplete",
+      "delivery_decision": "not_evaluated",
+      "event_persisted": true,
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "source": "cli",
+        "timeout_ms": 30000
+      },
+      "exit_code": 3,
+      "kind": "blocker",
+      "native_scan": {
+        "authority": "local_unverified",
+        "checker_id": "syntax.native_confirmation",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "input_stable": true,
+        "native": {
+          "diagnostics": [
+            {
+              "column": 4,
+              "line": 2,
+              "rule_id": "erlang.syntax.error"
+            }
+          ],
+          "diagnostics_truncated": false,
+          "preprocessing_unresolved": false,
+          "reason": "erlang_native_syntax_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "66d8f2783e502d67579a91339bea9f93f3145e500854b7667ea4171d2c3025f8",
+          "version": "OTP 28"
+        },
+        "operation": "task_verify",
+        "original_report": {
+          "grammar_sha256": null,
+          "run_id": "syntax-confirm-5903-1791109153509602000",
+          "sha256": "61e6c71d61d3da0d03c95f3763a2a3693a7009e6698cab703869148d0ff541c4",
+          "source_sha256": "22b202c1303137676dc8dbf46be3c26771f4faa453a223f1b607aecd2087c9e0"
+        },
+        "report_type": "syntax_task_recheck",
+        "run_id": "syntax-native-6032-1791109157567464000",
+        "schema_version": "0.3.0",
+        "target": {
+          "language": "erlang",
+          "path": "app.erl",
+          "source_sha256": "22b202c1303137676dc8dbf46be3c26771f4faa453a223f1b607aecd2087c9e0"
+        },
+        "task_id": "CG-B-fc3a348885e1937e6c3ec6395e4dbcfe",
+        "tool_path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-vfDieV/erl-tool",
+        "workspace_binding": "bound",
+        "workspace_id": "ws-6eb328da4516386bc1b5e139dea45f96"
+      },
+      "next_actions": [
+        "inspect_native_syntax_observation",
+        "repair_only_current_native_diagnostics",
+        "verify_policy_and_capability_before_closure"
+      ],
+      "observation": "still_blocked",
+      "operation": "task_verify",
+      "reason": null,
+      "report_type": "task_verification_preview",
+      "schema_version": "0.14.0",
+      "task_id": "CG-B-fc3a348885e1937e6c3ec6395e4dbcfe"
+    },
+    "stale": {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "verification_required",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "restore-checker-environment",
+        "affected_paths": [
+          "app.erl"
+        ],
+        "authority": "local_unverified",
+        "build_root": ".",
+        "checker_id": "syntax.native_confirmation",
+        "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+        "constraints": [
+          "先恢复检查完整性",
+          "不得关闭检查器或修改无关源码"
+        ],
+        "disposition": "verification_required",
+        "evidence_ref": {
+          "first_report_sha256": "61e6c71d61d3da0d03c95f3763a2a3693a7009e6698cab703869148d0ff541c4",
+          "first_run_id": "syntax-confirm-5903-1791109153509602000"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": []
+        },
+        "kind": "blocker",
+        "native_column_unit": "unicode_scalar",
+        "native_confirmation_reason": "syntax_confirmation_inputs_changed",
+        "native_confirmation_ref": {
+          "report_ref": ".codeguard/reports/syntax-native-6032-1791109157567464000.json",
+          "report_sha256": "42a80222d9074d124081bc12d3d247d3c4849a0215e35356eaa85ab5acb232d5",
+          "run_id": "syntax-native-6032-1791109157567464000"
+        },
+        "native_confirmation_status": "stale",
+        "native_diagnostic_positions": [],
+        "reason_code": "native_syntax_confirmation_needed",
+        "recheck_argv": [
+          "codeguard",
+          "task",
+          "verify",
+          "CG-B-fc3a348885e1937e6c3ec6395e4dbcfe",
+          ".",
+          "--format",
+          "json",
+          "--erl-tool",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-vfDieV/erl-tool"
+        ],
+        "schema_version": "0.4.0",
+        "scope": "app.erl",
+        "step": "源码或原生工具在语法复检后已变化；先运行当前输入的原生确认，不沿用旧修复或零诊断",
+        "task_id": "CG-B-fc3a348885e1937e6c3ec6395e4dbcfe"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.4.0"
+    },
+    "repaired": {
+      "authority": "local_unverified",
+      "command_status": "incomplete",
+      "delivery_decision": "not_evaluated",
+      "event_persisted": true,
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "source": "cli",
+        "timeout_ms": 30000
+      },
+      "exit_code": 3,
+      "kind": "blocker",
+      "native_scan": {
+        "authority": "local_unverified",
+        "checker_id": "syntax.native_confirmation",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "input_stable": true,
+        "native": {
+          "diagnostics": [],
+          "diagnostics_truncated": false,
+          "preprocessing_unresolved": false,
+          "reason": "erlang_native_forms_no_diagnostics",
+          "status": "completed",
+          "tool_sha256": "66d8f2783e502d67579a91339bea9f93f3145e500854b7667ea4171d2c3025f8",
+          "version": "OTP 28"
+        },
+        "operation": "task_verify",
+        "original_report": {
+          "grammar_sha256": null,
+          "run_id": "syntax-confirm-5903-1791109153509602000",
+          "sha256": "61e6c71d61d3da0d03c95f3763a2a3693a7009e6698cab703869148d0ff541c4",
+          "source_sha256": "22b202c1303137676dc8dbf46be3c26771f4faa453a223f1b607aecd2087c9e0"
+        },
+        "report_type": "syntax_task_recheck",
+        "run_id": "syntax-native-6789-1791109159672917000",
+        "schema_version": "0.3.0",
+        "target": {
+          "language": "erlang",
+          "path": "app.erl",
+          "source_sha256": "98eb573d5f63f346114eb1a193b759aa849165da40d8f50cb7c73cfaafbaaa2a"
+        },
+        "task_id": "CG-B-fc3a348885e1937e6c3ec6395e4dbcfe",
+        "tool_path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-vfDieV/erl-tool",
+        "workspace_binding": "bound",
+        "workspace_id": "ws-6eb328da4516386bc1b5e139dea45f96"
+      },
+      "next_actions": [
+        "inspect_native_syntax_observation",
+        "repair_only_current_native_diagnostics",
+        "verify_policy_and_capability_before_closure"
+      ],
+      "observation": "candidate_absent_unverified_policy",
+      "operation": "task_verify",
+      "reason": null,
+      "report_type": "task_verification_preview",
+      "schema_version": "0.14.0",
+      "task_id": "CG-B-fc3a348885e1937e6c3ec6395e4dbcfe"
+    },
+    "recurrent": {
+      "authority": "local_unverified",
+      "category_candidates": [
+        {
+          "capability_status": "gap",
+          "category": "lint",
+          "checker_id": "erlang.otp.forms",
+          "language": "erlang",
+          "legacy_status": "stable",
+          "next_action": "读取 native_results.erlang_lint 的逐文件诊断、阻塞和原工具复检指令；单文件 forms 不代替项目完整 lint、预处理、编译和测试",
+          "reason": "erlang_forms_observed_unverified_project_coverage",
+          "status": "native_incomplete"
+        },
+        {
+          "capability_status": "gap",
+          "category": "comments",
+          "checker_id": null,
+          "language": "erlang",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "dependencies",
+          "checker_id": null,
+          "language": "erlang",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "cve",
+          "checker_id": null,
+          "language": "erlang",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "security",
+          "checker_id": null,
+          "language": "erlang",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "build",
+          "checker_id": null,
+          "language": "erlang",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        }
+      ],
+      "command_status": "incomplete",
+      "delivery_decision": "incomplete",
+      "discovery": {
+        "blocked_paths": [],
+        "build_roots": [],
+        "checker_configurations": [],
+        "declared_versions": {},
+        "languages": [
+          {
+            "id": "erlang",
+            "manifests": [],
+            "source_files": [
+              "app.erl"
+            ]
+          }
+        ],
+        "lockfiles": [],
+        "manifest_sha256": {},
+        "native_tool_candidates": [],
+        "observation_complete": true,
+        "observed_entries": 2,
+        "report_type": "discovery",
+        "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-vfDieV/project",
+        "schema_version": "0.4.0",
+        "scope_summary": {
+          "configuration_exception_files_observed": 0,
+          "dependency_roots_excluded": 0,
+          "dot_prefix_roots_excluded": 1,
+          "git_safety_status": "not_evaluated",
+          "ordinary_scan_policy": "project_sources_default_v2"
+        },
+        "source_set_candidates": [],
+        "unknown_conditions": [
+          "source_sets_not_fully_classified",
+          "dialects_not_classified"
+        ]
+      },
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "jobs_limit": 4,
+        "jobs_source": "builtin_default",
+        "native_task_count": 1,
+        "source": "cli",
+        "started_native_task_count": 0,
+        "timeout_ms": 30000
+      },
+      "execution_tasks": [
+        {
+          "id": "erlang.lint",
+          "status": "native_observed_unverified"
+        }
+      ],
+      "exit_code": 3,
+      "export": {
+        "reason_code": null,
+        "status": "not_requested"
+      },
+      "native_results": {
+        "erlang_lint": {
+          "authority": "local_unverified",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "files": [
+            {
+              "current": true,
+              "findings": [
+                {
+                  "column": 4,
+                  "line": 2,
+                  "rule_id": "erlang.syntax.error"
+                }
+              ],
+              "native": {
+                "diagnostics": [
+                  {
+                    "column": 4,
+                    "line": 2,
+                    "rule_id": "erlang.syntax.error"
+                  }
+                ],
+                "diagnostics_truncated": false,
+                "preprocessing_unresolved": false,
+                "reason": "erlang_native_syntax_diagnostics",
+                "status": "diagnostics_observed",
+                "tool_sha256": "66d8f2783e502d67579a91339bea9f93f3145e500854b7667ea4171d2c3025f8",
+                "version": "OTP 28"
+              },
+              "next_action": "按当前原生语法位置修复并执行 recheck_argv；仍需项目完整 lint、预处理、编译和测试",
+              "path": "app.erl",
+              "recheck_argv": [
+                "codeguard",
+                "lint",
+                "erlang",
+                "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-vfDieV/project/app.erl",
+                "--erl-tool",
+                "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-vfDieV/erl-tool",
+                "--format=json"
+              ],
+              "source_sha256": "22b202c1303137676dc8dbf46be3c26771f4faa453a223f1b607aecd2087c9e0",
+              "task_id": "CG-B-fc3a348885e1937e6c3ec6395e4dbcfe",
+              "task_sync_reason": null
+            }
+          ],
+          "local_forms_complete": true,
+          "reason": "erlang_forms_observed_unverified_project_coverage",
+          "report_type": "erlang_forms_scan",
+          "schema_version": "0.2.0",
+          "scope": "single_file_forms_without_preprocessing",
+          "scope_stable": true,
+          "source_file_count": 1,
+          "task_id": null,
+          "task_status": "synced_partial",
+          "tool_selection": {
+            "executable": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-vfDieV/erl-tool",
+            "source": "explicit"
+          },
+          "unobserved_count": 0
+        },
+        "go_lint": null,
+        "java_cve": null,
+        "java_dependencies": null,
+        "java_javadoc": null,
+        "java_p3c": null,
+        "node_lint": null,
+        "npm_cve": [],
+        "python_cve": [],
+        "python_lint": null,
+        "rust_build": null,
+        "rust_comments": null,
+        "rust_cve": null,
+        "rust_lint": null
+      },
+      "next": null,
+      "obligation_status": "unresolved",
+      "operation": "check",
+      "reason": "full_project_obligations_and_trusted_policy_unavailable",
+      "report_type": "check_feedback",
+      "required_obligations": null,
+      "schema_version": "0.38.0",
+      "selection": "all",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 1,
+        "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+        "observations": [],
+        "reason": "native_preferred",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "not_run",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": {
+        "failures": [],
+        "new_blockers": 0,
+        "status": "synced_partial",
+        "tasks": []
+      },
+      "unresolved_conditions": [
+        "dialects_not_classified",
+        "erlang_project_lint_preprocessing_and_build_coverage_unverified",
+        "required_obligations_unresolved",
+        "source_sets_not_fully_classified",
+        "tool_lock_unverified",
+        "trusted_policy_unavailable"
+      ]
+    },
+    "recurrence_next": {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "actionable",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "repair-source",
+        "affected_paths": [
+          "app.erl"
+        ],
+        "authority": "local_unverified",
+        "build_root": ".",
+        "checker_id": "syntax.native_confirmation",
+        "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+        "constraints": [
+          "先恢复检查完整性",
+          "不得关闭检查器或修改无关源码"
+        ],
+        "disposition": "actionable",
+        "evidence_ref": {
+          "first_report_sha256": "61e6c71d61d3da0d03c95f3763a2a3693a7009e6698cab703869148d0ff541c4",
+          "first_run_id": "syntax-confirm-5903-1791109153509602000"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": []
+        },
+        "kind": "blocker",
+        "native_column_unit": "unicode_scalar",
+        "native_confirmation_reason": "erlang_native_syntax_diagnostics",
+        "native_confirmation_ref": {
+          "report_ref": ".codeguard/reports/syntax-confirm-6830-1791109160706008000.json",
+          "report_sha256": "16c79fb7ea30dd40f46a8f5d0bcad9e3bfd43b83b62357393349f0937babb085",
+          "run_id": "syntax-confirm-6830-1791109160706008000"
+        },
+        "native_confirmation_status": "diagnostics_observed",
+        "native_diagnostic_positions": [
+          {
+            "column": 4,
+            "line": 2,
+            "rule_id": "erlang.syntax.error"
+          }
+        ],
+        "reason_code": "native_syntax_confirmation_needed",
+        "recheck_argv": [
+          "codeguard",
+          "task",
+          "verify",
+          "CG-B-fc3a348885e1937e6c3ec6395e4dbcfe",
+          ".",
+          "--format",
+          "json",
+          "--erl-tool",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-vfDieV/erl-tool"
+        ],
+        "schema_version": "0.5.0",
+        "scope": "app.erl",
+        "step": "当前源码已有原生 Erlang 语法诊断；核对报告中有界原生位置并修复，然后使用同一工具复检；不要反复安装工具或关闭检查",
+        "task_id": "CG-B-fc3a348885e1937e6c3ec6395e4dbcfe"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.5.0"
+    },
+    "repair_ready": {
+      "delivery_decision": "not_evaluated",
+      "execution": "task_verification",
+      "host_blocking_verified": false,
+      "local_feedback": {
+        "authority": "local_unverified",
+        "checker_id": "syntax.native_confirmation",
+        "delivery_decision": "not_evaluated",
+        "event_persisted": true,
+        "native_column_unit": "unicode_scalar",
+        "native_confirmation_reason": "erlang_native_syntax_diagnostics",
+        "native_confirmation_ref": {
+          "report_ref": ".codeguard/reports/syntax-native-6925-1791109162848581000.json",
+          "report_sha256": "aa31b2af522c21961912614c81a5e2ac519a9485855e2978cc0f0a8b60936f19",
+          "run_id": "syntax-native-6925-1791109162848581000"
+        },
+        "native_confirmation_status": "diagnostics_observed",
+        "native_diagnostic_positions": [
+          {
+            "column": 4,
+            "line": 2,
+            "rule_id": "erlang.syntax.error"
+          }
+        ],
+        "observation": "still_blocked",
+        "reason": null,
+        "report_type": "hook_task_verification_summary",
+        "scan_report_available": true,
+        "schema_version": "0.2.0",
+        "task_id": "CG-B-fc3a348885e1937e6c3ec6395e4dbcfe"
+      },
+      "plan": {
+        "action": "verify_task",
+        "host_blocking_claimed": false,
+        "may_claim_delivery": false,
+        "requires_git_snapshot": false,
+        "scope_resolution_reason": null,
+        "soft_result_reuse_candidate": false,
+        "target_paths": [],
+        "task_id": "CG-B-fc3a348885e1937e6c3ec6395e4dbcfe"
+      },
+      "reason": null,
+      "report_type": "hook_execution_feedback",
+      "schema_version": "0.8.0",
+      "soft_result_reused": false
+    },
+    "persistence_failure": {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "source": "builtin_default",
+        "timeout_ms": 1800000
+      },
+      "known_limitations": [
+        "OTP 28 erlc rejects a missing final function period in `f() -> ok`, but this pinned WASM returns zero recoveries; 12/13 narrow native syntax cases agree. Other Erlang versions, systematic precision, public native-first lint route and release remain unqualified"
+      ],
+      "language": "erlang",
+      "native": {
+        "diagnostics": [
+          {
+            "column": 4,
+            "line": 2,
+            "rule_id": "erlang.syntax.error"
+          }
+        ],
+        "diagnostics_truncated": false,
+        "preprocessing_unresolved": false,
+        "reason": "erlang_native_syntax_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "66d8f2783e502d67579a91339bea9f93f3145e500854b7667ea4171d2c3025f8",
+        "version": "OTP 28"
+      },
+      "next_action": "核对并修复原生 Erlang 语法诊断，复用 tool_selection.executable 作为 --erl-tool 再检查；还需项目完整 lint、编译和测试",
+      "operation": "lint",
+      "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-vfDieV/project/blocked/other.erl",
+      "report_type": "erlang_lint_feedback",
+      "schema_version": "0.3.0",
+      "scope": "single_file_forms_without_preprocessing",
+      "source_sha256": "22b202c1303137676dc8dbf46be3c26771f4faa453a223f1b607aecd2087c9e0",
+      "status": "incomplete",
+      "syntax_precheck": null,
+      "task_id": null,
+      "task_status": "incomplete",
+      "task_sync_reason": "reports_directory_unavailable",
+      "tool_selection": {
+        "executable": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-vfDieV/erl-tool",
+        "source": "explicit"
+      },
+      "workspace_binding": "bound"
+    }
+  },
+  {
+    "evidence_kind": "real_otp_28",
+    "tarball_sha256": "feeaa64651519c6788373255f3005e9c0ee4595939a5f692380c2b2c65cafb95",
+    "installed_version": {
+      "build_identity": null,
+      "check_protocol_major": 1,
+      "cli_version": "0.1.4",
+      "report_type": "version",
+      "rulepack_compatibility": "unverified",
+      "schema_version": "0.1.0",
+      "target": "macos_arm64"
+    },
+    "initialized": {
+      "changed_directories": [
+        ".codeguard",
+        ".codeguard/findings",
+        ".codeguard/tasks",
+        ".codeguard/decisions",
+        ".codeguard/reports",
+        ".codeguard/runs",
+        ".codeguard/cache",
+        ".codeguard/worktrees",
+        ".codeguard/state"
+      ],
+      "changed_files": [
+        ".codeguard/.gitignore",
+        ".codeguard/README.md",
+        ".codeguard/project.json",
+        ".codeguard/module-graph.json",
+        ".codeguard/architecture.md",
+        "AGENTS.md",
+        ".codeguard/workspace.json"
+      ],
+      "conflict_file": null,
+      "delivery_decision": "not_evaluated",
+      "init_status": "partial",
+      "mode": "apply",
+      "next_actions": [
+        "review_project_profile",
+        "complete_init_readiness",
+        "run_doctor_and_check_when_available"
+      ],
+      "observation_complete": true,
+      "operation": "init",
+      "planned_files": [
+        ".codeguard/.gitignore",
+        ".codeguard/README.md",
+        ".codeguard/project.json",
+        ".codeguard/module-graph.json",
+        ".codeguard/architecture.md",
+        ".codeguard/workspace.json",
+        "AGENTS.md"
+      ],
+      "profile_stale": null,
+      "profile_summary": {
+        "architecture": "unknown",
+        "build_model": "not_resolved",
+        "build_roots": [],
+        "checker_inventory": "partial",
+        "checkers": [],
+        "installed_versions": "not_probed",
+        "language_targets": [],
+        "languages": [
+          {
+            "id": "erlang",
+            "manifest_count": 0,
+            "source_file_count": 1
+          }
+        ],
+        "unknown_conditions": [
+          "source_sets_not_fully_classified",
+          "dialects_not_classified"
+        ]
+      },
+      "readiness": "unknown",
+      "report_type": "init_plan",
+      "schema_version": "0.5.0",
+      "unresolved": [
+        "profile_refresh_partial",
+        "approved_quality_policy_not_bound",
+        "tool_readiness_not_probed"
+      ],
+      "workspace_id": "ws-330ae43b8e1cab5b06cf7b9e1adff20a"
+    },
+    "lint": {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "source": "cli",
+        "timeout_ms": 30000
+      },
+      "known_limitations": [
+        "OTP 28 erlc rejects a missing final function period in `f() -> ok`, but this pinned WASM returns zero recoveries; 12/13 narrow native syntax cases agree. Other Erlang versions, systematic precision, public native-first lint route and release remain unqualified"
+      ],
+      "language": "erlang",
+      "native": {
+        "diagnostics": [
+          {
+            "column": 4,
+            "line": 2,
+            "rule_id": "erlang.syntax.error"
+          }
+        ],
+        "diagnostics_truncated": false,
+        "preprocessing_unresolved": false,
+        "reason": "erlang_native_syntax_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "cd03d938d7547ef608076a58a49f5284931b43f39090087baf35efc1665dd5d6",
+        "version": "OTP 28"
+      },
+      "next_action": "核对并修复原生 Erlang 语法诊断，复用 tool_selection.executable 作为 --erl-tool 再检查；还需项目完整 lint、编译和测试",
+      "operation": "lint",
+      "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-h7T30P/project/app.erl",
+      "report_type": "erlang_lint_feedback",
+      "schema_version": "0.3.0",
+      "scope": "single_file_forms_without_preprocessing",
+      "source_sha256": "22b202c1303137676dc8dbf46be3c26771f4faa453a223f1b607aecd2087c9e0",
+      "status": "incomplete",
+      "syntax_precheck": null,
+      "task_id": "CG-B-f35f39299f779a08659ada6b546e1b3c",
+      "task_status": "synced_partial",
+      "task_sync_reason": null,
+      "tool_selection": {
+        "executable": "/opt/homebrew/Cellar/erlang/28.5/lib/erlang/bin/erl",
+        "source": "explicit"
+      },
+      "workspace_binding": "bound"
+    },
+    "aggregate": {
+      "authority": "local_unverified",
+      "category_candidates": [
+        {
+          "capability_status": "gap",
+          "category": "lint",
+          "checker_id": "erlang.otp.forms",
+          "language": "erlang",
+          "legacy_status": "stable",
+          "next_action": "读取 native_results.erlang_lint 的逐文件诊断、阻塞和原工具复检指令；单文件 forms 不代替项目完整 lint、预处理、编译和测试",
+          "reason": "erlang_forms_observed_unverified_project_coverage",
+          "status": "native_incomplete"
+        },
+        {
+          "capability_status": "gap",
+          "category": "comments",
+          "checker_id": null,
+          "language": "erlang",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "dependencies",
+          "checker_id": null,
+          "language": "erlang",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "cve",
+          "checker_id": null,
+          "language": "erlang",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "security",
+          "checker_id": null,
+          "language": "erlang",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "build",
+          "checker_id": null,
+          "language": "erlang",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        }
+      ],
+      "command_status": "incomplete",
+      "delivery_decision": "incomplete",
+      "discovery": {
+        "blocked_paths": [],
+        "build_roots": [],
+        "checker_configurations": [],
+        "declared_versions": {},
+        "languages": [
+          {
+            "id": "erlang",
+            "manifests": [],
+            "source_files": [
+              "app.erl"
+            ]
+          }
+        ],
+        "lockfiles": [],
+        "manifest_sha256": {},
+        "native_tool_candidates": [],
+        "observation_complete": true,
+        "observed_entries": 2,
+        "report_type": "discovery",
+        "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-h7T30P/project",
+        "schema_version": "0.4.0",
+        "scope_summary": {
+          "configuration_exception_files_observed": 0,
+          "dependency_roots_excluded": 0,
+          "dot_prefix_roots_excluded": 1,
+          "git_safety_status": "not_evaluated",
+          "ordinary_scan_policy": "project_sources_default_v2"
+        },
+        "source_set_candidates": [],
+        "unknown_conditions": [
+          "source_sets_not_fully_classified",
+          "dialects_not_classified"
+        ]
+      },
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "jobs_limit": 4,
+        "jobs_source": "builtin_default",
+        "native_task_count": 1,
+        "source": "cli",
+        "started_native_task_count": 0,
+        "timeout_ms": 30000
+      },
+      "execution_tasks": [
+        {
+          "id": "erlang.lint",
+          "status": "native_observed_unverified"
+        }
+      ],
+      "exit_code": 3,
+      "export": {
+        "reason_code": null,
+        "status": "not_requested"
+      },
+      "native_results": {
+        "erlang_lint": {
+          "authority": "local_unverified",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "files": [
+            {
+              "current": true,
+              "findings": [
+                {
+                  "column": 4,
+                  "line": 2,
+                  "rule_id": "erlang.syntax.error"
+                }
+              ],
+              "native": {
+                "diagnostics": [
+                  {
+                    "column": 4,
+                    "line": 2,
+                    "rule_id": "erlang.syntax.error"
+                  }
+                ],
+                "diagnostics_truncated": false,
+                "preprocessing_unresolved": false,
+                "reason": "erlang_native_syntax_diagnostics",
+                "status": "diagnostics_observed",
+                "tool_sha256": "cd03d938d7547ef608076a58a49f5284931b43f39090087baf35efc1665dd5d6",
+                "version": "OTP 28"
+              },
+              "next_action": "按当前原生语法位置修复并执行 recheck_argv；仍需项目完整 lint、预处理、编译和测试",
+              "path": "app.erl",
+              "recheck_argv": [
+                "codeguard",
+                "lint",
+                "erlang",
+                "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-h7T30P/project/app.erl",
+                "--erl-tool",
+                "/opt/homebrew/Cellar/erlang/28.5/lib/erlang/bin/erl",
+                "--format=json"
+              ],
+              "source_sha256": "22b202c1303137676dc8dbf46be3c26771f4faa453a223f1b607aecd2087c9e0",
+              "task_id": "CG-B-f35f39299f779a08659ada6b546e1b3c",
+              "task_sync_reason": null
+            }
+          ],
+          "local_forms_complete": true,
+          "reason": "erlang_forms_observed_unverified_project_coverage",
+          "report_type": "erlang_forms_scan",
+          "schema_version": "0.2.0",
+          "scope": "single_file_forms_without_preprocessing",
+          "scope_stable": true,
+          "source_file_count": 1,
+          "task_id": null,
+          "task_status": "synced_partial",
+          "tool_selection": {
+            "executable": "/opt/homebrew/Cellar/erlang/28.5/lib/erlang/bin/erl",
+            "source": "explicit"
+          },
+          "unobserved_count": 0
+        },
+        "go_lint": null,
+        "java_cve": null,
+        "java_dependencies": null,
+        "java_javadoc": null,
+        "java_p3c": null,
+        "node_lint": null,
+        "npm_cve": [],
+        "python_cve": [],
+        "python_lint": null,
+        "rust_build": null,
+        "rust_comments": null,
+        "rust_cve": null,
+        "rust_lint": null
+      },
+      "next": null,
+      "obligation_status": "unresolved",
+      "operation": "check",
+      "reason": "full_project_obligations_and_trusted_policy_unavailable",
+      "report_type": "check_feedback",
+      "required_obligations": null,
+      "schema_version": "0.38.0",
+      "selection": "all",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 1,
+        "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+        "observations": [],
+        "reason": "native_preferred",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "not_run",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": {
+        "failures": [],
+        "new_blockers": 0,
+        "status": "synced_partial",
+        "tasks": []
+      },
+      "unresolved_conditions": [
+        "dialects_not_classified",
+        "erlang_project_lint_preprocessing_and_build_coverage_unverified",
+        "required_obligations_unresolved",
+        "source_sets_not_fully_classified",
+        "tool_lock_unverified",
+        "trusted_policy_unavailable"
+      ]
+    },
+    "native_first": {
+      "affected_paths": [
+        "app.erl"
+      ],
+      "authority": "local_unverified",
+      "blocker_id": "CG-B-f35f39299f779a08659ada6b546e1b3c",
+      "build_root": ".",
+      "checker_id": "syntax.native_confirmation",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "execution": "incomplete",
+      "fingerprint": "f35f39299f779a08659ada6b546e1b3c605fc5e65c249d823e05c6f6e235585d",
+      "language": "erlang",
+      "native_evidence": {
+        "native": {
+          "diagnostics": [
+            {
+              "column": 4,
+              "line": 2,
+              "rule_id": "erlang.syntax.error"
+            }
+          ],
+          "diagnostics_truncated": false,
+          "preprocessing_unresolved": false,
+          "reason": "erlang_native_syntax_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "cd03d938d7547ef608076a58a49f5284931b43f39090087baf35efc1665dd5d6",
+          "version": "OTP 28"
+        },
+        "target": {
+          "language": "erlang",
+          "path": "app.erl",
+          "source_sha256": "22b202c1303137676dc8dbf46be3c26771f4faa453a223f1b607aecd2087c9e0"
+        },
+        "tool_path": "/opt/homebrew/Cellar/erlang/28.5/lib/erlang/bin/erl"
+      },
+      "observations": [],
+      "reason_code": "native_syntax_confirmation_needed",
+      "report_type": "syntax_confirmation_observation",
+      "run_id": "syntax-confirm-7895-1791109171914082000",
+      "schema_version": "0.2.0",
+      "scope": "app.erl",
+      "workspace_binding": "bound",
+      "workspace_id": "ws-330ae43b8e1cab5b06cf7b9e1adff20a"
+    },
+    "next": {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "actionable",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "repair-source",
+        "affected_paths": [
+          "app.erl"
+        ],
+        "authority": "local_unverified",
+        "build_root": ".",
+        "checker_id": "syntax.native_confirmation",
+        "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+        "constraints": [
+          "先恢复检查完整性",
+          "不得关闭检查器或修改无关源码"
+        ],
+        "disposition": "actionable",
+        "evidence_ref": {
+          "first_report_sha256": "8d2516ae797957083f5a8e247e9154135a502a2fa0a2e88155065ec88bc4ad6c",
+          "first_run_id": "syntax-confirm-7852-1791109170697580000"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": []
+        },
+        "kind": "blocker",
+        "native_column_unit": "unicode_scalar",
+        "native_confirmation_reason": "erlang_native_syntax_diagnostics",
+        "native_confirmation_ref": {
+          "report_ref": ".codeguard/reports/syntax-confirm-7895-1791109171914082000.json",
+          "report_sha256": "78bc615cca73d0b557c1d018a9c051ae6ea8b515b60a4038c788070a388df4b6",
+          "run_id": "syntax-confirm-7895-1791109171914082000"
+        },
+        "native_confirmation_status": "diagnostics_observed",
+        "native_diagnostic_positions": [
+          {
+            "column": 4,
+            "line": 2,
+            "rule_id": "erlang.syntax.error"
+          }
+        ],
+        "reason_code": "native_syntax_confirmation_needed",
+        "recheck_argv": [
+          "codeguard",
+          "task",
+          "verify",
+          "CG-B-f35f39299f779a08659ada6b546e1b3c",
+          ".",
+          "--format",
+          "json",
+          "--erl-tool",
+          "/opt/homebrew/Cellar/erlang/28.5/lib/erlang/bin/erl"
+        ],
+        "schema_version": "0.5.0",
+        "scope": "app.erl",
+        "step": "当前源码已有原生 Erlang 语法诊断；核对报告中有界原生位置并修复，然后使用同一工具复检；不要反复安装工具或关闭检查",
+        "task_id": "CG-B-f35f39299f779a08659ada6b546e1b3c"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.5.0"
+    },
+    "human": "Erlang 单文件原生语法发现诊断；先修复再复检（erlang_native_syntax_diagnostics）；核对并修复原生 Erlang 语法诊断，复用 tool_selection.executable 作为 --erl-tool 再检查；还需项目完整 lint、编译和测试\n  工具选择：explicit；/opt/homebrew/Cellar/erlang/28.5/lib/erlang/bin/erl\n  修复任务：\"CG-B-f35f39299f779a08659ada6b546e1b3c\"；使用 codeguard next PROJECT --format=json 获取当前指引\n  原生语法错误：2:4\n",
+    "present": {
+      "authority": "local_unverified",
+      "command_status": "incomplete",
+      "delivery_decision": "not_evaluated",
+      "event_persisted": true,
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "source": "cli",
+        "timeout_ms": 30000
+      },
+      "exit_code": 3,
+      "kind": "blocker",
+      "native_scan": {
+        "authority": "local_unverified",
+        "checker_id": "syntax.native_confirmation",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "input_stable": true,
+        "native": {
+          "diagnostics": [
+            {
+              "column": 4,
+              "line": 2,
+              "rule_id": "erlang.syntax.error"
+            }
+          ],
+          "diagnostics_truncated": false,
+          "preprocessing_unresolved": false,
+          "reason": "erlang_native_syntax_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "cd03d938d7547ef608076a58a49f5284931b43f39090087baf35efc1665dd5d6",
+          "version": "OTP 28"
+        },
+        "operation": "task_verify",
+        "original_report": {
+          "grammar_sha256": null,
+          "run_id": "syntax-confirm-7852-1791109170697580000",
+          "sha256": "8d2516ae797957083f5a8e247e9154135a502a2fa0a2e88155065ec88bc4ad6c",
+          "source_sha256": "22b202c1303137676dc8dbf46be3c26771f4faa453a223f1b607aecd2087c9e0"
+        },
+        "report_type": "syntax_task_recheck",
+        "run_id": "syntax-native-8041-1791109175318047000",
+        "schema_version": "0.3.0",
+        "target": {
+          "language": "erlang",
+          "path": "app.erl",
+          "source_sha256": "22b202c1303137676dc8dbf46be3c26771f4faa453a223f1b607aecd2087c9e0"
+        },
+        "task_id": "CG-B-f35f39299f779a08659ada6b546e1b3c",
+        "tool_path": "/opt/homebrew/Cellar/erlang/28.5/lib/erlang/bin/erl",
+        "workspace_binding": "bound",
+        "workspace_id": "ws-330ae43b8e1cab5b06cf7b9e1adff20a"
+      },
+      "next_actions": [
+        "inspect_native_syntax_observation",
+        "repair_only_current_native_diagnostics",
+        "verify_policy_and_capability_before_closure"
+      ],
+      "observation": "still_blocked",
+      "operation": "task_verify",
+      "reason": null,
+      "report_type": "task_verification_preview",
+      "schema_version": "0.14.0",
+      "task_id": "CG-B-f35f39299f779a08659ada6b546e1b3c"
+    },
+    "stale": {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "verification_required",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "restore-checker-environment",
+        "affected_paths": [
+          "app.erl"
+        ],
+        "authority": "local_unverified",
+        "build_root": ".",
+        "checker_id": "syntax.native_confirmation",
+        "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+        "constraints": [
+          "先恢复检查完整性",
+          "不得关闭检查器或修改无关源码"
+        ],
+        "disposition": "verification_required",
+        "evidence_ref": {
+          "first_report_sha256": "8d2516ae797957083f5a8e247e9154135a502a2fa0a2e88155065ec88bc4ad6c",
+          "first_run_id": "syntax-confirm-7852-1791109170697580000"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": []
+        },
+        "kind": "blocker",
+        "native_column_unit": "unicode_scalar",
+        "native_confirmation_reason": "syntax_confirmation_inputs_changed",
+        "native_confirmation_ref": {
+          "report_ref": ".codeguard/reports/syntax-native-8041-1791109175318047000.json",
+          "report_sha256": "c8e94094e4d60b04f94b21011eeef0e2154d552f68e341b8d9cdebab2e87d2b7",
+          "run_id": "syntax-native-8041-1791109175318047000"
+        },
+        "native_confirmation_status": "stale",
+        "native_diagnostic_positions": [],
+        "reason_code": "native_syntax_confirmation_needed",
+        "recheck_argv": [
+          "codeguard",
+          "task",
+          "verify",
+          "CG-B-f35f39299f779a08659ada6b546e1b3c",
+          ".",
+          "--format",
+          "json",
+          "--erl-tool",
+          "/opt/homebrew/Cellar/erlang/28.5/lib/erlang/bin/erl"
+        ],
+        "schema_version": "0.4.0",
+        "scope": "app.erl",
+        "step": "源码或原生工具在语法复检后已变化；先运行当前输入的原生确认，不沿用旧修复或零诊断",
+        "task_id": "CG-B-f35f39299f779a08659ada6b546e1b3c"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.4.0"
+    },
+    "repaired": {
+      "authority": "local_unverified",
+      "command_status": "incomplete",
+      "delivery_decision": "not_evaluated",
+      "event_persisted": true,
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "source": "cli",
+        "timeout_ms": 30000
+      },
+      "exit_code": 3,
+      "kind": "blocker",
+      "native_scan": {
+        "authority": "local_unverified",
+        "checker_id": "syntax.native_confirmation",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "input_stable": true,
+        "native": {
+          "diagnostics": [],
+          "diagnostics_truncated": false,
+          "preprocessing_unresolved": false,
+          "reason": "erlang_native_forms_no_diagnostics",
+          "status": "completed",
+          "tool_sha256": "cd03d938d7547ef608076a58a49f5284931b43f39090087baf35efc1665dd5d6",
+          "version": "OTP 28"
+        },
+        "operation": "task_verify",
+        "original_report": {
+          "grammar_sha256": null,
+          "run_id": "syntax-confirm-7852-1791109170697580000",
+          "sha256": "8d2516ae797957083f5a8e247e9154135a502a2fa0a2e88155065ec88bc4ad6c",
+          "source_sha256": "22b202c1303137676dc8dbf46be3c26771f4faa453a223f1b607aecd2087c9e0"
+        },
+        "report_type": "syntax_task_recheck",
+        "run_id": "syntax-native-8107-1791109177590826000",
+        "schema_version": "0.3.0",
+        "target": {
+          "language": "erlang",
+          "path": "app.erl",
+          "source_sha256": "98eb573d5f63f346114eb1a193b759aa849165da40d8f50cb7c73cfaafbaaa2a"
+        },
+        "task_id": "CG-B-f35f39299f779a08659ada6b546e1b3c",
+        "tool_path": "/opt/homebrew/Cellar/erlang/28.5/lib/erlang/bin/erl",
+        "workspace_binding": "bound",
+        "workspace_id": "ws-330ae43b8e1cab5b06cf7b9e1adff20a"
+      },
+      "next_actions": [
+        "inspect_native_syntax_observation",
+        "repair_only_current_native_diagnostics",
+        "verify_policy_and_capability_before_closure"
+      ],
+      "observation": "candidate_absent_unverified_policy",
+      "operation": "task_verify",
+      "reason": null,
+      "report_type": "task_verification_preview",
+      "schema_version": "0.14.0",
+      "task_id": "CG-B-f35f39299f779a08659ada6b546e1b3c"
+    },
+    "recurrent": {
+      "authority": "local_unverified",
+      "category_candidates": [
+        {
+          "capability_status": "gap",
+          "category": "lint",
+          "checker_id": "erlang.otp.forms",
+          "language": "erlang",
+          "legacy_status": "stable",
+          "next_action": "读取 native_results.erlang_lint 的逐文件诊断、阻塞和原工具复检指令；单文件 forms 不代替项目完整 lint、预处理、编译和测试",
+          "reason": "erlang_forms_observed_unverified_project_coverage",
+          "status": "native_incomplete"
+        },
+        {
+          "capability_status": "gap",
+          "category": "comments",
+          "checker_id": null,
+          "language": "erlang",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "dependencies",
+          "checker_id": null,
+          "language": "erlang",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "cve",
+          "checker_id": null,
+          "language": "erlang",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "security",
+          "checker_id": null,
+          "language": "erlang",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        },
+        {
+          "capability_status": "gap",
+          "category": "build",
+          "checker_id": null,
+          "language": "erlang",
+          "legacy_status": "stable",
+          "next_action": null,
+          "reason": "native_adapter_not_integrated",
+          "status": "not_integrated"
+        }
+      ],
+      "command_status": "incomplete",
+      "delivery_decision": "incomplete",
+      "discovery": {
+        "blocked_paths": [],
+        "build_roots": [],
+        "checker_configurations": [],
+        "declared_versions": {},
+        "languages": [
+          {
+            "id": "erlang",
+            "manifests": [],
+            "source_files": [
+              "app.erl"
+            ]
+          }
+        ],
+        "lockfiles": [],
+        "manifest_sha256": {},
+        "native_tool_candidates": [],
+        "observation_complete": true,
+        "observed_entries": 2,
+        "report_type": "discovery",
+        "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-h7T30P/project",
+        "schema_version": "0.4.0",
+        "scope_summary": {
+          "configuration_exception_files_observed": 0,
+          "dependency_roots_excluded": 0,
+          "dot_prefix_roots_excluded": 1,
+          "git_safety_status": "not_evaluated",
+          "ordinary_scan_policy": "project_sources_default_v2"
+        },
+        "source_set_candidates": [],
+        "unknown_conditions": [
+          "source_sets_not_fully_classified",
+          "dialects_not_classified"
+        ]
+      },
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "jobs_limit": 4,
+        "jobs_source": "builtin_default",
+        "native_task_count": 1,
+        "source": "cli",
+        "started_native_task_count": 0,
+        "timeout_ms": 30000
+      },
+      "execution_tasks": [
+        {
+          "id": "erlang.lint",
+          "status": "native_observed_unverified"
+        }
+      ],
+      "exit_code": 3,
+      "export": {
+        "reason_code": null,
+        "status": "not_requested"
+      },
+      "native_results": {
+        "erlang_lint": {
+          "authority": "local_unverified",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "files": [
+            {
+              "current": true,
+              "findings": [
+                {
+                  "column": 4,
+                  "line": 2,
+                  "rule_id": "erlang.syntax.error"
+                }
+              ],
+              "native": {
+                "diagnostics": [
+                  {
+                    "column": 4,
+                    "line": 2,
+                    "rule_id": "erlang.syntax.error"
+                  }
+                ],
+                "diagnostics_truncated": false,
+                "preprocessing_unresolved": false,
+                "reason": "erlang_native_syntax_diagnostics",
+                "status": "diagnostics_observed",
+                "tool_sha256": "cd03d938d7547ef608076a58a49f5284931b43f39090087baf35efc1665dd5d6",
+                "version": "OTP 28"
+              },
+              "next_action": "按当前原生语法位置修复并执行 recheck_argv；仍需项目完整 lint、预处理、编译和测试",
+              "path": "app.erl",
+              "recheck_argv": [
+                "codeguard",
+                "lint",
+                "erlang",
+                "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-h7T30P/project/app.erl",
+                "--erl-tool",
+                "/opt/homebrew/Cellar/erlang/28.5/lib/erlang/bin/erl",
+                "--format=json"
+              ],
+              "source_sha256": "22b202c1303137676dc8dbf46be3c26771f4faa453a223f1b607aecd2087c9e0",
+              "task_id": "CG-B-f35f39299f779a08659ada6b546e1b3c",
+              "task_sync_reason": null
+            }
+          ],
+          "local_forms_complete": true,
+          "reason": "erlang_forms_observed_unverified_project_coverage",
+          "report_type": "erlang_forms_scan",
+          "schema_version": "0.2.0",
+          "scope": "single_file_forms_without_preprocessing",
+          "scope_stable": true,
+          "source_file_count": 1,
+          "task_id": null,
+          "task_status": "synced_partial",
+          "tool_selection": {
+            "executable": "/opt/homebrew/Cellar/erlang/28.5/lib/erlang/bin/erl",
+            "source": "explicit"
+          },
+          "unobserved_count": 0
+        },
+        "go_lint": null,
+        "java_cve": null,
+        "java_dependencies": null,
+        "java_javadoc": null,
+        "java_p3c": null,
+        "node_lint": null,
+        "npm_cve": [],
+        "python_cve": [],
+        "python_lint": null,
+        "rust_build": null,
+        "rust_comments": null,
+        "rust_cve": null,
+        "rust_lint": null
+      },
+      "next": null,
+      "obligation_status": "unresolved",
+      "operation": "check",
+      "reason": "full_project_obligations_and_trusted_policy_unavailable",
+      "report_type": "check_feedback",
+      "required_obligations": null,
+      "schema_version": "0.38.0",
+      "selection": "all",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 1,
+        "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+        "observations": [],
+        "reason": "native_preferred",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "not_run",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": {
+        "failures": [],
+        "new_blockers": 0,
+        "status": "synced_partial",
+        "tasks": []
+      },
+      "unresolved_conditions": [
+        "dialects_not_classified",
+        "erlang_project_lint_preprocessing_and_build_coverage_unverified",
+        "required_obligations_unresolved",
+        "source_sets_not_fully_classified",
+        "tool_lock_unverified",
+        "trusted_policy_unavailable"
+      ]
+    },
+    "recurrence_next": {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "actionable",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "repair-source",
+        "affected_paths": [
+          "app.erl"
+        ],
+        "authority": "local_unverified",
+        "build_root": ".",
+        "checker_id": "syntax.native_confirmation",
+        "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+        "constraints": [
+          "先恢复检查完整性",
+          "不得关闭检查器或修改无关源码"
+        ],
+        "disposition": "actionable",
+        "evidence_ref": {
+          "first_report_sha256": "8d2516ae797957083f5a8e247e9154135a502a2fa0a2e88155065ec88bc4ad6c",
+          "first_run_id": "syntax-confirm-7852-1791109170697580000"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": []
+        },
+        "kind": "blocker",
+        "native_column_unit": "unicode_scalar",
+        "native_confirmation_reason": "erlang_native_syntax_diagnostics",
+        "native_confirmation_ref": {
+          "report_ref": ".codeguard/reports/syntax-confirm-8435-1791109178802290000.json",
+          "report_sha256": "4e10220251a3733a6cde14392a50a219e8c44746d2ec33c42dbf7f4b85419c56",
+          "run_id": "syntax-confirm-8435-1791109178802290000"
+        },
+        "native_confirmation_status": "diagnostics_observed",
+        "native_diagnostic_positions": [
+          {
+            "column": 4,
+            "line": 2,
+            "rule_id": "erlang.syntax.error"
+          }
+        ],
+        "reason_code": "native_syntax_confirmation_needed",
+        "recheck_argv": [
+          "codeguard",
+          "task",
+          "verify",
+          "CG-B-f35f39299f779a08659ada6b546e1b3c",
+          ".",
+          "--format",
+          "json",
+          "--erl-tool",
+          "/opt/homebrew/Cellar/erlang/28.5/lib/erlang/bin/erl"
+        ],
+        "schema_version": "0.5.0",
+        "scope": "app.erl",
+        "step": "当前源码已有原生 Erlang 语法诊断；核对报告中有界原生位置并修复，然后使用同一工具复检；不要反复安装工具或关闭检查",
+        "task_id": "CG-B-f35f39299f779a08659ada6b546e1b3c"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.5.0"
+    },
+    "repair_ready": {
+      "delivery_decision": "not_evaluated",
+      "execution": "task_verification",
+      "host_blocking_verified": false,
+      "local_feedback": {
+        "authority": "local_unverified",
+        "checker_id": "syntax.native_confirmation",
+        "delivery_decision": "not_evaluated",
+        "event_persisted": true,
+        "native_column_unit": "unicode_scalar",
+        "native_confirmation_reason": "erlang_native_syntax_diagnostics",
+        "native_confirmation_ref": {
+          "report_ref": ".codeguard/reports/syntax-native-10322-1791109181099183000.json",
+          "report_sha256": "be8ed8f5f0d1277263ec4c062744d71c1f37dd1dee72430fc0b90c5b1e3520d8",
+          "run_id": "syntax-native-10322-1791109181099183000"
+        },
+        "native_confirmation_status": "diagnostics_observed",
+        "native_diagnostic_positions": [
+          {
+            "column": 4,
+            "line": 2,
+            "rule_id": "erlang.syntax.error"
+          }
+        ],
+        "observation": "still_blocked",
+        "reason": null,
+        "report_type": "hook_task_verification_summary",
+        "scan_report_available": true,
+        "schema_version": "0.2.0",
+        "task_id": "CG-B-f35f39299f779a08659ada6b546e1b3c"
+      },
+      "plan": {
+        "action": "verify_task",
+        "host_blocking_claimed": false,
+        "may_claim_delivery": false,
+        "requires_git_snapshot": false,
+        "scope_resolution_reason": null,
+        "soft_result_reuse_candidate": false,
+        "target_paths": [],
+        "task_id": "CG-B-f35f39299f779a08659ada6b546e1b3c"
+      },
+      "reason": null,
+      "report_type": "hook_execution_feedback",
+      "schema_version": "0.8.0",
+      "soft_result_reused": false
+    },
+    "persistence_failure": {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "execution_budget": {
+        "enforcement": "native_execution_only",
+        "source": "builtin_default",
+        "timeout_ms": 1800000
+      },
+      "known_limitations": [
+        "OTP 28 erlc rejects a missing final function period in `f() -> ok`, but this pinned WASM returns zero recoveries; 12/13 narrow native syntax cases agree. Other Erlang versions, systematic precision, public native-first lint route and release remain unqualified"
+      ],
+      "language": "erlang",
+      "native": {
+        "diagnostics": [
+          {
+            "column": 4,
+            "line": 2,
+            "rule_id": "erlang.syntax.error"
+          }
+        ],
+        "diagnostics_truncated": false,
+        "preprocessing_unresolved": false,
+        "reason": "erlang_native_syntax_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "cd03d938d7547ef608076a58a49f5284931b43f39090087baf35efc1665dd5d6",
+        "version": "OTP 28"
+      },
+      "next_action": "核对并修复原生 Erlang 语法诊断，复用 tool_selection.executable 作为 --erl-tool 再检查；还需项目完整 lint、编译和测试",
+      "operation": "lint",
+      "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-npm-erlang-h7T30P/project/blocked/other.erl",
+      "report_type": "erlang_lint_feedback",
+      "schema_version": "0.3.0",
+      "scope": "single_file_forms_without_preprocessing",
+      "source_sha256": "22b202c1303137676dc8dbf46be3c26771f4faa453a223f1b607aecd2087c9e0",
+      "status": "incomplete",
+      "syntax_precheck": null,
+      "task_id": null,
+      "task_status": "incomplete",
+      "task_sync_reason": "reports_directory_unavailable",
+      "tool_selection": {
+        "executable": "/opt/homebrew/Cellar/erlang/28.5/lib/erlang/bin/erl",
+        "source": "explicit"
+      },
+      "workspace_binding": "bound"
+    }
+  }
+]

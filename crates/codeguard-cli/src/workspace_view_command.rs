@@ -156,12 +156,21 @@ pub fn run_show(args: &[String]) -> ExitCode {
         Ok(brief) => brief,
         Err(reason) => return output_error("task_show", parsed.json, "incomplete", 3, reason),
     };
+    // 首次原生确认必须保留简报绑定的工具选择参数，避免外层动作丢失必要输入。
+    let next_actions = if matches!(
+        brief["schema_version"].as_str(),
+        Some("0.7.0" | "0.8.0" | "0.9.0" | "0.10.0" | "0.11.0" | "0.12.0")
+    ) {
+        json!([brief["recheck_argv"]])
+    } else {
+        json!([["codeguard", "task", "verify", id, "."]])
+    };
     let report = json!({
-        "schema_version":"0.1.0","report_type":"task_show_preview",
+        "schema_version":if brief["schema_version"] == "0.12.0" {"0.2.0"}else{"0.1.0"},"report_type":"task_show_preview",
         "operation":"task_show","request_id":request_id(),"command_status":"complete","exit_code":0,
         "task_id":id,"task":brief,"state":"open",
         "evidence_freshness":"unverified","event_chain_status":"unverified",
-        "next_actions":[["codeguard","task","verify",id,"."]],
+        "next_actions":next_actions,
         "authority":"local_unverified","delivery_decision":"not_evaluated"
     });
     if parsed.json {

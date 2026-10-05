@@ -87,6 +87,8 @@
       "name": "TypeScript / JavaScript",
       "extensions": [
         ".ts",
+        ".mts",
+        ".cts",
         ".tsx",
         ".js",
         ".jsx",
@@ -557,7 +559,13 @@
       "extensions": [
         ".cpp",
         ".hpp",
-        ".cc"
+        ".cc",
+        ".C",
+        ".cp",
+        ".CPP",
+        ".c++",
+        ".cxx",
+        ".hxx"
       ],
       "markers": [],
       "status": "stable",
@@ -576,7 +584,7 @@
       "gate": [
         "bash",
         "-c",
-        "find . \\( -name '*.cpp' -o -name '*.hpp' -o -name '*.cc' \\) -type f -print0 | xargs -0 -r clang-tidy --quiet"
+        "find . \\( -name '*.cpp' -o -name '*.hpp' -o -name '*.cc' -o -name '*.C' -o -name '*.cp' -o -name '*.CPP' -o -name '*.c++' -o -name '*.cxx' -o -name '*.hxx' \\) -type f -print0 | xargs -0 -r clang-tidy --quiet"
       ],
       "linter_config_files": [
         ".clang-tidy",
@@ -1455,7 +1463,8 @@
       "id": "r",
       "name": "R",
       "extensions": [
-        ".r"
+        ".r",
+        ".R"
       ],
       "markers": [],
       "status": "stable",

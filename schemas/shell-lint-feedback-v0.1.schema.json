@@ -1,0 +1,623 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "authority",
+    "command_status",
+    "coverage_proven",
+    "delivery_decision",
+    "dialect",
+    "execution_budget",
+    "exit_code",
+    "input_stable",
+    "language",
+    "native",
+    "native_column_unit",
+    "native_identity_scope",
+    "next_actions",
+    "operation",
+    "project_configuration",
+    "repair_briefs",
+    "report_type",
+    "schema_version",
+    "scope",
+    "setup",
+    "source_path",
+    "source_sha256",
+    "syntax_precheck",
+    "task_workflow_status",
+    "tool_selection"
+  ],
+  "properties": {
+    "authority": {
+      "const": "local_unverified"
+    },
+    "command_status": {
+      "enum": [
+        "incomplete",
+        "cancelled"
+      ]
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "dialect": {
+      "type": "string",
+      "pattern": "^[a-z]{1,16}$"
+    },
+    "execution_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enforcement",
+        "source",
+        "timeout_ms"
+      ],
+      "properties": {
+        "enforcement": {
+          "const": "native_execution_only"
+        },
+        "source": {
+          "enum": [
+            "cli",
+            "registered_environment",
+            "builtin_default"
+          ]
+        },
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 86400000
+        }
+      }
+    },
+    "exit_code": {
+      "enum": [
+        3,
+        130
+      ]
+    },
+    "input_stable": {
+      "type": "boolean"
+    },
+    "language": {
+      "const": "shell"
+    },
+    "native": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "configuration_mode",
+        "diagnostics",
+        "environment_codes",
+        "reason",
+        "report_valid",
+        "status",
+        "tool_sha256",
+        "version"
+      ],
+      "properties": {
+        "configuration_mode": {
+          "enum": [
+            "not_applied",
+            "frozen_project_rc",
+            "builtin_without_global_rc"
+          ]
+        },
+        "diagnostics": {
+          "type": "array",
+          "maxItems": 128,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "rule_id",
+              "severity",
+              "line",
+              "column",
+              "end_line",
+              "end_column"
+            ],
+            "properties": {
+              "rule_id": {
+                "type": "string",
+                "pattern": "^SC[0-9]{4}$"
+              },
+              "severity": {
+                "enum": [
+                  "error",
+                  "warning",
+                  "info",
+                  "style"
+                ]
+              },
+              "line": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "column": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "end_line": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "end_column": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          }
+        },
+        "environment_codes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^SC[0-9]{4}$"
+          }
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "report_valid": {
+          "type": "boolean"
+        },
+        "status": {
+          "enum": [
+            "incomplete",
+            "completed",
+            "diagnostics_observed"
+          ]
+        },
+        "tool_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "version": {
+          "enum": [
+            null,
+            "0.11.0"
+          ]
+        }
+      }
+    },
+    "native_column_unit": {
+      "const": "unicode_scalar_one_based_tabs_one"
+    },
+    "native_identity_scope": {
+      "const": "entry_only"
+    },
+    "next_actions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "operation": {
+      "const": "lint"
+    },
+    "project_configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "global_configuration",
+        "reason",
+        "sha256",
+        "source_path",
+        "status"
+      ],
+      "properties": {
+        "global_configuration": {
+          "const": "not_loaded"
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "source_path": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "enum": [
+            "configured",
+            "missing",
+            "invalid",
+            "unknown"
+          ]
+        }
+      }
+    },
+    "repair_briefs": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "allowed_paths",
+          "attempt_history",
+          "closure_conditions",
+          "evidence",
+          "history_status",
+          "recheck_argv",
+          "rule_basis",
+          "status",
+          "steps"
+        ],
+        "properties": {
+          "allowed_paths": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "attempt_history": {
+            "type": "array",
+            "maxItems": 0
+          },
+          "closure_conditions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "evidence": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "diagnostic",
+              "source_path",
+              "source_sha256"
+            ],
+            "properties": {
+              "diagnostic": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "rule_id",
+                  "severity",
+                  "line",
+                  "column",
+                  "end_line",
+                  "end_column"
+                ],
+                "properties": {
+                  "rule_id": {
+                    "type": "string",
+                    "pattern": "^SC[0-9]{4}$"
+                  },
+                  "severity": {
+                    "enum": [
+                      "error",
+                      "warning",
+                      "info",
+                      "style"
+                    ]
+                  },
+                  "line": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "column": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "end_line": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "end_column": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              },
+              "source_path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            }
+          },
+          "history_status": {
+            "const": "not_integrated"
+          },
+          "recheck_argv": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "rule_basis": {
+            "type": "string",
+            "pattern": "^https://www\\.shellcheck\\.net/wiki/SC[0-9]{4}$"
+          },
+          "status": {
+            "enum": [
+              "repair_guidance",
+              "investigation_required"
+            ]
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "status": {
+                  "const": "investigation_required"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "allowed_paths": {
+                  "type": "array",
+                  "maxItems": 0
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "report_type": {
+      "const": "shell_lint_feedback"
+    },
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "scope": {
+      "const": "single_frozen_shell_file"
+    },
+    "setup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "automatic_installation",
+        "native_tool_requirement"
+      ],
+      "properties": {
+        "automatic_installation": {
+          "const": false
+        },
+        "native_tool_requirement": {
+          "enum": [
+            "available",
+            "required"
+          ]
+        }
+      }
+    },
+    "source_path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_sha256": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "syntax_precheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reason",
+        "status"
+      ],
+      "properties": {
+        "reason": {
+          "const": "shell_wasm_unavailable"
+        },
+        "status": {
+          "const": "not_run"
+        }
+      }
+    },
+    "task_workflow_status": {
+      "const": "not_integrated"
+    },
+    "tool_selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "executable",
+        "source"
+      ],
+      "properties": {
+        "executable": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source": {
+          "enum": [
+            "explicit",
+            "path",
+            "not_found"
+          ]
+        }
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://full-stack-plugins.github.io/codeguard/schemas/shell-lint-feedback-v0.1.schema.json",
+  "title": "ShellCheck single-file local feedback 0.1.0",
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "command_status": {
+            "const": "cancelled"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "exit_code": {
+            "const": 130
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "exit_code": {
+            "const": 3
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "native": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "completed",
+                  "diagnostics_observed"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "input_stable": {
+            "const": true
+          },
+          "native": {
+            "properties": {
+              "report_valid": {
+                "const": true
+              },
+              "version": {
+                "const": "0.11.0"
+              },
+              "tool_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "configuration_mode": {
+                "enum": [
+                  "frozen_project_rc",
+                  "builtin_without_global_rc"
+                ]
+              },
+              "environment_codes": {
+                "type": "array",
+                "maxItems": 0
+              }
+            }
+          },
+          "setup": {
+            "properties": {
+              "native_tool_requirement": {
+                "const": "available"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "native": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "native": {
+            "properties": {
+              "diagnostics": {
+                "type": "array",
+                "maxItems": 0
+              },
+              "reason": {
+                "const": "shellcheck_no_diagnostics"
+              }
+            }
+          },
+          "repair_briefs": {
+            "type": "array",
+            "maxItems": 0
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "native": {
+            "properties": {
+              "status": {
+                "const": "diagnostics_observed"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "native": {
+            "properties": {
+              "diagnostics": {
+                "minItems": 1
+              },
+              "reason": {
+                "const": "shellcheck_diagnostics"
+              }
+            }
+          },
+          "repair_briefs": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ]
+}

@@ -168,14 +168,15 @@ fn observe(
     cancelled: &AtomicBool,
 ) {
     report["reason"] = json!("cargo_tool_not_selected");
-    let Some(tool) = tool else {
+    let selected_tool = crate::cargo_tool_selection::resolve_cargo_tool(tool);
+    let Some(tool) = selected_tool.as_deref() else {
         return;
     };
-    let Ok(tool) = tool.canonicalize() else {
+    let Ok(resolved_tool) = tool.canonicalize() else {
         report["reason"] = json!("cargo_tool_unavailable");
         return;
     };
-    let Ok(tool_before) = read_bounded_regular_file(&tool, 128 * 1024 * 1024) else {
+    let Ok(tool_before) = read_bounded_regular_file(&resolved_tool, 128 * 1024 * 1024) else {
         report["reason"] = json!("cargo_tool_unavailable");
         return;
     };
@@ -224,7 +225,13 @@ fn observe(
         return;
     };
     let mut environment = BTreeMap::new();
-    for name in ["PATH", "HOME", "CARGO_HOME", "RUSTUP_HOME"] {
+    for name in [
+        "PATH",
+        "HOME",
+        "CARGO_HOME",
+        "RUSTUP_HOME",
+        "RUSTUP_TOOLCHAIN",
+    ] {
         if let Some(value) = std::env::var_os(name) {
             environment.insert(OsString::from(name), value);
         }
@@ -234,9 +241,12 @@ fn observe(
         scratch.path().as_os_str().to_os_string(),
     );
     environment.insert(OsString::from("CARGO_NET_OFFLINE"), OsString::from("true"));
+    // Cargo 的离线选项不约束 rustup；检查不得自动安装缺失工具链。
+    environment.insert(OsString::from("RUSTUP_AUTO_INSTALL"), OsString::from("0"));
     let result = run_process(
         &ProcessSpec {
-            executable: tool.clone(),
+            // 保留 Cargo 代理入口名；直接运行解析后的 rustup 会改变命令语义。
+            executable: tool.to_path_buf(),
             args: [
                 "rustdoc",
                 "--lib",
@@ -343,8 +353,11 @@ fn observe(
         "request_cancelled"
     } else if !unchanged {
         "inputs_changed_during_scan"
-    } else if !read_bounded_regular_file(&tool, 128 * 1024 * 1024)
-        .is_ok_and(|bytes| bytes == tool_before)
+    } else if !tool
+        .canonicalize()
+        .is_ok_and(|after| after == resolved_tool)
+        || !read_bounded_regular_file(&resolved_tool, 128 * 1024 * 1024)
+            .is_ok_and(|bytes| bytes == tool_before)
     {
         "tool_changed_during_scan"
     } else if outside {

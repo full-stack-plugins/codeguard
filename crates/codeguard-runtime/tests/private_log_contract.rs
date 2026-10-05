@@ -41,6 +41,7 @@ impl Drop for TestDir {
 fn outcome() -> ProcessOutcome {
     ProcessOutcome {
         termination: Termination::TimedOut,
+        spawn_os_error: None,
         stdout: vec![0xff, 0, b'a'],
         stderr: b"native error\n".to_vec(),
         elapsed: Duration::from_millis(25),
@@ -137,4 +138,29 @@ fn refuses_path_components_in_log_name() {
             "{name:?}"
         );
     }
+}
+
+#[test]
+fn spawn_failure_retains_os_error_without_fabricating_native_output() {
+    let dir = TestDir::new();
+    let spec = ProcessSpec {
+        executable: dir.0.join("missing-tool"),
+        args: Vec::new(),
+        cwd: dir.0.clone(),
+        env: BTreeMap::new(),
+        stdin: None,
+        deadline: Instant::now() + Duration::from_secs(2),
+        output_limit_bytes: 1024,
+    };
+    let result = run_process_recorded(&spec, &AtomicBool::new(false), &dir.0, "spawn.log")
+        .expect("启动失败仍需记录私有证据");
+    assert_eq!(result.termination, Termination::SpawnFailure);
+    assert!(result.stdout.is_empty());
+    assert!(result.stderr.is_empty());
+    let bytes = fs::read(dir.0.join("spawn.log")).unwrap();
+    assert_eq!(bytes[7], 7);
+    assert_eq!(
+        i32::from_le_bytes(bytes[8..12].try_into().unwrap()),
+        libc::ENOENT
+    );
 }

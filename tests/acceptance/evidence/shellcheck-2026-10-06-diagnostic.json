@@ -1,0 +1,110 @@
+{
+  "authority": "local_unverified",
+  "command_status": "incomplete",
+  "coverage_proven": false,
+  "delivery_decision": "not_evaluated",
+  "dialect": "bash",
+  "execution_budget": {
+    "enforcement": "native_execution_only",
+    "source": "cli",
+    "timeout_ms": 30000
+  },
+  "exit_code": 3,
+  "input_stable": true,
+  "language": "shell",
+  "native": {
+    "configuration_mode": "builtin_without_global_rc",
+    "diagnostics": [
+      {
+        "column": 6,
+        "end_column": 8,
+        "end_line": 2,
+        "line": 2,
+        "rule_id": "SC2086",
+        "severity": "info"
+      }
+    ],
+    "environment_codes": [],
+    "reason": "shellcheck_diagnostics",
+    "report_valid": true,
+    "status": "diagnostics_observed",
+    "tool_sha256": "68b842bed0fa9af12b3c63d0d99b5bbbfe33cb13f911179913020da2041ce1f5",
+    "version": "0.11.0"
+  },
+  "native_column_unit": "unicode_scalar_one_based_tabs_one",
+  "native_identity_scope": "entry_only",
+  "next_actions": [
+    "准备ShellCheck0.11.0和适用方言；不支持的zsh/fish必须使用专用原生检查能力。",
+    "环境/配置/源依赖未完成时先恢复检查能力；部分诊断保留供调查。",
+    "持久任务、项目全范围、Dockerfile/IaC、安全及发行仍须检查。"
+  ],
+  "operation": "lint",
+  "project_configuration": {
+    "global_configuration": "not_loaded",
+    "reason": null,
+    "sha256": null,
+    "source_path": null,
+    "status": "missing"
+  },
+  "repair_briefs": [
+    {
+      "allowed_paths": [
+        "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-shell-evidence-kc1zfds2/app.sh"
+      ],
+      "attempt_history": [],
+      "closure_conditions": [
+        "原工具在稳定输入和有效原规则下复检，问题确实消失。",
+        "持久任务、批准白名单及完整项目门禁需要独立验收；本简报不能关闭任务。"
+      ],
+      "evidence": {
+        "diagnostic": {
+          "column": 6,
+          "end_column": 8,
+          "end_line": 2,
+          "line": 2,
+          "rule_id": "SC2086",
+          "severity": "info"
+        },
+        "source_path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-shell-evidence-kc1zfds2/app.sh",
+        "source_sha256": "00400e6bf65ec46ff1d85a7494ac3f11a3ca09d56c5e0792941ff5ba67908968"
+      },
+      "history_status": "not_integrated",
+      "recheck_argv": [
+        "codeguard",
+        "lint",
+        "shell",
+        "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-shell-evidence-kc1zfds2/app.sh",
+        "--dialect",
+        "bash",
+        "--format=json",
+        "--shellcheck-tool",
+        "/opt/homebrew/bin/shellcheck"
+      ],
+      "rule_basis": "https://www.shellcheck.net/wiki/SC2086",
+      "status": "repair_guidance",
+      "steps": [
+        "先核对所选方言、原生配置及规则适用性；未完成时先修复环境或依赖，不能据旧位置修改源码。",
+        "按原生范围和官方规则检查引用、展开及可移植性，保持原行为；不要通过关闭规则或删任务冒充修复。",
+        "使用相同工具、方言和配置复检，记录差异；原生零诊断不等于完整项目通过。"
+      ]
+    }
+  ],
+  "report_type": "shell_lint_feedback",
+  "schema_version": "0.1.0",
+  "scope": "single_frozen_shell_file",
+  "setup": {
+    "automatic_installation": false,
+    "native_tool_requirement": "available"
+  },
+  "source_path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-shell-evidence-kc1zfds2/app.sh",
+  "source_sha256": "00400e6bf65ec46ff1d85a7494ac3f11a3ca09d56c5e0792941ff5ba67908968",
+  "syntax_precheck": {
+    "reason": "shell_wasm_unavailable",
+    "status": "not_run"
+  },
+  "task_workflow_status": "not_integrated",
+  "tool_selection": {
+    "executable": "/opt/homebrew/bin/shellcheck",
+    "source": "explicit"
+  }
+}

@@ -1,9 +1,128 @@
 #![cfg(all(feature = "wasm-precheck", unix))]
 
 use std::fs;
-use std::io::Write;
 use std::path::Path;
-use std::process::{Command, Stdio};
+use std::process::Command;
+
+#[test]
+fn controlled_javascript_replay_rejects_unexpected_native_output_and_preserves_inventory() {
+    use codeguard_cli::grammar_native_differential::replay_native_corpus;
+    use std::{
+        collections::BTreeMap,
+        os::unix::fs::PermissionsExt,
+        path::PathBuf,
+        sync::atomic::AtomicBool,
+        time::{Duration, Instant},
+    };
+    let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
+        "cg-javascript-native-control-{}",
+        std::process::id()
+    ));
+    fs::create_dir(&root).unwrap();
+    let tool = root.join("node");
+    let script = "#!/bin/sh\nif [ \"$1\" = --version ]; then printf 'v24.18.0\\n'; exit 0; fi\n[ \"$*\" = '--check --input-type=module' ] || exit 2\n[ -z \"${NODE_OPTIONS+x}\" ] || exit 2\n[ \"$PWD\" = / ] || exit 2\ninput=$(/bin/cat)\ncase \"$input\" in 'const x = 1;'*) exit 0;; esac\nprintf '[stdin]:1\\n%s\\n^\\n\\nSyntaxError: Unexpected token\\n    at checkSyntax (node:internal/main/check_syntax:72:5)\\n\\nNode.js v24.18.0\\n' \"$input\" >&2\nexit 1\n";
+    fs::write(&tool, script).unwrap();
+    fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
+    let mut corpus: serde_json::Value = serde_json::from_slice(&current_corpus_bytes()).unwrap();
+    corpus["cases"].as_array_mut().unwrap().retain(|row| {
+        row["language"] != "javascript"
+            || row["id"] == "javascript-plain"
+            || row["id"] == "javascript-missing_init"
+    });
+    let bytes = serde_json::to_vec(&corpus).unwrap();
+    let tools = BTreeMap::from([("javascript".into(), tool.clone())]);
+    let replay = |deadline, cancelled| {
+        replay_native_corpus(
+            &PathBuf::from(env!("CARGO_BIN_EXE_codeguard")),
+            &bytes,
+            &tools,
+            deadline,
+            &AtomicBool::new(cancelled),
+        )
+        .expect("explicit Node syntax observer must be available")
+    };
+    let report = replay(Instant::now() + Duration::from_secs(60), false);
+    assert_eq!(report["schema_version"], "0.4.0");
+    assert_eq!(report["language_count"], 32);
+    assert_eq!(report["sample_count"], 2);
+    assert_eq!(report["grammar_qualified_count"], 0);
+    for row in report["cases"].as_array().unwrap() {
+        assert_eq!(row["native"]["input_type"], "module");
+        assert_eq!(row["native_identity_current"], true);
+        assert_eq!(row["fixture_native_disagreement"], false, "{row}");
+        assert_eq!(row["comparison"], row["combined_candidate_comparison"]);
+    }
+    fs::write(&tool,"#!/bin/sh\nif [ \"$1\" = --version ]; then printf 'v24.18.0\\n'; exit 0; fi\n/bin/cat >/dev/null\nprintf unexpected\nexit 0\n").unwrap();
+    let report = replay(Instant::now() + Duration::from_secs(60), false);
+    assert!(
+        report["cases"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .all(|row| row["native_classification"] == "unknown" && row["comparison"] == "unknown")
+    );
+    for (deadline, cancelled) in [
+        (Instant::now(), false),
+        (Instant::now() + Duration::from_secs(60), true),
+    ] {
+        let report = replay(deadline, cancelled);
+        assert_eq!(report["sample_count"], 2);
+        assert!(
+            report["cases"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .all(|row| row["native_attempted"] == false && row["comparison"] == "unknown")
+        );
+    }
+    // 请求别名变化必须在第二次调用前拒绝，批次末撤回不能代替停止执行。
+    let alias = tool.with_extension("alias");
+    let other = tool.with_extension("other");
+    fs::write(&other, "#!/bin/sh\nprintf x >> \"$0.called\"\nexit 0\n").unwrap();
+    fs::set_permissions(&other, fs::Permissions::from_mode(0o700)).unwrap();
+    fs::write(&tool,"#!/bin/sh\nif [ \"$1\" = --version ]; then /bin/ln -sf \"$0.other\" \"$0.alias\"; printf 'v24.18.0\\n'; exit 0; fi\nprintf x >> \"$0.called\"\n/bin/cat >/dev/null\nexit 0\n").unwrap();
+    std::os::unix::fs::symlink(&tool, &alias).unwrap();
+    let redirected = replay_native_corpus(
+        &PathBuf::from(env!("CARGO_BIN_EXE_codeguard")),
+        &bytes,
+        &BTreeMap::from([("javascript".into(), alias)]),
+        Instant::now() + Duration::from_secs(60),
+        &AtomicBool::new(false),
+    )
+    .unwrap();
+    assert!(
+        !tool.with_extension("called").exists(),
+        "original canonical tool executed after request alias changed"
+    );
+    assert!(!root.join("node.other.called").exists());
+    assert!(
+        redirected["cases"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .all(|row| row["comparison"] == "unknown")
+    );
+    fs::remove_dir_all(root).unwrap();
+}
+
+fn current_corpus_bytes() -> Vec<u8> {
+    use codeguard_cli::grammar_evaluation::{validate_corpus, validate_corpus_against_manifest};
+    use sha2::{Digest, Sha256};
+    let original = include_bytes!("../../../tests/fixtures/grammar_regression_v0_2.json");
+    validate_corpus_against_manifest(
+        original,
+        include_bytes!("../../../tests/fixtures/grammar_manifests/manifest_2026_10_04.json"),
+    )
+    .unwrap();
+    let mut corpus: serde_json::Value = serde_json::from_slice(original).unwrap();
+    corpus["manifest_sha256"] = serde_json::json!(format!(
+        "{:x}",
+        Sha256::digest(include_bytes!("../../../grammars/manifest.json"))
+    ));
+    let bytes = serde_json::to_vec(&corpus).unwrap();
+    validate_corpus(&bytes).unwrap();
+    bytes
+}
 
 fn corpus() -> [(&'static str, &'static str, bool); 13] {
     [
@@ -76,49 +195,74 @@ fn javascript_worker_preserves_native_labeled_syntax_corpus() {
 #[test]
 #[ignore = "requires explicit existing Node 24.18.0 via CODEGUARD_NODE_BIN"]
 fn pinned_javascript_worker_matches_native_node_check_on_syntax_corpus() {
-    let node = std::env::var("CODEGUARD_NODE_BIN").expect("provide an existing Node executable");
-    let version = Command::new(&node).arg("--version").output().unwrap();
-    assert!(version.status.success());
-    assert_eq!(String::from_utf8_lossy(&version.stdout).trim(), "v24.18.0");
-    let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
-        "codeguard-javascript-differential-{}",
-        std::process::id()
-    ));
-    fs::create_dir_all(&root).unwrap();
-    let mut compared = 0;
-    for (name, source, expected_valid) in corpus() {
-        let mut native = Command::new(&node)
-            .args(["--check", "--input-type=module"])
-            .stdin(Stdio::piped())
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .spawn()
-            .unwrap();
-        native
-            .stdin
-            .take()
-            .unwrap()
-            .write_all(source.as_bytes())
-            .unwrap();
-        let native = native.wait_with_output().unwrap();
-        assert!(
-            matches!(native.status.code(), Some(0 | 1)),
-            "{name}: {native:?}"
-        );
-        assert_eq!(
-            native.status.success(),
-            expected_valid,
-            "{name}: Node disagrees with the pinned corpus label: {}",
-            String::from_utf8_lossy(&native.stderr)
-        );
-        assert_eq!(
-            candidate_is_valid(&root, name, source),
-            native.status.success(),
-            "{name}: Node={} worker classification differs",
-            String::from_utf8_lossy(&native.stderr)
-        );
-        compared += 1;
+    use codeguard_cli::grammar_native_differential::replay_native_corpus;
+    use std::{
+        collections::BTreeMap,
+        path::PathBuf,
+        sync::atomic::AtomicBool,
+        time::{Duration, Instant},
+    };
+    let node = PathBuf::from(
+        std::env::var("CODEGUARD_NODE_BIN").expect("provide an existing Node executable"),
+    );
+    let mut corpus: serde_json::Value = serde_json::from_slice(&current_corpus_bytes()).unwrap();
+    let extra: serde_json::Value = serde_json::from_slice(include_bytes!(
+        "../../../tests/fixtures/javascript_module_syntax_regression.json"
+    ))
+    .unwrap();
+    corpus["cases"]
+        .as_array_mut()
+        .unwrap()
+        .extend(extra["cases"].as_array().unwrap().iter().cloned());
+    let bytes = serde_json::to_vec(&corpus).unwrap();
+    let report = replay_native_corpus(
+        &PathBuf::from(env!("CARGO_BIN_EXE_codeguard")),
+        &bytes,
+        &BTreeMap::from([("javascript".into(), node)]),
+        Instant::now() + Duration::from_secs(300),
+        &AtomicBool::new(false),
+    )
+    .unwrap();
+    assert_eq!(report["schema_version"], "0.4.0");
+    assert_eq!(report["sample_count"], 18);
+    assert_eq!(report["program_stable"], true);
+    assert_eq!(report["grammar_qualified_count"], 0);
+    assert_eq!(report["delivery_decision"], "not_evaluated");
+    for row in report["cases"].as_array().unwrap() {
+        assert_eq!(row["native_identity_current"], true, "{row}");
+        assert_eq!(row["native"]["input_type"], "module");
+        assert_eq!(row["fixture_native_disagreement"], false, "{row}");
+        assert_ne!(row["comparison"], "unknown", "{row}");
+        assert_eq!(row["comparison"], row["combined_candidate_comparison"]);
     }
-    fs::remove_dir_all(root).unwrap();
-    assert_eq!(compared, 13);
+    for (name, source, expected) in self::corpus() {
+        let row = report["cases"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row["id"] == format!("javascript-{name}"))
+            .unwrap();
+        assert_eq!(
+            row["source_sha256"],
+            format!("{:x}", sha2::Sha256::digest(source.as_bytes()))
+        );
+        assert_eq!(
+            row["native_classification"],
+            if expected { "valid" } else { "invalid" }
+        );
+    }
+    use sha2::Digest;
+    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+    fs::write(
+        root.join("tests/acceptance/evidence/javascript-native-grammar-input-cancellation-2026-10-05.json"),
+        &bytes,
+    )
+    .unwrap();
+    fs::write(
+        root.join(
+            "tests/acceptance/evidence/javascript-native-grammar-differential-cancellation-2026-10-05.json",
+        ),
+        serde_json::to_vec(&report).unwrap(),
+    )
+    .unwrap();
 }

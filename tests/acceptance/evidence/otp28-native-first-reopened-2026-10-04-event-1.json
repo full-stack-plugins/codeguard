@@ -1,0 +1,20 @@
+{
+  "event": {
+    "event_id": "event-09ae5b605b5285a8dcd25e189c28b0e6581f150e2967c5b080b0c4ca138bddfe",
+    "identity": {
+      "checker_id": "syntax.native_confirmation",
+      "scope": "app.erl",
+      "task_id": "CG-B-adbe0d18568c875773065066871ea3ae",
+      "workspace_id": "ws-61c7cac666cd3addf981def0b69429cb"
+    },
+    "kind": {
+      "event": "reopened"
+    },
+    "parent_event_id": "event-fb3b032308cacd1f0ac441e5b3cf0634b54d4ec2719dfed22cdee6dbca9e8c96"
+  },
+  "evidence_sha256": "a5bd8606cd540d6ce02cfea1145cea0d68074f68763e36c8936a15dfe88d8214",
+  "original_report_sha256": "c3d08854a57f31baec9ce2e5c64e4902d6d0a7b3b20c44a73ae4641bbe7b43c5",
+  "policy_sha256": "78518f40ca4579bb414a8cac0ac216bebb0a2df14227142402b6aa4ef43e4d0f",
+  "report_type": "task_lifecycle_record",
+  "schema_version": "0.1.0"
+}

@@ -1,0 +1,419 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:config-inspection:0.3.0",
+  "title": "CodeGuard read-only local configuration inspection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "request_id",
+    "inspection_status",
+    "command_status",
+    "exit_code",
+    "authority",
+    "gate_effect",
+    "quality_decision",
+    "legacy_config",
+    "tool_lock",
+    "quality_policy",
+    "whitelist",
+    "effective_policy",
+    "diagnostics",
+    "warnings",
+    "next_actions",
+    "project_configuration"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.3.0"
+    },
+    "report_type": {
+      "const": "config_inspection"
+    },
+    "operation": {
+      "enum": [
+        "validate",
+        "explain"
+      ]
+    },
+    "request_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "inspection_status": {
+      "const": "incomplete"
+    },
+    "command_status": {
+      "const": "incomplete"
+    },
+    "exit_code": {
+      "const": 3
+    },
+    "authority": {
+      "const": "unverified"
+    },
+    "gate_effect": {
+      "const": "none"
+    },
+    "quality_decision": {
+      "const": "not_evaluated"
+    },
+    "legacy_config": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "extension_count",
+        "exclusion_count",
+        "custom_command_count",
+        "gate_scope"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "missing",
+            "invalid",
+            "structurally_valid_untrusted"
+          ]
+        },
+        "extension_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "exclusion_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "custom_command_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "gate_scope": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "delta",
+            "repo",
+            null
+          ]
+        }
+      }
+    },
+    "tool_lock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "tool_count"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "missing",
+            "invalid",
+            "structurally_valid_untrusted"
+          ]
+        },
+        "tool_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "quality_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "required_check_count",
+        "source_exclusion_count",
+        "candidate_sha256",
+        "tool_lock_reference"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "unbound",
+            "missing",
+            "invalid",
+            "candidate_unverified"
+          ]
+        },
+        "required_check_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "source_exclusion_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "candidate_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "tool_lock_reference": {
+          "enum": [
+            "not_checked",
+            "unresolved",
+            "mismatch",
+            "matched_untrusted"
+          ]
+        }
+      }
+    },
+    "whitelist": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "candidate_effect"
+      ],
+      "properties": {
+        "status": {
+          "const": "authority_unverified"
+        },
+        "candidate_effect": {
+          "const": "none"
+        }
+      }
+    },
+    "effective_policy": {
+      "type": "null"
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "next_actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "project_configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "basis",
+        "observation_status",
+        "native_execution",
+        "effective_rules",
+        "suppressions",
+        "truncated",
+        "build_root_count",
+        "manifest_count",
+        "checker_config_count",
+        "checker_count",
+        "blocked_path_count",
+        "unknown_condition_count",
+        "build_roots",
+        "manifest_sha256",
+        "checker_configurations",
+        "blocked_paths",
+        "unknown_conditions",
+        "checker_config_sha256"
+      ],
+      "properties": {
+        "basis": {
+          "const": "static_project_discovery"
+        },
+        "observation_status": {
+          "enum": [
+            "complete",
+            "incomplete"
+          ]
+        },
+        "native_execution": {
+          "const": "not_run"
+        },
+        "effective_rules": {
+          "const": "unresolved"
+        },
+        "suppressions": {
+          "const": "unresolved"
+        },
+        "truncated": {
+          "type": "boolean"
+        },
+        "build_root_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "manifest_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "checker_config_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "checker_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "blocked_path_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unknown_condition_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "build_roots": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "required": [
+              "path",
+              "manifests"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "manifests": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          "maxItems": 64
+        },
+        "manifest_sha256": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "maxProperties": 256
+        },
+        "checker_configurations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "build_root",
+              "checker_id",
+              "category",
+              "configuration",
+              "configuration_ref",
+              "reason",
+              "next_action"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "build_root": {
+                "type": "string",
+                "minLength": 1
+              },
+              "checker_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "category": {
+                "enum": [
+                  "lint",
+                  "comments",
+                  "dependencies",
+                  "cve",
+                  "security",
+                  "build"
+                ]
+              },
+              "configuration": {
+                "enum": [
+                  "configured",
+                  "missing",
+                  "invalid",
+                  "unknown"
+                ]
+              },
+              "configuration_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "next_action": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "maxItems": 256
+        },
+        "blocked_paths": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "maxItems": 32
+        },
+        "unknown_conditions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "maxItems": 32
+        },
+        "checker_config_sha256": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "maxProperties": 256
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "truncated": {
+                "const": true
+              }
+            },
+            "required": [
+              "truncated"
+            ]
+          },
+          "then": {
+            "properties": {
+              "observation_status": {
+                "const": "incomplete"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -2,7 +2,7 @@
 
 > **文档说明：**逐指令解释价值、输入输出、副作用、失败处理和目标闭环；保留 C01–C36 追踪。
 >
-> **文档版本：**1.2.0 · **最后更新：**2026-09-29 · **状态：**当前切片与目标契约分别标注。
+> **文档版本：**1.2.0 · **最后更新：**2026-10-04 · **状态：**当前切片与目标契约分别标注。
 
 [English](Codeguard-Command-Reference.md) · [文档导航](README.zh_CN.md) · [架构](Codeguard-Architecture.zh_CN.md) · [技术方案](Codeguard-Technical-Design.zh_CN.md)
 
@@ -15,16 +15,23 @@
 | doctor | 当前 `doctor [path] --ruff-tool ...`，不是目标 `doctor all .` 的完整多工具形式；已可保存/同步局部准备报告 |
 | lint | python/java/typescript/go 与源码可选构建的 Zig 有局部入口；没有公开 lint rust，Clippy 通过 check all |
 | comments/build | 当前公开 rust；Java Javadoc 走 `lint java FILE --checker javadoc`，不是 comments java |
-| cve/check | rust/python/typescript CVE 与 check all/java；完整策略和交付仍未评估 |
+| cve/check | rust/python/typescript CVE 与 check all/注册表规范语言ID；完整策略和交付仍未评估 |
 | 工作台 | sync/status/next/show/lease/attempt/部分 verify；不正式关闭、重开或自批 |
 | gate | 仅 pre-commit 路径安全预览；不是完整内容门禁 |
 | fix/pre-push/ci/mcp/compat/dependencies/security | 目标通用入口未实现，不能复制目标例子直接使用 |
 
-[已验收实现切片](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md)跟踪当前局部能力；[tasks](../openspec/changes/introduce-rust-codeguard-cli/tasks.md)独占完成状态。WASM 的完整统一入口仍为 S14 待办。可选 `codeguard-cli/wasm-precheck` 构建处理 `lint typescript <显式单文件>` 时，若观察到本地 ESLint 10 入口与唯一 flat config，会优先用 `PATH` 中可执行 Node 调用既有有界原生探针；缺 Node 则返回准备缺口。仅未观察到本地 ESLint 包时才输出 [TypeScript 0.3.0 候选反馈](../schemas/eslint-local-feedback-v0.3.schema.json)或 TSX 0.4.0。本地入口、包身份或配置不可信时保留具体环境阻塞，不启动 WASM。`lint java <显式单文件>` 仍输出 [Java 0.1.0 候选反馈](../schemas/java-syntax-precheck-feedback-v0.1.schema.json)。这些局部路径均不批准交付并保持退出 3；部分显式参数、Javadoc/Checkstyle 和符号链接沿用原路径，默认及已发布二进制也不含这项自动调度。见[原生优先局部验收](../tests/acceptance/native-first-eslint-candidate.md)与技术方案 5.3–5.4；后文未标当前的语法、退出0/1与闭环承诺均为目标契约。
+[已验收实现切片](../openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md)跟踪当前局部能力；[tasks](../openspec/changes/introduce-rust-codeguard-cli/tasks.md)独占完成状态。WASM 的完整统一入口仍为 S14 待办。可选 `codeguard-cli/wasm-precheck` 构建处理 `lint typescript <显式单文件>` 时，若观察到本地 ESLint 10 入口与唯一 flat config，会优先用 `PATH` 中可执行 Node 调用既有有界原生探针；缺 Node 则返回准备缺口。仅未观察到本地 ESLint 包时才输出 [TypeScript 0.3.0 候选反馈](../schemas/eslint-local-feedback-v0.3.schema.json)或 TSX 0.4.0。本地入口、包身份或配置不可信时保留具体环境阻塞，不启动 WASM。`lint java <显式单文件>` 仍输出 [Java 0.1.0 候选反馈](../schemas/java-syntax-precheck-feedback-v0.1.schema.json)。这些局部路径均不批准交付并保持退出 3；部分显式参数、Javadoc/Checkstyle 和符号链接沿用原路径，默认构建是否包含此项取决于 WASM 特性，发布包能力须以对应版本验收为准。见[原生优先局部验收](../tests/acceptance/native-first-eslint-candidate.md)与技术方案 5.3–5.4；后文未标当前的语法、退出0/1与闭环承诺均为目标契约。
 
-同一源码构建现在也会在 `check all` 的原生节点之后输出有界 `syntax_candidates`。[反馈 0.34.0](../schemas/check-feedback.schema.json)让 32 份固定 grammar 均能经统一入口分批被选用，同时保留原生阻塞、有界已知 grammar 限制（终端输出也限制条数）、未执行范围和未完成结论；Ruff 已完整覆盖的同摘要 Python 文件计入 `native_preferred_count`，不重复运行 WASM；`.tsx`、JavaScript、`.cfs` 与明确的 CFQuery 标签体分别路由。这仍是候选观察，不等于逐语言验收的原生兜底或自动宿主反馈，见[32 份验收](../tests/acceptance/check-all-32-grammar-candidates.md)。
+同一源码构建现在也会在 `check all` 的原生节点之后输出有界 `syntax_candidates`。[反馈 0.38.0](../schemas/check-feedback-v0.38.schema.json)让 32 份固定 grammar 均能经统一入口分批被选用，同时保留原生阻塞、有界已知 grammar 限制（终端输出也限制条数）、未执行范围和未完成结论；Ruff 已完整覆盖的同摘要 Python 文件计入 `native_preferred_count`，不重复运行 WASM；`.tsx`、JavaScript、`.cfs` 与明确的 CFQuery 标签体分别路由。这仍是候选观察，不等于逐语言验收的原生兜底或自动宿主反馈，见[32 份验收](../tests/acceptance/check-all-32-grammar-candidates.md)。
 
 对已初始化且使用规范绝对路径的 `--workspace`，TypeScript/TSX 候选回退改用[反馈 0.5.0](../schemas/eslint-local-feedback-v0.5.schema.json)：按源码范围保存同一张 ESLint 原生确认阻塞任务，仅同步成功时返回真实 `setup.task_id`。重复扫描和后续 WASM 无恢复节点不关闭任务。版本化本地报告已通过报告摘要关联有界疑似位置；能力匹配原生复检仍未接通，见[局部验收](../tests/acceptance/typescript-syntax-confirmation-task.md)。
+
+源码构建已把 ESLint 接入 `check all` 的 `node.lint` 任务图节点，与其它原生检查共用并发与截止时间。按发现的 JS/TS/TSX 文件选择最近的模块清单、本地 ESLint 10、唯一 flat config 和 Node；搜索不越过受检根。检查阶段收集报告，汇总阶段串行同步工作台，重复发现复用同一任务。每个完整且字节匹配的原生文件可免去重复 WASM；被忽略、配置错误或工具失败的文件仍保留降级与原生原因。协议为 `check_feedback` 0.36.0、`check_aborted` 0.13.0，原协议归档；`native_results.node_lint` 提供逐文件反馈、未执行文件、同步结果及下一步。见[验收范围](../tests/acceptance/check-all-eslint.md)。这不提升 grammar 资质或代替真实宿主验收。
+
+
+仅当前源码支持的 Erlang 入口：`codeguard lint erlang FILE [--erl-tool ABS_PATH] [--timeout DURATION] [--format human|json]`。支持普通 `.erl`/`.hrl` 文件；OTP 28 原生扫描/解析优先于可选 WASM；显式工具优先，否则从 PATH 绝对目录选择首个普通可执行 `erl`。所选工具的版本或执行失败不改变选择。原生故障及宏/预处理缺口保持未完成；整体退出 3，取消 130。报告使用[erlang_lint_feedback 0.2.0](../schemas/erlang-lint-feedback-v0.2.schema.json)，[验收](../tests/acceptance/erlang-native-first.md)明确区分当前源码与未包含本轮命令的公开 0.1.4 包。
+
+当前源码：`codeguard config validate|explain [path] [--policy-candidate FILE] --format json` 返回 `config_inspection` 0.3，按构建根静态观察原生配置，保留 `configuration_ref`、`reason`、`next_action` 及来源摘要。Maven P3C 须明确制品/规则集/错误处理声明，动态 ESLint 保持 unknown；终端最多展示 12 行检查器的来源及动作。两命令只读、退出 3，`effective_rules/suppressions=unresolved`、`native_execution=not_run`、`effective_policy=null`、`quality_decision=not_evaluated`。见[实际报告与边界](../tests/acceptance/config-native-observation.md)，公开 npm 0.1.4 尚不包含此扩展。
 
 ## 1. 命令体系与协作路线
 
@@ -423,7 +430,7 @@ gate 与 check 使用同一个义务/适配器/报告内核，差异是权威内
 
 已提供独立的 Python 执行切片：`codeguard lint python . --file src/changed.py --format json`。`--file` 可重复，但遵守同一 8 文件/512 字节单路径/2 KiB 总路径预算；只扫描被发现且精确选中的 Python 文件，未发现目标保留未完成原因。默认 CLI 对话报告为 `python_lint_feedback` 0.13，返回 `scan_scope=selected_files` 和 `requested_paths`。源码可选构建在 Ruff 不可用或未声明时可返回 0.14 的有界 Python WASM 疑似位置；已初始化工作区的单文件范围同步成功后返回 0.15 的真实稳定原生确认任务 ID，失败则显示持久化原因且任务 ID 为空。原生反馈和 `delivery_decision=not_evaluated` 保留；局部反馈不作为完整工作台扫描导入。原 0.12 报告 schema 保留供历史结果识别；`check all` 的嵌套 Python 结果未因此升级。目前 `hook plan` 尚未自动调用它；其它语言、宿主入口和批量范围执行仍待接线。
 
-现有局部执行入口 `codeguard hook execute PATH --timeout DURATION --format=json [--ruff-tool ABS_PATH] [--git-tool ABS_PATH]` 从 stdin 接收同一 `hook_trigger_request` 1.0.0。超时必须显式提供且不超过 120s。启动事件只读发现；Stop 只读最多 64 个 finding 和 64 份报告，报告字节总预算为 8 MiB，返回不调用检查器的 `hook_next_guidance`。记录超预算返回 `not_run/guidance_scope_exceeded`，需要显式执行 `codeguard next PATH --format=json`；无任务时要求新鲜完整检查，不能视作通过。`repair_ready` 先将单任务历史限制在 128 项和 1 MiB，再按稳定任务 ID 复用现有 `task verify`，通过有界子进程按原检查器复检；任务缺失、历史超限或子进程失败保留未完成。对话仅返回任务/检查器身份、观察结果、事件是否保存及有界原因，原生完整报告仍在既有本地复检路径中。`task verify` 的显式工具参数可传给 `hook execute`，其它事件收到这些参数会拒绝。确认成功且目标全为 Python 的编辑事件执行局部 Ruff。显式给出 Git 二进制后，`pre_commit` 读取本轮真实暂存 index（含替代 `GIT_INDEX_FILE`），Git 观察本身的截止时间取传入预算与 15s 较小值；`hook_git_index_summary` 给出 index 身份、违规总数、最多 32 个且每个至多 512 字节的路径、截断状态与对象状态，同时 `source_check=not_run`，不证明完整质量覆盖。Git 缺失或 index 观察失败仍为 `not_run`。失败/未知写入、混合语言、推送和 CI 仍保持 `not_run`。外层 `hook_execution_feedback` 升为 0.5，历史 0.1–0.4 schema 保留；`prompt_submitted` 仅返回固定的 `read_only_intent_guidance`，不运行源码检查、不签发交付结论；即使宿主声称可阻断，也固定 `host_blocking_verified=false`、`delivery_decision=not_evaluated`。该命令还没有被插件 Hook 自动调用，不能代替严格门禁。
+现有局部执行入口 `codeguard hook execute PATH --timeout DURATION --format=json [--ruff-tool ABS_PATH] [--git-tool ABS_PATH]` 从 stdin 接收同一 `hook_trigger_request` 1.0.0。超时必须显式提供且不超过 120s。启动事件只读发现；Stop 只读最多 64 个 finding 和 64 份报告，报告字节总预算为 8 MiB，返回不调用检查器的 `hook_next_guidance`。记录超预算返回 `not_run/guidance_scope_exceeded`，需要显式执行 `codeguard next PATH --format=json`；无任务时要求新鲜完整检查，不能视作通过。`repair_ready` 先将单任务历史限制在 128 项和 1 MiB，再按稳定任务 ID 复用现有 `task verify`，通过有界子进程按原检查器复检；任务缺失、历史超限或子进程失败保留未完成。对话仅返回任务/检查器身份、观察结果、事件是否保存及有界原因，原生完整报告仍在既有本地复检路径中。`task verify` 的显式工具参数可传给 `hook execute`，其它事件收到这些参数会拒绝，但成功编辑事件也允许 `--node-tool` 指定 Node。确认成功的编辑事件先执行所选 Python/Ruff、JS/TS/ESLint，再补充可选 WASM 候选观察。显式给出 Git 二进制后，`pre_commit` 读取本轮真实暂存 index（含替代 `GIT_INDEX_FILE`），Git 观察本身的截止时间取传入预算与 15s 较小值；`hook_git_index_summary` 给出 index 身份、违规总数、最多 32 个且每个至多 512 字节的路径、截断状态与对象状态，同时 `source_check=not_run`，不证明完整质量覆盖。Git 缺失或 index 观察失败仍为 `not_run`。失败/未知写入、推送和 CI 仍保持 `not_run`。外层 `hook_execution_feedback` 升为 0.6，历史 0.1–0.5 schema 保留；`prompt_submitted` 仅返回固定的 `read_only_intent_guidance`，不运行源码检查、不签发交付结论；即使宿主声称可阻断，也固定 `host_blocking_verified=false`、`delivery_decision=not_evaluated`。该命令还没有被插件 Hook 自动调用，不能代替严格门禁。
 
 Claude Code 候选软适配入口为 `codeguard hook claude <session-start|user-prompt-submit|post-tool-use|post-tool-use-failure|stop> PATH --timeout DURATION --format=json [--ruff-tool ABS_PATH]`。它从 stdin 读取至多 1 MiB 宿主 JSON，并校验事件名和工作目录。SessionStart 只读发现；UserPromptSubmit 只返回固定、非阻断的检查时机建议，不解析提示词或运行检查器；成功的 Write/Edit/MultiEdit 仅接受项目内普通文件，在同一 Rust 进程复用编辑执行器；PostToolUseFailure 走不检查源码的路由，绝不回显工具错误。Stop 有界读取本地事实，不运行检查器或读取可编辑任务正文；首次 Stop 有稳定任务时用 `hookSpecificOutput.additionalContext` 继续一次，已在 Stop 后继续或无任务时仅发 `systemMessage`，避免反复唤醒。局部编辑反馈最多 1200 字符，宿主退出 0 不表示检查通过。重复键、超预算、路径缺失/逃逸及事件不符均明确提示未运行。独立插件尚未调用这些候选入口，见[局部验收](../tests/acceptance/claude-post-tool-hook-candidate.md)。
 
@@ -600,3 +607,226 @@ codeguard next . --format json
 12. compat返回旧数字成功：新CI不能据此签发allow。
 
 help、参数schema、命令矩阵、CLI/MCP映射与测试样本应由同一注册定义生成并检查漂移；各命令是否具备真实工具验收另行记录。本文完整不代表36项入口已实现，也不替代后续全部语言和平台验收。
+
+源码新增编辑事件原生优先快检：`hook execute` / `hook claude post-tool-use` 只检查事件明确指定的普通文件，Python 用 Ruff、JS/TS 用模块本地 ESLint 10；同字节完整原生结果不重复解析。未覆盖文件可调用固定 WASM 候选，混合语言仍保留局部结果、原生未接线范围和失败原因。疑似恢复节点要求安装或修复原生工具并确认；完整零恢复候选只建议安装，不代表完整通过。共享事件截止时间，最多 8 文件、2 个 WASM worker；未构建 WASM 明确报告缺口。外层反馈 0.7.0，局部 `hook_fast_feedback` 0.2.0。候选任务已接入现有工作台；默认插件 Hook、能力匹配自动关闭和真实宿主验收未完成。见[编辑快检验收](../tests/acceptance/hook-fast-native-wasm.md)。
+
+源码编辑快检现将有恢复节点的固定 WASM 候选同步到既有 `.codeguard/` 工作台：按工作区/文件/语言稳定归并，Python 与 JS/TS 复用原有确认或准备身份。报告保存固定 grammar、源码 SHA-256、已知限制和原字节疑似位置；导入拒绝身份或坐标失配、重复 JSON 键。只有实际同步成功才给出任务 ID；完整零恢复不创建新的必需任务；无定位但恢复扫描未完成时创建检查恢复任务。两者都不能关闭旧任务。对话提供 `task show` / `task verify`，缺原生确认 adapter 明确反馈能力缺口。外层 Hook 协议为 0.7.0，局部为 0.2.0；通用 `next` 简报用 0.3.0，已有检查器仍返回 0.1.0。默认插件 Hook、能力匹配关闭和真实宿主验收仍未完成。
+
+
+### Zig 确认任务的原生复检
+
+源码构建现可执行 `codeguard task verify TASK_ID . --zig-tool /absolute/path/to/zig --format=json`，复检已持久化的 Zig WASM 确认任务。`hook execute` 的 `repair_ready` 事件接受同一显式工具参数，复用现有租约和已结束的尝试关联。`lint zig` 原生路径不依赖可选 WASM 特性；未构建该特性时，回退明确报告缺失。
+
+固定 Zig 0.16.0 探针在共同截止时间内执行 `version` 与 `ast-check --color off`，以 stdin 检查本轮原始源码字节。当前原生诊断使简报指向源码修复；工具缺失、版本不支持和执行失败仍指向环境恢复或具体决策。新鲜的 `next` 简报在复检 argv 中携带未改变的工具路径；源码或工具字节变化使旧诊断指引失效。报告与尝试继续保存在既有工作台，不另建任务系统。
+
+原生观察协议为 `syntax_task_recheck` 0.1.0，外层 `task_verification_preview` 为 0.12.0；通用修复简报为 0.3.0，原 0.2.0 简报与 0.11.0 复检 schema 原件保留。原生 AST 零诊断记录为 `candidate_absent_unverified_policy`：解除本地尝试的待复检状态，但不关闭任务，不认证项目 lint、构建或交付。Erlang 现通过显式 OTP 28 接入同一工作台，独立协议版本见 [Erlang 任务验收](../tests/acceptance/erlang-native-task-verification.md)；其余通用语言的原生确认 adapter 仍缺。见[验收记录](../tests/acceptance/syntax-native-task-verification.md)。
+
+简报同时提供最新原生报告引用/摘要和当前诊断位置；输入失效后不再投影这些位置。编译入二进制的不可变 grammar 校验结果仅在进程内复用，外部清单、源码和原生工具仍按当前字节复核。
+
+
+### Erlang 确认任务与原生修复指引（当前源码）
+
+`codeguard task verify TASK_ID . --erl-tool /absolute/path/to/erl --format=json` 和 `hook execute . --erl-tool /absolute/path/to/erl` 的 `repair_ready` 事件现复用已有 `.codeguard/` 任务、租约、尝试记录与共享截止时间，执行与 `lint erlang` 相同的 OTP 28 原生 forms 解析。工具和任务语言在租约或启动进程前核对，不启动项目源码、宏展开或 parse_transform。
+
+```mermaid
+flowchart LR
+    A[编辑初检疑似位置] --> B[同工作区/文件/语言稳定任务]
+    B --> C[task verify / repair_ready]
+    C --> D[显式 OTP 28 原生解析]
+    D -->|当前语法诊断| E[next 原生位置与修复命令]
+    E --> F[修复并记录 attempt]
+    F --> C
+    D -->|宏/预处理或工具故障| G[next 具体阻塞原因]
+    G --> H[恢复项目上下文或匹配工具]
+    H --> C
+    D -->|零诊断| I[保留证据，等待关闭条件核验]
+```
+
+Erlang 原生观察使用 `syntax_task_recheck` 0.2.0，复检反馈为 `task_verification_preview` 0.13.0，复检后的 `next` 简报为 0.4.0；Zig 和历史 schema 原件不变。简报新增 `native_confirmation_reason`，缺工具给出明确 OTP 28 准备动作；宏/条件编译给出项目原生预处理/编译需求。源码变化会清空当前诊断并要求复检；工具改变会移除旧工具 argv。只有版本已观察为 OTP 28 且摘要仍一致的工具可复用，过旧工具不能被建议为已就绪工具。
+
+原生零诊断记录为 `candidate_absent_unverified_policy`，解除关联尝试的待复检状态，但不关闭任务或签发交付许可；两次无进展沿用既有预算，转为具体决策而不是重复修复。当前限定可信关闭 API 已扩展到 Erlang 源码 SDK，默认宿主仍缺受保护策略接线；Erlang 项目完整 lint/预处理、原生发现的完整生命周期、自动工具发现及实际宿主发行尚未完成。公开 npm 0.1.4 不含此扩展。[验收与协议](../tests/acceptance/erlang-native-task-verification.md)。
+
+Erlang `repair_ready` 使用 Hook 0.8.0 / 内层摘要 0.2.0，直接包含当前原生位置、具体未完成原因、Unicode 字符列单位和已保存报告引用；其他 Hook 版本保持不变，实际安装宿主对话交付尚未验收。
+
+### 统一入口的 Erlang 原生优先检查（当前源码）
+
+```bash
+codeguard check all . --format=json
+codeguard check all . --erl-tool /absolute/path/to/erl --timeout 30s --jobs 2 --format=json
+```
+
+`erlang.lint` 节点选择显式工具或 PATH 绝对目录中的首个可执行 `erl`，复用已有受控 OTP 28 scanner/parser。每轮最多观察 64 个普通 UTF-8 文件，每文件不超过 1 MiB，沿用请求总截止时间和任务图并发预算。`native_results.erlang_lint` 提供当前源码摘要、诊断位置、工具选择、逐文件下一步及采用绝对源码路径的原工具复检 argv，可从项目外直接重放；超出原生预算的范围明确计入未观察数。
+
+只有完整、非预处理、源码与工具字节都匹配的 forms 观察才跳过重复 WASM。工具缺失保留候选初检；所选工具失败仍可伴随补充候选观察，但原生阻塞不会被洗成成功。宏/条件编译继续未完成。源码或工具变化会撤回受影响文件的当前定位和可复用 argv。项目范围变化设置 `scope_stable: false` 并保留仍与当前字节匹配的单文件诊断，同时撤回整体范围完整性。SIGINT 保持退出 130；JSON、human 和保守 SARIF 保留原生发现，不签发项目通过。
+
+该早期无任务投影增量的协议分别为 `check_feedback` **0.36.0**、`check_aborted` **0.13.0** 和内嵌 `erlang_forms_scan` **0.1.0**；旧聚合 Schema 逐字节保留。forms 局部完整不等于项目 lint、构建和测试完整。原生发现的任务持久化与可信关闭仍未实现，报告明确 `task_id: null`，不伪造任务。已有 WASM 来源的 Erlang 确认任务继续使用独立 `task verify` 流程。公开 npm 0.1.4 不含本轮聚合能力。见[验收记录](../tests/acceptance/check-all-erlang.md)。
+
+### Cargo 输入与代理入口边界（当前源码）
+
+Clippy 的普通扫描及同规则 `--force-warn` 对照使用 `cargo clippy --locked --offline --all-targets --message-format=json`。缺少根 Cargo.lock 时，在原生启动前返回 `cargo_lock_unavailable`，不生成锁文件。源码指纹取自启动前的有界快照；已观察源码、清单、锁、根 Clippy/Cargo/工具链配置或原工具改变时撤回本轮 Clippy finding，保留准备/重扫任务。稳定输入下的部分有效诊断仍保留，不能把损坏报告称完整。
+
+Cargo 为 rustup 等按入口名称分派的代理时，Clippy、rustdoc 与构建检查保留所选 Cargo 路径执行，同时核验解析目标的字节及运行后身份。私有 Clippy 输出目录以独立序号防止同时间戳碰撞。该边界只覆盖已观察输入，不证明完整 Cargo 生效配置、所有构建组合或进程沙箱；局部零诊断仍不能自动关闭任务。测试、失败记录和真实输出见 [Cargo 输入验收](../tests/acceptance/rust-clippy-input-stability.md)。公开 npm 0.1.4 尚不包含本批修改。
+
+
+### 已安装 Cargo 自动发现（当前源码）
+
+`check all`、`comments rust`、`build rust` 及其 Cargo 任务复检接受可选 `--cargo-tool`。未指定时，从调用方 PATH 的绝对目录中选择首个普通可执行 `cargo`；空目录、相对目录和不可执行入口不作为候选。显式无效工具或已选工具执行失败保留具体阻塞，不换用下一个 Cargo。聚合 Rust 检查共用本轮已选入口。
+
+最终 `cargo` 入口名保留，以兼容 rustup 按名称分派；既有解析后字节和运行后目标身份校验继续执行。子进程保留 `RUSTUP_TOOLCHAIN`，并固定 `RUSTUP_AUTO_INSTALL=0`，即使调用方设置为 `1`。Cargo 的 `--locked --offline` 不独立约束 rustup 安装工具链；[rustup 官方说明提供单独控制](https://rust-lang.github.io/rustup/environment-variables.html)。缺工具链仍是环境故障，不生成源码违规，也不自动安装。本项不证明完整工具链、有效 Cargo 配置、全项目覆盖或可信任务关闭。
+
+受控代理/不换工具反例及实际已安装/缺工具链观察见 [Cargo 自动发现验收](../tests/acceptance/cargo-native-discovery.md)。公开 npm 0.1.4 不包含本次源码变更。
+
+
+### 项目根 Ruff 工具发现（当前源码）
+
+已配置Python扫描的 `lint python`、`check all`、指定编辑Hook执行及同根任务复检，依次选择显式 `--ruff-tool`、受检根 `.venv/bin/ruff`、调用方绝对PATH目录中的可执行入口。不激活Shell环境、不枚举安装包、不安装Ruff；本地入口沿既有原生链路探测版本、固定并复核字节。普通本地目录/入口不存在时可继续PATH；父目录链接/非目录、损坏或不可执行入口返回 `ruff_local_tool_invalid`，不静默换用全局Ruff。所选工具版本/执行失败不尝试其它工具。
+
+损坏本地环境生成一张稳定准备任务，包含 `.venv/bin/ruff` 证据、限定环境修复范围、原Codeguard复检、历史及关闭条件。没有适用Ruff配置不启动工具。普通本地父目录中可使用可执行文件链接：解析后的工具字节在本轮固定并复核。局部成功或源码修复后零诊断仍不批准策略、不自动关闭任务。本项面向明确的受检根；逐模块虚拟环境、uv/Poetry/Conda解析、真实宿主及完整覆盖仍是独立待完成范围，见 [根内Ruff验收](../tests/acceptance/ruff-local-discovery.md)。公开npm 0.1.4不包含本次源码变更。
+
+
+### 无定位语法观察的检查恢复任务（当前源码）
+
+`check all/java` 与确认写入的 Hook 共用语法任务同步：有可定位恢复节点的观察需要原生确认；树已报告错误但恢复扫描未完成且没有可定位节点时，生成检查能力恢复任务。后者保留空恢复数组和 `syntax_recovery_incomplete`，不记为已确认源码违规，也不虚构修改位置。完整零恢复观察只推荐原生检查，不新建这类任务。
+
+同一工作区、文件和语言复用原有稳定任务身份；重复检查、Hook 和后续可定位观察更新同一任务。`next`/任务 Markdown 明确恢复工具、语言版本或 grammar，原生确认前不得修改源码。没有原生确认 adapter 时，`task verify` 记录能力缺口并保持开放；零恢复、安装或勾选均不关闭已有任务。保存失败保留观察、逐文件失败原因且不返回虚假任务 ID。
+
+聚合反馈使用 `check_feedback` 0.38.0 的 `syntax_tasks`；无位置本地确认报告为 0.3.0，可定位历史报告 0.1.0 与 Erlang 原生首次报告 0.2.0 保留。旧 schema 原件不改。Claude Hook 命令上下文分别显示恢复节点数和恢复扫描未完成数；这仍是命令重放，真实宿主与全部语言验收尚缺，公开 npm 0.1.4 未包含本批改动。见[验收与实际报告](../tests/acceptance/unlocated-syntax-recovery-tasks.md)。
+
+
+### Erlang 任务复检自动发现原生工具（当前源码）
+
+`codeguard task verify "$TASK_ID" . --format=json`（`TASK_ID` 使用 `next` 返回的真实 `task_id`） 对已有 Erlang 语法任务复用 lint/check 的工具选择：显式 `--erl-tool` 优先，否则从调用方 PATH 的绝对目录固定首个普通可执行 erl。复检核对 OTP 28、当前源码与工具字节，并沿用任务租约、预算、事件和原有报告版本。候选来源及原生首次发现来源均可复检；repair-ready Hook 复用同一入口。
+
+未找到工具才生成 `erlang_tool_not_found_on_path` 的环境观察；相对/空 PATH 与不可执行文件不参与选择。显式坏工具、所选版本或执行失败不改用后续工具，也不自动安装。成功观察后的 `next` 带实际工具的显式复检 argv，后续 PATH 变化不能替换这个入口。局部零诊断依然不自动关闭任务，宏/预处理、可信策略和完整项目能力仍须核验。见[复检自动发现验收](../tests/acceptance/erlang-recheck-discovery.md)。公开 npm 0.1.4 尚未包含本批改动。
+
+### Swift 无定位观察的原生复检（当前源码）
+
+已有 Swift 确认任务现支持 `codeguard task verify "$TASK_ID" . --swift-tool /absolute/path/to/swiftc --format=json`；`TASK_ID` 来自实际 `next`。同参数可传给 `hook execute` 的 `repair_ready`。调用方必须指定已有 Apple Swift 6.4 工具；当前不自动安装或从历史报告启动可编辑路径。缺工具给出定位既有编译器的具体动作，版本不匹配或执行失败保留原任务。
+
+Rust 读取并复核有界源码字节，通过冻结 stdin、固定 `/` cwd、清空环境和共同截止时间执行 `swiftc -frontend -parse -diagnostic-style llvm -no-color-diagnostics -`。只投影原生错误的规则和位置，不把原始诊断文案交给智能体作为指令。Swift 列坐标是 UTF-8 字节，核对字符边界；未知输出、退出码矛盾、超时、位置越界或工具变化均保持未完成。工具摘要绑定启动入口，不独立认证整套 Swift 安装环境。
+
+原生错误使同一任务的 `next` 进入源码修复；源码或工具变化撤回旧位置。修复后零诊断记录 `candidate_absent_unverified_policy`，不自动关闭，也不替代项目 lint、类型检查、宏/条件编译上下文、构建、安全或交付义务。重复无进展仍使用既有尝试预算。本批不提升 Swift grammar 资格或 32 语言精度结论，公开 npm 0.1.4 尚不含此扩展。
+
+新增协议分别为 `syntax_task_recheck` 0.4.0、`task_verification_preview` 0.15.0、`repair_brief_preview` 0.6.0、Hook 反馈 0.9.0（任务摘要 0.3.0）。聚合 `check` 的 `next` 含 Swift 原生简报时用 0.39.0，其他路径保留 0.38.0；旧 schema 原件不改。具体实测和完整报告见 [Swift 原生确认验收](../tests/acceptance/swift-native-task-confirmation.md)。
+
+开发源码中，已有 Kotlin 语法确认任务还可用 `codeguard task verify TASK_ID . --kotlinc-tool ABS_PATH --format=json`；`repair_ready` 接受相同参数，保留稳定任务和历史。混合诊断分别给出可修复语法位置及上下文阻塞。见 [任务复检验收](../tests/acceptance/kotlin-native-task-confirmation.md)。
+
+开发源码：`check all . --kotlinc-tool ABS_PATH` 与确认保存事件的 `hook execute . --kotlinc-tool ABS_PATH` 优先选择 Kotlin 原生工具；repair_ready 也接受该参数。已选工具失败保留阻塞，只有工具缺失才回退 WASM。
+
+开发源码：`lint swift FILE.swift [--swift-tool ABS_PATH] --format=json` 提供原生优先的单文件语法反馈；已有 task verify/repair_ready 为独立路径。完整项目 lint、类型和构建仍未完成。
+
+开发源码：`check all . --swift-tool ABS_PATH` 增加共享截止时间的 Swift 原生 parse；缺工具回退候选，已选工具失败不回退；完整 lint 与项目原生任务连接仍未完成。
+
+开发源码：确认 file_changed 的 `hook execute . --swift-tool ABS_PATH` 接通 Swift 原生单文件 parse；省略则发现调用方 PATH。其它非复检/非保存事件拒绝此工具参数，CLI Claude 摘要保留原生位置与任务同步缺口。
+
+### Swift 原生优先修复工作台（开发源码）
+
+已初始化 `.codeguard/` 的项目，`check all` 和确认成功保存后的 `hook execute file_changed` 将 Swift 原生语法诊断或环境阻塞同步为稳定任务。重复检查复用同一任务；`next` 与 `task show` 提供证据、规则、修改范围、步骤、复检命令、历史和关闭条件。未初始化工作区明确报告工作台未连接，同步失败保留阻塞，不能假定任务已生成。独立 `lint swift` 尚不生成任务。
+
+`codeguard task verify TASK_ID . [--swift-tool ABS_PATH] --format=json` 对首次原生来源任务支持显式工具或调用环境 PATH 发现。已有 WASM 来源任务保留显式工具契约；不执行历史记录中未经核对的路径。复检有诊断时要求修复源码；零诊断记录 `candidate_absent_unverified_policy`，原任务仍 open，后续完整 lint、类型、构建与交付检查仍待完成。
+
+首次原生来源协议为 observation 0.5、scan 0.2、check 0.44、首次 brief 0.11、保存 Hook fast 0.5 / 外层 0.13、复检内层 0.7 / 外层 0.18。已有复检简报继续使用 0.6；旧 schema 保持原件。实际 Apple Swift 6.4 执行验证了重复扫描、保存和修复前后复检的同一任务引用。本轮没有真实安装宿主或可信关闭验收，也不在公开 npm 0.1.4 中。
+
+### 缺失任务投影恢复
+
+`codeguard work sync . --format=json` 现在在工作区同步锁内恢复已提交事实对应的缺失 Markdown，再导入新报告并复核缺失投影。恢复读取结构化事实、当前 RepairBrief、原报告摘要和消费标记，不执行检查器；现有普通任务文件原字节保留，包括用户备注和勾选。链接、目录冲突、坏事实、来源摘要变化及未提交来源明确未完成。最多检查 1000 条事实，避免无界恢复。
+
+恢复只创建可读任务，含问题证据、规则依据、允许范围、步骤、复检 argv、历史及关闭条件。复检参数中的本机绝对路径脱敏为待核验占位；通过 `task show` 查询当前真实指引。恢复不关闭问题，不改原事实、事件、消费标记或尝试历史，也不代表门禁通过。仅恢复发生时使用 `work_sync_preview` 0.3.0，并返回正整数 `restored_task_projections`；无恢复时保留 0.2.0。
+
+实际恢复反馈示例（仅局部同步，不是交付通过）：
+
+```json
+{
+  "already_consumed_reports": 1,
+  "command_status": "partial",
+  "delivery_decision": "not_evaluated",
+  "failed_reports": 0,
+  "historical_findings": 0,
+  "imported_reports": 0,
+  "new_blockers": 0,
+  "new_findings": 0,
+  "next_actions": [
+    "inspect_findings_and_tasks",
+    "implement_native_reverification_and_full_gate"
+  ],
+  "operation": "work_sync",
+  "report_type": "work_sync_preview",
+  "restored_task_projections": 1,
+  "schema_version": "0.3.0",
+  "workspace_id": "ws-f734e620fead976b3bb5826be2fb3341"
+}
+```
+
+
+## 独立源码任务的下一步
+
+当next原优先项是等待执行者或预算耗尽的源码问题，且没有前置blocker，CLI会检查是否另有不同物理源码范围的可修复/待复检finding。证明独立后推荐该项，同时在next_actions及human输出保留延后任务的只读task show入口。原问题、预算、租约和门禁保持不变。重叠、别名、范围未知、坏事实或失败报告不被绕过；完整跨模块依赖图仍未完成，非Unix保留原选择。详见[实际验收及完整报告示例](../tests/acceptance/next-independent-source-work.md)。
+
+### Swift 限定语法任务闭环（开发源码）
+
+受保护宿主可调用 `verify_swift_task_resolution`，以 Apple Swift 6.4 对照首次反例与当前源码。策略 1.2.0、脱敏证据 0.3.0 与 Zig/Erlang 分版本；原生首次任务的 grammar 保持 null。原反例确有 parse 诊断、当前源码改变且同工具完整无诊断时追加 `code_fixed`，重复验证幂等；普通 `task verify --swift-tool` 检出同工具复发时重开同一父链。原反例合法转误报调查，工具异常或身份变化不关闭。签名和信任根由独立宿主提供，项目记录不提供关闭权威。此接口尚未接入默认插件或公开发行，不代替 SwiftLint、类型检查、项目构建和完整交付验收。详见[闭环验收](../tests/acceptance/swift-task-resolution-lifecycle.md)。
+
+### Kotlin 限定语法关闭与上下文分流（开发源码）
+
+`verify_kotlin_task_resolution` 复用共享宿主 SDK，以 kotlinc-jvm 2.4.10 对照原反例及当前源码；策略 1.3.0 / 证据 0.4.0 独立于其它语言，原生首次 grammar=null。原反例的 UTF-16 与 UTF-8 字节坐标须同时有效，源码已改变且原工具完整零诊断才追加 `code_fixed`。仅上下文诊断保留待验证；混合上下文未完成和已确认语法诊断时，保留原问题并支持普通 `task verify --kotlinc-tool` 重开同一父链，不因 `incomplete` 丢弃正向发现。签名来源由宿主独立固定；当前只绑定 launcher，不证明完整 JAR/JDK/项目构建身份。默认插件可信关闭、完整 lint/类型及发行仍未完成。详见[验收](../tests/acceptance/kotlin-task-resolution-lifecycle.md)。
+
+
+### 误报调查的来源指引
+
+`next` 和 `task show` 从绑定的首次报告生成同一调查步骤。原生首次任务核对原生诊断、输入、工具和环境差异；WASM 首次任务核对语法资产、语言版本和原生对照差异。原反例未检出原生诊断不等于已确认 grammar 缺陷。查询不执行检查器或修改租约、预算与历史，也不批准白名单或关闭。见[局部验收](../tests/acceptance/counterexample-source-guidance.md)。
+
+
+### 按语言执行项目检查
+
+`codeguard check <规范语言ID> . --format=json` 现在接受注册表全部57个ID。它按选择复用已接入的原生服务、共同预算及WASM回退；未接入的检查仍报告缺口。Java/all保持原报告协议，其他语言使用check_feedback 0.45、内部故障使用check_aborted 0.14。局部结果delivery_decision固定not_evaluated，空目标不算全项目通过。显式工具参数必须属于该语言；JavaScript/TypeScript共享npm构建根检查。未登记别名仍拒绝，不猜测语言。
+
+例如：`codeguard check python . --ruff-tool /absolute/path/to/ruff --format=json`。同一个混合项目中的Java/Maven和Rust/Cargo不会被此请求调度；原生检查缺失时，包含WASM能力的二进制只对选定语言运行候选初检。
+
+
+### Zig 工具发现与当前输入
+
+源码构建的 `lint zig FILE` 与 Zig 任务的 `task verify` 共用显式/PATH 选择：显式工具优先，否则取绝对PATH目录中第一个普通可执行zig；忽略空、相对目录和不可执行入口。选中工具失败不换到后面的编译器；未验收的补充WASM观察保留原生阻塞。单文件反馈0.2显示选择来源和source_current，源码或入口目标变化撤回旧原生位置；源码变化也撤回旧字节WASM。局部零诊断不关闭任务或放行项目，完整Zig lint/构建与聚合原生优先仍未完成。
+
+
+2026-10-05 开发源码 Zig 原生路由：`check all`、`check zig` 与限定编辑文件现在复用冻结的 Zig 0.16.0 AST 探针。显式/PATH 选择后优先原生；选定工具失败保留未完成观察，不改用 WASM 绕过。缺工具时保留候选回退。源码或工具入口变化撤回旧位置；共同截止时间内最多观察64文件，其余范围明确保留。新增 check 0.46 / 中止反馈0.15 / Hook 0.14 独立协议，无 Zig 的报告沿用历史版本。Claude 摘要包含有界原生规则、位置和原工具复检指令。Zig 原生首次任务现按下节接线，报告仅提供实际同步的任务ID，AST零诊断不关闭历史任务，也不证明完整lint/build。公开npm0.1.4和插件锁未更新。
+
+### Zig 首次原生任务接线（开发源码）
+
+初始化工作区中，`check zig`、`check all`、`lint zig` 和编辑 Hook 按工作区/源码范围同步同一稳定任务。新文件完整零诊断不创建修复任务；已有任务零诊断记录 `candidate_absent_unverified_policy`，保持 open。`next`、`task show` 提供有界原生位置与原工具复检参数；`task verify TASK_ID . [--zig-tool ABS_PATH] --format=json` 和 repair_ready 记录复检事件。原生首次事实的 grammar 身份为 null，原生诊断不要求修改 grammar。
+
+新协议：原生事实0.6、绑定扫描0.2、聚合0.47、单文件0.3、简报0.12、查看0.2、复检内层0.8/外层0.19、编辑Hook0.16、复检Hook0.15。旧 schema 不改写。实际 Zig 0.16.0 已验证错误与修复后输入；原生首次 Zig 可信关闭见下节；默认安装宿主、完整 lint/build 和发行仍未完成。公开 npm 0.1.4 未更新。见[验收](../tests/acceptance/zig-native-first-workbench.md)。
+
+### Zig 原生首次可信关闭（开发源码 SDK）
+
+受保护宿主可通过 `verify_zig_task_resolution` 使用独立签名策略1.4.0，核验原生首次事实0.6.0。grammar 必须为 null；旧 WASM 来源策略1.0.0不扩权。首次原工具确有诊断、源码已改变且同一工具完整零诊断时，追加限定 `code_fixed`，证据0.5.0。重复验证幂等；普通 `task verify --zig-tool` 的同工具正向复检重开同一父链。原反例合法进入误报调查，异常输出、越界位置、工具变化和缺可信上下文不关闭。签名信任根由宿主独立提供，默认插件与公开 npm 尚未接入该提供者；不能凭本地任务文件批准交付。见[验收](../tests/acceptance/zig-native-first-resolution.md)。
+
+### Go统一lint的原生优先与缺工具初检
+
+源码版 `codeguard lint go . --format json` 优先显式 `--go-tool`，否则查找调用方绝对PATH中的Go。工具已选择但版本/执行失败时保留原生故障；真正缺工具时，内置WASM做有界整文件初检，保留恢复和独立结构候选。候选或初检未完成要求准备项目适用原生工具；完整有界范围的零候选只推荐准备，原生义务仍未完成，退出码继续3。默认不含WASM的构建明确报告能力缺失。重复lint与check复用确认任务，补声明不自动关闭。公开npm0.1.4未更新。见[局部验收](../tests/acceptance/go-lint-fallback.md)。
+
+
+### 当前源码的只读帮助支持目录
+
+`codeguard help --format json`查询C01–C36与额外公开入口；`codeguard help task verify --format json`按精确命令前缀查询。返回`command_help`0.3，以implemented/partial/planned/unavailable_build与executable区分当前入口状态；后者不代表检查或安装已完成。默认构建的grammar probe不可用，WASM构建仍是未验收候选；独立MCP服务等未实现操作明确标planned。
+
+```bash
+codeguard help --format json
+codeguard help lint --format json
+codeguard task verify --help
+```
+
+帮助不读取项目、不启动工具，成功退出0仅表示查询完成，delivery_decision仍not_evaluated。精确前缀末尾帮助已接入；带语言、路径和任意工具参数的完整上下文帮助以及完整参数生成仍未完成。见[真实报告与验收](../tests/acceptance/command-help-current-support.md)。公开npm0.1.4未包含此源码增量。
+
+
+### Rust 独立 lint 原生优先入口
+
+当前源码支持 `codeguard lint rust . --cargo-tool /absolute/cargo --format json`。使用原生 Clippy 的锁定离线 all-targets 局部观察，复用聚合检查的输入核对和工作台同步，只执行 lint。初始化后同一 finding 保留同一任务，反馈含下一步，使用 `codeguard task verify TASK_ID . --cargo-tool /absolute/cargo --format json` 原工具复检；零诊断仍需规则/政策核验，不自动关闭任务。
+
+未显式选择 Cargo 且绝对 PATH 找不到可执行入口时，WASM 构建提供有界候选初检。发现候选或检查不完整要求准备原生工具；完整有界范围零候选推荐准备原生工具。显式错误/原生失败不回退、不自动安装。JSON 使用 `rust_lint_feedback` 0.1，交付始终未评估；帮助协议0.2新增Rust，历史0.1保持原件。源码接入不表示公开npm包已包含新入口或Rust完整语言验收完成。
+
+## Ruby 单文件原生语法与任务复检
+
+源码构建新增 `codeguard lint ruby FILE.rb --ruby-tool /absolute/path/to/ruby --format=json`。仅确认 Ruby 2.6.10p210 的 `ruby -c`，关闭 gems，使用冻结 UTF-8 stdin；不会运行用户源码。显式工具缺失、版本不匹配或执行失败不切换到 WASM。没有可选择的原生工具时，WASM 构建提供候选初检；候选/初检不完整要求准备工具，零候选推荐准备工具。报告 `ruby_lint_feedback`0.1 只保留原生行号，不猜测列号；项目 Ruby 版本兼容性未确认，RuboCop、注释、安全及完整项目检查仍须完成。help0.3 增加 Ruby，历史 help0.1/0.2 协议不修改。初始化工作区中，WASM 候选与原生观察复用一张稳定确认任务。`next`保留原生行位置和已核验`--ruby-tool`参数；`task verify`记录尝试，零诊断仍保留开放状态，等待策略/覆盖复核。反馈0.3、原生历史0.9、复检0.10、任务预览0.23与简报0.15保留旧协议。`codeguard check ruby ROOT --ruby-tool /absolute/path/to/ruby --format=json`及`check all`现已复用有界原生语法扫描和稳定任务连接器；选定工具失败不切到WASM。共享截止时间及64文件上限保留未观察范围；源码/工具身份变化撤回旧位置。聚合反馈0.51包含Ruby扫描0.1/0.2与简报0.15，不修改旧schema。完整RuboCop/项目lint和可信关闭仍待完成，不属于公开npm0.1.4的能力。
+
+
+Ruby 编辑快检接线：源码构建的 `hook execute` / `hook claude post-tool-use` 可选择 `--ruby-tool ABS_PATH` 或调用方绝对 PATH 的 Ruby。只检查确认编辑的文件，共用事件截止时间；选定工具失败不回退，缺工具保留 WASM 候选。原生行号与稳定任务进入有界对话，不回显源码/工具消息或猜列号；先核对项目 Ruby 版本适用性。`repair_ready` 用同一工具复检并保存真实证据引用，零诊断仍不关闭任务。编辑反馈 0.19（内层 0.10）、复检反馈 0.20（内层 0.6）新增封闭 schema，旧协议不改。实际宿主自动触发、完整 RuboCop 与公开 npm 版本尚未验收。

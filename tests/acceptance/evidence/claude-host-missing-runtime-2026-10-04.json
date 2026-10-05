@@ -1,0 +1,100 @@
+{
+  "evidence_type": "actual_claude_host_missing_runtime_observation",
+  "evidence_version": "0.1.0",
+  "captured_at": "2026-10-04",
+  "host_version": "Claude Code 2.1.273",
+  "codeguard_source_commit": "15a91a7b9291837e816f41d7934d68b4d083677e",
+  "plugin_source_commit": "dec5f9d1361eefff493e120b4278939a243814a9",
+  "plugin_sources_sha256": {
+    "hooks/hooks.json": "a9d9e5b2ae25258ed4dcd7fca44964e700ac75fb1e838aa6d63e246b01183584",
+    "hooks/rust_runtime_dispatch.cjs": "31edfd17640232fdce3d61cd05e10c05d2ecd82207c3358c5bf73f9ff4af3de2",
+    "runtime/codeguard_runtime.cjs": "71c8fee06d30b68e4473be150a0fc1749b07eb630be32c05372b5034822c7767",
+    "runtime/codeguard.lock.json": "80e32859722dff4644fd2a5efec3ba95886640bb848c1ea96b4c9e67f41f77b1"
+  },
+  "observations": [
+    {
+      "selection": "missing",
+      "host_exit_code": 1,
+      "elapsed_ms": 1081,
+      "tools_enabled": [],
+      "plugin_selection": "session_local_inline_source",
+      "cache_unchanged_empty": true,
+      "project_unchanged_empty": true,
+      "stdout_sha256": "e44b6a8eb7ec746d7a91db09f29d219656f1b646c2742ddc6543eabc19c6d8d0",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "hook_responses": [
+        {
+          "hook_name": "SessionStart:startup",
+          "hook_event": "SessionStart",
+          "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"CodeGuard Rust 运行时未完成（runtime_unavailable）；本次源码检查未运行，交付未评估。请用 Node 18+ 执行 node runtime/codeguard_runtime.cjs verify；支持的 macOS arm64 上显式运行 node runtime/codeguard_runtime.cjs install --download。运行时可用后，使用同一入口 exec init ABS_PROJECT --apply 初始化修复任务，或 exec next ABS_PROJECT 获取指引。\"}}\n",
+          "stderr": "",
+          "exit_code": 0,
+          "outcome": "success"
+        },
+        {
+          "hook_name": "UserPromptSubmit",
+          "hook_event": "UserPromptSubmit",
+          "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"UserPromptSubmit\",\"additionalContext\":\"CodeGuard Rust 运行时未完成（runtime_unavailable）；本次源码检查未运行，交付未评估。请用 Node 18+ 执行 node runtime/codeguard_runtime.cjs verify；支持的 macOS arm64 上显式运行 node runtime/codeguard_runtime.cjs install --download。运行时可用后，使用同一入口 exec init ABS_PROJECT --apply 初始化修复任务，或 exec next ABS_PROJECT 获取指引。\"}}\n",
+          "stderr": "",
+          "exit_code": 0,
+          "outcome": "success"
+        }
+      ],
+      "conversation_result": {
+        "subtype": "success",
+        "is_error": true,
+        "result": "Not logged in · Please run /login",
+        "total_cost_usd": 0,
+        "num_turns": 1
+      }
+    },
+    {
+      "selection": "authenv",
+      "host_exit_code": 0,
+      "elapsed_ms": 2776,
+      "tools_enabled": [],
+      "plugin_selection": "session_local_inline_source",
+      "cache_unchanged_empty": true,
+      "project_unchanged_empty": true,
+      "stdout_sha256": "7ff9a399c518ae65bf69457fa2790e26467ff6d344c9cfd9fb0e08397ccb889c",
+      "stderr_sha256": "9a08d2e57983f1a3f9cf6d7c5f1b83b294d798c8b79b2c6bf711046181a1a707",
+      "hook_responses": [
+        {
+          "hook_name": "SessionStart:startup",
+          "hook_event": "SessionStart",
+          "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"CodeGuard Rust 运行时未完成（runtime_unavailable）；本次源码检查未运行，交付未评估。请用 Node 18+ 执行 node runtime/codeguard_runtime.cjs verify；支持的 macOS arm64 上显式运行 node runtime/codeguard_runtime.cjs install --download。运行时可用后，使用同一入口 exec init ABS_PROJECT --apply 初始化修复任务，或 exec next ABS_PROJECT 获取指引。\"}}\n",
+          "stderr": "",
+          "exit_code": 0,
+          "outcome": "success"
+        },
+        {
+          "hook_name": "UserPromptSubmit",
+          "hook_event": "UserPromptSubmit",
+          "stdout": "{\"hookSpecificOutput\":{\"hookEventName\":\"UserPromptSubmit\",\"additionalContext\":\"CodeGuard Rust 运行时未完成（runtime_unavailable）；本次源码检查未运行，交付未评估。请用 Node 18+ 执行 node runtime/codeguard_runtime.cjs verify；支持的 macOS arm64 上显式运行 node runtime/codeguard_runtime.cjs install --download。运行时可用后，使用同一入口 exec init ABS_PROJECT --apply 初始化修复任务，或 exec next ABS_PROJECT 获取指引。\"}}\n",
+          "stderr": "",
+          "exit_code": 0,
+          "outcome": "success"
+        },
+        {
+          "hook_name": "Stop",
+          "hook_event": "Stop",
+          "stdout": "{\"systemMessage\":\"CodeGuard Rust 运行时未完成（runtime_unavailable）；本次源码检查未运行，交付未评估。请用 Node 18+ 执行 node runtime/codeguard_runtime.cjs verify；支持的 macOS arm64 上显式运行 node runtime/codeguard_runtime.cjs install --download。运行时可用后，使用同一入口 exec init ABS_PROJECT --apply 初始化修复任务，或 exec next ABS_PROJECT 获取指引。\"}\n",
+          "stderr": "",
+          "exit_code": 0,
+          "outcome": "success"
+        }
+      ],
+      "conversation_result": {
+        "subtype": "success",
+        "is_error": false,
+        "result": "**Incomplete — the source checks did not run.**\n\nThe CodeGuard hook feedback supplied to this session (SessionStart and UserPromptSubmit) states, verbatim:\n\n> CodeGuard Rust 运行时未完成（**runtime_unavailable**）；本次源码检查未运行，交付未评估。\n\nSo the reason shown is `runtime_unavailable` — the CodeGuard Rust runtime was unavailable, therefore the source check did not execute and the delivery was not evaluated. No code quality result was produced, and I am not claiming that quality passed.\n\nThe feedback also lists the remediation path: run `node runtime/codeguard_runtime.cjs verify` with Node 18+, and on supported macOS arm64 run `node runtime/codeguard_runtime.cjs install --download` explicitly to obtain the runtime.",
+        "total_cost_usd": 0.023829999999999997,
+        "num_turns": 1
+      }
+    }
+  ],
+  "full_host_acceptance": false,
+  "marketplace_installation_verified": false,
+  "source_check_executed": false,
+  "delivery_decision": "not_evaluated"
+}

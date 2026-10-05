@@ -13,6 +13,53 @@ fn java_grammar() -> WasmGrammar {
 }
 
 #[test]
+fn hidden_swift_missing_type_is_incomplete_even_with_zero_records() {
+    let mut grammar = WasmGrammar::load(
+        "swift",
+        include_bytes!("../../../grammars/swift/parser.wasm"),
+        "cc77a63b8487956270e2f385e29a03ba0773ba532a3c8a8844a26b4c98793843",
+        15,
+    )
+    .unwrap();
+    let tree = grammar.parse(b"func f(_ x: ) {}\n").unwrap();
+    assert!(tree.root_node().has_error());
+    let scan = scan_wasm_recoveries(&tree, 128).unwrap();
+    assert!(scan.recoveries.is_empty());
+    assert!(
+        scan.truncated,
+        "a hidden token cannot be classified as valid syntax"
+    );
+    let tree = grammar.parse(b"func f(_ x: Int) {}\n").unwrap();
+    let scan = scan_wasm_recoveries(&tree, 128).unwrap();
+    assert!(scan.recoveries.is_empty());
+    assert!(!scan.truncated);
+}
+
+#[test]
+fn hidden_kotlin_missing_tokens_do_not_look_clean() {
+    let mut grammar = WasmGrammar::load(
+        "kotlin",
+        include_bytes!("../../../grammars/kotlin/parser.wasm"),
+        "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+        14,
+    )
+    .unwrap();
+    for source in ["fun f(x: ) = x\n", "object C { val value = 1 }\n"] {
+        let tree = grammar.parse(source.as_bytes()).unwrap();
+        assert!(tree.root_node().has_error());
+        let scan = scan_wasm_recoveries(&tree, 128).unwrap();
+        assert!(
+            scan.truncated,
+            "hidden grammar error must remain incomplete"
+        );
+    }
+    let clean = grammar.parse(b"class C {}\n").unwrap();
+    let scan = scan_wasm_recoveries(&clean, 128).unwrap();
+    assert!(scan.recoveries.is_empty());
+    assert!(!scan.truncated);
+}
+
+#[test]
 fn error_and_missing_recoveries_keep_byte_positions() {
     let mut grammar = java_grammar();
     let clean = grammar

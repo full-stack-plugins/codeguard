@@ -13,6 +13,7 @@ static NEXT: AtomicU64 = AtomicU64::new(0);
 fn published_sync_and_record_schemas_cannot_claim_quality_allow() {
     for source in [
         include_str!("../../../schemas/work-sync-preview.schema.json"),
+        include_str!("../../../schemas/work-sync-preview-v0.3.schema.json"),
         include_str!("../../../schemas/finding-record.schema.json"),
         include_str!("../../../schemas/finding-observed-event.schema.json"),
         include_str!("../../../schemas/blocker-record.schema.json"),
@@ -622,6 +623,24 @@ fn missing_tool_groups_two_files_into_one_actionable_blocker() {
         assert_eq!(observation["record_type"], "local_blocker_observation");
         assert_eq!(observation["blocker_id"], id);
     }
+    fs::remove_file(&task[0]).unwrap();
+    let recovered = project.sync().1;
+    assert_eq!(recovered["restored_task_projections"], 1, "{recovered}");
+    assert_eq!(recovered["new_blockers"], 0);
+    let projection = fs::read_to_string(&task[0]).unwrap();
+    assert!(projection.contains("ruff_tool_not_found"));
+    assert!(projection.contains("blocker"));
+    assert!(!projection.contains("移除该导入"));
+    let unchanged: Value = serde_json::from_slice(
+        &fs::read(
+            project
+                .0
+                .join(format!(".codeguard/findings/{id}/finding.json")),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(unchanged, fact);
 }
 
 #[test]
@@ -775,4 +794,111 @@ fn backlog_failure_keeps_native_finding_visible_without_claiming_task_creation()
             .next()
             .is_none()
     );
+}
+
+#[test]
+fn consumed_finding_recovers_missing_projection_without_changing_evidence() {
+    let p = Project::new();
+    p.write_report("run-one", &p.report("run-one", &p.workspace_id()));
+    assert_eq!(p.sync().1["new_findings"], 1);
+    let id = format!("CG-{}", "a".repeat(32));
+    let task = p.0.join(format!(".codeguard/tasks/{id}.md"));
+    let paths = [
+        p.0.join(format!(".codeguard/findings/{id}/finding.json")),
+        p.0.join(format!(".codeguard/findings/{id}/events/run-one.json")),
+        p.0.join(".codeguard/state/consumed/run-one.json"),
+    ];
+    let before: Vec<_> = paths.iter().map(|p| fs::read(p).unwrap()).collect();
+    fs::remove_file(&task).unwrap();
+    let r = p.sync().1;
+    assert_eq!(r["restored_task_projections"], 1, "{r}");
+    assert_eq!(r["new_findings"], 0);
+    assert_eq!(r["delivery_decision"], "not_evaluated");
+    let text = fs::read_to_string(&task).unwrap();
+    for heading in [
+        "问题证据",
+        "规则依据",
+        "允许修改的范围",
+        "修复步骤",
+        "复检命令",
+        "历史尝试",
+        "关闭条件",
+    ] {
+        assert!(text.contains(heading), "{text}");
+    }
+    assert!(!text.contains(p.0.to_str().unwrap()));
+    for (path, expected) in paths.iter().zip(before) {
+        assert_eq!(fs::read(path).unwrap(), expected);
+    }
+    fs::write(&task, "人工备注\n- [x] 我认为已修复\n").unwrap();
+    let again = p.sync().1;
+    assert_eq!(again["schema_version"], "0.2.0");
+    assert_eq!(
+        fs::read_to_string(&task).unwrap(),
+        "人工备注\n- [x] 我认为已修复\n"
+    );
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .arg("next")
+        .arg(&p.0)
+        .arg("--format=json")
+        .output()
+        .unwrap();
+    let next: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(next["repair_brief"]["task_id"], id);
+    assert_eq!(next["delivery_decision"], "not_evaluated");
+}
+
+#[test]
+fn projection_recovery_rejects_wrong_workspace_fact_before_creating_markdown() {
+    let p = Project::new();
+    p.write_report("run-one", &p.report("run-one", &p.workspace_id()));
+    p.sync();
+    let id = format!("CG-{}", "a".repeat(32));
+    let task = p.0.join(format!(".codeguard/tasks/{id}.md"));
+    fs::remove_file(&task).unwrap();
+    let fact_path = p.0.join(format!(".codeguard/findings/{id}/finding.json"));
+    let mut fact: Value = serde_json::from_slice(&fs::read(&fact_path).unwrap()).unwrap();
+    fact["workspace_id"] = json!("ws-00000000000000000000000000000000");
+    fs::write(&fact_path, serde_json::to_vec(&fact).unwrap()).unwrap();
+    let r = p.sync().1;
+    assert_eq!(r["command_status"], "incomplete", "{r}");
+    assert!(!task.exists());
+}
+
+#[cfg(unix)]
+#[test]
+fn projection_recovery_never_follows_a_task_symlink() {
+    let p = Project::new();
+    p.write_report("run-one", &p.report("run-one", &p.workspace_id()));
+    p.sync();
+    let task =
+        p.0.join(format!(".codeguard/tasks/CG-{}.md", "a".repeat(32)));
+    fs::remove_file(&task).unwrap();
+    let outside = p.0.join("private-note.md");
+    fs::write(&outside, "人工数据").unwrap();
+    std::os::unix::fs::symlink(&outside, &task).unwrap();
+    assert_eq!(p.sync().1["command_status"], "incomplete");
+    assert_eq!(fs::read_to_string(&outside).unwrap(), "人工数据");
+    assert!(
+        fs::symlink_metadata(&task)
+            .unwrap()
+            .file_type()
+            .is_symlink()
+    );
+}
+
+#[test]
+fn new_scan_and_deleted_projection_recover_in_one_sync_without_report_failure() {
+    let p = Project::new();
+    p.write_report("run-one", &p.report("run-one", &p.workspace_id()));
+    p.sync();
+    let task =
+        p.0.join(format!(".codeguard/tasks/CG-{}.md", "a".repeat(32)));
+    fs::remove_file(task).unwrap();
+    p.write_report("run-two", &p.report("run-two", &p.workspace_id()));
+    let r = p.sync().1;
+    assert_eq!(r["failed_reports"], 0, "{r}");
+    assert_eq!(r["restored_task_projections"], 1);
+    assert_eq!(r["imported_reports"], 1);
+    assert_eq!(r["new_findings"], 0);
 }

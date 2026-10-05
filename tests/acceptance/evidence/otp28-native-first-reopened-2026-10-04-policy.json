@@ -1,0 +1,18 @@
+{
+  "adapter_sha256": "f6d18bad3950f25018d8736660f2a292874d46a01c5e74f4ef22ba675a72c1af",
+  "grammar_sha256": null,
+  "identity": {
+    "checker_id": "syntax.native_confirmation",
+    "scope": "app.erl",
+    "task_id": "CG-B-adbe0d18568c875773065066871ea3ae",
+    "workspace_id": "ws-61c7cac666cd3addf981def0b69429cb"
+  },
+  "native_rule_id": "erlang.syntax.error",
+  "native_version": "OTP 28",
+  "original_report_sha256": "c3d08854a57f31baec9ce2e5c64e4902d6d0a7b3b20c44a73ae4641bbe7b43c5",
+  "original_source_sha256": "c93016685874aea157536b407fe261479573844ba69124194a71a3b2940074cd",
+  "policy_revision": "p1",
+  "report_type": "task_resolution_policy",
+  "schema_version": "1.1.0",
+  "tool_sha256": "cd03d938d7547ef608076a58a49f5284931b43f39090087baf35efc1665dd5d6"
+}

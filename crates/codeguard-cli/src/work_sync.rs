@@ -14,7 +14,7 @@ use codeguard_runtime::TaskFileLock;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 
-use crate::java_p3c_command::render_pom;
+use crate::java_p3c_command::{has_projectable_findings, render_pom};
 use crate::java_p3c_scan::finding_record;
 use crate::workspace_refresh::read_workspace_baseline;
 
@@ -29,6 +29,8 @@ mod python_syntax_confirmation_report;
 mod rust_build_report;
 mod rust_cve_report;
 mod rustdoc_report;
+mod syntax_confirmation_report;
+mod task_projection;
 static NEXT_WRITE: AtomicU64 = AtomicU64::new(0);
 
 struct Arguments {
@@ -75,6 +77,7 @@ pub struct SyncSummary {
     pub new_blockers: u64,
     pub historical_findings: u64,
     pub failed_reports: u64,
+    pub restored_task_projections: u64,
 }
 
 /// 将当前 CLI 的脱敏报告写入已初始化工作区的本地报告队列。
@@ -118,7 +121,7 @@ pub fn run(args: &[String]) -> ExitCode {
         Ok(summary) => summary,
         Err(reason) => return print_unavailable(parsed.json, reason),
     };
-    let report = json!({
+    let mut report = json!({
         "schema_version":"0.2.0",
         "report_type":"work_sync_preview",
         "operation":"work_sync",
@@ -133,6 +136,10 @@ pub fn run(args: &[String]) -> ExitCode {
         "delivery_decision":"not_evaluated",
         "next_actions":["inspect_findings_and_tasks", "implement_native_reverification_and_full_gate"]
     });
+    if summary.restored_task_projections > 0 {
+        report["schema_version"] = json!("0.3.0");
+        report["restored_task_projections"] = json!(summary.restored_task_projections);
+    }
     if parsed.json {
         println!("{report}");
     } else {
@@ -143,6 +150,12 @@ pub fn run(args: &[String]) -> ExitCode {
             summary.imported_reports,
             summary.failed_reports
         );
+        if summary.restored_task_projections > 0 {
+            println!(
+                "已恢复 {} 份任务投影；原事实和关闭条件保持不变",
+                summary.restored_task_projections
+            );
+        }
     }
     ExitCode::from(3)
 }
@@ -177,6 +190,7 @@ pub fn sync_local_workspace(root: &Path) -> Result<SyncSummary, &'static str> {
     if fs::create_dir(&consumed).is_err() && !real_directory(&consumed) {
         return Err("consumed_state_unavailable");
     }
+    let restored_before_import = task_projection::recover_missing(root, true)?;
     let Ok(entries) = fs::read_dir(&reports) else {
         return Err("reports_unreadable");
     };
@@ -229,6 +243,8 @@ pub fn sync_local_workspace(root: &Path) -> Result<SyncSummary, &'static str> {
     if receipt_error {
         return Err("import_failure_receipt_write_failed");
     }
+    let restored_task_projections =
+        restored_before_import + task_projection::recover_missing(root, false)?;
     Ok(SyncSummary {
         workspace_id,
         imported_reports: imported,
@@ -237,6 +253,7 @@ pub fn sync_local_workspace(root: &Path) -> Result<SyncSummary, &'static str> {
         new_blockers,
         historical_findings,
         failed_reports: failures,
+        restored_task_projections,
     })
 }
 
@@ -346,7 +363,7 @@ pub(crate) fn latest_current_finding_observation(
         .ok_or("latest_report_invalid")?;
     if matches!(
         report["schema_version"].as_str(),
-        Some("0.5.0" | "0.6.0" | "0.7.0" | "0.8.0" | "0.9.0")
+        Some("0.5.0" | "0.6.0" | "0.7.0" | "0.8.0" | "0.9.0" | "0.18.0" | "0.19.0")
     ) {
         let config_ref = file["configuration_ref"]
             .as_str()
@@ -363,7 +380,10 @@ pub(crate) fn latest_current_finding_observation(
             return Err("latest_configuration_changed");
         }
     }
-    if report["schema_version"] == "0.9.0" {
+    if matches!(
+        report["schema_version"].as_str(),
+        Some("0.9.0" | "0.18.0" | "0.19.0")
+    ) {
         if let Some(claimed) = report["adapter_sha256"].as_str() {
             let current = crate::python_lint_command::current_adapter_sha256()
                 .ok_or("adapter_binary_unavailable")?;
@@ -457,27 +477,42 @@ fn import_one(
         codeguard_adapters::parse_unique_json(&bytes)
             .map_err(|_| "eslint_preparation_duplicate_or_invalid_json")?;
     }
-    if value["report_type"] == "python_syntax_confirmation_observation" {
+    if (value["report_type"] == "python_lint_feedback"
+        && matches!(value["schema_version"].as_str(), Some("0.18.0" | "0.19.0")))
+        || matches!(
+            value["report_type"].as_str(),
+            Some(
+                "python_syntax_confirmation_observation"
+                    | "syntax_confirmation_observation"
+                    | "syntax_task_recheck"
+            )
+        )
+    {
         codeguard_adapters::parse_unique_json(&bytes)
             .map_err(|_| "python_syntax_confirmation_duplicate_or_invalid_json")?;
     }
     // 已消费的历史报告按原字节收据确认，不用当前源码重演历史输入。
-    if matches!(
-        value["report_type"].as_str(),
-        Some(
-            "eslint_workbench_observation"
-                | "npm_cve_workbench_observation"
-                | "eslint_task_recheck"
-                | "eslint_preparation_observation"
-                | "java_checkstyle_workbench_observation"
-                | "checkstyle_task_recheck"
-                | "checkstyle_preparation_observation"
-                | "checkstyle_preparation_recheck"
-                | "rust_cve_workbench_observation"
-                | "python_cve_workbench_observation"
-                | "python_syntax_confirmation_observation"
+    if (value["report_type"] == "python_lint_feedback"
+        && matches!(value["schema_version"].as_str(), Some("0.18.0" | "0.19.0")))
+        || matches!(
+            value["report_type"].as_str(),
+            Some(
+                "eslint_workbench_observation"
+                    | "npm_cve_workbench_observation"
+                    | "eslint_task_recheck"
+                    | "eslint_preparation_observation"
+                    | "java_checkstyle_workbench_observation"
+                    | "checkstyle_task_recheck"
+                    | "checkstyle_preparation_observation"
+                    | "checkstyle_preparation_recheck"
+                    | "rust_cve_workbench_observation"
+                    | "python_cve_workbench_observation"
+                    | "python_syntax_confirmation_observation"
+                    | "syntax_confirmation_observation"
+                    | "syntax_task_recheck"
+            )
         )
-    ) {
+    {
         let run = value["run_id"]
             .as_str()
             .filter(|s| safe_run_id(s))
@@ -558,6 +593,28 @@ fn parse_report(
     report: &Value,
     digest: String,
 ) -> Result<ReportInput, &'static str> {
+    if report["report_type"] == "syntax_task_recheck" {
+        if !crate::syntax_task_recheck::valid_shape(root, report)
+            || report["workspace_id"] != workspace_id
+        {
+            return Err("syntax_task_recheck_invalid");
+        }
+        let run = report["run_id"].as_str().ok_or("report_run_id_invalid")?;
+        if path.file_stem().and_then(|p| p.to_str()) != Some(run) {
+            return Err("report_run_id_invalid");
+        }
+        return Ok(ReportInput {
+            workspace_id: workspace_id.into(),
+            run_id: run.into(),
+            digest,
+            findings: Vec::new(),
+            blockers: Vec::new(),
+            historical_findings: 0,
+        });
+    }
+    if report["report_type"] == "syntax_confirmation_observation" {
+        return syntax_confirmation_report::parse(root, workspace_id, path, report, digest);
+    }
     if report["report_type"] == "python_syntax_confirmation_observation" {
         return python_syntax_confirmation_report::parse(root, workspace_id, path, report, digest);
     }
@@ -632,7 +689,15 @@ fn parse_report(
     let report_v06 = report["schema_version"] == "0.6.0";
     let report_v07 = report["schema_version"] == "0.7.0";
     let report_v08 = report["schema_version"] == "0.8.0";
-    let report_v09 = report["schema_version"] == "0.9.0";
+    let report_v18 = matches!(report["schema_version"].as_str(), Some("0.18.0" | "0.19.0"));
+    if report_v18
+        && (!crate::python_confirmation_recheck::valid_binding(root, report)
+            || (report["task_input_stable"] == true
+                && !crate::python_confirmation_recheck::inputs_current(root, report)))
+    {
+        return Err("python_confirmation_recheck_binding_invalid");
+    }
+    let report_v09 = report["schema_version"] == "0.9.0" || report_v18;
     let has_suppression_audit = report_v08 || report_v09;
     if path.file_stem().and_then(|stem| stem.to_str()) != Some(run_id)
         || !(report["schema_version"] == "0.4.0"
@@ -1147,11 +1212,19 @@ fn parse_java_report(
                     .insert(relative.into());
                 continue;
             }
-            if matches!(
+            let completed = matches!(
                 status,
                 "findings_observed_untrusted" | "clean_scope_unproven"
-            ) {
-                observed_count += 1;
+            );
+            // 旧 0.2 报告只在嵌套观察中保留失败诊断，没有平铺投影；仍按阻塞导入。
+            let projected_partial = has_projectable_findings(native)
+                && flat
+                    .get(flat_index)
+                    .is_some_and(|finding| finding["path"] == relative);
+            if completed || projected_partial {
+                if completed {
+                    observed_count += 1;
+                }
                 let source_sha = native["source_sha256"]
                     .as_str()
                     .filter(|sha| valid_sha256(sha))
@@ -1235,7 +1308,9 @@ fn parse_java_report(
                         .or_default()
                         .insert(relative.into());
                 }
-                continue;
+                if completed {
+                    continue;
+                }
             }
             blocker_reason = reason;
         } else if configuration == "configured" && file_reason == "p3c_configuration_not_confirmed"
@@ -1715,7 +1790,11 @@ fn parse_rust_report(
             reason: reason.into(),
             build_root: ".".into(),
             scope: ".".into(),
-            affected_paths: vec!["Cargo.toml".into()],
+            affected_paths: if reason == "cargo_lock_unavailable" {
+                vec!["Cargo.toml".into(), "Cargo.lock".into()]
+            } else {
+                vec!["Cargo.toml".into()]
+            },
         }]
     };
     Ok(ReportInput {
@@ -2010,6 +2089,50 @@ fn persist_local_blocker_observation(
 }
 
 fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
+    if blocker.diagnostic_reason.as_deref() == Some("syntax_recovery_incomplete") {
+        return format!(
+            "# {} 语法检查能力恢复任务\n\n- 问题证据：范围 `{}`；报告 `.codeguard/reports/{}.json`，摘要 `{}`；固定 grammar 的恢复扫描未完成或错误无法定位，恢复节点数组为空；报告保留源码和 grammar 身份，没有可用的源码错误位置。\n- 规则依据：初检完整性与原生确认要求；零恢复不能代表语法通过，本任务不是已确认源码违规。\n- 允许修改范围：适用检查工具、语言版本和 grammar 配置；原生确认前不得修改源码，不关闭检查器，不伪造定位。\n- 修复步骤：核对原报告的语言、版本与已知限制，恢复适用原生 lint/编译器或调查 grammar；确认 adapter 缺失时提出具体能力决策，不重复无依据的源码修补。\n- 复检命令：codeguard task verify {} . --format=json；codeguard next . --format=json 显示当前能力缺口，恢复检查后再对同一范围复扫。\n- 历史尝试：首次 run {}；后续扫描和失败尝试保留在同一任务，正文不代表完整历史。\n- 关闭条件：同一源码范围的有效原生确认、完整覆盖及既有关闭策略均满足；安装、WASM 零恢复或勾选均不能关闭。\n",
+            blocker.id, blocker.scope, report.run_id, report.digest, blocker.id, report.run_id
+        );
+    }
+    if blocker.checker_id == "syntax.native_confirmation"
+        && blocker.diagnostic_reason.as_deref() == Some("swift_native_first_observation")
+    {
+        return format!(
+            "# {} Swift 原生检查任务\n\n- 问题证据：报告 `.codeguard/reports/{}.json`，摘要 `{}`，当前范围 `{}`；首次来源为原生 compiler，没有 WASM 观察。\n- 规则依据：Apple Swift 6.4 冻结单文件 frontend parse，语法诊断与工具/预算阻塞分别保留；类型与构建尚未检查。\n- 允许修改范围：仅当前原生语法位置对应源码；上下文或工具阻塞先恢复检查环境，不改无关源码。\n- 修复步骤：运行 next 核对最新证据，按语法位置修复或恢复项目上下文，保留历史尝试。\n- 复检命令：codeguard task verify {} . --swift-tool <已核验绝对路径> --format=json。\n- 历史尝试：首次 run {}，后续扫描和复检追加在原任务。\n- 关闭条件：有效原工具复检、正式策略及完整项目覆盖满足；局部零诊断或勾选不自动关闭。\n",
+            blocker.id, report.run_id, report.digest, blocker.scope, blocker.id, report.run_id
+        );
+    }
+    if blocker.checker_id == "syntax.native_confirmation"
+        && blocker.diagnostic_reason.as_deref() == Some("kotlin_native_first_observation")
+    {
+        return format!(
+            "# {} Kotlin 原生检查任务\n\n- 问题证据：报告 `.codeguard/reports/{}.json`，摘要 `{}`，当前范围 `{}`；首次来源为原生 compiler，没有 WASM 观察。\n- 规则依据：Kotlin/JVM 2.4.10 冻结单文件编译，语法诊断与上下文/环境阻塞分别保留。\n- 允许修改范围：仅当前原生语法位置对应源码；上下文或工具阻塞先恢复检查环境，不改无关源码。\n- 修复步骤：运行 next 核对最新证据，按语法位置修复或恢复项目上下文，保留历史尝试。\n- 复检命令：codeguard task verify {} . --kotlinc-tool <已核验绝对路径> --format=json。\n- 历史尝试：首次 run {}，后续扫描和复检追加在原任务。\n- 关闭条件：有效原工具复检、正式策略及完整项目覆盖满足；局部零诊断或勾选不自动关闭。\n",
+            blocker.id, report.run_id, report.digest, blocker.scope, blocker.id, report.run_id
+        );
+    }
+    if blocker.checker_id == "syntax.native_confirmation"
+        && blocker.diagnostic_reason.as_deref() == Some("erlang_native_first_observation")
+    {
+        return format!(
+            "# {} Erlang 原生检查发现待处理\n\n- 问题证据：范围 `{}`；报告 `.codeguard/reports/{}.json`，摘要 `{}`，记录当前源码、工具身份和原生诊断或环境阻塞；首次证据不含 WASM 观察。\n- 规则依据：OTP 28 原生 scanner/parser；局部语法诊断与缺工具、版本、预处理阻塞分别处理，不视为完整项目 lint 结论。\n- 允许修改范围：当前原生诊断成立时仅修复该范围源码；环境阻塞仅恢复原工具、版本和项目预处理上下文，不修改无关源码或关闭检查。\n- 修复步骤：先运行 codeguard next . --format=json 核对最新证据和允许动作，再按当前原生位置修复或恢复具体环境；源码或工具改变先复检，旧位置不能沿用。\n- 复检命令：codeguard task verify {} . --erl-tool <next 建议或已核验的绝对路径> --format=json；复用原生工具，不因已有诊断重复安装。\n- 历史尝试：首次 run {}；后续扫描、尝试和复检追加在同一任务，任务正文不是完整历史。\n- 关闭条件：原工具复检、可信项目策略与覆盖及正式关闭流程均满足；局部零诊断、任务勾选或安装完成不能自行关闭。\n",
+            blocker.id, blocker.scope, report.run_id, report.digest, blocker.id, report.run_id
+        );
+    }
+    if blocker.checker_id == "syntax.native_confirmation"
+        && blocker.diagnostic_reason.as_deref() == Some("go_package_structure_candidate")
+    {
+        return format!(
+            "# {} Go package声明原生确认待处理\n\n- 问题证据：范围 `{}`；报告 `.codeguard/reports/{}.json`，摘要 `{}`；独立结构候选未发现整文件package_clause，零宽文件起点不代表原生错误列。\n- 规则依据：codeguard.go.required_package 1.0.0，候选规则与原始ERROR/MISSING分别记录，不是已确认源码违规。\n- 允许修改范围：对应Go工具和项目包配置；原生确认后仅修复该文件的包声明，不能猜包名、删除函数或关闭检查。\n- 修复步骤：先核对完整文件范围，恢复适用原生lint或编译器；用原生结果确认声明及项目包归属，注释或字符串不算声明。\n- 复检命令：codeguard task verify {} . --format=json；next显示当前adapter缺口，未接适用原生能力时保留具体能力决策。\n- 历史尝试：首次run {}；重复扫描及失败尝试沿用同一任务。\n- 关闭条件：原工具复检、当前范围、完整覆盖及既有批准策略均满足；补声明、零候选或任务勾选均不能自动关闭。\n",
+            blocker.id, blocker.scope, report.run_id, report.digest, blocker.id, report.run_id
+        );
+    }
+    if blocker.checker_id == "syntax.native_confirmation" {
+        return format!(
+            "# {} 原生语法确认待处理\n\n- 问题证据：范围 `{}`；报告 `.codeguard/reports/{}.json`，摘要 `{}`，含固定 grammar、源码身份和原字节疑似位置。\n- 规则依据：候选 ERROR/MISSING 恢复不是已确认源码违规。\n- 允许修改范围：对应原生工具、版本和适用项目配置；原生确认前不要修改无关源码或关闭检查。\n- 修复步骤：查看原报告语言及已知限制，准备适用 lint/编译器，确认其语法能力和同一源码范围；原生诊断成立后修复，反证进入 grammar 误报调查。\n- 复检命令：codeguard task verify {} . --format=json；先用 codeguard next 查看适用原生 adapter 和工具参数；能力缺口会明确反馈，不能以其它语言的工具替代。\n- 历史尝试：首次 run {}；追加事件和尝试保存于同一任务。\n- 关闭条件：当前输入与适用原生语法能力确认，并满足既有关闭策略；安装、WASM 零恢复或任务勾选均不能关闭。\n",
+            blocker.id, blocker.scope, report.run_id, report.digest, blocker.id, report.run_id
+        );
+    }
     if blocker.checker_id == "python.pip_audit" {
         return format!(
             "# {} Python CVE 检查待处理\n\n- 问题证据：构建根 `{}`；本轮诊断 `{}`；报告摘要 `{}`，首次 run `{}`。原生 advisory 在脱敏本地报告中，数据库身份及时效未核验。\n- 规则依据：pip-audit 原生 advisory、标准 pylock 解析版本归属与可信漏洞源；本地任务没有白名单批准权威。\n- 允许范围：该构建根的 pyproject.toml、标准 pylock、审计工具和依赖版本；不得改动无关源码或关闭检查来消除问题。\n- 修复步骤：先恢复明确的工具、版本和锁输入；核对环境/依赖组及逐 advisory 归属，真实漏洞升级依赖，误报提出精确待审候选。\n- 复检命令：codeguard task verify {} . --pip-audit-tool <已核验绝对路径> --pip-audit-version <已核验版本> --format json。\n- 历史尝试：后续原生观察与复检记录在同一任务；首次任务文字不是完整历史。\n- 关闭条件：原工具复检及可信漏洞源、项目依赖范围和策略覆盖均核验；局部零漏洞或任务勾选不能关闭。\n",
@@ -2146,23 +2269,35 @@ fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
         );
     }
     if blocker.checker_id == "rust.cargo_clippy" {
+        let step = if blocker.reason == "cargo_lock_unavailable" {
+            "恢复项目原 Cargo.lock 或按项目依赖流程准备锁文件，再执行锁定离线检查；检查器不隐式生成锁，不修改无关源码。"
+        } else {
+            "按原因准备原生工具、配置或稳定输入并重跑锁定离线检查；若工具版本或规则不适用，提交策略决策。"
+        };
         let recheck = serde_json::to_string(&[
             "cargo",
             "clippy",
+            "--locked",
             "--offline",
             "--all-targets",
             "--message-format=json",
         ])
         .expect("复检参数可编码");
         return format!(
-            "# {} 环境/配置待处理\n\n- 阻塞证据：Cargo Clippy 本轮未完成；原因 `{}`；首次报告摘要 `{}`。\n- 规则依据：原生检查完整性要求；不是源码违规。\n- 允许范围：项目根；优先恢复 Cargo、Clippy、配置或稳定输入，不得关闭检查器。\n- 修复步骤：按原因准备原生工具并重跑检查；若工具版本或规则不适用，提交策略决策。\n- 复检 argv（项目根执行）：\n\n    {}\n\n- 历史尝试：尚无记录；首次 run `{}`。\n- 关闭条件：原检查器完成同范围复检；若产生发现，应继续处理。\n\n> 本地待处理记录，不是交付通过证明。\n",
-            blocker.id, blocker.reason, report.digest, recheck, report.run_id
+            "# {} 环境/配置待处理\n\n- 阻塞证据：Cargo Clippy 本轮未完成；原因 `{}`；首次报告摘要 `{}`。\n- 规则依据：原生检查完整性要求；不是源码违规。\n- 允许范围：项目根；优先恢复 Cargo、Clippy、配置或稳定输入，不得关闭检查器。\n- 修复步骤：{}\n- 复检 argv（项目根执行）：\n\n    {}\n\n- 历史尝试：尚无记录；首次 run `{}`。\n- 关闭条件：原检查器完成同范围复检；若产生发现，应继续处理。\n\n> 本地待处理记录，不是交付通过证明。\n",
+            blocker.id, blocker.reason, report.digest, step, recheck, report.run_id
+        );
+    }
+    if blocker.checker_id == "python.ruff" && blocker.reason == "ruff_local_tool_invalid" {
+        return format!(
+            "# {} Ruff本地环境修复任务\n\n- 问题证据：本地工具观察失败 `{}`，首次报告摘要 `{}`。\n- 规则依据：原生工具入口完整性，不是源码违规。\n- 允许范围：受检根 `.venv/bin/ruff`、普通父目录、执行权限与原工具字节；不修改无关源码。\n- 修复步骤：核对目录链接、损坏入口或执行权限，恢复原本地环境；不删除环境以换用全局工具绕过，确需改变工具选择时明确指定原检查上下文并复核。\n- 复检命令：codeguard task verify {} . --format json；自动发现恢复后的同根原生入口。\n- 历史尝试：首次run `{}`，后续观察和失败尝试保留在同一任务；首张文档不代表完整历史。\n- 关闭条件：原受阻检查恢复并完成有效原工具复检及策略/覆盖核验；仅安装、同步、勾选或局部零发现不能关闭。\n",
+            blocker.id, blocker.reason, report.digest, blocker.id, report.run_id
         );
     }
     if blocker.checker_id == "python.ruff" && blocker.reason == "python_syntax_confirmation_needed"
     {
         return format!(
-            "# {} Python 语法原生确认任务\n\n- 问题证据：源码范围 `{}` 的候选 WASM 初检尚未验收；脱敏疑似位置、源码及 grammar 摘要在 `.codeguard/reports/{}.json`，报告 SHA-256 `{}`。疑似位置不是已确认源码违规。\n- 规则依据：Tree-sitter 恢复节点只提示待核实位置，须用适用的 Python 原生语法能力和项目原配置确认。\n- 允许范围：只核对本源码、对应构建根、原生工具及配置；不得凭候选观察修改无关源码或增加白名单。\n- 修复步骤：查看同 run 的位置，再恢复原生检查；若原生反证，保留证据并调查 grammar 误报。\n- 复检命令：codeguard task verify {} . --ruff-tool <已核验绝对路径> --format json。\n- 历史尝试：首次 run `{}`；后续候选观察归并到同一任务。\n- 关闭条件：当前输入、范围与语法能力匹配的原生复检和可信策略核验完成；安装工具、任务勾选或后续 WASM 零恢复节点都不能关闭。\n",
+            "# {} Python 语法原生确认任务\n\n- 问题证据：源码范围 `{}` 的候选 WASM 初检尚未验收；脱敏疑似位置、源码及 grammar 摘要在 `.codeguard/reports/{}.json`，报告 SHA-256 `{}`。疑似位置不是已确认源码违规。\n- 规则依据：原始 Tree-sitter ERROR/MISSING 与独立 codeguard.python.required_suite 结构观察分别保留来源；结构观察的规则版本、配置摘要、父节点和零基字节坐标见报告。两者均须用适用的 Python 原生语法能力和项目原配置确认，不能将候选结构规则当作原生违规。\n- 允许范围：只核对本源码、对应构建根、原生工具及配置；不得凭候选观察修改无关源码或增加白名单。\n- 修复步骤：查看同 run 的位置，再恢复原生检查；若原生反证，保留证据并调查 grammar 误报。\n- 复检命令：codeguard task verify {} . --ruff-tool <已核验绝对路径> --format json。\n- 历史尝试：首次 run `{}`；后续候选观察归并到同一任务。\n- 关闭条件：当前输入、范围与语法能力匹配的原生复检和可信策略核验完成；安装工具、任务勾选或后续 WASM 零恢复节点都不能关闭。\n",
             blocker.id, blocker.scope, report.run_id, report.digest, blocker.id, report.run_id
         );
     }
@@ -2254,6 +2389,10 @@ fn render_task(report: &ReportInput, finding: &FindingInput) -> String {
             "lint",
             "java",
             finding.path.as_str(),
+            "--checker",
+            "p3c",
+            "--workspace",
+            ".",
             "--maven-tool",
             "<绝对路径>",
             "--java-home",
@@ -2265,7 +2404,7 @@ fn render_task(report: &ReportInput, finding: &FindingInput) -> String {
         ])
         .expect("复检参数可编码");
         return format!(
-            "# {} 待修复\n\n- 问题证据：原生 P3C/PMD 命名规则 `{}`，首次行号 {}；报告摘要 `{}`。\n- 规则依据：P3C 2.1.1 命名规则集；工具与规则批准、完整覆盖尚未核验。\n- 允许范围：仅下列项目内源码，不得靠关闭规则或修改无关文件消除诊断。\n\n    {}\n\n- 修复步骤：核对原生规则与命名语义后修复该文件；若确为误报，提出精确白名单候选并等待独立裁定。\n- 复检 argv（占位值替换为已核验绝对路径与摘要）：\n\n    {}\n\n- 历史尝试：尚无记录；首次 run `{}`。\n- 关闭条件：同一原生规则、工具和范围复检确认该发现消失，完整质量策略另行核验。\n\n> 本地待处理记录，不是交付通过证明。\n",
+            "# {} 待修复\n\n- 问题证据：原生 P3C/PMD 规则 `{}`，首次行号 {}；报告摘要 `{}`。\n- 规则依据：P3C 2.1.1 本轮已声明的规则子集；工具与规则批准、完整覆盖尚未核验。\n- 允许范围：仅下列项目内源码，不得靠关闭规则或修改无关文件消除诊断。\n\n    {}\n\n- 修复步骤：核对具体原生规则及其语义后修复该文件；若确为误报，提出精确白名单候选并等待独立裁定。\n- 复检 argv（占位值替换为已核验绝对路径与摘要）：\n\n    {}\n\n- 历史尝试：尚无记录；首次 run `{}`。\n- 关闭条件：同一原生规则、工具和范围复检确认该发现消失，完整质量策略另行核验。\n\n> 本地待处理记录，不是交付通过证明。\n",
             finding.id, finding.rule_id, finding.line, report.digest, path, recheck, report.run_id
         );
     }
@@ -2274,6 +2413,7 @@ fn render_task(report: &ReportInput, finding: &FindingInput) -> String {
         let recheck = serde_json::to_string(&[
             "cargo",
             "clippy",
+            "--locked",
             "--offline",
             "--all-targets",
             "--message-format=json",

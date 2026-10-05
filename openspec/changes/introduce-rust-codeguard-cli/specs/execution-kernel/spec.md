@@ -145,6 +145,10 @@ fix MUST 区分 dry-run 与 apply，检查目标身份及范围；应用前置�
 - **WHEN** 原生工具在产出finding后超时
 - **THEN** 从run和obligation可追溯已保留证据与真实终止原因，公开轨迹不泄漏原始敏感参数
 
+#### Scenario: Native process cannot be spawned
+- **WHEN** 操作系统拒绝启动原生进程
+- **THEN** 保留 SpawnFailure 和可取得的 OS 错误码，仅进入私有进程证据；不伪造原生 stderr、不将启动失败视为信号退出或源码违规、不自动重试
+
 #### Scenario: Metrics storage is unavailable
 - **WHEN** 指标存储失败但原检查已形成结论
 - **THEN** 保留原质量结论并明确观测故障；必要证据无法保存时报告操作未完成，不伪造检查成功

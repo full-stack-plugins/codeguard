@@ -301,3 +301,81 @@ fn configured_probe_rejects_a_higher_precedence_config() {
     assert_eq!(result.reason, Some("ruff_config_selection_changed"));
     fs::remove_dir_all(root).expect("清理测试目录");
 }
+
+#[test]
+#[ignore = "requires pinned Ruff 0.16.8; run with CODEGUARD_RUFF_BIN"]
+fn project_native_settings_bind_explicit_targets_and_keep_implicit_or_per_file_unknown() {
+    let tool = PathBuf::from(std::env::var_os("CODEGUARD_RUFF_BIN").expect("Ruff路径"));
+    let root = std::env::temp_dir()
+        .canonicalize()
+        .unwrap()
+        .join(format!("codeguard-ruff-target-{}", std::process::id()));
+    fs::create_dir(&root).unwrap();
+    let cases = [
+        (
+            "target-version = 'py39'\n[lint]\nselect = ['F401']\n",
+            Ok("py39"),
+            true,
+        ),
+        (
+            "target-version = 'py310'\n[lint]\nselect = ['F401']\n",
+            Ok("py310"),
+            false,
+        ),
+        (
+            "[lint]\nselect = ['F401']\n",
+            Err("ruff_target_not_explicit"),
+            false,
+        ),
+        (
+            "target-version = 'py310'\n[lint]\nselect = ['F401']\n[per-file-target-version]\n'app.py' = 'py39'\n",
+            Err("ruff_per_file_target_unresolved"),
+            true,
+        ),
+    ];
+    for (index, (configuration, target, syntax_present)) in cases.into_iter().enumerate() {
+        let project = root.join(index.to_string());
+        fs::create_dir(&project).unwrap();
+        let source = project.join("app.py");
+        let config = project.join("ruff.toml");
+        fs::write(&source, "match value:\n    case 1:\n        pass\n").unwrap();
+        fs::write(&config, configuration).unwrap();
+        let evidence = project.join("evidence");
+        fs::create_dir(&evidence).unwrap();
+        fs::set_permissions(&evidence, fs::Permissions::from_mode(0o700)).unwrap();
+        let mut probe = request(source.clone(), tool.clone(), evidence);
+        probe.deadline = Instant::now() + Duration::from_secs(20);
+        probe.project_config = Some(RuffConfigBinding {
+            path: config.clone(),
+            expected_sha256: digest(&config),
+        });
+        let result = run_ruff_probe(&probe, &AtomicBool::new(false));
+        assert_eq!(
+            result.state,
+            RuffProbeState::EvidenceComplete,
+            "{:?}",
+            result.reason
+        );
+        let settings = result.settings.as_ref().unwrap();
+        assert_eq!(settings.explicit_python_target(), target, "case {index}");
+        assert_eq!(
+            serde_json::to_value(settings)
+                .unwrap()
+                .as_object()
+                .unwrap()
+                .len(),
+            4
+        );
+        let diagnostics = &result.parsed.as_ref().unwrap().diagnostics;
+        assert_eq!(
+            diagnostics.iter().any(|row| row.code == "invalid-syntax"),
+            syntax_present
+        );
+        assert_eq!(
+            fs::read_to_string(source).unwrap(),
+            "match value:\n    case 1:\n        pass\n"
+        );
+        assert_eq!(fs::read_to_string(config).unwrap(), configuration);
+    }
+    fs::remove_dir_all(root).unwrap();
+}

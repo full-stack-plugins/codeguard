@@ -82,6 +82,7 @@
   路径并发补强：Unix 读取和复核改为从固定根目录描述符逐级 `openat`/`O_NOFOLLOW`，目录在检查期间切换为范围外符号链接的真实并发反例只能返回原范围字节或错误。副本写入和整个原生进程仍无完整沙箱；源集完整性、其它 adapter 接线和项目级 Maven 副作用仍缺，3.7 不勾选。
   `check all/java` 局部范围复核：原生节点结束后再次静态发现，比较源码/清单集合、构建根、已观察清单/锁/检查器配置摘要及配置状态；新增源码或规则配置变化会加入 `project_scope_changed_during_check`，原诊断保留。截止时间已耗尽则报告范围复核未执行；自有 `codeguard/state` 记录不造成假变化。尚未逐字节冻结全部源码、捕获瞬时改回、实现完整内核隔离或受保护义务账本，3.7/2.4 不勾选。
   同路径内容复核增量：`check all/java` 在原生节点前对初次发现的源码集合建立有界 `SourceSnapshot`，节点后从固定根目录描述符复核原路径字节。同一路径内容变化加入 `project_source_changed_during_check`；文件数/单文件/总字节超限或安全读取失败显式标记快照或复核不可用，不产生 allow。静态配置文件若同时被归类为源码，其内容变化也可触发此项；仅写入 CodeGuard 自有记录不触发。快照非原子、无进程沙箱，改后又改回、末次复核之后的变化和未发现目标尚不能捕获，3.7/2.4 仍不勾选。
+  Cargo 输入增量：Clippy 诊断绑定启动前源码、根配置/锁及工具身份，变化撤回发现；普通和抑制对照使用锁定离线命令，缺锁形成具体准备任务。Rustdoc/build 保留 Cargo 代理入口并复核改指；相同时间戳隔离目录不碰撞，取消保持优先级。实际失败、原生测试及边界见 [Cargo 输入验收](../../../tests/acceptance/rust-clippy-input-stability.md)。完整模型、源集与沙箱仍缺，父任务不勾选。
 - [ ] 3.8 实现严格缓存及义务等价证明；验收：同 mtime/size 内容替换、规则/依赖/工具/库变化必失效，软缓存不可直接认证。
 - [ ] 3.9 实现run/obligation/task/attempt关联轨迹与分阶段计时、缓存/终止原因；交付：脱敏结构化本地事件；验收：部分失败可追溯，公开轨迹不泄露原始argv/env，不默认上传遥测。
 - [ ] 3.10 实现证据索引、私有权限、引用与保留策略及受管清理；验收：活动run/lease、被引用证据、用户源码和tracked历史不被清理，磁盘/权限/symlink失败不扩大删除或伪造完成。
@@ -106,6 +107,7 @@
 - [ ] 4.7 接入 rules list/config validate/explain 命令；验收：有效规则、原生suppression与批准来源可解释，静态验证不执行项目脚本，配置错误为未完成而非源码违规。
   追加进展：`config validate/explain` 0.1 只返回旧配置与工具锁的静态状态、未绑定的可信质量策略和无效白名单权威；不产生有效策略或质量门禁。`rules list`、规则/原生配置差异和批准来源解释仍缺，任务不勾选。
   2026-09-27入口进展：Rust rules list现复用静态发现及内置版本化Ruff候选映射，逐语言显示配置声明、来源/许可/摘要/兼容版本和六类目录缺口；Node生态显式映射到TypeScript，不靠语言前缀丢失ESLint配置。动态配置不执行、本地同名映射/自批不授权，报告0.1固定未完成且无门禁效果。新增schema及验收用例，结果见verification.md。完整有效规则、可信来源、suppression和批准例外仍缺，4.7不勾选。
+  2026-10-04 配置反馈接线：config validate/explain 0.3 复用既有静态发现，按构建根展示原生声明、来源摘要及下一步；生效规则/suppression 未解析、不执行 JS 配置或原生工具。投影有上限并保留观察总数，截断不称完整；旧 JSON 递归重复键被拒。目标测试 58 项通过，见 [验收](../../../tests/acceptance/config-native-observation.md)。有效模型、受保护来源及全生态覆盖仍缺，4.1/4.2/4.7/5.10 保持未完成。
 - [ ] 4.8 实现精确误报白名单 schema、可信来源解析和 Rust 匹配器；验收：仅同一原生规则、目标/内容、工具/规则包/适配器及有效批准身份命中；通配、过期、冲突、自批和坏报告均不放行，原始 finding 保留。
   门禁碰撞反例：两个原生规则/义务共用 finding ID 时，旧纯领域门禁会把单条批准扩展到另一条；现将重复 ID 标为无效义务账本，白名单不匹配，原始阻断仍显示。可信批准接入、本轮原生身份和所有格式消费者仍缺，4.8 不勾选。
   原生身份加固：领域 finding 现可携本轮宿主冻结的完整身份，白名单处置必须同时与该独立身份匹配；缺字段的旧 finding、源码字节/指纹/工具/适配器/rulepack 摘要变化、依赖图或 advisory 变化均保留原始和活动阻断并返回 incomplete。该字段由谁从真实原工具和内容字节生成、如何验证宿主来源尚未接入；项目 JSON 自填同值不能取得信任，4.8 继续未完成。
@@ -330,7 +332,7 @@
 - [ ] 8.13 为 php 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
 - [ ] 8.14 实现 php 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
 - [ ] 8.15 完成 php 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.16 为 ruby 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.16 为 ruby 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。证据：`rulepacks/ruby_static_candidate_v1.json`、封闭 `schemas/ruby-static-candidate.schema.json`、Rust `parse_ruby_candidate_profile` 及 [档案验收](../../../tests/acceptance/ruby-candidate-baseline.md)。六槽保留 gap，MRI/JRuby/TruffleRuby 与五平台未验收，版本策略为待核验的项目锁解析；类/模块和方法文档分开，Brakeman 限 Rails，gem build 限 gem 项目且 build 适用性依项目而定。源文档与反例验证齐备，不从缺工具推导不适用。完整原生规则、工具制品、报告/修复链路和平台资格仍由 8.17/8.18 保持未完成。
 - [ ] 8.17 实现 ruby 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
 - [ ] 8.18 完成 ruby 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
 - [ ] 8.19 为 scala 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
@@ -481,9 +483,11 @@
   持久边界补充验收：Ruff finding 的任务、fact、本地观察、事件四阶段及 Ruff 环境 blocker 的 fact 阶段均用独立工作区恢复；重放后缺失记录恢复、原字节不变、事件仅一条、消费标记最后出现。此阶段是磁盘中间态重建，实际进程退出验收见下条；磁盘故障和完整多类别事务矩阵仍缺，9.4 不勾选。
   实际进程退出补充：仅单元测试编译的子进程在 Ruff finding 的事件已持久化、消费标记未写时直接退出，父进程复查磁盘并重试，事件不重复且游标恢复；生产构建无故障注入入口。其它阶段、磁盘故障、跨类别多记录强杀与完整 RunReport 仍缺，9.4 不勾选。
   临时写入恢复补充：旧 PID/计数命名的 staging 文件残留曾使 `write_once` 直接失败；现有界换用新的 `create_new` 名字，残留文件原字节不变，目标记录完成。仍未证明磁盘错误/断电和完整事务，9.4 不勾选。
-- [ ] 9.5 实现 append-only 事件、父关系、状态机与可重建 Markdown 投影；验收：手改勾选无复检不关闭，缺父/分支冲突触发协调。进行中：Ruff 与 Rust Clippy 初见 finding 写固定 `observed` 事件和任务投影，重复报告不改 tracked 文件；其余事件、父关系校验、完整状态机及投影重建尚未实现，不勾选。
+- [ ] 9.5 实现 append-only 事件、父关系、状态机与可重建 Markdown 投影；验收：手改勾选无复检不关闭，缺父/分支冲突触发协调。进行中：Ruff 与 Rust Clippy 初见 finding 写固定 `observed` 事件和任务投影，重复报告不改 tracked 文件；缺失受支持任务的Markdown投影现由9.5.1恢复；其余事件、父关系校验、完整状态机及分支协调仍缺，不勾选。
+- [x] 9.5.1 恢复受支持本地事实的缺失可读任务投影：同一锁内核对已消费来源、事实及当前指引，仅补缺失Markdown；既有备注不覆盖，坏事实/来源/链接拒绝，不执行检查器，不改变任务状态、事实/事件/消费标记、租约或预算。证据：[投影恢复验收](../../../tests/acceptance/task-projection-recovery.md)，实际Swift重复同步与七项任务内容、Ruff源码/工具阻塞和活跃租约尝试均验证；默认工作区1283通过、示例1通过，相关WASM63通过，忽略项不计通过。完整9.5状态机、跨平台故障与安全矩阵保持未完成。
 - [ ] 9.6 实现任务依赖与 blocker 归并；验收：多个模块共缺 JDK 形成一个前置任务，各义务仍完整可见。进行中：Rust `work sync` 已将同一 Ruff 构建根、同一不完整原因的多个受影响文件归并成一个 `kind=blocker` 任务，分别保留原路径与观察事件；不同构建根不误合并，见 `codeguard-cli/tests/acceptance/work-sync-ruff-blockers.md`。JDK 跨模块公共前置任务、义务依赖边及跨检查器归并尚缺，不勾选。
-- [ ] 9.7 实现 status/next/show 与 RepairBrief/版本化 recipe；验收：给出修复目标、范围、步骤和复检条件，诊断中的指令不可执行。进行中：Python Ruff 局部反馈给出有界修复提示；初版 sync 生成脱敏 Markdown 任务。Rust `next` 已从本地结构化 Ruff fact 生成只读简报，含范围、静态步骤、复检与关闭条件；任务 Markdown 指令不进入简报，缺工具/配置优先指向准备工作。尚无完整 status/show、真实尝试历史、版本化 recipe、租约与复检关闭，因此不勾选，见 `codeguard-cli/tests/acceptance/next-local-brief-preview.md`。
+- [ ] 9.7 实现 status/next/show 与 RepairBrief/版本化 recipe；验收：给出修复目标、范围、步骤和复检条件，诊断中的指令不可执行。进行中：Python Ruff 局部反馈给出有界修复提示；初版 sync 生成脱敏 Markdown 任务。Rust `next` 已从本地结构化 Ruff fact 生成只读简报，含范围、静态步骤、复检与关闭条件；任务 Markdown 指令不进入简报，缺工具/配置优先指向准备工作。已有本地status/show、Unix尝试/租约历史及多检查器原工具复检切片；完整版本化recipe、可信关闭、跨宿主与全部平台仍缺，因此不勾选，见 `codeguard-cli/tests/acceptance/next-local-brief-preview.md` 及后续分项验收。
+- [x] 9.7.2 让等待/预算耗尽的源码finding不饿死不同物理范围的独立任务：核对路径与dev/ino，保留前置blocker和未知范围的原分流；next_actions/human给出延后任务的只读查询，不改预算、租约、事实或门禁。验收：[独立源码任务](../../../tests/acceptance/next-independent-source-work.md)，Ruff0.16.8真实双F401及两次no-change、全findings/state JSON摘要保持；同路径/硬链接/前置阻塞反例，默认all-targets1288通过/113忽略、相关WASM97通过/13忽略。仅Unix物理源码选择，完整依赖图、跨平台与可信关闭仍属9.7/9.9/9.26，不替代父任务。
   doctor 复检进展：task verify 已重用原版本诊断和任务租约/尝试一致性，持久化摘要绑定收据；next 与尝试账本识别 doctor 身份。失败仍受阻、未选择未完成，真实 Ruff 恢复仅 environment_restored_unverified_policy，next 指向批准前置及原受阻质量检查，任务仍 open。65 项相关回归及实际协议验收通过；可信义务/正式关闭未实现，不勾选，见相邻 tests/acceptance/doctor-task-verification.md。
   Java/CVE blocker 现也有本地 Markdown 任务和 `java_cve.next` 只读简报，给出构建根、漏洞库/工具检查步骤及带占位参数的复检命令；原生 advisory 未被当作已确认漏洞或白名单批准。`task verify` 可重跑原生 OWASP 并保留局部观察，但正式关闭/重开尚未实现，9.7 不勾选。
   新增局部 `status` 与 `task show` 只读视图：前者从当前受限事实汇总开放任务、待同步报告和下一步，后者复用事实/事件核对展示指定任务的证据、范围、约束、历史和复检，不读取 Markdown 指令。画像/检查 freshness 固定未核验，空任务不称通过；缺完整事件父关系、历史 gate 收据、依赖、关闭状态与版本化 recipe，9.7 仍不勾选。见相邻 `codeguard-cli/tests/acceptance/status-show-local-preview.md`。
@@ -572,6 +576,7 @@
 - [ ] 11.15 完成Kimi宿主同一接入清单；依赖11.2–11.5与S09/S10；验收：实际调用二进制、失败可恢复、任务链闭合，不以其他宿主通过代替。
 - [ ] 11.16 将配置探测与原生检查结果反馈到 Codex/ZCode/Kimi 智能体对话；验收：已配置检查器、未配置项、有效诊断、工具故障、修复建议和复检命令清楚可见；backlog 同步失败仍显示本次结果，原始工具文本不能作为智能体指令。进行中：相邻 Rust `conversation_feedback` 已从结构校验后的 RunReport 生成 JSON/human 状态、规则 ID、可用的位置、未完成原因与复检 argv；`lint python` 把真实 Ruff 扫描配置、诊断、故障及 backlog 同步状态渲染成 CLI human/JSON，存储失败仍显示原生 finding，均排除原始工具文案；见 `codeguard-cli/tests/acceptance/{conversation-feedback-baseline,python-lint-scan,work-sync-ruff-baseline}.md`。可信来源绑定、完整规则解释与三宿主自动对话接线未完成，故不勾选。
 - [ ] 11.17 实现事件驱动的检查档位与宿主接线；责任：core/CLI/plugin。验收：启动只发现、成功编辑局部快检、失败写入无源码检查、未知写入重定范围、修复按原任务复检、提交/推送/CI 各取本轮真实范围；软结果身份等价才可复用，无法阻断的宿主不宣称硬门禁。进行中：core 已有纯事件路由及[反例目标测试](../../../tests/acceptance/hook-trigger-routing-candidate.md)；CLI 已有严格、有界的只读 `hook plan`，1.1 响应对逐文件快检限制 8 个不同路径、单路径 512 字节、路径总计 2 KiB，超预算明确重定范围而非截断或假称检查，保留 1.0 历史 schema，见[CLI 局部验收](../../../tests/acceptance/hook-plan-cli-candidate.md)。Claude Code `UserPromptSubmit` 已经由 Rust 候选入口映射成固定、非阻断的检查时机建议，提示内容不改变扫描或门禁范围，见[局部验收](../../../tests/acceptance/claude-post-tool-hook-candidate.md)。档位到完整真实检查器的命令映射、工具/配置/源码身份、时间/并发预算、三宿主默认 Hook 和真实 Git/CI 接线尚缺，不勾选。
+  编辑接线进展：Rust Hook 0.6 已按选中文件运行 Python/Ruff、JS/TS/ESLint，并对未覆盖文件复用 32 份 WASM 候选路由；混合范围、缺失/链接文件和原生未接线明确保留。Claude 候选摘要提供规则、初检动作、稳定任务与同步失败指引；重复扫描不重复建 ESLint 任务。见[编辑快检验收](../../../tests/acceptance/hook-fast-native-wasm.md)。Python 配置发现性能、候选任务闭环、默认插件及真实三宿主触发仍未完成，11.17 不勾选。
   - 新增 `lint python [path] --file REL_PATH` 的有界逐文件 Ruff 执行切片；报告明确 `scan_scope=selected_files`，未知目标未完成，局部结果不导入工作台为完整扫描。真实宿主事件到该 CLI 的调用、局部任务同步、软结果身份缓存及其它语言快检仍未完成，见[局部验收](../../../tests/acceptance/python-edit-scope-candidate.md)。
   - 新增 `hook execute` 消费同一宿主事件并调用 core 路由：启动只读发现，确认成功的纯 Python 编辑执行局部 Ruff；失败/未知写入、混合语言和交付动作不会误调用或声称通过。事件报告固定 `not_evaluated`，见[局部验收](../../../tests/acceptance/hook-execute-python-candidate.md)。插件实际 Hook、任务复检及 Git/CI 门禁仍未接线，11.17 保持未完成。
   - 后续增量：显式 Git 工具下的 `pre_commit` 已按真实暂存 index（含 `GIT_INDEX_FILE`）执行有界只读路径安全观察，报告升级为 `hook_execution_feedback` 0.2，历史 0.1 保留；仍固定 `source_check=not_run` 与交付未评估。真实仓库测试覆盖暂存/未暂存、替代 index 和缺工具，见同一[局部验收](../../../tests/acceptance/hook-execute-python-candidate.md)。这不是完整质量门禁，宿主接线和 Git/CI 全义务仍缺，11.17 不勾选。
@@ -596,6 +601,7 @@
 - [ ] 12.9 按 C01–C36 建立逐命令验收矩阵；验收：合法/非法参数、格式、操作退出码、副作用、未初始化、取消/重放/恢复及核心服务复用均有证据，MCP请求失败与服务生命周期分离。
 - [ ] 12.10 实现分层评测计算与证据不足判定；依赖1.4、12.2的语料/阈值冻结产物；验收：TP/FP/FN、Wilson区间、零分母、争议样本和覆盖差异有已知期望值，不能以零finding报100%准确。进行中：相邻 Rust Core 已实现纯分层计算与相关正反例，见 `codeguard-cli/tests/acceptance/quality-evaluation-baseline.md`；尚未接入经批准冻结的 oracle/阈值与真实回放，不能勾选。
 - [ ] 12.11 建立并执行确定性离线回归、独立holdout与真实工具/漏洞库评测的分离入口和报告归档；依赖12.2、12.10；验收：按语言/类别公布n/TP/FP/FN/区间及库身份/freshness/日期，网络波动不污染离线oracle，性能比较先证明发现/覆盖等价，不自动创建云定时任务。
+  2026-10-04 全 grammar 开发回放：Rust `evaluate_grammars` 已绑定清单/源码/程序摘要，复用隔离 worker 顺序实际执行全部 32 份资产、186 例固定回归；逐语言报告包括样本级 TP/FP/FN/TN、Wilson 区间、未知与冷 worker 耗时。回归标签不冒充独立 holdout，CFQuery SQL 临时标签不入精度分母，取消/预算/程序变化不删除未知分母；实际报告与逐语言缺口见 [验收](../../../tests/acceptance/grammar-regression-evaluation.md)。尚缺批准冻结配置、独立 holdout、真实原生/漏洞库独立入口与同覆盖性能，12.10/12.11/14.17/14.19 父任务仍开放。
 - [ ] 12.12 完成误报白名单正反例与全格式门禁验收；验收：用户指出误判后能沿同一稳定 finding 完成原工具复核、候选、独立批准、再次检查与对话反馈；精确命中为 allow_with_exceptions、真实阻断为 deny、工具/覆盖未完成为 incomplete；过期/错文件/错内容/错版本/自批/原生 suppression 均不放行，原始 finding、审批引用及到期提示在 CLI/MCP/Hook/SARIF 一致。
 
 ## 13. S13 发布、文档与规格收敛
@@ -1029,10 +1035,12 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 状态：逐项实施中，未达到整体验收。统一规格 [syntax-precheck](specs/syntax-precheck/spec.md)。依赖已有 CLI/原生调度/工作台切片，不等待整个 S13；本阶段验收进入 S12、S13。各任务须先失败样本后实现与回归；不改写原生规则。责任为模块维护职责，非已分配人员。
 
 - [ ] 14.1 资产清单与来源。责任：adapters / 发布。规格：SP04。依赖：无。验收：固定 CodeGraph 来源提交、grammar 版本、许可证、SHA-256、ABI、语言/方言；缺来源、错散列和不兼容样本拒绝加载。进行中：已从固定 CodeGraph 提交复制 Java/Python/TypeScript/TSX WASM 与 MIT 许可证，清单和 Rust 校验拒绝来源/字节/声明 ABI 漂移；四份资产已由 Rust 离线加载并实测 ABI，Python 尚无 lint 路由；见[Python 资产局部验收](../../../tests/acceptance/python-grammar-asset-candidate.md)；[局部证据](../../../tests/acceptance/grammar-asset-candidates.md)。新增与批准资产清单分离的[完整来源覆盖库存](../../../grammars/codegraph-coverage.json)及只读 `grammar status`：固定提交中的 30 份随仓 WASM 已逐字节核对，另两种依赖资产标为未固定，COBOL 的 16.4 MB 超出当前 8 MiB 加载限额；[覆盖验收](../../../tests/acceptance/codegraph-grammar-coverage.md)。其余 grammar 的上游许可证/版本、Rust 加载，以及所有候选的语言版本/方言、语料及可发行验收仍缺，不勾选。 Python 资产已接入可选源码构建的 `lint python` 局部候选路径，但版本/方言和发行验收仍缺；见[Python 兜底局部验收](../../../tests/acceptance/python-syntax-fallback-candidate.md)。 2026-09-29 增量：CodeGraph 来源更新至 `1072f82ce24db3d133258d30165cef6b74d108b2`，30/30 随仓字节与新提交一致。新增 Zig 第五份候选：保留新版原始 WASM、许可证和固定哈希；原始模块因 `__main_argc_argv` 不被 Rust `WasmStore` 接受，使用固定输入/输出散列的同签名导入适配后，可解析合法空容器及损坏样例，仍未做完整语料和原生对照；见[Zig 局部验收](../../../tests/acceptance/zig-grammar-candidate.md)。2026-09-29 后续增量：Objective-C 与 Solidity 从 CodeGraph 锁定的 `tree-sitter-wasms@0.1.13` 获取，依赖包完整性、两份原始 WASM、上游许可证及适配后字节均固定；Rust 将旧 `dylink` 元数据转为 `dylink.0`，离线加载、基本正反例及隔离 worker 候选观察通过。候选累计 7，已验收发行仍 0；完整语料、原生对照和公开 lint 路由仍缺，见[依赖 grammar 局部验收](../../../tests/acceptance/dependency-grammar-candidates.md)。后续增量：C、Go、JavaScript、Rust 的 CodeGraph 随仓 WASM 及上游版本标签许可证已固定，实测 Rust ABI、基础正反例和隔离 worker 候选状态；累计 11 份候选、21 种仍缺资产，见[主流语言局部验收](../../../tests/acceptance/mainstream-grammar-candidates.md)。再后续增量：C++/C#/Lua/Luau 的 CodeGraph 随仓 WASM 和上游许可证固定；C++ 真实 ABI 14（测试先按 15 失败后纠正），C# 的加载符号固定为 `c_sharp`，四份均由 Rust 离线加载并经隔离 worker 验证。累计 15 份候选、17 种仍缺资产，见[局部验收](../../../tests/acceptance/cpp-csharp-lua-luau-grammar-candidates.md)。本项及全量语言覆盖仍未完成。
-- [ ] 14.2 Rust WASM 加载器。责任：runtime。规格：SP04,SP05。依赖：14.1。验收：支持固定资产离线加载；不依赖 Node 解析器、CodeGraph 或用户安装 tree-sitter-cli；通过有效/损坏/错 ABI 样本及 MSRV。进行中：可选 `wasm-precheck` 特性已通过 Java/Python/TypeScript/TSX Rust `WasmStore` 加载与反例测试，并由私有工作进程从 stdin 处理真实源码、父进程核对身份与恢复锚点，见[局部验收](../../../tests/acceptance/syntax-worker-candidate.md)；本机无 Rust 1.85，MSRV 实编及正式 `lint/check` 接线尚缺。
+- [x] 14.2 Rust WASM 加载器。责任：runtime。规格：SP04,SP05。依赖：14.1。验收：支持固定资产离线加载；不依赖 Node 解析器、CodeGraph 或用户安装 tree-sitter-cli；通过有效/损坏/错 ABI 样本及 MSRV。证据：[完成核验](../../../tests/acceptance/rust-wasm-loader-completion.md)。8ca3bb1源码中的Rust WasmStore加载器完成32份固定候选离线加载、坏字节/错散列/错ABI拒绝；本机加载目标12通过，Rust1.85.0 CI 37243591502的default/WASM workspace/all-targets检查成功。此项只关闭加载器实现与指定验收，不批准候选发行、精度或平台隔离；14.1资产治理及14.3/14.4/14.17-14.19继续未完成。
 - [ ] 14.3 进程资源隔离。责任：runtime。规格：SP05。依赖：14.2。验收：验证超时、内存、输出、取消与崩溃；损坏 grammar 不阻塞其他模块、不遗留进程。进行中：Unix 候选 worker 复用受控进程组内核，输入 1 MiB、输出 64 KiB，父进程有共同截止时间和取消；崩溃后代清理、输出洪泛、运行中取消及随后正常解析均增加真实子进程反例。Linux 2 GiB `RLIMIT_AS`、3 GiB 分配负例与 worker 故障隔离在 [Ubuntu CI](https://github.com/full-stack-plugins/codeguard/actions/runs/36478461118) 真实通过；Wasmtime 虚拟预留缩小。macOS 本机硬限制实测不支持，候选仍不具内存隔离权威；见[局部验收](../../../tests/acceptance/syntax-worker-candidate.md)。其它目标平台、损坏 grammar 隔离及正式调度仍缺，不勾选。
 - [ ] 14.4 语言覆盖与源码映射。责任：adapters。规格：SP06。依赖：14.2。验收：识别 ERROR/MISSING，合并恢复节点；测试 Unicode、换行、嵌入语言、新语法和未知版本，不将不支持当源码违规。进行中：Rust 已提取两类原始节点，adapters 核对 UTF-8/CRLF 字节锚点并转换 Unicode 标量列；结构祖先归组保留并列错误，预算截断保持不完整；[局部证据](../../../tests/acceptance/syntax-recovery-candidate.md)。级联归并语料、版本/嵌入语言及原生对照仍缺。
 - [ ] 14.5 原生工具准备探测。责任：adapters。规格：SP01,SP03。依赖：现有配置发现。验收：识别项目本地工具、wrapper、版本和无效配置；PATH 缺失不等于未安装，不对坏配置重复建议安装。进行中：ESLint 本地包/入口及 Maven Wrapper 脚本/发行配置已有只读候选分类，`detect` 与 `check` 已输出固定路径观察的候选；`node_modules` 普通源码遍历被排除，链接和损坏配置保留阻塞；发现协议升级为 0.4.0，聚合协议升级为 0.31.0 并保留旧 schema；[局部证据](../../../tests/acceptance/native-tool-readiness-candidates.md)。单文件 TypeScript 本地候选已接通受控原生版本探针，见 [原生优先局部验收](../../../tests/acceptance/native-first-eslint-candidate.md)；单文件 TypeScript 现进一步区分本地包确实未观察到与配置歧义、链接入口、包身份损坏等环境阻塞；阻塞不被误当成工具缺失而触发 WASM，见同一[原生优先局部验收](../../../tests/acceptance/native-first-eslint-candidate.md)。显式工具自动选择、其它语言及多模块原生优先调度、更多构建器和真实多平台验收尚缺，不勾选。
+当前聚合入口进展：ESLint 已接入任务图、原生逐文件优先、串行任务同步和 next；状态与测试集中见[验收记录](../../../tests/acceptance/check-all-eslint.md)，不再以单文件入口代表全项目接线。尚缺完整工具/配置矩阵与其它语言的同等路由。
+
 - [ ] 14.6 逐模块原生优先调度。责任：CLI/core。规格：SP01。依赖：14.4,14.5。验收：原生可用先执行；原生违规不得被 WASM 洗白；多根分别选择并保留运行失败与兄弟结果。进行中：可选 CLI 特性在 `lint typescript`、`lint java` 显式单文件且完全缺少原生上下文时附加候选语法观察，部分原生上下文、符号链接、其它扩展名及 Javadoc/Checkstyle 选择保留原路径，见 [TypeScript 局部验收](../../../tests/acceptance/typescript-syntax-fallback-candidate.md)、[Java 局部验收](../../../tests/acceptance/java-syntax-fallback-candidate.md)。新增 `.tsx` 独立 grammar 的有效/无效 JSX 反例与候选报告方言绑定，见 [TSX 纠错验收](../../../tests/acceptance/tsx-grammar-candidate.md)。本地 ESLint 10 候选与单一 flat config 可见且 PATH 提供普通 Node 时，单文件 TypeScript 路径现在自动调用既有原生探针并保留其局部发现或版本失败；Node 不可解析或本地入口/配置/包身份不可信时保持具体准备反馈，不启动 WASM；本地包确实未观察到时仍可初检，见 [本地原生优先局部验收](../../../tests/acceptance/native-first-eslint-candidate.md)。项目原脚本参数、多模块调度、真实 ESLint 10 与混合结果保留仍缺，不勾选。 Python `lint` 现先保留 Ruff 原生结果；工具缺失或项目未声明 Ruff 时，对有界文件附加 WASM 疑似位置。无效配置与已有原生诊断不被 WASM 洗白；见[Python 兜底局部验收](../../../tests/acceptance/python-syntax-fallback-candidate.md)。
 - [ ] 14.7 初检协议与 schema。责任：core/CLI。规格：SP02,SP11。依赖：14.4。验收：固定版本和状态枚举、输入/资产身份、范围及缺口；空文件集、部分解析和未知版本不能 clean；未知 major 拒绝。进行中：core 已有状态聚合及[局部证据](../../../tests/acceptance/syntax-precheck-status-candidate.md)；adapters 候选报告 1.0.0 的封闭 schema 与严格读者拒绝重复键、未知版本、身份漂移与伪造 clean，见[候选报告证据](../../../tests/acceptance/syntax-precheck-report-candidate.md)；可选 CLI `lint typescript` 与 `lint java` 单文件入口分别产生 TypeScript 0.3.0、TSX 0.4.0、Java 0.1.0 局部候选反馈及位置化疑似观察，见 [TypeScript](../../../tests/acceptance/typescript-syntax-fallback-candidate.md) 与 [Java](../../../tests/acceptance/java-syntax-fallback-candidate.md) 验收。TypeScript/TSX 疑似位置现可进入已初始化工作台的版本化任务报告；正式全范围/嵌入区域/排除原因、Java 与多模块任务引用、所有消费者未知 major 拒绝与发布兼容仍缺，不勾选。 新增 Python 0.14.0 局部反馈 schema，明确原生状态、候选范围、源码和 grammar SHA-256、缺口与疑似位置；零观察仍 incomplete，见[Python 兜底局部验收](../../../tests/acceptance/python-syntax-fallback-candidate.md)。 Python 已初始化单文件反馈升级至 0.15.0，独立 0.1.0 脱敏确认报告绑定源码、固定 grammar 和真实任务引用；同步失败保留空 ID 与原因，见[局部验收](../../../tests/acceptance/python-syntax-fallback-candidate.md)。
 - [ ] 14.8 安装建议与必须确认策略。责任：core。规格：SP03。依赖：14.6,14.7。验收：可选原生缺失且完整 clean 仅推荐；疑似或已有必需义务要求恢复原生确认；无适配器给具体决策。进行中：core 已有纯决策函数，区分缺工具、坏配置、执行失败和无适配器；仅非空、完整、已验收且无恢复节点的 clean 才允许可选建议，伪造 clean 状态不能降级。见[局部验收](../../../tests/acceptance/syntax-setup-guidance-candidate.md)。真实工具准备来源、CLI/工作台任务投影及宿主反馈尚未接线，不勾选。
@@ -1121,3 +1129,510 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 14.4 / 14.17 / 14.19 Java 17 原生差分局部增量：本机现有 javac 21.0.12.1 以 `--release 17` 接受 8 份合法、拒绝 5 份纯语法破损样例，固定 Java WASM 隔离 worker 对 13 例的恢复分类与之全部一致。常规语料及显式原生差分目标测试各 1/1 通过，提交 `729978d` 的 Linux CI 普通语料与全套测试通过；清单已把原来笼统的“语料未验收”更正为窄范围事实。其它 Java 版本/方言、系统误报率、统一命令原生优先与完整发行验收仍缺，父任务不勾选；见[局部验收](../../../tests/acceptance/java-native-differential.md)。
 
 14.4 / 14.17 / 14.19 Kotlin 精度阻塞：本机 `kotlinc-jvm 2.4.10` 与固定 Kotlin WASM 对 13 份语法样例仅 12/13 分类一致。`fun f(x: ) = x` 被原生以缺类型拒绝，WASM 却零恢复，确认漏检。普通语料与显式原生差分测试各 1/1 通过并固定此唯一分歧；提交 `1623cf9` 的 Linux CI 普通回归、单项目 32/32、npm 与完整测试亦通过。清单、`grammar status` 和 `check all` 逐候选已知限制显示反例，项目报告仍不完整。需修 grammar 并补充版本语料、原生优先路由与发行验收；三项父任务不勾选。见[局部证据](../../../tests/acceptance/kotlin-native-differential.md)。
+
+14.4 / 14.7 / 14.17 Kotlin 隐藏恢复增量：固定 Kotlin grammar 对缺类型和合法 `object` 均报告树错误，但缺失 token 不可由 Rust 子节点枚举；原恢复扫描器的零结果会隐瞒解析器错误。现在 `has_error` 无可见错误子节点时将观察标为 `truncated`，使初检保持 `incomplete`；`check all` JSON 以 `syntax_recovery_incomplete` 标记，默认文本反馈提示原生确认。运行时 4/4、隔离 Kotlin CLI 常规 2/2、显式 `kotlinc-jvm 2.4.10` 差分 1/1、32 份单项目候选所在目标文件 9/9 测试通过。13 例差分现如实记为 11 例可判定且与原生一致、2 例未解析。Kotlin LSP 附带的新 WASM 在原 13 例虽消除了分歧，但扩展样例仍有两项原生合法误报和一项原生非法漏报，故未替换固定资产或升格 32 份中的任何语种。详见[差分证据](../../../tests/acceptance/kotlin-native-differential.md)；系统精度与原生优先路由仍缺，父任务不勾选。
+
+14.4 / 14.17 / 14.19 32 份最小合法样例验收收紧：四个有界项目和单项目的既有回归，除零恢复节点外，现逐观察要求 `reason=null`，防止 WASM 在语法树上含隐藏错误却被 32/32 路由数量掩盖；本机目标文件 9/9 通过。真实项目语料、原生差分、误报/漏报率及发行仍缺，父任务不勾选；见[局部验收](../../../tests/acceptance/check-all-32-grammar-candidates.md)。
+
+14.4 / 14.17 / 14.19 Erlang OTP 28 原生差分：8 份合法、5 份故意破损源码经本机 `erlc` 独立确认；固定 Erlang WASM 隔离 worker 对 13 例有 12 例分类一致、0 例未解析。缺少函数最终句点的源码被原生拒绝，WASM 零恢复，确认漏检。常规候选语料及显式原生差分目标测试各 1/1 通过；清单已知限制与 Linux CI 候选测试同步。需修 grammar、扩展版本/方言语料及完成原生优先统一命令和发行验收，父任务不勾选；见[局部证据](../../../tests/acceptance/erlang-native-differential.md)。
+
+2026-10-04 S11.17 / S14.9 / S14.10 接线增量：编辑候选恢复按文件/语言导入既有工作台，Python/ESLint 复用旧身份，其他语言有通用原生确认任务与明确 adapter 缺口。完整零恢复只推荐安装，不新增必需任务，也不关闭旧任务。指定 Python 发现不再遍历旁支；最近链接配置保留 unknown。对应 `hook_syntax_tasks`、`python_selected_discovery` 和更新后的[局部验收](../../../tests/acceptance/hook-fast-native-wasm.md)。能力匹配关闭、全部原生适配、失败尝试完整闭环、默认插件和实际宿主仍缺，父任务保持未完成。
+
+
+## 2026-10-04 Zig 原生确认与修复事件接线（进行中）
+
+对应 9.9–9.14、11.17、14.10–14.11：已将通用确认任务的 Zig 原生复检接入既有租约、报告、消费标记和尝试历史，next 携带可复用工具 argv，repair_ready 接受显式 Zig 工具；原生诊断指导源码修复，环境失败保持未完成，源码/工具变化使指引失效。原生零诊断仍待正式策略与覆盖核验，不关闭任务。其它通用语言 adapter、正式关闭/复发重开及真实宿主验收仍缺，不勾选父任务。见[验收记录](../../../tests/acceptance/syntax-native-task-verification.md)。
+
+## 2026-10-04 限定 Zig 任务的可信关闭与公开复发接线（进行中）
+
+9.7/9.10/9.11 与 14.10 新增可调用的受保护宿主应用入口：严格验签专用任务策略，固定首次报告/原反例/grammar/工具/宿主制品，原样本与当前源码由同一 Zig 0.16.0 在共用截止时间及批准期限内对照。真正修复才能追加限定 `code_fixed`，同字节或原样本原生合法进入误报调查，失败/变化保留待核验。生命周期按明确父链重放，缺父/分叉/循环/重复身份和证据缺失要求核对。
+
+处理器复用现有原生局部报告、验证事件、ready-to-verify 关联及租约。普通 `task verify` 再次检出匹配原工具的当前诊断可追加 `reopened`，宿主确认或重复复检不制造重复事件；首次 finding 不改写。next/task show/status 本地读者只给当前原生修复或历史待核验步骤，不把文件中的关闭声明升级为可信状态或交付 allow。独立策略/记录/对照/收据 schema 与中英文设计、README 已补充，见 [限定任务验收](../../../tests/acceptance/task-resolution-lifecycle.md)。
+
+当前范围仅 Zig 语法确认任务及宿主 SDK；默认插件与公开 CLI 的可信策略来源、其它原生检查器、环境/依赖/目标/政策处置、白名单裁定、完整门禁、跨机器/Windows 和性能仍缺。因此这些父任务均保持未完成，不以局部关闭测试代替全工作流验收；未发布 npm 或改动插件锁。
+
+## 2026-10-04 安装后的修复反馈验收增量
+
+11.17 / 13.4 / 14.18 已补私有离线 npm 包真实链路测试：Node 入口将保存事件和原生任务复检贯通到稳定任务、next 和有界 Claude 形状摘要；源码变化使旧位置失效，未经受保护策略的零诊断不自闭。旧公开 0.1.3 对照明确缺此功能。该验收纳入 CI，见 [安装链路记录](../../../tests/acceptance/npm-repair-local-package.md)；公开发行、默认插件、可信来源、真实宿主及完整平台验收仍缺，三个父任务不勾选。
+
+## 2026-10-04 0.1.4 候选制品准备（进行中）
+
+13.4 / 14.18 准备将当前编辑/任务/复检能力装入新 macOS arm64 npm 候选，版本与四个 crate 锁一致。必须核对干净源码身份、同一提交的 Linux CI、公开打包约束、包内全 32 grammar 及修复链路、注册表摘要和全新缓存调用；完成前不标发布。默认插件、受保护宿主来源、多平台及完整精度验收仍缺，父任务保持未完成。
+
+
+## 2026-10-04 0.1.4 公开候选发行完成（局部验收）
+
+来源 `1cd458f6e01a44a74388243e964e3f45290ac18e` 的 Linux CI、4 项包测试、注册表/本地摘要、新缓存 npx、真实公开包 Zig 修复反馈及 GitHub prerelease/tag/asset 身份已核对；见 [公开发行验收](../../../tests/acceptance/npm-0.1.4-candidate.md)。此前“尚未发布”的本批记录是发行前快照。插件 lock/默认 Hook、真实宿主、多平台、完整精度和门禁仍缺，13.4/14.18/11.17 不勾选。库存输出 schema 缺口保留，不能称全部公开报告 schema 已验收。
+
+
+## 2026-10-04 库存输出 schema 补齐
+
+`grammar_coverage_inventory` 1.1.0 的封闭输出 schema 已补，真实 0.1.4 release 程序输出与 4 项正反例开发验收通过；新增制品不改变已发布程序字节。逐语言、provider、候选计数及未知权威/allow 伪造被拒。见 [库存协议验收](../../../tests/acceptance/grammar-inventory-schema.md)。此前发行验收中缺 schema 是当时快照；完整 S14.7 不勾选。
+
+
+## 2026-10-04 Erlang 原生优先与隐藏错误统计纠正
+
+当前源码新增 `lint erlang FILE --erl-tool ABS_PATH [--timeout DURATION] --format=json`，由 Rust 受控进程调用 OTP 28 原生 scanner/parser，固定 cwd、禁用项目 `.erlang`、stdin 原字节、版本及工具/源码前后摘要。原生 13 例与独立 erlc 标签一致，缺句点给出原生诊断；宏/条件编译保持具体未完成，不执行源码、预处理或 parse_transform。原生显式故障不转到 PATH 或 WASM，未提供工具时仍有固定候选初检。新版本化报告与实际 JSON/伪造通过变体验证见[局部验收](../../../tests/acceptance/erlang-native-first.md)。8.134、14.5–14.9、14.17、14.19 仍因完整项目工具/注释/任务/宿主与发行缺口保持开放，Erlang grammar 原始漏检没有被删除或声称修好。
+
+Swift 差分纠正先以状态断言暴露旧清单文案的红测，再按真实 `truncated_files` 分类：13 例中 12 例可判定一致，缺类型 1 例未知；真实 Swift 6.4 对照通过，源码字节未变。Kotlin 已有对应运行时防护，其清单也纠正为 11 例可判定一致、2 例未知。未知仍保留在总语料分母，不按空诊断数组算作通过、分类一致、误报或漏报。新增 Swift 运行时回归及 CI 固定语料接线，见[差分记录](../../../tests/acceptance/swift-native-differential.md)。未提升任何 grammar 资格，14.4/14.17/14.19 父任务仍未完成，公开 npm 0.1.4 不含本轮改动。
+
+
+## 2026-10-04 Erlang 原生任务复检与对话证据接线（进行中）
+
+对应 8.134、9.9–9.14、11.17、14.10–14.11：显式 OTP 28 接入已有确认任务、租约、尝试与共享 deadline；next 提供当前原生位置、具体阻塞原因和可复用 --erl-tool argv，repair_ready 直接投影有界原生证据与真实报告引用。错语言参数在租约和执行前拒绝；预处理保留具体前置，原生零诊断仍等待关闭核验，两次无进展沿用已有预算。四份新版本 schema 不改历史协议，Erlang 字符列不误标字节列。见 [Erlang 任务验收](../../../tests/acceptance/erlang-native-task-verification.md)。完整项目适配、可信关闭/复发、默认插件/实际宿主与发行仍缺，父任务不勾选；公开 npm 0.1.4 未改变。
+
+
+## 2026-10-04 Erlang 源文件终止符修复准备（RED）
+
+14.4 / 14.17 / 14.19：已定位上游 grammar 可选函数分隔符根因，准备固定源码模式补丁；新增 24 份原生编译器独立标签，共 37 例语料。原 WASM 上有 10 项差异，扩展目标测试仍失败，不标完成。tree-sitter-cli 0.27.0 临时构建工具授权尚待回复，尚未生成、替换或发布修复 WASM；见[待重建记录](../../../tests/acceptance/erlang-source-forms-rebuild.md)。原 CLI 提交 695497c 的 Linux CI 已成功，不覆盖本轮草稿。
+
+
+## 2026-10-04 Erlang 原生工具自动发现局部增量
+
+8.134 / 14.5–14.9 / 14.17 / 14.19：未指定 --erl-tool 时从 PATH 绝对目录选首个可执行 erl，规范路径冻结并复用既有 OTP 28/字节核验；显式错误或已选工具失败不换工具/候选洗白。新增 0.2 选择反馈与实际双语 JSON，0.1 Schema 原件不改。五组相关特性 52 passed/0 failed/6 ignored，显式真实自动发现和原启动/宏边界各 1 passed，183 Schema、6 实际报告/2 双语完整例子和13矛盾反例通过；CLI 特性全目标 Clippy 通过。全工作区终态另记。见[局部验收](../../../tests/acceptance/erlang-native-discovery.md)。完整项目、任务/Hook 自动发现、可信关闭、宿主及发行仍缺；37例 grammar RED 草稿和工具授权待办保持，不勾选父任务。
+
+
+### 2026-10-04 Erlang 统一入口原生接线（局部进展）
+
+8.134 / 14.5–14.9 / 14.17 / 14.19：check all 的 erlang.lint 节点现复用显式/PATH 选择和 OTP 28 forms 探针，按总预算观察最多64文件；原生诊断、当前原工具复检 argv、环境/宏阻塞及未观察范围进入 human/JSON/SARIF。完整、字节匹配的单文件原生观察跳过重复 WASM；项目范围漂移撤回完整性但保留仍有效的文件发现，实际源码/工具变化才撤回对应定位。协议0.36/0.13和内嵌0.1独立归档，见[验收](../../../tests/acceptance/check-all-erlang.md)。原生发现任务持久化、完整项目检查、可信关闭、宿主和公开发行仍缺，父任务不勾选；37例grammar RED草稿保留。
+
+## 2026-10-04 统一 grammar 语料扩展与来源隔离（已验证切片）
+
+对应 12.11、14.17、14.19：保留历史 186 例，Rust 导入器加入 22 例结构反例与 Dart 上游 150 例，当前固定 358 例/32 语言/35 个语言×来源组。全部 worker 实际运行，355 可判定、3 unknown；Dart 上游组相对自身预期 4 TP、146 TN、无差异。CFQuery/COBOL 两例 pending 独立列组，不计指标；Erlang 10 FN、VB.NET 1 FP 仍未修复。0.2 保留逐组分母、选定合法/非法预期、来源摘要和原始报告，多来源汇总只加计数、不混算 precision/recall；0.1 schema/语料/旧证据不改写。
+
+解析器空树、缺分隔符吞样例与报告缺来源组覆盖计数分别有 RED→GREEN；全字节语料复现、版本拒绝、取消/期限、程序变化和归档不变量有目标回归。见 [0.2 实际验收](../../../tests/acceptance/grammar-cohort-regression-evaluation.md)。未引入 Python 产品运行时、不改变 grammar、npm 或插件锁。本切片不是独立原生 oracle、批准 holdout、语言精度或宿主验收，父任务与完整目标仍未完成。既有 Erlang 37 例 RED 草稿继续保留；不删除失败样例换取验收。
+
+## 2026-10-04 原生首次发现的任务接线（已验证切片）
+
+8.134 / 9.4 / 9.10 / 14.10–14.11：已初始化 `check all` 与最近工作台的 `lint erlang FILE` 直接持久当前原生诊断或环境/预处理阻塞，首次报告不伪造 WASM。重复扫描和历史 WASM 来源共享一个文件/语言任务；每批工作台同步一次。next 比较已消费扫描/复检证据，源码/工具变化撤回位置；repair_ready 原工具复检返回真实保存引用。初次零诊断不建待办，已有任务零诊断不自闭，保存失败保留诊断和具体原因。
+
+原始任务缺失、缺工具任务缺失、单文件接线各有 RED→GREEN，严格导入 10 个反例、特性工作台 11 passed / 1 ignored 和显式真实 OTP 1 passed；197 schema、11 实际输出与16伪造协议拒绝、190 历史 schema 字节一致。见[验收](../../../tests/acceptance/erlang-native-first-workbench.md)。完整项目原生检查、可信关闭/复发、全语言、实际宿主与发行仍缺；父任务不勾选。37例 Erlang grammar RED 草稿和公开 npm/插件状态保持。
+
+## 2026-10-04 npm 安装后的原生修复链路验收
+
+8.134 / 11.17 / 13.4 / 14.18：通过私有包的离线 npm 安装，原生首次 lint、聚合检查、next、原工具复检及 repair_ready 保持同一任务/真实引用；当前证据指导修复，陈旧位置撤回，零诊断无可信策略仍 open，保存失败不伪造 ID。受控协议与显式真实 OTP 两组各实际运行，Node runner3 passed（含1父测试）；未选择真实工具路径2 passed/1 skipped，未将跳过当验收。26份实际报告与14伪造反例通过 schema 校验，旧0.1.4程序实际拒绝 Erlang lint，不能声称公开已支持。见[安装后验收](../../../tests/acceptance/npm-erlang-native-repair.md)。CI新增同一目标，源码Rust不变、公开npm/插件锁不变；完整父任务继续开放。
+
+## 2026-10-04 P3C 单文件项目任务接线（已验证切片）
+
+原生 `lint java FILE` 已按最近已有/显式工作台和最近 POM 可确认规则子集检查单一文件，复用聚合 P3C 保存/同步和原工具 task verify；与 check java 保持同一稳定 finding。子模块配置缺失不套用父规则或默认十规则集，最近损坏工作台不绕过，保存失败保留诊断/具体原因且不伪造下一步。显式 `--checker p3c` 不转 WASM；未绑定原生报告 0.2 保留。P3C 任务模板不再把注释等规则误写成命名修复，七项任务内容有实际反例回归。追踪 RW21；证据见 [单文件验收](../../../tests/acceptance/java-p3c-file-workbench.md)。
+
+当前源码串行默认全工作区 213 组/1185 passed/0 failed/109 ignored；ignored 不是原生规则验收。特性、协议及最终静态检查终态见上述证据。首次并行默认/特性构建污染共享 binary 的失败保留在记录，不计通过。此切片不完成 P3C 56 规则/项目生效模型与覆盖、可信关闭/重开、真实宿主或发行；6.2、9.3、9.4、9.7、9.13、12.7 父任务仍 open。此前 f158035 的 Linux CI 37172785235 已 completed/success，只证明此前源码。
+
+
+## 2026-10-04 P3C 部分执行保留诊断和稳定任务（已验证缺陷修复）
+
+2.3 / 6.2 / 9.3 / 9.4 / 9.7 / 9.13 / 12.7：有效原生诊断后异常退出的 RED 已复现，修复项目投影遗漏；新鲜范围/规则/当前输入核对后的非空诊断同步为稳定源码问题，同时保留执行阻塞，失败文件完整计数为零。再次正向复检为 still_present，失败零诊断与阻塞分别为 incomplete/still_blocked；next 简报消费同一事件，不关闭任务。坏 XML、范围/输入变化和伪造投影不建当前问题；历史无投影 0.2 报告仍按阻塞读取。human 明示原生状态和原因。
+
+新增八个目标测试；默认全工作区 213 组/1193 passed/0 failed/109 ignored，相关特性七组89 passed/0 failed/20 ignored；28实际单文件反馈/12伪造协议反例、198 schema、fmt/分层/OpenSpec strict通过。见[验收](../../../tests/acceptance/java-p3c-partial-execution.md)。本批为受控原生协议，不证明完整 P3C 规则精度、生效模型、可信关闭、宿主或发行；父任务不勾选。已有 Erlang RED 草稿不提交。
+
+
+## 2026-10-04 Erlang 限定原生关闭与复发（已验证切片）
+
+对应 RW21、9.7、9.10、9.11、12.7、14.10、14.11。SDK 复用既有 Zig 服务，新增 OTP 28 固定规则/版本的签名策略与证据；WASM 首次和原生首次均可按原样本诊断、当前改变且完整零诊断关闭，普通同工具 task verify 检出复发可追加同一父链重开。原生首次 grammar=null，禁止伪造资产或替换原始工具；重算跨语言历史在原生执行前拒绝。宏、空 forms、截断、失败、原样本合法和输入变化仍保留待核验/误报调查。旧 Zig API 构造及 schema 保持兼容。
+
+三项 RED（入口缺失、null 策略拒绝、跨语言历史未提前绑定）后实现并验证。相关五组 47 passed/0 failed/5 ignored，显式真实 OTP 28 和 Zig 0.16.0 各1 passed；真实工具与签名夹具权威分开。200 schema 元定义、67 实际报告及12矛盾反例通过；最终全工作区/Clippy结果另按实际日志补录。[验收与实际报告](../../../tests/acceptance/erlang-task-resolution-lifecycle.md)。
+
+默认宿主的受保护策略提供者、全检查器关闭、完整项目 lint/门禁、真实宿主、多平台及独立精度验收仍缺，父任务不勾选；公开 npm 0.1.4 不含本批，不更改 grammar 资格或 Erlang 漏检 RED 草稿。
+
+
+本批最终默认 workspace/all-targets 214 组、1193 passed/0 failed/109 ignored，完整目标 WASM Clippy -D warnings 退出0；真实 OTP/Zig 各1 passed，相关特性47 passed/5 ignored。完整命令、日志摘要、原生首次 grammar=null 的实际收据和边界见本批生命周期验收。该证据未完成默认宿主可信策略接线、全语言精度或发布，父任务继续开放。
+
+
+## 2026-10-04 Rust 原生目标免重复解析与重复诊断归并
+
+7.1 / 9.3 / 14.6 / 14.10：聚合 Clippy 以本轮非缓存 artifact 的原根清单和启动前源码摘要绑定目标入口，WASM 只对当前字节相同的入口免重复；覆盖不从本地报告恢复，未证明模块/条件排除源码继续检查。同规则同文件同定位的库/测试诊断只同步一项 finding，error 优先；不同位置与执行阻塞保留，重复扫描更新原任务。四项目标反例先 RED 后实现，真实公开 Cargo 检查/重复任务/缺工具/部分失败已存档。完整覆盖、历史重复任务治理和宿主/发布仍缺，父任务保持开放；最终测试/日志见 [Rust 原生优先验收](../../../tests/acceptance/check-all-native-preferred-rust.md)。
+
+本批最终默认workspace/all-targets 217组、1213 passed/0 failed/110 ignored；受影响WASM library+8集成目标9组、105 passed/0 failed/7 ignored，显式真实Cargo1 passed。默认/特性全目标Clippy -D warnings、格式/分层/OpenSpec strict/双语架构命名、201 schema与4实际反馈/任务详情及10伪造变体通过；旧schema不改。完整命令范围、实际终端/任务/重复扫描、保留的失败与日志摘要见本批验收。完整grammar、真实宿主和发布仍未完成。
+
+
+## 2026-10-04 Cargo 自动发现与禁止隐式安装
+
+7.1 / 9.3 / 14.5 / 14.6 / 14.10：当前Clippy/rustdoc/check及原任务复检从调用方绝对PATH选择首个Cargo，显式坏工具和首选执行失败不换工具；保留最终代理入口名、RUSTUP_TOOLCHAIN并强制RUSTUP_AUTO_INSTALL=0。原实现七项受控测试2通过/5失败，修复后七项通过；本机实际已安装及缺失自定义工具链的两项另显式通过。真实PATH三检查、重复扫描同一finding/新增0、still_present复检、空PATH及未安装工具链报告已归档。完整工具链/配置/项目范围、其它语言自动选择、可信关闭与实际宿主仍缺，父任务保持开放，见 [Cargo自动发现验收](../../../tests/acceptance/cargo-native-discovery.md)。
+
+本批默认workspace/all-targets 218组、1220 passed/0 failed/112 ignored；受影响WASM CLI library+九集成目标10组、143 passed/0 failed/24 ignored，显式真实Cargo目标9 passed/0 failed/0 ignored（与受控/普通测试有重叠，不相加）。默认及特性全目标Clippy -D warnings、201 schema元定义与六实际报告/18伪造反例、格式/分层/OpenSpec strict/双语架构命名通过；历史schema不改。没有完整WASM suite或358例重跑，不更改grammar、插件锁及公开包；原有Erlang RED草稿保持未提交。完整目标继续未完成。
+
+
+## 2026-10-04 受检根本地 Ruff 与环境修复指引
+
+7.1 / 9.3 / 14.5 / 14.6 / 14.10：已有PATH发现保留，已配置受检根新增显式入口 > 普通`.venv/bin/ruff` > 绝对PATH的选择。显式坏工具或所选版本/执行失败不换工具；目录链接/损坏/不可执行本地入口返回ruff_local_tool_invalid，不生成源码违规。重复阻塞更新同一任务，简报及任务文档指明本地路径、环境修复范围、原工具复检、历史及关闭条件。没有配置不启动工具，指定编辑Hook只检查目标文件。首批入口3通过/6失败、任务指引1失败先RED，再通过14个受控及1个真实Ruff 0.16.8用例；实际零诊断仍是待核验，不自动关闭。逐模块环境管理器、可信关闭、完整覆盖/精度与实际宿主仍缺，父任务保持开放，见 [本地Ruff验收](../../../tests/acceptance/ruff-local-discovery.md)。
+
+最终默认workspace/all-targets 219组、1234 passed/0 failed/113 ignored；受影响WASM library+九集成目标10组、149 passed/0 failed/30 ignored，显式专用原生目标15 passed/0 failed/0 ignored（与受控/普通测试有重叠，不相加）。默认/特性全目标Clippy -D warnings、格式/分层/OpenSpec strict/架构命名及201 schema元定义通过，12份实际完整报告/36伪造反例通过；旧schema不改。实际原生发现、重复任务、Hook、修复待核验、再次出现、环境阻塞及复检原始输出已归档。没有完整WASM suite、独立精度或358例重跑；grammar、公开包、插件锁不变，预先Erlang RED草稿保持未提交。完整目标继续未完成。
+
+
+## 2026-10-04 无定位语法观察与聚合工作台接线
+
+同一change的9.3/9.9/14.7/14.10/14.11/14.19增量：固定Swift/Kotlin树的无定位错误原本只有incomplete提示，通用同步跳过零恢复，聚合WASM也未接通工作台。现在check all/java与确认写入Hook共用稳定任务；无定位且syntax_recovery_incomplete生成检查能力恢复任务，保留空位置、源码/grammar身份、环境范围及不修改源码约束。完整零恢复只推荐，不关闭历史任务；保存失败保留证据无假ID；缺adapter复检记录incomplete。聚合反馈0.38.0与新本地确认报告0.3.0，旧schema不改；原指纹与旧可定位/Erlang原生首次协议保留。
+
+初始四项红测与独立聚合红测均已复现；整个Hook工作台目标12 passed/0 failed/0 ignored。具体证据与最终回归见[验收](../../../tests/acceptance/unlocated-syntax-recovery-tasks.md)。没有改变grammar字节、已知精度差异、资格、插件锁或公开npm；正式原生adapter、关闭/覆盖/批准与真实宿主仍缺，父任务不勾选。
+
+本批终态：默认 workspace/all-targets 1234 passed/0 failed/113 ignored；受影响 WASM 16 组 210 passed/0 failed/30 ignored；默认及 WASM Clippy -D warnings、fmt、分层和 OpenSpec strict 通过。203 schema 元定义、16 份真实报告与 48 个伪造变体通过；新增开发协议回归 4 passed。实际报告揭露聚合 next 仅支持旧简报的 schema 缺口，新的 0.38 已引用完整既有简报版本而非放宽任意对象，旧 schema 字节不改。固定二进制实际捕获任务和复检；Swift 两例原生 parse 对照不提升资格。完整日志摘要及运行限制见[本批验收](../../../tests/acceptance/unlocated-syntax-recovery-tasks.md)。父任务不勾选，未重跑完整 WASM suite/358 例语料，公开发行和真实宿主未改变。
+
+
+## 2026-10-04 Erlang 任务复检与工具自动发现（进行中）
+
+对应既有 9.9、9.10、14.10、14.11、14.19；不创建第二份规格。现有 lint/check 能发现调用方 PATH 中的 erl，但 task verify 仅显式参数，导致已安装工具被误报未提供。新增场景和三个先失败的反例后，复检复用原工具选择服务；显式及首选失败不换工具，实际 next 固定工具路径，空/相对/不可执行来源仍未完成。候选/原生首次任务及 repair-ready 的共同入口、原协议、租约/事件和不自动关闭继续保持；完整原生确认与宿主关闭父任务仍开放。实际终态及证据补入[本批验收](../../../tests/acceptance/erlang-recheck-discovery.md)。
+
+本批终态：默认全工作区 1235 passed/0 failed/113 ignored；其后仅历史指引文案变化，最终默认工作台定向 12 passed/0 failed/1 ignored。最终 WASM 16 组 199 passed/0 failed/25 ignored；显式 OTP 28 实测新增目标 1 passed，最终二进制两来源实际复放。默认/WASM Clippy、fmt、分层和 OpenSpec strict 通过；旧 schema 未改，父任务未勾选。前批 4afa8bc 的 Linux CI 因旧对话文案断言失败，已重现并修改行为断言，本批远端结果独立确认。详情及固定日志见[本批验收](../../../tests/acceptance/erlang-recheck-discovery.md)。
+
+
+## 2026-10-04 Swift 无定位恢复的原生确认（进行中）
+
+延续 9.9/9.10/14.10/14.11/14.19。将已有 Swift 原生 parse 对照接入当前稳定任务、next 和 repair_ready，保存有界位置与 UTF-8 字节列。原生仅单文件 parse，不提升 grammar 资格，不自动关闭或替代 lint/构建；历史协议原件保留，新反馈单独版本化。目标红测、实际工具与受影响回归验证后补证据，父任务保持开放。
+
+
+## 2026-10-04 Swift 无定位恢复的原生确认（已验证切片）
+
+9.9/9.10/14.10/14.11/14.19 延续同一规格：显式 Apple Swift 6.4 frontend parse 接入稳定任务、next/task show 和 repair_ready；源码/工具身份和 UTF-8 字节边界复核，正常 driver banner 与同源 note 不误报为工具异常。原生13例基础对照（8合法/5非法）与多字节反例实测，零诊断仍保留 open，完整原生优先/项目范围、可信关闭和实际宿主仍未完成。
+
+最终默认220组1237 passed/0 failed/113 ignored；受影响WASM14组173 passed/0 failed/23 ignored，随后Swift上下文修正后最终library36 passed/0 failed/1 ignored、Swift目标8 passed/0 failed/0 ignored。默认/WASM Clippy、fmt、分层和OpenSpec strict通过；208 schema、50实际报告、150伪造变体和5开发协议测试通过。Linux旧提交安装验收的0.37陈旧断言已重现，精确更新0.38并增加不重复造WASM任务断言；同一固定程序私有离线安装的受控和真实OTP28目标runner3 passed，远端新提交独立核验。
+
+证据、历史失败与边界见[Swift验收](../../../tests/acceptance/swift-native-task-confirmation.md)。没有重跑358例全量语料或已知Erlang RED全套，grammar资格、公开包和插件锁未变，预先Erlang草稿保持。父任务及完整目标仍开放。
+
+## 2026-10-04 实际 Claude 缺运行时分支
+
+延续 11.2/11.4/11.17/14.19，插件源码 dec5f9d 在实际已安装 Claude Code 2.1.273 中会话内加载。首次隔离认证来源时退出 1，虽有两个真实 Hook 成功但不算对话验收；保留现有认证环境后退出 0，SessionStart/UserPromptSubmit/Stop 三事件自动返回有界未完成反馈，实际模型明确指出 runtime_unavailable、源码未检查、交付未评估。两次 tools=[]、项目/缓存均保持空，没有下载或原生检查。原始 stdout/stderr 摘要、固定插件输入及脱敏实际事件/回复归档于[宿主验收](../../../tests/acceptance/claude-host-missing-runtime.md)。这不是市场安装、成功/失败保存、完整修复循环或其他宿主验收，父任务保持开放。
+
+## 2026-10-04 Rust 最低版本传递依赖修复
+
+延续 1.2/11.1/12 的最低编译基线；新增回归在原锁发现 tree-sitter-language 0.1.8 要求 Rust 1.90，实际先失败。固定兼容的 0.1.7 并保持其它依赖和 grammar 字节，217 个活动节点的已声明最低版本回归转绿，45 个无声明节点不自批相容。CI 新增真实 1.85.0 的默认/WASM 全目标 locked check，本机未安装该工具链；远端与完整平台证据仍须继续核验。验收见[最低版本兼容](../../../tests/acceptance/rust-msrv-dependency-compatibility.md)，总体父任务保持开放。
+
+本批默认全目标 1238 passed/0 failed/113 ignored，后续最低版本 patch 边界及方向目标默认/WASM 各 9 passed；CLI WASM 定向 32 passed、runtime 18 passed，结果重叠不相加。更新依赖的全 32 grammar/358 例/35 来源组实际回放完成，707.51 秒；新原始报告通过 0.2 schema，仍保留 73/1/10/269 的分组混淆计数、3 unknown、2 pending、资格零。证据归入同一[最低版本验收](../../../tests/acceptance/rust-msrv-dependency-compatibility.md)，不能升级为完整语言、最低编译器或平台验收。
+
+本批最终默认/WASM Clippy、fmt、分层、OpenSpec strict、schema/实际报告及文档校验通过。Swift 提交 15a91a7 的远端 CI 37195556160 已终态 success，包括先前失败的安装验收；本批新的依赖锁与真实 1.85 job 必须按新提交核验，不能借用该旧锁成功结果。
+
+## 2026-10-04 实际 Claude 保存与原生复检、首次指引纠偏
+
+延续 11.2/11.4/11.17/14.10/14.11/14.19。实际 Claude Code 2.1.273 会话内加载插件源码 dec5f9d，私有缓存准备锁定公开 0.1.4；两次会话的 14 个 Rust 生命周期反馈覆盖成功/重复保存、真实文件系统 EACCES 写入失败和 Stop 首次继续/重入。Edit 参数预检失败没有调度失败 Hook，不冒充该分支验收。宿主实际调用同一 Zig 0.16.0 复检，诊断 1→0，观察 still_blocked→candidate_absent_unverified_policy，最终仅一张任务且 open、交付未评估。另有四个原 Bash legacy Hook，不计为 Rust Git 门禁。身份、脱敏实际事件及模型回复见[宿主验收](../../../tests/acceptance/claude-host-prepared-runtime.md)。
+
+实测发现公开包首次 next/任务文案误称 Zig adapter 缺失，模型因此认为无法复检。当前源码可读任务已经纠正；本批修正首次 next/task show，从已绑定原报告区分实际 Zig/OTP/Swift adapter 与未核验工具就绪，并给出对应参数；未知语言保留具体能力决策。查询不执行或安装工具，不接受可编辑执行路径；已有原生历史仍优先。新增正例先失败；无定位 Swift 的旧回归又捕获新提示覆盖无法定位约束，修正后 Hook 任务目标 15 passed/0 failed/0 ignored。原报告被修改时原机制拒绝整个投影，不为了保留任务显示削弱校验。最终后续回归与终态追加于 verification。
+
+源码首次指引有独立实际 CLI/schema 证据；它不是本次宿主运行的公开 0.1.4，也未更新插件锁或市场。完整宿主、可信关闭、全部语言/精度、平台与项目门禁父任务仍开放，不因部分实测勾选。
+
+本批首次准备简报 0.7.0 与聚合反馈 0.40.0 正式分版本；task show 外层动作保留同一工具参数。最终 WASM 两目标 22 passed、另五目标 44 passed/5 ignored；默认两目标 11 passed，与同名契约重叠不相加。默认/WASM 全目标 Clippy、fmt、分层、strict 验证通过；210 schema 元定义、208 历史字节、13 开发协议测试与 705 本地链接通过。旧非法报告只留 RED 证据；原生条件未运行不当作通过。实际宿主公开包与开发修正版本分开，日志身份见[本批验收](../../../tests/acceptance/claude-host-prepared-runtime.md)。4d620f7 远端 CI 37198192252 已 success，本批新修改不借用该成功。完整父任务、grammar 资格、其它宿主、可信关闭及发行继续未完成，未新增勾选。
+
+## 2026-10-04 Kotlin 原生优先独立入口（已验证切片）
+
+对应8.7/8.8、9.9、14.4/14.10/14.19：新增 Rust `lint kotlin`、Kotlin/JVM2.4.10有界私有编译、显式/PATH首工具选择以及缺工具WASM候选。语法与上下文分离，原生UTF-16列转UTF-8字节列；版本失败、未知输出、入口重定向、源码变化不换工具、不假通过。真实六场景报告、默认/WASM各9入口测试、4解析、7边界、11相邻和双构建严格Clippy已验证。缺后端或未完成必须进一步确认，human输出定位已修正。详见[验收](../../../tests/acceptance/kotlin-native-single-file.md)。仅独立入口，聚合/Hook/稳定任务复检尚未接线，完整lint/注释、JAR/JDK身份、独立精度和发行仍缺；父任务不勾选。
+
+## 2026-10-04 Kotlin 稳定任务原生复检与反馈（已验证切片）
+
+对应9.9/9.10、14.4/14.10/14.19：已有Kotlin确认任务接通task verify/repair_ready、显式及PATH原工具选择、原报告绑定、租约与追加验证事件。next/task show不再误称adapter缺失；源码变化撤销旧位置，语法与上下文混合时保留repair-source及独立上下文，零诊断不重复修复、不自动关闭。真实Kotlin2.4.10完整任务链路、3项错参租约前拒绝、任务3项、历史形状2项及5项新schema校验通过；相邻Erlang13/Swift7/通用8项通过。默认/WASM入口和严格Clippy、fmt、分层、OpenSpec严格校验通过，211旧schema原字节保留。详见[验收](../../../tests/acceptance/kotlin-native-task-confirmation.md)。首次check/file_changed的原生优先调度、完整项目lint/注释、JAR/JDK身份、独立精度、正式关闭及实际宿主/发行仍缺，父任务不勾选。
+
+### 2026-10-04 Kotlin 首次原生扫描局部进展（父任务未完成）
+
+在既有 syntax-precheck 场景下接通 `check all` / 确认 `file_changed` 的 Kotlin 原生优先观察、显式参数与 PATH 选择，原生来源事实、稳定任务同步、`next` / `task show`、原工具复检及 human 规则位置。普通 `.kt` 与 `.kts` 分开；已选工具失败和超出原生范围的未观察文件不通过 WASM 隐藏。新增协议不改旧 schema 字节，原生来源不伪造 grammar SHA。详细证据见[局部验收](../../../tests/acceptance/kotlin-native-first.md)。完整 Kotlin lint/注释/项目构建、可信工具链、可信关闭、多宿主、逐语言质量与发行仍有缺口，未勾选完整语言、修复或发行父任务。
+
+### 2026-10-04 白名单候选签名期限加固（4.8/4.10 仍未完成）
+
+普通候选及替代链每跳均拒绝跨出签名到期时间或宿主最长期限；更宽松的快照不扩大批准窗口。普通候选和根历史候选先复现错误绑定，再补全部三跳及两个独立上限、合法边界回归。见[局部验收](../../../tests/acceptance/approval-candidate-lifetime.md)。尚未接入真实审批发布、全原生身份和完整交付门禁，不以签名绑定测试勾选父任务。
+
+### 2026-10-04 首次原生扫描的远端反馈回归修复
+
+520daf6 的 Linux CI 37210749865 失败于既有未定位恢复任务指引断言；本机复现，并补源码变化后过期反馈的 RED。原生缺工具/过期历史现在保留首次0.3候选的“无法定位、原生确认前不得修改源码”约束，叠加具体环境恢复步骤；确认的当前原生语法诊断仍可修复。验收见[回归记录](../../../tests/acceptance/unlocated-native-history-guidance.md)。不删除失败记录，不以本地修复代替新提交远端CI终态，相关完整父任务继续未完成。
+
+### 2026-10-04 Swift 原生优先独立入口（父任务未完成）
+
+8.11/14.7/14.19 已增加 `lint swift` 单文件入口：显式或 PATH 原生工具优先，仅缺工具时使用内置候选。冻结 stdin、源码/编译入口身份复核、UTF-8 字节坐标、未知输出/超时/取消及输入变更均有边界测试；Apple Swift 6.4 实际五个原生与两个缺工具用例见[局部验收](../../../tests/acceptance/swift-native-single-file.md)。默认及 WASM 各九个入口测试、四个实际反馈协议测试通过。项目首次扫描、SwiftLint、类型/注释/安全、可信关闭与完整发行资格仍未完成，父任务不勾选。
+
+最新远端运行 37212223616 的 Kotlin 候选反馈两例因继承宿主 PATH 失败；候选专用测试改为固定缺原生环境，原生优先独立测试保持。修复后本地与远端结果追加，不将旧失败表述为通过。
+
+本地修复验证：`check_all_grammar_candidates` 10 passed / 0 failed / 0 ignored，`kotlin_native_first` 5 passed / 0 failed / 0 ignored；225 份旧 schema 字节不变，新协议后共 226 份元定义有效，文档链接、fmt、分层与 OpenSpec strict 通过。远端新提交待验证。
+
+### 2026-10-04 Swift 项目原生观察（父任务未完成）
+
+8.11/14.7/14.19 已接通 `check all . --swift-tool ABS_PATH`，显式/调用方 PATH 原生入口优先，最多64普通 Swift 文件共用截止时间；已选工具失败不切换 WASM，超范围仍未观察。当前原生字节位置及原工具复检 argv 进入聚合0.43报告，源码/工具变化撤回位置。默认/WASM各5个项目测试、各9个独立入口回归及4个实际协议测试通过；Apple Swift6.4错误/合法与缺工具三份实际报告见[项目观察验收](../../../tests/acceptance/swift-native-project.md)。项目原生任务连接明确 not_connected、无伪造ID；保存Hook、完整SwiftLint/类型/注释/安全与可信闭环仍未完成，不勾选父任务。
+
+Swift项目增量回归：32grammar10项、Hook执行19项通过（2项条件忽略）。Hook任务14项通过、1项旧聚合版本断言失败；升级到0.43并保留稳定任务与next断言，增加原生缺失/任务未连接断言。上轮远端37213692814另有Swift模拟器未读stdin导致的2例未完成反馈，当前只修正模拟器输入消费，不将产品失败降级。修正后测试和新远端终态另记。
+
+修正后终态：旧版本断言目标1 passed / 0 failed；消费stdin的Swift项目默认/WASM各5项、独立入口各9项通过；最终WASM all-targets严格Clippy通过，默认严格Clippy本轮已通过。4项实际协议测试、228份schema元定义、226份旧schema字节不变、分层及OpenSpec strict已验证。新Linux终态仍待验证。
+
+### 2026-10-05 Swift 确认保存原生反馈（父任务未完成）
+
+8.11/14.7/14.9/14.14/14.19 已让确认file_changed复用Swift原生项目scanner，显式/PATH工具优先且只检查选中路径。新外层0.12/局部0.4反馈进入CLI Claude有界摘要，保留当前字节位置，不回显工具文本或制造原生任务引用。混合范围候选疑似保持“必须原生确认”优先级。初始3项和混合范围1项分别RED；最终WASM6项、默认5项新测试及4项实际协议测试通过，已有Claude/Hook/Kotlin回归通过。真实Swift6.4三份直接Hook与两份CLI适配摘要见[保存反馈验收](../../../tests/acceptance/swift-native-hook.md)。输入由开发构造，不替代真实宿主安装触发验收；Swift原生稳定任务、可信闭环、完整语言和发行验收仍未完成，不勾选父任务。
+
+最终本地检查：默认与WASM all-targets严格Clippy通过；fmt、分层和OpenSpec strict通过；229份schema元定义有效，228份旧schema字节不变，相关中英文文档本地链接有效。新远端结果待验证。
+
+### 2026-10-05 Swift 原生首次任务与包验收环境修正
+
+Swift check all 与成功保存 Hook 在初始化工作区同步稳定原生任务，首次来源无 grammar 摘要；重复检查更新同一任务，next/task show 保留原工具 argv，原生来源 verify 支持显式/调用 PATH，旧 WASM 来源保持显式契约。修复后零诊断仍 open，不冒充完整 lint/类型/构建通过。真实 Apple Swift 6.4 运行证据及协议边界见 [工作台验收](../../../tests/acceptance/swift-native-workbench.md)。父任务不勾选。
+
+CI 37214829667 的 npm 全候选验收继承 Kotlin/Swift 工具，使原生优先路径取代 WASM，测试错误要求全部候选。包测试改为仅暴露 Node 的 PATH，产品选择策略不改；修复后验收结果另行记录，不以改动存在声称通过。
+
+本批最终受影响 WASM 八目标 58 passed / 0 failed / 4 ignored，默认 Swift 三目标 12 passed；默认/WASM 全目标 Clippy、236 schema 元定义与229历史字节保留、四项真实协议测试、fmt/分层/OpenSpec strict/本地文档链接通过。离线 npm 全32候选实际包调用在隔离 Node+sh PATH 后1 passed，未重跑另外两项包测试；原生策略不改。完整语料精度、实际安装宿主、可信关闭、多平台及公开发行仍未完成，不能勾选父任务。
+
+### 2026-10-05 全套回归的契约漂移收敛
+
+完整默认 suite 对15dcbbd在第172组以签名处置2失败中止（累计962 passed/2 failed/97 ignored），不记全套通过。合法签名正例改为200/180，新增300越界明确拒绝；漂移/撤销/过期反例改用合法期限，避免被无关拒绝短路。Linux37217854535的Swift初始化Hook旧协议断言已本机RED，修正为0.44/synced_partial且缺编译器不伪造原生任务；WASM任务引用一致性保留。两目标19 passed/0 failed/0 ignored，完整重跑待终态。见[回归验收](../../../tests/acceptance/contract-regression-drift.md)。
+
+9.5的缺失任务Markdown恢复场景已细化进remediation-workflow规格，尚未实现；保持原事实、事件、消费标记、租约/预算及gate不变，普通备注不覆盖，链接/目录/坏事实拒绝。父任务不勾选。
+
+### 2026-10-05 缺失任务投影恢复实现
+
+9.5：work sync在工作区锁内先恢复已消费来源的缺失Markdown，再导入新报告、复查剩余缺失投影；读取同一当前RepairBrief和严格来源摘要/消费标记，不运行原生工具或改事实/事件/预算。已有普通任务文件含备注/勾选保留原字节；链接/目录/坏事实/摘要冲突拒绝。恢复后报告0.3及正计数，无恢复保留0.2。首轮RED为已消费报告不会恢复任务，第二RED为删除投影与新扫描同轮造成无谓报告失败，两者已修复。局部Ruff问题、Ruff工具阻塞及实际Swift原生任务验证保持同一ID，七项指引和当前状态；自有记录入库安全、完整父事件/状态机及跨平台故障矩阵仍缺，9.5不勾选。
+
+此前0a3e6a3的完整默认workspace/all-targets终态为230组、1278 passed/0 failed/113 ignored，属于本次投影源码改动之前，不能代替该实现的受影响回归和后续全套。完整目标保持开放。
+
+本批默认四目标29 passed/0 failed/2 ignored；WASM十一目标95 passed/0 failed/7 ignored；后补租约目标默认/WASM各17 passed，与前批目标重叠不相加。实际Swift原生任务删除/恢复/备注重放保持同一ID与open，原事实/事件/标记逐字节不变；活跃租约/open attempt/预算历史也逐字节不变。四协议测试、237 schema元定义及236历史schema保留、默认/WASM全目标Clippy、fmt/分层/OpenSpec strict通过。当前源码完整默认重跑单独等待；证据和边界见[投影恢复验收](../../../tests/acceptance/task-projection-recovery.md)。
+
+2026-10-05 验收推进：任务投影恢复仅处理合法 CG-/CG-B-身份，非任务目录仍由 next/status 明示异常，不阻断独立有效原生报告导入；默认相关四目标60 passed、0 failed、7 ignored。WASM Ruff 取消夹具原来的未启动判断已由脚本 trace 及退出后 ready/late 文件反证；改为 shell 内建同步信号，保持真实后台 shell/sleep、2秒预算、130退出码及取消后无迟写断言，并新增非取消正对照。相关 WASM 五目标63 passed、0 failed、7 ignored；237 schema元定义、236历史schema不变、OpenSpec strict及分层检查通过。实际Swift恢复证据更新，任务仍open，原事实/事件/消费标记不变。完整默认测试仍在运行，不勾选9.5、3.3等父任务，不以局部通过代替全部平台/状态机/宿主与发行验收。
+
+当前源码完整默认测试已正常退出0（1283 passed/0 failed/113 ignored），示例目标另1 passed/0 failed；9.5.1受支持投影恢复切片已验收，父任务及完整目标仍开放。
+
+
+2026-10-05 独立源码任务调度进展：RED复现预算耗尽的finding占据next首项，使另一份可修复源码得不到指引。现仅在没有前置blocker、原首项为waiting/needs_decision源码finding时，核对物理路径/dev/ino并推荐不同范围的可修复或待复检finding；范围重叠/未知、别名、坏事实及失败报告保留原分流。延后任务由next_actions及human提供只读task show引用，不改事实、预算、租约或门禁。默认相关六目标62通过/12忽略，WASM十目标97通过/13忽略；真实Ruff0.16.8双F401及两次no-change后独立选择通过，原记录摘要不变。4项实际schema/状态不变量验收、OpenSpec strict和分层检查通过；当前完整all-targets测试在运行，未取得终态，不勾选9.7/9.9/9.26父任务，不代表完整依赖图、跨平台或已安装宿主。见[独立源码任务验收](../../../tests/acceptance/next-independent-source-work.md)。
+
+独立源码调度最终验收：完整默认all-targets退出0（1288 passed/0 failed/113 ignored），默认及WASM all-targets Clippy -D warnings通过。237历史schema原件不变、4项实际协议/状态不变量验收及790条本地链接检查通过。实际后补采集使用显式60秒预算并验证findings/state JSON摘要；10秒预算触限不作为成功证据、不改产品默认预算，也不声称性能目标达标。9.7.2切片完成，父任务保持开放。
+
+### 2026-10-05 Swift 限定任务闭环接线（父任务未完成）
+
+9.7/9.10/9.11、12.7、14.10/14.11：受保护宿主 Swift SDK 复用同一限定语法关闭服务、签名校验、原反例/当前字节对照、租约及父链。策略1.2.0/证据0.3.0分语言，原生首次grammar=null；普通task verify原工具复发可重开。接口缺失和旧分流scope mismatch分别RED，默认受控关闭/幂等/复发/反证/工具与批准身份边界已通过。真实原生、共享服务兼容回归和最终校验另行追加；默认插件可信提供者、真实宿主、全语言/完整SwiftLint/项目构建、平台与发行仍缺，不勾选父任务。见[Swift闭环验收](../../../tests/acceptance/swift-task-resolution-lifecycle.md)。
+
+Swift闭环本批终态：默认受影响6通过/1条件忽略，WASM六目标52通过/0失败/4条件忽略；真实Apple Swift6.4显式1通过，原错误→修复→复发链路成功。4实际输出协议/身份与负例、239 schema元定义/237历史原字节、默认/WASM全目标严格Clippy、fmt、分层、OpenSpec strict与新增链接通过。完整默认suite未重跑，旧1288不当成本批全套；新提交CI另核验。未改变公开npm、插件锁或完整父任务状态。
+
+### 2026-10-05 Kotlin 限定语法闭环与混合复发（父任务未完成）
+
+9.7/9.10/9.11、12.7、14.10/14.11：Kotlin宿主SDK接入同一原工具对照/签名/租约/父链；1.3策略/0.4证据、原生首次grammar=null、双坐标校验。原列读取和混合未完成复发不重开分别RED，修正后5默认受控通过；真实kotlinc-jvm2.4.10修复resolved、上下文verification_required、混合语法复发open，同一任务且1显式真实测试通过。4实际协议/状态负例通过；受影响WASM和静态终态另追加。CI新增Erlang/Swift/Kotlin SDK WASM目标，保留条件忽略与原生单独验收。完整工具链/项目能力、默认宿主可信提供者与发行仍缺，不勾选父任务，见[验收](../../../tests/acceptance/kotlin-task-resolution-lifecycle.md)。
+
+Kotlin闭环本批终态：受影响WASM八目标65通过/0失败/4条件忽略；真实编译器另1显式通过。默认/WASM全目标严格Clippy、241 schema元定义/239历史字节保留、Kotlin4实际协议与Swift4历史协议、fmt、分层、OpenSpec strict、12新增链接通过。本批不借用旧1288的完整默认结果，远端CI按新提交核验；完整父任务、发行和默认宿主仍未完成。
+
+
+2026-10-05 误报来源指引修复：对应9.7/9.10/14.12既有任务和新增反例来源场景。原生首次不再提示grammar误报，WASM首次保留资产对照但不确认缺陷；来源不可核对则needs_decision。Kotlin/Swift实际CLI三种读取输出一致且不改变检查器调用、事件或租约；Erlang覆盖WASM首次。受影响WASM五目标48通过/0失败/4忽略，默认反例2通过。协议、审批和关闭规则不变，完整父任务不勾选。见[局部验收](../../../tests/acceptance/counterexample-source-guidance.md)。
+
+
+2026-10-05 注册表语言check入口：2.1/2.3/9.7/14.10/14.19既有任务接线。入口从all/Java扩展到57个规范ID，限制原生调度、类别、WASM和下一步，未知/错生态参数执行前拒绝。新增0.45局部反馈/0.14故障协议，241历史schema不改。57-ID和混合项目先RED后GREEN；实际Ruff保留F401、C回退不解析非法Python且历史Python任务不抢占C指引。6项实际协议及负例校验通过，具体回归及最终检查见[验收](../../../tests/acceptance/check-language-selection.md)。别名、全命令、完整适配/策略/义务、宿主和发行仍缺，父任务不勾选。
+
+
+2026-10-05 Zig工具发现：9.9/9.10/14.10/14.11/14.19沿用同一规格。共享显式/PATH选择接通lint与原任务复检；冻结解析目标，输入变化撤回旧诊断，0.2单文件反馈独立版本化。PATH工具未提供与源码竞态的RED后默认7通过/1忽略，实际Zig0.16单文件和四轮显式/PATH任务对照各1显式通过；原任务仍open，4协议/负例通过。最终相关回归和检查终态补入[验收](../../../tests/acceptance/zig-native-discovery.md)。完整Zig聚合原生优先、lint/build、平台和发行仍缺，父任务保持开放。
+
+Zig本批终态：受影响WASM八目标52通过/0失败/6条件忽略，Hook另15通过/0失败；两者覆盖重叠。默认及WASM全目标严格Clippy、4协议负例、243历史schema原字节、278文档文件链接、fmt/分层/OpenSpec strict通过。完整默认suite未重跑；完整项目Zig原生接线和发行父任务仍不勾选。
+
+
+2026-10-05 Zig统一入口与编辑原生优先：9.9/9.10、14.7/14.9/14.14/14.19既有范围。check all/check zig与限定编辑复用冻结原生探针；选定失败保留，缺工具WASM回退；输入/别名变化撤回位置、最多64文件且未观察范围可见。新增0.46聚合/0.15中止/0.14Hook/0.6快检/0.1Zig scan协议，无Zig保留历史版本，SARIF、人类终端及Claude原生反馈不丢诊断。受影响WASM初轮71通过，最终渲染四目标41通过/4忽略；默认Zig/SARIF四目标20通过/1忽略；真实Zig另1显式通过。双构建严格Clippy、5协议负例、244历史schema字节、668文档链接、fmt/分层/OpenSpec strict通过。首次原生Zig持久任务、可信关闭、完整项目与发行仍缺，不勾选父任务，详见[验收](../../../tests/acceptance/zig-aggregate-native-routing.md)。
+
+本批中止报告保留Zig：原观察当前时保留诊断与SARIF发现，其他任务内部错误不抹掉它；0.15独立中止协议，默认/WASM各3构造器回归。真实混合项目内部故障注入仍未验收，不扩大局部证据。
+
+### 2026-10-05 Zig 首次原生任务接线（父任务未完成）
+
+单文件、聚合和编辑同步稳定身份；原工具复检和 repair_ready 记录事件，零诊断不自行关闭。实际 Zig 0.16.0 修复前后及协议验收见[证据](../../../tests/acceptance/zig-native-first-workbench.md)。14.10/14.11/14.14/14.19 与完整可信关闭、语言/宿主/发行验收仍未完成，不勾选父任务。
+
+### 2026-10-05 Zig 原生首次限定关闭与复发（父任务未完成）
+
+`verify_zig_task_resolution` 新增签名策略1.4 / 证据0.5，限定原生首次事实0.6且grammar=null；旧WASM来源不扩权。同工具原反例/当前输入对照关闭、幂等验证及普通复检重开；异常stdout和越界位置不报完成。受控拒绝/关闭测试、实际 Zig0.16.0与报告见[验收](../../../tests/acceptance/zig-native-first-resolution.md)。默认可信提供者、全语言能力匹配关闭与宿主/发行仍缺；14.10/14.11/14.14/14.19 保持未完成。
+
+### 2026-10-05 显式原生/WASM差分入口（父任务未完成）
+
+开发入口复用原生适配器及已有worker，对显式选择语言提供原生/WASM共同可判定差分，全部32语言库存和未知保留；不冒充独立holdout、资格或交付授权。参数拒绝、预算/取消及制品变更撤回的受控反例见[验收](../../../tests/acceptance/native-grammar-differential.md)。32语言独立原生标签、语言/版本/性能/宿主/发行及已知grammar修复仍缺；12.11/14.17/14.19 不勾选。
+
+实际四工具78例已重跑并保存原始报告：73例双方可判定、5例unknown，Erlang10漏检仍存在；Kotlin混合上下文结果保留严格定位语法证据而执行incomplete。受影响两目标13通过/0失败/2忽略、实际协议2通过、261schema有效且260历史字节不变、双构建严格Clippy等检查见上述验收；没有声称独立holdout或完整workspace验收。
+
+### 2026-10-05 Python 隔离原生语法差分（父任务未完成）
+
+显式Ruff0.16.8 / py312固定stdin和隔离规则，只消费一致的invalid-syntax，不把F401等普通lint、上下文或工具故障当语法违规。新增开发checker不扩大可信关闭服务，0.2报告独立于历史0.1；32库存保留，18例真实回放发现empty_body/bad_indent两个WASM漏检，未修复且资格0。见[验收](../../../tests/acceptance/python-native-grammar-differential.md)；12.11/14.17/14.19及Python完整能力仍未完成。
+
+### 2026-10-05 WASM 空block结构事实（接线未完成）
+
+runtime新增独立的全树空block事实扫描，记录父节点及原始字节位置；不受has_error裁剪，不伪造ERROR/MISSING或全语言违规。Python合法suite与Rust合法空块、记录/遍历预算的实际WASM测试见[验收](../../../tests/acceptance/wasm-empty-block-facts.md)。原始加载/恢复及新扫描共21通过；worker/公开报告/语言规则/任务未接线，Python两项漏检仍保留，14.4/14.17/14.19不勾选。
+
+### 2026-10-05 Python独立结构观察进入私有worker与显式探针
+
+已有空block事实扫描现接入固定Python required_suite候选规则、私有1.1协议和公开grammar probe 0.2协议；原始ERROR/MISSING数组与计数保持原始来源，结构观察另含规则配置摘要和坐标，资格仍0、交付未评估。三类缺语句块正例与五类合法反例、身份和位置拒绝、真实报告schema均验证，见[局部验收](../../../tests/acceptance/python-structure-probe.md)。统一lint/聚合报告、任务与原生复检尚未接线；Python历史两项FN及14.4/14.7/14.17/14.19父任务继续未完成，不覆盖历史差分证据。
+
+### 2026-10-05 Python结构规则进入lint、工作台与实际原生复检
+
+单文件Python兜底现将独立required_suite规则、父节点、配置摘要和原始坐标保存到反馈0.16/0.17及确认报告0.2；历史原始恢复协议不改。重复扫描同一任务，合法pass不假关闭；伪造规则摘要/越界坐标同步失败，human与任务文档有规则依据。实际Ruff三轮确认缺函数体、错误缩进与合法pass，保留原生发现/尝试，但可信关闭尚缺。见[验收](../../../tests/acceptance/python-structure-lint-task.md)。聚合检查、语言资格及14.11能力匹配可信关闭仍未完成；原始grammar FN2保持历史事实，父任务不勾选。
+
+### 2026-10-05 聚合check保留Python结构证据并复用稳定确认任务
+
+check python/all现通过0.48反馈保留独立结构计数和原始坐标，原始恢复计数不变；通用确认报告0.7仅接纳Python整文件结构观察，沿用lint稳定指纹，重复扫描不生成第二张任务。固定规则摘要/越界位置伪造报告同步拒绝，合法候选不关闭旧任务，human给规则和原生确认指引。见[验收](../../../tests/acceptance/check-python-structure.md)。可信关闭、语言资格与14.11仍缺；父任务不勾选，不改历史FN2证据。
+
+同一增量补齐复用扫描器的编辑Hook：局部0.8/外层0.17保留结构计数，正结构观察必须原生确认；Claude兼容对话摘要单列结构数量与规则ID。旧Hook协议和公开制品锁不改，实际宿主/默认发行验收仍缺。
+
+### 2026-10-05 Python原生两次调用的入口连续性缺陷修复
+
+版本探测后执行前重核请求路径与冻结制品摘要；版本命令换文件或重定向符号链接时停止第二次调用，检查后也复核。旧代码实际执行替换后脚本的RED反例现通过；实际Ruff合法/缺函数体/错误缩进三输入保留原生反馈。见[验收与可信关闭缺口](../../../tests/acceptance/python-native-tool-continuity.md)。Python稳定任务身份、两类首次报告与原生目标版本尚未接入受保护关闭服务，14.11与父任务不勾选；不改历史差分证据或自批关闭。
+
+14.11 Python首次证据校验增量：候选确认校验拆分当前文件读取和冻结源码验证，两者共同要求UTF-8、1 MiB预算、源码/grammar摘要及原始或结构位置。空观察绕过源码解码的实际RED反例已修复；冻结字节可以独立核验首次报告，但不能跳过首次消费收据或批准来源。当前导入仍拒绝修复后已过时的报告。此项只完善历史复检前置条件；Python单文件原生复检、两类首次报告完整读取及可信关闭仍未接通，14.11保持未完成。见[局部验收](../../../tests/acceptance/python-confirmation-source-snapshot.md)。
+
+9.10 / 14.11 Python单文件复检增量：task verify对python_syntax_confirmation_needed先核对两类首次报告及消费收据，按原范围只执行一个Python文件的项目Ruff检查。新版0.18局部报告/0.20任务反馈保留首次引用、当前源码及未验证策略；工作台导入拒绝错误范围/首次摘要，普通完整项目扫描保持原协议。源码已修复时首次证据仍绑定原字节，不用当前源码覆盖。可信双输入复检、批准关闭重开及全部语言能力仍缺，父任务不勾选。见[局部验收](../../../tests/acceptance/python-confirmation-scoped-recheck.md)。
+
+
+9.10 / 14.11 Ruff语法确认纠偏：匹配的原生invalid-syntax不再被小写规则审计拒绝；末尾空行原生错误保留坐标并生成稳定身份。新版0.19/0.21区分源码错误still_present与工具阻塞，为智能体提供限定文件修复指引，旧0.18历史保持原语义。可信关闭与跨语言全链路仍未完成，父任务不勾选。见[局部验收](../../../tests/acceptance/python-native-syntax-audit.md)。
+
+
+14.11 Python关闭前置继续收敛：隔离原生探针新增明确目标版本入口，非法目标在工具解析前拒绝；固定py312仅留在既有开发差分入口。宿主只读API `validate_python_task_original_source` 核对专用/通用首次报告、消费收据和冻结源码，共用封闭形状及原始/结构坐标校验，修复后的当前字节不能替代原样本。实际Ruff match在py39/py310的不同诊断已验证。签名策略/项目生效目标绑定、可信关闭/复发仍缺，14.11保持未完成。见[前置验收](../../../tests/acceptance/python-resolution-prerequisites.md)。
+
+
+14.11 Python项目目标观察：固定Ruff同轮原生设置新增内部明确lint目标入口；只接受唯一目标与空逐文件目标集合，none/缺失/重复/未知/逐文件未解析均提供具体原因，formatter/analyze默认不代入。公开四字段设置形状不改；实际四配置逐文件探针验证py39/py310语法差异、隐式默认与逐文件目标拒绝推断。此为关闭前置，尚未形成签名策略与项目配置的Python可信关闭链，父任务仍未完成。见[原生目标验收](../../../tests/acceptance/python-native-target-settings.md)。
+
+
+9.10 / 14.11 限定事件提交边界：现有原生语法服务分离语言复检与共同父链提交，提交前核对域证据/脱敏原生证据绑定和核心解决条件，拒绝拼接的身份或摘要。旧Zig/Erlang/Swift/Kotlin入口复用同一幂等、关闭冲突与复发算法；不改旧协议，不新增本地批准。Python专用签名策略和两类首次报告仍待接入共同服务，父任务不勾选。见[局部验收](../../../tests/acceptance/task-resolution-commit-boundary.md)。
+
+
+9.10 / 14.11 Python限定关闭与复发：Rust宿主SDK新增独立验签1.5策略，明确绑定项目lint目标、配置、原样本和制品；独立/聚合首次报告共用0.6封闭生命周期证据，原始stdin及当前项目单文件原生对照才可关闭，普通task verify只可重开。实际Ruff两类来源关闭、幂等和SDK复发1通过148.24秒；新增普通CLI复发RED为0条事件，接线后两类完整链路1通过159.48秒。最终回归和schema产物证据补入[局部验收](../../../tests/acceptance/python-task-resolution-lifecycle.md)。生产宿主信任根、全部语言与全项目门禁未完成，父任务不勾选。
+
+
+9.10/14.11/14.12 Python原生反证next纠偏：固定grammar在Python3.14模板字符串上的实际误报被Ruff明确目标反证；两类SDK报告进入误报调查后，next新增同一任务生命周期读取。当前源码/配置失效优先，不沿用旧反证修复或放行；报告首次来源不按全局版本号猜测。RED与终态见[局部验收](../../../tests/acceptance/python-template-string-counterevidence.md)。grammar重建与全部语言/宿主/门禁仍缺，父任务未完成。
+
+
+### 2026-10-05 原生语法动作与重试预算收敛
+
+9.9/9.10/14.10：真实Python原生still_present简报动作先RED后修为repair-source，输入失效/不完整不授予旧位置修复。语法确认任务同输入的环境恢复和源码修复共享预算，原始事件不重写；纯历史计数先RED，持久化动作切换后第三次尝试仍拒绝。默认lib54通过/3忽略，受影响WASM五目标96通过/6忽略，真实Ruff两来源链路1通过160.44秒，持久化预算增强目标1通过46.05秒。完整patch/环境身份、跨平台、默认宿主和全语言父任务仍开放，见[局部验收](../../../tests/acceptance/python-native-action-budget.md)。
+
+
+### 2026-10-05 TypeScript模块后缀发现与任务接线
+
+14.4/14.6/14.10/14.19：`.mts/.cts`与声明后缀在默认发现和聚合路由遗漏分别RED，统一注册表与固定TypeScript路由后实际四文件check all通过。重复check typescript保持两张疑似任务，合法声明不新建；单文件编辑Hook仅检查原范围。受控ESLint完整结果仍优先，另一构建根保持候选；七目标85通过，无忽略，默认/WASM严格Clippy及OpenSpec通过。未增加grammar资格或公开发行，父任务仍开放，见[验收](../../../tests/acceptance/typescript-module-extension-routing.md)。
+
+
+### 2026-10-05 grammar历史清单与当前回放身份修复（验收中）
+
+12.11/14.17/14.19：CI37257302720在已知限制元数据更新后5项语料校验失败，原因是冻结语料仍绑定旧清单。保存原清单字节，用有界只读入口核对历史；当前回放仍严格要求当前清单，显式生成新绑定语料且case不改。新增旧语料不得启动worker及清单拒绝反例；WASM常规13通过/0失败/2忽略，旧两份语料和归档报告逐字节保留。完整358例当前回放1通过444.20秒，32语种35来源组全部attempted，73/1/10/269、3unknown、2pending保持；新输入和清单原字节独立归档，schema与摘要验证通过。CI终态尚待确认，不勾选父任务，见[验收](../../../tests/acceptance/grammar-manifest-history-binding.md)。
+
+
+### 2026-10-05 固定资产按语种复用核验
+
+14.13/14.19：内置selected资产核验先RED（重复九次核验），成功缓存后同语种一次；并发第二语种也只核验一次，未知语种不增加缓存项，修改元数据副本不污染固定清单。外部传入字节/许可证/身份仍逐次核对并拒绝篡改。资产层19通过，CLI实际32份项目/编辑Hook及worker/历史边界45通过、2条件忽略；不保存源码结论、不跳过原生义务、不完成14.13跨命令结果缓存，父任务仍开放。见[验收](../../../tests/acceptance/selected-grammar-asset-reuse.md)。
+
+
+## 2026-10-05 R/C++ 后缀及原生差分 CI 绑定修复
+
+- 显式接入 `.R` 和六种 C++ 后缀，保留大小写语义及 `.h` 的候选歧义；真实八文件 check all 和既有 32 grammar 项目/Hook 回归通过。见 `tests/acceptance/r-cpp-extension-routing.md`。14.4、14.6、14.19 仍需完整验收。
+- 原生差分回归显式重绑定当前清单、核对历史及 cases 不变，旧身份仍拒绝；修正 Ruff 隔离替身的过期 argv。见 `tests/acceptance/native-corpus-current-binding.md`。14.17、14.19 保持开放，远端完整 CI 尚待新提交。
+
+
+## 2026-10-05 具体 grammar 限制的终端与对话反馈
+
+- 两个实际入口 RED 证明具体 Python 版本兼容限制被隐藏；有界补齐 human 与 Claude 摘要，固定元数据来源，不复制源码、不批准白名单；末尾未验收/未评估说明保留在1200字符预算内。见 `tests/acceptance/grammar-limitation-conversation-feedback.md`。14.7、14.8、14.19 保持开放，真实全宿主与正式语言精度仍待验收。
+
+
+## 2026-10-05 全工作区示例的历史语料导入修复
+
+- 默认全工作区回归在 Rust 语料导入示例发现真实身份失败；显式历史清单入口保留当前严格校验、原历史样本与 stdout 新输入，三项示例回归通过。双语命令示例改为当前可用参数，不覆盖历史字节。见 `tests/acceptance/workspace-regression-importer-binding.md`；12.11、14.17、14.19 的完整验收仍开放。
+
+
+## 2026-10-05 原生差分的结构规则独立测量（已验证切片）
+
+12.11/14.17/14.19：开发差分此前丢弃 worker 已核验的结构规则观察，无法测量补充规则效果；新增独立 0.3 报告，不替换原始 grammar 统计或历史 0.1/0.2 证据。两个固定 Python 漏报的原始 FN 保留，组合候选另列规则身份、坐标和分母；取消、超时、截断、原生/程序身份变化不得伪成通过。验收见[分层测量](../../../tests/acceptance/native-structure-differential.md)。最终原生差分7通过/0失败/0忽略（含实际Ruff），WASM CLI单元61通过/3条件忽略、schema5通过。真实18例原始6TP/10TN/2FN保留，组合候选8TP/10TN/0FP/0FN，仅为此回归组效果。独立 holdout、完整工具链与各语言资格仍缺，父任务保持未完成。
+
+
+## 2026-10-05 JavaScript 隔离原生差分（本地切片已验证）
+
+12.11/14.17/14.19：把已有直接Command的JavaScript原生样本对照迁入受控Rust runtime和统一差分入口，明确固定Node24.18.0/module目标，不代替项目ESLint或推断模块类型。Node二进制超过64MiB，按原生检查器独立使用128MiB有界制品预算，其它工具保持64MiB；调用前后核对入口/版本/制品，异常输出不能判为源码违规。0.4协议保留32语言库存、原始和组合候选分层以及资格零；历史报告不改。追加不执行源码、不解析导入、模块return和重复绑定样本，见[验收](../../../tests/acceptance/javascript-isolated-native-differential.md)。独立holdout、CommonJS/ESM项目目标绑定、全部语言原生对照与正式资格仍缺，父任务保持未完成。
+
+
+### 2026-10-05 进程启动故障诊断（验收中）
+
+3.9/12.11：上次远端信号回归取得SpawnFailure而非Signaled，根因未确认。缺失工具日志反例RED证明OS错误被丢弃；保留私有CGLOG1 kind=7的错误码，原生stdout/stderr不伪造，失败判定不放宽、不加自动重试。既有CI测试失败信息包含终止原因及私有数值槽，等待新的Linux证据。见JavaScript隔离差分验收；父任务仍开放。
+
+最终JavaScript原生3通过/0忽略、40.78秒，18样本保留5TP/0FP/2FN/11TN；版本后别名重定向、执行中取消均RED后修复。Ruff原生差分7通过/0忽略、23.99秒，原始FN2不变；WASM CLI单元64通过/3条件忽略，默认全工作区1358通过/123忽略，严格Clippy双配置与schema3+5通过。开发SHA-256优化保留摘要检查及既定预算；CI显式接入JavaScript反例。远端新CI、32语言完整资格及所有父任务仍开放。
+
+
+## 2026-10-05 六语言原生差分共享取消（本地切片已验证）
+
+3.1/12.11/14.17/14.19：既有五语言观察器忽略请求AtomicBool，版本实际启动后取消反例RED仍耗时2.602秒；统一传递令牌，六语言版本/源码共12种情形GREEN。Python差分集成保留1样本、32库存和unknown分母，不生成发现/资格/交付许可。产品签名包装保留，全局SIGINT继续由runtime处理；同步摘要I/O无硬中断保证。实际语料重跑和受影响语言任务回归进行中，历史报告不覆盖，父任务仍开放。见[验收](../../../tests/acceptance/native-differential-shared-cancellation.md)。
+
+最终WASM CLI单元65通过/3条件忽略（含六语言两阶段12种取消情形）；差分8通过/0忽略、25.45秒，Node3通过/0忽略、40.30秒；六个lint/任务服务目标43通过/4条件忽略，协议2项通过，严格Clippy双配置和定向格式/规格/分层验证通过。实际Python/JavaScript原始FN分别2，历史字节不改。新CI显式加入六语言取消单元目标，远端验收及父任务保持开放。
+
+
+## 2026-10-05 原生版本后入口复核（本地切片已验证）
+
+3.7/5.4/12.11/14.17/14.19：Zig版本阶段改变别名后仍执行源码的反例RED；补齐Zig/Erlang/Swift阶段边界入口与SHA复核，六语言两种变化12情形GREEN。取消测试改用阻塞30秒/截止10秒的语义反例，临时恢复旧令牌仍等待10.009秒RED，恢复后单元66通过/3条件忽略。真实六工具对照与相关回归进行中，不扩大资格或掩盖原始缺陷；完整TOCTOU、工具链闭包和所有父任务保持开放，见[验收](../../../tests/acceptance/native-version-entry-binding.md)。
+
+最终真实六工具先98例、再追加既有Python16例完成114例对照，原样保留14FN和5unknown；两报告及扩展输入分别归档，不称独立holdout或资格通过。受影响六目标46通过/4条件忽略，协议2通过，双配置严格Clippy与格式/规格/分层通过。前序27d4956、69d56b0远端CI均success，仅证明各自提交；本轮新CI与完整父任务仍开放。
+
+
+## 2026-10-05 版本期间源码副本与输出校验（本地切片已验证）
+
+3.7/5.4/12.11/14.17/14.19：Kotlin版本改副本、Zig异常版本stderr仍执行后继动作，两实际标记反例RED；前置输入/输出校验后GREEN，WASM CLI单元68通过/3条件忽略。原生差分三场景归属移动，不改内容/标准；真实Zig/Kotlin26例及相关回归进行中，既有14FN/5unknown报告保留。前序cbac625远端CI已success，父任务仍开放，见[验收](../../../tests/acceptance/native-version-input-continuity.md)。
+
+最终真实Zig/Kotlin26例对照保持24可比较、2unknown，原分类与114例报告对应子集一致；原报告不覆盖、不消除其14FN。受影响六目标40通过/3条件忽略、协议1通过，双配置严格Clippy及规格/格式/分层通过。新CI待本次提交，完整父任务仍开放。
+
+## 2026-10-05 Ruby 统一原生开发差分（局部验收）
+
+12.11/14.17/14.19：既有 Ruby 直接 Command 样本未接统一受控回放，受控入口反例先 RED（native_grammar_language_unsupported）；新增固定 Ruby2.6.10p210 语法观察、0.5 版本协议及七语言选择。原始恢复与组合候选分层、32库存、未知分母及资格0保持，旧0.1—0.4报告不改。实际Ruby18例5TP/0FP/0FN/13TN，增加BEGIN/END/require/shebang不执行与UTF-8样本；七语言共同批次及检查结果见[验收](../../../tests/acceptance/ruby-isolated-native-differential.md)。公开Ruby项目lint、可信任务关闭、独立holdout、完整语言/平台/资源/发行仍未完成，父任务不勾选。
+
+本切片最终本地验证：WASM单元70通过/3条件忽略，四目标差分25通过/6条件忽略，显式实际Ruby18例1通过；真实七工具132例34TP/0FP/14FN/79TN及5unknown，原六语言114例分类不变。协议11项、strict OpenSpec、分层、定向格式、严格Clippy双配置和diff检查通过。未重复完整default workspace和32 grammar全量回放；远端CI与所有父任务保持独立未完成状态。
+
+## 2026-10-05 Go SDK 整文件原生开发差分（局部验收）
+
+12.11/14.17/14.19：原统一入口不支持Go，反例RED后加入固定Go1.23.4/同SDK目录gofmt双制品观察。用整文件`-e /dev/stdin`而非允许片段的默认stdin，清空环境并禁自动工具链/模块下载；0.6协议不改旧0.1—0.5报告。辅助制品批次变化的反事实RED后恢复末尾复核，撤回旧比较；8语言16阶段取消及16入口变化、Go辅助变化/辅助版本取消另验。实际20例初轮暴露3个EOF定位误拒绝，保留旧报告；EOF单元RED后修复为原始换行字节锚点，最终5TP/0FP/2FN/12TN及1逻辑位置未知，未丢源码或标签。两个缺package的WASM漏检继续保留。完整公开Go能力、独立holdout、逻辑位置映射、grammar/结构纠偏、资源/发行及宿主闭环仍未完成，父任务不勾选。见[验收](../../../tests/acceptance/go-isolated-native-differential.md)。
+
+本切片最终本地记录：WASM单元75通过/3条件忽略，五个差分/语料目标28通过/8条件忽略，显式Go20例实际测试1通过；环境旗标强化受控目标另1通过。八工具152例39TP/0FP/16FN/91TN及6unknown，旧七语言132例分类不变。协议17项、严格规格/分层/定向格式及diff检查通过；未重复default全workspace与32 grammar全回放。完整父任务及新远端CI未完成，严格Clippy和后续交付证据独立记录。
+
+严格Clippy默认/WASM两配置均通过；前序1e80a15的完整CI37286928365已success。Go变更的远端CI仍需独立验收，不据前序结果关闭任何父任务。
+## 2026-10-05 Go整文件package结构规则底层（接线未完成）
+
+12.11/14.17/14.19：新增语言无关有界根节点事实与Go整文件required_package规则，显式核对语言/范围/根/子节点及预算，不搜索注释或字符串，不合成解析器恢复。接口缺失RED后运行时4、适配器1、组合目标6测试通过/1条件忽略；显式实际Go1.23.4对原20例加11专项反例共31次原生源码观察通过（部分源码重复），原20例组合7TP/0FP/0FN/12TN及1unknown，原始5TP/0FP/2FN/12TN不变。私有worker、公开报告/稳定任务/智能体指引及差分协议尚未接线，原公开行为不变，不能宣称公开漏检已修复或资格已验收；父任务不勾选。见[验收](../../../tests/acceptance/go-package-structure.md)。
+## 2026-10-05 Go package候选进入公开检查及稳定任务（局部验收）
+
+12.11/14.17/14.19：公开反例RED后接入worker1.2/probe0.3/check0.49/确认0.8/保存Hook0.18，保留Python旧版本；Go vet预览误标Python0.1的协议缺陷由新0.13修正。三次check go/all和保存复用同一任务，补声明后任务仍open；私有伪造帧及工作台伪造报告拒绝。WASM单元75、七个集成目标37通过，另有条件忽略；Go20真实差分组合7TP/0FP/0FN/12TN及1unknown，原始FN2不改。八语言相同152例新回放原始39TP/0FP/16FN/91TN及6unknown，组合43TP/0FP/12FN/91TN及6unknown，其它七语言结果不变；全部32语言保留且资格0。新Go实际协议3与Python历史兼容协议2通过。Go确认任务原生复检/可信关闭、独立lint回退、系统精度/holdout及发行仍未完成，父任务不勾选。见[验收](../../../tests/acceptance/go-package-structure.md)。
+
+2026-10-05后续进展：Go结构候选task verify首次历史读取RED已修复；显式Go SDK/gofmt整文件原生复检接入稳定任务，缺工具记录失败尝试，同一任务修复前后实际原生回归通过，复检0.9/任务反馈0.22保持局部未批准。可信关闭、独立lint回退及父任务完整验收未完成，继续不勾选。证据见 `tests/acceptance/go-package-structure.md`。
+
+上述Go原生任务复检进一步接入专用next预览0.14及按需聚合0.50，修正默认Zig文案与旧工具参数；真实简报和闭合协议验收通过，旧语言任务回归及默认/WASM严格Clippy通过。未将候选消失或局部零诊断当作可信关闭，父任务仍未完成。
+
+2026-10-05进展：Go独立lint原生优先/缺工具WASM初检公开反例RED后接线，外层0.7对话协议保留原生0.6与通用候选稳定任务。显式坏工具不静默改用候选；零候选只推荐原生准备，未完成或候选要求准备；补声明不关闭任务。局部验收见 `tests/acceptance/go-lint-fallback.md`；完整Go能力、真实宿主、可信关闭与grammar资格仍缺，父任务保持未完成。
+
+
+## 2026-10-05 Go双制品限定任务关闭（局部验收）
+
+9.10/14.10/14.12：Go原反例/当前源码的宿主SDK关闭入口缺失RED，补齐独立策略1.6与证据0.7；Go/gofmt/规范路径双制品绑定，旧版本拒绝扩展字段，仍不允许项目自批。受控边界及显式实际Go1.23.4对照覆盖限定关闭/重开，产物独立保存；原反证要求误报调查，辅助变化保留未完成。见[局部验收](../../../tests/acceptance/go-task-resolution-lifecycle.md)。生产宿主批准来源、全语言/平台、完整项目门禁和精度资格仍缺，父任务不勾选。
+
+
+## 2026-10-05 CFQuery服务器注释结束边界（局部验收）
+
+14.4/14.6/14.19：三路由反例以及真实check all反事实先RED，修复结束标签搜索，普通/嵌套CFML注释中的假结束标签不再截断候选，未闭合注释不能制造可信区域。保留全部原始字节、整文件CFML恢复和未验收状态；中文/CRLF偏移及片段SHA由真实worker核对。见[验收](../../../tests/acceptance/cfquery-comment-boundary.md)。原生精度、独立oracle和父任务完整验收仍缺，不勾选。
+
+
+## 2026-10-05 C01–C36当前支持帮助目录（局部验收）
+
+2.1/2.7/12.9：JSON/精确前缀查询缺失与过期help三反例RED；静态44入口目录明确36个追踪ID、部分/未实现和构建不可用，根别名与精确前缀末尾帮助复用服务。默认/WASM分别13项目标通过，实际报告0.1封闭协议/schema2通过；不启动工具、服务或读写项目。见[验收](../../../tests/acceptance/command-help-current-support.md)。完整参数生成/默认值/语言上下文帮助、CLI/MCP共用注册与逐命令完整矩阵仍缺，父任务不勾选。
+
+
+## 2026-10-05 Rust独立lint原生优先（局部验收）
+
+2.1/2.7/7.3/9.9/14.9–14.11/14.19：公开lint rust复用原生Clippy、共同预算和任务同步，只执行lint；未选择且缺Cargo时提供有界WASM候选和原生准备要求，显式失败不回退。初始三项缺入口反例RED；重复发现保留任务、原工具复检及真实Clippy发现/修正/强制告警对照已有实际证据。补齐Rust修复简报封闭schema，help0.2增加该语种，历史协议保留。见[验收](../../../tests/acceptance/rust-standalone-lint.md)。全部构建组合、完整原生政策与可信关闭/发行仍缺，父任务不勾选。
+
+## 2026-10-05 Ruby公开原生入口（任务复检仍为RED）
+
+对应S05/S08/S09/S14与native-tool-adapters新增Ruby场景。已实现单文件原生优先入口、Ruby2.6.10p210固定版本和stdin语法观察、仅行号反馈、显式故障不回退、缺原生的WASM初检及未知项目版本边界；help0.3、新封闭反馈schema与双语说明同步。真实/usr/bin/ruby对破损和修复源码分别观察诊断及零诊断；不授予项目覆盖、任务关闭或发布资格。
+
+公开入口已局部验证；稳定任务、next、task verify及check all自动接线仍待实现。任务链路测试native_first_task_repeats_and_original_tool_rechecks保持失败，不移除或标忽略，真实任务关闭测试尚不具执行前提。现有全语言/工作流父任务保持未勾选。
+
+
+## 2026-10-05 Ruby稳定任务与原工具复检（局部链路验收）
+
+对应已有8.*全语言、9.3/9.9、14.7/14.10/14.11/14.19，不重复创建change、不勾选父任务。初始化工作区中的固定Ruby原生首次诊断/环境失败与WASM候选使用相同工作区/文件/语言指纹；重复扫描更新证据，零候选不生成新源码任务，原生零诊断不自动关闭。next提供真实行号、unknown列单位、项目版本核对与复检argv；task verify --ruby-tool记录原工具观察与事件；语言不匹配/相对工具在原生启动及租约前拒绝。
+
+原生首次RED及WASM任务RED均已复现后修复。默认Ruby目标9通过/1真实测试忽略，WASM目标10通过/1真实测试忽略；另行显式/usr/bin/ruby实测修复目标1通过，真实对话输出/JSON协议分别留证。默认全workspace、受影响WASM回归与严格Clippy本批仍在收敛，最终以tests/acceptance/ruby-native-entry.md记录为准。聚合原生Ruby、Ruby3、签名关闭政策、逐语言精度/宿主/发行验收保持开放。
+
+
+本批终态：默认全workspace1387通过/0失败/125忽略；共享任务WASM11目标87通过/0失败/7忽略；追加反例后Ruby目标默认11/WASM12通过，各1真实测试忽略，显式真实Ruby目标另行1通过。schema5通过；默认/WASM严格Clippy、分层、fmt、OpenSpec通过，最终证据见tests/acceptance/ruby-native-entry.md。受保护的用户Erlang草稿散列不变，未纳入提交。本批不勾选全语言/全工作流父任务。
+
+
+## 2026-10-05 Ruby项目原生扫描接线（局部验收）
+
+对应既有8.*、9.3/9.9、14.7/14.10/14.11/14.19；不增加第二个change、不勾选全语言父任务。check ruby/all接受 --ruby-tool 绝对路径，显式或绝对PATH原生优先，固定Ruby2.6.10p210单文件-c语法观察，64文件上限/共同截止时间/源码及工具复核；未观察范围不靠WASM伪装完成。缺工具保留WASM候选，选定工具故障不回退。原生扫描复用独立lint的任务和next指引，项目Ruby版本、RuboCop、完整项目义务与可信关闭继续未评估。
+
+初始4项测试因缺入口/结果失败；接线后4项通过，再增加源码变化撤回及65文件上限反例。WASM受影响6目标58通过/0失败/3忽略；本机真实工具产生缺工具、原生诊断、无效显式工具和修复后零诊断报告。新反馈0.51和Ruby扫描0.1/0.2封闭schema补齐执行项、原因枚举和无结构候选的合法空列表；旧0.50等schema保持原件。最终默认全workspace和严格Clippy结果见tests/acceptance/ruby-project-native-scan.md。
+
+
+本批终态：默认全workspace1395通过/0失败/125忽略，WASM受影响6目标58通过/0失败/3忽略；32grammar/语言选择3目标26通过/0失败/1忽略；默认/WASM严格Clippy、fmt、分层、OpenSpec通过，实际两构建8份报告与schema3项验收见tests/acceptance/ruby-project-native-scan.md。未修改用户Erlang草稿、旧schema或grammar资产；完整语言资格和发行父任务仍开放。
+
+
+## 2026-10-05 Ruby 编辑与修复 Hook 接线
+
+对应既有9.3/9.9、11.17、14.6/14.7/14.9/14.10/14.11/14.14/14.18；不新建change、不勾选完整宿主或语言父任务。原生Ruby编辑只检查实际选择文件，显式工具或绝对PATH优先，缺工具候选、选定失败不回退；CLAUDE形状反馈使用当前行号、安全任务与复检命令，不回显源码/消息或猜列号。repair_ready记录真实报告引用与零诊断仍open。初始4项RED，接线后GREEN，追加缺工具和失败写入反例。新Hook外层0.19/0.20与内层0.10/0.6闭合schema通过8份真实CLI观察（含/usr/bin/ruby及默认构建缺WASM）及伪造字段反例，旧schema不修改。安装后链路、默认/WASM最终回归及Clippy证据见tests/acceptance/ruby-native-hook.md；真实宿主、完整Ruby能力与发行仍未验收。
+
+Ruby Hook本批终态：默认完整1404通过/0失败/125忽略，WASM受影响85通过/0失败/4忽略；默认/WASM严格Clippy、fmt、分层、OpenSpec strict通过。离线npm安装链路1通过、8份实际Hook报告及9份结构化安装报告协议回归通过。前一aaa3879的Linux CI 37324440688全成功，此前Go失败未复现但根因未确认；本批远端结果须独立核验。详见tests/acceptance/ruby-native-hook.md，不勾选完整语言、真实宿主或发行父任务。
+
+
+## 2026-10-05 Ruby 项目版本声明约束（局部验收）
+
+对应既有5.4、8.*、9.9、14.19：固定Ruby2.6误解析其它声明版本、运行期配置变化及嵌套Gemfile遮蔽工作区pin反例先RED；统一有界最近声明约束后GREEN。不匹配、歧义及链接返回环境未完成、不启动旧Ruby或回退WASM；源码/编辑/复检共用，next撤回不适用位置，无声明仍未批准。新增9项/default受影响63项/WASM受影响90项通过，真实Ruby两份报告通过封闭schema，双构建严格Clippy及既有Hook协议/分层/strict规格验证通过。完整项目版本探测、Gemfile/JRuby/RVM、全语言门禁与发行未完成，父任务不勾选。证据见[验收](../../../tests/acceptance/ruby-project-version.md)。默认全工作区及远端CI分别追加核验。
+
+最终默认全工作区/all-targets 256 个结果目标：1413 通过、0 失败、125 忽略，日志 `/private/tmp/codeguard-ruby-version-workspace-v2.log`。这是本批源码的默认构建验收；WASM 仅执行上述受影响目标，远端 CI 仍须按本次提交独立核验。
+
+## 2026-10-06 ShellCheck 原生单文件入口（7.4仍未完成）
+
+Rust受控调用ShellCheck0.11.0 json1，固定方言、stdin、入口摘要、私有rc及前后复核；项目rc探测与运行结果分开。严格报告解析保留原规则与字符列，环境规则独立归类，原生自由文本/fix不进入简报。七要素指引明确持久任务未接通。真实原工具SC2086、配置抑制、缺source与局部诊断共存、zsh拒绝、Unicode、tab/CRLF及干净样本分别归档，见[局部验收](../../../tests/acceptance/shellcheck-native-baseline.md)。完整项目Shell、zsh专用工具、Dockerfile/IaC、持久任务与平台发行仍未验收，7.4不勾选。

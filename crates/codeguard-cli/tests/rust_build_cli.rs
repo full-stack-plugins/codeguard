@@ -58,6 +58,14 @@ impl Fixture {
         let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
             .args(["build", "rust", self.0.to_str().unwrap(), "--format=json"])
             .args(args)
+            .env(
+                "PATH",
+                if args.contains(&"--cargo-tool") {
+                    std::env::var_os("PATH").unwrap_or_default()
+                } else {
+                    std::ffi::OsString::new()
+                },
+            )
             .env_remove("CODEGUARD_TIMEOUT")
             .output()
             .unwrap();
@@ -434,4 +442,35 @@ fn queued_build_rejects_forged_fingerprint_and_stale_target_only_creates_prepara
     assert_eq!(result["new_findings"], 0);
     assert_eq!(result["historical_findings"], 1, "{result}");
     assert_eq!(result["new_blockers"], 1);
+}
+
+#[test]
+fn cargo_proxy_preserves_selected_entrypoint_and_rejects_retargeting() {
+    for retarget in [false, true] {
+        let fixture = Fixture::new();
+        let tools = Fixture::new();
+        let mutation = if retarget {
+            "ln -sf alternate-proxy \"$0\""
+        } else {
+            ""
+        };
+        let dispatcher = tools.tool(&format!(
+            "case \"$0\" in */cargo-entry) ;; *) exit 91 ;; esac\n{mutation}\nprintf '%s\\n' '{{\"reason\":\"build-finished\",\"success\":true}}'"
+        ));
+        let alternate = tools.0.join("alternate-proxy");
+        fs::copy(&dispatcher, &alternate).unwrap();
+        let entry = tools.0.join("cargo-entry");
+        std::os::unix::fs::symlink(&dispatcher, &entry).unwrap();
+        let (exit, report) = fixture.check(&["--cargo-tool", entry.to_str().unwrap()]);
+        assert_eq!(exit, 3);
+        assert_eq!(report["local_scan_complete"], !retarget, "{report}");
+        assert_eq!(
+            report["reason"],
+            if retarget {
+                "tool_changed_during_scan"
+            } else {
+                "native_observed_unverified"
+            }
+        );
+    }
 }

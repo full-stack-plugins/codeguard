@@ -18,6 +18,7 @@ use crate::check_budget::{
     check_budget_record, parse_check_jobs, parse_check_timeout, resolve_check_runtime,
     select_check_jobs, select_check_timeout,
 };
+use crate::check_selection::CheckSelection as Selection;
 use crate::discovery::{DiscoveryReport, discover};
 use crate::go_lint_command::observe_for_check as observe_go_vet;
 use crate::java_checker_config_status::{checker_for_category, summarize};
@@ -38,7 +39,7 @@ use crate::python_lint_command::{
     annotate_conversation_budget, scan_and_sync_report_with_deadline,
 };
 use crate::report_export::export_report;
-use crate::rust_lint_scan::observe_cargo_clippy;
+use crate::rust_lint_scan::observe_cargo_clippy_with_coverage;
 use crate::work_sync::{save_local_report, sync_local_workspace};
 
 struct Args {
@@ -52,6 +53,11 @@ struct Args {
     cargo_audit_tool: Option<PathBuf>,
     rustsec_db: Option<PathBuf>,
     go_tool: Option<PathBuf>,
+    erl_tool: Option<PathBuf>,
+    kotlinc_tool: Option<PathBuf>,
+    swift_tool: Option<PathBuf>,
+    ruby_tool: Option<PathBuf>,
+    zig_tool: Option<PathBuf>,
     maven_tool: Option<PathBuf>,
     java_home: Option<PathBuf>,
     maven_repo: Option<PathBuf>,
@@ -67,25 +73,10 @@ struct Args {
 }
 
 #[derive(Clone, Copy, Eq, PartialEq)]
-enum Selection {
-    All,
-    Java,
-}
-
-#[derive(Clone, Copy, Eq, PartialEq)]
 enum OutputFormat {
     Human,
     Json,
     Sarif,
-}
-
-impl Selection {
-    fn as_str(self) -> &'static str {
-        match self {
-            Self::All => "all",
-            Self::Java => "java",
-        }
-    }
 }
 
 /// 执行已接入的原生检查并报告待确认的候选类别；当前绝不签发 allow。
@@ -133,7 +124,7 @@ pub fn run(args: &[String]) -> ExitCode {
     let source_paths: BTreeSet<PathBuf> = discovery
         .languages
         .iter()
-        .filter(|(language, _)| parsed.selection == Selection::All || language.as_str() == "java")
+        .filter(|(language, _)| parsed.selection.includes(language))
         .flat_map(|(_, evidence)| evidence.source_files.iter().map(PathBuf::from))
         .collect();
     let source_snapshot = if source_paths.is_empty() {
@@ -151,7 +142,7 @@ pub fn run(args: &[String]) -> ExitCode {
         .map(Some)
         .map_err(|_| "project_source_snapshot_unavailable")
     };
-    let python_present = parsed.selection == Selection::All
+    let python_present = parsed.selection.includes("python")
         && discovery
             .languages
             .get("python")
@@ -161,23 +152,53 @@ pub fn run(args: &[String]) -> ExitCode {
         .get("rust")
         .map(|evidence| &evidence.source_files);
     let rust_present =
-        parsed.selection == Selection::All && rust_sources.is_some_and(|files| !files.is_empty());
-    let go_present = parsed.selection == Selection::All
+        parsed.selection.includes("rust") && rust_sources.is_some_and(|files| !files.is_empty());
+    if rust_present {
+        parsed.cargo_tool =
+            crate::cargo_tool_selection::resolve_cargo_tool(parsed.cargo_tool.as_deref());
+    }
+    let node_sources = if parsed.selection.includes_node() {
+        crate::check_eslint_scan::sources(&discovery)
+            .into_iter()
+            .filter(|p| {
+                discovery.languages.iter().any(|(language, e)| {
+                    parsed.selection.includes(language) && e.source_files.contains(p)
+                })
+            })
+            .collect()
+    } else {
+        BTreeSet::new()
+    };
+    let node_present = !node_sources.is_empty();
+    let go_present = parsed.selection.includes("go")
         && discovery
             .languages
             .get("go")
             .is_some_and(|evidence| !evidence.source_files.is_empty());
+    let erlang_sources = if parsed.selection.includes("erlang") {
+        discovery
+            .languages
+            .get("erlang")
+            .map(|evidence| evidence.source_files.clone())
+            .unwrap_or_default()
+    } else {
+        BTreeSet::new()
+    };
+    let erlang_present = !erlang_sources.is_empty();
     let java_sources = discovery
         .languages
         .get("java")
         .map(|evidence| &evidence.source_files);
-    let java_present = java_sources.is_some_and(|files| !files.is_empty());
-    let dependency_configured = discovery.checker_configurations.iter().any(|entry| {
-        entry.checker_id == "java.maven.dependency" && entry.configuration == "configured"
-    });
-    let cve_configured = discovery.checker_configurations.iter().any(|entry| {
-        entry.checker_id == "java.maven.dependency_check" && entry.configuration == "configured"
-    });
+    let java_present =
+        parsed.selection.includes("java") && java_sources.is_some_and(|files| !files.is_empty());
+    let dependency_configured = parsed.selection.includes("java")
+        && discovery.checker_configurations.iter().any(|entry| {
+            entry.checker_id == "java.maven.dependency" && entry.configuration == "configured"
+        });
+    let cve_configured = parsed.selection.includes("java")
+        && discovery.checker_configurations.iter().any(|entry| {
+            entry.checker_id == "java.maven.dependency_check" && entry.configuration == "configured"
+        });
     let javadoc_configured = java_present
         && discovery.checker_configurations.iter().any(|entry| {
             entry.checker_id == "java.maven.javadoc" && entry.configuration == "configured"
@@ -189,7 +210,7 @@ pub fn run(args: &[String]) -> ExitCode {
                 && matches!(entry.configuration.as_str(), "unknown" | "invalid")
         });
     let mut npm_roots: BTreeMap<String, (String, Option<String>)> = BTreeMap::new();
-    let python_cve_roots: BTreeMap<String, String> = if parsed.selection == Selection::All {
+    let python_cve_roots: BTreeMap<String, String> = if parsed.selection.includes("python") {
         discovery
             .checker_configurations
             .iter()
@@ -210,7 +231,7 @@ pub fn run(args: &[String]) -> ExitCode {
     };
     let mut historical_npm_scope_error = None;
     let mut recorded_npm_scope_error = None;
-    if parsed.selection == Selection::All && cfg!(unix) {
+    if parsed.selection.includes_node() && cfg!(unix) {
         let mut scopes = BTreeMap::new();
         for entry in discovery
             .checker_configurations
@@ -258,25 +279,145 @@ pub fn run(args: &[String]) -> ExitCode {
     let mut rust_comments_outcome = None;
     let mut rust_build_outcome = None;
     let mut rust_cve_outcome = None;
+    let mut node_task_outcome = None;
     let mut go_task_outcome = None;
+    let mut erlang_task_outcome = None;
     let mut java_task_outcome = None;
     let mut javadoc_task_outcome = None;
     let mut dependency_task_outcome = None;
     let mut cve_task_outcome = None;
     let mut python_lint = Value::Null;
     let mut rust_lint = Value::Null;
+    let mut _rust_syntax_coverage =
+        crate::rust_native_syntax_coverage::RustNativeSyntaxCoverage::default();
     let mut rust_comments = Value::Null;
     let mut rust_build = Value::Null;
     let mut rust_cve = Value::Null;
+    let mut node_lint = Value::Null;
     let mut go_lint = Value::Null;
+    let mut erlang_lint = Value::Null;
+    let kotlin_sources = if parsed.selection.includes("kotlin") {
+        discovery
+            .languages
+            .get("kotlin")
+            .map(|e| {
+                e.source_files
+                    .iter()
+                    .filter(|p| p.ends_with(".kt"))
+                    .cloned()
+                    .collect()
+            })
+            .unwrap_or_default()
+    } else {
+        BTreeSet::new()
+    };
+    let mut kotlin_lint = if kotlin_sources.is_empty() {
+        Value::Null
+    } else {
+        let report = crate::check_kotlin_scan::observe(
+            &root,
+            &kotlin_sources,
+            parsed.kotlinc_tool.clone(),
+            deadline,
+            &AtomicBool::new(false),
+        );
+        execution_tasks.push(json!({"id":"kotlin.lint","status":if report["local_compile_complete"]==true {"native_observed_unverified"} else {"native_incomplete"}}));
+        report
+    };
+    let swift_sources = if parsed.selection.includes("swift") {
+        discovery
+            .languages
+            .get("swift")
+            .map(|e| {
+                e.source_files
+                    .iter()
+                    .filter(|p| p.ends_with(".swift"))
+                    .cloned()
+                    .collect()
+            })
+            .unwrap_or_default()
+    } else {
+        BTreeSet::new()
+    };
+    let mut swift_lint = if swift_sources.is_empty() {
+        Value::Null
+    } else {
+        let report = crate::check_swift_scan::observe(
+            &root,
+            &swift_sources,
+            parsed.swift_tool.clone(),
+            deadline,
+            &AtomicBool::new(false),
+        );
+        execution_tasks.push(json!({"id":"swift.lint","status":if report["local_parse_complete"]==true {"native_observed_unverified"} else {"native_incomplete"}}));
+        report
+    };
+    let ruby_sources = if parsed.selection.includes("ruby") {
+        discovery
+            .languages
+            .get("ruby")
+            .map(|e| {
+                e.source_files
+                    .iter()
+                    .filter(|p| p.ends_with(".rb"))
+                    .cloned()
+                    .collect()
+            })
+            .unwrap_or_default()
+    } else {
+        BTreeSet::new()
+    };
+    let mut ruby_lint = if ruby_sources.is_empty() {
+        Value::Null
+    } else {
+        let report = crate::check_ruby_scan::observe(
+            &root,
+            &ruby_sources,
+            parsed.ruby_tool.clone(),
+            deadline,
+            &AtomicBool::new(false),
+        );
+        execution_tasks.push(json!({"id":"ruby.lint","status":if report["local_parse_complete"]==true {"native_observed_unverified"} else {"native_incomplete"}}));
+        report
+    };
+    let zig_sources = if parsed.selection.includes("zig") {
+        discovery
+            .languages
+            .get("zig")
+            .map(|e| {
+                e.source_files
+                    .iter()
+                    .filter(|p| p.ends_with(".zig"))
+                    .cloned()
+                    .collect()
+            })
+            .unwrap_or_default()
+    } else {
+        BTreeSet::new()
+    };
+    let mut zig_lint = if zig_sources.is_empty() {
+        Value::Null
+    } else {
+        let report = crate::check_zig_scan::observe(
+            &root,
+            &zig_sources,
+            parsed.zig_tool.clone(),
+            deadline,
+            &AtomicBool::new(false),
+        );
+        execution_tasks.push(json!({"id":"zig.lint","status":if report["local_parse_complete"]==true {"native_observed_unverified"}else{"native_incomplete"}}));
+        report
+    };
     let mut java_p3c = Value::Null;
     let mut java_javadoc = Value::Null;
     let mut java_dependencies = Value::Null;
     let mut java_cve = Value::Null;
     let empty_java_sources = BTreeSet::new();
-    if python_present
+    if node_present
+        || python_present
         || rust_present
         || go_present
+        || erlang_present
         || java_present
         || dependency_configured
         || cve_configured
@@ -284,6 +425,13 @@ pub fn run(args: &[String]) -> ExitCode {
         || !python_cve_roots.is_empty()
     {
         let mut nodes = Vec::new();
+        if node_present {
+            nodes.push(TaskNode {
+                id: "node.lint".into(),
+                dependencies: Vec::new(),
+                resources: vec!["node.eslint".into()],
+            });
+        }
         if python_present {
             nodes.push(TaskNode {
                 id: "python.lint".into(),
@@ -318,6 +466,13 @@ pub fn run(args: &[String]) -> ExitCode {
                 id: "go.lint".into(),
                 dependencies: Vec::new(),
                 resources: vec!["go.vet".into()],
+            });
+        }
+        if erlang_present {
+            nodes.push(TaskNode {
+                id: "erlang.lint".into(),
+                dependencies: Vec::new(),
+                resources: vec!["erlang.otp.forms".into()],
             });
         }
         if java_present {
@@ -366,10 +521,13 @@ pub fn run(args: &[String]) -> ExitCode {
         let cancelled = AtomicBool::new(false);
         let python_slot = Mutex::new(None);
         let rust_slot = Mutex::new(None);
+        let rust_coverage_slot = Mutex::new(None);
         let rust_comments_slot = Mutex::new(None);
         let rust_build_slot = Mutex::new(None);
         let rust_cve_slot = Mutex::new(None);
+        let node_slot = Mutex::new(None::<crate::check_eslint_scan::CheckEslintScan>);
         let go_slot = Mutex::new(None);
+        let erlang_slot = Mutex::new(None);
         let java_slot = Mutex::new(None);
         let javadoc_slot = Mutex::new(None);
         let dependency_slot = Mutex::new(None);
@@ -453,6 +611,49 @@ pub fn run(args: &[String]) -> ExitCode {
                         .lock()
                         .expect("npm结果槽未中毒")
                         .insert(id.id.clone(), report);
+                    outcome
+                } else if id.id == "node.lint" {
+                    let scan = crate::check_eslint_scan::CheckEslintScan::run(
+                        &root,
+                        &node_sources,
+                        parsed
+                            .npm_options
+                            .get("--node-tool")
+                            .map(std::path::Path::new),
+                        deadline,
+                        flag,
+                    );
+                    let outcome = if scan.feedback["reason"] == "request_cancelled" {
+                        TaskExecution::Cancelled
+                    } else if scan.feedback["reason"] == "request_deadline_exceeded" {
+                        TaskExecution::TimedOut
+                    } else if scan.feedback["status"] == "local_observation" {
+                        TaskExecution::Succeeded
+                    } else {
+                        TaskExecution::Failed
+                    };
+                    *node_slot.lock().expect("ESLint结果槽未中毒") = Some(scan);
+                    outcome
+                } else if id.id == "erlang.lint" {
+                    let report = crate::check_erlang_scan::observe(
+                        &root,
+                        &erlang_sources,
+                        parsed.erl_tool.clone(),
+                        deadline,
+                        flag,
+                    );
+                    let outcome = if flag.load(Ordering::Relaxed)
+                        || codeguard_runtime::sigint_cancellation_requested()
+                    {
+                        TaskExecution::Cancelled
+                    } else if Instant::now() >= deadline {
+                        TaskExecution::TimedOut
+                    } else if report["local_forms_complete"] == true {
+                        TaskExecution::Succeeded
+                    } else {
+                        TaskExecution::Failed
+                    };
+                    *erlang_slot.lock().expect("Erlang结果槽未中毒") = Some(report);
                     outcome
                 } else if id.id == "go.lint" {
                     let report = observe_go_vet(&root, parsed.go_tool.as_deref(), deadline, flag);
@@ -541,7 +742,7 @@ pub fn run(args: &[String]) -> ExitCode {
                     *rust_comments_slot.lock().expect("Rust文档结果槽未中毒") = Some(report);
                     outcome
                 } else if id.id == "rust.lint" {
-                    let report = observe_cargo_clippy(
+                    let (report, coverage) = observe_cargo_clippy_with_coverage(
                         &root,
                         rust_sources.expect("Rust 任务具备源码范围"),
                         parsed.cargo_tool.as_deref(),
@@ -561,6 +762,7 @@ pub fn run(args: &[String]) -> ExitCode {
                         TaskExecution::Failed
                     };
                     *rust_slot.lock().expect("Rust 结果槽位未中毒") = Some(report);
+                    *rust_coverage_slot.lock().expect("Rust源码覆盖槽位未中毒") = Some(coverage);
                     outcome
                 } else if id.id == "java.javadoc" {
                     let report = observe_javadoc_project(
@@ -725,7 +927,7 @@ pub fn run(args: &[String]) -> ExitCode {
                         TaskOutcome::Cancelled | TaskOutcome::CancelledBeforeStart
                     )
                 });
-            let native_results = json!({
+            let mut native_results = json!({
                 "python_lint":python_slot.lock()
                     .unwrap_or_else(std::sync::PoisonError::into_inner)
                     .as_ref().and_then(|result| result.as_ref().ok()).cloned().unwrap_or(Value::Null),
@@ -734,15 +936,21 @@ pub fn run(args: &[String]) -> ExitCode {
                 "rust_comments":snapshot_native_slot(&rust_comments_slot),
                 "rust_build":snapshot_native_slot(&rust_build_slot),
                 "rust_cve":snapshot_native_slot(&rust_cve_slot),
+                "node_lint":node_slot.lock().unwrap_or_else(std::sync::PoisonError::into_inner).as_ref().map(|scan|scan.feedback.clone()).unwrap_or(Value::Null),
                 "go_lint":snapshot_native_slot(&go_slot),
+                "erlang_lint":snapshot_native_slot(&erlang_slot),
                 "java_p3c":snapshot_native_slot(&java_slot),
                 "java_javadoc":snapshot_native_slot(&javadoc_slot),
                 "java_dependencies":snapshot_native_slot(&dependency_slot),
                 "java_cve":snapshot_native_slot(&cve_slot),
                 "npm_cve":npm_slots.lock().unwrap_or_else(std::sync::PoisonError::into_inner).values().cloned().collect::<Vec<_>>()
             });
+            if zig_lint.is_object() {
+                crate::check_zig_scan::refresh(&root, &mut zig_lint, deadline);
+                native_results["zig_lint"] = zig_lint.clone();
+            }
             let report = aborted_task_report(
-                parsed.selection,
+                parsed.selection.clone(),
                 discovery.to_json(),
                 &outcomes,
                 native_results,
@@ -765,6 +973,15 @@ pub fn run(args: &[String]) -> ExitCode {
                 println!("{}", report["native_results"]);
             }
             return ExitCode::from(if cancelled_with_failure { 130 } else { 4 });
+        }
+        if node_present {
+            let outcome = *outcomes.get("node.lint").expect("ESLint任务结果完整");
+            node_task_outcome = Some(outcome);
+            execution_tasks.push(json!({"id":"node.lint","status":task_status(outcome)}));
+            if let Some(mut scan) = node_slot.into_inner().expect("ESLint结果槽未中毒") {
+                scan.sync(&root, deadline);
+                node_lint = scan.feedback;
+            }
         }
         let mut npm_reports = npm_slots.into_inner().expect("npm结果槽未中毒");
         let mut python_cve_reports = python_cve_slots
@@ -851,6 +1068,19 @@ pub fn run(args: &[String]) -> ExitCode {
             rust_lint = rust_slot
                 .into_inner()
                 .expect("Rust 结果槽位未中毒")
+                .unwrap_or(Value::Null);
+            _rust_syntax_coverage = rust_coverage_slot
+                .into_inner()
+                .expect("Rust源码覆盖槽位未中毒")
+                .unwrap_or_default();
+        }
+        if erlang_present {
+            let outcome = *outcomes.get("erlang.lint").expect("Erlang任务结果完整");
+            erlang_task_outcome = Some(outcome);
+            execution_tasks.push(json!({"id":"erlang.lint", "status":task_status(outcome)}));
+            erlang_lint = erlang_slot
+                .into_inner()
+                .expect("Erlang结果槽未中毒")
                 .unwrap_or(Value::Null);
         }
         if go_present {
@@ -955,60 +1185,10 @@ pub fn run(args: &[String]) -> ExitCode {
         }
     }
     if rust_lint.is_object() {
-        let (status, summary) = match save_local_report(&root, &rust_lint) {
-            Ok(()) if rust_lint["workspace_binding"] == "bound" => {
-                match sync_local_workspace(&root) {
-                    Ok(summary) if summary.failed_reports == 0 => (
-                        "synced_partial",
-                        json!({
-                            "new_findings":summary.new_findings,
-                            "new_blockers":summary.new_blockers,
-                            "imported_reports":summary.imported_reports,
-                            "historical_findings":summary.historical_findings,
-                            "failed_reports":summary.failed_reports
-                        }),
-                    ),
-                    _ => ("backlog_update_failed", Value::Null),
-                }
-            }
-            Ok(()) => ("not_initialized", Value::Null),
-            Err(_) => ("backlog_update_failed", Value::Null),
-        };
-        rust_lint["backlog_status"] = json!(status);
-        rust_lint["backlog_sync"] = summary;
-        rust_lint["next"] = if status == "synced_partial" {
-            read_local_brief(&root).unwrap_or(Value::Null)
-        } else {
-            Value::Null
-        };
+        crate::rust_lint_workbench::persist_and_sync(&root, &mut rust_lint);
     }
     if java_p3c.is_object() {
-        let (status, summary) = match save_local_report(&root, &java_p3c) {
-            Ok(()) if java_p3c["workspace_binding"] == "bound" => {
-                match sync_local_workspace(&root) {
-                    Ok(summary) if summary.failed_reports == 0 => (
-                        "synced_partial",
-                        json!({
-                            "new_findings":summary.new_findings,
-                            "new_blockers":summary.new_blockers,
-                            "imported_reports":summary.imported_reports,
-                            "historical_findings":summary.historical_findings,
-                            "failed_reports":summary.failed_reports
-                        }),
-                    ),
-                    _ => ("backlog_update_failed", Value::Null),
-                }
-            }
-            Ok(()) => ("not_initialized", Value::Null),
-            Err(_) => ("backlog_update_failed", Value::Null),
-        };
-        java_p3c["backlog_status"] = json!(status);
-        java_p3c["backlog_sync"] = summary;
-        java_p3c["next"] = if status == "synced_partial" {
-            read_local_brief_for_checker(&root, "java.maven.p3c").unwrap_or(Value::Null)
-        } else {
-            Value::Null
-        };
+        crate::java_p3c_workbench::persist_and_sync(&root, &mut java_p3c);
     }
     if java_cve.is_object() {
         let (status, summary) = match save_local_report(&root, &java_cve) {
@@ -1062,6 +1242,46 @@ pub fn run(args: &[String]) -> ExitCode {
         Ok(None) => None,
         Err(reason) => Some(reason),
     };
+    if zig_lint.is_object() {
+        if source_recheck.or(scope_recheck).is_some() {
+            zig_lint["scope_stable"] = json!(false);
+        }
+        crate::check_zig_scan::refresh(&root, &mut zig_lint, deadline);
+        crate::native_syntax_confirmation::connect(&root, &mut zig_lint, deadline);
+        crate::check_zig_scan::refresh(&root, &mut zig_lint, deadline);
+    }
+    if kotlin_lint.is_object() {
+        if source_recheck.or(scope_recheck).is_some() {
+            kotlin_lint["scope_stable"] = json!(false);
+        }
+        crate::check_kotlin_scan::refresh(&root, &mut kotlin_lint, deadline);
+        crate::native_syntax_confirmation::connect(&root, &mut kotlin_lint, deadline);
+        crate::check_kotlin_scan::refresh(&root, &mut kotlin_lint, deadline);
+    }
+    if swift_lint.is_object() {
+        if source_recheck.or(scope_recheck).is_some() {
+            swift_lint["scope_stable"] = json!(false);
+        }
+        crate::check_swift_scan::refresh(&root, &mut swift_lint, deadline);
+        crate::native_syntax_confirmation::connect(&root, &mut swift_lint, deadline);
+        crate::check_swift_scan::refresh(&root, &mut swift_lint, deadline);
+    }
+    if ruby_lint.is_object() {
+        if source_recheck.or(scope_recheck).is_some() {
+            ruby_lint["scope_stable"] = json!(false);
+        }
+        crate::check_ruby_scan::refresh(&root, &mut ruby_lint, deadline);
+        crate::native_syntax_confirmation::connect(&root, &mut ruby_lint, deadline);
+        crate::check_ruby_scan::refresh(&root, &mut ruby_lint, deadline);
+    }
+    if erlang_lint.is_object() {
+        if source_recheck.or(scope_recheck).is_some() {
+            crate::check_erlang_scan::invalidate_scope(&mut erlang_lint);
+        }
+        crate::check_erlang_scan::refresh(&root, &mut erlang_lint, deadline);
+        crate::native_syntax_confirmation::connect(&root, &mut erlang_lint, deadline);
+        crate::check_erlang_scan::refresh(&root, &mut erlang_lint, deadline);
+    }
     let python_doc_observed = python_lint["files"].as_array().is_some_and(|files| {
         files.iter().any(|file| {
             file["run_status"] == "findings"
@@ -1076,7 +1296,7 @@ pub fn run(args: &[String]) -> ExitCode {
     });
     let mut candidates = Vec::new();
     for (language, evidence) in &discovery.languages {
-        if parsed.selection == Selection::Java && language != "java" {
+        if !parsed.selection.includes(language) {
             continue;
         }
         if evidence.source_files.is_empty() && evidence.manifests.is_empty() {
@@ -1163,6 +1383,53 @@ pub fn run(args: &[String]) -> ExitCode {
                 "status": if observed { "observed_unverified" } else if npm_selected || python_lint_selected || rust_lint_selected || rust_comments_selected || rust_build_selected || rust_cve_selected || go_lint_selected || java_lint_selected || java_comments_selected || (language == "java" && category == "dependencies" && dependency_configured) || (cve_scope_configured) { "native_incomplete" } else if language == "java" && category == "comments" { if javadoc_configuration_unresolved { "configuration_unresolved" } else { "not_configured" } } else if let Some(candidate) = java_checker.as_ref() { candidate.status } else { "not_integrated" },
                 "reason": if rust_cve_selected { if observed { "rust_cve_database_freshness_unverified" } else { "rust_cve_native_incomplete" } } else if npm_selected { "npm_advisory_coverage_and_freshness_unverified" } else if planned_language { "planned_language_adapter_gap" } else if observed { "trusted_policy_and_coverage_unavailable" } else if java_lint_selected && java_p3c["local_observation_complete"] == true { "p3c_declared_rulesets_unverified_coverage" } else if java_comments_selected && java_javadoc["maven_multifile_probes"].as_array().is_some_and(|probes| probes.iter().any(|probe| matches!(probe["observation"]["native_status"].as_str(), Some("findings_observed_untrusted" | "clean_log_unverified")))) { "javadoc_multifile_probe_unverified_project_coverage" } else if java_comments_selected && java_javadoc["local_probe_complete"] == true { "javadoc_single_file_probe_unverified_coverage" } else if language == "java" && category == "dependencies" && java_dependencies["observed_graph_count"].as_u64().is_some_and(|count| count > 0) { "dependency_graph_observed_unverified_coverage" } else if cve_scope_configured && java_cve["observed_report_count"].as_u64().is_some_and(|count| count > 0) { "cve_report_observed_database_unverified" } else if (language == "java" && category == "dependencies" && dependency_configured) || cve_scope_configured || python_lint_selected || rust_lint_selected || rust_comments_selected || rust_build_selected || go_lint_selected || java_lint_selected || java_comments_selected { "native_scan_incomplete" } else if language == "java" && category == "comments" { if javadoc_configuration_unresolved { "javadoc_configuration_unresolved" } else { "not_configured" } } else if let Some(candidate) = java_checker.as_ref() { candidate.reason } else { "native_adapter_not_integrated" }
             });
+            if language == "kotlin" && category == "lint" && kotlin_lint.is_object() {
+                candidate["checker_id"] = json!("kotlin.jvm.compiler");
+                candidate["status"] = json!("native_incomplete");
+                candidate["reason"] = json!("kotlin_single_file_project_checks_unverified");
+                candidate["next_action"] = json!(
+                    "读取 native_results.kotlin_lint 的当前语法位置、上下文诊断、环境阻塞和稳定任务；单文件编译不代替项目 lint 与完整构建"
+                );
+            }
+            if language == "zig" && category == "lint" && zig_lint.is_object() {
+                candidate["checker_id"] = json!("zig.ast_check");
+                candidate["status"] = json!(if zig_lint["local_parse_complete"] == true {
+                    "observed_unverified"
+                } else {
+                    "native_incomplete"
+                });
+                candidate["reason"] = json!("zig_single_file_project_checks_unverified");
+                candidate["next_action"] = json!(
+                    "读取 native_results.zig_lint 当前原生位置和环境阻塞；修复后原工具复检，并继续完整项目 lint 与构建"
+                );
+            }
+            if language == "swift" && category == "lint" && swift_lint.is_object() {
+                candidate["checker_id"] = json!("swift.frontend.parse");
+                candidate["status"] = json!("native_incomplete");
+                candidate["reason"] = json!("swift_single_file_project_checks_unverified");
+                candidate["next_action"] = json!(
+                    "读取 native_results.swift_lint 的当前语法位置、环境阻塞；核对逐文件任务同步结果，单文件 parse不代替项目 lint 与完整构建"
+                );
+            }
+            if language == "ruby" && category == "lint" && ruby_lint.is_object() {
+                candidate["checker_id"] = json!("ruby.syntax");
+                candidate["status"] = json!("native_incomplete");
+                candidate["reason"] = json!("ruby_single_file_project_checks_unverified");
+                candidate["next_action"] = json!(
+                    "读取 native_results.ruby_lint 的当前语法位置、环境阻塞；核对逐文件任务同步结果，单文件Ruby2.6.10p210语法观察不代替项目 lint 与完整构建"
+                );
+            }
+            if language == "erlang" && category == "lint" && erlang_present {
+                candidate["checker_id"] = json!("erlang.otp.forms");
+                candidate["status"] = json!("native_incomplete");
+                candidate["reason"] = erlang_lint
+                    .get("reason")
+                    .cloned()
+                    .unwrap_or(json!("erlang_native_task_not_started"));
+                candidate["next_action"] = json!(
+                    "读取 native_results.erlang_lint 的逐文件诊断、阻塞和原工具复检指令；单文件 forms 不代替项目完整 lint、预处理、编译和测试"
+                );
+            }
             if python_comments_selected {
                 candidate["checker_id"] = json!("python.ruff");
                 candidate["next_action"] = json!(
@@ -1206,6 +1473,22 @@ pub fn run(args: &[String]) -> ExitCode {
                     "checker_configuration_unresolved"
                 });
             }
+            if category == "lint"
+                && node_sources
+                    .iter()
+                    .any(|path| evidence.source_files.contains(path))
+            {
+                candidate["checker_id"] = json!("node.eslint");
+                candidate["status"] = json!(if node_lint["status"] == "local_observation" {
+                    "observed_unverified"
+                } else {
+                    "native_incomplete"
+                });
+                candidate["reason"] = json!("eslint_project_coverage_unverified");
+                candidate["next_action"] = json!(
+                    "读取逐文件 ESLint 原生发现与准备原因，按项目原配置复检；缺工具或配置的模块继续语法初检"
+                );
+            }
             candidates.push(candidate);
         }
     }
@@ -1216,6 +1499,9 @@ pub fn run(args: &[String]) -> ExitCode {
     ]
     .into_iter()
     .collect();
+    if node_present && node_task_outcome != Some(TaskOutcome::Succeeded) {
+        unresolved.insert("node_lint_incomplete".into());
+    }
     if let Some(reason) = scope_recheck {
         unresolved.insert(reason.into());
     }
@@ -1226,7 +1512,7 @@ pub fn run(args: &[String]) -> ExitCode {
         unresolved.insert("project_observation_incomplete".into());
     }
     for (language, evidence) in &discovery.languages {
-        if (parsed.selection == Selection::All || language == "java")
+        if parsed.selection.includes(language)
             && (!evidence.source_files.is_empty() || !evidence.manifests.is_empty())
             && registry
                 .languages
@@ -1289,6 +1575,62 @@ pub fn run(args: &[String]) -> ExitCode {
     if rust_present && rust_task_outcome != Some(TaskOutcome::Succeeded) {
         unresolved.insert("rust_lint_task_incomplete".into());
     }
+    if kotlin_lint.is_object() {
+        unresolved.insert("kotlin_project_lint_and_build_coverage_unverified".into());
+        if kotlin_lint["local_compile_complete"] != true {
+            unresolved.insert("kotlin_native_scan_incomplete".into());
+        }
+        if matches!(
+            kotlin_lint["task_status"].as_str(),
+            Some("failed" | "sync_incomplete")
+        ) {
+            unresolved.insert("kotlin_task_sync_incomplete".into());
+        }
+    }
+    if zig_lint.is_object() {
+        unresolved.insert("zig_project_lint_and_build_coverage_unverified".into());
+        if zig_lint["task_status"] == "not_connected" {
+            unresolved.insert("zig_native_task_workspace_not_connected".into());
+        }
+        if zig_lint["task_status"] == "incomplete" {
+            unresolved.insert("zig_native_task_sync_incomplete".into());
+        }
+        if zig_lint["local_parse_complete"] != true {
+            unresolved.insert("zig_native_scan_incomplete".into());
+        }
+    }
+    if swift_lint.is_object() {
+        unresolved.insert("swift_project_lint_and_build_coverage_unverified".into());
+        if swift_lint["task_status"] == "not_connected" {
+            unresolved.insert("swift_native_task_workspace_not_connected".into());
+        }
+        if swift_lint["task_status"] == "incomplete" {
+            unresolved.insert("swift_native_task_sync_incomplete".into());
+        }
+        if swift_lint["local_parse_complete"] != true {
+            unresolved.insert("swift_native_scan_incomplete".into());
+        }
+    }
+    if ruby_lint.is_object() {
+        unresolved.insert("ruby_project_lint_and_build_coverage_unverified".into());
+        if ruby_lint["task_status"] == "not_connected" {
+            unresolved.insert("ruby_native_task_workspace_not_connected".into());
+        }
+        if ruby_lint["task_status"] == "incomplete" {
+            unresolved.insert("ruby_native_task_sync_incomplete".into());
+        }
+        if ruby_lint["local_parse_complete"] != true {
+            unresolved.insert("ruby_native_scan_incomplete".into());
+        }
+    }
+    if erlang_present {
+        unresolved.insert("erlang_project_lint_preprocessing_and_build_coverage_unverified".into());
+        if erlang_task_outcome != Some(TaskOutcome::Succeeded)
+            || erlang_lint["local_forms_complete"] != true
+        {
+            unresolved.insert("erlang_lint_task_incomplete".into());
+        }
+    }
     if go_present && go_task_outcome != Some(TaskOutcome::Succeeded) {
         unresolved.insert("go_lint_task_incomplete".into());
     }
@@ -1337,12 +1679,14 @@ pub fn run(args: &[String]) -> ExitCode {
         })
         || codeguard_runtime::sigint_cancellation_requested()
         || [
+            node_task_outcome,
             python_task_outcome,
             rust_task_outcome,
             rust_comments_outcome,
             rust_build_outcome,
             rust_cve_outcome,
             go_task_outcome,
+            erlang_task_outcome,
             java_task_outcome,
             javadoc_task_outcome,
             dependency_task_outcome,
@@ -1362,13 +1706,24 @@ pub fn run(args: &[String]) -> ExitCode {
     if parsed.selection == Selection::Java && !java_present {
         unresolved.insert("java_target_absent_or_unobserved".into());
     }
+    if matches!(parsed.selection, Selection::Language(_))
+        && !discovery.languages.iter().any(|(language, e)| {
+            parsed.selection.includes(language)
+                && (!e.source_files.is_empty() || !e.manifests.is_empty())
+        })
+    {
+        unresolved.insert(format!(
+            "{}_target_absent_or_unobserved",
+            parsed.selection.as_str()
+        ));
+    }
     unresolved.extend(discovery.unknown_conditions.iter().cloned());
-    let next = (parsed.selection == Selection::All)
+    let mut next = (parsed.selection.includes("rust"))
         .then(|| rust_lint.get("next").filter(|value| !value.is_null()))
         .flatten()
         .cloned()
         .or_else(|| {
-            (parsed.selection == Selection::All)
+            (parsed.selection.includes("rust"))
                 .then(|| {
                     if rust_build["backlog_status"] == "synced" {
                         read_local_brief_for_checker(&root, "rust.cargo_check")
@@ -1381,19 +1736,19 @@ pub fn run(args: &[String]) -> ExitCode {
                 .flatten()
         })
         .or_else(|| {
-            (parsed.selection == Selection::All && rust_cve_synced)
+            (parsed.selection.includes("rust") && rust_cve_synced)
                 .then(|| read_local_brief_for_checker(&root, "rust.cargo_audit").ok())
                 .flatten()
                 .filter(|value| !value.is_null())
         })
         .or_else(|| {
-            (parsed.selection == Selection::All)
+            (parsed.selection.includes("python"))
                 .then(|| python_lint.get("next").filter(|value| !value.is_null()))
                 .flatten()
                 .cloned()
         })
         .or_else(|| {
-            (parsed.selection == Selection::All && python_cve_synced)
+            (parsed.selection.includes("python") && python_cve_synced)
                 .then(|| read_local_brief_for_checker(&root, "python.pip_audit").ok())
                 .flatten()
                 .filter(|value| !value.is_null())
@@ -1406,6 +1761,12 @@ pub fn run(args: &[String]) -> ExitCode {
         })
         .or_else(|| {
             java_cve
+                .get("next")
+                .filter(|value| !value.is_null())
+                .cloned()
+        })
+        .or_else(|| {
+            node_lint
                 .get("next")
                 .filter(|value| !value.is_null())
                 .cloned()
@@ -1426,7 +1787,57 @@ pub fn run(args: &[String]) -> ExitCode {
                 Value::Null
             }
         });
+    if let Selection::Language(language) = &parsed.selection {
+        let checkers: &[&str] = match language.as_str() {
+            "python" => &["python.ruff", "python.ruff.doctor", "python.pip_audit"],
+            "rust" => &[
+                "rust.cargo_clippy",
+                "rust.cargo_check",
+                "rust.cargo_rustdoc",
+                "rust.cargo_audit",
+            ],
+            "go" => &["go.vet"],
+            "javascript" | "typescript" => {
+                &["node.eslint", "node.eslint.preparation", "node.npm.audit"]
+            }
+            _ => &[],
+        };
+        next = Value::Null;
+        for checker in checkers {
+            match read_local_brief_for_checker(&root, checker) {
+                Ok(brief) if !brief["repair_brief"].is_null() => {
+                    next = brief;
+                    break;
+                }
+                Ok(_) => {}
+                Err(reason) => {
+                    unresolved.insert(format!("selected_next_unavailable:{reason}"));
+                }
+            }
+        }
+        if next.is_null() {
+            let ids = [
+                &erlang_lint,
+                &kotlin_lint,
+                &swift_lint,
+                &zig_lint,
+                &ruby_lint,
+            ]
+            .into_iter()
+            .flat_map(|report| report["files"].as_array().into_iter().flatten())
+            .filter_map(|file| file["task_id"].as_str().map(str::to_owned))
+            .collect();
+            next = match crate::next_command::read_local_brief_for_tasks(&root, &ids) {
+                Ok(brief) => brief,
+                Err(reason) => {
+                    unresolved.insert(format!("selected_next_unavailable:{reason}"));
+                    Value::Null
+                }
+            };
+        }
+    }
     let started_native_task_count = [
+        node_task_outcome,
         python_task_outcome,
         rust_task_outcome,
         rust_comments_outcome,
@@ -1450,17 +1861,47 @@ pub fn run(args: &[String]) -> ExitCode {
                 | TaskOutcome::DependencyFailed
         )
     })
-    .count();
+    .count()
+        + usize::from(
+            kotlin_lint["files"]
+                .as_array()
+                .is_some_and(|files| files.iter().any(|f| f["native"]["tool_sha256"].is_string())),
+        );
+    let started_native_task_count = started_native_task_count
+        + usize::from(
+            swift_lint["files"]
+                .as_array()
+                .is_some_and(|files| files.iter().any(|f| f["native"]["tool_sha256"].is_string())),
+        );
+    let started_native_task_count = started_native_task_count
+        + usize::from(
+            zig_lint["files"]
+                .as_array()
+                .is_some_and(|files| files.iter().any(|f| f["native"]["tool_sha256"].is_string())),
+        );
+    let started_native_task_count = started_native_task_count
+        + usize::from(
+            ruby_lint["files"]
+                .as_array()
+                .is_some_and(|files| files.iter().any(|f| f["native"]["tool_sha256"].is_string())),
+        );
     #[cfg(feature = "wasm-precheck")]
     let syntax_candidates = crate::check_syntax_candidates::observe(
         &root,
         &discovery,
         crate::check_syntax_candidates::NativeCoverage {
+            node_lint: &node_lint,
             python_lint: &python_lint,
             go_lint: &go_lint,
+            erlang_lint: &erlang_lint,
+            kotlin_lint: &kotlin_lint,
+            swift_lint: &swift_lint,
+            ruby_lint: &ruby_lint,
+            zig_lint: &zig_lint,
+            rust_targets: &_rust_syntax_coverage,
             go_tool: parsed.go_tool.as_deref(),
         },
-        parsed.selection == Selection::Java,
+        parsed.selection.language(),
         parsed.jobs_limit,
         deadline,
         if request_cancelled {
@@ -1475,27 +1916,110 @@ pub fn run(args: &[String]) -> ExitCode {
     let syntax_candidates = json!({
         "status":"not_run","reason":"binary_without_wasm_precheck","execution_phase":"after_native",
         "authority":"candidate_unqualified","delivery_decision":"incomplete",
-        "source_file_count":discovery.languages.values().map(|item| item.source_files.len()).sum::<usize>() + discovery.ambiguous_source_files.len(),
+        "source_file_count":discovery.languages.iter().filter(|(language, _)|parsed.selection.includes(language)).map(|(_, item)| item.source_files.len()).sum::<usize>() + if parsed.selection == Selection::All {discovery.ambiguous_source_files.len()} else {0},
         "skipped_count":0,"unrouted_count":0,"native_preferred_count":0,"observations":[],
         "next_action":"使用包含固定语法资产的发行包运行候选初检，并完成适用原生检查"
     });
-    let report = json!({
-        "schema_version":"0.34.0", "report_type":"check_feedback",
+    let syntax_tasks = crate::syntax_confirmation::persist(&root, &syntax_candidates, deadline);
+    if syntax_tasks["status"] == "incomplete" {
+        unresolved.insert("syntax_task_sync_incomplete".into());
+    }
+    if next.is_null()
+        && syntax_tasks["tasks"]
+            .as_array()
+            .is_some_and(|tasks| !tasks.is_empty())
+    {
+        let selected_brief = if matches!(parsed.selection, Selection::Language(_)) {
+            let ids = syntax_tasks["tasks"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .filter_map(|task| task["task_id"].as_str().map(str::to_owned))
+                .collect();
+            crate::next_command::read_local_brief_for_tasks(&root, &ids)
+        } else {
+            read_local_brief(&root)
+        };
+        match selected_brief {
+            Ok(brief) => next = brief,
+            Err(reason) => {
+                unresolved.insert(format!("syntax_next_unavailable:{reason}"));
+            }
+        }
+    }
+    if zig_lint.is_object() {
+        crate::check_zig_scan::refresh(&root, &mut zig_lint, deadline);
+    }
+    if ruby_lint.is_object() {
+        crate::check_ruby_scan::refresh(&root, &mut ruby_lint, deadline);
+    }
+    let mut report = json!({
+        "schema_version":if ruby_lint.is_object() || next["schema_version"] == "0.15.0" {"0.51.0"} else if next["schema_version"] == "0.14.0" {"0.50.0"} else if next["schema_version"] == "0.13.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.49.0"} else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row.get("structural_observations").is_some())) {"0.48.0"} else if zig_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.12.0" {"0.47.0"}else if zig_lint.is_object() {"0.46.0"} else if matches!(parsed.selection, Selection::Language(_)) {"0.45.0"} else if swift_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.11.0" {"0.44.0"} else if swift_lint.is_object() {"0.43.0"} else if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
         "operation":"check", "selection":parsed.selection.as_str(), "command_status":if request_cancelled { "cancelled" } else { "incomplete" },
         "exit_code":if request_cancelled { 130 } else { 3 }, "delivery_decision":if parsed.selection == Selection::All { "incomplete" } else { "not_evaluated" }, "authority":"local_unverified",
-        "reason":if request_cancelled { "request_cancelled" } else if parsed.selection == Selection::All { "full_project_obligations_and_trusted_policy_unavailable" } else { "java_selection_obligations_and_trusted_policy_unavailable" },
+        "reason":if request_cancelled { "request_cancelled" } else if parsed.selection == Selection::All { "full_project_obligations_and_trusted_policy_unavailable" } else if parsed.selection == Selection::Java { "java_selection_obligations_and_trusted_policy_unavailable" } else { "language_selection_obligations_and_trusted_policy_unavailable" },
         "discovery":discovery.to_json(),
-        "native_results":{"python_lint":python_lint,"python_cve":python_cve,"rust_lint":rust_lint,"rust_comments":rust_comments,"rust_build":rust_build,"rust_cve":rust_cve,"go_lint":go_lint,"java_p3c":java_p3c,"java_javadoc":java_javadoc,"java_dependencies":java_dependencies,"java_cve":java_cve,"npm_cve":npm_cve}, "execution_tasks":execution_tasks,
+        "native_results":{"node_lint":node_lint,"python_lint":python_lint,"python_cve":python_cve,"rust_lint":rust_lint,"rust_comments":rust_comments,"rust_build":rust_build,"rust_cve":rust_cve,"go_lint":go_lint,"erlang_lint":erlang_lint,"kotlin_lint":kotlin_lint,"swift_lint":swift_lint,"java_p3c":java_p3c,"java_javadoc":java_javadoc,"java_dependencies":java_dependencies,"java_cve":java_cve,"npm_cve":npm_cve}, "execution_tasks":execution_tasks,
         "obligation_status":"unresolved", "required_obligations":null,
         "category_candidates":candidates, "unresolved_conditions":unresolved,
         "syntax_candidates":syntax_candidates,
+        "syntax_tasks":syntax_tasks,
         "execution_budget":check_budget_record(
             parsed.timeout_ms, parsed.timeout_source, parsed.jobs_limit, parsed.jobs_source,
-            usize::from(python_present) + python_cve_roots.len() + 4 * usize::from(rust_present) + usize::from(go_present) + usize::from(java_present) + usize::from(javadoc_configured) + usize::from(dependency_configured) + usize::from(cve_configured) + npm_roots.len(), started_native_task_count
+            usize::from(node_present) + usize::from(python_present) + python_cve_roots.len() + 4 * usize::from(rust_present) + usize::from(go_present) + usize::from(erlang_present) + usize::from(java_present) + usize::from(javadoc_configured) + usize::from(dependency_configured) + usize::from(cve_configured) + npm_roots.len() + usize::from(kotlin_lint.is_object()) + usize::from(swift_lint.is_object()) + usize::from(zig_lint.is_object()) + usize::from(ruby_lint.is_object()), started_native_task_count
         ),
         "next":next,
         "export":{"status":"not_requested","reason_code":null}
     });
+    if zig_lint.is_object()
+        || matches!(
+            report["schema_version"].as_str(),
+            Some("0.47.0" | "0.48.0" | "0.49.0" | "0.50.0" | "0.51.0")
+        )
+    {
+        report["native_results"]["zig_lint"] = zig_lint.clone();
+    }
+    // 历史报告维持封闭协议；只有新 Kotlin 报告携带新增原生字段。
+    if !matches!(
+        report["schema_version"].as_str(),
+        Some(
+            "0.42.0"
+                | "0.43.0"
+                | "0.44.0"
+                | "0.45.0"
+                | "0.46.0"
+                | "0.47.0"
+                | "0.48.0"
+                | "0.49.0"
+                | "0.50.0"
+                | "0.51.0"
+        )
+    ) {
+        if let Some(native) = report["native_results"].as_object_mut() {
+            native.remove("kotlin_lint");
+        }
+    }
+    if !matches!(
+        report["schema_version"].as_str(),
+        Some(
+            "0.43.0"
+                | "0.44.0"
+                | "0.45.0"
+                | "0.46.0"
+                | "0.47.0"
+                | "0.48.0"
+                | "0.49.0"
+                | "0.50.0"
+                | "0.51.0"
+        )
+    ) {
+        if let Some(native) = report["native_results"].as_object_mut() {
+            native.remove("swift_lint");
+        }
+    }
+    if report["schema_version"] == "0.51.0" {
+        report["native_results"]["ruby_lint"] = ruby_lint.clone();
+    }
     if parsed.format != OutputFormat::Human {
         emit_structured(&report, &parsed);
     } else {
@@ -1504,7 +2028,7 @@ pub fn run(args: &[String]) -> ExitCode {
             if parsed.selection == Selection::All {
                 "全项目"
             } else {
-                "Java "
+                parsed.selection.as_str()
             },
             if request_cancelled {
                 "已取消"
@@ -1514,10 +2038,9 @@ pub fn run(args: &[String]) -> ExitCode {
         );
         if let Some(checkers) = report["discovery"]["checker_configurations"].as_array() {
             for checker in checkers {
-                if parsed.selection == Selection::Java
-                    && !checker["checker_id"]
-                        .as_str()
-                        .is_some_and(|id| id.starts_with("java."))
+                if !checker["checker_id"]
+                    .as_str()
+                    .is_some_and(|id| parsed.selection.includes_checker(id))
                 {
                     continue;
                 }
@@ -1543,7 +2066,10 @@ pub fn run(args: &[String]) -> ExitCode {
         }
         if let Some(tools) = report["discovery"]["native_tool_candidates"].as_array() {
             for tool in tools {
-                if parsed.selection == Selection::Java && tool["checker_id"] != "java.maven" {
+                if !tool["checker_id"]
+                    .as_str()
+                    .is_some_and(|id| parsed.selection.includes_checker(id))
+                {
                     continue;
                 }
                 println!(
@@ -1657,8 +2183,138 @@ pub fn run(args: &[String]) -> ExitCode {
                 "复检: {}",
                 report["native_results"]["rust_lint"]["recheck_command"]
                     .as_str()
-                    .unwrap_or("cargo clippy --offline --all-targets --message-format=json")
+                    .unwrap_or(
+                        "cargo clippy --locked --offline --all-targets --message-format=json"
+                    )
             );
+        }
+        if let Some(files) = report["native_results"]["zig_lint"]["files"].as_array() {
+            println!(
+                "Zig 原生单文件 AST 检查；原生诊断任务按实际同步结果提供；完整 lint 与构建仍待完成"
+            );
+            for file in files {
+                println!(
+                    "  {}：{}；{}",
+                    file["path"], file["native"]["reason"], file["next_action"]
+                );
+                for row in file["native"]["diagnostics"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                {
+                    println!(
+                        "  {}:{}:{} {}",
+                        file["path"], row["line"], row["column"], row["rule_id"]
+                    );
+                }
+            }
+        }
+        if let Some(files) = report["native_results"]["swift_lint"]["files"].as_array() {
+            println!("Swift 原生冻结单文件 parse；完整 lint、类型、构建和任务同步仍待完成");
+            for file in files {
+                println!(
+                    "  {}：{}；{}",
+                    file["path"], file["native"]["reason"], file["next_action"]
+                );
+                for row in file["native"]["diagnostics"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                {
+                    println!(
+                        "  {}:{}:{} {}（UTF-8 字节列）",
+                        file["path"], row["line"], row["column"], row["rule_id"]
+                    );
+                }
+            }
+        }
+        if let Some(files) = report["native_results"]["ruby_lint"]["files"].as_array() {
+            println!("Ruby 原生冻结单文件语法观察；完整 lint、类型、构建和任务同步仍待完成");
+            for file in files {
+                println!(
+                    "  {}：{}；{}",
+                    file["path"], file["native"]["reason"], file["next_action"]
+                );
+                for row in file["native"]["diagnostics"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                {
+                    println!(
+                        "  {}:{} {}（仅行号，项目Ruby版本适用性待核对）",
+                        file["path"], row["line"], row["rule_id"]
+                    );
+                }
+            }
+        }
+        if let Some(files) = report["native_results"]["kotlin_lint"]["files"].as_array() {
+            println!("Kotlin 原生单文件编译；完整项目 lint 和构建仍待核验");
+            for file in files {
+                println!(
+                    "  {}：{}；{}",
+                    file["path"], file["native"]["reason"], file["next_action"]
+                );
+                for category in ["diagnostics", "context_diagnostics"] {
+                    for finding in file["native"][category].as_array().into_iter().flatten() {
+                        println!(
+                            "  {} {}:{}:{}；规则 {}；原生 UTF-16 列 {}",
+                            if category == "diagnostics" {
+                                "语法诊断"
+                            } else {
+                                "上下文诊断"
+                            },
+                            file["path"],
+                            finding["line"],
+                            finding["column_byte"],
+                            finding["rule_id"],
+                            finding["column_utf16"]
+                        );
+                    }
+                }
+                if !file["recheck_argv"].is_null() {
+                    println!("  复检 argv：{}", file["recheck_argv"]);
+                }
+                if !file["task_id"].is_null() {
+                    println!(
+                        "  稳定修复任务：{}；运行 codeguard next 获取当前动作",
+                        file["task_id"]
+                    );
+                }
+                if let Some(reason) = file["task_sync_reason"].as_str() {
+                    println!("  任务同步未完成：{reason}");
+                }
+            }
+        }
+        if let Some(files) = report["native_results"]["erlang_lint"]["files"].as_array() {
+            println!("Erlang 原生 forms；项目完整 lint、预处理、编译和测试仍待核验");
+            for file in files {
+                println!(
+                    "  {}：{}；{}",
+                    file["path"].as_str().unwrap_or("未知路径"),
+                    file["native"]["reason"].as_str().unwrap_or("未观察"),
+                    file["next_action"].as_str().unwrap_or("重跑原工具")
+                );
+                for finding in file["findings"].as_array().into_iter().flatten() {
+                    println!(
+                        "  原生语法错误：{}:{}:{}",
+                        file["path"].as_str().unwrap_or("未知路径"),
+                        finding["line"],
+                        finding["column"]
+                    );
+                }
+                if !file["recheck_argv"].is_null() {
+                    println!("  复检 argv：{}", file["recheck_argv"]);
+                }
+                if !file["task_id"].is_null() {
+                    println!(
+                        "  稳定修复任务：{}；运行 codeguard next 获取当前动作",
+                        file["task_id"]
+                    );
+                }
+                if let Some(reason) = file["task_sync_reason"].as_str() {
+                    println!("  任务同步未完成：{reason}；原生观察仍保留");
+                }
+            }
         }
         if let Some(findings) = report["native_results"]["go_lint"]["findings"].as_array() {
             println!(
@@ -1858,6 +2514,29 @@ pub fn run(args: &[String]) -> ExitCode {
         for task in &execution_tasks {
             println!("执行任务 {}: {}", task["id"], task["status"]);
         }
+        if let Some(files) = report["native_results"]["node_lint"]["files"].as_array() {
+            for file in files {
+                println!(
+                    "ESLint 文件：{}；原因：{}",
+                    file["path"], file["feedback"]["reason"]
+                );
+                for finding in file["feedback"]["findings"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                {
+                    println!(
+                        "原生规则 {}，行 {}，列 {}，严重度 {}",
+                        finding["rule_id"], finding["line"], finding["column"], finding["severity"]
+                    );
+                }
+                println!("下一步：{}", file["feedback"]["next_action"]);
+            }
+            println!(
+                "ESLint 工作台：{}",
+                report["native_results"]["node_lint"]["backlog_status"]
+            );
+        }
         if let Some(observations) = report["syntax_candidates"]["observations"].as_array() {
             if report["syntax_candidates"]["status"] == "not_run" {
                 if report["syntax_candidates"]["reason"] == "native_preferred" {
@@ -1906,19 +2585,72 @@ pub fn run(args: &[String]) -> ExitCode {
                 }
                 for item in observations
                     .iter()
+                    .filter(|item| item["reason"] == "syntax_recovery_incomplete")
+                    .take(8)
+                {
+                    println!(
+                        "  {} [{}] grammar 报告错误但恢复位置不完整；初检未完成，需适用原生工具确认。",
+                        item["path"].as_str().unwrap_or("?"),
+                        item["language"].as_str().unwrap_or("unknown")
+                    );
+                }
+                for item in observations
+                    .iter()
+                    .filter(|item| item.get("structural_observations").is_some())
+                    .take(8)
+                {
+                    for row in item["structural_observations"]
+                        .as_array()
+                        .into_iter()
+                        .flatten()
+                        .take(8)
+                    {
+                        println!(
+                            "  {} [{}] 候选结构 {}，父节点 {}；原始零基字节坐标 {}:{}；须用原生工具确认。",
+                            item["path"],
+                            item["language"],
+                            row["rule_id"],
+                            row["parent_syntax_kind"],
+                            row["start_row"],
+                            row["start_column_byte"]
+                        );
+                    }
+                }
+                for item in observations
+                    .iter()
                     .filter(|item| item["known_limitations"][0].is_string())
                     .take(8)
                 {
-                    if let Some(limitation) = item["known_limitations"][0].as_str() {
+                    // 同一固定清单可能包含通用边界及具体兼容问题，不能只显示第一条。
+                    for limitation in item["known_limitations"]
+                        .as_array()
+                        .into_iter()
+                        .flatten()
+                        .filter_map(Value::as_str)
+                        .take(3)
+                    {
                         println!(
                             "  {} [{}] 已知 grammar 限制：{}；仍需适用原生工具确认。",
                             item["path"].as_str().unwrap_or("?"),
                             item["language"].as_str().unwrap_or("unknown"),
-                            limitation
+                            limitation.chars().take(512).collect::<String>()
                         );
                     }
                 }
             }
+        }
+        if let Some(tasks) = report["syntax_tasks"]["tasks"].as_array() {
+            for task in tasks.iter().take(8) {
+                println!(
+                    "  原生确认/检查恢复任务 {}：{} [{}]；运行 codeguard task show {} . --format=json 查看证据与下一步。",
+                    task["task_id"], task["path"], task["language"], task["task_id"]
+                );
+            }
+        }
+        if report["syntax_tasks"]["status"] == "incomplete" {
+            println!(
+                "候选任务同步未完成；当前语法观察仍保留，先核对逐文件保存失败原因，不能假定任务已生成。"
+            );
         }
         if report["unresolved_conditions"]
             .as_array()
@@ -2087,6 +2819,12 @@ fn aborted_task_report(
     mut native_results: Value,
     cancelled: bool,
 ) -> Value {
+    if native_results.get("erlang_lint").is_none() {
+        native_results["erlang_lint"] = Value::Null;
+    }
+    if native_results.get("node_lint").is_none() {
+        native_results["node_lint"] = Value::Null;
+    }
     if native_results.get("rust_cve").is_none() {
         native_results["rust_cve"] = Value::Null;
     }
@@ -2104,12 +2842,15 @@ fn aborted_task_report(
         .filter(|(_, outcome)| **outcome == TaskOutcome::InternalFailure)
         .map(|(id, _)| id.clone())
         .collect();
-    let execution_tasks: Vec<_> = outcomes
+    let mut execution_tasks: Vec<_> = outcomes
         .iter()
         .map(|(id, outcome)| json!({"id":id,"status":task_status(*outcome)}))
         .collect();
+    if native_results["zig_lint"].is_object() {
+        execution_tasks.push(json!({"id":"zig.lint","status":if native_results["zig_lint"]["local_parse_complete"]==true {"native_observed_unverified"}else{"native_incomplete"}}));
+    }
     json!({
-        "schema_version":"0.11.0", "report_type":"check_aborted",
+        "schema_version":if native_results["zig_lint"].is_object() {"0.15.0"}else if matches!(selection, Selection::Language(_)) {"0.14.0"} else {"0.13.0"}, "report_type":"check_aborted",
         "operation":"check", "selection":selection.as_str(),
         "command_status":if cancelled { "cancelled" } else { "internal_error" },
         "exit_code":if cancelled { 130 } else { 4 },
@@ -2122,11 +2863,7 @@ fn aborted_task_report(
 }
 
 fn parse_args(args: &[String]) -> Result<Args, String> {
-    let selection = match args.first().map(String::as_str) {
-        Some("all") => Selection::All,
-        Some("java") => Selection::Java,
-        _ => return Err("当前 check 支持 all 或 java".into()),
-    };
+    let selection = Selection::parse(args.first().map(String::as_str))?;
     let mut root = None;
     let mut ruff_tool = None;
     let mut pip_audit_tool = None;
@@ -2136,6 +2873,11 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
     let mut cargo_audit_tool = None;
     let mut rustsec_db = None;
     let mut go_tool = None;
+    let mut erl_tool = None;
+    let mut kotlinc_tool = None;
+    let mut swift_tool = None;
+    let mut ruby_tool = None;
+    let mut zig_tool = None;
     let mut maven_tool = None;
     let mut java_home = None;
     let mut maven_repo = None;
@@ -2215,6 +2957,55 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
                     .is_some()
                 {
                     return Err("--rustsec-db 重复".into());
+                }
+            }
+            "--kotlinc-tool" => {
+                index += 1;
+                if kotlinc_tool
+                    .replace(PathBuf::from(
+                        args.get(index).ok_or("缺少 Kotlin 工具路径")?,
+                    ))
+                    .is_some()
+                {
+                    return Err("--kotlinc-tool 重复".into());
+                }
+            }
+            "--zig-tool" => {
+                index += 1;
+                if zig_tool
+                    .replace(PathBuf::from(args.get(index).ok_or("缺少 Zig 工具路径")?))
+                    .is_some()
+                {
+                    return Err("--zig-tool 重复".into());
+                }
+            }
+            "--swift-tool" => {
+                index += 1;
+                if swift_tool
+                    .replace(PathBuf::from(args.get(index).ok_or("缺少 Swift 工具路径")?))
+                    .is_some()
+                {
+                    return Err("--swift-tool 重复".into());
+                }
+            }
+            "--ruby-tool" => {
+                index += 1;
+                if ruby_tool
+                    .replace(PathBuf::from(args.get(index).ok_or("缺少 Ruby 工具路径")?))
+                    .is_some()
+                {
+                    return Err("--ruby-tool 重复".into());
+                }
+            }
+            "--erl-tool" => {
+                index += 1;
+                if erl_tool
+                    .replace(PathBuf::from(
+                        args.get(index).ok_or("缺少 Erlang 工具路径")?,
+                    ))
+                    .is_some()
+                {
+                    return Err("--erl-tool 重复".into());
                 }
             }
             "--go-tool" => {
@@ -2329,8 +3120,8 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
         index += 1;
     }
     if !npm_options.is_empty() {
-        if selection != Selection::All {
-            return Err("npm参数仅用于check all".into());
+        if !selection.includes_node() {
+            return Err("npm参数仅用于check all/javascript/typescript".into());
         }
         crate::npm_check_scan::validate_options(&npm_options)?;
     }
@@ -2360,18 +3151,42 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
     {
         return Err("Rust CVE 工具和数据库必须是绝对路径".into());
     }
+    if kotlinc_tool.as_ref().is_some_and(|p| !p.is_absolute()) {
+        return Err("--kotlinc-tool 必须是绝对路径".into());
+    }
+    if zig_tool.as_ref().is_some_and(|path| !path.is_absolute()) {
+        return Err("--zig-tool 必须是绝对路径".into());
+    }
+    if ruby_tool.as_ref().is_some_and(|path| !path.is_absolute()) {
+        return Err("--ruby-tool 必须是绝对路径".into());
+    }
+    if swift_tool.as_ref().is_some_and(|path| !path.is_absolute()) {
+        return Err("--swift-tool 必须是绝对路径".into());
+    }
+    if erl_tool.as_ref().is_some_and(|path| !path.is_absolute()) {
+        return Err("--erl-tool 必须是绝对路径".into());
+    }
     if go_tool.as_ref().is_some_and(|path| !path.is_absolute()) {
         return Err("--go-tool 必须是绝对路径".into());
     }
-    if selection == Selection::Java
-        && (ruff_tool.is_some()
-            || pip_audit_tool.is_some()
-            || cargo_tool.is_some()
-            || cargo_audit_tool.is_some()
-            || rustsec_db.is_some()
-            || go_tool.is_some())
+    if (!selection.includes("python") && (ruff_tool.is_some() || pip_audit_tool.is_some()))
+        || (!selection.includes("rust")
+            && (cargo_tool.is_some() || cargo_audit_tool.is_some() || rustsec_db.is_some()))
+        || (!selection.includes("go") && go_tool.is_some())
+        || (!selection.includes("erlang") && erl_tool.is_some())
+        || (!selection.includes("kotlin") && kotlinc_tool.is_some())
+        || (!selection.includes("swift") && swift_tool.is_some())
+        || (!selection.includes("ruby") && ruby_tool.is_some())
+        || (!selection.includes("zig") && zig_tool.is_some())
+        || (!selection.includes("java")
+            && (maven_tool.is_some()
+                || java_home.is_some()
+                || maven_repo.is_some()
+                || repo_sha256.is_some()
+                || cve_data_dir.is_some()
+                || cve_data_sha256.is_some()))
     {
-        return Err("check java 不接受其它语言的原生工具参数".into());
+        return Err("check 语言选择不接受其它语言的原生工具参数".into());
     }
     if [
         maven_tool.as_ref(),
@@ -2414,6 +3229,11 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
         cargo_audit_tool,
         rustsec_db,
         go_tool,
+        erl_tool,
+        kotlinc_tool,
+        swift_tool,
+        ruby_tool,
+        zig_tool,
         maven_tool,
         java_home,
         maven_repo,
@@ -2510,6 +3330,33 @@ mod tests {
         assert_eq!(
             report["native_results"]["python_lint"]["files"][0]["findings"][0]["rule_id"],
             "F401"
+        );
+    }
+    #[test]
+    fn aborted_report_preserves_previously_observed_zig_and_marks_incomplete() {
+        let packet: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../tests/acceptance/evidence/zig-aggregate-2026-10-05.json"
+        ))
+        .unwrap();
+        let zig = packet["broken"]["native_results"]["zig_lint"].clone();
+        let outcomes = BTreeMap::from([("python.lint".into(), TaskOutcome::InternalFailure)]);
+        let report = aborted_task_report(
+            Selection::All,
+            json!({}),
+            &outcomes,
+            json!({"zig_lint":zig}),
+            false,
+        );
+        assert_eq!(report["schema_version"], "0.15.0");
+        assert_eq!(report["native_results"]["zig_lint"], zig);
+        assert_eq!(report["execution_tasks"][1]["id"], "zig.lint");
+        assert_eq!(report["exit_code"], 4);
+        assert_eq!(
+            crate::partial_sarif_feedback::partial_check_sarif(&report)["runs"][0]["results"]
+                .as_array()
+                .unwrap()
+                .len(),
+            1
         );
     }
 }

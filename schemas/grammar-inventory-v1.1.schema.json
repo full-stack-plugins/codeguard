@@ -1,0 +1,1612 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:grammar-inventory:1.1.0",
+  "title": "Read-only grammar source inventory, not syntax or delivery approval",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "source_repository",
+    "source_commit",
+    "codegraph_grammar_count",
+    "codegraph_vendored_count",
+    "candidate_count",
+    "released_count",
+    "authority",
+    "parser_capability",
+    "gate_effect",
+    "execution",
+    "delivery_decision",
+    "next_action",
+    "assets"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.1.0"
+    },
+    "report_type": {
+      "const": "grammar_coverage_inventory"
+    },
+    "source_repository": {
+      "const": "https://github.com/partme-ai/codegraph"
+    },
+    "source_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "codegraph_grammar_count": {
+      "const": 32
+    },
+    "codegraph_vendored_count": {
+      "const": 30
+    },
+    "candidate_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 32
+    },
+    "released_count": {
+      "const": 0
+    },
+    "authority": {
+      "const": "source_inventory_only"
+    },
+    "parser_capability": {
+      "const": "unverified"
+    },
+    "gate_effect": {
+      "const": "none"
+    },
+    "execution": {
+      "const": "not_run"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "next_action": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "assets": {
+      "type": "array",
+      "minItems": 32,
+      "maxItems": 32,
+      "items": {
+        "$ref": "#/$defs/asset"
+      },
+      "allOf": [
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "arkts"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "c"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "cfml"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "cfquery"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "cfscript"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "cobol"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "cpp"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "csharp"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "dart"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "erlang"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "go"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "java"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "javascript"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "kotlin"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "lua"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "luau"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "nix"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "objc"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "pascal"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "php"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "python"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "r"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "ruby"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "rust"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "scala"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "solidity"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "swift"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "terraform"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "tsx"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "typescript"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "vbnet"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "language": {
+                "const": "zig"
+              }
+            },
+            "required": [
+              "language"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "properties": {
+              "provider": {
+                "const": "codegraph_vendored"
+              }
+            },
+            "required": [
+              "provider"
+            ]
+          },
+          "minContains": 30,
+          "maxContains": 30
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "language",
+        "provider",
+        "source_path",
+        "source_sha256",
+        "source_bytes",
+        "candidate_wasm_sha256",
+        "candidate_input_sha256",
+        "integration_status",
+        "runtime_observation",
+        "known_limitations",
+        "released",
+        "gap"
+      ],
+      "properties": {
+        "language": {
+          "enum": [
+            "arkts",
+            "c",
+            "cfml",
+            "cfquery",
+            "cfscript",
+            "cobol",
+            "cpp",
+            "csharp",
+            "dart",
+            "erlang",
+            "go",
+            "java",
+            "javascript",
+            "kotlin",
+            "lua",
+            "luau",
+            "nix",
+            "objc",
+            "pascal",
+            "php",
+            "python",
+            "r",
+            "ruby",
+            "rust",
+            "scala",
+            "solidity",
+            "swift",
+            "terraform",
+            "tsx",
+            "typescript",
+            "vbnet",
+            "zig"
+          ]
+        },
+        "provider": {
+          "enum": [
+            "codegraph_vendored",
+            "tree_sitter_wasms_dependency"
+          ]
+        },
+        "source_path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "source_bytes": {
+          "type": "integer",
+          "minimum": 8
+        },
+        "candidate_wasm_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "candidate_input_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "integration_status": {
+          "enum": [
+            "candidate_unvalidated",
+            "not_integrated"
+          ]
+        },
+        "runtime_observation": {
+          "enum": [
+            "rust_loader_smoke_passed",
+            "rust_loader_incompatible",
+            null
+          ]
+        },
+        "known_limitations": {
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "^[^\\u0000-\\u001f\\u007f]+$"
+          }
+        },
+        "released": {
+          "const": false
+        },
+        "gap": {
+          "enum": [
+            "rust_loader_incompatible",
+            "current_loader_size_limit",
+            "language_qualification_and_release_pending",
+            "asset_provenance_license_and_loader_validation_pending"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "integration_status": {
+                "const": "candidate_unvalidated"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "candidate_wasm_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "runtime_observation": {
+                "type": "string"
+              },
+              "known_limitations": {
+                "minItems": 1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "candidate_wasm_sha256": {
+                "type": "null"
+              },
+              "candidate_input_sha256": {
+                "type": "null"
+              },
+              "runtime_observation": {
+                "type": "null"
+              },
+              "known_limitations": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 0
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 0,
+            "maxContains": 0
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 1
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 1,
+            "maxContains": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 2
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 2,
+            "maxContains": 2
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 3
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 3,
+            "maxContains": 3
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 4
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 4,
+            "maxContains": 4
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 5
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 5,
+            "maxContains": 5
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 6
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 6,
+            "maxContains": 6
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 7
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 7,
+            "maxContains": 7
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 8
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 8,
+            "maxContains": 8
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 9
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 9,
+            "maxContains": 9
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 10
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 10,
+            "maxContains": 10
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 11
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 11,
+            "maxContains": 11
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 12
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 12,
+            "maxContains": 12
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 13
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 13,
+            "maxContains": 13
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 14
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 14,
+            "maxContains": 14
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 15
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 15,
+            "maxContains": 15
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 16
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 16,
+            "maxContains": 16
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 17
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 17,
+            "maxContains": 17
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 18
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 18,
+            "maxContains": 18
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 19
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 19,
+            "maxContains": 19
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 20
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 20,
+            "maxContains": 20
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 21
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 21,
+            "maxContains": 21
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 22
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 22,
+            "maxContains": 22
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 23
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 23,
+            "maxContains": 23
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 24
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 24,
+            "maxContains": 24
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 25
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 25,
+            "maxContains": 25
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 26
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 26,
+            "maxContains": 26
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 27
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 27,
+            "maxContains": 27
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 28
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 28,
+            "maxContains": 28
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 29
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 29,
+            "maxContains": 29
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 30
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 30,
+            "maxContains": 30
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 31
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 31,
+            "maxContains": 31
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "candidate_count": {
+            "const": 32
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "assets": {
+            "contains": {
+              "properties": {
+                "integration_status": {
+                  "const": "candidate_unvalidated"
+                }
+              },
+              "required": [
+                "integration_status"
+              ]
+            },
+            "minContains": 32,
+            "maxContains": 32
+          }
+        }
+      }
+    }
+  ]
+}

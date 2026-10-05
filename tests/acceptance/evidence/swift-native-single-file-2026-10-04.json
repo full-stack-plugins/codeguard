@@ -1,0 +1,356 @@
+{
+  "evidence_type": "actual_swift_native_first_single_file",
+  "base_commit": "d59142f0cd26c37a2706881ada38fd74aa4621bb",
+  "uncommitted_cli_wiring": true,
+  "program_sha256": "3a87d8389f1c1711d37a29f135acd30ced9f0e00d97c083a1f3ae8f04ab18681",
+  "compiler_version": "Apple Swift 6.4",
+  "reports": {
+    "good": {
+      "exit": 3,
+      "report_sha256": "6940a6fdc1171ec94e4b27776aa5bbf418312758e3482d52ba41c4a191ab4b99",
+      "source_sha256": "7c064a359f79df0f5d3d98d22f0828fa0aeb0ed4a3d5c7d64643cf4e2a962299",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "exit_code": 3,
+        "input_stable": true,
+        "language": "swift",
+        "native": {
+          "diagnostics": [],
+          "reason": "swift_native_parse_no_diagnostics",
+          "status": "completed",
+          "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+          "version": "Apple Swift 6.4"
+        },
+        "native_identity_scope": "compiler_entry_only",
+        "next_actions": [
+          "核对 Apple Swift 6.4 工具与当前诊断；使用 --swift-tool 绝对路径复检，不自动安装",
+          "frontend parse 仅做语法确认；SwiftLint、注释、类型、依赖、安全及完整构建仍须检查"
+        ],
+        "operation": "lint",
+        "report_type": "swift_lint_feedback",
+        "schema_version": "0.1.0",
+        "scope": "single_frozen_swift_file",
+        "setup": {
+          "automatic_installation": false,
+          "full_project_checks_required": true,
+          "native_confirmation_required": false
+        },
+        "source_path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-swift-lint-actual-bmvmaybs/App.swift",
+        "source_sha256": "7c064a359f79df0f5d3d98d22f0828fa0aeb0ed4a3d5c7d64643cf4e2a962299",
+        "syntax_precheck": null,
+        "tool_selection": {
+          "executable": "/usr/bin/swiftc",
+          "source": "explicit"
+        }
+      }
+    },
+    "bad_parameter": {
+      "exit": 3,
+      "report_sha256": "3e91e38f63bcaa48baf1d2d0e6e8550cebd4b5a6123fcb1aec01a6fa0c878b2e",
+      "source_sha256": "6f44da8b1f1db95bf1948aa134b683e1066a0c9ad8941138dc2de09e70958f03",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "exit_code": 3,
+        "input_stable": true,
+        "language": "swift",
+        "native": {
+          "diagnostics": [
+            {
+              "column": 13,
+              "line": 1,
+              "rule_id": "swift.parse.error"
+            }
+          ],
+          "reason": "swift_native_parse_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+          "version": "Apple Swift 6.4"
+        },
+        "native_identity_scope": "compiler_entry_only",
+        "next_actions": [
+          "核对 Apple Swift 6.4 工具与当前诊断；使用 --swift-tool 绝对路径复检，不自动安装",
+          "frontend parse 仅做语法确认；SwiftLint、注释、类型、依赖、安全及完整构建仍须检查"
+        ],
+        "operation": "lint",
+        "report_type": "swift_lint_feedback",
+        "schema_version": "0.1.0",
+        "scope": "single_frozen_swift_file",
+        "setup": {
+          "automatic_installation": false,
+          "full_project_checks_required": true,
+          "native_confirmation_required": false
+        },
+        "source_path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-swift-lint-actual-bmvmaybs/App.swift",
+        "source_sha256": "6f44da8b1f1db95bf1948aa134b683e1066a0c9ad8941138dc2de09e70958f03",
+        "syntax_precheck": null,
+        "tool_selection": {
+          "executable": "/usr/bin/swiftc",
+          "source": "explicit"
+        }
+      }
+    },
+    "emoji": {
+      "exit": 3,
+      "report_sha256": "0613056a3fed7f9d6fa5b04ae123de3d20eb1d23bfca8b63e6525c4257682307",
+      "source_sha256": "c8c28b4a3a2bfd6304a608436bc42b9aa3ab87b9dbdb2c0a93b1e1934302660d",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "exit_code": 3,
+        "input_stable": true,
+        "language": "swift",
+        "native": {
+          "diagnostics": [
+            {
+              "column": 36,
+              "line": 1,
+              "rule_id": "swift.parse.error"
+            }
+          ],
+          "reason": "swift_native_parse_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+          "version": "Apple Swift 6.4"
+        },
+        "native_identity_scope": "compiler_entry_only",
+        "next_actions": [
+          "核对 Apple Swift 6.4 工具与当前诊断；使用 --swift-tool 绝对路径复检，不自动安装",
+          "frontend parse 仅做语法确认；SwiftLint、注释、类型、依赖、安全及完整构建仍须检查"
+        ],
+        "operation": "lint",
+        "report_type": "swift_lint_feedback",
+        "schema_version": "0.1.0",
+        "scope": "single_frozen_swift_file",
+        "setup": {
+          "automatic_installation": false,
+          "full_project_checks_required": true,
+          "native_confirmation_required": false
+        },
+        "source_path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-swift-lint-actual-bmvmaybs/App.swift",
+        "source_sha256": "c8c28b4a3a2bfd6304a608436bc42b9aa3ab87b9dbdb2c0a93b1e1934302660d",
+        "syntax_precheck": null,
+        "tool_selection": {
+          "executable": "/usr/bin/swiftc",
+          "source": "explicit"
+        }
+      }
+    },
+    "eof": {
+      "exit": 3,
+      "report_sha256": "278a04be79052dc28926aa52db5d6af9e3509a8aae4f9044d6788f74996fc0a2",
+      "source_sha256": "09830c8060e72b4f08e8b4d1f98dacde74c53625b5eb9d1c702dbaeb5f4dba56",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "exit_code": 3,
+        "input_stable": true,
+        "language": "swift",
+        "native": {
+          "diagnostics": [
+            {
+              "column": 1,
+              "line": 2,
+              "rule_id": "swift.parse.error"
+            }
+          ],
+          "reason": "swift_native_parse_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+          "version": "Apple Swift 6.4"
+        },
+        "native_identity_scope": "compiler_entry_only",
+        "next_actions": [
+          "核对 Apple Swift 6.4 工具与当前诊断；使用 --swift-tool 绝对路径复检，不自动安装",
+          "frontend parse 仅做语法确认；SwiftLint、注释、类型、依赖、安全及完整构建仍须检查"
+        ],
+        "operation": "lint",
+        "report_type": "swift_lint_feedback",
+        "schema_version": "0.1.0",
+        "scope": "single_frozen_swift_file",
+        "setup": {
+          "automatic_installation": false,
+          "full_project_checks_required": true,
+          "native_confirmation_required": false
+        },
+        "source_path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-swift-lint-actual-bmvmaybs/App.swift",
+        "source_sha256": "09830c8060e72b4f08e8b4d1f98dacde74c53625b5eb9d1c702dbaeb5f4dba56",
+        "syntax_precheck": null,
+        "tool_selection": {
+          "executable": "/usr/bin/swiftc",
+          "source": "explicit"
+        }
+      }
+    },
+    "unresolved_type": {
+      "exit": 3,
+      "report_sha256": "3bc507df71dc7c6e15592a92beef1bf272daa253e5b239dc58d2923524693dcf",
+      "source_sha256": "200f114d06853d05d4297f4953ec0649b7834ffe2e5f1810773cfd4fd9eabdbc",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "exit_code": 3,
+        "input_stable": true,
+        "language": "swift",
+        "native": {
+          "diagnostics": [],
+          "reason": "swift_native_parse_no_diagnostics",
+          "status": "completed",
+          "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+          "version": "Apple Swift 6.4"
+        },
+        "native_identity_scope": "compiler_entry_only",
+        "next_actions": [
+          "核对 Apple Swift 6.4 工具与当前诊断；使用 --swift-tool 绝对路径复检，不自动安装",
+          "frontend parse 仅做语法确认；SwiftLint、注释、类型、依赖、安全及完整构建仍须检查"
+        ],
+        "operation": "lint",
+        "report_type": "swift_lint_feedback",
+        "schema_version": "0.1.0",
+        "scope": "single_frozen_swift_file",
+        "setup": {
+          "automatic_installation": false,
+          "full_project_checks_required": true,
+          "native_confirmation_required": false
+        },
+        "source_path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-swift-lint-actual-bmvmaybs/App.swift",
+        "source_sha256": "200f114d06853d05d4297f4953ec0649b7834ffe2e5f1810773cfd4fd9eabdbc",
+        "syntax_precheck": null,
+        "tool_selection": {
+          "executable": "/usr/bin/swiftc",
+          "source": "explicit"
+        }
+      }
+    },
+    "missing_hidden": {
+      "exit": 3,
+      "report_sha256": "d4ae9f272fad8d04e16f46d8a19a3b434cedf3e47e813f8689b7a1453f1becd3",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "exit_code": 3,
+        "input_stable": true,
+        "language": "swift",
+        "native": {
+          "diagnostics": [],
+          "reason": "swift_tool_not_found",
+          "status": "incomplete",
+          "tool_sha256": null,
+          "version": null
+        },
+        "native_identity_scope": "compiler_entry_only",
+        "next_actions": [
+          "核对 Apple Swift 6.4 工具与当前诊断；使用 --swift-tool 绝对路径复检，不自动安装",
+          "frontend parse 仅做语法确认；SwiftLint、注释、类型、依赖、安全及完整构建仍须检查"
+        ],
+        "operation": "lint",
+        "report_type": "swift_lint_feedback",
+        "schema_version": "0.1.0",
+        "scope": "single_frozen_swift_file",
+        "setup": {
+          "automatic_installation": false,
+          "full_project_checks_required": true,
+          "native_confirmation_required": true
+        },
+        "source_path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-swift-lint-actual-bmvmaybs/App.swift",
+        "source_sha256": "6f44da8b1f1db95bf1948aa134b683e1066a0c9ad8941138dc2de09e70958f03",
+        "syntax_precheck": {
+          "grammar_qualified": false,
+          "grammar_sha256": "cc77a63b8487956270e2f385e29a03ba0773ba532a3c8a8844a26b4c98793843",
+          "precheck": {
+            "cancelled": false,
+            "checked_files": 1,
+            "incomplete_files": 0,
+            "scope_complete": true,
+            "selected_files": 1,
+            "status": "incomplete",
+            "suspected_recoveries": 0,
+            "truncated_files": 1,
+            "unqualified_files": 1,
+            "unsupported_files": 0
+          },
+          "recoveries": [],
+          "status": "incomplete"
+        },
+        "tool_selection": {
+          "executable": null,
+          "source": "not_found"
+        }
+      }
+    },
+    "missing_clean": {
+      "exit": 3,
+      "report_sha256": "4b87520dc716454e511d0ef36c04d45ca524609ab2feb190c65a733b0086f148",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "exit_code": 3,
+        "input_stable": true,
+        "language": "swift",
+        "native": {
+          "diagnostics": [],
+          "reason": "swift_tool_not_found",
+          "status": "incomplete",
+          "tool_sha256": null,
+          "version": null
+        },
+        "native_identity_scope": "compiler_entry_only",
+        "next_actions": [
+          "核对 Apple Swift 6.4 工具与当前诊断；使用 --swift-tool 绝对路径复检，不自动安装",
+          "frontend parse 仅做语法确认；SwiftLint、注释、类型、依赖、安全及完整构建仍须检查"
+        ],
+        "operation": "lint",
+        "report_type": "swift_lint_feedback",
+        "schema_version": "0.1.0",
+        "scope": "single_frozen_swift_file",
+        "setup": {
+          "automatic_installation": false,
+          "full_project_checks_required": true,
+          "native_confirmation_required": false
+        },
+        "source_path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-swift-lint-actual-bmvmaybs/App.swift",
+        "source_sha256": "7c064a359f79df0f5d3d98d22f0828fa0aeb0ed4a3d5c7d64643cf4e2a962299",
+        "syntax_precheck": {
+          "grammar_qualified": false,
+          "grammar_sha256": "cc77a63b8487956270e2f385e29a03ba0773ba532a3c8a8844a26b4c98793843",
+          "precheck": {
+            "cancelled": false,
+            "checked_files": 1,
+            "incomplete_files": 0,
+            "scope_complete": true,
+            "selected_files": 1,
+            "status": "incomplete",
+            "suspected_recoveries": 0,
+            "truncated_files": 0,
+            "unqualified_files": 1,
+            "unsupported_files": 0
+          },
+          "recoveries": [],
+          "status": "incomplete"
+        },
+        "tool_selection": {
+          "executable": null,
+          "source": "not_found"
+        }
+      }
+    }
+  },
+  "full_lint_acceptance": false,
+  "trusted_closure": false,
+  "marketplace_host_acceptance": false
+}

@@ -177,6 +177,7 @@ fn rule_summary(code: &str) -> &'static str {
     match code {
         "F401" => "导入未使用",
         "E501" => "行长度超出已配置限制",
+        "invalid-syntax" => "Python原生语法错误",
         "D100" => "公共模块缺少文档字符串",
         "D101" => "公共类缺少文档字符串",
         _ => "查看原生规则说明及私有诊断详情",
@@ -212,6 +213,36 @@ pub fn scan_python_lint(
             .incomplete_reasons
             .push("discovery_incomplete".into());
     }
+    if request
+        .discovery
+        .unknown_conditions
+        .iter()
+        .any(|reason| reason == "selected_discovery_deadline_exceeded")
+    {
+        output
+            .incomplete_reasons
+            .push("request_deadline_exceeded".into());
+    }
+    if let Some(selected) = request.selected_paths {
+        if selected.is_empty() {
+            output
+                .incomplete_reasons
+                .push("selected_scope_empty".into());
+            return output;
+        }
+        for target in selected {
+            if !request
+                .discovery
+                .languages
+                .get("python")
+                .is_some_and(|python| python.source_files.contains(target))
+            {
+                output
+                    .incomplete_reasons
+                    .push(format!("target_not_discovered:{target}"));
+            }
+        }
+    }
     let Some(python) = request.discovery.languages.get("python") else {
         output.incomplete_reasons.push("no_python_sources".into());
         return output;
@@ -221,19 +252,6 @@ pub fn scan_python_lint(
         return output;
     }
     let sources: Vec<&String> = if let Some(selected) = request.selected_paths {
-        if selected.is_empty() {
-            output
-                .incomplete_reasons
-                .push("selected_scope_empty".into());
-            return output;
-        }
-        for target in selected {
-            if !python.source_files.contains(target) {
-                output
-                    .incomplete_reasons
-                    .push(format!("target_not_discovered:{target}"));
-            }
-        }
         python
             .source_files
             .iter()
@@ -491,8 +509,21 @@ fn derive_local_finding_keys(
     diagnostics
         .iter()
         .map(|diagnostic| {
-            let line = lines.get(diagnostic.location.row.checked_sub(1)? as usize)?;
-            let anchor = line.trim_ascii();
+            let row = diagnostic.location.row.checked_sub(1)? as usize;
+            let line = lines.get(row)?;
+            let mut anchor = line.trim_ascii();
+            if anchor.is_empty()
+                && diagnostic.code == "invalid-syntax"
+                && diagnostic.severity == "error"
+            {
+                // 原生EOF位置保持不变；身份引用此前实际源码，不凭空给空文件签发发现。
+                anchor = lines
+                    .get(..row)?
+                    .iter()
+                    .rev()
+                    .map(|line| line.trim_ascii())
+                    .find(|line| !line.is_empty())?;
+            }
             if anchor.is_empty() {
                 return None;
             }
@@ -551,6 +582,37 @@ mod tests {
             location: RuffLocation { row, column: 1 },
             severity: "error".into(),
         }
+    }
+
+    #[test]
+    fn native_syntax_at_empty_eof_uses_preceding_source_anchor() {
+        let source = b"def run():\n";
+        let keys = derive_local_finding_keys(
+            "app.py",
+            source,
+            &[diagnostic(
+                "invalid-syntax",
+                "Expected an indented block",
+                2,
+            )],
+        );
+        assert!(
+            keys[0].is_some(),
+            "native EOF diagnostics need a stable repair identity"
+        );
+        let shifted = derive_local_finding_keys(
+            "app.py",
+            b"# heading\ndef run():\n",
+            &[diagnostic(
+                "invalid-syntax",
+                "Expected an indented block",
+                3,
+            )],
+        );
+        assert_eq!(keys, shifted);
+        let unrelated =
+            derive_local_finding_keys("app.py", source, &[diagnostic("F401", "unused", 2)]);
+        assert!(unrelated[0].is_none());
     }
 
     #[test]

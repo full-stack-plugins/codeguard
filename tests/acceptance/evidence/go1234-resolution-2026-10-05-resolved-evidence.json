@@ -1,0 +1,54 @@
+{
+  "adapter_sha256": "ce2cb64c4b51442da6ecf53cc107d03bddcd8374c7af43f197c5504ed11dfc3a",
+  "companion_binding_sha256": "19436fb5bd7825f4450058b0704166c843979e04dddada5174d14710174fe7e4",
+  "current_native": {
+    "companion_binding_sha256": "19436fb5bd7825f4450058b0704166c843979e04dddada5174d14710174fe7e4",
+    "diagnostics": [],
+    "gofmt_sha256": "f0e9b77df6dcfeec18d33bd9305ff034c28aa2142d3a4fa3aa44e62a44c89e3b",
+    "input_type": "whole_file",
+    "reason": "go_native_syntax_no_diagnostics",
+    "status": "completed",
+    "tool_sha256": "5900a8e0942f88b7bacf2b44b397b4950c8dc9f850a16ae1249e1636860dd6ef",
+    "version": "go1.23.4"
+  },
+  "current_source_sha256": "8447c74ea2bf5c577cf27562d8f1a37111015c82d281261901409132f505e1b0",
+  "gofmt_sha256": "f0e9b77df6dcfeec18d33bd9305ff034c28aa2142d3a4fa3aa44e62a44c89e3b",
+  "grammar_sha256": "4eda5d91c99ca981e88bc7d3d33f0db166b4bab0a84d0021a9abf39b364c78ef",
+  "identity": {
+    "checker_id": "syntax.native_confirmation",
+    "scope": "app.go",
+    "task_id": "CG-B-875b1ae220798b5e6689391844d7da2f",
+    "workspace_id": "ws-b41c3cb5e98d81f4b5606ea52008494c"
+  },
+  "original_native": {
+    "companion_binding_sha256": "19436fb5bd7825f4450058b0704166c843979e04dddada5174d14710174fe7e4",
+    "diagnostics": [
+      {
+        "column": 1,
+        "column_unit": "utf8_byte",
+        "line": 1,
+        "rule_id": "go.syntax"
+      },
+      {
+        "column": 7,
+        "column_unit": "utf8_byte",
+        "line": 1,
+        "rule_id": "go.syntax"
+      }
+    ],
+    "gofmt_sha256": "f0e9b77df6dcfeec18d33bd9305ff034c28aa2142d3a4fa3aa44e62a44c89e3b",
+    "input_type": "whole_file",
+    "reason": "go_native_syntax_diagnostics",
+    "status": "diagnostics_observed",
+    "tool_sha256": "5900a8e0942f88b7bacf2b44b397b4950c8dc9f850a16ae1249e1636860dd6ef",
+    "version": "go1.23.4"
+  },
+  "original_report_sha256": "7fb8019037c53b361e328bbc3fb7d62ac5af819a17a70b08af5bbf6cb1646365",
+  "original_source_sha256": "cd347705df7a2a49cedfa9509f7370219d9c3e792d0d7153b50d8be511e3604b",
+  "outcome": "code_fixed",
+  "policy_revision": "p1",
+  "policy_sha256": "b13a650a0ea74dfd3d74ed375475d1cb8ed2f3816eedd154f4772cf70612f68f",
+  "report_type": "task_resolution_evidence",
+  "schema_version": "0.7.0",
+  "tool_sha256": "5900a8e0942f88b7bacf2b44b397b4950c8dc9f850a16ae1249e1636860dd6ef"
+}

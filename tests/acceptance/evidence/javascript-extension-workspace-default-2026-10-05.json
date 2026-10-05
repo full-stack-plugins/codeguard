@@ -1,0 +1,27 @@
+{
+  "record_type": "local_workspace_test_summary",
+  "date": "2026-10-05",
+  "command": "cargo test --locked --workspace --all-targets",
+  "features": "default",
+  "base_commit": "854e084956333bee340296abfc8b1ee21715be01",
+  "source_scope": "uncommitted_worktree_at_execution",
+  "exit_code": 0,
+  "target_result_records": 244,
+  "passed": 1358,
+  "failed": 0,
+  "ignored": 123,
+  "ignored_are_acceptance": false,
+  "log_sha256": "2da651d9f5841382e17a581eb3384d7df184c11faae7f7fe4fdb39e87fdea049",
+  "protected_user_draft": {
+    "path": "crates/codeguard-cli/tests/erlang_native_differential.rs",
+    "sha256": "2e3a296072e6a3aa34b561799c18c7d8b621d00f8786301d2612cee8cdab85b6",
+    "included_in_commit": false
+  },
+  "after_run_changes": "WASM-only JavaScript cancellation routing; separately tested with WASM lib and native differential targets",
+  "does_not_prove": [
+    "all_language_qualification",
+    "ignored_native_acceptance",
+    "linux_ci",
+    "release_acceptance"
+  ]
+}

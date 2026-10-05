@@ -1,0 +1,497 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:ruby-lint-feedback:0.3.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "language",
+    "command_status",
+    "exit_code",
+    "source_path",
+    "scope",
+    "source_sha256",
+    "input_stable",
+    "native",
+    "syntax_precheck",
+    "setup",
+    "coverage_proven",
+    "authority",
+    "delivery_decision",
+    "next_actions",
+    "tool_selection",
+    "native_identity_scope",
+    "project_version_compatibility",
+    "workspace_binding",
+    "task_id",
+    "task_status",
+    "task_sync_reason"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.3.0"
+    },
+    "report_type": {
+      "const": "ruby_lint_feedback"
+    },
+    "operation": {
+      "const": "lint"
+    },
+    "language": {
+      "const": "ruby"
+    },
+    "command_status": {
+      "enum": [
+        "incomplete",
+        "cancelled"
+      ]
+    },
+    "exit_code": {
+      "enum": [
+        3,
+        130
+      ]
+    },
+    "source_path": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "scope": {
+      "const": "single_frozen_ruby_file"
+    },
+    "source_sha256": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "input_stable": {
+      "type": "boolean"
+    },
+    "native": {
+      "$ref": "#/$defs/native"
+    },
+    "syntax_precheck": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "zig-lint-feedback-v0.1.schema.json#/$defs/candidate"
+        }
+      ]
+    },
+    "setup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "native_confirmation_required",
+        "automatic_installation",
+        "full_project_checks_required"
+      ],
+      "properties": {
+        "native_confirmation_required": {
+          "type": "boolean"
+        },
+        "automatic_installation": {
+          "const": false
+        },
+        "full_project_checks_required": {
+          "const": true
+        }
+      }
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "next_actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "tool_selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "executable"
+      ],
+      "properties": {
+        "source": {
+          "enum": [
+            "explicit",
+            "path",
+            "not_found"
+          ]
+        },
+        "executable": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "native_identity_scope": {
+      "const": "interpreter_entry_only"
+    },
+    "project_version_compatibility": {
+      "const": "unverified"
+    },
+    "workspace_binding": {
+      "enum": [
+        "bound",
+        "invalid"
+      ]
+    },
+    "task_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^CG-B-[0-9a-f]{32}$"
+    },
+    "task_status": {
+      "enum": [
+        "synced_partial",
+        "incomplete"
+      ]
+    },
+    "task_sync_reason": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[a-z_]{1,128}$"
+    }
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "diagnostic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "line",
+        "rule_id"
+      ],
+      "properties": {
+        "line": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4294967295
+        },
+        "rule_id": {
+          "const": "ruby.syntax"
+        }
+      }
+    },
+    "native": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason",
+        "version",
+        "tool_sha256",
+        "diagnostics"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "incomplete",
+            "completed",
+            "diagnostics_observed"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "pattern": "^[a-z_]{1,128}$"
+        },
+        "version": {
+          "enum": [
+            null,
+            "ruby 2.6.10p210"
+          ]
+        },
+        "tool_sha256": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/digest"
+            }
+          ]
+        },
+        "diagnostics": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "$ref": "#/$defs/diagnostic"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "completed",
+                  "diagnostics_observed"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "version": {
+                "const": "ruby 2.6.10p210"
+              },
+              "tool_sha256": {
+                "$ref": "#/$defs/digest"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "diagnostics": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "diagnostics_observed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "diagnostics": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "not_run"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "version": {
+                "type": "null"
+              },
+              "tool_sha256": {
+                "type": "null"
+              },
+              "diagnostics": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "const": "ruby_native_syntax_no_diagnostics"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "diagnostics_observed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "const": "ruby_native_syntax_diagnostics"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "incomplete"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "diagnostics": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "native": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "completed",
+                  "diagnostics_observed"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "source_sha256": {
+            "$ref": "#/$defs/digest"
+          },
+          "syntax_precheck": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "workspace_binding": {
+            "const": "invalid"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "task_id": {
+            "type": "null"
+          },
+          "task_status": {
+            "const": "incomplete"
+          },
+          "task_sync_reason": {
+            "const": "workspace_invalid"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "task_sync_reason": {
+            "type": "string"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "task_id": {
+            "type": "null"
+          },
+          "task_status": {
+            "const": "incomplete"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "task_id": {
+            "type": "string"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "workspace_binding": {
+            "const": "bound"
+          },
+          "task_status": {
+            "const": "synced_partial"
+          },
+          "task_sync_reason": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "tool_selection": {
+            "properties": {
+              "source": {
+                "enum": [
+                  "explicit",
+                  "path"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "syntax_precheck": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  ]
+}

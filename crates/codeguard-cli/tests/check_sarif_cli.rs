@@ -29,6 +29,11 @@ impl Project {
             "[package]\nname='cg-sarif'\nversion='0.1.0'\nedition='2021'\n",
         )
         .unwrap();
+        fs::write(
+            root.join("Cargo.lock"),
+            "version = 4\n[[package]]\nname=\"cg-sarif\"\nversion=\"0.1.0\"\n",
+        )
+        .unwrap();
         fs::write(root.join("src/lib.rs"), "pub fn answer() -> i32 { 42 }\n").unwrap();
         Self(root)
     }

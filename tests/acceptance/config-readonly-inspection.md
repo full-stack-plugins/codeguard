@@ -2,7 +2,7 @@
 
 命令：`codeguard config validate|explain [path] [--policy-candidate FILE] --format json`。
 
-本切片只读取项目根的旧 `codeguard.json` 和 `codeguard.lock.json`。旧字段 `exclude`、`gate_scope=delta`、`java.commands` 仅计数并产生待迁移诊断，不会被解释成批准的扫描排除、工具选择或白名单。未知/损坏旧字段、损坏工具锁、符号链接及超大文件均为未完成。`codeguard/decisions/` 的本地文件不能自授批准；当前命令不把它们作为有效策略输入。
+本记录描述历史旧配置切片；当前 0.3 原生配置扩展另见[验收记录](config-native-observation.md)。历史切片只读取项目根的旧 `codeguard.json` 和 `codeguard.lock.json`。旧字段 `exclude`、`gate_scope=delta`、`java.commands` 仅计数并产生待迁移诊断，不会被解释成批准的扫描排除、工具选择或白名单。未知/损坏旧字段、损坏工具锁、符号链接及超大文件均为未完成。`codeguard/decisions/` 的本地文件不能自授批准；当前命令不把它们作为有效策略输入。
 
 即使两个文件结构正确，可信质量策略和白名单批准来源仍未接入，`effective_policy=null`、`authority=unverified`、`gate_effect=none`、`quality_decision=not_evaluated`、退出 3。此切片不执行项目脚本、不写项目文件，也不宣称完成 C09/C10 的规则引用、原生配置差异或批准来源验证。
 

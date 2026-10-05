@@ -105,6 +105,91 @@ fn valid_python_does_not_turn_unqualified_grammar_into_clean() {
 }
 
 #[test]
+fn empty_python_suite_keeps_structure_evidence_and_stable_confirmation_task() {
+    let project = Project::new();
+    fs::write(project.0.join("broken.py"), "def run():\n").unwrap();
+    let init = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "init",
+            project.0.to_str().unwrap(),
+            "--apply",
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(init.status.code(), Some(3));
+    let first = project.lint(&["--file", "broken.py"]);
+    assert_eq!(first["schema_version"], "0.17.0");
+    assert_eq!(
+        first["syntax_precheck"]["observations"],
+        serde_json::json!([])
+    );
+    let rows = first["syntax_precheck"]["structural_observations"]
+        .as_array()
+        .unwrap();
+    assert_eq!(rows[0]["rule_id"], "codeguard.python.required_suite");
+    assert_eq!(rows[0]["path"], "broken.py");
+    let id = first["setup"]["task_id"].as_str().unwrap();
+    let confirmation: Value = fs::read_dir(project.0.join(".codeguard/reports"))
+        .unwrap()
+        .filter_map(|entry| {
+            serde_json::from_slice::<Value>(&fs::read(entry.ok()?.path()).ok()?).ok()
+        })
+        .find(|report| report["report_type"] == "python_syntax_confirmation_observation")
+        .unwrap();
+    assert_eq!(confirmation["schema_version"], "0.2.0");
+    assert_eq!(
+        confirmation["structural_observations"],
+        first["syntax_precheck"]["structural_observations"]
+    );
+    let reports = project.0.join(".codeguard/reports");
+    for (number, field, value) in [
+        (1, "rule_sha256", Value::String("0".repeat(64))),
+        (2, "start_byte", Value::from(999)),
+    ] {
+        let mut forged = confirmation.clone();
+        forged["run_id"] = Value::String(format!("python-syntax-999-{number}"));
+        forged["structural_observations"][0][field] = value;
+        fs::write(
+            reports.join(format!("python-syntax-999-{number}.json")),
+            serde_json::to_vec(&forged).unwrap(),
+        )
+        .unwrap();
+    }
+    let sync = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["work", "sync", project.0.to_str().unwrap(), "--format=json"])
+        .output()
+        .unwrap();
+    let report: Value = serde_json::from_slice(&sync.stdout).unwrap();
+    assert_eq!(report["failed_reports"], 2);
+    assert_eq!(report["new_blockers"], 0);
+    for number in [1, 2] {
+        fs::remove_file(reports.join(format!("python-syntax-999-{number}.json"))).unwrap();
+    }
+    assert_eq!(
+        project.lint(&["--file", "broken.py"])["setup"]["task_id"],
+        id
+    );
+    fs::write(project.0.join("broken.py"), "def run():\n    pass\n").unwrap();
+    assert_eq!(
+        project.lint(&["--file", "broken.py"])["setup"]["task_id"],
+        id
+    );
+    let fact: Value = serde_json::from_slice(
+        &fs::read(
+            project
+                .0
+                .join(".codeguard/findings")
+                .join(id)
+                .join("finding.json"),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(fact["state"], "open");
+}
+
+#[test]
 fn undeclared_ruff_still_provides_bounded_syntax_observation_without_claiming_ruff_missing() {
     let project = Project::new();
     fs::write(project.0.join("broken.py"), "def broken(\n").unwrap();
@@ -335,6 +420,145 @@ fn native_ruff_task_verify_records_an_attempt_without_closing_candidate_task() {
 }
 
 #[test]
+#[ignore = "requires native Ruff 0.16.8 via CODEGUARD_RUFF_BIN"]
+fn actual_ruff_confirms_empty_suite_and_preserves_unapproved_task() {
+    let tool = std::env::var("CODEGUARD_RUFF_BIN").unwrap();
+    let project = Project::new();
+    fs::write(project.0.join("ruff.toml"), "[lint]\nselect = ['F401']\n").unwrap();
+    fs::write(project.0.join("broken.py"), "def run():\n").unwrap();
+    let init = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "init",
+            project.0.to_str().unwrap(),
+            "--apply",
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(init.status.code(), Some(3));
+    fs::write(project.0.join("unrelated.py"), "import os\n").unwrap();
+    let first = project.lint(&["--file", "broken.py"]);
+    let id = first["setup"]["task_id"].as_str().unwrap();
+    for (source, expect_findings) in [
+        ("def run():\n", true),
+        ("if True:\npass\n", true),
+        ("def run():\n    pass\n", false),
+    ] {
+        fs::write(project.0.join("broken.py"), source).unwrap();
+        let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args([
+                "task",
+                "verify",
+                id,
+                project.0.to_str().unwrap(),
+                "--ruff-tool",
+                &tool,
+                "--format=json",
+            ])
+            .output()
+            .unwrap();
+        assert_eq!(
+            output.status.code(),
+            Some(3),
+            "{}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        let report: Value = serde_json::from_slice(&output.stdout).unwrap();
+        assert_eq!(report["task_id"], id);
+        assert_eq!(
+            report["native_scan"]["files"].as_array().unwrap().len(),
+            1,
+            "a syntax task must not scan unrelated lint findings: {report}"
+        );
+        assert_eq!(report["schema_version"], "0.21.0");
+        assert_eq!(report["native_scan"]["schema_version"], "0.19.0");
+        assert_eq!(
+            report["native_scan"]["task_scope"],
+            "single_python_confirmation_file"
+        );
+        assert_eq!(
+            report["observation"],
+            if expect_findings {
+                "still_present"
+            } else {
+                "candidate_absent_unverified_policy"
+            },
+            "{report}"
+        );
+        assert_eq!(report["event_persisted"], true, "{report}");
+        assert_eq!(
+            report["native_scan"]["local_scan_complete"], true,
+            "{report}"
+        );
+        assert_eq!(
+            report["native_scan"]["files"][0]["run_status"],
+            if expect_findings {
+                "findings"
+            } else {
+                "passed"
+            },
+            "{report}"
+        );
+        if expect_findings {
+            for finding in report["native_scan"]["files"][0]["findings"]
+                .as_array()
+                .unwrap()
+            {
+                assert_eq!(finding["rule_id"], "invalid-syntax");
+                assert!(finding["finding_id"].as_str().is_some());
+            }
+        }
+        assert_eq!(report["native_scan"]["files"][0]["path"], "broken.py");
+        assert_eq!(
+            !report["native_scan"]["files"][0]["findings"]
+                .as_array()
+                .unwrap()
+                .is_empty(),
+            expect_findings,
+            "{report}"
+        );
+        let shown = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args([
+                "task",
+                "show",
+                id,
+                project.0.to_str().unwrap(),
+                "--format=json",
+            ])
+            .output()
+            .unwrap();
+        assert_eq!(
+            shown.status.code(),
+            Some(0),
+            "{}",
+            String::from_utf8_lossy(&shown.stderr)
+        );
+        let shown: Value = serde_json::from_slice(&shown.stdout).unwrap();
+        if expect_findings {
+            assert_eq!(shown["task"]["disposition"], "actionable", "{shown}");
+            assert!(
+                shown["task"]["step"]
+                    .as_str()
+                    .unwrap()
+                    .contains("原生语法错误")
+            );
+        }
+        let fact: Value = serde_json::from_slice(
+            &fs::read(
+                project
+                    .0
+                    .join(".codeguard/findings")
+                    .join(id)
+                    .join("finding.json"),
+            )
+            .unwrap(),
+        )
+        .unwrap();
+        assert_eq!(fact["state"], "open", "原生局部结果不能代替可信关闭策略");
+    }
+}
+
+#[test]
 fn oversized_sibling_remains_visible_as_unavailable_without_erasing_other_suspicions() {
     let project = Project::new();
     fs::write(project.0.join("ruff.toml"), "[lint]\nselect = ['F401']\n").unwrap();
@@ -349,4 +573,127 @@ fn oversized_sibling_remains_visible_as_unavailable_without_erasing_other_suspic
     assert_eq!(precheck["unavailable"][0]["path"], "huge.py");
     assert_eq!(report["command_status"], "incomplete");
     assert_eq!(report["delivery_decision"], "not_evaluated");
+}
+
+#[test]
+fn scoped_confirmation_records_missing_tool_for_both_original_report_families() {
+    for generic in [false, true] {
+        let project = Project::new();
+        fs::write(project.0.join("ruff.toml"), "[lint]\nselect = ['F401']\n").unwrap();
+        fs::write(project.0.join("broken.py"), "def run():\n").unwrap();
+        fs::write(project.0.join("unrelated.py"), "import os\n").unwrap();
+        let init = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args([
+                "init",
+                project.0.to_str().unwrap(),
+                "--apply",
+                "--format=json",
+            ])
+            .output()
+            .unwrap();
+        assert_eq!(init.status.code(), Some(3));
+        if generic {
+            let check = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+                .args([
+                    "check",
+                    "python",
+                    project.0.to_str().unwrap(),
+                    "--format=json",
+                ])
+                .env("PATH", "")
+                .output()
+                .unwrap();
+            assert_eq!(check.status.code(), Some(3));
+        } else {
+            project.lint(&["--file", "broken.py"]);
+        }
+        let fact: Value = fs::read_dir(project.0.join(".codeguard/findings"))
+            .unwrap()
+            .filter_map(|e| {
+                serde_json::from_slice::<Value>(
+                    &fs::read(e.ok()?.path().join("finding.json")).ok()?,
+                )
+                .ok()
+            })
+            .find(|f| {
+                f["scope"] == "broken.py" && f["reason_code"] == "python_syntax_confirmation_needed"
+            })
+            .unwrap();
+        let id = fact["id"].as_str().unwrap();
+        fs::write(project.0.join("broken.py"), "def run():\n    pass\n").unwrap();
+        let first =
+            codeguard_cli::validate_python_task_original_source(&project.0, id, b"def run():\n")
+                .unwrap();
+        assert_eq!(first["run_id"], fact["first_run_id"]);
+        assert!(
+            codeguard_cli::validate_python_task_original_source(
+                &project.0,
+                id,
+                b"def run():\n    pass\n"
+            )
+            .is_err()
+        );
+        assert!(
+            codeguard_cli::validate_python_task_original_source(
+                &project.0,
+                id,
+                b"def run():\n\xff"
+            )
+            .is_err()
+        );
+        let missing = project.0.join("missing-ruff");
+        let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args([
+                "task",
+                "verify",
+                id,
+                project.0.to_str().unwrap(),
+                "--ruff-tool",
+                missing.to_str().unwrap(),
+                "--format=json",
+            ])
+            .env("PATH", "")
+            .output()
+            .unwrap();
+        assert_eq!(
+            output.status.code(),
+            Some(3),
+            "{}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        let result: Value = serde_json::from_slice(&output.stdout).unwrap();
+        assert_eq!(result["schema_version"], "0.21.0", "{result}");
+        assert_eq!(result["event_persisted"], true, "{result}");
+        assert_eq!(result["native_scan"]["files"].as_array().unwrap().len(), 1);
+        assert_eq!(result["native_scan"]["files"][0]["path"], "broken.py");
+        assert_eq!(
+            result["native_scan"]["task_binding"]["original_report"]["run_id"],
+            fact["first_run_id"]
+        );
+        assert!(
+            fact["first_run_id"]
+                .as_str()
+                .unwrap()
+                .starts_with(if generic {
+                    "syntax-confirm-"
+                } else {
+                    "python-syntax-"
+                })
+        );
+        let receipt = project
+            .0
+            .join(".codeguard/state/consumed")
+            .join(format!("{}.json", fact["first_run_id"].as_str().unwrap()));
+        let receipt_bytes = fs::read(&receipt).unwrap();
+        fs::remove_file(&receipt).unwrap();
+        assert!(
+            codeguard_cli::validate_python_task_original_source(&project.0, id, b"def run():\n")
+                .is_err()
+        );
+        fs::write(&receipt, &receipt_bytes).unwrap();
+        assert!(
+            codeguard_cli::validate_python_task_original_source(&project.0, id, b"def run():\n")
+                .is_ok()
+        );
+    }
 }

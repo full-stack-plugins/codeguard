@@ -9,6 +9,23 @@ pub fn partial_check_sarif(report: &Value) -> Value {
     let mut results = Vec::new();
     if let Some(checkers) = report["native_results"].as_object() {
         for (checker, value) in checkers {
+            if checker == "zig_lint" {
+                // 原生语法探针使用 diagnostics；仅投影当前输入的定位，不遗失真实发现或输出旧坐标。
+                for file in value["files"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .filter(|f| f["current"] == true)
+                {
+                    for diagnostic in file["native"]["diagnostics"]
+                        .as_array()
+                        .into_iter()
+                        .flatten()
+                    {
+                        results.push(sarif_observation(checker, diagnostic, results.len()));
+                    }
+                }
+            }
             collect_findings(checker, value, &mut results);
         }
     }

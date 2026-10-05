@@ -51,22 +51,44 @@ fn candidate_report(root: &Path, name: &str, source: &str) -> serde_json::Value 
     report
 }
 
+fn candidate_classification(report: &serde_json::Value) -> Option<bool> {
+    // 零诊断只在完整恢复扫描时才可用于差分；隐藏错误必须计为未知。
+    if report["precheck"]["truncated_files"].as_u64().unwrap() != 0 {
+        None
+    } else {
+        Some(report["recoveries"].as_array().unwrap().is_empty())
+    }
+}
+
 #[test]
-fn known_swift_missing_parameter_type_gap_cannot_claim_qualification() {
+fn swift_corpus_separates_decidable_cases_from_hidden_error() {
     let root = std::env::temp_dir()
         .canonicalize()
         .unwrap()
         .join(format!("codeguard-swift-gap-{}", std::process::id()));
     fs::create_dir_all(&root).unwrap();
-    let report = candidate_report(&root, "bad_param", "func f(_ x: ) {}\n");
+    let mut disagreements = Vec::new();
+    let mut unresolved = Vec::new();
+    for (name, source, expected_valid) in corpus() {
+        let report = candidate_report(&root, name, source);
+        assert_eq!(report["status"], "incomplete");
+        match candidate_classification(&report) {
+            Some(valid) if valid != expected_valid => disagreements.push(name),
+            None => unresolved.push(name),
+            _ => {}
+        }
+    }
     fs::remove_dir_all(root).unwrap();
-    assert!(report["recoveries"].as_array().unwrap().is_empty());
-    assert_eq!(report["status"], "incomplete");
+    assert!(
+        disagreements.is_empty(),
+        "decidable disagreements: {disagreements:?}"
+    );
+    assert_eq!(unresolved, ["bad_param"]);
 }
 
 #[test]
 #[ignore = "requires explicit existing Apple Swift 6.4 via CODEGUARD_SWIFTC_BIN"]
-fn swift_native_parse_exposes_one_known_candidate_false_negative() {
+fn swift_native_parse_retains_one_unresolved_hidden_type_error() {
     let swiftc = std::env::var("CODEGUARD_SWIFTC_BIN")
         .expect("provide an existing Apple Swift compiler executable");
     let version = Command::new(&swiftc).arg("--version").output().unwrap();
@@ -78,6 +100,7 @@ fn swift_native_parse_exposes_one_known_candidate_false_negative() {
     ));
     fs::create_dir_all(&root).unwrap();
     let mut mismatches = Vec::new();
+    let mut unresolved = Vec::new();
     for (name, source, expected_valid) in corpus() {
         let file = root.join(format!("{name}.swift"));
         fs::write(&file, source).unwrap();
@@ -97,10 +120,17 @@ fn swift_native_parse_exposes_one_known_candidate_false_negative() {
             String::from_utf8_lossy(&native.stderr)
         );
         let report = candidate_report(&root, name, source);
-        if report["recoveries"].as_array().unwrap().is_empty() != native.status.success() {
-            mismatches.push(name);
+        assert_eq!(fs::read_to_string(&file).unwrap(), source);
+        match candidate_classification(&report) {
+            Some(valid) if valid != native.status.success() => mismatches.push(name),
+            None => unresolved.push(name),
+            _ => {}
         }
     }
     fs::remove_dir_all(root).unwrap();
-    assert_eq!(mismatches, ["bad_param"]);
+    assert!(
+        mismatches.is_empty(),
+        "decidable mismatches: {mismatches:?}"
+    );
+    assert_eq!(unresolved, ["bad_param"]);
 }

@@ -47,19 +47,21 @@ pub fn run(args: &[String]) -> ExitCode {
         Some("checkstyle") => java_checkstyle_command::run(&forwarded),
         _ => {
             #[cfg(feature = "wasm-precheck")]
-            if let Ok(parsed) = java_p3c_command::parse_args(&forwarded) {
-                if crate::java_syntax_precheck::eligible(&parsed) {
-                    let report = crate::java_syntax_precheck::observe(
-                        &parsed,
-                        Instant::now() + Duration::from_secs(15),
-                    );
-                    if parsed.json {
-                        println!("{report}");
-                    } else {
-                        crate::java_syntax_precheck::print_feedback(&report);
-                    }
-                    return ExitCode::from(3);
+            if let Some(parsed) = java_p3c_command::parse_args(&forwarded)
+                .ok()
+                .filter(|_| checker.as_deref() != Some("p3c"))
+                .filter(crate::java_syntax_precheck::eligible)
+            {
+                let report = crate::java_syntax_precheck::observe(
+                    &parsed,
+                    Instant::now() + Duration::from_secs(15),
+                );
+                if parsed.json {
+                    println!("{report}");
+                } else {
+                    crate::java_syntax_precheck::print_feedback(&report);
                 }
+                return ExitCode::from(3);
             }
             java_p3c_command::run(&forwarded)
         }

@@ -168,7 +168,14 @@ fn spawn_signal_output_limit_and_changed_tool_have_specific_diagnostics() {
             "version_output_limit",
             "tool_identity_changed",
         ][variant];
-        assert_eq!(result.reason, Some(reason));
+        let log = fs::read(fixture.0.join("version.log")).unwrap();
+        let os_detail = i32::from_le_bytes(log[8..12].try_into().unwrap());
+        assert_eq!(
+            result.reason,
+            Some(reason),
+            "variant={variant}, termination={:?}, private_log_detail={os_detail}",
+            result.termination
+        );
         assert!(!result.complete);
     }
 }

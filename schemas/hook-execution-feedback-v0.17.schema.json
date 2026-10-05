@@ -1,0 +1,345 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "plan",
+    "execution",
+    "reason",
+    "local_feedback",
+    "delivery_decision",
+    "host_blocking_verified",
+    "soft_result_reused"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "execution": {
+            "const": "not_run"
+          }
+        },
+        "required": [
+          "execution"
+        ]
+      },
+      "then": {
+        "properties": {
+          "local_feedback": {
+            "type": "null"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "execution": {
+            "const": "read_only_discovery"
+          }
+        },
+        "required": [
+          "execution"
+        ]
+      },
+      "then": {
+        "properties": {
+          "plan": {
+            "properties": {
+              "action": {
+                "const": "discover_project"
+              }
+            }
+          },
+          "reason": {
+            "type": "null"
+          },
+          "local_feedback": {
+            "$ref": "#/$defs/discovery_summary"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "execution": {
+            "const": "read_only_intent_guidance"
+          }
+        },
+        "required": [
+          "execution"
+        ]
+      },
+      "then": {
+        "properties": {
+          "plan": {
+            "properties": {
+              "action": {
+                "const": "show_intent_guidance"
+              }
+            }
+          },
+          "reason": {
+            "type": "null"
+          },
+          "local_feedback": {
+            "$ref": "#/$defs/intent_guidance"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "execution": {
+            "const": "read_only_guidance"
+          }
+        },
+        "required": [
+          "execution"
+        ]
+      },
+      "then": {
+        "properties": {
+          "plan": {
+            "properties": {
+              "action": {
+                "const": "show_summary"
+              }
+            }
+          },
+          "reason": {
+            "type": "null"
+          },
+          "local_feedback": {
+            "$ref": "#/$defs/next_guidance"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "execution": {
+            "const": "task_verification"
+          }
+        },
+        "required": [
+          "execution"
+        ]
+      },
+      "then": {
+        "properties": {
+          "plan": {
+            "properties": {
+              "action": {
+                "const": "verify_task"
+              }
+            }
+          },
+          "reason": {
+            "type": "null"
+          },
+          "local_feedback": {
+            "$ref": "#/$defs/task_verification_summary"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "execution": {
+            "const": "local_observation"
+          }
+        },
+        "required": [
+          "execution"
+        ]
+      },
+      "then": {
+        "oneOf": [
+          {
+            "properties": {
+              "plan": {
+                "properties": {
+                  "action": {
+                    "const": "fast_file_check"
+                  }
+                }
+              },
+              "reason": {
+                "enum": [
+                  null,
+                  "request_cancelled"
+                ]
+              },
+              "local_feedback": {
+                "$ref": "#/$defs/fast_feedback"
+              }
+            }
+          },
+          {
+            "properties": {
+              "plan": {
+                "properties": {
+                  "action": {
+                    "const": "commit_gate"
+                  }
+                }
+              },
+              "reason": {
+                "type": "null"
+              },
+              "local_feedback": {
+                "$ref": "#/$defs/git_index_summary"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "$id": "urn:codeguard:schema:hook-execution-feedback:0.17.0",
+  "properties": {
+    "schema_version": {
+      "const": "0.17.0"
+    },
+    "report_type": {
+      "$ref": "hook-execution-feedback-v0.14.schema.json#/properties/report_type"
+    },
+    "plan": {
+      "$ref": "hook-execution-feedback-v0.14.schema.json#/properties/plan"
+    },
+    "execution": {
+      "const": "local_observation"
+    },
+    "reason": {
+      "$ref": "hook-execution-feedback-v0.14.schema.json#/properties/reason"
+    },
+    "local_feedback": {
+      "$ref": "#/$defs/fast_feedback"
+    },
+    "delivery_decision": {
+      "$ref": "hook-execution-feedback-v0.14.schema.json#/properties/delivery_decision"
+    },
+    "host_blocking_verified": {
+      "$ref": "hook-execution-feedback-v0.14.schema.json#/properties/host_blocking_verified"
+    },
+    "soft_result_reused": {
+      "$ref": "hook-execution-feedback-v0.14.schema.json#/properties/soft_result_reused"
+    }
+  },
+  "$defs": {
+    "fast_feedback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "report_type",
+        "scan_scope",
+        "requested_paths",
+        "python_lint",
+        "node_lint",
+        "syntax_candidates",
+        "syntax_tasks",
+        "unavailable_files",
+        "native_unwired_files",
+        "candidate_recovery_count",
+        "next_action",
+        "delivery_decision",
+        "coverage_proven",
+        "kotlin_lint",
+        "swift_lint",
+        "zig_lint",
+        "candidate_structure_count"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "0.8.0"
+        },
+        "report_type": {
+          "$ref": "hook-execution-feedback-v0.14.schema.json#/$defs/fast_feedback/properties/report_type"
+        },
+        "scan_scope": {
+          "$ref": "hook-execution-feedback-v0.14.schema.json#/$defs/fast_feedback/properties/scan_scope"
+        },
+        "requested_paths": {
+          "$ref": "hook-execution-feedback-v0.14.schema.json#/$defs/fast_feedback/properties/requested_paths"
+        },
+        "python_lint": {
+          "$ref": "hook-execution-feedback-v0.14.schema.json#/$defs/fast_feedback/properties/python_lint"
+        },
+        "node_lint": {
+          "$ref": "hook-execution-feedback-v0.14.schema.json#/$defs/fast_feedback/properties/node_lint"
+        },
+        "syntax_tasks": {
+          "$ref": "hook-execution-feedback-v0.14.schema.json#/$defs/fast_feedback/properties/syntax_tasks"
+        },
+        "syntax_candidates": {
+          "$ref": "check-feedback-v0.48.schema.json#/properties/syntax_candidates"
+        },
+        "unavailable_files": {
+          "$ref": "hook-execution-feedback-v0.14.schema.json#/$defs/fast_feedback/properties/unavailable_files"
+        },
+        "native_unwired_files": {
+          "$ref": "hook-execution-feedback-v0.14.schema.json#/$defs/fast_feedback/properties/native_unwired_files"
+        },
+        "candidate_recovery_count": {
+          "$ref": "hook-execution-feedback-v0.14.schema.json#/$defs/fast_feedback/properties/candidate_recovery_count"
+        },
+        "next_action": {
+          "const": "require_native_lint_confirmation"
+        },
+        "delivery_decision": {
+          "$ref": "hook-execution-feedback-v0.14.schema.json#/$defs/fast_feedback/properties/delivery_decision"
+        },
+        "coverage_proven": {
+          "$ref": "hook-execution-feedback-v0.14.schema.json#/$defs/fast_feedback/properties/coverage_proven"
+        },
+        "kotlin_lint": {
+          "$ref": "hook-execution-feedback-v0.14.schema.json#/$defs/fast_feedback/properties/kotlin_lint"
+        },
+        "swift_lint": {
+          "$ref": "hook-execution-feedback-v0.14.schema.json#/$defs/fast_feedback/properties/swift_lint"
+        },
+        "zig_lint": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "zig-ast-scan-v0.2.schema.json"
+            }
+          ]
+        },
+        "candidate_structure_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8192
+        }
+      }
+    },
+    "intent_guidance": {
+      "$ref": "hook-execution-feedback-v0.14.schema.json#/$defs/intent_guidance"
+    },
+    "task_verification_summary": {
+      "$ref": "hook-execution-feedback-v0.14.schema.json#/$defs/task_verification_summary"
+    },
+    "next_guidance": {
+      "$ref": "hook-execution-feedback-v0.14.schema.json#/$defs/next_guidance"
+    },
+    "discovery_summary": {
+      "$ref": "hook-execution-feedback-v0.14.schema.json#/$defs/discovery_summary"
+    },
+    "git_index_summary": {
+      "$ref": "hook-execution-feedback-v0.14.schema.json#/$defs/git_index_summary"
+    }
+  }
+}

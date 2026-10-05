@@ -2,5 +2,7 @@ schema: spec-driven
 context: |
   Codeguard Rust workspace: CLI, core, runtime, native-tool adapters.
   This repository owns introduce-rust-codeguard-cli, migrated from codeguard-plugin.
-  Native tools remain authoritative; WASM syntax precheck is planned, not implemented.
+  Native tools remain authoritative. WASM syntax precheck has 32 executable grammar
+  candidates; language qualification, complete native-first routing and host acceptance
+  remain in progress. Consult the implementation baseline and acceptance records.
   Only tasks.md tracks completion; preserve evidence and unresolved coverage.

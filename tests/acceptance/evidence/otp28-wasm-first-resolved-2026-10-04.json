@@ -1,0 +1,19 @@
+{
+  "authority": "host_context_verified",
+  "delivery_decision": "not_evaluated",
+  "event_ref": ".codeguard/findings/CG-B-ecb73193c85146d29abf3dc3f361dc81/events/lifecycle-event-c9be7e6045966d47b17d59ad54fb2120bfaf87f184b355eed5b15e4b1f106452.json",
+  "evidence_ref": ".codeguard/state/resolution_evidence/ac943068484416886bd633ce0f959dbaf9627f5baeb0b45ca9d909ca0195e60e.json",
+  "evidence_sha256": "ac943068484416886bd633ce0f959dbaf9627f5baeb0b45ca9d909ca0195e60e",
+  "identity": {
+    "checker_id": "syntax.native_confirmation",
+    "scope": "app.erl",
+    "task_id": "CG-B-ecb73193c85146d29abf3dc3f361dc81",
+    "workspace_id": "ws-634d75e28431bcf7c206d85a8a31dfcb"
+  },
+  "outcome": "code_fixed",
+  "policy_revision": "p1",
+  "policy_sha256": "dd3f8efac074c385a509cd388973f663b2af275b2579eaefd91b35a733032bc3",
+  "report_type": "task_resolution_receipt",
+  "schema_version": "0.1.0",
+  "state": "resolved"
+}

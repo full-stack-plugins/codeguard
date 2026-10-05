@@ -14,13 +14,70 @@
 - **WHEN** 前端具备有效 ESLint 而 Java 模块缺少 JDK
 - **THEN** 前端运行原生 lint，Java 模块提供语法初检；两者的范围、来源和准备状态分别保留
 
+#### Scenario: Aggregate checks discover module-local ESLint
+- **WHEN** `check all` 发现 JavaScript/TypeScript/TSX 源码及其项目本地受支持 ESLint、单一 flat config 和可用 Node
+- **THEN** 在统一任务图和截止时间内逐文件调用既有原生适配器，保留原规则发现；仅对本轮完整原生检查且源码字节未变的文件跳过重复 WASM。缺配置、被忽略、工具故障和其它模块仍分别保留阻塞与降级初检。已初始化工作区串行同步原生任务，重复扫描复用稳定任务；聚合报告、终端和 next 均可取得修复指引。
+
+#### Scenario: Source discovery alone does not establish a required installation
+- **WHEN** 聚合原生阶段发现 JS/TS 源码，但未观察到本地 ESLint 上下文
+- **THEN** 报告工具上下文缺口，不能仅凭源码存在生成阻断性安装任务或抢占 next；后续准备动作由项目原生义务或语法初检确认需求决定
+
 #### Scenario: Explicit Zig 0.16 source check takes precedence over the candidate grammar
 - **WHEN** `lint zig` 收到可核对的 Zig 0.16.0 工具与普通 `.zig` 文件
 - **THEN** 优先以受控进程运行原生 `zig ast-check`；原生诊断必须保留，不能因 WASM 观察覆盖。只有该原生工具未提供或不可运行时，才可返回未验收 WASM 候选观察，并始终保持整体未完成；`ast-check` 不等于全部 Zig lint、测试或构建。
 
+#### Scenario: Zig lint and task verification share invoking tool discovery
+- **WHEN** Zig lint or a recorded Zig confirmation task is invoked without an explicit tool
+- **THEN** select the first ordinary executable zig from absolute invoking PATH directories, ignoring empty/relative entries and non-executable candidates; explicit tools take precedence and a selected failure never switches to another compiler. Bind the selected tool and current source bytes to native observations, retain failure and candidate authority, and do not install tools
+- **AND** lint reports selection provenance in a separately versioned feedback; source changes or selected-entry target changes withdraw stale native coordinates, and changed source cannot retain an old-byte WASM observation. A read-only next query does not discover or execute a compiler
+
+#### Scenario: Explicit OTP 28 syntax parsing detects a missing form terminator
+- **WHEN** `lint erlang` 收到可核对的 OTP 28 `erl` 工具与普通 `.erl` 或 `.hrl` 文件
+- **THEN** 以固定参数和共同截止时间调用原生 `io:scan_erl_form` 与 `erl_parse:parse_form`，读取当前原字节、不展开预处理或执行项目编译插件；检查每项扫描/解析结果，不能把进程正常退出直接解释为零错误
+- **AND** 原生结果优先于候选 WASM，缺句点诊断和原生故障分别保留；宏、预处理指令或无法解释的位置保持未完成，不当作已确认源码违规，也不以 WASM 洗白；该阶段只观察单文件 forms，不替代项目 lint、编译或测试
+- **AND** 工具未提供时可以附加未验收 WASM 初检，报告其已知缺句点漏检并给出原生确认命令；显式无效工具不能静默改用 PATH 中的同名工具
+
+#### Scenario: A source-file grammar distinguishes function terminators from editor fragments
+- **WHEN** Erlang grammar 的原生差分发现源文件函数缺句点、末尾分号或中间缺分隔符被当作零恢复
+- **THEN** 修复必须固定原始 grammar、源码模式补丁、真实 external scanner、生成器/编译器版本及原始/派生 WASM 字节；不能通过字符串末尾匹配、伪造 ERROR/MISSING 或忽略差分制造通过
+- **AND** 使用同一普通、Unicode/CRLF、注释、字符串/字符/浮点数内句点、多子句、宏与条件编译正反语料，由独立原生工具确认标签；预处理和语言版本的未覆盖范围必须保留，窄语料通过不授予整语言资格
+
+#### Scenario: An Erlang checker is available on the invoking process PATH
+- **WHEN** 单文件 `lint erlang` 未指定 `--erl-tool`，且调用进程 PATH 的绝对目录可定位普通可执行 `erl`
+- **THEN** 固定所选工具的规范路径，以同一预算核对 OTP 28 版本与工具字节，并优先执行原生 scanner/parser；报告必须区分显式选择、PATH 选择和未找到工具
+- **AND** 显式错误工具不能改用 PATH；PATH 首个可执行工具的版本/执行失败也不能被后面的同名工具或 WASM 洗白。空/相对 PATH 条目和不可执行文件不作为自动工具；真正没有工具时保留候选初检与准备指引
+- **AND** 工具选择不授予原生完整覆盖或可信权威；单文件无预处理 forms 的范围及交付未评估保持不变
+
+#### Scenario: Aggregate checking observes Erlang forms before candidate parsing
+- **WHEN** `check all` discovers ordinary Erlang source files and resolves an explicit `--erl-tool` or an executable `erl` from absolute PATH directories
+- **THEN** schedule a bounded native forms task under the shared deadline and jobs limit, retain per-file diagnostics, tool-selection identity, source hashes and actionable original-tool recheck argv in human/JSON/SARIF feedback
+- **AND** only current, byte-matching files with complete non-preprocessed native forms observations may skip duplicate WASM; absent tools, unresolved preprocessing, truncated diagnostics, source/tool changes and execution failures remain visible and cannot become native or project success
+- **AND** files beyond the native budget remain explicitly unobserved; Java-only selection must not start Erlang, cancellation retains its exit semantics, and useful sibling results remain available. Changed project scope withdraws scope completeness but retains byte-current single-file diagnostics; stale file positions and argv are withdrawn. Forms parsing does not fulfill complete Erlang lint, compilation, tests or trusted task closure
+
+#### Scenario: Task verification finds an already installed Erlang checker
+- **WHEN** 已有 Erlang 语法确认或原生首次发现任务执行 `task verify`，未提供显式 `--erl-tool`
+- **THEN** 复用扫描入口的工具选择规则，在调用方 PATH 的绝对目录选择首个普通可执行 erl；用共享截止时间核对 OTP 28 版本、工具字节和当前任务源码，记录真实原生复检事件，而不是仅因缺参数报告工具未提供
+- **AND** 显式坏工具、所选版本或执行失败不改用后续工具；空、相对或不可执行 PATH 不产生自动工具。任务 next 保留所选原工具的有界复检 argv，后续 PATH 变化不能悄悄替换该明确入口；缺工具仍为环境恢复，不指示源码修改或自动安装
+- **AND** 候选与原生首次来源保持原协议和稳定任务身份；repair-ready Hook 复用相同复检入口，局部零诊断不授予可信关闭、完整 lint 或项目通过
+
 #### Scenario: Go vet excludes a file under build constraints
 - **WHEN** 本轮 Go 1.23.4 `go vet` 完成，受控 `go list` 证明部分源码进入默认构建，而另一份 `.go` 源码被构建标签排除
 - **THEN** 仅对同一源码字节且进入原生包清单的文件跳过重复 WASM；被排除文件继续候选初检，并保持平台/构建标签覆盖未完成
+
+#### Scenario: Clippy completes a current Rust target before candidate parsing
+- **WHEN** 聚合检查的锁定离线 Clippy 完成，机器流中的非缓存 compiler-artifact 将目标入口绑定到本轮已观察源码及原根 Cargo 清单
+- **THEN** 仅对启动前字节与当前字节一致的该目标入口跳过重复 WASM；终端和 JSON 保留原生发现、原生优先计数及其它文件初检。完整运行无有效 artifact、失败/截断/取消、重复 JSON 键、结束记录后新增事件、工具/输入改变不得产生此覆盖
+- **AND** Cargo 的 all-targets、零诊断或 artifact 入口不能证明目录里所有 `.rs` 已参与解析；未被证明的模块、条件排除源码、其它清单目标继续初检，完整 workspace/features/targets、语法资格与交付义务保持未完成。覆盖仅在本次进程内传递，不能从可编辑本地报告导入作为跳过依据
+
+#### Scenario: Cargo is already available on the invoking PATH
+- **WHEN** Rust 聚合、comments/build 或原生任务复检没有显式 Cargo 参数，调用进程 PATH 的绝对目录存在普通可执行 Cargo 或 Cargo 代理
+- **THEN** 选择首个适用入口，保留 `cargo` 名称运行原生工具；显式无效入口、首个已选择入口的版本/执行失败不能静默改用其它 Cargo。相对或空 PATH 目录、不可执行文件不作为自动工具
+- **AND** 子进程保留调用方 RUSTUP_TOOLCHAIN，同时强制 RUSTUP_AUTO_INSTALL=0；项目或调用方工具链缺失应反馈环境未完成，不通过检查隐式下载或安装。工具字节、输入稳定性、锁定离线及原工具复检约束仍适用；发现入口不证明工具/规则批准或完整项目覆盖
+
+#### Scenario: Configured Python root has a local Ruff outside PATH
+- **WHEN** 当前受检根配置Ruff且其普通`.venv/bin`目录有可执行Ruff，调用方没有显式工具参数
+- **THEN** 原生lint/check及同根任务复检优先选择该入口，然后才考虑调用方绝对PATH；显式参数保持最高优先级，所选工具版本/执行失败不换工具。普通本地目录没有Ruff时可继续PATH；本地目录链接、非目录、损坏/不可执行入口作为具体环境阻塞，不误报源码、不以全局工具掩盖损坏本地环境
+- **AND** 无Ruff配置或指定文件没有适用配置时不运行该工具；本轮工具字节、源/config绑定及原生复检约束继续有效。根本地发现不证明嵌套模块不同虚拟环境、其他环境管理器、工具链批准或完整项目覆盖
 
 #### Scenario: A local checker is absent from PATH
 - **WHEN** 项目声明的本地原生工具已可按受支持方式定位
@@ -143,11 +200,19 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 
 解析 MUST 同时识别 ERROR/MISSING 恢复，并按同一恢复原因归并级联节点；诊断 MUST 保留原文件位置、必要的有界脱敏上下文及 grammar 身份。不确定版本/方言、模板、宏、嵌入语言 MUST 明示覆盖限制。CodeGraph 用于提取符号的源码遮盖/启发式 MUST NOT 静默移入语法判定。仅凭恢复节点不得猜测具体缺失 token 或自动授予源码修改范围。
 
+若语法树标记错误但可遍历节点中无法定位任何对应 ERROR/MISSING，MUST 将该文件标为初检未完成，并保留原生检查义务；不得将零恢复节点当成语法有效或制造没有位置依据的源码 finding。
+
 同一语言族有独立 grammar 的方言 MUST 按实际文件类型选择和报告；尤其 `.tsx` MUST 使用 TSX grammar，不能拿普通 TypeScript grammar 的恢复节点当作 JSX 源码异常。候选报告读者 MUST 核对 grammar 方言与源文件扩展名一致；不匹配视为报告无效，不生成源码 finding。
 
 多语言共用后缀 MUST 保留歧义：`.m` 可能属于 Objective-C 或 MATLAB，`.sc` 可能属于 Scala 或 SuperCollider。没有可核对的语言证据时，自动检查 MUST 不调用猜测的 grammar、不把恢复节点记为源码问题，并保持范围未完成；用户显式指定 `grammar probe` 的语种仍可作候选诊断。
 
 `.m` 文件中 MATLAB 块注释 `%{ ... %}` 内的行首 `#import` 或 `@interface` 只是注释数据，MUST NOT 作为 Objective-C 证据；块注释外的明确 Objective-C 专属标记仍可用于候选路由。发现与检查 MUST 使用同一判别，避免一个入口报告未知而另一个入口执行错误 grammar。
+
+#### Scenario: TypeScript module extensions enter project discovery and syntax routing
+
+- **WHEN** 项目包含 `.mts`、`.cts` 或对应 `.d.mts`、`.d.cts` 声明文件
+- **THEN** 发现与聚合检查 MUST 将其归入 TypeScript 范围，缺原生时使用固定 TypeScript grammar，不能遗漏或交给 TSX grammar；非法语法仍仅作候选疑似，合法声明不证明完整 lint 或类型检查
+- **AND** `.mtsx`/`.ctsx` 等未知后缀不得因近似名称被猜测为 TSX
 
 #### Scenario: Shared extension would produce a speculative syntax finding
 - **WHEN** 项目包含无 Objective-C 专属标记的 MATLAB `.m` 源码，或 SuperCollider `.sc` 源码
@@ -166,6 +231,13 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 #### Scenario: One unmatched delimiter produces many recovery nodes
 - **WHEN** 同一恢复原因造成重复或级联节点
 - **THEN** 归并为可处理观察并保留受影响范围，不创建大量同义任务
+
+#### Scenario: Grammar hides a missing token from node traversal
+
+- **WHEN** grammar 的根节点 `has_error=true` 且 S-expression 含缺失 token，但运行时的可遍历子节点不能定位该 token
+- **THEN** 初检标为 incomplete，保留未完成计数并请求原生确认；零恢复节点不得升级为 clean
+- **AND** 已初始化工作区的 check/确认写入 Hook 将这种已绑定源码与 grammar 的观察同步为同一稳定检查恢复任务，保留无位置证据及检查未完成原因；next、可读任务和对话上下文要求恢复适用原生能力或调查 grammar，原生确认前不授予源码修改范围。重复扫描不新增同义任务，完整零恢复观察不新建该任务、不关闭已有任务；保存失败保留原报告且不返回虚假任务 ID
+- **AND** 没有该语言原生确认 adapter 时，task verify 记录具体能力缺口，任务保持开放，不能换用其它语言工具或伪造关闭；未知报告版本、零恢复且无未完成原因、错源码/grammar 身份或虚假定位均不可导入
 
 #### Scenario: A template includes unsupported embedded syntax
 - **WHEN** 只支持文件中一部分语言区域
@@ -188,8 +260,36 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 - **THEN** 逐例记录语法分类一致性、工具与语料身份；仅扩大该版本的局部精度证据，不将候选提升为完整 lint、其它版本或交付通过
 
 #### Scenario: Native syntax rejects a source that the WASM candidate accepts
-- **WHEN** 固定 Swift 6.4 编译器的语法阶段拒绝缺少参数类型的源码，而固定 Swift WASM 没有恢复节点
+- **WHEN** 固定 OTP 28 编译器拒绝函数缺少最终句点的源码，而固定 Erlang WASM 完整恢复扫描没有节点
 - **THEN** 记录带原生证据的漏检及待修复 grammar 身份，保持候选未验收和完整检查义务；不能因零恢复节点签发 clean、放入白名单或关闭任务
+
+#### Scenario: Differential evaluation receives an incomplete zero-diagnostic scan
+- **WHEN** Swift 或 Kotlin 固定样例返回空恢复数组，但隐藏错误使扫描未完成
+- **THEN** 该样例保留在总语料分母并单独计为未知覆盖；不能计作合法、非法、一致、误报或漏报，且不能删除该样例来提高精度指标
+
+#### Scenario: All bundled grammars are replayed for development evaluation
+- **WHEN** 开发期 Rust 回放入口消费绑定当前清单摘要、源码摘要及来源的固定回归语料
+- **THEN** 逐份固定 grammar 调用现有隔离 worker，输出每语言的全样本数、可判定分类、未知、TP/FP/FN、区间和有界耗时；重复键、语言缺项、字节身份失配在启动前拒绝。回归标签和待裁定标签分开，待裁定样本不进入精度分母，隐藏错误不当作零诊断通过；回归报告不冒充独立 holdout、原生工具回放、grammar 资格或发布批准
+
+#### Scenario: Development replay runs out of its shared budget
+- **WHEN** 回放在共同 deadline 内超时或被取消，或者所选运行程序字节发生变化
+- **THEN** 已有效取得的局部观察保留，未运行与受影响样本列为未知且仍计入原固定语料范围；不得重置预算、换工具补出绿色结论或提高 grammar 资格
+
+#### Scenario: Upstream grammar fixtures join the development replay
+- **WHEN** Rust 导入器读取已有的上游 Tree-sitter corpus 和仓库正反例
+- **THEN** 保留原源码字节、来源和预期树中的 ERROR/MISSING 分类，拒绝损坏预期树与不支持的 corpus 指令；上游 grammar 回归、仓库回归及待裁定语法按 cohort 分开。每语言报告公布已选合法/非法标签数和各组结果，不能把混合来源的预测汇总成一个 precision/recall，也不能将 grammar 自带预期当作独立原生 oracle。旧 0.1 语料和历史报告保持可读
+
+#### Scenario: Native forms diagnostics are the first repair evidence
+- **WHEN** 已初始化工作区的原生 Erlang forms 检查先取得诊断或具体环境/预处理阻塞
+- **THEN** 直接将源字节、原生工具与有界位置保存到同一文件/语言的稳定确认修复任务，不要求先制造 WASM 恢复节点，也不伪造 grammar 摘要；后续候选观察与原生扫描不得重复建任务。next 使用当前证据，源码或工具变化撤回旧位置；task verify 用原工具复检并记录结果，局部零诊断不自批关闭
+
+
+#### Scenario: CFQuery closing boundary occurs inside a server-side CFML comment
+
+- **WHEN** 一个完整CFQuery标签体含普通或嵌套CFML服务器注释，注释内出现`</cfquery>`文本
+- **THEN** 候选嵌入区域的结束位置必须取注释外的真实结束标签，保留原始字节及原文件偏移，不删除或遮盖注释源码
+- **AND** 未闭合CFML注释不能提供可信嵌入结束边界；保留整文件CFML候选而不制造截断的CFQuery片段，不据此批准语法或交付
+
 
 ### Requirement: Precheck briefs SHALL reach agent conversations with concrete next actions
 
@@ -215,9 +315,37 @@ human/结构化报告及宿主渲染 MUST 按结论、方式/范围、原生状�
 - **WHEN** 原生工具安装或恢复成功但尚未检查原目标
 - **THEN** 环境探测可更新，确认任务仍未解决
 
+#### Scenario: Multiple edited grammar candidates need native confirmation
+- **WHEN** initialized workspace edit feedback contains bounded recovery evidence for one or more bundled grammar languages
+- **THEN** import a versioned, source-and-grammar-bound observation into the existing task store, keeping one confirmation identity per workspace, file and language; Python and ESLint scopes reuse their existing preparation identities
+- **AND** preserve raw byte locations as suspected evidence, never source violations; complete zero-recovery observations create no new mandatory task and cannot close previous tasks
+- **AND** unavailable native confirmation adapters yield a concrete pending capability decision, never a Python fallback command for another language; persistence failure preserves feedback and exposes no fictitious task reference
+
 #### Scenario: Style-only checker returns zero diagnostics
 - **WHEN** 该检查器不能确认疑似语法所需能力
 - **THEN** 不关闭任务、不判 grammar 误报，指出所需的适用确认工具
+
+#### Scenario: A Zig confirmation task replays the native AST checker
+- **WHEN** task verify receives an explicit applicable Zig 0.16.0 tool for a recorded Zig candidate scope
+- **THEN** feed the current bounded source bytes to native ast-check under the existing task lease and deadline, bind the source/tool identities, and retain the observation and attempt association
+- **AND** distinguish native diagnostics, zero diagnostics, unavailable tools and changed inputs; zero diagnostics alone cannot grant formal resolution or project delivery
+
+#### Scenario: A fresh confirmation task already has an applicable native adapter
+- **WHEN** a verified original candidate report identifies Zig, Erlang or Swift and no native recheck has yet been recorded
+- **THEN** next and task show describe the actual available adapter and its supported version, distinguish unknown local tool readiness from an unavailable adapter, and provide the applicable native tool selection argument
+- **AND** the read-only query does not run or install a tool, does not take executable paths from editable task text or historical candidate data, and does not authorize source repair or task closure before native confirmation
+- **AND** languages without an implemented confirmation adapter retain the concrete capability decision; zero WASM recovery does not remove the obligation
+- **AND** structured preparation guidance uses a versioned contract that binds language, supported version, tool selection parameter and explicitly unassessed local readiness; it does not invent a native execution status or evidence reference, and aggregate consumers accept that exact version while historical schemas remain unchanged
+
+#### Scenario: A native syntax confirmation observation becomes stale
+- **WHEN** the source or tool changes after a recorded native syntax observation
+- **THEN** next and task show require a fresh native confirmation and preserve historical evidence; they cannot recommend a stale source repair or pretend the old zero-diagnostic observation still applies
+
+#### Scenario: An Erlang confirmation task uses its native forms parser
+- **WHEN** task verify or repair_ready receives an explicit OTP 28 erl tool for an existing Erlang candidate task
+- **THEN** run the same controlled native scanner/parser as lint erlang on the current task scope, under the existing lease, attempt association and shared deadline
+- **AND** retain versioned source/tool-bound observations and native positions; next provides reusable --erl-tool argv only while the tool identity is current
+- **AND** preprocessing, unknown output, tool failure and input changes remain incomplete with concrete reasons; native zero diagnostics alone cannot close the task, and Erlang options on another language are rejected before acquiring a lease or starting a tool
 
 #### Scenario: Native syntax confirmation contradicts the parser
 - **WHEN** 当前同输入、范围和方言的适用原生检查完整正常
@@ -226,6 +354,10 @@ human/结构化报告及宿主渲染 MUST 按结论、方式/范围、原生状�
 #### Scenario: Source changes or task files are removed
 - **WHEN** 复检前输入变化或智能体删除/勾选任务文件
 - **THEN** 旧观察不作为当前关闭依据，真实检查义务不因任务文件操作消失
+
+#### Scenario: The agent repeats native confirmation through repair-ready feedback
+- **WHEN** 已初始化任务的 Zig 原生观察已记录可用工具路径，智能体修复后触发 repair_ready
+- **THEN** next MUST 提供可复用的 task verify argv，Hook MUST 接受同任务的显式 Zig 工具并复用原有租约、尝试和共享截止时间；错误语言、陈旧字节或工具身份不得使旧诊断成为当前修复依据
 
 ### Requirement: Grammar false-positive dispositions SHALL be precise and preserve native obligations
 
@@ -242,6 +374,14 @@ human/结构化报告及宿主渲染 MUST 按结论、方式/范围、原生状�
 ### Requirement: Syntax caches SHALL bind inputs and retain historical observations on invalidation
 
 缓存 MUST 绑定源码字节、语言/方言画像、grammar/runtime、规则/查询版本及相关范围/配置身份。部分结果、取消、未支持范围 MUST NOT 作为 clean 重用。资产更新/回滚须核对版本清单并使相关缓存与处置失效；删除缓存不能删除问题历史或签发解决。相同 mtime/大小不构成身份相同。
+
+编译入同一二进制的不可变清单、WASM 与许可证 MAY 在进程内复用已经完整核验的资产结果；外部清单、源码、配置与原生工具 MUST NOT 因此省略当前身份复核，此资产复用不得作为检查结果或完整覆盖缓存。
+
+#### Scenario: Concurrent selections reuse only verified immutable assets
+
+- **WHEN** 同一进程反复或并发选择固定内置grammar
+- **THEN** 每个固定语种只需成功核验一次内置字节和许可证，未知语种不增加缓存项；返回独立元数据副本，调用方修改不污染后续选择
+- **AND** 外部传入WASM、许可证及身份仍逐次核验，不能因对应内置语种已缓存而接受篡改字节；该复用不是源码结果、配置、原生工具或交付认证缓存
 
 #### Scenario: Source changes without mtime or size change
 - **WHEN** 源码字节不同但时间和大小相同
@@ -263,6 +403,12 @@ WASM fallback MUST 通过明确版本的协议加入既有统一命令，不静�
 - **WHEN** 用户安装不含此能力的版本
 - **THEN** 文档与支持矩阵不宣称自动初检已可用，不用设计示例冒充运行记录
 
+#### Scenario: Swift hidden recovery receives native parse confirmation
+- **WHEN** 已消费 Swift WASM 确认任务包含无法定位的恢复异常，调用方提供已安装的 Apple Swift 6.4 原生编译器绝对入口
+- **THEN** Rust 以冻结 stdin、固定非项目 cwd 和共同截止时间调用 frontend parse；不构建、类型检查、加载项目插件或运行源码
+- **AND** 只把可核对 UTF-8 字节边界的原生错误位置写入同一任务的追加历史；next 和 repair_ready 返回脱敏原生位置、字节列单位和实际复检入口
+- **AND** 缺工具、版本不匹配、异常输出、超时及输入变化保留未完成；零诊断仅表示局部语法未观察到问题，不自动关闭或替代完整 lint、构建和交付
+
 ### Requirement: Syntax support claims SHALL have per-language and per-host evaluation evidence
 
 验收 MUST 分别记录合法/非法语料、ERROR/MISSING、语言版本/方言、模板位置映射、原生对照、误报/漏报、未知覆盖及白名单处置。每个声明支持的语言/宿主 MUST 有独立证据；CodeGraph 的支持清单不自动继承为 Codeguard 能力。冷/热启动、包大小、内存/并发及异常退出预算须实测后固化，不编造精度或性能数值。三个宿主的实际对话交付应分别验证，任一个通过不能替代另两个。
@@ -274,3 +420,299 @@ WASM fallback MUST 通过明确版本的协议加入既有统一命令，不静�
 #### Scenario: False positives disappear through exclusions
 - **WHEN** 扩大排除导致表面误报数下降
 - **THEN** 评测仍保留原始分母、排除和未完成覆盖，不能据此声称准确率提高
+
+#### Scenario: Kotlin native confirmation distinguishes syntax from missing project context
+- **WHEN** an explicit installed Kotlin/JVM 2.4.10 compiler checks a frozen ordinary `.kt` file in a private directory
+- **THEN** invoke its native compilation command without project build scripts, response files, compiler plugins or script execution; bind current source bytes and retain bounded compiler diagnostics
+- **AND** classify `[SYNTAX]` as native syntax evidence while unresolved references and other semantic diagnostics remain project-context limitations, not fabricated syntax violations; preserve syntax evidence when both coexist
+- **AND** only accept diagnostics belonging to the frozen input, translate verified native UTF-16 columns to UTF-8 byte positions, and reject unknown output, contradictory exit codes, truncated output, timeouts and changed input/tool identities
+- **AND** this single-file observation does not implement full Kotlin lint/comments, prove whole-project coverage, qualify its WASM or authorize trusted task closure; missing tools require preparation, never implicit installation
+
+#### Scenario: Kotlin selects native tooling before candidate fallback
+- **WHEN** a caller supplies an explicit compiler or invoking absolute PATH contains `kotlinc`
+- **THEN** retain that first selected tool and its failures without silently replacing it; only tool absence enables candidate WASM
+- **AND** missing backends, incomplete native checks or candidate recoveries/hidden errors require further native confirmation; complete observable candidate zero-recovery may recommend native installation without granting delivery
+- **AND** human feedback includes verified native rule and source positions, while JSON preserves bounded evidence and unresolved obligations
+
+#### Scenario: Existing Kotlin confirmation task uses the native compiler
+- **WHEN** task verify or repair_ready targets a bound Kotlin confirmation task
+- **THEN** use the same explicit/PATH native-tool selection and frozen-source observation as lint, append verification evidence to the existing stable task and preserve lease/attempt handling
+- **AND** reject wrong-language or relative tool arguments before acquiring a lease or starting a process
+- **AND** expose current syntax positions separately from unresolved project-context diagnostics, including mixed observations; changed source/tool identities withdraw stale positions
+- **AND** native zero diagnostics does not by itself prove policy/coverage or close the task; initial tool guidance must preserve the Kotlin selection option in task show and next
+
+#### Scenario: Kotlin first observation prefers a selected native compiler
+- **WHEN** check all or a confirmed file_changed event observes ordinary Kotlin files
+- **THEN** invoke the selected explicit or first absolute-PATH compiler before candidate parsing, within the shared deadline and requested scope
+- **AND** retain native syntax and context observations in a stable task without fabricating a WASM origin; selected-tool failure must not switch to a candidate parser
+- **AND** tool absence enables WASM, complete native zero diagnostics creates no new task, and repeated scans reuse existing identity and current evidence
+
+#### Scenario: Incomplete native history retains unlocated recovery guidance
+- **WHEN** a stable task originated from incomplete or unlocated candidate recovery and a later native observation still cannot confirm source diagnostics
+- **THEN** next and task show retain the unlocated limitation, forbid source edits before native confirmation, and provide concrete native-environment recovery guidance; a missing tool must not erase the original limitation or fabricate positions
+
+#### Scenario: Swift standalone checking selects native parsing before candidates
+- **WHEN** lint swift receives an ordinary Swift file and an explicit compiler or the first executable swiftc in absolute invoking PATH
+- **THEN** reuse bounded frozen-source frontend parsing, preserve validated UTF-8 byte positions, and retain selected-tool failure without selecting another compiler or WASM
+- **AND** only tool absence enables bundled candidate parsing; incomplete/hidden recovery requires native confirmation, complete zero recovery recommends native setup without granting project lint or delivery success
+
+#### Scenario: Swift project observation preserves native preference and scope gaps
+- **WHEN** `check all` discovers ordinary Swift sources
+- **THEN** it selects the explicit Swift tool or first executable invoking PATH entry before candidates, parses at most 64 frozen files under the shared deadline, reports unobserved sources and current byte positions, and never changes a selected failing compiler into a WASM success
+- **AND** missing tools retain candidate fallback, source or tool changes withdraw positions, and project lint, task connection and delivery gaps remain visible until independently implemented and verified.
+
+#### Scenario: Confirmed Swift edits provide native evidence to the host
+- **WHEN** a confirmed `file_changed` event selects Swift sources
+- **THEN** the Hook uses the same explicit/PATH native parser selection within the shared deadline and checks only selected sources, without replacing selected native failures with candidates
+- **AND** bounded host feedback includes current native counts and byte positions, never raw tool messages, and explicitly preserves missing task connection and full-project obligations.
+
+#### Scenario: Swift native first observations join a stable repair task
+- **WHEN** an initialized workspace observes current Swift native diagnostics or a selected-tool blocker
+- **THEN** the project/save scan records native-first evidence without fabricated grammar identity, updates one stable source-scope task, provides current repair/environment guidance and supports original-parser task verification
+- **AND** a subsequent clean observation records evidence but cannot auto-close; absent tools still use candidate confirmation, and failed persistence retains diagnostics with an explicit task gap.
+
+#### Scenario: Aggregate checks and edit feedback prefer the invoking Zig checker
+- **WHEN** check all, check zig or selected-file editing observes ordinary Zig files and an explicit or invoking-PATH Zig tool
+- **THEN** reuse the frozen native AST probe under the shared deadline; report original diagnostics, selected-tool failures, changed input and unobserved files without substituting WASM after a selected-tool failure. Missing tools retain candidate fallback and preparation guidance. Project lint/build and trusted closure remain independent obligations; no native diagnostic may disappear because the candidate grammar reports no recovery.
+
+#### Scenario: First-native Zig observations retain one actionable confirmation task
+- **WHEN** an initialized workspace receives a current Zig AST diagnostic or selected-tool failure from lint, aggregate checking or a confirmed edit
+- **THEN** import a language-versioned native-first report with no grammar identity into the existing stable task, synchronize once per bounded scan, retain original-tool guidance and real report references, and reuse the same ID on repeated observations. A new complete clean observation creates no task; an existing task records the observation but requires independently authorized capability-matching verification before closure.
+
+
+#### Scenario: Zig native output cannot create false completion or invalid repair coordinates
+- **WHEN** the Zig AST process exits zero with unexpected stdout, or a diagnostic position exceeds the frozen source line/byte bounds
+- **THEN** its observation remains incomplete and invalid positions are withdrawn; neither a clean result nor actionable coordinates may be inferred from the exit code alone
+
+
+#### Scenario: Explicit native grammar differential retains unknown and unselected coverage
+- **WHEN** the development evaluator compares frozen corpus bytes through explicitly installed native tools and the existing WASM worker
+- **THEN** reject invalid selections before process execution, retain all 32 languages in inventory, compare only jointly decidable syntax samples, keep context-only native blockers or hidden WASM recovery as unknown, preserve strictly located Kotlin syntax diagnostics even when mixed context blockers leave execution incomplete, withdraw classifications after tool/program identity changes, and do not promote reused-adapter regression evidence to independent holdout, grammar qualification or delivery permission
+
+#### Scenario: Python native grammar comparison excludes ordinary lint and project configuration
+- **WHEN** an explicit installed Ruff is used as the Python syntax observer in development native/WASM comparison
+- **THEN** freeze the tool/version and target dialect, feed the same source through isolated stdin with fixes/cache/project configuration and noqa suppression disabled, classify only consistent located `invalid-syntax` reports, retain other rules, wrong-source reports, tool failure or contradictory exit/JSON as incomplete, and do not extend trusted task-closing or project-delivery authority
+
+#### Scenario: Native differential measures parser and structure layers independently
+- **WHEN** the development evaluator receives verified independent structure-rule observations alongside parser ERROR/MISSING observations
+- **THEN** a separately versioned report preserves raw parser classification and TP/FP/FN/TN, records bounded structure observations with rule/version/digest and original positions, and separately measures the combined candidate against the same native observer and sample denominator; raw false negatives MUST NOT be erased by the combined result
+- **AND** truncated or failed worker observations remain unknown in both layers; changed program identity withdraws structure evidence and combined classification, and changed native identity withdraws both comparisons; this measured candidate neither confirms a violation nor qualifies a grammar, an independent holdout or project delivery
+
+#### Scenario: JavaScript development comparison uses an isolated explicit module syntax observer
+- **WHEN** an explicitly installed fixed Node is selected for development JavaScript native/WASM comparison
+- **THEN** use bounded frozen UTF-8 stdin, explicit module input and syntax-check-only arguments with a cleared environment, isolated cwd and shared deadline; verify requested entry and artifact continuity before and after execution, retaining a bounded Node-specific artifact budget without increasing other checker budgets
+- **AND** only consistent empty successful output or a syntax diagnostic bound to the original stdin line may classify native syntax; unexpected stdout, runtime/fatal errors, output/identity/version changes or malformed diagnostics remain unknown. Retain the source goal as module rather than infer project CommonJS/ESM settings; the versioned report cannot replace project ESLint, authorize task closure or certify grammar qualification
+
+#### Scenario: Ruby development comparison uses an isolated explicit syntax observer
+- **WHEN** 显式选择已安装Ruby2.6.10p210执行开发期原生/WASM差分
+- **THEN** 冻结UTF-8 stdin与请求入口/制品，清空环境、使用隔离cwd、禁用gems并仅调用版本与`-c -`，共享截止时间和取消令牌；BEGIN、END、require及普通源码不得执行
+- **AND** 仅消费一致的Syntax OK或绑定原始stdin行号的有界语法诊断；普通警告、未知输出、错路径、坏位置、矛盾退出、版本/入口变化和截断保持unknown；新增报告版本保留旧协议、32语言库存和未选覆盖，不授予项目Rubocop、任务关闭、独立holdout或grammar发行资格
+
+#### Scenario: Go development comparison binds both SDK tools and uses whole-file syntax
+- **WHEN** 显式选择已安装Go1.23.4 SDK入口执行开发期原生/WASM差分
+- **THEN** 只使用请求SDK入口同目录的gofmt，冻结两个制品及入口绑定，核对Go版本和gofmt构建版本；清空环境并禁用自动工具链/模块下载，冻结UTF-8 stdin，用`gofmt -e /dev/stdin`整文件解析，不能以无文件参数的片段模式证明完整源码语法
+- **AND** 共享截止时间/取消，版本或解析过程中任一入口/制品变化停止后继动作并撤回对应批次比较；仅消费一致的原生退出和原始stdin有界字节定位，位置重映射未解析、未知/矛盾输出及执行失败保持unknown；版本化报告保留32库存、旧协议、原始/组合分母，不把formatter语法观察作为项目lint、可信任务关闭或发行资格
+
+#### Scenario: Structural empty blocks remain distinct from parser recoveries
+- **WHEN** an application scans a grammar tree for empty `block` nodes that contain no non-comment named statement
+- **THEN** traverse even branches without `has_error`, retain the direct parent kind and original byte positions with explicit record/traversal budget exhaustion, and do not label these structural facts as parser ERROR/MISSING or language violations; legal empty blocks in other languages require independent language interpretation
+
+#### Scenario: Explicit JavaScript native differential is cancelled while checking
+- **WHEN** 版本已核验且原生语法检查正在执行时请求取消
+- **THEN** Node 观察使用同一取消令牌终止进程组，保留样本与 unknown 比较，不等待工具自行完成或将取消视为合法源码
+
+#### Scenario: Every selected native differential shares in-flight cancellation
+- **WHEN** 对已支持的Zig/Erlang/Swift/Kotlin/Python/JavaScript/Ruby/Go显式原生差分，在版本探测或源码检查实际启动后取消
+- **THEN** 观察器必须传递同一个请求令牌至runtime，停止当前进程组且不启动后继调用；保持样本、真实失败和unknown比较，不将工具自行退出当作取消完成
+
+#### Scenario: Native differential entry changes during version observation
+- **WHEN** 已接入原生观察器的版本调用改变请求别名或替换冻结入口字节
+- **THEN** 在源码调用前复核请求物理入口与制品摘要并拒绝执行后继调用；源码调用后同样复核，变化不能提供原生确认、关闭任务或比较资格
+
+### Requirement: Python隔离原生探针的入口连续性
+
+Python隔离语法探针 MUST 在版本探测后、语法执行前核验请求入口仍解析为冻结的规范化制品，并核验字节摘要；变化 MUST 返回具体未完成原因，不启动第二次调用。语法执行后 MUST 再次核验相同身份，变化后的结果不得按完整原生观察消费。该约束不授予项目版本、批准策略或任务关闭权威。
+
+#### Scenario: 版本命令替换自身制品
+- **WHEN** Ruff版本探测输出看似有效，但执行中替换了原入口文件
+- **THEN** 探针返回python_syntax_tool_changed及incomplete，不执行替换后的程序，不输出已确认违规或成功
+
+#### Scenario: 版本命令重定向请求别名
+- **WHEN** 版本命令把请求路径的符号链接改指其它入口，即使原规范化制品字节未变
+- **THEN** 探针在语法执行前拒绝继续，并保留原生检查未完成；不得仅执行原规范化路径而忽略请求入口变化
+
+### Requirement: Python候选确认的当前与冻结源码校验
+
+Python候选确认报告 MUST 对全部源码字节核验UTF-8、大小预算、摘要及原始/结构位置，即使观察数组为空也不得绕过解码。当前导入 MUST 读取并绑定当前普通文件。历史复检可对首次冻结字节校验原报告，但 MUST 另外核验首次报告摘要、消费收据及受保护批准来源，不能把内部一致性转换为任务关闭。结构报告 MUST 保留固定规则、grammar和版本约束。
+
+#### Scenario: Empty observations carry an undecodable source
+- **WHEN** Python确认报告的源码摘要匹配但字节不是UTF-8，原始观察数组为空
+- **THEN** 当前导入和冻结源码校验均拒绝证据，不生成清洁或关闭结论
+
+#### Scenario: A repaired source differs from the original candidate
+- **WHEN** 校验首次报告时提供其冻结源码，而当前文件已修复
+- **THEN** 原始证据只能与首次源码绑定，修复后的字节不能替代它；当前导入继续拒绝过时报告
+- **AND** 工作区、grammar、规则摘要、坐标或权限字段伪造仍被拒绝；通过校验不授予可信关闭权限
+
+### Requirement: Python确认任务按首次范围复检
+
+Python候选语法确认任务 MUST 只执行该任务首次报告绑定的单文件原生Ruff检查，不扫描无关兄弟文件。首次报告 MUST 与任务身份、工作区、范围、原字节摘要和已消费收据一致；篡改或缺收据 MUST 在原生进程启动前拒绝。原生检查 MUST 复用项目配置、工具身份、抑制观察及总截止时间，不能把固定开发目标py312当项目目标。局部报告 MUST 以新版本明确任务范围并保留首次报告引用，不作为项目全量检查或可信关闭。当前源码或配置变化 MUST 撤回本轮修复判断，失败尝试须记录。
+
+#### Scenario: Unrelated Python file has a lint violation
+- **WHEN** 单文件确认任务范围之外的兄弟文件存在F401，当前目标已修复
+- **THEN** 只对目标执行原生检查并记录其结果，无关文件不进入本任务报告或生成新任务；任务仍等待可信关闭策略
+
+#### Scenario: Original confirmation receipt is missing or changed
+- **WHEN** Python确认任务的首次报告摘要或消费收据不匹配
+- **THEN** 拒绝复检，不执行原生工具，不以当前文件重建或替换首次证据
+
+### Requirement: Ruff原生语法错误不被抑制审计误判
+
+Ruff正常与忽略noqa的检查若返回相同的invalid-syntax错误，Codeguard MUST 保留为原生语法诊断，不因小写或连字符误判为工具错误。该特殊诊断 MUST 在两轮中按文件、位置、消息、严重性及数量精确一致，不得计为被抑制规则；仅一轮出现、数量变化、非error严重性及其它未知小写规则 MUST 保留未完成。若合法原生位置落在文件末尾空行，稳定发现身份 MUST 可绑定前一条非空源码锚点，不能伪造原生位置或对其它规则扩大空行身份。局部原生成功仍不得代替可信关闭或项目覆盖。
+
+#### Scenario: Matching native syntax errors survive suppression audit
+- **WHEN** 两轮Ruff诊断都定位到相同原生invalid-syntax错误，另有普通F401的源码注释抑制差异
+- **THEN** 保留语法诊断，抑制差异只统计F401；不把invalid-syntax填入可抑制规则列表
+
+#### Scenario: A native EOF syntax diagnostic needs a stable task
+- **WHEN** 原生语法错误定位到有尾换行的末尾空行，前方存在真实源码
+- **THEN** 以此前非空源码核对稳定身份，保留原生行列；加入前置注释不改变该身份，未知位置和普通规则的空行诊断仍不可伪造身份
+
+### Requirement: Python原生确认区分源码与环境修复
+
+单文件Python确认报告0.19 MUST 将完整原生检查中仍存在的invalid-syntax标记为still_present，并向智能体提供绑定文件、原生位置及保持源码语义的修复指引。完整检查无此错误 MUST 仅标记candidate_absent_unverified_policy，普通lint发现不得当作语法确认失败。工具未完成 MUST 保留still_blocked，输入变化 MUST 撤回判断。旧0.18报告与已记录事件 MUST 保留原分类语义，不以新版判定破坏历史读取；新任务预览以0.21引用新报告，均不得自动关闭任务。
+
+#### Scenario: Native syntax remains after tool restoration
+- **WHEN** 本轮绑定文件的Ruff完整结果仍包含invalid-syntax
+- **THEN** 新报告标记still_present，任务提供源码修复指引，不能只要求恢复环境，也不能填入空实现关闭任务
+
+#### Scenario: Historical confirmation retains its recorded semantics
+- **WHEN** 读取0.18首次范围复检及其已记录事件
+- **THEN** 保留原环境恢复分类；0.19新报告使用独立版本表达语法确认结果，不重写历史事件
+
+### Requirement: Python原生确认的显式语言目标
+
+用于后续可信复检的Python隔离语法探针 MUST 接收已经独立核对的明确目标版本，目标集合绑定原生工具支持范围。未知、空白、带控制字符或参数形式的目标 MUST 在工具解析和原生执行前拒绝，不能默认推断项目为py312。开发差分现有固定py312入口 MUST 保留原行为及历史证据。观察 MUST 保留实际传入的目标；目标参数本身不证明项目配置来源、策略批准或任务可关闭。
+
+#### Scenario: Target version changes syntax validity
+- **WHEN** 原生Ruff对同一match源码分别按py39和py310检查
+- **THEN** py39保留原生语法诊断，py310可形成局部完整零诊断；两份观察明确标注不同目标，不据此自动关闭或授予项目门禁
+
+#### Scenario: Invalid target is supplied
+- **WHEN** 请求目标为空、超出工具支持集合或包含命令参数/控制字符
+- **THEN** 返回python_syntax_target_unverified和incomplete，未解析工具、未执行版本命令，也未宣称一个默认项目目标
+
+### Requirement: Python两类首次证据的冻结源码入口
+
+受保护宿主准备Python关闭请求时 MUST 能独立核对专用0.1/0.2与通用0.1/0.7首次报告、已消费收据和提供的冻结源码。通用报告 MUST 复用当前导入的同一封闭形状、grammar/规则身份和原字节位置校验，不读取修复后的文件作为原样本；解码与大小预算不得因非结构观察绕过。接口 MUST 为只读，不执行工具或申请租约，不将一致性返回转换为批准。历史引用或收据变化、错误源码与坐标 MUST 拒绝。
+
+#### Scenario: Repaired source differs from a consumed first report
+- **WHEN** Python任务当前文件已修复，宿主分别提供首次字节和当前字节
+- **THEN** 两类首次来源只接受已绑定的首次字节，当前字节不能覆盖首次证据；语法及结构位置继续核对原字节，任务不关闭
+
+#### Scenario: Unverified local history is not approval
+- **WHEN** 只读入口成功返回首次运行和摘要引用
+- **THEN** 不写历史、不执行原生工具、不生成批准或解决事件；目标版本、签名策略及双输入原生复检仍为独立关闭前置
+
+### Requirement: Python关闭目标来自同轮原生设置
+
+用于关闭前置的Python目标 MUST 从同工具、同源码、同配置的Ruff逐文件原生设置观察取得，不能把formatter/analyze目标、开发默认py312或语言文件后缀当作lint目标。固定Ruff版本的明确linter目标和空逐文件目标集合可提供候选目标；隐式none、缺字段、重复字段、未知格式/版本、未解析逐文件目标 MUST 返回具体未完成原因，普通lint观察可保留。内部目标观察 MUST 不改变旧公开设置schema、不证明批准或关闭；配置或工具变化不得沿用此观察。
+
+#### Scenario: Configured target changes native syntax outcome
+- **WHEN** 同一match文件分别由明确py39与py310配置经过原生逐文件检查
+- **THEN** 设置分别绑定相应目标，语法诊断按原配置保留；不得把formatter目标或固定py312代替原生linter目标
+
+#### Scenario: Native settings do not establish one explicit target
+- **WHEN** linter目标为none、字段缺失或重复、未知版本，或者配置逐文件目标尚未解析
+- **THEN** 关闭前置无目标并反馈具体原因；已有局部lint诊断仍可反馈，但不能从它们推导可信关闭
+
+
+### Requirement: Grammar replay SHALL separate historical evidence from current execution identity
+
+历史语料与报告 MUST 保留原字节、原清单摘要及分母，并用保存的对应清单核对。历史核对 MUST NOT 授予当前worker执行许可。当前回放 MUST 核对当前固定清单；需要复用旧样本时显式生成新绑定语料，保留全部样本源码、标签及来源，并记录新语料摘要，不覆盖旧证据。
+
+#### Scenario: Metadata changes invalidate current corpus identity without rewriting history
+- **WHEN** grammar已知限制元数据改变当前清单摘要
+- **THEN** 原语料只能按原清单验证，不能直接启动当前worker；另行生成的新绑定输入可以回放相同样本并记录真实当前身份，历史报告保持原摘要
+
+### Requirement: Explicit R and C++ source suffixes SHALL reach project checking
+
+发现与候选路由 MUST 一致接纳 R 的 `.R`/`.r` 和 C++ 的 `.C`/`.cp`/`.CPP`/`.c++`/`.cxx`/`.hxx`，保留已有后缀。不得统一转小写导致 `.C` 被当作 C，也不得把共享 `.h` 或 R Markdown 猜作这些 grammar。缺原生工具时仍提供候选观察与未完成反馈，不授予 grammar 质量验收或门禁通过。
+
+#### Scenario: A project uses conventional source suffixes without native tools
+- **WHEN** 工作区存在上述后缀的源码，原生工具不可用
+- **THEN** detect 保留准确文件身份，check all 用对应固定 grammar 产生观察；非法源码的恢复信息仍为候选，整体保持 incomplete
+
+### Requirement: Specific grammar limitations SHALL remain visible in agent feedback
+
+聚合终端反馈 MUST 有界显示固定清单中的具体已知限制，不能仅保留第一条通用未验收说明。宿主摘要 MUST 对本轮实际候选语言提供来自随程序固定清单的有界限制提示，不从用户源码、路径或任意外部报告文本获取提示；保持原生确认行动、源码保留和既有摘要预算。限制不是白名单或版本推断，不改变发现、任务、grammar 资格及门禁。
+
+#### Scenario: Python template strings encounter an older grammar
+- **WHEN** 缺原生工具的本轮候选观察包含 Python，固定清单记载 Python 3.14 模板字符串兼容限制
+- **THEN** 终端及 Claude 摘要均能看到具体版本限制，仍要求适用目标的原生确认且不复制源码或凭候选改写合法代码
+
+### Requirement: Go whole-file package checks SHALL remain independent of parser recovery
+
+Go完整文件候选初检 MUST 根据固定grammar的 `source_file` 根节点直接命名子节点核对 `package_clause`，不得以源码文本搜索代替AST事实。运行时仅返回有界的根节点观察，Go规则由适配层解释。代码片段模式、未知根节点或遍历预算耗尽 MUST 保持未知，不能给出零问题通过。缺声明 MUST 属于有版本、有规则摘要的独立结构候选，不能伪造ERROR/MISSING、修改原始grammar混淆矩阵、确认源码违规或关闭任务。该规则接入统一入口、报告、稳定任务和原生复检之前 MUST 明确为尚未接线，不据底层测试宣称公开漏检已经修复。
+
+#### Scenario: A complete Go file has no package clause
+- **WHEN** 完整文件只有 `x := 1` 或 `func f() {}`，grammar没有恢复且完整根节点观察没有package_clause
+- **THEN** 独立规则返回需原生确认的缺声明候选，保留原始grammar的valid观察；片段模式不套用此规则
+
+#### Scenario: Package text appears only in comments or strings
+- **WHEN** 注释或字符串中存在package字样，但根节点没有package_clause
+- **THEN** 不将这些字样认作声明；合法声明前的注释、build标签、Unicode名称及CRLF不产生缺声明候选
+
+#### Scenario: Root inspection cannot establish absence
+- **WHEN** 直接子节点超过预算、根类型未知，或检查对象是代码片段
+- **THEN** 返回未知，不把未观察到声明当成确定缺失，也不删除该样本
+
+### Requirement: Go package candidates SHALL reach public checks and stable confirmation tasks
+
+Go完整文件缺package结构候选 MUST 进入私有worker的独立版本、公开grammar probe、check go/all和文件保存快速反馈；报告保留原始恢复数组、规则摘要及整文件范围，使用文件起点零宽缺声明锚点，不冒充原生错误列。相同文件重复检查 MUST 复用同一原生确认任务，修复后的零候选 MUST NOT 自动关闭任务。任务与智能体反馈 MUST 要求恢复适用原生工具并确认缺声明，不能凭候选删除代码或安装其它语言工具。新增封闭协议 MUST 保留Python和旧历史报告语义，跨语言规则、未知范围、伪造摘要或坐标 MUST 拒绝。
+
+#### Scenario: A missing Go declaration survives the public edit loop
+- **WHEN** 无原生工具的已初始化Go项目含缺package的函数整文件，执行probe、check go/all与file_changed快速反馈
+- **THEN** 公开观察含独立结构候选及零原始恢复，check与hook复用同一确认任务，反馈要求原生确认；补上package后候选消失但旧任务保持open
+
+#### Scenario: Aggregate feedback selects an existing Go environment task
+- **WHEN** 同一检查产生Go原生环境任务和结构候选，next优先选择go.vet任务
+- **THEN** Go修复预览使用独立封闭版本并明确Go工具argv，不标为仅支持Python的旧预览；聚合协议接纳该版本，不放宽旧报告的checker或argv约束
+
+### Requirement: Go candidate tasks SHALL support bounded native syntax rechecks
+
+Go候选确认任务 MUST 接受显式 `--go-tool`，复用固定SDK与同目录gofmt的整文件只读检查；调用前后及保存前核对源码、主工具和辅助绑定。缺工具、未知版本、逻辑行重映射或身份变化 MUST 记录未完成尝试。首次结构报告已消费后的修复不得被误认为历史报告损坏；历史引用和消费收据仍必须匹配。原生诊断与零诊断分别反馈仍存在和候选消失，局部语法结果不能自动关闭任务或替代项目go vet、类型、依赖与CVE义务。
+
+#### Scenario: A Go package candidate is confirmed and repaired
+- **WHEN** 同一任务在缺package及补声明后以显式固定SDK执行task verify
+- **THEN** 分别记录绑定当前源码的原生诊断和局部零诊断，保留同一任务和首次报告引用，任务不因局部零诊断自动关闭
+
+#### Scenario: Tool arguments or history do not match
+- **WHEN** Go工具用于其它语言任务，或首次报告、消费收据或工具辅助绑定发生变化
+- **THEN** 错语言在启动前拒绝；损坏历史或变化输入不保存为完整观察，不伪造源码违规
+
+### Requirement: Standalone Go lint SHALL prefer native tools and provide missing-tool candidates
+
+`lint go` MUST 从显式路径或调用方绝对PATH目录选择原生Go；显式坏工具、已选工具版本/执行失败不得静默改用WASM掩盖故障。确实缺少原生工具时 MUST 使用内置固定Go grammar进行有界完整文件候选初检，保留原始恢复与独立结构规则，生成可重复同步的确认任务并输出智能体可消费报告。候选或未完成初检要求准备适用原生工具；有界范围完整且无候选只推荐准备，仍非原生lint通过、任务关闭或交付许可。默认不带WASM制品 MUST 明确能力缺失，不能生成假通过。
+
+#### Scenario: Native tool is absent and package declaration is missing
+- **WHEN** 无原生Go工具且完整文件缺package，执行lint go
+- **THEN** 返回结构候选和原生工具必须准备行动；初始化后重复lint与check复用同一确认任务，修复后的零候选不关闭原任务
+
+#### Scenario: Native tool is selected or candidate coverage is incomplete
+- **WHEN** 显式或绝对PATH选择了Go，或候选范围超过预算/读取失败/取消
+- **THEN** 所选工具优先执行且失败保留；未选工具时范围不完整不能报告初检无候选或推荐级工具准备
+
+
+### Requirement: Go limited resolution binds the complete syntax tool pair
+
+Go syntax-confirmation task resolution SHALL use host-verified approval policy 1.6.0 and evidence 0.7.0. Approval SHALL bind the original task/report/source/grammar, host adapter, Go1.23.4 executable, same-SDK gofmt executable SHA-256 and canonical companion-path binding. Old policy versions SHALL reject companion fields. Project-local records SHALL NOT supply approval authority.
+
+#### Scenario: Fixed whole-file source closes only the limited task
+- **WHEN** a trusted host approves the original Go candidate and both fixed tool artifacts, original bytes produce native diagnostics, current bytes produce no native diagnostics, and all inputs remain current
+- **THEN** the same task records code-fixed evidence; repeated verification is idempotent and later native recurrence reopens that task
+- **AND** the project delivery remains not_evaluated
+
+#### Scenario: Companion changes or native counterevidence prevent closure
+- **WHEN** gofmt content/path differs from approval, changes during verification, or the original bytes have no native diagnostics
+- **THEN** approval mismatch is rejected before native execution or current-input/native-incomplete evidence is preserved; zero original diagnostics requires false-positive review rather than code-fixed closure

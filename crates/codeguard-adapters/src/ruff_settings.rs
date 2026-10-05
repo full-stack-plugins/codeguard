@@ -18,6 +18,9 @@ pub struct RuffSettingsObservation {
     /// 只供同轮原生报告交叉核对；不扩大公开规则映射或批准范围。
     #[serde(skip)]
     enabled_native_rules: BTreeSet<String>,
+    /// 固定原生格式提供的明确lint目标；缺失、隐式或逐文件选择不作推断。
+    #[serde(skip)]
+    explicit_python_target: Result<String, &'static str>,
 }
 
 impl RuffSettingsObservation {
@@ -25,6 +28,14 @@ impl RuffSettingsObservation {
     #[must_use]
     pub fn native_rule_enabled(&self, rule_id: &str) -> bool {
         self.enabled_native_rules.contains(rule_id)
+    }
+
+    /// 返回同轮原生设置中的明确Python目标，或无法确定关闭目标的具体原因。
+    /// 该值不证明项目目标来源或批准；调用者必须核对工具、配置与源码连续性。
+    pub fn explicit_python_target(&self) -> Result<&str, &'static str> {
+        self.explicit_python_target
+            .as_deref()
+            .map_err(|reason| *reason)
     }
 }
 
@@ -109,5 +120,48 @@ pub fn parse_ruff_settings(raw: &[u8]) -> Result<RuffSettingsObservation, &'stat
         per_file_ignores_present,
         coverage_proven: false,
         enabled_native_rules: enabled,
+        explicit_python_target: parse_explicit_python_target(text),
     })
+}
+
+fn parse_explicit_python_target(text: &str) -> Result<String, &'static str> {
+    let mut target = None;
+    let mut per_file = None;
+    for line in text.lines() {
+        if let Some(value) = line.strip_prefix("linter.unresolved_target_version = ") {
+            if target.replace(value).is_some() {
+                return Err("ruff_target_settings_duplicate");
+            }
+        }
+        if let Some(value) = line.strip_prefix("linter.per_file_target_version = ") {
+            if per_file.replace(value).is_some() {
+                return Err("ruff_target_settings_duplicate");
+            }
+        }
+    }
+    let (Some(target), Some(per_file)) = (target, per_file) else {
+        return Err("ruff_target_settings_missing");
+    };
+    // 不把formatter/analyze的默认版本或尚未解析的逐文件模式代入lint原样本检查。
+    if per_file != "{}" {
+        return Err(if per_file == "{" {
+            "ruff_per_file_target_unresolved"
+        } else {
+            "ruff_target_settings_unvalidated"
+        });
+    }
+    let normalized = match target {
+        "3.7" => "py37",
+        "3.8" => "py38",
+        "3.9" => "py39",
+        "3.10" => "py310",
+        "3.11" => "py311",
+        "3.12" => "py312",
+        "3.13" => "py313",
+        "3.14" => "py314",
+        "3.15" => "py315",
+        "none" => return Err("ruff_target_not_explicit"),
+        _ => return Err("ruff_target_settings_unvalidated"),
+    };
+    Ok(normalized.into())
 }

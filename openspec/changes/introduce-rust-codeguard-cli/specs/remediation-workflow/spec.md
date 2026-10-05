@@ -4,6 +4,29 @@
 
 ## ADDED Requirements
 
+### Requirement: Bound single-file P3C lint SHALL reuse project remediation identity
+`lint java FILE` 显式选择 P3C 原生入口或提供原生上下文时，在最近已存在的 `.codeguard/` 或显式 `--workspace ROOT` 中 SHALL 复用项目 P3C 观察、稳定 finding 和原工具复检路径，只检查所选文件。SHALL 按最近 POM 的可静态确认规则子集执行；未配置、未知配置及不适用规则不得被默认十个规则集替代。最近损坏的工作台不得跳过、重建或退回未绑定探针。未绑定的既有局部报告保持兼容；源码越界或符号链接 SHALL 在原生启动前拒绝。
+
+#### Scenario: Single-file and project P3C discover the same rule violation
+- **WHEN** 已初始化工作区中的单文件 lint 和 check java 观察同一源码锚点及原生规则
+- **THEN** 更新同一个稳定任务并通过现有 task verify 原生服务复检，不重复执行一次单文件原生探针来同步结果；局部零诊断不证明完整规则覆盖或授权关闭
+
+#### Scenario: Closest module does not configure P3C
+- **WHEN** 父 POM 配置 P3C 而目标文件最近的子 POM 未配置或配置未知
+- **THEN** 返回该子构建根的配置阻塞和可读修复指引，不使用父规则或隔离默认规则伪造源码违规
+
+#### Scenario: Single-file P3C persistence fails
+- **WHEN** 原生诊断有效但工作台报告无法保存或同步失败
+- **THEN** 诊断仍反馈到 human/JSON，给出实际存储或同步失败原因；下一步和任务引用不得伪造，不能声称自动修复流程已经接通
+
+#### Scenario: P3C emits valid findings before execution fails
+- **WHEN** 原生工具异常退出但新鲜报告、所选规则、文件范围和当前源码身份已经核对，有可定位的诊断
+- **THEN** 单文件与项目入口 SHALL 同时同步同一稳定源码问题和执行阻塞；原生复检再次观察该问题时为 still_present，但完整观察计数不增加、阻塞不恢复、任务不关闭。重复扫描不得生成重复任务
+
+#### Scenario: Failed P3C execution cannot prove absence
+- **WHEN** 异常退出后的报告为空、无效、越界，或源码、工具、配置身份变化
+- **THEN** 空或不合格诊断 SHALL NOT 成为问题消失、环境恢复或修复完成；无效报告不得投影为当前源码问题，本次检查继续未完成并保留阻塞
+
 ### Requirement: npm remediation tasks SHALL recheck through their original native audit service
 npm持久任务 SHALL 支持 task verify，结构化任务根决定原生cwd，显式原工具上下文、共享预算与任务租约保护复检和持久化。结果 SHALL 反馈原生诊断及下一步，不从零漏洞推导完整覆盖或关闭。
 
@@ -110,6 +133,42 @@ RunReport 与准备诊断 PrerequisiteReport MUST 使用 workspace_id + run_id �
 
 正式 resolved MUST 由真实复检或有批准依据的 target_removed/policy_resolved 事件产生，并绑定问题、内容、规则/工具、策略和覆盖身份。代码修复、依赖修复、环境恢复、政策处置 MUST 分开归因。手工勾选、编辑状态、删除记录、增加忽略或未完成报告中不再出现 MUST NOT 关闭问题或改变 gate。例外 MUST 保留未解决事实。
 
+#### Scenario: A protected host verifies a resolution policy and runs the original checker
+- **WHEN** 受保护宿主独立固定信任根与策略上下文，验证限定任务的策略签名，并以固定原生工具复检当前范围
+- **THEN** 关闭处理器 MUST 核对原问题/范围、当前源码、原规则执行覆盖、工具/适配器/规则包与批准策略身份；匹配且问题消失时才追加限定任务的解决事件，不授予全项目 allow
+- **AND** 项目文件、CLI 参数自选的公钥、候选策略或未经复核的历史事件 MUST NOT 作为可信关闭输入；同字节原生反证进入误报调查，不记为代码修复
+
+#### Scenario: Protected Erlang native syntax resolution uses the same lifecycle service
+- **WHEN** 受保护宿主验签 OTP 28 的限定语法任务策略，并以同一固定工具重放首次原样本和当前源码
+- **THEN** 仅原样本确有语法诊断、当前源码已变化且完整 forms 检查无诊断时 SHALL 记录 code_fixed；重复复检幂等，普通原工具复检检出复发时重开同一父链任务。宏/include、无 form、截断、超时、错误工具或身份变化 MUST NOT 关闭；原样本原生合法进入误报调查
+- **AND** 旧 Zig 策略及证据协议保持兼容，Erlang 使用独立版本且禁止跨语言消费；此收据只证明限定语法任务，不批准全语言 lint 或项目交付
+
+#### Scenario: Native-first Erlang task resolution has no grammar identity
+- **WHEN** 首次任务来自已同步的 OTP 28 原生诊断而非 WASM，受保护宿主批准同一原工具、规则、源码与首次报告身份
+- **THEN** 策略和脱敏证据 SHALL 保留 grammar_sha256=null，以原生规则的批准策略摘要绑定规则身份；原样本诊断、当前源码变化和完整零诊断可关闭，普通同工具复检检出复发可重开。不存在的 grammar、缺字段或替换首次工具 MUST 在原生执行前拒绝
+
+#### Scenario: Protected Swift native syntax resolution reuses the lifecycle service
+- **WHEN** 受保护宿主验签 Apple Swift 6.4 的限定 parse 任务策略，并用首次固定工具对照原反例与当前源码
+- **THEN** 原反例有合法字节位置的 parse 诊断、当前源码变化且原工具完整零诊断时 SHALL 追加 code_fixed；重复复检幂等，普通原工具复检再次检出时重开同一任务父链。未完成、错误版本、工具/输入变化不关闭，原反例原生合法转误报调查
+- **AND** 原生首次任务的 grammar_sha256 SHALL 保持 null；Swift 使用独立策略和证据版本，不能消费 Zig/Erlang 身份；此入口不证明 SwiftLint、类型检查、项目构建或项目交付
+
+#### Scenario: Protected Kotlin native syntax resolution preserves project context blockers
+- **WHEN** 受保护宿主验签 kotlinc-jvm 2.4.10 的限定语法任务策略并对照原反例与当前源码
+- **THEN** 原反例有已核对 UTF-16/UTF-8 坐标的语法诊断，当前源码变化且同工具完整零诊断时 SHALL 记录 code_fixed；单独或混合项目上下文诊断、未知输出、超时、工具/输入变化 MUST NOT 证明修复
+- **AND** 当前原工具再次检出同一语法问题时 SHALL 保留发现并重开原父链，即使另有项目上下文未完成；只有上下文诊断时不得伪造语法复发。Kotlin 使用独立策略/证据版本，原生首次 grammar=null，不批准全项目 lint、类型或交付
+
+#### Scenario: Rehashed lifecycle evidence cannot change the original language
+- **WHEN** 本地关闭证据和父链记录被重算摘要，但证据协议、语言或 grammar 与已同步的首次任务事实不同
+- **THEN** 历史读取 SHALL 在原生执行前拒绝身份矛盾，并由 next 提供核对决策，不将本地文件当作可信关闭
+
+#### Scenario: Counterexample guidance preserves the first observation source
+- **WHEN** 本地读者投影原反例原生合法的误报调查历史
+- **THEN** 原生首次任务 SHALL 指向首次原生诊断、输入/工具/环境差异与限定纠错请求，不归咎于不存在的 grammar；WASM 首次任务 SHALL 指向首次语法资产与原生对照差异，不将疑似原因直接写为已确认 grammar 缺陷。next/task show 与可读简报保持同一来源，查询不运行检查器、不改预算/租约/事件、不得自动白名单或关闭
+
+#### Scenario: Resolution history is merged out of order or forks
+- **WHEN** 事件文件顺序改变、父节点缺失、出现循环或分叉关闭事件
+- **THEN** 单一有效链 MUST 按父关系重放；缺失、循环、冲突或重复身份 MUST 返回 reconciliation_required，不能选择时间最新的关闭事件；有效复发事件重开并保留关闭历史
+
 #### Scenario: Agent checks a task as done without verification
 - **WHEN** 任务 Markdown 被标为完成但无有效复检
 - **THEN** 正式状态仍待验证，交付判定不变
@@ -143,6 +202,14 @@ MUST 提供 attempt 开始/结束协议，受控 fix apply 自动登记，自由
 #### Scenario: The same failed patch is attempted repeatedly
 - **WHEN** 同一问题和补丁连续无进展达到预算
 - **THEN** 停止相同自动尝试，保留阻断并给出下一步诊断，不推荐跳过规则
+
+#### Scenario: One source finding is waiting or exhausted while another source can progress
+- **WHEN** next原优先任务是等待已有执行者或预算耗尽的源码finding，另有不同物理源码范围的actionable或verification_required finding，且没有未解决前置blocker
+- **THEN** 推荐可继续的独立源码任务，保留原任务及其预算/租约/待决策状态，next_actions提供原任务的只读task show引用，不降低任何门禁
+
+#### Scenario: A waiting source task overlaps the available repair target
+- **WHEN** 待执行源码任务与开放attempt的物理源码范围相同、互相包含或存在文件别名，或无法确认范围独立
+- **THEN** 不绕过等待任务推荐重叠修改；前置blocker及坏事实仍按原规则明示，不因选择另一任务消失
 
 #### Scenario: Tool output contains an instruction
 - **WHEN** 诊断文本要求执行 Shell 或关闭规则
@@ -425,3 +492,71 @@ ESLint 原生发现投影 MUST 使用工作区相对路径、原生规则、源�
 #### Scenario: Profile refresh cannot erase recorded npm remediation scope
 - **WHEN** 当前画像刷新后不再包含清单不可用的npm根，但本工作区仍有同一稳定完整性问题的本地事实记录
 - **THEN** 默认check all MUST 保留该物理构建根的准备范围；严格核验工作区、检查器、稳定身份、范围和事实结构，不能由可编辑任务附件的勾选或删除消除检查。事实只提供本地未验证范围线索，不授权原生执行、批准、关闭或覆盖；当前清单恢复后重新发现。损坏或跨工作区记录 MUST 明示范围恢复未完成，不扩展到越界路径或吞掉当前发现的其它根
+
+### Requirement: Missing task projections SHALL be recovered without changing facts
+`work sync` SHALL 在现有工作区锁内检查已持久结构化事实，为缺失的 Markdown 投影生成当前只读 RepairBrief 投影。SHALL 核验工作区、事实身份、证据及历史，不从删除或手工勾选推断关闭。现有普通任务文件 MUST 保持原字节，包括用户备注；符号链接、目录冲突、坏事实或未核验来源 MUST 明示失败，不覆盖其它路径。恢复不执行原生工具、不生成新问题或 observed/verification 事件、不改消费游标、租约、尝试预算或 gate。
+
+#### Scenario: Consumed finding survives deleted task markdown
+- **WHEN** 报告已消费、结构化事实与历史有效，用户删除 Markdown 后再次 work sync
+- **THEN** 恢复同一任务 ID 的七项可读指引，报告恢复数量；事实、历史事件及消费标记保持原字节，next 仍要求原工具复检，不签发关闭
+
+#### Scenario: Existing notes and conflicting projections
+- **WHEN** 投影包含用户备注或勾选，或缺失投影路径被符号链接/目录占用
+- **THEN** 普通文件原字节不变；路径冲突明确未完成，不跟随链接，不把文件存在视作修复证据
+
+#### Scenario: Invalid fact cannot generate repair instructions
+- **WHEN** 待恢复任务事实属于另一工作区、伪造稳定身份或证据不合法
+- **THEN** 在写入投影前拒绝恢复并保留事实，不能生成错误源码修改范围或调用原生工具
+
+
+#### Scenario: Trusted native-first Zig resolution preserves provenance and recurrence
+- **WHEN** an initialized Zig native-first task is rechecked with its original fixed tool under an independently signed, task-bound policy
+- **THEN** grammar identity remains null; only a diagnosed original sample, changed current source and complete clean same-tool recheck may close that scoped task; native failure or changed identity cannot close it; an ordinary same-tool positive recheck reopens the same parent chain without project delivery permission
+
+### Requirement: 限定解决事件的双表示绑定
+
+共享解决提交层 MUST 拒绝未支持的证据版本、缺字段和额外字段，并在读取或写入生命周期之前核对领域ResolutionEvidence与脱敏原生证据的任务身份、原/当前源码、工具、适配器、批准策略和原生对照摘要一致。调用者仍负责可信验签与原生执行；共享提交层不得从本地文件推断批准。两个表示不一致 MUST 拒绝，不以域对象policy_verified字段单独签发解决。提取提交层 MUST 保留旧语言版本、幂等摘要、父链重放、冲突核对和重开语义，不批准项目门禁。
+
+#### Scenario: Domain evidence differs from redacted native evidence
+- **WHEN** SDK调用者提供的脱敏证据中任务/源码/工具/策略或原生对照摘要与领域证据不一致
+- **THEN** 在生命周期读取和证据写入前返回task_resolution_evidence_binding_invalid，不追加解决或重开记录
+
+#### Scenario: Existing native resolution uses the shared commit layer
+- **WHEN** Zig/Erlang/Swift/Kotlin入口提供已验签且当前输入稳定的同一份复检证据
+- **THEN** 收据版本、证据字段及父链语义保持；相同证据重检幂等、不同关闭需协调、仍存在时可重开，不扩大批准范围
+
+### Requirement: Python受保护原生语法解决
+
+Python专用SDK入口 MUST 验证宿主独立选择的信任根、时间、基线、防回滚与签名策略1.5；策略绑定python.ruff单文件任务、两类已消费首次报告、冻结原字节、固定grammar、Ruff版本/制品、适配器、明确lint目标和配置身份。未知/缺失/错误范围/工具/配置/策略 MUST 在原生执行前拒绝。原样本 MUST 经stdin使用相同配置和明确目标作原生语法对照，不写回项目。当前源码 MUST 按同轮原生项目设置、正常/忽略noqa对照检查。只有原样本确有语法错误、当前源码已变化且原规则完整零诊断、输入稳定时 MAY 以新证据0.6记录限定code_fixed；原样本原生合法 MUST 为误报调查，未完成/配置或输入变化不得关闭。普通复检检出同工具、目标与配置的复发 MUST 重开同一父链任务。该SDK不作为CLI自选公钥批准入口，不授予项目门禁或语言资格。
+
+#### Scenario: Both Python candidate origins resolve and recur
+- **WHEN** 宿主批准专用或通用首次Python语法确认任务并使用固定Ruff复检原字节与当前源码
+- **THEN** 原生仍有语法错误时保持开放，修复后可限定解决，相同证据重检幂等，复发时保留原解决事件并重开；工具/配置/目标/首次引用变化不得复用旧批准
+
+#### Scenario: Native counterexample refutes the original candidate
+- **WHEN** 原样本在批准配置和目标下原生合法
+- **THEN** 保留false_positive_review_required，不记为代码修复、不关闭、不自行加入白名单
+
+
+#### Scenario: Python原生反证后的下一步保留合法源码
+- **WHEN** 两类Python候选首次报告的原字节在已绑定项目目标和配置下被原生工具完整接受，SDK记录false_positive_review_required
+- **THEN** next读取同一任务生命周期并提供WASM语言版本与原生差异调查，不继续普通候选源码修复、不自行白名单或批准关闭
+
+#### Scenario: 当前Python输入失效优先于历史误报指引
+- **WHEN** 已记录原生反证后源码或项目配置发生变化
+- **THEN** next保留source_input_changed_or_unavailable或configuration_input_changed_or_unavailable与原生复检指引，不以旧反证声称新输入合法
+
+
+### Requirement: Syntax confirmation action transitions SHALL preserve no-progress accounting
+
+Python确认任务的当前原生结果为still_present且输入未失效时 MUST 使用repair-source；不完整、缺工具或失效观察 MUST NOT 据旧位置授权源码修复。同一语法确认任务、同一前置输入的restore-checker-environment和repair-source MUST 共享无进展预算，保留旧事件原动作和指纹；其他任务的动作统计规则不得扩大。
+
+#### Scenario: Legacy restoration attempts remain counted after native confirmation
+- **GIVEN** 同一确认任务和输入已有两次无进展环境恢复尝试
+- **WHEN** 原生确认仍有语法错误并转为repair-source
+- **THEN** 历史无进展次数仍为二，下一次尝试因预算耗尽拒绝，旧事件不重写
+
+#### Scenario: Stale Python native diagnostics cannot request source edits
+- **GIVEN** Python语法确认曾有原生诊断
+- **WHEN** 当前源码或配置绑定已失效
+- **THEN** 撤销旧源码修复动作，要求重新核验，不能用旧位置指导修改

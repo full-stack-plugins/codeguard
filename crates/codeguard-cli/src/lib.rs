@@ -1,12 +1,28 @@
 //! CLI 共享的 Rust 开发期验收与命令应用服务入口。
 
 pub mod agents_block;
+mod command_catalogue;
+mod command_descriptor;
+mod command_examples;
+pub mod help_command;
 pub mod approval_snapshot;
 mod bound_false_positive_disposition;
+#[cfg(unix)]
+mod cargo_tool_selection;
+#[cfg(unix)]
+mod check_erlang_scan;
 #[cfg(unix)]
 pub mod doctor_command;
 #[cfg(unix)]
 mod doctor_scratch;
+#[cfg(unix)]
+mod erlang_lint_arguments;
+#[cfg(unix)]
+pub mod erlang_lint_command;
+#[cfg(unix)]
+mod erlang_syntax_probe;
+#[cfg(unix)]
+mod erlang_tool_selection;
 #[cfg(unix)]
 mod eslint_config_map;
 #[cfg(unix)]
@@ -18,7 +34,7 @@ mod eslint_effective_settings;
 mod eslint_lint_arguments;
 #[cfg(unix)]
 pub mod eslint_lint_command;
-#[cfg(all(feature = "wasm-precheck", unix))]
+#[cfg(unix)]
 mod eslint_native_first_candidate;
 mod eslint_preparation;
 pub mod eslint_probe;
@@ -47,6 +63,8 @@ mod npm_workbench;
 mod npm_workspace_scope;
 mod python_dependency_discovery;
 mod signed_disposition_binding;
+#[cfg(unix)]
+mod swift_syntax_probe;
 pub mod tools_command;
 pub use bound_false_positive_disposition::BoundFalsePositiveDisposition;
 pub use signed_disposition_binding::bind_signed_false_positive_preview;
@@ -78,8 +96,11 @@ pub mod cargo_build_repair_brief;
 pub mod check_budget;
 #[cfg(unix)]
 pub mod check_command;
+#[cfg(unix)]
+mod check_eslint_scan;
 pub mod check_plan;
 pub mod check_request;
+mod check_selection;
 #[cfg(all(unix, feature = "wasm-precheck"))]
 mod check_syntax_candidates;
 mod checkstyle_preparation;
@@ -92,6 +113,7 @@ mod checkstyle_workbench;
 #[cfg(unix)]
 pub mod claude_hook_command;
 pub mod config_command;
+mod config_project_observation;
 pub mod conversation_feedback;
 pub mod corpus;
 pub mod discovery;
@@ -102,13 +124,17 @@ pub mod git_index_safety;
 pub mod git_index_safety_command;
 #[cfg(unix)]
 pub mod go_lint_command;
+pub mod grammar_evaluation;
+mod grammar_evaluation_case;
+mod grammar_evaluation_corpus;
 #[cfg(feature = "wasm-precheck")]
 pub mod grammar_probe_command;
-#[cfg(feature = "wasm-precheck")]
 pub mod grammar_route;
 pub mod grammar_status_command;
 #[cfg(unix)]
 pub mod hook_execute_command;
+#[cfg(unix)]
+mod hook_fast_scan;
 pub mod hook_plan_command;
 pub mod init_command;
 mod java_checker_config_status;
@@ -126,6 +152,7 @@ pub mod java_lint_dispatch;
 #[cfg(unix)]
 pub mod java_p3c_command;
 mod java_p3c_scan;
+mod java_p3c_workbench;
 #[cfg(feature = "wasm-precheck")]
 mod java_syntax_precheck;
 pub mod legacy_v1_protocol;
@@ -155,7 +182,22 @@ pub mod python_lint_command;
 #[cfg(unix)]
 pub mod python_lint_scan;
 #[cfg(unix)]
+mod python_selected_discovery;
+#[cfg(unix)]
 mod python_syntax_confirmation;
+mod python_confirmation_recheck;
+#[cfg(unix)]
+mod python_task_resolution_request;
+#[cfg(unix)]
+mod python_task_resolution_policy_input;
+#[cfg(unix)]
+mod python_task_resolution_service;
+#[cfg(unix)]
+pub use python_task_resolution_request::PythonTaskResolutionRequest;
+#[cfg(unix)]
+pub use python_task_resolution_service::verify_python_task_resolution;
+#[cfg(unix)]
+pub use python_confirmation_recheck::validate_python_task_original_source;
 #[cfg(all(unix, feature = "wasm-precheck"))]
 mod python_syntax_precheck;
 pub mod quality_policy_candidate;
@@ -163,6 +205,8 @@ pub mod quality_policy_candidate;
 mod report_export;
 #[cfg(unix)]
 pub mod ruff_probe;
+#[cfg(unix)]
+mod ruff_tool_selection;
 mod ruff_verification_configuration;
 pub mod rules_list_command;
 pub mod run_report;
@@ -173,7 +217,11 @@ pub(crate) mod rust_build_task_recheck;
 pub mod rust_comments_command;
 pub(crate) mod rust_cve_task_recheck;
 #[cfg(unix)]
+mod rust_lint_inputs;
+#[cfg(unix)]
 pub mod rust_lint_scan;
+#[cfg(unix)]
+mod rust_native_syntax_coverage;
 pub mod rustdoc_repair_brief;
 #[cfg(unix)]
 pub(crate) mod rustdoc_task_recheck;
@@ -204,7 +252,7 @@ mod whitelist_correction_projection;
 pub mod work_sync;
 pub mod workspace_refresh;
 pub mod workspace_view_command;
-#[cfg(all(feature = "wasm-precheck", unix))]
+#[cfg(unix)]
 pub mod zig_lint_command;
 
 mod cargo_module_graph;
@@ -249,3 +297,127 @@ mod signed_distribution_download_request;
 mod npm_task_recheck;
 
 mod npm_check_scan;
+
+mod native_syntax_confirmation;
+#[cfg(unix)]
+mod syntax_confirmation;
+
+#[cfg(unix)]
+mod syntax_task_recheck;
+#[cfg(unix)]
+mod zig_syntax_probe;
+#[cfg(unix)]
+mod zig_tool_selection;
+
+#[cfg(unix)]
+mod plain_syntax_source;
+
+#[cfg(unix)]
+mod erlang_task_resolution_request;
+#[cfg(unix)]
+mod go_task_resolution_request;
+#[cfg(unix)]
+mod kotlin_task_resolution_request;
+#[cfg(unix)]
+mod swift_task_resolution_request;
+#[cfg(unix)]
+mod syntax_task_resolution_request;
+#[cfg(unix)]
+mod task_lifecycle_store;
+#[cfg(unix)]
+mod task_resolution_checker;
+#[cfg(unix)]
+mod task_resolution_policy_input;
+#[cfg(unix)]
+mod task_resolution_service;
+#[cfg(unix)]
+mod zig_task_resolution_request;
+#[cfg(unix)]
+pub use erlang_task_resolution_request::ErlangTaskResolutionRequest;
+#[cfg(unix)]
+pub use go_task_resolution_request::GoTaskResolutionRequest;
+#[cfg(unix)]
+pub use kotlin_task_resolution_request::KotlinTaskResolutionRequest;
+#[cfg(unix)]
+pub use swift_task_resolution_request::SwiftTaskResolutionRequest;
+#[cfg(unix)]
+pub use task_resolution_service::{
+    verify_erlang_task_resolution, verify_go_task_resolution, verify_kotlin_task_resolution,
+    verify_swift_task_resolution, verify_zig_task_resolution,
+};
+#[cfg(unix)]
+pub use zig_task_resolution_request::ZigTaskResolutionRequest;
+
+#[cfg(unix)]
+mod task_resolution_evidence_shape;
+
+#[cfg(unix)]
+pub mod kotlin_lint_command;
+
+#[cfg(unix)]
+mod kotlin_tool_selection;
+
+#[cfg(unix)]
+mod check_kotlin_scan;
+
+#[cfg(unix)]
+pub mod swift_lint_command;
+#[cfg(unix)]
+mod swift_tool_selection;
+
+#[cfg(unix)]
+mod check_swift_scan;
+
+#[cfg(unix)]
+mod check_zig_scan;
+
+#[cfg(unix)]
+mod hook_native_tools;
+
+#[cfg(all(feature = "wasm-precheck", unix))]
+pub mod grammar_native_differential;
+
+pub mod syntax_worker_structure;
+
+#[cfg(all(feature = "wasm-precheck", unix))]
+mod grammar_native_checker;
+#[cfg(all(feature = "wasm-precheck", unix))]
+mod javascript_syntax_probe;
+#[cfg(unix)]
+mod ruby_syntax_probe;
+#[cfg(unix)]
+mod ruby_project_version;
+#[cfg(unix)]
+pub mod ruby_lint_command;
+#[cfg(unix)]
+mod ruby_tool_selection;
+#[cfg(unix)]
+mod ruby_lint_workbench;
+#[cfg(unix)]
+mod check_ruby_scan;
+#[cfg(unix)]
+mod go_syntax_probe;
+#[cfg(unix)]
+mod go_tool_selection;
+#[cfg(unix)]
+mod go_lint_fallback;
+#[cfg(unix)]
+mod python_syntax_probe;
+
+#[cfg(unix)]
+mod rust_lint_arguments;
+#[cfg(unix)]
+pub mod rust_lint_command;
+#[cfg(unix)]
+mod rust_lint_fallback;
+#[cfg(unix)]
+mod rust_lint_workbench;
+
+#[cfg(unix)]
+pub mod shell_lint_command;
+#[cfg(unix)]
+mod shell_lint_arguments;
+#[cfg(unix)]
+mod shellcheck_config;
+#[cfg(unix)]
+mod shellcheck_probe;

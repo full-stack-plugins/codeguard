@@ -52,6 +52,7 @@ fn absent_explicit_zig_tool_uses_unqualified_wasm_without_claiming_clean() {
         .args(["lint", "zig"])
         .arg(&source)
         .arg("--format=json")
+        .env("PATH", "")
         .output()
         .unwrap();
     assert_eq!(output.status.code(), Some(3));

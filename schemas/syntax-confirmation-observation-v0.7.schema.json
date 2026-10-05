@@ -1,0 +1,302 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:syntax-confirmation-observation:0.7.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "workspace_binding",
+    "authority",
+    "coverage_proven",
+    "delivery_decision",
+    "execution",
+    "build_root",
+    "workspace_id",
+    "run_id",
+    "checker_id",
+    "reason_code",
+    "blocker_id",
+    "fingerprint",
+    "scope",
+    "language",
+    "affected_paths",
+    "observations"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.7.0"
+    },
+    "report_type": {
+      "const": "syntax_confirmation_observation"
+    },
+    "workspace_binding": {
+      "const": "bound"
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "execution": {
+      "const": "incomplete"
+    },
+    "build_root": {
+      "const": "."
+    },
+    "workspace_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^syntax-confirm-[0-9]+-[0-9]+$"
+    },
+    "checker_id": {
+      "const": "python.ruff"
+    },
+    "reason_code": {
+      "const": "python_syntax_confirmation_needed"
+    },
+    "blocker_id": {
+      "type": "string",
+      "pattern": "^CG-B-[0-9a-f]{32}$"
+    },
+    "fingerprint": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1
+    },
+    "language": {
+      "const": "python"
+    },
+    "affected_paths": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "observations": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "language",
+          "scope",
+          "byte_offset",
+          "status",
+          "reason",
+          "grammar_qualified",
+          "source_sha256",
+          "grammar_sha256",
+          "recovery_count",
+          "recoveries",
+          "known_limitations",
+          "structural_observation_count",
+          "structural_observations"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "language": {
+            "const": "python"
+          },
+          "scope": {
+            "const": "whole_file"
+          },
+          "byte_offset": {
+            "const": 0
+          },
+          "status": {
+            "const": "candidate_observed"
+          },
+          "reason": {
+            "enum": [
+              null,
+              "syntax_recovery_incomplete"
+            ]
+          },
+          "grammar_qualified": {
+            "const": false
+          },
+          "source_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "grammar_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "recovery_count": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 128
+          },
+          "known_limitations": {
+            "type": "array",
+            "maxItems": 8,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            }
+          },
+          "recoveries": {
+            "type": "array",
+            "maxItems": 8,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "syntax_kind",
+                "start_byte",
+                "end_byte",
+                "start_row",
+                "start_column_byte",
+                "end_row",
+                "end_column_byte"
+              ],
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "ERROR",
+                    "MISSING"
+                  ]
+                },
+                "syntax_kind": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "start_byte": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "end_byte": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "start_row": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "start_column_byte": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "end_row": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "end_column_byte": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "minItems": 0
+          },
+          "structural_observation_count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 128
+          },
+          "structural_observations": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "basis",
+                "rule_id",
+                "rule_version",
+                "rule_sha256",
+                "parent_syntax_kind",
+                "start_byte",
+                "end_byte",
+                "start_row",
+                "start_column_byte",
+                "end_row",
+                "end_column_byte"
+              ],
+              "properties": {
+                "basis": {
+                  "const": "codeguard_structure_rule"
+                },
+                "rule_id": {
+                  "const": "codeguard.python.required_suite"
+                },
+                "rule_version": {
+                  "const": "1.0.0"
+                },
+                "rule_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "parent_syntax_kind": {
+                  "enum": [
+                    "function_definition",
+                    "class_definition",
+                    "if_statement",
+                    "elif_clause",
+                    "else_clause",
+                    "for_statement",
+                    "while_statement",
+                    "try_statement",
+                    "except_clause",
+                    "finally_clause",
+                    "with_statement",
+                    "match_statement",
+                    "case_clause"
+                  ]
+                },
+                "start_byte": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "end_byte": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "start_row": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "start_column_byte": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "end_row": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "end_column_byte": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

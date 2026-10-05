@@ -1,0 +1,627 @@
+{
+  "evidence_type": "actual_native_task_projection_recovery",
+  "base_commit": "0a3e6a3e3c90f213e84ad43f4189d20cf94cb1bc",
+  "uncommitted_projection_recovery": true,
+  "program_sha256": "b4fc2dae3d8587fbaf5d683c6170479d41e8ad834fc32f39b177d4bb38149391",
+  "task_id": "CG-B-9ce758167e1f1dd521c21c6020a030d6",
+  "reports": {
+    "init": {
+      "exit": 3,
+      "stdout_sha256": "07cee48c3f2c9365fe12723d323e6a991411e90148bc00e448933ae652859038",
+      "report": {
+        "changed_directories": [
+          ".codeguard",
+          ".codeguard/findings",
+          ".codeguard/tasks",
+          ".codeguard/decisions",
+          ".codeguard/reports",
+          ".codeguard/runs",
+          ".codeguard/cache",
+          ".codeguard/worktrees",
+          ".codeguard/state"
+        ],
+        "changed_files": [
+          ".codeguard/.gitignore",
+          ".codeguard/README.md",
+          ".codeguard/project.json",
+          ".codeguard/module-graph.json",
+          ".codeguard/architecture.md",
+          "AGENTS.md",
+          ".codeguard/workspace.json"
+        ],
+        "conflict_file": null,
+        "delivery_decision": "not_evaluated",
+        "init_status": "partial",
+        "mode": "apply",
+        "next_actions": [
+          "review_project_profile",
+          "complete_init_readiness",
+          "run_doctor_and_check_when_available"
+        ],
+        "observation_complete": true,
+        "operation": "init",
+        "planned_files": [
+          ".codeguard/.gitignore",
+          ".codeguard/README.md",
+          ".codeguard/project.json",
+          ".codeguard/module-graph.json",
+          ".codeguard/architecture.md",
+          ".codeguard/workspace.json",
+          "AGENTS.md"
+        ],
+        "profile_stale": null,
+        "profile_summary": {
+          "architecture": "unknown",
+          "build_model": "not_resolved",
+          "build_roots": [],
+          "checker_inventory": "partial",
+          "checkers": [],
+          "installed_versions": "not_probed",
+          "language_targets": [],
+          "languages": [
+            {
+              "id": "swift",
+              "manifest_count": 0,
+              "source_file_count": 1
+            }
+          ],
+          "unknown_conditions": [
+            "source_sets_not_fully_classified",
+            "dialects_not_classified"
+          ]
+        },
+        "readiness": "unknown",
+        "report_type": "init_plan",
+        "schema_version": "0.5.0",
+        "unresolved": [
+          "profile_refresh_partial",
+          "approved_quality_policy_not_bound",
+          "tool_readiness_not_probed"
+        ],
+        "workspace_id": "ws-f734e620fead976b3bb5826be2fb3341"
+      }
+    },
+    "first": {
+      "exit": 3,
+      "stdout_sha256": "c10550f9b5234894156699a11bf7fbfb24eec99dc9e7537357c9d4582859063f",
+      "report": {
+        "authority": "local_unverified",
+        "category_candidates": [
+          {
+            "capability_status": "gap",
+            "category": "lint",
+            "checker_id": "swift.frontend.parse",
+            "language": "swift",
+            "legacy_status": "stable",
+            "next_action": "读取 native_results.swift_lint 的当前语法位置、环境阻塞；核对逐文件任务同步结果，单文件 parse不代替项目 lint 与完整构建",
+            "reason": "swift_single_file_project_checks_unverified",
+            "status": "native_incomplete"
+          },
+          {
+            "capability_status": "gap",
+            "category": "comments",
+            "checker_id": null,
+            "language": "swift",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "dependencies",
+            "checker_id": null,
+            "language": "swift",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "cve",
+            "checker_id": null,
+            "language": "swift",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "security",
+            "checker_id": null,
+            "language": "swift",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          },
+          {
+            "capability_status": "gap",
+            "category": "build",
+            "checker_id": null,
+            "language": "swift",
+            "legacy_status": "stable",
+            "next_action": null,
+            "reason": "native_adapter_not_integrated",
+            "status": "not_integrated"
+          }
+        ],
+        "command_status": "incomplete",
+        "delivery_decision": "incomplete",
+        "discovery": {
+          "blocked_paths": [],
+          "build_roots": [],
+          "checker_configurations": [],
+          "declared_versions": {},
+          "languages": [
+            {
+              "id": "swift",
+              "manifests": [],
+              "source_files": [
+                "App.swift"
+              ]
+            }
+          ],
+          "lockfiles": [],
+          "manifest_sha256": {},
+          "native_tool_candidates": [],
+          "observation_complete": true,
+          "observed_entries": 2,
+          "report_type": "discovery",
+          "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-projection-actual-e_uwoxh8",
+          "schema_version": "0.4.0",
+          "scope_summary": {
+            "configuration_exception_files_observed": 0,
+            "dependency_roots_excluded": 0,
+            "dot_prefix_roots_excluded": 1,
+            "git_safety_status": "not_evaluated",
+            "ordinary_scan_policy": "project_sources_default_v2"
+          },
+          "source_set_candidates": [],
+          "unknown_conditions": [
+            "source_sets_not_fully_classified",
+            "dialects_not_classified"
+          ]
+        },
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "jobs_limit": 4,
+          "jobs_source": "builtin_default",
+          "native_task_count": 1,
+          "source": "cli",
+          "started_native_task_count": 1,
+          "timeout_ms": 30000
+        },
+        "execution_tasks": [
+          {
+            "id": "swift.lint",
+            "status": "native_observed_unverified"
+          }
+        ],
+        "exit_code": 3,
+        "export": {
+          "reason_code": null,
+          "status": "not_requested"
+        },
+        "native_results": {
+          "erlang_lint": null,
+          "go_lint": null,
+          "java_cve": null,
+          "java_dependencies": null,
+          "java_javadoc": null,
+          "java_p3c": null,
+          "kotlin_lint": null,
+          "node_lint": null,
+          "npm_cve": [],
+          "python_cve": [],
+          "python_lint": null,
+          "rust_build": null,
+          "rust_comments": null,
+          "rust_cve": null,
+          "rust_lint": null,
+          "swift_lint": {
+            "authority": "local_unverified",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "files": [
+              {
+                "current": true,
+                "native": {
+                  "diagnostics": [
+                    {
+                      "column": 13,
+                      "line": 1,
+                      "rule_id": "swift.parse.error"
+                    }
+                  ],
+                  "reason": "swift_native_parse_diagnostics",
+                  "status": "diagnostics_observed",
+                  "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+                  "version": "Apple Swift 6.4"
+                },
+                "next_action": "按当前原生 UTF-8 字节列修复语法；项目语义另行核对依赖，继续完整项目检查",
+                "path": "App.swift",
+                "recheck_argv": [
+                  "codeguard",
+                  "lint",
+                  "swift",
+                  "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-projection-actual-e_uwoxh8/App.swift",
+                  "--swift-tool",
+                  "/usr/bin/swiftc",
+                  "--format=json"
+                ],
+                "source_sha256": "6f44da8b1f1db95bf1948aa134b683e1066a0c9ad8941138dc2de09e70958f03",
+                "task_id": "CG-B-9ce758167e1f1dd521c21c6020a030d6",
+                "task_sync_reason": null,
+                "tool_path": "/usr/bin/swiftc"
+              }
+            ],
+            "local_parse_complete": true,
+            "report_type": "swift_parse_scan",
+            "schema_version": "0.2.0",
+            "scope": "single_frozen_swift_files",
+            "scope_stable": true,
+            "source_file_count": 1,
+            "task_status": "synced_partial",
+            "tool_selection": {
+              "executable": "/usr/bin/swiftc",
+              "source": "explicit"
+            },
+            "unobserved_count": 0
+          }
+        },
+        "next": null,
+        "obligation_status": "unresolved",
+        "operation": "check",
+        "reason": "full_project_obligations_and_trusted_policy_unavailable",
+        "report_type": "check_feedback",
+        "required_obligations": null,
+        "schema_version": "0.44.0",
+        "selection": "all",
+        "syntax_candidates": {
+          "authority": "candidate_unqualified",
+          "delivery_decision": "incomplete",
+          "execution_phase": "after_native",
+          "native_preferred_count": 1,
+          "next_action": "核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过",
+          "observations": [],
+          "reason": "native_preferred",
+          "skipped_count": 0,
+          "source_file_count": 1,
+          "status": "not_run",
+          "unrouted_count": 0
+        },
+        "syntax_tasks": {
+          "failures": [],
+          "new_blockers": 0,
+          "status": "synced_partial",
+          "tasks": []
+        },
+        "unresolved_conditions": [
+          "dialects_not_classified",
+          "required_obligations_unresolved",
+          "source_sets_not_fully_classified",
+          "swift_project_lint_and_build_coverage_unverified",
+          "tool_lock_unverified",
+          "trusted_policy_unavailable"
+        ]
+      }
+    },
+    "show_before": {
+      "exit": 0,
+      "stdout_sha256": "78e8072770a55866cec89b02d40275ad3a7369c9265c30f03496e64e4500ed9a",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "event_chain_status": "unverified",
+        "evidence_freshness": "unverified",
+        "exit_code": 0,
+        "next_actions": [
+          [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-9ce758167e1f1dd521c21c6020a030d6",
+            ".",
+            "--format",
+            "json",
+            "--swift-tool",
+            "/usr/bin/swiftc"
+          ]
+        ],
+        "operation": "task_show",
+        "report_type": "task_show_preview",
+        "request_id": "view-39624-1791137228006019000",
+        "schema_version": "0.1.0",
+        "state": "open",
+        "task": {
+          "action_id": "repair-source",
+          "affected_paths": [
+            "App.swift"
+          ],
+          "authority": "local_unverified",
+          "build_root": ".",
+          "checker_id": "syntax.native_confirmation",
+          "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+          "constraints": [
+            "先恢复检查完整性",
+            "不得关闭检查器或修改无关源码"
+          ],
+          "disposition": "actionable",
+          "evidence_ref": {
+            "first_report_sha256": "f0194709487f16edecd366ef9fe44b5f2be6db5e986e371537224fddba1fc0e0",
+            "first_run_id": "syntax-confirm-39621-1791137227877042000"
+          },
+          "history": {
+            "attempt_count": 0,
+            "awaiting_verification": false,
+            "budget": 2,
+            "no_progress_count": 0,
+            "open_attempt_id": null,
+            "recent": []
+          },
+          "kind": "blocker",
+          "native_column_unit": "utf8_byte",
+          "native_confirmation_reason": "swift_native_parse_diagnostics",
+          "native_confirmation_ref": {
+            "report_ref": ".codeguard/reports/syntax-confirm-39621-1791137227877042000.json",
+            "report_sha256": "f0194709487f16edecd366ef9fe44b5f2be6db5e986e371537224fddba1fc0e0",
+            "run_id": "syntax-confirm-39621-1791137227877042000"
+          },
+          "native_confirmation_status": "diagnostics_observed",
+          "native_diagnostic_positions": [
+            {
+              "column": 13,
+              "line": 1,
+              "rule_id": "swift.parse.error"
+            }
+          ],
+          "reason_code": "native_syntax_confirmation_needed",
+          "recheck_argv": [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-9ce758167e1f1dd521c21c6020a030d6",
+            ".",
+            "--format",
+            "json",
+            "--swift-tool",
+            "/usr/bin/swiftc"
+          ],
+          "schema_version": "0.11.0",
+          "scope": "App.swift",
+          "step": "当前源码已有原生 Swift parse 语法诊断；核对有界原生位置和 UTF-8 字节列并修复，然后使用同一编译器复检；项目类型检查、构建和 lint 仍需完成",
+          "task_id": "CG-B-9ce758167e1f1dd521c21c6020a030d6"
+        },
+        "task_id": "CG-B-9ce758167e1f1dd521c21c6020a030d6"
+      }
+    },
+    "restore": {
+      "exit": 3,
+      "stdout_sha256": "bbba04adcef95f90d52807a15e1487214b7e8630ab4c22cd9276cda3c66de2fd",
+      "report": {
+        "already_consumed_reports": 1,
+        "command_status": "partial",
+        "delivery_decision": "not_evaluated",
+        "failed_reports": 0,
+        "historical_findings": 0,
+        "imported_reports": 0,
+        "new_blockers": 0,
+        "new_findings": 0,
+        "next_actions": [
+          "inspect_findings_and_tasks",
+          "implement_native_reverification_and_full_gate"
+        ],
+        "operation": "work_sync",
+        "report_type": "work_sync_preview",
+        "restored_task_projections": 1,
+        "schema_version": "0.3.0",
+        "workspace_id": "ws-f734e620fead976b3bb5826be2fb3341"
+      }
+    },
+    "show_after": {
+      "exit": 0,
+      "stdout_sha256": "3c010512bf3af1390f10cb29cba19fc83245e619c404ac7167e6096ab9ff4f28",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "event_chain_status": "unverified",
+        "evidence_freshness": "unverified",
+        "exit_code": 0,
+        "next_actions": [
+          [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-9ce758167e1f1dd521c21c6020a030d6",
+            ".",
+            "--format",
+            "json",
+            "--swift-tool",
+            "/usr/bin/swiftc"
+          ]
+        ],
+        "operation": "task_show",
+        "report_type": "task_show_preview",
+        "request_id": "view-39626-1791137228128400000",
+        "schema_version": "0.1.0",
+        "state": "open",
+        "task": {
+          "action_id": "repair-source",
+          "affected_paths": [
+            "App.swift"
+          ],
+          "authority": "local_unverified",
+          "build_root": ".",
+          "checker_id": "syntax.native_confirmation",
+          "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+          "constraints": [
+            "先恢复检查完整性",
+            "不得关闭检查器或修改无关源码"
+          ],
+          "disposition": "actionable",
+          "evidence_ref": {
+            "first_report_sha256": "f0194709487f16edecd366ef9fe44b5f2be6db5e986e371537224fddba1fc0e0",
+            "first_run_id": "syntax-confirm-39621-1791137227877042000"
+          },
+          "history": {
+            "attempt_count": 0,
+            "awaiting_verification": false,
+            "budget": 2,
+            "no_progress_count": 0,
+            "open_attempt_id": null,
+            "recent": []
+          },
+          "kind": "blocker",
+          "native_column_unit": "utf8_byte",
+          "native_confirmation_reason": "swift_native_parse_diagnostics",
+          "native_confirmation_ref": {
+            "report_ref": ".codeguard/reports/syntax-confirm-39621-1791137227877042000.json",
+            "report_sha256": "f0194709487f16edecd366ef9fe44b5f2be6db5e986e371537224fddba1fc0e0",
+            "run_id": "syntax-confirm-39621-1791137227877042000"
+          },
+          "native_confirmation_status": "diagnostics_observed",
+          "native_diagnostic_positions": [
+            {
+              "column": 13,
+              "line": 1,
+              "rule_id": "swift.parse.error"
+            }
+          ],
+          "reason_code": "native_syntax_confirmation_needed",
+          "recheck_argv": [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-9ce758167e1f1dd521c21c6020a030d6",
+            ".",
+            "--format",
+            "json",
+            "--swift-tool",
+            "/usr/bin/swiftc"
+          ],
+          "schema_version": "0.11.0",
+          "scope": "App.swift",
+          "step": "当前源码已有原生 Swift parse 语法诊断；核对有界原生位置和 UTF-8 字节列并修复，然后使用同一编译器复检；项目类型检查、构建和 lint 仍需完成",
+          "task_id": "CG-B-9ce758167e1f1dd521c21c6020a030d6"
+        },
+        "task_id": "CG-B-9ce758167e1f1dd521c21c6020a030d6"
+      }
+    },
+    "repeat": {
+      "exit": 3,
+      "stdout_sha256": "cf9a06e8d093f72b79d730a5ba6f153c1854b45586e38d9c4b8bb67620572a10",
+      "report": {
+        "already_consumed_reports": 1,
+        "command_status": "partial",
+        "delivery_decision": "not_evaluated",
+        "failed_reports": 0,
+        "historical_findings": 0,
+        "imported_reports": 0,
+        "new_blockers": 0,
+        "new_findings": 0,
+        "next_actions": [
+          "inspect_findings_and_tasks",
+          "implement_native_reverification_and_full_gate"
+        ],
+        "operation": "work_sync",
+        "report_type": "work_sync_preview",
+        "schema_version": "0.2.0",
+        "workspace_id": "ws-f734e620fead976b3bb5826be2fb3341"
+      }
+    },
+    "next_after_note": {
+      "exit": 0,
+      "stdout_sha256": "f900ec7178290a2de06e249d108c25a36f7664aee771badb6eaf88e7aa6b9c93",
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "disposition": "actionable",
+        "exit_code": 0,
+        "next_actions": [],
+        "operation": "next",
+        "reason": "local_task_selected",
+        "repair_brief": {
+          "action_id": "repair-source",
+          "affected_paths": [
+            "App.swift"
+          ],
+          "authority": "local_unverified",
+          "build_root": ".",
+          "checker_id": "syntax.native_confirmation",
+          "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+          "constraints": [
+            "先恢复检查完整性",
+            "不得关闭检查器或修改无关源码"
+          ],
+          "disposition": "actionable",
+          "evidence_ref": {
+            "first_report_sha256": "f0194709487f16edecd366ef9fe44b5f2be6db5e986e371537224fddba1fc0e0",
+            "first_run_id": "syntax-confirm-39621-1791137227877042000"
+          },
+          "history": {
+            "attempt_count": 0,
+            "awaiting_verification": false,
+            "budget": 2,
+            "no_progress_count": 0,
+            "open_attempt_id": null,
+            "recent": []
+          },
+          "kind": "blocker",
+          "native_column_unit": "utf8_byte",
+          "native_confirmation_reason": "swift_native_parse_diagnostics",
+          "native_confirmation_ref": {
+            "report_ref": ".codeguard/reports/syntax-confirm-39621-1791137227877042000.json",
+            "report_sha256": "f0194709487f16edecd366ef9fe44b5f2be6db5e986e371537224fddba1fc0e0",
+            "run_id": "syntax-confirm-39621-1791137227877042000"
+          },
+          "native_confirmation_status": "diagnostics_observed",
+          "native_diagnostic_positions": [
+            {
+              "column": 13,
+              "line": 1,
+              "rule_id": "swift.parse.error"
+            }
+          ],
+          "reason_code": "native_syntax_confirmation_needed",
+          "recheck_argv": [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-9ce758167e1f1dd521c21c6020a030d6",
+            ".",
+            "--format",
+            "json",
+            "--swift-tool",
+            "/usr/bin/swiftc"
+          ],
+          "schema_version": "0.11.0",
+          "scope": "App.swift",
+          "step": "当前源码已有原生 Swift parse 语法诊断；核对有界原生位置和 UTF-8 字节列并修复，然后使用同一编译器复检；项目类型检查、构建和 lint 仍需完成",
+          "task_id": "CG-B-9ce758167e1f1dd521c21c6020a030d6"
+        },
+        "report_type": "repair_brief_preview",
+        "schema_version": "0.11.0"
+      }
+    }
+  },
+  "original_record_sha256": {
+    ".codeguard/findings/CG-B-9ce758167e1f1dd521c21c6020a030d6/finding.json": "2a67c24abe6a63b5d0df457ff639a8858cf243acb16700500674eedd1f6616d2",
+    ".codeguard/findings/CG-B-9ce758167e1f1dd521c21c6020a030d6/events/syntax-confirm-39621-1791137227877042000.json": "a5046df7a18057db4b6b3c2506da2f3aa9c772d6ff0c476aaf6bd7632a10f5ce",
+    ".codeguard/state/consumed/syntax-confirm-39621-1791137227877042000.json": "ef609acd53f89ad908d2cf50e739c9e50f9fbf11932ae1f8d2f3aa30c082c2b0"
+  },
+  "recovered_record_sha256": {
+    ".codeguard/findings/CG-B-9ce758167e1f1dd521c21c6020a030d6/finding.json": "2a67c24abe6a63b5d0df457ff639a8858cf243acb16700500674eedd1f6616d2",
+    ".codeguard/findings/CG-B-9ce758167e1f1dd521c21c6020a030d6/events/syntax-confirm-39621-1791137227877042000.json": "a5046df7a18057db4b6b3c2506da2f3aa9c772d6ff0c476aaf6bd7632a10f5ce",
+    ".codeguard/state/consumed/syntax-confirm-39621-1791137227877042000.json": "ef609acd53f89ad908d2cf50e739c9e50f9fbf11932ae1f8d2f3aa30c082c2b0"
+  },
+  "recovered_markdown": "# CodeGuard 任务 CG-B-9ce758167e1f1dd521c21c6020a030d6\n\n此文件由已绑定本地事实恢复，仅为可读投影。勾选、备注或删除不能关闭问题。请用 task show 查询当前指引。\n\n## 问题证据\n\n```json\n{\n  \"evidence_ref\": {\n    \"first_report_sha256\": \"f0194709487f16edecd366ef9fe44b5f2be6db5e986e371537224fddba1fc0e0\",\n    \"first_run_id\": \"syntax-confirm-39621-1791137227877042000\"\n  },\n  \"native_confirmation_ref\": {\n    \"report_ref\": \".codeguard/reports/syntax-confirm-39621-1791137227877042000.json\",\n    \"report_sha256\": \"f0194709487f16edecd366ef9fe44b5f2be6db5e986e371537224fddba1fc0e0\",\n    \"run_id\": \"syntax-confirm-39621-1791137227877042000\"\n  }\n}\n```\n\n## 规则依据\n\n```json\n{\n  \"checker_id\": \"syntax.native_confirmation\",\n  \"kind\": \"blocker\",\n  \"native_rule_id\": null,\n  \"reason_code\": \"native_syntax_confirmation_needed\"\n}\n```\n\n## 允许修改的范围\n\n```json\n{\n  \"affected_paths\": [\n    \"App.swift\"\n  ],\n  \"constraints\": [\n    \"先恢复检查完整性\",\n    \"不得关闭检查器或修改无关源码\"\n  ],\n  \"disposition\": \"actionable\",\n  \"scope\": \"App.swift\"\n}\n```\n\n## 修复步骤\n\n```json\n\"当前源码已有原生 Swift parse 语法诊断；核对有界原生位置和 UTF-8 字节列并修复，然后使用同一编译器复检；项目类型检查、构建和 lint 仍需完成\"\n```\n\n## 复检命令\n\n```json\n[\n  \"codeguard\",\n  \"task\",\n  \"verify\",\n  \"CG-B-9ce758167e1f1dd521c21c6020a030d6\",\n  \".\",\n  \"--format\",\n  \"json\",\n  \"--swift-tool\",\n  \"<需核验的绝对路径>\"\n]\n```\n\n## 历史尝试\n\n```json\n{\n  \"attempt_count\": 0,\n  \"awaiting_verification\": false,\n  \"budget\": 2,\n  \"no_progress_count\": 0,\n  \"open_attempt_id\": null,\n  \"recent\": []\n}\n```\n\n## 关闭条件\n\n```json\n\"原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务\"\n```\n",
+  "final_state": "open",
+  "trusted_closure": false,
+  "actual_host_verified": false
+}

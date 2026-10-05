@@ -118,3 +118,157 @@ fn pinned_ruby_worker_matches_native_ruby_check_on_syntax_corpus() {
     fs::remove_dir_all(root).unwrap();
     assert_eq!(compared, 13);
 }
+
+#[test]
+fn controlled_ruby_replay_uses_explicit_isolated_native_observer() {
+    use codeguard_cli::grammar_native_differential::replay_native_corpus;
+    use sha2::{Digest, Sha256};
+    use std::{
+        collections::BTreeMap,
+        os::unix::fs::PermissionsExt,
+        path::PathBuf,
+        sync::atomic::AtomicBool,
+        time::{Duration, Instant},
+    };
+    let root = std::env::temp_dir()
+        .canonicalize()
+        .unwrap()
+        .join(format!("cg-ruby-native-control-{}", std::process::id()));
+    fs::create_dir(&root).unwrap();
+    let tool = root.join("ruby");
+    fs::write(&tool, "#!/bin/sh\nif [ \"$1\" = --version ]; then printf 'ruby 2.6.10p210 (fixture) [fixture]\\n'; exit 0; fi\n[ \"$*\" = '--disable=gems -EUTF-8:UTF-8 -W0 -c -' ] || exit 2\n[ -z \"${RUBYOPT+x}\" ] || exit 2\n[ \"$PWD\" = / ] || exit 2\n/bin/cat >/dev/null\nprintf 'Syntax OK\\n'\n").unwrap();
+    fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
+    let mut corpus: serde_json::Value = serde_json::from_slice(include_bytes!(
+        "../../../tests/fixtures/grammar_regression_v0_2.json"
+    ))
+    .unwrap();
+    corpus["manifest_sha256"] = serde_json::json!(format!(
+        "{:x}",
+        Sha256::digest(include_bytes!("../../../grammars/manifest.json"))
+    ));
+    let bytes = serde_json::to_vec(&corpus).unwrap();
+    let report = replay_native_corpus(
+        &PathBuf::from(env!("CARGO_BIN_EXE_codeguard")),
+        &bytes,
+        &BTreeMap::from([("ruby".into(), tool)]),
+        Instant::now() + Duration::from_secs(60),
+        &AtomicBool::new(false),
+    )
+    .unwrap();
+    fs::remove_dir_all(root).unwrap();
+    assert_eq!(report["schema_version"], "0.5.0");
+    assert_eq!(report["language_count"], 32);
+    assert_eq!(report["sample_count"], 14);
+    assert_eq!(report["native_adapter_reused"], false);
+    assert!(
+        report["cases"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .all(|row| row["native_classification"] == "valid")
+    );
+    assert_eq!(
+        report["languages"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|row| row["native_selected"] == true)
+            .count(),
+        1
+    );
+}
+
+#[test]
+#[ignore = "requires explicit existing Ruby 2.6.10p210 via CODEGUARD_RUBY_BIN"]
+fn pinned_ruby_uniform_replay_archives_frozen_native_and_wasm_evidence() {
+    use codeguard_cli::{
+        grammar_evaluation::{validate_corpus, validate_corpus_against_manifest},
+        grammar_native_differential::replay_native_corpus,
+    };
+    use sha2::{Digest, Sha256};
+    use std::{
+        collections::BTreeMap,
+        path::PathBuf,
+        sync::atomic::AtomicBool,
+        time::{Duration, Instant},
+    };
+    let original = include_bytes!("../../../tests/fixtures/grammar_regression_v0_2.json");
+    validate_corpus_against_manifest(
+        original,
+        include_bytes!("../../../tests/fixtures/grammar_manifests/manifest_2026_10_04.json"),
+    )
+    .unwrap();
+    let mut input: serde_json::Value = serde_json::from_slice(original).unwrap();
+    input["manifest_sha256"] = serde_json::json!(format!(
+        "{:x}",
+        Sha256::digest(include_bytes!("../../../grammars/manifest.json"))
+    ));
+    for (id, source) in [
+        (
+            "ruby-no_execution",
+            "BEGIN { raise \"BEGIN must not execute\" }\nEND { raise \"END must not execute\" }\nraise \"body must not execute\"\n",
+        ),
+        (
+            "ruby-no_require_resolution",
+            "require \"codeguard_nonexistent_module_must_not_load\"\nx = 1\n",
+        ),
+        (
+            "ruby-no_shebang_require",
+            "#!/usr/bin/ruby -r/codeguard_nonexistent_must_not_load.rb\nx = 1\n",
+        ),
+        ("ruby-utf8_encoding", "# coding: utf-8\n名称 = \"你好\"\n"),
+    ] {
+        input["cases"].as_array_mut().unwrap().push(serde_json::json!({"id":id,"language":"ruby","source":source,"source_sha256":format!("{:x}",Sha256::digest(source.as_bytes())),"expected_valid":true,"label":"regression","cohort":"repository_regression","origin":"crates/codeguard-cli/tests/ruby_native_differential.rs"}));
+    }
+    let bytes = serde_json::to_vec_pretty(&input).unwrap();
+    validate_corpus(&bytes).unwrap();
+    let ruby = PathBuf::from(
+        std::env::var("CODEGUARD_RUBY_BIN").expect("provide an existing Ruby executable"),
+    );
+    let report = replay_native_corpus(
+        &PathBuf::from(env!("CARGO_BIN_EXE_codeguard")),
+        &bytes,
+        &BTreeMap::from([("ruby".into(), ruby)]),
+        Instant::now() + Duration::from_secs(120),
+        &AtomicBool::new(false),
+    )
+    .unwrap();
+    assert_eq!(report["sample_count"], 18);
+    assert_eq!(report["schema_version"], "0.5.0");
+    let ruby = report["languages"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["language"] == "ruby")
+        .unwrap();
+    assert_eq!(
+        (
+            ruby["tp"].as_u64(),
+            ruby["fp"].as_u64(),
+            ruby["fn"].as_u64(),
+            ruby["tn"].as_u64()
+        ),
+        (Some(5), Some(0), Some(0), Some(13))
+    );
+    assert_eq!(ruby["native_unknown_count"], 0);
+    assert_eq!(ruby["wasm_unknown_count"], 0);
+    assert!(
+        report["cases"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .all(|row| row["native_identity_current"] == true
+                && row["fixture_native_disagreement"] == false)
+    );
+    let evidence = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../tests/acceptance/evidence");
+    fs::write(
+        evidence.join("ruby-native-grammar-input-2026-10-05.json"),
+        bytes,
+    )
+    .unwrap();
+    fs::write(
+        evidence.join("ruby-native-grammar-differential-2026-10-05.json"),
+        serde_json::to_vec_pretty(&report).unwrap(),
+    )
+    .unwrap();
+}

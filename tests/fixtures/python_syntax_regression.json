@@ -1,0 +1,164 @@
+{
+  "cases": [
+    {
+      "id": "python-unused_import",
+      "language": "python",
+      "source": "import os\n",
+      "source_sha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "expected_valid": true,
+      "label": "regression",
+      "cohort": "repository_regression",
+      "origin": "tests/fixtures/python_syntax_regression.json"
+    },
+    {
+      "id": "python-unresolved_name",
+      "language": "python",
+      "source": "value = missing_name\n",
+      "source_sha256": "980881091898a6efba92e52aaad8ef99b82ac1d28b1c51656bf745b29d90882e",
+      "expected_valid": true,
+      "label": "regression",
+      "cohort": "repository_regression",
+      "origin": "tests/fixtures/python_syntax_regression.json"
+    },
+    {
+      "id": "python-unicode",
+      "language": "python",
+      "source": "名字 = 1\n",
+      "source_sha256": "d49e089e2230e5abc3441fc1fa582e651438309d30a1da32f56eabe73cdaae6d",
+      "expected_valid": true,
+      "label": "regression",
+      "cohort": "repository_regression",
+      "origin": "tests/fixtures/python_syntax_regression.json"
+    },
+    {
+      "id": "python-match",
+      "language": "python",
+      "source": "match value:\n    case 1:\n        pass\n",
+      "source_sha256": "9009f19a66a3e268f8d59a1b540a6013294e3590f782af361fa555780826f91a",
+      "expected_valid": true,
+      "label": "regression",
+      "cohort": "repository_regression",
+      "origin": "tests/fixtures/python_syntax_regression.json"
+    },
+    {
+      "id": "python-type_alias",
+      "language": "python",
+      "source": "type Pair[T] = tuple[T, T]\n",
+      "source_sha256": "0e3933e53378242db640e68c37a4f52c5919502eea9cdd10aa0871f726cdbf7f",
+      "expected_valid": true,
+      "label": "regression",
+      "cohort": "repository_regression",
+      "origin": "tests/fixtures/python_syntax_regression.json"
+    },
+    {
+      "id": "python-exception_group",
+      "language": "python",
+      "source": "try:\n    run()\nexcept* ValueError:\n    pass\n",
+      "source_sha256": "f65ba507d47b35092df5794275dc4af68353620d02c8df0e161e7e0f726df141",
+      "expected_valid": true,
+      "label": "regression",
+      "cohort": "repository_regression",
+      "origin": "tests/fixtures/python_syntax_regression.json"
+    },
+    {
+      "id": "python-async",
+      "language": "python",
+      "source": "async def run():\n    await task()\n",
+      "source_sha256": "268c385abc60b8883b813c9fd5b60a38fcb584b3eae5d8f70aea6a64c2f30d3d",
+      "expected_valid": true,
+      "label": "regression",
+      "cohort": "repository_regression",
+      "origin": "tests/fixtures/python_syntax_regression.json"
+    },
+    {
+      "id": "python-walrus",
+      "language": "python",
+      "source": "if (value := 1):\n    pass\n",
+      "source_sha256": "c4316d5f5c636e4f3b49aab726248a1e5ba0c0324d1c50160e9c60ff0f9ea1e8",
+      "expected_valid": true,
+      "label": "regression",
+      "cohort": "repository_regression",
+      "origin": "tests/fixtures/python_syntax_regression.json"
+    },
+    {
+      "id": "python-comprehension",
+      "language": "python",
+      "source": "values = [x for x in range(3)]\n",
+      "source_sha256": "b430c3cc7332239acbda43350f97738bbe809f964c215de6be0c2c1ef94a74a3",
+      "expected_valid": true,
+      "label": "regression",
+      "cohort": "repository_regression",
+      "origin": "tests/fixtures/python_syntax_regression.json"
+    },
+    {
+      "id": "python-missing_colon",
+      "language": "python",
+      "source": "if True\n    pass\n",
+      "source_sha256": "ac73094b89b3d9961c0c22160fe6264e1cfd1a0075085ab11f6f5f5b47d11a91",
+      "expected_valid": false,
+      "label": "regression",
+      "cohort": "repository_regression",
+      "origin": "tests/fixtures/python_syntax_regression.json"
+    },
+    {
+      "id": "python-empty_body",
+      "language": "python",
+      "source": "def run():\n",
+      "source_sha256": "835eb2c99f89a3fa7f977cef1f5bb1d3d2562cff7feb055cdb6b0521e08aa2d2",
+      "expected_valid": false,
+      "label": "regression",
+      "cohort": "repository_regression",
+      "origin": "tests/fixtures/python_syntax_regression.json"
+    },
+    {
+      "id": "python-bad_parameter",
+      "language": "python",
+      "source": "def run(,):\n    pass\n",
+      "source_sha256": "0c3a765b9b50260ff2f65ea114707209c708043f598372edd5fed241b1bf7d15",
+      "expected_valid": false,
+      "label": "regression",
+      "cohort": "repository_regression",
+      "origin": "tests/fixtures/python_syntax_regression.json"
+    },
+    {
+      "id": "python-missing_expression",
+      "language": "python",
+      "source": "value =\n",
+      "source_sha256": "a0ed8b0da7e40b7809c8fd81fce937a2d239691f27de38691d100ac52d74d886",
+      "expected_valid": false,
+      "label": "regression",
+      "cohort": "repository_regression",
+      "origin": "tests/fixtures/python_syntax_regression.json"
+    },
+    {
+      "id": "python-bad_indent",
+      "language": "python",
+      "source": "if True:\npass\n",
+      "source_sha256": "37eb8fcb443c741fc73cf12e0ac53bff72d048e730548a9324c4624b3aa3e54a",
+      "expected_valid": false,
+      "label": "regression",
+      "cohort": "repository_regression",
+      "origin": "tests/fixtures/python_syntax_regression.json"
+    },
+    {
+      "id": "python-unclosed_string",
+      "language": "python",
+      "source": "value = \"oops\n",
+      "source_sha256": "f2279bb876d54439526cb4a505f043bbbebbb49dc93dc4023a5dd222a55cf393",
+      "expected_valid": false,
+      "label": "regression",
+      "cohort": "repository_regression",
+      "origin": "tests/fixtures/python_syntax_regression.json"
+    },
+    {
+      "id": "python-noqa_cannot_hide",
+      "language": "python",
+      "source": "def broken(: # noqa\n",
+      "source_sha256": "f93c1ef4137932ef4d564f21fde8a72c6092febc4612184128290434f4858b60",
+      "expected_valid": false,
+      "label": "regression",
+      "cohort": "repository_regression",
+      "origin": "tests/fixtures/python_syntax_regression.json"
+    }
+  ]
+}

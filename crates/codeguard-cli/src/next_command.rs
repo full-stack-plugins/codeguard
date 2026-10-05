@@ -75,6 +75,13 @@ pub fn run(args: &[String]) -> ExitCode {
         } else {
             println!("建议：{}", report["next_actions"]);
         }
+        if report["repair_brief"].is_object()
+            && report["next_actions"]
+                .as_array()
+                .is_some_and(|actions| !actions.is_empty())
+        {
+            println!("保留待处理任务的只读查询：{}", report["next_actions"]);
+        }
         println!("本命令只读取本地待办，交付门禁未评估。");
     }
     ExitCode::SUCCESS
@@ -84,7 +91,7 @@ pub fn run(args: &[String]) -> ExitCode {
 ///
 /// 参数 `root` 是已规范化项目根；返回值仍为本地未验证视图，不包含交付许可。
 pub fn read_local_brief(root: &Path) -> Result<Value, &'static str> {
-    build_view(root, None)
+    build_view(root, None, None)
 }
 
 /// 读取指定原生检查器的下一步；其它检查器的任务仍校验，但不会被推荐给局部检查。
@@ -92,13 +99,37 @@ pub(crate) fn read_local_brief_for_checker(
     root: &Path,
     checker_id: &str,
 ) -> Result<Value, &'static str> {
-    build_view(root, Some(checker_id))
+    build_view(root, Some(checker_id), None)
+}
+
+/// 从本轮已同步的任务身份读取下一步；返回既有 next 协议，不扩大到其它历史任务。
+pub(crate) fn read_local_brief_for_tasks(
+    root: &Path,
+    ids: &std::collections::BTreeSet<String>,
+) -> Result<Value, &'static str> {
+    if ids.is_empty() {
+        return Ok(Value::Null);
+    }
+    build_view(root, None, Some(ids))
 }
 
 /// 读取指定本地任务的受限事实简报，供原工具复检确定范围。
 ///
 /// 参数 `id` 只能是稳定 CG 身份；返回值不从可编辑 Markdown 提取指令。
 pub fn read_task_brief(root: &Path, id: &str) -> Result<Value, &'static str> {
+    read_task_brief_inner(root, id, false)
+}
+
+/// 为缺失的可读投影读取结构化指引；只豁免文件不存在，不豁免事实或链接校验。
+pub(crate) fn read_task_brief_for_projection(root: &Path, id: &str) -> Result<Value, &'static str> {
+    read_task_brief_inner(root, id, true)
+}
+
+fn read_task_brief_inner(
+    root: &Path,
+    id: &str,
+    allow_missing_projection: bool,
+) -> Result<Value, &'static str> {
     if !safe_id(id) {
         return Err("task_id_invalid");
     }
@@ -119,10 +150,11 @@ pub fn read_task_brief(root: &Path, id: &str) -> Result<Value, &'static str> {
         return Err("workspace_records_unavailable");
     }
     let directory = facts.join(id);
-    if !real_directory(&directory)
-        || !fs::symlink_metadata(tasks.join(format!("{id}.md")))
-            .is_ok_and(|metadata| metadata.file_type().is_file())
-    {
+    let projection_valid = match fs::symlink_metadata(tasks.join(format!("{id}.md"))) {
+        Ok(metadata) => metadata.file_type().is_file(),
+        Err(error) => allow_missing_projection && error.kind() == std::io::ErrorKind::NotFound,
+    };
+    if !real_directory(&directory) || !projection_valid {
         return Err("task_record_unavailable");
     }
     let fact: Value = serde_json::from_slice(&read_bounded(
@@ -141,7 +173,11 @@ pub fn read_task_brief(root: &Path, id: &str) -> Result<Value, &'static str> {
     Ok(candidate(root, id, &fact)?.brief)
 }
 
-fn build_view(root: &Path, checker_id: Option<&str>) -> Result<Value, &'static str> {
+fn build_view(
+    root: &Path,
+    checker_id: Option<&str>,
+    task_ids: Option<&std::collections::BTreeSet<String>>,
+) -> Result<Value, &'static str> {
     let baseline = read_workspace_baseline(root).map_err(|reason| {
         if reason == "legacy_workspace_requires_manual_migration" {
             "legacy_workspace_requires_manual_migration"
@@ -216,7 +252,9 @@ fn build_view(root: &Path, checker_id: Option<&str>) -> Result<Value, &'static s
             return Err("finding_fact_conflict");
         }
         let candidate = candidate(root, &id, &fact)?;
-        if checker_id.is_none_or(|checker| candidate.brief["checker_id"] == checker) {
+        if checker_id.is_none_or(|checker| candidate.brief["checker_id"] == checker)
+            && task_ids.is_none_or(|ids| ids.contains(&candidate.id))
+        {
             candidates.push(candidate);
         }
     }
@@ -246,7 +284,19 @@ fn build_view(root: &Path, checker_id: Option<&str>) -> Result<Value, &'static s
             .cmp(&right.priority)
             .then(left.id.cmp(&right.id))
     });
-    let selected = candidates.remove(0);
+    let selected_index = independent_source_task_index(root, &candidates).unwrap_or(0);
+    let deferred_queries = if selected_index == 0 {
+        json!([])
+    } else {
+        Value::Array(
+            candidates
+                .iter()
+                .filter(|candidate| deferred_source_finding(candidate))
+                .map(|candidate| json!(["codeguard", "task", "show", candidate.id, "."]))
+                .collect(),
+        )
+    };
+    let selected = candidates.remove(selected_index);
     let disposition = selected.brief["disposition"]
         .as_str()
         .ok_or("brief_disposition_invalid")?
@@ -255,8 +305,79 @@ fn build_view(root: &Path, checker_id: Option<&str>) -> Result<Value, &'static s
         &disposition,
         "local_task_selected",
         selected.brief,
-        json!([]),
+        deferred_queries,
     ))
+}
+
+// 仅在原首项是等待/待决策的源码问题时推进独立源码；完整依赖图未建立，
+// 因此前置 blocker 或无法证明物理范围独立时保持原选择，不扩展修改授权。
+fn deferred_source_finding(candidate: &Candidate) -> bool {
+    candidate.brief["kind"] == "finding"
+        && matches!(
+            candidate.brief["disposition"].as_str(),
+            Some("waiting" | "needs_decision")
+        )
+}
+
+fn independent_source_task_index(root: &Path, candidates: &[Candidate]) -> Option<usize> {
+    if !candidates.first().is_some_and(deferred_source_finding)
+        || candidates
+            .iter()
+            .any(|candidate| candidate.brief["kind"] == "blocker")
+    {
+        return None;
+    }
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::MetadataExt;
+        // 每个范围只读取一次；规范路径和 dev/ino 同时排除目录重叠、链接及硬链接别名。
+        let scopes: Vec<_> = candidates
+            .iter()
+            .map(|candidate| {
+                let scope = candidate.brief["scope"].as_str()?;
+                let path = root.join(scope).canonicalize().ok()?;
+                if !path.starts_with(root) {
+                    return None;
+                }
+                let metadata = fs::metadata(&path).ok()?;
+                metadata
+                    .is_file()
+                    .then_some((path, metadata.dev(), metadata.ino()))
+            })
+            .collect();
+        candidates
+            .iter()
+            .enumerate()
+            .skip(1)
+            .find_map(|(index, candidate)| {
+                if candidate.brief["kind"] != "finding"
+                    || !matches!(
+                        candidate.brief["disposition"].as_str(),
+                        Some("actionable" | "verification_required")
+                    )
+                {
+                    return None;
+                }
+                let source = scopes[index].as_ref()?;
+                let independent = candidates
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, other)| deferred_source_finding(other))
+                    .all(|(other_index, _)| {
+                        scopes[other_index].as_ref().is_some_and(|other| {
+                            !source.0.starts_with(&other.0)
+                                && !other.0.starts_with(&source.0)
+                                && (source.1, source.2) != (other.1, other.2)
+                        })
+                    });
+                independent.then_some(index)
+            })
+    }
+    #[cfg(not(unix))]
+    {
+        let _ = root;
+        None
+    }
 }
 
 fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static str> {
@@ -277,7 +398,8 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         .filter(|checker| {
             matches!(
                 *checker,
-                "node.eslint"
+                "syntax.native_confirmation"
+                    | "node.eslint"
                     | "node.eslint.preparation"
                     | "node.npm.audit"
                     | "python.ruff"
@@ -306,7 +428,9 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         .as_str()
         .filter(|sha| valid_sha256(sha))
         .ok_or("finding_report_invalid")?;
-    let recheck = if matches!(checker_id, "node.eslint" | "node.eslint.preparation") {
+    let recheck = if checker_id == "syntax.native_confirmation" {
+        json!(["codeguard", "task", "verify", id, ".", "--format", "json"])
+    } else if matches!(checker_id, "node.eslint" | "node.eslint.preparation") {
         // 当前原生上下文失效时仍指向 ESLint；占位参数要求重新核验，不能猜测工具身份。
         json!([
             "codeguard",
@@ -392,6 +516,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         json!([
             "cargo",
             "clippy",
+            "--locked",
             "--offline",
             "--all-targets",
             "--message-format=json"
@@ -487,7 +612,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         json!(["codeguard", "lint", "python", "."])
     };
     let mut brief = json!({
-        "schema_version":"0.1.0", "task_id":id, "kind":kind,
+        "schema_version":if checker_id == "syntax.native_confirmation" {"0.3.0"} else {"0.1.0"}, "task_id":id, "kind":kind,
         "checker_id":checker_id, "evidence_ref":{
             "first_run_id":first_run, "first_report_sha256":report_sha
         },
@@ -530,9 +655,19 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         brief["build_root"] = json!(build_root);
         brief["affected_paths"] = json!(paths);
         brief["constraints"] = json!(["先恢复检查完整性", "不得关闭检查器或修改无关源码"]);
-        let (priority, disposition, step) = if checker_id == "python.ruff"
-            && reason == "python_syntax_confirmation_needed"
-        {
+        let (priority, disposition, step) = if checker_id == "syntax.native_confirmation" {
+            (
+                1,
+                "needs_decision",
+                if fact["first_diagnostic_reason"] == "go_package_structure_candidate" {
+                    "Go整文件候选未发现package声明；先恢复适用原生Go lint或编译器确认完整文件范围，核对声明应属于哪个包。注释或字符串不算声明；不得凭候选删除函数、猜包名或关闭任务，原生确认后只修复目标源码并复检"
+                } else if fact["first_diagnostic_reason"] == "syntax_recovery_incomplete" {
+                    "固定 grammar 的恢复扫描未完成或错误无法定位；核对语言版本、grammar 限制并恢复适用原生 lint/编译器或提出具体能力决策。原生确认前不得修改源码，不虚构错误位置，不凭零恢复关闭任务"
+                } else {
+                    "查看固定 grammar 与当前源码的疑似证据；通过同一任务的原生复检核对适用语法能力，工具或 adapter 缺失时提出具体恢复或能力决策，不能改用 Python 或凭 WASM 零恢复关闭任务"
+                },
+            )
+        } else if checker_id == "python.ruff" && reason == "python_syntax_confirmation_needed" {
             (
                 1,
                 "actionable",
@@ -622,13 +757,23 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             (
                 1,
                 "actionable",
-                "恢复 Cargo Clippy 工具、配置或稳定输入，再运行原生检查",
+                if reason == "cargo_lock_unavailable" {
+                    "先恢复项目原 Cargo.lock 或按项目依赖流程准备锁文件，再执行锁定离线 Clippy；不修改无关源码，不由检查器隐式生成锁"
+                } else {
+                    "恢复 Cargo Clippy 工具、配置或稳定输入，再运行锁定离线原生检查"
+                },
             )
         } else if reason == "project_ruff_config_not_found" {
             (
                 0,
                 "needs_decision",
                 "确认项目是否要求 Ruff；若要求则按批准策略配置，若不要求则修订策略",
+            )
+        } else if checker_id == "python.ruff" && reason == "ruff_local_tool_invalid" {
+            (
+                1,
+                "actionable",
+                "核对受检根 .venv/bin/ruff 的普通父目录、可执行入口和目标字节；恢复原本地环境后由同一入口复检，不删除环境绕过、不修改无关源码",
             )
         } else if reason.starts_with("ruff_tool_") || reason == "tool_identity_mismatch" {
             (
@@ -775,7 +920,11 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             priority = 2;
         }
     }
-    let verification_observation = latest_verification_observation(root, id, fact, &brief)?;
+    let verification_observation = if checker_id == "syntax.native_confirmation" {
+        None
+    } else {
+        latest_verification_observation(root, id, fact, &brief)?
+    };
     if let Some(observation) = verification_observation.as_ref() {
         let outcome = observation.outcome.as_str();
         brief["verification_run_id"] = json!(observation.run_id);
@@ -864,6 +1013,47 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                 "复检后的 Checkstyle 目标源码已变化或不可用；重新确认当前范围并运行原工具，不沿用旧诊断修复方向"
             );
             priority = 0;
+        } else if checker_id == "python.ruff"
+            && brief["reason_code"] == "python_syntax_confirmation_needed"
+            && observation.source_sha256.is_some()
+            && (!observed_source_matches
+                || observation
+                    .ruff_configuration
+                    .as_ref()
+                    .is_some_and(|(config, sha)| {
+                        !brief["scope"].as_str().is_some_and(|path| {
+                            crate::ruff_verification_configuration::is_current(
+                                root, path, config, sha,
+                            )
+                        })
+                    }))
+        {
+            brief["verification_invalidated_reason"] = json!(if !observed_source_matches {
+                "source_input_changed_or_unavailable"
+            } else {
+                "configuration_input_changed_or_unavailable"
+            });
+            brief["disposition"] = json!("verification_required");
+            brief["step"] = json!(
+                "Python确认复检后的源码或配置已变化；按同一任务范围重新运行原生Ruff，不沿用旧修复或恢复判断"
+            );
+            priority = 0;
+        } else if checker_id == "python.ruff"
+            && brief["reason_code"] == "python_syntax_confirmation_needed"
+            && outcome == "still_present"
+            && observed_source_matches
+        {
+            brief["verification_observation"] = json!(outcome);
+            brief["disposition"] = json!("actionable");
+            brief["step"] = json!(
+                "本轮Ruff已确认该文件存在原生语法错误；按本任务报告的原生位置核对并修复源码，保持预期语义，不用空实现逃避检查；修复后对同一任务复检，不能凭WASM或任务勾选关闭"
+            );
+            brief["constraints"] = json!([
+                "仅修改本任务绑定的Python文件",
+                "修复前核对本轮原生位置与当前源码",
+                "不得关闭原生检查器或用空实现消除错误"
+            ]);
+            priority = 1;
         } else if matches!(
             outcome,
             "candidate_absent_unverified_policy" | "environment_restored_unverified_policy"
@@ -1091,6 +1281,80 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             0
         };
     }
+    if checker_id == "syntax.native_confirmation" {
+        if let Some(guidance) = crate::syntax_task_recheck::guidance(root, &brief) {
+            if matches!(guidance["schema_version"].as_str(), Some("0.7.0" | "0.9.0")) {
+                brief["schema_version"] = guidance["schema_version"].clone();
+                brief["native_adapter"] = guidance["native_adapter"].clone();
+                brief["tool_readiness"] = guidance["tool_readiness"].clone();
+            } else if matches!(
+                guidance["schema_version"].as_str(),
+                Some(
+                    "0.4.0"
+                        | "0.5.0"
+                        | "0.6.0"
+                        | "0.8.0"
+                        | "0.10.0"
+                        | "0.11.0"
+                        | "0.12.0"
+                        | "0.14.0"
+                        | "0.15.0"
+                )
+            ) {
+                brief["schema_version"] = guidance["schema_version"].clone();
+                brief["native_confirmation_reason"] =
+                    guidance["native_confirmation_reason"].clone();
+                brief["native_column_unit"] = guidance["native_column_unit"].clone();
+            }
+            if matches!(
+                guidance["schema_version"].as_str(),
+                Some("0.14.0" | "0.15.0")
+            ) {
+                brief["native_confirmation_ref"] = guidance["native_confirmation_ref"].clone();
+            }
+            brief["disposition"] = guidance["disposition"].clone();
+            brief["step"] = guidance["step"].clone();
+            for key in [
+                "native_confirmation_status",
+                "native_confirmation_ref",
+                "native_diagnostic_positions",
+                "native_context_diagnostics",
+            ] {
+                if !guidance[key].is_null() {
+                    brief[key] = guidance[key].clone();
+                }
+            }
+            if guidance["recheck_argv"].is_array() {
+                brief["recheck_argv"] = guidance["recheck_argv"].clone();
+            }
+            priority = if brief["disposition"] == "actionable" {
+                2
+            } else {
+                0
+            };
+        }
+    }
+    #[cfg(unix)]
+    if checker_id == "syntax.native_confirmation"
+        || (checker_id == "python.ruff"
+            && brief["reason_code"] == "python_syntax_confirmation_needed"
+            && !brief["verification_invalidated_reason"].is_string())
+    {
+        if let Some(guidance) = crate::task_lifecycle_store::guidance(
+            root,
+            &brief,
+            fact["workspace_id"]
+                .as_str()
+                .ok_or("workspace_identity_unavailable")?,
+        ) {
+            brief["disposition"] = guidance["disposition"].clone();
+            brief["step"] = guidance["step"].clone();
+            if checker_id == "syntax.native_confirmation" {
+                brief["native_diagnostic_positions"] = json!([]);
+            }
+            priority = 0;
+        }
+    }
     let action_id = canonical_action_id(&brief)?;
     brief["action_id"] = json!(action_id);
     #[cfg(unix)]
@@ -1227,6 +1491,25 @@ pub(crate) fn canonical_action_id(brief: &Value) -> Result<&'static str, &'stati
     match brief["kind"].as_str() {
         Some("finding") => Ok("repair-source"),
         Some("blocker")
+            if brief["checker_id"] == "python.ruff"
+                && brief["reason_code"] == "python_syntax_confirmation_needed"
+                && brief["verification_observation"] == "still_present"
+                && !brief["verification_invalidated_reason"].is_string() =>
+        {
+            Ok("repair-source")
+        }
+
+        Some("blocker")
+            if brief["checker_id"] == "syntax.native_confirmation"
+                && (brief["native_confirmation_status"] == "diagnostics_observed"
+                    || (matches!(brief["schema_version"].as_str(), Some("0.8.0" | "0.10.0"))
+                        && brief["native_diagnostic_positions"]
+                            .as_array()
+                            .is_some_and(|r| !r.is_empty()))) =>
+        {
+            Ok("repair-source")
+        }
+        Some("blocker")
             if brief["reason_code"] == "project_ruff_config_not_found"
                 || brief["reason_code"] == "p3c_configuration_not_confirmed" =>
         {
@@ -1348,6 +1631,8 @@ fn latest_verification_observation(
                 latest_run = sequence;
                 continue;
             }
+            let python_scoped_report = brief["checker_id"] == "python.ruff"
+                && matches!(report["schema_version"].as_str(), Some("0.18.0" | "0.19.0"));
             let go_report = brief["checker_id"] == "go.vet";
             let rust_report = brief["checker_id"] == "rust.cargo_clippy";
             let java_report = brief["checker_id"] == "java.maven.p3c";
@@ -1423,7 +1708,9 @@ fn latest_verification_observation(
                         || report["schema_version"] == "0.6.0"
                         || report["schema_version"] == "0.7.0"
                         || report["schema_version"] == "0.8.0"
-                        || report["schema_version"] == "0.9.0")
+                        || report["schema_version"] == "0.9.0"
+                        || (python_scoped_report
+                            && crate::python_confirmation_recheck::valid_binding(root, &report)))
                     && event["observation"] == classify(brief, &report)
             };
             if brief["checker_id"] == "python.ruff.doctor" && !report_shape_valid {
@@ -1461,9 +1748,12 @@ fn latest_verification_observation(
                 .as_str()
                 .ok_or("verification_event_invalid")?
                 .to_owned();
-            let source_sha256 = if preparation_report
-                && outcome == "environment_restored_unverified_policy"
-            {
+            let source_sha256 = if python_scoped_report && report["task_input_stable"] == true {
+                report["task_binding"]["source_sha256"]
+                    .as_str()
+                    .filter(|sha| valid_sha256(sha))
+                    .map(str::to_owned)
+            } else if preparation_report && outcome == "environment_restored_unverified_policy" {
                 report["scan"]["inputs"]["source"]["sha256"]
                     .as_str()
                     .filter(|s| valid_sha256(s))
@@ -1622,7 +1912,7 @@ fn run_sequence(run_id: &str) -> Option<u128> {
     if run_id.starts_with("eslint-") || run_id.starts_with("npm-") {
         return run_id.rsplit('-').next()?.parse().ok();
     }
-    if run_id.starts_with("checkstyle-") {
+    if run_id.starts_with("checkstyle-") || run_id.starts_with("syntax-confirm-") {
         return run_id.rsplit('-').next()?.parse().ok();
     }
     if let Some(value) = run_id
@@ -1646,7 +1936,7 @@ fn run_sequence(run_id: &str) -> Option<u128> {
 
 fn view(disposition: &str, reason: &str, brief: Value, actions: Value) -> Value {
     json!({
-        "schema_version":"0.1.0", "report_type":"repair_brief_preview",
+        "schema_version":if brief["checker_id"] == "go.vet" {json!("0.13.0")} else if brief["checker_id"] == "syntax.native_confirmation" {brief["schema_version"].clone()} else {json!("0.1.0")}, "report_type":"repair_brief_preview",
         "operation":"next", "command_status":"complete", "exit_code":0,
         "disposition":disposition, "reason":reason,
         "repair_brief":brief, "next_actions":actions,
@@ -1745,7 +2035,8 @@ fn real_directory(path: &Path) -> bool {
     fs::symlink_metadata(path).is_ok_and(|metadata| metadata.file_type().is_dir())
 }
 
-fn safe_id(value: &str) -> bool {
+/// 校验本地任务身份的封闭格式；格式有效不代表证据或权限已核验。
+pub(crate) fn safe_id(value: &str) -> bool {
     let suffix = value
         .strip_prefix("CG-B-")
         .or_else(|| value.strip_prefix("CG-"));
@@ -1844,5 +2135,44 @@ fn parse_format(value: &str) -> Result<bool, String> {
         "json" => Ok(true),
         "human" => Ok(false),
         _ => Err(format!("不支持的格式：{value}")),
+    }
+}
+
+#[cfg(test)]
+mod python_action_tests {
+    use super::canonical_action_id;
+    use serde_json::json;
+    #[test]
+    fn native_syntax_evidence_controls_action_even_when_budget_requires_decision() {
+        let mut brief = json!({"kind":"blocker","checker_id":"python.ruff","reason_code":"python_syntax_confirmation_needed","verification_observation":"still_present","disposition":"actionable"});
+        assert_eq!(canonical_action_id(&brief), Ok("repair-source"));
+        brief["disposition"] = json!("needs_decision");
+        assert_eq!(canonical_action_id(&brief), Ok("repair-source"));
+        brief["verification_invalidated_reason"] = json!("source_input_changed_or_unavailable");
+        assert_eq!(
+            canonical_action_id(&brief),
+            Ok("restore-checker-environment")
+        );
+        brief
+            .as_object_mut()
+            .unwrap()
+            .remove("verification_invalidated_reason");
+        for outcome in [
+            "still_blocked",
+            "candidate_absent_unverified_policy",
+            "incomplete",
+        ] {
+            brief["verification_observation"] = json!(outcome);
+            assert_eq!(
+                canonical_action_id(&brief),
+                Ok("restore-checker-environment")
+            );
+        }
+        brief["verification_observation"] = json!("still_present");
+        brief["reason_code"] = json!("ruff_tool_not_found");
+        assert_eq!(
+            canonical_action_id(&brief),
+            Ok("restore-checker-environment")
+        );
     }
 }

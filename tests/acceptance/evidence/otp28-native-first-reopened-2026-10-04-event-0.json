@@ -1,0 +1,20 @@
+{
+  "event": {
+    "event_id": "event-260d3ad2e6e02126f9b9cacf915d0364547473f752e2a9613220dbb598f81f89",
+    "identity": {
+      "checker_id": "syntax.native_confirmation",
+      "scope": "app.erl",
+      "task_id": "CG-B-adbe0d18568c875773065066871ea3ae",
+      "workspace_id": "ws-61c7cac666cd3addf981def0b69429cb"
+    },
+    "kind": {
+      "event": "observed"
+    },
+    "parent_event_id": null
+  },
+  "evidence_sha256": null,
+  "original_report_sha256": "c3d08854a57f31baec9ce2e5c64e4902d6d0a7b3b20c44a73ae4641bbe7b43c5",
+  "policy_sha256": null,
+  "report_type": "task_lifecycle_record",
+  "schema_version": "0.1.0"
+}

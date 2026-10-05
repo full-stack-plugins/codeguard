@@ -37,6 +37,10 @@ Rust CLI MUST 提供 `lint/comments/dependencies/cve/security/build/check <langu
 
 交付聚合 MUST 对照由可信策略与完整发现独立冻结的应有义务 ID 清单和实际计划的义务清单；任一清单漏项、重复或额外项均不能签发 allow。计划和冻结清单若都来自同一未经核验的项目可写输入，数量一致仍不构成可信来源证明。无适用义务的完整空项目仍按 not_applicable 处理。
 
+#### Scenario: Registered language check is scoped before native execution
+- **WHEN** 调用 check 的注册表规范语言 ID，并在混合项目中发现多个语言
+- **THEN** 入口 SHALL 接受全部已登记 ID，按选择仅调度该语言适用的已接入原生检查与候选语法观察；共享构建根检查可用于其适用语言，但不能运行无关语言工具。报告明示 selection，缺适配器或空目标不授予全项目通过，未知 ID 或不相干工具参数在原生进程与持久化前拒绝。别名未登记时不自行猜测
+
 #### Scenario: Java lint succeeds in a mixed project
 - **WHEN** Java lint 完成，但项目仍有 Python、安全或 CVE 义务未在该请求执行
 - **THEN** 请求可成功，交付状态为 not_evaluated，不能宣称全项目通过
@@ -293,3 +297,20 @@ npm公开CVE入口 MUST 按CLI、登记环境变量、项目runtime.json、内�
 #### Scenario: npm timeout precedence and malformed project defaults
 - **WHEN** 原项目预算、登记环境值与CLI值同时存在或低优先级文件格式无效
 - **THEN** 只使用最高优先级合法来源，显式CLI值不因低优先级坏文件失败；项目文件为候选且含未知字段、坏协议或符号链接时返回未完成，原生审计不启动
+
+
+### Requirement: Help SHALL report current command support without executing commands
+
+`help`、`--help`和`-h` MUST 以同一静态目录提供当前构建的C01–C36及额外公开入口的支持观察。`--format json` MUST 返回封闭帮助协议，明确implemented/partial/planned/unavailable_build与候选范围；查询成功不表示目标命令已执行或交付通过。语言子集与构建特性 MUST 来自编译期固定信息，不读取项目、PATH工具或运行原生检查。`help COMMAND...` MAY 查询未实现命令的目标入口，但必须标为planned且不可执行。未知查询或非法格式 MUST 返回2，不产生项目/工具副作用。
+
+#### Scenario: Agent queries the whole command catalogue
+- **WHEN** 调用help --format json
+- **THEN** 返回完整36个追踪ID、当前实际入口及支持边界，delivery_decision=not_evaluated；不把partial工具安装预览当作安装能力
+
+#### Scenario: Planned command queried through help
+- **WHEN** 查询help mcp serve或help gate ci
+- **THEN** 只展示未实现的目标契约，不启动服务/检查、不写工作区；帮助请求可成功但executable=false
+
+#### Scenario: Unknown command or duplicated format is requested
+- **WHEN** 帮助查询有未知入口、重复format或不支持的sarif格式
+- **THEN** 执行前返回2且stdout不输出伪成功JSON

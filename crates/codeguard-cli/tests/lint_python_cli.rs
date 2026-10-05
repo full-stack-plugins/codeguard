@@ -179,6 +179,37 @@ fn selected_file_runs_native_ruff_without_importing_partial_backlog() {
     assert_eq!(report["delivery_decision"], "not_evaluated");
 }
 
+/// 创建带启动信号与延迟写入的原生探针；同一脚本用于取消及非取消对照。
+fn cancellation_probe_script(late: &std::path::Path, ready: &std::path::Path) -> String {
+    format!(
+        "#!/bin/sh\n(sleep 0.6; : > '{}') &\n: > '{}'\nwait\n",
+        late.display(),
+        ready.display()
+    )
+}
+
+#[test]
+fn native_probe_fixture_reaches_late_write_without_cancellation() {
+    use std::os::unix::fs::PermissionsExt;
+    let project = Project::new();
+    let ready = project.0.join("native-ready");
+    let late = project.0.join("native-late-write");
+    let tool = project.0.join("ruff");
+    fs::write(&tool, cancellation_probe_script(&late, &ready)).unwrap();
+    fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
+    let output = Command::new(&tool)
+        .arg("--version")
+        .env_clear()
+        .output()
+        .unwrap();
+    assert!(output.status.success());
+    assert!(ready.exists(), "非取消对照必须写入启动标记");
+    assert!(
+        late.exists(),
+        "非取消对照必须实际执行迟写，否则取消反例无效"
+    );
+}
+
 #[test]
 fn sigint_during_native_probe_reaps_descendants_and_returns_130() {
     use std::os::unix::fs::PermissionsExt;
@@ -191,15 +222,8 @@ fn sigint_during_native_probe_reaps_descendants_and_returns_130() {
     let ready = project.0.join("native-ready");
     let late = project.0.join("native-late-write");
     let tool = project.0.join("ruff");
-    fs::write(
-        &tool,
-        format!(
-            "#!/bin/sh\n(sleep 0.6; /usr/bin/touch '{}') &\n/usr/bin/touch '{}'\nwait\n",
-            late.display(),
-            ready.display()
-        ),
-    )
-    .unwrap();
+    // 标记由 shell 内建重定向写入；取消验证仍覆盖后台 shell 与 sleep 子孙进程。
+    fs::write(&tool, cancellation_probe_script(&late, &ready)).unwrap();
     fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
     let child = Command::new(env!("CARGO_BIN_EXE_codeguard"))
         .args([
@@ -220,7 +244,15 @@ fn sigint_during_native_probe_reaps_descendants_and_returns_130() {
     while !ready.exists() && started.elapsed() < Duration::from_secs(2) {
         thread::sleep(Duration::from_millis(5));
     }
-    assert!(ready.exists(), "原生进程未开始，不能验证运行中取消");
+    if !ready.exists() {
+        let output = child.wait_with_output().unwrap();
+        panic!(
+            "原生进程未开始，不能验证运行中取消；exit={:?} stderr={} report={}",
+            output.status.code(),
+            String::from_utf8_lossy(&output.stderr),
+            String::from_utf8_lossy(&output.stdout)
+        );
+    }
     let interrupt = Command::new("/bin/kill")
         .args(["-INT", &child.id().to_string()])
         .output()
@@ -694,4 +726,29 @@ fn initialized_native_finding_returns_next_brief_in_same_cli_response() {
     assert_eq!(report["next"]["repair_brief"]["native_rule_id"], "F401");
     assert_eq!(report["next"]["disposition"], "actionable");
     assert_eq!(report["next"]["delivery_decision"], "not_evaluated");
+}
+
+#[test]
+fn unrelated_symlink_configuration_does_not_pollute_selected_discovery() {
+    let project = Project::new();
+    fs::write(project.0.join("changed.py"), "pass\n").unwrap();
+    fs::write(project.0.join("ruff.toml"), "[lint]\nselect = ['F401']\n").unwrap();
+    fs::create_dir(project.0.join("unrelated")).unwrap();
+    fs::write(project.0.join("unrelated/untouched.py"), "pass\n").unwrap();
+    std::os::unix::fs::symlink("../ruff.toml", project.0.join("unrelated/ruff.toml")).unwrap();
+    let (exit, report) = run(&project, &["--file", "changed.py"]);
+    assert_eq!(exit, 3);
+    assert!(
+        !report["incomplete_reasons"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|r| r == "discovery_incomplete"),
+        "{report}"
+    );
+    assert_eq!(report["files"].as_array().unwrap().len(), 1);
+    assert_eq!(
+        report["checker_configurations"].as_array().unwrap().len(),
+        1
+    );
 }

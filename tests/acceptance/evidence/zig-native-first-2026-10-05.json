@@ -1,0 +1,492 @@
+{
+  "broken": {
+    "authority": "local_unverified",
+    "command_status": "incomplete",
+    "delivery_decision": "not_evaluated",
+    "event_persisted": true,
+    "execution_budget": {
+      "enforcement": "native_execution_only",
+      "source": "builtin_default",
+      "timeout_ms": 1800000
+    },
+    "exit_code": 3,
+    "kind": "blocker",
+    "native_scan": {
+      "authority": "local_unverified",
+      "checker_id": "syntax.native_confirmation",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "input_stable": true,
+      "native": {
+        "diagnostic_count": 1,
+        "diagnostics": [
+          {
+            "column": 19,
+            "line": 1,
+            "rule_id": "zig.ast_check.error"
+          }
+        ],
+        "reason": "ast_check_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "71cc3995a7586753ebf82c66dfb8bef43df446517550678781834586a960f8c9",
+        "version": "0.16.0"
+      },
+      "operation": "task_verify",
+      "original_report": {
+        "grammar_sha256": null,
+        "run_id": "syntax-confirm-77156-1791151354288896000",
+        "sha256": "2b5406493b56cfd6bc4c430292240a0cef71130735466bc5ae913c2a56eaaa1a",
+        "source_sha256": "a8ee3cd373dab58c194f1e476577f7c851ab1f2f3e0631db6508bddec0f5bbe9"
+      },
+      "report_type": "syntax_task_recheck",
+      "run_id": "syntax-native-78577-1791151384068089000",
+      "schema_version": "0.8.0",
+      "target": {
+        "language": "zig",
+        "path": "app.zig",
+        "source_sha256": "a8ee3cd373dab58c194f1e476577f7c851ab1f2f3e0631db6508bddec0f5bbe9"
+      },
+      "task_id": "CG-B-ae88f4af156ed8c93d4b70bbcaa4aa92",
+      "tool_path": "/opt/homebrew/Cellar/zig/0.16.0_1/bin/zig",
+      "workspace_binding": "bound",
+      "workspace_id": "ws-89e4047c8429ec5db5fc9d8ac69d1b0e"
+    },
+    "next_actions": [
+      "inspect_native_syntax_observation",
+      "repair_only_current_native_diagnostics",
+      "verify_policy_and_capability_before_closure"
+    ],
+    "observation": "still_blocked",
+    "operation": "task_verify",
+    "reason": null,
+    "report_type": "task_verification_preview",
+    "schema_version": "0.19.0",
+    "task_id": "CG-B-ae88f4af156ed8c93d4b70bbcaa4aa92"
+  },
+  "fact_state": "open",
+  "first_scan": {
+    "authority": "local_unverified",
+    "category_candidates": [
+      {
+        "capability_status": "gap",
+        "category": "lint",
+        "checker_id": "zig.ast_check",
+        "language": "zig",
+        "legacy_status": "stable",
+        "next_action": "读取 native_results.zig_lint 当前原生位置和环境阻塞；修复后原工具复检，并继续完整项目 lint 与构建",
+        "reason": "zig_single_file_project_checks_unverified",
+        "status": "observed_unverified"
+      },
+      {
+        "capability_status": "gap",
+        "category": "comments",
+        "checker_id": null,
+        "language": "zig",
+        "legacy_status": "stable",
+        "next_action": null,
+        "reason": "native_adapter_not_integrated",
+        "status": "not_integrated"
+      },
+      {
+        "capability_status": "gap",
+        "category": "dependencies",
+        "checker_id": null,
+        "language": "zig",
+        "legacy_status": "stable",
+        "next_action": null,
+        "reason": "native_adapter_not_integrated",
+        "status": "not_integrated"
+      },
+      {
+        "capability_status": "gap",
+        "category": "cve",
+        "checker_id": null,
+        "language": "zig",
+        "legacy_status": "stable",
+        "next_action": null,
+        "reason": "native_adapter_not_integrated",
+        "status": "not_integrated"
+      },
+      {
+        "capability_status": "gap",
+        "category": "security",
+        "checker_id": null,
+        "language": "zig",
+        "legacy_status": "stable",
+        "next_action": null,
+        "reason": "native_adapter_not_integrated",
+        "status": "not_integrated"
+      },
+      {
+        "capability_status": "gap",
+        "category": "build",
+        "checker_id": null,
+        "language": "zig",
+        "legacy_status": "stable",
+        "next_action": null,
+        "reason": "native_adapter_not_integrated",
+        "status": "not_integrated"
+      }
+    ],
+    "command_status": "incomplete",
+    "delivery_decision": "not_evaluated",
+    "discovery": {
+      "blocked_paths": [],
+      "build_roots": [],
+      "checker_configurations": [],
+      "declared_versions": {},
+      "languages": [
+        {
+          "id": "zig",
+          "manifests": [],
+          "source_files": [
+            "app.zig"
+          ]
+        }
+      ],
+      "lockfiles": [],
+      "manifest_sha256": {},
+      "native_tool_candidates": [],
+      "observation_complete": true,
+      "observed_entries": 2,
+      "report_type": "discovery",
+      "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-zig-project-75745-0",
+      "schema_version": "0.4.0",
+      "scope_summary": {
+        "configuration_exception_files_observed": 0,
+        "dependency_roots_excluded": 0,
+        "dot_prefix_roots_excluded": 1,
+        "git_safety_status": "not_evaluated",
+        "ordinary_scan_policy": "project_sources_default_v2"
+      },
+      "source_set_candidates": [],
+      "unknown_conditions": [
+        "source_sets_not_fully_classified",
+        "dialects_not_classified"
+      ]
+    },
+    "execution_budget": {
+      "enforcement": "native_execution_only",
+      "jobs_limit": 4,
+      "jobs_source": "builtin_default",
+      "native_task_count": 1,
+      "source": "cli",
+      "started_native_task_count": 1,
+      "timeout_ms": 120000
+    },
+    "execution_tasks": [
+      {
+        "id": "zig.lint",
+        "status": "native_observed_unverified"
+      }
+    ],
+    "exit_code": 3,
+    "export": {
+      "reason_code": null,
+      "status": "not_requested"
+    },
+    "native_results": {
+      "erlang_lint": null,
+      "go_lint": null,
+      "java_cve": null,
+      "java_dependencies": null,
+      "java_javadoc": null,
+      "java_p3c": null,
+      "kotlin_lint": null,
+      "node_lint": null,
+      "npm_cve": [],
+      "python_cve": [],
+      "python_lint": null,
+      "rust_build": null,
+      "rust_comments": null,
+      "rust_cve": null,
+      "rust_lint": null,
+      "swift_lint": null,
+      "zig_lint": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "files": [
+          {
+            "current": true,
+            "native": {
+              "diagnostic_count": 1,
+              "diagnostics": [
+                {
+                  "column": 19,
+                  "line": 1,
+                  "rule_id": "zig.ast_check.error"
+                }
+              ],
+              "reason": "ast_check_diagnostics",
+              "status": "diagnostics_observed",
+              "tool_sha256": "71cc3995a7586753ebf82c66dfb8bef43df446517550678781834586a960f8c9",
+              "version": "0.16.0"
+            },
+            "next_action": "按当前原生位置修复语法；项目语义另行核对依赖，继续完整项目检查",
+            "path": "app.zig",
+            "recheck_argv": [
+              "codeguard",
+              "lint",
+              "zig",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-zig-project-75745-0/app.zig",
+              "--zig-tool",
+              "/opt/homebrew/bin/zig",
+              "--format=json"
+            ],
+            "source_sha256": "a8ee3cd373dab58c194f1e476577f7c851ab1f2f3e0631db6508bddec0f5bbe9",
+            "task_id": "CG-B-ae88f4af156ed8c93d4b70bbcaa4aa92",
+            "task_sync_reason": null,
+            "tool_path": "/opt/homebrew/Cellar/zig/0.16.0_1/bin/zig"
+          }
+        ],
+        "local_parse_complete": true,
+        "report_type": "zig_ast_scan",
+        "schema_version": "0.2.0",
+        "scope": "single_frozen_zig_files",
+        "scope_stable": true,
+        "source_file_count": 1,
+        "task_status": "synced_partial",
+        "tool_selection": {
+          "executable": "/opt/homebrew/bin/zig",
+          "source": "explicit"
+        },
+        "unobserved_count": 0
+      }
+    },
+    "next": {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "actionable",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "repair-source",
+        "affected_paths": [
+          "app.zig"
+        ],
+        "authority": "local_unverified",
+        "build_root": ".",
+        "checker_id": "syntax.native_confirmation",
+        "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+        "constraints": [
+          "先恢复检查完整性",
+          "不得关闭检查器或修改无关源码"
+        ],
+        "disposition": "actionable",
+        "evidence_ref": {
+          "first_report_sha256": "2b5406493b56cfd6bc4c430292240a0cef71130735466bc5ae913c2a56eaaa1a",
+          "first_run_id": "syntax-confirm-77156-1791151354288896000"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": []
+        },
+        "kind": "blocker",
+        "native_column_unit": "utf8_byte",
+        "native_confirmation_reason": "ast_check_diagnostics",
+        "native_confirmation_ref": {
+          "report_ref": ".codeguard/reports/syntax-confirm-77156-1791151354288896000.json",
+          "report_sha256": "2b5406493b56cfd6bc4c430292240a0cef71130735466bc5ae913c2a56eaaa1a",
+          "run_id": "syntax-confirm-77156-1791151354288896000"
+        },
+        "native_confirmation_status": "diagnostics_observed",
+        "native_diagnostic_positions": [
+          {
+            "column": 19,
+            "line": 1,
+            "rule_id": "zig.ast_check.error"
+          }
+        ],
+        "reason_code": "native_syntax_confirmation_needed",
+        "recheck_argv": [
+          "codeguard",
+          "task",
+          "verify",
+          "CG-B-ae88f4af156ed8c93d4b70bbcaa4aa92",
+          ".",
+          "--format",
+          "json",
+          "--zig-tool",
+          "/opt/homebrew/Cellar/zig/0.16.0_1/bin/zig"
+        ],
+        "schema_version": "0.12.0",
+        "scope": "app.zig",
+        "step": "当前源码已有原生 Zig AST 诊断；核对报告中有界原生位置并修复，然后使用同一工具复检；不要反复安装工具或关闭检查",
+        "task_id": "CG-B-ae88f4af156ed8c93d4b70bbcaa4aa92"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.12.0"
+    },
+    "obligation_status": "unresolved",
+    "operation": "check",
+    "reason": "language_selection_obligations_and_trusted_policy_unavailable",
+    "report_type": "check_feedback",
+    "required_obligations": null,
+    "schema_version": "0.47.0",
+    "selection": "zig",
+    "syntax_candidates": {
+      "authority": "candidate_unqualified",
+      "delivery_decision": "incomplete",
+      "execution_phase": "after_native",
+      "native_preferred_count": 0,
+      "next_action": "使用包含固定语法资产的发行包运行候选初检，并完成适用原生检查",
+      "observations": [],
+      "reason": "binary_without_wasm_precheck",
+      "skipped_count": 0,
+      "source_file_count": 1,
+      "status": "not_run",
+      "unrouted_count": 0
+    },
+    "syntax_tasks": {
+      "failures": [],
+      "new_blockers": 0,
+      "status": "synced_partial",
+      "tasks": []
+    },
+    "unresolved_conditions": [
+      "dialects_not_classified",
+      "required_obligations_unresolved",
+      "source_sets_not_fully_classified",
+      "tool_lock_unverified",
+      "trusted_policy_unavailable",
+      "zig_project_lint_and_build_coverage_unverified"
+    ]
+  },
+  "fixed": {
+    "authority": "local_unverified",
+    "command_status": "incomplete",
+    "delivery_decision": "not_evaluated",
+    "event_persisted": true,
+    "execution_budget": {
+      "enforcement": "native_execution_only",
+      "source": "builtin_default",
+      "timeout_ms": 1800000
+    },
+    "exit_code": 3,
+    "kind": "blocker",
+    "native_scan": {
+      "authority": "local_unverified",
+      "checker_id": "syntax.native_confirmation",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "input_stable": true,
+      "native": {
+        "diagnostic_count": 0,
+        "diagnostics": [],
+        "reason": "ast_check_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "71cc3995a7586753ebf82c66dfb8bef43df446517550678781834586a960f8c9",
+        "version": "0.16.0"
+      },
+      "operation": "task_verify",
+      "original_report": {
+        "grammar_sha256": null,
+        "run_id": "syntax-confirm-77156-1791151354288896000",
+        "sha256": "2b5406493b56cfd6bc4c430292240a0cef71130735466bc5ae913c2a56eaaa1a",
+        "source_sha256": "a8ee3cd373dab58c194f1e476577f7c851ab1f2f3e0631db6508bddec0f5bbe9"
+      },
+      "report_type": "syntax_task_recheck",
+      "run_id": "syntax-native-82866-1791151405832114000",
+      "schema_version": "0.8.0",
+      "target": {
+        "language": "zig",
+        "path": "app.zig",
+        "source_sha256": "971f41f2fce93bfa4d874c28649d3ce3aa92fc0fe5946a47a23a3bd623272129"
+      },
+      "task_id": "CG-B-ae88f4af156ed8c93d4b70bbcaa4aa92",
+      "tool_path": "/opt/homebrew/Cellar/zig/0.16.0_1/bin/zig",
+      "workspace_binding": "bound",
+      "workspace_id": "ws-89e4047c8429ec5db5fc9d8ac69d1b0e"
+    },
+    "next_actions": [
+      "inspect_native_syntax_observation",
+      "repair_only_current_native_diagnostics",
+      "verify_policy_and_capability_before_closure"
+    ],
+    "observation": "candidate_absent_unverified_policy",
+    "operation": "task_verify",
+    "reason": null,
+    "report_type": "task_verification_preview",
+    "schema_version": "0.19.0",
+    "task_id": "CG-B-ae88f4af156ed8c93d4b70bbcaa4aa92"
+  },
+  "next": {
+    "authority": "local_unverified",
+    "command_status": "complete",
+    "delivery_decision": "not_evaluated",
+    "disposition": "actionable",
+    "exit_code": 0,
+    "next_actions": [],
+    "operation": "next",
+    "reason": "local_task_selected",
+    "repair_brief": {
+      "action_id": "repair-source",
+      "affected_paths": [
+        "app.zig"
+      ],
+      "authority": "local_unverified",
+      "build_root": ".",
+      "checker_id": "syntax.native_confirmation",
+      "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+      "constraints": [
+        "先恢复检查完整性",
+        "不得关闭检查器或修改无关源码"
+      ],
+      "disposition": "actionable",
+      "evidence_ref": {
+        "first_report_sha256": "2b5406493b56cfd6bc4c430292240a0cef71130735466bc5ae913c2a56eaaa1a",
+        "first_run_id": "syntax-confirm-77156-1791151354288896000"
+      },
+      "history": {
+        "attempt_count": 0,
+        "awaiting_verification": false,
+        "budget": 2,
+        "no_progress_count": 0,
+        "open_attempt_id": null,
+        "recent": []
+      },
+      "kind": "blocker",
+      "native_column_unit": "utf8_byte",
+      "native_confirmation_reason": "ast_check_diagnostics",
+      "native_confirmation_ref": {
+        "report_ref": ".codeguard/reports/syntax-confirm-77156-1791151354288896000.json",
+        "report_sha256": "2b5406493b56cfd6bc4c430292240a0cef71130735466bc5ae913c2a56eaaa1a",
+        "run_id": "syntax-confirm-77156-1791151354288896000"
+      },
+      "native_confirmation_status": "diagnostics_observed",
+      "native_diagnostic_positions": [
+        {
+          "column": 19,
+          "line": 1,
+          "rule_id": "zig.ast_check.error"
+        }
+      ],
+      "reason_code": "native_syntax_confirmation_needed",
+      "recheck_argv": [
+        "codeguard",
+        "task",
+        "verify",
+        "CG-B-ae88f4af156ed8c93d4b70bbcaa4aa92",
+        ".",
+        "--format",
+        "json",
+        "--zig-tool",
+        "/opt/homebrew/Cellar/zig/0.16.0_1/bin/zig"
+      ],
+      "schema_version": "0.12.0",
+      "scope": "app.zig",
+      "step": "当前源码已有原生 Zig AST 诊断；核对报告中有界原生位置并修复，然后使用同一工具复检；不要反复安装工具或关闭检查",
+      "task_id": "CG-B-ae88f4af156ed8c93d4b70bbcaa4aa92"
+    },
+    "report_type": "repair_brief_preview",
+    "schema_version": "0.12.0"
+  }
+}

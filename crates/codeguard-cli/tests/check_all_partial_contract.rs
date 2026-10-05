@@ -27,6 +27,14 @@ impl Project {
         let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
             .args(["check", "all", self.0.to_str().unwrap(), "--format=json"])
             .args(extra)
+            .env(
+                "PATH",
+                if self.0.join("Cargo.toml").is_file() && !extra.contains(&"--cargo-tool") {
+                    std::ffi::OsString::new()
+                } else {
+                    std::env::var_os("PATH").unwrap_or_default()
+                },
+            )
             .env_remove("CODEGUARD_TIMEOUT")
             .env_remove("CODEGUARD_JOBS")
             .output()
@@ -59,7 +67,7 @@ fn check_feedback_schema_cannot_encode_allow() {
     .unwrap();
     assert_eq!(previous["properties"]["schema_version"]["const"], "0.30.0");
     assert_eq!(schema["additionalProperties"], false);
-    assert_eq!(schema["properties"]["schema_version"]["const"], "0.34.0");
+    assert_eq!(schema["properties"]["schema_version"]["const"], "0.36.0");
     let archived: Value = serde_json::from_str(include_str!(
         "../../../schemas/check-feedback-v0.32.schema.json"
     ))
@@ -244,7 +252,7 @@ fn check_all_keeps_local_checker_candidate_separate_from_execution() {
 
     let (exit, report) = project.check(&[]);
     assert_eq!(exit, 3);
-    assert_eq!(report["schema_version"], "0.34.0");
+    assert_eq!(report["schema_version"], "0.38.0");
     assert_eq!(report["discovery"]["schema_version"], "0.4.0");
     let candidates = report["discovery"]["native_tool_candidates"]
         .as_array()
@@ -560,7 +568,7 @@ fn rust_only_project_keeps_categories_as_candidates_without_inventing_policy_obl
     let (exit, report) = project.check(&[]);
     assert_eq!(exit, 3);
     assert_eq!(report["report_type"], "check_feedback");
-    assert_eq!(report["schema_version"], "0.34.0");
+    assert_eq!(report["schema_version"], "0.38.0");
     assert_eq!(report["execution_budget"]["timeout_ms"], 1_800_000);
     assert_eq!(report["execution_budget"]["source"], "builtin_default");
     assert_eq!(
@@ -944,6 +952,12 @@ fn check_all_cancelled_native_task_returns_130_and_keeps_discovery() {
         "[package]\nname='cancel-sample'\nversion='0.1.0'\nedition='2021'\n",
     )
     .unwrap();
+    // 此用例验证运行中的取消及兄弟任务诊断，需先满足锁定原生启动前提。
+    fs::write(
+        project.0.join("Cargo.lock"),
+        "version = 4\n[[package]]\nname=\"cancel-sample\"\nversion=\"0.1.0\"\n",
+    )
+    .unwrap();
     let ready = project.0.join("native-ready");
     let rust_ready = project.0.join("rust-ready");
     let late = project.0.join("native-late-write");
@@ -962,7 +976,7 @@ fn check_all_cancelled_native_task_returns_130_and_keeps_discovery() {
     fs::write(
         &cargo_tool,
         format!(
-            "#!/bin/sh\nsleep 2.2\nprintf '%s\\n' '{{\"reason\":\"compiler-message\",\"message\":{{\"level\":\"warning\",\"code\":{{\"code\":\"clippy::needless_return\"}},\"message\":\"unneeded return\",\"spans\":[{{\"file_name\":\"src/lib.rs\",\"line_start\":1,\"column_start\":1,\"is_primary\":true}}]}}}}' '{{\"reason\":\"build-finished\",\"success\":true}}'\n/usr/bin/touch '{}'\n",
+            "#!/bin/sh\nif [ \"$1\" != clippy ]; then printf '%s\\n' '{{\"reason\":\"build-finished\",\"success\":true}}'; exit 0; fi\nprintf '%s\\n' '{{\"reason\":\"compiler-message\",\"message\":{{\"level\":\"warning\",\"code\":{{\"code\":\"clippy::needless_return\"}},\"message\":\"unneeded return\",\"spans\":[{{\"file_name\":\"src/lib.rs\",\"line_start\":1,\"column_start\":1,\"is_primary\":true}}]}}}}' '{{\"reason\":\"build-finished\",\"success\":true}}'\n/usr/bin/touch '{}'\n",
             rust_ready.display()
         ),
     )

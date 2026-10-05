@@ -321,6 +321,7 @@ Rust 实现与本 change 归本仓；宿主实现归独立 codeguard-plugin 仓�
 | RW18 | [remediation-workflow](specs/remediation-workflow/spec.md) / ESLint incomplete prerequisites SHALL create investigation tasks | 7.3,9.3,9.24,12.7 |
 | RW19 | [remediation-workflow](specs/remediation-workflow/spec.md) / ESLint task verification SHALL retain native observations | 7.3,9.7,9.13,12.7 |
 | RW20 | [remediation-workflow](specs/remediation-workflow/spec.md) / npm local audit observations SHALL enter persistent coverage repair tasks | 7.3,9.3,9.4,9.13,12.7 |
+| RW21 | [remediation-workflow](specs/remediation-workflow/spec.md) / Bound single-file P3C lint SHALL reuse project remediation identity | 6.2,9.3,9.4,9.7,9.13,12.7 |
 | UC12 | [unified-cli-contract](specs/unified-cli-contract/spec.md) / check all SHALL orchestrate npm roots through the shared native runtime | 2.3,3.4,7.3,7.5,9.13,12.9 |
 | UC13 | [unified-cli-contract](specs/unified-cli-contract/spec.md) / Install previews SHALL distinguish bound layout declarations from verified package contents | 2.7,11.2,12.9 |
 | UC14 | [unified-cli-contract](specs/unified-cli-contract/spec.md) / npm public CVE feedback SHALL preserve local observation boundaries | 2.5,7.3,7.5,11.16,12.9 |
@@ -340,8 +341,36 @@ Rust 实现与本 change 归本仓；宿主实现归独立 codeguard-plugin 仓�
 | SP06 | [syntax-precheck](specs/syntax-precheck/spec.md) / Syntax observations SHALL preserve grammar fidelity and source positions | 14.4,14.17 |
 | SP07 | [syntax-precheck](specs/syntax-precheck/spec.md) / Precheck briefs SHALL reach agent conversations with concrete next actions | 14.9,14.14,14.15,14.16 |
 | SP08 | [syntax-precheck](specs/syntax-precheck/spec.md) / Suspected syntax tasks SHALL require capability-matched native verification | 14.10,14.11 |
+| SP08.Go | [syntax-precheck](specs/syntax-precheck/spec.md) / Go limited resolution binds the complete syntax tool pair | 9.10,14.11,14.12 |
 | SP09 | [syntax-precheck](specs/syntax-precheck/spec.md) / Grammar false-positive dispositions SHALL be precise and preserve native obligations | 14.12 |
 | SP10 | [syntax-precheck](specs/syntax-precheck/spec.md) / Syntax caches SHALL bind inputs and retain historical observations on invalidation | 14.13 |
 | SP11 | [syntax-precheck](specs/syntax-precheck/spec.md) / Fallback rollout SHALL preserve command and delivery compatibility | 14.7,14.9,14.18 |
 | SP12 | [syntax-precheck](specs/syntax-precheck/spec.md) / Syntax support claims SHALL have per-language and per-host evaluation evidence | 14.14,14.15,14.16,14.17,14.18 |
 | BD12 | [binary-distribution](specs/binary-distribution/spec.md) / npm launchers SHALL delegate checks to the matching Rust binary | 13.4.1,14.18 |
+
+2026-10-04：SP07/SP08 与 HP 编辑快检继续由 11.17、14.9–14.11 管理。新增通用候选确认报告复用现有工作台和 Python/ESLint 身份，不创建第二套状态清单；原生能力匹配关闭仍由未完成的 14.11 管理。
+
+
+## 2026-10-04 无定位观察进入检查恢复任务
+
+syntax-precheck的隐藏token场景→9.3/9.9/14.7/14.10/14.11/14.19：check all/java与确认写入Hook共用稳定语法任务同步；check_feedback 0.38及本地确认0.3协议分别保留失败任务范围和无位置未完成证据。实际实现位于syntax_confirmation/check_command/hook_fast_scan，next/work_sync保留检查环境范围及原生确认前不得修改源码，syntax_task_recheck接受原0.3首次证据并记录缺adapter失败。验收与证据：[无定位语法检查恢复](../../../tests/acceptance/unlocated-syntax-recovery-tasks.md)。这些是既有父任务的已验证增量，重命名/跨工具身份、完整attempt、原生adapter和正式关闭/宿主验收仍缺，不新建或勾选第二份任务。
+
+本批终态：默认 workspace/all-targets 1234 passed/0 failed/113 ignored；受影响 WASM 16 组 210 passed/0 failed/30 ignored；默认及 WASM Clippy -D warnings、fmt、分层和 OpenSpec strict 通过。203 schema 元定义、16 份真实报告与 48 个伪造变体通过；新增开发协议回归 4 passed。实际报告揭露聚合 next 仅支持旧简报的 schema 缺口，新的 0.38 已引用完整既有简报版本而非放宽任意对象，旧 schema 字节不改。固定二进制实际捕获任务和复检；Swift 两例原生 parse 对照不提升资格。完整日志摘要及运行限制见[本批验收](../../../tests/acceptance/unlocated-syntax-recovery-tasks.md)。父任务不勾选，未重跑完整 WASM suite/358 例语料，公开发行和真实宿主未改变。
+
+
+## 2026-10-04 Erlang 任务复检与工具自动发现（进行中）
+
+对应既有 9.9、9.10、14.10、14.11、14.19；不创建第二份规格。现有 lint/check 能发现调用方 PATH 中的 erl，但 task verify 仅显式参数，导致已安装工具被误报未提供。新增场景和三个先失败的反例后，复检复用原工具选择服务；显式及首选失败不换工具，实际 next 固定工具路径，空/相对/不可执行来源仍未完成。候选/原生首次任务及 repair-ready 的共同入口、原协议、租约/事件和不自动关闭继续保持；完整原生确认与宿主关闭父任务仍开放。实际终态及证据补入[本批验收](../../../tests/acceptance/erlang-recheck-discovery.md)。
+
+本批终态：默认全工作区 1235 passed/0 failed/113 ignored；其后仅历史指引文案变化，最终默认工作台定向 12 passed/0 failed/1 ignored。最终 WASM 16 组 199 passed/0 failed/25 ignored；显式 OTP 28 实测新增目标 1 passed，最终二进制两来源实际复放。默认/WASM Clippy、fmt、分层和 OpenSpec strict 通过；旧 schema 未改，父任务未勾选。前批 4afa8bc 的 Linux CI 因旧对话文案断言失败，已重现并修改行为断言，本批远端结果独立确认。详情及固定日志见[本批验收](../../../tests/acceptance/erlang-recheck-discovery.md)。
+
+
+## Swift 原生确认增量（2026-10-04）
+
+9.9/9.10/14.10/14.11/14.19：既有 Swift 无定位 WASM 确认任务复用 Rust 原生 parse、追加观察与 next/repair_ready，绑定源字节/工具并核对 UTF-8 字节列；缺工具给具体恢复步骤、零诊断不自动关闭。实际 Apple Swift 6.4 与受控边界证据见 [验收](../../../tests/acceptance/swift-native-task-confirmation.md)。Swift 全项目原生优先、可信关闭 SDK、真实宿主及语言资格仍缺，父任务未完成。
+
+
+2026-10-05：unified-cli-contract / `Help SHALL report current command support without executing commands` 由2.1、2.7、12.9跟踪；静态目录及帮助协议不替代正式全部参数注册或MCP接线。
+
+
+Rust独立lint原生优先及工作台→2.1/2.7/7.3/9.9/14.9–14.11/14.19：复用聚合原生服务、稳定任务和原工具复检，缺Cargo有界WASM初检，显式失败不回退；Rust简报专用schema和help0.2以实际报告验证。完整构建/政策/资格/宿主/发布未完成，证据见[验收](../../../tests/acceptance/rust-standalone-lint.md)。

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
@@ -115,6 +115,12 @@ test('本地离线 npm 包通过统一 check all 调用全部 32 份候选', () 
     ['a.zig', 'const Empty = struct {};\n'],
   ];
   try {
+    // 此场景验收候选回退，不应继承 runner 的原生编译器。
+    const runtimePath = path.join(scratch, 'runtime');
+    mkdirSync(runtimePath);
+    symlinkSync(process.execPath, path.join(runtimePath, 'node'));
+    symlinkSync('/bin/sh', path.join(runtimePath, 'sh'));
+    const npmPath = realpathSync(path.join(path.dirname(process.execPath), process.platform === 'win32' ? 'npm.cmd' : 'npm'));
     const observed = new Set();
     samples.forEach(([filename, source], index) => {
       const group = path.join(scratch, `group-${Math.floor(index / 8)}`);
@@ -122,11 +128,11 @@ test('本地离线 npm 包通过统一 check all 调用全部 32 份候选', () 
       writeFileSync(path.join(group, filename), source);
     });
     for (let groupIndex = 0; groupIndex < 4; groupIndex++) {
-      const checked = spawnSync('npm', [
+      const checked = spawnSync(npmPath, [
         'exec', '--offline', '--yes', '--cache', path.join(scratch, 'cache'),
         '--package', tarball, '--', 'codeguard', 'check', 'all', path.join(scratch, `group-${groupIndex}`),
         '--format=json', '--timeout', '120s',
-      ], { cwd: root, encoding: 'utf8', timeout: 150_000, maxBuffer: 4 * 1024 * 1024 });
+      ], { cwd: root, env: { ...process.env, PATH: runtimePath }, encoding: 'utf8', timeout: 150_000, maxBuffer: 4 * 1024 * 1024 });
       assert.equal(checked.status, 3, `group ${groupIndex}: ${checked.stderr}`);
       const report = JSON.parse(checked.stdout);
       assert.equal(report.delivery_decision, 'incomplete');

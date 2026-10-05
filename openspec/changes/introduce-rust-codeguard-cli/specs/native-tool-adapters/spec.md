@@ -4,6 +4,19 @@
 
 ## ADDED Requirements
 
+### Requirement: Native ShellCheck feedback SHALL preserve dialect, rc and original-rule evidence
+
+ShellCheck单文件入口 MUST 明确方言和工具兼容版本，冻结有界UTF8源码并通过受控stdin调用json1，不执行受检脚本、不应用原生fix。已知zsh/fish声明或文件名 MUST 保留未支持，不强制按bash制造诊断。显式rc或最近祖先配置与更近缺项 MUST 在调用前后核对；不加载的全局配置 MUST 公开说明，未知外部source范围 MUST 保留阻塞。环境规则与源发现 MUST 分开，保留部分有效诊断但不能判完整。json1位置 MUST 按其Unicode字符及tab语义核验；未知字段、重复键、异源文件、越界位置、退出与报告矛盾 MUST 未完成。原生自由文本及fix替换不得作为智能体指令。修复简报 MUST 包含七要素；未接持久历史时明确not_integrated，未完成证据不得授权源码修改或关闭任务。原生零诊断不得替代项目门禁。
+
+#### Scenario: A missing sourced file coexists with a quoting diagnostic
+- **WHEN** json1包含SC1091和SC2086且原始输入稳定
+- **THEN** SC1091保留为环境阻塞，SC2086保留为局部调查证据；整体未完成，不删除发现、不关闭任务
+
+#### Scenario: Project rc suppresses a native rule
+- **WHEN** 原项目rc明确disable=SC2086且原工具输出零诊断
+- **THEN** 保存原配置摘要和原生执行事实，但不能将抑制当作源码修复、CodeGuard批准白名单或完整交付
+
+
 ### Requirement: Explicit Maven Javadoc selection SHALL not fall back to isolated single-file diagnostics
 
 项目检查明确提供 Maven 执行上下文时，Javadoc MUST 选择原 POM/完整显式主源码的多文件检查，不再额外启动隔离单文件 JDK 探针。构建根不适用、配置/类路径未知、环境缺失或原生失败 MUST 保留具体未完成诊断，不得用单文件探针代替项目配置。未选择 Maven 的显式 JDK 局部模式保持可用，但 MUST 标注其单文件范围且不推导项目覆盖。报告 MUST 版本化显示探针模式及独立多文件结果；跨文件类型引用不得因为已舍弃的单文件上下文额外生成源码 finding 或环境任务。
@@ -39,11 +52,70 @@ adapter MUST 根据工具版本的报告及退出语义解析结果；MUST NOT �
 
 Rust 注释诊断 MUST 使用原生 Cargo/rustdoc 机器流，不能复用只接收 Clippy 规则的解析器或通过正则重写文档规则。已识别 missing_docs 与 rustdoc::broken_intra_doc_links 的观察 MUST 保留原生规则/级别、唯一主定位和原生 package/manifest/target 身份供执行层核对；不得把其它编译错误改称注释问题。重复 JSON 键、缺失/重复/失败的结束记录、结束后新事件、歧义主定位及未支持的警告 MUST 保持未完成。纯解析或显式局部库目标执行不证明项目原配置、完整工作区/features/targets、可信工具或批准规则覆盖。
 
-公开 comments rust 的局部探针 MUST 显式选择Cargo入口、采用共享预算与受控运行时，使用锁定离线输入和私有输出目录，不隐式下载/安装工具。MUST 将当前清单/锁/已观察源码、工具字节及原生主目标核对，输入变化、目标越界或机器流异常返回未完成。显式探针规则 MUST 标明不代表项目获批准的生效文档规则；局部零诊断不得关闭任务或批准白名单，完整配置闭包与构建组合仍须独立验证。
+公开 comments rust 的局部探针 MUST 固定显式指定或从调用方绝对PATH发现的Cargo入口、采用共享预算与受控运行时，使用锁定离线输入和私有输出目录，不隐式下载/安装工具。MUST 将当前清单/锁/已观察源码、工具字节及原生主目标核对，输入变化、目标越界或机器流异常返回未完成。显式探针规则 MUST 标明不代表项目获批准的生效文档规则；局部零诊断不得关闭任务或批准白名单，完整配置闭包与构建组合仍须独立验证。
 
 Rustdoc发现候选身份 MUST 绑定原生主定位字节范围所对应的真实UTF8源码及精确规则/相对目标，而不是诊断列表序号；范围缺失、倒置、越界或切断UTF8时不得猜测行内容补造。相同原生记录可去重，但同一候选身份对应多个不同源码范围/诊断时 MUST 明示歧义，保留观察且不分配正式finding ID或关闭任务。文档修复/行移动不得让剩余发现借用另一问题的顺序身份；完整符号归属尚未建立时仍是候选。
 
 Rustdoc逐问题反馈 MUST 提供问题证据、规则依据、允许修改的范围、修复步骤、原工具复检命令、尝试历史状态和关闭条件。局部完成且身份唯一时可提供限定目标源码的修复指引；输入变化、歧义、取消或其它未完成状态 MUST 保留调查指引且不给源码修改范围。尚未接入持久任务时 MUST 明示历史未接通，不得把空历史伪装为无失败尝试。简报不能授权任务关闭、白名单批准或完整交付。
+
+#### Scenario: Kotlin version probing changes the frozen source copy
+- **WHEN** Kotlin版本探测改变私有源码副本，或源码副本不再满足有界普通文件/字节一致性
+- **THEN** 在源码编译调用前拒绝执行，保留input_changed未完成状态，不仅在编译后撤回结果；源码编译后继续复核
+
+#### Scenario: Zig version probing emits unexpected stderr
+- **WHEN** Zig版本动作虽退出0并输出目标版本，却同时产生非空stderr
+- **THEN** 版本未核验，停止AST调用并保持未完成；不能把错误输出解释为用户源码违规
+
+#### Scenario: Cargo launcher is a multicall proxy
+- **WHEN** 显式或自动发现的 Cargo 入口通过符号链接指向依入口名分派命令的代理
+- **THEN** 核验解析后工具字节但保留所选入口执行 Clippy、rustdoc 与构建；执行后核对解析目标和字节，入口改指另一目标即使字节相同也返回未完成；不得误把 rustup 的管理命令输出当作 Cargo 机器报告
+
+#### Scenario: Cargo discovery preserves invoking toolchain without implicit installation
+- **WHEN** 局部 Rust 检查或原任务复检未显式指定工具，调用方绝对PATH存在普通可执行cargo
+- **THEN** 固定第一个入口供本轮原生执行；显式无效请求或所选工具执行失败不改用其它Cargo，空/相对目录及不可执行入口不作为候选
+- **AND** 继承RUSTUP_TOOLCHAIN并覆盖RUSTUP_AUTO_INSTALL为0；缺工具链反馈环境失败，不自动安装、不制造源码违规，既有输入/工具复核及完整覆盖未完成语义继续适用
+
+#### Scenario: Clippy requires prepared locked dependencies
+- **WHEN** 运行局部 Clippy 或同规则抑制对照
+- **THEN** Rust MUST 使用 `--locked --offline`，保留原锁字节；根锁不可用时在原生启动前反馈环境准备未完成，不生成锁文件、不判源码违规；依赖解析确需更新时原生失败仍保留未完成
+
+#### Scenario: Standalone Rust lint reuses native observation and repair workflow
+- **WHEN** 调用 `lint rust [path]` 并指定Cargo或从绝对PATH取得首个Cargo入口
+- **THEN** 复用原生Clippy局部观察、共享预算和输入核对，仅执行lint而不执行rustdoc、build或CVE；初始化工作区自动保存报告、同步稳定任务并反馈下一步，零诊断不能关闭任务或签发完整通过
+- **AND** 显式入口无效或原生执行失败不得换用其它工具或WASM掩盖原生失败
+
+#### Scenario: Standalone Rust lint has no native Cargo
+- **WHEN** 未显式选择Cargo且绝对PATH没有可用Cargo
+- **THEN** WASM构建对有界Rust源码提供候选初检并同步确认任务；发现候选或范围/运行未完成时必须准备原生工具，完整有界范围零候选时推荐准备；不安装工具、不把候选认定为源码违规；无WASM构建明确初检不可用
+
+#### Scenario: Ruby syntax observation is distinct from project style lint
+- **WHEN** 调用公开Ruby单文件lint入口或复检Ruby语法确认任务
+- **THEN** 只对冻结源码调用版本核验后的Ruby 2.6.10p210 `--disable=gems -EUTF-8:UTF-8 -W0 -c -`，不执行源码或项目插件；反馈明确固定语法版本与项目版本/完整lint未核验，不冒充RuboCop、类型、安全或完整项目检查
+- **AND** 原生诊断只保留工具提供的行，不从caret猜列；版本、工具、源码或报告异常保持未完成；显式失败不改选工具，不用WASM洗白原生失败
+
+#### Scenario: Ruby syntax observations retain stable confirmation tasks
+- **WHEN** 已初始化工作区取得当前Ruby原生异常或WASM候选，并再次检查或执行task verify
+- **THEN** 原生首次证据与WASM首次证据保留独立版本和来源，同一文件复用既有确认身份；原工具复检追加历史，零诊断不凭本地观察关闭任务；缺原生、无进展或版本上下文不足要求恢复检查能力或提出具体决策
+
+#### Scenario: Clippy inputs change during native execution
+- **WHEN** 已观察 Rust 源码、根 Cargo 清单/锁、Clippy/Cargo/工具链配置在原生运行期间变化，或原工具被替换
+- **THEN** 诊断指纹只来源于启动前固定字节；最终核对失败时撤回本轮源码 finding，返回具体未完成原因，不把旧诊断附到新源码，也不把零诊断作为环境恢复或修复候选。可选配置原先不存在而在扫描中新增也须失效，缺少有界普通输入时不得启动检查器
+
+#### Scenario: Clippy cancellation also observes changed inputs
+- **WHEN** 原生 Clippy 被取消且本轮源码或配置也已变化
+- **THEN** 撤回陈旧诊断，同时保留 request_cancelled 的优先级；聚合反馈不能将取消降级为普通未完成退出3
+
+#### Scenario: Stable Clippy evidence is followed by malformed output
+- **WHEN** 同一输入和工具字节下已有有效原生诊断，随后原生报告损坏或执行不完整
+- **THEN** 保留可归属的已观察诊断与未完成原因；不能因报告部分失败丢掉全部发现，也不能签发完整检查或交付通过
+
+#### Scenario: Clippy repeats a source diagnostic across native targets
+- **WHEN** 库、二进制或测试目标在同轮机器流重复报告同一文件、规则、行和列的问题
+- **THEN** 原生观察与工作台只投影一个该定位的 finding；同定位级别不同时保留 error 优先于 warning，原生执行失败仍独立保留。不同定位不得被归并，重复扫描复用原稳定任务而不是以目标次数新增序号身份；历史重复任务不据此自动关闭
+
+#### Scenario: Concurrent Clippy tasks observe identical clock timestamps
+- **WHEN** 同进程两个原生检查的时钟值相同
+- **THEN** 以独立序号及 create-exclusive 目录分配隔离 scratch，不因相同时间戳相互覆盖或误报目录不可用；只清理各自拥有的目录
 
 #### Scenario: Rustdoc evidence becomes stale before repair guidance
 - **WHEN** 原工具发现文档问题，但同轮输入变化或发现身份歧义
@@ -88,6 +160,11 @@ Rustdoc逐问题反馈 MUST 提供问题证据、规则依据、允许修改的�
 #### Scenario: Tool verification observes a local lock candidate
 - **WHEN** `tools verify` 读取本地工具锁候选并核对当前平台的入口、可选运行时及目录包字节
 - **THEN** 逐项反馈匹配、缺失、不可读、摘要失配或不可执行及恢复动作；不启动 wrapper、安装或联网，不把结构合法/字节匹配解释为可信批准、可启动或规则已执行。本地来源未获核验时整体未完成、readiness=unknown、无门禁效力；坏锁或链接锁不生成源码 finding
+
+#### Scenario: A configured root-local Ruff remains the original execution context
+- **WHEN** 已配置Python受检根有普通`.venv/bin`目录内的原生Ruff，或其本地环境损坏
+- **THEN** 没有显式工具时优先本地入口，沿原版本/工具/源码/config校验执行；已选入口失败不换全局工具。损坏本地上下文返回ruff_local_tool_invalid并同步同一环境任务，下一步及任务文档明确本地路径、权限/目录调查和原工具复检，不建议修改无关源码或用删除环境绕过
+- **AND** 无适用配置不启动；确实没有本地入口才保留已有PATH发现。本轮观察不证明其它模块虚拟环境、环境管理器或正式覆盖/批准；原生零诊断仍不能自动关闭任务
 
 #### Scenario: Doctor diagnoses an explicitly selected Ruff binary
 - **WHEN** doctor 观察项目配置并收到显式绝对路径的 Ruff 原生入口
@@ -598,3 +675,23 @@ Rust npm审计适配 MUST 核对具体原工具版本、auditReportVersion、冻
 #### Scenario: Public native finding disappears after a same-configuration repair
 - **WHEN** 原生工具先检出规则，再用相同原配置检查已修复文件而零诊断
 - **THEN** 对话分别展示原发现及局部零诊断，仍明确完整项目覆盖和策略未核验；未接持久任务时不虚构关闭事件
+
+
+#### Scenario: Ruby project checks reuse bounded native syntax observations
+- **WHEN** check ruby or check all discovers Ruby files
+- **THEN** Codeguard selects an explicit or absolute-PATH Ruby entry before WASM; observing at most64 frozen files with one shared deadline retains unobserved files and incomplete scope
+- **AND** selected tool failures never fall back to WASM, missing tools retain candidate fallback, invalidated source/tool identities withdraw old positions, and initialized workspaces reuse stable tasks and original-tool rechecks
+- **AND** fixed Ruby2.6.10p210 syntax observations have line-only evidence and never imply RuboCop, project-version compatibility, complete project lint or delivery approval.
+
+#### Scenario: Declared Ruby version prevents incompatible fixed-parser findings
+- **WHEN** a Ruby source has a nearest workspace-bounded `.ruby-version` declaration before native syntax observation
+- **THEN** the fixed Ruby 2.6.10p210 parser only runs for an exact supported 2.6.10 declaration; other versions, ambiguous aliases, unreadable or linked declarations return an environment-incomplete reason without source diagnostics or switching the selected tool to WASM
+- **AND** version inputs, including absent nearer files, are rechecked after parsing; changes withdraw diagnostics. No declaration retains the explicitly unverified preliminary path, not proof of project compatibility; Gemfile is not executed or inferred
+- **AND** lint, project/edit checks and task rechecks use the same bounded constraint; saved positions are withdrawn when the current declared version becomes incompatible or unresolved, without deleting history or closing the task
+
+
+#### Scenario: Ruby candidate inventory distinguishes project-specific tool scopes
+- **WHEN** the six-category Ruby research profile is read before adapter qualification
+- **THEN** lint, comments, dependencies, CVE, security and build each retain an explicit candidate and gap; MRI/JRuby/TruffleRuby and candidate platforms remain separately unverified, and tool versions require project-lock resolution rather than floating latest
+- **AND** class/module and method documentation rules remain distinct; Brakeman is scoped to Rails, gem packaging to gem projects, and custom project builds require explicit configuration; missing tools cannot imply not_applicable
+- **AND** the candidate profile is not an executable plan or implemented capability, and CVE requires independently bound database identity and freshness; a missing native database must not cause an implicit download during checking

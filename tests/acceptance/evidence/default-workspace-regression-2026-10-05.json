@@ -1,0 +1,25 @@
+{
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--workspace",
+    "--all-targets"
+  ],
+  "exit_code": 0,
+  "result_records": 244,
+  "passed": 1357,
+  "failed": 0,
+  "ignored": 123,
+  "log_sha256": "8a66b6356955a2e3d4471b2ea56df9c958679828c673f216e64c80de62c236da",
+  "log_path": "/private/tmp/codeguard-default-suite-green-2026-10-05.log",
+  "source_head": "9e13df5eb708c0ca2cb6862b92b7b535749a80f2",
+  "source_scope": "working_tree_after_importer_fix",
+  "source_overrides": {
+    "crates/codeguard-cli/examples/build_grammar_corpus.rs": "0f53b8fc80442875def8918c3c575f568b756887ef221e7aebe88c4dd428f657"
+  },
+  "protected_erlang_draft_sha256": "2e3a296072e6a3aa34b561799c18c7d8b621d00f8786301d2612cee8cdab85b6",
+  "wasm_precheck_enabled": false,
+  "ignored_is_not_acceptance": true,
+  "delivery_decision": "not_evaluated"
+}

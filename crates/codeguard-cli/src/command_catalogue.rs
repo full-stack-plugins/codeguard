@@ -1,0 +1,567 @@
+use crate::{command_descriptor::CommandDescriptor, command_examples::examples};
+
+/// 返回当前编译入口的固定目录；未实现操作保留planned，不读取工作区或工具。
+pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
+    vec![
+        CommandDescriptor {
+            tracking_id: Some(r#"C01"#),
+            command: r#"help"#,
+            examples: examples("help"),
+            support: r#"implemented"#,
+            executable: true,
+            operation_kind: r#"query"#,
+            usage: r#"help [COMMAND...] [--format human|json]"#,
+            scope: r#"静态命令目录；不读取项目或启动工具"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C02"#),
+            command: r#"--version"#,
+            examples: examples("--version"),
+            support: r#"implemented"#,
+            executable: true,
+            operation_kind: r#"query"#,
+            usage: r#"--version [--format human|json]"#,
+            scope: r#"构建声明与协议major；不核验发行来源"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C03"#),
+            command: r#"detect"#,
+            examples: examples("detect"),
+            support: r#"partial"#,
+            executable: true,
+            operation_kind: r#"query"#,
+            usage: r#"detect [path] [--format human|json]"#,
+            scope: r#"静态项目观察；不证明动态构建配置"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C04"#),
+            command: r#"capabilities"#,
+            examples: examples("capabilities"),
+            support: r#"implemented"#,
+            executable: true,
+            operation_kind: r#"query"#,
+            usage: r#"capabilities [language] [--platform ID] [--category ID] [--format human|json]"#,
+            scope: r#"能力库存；gap不表示原生已接入或项目通过"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C05"#),
+            command: r#"init"#,
+            examples: examples("init"),
+            support: r#"partial"#,
+            executable: true,
+            operation_kind: r#"management"#,
+            usage: r#"init [path] [--dry-run|--apply] [--format human|json]"#,
+            scope: r#"受管工作台和静态画像；完整架构识别仍缺"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C06"#),
+            command: r#"plan"#,
+            examples: examples("plan"),
+            support: r#"partial"#,
+            executable: true,
+            operation_kind: r#"plan"#,
+            usage: r#"plan <lint|comments|dependencies|cve|security|build|check> <language|all> [path] [--format human|json]"#,
+            scope: r#"只读候选计划；可信完整义务尚未接线"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C07"#),
+            command: r#"doctor"#,
+            examples: examples("doctor"),
+            support: if cfg!(unix) {
+                r#"partial"#
+            } else {
+                "unavailable_build"
+            },
+            executable: cfg!(unix),
+            operation_kind: r#"check"#,
+            usage: r#"doctor [path] [--ruff-tool ABS_PATH] [--timeout DURATION] [--format human|json]"#,
+            scope: r#"配置及显式Ruff版本的局部诊断"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C08"#),
+            command: r#"rules list"#,
+            examples: examples("rules list"),
+            support: r#"partial"#,
+            executable: true,
+            operation_kind: r#"query"#,
+            usage: r#"rules list <language|all> [path] [--format human|json]"#,
+            scope: r#"只读声明和规则来源；有效政策仍未核验"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C09"#),
+            command: r#"config validate"#,
+            examples: examples("config validate"),
+            support: r#"partial"#,
+            executable: true,
+            operation_kind: r#"check"#,
+            usage: r#"config validate [path] [--policy-candidate FILE] [--format human|json]"#,
+            scope: r#"静态配置和候选结构；不是可信生效政策"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C10"#),
+            command: r#"config explain"#,
+            examples: examples("config explain"),
+            support: r#"partial"#,
+            executable: true,
+            operation_kind: r#"query"#,
+            usage: r#"config explain [path] [--policy-candidate FILE] [--format human|json]"#,
+            scope: r#"配置来源及缺口；不批准排除或白名单"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C11"#),
+            command: r#"tools list"#,
+            examples: examples("tools list"),
+            support: r#"partial"#,
+            executable: true,
+            operation_kind: r#"query"#,
+            usage: r#"tools list [path] [--tool-lock-candidate FILE] [--format human|json]"#,
+            scope: r#"静态候选工具库存，不执行工具"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C12"#),
+            command: r#"tools verify"#,
+            examples: examples("tools verify"),
+            support: r#"partial"#,
+            executable: true,
+            operation_kind: r#"check"#,
+            usage: r#"tools verify [path] [--tool-lock-candidate FILE] [--managed-cache ABS_PATH] [--runtime ID=ABS_PATH] [--format human|json]"#,
+            scope: r#"静态制品核验；不授予可信工具锁批准"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C13"#),
+            command: r#"tools install"#,
+            examples: examples("tools install"),
+            support: r#"partial"#,
+            executable: true,
+            operation_kind: r#"management"#,
+            usage: r#"tools install --lock FILE [--distribution-manifest FILE] [path] [--dry-run|--apply]"#,
+            scope: r#"仅未批准预览；apply阻塞，不安装工具"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C14"#),
+            command: r#"lint"#,
+            examples: examples("lint"),
+            support: if cfg!(unix) {
+                r#"partial"#
+            } else {
+                "unavailable_build"
+            },
+            executable: cfg!(unix),
+            operation_kind: r#"check"#,
+            usage: r#"lint <java|python|typescript|zig|swift|kotlin|erlang|go|rust|ruby|shell> TARGET [--format human|json]"#,
+            scope: r#"语言专用参数和固定工具范围不同；完整项目lint未验收"#,
+            languages: &[
+                r#"java"#,
+                r#"python"#,
+                r#"typescript"#,
+                r#"zig"#,
+                r#"swift"#,
+                r#"kotlin"#,
+                r#"erlang"#,
+                r#"go"#,
+                r#"rust"#,
+                r#"ruby"#,
+                r#"shell"#,
+            ],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C15"#),
+            command: r#"comments"#,
+            examples: examples("comments"),
+            support: if cfg!(unix) {
+                r#"partial"#
+            } else {
+                "unavailable_build"
+            },
+            executable: cfg!(unix),
+            operation_kind: r#"check"#,
+            usage: r#"comments rust [path] [--cargo-tool ABS_PATH] [--timeout DURATION] [--format human|json]"#,
+            scope: r#"Rust库文档探针；完整文档政策与闭环尚缺"#,
+            languages: &[r#"rust"#],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C16"#),
+            command: r#"cve"#,
+            examples: examples("cve"),
+            support: if cfg!(unix) {
+                r#"partial"#
+            } else {
+                "unavailable_build"
+            },
+            executable: cfg!(unix),
+            operation_kind: r#"check"#,
+            usage: r#"cve <rust|python|typescript> [path] [--format human|json]"#,
+            scope: r#"原生审计需语言专用工具参数；时效和全覆盖未验收"#,
+            languages: &[r#"rust"#, r#"python"#, r#"typescript"#],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C17"#),
+            command: r#"security"#,
+            examples: examples("security"),
+            support: r#"planned"#,
+            executable: false,
+            operation_kind: r#"check"#,
+            usage: r#"security"#,
+            scope: r#"独立入口未实现；不得借用Git局部安全观察充当完整安全检查"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C18"#),
+            command: r#"build"#,
+            examples: examples("build"),
+            support: if cfg!(unix) {
+                r#"partial"#
+            } else {
+                "unavailable_build"
+            },
+            executable: cfg!(unix),
+            operation_kind: r#"check"#,
+            usage: r#"build rust [path] [--cargo-tool ABS_PATH] [--timeout DURATION] [--format human|json]"#,
+            scope: r#"原生局部类型检查；不执行全部构建或测试义务"#,
+            languages: &[r#"rust"#],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C19"#),
+            command: r#"check"#,
+            examples: examples("check"),
+            support: if cfg!(unix) {
+                r#"partial"#
+            } else {
+                "unavailable_build"
+            },
+            executable: cfg!(unix),
+            operation_kind: r#"check"#,
+            usage: r#"check <all|LANGUAGE_ID> [path] [--timeout DURATION] [--jobs N] [--format human|json|sarif] [--output PATH]"#,
+            scope: r#"支持57个规范ID的选择；仅已接入节点执行，其它义务保持gap"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C20"#),
+            command: r#"gate pre-commit"#,
+            examples: examples("gate pre-commit"),
+            support: if cfg!(unix) {
+                r#"partial"#
+            } else {
+                "unavailable_build"
+            },
+            executable: cfg!(unix),
+            operation_kind: r#"check"#,
+            usage: r#"gate pre-commit [path] [--git-tool ABS_PATH] [--format human|json]"#,
+            scope: r#"实际index的局部敏感内容观察，不签发完整门禁"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C21"#),
+            command: r#"gate pre-push"#,
+            examples: examples("gate pre-push"),
+            support: r#"planned"#,
+            executable: false,
+            operation_kind: r#"check"#,
+            usage: r#"gate pre-push"#,
+            scope: r#"完整推送ref门禁未实现"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C22"#),
+            command: r#"gate ci"#,
+            examples: examples("gate ci"),
+            support: r#"planned"#,
+            executable: false,
+            operation_kind: r#"check"#,
+            usage: r#"gate ci"#,
+            scope: r#"不可变交付完整门禁未实现"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C23"#),
+            command: r#"work sync"#,
+            examples: examples("work sync"),
+            support: r#"partial"#,
+            executable: true,
+            operation_kind: r#"management"#,
+            usage: r#"work sync [path] [--format human|json]"#,
+            scope: r#"已接入报告的稳定同步，不批准任务关闭"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C24"#),
+            command: r#"status"#,
+            examples: examples("status"),
+            support: r#"partial"#,
+            executable: true,
+            operation_kind: r#"query"#,
+            usage: r#"status [path] [--format human|json]"#,
+            scope: r#"局部工作台视图，不签发当前交付许可"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C25"#),
+            command: r#"next"#,
+            examples: examples("next"),
+            support: r#"partial"#,
+            executable: true,
+            operation_kind: r#"query"#,
+            usage: r#"next [path] [--format human|json]"#,
+            scope: r#"有界修复指引，完整宿主工作流仍缺"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C26"#),
+            command: r#"task show"#,
+            examples: examples("task show"),
+            support: r#"partial"#,
+            executable: true,
+            operation_kind: r#"query"#,
+            usage: r#"task show ID [path] [--format human|json]"#,
+            scope: r#"任务事实/尝试及限定简报，不自批历史"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C27"#),
+            command: r#"task claim"#,
+            examples: examples("task claim"),
+            support: if cfg!(unix) {
+                r#"partial"#
+            } else {
+                "unavailable_build"
+            },
+            executable: cfg!(unix),
+            operation_kind: r#"management"#,
+            usage: r#"task claim ID [path] --owner ID [--format human|json]"#,
+            scope: r#"Unix工作台限定租约，不授予代码修改或关闭权威"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C28"#),
+            command: r#"task heartbeat"#,
+            examples: examples("task heartbeat"),
+            support: if cfg!(unix) {
+                r#"partial"#
+            } else {
+                "unavailable_build"
+            },
+            executable: cfg!(unix),
+            operation_kind: r#"management"#,
+            usage: r#"task heartbeat ID [path] --owner ID --lease-token TOKEN [--format human|json]"#,
+            scope: r#"既有租约续期；冲突保持可见"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C29"#),
+            command: r#"task release"#,
+            examples: examples("task release"),
+            support: if cfg!(unix) {
+                r#"partial"#
+            } else {
+                "unavailable_build"
+            },
+            executable: cfg!(unix),
+            operation_kind: r#"management"#,
+            usage: r#"task release ID [path] --owner ID --lease-token TOKEN [--format human|json]"#,
+            scope: r#"释放租约，保留问题与历史"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C30"#),
+            command: r#"task attempt start"#,
+            examples: examples("task attempt start"),
+            support: if cfg!(unix) {
+                r#"partial"#
+            } else {
+                "unavailable_build"
+            },
+            executable: cfg!(unix),
+            operation_kind: r#"management"#,
+            usage: r#"task attempt start ID [path] --owner ID --lease-token TOKEN --action-id ID [--format human|json]"#,
+            scope: r#"记录有界尝试，不等于修复成功"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C31"#),
+            command: r#"task attempt finish"#,
+            examples: examples("task attempt finish"),
+            support: if cfg!(unix) {
+                r#"partial"#
+            } else {
+                "unavailable_build"
+            },
+            executable: cfg!(unix),
+            operation_kind: r#"management"#,
+            usage: r#"task attempt finish ID [path] --owner ID --lease-token TOKEN --attempt-id ID --outcome OUTCOME --note-code CODE [--format human|json]"#,
+            scope: r#"保留失败/无进展和尝试父链"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C32"#),
+            command: r#"fix"#,
+            examples: examples("fix"),
+            support: r#"planned"#,
+            executable: false,
+            operation_kind: r#"management"#,
+            usage: r#"fix"#,
+            scope: r#"独立原生自动修复入口未实现"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C33"#),
+            command: r#"task verify"#,
+            examples: examples("task verify"),
+            support: if cfg!(unix) {
+                r#"partial"#
+            } else {
+                "unavailable_build"
+            },
+            executable: cfg!(unix),
+            operation_kind: r#"check"#,
+            usage: r#"task verify ID [path] [--owner ID --lease-token TOKEN] [LANGUAGE_TOOL_OPTIONS] [--timeout DURATION] [--format human|json]"#,
+            scope: r#"已有任务原工具复检；CLI不自批关闭，可信关闭为宿主SDK限定能力"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C34"#),
+            command: r#"mcp serve"#,
+            examples: examples("mcp serve"),
+            support: r#"planned"#,
+            executable: false,
+            operation_kind: r#"host"#,
+            usage: r#"mcp serve"#,
+            scope: r#"Rust统一MCP服务入口未实现"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C35"#),
+            command: r#"compat legacy-v1"#,
+            examples: examples("compat legacy-v1"),
+            support: r#"planned"#,
+            executable: false,
+            operation_kind: r#"host"#,
+            usage: r#"compat legacy-v1"#,
+            scope: r#"协议映射存在，独立兼容运行时入口尚未实现"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: Some(r#"C36"#),
+            command: r#"dependencies"#,
+            examples: examples("dependencies"),
+            support: r#"planned"#,
+            executable: false,
+            operation_kind: r#"check"#,
+            usage: r#"dependencies"#,
+            scope: r#"独立入口未实现；Java局部节点仅在check内接入"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: None,
+            command: r#"grammar status"#,
+            examples: examples("grammar status"),
+            support: r#"implemented"#,
+            executable: true,
+            operation_kind: r#"query"#,
+            usage: r#"grammar status [--format human|json]"#,
+            scope: r#"固定来源覆盖和已知限制库存，不运行解析"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: None,
+            command: r#"grammar probe"#,
+            examples: examples("grammar probe"),
+            support: if cfg!(feature = "wasm-precheck") {
+                r#"partial"#
+            } else {
+                "unavailable_build"
+            },
+            executable: cfg!(feature = "wasm-precheck"),
+            operation_kind: r#"check"#,
+            usage: r#"grammar probe <language> <file> [--format=json]"#,
+            scope: r#"显式未验收WASM候选，始终未完成"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: None,
+            command: r#"hook plan"#,
+            examples: examples("hook plan"),
+            support: r#"partial"#,
+            executable: true,
+            operation_kind: r#"plan"#,
+            usage: r#"hook plan [--format=json]"#,
+            scope: r#"stdin事件的只读有限规划"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: None,
+            command: r#"hook execute"#,
+            examples: examples("hook execute"),
+            support: if cfg!(unix) {
+                r#"partial"#
+            } else {
+                "unavailable_build"
+            },
+            executable: cfg!(unix),
+            operation_kind: r#"host"#,
+            usage: r#"hook execute PATH [--timeout DURATION] [--format=json] [TOOL_OPTIONS]"#,
+            scope: r#"stdin局部事件执行；不代表真实宿主或完整交付"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: None,
+            command: r#"hook claude"#,
+            examples: examples("hook claude"),
+            support: if cfg!(unix) {
+                r#"partial"#
+            } else {
+                "unavailable_build"
+            },
+            executable: cfg!(unix),
+            operation_kind: r#"host"#,
+            usage: r#"hook claude <session-start|user-prompt-submit|post-tool-use|post-tool-use-failure|stop> PATH [--timeout DURATION] [--format=json]"#,
+            scope: r#"Claude事件桥接；实际安装宿主验收独立"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: None,
+            command: r#"rules whitelist list"#,
+            examples: examples("rules whitelist list"),
+            support: r#"partial"#,
+            executable: true,
+            operation_kind: r#"query"#,
+            usage: r#"rules whitelist list --candidate FILE [--candidate FILE...] [--format human|json]"#,
+            scope: r#"未批准白名单候选，只读查看"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: None,
+            command: r#"rules whitelist explain"#,
+            examples: examples("rules whitelist explain"),
+            support: r#"partial"#,
+            executable: true,
+            operation_kind: r#"query"#,
+            usage: r#"rules whitelist explain ID --candidate FILE [--candidate FILE...] [--observed-identity FILE] [--format human|json]"#,
+            scope: r#"精确候选身份解释，不批准例外"#,
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: None,
+            command: r#"rules whitelist propose"#,
+            examples: examples("rules whitelist propose"),
+            support: r#"partial"#,
+            executable: true,
+            operation_kind: r#"management"#,
+            usage: r#"rules whitelist propose FINDING_ID [path] [--ruff-tool ABS_PATH] [--format human|json]"#,
+            scope: r#"限定候选提案；可信批准与正式门禁仍缺"#,
+            languages: &[],
+        },
+    ]
+}

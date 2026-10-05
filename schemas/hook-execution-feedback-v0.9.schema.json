@@ -1,0 +1,286 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:hook-execution-feedback:0.9.0",
+  "title": "Candidate host-event execution; never a delivery gate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "plan",
+    "execution",
+    "reason",
+    "local_feedback",
+    "delivery_decision",
+    "host_blocking_verified",
+    "soft_result_reused"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.9.0"
+    },
+    "report_type": {
+      "const": "hook_execution_feedback"
+    },
+    "plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "target_paths",
+        "scope_resolution_reason",
+        "task_id",
+        "requires_git_snapshot",
+        "soft_result_reuse_candidate",
+        "host_blocking_claimed",
+        "may_claim_delivery"
+      ],
+      "properties": {
+        "action": {
+          "const": "verify_task"
+        },
+        "target_paths": {
+          "type": "array",
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        },
+        "scope_resolution_reason": {
+          "enum": [
+            null,
+            "changed_paths_missing",
+            "write_outcome_unknown",
+            "fast_scope_budget_exceeded"
+          ]
+        },
+        "task_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "requires_git_snapshot": {
+          "type": "boolean"
+        },
+        "soft_result_reuse_candidate": {
+          "type": "boolean"
+        },
+        "host_blocking_claimed": {
+          "type": "boolean"
+        },
+        "may_claim_delivery": {
+          "const": false
+        }
+      }
+    },
+    "execution": {
+      "const": "task_verification"
+    },
+    "reason": {
+      "type": "null"
+    },
+    "local_feedback": {
+      "$ref": "#/$defs/swift_task_summary"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "host_blocking_verified": {
+      "const": false
+    },
+    "soft_result_reused": {
+      "const": false
+    }
+  },
+  "$defs": {
+    "swift_task_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "report_type",
+        "task_id",
+        "checker_id",
+        "observation",
+        "event_persisted",
+        "reason",
+        "scan_report_available",
+        "authority",
+        "delivery_decision",
+        "native_confirmation_status",
+        "native_confirmation_reason",
+        "native_column_unit",
+        "native_diagnostic_positions",
+        "native_confirmation_ref"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "0.3.0"
+        },
+        "report_type": {
+          "const": "hook_task_verification_summary"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^CG-(B-)?[0-9a-f]{32}$"
+        },
+        "checker_id": {
+          "const": "syntax.native_confirmation"
+        },
+        "observation": {
+          "enum": [
+            "still_blocked",
+            "candidate_absent_unverified_policy",
+            "incomplete"
+          ]
+        },
+        "event_persisted": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 128
+        },
+        "scan_report_available": {
+          "type": "boolean"
+        },
+        "authority": {
+          "const": "local_unverified"
+        },
+        "delivery_decision": {
+          "const": "not_evaluated"
+        },
+        "native_confirmation_status": {
+          "enum": [
+            "stale",
+            "not_run",
+            "incomplete",
+            "completed",
+            "diagnostics_observed"
+          ]
+        },
+        "native_confirmation_reason": {
+          "type": "string",
+          "pattern": "^[a-z_]{1,128}$"
+        },
+        "native_column_unit": {
+          "const": "utf8_byte"
+        },
+        "native_diagnostic_positions": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "$ref": "syntax-task-recheck-v0.4.schema.json#/$defs/diagnostic"
+          }
+        },
+        "native_confirmation_ref": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "repair-brief-preview-v0.6.schema.json#/$defs/swift_syntax_recheck_brief/properties/native_confirmation_ref"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "native_confirmation_status": {
+                "enum": [
+                  "stale",
+                  "not_run",
+                  "incomplete",
+                  "completed"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "native_diagnostic_positions": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "event_persisted": {
+                "const": false
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "native_confirmation_ref": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "native_confirmation_status": {
+                "const": "diagnostics_observed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "native_confirmation_reason": {
+                "const": "swift_native_parse_diagnostics"
+              },
+              "native_diagnostic_positions": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "native_confirmation_status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "native_confirmation_reason": {
+                "const": "swift_native_parse_no_diagnostics"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "native_confirmation_status": {
+                "const": "stale"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "native_confirmation_reason": {
+                "const": "syntax_confirmation_inputs_changed"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

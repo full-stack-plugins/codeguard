@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:syntax-confirmation-observation:0.5.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "workspace_binding",
+    "authority",
+    "coverage_proven",
+    "delivery_decision",
+    "execution",
+    "build_root",
+    "workspace_id",
+    "run_id",
+    "checker_id",
+    "reason_code",
+    "blocker_id",
+    "fingerprint",
+    "scope",
+    "language",
+    "affected_paths",
+    "observations",
+    "native_evidence"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.5.0"
+    },
+    "report_type": {
+      "const": "syntax_confirmation_observation"
+    },
+    "workspace_binding": {
+      "const": "bound"
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "execution": {
+      "const": "incomplete"
+    },
+    "build_root": {
+      "const": "."
+    },
+    "workspace_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^syntax-confirm-[0-9]+-[0-9]+$"
+    },
+    "checker_id": {
+      "const": "syntax.native_confirmation"
+    },
+    "reason_code": {
+      "const": "native_syntax_confirmation_needed"
+    },
+    "blocker_id": {
+      "type": "string",
+      "pattern": "^CG-B-[0-9a-f]{32}$"
+    },
+    "fingerprint": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1
+    },
+    "language": {
+      "const": "swift"
+    },
+    "affected_paths": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "observations": {
+      "const": []
+    },
+    "native_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "target",
+        "tool_path",
+        "native"
+      ],
+      "properties": {
+        "target": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "language",
+            "source_sha256"
+          ],
+          "properties": {
+            "path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "language": {
+              "const": "swift"
+            },
+            "source_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "tool_path": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^/"
+        },
+        "native": {
+          "$ref": "swift-lint-feedback-v0.1.schema.json#/$defs/native"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "native_evidence": {
+            "properties": {
+              "native": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "completed",
+                      "diagnostics_observed"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "native_evidence": {
+            "properties": {
+              "tool_path": {
+                "type": "string",
+                "pattern": "^/"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

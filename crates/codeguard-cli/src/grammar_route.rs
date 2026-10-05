@@ -27,7 +27,7 @@ pub fn route_source<'a>(relative_path: &str, source: &'a [u8]) -> Vec<GrammarRou
         Some("cfm" | "cfc") => "cfml",
         Some("cfs") => "cfscript",
         Some("cbl" | "cob" | "cpy") => "cobol",
-        Some("cpp" | "cc" | "hpp") => "cpp",
+        Some("cpp" | "cc" | "hpp" | "C" | "cp" | "CPP" | "c++" | "cxx" | "hxx") => "cpp",
         Some("cs") => "csharp",
         Some("dart") => "dart",
         Some("erl" | "hrl") => "erlang",
@@ -43,7 +43,7 @@ pub fn route_source<'a>(relative_path: &str, source: &'a [u8]) -> Vec<GrammarRou
         Some("pas" | "dpr" | "dpk" | "lpr") => "pascal",
         Some("php") => "php",
         Some("py") => "python",
-        Some("r") => "r",
+        Some("r" | "R") => "r",
         Some("rb") => "ruby",
         Some("rs") => "rust",
         Some("scala") => "scala",
@@ -51,7 +51,7 @@ pub fn route_source<'a>(relative_path: &str, source: &'a [u8]) -> Vec<GrammarRou
         Some("swift") => "swift",
         Some("tf" | "tfvars" | "tofu") => "terraform",
         Some("tsx") => "tsx",
-        Some("ts") => "typescript",
+        Some("ts" | "mts" | "cts") => "typescript",
         Some("vb") => "vbnet",
         Some("zig") => "zig",
         _ => return Vec::new(),
@@ -79,10 +79,9 @@ pub fn route_source<'a>(relative_path: &str, source: &'a [u8]) -> Vec<GrammarRou
                 break;
             };
             let body_start = tag_end + 1;
-            let Some(close_relative) = find_bytes(&lowercase[body_start..], b"</cfquery>") else {
+            let Some(body_end) = next_cfquery_close(&lowercase, body_start) else {
                 break;
             };
-            let body_end = body_start + close_relative;
             if body_end > body_start {
                 routes.push(GrammarRoute {
                     language: "cfquery",
@@ -138,6 +137,21 @@ fn next_cfquery_open(source: &[u8], mut cursor: usize) -> Option<usize> {
             .is_some_and(|byte| byte.is_ascii_alphabetic() || matches!(byte, b'/' | b'!' | b'?'))
         {
             cursor = find_tag_end(source, open + 1)? + 1;
+        } else {
+            cursor = open + 1;
+        }
+    }
+    None
+}
+
+// 服务器移除的嵌套CFML注释不提供结束标签；保留片段原字节，不预处理SQL源码。
+fn next_cfquery_close(source: &[u8], mut cursor: usize) -> Option<usize> {
+    while cursor < source.len() {
+        let open = cursor + find_bytes(&source[cursor..], b"<")?;
+        if source[open..].starts_with(b"<!---") {
+            cursor = skip_nested_cfml_comment(source, open)?;
+        } else if source[open..].starts_with(b"</cfquery>") {
+            return Some(open);
         } else {
             cursor = open + 1;
         }

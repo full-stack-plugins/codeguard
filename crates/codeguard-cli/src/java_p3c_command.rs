@@ -31,6 +31,7 @@ const DECLARED_P3C_RULESETS: [&str; 10] = [
 
 pub(crate) struct Args {
     pub(crate) source: PathBuf,
+    pub(crate) workspace: Option<PathBuf>,
     pub(crate) maven_tool: Option<PathBuf>,
     pub(crate) java_home: Option<PathBuf>,
     pub(crate) maven_repo: Option<PathBuf>,
@@ -56,13 +57,17 @@ pub fn run(args: &[String]) -> ExitCode {
             return ExitCode::from(2);
         }
     };
-    let report = observe(
-        &args,
-        Instant::now() + Duration::from_secs(120),
-        &AtomicBool::new(false),
-    );
+    let deadline = Instant::now() + Duration::from_secs(120);
+    let cancelled = AtomicBool::new(false);
+    let report = match crate::java_p3c_workbench::locate(&args) {
+        Ok(Some(root)) => crate::java_p3c_workbench::observe(&args, &root, deadline, &cancelled),
+        Ok(None) => observe(&args, deadline, &cancelled),
+        Err(reason) => crate::java_p3c_workbench::unavailable(&args, reason),
+    };
     if args.json {
         println!("{report}");
+    } else if report["report_type"] == "java_p3c_file_feedback" {
+        crate::java_p3c_workbench::print_feedback(&report);
     } else {
         println!(
             "Java P3C 单文件原生诊断：{}",
@@ -86,11 +91,12 @@ pub(crate) fn parse_args(args: &[String]) -> Result<Args, String> {
     let Some(source) = args.first() else {
         return Err("lint java 缺少 Java 源文件路径".into());
     };
-    if source.starts_with('-') {
+    if source.is_empty() || source.starts_with('-') {
         return Err("lint java 缺少 Java 源文件路径".into());
     }
     let mut parsed = Args {
         source: PathBuf::from(source),
+        workspace: None,
         maven_tool: None,
         java_home: None,
         maven_repo: None,
@@ -111,6 +117,9 @@ pub(crate) fn parse_args(args: &[String]) -> Result<Args, String> {
             )
         };
         match key {
+            "--workspace" if parsed.workspace.is_none() => {
+                parsed.workspace = Some(PathBuf::from(value))
+            }
             "--maven-tool" if parsed.maven_tool.is_none() => {
                 parsed.maven_tool = Some(PathBuf::from(value))
             }
@@ -359,6 +368,16 @@ pub(crate) fn observe(args: &Args, deadline: Instant, cancelled: &AtomicBool) ->
     }
     report["local_status"] = json!("findings_observed_untrusted");
     with_reason(report, "native_findings_require_approved_context")
+}
+
+/// 判断非空诊断能否投影为问题；异常退出只保留已经核对的正向事实，不证明完整性。
+pub(crate) fn has_projectable_findings(report: &Value) -> bool {
+    report["findings"]
+        .as_array()
+        .is_some_and(|findings| !findings.is_empty())
+        && (report["local_status"] == "findings_observed_untrusted"
+            || (report["local_status"] == "incomplete"
+                && report["reason"] == "native_execution_failed"))
 }
 
 pub(crate) fn render_pom(selected: &[&str]) -> String {

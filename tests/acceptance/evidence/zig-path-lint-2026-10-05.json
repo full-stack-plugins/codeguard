@@ -1,0 +1,62 @@
+{
+  "broken": {
+    "authority": "local_unverified",
+    "coverage_proven": false,
+    "delivery_decision": "not_evaluated",
+    "language": "zig",
+    "native": {
+      "diagnostic_count": 1,
+      "diagnostics": [
+        {
+          "column": 19,
+          "line": 1,
+          "rule_id": "zig.ast_check.error"
+        }
+      ],
+      "reason": "ast_check_diagnostics",
+      "status": "diagnostics_observed",
+      "tool_sha256": "71cc3995a7586753ebf82c66dfb8bef43df446517550678781834586a960f8c9",
+      "version": "0.16.0"
+    },
+    "next_action": "核对原生 Zig AST 诊断的源码位置并修复；仍需执行项目完整 lint、构建和测试",
+    "operation": "lint",
+    "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-zig-discover-52005-0/app.zig",
+    "report_type": "zig_lint_feedback",
+    "schema_version": "0.2.0",
+    "source_current": true,
+    "source_sha256": "a8ee3cd373dab58c194f1e476577f7c851ab1f2f3e0631db6508bddec0f5bbe9",
+    "status": "incomplete",
+    "syntax_precheck": null,
+    "tool_selection": {
+      "executable": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-zig-discover-52005-0/bin/zig",
+      "source": "path"
+    }
+  },
+  "clean": {
+    "authority": "local_unverified",
+    "coverage_proven": false,
+    "delivery_decision": "not_evaluated",
+    "language": "zig",
+    "native": {
+      "diagnostic_count": 0,
+      "diagnostics": [],
+      "reason": "ast_check_no_diagnostics",
+      "status": "completed",
+      "tool_sha256": "71cc3995a7586753ebf82c66dfb8bef43df446517550678781834586a960f8c9",
+      "version": "0.16.0"
+    },
+    "next_action": "Zig ast-check 未发现局部语法错误；仍需执行项目完整 lint、构建和测试",
+    "operation": "lint",
+    "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-zig-discover-52005-0/app.zig",
+    "report_type": "zig_lint_feedback",
+    "schema_version": "0.2.0",
+    "source_current": true,
+    "source_sha256": "971f41f2fce93bfa4d874c28649d3ce3aa92fc0fe5946a47a23a3bd623272129",
+    "status": "incomplete",
+    "syntax_precheck": null,
+    "tool_selection": {
+      "executable": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-zig-discover-52005-0/bin/zig",
+      "source": "path"
+    }
+  }
+}

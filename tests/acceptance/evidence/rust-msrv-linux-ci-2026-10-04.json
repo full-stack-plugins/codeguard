@@ -1,0 +1,194 @@
+{
+  "evidence_type": "remote_linux_ci_terminal_observation",
+  "evidence_version": "0.1.0",
+  "captured_at": "2026-10-04",
+  "run_id": 37198192252,
+  "source_commit": "4d620f7e2e4c668f52b2e1083fba4e1c14b526d2",
+  "url": "https://github.com/full-stack-plugins/codeguard/actions/runs/37198192252",
+  "status": "completed",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "name": "msrv",
+      "databaseId": 111424298222,
+      "url": "https://github.com/full-stack-plugins/codeguard/actions/runs/37198192252/job/111424298222",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-04T11:16:54Z",
+      "completedAt": "2026-10-04T11:18:31Z",
+      "steps": [
+        {
+          "completedAt": "2026-10-04T11:16:55Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-04T11:16:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T11:16:57Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "number": 2,
+          "startedAt": "2026-10-04T11:16:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T11:17:05Z",
+          "conclusion": "success",
+          "name": "Install the declared minimum Rust in this CI runner",
+          "number": 3,
+          "startedAt": "2026-10-04T11:16:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T11:18:29Z",
+          "conclusion": "success",
+          "name": "Check default and WASM targets with actual Rust 1.85",
+          "number": 4,
+          "startedAt": "2026-10-04T11:17:05Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T11:18:29Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "number": 8,
+          "startedAt": "2026-10-04T11:18:29Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T11:18:29Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 9,
+          "startedAt": "2026-10-04T11:18:29Z",
+          "status": "completed"
+        }
+      ]
+    },
+    {
+      "name": "gate",
+      "databaseId": 111424298342,
+      "url": "https://github.com/full-stack-plugins/codeguard/actions/runs/37198192252/job/111424298342",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-10-04T11:16:53Z",
+      "completedAt": "2026-10-04T12:00:06Z",
+      "steps": [
+        {
+          "completedAt": "2026-10-04T11:16:55Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-04T11:16:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T11:16:56Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "number": 2,
+          "startedAt": "2026-10-04T11:16:55Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T11:16:57Z",
+          "conclusion": "success",
+          "name": "Check out corpus evidence source",
+          "number": 3,
+          "startedAt": "2026-10-04T11:16:56Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T11:16:57Z",
+          "conclusion": "success",
+          "name": "Verify crate layering debt does not grow",
+          "number": 4,
+          "startedAt": "2026-10-04T11:16:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T11:18:32Z",
+          "conclusion": "success",
+          "name": "Build workspace",
+          "number": 5,
+          "startedAt": "2026-10-04T11:16:57Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T11:18:32Z",
+          "conclusion": "success",
+          "name": "Preserve the binary without WASM for package rejection",
+          "number": 6,
+          "startedAt": "2026-10-04T11:18:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T11:37:45Z",
+          "conclusion": "success",
+          "name": "Verify Linux WASM worker resource boundary",
+          "number": 7,
+          "startedAt": "2026-10-04T11:18:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T11:49:40Z",
+          "conclusion": "success",
+          "name": "Replay every fixed grammar and retain per-language evidence",
+          "number": 8,
+          "startedAt": "2026-10-04T11:37:45Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T11:57:46Z",
+          "conclusion": "success",
+          "name": "Verify the local npm package contains a running WASM worker",
+          "number": 9,
+          "startedAt": "2026-10-04T11:49:40Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:00:04Z",
+          "conclusion": "success",
+          "name": "Run test suite",
+          "number": 10,
+          "startedAt": "2026-10-04T11:57:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:00:05Z",
+          "conclusion": "success",
+          "name": "Explain remaining layering debt",
+          "number": 11,
+          "startedAt": "2026-10-04T12:00:04Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:00:05Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "number": 22,
+          "startedAt": "2026-10-04T12:00:05Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-04T12:00:05Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 23,
+          "startedAt": "2026-10-04T12:00:05Z",
+          "status": "completed"
+        }
+      ]
+    }
+  ],
+  "metadata_sha256": "139ccce6b27f98ab3b9c399068b8935dea1c1d359bde1e99c05e6b3136037167",
+  "full_log_sha256": "59d32b7df073699bde6e84184507d5948137ef74bfe8e2e8309f979535645065",
+  "full_log_bytes": 549503,
+  "runtime_platform": "github_ubuntu_latest_x86_64",
+  "actual_rust_msrv": "1.85.0",
+  "local_new_guidance_fix_included": false,
+  "full_product_acceptance": false,
+  "scope": "MSRV default/WASM all-target locked check plus Linux regression, 32-grammar cohort replay, local npm installation and default workspace tests"
+}

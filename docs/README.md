@@ -20,6 +20,7 @@ This is the documentation entry for Rust Codeguard. The eleven former `rust-cli/
 | [Native adapter contracts](Codeguard-Adapter-Contracts.md) | Native configuration/reports and Java/CVE/security boundaries |
 | [Trust and distribution](Codeguard-Trust-and-Distribution.md) | Signatures, revision chains, tool packages, npm and grammar assets |
 | [Validation and rollout](Codeguard-Validation-and-Rollout.md) | Language matrix, F01–F26, precision targets, host/release evidence |
+| [Grammar development evaluation](Codeguard-Grammar-Evaluation.md) | Fixed 358-case, 32-language, 35-cohort replay with separate fixture metrics and unknowns |
 | [Legacy compatibility](Codeguard-Legacy-Compatibility.md) | Old CLI/MCP/hook mapping and the dated 2026-09-24 audit |
 
 ## Current, target and historical evidence
@@ -33,3 +34,10 @@ C01–C36 are command-design IDs and F01–F26 are failure-acceptance IDs, not c
 The existing [OpenSpec proposal](../openspec/changes/introduce-rust-codeguard-cli/proposal.md), [specs](../openspec/changes/introduce-rust-codeguard-cli/specs), [tasks](../openspec/changes/introduce-rust-codeguard-cli/tasks.md) and [implementation coverage](../openspec/changes/introduce-rust-codeguard-cli/implementation-coverage.md) remain authoritative. See [acceptance records](../tests/acceptance) for bounded observations. Consolidation does not mark implementation tasks complete or archive the change.
 
 The [consolidation record](../openspec/changes/introduce-rust-codeguard-cli/documentation-consolidation.md) maps old ownership and resolved conflicts. Original migration paths/digests remain historical provenance.
+
+
+### Current public candidate: 0.1.4
+
+`@partme.ai/codeguard@0.1.4` is published for Apple Silicon macOS from clean source `1cd458f6e01a44a74388243e964e3f45290ac18e`. It includes all 32 runnable, unqualified grammars, bounded edited-file checks, stable native-confirmation tasks, native rechecks and `next` guidance. Registry hashes, a fresh-cache npx invocation, the actual public-package repair loop with Zig 0.16.0, and the source commit's Linux CI passed. Ordinary CLI clean output cannot close a task without trusted policy. The protected Zig SDK is a source integration API; npm does not expose a self-approval command. Plugin activation, installed-host acceptance, full precision, other platforms and complete gates remain open. Earlier 0.1.3 evidence is historical. See [0.1.4 acceptance](../tests/acceptance/npm-0.1.4-candidate.md).
+
+Native-first task creation, current evidence and recheck protocols: [Codeguard-Native-Repair-Workflow](Codeguard-Native-Repair-Workflow.md).
