@@ -64,6 +64,14 @@ pub fn verify_rust_task_resolution(
     verify_task_resolution(request, TaskResolutionChecker::Rust)
 }
 
+/// 以宿主签名策略复检 Ruby 原反例与当前源码，保留版本声明变化及原生反证。
+/// 参数绑定原工具和原任务；返回限定关闭或重开收据，不签发项目交付许可。
+pub fn verify_ruby_task_resolution(
+    request: &crate::RubyTaskResolutionRequest<'_>,
+) -> Result<Value, &'static str> {
+    verify_task_resolution(request, TaskResolutionChecker::Ruby)
+}
+
 fn verify_task_resolution(
     request: &SyntaxTaskResolutionRequest<'_>,
     checker: TaskResolutionChecker,
@@ -207,6 +215,21 @@ fn original_binding_matches(
     policy: &TaskResolutionPolicyInput,
     checker: TaskResolutionChecker,
 ) -> bool {
+    if checker.language() == "ruby" {
+        if original["schema_version"] == "0.9.0" {
+            return policy.grammar_sha256.is_none()
+                && original["native_evidence"]["target"]["source_sha256"]
+                    == policy.original_source_sha256
+                && original["native_evidence"]["native"]["tool_sha256"] == policy.tool_sha256
+                && original["native_evidence"]["native"]["version"] == policy.native_version;
+        }
+        return matches!(original["schema_version"].as_str(), Some("0.1.0" | "0.7.0"))
+            && original["native_evidence"].is_null()
+            && policy.grammar_sha256.as_ref().is_some_and(|grammar| {
+                original["observations"][0]["source_sha256"] == policy.original_source_sha256
+                    && original["observations"][0]["grammar_sha256"] == *grammar
+            });
+    }
     if checker.language() == "rust" {
         if policy.schema_version == "1.8.0" {
             return matches!(original["schema_version"].as_str(), Some("0.1.0" | "0.7.0"))
@@ -260,6 +283,11 @@ fn execute(
     let brief = crate::next_command::read_task_brief(root, request.task_id)?;
     let source_path = root.join(&policy.identity.scope);
     let current = crate::plain_syntax_source::read_plain_source(&source_path)?;
+    let ruby_context = if checker.language() == "ruby" {
+        Some(crate::ruby_project_version::capture(root, &source_path)?)
+    } else {
+        None
+    };
     let rust_context = if checker.language() == "rust" {
         Some(crate::rust_project_edition::RustProjectEdition::capture(
             root,
@@ -301,6 +329,12 @@ fn execute(
         && tool_hash(tool).is_ok_and(|s| s == policy.tool_sha256)
         && artifact_hash(executable).is_ok_and(|s| s == policy.adapter_sha256)
         && (checker.language() != "go" || go_companion_matches(tool, policy))
+        && ruby_context.as_ref().is_none_or(|inputs| {
+            crate::ruby_project_version::capture(root, &source_path)
+                .ok()
+                .as_ref()
+                == Some(inputs)
+        })
         && rust_context
             .as_ref()
             .is_none_or(|context| context.current());
@@ -339,6 +373,9 @@ fn execute(
     let current_completed = current_completed
         && (checker.language() != "rust"
             || crate::rust_syntax_evidence::valid(&current_native, Some(&current)));
+    let current_completed = current_completed
+        && (checker.language() != "ruby"
+            || crate::ruby_syntax_probe::valid_observation(&current_native, Some(&current)));
     let original_completed = checker.original_completed(&original_native, request.original_source);
     let current_issue_present = current_native["status"] == "diagnostics_observed"
         || (checker.language() == "kotlin"
@@ -445,6 +482,14 @@ pub(crate) fn commit_resolution(
             return Err("task_resolution_evidence_binding_invalid");
         }
     }
+    if raw_evidence["schema_version"] == "0.10.0"
+        && (raw_evidence["identity"]["checker_id"] != "syntax.native_confirmation"
+            || !["original_native", "current_native"]
+                .iter()
+                .all(|key| crate::ruby_syntax_probe::valid_observation(&raw_evidence[*key], None)))
+    {
+        return Err("task_resolution_evidence_binding_invalid");
+    }
     if raw_evidence["schema_version"] == "0.7.0" {
         keys.extend(["gofmt_sha256", "companion_binding_sha256"]);
         if !crate::task_resolution_evidence_shape::valid_go_binding(&raw_evidence) {
@@ -466,7 +511,16 @@ pub(crate) fn commit_resolution(
     }) || !matches!(
         raw_evidence["schema_version"].as_str(),
         Some(
-            "0.1.0" | "0.2.0" | "0.3.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.7.0" | "0.8.0" | "0.9.0"
+            "0.1.0"
+                | "0.2.0"
+                | "0.3.0"
+                | "0.4.0"
+                | "0.5.0"
+                | "0.6.0"
+                | "0.7.0"
+                | "0.8.0"
+                | "0.9.0"
+                | "0.10.0"
         )
     ) {
         return Err("task_resolution_evidence_binding_invalid");

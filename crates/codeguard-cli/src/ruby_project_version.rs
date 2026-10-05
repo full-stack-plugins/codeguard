@@ -31,10 +31,10 @@ pub(crate) fn source_root(source: &Path) -> Option<PathBuf> {
 }
 
 /// 版本观察输入，保留已有声明及更近目录中尚不存在的声明路径。
-type VersionInputs = Vec<(PathBuf, Option<Vec<u8>>)>;
+pub(crate) type VersionInputs = Vec<(PathBuf, Option<Vec<u8>>)>;
 
 /// 读取源码祖先内最近版本声明及所有更近缺项；返回原始字节快照或环境原因。
-fn capture(root: &Path, source: &Path) -> Result<VersionInputs, &'static str> {
+pub(crate) fn capture(root: &Path, source: &Path) -> Result<VersionInputs, &'static str> {
     if !root.is_absolute()
         || source
             .components()

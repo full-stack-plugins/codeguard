@@ -336,6 +336,7 @@ mod erlang_task_resolution_request;
 mod go_task_resolution_request;
 #[cfg(unix)]
 mod rust_task_resolution_request;
+mod ruby_task_resolution_request;
 #[cfg(unix)]
 mod kotlin_task_resolution_request;
 #[cfg(unix)]
@@ -358,6 +359,7 @@ pub use erlang_task_resolution_request::ErlangTaskResolutionRequest;
 pub use go_task_resolution_request::GoTaskResolutionRequest;
 #[cfg(unix)]
 pub use rust_task_resolution_request::RustTaskResolutionRequest;
+pub use ruby_task_resolution_request::RubyTaskResolutionRequest;
 #[cfg(unix)]
 pub use kotlin_task_resolution_request::KotlinTaskResolutionRequest;
 #[cfg(unix)]
@@ -366,6 +368,7 @@ pub use swift_task_resolution_request::SwiftTaskResolutionRequest;
 pub use task_resolution_service::{
     verify_erlang_task_resolution, verify_go_task_resolution, verify_kotlin_task_resolution,
     verify_swift_task_resolution, verify_zig_task_resolution, verify_rust_task_resolution,
+    verify_ruby_task_resolution,
 };
 #[cfg(unix)]
 pub use zig_task_resolution_request::ZigTaskResolutionRequest;
