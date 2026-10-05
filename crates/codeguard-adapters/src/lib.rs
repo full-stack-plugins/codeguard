@@ -72,6 +72,10 @@ mod eslint_json;
 mod eslint_message_report;
 mod eslint_parsed;
 mod go_candidate;
+mod ruby_candidate;
+mod ruby_candidate_profile;
+mod ruby_candidate_slot;
+mod ruby_candidate_tool;
 mod grammar_asset_manifest;
 mod legacy_dylink_compat;
 mod zig_wasm_compat;
@@ -399,3 +403,8 @@ pub use kotlin_parsed::KotlinParsed;
 
 mod kotlin_native_observation;
 pub use kotlin_native_observation::valid_kotlin_native_observation;
+
+pub use ruby_candidate::{bundled_ruby_candidate_profile, parse_ruby_candidate_profile};
+pub use ruby_candidate_profile::RubyCandidateProfile;
+pub use ruby_candidate_slot::RubyCandidateSlot;
+pub use ruby_candidate_tool::RubyCandidateTool;

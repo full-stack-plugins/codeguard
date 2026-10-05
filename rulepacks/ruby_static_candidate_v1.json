@@ -1,0 +1,254 @@
+{
+  "schema_version": "1.0.0",
+  "language": "ruby",
+  "runtime_dialects": [
+    "mri",
+    "jruby",
+    "truffleruby"
+  ],
+  "runtime_validation": "unverified",
+  "platforms": [
+    "macos_arm64",
+    "macos_x86_64",
+    "linux_x86_64",
+    "linux_aarch64",
+    "windows_x86_64"
+  ],
+  "platform_validation": "unverified",
+  "target_version_inputs": [
+    ".ruby-version",
+    ".tool-versions",
+    "mise.toml",
+    "Gemfile",
+    "Gemfile.lock",
+    "*.gemspec",
+    ".rubocop.yml"
+  ],
+  "version_gaps": [
+    "runtime_and_tool_versions_must_be_independently_bound",
+    "dynamic_ruby_declarations_must_not_be_executed_for_discovery",
+    "fixed_mri_2_6_syntax_observation_does_not_qualify_other_versions_or_runtimes",
+    "rubocop_target_version_and_parser_engine_require_effective_configuration"
+  ],
+  "categories": [
+    {
+      "category": "lint",
+      "applicability": "applicable",
+      "status": "gap",
+      "tools": [
+        {
+          "tool_id": "rubocop",
+          "candidate_version": "project_locked",
+          "version_status": "unvalidated_project_lock_required",
+          "candidate_argv": [
+            "bundle",
+            "exec",
+            "rubocop",
+            "--format",
+            "json"
+          ],
+          "scope": "ruby_project",
+          "sources": [
+            "https://docs.rubocop.org/rubocop/latest/configuration.html",
+            "https://docs.rubocop.org/rubocop/latest/usage/basic_usage.html"
+          ]
+        }
+      ],
+      "requires_database_freshness": false,
+      "coverage_gaps": [
+        "native_rules_reports_and_exit_contract_unvalidated",
+        "effective_configuration_inheritance_plugins_and_parser_unvalidated",
+        "ruby_c_only_observes_syntax_not_project_style_lint"
+      ]
+    },
+    {
+      "category": "comments",
+      "applicability": "applicable",
+      "status": "gap",
+      "tools": [
+        {
+          "tool_id": "rubocop_documentation",
+          "candidate_version": "project_locked",
+          "version_status": "unvalidated_project_lock_required",
+          "candidate_argv": [
+            "bundle",
+            "exec",
+            "rubocop",
+            "--only",
+            "Style/Documentation",
+            "--format",
+            "json"
+          ],
+          "scope": "ruby_project",
+          "sources": [
+            "https://docs.rubocop.org/rubocop/latest/cops_style.html#styledocumentation"
+          ]
+        },
+        {
+          "tool_id": "rubocop_documentation_method",
+          "candidate_version": "project_locked",
+          "version_status": "unvalidated_project_lock_required",
+          "candidate_argv": [
+            "bundle",
+            "exec",
+            "rubocop",
+            "--only",
+            "Style/DocumentationMethod",
+            "--format",
+            "json"
+          ],
+          "scope": "ruby_project",
+          "sources": [
+            "https://docs.rubocop.org/rubocop/latest/cops_style.html#styledocumentationmethod"
+          ]
+        }
+      ],
+      "requires_database_freshness": false,
+      "coverage_gaps": [
+        "style_documentation_is_class_module_presence_not_method_contract_quality",
+        "method_documentation_rule_is_non_default_and_not_parameter_return_semantic_validation",
+        "comment_policy_must_be_configured_not_inferred_from_formatter"
+      ]
+    },
+    {
+      "category": "dependencies",
+      "applicability": "applicable",
+      "status": "gap",
+      "tools": [
+        {
+          "tool_id": "bundle_list",
+          "candidate_version": "project_locked",
+          "version_status": "unvalidated_project_lock_required",
+          "candidate_argv": [
+            "bundle",
+            "list"
+          ],
+          "scope": "bundler_project",
+          "sources": [
+            "https://bundler.io/man/bundle-list.1.html",
+            "https://bundler.io/guides/using_bundler_in_applications.html"
+          ]
+        }
+      ],
+      "requires_database_freshness": false,
+      "coverage_gaps": [
+        "list_output_does_not_prove_complete_dependency_graph",
+        "gemfile_gemspec_dynamic_execution_requires_separate_execution_policy",
+        "git_path_sources_groups_platforms_and_nested_gems_unvalidated",
+        "licenses_sbom_provenance_and_lock_checksums_unvalidated"
+      ]
+    },
+    {
+      "category": "cve",
+      "applicability": "applicable",
+      "status": "gap",
+      "tools": [
+        {
+          "tool_id": "bundler_audit",
+          "candidate_version": "project_locked",
+          "version_status": "unvalidated_project_lock_required",
+          "candidate_argv": [
+            "bundle-audit",
+            "check",
+            "--no-update",
+            "--format",
+            "json"
+          ],
+          "scope": "bundler_project",
+          "sources": [
+            "https://github.com/rubysec/bundler-audit",
+            "https://github.com/rubysec/ruby-advisory-db"
+          ]
+        }
+      ],
+      "requires_database_freshness": true,
+      "coverage_gaps": [
+        "database_snapshot_source_identity_and_freshness_unverified",
+        "lock_node_advisory_alias_and_platform_attribution_unvalidated",
+        "native_ignore_config_is_not_codeguard_allowlist_approval",
+        "ruby_runtime_cves_and_unlocked_scripts_not_covered",
+        "offline_database_missing_must_remain_incomplete",
+        "missing_database_can_trigger_native_download_even_without_update_flag_requires_preflight"
+      ]
+    },
+    {
+      "category": "security",
+      "applicability": "applicable",
+      "status": "gap",
+      "tools": [
+        {
+          "tool_id": "rubocop_security",
+          "candidate_version": "project_locked",
+          "version_status": "unvalidated_project_lock_required",
+          "candidate_argv": [
+            "bundle",
+            "exec",
+            "rubocop",
+            "--only",
+            "Security",
+            "--format",
+            "json"
+          ],
+          "scope": "ruby_project",
+          "sources": [
+            "https://docs.rubocop.org/rubocop/latest/cops_security.html"
+          ]
+        },
+        {
+          "tool_id": "brakeman",
+          "candidate_version": "project_locked",
+          "version_status": "unvalidated_project_lock_required",
+          "candidate_argv": [
+            "bundle",
+            "exec",
+            "brakeman",
+            "--format",
+            "json",
+            "--no-pager"
+          ],
+          "scope": "rails_project",
+          "sources": [
+            "https://brakemanscanner.org/docs/options/",
+            "https://brakemanscanner.org/docs/"
+          ]
+        }
+      ],
+      "requires_database_freshness": false,
+      "coverage_gaps": [
+        "brakeman_is_rails_specific_not_all_ruby_security",
+        "whole_program_scope_and_ignored_warnings_unvalidated",
+        "report_confidence_does_not_equal_proven_security_violation",
+        "secrets_iac_containers_and_general_dataflow_not_fully_covered"
+      ]
+    },
+    {
+      "category": "build",
+      "applicability": "project_dependent",
+      "status": "gap",
+      "tools": [
+        {
+          "tool_id": "gem_build",
+          "candidate_version": "project_locked",
+          "version_status": "unvalidated_project_lock_required",
+          "candidate_argv": [
+            "gem",
+            "build",
+            "SELECTED_GEMSPEC"
+          ],
+          "scope": "gem_project",
+          "sources": [
+            "https://guides.rubygems.org/make-your-own-gem/"
+          ]
+        }
+      ],
+      "requires_database_freshness": false,
+      "coverage_gaps": [
+        "gem_build_packages_gems_not_arbitrary_ruby_projects",
+        "gemspec_evaluation_executes_ruby_requires_trusted_build_policy",
+        "native_extensions_platform_targets_and_dependencies_unvalidated",
+        "rake_rails_or_custom_build_must_use_explicit_project_configuration",
+        "ruby_c_and_tests_are_not_complete_artifact_build"
+      ]
+    }
+  ]
+}

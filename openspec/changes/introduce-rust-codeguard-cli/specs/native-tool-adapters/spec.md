@@ -675,3 +675,10 @@ Rust npm审计适配 MUST 核对具体原工具版本、auditReportVersion、冻
 - **THEN** the fixed Ruby 2.6.10p210 parser only runs for an exact supported 2.6.10 declaration; other versions, ambiguous aliases, unreadable or linked declarations return an environment-incomplete reason without source diagnostics or switching the selected tool to WASM
 - **AND** version inputs, including absent nearer files, are rechecked after parsing; changes withdraw diagnostics. No declaration retains the explicitly unverified preliminary path, not proof of project compatibility; Gemfile is not executed or inferred
 - **AND** lint, project/edit checks and task rechecks use the same bounded constraint; saved positions are withdrawn when the current declared version becomes incompatible or unresolved, without deleting history or closing the task
+
+
+#### Scenario: Ruby candidate inventory distinguishes project-specific tool scopes
+- **WHEN** the six-category Ruby research profile is read before adapter qualification
+- **THEN** lint, comments, dependencies, CVE, security and build each retain an explicit candidate and gap; MRI/JRuby/TruffleRuby and candidate platforms remain separately unverified, and tool versions require project-lock resolution rather than floating latest
+- **AND** class/module and method documentation rules remain distinct; Brakeman is scoped to Rails, gem packaging to gem projects, and custom project builds require explicit configuration; missing tools cannot imply not_applicable
+- **AND** the candidate profile is not an executable plan or implemented capability, and CVE requires independently bound database identity and freshness; a missing native database must not cause an implicit download during checking

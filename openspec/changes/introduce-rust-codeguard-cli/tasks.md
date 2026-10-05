@@ -332,7 +332,7 @@
 - [ ] 8.13 为 php 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
 - [ ] 8.14 实现 php 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
 - [ ] 8.15 完成 php 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.16 为 ruby 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.16 为 ruby 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。证据：`rulepacks/ruby_static_candidate_v1.json`、封闭 `schemas/ruby-static-candidate.schema.json`、Rust `parse_ruby_candidate_profile` 及 [档案验收](../../../tests/acceptance/ruby-candidate-baseline.md)。六槽保留 gap，MRI/JRuby/TruffleRuby 与五平台未验收，版本策略为待核验的项目锁解析；类/模块和方法文档分开，Brakeman 限 Rails，gem build 限 gem 项目且 build 适用性依项目而定。源文档与反例验证齐备，不从缺工具推导不适用。完整原生规则、工具制品、报告/修复链路和平台资格仍由 8.17/8.18 保持未完成。
 - [ ] 8.17 实现 ruby 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
 - [ ] 8.18 完成 ruby 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
 - [ ] 8.19 为 scala 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
