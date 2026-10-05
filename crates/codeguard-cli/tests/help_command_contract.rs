@@ -59,7 +59,7 @@ fn json_help_covers_all_tracking_ids_and_keeps_quality_unevaluated() {
         }
     );
     assert!(
-        !lint["languages"]
+        lint["languages"]
             .as_array()
             .unwrap()
             .iter()

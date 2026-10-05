@@ -75,6 +75,15 @@ Rustdoc逐问题反馈 MUST 提供问题证据、规则依据、允许修改的�
 - **WHEN** 未显式选择Cargo且绝对PATH没有可用Cargo
 - **THEN** WASM构建对有界Rust源码提供候选初检并同步确认任务；发现候选或范围/运行未完成时必须准备原生工具，完整有界范围零候选时推荐准备；不安装工具、不把候选认定为源码违规；无WASM构建明确初检不可用
 
+#### Scenario: Ruby syntax observation is distinct from project style lint
+- **WHEN** 调用公开Ruby单文件lint入口或复检Ruby语法确认任务
+- **THEN** 只对冻结源码调用版本核验后的Ruby 2.6.10p210 `--disable=gems -EUTF-8:UTF-8 -W0 -c -`，不执行源码或项目插件；反馈明确固定语法版本与项目版本/完整lint未核验，不冒充RuboCop、类型、安全或完整项目检查
+- **AND** 原生诊断只保留工具提供的行，不从caret猜列；版本、工具、源码或报告异常保持未完成；显式失败不改选工具，不用WASM洗白原生失败
+
+#### Scenario: Ruby syntax observations retain stable confirmation tasks
+- **WHEN** 已初始化工作区取得当前Ruby原生异常或WASM候选，并再次检查或执行task verify
+- **THEN** 原生首次证据与WASM首次证据保留独立版本和来源，同一文件复用既有确认身份；原工具复检追加历史，零诊断不凭本地观察关闭任务；缺原生、无进展或版本上下文不足要求恢复检查能力或提出具体决策
+
 #### Scenario: Clippy inputs change during native execution
 - **WHEN** 已观察 Rust 源码、根 Cargo 清单/锁、Clippy/Cargo/工具链配置在原生运行期间变化，或原工具被替换
 - **THEN** 诊断指纹只来源于启动前固定字节；最终核对失败时撤回本轮源码 finding，返回具体未完成原因，不把旧诊断附到新源码，也不把零诊断作为环境恢复或修复候选。可选配置原先不存在而在扫描中新增也须失效，缺少有界普通输入时不得启动检查器

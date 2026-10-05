@@ -1,0 +1,42 @@
+{
+  "affected_paths": [
+    "app.rb"
+  ],
+  "authority": "local_unverified",
+  "blocker_id": "CG-B-8b389025737ce2ebad50f36eb4f68623",
+  "build_root": ".",
+  "checker_id": "syntax.native_confirmation",
+  "coverage_proven": false,
+  "delivery_decision": "not_evaluated",
+  "execution": "incomplete",
+  "fingerprint": "8b389025737ce2ebad50f36eb4f6862352ec42934fc050614cbf5060dbc077ae",
+  "language": "ruby",
+  "native_evidence": {
+    "native": {
+      "diagnostics": [
+        {
+          "line": 1,
+          "rule_id": "ruby.syntax"
+        }
+      ],
+      "reason": "ruby_native_syntax_diagnostics",
+      "status": "diagnostics_observed",
+      "tool_sha256": "8404c9d5fd2200e82c2520c8d9c1badf2a164c0da7c350b54e86cb0025ad9b50",
+      "version": "ruby 2.6.10p210"
+    },
+    "target": {
+      "language": "ruby",
+      "path": "app.rb",
+      "source_sha256": "cedce0abe1dc0ec03b8245285802afc1044f2aea5cf68f39223f6b5c4913bb20"
+    },
+    "tool_path": "/usr/bin/ruby"
+  },
+  "observations": [],
+  "reason_code": "native_syntax_confirmation_needed",
+  "report_type": "syntax_confirmation_observation",
+  "run_id": "syntax-confirm-64214-1791207771473104000",
+  "schema_version": "0.9.0",
+  "scope": "app.rb",
+  "workspace_binding": "bound",
+  "workspace_id": "ws-184ce0bf89bfd45988a856e4b8358450"
+}

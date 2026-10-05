@@ -1,0 +1,50 @@
+{
+  "affected_paths": [
+    "app.rb"
+  ],
+  "authority": "local_unverified",
+  "blocker_id": "CG-B-8b389025737ce2ebad50f36eb4f68623",
+  "build_root": ".",
+  "checker_id": "syntax.native_confirmation",
+  "coverage_proven": false,
+  "delivery_decision": "not_evaluated",
+  "execution": "incomplete",
+  "fingerprint": "8b389025737ce2ebad50f36eb4f6862352ec42934fc050614cbf5060dbc077ae",
+  "language": "ruby",
+  "observations": [
+    {
+      "byte_offset": 0,
+      "grammar_qualified": false,
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "known_limitations": [
+        "Ruby 2.6.10 native syntax differential agrees on 13 narrow cases; other versions, dialect corpus, systematic precision, native-first lint route and release remain unqualified"
+      ],
+      "language": "ruby",
+      "path": "app.rb",
+      "reason": null,
+      "recoveries": [
+        {
+          "end_byte": 6,
+          "end_column_byte": 6,
+          "end_row": 0,
+          "kind": "ERROR",
+          "start_byte": 0,
+          "start_column_byte": 0,
+          "start_row": 0,
+          "syntax_kind": "ERROR"
+        }
+      ],
+      "recovery_count": 1,
+      "scope": "whole_file",
+      "source_sha256": "cedce0abe1dc0ec03b8245285802afc1044f2aea5cf68f39223f6b5c4913bb20",
+      "status": "candidate_observed"
+    }
+  ],
+  "reason_code": "native_syntax_confirmation_needed",
+  "report_type": "syntax_confirmation_observation",
+  "run_id": "syntax-confirm-64210-1791207771395241000",
+  "schema_version": "0.1.0",
+  "scope": "app.rb",
+  "workspace_binding": "bound",
+  "workspace_id": "ws-184ce0bf89bfd45988a856e4b8358450"
+}

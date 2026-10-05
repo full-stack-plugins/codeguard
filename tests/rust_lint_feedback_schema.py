@@ -42,7 +42,7 @@ class RustLintFeedback(unittest.TestCase):
         self.assertEqual(recheck['observation'],'candidate_absent_unverified_policy')
     def test_current_help_reports_rust_and_keeps_old_protocol(self):
         out=subprocess.run([os.environ.get('CODEGUARD_RUST_LINT_BIN',str(ROOT/'target/debug/codeguard')),'help','lint','--format=json'],capture_output=True,timeout=10)
-        data=json.loads(out.stdout);validator('command-help-v0.2.schema.json').validate(data)
+        data=json.loads(out.stdout);validator('command-help-v0.3.schema.json').validate(data)
         self.assertIn('rust',data['commands'][0]['languages'])
         self.assertFalse(validator('command-help-v0.1.schema.json').is_valid(data))
 

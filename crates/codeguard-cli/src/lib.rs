@@ -383,8 +383,14 @@ pub mod syntax_worker_structure;
 mod grammar_native_checker;
 #[cfg(all(feature = "wasm-precheck", unix))]
 mod javascript_syntax_probe;
-#[cfg(all(feature = "wasm-precheck", unix))]
+#[cfg(unix)]
 mod ruby_syntax_probe;
+#[cfg(unix)]
+pub mod ruby_lint_command;
+#[cfg(unix)]
+mod ruby_tool_selection;
+#[cfg(unix)]
+mod ruby_lint_workbench;
 #[cfg(unix)]
 mod go_syntax_probe;
 #[cfg(unix)]

@@ -132,3 +132,8 @@ Clippy 现在在原生执行前冻结已观察源码及根配置/锁的字节或
 对应既有 9.9、9.10、14.10、14.11、14.19；不创建第二份规格。现有 lint/check 能发现调用方 PATH 中的 erl，但 task verify 仅显式参数，导致已安装工具被误报未提供。新增场景和三个先失败的反例后，复检复用原工具选择服务；显式及首选失败不换工具，实际 next 固定工具路径，空/相对/不可执行来源仍未完成。候选/原生首次任务及 repair-ready 的共同入口、原协议、租约/事件和不自动关闭继续保持；完整原生确认与宿主关闭父任务仍开放。实际终态及证据补入[本批验收](../../../tests/acceptance/erlang-recheck-discovery.md)。
 
 本批终态：默认全工作区 1235 passed/0 failed/113 ignored；其后仅历史指引文案变化，最终默认工作台定向 12 passed/0 failed/1 ignored。最终 WASM 16 组 199 passed/0 failed/25 ignored；显式 OTP 28 实测新增目标 1 passed，最终二进制两来源实际复放。默认/WASM Clippy、fmt、分层和 OpenSpec strict 通过；旧 schema 未改，父任务未勾选。前批 4afa8bc 的 Linux CI 因旧对话文案断言失败，已重现并修改行为断言，本批远端结果独立确认。详情及固定日志见[本批验收](../../../tests/acceptance/erlang-recheck-discovery.md)。
+
+
+## 2026-10-05 Ruby原生优先与稳定任务局部链路
+
+源码新增lint ruby单文件、绝对PATH/显式原生选择与有界WASM缺工具初检。固定Ruby2.6.10p210以stdin进行-c，不执行源码/gems；项目版本未知、无列号、原生失败不回退等边界明确。WASM候选与原生首次观察复用稳定任务；next/原工具task verify保存证据，零诊断仍不关闭。真实/usr/bin/ruby完成发现→修复→复检，报告和尝试协议留证；完整语言lint、原生聚合、可信关闭与公开发行不借用这条链路作为证明。见[局部验收](../../../tests/acceptance/ruby-native-entry.md)。

@@ -1,4 +1,4 @@
-//! 显式 Ruby 的隔离语法观察；仅作开发对照，不执行源码或代替项目 Rubocop。
+//! 显式 Ruby 的隔离语法观察；用于有界产品反馈与开发对照，不执行源码或代替项目 RuboCop。
 use codeguard_runtime::{ProcessSpec, Termination, read_bounded_regular_file, run_process};
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
@@ -7,7 +7,7 @@ use std::{
 };
 
 /// 对冻结 UTF-8 stdin 执行固定 Ruby 2.6.10p210 的语法检查。
-/// 参数为显式绝对工具路径、原始源码和共同截止时间；返回仅具开发对照权威的有界观察。
+/// 参数为显式绝对工具路径、原始源码和共同截止时间；返回仅具局部未验证权威的有界观察。
 pub(crate) fn observe(
     tool: &Path,
     source: &[u8],
@@ -97,6 +97,64 @@ pub(crate) fn observe(
     });
     report
 }
+/// 校验已保存的固定 Ruby 观察；参数为报告和可选当前源码，返回形状及真实行范围是否有效。
+/// 不猜测列号；历史源码已改变时仅核验有界行号，当前源码可用时核验行范围。
+pub(crate) fn valid_observation(native: &Value, source: Option<&[u8]>) -> bool {
+    let keys = ["status", "reason", "version", "tool_sha256", "diagnostics"];
+    let valid_sha = |v: &Value| {
+        v.as_str().is_some_and(|s| {
+            s.len() == 64
+                && s.bytes()
+                    .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+        })
+    };
+    if !native
+        .as_object()
+        .is_some_and(|o| o.len() == keys.len() && keys.iter().all(|k| o.contains_key(*k)))
+        || !native["reason"].as_str().is_some_and(|s| {
+            !s.is_empty()
+                && s.len() <= 128
+                && s.bytes().all(|b| b.is_ascii_lowercase() || b == b'_')
+        })
+        || !(native["version"].is_null() || native["version"] == "ruby 2.6.10p210")
+        || !(native["tool_sha256"].is_null() || valid_sha(&native["tool_sha256"]))
+    {
+        return false;
+    }
+    let Some(rows) = native["diagnostics"].as_array().filter(|r| r.len() <= 32) else {
+        return false;
+    };
+    match native["status"].as_str() {
+        Some("incomplete") => return rows.is_empty(),
+        Some("completed" | "diagnostics_observed") => {}
+        _ => return false,
+    }
+    if native["version"] != "ruby 2.6.10p210"
+        || !valid_sha(&native["tool_sha256"])
+        || (native["status"] == "completed"
+            && (!rows.is_empty() || native["reason"] != "ruby_native_syntax_no_diagnostics"))
+        || (native["status"] == "diagnostics_observed"
+            && (rows.is_empty() || native["reason"] != "ruby_native_syntax_diagnostics"))
+    {
+        return false;
+    }
+    let mut lines = std::collections::BTreeSet::new();
+    rows.iter().all(|row| {
+        row.as_object()
+            .is_some_and(|o| o.len() == 2 && o.contains_key("line") && o.contains_key("rule_id"))
+            && row["rule_id"] == "ruby.syntax"
+            && row["line"].as_u64().is_some_and(|line| {
+                line > 0
+                    && line <= u32::MAX as u64
+                    && lines.insert(line)
+                    && source.is_none_or(|bytes| {
+                        std::str::from_utf8(bytes)
+                            .is_ok_and(|text| line as usize <= text.lines().count().max(1))
+                    })
+            })
+    })
+}
+
 fn digest(bytes: &[u8]) -> String {
     format!("{:x}", Sha256::digest(bytes))
 }
@@ -161,7 +219,30 @@ fn diagnostic_lines(stderr: &[u8], source: &[u8]) -> Option<Vec<Value>> {
 
 #[cfg(test)]
 mod tests {
-    use super::{diagnostic_lines, verified_version};
+    use super::{diagnostic_lines, valid_observation, verified_version};
+    #[test]
+    fn history_rejects_fabricated_columns_versions_lines_and_duplicate_diagnostics() {
+        let good = serde_json::json!({"status":"diagnostics_observed","reason":"ruby_native_syntax_diagnostics","version":"ruby 2.6.10p210","tool_sha256":"a".repeat(64),"diagnostics":[{"line":1,"rule_id":"ruby.syntax"}]});
+        assert!(valid_observation(&good, Some(b"def f(\n")));
+        for (key, value) in [
+            ("column", serde_json::json!(1)),
+            ("rule_id", serde_json::json!("rubocop.Style")),
+            ("line", serde_json::json!(2)),
+        ] {
+            let mut bad = good.clone();
+            bad["diagnostics"][0][key] = value;
+            assert!(!valid_observation(&bad, Some(b"def f(\n")));
+        }
+        let mut bad = good.clone();
+        bad["version"] = serde_json::json!("ruby 3.4.0");
+        assert!(!valid_observation(&bad, None));
+        let mut bad = good.clone();
+        bad["diagnostics"]
+            .as_array_mut()
+            .unwrap()
+            .push(good["diagnostics"][0].clone());
+        assert!(!valid_observation(&bad, None));
+    }
     #[test]
     fn inconsistent_exits_and_unexpected_output_never_confirm_syntax() {
         use std::{

@@ -38,6 +38,7 @@ struct Arguments {
     zig_tool: Option<PathBuf>,
     erl_tool: Option<PathBuf>,
     swift_tool: Option<PathBuf>,
+    ruby_tool: Option<PathBuf>,
     kotlinc_tool: Option<PathBuf>,
     cargo_tool: Option<PathBuf>,
     cargo_audit_tool: Option<PathBuf>,
@@ -104,6 +105,7 @@ pub fn run(args: &[String]) -> ExitCode {
     if (parsed.zig_tool.is_some()
         || parsed.erl_tool.is_some()
         || parsed.swift_tool.is_some()
+        || parsed.ruby_tool.is_some()
         || parsed.kotlinc_tool.is_some())
         && !syntax_task
     {
@@ -115,6 +117,7 @@ pub fn run(args: &[String]) -> ExitCode {
         && (parsed.zig_tool.is_some()
             || parsed.erl_tool.is_some()
             || parsed.swift_tool.is_some()
+            || parsed.ruby_tool.is_some()
             || parsed.kotlinc_tool.is_some()
             || parsed.go_tool.is_some())
     {
@@ -125,6 +128,7 @@ pub fn run(args: &[String]) -> ExitCode {
         if (parsed.zig_tool.is_some() && original["language"] != "zig")
             || (parsed.erl_tool.is_some() && original["language"] != "erlang")
             || (parsed.swift_tool.is_some() && original["language"] != "swift")
+            || (parsed.ruby_tool.is_some() && original["language"] != "ruby")
             || (parsed.kotlinc_tool.is_some() && original["language"] != "kotlin")
             || (parsed.go_tool.is_some() && original["language"] != "go")
         {
@@ -234,6 +238,15 @@ pub fn run(args: &[String]) -> ExitCode {
             .is_ok_and(|original| original["language"] == "go")
         {
             crate::syntax_task_recheck::run_go(&root, &brief, parsed.go_tool.as_deref(), deadline)
+        } else if crate::syntax_task_recheck::original(&root, &brief)
+            .is_ok_and(|original| original["language"] == "ruby")
+        {
+            crate::syntax_task_recheck::run_ruby(
+                &root,
+                &brief,
+                parsed.ruby_tool.as_deref(),
+                deadline,
+            )
         } else {
             crate::syntax_task_recheck::run(
                 &root,
@@ -670,6 +683,7 @@ pub fn run(args: &[String]) -> ExitCode {
     });
     if syntax_task {
         report["schema_version"] = json!(match report["native_scan"]["schema_version"].as_str() {
+            Some("0.10.0") => "0.23.0",
             Some("0.9.0") => "0.22.0",
             Some("0.8.0") => "0.19.0",
             Some("0.7.0") => "0.18.0",
@@ -1476,6 +1490,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
     let mut zig_tool = None;
     let mut erl_tool = None;
     let mut swift_tool = None;
+    let mut ruby_tool = None;
     let mut kotlinc_tool = None;
     let mut cargo_tool = None;
     let mut cargo_audit_tool = None;
@@ -1516,6 +1531,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                 | "--zig-tool"
                 | "--erl-tool"
                 | "--swift-tool"
+                | "--ruby-tool"
                 | "--kotlinc-tool"
                 | "--cargo-tool"
                 | "--cargo-audit-tool"
@@ -1553,6 +1569,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                 "--zig-tool" if zig_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--erl-tool" if erl_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--swift-tool" if swift_tool.replace(PathBuf::from(value)).is_none() => {}
+                "--ruby-tool" if ruby_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--kotlinc-tool" if kotlinc_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--cargo-tool" if cargo_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--cargo-audit-tool"
@@ -1595,6 +1612,9 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
         .is_some_and(|tool| !tool.is_absolute())
     {
         return Err("--kotlinc-tool 必须是绝对路径".into());
+    }
+    if ruby_tool.as_ref().is_some_and(|tool| !tool.is_absolute()) {
+        return Err("Ruby工具必须为绝对路径".into());
     }
     if swift_tool.as_ref().is_some_and(|tool| !tool.is_absolute()) {
         return Err("--swift-tool 必须是绝对路径".into());
@@ -1679,6 +1699,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
         zig_tool,
         erl_tool,
         swift_tool,
+        ruby_tool,
         kotlinc_tool,
         cargo_tool,
         cargo_audit_tool,

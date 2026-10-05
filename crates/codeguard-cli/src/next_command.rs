@@ -1298,6 +1298,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                         | "0.11.0"
                         | "0.12.0"
                         | "0.14.0"
+                        | "0.15.0"
                 )
             ) {
                 brief["schema_version"] = guidance["schema_version"].clone();
@@ -1305,7 +1306,10 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                     guidance["native_confirmation_reason"].clone();
                 brief["native_column_unit"] = guidance["native_column_unit"].clone();
             }
-            if guidance["schema_version"] == "0.14.0" {
+            if matches!(
+                guidance["schema_version"].as_str(),
+                Some("0.14.0" | "0.15.0")
+            ) {
                 brief["native_confirmation_ref"] = guidance["native_confirmation_ref"].clone();
             }
             brief["disposition"] = guidance["disposition"].clone();

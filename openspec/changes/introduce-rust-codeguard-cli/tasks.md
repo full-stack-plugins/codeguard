@@ -1592,3 +1592,19 @@ check python/all现通过0.48反馈保留独立结构计数和原始坐标，原
 ## 2026-10-05 Rust独立lint原生优先（局部验收）
 
 2.1/2.7/7.3/9.9/14.9–14.11/14.19：公开lint rust复用原生Clippy、共同预算和任务同步，只执行lint；未选择且缺Cargo时提供有界WASM候选和原生准备要求，显式失败不回退。初始三项缺入口反例RED；重复发现保留任务、原工具复检及真实Clippy发现/修正/强制告警对照已有实际证据。补齐Rust修复简报封闭schema，help0.2增加该语种，历史协议保留。见[验收](../../../tests/acceptance/rust-standalone-lint.md)。全部构建组合、完整原生政策与可信关闭/发行仍缺，父任务不勾选。
+
+## 2026-10-05 Ruby公开原生入口（任务复检仍为RED）
+
+对应S05/S08/S09/S14与native-tool-adapters新增Ruby场景。已实现单文件原生优先入口、Ruby2.6.10p210固定版本和stdin语法观察、仅行号反馈、显式故障不回退、缺原生的WASM初检及未知项目版本边界；help0.3、新封闭反馈schema与双语说明同步。真实/usr/bin/ruby对破损和修复源码分别观察诊断及零诊断；不授予项目覆盖、任务关闭或发布资格。
+
+公开入口已局部验证；稳定任务、next、task verify及check all自动接线仍待实现。任务链路测试native_first_task_repeats_and_original_tool_rechecks保持失败，不移除或标忽略，真实任务关闭测试尚不具执行前提。现有全语言/工作流父任务保持未勾选。
+
+
+## 2026-10-05 Ruby稳定任务与原工具复检（局部链路验收）
+
+对应已有8.*全语言、9.3/9.9、14.7/14.10/14.11/14.19，不重复创建change、不勾选父任务。初始化工作区中的固定Ruby原生首次诊断/环境失败与WASM候选使用相同工作区/文件/语言指纹；重复扫描更新证据，零候选不生成新源码任务，原生零诊断不自动关闭。next提供真实行号、unknown列单位、项目版本核对与复检argv；task verify --ruby-tool记录原工具观察与事件；语言不匹配/相对工具在原生启动及租约前拒绝。
+
+原生首次RED及WASM任务RED均已复现后修复。默认Ruby目标9通过/1真实测试忽略，WASM目标10通过/1真实测试忽略；另行显式/usr/bin/ruby实测修复目标1通过，真实对话输出/JSON协议分别留证。默认全workspace、受影响WASM回归与严格Clippy本批仍在收敛，最终以tests/acceptance/ruby-native-entry.md记录为准。聚合原生Ruby、Ruby3、签名关闭政策、逐语言精度/宿主/发行验收保持开放。
+
+
+本批终态：默认全workspace1387通过/0失败/125忽略；共享任务WASM11目标87通过/0失败/7忽略；追加反例后Ruby目标默认11/WASM12通过，各1真实测试忽略，显式真实Ruby目标另行1通过。schema5通过；默认/WASM严格Clippy、分层、fmt、OpenSpec通过，最终证据见tests/acceptance/ruby-native-entry.md。受保护的用户Erlang草稿散列不变，未纳入提交。本批不勾选全语言/全工作流父任务。
