@@ -35,6 +35,29 @@ pub fn project_eslint_findings(
     let lines: Vec<_> = normalized
         .split(['\n', '\r', '\u{2028}', '\u{2029}'])
         .collect();
+    // 去重不能丢弃异源或损坏的诊断，否则会将部分输入伪装为完整任务依据。
+    for finding in findings {
+        if finding.path != absolute
+            || !matches!(finding.severity, 1 | 2)
+            || finding.rule_id.is_empty()
+            || finding.rule_id.len() > 512
+            || finding.rule_id.chars().any(char::is_control)
+            || finding.message.is_empty()
+            || finding.message.len() > 4096
+        {
+            return None;
+        }
+        let line = lines.get(usize::try_from(finding.line.checked_sub(1)?).ok()?)?;
+        if finding.column == 0
+            || usize::try_from(finding.column).ok()? > line.encode_utf16().count() + 1
+        {
+            return None;
+        }
+        let anchor = line.trim();
+        if anchor.is_empty() {
+            return None;
+        }
+    }
     let mut ordered = findings.to_vec();
     ordered.sort_by(|left, right| {
         (
@@ -60,26 +83,9 @@ pub fn project_eslint_findings(
     let mut occurrences = BTreeMap::<String, u64>::new();
     let mut records = Vec::new();
     for finding in ordered {
-        if finding.path != absolute
-            || !matches!(finding.severity, 1 | 2)
-            || finding.rule_id.is_empty()
-            || finding.rule_id.len() > 512
-            || finding.rule_id.chars().any(char::is_control)
-            || finding.message.is_empty()
-            || finding.message.len() > 4096
-        {
-            return None;
-        }
+        // 全量验证后才进行稳定去重；此处复用已验证的源码锚点。
         let line = lines.get(usize::try_from(finding.line.checked_sub(1)?).ok()?)?;
-        if finding.column == 0
-            || usize::try_from(finding.column).ok()? > line.encode_utf16().count() + 1
-        {
-            return None;
-        }
         let anchor = line.trim();
-        if anchor.is_empty() {
-            return None;
-        }
         let mut hash = Sha256::new();
         for part in [
             b"codeguard-eslint-finding-v1".as_slice(),

@@ -1736,3 +1736,8 @@ Rust输入补录终态：实际原生lint修复及原工具任务复检1通过�
 对应12.1 / 14.1 / 14.9。两轮远端默认suite因CFQuery旧泛SQL文案断言失败，当前源码本地复现同一RED；修正为当前PostgreSQL方言证据，并核对全部32行限制与固定清单一致，保留零资格/只读/未执行权威。CI在解析器及npm检查前运行default/WASM库存，不删除完整suite。默认2项及WASM三个目标8项通过，Docker原生对照1项条件忽略；见[库存CI纠正验收](../../../tests/acceptance/grammar-inventory-ci-correction.md)。语言精度、完整宿主和发行仍缺，父任务不勾选。
 
 SP22完整默认终态：当前源码workspace all-targets 1500 passed / 0 failed / 132 ignored，库存Schema4项通过。未启用WASM及未执行用户Erlang草稿；跨平台/宿主/语言资格/发行与远端新提交CI仍需独立验收，不勾选父任务。
+
+
+## 2026-10-06 SP23 ESLint 去重前全量验证（已验证缺陷修复）
+
+稳定任务投影先验证所有原生诊断再去重，拒绝重复键掩盖异源路径或超预算消息；合法任务身份和排序保持兼容。反例实际 RED→GREEN；六个受影响目标 40 passed / 0 failed / 8 ignored，adapters 全目标严格 Clippy、OpenSpec strict、layering、所改文件格式与 diff 检查通过。见[验收记录](../../../tests/acceptance/eslint-duplicate-validation.md)。本项不替代全项目 ESLint、真实宿主和 S09 父任务验收，不勾选父任务。
