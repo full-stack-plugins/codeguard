@@ -1,0 +1,72 @@
+{
+  "changed_directories": [
+    ".codeguard",
+    ".codeguard/findings",
+    ".codeguard/tasks",
+    ".codeguard/decisions",
+    ".codeguard/reports",
+    ".codeguard/runs",
+    ".codeguard/cache",
+    ".codeguard/worktrees",
+    ".codeguard/state"
+  ],
+  "changed_files": [
+    ".codeguard/.gitignore",
+    ".codeguard/README.md",
+    ".codeguard/project.json",
+    ".codeguard/module-graph.json",
+    ".codeguard/architecture.md",
+    "AGENTS.md",
+    ".codeguard/workspace.json"
+  ],
+  "conflict_file": null,
+  "delivery_decision": "not_evaluated",
+  "init_status": "partial",
+  "mode": "apply",
+  "next_actions": [
+    "review_project_profile",
+    "complete_init_readiness",
+    "run_doctor_and_check_when_available"
+  ],
+  "observation_complete": true,
+  "operation": "init",
+  "planned_files": [
+    ".codeguard/.gitignore",
+    ".codeguard/README.md",
+    ".codeguard/project.json",
+    ".codeguard/module-graph.json",
+    ".codeguard/architecture.md",
+    ".codeguard/workspace.json",
+    "AGENTS.md"
+  ],
+  "profile_stale": null,
+  "profile_summary": {
+    "architecture": "unknown",
+    "build_model": "not_resolved",
+    "build_roots": [],
+    "checker_inventory": "partial",
+    "checkers": [],
+    "installed_versions": "not_probed",
+    "language_targets": [],
+    "languages": [
+      {
+        "id": "shell",
+        "manifest_count": 0,
+        "source_file_count": 1
+      }
+    ],
+    "unknown_conditions": [
+      "source_sets_not_fully_classified",
+      "dialects_not_classified"
+    ]
+  },
+  "readiness": "unknown",
+  "report_type": "init_plan",
+  "schema_version": "0.5.0",
+  "unresolved": [
+    "profile_refresh_partial",
+    "approved_quality_policy_not_bound",
+    "tool_readiness_not_probed"
+  ],
+  "workspace_id": "ws-13016c7a49a3fcc2d9125bac0b04953f"
+}

@@ -207,7 +207,7 @@ Supply the original checker's required tool/configuration options to `task verif
 | `tools list / verify`, `doctor` | Inspect tools and limited environment probes | Explicit Ruff doctor probe; `tools install --apply` is blocked |
 | `plan CATEGORY LANGUAGE` | Preview selections and gaps | Not a certified execution plan |
 | `hook plan` | Route a versioned host event to a candidate check tier | Reads bounded JSON on stdin; exit 3, no check or host blocking |
-| `hook execute` | Run read-only discovery, bounded Stop guidance, task-bound recheck, selected Python/Ruff, JS/TS/ESLint and optional WASM feedback, or a live pre-commit index safety preview | Explicit timeout; repair reuses `task verify` and never closes a task or approves delivery |
+| `hook execute` | Run read-only discovery, bounded Stop guidance, task-bound recheck, selected Python/Ruff, JS/TS/ESLint, Kotlin, Swift, Zig, Ruby, ShellCheck and optional WASM feedback, or a live pre-commit index safety preview | Explicit timeout; repair reuses `task verify` and never closes a task or approves delivery |
 | `hook claude <session-start\|user-prompt-submit\|post-tool-use\|post-tool-use-failure\|stop>` | Map Claude Code lifecycle events to read-only discovery, constant prompt guidance, bounded edit feedback, no-check failure feedback, or local next-step guidance | Candidate soft Hooks; Stop offers one task continuation at most; default Hooks and delivery gates remain incomplete |
 | `lint python / java / typescript / go` | Run selected native checks | Adapter-specific options and scope |
 | `comments rust`, `build rust` | Documentation and type checking | Build does not run project tests |
@@ -734,3 +734,22 @@ flowchart LR
 ```
 
 See [project Shell acceptance](tests/acceptance/shellcheck-project-baseline.md).
+
+### Shell edit and repair events
+
+Rust `hook execute` and the Claude-shaped adapter route confirmed Shell edits to the same per-file ShellCheck path, accepting `--shellcheck-tool /absolute/path`. Only selected files run within the event deadline. Tasks retain their identity across `lint shell`, `check shell`, and edit events; an uninitialized workspace is not created automatically.
+
+```mermaid
+flowchart LR
+    A[Confirmed Shell edit] --> B[Selected files and observed dialect]
+    B --> C[Native ShellCheck and input revalidation]
+    C --> D[Stable tasks and bounded dialogue]
+    D --> E[Agent repairs]
+    E --> F[Task-bound repair_ready]
+    F --> G[Original-rule task verify]
+    G --> H[Persist observation and retain closure requirements]
+```
+
+Edit feedback uses outer protocol 0.21 and inner 0.11, preserving earlier schemas. Dialogue includes current SC rules, Unicode scalar positions, persisted task IDs, and recheck commands; source and free-form tool messages are excluded. Missing tools, unsupported dialects, selected-tool failures, and persistence failures remain incomplete. No bundled Shell WASM fallback is claimed. Failed writes run no checker; repair-ready events call the existing task verifier, and zero diagnostics never close a task.
+
+The [acceptance record](tests/acceptance/shellcheck-hook-baseline.md) distinguishes real ShellCheck output, controlled fixtures, offline npm installation, and live host sessions. Claude-shaped replay does not prove acceptance in a real installed host or a complete project delivery gate.

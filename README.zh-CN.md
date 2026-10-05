@@ -205,7 +205,7 @@ codeguard task verify "$TASK_ID" . --format json
 | `config validate / explain`、`rules list` | 查看配置和规则来源 | 候选不构成策略批准 |
 | `tools list / verify`、`doctor` | 查看工具和有限环境探测 | 显式 Ruff doctor 探测；`tools install --apply` 受阻 |
 | `plan CATEGORY LANGUAGE` | 预览选择和缺口 | 不是已认证执行计划 |
-| `hook execute` | 启动只读发现、Stop 有界下一步、按任务原工具复检、Python/Ruff、JS/TS/ESLint 与可选 WASM 编辑反馈及显式 Git 工具的提交面安全预览 | 必须给超时；复检不自动关闭任务，推送/CI 仍未接线，不构成宿主交付门禁 |
+| `hook execute` | 启动只读发现、Stop 有界下一步、按任务原工具复检、Python/Ruff、JS/TS/ESLint、Kotlin、Swift、Zig、Ruby、ShellCheck 原生编辑反馈与可选 WASM及显式 Git 工具的提交面安全预览 | 必须给超时；复检不自动关闭任务，推送/CI 仍未接线，不构成宿主交付门禁 |
 | `hook claude <session-start\|post-tool-use\|post-tool-use-failure\|stop>` | 将 Claude Code 生命周期事件映射为只读发现、局部编辑反馈、失败不检查或本地下一步指引 | 候选软 Hook；Stop 最多引导一次继续；默认 Hook 与交付门禁仍未接通 |
 | `lint python / java / typescript / go` | 执行已接入原生检查 | 参数和范围因适配器而异 |
 | `comments rust`、`build rust` | 文档与类型检查 | build 不运行项目测试 |
@@ -717,3 +717,22 @@ flowchart LR
 ```
 
 证据见 [项目Shell验收](tests/acceptance/shellcheck-project-baseline.md)。
+
+### Shell 编辑与修复事件
+
+Rust `hook execute` 和 Claude 格式适配器现在把已确认的 Shell 编辑路由到同一 ShellCheck 逐文件路径，接受 `--shellcheck-tool /absolute/path`；仅检查事件选择的文件，共享事件超时，不运行完整项目构建。任务 ID 与 `lint shell` / `check shell` 保持一致，未初始化工作区不自动创建任务。
+
+```mermaid
+flowchart LR
+    A[确认 Shell 编辑] --> B[选中文件及实际方言]
+    B --> C[原生 ShellCheck 与当前输入复核]
+    C --> D[更新同一任务及脱敏对话摘要]
+    D --> E[智能体修复]
+    E --> F[repair_ready 绑定任务]
+    F --> G[原规则 task verify]
+    G --> H[记录观察 仍须核验关闭条件]
+```
+
+编辑反馈外层协议0.21、内层0.11，旧协议保留。对话仅显示当前 SC 规则、Unicode 标量位置、实际已同步任务 ID 及复检命令，排除源码和原生自由文本。缺工具、不支持方言、工具失败和工作台保存失败保持未完成；当前不存在 Shell 内置 WASM，不虚构兜底。失败写入不检查；`repair_ready` 复用既有任务复检，零诊断不关闭问题。
+
+[验收记录](tests/acceptance/shellcheck-hook-baseline.md)区分真实 ShellCheck 报告、受控工具测试、npm 离线安装及实际宿主会话。Claude 形状重放通过不代表真实已安装宿主或完整项目门禁已验收。

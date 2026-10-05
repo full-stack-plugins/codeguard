@@ -1654,3 +1654,9 @@ next 0.17/task show 0.3和新Markdown统一提供绑定任务ID的task verify，
 ## 2026-10-06 Shell逐文件项目入口接线（局部验收）
 
 check shell/all接入ShellCheck0.11.0，按shebang/文件声明或显式默认方言逐项观察；最多64文件，共享总deadline，超限明示。原rc、SC规则和环境原因逐文件保存，绑定请求工作区根，子工作台不劫持归属，重复任务稳定。未知/不适用方言直接needs_decision；运行期间源修改撤回当前定位，SARIF保留当前局部诊断且不公开路径。新check反馈0.52与shell_native_scan0.1；旧报告协议不变。真实工具记录、范围/预算/错误参数/嵌套工作台反例见tests/acceptance/shellcheck-project-baseline.md。没有Shell WASM，不伪造fallback；完整source依赖、各检查族、可信关闭/复发、Dockerfile/IaC、专用zsh/fish和平台验收仍缺，7.4/S09不勾选。
+
+## 2026-10-06 Shell 编辑与修复 Hook 接线
+
+对应7.4、9.3/9.9、11.17、14.9/14.10及hook-protocol。确认编辑只选择实际文件，显式ShellCheck或PATH优先；任务与原生lint/check复用，实际方言优先，共享截止时间。repair_ready识别shell.shellcheck、调用原SC规则复检，复核输入并保持零诊断不关闭。Claude形状返回安全规则、Unicode位置与真实任务，拒绝源码/工具自由文本。初始四项RED，接线后六项default/WASM通过；失败写入夹具补齐必需timeout后验证不检查。新0.21/0.11封闭协议、真实ShellCheck及npm安装链路见[验收](../../../tests/acceptance/shellcheck-hook-baseline.md)。完整宿主、Shell覆盖、签名关闭/复发与发行父任务仍开放。
+
+Shell Hook最终源码验证：默认全workspace262目标1452通过/0失败/126忽略，WASM相关7目标64通过/0失败/3忽略，两种配置严格Clippy通过。已修复携带预配置工具的失败写入被误报为复检错参，实际输出为not_run/write_failed；npm执行标记验证不启动检查。没有改变可信关闭或全语言验收标准。

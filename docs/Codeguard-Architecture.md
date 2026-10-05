@@ -1046,3 +1046,22 @@ flowchart LR
 ```
 
 See [project Shell acceptance](../tests/acceptance/shellcheck-project-baseline.md).
+
+### Shell edit and repair events
+
+Rust `hook execute` and the Claude-shaped adapter route confirmed Shell edits to the same per-file ShellCheck path, accepting `--shellcheck-tool /absolute/path`. Only selected files run within the event deadline. Tasks retain their identity across `lint shell`, `check shell`, and edit events; an uninitialized workspace is not created automatically.
+
+```mermaid
+flowchart LR
+    A[Confirmed Shell edit] --> B[Selected files and observed dialect]
+    B --> C[Native ShellCheck and input revalidation]
+    C --> D[Stable tasks and bounded dialogue]
+    D --> E[Agent repairs]
+    E --> F[Task-bound repair_ready]
+    F --> G[Original-rule task verify]
+    G --> H[Persist observation and retain closure requirements]
+```
+
+Edit feedback uses outer protocol 0.21 and inner 0.11, preserving earlier schemas. Dialogue includes current SC rules, Unicode scalar positions, persisted task IDs, and recheck commands; source and free-form tool messages are excluded. Missing tools, unsupported dialects, selected-tool failures, and persistence failures remain incomplete. No bundled Shell WASM fallback is claimed. Failed writes run no checker; repair-ready events call the existing task verifier, and zero diagnostics never close a task.
+
+The [acceptance record](../tests/acceptance/shellcheck-hook-baseline.md) distinguishes real ShellCheck output, controlled fixtures, offline npm installation, and live host sessions. Claude-shaped replay does not prove acceptance in a real installed host or a complete project delivery gate.
