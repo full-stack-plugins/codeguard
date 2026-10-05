@@ -281,9 +281,91 @@ fn execute(
     {
         outcome = "resolution_evidence_incomplete";
     }
-    let mut records = load(root, &policy.identity, &policy.original_report_sha256)?;
+    commit_resolution(
+        root,
+        request.task_id,
+        &policy.original_report_sha256,
+        &evidence,
+        json!({"schema_version":checker.evidence_version(&policy.schema_version),"report_type":"task_resolution_evidence","identity":policy.identity,"original_report_sha256":policy.original_report_sha256,"original_source_sha256":policy.original_source_sha256,"current_source_sha256":digest(&current),"grammar_sha256":policy.grammar_sha256,"tool_sha256":policy.tool_sha256,"adapter_sha256":policy.adapter_sha256,"policy_sha256":policy_sha,"policy_revision":policy.policy_revision,"original_native":original_native,"current_native":current_native,"outcome":outcome}),
+        outcome,
+    )
+}
+
+/// 提交限定任务的原生复检证据，保留幂等、父链冲突和复发语义。
+/// 参数必须来自已验签且输入仍稳定的宿主复检服务；本函数不从本地文件取得批准。
+/// 返回限定任务收据，不改变项目门禁。
+pub(crate) fn commit_resolution(
+    root: &Path,
+    task_id: &str,
+    original_report_sha256: &str,
+    evidence: &ResolutionEvidence,
+    mut raw_evidence: Value,
+    mut outcome: &'static str,
+) -> Result<Value, &'static str> {
+    let keys = [
+        "schema_version",
+        "report_type",
+        "identity",
+        "original_report_sha256",
+        "original_source_sha256",
+        "current_source_sha256",
+        "grammar_sha256",
+        "tool_sha256",
+        "adapter_sha256",
+        "policy_sha256",
+        "policy_revision",
+        "original_native",
+        "current_native",
+        "outcome",
+    ];
+    if !raw_evidence.as_object().is_some_and(|object| {
+        object.len() == keys.len() && keys.iter().all(|key| object.contains_key(*key))
+    }) || !matches!(
+        raw_evidence["schema_version"].as_str(),
+        Some("0.1.0" | "0.2.0" | "0.3.0" | "0.4.0" | "0.5.0")
+    ) {
+        return Err("task_resolution_evidence_binding_invalid");
+    }
+    let policy_sha = evidence.policy_sha256.as_str();
+    let identity =
+        serde_json::to_value(&evidence.identity).map_err(|_| "task_resolution_encoding_failed")?;
+    let native_sha = digest(
+        &serde_json::to_vec(&json!({
+            "original":raw_evidence["original_native"],"current":raw_evidence["current_native"]
+        }))
+        .map_err(|_| "task_resolution_encoding_failed")?,
+    );
+    let grammar_matches = if raw_evidence["grammar_sha256"].is_null() {
+        evidence.rulepack_sha256 == evidence.policy_sha256
+    } else {
+        raw_evidence["grammar_sha256"] == evidence.rulepack_sha256
+    };
+    // 写入之前核对两种表示，不允许未来语言入口拼接另一份报告或批准身份。
+    if task_id != evidence.identity.task_id
+        || raw_evidence["report_type"] != "task_resolution_evidence"
+        || raw_evidence["identity"] != identity
+        || raw_evidence["original_report_sha256"] != original_report_sha256
+        || raw_evidence["original_source_sha256"] != evidence.original_source_sha256
+        || raw_evidence["current_source_sha256"] != evidence.current_source_sha256
+        || raw_evidence["tool_sha256"] != evidence.tool_sha256
+        || raw_evidence["adapter_sha256"] != evidence.adapter_sha256
+        || raw_evidence["policy_sha256"] != evidence.policy_sha256
+        || raw_evidence["policy_revision"] != evidence.policy_revision
+        || raw_evidence["outcome"] != outcome
+        || native_sha != evidence.native_report_sha256
+        || !grammar_matches
+    {
+        return Err("task_resolution_evidence_binding_invalid");
+    }
+    if outcome == "code_fixed"
+        && evaluate_resolution(&evidence.identity, evidence)
+            != ResolutionOutcome::Resolved(ResolutionCause::CodeFixed)
+    {
+        outcome = "resolution_evidence_incomplete";
+    }
+    let mut records = load(root, &evidence.identity, original_report_sha256)?;
     let events: Vec<_> = records.iter().map(|r| r.event.clone()).collect();
-    let tip = reduce_task_lifecycle(&policy.identity, &events, &[]).tip_event_id;
+    let tip = reduce_task_lifecycle(&evidence.identity, &events, &[]).tip_event_id;
     let previous = tip
         .as_ref()
         .and_then(|id| records.iter().find(|r| r.event.event_id == *id));
@@ -294,7 +376,9 @@ fn execute(
     {
         outcome = "resolution_history_binding_changed";
     }
-    let raw_evidence=serde_json::to_vec_pretty(&json!({"schema_version":checker.evidence_version(&policy.schema_version),"report_type":"task_resolution_evidence","identity":policy.identity,"original_report_sha256":policy.original_report_sha256,"original_source_sha256":policy.original_source_sha256,"current_source_sha256":digest(&current),"grammar_sha256":policy.grammar_sha256,"tool_sha256":policy.tool_sha256,"adapter_sha256":policy.adapter_sha256,"policy_sha256":policy_sha,"policy_revision":policy.policy_revision,"original_native":original_native,"current_native":current_native,"outcome":outcome})).map_err(|_|"task_resolution_encoding_failed")?;
+    raw_evidence["outcome"] = json!(outcome);
+    let raw_evidence =
+        serde_json::to_vec_pretty(&raw_evidence).map_err(|_| "task_resolution_encoding_failed")?;
     let evidence_sha = digest(&raw_evidence);
     let same = previous.filter(|r| r.evidence_sha256.as_deref() == Some(&evidence_sha));
     if outcome == "code_fixed"
@@ -340,10 +424,10 @@ fn execute(
                 event: TaskLifecycleEvent {
                     event_id: String::new(),
                     parent_event_id: None,
-                    identity: policy.identity.clone(),
+                    identity: evidence.identity.clone(),
                     kind: TaskLifecycleKind::Observed,
                 },
-                original_report_sha256: policy.original_report_sha256.clone(),
+                original_report_sha256: original_report_sha256.to_owned(),
                 evidence_sha256: None,
                 policy_sha256: None,
             };
@@ -351,7 +435,7 @@ fn execute(
             records.push(initial);
         }
         let parent = reduce_task_lifecycle(
-            &policy.identity,
+            &evidence.identity,
             &records.iter().map(|r| r.event.clone()).collect::<Vec<_>>(),
             &[],
         )
@@ -363,17 +447,17 @@ fn execute(
             event: TaskLifecycleEvent {
                 event_id: String::new(),
                 parent_event_id: Some(parent),
-                identity: policy.identity.clone(),
+                identity: evidence.identity.clone(),
                 kind,
             },
-            original_report_sha256: policy.original_report_sha256.clone(),
+            original_report_sha256: original_report_sha256.to_owned(),
             evidence_sha256: Some(evidence_sha.clone()),
             policy_sha256: Some(policy_sha.into()),
         };
         next.event.event_id = crate::task_lifecycle_store::event_id(&next)?;
         let mut proposed = records.iter().map(|r| r.event.clone()).collect::<Vec<_>>();
         proposed.push(next.event.clone());
-        if reduce_task_lifecycle(&policy.identity, &proposed, &[]).state
+        if reduce_task_lifecycle(&evidence.identity, &proposed, &[]).state
             == TaskLifecycleState::ReconciliationRequired
         {
             return Err("task_lifecycle_reconciliation_required");
@@ -388,12 +472,12 @@ fn execute(
         Vec::new()
     };
     let view = reduce_task_lifecycle(
-        &policy.identity,
+        &evidence.identity,
         &records.iter().map(|r| r.event.clone()).collect::<Vec<_>>(),
         &verified,
     );
     Ok(
-        json!({"schema_version":"0.1.0","report_type":"task_resolution_receipt","identity":policy.identity,"state":view.state,"outcome":outcome,"authority":"host_context_verified","policy_sha256":policy_sha,"policy_revision":policy.policy_revision,"event_ref":format!(".codeguard/findings/{}/events/lifecycle-{}.json",request.task_id,record.event.event_id),"evidence_ref":evidence_ref,"evidence_sha256":evidence_sha,"delivery_decision":"not_evaluated"}),
+        json!({"schema_version":"0.1.0","report_type":"task_resolution_receipt","identity":evidence.identity,"state":view.state,"outcome":outcome,"authority":"host_context_verified","policy_sha256":policy_sha,"policy_revision":evidence.policy_revision,"event_ref":format!(".codeguard/findings/{}/events/lifecycle-{}.json",task_id,record.event.event_id),"evidence_ref":evidence_ref,"evidence_sha256":evidence_sha,"delivery_decision":"not_evaluated"}),
     )
 }
 fn before_deadline(deadline: Instant) -> Result<(), &'static str> {
@@ -414,4 +498,87 @@ fn artifact_hash(path: &Path) -> Result<String, &'static str> {
     read_bounded_regular_file(path, 256 * 1024 * 1024)
         .map(|b| digest(&b))
         .map_err(|_| "task_resolution_adapter_unavailable")
+}
+
+#[cfg(test)]
+mod commit_tests {
+    use codeguard_core::{ResolutionCause, ResolutionEvidence, TaskIdentity};
+    use serde_json::json;
+    use std::path::Path;
+    #[test]
+    fn mismatched_domain_and_redacted_evidence_is_rejected_before_history_access() {
+        let identity = TaskIdentity {
+            workspace_id: "commit-boundary".into(),
+            task_id: format!("CG-B-{}", "a".repeat(32)),
+            checker_id: "syntax.native_confirmation".into(),
+            scope: "app.zig".into(),
+        };
+        let native = json!({"status":"incomplete","reason":"zig_ast_check_incomplete","version":"0.16.0","tool_sha256":"b".repeat(64),"diagnostics":[]});
+        let pair = json!({"original":native,"current":native});
+        let evidence = ResolutionEvidence {
+            identity: identity.clone(),
+            original_source_sha256: "c".repeat(64),
+            current_source_sha256: "d".repeat(64),
+            native_report_sha256: super::digest(&serde_json::to_vec(&pair).unwrap()),
+            tool_sha256: "b".repeat(64),
+            adapter_sha256: "e".repeat(64),
+            rulepack_sha256: "f".repeat(64),
+            policy_sha256: "1".repeat(64),
+            policy_revision: "p1".into(),
+            native_completed: false,
+            original_rule_checked: false,
+            target_covered: true,
+            inputs_current: true,
+            policy_verified: true,
+            issue_still_present: false,
+            suppression_changed: false,
+            target_removed: false,
+            cause: ResolutionCause::CodeFixed,
+        };
+        let raw = json!({"schema_version":"0.1.0","report_type":"task_resolution_evidence","identity":identity,
+            "original_report_sha256":"2".repeat(64),"original_source_sha256":evidence.original_source_sha256,"current_source_sha256":evidence.current_source_sha256,
+            "grammar_sha256":evidence.rulepack_sha256,"tool_sha256":evidence.tool_sha256,"adapter_sha256":evidence.adapter_sha256,
+            "policy_sha256":evidence.policy_sha256,"policy_revision":evidence.policy_revision,"original_native":native,"current_native":native,"outcome":"native_incomplete"});
+        assert_eq!(
+            super::commit_resolution(
+                Path::new("/codeguard-commit-no-workspace"),
+                &identity.task_id,
+                &"2".repeat(64),
+                &evidence,
+                raw.clone(),
+                "native_incomplete"
+            ),
+            Err("task_lifecycle_directory_invalid")
+        );
+        for key in [
+            "schema_version",
+            "report_type",
+            "outcome",
+            "identity",
+            "original_report_sha256",
+            "original_source_sha256",
+            "current_source_sha256",
+            "tool_sha256",
+            "adapter_sha256",
+            "grammar_sha256",
+            "policy_sha256",
+            "policy_revision",
+            "current_native",
+        ] {
+            let mut forged = raw.clone();
+            forged[key] = json!("forged");
+            assert_eq!(
+                super::commit_resolution(
+                    Path::new("/codeguard-commit-no-workspace"),
+                    &identity.task_id,
+                    &"2".repeat(64),
+                    &evidence,
+                    forged,
+                    "native_incomplete"
+                ),
+                Err("task_resolution_evidence_binding_invalid"),
+                "{key}"
+            );
+        }
+    }
 }

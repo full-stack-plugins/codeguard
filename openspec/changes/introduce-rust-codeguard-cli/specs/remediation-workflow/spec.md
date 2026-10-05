@@ -512,3 +512,15 @@ ESLint 原生发现投影 MUST 使用工作区相对路径、原生规则、源�
 #### Scenario: Trusted native-first Zig resolution preserves provenance and recurrence
 - **WHEN** an initialized Zig native-first task is rechecked with its original fixed tool under an independently signed, task-bound policy
 - **THEN** grammar identity remains null; only a diagnosed original sample, changed current source and complete clean same-tool recheck may close that scoped task; native failure or changed identity cannot close it; an ordinary same-tool positive recheck reopens the same parent chain without project delivery permission
+
+### Requirement: 限定解决事件的双表示绑定
+
+共享解决提交层 MUST 拒绝未支持的证据版本、缺字段和额外字段，并在读取或写入生命周期之前核对领域ResolutionEvidence与脱敏原生证据的任务身份、原/当前源码、工具、适配器、批准策略和原生对照摘要一致。调用者仍负责可信验签与原生执行；共享提交层不得从本地文件推断批准。两个表示不一致 MUST 拒绝，不以域对象policy_verified字段单独签发解决。提取提交层 MUST 保留旧语言版本、幂等摘要、父链重放、冲突核对和重开语义，不批准项目门禁。
+
+#### Scenario: Domain evidence differs from redacted native evidence
+- **WHEN** SDK调用者提供的脱敏证据中任务/源码/工具/策略或原生对照摘要与领域证据不一致
+- **THEN** 在生命周期读取和证据写入前返回task_resolution_evidence_binding_invalid，不追加解决或重开记录
+
+#### Scenario: Existing native resolution uses the shared commit layer
+- **WHEN** Zig/Erlang/Swift/Kotlin入口提供已验签且当前输入稳定的同一份复检证据
+- **THEN** 收据版本、证据字段及父链语义保持；相同证据重检幂等、不同关闭需协调、仍存在时可重开，不扩大批准范围
