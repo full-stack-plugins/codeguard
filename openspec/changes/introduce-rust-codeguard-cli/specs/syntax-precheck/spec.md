@@ -485,6 +485,11 @@ WASM fallback MUST 通过明确版本的协议加入既有统一命令，不静�
 - **WHEN** an explicit installed Ruff is used as the Python syntax observer in development native/WASM comparison
 - **THEN** freeze the tool/version and target dialect, feed the same source through isolated stdin with fixes/cache/project configuration and noqa suppression disabled, classify only consistent located `invalid-syntax` reports, retain other rules, wrong-source reports, tool failure or contradictory exit/JSON as incomplete, and do not extend trusted task-closing or project-delivery authority
 
+#### Scenario: Native differential measures parser and structure layers independently
+- **WHEN** the development evaluator receives verified independent structure-rule observations alongside parser ERROR/MISSING observations
+- **THEN** a separately versioned report preserves raw parser classification and TP/FP/FN/TN, records bounded structure observations with rule/version/digest and original positions, and separately measures the combined candidate against the same native observer and sample denominator; raw false negatives MUST NOT be erased by the combined result
+- **AND** truncated or failed worker observations remain unknown in both layers; changed program identity withdraws structure evidence and combined classification, and changed native identity withdraws both comparisons; this measured candidate neither confirms a violation nor qualifies a grammar, an independent holdout or project delivery
+
 #### Scenario: Structural empty blocks remain distinct from parser recoveries
 - **WHEN** an application scans a grammar tree for empty `block` nodes that contain no non-comment named statement
 - **THEN** traverse even branches without `has_error`, retain the direct parent kind and original byte positions with explicit record/traversal budget exhaustion, and do not label these structural facts as parser ERROR/MISSING or language violations; legal empty blocks in other languages require independent language interpretation

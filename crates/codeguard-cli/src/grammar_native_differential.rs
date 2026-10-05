@@ -64,6 +64,7 @@ pub fn replay_native_corpus(
     }
     let manifest: Value = serde_json::from_slice(include_bytes!("../../../grammars/manifest.json"))
         .map_err(|_| "native_grammar_manifest_invalid")?;
+    let measure_structure = tools.contains_key("python");
     let mut cases = Vec::new();
     for case in &corpus.cases {
         let Some((checker, tool, tool_sha)) = frozen.get(&case.language) else {
@@ -110,27 +111,36 @@ pub fn replay_native_corpus(
                     cancelled,
                 )
             };
-        let (wasm_class, recovery_count, wasm_reason) = match observation {
+        let (wasm_class, recovery_count, wasm_reason, structures) = match observation {
             Ok(observation) => {
                 let truncated = observation.precheck.truncated_files > 0;
                 (
                     classify_probe(observation.recoveries.len(), truncated),
                     Some(observation.recoveries.len()),
                     truncated.then_some("syntax_recovery_incomplete".to_owned()),
+                    Some(observation.structural_observations),
                 )
             }
-            Err(reason) => (None, None, Some(reason)),
+            Err(reason) => (None, None, Some(reason), None),
         };
         let asset = manifest["assets"]
             .as_array()
             .and_then(|assets| assets.iter().find(|a| a["language"] == case.language))
             .ok_or("native_grammar_asset_missing")?;
-        cases.push(json!({"id":case.id,"language":case.language,"cohort":case.cohort,"origin":case.origin,
+        let mut row = json!({"id":case.id,"language":case.language,"cohort":case.cohort,"origin":case.origin,
             "source_sha256":case.source_sha256,"grammar_sha256":asset["sha256"],"fixture_expected_valid":case.expected_valid,"fixture_label":case.label,
             "native_attempted":native_attempted,"native":native,"native_classification":name(native_class),"native_identity_current":tool_current,
             "native_elapsed_us":native_us,"wasm_classification":name(wasm_class),"wasm_recovery_count":recovery_count,"wasm_reason":wasm_reason,
             "wasm_elapsed_us":elapsed_us(wasm_started),"comparison":comparison(native_class,wasm_class),
-            "fixture_native_disagreement":native_class.map(|valid|valid!=case.expected_valid)}));
+            "fixture_native_disagreement":native_class.map(|valid|valid!=case.expected_valid)});
+        if measure_structure {
+            // 原始恢复统计保持不变，结构规则仅补充独立的候选层测量。
+            let combined = combined_candidate(wasm_class, structures.as_ref().map(Vec::len));
+            row["structural_observations"] = json!(structures);
+            row["combined_candidate_classification"] = json!(name(combined));
+            row["combined_candidate_comparison"] = json!(comparison(native_class, combined));
+        }
+        cases.push(row);
     }
     let program_stable =
         artifact_hash(executable, 256 * 1024 * 1024).is_ok_and(|s| s == program_sha);
@@ -160,28 +170,59 @@ pub fn replay_native_corpus(
                     row["wasm_classification"] = json!("unknown");
                     row["wasm_recovery_count"] = Value::Null;
                     row["wasm_reason"] = json!("grammar_evaluation_program_changed");
+                    if measure_structure {
+                        row["structural_observations"] = Value::Null;
+                        row["combined_candidate_classification"] = json!("unknown");
+                    }
                 }
                 row["comparison"] = json!(comparison(
                     parse_name(&row["native_classification"]),
                     parse_name(&row["wasm_classification"])
                 ));
+                if measure_structure {
+                    // 原生身份撤回同时影响两层比较，不能沿用先前的有效分母。
+                    row["combined_candidate_comparison"] = json!(comparison(
+                        parse_name(&row["native_classification"]),
+                        parse_name(&row["combined_candidate_classification"]),
+                    ));
+                }
             }
             let local: Vec<&Value> = cases.iter().filter(|c| c["language"] == language).collect();
             let count = |key: &str, value: &str| local.iter().filter(|c| c[key] == value).count();
-            inventory.push(json!({"language":language,"grammar_sha256":asset["sha256"],"native_selected":true,"native_version":checker.version(),"tool_sha256":sha,"tool_stable":stable,
+            let mut language_row = json!({"language":language,"grammar_sha256":asset["sha256"],"native_selected":true,"native_version":checker.version(),"tool_sha256":sha,"tool_stable":stable,
                 "sample_count":local.len(),"native_unknown_count":count("native_classification","unknown"),"wasm_unknown_count":count("wasm_classification","unknown"),
                 "compared_count":local.iter().filter(|c|c["comparison"]!="unknown").count(),"tp":count("comparison","true_positive"),"fp":count("comparison","false_positive"),"fn":count("comparison","false_negative"),"tn":count("comparison","true_negative"),
-                "fixture_native_disagreement_count":local.iter().filter(|c| c["fixture_native_disagreement"]==true).count(),"grammar_qualified":false}));
+                "fixture_native_disagreement_count":local.iter().filter(|c| c["fixture_native_disagreement"]==true).count(),"grammar_qualified":false});
+            if measure_structure {
+                language_row["combined_candidate"] = json!({
+                    "compared_count":local.iter().filter(|c|c["combined_candidate_comparison"]!="unknown").count(),
+                    "unknown_count":count("combined_candidate_comparison","unknown"),
+                    "tp":count("combined_candidate_comparison","true_positive"),
+                    "fp":count("combined_candidate_comparison","false_positive"),
+                    "fn":count("combined_candidate_comparison","false_negative"),
+                    "tn":count("combined_candidate_comparison","true_negative")
+                });
+            }
+            inventory.push(language_row);
         } else {
             inventory.push(json!({"language":language,"grammar_sha256":asset["sha256"],"native_selected":false,"reason":if checker(language).is_some(){"explicit_native_tool_not_selected"}else{"native_differential_adapter_unavailable"},"grammar_qualified":false}));
         }
     }
-    Ok(
-        json!({"schema_version":if tools.contains_key("python") {"0.2.0"}else{"0.1.0"},"report_type":"native_grammar_differential","status":"incomplete","delivery_decision":"not_evaluated",
+    let mut report = json!({"schema_version":if measure_structure {"0.3.0"}else{"0.1.0"},"report_type":"native_grammar_differential","status":"incomplete","delivery_decision":"not_evaluated",
         "authority":"development_native_differential_only","native_adapter_reused":true,"independent_holdout":false,"grammar_qualified_count":0,
         "corpus_sha256":digest(corpus_bytes),"manifest_sha256":corpus.manifest_sha256,"program_sha256":program_sha,"program_stable":program_stable,
-        "language_count":inventory.len(),"selected_language_count":frozen.len(),"sample_count":cases.len(),"languages":inventory,"cases":cases}),
-    )
+        "language_count":inventory.len(),"selected_language_count":frozen.len(),"sample_count":cases.len(),"languages":inventory,"cases":cases});
+    if measure_structure {
+        report["combined_candidate_authority"] = json!("native_confirmation_required");
+    }
+    Ok(report)
+}
+
+// 隐藏恢复、截断或失败不能被正向结构观察升级为可判定结果。
+fn combined_candidate(parser: Option<bool>, structure_count: Option<usize>) -> Option<bool> {
+    let parser_valid = parser?;
+    let structure_count = structure_count?;
+    Some(parser_valid && structure_count == 0)
 }
 fn checker(language: &str) -> Option<GrammarNativeChecker> {
     GrammarNativeChecker::for_language(language)
@@ -218,5 +259,24 @@ fn comparison(native: Option<bool>, wasm: Option<bool>) -> &'static str {
         (Some(false), Some(true)) => "false_negative",
         (Some(true), Some(true)) => "true_negative",
         _ => "unknown",
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn combined_candidate_requires_complete_parser_and_structure_observation() {
+        for (parser, count, expected) in [
+            (Some(true), Some(0), Some(true)),
+            (Some(true), Some(1), Some(false)),
+            (Some(false), Some(0), Some(false)),
+            (Some(false), Some(1), Some(false)),
+            (None, Some(0), None),
+            (None, Some(1), None),
+            (Some(true), None, None),
+            (Some(false), None, None),
+        ] {
+            assert_eq!(super::combined_candidate(parser, count), expected);
+        }
     }
 }
