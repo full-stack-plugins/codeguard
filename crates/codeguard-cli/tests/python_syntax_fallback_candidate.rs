@@ -470,13 +470,44 @@ fn actual_ruff_confirms_empty_suite_and_preserves_unapproved_task() {
             1,
             "a syntax task must not scan unrelated lint findings: {report}"
         );
-        assert_eq!(report["schema_version"], "0.20.0");
-        assert_eq!(report["native_scan"]["schema_version"], "0.18.0");
+        assert_eq!(report["schema_version"], "0.21.0");
+        assert_eq!(report["native_scan"]["schema_version"], "0.19.0");
         assert_eq!(
             report["native_scan"]["task_scope"],
             "single_python_confirmation_file"
         );
+        assert_eq!(
+            report["observation"],
+            if expect_findings {
+                "still_present"
+            } else {
+                "candidate_absent_unverified_policy"
+            },
+            "{report}"
+        );
         assert_eq!(report["event_persisted"], true, "{report}");
+        assert_eq!(
+            report["native_scan"]["local_scan_complete"], true,
+            "{report}"
+        );
+        assert_eq!(
+            report["native_scan"]["files"][0]["run_status"],
+            if expect_findings {
+                "findings"
+            } else {
+                "passed"
+            },
+            "{report}"
+        );
+        if expect_findings {
+            for finding in report["native_scan"]["files"][0]["findings"]
+                .as_array()
+                .unwrap()
+            {
+                assert_eq!(finding["rule_id"], "invalid-syntax");
+                assert!(finding["finding_id"].as_str().is_some());
+            }
+        }
         assert_eq!(report["native_scan"]["files"][0]["path"], "broken.py");
         assert_eq!(
             !report["native_scan"]["files"][0]["findings"]
@@ -486,6 +517,32 @@ fn actual_ruff_confirms_empty_suite_and_preserves_unapproved_task() {
             expect_findings,
             "{report}"
         );
+        let shown = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args([
+                "task",
+                "show",
+                id,
+                project.0.to_str().unwrap(),
+                "--format=json",
+            ])
+            .output()
+            .unwrap();
+        assert_eq!(
+            shown.status.code(),
+            Some(0),
+            "{}",
+            String::from_utf8_lossy(&shown.stderr)
+        );
+        let shown: Value = serde_json::from_slice(&shown.stdout).unwrap();
+        if expect_findings {
+            assert_eq!(shown["task"]["disposition"], "actionable", "{shown}");
+            assert!(
+                shown["task"]["step"]
+                    .as_str()
+                    .unwrap()
+                    .contains("原生语法错误")
+            );
+        }
         let fact: Value = serde_json::from_slice(
             &fs::read(
                 project
@@ -585,7 +642,7 @@ fn scoped_confirmation_records_missing_tool_for_both_original_report_families() 
             String::from_utf8_lossy(&output.stderr)
         );
         let result: Value = serde_json::from_slice(&output.stdout).unwrap();
-        assert_eq!(result["schema_version"], "0.20.0", "{result}");
+        assert_eq!(result["schema_version"], "0.21.0", "{result}");
         assert_eq!(result["event_persisted"], true, "{result}");
         assert_eq!(result["native_scan"]["files"].as_array().unwrap().len(), 1);
         assert_eq!(result["native_scan"]["files"][0]["path"], "broken.py");

@@ -1036,6 +1036,22 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                 "Python确认复检后的源码或配置已变化；按同一任务范围重新运行原生Ruff，不沿用旧修复或恢复判断"
             );
             priority = 0;
+        } else if checker_id == "python.ruff"
+            && brief["reason_code"] == "python_syntax_confirmation_needed"
+            && outcome == "still_present"
+            && observed_source_matches
+        {
+            brief["verification_observation"] = json!(outcome);
+            brief["disposition"] = json!("actionable");
+            brief["step"] = json!(
+                "本轮Ruff已确认该文件存在原生语法错误；按本任务报告的原生位置核对并修复源码，保持预期语义，不用空实现逃避检查；修复后对同一任务复检，不能凭WASM或任务勾选关闭"
+            );
+            brief["constraints"] = json!([
+                "仅修改本任务绑定的Python文件",
+                "修复前核对本轮原生位置与当前源码",
+                "不得关闭原生检查器或用空实现消除错误"
+            ]);
+            priority = 1;
         } else if matches!(
             outcome,
             "candidate_absent_unverified_policy" | "environment_restored_unverified_policy"
@@ -1582,6 +1598,8 @@ fn latest_verification_observation(
                 latest_run = sequence;
                 continue;
             }
+            let python_scoped_report = brief["checker_id"] == "python.ruff"
+                && matches!(report["schema_version"].as_str(), Some("0.18.0" | "0.19.0"));
             let go_report = brief["checker_id"] == "go.vet";
             let rust_report = brief["checker_id"] == "rust.cargo_clippy";
             let java_report = brief["checker_id"] == "java.maven.p3c";
@@ -1658,7 +1676,7 @@ fn latest_verification_observation(
                         || report["schema_version"] == "0.7.0"
                         || report["schema_version"] == "0.8.0"
                         || report["schema_version"] == "0.9.0"
-                        || (report["schema_version"] == "0.18.0"
+                        || (python_scoped_report
                             && crate::python_confirmation_recheck::valid_binding(root, &report)))
                     && event["observation"] == classify(brief, &report)
             };
@@ -1697,9 +1715,7 @@ fn latest_verification_observation(
                 .as_str()
                 .ok_or("verification_event_invalid")?
                 .to_owned();
-            let source_sha256 = if report["schema_version"] == "0.18.0"
-                && report["task_input_stable"] == true
-            {
+            let source_sha256 = if python_scoped_report && report["task_input_stable"] == true {
                 report["task_binding"]["source_sha256"]
                     .as_str()
                     .filter(|sha| valid_sha256(sha))

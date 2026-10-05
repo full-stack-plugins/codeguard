@@ -513,3 +513,27 @@ Python候选语法确认任务 MUST 只执行该任务首次报告绑定的单�
 #### Scenario: Original confirmation receipt is missing or changed
 - **WHEN** Python确认任务的首次报告摘要或消费收据不匹配
 - **THEN** 拒绝复检，不执行原生工具，不以当前文件重建或替换首次证据
+
+### Requirement: Ruff原生语法错误不被抑制审计误判
+
+Ruff正常与忽略noqa的检查若返回相同的invalid-syntax错误，Codeguard MUST 保留为原生语法诊断，不因小写或连字符误判为工具错误。该特殊诊断 MUST 在两轮中按文件、位置、消息、严重性及数量精确一致，不得计为被抑制规则；仅一轮出现、数量变化、非error严重性及其它未知小写规则 MUST 保留未完成。若合法原生位置落在文件末尾空行，稳定发现身份 MUST 可绑定前一条非空源码锚点，不能伪造原生位置或对其它规则扩大空行身份。局部原生成功仍不得代替可信关闭或项目覆盖。
+
+#### Scenario: Matching native syntax errors survive suppression audit
+- **WHEN** 两轮Ruff诊断都定位到相同原生invalid-syntax错误，另有普通F401的源码注释抑制差异
+- **THEN** 保留语法诊断，抑制差异只统计F401；不把invalid-syntax填入可抑制规则列表
+
+#### Scenario: A native EOF syntax diagnostic needs a stable task
+- **WHEN** 原生语法错误定位到有尾换行的末尾空行，前方存在真实源码
+- **THEN** 以此前非空源码核对稳定身份，保留原生行列；加入前置注释不改变该身份，未知位置和普通规则的空行诊断仍不可伪造身份
+
+### Requirement: Python原生确认区分源码与环境修复
+
+单文件Python确认报告0.19 MUST 将完整原生检查中仍存在的invalid-syntax标记为still_present，并向智能体提供绑定文件、原生位置及保持源码语义的修复指引。完整检查无此错误 MUST 仅标记candidate_absent_unverified_policy，普通lint发现不得当作语法确认失败。工具未完成 MUST 保留still_blocked，输入变化 MUST 撤回判断。旧0.18报告与已记录事件 MUST 保留原分类语义，不以新版判定破坏历史读取；新任务预览以0.21引用新报告，均不得自动关闭任务。
+
+#### Scenario: Native syntax remains after tool restoration
+- **WHEN** 本轮绑定文件的Ruff完整结果仍包含invalid-syntax
+- **THEN** 新报告标记still_present，任务提供源码修复指引，不能只要求恢复环境，也不能填入空实现关闭任务
+
+#### Scenario: Historical confirmation retains its recorded semantics
+- **WHEN** 读取0.18首次范围复检及其已记录事件
+- **THEN** 保留原环境恢复分类；0.19新报告使用独立版本表达语法确认结果，不重写历史事件

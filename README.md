@@ -590,3 +590,8 @@ Source-built Python fallback now preserves `codeguard.python.required_suite` evi
 Source-built edit Hook feedback0.17 (local0.8) also retains separate structure counts and requires native confirmation when present. The Claude-compatible summary includes rule and count; this is not installed-host acceptance or a change to published plugin defaults.
 
 Python candidate-confirmation `task verify` now runs only the first report’s bound file through project Ruff configuration. Versioned feedback preserves the consumed original report and current input; it does not close the task or certify the project. [Scoped recheck acceptance](tests/acceptance/python-confirmation-scoped-recheck.md).
+
+
+### Python native syntax repair feedback (0.19 / 0.21)
+
+Matching `invalid-syntax` diagnostics in Ruff normal and ignore-noqa runs remain native syntax errors instead of suppression-audit failures. An EOF diagnostic can use the preceding nonempty source as its stable task anchor without changing native coordinates. Single-file confirmation feedback 0.19 and task preview 0.21 distinguish remaining syntax errors as `still_present` and provide source-repair guidance. A complete recheck without syntax errors only yields `candidate_absent_unverified_policy`; it cannot close a task. Historical 0.18 reports retain their event semantics, and source or configuration changes withdraw current conclusions. See [native syntax feedback acceptance](tests/acceptance/python-native-syntax-audit.md).

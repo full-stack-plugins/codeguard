@@ -1454,3 +1454,6 @@ check python/all现通过0.48反馈保留独立结构计数和原始坐标，原
 14.11 Python首次证据校验增量：候选确认校验拆分当前文件读取和冻结源码验证，两者共同要求UTF-8、1 MiB预算、源码/grammar摘要及原始或结构位置。空观察绕过源码解码的实际RED反例已修复；冻结字节可以独立核验首次报告，但不能跳过首次消费收据或批准来源。当前导入仍拒绝修复后已过时的报告。此项只完善历史复检前置条件；Python单文件原生复检、两类首次报告完整读取及可信关闭仍未接通，14.11保持未完成。见[局部验收](../../../tests/acceptance/python-confirmation-source-snapshot.md)。
 
 9.10 / 14.11 Python单文件复检增量：task verify对python_syntax_confirmation_needed先核对两类首次报告及消费收据，按原范围只执行一个Python文件的项目Ruff检查。新版0.18局部报告/0.20任务反馈保留首次引用、当前源码及未验证策略；工作台导入拒绝错误范围/首次摘要，普通完整项目扫描保持原协议。源码已修复时首次证据仍绑定原字节，不用当前源码覆盖。可信双输入复检、批准关闭重开及全部语言能力仍缺，父任务不勾选。见[局部验收](../../../tests/acceptance/python-confirmation-scoped-recheck.md)。
+
+
+9.10 / 14.11 Ruff语法确认纠偏：匹配的原生invalid-syntax不再被小写规则审计拒绝；末尾空行原生错误保留坐标并生成稳定身份。新版0.19/0.21区分源码错误still_present与工具阻塞，为智能体提供限定文件修复指引，旧0.18历史保持原语义。可信关闭与跨语言全链路仍未完成，父任务不勾选。见[局部验收](../../../tests/acceptance/python-native-syntax-audit.md)。

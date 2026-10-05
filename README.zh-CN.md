@@ -572,3 +572,8 @@ Claude Code 2.1.273 已有会话内插件源码加载的实际证据，覆盖成
 编辑Hook的源码构建反馈0.17（局部0.8）也保留独立结构计数；存在结构观察时要求原生确认。Claude兼容摘要提供规则和数量；尚不证明实际安装宿主验收或已发布插件默认行为。
 
 Python候选确认任务的`task verify`现只按首次报告绑定文件复用项目Ruff配置。版本化反馈保留已消费首次证据与当前输入，不关闭任务或认证项目。[单文件复检验收](tests/acceptance/python-confirmation-scoped-recheck.md)。
+
+
+### Python原生语法修复反馈（0.19 / 0.21）
+
+Ruff正常与忽略noqa的两轮结果中一致的`invalid-syntax`现在保留为原生语法错误，不误判为抑制审计工具故障。末尾空行上的原生错误可用前一非空源码生成稳定任务身份，原生行列保持不变。单文件确认反馈0.19、任务预览0.21将语法错误仍存在区分为`still_present`，向智能体提供源码修复步骤；完整复检无语法错误仅为`candidate_absent_unverified_policy`，不自动关闭。历史0.18报告保留原事件语义，源码或配置变化撤回本轮判断。验收见[原生语法反馈](tests/acceptance/python-native-syntax-audit.md)。

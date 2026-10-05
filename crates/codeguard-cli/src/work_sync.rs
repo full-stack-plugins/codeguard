@@ -363,7 +363,7 @@ pub(crate) fn latest_current_finding_observation(
         .ok_or("latest_report_invalid")?;
     if matches!(
         report["schema_version"].as_str(),
-        Some("0.5.0" | "0.6.0" | "0.7.0" | "0.8.0" | "0.9.0" | "0.18.0")
+        Some("0.5.0" | "0.6.0" | "0.7.0" | "0.8.0" | "0.9.0" | "0.18.0" | "0.19.0")
     ) {
         let config_ref = file["configuration_ref"]
             .as_str()
@@ -380,7 +380,10 @@ pub(crate) fn latest_current_finding_observation(
             return Err("latest_configuration_changed");
         }
     }
-    if matches!(report["schema_version"].as_str(), Some("0.9.0" | "0.18.0")) {
+    if matches!(
+        report["schema_version"].as_str(),
+        Some("0.9.0" | "0.18.0" | "0.19.0")
+    ) {
         if let Some(claimed) = report["adapter_sha256"].as_str() {
             let current = crate::python_lint_command::current_adapter_sha256()
                 .ok_or("adapter_binary_unavailable")?;
@@ -474,7 +477,8 @@ fn import_one(
         codeguard_adapters::parse_unique_json(&bytes)
             .map_err(|_| "eslint_preparation_duplicate_or_invalid_json")?;
     }
-    if (value["report_type"] == "python_lint_feedback" && value["schema_version"] == "0.18.0")
+    if (value["report_type"] == "python_lint_feedback"
+        && matches!(value["schema_version"].as_str(), Some("0.18.0" | "0.19.0")))
         || matches!(
             value["report_type"].as_str(),
             Some(
@@ -488,7 +492,8 @@ fn import_one(
             .map_err(|_| "python_syntax_confirmation_duplicate_or_invalid_json")?;
     }
     // 已消费的历史报告按原字节收据确认，不用当前源码重演历史输入。
-    if (value["report_type"] == "python_lint_feedback" && value["schema_version"] == "0.18.0")
+    if (value["report_type"] == "python_lint_feedback"
+        && matches!(value["schema_version"].as_str(), Some("0.18.0" | "0.19.0")))
         || matches!(
             value["report_type"].as_str(),
             Some(
@@ -684,7 +689,7 @@ fn parse_report(
     let report_v06 = report["schema_version"] == "0.6.0";
     let report_v07 = report["schema_version"] == "0.7.0";
     let report_v08 = report["schema_version"] == "0.8.0";
-    let report_v18 = report["schema_version"] == "0.18.0";
+    let report_v18 = matches!(report["schema_version"].as_str(), Some("0.18.0" | "0.19.0"));
     if report_v18
         && (!crate::python_confirmation_recheck::valid_binding(root, report)
             || (report["task_input_stable"] == true

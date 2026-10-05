@@ -156,7 +156,7 @@ pub(crate) fn valid_binding(root: &Path, report: &Value) -> bool {
     report
         .as_object()
         .is_some_and(|o| o.len() == keys.len() && keys.iter().all(|key| o.contains_key(*key)))
-        && report["schema_version"] == "0.18.0"
+        && matches!(report["schema_version"].as_str(), Some("0.18.0" | "0.19.0"))
         && report["report_type"] == "python_lint_feedback"
         && report["scope"] == "local_native_scan_only"
         && report["operation"] == "lint"

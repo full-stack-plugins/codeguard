@@ -1349,3 +1349,8 @@ The isolated Python native probe now rechecks the requested entry and frozen byt
 Python candidate confirmation shares a frozen-source validator while current import remains bound to the current file. Empty observations cannot bypass UTF-8 validation. This validator does not verify consumption receipts or approvals and cannot resolve tasks. See [acceptance](../tests/acceptance/python-confirmation-source-snapshot.md).
 
 Python candidate confirmation now rechecks only its original single-file scope through the existing project Ruff configuration and native execution chain. Feedback 0.18 and task preview 0.20 bind the consumed first report and current source; neither grants project coverage nor trusted task resolution. Missing or modified original receipts reject execution. See [acceptance](../tests/acceptance/python-confirmation-scoped-recheck.md).
+
+
+### Python native syntax repair feedback (0.19 / 0.21)
+
+Matching `invalid-syntax` diagnostics in Ruff normal and ignore-noqa runs remain native syntax errors instead of suppression-audit failures. An EOF diagnostic can use the preceding nonempty source as its stable task anchor without changing native coordinates. Single-file confirmation feedback 0.19 and task preview 0.21 distinguish remaining syntax errors as `still_present` and provide source-repair guidance. A complete recheck without syntax errors only yields `candidate_absent_unverified_policy`; it cannot close a task. Historical 0.18 reports retain their event semantics, and source or configuration changes withdraw current conclusions. See [native syntax feedback acceptance](../tests/acceptance/python-native-syntax-audit.md).

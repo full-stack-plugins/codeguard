@@ -506,7 +506,7 @@ pub fn run(args: &[String]) -> ExitCode {
             &std::sync::atomic::AtomicBool::new(false),
         ) {
             Ok(mut report) => {
-                report["schema_version"] = json!("0.18.0");
+                report["schema_version"] = json!("0.19.0");
                 report["task_scope"] = json!("single_python_confirmation_file");
                 report["task_binding"] = json!({"task_id":parsed.task_id,"path":path,
                     "source_sha256":crate::python_confirmation_recheck::digest(&before),
@@ -693,7 +693,7 @@ pub fn run(args: &[String]) -> ExitCode {
         report["schema_version"] = json!("0.7.0");
     } else if brief["checker_id"] == "python.ruff" {
         report["schema_version"] = json!(if python_confirmation {
-            "0.20.0"
+            "0.21.0"
         } else {
             "0.9.0"
         });
@@ -1280,12 +1280,38 @@ fn valid_sha256(value: &str) -> bool {
 }
 
 pub(crate) fn classify(brief: &Value, scan: &Value) -> &'static str {
-    if scan["schema_version"] == "0.18.0" && scan["task_input_stable"] != true {
+    if matches!(scan["schema_version"].as_str(), Some("0.18.0" | "0.19.0"))
+        && scan["task_input_stable"] != true
+    {
         return "incomplete";
     }
     let Some(files) = scan["files"].as_array() else {
         return "incomplete";
     };
+    if scan["schema_version"] == "0.19.0"
+        && brief["kind"] == "blocker"
+        && brief["checker_id"] == "python.ruff"
+        && brief["reason_code"] == "python_syntax_confirmation_needed"
+    {
+        let Some(file) = files.iter().find(|file| file["path"] == brief["scope"]) else {
+            return "still_blocked";
+        };
+        if !matches!(
+            file["run_status"].as_str(),
+            Some("passed" | "findings" | "suppressed")
+        ) || !file["source_sha256"].as_str().is_some_and(valid_sha256)
+        {
+            return "still_blocked";
+        }
+        return if file["findings"]
+            .as_array()
+            .is_some_and(|rows| rows.iter().any(|row| row["rule_id"] == "invalid-syntax"))
+        {
+            "still_present"
+        } else {
+            "candidate_absent_unverified_policy"
+        };
+    }
     if brief["kind"] == "finding" {
         let Some(path) = brief["scope"].as_str() else {
             return "incomplete";
@@ -1672,5 +1698,35 @@ fn parse_format(value: &str) -> Result<bool, String> {
         "json" => Ok(true),
         "human" => Ok(false),
         _ => Err(format!("不支持的格式：{value}")),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::classify;
+    use serde_json::json;
+    #[test]
+    fn python_confirmation_distinguishes_syntax_from_environment_and_style() {
+        let brief = json!({"kind":"blocker","checker_id":"python.ruff","reason_code":"python_syntax_confirmation_needed",
+            "scope":"broken.py","affected_paths":["broken.py"]});
+        let mut scan = json!({"schema_version":"0.19.0","task_input_stable":true,
+            "files":[{"path":"broken.py","run_status":"findings","source_sha256":"a".repeat(64),
+                "findings":[{"rule_id":"invalid-syntax"}]}]});
+        assert_eq!(classify(&brief, &scan), "still_present");
+        let mut historical = scan.clone();
+        historical["schema_version"] = json!("0.18.0");
+        assert_eq!(
+            classify(&brief, &historical),
+            "environment_restored_unverified_policy"
+        );
+        scan["files"][0]["findings"][0]["rule_id"] = json!("F401");
+        assert_eq!(
+            classify(&brief, &scan),
+            "candidate_absent_unverified_policy"
+        );
+        scan["files"][0]["run_status"] = json!("incomplete");
+        assert_eq!(classify(&brief, &scan), "still_blocked");
+        scan["task_input_stable"] = json!(false);
+        assert_eq!(classify(&brief, &scan), "incomplete");
     }
 }
