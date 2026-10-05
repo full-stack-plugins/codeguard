@@ -79,7 +79,16 @@ pub(crate) fn load(
                     serde_json::to_value(identity).map_err(|_| "task_lifecycle_encoding_failed")?;
                 if !matches!(
                     value["schema_version"].as_str(),
-                    Some("0.1.0" | "0.2.0" | "0.3.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.7.0")
+                    Some(
+                        "0.1.0"
+                            | "0.2.0"
+                            | "0.3.0"
+                            | "0.4.0"
+                            | "0.5.0"
+                            | "0.6.0"
+                            | "0.7.0"
+                            | "0.8.0"
+                    )
                 ) || value["report_type"] != "task_resolution_evidence"
                     || value["identity"] != identity_value
                     || value["original_report_sha256"] != original_sha
@@ -199,7 +208,15 @@ fn origin_matches_evidence(original: &serde_json::Value, evidence: &serde_json::
             | (Some("swift"), Some("0.3.0"))
             | (Some("kotlin"), Some("0.4.0"))
             | (Some("go"), Some("0.7.0"))
+            | (Some("rust"), Some("0.8.0"))
     ) {
+        return false;
+    }
+    if evidence["schema_version"] == "0.8.0"
+        && (original["schema_version"] != "0.12.0"
+            || evidence["edition_context"]
+                != original["native_evidence"]["native"]["edition_context"])
+    {
         return false;
     }
     if (evidence["schema_version"] == "0.5.0") != (original["schema_version"] == "0.6.0") {
@@ -207,7 +224,7 @@ fn origin_matches_evidence(original: &serde_json::Value, evidence: &serde_json::
     }
     if matches!(
         original["schema_version"].as_str(),
-        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0")
+        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.12.0")
     ) {
         evidence["grammar_sha256"].is_null()
             && evidence["original_source_sha256"]
@@ -383,7 +400,10 @@ pub(crate) fn record_native_recurrence(
                 | (Some("0.3.0"), Some("swift"))
                 | (Some("0.4.0"), Some("kotlin"))
                 | (Some("0.7.0"), Some("go"))
+                | (Some("0.8.0"), Some("rust"))
         )
+        || (evidence["schema_version"] == "0.8.0"
+            && scan["native"]["edition_context"] != evidence["edition_context"])
         || (evidence["schema_version"] == "0.7.0"
             && (scan["native"]["gofmt_sha256"] != evidence["gofmt_sha256"]
                 || scan["native"]["companion_binding_sha256"]

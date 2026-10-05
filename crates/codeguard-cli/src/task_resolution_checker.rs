@@ -9,6 +9,7 @@ pub(crate) enum TaskResolutionChecker {
     Swift,
     Kotlin,
     Go,
+    Rust,
 }
 
 impl TaskResolutionChecker {
@@ -20,6 +21,7 @@ impl TaskResolutionChecker {
             Self::Swift => "swift",
             Self::Kotlin => "kotlin",
             Self::Go => "go",
+            Self::Rust => "rust",
         }
     }
     /// 返回允许复检的原生语法规则标识。
@@ -30,6 +32,7 @@ impl TaskResolutionChecker {
             Self::Swift => "swift.parse.error",
             Self::Kotlin => "kotlin.syntax",
             Self::Go => "go.syntax",
+            Self::Rust => "rust.syntax",
         }
     }
     /// 返回验收范围内的固定原生版本。
@@ -40,6 +43,7 @@ impl TaskResolutionChecker {
             Self::Swift => "Apple Swift 6.4",
             Self::Kotlin => "kotlinc-jvm 2.4.10",
             Self::Go => "go1.23.4",
+            Self::Rust => "rustfmt 1.9.0-stable",
         }
     }
     /// 返回该语言必须使用的批准策略版本。
@@ -50,6 +54,7 @@ impl TaskResolutionChecker {
             Self::Swift => "1.2.0",
             Self::Kotlin => "1.3.0",
             Self::Go => "1.6.0",
+            Self::Rust => "1.7.0",
         }
     }
     /// 核对入口允许的签名策略版本；Zig 原生首次策略与旧 WASM 来源策略分开。
@@ -65,6 +70,7 @@ impl TaskResolutionChecker {
             Self::Swift => "0.3.0",
             Self::Kotlin => "0.4.0",
             Self::Go => "0.7.0",
+            Self::Rust => "0.8.0",
         }
     }
     /// 将指定源码字节交给固定工具，返回有界原生观察；各次调用共用截止时间。
@@ -93,6 +99,7 @@ impl TaskResolutionChecker {
             Self::Swift => crate::swift_syntax_probe::observe_with_cancellation(tool, source, deadline, cancelled),
             Self::Kotlin => crate::kotlin_lint_command::observe_with_cancellation(tool, source, deadline, cancelled),
             Self::Go => crate::go_syntax_probe::observe(tool, source, deadline, cancelled),
+            Self::Rust => json!({"status":"incomplete","reason":"rust_edition_context_unresolved"}),
         }
     }
     /// 核对原反例完成状态及位置；Kotlin 同时验证 UTF-16 列与 UTF-8 字节列。
@@ -103,6 +110,9 @@ impl TaskResolutionChecker {
             Some("completed" | "diagnostics_observed")
         ) {
             return false;
+        }
+        if matches!(self, Self::Rust) {
+            return crate::rust_syntax_evidence::valid(native, Some(source));
         }
         if matches!(self, Self::Go) {
             return crate::go_syntax_probe::valid_observation(native, Some(source));
@@ -133,6 +143,7 @@ impl TaskResolutionChecker {
     ) -> Result<Value, &'static str> {
         match self {
             Self::Go => crate::syntax_task_recheck::run_go(root, brief, Some(tool), deadline),
+            Self::Rust => crate::rust_syntax_task_recheck::run(root, brief, Some(tool), deadline),
             Self::Zig => {
                 crate::syntax_task_recheck::run(root, brief, Some(tool), None, None, None, deadline)
             }

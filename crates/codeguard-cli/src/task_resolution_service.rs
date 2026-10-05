@@ -56,6 +56,14 @@ pub fn verify_go_task_resolution(
     verify_task_resolution(request, TaskResolutionChecker::Go)
 }
 
+/// 验签宿主固定的Rust原生首次任务策略，并在同一Cargo edition下对照原反例与当前源码。
+/// 参数来自受保护宿主；返回限定任务收据，不替代Clippy或全项目交付门禁。
+pub fn verify_rust_task_resolution(
+    request: &crate::RustTaskResolutionRequest<'_>,
+) -> Result<Value, &'static str> {
+    verify_task_resolution(request, TaskResolutionChecker::Rust)
+}
+
 fn verify_task_resolution(
     request: &SyntaxTaskResolutionRequest<'_>,
     checker: TaskResolutionChecker,
@@ -105,6 +113,11 @@ fn verify_task_resolution(
     {
         return Err("task_resolution_policy_invalid");
     }
+    if (checker.language() == "rust" && !raw["edition_context"].is_object())
+        || (checker.language() != "rust" && raw.get("edition_context").is_some())
+    {
+        return Err("task_resolution_policy_invalid");
+    }
     let policy: TaskResolutionPolicyInput =
         serde_json::from_value(raw).map_err(|_| "task_resolution_policy_invalid")?;
     if !checker.accepts_policy_version(&policy.schema_version)
@@ -139,6 +152,15 @@ fn verify_task_resolution(
         || !original_binding_matches(&original, &policy, checker)
     {
         return Err("task_resolution_original_identity_mismatch");
+    }
+    if checker.language() == "rust" {
+        let context = crate::rust_project_edition::RustProjectEdition::capture(
+            &root,
+            &policy.identity.scope,
+        )?;
+        if policy.edition_context.as_ref() != Some(&context.report()) {
+            return Err("task_resolution_edition_context_mismatch");
+        }
     }
     let tool = request
         .tool
@@ -185,6 +207,16 @@ fn original_binding_matches(
     policy: &TaskResolutionPolicyInput,
     checker: TaskResolutionChecker,
 ) -> bool {
+    if checker.language() == "rust" {
+        return original["schema_version"] == "0.12.0"
+            && policy.grammar_sha256.is_none()
+            && original["native_evidence"]["target"]["source_sha256"]
+                == policy.original_source_sha256
+            && original["native_evidence"]["native"]["tool_sha256"] == policy.tool_sha256
+            && original["native_evidence"]["native"]["version"] == policy.native_version
+            && policy.edition_context.as_ref()
+                == Some(&original["native_evidence"]["native"]["edition_context"]);
+    }
     if matches!(
         original["schema_version"].as_str(),
         Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0")
@@ -220,7 +252,34 @@ fn execute(
     let brief = crate::next_command::read_task_brief(root, request.task_id)?;
     let source_path = root.join(&policy.identity.scope);
     let current = crate::plain_syntax_source::read_plain_source(&source_path)?;
-    let original_native = checker.observe(tool, request.original_source, root, request.deadline);
+    let rust_context = if checker.language() == "rust" {
+        Some(crate::rust_project_edition::RustProjectEdition::capture(
+            root,
+            &policy.identity.scope,
+        )?)
+    } else {
+        None
+    };
+    if rust_context
+        .as_ref()
+        .is_some_and(|c| policy.edition_context.as_ref() != Some(&c.report()))
+    {
+        return Err("task_resolution_edition_context_mismatch");
+    }
+    let original_native = if let Some(context) = &rust_context {
+        let mut native = crate::rustfmt_syntax_probe::observe_with_context_guard(
+            tool,
+            request.original_source,
+            context.edition,
+            request.deadline,
+            &std::sync::atomic::AtomicBool::new(false),
+            &|| context.current(),
+        );
+        native["edition_context"] = context.report();
+        native
+    } else {
+        checker.observe(tool, request.original_source, root, request.deadline)
+    };
     before_deadline(request.deadline)?;
     let current_report = checker.recheck(root, &brief, tool, request.deadline)?;
     let current_native = current_report["native"].clone();
@@ -233,7 +292,10 @@ fn execute(
         .is_ok_and(|b| b == current)
         && tool_hash(tool).is_ok_and(|s| s == policy.tool_sha256)
         && artifact_hash(executable).is_ok_and(|s| s == policy.adapter_sha256)
-        && (checker.language() != "go" || go_companion_matches(tool, policy));
+        && (checker.language() != "go" || go_companion_matches(tool, policy))
+        && rust_context
+            .as_ref()
+            .is_none_or(|context| context.current());
     let brief = crate::next_command::read_task_brief(root, request.task_id)?;
     let original = crate::syntax_task_recheck::original(root, &brief)?;
     if brief["evidence_ref"]["first_report_sha256"] != policy.original_report_sha256
@@ -252,6 +314,8 @@ fn execute(
     let native_bound = [&original_native, &current_native].iter().all(|r| {
         r["version"] == policy.native_version
             && r["tool_sha256"] == policy.tool_sha256
+            && (checker.language() != "rust"
+                || policy.edition_context.as_ref() == Some(&r["edition_context"]))
             && (checker.language() != "go"
                 || (r["gofmt_sha256"].as_str() == policy.gofmt_sha256.as_deref()
                     && r["companion_binding_sha256"].as_str()
@@ -264,6 +328,9 @@ fn execute(
     let current_completed = current_completed
         && (checker.language() != "go"
             || crate::go_syntax_probe::valid_observation(&current_native, Some(&current)));
+    let current_completed = current_completed
+        && (checker.language() != "rust"
+            || crate::rust_syntax_evidence::valid(&current_native, Some(&current)));
     let original_completed = checker.original_completed(&original_native, request.original_source);
     let current_issue_present = current_native["status"] == "diagnostics_observed"
         || (checker.language() == "kotlin"
@@ -317,6 +384,9 @@ fn execute(
         outcome = "resolution_evidence_incomplete";
     }
     let mut raw_evidence = json!({"schema_version":checker.evidence_version(&policy.schema_version),"report_type":"task_resolution_evidence","identity":policy.identity,"original_report_sha256":policy.original_report_sha256,"original_source_sha256":policy.original_source_sha256,"current_source_sha256":digest(&current),"grammar_sha256":policy.grammar_sha256,"tool_sha256":policy.tool_sha256,"adapter_sha256":policy.adapter_sha256,"policy_sha256":policy_sha,"policy_revision":policy.policy_revision,"original_native":original_native,"current_native":current_native,"outcome":outcome});
+    if checker.language() == "rust" {
+        raw_evidence["edition_context"] = json!(policy.edition_context);
+    }
     if checker.language() == "go" {
         raw_evidence["gofmt_sha256"] = json!(policy.gofmt_sha256);
         raw_evidence["companion_binding_sha256"] = json!(policy.companion_binding_sha256);
@@ -358,6 +428,12 @@ pub(crate) fn commit_resolution(
         "current_native",
         "outcome",
     ];
+    if raw_evidence["schema_version"] == "0.8.0" {
+        keys.push("edition_context");
+        if !crate::task_resolution_evidence_shape::valid_rust_binding(&raw_evidence) {
+            return Err("task_resolution_evidence_binding_invalid");
+        }
+    }
     if raw_evidence["schema_version"] == "0.7.0" {
         keys.extend(["gofmt_sha256", "companion_binding_sha256"]);
         if !crate::task_resolution_evidence_shape::valid_go_binding(&raw_evidence) {
@@ -378,7 +454,7 @@ pub(crate) fn commit_resolution(
         object.len() == keys.len() && keys.iter().all(|key| object.contains_key(*key))
     }) || !matches!(
         raw_evidence["schema_version"].as_str(),
-        Some("0.1.0" | "0.2.0" | "0.3.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.7.0")
+        Some("0.1.0" | "0.2.0" | "0.3.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.7.0" | "0.8.0")
     ) {
         return Err("task_resolution_evidence_binding_invalid");
     }

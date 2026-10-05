@@ -19,6 +19,12 @@ pub(crate) fn valid(record: &TaskLifecycleRecord, value: &Value) -> bool {
         "current_native",
         "outcome",
     ];
+    if value["schema_version"] == "0.8.0" {
+        expected.push("edition_context");
+        if !valid_rust_binding(value) {
+            return false;
+        }
+    }
     if value["schema_version"] == "0.7.0" {
         expected.extend(["gofmt_sha256", "companion_binding_sha256"]);
         if !valid_go_binding(value) {
@@ -50,7 +56,7 @@ pub(crate) fn valid(record: &TaskLifecycleRecord, value: &Value) -> bool {
         || !(value["grammar_sha256"].as_str().is_some_and(digest)
             || (matches!(
                 value["schema_version"].as_str(),
-                Some("0.2.0" | "0.3.0" | "0.4.0" | "0.5.0")
+                Some("0.2.0" | "0.3.0" | "0.4.0" | "0.5.0" | "0.8.0")
             ) && value["grammar_sha256"].is_null()))
         || !native_for_version(value, "original_native")
         || !native_for_version(value, "current_native")
@@ -106,11 +112,14 @@ fn native_bound(value: &Value) -> bool {
         Some("0.4.0") => "kotlinc-jvm 2.4.10",
         Some("0.6.0") => "ruff 0.16.8",
         Some("0.7.0") => "go1.23.4",
+        Some("0.8.0") => "rustfmt 1.9.0-stable",
         _ => return false,
     };
     ["original_native", "current_native"].iter().all(|k| {
         value[*k]["tool_sha256"] == value["tool_sha256"]
             && value[*k]["version"] == version
+            && (value["schema_version"] != "0.8.0"
+                || value[*k]["edition_context"] == value["edition_context"])
             && (value["schema_version"] != "0.7.0"
                 || (value[*k]["gofmt_sha256"] == value["gofmt_sha256"]
                     && value[*k]["companion_binding_sha256"] == value["companion_binding_sha256"]))
@@ -119,6 +128,7 @@ fn native_bound(value: &Value) -> bool {
 fn native_for_version(evidence: &Value, key: &str) -> bool {
     match evidence["schema_version"].as_str() {
         Some("0.1.0" | "0.5.0") => native(&evidence[key]),
+        Some("0.8.0") => crate::rust_syntax_evidence::valid(&evidence[key], None),
         Some("0.7.0") => crate::go_syntax_probe::valid_observation(&evidence[key], None),
         Some("0.6.0") => crate::python_syntax_probe::valid_native_observation(&evidence[key], None),
         Some("0.2.0") => crate::erlang_syntax_probe::valid_native_observation(&evidence[key], None),
@@ -257,6 +267,18 @@ pub(crate) fn valid_python_binding(value: &Value) -> bool {
             value[*key]["target_version"] == value["target_version"]
                 && crate::python_syntax_probe::valid_native_observation(&value[*key], None)
         })
+}
+
+/// Rust限定证据保留真实edition上下文；原生首次grammar为空，不承认项目批准。
+/// 参数为脱敏生命周期证据；结构有效仍须由宿主核验签名和当前字节。
+pub(crate) fn valid_rust_binding(value: &Value) -> bool {
+    value["identity"]["checker_id"] == "syntax.native_confirmation"
+        && value["grammar_sha256"].is_null()
+        && value["edition_context"].is_object()
+        && ["original_native", "current_native"]
+            .iter()
+            .all(|key| crate::rust_syntax_evidence::valid(&value[*key], None))
+        && value["original_native"]["edition_context"] == value["edition_context"]
 }
 
 #[cfg(test)]
