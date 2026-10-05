@@ -1460,3 +1460,6 @@ check python/all现通过0.48反馈保留独立结构计数和原始坐标，原
 
 
 14.11 Python关闭前置继续收敛：隔离原生探针新增明确目标版本入口，非法目标在工具解析前拒绝；固定py312仅留在既有开发差分入口。宿主只读API `validate_python_task_original_source` 核对专用/通用首次报告、消费收据和冻结源码，共用封闭形状及原始/结构坐标校验，修复后的当前字节不能替代原样本。实际Ruff match在py39/py310的不同诊断已验证。签名策略/项目生效目标绑定、可信关闭/复发仍缺，14.11保持未完成。见[前置验收](../../../tests/acceptance/python-resolution-prerequisites.md)。
+
+
+14.11 Python项目目标观察：固定Ruff同轮原生设置新增内部明确lint目标入口；只接受唯一目标与空逐文件目标集合，none/缺失/重复/未知/逐文件未解析均提供具体原因，formatter/analyze默认不代入。公开四字段设置形状不改；实际四配置逐文件探针验证py39/py310语法差异、隐式默认与逐文件目标拒绝推断。此为关闭前置，尚未形成签名策略与项目配置的Python可信关闭链，父任务仍未完成。见[原生目标验收](../../../tests/acceptance/python-native-target-settings.md)。

@@ -55,3 +55,57 @@ fn malformed_or_missing_settings_never_look_like_clean_coverage() {
         assert!(parse_ruff_settings(raw).is_err(), "{raw:?}");
     }
 }
+
+#[test]
+fn explicit_native_python_target_is_observed_without_changing_public_settings_shape() {
+    for (version, expected) in [("3.9", "py39"), ("3.10", "py310"), ("3.15", "py315")] {
+        let raw = format!(
+            "linter.rules.enabled = [\n]\nlinter.per_file_ignores = {{}}\nlinter.unresolved_target_version = {version}\nlinter.per_file_target_version = {{}}\n"
+        );
+        let observed = parse_ruff_settings(raw.as_bytes()).unwrap();
+        assert_eq!(observed.explicit_python_target(), Ok(expected));
+        let value = serde_json::to_value(observed).unwrap();
+        assert_eq!(value.as_object().unwrap().len(), 4);
+        assert!(value.get("explicit_python_target").is_none());
+    }
+}
+
+#[test]
+fn unknown_implicit_duplicate_and_per_file_targets_do_not_supply_a_closure_target() {
+    let base = "linter.rules.enabled = [\n]\nlinter.per_file_ignores = {}\n";
+    for (suffix, reason) in [
+        ("", "ruff_target_settings_missing"),
+        (
+            "formatter.unresolved_target_version = 3.12\nanalyze.target_version = 3.12\n",
+            "ruff_target_settings_missing",
+        ),
+        (
+            "linter.unresolved_target_version = 3.10\nlinter.per_file_target_version = {}\nlinter.per_file_target_version = {}\n",
+            "ruff_target_settings_duplicate",
+        ),
+        (
+            "linter.unresolved_target_version = none\nlinter.per_file_target_version = {}\n",
+            "ruff_target_not_explicit",
+        ),
+        (
+            "linter.unresolved_target_version = 3.16\nlinter.per_file_target_version = {}\n",
+            "ruff_target_settings_unvalidated",
+        ),
+        (
+            "linter.unresolved_target_version = 3.9\nlinter.unresolved_target_version = 3.10\nlinter.per_file_target_version = {}\n",
+            "ruff_target_settings_duplicate",
+        ),
+        (
+            "linter.unresolved_target_version = 3.10\nlinter.per_file_target_version = {\n}\n",
+            "ruff_per_file_target_unresolved",
+        ),
+        (
+            "linter.unresolved_target_version = 3.10\n",
+            "ruff_target_settings_missing",
+        ),
+    ] {
+        let observed = parse_ruff_settings(format!("{base}{suffix}").as_bytes()).unwrap();
+        assert_eq!(observed.explicit_python_target(), Err(reason), "{suffix}");
+        assert!(!observed.coverage_proven);
+    }
+}

@@ -1360,3 +1360,8 @@ Ruff正常与忽略noqa的两轮结果中一致的`invalid-syntax`现在保留�
 ### Python关闭前置的原样本与目标版本
 
 宿主只读接口`validate_python_task_original_source(root, task_id, source)`核对两类首次报告、消费收据、冻结字节和原始/结构位置；当前文件已修复时仍接受原字节，拒绝以当前字节替代。隔离语法探针可接收明确Python目标，非法目标在工具解析前拒绝；开发差分固定py312入口保持不变。这些是关闭前置，不构成签名批准、项目目标来源或可信关闭。见[验收](../tests/acceptance/python-resolution-prerequisites.md)。
+
+
+### Ruff原生lint目标观察
+
+`RuffSettingsObservation::explicit_python_target()`仅返回固定Ruff原生设置中的明确lint目标。设置必须具有唯一`linter.unresolved_target_version`和空`linter.per_file_target_version`；隐式none、缺失/重复、未知版本与尚未解析的逐文件目标返回具体原因。formatter/analyze目标不作替代。该内部观察与同轮工具、源码、配置核对链共用，不增加旧公开设置字段，也不批准关闭。见[验收](../tests/acceptance/python-native-target-settings.md)。

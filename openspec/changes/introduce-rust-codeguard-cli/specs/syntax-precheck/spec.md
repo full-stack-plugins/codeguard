@@ -561,3 +561,15 @@ Ruff正常与忽略noqa的检查若返回相同的invalid-syntax错误，Codegua
 #### Scenario: Unverified local history is not approval
 - **WHEN** 只读入口成功返回首次运行和摘要引用
 - **THEN** 不写历史、不执行原生工具、不生成批准或解决事件；目标版本、签名策略及双输入原生复检仍为独立关闭前置
+
+### Requirement: Python关闭目标来自同轮原生设置
+
+用于关闭前置的Python目标 MUST 从同工具、同源码、同配置的Ruff逐文件原生设置观察取得，不能把formatter/analyze目标、开发默认py312或语言文件后缀当作lint目标。固定Ruff版本的明确linter目标和空逐文件目标集合可提供候选目标；隐式none、缺字段、重复字段、未知格式/版本、未解析逐文件目标 MUST 返回具体未完成原因，普通lint观察可保留。内部目标观察 MUST 不改变旧公开设置schema、不证明批准或关闭；配置或工具变化不得沿用此观察。
+
+#### Scenario: Configured target changes native syntax outcome
+- **WHEN** 同一match文件分别由明确py39与py310配置经过原生逐文件检查
+- **THEN** 设置分别绑定相应目标，语法诊断按原配置保留；不得把formatter目标或固定py312代替原生linter目标
+
+#### Scenario: Native settings do not establish one explicit target
+- **WHEN** linter目标为none、字段缺失或重复、未知版本，或者配置逐文件目标尚未解析
+- **THEN** 关闭前置无目标并反馈具体原因；已有局部lint诊断仍可反馈，但不能从它们推导可信关闭
