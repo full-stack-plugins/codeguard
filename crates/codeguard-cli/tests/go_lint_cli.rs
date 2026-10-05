@@ -5,16 +5,24 @@ use std::process::Command;
 
 #[test]
 fn go_lint_without_explicit_tool_remains_incomplete() {
+    let root = std::env::temp_dir().join(format!("cg-go-lint-empty-{}", std::process::id()));
+    std::fs::create_dir_all(&root).unwrap();
     let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
-        .args(["lint", "go", ".", "--format", "json"])
+        .args(["lint", "go"])
+        .arg(&root)
+        .args(["--format", "json"])
+        .env("PATH", "")
         .output()
         .unwrap();
     assert_eq!(output.status.code(), Some(3));
     let feedback: Value = serde_json::from_slice(&output.stdout).unwrap();
     assert_eq!(feedback["language"], "go");
     assert_eq!(feedback["delivery_decision"], "not_evaluated");
-    assert_eq!(feedback["native_status"], "incomplete");
-    assert_eq!(feedback["reason"], "go_tool_not_selected");
+    assert_eq!(feedback["report_type"], "go_lint_fallback_feedback");
+    assert_eq!(feedback["native_report"]["native_status"], "incomplete");
+    assert_eq!(feedback["native_report"]["reason"], "go_tool_not_selected");
+    assert_eq!(feedback["native_tool_requirement"], "required");
+    std::fs::remove_dir_all(root).unwrap();
 }
 
 #[test]

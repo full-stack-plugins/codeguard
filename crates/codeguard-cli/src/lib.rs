@@ -380,4 +380,8 @@ mod ruby_syntax_probe;
 #[cfg(unix)]
 mod go_syntax_probe;
 #[cfg(unix)]
+mod go_tool_selection;
+#[cfg(unix)]
+mod go_lint_fallback;
+#[cfg(unix)]
 mod python_syntax_probe;

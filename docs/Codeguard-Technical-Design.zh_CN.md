@@ -1426,8 +1426,14 @@ Kotlin版本阶段结束后，原生观察器在编译前后核对私有源码�
 
 probe0.3声明`source_scope=whole_file`；聚合0.49接纳正确绑定的Python/Go结构，以及独立Go vet修复预览0.13。通用Go确认0.8绑定冻结源码、固定grammar/规则、整文件路由及稳定任务身份；保存反馈0.18/fast0.9复用同一报告与任务。Python和历史版本不变。原生差分0.7分别测量原始grammar及组合候选，保留未知样本和源码身份。见[协议](../schemas/grammar-probe-v0.3.schema.json)与[验收](../tests/acceptance/go-package-structure.md)。
 
-Go预览版本修正了既有Go vet argv错标为仅支持Python的0.1预览的问题。Go项目原生lint继续使用既有Go vet；后续已接入显式Go确认任务语法复检；独立lint回退、可信关闭、独立holdout或发行资格仍未完成。
+Go预览版本修正了既有Go vet argv错标为仅支持Python的0.1预览的问题。Go项目原生lint继续使用既有Go vet；后续已接入显式Go确认任务语法复检；Go完整lint义务、可信关闭、独立holdout或发行资格仍未完成。
 
 Go候选任务复检现接受 `--go-tool /absolute/sdk/bin/go`，对冻结整文件字节调用固定SDK同目录 `gofmt -e /dev/stdin`。复检0.9/任务反馈0.22保留原生诊断、主/辅助制品身份、首次报告收据和失败尝试；修复后当前源码不会使原候选历史被误判损坏。局部零诊断继续保留open任务，等待批准政策与覆盖。见[验收](../tests/acceptance/go-package-structure.md)。
 
 Go专用修复预览0.14绑定原生观察和 --go-tool；初次反馈不伪造原生报告。聚合仅在携带该简报时采用0.50，既有Go vet预览0.13/聚合0.49继续保留。
+
+### Go统一lint的原生优先与缺工具初检
+
+源码版 `codeguard lint go . --format json` 优先显式 `--go-tool`，否则查找调用方绝对PATH中的Go。工具已选择但版本/执行失败时保留原生故障；真正缺工具时，内置WASM做有界整文件初检，保留恢复和独立结构候选。候选或初检未完成要求准备项目适用原生工具；完整有界范围的零候选只推荐准备，原生义务仍未完成，退出码继续3。默认不含WASM的构建明确报告能力缺失。重复lint与check复用确认任务，补声明不自动关闭。公开npm0.1.4未更新。见[局部验收](../tests/acceptance/go-lint-fallback.md)。
+
+闭合回退协议0.7包含不变的原生0.6报告、syntax_candidates、syntax_tasks、preliminary_result与native_tool_requirement。原生报告和候选收据独立保存，外层对话报告不证明原生执行。

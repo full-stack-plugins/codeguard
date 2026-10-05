@@ -624,3 +624,7 @@ Python 语法确认任务的当前原生观察为 `still_present` 且未因源�
 源码版通过独立AST规则发现Go完整文件缺少package声明。`grammar probe go FILE`、`check go/all`和确认保存的Hook保留原始恢复统计，并复用同一原生确认任务；补声明只消除候选，不关闭任务。`lint go`仍调用已有原生Go vet，确认任务的可信关闭及grammar资格尚未完成。公开npm0.1.4不含这些变更。见[验收](tests/acceptance/go-package-structure.md)。
 
 Go候选任务现可执行 `codeguard task verify <task-id> . --go-tool /absolute/sdk/bin/go --format=json`，对冻结整文件源码做原生语法复检并记录尝试；任务须满足批准关闭条件才能关闭。见[验收](tests/acceptance/go-package-structure.md)。
+
+### Go统一lint的原生优先与缺工具初检
+
+源码版 `codeguard lint go . --format json` 优先显式 `--go-tool`，否则查找调用方绝对PATH中的Go。工具已选择但版本/执行失败时保留原生故障；真正缺工具时，内置WASM做有界整文件初检，保留恢复和独立结构候选。候选或初检未完成要求准备项目适用原生工具；完整有界范围的零候选只推荐准备，原生义务仍未完成，退出码继续3。默认不含WASM的构建明确报告能力缺失。重复lint与check复用确认任务，补声明不自动关闭。公开npm0.1.4未更新。见[局部验收](tests/acceptance/go-lint-fallback.md)。

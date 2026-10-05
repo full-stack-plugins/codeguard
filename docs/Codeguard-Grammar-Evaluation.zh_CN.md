@@ -162,6 +162,10 @@ Kotlin版本阶段结束后，原生观察器在编译前后核对私有源码�
 
 同一现有Go1.23.4对原20例的新运行：组合候选 **7TP / 0FP / 0FN / 12TN / 1unknown**；原始grammar仍 **5TP / 0FP / 2FN / 12TN / 1unknown**。新0.7差分报告保留原源码、标签及原始分类，逻辑位置重映射继续未知。底层验收的另外11条专项开发回归覆盖注释/字符串、空输入、build标签、Unicode及CRLF，不是独立holdout。
 
-Go确认任务的可信关闭、独立lint go的WASM回退、系统精度、资源与发行资格仍未完成。lint go继续调用已有原生Go vet。公开npm0.1.4不包含本轮能力。见[公开验收](../tests/acceptance/go-package-structure.md)与[新Go报告](../tests/acceptance/evidence/go-native-grammar-package-differential-2026-10-05.json)。
+Go确认任务的可信关闭、Go完整lint义务、系统精度、资源与发行资格仍未完成。lint go继续调用已有原生Go vet。公开npm0.1.4不包含本轮能力。见[公开验收](../tests/acceptance/go-package-structure.md)与[新Go报告](../tests/acceptance/evidence/go-native-grammar-package-differential-2026-10-05.json)。
 
 Go候选任务复检现接受 `--go-tool /absolute/sdk/bin/go`，对冻结整文件字节调用固定SDK同目录 `gofmt -e /dev/stdin`。复检0.9/任务反馈0.22保留原生诊断、主/辅助制品身份、首次报告收据和失败尝试；修复后当前源码不会使原候选历史被误判损坏。局部零诊断继续保留open任务，等待批准政策与覆盖。见[验收](../tests/acceptance/go-package-structure.md)。
+
+### Go统一lint的原生优先与缺工具初检
+
+源码版 `codeguard lint go . --format json` 优先显式 `--go-tool`，否则查找调用方绝对PATH中的Go。工具已选择但版本/执行失败时保留原生故障；真正缺工具时，内置WASM做有界整文件初检，保留恢复和独立结构候选。候选或初检未完成要求准备项目适用原生工具；完整有界范围的零候选只推荐准备，原生义务仍未完成，退出码继续3。默认不含WASM的构建明确报告能力缺失。重复lint与check复用确认任务，补声明不自动关闭。公开npm0.1.4未更新。见[局部验收](../tests/acceptance/go-lint-fallback.md)。

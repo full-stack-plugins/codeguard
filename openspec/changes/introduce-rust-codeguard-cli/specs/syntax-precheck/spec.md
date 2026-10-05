@@ -682,3 +682,15 @@ Go候选确认任务 MUST 接受显式 `--go-tool`，复用固定SDK与同目录
 #### Scenario: Tool arguments or history do not match
 - **WHEN** Go工具用于其它语言任务，或首次报告、消费收据或工具辅助绑定发生变化
 - **THEN** 错语言在启动前拒绝；损坏历史或变化输入不保存为完整观察，不伪造源码违规
+
+### Requirement: Standalone Go lint SHALL prefer native tools and provide missing-tool candidates
+
+`lint go` MUST 从显式路径或调用方绝对PATH目录选择原生Go；显式坏工具、已选工具版本/执行失败不得静默改用WASM掩盖故障。确实缺少原生工具时 MUST 使用内置固定Go grammar进行有界完整文件候选初检，保留原始恢复与独立结构规则，生成可重复同步的确认任务并输出智能体可消费报告。候选或未完成初检要求准备适用原生工具；有界范围完整且无候选只推荐准备，仍非原生lint通过、任务关闭或交付许可。默认不带WASM制品 MUST 明确能力缺失，不能生成假通过。
+
+#### Scenario: Native tool is absent and package declaration is missing
+- **WHEN** 无原生Go工具且完整文件缺package，执行lint go
+- **THEN** 返回结构候选和原生工具必须准备行动；初始化后重复lint与check复用同一确认任务，修复后的零候选不关闭原任务
+
+#### Scenario: Native tool is selected or candidate coverage is incomplete
+- **WHEN** 显式或绝对PATH选择了Go，或候选范围超过预算/读取失败/取消
+- **THEN** 所选工具优先执行且失败保留；未选工具时范围不完整不能报告初检无候选或推荐级工具准备

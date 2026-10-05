@@ -65,8 +65,18 @@ pub fn run(args: &[String]) -> ExitCode {
         _ => return emit(empty_feedback(), arguments.json),
     };
     let cancelled = AtomicBool::new(false);
-    let mut feedback = observe_for_check(&root, arguments.tool.as_deref(), deadline, &cancelled);
+    let selection = crate::go_tool_selection::GoToolSelection::discover(arguments.tool);
+    let mut feedback = observe_for_check(&root, selection.tool(), deadline, &cancelled);
     persist_and_sync(&root, &mut feedback);
+    if selection.tool().is_none() {
+        return crate::go_lint_fallback::run(
+            &root,
+            feedback,
+            selection.report(),
+            deadline,
+            arguments.json,
+        );
+    }
     emit(feedback, arguments.json)
 }
 
@@ -154,6 +164,8 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                     return Err("--go-tool 不能重复".into());
                 }
             }
+            "--format=json" => json = true,
+            "--format=human" => json = false,
             "--format" => {
                 cursor += 1;
                 let value = args.get(cursor).ok_or("--format 缺少 human|json")?;
