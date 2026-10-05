@@ -1,6 +1,6 @@
 # Rust project edition and native syntax observation
 
-Updated: 2026-10-06. This document describes an implemented Unix Rust library service for preparing selected-file native parser feedback. The editing Hook and task connection remain pending.
+Updated: 2026-10-06. This document describes an implemented Unix Rust library service for preparing selected-file native parser feedback. Selected-file editing Hook and stable tasks are connected; complete project and real-host acceptance remain pending.
 
 ```mermaid
 flowchart LR
@@ -30,3 +30,5 @@ Native observation0.2 allows only2015/2018/2021/2024 while historical observatio
 The real installed tool was tested on identical `pub async fn f() {}` bytes: default2015 produces located native diagnostics, explicit2021/2024 produces no diagnostics. [Acceptance evidence](../tests/acceptance/rust-project-edition.md) binds this scoped result; it does not establish general precision, language qualification or release readiness.
 
 Cargo declaration semantics: [manifest edition](https://doc.rust-lang.org/cargo/reference/manifest.html#the-edition-field), [workspace package inheritance](https://doc.rust-lang.org/cargo/reference/workspaces.html#the-package-table). Next integration must retain original native lint obligations, task identity, safe conversation feedback and source-context uncertainty. No new CLI option is claimed here.
+
+Selected-file edit Hook and stable tasks now use this service through `--rustfmt-tool`; failures of selected tools do not fall back. See [scoped chain acceptance](../tests/acceptance/rust-native-hook.md).

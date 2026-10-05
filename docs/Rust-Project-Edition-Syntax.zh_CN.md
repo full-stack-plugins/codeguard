@@ -1,6 +1,6 @@
 # Rust 项目 edition 与原生语法观察
 
-更新：2026-10-06。本文描述已实现的 Unix Rust 库服务，用于准备选中文件的适用原生解析反馈；完整编辑 Hook 和任务连接尚未完成。
+更新：2026-10-06。本文描述已实现的 Unix Rust 库服务，用于准备选中文件的适用原生解析反馈；选中文件编辑 Hook 与稳定任务现已接线；完整项目与实际宿主验收仍未完成。
 
 ```mermaid
 flowchart LR
@@ -29,4 +29,4 @@ flowchart LR
 
 真实安装工具对完全相同 `pub async fn f() {}` 字节：缺省2015给原生定位诊断，明确2021/2024无诊断。[局部验收](../tests/acceptance/rust-project-edition.md)保存范围证据，不代表一般精度、语言资格或发行通过。
 
-语义依据：[Cargo edition](https://doc.rust-lang.org/cargo/reference/manifest.html#the-edition-field)、[工作区包继承](https://doc.rust-lang.org/cargo/reference/workspaces.html#the-package-table)。后续编辑接线必须保留原生lint义务、稳定任务、安全对话反馈及源码上下文不确定性。本文不声称已增加CLI选项。
+语义依据：[Cargo edition](https://doc.rust-lang.org/cargo/reference/manifest.html#the-edition-field)、[工作区包继承](https://doc.rust-lang.org/cargo/reference/workspaces.html#the-package-table)。后续编辑接线必须保留原生lint义务、稳定任务、安全对话反馈及源码上下文不确定性。Hook 和 task verify 已提供 --rustfmt-tool，原生缺失时保留 WASM 候选；已选工具失败不回退。

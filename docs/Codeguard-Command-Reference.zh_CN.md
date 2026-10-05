@@ -830,3 +830,5 @@ codeguard task verify --help
 
 
 Ruby 编辑快检接线：源码构建的 `hook execute` / `hook claude post-tool-use` 可选择 `--ruby-tool ABS_PATH` 或调用方绝对 PATH 的 Ruby。只检查确认编辑的文件，共用事件截止时间；选定工具失败不回退，缺工具保留 WASM 候选。原生行号与稳定任务进入有界对话，不回显源码/工具消息或猜列号；先核对项目 Ruby 版本适用性。`repair_ready` 用同一工具复检并保存真实证据引用，零诊断仍不关闭任务。编辑反馈 0.19（内层 0.10）、复检反馈 0.20（内层 0.6）新增封闭 schema，旧协议不改。实际宿主自动触发、完整 RuboCop 与公开 npm 版本尚未验收。
+
+Rust 编辑入口：源码构建的 `hook execute ROOT --rustfmt-tool ABS_PATH --timeout 30s --format=json` 和 `hook claude post-tool-use` 按选中文件 Cargo edition 调用固定 Rustfmt1.9.0-stable。未显式选择时查找绝对 PATH 入口；真正缺失才使用已构建的 WASM 初检。`next ROOT --format=json` 返回稳定确认任务和原工具复检参数，`task verify TASK_ID ROOT --rustfmt-tool ABS_PATH --format=json` 保存同任务观察。Rustfmt 是语法解析观察，Clippy/类型/完整构建仍待检查；零诊断不自动关闭。选定工具故障保留 incomplete，代理工具版本未认证不回退隐藏故障。公开 npm 版本未因源码或离线安装测试自动更新。

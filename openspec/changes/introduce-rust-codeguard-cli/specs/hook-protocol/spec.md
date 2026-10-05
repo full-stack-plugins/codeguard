@@ -187,3 +187,18 @@ Stop 事件 MAY 从已存在的本地任务事实生成有界、只读的下一�
 - **WHEN** a selected Go source belongs to a nearest `go.mod` or enclosing `go.work` declaring a minimum Go version or suggested toolchain newer than the supported syntax SDK, or the relevant declarations cannot be read unambiguously
 - **THEN** editing and original-tool task verification return an environment observation without invoking the incompatible SDK, generating source diagnostics, or silently switching to WASM; declarations are read statically with bounded input, and changes during observation withdraw prior diagnostics
 - **AND** saved guidance withdraws source positions when current declarations become incompatible; absence of a declaration is still only an unapproved local syntax observation, never full language-version or project acceptance
+
+
+### Requirement: Rust edit feedback SHALL use edition-bound native parsing and retain lint obligations
+
+Confirmed Rust edits SHALL observe only requested safe files through the shared deadline and bounded fixed Rustfmt parser with applicable Cargo edition. Explicit/absolute-PATH native selection SHALL take precedence over WASM initial parsing; selected-tool failures SHALL remain incomplete without fallback. Absent tools MAY yield bundled WASM candidates while preserving native preparation/confirmation tasks. Edition/source/tool changes SHALL withdraw current positions. The formatter parser SHALL NOT be described as Clippy, complete lint/type/build validation or delivery permission; those project obligations remain outstanding.
+
+Current native diagnostics and environment failures SHALL reuse stable Rust syntax confirmation tasks and safe conversation guidance. Repeated observations SHALL update evidence rather than create duplicate tasks. Repair-ready and task verification SHALL use the same scoped project parser, retain original evidence and record an observation; zero diagnostics SHALL NOT automatically close the task. Failed writes SHALL neither run the parser nor create workbench state.
+
+#### Scenario: Rust editing and task verification share one scoped task
+- **WHEN** a confirmed selected Rust edit produces native syntax diagnostics and repeats, then source is repaired and the original task is rechecked
+- **THEN** preserve one task, expose safe line/rule/source-independent guidance and original-tool observation, keep the task open after local zero diagnostics and retain Clippy/build obligations
+
+#### Scenario: Missing tool and selected tool failure differ
+- **WHEN** no Rustfmt entry exists, or an explicit selected tool fails/has unverified version or project edition is unresolved
+- **THEN** only true absence enables the WASM initial scan; selected failure or unresolved edition produces concrete preparation/decision feedback without source-edit instructions or a quality pass

@@ -31,7 +31,9 @@ pub(super) fn parse(
             fingerprint: report["fingerprint"].as_str().unwrap().into(),
             reason: report["reason_code"].as_str().unwrap().into(),
             diagnostic_reason: Some(
-                if report["schema_version"] == "0.9.0" {
+                if report["schema_version"] == "0.12.0" {
+                    "rust_native_first_observation"
+                } else if report["schema_version"] == "0.9.0" {
                     "ruby_native_first_observation"
                 } else if report["schema_version"] == "0.8.0" {
                     "go_package_structure_candidate"

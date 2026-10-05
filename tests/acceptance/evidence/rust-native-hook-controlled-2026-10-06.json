@@ -1,0 +1,633 @@
+[
+  {
+    "delivery_decision": "not_evaluated",
+    "execution": "local_observation",
+    "host_blocking_verified": false,
+    "local_feedback": {
+      "candidate_recovery_count": 0,
+      "candidate_structure_count": 0,
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "go_syntax": null,
+      "kotlin_lint": null,
+      "native_unwired_files": [],
+      "next_action": "review_native_results_and_resolve_incomplete_checks",
+      "node_lint": {
+        "backlog_status": "not_connected",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "files": [],
+        "new_blockers": 0,
+        "new_findings": 0,
+        "next": null,
+        "reason": "eslint_files_incomplete",
+        "status": "incomplete",
+        "unexecuted_files": []
+      },
+      "python_lint": null,
+      "report_type": "hook_fast_feedback",
+      "requested_paths": [
+        "src/lib.rs"
+      ],
+      "ruby_lint": null,
+      "rust_syntax": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "files": [
+          {
+            "current": true,
+            "native": {
+              "diagnostics": [],
+              "edition": "2021",
+              "edition_context": {
+                "edition": "2021",
+                "manifest_ref": "Cargo.toml",
+                "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+                "workspace_manifest_ref": null,
+                "workspace_manifest_sha256": null
+              },
+              "observation_kind": "formatter_parser",
+              "reason": "rustfmt_syntax_tool_unavailable",
+              "status": "incomplete",
+              "tool_sha256": null,
+              "version": null
+            },
+            "path": "src/lib.rs",
+            "recheck_argv": null,
+            "source_sha256": "c4f7e70d40f8cc9a2a7d960468502b18e912b8b3d34776ac35a8d3ae64114c97",
+            "task_id": "CG-B-d600cf8dc8ea0bf1d010003bf7dc305c",
+            "task_sync_reason": null,
+            "tool_path": null
+          }
+        ],
+        "local_parse_complete": false,
+        "native_lint_obligation": "cargo_clippy_pending",
+        "report_type": "rust_syntax_scan",
+        "schema_version": "0.2.0",
+        "scope": "single_frozen_rust_files",
+        "source_file_count": 1,
+        "task_status": "synced_partial",
+        "tool_selection": {
+          "executable": "/missing/rustfmt",
+          "source": "explicit"
+        },
+        "unobserved_count": 0
+      },
+      "scan_scope": "selected_files",
+      "schema_version": "0.14.0",
+      "shell_lint": null,
+      "swift_lint": null,
+      "syntax_candidates": {
+        "observations": [],
+        "reason": "wasm_feature_not_built",
+        "status": "not_run"
+      },
+      "syntax_tasks": {
+        "failures": [],
+        "new_blockers": 0,
+        "status": "synced_partial",
+        "tasks": []
+      },
+      "unavailable_files": [],
+      "zig_lint": null
+    },
+    "plan": {
+      "action": "fast_file_check",
+      "host_blocking_claimed": false,
+      "may_claim_delivery": false,
+      "requires_git_snapshot": false,
+      "scope_resolution_reason": null,
+      "soft_result_reuse_candidate": true,
+      "target_paths": [
+        "src/lib.rs"
+      ],
+      "task_id": null
+    },
+    "reason": null,
+    "report_type": "hook_execution_feedback",
+    "schema_version": "0.24.0",
+    "soft_result_reused": false
+  },
+  {
+    "delivery_decision": "not_evaluated",
+    "execution": "local_observation",
+    "host_blocking_verified": false,
+    "local_feedback": {
+      "candidate_recovery_count": 0,
+      "candidate_structure_count": 0,
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "go_syntax": null,
+      "kotlin_lint": null,
+      "native_unwired_files": [],
+      "next_action": "repair_native_source",
+      "node_lint": {
+        "backlog_status": "not_connected",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "files": [],
+        "new_blockers": 0,
+        "new_findings": 0,
+        "next": null,
+        "reason": "eslint_files_incomplete",
+        "status": "incomplete",
+        "unexecuted_files": []
+      },
+      "python_lint": null,
+      "report_type": "hook_fast_feedback",
+      "requested_paths": [
+        "src/lib.rs"
+      ],
+      "ruby_lint": null,
+      "rust_syntax": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "files": [
+          {
+            "current": true,
+            "native": {
+              "diagnostics": [
+                {
+                  "line": 1,
+                  "rule_id": "rust.syntax"
+                }
+              ],
+              "edition": "2021",
+              "edition_context": {
+                "edition": "2021",
+                "manifest_ref": "Cargo.toml",
+                "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+                "workspace_manifest_ref": null,
+                "workspace_manifest_sha256": null
+              },
+              "observation_kind": "formatter_parser",
+              "reason": "rustfmt_native_parse_diagnostics",
+              "status": "diagnostics_observed",
+              "tool_sha256": "94b594e910f080392125d439bab44403d701875907a5469d8886eb475d3569b1",
+              "version": "rustfmt 1.9.0-stable"
+            },
+            "path": "src/lib.rs",
+            "recheck_argv": null,
+            "source_sha256": "c4f7e70d40f8cc9a2a7d960468502b18e912b8b3d34776ac35a8d3ae64114c97",
+            "task_id": "CG-B-ae3ba7570e4003d5da08a1b44691f0e7",
+            "task_sync_reason": null,
+            "tool_path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-rust-hook-52382-3/rustfmt"
+          }
+        ],
+        "local_parse_complete": true,
+        "native_lint_obligation": "cargo_clippy_pending",
+        "report_type": "rust_syntax_scan",
+        "schema_version": "0.2.0",
+        "scope": "single_frozen_rust_files",
+        "source_file_count": 1,
+        "task_status": "synced_partial",
+        "tool_selection": {
+          "executable": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-rust-hook-52382-3/rustfmt",
+          "source": "explicit"
+        },
+        "unobserved_count": 0
+      },
+      "scan_scope": "selected_files",
+      "schema_version": "0.14.0",
+      "shell_lint": null,
+      "swift_lint": null,
+      "syntax_candidates": {
+        "observations": [],
+        "reason": "wasm_feature_not_built",
+        "status": "not_run"
+      },
+      "syntax_tasks": {
+        "failures": [],
+        "new_blockers": 0,
+        "status": "synced_partial",
+        "tasks": []
+      },
+      "unavailable_files": [],
+      "zig_lint": null
+    },
+    "plan": {
+      "action": "fast_file_check",
+      "host_blocking_claimed": false,
+      "may_claim_delivery": false,
+      "requires_git_snapshot": false,
+      "scope_resolution_reason": null,
+      "soft_result_reuse_candidate": true,
+      "target_paths": [
+        "src/lib.rs"
+      ],
+      "task_id": null
+    },
+    "reason": null,
+    "report_type": "hook_execution_feedback",
+    "schema_version": "0.24.0",
+    "soft_result_reused": false
+  },
+  {
+    "delivery_decision": "not_evaluated",
+    "execution": "local_observation",
+    "host_blocking_verified": false,
+    "local_feedback": {
+      "candidate_recovery_count": 0,
+      "candidate_structure_count": 0,
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "go_syntax": null,
+      "kotlin_lint": null,
+      "native_unwired_files": [],
+      "next_action": "repair_native_source",
+      "node_lint": {
+        "backlog_status": "not_connected",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "files": [],
+        "new_blockers": 0,
+        "new_findings": 0,
+        "next": null,
+        "reason": "eslint_files_incomplete",
+        "status": "incomplete",
+        "unexecuted_files": []
+      },
+      "python_lint": null,
+      "report_type": "hook_fast_feedback",
+      "requested_paths": [
+        "src/lib.rs"
+      ],
+      "ruby_lint": null,
+      "rust_syntax": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "files": [
+          {
+            "current": true,
+            "native": {
+              "diagnostics": [
+                {
+                  "line": 1,
+                  "rule_id": "rust.syntax"
+                }
+              ],
+              "edition": "2021",
+              "edition_context": {
+                "edition": "2021",
+                "manifest_ref": "Cargo.toml",
+                "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+                "workspace_manifest_ref": null,
+                "workspace_manifest_sha256": null
+              },
+              "observation_kind": "formatter_parser",
+              "reason": "rustfmt_native_parse_diagnostics",
+              "status": "diagnostics_observed",
+              "tool_sha256": "fbb621c1230bff80666dc3dd6ecda5bbdd8f325639a3fabf9285c681ee8105db",
+              "version": "rustfmt 1.9.0-stable"
+            },
+            "path": "src/lib.rs",
+            "recheck_argv": null,
+            "source_sha256": "c4f7e70d40f8cc9a2a7d960468502b18e912b8b3d34776ac35a8d3ae64114c97",
+            "task_id": "CG-B-0e6d8c91959935de235e75cbbb04e12c",
+            "task_sync_reason": null,
+            "tool_path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-rust-hook-52382-2/rustfmt"
+          }
+        ],
+        "local_parse_complete": true,
+        "native_lint_obligation": "cargo_clippy_pending",
+        "report_type": "rust_syntax_scan",
+        "schema_version": "0.2.0",
+        "scope": "single_frozen_rust_files",
+        "source_file_count": 1,
+        "task_status": "synced_partial",
+        "tool_selection": {
+          "executable": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-rust-hook-52382-2/rustfmt",
+          "source": "explicit"
+        },
+        "unobserved_count": 0
+      },
+      "scan_scope": "selected_files",
+      "schema_version": "0.14.0",
+      "shell_lint": null,
+      "swift_lint": null,
+      "syntax_candidates": {
+        "observations": [],
+        "reason": "wasm_feature_not_built",
+        "status": "not_run"
+      },
+      "syntax_tasks": {
+        "failures": [],
+        "new_blockers": 0,
+        "status": "synced_partial",
+        "tasks": []
+      },
+      "unavailable_files": [],
+      "zig_lint": null
+    },
+    "plan": {
+      "action": "fast_file_check",
+      "host_blocking_claimed": false,
+      "may_claim_delivery": false,
+      "requires_git_snapshot": false,
+      "scope_resolution_reason": null,
+      "soft_result_reuse_candidate": true,
+      "target_paths": [
+        "src/lib.rs"
+      ],
+      "task_id": null
+    },
+    "reason": null,
+    "report_type": "hook_execution_feedback",
+    "schema_version": "0.24.0",
+    "soft_result_reused": false
+  },
+  {
+    "delivery_decision": "not_evaluated",
+    "execution": "local_observation",
+    "host_blocking_verified": false,
+    "local_feedback": {
+      "candidate_recovery_count": 0,
+      "candidate_structure_count": 0,
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "go_syntax": null,
+      "kotlin_lint": null,
+      "native_unwired_files": [],
+      "next_action": "repair_native_source",
+      "node_lint": {
+        "backlog_status": "not_connected",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "files": [],
+        "new_blockers": 0,
+        "new_findings": 0,
+        "next": null,
+        "reason": "eslint_files_incomplete",
+        "status": "incomplete",
+        "unexecuted_files": []
+      },
+      "python_lint": null,
+      "report_type": "hook_fast_feedback",
+      "requested_paths": [
+        "src/lib.rs"
+      ],
+      "ruby_lint": null,
+      "rust_syntax": {
+        "authority": "local_unverified",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "files": [
+          {
+            "current": true,
+            "native": {
+              "diagnostics": [
+                {
+                  "line": 1,
+                  "rule_id": "rust.syntax"
+                }
+              ],
+              "edition": "2021",
+              "edition_context": {
+                "edition": "2021",
+                "manifest_ref": "Cargo.toml",
+                "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+                "workspace_manifest_ref": null,
+                "workspace_manifest_sha256": null
+              },
+              "observation_kind": "formatter_parser",
+              "reason": "rustfmt_native_parse_diagnostics",
+              "status": "diagnostics_observed",
+              "tool_sha256": "fbb621c1230bff80666dc3dd6ecda5bbdd8f325639a3fabf9285c681ee8105db",
+              "version": "rustfmt 1.9.0-stable"
+            },
+            "path": "src/lib.rs",
+            "recheck_argv": null,
+            "source_sha256": "c4f7e70d40f8cc9a2a7d960468502b18e912b8b3d34776ac35a8d3ae64114c97",
+            "task_id": "CG-B-0e6d8c91959935de235e75cbbb04e12c",
+            "task_sync_reason": null,
+            "tool_path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-rust-hook-52382-2/rustfmt"
+          }
+        ],
+        "local_parse_complete": true,
+        "native_lint_obligation": "cargo_clippy_pending",
+        "report_type": "rust_syntax_scan",
+        "schema_version": "0.2.0",
+        "scope": "single_frozen_rust_files",
+        "source_file_count": 1,
+        "task_status": "synced_partial",
+        "tool_selection": {
+          "executable": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-rust-hook-52382-2/rustfmt",
+          "source": "explicit"
+        },
+        "unobserved_count": 0
+      },
+      "scan_scope": "selected_files",
+      "schema_version": "0.14.0",
+      "shell_lint": null,
+      "swift_lint": null,
+      "syntax_candidates": {
+        "observations": [],
+        "reason": "wasm_feature_not_built",
+        "status": "not_run"
+      },
+      "syntax_tasks": {
+        "failures": [],
+        "new_blockers": 0,
+        "status": "synced_partial",
+        "tasks": []
+      },
+      "unavailable_files": [],
+      "zig_lint": null
+    },
+    "plan": {
+      "action": "fast_file_check",
+      "host_blocking_claimed": false,
+      "may_claim_delivery": false,
+      "requires_git_snapshot": false,
+      "scope_resolution_reason": null,
+      "soft_result_reuse_candidate": true,
+      "target_paths": [
+        "src/lib.rs"
+      ],
+      "task_id": null
+    },
+    "reason": null,
+    "report_type": "hook_execution_feedback",
+    "schema_version": "0.24.0",
+    "soft_result_reused": false
+  },
+  {
+    "delivery_decision": "not_evaluated",
+    "execution": "task_verification",
+    "host_blocking_verified": false,
+    "local_feedback": {
+      "authority": "local_unverified",
+      "checker_id": "syntax.native_confirmation",
+      "delivery_decision": "not_evaluated",
+      "event_persisted": true,
+      "native_column_unit": "unavailable",
+      "native_confirmation_reason": "rustfmt_native_parse_no_diagnostics",
+      "native_confirmation_ref": {
+        "report_ref": ".codeguard/reports/syntax-native-52611-1791236014225954000.json",
+        "report_sha256": "38ad992c67c9775add50aa075a21525f9e1ad13f377afc8c4c8bcd0fc44baa41",
+        "run_id": "syntax-native-52611-1791236014225954000"
+      },
+      "native_confirmation_status": "completed",
+      "native_diagnostic_positions": [],
+      "observation": "candidate_absent_unverified_policy",
+      "reason": null,
+      "report_type": "hook_task_verification_summary",
+      "scan_report_available": true,
+      "schema_version": "0.7.0",
+      "task_id": "CG-B-ae3ba7570e4003d5da08a1b44691f0e7"
+    },
+    "plan": {
+      "action": "verify_task",
+      "host_blocking_claimed": false,
+      "may_claim_delivery": false,
+      "requires_git_snapshot": false,
+      "scope_resolution_reason": null,
+      "soft_result_reuse_candidate": false,
+      "target_paths": [],
+      "task_id": "CG-B-ae3ba7570e4003d5da08a1b44691f0e7"
+    },
+    "reason": null,
+    "report_type": "hook_execution_feedback",
+    "schema_version": "0.25.0",
+    "soft_result_reused": false
+  },
+  {
+    "authority": "local_unverified",
+    "command_status": "complete",
+    "delivery_decision": "not_evaluated",
+    "disposition": "actionable",
+    "exit_code": 0,
+    "next_actions": [],
+    "operation": "next",
+    "reason": "local_task_selected",
+    "repair_brief": {
+      "action_id": "repair-source",
+      "affected_paths": [
+        "src/lib.rs"
+      ],
+      "authority": "local_unverified",
+      "build_root": ".",
+      "checker_id": "syntax.native_confirmation",
+      "closure_condition": "\u539f\u751f\u5de5\u5177\u6309\u76f8\u540c\u53d7\u63a7\u7b56\u7565\u5b8c\u6574\u590d\u68c0\u5e76\u786e\u8ba4\u95ee\u9898\u5df2\u89e3\u51b3\uff1b\u5c40\u90e8\u67e5\u8be2\u4e0d\u80fd\u5173\u95ed\u4efb\u52a1",
+      "constraints": [
+        "\u5148\u6062\u590d\u68c0\u67e5\u5b8c\u6574\u6027",
+        "\u4e0d\u5f97\u5173\u95ed\u68c0\u67e5\u5668\u6216\u4fee\u6539\u65e0\u5173\u6e90\u7801"
+      ],
+      "disposition": "actionable",
+      "evidence_ref": {
+        "first_report_sha256": "b483963344c5e44c0d572e60746ea931b35114e87bc49aca4690c8c0b470ea13",
+        "first_run_id": "syntax-confirm-52595-1791236014415244000"
+      },
+      "history": {
+        "attempt_count": 0,
+        "awaiting_verification": false,
+        "budget": 2,
+        "no_progress_count": 0,
+        "open_attempt_id": null,
+        "recent": []
+      },
+      "kind": "blocker",
+      "native_column_unit": "unavailable",
+      "native_confirmation_reason": "rustfmt_native_parse_diagnostics",
+      "native_confirmation_ref": {
+        "report_ref": ".codeguard/reports/syntax-confirm-52624-1791236014523379000.json",
+        "report_sha256": "14fba3ab429169b9c01dd6d307e592cda1fb8cd73c0041b111ffa73fd57f8018",
+        "run_id": "syntax-confirm-52624-1791236014523379000"
+      },
+      "native_confirmation_status": "diagnostics_observed",
+      "native_diagnostic_positions": [
+        {
+          "line": 1,
+          "rule_id": "rust.syntax"
+        }
+      ],
+      "reason_code": "native_syntax_confirmation_needed",
+      "recheck_argv": [
+        "codeguard",
+        "task",
+        "verify",
+        "CG-B-0e6d8c91959935de235e75cbbb04e12c",
+        ".",
+        "--format",
+        "json",
+        "--rustfmt-tool",
+        "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-rust-hook-52382-2/rustfmt"
+      ],
+      "schema_version": "0.19.0",
+      "scope": "src/lib.rs",
+      "step": "\u5f53\u524d\u9009\u4e2d\u6587\u4ef6\u5df2\u6709edition\u9002\u7528\u7684Rustfmt\u89e3\u6790\u8bca\u65ad\uff1b\u6838\u5bf9\u539f\u751f\u884c\u53f7\u53ca\u5b9e\u9645\u6a21\u5757/\u5b8f\u4e0a\u4e0b\u6587\u540e\u4fee\u590d\uff0c\u4ee5\u540c\u4e00 --rustfmt-tool \u590d\u68c0\u3002\u683c\u5f0f\u5dee\u5f02\u4e0d\u7b97\u8bed\u6cd5\u9519\u8bef\uff1bCargo Clippy\u3001\u7c7b\u578b\u548c\u6784\u5efa\u4ecd\u5f85\u5b8c\u6210",
+      "task_id": "CG-B-0e6d8c91959935de235e75cbbb04e12c"
+    },
+    "report_type": "repair_brief_preview",
+    "schema_version": "0.19.0"
+  },
+  {
+    "authority": "local_unverified",
+    "command_status": "incomplete",
+    "delivery_decision": "not_evaluated",
+    "event_persisted": true,
+    "execution_budget": {
+      "enforcement": "native_execution_only",
+      "source": "builtin_default",
+      "timeout_ms": 1800000
+    },
+    "exit_code": 3,
+    "kind": "blocker",
+    "native_scan": {
+      "authority": "local_unverified",
+      "checker_id": "syntax.native_confirmation",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "input_stable": true,
+      "native": {
+        "diagnostics": [],
+        "edition": "2021",
+        "edition_context": {
+          "edition": "2021",
+          "manifest_ref": "Cargo.toml",
+          "manifest_sha256": "918f4235220587c824be3e64352af40c838fc86e059a6d6eb36338c01a3c5146",
+          "workspace_manifest_ref": null,
+          "workspace_manifest_sha256": null
+        },
+        "observation_kind": "formatter_parser",
+        "reason": "rustfmt_native_parse_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "94b594e910f080392125d439bab44403d701875907a5469d8886eb475d3569b1",
+        "version": "rustfmt 1.9.0-stable"
+      },
+      "operation": "task_verify",
+      "original_report": {
+        "grammar_sha256": null,
+        "run_id": "syntax-confirm-52594-1791236014031162000",
+        "sha256": "72472c59955fba28a42e1bc372ba2c07155440e7f6de82a308e17d69644607b4",
+        "source_sha256": "c4f7e70d40f8cc9a2a7d960468502b18e912b8b3d34776ac35a8d3ae64114c97"
+      },
+      "report_type": "syntax_task_recheck",
+      "run_id": "syntax-native-52605-1791236014134489000",
+      "schema_version": "0.11.0",
+      "target": {
+        "language": "rust",
+        "path": "src/lib.rs",
+        "source_sha256": "16c2fca9e371936458d01576b4ca311c22d166a45539ccbc9104823d0b10db47"
+      },
+      "task_id": "CG-B-ae3ba7570e4003d5da08a1b44691f0e7",
+      "tool_path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-rust-hook-52382-3/rustfmt",
+      "workspace_binding": "bound",
+      "workspace_id": "ws-56030beefec4b04df12770e86345a944"
+    },
+    "next_actions": [
+      "inspect_native_syntax_observation",
+      "repair_only_current_native_diagnostics",
+      "verify_policy_and_capability_before_closure"
+    ],
+    "observation": "candidate_absent_unverified_policy",
+    "operation": "task_verify",
+    "reason": null,
+    "report_type": "task_verification_preview",
+    "schema_version": "0.25.0",
+    "task_id": "CG-B-ae3ba7570e4003d5da08a1b44691f0e7"
+  }
+]

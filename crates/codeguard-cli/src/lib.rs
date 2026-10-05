@@ -229,6 +229,14 @@ pub mod rust_project_edition;
 #[cfg(unix)]
 pub mod rust_project_syntax;
 #[cfg(unix)]
+mod rustfmt_tool_selection;
+#[cfg(unix)]
+mod rust_syntax_evidence;
+#[cfg(unix)]
+mod check_rust_syntax_scan;
+#[cfg(unix)]
+mod rust_syntax_task_recheck;
+#[cfg(unix)]
 pub mod rust_lint_scan;
 #[cfg(unix)]
 mod rust_native_syntax_coverage;
