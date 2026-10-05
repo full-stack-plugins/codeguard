@@ -621,6 +621,26 @@ fn scoped_confirmation_records_missing_tool_for_both_original_report_families() 
             .unwrap();
         let id = fact["id"].as_str().unwrap();
         fs::write(project.0.join("broken.py"), "def run():\n    pass\n").unwrap();
+        let first =
+            codeguard_cli::validate_python_task_original_source(&project.0, id, b"def run():\n")
+                .unwrap();
+        assert_eq!(first["run_id"], fact["first_run_id"]);
+        assert!(
+            codeguard_cli::validate_python_task_original_source(
+                &project.0,
+                id,
+                b"def run():\n    pass\n"
+            )
+            .is_err()
+        );
+        assert!(
+            codeguard_cli::validate_python_task_original_source(
+                &project.0,
+                id,
+                b"def run():\n\xff"
+            )
+            .is_err()
+        );
         let missing = project.0.join("missing-ruff");
         let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
             .args([
@@ -659,6 +679,21 @@ fn scoped_confirmation_records_missing_tool_for_both_original_report_families() 
                 } else {
                     "python-syntax-"
                 })
+        );
+        let receipt = project
+            .0
+            .join(".codeguard/state/consumed")
+            .join(format!("{}.json", fact["first_run_id"].as_str().unwrap()));
+        let receipt_bytes = fs::read(&receipt).unwrap();
+        fs::remove_file(&receipt).unwrap();
+        assert!(
+            codeguard_cli::validate_python_task_original_source(&project.0, id, b"def run():\n")
+                .is_err()
+        );
+        fs::write(&receipt, &receipt_bytes).unwrap();
+        assert!(
+            codeguard_cli::validate_python_task_original_source(&project.0, id, b"def run():\n")
+                .is_ok()
         );
     }
 }

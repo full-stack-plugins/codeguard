@@ -102,6 +102,25 @@ pub(crate) fn valid_report(root: &Path, workspace: &str, report: &Value) -> bool
         return crate::native_syntax_confirmation::valid_history_report(root, workspace, report)
             && crate::syntax_task_recheck::inputs_current(root, &report["native_evidence"]);
     }
+    let Some(path) = report["scope"].as_str().filter(|p| safe_path(p)) else {
+        return false;
+    };
+    let source = root.join(path);
+    if source.canonicalize().ok().as_deref() != Some(source.as_path()) {
+        return false;
+    }
+    let Ok(bytes) = read_bounded_regular_file(&source, 1024 * 1024) else {
+        return false;
+    };
+    valid_source_snapshot(workspace, report, &bytes)
+}
+
+/// 对指定冻结字节核对候选报告身份、固定资产和位置，不读取修复后的当前文件。
+/// 参数为工作区、历史报告和原始源码；返回内部一致性，调用者仍须核对首次收据和批准来源。
+pub(crate) fn valid_source_snapshot(workspace: &str, report: &Value, bytes: &[u8]) -> bool {
+    if bytes.len() > 1024 * 1024 || std::str::from_utf8(bytes).is_err() {
+        return false;
+    }
     let keys = [
         "schema_version",
         "report_type",
@@ -164,21 +183,14 @@ pub(crate) fn valid_report(root: &Path, workspace: &str, report: &Value) -> bool
     {
         return false;
     }
-    let source = root.join(path);
-    if source.canonicalize().ok().as_deref() != Some(source.as_path()) {
-        return false;
-    }
-    let Ok(bytes) = read_bounded_regular_file(&source, 1024 * 1024) else {
-        return false;
-    };
-    let sha = format!("{:x}", Sha256::digest(&bytes));
+    let sha = format!("{:x}", Sha256::digest(bytes));
     let Some(grammar) = bundled_grammar_candidates()
         .ok()
         .and_then(|m| m.assets.into_iter().find(|a| a.language == language))
     else {
         return false;
     };
-    let routes = crate::grammar_route::route_source(path, &bytes);
+    let routes = crate::grammar_route::route_source(path, bytes);
     let Some(rows) = report["observations"]
         .as_array()
         .filter(|r| !r.is_empty() && r.len() <= 64)
@@ -244,7 +256,7 @@ pub(crate) fn valid_report(root: &Path, workspace: &str, report: &Value) -> bool
                     serde_json::from_value::<crate::syntax_worker_structure::SyntaxWorkerStructure>(
                         value.clone(),
                     )
-                    .is_ok_and(|value| value.valid("python", &bytes))
+                    .is_ok_and(|value| value.valid("python", bytes))
                 })
             {
                 return false;
@@ -297,8 +309,8 @@ pub(crate) fn valid_report(root: &Path, workspace: &str, report: &Value) -> bool
             {
                 return false;
             }
-            let (sr, sc) = point(&bytes, start as usize);
-            let (er, ec) = point(&bytes, end as usize);
+            let (sr, sc) = point(bytes, start as usize);
+            let (er, ec) = point(bytes, end as usize);
             r["start_row"] == sr
                 && r["start_column_byte"] == sc
                 && r["end_row"] == er
@@ -360,4 +372,85 @@ pub(crate) fn identity(
         "native_syntax_confirmation_needed",
         format!("{:x}", hash.finalize()),
     )
+}
+
+#[cfg(test)]
+mod snapshot_tests {
+    use serde_json::{Value, json};
+    use sha2::{Digest, Sha256};
+
+    fn report(source: &[u8], structural: bool) -> Value {
+        let workspace = "generic-python-snapshot";
+        let scope = "sample.py";
+        let (checker, reason, fingerprint) = super::identity(workspace, scope, "python");
+        let (grammar, _) = codeguard_adapters::bundled_grammar_candidate("python").unwrap();
+        let mut row = json!({"path":scope,"language":"python","scope":"whole_file","byte_offset":0,
+            "status":"candidate_observed","reason":null,"grammar_qualified":false,
+            "source_sha256":format!("{:x}", Sha256::digest(source)),"grammar_sha256":grammar.sha256,
+            "recovery_count":1,"recoveries":[{"kind":"ERROR","syntax_kind":"ERROR",
+                "start_byte":0,"end_byte":3,"start_row":0,"start_column_byte":0,"end_row":0,"end_column_byte":3}],
+            "known_limitations":grammar.known_limitations});
+        if structural {
+            row["recovery_count"] = json!(0);
+            row["recoveries"] = json!([]);
+            row["structural_observation_count"] = json!(1);
+            row["structural_observations"] = json!([{"basis":"codeguard_structure_rule",
+                "rule_id":"codeguard.python.required_suite","rule_version":"1.0.0",
+                "rule_sha256":codeguard_adapters::python_suite_rule_sha256(),
+                "parent_syntax_kind":"function_definition","start_byte":14,"end_byte":14,
+                "start_row":1,"start_column_byte":0,"end_row":1,"end_column_byte":0}]);
+        }
+        json!({"schema_version":if structural {"0.7.0"} else {"0.1.0"},
+            "report_type":"syntax_confirmation_observation","workspace_binding":"bound",
+            "workspace_id":workspace,"run_id":"syntax-confirm-1-1","authority":"local_unverified",
+            "coverage_proven":false,"delivery_decision":"not_evaluated","execution":"incomplete",
+            "checker_id":checker,"reason_code":reason,"blocker_id":format!("CG-B-{}", &fingerprint[..32]),
+            "fingerprint":fingerprint,"build_root":".","scope":scope,"language":"python",
+            "affected_paths":[scope],"observations":[row]})
+    }
+    #[test]
+    fn original_generic_snapshot_is_not_replaced_by_repaired_source() {
+        let source = b"def broken():\n";
+        for structural in [false, true] {
+            let mut value = report(source, structural);
+            assert!(super::valid_source_snapshot(
+                "generic-python-snapshot",
+                &value,
+                source
+            ));
+            assert!(!super::valid_source_snapshot(
+                "generic-python-snapshot",
+                &value,
+                b"def broken():\n    pass\n"
+            ));
+            assert!(!super::valid_source_snapshot(
+                "other-workspace",
+                &value,
+                source
+            ));
+            value["observations"][0]["grammar_sha256"] = json!("a".repeat(64));
+            assert!(!super::valid_source_snapshot(
+                "generic-python-snapshot",
+                &value,
+                source
+            ));
+        }
+    }
+    #[test]
+    fn generic_snapshot_rejects_undecodable_source_and_forged_coordinates() {
+        let bad = b"value = \xff\n";
+        assert!(!super::valid_source_snapshot(
+            "generic-python-snapshot",
+            &report(bad, false),
+            bad
+        ));
+        let source = b"def broken():\n";
+        let mut value = report(source, false);
+        value["observations"][0]["recoveries"][0]["end_column_byte"] = json!(999);
+        assert!(!super::valid_source_snapshot(
+            "generic-python-snapshot",
+            &value,
+            source
+        ));
+    }
 }

@@ -182,6 +182,8 @@ mod python_selected_discovery;
 #[cfg(unix)]
 mod python_syntax_confirmation;
 mod python_confirmation_recheck;
+#[cfg(unix)]
+pub use python_confirmation_recheck::validate_python_task_original_source;
 #[cfg(all(unix, feature = "wasm-precheck"))]
 mod python_syntax_precheck;
 pub mod quality_policy_candidate;

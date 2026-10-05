@@ -1457,3 +1457,6 @@ check python/all现通过0.48反馈保留独立结构计数和原始坐标，原
 
 
 9.10 / 14.11 Ruff语法确认纠偏：匹配的原生invalid-syntax不再被小写规则审计拒绝；末尾空行原生错误保留坐标并生成稳定身份。新版0.19/0.21区分源码错误still_present与工具阻塞，为智能体提供限定文件修复指引，旧0.18历史保持原语义。可信关闭与跨语言全链路仍未完成，父任务不勾选。见[局部验收](../../../tests/acceptance/python-native-syntax-audit.md)。
+
+
+14.11 Python关闭前置继续收敛：隔离原生探针新增明确目标版本入口，非法目标在工具解析前拒绝；固定py312仅留在既有开发差分入口。宿主只读API `validate_python_task_original_source` 核对专用/通用首次报告、消费收据和冻结源码，共用封闭形状及原始/结构坐标校验，修复后的当前字节不能替代原样本。实际Ruff match在py39/py310的不同诊断已验证。签名策略/项目生效目标绑定、可信关闭/复发仍缺，14.11保持未完成。见[前置验收](../../../tests/acceptance/python-resolution-prerequisites.md)。

@@ -96,6 +96,53 @@ pub(crate) fn original_reference(root: &Path, brief: &Value) -> Result<Value, &'
     )
 }
 
+/// 核对指定Python任务的首次报告、消费收据与宿主保留的原始源码。
+/// 参数为初始化工作区、稳定任务ID及原始字节；返回首次引用，不执行原生工具、不批准关闭。
+/// 宿主须另外固定目标版本、工具和签名策略，不能把本地收据当作可信批准。
+#[cfg(unix)]
+pub fn validate_python_task_original_source(
+    root: &Path,
+    task_id: &str,
+    source: &[u8],
+) -> Result<Value, &'static str> {
+    if source.len() > 1024 * 1024 || std::str::from_utf8(source).is_err() {
+        return Err("python_confirmation_original_source_invalid");
+    }
+    let root = root.canonicalize().map_err(|_| "workspace_unreadable")?;
+    let brief = crate::next_command::read_task_brief(&root, task_id)?;
+    let reference = original_reference(&root, &brief)?;
+    let run = reference["run_id"]
+        .as_str()
+        .ok_or("python_confirmation_original_invalid")?;
+    let bytes = read_bounded_regular_file(
+        &root.join(".codeguard/reports").join(format!("{run}.json")),
+        1024 * 1024,
+    )
+    .map_err(|_| "python_confirmation_original_unavailable")?;
+    if reference["report_sha256"] != digest(&bytes) || reference["source_sha256"] != digest(source)
+    {
+        return Err("python_confirmation_original_changed");
+    }
+    let report = codeguard_adapters::parse_unique_json(&bytes)
+        .map_err(|_| "python_confirmation_original_invalid")?;
+    let workspace = report["workspace_id"]
+        .as_str()
+        .ok_or("python_confirmation_original_invalid")?;
+    let valid = if report["report_type"] == "python_syntax_confirmation_observation" {
+        crate::python_syntax_confirmation::valid_source_snapshot(workspace, &report, source)
+    } else {
+        crate::syntax_confirmation::valid_source_snapshot(workspace, &report, source)
+    };
+    if !valid {
+        return Err("python_confirmation_original_source_invalid");
+    }
+    // 校验过程后再次核对引用与消费收据，避免读到期间改变的本地历史。
+    if original_reference(&root, &brief)? != reference {
+        return Err("python_confirmation_original_changed");
+    }
+    Ok(reference)
+}
+
 /// 校验单文件任务报告的范围和首次引用；返回值不证明原生或批准权威。
 pub(crate) fn valid_binding(root: &Path, report: &Value) -> bool {
     let binding = &report["task_binding"];

@@ -10,7 +10,27 @@ use std::{
 /// 返回固定 Ruff 0.16.8 / Python 3.12 的局部语法观察。
 /// 参数为绝对工具路径、源码字节和总截止时间；没有项目、规则或交付授权。
 pub(crate) fn observe(tool: &Path, source: &[u8], deadline: Instant) -> Value {
-    let mut report = json!({"status":"incomplete","reason":"python_syntax_tool_unavailable","version":null,"tool_sha256":null,"target_version":"py312","diagnostics":[]});
+    observe_for_target(tool, source, "py312", deadline)
+}
+
+/// 对冻结源码按明确目标Python版本执行隔离语法检查。
+/// 参数为绝对工具路径、源码、宿主已核对目标及截止时间；返回局部观察，不推断项目目标或批准关闭。
+pub(crate) fn observe_for_target(
+    tool: &Path,
+    source: &[u8],
+    target: &str,
+    deadline: Instant,
+) -> Value {
+    let mut report = json!({"status":"incomplete","reason":"python_syntax_target_unverified","version":null,"tool_sha256":null,"target_version":null,"diagnostics":[]});
+    // 目标作为独立argv使用，版本集合固定于已验收Ruff，不接受自由参数或默认为项目版本。
+    if !matches!(
+        target,
+        "py37" | "py38" | "py39" | "py310" | "py311" | "py312" | "py313" | "py314" | "py315"
+    ) {
+        return report;
+    }
+    report["target_version"] = json!(target);
+    report["reason"] = json!("python_syntax_tool_unavailable");
     if !tool.is_absolute() || source.len() > 1024 * 1024 || std::str::from_utf8(source).is_err() {
         return report;
     }
@@ -66,7 +86,7 @@ pub(crate) fn observe(tool: &Path, source: &[u8], deadline: Instant) -> Value {
             "--select",
             "E9",
             "--target-version",
-            "py312",
+            target,
             "--output-format",
             "json",
             "--stdin-filename",
@@ -134,6 +154,30 @@ fn parse_syntax(code: i32, stdout: &[u8], source: &[u8]) -> Option<Vec<Value>> {
 mod tests {
     use super::parse_syntax;
     use serde_json::json;
+    #[test]
+    fn invalid_target_is_rejected_before_tool_resolution() {
+        let tool = std::path::Path::new("/does-not-exist/ruff");
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(2);
+        for target in ["", "py316", "3.12", "py312\n", "--fix"] {
+            let report = super::observe_for_target(tool, b"x = 1\n", target, deadline);
+            assert_eq!(report["reason"], "python_syntax_target_unverified");
+            assert_eq!(report["status"], "incomplete");
+            assert!(report["tool_sha256"].is_null());
+            assert!(report["target_version"].is_null());
+        }
+    }
+    #[test]
+    #[ignore = "requires installed Ruff0.16.8 via CODEGUARD_RUFF_SYNTAX_BIN"]
+    fn actual_target_version_changes_native_syntax_classification() {
+        let tool = std::path::PathBuf::from(std::env::var("CODEGUARD_RUFF_SYNTAX_BIN").unwrap());
+        let source = b"match value:\n    case 1:\n        pass\n";
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(20);
+        for (target, expected) in [("py39", "diagnostics_observed"), ("py310", "completed")] {
+            let report = super::observe_for_target(&tool, source, target, deadline);
+            assert_eq!(report["target_version"], target);
+            assert_eq!(report["status"], expected, "{report}");
+        }
+    }
     #[test]
     #[ignore = "requires installed Ruff0.16.8 via CODEGUARD_RUFF_SYNTAX_BIN"]
     fn actual_ruff_stable_tool_preserves_valid_and_invalid_syntax_results() {

@@ -537,3 +537,27 @@ Ruff正常与忽略noqa的检查若返回相同的invalid-syntax错误，Codegua
 #### Scenario: Historical confirmation retains its recorded semantics
 - **WHEN** 读取0.18首次范围复检及其已记录事件
 - **THEN** 保留原环境恢复分类；0.19新报告使用独立版本表达语法确认结果，不重写历史事件
+
+### Requirement: Python原生确认的显式语言目标
+
+用于后续可信复检的Python隔离语法探针 MUST 接收已经独立核对的明确目标版本，目标集合绑定原生工具支持范围。未知、空白、带控制字符或参数形式的目标 MUST 在工具解析和原生执行前拒绝，不能默认推断项目为py312。开发差分现有固定py312入口 MUST 保留原行为及历史证据。观察 MUST 保留实际传入的目标；目标参数本身不证明项目配置来源、策略批准或任务可关闭。
+
+#### Scenario: Target version changes syntax validity
+- **WHEN** 原生Ruff对同一match源码分别按py39和py310检查
+- **THEN** py39保留原生语法诊断，py310可形成局部完整零诊断；两份观察明确标注不同目标，不据此自动关闭或授予项目门禁
+
+#### Scenario: Invalid target is supplied
+- **WHEN** 请求目标为空、超出工具支持集合或包含命令参数/控制字符
+- **THEN** 返回python_syntax_target_unverified和incomplete，未解析工具、未执行版本命令，也未宣称一个默认项目目标
+
+### Requirement: Python两类首次证据的冻结源码入口
+
+受保护宿主准备Python关闭请求时 MUST 能独立核对专用0.1/0.2与通用0.1/0.7首次报告、已消费收据和提供的冻结源码。通用报告 MUST 复用当前导入的同一封闭形状、grammar/规则身份和原字节位置校验，不读取修复后的文件作为原样本；解码与大小预算不得因非结构观察绕过。接口 MUST 为只读，不执行工具或申请租约，不将一致性返回转换为批准。历史引用或收据变化、错误源码与坐标 MUST 拒绝。
+
+#### Scenario: Repaired source differs from a consumed first report
+- **WHEN** Python任务当前文件已修复，宿主分别提供首次字节和当前字节
+- **THEN** 两类首次来源只接受已绑定的首次字节，当前字节不能覆盖首次证据；语法及结构位置继续核对原字节，任务不关闭
+
+#### Scenario: Unverified local history is not approval
+- **WHEN** 只读入口成功返回首次运行和摘要引用
+- **THEN** 不写历史、不执行原生工具、不生成批准或解决事件；目标版本、签名策略及双输入原生复检仍为独立关闭前置
