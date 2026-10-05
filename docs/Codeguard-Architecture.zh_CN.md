@@ -1139,4 +1139,23 @@ Rust编辑反馈现保留安全行号、稳定任务与原Rustfmt复检指引，
 
 Rust编辑后现提供可执行的批次后Clippy指令，明确编辑阶段未运行项目lint。原任务repair_ready保留当前规则/行号并撤回输入变化后的指引；这不是后台队列或可信关闭。见[项目lint后续流程](Rust-Project-Lint-Followup.zh_CN.md)。
 
-Rust 原生首次语法任务现有受保护宿主 SDK 关闭与同工具复发重开路径；固定 Cargo edition 来源与原反例，未完成或输入变化不能关闭。生产宿主批准接线和 WASM 首次任务仍待完成，不能替代 Clippy/项目门禁。详见 [限定验收](../tests/acceptance/rust-task-resolution.md)。
+Rust 原生首次与 WASM 首次语法任务均可通过同一受保护宿主 SDK 确认、限定关闭和同工具复发重开。原生首次保留 grammar=null（策略1.7/证据0.8）；WASM 首次保留真实 grammar 摘要（策略1.8/证据0.9）。两者绑定 Cargo edition 来源与原反例；原生反证转调查，未完成或输入变化不能关闭。生产宿主批准接线仍待完成，不替代 Clippy/项目门禁。详见 [限定验收](../tests/acceptance/rust-task-resolution.md)。
+
+WASM 首次闭环的实际执行路径、协议与误报分流见 [验收记录](../tests/acceptance/rust-wasm-task-resolution.md)。
+
+
+```mermaid
+flowchart LR
+    A[首次语法任务] --> B{首次来源}
+    B -->|原生| C["核对首次工具及 edition 来源<br/>策略1.7 / 证据0.8 / grammar=null"]
+    B -->|WASM| D["绑定首次 grammar 与批准 edition<br/>策略1.8 / 证据0.9"]
+    C --> E[同一工具及预算复检原反例和当前源码]
+    D --> E
+    E -->|原反例有诊断且当前已修复| F[限定任务关闭]
+    E -->|原反例无诊断| G[误报调查]
+    E -->|未完成或输入变化| H[继续核验]
+    F --> I[普通原工具复检检出复发]
+    I --> J[重开同一父链任务]
+```
+
+该图对应当前源码的宿主批准路径；批准上下文来自宿主SDK调用方，尚未实现生产宿主自动接线，不能从项目本地历史推断全项目通过。

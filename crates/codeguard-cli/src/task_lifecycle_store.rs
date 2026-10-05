@@ -88,6 +88,7 @@ pub(crate) fn load(
                             | "0.6.0"
                             | "0.7.0"
                             | "0.8.0"
+                            | "0.9.0"
                     )
                 ) || value["report_type"] != "task_resolution_evidence"
                     || value["identity"] != identity_value
@@ -208,8 +209,14 @@ fn origin_matches_evidence(original: &serde_json::Value, evidence: &serde_json::
             | (Some("swift"), Some("0.3.0"))
             | (Some("kotlin"), Some("0.4.0"))
             | (Some("go"), Some("0.7.0"))
-            | (Some("rust"), Some("0.8.0"))
+            | (Some("rust"), Some("0.8.0" | "0.9.0"))
     ) {
+        return false;
+    }
+    if evidence["schema_version"] == "0.9.0"
+        && (!matches!(original["schema_version"].as_str(), Some("0.1.0" | "0.7.0"))
+            || !original["native_evidence"].is_null())
+    {
         return false;
     }
     if evidence["schema_version"] == "0.8.0"
@@ -400,9 +407,9 @@ pub(crate) fn record_native_recurrence(
                 | (Some("0.3.0"), Some("swift"))
                 | (Some("0.4.0"), Some("kotlin"))
                 | (Some("0.7.0"), Some("go"))
-                | (Some("0.8.0"), Some("rust"))
+                | (Some("0.8.0" | "0.9.0"), Some("rust"))
         )
-        || (evidence["schema_version"] == "0.8.0"
+        || (matches!(evidence["schema_version"].as_str(), Some("0.8.0" | "0.9.0"))
             && scan["native"]["edition_context"] != evidence["edition_context"])
         || (evidence["schema_version"] == "0.7.0"
             && (scan["native"]["gofmt_sha256"] != evidence["gofmt_sha256"]
