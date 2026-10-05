@@ -192,6 +192,10 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 - **WHEN** 用户取消初检
 - **THEN** 回收工作进程并保留取消状态，不缓存或签发 clean
 
+#### Scenario: An error branch has a large number of normal siblings
+- **WHEN** 恢复扫描为定位错误检查宽语法树中的正常子节点
+- **THEN** 每次子节点检查同样消耗遍历预算；不得只统计进入错误分支的节点。超过预算保留已有观察并报告扫描未完成，不伪称完整或增加无位置依据的恢复节点；兄弟遍历避免反复按索引从头查找
+
 #### Scenario: A host cannot enforce a declared bound
 - **WHEN** 平台无法提供声明的隔离/预算能力
 - **THEN** 如实登记缺口，不将该平台标为已通过运行验收

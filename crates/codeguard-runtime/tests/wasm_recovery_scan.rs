@@ -132,6 +132,23 @@ fn diagnostic_budget_is_explicitly_incomplete() {
 }
 
 #[test]
+fn wide_error_branch_counts_normal_siblings_against_traversal_budget() {
+    let mut grammar = java_grammar();
+    let source = format!("class A {{ {} int x = ; }}", ";".repeat(200_010));
+    let tree = grammar.parse(source.as_bytes()).unwrap();
+    assert!(tree.root_node().has_error());
+    let scan = scan_wasm_recoveries(&tree, 32).unwrap();
+    assert!(
+        scan.truncated,
+        "inspecting normal siblings must consume the bounded traversal budget"
+    );
+    let smaller = grammar.parse(b"class A { ; ; int x = ; }").unwrap();
+    let complete = scan_wasm_recoveries(&smaller, 32).unwrap();
+    assert!(!complete.truncated);
+    assert!(!complete.recoveries.is_empty());
+}
+
+#[test]
 fn typescript_recoveries_are_observations_with_original_byte_ranges() {
     let mut grammar = WasmGrammar::load(
         "typescript",
