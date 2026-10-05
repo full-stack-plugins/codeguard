@@ -1,4 +1,6 @@
-use codeguard_cli::grammar_evaluation::{classify_probe, validate_corpus};
+use codeguard_cli::grammar_evaluation::{
+    classify_probe, validate_corpus, validate_corpus_against_manifest,
+};
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 
@@ -77,7 +79,7 @@ fn versioned_cohorts_are_explicit_and_cannot_claim_approved_holdout() {
 #[test]
 fn checked_in_regression_corpus_includes_all_languages_and_known_gaps() {
     let bytes = include_bytes!("../../../tests/fixtures/grammar_regression.json");
-    validate_corpus(bytes).unwrap();
+    validate_corpus_against_manifest(bytes, ARCHIVED_MANIFEST).unwrap();
     let doc: Value = serde_json::from_slice(bytes).unwrap();
     for (language, id) in [
         ("erlang", "erlang-missing_period"),
@@ -98,9 +100,10 @@ fn checked_in_regression_corpus_includes_all_languages_and_known_gaps() {
 
 #[test]
 fn expanded_corpus_preserves_each_language_and_upstream_label_provenance() {
-    let corpus = validate_corpus(include_bytes!(
-        "../../../tests/fixtures/grammar_regression_v0_2.json"
-    ))
+    let corpus = validate_corpus_against_manifest(
+        include_bytes!("../../../tests/fixtures/grammar_regression_v0_2.json"),
+        ARCHIVED_MANIFEST,
+    )
     .unwrap();
     assert_eq!(corpus.schema_version, "0.2.0");
     assert_eq!(corpus.cases.len(), 358);
@@ -266,7 +269,7 @@ fn archived_expanded_report_binds_cases_and_preserves_cohort_denominators() {
     .unwrap();
     assert_separate_cohort_counts(&report);
     let bytes = include_bytes!("../../../tests/fixtures/grammar_regression_v0_2.json");
-    let corpus = validate_corpus(bytes).unwrap();
+    let corpus = validate_corpus_against_manifest(bytes, ARCHIVED_MANIFEST).unwrap();
     assert_eq!(
         report["corpus_sha256"],
         format!("{:x}", Sha256::digest(bytes))
@@ -291,7 +294,9 @@ fn archived_expanded_report_binds_cases_and_preserves_cohort_denominators() {
 fn expired_cohort_replay_preserves_label_coverage_without_pooling() {
     let report = codeguard_cli::grammar_evaluation::replay_corpus(
         std::path::Path::new(env!("CARGO_BIN_EXE_codeguard")),
-        include_bytes!("../../../tests/fixtures/grammar_regression_v0_2.json"),
+        &current_corpus_bytes(include_bytes!(
+            "../../../tests/fixtures/grammar_regression_v0_2.json"
+        )),
         std::time::Instant::now(),
         &std::sync::atomic::AtomicBool::new(false),
     )
@@ -312,7 +317,9 @@ fn expired_cohort_replay_preserves_label_coverage_without_pooling() {
 fn replay_expanded_cohorts_and_archive_current_evidence() {
     let report = codeguard_cli::grammar_evaluation::replay_corpus(
         std::path::Path::new(env!("CARGO_BIN_EXE_codeguard")),
-        include_bytes!("../../../tests/fixtures/grammar_regression_v0_2.json"),
+        &current_corpus_bytes(include_bytes!(
+            "../../../tests/fixtures/grammar_regression_v0_2.json"
+        )),
         std::time::Instant::now() + std::time::Duration::from_secs(1200),
         &std::sync::atomic::AtomicBool::new(false),
     )
@@ -405,7 +412,9 @@ fn cancelled_and_expired_replays_retain_the_entire_corpus_as_unknown() {
     use std::path::Path;
     use std::sync::atomic::AtomicBool;
     use std::time::{Duration, Instant};
-    let bytes = include_bytes!("../../../tests/fixtures/grammar_regression.json");
+    let bytes = current_corpus_bytes(include_bytes!(
+        "../../../tests/fixtures/grammar_regression.json"
+    ));
     for (cancelled, deadline, reason) in [
         (false, Instant::now(), "request_deadline_exceeded"),
         (
@@ -416,7 +425,7 @@ fn cancelled_and_expired_replays_retain_the_entire_corpus_as_unknown() {
     ] {
         let report = replay_corpus(
             Path::new(env!("CARGO_BIN_EXE_codeguard")),
-            bytes,
+            &bytes,
             deadline,
             &AtomicBool::new(cancelled),
         )
@@ -485,7 +494,9 @@ fn replay_every_bundled_language_and_archive_current_evidence() {
     use std::time::{Duration, Instant};
     let report = replay_corpus(
         Path::new(env!("CARGO_BIN_EXE_codeguard")),
-        include_bytes!("../../../tests/fixtures/grammar_regression.json"),
+        &current_corpus_bytes(include_bytes!(
+            "../../../tests/fixtures/grammar_regression.json"
+        )),
         Instant::now() + Duration::from_secs(600),
         &AtomicBool::new(false),
     )
@@ -520,4 +531,102 @@ fn replay_every_bundled_language_and_archive_current_evidence() {
         .unwrap();
     assert_eq!(pending["label"], "pending");
     println!("GRAMMAR_EVALUATION_REPORT={report}");
+}
+
+const ARCHIVED_MANIFEST: &[u8] =
+    include_bytes!("../../../tests/fixtures/grammar_manifests/manifest_2026_10_04.json");
+
+fn current_corpus_bytes(archived: &[u8]) -> Vec<u8> {
+    validate_corpus_against_manifest(archived, ARCHIVED_MANIFEST).unwrap();
+    let mut value: Value = serde_json::from_slice(archived).unwrap();
+    let cases = value["cases"].clone();
+    value["manifest_sha256"] = json!(format!(
+        "{:x}",
+        Sha256::digest(include_bytes!("../../../grammars/manifest.json"))
+    ));
+    assert_eq!(value["cases"], cases);
+    let bytes = serde_json::to_vec(&value).unwrap();
+    validate_corpus(&bytes).unwrap();
+    bytes
+}
+
+#[test]
+fn archived_manifest_binding_does_not_authorize_current_replay_identity() {
+    let bytes = include_bytes!("../../../tests/fixtures/grammar_regression_v0_2.json");
+    let historical = validate_corpus_against_manifest(bytes, ARCHIVED_MANIFEST).unwrap();
+    assert_eq!(
+        historical.manifest_sha256,
+        format!("{:x}", Sha256::digest(ARCHIVED_MANIFEST))
+    );
+    assert!(validate_corpus(bytes).is_err());
+    assert!(validate_corpus_against_manifest(bytes, b"{}").is_err());
+    let rebound = current_corpus_bytes(bytes);
+    assert_ne!(Sha256::digest(bytes), Sha256::digest(&rebound));
+    let a: Value = serde_json::from_slice(bytes).unwrap();
+    let b: Value = serde_json::from_slice(&rebound).unwrap();
+    assert_eq!(a["cases"], b["cases"]);
+}
+
+#[cfg(all(feature = "wasm-precheck", unix))]
+#[test]
+fn archived_corpus_cannot_start_current_worker_without_explicit_rebinding() {
+    let result = codeguard_cli::grammar_evaluation::replay_corpus(
+        std::path::Path::new("/definitely-absent-worker"),
+        include_bytes!("../../../tests/fixtures/grammar_regression_v0_2.json"),
+        std::time::Instant::now(),
+        &std::sync::atomic::AtomicBool::new(false),
+    );
+    assert_eq!(
+        result.unwrap_err(),
+        "grammar_evaluation_corpus_identity_invalid"
+    );
+}
+
+#[test]
+fn historical_manifest_shape_and_digest_remain_checked() {
+    let corpus = include_bytes!("../../../tests/fixtures/grammar_regression_v0_2.json");
+    let mut manifest: Value = serde_json::from_slice(ARCHIVED_MANIFEST).unwrap();
+    manifest["assets"][0]["language"] = json!("renamed");
+    assert!(
+        validate_corpus_against_manifest(corpus, &serde_json::to_vec(&manifest).unwrap()).is_err()
+    );
+    let duplicate = br#"{"assets":[],"assets":[]}"#;
+    assert!(validate_corpus_against_manifest(corpus, duplicate).is_err());
+    assert!(validate_corpus_against_manifest(corpus, &vec![b' '; 1024 * 1024 + 1]).is_err());
+}
+
+#[test]
+fn current_manifest_replay_archive_preserves_all_samples_and_distinct_identity() {
+    let input =
+        include_bytes!("../../../tests/acceptance/evidence/grammar-current-corpus-2026-10-05.json");
+    let manifest =
+        include_bytes!("../../../tests/fixtures/grammar_manifests/manifest_2026_10_05.json");
+    let corpus = validate_corpus_against_manifest(input, manifest).unwrap();
+    let report: Value = serde_json::from_slice(include_bytes!(
+        "../../../tests/acceptance/evidence/grammar-current-manifest-2026-10-05.json"
+    ))
+    .unwrap();
+    assert_separate_cohort_counts(&report);
+    assert_eq!(
+        report["corpus_sha256"],
+        format!("{:x}", Sha256::digest(input))
+    );
+    assert_eq!(report["manifest_sha256"], corpus.manifest_sha256);
+    assert_eq!(report["program_stable"], true);
+    assert!(
+        report["cases"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .all(|case| case["attempted"] == true)
+    );
+    let historical: Value = serde_json::from_slice(include_bytes!(
+        "../../../tests/fixtures/grammar_regression_v0_2.json"
+    ))
+    .unwrap();
+    let current: Value = serde_json::from_slice(input).unwrap();
+    assert_eq!(current["cases"], historical["cases"]);
+    assert_ne!(current["manifest_sha256"], historical["manifest_sha256"]);
+    assert_eq!(report["grammar_qualified_count"], 0);
+    assert_eq!(report["delivery_decision"], "not_evaluated");
 }

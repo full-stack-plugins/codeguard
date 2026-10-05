@@ -2,7 +2,6 @@
 
 pub use crate::grammar_evaluation_corpus::GrammarEvaluationCorpus;
 use codeguard_adapters::parse_unique_json;
-use serde_json::Value;
 use sha2::{Digest, Sha256};
 use std::collections::BTreeSet;
 
@@ -11,6 +10,36 @@ const MANIFEST: &[u8] = include_bytes!("../../../grammars/manifest.json");
 /// 校验固定语料的结构、范围与字节绑定；在任何进程启动前调用。
 /// 参数为至多 16 MiB 的原始 JSON；返回包含全部随仓语言的语料或具体原因。
 pub fn validate_corpus(bytes: &[u8]) -> Result<GrammarEvaluationCorpus, String> {
+    validate_corpus_against_manifest(bytes, MANIFEST)
+}
+
+/// 只读核对语料与调用方保存的清单原字节；用于历史证据，不提供当前执行许可。
+/// 参数为有界语料及历史清单；返回原始绑定语料，或形状/摘要错误。
+/// 当前 worker 回放仍必须通过 validate_corpus，不能以历史清单绕过当前资产身份。
+pub fn validate_corpus_against_manifest(
+    bytes: &[u8],
+    manifest_bytes: &[u8],
+) -> Result<GrammarEvaluationCorpus, String> {
+    if manifest_bytes.len() > 1024 * 1024 {
+        return Err("grammar_evaluation_manifest_too_large".into());
+    }
+    let manifest = parse_unique_json(manifest_bytes).map_err(str::to_owned)?;
+    let assets = manifest["assets"]
+        .as_array()
+        .ok_or("grammar_evaluation_manifest_invalid")?;
+    if assets.is_empty() || assets.len() > 128 {
+        return Err("grammar_evaluation_manifest_invalid".into());
+    }
+    let mut expected = BTreeSet::new();
+    for asset in assets {
+        let language = asset["language"]
+            .as_str()
+            .filter(|value| valid_id(value))
+            .ok_or("grammar_evaluation_manifest_invalid")?;
+        if !expected.insert(language) {
+            return Err("grammar_evaluation_manifest_invalid".into());
+        }
+    }
     if bytes.len() > 16 * 1024 * 1024 {
         return Err("grammar_evaluation_corpus_too_large".into());
     }
@@ -28,19 +57,12 @@ pub fn validate_corpus(bytes: &[u8]) -> Result<GrammarEvaluationCorpus, String> 
         serde_json::from_value(value).map_err(|_| "grammar_evaluation_corpus_shape_invalid")?;
     if !matches!(corpus.schema_version.as_str(), "0.1.0" | "0.2.0")
         || corpus.corpus_type != "grammar_regression"
-        || corpus.manifest_sha256 != digest(MANIFEST)
+        || corpus.manifest_sha256 != digest(manifest_bytes)
         || corpus.cases.is_empty()
         || corpus.cases.len() > 4096
     {
         return Err("grammar_evaluation_corpus_identity_invalid".into());
     }
-    let manifest: Value = serde_json::from_slice(MANIFEST).map_err(|e| e.to_string())?;
-    let expected: BTreeSet<&str> = manifest["assets"]
-        .as_array()
-        .ok_or("grammar_evaluation_manifest_invalid")?
-        .iter()
-        .filter_map(|a| a["language"].as_str())
-        .collect();
     let mut ids = BTreeSet::new();
     let mut languages = BTreeSet::new();
     for case in &corpus.cases {

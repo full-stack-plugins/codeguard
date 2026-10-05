@@ -1390,3 +1390,8 @@ Python 语法确认任务的当前原生观察为 `still_present` 且未因源�
 ### TypeScript 模块源码的统一范围
 
 `detect`、`check all` / `check typescript` 和 `file_changed` Hook 现在将 `.mts/.cts` 及 `.d.mts/.d.cts` 纳入既有 TypeScript 范围，使用同一固定 TypeScript grammar，不误用 TSX。同文件已有完整原生 ESLint 观察时仍原生优先；其他构建根缺上下文的文件独立执行候选初检。重复疑似更新同一确认任务，合法声明不创建新语法阻塞；编辑 Hook 仅检查确认写入的文件。后缀识别不证明模块解析、类型检查、grammar 资格或交付通过。见[模块后缀验收](../tests/acceptance/typescript-module-extension-routing.md)。
+
+
+### 历史清单与当前回放
+
+历史语料/报告保留原清单与语料摘要，使用保存的原清单字节只读核对。当前回放仍要求当前固定清单；复用相同样本须显式生成新绑定输入并记录新语料摘要，不覆盖历史报告。只读清单核对不提供执行或发行许可，详见[边界验收](../tests/acceptance/grammar-manifest-history-binding.md)。

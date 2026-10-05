@@ -579,3 +579,12 @@ Ruff正常与忽略noqa的检查若返回相同的invalid-syntax错误，Codegua
 #### Scenario: Native settings do not establish one explicit target
 - **WHEN** linter目标为none、字段缺失或重复、未知版本，或者配置逐文件目标尚未解析
 - **THEN** 关闭前置无目标并反馈具体原因；已有局部lint诊断仍可反馈，但不能从它们推导可信关闭
+
+
+### Requirement: Grammar replay SHALL separate historical evidence from current execution identity
+
+历史语料与报告 MUST 保留原字节、原清单摘要及分母，并用保存的对应清单核对。历史核对 MUST NOT 授予当前worker执行许可。当前回放 MUST 核对当前固定清单；需要复用旧样本时显式生成新绑定语料，保留全部样本源码、标签及来源，并记录新语料摘要，不覆盖旧证据。
+
+#### Scenario: Metadata changes invalidate current corpus identity without rewriting history
+- **WHEN** grammar已知限制元数据改变当前清单摘要
+- **THEN** 原语料只能按原清单验证，不能直接启动当前worker；另行生成的新绑定输入可以回放相同样本并记录真实当前身份，历史报告保持原摘要

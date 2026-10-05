@@ -1482,3 +1482,8 @@ check python/all现通过0.48反馈保留独立结构计数和原始坐标，原
 ### 2026-10-05 TypeScript模块后缀发现与任务接线
 
 14.4/14.6/14.10/14.19：`.mts/.cts`与声明后缀在默认发现和聚合路由遗漏分别RED，统一注册表与固定TypeScript路由后实际四文件check all通过。重复check typescript保持两张疑似任务，合法声明不新建；单文件编辑Hook仅检查原范围。受控ESLint完整结果仍优先，另一构建根保持候选；七目标85通过，无忽略，默认/WASM严格Clippy及OpenSpec通过。未增加grammar资格或公开发行，父任务仍开放，见[验收](../../../tests/acceptance/typescript-module-extension-routing.md)。
+
+
+### 2026-10-05 grammar历史清单与当前回放身份修复（验收中）
+
+12.11/14.17/14.19：CI37257302720在已知限制元数据更新后5项语料校验失败，原因是冻结语料仍绑定旧清单。保存原清单字节，用有界只读入口核对历史；当前回放仍严格要求当前清单，显式生成新绑定语料且case不改。新增旧语料不得启动worker及清单拒绝反例；WASM常规13通过/0失败/2忽略，旧两份语料和归档报告逐字节保留。完整358例当前回放1通过444.20秒，32语种35来源组全部attempted，73/1/10/269、3unknown、2pending保持；新输入和清单原字节独立归档，schema与摘要验证通过。CI终态尚待确认，不勾选父任务，见[验收](../../../tests/acceptance/grammar-manifest-history-binding.md)。
