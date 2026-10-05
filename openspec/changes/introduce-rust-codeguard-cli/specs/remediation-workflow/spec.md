@@ -536,3 +536,12 @@ Python专用SDK入口 MUST 验证宿主独立选择的信任根、时间、基�
 #### Scenario: Native counterexample refutes the original candidate
 - **WHEN** 原样本在批准配置和目标下原生合法
 - **THEN** 保留false_positive_review_required，不记为代码修复、不关闭、不自行加入白名单
+
+
+#### Scenario: Python原生反证后的下一步保留合法源码
+- **WHEN** 两类Python候选首次报告的原字节在已绑定项目目标和配置下被原生工具完整接受，SDK记录false_positive_review_required
+- **THEN** next读取同一任务生命周期并提供WASM语言版本与原生差异调查，不继续普通候选源码修复、不自行白名单或批准关闭
+
+#### Scenario: 当前Python输入失效优先于历史误报指引
+- **WHEN** 已记录原生反证后源码或项目配置发生变化
+- **THEN** next保留source_input_changed_or_unavailable或configuration_input_changed_or_unavailable与原生复检指引，不以旧反证声称新输入合法

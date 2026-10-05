@@ -1317,7 +1317,11 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         }
     }
     #[cfg(unix)]
-    if checker_id == "syntax.native_confirmation" {
+    if checker_id == "syntax.native_confirmation"
+        || (checker_id == "python.ruff"
+            && brief["reason_code"] == "python_syntax_confirmation_needed"
+            && !brief["verification_invalidated_reason"].is_string())
+    {
         if let Some(guidance) = crate::task_lifecycle_store::guidance(
             root,
             &brief,
@@ -1327,7 +1331,9 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         ) {
             brief["disposition"] = guidance["disposition"].clone();
             brief["step"] = guidance["step"].clone();
-            brief["native_diagnostic_positions"] = json!([]);
+            if checker_id == "syntax.native_confirmation" {
+                brief["native_diagnostic_positions"] = json!([]);
+            }
             priority = 0;
         }
     }

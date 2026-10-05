@@ -1377,3 +1377,6 @@ Ruff正常与忽略noqa的两轮结果中一致的`invalid-syntax`现在保留�
 宿主SDK `verify_python_task_resolution` 接收独立信任根和签名策略，绑定Python任务、已消费首次报告、原样本、grammar、Ruff制品、适配器、明确lint目标及项目配置摘要。Rust调用原生Ruff，以绑定配置和目标对照原始stdin与当前单文件；当前文件复用正常/忽略noqa扫描及同轮设置观察。原样本存在语法诊断、当前已修改且完整无语法诊断、输入和批准身份仍稳定时，才记录限定关闭。原样本原生合法则记录误报调查；缺工具、未解析目标、配置变化或运行不完整均不能关闭。策略不支持以隐式默认或formatter目标代替lint目标。
 
 两类Python首次WASM报告共用稳定任务与追加父链。新证据使用独立封闭0.6协议，不修改历史版本；重复验证幂等，复发重开保留关闭历史。普通复检只可重开，不凭历史策略批准新关闭。SDK测试中的独立签名夹具不证明生产宿主信任根已接入，限定关闭不代表项目门禁通过，也不授予grammar发布资格。局部验证记录见[Python任务关闭验收](../tests/acceptance/python-task-resolution-lifecycle.md)。
+
+
+Python3.14模板字符串提供真实原生反证：固定Python WASM仍产生ERROR，Ruff在明确py314下接受同字节，py313下仍报告语法错误。限定SDK记录误报调查后，next现读取同一Python确认任务的生命周期，要求核对grammar版本与原生差异，保留合法源码；源码或配置已变化时，当前输入失效提示优先于历史反证。不会自动白名单或关闭，也不修改旧语料统计。见[实际反证验收](../tests/acceptance/python-template-string-counterevidence.md)。

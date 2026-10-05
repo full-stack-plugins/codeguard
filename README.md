@@ -613,3 +613,5 @@ Native syntax services now separate rechecks from `commit_resolution`. Before co
 
 
 Python syntax confirmation tasks now support scoped host SDK resolution. Independently signed policy 1.5 binds original source, explicit lint target, project configuration and the Ruff artifact. Complete original/current native comparison and stable inputs are required for a code-fix event. Ordinary `task verify` can record recurrence under the same bindings, but cannot authorize closure from local history. This does not certify production host integration, all languages or project delivery gates; see the [scoped acceptance record](tests/acceptance/python-task-resolution-lifecycle.md).
+
+Python native counterevidence now reaches `next`: preserve valid source and investigate grammar/version differences. Current source or configuration changes require fresh verification before historical counterevidence can be used. See [counterevidence acceptance](tests/acceptance/python-template-string-counterevidence.md).

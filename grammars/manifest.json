@@ -206,7 +206,8 @@
       "codeguard_runtime_validation": "rust_loader_smoke_passed",
       "language_versions": [],
       "known_limitations": [
-        "Rust loader smoke passed; Python language versions, dialects, isolation and syntax corpus are not yet validated"
+        "Rust loader smoke passed; Python language versions, dialects, isolation and syntax corpus are not yet validated",
+        "Pinned v0.23.6 reports ERROR for Python 3.14 template strings such as message = t\"hello\". Ruff 0.16.8 accepts identical bytes under explicit py314 and rejects them under py313; require target-bound native confirmation and grammar repair. This does not qualify the language or approve a whitelist."
       ],
       "release_status": "candidate_unvalidated"
     },

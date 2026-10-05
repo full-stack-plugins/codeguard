@@ -98,6 +98,19 @@ fn codegraph_coverage_is_explicit_and_never_claims_parser_or_gate_completion() {
     );
     let zig = assets.iter().find(|row| row["language"] == "zig").unwrap();
     assert_eq!(zig["gap"], "language_qualification_and_release_pending");
+    let python = assets
+        .iter()
+        .find(|row| row["language"] == "python")
+        .unwrap();
+    assert!(
+        python["known_limitations"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|row| row
+                .as_str()
+                .is_some_and(|s| s.contains("py314") && s.contains("template strings")))
+    );
     let vbnet = assets
         .iter()
         .find(|row| row["language"] == "vbnet")

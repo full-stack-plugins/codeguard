@@ -1469,3 +1469,6 @@ check python/all现通过0.48反馈保留独立结构计数和原始坐标，原
 
 
 9.10 / 14.11 Python限定关闭与复发：Rust宿主SDK新增独立验签1.5策略，明确绑定项目lint目标、配置、原样本和制品；独立/聚合首次报告共用0.6封闭生命周期证据，原始stdin及当前项目单文件原生对照才可关闭，普通task verify只可重开。实际Ruff两类来源关闭、幂等和SDK复发1通过148.24秒；新增普通CLI复发RED为0条事件，接线后两类完整链路1通过159.48秒。最终回归和schema产物证据补入[局部验收](../../../tests/acceptance/python-task-resolution-lifecycle.md)。生产宿主信任根、全部语言与全项目门禁未完成，父任务不勾选。
+
+
+9.10/14.11/14.12 Python原生反证next纠偏：固定grammar在Python3.14模板字符串上的实际误报被Ruff明确目标反证；两类SDK报告进入误报调查后，next新增同一任务生命周期读取。当前源码/配置失效优先，不沿用旧反证修复或放行；报告首次来源不按全局版本号猜测。RED与终态见[局部验收](../../../tests/acceptance/python-template-string-counterevidence.md)。grammar重建与全部语言/宿主/门禁仍缺，父任务未完成。
