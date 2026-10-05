@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:javascript-native-syntax:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "reason",
+    "version",
+    "tool_sha256",
+    "input_type",
+    "diagnostics"
+  ],
+  "properties": {
+    "status": {
+      "enum": [
+        "incomplete",
+        "completed",
+        "diagnostics_observed"
+      ]
+    },
+    "reason": {
+      "enum": [
+        "javascript_syntax_input_invalid",
+        "javascript_syntax_tool_unavailable",
+        "javascript_syntax_tool_changed",
+        "javascript_syntax_version_unverified",
+        "javascript_syntax_execution_incomplete",
+        "javascript_syntax_report_invalid",
+        "javascript_native_syntax_no_diagnostics",
+        "javascript_native_syntax_diagnostics"
+      ]
+    },
+    "version": {
+      "enum": [
+        null,
+        "v24.18.0"
+      ]
+    },
+    "tool_sha256": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "input_type": {
+      "const": "module"
+    },
+    "diagnostics": {
+      "type": "array",
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "line",
+          "rule_id"
+        ],
+        "properties": {
+          "line": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "rule_id": {
+            "const": "javascript.syntax"
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "completed"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "reason": {
+            "const": "javascript_native_syntax_no_diagnostics"
+          },
+          "version": {
+            "const": "v24.18.0"
+          },
+          "tool_sha256": {
+            "type": "string"
+          },
+          "diagnostics": {
+            "maxItems": 0
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "diagnostics_observed"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "reason": {
+            "const": "javascript_native_syntax_diagnostics"
+          },
+          "version": {
+            "const": "v24.18.0"
+          },
+          "tool_sha256": {
+            "type": "string"
+          },
+          "diagnostics": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "incomplete"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "reason": {
+            "enum": [
+              "javascript_syntax_input_invalid",
+              "javascript_syntax_tool_unavailable",
+              "javascript_syntax_tool_changed",
+              "javascript_syntax_version_unverified",
+              "javascript_syntax_execution_incomplete",
+              "javascript_syntax_report_invalid"
+            ]
+          },
+          "diagnostics": {
+            "const": []
+          }
+        }
+      }
+    }
+  ]
+}

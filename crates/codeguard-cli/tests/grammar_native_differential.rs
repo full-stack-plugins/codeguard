@@ -154,7 +154,7 @@ fn actual_python_syntax_corpus_keeps_non_syntax_lint_out_of_comparison() {
     }
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
     fs::write(
-        root.join("tests/acceptance/evidence/python-native-structure-differential-2026-10-05.json"),
+        root.join("tests/acceptance/evidence/python-native-structure-differential-node-extension-2026-10-05.json"),
         serde_json::to_vec(&report).unwrap(),
     )
     .unwrap();

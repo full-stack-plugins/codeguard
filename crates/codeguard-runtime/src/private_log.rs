@@ -386,7 +386,14 @@ fn write_record(file: &mut File, outcome: &ProcessOutcome) -> io::Result<()> {
     file.write_all(b"CGLOG1\0")?;
     let (kind, exit_code) = termination_code(outcome.termination);
     file.write_all(&[kind])?;
-    file.write_all(&exit_code.to_le_bytes())?;
+    // CGLOG1 的数值槽按终止类型解释：正常退出为退出码，启动失败为 OS 错误码。
+    // 零表示旧记录或操作系统未提供错误码；原生输出与格式长度均不改变。
+    let detail = if outcome.termination == Termination::SpawnFailure {
+        outcome.spawn_os_error.unwrap_or(0)
+    } else {
+        exit_code
+    };
+    file.write_all(&detail.to_le_bytes())?;
     let elapsed = u64::try_from(outcome.elapsed.as_nanos()).unwrap_or(u64::MAX);
     file.write_all(&elapsed.to_le_bytes())?;
     file.write_all(&(outcome.stdout.len() as u64).to_le_bytes())?;

@@ -59,12 +59,13 @@ pub fn replay_native_corpus(
         if !metadata.is_file() || metadata.permissions().mode() & 0o111 == 0 {
             return Err("native_grammar_tool_unavailable".into());
         }
-        let sha = artifact_hash(&path, 64 * 1024 * 1024)?;
+        let sha = artifact_hash(&path, checker.artifact_budget())?;
         frozen.insert(language.clone(), (checker, path, sha));
     }
     let manifest: Value = serde_json::from_slice(include_bytes!("../../../grammars/manifest.json"))
         .map_err(|_| "native_grammar_manifest_invalid")?;
-    let measure_structure = tools.contains_key("python");
+    let javascript_selected = tools.contains_key("javascript");
+    let measure_structure = tools.contains_key("python") || javascript_selected;
     let mut cases = Vec::new();
     for case in &corpus.cases {
         let Some((checker, tool, tool_sha)) = frozen.get(&case.language) else {
@@ -72,7 +73,8 @@ pub fn replay_native_corpus(
         };
         let admitted = !cancelled.load(Ordering::Relaxed) && Instant::now() < deadline;
         let native_started = Instant::now();
-        let tool_ready = artifact_hash(tool, 64 * 1024 * 1024).is_ok_and(|sha| sha == *tool_sha)
+        let tool_ready = artifact_hash(tool, checker.artifact_budget())
+            .is_ok_and(|sha| sha == *tool_sha)
             && tools
                 .get(&case.language)
                 .and_then(|input| input.canonicalize().ok())
@@ -83,12 +85,20 @@ pub fn replay_native_corpus(
             && !cancelled.load(Ordering::Relaxed)
             && Instant::now() < deadline;
         let native = if native_attempted {
-            checker.observe(tool, case.source.as_bytes(), &cwd, deadline)
+            // 保留原请求入口供观察器复核别名；只传规范路径会隐藏版本调用中的重定向。
+            checker.observe(
+                &tools[&case.language],
+                case.source.as_bytes(),
+                &cwd,
+                deadline,
+                cancelled,
+            )
         } else {
             json!({"status":"not_run","reason":if !tool_ready {"native_grammar_tool_changed"}else if cancelled.load(Ordering::Relaxed) {"request_cancelled"} else {"request_deadline_exceeded"},"version":null,"tool_sha256":null,"diagnostics":[]})
         };
         let native_us = elapsed_us(native_started);
-        let tool_current = artifact_hash(tool, 64 * 1024 * 1024).is_ok_and(|s| s == *tool_sha)
+        let tool_current = artifact_hash(tool, checker.artifact_budget())
+            .is_ok_and(|s| s == *tool_sha)
             && native["tool_sha256"] == *tool_sha
             && native["version"] == checker.version();
         let native_class = tool_current.then(|| classify_native(&native)).flatten();
@@ -153,7 +163,8 @@ pub fn replay_native_corpus(
             .as_str()
             .ok_or("native_grammar_manifest_invalid")?;
         if let Some((checker, tool, sha)) = frozen.get(language) {
-            let stable = artifact_hash(tool, 64 * 1024 * 1024).is_ok_and(|current| current == *sha)
+            let stable = artifact_hash(tool, checker.artifact_budget())
+                .is_ok_and(|current| current == *sha)
                 && tools
                     .get(language)
                     .and_then(|input| input.canonicalize().ok())
@@ -208,8 +219,8 @@ pub fn replay_native_corpus(
             inventory.push(json!({"language":language,"grammar_sha256":asset["sha256"],"native_selected":false,"reason":if checker(language).is_some(){"explicit_native_tool_not_selected"}else{"native_differential_adapter_unavailable"},"grammar_qualified":false}));
         }
     }
-    let mut report = json!({"schema_version":if measure_structure {"0.3.0"}else{"0.1.0"},"report_type":"native_grammar_differential","status":"incomplete","delivery_decision":"not_evaluated",
-        "authority":"development_native_differential_only","native_adapter_reused":true,"independent_holdout":false,"grammar_qualified_count":0,
+    let mut report = json!({"schema_version":if javascript_selected {"0.4.0"}else if measure_structure {"0.3.0"}else{"0.1.0"},"report_type":"native_grammar_differential","status":"incomplete","delivery_decision":"not_evaluated",
+        "authority":"development_native_differential_only","native_adapter_reused":!javascript_selected,"independent_holdout":false,"grammar_qualified_count":0,
         "corpus_sha256":digest(corpus_bytes),"manifest_sha256":corpus.manifest_sha256,"program_sha256":program_sha,"program_stable":program_stable,
         "language_count":inventory.len(),"selected_language_count":frozen.len(),"sample_count":cases.len(),"languages":inventory,"cases":cases});
     if measure_structure {

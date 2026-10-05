@@ -1,0 +1,1329 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:native-grammar-differential:0.4.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "status",
+    "delivery_decision",
+    "authority",
+    "native_adapter_reused",
+    "independent_holdout",
+    "grammar_qualified_count",
+    "corpus_sha256",
+    "manifest_sha256",
+    "program_sha256",
+    "program_stable",
+    "language_count",
+    "selected_language_count",
+    "sample_count",
+    "languages",
+    "cases",
+    "combined_candidate_authority"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.4.0"
+    },
+    "report_type": {
+      "const": "native_grammar_differential"
+    },
+    "status": {
+      "const": "incomplete"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "authority": {
+      "const": "development_native_differential_only"
+    },
+    "native_adapter_reused": {
+      "const": false
+    },
+    "independent_holdout": {
+      "const": false
+    },
+    "grammar_qualified_count": {
+      "const": 0
+    },
+    "corpus_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "manifest_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "program_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "program_stable": {
+      "type": "boolean"
+    },
+    "language_count": {
+      "const": 32
+    },
+    "selected_language_count": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 6
+    },
+    "sample_count": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 4096
+    },
+    "languages": {
+      "type": "array",
+      "minItems": 32,
+      "maxItems": 32,
+      "items": {
+        "anyOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "language",
+              "grammar_sha256",
+              "native_selected",
+              "native_version",
+              "tool_sha256",
+              "tool_stable",
+              "sample_count",
+              "native_unknown_count",
+              "wasm_unknown_count",
+              "compared_count",
+              "tp",
+              "fp",
+              "fn",
+              "tn",
+              "fixture_native_disagreement_count",
+              "grammar_qualified",
+              "combined_candidate"
+            ],
+            "properties": {
+              "language": {
+                "enum": [
+                  "zig",
+                  "erlang",
+                  "swift",
+                  "kotlin",
+                  "python",
+                  "javascript"
+                ]
+              },
+              "grammar_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "native_selected": {
+                "const": true
+              },
+              "native_version": {
+                "type": "string",
+                "minLength": 1
+              },
+              "tool_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "tool_stable": {
+                "type": "boolean"
+              },
+              "sample_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "native_unknown_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "wasm_unknown_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "compared_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "tp": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "fp": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "fn": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "tn": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "fixture_native_disagreement_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "grammar_qualified": {
+                "const": false
+              },
+              "combined_candidate": {
+                "$ref": "#/$defs/combined_counts"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "language",
+              "grammar_sha256",
+              "native_selected",
+              "reason",
+              "grammar_qualified"
+            ],
+            "properties": {
+              "language": {
+                "type": "string",
+                "minLength": 1
+              },
+              "grammar_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "native_selected": {
+                "const": false
+              },
+              "reason": {
+                "enum": [
+                  "explicit_native_tool_not_selected",
+                  "native_differential_adapter_unavailable"
+                ]
+              },
+              "grammar_qualified": {
+                "const": false
+              }
+            }
+          }
+        ]
+      },
+      "contains": {
+        "properties": {
+          "language": {
+            "const": "javascript"
+          },
+          "native_selected": {
+            "const": true
+          }
+        }
+      }
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4096,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "language",
+          "cohort",
+          "origin",
+          "source_sha256",
+          "grammar_sha256",
+          "fixture_expected_valid",
+          "fixture_label",
+          "native_attempted",
+          "native",
+          "native_classification",
+          "native_identity_current",
+          "native_elapsed_us",
+          "wasm_classification",
+          "wasm_recovery_count",
+          "wasm_reason",
+          "wasm_elapsed_us",
+          "comparison",
+          "fixture_native_disagreement",
+          "structural_observations",
+          "combined_candidate_classification",
+          "combined_candidate_comparison"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,128}$"
+          },
+          "language": {
+            "enum": [
+              "zig",
+              "erlang",
+              "swift",
+              "kotlin",
+              "python",
+              "javascript"
+            ]
+          },
+          "cohort": {
+            "enum": [
+              "repository_regression",
+              "upstream_grammar_regression",
+              "provisional_syntax"
+            ]
+          },
+          "origin": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "source_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "grammar_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "fixture_expected_valid": {
+            "type": "boolean"
+          },
+          "fixture_label": {
+            "enum": [
+              "regression",
+              "pending"
+            ]
+          },
+          "native_attempted": {
+            "type": "boolean"
+          },
+          "native": {
+            "anyOf": [
+              {
+                "$ref": "zig-lint-feedback-v0.2.schema.json#/properties/native"
+              },
+              {
+                "$ref": "erlang-lint-feedback-v0.2.schema.json#/properties/native"
+              },
+              {
+                "$ref": "swift-lint-feedback-v0.1.schema.json#/properties/native"
+              },
+              {
+                "$ref": "kotlin-lint-feedback-v0.1.schema.json#/properties/native"
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "status",
+                  "reason",
+                  "version",
+                  "tool_sha256",
+                  "diagnostics"
+                ],
+                "properties": {
+                  "status": {
+                    "const": "not_run"
+                  },
+                  "reason": {
+                    "enum": [
+                      "request_cancelled",
+                      "request_deadline_exceeded",
+                      "native_grammar_tool_changed"
+                    ]
+                  },
+                  "version": {
+                    "type": "null"
+                  },
+                  "tool_sha256": {
+                    "type": "null"
+                  },
+                  "diagnostics": {
+                    "const": []
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "status",
+                  "reason",
+                  "version",
+                  "tool_sha256",
+                  "target_version",
+                  "diagnostics"
+                ],
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "incomplete",
+                      "completed",
+                      "diagnostics_observed"
+                    ]
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "version": {
+                    "enum": [
+                      null,
+                      "ruff 0.16.8"
+                    ]
+                  },
+                  "tool_sha256": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    ]
+                  },
+                  "target_version": {
+                    "const": "py312"
+                  },
+                  "diagnostics": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "line",
+                        "column",
+                        "column_unit",
+                        "rule_id"
+                      ],
+                      "properties": {
+                        "line": {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "column": {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        "column_unit": {
+                          "const": "ruff_reported"
+                        },
+                        "rule_id": {
+                          "const": "invalid-syntax"
+                        }
+                      }
+                    }
+                  }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "status": {
+                          "const": "completed"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "reason": {
+                          "const": "python_native_syntax_no_diagnostics"
+                        },
+                        "version": {
+                          "const": "ruff 0.16.8"
+                        },
+                        "tool_sha256": {
+                          "type": "string"
+                        },
+                        "diagnostics": {
+                          "maxItems": 0
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "status": {
+                          "const": "diagnostics_observed"
+                        }
+                      }
+                    },
+                    "then": {
+                      "properties": {
+                        "reason": {
+                          "const": "python_native_syntax_diagnostics"
+                        },
+                        "version": {
+                          "const": "ruff 0.16.8"
+                        },
+                        "tool_sha256": {
+                          "type": "string"
+                        },
+                        "diagnostics": {
+                          "minItems": 1
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "$ref": "javascript-native-syntax.schema.json"
+              }
+            ]
+          },
+          "native_classification": {
+            "enum": [
+              "valid",
+              "invalid",
+              "unknown"
+            ]
+          },
+          "native_identity_current": {
+            "type": "boolean"
+          },
+          "native_elapsed_us": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "wasm_classification": {
+            "enum": [
+              "valid",
+              "invalid",
+              "unknown"
+            ]
+          },
+          "wasm_recovery_count": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "wasm_reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "wasm_elapsed_us": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "comparison": {
+            "enum": [
+              "true_positive",
+              "false_positive",
+              "false_negative",
+              "true_negative",
+              "unknown"
+            ]
+          },
+          "fixture_native_disagreement": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "structural_observations": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "array",
+                "maxItems": 128,
+                "items": {
+                  "allOf": [
+                    {
+                      "$ref": "grammar-probe-v0.2.schema.json#/$defs/structure"
+                    },
+                    {
+                      "properties": {
+                        "rule_sha256": {
+                          "const": "5bb5f1dda689d02863da19e8068cb48e8de4f368ab0217e760bf70584e7710ef"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "combined_candidate_classification": {
+            "enum": [
+              "valid",
+              "invalid",
+              "unknown"
+            ]
+          },
+          "combined_candidate_comparison": {
+            "enum": [
+              "true_positive",
+              "false_positive",
+              "false_negative",
+              "true_negative",
+              "unknown"
+            ]
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "native_identity_current": {
+                  "const": false
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "native_classification": {
+                  "const": "unknown"
+                },
+                "comparison": {
+                  "const": "unknown"
+                },
+                "fixture_native_disagreement": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "native_classification": {
+                  "const": "unknown"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "comparison": {
+                  "const": "unknown"
+                },
+                "fixture_native_disagreement": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "wasm_classification": {
+                  "const": "unknown"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "comparison": {
+                  "const": "unknown"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "language": {
+                  "const": "python"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "native": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "status",
+                        "reason",
+                        "version",
+                        "tool_sha256",
+                        "target_version",
+                        "diagnostics"
+                      ],
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "incomplete",
+                            "completed",
+                            "diagnostics_observed"
+                          ]
+                        },
+                        "reason": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "version": {
+                          "enum": [
+                            null,
+                            "ruff 0.16.8"
+                          ]
+                        },
+                        "tool_sha256": {
+                          "anyOf": [
+                            {
+                              "type": "null"
+                            },
+                            {
+                              "type": "string",
+                              "pattern": "^[0-9a-f]{64}$"
+                            }
+                          ]
+                        },
+                        "target_version": {
+                          "const": "py312"
+                        },
+                        "diagnostics": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "required": [
+                              "line",
+                              "column",
+                              "column_unit",
+                              "rule_id"
+                            ],
+                            "properties": {
+                              "line": {
+                                "type": "integer",
+                                "minimum": 1
+                              },
+                              "column": {
+                                "type": "integer",
+                                "minimum": 1
+                              },
+                              "column_unit": {
+                                "const": "ruff_reported"
+                              },
+                              "rule_id": {
+                                "const": "invalid-syntax"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "allOf": [
+                        {
+                          "if": {
+                            "properties": {
+                              "status": {
+                                "const": "completed"
+                              }
+                            }
+                          },
+                          "then": {
+                            "properties": {
+                              "reason": {
+                                "const": "python_native_syntax_no_diagnostics"
+                              },
+                              "version": {
+                                "const": "ruff 0.16.8"
+                              },
+                              "tool_sha256": {
+                                "type": "string"
+                              },
+                              "diagnostics": {
+                                "maxItems": 0
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "if": {
+                            "properties": {
+                              "status": {
+                                "const": "diagnostics_observed"
+                              }
+                            }
+                          },
+                          "then": {
+                            "properties": {
+                              "reason": {
+                                "const": "python_native_syntax_diagnostics"
+                              },
+                              "version": {
+                                "const": "ruff 0.16.8"
+                              },
+                              "tool_sha256": {
+                                "type": "string"
+                              },
+                              "diagnostics": {
+                                "minItems": 1
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "status",
+                        "reason",
+                        "version",
+                        "tool_sha256",
+                        "diagnostics"
+                      ],
+                      "properties": {
+                        "status": {
+                          "const": "not_run"
+                        },
+                        "reason": {
+                          "enum": [
+                            "request_cancelled",
+                            "request_deadline_exceeded",
+                            "native_grammar_tool_changed"
+                          ]
+                        },
+                        "version": {
+                          "type": "null"
+                        },
+                        "tool_sha256": {
+                          "type": "null"
+                        },
+                        "diagnostics": {
+                          "const": []
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "native": {
+                        "properties": {
+                          "status": {
+                            "const": "incomplete"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "native_classification": {
+                        "const": "unknown"
+                      },
+                      "comparison": {
+                        "const": "unknown"
+                      },
+                      "fixture_native_disagreement": {
+                        "type": "null"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            "else": {
+              "properties": {
+                "native": {
+                  "not": {
+                    "required": [
+                      "target_version"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "native_classification": {
+                  "const": "unknown"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "combined_candidate_comparison": {
+                  "const": "unknown"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "wasm_classification": {
+                  "const": "unknown"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "combined_candidate_classification": {
+                  "const": "unknown"
+                },
+                "combined_candidate_comparison": {
+                  "const": "unknown"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "combined_candidate_classification": {
+                  "const": "unknown"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "combined_candidate_comparison": {
+                  "const": "unknown"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "structural_observations": {
+                  "type": "null"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "wasm_classification": {
+                  "const": "unknown"
+                },
+                "combined_candidate_classification": {
+                  "const": "unknown"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "wasm_classification": {
+                  "enum": [
+                    "valid",
+                    "invalid"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "structural_observations": {
+                  "type": "array"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "language": {
+                  "not": {
+                    "const": "python"
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "structural_observations": {
+                  "anyOf": [
+                    {
+                      "type": "null"
+                    },
+                    {
+                      "const": []
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "wasm_classification": {
+                  "const": "valid"
+                },
+                "structural_observations": {
+                  "type": "array",
+                  "maxItems": 0
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "combined_candidate_classification": {
+                  "const": "valid"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "wasm_classification": {
+                  "enum": [
+                    "valid",
+                    "invalid"
+                  ]
+                },
+                "structural_observations": {
+                  "type": "array",
+                  "minItems": 1
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "combined_candidate_classification": {
+                  "const": "invalid"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "wasm_classification": {
+                  "const": "invalid"
+                },
+                "structural_observations": {
+                  "type": "array"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "combined_candidate_classification": {
+                  "const": "invalid"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "native_classification": {
+                  "const": "valid"
+                },
+                "combined_candidate_classification": {
+                  "const": "valid"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "combined_candidate_comparison": {
+                  "const": "true_negative"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "native_classification": {
+                  "const": "valid"
+                },
+                "combined_candidate_classification": {
+                  "const": "invalid"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "combined_candidate_comparison": {
+                  "const": "false_positive"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "native_classification": {
+                  "const": "invalid"
+                },
+                "combined_candidate_classification": {
+                  "const": "valid"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "combined_candidate_comparison": {
+                  "const": "false_negative"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "native_classification": {
+                  "const": "invalid"
+                },
+                "combined_candidate_classification": {
+                  "const": "invalid"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "combined_candidate_comparison": {
+                  "const": "true_positive"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "language": {
+                  "const": "javascript"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "native": {
+                  "anyOf": [
+                    {
+                      "$ref": "javascript-native-syntax.schema.json"
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "status",
+                        "reason",
+                        "version",
+                        "tool_sha256",
+                        "diagnostics"
+                      ],
+                      "properties": {
+                        "status": {
+                          "const": "not_run"
+                        },
+                        "reason": {
+                          "enum": [
+                            "request_cancelled",
+                            "request_deadline_exceeded",
+                            "native_grammar_tool_changed"
+                          ]
+                        },
+                        "version": {
+                          "type": "null"
+                        },
+                        "tool_sha256": {
+                          "type": "null"
+                        },
+                        "diagnostics": {
+                          "const": []
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "native_identity_current": {
+                        "const": true
+                      },
+                      "native": {
+                        "properties": {
+                          "status": {
+                            "const": "completed"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "native_classification": {
+                        "const": "valid"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "native_identity_current": {
+                        "const": true
+                      },
+                      "native": {
+                        "properties": {
+                          "status": {
+                            "const": "diagnostics_observed"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "native_classification": {
+                        "const": "invalid"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "native_identity_current": {
+                        "const": true
+                      },
+                      "native": {
+                        "properties": {
+                          "status": {
+                            "const": "incomplete"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "native_classification": {
+                        "const": "unknown"
+                      }
+                    }
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "native_identity_current": {
+                        "const": true
+                      },
+                      "native": {
+                        "properties": {
+                          "status": {
+                            "const": "not_run"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "native_classification": {
+                        "const": "unknown"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "combined_candidate_authority": {
+      "const": "native_confirmation_required"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "program_stable": {
+            "const": false
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "cases": {
+            "items": {
+              "properties": {
+                "wasm_classification": {
+                  "const": "unknown"
+                },
+                "wasm_recovery_count": {
+                  "type": "null"
+                },
+                "structural_observations": {
+                  "type": "null"
+                },
+                "combined_candidate_classification": {
+                  "const": "unknown"
+                },
+                "combined_candidate_comparison": {
+                  "const": "unknown"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "combined_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "compared_count",
+        "unknown_count",
+        "tp",
+        "fp",
+        "fn",
+        "tn"
+      ],
+      "properties": {
+        "compared_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unknown_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tp": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "fp": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "fn": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tn": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

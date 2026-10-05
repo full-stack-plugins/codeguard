@@ -490,6 +490,11 @@ WASM fallback MUST 通过明确版本的协议加入既有统一命令，不静�
 - **THEN** a separately versioned report preserves raw parser classification and TP/FP/FN/TN, records bounded structure observations with rule/version/digest and original positions, and separately measures the combined candidate against the same native observer and sample denominator; raw false negatives MUST NOT be erased by the combined result
 - **AND** truncated or failed worker observations remain unknown in both layers; changed program identity withdraws structure evidence and combined classification, and changed native identity withdraws both comparisons; this measured candidate neither confirms a violation nor qualifies a grammar, an independent holdout or project delivery
 
+#### Scenario: JavaScript development comparison uses an isolated explicit module syntax observer
+- **WHEN** an explicitly installed fixed Node is selected for development JavaScript native/WASM comparison
+- **THEN** use bounded frozen UTF-8 stdin, explicit module input and syntax-check-only arguments with a cleared environment, isolated cwd and shared deadline; verify requested entry and artifact continuity before and after execution, retaining a bounded Node-specific artifact budget without increasing other checker budgets
+- **AND** only consistent empty successful output or a syntax diagnostic bound to the original stdin line may classify native syntax; unexpected stdout, runtime/fatal errors, output/identity/version changes or malformed diagnostics remain unknown. Retain the source goal as module rather than infer project CommonJS/ESM settings; the versioned report cannot replace project ESLint, authorize task closure or certify grammar qualification
+
 #### Scenario: Structural empty blocks remain distinct from parser recoveries
 - **WHEN** an application scans a grammar tree for empty `block` nodes that contain no non-comment named statement
 - **THEN** traverse even branches without `has_error`, retain the direct parent kind and original byte positions with explicit record/traversal budget exhaustion, and do not label these structural facts as parser ERROR/MISSING or language violations; legal empty blocks in other languages require independent language interpretation
@@ -615,3 +620,7 @@ Ruff正常与忽略noqa的检查若返回相同的invalid-syntax错误，Codegua
 #### Scenario: Python template strings encounter an older grammar
 - **WHEN** 缺原生工具的本轮候选观察包含 Python，固定清单记载 Python 3.14 模板字符串兼容限制
 - **THEN** 终端及 Claude 摘要均能看到具体版本限制，仍要求适用目标的原生确认且不复制源码或凭候选改写合法代码
+
+#### Scenario: Explicit JavaScript native differential is cancelled while checking
+- **WHEN** 版本已核验且原生语法检查正在执行时请求取消
+- **THEN** Node 观察使用同一取消令牌终止进程组，保留样本与 unknown 比较，不等待工具自行完成或将取消视为合法源码
