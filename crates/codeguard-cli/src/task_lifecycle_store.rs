@@ -89,6 +89,7 @@ pub(crate) fn load(
                             | "0.7.0"
                             | "0.8.0"
                             | "0.9.0"
+                            | "0.10.0"
                     )
                 ) || value["report_type"] != "task_resolution_evidence"
                     || value["identity"] != identity_value
@@ -210,7 +211,16 @@ fn origin_matches_evidence(original: &serde_json::Value, evidence: &serde_json::
             | (Some("kotlin"), Some("0.4.0"))
             | (Some("go"), Some("0.7.0"))
             | (Some("rust"), Some("0.8.0" | "0.9.0"))
+            | (Some("ruby"), Some("0.10.0"))
     ) {
+        return false;
+    }
+    if evidence["schema_version"] == "0.10.0"
+        && (!matches!(
+            original["schema_version"].as_str(),
+            Some("0.1.0" | "0.7.0" | "0.9.0")
+        ) || ((original["schema_version"] == "0.9.0") != evidence["grammar_sha256"].is_null()))
+    {
         return false;
     }
     if evidence["schema_version"] == "0.9.0"
@@ -231,7 +241,7 @@ fn origin_matches_evidence(original: &serde_json::Value, evidence: &serde_json::
     }
     if matches!(
         original["schema_version"].as_str(),
-        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.12.0")
+        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.9.0" | "0.12.0")
     ) {
         evidence["grammar_sha256"].is_null()
             && evidence["original_source_sha256"]
@@ -408,6 +418,7 @@ pub(crate) fn record_native_recurrence(
                 | (Some("0.4.0"), Some("kotlin"))
                 | (Some("0.7.0"), Some("go"))
                 | (Some("0.8.0" | "0.9.0"), Some("rust"))
+                | (Some("0.10.0"), Some("ruby"))
         )
         || (matches!(evidence["schema_version"].as_str(), Some("0.8.0" | "0.9.0"))
             && scan["native"]["edition_context"] != evidence["edition_context"])

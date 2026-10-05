@@ -1,0 +1,305 @@
+[
+  {
+    "policy": {
+      "adapter_sha256": "b744f7e2612a49069c352d19423663bc225994b1ee494d5c56a3c6f38f8d5e29",
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "identity": {
+        "checker_id": "syntax.native_confirmation",
+        "scope": "app.rb",
+        "task_id": "CG-B-2faf2f092787a7c834e2df9d4a1288f3",
+        "workspace_id": "ws-47f38ea2237af5a68d3a7fc227f6dc3c"
+      },
+      "native_rule_id": "ruby.syntax",
+      "native_version": "ruby 2.6.10p210",
+      "original_report_sha256": "5b1cc53530418dc0adb4848ffc58a065381f79bdbf9ae985d343c04857ff0a77",
+      "original_source_sha256": "cedce0abe1dc0ec03b8245285802afc1044f2aea5cf68f39223f6b5c4913bb20",
+      "policy_revision": "p1",
+      "report_type": "task_resolution_policy",
+      "schema_version": "1.9.0",
+      "tool_sha256": "e09509fdf24f343d1c45ef6979977b7f4d94ff45b48faab46ebef1406caca753"
+    },
+    "receipt": {
+      "authority": "host_context_verified",
+      "delivery_decision": "not_evaluated",
+      "event_ref": ".codeguard/findings/CG-B-2faf2f092787a7c834e2df9d4a1288f3/events/lifecycle-event-c00aed932fb2bcf2db843017dc3ff7886830b310911537a10587edb545ef0a52.json",
+      "evidence_ref": ".codeguard/state/resolution_evidence/a06174e4d0aefdaa437d905f9ba079a437532f7bca8384eda26788081597253d.json",
+      "evidence_sha256": "a06174e4d0aefdaa437d905f9ba079a437532f7bca8384eda26788081597253d",
+      "identity": {
+        "checker_id": "syntax.native_confirmation",
+        "scope": "app.rb",
+        "task_id": "CG-B-2faf2f092787a7c834e2df9d4a1288f3",
+        "workspace_id": "ws-47f38ea2237af5a68d3a7fc227f6dc3c"
+      },
+      "outcome": "false_positive_review_required",
+      "policy_revision": "p1",
+      "policy_sha256": "4cc99702d020ebb4f3edb6a60789343c40b28052d4b735c82b0ff6b9c986e391",
+      "report_type": "task_resolution_receipt",
+      "schema_version": "0.1.0",
+      "state": "verification_required"
+    },
+    "evidence": {
+      "adapter_sha256": "b744f7e2612a49069c352d19423663bc225994b1ee494d5c56a3c6f38f8d5e29",
+      "current_native": {
+        "diagnostics": [],
+        "reason": "ruby_native_syntax_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "e09509fdf24f343d1c45ef6979977b7f4d94ff45b48faab46ebef1406caca753",
+        "version": "ruby 2.6.10p210"
+      },
+      "current_source_sha256": "a22b1e0eaa7e781042ae2699019a507b0c31563bd36c104293c6ffb3dae51159",
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "identity": {
+        "checker_id": "syntax.native_confirmation",
+        "scope": "app.rb",
+        "task_id": "CG-B-2faf2f092787a7c834e2df9d4a1288f3",
+        "workspace_id": "ws-47f38ea2237af5a68d3a7fc227f6dc3c"
+      },
+      "original_native": {
+        "diagnostics": [],
+        "reason": "ruby_native_syntax_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "e09509fdf24f343d1c45ef6979977b7f4d94ff45b48faab46ebef1406caca753",
+        "version": "ruby 2.6.10p210"
+      },
+      "original_report_sha256": "5b1cc53530418dc0adb4848ffc58a065381f79bdbf9ae985d343c04857ff0a77",
+      "original_source_sha256": "cedce0abe1dc0ec03b8245285802afc1044f2aea5cf68f39223f6b5c4913bb20",
+      "outcome": "false_positive_review_required",
+      "policy_revision": "p1",
+      "policy_sha256": "4cc99702d020ebb4f3edb6a60789343c40b28052d4b735c82b0ff6b9c986e391",
+      "report_type": "task_resolution_evidence",
+      "schema_version": "0.10.0",
+      "tool_sha256": "e09509fdf24f343d1c45ef6979977b7f4d94ff45b48faab46ebef1406caca753"
+    }
+  },
+  {
+    "policy": {
+      "adapter_sha256": "b744f7e2612a49069c352d19423663bc225994b1ee494d5c56a3c6f38f8d5e29",
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "identity": {
+        "checker_id": "syntax.native_confirmation",
+        "scope": "app.rb",
+        "task_id": "CG-B-e79bcb03e6de7ff43323bbb9786403e1",
+        "workspace_id": "ws-0acd715022b6ab4d3abfac4e551ba924"
+      },
+      "native_rule_id": "ruby.syntax",
+      "native_version": "ruby 2.6.10p210",
+      "original_report_sha256": "a252b49109b25914225f898aed58cbc0736d8e05d998fff0bfc9f15f43d5ab7b",
+      "original_source_sha256": "cedce0abe1dc0ec03b8245285802afc1044f2aea5cf68f39223f6b5c4913bb20",
+      "policy_revision": "p1",
+      "report_type": "task_resolution_policy",
+      "schema_version": "1.9.0",
+      "tool_sha256": "ebf76731c195908c4a716690f18a3d3fe90c4f62503cfb54423d4fb9f96fbea0"
+    },
+    "receipt": {
+      "authority": "host_context_verified",
+      "delivery_decision": "not_evaluated",
+      "event_ref": ".codeguard/findings/CG-B-e79bcb03e6de7ff43323bbb9786403e1/events/lifecycle-event-cb8dc123b593ba7ed45a3e3cab073221ced30c4f8f9ee840dabe05da2f6e6c97.json",
+      "evidence_ref": ".codeguard/state/resolution_evidence/b2f0acbd7519264309deefa46ce6f213628300a4cf63a02524c45ea48f05ea34.json",
+      "evidence_sha256": "b2f0acbd7519264309deefa46ce6f213628300a4cf63a02524c45ea48f05ea34",
+      "identity": {
+        "checker_id": "syntax.native_confirmation",
+        "scope": "app.rb",
+        "task_id": "CG-B-e79bcb03e6de7ff43323bbb9786403e1",
+        "workspace_id": "ws-0acd715022b6ab4d3abfac4e551ba924"
+      },
+      "outcome": "code_fixed",
+      "policy_revision": "p1",
+      "policy_sha256": "0f795124d990f3434469fb4f7ca636909c6d6176381a45246f35436d4d27b43b",
+      "report_type": "task_resolution_receipt",
+      "schema_version": "0.1.0",
+      "state": "resolved"
+    },
+    "evidence": {
+      "adapter_sha256": "b744f7e2612a49069c352d19423663bc225994b1ee494d5c56a3c6f38f8d5e29",
+      "current_native": {
+        "diagnostics": [],
+        "reason": "ruby_native_syntax_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "ebf76731c195908c4a716690f18a3d3fe90c4f62503cfb54423d4fb9f96fbea0",
+        "version": "ruby 2.6.10p210"
+      },
+      "current_source_sha256": "a22b1e0eaa7e781042ae2699019a507b0c31563bd36c104293c6ffb3dae51159",
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "identity": {
+        "checker_id": "syntax.native_confirmation",
+        "scope": "app.rb",
+        "task_id": "CG-B-e79bcb03e6de7ff43323bbb9786403e1",
+        "workspace_id": "ws-0acd715022b6ab4d3abfac4e551ba924"
+      },
+      "original_native": {
+        "diagnostics": [
+          {
+            "line": 1,
+            "rule_id": "ruby.syntax"
+          }
+        ],
+        "reason": "ruby_native_syntax_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "ebf76731c195908c4a716690f18a3d3fe90c4f62503cfb54423d4fb9f96fbea0",
+        "version": "ruby 2.6.10p210"
+      },
+      "original_report_sha256": "a252b49109b25914225f898aed58cbc0736d8e05d998fff0bfc9f15f43d5ab7b",
+      "original_source_sha256": "cedce0abe1dc0ec03b8245285802afc1044f2aea5cf68f39223f6b5c4913bb20",
+      "outcome": "code_fixed",
+      "policy_revision": "p1",
+      "policy_sha256": "0f795124d990f3434469fb4f7ca636909c6d6176381a45246f35436d4d27b43b",
+      "report_type": "task_resolution_evidence",
+      "schema_version": "0.10.0",
+      "tool_sha256": "ebf76731c195908c4a716690f18a3d3fe90c4f62503cfb54423d4fb9f96fbea0"
+    }
+  },
+  {
+    "policy": {
+      "adapter_sha256": "b744f7e2612a49069c352d19423663bc225994b1ee494d5c56a3c6f38f8d5e29",
+      "grammar_sha256": null,
+      "identity": {
+        "checker_id": "syntax.native_confirmation",
+        "scope": "app.rb",
+        "task_id": "CG-B-5216654761843994f40350ac314cedd2",
+        "workspace_id": "ws-988ef0c07f240477429dc52f966a449f"
+      },
+      "native_rule_id": "ruby.syntax",
+      "native_version": "ruby 2.6.10p210",
+      "original_report_sha256": "84d145091692f482d6b17aa109c7c58a406de7ab1db840624bb4aeeb984fdb82",
+      "original_source_sha256": "cedce0abe1dc0ec03b8245285802afc1044f2aea5cf68f39223f6b5c4913bb20",
+      "policy_revision": "p1",
+      "report_type": "task_resolution_policy",
+      "schema_version": "1.9.0",
+      "tool_sha256": "ebf76731c195908c4a716690f18a3d3fe90c4f62503cfb54423d4fb9f96fbea0"
+    },
+    "receipt": {
+      "authority": "host_context_verified",
+      "delivery_decision": "not_evaluated",
+      "event_ref": ".codeguard/findings/CG-B-5216654761843994f40350ac314cedd2/events/lifecycle-event-dbb154a38a28722f19d8e472adc225110ff59061518eccb1d96c32b747739967.json",
+      "evidence_ref": ".codeguard/state/resolution_evidence/5ad6fce2b91d51796578c6369237bcf575640590ba5ea727a74ad5eddda91a59.json",
+      "evidence_sha256": "5ad6fce2b91d51796578c6369237bcf575640590ba5ea727a74ad5eddda91a59",
+      "identity": {
+        "checker_id": "syntax.native_confirmation",
+        "scope": "app.rb",
+        "task_id": "CG-B-5216654761843994f40350ac314cedd2",
+        "workspace_id": "ws-988ef0c07f240477429dc52f966a449f"
+      },
+      "outcome": "code_fixed",
+      "policy_revision": "p1",
+      "policy_sha256": "694a62fb24f2e6c459f4f5b4d868825f25d4db05aa4be2e6aa9d439307106302",
+      "report_type": "task_resolution_receipt",
+      "schema_version": "0.1.0",
+      "state": "resolved"
+    },
+    "evidence": {
+      "adapter_sha256": "b744f7e2612a49069c352d19423663bc225994b1ee494d5c56a3c6f38f8d5e29",
+      "current_native": {
+        "diagnostics": [],
+        "reason": "ruby_native_syntax_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "ebf76731c195908c4a716690f18a3d3fe90c4f62503cfb54423d4fb9f96fbea0",
+        "version": "ruby 2.6.10p210"
+      },
+      "current_source_sha256": "a22b1e0eaa7e781042ae2699019a507b0c31563bd36c104293c6ffb3dae51159",
+      "grammar_sha256": null,
+      "identity": {
+        "checker_id": "syntax.native_confirmation",
+        "scope": "app.rb",
+        "task_id": "CG-B-5216654761843994f40350ac314cedd2",
+        "workspace_id": "ws-988ef0c07f240477429dc52f966a449f"
+      },
+      "original_native": {
+        "diagnostics": [
+          {
+            "line": 1,
+            "rule_id": "ruby.syntax"
+          }
+        ],
+        "reason": "ruby_native_syntax_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "ebf76731c195908c4a716690f18a3d3fe90c4f62503cfb54423d4fb9f96fbea0",
+        "version": "ruby 2.6.10p210"
+      },
+      "original_report_sha256": "84d145091692f482d6b17aa109c7c58a406de7ab1db840624bb4aeeb984fdb82",
+      "original_source_sha256": "cedce0abe1dc0ec03b8245285802afc1044f2aea5cf68f39223f6b5c4913bb20",
+      "outcome": "code_fixed",
+      "policy_revision": "p1",
+      "policy_sha256": "694a62fb24f2e6c459f4f5b4d868825f25d4db05aa4be2e6aa9d439307106302",
+      "report_type": "task_resolution_evidence",
+      "schema_version": "0.10.0",
+      "tool_sha256": "ebf76731c195908c4a716690f18a3d3fe90c4f62503cfb54423d4fb9f96fbea0"
+    }
+  },
+  {
+    "policy": {
+      "adapter_sha256": "b744f7e2612a49069c352d19423663bc225994b1ee494d5c56a3c6f38f8d5e29",
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "identity": {
+        "checker_id": "syntax.native_confirmation",
+        "scope": "app.rb",
+        "task_id": "CG-B-e5ee892719783598ef8f030c75695d06",
+        "workspace_id": "ws-326168716edbc07c7b27f3f7557a59de"
+      },
+      "native_rule_id": "ruby.syntax",
+      "native_version": "ruby 2.6.10p210",
+      "original_report_sha256": "4e79155fb2c836a53f4102c43267728878a77f813f96d1fff3da1765812753b9",
+      "original_source_sha256": "cedce0abe1dc0ec03b8245285802afc1044f2aea5cf68f39223f6b5c4913bb20",
+      "policy_revision": "p1",
+      "report_type": "task_resolution_policy",
+      "schema_version": "1.9.0",
+      "tool_sha256": "bee9ae48d07585956b33e2fb06edf776ea901623864d99619829bc0ddc875e16"
+    },
+    "receipt": {
+      "authority": "host_context_verified",
+      "delivery_decision": "not_evaluated",
+      "event_ref": ".codeguard/findings/CG-B-e5ee892719783598ef8f030c75695d06/events/lifecycle-event-a56367647708864a81ed43fa48d86c6db3952f517a0386b1e6761972ba0ff4a5.json",
+      "evidence_ref": ".codeguard/state/resolution_evidence/a8ba19230aa1f36d81209ed05179af066e55f110f87dd1ed5de8e59b61a2e9c6.json",
+      "evidence_sha256": "a8ba19230aa1f36d81209ed05179af066e55f110f87dd1ed5de8e59b61a2e9c6",
+      "identity": {
+        "checker_id": "syntax.native_confirmation",
+        "scope": "app.rb",
+        "task_id": "CG-B-e5ee892719783598ef8f030c75695d06",
+        "workspace_id": "ws-326168716edbc07c7b27f3f7557a59de"
+      },
+      "outcome": "inputs_stale",
+      "policy_revision": "p1",
+      "policy_sha256": "1023c7b0375a1da41530a3fe52f91132707c713d5ea92fd94bae34a65943ffbb",
+      "report_type": "task_resolution_receipt",
+      "schema_version": "0.1.0",
+      "state": "verification_required"
+    },
+    "evidence": {
+      "adapter_sha256": "b744f7e2612a49069c352d19423663bc225994b1ee494d5c56a3c6f38f8d5e29",
+      "current_native": {
+        "diagnostics": [],
+        "reason": "ruby_project_version_mismatch",
+        "status": "incomplete",
+        "tool_sha256": null,
+        "version": null
+      },
+      "current_source_sha256": "a22b1e0eaa7e781042ae2699019a507b0c31563bd36c104293c6ffb3dae51159",
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "identity": {
+        "checker_id": "syntax.native_confirmation",
+        "scope": "app.rb",
+        "task_id": "CG-B-e5ee892719783598ef8f030c75695d06",
+        "workspace_id": "ws-326168716edbc07c7b27f3f7557a59de"
+      },
+      "original_native": {
+        "diagnostics": [
+          {
+            "line": 1,
+            "rule_id": "ruby.syntax"
+          }
+        ],
+        "reason": "ruby_native_syntax_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "bee9ae48d07585956b33e2fb06edf776ea901623864d99619829bc0ddc875e16",
+        "version": "ruby 2.6.10p210"
+      },
+      "original_report_sha256": "4e79155fb2c836a53f4102c43267728878a77f813f96d1fff3da1765812753b9",
+      "original_source_sha256": "cedce0abe1dc0ec03b8245285802afc1044f2aea5cf68f39223f6b5c4913bb20",
+      "outcome": "inputs_stale",
+      "policy_revision": "p1",
+      "policy_sha256": "1023c7b0375a1da41530a3fe52f91132707c713d5ea92fd94bae34a65943ffbb",
+      "report_type": "task_resolution_evidence",
+      "schema_version": "0.10.0",
+      "tool_sha256": "bee9ae48d07585956b33e2fb06edf776ea901623864d99619829bc0ddc875e16"
+    }
+  }
+]

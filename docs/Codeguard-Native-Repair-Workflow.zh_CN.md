@@ -266,3 +266,10 @@ Rust 读取并复核有界源码字节，通过冻结 stdin、固定 `/` cwd、�
 原生错误使同一任务的 `next` 进入源码修复；源码或工具变化撤回旧位置。修复后零诊断记录 `candidate_absent_unverified_policy`，不自动关闭，也不替代项目 lint、类型检查、宏/条件编译上下文、构建、安全或交付义务。重复无进展仍使用既有尝试预算。本批不提升 Swift grammar 资格或 32 语言精度结论，公开 npm 0.1.4 尚不含此扩展。
 
 新增协议分别为 `syntax_task_recheck` 0.4.0、`task_verification_preview` 0.15.0、`repair_brief_preview` 0.6.0、Hook 反馈 0.9.0（任务摘要 0.3.0）。聚合 `check` 的 `next` 含 Swift 原生简报时用 0.39.0，其他路径保留 0.38.0；旧 schema 原件不改。具体实测和完整报告见 [Swift 原生确认验收](../tests/acceptance/swift-native-task-confirmation.md)。
+
+
+### Ruby 原工具关闭与复发（当前源码 SDK）
+
+`verify_ruby_task_resolution(&RubyTaskResolutionRequest)` 将固定 Ruby 2.6.10p210 接入现有宿主 SDK。签名策略 1.9.0 与证据 0.10.0 同时支持原生首次及 WASM 首次任务：前者 grammar 为 null 并绑定首次工具，后者保留首次 grammar。原始样例与当前源码共用预算；版本声明及其缺项在请求前后复核。只有原工具确认原问题、当前已修改源码完整无诊断且输入稳定，才关闭限定任务。重复复检幂等；同工具的普通 `task verify --ruby-tool` 可沿父链记录复发。
+
+原始样例原生无诊断时提出误报复核；未知版本、坏输出或声明变化不能关闭。Ruby 诊断只使用原生行号，不制造列号或冒充 RuboCop。签名/信任根仍由独立宿主提供；本批源码能力尚未发布到 npm，也未证明默认插件已能可信关闭。详见 [Ruby 原工具验收](../tests/acceptance/ruby-task-resolution.md)。

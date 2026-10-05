@@ -1741,3 +1741,8 @@ SP22完整默认终态：当前源码workspace all-targets 1500 passed / 0 faile
 ## 2026-10-06 SP23 ESLint 去重前全量验证（已验证缺陷修复）
 
 稳定任务投影先验证所有原生诊断再去重，拒绝重复键掩盖异源路径或超预算消息；合法任务身份和排序保持兼容。反例实际 RED→GREEN；六个受影响目标 40 passed / 0 failed / 8 ignored，adapters 全目标严格 Clippy、OpenSpec strict、layering、所改文件格式与 diff 检查通过。见[验收记录](../../../tests/acceptance/eslint-duplicate-validation.md)。本项不替代全项目 ESLint、真实宿主和 S09 父任务验收，不勾选父任务。
+
+
+## 2026-10-06 SP24 Ruby 原工具 SDK 关闭与复发（已验证切片）
+
+新增 RubyTaskResolutionRequest / verify_ruby_task_resolution，策略1.9.0和证据0.10.0绑定原生首次或WASM首次报告；原样本与当前源码同工具复检、版本声明前后复核、幂等关闭/复发重开、借用租约及尝试消费已验证。共享服务/Ruby回归81通过/0失败/9忽略；当前Ruby目标7通过/1忽略，默认构建五目标35通过/2忽略；本机Ruby真实工具两种来源闭环1通过且4份实际结果归档，schema3通过。默认/WASM严格Clippy、OpenSpec strict、layering、格式及diff检查通过。见[局部验收](../../../tests/acceptance/ruby-task-resolution.md)。宿主信任根仍为测试夹具，未修改普通CLI关闭权限，不勾选完整S09/S14、Ruby能力、真实宿主或发行父任务。

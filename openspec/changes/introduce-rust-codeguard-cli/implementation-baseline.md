@@ -151,3 +151,8 @@ check ruby/all新增--ruby-tool并复用固定版本有界语法扫描；64文�
 已补齐Ruby编辑Hook的实际未接线缺口，复用限定原生扫描/稳定任务，支持--ruby-tool及绝对PATH，repair_ready保留当前行号及真实报告引用。对话不猜列号或回显工具消息；原生失败不换WASM，零诊断不自闭任务。8份实际CLI报告与封闭协议回归通过；最终安装和受影响回归见[验收](../../../tests/acceptance/ruby-native-hook.md)。真实宿主触发和公开发行不以形状重放计完成。
 
 Ruby Hook本批终态：默认完整1404通过/0失败/125忽略，WASM受影响85通过/0失败/4忽略；默认/WASM严格Clippy、fmt、分层、OpenSpec strict通过。离线npm安装链路1通过、8份实际Hook报告及9份结构化安装报告协议回归通过。前一aaa3879的Linux CI 37324440688全成功，此前Go失败未复现但根因未确认；本批远端结果须独立核验。详见tests/acceptance/ruby-native-hook.md，不勾选完整语言、真实宿主或发行父任务。
+
+
+## 2026-10-06 Ruby 原工具限定关闭与复发（源码 SDK）
+
+Ruby原生/WASM首次稳定任务已接入共享宿主服务，保留原报告、工具与grammar身份及版本声明变化；本机Ruby2.6.10p210确认修复、幂等与复发，默认构建支持原生首次链路。普通task verify仍不从项目历史取得关闭批准。真实宿主政策提供者、完整RuboCop/语言规则与发行资格未完成。见[验收](../../../tests/acceptance/ruby-task-resolution.md)。
