@@ -751,3 +751,19 @@ Diagnostics SHALL require a recognized error header and bounded positions referr
 #### Scenario: Tool or private configuration changes during version detection
 - **WHEN** the selected executable alias/content or private configuration changes after version observation
 - **THEN** reject the observation before invoking the parser and preserve incomplete evidence without replacement-tool fallback
+
+### Requirement: Rust edit parsing SHALL resolve Cargo edition before native syntax observation
+
+Project Rust parser selection SHALL distinguish package edition, explicit workspace inheritance, absent package edition and standalone source. A valid package with no edition uses Cargo's backward-compatible 2015 default, not the newest formatter edition. Explicit `edition.workspace=true` SHALL require a supplied valid workspace package edition; false inheritance, unknown editions, malformed/duplicate TOML and virtual-workspace-only source SHALL remain unresolved. Static declaration parsing SHALL be bounded, shall not execute Cargo or project scripts, and shall retain an explicit package.workspace locator for the filesystem layer to resolve. A missing Cargo manifest SHALL NOT default standalone source to any edition. Declaration parsing alone SHALL NOT prove workspace membership, source ownership, tool suitability or project lint coverage.
+
+#### Scenario: Package and workspace editions differ
+- **WHEN** a package explicitly declares edition2018 while its surrounding workspace declares2024
+- **THEN** the package uses2018; only an explicit workspace inheritance declaration resolves to2024
+
+#### Scenario: Omitted or unresolved edition is handled without guessing
+- **WHEN** a valid package omits edition, a standalone file lacks a manifest, or workspace inheritance has no valid edition provider
+- **THEN** only the valid package defaults to2015; the other contexts remain unresolved and no incompatible fixed-edition parser is invoked
+
+#### Scenario: Declaration changes during tool version detection
+- **WHEN** a nearer manifest appears or package/workspace declaration or source bytes change during the native version invocation
+- **THEN** withdraw current diagnostics and do not start the second parser invocation; retain an incomplete observation without task closure

@@ -11,13 +11,42 @@ use std::{
 
 /// 对固定 edition2024 的冻结 stdin 作 Rustfmt 解析；参数是显式入口、源码及共同预算。
 /// 返回脱敏语法观察，不检查格式差异、不执行 Cargo/源码，也不授予 lint 或项目覆盖。
+#[cfg(any(feature = "wasm-precheck", test))]
 pub(crate) fn observe(
     tool: &Path,
     source: &[u8],
     deadline: Instant,
     cancelled: &AtomicBool,
 ) -> Value {
+    observe_for_edition(tool, source, "2024", deadline, cancelled)
+}
+
+/// 使用已解析Cargo edition的同字节原生观察；返回脱敏解析协议而非lint结论。
+#[cfg(any(feature = "wasm-precheck", test))]
+pub(crate) fn observe_for_edition(
+    tool: &Path,
+    source: &[u8],
+    edition: &str,
+    deadline: Instant,
+    cancelled: &AtomicBool,
+) -> Value {
+    observe_with_context_guard(tool, source, edition, deadline, cancelled, &|| true)
+}
+
+/// 在版本调用与解析之间核对项目声明/源码上下文；参数含只读连续性检查。
+pub(crate) fn observe_with_context_guard(
+    tool: &Path,
+    source: &[u8],
+    edition: &str,
+    deadline: Instant,
+    cancelled: &AtomicBool,
+    context_current: &dyn Fn() -> bool,
+) -> Value {
     let mut report = json!({"status":"incomplete","reason":"rustfmt_syntax_input_invalid","version":null,"tool_sha256":null,"edition":"2024","observation_kind":"formatter_parser","diagnostics":[]});
+    if !matches!(edition, "2015" | "2018" | "2021" | "2024") {
+        return report;
+    }
+    report["edition"] = json!(edition);
     if !tool.is_absolute() || source.len() > 1024 * 1024 || std::str::from_utf8(source).is_err() {
         return report;
     }
@@ -30,7 +59,7 @@ pub(crate) fn observe(
     };
     let sha = format!("{:x}", Sha256::digest(&bytes));
     report["tool_sha256"] = json!(sha);
-    let Some(scratch) = crate::rustfmt_scratch::RustfmtScratch::create() else {
+    let Some(scratch) = crate::rustfmt_scratch::RustfmtScratch::create_for_edition(edition) else {
         report["reason"] = json!("rustfmt_private_config_unavailable");
         return report;
     };
@@ -70,6 +99,10 @@ pub(crate) fn observe(
         return report;
     }
     report["version"] = json!("rustfmt 1.9.0-stable");
+    if !context_current() {
+        report["reason"] = json!("rustfmt_project_context_changed");
+        return report;
+    }
     // 不用 --check：格式差异不是语法错误；stdin 不向原文件写入格式结果。
     let outcome = invoke(
         &[
@@ -118,6 +151,10 @@ pub(crate) fn observe(
         });
         return report;
     };
+    if !context_current() {
+        report["reason"] = json!("rustfmt_project_context_changed");
+        return report;
+    }
     report["status"] = json!(status);
     report["reason"] = json!(reason);
     report["diagnostics"] = json!(diagnostics);

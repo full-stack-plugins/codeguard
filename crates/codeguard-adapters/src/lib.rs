@@ -21,6 +21,7 @@ pub use cargo_build_diagnostic::CargoBuildDiagnostic;
 pub use cargo_build_parsed::CargoBuildParsed;
 mod cargo_clippy;
 mod cargo_module_model;
+mod cargo_edition_declaration;
 mod cargo_rustdoc;
 mod checker_configuration;
 mod checkstyle_command;
@@ -118,6 +119,7 @@ mod ruff_settings;
 pub use capability_validation::validate_capability_inventory;
 pub use cargo_clippy::{ClippyFinding, ClippyParsed, parse_cargo_clippy_json};
 pub use cargo_module_model::CargoModuleModel;
+pub use cargo_edition_declaration::CargoEditionDeclaration;
 pub use cargo_rustdoc::parse_cargo_rustdoc_json;
 pub use checker_configuration::{
     CheckerConfiguration, configured_p3c_rulesets, inspect_gradle_unknown, inspect_maven_pom,
