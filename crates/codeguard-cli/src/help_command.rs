@@ -50,7 +50,7 @@ pub fn run(args: &[String]) -> ExitCode {
     if format == Some("json") {
         println!(
             "{}",
-            json!({"schema_version":"0.3.0","report_type":"command_help",
+            json!({"schema_version":"0.4.0","report_type":"command_help",
             "operation":"help","cli_version":env!("CARGO_PKG_VERSION"),"command_status":"complete",
             "exit_code":0,"selection":selection,"native_execution":"not_run",
             "delivery_decision":"not_evaluated","commands":commands})

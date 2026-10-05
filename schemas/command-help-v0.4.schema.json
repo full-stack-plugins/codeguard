@@ -1,0 +1,1459 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeguard.dev/schemas/command-help-v0.4.schema.json",
+  "title": "当前构建的只读命令支持目录",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.4.0"
+    },
+    "report_type": {
+      "const": "command_help"
+    },
+    "operation": {
+      "const": "help"
+    },
+    "cli_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][A-Za-z0-9.-]+)?$"
+    },
+    "command_status": {
+      "const": "complete"
+    },
+    "exit_code": {
+      "const": 0
+    },
+    "selection": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        }
+      ]
+    },
+    "native_execution": {
+      "const": "not_run"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "commands": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 44,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/command"
+      }
+    }
+  },
+  "$defs": {
+    "command": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tracking_id",
+        "command",
+        "support",
+        "executable",
+        "operation_kind",
+        "usage",
+        "scope",
+        "languages",
+        "examples"
+      ],
+      "properties": {
+        "tracking_id": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^C(?:0[1-9]|[12][0-9]|3[0-6])$"
+            }
+          ]
+        },
+        "command": {
+          "enum": [
+            "help",
+            "--version",
+            "detect",
+            "capabilities",
+            "init",
+            "plan",
+            "doctor",
+            "rules list",
+            "config validate",
+            "config explain",
+            "tools list",
+            "tools verify",
+            "tools install",
+            "lint",
+            "comments",
+            "cve",
+            "security",
+            "build",
+            "check",
+            "gate pre-commit",
+            "gate pre-push",
+            "gate ci",
+            "work sync",
+            "status",
+            "next",
+            "task show",
+            "task claim",
+            "task heartbeat",
+            "task release",
+            "task attempt start",
+            "task attempt finish",
+            "fix",
+            "task verify",
+            "mcp serve",
+            "compat legacy-v1",
+            "dependencies",
+            "grammar status",
+            "grammar probe",
+            "hook plan",
+            "hook execute",
+            "hook claude",
+            "rules whitelist list",
+            "rules whitelist explain",
+            "rules whitelist propose"
+          ]
+        },
+        "support": {
+          "enum": [
+            "implemented",
+            "partial",
+            "planned",
+            "unavailable_build"
+          ]
+        },
+        "executable": {
+          "type": "boolean"
+        },
+        "operation_kind": {
+          "enum": [
+            "query",
+            "plan",
+            "management",
+            "check",
+            "host"
+          ]
+        },
+        "usage": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "languages": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 57,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          }
+        },
+        "examples": {
+          "type": "array",
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^codeguard [^\\r\\n]+$"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "support": {
+                "enum": [
+                  "planned",
+                  "unavailable_build"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "executable": {
+                "const": false
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "executable": {
+                "const": true
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "help"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C01"
+              },
+              "operation_kind": {
+                "const": "query"
+              },
+              "support": {
+                "enum": [
+                  "implemented"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "--version"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C02"
+              },
+              "operation_kind": {
+                "const": "query"
+              },
+              "support": {
+                "enum": [
+                  "implemented"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "detect"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C03"
+              },
+              "operation_kind": {
+                "const": "query"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "capabilities"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C04"
+              },
+              "operation_kind": {
+                "const": "query"
+              },
+              "support": {
+                "enum": [
+                  "implemented"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "init"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C05"
+              },
+              "operation_kind": {
+                "const": "management"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "plan"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C06"
+              },
+              "operation_kind": {
+                "const": "plan"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "doctor"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C07"
+              },
+              "operation_kind": {
+                "const": "check"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "rules list"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C08"
+              },
+              "operation_kind": {
+                "const": "query"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "config validate"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C09"
+              },
+              "operation_kind": {
+                "const": "check"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "config explain"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C10"
+              },
+              "operation_kind": {
+                "const": "query"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "tools list"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C11"
+              },
+              "operation_kind": {
+                "const": "query"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "tools verify"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C12"
+              },
+              "operation_kind": {
+                "const": "check"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "tools install"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C13"
+              },
+              "operation_kind": {
+                "const": "management"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "lint"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C14"
+              },
+              "operation_kind": {
+                "const": "check"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": [
+                  "java",
+                  "python",
+                  "typescript",
+                  "zig",
+                  "swift",
+                  "kotlin",
+                  "erlang",
+                  "go",
+                  "rust",
+                  "ruby",
+                  "shell"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "comments"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C15"
+              },
+              "operation_kind": {
+                "const": "check"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": [
+                  "rust"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "cve"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C16"
+              },
+              "operation_kind": {
+                "const": "check"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": [
+                  "rust",
+                  "python",
+                  "typescript"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "security"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C17"
+              },
+              "operation_kind": {
+                "const": "check"
+              },
+              "support": {
+                "enum": [
+                  "planned"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "build"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C18"
+              },
+              "operation_kind": {
+                "const": "check"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": [
+                  "rust"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "check"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C19"
+              },
+              "operation_kind": {
+                "const": "check"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "gate pre-commit"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C20"
+              },
+              "operation_kind": {
+                "const": "check"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "gate pre-push"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C21"
+              },
+              "operation_kind": {
+                "const": "check"
+              },
+              "support": {
+                "enum": [
+                  "planned"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "gate ci"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C22"
+              },
+              "operation_kind": {
+                "const": "check"
+              },
+              "support": {
+                "enum": [
+                  "planned"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "work sync"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C23"
+              },
+              "operation_kind": {
+                "const": "management"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "status"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C24"
+              },
+              "operation_kind": {
+                "const": "query"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "next"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C25"
+              },
+              "operation_kind": {
+                "const": "query"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "task show"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C26"
+              },
+              "operation_kind": {
+                "const": "query"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "task claim"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C27"
+              },
+              "operation_kind": {
+                "const": "management"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "task heartbeat"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C28"
+              },
+              "operation_kind": {
+                "const": "management"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "task release"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C29"
+              },
+              "operation_kind": {
+                "const": "management"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "task attempt start"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C30"
+              },
+              "operation_kind": {
+                "const": "management"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "task attempt finish"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C31"
+              },
+              "operation_kind": {
+                "const": "management"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "fix"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C32"
+              },
+              "operation_kind": {
+                "const": "management"
+              },
+              "support": {
+                "enum": [
+                  "planned"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "task verify"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C33"
+              },
+              "operation_kind": {
+                "const": "check"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "mcp serve"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C34"
+              },
+              "operation_kind": {
+                "const": "host"
+              },
+              "support": {
+                "enum": [
+                  "planned"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "compat legacy-v1"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C35"
+              },
+              "operation_kind": {
+                "const": "host"
+              },
+              "support": {
+                "enum": [
+                  "planned"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "dependencies"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": "C36"
+              },
+              "operation_kind": {
+                "const": "check"
+              },
+              "support": {
+                "enum": [
+                  "planned"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "grammar status"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": null
+              },
+              "operation_kind": {
+                "const": "query"
+              },
+              "support": {
+                "enum": [
+                  "implemented"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "grammar probe"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": null
+              },
+              "operation_kind": {
+                "const": "check"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "hook plan"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": null
+              },
+              "operation_kind": {
+                "const": "plan"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "hook execute"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": null
+              },
+              "operation_kind": {
+                "const": "host"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "hook claude"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": null
+              },
+              "operation_kind": {
+                "const": "host"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "rules whitelist list"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": null
+              },
+              "operation_kind": {
+                "const": "query"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "rules whitelist explain"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": null
+              },
+              "operation_kind": {
+                "const": "query"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "command": {
+                "const": "rules whitelist propose"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "tracking_id": {
+                "const": null
+              },
+              "operation_kind": {
+                "const": "management"
+              },
+              "support": {
+                "enum": [
+                  "partial",
+                  "unavailable_build"
+                ]
+              },
+              "languages": {
+                "const": []
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "cli_version",
+    "command_status",
+    "exit_code",
+    "selection",
+    "native_execution",
+    "delivery_decision",
+    "commands"
+  ]
+}

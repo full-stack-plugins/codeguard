@@ -4,6 +4,19 @@
 
 ## ADDED Requirements
 
+### Requirement: Native ShellCheck feedback SHALL preserve dialect, rc and original-rule evidence
+
+ShellCheck单文件入口 MUST 明确方言和工具兼容版本，冻结有界UTF8源码并通过受控stdin调用json1，不执行受检脚本、不应用原生fix。已知zsh/fish声明或文件名 MUST 保留未支持，不强制按bash制造诊断。显式rc或最近祖先配置与更近缺项 MUST 在调用前后核对；不加载的全局配置 MUST 公开说明，未知外部source范围 MUST 保留阻塞。环境规则与源发现 MUST 分开，保留部分有效诊断但不能判完整。json1位置 MUST 按其Unicode字符及tab语义核验；未知字段、重复键、异源文件、越界位置、退出与报告矛盾 MUST 未完成。原生自由文本及fix替换不得作为智能体指令。修复简报 MUST 包含七要素；未接持久历史时明确not_integrated，未完成证据不得授权源码修改或关闭任务。原生零诊断不得替代项目门禁。
+
+#### Scenario: A missing sourced file coexists with a quoting diagnostic
+- **WHEN** json1包含SC1091和SC2086且原始输入稳定
+- **THEN** SC1091保留为环境阻塞，SC2086保留为局部调查证据；整体未完成，不删除发现、不关闭任务
+
+#### Scenario: Project rc suppresses a native rule
+- **WHEN** 原项目rc明确disable=SC2086且原工具输出零诊断
+- **THEN** 保存原配置摘要和原生执行事实，但不能将抑制当作源码修复、CodeGuard批准白名单或完整交付
+
+
 ### Requirement: Explicit Maven Javadoc selection SHALL not fall back to isolated single-file diagnostics
 
 项目检查明确提供 Maven 执行上下文时，Javadoc MUST 选择原 POM/完整显式主源码的多文件检查，不再额外启动隔离单文件 JDK 探针。构建根不适用、配置/类路径未知、环境缺失或原生失败 MUST 保留具体未完成诊断，不得用单文件探针代替项目配置。未选择 Maven 的显式 JDK 局部模式保持可用，但 MUST 标注其单文件范围且不推导项目覆盖。报告 MUST 版本化显示探针模式及独立多文件结果；跨文件类型引用不得因为已舍弃的单文件上下文额外生成源码 finding 或环境任务。

@@ -408,3 +408,10 @@ pub use ruby_candidate::{bundled_ruby_candidate_profile, parse_ruby_candidate_pr
 pub use ruby_candidate_profile::RubyCandidateProfile;
 pub use ruby_candidate_slot::RubyCandidateSlot;
 pub use ruby_candidate_tool::RubyCandidateTool;
+
+mod shellcheck_diagnostic;
+mod shellcheck_parsed;
+mod shellcheck_json;
+pub use shellcheck_diagnostic::ShellCheckDiagnostic;
+pub use shellcheck_parsed::ShellCheckParsed;
+pub use shellcheck_json::parse_shellcheck_json1;

@@ -35,9 +35,9 @@ class RubyLintFeedback(unittest.TestCase):
         binary=os.environ.get('CODEGUARD_RUBY_BIN',str(ROOT/'target/debug/codeguard'))
         out=subprocess.run([binary,'help','lint','--format=json'],capture_output=True,timeout=10)
         self.assertEqual(out.returncode,0)
-        data=json.loads(out.stdout);validator('command-help-v0.3.schema.json').validate(data)
+        data=json.loads(out.stdout);validator('command-help-v0.4.schema.json').validate(data)
         self.assertIn('ruby',data['commands'][0]['languages'])
-        for version in ['0.1','0.2']:self.assertFalse(validator(f'command-help-v{version}.schema.json').is_valid(data))
+        for version in ['0.1','0.2','0.3']:self.assertFalse(validator(f'command-help-v{version}.schema.json').is_valid(data))
 
     def test_archived_workflow_and_native_origin(self):
         prefix=ROOT/'tests/acceptance/evidence'

@@ -412,3 +412,12 @@ pub mod rust_lint_command;
 mod rust_lint_fallback;
 #[cfg(unix)]
 mod rust_lint_workbench;
+
+#[cfg(unix)]
+pub mod shell_lint_command;
+#[cfg(unix)]
+mod shell_lint_arguments;
+#[cfg(unix)]
+mod shellcheck_config;
+#[cfg(unix)]
+mod shellcheck_probe;

@@ -1632,3 +1632,7 @@ Ruby Hook本批终态：默认完整1404通过/0失败/125忽略，WASM受影响
 对应既有5.4、8.*、9.9、14.19：固定Ruby2.6误解析其它声明版本、运行期配置变化及嵌套Gemfile遮蔽工作区pin反例先RED；统一有界最近声明约束后GREEN。不匹配、歧义及链接返回环境未完成、不启动旧Ruby或回退WASM；源码/编辑/复检共用，next撤回不适用位置，无声明仍未批准。新增9项/default受影响63项/WASM受影响90项通过，真实Ruby两份报告通过封闭schema，双构建严格Clippy及既有Hook协议/分层/strict规格验证通过。完整项目版本探测、Gemfile/JRuby/RVM、全语言门禁与发行未完成，父任务不勾选。证据见[验收](../../../tests/acceptance/ruby-project-version.md)。默认全工作区及远端CI分别追加核验。
 
 最终默认全工作区/all-targets 256 个结果目标：1413 通过、0 失败、125 忽略，日志 `/private/tmp/codeguard-ruby-version-workspace-v2.log`。这是本批源码的默认构建验收；WASM 仅执行上述受影响目标，远端 CI 仍须按本次提交独立核验。
+
+## 2026-10-06 ShellCheck 原生单文件入口（7.4仍未完成）
+
+Rust受控调用ShellCheck0.11.0 json1，固定方言、stdin、入口摘要、私有rc及前后复核；项目rc探测与运行结果分开。严格报告解析保留原规则与字符列，环境规则独立归类，原生自由文本/fix不进入简报。七要素指引明确持久任务未接通。真实原工具SC2086、配置抑制、缺source与局部诊断共存、zsh拒绝、Unicode、tab/CRLF及干净样本分别归档，见[局部验收](../../../tests/acceptance/shellcheck-native-baseline.md)。完整项目Shell、zsh专用工具、Dockerfile/IaC、持久任务与平台发行仍未验收，7.4不勾选。
