@@ -1,0 +1,85 @@
+[
+  {
+    "coverage_proven": false,
+    "delivery_decision": "not_evaluated",
+    "edition_context": {
+      "edition": "2015",
+      "manifest_ref": "member/Cargo.toml",
+      "manifest_sha256": "79d398a02e9ba2e1a464c454fdb26f4491551e1c43d86fdea160d052f44e3485",
+      "workspace_manifest_ref": null,
+      "workspace_manifest_sha256": null
+    },
+    "native": {
+      "diagnostics": [
+        {
+          "line": 1,
+          "rule_id": "rust.syntax"
+        }
+      ],
+      "edition": "2015",
+      "observation_kind": "formatter_parser",
+      "reason": "rustfmt_native_parse_diagnostics",
+      "status": "diagnostics_observed",
+      "tool_sha256": "98e8da71078a8b5710f1818c98da25d92de162a122bd9a6db222ca929e545468",
+      "version": "rustfmt 1.9.0-stable"
+    },
+    "path": "member/src/lib.rs",
+    "reason": "rustfmt_native_parse_diagnostics",
+    "report_type": "rust_project_syntax_observation",
+    "schema_version": "0.1.0",
+    "source_sha256": "50ea244a4a4cde53373465eda3c22527014999efe14e3f326ed44978cb5e8dc6",
+    "status": "diagnostics_observed"
+  },
+  {
+    "coverage_proven": false,
+    "delivery_decision": "not_evaluated",
+    "edition_context": {
+      "edition": "2021",
+      "manifest_ref": "member/Cargo.toml",
+      "manifest_sha256": "53297149e95dfb337cd699249345a66242c8fd1aee7e83f7a0b97990c0f95e39",
+      "workspace_manifest_ref": null,
+      "workspace_manifest_sha256": null
+    },
+    "native": {
+      "diagnostics": [],
+      "edition": "2021",
+      "observation_kind": "formatter_parser",
+      "reason": "rustfmt_native_parse_no_diagnostics",
+      "status": "completed",
+      "tool_sha256": "98e8da71078a8b5710f1818c98da25d92de162a122bd9a6db222ca929e545468",
+      "version": "rustfmt 1.9.0-stable"
+    },
+    "path": "member/src/lib.rs",
+    "reason": "rustfmt_native_parse_no_diagnostics",
+    "report_type": "rust_project_syntax_observation",
+    "schema_version": "0.1.0",
+    "source_sha256": "50ea244a4a4cde53373465eda3c22527014999efe14e3f326ed44978cb5e8dc6",
+    "status": "completed"
+  },
+  {
+    "coverage_proven": false,
+    "delivery_decision": "not_evaluated",
+    "edition_context": {
+      "edition": "2024",
+      "manifest_ref": "member/Cargo.toml",
+      "manifest_sha256": "62e6c1c1ec165aca37a6bc0b1ec77ecefe8955a5fbb8a9a55207e223e0d35448",
+      "workspace_manifest_ref": null,
+      "workspace_manifest_sha256": null
+    },
+    "native": {
+      "diagnostics": [],
+      "edition": "2024",
+      "observation_kind": "formatter_parser",
+      "reason": "rustfmt_native_parse_no_diagnostics",
+      "status": "completed",
+      "tool_sha256": "98e8da71078a8b5710f1818c98da25d92de162a122bd9a6db222ca929e545468",
+      "version": "rustfmt 1.9.0-stable"
+    },
+    "path": "member/src/lib.rs",
+    "reason": "rustfmt_native_parse_no_diagnostics",
+    "report_type": "rust_project_syntax_observation",
+    "schema_version": "0.1.0",
+    "source_sha256": "50ea244a4a4cde53373465eda3c22527014999efe14e3f326ed44978cb5e8dc6",
+    "status": "completed"
+  }
+]

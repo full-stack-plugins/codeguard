@@ -17,7 +17,15 @@ pub(crate) struct RustfmtScratch {
 }
 impl RustfmtScratch {
     /// 独占创建配置目录并固定 edition；返回配置与原字节快照，不读取项目配置。
+    #[cfg(test)]
     pub(crate) fn create() -> Option<Self> {
+        Self::create_for_edition("2024")
+    }
+    /// 创建指定edition的私有配置；只接受已支持的Cargo edition，不读取项目配置。
+    pub(crate) fn create_for_edition(edition: &str) -> Option<Self> {
+        if !matches!(edition, "2015" | "2018" | "2021" | "2024") {
+            return None;
+        }
         let parent = std::env::temp_dir().canonicalize().ok()?;
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -36,7 +44,9 @@ impl RustfmtScratch {
                 .mode(0o600)
                 .open(root.join("fixed.toml"))
                 .ok()?;
-            config.write_all(b"edition = \"2024\"\n").ok()?;
+            config
+                .write_all(format!("edition = \"{edition}\"\n").as_bytes())
+                .ok()?;
             let snapshot =
                 SourceSnapshot::capture(&root, [PathBuf::from("fixed.toml")], 1, 1024, 1024)
                     .ok()?;
