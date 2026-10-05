@@ -1011,6 +1011,31 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                 "复检后的 Checkstyle 目标源码已变化或不可用；重新确认当前范围并运行原工具，不沿用旧诊断修复方向"
             );
             priority = 0;
+        } else if checker_id == "python.ruff"
+            && brief["reason_code"] == "python_syntax_confirmation_needed"
+            && observation.source_sha256.is_some()
+            && (!observed_source_matches
+                || observation
+                    .ruff_configuration
+                    .as_ref()
+                    .is_some_and(|(config, sha)| {
+                        !brief["scope"].as_str().is_some_and(|path| {
+                            crate::ruff_verification_configuration::is_current(
+                                root, path, config, sha,
+                            )
+                        })
+                    }))
+        {
+            brief["verification_invalidated_reason"] = json!(if !observed_source_matches {
+                "source_input_changed_or_unavailable"
+            } else {
+                "configuration_input_changed_or_unavailable"
+            });
+            brief["disposition"] = json!("verification_required");
+            brief["step"] = json!(
+                "Python确认复检后的源码或配置已变化；按同一任务范围重新运行原生Ruff，不沿用旧修复或恢复判断"
+            );
+            priority = 0;
         } else if matches!(
             outcome,
             "candidate_absent_unverified_policy" | "environment_restored_unverified_policy"
@@ -1632,7 +1657,9 @@ fn latest_verification_observation(
                         || report["schema_version"] == "0.6.0"
                         || report["schema_version"] == "0.7.0"
                         || report["schema_version"] == "0.8.0"
-                        || report["schema_version"] == "0.9.0")
+                        || report["schema_version"] == "0.9.0"
+                        || (report["schema_version"] == "0.18.0"
+                            && crate::python_confirmation_recheck::valid_binding(root, &report)))
                     && event["observation"] == classify(brief, &report)
             };
             if brief["checker_id"] == "python.ruff.doctor" && !report_shape_valid {
@@ -1670,9 +1697,14 @@ fn latest_verification_observation(
                 .as_str()
                 .ok_or("verification_event_invalid")?
                 .to_owned();
-            let source_sha256 = if preparation_report
-                && outcome == "environment_restored_unverified_policy"
+            let source_sha256 = if report["schema_version"] == "0.18.0"
+                && report["task_input_stable"] == true
             {
+                report["task_binding"]["source_sha256"]
+                    .as_str()
+                    .filter(|sha| valid_sha256(sha))
+                    .map(str::to_owned)
+            } else if preparation_report && outcome == "environment_restored_unverified_policy" {
                 report["scan"]["inputs"]["source"]["sha256"]
                     .as_str()
                     .filter(|s| valid_sha256(s))

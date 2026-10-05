@@ -588,3 +588,5 @@ Source-built Python fallback now preserves `codeguard.python.required_suite` evi
 `check python` / `check all` now preserve separate structure observations and actual counts in feedback0.48 and reuse the stable lint task. Generic confirmation0.7 validates fixed rule configuration and original byte coordinates. Valid candidate observations do not close earlier tasks; trusted closure remains incomplete. See [aggregate acceptance](tests/acceptance/check-python-structure.md).
 
 Source-built edit Hook feedback0.17 (local0.8) also retains separate structure counts and requires native confirmation when present. The Claude-compatible summary includes rule and count; this is not installed-host acceptance or a change to published plugin defaults.
+
+Python candidate-confirmation `task verify` now runs only the first report’s bound file through project Ruff configuration. Versioned feedback preserves the consumed original report and current input; it does not close the task or certify the project. [Scoped recheck acceptance](tests/acceptance/python-confirmation-scoped-recheck.md).

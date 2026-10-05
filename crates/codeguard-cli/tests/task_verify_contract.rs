@@ -239,7 +239,7 @@ fn verify_without_existing_owner_uses_and_releases_its_own_lease() {
         &fs::read(project.0.join(format!(".codeguard/state/leases/{id}.json"))).unwrap(),
     )
     .unwrap();
-    assert_eq!(lease["status"], "released");
+    assert_eq!(lease["status"], "released", "{report}");
     assert!(
         lease["owner"]
             .as_str()

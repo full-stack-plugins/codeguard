@@ -90,6 +90,16 @@ pub fn run(args: &[String]) -> ExitCode {
         Ok(brief) => brief,
         Err(reason) => return print_unavailable(&parsed, reason),
     };
+    let python_confirmation = brief["checker_id"] == "python.ruff"
+        && brief["reason_code"] == "python_syntax_confirmation_needed";
+    let python_original = if python_confirmation {
+        match crate::python_confirmation_recheck::original_reference(&root, &brief) {
+            Ok(reference) => Some(reference),
+            Err(reason) => return print_unavailable(&parsed, reason),
+        }
+    } else {
+        None
+    };
     let syntax_task = brief["checker_id"] == "syntax.native_confirmation";
     if (parsed.zig_tool.is_some()
         || parsed.erl_tool.is_some()
@@ -471,6 +481,46 @@ pub fn run(args: &[String]) -> ExitCode {
                 return print_unavailable(&parsed, release.err().unwrap_or(reason));
             }
         }
+    } else if python_confirmation {
+        let path = brief["scope"].as_str().expect("已核验首次Python范围");
+        let source = root.join(path);
+        let before = if source.canonicalize().ok().as_deref() == Some(source.as_path()) {
+            read_bounded_regular_file(&source, 1024 * 1024).ok()
+        } else {
+            None
+        };
+        let Some(before) = before else {
+            let release = finish_verification(&root, &parsed.task_id, &lease);
+            return print_unavailable(
+                &parsed,
+                release
+                    .err()
+                    .unwrap_or("python_confirmation_source_unavailable"),
+            );
+        };
+        match crate::python_lint_command::scan_local_report_scoped_with_deadline(
+            &root,
+            parsed.ruff_tool.as_deref(),
+            Some(&[path.to_owned()]),
+            deadline,
+            &std::sync::atomic::AtomicBool::new(false),
+        ) {
+            Ok(mut report) => {
+                report["schema_version"] = json!("0.18.0");
+                report["task_scope"] = json!("single_python_confirmation_file");
+                report["task_binding"] = json!({"task_id":parsed.task_id,"path":path,
+                    "source_sha256":crate::python_confirmation_recheck::digest(&before),
+                    "original_report":python_original});
+                report["task_input_stable"] = json!(
+                    crate::python_confirmation_recheck::inputs_current(&root, &report)
+                );
+                report
+            }
+            Err(reason) => {
+                let release = finish_verification(&root, &parsed.task_id, &lease);
+                return print_unavailable(&parsed, release.err().unwrap_or(reason));
+            }
+        }
     } else if brief["checker_id"] == "python.ruff" {
         match scan_local_report_with_deadline(
             &root,
@@ -642,7 +692,11 @@ pub fn run(args: &[String]) -> ExitCode {
     } else if brief["checker_id"] == "rust.cargo_rustdoc" {
         report["schema_version"] = json!("0.7.0");
     } else if brief["checker_id"] == "python.ruff" {
-        report["schema_version"] = json!("0.9.0");
+        report["schema_version"] = json!(if python_confirmation {
+            "0.20.0"
+        } else {
+            "0.9.0"
+        });
     }
     let persist = if codeguard_runtime::sigint_cancellation_requested() {
         Err("request_cancelled")
@@ -652,9 +706,15 @@ pub fn run(args: &[String]) -> ExitCode {
         match lock_verification(&root, &parsed.task_id, &lease) {
             Ok(_guard) => match latest_ready_attempt(&root, &parsed.task_id) {
                 Ok(current) if current == bound_attempt => {
-                    if (syntax_task
-                        && scan["input_stable"] == true
-                        && !crate::syntax_task_recheck::inputs_current(&root, &scan))
+                    if (python_confirmation
+                        && (!crate::python_confirmation_recheck::valid_binding(&root, &scan)
+                            || (scan["task_input_stable"] == true
+                                && !crate::python_confirmation_recheck::inputs_current(
+                                    &root, &scan,
+                                ))))
+                        || (syntax_task
+                            && scan["input_stable"] == true
+                            && !crate::syntax_task_recheck::inputs_current(&root, &scan))
                         || (npm_task && !crate::npm_task_recheck::inputs_current(&root, &scan))
                         || (brief["checker_id"] == "rust.cargo_check"
                             && scan["input_stable"] == true
@@ -743,6 +803,27 @@ pub fn run(args: &[String]) -> ExitCode {
         }
         if !report["reason"].is_null() {
             println!("记录原因：{}", report["reason"]);
+        }
+        if python_confirmation {
+            println!(
+                "复检范围：{}（仅首次Python确认文件）；首次报告：{}；输入一致：{}",
+                report["native_scan"]["task_binding"]["path"],
+                report["native_scan"]["task_binding"]["original_report"]["run_id"],
+                report["native_scan"]["task_input_stable"]
+            );
+            for file in report["native_scan"]["files"]
+                .as_array()
+                .into_iter()
+                .flatten()
+            {
+                println!("原生状态：{}；原因：{}", file["run_status"], file["reason"]);
+                for finding in file["findings"].as_array().into_iter().flatten().take(8) {
+                    println!(
+                        "原生规则 {}；行 {}，Ruff原生列 {}",
+                        finding["rule_id"], finding["line"], finding["column"]
+                    );
+                }
+            }
         }
         if syntax_task {
             println!(
@@ -1199,6 +1280,9 @@ fn valid_sha256(value: &str) -> bool {
 }
 
 pub(crate) fn classify(brief: &Value, scan: &Value) -> &'static str {
+    if scan["schema_version"] == "0.18.0" && scan["task_input_stable"] != true {
+        return "incomplete";
+    }
     let Some(files) = scan["files"].as_array() else {
         return "incomplete";
     };

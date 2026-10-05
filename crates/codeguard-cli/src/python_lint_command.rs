@@ -332,7 +332,7 @@ pub fn scan_local_report_with_deadline(
     scan_local_report_scoped_with_deadline(root, ruff_tool, None, deadline, cancelled)
 }
 
-fn scan_local_report_scoped_with_deadline(
+pub(crate) fn scan_local_report_scoped_with_deadline(
     root: &Path,
     ruff_tool: Option<&Path>,
     selected_paths: Option<&[String]>,

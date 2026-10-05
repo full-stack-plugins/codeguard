@@ -181,6 +181,7 @@ pub mod python_lint_scan;
 mod python_selected_discovery;
 #[cfg(unix)]
 mod python_syntax_confirmation;
+mod python_confirmation_recheck;
 #[cfg(all(unix, feature = "wasm-precheck"))]
 mod python_syntax_precheck;
 pub mod quality_policy_candidate;

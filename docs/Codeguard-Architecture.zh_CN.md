@@ -861,3 +861,5 @@ Rust runtime新增 `scan_wasm_empty_blocks`，全树观察无非comment命名语
 聚合结构证据接线见[验收记录](../tests/acceptance/check-python-structure.md)，不能据此声明grammar质量认证或完整交付门禁完成。
 
 Python隔离原生探针现于版本探测后、检查前核验请求入口与冻结字节，入口变化不启动第二次调用；检查后继续核验。实际三输入与替换/重定向反例见[原生入口连续性验收](../tests/acceptance/python-native-tool-continuity.md)。Python可信关闭仍缺稳定任务身份、首次报告与批准目标版本接线，不把开发py312探针视为项目通过。
+
+Python候选确认任务现按首次单文件范围复用项目Ruff配置和原生执行链。反馈0.18与任务预览0.20绑定已消费首次报告及当前源码，不授予项目覆盖或可信关闭。首次收据缺失或篡改时拒绝执行。见[局部验收](../tests/acceptance/python-confirmation-scoped-recheck.md)。

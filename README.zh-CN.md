@@ -570,3 +570,5 @@ Claude Code 2.1.273 已有会话内插件源码加载的实际证据，覆盖成
 `check python` / `check all` 现通过反馈0.48保留独立结构观察和真实计数，复用lint的稳定任务；通用确认报告0.7逐项核验规则配置及原字节坐标。合法候选结果不关闭旧任务，可信关闭仍未完成。见[聚合验收](tests/acceptance/check-python-structure.md)。
 
 编辑Hook的源码构建反馈0.17（局部0.8）也保留独立结构计数；存在结构观察时要求原生确认。Claude兼容摘要提供规则和数量；尚不证明实际安装宿主验收或已发布插件默认行为。
+
+Python候选确认任务的`task verify`现只按首次报告绑定文件复用项目Ruff配置。版本化反馈保留已消费首次证据与当前输入，不关闭任务或认证项目。[单文件复检验收](tests/acceptance/python-confirmation-scoped-recheck.md)。

@@ -363,7 +363,7 @@ pub(crate) fn latest_current_finding_observation(
         .ok_or("latest_report_invalid")?;
     if matches!(
         report["schema_version"].as_str(),
-        Some("0.5.0" | "0.6.0" | "0.7.0" | "0.8.0" | "0.9.0")
+        Some("0.5.0" | "0.6.0" | "0.7.0" | "0.8.0" | "0.9.0" | "0.18.0")
     ) {
         let config_ref = file["configuration_ref"]
             .as_str()
@@ -380,7 +380,7 @@ pub(crate) fn latest_current_finding_observation(
             return Err("latest_configuration_changed");
         }
     }
-    if report["schema_version"] == "0.9.0" {
+    if matches!(report["schema_version"].as_str(), Some("0.9.0" | "0.18.0")) {
         if let Some(claimed) = report["adapter_sha256"].as_str() {
             let current = crate::python_lint_command::current_adapter_sha256()
                 .ok_or("adapter_binary_unavailable")?;
@@ -474,36 +474,40 @@ fn import_one(
         codeguard_adapters::parse_unique_json(&bytes)
             .map_err(|_| "eslint_preparation_duplicate_or_invalid_json")?;
     }
-    if matches!(
-        value["report_type"].as_str(),
-        Some(
-            "python_syntax_confirmation_observation"
-                | "syntax_confirmation_observation"
-                | "syntax_task_recheck"
+    if (value["report_type"] == "python_lint_feedback" && value["schema_version"] == "0.18.0")
+        || matches!(
+            value["report_type"].as_str(),
+            Some(
+                "python_syntax_confirmation_observation"
+                    | "syntax_confirmation_observation"
+                    | "syntax_task_recheck"
+            )
         )
-    ) {
+    {
         codeguard_adapters::parse_unique_json(&bytes)
             .map_err(|_| "python_syntax_confirmation_duplicate_or_invalid_json")?;
     }
     // 已消费的历史报告按原字节收据确认，不用当前源码重演历史输入。
-    if matches!(
-        value["report_type"].as_str(),
-        Some(
-            "eslint_workbench_observation"
-                | "npm_cve_workbench_observation"
-                | "eslint_task_recheck"
-                | "eslint_preparation_observation"
-                | "java_checkstyle_workbench_observation"
-                | "checkstyle_task_recheck"
-                | "checkstyle_preparation_observation"
-                | "checkstyle_preparation_recheck"
-                | "rust_cve_workbench_observation"
-                | "python_cve_workbench_observation"
-                | "python_syntax_confirmation_observation"
-                | "syntax_confirmation_observation"
-                | "syntax_task_recheck"
+    if (value["report_type"] == "python_lint_feedback" && value["schema_version"] == "0.18.0")
+        || matches!(
+            value["report_type"].as_str(),
+            Some(
+                "eslint_workbench_observation"
+                    | "npm_cve_workbench_observation"
+                    | "eslint_task_recheck"
+                    | "eslint_preparation_observation"
+                    | "java_checkstyle_workbench_observation"
+                    | "checkstyle_task_recheck"
+                    | "checkstyle_preparation_observation"
+                    | "checkstyle_preparation_recheck"
+                    | "rust_cve_workbench_observation"
+                    | "python_cve_workbench_observation"
+                    | "python_syntax_confirmation_observation"
+                    | "syntax_confirmation_observation"
+                    | "syntax_task_recheck"
+            )
         )
-    ) {
+    {
         let run = value["run_id"]
             .as_str()
             .filter(|s| safe_run_id(s))
@@ -680,7 +684,15 @@ fn parse_report(
     let report_v06 = report["schema_version"] == "0.6.0";
     let report_v07 = report["schema_version"] == "0.7.0";
     let report_v08 = report["schema_version"] == "0.8.0";
-    let report_v09 = report["schema_version"] == "0.9.0";
+    let report_v18 = report["schema_version"] == "0.18.0";
+    if report_v18
+        && (!crate::python_confirmation_recheck::valid_binding(root, report)
+            || (report["task_input_stable"] == true
+                && !crate::python_confirmation_recheck::inputs_current(root, report)))
+    {
+        return Err("python_confirmation_recheck_binding_invalid");
+    }
+    let report_v09 = report["schema_version"] == "0.9.0" || report_v18;
     let has_suppression_audit = report_v08 || report_v09;
     if path.file_stem().and_then(|stem| stem.to_str()) != Some(run_id)
         || !(report["schema_version"] == "0.4.0"

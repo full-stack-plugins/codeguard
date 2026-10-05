@@ -436,6 +436,7 @@ fn actual_ruff_confirms_empty_suite_and_preserves_unapproved_task() {
         .output()
         .unwrap();
     assert_eq!(init.status.code(), Some(3));
+    fs::write(project.0.join("unrelated.py"), "import os\n").unwrap();
     let first = project.lint(&["--file", "broken.py"]);
     let id = first["setup"]["task_id"].as_str().unwrap();
     for (source, expect_findings) in [
@@ -456,9 +457,26 @@ fn actual_ruff_confirms_empty_suite_and_preserves_unapproved_task() {
             ])
             .output()
             .unwrap();
-        assert_eq!(output.status.code(), Some(3));
+        assert_eq!(
+            output.status.code(),
+            Some(3),
+            "{}",
+            String::from_utf8_lossy(&output.stderr)
+        );
         let report: Value = serde_json::from_slice(&output.stdout).unwrap();
         assert_eq!(report["task_id"], id);
+        assert_eq!(
+            report["native_scan"]["files"].as_array().unwrap().len(),
+            1,
+            "a syntax task must not scan unrelated lint findings: {report}"
+        );
+        assert_eq!(report["schema_version"], "0.20.0");
+        assert_eq!(report["native_scan"]["schema_version"], "0.18.0");
+        assert_eq!(
+            report["native_scan"]["task_scope"],
+            "single_python_confirmation_file"
+        );
+        assert_eq!(report["event_persisted"], true, "{report}");
         assert_eq!(report["native_scan"]["files"][0]["path"], "broken.py");
         assert_eq!(
             !report["native_scan"]["files"][0]["findings"]
@@ -498,4 +516,92 @@ fn oversized_sibling_remains_visible_as_unavailable_without_erasing_other_suspic
     assert_eq!(precheck["unavailable"][0]["path"], "huge.py");
     assert_eq!(report["command_status"], "incomplete");
     assert_eq!(report["delivery_decision"], "not_evaluated");
+}
+
+#[test]
+fn scoped_confirmation_records_missing_tool_for_both_original_report_families() {
+    for generic in [false, true] {
+        let project = Project::new();
+        fs::write(project.0.join("ruff.toml"), "[lint]\nselect = ['F401']\n").unwrap();
+        fs::write(project.0.join("broken.py"), "def run():\n").unwrap();
+        fs::write(project.0.join("unrelated.py"), "import os\n").unwrap();
+        let init = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args([
+                "init",
+                project.0.to_str().unwrap(),
+                "--apply",
+                "--format=json",
+            ])
+            .output()
+            .unwrap();
+        assert_eq!(init.status.code(), Some(3));
+        if generic {
+            let check = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+                .args([
+                    "check",
+                    "python",
+                    project.0.to_str().unwrap(),
+                    "--format=json",
+                ])
+                .env("PATH", "")
+                .output()
+                .unwrap();
+            assert_eq!(check.status.code(), Some(3));
+        } else {
+            project.lint(&["--file", "broken.py"]);
+        }
+        let fact: Value = fs::read_dir(project.0.join(".codeguard/findings"))
+            .unwrap()
+            .filter_map(|e| {
+                serde_json::from_slice::<Value>(
+                    &fs::read(e.ok()?.path().join("finding.json")).ok()?,
+                )
+                .ok()
+            })
+            .find(|f| {
+                f["scope"] == "broken.py" && f["reason_code"] == "python_syntax_confirmation_needed"
+            })
+            .unwrap();
+        let id = fact["id"].as_str().unwrap();
+        fs::write(project.0.join("broken.py"), "def run():\n    pass\n").unwrap();
+        let missing = project.0.join("missing-ruff");
+        let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args([
+                "task",
+                "verify",
+                id,
+                project.0.to_str().unwrap(),
+                "--ruff-tool",
+                missing.to_str().unwrap(),
+                "--format=json",
+            ])
+            .env("PATH", "")
+            .output()
+            .unwrap();
+        assert_eq!(
+            output.status.code(),
+            Some(3),
+            "{}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        let result: Value = serde_json::from_slice(&output.stdout).unwrap();
+        assert_eq!(result["schema_version"], "0.20.0", "{result}");
+        assert_eq!(result["event_persisted"], true, "{result}");
+        assert_eq!(result["native_scan"]["files"].as_array().unwrap().len(), 1);
+        assert_eq!(result["native_scan"]["files"][0]["path"], "broken.py");
+        assert_eq!(
+            result["native_scan"]["task_binding"]["original_report"]["run_id"],
+            fact["first_run_id"]
+        );
+        assert!(
+            fact["first_run_id"]
+                .as_str()
+                .unwrap()
+                .starts_with(if generic {
+                    "syntax-confirm-"
+                } else {
+                    "python-syntax-"
+                })
+        );
+    }
 }
