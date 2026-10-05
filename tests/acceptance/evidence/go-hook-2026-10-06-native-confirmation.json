@@ -1,0 +1,53 @@
+{
+  "affected_paths": [
+    "app.go"
+  ],
+  "authority": "local_unverified",
+  "blocker_id": "CG-B-374e645c8d56728554421f6a427974bc",
+  "build_root": ".",
+  "checker_id": "syntax.native_confirmation",
+  "coverage_proven": false,
+  "delivery_decision": "not_evaluated",
+  "execution": "incomplete",
+  "fingerprint": "374e645c8d56728554421f6a427974bc8a45aa032a25490ffe61b5753fde5589",
+  "language": "go",
+  "native_evidence": {
+    "native": {
+      "companion_binding_sha256": "19436fb5bd7825f4450058b0704166c843979e04dddada5174d14710174fe7e4",
+      "diagnostics": [
+        {
+          "column": 12,
+          "column_unit": "utf8_byte",
+          "line": 2,
+          "rule_id": "go.syntax"
+        },
+        {
+          "column": 14,
+          "column_unit": "utf8_byte",
+          "line": 2,
+          "rule_id": "go.syntax"
+        }
+      ],
+      "gofmt_sha256": "f0e9b77df6dcfeec18d33bd9305ff034c28aa2142d3a4fa3aa44e62a44c89e3b",
+      "input_type": "whole_file",
+      "reason": "go_native_syntax_diagnostics",
+      "status": "diagnostics_observed",
+      "tool_sha256": "5900a8e0942f88b7bacf2b44b397b4950c8dc9f850a16ae1249e1636860dd6ef",
+      "version": "go1.23.4"
+    },
+    "target": {
+      "language": "go",
+      "path": "app.go",
+      "source_sha256": "cdcb7b5c81af6ffdcf7b000d28b4814ccb27e8f7879d9c7e3248c0303c208341"
+    },
+    "tool_path": "/usr/local/go/bin/go"
+  },
+  "observations": [],
+  "reason_code": "native_syntax_confirmation_needed",
+  "report_type": "syntax_confirmation_observation",
+  "run_id": "syntax-confirm-78479-1791228926097822000",
+  "schema_version": "0.10.0",
+  "scope": "app.go",
+  "workspace_binding": "bound",
+  "workspace_id": "ws-8bdd4c32ba44a4ca527a2e561e729cf4"
+}

@@ -395,6 +395,7 @@ mod ruby_tool_selection;
 mod ruby_lint_workbench;
 #[cfg(unix)]
 mod check_ruby_scan;
+mod check_go_syntax_scan;
 #[cfg(unix)]
 mod go_syntax_probe;
 #[cfg(unix)]

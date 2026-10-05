@@ -175,3 +175,9 @@ Stop 事件 MAY 从已存在的本地任务事实生成有界、只读的下一�
 - **THEN** the no-check route ignores those options, returns `not_run/write_failed`, and starts no process or workbench mutation
 - **AND** unknown, duplicate, empty, relative-path and over-budget arguments remain invalid; task ownership and lease options remain restricted to task verification
 - **AND** this exception does not silently enable an unwired checker on a confirmed edit
+
+#### Scenario: Go edits use the frozen SDK whole-file syntax probe before WASM
+- **WHEN** a confirmed Go edit selects an explicit Go SDK or an absolute PATH entry
+- **THEN** only selected files are passed as frozen stdin to the same SDK's verified gofmt under one deadline; no project code, go vet or dependency installation executes
+- **AND** selected tool failures remain incomplete without WASM fallback; missing tools retain candidate feedback and confirmation requirements
+- **AND** native observations reuse stable syntax tasks and original-SDK task verification; zero diagnostics do not close tasks or prove project lint coverage

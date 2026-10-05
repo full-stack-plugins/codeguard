@@ -198,7 +198,7 @@ fn run_with_tools(
         .as_nanos();
     let native_first = matches!(
         original["schema_version"].as_str(),
-        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.9.0")
+        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.9.0" | "0.10.0")
     );
     let mut report = json!({"schema_version":if language == "ruby" {"0.10.0"} else if language == "go" {"0.9.0"} else if language == "zig" && native_first {"0.8.0"}else if language == "kotlin" && native_first {"0.6.0"} else if language == "kotlin" {"0.5.0"} else if language == "swift" && native_first {"0.7.0"} else if language == "swift" {"0.4.0"} else if native_first {"0.3.0"} else if language == "erlang" {"0.2.0"} else {"0.1.0"},"report_type":"syntax_task_recheck","operation":"task_verify",
         "workspace_binding":"bound","workspace_id":original["workspace_id"],"run_id":format!("syntax-native-{}-{nanos}",std::process::id()),
@@ -257,7 +257,7 @@ pub(crate) fn original(root: &Path, brief: &Value) -> Result<Value, &'static str
         .ok_or("workspace_invalid")?;
     let valid_origin = if matches!(
         report["schema_version"].as_str(),
-        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.9.0")
+        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.9.0" | "0.10.0")
     ) {
         crate::native_syntax_confirmation::valid_history_report(root, &workspace, &report)
     } else {
@@ -308,7 +308,7 @@ pub(crate) fn original(root: &Path, brief: &Value) -> Result<Value, &'static str
 fn original_reference(original: &Value, sha: &Value) -> Value {
     let native_first = matches!(
         original["schema_version"].as_str(),
-        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.9.0")
+        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.9.0" | "0.10.0")
     );
     json!({"run_id":original["run_id"],"sha256":sha,
         "source_sha256":if native_first {original["native_evidence"]["target"]["source_sha256"].clone()} else {original["observations"][0]["source_sha256"].clone()},
@@ -860,7 +860,14 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
         };
     }
     if report["target"]["language"] == "go" {
-        guidance["schema_version"] = json!("0.14.0");
+        guidance["schema_version"] = json!(if report["run_id"]
+            .as_str()
+            .is_some_and(|r| r.starts_with("syntax-confirm-"))
+        {
+            "0.18.0"
+        } else {
+            "0.14.0"
+        });
         guidance["native_column_unit"] = json!("utf8_byte");
         guidance["native_confirmation_reason"] = if inputs_current(root, &report) {
             report["native"]["reason"].clone()
