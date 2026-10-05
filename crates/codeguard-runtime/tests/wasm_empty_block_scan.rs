@@ -99,3 +99,19 @@ fn whole_tree_visit_budget_cannot_look_complete_with_zero_facts() {
         "a zero-fact traversal must retain the exhausted node budget"
     );
 }
+
+#[test]
+fn structural_child_inspections_consume_budget_and_preserve_existing_facts() {
+    let mut grammar = python();
+    let tail = "pass\n".repeat(60_000);
+    for (prefix, expected_blocks) in [("", 0), ("def missing():\n", 1)] {
+        let source = format!("{prefix}{tail}");
+        let tree = grammar.parse(source.as_bytes()).unwrap();
+        let scan = scan_wasm_empty_blocks(&tree, 32).unwrap();
+        assert_eq!(scan.blocks.len(), expected_blocks);
+        assert!(
+            scan.truncated,
+            "child inspection work must consume the structural traversal budget"
+        );
+    }
+}
