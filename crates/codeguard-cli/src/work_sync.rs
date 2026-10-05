@@ -29,6 +29,8 @@ mod python_syntax_confirmation_report;
 mod rust_build_report;
 mod rust_cve_report;
 mod rustdoc_report;
+#[cfg(unix)]
+pub(crate) mod shell_report;
 mod syntax_confirmation_report;
 mod task_projection;
 static NEXT_WRITE: AtomicU64 = AtomicU64::new(0);
@@ -593,6 +595,10 @@ fn parse_report(
     report: &Value,
     digest: String,
 ) -> Result<ReportInput, &'static str> {
+    #[cfg(unix)]
+    if report["report_type"] == "shellcheck_workbench_observation" {
+        return shell_report::parse(root, workspace_id, path, report, digest);
+    }
     if report["report_type"] == "syntax_task_recheck" {
         if !crate::syntax_task_recheck::valid_shape(root, report)
             || report["workspace_id"] != workspace_id
@@ -2089,6 +2095,20 @@ fn persist_local_blocker_observation(
 }
 
 fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
+    if blocker.checker_id == "shell.shellcheck" {
+        return format!(
+            "# {} ShellCheck 环境恢复任务\n\n- 问题证据：报告 .codeguard/reports/{}.json，摘要 {}；范围 {}；原因 {}。\n- 规则依据：原生检查能力必须完整，环境故障不是源码违规。\n- 允许范围：仅检查环境、方言及原配置；不修改无关源码。\n- 修复步骤：核对原工具版本、source依赖、rc及输入稳定性，恢复后复扫；zsh/fish需要专用原生能力。\n- 复检命令：codeguard lint shell <目标源码> --dialect <原方言> --shellcheck-tool <已核验绝对路径> --format=json。\n- 历史尝试：首次run {}，后续不同阻塞原因仍归同一任务；完整尝试流程尚待接线。\n- 关闭条件：恢复原检查且正式复检流程通过；安装、勾选和零诊断不能自行关闭。\n",
+            blocker.id,
+            report.run_id,
+            report.digest,
+            blocker.scope,
+            blocker
+                .diagnostic_reason
+                .as_deref()
+                .unwrap_or(&blocker.reason),
+            report.run_id
+        );
+    }
     if blocker.diagnostic_reason.as_deref() == Some("syntax_recovery_incomplete") {
         return format!(
             "# {} 语法检查能力恢复任务\n\n- 问题证据：范围 `{}`；报告 `.codeguard/reports/{}.json`，摘要 `{}`；固定 grammar 的恢复扫描未完成或错误无法定位，恢复节点数组为空；报告保留源码和 grammar 身份，没有可用的源码错误位置。\n- 规则依据：初检完整性与原生确认要求；零恢复不能代表语法通过，本任务不是已确认源码违规。\n- 允许修改范围：适用检查工具、语言版本和 grammar 配置；原生确认前不得修改源码，不关闭检查器，不伪造定位。\n- 修复步骤：核对原报告的语言、版本与已知限制，恢复适用原生 lint/编译器或调查 grammar；确认 adapter 缺失时提出具体能力决策，不重复无依据的源码修补。\n- 复检命令：codeguard task verify {} . --format=json；codeguard next . --format=json 显示当前能力缺口，恢复检查后再对同一范围复扫。\n- 历史尝试：首次 run {}；后续扫描和失败尝试保留在同一任务，正文不代表完整历史。\n- 关闭条件：同一源码范围的有效原生确认、完整覆盖及既有关闭策略均满足；安装、WASM 零恢复或勾选均不能关闭。\n",
@@ -2324,6 +2344,19 @@ fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
 }
 
 fn render_task(report: &ReportInput, finding: &FindingInput) -> String {
+    if finding.checker_id == "shell.shellcheck" {
+        return format!(
+            "# {} ShellCheck 规则组修复任务\n\n- 问题证据：原生 {}，首次行 {}；原报告 .codeguard/reports/{}.json，摘要 {}；同文件同方言同规则的多个位置作为一组，原位置在报告中保留。\n- 规则依据：https://www.shellcheck.net/wiki/{}；原项目rc与可信策略分开。\n- 允许范围：仅目标源码 {}；先核对当前证据，不能按历史位置修改。\n- 修复步骤：按原规则修复引用、展开或可移植性，保留行为；不关闭规则代替修复。\n- 复检命令：codeguard lint shell <目标源码> --dialect <原方言> --shellcheck-tool <已核验绝对路径> --format=json；同一原配置。\n- 历史尝试：首次run {}；后续扫描追加在同一任务。尝试与正式关闭尚待接线。\n- 关闭条件：稳定输入的原工具复检、完整策略和正式关闭流程；零诊断、配置抑制、同步或勾选不能关闭。\n",
+            finding.id,
+            finding.rule_id,
+            finding.line,
+            report.run_id,
+            report.digest,
+            finding.rule_id,
+            serde_json::to_string(&finding.path).unwrap(),
+            report.run_id
+        );
+    }
     if finding.checker_id == "rust.cargo_check" {
         return format!(
             "# {} 编译待修复\n\n- 问题证据：原生编译 `{}`，首次行 {}；报告摘要 `{}`。\n- 规则依据：rustc原生编译错误码及对应类型/语言约束；不是Clippy或文档规则。\n- 允许范围：仅目标文件 {}；跨文件影响须先扩展可核验范围。\n- 修复步骤：核对本轮源码和原生错误码，修正类型或符号归属；不关闭检查替代修复。\n- 复检命令：codeguard build rust . --cargo-tool <本轮已核验绝对路径> --format json；类型检查不执行测试。\n- 历史尝试：首次run {}；后续观察保留在同一问题，首张任务不是当前完整历史。\n- 关闭条件：原工具稳定输入下确认问题消失，并完成项目策略/构建组合/测试核验；同步或勾选不能关闭。\n",

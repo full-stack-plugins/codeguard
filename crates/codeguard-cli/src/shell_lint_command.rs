@@ -131,7 +131,8 @@ pub fn run(args: &[String]) -> ExitCode {
         let actionable=stable && native["status"]=="diagnostics_observed";
         json!({"status":if actionable{"repair_guidance"}else{"investigation_required"},"evidence":{"source_path":a.file,"source_sha256":source_sha,"diagnostic":d},"rule_basis":format!("https://www.shellcheck.net/wiki/{}",d["rule_id"].as_str().unwrap_or("unknown")),"allowed_paths":if actionable{vec![json!(a.file)]}else{Vec::<Value>::new()},"steps":["先核对所选方言、原生配置及规则适用性；未完成时先修复环境或依赖，不能据旧位置修改源码。","按原生范围和官方规则检查引用、展开及可移植性，保持原行为；不要通过关闭规则或删任务冒充修复。","使用相同工具、方言和配置复检，记录差异；原生零诊断不等于完整项目通过。"],"recheck_argv":recheck,"attempt_history":[],"history_status":"not_integrated","closure_conditions":["原工具在稳定输入和有效原规则下复检，问题确实消失。","持久任务、批准白名单及完整项目门禁需要独立验收；本简报不能关闭任务。"]})
     }).collect();
-    let report = json!({"schema_version":"0.1.0","report_type":"shell_lint_feedback","operation":"lint","language":"shell","source_path":a.file,"source_sha256":source_sha,"input_stable":stable,"dialect":a.dialect,"scope":"single_frozen_shell_file","command_status":if cancelled{"cancelled"}else{"incomplete"},"exit_code":if cancelled{130}else{3},"authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated","execution_budget":budget_record(timeout,budget_source),"tool_selection":{"source":if explicit{"explicit"}else if tool.is_some(){"path"}else{"not_found"},"executable":tool},"native_identity_scope":"entry_only","project_configuration":config_report,"native":native,"native_column_unit":"unicode_scalar_one_based_tabs_one","syntax_precheck":{"status":"not_run","reason":"shell_wasm_unavailable"},"setup":{"native_tool_requirement":if matches!(native["status"].as_str(),Some("completed"|"diagnostics_observed")){"available"}else{"required"},"automatic_installation":false},"repair_briefs":briefs,"task_workflow_status":"not_integrated","next_actions":["准备ShellCheck0.11.0和适用方言；不支持的zsh/fish必须使用专用原生检查能力。","环境/配置/源依赖未完成时先恢复检查能力；部分诊断保留供调查。","持久任务、项目全范围、Dockerfile/IaC、安全及发行仍须检查。"]});
+    let mut report = json!({"schema_version":"0.1.0","report_type":"shell_lint_feedback","operation":"lint","language":"shell","source_path":a.file,"source_sha256":source_sha,"input_stable":stable,"dialect":a.dialect,"scope":"single_frozen_shell_file","command_status":if cancelled{"cancelled"}else{"incomplete"},"exit_code":if cancelled{130}else{3},"authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated","execution_budget":budget_record(timeout,budget_source),"tool_selection":{"source":if explicit{"explicit"}else if tool.is_some(){"path"}else{"not_found"},"executable":tool},"native_identity_scope":"entry_only","project_configuration":config_report,"native":native,"native_column_unit":"unicode_scalar_one_based_tabs_one","syntax_precheck":{"status":"not_run","reason":"shell_wasm_unavailable"},"setup":{"native_tool_requirement":if matches!(native["status"].as_str(),Some("completed"|"diagnostics_observed")){"available"}else{"required"},"automatic_installation":false},"repair_briefs":briefs,"task_workflow_status":"not_integrated","next_actions":["准备ShellCheck0.11.0和适用方言；不支持的zsh/fish必须使用专用原生检查能力。","环境/配置/源依赖未完成时先恢复检查能力；部分诊断保留供调查。","持久任务、项目全范围、Dockerfile/IaC、安全及发行仍须检查。"]});
+    crate::shell_lint_workbench::connect(&a.file, a.config.as_deref(), &mut report, deadline);
     if a.json {
         println!("{report}");
     } else {
@@ -152,6 +153,9 @@ pub fn run(args: &[String]) -> ExitCode {
             );
         }
         println!("修复指引：{}", report["repair_briefs"]);
+        if report["workbench"].is_object() {
+            println!("工作台：{}", report["workbench"]);
+        }
         println!("下一步：{}", report["next_actions"]);
     }
     ExitCode::from(if cancelled { 130 } else { 3 })

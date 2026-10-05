@@ -1636,3 +1636,9 @@ Ruby Hook本批终态：默认完整1404通过/0失败/125忽略，WASM受影响
 ## 2026-10-06 ShellCheck 原生单文件入口（7.4仍未完成）
 
 Rust受控调用ShellCheck0.11.0 json1，固定方言、stdin、入口摘要、私有rc及前后复核；项目rc探测与运行结果分开。严格报告解析保留原规则与字符列，环境规则独立归类，原生自由文本/fix不进入简报。七要素指引明确持久任务未接通。真实原工具SC2086、配置抑制、缺source与局部诊断共存、zsh拒绝、Unicode、tab/CRLF及干净样本分别归档，见[局部验收](../../../tests/acceptance/shellcheck-native-baseline.md)。完整项目Shell、zsh专用工具、Dockerfile/IaC、持久任务与平台发行仍未验收，7.4不勾选。
+
+## 2026-10-06 ShellCheck 发现与指引持久化（7.4/9.x仍未完成）
+
+单文件原生观察进入既有报告消费与追加事件工作台，文件×方言×原SC规则作为稳定位置组；环境阻塞以文件×方言归并，具体原因保留在每轮原报告。未初始化不自动初始化，坏报告拒绝、过期输入不创建可修源码发现；源码/rc变化使next要求复扫。反馈0.2.0提供真实同步/任务引用，next0.16.0保留同方言与原显式rc命令。新增RED/GREEN验证重复扫描单组、坏坐标拒绝、配置变化撤回指引、环境原因变化单任务和零诊断不关闭；Shell专用task verify、可信关闭与复发、实际宿主和项目级Shell/Dockerfile/IaC仍缺，父任务不勾选。
+
+本批[工作台局部验收](../../../tests/acceptance/shellcheck-workbench-baseline.md)：默认workspace/all-targets1432通过、0失败、126忽略；WASM定向38通过、0失败、3忽略，明确选中ShellCheck0.11.0的真实目标另1通过；三个真实捕获schema测试、两特性严格Clippy、分层及OpenSpec strict通过。未执行完整WASM用户草稿、实际宿主或正式关闭验收，不借上述结果关闭父任务。

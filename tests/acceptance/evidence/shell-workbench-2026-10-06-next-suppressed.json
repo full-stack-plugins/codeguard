@@ -1,0 +1,53 @@
+{
+  "authority": "local_unverified",
+  "command_status": "complete",
+  "delivery_decision": "not_evaluated",
+  "disposition": "verification_required",
+  "exit_code": 0,
+  "next_actions": [],
+  "operation": "next",
+  "reason": "local_task_selected",
+  "repair_brief": {
+    "action_id": "repair-source",
+    "authority": "local_unverified",
+    "checker_id": "shell.shellcheck",
+    "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+    "constraints": [
+      "仅修改目标源码",
+      "不得忽略规则或将任务勾选当作复检"
+    ],
+    "disposition": "verification_required",
+    "evidence_ref": {
+      "first_report_sha256": "25ba841911043022e4ae319fa04e6ca3499a6b3b7c3379376eb39f1bf0cd8914",
+      "first_run_id": "shellcheck-1791217900908529000-67383-0"
+    },
+    "history": {
+      "attempt_count": 0,
+      "awaiting_verification": false,
+      "budget": 2,
+      "no_progress_count": 0,
+      "open_attempt_id": null,
+      "recent": []
+    },
+    "kind": "finding",
+    "native_rule_id": "SC2086",
+    "recheck_argv": [
+      "codeguard",
+      "lint",
+      "shell",
+      "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-shell-real-work-0pkwkvgr/app.sh",
+      "--dialect",
+      "bash",
+      "--shellcheck-tool",
+      "<已核验的绝对路径>",
+      "--format=json"
+    ],
+    "schema_version": "0.16.0",
+    "scope": "app.sh",
+    "source_sha256": "00400e6bf65ec46ff1d85a7494ac3f11a3ca09d56c5e0792941ff5ba67908968",
+    "step": "Shell源码或原rc已经变化；先按同方言和原工具重新检查当前规则适用性，不按旧位置直接修改。配置抑制和零诊断不是已修复，任务正式关闭仍须复检流程。",
+    "task_id": "CG-9e3be727dbf76c8e55a5ca543cc21506"
+  },
+  "report_type": "repair_brief_preview",
+  "schema_version": "0.16.0"
+}
