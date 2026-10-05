@@ -642,3 +642,19 @@ Ruff正常与忽略noqa的检查若返回相同的invalid-syntax错误，Codegua
 #### Scenario: Python template strings encounter an older grammar
 - **WHEN** 缺原生工具的本轮候选观察包含 Python，固定清单记载 Python 3.14 模板字符串兼容限制
 - **THEN** 终端及 Claude 摘要均能看到具体版本限制，仍要求适用目标的原生确认且不复制源码或凭候选改写合法代码
+
+### Requirement: Go whole-file package checks SHALL remain independent of parser recovery
+
+Go完整文件候选初检 MUST 根据固定grammar的 `source_file` 根节点直接命名子节点核对 `package_clause`，不得以源码文本搜索代替AST事实。运行时仅返回有界的根节点观察，Go规则由适配层解释。代码片段模式、未知根节点或遍历预算耗尽 MUST 保持未知，不能给出零问题通过。缺声明 MUST 属于有版本、有规则摘要的独立结构候选，不能伪造ERROR/MISSING、修改原始grammar混淆矩阵、确认源码违规或关闭任务。该规则接入统一入口、报告、稳定任务和原生复检之前 MUST 明确为尚未接线，不据底层测试宣称公开漏检已经修复。
+
+#### Scenario: A complete Go file has no package clause
+- **WHEN** 完整文件只有 `x := 1` 或 `func f() {}`，grammar没有恢复且完整根节点观察没有package_clause
+- **THEN** 独立规则返回需原生确认的缺声明候选，保留原始grammar的valid观察；片段模式不套用此规则
+
+#### Scenario: Package text appears only in comments or strings
+- **WHEN** 注释或字符串中存在package字样，但根节点没有package_clause
+- **THEN** 不将这些字样认作声明；合法声明前的注释、build标签、Unicode名称及CRLF不产生缺声明候选
+
+#### Scenario: Root inspection cannot establish absence
+- **WHEN** 直接子节点超过预算、根类型未知，或检查对象是代码片段
+- **THEN** 返回未知，不把未观察到声明当成确定缺失，也不删除该样本

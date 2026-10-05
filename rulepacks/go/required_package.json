@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0.0",
+  "rule_id": "codeguard.go.required_package",
+  "rule_version": "1.0.0",
+  "qualification": "candidate_unqualified",
+  "basis": "codeguard_structure_rule",
+  "language": "go",
+  "source_scope": "whole_file",
+  "root_kind": "source_file",
+  "required_direct_named_child_kind": "package_clause"
+}
