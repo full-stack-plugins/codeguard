@@ -59,6 +59,21 @@ class ShellFeedback(unittest.TestCase):
             validator('shellcheck-workbench-observation-v0.1.schema.json').validate(data)
         fact=json.loads((prefix/'shell-workbench-2026-10-06-fact.json').read_text());self.assertEqual(fact['state'],'open')
 
+    def test_real_shell_task_rechecks(self):
+        prefix=ROOT/'tests/acceptance/evidence'
+        v=validator('task-verification-preview-v0.24.schema.json')
+        for name,outcome in [('present','still_present'),('rc-disabled','rule_coverage_requires_review'),('comment-disabled','suppression_requires_review'),('fixed','candidate_absent_unverified_policy')]:
+            data=json.loads((prefix/f'shell-task-2026-10-06-{name}.json').read_text())
+            v.validate(data)
+            self.assertEqual(data['observation'],outcome)
+            self.assertTrue(data['event_persisted'])
+            for key,value in [('delivery_decision','allow'),('authority','trusted'),('observation','resolved')]:
+                bad=copy.deepcopy(data);bad[key]=value;self.assertFalse(v.is_valid(bad))
+            bad=copy.deepcopy(data);bad['native_scan']['unexpected']=True;self.assertFalse(v.is_valid(bad))
+            bad=copy.deepcopy(data);bad['native_scan']['task_rule']=None;self.assertFalse(v.is_valid(bad))
+        fact=json.loads((prefix/'shell-task-2026-10-06-fact.json').read_text())
+        self.assertEqual(fact['state'],'open')
+
     def test_help_compatibility(self):
         data = json.loads((ROOT / 'tests/acceptance/evidence/command-help-shell-2026-10-06-default.json').read_text())
         validator('command-help-v0.4.schema.json').validate(data)

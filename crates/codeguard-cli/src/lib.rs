@@ -424,3 +424,6 @@ mod shellcheck_probe;
 
 #[cfg(unix)]
 mod shell_lint_workbench;
+
+#[cfg(unix)]
+mod shell_task_recheck;

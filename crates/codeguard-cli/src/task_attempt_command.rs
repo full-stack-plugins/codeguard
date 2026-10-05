@@ -430,7 +430,9 @@ fn verified_rechecks(
         else {
             continue;
         };
-        let nanos = if run_id.starts_with("rust-cve-") || run_id.starts_with("python-cve-") {
+        let nanos = if let Some(value) = run_id.strip_prefix("shellcheck-") {
+            value.split('-').next().and_then(|s| s.parse::<u128>().ok())
+        } else if run_id.starts_with("rust-cve-") || run_id.starts_with("python-cve-") {
             run_id
                 .rsplit('-')
                 .nth(1)
@@ -588,6 +590,9 @@ fn verified_rechecks(
         } else if brief["checker_id"] == "python.pip_audit" {
             crate::work_sync::valid_python_cve_observation(root, &report)
                 && event["observation"] == crate::python_cve_task_recheck::classify(brief, &report)
+        } else if brief["checker_id"] == "shell.shellcheck" {
+            crate::shell_task_recheck::valid_shape(root, &report)
+                && event["observation"] == crate::shell_task_recheck::classify(brief, &report)
         } else if brief["checker_id"] == "rust.cargo_rustdoc" {
             crate::rustdoc_task_recheck::valid_shape(&report)
                 && event["observation"] == crate::rustdoc_task_recheck::classify(brief, &report)

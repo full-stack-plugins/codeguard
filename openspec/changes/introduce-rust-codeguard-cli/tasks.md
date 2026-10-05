@@ -1642,3 +1642,7 @@ Rust受控调用ShellCheck0.11.0 json1，固定方言、stdin、入口摘要、�
 单文件原生观察进入既有报告消费与追加事件工作台，文件×方言×原SC规则作为稳定位置组；环境阻塞以文件×方言归并，具体原因保留在每轮原报告。未初始化不自动初始化，坏报告拒绝、过期输入不创建可修源码发现；源码/rc变化使next要求复扫。反馈0.2.0提供真实同步/任务引用，next0.16.0保留同方言与原显式rc命令。新增RED/GREEN验证重复扫描单组、坏坐标拒绝、配置变化撤回指引、环境原因变化单任务和零诊断不关闭；Shell专用task verify、可信关闭与复发、实际宿主和项目级Shell/Dockerfile/IaC仍缺，父任务不勾选。
 
 本批[工作台局部验收](../../../tests/acceptance/shellcheck-workbench-baseline.md)：默认workspace/all-targets1432通过、0失败、126忽略；WASM定向38通过、0失败、3忽略，明确选中ShellCheck0.11.0的真实目标另1通过；三个真实捕获schema测试、两特性严格Clippy、分层及OpenSpec strict通过。未执行完整WASM用户草稿、实际宿主或正式关闭验收，不借上述结果关闭父任务。
+
+## 2026-10-06 ShellCheck原工具任务复检（局部验收）
+
+单文件Shell规则组接入 `task verify --shellcheck-tool`，绑定首次报告摘要、方言、范围、显式rc与SC规则；复用租约、失败尝试及next历史读取。真实ShellCheck0.11.0四次观察区分still_present、rule_coverage_requires_review、suppression_requires_review、candidate_absent_unverified_policy，最终任务仍open；没有可信政策/覆盖时不能关闭。错传--ruff-tool反例先失败后修复为租约前参数拒绝，首次不存在的规则组不得导入。协议0.24/私有0.1、双语文档和实际记录见 `tests/acceptance/shellcheck-task-recheck-baseline.md`。next专用复检指引、完整Shell检查、可信关闭/复发、跨平台和发行仍缺；7.4、S09父任务继续开放。

@@ -50,20 +50,7 @@ pub fn run(args: &[String]) -> ExitCode {
             json!({"status":"unknown","source_path":null,"sha256":null,"reason":"source_unavailable","global_configuration":"not_loaded"})
         }
     };
-    let known_unsupported_file = a
-        .file
-        .extension()
-        .and_then(|s| s.to_str())
-        .is_some_and(|s| matches!(s, "zsh" | "fish"))
-        || a.file
-            .file_name()
-            .and_then(|s| s.to_str())
-            .is_some_and(|s| {
-                matches!(
-                    s,
-                    ".zshrc" | ".zshenv" | ".zprofile" | ".zlogin" | ".zlogout"
-                )
-            });
+    let known_unsupported_file = unsupported_file(&a.file);
     let dialect_supported = !known_unsupported_file
         && matches!(
             a.dialect.as_str(),
@@ -160,7 +147,7 @@ pub fn run(args: &[String]) -> ExitCode {
     }
     ExitCode::from(if cancelled { 130 } else { 3 })
 }
-fn discover_tool() -> Option<PathBuf> {
+pub(crate) fn discover_tool() -> Option<PathBuf> {
     let path = std::env::var_os("PATH")?;
     std::env::split_paths(&path)
         .filter(|p| p.is_absolute())
@@ -169,7 +156,7 @@ fn discover_tool() -> Option<PathBuf> {
             std::fs::metadata(p).is_ok_and(|m| m.is_file() && m.permissions().mode() & 0o111 != 0)
         })
 }
-fn supported_shebang(source: &[u8]) -> bool {
+pub(crate) fn supported_shebang(source: &[u8]) -> bool {
     let text = std::str::from_utf8(source).unwrap_or("");
     let first = text.lines().next().unwrap_or("");
     let Some(rest) = first.strip_prefix("#!") else {
@@ -189,4 +176,36 @@ fn supported_shebang(source: &[u8]) -> bool {
             .unwrap_or("");
     }
     matches!(name, "sh" | "bash" | "dash" | "ksh" | "busybox")
+}
+
+/// 判断已知不适用ShellCheck的文件名，首次检查和复检共享同一边界。
+pub(crate) fn unsupported_file(file: &Path) -> bool {
+    file.extension()
+        .and_then(|s| s.to_str())
+        .is_some_and(|s| matches!(s, "zsh" | "fish"))
+        || file.file_name().and_then(|s| s.to_str()).is_some_and(|s| {
+            matches!(
+                s,
+                ".zshrc" | ".zshenv" | ".zprofile" | ".zlogin" | ".zlogout"
+            )
+        })
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn known_unsupported_names_are_shared_with_task_verification() {
+        for name in [
+            "app.zsh",
+            "app.fish",
+            ".zshrc",
+            ".zshenv",
+            ".zprofile",
+            ".zlogin",
+            ".zlogout",
+        ] {
+            assert!(super::unsupported_file(std::path::Path::new(name)));
+        }
+        assert!(!super::unsupported_file(std::path::Path::new("app.sh")));
+    }
 }
