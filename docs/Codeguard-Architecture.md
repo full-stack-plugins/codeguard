@@ -908,3 +908,8 @@ A Python syntax-confirmation task uses `repair-source` when its current native o
 ### Explicit R and C++ source suffixes
 
 Project discovery and WASM candidate routing include `.R`/`.r` and C++ `.C`/`.cp`/`.CPP`/`.c++`/`.cxx`/`.hxx`, retaining existing suffixes. Case remains significant: `.C` uses C++, while shared `.h` gets no speculative C++ grammar route. Missing native tools still produce actual candidate observations and `incomplete` delivery; suffix coverage does not qualify a grammar or grant acceptance. See [suffix acceptance](../tests/acceptance/r-cpp-extension-routing.md).
+
+
+### Conversation projection of pinned limitations
+
+Candidate reports, independent structural rules and native diagnostics retain distinct provenance. Terminal feedback exposes bounded specific limitations. Claude resolves them from the bundled manifest for observed candidate languages, deduplicates and limits text, and does not use external report messages or source. Summaries reserve the incomplete-qualification and unevaluated-delivery boundary. Known compatibility issues still need native confirmation and do not expand allowlists. See [acceptance](../tests/acceptance/grammar-limitation-conversation-feedback.md).

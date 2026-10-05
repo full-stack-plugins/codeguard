@@ -2527,12 +2527,19 @@ pub fn run(args: &[String]) -> ExitCode {
                     .filter(|item| item["known_limitations"][0].is_string())
                     .take(8)
                 {
-                    if let Some(limitation) = item["known_limitations"][0].as_str() {
+                    // 同一固定清单可能包含通用边界及具体兼容问题，不能只显示第一条。
+                    for limitation in item["known_limitations"]
+                        .as_array()
+                        .into_iter()
+                        .flatten()
+                        .filter_map(Value::as_str)
+                        .take(3)
+                    {
                         println!(
                             "  {} [{}] 已知 grammar 限制：{}；仍需适用原生工具确认。",
                             item["path"].as_str().unwrap_or("?"),
                             item["language"].as_str().unwrap_or("unknown"),
-                            limitation
+                            limitation.chars().take(512).collect::<String>()
                         );
                     }
                 }

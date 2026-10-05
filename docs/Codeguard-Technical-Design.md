@@ -1404,3 +1404,8 @@ Successful verification of bundled grammar bytes and licenses is now reused per 
 ### Explicit R and C++ source suffixes
 
 Project discovery and WASM candidate routing include `.R`/`.r` and C++ `.C`/`.cp`/`.CPP`/`.c++`/`.cxx`/`.hxx`, retaining existing suffixes. Case remains significant: `.C` uses C++, while shared `.h` gets no speculative C++ grammar route. Missing native tools still produce actual candidate observations and `incomplete` delivery; suffix coverage does not qualify a grammar or grant acceptance. See [suffix acceptance](../tests/acceptance/r-cpp-extension-routing.md).
+
+
+### Bounded grammar limitation output
+
+Aggregate human output includes at most three limitations per candidate, 512 characters each, for eight candidates. Claude takes the last appended limitation from pinned metadata, at most 180 characters for each of two deduplicated languages. It does not use user source, paths or arbitrary report text, and adds no worker invocation. The 1200-character context budget reserves space for the final unqualified/unevaluated boundary. Report versions, findings, tasks and gates remain unchanged. See [acceptance](../tests/acceptance/grammar-limitation-conversation-feedback.md).

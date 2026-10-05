@@ -630,3 +630,6 @@ A Python syntax-confirmation task uses `repair-source` when its current native o
 ### Explicit R and C++ source suffixes
 
 Project discovery and WASM candidate routing include `.R`/`.r` and C++ `.C`/`.cp`/`.CPP`/`.c++`/`.cxx`/`.hxx`, retaining existing suffixes. Case remains significant: `.C` uses C++, while shared `.h` gets no speculative C++ grammar route. Missing native tools still produce actual candidate observations and `incomplete` delivery; suffix coverage does not qualify a grammar or grant acceptance. See [suffix acceptance](tests/acceptance/r-cpp-extension-routing.md).
+
+
+Specific grammar compatibility limits appear in bounded terminal and Claude summaries, including older Python grammar behavior for 3.14 template strings. Feedback still requires native confirmation; source text is omitted and limitations are not allowlist decisions. See [conversation acceptance](tests/acceptance/grammar-limitation-conversation-feedback.md).

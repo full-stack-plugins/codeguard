@@ -612,3 +612,6 @@ Python 语法确认任务的当前原生观察为 `still_present` 且未因源�
 ### R 与 C++ 显式源码后缀
 
 项目发现及 WASM 候选路由支持 `.R`/`.r`，以及 C++ 的 `.C`/`.cp`/`.CPP`/`.c++`/`.cxx`/`.hxx`，保留既有后缀。大小写保持原义，`.C` 不会按 C 解析；共享 `.h` 仍不能仅凭后缀取得 C++ grammar 路由。原生工具缺失时提供实际候选观察，整体保留 `incomplete`，不据此宣称语法资格或交付通过。见[后缀验收](tests/acceptance/r-cpp-extension-routing.md)。
+
+
+具体 grammar 兼容限制会在终端及 Claude 局部检查摘要中有界显示，例如旧 Python grammar 对 3.14 模板字符串的误报；摘要仍要求原生确认，不复制源码或把限制视为白名单。见[对话反馈验收](tests/acceptance/grammar-limitation-conversation-feedback.md)。

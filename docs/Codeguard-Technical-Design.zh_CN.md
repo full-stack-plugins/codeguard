@@ -1405,3 +1405,8 @@ Python 语法确认任务的当前原生观察为 `still_present` 且未因源�
 ### R 与 C++ 显式源码后缀
 
 项目发现及 WASM 候选路由支持 `.R`/`.r`，以及 C++ 的 `.C`/`.cp`/`.CPP`/`.c++`/`.cxx`/`.hxx`，保留既有后缀。大小写保持原义，`.C` 不会按 C 解析；共享 `.h` 仍不能仅凭后缀取得 C++ grammar 路由。原生工具缺失时提供实际候选观察，整体保留 `incomplete`，不据此宣称语法资格或交付通过。见[后缀验收](../tests/acceptance/r-cpp-extension-routing.md)。
+
+
+### grammar 限制的有界输出
+
+聚合 human 每个候选最多三条限制、每条512字符、最多八项候选。Claude 摘要从本程序固定元数据选择最后追加的限制，每语言180字符、最多两种语言、重复归并；不取用户源码、路径或报告任意字符串。该投影不增加 worker 执行。1200字符总预算为末尾未验收/未评估说明预留空间。报告版本、发现、任务及门禁不变，见[验收](../tests/acceptance/grammar-limitation-conversation-feedback.md)。

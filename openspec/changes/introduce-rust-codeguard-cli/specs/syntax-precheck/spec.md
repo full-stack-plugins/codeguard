@@ -602,3 +602,11 @@ Ruff正常与忽略noqa的检查若返回相同的invalid-syntax错误，Codegua
 #### Scenario: A project uses conventional source suffixes without native tools
 - **WHEN** 工作区存在上述后缀的源码，原生工具不可用
 - **THEN** detect 保留准确文件身份，check all 用对应固定 grammar 产生观察；非法源码的恢复信息仍为候选，整体保持 incomplete
+
+### Requirement: Specific grammar limitations SHALL remain visible in agent feedback
+
+聚合终端反馈 MUST 有界显示固定清单中的具体已知限制，不能仅保留第一条通用未验收说明。宿主摘要 MUST 对本轮实际候选语言提供来自随程序固定清单的有界限制提示，不从用户源码、路径或任意外部报告文本获取提示；保持原生确认行动、源码保留和既有摘要预算。限制不是白名单或版本推断，不改变发现、任务、grammar 资格及门禁。
+
+#### Scenario: Python template strings encounter an older grammar
+- **WHEN** 缺原生工具的本轮候选观察包含 Python，固定清单记载 Python 3.14 模板字符串兼容限制
+- **THEN** 终端及 Claude 摘要均能看到具体版本限制，仍要求适用目标的原生确认且不复制源码或凭候选改写合法代码

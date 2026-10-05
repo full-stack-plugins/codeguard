@@ -823,3 +823,30 @@ fn project_check_observes_r_and_cpp_explicit_suffixes() {
     }
     assert_eq!(report["delivery_decision"], "incomplete");
 }
+
+#[test]
+fn human_feedback_retains_specific_python_version_limitation() {
+    let root = std::env::temp_dir()
+        .canonicalize()
+        .unwrap()
+        .join(format!("cg-python-specific-limit-{}", std::process::id()));
+    fs::create_dir(&root).unwrap();
+    fs::write(
+        root.join("app.py"),
+        "message = t\"private-secret-content\"\n",
+    )
+    .unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .env("PATH", &root)
+        .args(["check", "python"])
+        .arg(&root)
+        .args(["--timeout", "30s"])
+        .output()
+        .unwrap();
+    fs::remove_dir_all(root).unwrap();
+    assert_eq!(output.status.code(), Some(3));
+    let text = String::from_utf8(output.stdout).unwrap();
+    assert!(text.contains("Python 3.14 template strings"), "{text}");
+    assert!(text.contains("target-bound native confirmation"), "{text}");
+    assert!(!text.contains("private-secret-content"), "{text}");
+}

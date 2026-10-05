@@ -525,6 +525,7 @@ fn claude_edit_context_contains_real_confirmation_task_and_bounded_guidance() {
     assert!(context.contains("原生确认任务 CG-B-"), "{context}");
     assert!(context.contains("codeguard task show"));
     assert!(context.chars().count() <= 1200);
+    assert!(context.ends_with("候选语法能力尚未完整验收，完整项目与交付未评估。"));
 }
 
 #[test]
@@ -839,4 +840,48 @@ fn unlocated_claude_context_explains_zero_positions_and_real_recovery_task() {
     );
     assert!(!context.contains("建议安装适用原生 lint"), "{context}");
     assert!(context.chars().count() <= 1200);
+    assert!(context.ends_with("候选语法能力尚未完整验收，完整项目与交付未评估。"));
+}
+
+#[test]
+fn claude_context_retains_specific_grammar_limitation_without_source() {
+    let p = Project::new("specific-limit");
+    fs::write(
+        p.0.join("app.py"),
+        "message = t\"private-secret-content\"\n",
+    )
+    .unwrap();
+    let mut child = p
+        .command()
+        .args(["hook", "claude", "post-tool-use"])
+        .arg(&p.0)
+        .args(["--timeout=30s", "--format=json"])
+        .env("PATH", &p.0)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .spawn()
+        .unwrap();
+    let event = json!({"hook_event_name":"PostToolUse", "cwd":p.0,
+        "tool_name":"Edit", "tool_input":{"file_path":p.0.join("app.py")},
+        "tool_response":{"success":true}});
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(event.to_string().as_bytes())
+        .unwrap();
+    let output = child.wait_with_output().unwrap();
+    assert_eq!(output.status.code(), Some(0));
+    let report: Value = serde_json::from_slice(&output.stdout).unwrap();
+    let context = report["hookSpecificOutput"]["additionalContext"]
+        .as_str()
+        .unwrap();
+    assert!(
+        context.contains("Python 3.14 template strings"),
+        "{context}"
+    );
+    assert!(context.contains("不要仅凭候选结果修改源码"), "{context}");
+    assert!(!context.contains("private-secret-content"), "{context}");
+    assert!(context.chars().count() <= 1200);
+    assert!(context.ends_with("候选语法能力尚未完整验收，完整项目与交付未评估。"));
 }

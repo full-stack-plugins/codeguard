@@ -1498,3 +1498,8 @@ check python/all现通过0.48反馈保留独立结构计数和原始坐标，原
 
 - 显式接入 `.R` 和六种 C++ 后缀，保留大小写语义及 `.h` 的候选歧义；真实八文件 check all 和既有 32 grammar 项目/Hook 回归通过。见 `tests/acceptance/r-cpp-extension-routing.md`。14.4、14.6、14.19 仍需完整验收。
 - 原生差分回归显式重绑定当前清单、核对历史及 cases 不变，旧身份仍拒绝；修正 Ruff 隔离替身的过期 argv。见 `tests/acceptance/native-corpus-current-binding.md`。14.17、14.19 保持开放，远端完整 CI 尚待新提交。
+
+
+## 2026-10-05 具体 grammar 限制的终端与对话反馈
+
+- 两个实际入口 RED 证明具体 Python 版本兼容限制被隐藏；有界补齐 human 与 Claude 摘要，固定元数据来源，不复制源码、不批准白名单；末尾未验收/未评估说明保留在1200字符预算内。见 `tests/acceptance/grammar-limitation-conversation-feedback.md`。14.7、14.8、14.19 保持开放，真实全宿主与正式语言精度仍待验收。
