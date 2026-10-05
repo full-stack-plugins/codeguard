@@ -1718,3 +1718,7 @@ Rust输入补录终态：实际原生lint修复及原工具任务复检1通过�
 ## 2026-10-06 SP18 Rust WASM 首次任务原生闭环（已验证切片）
 
 对应9.10 / S14，在现有批准契约下接入policy1.8/evidence0.9并保留首次真实grammar身份；原生首次1.7/0.8保持null。缺工具时WASM任务、同工具原反例确认、修复/幂等关闭及公开复检复发重开通过；原生反证后next和精确任务简报要求调查首次WASM/grammar而不修改合法源码。缺/错grammar、交换来源、工具与edition变化均拒绝关闭。新增受控3项、两种来源当前构建真实Rustfmt完整链2项、共享WASM八目标55项及协议6项通过。见tests/acceptance/rust-wasm-task-resolution.md。宿主信任根/时钟是测试夹具，生产自动接线、普通任务自动关闭的核心契约调整、其它检查族/平台、独立精度和发行仍未完成，父任务不勾选。
+
+## 2026-10-06 SP19 当前版本 32 grammar 全量回放与缺陷定位
+
+对应 S12.11 / 14.17 / 14.19。当前源码 9208b43 实际重跑 358 例、32 语言、35 来源组，1 passed / 0 failed / 0 ignored，317.87 秒。新增字节绑定语料和逐例报告，归档测试核对源身份及不确定性，保留旧记录。明确保留 Erlang 十例漏检、VB.NET 一例误报、Kotlin/Swift 三例未知和 CFQuery 一例待裁定，不冒充当前原生对照或独立 holdout。详见[当前回放缺陷清单](../../../tests/acceptance/grammar-current-full-replay-2026-10-06.md)。全部 grammar 仍未正式验收，父任务不勾选。

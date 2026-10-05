@@ -536,6 +536,39 @@ fn replay_every_bundled_language_and_archive_current_evidence() {
 const ARCHIVED_MANIFEST: &[u8] =
     include_bytes!("../../../tests/fixtures/grammar_manifests/manifest_2026_10_04.json");
 
+#[test]
+fn current_full_replay_evidence_binds_each_source_and_preserves_uncertainty() {
+    let input =
+        include_bytes!("../../../tests/acceptance/evidence/grammar-current-corpus-2026-10-06.json");
+    let corpus = validate_corpus(input).unwrap();
+    let report: Value = serde_json::from_slice(include_bytes!(
+        "../../../tests/acceptance/evidence/grammar-current-manifest-2026-10-06.json"
+    ))
+    .unwrap();
+    assert_separate_cohort_counts(&report);
+    assert_eq!(
+        report["corpus_sha256"],
+        format!("{:x}", Sha256::digest(input))
+    );
+    assert_eq!(report["manifest_sha256"], corpus.manifest_sha256);
+    assert_eq!(report["program_stable"], true);
+    assert_eq!(report["grammar_qualified_count"], 0);
+    assert_eq!(report["independent_holdout"], false);
+    assert_eq!(report["native_oracle_executed"], false);
+    assert_eq!(report["delivery_decision"], "not_evaluated");
+    let cases = report["cases"].as_array().unwrap();
+    for source in &corpus.cases {
+        let row = cases.iter().find(|row| row["id"] == source.id).unwrap();
+        assert_eq!(row["attempted"], true);
+        assert_eq!(row["source_sha256"], source.source_sha256);
+        assert_eq!(row["language"], source.language);
+        assert_eq!(row["cohort"], source.cohort);
+        assert_eq!(row["label"], source.label);
+        assert_eq!(row["origin"], source.origin);
+        assert_eq!(row["expected_valid"], source.expected_valid);
+    }
+}
+
 fn current_corpus_bytes(archived: &[u8]) -> Vec<u8> {
     validate_corpus_against_manifest(archived, ARCHIVED_MANIFEST).unwrap();
     let mut value: Value = serde_json::from_slice(archived).unwrap();
