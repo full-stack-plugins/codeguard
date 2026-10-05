@@ -149,3 +149,98 @@ fn changed_rc_withdraws_actionable_old_positions_and_blockers_keep_one_task() {
     );
     assert_eq!(q.tasks(), ids);
 }
+
+#[test]
+fn task_verify_uses_original_shell_rule_and_preserves_suppression_review() {
+    let p = Project::new();
+    let first = p.lint(true);
+    let id = first["workbench"]["task_ids"][0].as_str().unwrap();
+    let tool = p.0.join("shellcheck");
+    let args = [
+        "task",
+        "verify",
+        id,
+        p.0.to_str().unwrap(),
+        "--shellcheck-tool",
+        tool.to_str().unwrap(),
+        "--format=json",
+    ];
+    let observed = p.run(&args);
+    assert_eq!(observed["observation"], "still_present");
+    assert_eq!(observed["event_persisted"], true);
+    fs::write(p.0.join(".shellcheckrc"), "disable=SC2086\n").unwrap();
+    p.lint(false);
+    let suppressed = p.run(&args);
+    assert_eq!(
+        suppressed["observation"], "rule_coverage_requires_review",
+        "{suppressed}"
+    );
+    assert_eq!(suppressed["event_persisted"], true);
+    fs::remove_file(p.0.join(".shellcheckrc")).unwrap();
+    fs::write(p.0.join("app.sh"), "#!/bin/bash\necho \"$1\"\n").unwrap();
+    let clean = p.run(&args);
+    assert_eq!(clean["observation"], "candidate_absent_unverified_policy");
+    assert_eq!(clean["event_persisted"], true);
+    let next = p.run(&["next", p.0.to_str().unwrap(), "--format=json"]);
+    assert_eq!(next["repair_brief"]["checker_id"], "shell.shellcheck");
+}
+
+#[test]
+fn shell_verify_rejects_foreign_tool_flags_before_claiming_or_running() {
+    let p = Project::new();
+    let first = p.lint(true);
+    let id = first["workbench"]["task_ids"][0].as_str().unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "task",
+            "verify",
+            id,
+            p.0.to_str().unwrap(),
+            "--ruff-tool",
+            p.0.join("shellcheck").to_str().unwrap(),
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(2), "{output:?}");
+}
+
+#[test]
+fn shell_recheck_cannot_import_a_rule_absent_from_the_original_report() {
+    use sha2::{Digest, Sha256};
+    let p = Project::new();
+    let first = p.lint(true);
+    let id = first["workbench"]["task_ids"][0].as_str().unwrap();
+    let report = p.run(&[
+        "task",
+        "verify",
+        id,
+        p.0.to_str().unwrap(),
+        "--shellcheck-tool",
+        p.0.join("shellcheck").to_str().unwrap(),
+        "--format=json",
+    ]);
+    let mut scan = report["native_scan"].clone();
+    scan["run_id"] = json!("shellcheck-forged-rule");
+    scan["task_rule"] = json!("SC2000");
+    let mut hash = Sha256::new();
+    for text in [
+        "codeguard-shell-rule-group-v1",
+        "shell.shellcheck",
+        "app.sh",
+        "bash",
+        "SC2000",
+    ] {
+        hash.update((text.len() as u64).to_be_bytes());
+        hash.update(text.as_bytes());
+    }
+    scan["task_id"] = json!(format!("CG-{}", &format!("{:x}", hash.finalize())[..32]));
+    fs::write(
+        p.0.join(".codeguard/reports/shellcheck-forged-rule.json"),
+        serde_json::to_vec(&scan).unwrap(),
+    )
+    .unwrap();
+    let sync = p.run(&["work", "sync", p.0.to_str().unwrap(), "--format=json"]);
+    assert_eq!(sync["failed_reports"], 1, "{sync}");
+    assert_eq!(p.tasks().len(), 1);
+}

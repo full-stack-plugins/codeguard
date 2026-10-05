@@ -1,0 +1,127 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:task-verification-preview:0.24.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "command_status",
+    "exit_code",
+    "task_id",
+    "kind",
+    "observation",
+    "event_persisted",
+    "reason",
+    "native_scan",
+    "authority",
+    "delivery_decision",
+    "execution_budget",
+    "next_actions"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.24.0"
+    },
+    "execution_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timeout_ms",
+        "source",
+        "enforcement"
+      ],
+      "properties": {
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 86400000
+        },
+        "source": {
+          "enum": [
+            "cli",
+            "registered_environment",
+            "project_default",
+            "builtin_default"
+          ]
+        },
+        "enforcement": {
+          "const": "native_execution_only"
+        }
+      }
+    },
+    "report_type": {
+      "const": "task_verification_preview"
+    },
+    "operation": {
+      "const": "task_verify"
+    },
+    "command_status": {
+      "const": "incomplete"
+    },
+    "exit_code": {
+      "const": 3
+    },
+    "task_id": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^CG-(B-)?[0-9a-f]{32}$"
+        }
+      ]
+    },
+    "kind": {
+      "enum": [
+        "finding",
+        "blocker",
+        null
+      ]
+    },
+    "observation": {
+      "enum": [
+        "incomplete",
+        "still_present",
+        "still_blocked",
+        "suppression_requires_review",
+        "rule_coverage_requires_review",
+        "candidate_absent_unverified_policy",
+        "environment_restored_unverified_policy"
+      ]
+    },
+    "event_persisted": {
+      "type": "boolean"
+    },
+    "reason": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        }
+      ]
+    },
+    "native_scan": {
+      "$ref": "shellcheck-task-recheck-v0.1.schema.json"
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "next_actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

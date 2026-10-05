@@ -41,6 +41,7 @@ struct Arguments {
     ruby_tool: Option<PathBuf>,
     kotlinc_tool: Option<PathBuf>,
     cargo_tool: Option<PathBuf>,
+    shellcheck_tool: Option<PathBuf>,
     cargo_audit_tool: Option<PathBuf>,
     rustsec_db: Option<PathBuf>,
     pip_audit_tool: Option<PathBuf>,
@@ -101,6 +102,33 @@ pub fn run(args: &[String]) -> ExitCode {
     } else {
         None
     };
+    let shell_task = brief["checker_id"] == "shell.shellcheck";
+    if parsed.shellcheck_tool.is_some() && !shell_task {
+        eprintln!("--shellcheck-tool 仅用于ShellCheck任务");
+        return ExitCode::from(2);
+    }
+    if shell_task
+        && (parsed.ruff_tool.is_some()
+            || parsed.cargo_tool.is_some()
+            || parsed.cargo_audit_tool.is_some()
+            || parsed.rustsec_db.is_some()
+            || parsed.pip_audit_tool.is_some()
+            || parsed.pip_audit_version.is_some()
+            || parsed.maven_tool.is_some()
+            || parsed.java_home.is_some()
+            || parsed.java_tool.is_some()
+            || parsed.checkstyle_jar.is_some()
+            || parsed.checkstyle_config.is_some()
+            || parsed.maven_repo.is_some()
+            || parsed.repo_sha256.is_some()
+            || parsed.cve_data_dir.is_some()
+            || parsed.cve_data_sha256.is_some()
+            || !parsed.eslint_options.is_empty()
+            || !parsed.npm_options.is_empty())
+    {
+        eprintln!("ShellCheck任务不接受其它检查器的工具或配置参数");
+        return ExitCode::from(2);
+    }
     let syntax_task = brief["checker_id"] == "syntax.native_confirmation";
     if (parsed.zig_tool.is_some()
         || parsed.erl_tool.is_some()
@@ -444,6 +472,19 @@ pub fn run(args: &[String]) -> ExitCode {
                 );
             }
         }
+    } else if shell_task {
+        match crate::shell_task_recheck::run(
+            &root,
+            &brief,
+            parsed.shellcheck_tool.as_deref(),
+            deadline,
+        ) {
+            Ok(report) => report,
+            Err(reason) => {
+                let release = finish_verification(&root, &parsed.task_id, &lease);
+                return print_unavailable(&parsed, release.err().unwrap_or(reason));
+            }
+        }
     } else if brief["checker_id"] == "rust.cargo_rustdoc" {
         match crate::rustdoc_task_recheck::run(
             &root,
@@ -663,6 +704,8 @@ pub fn run(args: &[String]) -> ExitCode {
             crate::rust_cve_task_recheck::classify(&brief, &scan)
         } else if brief["checker_id"] == "python.pip_audit" {
             crate::python_cve_task_recheck::classify(&brief, &scan)
+        } else if shell_task {
+            crate::shell_task_recheck::classify(&brief, &scan)
         } else if brief["checker_id"] == "rust.cargo_rustdoc" {
             crate::rustdoc_task_recheck::classify(&brief, &scan)
         } else if brief["checker_id"] == "rust.cargo_clippy" {
@@ -681,6 +724,9 @@ pub fn run(args: &[String]) -> ExitCode {
         "execution_budget":budget_record(parsed.timeout_ms, parsed.timeout_source),
         "next_actions":["inspect_native_recheck_and_policy_before_closure"]
     });
+    if shell_task {
+        report["schema_version"] = json!("0.24.0");
+    }
     if syntax_task {
         report["schema_version"] = json!(match report["native_scan"]["schema_version"].as_str() {
             Some("0.10.0") => "0.23.0",
@@ -747,6 +793,9 @@ pub fn run(args: &[String]) -> ExitCode {
                             && !crate::rust_cve_task_recheck::inputs_current(&root, &scan))
                         || (brief["checker_id"] == "python.pip_audit"
                             && !crate::python_cve_task_recheck::inputs_current(&root, &scan))
+                        || (shell_task
+                            && scan["input_stable"] == true
+                            && !crate::shell_task_recheck::inputs_current(&root, &scan))
                         || (brief["checker_id"] == "rust.cargo_rustdoc"
                             && scan["input_stable"] == true
                             && !crate::rustdoc_task_recheck::inputs_current(&root, &scan))
@@ -775,7 +824,7 @@ pub fn run(args: &[String]) -> ExitCode {
     if let Err(reason) = persist {
         if reason == "source_changed_before_verification_record" {
             report["observation"] = json!("incomplete");
-            report["native_scan"][if syntax_task {
+            report["native_scan"][if syntax_task || shell_task {
                 "input_stable"
             } else {
                 "task_input_stable"
@@ -1493,6 +1542,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
     let mut ruby_tool = None;
     let mut kotlinc_tool = None;
     let mut cargo_tool = None;
+    let mut shellcheck_tool = None;
     let mut cargo_audit_tool = None;
     let mut rustsec_db = None;
     let mut pip_audit_tool = None;
@@ -1534,6 +1584,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                 | "--ruby-tool"
                 | "--kotlinc-tool"
                 | "--cargo-tool"
+                | "--shellcheck-tool"
                 | "--cargo-audit-tool"
                 | "--rustsec-db"
                 | "--pip-audit-tool"
@@ -1572,6 +1623,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                 "--ruby-tool" if ruby_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--kotlinc-tool" if kotlinc_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--cargo-tool" if cargo_tool.replace(PathBuf::from(value)).is_none() => {}
+                "--shellcheck-tool" if shellcheck_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--cargo-audit-tool"
                     if cargo_audit_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--rustsec-db" if rustsec_db.replace(PathBuf::from(value)).is_none() => {}
@@ -1645,6 +1697,9 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
     {
         return Err("Python CVE 工具与版本必须成对提供，工具路径必须为绝对路径".into());
     }
+    if shellcheck_tool.as_ref().is_some_and(|p| !p.is_absolute()) {
+        return Err("--shellcheck-tool 必须是绝对路径".into());
+    }
     if [
         maven_tool.as_ref(),
         java_home.as_ref(),
@@ -1702,6 +1757,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
         ruby_tool,
         kotlinc_tool,
         cargo_tool,
+        shellcheck_tool,
         cargo_audit_tool,
         rustsec_db,
         pip_audit_tool,

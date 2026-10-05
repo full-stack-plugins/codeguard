@@ -1674,6 +1674,14 @@ fn latest_verification_observation(
                 latest_run = sequence;
                 continue;
             }
+            if brief["checker_id"] == "shell.shellcheck"
+                && event["report_sha256"] == format!("{:x}", Sha256::digest(&report_bytes))
+                && !crate::shell_task_recheck::inputs_current(root, &report)
+            {
+                latest_verify = None;
+                latest_run = sequence;
+                continue;
+            }
             if brief["checker_id"] == "rust.cargo_rustdoc"
                 && event["report_sha256"] == format!("{:x}", Sha256::digest(&report_bytes))
                 && !crate::rustdoc_task_recheck::inputs_current(root, &report)
@@ -1751,6 +1759,9 @@ fn latest_verification_observation(
                 crate::work_sync::valid_python_cve_observation(root, &report)
                     && event["observation"]
                         == crate::python_cve_task_recheck::classify(brief, &report)
+            } else if brief["checker_id"] == "shell.shellcheck" {
+                crate::shell_task_recheck::valid_shape(root, &report)
+                    && event["observation"] == crate::shell_task_recheck::classify(brief, &report)
             } else if brief["checker_id"] == "rust.cargo_rustdoc" {
                 crate::rustdoc_task_recheck::valid_shape(&report)
                     && event["observation"] == crate::rustdoc_task_recheck::classify(brief, &report)
@@ -1822,7 +1833,9 @@ fn latest_verification_observation(
                 "still_present"
                     | "candidate_absent_unverified_policy"
                     | "suppression_requires_review"
-            ) || ((go_report || checkstyle_report)
+            ) || ((go_report
+                || checkstyle_report
+                || brief["checker_id"] == "shell.shellcheck")
                 && outcome == "rule_coverage_requires_review"))
                 && brief["kind"] == "finding"
             {
@@ -1846,6 +1859,12 @@ fn latest_verification_observation(
                             .and_then(|r| r["sha256"].as_str())
                             .filter(|s| valid_sha256(s))
                             .ok_or("rust_verification_source_identity_invalid")?
+                            .to_owned()
+                    } else if brief["checker_id"] == "shell.shellcheck" {
+                        report["source_sha256"]
+                            .as_str()
+                            .filter(|s| valid_sha256(s))
+                            .ok_or("shell_verification_source_invalid")?
                             .to_owned()
                     } else if go_report {
                         report["task_target"]["source_sha256"]
@@ -1962,6 +1981,9 @@ fn latest_verification_observation(
 }
 
 fn run_sequence(run_id: &str) -> Option<u128> {
+    if let Some(value) = run_id.strip_prefix("shellcheck-") {
+        return value.split('-').next()?.parse().ok();
+    }
     if run_id.starts_with("rust-cve-") || run_id.starts_with("python-cve-") {
         return run_id.rsplit('-').nth(1)?.parse().ok();
     }

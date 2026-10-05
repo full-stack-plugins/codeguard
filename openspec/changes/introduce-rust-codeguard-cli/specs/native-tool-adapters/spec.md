@@ -12,6 +12,18 @@ Shell单文件局部观察 MUST 在已初始化工作台复用脱敏报告消费
 - **WHEN** 原SC2086规则组已经落盘，随后原rc变为disable=SC2086且原生零诊断
 - **THEN** 原任务仍开放，next要求核对当前规则适用性及原生复扫，不按历史位置修改或声称代码已修复
 
+### Requirement: Shell task verification SHALL bind the original rule and reject unrelated tools
+
+Shell任务复检 MUST 从首次报告摘要绑定范围、方言、显式rc及原SC规则；复检不得导入首次报告没有的规则组。非Shell工具参数 MUST 在租约及原生启动前拒绝。已知zsh/fish文件名和声明 MUST 与首次检查使用同一支持边界。配置变化或疑似disable注释 MUST 明确需要覆盖或抑制审查；注释文本观察不是有效抑制证明。局部零诊断 MUST 仅记录candidate_absent，不能关闭任务或签发allow。复检报告 MUST 接入既有失败尝试、租约和历史读取协议，不允许因新增报告类型绕过重复无进展预算。
+
+#### Scenario: A foreign tool parameter is supplied to a Shell task
+- **WHEN** Shell任务复检收到--ruff-tool参数
+- **THEN** 返回参数错误，不取得租约、不运行原生检查、不追加复检事件
+
+#### Scenario: Original rule is absent under a changed rc
+- **WHEN** 首次发现SC2086后rc被修改，复检零诊断
+- **THEN** 记录rule_coverage_requires_review，任务保持开放
+
 ### Requirement: Native ShellCheck feedback SHALL preserve dialect, rc and original-rule evidence
 
 ShellCheck单文件入口 MUST 明确方言和工具兼容版本，冻结有界UTF8源码并通过受控stdin调用json1，不执行受检脚本、不应用原生fix。已知zsh/fish声明或文件名 MUST 保留未支持，不强制按bash制造诊断。显式rc或最近祖先配置与更近缺项 MUST 在调用前后核对；不加载的全局配置 MUST 公开说明，未知外部source范围 MUST 保留阻塞。环境规则与源发现 MUST 分开，保留部分有效诊断但不能判完整。json1位置 MUST 按其Unicode字符及tab语义核验；未知字段、重复键、异源文件、越界位置、退出与报告矛盾 MUST 未完成。原生自由文本及fix替换不得作为智能体指令。修复简报 MUST 包含七要素；未接持久历史时明确not_integrated，未完成证据不得授权源码修改或关闭任务。原生零诊断不得替代项目门禁。

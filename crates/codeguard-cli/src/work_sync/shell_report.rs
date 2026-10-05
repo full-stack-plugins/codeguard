@@ -16,7 +16,7 @@ fn exact(v: &Value, keys: &[&str]) -> bool {
 fn sha(bytes: &[u8]) -> String {
     format!("{:x}", Sha256::digest(bytes))
 }
-fn fingerprint(path: &str, dialect: &str, rule: &str) -> String {
+pub(crate) fn fingerprint(path: &str, dialect: &str, rule: &str) -> String {
     let mut h = Sha256::new();
     for s in [
         "codeguard-shell-rule-group-v1",
@@ -351,4 +351,41 @@ pub(super) fn parse(
         blockers,
         historical_findings: if stable { 0 } else { groups.len() as u64 },
     })
+}
+
+/// 复检封套转换后复用普通观察严格解析。
+pub(super) fn parse_recheck(
+    root: &Path,
+    workspace_id: &str,
+    path: &Path,
+    r: &Value,
+    digest: String,
+) -> Result<ReportInput, &'static str> {
+    if !crate::shell_task_recheck::valid_binding(root, r) {
+        return Err("shell_task_binding_invalid");
+    }
+    parse(
+        root,
+        workspace_id,
+        path,
+        &crate::shell_task_recheck::normal(r),
+        digest,
+    )
+}
+/// 核验本轮完整封套，不签发关闭权威。
+pub(crate) fn valid_recheck(root: &Path, r: &Value) -> bool {
+    let Some(workspace) = r["workspace_id"].as_str() else {
+        return false;
+    };
+    let Some(run) = r["run_id"].as_str() else {
+        return false;
+    };
+    parse_recheck(
+        root,
+        workspace,
+        &root.join(format!(".codeguard/reports/{run}.json")),
+        r,
+        String::new(),
+    )
+    .is_ok()
 }

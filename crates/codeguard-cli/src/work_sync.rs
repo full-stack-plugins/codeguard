@@ -596,6 +596,10 @@ fn parse_report(
     digest: String,
 ) -> Result<ReportInput, &'static str> {
     #[cfg(unix)]
+    if report["report_type"] == "shellcheck_task_recheck" {
+        return shell_report::parse_recheck(root, workspace_id, path, report, digest);
+    }
+    #[cfg(unix)]
     if report["report_type"] == "shellcheck_workbench_observation" {
         return shell_report::parse(root, workspace_id, path, report, digest);
     }
