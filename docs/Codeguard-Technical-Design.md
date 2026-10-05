@@ -1345,3 +1345,5 @@ Rust runtime now provides `scan_wasm_empty_blocks`, traversing the full tree for
 See [aggregate structure acceptance](../tests/acceptance/check-python-structure.md); this does not certify grammar quality or the full delivery gate.
 
 The isolated Python native probe now rechecks the requested entry and frozen bytes after version detection and before syntax execution; changed entries do not trigger a second invocation. It also verifies continuity afterwards. See [native-entry acceptance](../tests/acceptance/python-native-tool-continuity.md). Trusted Python closure still requires stable task identity, original-report and approved target-version integration; the development py312 probe does not authorize project delivery.
+
+Python candidate confirmation shares a frozen-source validator while current import remains bound to the current file. Empty observations cannot bypass UTF-8 validation. This validator does not verify consumption receipts or approvals and cannot resolve tasks. See [acceptance](../tests/acceptance/python-confirmation-source-snapshot.md).
