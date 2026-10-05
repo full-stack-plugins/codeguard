@@ -592,3 +592,6 @@ Ruff正常与忽略noqa的两轮结果中一致的`invalid-syntax`现在保留�
 ### 限定任务的共享事件提交
 
 原生语法服务已拆分复检与`commit_resolution`事件提交。提交前核对领域证据与脱敏原生对照的身份、原/当前源码、工具、适配器、grammar/批准策略及原生对照摘要，拒绝不一致的拼接。各语言入口仍负责验签和实际复检；共同提交逻辑保留幂等、策略变化核对、父链冲突和复发重开，不提供项目门禁。此拆分供Python后续接入，尚不表示Python可信关闭已实现。见[验收](tests/acceptance/task-resolution-commit-boundary.md)。
+
+
+Python语法确认任务新增宿主SDK限定关闭：独立签名策略1.5绑定原样本、明确lint目标、项目配置和Ruff制品；原始/当前原生对照完整且输入稳定才记录代码修复。普通`task verify`可在同一绑定下记录复发重开，不能凭本地历史批准新关闭。此能力尚未代表生产宿主接入、全部语言或项目门禁验收；见[局部验收](tests/acceptance/python-task-resolution-lifecycle.md)。

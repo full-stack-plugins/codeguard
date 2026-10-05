@@ -610,3 +610,6 @@ The read-only host API `validate_python_task_original_source(root, task_id, sour
 ### Shared event commit for scoped tasks
 
 Native syntax services now separate rechecks from `commit_resolution`. Before committing, domain evidence must match the redacted native pair for identity, original/current source, tool, adapter, grammar/approved policy and native-pair digest. Language entry points still verify signatures and execute native rechecks. Shared commit logic retains idempotency, policy-change reconciliation, parent-chain conflicts and recurrence, without granting project delivery. This prepares Python integration; Python trusted resolution is not implemented yet. See [acceptance](tests/acceptance/task-resolution-commit-boundary.md).
+
+
+Python syntax confirmation tasks now support scoped host SDK resolution. Independently signed policy 1.5 binds original source, explicit lint target, project configuration and the Ruff artifact. Complete original/current native comparison and stable inputs are required for a code-fix event. Ordinary `task verify` can record recurrence under the same bindings, but cannot authorize closure from local history. This does not certify production host integration, all languages or project delivery gates; see the [scoped acceptance record](tests/acceptance/python-task-resolution-lifecycle.md).

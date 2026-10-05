@@ -524,3 +524,15 @@ ESLint 原生发现投影 MUST 使用工作区相对路径、原生规则、源�
 #### Scenario: Existing native resolution uses the shared commit layer
 - **WHEN** Zig/Erlang/Swift/Kotlin入口提供已验签且当前输入稳定的同一份复检证据
 - **THEN** 收据版本、证据字段及父链语义保持；相同证据重检幂等、不同关闭需协调、仍存在时可重开，不扩大批准范围
+
+### Requirement: Python受保护原生语法解决
+
+Python专用SDK入口 MUST 验证宿主独立选择的信任根、时间、基线、防回滚与签名策略1.5；策略绑定python.ruff单文件任务、两类已消费首次报告、冻结原字节、固定grammar、Ruff版本/制品、适配器、明确lint目标和配置身份。未知/缺失/错误范围/工具/配置/策略 MUST 在原生执行前拒绝。原样本 MUST 经stdin使用相同配置和明确目标作原生语法对照，不写回项目。当前源码 MUST 按同轮原生项目设置、正常/忽略noqa对照检查。只有原样本确有语法错误、当前源码已变化且原规则完整零诊断、输入稳定时 MAY 以新证据0.6记录限定code_fixed；原样本原生合法 MUST 为误报调查，未完成/配置或输入变化不得关闭。普通复检检出同工具、目标与配置的复发 MUST 重开同一父链任务。该SDK不作为CLI自选公钥批准入口，不授予项目门禁或语言资格。
+
+#### Scenario: Both Python candidate origins resolve and recur
+- **WHEN** 宿主批准专用或通用首次Python语法确认任务并使用固定Ruff复检原字节与当前源码
+- **THEN** 原生仍有语法错误时保持开放，修复后可限定解决，相同证据重检幂等，复发时保留原解决事件并重开；工具/配置/目标/首次引用变化不得复用旧批准
+
+#### Scenario: Native counterexample refutes the original candidate
+- **WHEN** 原样本在批准配置和目标下原生合法
+- **THEN** 保留false_positive_review_required，不记为代码修复、不关闭、不自行加入白名单

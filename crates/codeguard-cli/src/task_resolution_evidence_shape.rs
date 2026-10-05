@@ -3,25 +3,34 @@ use codeguard_core::{ResolutionCause, TaskLifecycleKind, TaskLifecycleRecord};
 use serde_json::Value;
 
 pub(crate) fn valid(record: &TaskLifecycleRecord, value: &Value) -> bool {
-    if !keys(
-        value,
-        &[
-            "schema_version",
-            "report_type",
-            "identity",
-            "original_report_sha256",
-            "original_source_sha256",
-            "current_source_sha256",
-            "grammar_sha256",
-            "tool_sha256",
-            "adapter_sha256",
-            "policy_sha256",
-            "policy_revision",
-            "original_native",
-            "current_native",
-            "outcome",
-        ],
-    ) || !value["policy_revision"].as_str().is_some_and(token)
+    let mut expected = vec![
+        "schema_version",
+        "report_type",
+        "identity",
+        "original_report_sha256",
+        "original_source_sha256",
+        "current_source_sha256",
+        "grammar_sha256",
+        "tool_sha256",
+        "adapter_sha256",
+        "policy_sha256",
+        "policy_revision",
+        "original_native",
+        "current_native",
+        "outcome",
+    ];
+    if value["schema_version"] == "0.6.0" {
+        expected.extend([
+            "target_version",
+            "configuration_ref",
+            "configuration_sha256",
+        ]);
+        if !valid_python_binding(value) {
+            return false;
+        }
+    }
+    if !keys(value, &expected)
+        || !value["policy_revision"].as_str().is_some_and(token)
         || ![
             "original_report_sha256",
             "original_source_sha256",
@@ -89,6 +98,7 @@ fn native_bound(value: &Value) -> bool {
         Some("0.2.0") => "OTP 28",
         Some("0.3.0") => "Apple Swift 6.4",
         Some("0.4.0") => "kotlinc-jvm 2.4.10",
+        Some("0.6.0") => "ruff 0.16.8",
         _ => return false,
     };
     ["original_native", "current_native"].iter().all(|k| {
@@ -98,6 +108,7 @@ fn native_bound(value: &Value) -> bool {
 fn native_for_version(evidence: &Value, key: &str) -> bool {
     match evidence["schema_version"].as_str() {
         Some("0.1.0" | "0.5.0") => native(&evidence[key]),
+        Some("0.6.0") => crate::python_syntax_probe::valid_native_observation(&evidence[key], None),
         Some("0.2.0") => crate::erlang_syntax_probe::valid_native_observation(&evidence[key], None),
         Some("0.3.0") => crate::swift_syntax_probe::valid_native_observation(&evidence[key], None),
         Some("0.4.0") => codeguard_adapters::valid_kotlin_native_observation(&evidence[key], None),
@@ -188,6 +199,39 @@ fn token(value: &str) -> bool {
         && value
             .bytes()
             .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'-' | b'_' | b'.' | b':'))
+}
+
+/// 核对Python专用版本的配置、目标及原生观察绑定；不授予批准权威。
+pub(crate) fn valid_python_binding(value: &Value) -> bool {
+    value["identity"]["checker_id"] == "python.ruff"
+        && value["grammar_sha256"].as_str().is_some_and(digest)
+        && value["configuration_sha256"].as_str().is_some_and(digest)
+        && value["configuration_ref"].as_str().is_some_and(|s| {
+            !s.is_empty()
+                && !s.contains('\\')
+                && !s.chars().any(char::is_control)
+                && std::path::Path::new(s)
+                    .components()
+                    .all(|c| matches!(c, std::path::Component::Normal(_)))
+        })
+        && value["target_version"].as_str().is_some_and(|s| {
+            matches!(
+                s,
+                "py37"
+                    | "py38"
+                    | "py39"
+                    | "py310"
+                    | "py311"
+                    | "py312"
+                    | "py313"
+                    | "py314"
+                    | "py315"
+            )
+        })
+        && ["original_native", "current_native"].iter().all(|key| {
+            value[*key]["target_version"] == value["target_version"]
+                && crate::python_syntax_probe::valid_native_observation(&value[*key], None)
+        })
 }
 
 #[cfg(test)]

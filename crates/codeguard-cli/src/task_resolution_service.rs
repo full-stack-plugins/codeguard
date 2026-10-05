@@ -302,7 +302,7 @@ pub(crate) fn commit_resolution(
     mut raw_evidence: Value,
     mut outcome: &'static str,
 ) -> Result<Value, &'static str> {
-    let keys = [
+    let mut keys = vec![
         "schema_version",
         "report_type",
         "identity",
@@ -318,11 +318,21 @@ pub(crate) fn commit_resolution(
         "current_native",
         "outcome",
     ];
+    if raw_evidence["schema_version"] == "0.6.0" {
+        keys.extend([
+            "target_version",
+            "configuration_ref",
+            "configuration_sha256",
+        ]);
+        if !crate::task_resolution_evidence_shape::valid_python_binding(&raw_evidence) {
+            return Err("task_resolution_evidence_binding_invalid");
+        }
+    }
     if !raw_evidence.as_object().is_some_and(|object| {
         object.len() == keys.len() && keys.iter().all(|key| object.contains_key(*key))
     }) || !matches!(
         raw_evidence["schema_version"].as_str(),
-        Some("0.1.0" | "0.2.0" | "0.3.0" | "0.4.0" | "0.5.0")
+        Some("0.1.0" | "0.2.0" | "0.3.0" | "0.4.0" | "0.5.0" | "0.6.0")
     ) {
         return Err("task_resolution_evidence_binding_invalid");
     }

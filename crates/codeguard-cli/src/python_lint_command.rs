@@ -456,7 +456,7 @@ pub(crate) fn current_adapter_sha256() -> Option<String> {
     Some(format!("{:x}", Sha256::digest(bytes)))
 }
 
-fn annotate_rulepack(feedback: &mut Value, tool_version: Option<&str>) {
+pub(crate) fn annotate_rulepack(feedback: &mut Value, tool_version: Option<&str>) {
     let pack = bundled_ruff_rulepack().ok();
     let compatible = pack.as_ref().is_some_and(|pack| {
         tool_version.is_some_and(|version| pack.supports_tool_version(version))

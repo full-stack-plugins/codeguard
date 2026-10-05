@@ -1,4 +1,4 @@
-//! 使用已安装 Ruff 对冻结 stdin 做隔离语法检查，不加载项目配置或执行用户代码。
+//! 使用已安装Ruff对冻结stdin做语法检查；隔离入口与批准配置入口分别绑定上下文，不执行用户代码。
 use codeguard_adapters::{RuffParseState, parse_ruff_json};
 use codeguard_runtime::{ProcessSpec, Termination, read_bounded_regular_file, run_process};
 use serde_json::{Value, json};
@@ -9,16 +9,41 @@ use std::{
 
 /// 返回固定 Ruff 0.16.8 / Python 3.12 的局部语法观察。
 /// 参数为绝对工具路径、源码字节和总截止时间；没有项目、规则或交付授权。
+#[cfg(any(feature = "wasm-precheck", test))]
 pub(crate) fn observe(tool: &Path, source: &[u8], deadline: Instant) -> Value {
     observe_for_target(tool, source, "py312", deadline)
 }
 
 /// 对冻结源码按明确目标Python版本执行隔离语法检查。
 /// 参数为绝对工具路径、源码、宿主已核对目标及截止时间；返回局部观察，不推断项目目标或批准关闭。
+#[cfg(any(feature = "wasm-precheck", test))]
 pub(crate) fn observe_for_target(
     tool: &Path,
     source: &[u8],
     target: &str,
+    deadline: Instant,
+) -> Value {
+    observe_with_context(tool, source, target, None, deadline)
+}
+
+/// 对原始stdin按批准的项目配置与明确目标复检，绝不改写当前源码。
+/// 参数包括普通配置与绑定源码的绝对路径；调用者必须在前后核对配置与输入身份。
+pub(crate) fn observe_configured(
+    tool: &Path,
+    source: &[u8],
+    target: &str,
+    config: &Path,
+    path: &Path,
+    deadline: Instant,
+) -> Value {
+    observe_with_context(tool, source, target, Some((config, path)), deadline)
+}
+
+fn observe_with_context(
+    tool: &Path,
+    source: &[u8],
+    target: &str,
+    context: Option<(&Path, &Path)>,
     deadline: Instant,
 ) -> Value {
     let mut report = json!({"status":"incomplete","reason":"python_syntax_target_unverified","version":null,"tool_sha256":null,"target_version":null,"diagnostics":[]});
@@ -77,24 +102,38 @@ pub(crate) fn observe_for_target(
     }
     report["version"] = json!("ruff 0.16.8");
     // 选择 E9 仅触发解析/I/O；原生 invalid-syntax 不受 noqa 抑制。其它规则不能当语法错误。
-    let outcome = invoke(
-        &[
-            "check",
-            "--isolated",
-            "--no-cache",
-            "--ignore-noqa",
-            "--select",
-            "E9",
-            "--target-version",
-            target,
-            "--output-format",
-            "json",
-            "--stdin-filename",
-            "codeguard_input.py",
-            "-",
-        ],
-        Some(source.to_vec()),
-    );
+    let filename = context.map_or(Some("/codeguard_input.py"), |(_, path)| path.to_str());
+    let Some(filename) = filename else {
+        report["reason"] = json!("python_syntax_context_unverified");
+        return report;
+    };
+    let mut args = vec![
+        "check",
+        "--no-cache",
+        "--ignore-noqa",
+        "--select",
+        "E9",
+        "--target-version",
+        target,
+        "--output-format",
+        "json",
+        "--stdin-filename",
+        filename,
+    ];
+    if let Some((config, path)) = context {
+        let Some(config) = config
+            .to_str()
+            .filter(|_| config.is_absolute() && path.is_absolute())
+        else {
+            report["reason"] = json!("python_syntax_context_unverified");
+            return report;
+        };
+        args.extend(["--config", config]);
+    } else {
+        args.push("--isolated");
+    }
+    args.push("-");
+    let outcome = invoke(&args, Some(source.to_vec()));
     if !tool_current() {
         report["reason"] = json!("python_syntax_tool_changed");
         return report;
@@ -110,7 +149,7 @@ pub(crate) fn observe_for_target(
         report["reason"] = json!("python_syntax_unexpected_stderr");
         return report;
     }
-    let Some(rows) = parse_syntax(code, &outcome.stdout, source) else {
+    let Some(rows) = parse_syntax_at(code, &outcome.stdout, source, filename) else {
         report["reason"] = json!("python_syntax_report_invalid");
         return report;
     };
@@ -131,9 +170,13 @@ pub(crate) fn observe_for_target(
 fn digest(bytes: &[u8]) -> String {
     format!("{:x}", Sha256::digest(bytes))
 }
+#[cfg(test)]
 fn parse_syntax(code: i32, stdout: &[u8], source: &[u8]) -> Option<Vec<Value>> {
+    parse_syntax_at(code, stdout, source, "/codeguard_input.py")
+}
+fn parse_syntax_at(code: i32, stdout: &[u8], source: &[u8], filename: &str) -> Option<Vec<Value>> {
     let parsed = parse_ruff_json(code, stdout);
-    if parsed.state != RuffParseState::Valid {
+    if parsed.state != RuffParseState::Valid || parsed.diagnostics.len() > 512 {
         return None;
     }
     let text = std::str::from_utf8(source).ok()?;
@@ -142,7 +185,7 @@ fn parse_syntax(code: i32, stdout: &[u8], source: &[u8]) -> Option<Vec<Value>> {
         let column = diagnostic.location.column as usize;
         // 保留原生列，不将它未经证明地转换为编辑坐标；这里只核验行/列的保守上界。
         if diagnostic.code != "invalid-syntax" || diagnostic.severity != "error"
-            || diagnostic.filename != "/codeguard_input.py"
+            || diagnostic.filename != filename
             || !text.split('\n').nth(line.checked_sub(1)?).is_some_and(|s| column > 0 && column <= s.len() + 1) {
             return None;
         }
@@ -150,10 +193,137 @@ fn parse_syntax(code: i32, stdout: &[u8], source: &[u8]) -> Option<Vec<Value>> {
     }).collect()
 }
 
+/// 核对脱敏Python原生观察的封闭形状和可选源码位置，不证明工具或批准来源。
+pub(crate) fn valid_native_observation(value: &Value, source: Option<&[u8]>) -> bool {
+    // 零诊断也必须核对源码格式，不能让空数组绕过UTF-8或大小限制。
+    if source.is_some_and(|bytes| bytes.len() > 1024 * 1024 || std::str::from_utf8(bytes).is_err())
+    {
+        return false;
+    }
+    let keys = [
+        "status",
+        "reason",
+        "version",
+        "tool_sha256",
+        "target_version",
+        "diagnostics",
+    ];
+    if !value
+        .as_object()
+        .is_some_and(|o| o.len() == keys.len() && keys.iter().all(|k| o.contains_key(*k)))
+    {
+        return false;
+    }
+    let target = value["target_version"].as_str().is_some_and(|target| {
+        matches!(
+            target,
+            "py37" | "py38" | "py39" | "py310" | "py311" | "py312" | "py313" | "py314" | "py315"
+        )
+    });
+    if !(target
+        || (value["status"] == "incomplete"
+            && value["target_version"].is_null()
+            && value["reason"] == "python_syntax_target_unverified"))
+        || !(value["version"].is_null() || value["version"] == "ruff 0.16.8")
+        || !(value["tool_sha256"].is_null()
+            || value["tool_sha256"].as_str().is_some_and(|s| {
+                s.len() == 64
+                    && s.bytes()
+                        .all(|b| b.is_ascii_digit() || matches!(b, b'a'..=b'f'))
+            }))
+    {
+        return false;
+    }
+    let Some(rows) = value["diagnostics"].as_array().filter(|r| r.len() <= 512) else {
+        return false;
+    };
+    if !rows.iter().all(|row| {
+        row.as_object().is_some_and(|r| r.len() == 4)
+            && row["rule_id"] == "invalid-syntax"
+            && row["column_unit"] == "ruff_reported"
+            && row["line"]
+                .as_u64()
+                .is_some_and(|n| n > 0 && n <= u32::MAX as u64)
+            && row["column"]
+                .as_u64()
+                .is_some_and(|n| n > 0 && n <= 1024 * 1024 + 1)
+            && source.is_none_or(|bytes| {
+                bytes.len() <= 1024 * 1024
+                    && std::str::from_utf8(bytes).is_ok()
+                    && bytes
+                        .split(|b| *b == b'\n')
+                        .nth(row["line"].as_u64().unwrap_or(0).saturating_sub(1) as usize)
+                        .is_some_and(|line| {
+                            row["column"].as_u64().unwrap_or(0) <= line.len() as u64 + 1
+                        })
+            })
+    }) {
+        return false;
+    }
+    match value["status"].as_str() {
+        Some("completed" | "diagnostics_observed") => {
+            value["version"] == "ruff 0.16.8"
+                && value["tool_sha256"].is_string()
+                && target
+                && if value["status"] == "completed" {
+                    rows.is_empty() && value["reason"] == "python_native_syntax_no_diagnostics"
+                } else {
+                    !rows.is_empty() && value["reason"] == "python_native_syntax_diagnostics"
+                }
+        }
+        Some("incomplete") => matches!(
+            value["reason"].as_str(),
+            Some(
+                "python_syntax_tool_unavailable"
+                    | "python_syntax_target_unverified"
+                    | "python_syntax_context_unverified"
+                    | "python_syntax_tool_changed"
+                    | "python_syntax_version_unverified"
+                    | "python_syntax_execution_incomplete"
+                    | "python_syntax_unexpected_stderr"
+                    | "python_syntax_report_invalid"
+            )
+        ),
+        _ => false,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::parse_syntax;
     use serde_json::json;
+    #[test]
+    fn closed_native_observation_rejects_forgery_and_invalid_empty_source() {
+        let clean = json!({"status":"completed","reason":"python_native_syntax_no_diagnostics",
+            "version":"ruff 0.16.8","tool_sha256":"a".repeat(64),"target_version":"py312","diagnostics":[]});
+        assert!(super::valid_native_observation(&clean, Some(b"x = 1\n")));
+        assert!(!super::valid_native_observation(&clean, Some(&[255])));
+        assert!(!super::valid_native_observation(
+            &clean,
+            Some(&vec![b'x'; 1024 * 1024 + 1])
+        ));
+        for (key, value) in [
+            ("approved", json!(true)),
+            ("version", json!("ruff 0.1.0")),
+            ("target_version", json!("py316")),
+            ("reason", json!("python_native_syntax_diagnostics")),
+        ] {
+            let mut forged = clean.clone();
+            forged[key] = value;
+            assert!(
+                !super::valid_native_observation(&forged, Some(b"x = 1\n")),
+                "{key}"
+            );
+        }
+        let mut present = clean;
+        present["status"] = json!("diagnostics_observed");
+        present["reason"] = json!("python_native_syntax_diagnostics");
+        present["diagnostics"] =
+            json!([{"line":1,"column":1,"column_unit":"ruff_reported","rule_id":"invalid-syntax"}]);
+        assert!(super::valid_native_observation(&present, Some(b"def (\n")));
+        present["diagnostics"][0]["line"] = json!(99);
+        assert!(!super::valid_native_observation(&present, Some(b"def (\n")));
+    }
     #[test]
     fn invalid_target_is_rejected_before_tool_resolution() {
         let tool = std::path::Path::new("/does-not-exist/ruff");

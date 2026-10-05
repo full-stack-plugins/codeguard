@@ -1369,3 +1369,10 @@ The read-only host API `validate_python_task_original_source(root, task_id, sour
 ### Shared event commit for scoped tasks
 
 Native syntax services now separate rechecks from `commit_resolution`. Before committing, domain evidence must match the redacted native pair for identity, original/current source, tool, adapter, grammar/approved policy and native-pair digest. Language entry points still verify signatures and execute native rechecks. Shared commit logic retains idempotency, policy-change reconciliation, parent-chain conflicts and recurrence, without granting project delivery. This prepares Python integration; Python trusted resolution is not implemented yet. See [acceptance](../tests/acceptance/task-resolution-commit-boundary.md).
+
+
+### Scoped Python native syntax resolution (policy 1.5 / evidence 0.6)
+
+The host SDK `verify_python_task_resolution` binds an independently signed policy to the task, consumed first report, original source, grammar, Ruff artifact, adapter, explicit lint target and project configuration digest. Rust invokes native Ruff against original stdin and the current scoped file. The current scan retains normal/ignore-noqa comparison and effective settings. Closure requires native syntax diagnostics on the original source, changed current source with complete zero syntax diagnostics, and stable inputs and policy bindings. Native counterevidence on the original enters false-positive investigation. Missing tools, unresolved targets, changed configuration and incomplete runs cannot close a task; formatter targets and implicit defaults cannot supply the lint target.
+
+Both first-report families retain one task and append-only lifecycle history. Closed evidence 0.6 leaves historical protocols unchanged. Repeated verification is idempotent; recurrence preserves the previous closure. Ordinary verification may reopen but cannot authorize a new closure using a historical policy. Independent signing fixtures do not certify production host trust integration, project delivery or grammar qualification. See the [scoped acceptance record](../tests/acceptance/python-task-resolution-lifecycle.md).

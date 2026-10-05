@@ -1,0 +1,598 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeguard.dev/schemas/task-resolution-evidence-v0.6.schema.json",
+  "title": "Python原样本与当前源码原生对照证据：配置和目标绑定",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.6.0"
+    },
+    "report_type": {
+      "const": "task_resolution_evidence"
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "workspace_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.:-]{1,128}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^CG-B-[0-9a-f]{32}$"
+        },
+        "checker_id": {
+          "const": "python.ruff"
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))[^\\\\:\\x00-\\x1f\\x7f]+$"
+        }
+      },
+      "required": [
+        "workspace_id",
+        "task_id",
+        "checker_id",
+        "scope"
+      ]
+    },
+    "original_report_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "original_source_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "current_source_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "grammar_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "tool_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "adapter_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "policy_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "policy_revision": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.:-]{1,128}$"
+    },
+    "original_native": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "completed",
+            "diagnostics_observed",
+            "incomplete"
+          ]
+        },
+        "reason": {
+          "enum": [
+            "python_native_syntax_no_diagnostics",
+            "python_native_syntax_diagnostics",
+            "python_syntax_tool_unavailable",
+            "python_syntax_target_unverified",
+            "python_syntax_context_unverified",
+            "python_syntax_tool_changed",
+            "python_syntax_version_unverified",
+            "python_syntax_execution_incomplete",
+            "python_syntax_unexpected_stderr",
+            "python_syntax_report_invalid"
+          ]
+        },
+        "version": {
+          "enum": [
+            "ruff 0.16.8",
+            null
+          ]
+        },
+        "tool_sha256": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "diagnostics": {
+          "type": "array",
+          "maxItems": 512,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "line": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 4294967295
+              },
+              "column": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1048577
+              },
+              "rule_id": {
+                "const": "invalid-syntax"
+              },
+              "column_unit": {
+                "const": "ruff_reported"
+              }
+            },
+            "required": [
+              "line",
+              "column",
+              "rule_id",
+              "column_unit"
+            ]
+          }
+        },
+        "target_version": {
+          "enum": [
+            "py37",
+            "py38",
+            "py39",
+            "py310",
+            "py311",
+            "py312",
+            "py313",
+            "py314",
+            "py315",
+            null
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "reason",
+        "version",
+        "tool_sha256",
+        "diagnostics",
+        "target_version"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "const": "python_native_syntax_no_diagnostics"
+              },
+              "version": {
+                "const": "ruff 0.16.8"
+              },
+              "tool_sha256": {
+                "type": "string"
+              },
+              "target_version": {
+                "enum": [
+                  "py37",
+                  "py38",
+                  "py39",
+                  "py310",
+                  "py311",
+                  "py312",
+                  "py313",
+                  "py314",
+                  "py315"
+                ]
+              },
+              "diagnostics": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "diagnostics_observed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "const": "python_native_syntax_diagnostics"
+              },
+              "version": {
+                "const": "ruff 0.16.8"
+              },
+              "tool_sha256": {
+                "type": "string"
+              },
+              "target_version": {
+                "enum": [
+                  "py37",
+                  "py38",
+                  "py39",
+                  "py310",
+                  "py311",
+                  "py312",
+                  "py313",
+                  "py314",
+                  "py315"
+                ]
+              },
+              "diagnostics": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "incomplete"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "enum": [
+                  "python_syntax_tool_unavailable",
+                  "python_syntax_target_unverified",
+                  "python_syntax_context_unverified",
+                  "python_syntax_tool_changed",
+                  "python_syntax_version_unverified",
+                  "python_syntax_execution_incomplete",
+                  "python_syntax_unexpected_stderr",
+                  "python_syntax_report_invalid"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "target_version": {
+                "type": "null"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "const": "incomplete"
+              },
+              "reason": {
+                "const": "python_syntax_target_unverified"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "current_native": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "completed",
+            "diagnostics_observed",
+            "incomplete"
+          ]
+        },
+        "reason": {
+          "enum": [
+            "python_native_syntax_no_diagnostics",
+            "python_native_syntax_diagnostics",
+            "python_syntax_tool_unavailable",
+            "python_syntax_target_unverified",
+            "python_syntax_context_unverified",
+            "python_syntax_tool_changed",
+            "python_syntax_version_unverified",
+            "python_syntax_execution_incomplete",
+            "python_syntax_unexpected_stderr",
+            "python_syntax_report_invalid"
+          ]
+        },
+        "version": {
+          "enum": [
+            "ruff 0.16.8",
+            null
+          ]
+        },
+        "tool_sha256": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "diagnostics": {
+          "type": "array",
+          "maxItems": 512,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "line": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 4294967295
+              },
+              "column": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1048577
+              },
+              "rule_id": {
+                "const": "invalid-syntax"
+              },
+              "column_unit": {
+                "const": "ruff_reported"
+              }
+            },
+            "required": [
+              "line",
+              "column",
+              "rule_id",
+              "column_unit"
+            ]
+          }
+        },
+        "target_version": {
+          "enum": [
+            "py37",
+            "py38",
+            "py39",
+            "py310",
+            "py311",
+            "py312",
+            "py313",
+            "py314",
+            "py315",
+            null
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "reason",
+        "version",
+        "tool_sha256",
+        "diagnostics",
+        "target_version"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "const": "python_native_syntax_no_diagnostics"
+              },
+              "version": {
+                "const": "ruff 0.16.8"
+              },
+              "tool_sha256": {
+                "type": "string"
+              },
+              "target_version": {
+                "enum": [
+                  "py37",
+                  "py38",
+                  "py39",
+                  "py310",
+                  "py311",
+                  "py312",
+                  "py313",
+                  "py314",
+                  "py315"
+                ]
+              },
+              "diagnostics": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "diagnostics_observed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "const": "python_native_syntax_diagnostics"
+              },
+              "version": {
+                "const": "ruff 0.16.8"
+              },
+              "tool_sha256": {
+                "type": "string"
+              },
+              "target_version": {
+                "enum": [
+                  "py37",
+                  "py38",
+                  "py39",
+                  "py310",
+                  "py311",
+                  "py312",
+                  "py313",
+                  "py314",
+                  "py315"
+                ]
+              },
+              "diagnostics": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "incomplete"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "enum": [
+                  "python_syntax_tool_unavailable",
+                  "python_syntax_target_unverified",
+                  "python_syntax_context_unverified",
+                  "python_syntax_tool_changed",
+                  "python_syntax_version_unverified",
+                  "python_syntax_execution_incomplete",
+                  "python_syntax_unexpected_stderr",
+                  "python_syntax_report_invalid"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "target_version": {
+                "type": "null"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "const": "incomplete"
+              },
+              "reason": {
+                "const": "python_syntax_target_unverified"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "outcome": {
+      "enum": [
+        "code_fixed",
+        "still_present",
+        "inputs_stale",
+        "native_incomplete",
+        "false_positive_review_required",
+        "resolution_evidence_incomplete",
+        "resolution_history_binding_changed"
+      ]
+    },
+    "target_version": {
+      "enum": [
+        "py37",
+        "py38",
+        "py39",
+        "py310",
+        "py311",
+        "py312",
+        "py313",
+        "py314",
+        "py315"
+      ]
+    },
+    "configuration_ref": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))[^\\\\:\\x00-\\x1f\\x7f]+$"
+    },
+    "configuration_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "required": [
+    "schema_version",
+    "report_type",
+    "identity",
+    "original_report_sha256",
+    "original_source_sha256",
+    "current_source_sha256",
+    "grammar_sha256",
+    "tool_sha256",
+    "adapter_sha256",
+    "policy_sha256",
+    "policy_revision",
+    "original_native",
+    "current_native",
+    "outcome",
+    "target_version",
+    "configuration_ref",
+    "configuration_sha256"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "outcome": {
+            "const": "code_fixed"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "original_native": {
+            "properties": {
+              "status": {
+                "const": "diagnostics_observed"
+              }
+            }
+          },
+          "current_native": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

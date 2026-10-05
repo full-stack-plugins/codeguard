@@ -183,6 +183,16 @@ mod python_selected_discovery;
 mod python_syntax_confirmation;
 mod python_confirmation_recheck;
 #[cfg(unix)]
+mod python_task_resolution_request;
+#[cfg(unix)]
+mod python_task_resolution_policy_input;
+#[cfg(unix)]
+mod python_task_resolution_service;
+#[cfg(unix)]
+pub use python_task_resolution_request::PythonTaskResolutionRequest;
+#[cfg(unix)]
+pub use python_task_resolution_service::verify_python_task_resolution;
+#[cfg(unix)]
 pub use python_confirmation_recheck::validate_python_task_original_source;
 #[cfg(all(unix, feature = "wasm-precheck"))]
 mod python_syntax_precheck;
@@ -363,5 +373,5 @@ pub mod syntax_worker_structure;
 
 #[cfg(all(feature = "wasm-precheck", unix))]
 mod grammar_native_checker;
-#[cfg(all(feature = "wasm-precheck", unix))]
+#[cfg(unix)]
 mod python_syntax_probe;

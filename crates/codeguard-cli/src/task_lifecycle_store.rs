@@ -79,7 +79,7 @@ pub(crate) fn load(
                     serde_json::to_value(identity).map_err(|_| "task_lifecycle_encoding_failed")?;
                 if !matches!(
                     value["schema_version"].as_str(),
-                    Some("0.1.0" | "0.2.0" | "0.3.0" | "0.4.0" | "0.5.0")
+                    Some("0.1.0" | "0.2.0" | "0.3.0" | "0.4.0" | "0.5.0" | "0.6.0")
                 ) || value["report_type"] != "task_resolution_evidence"
                     || value["identity"] != identity_value
                     || value["original_report_sha256"] != original_sha
@@ -143,10 +143,52 @@ fn original_task_report(
         return Err("task_lifecycle_evidence_binding_invalid");
     }
     let brief = serde_json::json!({"task_id":identity.task_id,"scope":identity.scope,"evidence_ref":{"first_run_id":fact["first_run_id"],"first_report_sha256":sha}});
+    if identity.checker_id == "python.ruff" {
+        let mut brief = brief;
+        brief["checker_id"] = fact["checker_id"].clone();
+        brief["kind"] = fact["kind"].clone();
+        brief["reason_code"] = fact["reason_code"].clone();
+        let reference = crate::python_confirmation_recheck::original_reference(root, &brief)
+            .map_err(|_| "task_lifecycle_evidence_binding_invalid")?;
+        let run = reference["run_id"]
+            .as_str()
+            .ok_or("task_lifecycle_evidence_binding_invalid")?;
+        let bytes = read_bounded_regular_file(
+            &root.join(format!(".codeguard/reports/{run}.json")),
+            1024 * 1024,
+        )
+        .map_err(|_| "task_lifecycle_evidence_binding_invalid")?;
+        if digest(&bytes) != sha {
+            return Err("task_lifecycle_evidence_binding_invalid");
+        }
+        return codeguard_adapters::parse_unique_json(&bytes)
+            .map_err(|_| "task_lifecycle_evidence_binding_invalid");
+    }
     crate::syntax_task_recheck::original(root, &brief)
         .map_err(|_| "task_lifecycle_evidence_binding_invalid")
 }
 fn origin_matches_evidence(original: &serde_json::Value, evidence: &serde_json::Value) -> bool {
+    if evidence["schema_version"] == "0.6.0" {
+        let dedicated = original["report_type"] == "python_syntax_confirmation_observation"
+            && matches!(original["schema_version"].as_str(), Some("0.1.0" | "0.2.0"));
+        let generic = original["report_type"] == "syntax_confirmation_observation"
+            && original["language"] == "python"
+            && matches!(original["schema_version"].as_str(), Some("0.1.0" | "0.7.0"));
+        let source = if dedicated {
+            &original["source_sha256"]
+        } else {
+            &original["observations"][0]["source_sha256"]
+        };
+        let grammar = if dedicated {
+            &original["grammar_sha256"]
+        } else {
+            &original["observations"][0]["grammar_sha256"]
+        };
+        return (dedicated || generic)
+            && original["checker_id"] == "python.ruff"
+            && evidence["grammar_sha256"] == *grammar
+            && evidence["original_source_sha256"] == *source;
+    }
     if !matches!(
         (
             original["language"].as_str(),
@@ -281,6 +323,9 @@ pub(crate) fn record_native_recurrence(
     brief: &serde_json::Value,
     scan: &serde_json::Value,
 ) -> Result<(), &'static str> {
+    if brief["checker_id"] == "python.ruff" {
+        return crate::python_task_resolution_service::record_recurrence(root, brief, scan);
+    }
     if brief["checker_id"] != "syntax.native_confirmation"
         || scan["input_stable"] != true
         || !(scan["native"]["status"] == "diagnostics_observed"
