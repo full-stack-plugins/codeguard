@@ -1,6 +1,10 @@
 //! CLI 共享的 Rust 开发期验收与命令应用服务入口。
 
 pub mod agents_block;
+mod command_catalogue;
+mod command_descriptor;
+mod command_examples;
+pub mod help_command;
 pub mod approval_snapshot;
 mod bound_false_positive_disposition;
 #[cfg(unix)]

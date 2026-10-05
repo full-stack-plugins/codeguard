@@ -368,3 +368,6 @@ syntax-precheck的隐藏token场景→9.3/9.9/14.7/14.10/14.11/14.19：check all
 ## Swift 原生确认增量（2026-10-04）
 
 9.9/9.10/14.10/14.11/14.19：既有 Swift 无定位 WASM 确认任务复用 Rust 原生 parse、追加观察与 next/repair_ready，绑定源字节/工具并核对 UTF-8 字节列；缺工具给具体恢复步骤、零诊断不自动关闭。实际 Apple Swift 6.4 与受控边界证据见 [验收](../../../tests/acceptance/swift-native-task-confirmation.md)。Swift 全项目原生优先、可信关闭 SDK、真实宿主及语言资格仍缺，父任务未完成。
+
+
+2026-10-05：unified-cli-contract / `Help SHALL report current command support without executing commands` 由2.1、2.7、12.9跟踪；静态目录及帮助协议不替代正式全部参数注册或MCP接线。

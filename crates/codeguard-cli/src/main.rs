@@ -15,89 +15,13 @@ fn main() -> ExitCode {
         return ExitCode::from(4);
     }
     let args: Vec<String> = std::env::args().skip(1).collect();
+    if let Some(selection) = codeguard_cli::help_command::trailing_selection(&args) {
+        return codeguard_cli::help_command::run(&selection);
+    }
     match args.as_slice() {
         [version, rest @ ..] if version == "--version" || version == "-V" => version_report(rest),
-        [help] if help == "--help" || help == "-h" || help == "help" => {
-            println!(
-                "codeguard {}\n用法: codeguard --version [--format human|json] | capabilities [language] [--platform ID] [--category ID] [--format human|json] | detect [path] [--format human|json] | init [path] [--dry-run|--apply] [--format human|json] | config <validate|explain> [path] [--policy-candidate FILE] [--format human|json] | plan <lint|comments|dependencies|cve|security|build|check> <language|all> [path] [--format human|json] | check <all|LANGUAGE_ID> [path] [--node-tool ABS_PATH --npm-entry ABS_PATH --npm-version VERSION --userconfig ABS_PATH --globalconfig ABS_PATH [--registry URL]] [--ruff-tool ABS_PATH] [--cargo-tool ABS_PATH] [--go-tool ABS_PATH] [--erl-tool ABS_PATH] [--zig-tool ABS_PATH] [--maven-tool ABS_PATH --java-home ABS_PATH --maven-repo ABS_PATH --repo-sha256 SHA256] [--timeout DURATION] [--jobs N] [--format human|json|sarif] [--output PATH] | check java [path] [--maven-tool ABS_PATH --java-home ABS_PATH --maven-repo ABS_PATH --repo-sha256 SHA256] [--timeout DURATION] [--jobs N] [--format human|json|sarif] [--output PATH] | lint python [path] [--ruff-tool ABS_PATH] [--timeout DURATION] [--format human|json] | lint typescript PATH [--config-map ABS_PATH] [--node-tool ABS_PATH --eslint-entry ABS_PATH --eslint-version VERSION --config ABS_PATH --cwd ABS_PATH] [--workspace ABS_PATH] [--timeout DURATION] [--format human|json] | lint go [path] [--go-tool ABS_PATH] [--timeout DURATION] [--format human|json] | lint java FILE [--checker p3c] [--workspace ABS_PATH] [--maven-tool ABS_PATH --java-home ABS_PATH --maven-repo ABS_PATH --repo-sha256 SHA256] [--format human|json] | lint java FILE --checker javadoc --java-home ABS_PATH [--format human|json] | work sync [path] [--format human|json] | status [path] [--format human|json] | next [path] [--format human|json] | task show ID [path] [--format human|json] | task <claim|heartbeat|release> ID [path] --owner ID [--lease-token TOKEN] [--format human|json] | task attempt <start|finish> ID [path] --owner ID --lease-token TOKEN [--action-id ID|--attempt-id ID --outcome OUTCOME --note-code CODE] [--format human|json] | task verify ID [path] [--owner ID --lease-token TOKEN] [--node-tool ABS_PATH --npm-entry ABS_PATH --npm-version VERSION --userconfig ABS_PATH --globalconfig ABS_PATH [--registry URL]|--node-tool ABS_PATH --eslint-entry ABS_PATH --eslint-version VERSION --config ABS_PATH --cwd ABS_PATH|--ruff-tool ABS_PATH|--cargo-tool ABS_PATH|--go-tool ABS_PATH|--maven-tool ABS_PATH --java-home ABS_PATH --maven-repo ABS_PATH --repo-sha256 SHA256 --cve-data-dir ABS_PATH --cve-data-sha256 SHA256] [--timeout DURATION] [--format human|json] | gate pre-commit [path] [--git-tool ABS_PATH] [--format human|json] | cve typescript [path] [--workspace ABS_PATH] [--node-tool ABS_PATH --npm-entry ABS_PATH --npm-version VERSION --userconfig ABS_PATH --globalconfig ABS_PATH] [--registry URL] [--timeout DURATION] [--format human|json] | rules whitelist list --candidate FILE [--candidate FILE...] [--format human|json] | rules whitelist explain ID --candidate FILE [--candidate FILE...] [--observed-identity FILE] [--format human|json] | rules whitelist propose FINDING_ID [path] [--ruff-tool ABS_PATH] [--correct-decision FILE --correction-reason CODE --verification-run RUN_ID [--replacement FILE] [--record]] [--format human|json]",
-                env!("CARGO_PKG_VERSION")
-            );
-            println!("check all 可汇总已接入的原生结果与未完成义务；完整质量门禁尚未实现。");
-            println!(
-                "lint python [path] 可重复使用 --file REL_PATH 指定最多 8 个本轮编辑文件作局部 Ruff 反馈；不会把局部报告同步成完整工作台扫描，也不签发交付通过。"
-            );
-            println!(
-                "宿主事件只读规划：hook plan [--format=json] 从 stdin 读取 hook_trigger_request 1.0.0，返回 hook_trigger_plan 1.1.0 与退出码 3；批量编辑超出快检预算时要求改用有界批量范围，尚不执行检查或阻断宿主。"
-            );
-            println!(
-                "局部事件执行：hook execute PATH --timeout DURATION --format=json [--ruff-tool ABS_PATH] [--git-tool ABS_PATH] 从 stdin 读取同一事件协议；启动只发现、用户提示只给固定建议、Stop 有界只读提示、repair_ready 复用 task verify 原工具复检、确认 Python 编辑调用 Ruff 局部快检、显式 Git 工具的 pre_commit 观察真实 index；完整交付始终 not_evaluated。"
-            );
-            println!(
-                "Claude 候选软 Hook：hook claude <session-start|user-prompt-submit|post-tool-use|post-tool-use-failure|stop> PATH --timeout DURATION --format=json [--ruff-tool ABS_PATH] 从 stdin 读取宿主事件；启动只读发现，用户提示只给检查时机建议，成功保存局部 Ruff，失败保存不检查，Stop 有界读取下一步；输出脱敏反馈，宿主退出 0 不表示检查或交付通过。插件尚未自动接线。"
-            );
-            println!(
-                "check all 的 Python CVE 节点可用 --pip-audit-tool ABS_PATH --pip-audit-version VERSION；逐构建根反馈原生结果或锁文件/工具阻塞，不签发零漏洞结论。"
-            );
-            println!(
-                "Python CVE 稳定任务可用 task verify ID . --pip-audit-tool ABS_PATH --pip-audit-version VERSION --format json 原工具复检；复检只追加证据，不自动关闭任务。"
-            );
-            println!(
-                "check all 的 Rust CVE 节点使用 --cargo-audit-tool ABS_PATH --rustsec-db ABS_PATH；缺工具或数据库显示环境阻塞，漏洞库时效未核验时不放行。"
-            );
-            println!(
-                "工具库存/静态核验：tools <list|verify> [path] [--tool-lock-candidate FILE] [--managed-cache ABS_PATH] [--runtime ID=ABS_PATH] [--format human|json]；不启动或安装工具；tools install --lock FILE [--distribution-manifest FILE] [path] [--dry-run|--apply] 当前只提供未批准候选预览，apply 阻塞。"
-            );
-            println!(
-                "check <规范语言ID> 支持注册表57个ID；仅调度选定语言的已有原生检查和WASM候选，局部交付为not_evaluated，缺适配器仍未完成。"
-            );
-            println!(
-                "Rust CVE 局部探针：cve rust [path] --cargo-audit-tool ABS_PATH --db ABS_PATH [--timeout DURATION] [--format human|json]；原生离线审计，数据库时效与交付门禁尚未核验。"
-            );
-            println!(
-                "Python CVE 局部探针：cve python [path] --pip-audit-tool ABS_PATH --pip-audit-version VERSION [--timeout DURATION] [--format human|json]；仅复放标准 pylock 快照，数据库和完整项目覆盖尚未核验。"
-            );
-            println!(
-                "Rust 注释探针：comments rust [path] [--cargo-tool ABS_PATH] [--timeout DURATION] [--format human|json]；原生库目标观察，完整文档政策与任务闭环仍未接入。"
-            );
-            println!(
-                "Rust 构建探针：build rust [path] [--cargo-tool ABS_PATH] [--timeout DURATION] [--format human|json]；原生类型检查，不执行测试，完整构建政策与任务闭环尚未接入。"
-            );
-            println!(
-                "规则目录：rules list <language|all> [path] [--format human|json]；只读配置声明、候选规则来源及目录缺口，不执行检查或批准白名单。"
-            );
-            println!(
-                "语法资产覆盖：grammar status [--format human|json]；只读列出固定 CodeGraph 来源的 32 种独立 grammar、CodeGuard 候选与未接入项；不加载 WASM、不运行 lint。"
-            );
-            #[cfg(feature = "wasm-precheck")]
-            println!(
-                "显式候选语法观察：grammar probe <language> <file> [--format=json]；隔离加载 32 份固定资产之一，始终返回未完成和退出码 3，不代替原生 lint。"
-            );
-            #[cfg(all(feature = "wasm-precheck", unix))]
-            println!(
-                "check all 会在原生节点之后按源码方言有界执行 32 份固定 WASM 的候选初检；check_feedback 0.34.0 的 syntax_candidates 保留疑似位置、已知限制、原生优先计数和未执行范围，始终不能代替原生义务或放行交付。"
-            );
-            #[cfg(all(feature = "wasm-precheck", unix))]
-            println!(
-                "Zig 原生优先局部检查：lint zig FILE [--zig-tool ABS_PATH] [--format=json]；显式/PATH选择 Zig 0.16.0 使用 ast-check，缺工具时提供未验收 WASM 候选；0.2反馈显示选择来源和当前源码状态；check all/check zig 和限定编辑复用原生 AST 探针，分别以0.46/0.14输出；始终不签发完整 lint 或交付通过。"
-            );
-            #[cfg(unix)]
-            println!(
-                "Kotlin 原生优先局部检查：lint kotlin FILE [--kotlinc-tool ABS_PATH] [--timeout DURATION] [--format human|json]；优先显式工具或 PATH 的首个 kotlinc，当前支持 JVM 2.4.10；工具缺失时 WASM 初检，工具失败不跳过；单文件观察不签发完整项目通过。"
-            );
-            println!(
-                "Erlang 原生优先局部检查：lint erlang FILE [--erl-tool ABS_PATH] [--timeout DURATION] [--format human|json]；显式 OTP 28 使用原生 forms 扫描/解析，宏与预处理保持未完成；不签发完整 lint 或交付通过。 已有 Erlang 语法确认任务可用 task verify ID PATH --erl-tool ABS_PATH，repair_ready 接受同参数；复用原任务与尝试历史，零诊断不自动关闭。"
-            );
-            #[cfg(unix)]
-            println!(
-                "Swift 原生任务确认：task verify ID PATH --swift-tool ABS_PATH；Apple Swift 6.4 仅 frontend parse，返回 UTF-8 字节列和局部诊断，repair_ready 同参数，不自动关闭。"
-            );
-            println!(
-                "检查预算：check all 支持 --jobs 1–64 和 CODEGUARD_JOBS；--timeout 优先于 CODEGUARD_TIMEOUT，默认 30m。项目默认值见 .codeguard/runtime.json 1.1；当前仅原生执行受截止时间约束。"
-            );
-            println!(
-                "局部环境诊断：doctor [path] [--ruff-tool ABS_PATH] [--timeout DURATION] [--format human|json]；仅观察配置与显式 Ruff 版本。"
-            );
-            ExitCode::SUCCESS
+        [help, rest @ ..] if matches!(help.as_str(), "--help" | "-h" | "help") => {
+            codeguard_cli::help_command::run(rest)
         }
         [command, rest @ ..] if command == "capabilities" => capabilities(rest),
         [command, rest @ ..] if command == "detect" => detect(rest),
