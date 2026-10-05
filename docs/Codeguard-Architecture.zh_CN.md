@@ -917,3 +917,23 @@ Python 语法确认任务的当前原生观察为 `still_present` 且未因源�
 ### 固定限制的对话投影
 
 候选报告、独立结构规则与原生诊断分别保留来源。终端有界展示具体 grammar 限制；Claude 按本轮候选语言从随程序固定清单读取提示，归并语言并限长，不信任外部报告文本或源码。摘要预留未验收/交付未评估说明，已知兼容问题仍须原生确认，不自动扩大白名单。见[反馈验收](../tests/acceptance/grammar-limitation-conversation-feedback.md)。
+### Go完整文件独立结构候选
+
+源码版用runtime的语言无关根节点子节点事实，加上adapter中的Go整文件规则，补充grammar允许片段的宽松解析。规则有版本、明确whole_file范围且未获资格验收；原始恢复统计独立保留。候选不授予源码违规、猜测包名或关闭任务的权威。
+
+```mermaid
+flowchart LR
+    A[选定Go文件] --> B[既有原生Go检查]
+    B -->|尚未覆盖的冻结源码| C[隔离WASM工作进程]
+    C --> D[原始ERROR与MISSING]
+    C --> E[有界根节点子节点事实]
+    E --> F[Go整文件package规则]
+    D --> G[有版本的候选反馈]
+    F --> G
+    G --> H[唯一稳定确认任务]
+    H --> I[恢复适用原生检查]
+    I --> J[确认源码或环境修复方向]
+    J --> K[原工具复检及关闭策略]
+```
+
+probe、聚合检查和保存反馈已携带该候选；末端Go确认任务的原生adapter及可信关闭仍待完成。修复指引要求原生确认前保留源码，零候选复扫继续保留任务。见[验收](../tests/acceptance/go-package-structure.md)。

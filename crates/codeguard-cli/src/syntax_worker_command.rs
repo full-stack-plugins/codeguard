@@ -3,7 +3,9 @@
 use crate::syntax_worker_envelope::SyntaxWorkerEnvelope;
 use crate::syntax_worker_recovery::SyntaxWorkerRecovery;
 use codeguard_adapters::bundled_grammar_candidate;
-use codeguard_runtime::{WasmGrammar, scan_wasm_empty_blocks, scan_wasm_recoveries};
+use codeguard_runtime::{
+    WasmGrammar, scan_wasm_empty_blocks, scan_wasm_recoveries, scan_wasm_root_child,
+};
 use sha2::{Digest, Sha256};
 use std::io::Read;
 use std::process::ExitCode;
@@ -94,6 +96,39 @@ fn observe(language: &str, source: &[u8]) -> Result<SyntaxWorkerEnvelope, String
             });
         }
     }
+    if language == "go" {
+        // Go入口观察完整文件，片段模式不在此协议内；声明只能来自直接AST子节点。
+        let root = scan_wasm_root_child(&tree, "package_clause", 200_000)?;
+        match codeguard_adapters::missing_go_package_candidate(
+            language,
+            true,
+            &root.root_syntax_kind,
+            &root.child_syntax_kind,
+            root.present,
+            root.truncated,
+        ) {
+            Some(true) if scanned.recoveries.len() < MAX_RECOVERIES => {
+                structural_observations.push(
+                    crate::syntax_worker_structure::SyntaxWorkerStructure {
+                        basis: "codeguard_structure_rule".into(),
+                        rule_id: "codeguard.go.required_package".into(),
+                        rule_version: "1.0.0".into(),
+                        rule_sha256: codeguard_adapters::go_package_rule_sha256(),
+                        parent_syntax_kind: root.root_syntax_kind,
+                        // 缺整文件声明的零宽锚点，不冒充原生工具指出的错误列。
+                        start_byte: 0,
+                        end_byte: 0,
+                        start_row: 0,
+                        start_column_byte: 0,
+                        end_row: 0,
+                        end_column_byte: 0,
+                    },
+                );
+            }
+            Some(false) => {}
+            Some(true) | None => structural_truncated = true,
+        }
+    }
     let recoveries = scanned
         .recoveries
         .into_iter()
@@ -112,6 +147,8 @@ fn observe(language: &str, source: &[u8]) -> Result<SyntaxWorkerEnvelope, String
     Ok(SyntaxWorkerEnvelope {
         schema_version: if structural_observations.is_empty() {
             "1.0.0"
+        } else if language == "go" {
+            "1.2.0"
         } else {
             "1.1.0"
         }

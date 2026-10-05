@@ -1420,3 +1420,10 @@ Python 语法确认任务的当前原生观察为 `still_present` 且未因源�
 Zig、Erlang、Swift原生观察现于版本返回后、源码调用前及调用后复核原请求别名、规范入口和制品摘要；变化时停止后继调用，保持未完成。六语言别名/制品替换反例见[入口复核验收](../tests/acceptance/native-version-entry-binding.md)。核验与spawn间的完整TOCTOU和工具链闭包仍未解决。
 
 Kotlin版本阶段结束后，原生观察器在编译前后核对私有源码副本与冻结输入；Zig版本探测异常stderr会停止AST调用。两者均保持工具/输入未完成，不生成源码违规，见[阶段输入验收](../tests/acceptance/native-version-input-continuity.md)。
+### Go package候选协议与修复反馈
+
+固定`codeguard.go.required_package`规则只读取`source_file`直接命名子节点，不搜索关键字。Go worker1.2发布一条文件起点零宽结构观察，绑定规则、版本及摘要；旧worker1.1仍仅用于Python。父进程拒绝跨语言规则、错误摘要、重复Go结构、未知字段及非零锚点；预算耗尽保持未完成。
+
+probe0.3声明`source_scope=whole_file`；聚合0.49接纳正确绑定的Python/Go结构，以及独立Go vet修复预览0.13。通用Go确认0.8绑定冻结源码、固定grammar/规则、整文件路由及稳定任务身份；保存反馈0.18/fast0.9复用同一报告与任务。Python和历史版本不变。原生差分0.7分别测量原始grammar及组合候选，保留未知样本和源码身份。见[协议](../schemas/grammar-probe-v0.3.schema.json)与[验收](../tests/acceptance/go-package-structure.md)。
+
+Go预览版本修正了既有Go vet argv错标为仅支持Python的0.1预览的问题。Go项目原生lint继续使用既有Go vet；本轮未增加Go确认任务原生adapter、独立lint回退、可信关闭、独立holdout或发行资格。

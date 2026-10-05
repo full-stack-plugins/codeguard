@@ -70,7 +70,10 @@ pub fn run(args: &[String]) -> ExitCode {
                 }
             });
             if !observation.structural_observations.is_empty() {
-                report["schema_version"] = json!("0.2.0");
+                report["schema_version"] = json!(if language == "go" { "0.3.0" } else { "0.2.0" });
+                if language == "go" {
+                    report["source_scope"] = json!("whole_file");
+                }
                 report["precheck_scope"] = json!("raw_parser_recoveries_and_observation_budgets");
                 report["next_action"] =
                     json!("confirm_candidate_structure_with_applicable_native_tool");

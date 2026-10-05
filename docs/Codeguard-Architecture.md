@@ -917,3 +917,23 @@ Project discovery and WASM candidate routing include `.R`/`.r` and C++ `.C`/`.cp
 ### Conversation projection of pinned limitations
 
 Candidate reports, independent structural rules and native diagnostics retain distinct provenance. Terminal feedback exposes bounded specific limitations. Claude resolves them from the bundled manifest for observed candidate languages, deduplicates and limits text, and does not use external report messages or source. Summaries reserve the incomplete-qualification and unevaluated-delivery boundary. Known compatibility issues still need native confirmation and do not expand allowlists. See [acceptance](../tests/acceptance/grammar-limitation-conversation-feedback.md).
+### Go whole-file structural candidate lane
+
+Source builds use a language-neutral runtime root-child observation and a Go adapter rule to supplement permissive fragment parsing. The rule is explicitly whole-file, versioned and unqualified. Raw recoveries remain separate; a candidate never authorizes a source violation, guessed package name or task closure.
+
+```mermaid
+flowchart LR
+    A[Selected Go file] --> B[Existing native Go checks]
+    B -->|Uncovered frozen bytes| C[Isolated WASM worker]
+    C --> D[Raw ERROR / MISSING]
+    C --> E[Bounded root-child facts]
+    E --> F[Go whole-file package rule]
+    D --> G[Versioned candidate feedback]
+    F --> G
+    G --> H[One stable confirmation task]
+    H --> I[Restore applicable native checking]
+    I --> J[Confirm source or environment repair]
+    J --> K[Original-tool recheck and closure policy]
+```
+
+Probe, aggregate checking and save feedback now carry the Go candidate; the final Go confirmation-task adapter and trusted closure path remain pending. Repair instructions preserve source until native confirmation and keep the task open after a zero-candidate rescan. See [acceptance](../tests/acceptance/go-package-structure.md).

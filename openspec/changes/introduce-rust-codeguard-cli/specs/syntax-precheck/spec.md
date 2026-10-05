@@ -658,3 +658,15 @@ Go完整文件候选初检 MUST 根据固定grammar的 `source_file` 根节点�
 #### Scenario: Root inspection cannot establish absence
 - **WHEN** 直接子节点超过预算、根类型未知，或检查对象是代码片段
 - **THEN** 返回未知，不把未观察到声明当成确定缺失，也不删除该样本
+
+### Requirement: Go package candidates SHALL reach public checks and stable confirmation tasks
+
+Go完整文件缺package结构候选 MUST 进入私有worker的独立版本、公开grammar probe、check go/all和文件保存快速反馈；报告保留原始恢复数组、规则摘要及整文件范围，使用文件起点零宽缺声明锚点，不冒充原生错误列。相同文件重复检查 MUST 复用同一原生确认任务，修复后的零候选 MUST NOT 自动关闭任务。任务与智能体反馈 MUST 要求恢复适用原生工具并确认缺声明，不能凭候选删除代码或安装其它语言工具。新增封闭协议 MUST 保留Python和旧历史报告语义，跨语言规则、未知范围、伪造摘要或坐标 MUST 拒绝。
+
+#### Scenario: A missing Go declaration survives the public edit loop
+- **WHEN** 无原生工具的已初始化Go项目含缺package的函数整文件，执行probe、check go/all与file_changed快速反馈
+- **THEN** 公开观察含独立结构候选及零原始恢复，check与hook复用同一确认任务，反馈要求原生确认；补上package后候选消失但旧任务保持open
+
+#### Scenario: Aggregate feedback selects an existing Go environment task
+- **WHEN** 同一检查产生Go原生环境任务和结构候选，next优先选择go.vet任务
+- **THEN** Go修复预览使用独立封闭版本并明确Go工具argv，不标为仅支持Python的旧预览；聚合协议接纳该版本，不放宽旧报告的checker或argv约束

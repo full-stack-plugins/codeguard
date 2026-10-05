@@ -61,10 +61,12 @@ pub fn run_syntax_worker_candidate(
     }
     let report: SyntaxWorkerEnvelope =
         serde_json::from_value(value).map_err(|_| "syntax_worker_report_invalid")?;
-    if !matches!(report.schema_version.as_str(), "1.0.0" | "1.1.0")
+    if !matches!(report.schema_version.as_str(), "1.0.0" | "1.1.0" | "1.2.0")
         || (report.schema_version == "1.0.0" && !report.structural_observations.is_empty())
         || (report.schema_version == "1.1.0"
             && (language != "python" || report.structural_observations.is_empty()))
+        || (report.schema_version == "1.2.0"
+            && (language != "go" || report.structural_observations.len() != 1))
         || report.report_type != "syntax_worker_candidate"
         || report.language != language
         || report.grammar_sha256 != asset.sha256

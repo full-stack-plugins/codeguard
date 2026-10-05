@@ -619,3 +619,6 @@ Python 语法确认任务的当前原生观察为 `still_present` 且未因源�
 
 
 具体 grammar 兼容限制会在终端及 Claude 局部检查摘要中有界显示，例如旧 Python grammar 对 3.14 模板字符串的误报；摘要仍要求原生确认，不复制源码或把限制视为白名单。见[对话反馈验收](tests/acceptance/grammar-limitation-conversation-feedback.md)。
+### Go整文件缺声明候选（源码版）
+
+源码版通过独立AST规则发现Go完整文件缺少package声明。`grammar probe go FILE`、`check go/all`和确认保存的Hook保留原始恢复统计，并复用同一原生确认任务；补声明只消除候选，不关闭任务。`lint go`仍调用已有原生Go vet，确认任务的原生复检/可信关闭及grammar资格尚未完成。公开npm0.1.4不含这些变更。见[验收](tests/acceptance/go-package-structure.md)。

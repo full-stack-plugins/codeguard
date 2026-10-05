@@ -185,7 +185,7 @@ fn controlled_go_uniform_replay_requires_whole_file_and_both_sdk_tools() {
     )
     .unwrap();
     fs::remove_dir_all(root).unwrap();
-    assert_eq!(report["schema_version"], "0.6.0");
+    assert_eq!(report["schema_version"], "0.7.0");
     assert_eq!(report["sample_count"], 14);
     assert_eq!(report["language_count"], 32);
     assert_eq!(report["native_adapter_reused"], false);
@@ -262,7 +262,7 @@ fn pinned_go_uniform_replay_archives_whole_file_and_companion_evidence() {
         &AtomicBool::new(false),
     )
     .unwrap();
-    assert_eq!(report["schema_version"], "0.6.0");
+    assert_eq!(report["schema_version"], "0.7.0");
     assert_eq!(report["sample_count"], 20);
     assert_eq!(report["language_count"], 32);
     assert_eq!(report["grammar_qualified_count"], 0);
@@ -302,12 +302,12 @@ fn pinned_go_uniform_replay_archives_whole_file_and_companion_evidence() {
     assert_eq!(go["compared_count"], 19, "不能丢弃EOF语法诊断的样本");
     let evidence = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../tests/acceptance/evidence");
     fs::write(
-        evidence.join("go-native-grammar-input-2026-10-05.json"),
+        evidence.join("go-native-grammar-package-input-2026-10-05.json"),
         bytes,
     )
     .unwrap();
     fs::write(
-        evidence.join("go-native-grammar-differential-2026-10-05.json"),
+        evidence.join("go-native-grammar-package-differential-2026-10-05.json"),
         serde_json::to_vec_pretty(&report).unwrap(),
     )
     .unwrap();

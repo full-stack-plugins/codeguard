@@ -53,7 +53,7 @@ pub(crate) fn persist(root: &Path, syntax: &Value, deadline: Instant) -> Value {
                 .iter()
                 .any(|row| row.get("structural_observations").is_some())
             {
-                "0.7.0"
+                if language == "go" { "0.8.0" } else { "0.7.0" }
             } else if rows.iter().any(|row| row["recovery_count"] == 0) {
                 "0.3.0"
             } else {
@@ -153,8 +153,9 @@ pub(crate) fn valid_source_snapshot(workspace: &str, report: &Value, bytes: &[u8
     let (checker, reason, fingerprint) = identity(workspace, path, language);
     if !matches!(
         report["schema_version"].as_str(),
-        Some("0.1.0" | "0.3.0" | "0.7.0")
+        Some("0.1.0" | "0.3.0" | "0.7.0" | "0.8.0")
     ) || (report["schema_version"] == "0.7.0" && language != "python")
+        || (report["schema_version"] == "0.8.0" && language != "go")
         || report["report_type"] != "syntax_confirmation_observation"
         || report["workspace_binding"] != "bound"
         || report["workspace_id"] != workspace
@@ -199,7 +200,7 @@ pub(crate) fn valid_source_snapshot(workspace: &str, report: &Value, bytes: &[u8
     };
     let mut offsets = std::collections::BTreeSet::new();
     rows.iter().all(|row| {
-        let structural = report["schema_version"] == "0.7.0";
+        let structural = matches!(report["schema_version"].as_str(), Some("0.7.0" | "0.8.0"));
         let mut row_keys = vec![
             "path",
             "language",
@@ -240,7 +241,7 @@ pub(crate) fn valid_source_snapshot(workspace: &str, report: &Value, bytes: &[u8
         if structural {
             let Some(count) = row["structural_observation_count"]
                 .as_u64()
-                .filter(|count| *count > 0 && *count <= 128)
+                .filter(|count| *count > 0 && *count <= 128 && (language != "go" || *count == 1))
             else {
                 return false;
             };
@@ -256,7 +257,7 @@ pub(crate) fn valid_source_snapshot(workspace: &str, report: &Value, bytes: &[u8
                     serde_json::from_value::<crate::syntax_worker_structure::SyntaxWorkerStructure>(
                         value.clone(),
                     )
-                    .is_ok_and(|value| value.valid("python", bytes))
+                    .is_ok_and(|value| value.valid(language, bytes))
                 })
             {
                 return false;

@@ -659,7 +659,9 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             (
                 1,
                 "needs_decision",
-                if fact["first_diagnostic_reason"] == "syntax_recovery_incomplete" {
+                if fact["first_diagnostic_reason"] == "go_package_structure_candidate" {
+                    "Go整文件候选未发现package声明；先恢复适用原生Go lint或编译器确认完整文件范围，核对声明应属于哪个包。注释或字符串不算声明；不得凭候选删除函数、猜包名或关闭任务，原生确认后只修复目标源码并复检"
+                } else if fact["first_diagnostic_reason"] == "syntax_recovery_incomplete" {
                     "固定 grammar 的恢复扫描未完成或错误无法定位；核对语言版本、grammar 限制并恢复适用原生 lint/编译器或提出具体能力决策。原生确认前不得修改源码，不虚构错误位置，不凭零恢复关闭任务"
                 } else {
                     "查看固定 grammar 与当前源码的疑似证据；通过同一任务的原生复检核对适用语法能力，工具或 adapter 缺失时提出具体恢复或能力决策，不能改用 Python 或凭 WASM 零恢复关闭任务"
@@ -1918,7 +1920,7 @@ fn run_sequence(run_id: &str) -> Option<u128> {
 
 fn view(disposition: &str, reason: &str, brief: Value, actions: Value) -> Value {
     json!({
-        "schema_version":if brief["checker_id"] == "syntax.native_confirmation" {brief["schema_version"].clone()} else {json!("0.1.0")}, "report_type":"repair_brief_preview",
+        "schema_version":if brief["checker_id"] == "go.vet" {json!("0.13.0")} else if brief["checker_id"] == "syntax.native_confirmation" {brief["schema_version"].clone()} else {json!("0.1.0")}, "report_type":"repair_brief_preview",
         "operation":"next", "command_status":"complete", "exit_code":0,
         "disposition":disposition, "reason":reason,
         "repair_brief":brief, "next_actions":actions,

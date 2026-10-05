@@ -2119,6 +2119,14 @@ fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
             blocker.id, blocker.scope, report.run_id, report.digest, blocker.id, report.run_id
         );
     }
+    if blocker.checker_id == "syntax.native_confirmation"
+        && blocker.diagnostic_reason.as_deref() == Some("go_package_structure_candidate")
+    {
+        return format!(
+            "# {} Go package声明原生确认待处理\n\n- 问题证据：范围 `{}`；报告 `.codeguard/reports/{}.json`，摘要 `{}`；独立结构候选未发现整文件package_clause，零宽文件起点不代表原生错误列。\n- 规则依据：codeguard.go.required_package 1.0.0，候选规则与原始ERROR/MISSING分别记录，不是已确认源码违规。\n- 允许修改范围：对应Go工具和项目包配置；原生确认后仅修复该文件的包声明，不能猜包名、删除函数或关闭检查。\n- 修复步骤：先核对完整文件范围，恢复适用原生lint或编译器；用原生结果确认声明及项目包归属，注释或字符串不算声明。\n- 复检命令：codeguard task verify {} . --format=json；next显示当前adapter缺口，未接适用原生能力时保留具体能力决策。\n- 历史尝试：首次run {}；重复扫描及失败尝试沿用同一任务。\n- 关闭条件：原工具复检、当前范围、完整覆盖及既有批准策略均满足；补声明、零候选或任务勾选均不能自动关闭。\n",
+            blocker.id, blocker.scope, report.run_id, report.digest, blocker.id, report.run_id
+        );
+    }
     if blocker.checker_id == "syntax.native_confirmation" {
         return format!(
             "# {} 原生语法确认待处理\n\n- 问题证据：范围 `{}`；报告 `.codeguard/reports/{}.json`，摘要 `{}`，含固定 grammar、源码身份和原字节疑似位置。\n- 规则依据：候选 ERROR/MISSING 恢复不是已确认源码违规。\n- 允许修改范围：对应原生工具、版本和适用项目配置；原生确认前不要修改无关源码或关闭检查。\n- 修复步骤：查看原报告语言及已知限制，准备适用 lint/编译器，确认其语法能力和同一源码范围；原生诊断成立后修复，反证进入 grammar 误报调查。\n- 复检命令：codeguard task verify {} . --format=json；先用 codeguard next 查看适用原生 adapter 和工具参数；能力缺口会明确反馈，不能以其它语言的工具替代。\n- 历史尝试：首次 run {}；追加事件和尝试保存于同一任务。\n- 关闭条件：当前输入与适用原生语法能力确认，并满足既有关闭策略；安装、WASM 零恢复或任务勾选均不能关闭。\n",

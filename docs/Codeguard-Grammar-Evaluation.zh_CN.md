@@ -154,10 +154,12 @@ Kotlin版本阶段结束后，原生观察器在编译前后核对私有源码�
 ## Go SDK 的整文件原生对照
 
 开发差分新增显式Go1.23.4 SDK与同目录gofmt，冻结两个制品及请求入口，核对SDK/辅助构建版本，并在批次末撤回辅助变化后的旧比较。`gofmt -e /dev/stdin`按整文件语法检查，避免默认stdin片段模式把缺package内容视为合法；不写源码、不解析导入或执行init，格式变化不算违规。0.6报告保留旧协议与32库存。实际20例为5TP/0FP/2FN/12TN及1未知：EOF锚点已修复，缺package两例WASM漏检与未解析逻辑位置继续保留，资格仍0。该开发观察不替代公开go vet或可信任务关闭。见[验收](../tests/acceptance/go-isolated-native-differential.md)。
-## Go整文件package规则：底层已验证，公开接线待完成
+## Go整文件package规则与公开候选工作流
 
-固定Go grammar允许缺少 `package_clause` 的片段。新增有版本的 `codeguard.go.required_package` 1.0.0规则，仅解释 `source_file` 根节点的有界直接命名子节点事实。必须明确语言为Go、范围为完整文件；片段、其它语言、未知根/子节点种类或遍历预算耗尽返回未知。不搜索注释和字符串中的声明文本；runtime只提供事实，adapter解释Go规则。不合成ERROR/MISSING，不改变原始grammar统计。
+固定Go grammar允许缺少`package_clause`的片段。独立`codeguard.go.required_package`1.0.0规则解释`source_file`根节点的有界直接命名子节点。runtime只返回事实，adapter明确核对Go和完整文件范围；注释/字符串不算声明，未知范围/根/子节点或预算耗尽保持未知。不合成ERROR/MISSING，不改变原始统计。
 
-同一现有Go1.23.4原生SDK对原20例的新运行确认：独立组合开发候选为 **7TP / 0FP / 0FN / 12TN / 1unknown**，原始解析层仍为 **5TP / 0FP / 2FN / 12TN / 1unknown**。另11例覆盖注释/字符串文本、空输入、build标签、Unicode包名和CRLF，均与同一原生工具一致。这些是开发回归，不能称为独立holdout。
+源码版已接入私有worker1.2、公开probe0.3、聚合check0.49、确认观察0.8、保存Hook反馈0.18。Python worker1.1/probe0.2/check0.48及历史报告语义不变。缺整文件声明以文件起点零宽候选锚点表达，不冒充原生错误列。重复check go/all与保存Hook复用同一任务；补上声明只消除候选，不关闭任务。Go vet修复预览使用独立0.13，避免把Go工具argv错标为Python预览。
 
-此底层能力**尚未接入私有worker、公开probe/check反馈、持久确认任务和原生差分协议**。现有公开行为及历史报告不变，grammar资格仍为0。后续接线必须版本化受影响协议，保留语言和完整文件范围、原始/组合统计分离，并要求原生确认，不能按未验收候选擅改源码。见[验收](../tests/acceptance/go-package-structure.md)。
+同一现有Go1.23.4对原20例的新运行：组合候选 **7TP / 0FP / 0FN / 12TN / 1unknown**；原始grammar仍 **5TP / 0FP / 2FN / 12TN / 1unknown**。新0.7差分报告保留原源码、标签及原始分类，逻辑位置重映射继续未知。底层验收的另外11条专项开发回归覆盖注释/字符串、空输入、build标签、Unicode及CRLF，不是独立holdout。
+
+Go确认任务的原生adapter/可信关闭、独立lint go的WASM回退、系统精度、资源与发行资格仍未完成。lint go继续调用已有原生Go vet。公开npm0.1.4不包含本轮能力。见[公开验收](../tests/acceptance/go-package-structure.md)与[新Go报告](../tests/acceptance/evidence/go-native-grammar-package-differential-2026-10-05.json)。

@@ -29,6 +29,8 @@ Source builds also support `codeguard task verify TASK_ID . --erl-tool /absolute
 
 ## 1. Purpose and boundaries
 
+Source builds now detect a missing Go whole-file `package` declaration through a separate AST rule. `grammar probe go FILE`, `check go/all`, and confirmed save hooks preserve raw parser recoveries and reuse one native-confirmation task. Adding the declaration removes the candidate without closing the task. Native Go vet remains responsible for `lint go`; Go confirmation-task native recheck/closure and grammar qualification remain incomplete. These changes are not in public npm0.1.4. See [acceptance](tests/acceptance/go-package-structure.md).
+
 - Discover languages, build roots, declared versions, checker configuration, and statically observable module relationships.
 - Unify code-style, documentation, dependency, vulnerability, security, and build checks as native adapters become available.
 - Explain missing configuration and environment problems without misreporting them as source violations.
