@@ -123,6 +123,8 @@ fn main() -> ExitCode {
                 codeguard_cli::eslint_lint_command::run(&rest[1..])
             } else if rest.first().is_some_and(|language| language == "go") {
                 codeguard_cli::go_lint_command::run(&rest[1..])
+            } else if rest.first().is_some_and(|language| language == "rust") {
+                codeguard_cli::rust_lint_command::run(&rest[1..])
             } else {
                 codeguard_cli::python_lint_command::run(rest)
             }

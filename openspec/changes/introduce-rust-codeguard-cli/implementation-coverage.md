@@ -371,3 +371,6 @@ syntax-precheck的隐藏token场景→9.3/9.9/14.7/14.10/14.11/14.19：check all
 
 
 2026-10-05：unified-cli-contract / `Help SHALL report current command support without executing commands` 由2.1、2.7、12.9跟踪；静态目录及帮助协议不替代正式全部参数注册或MCP接线。
+
+
+Rust独立lint原生优先及工作台→2.1/2.7/7.3/9.9/14.9–14.11/14.19：复用聚合原生服务、稳定任务和原工具复检，缺Cargo有界WASM初检，显式失败不回退；Rust简报专用schema和help0.2以实际报告验证。完整构建/政策/资格/宿主/发布未完成，证据见[验收](../../../tests/acceptance/rust-standalone-lint.md)。

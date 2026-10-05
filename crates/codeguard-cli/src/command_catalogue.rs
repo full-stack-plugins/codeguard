@@ -161,7 +161,7 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             },
             executable: cfg!(unix),
             operation_kind: r#"check"#,
-            usage: r#"lint <java|python|typescript|zig|swift|kotlin|erlang|go> TARGET [--format human|json]"#,
+            usage: r#"lint <java|python|typescript|zig|swift|kotlin|erlang|go|rust> TARGET [--format human|json]"#,
             scope: r#"语言专用参数和固定工具范围不同；完整项目lint未验收"#,
             languages: &[
                 r#"java"#,
@@ -172,6 +172,7 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
                 r#"kotlin"#,
                 r#"erlang"#,
                 r#"go"#,
+                r#"rust"#,
             ],
         },
         CommandDescriptor {

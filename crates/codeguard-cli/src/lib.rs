@@ -393,3 +393,12 @@ mod go_tool_selection;
 mod go_lint_fallback;
 #[cfg(unix)]
 mod python_syntax_probe;
+
+#[cfg(unix)]
+mod rust_lint_arguments;
+#[cfg(unix)]
+pub mod rust_lint_command;
+#[cfg(unix)]
+mod rust_lint_fallback;
+#[cfg(unix)]
+mod rust_lint_workbench;

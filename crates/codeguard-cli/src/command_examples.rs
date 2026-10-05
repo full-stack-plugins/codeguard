@@ -2,6 +2,7 @@
 pub(crate) fn examples(command: &str) -> &'static [&'static str] {
     match command {
         "lint" => &[
+            "codeguard lint rust . --cargo-tool /absolute/cargo --format json",
             "codeguard lint go . --go-tool /absolute/sdk/bin/go --format json",
             "codeguard lint erlang app.erl --erl-tool /absolute/erl --format json",
             "codeguard lint swift app.swift --swift-tool /absolute/swift --format json",

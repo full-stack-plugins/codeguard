@@ -1,5 +1,7 @@
 # 当前构建只读命令支持帮助
 
+历史快照：本记录对应8f82319的command_help0.1。后续Rust独立lint使用help0.2；原0.1报告/schema保留，新证据见[rust-standalone-lint](rust-standalone-lint.md)。
+
 规格：`introduce-rust-codeguard-cli` unified-cli-contract新增Help要求，2.1/2.7/12.9继续跟踪。
 
 ## 问题和实现

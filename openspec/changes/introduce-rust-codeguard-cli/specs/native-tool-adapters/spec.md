@@ -66,6 +66,15 @@ Rustdoc逐问题反馈 MUST 提供问题证据、规则依据、允许修改的�
 - **WHEN** 运行局部 Clippy 或同规则抑制对照
 - **THEN** Rust MUST 使用 `--locked --offline`，保留原锁字节；根锁不可用时在原生启动前反馈环境准备未完成，不生成锁文件、不判源码违规；依赖解析确需更新时原生失败仍保留未完成
 
+#### Scenario: Standalone Rust lint reuses native observation and repair workflow
+- **WHEN** 调用 `lint rust [path]` 并指定Cargo或从绝对PATH取得首个Cargo入口
+- **THEN** 复用原生Clippy局部观察、共享预算和输入核对，仅执行lint而不执行rustdoc、build或CVE；初始化工作区自动保存报告、同步稳定任务并反馈下一步，零诊断不能关闭任务或签发完整通过
+- **AND** 显式入口无效或原生执行失败不得换用其它工具或WASM掩盖原生失败
+
+#### Scenario: Standalone Rust lint has no native Cargo
+- **WHEN** 未显式选择Cargo且绝对PATH没有可用Cargo
+- **THEN** WASM构建对有界Rust源码提供候选初检并同步确认任务；发现候选或范围/运行未完成时必须准备原生工具，完整有界范围零候选时推荐准备；不安装工具、不把候选认定为源码违规；无WASM构建明确初检不可用
+
 #### Scenario: Clippy inputs change during native execution
 - **WHEN** 已观察 Rust 源码、根 Cargo 清单/锁、Clippy/Cargo/工具链配置在原生运行期间变化，或原工具被替换
 - **THEN** 诊断指纹只来源于启动前固定字节；最终核对失败时撤回本轮源码 finding，返回具体未完成原因，不把旧诊断附到新源码，也不把零诊断作为环境恢复或修复候选。可选配置原先不存在而在扫描中新增也须失效，缺少有界普通输入时不得启动检查器

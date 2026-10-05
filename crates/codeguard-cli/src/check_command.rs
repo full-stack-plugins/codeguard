@@ -1156,32 +1156,7 @@ pub fn run(args: &[String]) -> ExitCode {
         }
     }
     if rust_lint.is_object() {
-        let (status, summary) = match save_local_report(&root, &rust_lint) {
-            Ok(()) if rust_lint["workspace_binding"] == "bound" => {
-                match sync_local_workspace(&root) {
-                    Ok(summary) if summary.failed_reports == 0 => (
-                        "synced_partial",
-                        json!({
-                            "new_findings":summary.new_findings,
-                            "new_blockers":summary.new_blockers,
-                            "imported_reports":summary.imported_reports,
-                            "historical_findings":summary.historical_findings,
-                            "failed_reports":summary.failed_reports
-                        }),
-                    ),
-                    _ => ("backlog_update_failed", Value::Null),
-                }
-            }
-            Ok(()) => ("not_initialized", Value::Null),
-            Err(_) => ("backlog_update_failed", Value::Null),
-        };
-        rust_lint["backlog_status"] = json!(status);
-        rust_lint["backlog_sync"] = summary;
-        rust_lint["next"] = if status == "synced_partial" {
-            read_local_brief(&root).unwrap_or(Value::Null)
-        } else {
-            Value::Null
-        };
+        crate::rust_lint_workbench::persist_and_sync(&root, &mut rust_lint);
     }
     if java_p3c.is_object() {
         crate::java_p3c_workbench::persist_and_sync(&root, &mut java_p3c);

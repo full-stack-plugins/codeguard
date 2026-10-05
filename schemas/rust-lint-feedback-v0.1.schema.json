@@ -1,0 +1,486 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:rust-lint-feedback:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "language",
+    "authority",
+    "coverage_proven",
+    "delivery_decision",
+    "command_status",
+    "exit_code",
+    "execution_budget",
+    "tool_selection",
+    "native_report",
+    "syntax_candidates",
+    "syntax_tasks",
+    "next",
+    "preliminary_result",
+    "native_tool_requirement"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "report_type": {
+      "const": "rust_lint_feedback"
+    },
+    "operation": {
+      "const": "lint"
+    },
+    "language": {
+      "const": "rust"
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "command_status": {
+      "enum": [
+        "incomplete",
+        "cancelled"
+      ]
+    },
+    "exit_code": {
+      "enum": [
+        3,
+        130
+      ]
+    },
+    "execution_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timeout_ms",
+        "source",
+        "enforcement"
+      ],
+      "properties": {
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 86400000
+        },
+        "source": {
+          "enum": [
+            "cli",
+            "registered_environment",
+            "project_default",
+            "builtin_default"
+          ]
+        },
+        "enforcement": {
+          "const": "native_execution_only"
+        }
+      }
+    },
+    "tool_selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "executable"
+      ],
+      "properties": {
+        "source": {
+          "enum": [
+            "not_found",
+            "explicit",
+            "path"
+          ]
+        },
+        "executable": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "native_report": {
+      "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/rust_lint"
+    },
+    "syntax_candidates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason",
+        "execution_phase",
+        "authority",
+        "delivery_decision",
+        "source_file_count",
+        "skipped_count",
+        "unrouted_count",
+        "native_preferred_count",
+        "observations",
+        "next_action"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "not_run",
+            "attempted_incomplete",
+            "observed_partial"
+          ]
+        },
+        "reason": {
+          "enum": [
+            "source_or_scope_changed",
+            "request_cancelled",
+            "worker_executable_unavailable",
+            "grammar_manifest_invalid",
+            "bounded_scope",
+            "unrouted_source",
+            "candidate_unavailable",
+            "candidate_unqualified",
+            "native_preferred",
+            "binary_without_wasm_precheck",
+            "wasm_feature_not_built",
+            "grammar_registry_unavailable",
+            "project_root_unavailable",
+            "rust_source_scope_unavailable",
+            "rust_source_discovery_incomplete",
+            "native_tool_selected"
+          ]
+        },
+        "execution_phase": {
+          "const": "after_native"
+        },
+        "authority": {
+          "const": "candidate_unqualified"
+        },
+        "delivery_decision": {
+          "const": "incomplete"
+        },
+        "source_file_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "skipped_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unrouted_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "native_preferred_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "next_action": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observations": {
+          "type": "array",
+          "maxItems": 64,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "language",
+              "scope",
+              "byte_offset",
+              "status",
+              "reason",
+              "grammar_qualified",
+              "source_sha256",
+              "grammar_sha256",
+              "recovery_count",
+              "recoveries",
+              "known_limitations"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "language": {
+                "const": "rust"
+              },
+              "scope": {
+                "enum": [
+                  "whole_file",
+                  "cfquery_body"
+                ]
+              },
+              "byte_offset": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "status": {
+                "enum": [
+                  "candidate_observed",
+                  "candidate_unavailable"
+                ]
+              },
+              "reason": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "grammar_qualified": {
+                "const": false
+              },
+              "source_sha256": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "grammar_sha256": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "recovery_count": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "known_limitations": {
+                "type": "array",
+                "maxItems": 8,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1024
+                }
+              },
+              "recoveries": {
+                "type": "array",
+                "maxItems": 8,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "kind",
+                    "syntax_kind",
+                    "start_byte",
+                    "end_byte",
+                    "start_row",
+                    "start_column_byte",
+                    "end_row",
+                    "end_column_byte"
+                  ],
+                  "properties": {
+                    "kind": {
+                      "enum": [
+                        "ERROR",
+                        "MISSING"
+                      ]
+                    },
+                    "syntax_kind": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "start_byte": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "end_byte": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "start_row": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "start_column_byte": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "end_row": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "end_column_byte": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "syntax_tasks": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/syntax_tasks"
+        }
+      ]
+    },
+    "next": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "repair-brief-preview.schema.json"
+        },
+        {
+          "$ref": "repair-brief-preview-v0.4.schema.json"
+        },
+        {
+          "$ref": "repair-brief-preview-v0.5.schema.json"
+        },
+        {
+          "$ref": "repair-brief-preview-v0.6.schema.json"
+        },
+        {
+          "$ref": "repair-brief-preview-v0.7.schema.json"
+        },
+        {
+          "$ref": "repair-brief-preview-v0.8.schema.json"
+        },
+        {
+          "$ref": "repair-brief-preview-v0.9.schema.json"
+        },
+        {
+          "$ref": "repair-brief-preview-v0.10.schema.json"
+        },
+        {
+          "$ref": "repair-brief-preview-v0.11.schema.json"
+        },
+        {
+          "$ref": "rust-clippy-repair-brief-preview-v0.1.schema.json"
+        }
+      ]
+    },
+    "preliminary_result": {
+      "enum": [
+        "not_run",
+        "incomplete",
+        "candidates_observed",
+        "no_candidates_observed"
+      ]
+    },
+    "native_tool_requirement": {
+      "enum": [
+        "available",
+        "required",
+        "recommended"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "command_status": {
+            "const": "cancelled"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "exit_code": {
+            "const": 130
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "exit_code": {
+            "const": 3
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "native_tool_requirement": {
+            "const": "recommended"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "preliminary_result": {
+            "const": "no_candidates_observed"
+          },
+          "tool_selection": {
+            "properties": {
+              "source": {
+                "const": "not_found"
+              },
+              "executable": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "native_tool_requirement": {
+            "const": "available"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "native_report": {
+            "type": "object",
+            "properties": {
+              "local_scan_complete": {
+                "const": true
+              }
+            }
+          },
+          "tool_selection": {
+            "properties": {
+              "source": {
+                "enum": [
+                  "explicit",
+                  "path"
+                ]
+              },
+              "executable": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "preliminary_result": {
+            "const": "not_run"
+          },
+          "syntax_candidates": {
+            "properties": {
+              "reason": {
+                "const": "native_tool_selected"
+              },
+              "observations": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}
