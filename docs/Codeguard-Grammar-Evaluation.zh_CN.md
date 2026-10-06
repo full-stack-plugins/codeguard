@@ -169,3 +169,7 @@ Go候选任务复检现接受 `--go-tool /absolute/sdk/bin/go`，对冻结整文
 ### Go统一lint的原生优先与缺工具初检
 
 源码版 `codeguard lint go . --format json` 优先显式 `--go-tool`，否则查找调用方绝对PATH中的Go。工具已选择但版本/执行失败时保留原生故障；真正缺工具时，内置WASM做有界整文件初检，保留恢复和独立结构候选。候选或初检未完成要求准备项目适用原生工具；完整有界范围的零候选只推荐准备，原生义务仍未完成，退出码继续3。默认不含WASM的构建明确报告能力缺失。重复lint与check复用确认任务，补声明不自动关闭。公开npm0.1.4未更新。见[局部验收](../tests/acceptance/go-lint-fallback.md)。
+
+## 2026-10-06 Java21原生增量对照
+
+Java差分验收先核对truncated_files，隐藏恢复保留unknown，避免空recoveries误计为干净。原13例仍用javac21按release17对照；新增8例单独按release21执行，含模式switch/guard/record pattern/sealed/text block及三个语法错误，实际3TP/5TN/0FP/0FN/0unknown。新增组是本轮作者样本，independent_holdout=false，不提升grammar资格或混入固定358例。原生工具和源码摘要随证据绑定。见 [验收](../tests/acceptance/java21-native-differential.md)。

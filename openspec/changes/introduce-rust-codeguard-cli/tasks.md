@@ -1887,3 +1887,10 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 - [x] 修复check java的P3C准备简报与聚合0.38 schema不兼容，并验证完整实际输出及拒绝反例（新增0.58，历史协议保留；见p3c-preparation-aggregate-schema验收）。
 
 见 [验收](../../../tests/acceptance/maven-javadoc-task-recheck.md)。110通过/0失败/22条件忽略；真实Maven新工作台、复杂项目、可信关闭/复发与实际宿主未完成，6.x/9.x父任务仍开放。
+
+## 2026-10-06 Java差分验收分类与Java21版本组
+
+- [x] Java原生差分将截断/隐藏恢复保留unknown，空recoveries不独立证明干净；原13例原生对照继续通过。
+- [x] 用既有javac21新增Java21语法8例原生对照，绑定工具和源码摘要，单独统计3TP/5TN；作者语料不当作独立盲测，不提升32grammar资格。
+
+见 tests/acceptance/java21-native-differential.md。Java目标4通过/0失败/0忽略；独立holdout、既有六项争议、全语言及真实宿主父任务继续开放。
