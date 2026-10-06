@@ -1,6 +1,6 @@
 //! 显式单文件候选语法观察；不将未经验收的 grammar 结果变为 lint 结论。
 
-use crate::syntax_worker_runner::run_syntax_worker_candidate;
+use crate::syntax_worker_runner::{run_syntax_worker_candidate, run_syntax_worker_binding_candidate};
 use codeguard_adapters::bundled_grammar_candidate;
 use serde_json::json;
 use std::path::PathBuf;
@@ -40,7 +40,12 @@ pub fn run(args: &[String]) -> ExitCode {
         Some(name) => name,
         None => return emit_incomplete(language, source_path, "source_path_invalid"),
     };
-    let result = run_syntax_worker_candidate(
+    let runner = if language == "javascript" {
+        run_syntax_worker_binding_candidate
+    } else {
+        run_syntax_worker_candidate
+    };
+    let result = runner(
         &executable,
         language,
         relative_name,
@@ -70,7 +75,9 @@ pub fn run(args: &[String]) -> ExitCode {
                 }
             });
             if !observation.structural_observations.is_empty() {
-                report["schema_version"] = json!(if language == "cfquery" {
+                report["schema_version"] = json!(if language == "javascript" {
+                    "0.6.0"
+                } else if language == "cfquery" {
                     "0.4.0"
                 } else if language == "go" {
                     "0.3.0"
@@ -79,6 +86,9 @@ pub fn run(args: &[String]) -> ExitCode {
                 });
                 if language == "cfquery" {
                     report["source_scope"] = json!("static_cfquery_sql_candidate");
+                }
+                if language == "javascript" {
+                    report["structural_rule_scope"] = json!("direct_simple_lexical_names_only");
                 }
                 if language == "go" {
                     report["source_scope"] = json!("whole_file");
@@ -89,7 +99,9 @@ pub fn run(args: &[String]) -> ExitCode {
                 report["structural_observations"] = json!(observation.structural_observations);
             }
             if observation.parser_error_location_unavailable {
-                report["schema_version"] = json!("0.5.0");
+                if report["schema_version"] != "0.6.0" {
+                    report["schema_version"] = json!("0.5.0");
+                }
                 report["parser_error_location_unavailable"] = json!(true);
                 report["next_action"] =
                     json!("compare_original_source_with_native_tool_then_review_grammar");

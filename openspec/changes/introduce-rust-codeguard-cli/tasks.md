@@ -1780,3 +1780,7 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 ## 2026-10-06 JavaScript 重复直接绑定事实基础设施
 
 14.4/14.17/14.19：新增有界通用AST根作用域简单绑定扫描，四种节点类型由调用方指定，保留重复位置、记录/访问截断，不输出标识符文本或伪造ERROR/MISSING。API缺失RED后普通三项通过；显式Node24.18.0两种输入模式16轮对照通过，顶层return的module/CommonJS差异保持上下文要求。尚未接入公开worker/probe/check/Hook/任务及规则包/schema，已知原始与组合FN仍保留、不勾选父任务。见[验收](../../../tests/acceptance/javascript-direct-binding-facts.md)。
+
+## 2026-10-06 JavaScript 绑定候选显式probe接线
+
+14.4/14.9/14.17/14.19：固定规则包及adapter身份已接入隔离worker1.5、显式grammar probe0.6，原始恢复与直接简单lexical绑定候选独立保留，零候选沿用旧协议。公开RED后四项通过，八种身份/位置/版本篡改及旧消费者上下文拒绝；Unicode/截断可见，三份实际新报告schema与九种伪造变体通过验证。相关六目标42通过/2条件忽略与新目标重叠不累加；最终范围字段下新目标四项复检通过。check/lint、Hook、持久任务和差分报告仍待升级接线，既有FN、资格和发布不改，不勾选父任务。见[验收](../../../tests/acceptance/javascript-binding-probe.md)。

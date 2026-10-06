@@ -115,6 +115,8 @@ cargo build --locked -p codeguard-cli
 
 ### npm 安装与一次性调用
 
+WASM源码构建现可通过`codeguard grammar probe javascript FILE --format=json`观察重复直接JavaScript let/const绑定候选。[Probe0.6](schemas/grammar-probe-v0.6.schema.json)保留原始解析器恢复，明确有限规则范围并要求原生确认。项目检查、Hook和修复任务尚未接入本规则；已发布npm0.1.4不含此增量。[验收](tests/acceptance/javascript-binding-probe.md)。
+
 源码以 `--features wasm-precheck` 构建后，可显式运行 `codeguard grammar probe <language> <file> --format=json`，由隔离 worker 调用 32 份固定候选中的任意一份。命令始终以退出码 3 返回，并标记 `status=incomplete`、`native.status=not_run`、`delivery_decision=not_evaluated`；解析完成时还标记 `precheck.status=incomplete`。输入或 worker 失败也遵守同一份[封闭 JSON Schema](schemas/grammar-probe-v0.1.schema.json)。恢复锚点只是疑似观察。此诊断入口尚未把全部语种接入已验收的原生优先 `lint/check`；已发布 npm 包仅把它作为未验收候选提供。
 
 源码构建的 `check all` 现自动按 JS/TS/TSX 源码最近的项目清单选择本地 ESLint 10 和单一 flat config；`--node-tool` 优先，否则查找 PATH 中的 Node。原生结果进入 `native_results.node_lint`，已初始化工作区自动同步稳定任务并返回 `next`。完整且源码摘要匹配的原生文件跳过重复 WASM；缺配置、原生忽略或故障的文件保留原因并继续候选初检。此接线也适用于未启用 WASM 的构建；已包含在 npm 0.1.4，不覆盖 pnpm 链接包、ESLint 旧版或所有配置组合。见[聚合 ESLint 验收](tests/acceptance/check-all-eslint.md)。
