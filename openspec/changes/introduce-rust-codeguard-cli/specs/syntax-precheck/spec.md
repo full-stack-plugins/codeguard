@@ -868,3 +868,16 @@ The implementation SHALL derive return-outside-function facts from bounded AST t
 - **THEN** only the return outside function boundaries is retained as an AST fact
 - **AND** record or traversal exhaustion remains visibly truncated
 - **AND** no grammar qualification, native completion or project delivery permission is granted
+
+#### Scenario: Explicit module probe preserves mode-bound candidates
+- **WHEN** `grammar probe javascript FILE --module --format=json` is requested
+- **THEN** the private worker and probe bind `javascript_mode=module`, source identity and the fixed module-return rule identity
+- **AND** function-external returns are candidate structures, separate from raw parser recoveries
+- **AND** a probe without `--module` never activates this rule, while other-language or contradictory mode arguments fail before parsing
+- **AND** old worker/probe consumers reject unsupported context instead of interpreting candidates as complete lint
+
+#### Scenario: Module differential uses the same explicit candidate scope
+- **WHEN** the developer differential selects the fixed Node observer that always runs `--input-type=module`
+- **THEN** each JavaScript row binds `javascript_mode=module` and uses the explicit module worker
+- **AND** raw parser false negatives remain unchanged while duplicate binding and outer-return rules contribute only to combined candidates
+- **AND** wrong-mode/cross-language structure evidence or fabricated qualification is rejected by the versioned report contract

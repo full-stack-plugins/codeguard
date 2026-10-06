@@ -437,3 +437,6 @@ pub use clang_sarif::parse_clang_stdin_sarif;
 
 mod erlang_form_rule;
 pub use erlang_form_rule::erlang_form_rule_sha256;
+
+mod javascript_module_return_rule;
+pub use javascript_module_return_rule::{javascript_module_return_node_kinds, javascript_module_return_rule_sha256};

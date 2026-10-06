@@ -493,3 +493,6 @@ mod syntax_lint_feedback;
 mod clang_syntax_probe;
 #[cfg(unix)]
 mod clang_lint_feedback;
+
+#[cfg(feature = "wasm-precheck")]
+mod syntax_worker_mode;

@@ -33,10 +33,18 @@ impl SyntaxWorkerStructure {
     pub fn valid(&self, language: &str, source: &[u8]) -> bool {
         let rule_valid = match language {
             "javascript" => {
-                self.rule_id == "codeguard.javascript.duplicate_direct_lexical_binding"
+                (self.rule_id == "codeguard.javascript.duplicate_direct_lexical_binding"
                     && self.rule_sha256 == codeguard_adapters::javascript_binding_rule_sha256()
                     && self.parent_syntax_kind == "program"
-                    && self.start_byte < self.end_byte
+                    && self.start_byte < self.end_byte)
+                    || (self.rule_id == "codeguard.javascript.module_return_outside_function"
+                        && self.rule_sha256
+                            == codeguard_adapters::javascript_module_return_rule_sha256()
+                        && self.parent_syntax_kind == "return_statement"
+                        && self.start_byte < self.end_byte
+                        && source
+                            .get(self.start_byte..self.end_byte)
+                            .is_some_and(|span| span.starts_with(b"return")))
             }
             "erlang" => {
                 self.rule_id == "codeguard.erlang.form_terminator"

@@ -42,12 +42,13 @@ fn controlled_javascript_replay_rejects_unexpected_native_output_and_preserves_i
         .expect("explicit Node syntax observer must be available")
     };
     let report = replay(Instant::now() + Duration::from_secs(60), false);
-    assert_eq!(report["schema_version"], "0.9.0");
+    assert_eq!(report["schema_version"], "0.10.0");
     assert_eq!(report["language_count"], 32);
     assert_eq!(report["sample_count"], 2);
     assert_eq!(report["grammar_qualified_count"], 0);
     for row in report["cases"].as_array().unwrap() {
         assert_eq!(row["native"]["input_type"], "module");
+        assert_eq!(row["javascript_mode"], "module");
         assert_eq!(row["native_identity_current"], true);
         assert_eq!(row["fixture_native_disagreement"], false, "{row}");
         assert_eq!(row["comparison"], row["combined_candidate_comparison"]);
@@ -223,7 +224,7 @@ fn pinned_javascript_worker_matches_native_node_check_on_syntax_corpus() {
         &AtomicBool::new(false),
     )
     .unwrap();
-    assert_eq!(report["schema_version"], "0.9.0");
+    assert_eq!(report["schema_version"], "0.10.0");
     assert_eq!(report["sample_count"], 18);
     assert_eq!(report["program_stable"], true);
     assert_eq!(report["grammar_qualified_count"], 0);
@@ -231,9 +232,13 @@ fn pinned_javascript_worker_matches_native_node_check_on_syntax_corpus() {
     for row in report["cases"].as_array().unwrap() {
         assert_eq!(row["native_identity_current"], true, "{row}");
         assert_eq!(row["native"]["input_type"], "module");
+        assert_eq!(row["javascript_mode"], "module");
         assert_eq!(row["fixture_native_disagreement"], false, "{row}");
         assert_ne!(row["comparison"], "unknown", "{row}");
-        if row["id"] == "javascript-duplicate_binding" {
+        if matches!(
+            row["id"].as_str(),
+            Some("javascript-duplicate_binding" | "javascript-module_return")
+        ) {
             assert_eq!(row["comparison"], "false_negative");
             assert_eq!(row["combined_candidate_comparison"], "true_positive");
             assert_eq!(row["structural_observations"].as_array().unwrap().len(), 1);

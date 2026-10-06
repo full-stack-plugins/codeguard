@@ -1,6 +1,10 @@
 /// 按固定入口提供已接线的参数示例；占位路径须由调用者替换并由命令本身核对。
 pub(crate) fn examples(command: &str) -> &'static [&'static str] {
     match command {
+        "grammar probe" => &[
+            "codeguard grammar probe javascript FILE --format=json",
+            "codeguard grammar probe javascript MODULE_FILE --module --format=json",
+        ],
         "lint" => &[
             "codeguard lint all . --jobs 2 --timeout 30m --format json",
             "codeguard lint shell app.sh --dialect bash --shellcheck-tool /absolute/shellcheck --format json",

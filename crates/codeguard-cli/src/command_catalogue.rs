@@ -531,7 +531,7 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             },
             executable: cfg!(feature = "wasm-precheck"),
             operation_kind: r#"check"#,
-            usage: r#"grammar probe <language> <file> [--format=json]"#,
+            usage: r#"grammar probe <language> <file> [--module (javascript only)] [--format=json]"#,
             scope: r#"显式未验收WASM候选，始终未完成"#,
             languages: &[],
         },

@@ -169,3 +169,7 @@ The development differential now shares the project's direct duplicate-binding w
 ## AST facts for a module-only return candidate
 
 The runtime now traverses bounded AST nodes outside function/generator/arrow/method subtrees, including outer control flow. It retains UTF-8 byte locations and explicit budget truncation. Actual Node24.18.0 compared11 source samples in module and CommonJS modes (22 syntax checks), confirming the need for explicit module context. This is only the fact layer; public worker/probe, project mode and differential wiring remain open. The existing module_return false negative and0/32 qualification are unchanged. See [limited acceptance](../tests/acceptance/javascript-module-return-ast.md).
+
+## Explicit module candidates and native combined differential
+
+`grammar probe javascript FILE --module --format=json` now observes outer returns through worker1.7/probe0.8. The undeclared-mode path does not activate this rule; zero candidates and input failures retain explicit context. The development Node differential fixes module context and reuses this worker in report0.10: actual18 cases yield raw5TP/11TN/0FP/2FN and combined7TP/11TN/0FP/0FN. Raw misses remain visible, fixed358 metrics and0/32 qualification are unchanged, and this is not an independent holdout. Automatic project-mode observation, task and host wiring remain open. See [limited acceptance](../tests/acceptance/javascript-module-worker-probe.md).

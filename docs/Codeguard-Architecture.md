@@ -1333,3 +1333,22 @@ Other-category history remains stored, but this invocation does not select its r
 `lint all` selects next within the allowed lint checker set in one local-fact validation pass. Historical build/CVE/comments tasks do not hide valid lint guidance and remain stored. Syntax-confirmation fallback selects only task IDs produced by this invocation.
 
 The WASM regression for source 29ec2e1 completed: foundation crates plus CLI lib/bins and 201 integration targets produced 1,879 passes, zero failures and 177 conditional tests not executed. The uncommitted Erlang draft was explicitly excluded. Strict Clippy passed. This does not qualify independent corpora, the full native-tool matrix, hosts or publication. See tests/acceptance/wasm-regression-29ec2e1.md; all 32 grammars remain candidates with zero formally qualified.
+
+## Explicit JavaScript module candidate boundary
+
+`grammar probe javascript FILE --module --format=json` binds an explicit module request to private worker1.7 and probe0.8. The worker reads frozen stdin and the pinned grammar, keeping raw ERROR/MISSING, direct duplicate bindings and returns outside functions as separate evidence. The parent validates mode/version/source/grammar/rule identities and byte positions. Legacy requests cannot consume module rules; wrong languages or unknown modes fail before parsing. Recovery and structure records share a total128-record output budget, with visible truncation. Zero candidates and input failures still retain the explicit mode and incomplete status.
+
+```mermaid
+flowchart LR
+    A[Explicit candidate request] --> B{Module mode declared?}
+    B -->|JavaScript --module| C[Parent binds mode and frozen input]
+    B -->|Undeclared| D[Existing recovery and binding candidates]
+    C --> E[Isolated worker 1.7]
+    E --> F[Raw parser recoveries]
+    E --> G[Duplicate bindings and outer returns]
+    F --> H[Parent validates identity and budgets]
+    G --> H
+    H --> I[Probe 0.8: incomplete and native confirmation]
+```
+
+This entry does not infer project mode, install tools, execute source, replace native lint or close tasks. CommonJS may permit outer returns. Existing schemas remain unchanged; new context and rules require the new protocol. Automatic project-mode observation and task/host wiring still need separate acceptance. See [limited acceptance](../tests/acceptance/javascript-module-worker-probe.md).

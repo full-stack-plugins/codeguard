@@ -1,6 +1,7 @@
 //! 私有语法工作进程：只读 stdin 与固定内置 grammar，不解释项目文件或策略。
 
 use crate::syntax_worker_envelope::SyntaxWorkerEnvelope;
+use crate::syntax_worker_mode::SyntaxWorkerMode;
 use crate::syntax_worker_recovery::SyntaxWorkerRecovery;
 use codeguard_adapters::bundled_grammar_candidate;
 use codeguard_runtime::{
@@ -16,13 +17,16 @@ const MAX_RECOVERIES: usize = 128;
 /// 在独立进程中解析一份 stdin 源码；参数仅允许固定候选语种。
 /// 返回原始恢复观察，不赋予 grammar 验收、原生 lint 或交付权威。
 pub fn run(args: &[String]) -> ExitCode {
-    let (language, bindings) = match args {
-        [language] => (language, false),
+    let (language, mode) = match args {
+        [language] => (language, SyntaxWorkerMode::Default),
         [language, option] if language == "javascript" && option == "--direct-bindings" => {
-            (language, true)
+            (language, SyntaxWorkerMode::Bindings)
         }
         [language, option] if language == "erlang" && option == "--form-terminators" => {
-            (language, true)
+            (language, SyntaxWorkerMode::Bindings)
+        }
+        [language, option] if language == "javascript" && option == "--javascript-module" => {
+            (language, SyntaxWorkerMode::Module)
         }
         _ => {
             eprintln!("语法工作进程参数无效");
@@ -49,7 +53,7 @@ pub fn run(args: &[String]) -> ExitCode {
         eprintln!("语法工作进程输入不是 UTF-8");
         return ExitCode::from(3);
     }
-    match observe(language, &source, bindings) {
+    match observe(language, &source, mode) {
         Ok(report) => match serde_json::to_string(&report) {
             Ok(json) => {
                 println!("{json}");
@@ -64,7 +68,13 @@ pub fn run(args: &[String]) -> ExitCode {
     }
 }
 
-fn observe(language: &str, source: &[u8], bindings: bool) -> Result<SyntaxWorkerEnvelope, String> {
+fn observe(
+    language: &str,
+    source: &[u8],
+    mode: SyntaxWorkerMode,
+) -> Result<SyntaxWorkerEnvelope, String> {
+    let bindings = mode != SyntaxWorkerMode::Default;
+    let module = mode == SyntaxWorkerMode::Module;
     let (asset, wasm) = bundled_grammar_candidate(language)?;
     if asset.codeguard_runtime_validation != "rust_loader_smoke_passed" {
         return Err("grammar 与当前 Rust WASM 运行时不兼容".into());
@@ -106,6 +116,38 @@ fn observe(language: &str, source: &[u8], bindings: bool) -> Result<SyntaxWorker
                 start_column_byte: binding.start_column_byte,
                 end_row: binding.end_row,
                 end_column_byte: binding.end_column_byte,
+            });
+        }
+    }
+    if module {
+        let (kinds, functions) = codeguard_adapters::javascript_module_return_node_kinds()?;
+        let function_refs = functions.iter().map(String::as_str).collect::<Vec<_>>();
+        let scanned_returns = codeguard_runtime::scan_wasm_outer_returns(
+            &tree,
+            source,
+            kinds.each_ref().map(String::as_str),
+            &function_refs,
+            MAX_RECOVERIES,
+            200_000,
+        )?;
+        structural_truncated |= scanned_returns.truncated;
+        for fact in scanned_returns.returns {
+            if scanned.recoveries.len() + structural_observations.len() == MAX_RECOVERIES {
+                structural_truncated = true;
+                break;
+            }
+            structural_observations.push(crate::syntax_worker_structure::SyntaxWorkerStructure {
+                basis: "codeguard_structure_rule".into(),
+                rule_id: "codeguard.javascript.module_return_outside_function".into(),
+                rule_version: "1.0.0".into(),
+                rule_sha256: codeguard_adapters::javascript_module_return_rule_sha256(),
+                parent_syntax_kind: fact.syntax_kind,
+                start_byte: fact.start_byte,
+                end_byte: fact.end_byte,
+                start_row: fact.start_row,
+                start_column_byte: fact.start_column_byte,
+                end_row: fact.end_row,
+                end_column_byte: fact.end_column_byte,
             });
         }
     }
@@ -241,23 +283,24 @@ fn observe(language: &str, source: &[u8], bindings: bool) -> Result<SyntaxWorker
         })
         .collect();
     Ok(SyntaxWorkerEnvelope {
-        schema_version:
-            if bindings && language == "erlang" && !structural_observations.is_empty() {
-                "1.6.0"
-            } else if bindings && !structural_observations.is_empty() {
-                "1.5.0"
-            } else if scanned.parser_error_location_unavailable {
-                "1.4.0"
-            } else if structural_observations.is_empty() {
-                "1.0.0"
-            } else if language == "cfquery" {
-                "1.3.0"
-            } else if language == "go" {
-                "1.2.0"
-            } else {
-                "1.1.0"
-            }
-            .into(),
+        schema_version: if module {
+            "1.7.0"
+        } else if bindings && language == "erlang" && !structural_observations.is_empty() {
+            "1.6.0"
+        } else if bindings && !structural_observations.is_empty() {
+            "1.5.0"
+        } else if scanned.parser_error_location_unavailable {
+            "1.4.0"
+        } else if structural_observations.is_empty() {
+            "1.0.0"
+        } else if language == "cfquery" {
+            "1.3.0"
+        } else if language == "go" {
+            "1.2.0"
+        } else {
+            "1.1.0"
+        }
+        .into(),
         report_type: "syntax_worker_candidate".into(),
         language: language.into(),
         grammar_sha256: asset.sha256.clone(),
@@ -267,6 +310,7 @@ fn observe(language: &str, source: &[u8], bindings: bool) -> Result<SyntaxWorker
         parser_error_location_unavailable: scanned
             .parser_error_location_unavailable
             .then_some(true),
+        javascript_mode: module.then(|| "module".into()),
         recoveries,
         structural_observations,
     })

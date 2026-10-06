@@ -1333,3 +1333,22 @@ flowchart LR
 `lint all` 的 next 通过一次本地事实校验，在允许的 lint 检查器集合内选择；历史构建/CVE/注释任务不使有效 lint 指引变成空值，也不会被删除。语法确认后备只选择本轮产生的任务 ID。
 
 当前源码29ec2e1的WASM扩展回归已结束：基础crate与CLI lib/bins、201个集成目标合计1879通过、0失败、177条件用例未执行，明确排除未提交Erlang草稿。严格Clippy通过；这不代表独立语料、原生工具全矩阵、宿主或发布验收。详见tests/acceptance/wasm-regression-29ec2e1.md；32个grammar仍为候选，正式资格0。
+
+## 显式 JavaScript module 候选边界
+
+`grammar probe javascript FILE --module --format=json`将显式module请求固定到私有worker1.7及probe0.8。worker只读冻结stdin，使用同一固定grammar：原始ERROR/MISSING、重复直接绑定和函数外return分别留证据。父进程验证模式/版本/源码/grammar/规则摘要/字节位置；旧请求不能消费module规则，错语言或未知模式在解析前拒绝。记录总预算仍128，原始恢复与两类结构候选共用，访问截断保留未完成；零候选也保留module身份和incomplete。缺文件等失败同样保留请求模式。
+
+```mermaid
+flowchart LR
+    A[显式候选请求] --> B{声明 module 模式?}
+    B -->|JavaScript --module| C[父进程绑定模式和冻结输入]
+    B -->|未声明| D[既有语法与绑定候选]
+    C --> E[隔离 worker 1.7]
+    E --> F[原始解析恢复]
+    E --> G[重复绑定与函数外 return]
+    F --> H[父进程验证身份与预算]
+    G --> H
+    H --> I[Probe 0.8: incomplete + 原生确认指引]
+```
+
+该入口不自动推断项目模式，不安装工具，不执行源码，不取代原生lint或关闭任务。CommonJS的顶层return可合法，不能套用模块规则。旧报告schema保持不变；新字段/规则只能通过新协议消费。项目模式自动观察、任务与宿主接线仍需独立验收。见[局部验收](../tests/acceptance/javascript-module-worker-probe.md)。
