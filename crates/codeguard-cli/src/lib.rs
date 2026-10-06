@@ -542,3 +542,6 @@ pub mod python_comments_command;
 
 #[cfg(unix)]
 mod python_documentation_configuration;
+
+#[cfg(unix)]
+mod cargo_audit_database_snapshot;

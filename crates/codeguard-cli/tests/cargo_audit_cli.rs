@@ -91,6 +91,23 @@ fn real_cargo_audit_finds_vulnerable_locked_package_without_granting_delivery() 
     assert_eq!(report["findings"][0]["advisory_id"], "RUSTSEC-2020-0071");
     assert_eq!(report["delivery_decision"], "not_evaluated");
     assert_eq!(report["reason"], "database_freshness_unverified");
+    fs::write(
+        fixture.0.join("Cargo.lock"),
+        "version = 3\n\n[[package]]\nname='audit-example'\nversion='0.1.0'\n",
+    )
+    .unwrap();
+    let (_, clean) = fixture.run_with_db(std::path::Path::new(&tool), std::path::Path::new(&db));
+    assert_eq!(clean["local_scan_complete"], true, "{clean}");
+    assert_eq!(clean["findings"], serde_json::json!([]));
+    assert_eq!(clean["database_freshness"], "unverified");
+    if let Ok(path) = std::env::var("CODEGUARD_TEST_CARGO_AUDIT_DATABASE_NATIVE_EVIDENCE") {
+        fs::write(
+            path,
+            serde_json::to_vec_pretty(&serde_json::json!({"vulnerable":report,"clean":clean}))
+                .unwrap(),
+        )
+        .unwrap();
+    }
 }
 impl Drop for Fixture {
     fn drop(&mut self) {
@@ -248,4 +265,134 @@ fn valid_advisory_after_native_crash_remains_visible_with_incomplete_status() {
     assert_eq!(truncated_report["local_scan_complete"], false);
     assert_eq!(truncated_report["reason"], "cargo_audit_output_limit");
     assert_eq!(truncated_report["findings"], serde_json::json!([]));
+}
+
+#[test]
+fn changed_database_keeps_candidate_but_never_grants_local_completion() {
+    let mut evidence = Vec::new();
+    for (name, mutation, reason, complete) in [
+        (
+            "rewrite",
+            "printf 'changed advisory\\n' > advisory-db/crates/time/advisory.md",
+            "cargo_audit_database_changed",
+            false,
+        ),
+        (
+            "remove",
+            "rm advisory-db/crates/time/advisory.md",
+            "cargo_audit_database_changed",
+            false,
+        ),
+        (
+            "add",
+            "printf 'new advisory\\n' > advisory-db/crates/time/new.md",
+            "cargo_audit_database_changed",
+            false,
+        ),
+        (
+            "replace_root",
+            "mv advisory-db saved-db; mkdir -p advisory-db/crates/time; cp saved-db/crates/time/advisory.md advisory-db/crates/time/advisory.md",
+            "cargo_audit_database_changed",
+            false,
+        ),
+        (
+            "revert_content",
+            "printf 'temporary\\n' > advisory-db/crates/time/advisory.md; printf 'original advisory\\n' > advisory-db/crates/time/advisory.md",
+            "cargo_audit_database_changed",
+            false,
+        ),
+        (
+            "lock_housekeeping",
+            "touch advisory-db/db.lock",
+            "database_freshness_unverified",
+            true,
+        ),
+    ] {
+        let fixture = Fixture::new();
+        let tool = fixture.0.join("audit-tool");
+        let database = fixture.0.join("advisory-db/crates/time");
+        fs::create_dir_all(&database).unwrap();
+        fs::write(database.join("advisory.md"), "original advisory\n").unwrap();
+        // 运输只模拟有效原生JSON，实际改变目录输入；不证明RustSec语义。
+        let output = serde_json::json!({"database":{"advisory-count":1,"last-commit":null,"last-updated":null},"lockfile":{"dependency-count":1},"settings":{"target_arch":[],"target_os":[],"severity":null,"ignore":[],"informational_warnings":[]},"vulnerabilities":{"found":true,"count":1,"list":[{"advisory":{"id":"RUSTSEC-2020-0071","package":"time","aliases":["CVE-2020-26235"],"cvss":null},"package":{"name":"time","version":"0.1.40","source":"registry+https://github.com/rust-lang/crates.io-index","checksum":"0000000000000000000000000000000000000000000000000000000000000000"}}]},"warnings":{}});
+        fs::write(
+            &tool,
+            format!(
+                "#!/bin/sh\n{mutation}\nprintf '%s\\n' '{}'\nexit 1\n",
+                output
+            ),
+        )
+        .unwrap();
+        fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
+        let init = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(["init", "--apply", "--format=json"])
+            .arg(&fixture.0)
+            .output()
+            .unwrap();
+        assert_eq!(init.status.code(), Some(3));
+        let (exit, report) = fixture.run(&tool);
+        assert_eq!(exit, 3);
+        assert_eq!(report["local_scan_complete"], complete, "{name}: {report}");
+        assert_eq!(report["reason"], reason, "{name}: {report}");
+        assert_eq!(report["findings"][0]["advisory_id"], "RUSTSEC-2020-0071");
+        assert_eq!(report["database_freshness"], "unverified");
+        if name == "revert_content" {
+            assert_eq!(
+                fs::read(database.join("advisory.md")).unwrap(),
+                b"original advisory\n"
+            );
+        }
+        let next = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(["next", "--format=json"])
+            .arg(&fixture.0)
+            .output()
+            .unwrap();
+        let next: Value = serde_json::from_slice(&next.stdout).unwrap();
+        assert_eq!(
+            next["repair_brief"]["checker_id"], "rust.cargo_audit",
+            "{name}: {next}"
+        );
+        evidence.push(serde_json::json!({"case":name,"report":report,"next":next}));
+    }
+    if let Ok(path) = std::env::var("CODEGUARD_TEST_CARGO_AUDIT_DATABASE_EVIDENCE") {
+        fs::write(path, serde_json::to_vec_pretty(&evidence).unwrap()).unwrap();
+    }
+}
+
+#[test]
+fn symlinked_collection_does_not_execute_selected_audit_tool() {
+    let fixture = Fixture::new();
+    let outside = fixture.0.join("outside");
+    fs::create_dir(&outside).unwrap();
+    std::os::unix::fs::symlink(&outside, fixture.0.join("advisory-db/crates")).unwrap();
+    let tool = fixture.0.join("audit-tool");
+    fs::write(&tool, "#!/bin/sh\ntouch called\nprintf '{}\\n'\n").unwrap();
+    fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
+    let (_, report) = fixture.run(&tool);
+    assert_eq!(
+        report["reason"],
+        "cargo_audit_database_snapshot_unavailable"
+    );
+    assert!(!fixture.0.join("called").exists());
+}
+
+#[test]
+fn oversized_database_entry_is_an_environment_limit_without_tool_execution() {
+    let fixture = Fixture::new();
+    fs::create_dir_all(fixture.0.join("advisory-db/crates/time")).unwrap();
+    fs::write(
+        fixture.0.join("advisory-db/crates/time/large.md"),
+        vec![b'a'; 2 * 1024 * 1024 + 1],
+    )
+    .unwrap();
+    let tool = fixture.0.join("audit-tool");
+    fs::write(&tool, "#!/bin/sh\ntouch called\nprintf '{}\\n'\n").unwrap();
+    fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
+    let (_, report) = fixture.run(&tool);
+    assert_eq!(
+        report["reason"],
+        "cargo_audit_database_snapshot_limit_exceeded"
+    );
+    assert_eq!(report["findings"], serde_json::json!([]));
+    assert!(!fixture.0.join("called").exists());
 }
