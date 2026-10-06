@@ -85,6 +85,25 @@ pub fn run(
     }
     let (Some(bundle), Some(java)) = (bundle, java) else {
         report["reason"] = json!("prerequisites_missing");
+        let inputs = json!(
+            snapshot
+                .files()
+                .iter()
+                .map(|(p, b)| json!({"path":p,"sha256":digest(b)}))
+                .collect::<Vec<_>>()
+        );
+        if let Ok(mut scan) = prepare(
+            root,
+            &inputs,
+            &crate::gradle_javadoc_probe::missing_prerequisites(),
+        ) {
+            scan["run_id"] = report["run_id"].clone();
+            report["scan"] = scan;
+            report["task_input_stable"] = json!(
+                snapshot.verify_source_unchanged().ok() == Some(true)
+                    && inputs_current(root, &report)
+            );
+        }
         return Ok(report);
     };
     if !bundle.is_absolute() || !java.is_absolute() {
@@ -247,11 +266,19 @@ pub fn classify(brief: &Value, report: &Value) -> &'static str {
     if brief["kind"] == "blocker" {
         return "rule_coverage_requires_review";
     }
-    if report["scan"]["findings"].as_array().is_some_and(|rows| {
-        rows.iter()
-            .any(|r| r["path"] == brief["scope"] && r["rule_id"] == brief["native_rule_id"])
-    }) {
+    let findings = report["scan"]["findings"]
+        .as_array()
+        .expect("完整扫描形状已验证");
+    let same_rule =
+        |r: &Value| r["path"] == brief["scope"] && r["rule_id"] == brief["native_rule_id"];
+    if findings
+        .iter()
+        .any(|r| same_rule(r) && r["finding_id"] == brief["task_id"])
+    {
         "still_present"
+    } else if findings.iter().any(same_rule) {
+        // 同文件同规则的另一个行锚点不是原问题的确认，也不能作为消失/关闭证明。
+        "rule_coverage_requires_review"
     } else {
         "candidate_absent_unverified_policy"
     }
@@ -417,7 +444,8 @@ fn projection_agrees(scan: &Value) -> bool {
     }
 }
 
-fn original(root: &Path, brief: &Value) -> Result<Value, &'static str> {
+/// 核对首次报告、消费收据和任务原生身份，返回原选定输入；不要求历史源码仍相同。
+pub(crate) fn original(root: &Path, brief: &Value) -> Result<Value, &'static str> {
     if brief["checker_id"] != "java.gradle.javadoc"
         || !matches!(brief["kind"].as_str(), Some("finding" | "blocker"))
     {

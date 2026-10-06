@@ -82,10 +82,15 @@ fn imported_gradle_tasks_are_stable_and_have_gradle_native_guidance() {
         next["repair_brief"]["checker_id"], "java.gradle.javadoc",
         "{next}"
     );
-    assert_eq!(next["repair_brief"]["task_verify_status"], "not_integrated");
+    assert_eq!(
+        next["repair_brief"]["task_verify_status"],
+        "local_observation_only"
+    );
     let argv = next["repair_brief"]["recheck_argv"].as_array().unwrap();
-    assert!(argv.contains(&json!("--gradle-javadoc")));
-    assert!(argv.contains(&json!("src/main/java/Sample.java")));
+    assert!(argv.contains(&json!("--gradle-bundle")));
+    assert_eq!(argv[1], "task");
+    assert_eq!(argv[2], "verify");
+    assert_eq!(argv[3], next["repair_brief"]["task_id"]);
     assert!(!argv.contains(&json!("python")));
     let again = prepare(&dir.0, &inputs, &native).unwrap();
     save_local_report(&dir.0, &again).unwrap();
@@ -113,7 +118,7 @@ fn imported_gradle_tasks_are_stable_and_have_gradle_native_guidance() {
     let recovered = sync_local_workspace(&dir.0).unwrap();
     assert_eq!(recovered.restored_task_projections, 1);
     let text = fs::read_to_string(dir.0.join(format!(".codeguard/tasks/{id}.md"))).unwrap();
-    assert!(text.contains("--gradle-javadoc"));
+    assert!(text.contains("--gradle-bundle"));
     let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
         .args(["check", "java"])
         .arg(&dir.0)
@@ -122,7 +127,7 @@ fn imported_gradle_tasks_are_stable_and_have_gradle_native_guidance() {
         .unwrap();
     assert_eq!(out.status.code(), Some(3));
     let historical: Value = serde_json::from_slice(&out.stdout).unwrap();
-    assert_eq!(historical["schema_version"], "0.65.0");
+    assert_eq!(historical["schema_version"], "0.66.0");
     assert!(historical["gradle_javadoc_tasks"].is_null());
     assert_eq!(
         historical["next"]["repair_brief"]["checker_id"],
@@ -184,7 +189,7 @@ fn actual_public_check_persists_and_reuses_gradle_documentation_tasks() {
         serde_json::from_slice::<Value>(&out.stdout).unwrap()
     };
     let first = run("java");
-    assert_eq!(first["schema_version"], "0.65.0");
+    assert_eq!(first["schema_version"], "0.66.0");
     assert_eq!(
         first["gradle_javadoc_tasks"]["status"], "synced_partial",
         "{first}"

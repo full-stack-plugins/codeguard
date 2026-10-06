@@ -859,5 +859,13 @@ Gradle Javadoc repair observations SHALL use their own java.gradle.javadoc check
 - **THEN** it SHALL bind the consumed original report and workspace, retain the original selected input set, reject changed non-Java configuration or existing tool identities before native execution, capture current repairable Java inputs before execution, and record the original-native local observation without granting trusted closure
 
 #### Scenario: Gradle local task verification records absence and failure separately
-- **WHEN** the original native task still emits the same rule/path, emits no matching diagnostic, or cannot run with a stable original context
+- **WHEN** the original native task still emits the same stable finding identity and rule/path, emits no matching diagnostic, or cannot run with a stable original context
 - **THEN** verification SHALL distinguish still-present, candidate-absent with unverified policy, rule/coverage review and incomplete observations, persist failures and attempt linkage, and invalidate old observations after input/tool changes; no local observation SHALL close the task
+
+#### Scenario: A new same-file Gradle diagnostic is not the original finding
+- **WHEN** an original-source repair removes the original finding but native Javadoc reports another finding identity with the same path/rule
+- **THEN** task verification SHALL retain rule/coverage review for the original task, import the new source-bound finding with its own identity and wrapped first evidence, and permit its original-native recheck without claiming the original finding still exists
+
+#### Scenario: Missing original Gradle tools redirects repair to preparation
+- **WHEN** public task verification has unchanged selected inputs but lacks explicit original Gradle/JDK context
+- **THEN** it SHALL persist an incomplete failure linked to the ready attempt, update a separate preparation task without pretending to execute native Javadoc, prioritize environment recovery in next, and reject repeated non-actionable source repair; changed inputs or tool bytes SHALL withdraw the old verification observation
