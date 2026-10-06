@@ -976,4 +976,7 @@ C/C++ 原任务复检与新封闭协议的当前证据见[复检验收](../tests
 C/C++ 受控尝试、无进展诊断与当前协议见[尝试日志验收](../tests/acceptance/c-family-comments-attempt-history.md)；本地日志不能替代完整四核心生产验收。
 
 
-C/C++显式comments现同次原生扫描返回原警告及函数文档结构：无原警告也会报告缺注释；未知/非法结构、源码工具失稳不变成违规。反馈0.5/0.6保留原条数并归并重复定位，结构任务状态仍not_integrated，完整详细文档资格未授予。见[公开结构反馈](../tests/acceptance/c-family-comments-structure-cli.md)。
+C/C++显式comments现同次原生扫描返回原警告及函数文档结构：无原警告也会报告缺注释；未知/非法结构、源码工具失稳不变成违规。反馈0.5/0.6保留原条数并归并重复定位，结构稳定任务现partial，专用复检/尝试尚未接通，完整详细文档资格未授予。见[公开结构反馈](../tests/acceptance/c-family-comments-structure-cli.md)。
+
+
+C/C++结构缺失现按文件/语言标准/Codeguard自有策略创建稳定修复任务，next给出全部当前函数定位与原comments复扫命令；重载和行号移动不重复创建，删除Markdown可恢复，局部消失仍open。专用task verify/attempt目前执行前拒绝，完整详细准确性与可信关闭仍未验收。见[结构任务验收](../tests/acceptance/c-family-structure-workbench.md)。

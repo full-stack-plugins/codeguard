@@ -1,0 +1,10 @@
+{
+  "evidence_kind": "development_structure_workbench_schema",
+  "qualification": "not_granted",
+  "schemas_valid": 495,
+  "historical_schemas_unchanged": 491,
+  "feedback_and_brief_pairs_valid": 20,
+  "task_show_valid": 4,
+  "structural_packets_valid": 20,
+  "negative_cases_rejected": 5
+}

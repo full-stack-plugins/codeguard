@@ -64,3 +64,7 @@ Both modes pass35 targeted tests, including12 real public cases each, plus exist
 未初始化不写工作台；已绑定缺注释但无警告时不冒充已创建结构任务，structural_task_workflow_status明确not_integrated。完整详细文档准确性、全部对象/项目上下文、结构稳定任务与原工具复检、可信关闭/复发、独立精度、五平台/发行继续待完成；66完成/288未完成、228核心blocked、grammar0/32不变。
 
 Uninitialized projects stay uninitialized. Bound structural absence does not imply a persisted repair task. Structural tasks/verification, full accuracy/context, trusted closure, precision, platform and release acceptance remain pending. Counts remain66/288, all228 cores blocked and grammar qualification0/32.
+
+后续任务接线：已绑定反馈0.7现创建/投影结构稳定任务并提供next0.31；本文0.5/0.6是f6cc1bc历史反馈检查点。专用verify/attempt仍未接线，见[当前结构任务](c-family-structure-workbench.md)。
+
+Follow-up: bound feedback0.7 now persists structural tasks and provides brief0.31. This0.5/0.6 record is thef6cc1bc checkpoint; dedicated verification/attempts remain pending.
