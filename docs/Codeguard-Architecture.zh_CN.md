@@ -1539,3 +1539,6 @@ Rust CVE局部观察现在核对同轮RustSec crates/rust内容、成员及物�
 C/C++ 原任务复检与新封闭协议的当前证据见[复检验收](../tests/acceptance/c-family-comments-task-recheck.md)；完整四核心生产资格仍未授予。
 
 C/C++ 受控尝试、无进展诊断与当前协议见[尝试日志验收](../tests/acceptance/c-family-comments-attempt-history.md)；本地日志不能替代完整四核心生产验收。
+
+
+C/C++现新增原生Clang AST函数文档结构适配器，可区分无文档、空用途及缺参数/返回说明；重声明、文档引用和复杂类型保持未知。该底层能力尚未接入公开comments/check与任务闭环，不替代现有原生警告或完整生产验收。见[结构验收](../tests/acceptance/clang-documentation-structure.md)。

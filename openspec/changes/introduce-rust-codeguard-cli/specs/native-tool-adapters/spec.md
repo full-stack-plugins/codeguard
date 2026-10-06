@@ -1133,3 +1133,20 @@ C/C++ documentation task attempts SHALL reuse existing claim tokens, generation 
 #### Scenario: An earlier verification report is unavailable or its observation is forged
 - **WHEN** an earlier current-input ready attempt loses its local recheck report or its event contradicts the original report
 - **THEN** the missing evidence SHALL require investigation without resetting repair permission, and contradictory observations SHALL be rejected
+
+
+### Requirement: C-family documentation structure SHALL preserve native AST association and uncertainty
+
+Codeguard SHALL interpret a version-bound original Clang JSON AST to distinguish absent documentation from empty documentation and inspect purpose, named parameter and applicable return descriptions. These structural facts SHALL remain separate from native warning IDs and semantic accuracy or production qualification.
+
+#### Scenario: Native warnings are empty for an undocumented function
+- **WHEN** a directly observed non-implicit standalone function has no FullComment in its original AST
+- **THEN** its documentation presence SHALL be absent rather than inferred compliant from zero warnings
+- **AND** present but empty documentation SHALL retain missing purpose, parameter and applicable return components
+
+#### Scenario: Association or supported declaration context is uncertain
+- **WHEN** the AST/source token does not match, parameter command indexes contradict actual declarations, input is malformed or budget exceeded
+- **THEN** the adapter SHALL reject the observation rather than guess documentation findings
+- **WHEN** a function redeclares an earlier declaration, or a class/template/other unimplemented declaration is present
+- **THEN** inheritance or unsupported context SHALL remain unknown without missing-comment allegations or complete coverage claims
+- **AND** nonempty text SHALL NOT prove semantic accuracy, detailed behavior or trusted closure

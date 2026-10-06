@@ -451,6 +451,8 @@ mod clang_sarif;
 pub use clang_sarif::parse_clang_stdin_sarif;
 mod clang_documentation_rule;
 pub use clang_documentation_rule::clang_documentation_guidance;
+mod clang_documentation_ast;
+pub use clang_documentation_ast::parse_clang_documentation_ast;
 
 mod erlang_form_rule;
 pub use erlang_form_rule::erlang_form_rule_sha256;

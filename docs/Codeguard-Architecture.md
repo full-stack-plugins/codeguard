@@ -1539,3 +1539,6 @@ The dedicated `c_family_comments_feedback` 0.1 observation leaves project config
 See [C/C++ original-task recheck acceptance](../tests/acceptance/c-family-comments-task-recheck.md) for current closed protocols and evidence. Full four-core production qualification remains ungranted.
 
 See [C/C++ controlled attempt acceptance](../tests/acceptance/c-family-comments-attempt-history.md) for current repair history and protocols. Local history does not replace full four-core production acceptance.
+
+
+A native Clang AST function-documentation adapter now distinguishes absent comments and missing purpose/parameter/return descriptions. Redeclarations, comment references and complex types remain unknown. Public comments/check and repair integration are pending; this foundation does not replace native warnings or grant production acceptance. See [structural evidence](../tests/acceptance/clang-documentation-structure.md).
