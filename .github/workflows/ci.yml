@@ -48,6 +48,8 @@ jobs:
           cargo test --locked -p codeguard-adapters --test legacy_registry_identity
           cargo test --locked -p codeguard-cli --example audit_legacy_registry
           cargo run --locked -p codeguard-cli --example audit_legacy_registry -- --check tests/acceptance/evidence/legacy-registry-audit-2026-10-06.json
+          cargo test --locked -p codeguard-cli --example audit_legacy_source -- --include-ignored
+          cargo run --locked -p codeguard-cli --example audit_legacy_source -- --check-source ../codeguard-plugin
 
       - name: Preserve the binary without WASM for package rejection
         run: cp target/debug/codeguard "$RUNNER_TEMP/codeguard-no-wasm"

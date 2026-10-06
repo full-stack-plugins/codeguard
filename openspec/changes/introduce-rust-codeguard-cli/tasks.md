@@ -10,7 +10,7 @@
 
 依赖：无。覆盖：unified-cli-contract、native-tool-adapters、binary-distribution。
 
-- [ ] 1.1 核对最新旧源码与 57 项清单差异，建立“保留正确行为 / 明确纠偏 / legacy 兼容”表；验收：每条差异关联 spec 和 fixture。
+- [x] 1.1 核对最新旧源码与 57 项清单差异，建立“保留正确行为 / 明确纠偏 / legacy 兼容”表；验收：每条差异关联 spec 和 fixture。 证据：[最新源码审计](../../../tests/acceptance/legacy-source-migration-audit.md)及[57语言审计](../../../tests/acceptance/legacy-registry-identity-audit.md)。21个源码变化与四项语言字段差异逐项归类，固定Git源码/夹具摘要及六种篡改反例实际核对通过；本项完成迁移差异核对，不代表S05–S12原生实现和宿主验收完成。
 - [x] 1.2 在获准位置建立用户指定 `codeguard-cli/` 四 crate workspace，锁定 MSRV/依赖/Cargo.lock；验收：可运行 `codeguard --version`，无空适配器充数。证据：相邻 `codeguard-cli/tests/acceptance/engineering-baseline.md`；真实适配器能力仍为 gap。
 - [x] 1.3 建立 crate 依赖方向检查；验收：core→runtime、adapters→runtime、宿主 SDK 入 core 等反例均被拒绝。证据：相邻 `codeguard-cli/crates/codeguard-cli/tests/crate_boundaries.rs` 与工程基线验收记录；检查器已改用 Rust 消费 Cargo metadata。
 - [x] 1.4 创建真实语料登记、脱敏和 oracle 格式，收录当前误判/假通过最小样本；验收：源码/工具/规则身份可复现，争议样本独立标记。证据：相邻 `codeguard-cli/tests/acceptance/corpus-baseline.md`；Rust 语料验证与真实 Ruff/Maven 回放已替代新工程的 Python 辅助脚本，历史未复现样本不计入已接受 oracle。
@@ -1760,3 +1760,7 @@ SP22完整默认终态：当前源码workspace all-targets 1500 passed / 0 faile
 ## 2026-10-06 SP27 57语言身份及迁移字段核对（局部验收）
 
 固定插件dec5f9d的57语言快照，Rust工具逐字段核对并归档四项差异；保留扩展名纠偏覆盖，不将legacy命令直接执行。注册表解析拒绝规范身份替换、归属互换、重复未知状态行、未知版本及重复JSON键，实际五失败反例修复后通过。身份6项、适配器库9项和CLI关联46项通过，无失败/忽略。CI增加早期审计。1.1其它非语言行为/真实原生迁移仍开放，父任务不勾选；不改变WASM资格或发行。见[验收](../../../tests/acceptance/legacy-registry-identity-audit.md)。
+
+## 2026-10-06 SP28 最新源码迁移审计完成（1.1）
+
+固定03ebb24..dec5f9d的bin/scripts/hooks全部21项变化，逐项绑定规格、分类依据与固定fixture。Rust审计器实际Git对照及六种篡改反例2通过/0失败/0忽略；旧兼容Python38项通过，Node6通过/2条件跳过，旧架构与可移植校验通过。57语言审计先前已完成。1.1按原任务的差异核对验收勾选；原生六类别、C35完整运行时、宿主权限、WASM资格与发布均不借此完成。提交7fec0c9完整默认workspace275组、1516通过/0失败/135条件忽略；新审计示例单独实际验收，不与基线结果合并。

@@ -72,4 +72,38 @@ Dispositions:
 - **Correct interpretation:** stable denotes historical command declarations, planned remains an explicit gap, formatter-only is not lint, and missing tools or malformed reports cannot imply acceptance. The existing native-tool-adapters, verdict-integrity and syntax-precheck specifications govern these semantics.
 - **Legacy compatibility:** old lint/format/gate argv remain declarations rather than new authorized execution plans or delivery allow. The C++ gate-template difference belongs here. See [compatibility boundaries](Codeguard-Legacy-Compatibility.md).
 
-[Field-level audit](../tests/acceptance/evidence/legacy-registry-audit-2026-10-06.json) and [acceptance](../tests/acceptance/legacy-registry-identity-audit.md). Every row uses the two-snapshot 57-identity fixture; changed rows link specific extension/compatibility fixtures. This inventory audit does not complete the other source-behavior requirements of OpenSpec1.1; the parent remains open.
+[Field-level audit](../tests/acceptance/evidence/legacy-registry-audit-2026-10-06.json) and [acceptance](../tests/acceptance/legacy-registry-identity-audit.md). Every row uses the two-snapshot 57-identity fixture; changed rows link specific extension/compatibility fixtures. The inventory audit alone is insufficient for OpenSpec1.1; the complete source audit below now covers its remaining source-delta scope. See [source acceptance](../tests/acceptance/legacy-source-migration-audit.md). Native implementation and host acceptance remain separate open tasks.
+
+## Complete source delta audit
+
+The fixed source range is `03ebb24..dec5f9d`: all 21 changed files under bin/scripts/hooks are listed below. Source and referenced fixture bytes are checked directly against Git, independently of the active checkout. This audit is not implementation or native migration acceptance.
+
+| Source | Disposition | Specification | Fixture |
+|---|---|---|---|
+| `bin/codeguard` | preserve | hook-protocol | `tests/test_rust_lifecycle.cjs` |
+| `hooks/__protocol__.md` | preserve | hook-protocol | `tests/test_rust_lifecycle.cjs` |
+| `hooks/env_check.py` | legacy | hook-protocol | `tests/test_plugin_manifests.py` |
+| `hooks/gate_lib.py` | legacy | hook-protocol | `tests/test_plugin_manifests.py` |
+| `hooks/hooks.json` | preserve | hook-protocol | `tests/test_rust_lifecycle.cjs` |
+| `hooks/post_tool_lint.py` | legacy | hook-protocol | `tests/test_plugin_manifests.py` |
+| `hooks/pre_tool_git_guard.py` | legacy | hook-protocol | `tests/test_plugin_manifests.py` |
+| `hooks/rust_runtime_dispatch.cjs` | preserve | hook-protocol | `tests/test_rust_lifecycle.cjs` |
+| `hooks/stop_summary.py` | legacy | hook-protocol | `tests/test_plugin_manifests.py` |
+| `hooks/user_prompt_validator.py` | legacy | hook-protocol | `tests/test_prompt_application.py` |
+| `scripts/bump-plugin.mjs` | preserve | binary-distribution | `tests/test_plugin_manifests.py` |
+| `scripts/check_architecture.py` | legacy | execution-kernel | `tests/test_architecture.py` |
+| `scripts/codeguard/engine.py` | correct | verdict-integrity | `tests/test_engine_boundary.py` |
+| `scripts/codeguard/gate.py` | preserve | execution-kernel | `tests/test_skip_gate_safety_scope.py` |
+| `scripts/codeguard/git_guard_application.py` | legacy | hook-protocol | `tests/test_skip_gate_safety_scope.py` |
+| `scripts/codeguard/prompt_application.py` | legacy | hook-protocol | `tests/test_skip_gate_safety_scope.py` |
+| `scripts/codeguard/reporting.py` | legacy | hook-protocol | `tests/test_skip_gate_safety_scope.py` |
+| `scripts/codeguard/toolchain.py` | preserve | execution-kernel | `tests/test_skip_gate_safety_scope.py` |
+| `scripts/engine_report.py` | correct | verdict-integrity | `tests/test_engine_boundary.py` |
+| `scripts/paths.py` | preserve | execution-kernel | `tests/test_skip_gate_safety_scope.py` |
+| `scripts/validate_portable_plugin.py` | preserve | binary-distribution | `plugin.json` |
+
+```bash
+cargo run --locked -p codeguard-cli --example audit_legacy_source -- --check-source ../codeguard-plugin
+```
+
+[Full source/fixture hashes and rationale](../tests/acceptance/evidence/legacy-source-audit-2026-10-06.json). `preserve`, `correct`, `legacy` mean retain valid behavior, explicitly correct semantics, and retain named legacy compatibility. The engine inventory and exit-zero observations do not grant protected delivery authority; Python PATH discovery remains legacy only.
