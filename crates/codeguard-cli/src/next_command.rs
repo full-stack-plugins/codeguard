@@ -1780,6 +1780,20 @@ fn current_correction_refs(
 }
 
 fn finding_repair_step(checker_id: &str, rule: &str) -> &'static str {
+    if checker_id == "rust.cargo_clippy" {
+        match rule {
+            "clippy::missing_errors_doc" => {
+                return "核对实际 Result 错误类型与触发条件，补齐 # Errors 的具体说明；章节标题不能代替内容，不改变返回类型或错误行为迎合检查；按原任务原 Cargo 运行 task verify，零诊断不代表详细契约或可信关闭";
+            }
+            "clippy::missing_panics_doc" => {
+                return "核对实际 panic、unwrap、expect 及适用调用条件，补齐 # Panics 的具体说明；章节标题不能代替内容，不改变 API 行为迎合检查；按原任务原 Cargo 运行 task verify，隐式或跨调用 panic 仍需调查";
+            }
+            "clippy::missing_safety_doc" => {
+                return "核对 unsafe API 的调用前置条件与调用者责任，补齐 # Safety 的具体说明；章节标题不能代替内容，不删除 unsafe 或改变 API 逃逸；按原任务原 Cargo 运行 task verify，说明的准确性仍需语义核验";
+            }
+            _ => {}
+        }
+    }
     if checker_id == "python.ruff" {
         if let Some(doc) = codeguard_adapters::RuffDocumentationRule::from_code(rule) {
             return doc.step;
@@ -2569,6 +2583,22 @@ fn parse_format(value: &str) -> Result<bool, String> {
 mod python_action_tests {
     use super::canonical_action_id;
     use serde_json::json;
+    #[test]
+    fn clippy_documentation_guidance_requires_exact_checker_and_rule() {
+        for (rule, section) in [
+            ("missing_errors_doc", "Errors"),
+            ("missing_panics_doc", "Panics"),
+            ("missing_safety_doc", "Safety"),
+        ] {
+            let rule = format!("clippy::{rule}");
+            assert!(super::finding_repair_step("rust.cargo_clippy", &rule).contains(section));
+            assert!(!super::finding_repair_step("python.ruff", &rule).contains(section));
+            assert!(
+                !super::finding_repair_step("rust.cargo_clippy", &format!("{rule}_unknown"))
+                    .contains(section)
+            );
+        }
+    }
     #[test]
     fn native_syntax_evidence_controls_action_even_when_budget_requires_decision() {
         let mut brief = json!({"kind":"blocker","checker_id":"python.ruff","reason_code":"python_syntax_confirmation_needed","verification_observation":"still_present","disposition":"actionable"});

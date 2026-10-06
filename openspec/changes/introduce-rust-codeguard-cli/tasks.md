@@ -2093,3 +2093,5 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 CI37503859591终态MSRV通过、gate源码检出失败。确认语料9e4adb1远端可达，审计dec5f9d只在插件本地main；本地固定Git21项审计及两个变异/缺仓库目标通过、旧注册表审计回放通过；插件Node6通过/2实际条件跳过、技能vendor离线/在线通过。插件main有3个远端未包含提交，候选branch不是其祖先；主分支推送会改变默认Hook，已请求授权但尚未执行，不强推/合并/更换来源或发市场。待决动作与证据见tests/acceptance/ci-source-reachability.md。
 
 逐语言四核心、32grammar完整原生版本/方言与独立语料、可信闭环、平台/性能/宿主/发行仍未完成；父任务保持66完成/288待完成，正式grammar资格0/32。受保护Erlang草稿未修改、执行或提交。
+
+2026-10-07 Rust Clippy 文档契约局部进展：延续7.1/15.3/15.6，原 Errors 指引测试先RED后补齐三个精确原规则指引，真实已有Clippy验证重复身份、仍存在、allow抑制及修复后未受信消失。空章节标题被本机原生接受，不能证明详细说明；未选pedantic不自动开启。源码事实仍open，comments rust仍独立Rustdoc探针；详细内容/全部构建组合/统一类别/独立精度/可信闭环仍未完成，不勾选父任务、不改变0/32资格。见tests/acceptance/clippy-documentation-contract.md。
