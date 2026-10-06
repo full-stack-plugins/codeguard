@@ -99,6 +99,15 @@ fn native_documentation_profile_is_distinct_source_bound_and_has_repair_guidance
     let r = read_report(&invoke(&source, "c", &selected, "c11", true));
     assert_eq!(r["report_type"], "c_family_comments_feedback");
     assert_eq!(r["local_scan_complete"], true);
+    assert_eq!(r["documentation_structure"]["status"], "incomplete");
+    assert_eq!(
+        r["documentation_structure"]["reason"],
+        "clang_structure_report_invalid"
+    );
+    assert_eq!(
+        r["documentation_structure"]["native_raw_diagnostic_count"],
+        1
+    );
     assert_eq!(r["documentation_findings"].as_array().unwrap().len(), 1);
     let finding = &r["documentation_findings"][0];
     assert_eq!(
@@ -245,6 +254,7 @@ fn changed_source_or_tool_and_wrong_version_withdraw_documentation_diagnostics()
         let r = read_report(&invoke(&source, "c", &selected, "c11", true));
         assert_eq!(r["local_scan_complete"], false);
         assert_eq!(r["documentation_findings"], json!([]));
+        assert_eq!(r["documentation_structure"]["observation"], Value::Null);
         assert_eq!(
             r["native"]["reason"],
             match modification {

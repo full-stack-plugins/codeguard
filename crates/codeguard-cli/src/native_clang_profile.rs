@@ -7,13 +7,17 @@ pub(crate) enum NativeClangProfile {
     Syntax,
     /// 检查Clang认识的文档注释命令和描述，不证明全部API文档覆盖。
     Documentation,
+    /// 同次原生扫描输出警告和函数文档AST，结构事实不冒充原警告或完整政策。
+    DocumentationStructure,
 }
 impl NativeClangProfile {
     /// 返回固定原生警告参数；无运行输入，返回静态字面argv列表。
     pub(crate) fn warning_flags(self) -> &'static [&'static str] {
         match self {
             Self::Syntax => &["-Wall", "-Wextra", "-Wpedantic"],
-            Self::Documentation => &["-Wdocumentation", "-Wdocumentation-pedantic"],
+            Self::Documentation | Self::DocumentationStructure => {
+                &["-Wdocumentation", "-Wdocumentation-pedantic"]
+            }
         }
     }
 }

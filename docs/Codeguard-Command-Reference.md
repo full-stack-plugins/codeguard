@@ -473,3 +473,6 @@ The dedicated `c_family_comments_feedback` 0.1 observation leaves project config
 See [C/C++ original-task recheck acceptance](../tests/acceptance/c-family-comments-task-recheck.md) for current closed protocols and evidence. Full four-core production qualification remains ungranted.
 
 See [C/C++ controlled attempt acceptance](../tests/acceptance/c-family-comments-attempt-history.md) for current repair history and protocols. Local history does not replace full four-core production acceptance.
+
+
+Explicit C/C++ comments now returns native warnings and function-documentation structure from one scan. Zero warnings can still expose absent comments; unsupported/invalid or changed-input structures cannot become violations. Feedback0.5/0.6 preserves raw warning counts and groups repeated positions. Structural tasks remain not_integrated and full detailed-documentation qualification is not granted. See [public structural feedback](../tests/acceptance/c-family-comments-structure-cli.md).

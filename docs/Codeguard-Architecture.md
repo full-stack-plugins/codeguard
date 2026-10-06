@@ -1541,4 +1541,7 @@ See [C/C++ original-task recheck acceptance](../tests/acceptance/c-family-commen
 See [C/C++ controlled attempt acceptance](../tests/acceptance/c-family-comments-attempt-history.md) for current repair history and protocols. Local history does not replace full four-core production acceptance.
 
 
-A native Clang AST function-documentation adapter now distinguishes absent comments and missing purpose/parameter/return descriptions. Redeclarations, comment references and complex types remain unknown. Public comments/check and repair integration are pending; this foundation does not replace native warnings or grant production acceptance. See [structural evidence](../tests/acceptance/clang-documentation-structure.md).
+A native Clang AST function-documentation adapter now distinguishes absent comments and missing purpose/parameter/return descriptions. Redeclarations, comment references and complex types remain unknown. Explicit comments feedback is connected; check and structural repair integration remain pending; this foundation does not replace native warnings or grant production acceptance. See [structural evidence](../tests/acceptance/clang-documentation-structure.md).
+
+
+Explicit C/C++ comments now returns native warnings and function-documentation structure from one scan. Zero warnings can still expose absent comments; unsupported/invalid or changed-input structures cannot become violations. Feedback0.5/0.6 preserves raw warning counts and groups repeated positions. Structural tasks remain not_integrated and full detailed-documentation qualification is not granted. See [public structural feedback](../tests/acceptance/c-family-comments-structure-cli.md).

@@ -48,6 +48,7 @@ pub fn run(args: &[String]) -> ExitCode {
     ]);
     let mut native = json!({"status":"incomplete","reason":"clang_source_scope_unavailable","version":null,"tool_sha256":null,"diagnostics":[]});
     let mut source_sha256 = Value::Null;
+    let mut structure = json!({"status":"incomplete","reason":"clang_structure_unavailable","observation":null,"native_raw_diagnostic_count":null});
     let source_observation = crate::plain_syntax_source::read_plain_source(&request.source);
     if let Ok(source) = &source_observation {
         let extension = path.extension().and_then(|extension| extension.to_str());
@@ -60,7 +61,7 @@ pub fn run(args: &[String]) -> ExitCode {
         };
         if applicable {
             source_sha256 = json!(format!("{:x}", Sha256::digest(source)));
-            native = crate::clang_syntax_probe::observe_documentation(
+            (native, structure) = crate::clang_syntax_probe::observe_documentation_with_structure(
                 request.clang_tool.as_deref().expect("工具上下文已校验"),
                 &request.language,
                 request.standard.as_deref().expect("标准上下文已校验"),
@@ -74,6 +75,7 @@ pub fn run(args: &[String]) -> ExitCode {
                 native["status"] = json!("incomplete");
                 native["reason"] = json!("clang_source_changed");
                 native["diagnostics"] = json!([]);
+                structure = json!({"status":"incomplete","reason":"clang_source_changed","observation":null,"native_raw_diagnostic_count":null});
             }
         }
     } else if let Err(reason) = source_observation {
@@ -88,6 +90,7 @@ pub fn run(args: &[String]) -> ExitCode {
             "clang_execution_incomplete"
         });
         native["diagnostics"] = json!([]);
+        structure = json!({"status":"incomplete","reason":if cancelled {"request_cancelled"}else{"clang_execution_incomplete"},"observation":null,"native_raw_diagnostic_count":null});
     }
     let mut documentation_findings = Vec::new();
     let mut unclassified = Vec::new();
@@ -132,9 +135,17 @@ pub fn run(args: &[String]) -> ExitCode {
             deadline,
         );
         report["next_actions"][0] = json!(
-            "按当前原生规则和位置修正文档并运行原工具复扫；稳定任务已接入，专用task verify及可信关闭仍待实现。"
+            "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务与可信关闭仍待实现。"
         );
     }
+    report["schema_version"] = json!(if report.get("workbench").is_some() {
+        "0.6.0"
+    } else {
+        "0.5.0"
+    });
+    report["documentation_structure"] = structure;
+    report["structural_task_workflow_status"] = json!("not_integrated");
+    report["next_actions"].as_array_mut().expect("固定反馈动作").push(json!("读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；结构任务与原工具结构复检仍待接线，不把非空说明当准确性或关闭证据。"));
     if request.json {
         println!("{report}");
     } else {
@@ -146,6 +157,27 @@ pub fn run(args: &[String]) -> ExitCode {
             "原生状态 {}；原因 {}",
             report["native"]["status"], report["native"]["reason"]
         );
+        println!(
+            "原生文档结构 {}；原因 {}",
+            report["documentation_structure"]["status"],
+            report["documentation_structure"]["reason"]
+        );
+        for row in report["documentation_structure"]["observation"]["functions"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .take(8)
+        {
+            println!(
+                "文档结构 {}：{}:{}:{}；缺失组件 {}；状态 {}",
+                row["name"],
+                report["path"],
+                row["line"],
+                row["column_byte"],
+                row["missing_components"],
+                row["structure_status"]
+            );
+        }
         if !report["workbench"].is_null() {
             println!(
                 "工作台 {}；任务 {}",

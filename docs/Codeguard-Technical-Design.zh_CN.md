@@ -2029,4 +2029,7 @@ C/C++ 原任务复检与新封闭协议的当前证据见[复检验收](../tests
 C/C++ 受控尝试、无进展诊断与当前协议见[尝试日志验收](../tests/acceptance/c-family-comments-attempt-history.md)；本地日志不能替代完整四核心生产验收。
 
 
-C/C++现新增原生Clang AST函数文档结构适配器，可区分无文档、空用途及缺参数/返回说明；重声明、文档引用和复杂类型保持未知。该底层能力尚未接入公开comments/check与任务闭环，不替代现有原生警告或完整生产验收。见[结构验收](../tests/acceptance/clang-documentation-structure.md)。
+C/C++现新增原生Clang AST函数文档结构适配器，可区分无文档、空用途及缺参数/返回说明；重声明、文档引用和复杂类型保持未知。该能力现已接入显式comments反馈，check与结构任务闭环尚未接入，不替代现有原生警告或完整生产验收。见[结构验收](../tests/acceptance/clang-documentation-structure.md)。
+
+
+C/C++显式comments现同次原生扫描返回原警告及函数文档结构：无原警告也会报告缺注释；未知/非法结构、源码工具失稳不变成违规。反馈0.5/0.6保留原条数并归并重复定位，结构任务状态仍not_integrated，完整详细文档资格未授予。见[公开结构反馈](../tests/acceptance/c-family-comments-structure-cli.md)。

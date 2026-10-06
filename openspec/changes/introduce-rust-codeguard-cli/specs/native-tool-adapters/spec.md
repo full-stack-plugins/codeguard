@@ -1150,3 +1150,18 @@ Codeguard SHALL interpret a version-bound original Clang JSON AST to distinguish
 - **WHEN** a function redeclares an earlier declaration, or a class/template/other unimplemented declaration is present
 - **THEN** inheritance or unsupported context SHALL remain unknown without missing-comment allegations or complete coverage claims
 - **AND** nonempty text SHALL NOT prove semantic accuracy, detailed behavior or trusted closure
+
+
+### Requirement: Public C-family comments SHALL expose separately bounded native structural observations
+
+The explicit standalone comments command SHALL obtain warning diagnostics and a function-documentation JSON AST from one original Clang scan of the same frozen stdin, under the same selected-tool identity, deadline and cancellation boundary. It SHALL expose structural observation separately from original native warnings, withdraw structure on source/tool changes or interruption, and preserve an explicit structural failure if AST is malformed. Existing warning facts SHALL NOT be invented from structural absence.
+
+#### Scenario: Zero warnings hide absent documentation
+- **WHEN** comments c/cpp executes a supported explicit standalone source with no function documentation and the original warnings are empty
+- **THEN** the public report SHALL include native AST-associated absence with local_unverified authority and not_granted qualification
+- **AND** uninitialized projects SHALL remain uninitialized; structural task creation and trusted closure SHALL NOT be implied
+
+#### Scenario: One original scan emits warnings but no usable AST
+- **WHEN** native warning evidence is valid but the independently interpreted AST is unavailable, malformed or outside supported budget
+- **THEN** original warning evidence SHALL remain separately visible while structural coverage is incomplete
+- **AND** no additional compilation, project configuration mutation or free compiler arguments SHALL be introduced

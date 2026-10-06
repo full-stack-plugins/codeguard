@@ -974,3 +974,6 @@ Rust CVE局部观察现在核对同轮RustSec crates/rust内容、成员及物�
 C/C++ 原任务复检与新封闭协议的当前证据见[复检验收](../tests/acceptance/c-family-comments-task-recheck.md)；完整四核心生产资格仍未授予。
 
 C/C++ 受控尝试、无进展诊断与当前协议见[尝试日志验收](../tests/acceptance/c-family-comments-attempt-history.md)；本地日志不能替代完整四核心生产验收。
+
+
+C/C++显式comments现同次原生扫描返回原警告及函数文档结构：无原警告也会报告缺注释；未知/非法结构、源码工具失稳不变成违规。反馈0.5/0.6保留原条数并归并重复定位，结构任务状态仍not_integrated，完整详细文档资格未授予。见[公开结构反馈](../tests/acceptance/c-family-comments-structure-cli.md)。
