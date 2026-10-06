@@ -796,3 +796,14 @@ Project Rust parser selection SHALL distinguish package edition, explicit worksp
 #### Scenario: 原始WASM候选与原生零诊断保持同一源码
 - **WHEN** 有效且当前的局部原生复检没有语法诊断，绑定的源码摘要仍等于首次WASM候选摘要，且原始grammar引用可核对
 - **THEN** next/task show SHALL 将此作为grammar反证候选处理，指导兼容性/预算调查而不是声称源码已修复；输入变化或原生首次来源不得套用同字节WASM反证描述，任务仍保留既有复检和关闭权威
+
+### Requirement: Duplicate binding facts SHALL preserve lexical scope and parser evidence
+有界AST事实扫描 SHALL 只在调用方指定的同一直接父作用域内比较明确的声明与简单标识符节点，返回重复声明的原始位置，不将事实伪造为ERROR/MISSING。所有访问和记录有预算，截断不证明不存在重复；不通过文本搜索把注释、字符串或嵌套作用域当作声明。该事实不单独批准JavaScript检查完整或替代原生确认。
+
+#### Scenario: Direct JavaScript lexical declarations repeat the same simple name
+- **WHEN** 固定JavaScript grammar对`const x=1; const x=2;`没有恢复节点
+- **THEN** 直接program下lexical_declaration的简单identifier重复事实可独立观察；保留原始parser零恢复和语言未验收状态
+
+#### Scenario: Scope or declaration semantics differ
+- **WHEN** 同名声明位于嵌套块或函数、仅为var重复声明、出现在字符串/注释，或需解构/export/转义归一化和模块上下文解释
+- **THEN** 简单直接绑定事实扫描不把这些情况猜成相同作用域违规；未接线的语言规则与范围不声明已完成

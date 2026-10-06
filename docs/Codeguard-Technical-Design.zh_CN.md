@@ -1628,3 +1628,5 @@ WASM 首次闭环的实际执行路径、协议与误报分流见 [验收记录]
 完整局部原生复检没有语法诊断时，next/task show会比较首次WASM与本次源码摘要；同字节且原grammar引用有效，明确提示grammar反证候选并调查兼容/预算。输入改变和原生首次来源不套用此描述。任务仍开放，不据此自动白名单放行或批准交付。[Acceptance](../tests/acceptance/native-same-source-counterevidence.md)
 
 Javadoc主源码选择以最近观察到的构建根为基准；没有独立构建根的`vendor/src/main/java/`不能借用外层主源集配置。Maven多文件探针排除归属于更近构建根的源码，内层未确认Javadoc配置时也不借父配置扫描。未解析源码仍可见并保持覆盖未完成；自定义源目录和Maven effective模型仍待实现。[验收](../tests/acceptance/javadoc-build-root-source-scope.md)
+
+runtime新增有界直接同级绑定AST事实。JavaScript开发测试将重复直接let/const名称与Node的module/CommonJS模式对照，保留嵌套作用域及var反例。该基础设施尚未接入公开worker报告、CLI检查或修复任务；现有公开发现及差分计数不变。须补语言规则、报告版本和原生确认接线后，才能成为用户可用能力。[验收](../tests/acceptance/javascript-direct-binding-facts.md)

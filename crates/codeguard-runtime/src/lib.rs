@@ -30,6 +30,15 @@ mod wasm_root_child_scan;
 #[cfg(feature = "wasm-precheck")]
 pub use wasm_root_child_scan::{WasmRootChildScan, scan_wasm_root_child};
 
+#[cfg(feature = "wasm-precheck")]
+mod wasm_duplicate_binding;
+#[cfg(feature = "wasm-precheck")]
+pub use wasm_duplicate_binding::WasmDuplicateBinding;
+#[cfg(feature = "wasm-precheck")]
+mod wasm_sibling_binding_scan;
+#[cfg(feature = "wasm-precheck")]
+pub use wasm_sibling_binding_scan::{WasmSiblingBindingScan, scan_wasm_sibling_bindings};
+
 #[cfg(unix)]
 mod installed_artifact;
 #[cfg(unix)]
