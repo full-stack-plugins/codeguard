@@ -52,3 +52,5 @@ flowchart LR
 WASM 构建相同两个 Gradle 目标 8 通过、0 失败、4 条件忽略，与默认用例重叠，不累加为独立样本。默认及 WASM 的 CLI/适配器全目标 Clippy 通过；分层、OpenSpec strict 和 diff 检查通过。详见 [同批摘要](evidence/gradle-native-javadoc-2026-10-06.json)。本批未安装下载工具、未发布 npm、未执行用户 Erlang 草稿。
 
 未完成：公开质量入口/智能体反馈、修复任务及原工具复检关闭、完整 JDK 闭包、原项目完整源码及配置范围、自定义 doclet、多项目实际质量任务、故障/取消下完整后代清理验收、详细 throws/字段/行为契约及所有语言覆盖。前后核对 Gradle 完整树与 JDK 入口/release 不等于供应链信任或完整 JDK 绑定。当前父任务、语言生产资格和32份语法正式资格均不由这批局部结果升级。
+
+后续批次已接通公开质量检查，见 [公开入口验收](gradle-public-javadoc-check.md)；本文件描述内部服务批次的证据范围。修复任务闭环仍未完成。

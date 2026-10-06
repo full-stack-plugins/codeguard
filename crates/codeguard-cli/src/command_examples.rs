@@ -40,6 +40,7 @@ pub(crate) fn examples(command: &str) -> &'static [&'static str] {
         "check" => &[
             "codeguard check all . --timeout 60s --jobs 1 --format json",
             "codeguard check java . --gradle-bundle /absolute/gradle --java-home /absolute/jdk --gradle-project-file settings.gradle --gradle-project-file build.gradle --format json",
+            "codeguard check java . --gradle-javadoc --gradle-bundle /absolute/gradle --java-home /absolute/jdk21 --gradle-project-file settings.gradle --gradle-project-file build.gradle --gradle-project-file src/main/java/Example.java --format json",
             "codeguard check go . --go-tool /absolute/sdk/bin/go --format json",
             "codeguard check swift . --swift-tool /absolute/swift --format json",
             "codeguard check kotlin . --kotlinc-tool /absolute/kotlinc --format json",

@@ -1,0 +1,69 @@
+{
+  "record_kind": "local_acceptance_summary",
+  "recorded_date": "2026-10-06",
+  "scope": "public check java/all explicit Gradle Javadoc; no automatic task persistence/closure",
+  "source_sha256": {
+    "crates/codeguard-cli/src/check_command.rs": "ff77704c937021b86efdfbf071d169424e2b42883418420dc728c4432a04fe7c",
+    "crates/codeguard-cli/src/command_examples.rs": "86a51df5440e972a3f3ce9955e24484be709f4ff660a4e501f7f7abd61b81090",
+    "crates/codeguard-cli/src/gradle_javadoc_probe.rs": "975a919f3236e85083966547fc96208d480034a17b150569fe1be781f6191a62",
+    "crates/codeguard-cli/tests/gradle_javadoc_probe.rs": "6355c1471813882313f58722b37a5f6d2d61f7bc9c23925410dfd206918816be",
+    "schemas/check-feedback-v0.63.schema.json": "2587c3abc42bb3e82f93b39b5aad0e61a533d9976264acefb68e8729e265f253",
+    "schemas/check-aborted-v0.17.schema.json": "76661b466f15bc08712848d94ee547bef15d9d3181df19725d080b66f15bc415"
+  },
+  "tests": {
+    "default_gradle": {
+      "passed": 11,
+      "failed": 0,
+      "ignored": 5
+    },
+    "entry_regression": {
+      "passed": 18,
+      "failed": 0,
+      "ignored": 1
+    },
+    "aggregation_unit": {
+      "passed": 5,
+      "failed": 0
+    },
+    "actual_public_gradle": {
+      "passed": 1,
+      "failed": 0,
+      "observations": 2,
+      "diagnostic_counts": [
+        3,
+        0
+      ]
+    },
+    "wasm_gradle": {
+      "passed": 11,
+      "failed": 0,
+      "ignored": 5,
+      "overlap_with_default": true
+    }
+  },
+  "schema": {
+    "meta_valid": 415,
+    "actual_cli_reports_valid": 5,
+    "constructed_unit_report_valid": 1,
+    "forgeries_rejected": 7,
+    "old_consumer_rejected": true
+  },
+  "checks": {
+    "default_clippy": "pass",
+    "wasm_clippy": "pass",
+    "layering": "pass",
+    "openspec_strict": "pass",
+    "diff": "pass"
+  },
+  "coverage_proven": false,
+  "production_qualified": false,
+  "delivery_decision": "not_evaluated",
+  "reports_sha256": "ed073c09bfe7976db551396957bde36dfaa9977212d6ba003f51ac336549e882",
+  "pending": [
+    "automatic task persistence and native recheck closure",
+    "complete detailed documentation rules and configuration/source/JDK closure",
+    "multi-project/custom-doclet quality coverage",
+    "complete descendant cleanup acceptance",
+    "57-language core production qualification and formal 32-grammar qualification"
+  ]
+}
