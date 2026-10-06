@@ -14,6 +14,8 @@ use crate::workspace_refresh::read_workspace_baseline;
 
 const MAX_FACT_BYTES: u64 = 128 * 1024;
 const MAX_SOURCE_BYTES: u64 = 16 * 1024 * 1024;
+#[cfg(unix)]
+mod c_family_comments_candidate;
 
 struct Arguments {
     root: PathBuf,
@@ -443,6 +445,13 @@ fn independent_source_task_index(root: &Path, candidates: &[Candidate]) -> Optio
 }
 
 fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static str> {
+    #[cfg(unix)]
+    if matches!(
+        fact["checker_id"].as_str(),
+        Some("c.clang.documentation" | "cpp.clang.documentation")
+    ) {
+        return c_family_comments_candidate::candidate(root, id, fact);
+    }
     let kind = fact["kind"].as_str().ok_or("finding_kind_invalid")?;
     let fingerprint = fact["fingerprint"]
         .as_str()
@@ -2420,7 +2429,7 @@ fn run_sequence(run_id: &str) -> Option<u128> {
 
 fn view(disposition: &str, reason: &str, brief: Value, actions: Value) -> Value {
     json!({
-        "schema_version":if brief["schema_version"] == "0.27.0" {json!("0.27.0")}else if brief["schema_version"] == "0.26.0" {json!("0.26.0")}else if brief["schema_version"] == "0.25.0" {json!("0.25.0")}else if brief["schema_version"] == "0.24.0" {json!("0.24.0")}else if brief["schema_version"] == "0.23.0" {json!("0.23.0")}else if brief["schema_version"] == "0.22.0" {json!("0.22.0")}else if brief["schema_version"] == "0.21.0" {json!("0.21.0")}else if brief["schema_version"] == "0.20.0" {json!("0.20.0")}else if brief["checker_id"] == "shell.shellcheck" {json!("0.17.0")} else if brief["checker_id"] == "go.vet" {json!("0.13.0")} else if brief["checker_id"] == "syntax.native_confirmation" {brief["schema_version"].clone()} else {json!("0.1.0")}, "report_type":"repair_brief_preview",
+        "schema_version":if brief["schema_version"] == "0.28.0" {json!("0.28.0")}else if brief["schema_version"] == "0.27.0" {json!("0.27.0")}else if brief["schema_version"] == "0.26.0" {json!("0.26.0")}else if brief["schema_version"] == "0.25.0" {json!("0.25.0")}else if brief["schema_version"] == "0.24.0" {json!("0.24.0")}else if brief["schema_version"] == "0.23.0" {json!("0.23.0")}else if brief["schema_version"] == "0.22.0" {json!("0.22.0")}else if brief["schema_version"] == "0.21.0" {json!("0.21.0")}else if brief["schema_version"] == "0.20.0" {json!("0.20.0")}else if brief["checker_id"] == "shell.shellcheck" {json!("0.17.0")} else if brief["checker_id"] == "go.vet" {json!("0.13.0")} else if brief["checker_id"] == "syntax.native_confirmation" {brief["schema_version"].clone()} else {json!("0.1.0")}, "report_type":"repair_brief_preview",
         "operation":"next", "command_status":"complete", "exit_code":0,
         "disposition":disposition, "reason":reason,
         "repair_brief":brief, "next_actions":actions,

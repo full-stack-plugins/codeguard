@@ -20,6 +20,7 @@ pub(crate) fn examples(command: &str) -> &'static [&'static str] {
         ],
         "comments" => &[
             "codeguard comments c api.c --clang-tool /absolute/clang --standard c11 --format json",
+            "codeguard comments c /absolute/project/api.c --workspace /absolute/project --clang-tool /absolute/clang --standard c11 --format json",
             "codeguard comments cpp api.cpp --clang-tool /absolute/clang --standard c++17 --format json",
             "codeguard comments java File.java --java-home /absolute/jdk21 --format json",
             "codeguard comments java File.java --workspace . --java-home /absolute/jdk21 --format json",

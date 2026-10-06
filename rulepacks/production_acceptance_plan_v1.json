@@ -22,8 +22,8 @@
     "crates/codeguard-adapters/src/ruff_settings.rs": "23736d55ef974a9f0b571d162365c6554001fa5ee3b2b69db6deb4507466af88",
     "crates/codeguard-adapters/tests/clang_documentation_contract.rs": "9d603b7ccb435c5e55837156e76d506573e8703aadf7017be07b6cf28281e261",
     "crates/codeguard-adapters/tests/ruff_settings_contract.rs": "a34cd88caaf4d1d49688bcbc31d534ba21b5298f5e1a1c9bd59125ceda3e072a",
-    "crates/codeguard-cli/src/c_family_comments_arguments.rs": "dba74490d78d723967f93004bcdb7db7b9d0f2c35ae48c5d8ce9d0808b232add",
-    "crates/codeguard-cli/src/c_family_comments_command.rs": "4721d59801576e8ae7217f5edab1afff7bb873883d2b24e7af30edda9e991b30",
+    "crates/codeguard-cli/src/c_family_comments_arguments.rs": "5de2e41865b78231ad1ac3aab9a61549e4a56c1b12e89801f23e83abdda01a3e",
+    "crates/codeguard-cli/src/c_family_comments_command.rs": "42eb21dd52c1605345e19e83d3b13cef8de0b3e61c274cc674d4b91fd081d796",
     "crates/codeguard-cli/src/cargo_audit_command.rs": "4d49405d1e69a55ba13046f463663443ef30c1a931451c044bed5b3b8d0c0749",
     "crates/codeguard-cli/src/cargo_audit_database_snapshot.rs": "c21185f19669ab6a8568c2d00f218251bc1e6cb35a4057c401c4cee69713db8a",
     "crates/codeguard-cli/src/check_command.rs": "3332462348b2d973f0db1a7cd20d5ced5ef23903e9d8760fc715a070e53b5d80",
@@ -49,7 +49,7 @@
     "crates/codeguard-cli/src/kotlin_lint_command.rs": "f19e0babe23cc3cce52d69d6821416d6b9fdd7b6d8b484d3413e1368fef05ad8",
     "crates/codeguard-cli/src/maven_javadoc_task_recheck.rs": "d55951f3a1b960e8885a1027d5375909bbd4e7a33d6461ff724ad65d9d35febd",
     "crates/codeguard-cli/src/native_clang_profile.rs": "85e175638fae0898f2d49a9899712727b43851f74b127cc457980f90a151fcea",
-    "crates/codeguard-cli/src/next_command.rs": "af95bad4d5a599d4f3a78cb9ff66fc6085a966390bc1231b1ca8e196510e86fa",
+    "crates/codeguard-cli/src/next_command.rs": "4b3c9b2b9996fe8624f0e1eaf1400d5c6cba472fc11b3a0838bfc290e3f6e208",
     "crates/codeguard-cli/src/npm_audit_command.rs": "68a3cdf49008d6ad8b6a58b7aa07bf0a0dc65876160edef2213d30a1bc367b01",
     "crates/codeguard-cli/src/partial_sarif_feedback.rs": "957236601864e568e999288e39183420f0c10ea2c1c31fd9d29de8e176069e20",
     "crates/codeguard-cli/src/python_comments_arguments.rs": "49e2305246bb4f8ad84cf2b061b68065d0efb4fb642c66fb8ee8c94ad32280cd",
@@ -67,9 +67,9 @@
     "crates/codeguard-cli/src/rust_project_syntax.rs": "6c3a274337fb1b762ee0a73f7171b9e64f9a5d59be23a8f6645ff6d9e4bc2033",
     "crates/codeguard-cli/src/shell_lint_command.rs": "8e3d859a6c52e282296975751f9fe74e26eb7371105740f526f22990e79d72ae",
     "crates/codeguard-cli/src/swift_lint_command.rs": "182c8a6b43df9164f0c95c91f089bb2be921f56e54b6c6e81d35ae00f717d752",
-    "crates/codeguard-cli/src/task_attempt_command.rs": "93879ad17dddce9b90fdf6bc64c2e6e0feac8a26eb3ab0a663c667fd6c5d58d3",
-    "crates/codeguard-cli/src/task_verify_command.rs": "3550968173682c00d23209625351912699fb7b845be188a53740abf541841639",
-    "crates/codeguard-cli/src/work_sync.rs": "f9eb6a4d19d0cc5558cb930c16c5ad4e3b5ca14827302ccb19378afe308b7130",
+    "crates/codeguard-cli/src/task_attempt_command.rs": "178001ae9a0ae494d61602762cb95b00f3959547eb48282569225300c0dfa9d3",
+    "crates/codeguard-cli/src/task_verify_command.rs": "1fe986d75bcbc40c9736d903d171483e6440a48da2288f2b4721fe4e4b5b4f90",
+    "crates/codeguard-cli/src/work_sync.rs": "277b6d0cbae2b7c13df94e8c58296c32c3872e856454bdcacaea14ce2a02c878",
     "crates/codeguard-cli/src/work_sync/gradle_cve_report.rs": "1b8478d43a02101112e2ac58ff5d53b9b3300b0dc05ceabd3e981425221ffe92",
     "crates/codeguard-cli/src/work_sync/rust_cve_report.rs": "a5ed6b941bbf754ad6220095963c8705eab7761feaba0e2406d6511fd185ab86",
     "crates/codeguard-cli/src/zig_lint_command.rs": "5b8ba70c0d613c56f4db7ced0d09e5bcb75468ab8ea35fcfe269626d55549e3f",
@@ -87,7 +87,7 @@
     "schemas/python-comments-feedback-v0.1.schema.json": "90c96bd468de354048714edf91247827092c2e56269c3b1f85aa584933a10a08",
     "schemas/python-comments-feedback-v0.2.schema.json": "0206f7d7e5a5fc1854a1204dcaecaec4c20bde21c52faa0a40f50cd6cf49956e",
     "schemas/rust-comments-feedback-v0.1.schema.json": "90a91bcf9654766eb3c758ba0520d15dc14e299e97a62de2a8b8daa240861963",
-    "tests/acceptance/c-family-comments-native.md": "af99e60a45bfae0a0beb3d8ed334698244134005145e682b10773a721dc9d443",
+    "tests/acceptance/c-family-comments-native.md": "3a55885beb6d02fb53641f8b3f0a45391d73a0b954146ff9824857feeb5164b0",
     "tests/acceptance/c-family-native-punctuation.md": "4465d86d3afaba9e2a54c3a58e5b5d2df102e670ccc487b1b26d125b704d08b3",
     "tests/acceptance/c-family-native-replay.md": "4785bd96ba17fa12f7958628ac2562301e6a04611b01a5065783d52afb9d6786",
     "tests/acceptance/cargo-audit-database-stability.md": "41872398f618a48e9ca3c65aab72563df769e2d5e6296ff14a0e2ad4b57dc2e8",
@@ -176,7 +176,21 @@
     "tests/acceptance/zig-native-differential.md": "3e67a9508411fa210897b22c36869500de5edad1ea3080c7e34592a37c44419c",
     "tests/c_family_comments_schema.py": "b71f373e6b69c7ee76d500ff6d0b04510151193bf744fc1e8ec04b8b52f25f14",
     "tests/fixtures/java_native_tool_bootstrap/pom.xml": "651bd2709304a8bf5a7371b5a7503bedf9482a2f915afd5d93cf36a5473410a5",
-    "tests/fixtures/java_native_tool_bootstrap/src/main/java/BootstrapDocs.java": "2cb6b78b759253536027b34afc500f751d1e4614420f77ddcd5623a9a7ab19fa"
+    "tests/fixtures/java_native_tool_bootstrap/src/main/java/BootstrapDocs.java": "2cb6b78b759253536027b34afc500f751d1e4614420f77ddcd5623a9a7ab19fa",
+    "crates/codeguard-cli/src/command_examples.rs": "593a8afd342610ae5854725253be89f6a49ecc1f6d0b68b5f2f271a746cf9686",
+    "tests/acceptance/c-family-comments-workbench.md": "809f7e3d60b7bf1fd0c44af1c9b25bb143ab5040c2a00568509c7fd6f1f094f0",
+    "schemas/c-family-comments-feedback-v0.2.schema.json": "effa6a0a8cb553a12e986e5ac30ae002c585efacf957e0fdce477f662979f5b2",
+    "crates/codeguard-cli/src/c_family_comments_workbench.rs": "c3f0ced4000a29fe42ae73f0f5b61e7f0145df47c3c71e4438c93b21afa6a9c8",
+    "crates/codeguard-cli/src/next_command/c_family_comments_candidate.rs": "5e647a74d7d8eeae7623528fc794cb6e70bbe02c461f373a62c41b7ef1980c08",
+    "crates/codeguard-cli/src/work_sync/c_family_comments_report.rs": "f1b46bc67b85f4883c20df6261cfd3ca570fe1fe37db7fd050b0ecaeb824dd60",
+    "tests/acceptance/evidence/c-family-comments-workbench-native.json": "a0c932b60a947d50516e9403386c434d4a361bbca15a8209dfed3226cc712569",
+    "tests/acceptance/evidence/c-family-comments-workbench-native-wasm.json": "7dc69445e19c612abe9e74dcfc1f0963818298fe028d718c09174c2a7f775d99",
+    "schemas/repair-brief-preview-v0.28.schema.json": "d328e48a57c515589bc246a3d37a310aa441521791c2f21ea83b156547a7b52a",
+    "tests/c_family_comments_workbench_schema.py": "5b632a64c12047d75412b76d97808c0647b2f6f455f4afa7b378aceb7df35895",
+    "tests/acceptance/evidence/c-family-comments-workbench-schema.json": "b8549177571bfa65a069522cbb23ead94d913d99c81e648a93ba5728cf3f7847",
+    "schemas/clang-documentation-workbench-observation-v0.1.schema.json": "cbde60cf037e29c6dce1c8754575b3aa0ddb0168306e1a9f0a12af5eab6c31c0",
+    "crates/codeguard-cli/src/lib.rs": "e7563be922bb4c16fa5c432f7dd5c8570b5cf7211fc634ec938d70e6fa394238",
+    "crates/codeguard-cli/tests/c_family_comments_workbench.rs": "38f4998924af811005f4a29e0144d30659e51664262fb8d511ec616b59ca2770"
   },
   "languages": [
     {
@@ -2969,7 +2983,16 @@
                 "crates/codeguard-cli/src/c_family_comments_arguments.rs",
                 "crates/codeguard-cli/src/c_family_comments_command.rs",
                 "crates/codeguard-cli/src/clang_syntax_probe.rs",
-                "crates/codeguard-adapters/src/clang_documentation_rule.rs"
+                "crates/codeguard-adapters/src/clang_documentation_rule.rs",
+                "crates/codeguard-cli/src/c_family_comments_workbench.rs",
+                "crates/codeguard-cli/src/work_sync/c_family_comments_report.rs",
+                "crates/codeguard-cli/src/next_command/c_family_comments_candidate.rs",
+                "crates/codeguard-cli/src/lib.rs",
+                "crates/codeguard-cli/src/command_examples.rs",
+                "crates/codeguard-cli/src/work_sync.rs",
+                "crates/codeguard-cli/src/next_command.rs",
+                "crates/codeguard-cli/src/task_attempt_command.rs",
+                "crates/codeguard-cli/src/task_verify_command.rs"
               ],
               "evidence_refs": [
                 "crates/codeguard-adapters/tests/clang_documentation_contract.rs",
@@ -2980,10 +3003,19 @@
                 "tests/c_family_comments_schema.py",
                 "tests/acceptance/evidence/c-family-comments-native-wasm.json",
                 "tests/acceptance/evidence/c-family-comments-schema.json",
-                "tests/acceptance/evidence/c-family-comments-transport.json"
+                "tests/acceptance/evidence/c-family-comments-transport.json",
+                "crates/codeguard-cli/tests/c_family_comments_workbench.rs",
+                "schemas/c-family-comments-feedback-v0.2.schema.json",
+                "schemas/clang-documentation-workbench-observation-v0.1.schema.json",
+                "schemas/repair-brief-preview-v0.28.schema.json",
+                "tests/acceptance/c-family-comments-workbench.md",
+                "tests/c_family_comments_workbench_schema.py",
+                "tests/acceptance/evidence/c-family-comments-workbench-native.json",
+                "tests/acceptance/evidence/c-family-comments-workbench-native-wasm.json",
+                "tests/acceptance/evidence/c-family-comments-workbench-schema.json"
               ],
               "blockers": [
-                "仅固定Apple Clang21/C11或C++17单文件文档警告；项目原配置/头文件/宏、全部API缺失及详细契约、持久任务复检尚未整合",
+                "稳定文档任务与原命令复扫已接通；仅固定Apple Clang21/C11或C++17单文件，项目原配置/头文件/宏、全部API缺失与详细契约、专用task verify/尝试日志未完成",
                 "c/standalone: Doxygen/API用途/参数/返回/错误与内存所有权的完整原生规则/合法反例/契约准确性未验收",
                 "c/standalone/documentation:五平台、宿主反馈、可信关闭和复发重开未验收"
               ]
@@ -3250,7 +3282,16 @@
                 "crates/codeguard-cli/src/c_family_comments_arguments.rs",
                 "crates/codeguard-cli/src/c_family_comments_command.rs",
                 "crates/codeguard-cli/src/clang_syntax_probe.rs",
-                "crates/codeguard-adapters/src/clang_documentation_rule.rs"
+                "crates/codeguard-adapters/src/clang_documentation_rule.rs",
+                "crates/codeguard-cli/src/c_family_comments_workbench.rs",
+                "crates/codeguard-cli/src/work_sync/c_family_comments_report.rs",
+                "crates/codeguard-cli/src/next_command/c_family_comments_candidate.rs",
+                "crates/codeguard-cli/src/lib.rs",
+                "crates/codeguard-cli/src/command_examples.rs",
+                "crates/codeguard-cli/src/work_sync.rs",
+                "crates/codeguard-cli/src/next_command.rs",
+                "crates/codeguard-cli/src/task_attempt_command.rs",
+                "crates/codeguard-cli/src/task_verify_command.rs"
               ],
               "evidence_refs": [
                 "crates/codeguard-adapters/tests/clang_documentation_contract.rs",
@@ -3261,10 +3302,19 @@
                 "tests/c_family_comments_schema.py",
                 "tests/acceptance/evidence/c-family-comments-native-wasm.json",
                 "tests/acceptance/evidence/c-family-comments-schema.json",
-                "tests/acceptance/evidence/c-family-comments-transport.json"
+                "tests/acceptance/evidence/c-family-comments-transport.json",
+                "crates/codeguard-cli/tests/c_family_comments_workbench.rs",
+                "schemas/c-family-comments-feedback-v0.2.schema.json",
+                "schemas/clang-documentation-workbench-observation-v0.1.schema.json",
+                "schemas/repair-brief-preview-v0.28.schema.json",
+                "tests/acceptance/c-family-comments-workbench.md",
+                "tests/c_family_comments_workbench_schema.py",
+                "tests/acceptance/evidence/c-family-comments-workbench-native.json",
+                "tests/acceptance/evidence/c-family-comments-workbench-native-wasm.json",
+                "tests/acceptance/evidence/c-family-comments-workbench-schema.json"
               ],
               "blockers": [
-                "仅固定Apple Clang21/C11或C++17单文件文档警告；项目原配置/头文件/宏、全部API缺失及详细契约、持久任务复检尚未整合",
+                "稳定文档任务与原命令复扫已接通；仅固定Apple Clang21/C11或C++17单文件，项目原配置/头文件/宏、全部API缺失与详细契约、专用task verify/尝试日志未完成",
                 "cpp/standalone: Doxygen/API用途/模板/异常/生命周期与线程安全的完整原生规则/合法反例/契约准确性未验收",
                 "cpp/standalone/documentation:五平台、宿主反馈、可信关闭和复发重开未验收"
               ]

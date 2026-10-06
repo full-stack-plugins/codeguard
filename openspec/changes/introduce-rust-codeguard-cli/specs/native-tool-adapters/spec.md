@@ -4,6 +4,18 @@
 
 ## ADDED Requirements
 
+### Requirement: C-family documentation observations SHALL persist stable native rule groups
+
+C/C++显式文件文档检查 MUST 在已有工作台保存脱敏原生观察并复用报告消费事务；未初始化不得创建工作台。任务身份 MUST 按文件、语言、标准、固定文档档案与原生规则组稳定生成，全部位置保留，不以行号漂移创建新任务。环境失败与未适配诊断 MUST 保留稳定阻塞，不制造源码违规。next MUST 核验首次报告摘要和已消费本轮观察，保留原工具、标准、配置覆盖边界、允许修改范围及原命令复扫指引；输入或工具上下文变化时撤回历史定位权限。零诊断只能说明局部候选消失，不能关闭任务或授予详细文档资格。专用task verify与可信关闭尚未接通时 MUST 明确公开缺口，不伪造完成。
+
+#### Scenario: Documentation lines move between scans
+- **WHEN** 同文件同标准同原生规则的位置发生移动，重复检查导入当前报告
+- **THEN** 更新同一个规则组的观察，保留全部当前位置，任务数量不增加
+
+#### Scenario: A clean rescan follows a native documentation finding
+- **WHEN** 原任务再次扫描未发现原规则
+- **THEN** 原任务保持开放，next明确局部候选未观察到及完整覆盖/专用复检缺口
+
 ### Requirement: Every registered language SHALL satisfy all four production cores independently
 
 全部57个canonical语言 MUST 分别完成syntax、documentation、conventions、vulnerabilities四项核心能力，共228项义务。每项 MUST 按声明的语言版本、方言、构建生态和目标平台取得真实原生运行与独立验收证据；局部实现、配置存在、工具退出0、任务勾选及模拟报告 MUST NOT 授予生产资格。Java Maven与Gradle MUST 分别完成文档、规范和依赖漏洞路径，不得以其中之一代替另一条路径。未完成项 MUST 保留blocked及具体缺口，不能改为不适用来消除既定义务。

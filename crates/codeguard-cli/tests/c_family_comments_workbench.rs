@@ -1,0 +1,412 @@
+#![cfg(unix)]
+use serde_json::{Value, json};
+use std::{
+    fs,
+    os::unix::fs::PermissionsExt,
+    path::PathBuf,
+    process::Command,
+    sync::atomic::{AtomicU64, Ordering},
+};
+
+static NEXT: AtomicU64 = AtomicU64::new(0);
+struct Project(PathBuf);
+impl Project {
+    fn new() -> Self {
+        let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
+            "cg-c-doc-work-{}-{}",
+            std::process::id(),
+            NEXT.fetch_add(1, Ordering::Relaxed)
+        ));
+        fs::create_dir(&root).unwrap();
+        fs::write(root.join("api.c"), "/** API.\n * @param value\n * @param other\n */\nint api(int value, int other) { return value + other; }\n").unwrap();
+        let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(["init"])
+            .arg(&root)
+            .args(["--apply", "--format=json"])
+            .output()
+            .unwrap();
+        assert_eq!(output.status.code(), Some(3), "{output:?}");
+        let tool = root.join("clang");
+        fs::write(&tool, format!("#!/bin/sh\nif [ \"$1\" = --version ]; then echo 'Apple clang version 21.0.0 (clang-2100.3.34.2)'; exit 0; fi\ncat >/dev/null\ncat '{}' >&2\n", root.join("sarif.json").display())).unwrap();
+        fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
+        Self(root)
+    }
+    fn scan(&self, lines: &[u64]) -> Value {
+        let rows: Vec<_> = lines.iter().map(|line| json!({"level":"warning","ruleId":"warn_doc_block_command_empty_paragraph","ruleIndex":0,"message":{"text":"HOST_SECRET"},"locations":[{"physicalLocation":{"artifactLocation":{"uri":"file://","index":0},"region":{"startLine":line,"startColumn":4}}}]})).collect();
+        let sarif = json!({"version":"2.1.0","runs":[{"columnKind":"unicodeCodePoints","invocations":[{"executionSuccessful":true}],"artifacts":[{"location":{"uri":"file://","index":0}}],"tool":{"driver":{"name":"clang","version":"Apple clang version 21.0.0 (clang-2100.3.34.2)","rules":[{"id":"warn_doc_block_command_empty_paragraph"}]}},"results":rows}]});
+        fs::write(self.0.join("sarif.json"), sarif.to_string()).unwrap();
+        let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(["comments", "c"])
+            .arg(self.0.join("api.c"))
+            .arg("--clang-tool")
+            .arg(self.0.join("clang"))
+            .args(["--standard", "c11", "--workspace"])
+            .arg(&self.0)
+            .arg("--format=json")
+            .output()
+            .unwrap();
+        assert_eq!(output.status.code(), Some(3), "{output:?}");
+        let report: Value = serde_json::from_slice(&output.stdout).unwrap();
+        capture(&report);
+        for entry in fs::read_dir(self.0.join(".codeguard/reports")).unwrap() {
+            let entry = entry.unwrap();
+            if entry.path().extension().is_some_and(|e| e == "json") {
+                capture(
+                    &serde_json::from_slice::<Value>(&fs::read(entry.path()).unwrap()).unwrap(),
+                );
+            }
+        }
+        report
+    }
+    fn next(&self) -> Value {
+        let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(["next"])
+            .arg(&self.0)
+            .arg("--format=json")
+            .output()
+            .unwrap();
+        assert!(output.status.success(), "{output:?}");
+        let report: Value = serde_json::from_slice(&output.stdout).unwrap();
+        capture(&report);
+        report
+    }
+}
+impl Drop for Project {
+    fn drop(&mut self) {
+        let _ = fs::remove_dir_all(&self.0);
+    }
+}
+fn capture(report: &Value) {
+    if let Some(directory) = std::env::var_os("CODEGUARD_C_DOC_WORKBENCH_REPORT_DIR") {
+        fs::create_dir_all(&directory).unwrap();
+        fs::write(
+            PathBuf::from(directory).join(format!(
+                "report-{}-{}.json",
+                std::process::id(),
+                NEXT.fetch_add(1, Ordering::Relaxed)
+            )),
+            serde_json::to_vec_pretty(report).unwrap(),
+        )
+        .unwrap();
+    }
+}
+
+#[test]
+fn clean_initial_scan_has_no_invented_task_and_missing_tool_has_stable_environment_task() {
+    let p = Project::new();
+    let clean = p.scan(&[]);
+    assert_eq!(clean["workbench"]["task_ids"], json!([]));
+    assert_eq!(clean["next"], Value::Null);
+    fs::remove_file(p.0.join("clang")).unwrap();
+    let blocked = p.scan(&[]);
+    let id = blocked["workbench"]["task_ids"][0].as_str().unwrap();
+    assert!(id.starts_with("CG-B-"));
+    assert_eq!(
+        blocked["next"]["repair_brief"]["native_reason"],
+        "clang_tool_unavailable"
+    );
+    assert_eq!(blocked["documentation_findings"], json!([]));
+    fs::write(p.0.join("api.c"), "#include <missing.h>\nint api(void);\n").unwrap();
+    let changed = p.scan(&[]);
+    assert_eq!(changed["workbench"]["task_ids"][0], id);
+    assert_eq!(
+        changed["next"]["repair_brief"]["native_reason"],
+        "clang_preprocessor_context_unresolved"
+    );
+}
+
+#[test]
+fn cpp_and_unadapted_rules_preserve_checker_identity_and_mapping_blockers() {
+    let p = Project::new();
+    p.scan(&[2]);
+    fs::copy(p.0.join("api.c"), p.0.join("api.cpp")).unwrap();
+    let original = fs::read_to_string(p.0.join("clang")).unwrap();
+    fs::write(
+        p.0.join("clang"),
+        original.replace(
+            "cat '",
+            "sed 's/warn_doc_block_command_empty_paragraph/warn_doc_unadapted/g' '",
+        ),
+    )
+    .unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["comments", "cpp"])
+        .arg(p.0.join("api.cpp"))
+        .arg("--clang-tool")
+        .arg(p.0.join("clang"))
+        .args(["--standard", "c++17", "--format=json"])
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(3), "{out:?}");
+    let r: Value = serde_json::from_slice(&out.stdout).unwrap();
+    capture(&r);
+    assert_eq!(r["workbench"]["status"], "synced_partial");
+    assert_eq!(r["documentation_findings"], json!([]));
+    assert_eq!(
+        r["next"]["repair_brief"]["checker_id"],
+        "cpp.clang.documentation"
+    );
+    assert_eq!(r["next"]["repair_brief"]["kind"], "blocker");
+    assert_eq!(
+        r["next"]["repair_brief"]["unclassified_native_diagnostics"][0]["rule_id"],
+        "clang.warn_doc_unadapted"
+    );
+}
+
+#[test]
+fn foreign_explicit_scope_is_rejected_and_invalid_nearest_workspace_never_falls_back() {
+    let p = Project::new();
+    p.scan(&[]);
+    let child = p.0.join("child");
+    fs::create_dir(&child).unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["comments", "c"])
+        .arg(p.0.join("api.c"))
+        .arg("--clang-tool")
+        .arg(p.0.join("clang"))
+        .args(["--standard", "c11", "--workspace"])
+        .arg(&child)
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(2));
+    fs::write(child.join(".codeguard"), "invalid nearest workspace").unwrap();
+    fs::copy(p.0.join("api.c"), child.join("api.c")).unwrap();
+    let before = fs::read_dir(p.0.join(".codeguard/reports"))
+        .unwrap()
+        .count();
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["comments", "c"])
+        .arg(child.join("api.c"))
+        .arg("--clang-tool")
+        .arg(p.0.join("clang"))
+        .args(["--standard", "c11", "--format=json"])
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(3));
+    let r: Value = serde_json::from_slice(&out.stdout).unwrap();
+    capture(&r);
+    assert_eq!(r["workspace_binding"], "not_bound");
+    assert_eq!(r["workbench"]["status"], "incomplete");
+    assert_eq!(
+        before,
+        fs::read_dir(p.0.join(".codeguard/reports"))
+            .unwrap()
+            .count()
+    );
+}
+
+#[test]
+fn linked_source_cannot_redirect_observation_storage_into_another_project() {
+    let p = Project::new();
+    let other = Project::new();
+    fs::remove_file(p.0.join("api.c")).unwrap();
+    std::os::unix::fs::symlink(other.0.join("api.c"), p.0.join("api.c")).unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["comments", "c"])
+        .arg(p.0.join("api.c"))
+        .arg("--clang-tool")
+        .arg(p.0.join("clang"))
+        .args(["--standard", "c11", "--format=json"])
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(3));
+    let r: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(r["schema_version"], "0.1.0");
+    assert_eq!(r["workspace_binding"], "not_bound");
+    assert_eq!(r["documentation_findings"], json!([]));
+    assert_eq!(
+        fs::read_dir(other.0.join(".codeguard/reports"))
+            .unwrap()
+            .count(),
+        0
+    );
+    assert_eq!(
+        fs::read_dir(p.0.join(".codeguard/reports"))
+            .unwrap()
+            .count(),
+        0
+    );
+}
+
+#[test]
+fn changed_tool_retracts_authority_and_unimplemented_task_services_do_not_acquire_leases() {
+    let p = Project::new();
+    let r = p.scan(&[2]);
+    let id = r["workbench"]["task_ids"][0].as_str().unwrap();
+    let original = fs::read_to_string(p.0.join("clang")).unwrap();
+    fs::write(p.0.join("clang"), format!("{original}\n# changed\n")).unwrap();
+    let next = p.next();
+    assert_eq!(
+        next["repair_brief"]["observation_status"],
+        "tool_or_standard_changed"
+    );
+    assert_eq!(next["repair_brief"]["allowed_paths"], json!([]));
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["task", "verify", id])
+        .arg(&p.0)
+        .arg("--format=json")
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(3));
+    assert!(
+        String::from_utf8(out.stdout)
+            .unwrap()
+            .contains("clang_documentation_task_verification_not_integrated")
+    );
+    assert!(!p.0.join(".codeguard/state/task_locks").exists());
+}
+
+#[test]
+fn malformed_packet_and_origin_tampering_cannot_create_or_authorize_a_finding() {
+    let p = Project::new();
+    let r = p.scan(&[2]);
+    let run = r["workbench"]["run_id"].as_str().unwrap();
+    let path = p.0.join(format!(".codeguard/reports/{run}.json"));
+    let mut packet: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+    packet["authority"] = json!("trusted");
+    packet["run_id"] = json!("clangdoc-1-0-999999999999999999999");
+    fs::write(
+        p.0.join(".codeguard/reports/clangdoc-1-0-999999999999999999999.json"),
+        packet.to_string(),
+    )
+    .unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["work", "sync"])
+        .arg(&p.0)
+        .arg("--format=json")
+        .output()
+        .unwrap();
+    let sync: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(sync["failed_reports"], 1);
+    assert_eq!(sync["new_findings"], 0);
+    // 先隔离已拒绝的新报文，再单独检验首次报告摘要篡改，避免队列失败掩盖目标断言。
+    fs::remove_file(p.0.join(".codeguard/reports/clangdoc-1-0-999999999999999999999.json"))
+        .unwrap();
+    fs::write(&path, b"{}").unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["next"])
+        .arg(&p.0)
+        .arg("--format=json")
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(3));
+    let feedback = String::from_utf8(out.stdout).unwrap();
+    let feedback: Value = serde_json::from_str(&feedback).unwrap();
+    // 共享队列先核对已消费报告摘要，比专属候选读取更早拒绝篡改。
+    assert_eq!(feedback["reason"], "consumed_marker_invalid");
+    assert_eq!(feedback["repair_brief"], Value::Null);
+}
+
+#[test]
+#[ignore = "requires existing Apple Clang21 via CODEGUARD_CLANG_BIN"]
+fn actual_clang_documentation_rules_reach_stable_workbench_tasks() {
+    let p = Project::new();
+    let tool = std::env::var_os("CODEGUARD_CLANG_BIN").expect("explicit Clang required");
+    fs::copy(p.0.join("api.c"), p.0.join("api.cpp")).unwrap();
+    let mut cases = Vec::new();
+    for (language, filename, standard) in [("c", "api.c", "c11"), ("cpp", "api.cpp", "c++17")] {
+        let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(["comments", language])
+            .arg(p.0.join(filename))
+            .arg("--clang-tool")
+            .arg(&tool)
+            .args(["--standard", standard, "--workspace"])
+            .arg(&p.0)
+            .arg("--format=json")
+            .output()
+            .unwrap();
+        assert_eq!(out.status.code(), Some(3), "{out:?}");
+        let r: Value = serde_json::from_slice(&out.stdout).unwrap();
+        capture(&r);
+        assert_eq!(r["workbench"]["status"], "synced_partial");
+        assert_eq!(
+            r["next"]["repair_brief"]["native_positions"]
+                .as_array()
+                .unwrap()
+                .len(),
+            2
+        );
+        assert_eq!(
+            r["next"]["repair_brief"]["observation_status"],
+            "native_rule_observed"
+        );
+        assert_eq!(r["coverage_proven"], false);
+        cases.push(r);
+    }
+    for e in fs::read_dir(p.0.join(".codeguard/reports")).unwrap() {
+        capture(&serde_json::from_slice::<Value>(&fs::read(e.unwrap().path()).unwrap()).unwrap());
+    }
+    if let Some(path) = std::env::var_os("CODEGUARD_C_DOC_WORKBENCH_NATIVE_EVIDENCE") {
+        use sha2::{Digest, Sha256};
+        let binary = fs::read(env!("CARGO_BIN_EXE_codeguard")).unwrap();
+        let evidence = json!({"evidence_kind":"local_native_workbench_regression","qualification":"not_granted","independent_holdout":false,"codeguard_sha256":format!("{:x}",Sha256::digest(binary)),"test_source_sha256":format!("{:x}",Sha256::digest(include_bytes!("c_family_comments_workbench.rs"))),"cases":cases});
+        fs::write(path, serde_json::to_vec_pretty(&evidence).unwrap()).unwrap();
+    }
+}
+
+#[test]
+fn native_rule_positions_share_stable_task_and_clean_rescan_does_not_close_it() {
+    let p = Project::new();
+    let first = p.scan(&[2, 3]);
+    assert_eq!(first["workbench"]["status"], "synced_partial");
+    let id = first["workbench"]["task_ids"][0]
+        .as_str()
+        .unwrap()
+        .to_owned();
+    assert_eq!(first["workbench"]["task_ids"].as_array().unwrap().len(), 1);
+    assert_eq!(
+        first["next"]["repair_brief"]["native_positions"]
+            .as_array()
+            .unwrap()
+            .len(),
+        2
+    );
+    let second = p.scan(&[3]);
+    assert_eq!(second["workbench"]["task_ids"][0], id);
+    assert_eq!(second["workbench"]["sync"]["new_findings"], 0);
+    assert_eq!(p.next()["repair_brief"]["native_positions"][0]["line"], 3);
+    assert!(!second.to_string().contains("HOST_SECRET"));
+    let clean = p.scan(&[]);
+    assert_eq!(clean["next"]["repair_brief"]["task_id"], id);
+    assert_eq!(
+        clean["next"]["repair_brief"]["observation_status"],
+        "candidate_absent_unverified"
+    );
+    let fact: Value = serde_json::from_slice(
+        &fs::read(p.0.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(fact["state"], "open");
+    assert_eq!(clean["coverage_proven"], false);
+}
+
+#[test]
+fn changed_input_retracts_positions_and_missing_projection_can_be_restored() {
+    let p = Project::new();
+    let report = p.scan(&[2]);
+    let id = report["workbench"]["task_ids"][0].as_str().unwrap();
+    fs::write(p.0.join("api.c"), "int api(void) { return 0; }\n").unwrap();
+    let next = p.next();
+    assert_eq!(next["repair_brief"]["observation_status"], "input_changed");
+    assert_eq!(next["repair_brief"]["allowed_paths"], json!([]));
+    fs::remove_file(p.0.join(format!(".codeguard/tasks/{id}.md"))).unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["work", "sync"])
+        .arg(&p.0)
+        .arg("--format=json")
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(3), "{output:?}");
+    let task = fs::read_to_string(p.0.join(format!(".codeguard/tasks/{id}.md"))).unwrap();
+    for part in [
+        "问题证据",
+        "规则依据",
+        "允许修改的范围",
+        "修复步骤",
+        "复检命令",
+        "历史尝试",
+        "关闭条件",
+    ] {
+        assert!(task.contains(part), "{part}");
+    }
+}
