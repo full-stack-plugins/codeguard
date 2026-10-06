@@ -1507,3 +1507,6 @@ C/C++ 独立 Clang 入口已修复字符串、注释和原始字符串中的井�
 
 
 Rust 的详细文档任务现对原生 Clippy `missing_errors_doc`、`missing_panics_doc`、`missing_safety_doc` 给出具体 Errors/Panics/Safety 修复指引，复用稳定任务及原工具抑制对照。已有 Clippy 实测接受空章节标题，因此零诊断不代表详细说明合格，事实继续 open；不会隐式启用 pedantic。`comments rust` 仍为 Rustdoc 局部探针，尚未统一完整文档契约。参见 [局部验收与缺口](../tests/acceptance/clippy-documentation-contract.md)。
+
+
+`check rust/all` 现在把原生 Clippy 的三类文档诊断作为独立 comments 观察，与原 Rustdoc 行并存，不覆盖原工具阻塞或重复执行 Clippy；仅精确已知规则参与，零发现不证明详细契约启用。参见 [聚合验收](../tests/acceptance/clippy-documentation-aggregate.md)。

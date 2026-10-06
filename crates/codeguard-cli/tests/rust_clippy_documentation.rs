@@ -125,6 +125,22 @@ fn native_documentation_contracts_reuse_tasks_and_preserve_semantic_limits() {
         let verify = || p.invoke(&["task", "verify", id, "--cargo-tool", &tool, "--format=json"]);
         let present = verify();
         assert_eq!(present["observation"], "still_present", "{present}");
+        let aggregate = p.invoke(&["check", "rust", "--cargo-tool", &tool, "--format=json"]);
+        let rows = aggregate["category_candidates"].as_array().unwrap();
+        for checker in ["rust.cargo_clippy", "rust.cargo_rustdoc"] {
+            assert!(
+                rows.iter()
+                    .any(|r| r["category"] == "comments" && r["checker_id"] == checker),
+                "{aggregate}"
+            );
+        }
+        let observed = aggregate["native_results"]["rust_lint"]["findings"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|f| f["rule_id"] == native_rule)
+            .unwrap();
+        assert_eq!(observed["finding_id"], id);
         fs::write(
             p.0.join("src/lib.rs"),
             source("", &format!("#[allow(clippy::{rule})]")),
@@ -166,7 +182,7 @@ fn native_documentation_contracts_reuse_tasks_and_preserve_semantic_limits() {
         )
         .unwrap();
         assert_eq!(fact["state"], "open");
-        evidence.push(json!({"rule":native_rule,"first":first,"repeat":repeat,"present":present,"suppressed":suppressed,"bare_heading":bare,"repaired":repaired,"state":fact["state"]}));
+        evidence.push(json!({"rule":native_rule,"first":first,"repeat":repeat,"present":present,"aggregate":aggregate,"suppressed":suppressed,"bare_heading":bare,"repaired":repaired,"state":fact["state"]}));
     }
     let p = Project::new(
         3,

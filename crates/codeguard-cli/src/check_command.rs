@@ -1801,6 +1801,40 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                     "ruff_d100_native_observation_incomplete"
                 });
             }
+            // 文档类原生发现来自两个独立服务；保留Rustdoc义务，不能用Clippy结果覆盖。
+            // 只分类精确已适配的原规则，空结果不证明这些规则启用或详细内容合格。
+            if rust_comments_selected
+                && rust_lint["findings"].as_array().is_some_and(|findings| {
+                    findings.iter().any(|finding| {
+                        matches!(
+                            finding["rule_id"].as_str(),
+                            Some(
+                                "clippy::missing_errors_doc"
+                                    | "clippy::missing_panics_doc"
+                                    | "clippy::missing_safety_doc"
+                            )
+                        )
+                    })
+                })
+            {
+                candidates.push(candidate.clone());
+                candidate["checker_id"] = json!("rust.cargo_clippy");
+                let complete = rust_task_outcome == Some(TaskOutcome::Succeeded)
+                    && rust_lint["local_scan_complete"] == true;
+                candidate["status"] = json!(if complete {
+                    "observed_unverified"
+                } else {
+                    "native_incomplete"
+                });
+                candidate["reason"] = json!(if complete {
+                    "trusted_policy_and_coverage_unavailable"
+                } else {
+                    "native_scan_incomplete"
+                });
+                candidate["next_action"] = json!(
+                    "读取 native_results.rust_lint 的原生 Errors/Panics/Safety 规则与稳定任务，说明实际契约并用原 Cargo 对原任务 task verify；空章节不能代替详细说明，Rustdoc 与完整文档覆盖仍须分别核验"
+                );
+            }
             if language == "python" && category == "cve" {
                 candidate["checker_id"] = json!("python.pip_audit");
                 candidate["next_action"] = json!(

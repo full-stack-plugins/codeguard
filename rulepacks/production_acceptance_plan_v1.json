@@ -79,7 +79,7 @@
     "crates/codeguard-cli/src/gradle_cve_task_recheck.rs": "3229794e846ca217567f82fcb80a79790786ef46f5d90772fe919933d3b91708",
     "crates/codeguard-cli/src/task_attempt_command.rs": "93879ad17dddce9b90fdf6bc64c2e6e0feac8a26eb3ab0a663c667fd6c5d58d3",
     "tests/acceptance/gradle-cve-task-recheck.md": "3ff19b9086f93816d54281c661126235c0fe4408ed9dd64d48dda4a9276cc238",
-    "crates/codeguard-cli/src/check_command.rs": "039092dab2d4409ac67ac9eb1fe1b0db2f4011f62c2d87cb6e7e31d6dd2561a7",
+    "crates/codeguard-cli/src/check_command.rs": "3332462348b2d973f0db1a7cd20d5ced5ef23903e9d8760fc715a070e53b5d80",
     "crates/codeguard-cli/src/partial_sarif_feedback.rs": "957236601864e568e999288e39183420f0c10ea2c1c31fd9d29de8e176069e20",
     "crates/codeguard-cli/src/command_catalogue.rs": "9a0a368513198cb30ae649bf93f7ef2d541dd5c527369966d87c195a071e6809",
     "tests/acceptance/gradle-cve-unified-check.md": "20168de147524d603c3f47101e098cbf20b9469ae985fca68068a9f6bc5b620c",
@@ -89,9 +89,11 @@
     "crates/codeguard-cli/src/grammar_native_differential.rs": "cc03129c80eef2b0d77f57f2abcc89b3a4a5107a6f81f723cebf98bcebfa26ab",
     "tests/acceptance/c-family-native-replay.md": "4785bd96ba17fa12f7958628ac2562301e6a04611b01a5065783d52afb9d6786",
     "tests/acceptance/c-family-native-punctuation.md": "4465d86d3afaba9e2a54c3a58e5b5d2df102e670ccc487b1b26d125b704d08b3",
-    "crates/codeguard-cli/tests/rust_clippy_documentation.rs": "37e37e15921cfd6aa3fbfcf5d17fa15850a91df9bfb1f553ef24785c56e7572f",
+    "crates/codeguard-cli/tests/rust_clippy_documentation.rs": "d08bf377103b2598d5cd6ba3cb497e0c40837b647ffe7e8de44a75b281a307b6",
     "tests/acceptance/clippy-documentation-contract.md": "7843e99c75b262710126c0c1b56596a0a004db563603b0575564e86416304060",
-    "crates/codeguard-cli/src/rust_lint_scan.rs": "d0d76dcfabafc6f6701bba6946b3130f23c3b053bf77bda7e7abaf10ca9d3e09"
+    "crates/codeguard-cli/src/rust_lint_scan.rs": "d0d76dcfabafc6f6701bba6946b3130f23c3b053bf77bda7e7abaf10ca9d3e09",
+    "tests/acceptance/clippy-documentation-aggregate.md": "99f0b90dafda408b755f414277b55313c453771131038adada6295e572f15cc6",
+    "crates/codeguard-cli/tests/check_all_rust_native.rs": "7c108afc9a4bb1524601ce727315b22e771e234e4dd305416f2523baa1a3f7c1"
   },
   "languages": [
     {
@@ -390,7 +392,9 @@
               "evidence_refs": [
                 "tests/acceptance/rustdoc-task-recheck.md",
                 "tests/acceptance/clippy-documentation-contract.md",
-                "crates/codeguard-cli/tests/rust_clippy_documentation.rs"
+                "crates/codeguard-cli/tests/rust_clippy_documentation.rs",
+                "tests/acceptance/clippy-documentation-aggregate.md",
+                "crates/codeguard-cli/tests/check_all_rust_native.rs"
               ],
               "blockers": [
                 "rust/cargo: Rustdoc用途/参数/返回/错误/Panics/Safety及目标特性的完整原生规则/合法反例/契约准确性未验收",
