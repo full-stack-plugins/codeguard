@@ -260,6 +260,26 @@ pub fn discover<P: ObservationPort>(
                     .checker_configurations
                     .extend(inspect_gradle_unknown(build_root, manifest));
             }
+            for manifest in manifests.iter().filter(|name| name.ends_with("Cargo.toml")) {
+                let bytes = observation
+                    .read_bounded(&root.join(manifest), MAX_MANIFEST_BYTES)
+                    .ok();
+                let stable = bytes.as_ref().is_some_and(|bytes| {
+                    report.manifest_sha256.get(manifest)
+                        == Some(&format!("{:x}", Sha256::digest(bytes)))
+                });
+                if !stable {
+                    report.observation_complete = false;
+                    report.blocked_paths.push(manifest.clone());
+                }
+                report.checker_configurations.extend(
+                    codeguard_adapters::inspect_cargo_documentation_config(
+                        bytes.as_deref().filter(|_| stable),
+                        build_root,
+                        manifest,
+                    ),
+                );
+            }
         }
         report
             .unknown_conditions
@@ -692,6 +712,43 @@ mod tests {
     use std::collections::BTreeMap;
     use std::io;
     use std::path::{Path, PathBuf};
+
+    struct ChangingCargoObservation(std::cell::Cell<usize>);
+    impl ObservationPort for ChangingCargoObservation {
+        fn classify(&self, path: &Path) -> io::Result<ObservedPathKind> {
+            Ok(if path == Path::new("project") {
+                ObservedPathKind::Directory
+            } else {
+                ObservedPathKind::File
+            })
+        }
+        fn children(&self, _directory: &Path) -> io::Result<Vec<PathBuf>> {
+            Ok(vec![PathBuf::from("project/Cargo.toml")])
+        }
+        fn read_bounded(&self, _path: &Path, _limit: u64) -> io::Result<Vec<u8>> {
+            let count = self.0.get();
+            self.0.set(count + 1);
+            Ok(format!(
+                "[package]\nname='a'\nversion='0.1.0'\n[lints.clippy]\nmissing_errors_doc='{}'\n",
+                if count == 0 { "allow" } else { "warn" }
+            )
+            .into_bytes())
+        }
+    }
+    #[test]
+    fn changed_cargo_bytes_cannot_bind_new_documentation_declarations() {
+        let port = ChangingCargoObservation(std::cell::Cell::new(0));
+        let r = discover(Path::new("project"), &legacy_registry().unwrap(), &port);
+        assert!(!r.observation_complete);
+        assert!(r.blocked_paths.iter().any(|p| p == "Cargo.toml"));
+        assert!(port.0.get() >= 2);
+        assert!(
+            r.checker_configurations
+                .iter()
+                .all(|c| c.configuration == "unknown"
+                    && !c.next_action.contains("missing_errors_doc=warn"))
+        );
+    }
 
     struct FakeObservation {
         children: BTreeMap<PathBuf, Vec<PathBuf>>,

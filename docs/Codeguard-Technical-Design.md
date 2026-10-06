@@ -1983,3 +1983,6 @@ Native Clippy documentation findings now receive specific Errors/Panics/Safety r
 
 
 `check rust/all` now retains a separate comments observation for the three native Clippy documentation rules alongside Rustdoc, preserving each tool obligation without another Clippy execution. Only exact known diagnostics participate; zero findings do not establish enabled or complete documentation contracts. See [aggregate acceptance](../tests/acceptance/clippy-documentation-aggregate.md).
+
+
+Cargo documentation discovery now records manifest levels for five exact native lints per build root, bound to the observed manifest digest. Inheritance, groups, source attributes and absent declarations remain unresolved. Initialization stores details in the profile and retains AGENTS summaries/references; it does not add rules or qualify detailed documentation. See [declaration acceptance](../tests/acceptance/cargo-documentation-declarations.md).

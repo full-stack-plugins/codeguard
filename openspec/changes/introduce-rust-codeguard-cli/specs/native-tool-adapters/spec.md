@@ -130,6 +130,11 @@ Rustdoc逐问题反馈 MUST 提供问题证据、规则依据、允许修改的�
 - **THEN** comments 类别保留独立 Clippy 观察和原 Rustdoc 观察，不覆盖或丢失任一原工具义务；两者只提供局部未核验结果，任务仍复用原检查器身份
 - **AND** 原生失败后保留已有发现并标未完成；未知相似规则或零发现不能据此前缀声称详细文档规则完整启用
 
+#### Scenario: Cargo documentation declarations do not imply effective coverage
+- **WHEN** detect/init/check 观察 Cargo 构建根的文档 lint 声明
+- **THEN** 绑定同次清单摘要，分别保留 Rustdoc/Clippy 的精确声明等级；缺清单声明不判规则缺失，workspace继承、源码属性、组与priority仍须原生核验
+- **AND** 不执行工具或添加规则；清单不可读/变化/非法结构保持未知，虚拟workspace声明不能冒充成员启用，配置观察不授予文档完整性或可信关闭
+
 #### Scenario: Standalone Rust lint has no native Cargo
 - **WHEN** 未显式选择Cargo且绝对PATH没有可用Cargo
 - **THEN** WASM构建对有界Rust源码提供候选初检并同步确认任务；发现候选或范围/运行未完成时必须准备原生工具，完整有界范围零候选时推荐准备；不安装工具、不把候选认定为源码违规；无WASM构建明确初检不可用
