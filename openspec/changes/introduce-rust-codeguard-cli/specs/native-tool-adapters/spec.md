@@ -135,6 +135,11 @@ Rustdoc逐问题反馈 MUST 提供问题证据、规则依据、允许修改的�
 - **THEN** 绑定同次清单摘要，分别保留 Rustdoc/Clippy 的精确声明等级；缺清单声明不判规则缺失，workspace继承、源码属性、组与priority仍须原生核验
 - **AND** 不执行工具或添加规则；清单不可读/变化/非法结构保持未知，虚拟workspace声明不能冒充成员启用，配置观察不授予文档完整性或可信关闭
 
+#### Scenario: Cargo workspace documentation declarations require member opt-in
+- **WHEN** 成员使用唯一的 `lints.workspace = true` 且同次摘要稳定的最近祖先/本根清单包含 workspace 文档规则
+- **THEN** 分别关联成员与 workspace 的精确声明，显式来源仍可复核，配置保持 unknown；成员未选择继承不能套用祖先规则
+- **AND** 祖先不可读/变化/非法、显式 package.workspace 尚未解析或超预算时不借用更远工作区；成员归属、exclude/glob/源码属性/group/priority/目标生效范围仍须原 Cargo 核验，不能授予完整配置或文档资格
+
 #### Scenario: Standalone Rust lint has no native Cargo
 - **WHEN** 未显式选择Cargo且绝对PATH没有可用Cargo
 - **THEN** WASM构建对有界Rust源码提供候选初检并同步确认任务；发现候选或范围/运行未完成时必须准备原生工具，完整有界范围零候选时推荐准备；不安装工具、不把候选认定为源码违规；无WASM构建明确初检不可用

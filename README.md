@@ -1114,3 +1114,5 @@ Native Clippy documentation findings now receive specific Errors/Panics/Safety r
 
 
 Cargo documentation discovery now records manifest levels for five exact native lints per build root, bound to the observed manifest digest. Inheritance, groups, source attributes and absent declarations remain unresolved. Initialization stores details in the profile and retains AGENTS summaries/references; it does not add rules or qualify detailed documentation. See [declaration acceptance](tests/acceptance/cargo-documentation-declarations.md).
+
+Cargo documentation discovery now associates an opted-in member with its nearest observed workspace lint declarations, retaining both manifest identities and the original member configuration reference. Unreadable or changed candidates are incomplete; nearer invalid/missing rules are not replaced with farther rules. Explicit workspace references and full membership/effective coverage remain unresolved. This candidate association grants no production qualification.

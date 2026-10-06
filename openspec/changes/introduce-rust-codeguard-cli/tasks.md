@@ -2099,3 +2099,5 @@ CI37503859591终态MSRV通过、gate源码检出失败。确认语料9e4adb1远�
 2026-10-07 Rust聚合文档分类进展：同一7.1/15.3/15.6反例先RED后保留Clippy三精确文档规则及Rustdoc两独立comments义务，原生失败的已有诊断不伪装完整；未知相似规则或零发现不声称规则启用。真实已有Clippy公开check rust验证三规则与原稳定身份，证据见tests/acceptance/clippy-documentation-aggregate.md。完整详细内容/统一comments入口/全组合/独立精度/可信闭环及逐语言生产资格仍未完成，不勾选父任务。
 
 2026-10-07 Cargo文档声明进展：延续7.1/15.3/15.6，配置记录缺失的目标RED后增加逐构建根五项精确声明与本次摘要绑定；未知继承/组/属性/未声明不判缺失或启用完整。init保留画像详情和AGENTS摘要引用，不改清单。真实已有Clippy的清单warn/allow与源码属性三组分别三/零/三诊断，状态仍unknown；来源变化反例和非法输入通过。详见tests/acceptance/cargo-documentation-declarations.md。完整生效模型、详细契约/配置稳定任务/独立精度/可信闭环及逐语言生产资格仍未完成，不勾选父任务。
+
+2026-10-07 Cargo workspace文档候选来源进展：延续7.1/15.3/15.6，成员声明关联先RED后接通最近workspace与本轮摘要核验，未选择继承不能套用；最近缺失/非法、显式引用及变化/I/O/链接/预算保持未知或不完整。真实已有Clippy两配置各四次oracle，warn继承/未继承一/零诊断，allow均零；默认/WASM六目标各104通过/6忽略，祖先故障单元各1、真实oracle各1。详见tests/acceptance/cargo-documentation-workspace.md，完整生效模型/详细契约/配置任务/原工具workspace公开闭环及生产资格仍未完成，不勾选父任务。
