@@ -2472,3 +2472,11 @@ ESLint统一入口对JavaScript四种扩展接入原生优先及共享候选扫�
 默认五目标最后有效结果60 passed / 0 failed / 12 ignored；WASM六目标最后有效结果78 passed / 0 failed / 12 ignored，两构建重叠不相加。WASM首次新测试将工作区全部任务数误定为1，与独立语法确认任务冲突（20 passed / 1 failed / 2 ignored）；仅将断言修正为核对同一Ruff环境问题唯一身份，最终work sync与cross-category两目标22 passed / 0 failed / 2 ignored。最终结果各目标只计最后有效一次。忽略项未执行，不代表真实SDK通过。
 
 WASM CLI全目标Clippy -D warnings、定向rustfmt、分层、OpenSpec strict与diff检查通过。[验收](../../../tests/acceptance/repair-sync-unique-json.md)保留失败与复跑区别；证据索引记录日志和源码身份。完整目标、9.3/9.7/12.5仍未验收；未改变可信关闭、grammar或公开版本。Erlang用户草稿未改动或执行。
+
+## 2026-10-06 默认全工作区回归及真实Ruff补证
+
+当前54e905c：首次`cargo test --workspace --locked`退出101，CLI库70通过/6失败/3忽略，版本探测超时或未启动使Go/Python/Ruby断言失败；停止后未跑目标不能计通过。未修改源码/预算，CLI整个库复跑76通过/0失败/3忽略；扩大到`cargo test --workspace --all-targets --locked`退出0，287结果目标1535通过/0失败/138忽略。首次失败并非被覆盖或忽略，冷启动可靠性仍未接受。
+
+已有Ruff0.16.8显式执行work_sync两个条件用例2通过/0失败/0忽略，3.51秒；与138忽略中的两项重叠，单独记录。Ruff工具前后摘要稳定；程序摘要仅执行前捕获，归档时target目录不存在，执行后程序身份未复核且未重建。正常重复扫描稳定任务、存储故障保留F401和失败反馈。默认全工作区全目标Clippy -D warnings通过34.13秒；374schema元定义、分层、OpenSpec strict及diff检查通过，不把元定义校验当完整实例验收。
+
+[验收说明](../../../tests/acceptance/workspace-regression-20261006.md)与[日志/制品/来源身份](../../../tests/acceptance/evidence/default-workspace-regression-2026-10-06.json)保留各阶段区别。54e905c远端CI37414921955终态failure，msrv成功，gate失败于Check out corpus evidence source。用户草稿摘要不变，默认cfg下0项测试，未修改/纳入提交；未执行完整WASM/平台/工具链/宿主验收或发布，13.2等父任务仍开放。

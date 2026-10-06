@@ -1,0 +1,81 @@
+{
+  "evidence_type": "default_workspace_regression_with_initial_failures_preserved",
+  "captured_at": "2026-10-06",
+  "source_commit": "54e905c30e95e8b10612e1138a9cd6b7a336615d",
+  "source_scope": "committed_product_sources_with_protected_wasm_only_test_draft",
+  "protected_erlang_draft_sha256": "2e3a296072e6a3aa34b561799c18c7d8b621d00f8786301d2612cee8cdab85b6",
+  "protected_draft_tests_executed": 0,
+  "program_sha256_before_native_tests": "c7369577e16d74fd16d3252eb46b0b207c58bd1af605d094e0c981d05826a9ea",
+  "program_digest_capture": "actual shasum output before native test invocation",
+  "program_after_native_tests_reverified": false,
+  "program_after_archive_status": "target directory absent; cause not established; no rebuild",
+  "wasm_precheck_enabled": false,
+  "initial_workspace": {
+    "command": [
+      "cargo",
+      "test",
+      "--workspace",
+      "--locked"
+    ],
+    "exit_code": 101,
+    "failed_cli_library": {
+      "passed": 70,
+      "failed": 6,
+      "ignored": 3
+    },
+    "later_targets_not_run": true
+  },
+  "same_source_library_recheck": {
+    "passed": 76,
+    "failed": 0,
+    "ignored": 3,
+    "elapsed_seconds": 2.12
+  },
+  "expanded_workspace": {
+    "command": [
+      "cargo",
+      "test",
+      "--workspace",
+      "--all-targets",
+      "--locked"
+    ],
+    "exit_code": 0,
+    "result_records": 287,
+    "passed": 1535,
+    "failed": 0,
+    "ignored": 138
+  },
+  "explicit_native_ruff": {
+    "version": "0.16.8",
+    "tool_sha256": "71f417319c8c4d45562034b44a4ff08e5a1b3dddab5b5c42d5df9800e86a6084",
+    "tool_identity_stable": true,
+    "passed": 2,
+    "failed": 0,
+    "ignored": 0,
+    "overlaps_workspace_ignored_cases": true
+  },
+  "default_workspace_clippy": "passed_all_targets",
+  "schema_metaschema_validation": {
+    "passed": 374,
+    "instance_validation_claimed": false
+  },
+  "logs_sha256": {
+    "cg-workspace-default-54e905c.log": "c07a91554d5215399d242a68082c8ddd163439aa07e92cfc5d7ca7647ddf9034",
+    "cg-workspace-cli-lib-recheck.log": "266671dd2e3bf7f9e5f58364375f6fe503b9c7ad277807d8d1e1d9838d83b63b",
+    "cg-workspace-default-all-targets-54e905c.log": "dea17d0a585e93aeb35cd324149dc96cbdfbdffe1af8bb5254fdbe431ccda465",
+    "cg-workspace-native-ruff-54e905c.log": "d62208970805ba492158e923373bada7dc1a51c3de90928a78b4707a76cc8383",
+    "cg-workspace-default-clippy-54e905c.log": "e08a119ec47e5db0006b88dfc1a870c2b3b20a5cfbccce7ad259d5e900b330a9",
+    "cg-workspace-schema-meta-54e905c.log": "53d551266d9540ccc49c3e32f6f349b665cff1e18c47c4a6b2d2ef921adf9121"
+  },
+  "ci": {
+    "run_id": 37414921955,
+    "conclusion": "failure",
+    "msrv": "success",
+    "gate_failure_step": "Check out corpus evidence source"
+  },
+  "cold_start_reliability_accepted": false,
+  "full_wasm_suite": false,
+  "full_host_acceptance": false,
+  "full_platform_acceptance": false,
+  "delivery_decision": "not_evaluated"
+}
