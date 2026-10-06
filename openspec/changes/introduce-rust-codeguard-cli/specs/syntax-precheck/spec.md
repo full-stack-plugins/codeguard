@@ -788,3 +788,7 @@ Project Rust parser selection SHALL distinguish package edition, explicit worksp
 #### Scenario: 预算耗尽不冒充隐藏错误
 - **WHEN** 正常兄弟节点检查耗尽扫描预算且没有已确认的不可定位错误
 - **THEN** SHALL 保留截断未完成状态，不声称存在隐藏 token；旧工作进程版本不得携带新字段，新字段矛盾时 SHALL 拒绝报告
+
+#### Scenario: 项目检查与智能体入口的未完成解析指引
+- **WHEN** 项目检查、编辑Hook或稳定任务反馈包含 syntax_recovery_incomplete，包括不可定位错误或扫描预算耗尽
+- **THEN** 人类输出不得仅凭截断声称grammar已确认错误；反馈、任务正文和next SHALL 要求对原始源码使用适用原生工具确认，原生确认合法时调查grammar版本/兼容性或扫描预算，原生诊断成立时才按真实位置修复；保留无位置、未完成和既有任务身份

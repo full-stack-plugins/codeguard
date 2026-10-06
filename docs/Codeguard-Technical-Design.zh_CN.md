@@ -1622,3 +1622,5 @@ Rust编辑后现提供可执行的批次后Clippy指令，明确编辑阶段未�
 Rust 原生首次与 WASM 首次语法任务均可通过同一受保护宿主 SDK 确认、限定关闭和同工具复发重开。原生首次保留 grammar=null（策略1.7/证据0.8）；WASM 首次保留真实 grammar 摘要（策略1.8/证据0.9）。两者绑定 Cargo edition 来源与原反例；原生反证转调查，未完成或输入变化不能关闭。生产宿主批准接线仍待完成，不替代 Clippy/项目门禁。详见 [限定验收](../tests/acceptance/rust-task-resolution.md)。
 
 WASM 首次闭环的实际执行路径、协议与误报分流见 [验收记录](../tests/acceptance/rust-wasm-task-resolution.md)。
+
+未完成解析反馈现明确要求对原始源码进行适用原生确认：原生确认合法时调查grammar版本/兼容性或扫描预算，诊断成立时才按真实位置修复。不能仅凭截断声称grammar已报告错误。项目输出、编辑对话、持久任务及next/task show共用此分流，任务身份和关闭要求保持原有语义。[Acceptance](../tests/acceptance/incomplete-syntax-guidance.md)

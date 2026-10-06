@@ -1159,3 +1159,5 @@ flowchart LR
 ```
 
 该图对应当前源码的宿主批准路径；批准上下文来自宿主SDK调用方，尚未实现生产宿主自动接线，不能从项目本地历史推断全项目通过。
+
+未完成解析反馈现明确要求对原始源码进行适用原生确认：原生确认合法时调查grammar版本/兼容性或扫描预算，诊断成立时才按真实位置修复。不能仅凭截断声称grammar已报告错误。项目输出、编辑对话、持久任务及next/task show共用此分流，任务身份和关闭要求保持原有语义。[Acceptance](../tests/acceptance/incomplete-syntax-guidance.md)

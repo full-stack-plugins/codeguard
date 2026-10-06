@@ -32,6 +32,11 @@ fn hidden_kotlin_recovery_is_visible_in_project_feedback() {
     assert_eq!(kotlin["recovery_count"], 0);
     assert_eq!(kotlin["reason"], "syntax_recovery_incomplete");
     assert_eq!(report["delivery_decision"], "incomplete");
+    let guidance = report["syntax_candidates"]["next_action"].as_str().unwrap();
+    assert!(
+        guidance.contains("原始源码") && guidance.contains("原生确认合法"),
+        "{guidance}"
+    );
     let text_output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
         // 固定缺原生工具分支，避免宿主 kotlinc 抢占候选观察。
         .env("PATH", &root)
@@ -41,7 +46,9 @@ fn hidden_kotlin_recovery_is_visible_in_project_feedback() {
         .unwrap();
     assert_eq!(text_output.status.code(), Some(3));
     assert!(
-        String::from_utf8_lossy(&text_output.stdout).contains("grammar 报告错误但恢复位置不完整"),
+        String::from_utf8_lossy(&text_output.stdout).contains("原生确认合法")
+            && !String::from_utf8_lossy(&text_output.stdout)
+                .contains("grammar 报告错误但恢复位置不完整"),
         "{}",
         String::from_utf8_lossy(&text_output.stdout)
     );
