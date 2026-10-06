@@ -110,12 +110,15 @@ fn valid_id(id: &str) -> bool {
 }
 
 #[cfg(all(feature = "wasm-precheck", unix))]
-pub use replay::replay_corpus;
+pub use replay::{replay_corpus, replay_corpus_with_structures};
 
 #[cfg(all(feature = "wasm-precheck", unix))]
 mod replay {
     use super::{MANIFEST, classify_probe, digest, validate_corpus};
-    use crate::syntax_worker_runner::run_syntax_worker_candidate;
+    use crate::syntax_worker_runner::{
+        run_syntax_worker_candidate, run_syntax_worker_binding_candidate,
+        run_syntax_worker_form_candidate,
+    };
     use codeguard_core::{
         EvaluationCase, EvaluationOutcome, EvaluationThresholds, OracleDecision, evaluate_quality,
     };
@@ -134,6 +137,27 @@ mod replay {
         deadline: Instant,
         cancelled: &AtomicBool,
     ) -> Result<Value, String> {
+        replay(executable, corpus_bytes, deadline, cancelled, false)
+    }
+
+    /// 用项目检查的结构规则回放相同语料；原始解析器报告与组合候选按来源分别保留。
+    /// 参数为固定程序、当前清单绑定语料及共享预算；返回开发测量，不授予资格或关闭。
+    pub fn replay_corpus_with_structures(
+        executable: &Path,
+        corpus_bytes: &[u8],
+        deadline: Instant,
+        cancelled: &AtomicBool,
+    ) -> Result<Value, String> {
+        replay(executable, corpus_bytes, deadline, cancelled, true)
+    }
+
+    fn replay(
+        executable: &Path,
+        corpus_bytes: &[u8],
+        deadline: Instant,
+        cancelled: &AtomicBool,
+        structures: bool,
+    ) -> Result<Value, String> {
         // 全部输入先校验，错误语料不能先运行一部分再报参数错。
         let corpus = validate_corpus(corpus_bytes)?;
         if !executable.is_absolute() {
@@ -142,6 +166,7 @@ mod replay {
         let program_sha = hash_program(executable)?;
         let mut rows = Vec::new();
         let mut evaluations = Vec::new();
+        let mut combined_rows = Vec::new();
         for case in &corpus.cases {
             let started = Instant::now();
             let observation = if cancelled.load(Ordering::Relaxed) {
@@ -149,7 +174,14 @@ mod replay {
             } else if Instant::now() >= deadline {
                 Err("request_deadline_exceeded".into())
             } else {
-                run_syntax_worker_candidate(
+                let runner = if structures && case.language == "erlang" {
+                    run_syntax_worker_form_candidate
+                } else if structures && case.language == "javascript" {
+                    run_syntax_worker_binding_candidate
+                } else {
+                    run_syntax_worker_candidate
+                };
+                runner(
                     executable,
                     &case.language,
                     &case.id,
@@ -158,6 +190,14 @@ mod replay {
                     cancelled,
                 )
             };
+            let structural_observations = observation
+                .as_ref()
+                .map(|obs| obs.structural_observations.clone())
+                .unwrap_or_default();
+            let grammar_sha256 = observation
+                .as_ref()
+                .ok()
+                .map(|obs| obs.grammar_sha256.clone());
             let (classification, recovery_count, reason, attempted) = match observation {
                 Ok(obs) => {
                     let truncated = obs.precheck.truncated_files > 0;
@@ -212,6 +252,14 @@ mod replay {
                 rows.last_mut().ok_or("grammar_evaluation_row_missing")?["cohort"] =
                     json!(case.cohort);
             }
+            if structures {
+                let combined =
+                    classification.map(|valid| valid && structural_observations.is_empty());
+                combined_rows.push(json!({"id":case.id,"language":case.language,"cohort":case.cohort,
+                    "label":case.label,"source_sha256":case.source_sha256,"grammar_sha256":grammar_sha256,
+                    "expected_valid":case.expected_valid,"classification":classification_name(combined),
+                    "structural_observations":structural_observations}));
+            }
         }
         let program_stable = hash_program(executable).is_ok_and(|current| current == program_sha);
         if !program_stable {
@@ -221,6 +269,9 @@ mod replay {
                 row["reason"] = json!("grammar_evaluation_program_changed");
                 evaluation.observed_complete = false;
                 evaluation.observed_findings.clear();
+            }
+            for row in &mut combined_rows {
+                row["classification"] = json!("unknown");
             }
         }
         // 固定规格下界；未批准的开发语料不因此变成发布验收。
@@ -303,7 +354,59 @@ mod replay {
             report["cohort_count"] = json!(cohort_count);
             report["cohort_policy"] = json!("separate_sources_no_pooled_precision");
         }
+        if structures {
+            return Ok(combined_report(report, combined_rows));
+        }
         Ok(report)
+    }
+
+    fn combined_report(raw: Value, rows: Vec<Value>) -> Value {
+        // 只列分语言/分来源分母，不汇总精度；待裁定标签不进入混淆计数。
+        let mut groups = std::collections::BTreeMap::<(String, String), Vec<&Value>>::new();
+        for row in &rows {
+            let language = row["language"].as_str().unwrap_or_default().to_owned();
+            let cohort = row["cohort"].as_str().unwrap_or_default().to_owned();
+            groups.entry((language, cohort)).or_default().push(row);
+        }
+        let cohorts: Vec<Value> = groups
+            .into_iter()
+            .map(|((language, cohort), cases)| {
+                let mut counts = [0usize; 4];
+                let mut unknown = 0;
+                let mut pending = 0;
+                for row in &cases {
+                    if row["classification"] == "unknown" {
+                        unknown += 1;
+                    }
+                    if row["label"] == "pending" {
+                        pending += 1;
+                        continue;
+                    }
+                    match (
+                        row["expected_valid"].as_bool(),
+                        row["classification"].as_str(),
+                    ) {
+                        (Some(false), Some("invalid")) => counts[0] += 1,
+                        (Some(true), Some("invalid")) => counts[1] += 1,
+                        (Some(false), Some("valid")) => counts[2] += 1,
+                        (Some(true), Some("valid")) => counts[3] += 1,
+                        _ => {}
+                    }
+                }
+                json!({"language":language,"cohort":cohort,"sample_count":cases.len(),
+                "unknown_count":unknown,"pending_label_count":pending,
+                "tp":counts[0],"fp":counts[1],"fn":counts[2],"tn":counts[3]})
+            })
+            .collect();
+        json!({"report_type":"grammar_structure_evaluation","schema_version":"0.1.0",
+            "authority":"repository_regression_only","status":"incomplete",
+            "delivery_decision":"not_evaluated","grammar_qualified_count":0,
+            "native_oracle_executed":false,"independent_holdout":false,
+            "program_stable":raw["program_stable"],"program_sha256":raw["program_sha256"],
+            "manifest_sha256":raw["manifest_sha256"],"corpus_sha256":raw["corpus_sha256"],
+            "sample_count":rows.len(),"language_count":raw["language_count"],
+            "cohort_count":cohorts.len(),"cohort_policy":"separate_sources_no_pooled_precision",
+            "raw_report":raw,"combined_cases":rows,"combined_cohorts":cohorts})
     }
 
     fn separate_cohorts(cohorts: &[Value], rows: &[Value]) -> Result<Vec<Value>, String> {

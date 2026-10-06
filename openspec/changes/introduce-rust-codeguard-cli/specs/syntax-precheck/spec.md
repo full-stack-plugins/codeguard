@@ -846,3 +846,7 @@ The system SHALL inspect direct function-form terminal tokens in the pinned Erla
 - **WHEN** native Erlang is unavailable and project scanning or a confirmed edit discovers a direct function form termination candidate
 - **THEN** the shared bounded worker emits the same versioned structural evidence and updates one stable native-confirmation task, with original-tool recheck instructions and preserved attempt history
 - **AND** subsequent zero candidates cannot close that task, changed source retains its original consumed evidence, and forged rule/source/position reports cannot be imported
+
+#### Scenario: Current full replay measures structural candidates separately
+- **WHEN** the fixed 32-language corpus is replayed with the same structural rules used by project checks, including explicit JavaScript and Erlang rules
+- **THEN** a versioned report preserves the original parser classification and separate combined classifications, rule identities and per-language/source-group counts; truncation, cancellation or program changes remain unknown, pending labels remain unevaluated, and no language qualification is granted
