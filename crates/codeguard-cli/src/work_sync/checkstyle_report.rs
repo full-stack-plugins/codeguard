@@ -40,7 +40,7 @@ pub(super) fn parse(
         .as_str()
         .filter(|s| safe_run_id(s))
         .ok_or("report_run_id_invalid")?;
-    if report["schema_version"] != "0.1.0"
+    if !matches!(report["schema_version"].as_str(), Some("0.1.0" | "0.2.0"))
         || report["workspace_binding"] != "bound"
         || report["workspace_id"] != workspace_id
         || report["authority"] != "local_unverified"
@@ -92,6 +92,13 @@ pub(super) fn parse(
     }
     let bindings = checkstyle_comment_rule_bindings(&frozen["config"], "10.21.4")
         .ok_or("checkstyle_configuration_context_unresolved")?;
+    if report["schema_version"] == "0.1.0"
+        && bindings
+            .values()
+            .any(|b| codeguard_adapters::checkstyle_detailed_rule_class(&b.checker_class))
+    {
+        return Err("checkstyle_rule_protocol_invalid");
+    }
     let mut occurrences = BTreeMap::new();
     let mut findings = Vec::new();
     for candidate in report["findings"]

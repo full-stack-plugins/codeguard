@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:checkstyle-preparation-recheck-v0.2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "workspace_binding",
+    "workspace_id",
+    "checker_id",
+    "authority",
+    "coverage_proven",
+    "delivery_decision",
+    "run_id",
+    "report_type",
+    "local_status",
+    "reason",
+    "scan",
+    "target",
+    "task_input_stable"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.2.0"
+    },
+    "workspace_binding": {
+      "const": "bound"
+    },
+    "workspace_id": {
+      "type": "string",
+      "pattern": "^ws-[0-9a-f]{32}$"
+    },
+    "checker_id": {
+      "const": "java.checkstyle.preparation"
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^checkstyle-preparation-verify-[0-9]+-[0-9]+$"
+    },
+    "report_type": {
+      "const": "checkstyle_preparation_recheck"
+    },
+    "local_status": {
+      "enum": [
+        "observed",
+        "incomplete"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "pattern": "^[a-z_]{1,80}$"
+    },
+    "scan": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "checkstyle-workbench-observation-v0.2.schema.json"
+        }
+      ]
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "path"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "pattern": "^CG-B-[0-9a-f]{32}$"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "task_input_stable": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "boolean"
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "local_status": {
+            "const": "incomplete"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "scan": {
+            "type": "null"
+          },
+          "task_input_stable": {
+            "type": "null"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "scan": {
+            "type": "object"
+          },
+          "task_input_stable": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  ]
+}

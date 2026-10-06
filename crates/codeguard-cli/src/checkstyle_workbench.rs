@@ -78,7 +78,7 @@ pub(crate) fn prepare(
         .map_err(|_| "clock_unavailable")?
         .as_nanos();
     Ok(
-        json!({"schema_version":"0.1.0","report_type":"java_checkstyle_workbench_observation",
+        json!({"schema_version":if feedback["schema_version"] == "0.5.0" {"0.2.0"}else{"0.1.0"},"report_type":"java_checkstyle_workbench_observation",
         "workspace_binding":"bound","workspace_id":workspace_id,"run_id":format!("checkstyle-{}-{nanos}",std::process::id()),
         "authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated",
         "checker_id":"java.checkstyle","source_path":relative,"inputs":inputs,"findings":findings}),
