@@ -1114,6 +1114,8 @@ Rust CVE局部观察现在核对同轮RustSec crates/rust内容、成员及物�
 
 `codeguard comments c api.c --clang-tool /absolute/clang --standard c11 --format=json`；C++ 使用 `comments cpp api.cpp --standard c++17` 并保留同一工具参数。当前仅适配已实测的 Apple Clang 21 独立文档警告档案，明确工具与标准，不隐式安装。原生 SARIF 的空命令描述、错误参数名及 void 返回标签三项精确规则带有修复步骤、仅文档允许范围和原工具复检 argv；未知规则单独保留。坏报告、输入变化、取消和未解析预处理不能成为源码违规。
 
-这是 `c_family_comments_feedback` 0.1 的局部观察：项目原配置未知，完整详细契约未授予资格；Clang完全缺失注释也可能零诊断。未绑定工作台时保留0.1/`next=null`；已有工作台现在提供0.3反馈、按文件/语言标准/原规则归并的稳定任务和next0.29，保留全部当前位置及原工具复扫argv。输入或工具变化撤回修复定位，清洁复扫保留开放任务。专用task verify已沿首次工具/标准/规则接通，记录局部事实并保持任务开放；专用尝试日志、项目检查和Hook仍待接通；退出3，取消130，不自动关闭任务或授予门禁。真实16例、执行路径和剩余缺口见[原生文档验收](tests/acceptance/c-family-comments-native.md)。
+这是 `c_family_comments_feedback` 0.1 的局部观察：项目原配置未知，完整详细契约未授予资格；Clang完全缺失注释也可能零诊断。未绑定工作台时保留0.1/`next=null`；已有工作台现在提供0.4反馈、按文件/语言标准/原规则归并的稳定任务和next0.30，保留全部当前位置及原工具复扫argv。输入或工具变化撤回修复定位，清洁复扫保留开放任务。专用task verify已沿首次工具/标准/规则接通，记录局部事实并保持任务开放；专用尝试日志已接通，按当前源码/原工具上下文记录失败与预算；项目检查和Hook仍待接通；退出3，取消130，不自动关闭任务或授予门禁。真实16例、执行路径和剩余缺口见[原生文档验收](tests/acceptance/c-family-comments-native.md)。
 
 C/C++ 原任务复检与新封闭协议的当前证据见[复检验收](tests/acceptance/c-family-comments-task-recheck.md)；完整四核心生产资格仍未授予。
+
+C/C++ 受控尝试、无进展诊断与当前协议见[尝试日志验收](tests/acceptance/c-family-comments-attempt-history.md)；本地日志不能替代完整四核心生产验收。

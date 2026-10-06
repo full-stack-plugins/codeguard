@@ -153,17 +153,70 @@ pub(super) fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate
     } else {
         "native_rule_observed"
     };
-    let actionable = status == "native_rule_observed";
+    let source_actionable = status == "native_rule_observed";
+    let environment_actionable = kind == "blocker"
+        && status == "native_incomplete"
+        && latest["native"]["reason"] == "clang_tool_unavailable"
+        && first["native"]["tool_sha256"].is_null();
+    let actionable = source_actionable || environment_actionable;
     let guidance = codeguard_adapters::clang_documentation_guidance(rule).unwrap_or(json!({"rule_summary":"原生文档检查未完成或存在未适配规则","repair_steps":["核对原生原因、工具与源码范围，再运行原文档检查。"]}));
-    let brief = json!({"schema_version":"0.29.0","task_id":id,"kind":kind,"checker_id":checker(&first),"scope":first["path"],"source_sha256":latest["source_sha256"],"native_rule_id":if kind == "finding" {json!(rule)} else {Value::Null},
-        "evidence_ref":{"first_run_id":run,"first_report_sha256":digest},"current_run_id":latest["run_id"],"observation_status":status,"native_reason":latest["native"]["reason"],"native_positions":if actionable {json!(present)} else {json!([])},
+    let mut brief = json!({"schema_version":"0.30.0","task_id":id,"kind":kind,"checker_id":checker(&first),"scope":first["path"],"source_sha256":latest["source_sha256"],"native_rule_id":if kind == "finding" {json!(rule)} else {Value::Null},
+        "evidence_ref":{"first_run_id":run,"first_report_sha256":digest},"current_run_id":latest["run_id"],"observation_status":status,"native_reason":latest["native"]["reason"],"native_positions":if source_actionable {json!(present)} else {json!([])},
         "unclassified_native_diagnostics":latest["native"]["diagnostics"].as_array().into_iter().flatten().filter(|d| d["rule_id"].as_str().is_some_and(|r| codeguard_adapters::clang_documentation_guidance(r).is_none())).cloned().collect::<Vec<_>>(),
-        "rule_basis":guidance["rule_summary"],"constraints":["仅文档注释；保留源码API与行为","本地报告非可信政策，不能关闭任务或自批白名单"],"allowed_paths":if actionable {json!([first["path"]])} else {json!([])},
+        "rule_basis":guidance["rule_summary"],"constraints":["仅文档注释；保留源码API与行为","本地报告非可信政策，不能关闭任务或自批白名单"],"allowed_paths":if source_actionable {json!([first["path"]])} else {json!([])},
         "disposition":if actionable {"actionable"} else {"needs_decision"},"reason_code":status,"step":guidance["repair_steps"],"recheck_argv":["codeguard","task","verify",id,root,"--clang-tool",first["selected_tool"],"--format=json"],
-        "history":{"status":"native_observations_only","task_verify":"partial","attempt_journal":"not_integrated"},"closure_condition":"原工具局部任务复检已接通；完整详细文档覆盖、尝试历史和可信关闭仍待完成；零诊断或勾选不关闭","authority":"local_unverified","delivery_decision":"not_evaluated"});
+        "closure_condition":"尝试和原工具局部复检均不关闭；仍需完整详细文档覆盖、可信政策与关闭/复发验证。零诊断、勾选或本地失败记录均不能放行。","authority":"local_unverified","delivery_decision":"not_evaluated"});
+    brief["affected_paths"] = json!([first["path"]]);
+    brief["action_id"] = json!(super::canonical_action_id(&brief)?);
+    if environment_actionable {
+        brief["step"] = json!([format!(
+            "恢复首次选择的原工具路径 {}，核对Apple Clang21与固定标准，再执行原任务复检；不修改无关源码。",
+            first["selected_tool"].as_str().unwrap_or("")
+        )]);
+    }
+    let history = crate::task_attempt_command::attempt_history(root, id, &brief)?;
+    let mut priority = if source_actionable { 1 } else { 0 };
+    if history["open_attempt_id"].is_string() {
+        brief["disposition"] = json!("waiting");
+        brief["reason_code"] = json!("attempt_in_progress");
+        brief["step"] = json!(["由持有租约的执行者记录当前尝试结果；结束前不重复修复同一任务。"]);
+        priority = 0;
+    } else if history["awaiting_verification"] == true {
+        brief["disposition"] = json!("verification_required");
+        brief["reason_code"] = json!("original_verification_required");
+        brief["step"] = json!([
+            "修复尝试已结束；按首次工具、标准与规则执行task verify，不能用再次勾选任务代替复检。"
+        ]);
+        priority = 0;
+    } else if history["unverified_prior_attempt_count"]
+        .as_u64()
+        .unwrap_or(0)
+        > 0
+    {
+        brief["disposition"] = json!("needs_decision");
+        brief["reason_code"] = json!("historical_verification_evidence_unavailable");
+        brief["step"] = json!([
+            "先恢复当前输入下早先尝试的原复检报告或调查失效原因；缺失本地证据不能删除失败尝试或恢复修复预算。"
+        ]);
+        priority = 0;
+    } else if history["no_progress_count"].as_u64().unwrap_or(0) >= 2 && actionable {
+        brief["disposition"] = json!("needs_decision");
+        brief["reason_code"] = json!("no_progress_budget_exhausted");
+        brief["step"] = json!([format!(
+            "同一源码、原工具上下文与动作已连续无进展；核对规则 {}、原生原因 {} 和最近失败记录，提出具体修复或误报纠错决策；重命名动作、重复扫描不能重置预算。",
+            rule,
+            latest["native"]["reason"].as_str().unwrap_or("unknown")
+        )]);
+        priority = 0;
+    }
+    if brief["disposition"] != "actionable" {
+        brief["allowed_paths"] = json!([]);
+    }
+    brief["history"] = history;
+
     Ok(Candidate {
         id: id.into(),
-        priority: if actionable { 1 } else { 0 },
+        priority,
         brief,
     })
 }

@@ -294,3 +294,38 @@ pub(crate) fn classify(brief: &Value, r: &Value) -> &'static str {
         "candidate_absent_unverified_policy"
     }
 }
+
+/// 计算受控尝试的当前输入身份；包含源码、首次语言/标准与当前工具状态，不能只靠动作名重置预算。
+/// 参数为已初始化工作区与原任务摘要；返回当前输入SHA-256，不可读或越界输入返回具体错误。
+pub(crate) fn attempt_input_digest(root: &Path, brief: &Value) -> Result<String, &'static str> {
+    let first = original(root, &reference(brief))?;
+    let path = first["path"].as_str().ok_or("attempt_scope_invalid")?;
+    let snapshot =
+        SourceSnapshot::capture(root, [PathBuf::from(path)], 1, 1024 * 1024, 1024 * 1024)
+            .map_err(|_| "attempt_source_unavailable")?;
+    let bytes = snapshot
+        .files()
+        .get(&PathBuf::from(path))
+        .ok_or("attempt_source_unavailable")?;
+    let selected = Path::new(
+        first["selected_tool"]
+            .as_str()
+            .ok_or("attempt_tool_invalid")?,
+    );
+    let canonical = selected.canonicalize().ok();
+    let tool_bytes = canonical
+        .as_ref()
+        .and_then(|p| read_bounded_regular_file(p, 256 * 1024 * 1024).ok());
+    let state = if tool_bytes.is_some() {
+        "observed"
+    } else if std::fs::symlink_metadata(selected)
+        .is_err_and(|e| e.kind() == std::io::ErrorKind::NotFound)
+    {
+        "missing"
+    } else {
+        "unavailable"
+    };
+    let payload = json!({"version":"clang-documentation-attempt-input-v1","scope":path,"language":first["language"],"standard":first["standard"],"profile":first["profile"],"source_sha256":format!("{:x}",Sha256::digest(bytes)),"selected_tool":first["selected_tool"],"canonical_tool":canonical,"tool_state":state,"tool_sha256":tool_bytes.as_ref().map(|b|format!("{:x}",Sha256::digest(b)))});
+    let bytes = serde_json::to_vec(&payload).map_err(|_| "attempt_input_encoding_failed")?;
+    Ok(format!("{:x}", Sha256::digest(bytes)))
+}
