@@ -1968,3 +1968,7 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 ## 2026-10-06 Maven/Gradle同根配置归属缺陷修复
 
 同目录if/else发现逻辑会丢弃Gradle及第二份Gradle脚本，三个新用例RED后修复。依赖/CVE/安全类别不再用已配置或已执行Maven覆盖Gradle未解析义务，Maven局部图和漏洞保留在native_results。新版check_feedback0.61封闭消费实际报告；默认50通过、WASM7通过（重叠，不合计独立样本），21报告/409schema验证通过。缓存Gradle8.10.2版本命令实测可用，OWASP插件缓存目录未找到，未安装下载。详见tests/acceptance/java-mixed-build-roots.md；6.x/8.x/15.5仍待真正Gradle插件运行及修复闭环，保持未完成。
+
+## 2026-10-06 Gradle生效模型解析契约
+
+新增逐项目插件/目录/任务实现类/启用状态模型和严格Rust解析器，不按同名任务猜测OWASP能力；拒绝重复、越界、缺父项目、未知协议和未覆盖composite build。受控JSON四项测试覆盖官方身份组合与异常输入，详见tests/acceptance/gradle-checker-model.md。尚未原生采集或接入公开命令，不声称真实Gradle扫描或生产资格；6.x/8.x/15.5继续未完成。

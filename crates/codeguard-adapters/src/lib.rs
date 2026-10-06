@@ -440,3 +440,12 @@ pub use erlang_form_rule::erlang_form_rule_sha256;
 
 mod javascript_module_return_rule;
 pub use javascript_module_return_rule::{javascript_module_return_node_kinds, javascript_module_return_rule_sha256};
+
+mod gradle_checker_task;
+mod gradle_project_checker_model;
+mod gradle_checker_model;
+mod gradle_checker_model_parser;
+pub use gradle_checker_task::GradleCheckerTask;
+pub use gradle_project_checker_model::GradleProjectCheckerModel;
+pub use gradle_checker_model::GradleCheckerModel;
+pub use gradle_checker_model_parser::parse_gradle_checker_model;
