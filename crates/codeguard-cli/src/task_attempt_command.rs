@@ -128,7 +128,13 @@ fn execute(args: &Args) -> Result<Value, &'static str> {
     if !real_directory(&state) {
         return Err("workspace_state_unavailable");
     }
-    read_task_brief(&root, &args.task_id)?;
+    let initial = read_task_brief(&root, &args.task_id)?;
+    if matches!(
+        initial["checker_id"].as_str(),
+        Some("c.clang.documentation_structure" | "cpp.clang.documentation_structure")
+    ) {
+        return Err("clang_structure_attempt_journal_not_integrated");
+    }
     let locks = state.join("task_locks");
     ensure_directory(&locks)?;
     let _lock = TaskFileLock::acquire(&locks.join(format!("{}.lock", args.task_id)))

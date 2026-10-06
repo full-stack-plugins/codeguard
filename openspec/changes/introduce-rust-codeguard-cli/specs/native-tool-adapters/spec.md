@@ -1165,3 +1165,20 @@ The explicit standalone comments command SHALL obtain warning diagnostics and a 
 - **WHEN** native warning evidence is valid but the independently interpreted AST is unavailable, malformed or outside supported budget
 - **THEN** original warning evidence SHALL remain separately visible while structural coverage is incomplete
 - **AND** no additional compilation, project configuration mutation or free compiler arguments SHALL be introduced
+
+
+### Requirement: C-family structural documentation SHALL persist stable file-policy repair groups
+
+For an initialized workspace, current native AST-associated missing comment/purpose/parameter/applicable-return components SHALL form a stable file/language/standard/policy group. Line numbers, function names and source digests SHALL NOT define a per-function identity. Codeguard-owned structural policy SHALL be explicitly distinguished from original Clang warning IDs.
+
+#### Scenario: Repeat scans and overloaded functions share a bounded structural repair group
+- **WHEN** explicit comments scans a current file with supported structural deficits, including same-name C++ overloads
+- **THEN** it SHALL create one stable policy task with all current affected function/component evidence, original source and tool context, precise comment-only scope and original comments re-scan argv
+- **AND** repeated scans or line movement SHALL update that task without duplicate identities or binding evidence to one overload
+
+#### Scenario: Local correction or changed evidence cannot close a structural task
+- **WHEN** a later same-context original scan finds no supported missing component
+- **THEN** the task SHALL remain open with an unverified candidate-absence observation and no repair permission
+- **WHEN** source/tool/original report/consumption binding is stale, malformed or altered
+- **THEN** next SHALL withdraw source permissions or reject conflicting evidence
+- **AND** unsupported dedicated task verification/attempt recording SHALL fail before starting a wrong language checker; re-scan capability SHALL NOT imply trusted closure or full detailed accuracy

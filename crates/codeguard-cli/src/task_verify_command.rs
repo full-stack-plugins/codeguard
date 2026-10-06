@@ -95,6 +95,12 @@ pub fn run(args: &[String]) -> ExitCode {
         Err(reason) => return print_unavailable(&parsed, reason),
     };
     let gradle_cve_task = brief["checker_id"] == "java.gradle.dependency_check";
+    if matches!(
+        brief["checker_id"].as_str(),
+        Some("c.clang.documentation_structure" | "cpp.clang.documentation_structure")
+    ) {
+        return print_unavailable(&parsed, "clang_structure_task_verify_not_integrated");
+    }
     let c_documentation_task = matches!(
         brief["checker_id"].as_str(),
         Some("c.clang.documentation" | "cpp.clang.documentation")

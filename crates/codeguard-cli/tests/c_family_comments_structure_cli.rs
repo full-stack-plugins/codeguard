@@ -96,9 +96,9 @@ fn public_comments_exposes_absent_empty_and_valid_structural_descriptions() {
                 .unwrap();
             assert_eq!(out.status.code(), Some(3));
             let report: Value = serde_json::from_slice(&out.stdout).unwrap();
-            assert_eq!(report["schema_version"], "0.6.0");
+            assert_eq!(report["schema_version"], "0.7.0");
             assert_eq!(report["workspace_binding"], "bound");
-            assert_eq!(report["structural_task_workflow_status"], "not_integrated");
+            assert_eq!(report["structural_task_workflow_status"], "partial");
             if missing_tool {
                 assert_eq!(report["documentation_structure"]["status"], "incomplete");
                 assert_eq!(

@@ -453,6 +453,8 @@ mod clang_documentation_rule;
 pub use clang_documentation_rule::clang_documentation_guidance;
 mod clang_documentation_ast;
 pub use clang_documentation_ast::parse_clang_documentation_ast;
+mod clang_documentation_structure;
+pub use clang_documentation_structure::valid_clang_documentation_structure;
 
 mod erlang_form_rule;
 pub use erlang_form_rule::erlang_form_rule_sha256;

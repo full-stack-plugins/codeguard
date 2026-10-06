@@ -513,6 +513,8 @@ pub mod c_family_comments_command;
 #[cfg(unix)]
 mod c_family_comments_workbench;
 #[cfg(unix)]
+mod c_family_structure_workbench;
+#[cfg(unix)]
 mod c_family_comments_task_recheck;
 #[cfg(unix)]
 mod clang_lint_feedback;

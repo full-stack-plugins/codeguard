@@ -127,6 +127,7 @@ pub fn run(args: &[String]) -> ExitCode {
         "native":native,"documentation_findings":documentation_findings,"unclassified_native_diagnostics":unclassified,
         "next_actions":["按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
             "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。"]});
+    report["documentation_structure"] = structure.clone();
     if let Some(root) = workspace {
         crate::c_family_comments_workbench::connect(
             &root,
@@ -134,18 +135,26 @@ pub fn run(args: &[String]) -> ExitCode {
             &mut report,
             deadline,
         );
+        crate::c_family_structure_workbench::connect(
+            &root,
+            request.clang_tool.as_deref().expect("工具已校验"),
+            &mut report,
+            deadline,
+        );
         report["next_actions"][0] = json!(
-            "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务与可信关闭仍待实现。"
+            "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify与可信关闭仍待实现。"
         );
     }
     report["schema_version"] = json!(if report.get("workbench").is_some() {
-        "0.6.0"
+        "0.7.0"
     } else {
         "0.5.0"
     });
     report["documentation_structure"] = structure;
-    report["structural_task_workflow_status"] = json!("not_integrated");
-    report["next_actions"].as_array_mut().expect("固定反馈动作").push(json!("读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；结构任务与原工具结构复检仍待接线，不把非空说明当准确性或关闭证据。"));
+    if report.get("structural_workbench").is_none() {
+        report["structural_task_workflow_status"] = json!("not_integrated");
+    }
+    report["next_actions"].as_array_mut().expect("固定反馈动作").push(json!("读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原comments命令复扫；专用结构task verify与可信关闭仍待接线，不把非空说明当准确性或关闭证据。"));
     if request.json {
         println!("{report}");
     } else {
