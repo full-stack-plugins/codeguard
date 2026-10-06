@@ -1916,3 +1916,7 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 ## 2026-10-06 lint all 公开SIGINT与清理验收
 
 对应2.3/2.8：同一受控进程夹具分别check all/lint all实际发送SIGINT，退出130、保留已完成Clippy诊断与Python取消状态、核对子孙无晚写入；lint协议与候选保持仅lint。默认相关23通过/3条件忽略，WASM取消两项通过（重叠不累计），两份实际报告和每份两种状态矛盾反例核验。见tests/acceptance/lint-all-cancellation.md。内部异常、完整聚合、跨入口/平台/宿主仍缺，不勾选父任务。
+
+## 2026-10-06 lint all 类别内next与历史任务保留
+
+对应2.1/9.x：公开RED证明历史构建阻塞使当前Clippy指引被清空。新增单次允许检查器集合选择，保留全量事实校验和优先级；语法确认后备限定本轮任务ID，不删除历史构建事实。默认相关42通过/5条件忽略，WASM同一公开用例1通过，实际报告/Clippy/分层/OpenSpec通过。见tests/acceptance/lint-all-next-selection.md。完整任务调度、可信关闭、矩阵/宿主仍缺，父任务保持开放。

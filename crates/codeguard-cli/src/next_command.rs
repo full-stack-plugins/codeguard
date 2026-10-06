@@ -99,7 +99,15 @@ pub(crate) fn read_local_brief_for_checker(
     root: &Path,
     checker_id: &str,
 ) -> Result<Value, &'static str> {
-    build_view(root, Some(checker_id), None)
+    build_view(root, Some(&[checker_id]), None)
+}
+
+/// 一次校验本地事实并从允许的检查器集合选择任务，避免重复遍历历史队列。
+pub(crate) fn read_local_brief_for_checkers(
+    root: &Path,
+    checker_ids: &[&str],
+) -> Result<Value, &'static str> {
+    build_view(root, Some(checker_ids), None)
 }
 
 /// 从本轮已同步的任务身份读取下一步；返回既有 next 协议，不扩大到其它历史任务。
@@ -175,7 +183,7 @@ fn read_task_brief_inner(
 
 fn build_view(
     root: &Path,
-    checker_id: Option<&str>,
+    checker_ids: Option<&[&str]>,
     task_ids: Option<&std::collections::BTreeSet<String>>,
 ) -> Result<Value, &'static str> {
     let baseline = read_workspace_baseline(root).map_err(|reason| {
@@ -254,22 +262,28 @@ fn build_view(
             return Err("finding_fact_conflict");
         }
         let candidate = candidate(root, &id, &fact)?;
-        if checker_id.is_none_or(|checker| candidate.brief["checker_id"] == checker)
-            && task_ids.is_none_or(|ids| ids.contains(&candidate.id))
+        if checker_ids.is_none_or(|checkers| {
+            checkers
+                .iter()
+                .any(|checker| candidate.brief["checker_id"] == *checker)
+        }) && task_ids.is_none_or(|ids| ids.contains(&candidate.id))
         {
             candidates.push(candidate);
         }
     }
     if candidates.is_empty() {
-        let selected_command = if matches!(
-            checker_id,
-            Some("java.maven.p3c" | "java.maven.dependency_check")
-        ) {
+        let selected_command = if checker_ids.is_some_and(|checkers| {
+            checkers.len() == 1
+                && matches!(
+                    checkers[0],
+                    "java.maven.p3c" | "java.maven.dependency_check"
+                )
+        }) {
             "java"
         } else {
             "all"
         };
-        let reason = if checker_id.is_some() {
+        let reason = if checker_ids.is_some() {
             "no_selected_tasks_without_fresh_language_check"
         } else {
             "no_tasks_without_fresh_full_gate"

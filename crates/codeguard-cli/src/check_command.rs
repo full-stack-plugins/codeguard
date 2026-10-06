@@ -2049,6 +2049,56 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
             }
         }
     }
+    if lint_only {
+        // 按本次类别选择候选，不能在全历史首项选中后简单丢弃而使有效lint任务饥饿。
+        match crate::next_command::read_local_brief_for_checkers(
+            &root,
+            &[
+                "rust.cargo_clippy",
+                "python.ruff",
+                "python.ruff.doctor",
+                "java.maven.p3c",
+                "node.eslint",
+                "node.eslint.preparation",
+                "go.vet",
+                "shell.shellcheck",
+            ],
+        ) {
+            Ok(brief) if brief["repair_brief"].is_object() => next = brief,
+            Ok(_) => next = Value::Null,
+            Err(reason) => {
+                unresolved.insert(format!("lint_next_unavailable:{reason}"));
+                next = Value::Null;
+            }
+        }
+        if next.is_null() {
+            // 语法确认仅允许本轮原生/候选产生的任务，不扩大到任意历史语种。
+            let ids = [
+                &erlang_lint,
+                &kotlin_lint,
+                &swift_lint,
+                &zig_lint,
+                &ruby_lint,
+            ]
+            .into_iter()
+            .flat_map(|report| report["files"].as_array().into_iter().flatten())
+            .filter_map(|file| file["task_id"].as_str().map(str::to_owned))
+            .chain(
+                syntax_tasks["tasks"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .filter_map(|task| task["task_id"].as_str().map(str::to_owned)),
+            )
+            .collect();
+            match crate::next_command::read_local_brief_for_tasks(&root, &ids) {
+                Ok(brief) => next = brief,
+                Err(reason) => {
+                    unresolved.insert(format!("lint_next_unavailable:{reason}"));
+                }
+            }
+        }
+    }
     if zig_lint.is_object() {
         crate::check_zig_scan::refresh(&root, &mut zig_lint, deadline);
     }
