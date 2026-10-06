@@ -18,7 +18,7 @@ const EXTRA: &[&str] = &[
     "suppression_status",
 ];
 /// 读取首次绑定报告，不接受报告摘要漂移或跨任务上下文。
-fn original(root: &Path, reference: &Value) -> Result<Value, &'static str> {
+pub(crate) fn original(root: &Path, reference: &Value) -> Result<Value, &'static str> {
     let run = reference["run_id"]
         .as_str()
         .filter(|s| {

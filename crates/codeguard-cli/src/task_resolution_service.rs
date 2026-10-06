@@ -473,6 +473,12 @@ pub(crate) fn commit_resolution(
         "current_native",
         "outcome",
     ];
+    if raw_evidence["schema_version"] == "0.11.0" {
+        keys.extend(["native_rule_id", "dialect", "project_configuration"]);
+        if !crate::shell_resolution_evidence::binding(&raw_evidence) {
+            return Err("task_resolution_evidence_binding_invalid");
+        }
+    }
     if matches!(
         raw_evidence["schema_version"].as_str(),
         Some("0.8.0" | "0.9.0")
@@ -521,6 +527,7 @@ pub(crate) fn commit_resolution(
                 | "0.8.0"
                 | "0.9.0"
                 | "0.10.0"
+                | "0.11.0"
         )
     ) {
         return Err("task_resolution_evidence_binding_invalid");
@@ -576,6 +583,11 @@ pub(crate) fn commit_resolution(
         outcome = "resolution_history_binding_changed";
     }
     raw_evidence["outcome"] = json!(outcome);
+    let receipt_version = if raw_evidence["schema_version"] == "0.11.0" {
+        "0.2.0"
+    } else {
+        "0.1.0"
+    };
     let raw_evidence =
         serde_json::to_vec_pretty(&raw_evidence).map_err(|_| "task_resolution_encoding_failed")?;
     let evidence_sha = digest(&raw_evidence);
@@ -676,7 +688,7 @@ pub(crate) fn commit_resolution(
         &verified,
     );
     Ok(
-        json!({"schema_version":"0.1.0","report_type":"task_resolution_receipt","identity":evidence.identity,"state":view.state,"outcome":outcome,"authority":"host_context_verified","policy_sha256":policy_sha,"policy_revision":evidence.policy_revision,"event_ref":format!(".codeguard/findings/{}/events/lifecycle-{}.json",task_id,record.event.event_id),"evidence_ref":evidence_ref,"evidence_sha256":evidence_sha,"delivery_decision":"not_evaluated"}),
+        json!({"schema_version":receipt_version,"report_type":"task_resolution_receipt","identity":evidence.identity,"state":view.state,"outcome":outcome,"authority":"host_context_verified","policy_sha256":policy_sha,"policy_revision":evidence.policy_revision,"event_ref":format!(".codeguard/findings/{}/events/lifecycle-{}.json",task_id,record.event.event_id),"evidence_ref":evidence_ref,"evidence_sha256":evidence_sha,"delivery_decision":"not_evaluated"}),
     )
 }
 fn go_companion_matches(tool: &Path, policy: &TaskResolutionPolicyInput) -> bool {
