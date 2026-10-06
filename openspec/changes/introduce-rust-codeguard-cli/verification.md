@@ -2418,3 +2418,7 @@ ESLint统一入口对JavaScript四种扩展接入原生优先及共享候选扫�
 ### 全注册表独立候选lint入口
 
 统一单文件服务实际调用剩余20grammar，与原专用入口分开；原生适配缺口输出unknown，不证明工具未安装。WASM四目标31通过、补充身份/路径反例后单目标5通过（重叠），默认四目标14通过/4忽略。实际报告/schema和验收记录在tests/acceptance/standalone-syntax-lint.md。未以此证据声称32语言原生lint、正式精度、完整关闭、真实宿主或发行完成。
+
+### C/C++显式原生入口
+
+默认两个目标7通过/1忽略、WASM四目标21通过/1忽略，解析器契约1通过；另显式真实Clang目标1通过（八份反馈）。参数/human问题均真实RED修复；固定driver/input/rule及Unicode字节位置保留，疑似编译上下文不当源码违规。报告0.2及源样例见tests/acceptance/clang-standalone-native.md；不借该限定结果证明完整C/C++ lint、项目模型、任务关闭或真实宿主完成。

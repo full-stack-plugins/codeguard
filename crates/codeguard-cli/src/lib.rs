@@ -477,3 +477,8 @@ pub mod syntax_lint_command;
 
 #[cfg(all(unix, feature = "wasm-precheck"))]
 mod syntax_lint_feedback;
+
+#[cfg(unix)]
+mod clang_syntax_probe;
+#[cfg(unix)]
+mod clang_lint_feedback;

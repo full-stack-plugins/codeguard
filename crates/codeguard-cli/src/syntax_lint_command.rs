@@ -10,7 +10,7 @@ use std::{
 #[cfg(feature = "wasm-precheck")]
 use std::collections::BTreeSet;
 
-/// 为尚无专用原生入口的注册表语言返回局部候选与修复任务；不执行注册表历史命令。
+/// 为注册表语言返回明确Clang原生观察或局部候选与修复任务；不执行注册表历史命令。
 /// 参数只允许明确文件与预算/工作区/格式；返回3或取消130，绝不签发通过。
 pub fn run(args: &[String]) -> ExitCode {
     let args = match SyntaxLintArguments::parse(args) {
@@ -26,8 +26,12 @@ pub fn run(args: &[String]) -> ExitCode {
         "native":{"status":"not_run","reason":"native_adapter_not_integrated","configuration_status":"unknown"},
         "syntax_candidates":null,"syntax_tasks":null,"setup":{"requirement":"required","task_id":null},
         "reason":"wasm_not_enabled","next_action":"此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过"});
-    #[cfg(feature = "wasm-precheck")]
-    observe(&args, deadline, &mut report);
+    if args.clang_tool.is_some() {
+        report = crate::clang_lint_feedback::observe(&args, deadline);
+    } else {
+        #[cfg(feature = "wasm-precheck")]
+        observe(&args, deadline, &mut report);
+    }
     #[cfg(not(feature = "wasm-precheck"))]
     let _ = deadline;
     if codeguard_runtime::sigint_cancellation_requested() {
@@ -36,12 +40,34 @@ pub fn run(args: &[String]) -> ExitCode {
     if args.json {
         println!("{report}");
     } else {
-        println!(
-            "{} lint：检查未完成；原生适配器尚未接入，工具配置状态未知。",
-            args.language
-        );
-        #[cfg(feature = "wasm-precheck")]
-        crate::syntax_lint_feedback::print_feedback(&report["syntax_candidates"]);
+        if args.clang_tool.is_some() {
+            println!(
+                "{} lint：固定Clang原生语法观察；完整项目检查未完成。",
+                args.language
+            );
+            for row in report["native"]["diagnostics"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .take(8)
+            {
+                println!(
+                    "原生规则 {}，一开始行 {}、UTF-8字节列 {}",
+                    row["rule_id"], row["line"], row["column_byte"]
+                );
+            }
+            println!(
+                "原生状态 {}；原因 {}",
+                report["native"]["status"], report["native"]["reason"]
+            );
+        } else {
+            println!(
+                "{} lint：检查未完成；原生适配器尚未接入，工具配置状态未知。",
+                args.language
+            );
+            #[cfg(feature = "wasm-precheck")]
+            crate::syntax_lint_feedback::print_feedback(&report["syntax_candidates"]);
+        }
         println!(
             "{}",
             report["next_action"].as_str().unwrap_or("需要原生确认")
