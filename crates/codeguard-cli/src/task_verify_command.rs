@@ -92,6 +92,9 @@ pub fn run(args: &[String]) -> ExitCode {
         Ok(brief) => brief,
         Err(reason) => return print_unavailable(&parsed, reason),
     };
+    if brief["checker_id"] == "java.gradle.dependency_check" {
+        return print_unavailable(&parsed, "gradle_cve_task_verify_not_integrated");
+    }
     let python_confirmation = brief["checker_id"] == "python.ruff"
         && brief["reason_code"] == "python_syntax_confirmation_needed";
     let python_original = if python_confirmation {

@@ -1971,3 +1971,6 @@ Real native tests cover all seven rules, repeated identity, presence, noqa suppr
 Read-only four-core acceptance plan: `codeguard capabilities [language] --acceptance-plan --format=json`. All 57 languages / 228 obligations remain unqualified; filtering preserves full obligations. See [acceptance plan](Codeguard-Production-Acceptance-Plan.md).
 
 Java Gradle vulnerability checks now expose explicit original tasks through `codeguard cve java`, preserving JSON configuration and optional module-cache inputs. Observations remain unverified; workbench integration and full native acceptance are pending. See [Gradle OWASP](Codeguard-Gradle-Vulnerability-Checks.md).
+
+
+Explicit Gradle CVE now syncs sanitized stable preparation tasks in initialized workspaces, retaining original input/task flags in next/task show. Empty reports never close tasks; task verify and unified check scheduling remain pending. See [Gradle vulnerability checks](Codeguard-Gradle-Vulnerability-Checks.md) for current protocols, execution paths and acceptance.

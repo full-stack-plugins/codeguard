@@ -313,7 +313,7 @@ fn actual_gradle_rejects_imitation_task_and_missing_offline_plugin_without_advis
         let public_feedback: Value = serde_json::from_slice(&public.stdout).unwrap();
         assert_eq!(public_feedback["native"]["native_status"], "incomplete");
         assert_eq!(public_feedback["native"]["native_exit_code"], 1);
-        assert_eq!(public_feedback["task_sync"], "not_integrated");
+        assert_eq!(public_feedback["task_sync"], "not_initialized");
         assert_no_acceptance(&public_feedback["native"]);
         assert!(!request.native.project_root.join(".codeguard").exists());
         reports.push(json!({"case":name,"source_settings":"rootProject.name='sample'\n","source_build":build,"report":out,"public_feedback":public_feedback}));
@@ -386,7 +386,7 @@ fn public_java_cve_keeps_original_native_reports_and_rejects_ambiguous_options()
         2
     );
     assert_eq!(feedback["delivery_decision"], "not_evaluated");
-    assert_eq!(feedback["task_sync"], "not_integrated");
+    assert_eq!(feedback["task_sync"], "not_initialized");
     assert!(!fixture.0.join("project/.codeguard").exists());
     for extra in [
         vec!["--gradle-owasp-task", ":dependencyCheckAnalyze"],
@@ -530,7 +530,7 @@ fn public_sigint_returns_cancelled_feedback_without_quality_acceptance() {
     let feedback: Value = serde_json::from_slice(&output.stdout).unwrap();
     assert_eq!(feedback["native"]["reason"], "request_cancelled");
     assert_no_acceptance(&feedback["native"]);
-    assert_eq!(feedback["task_sync"], "not_integrated");
+    assert_eq!(feedback["task_sync"], "incomplete");
     if let Some(path) = std::env::var_os("CODEGUARD_TEST_GRADLE_CVE_CANCEL_EVIDENCE") {
         fs::write(path, serde_json::to_vec_pretty(&feedback).unwrap()).unwrap();
     }
@@ -624,4 +624,163 @@ fn below_budget_multiple_reports_keep_every_task_and_suppressed_observation() {
         assert_eq!(row["advisories"][1]["suppressed_by_native_tool"], true);
     }
     assert_no_acceptance(&out);
+}
+
+#[test]
+fn initialized_gradle_cve_syncs_one_stable_preparation_task_and_rejects_tampering() {
+    use std::process::Command;
+    let fixture = Fixture::new(&script(&model(), &ownership(), &report(), "exit 0"));
+    let root = fixture.0.join("project");
+    let init = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["init", root.to_str().unwrap(), "--apply"])
+        .output()
+        .unwrap();
+    assert_eq!(
+        init.status.code(),
+        Some(3),
+        "{}",
+        String::from_utf8_lossy(&init.stderr)
+    );
+    let scan = || {
+        Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args([
+                "cve",
+                "java",
+                root.to_str().unwrap(),
+                "--gradle-bundle",
+                fixture.0.join("gradle").to_str().unwrap(),
+                "--java-home",
+                fixture.0.join("jdk").to_str().unwrap(),
+                "--gradle-project-file",
+                "settings.gradle",
+                "--gradle-project-file",
+                "build.gradle",
+                "--gradle-owasp-task",
+                ":dependencyCheckAnalyze",
+                "--format=json",
+            ])
+            .output()
+            .unwrap()
+    };
+    for _ in 0..2 {
+        let result = scan();
+        assert_eq!(result.status.code(), Some(3));
+        let value: Value = serde_json::from_slice(&result.stdout).unwrap();
+        assert_eq!(value["task_sync"], "synced", "{value}");
+    }
+    fs::write(fixture.0.join("gradle/bin/gradle"), "#!/bin/sh\nexit 1\n").unwrap();
+    let blocked = scan();
+    let blocked_value: Value = serde_json::from_slice(&blocked.stdout).unwrap();
+    assert_eq!(blocked_value["native"]["native_status"], "incomplete");
+    assert_eq!(blocked_value["task_sync"], "synced");
+    let mut empty = report();
+    empty["dependencies"] = json!([]);
+    fs::write(
+        fixture.0.join("gradle/bin/gradle"),
+        script(&model(), &ownership(), &empty, "exit 0"),
+    )
+    .unwrap();
+    let zero = scan();
+    let value: Value = serde_json::from_slice(&zero.stdout).unwrap();
+    assert_eq!(value["task_sync"], "synced");
+    assert_eq!(value["native"]["reports"][0]["dependency_count"], 0);
+    if let Some(directory) = std::env::var_os("CODEGUARD_TEST_GRADLE_CVE_WORKBENCH_EVIDENCE") {
+        fs::create_dir_all(&directory).unwrap();
+        fs::write(
+            PathBuf::from(directory).join("public-empty.json"),
+            serde_json::to_vec_pretty(&value).unwrap(),
+        )
+        .unwrap();
+    }
+    let tasks: Vec<_> = fs::read_dir(root.join(".codeguard/tasks"))
+        .unwrap()
+        .collect();
+    assert_eq!(tasks.len(), 1);
+    let next = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["next", root.to_str().unwrap(), "--format=json"])
+        .output()
+        .unwrap();
+    assert!(
+        next.status.success(),
+        "{}",
+        String::from_utf8_lossy(&next.stderr)
+    );
+    let text = String::from_utf8(next.stdout).unwrap();
+    if let Some(directory) = std::env::var_os("CODEGUARD_TEST_GRADLE_CVE_WORKBENCH_EVIDENCE") {
+        fs::write(PathBuf::from(directory).join("next.json"), &text).unwrap();
+    }
+    assert!(text.contains("java.gradle.dependency_check"), "{text}");
+    assert!(text.contains(":dependencyCheckAnalyze"), "{text}");
+    assert!(!text.contains("pkg:maven"));
+    let reports: Vec<_> = fs::read_dir(root.join(".codeguard/reports"))
+        .unwrap()
+        .map(|e| e.unwrap().path())
+        .filter(|p| {
+            p.file_name()
+                .unwrap()
+                .to_string_lossy()
+                .starts_with("cve-gradle-")
+        })
+        .collect();
+    assert_eq!(reports.len(), 4);
+    let id = tasks[0]
+        .as_ref()
+        .unwrap()
+        .path()
+        .file_stem()
+        .unwrap()
+        .to_string_lossy()
+        .into_owned();
+    let verify = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "task",
+            "verify",
+            &id,
+            root.to_str().unwrap(),
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(verify.status.code(), Some(3));
+    assert!(
+        String::from_utf8_lossy(&verify.stdout).contains("gradle_cve_task_verify_not_integrated")
+    );
+    let mut value: Value = serde_json::from_slice(&fs::read(&reports[0]).unwrap()).unwrap();
+    if let Some(directory) = std::env::var_os("CODEGUARD_TEST_GRADLE_CVE_WORKBENCH_EVIDENCE") {
+        fs::create_dir_all(&directory).unwrap();
+        fs::write(
+            PathBuf::from(directory).join("workbench.json"),
+            serde_json::to_vec_pretty(&value).unwrap(),
+        )
+        .unwrap();
+    }
+    let mut stale = value.clone();
+    stale["run_id"] = json!("cve-gradle-unconsumed-01");
+    fs::write(
+        root.join(".codeguard/reports/cve-gradle-unconsumed-01.json"),
+        serde_json::to_vec_pretty(&stale).unwrap(),
+    )
+    .unwrap();
+    fs::write(
+        root.join("build.gradle"),
+        "plugins { id 'java' } // changed after scan\n",
+    )
+    .unwrap();
+    let stale_sync = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["work", "sync", root.to_str().unwrap(), "--format=json"])
+        .output()
+        .unwrap();
+    assert!(!stale_sync.status.success());
+    fs::remove_file(root.join(".codeguard/reports/cve-gradle-unconsumed-01.json")).unwrap();
+    value["coverage_proven"] = json!(true);
+    fs::write(&reports[0], serde_json::to_vec_pretty(&value).unwrap()).unwrap();
+    let sync = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["work", "sync", root.to_str().unwrap(), "--format=json"])
+        .output()
+        .unwrap();
+    assert!(
+        !sync.status.success(),
+        "{}",
+        String::from_utf8_lossy(&sync.stdout)
+    );
 }

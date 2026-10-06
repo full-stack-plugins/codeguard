@@ -27,7 +27,7 @@ struct Arguments {
 }
 
 /// 执行显式Gradle OWASP原任务并反馈本轮报告；参数为CLI选项，未受信结果退出3、取消130。
-/// 当前不写工作台、不自动安装工具，也不授予数据库时效或完整依赖覆盖。
+/// 已初始化工作台保存脱敏准备任务；不自动安装工具，也不授予数据库时效或完整依赖覆盖。
 pub fn run(args: &[String]) -> ExitCode {
     let options = match parse(args) {
         Ok(value) => value,
@@ -52,6 +52,8 @@ pub fn run(args: &[String]) -> ExitCode {
             return ExitCode::from(2);
         }
     };
+    let cache_selected = options.module_cache.is_some();
+    let workspace_root = root.clone();
     let request = Request {
         module_cache: options.module_cache,
         native: NativeRequest {
@@ -64,14 +66,34 @@ pub fn run(args: &[String]) -> ExitCode {
         task_paths: options.tasks.clone(),
     };
     let native = observe(&request, &AtomicBool::new(false));
+    let (task_sync, task_sync_reason) = if native["reason"] == "request_cancelled" {
+        ("incomplete", Some("request_cancelled"))
+    } else {
+        match crate::gradle_cve_workbench::persist(
+            &workspace_root,
+            &options.files,
+            &options.tasks,
+            cache_selected,
+            &native,
+        ) {
+            Ok(true) => ("synced", None),
+            Ok(false) => ("not_initialized", None),
+            Err(reason) => ("incomplete", Some(reason)),
+        }
+    };
     let next_action = if native["reason"] == "gradle_owasp_report_budget_exceeded" {
         "累计报告或反馈超出预算；保留完整任务清单，将原任务分批执行并汇总所有分批结果。不得删除检查义务、降低规则或把未读取报告当作无漏洞；超大单任务需要独立的大报告处理方案，当前交付仍未评估"
     } else if native["native_status"] == "reports_observed_unverified" {
-        "按原任务报告调查活动与原生抑制的漏洞，核对真实依赖归属和漏洞库时效；使用相同工具、输入、原任务复检。空报告不能证明无漏洞，当前持久任务与可信关闭未接线"
+        "按原任务报告调查活动与原生抑制的漏洞，核对真实依赖归属和漏洞库时效；使用相同工具、输入、原任务复检。空报告不能证明无漏洞，已初始化工作区可用next/task show查询准备任务；task verify与可信关闭仍未接线"
     } else {
         "读取原生reason恢复已有Gradle/JDK、原OWASP任务、原JSON配置和选定输入；缺插件或漏洞库属于环境阻塞，不修改无关源码。恢复后使用相同原任务复检"
     };
-    let report = json!({"schema_version":"0.2.0","report_type":"java_gradle_cve_feedback","operation":"cve","language":"java","mode":"gradle","selected_inputs":options.files,"requested_task_paths":options.tasks,"budget":budget_record(timeout,source),"native":native,"next_action":next_action,"task_sync":"not_integrated","authority":"local_unverified","delivery_decision":"not_evaluated"});
+    let report = json!({"schema_version":"0.3.0","report_type":"java_gradle_cve_feedback","operation":"cve","language":"java","mode":"gradle","selected_inputs":options.files,"requested_task_paths":options.tasks,"budget":budget_record(timeout,source),"native":native,"next_action":next_action,"task_sync":task_sync,"task_sync_reason":task_sync_reason,"authority":"local_unverified","delivery_decision":"not_evaluated"});
+    if let Some(reason) = task_sync_reason {
+        if !options.json {
+            eprintln!("工作台同步未完成：{reason}；核对工作区和输入后重跑原命令");
+        }
+    }
     if options.json {
         println!("{report}");
     } else {

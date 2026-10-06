@@ -431,6 +431,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                     | "java.jdk.javadoc"
                     | "java.maven.javadoc"
                     | "java.gradle.javadoc"
+                    | "java.gradle.dependency_check"
                     | "java.checkstyle"
                     | "java.checkstyle.preparation"
                     | "java.maven.p3c"
@@ -585,6 +586,15 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             "--registry",
             "<已核验审计源>"
         ])
+    } else if checker_id == "java.gradle.dependency_check" {
+        #[cfg(unix)]
+        {
+            crate::gradle_cve_workbench::recheck_argv(root, fact)?
+        }
+        #[cfg(not(unix))]
+        {
+            json!(["codeguard", "cve", "java", "."])
+        }
     } else if checker_id == "java.maven.dependency_check" {
         json!([
             "codeguard",
@@ -788,6 +798,13 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                 "actionable",
                 "先恢复package.json及锁文件的可读普通文件和物理路径，再核对语法、重复字段、scripts类型，修正配置后恢复原生npm审计；再核验锁节点和漏洞源覆盖及时效，按原报告修订依赖并复检，局部零发现不得关闭任务",
             )
+        } else if checker_id == "java.gradle.dependency_check" {
+            brief["first_diagnostic_reason"] = fact["first_diagnostic_reason"].clone();
+            (
+                5,
+                "actionable",
+                "按原任务/选定输入恢复Gradle OWASP；超限保留全部任务分批执行，核验漏洞库和依赖归属；未确认advisory不作为源码漏洞，task verify尚未接线，原命令复扫不可信关闭",
+            )
         } else if checker_id == "java.maven.dependency_check" {
             (
                 1,
@@ -940,6 +957,13 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             },
         )
     };
+    if checker_id == "java.gradle.dependency_check" {
+        brief["schema_version"] = json!("0.26.0");
+        brief["task_verify_status"] = json!("not_integrated");
+        brief["closure_condition"] = json!(
+            "原工具完整复检、漏洞库与依赖归属及可信策略均核验；task verify尚未接线，当前观察无关闭权威"
+        );
+    }
     if checker_id == "java.gradle.javadoc" {
         brief["schema_version"] = json!("0.24.0");
         brief["observation_scope"] = json!("selected_gradle_javadoc_inputs");
@@ -2288,7 +2312,7 @@ fn run_sequence(run_id: &str) -> Option<u128> {
 
 fn view(disposition: &str, reason: &str, brief: Value, actions: Value) -> Value {
     json!({
-        "schema_version":if brief["schema_version"] == "0.25.0" {json!("0.25.0")}else if brief["schema_version"] == "0.24.0" {json!("0.24.0")}else if brief["schema_version"] == "0.23.0" {json!("0.23.0")}else if brief["schema_version"] == "0.22.0" {json!("0.22.0")}else if brief["schema_version"] == "0.21.0" {json!("0.21.0")}else if brief["schema_version"] == "0.20.0" {json!("0.20.0")}else if brief["checker_id"] == "shell.shellcheck" {json!("0.17.0")} else if brief["checker_id"] == "go.vet" {json!("0.13.0")} else if brief["checker_id"] == "syntax.native_confirmation" {brief["schema_version"].clone()} else {json!("0.1.0")}, "report_type":"repair_brief_preview",
+        "schema_version":if brief["schema_version"] == "0.26.0" {json!("0.26.0")}else if brief["schema_version"] == "0.25.0" {json!("0.25.0")}else if brief["schema_version"] == "0.24.0" {json!("0.24.0")}else if brief["schema_version"] == "0.23.0" {json!("0.23.0")}else if brief["schema_version"] == "0.22.0" {json!("0.22.0")}else if brief["schema_version"] == "0.21.0" {json!("0.21.0")}else if brief["schema_version"] == "0.20.0" {json!("0.20.0")}else if brief["checker_id"] == "shell.shellcheck" {json!("0.17.0")} else if brief["checker_id"] == "go.vet" {json!("0.13.0")} else if brief["checker_id"] == "syntax.native_confirmation" {brief["schema_version"].clone()} else {json!("0.1.0")}, "report_type":"repair_brief_preview",
         "operation":"next", "command_status":"complete", "exit_code":0,
         "disposition":disposition, "reason":reason,
         "repair_brief":brief, "next_actions":actions,

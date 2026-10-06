@@ -526,3 +526,6 @@ mod gradle_module_cache;
 
 #[cfg(unix)]
 mod gradle_owasp_report_budget;
+
+#[cfg(unix)]
+pub mod gradle_cve_workbench;

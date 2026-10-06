@@ -26,6 +26,8 @@ mod javadoc_report;
 mod maven_javadoc_report;
 #[cfg(unix)]
 mod gradle_javadoc_report;
+#[cfg(unix)]
+mod gradle_cve_report;
 mod doctor_report;
 mod eslint_report;
 mod npm_preparation_report;
@@ -515,6 +517,7 @@ fn import_one(
                     | "javadoc_workbench_observation"
                     | "maven_javadoc_workbench_observation"
                     | "gradle_javadoc_workbench_observation"
+                    | "gradle_cve_workbench_observation"
                     | "gradle_javadoc_task_recheck"
                     | "maven_javadoc_task_recheck"
                     | "javadoc_task_recheck"
@@ -641,6 +644,10 @@ fn parse_report(
     }
     if report["report_type"] == "python_syntax_confirmation_observation" {
         return python_syntax_confirmation_report::parse(root, workspace_id, path, report, digest);
+    }
+    #[cfg(unix)]
+    if report["report_type"] == "gradle_cve_workbench_observation" {
+        return gradle_cve_report::parse(root, workspace_id, path, report, digest);
     }
     if report["report_type"] == "python_cve_workbench_observation" {
         return python_cve_report::parse(root, workspace_id, path, report, digest);
@@ -2142,6 +2149,17 @@ fn persist_local_blocker_observation(
 }
 
 fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
+    if blocker.checker_id == "java.gradle.dependency_check" {
+        return format!(
+            "# {} Gradle CVE准备任务\n\n- 问题证据：原报告 .codeguard/reports/{}.json，摘要 {}，具体原因 {}。\n- 规则依据：原生OWASP任务、数据库时效及依赖归属；未经确认的观察不是源码漏洞。\n- 允许范围：原Gradle/JDK21、选定输入、原任务及漏洞库；不修改无关源码。\n- 修复步骤：恢复原工具和配置，超预算按完整任务清单分批复检；观察到advisory后核验库与真实组件，不能删检查义务。\n- 复检命令：codeguard task show {} . --format=json读取完整原任务/选定输入参数，然后按recheck_argv运行codeguard cve java；task verify接线尚未完成，不虚构完成。\n- 历史尝试：首次run {}，重复扫描追加稳定任务的观察；失败需记录。\n- 关闭条件：原工具完整复检与可信策略均通过；空报告、勾选、删除任务或局部成功均不能关闭。\n",
+            blocker.id,
+            report.run_id,
+            report.digest,
+            blocker.diagnostic_reason.as_deref().unwrap_or("unknown"),
+            blocker.id,
+            report.run_id
+        );
+    }
     if blocker.checker_id == "java.gradle.javadoc" {
         return format!(
             "# {} Gradle Javadoc准备任务\n\n- 问题证据：原因 {} / {}；报告 .codeguard/reports/{}.json，摘要 {}。\n- 规则依据：原工具执行和完整规则/范围核验，不是源码违规。\n- 允许范围：原Gradle、JDK21、构建配置及所选范围，不修改无关源码。\n- 修复步骤：故障时恢复原工具与原配置；规则/覆盖未验收时提出具体项目政策决策，不反复安装或修改源码。\n- 复检命令：codeguard task verify {0} . --gradle-bundle <原Gradle绝对路径> --java-home <原JDK21绝对路径> --format=json；codeguard next . --format=json核对指引及原Gradle/JDK路径后复检；复用原选定输入，记录失败和局部观察，不授予可信关闭。\n- 历史尝试：首次run {}；重复扫描沿同一准备问题追加观察，失败尝试需记录。\n- 关闭条件：原工具完整复检与可信政策均满足；无诊断、安装或勾选不关闭，当前仅局部观察。\n",
