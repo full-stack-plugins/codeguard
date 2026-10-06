@@ -157,12 +157,12 @@ pub fn run(args: &[String]) -> ExitCode {
     }
     if let Ok(root) = target.canonicalize() {
         if root.is_dir() && root.join(".codeguard/workspace.json").exists() {
-            report["schema_version"] = json!("0.2.0");
+            report["schema_version"] = json!("0.3.0");
             report["workbench"] = crate::javadoc_workbench::connect(&root, &report);
             report["workbench_status"] = report["workbench"]["status"].clone();
             report["next_actions"] = json!([
                 "依据原生诊断及工作台修复简报修复后，以相同JDK及原配置重新运行comments java",
-                "Javadoc task verify及可信关闭尚未接通；局部零诊断不能关闭任务"
+                "按原任务运行task verify保存原工具复检；可信关闭尚未接通，局部零诊断不能关闭任务"
             ]);
         }
     }

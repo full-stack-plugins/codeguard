@@ -14,12 +14,12 @@ pub(crate) fn connect(root: &Path, feedback: &Value) -> Value {
     let result = prepare(root, feedback).and_then(|report| {
         save_local_report(root, &report)?;
         let summary = sync_local_workspace(root)?;
-        Ok(json!({"status":if summary.failed_reports == 0 {"synced_partial"} else {"sync_incomplete"},"new_findings":summary.new_findings,"new_blockers":summary.new_blockers,"next":read_local_brief_for_checker(root,"java.jdk.javadoc").unwrap_or_else(|reason| json!({"disposition":"verification_required","reason":reason})),"task_verify_status":"not_integrated"}))
+        Ok(json!({"status":if summary.failed_reports == 0 {"synced_partial"} else {"sync_incomplete"},"new_findings":summary.new_findings,"new_blockers":summary.new_blockers,"next":read_local_brief_for_checker(root,"java.jdk.javadoc").unwrap_or_else(|reason| json!({"disposition":"verification_required","reason":reason})),"task_verify_status":"local_observation_only"}))
     });
-    result.unwrap_or_else(|reason| json!({"status":reason,"new_findings":0,"new_blockers":0,"next":null,"task_verify_status":"not_integrated"}))
+    result.unwrap_or_else(|reason| json!({"status":reason,"new_findings":0,"new_blockers":0,"next":null,"task_verify_status":"local_observation_only"}))
 }
 
-fn prepare(root: &Path, feedback: &Value) -> Result<Value, &'static str> {
+pub(crate) fn prepare(root: &Path, feedback: &Value) -> Result<Value, &'static str> {
     let baseline = read_workspace_baseline(root).map_err(|_| "workspace_invalid")?;
     let id = baseline
         .as_ref()

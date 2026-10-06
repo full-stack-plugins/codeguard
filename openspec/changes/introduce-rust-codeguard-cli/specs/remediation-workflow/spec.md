@@ -621,3 +621,15 @@ Python确认任务的当前原生结果为still_present且输入未失效时 MUS
 #### Scenario: Project Javadoc configuration is absent
 - **WHEN** 用户显式选择 Java comments 而该项目没有确认的配置
 - **THEN** 保留一个可读准备任务，不运行工具、不报告源码违规，不将该建议升级为必需交付义务
+
+### Requirement: Javadoc task recheck SHALL bind original context and keep unverified closure open
+
+Javadoc任务 MUST 支持显式JDK21的原工具复检，保存对应任务的复检事件及失败尝试。原报告摘要、任务范围、源码、原配置和工具身份 MUST 绑定；缺工具或输入变化为incomplete，配置变化及同规则不同锚点需要复核；局部零诊断只能成为未核验消失候选，不能自动关闭或批准白名单。其它检查器参数 MUST 在取得租约和启动工具前拒绝。
+
+#### Scenario: Javadoc task is still present or native tool is missing
+- **WHEN** 对原任务运行同工具复检或未提供必需JDK
+- **THEN** 保存still_present或incomplete事件，保持open，反馈原检查器的下一步
+
+#### Scenario: Documented source has no original Javadoc diagnostic
+- **WHEN** 同工具及原配置下补齐文档后复检为零诊断
+- **THEN** 保存candidate_absent_unverified_policy，保留任务开放；配置或工具变更不能获得该结论

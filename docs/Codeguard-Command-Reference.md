@@ -349,7 +349,7 @@ The independent `java_comments_feedback 0.1.0` wrapper preserves the existing re
 
 ### Javadoc project workbench integration (source increment)
 
-For initialized projects, `comments java .` in JDK single-file mode saves local observations and synchronizes stable tasks using wrapper protocol `java_comments_feedback 0.2.0`. Uninitialized projects, standalone files and unsupported scopes retain the 0.1 local feedback. Rule, relative file, source anchor and occurrence ordinal define identity; line numbers only locate evidence. Repeat scans append observations without duplicate tasks.
+For initialized projects, `comments java .` in JDK single-file mode saves local observations and synchronizes stable tasks using wrapper protocol `java_comments_feedback 0.3.0`. Uninitialized projects, standalone files and unsupported scopes retain the 0.1 local feedback. Rule, relative file, source anchor and occurrence ordinal define identity; line numbers only locate evidence. Repeat scans append observations without duplicate tasks.
 
 ```mermaid
 flowchart LR
@@ -362,4 +362,27 @@ flowchart LR
     C -->|Failure| H[Visible persistence error without fake tasks]
 ```
 
-Missing configuration or incomplete execution creates preparation records, not source violations or new mandatory delivery obligations. Feedback exposes `workbench.status/new_findings/new_blockers/next`. Persistence failures return no fake tasks. Briefs and task text include evidence, rule basis, scope, steps, recheck and closure conditions. Local zero diagnostics leave prior tasks open with `task_verify_status=not_integrated`. Maven multi-file and standalone-file workbench integration remain incomplete, as do trusted closure and actual host acceptance.
+Missing configuration or incomplete execution creates preparation records, not source violations or new mandatory delivery obligations. Feedback exposes `workbench.status/new_findings/new_blockers/next`. Persistence failures return no fake tasks. Briefs and task text include evidence, rule basis, scope, steps, recheck and closure conditions. Local zero diagnostics leave prior tasks open with `task_verify_status=local_observation_only`; original-task rechecks are described below. Maven multi-file and standalone-file workbench integration remain incomplete, as do trusted closure and actual host acceptance.
+
+### Recheck the original Javadoc task (source increment)
+
+Initialized-project JDK-mode Javadoc tasks now support original-tool rechecks:
+
+```bash
+codeguard task verify CG-<task-identity> . --java-home /absolute/jdk21 --format json
+```
+
+The recheck reads the digest-bound original observation and selects the task source with current native configuration. It never selects an executable from saved reports. Source, configuration and explicit JDK21 tool bytes are checked around scanning and before recording. Unrelated checker options are rejected before leases or execution. Results `still_present`, `incomplete`, `rule_coverage_requires_review` and `candidate_absent_unverified_policy` are recorded on the original task, bound to the native report and current attempt. Missing or changed tools and unstable inputs cannot mean repair completion. Changed configuration or another anchor for the same rule requires review.
+
+```mermaid
+flowchart LR
+    A[Original task report and current inputs] --> B[Explicit JDK21 native recheck]
+    B --> C[Validate scope source configuration and tool identity]
+    C --> D[Original task event and attempt history]
+    D --> E[next gives current native feedback]
+    E --> F{Repeated lack of progress}
+    F -->|Yes| G[Concrete decision required]
+    F -->|No| H[Continue rule repair or environment recovery]
+```
+
+Current protocols: project wrapper `java_comments_feedback 0.3.0`, Javadoc brief0.2, native container `javadoc_task_recheck 0.1.0`, public `task_verification_preview 0.26.0`. Older schemas remain readable. `task_verify_status=local_observation_only` means local rechecks are connected; trusted closure remains unaccepted. Zero diagnostics after documentation repair only records an absence candidate and leaves the task open. Whitelist approval, full project-rule attribution and actual host acceptance remain independent work. Maven multi-file and standalone-file workbench scope has not expanded.

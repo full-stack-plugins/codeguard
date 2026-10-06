@@ -260,7 +260,7 @@ fn initialized_project_syncs_one_stable_javadoc_task_and_real_next() {
         let brief = &r["workbench"]["next"]["repair_brief"];
         assert_eq!(brief["checker_id"], "java.jdk.javadoc");
         assert_eq!(brief["kind"], "finding");
-        assert_eq!(brief["recheck_argv"][1], "comments");
+        assert_eq!(brief["recheck_argv"][1], "task");
         if iteration == 0 {
             task = brief["task_id"].clone();
         } else {
@@ -408,5 +408,249 @@ fn actual_jdk_project_clean_observation_keeps_previous_tasks_open() {
                 .unwrap();
         assert_eq!(fact["state"], "open");
     }
-    assert_eq!(second["workbench"]["task_verify_status"], "not_integrated");
+    assert_eq!(
+        second["workbench"]["task_verify_status"],
+        "local_observation_only"
+    );
+}
+
+#[test]
+fn javadoc_task_verify_records_present_and_missing_tool_without_closing() {
+    let f = configured_project();
+    let r: Value = serde_json::from_slice(&f.run(f.root.to_str().unwrap(), &[]).stdout).unwrap();
+    let id = r["workbench"]["next"]["repair_brief"]["task_id"]
+        .as_str()
+        .unwrap();
+    for home in [Some(f.home.to_str().unwrap()), None] {
+        let mut command = Command::new(env!("CARGO_BIN_EXE_codeguard"));
+        command.args([
+            "task",
+            "verify",
+            id,
+            f.root.to_str().unwrap(),
+            "--format=json",
+        ]);
+        if let Some(home) = home {
+            command.args(["--java-home", home]);
+        }
+        let out = command.output().unwrap();
+        assert_eq!(out.status.code(), Some(3));
+        let report: Value = serde_json::from_slice(&out.stdout).unwrap();
+        assert_eq!(
+            report["observation"],
+            if home.is_some() {
+                "still_present"
+            } else {
+                "incomplete"
+            },
+            "{report}"
+        );
+        assert_eq!(report["event_persisted"], true, "{report}");
+        let fact: Value = serde_json::from_slice(
+            &fs::read(
+                f.root
+                    .join(format!(".codeguard/findings/{id}/finding.json")),
+            )
+            .unwrap(),
+        )
+        .unwrap();
+        assert_eq!(fact["state"], "open");
+    }
+}
+
+#[test]
+fn javadoc_verify_rejects_unrelated_tool_parameters_before_native_execution() {
+    let f = configured_project();
+    let r: Value = serde_json::from_slice(&f.run(f.root.to_str().unwrap(), &[]).stdout).unwrap();
+    let id = r["workbench"]["next"]["repair_brief"]["task_id"]
+        .as_str()
+        .unwrap();
+    fs::remove_file(f.home.join("invoked")).unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "task",
+            "verify",
+            id,
+            f.root.to_str().unwrap(),
+            "--java-home",
+            f.home.to_str().unwrap(),
+            "--maven-tool",
+            "/bad/mvn",
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(2));
+    assert!(!f.home.join("invoked").exists());
+}
+
+#[test]
+fn javadoc_task_verify_changed_sdk_cannot_claim_absence() {
+    let f = configured_project();
+    let r: Value = serde_json::from_slice(&f.run(f.root.to_str().unwrap(), &[]).stdout).unwrap();
+    let id = r["workbench"]["next"]["repair_brief"]["task_id"]
+        .as_str()
+        .unwrap();
+    fs::write(f.home.join("bin/java"), "different runtime identity").unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "task",
+            "verify",
+            id,
+            f.root.to_str().unwrap(),
+            "--java-home",
+            f.home.to_str().unwrap(),
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    let r: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(r["observation"], "incomplete", "{r}");
+    assert_eq!(r["native_scan"]["tool_identity_matches"], false);
+    assert_eq!(r["event_persisted"], true);
+}
+
+#[test]
+fn javadoc_failed_attempts_bind_verification_and_stop_repetition() {
+    let f = configured_project();
+    let root = f.root.to_str().unwrap();
+    let r: Value = serde_json::from_slice(&f.run(root, &[]).stdout).unwrap();
+    let brief = &r["workbench"]["next"]["repair_brief"];
+    let id = brief["task_id"].as_str().unwrap();
+    let action = brief["action_id"].as_str().unwrap();
+    let run = |args: &[&str]| {
+        let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(args)
+            .arg("--format=json")
+            .output()
+            .unwrap();
+        (
+            out.status.code().unwrap(),
+            serde_json::from_slice::<Value>(&out.stdout).unwrap(),
+        )
+    };
+    let (exit, claim) = run(&["task", "claim", id, root, "--owner", "javadoc-agent"]);
+    assert_eq!(exit, 0);
+    let token = claim["lease_token"].as_str().unwrap();
+    for _ in 0..2 {
+        let (exit, start) = run(&[
+            "task",
+            "attempt",
+            "start",
+            id,
+            root,
+            "--owner",
+            "javadoc-agent",
+            "--lease-token",
+            token,
+            "--action-id",
+            action,
+        ]);
+        assert_eq!(exit, 0, "{start}");
+        let attempt = start["attempt_id"].as_str().unwrap();
+        let (exit, finish) = run(&[
+            "task",
+            "attempt",
+            "finish",
+            id,
+            root,
+            "--owner",
+            "javadoc-agent",
+            "--lease-token",
+            token,
+            "--attempt-id",
+            attempt,
+            "--outcome",
+            "ready-to-verify",
+            "--note-code",
+            "source_edit",
+        ]);
+        assert_eq!(exit, 0, "{finish}");
+        let (_, verified) = run(&[
+            "task",
+            "verify",
+            id,
+            root,
+            "--java-home",
+            f.home.to_str().unwrap(),
+            "--owner",
+            "javadoc-agent",
+            "--lease-token",
+            token,
+        ]);
+        assert_eq!(verified["observation"], "still_present", "{verified}");
+        assert_eq!(verified["event_persisted"], true, "{verified}");
+    }
+    let (_, next) = run(&["next", root]);
+    assert_eq!(
+        next["repair_brief"]["disposition"], "needs_decision",
+        "{next}"
+    );
+}
+
+#[test]
+#[ignore = "需要已有JDK21，验证注释任务原工具复检和原配置变化分流"]
+fn actual_jdk_task_verify_absence_and_configuration_change_keep_open() {
+    let f = configured_project();
+    let home = std::env::var("CODEGUARD_TEST_JAVA_HOME").unwrap();
+    let run = |args: &[&str]| {
+        let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(args)
+            .arg("--format=json")
+            .output()
+            .unwrap();
+        assert_eq!(out.status.code(), Some(3), "{:?}", out);
+        serde_json::from_slice::<Value>(&out.stdout).unwrap()
+    };
+    let root = f.root.to_str().unwrap();
+    let first = run(&["comments", "java", root, "--java-home", &home]);
+    assert_eq!(first["workbench"]["status"], "synced_partial");
+    let id = fs::read_dir(f.root.join(".codeguard/findings"))
+        .unwrap()
+        .map(|e| {
+            let e = e.unwrap();
+            let fact: Value =
+                serde_json::from_slice(&fs::read(e.path().join("finding.json")).unwrap()).unwrap();
+            fact
+        })
+        .find(|f| f["native_rule_id"] == "JavadocMissingComment")
+        .unwrap()["id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+    let verify = || run(&["task", "verify", &id, root, "--java-home", &home]);
+    let present = verify();
+    assert_eq!(present["observation"], "still_present", "{present}");
+    assert_eq!(present["event_persisted"], true);
+    fs::write(f.root.join("src/main/java/Bad.java"),"/** Documented class. */\npublic class Bad { /** Documented constructor. */ public Bad() {} }\n").unwrap();
+    let absent = verify();
+    assert_eq!(
+        absent["observation"], "candidate_absent_unverified_policy",
+        "{absent}"
+    );
+    assert_eq!(absent["event_persisted"], true);
+    let pom = f.root.join("pom.xml");
+    fs::write(
+        &pom,
+        format!(
+            "<!-- Configuration changed -->\n{}",
+            fs::read_to_string(&pom).unwrap()
+        ),
+    )
+    .unwrap();
+    let changed = verify();
+    assert_eq!(
+        changed["observation"], "rule_coverage_requires_review",
+        "{changed}"
+    );
+    assert_eq!(changed["event_persisted"], true);
+    let fact: Value = serde_json::from_slice(
+        &fs::read(
+            f.root
+                .join(format!(".codeguard/findings/{id}/finding.json")),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(fact["state"], "open");
 }

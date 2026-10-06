@@ -612,8 +612,9 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
     } else if checker_id == "java.jdk.javadoc" {
         json!([
             "codeguard",
-            "comments",
-            "java",
+            "task",
+            "verify",
+            id,
             ".",
             "--java-home",
             "<已核验的JDK21绝对路径>",
@@ -868,12 +869,13 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         )
     };
     if checker_id == "java.jdk.javadoc" {
-        brief["task_verify_status"] = json!("not_integrated");
+        brief["schema_version"] = json!("0.2.0");
+        brief["task_verify_status"] = json!("local_observation_only");
         brief["rule_basis"] = json!("JDK21 Javadoc 原生缺注释和标签诊断；项目政策未核验");
         brief["step"] = json!(if kind == "blocker" {
-            "核对原配置、JDK21和检查范围，恢复后重新运行comments java；不修改无关源码，不把缺配置当源码违规或必需交付义务"
+            "核对原配置、JDK21和检查范围，恢复后按本任务运行task verify；不修改无关源码，不把缺配置当源码违规或必需交付义务"
         } else {
-            "核对原生位置与实际API契约，补全类、公共构造函数、参数、返回值或异常文档；源码变化时先重新运行comments java确认；不得关闭规则或用勾选代替复检"
+            "核对原生位置与实际API契约，补全类、公共构造函数、参数、返回值或异常文档；源码变化时先对本任务运行task verify确认；不得关闭规则或用勾选代替复检"
         });
     }
     if checker_id == "shell.shellcheck" {
@@ -1223,7 +1225,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             } else if checker_id == "rust.cargo_clippy" {
                 "Clippy 本轮未再报告原问题；核查 allow/cap-lints、Cargo lints、特性组合和工具身份后重新复检"
             } else if checker_id == "java.jdk.javadoc" {
-                "Javadoc局部零诊断不关闭历史问题；用同一原配置和JDK复检，任务关闭适配仍待完成"
+                "Javadoc局部零诊断不关闭历史问题；用同一原配置和JDK复检，可信关闭仍待完成"
             } else if checker_id == "java.maven.p3c" {
                 "P3C 命名规则局部复检未再报告原问题；核查原生报告的文件覆盖、配置及工具身份，完成全规则与策略复检后再裁定"
             } else {
@@ -1696,6 +1698,15 @@ fn latest_verification_observation(
                     return Err("verification_event_invalid");
                 }
             }
+            if brief["checker_id"] == "java.jdk.javadoc"
+                && report["task_input_stable"] == true
+                && event["report_sha256"] == format!("{:x}", Sha256::digest(&report_bytes))
+                && !crate::javadoc_task_recheck::inputs_current(root, &report)
+            {
+                latest_verify = None;
+                latest_run = sequence;
+                continue;
+            }
             // 输入已变化的npm历史复检不能继续解释当前依赖，也不阻断新的复检指引。
             if brief["checker_id"] == "rust.cargo_check"
                 && event["report_sha256"] == format!("{:x}", Sha256::digest(&report_bytes))
@@ -1774,6 +1785,9 @@ fn latest_verification_observation(
                     )
                     && report["checker_id"] == "go.vet"
                     && event["observation"] == classify_go(brief, &report)
+            } else if brief["checker_id"] == "java.jdk.javadoc" {
+                crate::javadoc_task_recheck::valid_shape(&report)
+                    && event["observation"] == crate::javadoc_task_recheck::classify(brief, &report)
             } else if preparation_report {
                 crate::checkstyle_preparation_recheck::valid_shape(&report)
                     && event["observation"]
@@ -1882,7 +1896,8 @@ fn latest_verification_observation(
                     | "suppression_requires_review"
             ) || ((go_report
                 || checkstyle_report
-                || brief["checker_id"] == "shell.shellcheck")
+                || brief["checker_id"] == "shell.shellcheck"
+                || brief["checker_id"] == "java.jdk.javadoc")
                 && outcome == "rule_coverage_requires_review"))
                 && brief["kind"] == "finding"
             {
@@ -1895,6 +1910,17 @@ fn latest_verification_observation(
                             .as_str()
                             .filter(|s| valid_sha256(s))
                             .ok_or("verification_event_invalid")?
+                            .to_owned()
+                    } else if brief["checker_id"] == "java.jdk.javadoc" {
+                        report["input_bindings"]
+                            .as_array()
+                            .and_then(|rows| {
+                                rows.iter()
+                                    .find(|r| r["location"] == "workspace" && r["path"] == path)
+                            })
+                            .and_then(|r| r["sha256"].as_str())
+                            .filter(|s| valid_sha256(s))
+                            .ok_or("javadoc_verification_source_invalid")?
                             .to_owned()
                     } else if matches!(
                         brief["checker_id"].as_str(),
@@ -2040,7 +2066,10 @@ fn run_sequence(run_id: &str) -> Option<u128> {
     if run_id.starts_with("eslint-") || run_id.starts_with("npm-") {
         return run_id.rsplit('-').next()?.parse().ok();
     }
-    if run_id.starts_with("checkstyle-") || run_id.starts_with("syntax-confirm-") {
+    if run_id.starts_with("checkstyle-")
+        || run_id.starts_with("syntax-confirm-")
+        || run_id.starts_with("javadoc-")
+    {
         return run_id.rsplit('-').next()?.parse().ok();
     }
     if let Some(value) = run_id

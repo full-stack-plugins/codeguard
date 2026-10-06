@@ -833,7 +833,7 @@ codeguard comments java . --java-home /absolute/jdk21 --maven-tool /absolute/mvn
 
 ### Javadoc 项目工作台接线（源码增量）
 
-已初始化项目的 `comments java .` 在 JDK 单文件模式中自动保存局部观察并同步稳定任务，包装协议升级为 `java_comments_feedback 0.2.0`；未初始化、独立文件及未接通范围仍沿用0.1局部反馈。行号用于定位；规则、文件、源码锚点和同锚点序号构成身份。重复扫描追加观察，不增加重复任务。
+已初始化项目的 `comments java .` 在 JDK 单文件模式中自动保存局部观察并同步稳定任务，包装协议现为 `java_comments_feedback 0.3.0`；未初始化、独立文件及未接通范围仍沿用0.1局部反馈。行号用于定位；规则、文件、源码锚点和同锚点序号构成身份。重复扫描追加观察，不增加重复任务。
 
 ```mermaid
 flowchart LR
@@ -846,4 +846,27 @@ flowchart LR
     C -->|失败| H[显示持久化错误 不虚构任务]
 ```
 
-缺配置或原生未完成生成准备记录，不成为源码违规或自动新增交付义务。报告使用 `workbench.status/new_findings/new_blockers/next`，持久失败不返回虚构任务；`next` 和任务文字提供证据、规则、允许范围、步骤、复检和关闭条件。局部零诊断保留开放任务，`task_verify_status=not_integrated`；Maven多文件报告与文件入口的工作台适配尚未接通。完整可信关闭和宿主验收仍待完成。
+缺配置或原生未完成生成准备记录，不成为源码违规或自动新增交付义务。报告使用 `workbench.status/new_findings/new_blockers/next`，持久失败不返回虚构任务；`next` 和任务文字提供证据、规则、允许范围、步骤、复检和关闭条件。局部零诊断保留开放任务，`task_verify_status=local_observation_only`，原任务复检见下节；Maven多文件报告与文件入口的工作台适配尚未接通。完整可信关闭和宿主验收仍待完成。
+
+### Javadoc 原任务复检（源码增量）
+
+已初始化项目 JDK 模式的 Javadoc 任务支持原工具复检：
+
+```bash
+codeguard task verify CG-<任务身份> . --java-home /absolute/jdk21 --format json
+```
+
+复检读取摘要绑定的原观察，只选择任务对应主源码与当前原生配置；不会从报告里选择可执行程序。显式 JDK21 的源码、配置、工具字节在扫描及记录前核对。其它检查器参数在租约和启动前拒绝。结果 `still_present`、`incomplete`、`rule_coverage_requires_review`、`candidate_absent_unverified_policy` 保存到同一任务事件，绑定原生报告和本次尝试。缺工具、工具失配或输入变化不成为修复完成；配置改变或同规则不同锚点需要复核。
+
+```mermaid
+flowchart LR
+    A[任务原报告与当前输入] --> B[显式JDK21原工具复检]
+    B --> C[归属 源码 配置与工具身份复核]
+    C --> D[原任务复检事件与尝试历史]
+    D --> E[next提供当前原生反馈]
+    E --> F{连续无进展}
+    F -->|是| G[具体决策需求]
+    F -->|否| H[按规则继续修复或恢复环境]
+```
+
+当前版本：项目包装 `java_comments_feedback 0.3.0`、Javadoc修复简报0.2、原生复检容器 `javadoc_task_recheck 0.1.0`、公开 `task_verification_preview 0.26.0`。旧schema保持可读；`task_verify_status=local_observation_only` 表示已接通局部复检，正式可信关闭仍未验收。补齐文档后的零诊断只记录消失候选并保持open；白名单审批、原完整项目规则归因与实际宿主仍需独立完成。Maven多文件和独立文件工作台范围没有因此扩展。

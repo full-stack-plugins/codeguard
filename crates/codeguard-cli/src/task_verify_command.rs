@@ -101,6 +101,19 @@ pub fn run(args: &[String]) -> ExitCode {
     } else {
         None
     };
+    let javadoc_task = brief["checker_id"] == "java.jdk.javadoc";
+    if javadoc_task
+        && (parsed.maven_tool.is_some()
+            || parsed.maven_repo.is_some()
+            || parsed.repo_sha256.is_some()
+            || parsed.cargo_tool.is_some()
+            || parsed.ruff_tool.is_some()
+            || parsed.cve_data_dir.is_some()
+            || parsed.cve_data_sha256.is_some())
+    {
+        eprintln!("JDK Javadoc任务仅接受对应JDK与共享预算参数");
+        return ExitCode::from(2);
+    }
     let shell_task = brief["checker_id"] == "shell.shellcheck";
     if parsed.shellcheck_tool.is_some() && !shell_task {
         eprintln!("--shellcheck-tool 仅用于ShellCheck任务");
@@ -338,6 +351,15 @@ pub fn run(args: &[String]) -> ExitCode {
             crate::checkstyle_preparation_recheck::run(&root, &brief, &options, deadline)
         } else {
             crate::checkstyle_task_recheck::run(&root, &brief, &options, deadline)
+        }
+    } else if javadoc_task {
+        match crate::javadoc_task_recheck::run(&root, &brief, parsed.java_home.as_deref(), deadline)
+        {
+            Ok(report) => report,
+            Err(reason) => {
+                let release = finish_verification(&root, &parsed.task_id, &lease);
+                return print_unavailable(&parsed, release.err().unwrap_or(reason));
+            }
         }
     } else if brief["checker_id"] == "go.vet" {
         crate::go_lint_command::observe_for_check(
@@ -697,6 +719,8 @@ pub fn run(args: &[String]) -> ExitCode {
             crate::npm_task_recheck::classify(&root, &brief, &scan)
         } else if eslint_task {
             crate::eslint_task_recheck::classify(&brief, &scan)
+        } else if javadoc_task {
+            crate::javadoc_task_recheck::classify(&brief, &scan)
         } else if brief["checker_id"] == "java.checkstyle.preparation" {
             crate::checkstyle_preparation_recheck::classify(&brief, &scan)
         } else if brief["checker_id"] == "java.checkstyle" {
@@ -735,6 +759,9 @@ pub fn run(args: &[String]) -> ExitCode {
         "execution_budget":budget_record(parsed.timeout_ms, parsed.timeout_source),
         "next_actions":["inspect_native_recheck_and_policy_before_closure"]
     });
+    if javadoc_task {
+        report["schema_version"] = json!("0.26.0");
+    }
     if shell_task {
         report["schema_version"] = json!("0.24.0");
     }
@@ -811,6 +838,9 @@ pub fn run(args: &[String]) -> ExitCode {
                         || (brief["checker_id"] == "rust.cargo_rustdoc"
                             && scan["input_stable"] == true
                             && !crate::rustdoc_task_recheck::inputs_current(&root, &scan))
+                        || (javadoc_task
+                            && scan["task_input_stable"] == true
+                            && !crate::javadoc_task_recheck::inputs_current(&root, &scan))
                         || (brief["checker_id"] == "java.checkstyle.preparation"
                             && !crate::checkstyle_preparation_recheck::inputs_current(&scan))
                         || (brief["checker_id"] == "java.checkstyle"

@@ -1852,3 +1852,10 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 - [x] 重复扫描、保存失败恢复、伪造指纹拒绝、真实JDK项目修复后仍开放及受影响工作台回归；新增报告与简报schema并验证实际输出。
 
 证据见 [Javadoc项目工作台](../../../tests/acceptance/javadoc-project-workbench.md)。Maven多文件与文件工作台、task verify和可信关闭仍需完成，9.x父任务保留未完成。
+
+## 2026-10-06 Javadoc 原任务复检（已验证局部实现）
+
+- [x] Javadoc JDK项目任务task verify复检、原报告/配置/工具身份、租约与尝试绑定、记录前输入复核、next读取及历史失效；不自动关闭。
+- [x] 缺工具和工具变化、参数隔离、重复无进展、真实JDK文档补齐和POM变更分流，以及公开报告schema与受影响回归。
+
+证据见 [Javadoc任务复检](../../../tests/acceptance/javadoc-task-recheck.md)。完整可信关闭、复发、Maven与文件工作台尚未完成；9.x父任务不勾选。

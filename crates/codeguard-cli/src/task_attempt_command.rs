@@ -439,6 +439,7 @@ fn verified_rechecks(
                 .and_then(|s| s.parse::<u128>().ok())
         } else if run_id.starts_with("syntax-native-")
             || run_id.starts_with("checkstyle-")
+            || run_id.starts_with("javadoc-")
             || run_id.starts_with("eslint-")
             || run_id.starts_with("npm-")
             || run_id.starts_with("rustdoc-")
@@ -541,6 +542,13 @@ fn verified_rechecks(
         {
             continue;
         }
+        if brief["checker_id"] == "java.jdk.javadoc"
+            && report["task_input_stable"] == true
+            && event["report_sha256"] == digest(&report_bytes)
+            && !crate::javadoc_task_recheck::inputs_current(root, &report)
+        {
+            continue;
+        }
         let report_matches = if brief["checker_id"] == "syntax.native_confirmation" {
             crate::syntax_task_recheck::valid_shape(root, &report)
                 && event["observation"] == crate::syntax_task_recheck::classify(&report)
@@ -564,6 +572,9 @@ fn verified_rechecks(
                 )
                 && report["checker_id"] == "go.vet"
                 && event["observation"] == classify_go(brief, &report)
+        } else if brief["checker_id"] == "java.jdk.javadoc" {
+            crate::javadoc_task_recheck::valid_shape(&report)
+                && event["observation"] == crate::javadoc_task_recheck::classify(brief, &report)
         } else if brief["checker_id"] == "java.checkstyle.preparation" {
             crate::checkstyle_preparation_recheck::valid_shape(&report)
                 && event["observation"]
