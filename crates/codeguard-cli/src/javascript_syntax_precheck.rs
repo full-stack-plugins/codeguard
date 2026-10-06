@@ -98,19 +98,31 @@ pub(crate) fn observe(args: &EslintLintArguments, deadline: Instant) -> Value {
     if codeguard_runtime::sigint_cancellation_requested() {
         report["reason"] = json!("request_cancelled");
     } else if args.workspace.is_some() {
-        let tasks = crate::syntax_confirmation::persist(&root, &syntax, deadline);
+        let mut tasks = crate::syntax_confirmation::persist(&root, &syntax, deadline);
+        let pending = if no_candidates {
+            match pending_confirmation(&root, relative) {
+                Ok(task) => task,
+                Err(reason) => {
+                    // 无法读取历史不能等价于没有待办；保留原生义务，输出固定恢复原因。
+                    report["setup"]["requirement"] = json!("required");
+                    report["setup"]["reason"] = json!("native_confirmation_needed");
+                    tasks["status"] = json!("incomplete");
+                    tasks["failures"]
+                        .as_array_mut()
+                        .expect("同步结果包含失败数组")
+                        .push(json!({"path":relative,"language":"javascript","reason":reason}));
+                    None
+                }
+            }
+        } else {
+            None
+        };
         report["workbench_status"] = tasks["status"].clone();
         let mut workbench = json!({"status":tasks["status"]});
         let selected_task = tasks["tasks"][0]["task_id"]
             .as_str()
             .map(str::to_owned)
-            .or_else(|| {
-                if no_candidates {
-                    pending_confirmation(&root, relative)
-                } else {
-                    None
-                }
-            });
+            .or(pending);
         if let Some(id) = selected_task {
             report["setup"]["task_id"] = json!(id);
             workbench["task_id"] = json!(id);
@@ -134,7 +146,7 @@ pub(crate) fn observe(args: &EslintLintArguments, deadline: Instant) -> Value {
             }) {
                 "工作区未初始化；先对原工作区执行 codeguard init <工作区> --apply，再按原 lint 命令复检。保留初检候选，不修改源码或虚构任务"
             } else {
-                "本次候选任务同步未完成；查看 syntax_tasks.failures，核查 .codeguard/reports 的路径、权限及受管工作区身份，再按原命令复检，不自行创建关闭证据"
+                "本次候选任务同步未完成；查看 syntax_tasks.failures，核查 .codeguard/findings、tasks、reports 的路径、权限及受管工作区身份，恢复历史任务记录，再按原命令复检，不自行创建关闭证据"
             });
         }
         report["workbench"] = workbench;
@@ -145,20 +157,53 @@ pub(crate) fn observe(args: &EslintLintArguments, deadline: Instant) -> Value {
 }
 
 // 仅从已初始化工作区及经过完整工作台校验的现存任务恢复引用，不制造新任务或关闭证据。
-fn pending_confirmation(root: &std::path::Path, relative: &str) -> Option<String> {
+fn pending_confirmation(
+    root: &std::path::Path,
+    relative: &str,
+) -> Result<Option<String>, &'static str> {
     let baseline = crate::workspace_refresh::read_workspace_baseline(root)
-        .ok()
-        .flatten()?;
-    let fingerprint = crate::eslint_preparation::fingerprint(baseline.workspace_id()?, relative);
+        .map_err(|_| "workspace_invalid")?
+        .ok_or("workspace_not_initialized")?;
+    let fingerprint = crate::eslint_preparation::fingerprint(
+        baseline.workspace_id().ok_or("workspace_id_unavailable")?,
+        relative,
+    );
     let id = format!("CG-B-{}", &fingerprint[..32]);
-    let brief = crate::next_command::read_task_brief(root, &id).ok()?;
+    // 检查父目录本身，避免通过可替换链接读取其他工作区的历史。
+    for path in [
+        root.join(".codeguard"),
+        root.join(".codeguard/findings"),
+        root.join(".codeguard/tasks"),
+    ] {
+        match std::fs::symlink_metadata(&path) {
+            Ok(metadata)
+                if metadata.file_type().is_dir()
+                    && path.canonicalize().ok().as_deref() == Some(path.as_path()) => {}
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+            _ => return Err("workspace_records_unavailable"),
+        }
+    }
+    let directory = root.join(".codeguard/findings").join(&id);
+    let projection = root.join(".codeguard/tasks").join(format!("{id}.md"));
+    let absent = |path: &std::path::Path| -> Result<bool, &'static str> {
+        match std::fs::symlink_metadata(path) {
+            Ok(_) => Ok(false),
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(true),
+            Err(_) => Err("task_record_unavailable"),
+        }
+    };
+    // 只有事实目录和投影均不存在才表示没有同范围任务；半缺失要求恢复记录。
+    if absent(&directory)? && absent(&projection)? {
+        return Ok(None);
+    }
+    let brief = crate::next_command::read_task_brief(root, &id)?;
     if brief["checker_id"] != "node.eslint.preparation"
         || brief["kind"] != "blocker"
         || brief["scope"] != relative
     {
-        return None;
+        return Err("task_identity_conflict");
     }
-    Some(id)
+    Ok(Some(id))
 }
 
 /// 输出有界脱敏语法与结构位置；参数为本轮候选报告，不输出源码片段或标识符。

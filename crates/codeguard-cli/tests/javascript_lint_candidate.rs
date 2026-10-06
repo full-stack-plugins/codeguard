@@ -124,6 +124,35 @@ fn unbound_and_commonjs_return_feedback_recommends_native_without_inventing_erro
         assert!(!f.0.join(".codeguard").exists());
         assert_eq!(fs::read_to_string(source).unwrap(), text);
     }
+    let source = f.0.join("input.mjs");
+    let args = [
+        "lint",
+        "typescript",
+        source.to_str().unwrap(),
+        "--workspace",
+        f.0.to_str().unwrap(),
+        "--format=json",
+    ];
+    let uninitialized = run(&args);
+    assert_eq!(uninitialized["setup"]["requirement"], "required");
+    assert_eq!(
+        uninitialized["syntax_tasks"]["failures"][0]["reason"],
+        "workspace_not_initialized"
+    );
+    run(&["init", f.0.to_str().unwrap(), "--apply", "--format=json"]);
+    let no_history = run(&args);
+    assert_eq!(
+        no_history["setup"]["requirement"], "recommended",
+        "{no_history}"
+    );
+    assert_eq!(no_history["syntax_tasks"]["failures"], json!([]));
+    fs::write(f.0.join(".codeguard/workspace.json"), "{").unwrap();
+    let invalid = run(&args);
+    assert_eq!(invalid["setup"]["requirement"], "required");
+    assert_eq!(
+        invalid["syntax_tasks"]["failures"][0]["reason"],
+        "workspace_invalid"
+    );
 }
 
 #[test]
@@ -231,4 +260,74 @@ fn outside_workspace_cannot_create_confirmation_and_human_feedback_redacts_names
     );
     assert!(text.contains("UTF-8"));
     assert!(!text.contains("PRIVATE_IDENTIFIER_TOKEN"));
+}
+
+#[test]
+fn damaged_history_never_downgrades_pending_native_confirmation() {
+    use std::os::unix::fs::symlink;
+    let f = fixture("history");
+    run(&["init", f.0.to_str().unwrap(), "--apply", "--format=json"]);
+    let source = f.0.join("input.js");
+    fs::write(&source, "const x=1; const x=2;\n").unwrap();
+    let args = [
+        "lint",
+        "typescript",
+        source.to_str().unwrap(),
+        "--workspace",
+        f.0.to_str().unwrap(),
+        "--format=json",
+    ];
+    let first = run(&args);
+    let id = first["setup"]["task_id"].as_str().unwrap();
+    let fact =
+        f.0.join(".codeguard/findings")
+            .join(id)
+            .join("finding.json");
+    let projection = f.0.join(".codeguard/tasks").join(format!("{id}.md"));
+    let original = fs::read(&fact).unwrap();
+    let markdown = fs::read(&projection).unwrap();
+    fs::write(&source, "const x=1;\n").unwrap();
+    for mutation in [
+        "bad_json",
+        "missing_projection",
+        "linked_projection",
+        "forged_closed",
+    ] {
+        fs::write(&fact, &original).unwrap();
+        if fs::symlink_metadata(&projection).is_ok() {
+            fs::remove_file(&projection).unwrap();
+        }
+        fs::write(&projection, &markdown).unwrap();
+        match mutation {
+            "bad_json" => fs::write(&fact, "{").unwrap(),
+            "missing_projection" => fs::remove_file(&projection).unwrap(),
+            "linked_projection" => {
+                let foreign = f.0.join("foreign.md");
+                fs::write(&foreign, "DO_NOT_EXECUTE_HISTORY_TEXT").unwrap();
+                fs::remove_file(&projection).unwrap();
+                symlink(&foreign, &projection).unwrap();
+            }
+            "forged_closed" => {
+                let mut value: Value = serde_json::from_slice(&original).unwrap();
+                value["state"] = json!("closed");
+                fs::write(&fact, serde_json::to_vec(&value).unwrap()).unwrap();
+            }
+            _ => unreachable!(),
+        }
+        let report = run(&args);
+        assert_eq!(
+            report["setup"]["requirement"], "required",
+            "{mutation}: {report}"
+        );
+        assert_eq!(report["setup"]["task_id"], Value::Null);
+        assert_eq!(report["workbench_status"], "incomplete");
+        assert!(
+            !report["syntax_tasks"]["failures"]
+                .as_array()
+                .unwrap()
+                .is_empty()
+        );
+        assert!(!report.to_string().contains("DO_NOT_EXECUTE_HISTORY_TEXT"));
+        assert_eq!(fs::read_to_string(&source).unwrap(), "const x=1;\n");
+    }
 }

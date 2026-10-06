@@ -825,3 +825,8 @@ Project Rust parser selection SHALL distinguish package edition, explicit worksp
 - **AND** a candidate-free observation SHALL recommend native lint only when no validated open confirmation task remains for that workspace and scope
 - **AND** an existing open task SHALL retain its identity and required native confirmation even when the latest candidate observation contains no issue
 - **AND** automatic native discovery SHALL NOT search or execute beyond the selected workspace boundary
+
+#### Scenario: JavaScript 零候选不能隐藏损坏的历史确认任务
+- **WHEN** 独立 JavaScript 初检没有当前候选，但同范围历史任务的事实、投影、父目录或工作区身份无法核验
+- **THEN** 保留 required 原生确认要求，将工作台同步报告标记 incomplete，并输出具体记录恢复原因；不把读取失败当作没有任务，不读取链接目标的指令，不虚构任务引用或将本地 closed 字段当作有效关闭
+- **AND** 只有可核验工作区中同范围事实目录及任务投影确实均不存在，才按当前有界零候选观察提供推荐安装建议；后续完整门禁仍独立核对全部义务

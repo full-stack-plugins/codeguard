@@ -1638,3 +1638,5 @@ runtime的有界直接同级绑定AST事实现接入WASM源码构建的`grammar 
 ### JavaScript 独立 lint 与历史确认要求
 
 `lint typescript` 是当前ESLint统一入口；四种JavaScript扩展先在所选工作区内发现原生工具，没有本地上下文时复用项目的单文件WASM候选扫描与工作台，使用反馈0.6。结构/恢复位置分开，等号及分隔参数共用重复校验。当前零候选仅在没有同范围开放确认任务时推荐原生lint；已有任务则保留ID及required，避免从独立入口逃逸。所选原生失败不回退，任务同步故障保留候选并报告具体原因。新schema保持旧版本不变，真实宿主/完整资格/发行仍待验收。见[验收](../tests/acceptance/javascript-lint-candidate.md)。
+
+JavaScript 兜底须区分同范围确认任务确实不存在与历史无法核验。事实损坏、投影缺失、目录被替换或本地伪造 closed 状态时，保留必须原生确认及工作台未完成结果，提供固定的记录恢复原因；不从 Markdown 导入指令，不将本地状态作为关闭权威。
