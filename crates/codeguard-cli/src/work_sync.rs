@@ -24,6 +24,8 @@ mod checkstyle_report;
 mod javadoc_report;
 #[cfg(unix)]
 mod maven_javadoc_report;
+#[cfg(unix)]
+mod gradle_javadoc_report;
 mod doctor_report;
 mod eslint_report;
 mod npm_preparation_report;
@@ -512,6 +514,7 @@ fn import_one(
                     | "java_checkstyle_workbench_observation"
                     | "javadoc_workbench_observation"
                     | "maven_javadoc_workbench_observation"
+                    | "gradle_javadoc_workbench_observation"
                     | "maven_javadoc_task_recheck"
                     | "javadoc_task_recheck"
                     | "checkstyle_task_recheck"
@@ -705,6 +708,10 @@ fn parse_report(
     #[cfg(unix)]
     if report["report_type"] == "maven_javadoc_task_recheck" {
         return maven_javadoc_report::parse_recheck(root, workspace_id, path, report, digest);
+    }
+    #[cfg(unix)]
+    if report["report_type"] == "gradle_javadoc_workbench_observation" {
+        return gradle_javadoc_report::parse(root, workspace_id, path, report, digest);
     }
     #[cfg(unix)]
     if report["report_type"] == "maven_javadoc_workbench_observation" {
@@ -2130,6 +2137,18 @@ fn persist_local_blocker_observation(
 }
 
 fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
+    if blocker.checker_id == "java.gradle.javadoc" {
+        return format!(
+            "# {} Gradle Javadoc准备任务\n\n- 问题证据：原因 {} / {}；报告 .codeguard/reports/{}.json，摘要 {}。\n- 规则依据：原工具执行和完整规则/范围核验，不是源码违规。\n- 允许范围：原Gradle、JDK21、构建配置及所选范围，不修改无关源码。\n- 修复步骤：故障时恢复原工具与原配置；规则/覆盖未验收时提出具体项目政策决策，不反复安装或修改源码。\n- 复检命令：codeguard next . --format=json取得相同所选输入的check java --gradle-javadoc参数，再以核验后的原Gradle/JDK路径复扫；task verify尚未整合，不作关闭承诺。\n- 历史尝试：首次run {}；重复扫描沿同一准备问题追加观察，失败尝试需记录。\n- 关闭条件：原工具完整复检与可信政策均满足；无诊断、安装或勾选不关闭，当前仅局部观察。\n",
+            blocker.id,
+            blocker.reason,
+            blocker.diagnostic_reason.as_deref().unwrap_or("unknown"),
+            report.run_id,
+            report.digest,
+            report.run_id
+        );
+    }
+
     if blocker.checker_id == "java.maven.javadoc" {
         return format!(
             "# {} Maven Javadoc准备任务\n\n- 问题证据：原因 {}；原报告 {} / {}。\n- 规则依据：原生多文件检查完整性，非源码违规。\n- 允许范围：构建根 {}、原POM、Maven/JDK和离线仓库；不修改无关源码。\n- 修复步骤：恢复匹配工具和原配置，再按相同上下文重跑comments java。\n- 复检命令：codeguard task verify {0} . --maven-tool <原绝对路径> --java-home <原JDK21> --maven-repo <原离线仓库> --repo-sha256 <复核摘要> --format json。\n- 历史尝试：首次run {}；task attempt记录诊断，后续扫描追加原任务。\n- 关闭条件：原工具完整复检和可信策略；原任务局部复检已接通，可信关闭未验收，零诊断不关闭。\n",
@@ -2412,6 +2431,19 @@ fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
 }
 
 fn render_task(report: &ReportInput, finding: &FindingInput) -> String {
+    if finding.checker_id == "java.gradle.javadoc" {
+        return format!(
+            "# {} Gradle Javadoc修复任务\n\n- 问题证据：原生 {}，目标 {}，首次行 {}；报告 .codeguard/reports/{}.json，摘要 {}。\n- 规则依据：原Gradle官方Javadoc任务诊断，原doclint/doclet及源集保持，完整详细规则尚未验收。\n- 允许范围：仅该源码与真实API文档，不关闭检查器或添加抑制代替修复。\n- 修复步骤：核对本轮位置和实际契约，补齐用途、参数、返回或异常的详细说明，裸标签不能代替内容。\n- 复检命令：codeguard next . --format=json取得原所选输入的check java --gradle-javadoc参数，核验原Gradle/JDK后复扫；task verify尚未整合。\n- 历史尝试：首次run {}；重复扫描追加同一问题，记录失败和无进展，旧行号不能直接修改。\n- 关闭条件：原工具完整复检和可信政策；当前不自动关闭，零诊断和勾选均不能关闭。\n",
+            finding.id,
+            finding.rule_id,
+            finding.path,
+            finding.line,
+            report.run_id,
+            report.digest,
+            report.run_id
+        );
+    }
+
     if finding.checker_id == "java.maven.javadoc" {
         return format!(
             "# {} Maven Javadoc修复任务\n\n- 问题证据：原生 {}，目标 {}，首次行 {}；报告 {} / {}。\n- 规则依据：原POM固定Javadoc多文件诊断，项目政策尚未核验。\n- 允许范围：仅目标源码，保留规则和API语义。\n- 修复步骤：依据实际契约补齐公共类、构造函数、参数、返回及异常文档。\n- 复检命令：codeguard task verify {0} . --maven-tool <原绝对路径> --java-home <原JDK21> --maven-repo <原离线仓库> --repo-sha256 <复核摘要> --format json。\n- 历史尝试：首次run {}；重扫归并同任务，task attempt记录失败。\n- 关闭条件：原工具完整复检及可信策略；原任务局部复检已接通，可信关闭未验收，勾选或零诊断不关闭。\n",

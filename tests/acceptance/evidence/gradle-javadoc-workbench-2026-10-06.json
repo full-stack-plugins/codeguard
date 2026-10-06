@@ -1,0 +1,78 @@
+{
+  "record_kind": "local_acceptance_summary",
+  "recorded_date": "2026-10-06",
+  "scope": "Gradle documentation persistent observations, stable task sync and next guidance; original-task native verify/closure not integrated",
+  "source_sha256": {
+    "crates/codeguard-cli/src/check_command.rs": "77e931f80e24e4182c69a181e0686346f1e70eedba4ce7af0fad22f6f962fb51",
+    "crates/codeguard-cli/src/gradle_javadoc_workbench.rs": "e0a8de5070c03aee74aaae309964b62401dd6b29bac08a78547aa6ae3a1b6a08",
+    "crates/codeguard-cli/src/next_command.rs": "9b81426d8d7dbe8b4881ace7884b7170139ea13a0ac831651a50738e120a33f1",
+    "crates/codeguard-cli/src/work_sync.rs": "20a5e1fdc0aef99a0cae377d072df74e9badd05a01338c32f3a7e880b74866dc",
+    "crates/codeguard-cli/src/work_sync/gradle_javadoc_report.rs": "ae08bf38ae935ed32e90fe30997a5a6caed16ce826277dc6cc1ad5b1a4f0a2a7",
+    "crates/codeguard-cli/tests/gradle_javadoc_work_sync.rs": "07ad03251b9c814021f81863e66d62a5adae5c814f242719371518ef0039ac3b",
+    "schemas/check-feedback-v0.65.schema.json": "1fbf150656d463d9fadca4708a508e04d82c2fdbb16f47d3a5ada39ebd208f84",
+    "schemas/gradle-javadoc-workbench-observation-v0.1.schema.json": "bf8055b3a0ac8451c0878960c3f9f6da6160a6da655982900cb9ca25eaf6acb4",
+    "schemas/repair-brief-preview-v0.22.schema.json": "4ee6af32c3bba9b1966b7ed3671ddfd23a5ec8af8c854ef945dd8d2d74bcd45e"
+  },
+  "tests": {
+    "default": {
+      "passed": 25,
+      "failed": 0,
+      "ignored": 8
+    },
+    "wasm": {
+      "passed": 19,
+      "failed": 0,
+      "ignored": 7,
+      "overlap_with_default": true
+    },
+    "actual_public_gradle": {
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "observations": 3,
+      "diagnostic_counts": [
+        2,
+        2,
+        0
+      ],
+      "stored_workbench_reports": 3,
+      "retained_finding_state": "open"
+    }
+  },
+  "schema": {
+    "meta_valid": 419,
+    "reports_valid": 14,
+    "forgeries_rejected": 8,
+    "old_consumer_rejected": true
+  },
+  "checks": {
+    "default_clippy": "pass",
+    "wasm_clippy": "pass",
+    "layering": "pass",
+    "openspec_strict": "pass",
+    "diff": "pass"
+  },
+  "evidence_boundary": {
+    "fixtures": "constructed native report template; not actual native precision samples",
+    "actual": "existing Gradle8.10.2/JDK21, three CLI checks including all selection, source repair and persisted report capture",
+    "identity": "line anchor identity; not complete symbol identity",
+    "summary_counts": "workspace sync totals; not exclusively Gradle",
+    "performance": "bounded latest consumed preparation selection; no benchmark"
+  },
+  "reports_sha256": {
+    "gradle-javadoc-workbench-native-2026-10-06.json": "e589650453e19b8cc6b738326d96a19612d2dffac08e353918c0cd50d295464c",
+    "gradle-javadoc-workbench-fixture-2026-10-06.json": "cc6896c1b0d12c2c484eb31b123d0c83fce9ca84aea54494b8ee07cbfa5a20ba",
+    "gradle-javadoc-preparation-transitions-2026-10-06.json": "d27641f4901b5ad33bdc2a5e787db809b8ab840d7466c3783a1a15fbd67102d1"
+  },
+  "production_qualified": false,
+  "coverage_proven": false,
+  "rule_configuration_complete": false,
+  "task_verify_status": "not_integrated",
+  "delivery_decision": "not_evaluated",
+  "pending": [
+    "original-task native verification, trusted closure and reopening",
+    "complete detailed rules and original source/configuration/JDK closure",
+    "multi-project/custom doclet documentation quality coverage",
+    "57-language four-core production matrix and formal 32-grammar qualification"
+  ]
+}

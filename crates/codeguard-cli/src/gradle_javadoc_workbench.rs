@@ -291,3 +291,224 @@ fn identity(parts: &[&[u8]]) -> String {
     }
     format!("{:x}", h.finalize())
 }
+
+/// 绑定已初始化工作区并生成可持久化报告；参数为执行前选定输入和局部原生报告，返回未受信观察。
+/// 不隐式初始化，不读取或执行报告中的命令，不授予关闭或完整覆盖。
+pub fn prepare(root: &Path, inputs: &Value, native: &Value) -> Result<Value, &'static str> {
+    let baseline =
+        crate::workspace_refresh::read_workspace_baseline(root).map_err(|_| "workspace_invalid")?;
+    let id = baseline
+        .as_ref()
+        .and_then(|b| b.workspace_id())
+        .ok_or("workspace_not_initialized")?;
+    let (findings, blockers) = project(root, inputs, native)?;
+    let nanos = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_err(|_| "clock_unavailable")?
+        .as_nanos();
+    Ok(
+        json!({"schema_version":"0.1.0","report_type":"gradle_javadoc_workbench_observation","workspace_binding":"bound","workspace_id":id,"run_id":format!("javadoc-gradle-{}-{nanos}",std::process::id()),"checker_id":"java.gradle.javadoc","authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated","inputs":inputs,"native":native,"findings":findings,"blockers":blockers}),
+    )
+}
+
+/// 从原报告字节构造静态复扫参数；参数为工作区、首次run和摘要，返回指引，不执行工具。
+pub(crate) fn recheck_argv(root: &Path, run: &str, expected: &str) -> Result<Value, &'static str> {
+    let bytes = codeguard_runtime::read_bounded_regular_file(
+        &root.join(format!(".codeguard/reports/{run}.json")),
+        16 * 1024 * 1024,
+    )
+    .map_err(|_| "gradle_original_report_unavailable")?;
+    if digest(&bytes) != expected {
+        return Err("gradle_original_report_changed");
+    }
+    let report = codeguard_adapters::parse_unique_json(&bytes)
+        .map_err(|_| "gradle_original_report_invalid")?;
+    let baseline =
+        crate::workspace_refresh::read_workspace_baseline(root).map_err(|_| "workspace_invalid")?;
+    if report["report_type"] != "gradle_javadoc_workbench_observation"
+        || report["run_id"] != run
+        || report["workspace_id"].as_str() != baseline.as_ref().and_then(|b| b.workspace_id())
+        || report["checker_id"] != "java.gradle.javadoc"
+    {
+        return Err("gradle_original_report_identity_invalid");
+    }
+    let rows = report["inputs"]
+        .as_array()
+        .filter(|r| !r.is_empty() && r.len() <= 128)
+        .ok_or("gradle_original_inputs_invalid")?;
+    let mut argv = vec![
+        json!("codeguard"),
+        json!("check"),
+        json!("java"),
+        json!(root),
+        json!("--gradle-javadoc"),
+        json!("--gradle-bundle"),
+        json!("<已核验原Gradle绝对路径>"),
+        json!("--java-home"),
+        json!("<已核验原JDK21绝对路径>"),
+    ];
+    for row in rows {
+        let path = row["path"]
+            .as_str()
+            .filter(|p| safe(p))
+            .ok_or("gradle_original_input_invalid")?;
+        argv.push(json!("--gradle-project-file"));
+        argv.push(json!(path));
+    }
+    argv.push(json!("--format=json"));
+    Ok(json!(argv))
+}
+
+/// 保存和同步扫描前快照绑定的局部观察；返回更新计数，未初始化时不自动建工作区。
+pub(crate) fn connect(root: &Path, snapshot: Option<&SourceSnapshot>, native: &Value) -> Value {
+    let result: Result<Value, &'static str> = (|| {
+        let snapshot = snapshot.ok_or("gradle_workbench_snapshot_unavailable")?;
+        if snapshot.verify_source_unchanged().ok() != Some(true) {
+            return Err("gradle_workbench_inputs_changed");
+        }
+        let inputs = json!(
+            snapshot
+                .files()
+                .iter()
+                .map(|(p, b)| json!({"path":p,"sha256":digest(b)}))
+                .collect::<Vec<_>>()
+        );
+        let report = prepare(root, &inputs, native)?;
+        crate::work_sync::save_local_report(root, &report)?;
+        let summary = crate::work_sync::sync_local_workspace(root)?;
+        Ok(
+            json!({"status":if summary.failed_reports==0 {"synced_partial"} else {"sync_incomplete"},"new_findings":summary.new_findings,"new_blockers":summary.new_blockers,"task_verify_status":"not_integrated","summary_scope":"workspace_sync"}),
+        )
+    })();
+    result.unwrap_or_else(|reason|json!({"status":reason,"new_findings":0,"new_blockers":0,"task_verify_status":"not_integrated","summary_scope":"workspace_sync"}))
+}
+
+/// 核对消费收据、原报告字节和准备观察，返回最新诊断及证据引用；不沿用未消费或篡改记录。
+pub(crate) fn latest_preparation(
+    root: &Path,
+    id: &str,
+    fact: &Value,
+) -> Result<(String, Value), &'static str> {
+    let directory = root.join(format!(".codeguard/state/observations/{id}"));
+    if directory.canonicalize().ok().as_ref() != Some(&directory) {
+        return Err("gradle_preparation_path_invalid");
+    }
+    let entries = std::fs::read_dir(&directory)
+        .map_err(|_| "gradle_preparation_unavailable")?
+        .take(1001)
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|_| "gradle_preparation_unavailable")?;
+    if entries.len() > 1000 {
+        return Err("gradle_preparation_budget_exceeded");
+    }
+    let mut ordered = Vec::new();
+    for entry in entries {
+        let path = entry.path();
+        let run = path
+            .file_stem()
+            .and_then(|s| s.to_str())
+            .ok_or("gradle_preparation_run_invalid")?;
+        if path.extension().and_then(|s| s.to_str()) != Some("json")
+            || !run.starts_with("javadoc-gradle-")
+            || !run.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'-')
+        {
+            return Err("gradle_preparation_run_invalid");
+        }
+        let sequence = run
+            .rsplit('-')
+            .next()
+            .and_then(|s| s.parse::<u128>().ok())
+            .ok_or("gradle_preparation_run_invalid")?;
+        ordered.push((sequence, path));
+    }
+    // 先按运行序列选最新已消费观察，只读取该报告，不重复载入全部历史大报告。
+    ordered.sort_by_key(|a| std::cmp::Reverse(a.0));
+    for (_, path) in ordered {
+        let run = path
+            .file_stem()
+            .and_then(|s| s.to_str())
+            .ok_or("gradle_preparation_run_invalid")?;
+        let marker = root.join(format!(".codeguard/state/consumed/{run}.json"));
+        if !marker
+            .try_exists()
+            .map_err(|_| "gradle_preparation_receipt_unavailable")?
+        {
+            continue;
+        }
+        let data = codeguard_runtime::read_bounded_regular_file(&path, 128 * 1024)
+            .map_err(|_| "gradle_preparation_unavailable")?;
+        let obs = codeguard_adapters::parse_unique_json(&data)
+            .map_err(|_| "gradle_preparation_invalid")?;
+        if !exact(
+            &obs,
+            &[
+                "schema_version",
+                "record_type",
+                "blocker_id",
+                "workspace_id",
+                "run_id",
+                "report_sha256",
+                "reason_code",
+                "affected_paths",
+                "authority",
+                "diagnostic_reason",
+            ],
+        ) || obs["schema_version"] != "0.1.0"
+            || obs["record_type"] != "local_blocker_observation"
+            || obs["blocker_id"] != id
+            || obs["workspace_id"] != fact["workspace_id"]
+            || obs["run_id"] != run
+            || obs["reason_code"] != "gradle_javadoc_preparation_required"
+            || obs["authority"] != "local_unverified"
+        {
+            return Err("gradle_preparation_identity_invalid");
+        }
+        let expected = obs["report_sha256"]
+            .as_str()
+            .filter(|s| sha(s))
+            .ok_or("gradle_preparation_digest_invalid")?;
+        let receipt = codeguard_runtime::read_bounded_regular_file(&marker, 4096)
+            .map_err(|_| "gradle_preparation_receipt_unavailable")?;
+        let wanted=serde_json::to_vec_pretty(&json!({"schema_version":"0.1.0","workspace_id":fact["workspace_id"],"run_id":run,"report_sha256":expected})).map_err(|_|"gradle_preparation_encoding_invalid")?;
+        if receipt != wanted {
+            return Err("gradle_preparation_receipt_invalid");
+        }
+        let report_bytes = codeguard_runtime::read_bounded_regular_file(
+            &root.join(format!(".codeguard/reports/{run}.json")),
+            16 * 1024 * 1024,
+        )
+        .map_err(|_| "gradle_preparation_report_unavailable")?;
+        if digest(&report_bytes) != expected {
+            return Err("gradle_preparation_report_changed");
+        }
+        let report = codeguard_adapters::parse_unique_json(&report_bytes)
+            .map_err(|_| "gradle_preparation_report_invalid")?;
+        if report["report_type"] != "gradle_javadoc_workbench_observation"
+            || report["workspace_id"] != fact["workspace_id"]
+            || report["run_id"] != run
+            || report["checker_id"] != "java.gradle.javadoc"
+        {
+            return Err("gradle_preparation_report_invalid");
+        }
+        valid_native(&report["native"])?;
+        let blocker = report["blockers"]
+            .as_array()
+            .and_then(|rows| rows.iter().find(|b| b["id"] == id))
+            .ok_or("gradle_preparation_report_invalid")?;
+        if blocker["fingerprint"] != fact["fingerprint"]
+            || blocker["affected_paths"] != obs["affected_paths"]
+            || blocker["diagnostic_reason"] != obs["diagnostic_reason"]
+            || obs["diagnostic_reason"] != report["native"]["reason"]
+        {
+            return Err("gradle_preparation_report_invalid");
+        }
+        return Ok((
+            obs["diagnostic_reason"]
+                .as_str()
+                .ok_or("gradle_preparation_reason_invalid")?
+                .to_owned(),
+            json!({"run_id":run,"report_sha256":expected}),
+        ));
+    }
+    Err("gradle_preparation_consumed_observation_missing")
+}

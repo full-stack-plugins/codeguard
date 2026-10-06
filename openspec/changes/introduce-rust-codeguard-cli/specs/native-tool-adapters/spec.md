@@ -845,3 +845,11 @@ Gradle Javadoc repair observations SHALL use their own java.gradle.javadoc check
 #### Scenario: Gradle preparation observations cannot close source findings
 - **WHEN** native execution is incomplete or empty diagnostics remain unqualified for complete rules and scope
 - **THEN** projection SHALL preserve a separate preparation observation and SHALL NOT close source findings, mark coverage complete or claim persistent task integration before that integration is independently implemented and verified
+
+#### Scenario: Public Gradle documentation observations persist without granting closure
+- **WHEN** check java/all explicitly requests Gradle Javadoc in an initialized workspace with unchanged pre-execution inputs
+- **THEN** the bound local report SHALL be validated before first import, duplicate scans SHALL update the same finding/preparation records, readable tasks SHALL include evidence/rules/scope/steps/recheck/history/closure, and next SHALL retain Gradle native guidance; historical Java checks SHALL preserve that guidance without pretending to execute Gradle
+
+#### Scenario: Empty Gradle documentation recheck cannot erase historical findings
+- **WHEN** later selected Gradle documentation output is empty while complete rules, scope and trusted closure remain unqualified
+- **THEN** original findings SHALL stay open, environment/preparation observations SHALL remain distinct, and task verification SHALL be explicitly marked not-integrated until its original-native verification path is separately implemented
