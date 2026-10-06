@@ -1822,3 +1822,7 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 ## 2026-10-06 项目 Rust CVE 已有工具发现与聚合简报协议
 
 5.2/5.6/7.1/9.x/14.5：check all的rust.cve节点未指定工具时选择绝对PATH已有cargo-audit，显式或首个存在入口失败不换工具，未选择离线数据库单独反馈。真实已安装cargo-audit0.22.2与缓存RustSec两轮检出time0.1.40的RUSTSEC-2020-0071并复用同任务，未核验数据库不通过；独立cve/task verify仍显式指定。实际校验发现聚合next遗漏已有Clippy简报schema，新check0.56闭合引用且旧协议不修改。默认/WASM受影响四目标各40通过/7条件忽略，实际原生1通过；374元定义、两份实际聚合/嵌入报告、三篡改及旧消费者拒绝通过。见tests/acceptance/cargo-audit-path-discovery.md；完整工具锁/版本、数据库权威、CVE全覆盖/可信关闭、宿主和发行仍未完成，父任务不勾选。
+
+## 2026-10-06 Claude 保存反馈的持久失败与恢复回归
+
+11.17 / 14.14 / 14.19 补充当前开发程序的 Claude 协议集成测试：报告目录故障下重复保存均反馈同步未完成，不伪造任务，不回显不可信源码注释；恢复目录后生成唯一稳定任务，重复事件保持任务投影与 open 状态。显式目标1通过。实际宿主旧固定缓存缺少active.json，新尝试在init阶段停止，未启动宿主，未下载或安装；不算真实宿主验收，父任务不勾选。详见[验收记录](../../../tests/acceptance/claude-persistence-recovery-protocol.md)。
