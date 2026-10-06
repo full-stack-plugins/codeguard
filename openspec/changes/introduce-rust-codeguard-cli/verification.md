@@ -2410,3 +2410,7 @@ ESLint统一入口对JavaScript四种扩展接入原生优先及共享候选扫�
 最终四组WASM目标34 passed/0 failed/0 ignored，参数单目标1 passed（其他库目标过滤不计）；默认/WASM全目标Clippy -D warnings、格式/分层/OpenSpec strict/diff通过。366 schema元定义、19实际反馈/7伪造变体通过，新旧任务原身份复用。真实ESLint/宿主/语言资格/358语料与公开发行未在本批完成，父任务保持开放，受保护Erlang草稿保持原字节。上轮CI37401747231因固定插件源码dec5f9d远端不可达在gate早期失败，MSRV成功；不绕过该审计，不借其结果证明本轮成功。详情及实际报告见[验收](../../../tests/acceptance/javascript-lint-candidate.md)。
 
 本批默认原生入口三目标终态8 passed/0 failed/6 ignored；真实工具条件未执行不计原生验收。默认参数目标1 passed，与特性参数测试范围重叠，不累加；本批未执行全工作区。受保护Erlang草稿SHA-256保持原值。
+
+### JavaScript 历史记录恢复分流
+
+公开RED证明坏JSON导致错误推荐；修复后6项独立测试及受影响35项回归通过（重叠不累加），保留required、失败原因及空引用。已初始化无历史的正向对照通过。实际JSON/schema记录见tests/acceptance/javascript-history-recovery.md；不借用模拟历史证明真实ESLint、宿主、关闭或全语言精度。
