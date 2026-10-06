@@ -2508,3 +2508,7 @@ WASM CLI全目标Clippy -D warnings、定向rustfmt、分层、OpenSpec strict�
 ## 2026-10-06 Maven Javadoc 原任务复检局部验收
 
 原任务复检绑定首次报告/工作区/构建根/POM/Maven/JDK/离线仓库，重新执行既有多文件探针；缺工具及身份变化未完成，POM/源集变化要求覆盖复核，零诊断仅消失候选，范围外阻塞保留。租约下两次无进展转needs_decision。受控Maven夹具六项目标及八目标110通过/0失败/22条件忽略；五schema元定义、17实际输出、六伪造coverage反例、CLI全目标Clippy、分层及OpenSpec strict通过。真实check java聚合0.38的P3C准备简报不符合旧schema，独立记为待修复，未声称聚合或真实Maven插件验收通过。详见 tests/acceptance/maven-javadoc-task-recheck.md 及证据JSON。可信关闭/复发、复杂项目、宿主及完整目标保持未完成。
+
+## 2026-10-06 P3C配置准备简报聚合协议修复
+
+完整实际0.38聚合schema拒绝P3C配置准备简报，目标0.58版本测试先失败。新增0.58及限定blocker/检查器/原因/review-project-policy/固定重扫参数的封闭schema，修复Java选择原因码遗漏，保留历史协议。四目标57通过/0失败/10条件忽略；完整实际聚合与两处简报通过，六篡改与旧消费者拒绝符合预期。CLI严格Clippy、分层/OpenSpec strict通过。局部验收 tests/acceptance/p3c-preparation-aggregate-schema.md；不代替全部P3C分支、原生执行、宿主或完整目标。
