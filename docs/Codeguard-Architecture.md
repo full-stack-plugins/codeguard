@@ -1307,3 +1307,25 @@ See [acceptance](../tests/acceptance/maven-javadoc-task-recheck.md). This increm
 ## CLI language aliases (source builds)
 
 Public check categories and plan accept py→python, rs→rust, ts→typescript, rb→ruby, kt→kotlin, erl→erlang, golang→go, c++→cpp and c#→csharp. For example, `codeguard plan lint py . --format json` reports the canonical python identity; `codeguard lint py .` uses the existing Ruff entry. Only explicit language positions are normalized; source/tool paths remain unchanged. Grammar probes keep their distinct identities. JavaScript/TSX/bash mappings are not guessed, and unknown spellings retain existing validation. Aliases do not install tools, add capabilities, alter exit codes or promote planned languages.
+
+## Multilanguage scope of `lint all`
+
+The source CLI supports `codeguard lint all . --jobs 2 --timeout 30m --format json`. It reuses project discovery and the shared scheduling budget, selecting lint nodes only. It does not create separate build, comments, dependencies or CVE tasks. Native lint tools such as Clippy may themselves compile the project, and comment diagnostics returned by native lint rules remain visible. Dedicated CVE options are rejected before project reads or tool execution.
+
+```mermaid
+flowchart LR
+    A[lint all] --> B[Discover languages and build roots]
+    B --> C[Select lint candidates only]
+    C --> D[Shared budget and existing native adapters]
+    C --> E[Bounded WASM candidates or capability gaps]
+    D --> F[Partial feedback and lint repair guidance]
+    E --> F
+```
+
+Normal feedback uses check_feedback version 0.59.0 with requested_categories=["lint"]. This is a field excerpt, not a complete report:
+
+```json
+{"schema_version":"0.59.0","report_type":"check_feedback","selection":"all","requested_categories":["lint"],"delivery_decision":"incomplete"}
+```
+
+Other-category history remains stored, but this invocation does not select its repair briefs as next. Missing tools, unsupported languages and unqualified WASM candidates remain incomplete. Zero native diagnostics cannot issue project-wide allow. Internal faults retain the existing check_aborted protocol; this batch does not separately qualify lint-mode cancellation or internal faults. Source implementation does not establish npm publication.

@@ -161,8 +161,8 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             },
             executable: cfg!(unix),
             operation_kind: r#"check"#,
-            usage: r#"lint <registered-language> TARGET [--format human|json]"#,
-            scope: r#"注册表规范语言；专用原生入口优先，其余仅有界候选/能力缺口；完整项目lint未验收"#,
+            usage: r#"lint <registered-language|all> TARGET [--format human|json]"#,
+            scope: r#"all按发现语言仅调度lint并共享预算；专用原生入口优先，其余仅有界候选/能力缺口；完整项目lint未验收"#,
             languages: &[
                 "java",
                 "rust",

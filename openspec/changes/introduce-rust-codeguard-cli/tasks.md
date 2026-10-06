@@ -1908,3 +1908,7 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 - [x] 完整默认workspace/all-targets重新运行、全工作区严格Clippy、397schema元定义及实际库存/别名计划协议校验，首轮失败与终态证据分别保留。
 
 见 tests/acceptance/default-workspace-comments-dispatch.md。290组1565通过/0失败/142条件忽略，不启用WASM；远端4445f06 MSRV通过但gate在固定插件源检出失败，不称CI通过。142项条件测试、全部平台/宿主/资格与完整父任务仍开放。
+
+## 2026-10-06 lint all 多语言调度范围修正
+
+对应2.1/2.3/7.x：公开lint all从Python专用入口改为共享项目调度，仅选择lint节点，正常反馈0.59固定requested_categories=lint。独立build/comments/dependencies/CVE任务不运行，原生lint自身行为保留；不删除其它类别历史，next不选其简报。默认七目标86通过/15条件忽略、WASM范围四项通过、实际报告及四伪造反例、严格Clippy/分层/OpenSpec通过。见tests/acceptance/lint-all-scope.md。完整账本/原生矩阵、取消故障全入口、宿主/平台/发行未完成，父任务不勾选。

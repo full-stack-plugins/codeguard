@@ -1762,3 +1762,25 @@ flowchart LR
 ## CLI语言别名（源码构建）
 
 公开检查命令和plan支持：py→python、rs→rust、ts→typescript、rb→ruby、kt→kotlin、erl→erlang、golang→go、c++→cpp、c#→csharp。例如 `codeguard plan lint py . --format json` 返回规范python身份；`codeguard lint py .` 进入既有Ruff入口。仅语言参数位置归一，源码/工具路径不修改。grammar probe保留独立语法身份，JavaScript/TSX/bash等不作推测映射；未登记拼写继续由原入口校验。别名不安装工具、不新增检测能力、不改变退出码或planned状态。
+
+## `lint all` 的多语言检查范围
+
+源码 CLI 的 `codeguard lint all . --jobs 2 --timeout 30m --format json` 复用项目发现与共享调度预算，只选择 lint 节点；不创建独立 build、comments、dependencies 或 CVE 任务。Clippy 等原生 lint 自身仍可能编译项目，原生规则返回的注释问题也保留。专用 CVE 参数在读取项目和启动工具前拒绝。
+
+```mermaid
+flowchart LR
+    A[lint all] --> B[发现项目语言与构建根]
+    B --> C[仅选择 lint 候选]
+    C --> D[共享预算与现有原生适配器]
+    C --> E[有界 WASM 候选或能力缺口]
+    D --> F[统一局部反馈与 lint 修复指引]
+    E --> F
+```
+
+正常反馈沿用 check_feedback 报告，版本为 0.59.0，并明确 requested_categories=["lint"]。下面仅为字段节选，不是完整报告：
+
+```json
+{"schema_version":"0.59.0","report_type":"check_feedback","selection":"all","requested_categories":["lint"],"delivery_decision":"incomplete"}
+```
+
+历史其他类别事实保留，但本次 next 不选其他类别简报。缺原生工具、未接入语言和未获资格的 WASM 均保留未完成状态；原生局部零诊断不能签发完整项目 allow。内部异常仍使用现有 check_aborted 协议，本批没有独立验收 lint 模式的取消和内部异常。当前能力属于源码实现，不能据此宣称 npm 已发布相同能力。
