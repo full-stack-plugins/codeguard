@@ -625,8 +625,9 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
     } else if checker_id == "java.maven.javadoc" {
         json!([
             "codeguard",
-            "comments",
-            "java",
+            "task",
+            "verify",
+            id,
             ".",
             "--maven-tool",
             "<原Maven绝对路径>",
@@ -887,14 +888,14 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         )
     };
     if checker_id == "java.maven.javadoc" {
-        brief["schema_version"] = json!("0.4.0");
+        brief["schema_version"] = json!("0.5.0");
         brief["observation_scope"] = json!("configured_maven_multifile_probe");
-        brief["task_verify_status"] = json!("not_integrated");
+        brief["task_verify_status"] = json!("local_observation_only");
         brief["rule_basis"] = json!("原POM固定Javadoc多文件原生诊断；项目政策未核验");
         brief["step"] = json!(if kind == "blocker" {
-            "恢复本构建根原POM、Maven、JDK21和固定离线仓库后重跑comments java；不得修改无关源码或关闭检查器"
+            "恢复本构建根原POM、Maven、JDK21和固定离线仓库后按原任务运行task verify；不得修改无关源码或关闭检查器"
         } else {
-            "核对原生规则、位置及实际API契约，补齐注释后按原Maven多文件上下文重跑comments java；源码变化先复扫，不勾选关闭；task verify未接通"
+            "核对原生规则、位置及实际API契约，补齐注释后按原Maven多文件上下文运行task verify；源码变化先复检，不勾选关闭；可信关闭未验收"
         });
     }
     if checker_id == "java.jdk.javadoc" {
@@ -1729,6 +1730,15 @@ fn latest_verification_observation(
                     return Err("verification_event_invalid");
                 }
             }
+            if brief["checker_id"] == "java.maven.javadoc"
+                && report["task_input_stable"] == true
+                && event["report_sha256"] == format!("{:x}", Sha256::digest(&report_bytes))
+                && !crate::maven_javadoc_task_recheck::inputs_current(root, &report)
+            {
+                latest_verify = None;
+                latest_run = sequence;
+                continue;
+            }
             if brief["checker_id"] == "java.jdk.javadoc"
                 && report["task_input_stable"] == true
                 && event["report_sha256"] == format!("{:x}", Sha256::digest(&report_bytes))
@@ -1816,6 +1826,10 @@ fn latest_verification_observation(
                     )
                     && report["checker_id"] == "go.vet"
                     && event["observation"] == classify_go(brief, &report)
+            } else if brief["checker_id"] == "java.maven.javadoc" {
+                crate::maven_javadoc_task_recheck::valid_shape(&report)
+                    && event["observation"]
+                        == crate::maven_javadoc_task_recheck::classify(brief, &report)
             } else if brief["checker_id"] == "java.jdk.javadoc" {
                 crate::javadoc_task_recheck::valid_shape(&report)
                     && event["observation"] == crate::javadoc_task_recheck::classify(brief, &report)
@@ -1928,7 +1942,8 @@ fn latest_verification_observation(
             ) || ((go_report
                 || checkstyle_report
                 || brief["checker_id"] == "shell.shellcheck"
-                || brief["checker_id"] == "java.jdk.javadoc")
+                || brief["checker_id"] == "java.jdk.javadoc"
+                || brief["checker_id"] == "java.maven.javadoc")
                 && outcome == "rule_coverage_requires_review"))
                 && brief["kind"] == "finding"
             {
@@ -1942,7 +1957,10 @@ fn latest_verification_observation(
                             .filter(|s| valid_sha256(s))
                             .ok_or("verification_event_invalid")?
                             .to_owned()
-                    } else if brief["checker_id"] == "java.jdk.javadoc" {
+                    } else if matches!(
+                        brief["checker_id"].as_str(),
+                        Some("java.jdk.javadoc" | "java.maven.javadoc")
+                    ) {
                         report["input_bindings"]
                             .as_array()
                             .and_then(|rows| {

@@ -542,6 +542,13 @@ fn verified_rechecks(
         {
             continue;
         }
+        if brief["checker_id"] == "java.maven.javadoc"
+            && report["task_input_stable"] == true
+            && event["report_sha256"] == digest(&report_bytes)
+            && !crate::maven_javadoc_task_recheck::inputs_current(root, &report)
+        {
+            continue;
+        }
         if brief["checker_id"] == "java.jdk.javadoc"
             && report["task_input_stable"] == true
             && event["report_sha256"] == digest(&report_bytes)
@@ -572,6 +579,10 @@ fn verified_rechecks(
                 )
                 && report["checker_id"] == "go.vet"
                 && event["observation"] == classify_go(brief, &report)
+        } else if brief["checker_id"] == "java.maven.javadoc" {
+            crate::maven_javadoc_task_recheck::valid_shape(&report)
+                && event["observation"]
+                    == crate::maven_javadoc_task_recheck::classify(brief, &report)
         } else if brief["checker_id"] == "java.jdk.javadoc" {
             crate::javadoc_task_recheck::valid_shape(&report)
                 && event["observation"] == crate::javadoc_task_recheck::classify(brief, &report)

@@ -16,31 +16,47 @@ use std::{
 
 /// 保存原生观察及稳定任务；快照缺失或变化不导入旧诊断，不自动初始化或关闭。
 pub(crate) fn connect(root: &Path, feedback: &Value, snapshot: Option<&SourceSnapshot>) -> Value {
-    let result = (|| {
-        let baseline = read_workspace_baseline(root).map_err(|_| "workspace_invalid")?;
-        let id = baseline
-            .as_ref()
-            .and_then(|b| b.workspace_id())
-            .ok_or("workspace_not_initialized")?;
-        let snapshot = snapshot.ok_or("maven_workbench_snapshot_unavailable")?;
-        if snapshot.verify_source_unchanged().ok() != Some(true) {
-            return Err("maven_workbench_inputs_changed");
-        }
-        let inputs:Vec<Value>=snapshot.files().iter().map(|(p,b)|json!({"path":p.to_string_lossy(),"sha256":format!("{:x}",Sha256::digest(b))})).collect();
-        let native = &feedback["native_observation"];
-        let (findings, blockers) = project(root, &json!(inputs), native)?;
-        let nanos = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .map_err(|_| "clock_unavailable")?
-            .as_nanos();
-        let report = json!({"schema_version":"0.1.0","report_type":"maven_javadoc_workbench_observation","workspace_binding":"bound","workspace_id":id,"run_id":format!("javadoc-maven-{}-{nanos}",std::process::id()),"checker_id":"java.maven.javadoc","authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated","inputs":inputs,"native":native,"findings":findings,"blockers":blockers});
+    let result: Result<Value, &'static str> = (|| {
+        let report = prepare(root, feedback, snapshot)?;
         save_local_report(root, &report)?;
         let summary = sync_local_workspace(root)?;
         Ok(
-            json!({"status":if summary.failed_reports==0 {"synced_partial"}else{"sync_incomplete"},"new_findings":summary.new_findings,"new_blockers":summary.new_blockers,"next":read_local_brief_for_checker(root,"java.maven.javadoc").unwrap_or_else(|reason|json!({"disposition":"verification_required","reason":reason})),"task_verify_status":"not_integrated"}),
+            json!({"status":if summary.failed_reports==0 {"synced_partial"}else{"sync_incomplete"},"new_findings":summary.new_findings,"new_blockers":summary.new_blockers,"next":read_local_brief_for_checker(root,"java.maven.javadoc").unwrap_or_else(|reason|json!({"disposition":"verification_required","reason":reason})),"task_verify_status":"local_observation_only"}),
         )
     })();
-    result.unwrap_or_else(|reason|json!({"status":reason,"new_findings":0,"new_blockers":0,"next":null,"task_verify_status":"not_integrated"}))
+    result.unwrap_or_else(|reason|json!({"status":reason,"new_findings":0,"new_blockers":0,"next":null,"task_verify_status":"local_observation_only"}))
+}
+
+/// 绑定扫描前快照并构造可保存观察；不在此处写任务或执行工具。
+pub(crate) fn prepare(
+    root: &Path,
+    feedback: &Value,
+    snapshot: Option<&SourceSnapshot>,
+) -> Result<Value, &'static str> {
+    let baseline = read_workspace_baseline(root).map_err(|_| "workspace_invalid")?;
+    let id = baseline
+        .as_ref()
+        .and_then(|b| b.workspace_id())
+        .ok_or("workspace_not_initialized")?;
+    let snapshot = snapshot.ok_or("maven_workbench_snapshot_unavailable")?;
+    if snapshot.verify_source_unchanged().ok() != Some(true) {
+        return Err("maven_workbench_inputs_changed");
+    }
+    let inputs: Vec<Value> = snapshot
+        .files()
+        .iter()
+        .map(
+            |(p, b)| json!({"path":p.to_string_lossy(),"sha256":format!("{:x}",Sha256::digest(b))}),
+        )
+        .collect();
+    let native = &feedback["native_observation"];
+    let (findings, blockers) = project(root, &json!(inputs), native)?;
+    let nanos = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_err(|_| "clock_unavailable")?
+        .as_nanos();
+    let report = json!({"schema_version":"0.1.0","report_type":"maven_javadoc_workbench_observation","workspace_binding":"bound","workspace_id":id,"run_id":format!("javadoc-maven-{}-{nanos}",std::process::id()),"checker_id":"java.maven.javadoc","authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated","inputs":inputs,"native":native,"findings":findings,"blockers":blockers});
+    Ok(report)
 }
 
 /// 按当前字节重算原生诊断投影；调用方同时核对保存的投影，不相信报告自填身份。

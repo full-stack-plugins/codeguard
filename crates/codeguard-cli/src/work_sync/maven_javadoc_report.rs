@@ -109,3 +109,38 @@ pub(super) fn parse(
         historical_findings: 0,
     })
 }
+
+/// 导入原任务复检的当前内层扫描；无扫描时仅允许保存失败观察事件。
+pub(super) fn parse_recheck(
+    root: &Path,
+    workspace: &str,
+    path: &Path,
+    report: &Value,
+    digest: String,
+) -> Result<ReportInput, &'static str> {
+    if !crate::maven_javadoc_task_recheck::valid_shape(report)
+        || report["workspace_id"] != workspace
+        || report["run_id"].as_str() != path.file_stem().and_then(|p| p.to_str())
+    {
+        return Err("maven_javadoc_recheck_identity_invalid");
+    }
+    if report["scan"].is_null() {
+        return Ok(ReportInput {
+            workspace_id: workspace.into(),
+            run_id: report["run_id"]
+                .as_str()
+                .ok_or("maven_javadoc_run_invalid")?
+                .into(),
+            digest,
+            findings: Vec::new(),
+            blockers: Vec::new(),
+            historical_findings: 0,
+        });
+    }
+    if report["scan"]["run_id"] != report["run_id"]
+        || report["scan"]["workspace_id"] != report["workspace_id"]
+    {
+        return Err("maven_javadoc_recheck_binding_invalid");
+    }
+    parse(root, workspace, path, &report["scan"], digest)
+}

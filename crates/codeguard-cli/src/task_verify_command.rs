@@ -102,6 +102,18 @@ pub fn run(args: &[String]) -> ExitCode {
         None
     };
     let javadoc_task = brief["checker_id"] == "java.jdk.javadoc";
+    let maven_javadoc_task = brief["checker_id"] == "java.maven.javadoc";
+    if maven_javadoc_task
+        && (parsed.ruff_tool.is_some()
+            || parsed.cargo_tool.is_some()
+            || parsed.cve_data_dir.is_some()
+            || parsed.cve_data_sha256.is_some()
+            || !parsed.eslint_options.is_empty()
+            || !parsed.npm_options.is_empty())
+    {
+        eprintln!("Maven Javadoc任务只接受原Maven、JDK和离线仓库上下文及共享参数");
+        return ExitCode::from(2);
+    }
     if javadoc_task
         && (parsed.maven_tool.is_some()
             || parsed.maven_repo.is_some()
@@ -351,6 +363,26 @@ pub fn run(args: &[String]) -> ExitCode {
             crate::checkstyle_preparation_recheck::run(&root, &brief, &options, deadline)
         } else {
             crate::checkstyle_task_recheck::run(&root, &brief, &options, deadline)
+        }
+    } else if maven_javadoc_task {
+        match crate::maven_javadoc_task_recheck::run(
+            &root,
+            &brief,
+            &crate::java_javadoc_scan::NativeContext {
+                manifest_sha256: &std::collections::BTreeMap::new(),
+                java_home: parsed.java_home.as_deref(),
+                maven_tool: parsed.maven_tool.as_deref(),
+                maven_repo: parsed.maven_repo.as_deref(),
+                repo_sha256: parsed.repo_sha256.as_deref(),
+                deadline,
+                cancelled: &std::sync::atomic::AtomicBool::new(false),
+            },
+        ) {
+            Ok(report) => report,
+            Err(reason) => {
+                let release = finish_verification(&root, &parsed.task_id, &lease);
+                return print_unavailable(&parsed, release.err().unwrap_or(reason));
+            }
         }
     } else if javadoc_task {
         match crate::javadoc_task_recheck::run(&root, &brief, parsed.java_home.as_deref(), deadline)
@@ -719,6 +751,8 @@ pub fn run(args: &[String]) -> ExitCode {
             crate::npm_task_recheck::classify(&root, &brief, &scan)
         } else if eslint_task {
             crate::eslint_task_recheck::classify(&brief, &scan)
+        } else if maven_javadoc_task {
+            crate::maven_javadoc_task_recheck::classify(&brief, &scan)
         } else if javadoc_task {
             crate::javadoc_task_recheck::classify(&brief, &scan)
         } else if brief["checker_id"] == "java.checkstyle.preparation" {
@@ -759,6 +793,9 @@ pub fn run(args: &[String]) -> ExitCode {
         "execution_budget":budget_record(parsed.timeout_ms, parsed.timeout_source),
         "next_actions":["inspect_native_recheck_and_policy_before_closure"]
     });
+    if maven_javadoc_task {
+        report["schema_version"] = json!("0.28.0");
+    }
     if javadoc_task {
         report["schema_version"] = json!("0.27.0");
     }
@@ -838,6 +875,9 @@ pub fn run(args: &[String]) -> ExitCode {
                         || (brief["checker_id"] == "rust.cargo_rustdoc"
                             && scan["input_stable"] == true
                             && !crate::rustdoc_task_recheck::inputs_current(&root, &scan))
+                        || (maven_javadoc_task
+                            && scan["task_input_stable"] == true
+                            && !crate::maven_javadoc_task_recheck::inputs_current(&root, &scan))
                         || (javadoc_task
                             && scan["task_input_stable"] == true
                             && !crate::javadoc_task_recheck::inputs_current(&root, &scan))

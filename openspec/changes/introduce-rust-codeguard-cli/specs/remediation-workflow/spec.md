@@ -666,3 +666,18 @@ An initialized workspace SHALL persist native Maven Javadoc multi-file observati
 - **WHEN** input bytes change before persistence/import or a projected fingerprint is forged
 - **THEN** CodeGuard rejects the new observation without accepting source findings
 - **AND** previously consumed reports remain historical under their original digest receipts
+
+### Requirement: Maven Javadoc task verification SHALL retain the original multi-file context
+Maven Javadoc 原任务复检 SHALL 绑定首次报告、工作区、最近构建根、POM、Maven、JDK 和离线仓库身份，重新调用既有原生多文件探针。工具缺失或身份不匹配不得切换为 JDK 单文件检查；配置与源集变化不得据零诊断关闭任务。复检事件 SHALL 接入原任务租约与尝试历史，局部观察保持开放。
+
+#### Scenario: Documentation is repaired under unchanged Maven context
+- **WHEN** 原任务在同一构建根和工具上下文下补齐注释，局部原生复检不再检出
+- **THEN** 保存 candidate_absent_unverified_policy，保持任务开放，明确完整规则覆盖和关闭策略尚未核验
+
+#### Scenario: POM or source membership changes
+- **WHEN** 当前 POM 或归属于该构建根的 Java 源码集合与首次报告不同
+- **THEN** 保存 rule_coverage_requires_review；主源码探针完成也不能清除范围外的源集阻塞
+
+#### Scenario: Repeated repair attempts make no progress
+- **WHEN** 同一租约下两次修复动作结束后，原 Maven 复检仍检出相同问题
+- **THEN** 尝试历史记录两次结果，next 返回 needs_decision，不能凭任务勾选或重复执行签发关闭
