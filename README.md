@@ -1069,3 +1069,20 @@ flowchart LR
 Separate contracts are local feedback0.5, workbench/source recheck/preparation recheck0.2, brief/preview0.25, source task preview0.33 and preparation preview0.34. Historical schemas are unchanged. First import rejects extended configurations disguised as workbench0.1; recheck and scan versions must match. Aggregate0.70 supports a selected detailed Checkstyle brief, but this batch's public aggregate selected a higher-priority P3C preparation task and retained0.58. Version0.70 has constructed serialization validation only, not actual route qualification. That public aggregate also exposed a historical invalid Javadoc reason; the producer now emits the existing `javadoc_checker_not_configured` code without claiming configuration or execution.
 
 Controlled XML process fixtures cover all three classes, task reuse/repair recheck and preparation recovery with recheckable new source tasks. The fixture is not Java/Checkstyle and proves no native semantics or precision. No existing10.21.4 all-JAR was found; the real conditional test remains unexecuted. Full description/configuration/project coverage, independent false-positive evaluation, trusted closure/recurrence, all57 languages/four capabilities and production host/platform acceptance remain pending. Tasks15.3/15.6 stay open; formal syntax qualification remains0/32. See [acceptance](tests/acceptance/checkstyle-detailed-descriptions.md).
+
+## Python documentation contracts: native Ruff DOC increment (2026-10-06)
+
+Pinned Ruff 0.16.8 DOC102 (extraneous parameters), DOC201/202 (returns), DOC402/403 (yields), and DOC501/502 (exceptions) now reach documentation classification, bounded guidance, stable tasks and original-tool rechecks. The original project must explicitly select preview and its rules. CodeGuard does not inject preview options or reproduce semantic checks. Diagnostics contradicting effective settings remain incomplete; unknown DOC identifiers receive no adapter qualification from their prefix. Existing D### classification and unapproved rule mappings remain intact.
+
+DOC502 compares direct raise statements and may conflict with accurate implicit-exception documentation. Retain the diagnosis and require investigation of the call chain and project convention; never automatically delete real exception documentation. Use precise false-positive adjudication when needed. Native exemptions for Google Return/Yield summaries, None, stubs and abstract stubs are preserved. This local native version still reports DOC201 for an abstract method with a concrete return body; broad exemption prose is not acceptance. These seven rules do not prove complete purpose, parameter, exception or behavioral documentation.
+
+```mermaid
+flowchart LR
+    A[Original configuration and existing Ruff] --> B[Cross-check native settings and diagnostics]
+    B --> C[DOC findings and stable tasks]
+    C --> D[Detailed repair or convention investigation]
+    D --> E[Original task and tool recheck]
+    E --> F[Present / suppression review / untrusted absence]
+```
+
+Real native tests cover all seven rules, repeated identity, presence, noqa suppression and absence after documentation repair; facts remain open. Additional cases retain native exemptions, implicit-exception conflicts and unselected DOC rules. Existing protocols admit native rule IDs and redacted guidance; historical schemas, approved mappings and closure authority are not expanded. See [Ruff DOC acceptance](tests/acceptance/ruff-documentation-contract.md) for evidence and version limits. Complete Python documentation, independent precision, all platforms and production qualification remain pending.

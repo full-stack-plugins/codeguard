@@ -925,7 +925,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         brief["native_rule_id"] = json!(rule);
         brief["source_sha256"] = json!(source_sha);
         brief["constraints"] = json!(["仅修改目标源码", "不得忽略规则或将任务勾选当作复检"]);
-        let step = finding_repair_step(rule);
+        let step = finding_repair_step(checker_id, rule);
         brief["step"] = json!(if same_source {
             step
         } else {
@@ -1443,6 +1443,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                 brief["checkstyle_guidance"]["repair_steps"][0].clone()
             } else {
                 json!(finding_repair_step(
+                    checker_id,
                     brief["native_rule_id"]
                         .as_str()
                         .ok_or("finding_rule_invalid")?
@@ -1725,7 +1726,12 @@ fn current_correction_refs(
     Ok((references, projections))
 }
 
-fn finding_repair_step(rule: &str) -> &'static str {
+fn finding_repair_step(checker_id: &str, rule: &str) -> &'static str {
+    if checker_id == "python.ruff" {
+        if let Some(doc) = codeguard_adapters::RuffDocumentationRule::from_code(rule) {
+            return doc.step;
+        }
+    }
     match rule {
         "JavadocEmptyComment"
         | "JavadocMissingMainDescription"

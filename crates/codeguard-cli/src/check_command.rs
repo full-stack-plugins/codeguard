@@ -1465,7 +1465,20 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                     findings.iter().any(|finding| {
                         finding["rule_id"]
                             .as_str()
-                            .is_some_and(codeguard_adapters::is_ruff_pydocstyle_rule)
+                            .is_some_and(codeguard_adapters::is_ruff_documentation_rule)
+                    })
+                })
+        })
+    });
+    let python_contract_doc_observed = python_lint["files"].as_array().is_some_and(|files| {
+        files.iter().any(|file| {
+            file["run_status"] == "findings"
+                && file["findings"].as_array().is_some_and(|findings| {
+                    findings.iter().any(|finding| {
+                        finding["rule_id"]
+                            .as_str()
+                            .and_then(codeguard_adapters::RuffDocumentationRule::from_code)
+                            .is_some()
                     })
                 })
         })
@@ -1665,14 +1678,20 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
             if python_comments_selected {
                 candidate["checker_id"] = json!("python.ruff");
                 candidate["next_action"] = json!(
-                    "核对 Ruff 原生 pydocstyle 规则与定位，按项目约定修正文档后运行同一原生工具复检；完整规则集与批准覆盖仍须核验"
+                    "核对 Ruff 原生文档规则与定位，按项目约定修正文档后运行同一原生工具复检；完整规则集与批准覆盖仍须核验"
                 );
                 candidate["status"] = json!(if observed {
                     "observed_unverified"
                 } else {
                     "native_incomplete"
                 });
-                candidate["reason"] = json!(if observed {
+                candidate["reason"] = json!(if python_contract_doc_observed {
+                    if observed {
+                        "trusted_policy_and_coverage_unavailable"
+                    } else {
+                        "native_scan_incomplete"
+                    }
+                } else if observed {
                     "ruff_d100_native_finding_unverified_coverage"
                 } else {
                     "ruff_d100_native_observation_incomplete"

@@ -109,3 +109,29 @@ fn unknown_implicit_duplicate_and_per_file_targets_do_not_supply_a_closure_targe
         assert!(!observed.coverage_proven);
     }
 }
+
+#[test]
+fn pydoclint_exact_catalog_does_not_expand_pydocstyle_or_approved_mappings() {
+    for code in [
+        "DOC102", "DOC201", "DOC202", "DOC402", "DOC403", "DOC501", "DOC502",
+    ] {
+        assert!(codeguard_adapters::is_ruff_documentation_rule(code));
+        assert!(!is_ruff_pydocstyle_rule(code));
+        let rule = codeguard_adapters::RuffDocumentationRule::from_code(code).unwrap();
+        assert_eq!(rule.investigation_required, code == "DOC502");
+        assert!(rule.step.contains("实际"));
+        let raw = format!(
+            "linter.rules.enabled = [\n\tdocumentation ({code}),\n]\nlinter.per_file_ignores = {{}}\n"
+        );
+        let settings = parse_ruff_settings(raw.as_bytes()).unwrap();
+        assert!(settings.native_rule_enabled(code));
+        assert!(settings.globally_enabled_mapped_rules.is_empty());
+    }
+    for code in [
+        "DOC", "DOC20", "DOC2010", "DOC101", "DOC999", "doc201", "DOC2A1", "F401",
+    ] {
+        assert!(!codeguard_adapters::is_ruff_documentation_rule(code));
+        assert!(codeguard_adapters::RuffDocumentationRule::from_code(code).is_none());
+    }
+    assert!(codeguard_adapters::is_ruff_documentation_rule("D417"));
+}
