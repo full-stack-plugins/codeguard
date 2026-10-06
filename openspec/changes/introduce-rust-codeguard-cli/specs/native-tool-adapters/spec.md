@@ -974,3 +974,8 @@ Model capture, original task execution and report ownership observation SHALL sh
 #### Scenario: C11 and C++17 uniform native grammar replay keeps semantic diagnostics unknown
 - **WHEN** development corpus replay explicitly selects an existing fixed Apple Clang21 tool for c or cpp
 - **THEN** it SHALL reuse the isolated native service with c11 or c++17, shared deadline/cancellation and frozen original entry/artifact identity. It SHALL retain all 32 inventory rows, selected samples and unknown denominators. Version/tool/context failures SHALL NOT become syntax failures; warnings alone SHALL NOT become invalid syntax. Only independently audited parsing diagnostic rules MAY classify syntax errors, and mixed semantic/unknown errors SHALL remain unknown. Standard and classification policy SHALL be recorded in a new versioned report without changing historical report semantics, granting grammar qualification or claiming independent holdout.
+
+
+#### Scenario: Audited Clang punctuation rules preserve standard-specific extensions
+- **WHEN** C11/C++17 replay observes an audited punctuation error or a native extension warning
+- **THEN** it SHALL classify only exact audited parsing rule IDs, retain original diagnostics and keep semantic/unknown/mixed diagnostics unknown. Warning-only syntax classification SHALL require the audited non-syntax-warning rule set; extension warnings SHALL remain unknown. The same source MAY remain unknown for C11 and invalid for C++17. Expanded classification SHALL use a new report/policy version; historical expression-only reports SHALL remain unchanged and no production qualification SHALL be granted.

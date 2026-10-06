@@ -2082,3 +2082,14 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 5观察器单元通过（含11语言双阶段取消/入口更换、混合语义反例），WASM公开/回放两目标8通过/3条件忽略，原差分7通过/1忽略；默认公开与计划11通过/2忽略。显式已有Clang原生条件用例另1通过：12开发回归，每语言1TP/0FP/0FN/3TN/2unknown，不计独立精度。473schema元定义、472历史schema原字节、新实际报告/六种伪造/旧消费者拒绝，双配置all-targets严格Clippy、分层/格式/OpenSpec通过；76来源摘要及1312任务引用核验。验收见tests/acceptance/c-family-native-replay.md。
 
 完整原生解析规则、标准/方言/项目预处理及独立语料、逐语言四核心/32grammar、可信闭环、平台/宿主/发行仍未完成；父任务保持66完成/288待完成。CI37502132499终态gate在Check out corpus evidence source失败/MSRV通过，新提交不得沿用它宣称通过。受保护Erlang草稿原摘要保持，不运行或提交。
+
+
+## 2026-10-07 Clang标点解析与C11扩展统计边界
+
+延续14.17/14.19、15.2/15.7，标点解析规则在旧expression-only策略被留unknown的契约先RED；核对固定LLVM定义与真实AppleClang21后接入七个精确解析ID，不用前缀宽匹配。原warning/规则/位置仍进入原生反馈，仅unused-variable/parameter可支持valid语法统计，其它/混合扩展与语义error保持unknown。实际C11缺成员分号给扩展warning、C++17给error，分别保留；原公开lint0.2不改。新0.12协议，0.11历史报告/规则语义原字节保持。
+
+实际已有Clang+WASM26开发回归：C13例7TP/0FP/0FN/3TN/3unknown；C++13例8TP/0FP/0FN/3TN/2unknown。unknown不移出分母，不计独立精度。6观察器单元通过；WASM三回归目标15通过/4条件忽略；新增回放与生产计划5通过/1忽略；显式真实条件1另通过。双配置all-targets严格Clippy、分层/格式/OpenSpec、新报告与六类伪造/旧消费者拒绝通过；474schema定义、旧473原字节保持。CI增加两个WASM目标，固定插件来源审计原样保留。见tests/acceptance/c-family-native-punctuation.md。
+
+CI37503859591终态MSRV通过、gate源码检出失败。确认语料9e4adb1远端可达，审计dec5f9d只在插件本地main；本地固定Git21项审计及两个变异/缺仓库目标通过、旧注册表审计回放通过；插件Node6通过/2实际条件跳过、技能vendor离线/在线通过。插件main有3个远端未包含提交，候选branch不是其祖先；主分支推送会改变默认Hook，已请求授权但尚未执行，不强推/合并/更换来源或发市场。待决动作与证据见tests/acceptance/ci-source-reachability.md。
+
+逐语言四核心、32grammar完整原生版本/方言与独立语料、可信闭环、平台/性能/宿主/发行仍未完成；父任务保持66完成/288待完成，正式grammar资格0/32。受保护Erlang草稿未修改、执行或提交。

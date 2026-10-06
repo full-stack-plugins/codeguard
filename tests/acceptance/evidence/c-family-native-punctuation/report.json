@@ -1,0 +1,1256 @@
+{
+  "authority": "development_native_differential_only",
+  "cases": [
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "valid",
+      "combined_candidate_comparison": "true_negative",
+      "comparison": "true_negative",
+      "fixture_expected_valid": true,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "a271e584616c7c3c0ac663f01cd05dd5f1a6c2ce6d4cd23096548985a95d0ccb",
+      "id": "c-replay-plain",
+      "language": "c",
+      "native": {
+        "diagnostics": [],
+        "reason": "clang_native_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+        "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+      },
+      "native_attempted": true,
+      "native_classification": "valid",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 30331,
+      "native_identity_current": true,
+      "native_standard": "c11",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "09f070fd688d86702582e9ef290ccc1e04cfbe576cf14effc6938962b5fca98a",
+      "structural_observations": [],
+      "wasm_classification": "valid",
+      "wasm_elapsed_us": 2007825,
+      "wasm_reason": null,
+      "wasm_recovery_count": 0
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "valid",
+      "combined_candidate_comparison": "true_negative",
+      "comparison": "true_negative",
+      "fixture_expected_valid": true,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "a271e584616c7c3c0ac663f01cd05dd5f1a6c2ce6d4cd23096548985a95d0ccb",
+      "id": "c-replay-warning",
+      "language": "c",
+      "native": {
+        "diagnostics": [
+          {
+            "column_byte": 19,
+            "level": "warning",
+            "line": 1,
+            "rule_id": "clang.warn_unused_variable"
+          }
+        ],
+        "reason": "clang_native_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+        "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+      },
+      "native_attempted": true,
+      "native_classification": "valid",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 29555,
+      "native_identity_current": true,
+      "native_standard": "c11",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "cfa759a851ca48b7ff1679414c7d54487113e940394288762e5c813b942ee3cd",
+      "structural_observations": [],
+      "wasm_classification": "valid",
+      "wasm_elapsed_us": 722806,
+      "wasm_reason": null,
+      "wasm_recovery_count": 0
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "valid",
+      "combined_candidate_comparison": "true_negative",
+      "comparison": "true_negative",
+      "fixture_expected_valid": true,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "a271e584616c7c3c0ac663f01cd05dd5f1a6c2ce6d4cd23096548985a95d0ccb",
+      "id": "c-replay-literal",
+      "language": "c",
+      "native": {
+        "diagnostics": [],
+        "reason": "clang_native_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+        "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+      },
+      "native_attempted": true,
+      "native_classification": "valid",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 31560,
+      "native_identity_current": true,
+      "native_standard": "c11",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "522d3e3a175389933d82e3d2c4f7f33b528acb2701eb879a091caac33ec5d761",
+      "structural_observations": [],
+      "wasm_classification": "valid",
+      "wasm_elapsed_us": 723557,
+      "wasm_reason": null,
+      "wasm_recovery_count": 0
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "invalid",
+      "combined_candidate_comparison": "true_positive",
+      "comparison": "true_positive",
+      "fixture_expected_valid": false,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "a271e584616c7c3c0ac663f01cd05dd5f1a6c2ce6d4cd23096548985a95d0ccb",
+      "id": "c-replay-syntax",
+      "language": "c",
+      "native": {
+        "diagnostics": [
+          {
+            "column_byte": 9,
+            "level": "error",
+            "line": 1,
+            "rule_id": "clang.err_expected_expression"
+          }
+        ],
+        "reason": "clang_native_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+        "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+      },
+      "native_attempted": true,
+      "native_classification": "invalid",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 33988,
+      "native_identity_current": true,
+      "native_standard": "c11",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "fe46ce8f36ea2887dc2edf71eb1732bbe0816f9132050aa155b2acd4a8de445c",
+      "structural_observations": [],
+      "wasm_classification": "invalid",
+      "wasm_elapsed_us": 723702,
+      "wasm_reason": null,
+      "wasm_recovery_count": 1
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "invalid",
+      "combined_candidate_comparison": "true_positive",
+      "comparison": "true_positive",
+      "fixture_expected_valid": false,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "a271e584616c7c3c0ac663f01cd05dd5f1a6c2ce6d4cd23096548985a95d0ccb",
+      "id": "c-replay-syntax_declaration",
+      "language": "c",
+      "native": {
+        "diagnostics": [
+          {
+            "column_byte": 8,
+            "level": "error",
+            "line": 1,
+            "rule_id": "clang.err_invalid_token_after_toplevel_declarator"
+          }
+        ],
+        "reason": "clang_native_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+        "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+      },
+      "native_attempted": true,
+      "native_classification": "invalid",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 31990,
+      "native_identity_current": true,
+      "native_standard": "c11",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "ee1e8162df320b447dd9d46741b65271787b0cfe8cc86c1f464753e298118fd5",
+      "structural_observations": [],
+      "wasm_classification": "invalid",
+      "wasm_elapsed_us": 730089,
+      "wasm_reason": null,
+      "wasm_recovery_count": 1
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "invalid",
+      "combined_candidate_comparison": "true_positive",
+      "comparison": "true_positive",
+      "fixture_expected_valid": false,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "a271e584616c7c3c0ac663f01cd05dd5f1a6c2ce6d4cd23096548985a95d0ccb",
+      "id": "c-replay-syntax_local_declaration",
+      "language": "c",
+      "native": {
+        "diagnostics": [
+          {
+            "column_byte": 22,
+            "level": "error",
+            "line": 1,
+            "rule_id": "clang.err_expected_semi_declaration"
+          }
+        ],
+        "reason": "clang_native_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+        "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+      },
+      "native_attempted": true,
+      "native_classification": "invalid",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 37557,
+      "native_identity_current": true,
+      "native_standard": "c11",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "cd0b4c5f893505efdfe14317c4cc54e70864fd6ea83e4d701f04f1178ac6a2d6",
+      "structural_observations": [],
+      "wasm_classification": "invalid",
+      "wasm_elapsed_us": 742059,
+      "wasm_reason": null,
+      "wasm_recovery_count": 1
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "invalid",
+      "combined_candidate_comparison": "true_positive",
+      "comparison": "true_positive",
+      "fixture_expected_valid": false,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "a271e584616c7c3c0ac663f01cd05dd5f1a6c2ce6d4cd23096548985a95d0ccb",
+      "id": "c-replay-syntax_return",
+      "language": "c",
+      "native": {
+        "diagnostics": [
+          {
+            "column_byte": 23,
+            "level": "error",
+            "line": 1,
+            "rule_id": "clang.err_expected_semi_after_stmt"
+          }
+        ],
+        "reason": "clang_native_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+        "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+      },
+      "native_attempted": true,
+      "native_classification": "invalid",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 32602,
+      "native_identity_current": true,
+      "native_standard": "c11",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "2601ca85b715cf41e487639a838e56488c953cebe5b027388a2fb9f796db03c6",
+      "structural_observations": [],
+      "wasm_classification": "invalid",
+      "wasm_elapsed_us": 737647,
+      "wasm_reason": null,
+      "wasm_recovery_count": 1
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "invalid",
+      "combined_candidate_comparison": "true_positive",
+      "comparison": "true_positive",
+      "fixture_expected_valid": false,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "a271e584616c7c3c0ac663f01cd05dd5f1a6c2ce6d4cd23096548985a95d0ccb",
+      "id": "c-replay-syntax_expression",
+      "language": "c",
+      "native": {
+        "diagnostics": [
+          {
+            "column_byte": 27,
+            "level": "error",
+            "line": 1,
+            "rule_id": "clang.err_expected_semi_after_expr"
+          }
+        ],
+        "reason": "clang_native_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+        "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+      },
+      "native_attempted": true,
+      "native_classification": "invalid",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 33677,
+      "native_identity_current": true,
+      "native_standard": "c11",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "0a4c2679d8bf08e6e5e4e152e218edd020efa469bfdd0c9fa37973c4ccbfc314",
+      "structural_observations": [],
+      "wasm_classification": "invalid",
+      "wasm_elapsed_us": 733210,
+      "wasm_reason": null,
+      "wasm_recovery_count": 1
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "invalid",
+      "combined_candidate_comparison": "unknown",
+      "comparison": "unknown",
+      "fixture_expected_valid": false,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": null,
+      "grammar_sha256": "a271e584616c7c3c0ac663f01cd05dd5f1a6c2ce6d4cd23096548985a95d0ccb",
+      "id": "c-replay-syntax_member",
+      "language": "c",
+      "native": {
+        "diagnostics": [
+          {
+            "column_byte": 17,
+            "level": "warning",
+            "line": 1,
+            "rule_id": "clang.ext_expected_semi_decl_list"
+          }
+        ],
+        "reason": "clang_native_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+        "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+      },
+      "native_attempted": true,
+      "native_classification": "unknown",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 32701,
+      "native_identity_current": true,
+      "native_standard": "c11",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "40ed42ac0bf9af19462e7d66062cbf19e771415a53b848e14bed6fee32a84fe5",
+      "structural_observations": [],
+      "wasm_classification": "invalid",
+      "wasm_elapsed_us": 734980,
+      "wasm_reason": null,
+      "wasm_recovery_count": 1
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "invalid",
+      "combined_candidate_comparison": "true_positive",
+      "comparison": "true_positive",
+      "fixture_expected_valid": false,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "a271e584616c7c3c0ac663f01cd05dd5f1a6c2ce6d4cd23096548985a95d0ccb",
+      "id": "c-replay-syntax_paren",
+      "language": "c",
+      "native": {
+        "diagnostics": [
+          {
+            "column_byte": 21,
+            "level": "error",
+            "line": 1,
+            "rule_id": "clang.err_expected"
+          }
+        ],
+        "reason": "clang_native_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+        "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+      },
+      "native_attempted": true,
+      "native_classification": "invalid",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 35897,
+      "native_identity_current": true,
+      "native_standard": "c11",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "164b66ee645d01c61fc5c9aecb92293a83a54e3f3a852ed2585885528b86bfee",
+      "structural_observations": [],
+      "wasm_classification": "invalid",
+      "wasm_elapsed_us": 780148,
+      "wasm_reason": null,
+      "wasm_recovery_count": 1
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "invalid",
+      "combined_candidate_comparison": "true_positive",
+      "comparison": "true_positive",
+      "fixture_expected_valid": false,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "a271e584616c7c3c0ac663f01cd05dd5f1a6c2ce6d4cd23096548985a95d0ccb",
+      "id": "c-replay-syntax_brace",
+      "language": "c",
+      "native": {
+        "diagnostics": [
+          {
+            "column_byte": 24,
+            "level": "error",
+            "line": 1,
+            "rule_id": "clang.err_expected"
+          }
+        ],
+        "reason": "clang_native_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+        "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+      },
+      "native_attempted": true,
+      "native_classification": "invalid",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 29835,
+      "native_identity_current": true,
+      "native_standard": "c11",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "4dcee1b74176bac43463106872c084f857e87d94fecf7da62a8747f3b6ab2af3",
+      "structural_observations": [],
+      "wasm_classification": "invalid",
+      "wasm_elapsed_us": 732434,
+      "wasm_reason": null,
+      "wasm_recovery_count": 1
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "valid",
+      "combined_candidate_comparison": "unknown",
+      "comparison": "unknown",
+      "fixture_expected_valid": true,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": null,
+      "grammar_sha256": "a271e584616c7c3c0ac663f01cd05dd5f1a6c2ce6d4cd23096548985a95d0ccb",
+      "id": "c-replay-semantic",
+      "language": "c",
+      "native": {
+        "diagnostics": [
+          {
+            "column_byte": 1,
+            "level": "error",
+            "line": 1,
+            "rule_id": "clang.err_unknown_typename"
+          }
+        ],
+        "reason": "clang_native_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+        "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+      },
+      "native_attempted": true,
+      "native_classification": "unknown",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 30761,
+      "native_identity_current": true,
+      "native_standard": "c11",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "9e5331d034d800e6abf496bce9b81bb734a3535ecd7efafa12b66c50a49ffcc0",
+      "structural_observations": [],
+      "wasm_classification": "valid",
+      "wasm_elapsed_us": 733536,
+      "wasm_reason": null,
+      "wasm_recovery_count": 0
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "invalid",
+      "combined_candidate_comparison": "unknown",
+      "comparison": "unknown",
+      "fixture_expected_valid": true,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": null,
+      "grammar_sha256": "a271e584616c7c3c0ac663f01cd05dd5f1a6c2ce6d4cd23096548985a95d0ccb",
+      "id": "c-replay-context",
+      "language": "c",
+      "native": {
+        "diagnostics": [],
+        "reason": "clang_preprocessor_context_unresolved",
+        "status": "incomplete",
+        "tool_sha256": null,
+        "version": null
+      },
+      "native_attempted": true,
+      "native_classification": "unknown",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 469,
+      "native_identity_current": false,
+      "native_standard": "c11",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "18ac5d54ba06089e8a6e050655d1c5e74076554e15aeee51b8dd2ef3e1e5b879",
+      "structural_observations": [],
+      "wasm_classification": "invalid",
+      "wasm_elapsed_us": 734587,
+      "wasm_reason": null,
+      "wasm_recovery_count": 1
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "valid",
+      "combined_candidate_comparison": "true_negative",
+      "comparison": "true_negative",
+      "fixture_expected_valid": true,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "70f5e2b9976dad56bdcd1fafcb3af8c839c7a92e7beaa437162bcf45f390e83d",
+      "id": "cpp-replay-plain",
+      "language": "cpp",
+      "native": {
+        "diagnostics": [],
+        "reason": "clang_native_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+        "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+      },
+      "native_attempted": true,
+      "native_classification": "valid",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 31840,
+      "native_identity_current": true,
+      "native_standard": "c++17",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "09f070fd688d86702582e9ef290ccc1e04cfbe576cf14effc6938962b5fca98a",
+      "structural_observations": [],
+      "wasm_classification": "valid",
+      "wasm_elapsed_us": 1234362,
+      "wasm_reason": null,
+      "wasm_recovery_count": 0
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "valid",
+      "combined_candidate_comparison": "true_negative",
+      "comparison": "true_negative",
+      "fixture_expected_valid": true,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "70f5e2b9976dad56bdcd1fafcb3af8c839c7a92e7beaa437162bcf45f390e83d",
+      "id": "cpp-replay-warning",
+      "language": "cpp",
+      "native": {
+        "diagnostics": [
+          {
+            "column_byte": 19,
+            "level": "warning",
+            "line": 1,
+            "rule_id": "clang.warn_unused_variable"
+          }
+        ],
+        "reason": "clang_native_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+        "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+      },
+      "native_attempted": true,
+      "native_classification": "valid",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 32606,
+      "native_identity_current": true,
+      "native_standard": "c++17",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "cfa759a851ca48b7ff1679414c7d54487113e940394288762e5c813b942ee3cd",
+      "structural_observations": [],
+      "wasm_classification": "valid",
+      "wasm_elapsed_us": 1233759,
+      "wasm_reason": null,
+      "wasm_recovery_count": 0
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "valid",
+      "combined_candidate_comparison": "true_negative",
+      "comparison": "true_negative",
+      "fixture_expected_valid": true,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "70f5e2b9976dad56bdcd1fafcb3af8c839c7a92e7beaa437162bcf45f390e83d",
+      "id": "cpp-replay-literal",
+      "language": "cpp",
+      "native": {
+        "diagnostics": [],
+        "reason": "clang_native_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+        "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+      },
+      "native_attempted": true,
+      "native_classification": "valid",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 29092,
+      "native_identity_current": true,
+      "native_standard": "c++17",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "522d3e3a175389933d82e3d2c4f7f33b528acb2701eb879a091caac33ec5d761",
+      "structural_observations": [],
+      "wasm_classification": "valid",
+      "wasm_elapsed_us": 1227957,
+      "wasm_reason": null,
+      "wasm_recovery_count": 0
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "invalid",
+      "combined_candidate_comparison": "true_positive",
+      "comparison": "true_positive",
+      "fixture_expected_valid": false,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "70f5e2b9976dad56bdcd1fafcb3af8c839c7a92e7beaa437162bcf45f390e83d",
+      "id": "cpp-replay-syntax",
+      "language": "cpp",
+      "native": {
+        "diagnostics": [
+          {
+            "column_byte": 9,
+            "level": "error",
+            "line": 1,
+            "rule_id": "clang.err_expected_expression"
+          }
+        ],
+        "reason": "clang_native_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+        "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+      },
+      "native_attempted": true,
+      "native_classification": "invalid",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 32576,
+      "native_identity_current": true,
+      "native_standard": "c++17",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "fe46ce8f36ea2887dc2edf71eb1732bbe0816f9132050aa155b2acd4a8de445c",
+      "structural_observations": [],
+      "wasm_classification": "invalid",
+      "wasm_elapsed_us": 1235750,
+      "wasm_reason": null,
+      "wasm_recovery_count": 1
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "invalid",
+      "combined_candidate_comparison": "true_positive",
+      "comparison": "true_positive",
+      "fixture_expected_valid": false,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "70f5e2b9976dad56bdcd1fafcb3af8c839c7a92e7beaa437162bcf45f390e83d",
+      "id": "cpp-replay-syntax_declaration",
+      "language": "cpp",
+      "native": {
+        "diagnostics": [
+          {
+            "column_byte": 8,
+            "level": "error",
+            "line": 1,
+            "rule_id": "clang.err_invalid_token_after_toplevel_declarator"
+          }
+        ],
+        "reason": "clang_native_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+        "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+      },
+      "native_attempted": true,
+      "native_classification": "invalid",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 32495,
+      "native_identity_current": true,
+      "native_standard": "c++17",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "ee1e8162df320b447dd9d46741b65271787b0cfe8cc86c1f464753e298118fd5",
+      "structural_observations": [],
+      "wasm_classification": "invalid",
+      "wasm_elapsed_us": 1234273,
+      "wasm_reason": null,
+      "wasm_recovery_count": 1
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "invalid",
+      "combined_candidate_comparison": "true_positive",
+      "comparison": "true_positive",
+      "fixture_expected_valid": false,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "70f5e2b9976dad56bdcd1fafcb3af8c839c7a92e7beaa437162bcf45f390e83d",
+      "id": "cpp-replay-syntax_local_declaration",
+      "language": "cpp",
+      "native": {
+        "diagnostics": [
+          {
+            "column_byte": 22,
+            "level": "error",
+            "line": 1,
+            "rule_id": "clang.err_expected_semi_declaration"
+          }
+        ],
+        "reason": "clang_native_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+        "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+      },
+      "native_attempted": true,
+      "native_classification": "invalid",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 31624,
+      "native_identity_current": true,
+      "native_standard": "c++17",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "cd0b4c5f893505efdfe14317c4cc54e70864fd6ea83e4d701f04f1178ac6a2d6",
+      "structural_observations": [],
+      "wasm_classification": "invalid",
+      "wasm_elapsed_us": 1233835,
+      "wasm_reason": null,
+      "wasm_recovery_count": 1
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "invalid",
+      "combined_candidate_comparison": "true_positive",
+      "comparison": "true_positive",
+      "fixture_expected_valid": false,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "70f5e2b9976dad56bdcd1fafcb3af8c839c7a92e7beaa437162bcf45f390e83d",
+      "id": "cpp-replay-syntax_return",
+      "language": "cpp",
+      "native": {
+        "diagnostics": [
+          {
+            "column_byte": 23,
+            "level": "error",
+            "line": 1,
+            "rule_id": "clang.err_expected_semi_after_stmt"
+          }
+        ],
+        "reason": "clang_native_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+        "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+      },
+      "native_attempted": true,
+      "native_classification": "invalid",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 30048,
+      "native_identity_current": true,
+      "native_standard": "c++17",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "2601ca85b715cf41e487639a838e56488c953cebe5b027388a2fb9f796db03c6",
+      "structural_observations": [],
+      "wasm_classification": "invalid",
+      "wasm_elapsed_us": 1254321,
+      "wasm_reason": null,
+      "wasm_recovery_count": 1
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "invalid",
+      "combined_candidate_comparison": "true_positive",
+      "comparison": "true_positive",
+      "fixture_expected_valid": false,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "70f5e2b9976dad56bdcd1fafcb3af8c839c7a92e7beaa437162bcf45f390e83d",
+      "id": "cpp-replay-syntax_expression",
+      "language": "cpp",
+      "native": {
+        "diagnostics": [
+          {
+            "column_byte": 27,
+            "level": "error",
+            "line": 1,
+            "rule_id": "clang.err_expected_semi_after_expr"
+          }
+        ],
+        "reason": "clang_native_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+        "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+      },
+      "native_attempted": true,
+      "native_classification": "invalid",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 32345,
+      "native_identity_current": true,
+      "native_standard": "c++17",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "0a4c2679d8bf08e6e5e4e152e218edd020efa469bfdd0c9fa37973c4ccbfc314",
+      "structural_observations": [],
+      "wasm_classification": "invalid",
+      "wasm_elapsed_us": 1236128,
+      "wasm_reason": null,
+      "wasm_recovery_count": 1
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "invalid",
+      "combined_candidate_comparison": "true_positive",
+      "comparison": "true_positive",
+      "fixture_expected_valid": false,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "70f5e2b9976dad56bdcd1fafcb3af8c839c7a92e7beaa437162bcf45f390e83d",
+      "id": "cpp-replay-syntax_member",
+      "language": "cpp",
+      "native": {
+        "diagnostics": [
+          {
+            "column_byte": 17,
+            "level": "error",
+            "line": 1,
+            "rule_id": "clang.err_expected_semi_decl_list"
+          }
+        ],
+        "reason": "clang_native_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+        "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+      },
+      "native_attempted": true,
+      "native_classification": "invalid",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 31027,
+      "native_identity_current": true,
+      "native_standard": "c++17",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "40ed42ac0bf9af19462e7d66062cbf19e771415a53b848e14bed6fee32a84fe5",
+      "structural_observations": [],
+      "wasm_classification": "invalid",
+      "wasm_elapsed_us": 1242686,
+      "wasm_reason": null,
+      "wasm_recovery_count": 1
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "invalid",
+      "combined_candidate_comparison": "true_positive",
+      "comparison": "true_positive",
+      "fixture_expected_valid": false,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "70f5e2b9976dad56bdcd1fafcb3af8c839c7a92e7beaa437162bcf45f390e83d",
+      "id": "cpp-replay-syntax_paren",
+      "language": "cpp",
+      "native": {
+        "diagnostics": [
+          {
+            "column_byte": 21,
+            "level": "error",
+            "line": 1,
+            "rule_id": "clang.err_expected"
+          }
+        ],
+        "reason": "clang_native_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+        "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+      },
+      "native_attempted": true,
+      "native_classification": "invalid",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 32766,
+      "native_identity_current": true,
+      "native_standard": "c++17",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "164b66ee645d01c61fc5c9aecb92293a83a54e3f3a852ed2585885528b86bfee",
+      "structural_observations": [],
+      "wasm_classification": "invalid",
+      "wasm_elapsed_us": 1254149,
+      "wasm_reason": null,
+      "wasm_recovery_count": 1
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "invalid",
+      "combined_candidate_comparison": "true_positive",
+      "comparison": "true_positive",
+      "fixture_expected_valid": false,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "70f5e2b9976dad56bdcd1fafcb3af8c839c7a92e7beaa437162bcf45f390e83d",
+      "id": "cpp-replay-syntax_brace",
+      "language": "cpp",
+      "native": {
+        "diagnostics": [
+          {
+            "column_byte": 24,
+            "level": "error",
+            "line": 1,
+            "rule_id": "clang.err_expected"
+          }
+        ],
+        "reason": "clang_native_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+        "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+      },
+      "native_attempted": true,
+      "native_classification": "invalid",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 30341,
+      "native_identity_current": true,
+      "native_standard": "c++17",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "4dcee1b74176bac43463106872c084f857e87d94fecf7da62a8747f3b6ab2af3",
+      "structural_observations": [],
+      "wasm_classification": "invalid",
+      "wasm_elapsed_us": 1234550,
+      "wasm_reason": null,
+      "wasm_recovery_count": 1
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "valid",
+      "combined_candidate_comparison": "unknown",
+      "comparison": "unknown",
+      "fixture_expected_valid": true,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": null,
+      "grammar_sha256": "70f5e2b9976dad56bdcd1fafcb3af8c839c7a92e7beaa437162bcf45f390e83d",
+      "id": "cpp-replay-semantic",
+      "language": "cpp",
+      "native": {
+        "diagnostics": [
+          {
+            "column_byte": 1,
+            "level": "error",
+            "line": 1,
+            "rule_id": "clang.err_unknown_typename"
+          }
+        ],
+        "reason": "clang_native_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+        "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+      },
+      "native_attempted": true,
+      "native_classification": "unknown",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 31199,
+      "native_identity_current": true,
+      "native_standard": "c++17",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "9e5331d034d800e6abf496bce9b81bb734a3535ecd7efafa12b66c50a49ffcc0",
+      "structural_observations": [],
+      "wasm_classification": "valid",
+      "wasm_elapsed_us": 1239917,
+      "wasm_reason": null,
+      "wasm_recovery_count": 0
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "invalid",
+      "combined_candidate_comparison": "unknown",
+      "comparison": "unknown",
+      "fixture_expected_valid": true,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": null,
+      "grammar_sha256": "70f5e2b9976dad56bdcd1fafcb3af8c839c7a92e7beaa437162bcf45f390e83d",
+      "id": "cpp-replay-context",
+      "language": "cpp",
+      "native": {
+        "diagnostics": [],
+        "reason": "clang_preprocessor_context_unresolved",
+        "status": "incomplete",
+        "tool_sha256": null,
+        "version": null
+      },
+      "native_attempted": true,
+      "native_classification": "unknown",
+      "native_classification_policy": "clang-audited-punctuation-v1",
+      "native_elapsed_us": 506,
+      "native_identity_current": false,
+      "native_standard": "c++17",
+      "origin": "crates/codeguard-cli/tests/c_family_native_replay.rs",
+      "source_sha256": "18ac5d54ba06089e8a6e050655d1c5e74076554e15aeee51b8dd2ef3e1e5b879",
+      "structural_observations": [],
+      "wasm_classification": "invalid",
+      "wasm_elapsed_us": 1234534,
+      "wasm_reason": null,
+      "wasm_recovery_count": 1
+    }
+  ],
+  "combined_candidate_authority": "native_confirmation_required",
+  "corpus_sha256": "fc2da8fa19cdbc383215787393ef8b8f21d90a5d69e584932d5769653a7a30fb",
+  "delivery_decision": "not_evaluated",
+  "grammar_qualified_count": 0,
+  "independent_holdout": false,
+  "language_count": 32,
+  "languages": [
+    {
+      "combined_candidate": {
+        "compared_count": 10,
+        "fn": 0,
+        "fp": 0,
+        "tn": 3,
+        "tp": 7,
+        "unknown_count": 3
+      },
+      "compared_count": 10,
+      "fixture_native_disagreement_count": 0,
+      "fn": 0,
+      "fp": 0,
+      "grammar_qualified": false,
+      "grammar_sha256": "a271e584616c7c3c0ac663f01cd05dd5f1a6c2ce6d4cd23096548985a95d0ccb",
+      "language": "c",
+      "native_selected": true,
+      "native_unknown_count": 3,
+      "native_version": "Apple clang version 21.0.0 (clang-2100.3.34.2)",
+      "sample_count": 13,
+      "tn": 3,
+      "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+      "tool_stable": true,
+      "tp": 7,
+      "wasm_unknown_count": 0
+    },
+    {
+      "combined_candidate": {
+        "compared_count": 11,
+        "fn": 0,
+        "fp": 0,
+        "tn": 3,
+        "tp": 8,
+        "unknown_count": 2
+      },
+      "compared_count": 11,
+      "fixture_native_disagreement_count": 0,
+      "fn": 0,
+      "fp": 0,
+      "grammar_qualified": false,
+      "grammar_sha256": "70f5e2b9976dad56bdcd1fafcb3af8c839c7a92e7beaa437162bcf45f390e83d",
+      "language": "cpp",
+      "native_selected": true,
+      "native_unknown_count": 2,
+      "native_version": "Apple clang version 21.0.0 (clang-2100.3.34.2)",
+      "sample_count": 13,
+      "tn": 3,
+      "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+      "tool_stable": true,
+      "tp": 8,
+      "wasm_unknown_count": 0
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "6f69e1cae44e1c32c1eccc170dc5a9778fb94ff716f71113fe1f8c4299aa2f40",
+      "language": "csharp",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "4eda5d91c99ca981e88bc7d3d33f0db166b4bab0a84d0021a9abf39b364c78ef",
+      "language": "go",
+      "native_selected": false,
+      "reason": "explicit_native_tool_not_selected"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "181a6fbc34d7864a551d91c13882fc33007e923b3c81a4bdbe7fa47492090077",
+      "language": "java",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+      "language": "javascript",
+      "native_selected": false,
+      "reason": "explicit_native_tool_not_selected"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "6d95607fc7d78964cfdf065ccb1ba76be5ed217c5ec0d0a3cace13c59fa1ae43",
+      "language": "lua",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "f1647052518f2bdfae8e8c0b033ffdeca1193d69d11c78ba20f84c8374fd0fe3",
+      "language": "luau",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "2606d4c5809fab61de44d328072d1371d53aa4aff5734436cb2a0ce8db7f2b0c",
+      "language": "objc",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "a7fdc587e77bd729b9f5b783c659be23c896e305a2c374472bed7114d9e01fac",
+      "language": "python",
+      "native_selected": false,
+      "reason": "explicit_native_tool_not_selected"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "206031e0f67fb41ecae505868ca3bb917df7375031aebafd2f97314a849713fe",
+      "language": "rust",
+      "native_selected": false,
+      "reason": "explicit_native_tool_not_selected"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "ba02ba3c98c8ce976ed962d727ef48940b3a18dd2243830a8158b558de64b4f2",
+      "language": "solidity",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "8f647a1b2cafe9ab00fb2056d79021d2a144ba17a72f45511072311c1b05d08e",
+      "language": "tsx",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "3a44d634c9840dccec36f33b99592bd086a2f940e9cd80c64347c45b7dce662f",
+      "language": "typescript",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "e8a3aa89cc07b59188122e6c1e0a812ca58cf85c9e191dcf2663a30b6b3b99e3",
+      "language": "zig",
+      "native_selected": false,
+      "reason": "explicit_native_tool_not_selected"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "db0812971109457d22b3fe9dcdb1cd8e614fba2a338e220670bd254485753623",
+      "language": "arkts",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "4acffa1c013df751193a21ce429777ca214c7d3a7e3665085b6df00dad8869f0",
+      "language": "nix",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "0d9ef3ae926acc0411bfecba9b34df4ea659061917b96455570a45a70824e890",
+      "language": "terraform",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "7dad281b3b24924d619cb7059a42b409e7690ebeb8ebbc82882e68167656e012",
+      "language": "dart",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+      "language": "erlang",
+      "native_selected": false,
+      "reason": "explicit_native_tool_not_selected"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "be3634fca99c19f5e1035a1a9c7d93d6ee82b35e6d5024f02be4883b71329c3e",
+      "language": "pascal",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "17aeb294c58dd47045b470fc082ccceac3100c8e548b13764d4f3987a062322f",
+      "language": "cfml",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "9d4eaaec46eec7e6400d4b8d6c85fac7dfe33867ed5b4e5c218dfa7851c32558",
+      "language": "cfquery",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "e381db5d2b8a7744fc7d8e51b0a14ff03f86c8ff497cdfe32d1da467f19d4096",
+      "language": "cfscript",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "65b98799f92e831d8b5ed8cd811464c71fac31c4beabf66990a545a4f65e02f1",
+      "language": "cobol",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "37d7fe5a91ca98941dc05493b0c05a0df0f36df5035890fa00b02497c68aaac3",
+      "language": "scala",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "cc77a63b8487956270e2f385e29a03ba0773ba532a3c8a8844a26b4c98793843",
+      "language": "swift",
+      "native_selected": false,
+      "reason": "explicit_native_tool_not_selected"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "e38a09e1826c7ec06340c0531a98bbb5ee79bdd710bba3d3349b79a19721e844",
+      "language": "vbnet",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "2a8f5acd1c53d91e0ec5c01a6830d8ac7f5a7f96f0ac4b3768c016c8e9d07711",
+      "language": "r",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "language": "ruby",
+      "native_selected": false,
+      "reason": "explicit_native_tool_not_selected"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "6545a9a110bc878e26ed329950147e190c83da038bb17e999de646fe6c4d6c82",
+      "language": "php",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+      "language": "kotlin",
+      "native_selected": false,
+      "reason": "explicit_native_tool_not_selected"
+    }
+  ],
+  "manifest_sha256": "9fe2fa77181aedd74755a2ac5b8fe694b2d4f2d33f03518d814476a911b2a610",
+  "native_adapter_reused": true,
+  "program_sha256": "ba32d8377a7e9e0961ed53e96066ace4ac06847a4e9aefada352f0d88ee0be4a",
+  "program_stable": true,
+  "report_type": "native_grammar_differential",
+  "sample_count": 26,
+  "schema_version": "0.12.0",
+  "selected_language_count": 2,
+  "status": "incomplete"
+}
