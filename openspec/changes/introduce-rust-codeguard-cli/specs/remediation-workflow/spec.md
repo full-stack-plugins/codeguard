@@ -238,6 +238,10 @@ MUST 提供 attempt 开始/结束协议，受控 fix apply 自动登记，自由
 - **WHEN** 问题事实、验证事件、原生报告或消费收据在任意嵌套对象中包含重复JSON字段，即使最后一个值看似合法
 - **THEN** next/status/task show SHALL 拒绝歧义记录，不发布该记录的修复指令或恢复结论；不回显不可信字段，历史原件保留供诊断，修复合法记录后只读查询可以恢复，查询成功不签发交付许可
 
+#### Scenario: synchronization encounters ambiguous existing facts
+- **WHEN** 新原生观察对应的既有finding或blocker事实含重复JSON字段
+- **THEN** work sync SHALL 记录该报告导入失败，保留原始事实，不给该记录追加已接受观察或消费成功收据；恢复合法事实后的新报告继续复用同一任务，不通过改写历史假装旧报告已成功
+
 ### Requirement: Enabled plugin workflows SHALL connect scans to actionable briefs
 
 显式初始化并启用工作流后，插件扫描 MUST 经过保存 run、幂等 sync、返回状态/RepairBrief 的路径；仅有重复报错而没有任务指引 MUST 不作为完成的插件接入。未初始化时 MUST 提供临时简报与初始化计划，不静默写受管目录。同步失败 MUST 保留原结果并明示恢复动作；不能假称持久任务已生成或改变质量 gate。

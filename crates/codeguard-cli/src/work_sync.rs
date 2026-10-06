@@ -338,7 +338,8 @@ pub(crate) fn latest_current_finding_observation(
     let (_, _, path) = latest.ok_or("no_local_scan_report")?;
     let bytes = read_bounded_file(&path, MAX_REPORT_BYTES)?;
     let digest = format!("{:x}", Sha256::digest(&bytes));
-    let report: Value = serde_json::from_slice(&bytes).map_err(|_| "latest_report_invalid")?;
+    let report: Value =
+        codeguard_adapters::parse_unique_json(&bytes).map_err(|_| "latest_report_invalid")?;
     let parsed = parse_report(root, &workspace_id, &path, &report, digest.clone())
         .map_err(|_| "latest_report_invalid")?;
     let marker = consumed.join(format!("{}.json", parsed.run_id));
@@ -470,7 +471,8 @@ fn import_one(
 ) -> Result<(bool, u64, u64, u64), &'static str> {
     let bytes = read_bounded_file(path, MAX_REPORT_BYTES)?;
     let digest = format!("{:x}", Sha256::digest(&bytes));
-    let value: Value = serde_json::from_slice(&bytes).map_err(|_| "report_invalid_json")?;
+    let value: Value =
+        codeguard_adapters::parse_unique_json(&bytes).map_err(|_| "report_invalid_json")?;
     if value["report_type"] == "npm_cve_workbench_observation" {
         codeguard_adapters::parse_unique_json(&bytes)
             .map_err(|_| "npm_report_duplicate_or_invalid_json")?;
@@ -1852,7 +1854,8 @@ fn persist_finding(
         true
     } else {
         let old = read_bounded_file(&fact_path, 128 * 1024)?;
-        let value: Value = serde_json::from_slice(&old).map_err(|_| "finding_corrupt")?;
+        let value: Value =
+            codeguard_adapters::parse_unique_json(&old).map_err(|_| "finding_corrupt")?;
         if value["fingerprint"] != finding.fingerprint
             || value["checker_id"] != finding.checker_id
             || value["path"] != finding.path
@@ -2022,7 +2025,8 @@ fn persist_blocker(
         true
     } else {
         let old = read_bounded_file(&fact_path, 128 * 1024)?;
-        let value: Value = serde_json::from_slice(&old).map_err(|_| "blocker_fact_corrupt")?;
+        let value: Value =
+            codeguard_adapters::parse_unique_json(&old).map_err(|_| "blocker_fact_corrupt")?;
         if value["kind"] != "blocker"
             || value["checker_id"] != blocker.checker_id
             || value["fingerprint"] != blocker.fingerprint

@@ -2464,3 +2464,11 @@ ESLint统一入口对JavaScript四种扩展接入原生优先及共享候选扫�
 实际RED：加入冲突state后next仍退出0且发布正常简报；新增目标期望3失败。复用现有parse_unique_json后，顶层/嵌套问题事实、实际verify事件和消费收据反例拒绝；合法原件恢复后next/status/show恢复查询，交付未评估。验证事件和收据原件在错误查询后保持不变。next读取的原生报告、导入失败收据、纠错引用同步使用递归唯一字段解析；保留原有大小上限、错误原因和无效纠错过滤行为，不改动批准或关闭政策。
 
 默认status_show/next/task_verify三目标24 passed / 0 failed / 10 ignored；WASM加hook_syntax_tasks四目标42 passed / 0 failed / 10 ignored。两构建重叠不相加，忽略的条件原生用例不计通过。WASM CLI全目标严格Clippy、定向rustfmt、分层、OpenSpec strict和diff检查通过。详见[验收](../../../tests/acceptance/repair-record-unique-json.md)与[证据身份](../../../tests/acceptance/evidence/repair-record-unique-json-2026-10-06.json)。未运行完整工作区、精度、真实宿主或发布验收，不勾选9.x/12.5/12.9父任务。用户Erlang草稿摘要未变，不纳入提交或执行。
+
+## 2026-10-06 写入链路的重复字段拒绝
+
+基于7c2221a，实际RED证明work sync继续接受含冲突state的finding：failed_reports=0/imported_reports=1。同步报告、索引及既有finding/blocker事实，以及尝试历史验证事件/原生报告改用现有递归唯一字段解析。两类反例证明不写新接受观察或成功消费收据，故障事实字节保留；恢复合法事实后的新报告复用同一原生任务，旧失败收据不被自动擦除。
+
+默认五目标最后有效结果60 passed / 0 failed / 12 ignored；WASM六目标最后有效结果78 passed / 0 failed / 12 ignored，两构建重叠不相加。WASM首次新测试将工作区全部任务数误定为1，与独立语法确认任务冲突（20 passed / 1 failed / 2 ignored）；仅将断言修正为核对同一Ruff环境问题唯一身份，最终work sync与cross-category两目标22 passed / 0 failed / 2 ignored。最终结果各目标只计最后有效一次。忽略项未执行，不代表真实SDK通过。
+
+WASM CLI全目标Clippy -D warnings、定向rustfmt、分层、OpenSpec strict与diff检查通过。[验收](../../../tests/acceptance/repair-sync-unique-json.md)保留失败与复跑区别；证据索引记录日志和源码身份。完整目标、9.3/9.7/12.5仍未验收；未改变可信关闭、grammar或公开版本。Erlang用户草稿未改动或执行。

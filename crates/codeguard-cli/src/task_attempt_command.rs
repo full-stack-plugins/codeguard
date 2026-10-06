@@ -467,8 +467,8 @@ fn verified_rechecks(
         }
         .ok_or("verification_event_invalid")?;
         let bytes = bounded_regular(&entry.path(), MAX_EVENT_BYTES)?;
-        let event: Value =
-            serde_json::from_slice(&bytes).map_err(|_| "verification_event_invalid")?;
+        let event: Value = codeguard_adapters::parse_unique_json(&bytes)
+            .map_err(|_| "verification_event_invalid")?;
         if event["schema_version"] != "0.3.0" {
             continue;
         }
@@ -508,8 +508,8 @@ fn verified_rechecks(
             }
             Err(reason) => return Err(reason),
         };
-        let report: Value =
-            serde_json::from_slice(&report_bytes).map_err(|_| "verification_event_invalid")?;
+        let report: Value = codeguard_adapters::parse_unique_json(&report_bytes)
+            .map_err(|_| "verification_event_invalid")?;
         if brief["checker_id"] == "node.npm.audit" {
             codeguard_adapters::parse_unique_json(&report_bytes)
                 .map_err(|_| "verification_event_invalid")?;
