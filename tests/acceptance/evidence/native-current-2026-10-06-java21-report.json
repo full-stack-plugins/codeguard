@@ -1,0 +1,338 @@
+{
+  "delivery_decision": "not_evaluated",
+  "grammar_qualified": false,
+  "independent_holdout": false,
+  "native_tool_sha256": "f9b046eb45d522f6e41d0b7eef03d4a1d0f898e0b54f1eac0a1b254be81d0e36",
+  "native_version": "javac 21.0.12.1\n",
+  "observations": [
+    {
+      "candidate": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "181a6fbc34d7864a551d91c13882fc33007e923b3c81a4bdbe7fa47492090077",
+        "language": "java",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "run_or_configure_applicable_native_lint_before_delivery",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-java21-differential-95591/pattern_switch.java",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.1.0",
+        "source_sha256": "7cff38df8d68315bc79af1147df3a612703cd8379a065c9c5f3f1e1c848fbad0",
+        "status": "incomplete"
+      },
+      "candidate_valid": true,
+      "case": "pattern_switch",
+      "native_valid": true,
+      "source_sha256": "7cff38df8d68315bc79af1147df3a612703cd8379a065c9c5f3f1e1c848fbad0"
+    },
+    {
+      "candidate": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "181a6fbc34d7864a551d91c13882fc33007e923b3c81a4bdbe7fa47492090077",
+        "language": "java",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "run_or_configure_applicable_native_lint_before_delivery",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-java21-differential-95591/guarded_switch.java",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.1.0",
+        "source_sha256": "a9aa35d2e450397b94864ca9f84fa9cb08b63d05d396fe9bdc9f75e0cc91cf03",
+        "status": "incomplete"
+      },
+      "candidate_valid": true,
+      "case": "guarded_switch",
+      "native_valid": true,
+      "source_sha256": "a9aa35d2e450397b94864ca9f84fa9cb08b63d05d396fe9bdc9f75e0cc91cf03"
+    },
+    {
+      "candidate": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "181a6fbc34d7864a551d91c13882fc33007e923b3c81a4bdbe7fa47492090077",
+        "language": "java",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "run_or_configure_applicable_native_lint_before_delivery",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-java21-differential-95591/record_pattern.java",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.1.0",
+        "source_sha256": "daa326a9f452f3ffa0f0fbfa0effefde9d41b2af0a736c4a11e59c5509a7f3f3",
+        "status": "incomplete"
+      },
+      "candidate_valid": true,
+      "case": "record_pattern",
+      "native_valid": true,
+      "source_sha256": "daa326a9f452f3ffa0f0fbfa0effefde9d41b2af0a736c4a11e59c5509a7f3f3"
+    },
+    {
+      "candidate": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "181a6fbc34d7864a551d91c13882fc33007e923b3c81a4bdbe7fa47492090077",
+        "language": "java",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "run_or_configure_applicable_native_lint_before_delivery",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-java21-differential-95591/sealed_record.java",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.1.0",
+        "source_sha256": "914ba8be2750d45b3c1eaea1720b23d7fdbdb0f1252d10ef3e50838c758de27b",
+        "status": "incomplete"
+      },
+      "candidate_valid": true,
+      "case": "sealed_record",
+      "native_valid": true,
+      "source_sha256": "914ba8be2750d45b3c1eaea1720b23d7fdbdb0f1252d10ef3e50838c758de27b"
+    },
+    {
+      "candidate": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "181a6fbc34d7864a551d91c13882fc33007e923b3c81a4bdbe7fa47492090077",
+        "language": "java",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "run_or_configure_applicable_native_lint_before_delivery",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-java21-differential-95591/text_block.java",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 0,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "recoveries": [],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.1.0",
+        "source_sha256": "1d48239dbc78baafcc7554ff7c16758feed86ba75fae4f0e05c1723c92604145",
+        "status": "incomplete"
+      },
+      "candidate_valid": true,
+      "case": "text_block",
+      "native_valid": true,
+      "source_sha256": "1d48239dbc78baafcc7554ff7c16758feed86ba75fae4f0e05c1723c92604145"
+    },
+    {
+      "candidate": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "181a6fbc34d7864a551d91c13882fc33007e923b3c81a4bdbe7fa47492090077",
+        "language": "java",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "confirm_suspected_recoveries_with_applicable_native_tool",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-java21-differential-95591/missing_guard.java",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 1,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "recoveries": [
+          {
+            "end_byte": 65,
+            "end_column_byte": 65,
+            "end_row": 0,
+            "group_id": 1,
+            "kind": "ERROR",
+            "start_byte": 61,
+            "start_column_byte": 61,
+            "start_row": 0,
+            "syntax_kind": "ERROR"
+          }
+        ],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.1.0",
+        "source_sha256": "61eb96df16c9d6b42aec9e07ce656a127b7c2658ad451aae3307a21709a170c1",
+        "status": "incomplete"
+      },
+      "candidate_valid": false,
+      "case": "missing_guard",
+      "native_valid": false,
+      "source_sha256": "61eb96df16c9d6b42aec9e07ce656a127b7c2658ad451aae3307a21709a170c1"
+    },
+    {
+      "candidate": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "181a6fbc34d7864a551d91c13882fc33007e923b3c81a4bdbe7fa47492090077",
+        "language": "java",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "confirm_suspected_recoveries_with_applicable_native_tool",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-java21-differential-95591/missing_record_parameter_type.java",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 1,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "recoveries": [
+          {
+            "end_byte": 74,
+            "end_column_byte": 74,
+            "end_row": 0,
+            "group_id": 1,
+            "kind": "ERROR",
+            "start_byte": 73,
+            "start_column_byte": 73,
+            "start_row": 0,
+            "syntax_kind": "ERROR"
+          }
+        ],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.1.0",
+        "source_sha256": "97ebf921f8c089fe01a329e275af683fa78eac2903dbc22eb1a312cf49574de7",
+        "status": "incomplete"
+      },
+      "candidate_valid": false,
+      "case": "missing_record_parameter_type",
+      "native_valid": false,
+      "source_sha256": "97ebf921f8c089fe01a329e275af683fa78eac2903dbc22eb1a312cf49574de7"
+    },
+    {
+      "candidate": {
+        "delivery_decision": "not_evaluated",
+        "grammar_qualified": false,
+        "grammar_sha256": "181a6fbc34d7864a551d91c13882fc33007e923b3c81a4bdbe7fa47492090077",
+        "language": "java",
+        "native": {
+          "reason": "explicit_candidate_probe",
+          "status": "not_run"
+        },
+        "next_action": "confirm_suspected_recoveries_with_applicable_native_tool",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/codeguard-java21-differential-95591/missing_switch_arrow.java",
+        "precheck": {
+          "cancelled": false,
+          "checked_files": 1,
+          "incomplete_files": 0,
+          "scope_complete": true,
+          "selected_files": 1,
+          "status": "incomplete",
+          "suspected_recoveries": 2,
+          "truncated_files": 0,
+          "unqualified_files": 1,
+          "unsupported_files": 0
+        },
+        "recoveries": [
+          {
+            "end_byte": 60,
+            "end_column_byte": 60,
+            "end_row": 0,
+            "group_id": 1,
+            "kind": "MISSING",
+            "start_byte": 60,
+            "start_column_byte": 60,
+            "start_row": 0,
+            "syntax_kind": ":"
+          },
+          {
+            "end_byte": 86,
+            "end_column_byte": 86,
+            "end_row": 0,
+            "group_id": 2,
+            "kind": "ERROR",
+            "start_byte": 73,
+            "start_column_byte": 73,
+            "start_row": 0,
+            "syntax_kind": "ERROR"
+          }
+        ],
+        "report_type": "grammar_candidate_probe",
+        "schema_version": "0.1.0",
+        "source_sha256": "6b92578733f6c9150f13fd2dbabc641bbb59bf626c8ff54d0858c07b2cf9427a",
+        "status": "incomplete"
+      },
+      "candidate_valid": false,
+      "case": "missing_switch_arrow",
+      "native_valid": false,
+      "source_sha256": "6b92578733f6c9150f13fd2dbabc641bbb59bf626c8ff54d0858c07b2cf9427a"
+    }
+  ],
+  "schema_version": "0.1.0",
+  "scope": "java21_new_local_cases"
+}

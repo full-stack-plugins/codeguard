@@ -1,0 +1,830 @@
+{
+  "authority": "development_native_differential_only",
+  "cases": [
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "invalid",
+      "combined_candidate_comparison": "true_positive",
+      "comparison": "true_positive",
+      "fixture_expected_valid": false,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "id": "ruby-bad_call",
+      "language": "ruby",
+      "native": {
+        "diagnostics": [
+          {
+            "line": 1,
+            "rule_id": "ruby.syntax"
+          }
+        ],
+        "reason": "ruby_native_syntax_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "8404c9d5fd2200e82c2520c8d9c1badf2a164c0da7c350b54e86cb0025ad9b50",
+        "version": "ruby 2.6.10p210"
+      },
+      "native_attempted": true,
+      "native_classification": "invalid",
+      "native_elapsed_us": 36466,
+      "native_identity_current": true,
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs",
+      "source_sha256": "aba3e496a5ff34ab4b9d6b6e087b27a2740abe44e5f97242965fbeeb562d63a8",
+      "structural_observations": [],
+      "wasm_classification": "invalid",
+      "wasm_elapsed_us": 813117,
+      "wasm_reason": null,
+      "wasm_recovery_count": 1
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "invalid",
+      "combined_candidate_comparison": "true_positive",
+      "comparison": "true_positive",
+      "fixture_expected_valid": false,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "id": "ruby-bad_def",
+      "language": "ruby",
+      "native": {
+        "diagnostics": [
+          {
+            "line": 2,
+            "rule_id": "ruby.syntax"
+          }
+        ],
+        "reason": "ruby_native_syntax_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "8404c9d5fd2200e82c2520c8d9c1badf2a164c0da7c350b54e86cb0025ad9b50",
+        "version": "ruby 2.6.10p210"
+      },
+      "native_attempted": true,
+      "native_classification": "invalid",
+      "native_elapsed_us": 32007,
+      "native_identity_current": true,
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs",
+      "source_sha256": "739efbce7caaccc74780a9754c65e1df7fee4322545d6cb7a97459cde2931ce1",
+      "structural_observations": [],
+      "wasm_classification": "invalid",
+      "wasm_elapsed_us": 801627,
+      "wasm_reason": null,
+      "wasm_recovery_count": 1
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "valid",
+      "combined_candidate_comparison": "true_negative",
+      "comparison": "true_negative",
+      "fixture_expected_valid": true,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "id": "ruby-block",
+      "language": "ruby",
+      "native": {
+        "diagnostics": [],
+        "reason": "ruby_native_syntax_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "8404c9d5fd2200e82c2520c8d9c1badf2a164c0da7c350b54e86cb0025ad9b50",
+        "version": "ruby 2.6.10p210"
+      },
+      "native_attempted": true,
+      "native_classification": "valid",
+      "native_elapsed_us": 31998,
+      "native_identity_current": true,
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs",
+      "source_sha256": "7ba246dcfeb6922bb0675bc4b6fd42e8bbb935b5613cec0a6de9af5174f3ec8f",
+      "structural_observations": [],
+      "wasm_classification": "valid",
+      "wasm_elapsed_us": 804893,
+      "wasm_reason": null,
+      "wasm_recovery_count": 0
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "valid",
+      "combined_candidate_comparison": "true_negative",
+      "comparison": "true_negative",
+      "fixture_expected_valid": true,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "id": "ruby-class",
+      "language": "ruby",
+      "native": {
+        "diagnostics": [],
+        "reason": "ruby_native_syntax_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "8404c9d5fd2200e82c2520c8d9c1badf2a164c0da7c350b54e86cb0025ad9b50",
+        "version": "ruby 2.6.10p210"
+      },
+      "native_attempted": true,
+      "native_classification": "valid",
+      "native_elapsed_us": 25774,
+      "native_identity_current": true,
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs",
+      "source_sha256": "da1628da0157dd45694efca72acb136eeaa674b1dc7d14683400c8e1c173a71e",
+      "structural_observations": [],
+      "wasm_classification": "valid",
+      "wasm_elapsed_us": 810658,
+      "wasm_reason": null,
+      "wasm_recovery_count": 0
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "valid",
+      "combined_candidate_comparison": "true_negative",
+      "comparison": "true_negative",
+      "fixture_expected_valid": true,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "id": "ruby-hash",
+      "language": "ruby",
+      "native": {
+        "diagnostics": [],
+        "reason": "ruby_native_syntax_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "8404c9d5fd2200e82c2520c8d9c1badf2a164c0da7c350b54e86cb0025ad9b50",
+        "version": "ruby 2.6.10p210"
+      },
+      "native_attempted": true,
+      "native_classification": "valid",
+      "native_elapsed_us": 32029,
+      "native_identity_current": true,
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs",
+      "source_sha256": "f602bb55a5fbbdb4c0c7286d4e4fdb918b7673ebb1e7d3a809bb33b208f6ce14",
+      "structural_observations": [],
+      "wasm_classification": "valid",
+      "wasm_elapsed_us": 800183,
+      "wasm_reason": null,
+      "wasm_recovery_count": 0
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "valid",
+      "combined_candidate_comparison": "true_negative",
+      "comparison": "true_negative",
+      "fixture_expected_valid": true,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "id": "ruby-heredoc",
+      "language": "ruby",
+      "native": {
+        "diagnostics": [],
+        "reason": "ruby_native_syntax_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "8404c9d5fd2200e82c2520c8d9c1badf2a164c0da7c350b54e86cb0025ad9b50",
+        "version": "ruby 2.6.10p210"
+      },
+      "native_attempted": true,
+      "native_classification": "valid",
+      "native_elapsed_us": 27098,
+      "native_identity_current": true,
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs",
+      "source_sha256": "53f2a7f08242e2317aaf5ba199a3cd89c3e54c062ef878641566a0fc5381283a",
+      "structural_observations": [],
+      "wasm_classification": "valid",
+      "wasm_elapsed_us": 802243,
+      "wasm_reason": null,
+      "wasm_recovery_count": 0
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "valid",
+      "combined_candidate_comparison": "true_negative",
+      "comparison": "true_negative",
+      "fixture_expected_valid": true,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "id": "ruby-interpolation",
+      "language": "ruby",
+      "native": {
+        "diagnostics": [],
+        "reason": "ruby_native_syntax_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "8404c9d5fd2200e82c2520c8d9c1badf2a164c0da7c350b54e86cb0025ad9b50",
+        "version": "ruby 2.6.10p210"
+      },
+      "native_attempted": true,
+      "native_classification": "valid",
+      "native_elapsed_us": 29251,
+      "native_identity_current": true,
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs",
+      "source_sha256": "6b478dde9564fee10b0e09a1d04ebe1c2234603f8b89e4cb02962389e6120ee9",
+      "structural_observations": [],
+      "wasm_classification": "valid",
+      "wasm_elapsed_us": 803283,
+      "wasm_reason": null,
+      "wasm_recovery_count": 0
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "invalid",
+      "combined_candidate_comparison": "true_positive",
+      "comparison": "true_positive",
+      "fixture_expected_valid": false,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "id": "ruby-missing_end",
+      "language": "ruby",
+      "native": {
+        "diagnostics": [
+          {
+            "line": 4,
+            "rule_id": "ruby.syntax"
+          }
+        ],
+        "reason": "ruby_native_syntax_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "8404c9d5fd2200e82c2520c8d9c1badf2a164c0da7c350b54e86cb0025ad9b50",
+        "version": "ruby 2.6.10p210"
+      },
+      "native_attempted": true,
+      "native_classification": "invalid",
+      "native_elapsed_us": 30495,
+      "native_identity_current": true,
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs",
+      "source_sha256": "bbbcf874b739d2a39a1f99b4b7e2252c1930d23ac7d7cb1373fc3d21f92d7524",
+      "structural_observations": [],
+      "wasm_classification": "invalid",
+      "wasm_elapsed_us": 805340,
+      "wasm_reason": null,
+      "wasm_recovery_count": 1
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "invalid",
+      "combined_candidate_comparison": "true_positive",
+      "comparison": "true_positive",
+      "fixture_expected_valid": false,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "id": "ruby-missing_expr",
+      "language": "ruby",
+      "native": {
+        "diagnostics": [
+          {
+            "line": 1,
+            "rule_id": "ruby.syntax"
+          }
+        ],
+        "reason": "ruby_native_syntax_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "8404c9d5fd2200e82c2520c8d9c1badf2a164c0da7c350b54e86cb0025ad9b50",
+        "version": "ruby 2.6.10p210"
+      },
+      "native_attempted": true,
+      "native_classification": "invalid",
+      "native_elapsed_us": 30052,
+      "native_identity_current": true,
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs",
+      "source_sha256": "707e1b82e5553724dd4a6c1a3e3f5a4d1786442f26a7db4b0e785201603d7616",
+      "structural_observations": [],
+      "wasm_classification": "invalid",
+      "wasm_elapsed_us": 803878,
+      "wasm_reason": null,
+      "wasm_recovery_count": 1
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "valid",
+      "combined_candidate_comparison": "true_negative",
+      "comparison": "true_negative",
+      "fixture_expected_valid": true,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "id": "ruby-modifier",
+      "language": "ruby",
+      "native": {
+        "diagnostics": [],
+        "reason": "ruby_native_syntax_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "8404c9d5fd2200e82c2520c8d9c1badf2a164c0da7c350b54e86cb0025ad9b50",
+        "version": "ruby 2.6.10p210"
+      },
+      "native_attempted": true,
+      "native_classification": "valid",
+      "native_elapsed_us": 31888,
+      "native_identity_current": true,
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs",
+      "source_sha256": "d9eb7dc0bb42c387b779d3cc5069c3bfb6fe0703d77680face9c4737ed00133d",
+      "structural_observations": [],
+      "wasm_classification": "valid",
+      "wasm_elapsed_us": 802475,
+      "wasm_reason": null,
+      "wasm_recovery_count": 0
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "valid",
+      "combined_candidate_comparison": "true_negative",
+      "comparison": "true_negative",
+      "fixture_expected_valid": true,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "id": "ruby-module",
+      "language": "ruby",
+      "native": {
+        "diagnostics": [],
+        "reason": "ruby_native_syntax_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "8404c9d5fd2200e82c2520c8d9c1badf2a164c0da7c350b54e86cb0025ad9b50",
+        "version": "ruby 2.6.10p210"
+      },
+      "native_attempted": true,
+      "native_classification": "valid",
+      "native_elapsed_us": 31902,
+      "native_identity_current": true,
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs",
+      "source_sha256": "8a7b5f2cf1a966c0352378942012d5cc10a6f3a54c97991d619ced14ecd46599",
+      "structural_observations": [],
+      "wasm_classification": "valid",
+      "wasm_elapsed_us": 808624,
+      "wasm_reason": null,
+      "wasm_recovery_count": 0
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "valid",
+      "combined_candidate_comparison": "true_negative",
+      "comparison": "true_negative",
+      "fixture_expected_valid": true,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "id": "ruby-plain",
+      "language": "ruby",
+      "native": {
+        "diagnostics": [],
+        "reason": "ruby_native_syntax_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "8404c9d5fd2200e82c2520c8d9c1badf2a164c0da7c350b54e86cb0025ad9b50",
+        "version": "ruby 2.6.10p210"
+      },
+      "native_attempted": true,
+      "native_classification": "valid",
+      "native_elapsed_us": 30149,
+      "native_identity_current": true,
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs",
+      "source_sha256": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4",
+      "structural_observations": [],
+      "wasm_classification": "valid",
+      "wasm_elapsed_us": 808523,
+      "wasm_reason": null,
+      "wasm_recovery_count": 0
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "valid",
+      "combined_candidate_comparison": "true_negative",
+      "comparison": "true_negative",
+      "fixture_expected_valid": true,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "id": "ruby-routing_control",
+      "language": "ruby",
+      "native": {
+        "diagnostics": [],
+        "reason": "ruby_native_syntax_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "8404c9d5fd2200e82c2520c8d9c1badf2a164c0da7c350b54e86cb0025ad9b50",
+        "version": "ruby 2.6.10p210"
+      },
+      "native_attempted": true,
+      "native_classification": "valid",
+      "native_elapsed_us": 31654,
+      "native_identity_current": true,
+      "origin": "crates/codeguard-cli/tests/check_all_grammar_candidates.rs",
+      "source_sha256": "9c413f7a07711445f01e9c6b13b3d4333a0685059fc2923001a81839604b9298",
+      "structural_observations": [],
+      "wasm_classification": "valid",
+      "wasm_elapsed_us": 811864,
+      "wasm_reason": null,
+      "wasm_recovery_count": 0
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "invalid",
+      "combined_candidate_comparison": "true_positive",
+      "comparison": "true_positive",
+      "fixture_expected_valid": false,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "id": "ruby-unclosed_string",
+      "language": "ruby",
+      "native": {
+        "diagnostics": [
+          {
+            "line": 1,
+            "rule_id": "ruby.syntax"
+          }
+        ],
+        "reason": "ruby_native_syntax_diagnostics",
+        "status": "diagnostics_observed",
+        "tool_sha256": "8404c9d5fd2200e82c2520c8d9c1badf2a164c0da7c350b54e86cb0025ad9b50",
+        "version": "ruby 2.6.10p210"
+      },
+      "native_attempted": true,
+      "native_classification": "invalid",
+      "native_elapsed_us": 29701,
+      "native_identity_current": true,
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs",
+      "source_sha256": "bf5c73a5e6e9694a0f23b0140fa931284ab562afaed4ce6d81c65e608be908cd",
+      "structural_observations": [],
+      "wasm_classification": "invalid",
+      "wasm_elapsed_us": 805862,
+      "wasm_reason": null,
+      "wasm_recovery_count": 1
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "valid",
+      "combined_candidate_comparison": "true_negative",
+      "comparison": "true_negative",
+      "fixture_expected_valid": true,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "id": "ruby-no_execution",
+      "language": "ruby",
+      "native": {
+        "diagnostics": [],
+        "reason": "ruby_native_syntax_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "8404c9d5fd2200e82c2520c8d9c1badf2a164c0da7c350b54e86cb0025ad9b50",
+        "version": "ruby 2.6.10p210"
+      },
+      "native_attempted": true,
+      "native_classification": "valid",
+      "native_elapsed_us": 31663,
+      "native_identity_current": true,
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs",
+      "source_sha256": "b03c31f363b4ec8a587faa0279f6770e99a3d75920f1316674b5df1fc37c999e",
+      "structural_observations": [],
+      "wasm_classification": "valid",
+      "wasm_elapsed_us": 799550,
+      "wasm_reason": null,
+      "wasm_recovery_count": 0
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "valid",
+      "combined_candidate_comparison": "true_negative",
+      "comparison": "true_negative",
+      "fixture_expected_valid": true,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "id": "ruby-no_require_resolution",
+      "language": "ruby",
+      "native": {
+        "diagnostics": [],
+        "reason": "ruby_native_syntax_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "8404c9d5fd2200e82c2520c8d9c1badf2a164c0da7c350b54e86cb0025ad9b50",
+        "version": "ruby 2.6.10p210"
+      },
+      "native_attempted": true,
+      "native_classification": "valid",
+      "native_elapsed_us": 31275,
+      "native_identity_current": true,
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs",
+      "source_sha256": "0b505a823a43635d5fb347d7d6f027a2fed1de19d3a4abfeb8f22df493429c14",
+      "structural_observations": [],
+      "wasm_classification": "valid",
+      "wasm_elapsed_us": 806677,
+      "wasm_reason": null,
+      "wasm_recovery_count": 0
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "valid",
+      "combined_candidate_comparison": "true_negative",
+      "comparison": "true_negative",
+      "fixture_expected_valid": true,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "id": "ruby-no_shebang_require",
+      "language": "ruby",
+      "native": {
+        "diagnostics": [],
+        "reason": "ruby_native_syntax_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "8404c9d5fd2200e82c2520c8d9c1badf2a164c0da7c350b54e86cb0025ad9b50",
+        "version": "ruby 2.6.10p210"
+      },
+      "native_attempted": true,
+      "native_classification": "valid",
+      "native_elapsed_us": 27364,
+      "native_identity_current": true,
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs",
+      "source_sha256": "f2beb436e1b24ff1520ad4555458be693f432758813fac0fcfa349c564243698",
+      "structural_observations": [],
+      "wasm_classification": "valid",
+      "wasm_elapsed_us": 810087,
+      "wasm_reason": null,
+      "wasm_recovery_count": 0
+    },
+    {
+      "cohort": "repository_regression",
+      "combined_candidate_classification": "valid",
+      "combined_candidate_comparison": "true_negative",
+      "comparison": "true_negative",
+      "fixture_expected_valid": true,
+      "fixture_label": "regression",
+      "fixture_native_disagreement": false,
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "id": "ruby-utf8_encoding",
+      "language": "ruby",
+      "native": {
+        "diagnostics": [],
+        "reason": "ruby_native_syntax_no_diagnostics",
+        "status": "completed",
+        "tool_sha256": "8404c9d5fd2200e82c2520c8d9c1badf2a164c0da7c350b54e86cb0025ad9b50",
+        "version": "ruby 2.6.10p210"
+      },
+      "native_attempted": true,
+      "native_classification": "valid",
+      "native_elapsed_us": 27267,
+      "native_identity_current": true,
+      "origin": "crates/codeguard-cli/tests/ruby_native_differential.rs",
+      "source_sha256": "85526cba1d39b0d3f8bbbbaf657fccca12befa991c81cff5b1ebaf98e61a3d99",
+      "structural_observations": [],
+      "wasm_classification": "valid",
+      "wasm_elapsed_us": 807062,
+      "wasm_reason": null,
+      "wasm_recovery_count": 0
+    }
+  ],
+  "combined_candidate_authority": "native_confirmation_required",
+  "corpus_sha256": "a3ec42480b777afdda808e7dba323af2afcac97ee9886448b6c75556400bc7eb",
+  "delivery_decision": "not_evaluated",
+  "grammar_qualified_count": 0,
+  "independent_holdout": false,
+  "language_count": 32,
+  "languages": [
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "a271e584616c7c3c0ac663f01cd05dd5f1a6c2ce6d4cd23096548985a95d0ccb",
+      "language": "c",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "70f5e2b9976dad56bdcd1fafcb3af8c839c7a92e7beaa437162bcf45f390e83d",
+      "language": "cpp",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "6f69e1cae44e1c32c1eccc170dc5a9778fb94ff716f71113fe1f8c4299aa2f40",
+      "language": "csharp",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "4eda5d91c99ca981e88bc7d3d33f0db166b4bab0a84d0021a9abf39b364c78ef",
+      "language": "go",
+      "native_selected": false,
+      "reason": "explicit_native_tool_not_selected"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "181a6fbc34d7864a551d91c13882fc33007e923b3c81a4bdbe7fa47492090077",
+      "language": "java",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+      "language": "javascript",
+      "native_selected": false,
+      "reason": "explicit_native_tool_not_selected"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "6d95607fc7d78964cfdf065ccb1ba76be5ed217c5ec0d0a3cace13c59fa1ae43",
+      "language": "lua",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "f1647052518f2bdfae8e8c0b033ffdeca1193d69d11c78ba20f84c8374fd0fe3",
+      "language": "luau",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "2606d4c5809fab61de44d328072d1371d53aa4aff5734436cb2a0ce8db7f2b0c",
+      "language": "objc",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "a7fdc587e77bd729b9f5b783c659be23c896e305a2c374472bed7114d9e01fac",
+      "language": "python",
+      "native_selected": false,
+      "reason": "explicit_native_tool_not_selected"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "206031e0f67fb41ecae505868ca3bb917df7375031aebafd2f97314a849713fe",
+      "language": "rust",
+      "native_selected": false,
+      "reason": "explicit_native_tool_not_selected"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "ba02ba3c98c8ce976ed962d727ef48940b3a18dd2243830a8158b558de64b4f2",
+      "language": "solidity",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "8f647a1b2cafe9ab00fb2056d79021d2a144ba17a72f45511072311c1b05d08e",
+      "language": "tsx",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "3a44d634c9840dccec36f33b99592bd086a2f940e9cd80c64347c45b7dce662f",
+      "language": "typescript",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "e8a3aa89cc07b59188122e6c1e0a812ca58cf85c9e191dcf2663a30b6b3b99e3",
+      "language": "zig",
+      "native_selected": false,
+      "reason": "explicit_native_tool_not_selected"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "db0812971109457d22b3fe9dcdb1cd8e614fba2a338e220670bd254485753623",
+      "language": "arkts",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "4acffa1c013df751193a21ce429777ca214c7d3a7e3665085b6df00dad8869f0",
+      "language": "nix",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "0d9ef3ae926acc0411bfecba9b34df4ea659061917b96455570a45a70824e890",
+      "language": "terraform",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "7dad281b3b24924d619cb7059a42b409e7690ebeb8ebbc82882e68167656e012",
+      "language": "dart",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "dbab33f03e07b89f4385fcdd48d87d86ba35c82a0a426788d55b8c25410bc491",
+      "language": "erlang",
+      "native_selected": false,
+      "reason": "explicit_native_tool_not_selected"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "be3634fca99c19f5e1035a1a9c7d93d6ee82b35e6d5024f02be4883b71329c3e",
+      "language": "pascal",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "17aeb294c58dd47045b470fc082ccceac3100c8e548b13764d4f3987a062322f",
+      "language": "cfml",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "9d4eaaec46eec7e6400d4b8d6c85fac7dfe33867ed5b4e5c218dfa7851c32558",
+      "language": "cfquery",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "e381db5d2b8a7744fc7d8e51b0a14ff03f86c8ff497cdfe32d1da467f19d4096",
+      "language": "cfscript",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "65b98799f92e831d8b5ed8cd811464c71fac31c4beabf66990a545a4f65e02f1",
+      "language": "cobol",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "37d7fe5a91ca98941dc05493b0c05a0df0f36df5035890fa00b02497c68aaac3",
+      "language": "scala",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "cc77a63b8487956270e2f385e29a03ba0773ba532a3c8a8844a26b4c98793843",
+      "language": "swift",
+      "native_selected": false,
+      "reason": "explicit_native_tool_not_selected"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "e38a09e1826c7ec06340c0531a98bbb5ee79bdd710bba3d3349b79a19721e844",
+      "language": "vbnet",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "2a8f5acd1c53d91e0ec5c01a6830d8ac7f5a7f96f0ac4b3768c016c8e9d07711",
+      "language": "r",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "combined_candidate": {
+        "compared_count": 18,
+        "fn": 0,
+        "fp": 0,
+        "tn": 13,
+        "tp": 5,
+        "unknown_count": 0
+      },
+      "compared_count": 18,
+      "fixture_native_disagreement_count": 0,
+      "fn": 0,
+      "fp": 0,
+      "grammar_qualified": false,
+      "grammar_sha256": "4cb5a4b12870876ca864c1e92fe1f5cd47036b2adc083e9306488af88867dbb4",
+      "language": "ruby",
+      "native_selected": true,
+      "native_unknown_count": 0,
+      "native_version": "ruby 2.6.10p210",
+      "sample_count": 18,
+      "tn": 13,
+      "tool_sha256": "8404c9d5fd2200e82c2520c8d9c1badf2a164c0da7c350b54e86cb0025ad9b50",
+      "tool_stable": true,
+      "tp": 5,
+      "wasm_unknown_count": 0
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "6545a9a110bc878e26ed329950147e190c83da038bb17e999de646fe6c4d6c82",
+      "language": "php",
+      "native_selected": false,
+      "reason": "native_differential_adapter_unavailable"
+    },
+    {
+      "grammar_qualified": false,
+      "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+      "language": "kotlin",
+      "native_selected": false,
+      "reason": "explicit_native_tool_not_selected"
+    }
+  ],
+  "manifest_sha256": "9fe2fa77181aedd74755a2ac5b8fe694b2d4f2d33f03518d814476a911b2a610",
+  "native_adapter_reused": false,
+  "program_sha256": "efc857d1ea86dec5a955a8a518ab7e228b5cdcf77213e8fc371f5eb27dc8f5b4",
+  "program_stable": true,
+  "report_type": "native_grammar_differential",
+  "sample_count": 18,
+  "schema_version": "0.5.0",
+  "selected_language_count": 1,
+  "status": "incomplete"
+}
