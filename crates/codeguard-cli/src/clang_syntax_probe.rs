@@ -23,7 +23,7 @@ pub(crate) fn observe(
         return report;
     }
     // 预处理会影响头文件、宏与分支；尚无编译数据库时不能把缺上下文报成源码错误。
-    if source.contains(&b'#') {
+    if codeguard_adapters::has_c_family_preprocessor_directive(source, language != "c") {
         report["reason"] = json!("clang_preprocessor_context_unresolved");
         return report;
     }

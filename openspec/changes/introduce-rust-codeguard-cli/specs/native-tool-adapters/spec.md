@@ -962,3 +962,10 @@ Model capture, original task execution and report ownership observation SHALL sh
 #### Scenario: Unified check schedules explicit Gradle OWASP independently from Maven
 - **WHEN** check all/java receives bounded original Gradle OWASP task paths, selected project files, explicit existing Gradle/JDK and an optional existing module cache
 - **THEN** it SHALL schedule the original native OWASP check within the shared request budget, preserve reports/active and native-suppressed advisories and expose the Gradle checker independently from Maven. It SHALL sync sanitized stable preparation tasks and provide original-task next guidance; model capture alone, zero advisories or native failure SHALL NOT become CVE acceptance. Explicit Gradle Javadoc and CVE MAY coexist using serialized Gradle resources. Lint-only or unrelated-language commands SHALL reject CVE options before launching tools; cancellation SHALL not persist a CVE scan.
+
+
+#### Scenario: Clang standalone preprocessing guard distinguishes literals from directives
+- **WHEN** explicitly selected C11/C++17 input contains hash characters in ordinary strings, character literals, comments or C++ raw strings
+- **THEN** CodeGuard SHALL preserve native syntax checking rather than infer missing header/macro context from those literal characters. Real line-start preprocessing directives, including digraph spellings and C11 trigraphs, SHALL remain context-unresolved before native execution. Line splicing and raw-string translation boundaries SHALL not allow header reads or fabricate source findings. This guard SHALL not establish a complete preprocessing model or production qualification.
+
+- **AND** the fixed Clang guard SHALL account for initial UTF-8 BOM and LF, CR, CRLF, LFCR and horizontal-space splices within the 1MiB input budget. Uncertain leading Unicode recovery SHALL remain explicitly context-unresolved without source violations or qualification.
