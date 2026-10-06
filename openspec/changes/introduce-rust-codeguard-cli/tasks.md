@@ -1920,3 +1920,7 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 ## 2026-10-06 lint all 类别内next与历史任务保留
 
 对应2.1/9.x：公开RED证明历史构建阻塞使当前Clippy指引被清空。新增单次允许检查器集合选择，保留全量事实校验和优先级；语法确认后备限定本轮任务ID，不删除历史构建事实。默认相关42通过/5条件忽略，WASM同一公开用例1通过，实际报告/Clippy/分层/OpenSpec通过。见tests/acceptance/lint-all-next-selection.md。完整任务调度、可信关闭、矩阵/宿主仍缺，父任务保持开放。
+
+## 2026-10-06 WASM扩展回归与ESLint外部目标边界
+
+对应12.1/12.9/14.x：实际基础层WASM80组420通过/10忽略；排除用户Erlang草稿的CLI201目标在64组546通过/2失败/48忽略后终止。修复JS外部目标not_connected缺明确边界反馈，保留不扫描/不建任务；准备测试明确部分显式上下文，避免误把合法无上下文WASM回退当强制环境任务。定向WASM12通过/4忽略、默认6通过/4忽略，实际反馈schema、严格Clippy/分层/OpenSpec通过。见tests/acceptance/wasm-eslint-boundary-regression.md。完整CLI重跑未完成，不勾选父任务。

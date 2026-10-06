@@ -47,6 +47,13 @@ pub(crate) fn observe(args: &EslintLintArguments, deadline: Instant) -> Value {
         .ok()
         .and_then(|path| path.to_str())
     else {
+        if args.workspace.is_some() {
+            report["workbench_status"] = json!("source_outside_workspace");
+            report["workbench"] = json!({"status":"source_outside_workspace"});
+            report["next_action"] = json!(
+                "源码不在指定工作区内；核对目标与 --workspace，不扫描外部源码或创建工作区任务"
+            );
+        }
         return report;
     };
     let selected = BTreeSet::from([relative.to_owned()]);
