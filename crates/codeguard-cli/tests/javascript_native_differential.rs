@@ -252,16 +252,20 @@ fn pinned_javascript_worker_matches_native_node_check_on_syntax_corpus() {
         );
     }
     use sha2::Digest;
-    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+    // 每轮写独立目录，不覆盖仓库内历史原生观察。
+    let root = std::env::var_os("CODEGUARD_NATIVE_DIFFERENTIAL_REPORT_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| {
+            std::env::temp_dir().join(format!("cg-native-javascript-{}", std::process::id()))
+        });
+    fs::create_dir_all(&root).unwrap();
     fs::write(
-        root.join("tests/acceptance/evidence/javascript-native-grammar-input-cancellation-2026-10-05.json"),
+        root.join("javascript-native-grammar-input-cancellation-2026-10-05.json"),
         &bytes,
     )
     .unwrap();
     fs::write(
-        root.join(
-            "tests/acceptance/evidence/javascript-native-grammar-differential-cancellation-2026-10-05.json",
-        ),
+        root.join("javascript-native-grammar-differential-cancellation-2026-10-05.json"),
         serde_json::to_vec(&report).unwrap(),
     )
     .unwrap();

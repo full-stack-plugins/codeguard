@@ -1928,3 +1928,7 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 ## 2026-10-06 当前WASM扩展回归终态收口
 
 对应12.1/12.9/14.x：ESLint修正后CLI从头实际重跑，201个metadata登记集成目标及lib/bins全部终态退出0；排除用户Erlang草稿。CLI203组1459通过/167条件忽略，基础80组420通过/10忽略（基础源码逐路径未变），合计1879通过/0失败/177忽略。WASM全工作区严格Clippy、398schema元定义、实际库存1.1、分层/OpenSpec通过。见tests/acceptance/wasm-regression-29ec2e1.md。远端当前CI证据源checkout失败、独立回放/holdout/原生条件/真实宿主及资格0/32仍未完成，父任务不勾选。
+
+## 2026-10-06 九语言已有原生工具实际差分
+
+对应12.3/12.11/14.17/14.19：本机九语言10工具入口版本匹配，显式条件12测试全部通过，无安装/下载；Kotlin2/Swift1 unknown保留。JavaScript额外module语料仍2FN，其中重复绑定的组合测量没用项目结构入口，后续需对齐，module_return仍需模式条件。改三项归档测试写独立目录，29历史报告字节不变，七份本轮报告/输入新名归档。普通相关7通过/5忽略、实际六份报告与输入schema、严格Clippy/分层/OpenSpec通过。见tests/acceptance/native-current-nine-language.md。独立holdout/完整矩阵/宿主及资格0/32仍缺，不勾选父任务。

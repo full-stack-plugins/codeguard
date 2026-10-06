@@ -260,7 +260,13 @@ fn pinned_ruby_uniform_replay_archives_frozen_native_and_wasm_evidence() {
             .all(|row| row["native_identity_current"] == true
                 && row["fixture_native_disagreement"] == false)
     );
-    let evidence = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../tests/acceptance/evidence");
+    // 独立输出本轮证据，保留旧源码/工具身份绑定的历史报告。
+    let evidence = std::env::var_os("CODEGUARD_NATIVE_DIFFERENTIAL_REPORT_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| {
+            std::env::temp_dir().join(format!("cg-native-ruby-{}", std::process::id()))
+        });
+    fs::create_dir_all(&evidence).unwrap();
     fs::write(
         evidence.join("ruby-native-grammar-input-2026-10-05.json"),
         bytes,
