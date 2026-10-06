@@ -5,7 +5,10 @@ use crate::go_lint_command::selected_sources_for_candidate;
 use crate::grammar_probe_command::read_plain_source;
 use crate::grammar_route::route_source;
 use crate::syntax_worker_candidate_observation::SyntaxWorkerCandidateObservation;
-use crate::syntax_worker_runner::{run_syntax_worker_candidate, run_syntax_worker_binding_candidate};
+use crate::syntax_worker_runner::{
+    run_syntax_worker_candidate, run_syntax_worker_binding_candidate,
+    run_syntax_worker_form_candidate,
+};
 use codeguard_adapters::bundled_grammar_metadata;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
@@ -251,6 +254,8 @@ pub(crate) fn observe_selected(
                     scope.spawn(|| {
                         let run = if job.language == "javascript" {
                             run_syntax_worker_binding_candidate
+                        } else if job.language == "erlang" {
+                            run_syntax_worker_form_candidate
                         } else {
                             run_syntax_worker_candidate
                         };

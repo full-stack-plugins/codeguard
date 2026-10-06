@@ -359,6 +359,12 @@ fn summarize(path: &str, report: &Value) -> String {
         .flatten()
         .filter(|f| f["input_stable"] == true)
         .flat_map(|f| f["native"]["diagnostics"].as_array().into_iter().flatten());
+    let erlang = feedback["erlang_lint"]["files"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter(|f| f["current"] == true)
+        .flat_map(|f| f["native"]["diagnostics"].as_array().into_iter().flatten());
     for finding in python
         .chain(node)
         .chain(swift)
@@ -367,6 +373,7 @@ fn summarize(path: &str, report: &Value) -> String {
         .chain(go)
         .chain(rust)
         .chain(shell)
+        .chain(erlang)
     {
         count += 1;
         if let Some(rule) = finding["rule_id"].as_str().filter(|r| {
@@ -397,6 +404,7 @@ fn summarize(path: &str, report: &Value) -> String {
                 *id,
                 "codeguard.python.required_suite"
                     | "codeguard.go.required_package"
+                    | "codeguard.erlang.form_terminator"
                     | "codeguard.cfquery.distinct_projection"
                     | "codeguard.javascript.duplicate_direct_lexical_binding"
             )

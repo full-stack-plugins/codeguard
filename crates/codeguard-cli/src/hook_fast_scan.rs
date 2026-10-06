@@ -184,11 +184,41 @@ pub(crate) fn observe(
     if rust_syntax.is_object() {
         crate::native_syntax_confirmation::connect(root, &mut rust_syntax, deadline);
     }
+    let erlang_paths = selected
+        .iter()
+        .filter(|p| p.ends_with(".erl") || p.ends_with(".hrl"))
+        .cloned()
+        .collect::<BTreeSet<_>>();
+    let mut erlang_lint = if erlang_paths.is_empty() {
+        Value::Null
+    } else {
+        crate::check_erlang_scan::observe(
+            root,
+            &erlang_paths,
+            tools.erl.map(Path::to_path_buf),
+            deadline,
+            &cancelled,
+        )
+    };
+    if erlang_lint.is_object() {
+        crate::check_erlang_scan::refresh(root, &mut erlang_lint, deadline);
+        // 缺工具先由候选分流是否需要确认；选择过工具的失败必须保留原生环境任务。
+        if !cfg!(feature = "wasm-precheck")
+            || erlang_lint["tool_selection"]["source"] != "not_found"
+        {
+            crate::native_syntax_confirmation::connect(root, &mut erlang_lint, deadline);
+            crate::check_erlang_scan::refresh(root, &mut erlang_lint, deadline);
+        }
+    }
     // 所选原生入口故障不能以WASM掩盖；确实缺入口才允许候选初检。
     #[cfg(feature = "wasm-precheck")]
     let syntax_selected = selected
         .iter()
         .filter(|p| !p.ends_with(".rs") || rust_syntax["tool_selection"]["source"] == "not_found")
+        .filter(|p| {
+            !(p.ends_with(".erl") || p.ends_with(".hrl"))
+                || erlang_lint["tool_selection"]["source"] == "not_found"
+        })
         .cloned()
         .collect::<BTreeSet<_>>();
     #[cfg(feature = "wasm-precheck")]
@@ -199,7 +229,7 @@ pub(crate) fn observe(
             node_lint: &node_lint,
             python_lint: &python_lint,
             go_lint: &go_syntax,
-            erlang_lint: &Value::Null,
+            erlang_lint: &erlang_lint,
             kotlin_lint: &kotlin_lint,
             swift_lint: &swift_lint,
             ruby_lint: &ruby_lint,
@@ -234,6 +264,8 @@ pub(crate) fn observe(
         .filter(|p| {
             !p.ends_with(".rs")
                 && !p.ends_with(".go")
+                && !p.ends_with(".erl")
+                && !p.ends_with(".hrl")
                 && !shell_paths.contains(*p)
                 && !p.ends_with(".rb")
                 && !p.ends_with(".zig")
@@ -272,19 +304,25 @@ pub(crate) fn observe(
                     .as_array()
                     .is_some_and(|d| !d.is_empty())
         })
-    }) || [&rust_syntax, &go_syntax, &swift_lint, &zig_lint, &ruby_lint]
-        .iter()
-        .any(|report| {
-            report["files"].as_array().is_some_and(|files| {
-                files.iter().any(|f| {
-                    f["current"] == true
-                        && f["native"]["diagnostics"]
-                            .as_array()
-                            .is_some_and(|d| !d.is_empty())
-                })
+    }) || [
+        &rust_syntax,
+        &go_syntax,
+        &swift_lint,
+        &zig_lint,
+        &ruby_lint,
+        &erlang_lint,
+    ]
+    .iter()
+    .any(|report| {
+        report["files"].as_array().is_some_and(|files| {
+            files.iter().any(|f| {
+                f["current"] == true
+                    && f["native"]["diagnostics"]
+                        .as_array()
+                        .is_some_and(|d| !d.is_empty())
             })
         })
-    {
+    }) {
         "repair_native_source"
     } else if unavailable.is_empty()
         && candidate_count > 0
@@ -304,7 +342,7 @@ pub(crate) fn observe(
         .as_array()
         .is_some_and(|rows| rows.iter().any(|r| r["language"] == "cfquery"));
     let mut feedback = json!({
-        "schema_version":if syntax["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"]=="javascript" && row.get("structural_observations").is_some())) {"0.15.0"}else if rust_syntax.is_object(){"0.14.0"}else if cfquery {"0.13.0"}else if go_syntax.is_object(){"0.12.0"}else if shell_lint.is_object(){"0.11.0"}else if ruby_lint.is_object(){"0.10.0"}else if structures > 0 && syntax["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.9.0"} else if cfquery || structures > 0 {"0.8.0"} else if zig_lint["schema_version"] == "0.2.0" {"0.7.0"}else if zig_lint.is_object(){"0.6.0"}else if swift_lint["schema_version"] == "0.2.0" {"0.5.0"} else if swift_lint.is_object(){"0.4.0"}else if kotlin_lint.is_object(){"0.3.0"}else{"0.2.0"},"report_type":"hook_fast_feedback",
+        "schema_version":if erlang_lint.is_object() || syntax["observations"].as_array().is_some_and(|rows| rows.iter().any(|row|row["language"]=="erlang" && row.get("structural_observations").is_some())) {"0.16.0"}else if syntax["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"]=="javascript" && row.get("structural_observations").is_some())) {"0.15.0"}else if rust_syntax.is_object(){"0.14.0"}else if cfquery {"0.13.0"}else if go_syntax.is_object(){"0.12.0"}else if shell_lint.is_object(){"0.11.0"}else if ruby_lint.is_object(){"0.10.0"}else if structures > 0 && syntax["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.9.0"} else if cfquery || structures > 0 {"0.8.0"} else if zig_lint["schema_version"] == "0.2.0" {"0.7.0"}else if zig_lint.is_object(){"0.6.0"}else if swift_lint["schema_version"] == "0.2.0" {"0.5.0"} else if swift_lint.is_object(){"0.4.0"}else if kotlin_lint.is_object(){"0.3.0"}else{"0.2.0"},"report_type":"hook_fast_feedback",
         "scan_scope":"selected_files","requested_paths":requested,
         "python_lint":python_lint,"node_lint":node_lint,"syntax_candidates":syntax,"syntax_tasks":syntax_tasks,
         "unavailable_files":unavailable,"native_unwired_files":native_unwired,
@@ -314,7 +352,8 @@ pub(crate) fn observe(
     if rust_syntax.is_object() || cfquery || structures > 0 {
         feedback["candidate_structure_count"] = json!(structures);
     }
-    if rust_syntax.is_object()
+    if feedback["schema_version"] == "0.16.0"
+        || rust_syntax.is_object()
         || cfquery
         || go_syntax.is_object()
         || shell_lint.is_object()
@@ -326,7 +365,8 @@ pub(crate) fn observe(
     {
         feedback["kotlin_lint"] = kotlin_lint;
     }
-    if rust_syntax.is_object()
+    if feedback["schema_version"] == "0.16.0"
+        || rust_syntax.is_object()
         || cfquery
         || go_syntax.is_object()
         || shell_lint.is_object()
@@ -337,7 +377,8 @@ pub(crate) fn observe(
     {
         feedback["swift_lint"] = swift_lint;
     }
-    if rust_syntax.is_object()
+    if feedback["schema_version"] == "0.16.0"
+        || rust_syntax.is_object()
         || cfquery
         || go_syntax.is_object()
         || shell_lint.is_object()
@@ -347,8 +388,10 @@ pub(crate) fn observe(
     {
         feedback["zig_lint"] = zig_lint;
     }
-    if feedback["schema_version"] == "0.15.0"
-        || rust_syntax.is_object()
+    if matches!(
+        feedback["schema_version"].as_str(),
+        Some("0.15.0" | "0.16.0")
+    ) || rust_syntax.is_object()
         || cfquery
         || go_syntax.is_object()
         || shell_lint.is_object()
@@ -356,23 +399,34 @@ pub(crate) fn observe(
     {
         feedback["ruby_lint"] = ruby_lint;
     }
-    if feedback["schema_version"] == "0.15.0"
-        || rust_syntax.is_object()
+    if matches!(
+        feedback["schema_version"].as_str(),
+        Some("0.15.0" | "0.16.0")
+    ) || rust_syntax.is_object()
         || cfquery
         || go_syntax.is_object()
         || shell_lint.is_object()
     {
         feedback["shell_lint"] = shell_lint;
     }
-    if feedback["schema_version"] == "0.15.0"
-        || rust_syntax.is_object()
+    if matches!(
+        feedback["schema_version"].as_str(),
+        Some("0.15.0" | "0.16.0")
+    ) || rust_syntax.is_object()
         || cfquery
         || go_syntax.is_object()
     {
         feedback["go_syntax"] = go_syntax;
     }
-    if feedback["schema_version"] == "0.15.0" || rust_syntax.is_object() {
+    if matches!(
+        feedback["schema_version"].as_str(),
+        Some("0.15.0" | "0.16.0")
+    ) || rust_syntax.is_object()
+    {
         feedback["rust_syntax"] = rust_syntax;
+    }
+    if feedback["schema_version"] == "0.16.0" {
+        feedback["erlang_lint"] = erlang_lint;
     }
     feedback
 }

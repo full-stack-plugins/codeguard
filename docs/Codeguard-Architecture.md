@@ -1196,3 +1196,6 @@ flowchart LR
     F --> H[Shared stable confirmation task]
     H --> I[Native confirmation or adapter decision]
 ```
+
+
+The Erlang project/edit path now applies native-first selection before bounded WASM structural fallback. Persistent task identity spans environment blockers, candidates and native rechecks; zero diagnostics alone do not close it. [Workflow and execution diagram](../tests/acceptance/erlang-form-workbench.md).
