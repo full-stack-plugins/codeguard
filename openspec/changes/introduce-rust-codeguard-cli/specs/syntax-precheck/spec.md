@@ -858,3 +858,13 @@ The native differential SHALL use the same frozen JavaScript binding worker as p
 #### Scenario: Native-invalid duplicate declaration has a combined candidate
 - **WHEN** a frozen direct lexical duplicate is rejected by the selected Node syntax observer but has no parser recovery
 - **THEN** the raw comparison remains false_negative, the combined comparison is true_positive with the project rule evidence, and no grammar qualification or delivery permission is issued
+
+### Requirement: Module-only return candidates SHALL use bounded AST facts and explicit mode
+
+The implementation SHALL derive return-outside-function facts from bounded AST traversal, including returns nested in control-flow blocks, and SHALL skip function declarations, expressions, generators, arrows and methods. Facts SHALL retain byte locations and incomplete traversal. The presence of these facts alone SHALL NOT classify CommonJS or unknown-mode input as invalid. Activation of a module-only candidate SHALL require an explicit applicable module context.
+
+#### Scenario: Returns in functions remain legal candidates
+- **WHEN** a JavaScript AST contains function, generator, arrow or method returns and an outer control-flow return
+- **THEN** only the return outside function boundaries is retained as an AST fact
+- **AND** record or traversal exhaustion remains visibly truncated
+- **AND** no grammar qualification, native completion or project delivery permission is granted

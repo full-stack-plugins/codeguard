@@ -177,3 +177,7 @@ Java差分验收先核对truncated_files，隐藏恢复保留unknown，避免空
 ## JavaScript 原生差分对齐项目结构候选
 
 开发差分现在复用项目检查的重复直接绑定 worker，报告0.9分别保留原始恢复与组合结构指标。真实 Node24.18.0 的18个额外 module 样例：原始5TP/11TN/0FP/2FN，组合6TP/11TN/0FP/1FN；重复绑定得到结构规则证据，顶层 module return 仍漏检。规则摘要和语言范围受 schema 约束；旧协议保持不变，旧0.4消费者拒绝新版本。此修正不新增发行资格、不改变固定358例指标，也不能对 CommonJS/未知模式无条件报顶层 return。独立holdout及正式资格仍未完成。见[局部验收](../tests/acceptance/javascript-native-project-binding.md)。
+
+## 模块 return 候选的 AST 事实基础
+
+runtime新增有界函数外return扫描：覆盖顶层控制流、跳过函数/生成器/箭头/方法子树、保留UTF-8字节位置和预算截断。真实Node24.18.0对11份源码在module/CommonJS下共22次对照，证明规则必须带模块模式条件。当前仅有事实层，公开worker/probe/项目模式/差分尚未接线，因此module_return仍漏检、资格0/32。见[局部验收](../tests/acceptance/javascript-module-return-ast.md)。

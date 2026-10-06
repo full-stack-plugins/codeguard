@@ -1936,3 +1936,7 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 ## 2026-10-06 JavaScript 原生差分复用项目绑定候选
 
 延续12.11/14.17/14.19，父任务不勾选。JavaScript原生差分复用项目直接重复绑定worker，raw与combined分开；报告0.9按语言/规则摘要约束，旧协议不变。受控RED→GREEN，相关四目标15通过/6条件忽略，真实Node24.18.0显式1通过：18例raw5TP/11TN/0FP/2FN，combined6TP/11TN/0FP/1FN。module_return仍漏检，不扩大到CommonJS/未知模式；固定358指标不变。实际schema与三种篡改/旧消费者拒绝、严格Clippy修复后通过。见tests/acceptance/javascript-native-project-binding.md。独立holdout/正式资格0/32及完整发布验收仍缺。
+
+## 2026-10-06 JavaScript 模块 return 的 AST 事实基础
+
+延续12.11/14.17/14.19，父任务不勾选。runtime新增有界函数外return事实，覆盖顶层控制流并跳过函数/生成器/箭头/方法子树；预算截断和字节位置真实保留。新API缺失RED后实现，四目标16通过/2条件忽略，实际Node24.18.0显式1通过（11源码、22次module/CommonJS对照），严格WASM runtime/all-targets Clippy通过。公共worker/probe/项目模式/差分尚未接线，module_return漏检统计不变；禁止未知模式自启。见tests/acceptance/javascript-module-return-ast.md。40cc624 CI37431391905仍失败于固定插件证据源码checkout，后续门禁未运行。
