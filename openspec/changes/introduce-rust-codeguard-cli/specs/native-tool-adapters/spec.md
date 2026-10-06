@@ -809,3 +809,15 @@ Rust SHALL interpret a versioned native Gradle configuration model per root/subp
 #### Scenario: Native configuration fails or the input changes
 - **WHEN** the selected-file native model probe fails, times out, is cancelled, exceeds its budget or observes changed source/tool/script identity
 - **THEN** no model SHALL be accepted as current; the result SHALL remain incomplete with a concrete recovery reason and no source violation
+
+### Requirement: Gradle Javadoc observations SHALL execute original native tasks without replacing documentation rules
+
+The Gradle Javadoc application service SHALL select enabled tasks by the official Javadoc implementation base class and an observed Java plugin, use fully qualified task paths, and preserve original doclint/doclet/access/source-set configuration. It MAY fix diagnostic JVM language in the private invocation. Native model capture and selected quality tasks SHALL share a single bounded offline Gradle invocation over the same immutable selected inputs. Unknown output, out-of-scope locations, unsupported JDK format, cancellation, tool/input changes and native execution failures SHALL remain incomplete rather than source violations or clean acceptance.
+
+#### Scenario: Empty parameter and return descriptions remain native findings
+- **WHEN** JDK21 reports missing descriptions for @param or @return in the selected source snapshot
+- **THEN** Gradle feedback preserves these native rule identities and exact validated locations, without widening historical standalone Javadoc protocols
+
+#### Scenario: Empty diagnostics do not prove detailed documentation compliance
+- **WHEN** native Gradle Javadoc emits no recognized diagnostics
+- **THEN** feedback remains empty_output_unverified with rule_configuration_complete=false and coverage_proven=false; public repair integration and full detailed documentation acceptance remain separate obligations

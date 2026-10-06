@@ -449,3 +449,12 @@ pub use gradle_checker_task::GradleCheckerTask;
 pub use gradle_project_checker_model::GradleProjectCheckerModel;
 pub use gradle_checker_model::GradleCheckerModel;
 pub use gradle_checker_model_parser::parse_gradle_checker_model;
+
+mod gradle_javadoc_task_plan;
+mod gradle_javadoc_plan;
+mod gradle_javadoc_diagnostic;
+mod gradle_javadoc_output;
+pub use gradle_javadoc_task_plan::GradleJavadocTaskPlan;
+pub use gradle_javadoc_plan::plan_gradle_javadoc_tasks;
+pub use gradle_javadoc_diagnostic::GradleJavadocDiagnostic;
+pub use gradle_javadoc_output::parse_gradle_javadoc_output;

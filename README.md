@@ -998,3 +998,10 @@ Static discovery now retains every Maven/Groovy-Gradle/Kotlin-Gradle configurati
 ### Gradle configuration observation in the development CLI
 
 `check java` and `check all` accept `--gradle-bundle`, `--java-home` and repeatable `--gradle-project-file` options to observe explicitly selected build inputs with an existing Gradle distribution. The shared scheduler handles timeout/cancellation. Check feedback0.62 preserves the partial model separately from quality results; `lint all` rejects the options. A successful model does not establish full configuration coverage or execute quality/vulnerability tasks. See [command reference](docs/Codeguard-Command-Reference.md) and [acceptance](tests/acceptance/gradle-public-model-check.md). No npm release or production qualification is claimed.
+
+
+### Gradle native Javadoc application service (partial development capability)
+
+`gradle_javadoc_probe::observe` captures the native model and reruns enabled official Javadoc tasks in one offline Gradle invocation. It preserves project doclint/doclet/access/source-set settings and fixes only the diagnostic JVM language. Rust validates selected source bytes and diagnostic locations; native failures, unknown diagnostics and input changes remain incomplete. Four observations within one real Gradle 8.10.2/JDK21 conditional test produce 3 missing-comment, 2 missing-tag, 2 empty-description, and 0 diagnostics. These are not an independent precision corpus or production acceptance. Empty output remains `empty_output_unverified` with `rule_configuration_complete=false` and `coverage_proven=false`.
+
+This internal service is not connected to public check quality tasks, agent feedback or repair closure. Existing check_feedback 0.62 still carries only the Gradle configuration model. Complete detailed documentation rules, JDK/source closure, multi-project/custom-doclet cases, both Maven/Gradle paths and per-language acceptance remain open. See [Gradle Javadoc acceptance](tests/acceptance/gradle-native-javadoc.md).
