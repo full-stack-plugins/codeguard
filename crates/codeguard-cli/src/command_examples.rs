@@ -19,6 +19,7 @@ pub(crate) fn examples(command: &str) -> &'static [&'static str] {
             "codeguard comments rust . --cargo-tool /absolute/cargo --format json",
         ],
         "task verify" => &[
+            "codeguard task verify TASK_ID . --java-home /absolute/jdk21 --format json",
             "codeguard task verify TASK_ID . --rustfmt-tool /absolute/toolchain/bin/rustfmt --format json",
             "codeguard task verify TASK_ID . --go-tool /absolute/sdk/bin/go --format json",
             "codeguard task verify TASK_ID . --erl-tool /absolute/erl --format json",

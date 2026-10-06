@@ -509,6 +509,7 @@ fn import_one(
                     | "eslint_preparation_observation"
                     | "java_checkstyle_workbench_observation"
                     | "javadoc_workbench_observation"
+                    | "javadoc_task_recheck"
                     | "checkstyle_task_recheck"
                     | "checkstyle_preparation_observation"
                     | "checkstyle_preparation_recheck"
@@ -692,6 +693,10 @@ fn parse_report(
     }
     if report["report_type"] == "rust_clippy_local_observation" {
         return parse_rust_report(root, workspace_id, path, report, digest);
+    }
+    #[cfg(unix)]
+    if report["report_type"] == "javadoc_task_recheck" {
+        return javadoc_report::parse_recheck(root, workspace_id, path, report, digest);
     }
     #[cfg(unix)]
     if report["report_type"] == "javadoc_workbench_observation" {
@@ -2115,7 +2120,7 @@ fn persist_local_blocker_observation(
 fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
     if blocker.checker_id == "java.jdk.javadoc" {
         return format!(
-            "# {} Javadoc 准备任务\n\n- 问题证据：原因 {}，范围 {}；报告 {}，摘要 {}。\n- 规则依据：原配置与完整原生观察前置；不是源码违规，不自动成为交付义务。\n- 允许范围：JDK21、原配置和环境，不能反复修改无关源码。\n- 修复步骤：核对配置和原工具版本，恢复适用检查能力。\n- 复检命令：codeguard comments java . --java-home <已核验JDK21绝对路径> --format json。\n- 历史尝试：首次run {}；用task attempt记录失败和具体诊断。\n- 关闭条件：原工具完整复检及可信策略；task verify适配待接通，安装、勾选或局部成功不关闭。\n",
+            "# {} Javadoc 准备任务\n\n- 问题证据：原因 {}，范围 {}；报告 {}，摘要 {}。\n- 规则依据：原配置与完整原生观察前置；不是源码违规，不自动成为交付义务。\n- 允许范围：JDK21、原配置和环境，不能反复修改无关源码。\n- 修复步骤：核对配置和原工具版本，恢复适用检查能力。\n- 复检命令：codeguard task verify {0} . --java-home <已核验JDK21绝对路径> --format json。\n- 历史尝试：首次run {}；用task attempt记录失败和具体诊断。\n- 关闭条件：原工具完整复检及可信策略；可信关闭仍待验证，安装、勾选或局部成功不关闭。\n",
             blocker.id, blocker.reason, blocker.scope, report.run_id, report.digest, report.run_id
         );
     }
@@ -2382,7 +2387,7 @@ fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
 fn render_task(report: &ReportInput, finding: &FindingInput) -> String {
     if finding.checker_id == "java.jdk.javadoc" {
         return format!(
-            "# {} Javadoc 修复任务\n\n- 问题证据：原生规则 {}，首次行 {}；报告 {}，摘要 {}。\n- 规则依据：JDK21 Javadoc 原生注释和标签检查；项目政策未核验。\n- 允许范围：仅目标源码 {}，禁止关闭规则替代修复。\n- 修复步骤：核对API契约，补类、公共构造函数、参数、返回或异常文档；误报提交精确纠错。\n- 复检命令：codeguard comments java . --java-home <已核验JDK21绝对路径> --format json。\n- 历史尝试：首次run {}；后续观察保存到同一问题，task attempt记录尝试。\n- 关闭条件：原工具完整复检及可信策略；task verify适配尚未接通，零诊断与勾选不能关闭。\n",
+            "# {} Javadoc 修复任务\n\n- 问题证据：原生规则 {}，首次行 {}；报告 {}，摘要 {}。\n- 规则依据：JDK21 Javadoc 原生注释和标签检查；项目政策未核验。\n- 允许范围：仅目标源码 {}，禁止关闭规则替代修复。\n- 修复步骤：核对API契约，补类、公共构造函数、参数、返回或异常文档；误报提交精确纠错。\n- 复检命令：codeguard task verify {0} . --java-home <已核验JDK21绝对路径> --format json。\n- 历史尝试：首次run {}；后续观察保存到同一问题，task attempt记录尝试。\n- 关闭条件：原工具完整复检及可信策略；可信关闭尚未验收，零诊断与勾选不能关闭。\n",
             finding.id,
             finding.rule_id,
             finding.line,

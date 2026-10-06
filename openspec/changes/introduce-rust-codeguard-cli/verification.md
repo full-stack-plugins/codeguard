@@ -2488,3 +2488,7 @@ WASM CLI全目标Clippy -D warnings、定向rustfmt、分层、OpenSpec strict�
 ## 2026-10-06 Javadoc 项目工作台
 
 已初始化Java项目JDK模式接通持久观察、稳定任务及next反馈。五个回归目标46通过/0失败/17条件忽略；真实已有JDK21项目目标另行1通过，与忽略项重叠。修复后局部零诊断保留历史任务open。3份新schema、实际包装/next及观察报告验证通过，严格Clippy、分层、OpenSpec通过。Maven、单文件工作台及task verify仍未接通，父任务不勾选。见 tests/acceptance/javadoc-project-workbench.md。
+
+## 2026-10-06 Javadoc 原任务复检
+
+七个受影响回归目标81通过/0失败/28条件忽略；真实已有JDK21原任务复检目标另行1通过，和忽略项重叠。原问题仍在、补齐注释后的局部消失、配置改变、缺工具分别记录局部结果，保持open。4份新schema及实际项目包装、next、四轮公开复检/原生容器通过schema，严格Clippy、分层、OpenSpec通过。未证明可信关闭、宿主或全语言交付。见 tests/acceptance/javadoc-task-recheck.md。

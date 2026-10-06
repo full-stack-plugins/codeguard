@@ -253,3 +253,38 @@ fn exact_keys(value: &Value, keys: &[&str]) -> bool {
         .as_object()
         .is_some_and(|o| o.len() == keys.len() && keys.iter().all(|k| o.contains_key(*k)))
 }
+
+/// 导入复检容器中的当前观察，失败复检只保留原任务事件，不造源码事实。
+pub(super) fn parse_recheck(
+    root: &Path,
+    workspace: &str,
+    path: &Path,
+    report: &Value,
+    digest: String,
+) -> Result<ReportInput, &'static str> {
+    if !crate::javadoc_task_recheck::valid_shape(report)
+        || report["workspace_id"] != workspace
+        || report["run_id"].as_str() != path.file_stem().and_then(|s| s.to_str())
+    {
+        return Err("javadoc_recheck_identity_invalid");
+    }
+    if report["scan"].is_null() {
+        return Ok(ReportInput {
+            workspace_id: workspace.into(),
+            run_id: report["run_id"]
+                .as_str()
+                .ok_or("javadoc_run_invalid")?
+                .into(),
+            digest,
+            findings: Vec::new(),
+            blockers: Vec::new(),
+            historical_findings: 0,
+        });
+    }
+    if report["task_input_stable"] == true
+        && !crate::javadoc_task_recheck::inputs_current(root, report)
+    {
+        return Err("javadoc_recheck_input_changed");
+    }
+    parse(root, workspace, path, &report["scan"], digest)
+}
