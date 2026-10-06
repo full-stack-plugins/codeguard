@@ -523,3 +523,6 @@ pub mod java_gradle_cve_command;
 
 #[cfg(unix)]
 mod gradle_module_cache;
+
+#[cfg(unix)]
+mod gradle_owasp_report_budget;

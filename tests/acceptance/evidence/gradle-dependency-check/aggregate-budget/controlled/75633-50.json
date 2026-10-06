@@ -1,0 +1,27 @@
+{
+  "authority": "local_unverified",
+  "checker_id": "java.gradle.dependency_check",
+  "coverage_proven": false,
+  "database_freshness_verified": false,
+  "delivery_decision": "not_evaluated",
+  "dependency_attribution_verified": false,
+  "dependency_cache_sha256": null,
+  "gradle_bundle_sha256": "ad87a7fef00e7b6bb65fdc83c69da32ce633f4d82c6bc45dfe9f4f7b590d62aa",
+  "init_scripts_sha256": "384b54fad544562d01b2931612ae38cdf3bb60a30bb6dbf41d18bcd7581ad6df",
+  "java_entry_sha256": "430786dda544af57cee67ff74709ace9dd922e08e0a6f36d56921b7b82088672",
+  "jdk_release_sha256": "de3b2cd7580150641e86a183a24483372a6ba524b5dcd2a622cce5b44f7f3e51",
+  "model_report_sha256": "685c17e5917bca36a88f23c16faf6c6d0ec1c1a8062db795f3e6912b74568f17",
+  "native_exit_code": 0,
+  "native_status": "incomplete",
+  "native_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "native_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "ownership_report_sha256": "8b7feca7499075d5754d470d5c079da55669b0a2d0a8c2d5512dcffb5d057324",
+  "reason": "gradle_owasp_native_report_attribution_unresolved",
+  "report_type": "gradle_dependency_check_probe",
+  "reports": [],
+  "schema_version": "0.2.0",
+  "source_snapshot_sha256": "81e7352b015b67522ad07a095bb22e2c89c20e85864beb7ad49aab72d2ccd342",
+  "task_paths": [
+    ":dependencyCheckAnalyze"
+  ]
+}

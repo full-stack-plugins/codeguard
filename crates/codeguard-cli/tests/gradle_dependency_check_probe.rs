@@ -535,3 +535,93 @@ fn public_sigint_returns_cancelled_feedback_without_quality_acceptance() {
         fs::write(path, serde_json::to_vec_pretty(&feedback).unwrap()).unwrap();
     }
 }
+
+fn multi_report_fixture(native_reports: &[Value]) -> (Fixture, Request) {
+    let mut native_model = model();
+    native_model["projects"][0]["tasks"] = json!([]);
+    let mut owner = ownership();
+    owner["tasks"] = json!([]);
+    let mut writes = String::new();
+    let mut tasks = Vec::new();
+    for (index, native_report) in native_reports.iter().enumerate() {
+        let task = format!(":scan{index}");
+        let path = format!("build/scan{index}/dependency-check-report.json");
+        native_model["projects"][0]["tasks"].as_array_mut().unwrap().push(json!({"name":format!("scan{index}"),"implementation":"org.owasp.dependencycheck.gradle.tasks.Analyze","enabled":true}));
+        owner["tasks"].as_array_mut().unwrap().push(json!({"project_path":":","task_path":task,"implementation":"org.owasp.dependencycheck.gradle.tasks.Analyze","report_project_name":"root project 'sample'","report_path":path}));
+        writes +=
+            &format!("mkdir -p build/scan{index}\ncat > {path} <<'JSON'\n{native_report}\nJSON\n");
+        tasks.push(task);
+    }
+    let fixture = Fixture::new(&script(
+        &native_model,
+        &owner,
+        &report(),
+        &(writes + "exit 0"),
+    ));
+    let mut request = fixture.request();
+    request.task_paths = tasks;
+    (fixture, request)
+}
+
+#[test]
+fn aggregate_report_bytes_and_advisories_cannot_escape_per_file_limits() {
+    for (name, native_reports) in [
+        ("bytes", {
+            let mut sample = report();
+            sample["padding"] = "x".repeat(6 * 1024 * 1024).into();
+            vec![sample; 3]
+        }),
+        ("advisories", {
+            let mut sample = report();
+            sample["dependencies"][0]["suppressedVulnerabilities"] = json!([]);
+            sample["dependencies"][0]["vulnerabilities"] = json!(
+                (0..501)
+                    .map(|index| json!({"source":"NVD","name":format!("CVE-2020-{index:04}")}))
+                    .collect::<Vec<_>>()
+            );
+            vec![sample; 2]
+        }),
+    ] {
+        let (_fixture, request) = multi_report_fixture(&native_reports);
+        let out = observe(&request, &AtomicBool::new(false));
+        assert_eq!(out["native_status"], "incomplete", "{name}: {out}");
+        assert_eq!(out["reason"], "gradle_owasp_report_budget_exceeded");
+        assert!(out["reports"].as_array().unwrap().is_empty());
+        assert_no_acceptance(&out);
+    }
+}
+
+#[test]
+fn repeated_package_ids_cannot_expand_feedback_beyond_aggregate_budget() {
+    let mut sample = report();
+    sample["dependencies"][0]["packages"] = json!(
+        (0..32)
+            .map(|index| json!({"id":format!("pkg:maven/{index}/{}@1","x".repeat(480))}))
+            .collect::<Vec<_>>()
+    );
+    sample["dependencies"][0]["suppressedVulnerabilities"] = json!([]);
+    sample["dependencies"][0]["vulnerabilities"] = json!(
+        (0..200)
+            .map(|index| json!({"source":"NVD","name":format!("CVE-2020-{index:04}")}))
+            .collect::<Vec<_>>()
+    );
+    let (_fixture, request) = multi_report_fixture(&[sample]);
+    let out = observe(&request, &AtomicBool::new(false));
+    assert_eq!(out["reason"], "gradle_owasp_report_budget_exceeded");
+    assert_no_acceptance(&out);
+}
+
+#[test]
+fn below_budget_multiple_reports_keep_every_task_and_suppressed_observation() {
+    let (_fixture, request) = multi_report_fixture(&[report(), report()]);
+    let out = observe(&request, &AtomicBool::new(false));
+    assert_eq!(out["native_status"], "reports_observed_unverified");
+    let reports = out["reports"].as_array().unwrap();
+    assert_eq!(reports.len(), 2);
+    for (index, row) in reports.iter().enumerate() {
+        assert_eq!(row["task_path"], format!(":scan{index}"));
+        assert_eq!(row["advisories"].as_array().unwrap().len(), 2);
+        assert_eq!(row["advisories"][1]["suppressed_by_native_tool"], true);
+    }
+    assert_no_acceptance(&out);
+}

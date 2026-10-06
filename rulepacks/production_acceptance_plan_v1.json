@@ -19,12 +19,13 @@
     "crates/codeguard-cli/src/erlang_lint_command.rs": "0a223cbcd09923140a75c1b147f50e241adb5e722ee674e8bea0968921f76a37",
     "crates/codeguard-cli/src/eslint_lint_command.rs": "d89fd7c1da69c083beebabe3dca6222d3bb7247a558ea4c1e8caab930596ea2d",
     "crates/codeguard-cli/src/go_lint_command.rs": "34482e8c77d1ec997edcb1a4f912c997736b2848a784495850d2c9f2c7d7e800",
-    "crates/codeguard-cli/src/gradle_dependency_check_probe.rs": "773addd9d74f2b5b2ab1551a31bd10c48e9fcbf0abf2c8e21ac90c88fa1a3fb3",
+    "crates/codeguard-cli/src/gradle_dependency_check_probe.rs": "629b5acfbfce236fe6e64866a4fca3cfd06b2a8961b6f3e77f93d5e544bd0bca",
     "crates/codeguard-cli/src/gradle_javadoc_task_recheck.rs": "0ffc0b45d197892862b5336bb2d85432233ded3033e6c2444b603589dc949bd3",
     "crates/codeguard-cli/src/gradle_module_cache.rs": "5489b87236a0d7567225ebc6fcb34f368733e2a643c22ab5632b6142499128e6",
+    "crates/codeguard-cli/src/gradle_owasp_report_budget.rs": "55756e926335d8652005c88f993173f2fb053ca8a0f659d35b88efbf0a5d7985",
     "crates/codeguard-cli/src/grammar_native_checker.rs": "87f2f8a19ca1fc6016dd1d4affac87cd824a8d60f497479b2d94aeaf317548f6",
     "crates/codeguard-cli/src/java_cve_scan.rs": "98d4793d27c3b4d912b983c6a996a8ee8128bae97fe7ef0aa0f6375ed3c9d437",
-    "crates/codeguard-cli/src/java_gradle_cve_command.rs": "c36e9f3c1e510032ddaf2365d5842727922c6d98934104527d33116a8b6e8b33",
+    "crates/codeguard-cli/src/java_gradle_cve_command.rs": "f05001d10b1b60f2b54f57a305204b12e60f1d78ecccccdc4e891566fb0f05b4",
     "crates/codeguard-cli/src/java_p3c_scan.rs": "36e022ba1f7c157ff52a2839287d9b8497c9bdd5583212128a81df95f5fcf69e",
     "crates/codeguard-cli/src/javascript_syntax_probe.rs": "4ba09a558662332e953e89512d386642653d5cc59dd1336f8ec31b51137731e1",
     "crates/codeguard-cli/src/kotlin_lint_command.rs": "f19e0babe23cc3cce52d69d6821416d6b9fdd7b6d8b484d3413e1368fef05ad8",
@@ -50,6 +51,7 @@
     "tests/acceptance/go-vet-json-local-probe.md": "907da8741a05e6d3321567cf0d2c9581e04954a6d2b6f7d749f2791d453ae379",
     "tests/acceptance/gradle-dependency-check-probe.md": "cc8108e6362e6520514a6f339d2663cd3b0b219a6de8e4b5d510e6ed91d1f4d6",
     "tests/acceptance/gradle-javadoc-public-task-recheck.md": "cf8e14b866599424f70d17af8302c7e7e8540d375de63939b2b482a0708849a2",
+    "tests/acceptance/gradle-owasp-aggregate-budget.md": "e3931c23aa163e164a5dc4a4ffb8c785f56a21c8d44885c262c42eb7a4726724",
     "tests/acceptance/java-native-differential.md": "6be7abb2e2129409ce619c53875c845bad1c6e4f3ded6b6f86b85608106cf906",
     "tests/acceptance/java-p3c-cli-native-local.md": "e0d8d4b15c867d2dc5dbafd7ba26e034bc0d11d793530466af576f43fe1690b7",
     "tests/acceptance/kotlin-native-differential.md": "8273d9303d68d4e4e8fa4fe17828fa0e74760aa1d9c02c70d68b89510317deaf",
@@ -262,10 +264,12 @@
                 "crates/codeguard-cli/src/gradle_dependency_check_probe.rs",
                 "crates/codeguard-cli/src/gradle_module_cache.rs",
                 "crates/codeguard-adapters/src/gradle_dependency_check_plan.rs",
-                "crates/codeguard-adapters/src/gradle_owasp_report_ownership_parser.rs"
+                "crates/codeguard-adapters/src/gradle_owasp_report_ownership_parser.rs",
+                "crates/codeguard-cli/src/gradle_owasp_report_budget.rs"
               ],
               "evidence_refs": [
-                "tests/acceptance/gradle-dependency-check-probe.md"
+                "tests/acceptance/gradle-dependency-check-probe.md",
+                "tests/acceptance/gradle-owasp-aggregate-budget.md"
               ],
               "blockers": [
                 "真实OWASP有/无漏洞原生扫描、插件缓存闭包、漏洞库时效和完整依赖归属仍待验收；受控报告和实际缺插件阻塞不能授予资格",
