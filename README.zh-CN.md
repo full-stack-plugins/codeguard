@@ -813,3 +813,5 @@ Rust编辑后现提供可执行的批次后Clippy指令，明确编辑阶段未�
 Rust 原生首次与 WASM 首次语法任务均可通过同一受保护宿主 SDK 确认、限定关闭和同工具复发重开。原生首次保留 grammar=null（策略1.7/证据0.8）；WASM 首次保留真实 grammar 摘要（策略1.8/证据0.9）。两者绑定 Cargo edition 来源与原反例；原生反证转调查，未完成或输入变化不能关闭。生产宿主批准接线仍待完成，不替代 Clippy/项目门禁。详见 [限定验收](tests/acceptance/rust-task-resolution.md)。
 
 WASM 首次闭环的实际执行路径、协议与误报分流见 [验收记录](tests/acceptance/rust-wasm-task-resolution.md)。
+
+JavaScript 回退候选已接入项目检查与确认编辑 Hook：重复顶层简单 let/const 绑定保留独立结构证据，沿用同一 ESLint 确认任务，并由 `next` 指导原生检查。这是有界候选能力；独立 lint 接线、真实宿主验收与 grammar 资格仍未完成。见[验收](tests/acceptance/javascript-binding-workbench.md)。

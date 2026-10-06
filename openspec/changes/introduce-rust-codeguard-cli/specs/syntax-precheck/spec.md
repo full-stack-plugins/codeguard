@@ -811,3 +811,10 @@ Project Rust parser selection SHALL distinguish package edition, explicit worksp
 #### Scenario: Explicit probe exposes a bounded duplicate binding candidate
 - **WHEN** `grammar probe javascript FILE`观察到重复直接简单lexical绑定
 - **THEN** SHALL 输出独立版本化结构候选及固定规则配置摘要，保留原始恢复、grammar未验收和退出3，要求适用原生工具确认；旧版本消费者不猜成原生违规或普通通过。项目check/Hook/任务接线须分别验收，不能借probe结果宣称完成
+
+#### Scenario: JavaScript direct binding candidates reuse the project and edit confirmation task
+- **WHEN** an initialized workspace contains duplicate direct simple JavaScript lexical bindings outside proven native coverage
+- **THEN** project and confirmed edit checks SHALL preserve structural observations separately from parser recoveries and sync the same ESLint confirmation task
+- **AND** next SHALL identify the bounded candidate rule and require applicable native checking with the original dialect and configuration
+- **AND** a later candidate observation without duplicates SHALL NOT close the existing task
+- **AND** forged rule, grammar, position or cross-language protocol identities SHALL be rejected by the report importer

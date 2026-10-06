@@ -5,7 +5,7 @@ use crate::go_lint_command::selected_sources_for_candidate;
 use crate::grammar_probe_command::read_plain_source;
 use crate::grammar_route::route_source;
 use crate::syntax_worker_candidate_observation::SyntaxWorkerCandidateObservation;
-use crate::syntax_worker_runner::run_syntax_worker_candidate;
+use crate::syntax_worker_runner::{run_syntax_worker_candidate, run_syntax_worker_binding_candidate};
 use codeguard_adapters::bundled_grammar_metadata;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
@@ -249,7 +249,12 @@ pub(crate) fn observe_selected(
                         unreachable!("worker index must refer to a prepared job")
                     };
                     scope.spawn(|| {
-                        run_syntax_worker_candidate(
+                        let run = if job.language == "javascript" {
+                            run_syntax_worker_binding_candidate
+                        } else {
+                            run_syntax_worker_candidate
+                        };
+                        run(
                             &executable,
                             job.language,
                             &job.relative,

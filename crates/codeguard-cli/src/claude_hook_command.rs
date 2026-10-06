@@ -398,6 +398,7 @@ fn summarize(path: &str, report: &Value) -> String {
                 "codeguard.python.required_suite"
                     | "codeguard.go.required_package"
                     | "codeguard.cfquery.distinct_projection"
+                    | "codeguard.javascript.duplicate_direct_lexical_binding"
             )
         })
         .collect::<std::collections::BTreeSet<_>>();

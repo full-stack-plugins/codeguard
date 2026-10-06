@@ -2394,3 +2394,11 @@ Clippy 现在在原生执行前冻结已观察源码及根配置/锁的字节或
 208 schema 元定义、真实宿主两份原生 wrapper 与内部 native scan 通过历史协议；Swift 5 项、无定位 4 项开发 schema 回归通过。当前开发二进制的独立首次 next/task show 捕获明确不是实际宿主新版本安装；公开包、插件锁、grammar 字节/资格不变。完整目标与父任务仍开放。
 
 本批首次准备简报 0.7.0 与聚合反馈 0.40.0 正式分版本；task show 外层动作保留同一工具参数。最终 WASM 两目标 22 passed、另五目标 44 passed/5 ignored；默认两目标 11 passed，与同名契约重叠不相加。默认/WASM 全目标 Clippy、fmt、分层、strict 验证通过；210 schema 元定义、208 历史字节、13 开发协议测试与 705 本地链接通过。旧非法报告只留 RED 证据；原生条件未运行不当作通过。实际宿主公开包与开发修正版本分开，日志身份见[本批验收](../../../tests/acceptance/claude-host-prepared-runtime.md)。4d620f7 远端 CI 37198192252 已 success，本批新修改不借用该成功。完整父任务、grammar 资格、其它宿主、可信关闭及发行继续未完成，未新增勾选。
+
+## 2026-10-06 JavaScript 项目候选与稳定任务接线
+
+原生优先后接通直接简单lexical重复绑定的项目检查、确认编辑Hook、稳定ESLint确认任务和具体next指引；新协议0.54/0.13/0.27/0.20均保持旧schema不改。端到端RED后验证同ID归并、四种伪造报告导入拒绝及后续候选干净不关闭；Claude CLI摘要显示固定规则，不作为实际宿主验收。八目标79 passed/0 failed/3 ignored；随后增加Claude摘要断言的端到端1 passed与前者重叠。365 schema元定义、5实际输出和5语义伪造变体通过；WASM及默认全目标Clippy -D warnings、格式/分层/OpenSpec strict通过。报告选择等价条件按Clippy修正，最终契约回归另记录。
+
+[验收与合成工作区实际报告](../../../tests/acceptance/javascript-binding-workbench.md)。完整默认工作区/358例/语言资格/真实宿主/独立lint/公开发布未在本批完成，父任务保留开放，受保护Erlang草稿保持原字节。已知远端插件source审计阻塞不由本批规避。
+
+最终源代码下新增端到端与next/work sync契约三目标：27 passed/0 failed/2 ignored。与前述目标有重叠，不累加为整体覆盖。
