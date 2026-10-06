@@ -376,3 +376,7 @@ syntax-precheck的隐藏token场景→9.3/9.9/14.7/14.10/14.11/14.19：check all
 
 
 Rust独立lint原生优先及工作台→2.1/2.7/7.3/9.9/14.9–14.11/14.19：复用聚合原生服务、稳定任务和原工具复检，缺Cargo有界WASM初检，显式失败不回退；Rust简报专用schema和help0.2以实际报告验证。完整构建/政策/资格/宿主/发布未完成，证据见[验收](../../../tests/acceptance/rust-standalone-lint.md)。
+
+## 四类核心生产门槛补充（2026-10-06）
+
+用户明确要求各语言的语法、详细文档注释、开发规范与漏洞检查全部生产就绪。新增 Requirement 位于 native-tool-adapters / Every registered language SHALL qualify all four core production capabilities，映射任务15.1–15.7；执行复用6.x/7.x/8.x、9.x/10.x/11.x/12.x，不另建规格事实源。57个canonical条目均纳入目标；当前32个WASM运行与0个正式资格分别报告，planned条目仍是未完成目标。Java漏洞路径必须分别验收Maven/Gradle。本文M3原有planned保留说明是历史迁移状态，不构成本次生产目标的豁免。任何未验收核心单元不得投影为已生产就绪。

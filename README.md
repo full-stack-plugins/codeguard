@@ -980,3 +980,24 @@ Other-category history remains stored, but this invocation does not select its r
 `lint all` selects next within the allowed lint checker set in one local-fact validation pass. Historical build/CVE/comments tasks do not hide valid lint guidance and remain stored. Syntax-confirmation fallback selects only task IDs produced by this invocation.
 
 The WASM regression for source 29ec2e1 completed: foundation crates plus CLI lib/bins and 201 integration targets produced 1,879 passes, zero failures and 177 conditional tests not executed. The uncommitted Erlang draft was explicitly excluded. Strict Clippy passed. This does not qualify independent corpora, the full native-tool matrix, hosts or publication. See tests/acceptance/wasm-regression-29ec2e1.md; all 32 grammars remain candidates with zero formally qualified.
+
+## Core production acceptance and declared-module integration
+
+The production target now requires all 57 canonical language entries to qualify syntax, detailed documentation comments, development conventions and vulnerability checking. Historical planned entries remain unfinished targets. Java must qualify both Maven and Gradle vulnerability paths, detailed Javadoc and native P3C. A configured tool, runnable WASM or mocked test does not establish qualification. Independent labelled evaluation, supported versions/builds/platforms and the complete native repair/recheck/reopen path are mandatory; current formal WASM qualification remains 0/32. See OpenSpec tasks15.1–15.7.
+
+Current source integrates declared JavaScript module evidence into project checks, standalone `lint typescript`, `lint all` and file-edit feedback. Applicable native ESLint retains priority. Uncovered whole-file `.mjs` and explicitly module-typed `.js` use the module candidate worker, while CommonJS/unknown modes keep their existing precheck and never activate the outer-return module rule. Source and mode evidence are rechecked after worker execution. Persisted confirmation0.15, check0.60, ESLint feedback0.7, hook0.29/fast0.17 and module repair brief0.21 retain separate versioned contracts. Module context changes prevent native task recheck from reusing the old package boundary. Repeated checks reuse stable tasks; clean candidates cannot close them. No new npm/host publication or production qualification is claimed. See [integration acceptance](tests/acceptance/javascript-module-workbench.md).
+
+```mermaid
+flowchart LR
+    A[Project lint or edit request] --> B{Applicable native ESLint}
+    B -->|Available| C[Original native checks]
+    B -->|Unavailable or uncovered| D[Observe source and declared mode]
+    D -->|Module| E[Module WASM candidate worker]
+    D -->|CommonJS or unknown| F[Existing bounded precheck]
+    E --> G[Recheck source and mode evidence]
+    F --> H[Incomplete precheck feedback]
+    G -->|Changed| H
+    G -->|Stable| I[Evidence-bound stable confirmation task]
+    I --> J[Agent feedback and original native verification]
+    J --> K[Closure requires accepted native repair evidence]
+```

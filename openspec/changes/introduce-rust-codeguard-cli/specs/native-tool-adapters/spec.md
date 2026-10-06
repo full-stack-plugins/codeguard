@@ -759,3 +759,31 @@ Rust npm审计适配 MUST 核对具体原工具版本、auditReportVersion、冻
 #### Scenario: Aggregate check selects an existing Clippy repair brief
 - **WHEN** a bound project check selects the existing typed rust.cargo_clippy next brief
 - **THEN** a new aggregate protocol version references its dedicated closed schema; historical aggregate schemas remain unchanged, and actual reports must validate without dropping the sibling task or making next an arbitrary object
+
+### Requirement: Every registered language SHALL qualify all four core production capabilities
+
+Codeguard SHALL target every one of the 57 canonical registry entries for production qualification of syntax, documentation comments, development conventions and vulnerability checking. The historical stable/planned labels SHALL NOT establish qualification or exclude an entry from this target. Qualification SHALL be recorded per language, supported version/dialect, build ecosystem and advertised platform, with reproducible real-tool and end-to-end acceptance evidence. A candidate asset, formatter-only adapter, configured tool, zero findings, mocked process or passed unit suite SHALL NOT establish production readiness. Missing implementations SHALL remain explicit release blockers. These four capabilities SHALL supplement, not replace, existing dependency/security/build requirements.
+
+#### Scenario: All bundled parsers execute but native checks remain incomplete
+- **WHEN** all 32 bundled WASM assets execute and one language lacks its accepted native syntax checker
+- **THEN** that language SHALL remain unqualified and the all-language production claim SHALL be rejected
+
+#### Scenario: Documentation exists but required contract details are absent
+- **WHEN** a required public API comment lacks the applicable purpose, parameter, return, error or behavioral-contract description
+- **THEN** the configured documentation checker SHALL report the precise missing requirement with native rule/location evidence, generate a stable repair task and require original-tool verification; an empty comment or bare tag SHALL NOT satisfy the detailed-documentation policy
+
+#### Scenario: A project convention engine has no complete native integration
+- **WHEN** Java P3C or another language's applicable native convention checker lacks configuration discovery, execution, diagnosis interpretation or repair verification
+- **THEN** that convention capability SHALL remain unqualified; a formatter or generic syntax result SHALL NOT replace its acceptance
+
+#### Scenario: Java vulnerability checking supports only one build ecosystem
+- **WHEN** Maven vulnerability checking is implemented but Gradle vulnerability checking is not
+- **THEN** Java's required Maven-and-Gradle production coverage SHALL remain incomplete; each build path SHALL independently bind its resolved dependencies, vulnerability-source identity/freshness, native advisories and remediation verification
+
+#### Scenario: A language has no standalone dependency manifest
+- **WHEN** source files share a dependency ecosystem or have no directly applicable package coordinates
+- **THEN** Codeguard SHALL identify the actual project/build dependency scope and document the justified applicability boundary; unsupported scanning SHALL NOT become a fabricated clean result or automatically approved exclusion
+
+#### Scenario: A release makes an all-language production claim
+- **WHEN** Codeguard requests production release acceptance
+- **THEN** the gate SHALL require every claimed language/version/build/platform row to pass all four core capabilities, independent precision/recall and failure-mode evaluation, persistent repair/recheck/reopen behavior and installed host feedback; unresolved rows SHALL block that claim

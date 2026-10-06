@@ -31,7 +31,9 @@ pub(super) fn parse(
             fingerprint: report["fingerprint"].as_str().unwrap().into(),
             reason: report["reason_code"].as_str().unwrap().into(),
             diagnostic_reason: Some(
-                if report["schema_version"] == "0.14.0" {
+                if report["schema_version"] == "0.15.0" {
+                    "javascript_module_context_candidate"
+                } else if report["schema_version"] == "0.14.0" {
                     "erlang_form_terminator_candidate"
                 } else if report["schema_version"] == "0.13.0" {
                     "javascript_direct_binding_candidate"

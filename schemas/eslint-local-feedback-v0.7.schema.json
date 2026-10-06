@@ -1,0 +1,416 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:eslint-local-feedback:0.6.0",
+  "title": "Incomplete JavaScript fallback feedback using shared project observations",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "status",
+    "local_coherent",
+    "coverage_proven",
+    "delivery_decision",
+    "reason",
+    "findings",
+    "suppressed_count",
+    "workbench_status",
+    "workbench",
+    "native",
+    "setup",
+    "next_action",
+    "syntax_candidates",
+    "syntax_tasks"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.7.0"
+    },
+    "report_type": {
+      "const": "eslint_local_feedback"
+    },
+    "status": {
+      "const": "incomplete"
+    },
+    "local_coherent": {
+      "const": false
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "reason": {
+      "enum": [
+        "eslint_execution_context_missing",
+        "request_cancelled"
+      ]
+    },
+    "findings": {
+      "const": []
+    },
+    "suppressed_count": {
+      "const": 0
+    },
+    "workbench_status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workbench": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "minLength": 1
+            },
+            "task_id": {
+              "type": "string",
+              "pattern": "^CG-B-[0-9a-f]{32}$"
+            }
+          }
+        }
+      ]
+    },
+    "native": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason"
+      ],
+      "properties": {
+        "status": {
+          "const": "not_run"
+        },
+        "reason": {
+          "const": "explicit_context_missing"
+        }
+      }
+    },
+    "setup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement",
+        "reason",
+        "task_id"
+      ],
+      "properties": {
+        "requirement": {
+          "enum": [
+            "required",
+            "recommended"
+          ]
+        },
+        "reason": {
+          "enum": [
+            "native_confirmation_needed",
+            "native_lint_recommended",
+            "native_confirmation_still_pending"
+          ]
+        },
+        "task_id": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^CG-B-[0-9a-f]{32}$"
+            }
+          ]
+        }
+      }
+    },
+    "next_action": {
+      "type": "string",
+      "minLength": 1
+    },
+    "syntax_candidates": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "reason",
+            "observations"
+          ],
+          "properties": {
+            "status": {
+              "const": "not_run"
+            },
+            "reason": {
+              "const": "source_scope_unavailable"
+            },
+            "observations": {
+              "const": []
+            }
+          }
+        },
+        {
+          "$ref": "check-feedback-v0.60.schema.json#/$defs/syntax_candidates"
+        }
+      ]
+    },
+    "syntax_tasks": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/syntax_tasks"
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "nullable_digest": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "classification",
+        "kind",
+        "syntax_kind",
+        "start_line",
+        "start_column",
+        "end_line",
+        "end_column",
+        "group_id"
+      ],
+      "properties": {
+        "classification": {
+          "const": "suspected"
+        },
+        "kind": {
+          "enum": [
+            "ERROR",
+            "MISSING"
+          ]
+        },
+        "syntax_kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "start_line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "start_column": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "end_line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "end_column": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "group_id": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "properties": {
+        "syntax_candidates": {
+          "properties": {
+            "observations": {
+              "items": {
+                "properties": {
+                  "language": {
+                    "const": "javascript"
+                  },
+                  "scope": {
+                    "const": "whole_file"
+                  },
+                  "byte_offset": {
+                    "const": 0
+                  }
+                },
+                "required": [
+                  "language",
+                  "scope",
+                  "byte_offset"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "setup": {
+            "properties": {
+              "requirement": {
+                "const": "recommended"
+              }
+            },
+            "required": [
+              "requirement"
+            ]
+          }
+        },
+        "required": [
+          "setup"
+        ]
+      },
+      "then": {
+        "properties": {
+          "setup": {
+            "properties": {
+              "reason": {
+                "const": "native_lint_recommended"
+              },
+              "task_id": {
+                "type": "null"
+              }
+            }
+          },
+          "syntax_candidates": {
+            "properties": {
+              "status": {
+                "const": "observed_partial"
+              },
+              "skipped_count": {
+                "const": 0
+              },
+              "unrouted_count": {
+                "const": 0
+              },
+              "observations": {
+                "minItems": 1,
+                "maxItems": 1,
+                "items": {
+                  "properties": {
+                    "status": {
+                      "const": "candidate_observed"
+                    },
+                    "reason": {
+                      "type": "null"
+                    },
+                    "recovery_count": {
+                      "const": 0
+                    },
+                    "structural_observation_count": {
+                      "const": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "setup": {
+            "properties": {
+              "reason": {
+                "enum": [
+                  "native_confirmation_needed",
+                  "native_confirmation_still_pending"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "setup": {
+            "properties": {
+              "reason": {
+                "const": "native_confirmation_still_pending"
+              }
+            },
+            "required": [
+              "reason"
+            ]
+          }
+        },
+        "required": [
+          "setup"
+        ]
+      },
+      "then": {
+        "properties": {
+          "setup": {
+            "properties": {
+              "requirement": {
+                "const": "required"
+              },
+              "task_id": {
+                "type": "string",
+                "pattern": "^CG-B-[0-9a-f]{32}$"
+              }
+            }
+          },
+          "syntax_candidates": {
+            "properties": {
+              "status": {
+                "const": "observed_partial"
+              },
+              "skipped_count": {
+                "const": 0
+              },
+              "unrouted_count": {
+                "const": 0
+              },
+              "observations": {
+                "minItems": 1,
+                "maxItems": 1,
+                "items": {
+                  "properties": {
+                    "status": {
+                      "const": "candidate_observed"
+                    },
+                    "reason": {
+                      "type": "null"
+                    },
+                    "recovery_count": {
+                      "const": 0
+                    },
+                    "structural_observation_count": {
+                      "const": 0
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

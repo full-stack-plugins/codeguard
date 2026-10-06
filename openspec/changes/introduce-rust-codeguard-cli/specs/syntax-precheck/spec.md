@@ -891,3 +891,11 @@ Before automatically activating module-only candidates, the implementation SHALL
 - **THEN** the nearest package determines explicit declared mode or unknown state
 - **AND** creation/removal/change of the mode evidence changes the observation used to validate the scan
 - **AND** package/default uncertainty never produces a source violation or fabricated clean result
+
+#### Scenario: Project fallback binds module evidence to stable native-confirmation tasks
+- **WHEN** a JavaScript candidate scan lacks applicable native lint and current bounded mode evidence declares module
+- **THEN** it selects the explicit module worker and verifies the same source/mode evidence after scanning
+- **AND** visible observations and persisted native-confirmation reports retain that evidence and rule identities
+- **AND** repeated project/lint/edit checks reuse one task, while a later zero candidate does not close it
+- **AND** CommonJS or unknown-mode sources never activate the module-return candidate
+- **AND** changed mode evidence or forged context remains incomplete and cannot create an accepted source finding

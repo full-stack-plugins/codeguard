@@ -2250,7 +2250,11 @@ fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
     if blocker.checker_id == "node.eslint.preparation"
         && matches!(
             blocker.diagnostic_reason.as_deref(),
-            Some("eslint_syntax_confirmation_needed" | "javascript_direct_binding_candidate")
+            Some(
+                "eslint_syntax_confirmation_needed"
+                    | "javascript_direct_binding_candidate"
+                    | "javascript_module_context_candidate"
+            )
         )
     {
         return format!(

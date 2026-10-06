@@ -7,7 +7,7 @@ use crate::grammar_route::route_source;
 use crate::syntax_worker_candidate_observation::SyntaxWorkerCandidateObservation;
 use crate::syntax_worker_runner::{
     run_syntax_worker_candidate, run_syntax_worker_binding_candidate,
-    run_syntax_worker_form_candidate,
+    run_syntax_worker_form_candidate, run_syntax_worker_module_candidate,
 };
 use codeguard_adapters::bundled_grammar_metadata;
 use serde_json::{Value, json};
@@ -45,6 +45,7 @@ struct CandidateJob {
     byte_offset: usize,
     end_byte: usize,
     known_limitations: Vec<String>,
+    javascript_mode: Option<Box<crate::javascript_mode_observation::JavascriptModeObservation>>,
 }
 
 enum PlannedObservation {
@@ -220,6 +221,19 @@ pub(crate) fn observe_selected(
                 .find(|asset| asset.language == language)
                 .map(|asset| asset.known_limitations.clone())
                 .unwrap_or_default();
+            let javascript_mode =
+                if language == "javascript" && byte_offset == 0 && end_byte == source.len() {
+                    let mode = crate::javascript_mode_observation::observe_javascript_mode(
+                        root,
+                        Path::new(relative),
+                    );
+                    (mode.mode == "module"
+                        && mode.source_sha256.as_deref()
+                            == Some(format!("{:x}", Sha256::digest(source.as_slice())).as_str()))
+                    .then_some(Box::new(mode))
+                } else {
+                    None
+                };
             planned.push(PlannedObservation::Worker(CandidateJob {
                 relative: relative.clone(),
                 source: Arc::clone(&source),
@@ -228,6 +242,7 @@ pub(crate) fn observe_selected(
                 byte_offset,
                 end_byte,
                 known_limitations,
+                javascript_mode,
             }));
         }
     }
@@ -252,7 +267,9 @@ pub(crate) fn observe_selected(
                         unreachable!("worker index must refer to a prepared job")
                     };
                     scope.spawn(|| {
-                        let run = if job.language == "javascript" {
+                        let run = if job.javascript_mode.is_some() {
+                            run_syntax_worker_module_candidate
+                        } else if job.language == "javascript" {
                             run_syntax_worker_binding_candidate
                         } else if job.language == "erlang" {
                             run_syntax_worker_form_candidate
@@ -342,6 +359,14 @@ fn candidate_result(
                     "known_limitations":job.known_limitations
                 });
             }
+            if job.javascript_mode.as_ref().is_some_and(|mode| {
+                crate::javascript_mode_observation::observe_javascript_mode(
+                    root,
+                    Path::new(&job.relative),
+                ) != **mode
+            }) {
+                return json!({"path":job.relative,"language":job.language,"scope":job.scope,"byte_offset":job.byte_offset,"status":"candidate_unavailable","reason":"javascript_mode_changed_during_precheck","grammar_qualified":false,"source_sha256":null,"grammar_sha256":null,"recovery_count":0,"recoveries":[],"known_limitations":job.known_limitations});
+            }
             // 嵌入片段的 worker 坐标以片段为起点，公开报告还原为文件坐标。
             let base_row = job.source[..job.byte_offset]
                 .iter()
@@ -376,7 +401,10 @@ fn candidate_result(
             if job.language == "cfquery" {
                 report["fragment_source_sha256"] = json!(observation.source_sha256);
             }
-            if !observation.structural_observations.is_empty() {
+            if let Some(mode) = &job.javascript_mode {
+                report["javascript_mode_observation"] = json!(mode);
+            }
+            if !observation.structural_observations.is_empty() || job.javascript_mode.is_some() {
                 report["structural_observation_count"] =
                     json!(observation.structural_observations.len());
                 report["structural_observations"] = json!(

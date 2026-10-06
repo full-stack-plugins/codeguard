@@ -61,7 +61,11 @@ fn standalone_javascript_duplicates_reuse_project_confirmation_identity() {
             "--format=json",
         ];
         let first = run(&args);
-        assert_eq!(first["schema_version"], "0.6.0", "{first}");
+        assert_eq!(
+            first["schema_version"],
+            if suffix == "mjs" { "0.7.0" } else { "0.6.0" },
+            "{first}"
+        );
         let row = &first["syntax_candidates"]["observations"][0];
         assert_eq!(row["language"], "javascript");
         assert_eq!(row["recovery_count"], 0);
@@ -117,7 +121,11 @@ fn unbound_and_commonjs_return_feedback_recommends_native_without_inventing_erro
             source.to_str().unwrap(),
             "--format=json",
         ]);
-        assert_eq!(report["schema_version"], "0.6.0", "{report}");
+        assert_eq!(
+            report["schema_version"],
+            if suffix == "mjs" { "0.7.0" } else { "0.6.0" },
+            "{report}"
+        );
         assert_eq!(report["setup"]["requirement"], "recommended");
         assert_eq!(report["setup"]["task_id"], Value::Null);
         assert_eq!(report["delivery_decision"], "not_evaluated");

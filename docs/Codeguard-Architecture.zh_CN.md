@@ -1357,7 +1357,7 @@ flowchart LR
 
 源码模式观察接口已实现，返回`javascript_mode_observation`0.1：普通源码和物理工作区绑定后，`.mjs`/`.cjs`分别明确module/CommonJS，`.js`只读取工作区内最近包的唯一显式`type`。缺type、坏/重复JSON、链接、越界、超预算、loader模式未知时不猜测或继承外包。源码上限1MiB、清单256KiB、搜索64目录；源码/包摘要和已搜索目录保留，便于扫描前后发现近包变化。它不执行原生工具，也不证明生效ESLint配置。
 
-自动scanner/任务/Hook尚未消费此接口；下一步应将前后模式证据比较和失效原因接入候选及复检，不能把本批当作自动检查已完成。真实Node按文件路径的5例对照和21份协议观察见[局部验收](../tests/acceptance/javascript-project-mode.md)。
+该接口基线批次尚未接入自动scanner/任务/Hook；当前接线及独立验收见下方新增章节。真实Node按文件路径的5例对照和21份协议观察见[局部验收](../tests/acceptance/javascript-project-mode.md)。
 
 ```mermaid
 flowchart LR
@@ -1371,4 +1371,25 @@ flowchart LR
     F --> G
     E --> G
     G -.待接线: 前后连续性核对.-> H[项目候选与稳定任务]
+```
+
+## 四类核心生产验收与声明模块接线
+
+生产目标要求57个canonical语言条目逐项验收语法、详细文档注释、开发规范和漏洞检查；历史planned仍是未完成目标。Java必须分别验收Maven/Gradle漏洞路径、详细Javadoc和原生P3C。配置存在、WASM可运行或模拟测试通过都不能证明生产就绪。独立标注评测、声明支持的版本/构建器/平台、原工具修复复检关闭与复发重开均为必需验收；当前WASM正式资格仍为0/32。详见OpenSpec任务15.1–15.7。
+
+当前源码把JavaScript声明模式证据接入项目检查、独立 `lint typescript`、`lint all` 与文件编辑反馈，适用原生ESLint仍优先。未覆盖的整文件 `.mjs` 和明确声明module的 `.js` 使用模块候选worker；CommonJS/未知模式继续原有有界初检，不启用函数外return模块规则。worker之后复核源码和模式证据；持久确认0.15、项目检查0.60、ESLint反馈0.7、Hook0.29/局部0.17与模块修复简报0.21使用独立版本契约。包声明改变时原任务复检报告上下文失效，不能沿用旧模块证据。重复检查复用稳定任务，清洁候选不能关闭任务。本批不声称新的npm/宿主发行或生产资格。见[接线验收](../tests/acceptance/javascript-module-workbench.md)。
+
+```mermaid
+flowchart LR
+    A[项目lint或编辑请求] --> B{适用原生ESLint}
+    B -->|可用| C[原配置原生检查]
+    B -->|缺失或未覆盖| D[观察源码与声明模式]
+    D -->|Module| E[模块WASM候选worker]
+    D -->|CommonJS或未知| F[原有有界初检]
+    E --> G[复核源码与模式]
+    F --> H[未完成初检反馈]
+    G -->|变化| H
+    G -->|稳定| I[绑定证据的稳定确认任务]
+    I --> J[智能体反馈与原工具复检]
+    J --> K[关闭仍需通过原生修复验收]
 ```
