@@ -1403,4 +1403,4 @@ flowchart LR
 
 Rust 应用服务 `gradle_model_probe::observe` 可通过固定 init 脚本、已有 Gradle 和独立离线工作目录，观察选定构建文件对应的真实插件及任务实现基类/启用状态。已实测 Gradle 8.10.2 的 Groovy 多子项目与 Kotlin DSL；普通同名任务不授予 OWASP 身份。完整 Gradle 制品树、选定源码及脚本前后核对，JDK 目前只核对入口和 release。报告协议为 `gradle-model-probe-v0.1.schema.json`，保持局部未受信配置观察；不证明完整配置覆盖或质量检查通过。
 
-该服务尚未接入公开命令，不改变 detect/config explain 的只读行为；后续仍需原生 Javadoc/规范/漏洞任务执行、报告归属、依赖图和漏洞库及修复闭环。真实测试与边界见 [原生模型局部采集验收](../tests/acceptance/gradle-native-model-probe.md)。
+开发期CLI已通过 `check java` / `check all` 接入选定输入观察：显式提供 `--gradle-bundle`、`--java-home` 和可重复的 `--gradle-project-file`。复用统一调度与截止时间，check_feedback 0.62 在 `native_results.java_gradle_model` 单独保存模型；`lint all` 拒绝这组模型参数。detect/config explain 保持只读；后续仍需原生 Javadoc/规范/漏洞任务执行、报告归属、依赖图和漏洞库及修复闭环。真实测试与边界见 [原生模型局部采集验收](../tests/acceptance/gradle-native-model-probe.md)。

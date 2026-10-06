@@ -794,6 +794,8 @@ Codeguard SHALL target every one of the 57 canonical registry entries for produc
 
 ### Requirement: Gradle checker model observation SHALL preserve native project and task identities
 
+The public check entry SHALL accept an explicitly selected partial Gradle model probe through `--gradle-bundle`, `--java-home` and repeatable `--gradle-project-file` options. It SHALL use the existing task scheduler and shared deadline/cancellation limits, preserve the observation separately from quality results, and SHALL NOT upgrade static checker configuration, project coverage or quality acceptance from this partial model. Invalid scope options SHALL fail before execution. The lint-only entry SHALL reject these configuration-model options.
+
 Rust SHALL interpret a versioned native Gradle configuration model per root/subproject, preserving the applied checker plugin IDs, actual task implementation types, enabled flags and bounded project/build directories. Matching task names alone SHALL NOT establish OWASP capability. Duplicate JSON fields, repeated identities, missing parent projects, unsupported protocols, oversized models and out-of-root directories SHALL remain incomplete. Included composite builds SHALL NOT be silently omitted. A selected-file model probe SHALL preserve its partial input scope and SHALL NOT claim complete project coverage, vulnerability results, detailed-documentation compliance or production readiness.
 
 #### Scenario: A normal task imitates the official vulnerability task name

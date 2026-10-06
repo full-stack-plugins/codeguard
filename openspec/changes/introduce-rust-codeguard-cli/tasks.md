@@ -1976,3 +1976,7 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 ## 2026-10-06 Gradle原生模型局部采集应用服务
 
 延续上述解析契约，Rust应用服务以固定init脚本在选定文件私有副本中离线运行已有Gradle，核对源/脚本/Gradle制品树/JDK入口前后身份；实际观察任务继承链、插件及启用状态。默认故障/脱敏/变化/超时及真实Groovy多子项目、Kotlin DSL测试见tests/acceptance/gradle-native-model-probe.md。公开命令尚未接线，选定范围/完整JDK/原生漏洞扫描/修复闭环仍未验收，不改变父任务和正式资格。
+
+## 2026-10-06 Gradle模型接入check统一调度
+
+公开入口RED后接通check java/all的显式Gradle分发/JDK/选定文件参数，复用统一任务图、截止时间和取消。check_feedback0.62与check_aborted0.16独立保存局部模型，不升级配置/质量/CVE结论；lint all拒绝模型参数。默认12通过/3条件忽略，跨入口18通过/1忽略、真实公开Gradle1通过及异常单元4通过，见tests/acceptance/gradle-public-model-check.md。实际SIGINT130、三CLI报告/一单元异常报告/七伪造反例/旧消费者拒绝均校验；原生质量扫描、完整范围和修复闭环仍缺，6.x/8.x/15.5不勾选。

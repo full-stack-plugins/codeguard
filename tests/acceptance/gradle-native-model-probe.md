@@ -1,5 +1,7 @@
 # Gradle原生模型局部采集
 
+本文件记录ff5504e采集服务批次；后续公开check接线及新增验收见[统一检查入口](gradle-public-model-check.md)。
+
 对应introduce-rust-codeguard-cli / native-tool-adapters、6.x、8.x、15.5。本批增加Rust应用服务`gradle_model_probe::observe`，不是新的公开CLI指令，也未连接detect/config explain等只读入口。调用方显式选择构建文件与已有Gradle/JDK；不安装插件，不运行质量任务。
 
 固定init脚本由真实Gradle读取插件ID及任务继承链，归一化官方任务基类；根/子项目、目录和enabled事实保留。模型仅描述选定输入副本，不声称完整原项目配置：未选文件、外部插件缓存、全JDK及受信身份尚未验收，报告使用`local_unverified`、`selected_project_files`、`coverage_proven=false`。同名普通任务不能获得OWASP身份，相关任务缺失不代表所有其它检查器不存在。

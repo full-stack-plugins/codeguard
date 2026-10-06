@@ -1,5 +1,7 @@
 # Gradle 原生配置模型解析基础
 
+本文件记录0e5f417解析基础批次；后续原生采集与公开入口见[采集服务](gradle-native-model-probe.md)和[统一检查入口](gradle-public-model-check.md)。
+
 对应现有 `introduce-rust-codeguard-cli` 的 native-tool-adapters / Gradle checker model observation，以及6.x、8.x、15.5。本批实现Rust解析契约，尚未实现原生模型采集与公开命令接线；测试输入是受控JSON，不是Gradle进程结果。实现先于本批测试，不声称完成RED→GREEN。
 
 模型保留Gradle版本、根/子项目身份、项目目录、构建目录、已观察插件ID、任务实现类与启用状态。OWASP可选任务必须同时具有原生插件ID、启用状态及准确官方Analyze/Aggregate基类身份；仅名称相似、禁用任务、未应用插件或未经归一化的装饰类都不能获得该身份。返回空集合只表示该模型没有适用任务，不代表全部漏洞检查器不存在。

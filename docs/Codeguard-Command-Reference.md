@@ -412,3 +412,14 @@ codeguard next . --format json
 The Maven-bound wrapper is `java_comments_feedback 0.5.0`, the saved observation is `maven_javadoc_workbench_observation 0.1.0`, and the inner repair brief is0.4 with `observation_scope=configured_maven_multifile_probe`. Existing JDK file/project wrappers and recheck protocols remain available. Feedback includes the stable task, evidence, native rule, allowed scope and original Maven rescan arguments. `task_verify_status=not_integrated` explicitly identifies the missing Maven task-verification integration; a JDK single-file check cannot substitute for it. Preparation tasks restore the environment, repeat scans reuse the task, and local zero diagnostics do not close historical tasks.
 
 This covers the existing simple static-POM direct-replay probe. Effective models, complex projects, Maven original-task verification, trusted closure/recurrence, actual hosts and release acceptance remain open. This increment uses controlled Maven process fixtures and does not claim actual plugin execution. See `tests/acceptance/maven-javadoc-workbench.md`.
+
+
+### Gradle model observation in project check (development CLI)
+
+```bash
+codeguard check java . --gradle-bundle /absolute/gradle-8.10.2 --java-home /absolute/jdk \
+  --gradle-project-file settings.gradle --gradle-project-file build.gradle \
+  --gradle-project-file app/build.gradle --format json
+```
+
+Select the actual Groovy or Kotlin DSL files explicitly. The model describes only the selected copy and does not establish complete project coverage or execute documentation, convention or vulnerability tasks. All options are required together; paths must be unique normal relative files. The check remains incomplete, preserving the model separately in check_feedback 0.62. `check all` accepts the same options; `lint all` rejects them. This is local development CLI acceptance, without an npm release claim. See [public Gradle model acceptance](../tests/acceptance/gradle-public-model-check.md).
