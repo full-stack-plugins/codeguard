@@ -2103,3 +2103,5 @@ CI37503859591终态MSRV通过、gate源码检出失败。确认语料9e4adb1远�
 2026-10-07 Cargo workspace文档候选来源进展：延续7.1/15.3/15.6，成员声明关联先RED后接通最近workspace与本轮摘要核验，未选择继承不能套用；最近缺失/非法、显式引用及变化/I/O/链接/预算保持未知或不完整。真实已有Clippy两配置各四次oracle，warn继承/未继承一/零诊断，allow均零；默认/WASM六目标各104通过/6忽略，祖先故障单元各1、真实oracle各1。详见tests/acceptance/cargo-documentation-workspace.md，完整生效模型/详细契约/配置任务/原工具workspace公开闭环及生产资格仍未完成，不勾选父任务。
 
 2026-10-07 Cargo显式workspace文档引用：延续7.1/15.3/15.6，非祖先引用公开RED后只关联声明目标；项目内相对点/父组件逐目录核验，缺目录/链接/逃逸/未观察/摘要变化/非法或无workspace不回退祖先。真实已有Clippy三路径两等级默认/WASM各6次oracle，warn一条warning、allow零，源码/成员清单不变；六相关目标各107通过/7条件忽略，发现三单元两配置各3、适配器3通过。验收tests/acceptance/cargo-documentation-explicit-workspace.md。完整配置/详细契约/绝对或非便携引用/配置任务/原生workspace闭环、独立精度和全平台仍开放，不勾选父任务，不改变66/288、0/32资格。
+
+2026-10-07 Java原工具准备审计：已有Maven/Checkstyle详细模块与公开闭环代码不重复实现；只读核对本机缺完整插件缓存/JAR，官方Checkstyle10.21.4资产元数据及Maven Javadoc3.12.0 POM HEAD可达。新增隔离准备计划和可审阅最小bootstrap固定POM/详细源码，已有JDK21直接doclint全组退出0。默认两个既有CLI目标7通过/3真实条件忽略，不计实际插件运行；工具下载需明确允许，尚未安装/下载。见tests/acceptance/java-native-tool-preparation-plan.md，15.3/15.6保持未完成，66/288与0/32不变。

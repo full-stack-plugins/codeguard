@@ -2546,3 +2546,5 @@ Java验收分类器先检查truncated_files，隐藏恢复不计作干净。现�
 2026-10-07 Cargo显式workspace候选来源：公开非祖先引用先RED后GREEN，默认/WASM六相关目标各107通过/7条件忽略；三个发现端口边界单元各3通过，适配器Cargo3通过。已有Clippy显式oracle两配置各1通过，三路径×warn/allow共12原Cargo运行、12实际discovery报告/474历史schema原字节保持。缺目录/链接测试按现有partial exit3核验，未改CLI退出协议；实际报告片段同步中英文技术设计。完整成员/生效覆盖/详细内容/可信关闭及平台/宿主/发布仍未验收，66/288与0/32不变。上一提交6bd3b71的CI37513221175仍在固定审计来源checkout失败，插件远端main仍f09c074e，不绕过门禁。
 
 本批默认/WASM全工作区全目标Clippy -D warnings、定向格式、分层/OpenSpec strict通过；生产计划关联90份源码/证据指纹，保持全部生产义务和未验收状态。用户Erlang草稿不编辑/暂存/执行。
+
+2026-10-07 Java原工具准备：固定官方来源只读核对及缺本机缓存审计见tests/acceptance/java-native-tool-preparation-plan.md。受控详细模块/协议回归两个CLI目标7通过/3条件忽略；bootstrap POM固定坐标检查与已有JDK21直接javadoc -Xdoclint:all退出0，只证输入可用。未下载制品或依赖、未运行真实Maven/Checkstyle详细插件正常扫描，等待明确允许；不是生产验收完成，不改变父任务/32grammar资格。CI37515178587仍在固定源checkout失败，不改门禁。
