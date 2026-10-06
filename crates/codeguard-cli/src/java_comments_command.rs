@@ -7,7 +7,7 @@ use crate::discovery::discover;
 use crate::java_javadoc_command::{Args, observe};
 use crate::java_javadoc_scan::{NativeContext, observe_project};
 use codeguard_adapters::legacy_registry;
-use codeguard_runtime::NativeObservation;
+use codeguard_runtime::{NativeObservation, SourceSnapshot};
 use serde_json::json;
 use std::collections::{BTreeSet, HashSet};
 use std::path::PathBuf;
@@ -129,6 +129,7 @@ pub fn run(args: &[String]) -> ExitCode {
     }
     let deadline = Instant::now() + Duration::from_millis(timeout);
     let cancelled = AtomicBool::new(false);
+    let mut maven_snapshot = None;
     let mut report = json!({"schema_version":"0.1.0", "report_type":"java_comments_feedback", "operation":"comments", "language":"java", "category":"comments", "target_kind":"unavailable", "command_status":"incomplete", "exit_code":3, "reason":"target_unavailable", "execution_budget":budget_record(timeout, source), "native_observation":null, "discovery":null, "coverage_proven":false, "authority":"local_unverified", "delivery_decision":"not_evaluated", "workbench_status":"not_integrated", "next_actions":["依据原生诊断修复注释或配置；使用相同原生上下文重新执行 comments java", "Javadoc 持久任务适配尚未接通，不能据此关闭任务"]});
     if let Ok(path) = target.canonicalize() {
         if path.is_file() {
@@ -157,6 +158,27 @@ pub fn run(args: &[String]) -> ExitCode {
                     .get("java")
                     .map(|language| language.source_files.clone())
                     .unwrap_or_else(BTreeSet::new);
+                if maven_tool.is_some() {
+                    let paths: BTreeSet<PathBuf> = sources
+                        .iter()
+                        .map(PathBuf::from)
+                        .chain(
+                            discovery
+                                .checker_configurations
+                                .iter()
+                                .filter(|c| c.checker_id == "java.maven.javadoc")
+                                .map(|c| PathBuf::from(&c.configuration_ref)),
+                        )
+                        .collect();
+                    maven_snapshot = SourceSnapshot::capture(
+                        &path,
+                        paths,
+                        100_001,
+                        16 * 1024 * 1024,
+                        128 * 1024 * 1024,
+                    )
+                    .ok();
+                }
                 report["native_observation"] = observe_project(
                     &path,
                     &sources,
@@ -185,13 +207,26 @@ pub fn run(args: &[String]) -> ExitCode {
             .filter(|p| p.is_dir() && p.join(".codeguard/workspace.json").exists())
     });
     if let Some(root) = root {
-        report["schema_version"] = json!("0.4.0");
-        report["workbench"] = crate::javadoc_workbench::connect(&root, &report);
+        let maven = report["native_observation"]["probe_mode"] == "maven_multifile";
+        report["schema_version"] = json!(if maven { "0.5.0" } else { "0.4.0" });
+        report["workbench"] = if maven {
+            crate::maven_javadoc_workbench::connect(&root, &report, maven_snapshot.as_ref())
+        } else {
+            crate::javadoc_workbench::connect(&root, &report)
+        };
         report["workbench_status"] = report["workbench"]["status"].clone();
-        report["next_actions"] = json!([
-            "按本次显式文件或项目配置模式核对原生诊断与工作台简报",
-            "按原任务运行task verify保存原工具复检；可信关闭尚未接通，局部零诊断不能关闭任务"
-        ]);
+        if maven {
+            report["next_actions"] = json!([
+                "依据Maven原生诊断及稳定任务恢复环境或修复注释，使用相同原POM、Maven、JDK和固定离线仓库重跑comments java",
+                "Maven原任务task verify及可信关闭尚未接通，零诊断和勾选不能关闭任务"
+            ]);
+        }
+        if !maven {
+            report["next_actions"] = json!([
+                "按本次显式文件或项目配置模式核对原生诊断与工作台简报",
+                "按原任务运行task verify保存原工具复检；可信关闭尚未接通，局部零诊断不能关闭任务"
+            ]);
+        }
     }
     let exit = if codeguard_runtime::sigint_cancellation_requested()
         || report["reason"] == "request_cancelled"
