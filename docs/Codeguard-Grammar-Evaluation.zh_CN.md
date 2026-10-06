@@ -185,3 +185,9 @@ runtime新增有界函数外return扫描：覆盖顶层控制流、跳过函数/
 ## 显式module候选与原生组合差分接线
 
 `grammar probe javascript FILE --module --format=json`现在通过worker1.7/probe0.8观察函数外return；缺失模式的原入口不启用这条规则，零候选/读取失败也保留显式模式。开发Node差分固定module上下文，报告0.10复用同一worker：实际18例raw5TP/11TN/0FP/2FN，combined7TP/11TN/0FP/0FN。原始漏检不被抹除，固定358指标和正式资格0/32不变；这不是独立holdout。项目模式自动观察、任务和宿主接线仍开放。见[局部验收](../tests/acceptance/javascript-module-worker-probe.md)。
+
+## 项目 JavaScript 声明模式证据接口
+
+源码模式观察接口已实现，返回`javascript_mode_observation`0.1：普通源码和物理工作区绑定后，`.mjs`/`.cjs`分别明确module/CommonJS，`.js`只读取工作区内最近包的唯一显式`type`。缺type、坏/重复JSON、链接、越界、超预算、loader模式未知时不猜测或继承外包。源码上限1MiB、清单256KiB、搜索64目录；源码/包摘要和已搜索目录保留，便于扫描前后发现近包变化。它不执行原生工具，也不证明生效ESLint配置。
+
+自动scanner/任务/Hook尚未消费此接口；下一步应将前后模式证据比较和失效原因接入候选及复检，不能把本批当作自动检查已完成。真实Node按文件路径的5例对照和21份协议观察见[局部验收](../tests/acceptance/javascript-project-mode.md)。

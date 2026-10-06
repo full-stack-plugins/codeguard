@@ -173,3 +173,9 @@ The runtime now traverses bounded AST nodes outside function/generator/arrow/met
 ## Explicit module candidates and native combined differential
 
 `grammar probe javascript FILE --module --format=json` now observes outer returns through worker1.7/probe0.8. The undeclared-mode path does not activate this rule; zero candidates and input failures retain explicit context. The development Node differential fixes module context and reuses this worker in report0.10: actual18 cases yield raw5TP/11TN/0FP/2FN and combined7TP/11TN/0FP/0FN. Raw misses remain visible, fixed358 metrics and0/32 qualification are unchanged, and this is not an independent holdout. Automatic project-mode observation, task and host wiring remain open. See [limited acceptance](../tests/acceptance/javascript-module-worker-probe.md).
+
+## Project JavaScript declared-mode evidence interface
+
+The mode observation interface now returns `javascript_mode_observation`0.1. It binds ordinary source and a physical workspace: `.mjs`/`.cjs` explicitly declare module/CommonJS, while `.js` reads only the nearest in-scope package's unique explicit `type`. Missing types, malformed/duplicate JSON, links, out-of-scope or over-budget inputs and unresolved loader modes remain unknown without outer-package inheritance. Limits are1MiB source,256KiB manifest and64 searched directories. Source/package digests and searched directories preserve evidence for detecting nearer-package changes before and after scanning. This does not execute native tools or prove effective ESLint configuration.
+
+Automatic scanners/tasks/hooks do not yet consume this interface. The next integration must compare mode evidence across execution and preserve invalidation reasons; this batch is not automatic project-check acceptance. See [limited acceptance](../tests/acceptance/javascript-project-mode.md) for5 actual Node file checks and21 protocol observations.

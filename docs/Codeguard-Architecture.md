@@ -1352,3 +1352,23 @@ flowchart LR
 ```
 
 This entry does not infer project mode, install tools, execute source, replace native lint or close tasks. CommonJS may permit outer returns. Existing schemas remain unchanged; new context and rules require the new protocol. Automatic project-mode observation and task/host wiring still need separate acceptance. See [limited acceptance](../tests/acceptance/javascript-module-worker-probe.md).
+
+## Project JavaScript declared-mode evidence interface
+
+The mode observation interface now returns `javascript_mode_observation`0.1. It binds ordinary source and a physical workspace: `.mjs`/`.cjs` explicitly declare module/CommonJS, while `.js` reads only the nearest in-scope package's unique explicit `type`. Missing types, malformed/duplicate JSON, links, out-of-scope or over-budget inputs and unresolved loader modes remain unknown without outer-package inheritance. Limits are1MiB source,256KiB manifest and64 searched directories. Source/package digests and searched directories preserve evidence for detecting nearer-package changes before and after scanning. This does not execute native tools or prove effective ESLint configuration.
+
+Automatic scanners/tasks/hooks do not yet consume this interface. The next integration must compare mode evidence across execution and preserve invalidation reasons; this batch is not automatic project-check acceptance. See [limited acceptance](../tests/acceptance/javascript-project-mode.md) for5 actual Node file checks and21 protocol observations.
+
+```mermaid
+flowchart LR
+    A[Physical workspace and ordinary source] --> B{Source extension}
+    B -->|mjs / cjs| C[Explicit extension mode]
+    B -->|js| D[Nearest in-scope package.json]
+    B -->|Unresolved loader| E[Unknown with reason]
+    D -->|Unique explicit type| F[Declared package mode and digest]
+    D -->|Missing invalid linked over-budget| E
+    C --> G[Mode evidence and source digest]
+    F --> G
+    E --> G
+    G -.Pending continuity integration.-> H[Project candidates and stable tasks]
+```

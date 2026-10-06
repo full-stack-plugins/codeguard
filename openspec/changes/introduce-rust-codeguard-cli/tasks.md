@@ -1944,3 +1944,7 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 ## 2026-10-06 JavaScript 显式module worker/probe与组合差分
 
 延续12.11/14.9/14.17/14.19，父任务不勾选。显式module请求固定worker1.7/probe0.8，绑定规则与模式、输出预算128；普通/未知/CommonJS路径不启用module规则，父进程拒绝模式/版本/身份伪装。公开grammar probe的参数、help、中英文README/架构/技术/评测已同步。Node差分固定module，接线0.10前真实RED，后18例raw5TP/11TN/0FP/2FN、combined7TP/11TN/0FP/0FN；原始和固定358指标不变。八相关WASM目标51通过/2条件忽略、实际Node另1通过、默认help5通过；14实际probe/1实际差分/401 schema与篡改/旧消费者拒绝、严格Clippy/分层/OpenSpec/diff通过。测试捕获目录竞态独立修复，失败日志保留。见tests/acceptance/javascript-module-worker-probe.md。项目mode自动观察、任务/宿主、独立holdout/正式资格0/32及发行仍缺。
+
+## 2026-10-06 JavaScript 项目声明模式证据接口
+
+延续12.11/14.9/14.17/14.19，父任务不勾选。新增模式观察0.1接口：物理工作区/普通源码绑定；mjs/cjs后缀，js最近包唯一显式type；缺type/坏或重复JSON/链接/越界/超预算不推断、不继承外包。绑定源码/包摘要和64目录负向搜索依据，原生未执行/交付未评估。API缺失RED→GREEN，默认4通过/1忽略，WASM相关11通过/1忽略；真实Node文件路径5例另1通过；21实际观察/402 schema和六种篡改拒绝、默认/WASM严格Clippy、分层/OpenSpec/diff通过。见tests/acceptance/javascript-project-mode.md。自动scanner/任务/复检/Hook消费者尚未接线，资格0/32与所有既有精度指标不变。
