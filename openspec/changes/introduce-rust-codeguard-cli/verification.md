@@ -2512,3 +2512,7 @@ WASM CLI全目标Clippy -D warnings、定向rustfmt、分层、OpenSpec strict�
 ## 2026-10-06 P3C配置准备简报聚合协议修复
 
 完整实际0.38聚合schema拒绝P3C配置准备简报，目标0.58版本测试先失败。新增0.58及限定blocker/检查器/原因/review-project-policy/固定重扫参数的封闭schema，修复Java选择原因码遗漏，保留历史协议。四目标57通过/0失败/10条件忽略；完整实际聚合与两处简报通过，六篡改与旧消费者拒绝符合预期。CLI严格Clippy、分层/OpenSpec strict通过。局部验收 tests/acceptance/p3c-preparation-aggregate-schema.md；不代替全部P3C分支、原生执行、宿主或完整目标。
+
+## 2026-10-06 Java差分隐藏恢复与Java21增量对照
+
+Java验收分类器先检查truncated_files，隐藏恢复不计作干净。现有JDK21.0.12.1对原13例release17和新增8例release21实际差分均一致；新增组3TP/5TN/0FP/0FN/0unknown，作者样本independent_holdout=false，与358固定回归不混计。整个Java目标4通过/0失败/0忽略；目标特性Clippy、diff/OpenSpec验证见对应验收与证据。未运行Erlang草稿或完整WASM/358回放，未安装/下载工具，资格和整体目标仍未完成。

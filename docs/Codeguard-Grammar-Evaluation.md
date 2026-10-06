@@ -157,3 +157,7 @@ Go candidate-task rechecks now accept `--go-tool /absolute/sdk/bin/go` and invok
 ### Native-first Go lint with missing-tool candidates
 
 Source-built `codeguard lint go . --format json` prefers explicit `--go-tool`, then executable Go from absolute caller PATH entries. Selected tool/version/execution failures remain native failures. When no native tool exists, the built-in WASM produces bounded whole-file recovery and structure candidates. Candidates or incomplete prechecks require a project-appropriate native tool; zero candidates in the completely observed bounded scope only recommend preparation. Native obligations remain incomplete and exit3 is retained. Builds without WASM report that capability gap. Repeated lint/check reuse the confirmation task; adding a package declaration does not close it. Public npm0.1.4 is unchanged. See [limited acceptance](../tests/acceptance/go-lint-fallback.md).
+
+## 2026-10-06 Java21 native comparison
+
+Java differential acceptance now checks truncated_files before treating empty recoveries as clean; hidden recovery remains unknown. The original13 cases retain their javac21/release17 comparison. A separate release21 group covers pattern switch, guards, record patterns, sealed records, text blocks and three syntax errors: actual3TP/5TN/0FP/0FN/0unknown. These are author-created local cases (independent_holdout=false), not independent qualification or additions to the fixed358-case metrics. Native-tool and source digests bind the evidence. See [acceptance](../tests/acceptance/java21-native-differential.md).
