@@ -206,7 +206,17 @@ fn public_check_schedules_one_documentation_job_and_preserves_incomplete_feedbac
         let output = public_command(&project, selection).output().unwrap();
         assert_eq!(output.status.code(), Some(3), "{output:?}");
         let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
-        assert_eq!(report["schema_version"], "0.63.0");
+        assert_eq!(report["schema_version"], "0.64.0");
+        let category = report["category_candidates"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|c| c["language"] == "java" && c["category"] == "comments")
+            .unwrap();
+        assert_eq!(category["checker_id"], "java.gradle.javadoc");
+        assert_eq!(category["status"], "native_incomplete");
+        assert_eq!(category["reason"], "gradle_javadoc_native_incomplete");
+        assert!(category["next_action"].as_str().unwrap().contains("Gradle"));
         assert!(report["native_results"].get("java_gradle_model").is_none());
         assert_eq!(
             report["native_results"]["java_gradle_javadoc"]["native_status"],
@@ -303,7 +313,20 @@ fn actual_public_check_preserves_native_documentation_findings_without_coverage_
             .unwrap();
         assert_eq!(output.status.code(), Some(3), "{output:?}");
         let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
-        assert_eq!(report["schema_version"], "0.63.0");
+        assert_eq!(report["schema_version"], "0.64.0");
+        let category = report["category_candidates"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|c| c["language"] == "java" && c["category"] == "comments")
+            .unwrap();
+        assert_eq!(category["checker_id"], "java.gradle.javadoc");
+        assert_eq!(category["status"], "observed_unverified");
+        assert_eq!(
+            category["reason"],
+            "gradle_javadoc_selected_inputs_and_rules_unverified"
+        );
+        assert!(category["next_action"].as_str().unwrap().contains("Gradle"));
         let native = &report["native_results"]["java_gradle_javadoc"];
         assert_eq!(native["native_status"], status, "{report}");
         assert_eq!(native["findings"].as_array().unwrap().len(), expected_count);
@@ -375,7 +398,7 @@ fn public_javadoc_sigint_preserves_cancelled_native_observation() {
     let output = child.wait_with_output().unwrap();
     assert_eq!(output.status.code(), Some(130), "{output:?}");
     let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
-    assert_eq!(report["schema_version"], "0.63.0");
+    assert_eq!(report["schema_version"], "0.64.0");
     assert_eq!(
         report["native_results"]["java_gradle_javadoc"]["reason"],
         "request_cancelled"
@@ -397,6 +420,42 @@ fn public_javadoc_sigint_preserves_cancelled_native_observation() {
         fs::create_dir_all(&dir).unwrap();
         fs::write(
             PathBuf::from(dir).join("sigint.json"),
+            serde_json::to_vec_pretty(&report).unwrap(),
+        )
+        .unwrap();
+    }
+}
+
+#[test]
+fn unexecuted_gradle_documentation_configuration_remains_unknown_not_missing() {
+    let project = Project::new("public class Sample {}\n");
+    let output = std::process::Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["check", "java"])
+        .arg(&project.0)
+        .arg("--format=json")
+        .env("PATH", "/no/tools")
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(3), "{output:?}");
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    let category = report["category_candidates"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|c| c["language"] == "java" && c["category"] == "comments")
+        .unwrap();
+    assert_eq!(category["status"], "configuration_unresolved");
+    assert_eq!(category["reason"], "javadoc_configuration_unresolved");
+    assert!(category["next_action"].as_str().unwrap().contains("Gradle"));
+    assert!(
+        report["native_results"]
+            .get("java_gradle_javadoc")
+            .is_none()
+    );
+    if let Some(dir) = std::env::var_os("CODEGUARD_TEST_GRADLE_JAVADOC_PUBLIC_REPORTS") {
+        fs::create_dir_all(&dir).unwrap();
+        fs::write(
+            PathBuf::from(dir).join("static-unknown.json"),
             serde_json::to_vec_pretty(&report).unwrap(),
         )
         .unwrap();

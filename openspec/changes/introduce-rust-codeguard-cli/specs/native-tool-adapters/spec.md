@@ -825,3 +825,11 @@ The Gradle Javadoc application service SHALL select enabled tasks by the officia
 #### Scenario: Public Java or all check explicitly selects Gradle documentation tasks
 - **WHEN** check java/all receives --gradle-javadoc together with an existing Gradle/JDK and selected build and Java inputs
 - **THEN** one scheduled java.gradle.javadoc task SHALL perform native model capture and original Javadoc checking, preserve separate java_gradle_javadoc feedback, and SHALL NOT run an additional configuration-model invocation or upgrade complete rule/coverage/delivery acceptance; invalid prerequisites and lint-only requests SHALL fail before native execution
+
+#### Scenario: Gradle documentation execution and category summary agree
+- **WHEN** an explicit Gradle documentation task emits recognized findings or empty output, or remains incomplete due to native prerequisites/cancellation
+- **THEN** the Java comments category SHALL identify the requested Gradle adapter, preserve observed-unverified or native-incomplete status with a concrete reason and matching Gradle follow-up, and SHALL NOT mislabel it as an absent Maven configuration or upgrade complete documentation compliance
+
+#### Scenario: Gradle static Javadoc configuration is unresolved
+- **WHEN** static discovery preserves an unknown or invalid Gradle Javadoc configuration without native documentation execution
+- **THEN** Java comments SHALL remain configuration_unresolved with build-root-aware Maven/Gradle guidance rather than missing configuration or a requirement to modify an unrelated build system

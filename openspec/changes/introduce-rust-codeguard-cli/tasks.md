@@ -1990,3 +1990,10 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 ## 2026-10-06 Gradle原生Javadoc接入公开check
 
 延续6.x/8.x/15.3，公开新参数用例RED后接通check java/all的--gradle-javadoc。只创建一个Gradle质量任务，单次调用保留模型/注释观察，反馈0.63与异常0.17；仅模型行为仍0.62。实际公开Gradle/JDK缺注释和完整注释两组3/0诊断、SIGINT130与兄弟异常单元保留通过，见tests/acceptance/gradle-public-javadoc-check.md。自动任务持久化、复检关闭、完整规则/范围和逐语言生产资格继续未完成；父任务不勾选。
+
+
+## 2026-10-06 Gradle文档类别归属误报修正
+
+实际0.63有/无诊断报告均误报Java/comments未配置。新用例RED后，0.64按显式Gradle文档请求保留observed_unverified/native_incomplete、正确checker和Gradle复检指引；执行故障不当配置缺失。真实两组3/0诊断和缺工具/取消、封闭协议反例见tests/acceptance/gradle-javadoc-category-attribution.md。稳定Gradle修复任务/复检关闭仍未完成；6.x/8.x/15.3及生产资格保持未完成。
+
+同批补充：纯静态Gradle文档未知配置曾误报缺失，独立RED后保留configuration_unresolved及匹配构建根的配置核验指引；现有0.61协议消费有效，不增加原生任务或授予配置完整性。
