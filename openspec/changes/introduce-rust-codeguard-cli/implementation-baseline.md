@@ -160,3 +160,11 @@ Ruby原生/WASM首次稳定任务已接入共享宿主服务，保留原报告�
 ## 2026-10-06 最新源码迁移审计完成
 
 1.1的最新源码与57语言差异核对已实际验收，证据见[完整源码审计](../../../tests/acceptance/legacy-source-migration-audit.md)。仅关闭该审计任务，原生适配、真实宿主、WASM资格和交付门禁仍开放。7fec0c9完整默认测试1516通过/0失败/135条件忽略；新增源码审计2项单独通过。
+
+## 2026-10-06 原任务复检、协议与语言入口更新
+
+Maven Javadoc多文件工作台及原任务task verify已接通稳定任务、扫描前/保存前输入复核、首次构建根/POM/Maven/JDK/离线仓库身份、原租约与尝试历史；局部零诊断不关闭，配置或源集变化需覆盖复核。P3C未确认配置准备简报已新增封闭聚合0.58，完整实际报告与拒绝反例通过。公共检查/plan入口已支持九项明确语言别名，不改写路径/grammar身份。详见 [Maven复检](../../../tests/acceptance/maven-javadoc-task-recheck.md)、[P3C协议](../../../tests/acceptance/p3c-preparation-aggregate-schema.md)、[语言别名](../../../tests/acceptance/language-alias-cli.md)。
+
+Java21增量原生差分及隐藏恢复分类已补齐：本轮作者样本不作为独立holdout，32份grammar全部仍是候选，released_count=0。来源与版本证据见 [Java21验收](../../../tests/acceptance/java21-native-differential.md)。公开发行、独立精度、完整语言/项目模型、可信关闭及真实宿主分别验收，完整目标仍未完成。2026-09-28表是历史切片，不用旧“别名未实现”等描述覆盖后续证据。
+
+当前远端提交4445f06的CI37423582241：MSRV成功，gate在Check out corpus evidence source阶段失败，因锁定的插件提交dec5f9d远端不可达，未运行后续门禁；不称为CI通过。不能为消除失败修改语料锁或撤去检查。

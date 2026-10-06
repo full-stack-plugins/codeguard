@@ -472,9 +472,12 @@ fn target_mismatch_and_input_change_cannot_be_complete_observations() {
 #[test]
 fn invalid_arguments_stop_before_tool_execution() {
     let fixture = Fixture::new();
+    let marker = fixture.0.join("unexpected-native-execution");
+    let tool = fixture.tool(&format!(": > '{}'", marker.display()));
+    fs::copy(tool, fixture.0.join("cargo")).unwrap();
     for args in [
         vec!["comments", "rust", "--cargo-tool", "relative"],
-        vec!["comments", "java"],
+        vec!["comments", "unknown-language"],
         vec!["comments", "rust", "--format=sarif"],
         vec!["comments", "rust", "--timeout", "0s"],
     ] {
@@ -482,13 +485,35 @@ fn invalid_arguments_stop_before_tool_execution() {
             Command::new(env!("CARGO_BIN_EXE_codeguard"))
                 .args(args)
                 .current_dir(&fixture.0)
+                .env("PATH", &fixture.0)
                 .output()
                 .unwrap()
                 .status
                 .code(),
             Some(2)
         );
+        assert!(
+            !marker.exists(),
+            "invalid arguments must not execute native tools"
+        );
     }
+}
+
+#[test]
+fn supported_java_comments_without_java_sources_is_incomplete_not_usage_error() {
+    let fixture = Fixture::new();
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["comments", "java", "--format=json"])
+        .current_dir(&fixture.0)
+        .env("PATH", &fixture.0)
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(3));
+    let report: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(report["report_type"], "java_comments_feedback");
+    assert_eq!(report["language"], "java");
+    assert_eq!(report["command_status"], "incomplete");
+    assert_eq!(report["delivery_decision"], "not_evaluated");
 }
 
 #[test]

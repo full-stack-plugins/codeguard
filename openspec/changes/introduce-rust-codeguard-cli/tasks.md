@@ -1901,3 +1901,10 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 - [x] 只读九别名plan、六组公开原入口对照、三项位置/注册表约束测试及帮助/计划回归、严格Clippy验收。
 
 见 tests/acceptance/language-alias-cli.md。10CLI+3单元通过；不提升语言能力或planned状态，未改变公开npm；完整可信plan/全量类别/多平台及2.1父任务仍开放。
+
+## 2026-10-06 完整默认回归与Java注释入口兼容
+
+- [x] 修正Rust注释验收中已过期的comments java非法命令假设，真正未知语言/错参在工具执行前拒绝，新增已支持Java入口的未完成报告验证。
+- [x] 完整默认workspace/all-targets重新运行、全工作区严格Clippy、397schema元定义及实际库存/别名计划协议校验，首轮失败与终态证据分别保留。
+
+见 tests/acceptance/default-workspace-comments-dispatch.md。290组1565通过/0失败/142条件忽略，不启用WASM；远端4445f06 MSRV通过但gate在固定插件源检出失败，不称CI通过。142项条件测试、全部平台/宿主/资格与完整父任务仍开放。
