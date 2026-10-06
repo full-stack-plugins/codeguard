@@ -43,7 +43,7 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             support: r#"implemented"#,
             executable: true,
             operation_kind: r#"query"#,
-            usage: r#"capabilities [language] [--platform ID] [--category ID] [--format human|json]"#,
+            usage: r#"capabilities [language] [--platform ID] [--category ID] [--format human|json] | capabilities [language] --acceptance-plan [--format human|json]"#,
             scope: r#"能力库存；gap不表示原生已接入或项目通过"#,
             languages: &[],
         },

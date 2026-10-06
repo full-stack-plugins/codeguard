@@ -1086,3 +1086,5 @@ flowchart LR
 ```
 
 Real native tests cover all seven rules, repeated identity, presence, noqa suppression and absence after documentation repair; facts remain open. Additional cases retain native exemptions, implicit-exception conflicts and unselected DOC rules. Existing protocols admit native rule IDs and redacted guidance; historical schemas, approved mappings and closure authority are not expanded. See [Ruff DOC acceptance](tests/acceptance/ruff-documentation-contract.md) for evidence and version limits. Complete Python documentation, independent precision, all platforms and production qualification remain pending.
+
+Read-only four-core acceptance plan: `codeguard capabilities [language] --acceptance-plan --format=json`. All 57 languages / 228 obligations remain unqualified; filtering preserves full obligations. See [acceptance plan](docs/Codeguard-Production-Acceptance-Plan.md).
