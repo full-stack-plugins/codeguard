@@ -64,12 +64,14 @@ pub fn run(args: &[String]) -> ExitCode {
         task_paths: options.tasks.clone(),
     };
     let native = observe(&request, &AtomicBool::new(false));
-    let next_action = if native["native_status"] == "reports_observed_unverified" {
+    let next_action = if native["reason"] == "gradle_owasp_report_budget_exceeded" {
+        "累计报告或反馈超出预算；保留完整任务清单，将原任务分批执行并汇总所有分批结果。不得删除检查义务、降低规则或把未读取报告当作无漏洞；超大单任务需要独立的大报告处理方案，当前交付仍未评估"
+    } else if native["native_status"] == "reports_observed_unverified" {
         "按原任务报告调查活动与原生抑制的漏洞，核对真实依赖归属和漏洞库时效；使用相同工具、输入、原任务复检。空报告不能证明无漏洞，当前持久任务与可信关闭未接线"
     } else {
         "读取原生reason恢复已有Gradle/JDK、原OWASP任务、原JSON配置和选定输入；缺插件或漏洞库属于环境阻塞，不修改无关源码。恢复后使用相同原任务复检"
     };
-    let report = json!({"schema_version":"0.1.0","report_type":"java_gradle_cve_feedback","operation":"cve","language":"java","mode":"gradle","selected_inputs":options.files,"requested_task_paths":options.tasks,"budget":budget_record(timeout,source),"native":native,"next_action":next_action,"task_sync":"not_integrated","authority":"local_unverified","delivery_decision":"not_evaluated"});
+    let report = json!({"schema_version":"0.2.0","report_type":"java_gradle_cve_feedback","operation":"cve","language":"java","mode":"gradle","selected_inputs":options.files,"requested_task_paths":options.tasks,"budget":budget_record(timeout,source),"native":native,"next_action":next_action,"task_sync":"not_integrated","authority":"local_unverified","delivery_decision":"not_evaluated"});
     if options.json {
         println!("{report}");
     } else {

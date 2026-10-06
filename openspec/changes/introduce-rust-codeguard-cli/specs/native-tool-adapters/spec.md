@@ -943,3 +943,7 @@ Model capture, original task execution and report ownership observation SHALL sh
 #### Scenario: An existing Gradle dependency cache enables offline original plugin resolution
 - **WHEN** --gradle-module-cache explicitly selects an existing caches/modules-2 directory
 - **THEN** Rust SHALL take a bounded immutable dependency-cache snapshot into the private Gradle user directory, reject user configuration and symlink escapes, preserve the cache digest and reject source-cache changes; it SHALL NOT modify or implicitly select the user's Gradle home or install plugin dependencies
+
+#### Scenario: Individually bounded native reports exceed aggregate resource limits
+- **WHEN** multiple selected OWASP tasks exceed16MiB cumulative report input,1000 cumulative advisory observations or2MiB serialized report feedback, including repeated package identifiers expanding small inputs
+- **THEN** the application service SHALL stop bounded aggregation with a concrete incomplete budget observation, SHALL NOT silently truncate reports or issue an empty-clean verdict, and SHALL check cancellation/deadline between report reads and feedback records

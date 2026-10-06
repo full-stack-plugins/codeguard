@@ -289,7 +289,15 @@ pub fn observe(selected: &Request, cancelled: &AtomicBool) -> Value {
     };
     report["ownership_report_sha256"] = json!(digest(&ownership_bytes));
     let mut reports = Vec::new();
+    let mut budget = crate::gradle_owasp_report_budget::GradleOwaspReportBudget::default();
     for owner in ownership {
+        if cancelled.load(Ordering::Relaxed) || codeguard_runtime::sigint_cancellation_requested() {
+            fail!("request_cancelled");
+        }
+        if Instant::now() >= request.deadline {
+            fail!("request_deadline_exceeded");
+        }
+
         // 原输出不能来自选定输入，且逐级物理路径不得通过符号链接逃逸私有副本。
         if snapshot
             .files()
@@ -304,7 +312,21 @@ pub fn observe(selected: &Request, cancelled: &AtomicBool) -> Value {
         if !canonical.starts_with(&project) || canonical != path {
             fail!("gradle_owasp_report_scope_invalid");
         }
-        let Ok(bytes) = read_bounded_regular_file(&path, 8 * 1024 * 1024) else {
+        let limit = budget.remaining_input().min(8 * 1024 * 1024);
+        if limit == 0 {
+            fail!("gradle_owasp_report_budget_exceeded");
+        }
+        if fs::symlink_metadata(&path)
+            .ok()
+            .is_some_and(|metadata| metadata.len() > limit as u64)
+        {
+            fail!(if limit < 8 * 1024 * 1024 {
+                "gradle_owasp_report_budget_exceeded"
+            } else {
+                "gradle_owasp_report_unavailable"
+            });
+        }
+        let Ok(bytes) = read_bounded_regular_file(&path, limit as u64) else {
             fail!("gradle_owasp_report_unavailable");
         };
         let Ok(parsed) = parse_owasp_dependency_check_json(&bytes) else {
@@ -313,8 +335,31 @@ pub fn observe(selected: &Request, cancelled: &AtomicBool) -> Value {
         if parsed.engine_version != "12.1.0" || parsed.project_name != owner.report_project_name {
             fail!("gradle_owasp_native_report_attribution_unresolved");
         }
-        let advisories=parsed.advisories.iter().map(|item|json!({"source":item.source,"advisory_id":item.advisory_id,"score":item.score,"package_ids":item.package_ids,"dependency_sha256":item.dependency_sha256,"suppressed_by_native_tool":item.suppressed_by_native_tool})).collect::<Vec<_>>();
-        reports.push(json!({"project_path":owner.project_path,"task_path":owner.task_path,"implementation":owner.implementation,"report_path":owner.report_path,"report_sha256":digest(&bytes),"engine_version":parsed.engine_version,"project_name":parsed.project_name,"report_date":parsed.report_date,"data_sources":parsed.data_sources,"dependency_count":parsed.dependency_count,"advisories":advisories}));
+        if let Err(reason) = budget.reserve_input(bytes.len(), parsed.advisories.len()) {
+            fail!(reason);
+        }
+        let mut row = json!({"project_path":owner.project_path,"task_path":owner.task_path,"implementation":owner.implementation,"report_path":owner.report_path,"report_sha256":digest(&bytes),"engine_version":parsed.engine_version,"project_name":parsed.project_name,"report_date":parsed.report_date,"data_sources":parsed.data_sources,"dependency_count":parsed.dependency_count,"advisories":[]});
+        if let Err(reason) = budget.reserve_feedback(&row) {
+            fail!(reason);
+        }
+        let mut advisories = Vec::new();
+        for item in parsed.advisories {
+            if cancelled.load(Ordering::Relaxed)
+                || codeguard_runtime::sigint_cancellation_requested()
+            {
+                fail!("request_cancelled");
+            }
+            if Instant::now() >= request.deadline {
+                fail!("request_deadline_exceeded");
+            }
+            let value = json!({"source":item.source,"advisory_id":item.advisory_id,"score":item.score,"package_ids":item.package_ids,"dependency_sha256":item.dependency_sha256,"suppressed_by_native_tool":item.suppressed_by_native_tool});
+            if let Err(reason) = budget.reserve_feedback(&value) {
+                fail!(reason);
+            }
+            advisories.push(value);
+        }
+        row["advisories"] = json!(advisories);
+        reports.push(row);
     }
     if cancelled.load(Ordering::Relaxed) || codeguard_runtime::sigint_cancellation_requested() {
         fail!("request_cancelled");
@@ -410,5 +455,5 @@ fn private_scratch() -> Result<Scratch, ()> {
 
 /// 构造缺前置的观察；不表示原生执行或漏洞清洁。
 pub fn missing_prerequisites() -> Value {
-    json!({"schema_version":"0.1.0","report_type":"gradle_dependency_check_probe","checker_id":"java.gradle.dependency_check","native_status":"incomplete","reason":"prerequisites_missing","init_scripts_sha256":digest(format!("{MODEL_SCRIPT}\n{OWASP_SCRIPT}").as_bytes()),"dependency_cache_sha256":null,"model_report_sha256":null,"ownership_report_sha256":null,"source_snapshot_sha256":null,"gradle_bundle_sha256":null,"java_entry_sha256":null,"jdk_release_sha256":null,"task_paths":[],"native_exit_code":null,"native_stdout_sha256":null,"native_stderr_sha256":null,"reports":[],"database_freshness_verified":false,"dependency_attribution_verified":false,"coverage_proven":false,"authority":"local_unverified","delivery_decision":"not_evaluated"})
+    json!({"schema_version":"0.2.0","report_type":"gradle_dependency_check_probe","checker_id":"java.gradle.dependency_check","native_status":"incomplete","reason":"prerequisites_missing","init_scripts_sha256":digest(format!("{MODEL_SCRIPT}\n{OWASP_SCRIPT}").as_bytes()),"dependency_cache_sha256":null,"model_report_sha256":null,"ownership_report_sha256":null,"source_snapshot_sha256":null,"gradle_bundle_sha256":null,"java_entry_sha256":null,"jdk_release_sha256":null,"task_paths":[],"native_exit_code":null,"native_stdout_sha256":null,"native_stderr_sha256":null,"reports":[],"database_freshness_verified":false,"dependency_attribution_verified":false,"coverage_proven":false,"authority":"local_unverified","delivery_decision":"not_evaluated"})
 }
