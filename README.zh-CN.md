@@ -976,3 +976,8 @@ flowchart LR
 ## 同构建根的 Maven 与 Gradle 归属
 
 静态发现现逐份保留同一物理目录的Maven、Groovy Gradle、Kotlin Gradle配置引用。损坏POM不能遮蔽Gradle，两种Gradle脚本并存也分别保留。Java依赖/CVE/安全类别保留构建器混合或Gradle未解析状态，不再挂全范围Maven身份；已经取得的Maven局部依赖图和漏洞观察仍放在native_results。check反馈0.61保留普通检查/lint-only两个封闭契约，Java注释not_configured原因严格限于对应类别，旧schema不改。这是范围归属修复，不是原生Gradle插件执行或生产验收完成。本地缓存Gradle8.10.2版本命令已实际运行，所检查OWASP Gradle插件缓存路径不存在，本批未安装或下载。见[验收记录](tests/acceptance/java-mixed-build-roots.md)。
+
+
+### 开发期CLI的Gradle配置观察
+
+`check java` / `check all`可显式提供`--gradle-bundle`、`--java-home`及可重复的`--gradle-project-file`，使用已有Gradle观察选定构建输入。统一调度处理超时与取消，check_feedback0.62将局部模型与质量结果分开保存；`lint all`拒绝此组参数。模型成功不证明完整配置覆盖，也不执行质量/漏洞任务。见[命令参考](docs/Codeguard-Command-Reference.zh_CN.md)和[验收](tests/acceptance/gradle-public-model-check.md)；未发布npm包或授予生产资格。

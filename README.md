@@ -993,3 +993,8 @@ flowchart LR
 ## Maven and Gradle in the same build root
 
 Static discovery now retains every Maven/Groovy-Gradle/Kotlin-Gradle configuration reference in a shared physical directory. A malformed POM cannot hide Gradle, and two Gradle build scripts remain separate observations. Java dependency/CVE/security aggregates keep the mixed-build or unresolved-Gradle condition and no global Maven checker identity; any available Maven-local dependency graph and advisory observations remain in `native_results`. Check feedback0.61 preserves closed normal-check and lint-only contracts, including narrowly constrained Java comments `not_configured`; prior schemas remain unchanged. This fixes scope attribution, not native Gradle plugin execution or production acceptance. The local cached Gradle8.10.2 version command ran, while the inspected OWASP Gradle plugin cache paths were absent; no installation/download was performed. See [acceptance](tests/acceptance/java-mixed-build-roots.md).
+
+
+### Gradle configuration observation in the development CLI
+
+`check java` and `check all` accept `--gradle-bundle`, `--java-home` and repeatable `--gradle-project-file` options to observe explicitly selected build inputs with an existing Gradle distribution. The shared scheduler handles timeout/cancellation. Check feedback0.62 preserves the partial model separately from quality results; `lint all` rejects the options. A successful model does not establish full configuration coverage or execute quality/vulnerability tasks. See [command reference](docs/Codeguard-Command-Reference.md) and [acceptance](tests/acceptance/gradle-public-model-check.md). No npm release or production qualification is claimed.

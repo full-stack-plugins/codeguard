@@ -291,3 +291,248 @@ fn existing_gradle_observes_kotlin_dsl_without_executing_quality_tasks() {
         fs::write(output, serde_json::to_vec_pretty(&report).unwrap()).unwrap();
     }
 }
+
+#[test]
+fn public_check_preserves_gradle_model_failure_as_local_configuration_observation() {
+    let fixture = Fixture::new("#!/bin/sh\nprintf secret >&2\nexit 1\n");
+    fs::write(
+        fixture.directory.path().join("project/Sample.java"),
+        "class Sample {}\n",
+    )
+    .unwrap();
+    let request = fixture.request();
+    let output = std::process::Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["check", "java"])
+        .arg(&request.project_root)
+        .arg("--gradle-bundle")
+        .arg(&request.gradle_bundle)
+        .arg("--java-home")
+        .arg(&request.java_home)
+        .args([
+            "--gradle-project-file",
+            "settings.gradle",
+            "--gradle-project-file",
+            "build.gradle",
+            "--format=json",
+        ])
+        .env("PATH", "/no/tools")
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(3), "{output:?}");
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(report["schema_version"], "0.62.0");
+    assert_eq!(
+        report["native_results"]["java_gradle_model"]["reason"],
+        "native_execution_incomplete"
+    );
+    assert!(
+        report["execution_tasks"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|t| t["id"] == "java.gradle.model" && t["status"] == "native_incomplete")
+    );
+    assert_eq!(report["obligation_status"], "unresolved");
+    assert!(!String::from_utf8(output.stdout).unwrap().contains("secret"));
+    if let Some(path) = std::env::var_os("CODEGUARD_TEST_GRADLE_CHECK_REPORT") {
+        fs::write(path, serde_json::to_vec_pretty(&report).unwrap()).unwrap();
+    }
+}
+
+#[test]
+fn public_model_scope_options_reject_partial_duplicate_escaping_or_wrong_language() {
+    let fixture = Fixture::new("#!/bin/sh\nexit 1\n");
+    let request = fixture.request();
+    for (command, language, extra) in [
+        (
+            "check",
+            "java",
+            vec!["--gradle-project-file", "settings.gradle"],
+        ),
+        (
+            "check",
+            "java",
+            vec![
+                "--gradle-project-file",
+                "settings.gradle",
+                "--gradle-project-file",
+                "../build.gradle",
+            ],
+        ),
+        (
+            "check",
+            "java",
+            vec![
+                "--gradle-project-file",
+                "settings.gradle",
+                "--gradle-project-file",
+                "build.gradle",
+                "--gradle-project-file",
+                "build.gradle",
+            ],
+        ),
+        (
+            "check",
+            "python",
+            vec![
+                "--gradle-project-file",
+                "settings.gradle",
+                "--gradle-project-file",
+                "build.gradle",
+            ],
+        ),
+        (
+            "lint",
+            "all",
+            vec![
+                "--gradle-project-file",
+                "settings.gradle",
+                "--gradle-project-file",
+                "build.gradle",
+            ],
+        ),
+    ] {
+        let output = std::process::Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args([command, language])
+            .arg(&request.project_root)
+            .arg("--gradle-bundle")
+            .arg(&request.gradle_bundle)
+            .arg("--java-home")
+            .arg(&request.java_home)
+            .args(extra)
+            .arg("--format=json")
+            .env("PATH", "/no/tools")
+            .output()
+            .unwrap();
+        assert_eq!(output.status.code(), Some(2), "{output:?}");
+        assert!(output.stdout.is_empty());
+    }
+}
+
+#[test]
+#[ignore = "requires explicitly supplied existing Gradle and JDK; never installs"]
+fn public_check_runs_existing_gradle_model_without_promoting_quality_configuration() {
+    let fixture = Fixture::new("#!/bin/sh\nexit 1\n");
+    let request = fixture.request();
+    fs::write(
+        request.project_root.join("Sample.java"),
+        "class Sample {}\n",
+    )
+    .unwrap();
+    let output = std::process::Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["check", "java"])
+        .arg(&request.project_root)
+        .arg("--gradle-bundle")
+        .arg(std::env::var_os("CODEGUARD_TEST_GRADLE_BUNDLE").expect("existing Gradle"))
+        .arg("--java-home")
+        .arg(std::env::var_os("CODEGUARD_TEST_JAVA_HOME").expect("existing JDK"))
+        .args([
+            "--gradle-project-file",
+            "settings.gradle",
+            "--gradle-project-file",
+            "build.gradle",
+            "--timeout",
+            "60s",
+            "--format=json",
+        ])
+        .env("PATH", "/no/tools")
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(3), "{output:?}");
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(report["schema_version"], "0.62.0");
+    assert_eq!(
+        report["native_results"]["java_gradle_model"]["native_status"], "model_observed_unverified",
+        "{report}"
+    );
+    assert_eq!(
+        report["native_results"]["java_gradle_model"]["coverage_proven"],
+        false
+    );
+    assert!(
+        report["category_candidates"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|row| row["language"] == "java"
+                && row["category"] == "cve"
+                && row["status"] == "configuration_unresolved")
+    );
+    assert_eq!(
+        report["native_results"]["java_cve"],
+        serde_json::Value::Null
+    );
+    if let Some(path) = std::env::var_os("CODEGUARD_TEST_GRADLE_CHECK_REPORT") {
+        fs::write(path, serde_json::to_vec_pretty(&report).unwrap()).unwrap();
+    }
+}
+
+#[test]
+fn public_check_sigint_cancels_gradle_model_and_preserves_incomplete_report() {
+    let fixture = Fixture::new("#!/bin/sh\nexit 1\n");
+    let request = fixture.request();
+    let marker = fixture.directory.path().join("started");
+    fs::write(
+        request.gradle_bundle.join("bin/gradle"),
+        format!(
+            "#!/bin/sh\nprintf started > '{}'\nsleep 10\n",
+            marker.display()
+        ),
+    )
+    .unwrap();
+    let child = std::process::Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["check", "java"])
+        .arg(&request.project_root)
+        .arg("--gradle-bundle")
+        .arg(&request.gradle_bundle)
+        .arg("--java-home")
+        .arg(&request.java_home)
+        .args([
+            "--gradle-project-file",
+            "settings.gradle",
+            "--gradle-project-file",
+            "build.gradle",
+            "--timeout",
+            "15s",
+            "--format=json",
+        ])
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .env("PATH", "/no/tools")
+        .spawn()
+        .unwrap();
+    let until = Instant::now() + Duration::from_secs(5);
+    while !marker.exists() && Instant::now() < until {
+        std::thread::sleep(Duration::from_millis(20));
+    }
+    if !marker.exists() {
+        let mut child = child;
+        let _ = child.kill();
+        let _ = child.wait();
+        panic!("Gradle process did not start");
+    }
+    assert!(
+        std::process::Command::new("/bin/kill")
+            .args(["-INT", &child.id().to_string()])
+            .status()
+            .unwrap()
+            .success()
+    );
+    let output = child.wait_with_output().unwrap();
+    assert_eq!(output.status.code(), Some(130), "{output:?}");
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(
+        report["native_results"]["java_gradle_model"]["reason"],
+        "request_cancelled"
+    );
+    assert!(
+        report["execution_tasks"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|t| t["id"] == "java.gradle.model" && t["status"] == "cancelled")
+    );
+    if let Some(path) = std::env::var_os("CODEGUARD_TEST_GRADLE_CANCEL_REPORT") {
+        fs::write(path, serde_json::to_vec_pretty(&report).unwrap()).unwrap();
+    }
+}

@@ -913,3 +913,14 @@ codeguard next . --format json
 Maven绑定包装为 `java_comments_feedback 0.5.0`，保存观察为 `maven_javadoc_workbench_observation 0.1.0`，修复简报内部版本0.4且 `observation_scope=configured_maven_multifile_probe`。JDK文件/项目模式保留0.4包装及已有复检协议。反馈包含稳定任务身份、证据引用、原生规则、允许范围和原Maven重扫argv。`task_verify_status=not_integrated` 明示Maven原任务复检尚未接通，不能套用JDK单文件复检；准备任务只恢复环境，不修改无关源码。重复扫描不重复建任务，局部零诊断不关闭历史任务。
 
 当前只覆盖既有简单静态POM直接重放探针；完整生效模型、复杂项目、Maven原任务复检、可信关闭/复发、真实宿主及发行仍需验收。本轮验证使用受控Maven进程夹具，不冒充真实插件执行。详见 `tests/acceptance/maven-javadoc-workbench.md`。
+
+
+### 项目检查中的Gradle模型观察（开发期CLI）
+
+```bash
+codeguard check java . --gradle-bundle /absolute/gradle-8.10.2 --java-home /absolute/jdk \
+  --gradle-project-file settings.gradle --gradle-project-file build.gradle \
+  --gradle-project-file app/build.gradle --format json
+```
+
+显式选择实际Groovy/Kotlin DSL文件；模型仅描述选定副本，不证明完整项目配置覆盖，也不执行注释、开发规范或漏洞任务。工具、JDK和根settings/build文件须同时提供；输入必须为唯一普通相对路径。check_feedback 0.62独立保存模型，检查仍保持未完成。`check all`接受同组参数，`lint all`拒绝；这只是本地开发CLI验收，不代表npm包已发布。见[公开入口验收](../tests/acceptance/gradle-public-model-check.md)。

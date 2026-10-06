@@ -54,6 +54,8 @@ struct Args {
     shellcheck_tool: Option<PathBuf>,
     shell_dialect: Option<String>,
     zig_tool: Option<PathBuf>,
+    gradle_bundle: Option<PathBuf>,
+    gradle_project_files: BTreeSet<PathBuf>,
     maven_tool: Option<PathBuf>,
     java_home: Option<PathBuf>,
     maven_repo: Option<PathBuf>,
@@ -87,6 +89,8 @@ pub fn run_lint_all(args: &[String]) -> ExitCode {
         return ExitCode::from(2);
     }
     let forbidden = [
+        "--gradle-bundle",
+        "--gradle-project-file",
         "--pip-audit-tool",
         "--pip-audit-version",
         "--cargo-audit-tool",
@@ -104,7 +108,7 @@ pub fn run_lint_all(args: &[String]) -> ExitCode {
         .iter()
         .any(|a| forbidden.contains(&a.split('=').next().unwrap_or(a)))
     {
-        eprintln!("lint all不接受独立CVE检查参数");
+        eprintln!("lint all不接受独立CVE或配置模型参数");
         return ExitCode::from(2);
     }
     run_scoped(args, true)
@@ -466,6 +470,9 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
         execution_tasks.push(json!({"id":"zig.lint","status":if report["local_parse_complete"]==true {"native_observed_unverified"}else{"native_incomplete"}}));
         report
     };
+    let gradle_requested = parsed.gradle_bundle.is_some();
+    let mut java_gradle_model = Value::Null;
+    let mut gradle_model_outcome = None;
     let mut java_p3c = Value::Null;
     let mut java_javadoc = Value::Null;
     let mut java_dependencies = Value::Null;
@@ -477,6 +484,7 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
         || go_present
         || erlang_present
         || java_present
+        || gradle_requested
         || dependency_configured
         || cve_configured
         || !npm_roots.is_empty()
@@ -549,6 +557,13 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                 });
             }
         }
+        if gradle_requested {
+            nodes.push(TaskNode {
+                id: "java.gradle.model".into(),
+                dependencies: Vec::new(),
+                resources: vec!["java.gradle_model".into()],
+            });
+        }
         if dependency_configured {
             nodes.push(TaskNode {
                 id: "java.dependencies".into(),
@@ -588,6 +603,7 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
         let node_slot = Mutex::new(None::<crate::check_eslint_scan::CheckEslintScan>);
         let go_slot = Mutex::new(None);
         let erlang_slot = Mutex::new(None);
+        let gradle_model_slot = Mutex::new(None);
         let java_slot = Mutex::new(None);
         let javadoc_slot = Mutex::new(None);
         let dependency_slot = Mutex::new(None);
@@ -827,6 +843,31 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                     *rust_slot.lock().expect("Rust 结果槽位未中毒") = Some(report);
                     *rust_coverage_slot.lock().expect("Rust源码覆盖槽位未中毒") = Some(coverage);
                     outcome
+                } else if id.id == "java.gradle.model" {
+                    let report = crate::gradle_model_probe::observe(
+                        &crate::gradle_model_probe::Request {
+                            project_root: root.clone(),
+                            project_files: parsed.gradle_project_files.clone(),
+                            gradle_bundle: parsed
+                                .gradle_bundle
+                                .clone()
+                                .expect("显式Gradle任务有工具"),
+                            java_home: parsed.java_home.clone().expect("参数验证要求JDK"),
+                            deadline,
+                        },
+                        flag,
+                    );
+                    let outcome = if report["reason"] == "request_cancelled" {
+                        TaskExecution::Cancelled
+                    } else if report["reason"] == "request_deadline_exceeded" {
+                        TaskExecution::TimedOut
+                    } else if report["native_status"] == "model_observed_unverified" {
+                        TaskExecution::Succeeded
+                    } else {
+                        TaskExecution::Failed
+                    };
+                    *gradle_model_slot.lock().expect("Gradle模型结果槽未中毒") = Some(report);
+                    outcome
                 } else if id.id == "java.javadoc" {
                     let report = observe_javadoc_project(
                         &root,
@@ -1008,6 +1049,14 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                 "java_cve":snapshot_native_slot(&cve_slot),
                 "npm_cve":npm_slots.lock().unwrap_or_else(std::sync::PoisonError::into_inner).values().cloned().collect::<Vec<_>>()
             });
+            if gradle_requested {
+                native_results["java_gradle_model"] = snapshot_native_slot(&gradle_model_slot);
+                native_results["kotlin_lint"] = kotlin_lint.clone();
+                native_results["swift_lint"] = swift_lint.clone();
+                native_results["ruby_lint"] = ruby_lint.clone();
+                native_results["shell_lint"] = shell_lint.clone();
+                native_results["zig_lint"] = zig_lint.clone();
+            }
             if zig_lint.is_object() {
                 crate::check_zig_scan::refresh(&root, &mut zig_lint, deadline);
                 native_results["zig_lint"] = zig_lint.clone();
@@ -1157,6 +1206,17 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
             go_lint = go_slot
                 .into_inner()
                 .expect("Go 结果槽位未中毒")
+                .unwrap_or(Value::Null);
+        }
+        if gradle_requested {
+            let outcome = *outcomes
+                .get("java.gradle.model")
+                .expect("Gradle模型任务结果完整");
+            gradle_model_outcome = Some(outcome);
+            execution_tasks.push(json!({"id":"java.gradle.model", "status":task_status(outcome)}));
+            java_gradle_model = gradle_model_slot
+                .into_inner()
+                .expect("Gradle模型结果槽未中毒")
                 .unwrap_or(Value::Null);
         }
         if java_present {
@@ -1801,6 +1861,7 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
             javadoc_task_outcome,
             dependency_task_outcome,
             cve_task_outcome,
+            gradle_model_outcome,
         ]
         .into_iter()
         .flatten()
@@ -1810,6 +1871,13 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                 TaskOutcome::Cancelled | TaskOutcome::CancelledBeforeStart
             )
         });
+    if gradle_requested {
+        unresolved
+            .insert("gradle_selected_configuration_model_and_quality_coverage_unverified".into());
+        if java_gradle_model["native_status"] != "model_observed_unverified" {
+            unresolved.insert("gradle_native_model_incomplete".into());
+        }
+    }
     if request_cancelled {
         unresolved.insert("request_cancelled".into());
     }
@@ -1962,6 +2030,7 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
         javadoc_task_outcome,
         dependency_task_outcome,
         cve_task_outcome,
+        gradle_model_outcome,
     ]
     .into_iter()
     .flatten()
@@ -2127,7 +2196,7 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
         .iter()
         .any(|entry| entry.checker_id.starts_with("java.gradle."));
     let mut report = json!({
-        "schema_version":if gradle_model_unresolved {"0.61.0"}else if next["schema_version"] == "0.21.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row|row.get("javascript_mode_observation").is_some())) {"0.60.0"}else if lint_only {"0.59.0"}else if next["repair_brief"]["checker_id"] == "java.maven.p3c" && next["repair_brief"]["reason_code"] == "p3c_configuration_not_confirmed" {"0.58.0"}else if next["repair_brief"]["checker_id"] == "java.maven.javadoc" {"0.57.0"}else if next["repair_brief"]["checker_id"] == "rust.cargo_clippy" {"0.56.0"}else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"]=="erlang" && row.get("structural_observations").is_some())) {"0.55.0"} else if next["schema_version"] == "0.20.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"]=="javascript" && row.get("structural_observations").is_some())) {"0.54.0"}else if syntax_candidates["observations"].as_array().is_some_and(|rows|rows.iter().any(|row|row["language"]=="cfquery")) {"0.53.0"}else if shell_lint.is_object() || next["schema_version"]=="0.17.0" {"0.52.0"}else if ruby_lint.is_object() || next["schema_version"] == "0.15.0" {"0.51.0"} else if next["schema_version"] == "0.14.0" {"0.50.0"} else if next["schema_version"] == "0.13.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.49.0"} else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row.get("structural_observations").is_some())) {"0.48.0"} else if zig_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.12.0" {"0.47.0"}else if zig_lint.is_object() {"0.46.0"} else if matches!(parsed.selection, Selection::Language(_)) {"0.45.0"} else if swift_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.11.0" {"0.44.0"} else if swift_lint.is_object() {"0.43.0"} else if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
+        "schema_version":if gradle_requested {"0.62.0"}else if gradle_model_unresolved {"0.61.0"}else if next["schema_version"] == "0.21.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row|row.get("javascript_mode_observation").is_some())) {"0.60.0"}else if lint_only {"0.59.0"}else if next["repair_brief"]["checker_id"] == "java.maven.p3c" && next["repair_brief"]["reason_code"] == "p3c_configuration_not_confirmed" {"0.58.0"}else if next["repair_brief"]["checker_id"] == "java.maven.javadoc" {"0.57.0"}else if next["repair_brief"]["checker_id"] == "rust.cargo_clippy" {"0.56.0"}else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"]=="erlang" && row.get("structural_observations").is_some())) {"0.55.0"} else if next["schema_version"] == "0.20.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"]=="javascript" && row.get("structural_observations").is_some())) {"0.54.0"}else if syntax_candidates["observations"].as_array().is_some_and(|rows|rows.iter().any(|row|row["language"]=="cfquery")) {"0.53.0"}else if shell_lint.is_object() || next["schema_version"]=="0.17.0" {"0.52.0"}else if ruby_lint.is_object() || next["schema_version"] == "0.15.0" {"0.51.0"} else if next["schema_version"] == "0.14.0" {"0.50.0"} else if next["schema_version"] == "0.13.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.49.0"} else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row.get("structural_observations").is_some())) {"0.48.0"} else if zig_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.12.0" {"0.47.0"}else if zig_lint.is_object() {"0.46.0"} else if matches!(parsed.selection, Selection::Language(_)) {"0.45.0"} else if swift_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.11.0" {"0.44.0"} else if swift_lint.is_object() {"0.43.0"} else if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
         "operation":"check", "selection":parsed.selection.as_str(), "command_status":if request_cancelled { "cancelled" } else { "incomplete" },
         "exit_code":if request_cancelled { 130 } else { 3 }, "delivery_decision":if parsed.selection == Selection::All { "incomplete" } else { "not_evaluated" }, "authority":"local_unverified",
         "reason":if request_cancelled { "request_cancelled" } else if parsed.selection == Selection::All { "full_project_obligations_and_trusted_policy_unavailable" } else if parsed.selection == Selection::Java { "java_selection_obligations_and_trusted_policy_unavailable" } else { "language_selection_obligations_and_trusted_policy_unavailable" },
@@ -2139,11 +2208,14 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
         "syntax_tasks":syntax_tasks,
         "execution_budget":check_budget_record(
             parsed.timeout_ms, parsed.timeout_source, parsed.jobs_limit, parsed.jobs_source,
-            usize::from(node_present) + usize::from(python_present) + python_cve_roots.len() + 4 * usize::from(rust_present) + usize::from(go_present) + usize::from(erlang_present) + usize::from(java_present) + usize::from(javadoc_configured) + usize::from(dependency_configured) + usize::from(cve_configured) + npm_roots.len() + usize::from(kotlin_lint.is_object()) + usize::from(swift_lint.is_object()) + usize::from(zig_lint.is_object()) + usize::from(ruby_lint.is_object()) + usize::from(shell_lint.is_object()), started_native_task_count
+            usize::from(node_present) + usize::from(python_present) + python_cve_roots.len() + 4 * usize::from(rust_present) + usize::from(go_present) + usize::from(erlang_present) + usize::from(java_present) + usize::from(javadoc_configured) + usize::from(dependency_configured) + usize::from(cve_configured) + npm_roots.len() + usize::from(kotlin_lint.is_object()) + usize::from(swift_lint.is_object()) + usize::from(zig_lint.is_object()) + usize::from(ruby_lint.is_object()) + usize::from(shell_lint.is_object()) + usize::from(gradle_requested), started_native_task_count
         ),
         "next":next,
         "export":{"status":"not_requested","reason_code":null}
     });
+    if gradle_requested {
+        report["native_results"]["java_gradle_model"] = java_gradle_model;
+    }
     if zig_lint.is_object()
         || matches!(
             report["schema_version"].as_str(),
@@ -2163,6 +2235,7 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                     | "0.59.0"
                     | "0.60.0"
                     | "0.61.0"
+                    | "0.62.0"
             )
         )
     {
@@ -2192,6 +2265,7 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                 | "0.59.0"
                 | "0.60.0"
                 | "0.61.0"
+                | "0.62.0"
         )
     ) {
         if let Some(native) = report["native_results"].as_object_mut() {
@@ -2220,6 +2294,7 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                 | "0.59.0"
                 | "0.60.0"
                 | "0.61.0"
+                | "0.62.0"
         )
     ) {
         if let Some(native) = report["native_results"].as_object_mut() {
@@ -2240,6 +2315,7 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                 | "0.59.0"
                 | "0.60.0"
                 | "0.61.0"
+                | "0.62.0"
         )
     ) {
         report["native_results"]["ruby_lint"] = ruby_lint.clone();
@@ -2257,6 +2333,7 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                 | "0.59.0"
                 | "0.60.0"
                 | "0.61.0"
+                | "0.62.0"
         )
     ) {
         report["native_results"]["shell_lint"] = shell_lint.clone();
@@ -2613,6 +2690,25 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                     finding["path"], finding["line"], finding["rule_id"]
                 );
             }
+        }
+        if report["native_results"]["java_gradle_model"].is_object() {
+            let model = &report["native_results"]["java_gradle_model"];
+            println!(
+                "Gradle配置模型（选定输入，未执行质量任务）: {} ({})",
+                model["native_status"].as_str().unwrap_or("incomplete"),
+                model["reason"].as_str().unwrap_or("unknown")
+            );
+            for project in model["model"]["projects"].as_array().into_iter().flatten() {
+                println!(
+                    "Gradle项目 {}: 插件 {}；相关任务 {}",
+                    project["path"].as_str().unwrap_or(":"),
+                    project["plugins"],
+                    project["tasks"]
+                );
+            }
+            println!(
+                "下一步：补全原项目配置范围，并运行原生注释、开发规范和漏洞检查；当前模型不证明质量通过。"
+            );
         }
         if let Some(files) = report["native_results"]["java_p3c"]["files"].as_array() {
             for file in files {
@@ -3133,7 +3229,7 @@ fn aborted_task_report(
         execution_tasks.push(json!({"id":"zig.lint","status":if native_results["zig_lint"]["local_parse_complete"]==true {"native_observed_unverified"}else{"native_incomplete"}}));
     }
     json!({
-        "schema_version":if native_results["zig_lint"].is_object() {"0.15.0"}else if matches!(selection, Selection::Language(_)) {"0.14.0"} else {"0.13.0"}, "report_type":"check_aborted",
+        "schema_version":if native_results.get("java_gradle_model").is_some() {"0.16.0"}else if native_results["zig_lint"].is_object() {"0.15.0"}else if matches!(selection, Selection::Language(_)) {"0.14.0"} else {"0.13.0"}, "report_type":"check_aborted",
         "operation":"check", "selection":selection.as_str(),
         "command_status":if cancelled { "cancelled" } else { "internal_error" },
         "exit_code":if cancelled { 130 } else { 4 },
@@ -3163,6 +3259,8 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
     let mut shellcheck_tool = None;
     let mut shell_dialect = None;
     let mut zig_tool = None;
+    let mut gradle_bundle = None;
+    let mut gradle_project_files = BTreeSet::new();
     let mut maven_tool = None;
     let mut java_home = None;
     let mut maven_repo = None;
@@ -3318,6 +3416,34 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
                     .is_some()
                 {
                     return Err("--go-tool 重复".into());
+                }
+            }
+            "--gradle-bundle" => {
+                index += 1;
+                if gradle_bundle
+                    .replace(PathBuf::from(args.get(index).ok_or("缺少Gradle分发路径")?))
+                    .is_some()
+                {
+                    return Err("--gradle-bundle重复".into());
+                }
+            }
+            "--gradle-project-file" => {
+                index += 1;
+                let file = PathBuf::from(args.get(index).ok_or("缺少Gradle选定文件")?);
+                if file.as_os_str().is_empty()
+                    || file.is_absolute()
+                    || !file
+                        .components()
+                        .all(|c| matches!(c, std::path::Component::Normal(_)))
+                    || file.to_str().is_none_or(|s| {
+                        s.chars().any(char::is_control)
+                            || s.contains(['\\', ':'])
+                            || s.split('/').any(|p| p.is_empty() || p == "." || p == "..")
+                    })
+                    || !gradle_project_files.insert(file)
+                    || gradle_project_files.len() > 128
+                {
+                    return Err("Gradle选定文件必须唯一且为普通相对路径".into());
                 }
             }
             "--maven-tool" => {
@@ -3481,6 +3607,21 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
     if go_tool.as_ref().is_some_and(|path| !path.is_absolute()) {
         return Err("--go-tool 必须是绝对路径".into());
     }
+    if gradle_bundle.is_some() != !gradle_project_files.is_empty()
+        || (gradle_bundle.is_some() && java_home.is_none())
+    {
+        return Err("Gradle模型要求--gradle-bundle、--java-home和选定项目文件同时提供".into());
+    }
+    if gradle_bundle.is_some()
+        && (!["settings.gradle", "settings.gradle.kts"]
+            .iter()
+            .any(|p| gradle_project_files.contains(&PathBuf::from(p)))
+            || !["build.gradle", "build.gradle.kts"]
+                .iter()
+                .any(|p| gradle_project_files.contains(&PathBuf::from(p))))
+    {
+        return Err("Gradle模型缺少根settings/build选定输入".into());
+    }
     if (!selection.includes("python") && (ruff_tool.is_some() || pip_audit_tool.is_some()))
         || (!selection.includes("rust")
             && (cargo_tool.is_some() || cargo_audit_tool.is_some() || rustsec_db.is_some()))
@@ -3492,7 +3633,8 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
         || (!selection.includes("shell") && (shellcheck_tool.is_some() || shell_dialect.is_some()))
         || (!selection.includes("zig") && zig_tool.is_some())
         || (!selection.includes("java")
-            && (maven_tool.is_some()
+            && (gradle_bundle.is_some()
+                || maven_tool.is_some()
                 || java_home.is_some()
                 || maven_repo.is_some()
                 || repo_sha256.is_some()
@@ -3502,6 +3644,7 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
         return Err("check 语言选择不接受其它语言的原生工具参数".into());
     }
     if [
+        gradle_bundle.as_ref(),
         maven_tool.as_ref(),
         java_home.as_ref(),
         maven_repo.as_ref(),
@@ -3549,6 +3692,8 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
         shellcheck_tool,
         shell_dialect,
         zig_tool,
+        gradle_bundle,
+        gradle_project_files,
         maven_tool,
         java_home,
         maven_repo,
@@ -3581,6 +3726,37 @@ mod tests {
     use serde_json::json;
 
     use super::{Selection, aborted_task_report};
+
+    #[test]
+    fn gradle_model_survives_sibling_internal_failure_without_acceptance() {
+        let bundle: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../tests/acceptance/evidence/gradle-public-model-check-reports-2026-10-06.json"
+        ))
+        .unwrap();
+        let source = &bundle["reports"][1];
+        let outcomes = BTreeMap::from([
+            ("java.gradle.model".into(), TaskOutcome::Succeeded),
+            ("java.p3c".into(), TaskOutcome::InternalFailure),
+        ]);
+        let report = aborted_task_report(
+            Selection::Java,
+            source["discovery"].clone(),
+            &outcomes,
+            source["native_results"].clone(),
+            false,
+        );
+        assert_eq!(report["schema_version"], "0.16.0");
+        assert_eq!(report["exit_code"], 4);
+        assert_eq!(
+            report["native_results"]["java_gradle_model"],
+            source["native_results"]["java_gradle_model"]
+        );
+        assert_eq!(report["failed_task_ids"], json!(["java.p3c"]));
+        assert_eq!(report["delivery_decision"], "not_evaluated");
+        if let Some(path) = std::env::var_os("CODEGUARD_TEST_GRADLE_ABORT_REPORT") {
+            std::fs::write(path, serde_json::to_vec_pretty(&report).unwrap()).unwrap();
+        }
+    }
 
     #[test]
     fn internal_task_failure_keeps_sibling_native_findings_visible() {
