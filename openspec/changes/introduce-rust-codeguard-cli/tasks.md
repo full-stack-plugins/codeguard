@@ -75,7 +75,7 @@
   Java 扩展：`check_feedback` 0.7 增加 `java.p3c` 独立节点，复用相同截止时间和取消标志，缺项目配置或工具前提仍保留文件级原因。原生 Maven 探针使用私有临时工作区；完整规则集、跨模块构建资源锁及工作区级义务仍缺，3.4 不勾选。
   并发私有工作区补强：共享 `DoctorScratch` 在内部标签后追加进程 ID 与进程内单调序号，防止同一时钟刻度的多个任务争抢同名 0700 目录；目录仍独占创建、不复用残留。并发同标签 RED→GREEN、Python CVE 多根 20 次及整组 15 次重复运行见[局部验收](../../../tests/acceptance/private-scratch-concurrency.md)。跨进程资源锁与完整 CheckPlan 仍缺，3.4 不勾选。
 - [ ] 3.5 实现工作树/index/ref 快照与原始字节校验；验收：SHA-1/SHA-256、坏批响应、特殊文件、symlink/gitlink/LFS 均明确处理。进行中：相邻 Rust CLI 已按 NUL 协议读取真实 index、前后复核列表，并对有界普通 blob 独立核验 SHA-1/SHA-256 Git OID、记录脱敏字节摘要；symlink/gitlink/LFS、超预算和对象读取失败明确 unresolved，见 `codeguard-cli/tests/acceptance/git-index-safety-preview.md`。工作树/ref 快照、坏批响应注入测试、特殊类型完整语义及 Git 工具身份未完成。
-  局部保留进展：单对象/总预算超限不再清空其它已核对 blob 的证据；局部原生 batch 故障也保留先前逐对象核对的结果，并将余项列为 unresolved。真实超预算混合样本通过；受控 Git 第二批损坏响应反例证明前 64 个 OID 证据保留、第 66 个未完成。其它坏批响应变体、工作树/ref 快照及跨平台实测仍缺，3.5 不勾选。
+  局部保留进展：单对象/总预算超限不再清空其它已核对 blob 的证据；局部原生 batch 故障也保留先前逐对象核对的结果，并将余项列为 unresolved。真实超预算混合样本通过；受控 Git 第二批损坏响应反例证明前 64 个 OID 证据保留、第 65 个未完成。其它坏批响应变体、工作树/ref 快照及跨平台实测仍缺，3.5 不勾选。
 - [ ] 3.6 实现 GIT_INDEX_FILE、初始提交、worktree、多 ref/non-HEAD/删除 ref push 输入；验收：真实临时 Git 仓检查准确且 index 不变。进行中：相邻 Rust 的真实 index 路径安全预览覆盖初始仓库、替代 `GIT_INDEX_FILE` 与默认 index 不变；worktree 和 pre-push 多 ref/删除 ref 尚未实现，不勾选。
 - [ ] 3.7 实现执行前后内容身份复核和源码副作用检测；验收：并发编辑或检查器改源码导致 incomplete。
   进行中：相邻 Rust runtime 新增显式相对路径的有界 `SourceSnapshot`，拒绝静态可见的路径越界、重复、符号链接及预算超限；私有副本须写入新目录，运行后复核原件与副本字节。JDK Javadoc 单文件入口已使用此契约，真实 JDK 21 与链接/修改反例通过，见 `codeguard-cli/tests/acceptance/source-snapshot-boundary.md`。调用方源集完整性、并发目录替换的内核级隔离、其它 adapter 接线和项目级 Maven 副作用仍缺，3.7 不勾选。
@@ -1198,7 +1198,7 @@ Swift 差分纠正先以状态断言暴露旧清单文案的红测，再按真�
 
 ## 2026-10-04 统一 grammar 语料扩展与来源隔离（已验证切片）
 
-对应 12.11、14.17、14.19：保留历史 186 例，Rust 导入器加入 22 例结构反例与 Dart 上游 150 例，当前固定 358 例/32 语言/36 个语言×来源组。全部 worker 实际运行，355 可判定、3 unknown；Dart 上游组相对自身预期 4 TP、146 TN、无差异。CFQuery/COBOL 两例 pending 独立列组，不计指标；Erlang 10 FN、VB.NET 1 FP 仍未修复。0.2 保留逐组分母、选定合法/非法预期、来源摘要和原始报告，多来源汇总只加计数、不混算 precision/recall；0.1 schema/语料/旧证据不改写。
+对应 12.11、14.17、14.19：保留历史 186 例，Rust 导入器加入 22 例结构反例与 Dart 上游 150 例，当前固定 358 例/32 语言/35 个语言×来源组。全部 worker 实际运行，355 可判定、3 unknown；Dart 上游组相对自身预期 4 TP、146 TN、无差异。CFQuery/COBOL 两例 pending 独立列组，不计指标；Erlang 10 FN、VB.NET 1 FP 仍未修复。0.2 保留逐组分母、选定合法/非法预期、来源摘要和原始报告，多来源汇总只加计数、不混算 precision/recall；0.1 schema/语料/旧证据不改写。
 
 解析器空树、缺分隔符吞样例与报告缺来源组覆盖计数分别有 RED→GREEN；全字节语料复现、版本拒绝、取消/期限、程序变化和归档不变量有目标回归。见 [0.2 实际验收](../../../tests/acceptance/grammar-cohort-regression-evaluation.md)。未引入 Python 产品运行时、不改变 grammar、npm 或插件锁。本切片不是独立原生 oracle、批准 holdout、语言精度或宿主验收，父任务与完整目标仍未完成。既有 Erlang 37 例 RED 草稿继续保留；不删除失败样例换取验收。
 
@@ -1294,7 +1294,7 @@ Swift 差分纠正先以状态断言暴露旧清单文案的红测，再按真�
 
 ## 2026-10-04 Rust 最低版本传递依赖修复
 
-延续 1.2/11.1/12 的最低编译基线；新增回归在原锁发现 tree-sitter-language 0.1.8 要求 Rust 1.90，实际先失败。固定兼容的 0.1.7 并保持其它依赖和 grammar 字节，217 个活动节点的已声明最低版本回归转绿，46 个无声明节点不自批相容。CI 新增真实 1.85.0 的默认/WASM 全目标 locked check，本机未安装该工具链；远端与完整平台证据仍须继续核验。验收见[最低版本兼容](../../../tests/acceptance/rust-msrv-dependency-compatibility.md)，总体父任务保持开放。
+延续 1.2/11.1/12 的最低编译基线；新增回归在原锁发现 tree-sitter-language 0.1.8 要求 Rust 1.90，实际先失败。固定兼容的 0.1.7 并保持其它依赖和 grammar 字节，217 个活动节点的已声明最低版本回归转绿，45 个无声明节点不自批相容。CI 新增真实 1.85.0 的默认/WASM 全目标 locked check，本机未安装该工具链；远端与完整平台证据仍须继续核验。验收见[最低版本兼容](../../../tests/acceptance/rust-msrv-dependency-compatibility.md)，总体父任务保持开放。
 
 本批默认全目标 1238 passed/0 failed/113 ignored，后续最低版本 patch 边界及方向目标默认/WASM 各 9 passed；CLI WASM 定向 32 passed、runtime 18 passed，结果重叠不相加。更新依赖的全 32 grammar/358 例/35 来源组实际回放完成，707.51 秒；新原始报告通过 0.2 schema，仍保留 73/1/10/269 的分组混淆计数、3 unknown、2 pending、资格零。证据归入同一[最低版本验收](../../../tests/acceptance/rust-msrv-dependency-compatibility.md)，不能升级为完整语言、最低编译器或平台验收。
 
