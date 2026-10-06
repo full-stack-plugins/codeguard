@@ -1,0 +1,41 @@
+{
+  "schema_meta_valid_count": 476,
+  "valid_report_count": 17,
+  "valid_reports": [
+    "python-comments-native.json:DOC102",
+    "python-comments-native.json:DOC201",
+    "python-comments-native.json:DOC202",
+    "python-comments-native.json:DOC402",
+    "python-comments-native.json:DOC403",
+    "python-comments-native.json:DOC501",
+    "python-comments-native.json:DOC502",
+    "python-comments-native-wasm.json:DOC102",
+    "python-comments-native-wasm.json:DOC201",
+    "python-comments-native-wasm.json:DOC202",
+    "python-comments-native-wasm.json:DOC402",
+    "python-comments-native-wasm.json:DOC403",
+    "python-comments-native-wasm.json:DOC501",
+    "python-comments-native-wasm.json:DOC502",
+    "unselected-doc",
+    "unavailable-root",
+    "wasm-unselected-doc"
+  ],
+  "rejected_variant_count": 12,
+  "rejected_variants": [
+    "coverage_proven",
+    "delivery_decision",
+    "detailed_contract_qualification",
+    "documentation_rule_coverage",
+    "authority",
+    "exit_code",
+    "schema_version",
+    "false-native-completion",
+    "unknown-doc",
+    "raw-message",
+    "repair-extra",
+    "cancel-status-mismatch"
+  ],
+  "unchanged_historical_schema_count": 475,
+  "qualification": "not_granted",
+  "schema_sha256": "90c96bd468de354048714edf91247827092c2e56269c3b1f85aa584933a10a08"
+}

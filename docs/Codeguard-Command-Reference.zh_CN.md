@@ -950,3 +950,10 @@ Gradle文档原生描述检查现补齐空注释、缺主描述和空异常说�
 Java Gradle 漏洞检查新增显式原任务入口 `codeguard cve java`；JSON 原配置与可选模块缓存保留，结果仍未受信，工作台和完整原生验收待完成。详见[Gradle OWASP](Codeguard-Gradle-Vulnerability-Checks.zh_CN.md).
 
 `comments rust` 现返回独立 `rust_comments_feedback` 0.1 封装，在 `native_results` 保留原 Rustdoc 0.4 与 Clippy 0.2 观察。两项顺序执行且共用截止时间，`next` 选择文档任务。原独立入口的 Rustdoc JSON 消费方须改读 `native_results.rustdoc`；已保存原生报告和原工具任务复检保持兼容。参见 [统一入口验收](../tests/acceptance/rust-comments-combined.md)。
+
+
+### Python 独立文档入口的局部能力
+
+`codeguard comments python . --ruff-tool /absolute/path/to/ruff --format=json` 复用项目原 Ruff 配置和原工具检查，返回 `python_comments_feedback` 0.1。`native_report` 保留完整脱敏原生0.12对话报告；顶层 `documentation_findings` 仅取已有D###和七项明确DOC规则，顶层 `next` 保留当前及历史文档任务与准备任务，其他开发规范问题仍保留在原生子报告。零诊断不等于详细注释合格：规则覆盖固定 `unverified`，详细契约资格固定 `not_granted`，整体退出3。缺配置生成准备任务；不会开启preview、改配置或用WASM代替文档检查。已初始化项目沿用稳定任务和 `task verify` 原工具复检，原事实不自动关闭。
+
+参见 [独立入口与真实Ruff验收](../tests/acceptance/python-comments-cli.md)。

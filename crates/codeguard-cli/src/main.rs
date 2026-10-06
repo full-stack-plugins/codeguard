@@ -55,6 +55,10 @@ fn main() -> ExitCode {
             codeguard_cli::syntax_worker_command::run(rest)
         }
         #[cfg(unix)]
+        [command, language, rest @ ..] if command == "comments" && language == "python" => {
+            codeguard_cli::python_comments_command::run(rest)
+        }
+        #[cfg(unix)]
         [command, language, rest @ ..] if command == "comments" && language == "java" => {
             codeguard_cli::java_comments_command::run(rest)
         }

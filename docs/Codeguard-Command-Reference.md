@@ -449,3 +449,10 @@ Read-only four-core acceptance plan: `codeguard capabilities [language] --accept
 Java Gradle vulnerability checks now expose explicit original tasks through `codeguard cve java`, preserving JSON configuration and optional module-cache inputs. Observations remain unverified; workbench integration and full native acceptance are pending. See [Gradle OWASP](Codeguard-Gradle-Vulnerability-Checks.md).
 
 `comments rust` now returns the dedicated `rust_comments_feedback` 0.1 wrapper, retaining original Rustdoc 0.4 and Clippy 0.2 observations under `native_results`. It runs both sequentially within one deadline and selects documentation tasks for `next`. Consumers of the former standalone Rustdoc JSON must read `native_results.rustdoc`; stored native reports and original-tool task verification remain compatible. See [combined-entry acceptance](../tests/acceptance/rust-comments-combined.md).
+
+
+### Partial standalone Python documentation entry
+
+`codeguard comments python . --ruff-tool /absolute/path/to/ruff --format=json` reuses project-configured native Ruff and returns `python_comments_feedback` 0.1. `native_report` retains the complete sanitized 0.12 native conversation report. Top-level `documentation_findings` selects existing D### observations and seven explicitly mapped DOC rules; top-level `next` retains current and historical documentation tasks and preparation blockers. Other convention findings remain in the native child report. Zero diagnostics do not qualify detailed comments: documentation rule coverage stays `unverified`, detailed contract qualification stays `not_granted`, and the overall exit is 3. Missing configuration creates preparation work. It does not enable preview, modify configuration or substitute WASM for documentation checks. Initialized projects reuse stable tasks and original-tool `task verify`; native facts are not closed automatically.
+
+See [standalone entry and actual Ruff acceptance](../tests/acceptance/python-comments-cli.md).

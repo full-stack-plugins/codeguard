@@ -52,6 +52,17 @@ impl Project {
         ])
     }
 
+    fn comments(&self, tool: &str) -> Value {
+        self.run(&[
+            "comments",
+            "python",
+            self.0.to_str().unwrap(),
+            "--ruff-tool",
+            tool,
+            "--format=json",
+        ])
+    }
+
     fn verify(&self, id: &str, tool: &str) -> Value {
         self.run(&[
             "task",
@@ -123,6 +134,18 @@ fn actual_pydoclint_rules_reach_comments_tasks_and_original_rechecks() {
     let mut evidence = Vec::new();
     for (rule, source, repaired) in cases {
         let project = Project::new(rule, source);
+        let direct = project.comments(tool);
+        assert_eq!(direct["report_type"], "python_comments_feedback");
+        assert_eq!(direct["local_scan_complete"], true, "{direct}");
+        assert!(
+            direct["documentation_findings"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|finding| finding["rule_id"] == rule),
+            "{direct}"
+        );
+        assert_eq!(direct["detailed_contract_qualification"], "not_granted");
         let first = project.check(tool);
         let files = first["native_results"]["python_lint"]["files"]
             .as_array()
@@ -203,7 +226,7 @@ fn actual_pydoclint_rules_reach_comments_tasks_and_original_rechecks() {
         )
         .unwrap();
         assert_eq!(fact["state"], "open");
-        evidence.push(json!({"codeguard_binary_sha256":binary_sha256,"rule":rule,"first":first,"next":next,"present":present,"suppressed":suppressed,"repeated":repeated,"absent":absent,"fact_state":fact["state"]}));
+        evidence.push(json!({"codeguard_binary_sha256":binary_sha256,"rule":rule,"direct_comments":direct,"first":first,"next":next,"present":present,"suppressed":suppressed,"repeated":repeated,"absent":absent,"fact_state":fact["state"]}));
     }
     assert_eq!(
         binary_sha256,
@@ -295,6 +318,16 @@ fn actual_native_exemptions_and_implicit_exception_require_no_invented_violation
         "preview=false\n[lint]\nselect=['F401']\n",
     )
     .unwrap();
+    let direct_unconfigured = project.comments(tool);
+    assert_eq!(direct_unconfigured["documentation_findings"], json!([]));
+    assert_eq!(
+        direct_unconfigured["documentation_rule_coverage"],
+        "unverified"
+    );
+    assert_eq!(
+        direct_unconfigured["detailed_contract_qualification"],
+        "not_granted"
+    );
     let unconfigured = project.check(tool);
     assert!(
         unconfigured["native_results"]["python_lint"]["files"]
@@ -303,7 +336,7 @@ fn actual_native_exemptions_and_implicit_exception_require_no_invented_violation
             .iter()
             .all(|file| file["findings"].as_array().unwrap().is_empty())
     );
-    evidence.push(json!({"case":"doc_not_selected_no_preview_injection","report":unconfigured}));
+    evidence.push(json!({"case":"doc_not_selected_no_preview_injection","direct_comments":direct_unconfigured,"report":unconfigured}));
     if let Ok(path) = std::env::var("CODEGUARD_TEST_RUFF_DOC_EXEMPTION_EVIDENCE") {
         fs::write(path, serde_json::to_vec_pretty(&evidence).unwrap()).unwrap();
     }

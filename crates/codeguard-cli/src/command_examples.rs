@@ -23,6 +23,7 @@ pub(crate) fn examples(command: &str) -> &'static [&'static str] {
             "codeguard comments java File.java --workspace . --java-home /absolute/jdk21 --format json",
             "codeguard comments java . --java-home /absolute/jdk21 --maven-tool /absolute/mvn --maven-repo /absolute/repository --repo-sha256 SHA256 --format json",
             "codeguard comments rust . --cargo-tool /absolute/cargo --format json",
+            "codeguard comments python . --ruff-tool /absolute/ruff --format json",
         ],
         "task verify" => &[
             "codeguard task verify TASK_ID . --java-home /absolute/jdk21 --format json",
