@@ -42,7 +42,7 @@ fn controlled_javascript_replay_rejects_unexpected_native_output_and_preserves_i
         .expect("explicit Node syntax observer must be available")
     };
     let report = replay(Instant::now() + Duration::from_secs(60), false);
-    assert_eq!(report["schema_version"], "0.4.0");
+    assert_eq!(report["schema_version"], "0.9.0");
     assert_eq!(report["language_count"], 32);
     assert_eq!(report["sample_count"], 2);
     assert_eq!(report["grammar_qualified_count"], 0);
@@ -223,7 +223,7 @@ fn pinned_javascript_worker_matches_native_node_check_on_syntax_corpus() {
         &AtomicBool::new(false),
     )
     .unwrap();
-    assert_eq!(report["schema_version"], "0.4.0");
+    assert_eq!(report["schema_version"], "0.9.0");
     assert_eq!(report["sample_count"], 18);
     assert_eq!(report["program_stable"], true);
     assert_eq!(report["grammar_qualified_count"], 0);
@@ -233,7 +233,13 @@ fn pinned_javascript_worker_matches_native_node_check_on_syntax_corpus() {
         assert_eq!(row["native"]["input_type"], "module");
         assert_eq!(row["fixture_native_disagreement"], false, "{row}");
         assert_ne!(row["comparison"], "unknown", "{row}");
-        assert_eq!(row["comparison"], row["combined_candidate_comparison"]);
+        if row["id"] == "javascript-duplicate_binding" {
+            assert_eq!(row["comparison"], "false_negative");
+            assert_eq!(row["combined_candidate_comparison"], "true_positive");
+            assert_eq!(row["structural_observations"].as_array().unwrap().len(), 1);
+        } else {
+            assert_eq!(row["comparison"], row["combined_candidate_comparison"]);
+        }
     }
     for (name, source, expected) in self::corpus() {
         let row = report["cases"]
@@ -269,4 +275,61 @@ fn pinned_javascript_worker_matches_native_node_check_on_syntax_corpus() {
         serde_json::to_vec(&report).unwrap(),
     )
     .unwrap();
+}
+
+#[test]
+fn combined_native_replay_uses_project_duplicate_binding_rule_without_rewriting_raw_result() {
+    use codeguard_cli::grammar_native_differential::replay_native_corpus;
+    use sha2::{Digest, Sha256};
+    use std::{
+        collections::BTreeMap,
+        os::unix::fs::PermissionsExt,
+        path::PathBuf,
+        sync::atomic::AtomicBool,
+        time::{Duration, Instant},
+    };
+    let root = std::env::temp_dir()
+        .canonicalize()
+        .unwrap()
+        .join(format!("cg-js-combined-{}", std::process::id()));
+    fs::create_dir_all(&root).unwrap();
+    let tool = root.join("node");
+    fs::write(&tool, "#!/bin/sh\nif [ \"$1\" = --version ]; then printf 'v24.18.0\\n'; exit 0; fi\n/bin/cat >/dev/null\nprintf '[stdin]:1\\nconst x=1; const x=2;\\n                 ^\\n\\nSyntaxError: Identifier x has already been declared\\n    at checkSyntax (node:internal/main/check_syntax:72:5)\\n\\nNode.js v24.18.0\\n' >&2\nexit 1\n").unwrap();
+    fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
+    let mut corpus: serde_json::Value = serde_json::from_slice(&current_corpus_bytes()).unwrap();
+    corpus["cases"]
+        .as_array_mut()
+        .unwrap()
+        .retain(|row| row["language"] != "javascript" || row["id"] == "javascript-plain");
+    let source = "const x=1; const x=2;\n";
+    let row = corpus["cases"]
+        .as_array_mut()
+        .unwrap()
+        .iter_mut()
+        .find(|row| row["id"] == "javascript-plain")
+        .unwrap();
+    row["id"] = "javascript-controlled_duplicate_binding".into();
+    row["source"] = source.into();
+    row["source_sha256"] = format!("{:x}", Sha256::digest(source.as_bytes())).into();
+    row["expected_valid"] = false.into();
+    let report = replay_native_corpus(
+        &PathBuf::from(env!("CARGO_BIN_EXE_codeguard")),
+        &serde_json::to_vec(&corpus).unwrap(),
+        &BTreeMap::from([("javascript".into(), tool)]),
+        Instant::now() + Duration::from_secs(30),
+        &AtomicBool::new(false),
+    )
+    .unwrap();
+    assert_eq!(report["cases"][0]["native_classification"], "invalid");
+    assert_eq!(report["cases"][0]["comparison"], "false_negative");
+    assert_eq!(
+        report["cases"][0]["combined_candidate_comparison"], "true_positive",
+        "{report}"
+    );
+    assert_eq!(
+        report["cases"][0]["structural_observations"][0]["rule_id"],
+        "codeguard.javascript.duplicate_direct_lexical_binding"
+    );
+    assert_eq!(report["grammar_qualified_count"], 0);
+    fs::remove_dir_all(root).unwrap();
 }

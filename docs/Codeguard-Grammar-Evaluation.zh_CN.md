@@ -173,3 +173,7 @@ Go候选任务复检现接受 `--go-tool /absolute/sdk/bin/go`，对冻结整文
 ## 2026-10-06 Java21原生增量对照
 
 Java差分验收先核对truncated_files，隐藏恢复保留unknown，避免空recoveries误计为干净。原13例仍用javac21按release17对照；新增8例单独按release21执行，含模式switch/guard/record pattern/sealed/text block及三个语法错误，实际3TP/5TN/0FP/0FN/0unknown。新增组是本轮作者样本，independent_holdout=false，不提升grammar资格或混入固定358例。原生工具和源码摘要随证据绑定。见 [验收](../tests/acceptance/java21-native-differential.md)。
+
+## JavaScript 原生差分对齐项目结构候选
+
+开发差分现在复用项目检查的重复直接绑定 worker，报告0.9分别保留原始恢复与组合结构指标。真实 Node24.18.0 的18个额外 module 样例：原始5TP/11TN/0FP/2FN，组合6TP/11TN/0FP/1FN；重复绑定得到结构规则证据，顶层 module return 仍漏检。规则摘要和语言范围受 schema 约束；旧协议保持不变，旧0.4消费者拒绝新版本。此修正不新增发行资格、不改变固定358例指标，也不能对 CommonJS/未知模式无条件报顶层 return。独立holdout及正式资格仍未完成。见[局部验收](../tests/acceptance/javascript-native-project-binding.md)。
