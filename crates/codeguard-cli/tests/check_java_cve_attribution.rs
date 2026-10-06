@@ -90,6 +90,21 @@ fi
             ])
             .output()
             .unwrap();
+        if let Some(dir) = std::env::var_os("CODEGUARD_JAVA_MIXED_BUILD_REPORT_DIR") {
+            let value: Value = serde_json::from_slice(&output.stdout).unwrap();
+            if value["schema_version"] == "0.61.0" {
+                fs::create_dir_all(&dir).unwrap();
+                fs::write(
+                    PathBuf::from(dir).join(format!(
+                        "native-attribution-{}-{}.json",
+                        std::process::id(),
+                        NEXT.fetch_add(1, Ordering::Relaxed)
+                    )),
+                    &output.stdout,
+                )
+                .unwrap();
+            }
+        }
         (
             output.status.code().unwrap(),
             serde_json::from_slice(&output.stdout).unwrap(),
@@ -156,4 +171,36 @@ fn same_pom_native_reports_produce_exact_digest_candidate_only() {
         "attribution_unavailable"
     );
     assert!(!private.to_string().contains("private.example"));
+}
+
+#[test]
+fn mixed_build_root_keeps_maven_native_evidence_without_assigning_it_to_gradle() {
+    let project = Project::new();
+    fs::write(project.0.join("build.gradle.kts"), b"plugins { java }\n").unwrap();
+    let digest = format!("{:x}", Sha256::digest(b"artifact-bytes"));
+    let (exit, report, stderr) = project.check(&digest, false);
+    assert_eq!(exit, 3, "{stderr}");
+    assert_eq!(
+        report["native_results"]["java_cve"]["observed_report_count"], 1,
+        "{report}"
+    );
+    assert_eq!(
+        report["native_results"]["java_dependencies"]["observed_graph_count"], 1,
+        "{report}"
+    );
+    assert_eq!(
+        report["native_results"]["java_cve"]["probes"][0]["observation"]["advisories"][0]["advisory_id"],
+        "CVE-2026-1234"
+    );
+    for category in ["cve", "dependencies", "security"] {
+        let row = report["category_candidates"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row["language"] == "java" && row["category"] == category)
+            .unwrap();
+        assert_eq!(row["checker_id"], Value::Null, "{report}");
+        assert_eq!(row["status"], "configuration_unresolved", "{report}");
+        assert_eq!(row["reason"], "checker_build_systems_mixed", "{report}");
+    }
 }
