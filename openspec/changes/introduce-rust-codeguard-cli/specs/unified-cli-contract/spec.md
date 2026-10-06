@@ -353,3 +353,10 @@ CLI检查类别/check/plan入口 SHALL 将已登记py/rs/ts/rb/kt/erl/golang/c++
 #### Scenario: A path or grammar dialect resembles an alias
 - **WHEN** 源码路径、工具路径或grammar探针的选择出现py/ts等字符串
 - **THEN** 路径和grammar方言保持原值，只有具名公开检查命令的语言位置归一
+
+### Requirement: lint all SHALL select lint tasks across discovered languages
+公开lint all SHALL复用多语言检查调度器的发现、输入快照、并发预算、原生适配及任务反馈，只选择lint类别。不启动独立build/comments/dependencies/cve任务，不把Python扫描当作全语言检查。报告 SHALL 明确requested_categories=[lint]，保留各语言能力缺口及未完成状态，不签发完整项目通过。
+
+#### Scenario: A mixed Python and Rust project requests lint all
+- **WHEN** 项目包含Python与Rust源码，执行lint all
+- **THEN** 调度python.lint及rust.lint，缺工具保留未完成；不调度Rust构建、注释或漏洞检查，不生成这些类别的失败记录

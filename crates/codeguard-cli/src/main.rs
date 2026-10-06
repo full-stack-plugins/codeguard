@@ -111,6 +111,9 @@ fn main() -> ExitCode {
         [command, rest @ ..] if command == "task" => codeguard_cli::task_verify_command::run(rest),
         #[cfg(unix)]
         [command, rest @ ..] if command == "lint" => {
+            if rest.first().is_some_and(|language| language == "all") {
+                return codeguard_cli::check_command::run_lint_all(rest);
+            }
             if rest.first().is_some_and(|language| language == "java") {
                 codeguard_cli::java_lint_dispatch::run(&rest[1..])
             } else if rest.first().is_some_and(|language| language == "zig") {

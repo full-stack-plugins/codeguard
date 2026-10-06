@@ -77,6 +77,40 @@ enum OutputFormat {
 
 /// 执行已接入的原生检查并报告待确认的候选类别；当前绝不签发 allow。
 pub fn run(args: &[String]) -> ExitCode {
+    run_scoped(args, false)
+}
+
+/// 对全部发现语言执行lint类别；输入复用检查参数，返回原生局部检查退出语义。
+pub fn run_lint_all(args: &[String]) -> ExitCode {
+    if args.first().map(String::as_str) != Some("all") {
+        eprintln!("lint all需要all语言选择");
+        return ExitCode::from(2);
+    }
+    let forbidden = [
+        "--pip-audit-tool",
+        "--pip-audit-version",
+        "--cargo-audit-tool",
+        "--rustsec-db",
+        "--cve-data-dir",
+        "--cve-data-sha256",
+        "--node-tool",
+        "--npm-entry",
+        "--npm-version",
+        "--userconfig",
+        "--globalconfig",
+        "--registry",
+    ];
+    if args
+        .iter()
+        .any(|a| forbidden.contains(&a.split('=').next().unwrap_or(a)))
+    {
+        eprintln!("lint all不接受独立CVE检查参数");
+        return ExitCode::from(2);
+    }
+    run_scoped(args, true)
+}
+
+fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
     let mut parsed = match parse_args(args) {
         Ok(parsed) => parsed,
         Err(reason) => {
@@ -187,47 +221,52 @@ pub fn run(args: &[String]) -> ExitCode {
         .map(|evidence| &evidence.source_files);
     let java_present =
         parsed.selection.includes("java") && java_sources.is_some_and(|files| !files.is_empty());
-    let dependency_configured = parsed.selection.includes("java")
+    let dependency_configured = !lint_only
+        && parsed.selection.includes("java")
         && discovery.checker_configurations.iter().any(|entry| {
             entry.checker_id == "java.maven.dependency" && entry.configuration == "configured"
         });
-    let cve_configured = parsed.selection.includes("java")
+    let cve_configured = !lint_only
+        && parsed.selection.includes("java")
         && discovery.checker_configurations.iter().any(|entry| {
             entry.checker_id == "java.maven.dependency_check" && entry.configuration == "configured"
         });
-    let javadoc_configured = java_present
+    let javadoc_configured = !lint_only
+        && java_present
         && discovery.checker_configurations.iter().any(|entry| {
             entry.checker_id == "java.maven.javadoc" && entry.configuration == "configured"
         });
-    let javadoc_configuration_unresolved = java_present
+    let javadoc_configuration_unresolved = !lint_only
+        && java_present
         && !javadoc_configured
         && discovery.checker_configurations.iter().any(|entry| {
             entry.checker_id == "java.maven.javadoc"
                 && matches!(entry.configuration.as_str(), "unknown" | "invalid")
         });
     let mut npm_roots: BTreeMap<String, (String, Option<String>)> = BTreeMap::new();
-    let python_cve_roots: BTreeMap<String, String> = if parsed.selection.includes("python") {
-        discovery
-            .checker_configurations
-            .iter()
-            .filter(|entry| entry.checker_id == "python.pip_audit")
-            .filter(|entry| {
-                let manifest = if entry.build_root == "." {
-                    "pyproject.toml".to_owned()
-                } else {
-                    format!("{}/pyproject.toml", entry.build_root)
-                };
-                discovery.manifest_sha256.contains_key(&manifest)
-            })
-            .enumerate()
-            .map(|(index, entry)| (format!("python.cve.{index}"), entry.build_root.clone()))
-            .collect()
-    } else {
-        BTreeMap::new()
-    };
+    let python_cve_roots: BTreeMap<String, String> =
+        if !lint_only && parsed.selection.includes("python") {
+            discovery
+                .checker_configurations
+                .iter()
+                .filter(|entry| entry.checker_id == "python.pip_audit")
+                .filter(|entry| {
+                    let manifest = if entry.build_root == "." {
+                        "pyproject.toml".to_owned()
+                    } else {
+                        format!("{}/pyproject.toml", entry.build_root)
+                    };
+                    discovery.manifest_sha256.contains_key(&manifest)
+                })
+                .enumerate()
+                .map(|(index, entry)| (format!("python.cve.{index}"), entry.build_root.clone()))
+                .collect()
+        } else {
+            BTreeMap::new()
+        };
     let mut historical_npm_scope_error = None;
     let mut recorded_npm_scope_error = None;
-    if parsed.selection.includes_node() && cfg!(unix) {
+    if !lint_only && parsed.selection.includes_node() && cfg!(unix) {
         let mut scopes = BTreeMap::new();
         for entry in discovery
             .checker_configurations
@@ -459,21 +498,23 @@ pub fn run(args: &[String]) -> ExitCode {
             });
         }
         if rust_present {
-            nodes.push(TaskNode {
-                id: "rust.cve".into(),
-                dependencies: Vec::new(),
-                resources: vec!["rust.advisory_db".into()],
-            });
-            nodes.push(TaskNode {
-                id: "rust.build".into(),
-                dependencies: Vec::new(),
-                resources: vec!["rust.cargo_target".into()],
-            });
-            nodes.push(TaskNode {
-                id: "rust.comments".into(),
-                dependencies: Vec::new(),
-                resources: vec!["rust.cargo_target".into()],
-            });
+            if !lint_only {
+                nodes.push(TaskNode {
+                    id: "rust.cve".into(),
+                    dependencies: Vec::new(),
+                    resources: vec!["rust.advisory_db".into()],
+                });
+                nodes.push(TaskNode {
+                    id: "rust.build".into(),
+                    dependencies: Vec::new(),
+                    resources: vec!["rust.cargo_target".into()],
+                });
+                nodes.push(TaskNode {
+                    id: "rust.comments".into(),
+                    dependencies: Vec::new(),
+                    resources: vec!["rust.cargo_target".into()],
+                });
+            }
             nodes.push(TaskNode {
                 id: "rust.lint".into(),
                 dependencies: Vec::new(),
@@ -1059,27 +1100,31 @@ pub fn run(args: &[String]) -> ExitCode {
             };
         }
         if rust_present {
-            let cve_outcome = *outcomes.get("rust.cve").expect("Rust CVE 任务结果完整");
-            rust_cve_outcome = Some(cve_outcome);
-            execution_tasks.push(json!({"id":"rust.cve","status":task_status(cve_outcome)}));
-            rust_cve = rust_cve_slot
-                .into_inner()
-                .expect("Rust CVE 结果槽未中毒")
-                .unwrap_or(Value::Null);
-            let build_outcome = *outcomes.get("rust.build").expect("Rust构建任务结果完整");
-            rust_build_outcome = Some(build_outcome);
-            execution_tasks.push(json!({"id":"rust.build","status":task_status(build_outcome)}));
-            rust_build = rust_build_slot
-                .into_inner()
-                .expect("Rust构建结果槽未中毒")
-                .unwrap_or(Value::Null);
-            let doc_outcome = *outcomes.get("rust.comments").expect("Rust文档任务结果完整");
-            rust_comments_outcome = Some(doc_outcome);
-            execution_tasks.push(json!({"id":"rust.comments","status":task_status(doc_outcome)}));
-            rust_comments = rust_comments_slot
-                .into_inner()
-                .expect("Rust文档结果槽未中毒")
-                .unwrap_or(Value::Null);
+            if !lint_only {
+                let cve_outcome = *outcomes.get("rust.cve").expect("Rust CVE 任务结果完整");
+                rust_cve_outcome = Some(cve_outcome);
+                execution_tasks.push(json!({"id":"rust.cve","status":task_status(cve_outcome)}));
+                rust_cve = rust_cve_slot
+                    .into_inner()
+                    .expect("Rust CVE 结果槽未中毒")
+                    .unwrap_or(Value::Null);
+                let build_outcome = *outcomes.get("rust.build").expect("Rust构建任务结果完整");
+                rust_build_outcome = Some(build_outcome);
+                execution_tasks
+                    .push(json!({"id":"rust.build","status":task_status(build_outcome)}));
+                rust_build = rust_build_slot
+                    .into_inner()
+                    .expect("Rust构建结果槽未中毒")
+                    .unwrap_or(Value::Null);
+                let doc_outcome = *outcomes.get("rust.comments").expect("Rust文档任务结果完整");
+                rust_comments_outcome = Some(doc_outcome);
+                execution_tasks
+                    .push(json!({"id":"rust.comments","status":task_status(doc_outcome)}));
+                rust_comments = rust_comments_slot
+                    .into_inner()
+                    .expect("Rust文档结果槽未中毒")
+                    .unwrap_or(Value::Null);
+            }
             let outcome = *outcomes.get("rust.lint").expect("任务图结果应完整");
             if outcome == TaskOutcome::InternalFailure {
                 eprintln!("Rust 任务发生内部异常");
@@ -1345,6 +1390,9 @@ pub fn run(args: &[String]) -> ExitCode {
         });
         let planned_language = legacy_status == "planned";
         for category in CHECK_CATEGORIES {
+            if lint_only && category != "lint" {
+                continue;
+            }
             let npm_selected = matches!(language.as_str(), "typescript" | "javascript")
                 && category == "cve"
                 && !npm_roots.is_empty();
@@ -1582,7 +1630,7 @@ pub fn run(args: &[String]) -> ExitCode {
             unresolved.insert("python_cve_task_incomplete".into());
         }
     }
-    if rust_present {
+    if rust_present && !lint_only {
         unresolved.insert("rust_cve_database_freshness_unverified".into());
         if rust_cve_outcome != Some(TaskOutcome::Succeeded) {
             unresolved.insert("rust_cve_task_incomplete".into());
@@ -2011,7 +2059,7 @@ pub fn run(args: &[String]) -> ExitCode {
         crate::check_shell_scan::refresh(&root, &mut shell_lint, deadline);
     }
     let mut report = json!({
-        "schema_version":if next["repair_brief"]["checker_id"] == "java.maven.p3c" && next["repair_brief"]["reason_code"] == "p3c_configuration_not_confirmed" {"0.58.0"}else if next["repair_brief"]["checker_id"] == "java.maven.javadoc" {"0.57.0"}else if next["repair_brief"]["checker_id"] == "rust.cargo_clippy" {"0.56.0"}else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"]=="erlang" && row.get("structural_observations").is_some())) {"0.55.0"} else if next["schema_version"] == "0.20.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"]=="javascript" && row.get("structural_observations").is_some())) {"0.54.0"}else if syntax_candidates["observations"].as_array().is_some_and(|rows|rows.iter().any(|row|row["language"]=="cfquery")) {"0.53.0"}else if shell_lint.is_object() || next["schema_version"]=="0.17.0" {"0.52.0"}else if ruby_lint.is_object() || next["schema_version"] == "0.15.0" {"0.51.0"} else if next["schema_version"] == "0.14.0" {"0.50.0"} else if next["schema_version"] == "0.13.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.49.0"} else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row.get("structural_observations").is_some())) {"0.48.0"} else if zig_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.12.0" {"0.47.0"}else if zig_lint.is_object() {"0.46.0"} else if matches!(parsed.selection, Selection::Language(_)) {"0.45.0"} else if swift_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.11.0" {"0.44.0"} else if swift_lint.is_object() {"0.43.0"} else if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
+        "schema_version":if lint_only {"0.59.0"}else if next["repair_brief"]["checker_id"] == "java.maven.p3c" && next["repair_brief"]["reason_code"] == "p3c_configuration_not_confirmed" {"0.58.0"}else if next["repair_brief"]["checker_id"] == "java.maven.javadoc" {"0.57.0"}else if next["repair_brief"]["checker_id"] == "rust.cargo_clippy" {"0.56.0"}else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"]=="erlang" && row.get("structural_observations").is_some())) {"0.55.0"} else if next["schema_version"] == "0.20.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"]=="javascript" && row.get("structural_observations").is_some())) {"0.54.0"}else if syntax_candidates["observations"].as_array().is_some_and(|rows|rows.iter().any(|row|row["language"]=="cfquery")) {"0.53.0"}else if shell_lint.is_object() || next["schema_version"]=="0.17.0" {"0.52.0"}else if ruby_lint.is_object() || next["schema_version"] == "0.15.0" {"0.51.0"} else if next["schema_version"] == "0.14.0" {"0.50.0"} else if next["schema_version"] == "0.13.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.49.0"} else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row.get("structural_observations").is_some())) {"0.48.0"} else if zig_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.12.0" {"0.47.0"}else if zig_lint.is_object() {"0.46.0"} else if matches!(parsed.selection, Selection::Language(_)) {"0.45.0"} else if swift_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.11.0" {"0.44.0"} else if swift_lint.is_object() {"0.43.0"} else if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
         "operation":"check", "selection":parsed.selection.as_str(), "command_status":if request_cancelled { "cancelled" } else { "incomplete" },
         "exit_code":if request_cancelled { 130 } else { 3 }, "delivery_decision":if parsed.selection == Selection::All { "incomplete" } else { "not_evaluated" }, "authority":"local_unverified",
         "reason":if request_cancelled { "request_cancelled" } else if parsed.selection == Selection::All { "full_project_obligations_and_trusted_policy_unavailable" } else if parsed.selection == Selection::Java { "java_selection_obligations_and_trusted_policy_unavailable" } else { "language_selection_obligations_and_trusted_policy_unavailable" },
@@ -2044,6 +2092,7 @@ pub fn run(args: &[String]) -> ExitCode {
                     | "0.56.0"
                     | "0.57.0"
                     | "0.58.0"
+                    | "0.59.0"
             )
         )
     {
@@ -2070,6 +2119,7 @@ pub fn run(args: &[String]) -> ExitCode {
                 | "0.56.0"
                 | "0.57.0"
                 | "0.58.0"
+                | "0.59.0"
         )
     ) {
         if let Some(native) = report["native_results"].as_object_mut() {
@@ -2095,6 +2145,7 @@ pub fn run(args: &[String]) -> ExitCode {
                 | "0.56.0"
                 | "0.57.0"
                 | "0.58.0"
+                | "0.59.0"
         )
     ) {
         if let Some(native) = report["native_results"].as_object_mut() {
@@ -2103,15 +2154,48 @@ pub fn run(args: &[String]) -> ExitCode {
     }
     if matches!(
         report["schema_version"].as_str(),
-        Some("0.51.0" | "0.52.0" | "0.53.0" | "0.54.0" | "0.55.0" | "0.56.0" | "0.57.0" | "0.58.0")
+        Some(
+            "0.51.0"
+                | "0.52.0"
+                | "0.53.0"
+                | "0.54.0"
+                | "0.55.0"
+                | "0.56.0"
+                | "0.57.0"
+                | "0.58.0"
+                | "0.59.0"
+        )
     ) {
         report["native_results"]["ruby_lint"] = ruby_lint.clone();
     }
     if matches!(
         report["schema_version"].as_str(),
-        Some("0.52.0" | "0.53.0" | "0.54.0" | "0.55.0" | "0.56.0" | "0.57.0" | "0.58.0")
+        Some("0.52.0" | "0.53.0" | "0.54.0" | "0.55.0" | "0.56.0" | "0.57.0" | "0.58.0" | "0.59.0")
     ) {
         report["native_results"]["shell_lint"] = shell_lint.clone();
+    }
+    if lint_only {
+        report["requested_categories"] = json!(["lint"]);
+        // 全量历史同步保留其它类别事实，但本次简报不能指导执行独立CVE/构建/注释任务。
+        if report["next"]["repair_brief"]["checker_id"]
+            .as_str()
+            .is_some_and(|checker| {
+                !matches!(
+                    checker,
+                    "python.ruff"
+                        | "python.ruff.doctor"
+                        | "rust.cargo_clippy"
+                        | "node.eslint"
+                        | "node.eslint.preparation"
+                        | "java.maven.p3c"
+                        | "go.vet"
+                        | "shell.shellcheck"
+                        | "syntax.native_confirmation"
+                )
+            })
+        {
+            report["next"] = Value::Null;
+        }
     }
     if parsed.format != OutputFormat::Human {
         emit_structured(&report, &parsed);
