@@ -1912,3 +1912,7 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 ## 2026-10-06 lint all 多语言调度范围修正
 
 对应2.1/2.3/7.x：公开lint all从Python专用入口改为共享项目调度，仅选择lint节点，正常反馈0.59固定requested_categories=lint。独立build/comments/dependencies/CVE任务不运行，原生lint自身行为保留；不删除其它类别历史，next不选其简报。默认七目标86通过/15条件忽略、WASM范围四项通过、实际报告及四伪造反例、严格Clippy/分层/OpenSpec通过。见tests/acceptance/lint-all-scope.md。完整账本/原生矩阵、取消故障全入口、宿主/平台/发行未完成，父任务不勾选。
+
+## 2026-10-06 lint all 公开SIGINT与清理验收
+
+对应2.3/2.8：同一受控进程夹具分别check all/lint all实际发送SIGINT，退出130、保留已完成Clippy诊断与Python取消状态、核对子孙无晚写入；lint协议与候选保持仅lint。默认相关23通过/3条件忽略，WASM取消两项通过（重叠不累计），两份实际报告和每份两种状态矛盾反例核验。见tests/acceptance/lint-all-cancellation.md。内部异常、完整聚合、跨入口/平台/宿主仍缺，不勾选父任务。
