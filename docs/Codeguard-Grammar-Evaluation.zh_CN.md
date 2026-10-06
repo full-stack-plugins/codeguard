@@ -215,3 +215,6 @@ flowchart LR
 
 
 C11/C++17开发期统一回放现复用固定Clang原生服务与共享取消令牌。警告不算语法错误；仅已审计缺表达式解析规则可分类，语义/混合/预处理上下文保持unknown。新0.11协议记录标准与策略，32库存及零资格保持；见[局部验收](../tests/acceptance/c-family-native-replay.md)。
+
+
+0.12逐条审计七个Clang标点解析ID；非已审计warning/语义混合保留unknown，C11扩展与C++17错误分开，历史0.11保持。见[增量验收](../tests/acceptance/c-family-native-punctuation.md)与[CI来源待决动作](../tests/acceptance/ci-source-reachability.md)。

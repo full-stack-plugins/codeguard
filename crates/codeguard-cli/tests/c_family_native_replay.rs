@@ -35,6 +35,21 @@ fn corpus() -> Vec<u8> {
             ("warning", "int f(void) { int unused; return 0; }\n", true),
             ("literal", "const char *s=\"#literal\";\n", true),
             ("syntax", "int x = ;\n", false),
+            ("syntax_declaration", "int x=1\n", false),
+            (
+                "syntax_local_declaration",
+                "int f(void) { int x=1 return x; }\n",
+                false,
+            ),
+            ("syntax_return", "int f(void) { return 0 }\n", false),
+            ("syntax_expression", "int f(void) { int x=0; x++ }\n", false),
+            ("syntax_member", "struct P { int x\n};\n", false),
+            (
+                "syntax_paren",
+                "int f(void) { if (1 { return 0; } return 1; }\n",
+                false,
+            ),
+            ("syntax_brace", "int f(void) { return 0;\n", false),
             ("semantic", "UnknownType x;\n", true),
             ("context", "%:include \"missing.h\"\n", true),
         ] {
@@ -65,10 +80,10 @@ fn selected_clang_wrong_version_retains_unknown_cases_and_full_inventory() {
     let result = std::panic::catch_unwind(|| replay(tool, 90));
     fs::remove_dir_all(root).unwrap();
     let report = result.unwrap();
-    assert_eq!(report["schema_version"], "0.11.0");
+    assert_eq!(report["schema_version"], "0.12.0");
     assert_eq!(report["native_adapter_reused"], true);
     assert_eq!(report["language_count"], 32);
-    assert_eq!(report["sample_count"], 12);
+    assert_eq!(report["sample_count"], 26);
     assert_eq!(report["grammar_qualified_count"], 0);
     assert!(
         report["cases"]
@@ -84,13 +99,16 @@ fn selected_clang_wrong_version_retains_unknown_cases_and_full_inventory() {
 fn actual_clang_warnings_semantics_and_context_do_not_fabricate_syntax_labels() {
     let tool = PathBuf::from(std::env::var_os("CODEGUARD_CLANG_BIN").unwrap());
     let report = replay(tool, 180);
-    assert_eq!(report["schema_version"], "0.11.0");
+    assert_eq!(report["schema_version"], "0.12.0");
     assert_eq!(report["native_adapter_reused"], true);
     for row in report["cases"].as_array().unwrap() {
         let id = row["id"].as_str().unwrap();
-        let expected = if id.ends_with("semantic") || id.ends_with("context") {
+        let expected = if id.ends_with("semantic")
+            || id.ends_with("context")
+            || (row["language"] == "c" && id.ends_with("syntax_member"))
+        {
             "unknown"
-        } else if id.ends_with("syntax") {
+        } else if id.ends_with("syntax") || id.contains("-syntax_") {
             "invalid"
         } else {
             "valid"

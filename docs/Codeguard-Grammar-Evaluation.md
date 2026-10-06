@@ -203,3 +203,6 @@ flowchart LR
 
 
 Uniform development replay now reuses the fixed Clang service for C11/C++17 with shared cancellation. Warnings do not count as syntax errors; only the audited expected-expression parsing rule classifies invalid syntax. Semantic/mixed/context diagnostics remain unknown. Report0.11 records standard and policy, preserves the32-language inventory, and grants no qualification. See [bounded acceptance](../tests/acceptance/c-family-native-replay.md).
+
+
+Report0.12 audits seven exact Clang punctuation IDs; unaudited warnings and mixed semantic diagnostics remain unknown. C11 extensions and C++17 errors are measured separately, with historical0.11 unchanged. See [incremental acceptance](../tests/acceptance/c-family-native-punctuation.md) and [pending CI source action](../tests/acceptance/ci-source-reachability.md).

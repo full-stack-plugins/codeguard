@@ -81,8 +81,26 @@ impl GrammarNativeChecker {
             let mut syntax_error = false;
             for row in rows {
                 match row["level"].as_str()? {
-                    "warning" | "note" => {}
-                    "error" if row["rule_id"] == "clang.err_expected_expression" => {
+                    "warning"
+                        if matches!(
+                            row["rule_id"].as_str(),
+                            Some("clang.warn_unused_variable" | "clang.warn_unused_parameter")
+                        ) => {}
+                    "note" => {}
+                    "error"
+                        if matches!(
+                            row["rule_id"].as_str(),
+                            Some(
+                                "clang.err_expected_expression"
+                                    | "clang.err_expected"
+                                    | "clang.err_expected_semi_declaration"
+                                    | "clang.err_expected_semi_decl_list"
+                                    | "clang.err_expected_semi_after_stmt"
+                                    | "clang.err_expected_semi_after_expr"
+                                    | "clang.err_invalid_token_after_toplevel_declarator"
+                            )
+                        ) =>
+                    {
                         syntax_error = true
                     }
                     // 类型、名称、扩展诊断及未审计解析规则不能被解释为grammar漏报。
@@ -165,6 +183,10 @@ mod tests {
                     None,
                 ),
                 (
+                    serde_json::json!([{"level":"warning","rule_id":"clang.ext_expected_semi_decl_list"}]),
+                    None,
+                ),
+                (
                     serde_json::json!([{"rule_id":"clang.err_expected_expression"}]),
                     None,
                 ),
@@ -175,6 +197,21 @@ mod tests {
                     ),
                     expected
                 );
+            }
+        }
+    }
+
+    #[test]
+    fn clang_audited_punctuation_errors_are_not_left_unknown() {
+        for checker in [GrammarNativeChecker::C, GrammarNativeChecker::Cpp] {
+            for rule in [
+                "clang.err_expected",
+                "clang.err_expected_semi_declaration",
+                "clang.err_expected_semi_decl_list",
+                "clang.err_expected_semi_after_stmt",
+                "clang.err_expected_semi_after_expr",
+            ] {
+                assert_eq!(checker.classify(&serde_json::json!({"status":"diagnostics_observed","diagnostics":[{"level":"error","rule_id":rule}]})), Some(false), "{rule}");
             }
         }
     }
