@@ -2007,3 +2007,7 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 ## 2026-10-06 Gradle文档持久任务与next公开接线
 
 延续15.3/15.6，不勾选父任务。原生检查前选定输入快照绑定，已初始化工作区保存独立Gradle局部报告；首次导入重算问题投影，重复扫描归并，环境/覆盖准备任务分开，Markdown可恢复。check java/all显式请求及普通Java历史查询反馈0.65，next指引0.22保留原选定输入和工具核验占位。真实三次公开Gradle/JDK检查覆盖首次问题、check all复用和修复后空输出仍开放；构造报告边界测试另列，详见tests/acceptance/gradle-javadoc-workbench.md。task verify仍not_integrated，原任务原工具复检、关闭/复发、完整规则/范围和生产矩阵继续未完成。
+
+### Gradle文档原任务复检内部服务（2026-10-06）
+
+延续15.3/15.6，新增内部服务绑定首次已消费报告及任务身份、原选定范围、构建配置和已知Gradle/JDK摘要，Java源码允许修复。范围/规则伪造、残缺扫描误判消失及删减投影掩盖原生诊断的反例先RED后修复；真实已有Gradle/JDK验证仍存在、修复后未受信消失及取消，原事实保持open。独立封闭内部协议0.1见tests/acceptance/gradle-javadoc-task-recheck-service.md。公开task verify、同步导入/失败尝试、next复检观察、可信关闭/复发及完整规则/范围仍未接线或未验收，公开not_integrated保持，不勾选父任务，不改变0/32正式资格。

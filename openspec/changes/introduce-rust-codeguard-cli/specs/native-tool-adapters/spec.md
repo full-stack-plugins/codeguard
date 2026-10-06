@@ -853,3 +853,11 @@ Gradle Javadoc repair observations SHALL use their own java.gradle.javadoc check
 #### Scenario: Empty Gradle documentation recheck cannot erase historical findings
 - **WHEN** later selected Gradle documentation output is empty while complete rules, scope and trusted closure remain unqualified
 - **THEN** original findings SHALL stay open, environment/preparation observations SHALL remain distinct, and task verification SHALL be explicitly marked not-integrated until its original-native verification path is separately implemented
+
+#### Scenario: Gradle documentation task verification preserves original inputs and tools
+- **WHEN** task verify selects a Gradle Javadoc finding or preparation task with explicit existing Gradle/JDK paths
+- **THEN** it SHALL bind the consumed original report and workspace, retain the original selected input set, reject changed non-Java configuration or existing tool identities before native execution, capture current repairable Java inputs before execution, and record the original-native local observation without granting trusted closure
+
+#### Scenario: Gradle local task verification records absence and failure separately
+- **WHEN** the original native task still emits the same rule/path, emits no matching diagnostic, or cannot run with a stable original context
+- **THEN** verification SHALL distinguish still-present, candidate-absent with unverified policy, rule/coverage review and incomplete observations, persist failures and attempt linkage, and invalidate old observations after input/tool changes; no local observation SHALL close the task

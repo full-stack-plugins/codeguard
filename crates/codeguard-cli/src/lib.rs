@@ -8,6 +8,8 @@ pub mod gradle_model_probe_request;
 pub mod gradle_javadoc_probe;
 #[cfg(unix)]
 pub mod gradle_javadoc_workbench;
+#[cfg(unix)]
+pub mod gradle_javadoc_task_recheck;
 
 pub mod agents_block;
 pub mod language_alias;
