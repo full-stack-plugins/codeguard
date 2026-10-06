@@ -746,3 +746,8 @@ Rust npm审计适配 MUST 核对具体原工具版本、auditReportVersion、冻
 - **THEN** lint, comments, dependencies, CVE, security and build each retain an explicit candidate and gap; MRI/JRuby/TruffleRuby and candidate platforms remain separately unverified, and tool versions require project-lock resolution rather than floating latest
 - **AND** class/module and method documentation rules remain distinct; Brakeman is scoped to Rails, gem packaging to gem projects, and custom project builds require explicit configuration; missing tools cannot imply not_applicable
 - **AND** the candidate profile is not an executable plan or implemented capability, and CVE requires independently bound database identity and freshness; a missing native database must not cause an implicit download during checking
+
+#### Scenario: Explicit standalone Clang context preserves native diagnostics
+- **WHEN** 对C/C++单文件明确提供固定Clang工具及已支持的标准上下文
+- **THEN** Rust runtime以冻结stdin、共同deadline、清空环境及禁止默认配置的固定argv执行原生语法检查，核验版本/制品及同输入SARIF身份。仅返回原生规则与有界UTF-8位置，诊断自由文本不注入对话；不执行源码、不生成对象文件或声称完整lint/build完成
+- **AND** 选定原生失败/报告无效不回退WASM。头文件、宏/预处理上下文未解析时保留环境/上下文阻塞而非源码违规；未知标准、无关工具参数和未配对上下文在执行前拒绝。当前完整配置、规则、工作台持久化及宿主接线仍须分别实现验收

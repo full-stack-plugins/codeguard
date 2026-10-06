@@ -1,0 +1,622 @@
+{
+  "evidence_scope": "local_explicit_standalone_clang_syntax",
+  "actual_native_tool_verified": true,
+  "actual_host_verified": false,
+  "clang_tasks_persisted": false,
+  "grammar_qualified_count": 0,
+  "codeguard_binary_sha256": "bba968396dde73bc03c30731d092629086e79527ac8f940cf4fda9fc56d4d4c4",
+  "reports": {
+    "fixtures": [
+      {
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "findings": [],
+        "native": {
+          "diagnostics": [],
+          "reason": "clang_preprocessor_context_unresolved",
+          "status": "incomplete",
+          "tool_sha256": null,
+          "version": null
+        },
+        "native_context": {
+          "project_configuration": "unknown",
+          "scope": "explicit_standalone_stdin",
+          "standard": "c11",
+          "warning_profile": "clang-wall-extra-pedantic-v1"
+        },
+        "next_action": "按原工具、语言及明确标准复检；原生语法观察不替代项目clang-tidy、编译数据库、头文件/宏、安全或依赖检查。本入口尚未持久同步Clang原生任务，不凭零诊断关闭历史任务",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-context-29436/a.c",
+        "reason": "native_project_coverage_unverified",
+        "report_type": "syntax_lint_feedback",
+        "schema_version": "0.2.0",
+        "selection": {
+          "category": "lint",
+          "language": "c"
+        },
+        "setup": {
+          "requirement": "required",
+          "task_id": null
+        },
+        "source_sha256": "4ed7db9d12238cde978f85c0189411817fbdc7e188ac0fd4cad8bae313ada55d",
+        "status": "incomplete",
+        "syntax_candidates": null,
+        "syntax_tasks": null,
+        "verification_command": [
+          "codeguard",
+          "lint",
+          "c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-context-29436/a.c",
+          "--clang-tool",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-context-29436/clang",
+          "--standard",
+          "c11",
+          "--format=json"
+        ]
+      },
+      {
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "findings": [],
+        "native": {
+          "diagnostics": [
+            {
+              "column_byte": 9,
+              "level": "error",
+              "line": 1,
+              "rule_id": "clang.err_expected_expression"
+            }
+          ],
+          "reason": "clang_native_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "6118a3532d74ffdb7b231e000fb92820c71019dc1d1dbd6dc34ebef3d69db20a",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "native_context": {
+          "project_configuration": "unknown",
+          "scope": "explicit_standalone_stdin",
+          "standard": "c11",
+          "warning_profile": "clang-wall-extra-pedantic-v1"
+        },
+        "next_action": "按原工具、语言及明确标准复检；原生语法观察不替代项目clang-tidy、编译数据库、头文件/宏、安全或依赖检查。本入口尚未持久同步Clang原生任务，不凭零诊断关闭历史任务",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-native-29436/a.c",
+        "reason": "native_project_coverage_unverified",
+        "report_type": "syntax_lint_feedback",
+        "schema_version": "0.2.0",
+        "selection": {
+          "category": "lint",
+          "language": "c"
+        },
+        "setup": {
+          "requirement": "required",
+          "task_id": null
+        },
+        "source_sha256": "fe46ce8f36ea2887dc2edf71eb1732bbe0816f9132050aa155b2acd4a8de445c",
+        "status": "incomplete",
+        "syntax_candidates": null,
+        "syntax_tasks": null,
+        "verification_command": [
+          "codeguard",
+          "lint",
+          "c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-native-29436/a.c",
+          "--clang-tool",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-native-29436/clang",
+          "--standard",
+          "c11",
+          "--format=json"
+        ]
+      },
+      {
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "findings": [],
+        "native": {
+          "diagnostics": [],
+          "reason": "clang_report_invalid",
+          "status": "incomplete",
+          "tool_sha256": "5c43579bcc3f21b783c4948a7db6f80aadbead594f038abf3cbf34c7e84f128c",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "native_context": {
+          "project_configuration": "unknown",
+          "scope": "explicit_standalone_stdin",
+          "standard": "c11",
+          "warning_profile": "clang-wall-extra-pedantic-v1"
+        },
+        "next_action": "按原工具、语言及明确标准复检；原生语法观察不替代项目clang-tidy、编译数据库、头文件/宏、安全或依赖检查。本入口尚未持久同步Clang原生任务，不凭零诊断关闭历史任务",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-badreport-29436/a.c",
+        "reason": "native_project_coverage_unverified",
+        "report_type": "syntax_lint_feedback",
+        "schema_version": "0.2.0",
+        "selection": {
+          "category": "lint",
+          "language": "c"
+        },
+        "setup": {
+          "requirement": "required",
+          "task_id": null
+        },
+        "source_sha256": "fe46ce8f36ea2887dc2edf71eb1732bbe0816f9132050aa155b2acd4a8de445c",
+        "status": "incomplete",
+        "syntax_candidates": null,
+        "syntax_tasks": null,
+        "verification_command": [
+          "codeguard",
+          "lint",
+          "c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-badreport-29436/a.c",
+          "--clang-tool",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-badreport-29436/clang",
+          "--standard",
+          "c11",
+          "--format=json"
+        ]
+      },
+      {
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "findings": [],
+        "native": {
+          "diagnostics": [
+            {
+              "column_byte": 9,
+              "level": "warning",
+              "line": 1,
+              "rule_id": "clang.warn_unused_variable"
+            }
+          ],
+          "reason": "clang_native_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "18d2ff06ba4c813ddc3db1d1176a297c5a729657e106151fd54f789fb112dc54",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "native_context": {
+          "project_configuration": "unknown",
+          "scope": "explicit_standalone_stdin",
+          "standard": "c11",
+          "warning_profile": "clang-wall-extra-pedantic-v1"
+        },
+        "next_action": "按原工具、语言及明确标准复检；原生语法观察不替代项目clang-tidy、编译数据库、头文件/宏、安全或依赖检查。本入口尚未持久同步Clang原生任务，不凭零诊断关闭历史任务",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-warning-29436/a.c",
+        "reason": "native_project_coverage_unverified",
+        "report_type": "syntax_lint_feedback",
+        "schema_version": "0.2.0",
+        "selection": {
+          "category": "lint",
+          "language": "c"
+        },
+        "setup": {
+          "requirement": "required",
+          "task_id": null
+        },
+        "source_sha256": "5e5a5e7844574cd10ba86486e16e83ac397327d9c6b603f5cb7816c6fdd0997d",
+        "status": "incomplete",
+        "syntax_candidates": null,
+        "syntax_tasks": null,
+        "verification_command": [
+          "codeguard",
+          "lint",
+          "c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-warning-29436/a.c",
+          "--clang-tool",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-warning-29436/clang",
+          "--standard",
+          "c11",
+          "--format=json"
+        ]
+      }
+    ],
+    "actual_clang": [
+      {
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "findings": [],
+        "native": {
+          "diagnostics": [
+            {
+              "column_byte": 9,
+              "level": "error",
+              "line": 1,
+              "rule_id": "clang.err_expected_expression"
+            }
+          ],
+          "reason": "clang_native_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "1590ac950a3d627817d09ade5cb60b2115f17a72182a3141e010b4bcc482a0c9",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "native_context": {
+          "project_configuration": "unknown",
+          "scope": "explicit_standalone_stdin",
+          "standard": "c11",
+          "warning_profile": "clang-wall-extra-pedantic-v1"
+        },
+        "next_action": "按原工具、语言及明确标准复检；原生语法观察不替代项目clang-tidy、编译数据库、头文件/宏、安全或依赖检查。本入口尚未持久同步Clang原生任务，不凭零诊断关闭历史任务",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-actual-29557/a.c",
+        "reason": "native_project_coverage_unverified",
+        "report_type": "syntax_lint_feedback",
+        "schema_version": "0.2.0",
+        "selection": {
+          "category": "lint",
+          "language": "c"
+        },
+        "setup": {
+          "requirement": "required",
+          "task_id": null
+        },
+        "source_sha256": "fe46ce8f36ea2887dc2edf71eb1732bbe0816f9132050aa155b2acd4a8de445c",
+        "status": "incomplete",
+        "syntax_candidates": null,
+        "syntax_tasks": null,
+        "verification_command": [
+          "codeguard",
+          "lint",
+          "c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-actual-29557/a.c",
+          "--clang-tool",
+          "/Library/Developer/CommandLineTools/usr/bin/clang",
+          "--standard",
+          "c11",
+          "--format=json"
+        ]
+      },
+      {
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "findings": [],
+        "native": {
+          "diagnostics": [
+            {
+              "column_byte": 29,
+              "level": "error",
+              "line": 1,
+              "rule_id": "clang.err_expected_expression"
+            }
+          ],
+          "reason": "clang_native_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "1590ac950a3d627817d09ade5cb60b2115f17a72182a3141e010b4bcc482a0c9",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "native_context": {
+          "project_configuration": "unknown",
+          "scope": "explicit_standalone_stdin",
+          "standard": "c11",
+          "warning_profile": "clang-wall-extra-pedantic-v1"
+        },
+        "next_action": "按原工具、语言及明确标准复检；原生语法观察不替代项目clang-tidy、编译数据库、头文件/宏、安全或依赖检查。本入口尚未持久同步Clang原生任务，不凭零诊断关闭历史任务",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-actual-29557/a.c",
+        "reason": "native_project_coverage_unverified",
+        "report_type": "syntax_lint_feedback",
+        "schema_version": "0.2.0",
+        "selection": {
+          "category": "lint",
+          "language": "c"
+        },
+        "setup": {
+          "requirement": "required",
+          "task_id": null
+        },
+        "source_sha256": "425af41799da1f3e5d2a7115134a2e9554004567a72a42d456699eb02f56c4e6",
+        "status": "incomplete",
+        "syntax_candidates": null,
+        "syntax_tasks": null,
+        "verification_command": [
+          "codeguard",
+          "lint",
+          "c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-actual-29557/a.c",
+          "--clang-tool",
+          "/Library/Developer/CommandLineTools/usr/bin/clang",
+          "--standard",
+          "c11",
+          "--format=json"
+        ]
+      },
+      {
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "findings": [],
+        "native": {
+          "diagnostics": [
+            {
+              "column_byte": 19,
+              "level": "warning",
+              "line": 1,
+              "rule_id": "clang.warn_unused_variable"
+            }
+          ],
+          "reason": "clang_native_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "1590ac950a3d627817d09ade5cb60b2115f17a72182a3141e010b4bcc482a0c9",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "native_context": {
+          "project_configuration": "unknown",
+          "scope": "explicit_standalone_stdin",
+          "standard": "c11",
+          "warning_profile": "clang-wall-extra-pedantic-v1"
+        },
+        "next_action": "按原工具、语言及明确标准复检；原生语法观察不替代项目clang-tidy、编译数据库、头文件/宏、安全或依赖检查。本入口尚未持久同步Clang原生任务，不凭零诊断关闭历史任务",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-actual-29557/a.c",
+        "reason": "native_project_coverage_unverified",
+        "report_type": "syntax_lint_feedback",
+        "schema_version": "0.2.0",
+        "selection": {
+          "category": "lint",
+          "language": "c"
+        },
+        "setup": {
+          "requirement": "required",
+          "task_id": null
+        },
+        "source_sha256": "5e5a5e7844574cd10ba86486e16e83ac397327d9c6b603f5cb7816c6fdd0997d",
+        "status": "incomplete",
+        "syntax_candidates": null,
+        "syntax_tasks": null,
+        "verification_command": [
+          "codeguard",
+          "lint",
+          "c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-actual-29557/a.c",
+          "--clang-tool",
+          "/Library/Developer/CommandLineTools/usr/bin/clang",
+          "--standard",
+          "c11",
+          "--format=json"
+        ]
+      },
+      {
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "findings": [],
+        "native": {
+          "diagnostics": [],
+          "reason": "clang_native_no_diagnostics",
+          "status": "completed",
+          "tool_sha256": "1590ac950a3d627817d09ade5cb60b2115f17a72182a3141e010b4bcc482a0c9",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "native_context": {
+          "project_configuration": "unknown",
+          "scope": "explicit_standalone_stdin",
+          "standard": "c11",
+          "warning_profile": "clang-wall-extra-pedantic-v1"
+        },
+        "next_action": "按原工具、语言及明确标准复检；原生语法观察不替代项目clang-tidy、编译数据库、头文件/宏、安全或依赖检查。本入口尚未持久同步Clang原生任务，不凭零诊断关闭历史任务",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-actual-29557/a.c",
+        "reason": "native_project_coverage_unverified",
+        "report_type": "syntax_lint_feedback",
+        "schema_version": "0.2.0",
+        "selection": {
+          "category": "lint",
+          "language": "c"
+        },
+        "setup": {
+          "requirement": "required",
+          "task_id": null
+        },
+        "source_sha256": "996137ced8354c0b4b3730a96a1480001118944458519ab2d63f519546de97a4",
+        "status": "incomplete",
+        "syntax_candidates": null,
+        "syntax_tasks": null,
+        "verification_command": [
+          "codeguard",
+          "lint",
+          "c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-actual-29557/a.c",
+          "--clang-tool",
+          "/Library/Developer/CommandLineTools/usr/bin/clang",
+          "--standard",
+          "c11",
+          "--format=json"
+        ]
+      },
+      {
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "findings": [],
+        "native": {
+          "diagnostics": [
+            {
+              "column_byte": 9,
+              "level": "error",
+              "line": 1,
+              "rule_id": "clang.err_expected_expression"
+            }
+          ],
+          "reason": "clang_native_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "1590ac950a3d627817d09ade5cb60b2115f17a72182a3141e010b4bcc482a0c9",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "native_context": {
+          "project_configuration": "unknown",
+          "scope": "explicit_standalone_stdin",
+          "standard": "c++17",
+          "warning_profile": "clang-wall-extra-pedantic-v1"
+        },
+        "next_action": "按原工具、语言及明确标准复检；原生语法观察不替代项目clang-tidy、编译数据库、头文件/宏、安全或依赖检查。本入口尚未持久同步Clang原生任务，不凭零诊断关闭历史任务",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-actual-29557/a.cpp",
+        "reason": "native_project_coverage_unverified",
+        "report_type": "syntax_lint_feedback",
+        "schema_version": "0.2.0",
+        "selection": {
+          "category": "lint",
+          "language": "cpp"
+        },
+        "setup": {
+          "requirement": "required",
+          "task_id": null
+        },
+        "source_sha256": "fe46ce8f36ea2887dc2edf71eb1732bbe0816f9132050aa155b2acd4a8de445c",
+        "status": "incomplete",
+        "syntax_candidates": null,
+        "syntax_tasks": null,
+        "verification_command": [
+          "codeguard",
+          "lint",
+          "cpp",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-actual-29557/a.cpp",
+          "--clang-tool",
+          "/Library/Developer/CommandLineTools/usr/bin/clang",
+          "--standard",
+          "c++17",
+          "--format=json"
+        ]
+      },
+      {
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "findings": [],
+        "native": {
+          "diagnostics": [
+            {
+              "column_byte": 29,
+              "level": "error",
+              "line": 1,
+              "rule_id": "clang.err_expected_expression"
+            }
+          ],
+          "reason": "clang_native_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "1590ac950a3d627817d09ade5cb60b2115f17a72182a3141e010b4bcc482a0c9",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "native_context": {
+          "project_configuration": "unknown",
+          "scope": "explicit_standalone_stdin",
+          "standard": "c++17",
+          "warning_profile": "clang-wall-extra-pedantic-v1"
+        },
+        "next_action": "按原工具、语言及明确标准复检；原生语法观察不替代项目clang-tidy、编译数据库、头文件/宏、安全或依赖检查。本入口尚未持久同步Clang原生任务，不凭零诊断关闭历史任务",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-actual-29557/a.cpp",
+        "reason": "native_project_coverage_unverified",
+        "report_type": "syntax_lint_feedback",
+        "schema_version": "0.2.0",
+        "selection": {
+          "category": "lint",
+          "language": "cpp"
+        },
+        "setup": {
+          "requirement": "required",
+          "task_id": null
+        },
+        "source_sha256": "425af41799da1f3e5d2a7115134a2e9554004567a72a42d456699eb02f56c4e6",
+        "status": "incomplete",
+        "syntax_candidates": null,
+        "syntax_tasks": null,
+        "verification_command": [
+          "codeguard",
+          "lint",
+          "cpp",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-actual-29557/a.cpp",
+          "--clang-tool",
+          "/Library/Developer/CommandLineTools/usr/bin/clang",
+          "--standard",
+          "c++17",
+          "--format=json"
+        ]
+      },
+      {
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "findings": [],
+        "native": {
+          "diagnostics": [
+            {
+              "column_byte": 19,
+              "level": "warning",
+              "line": 1,
+              "rule_id": "clang.warn_unused_variable"
+            }
+          ],
+          "reason": "clang_native_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "1590ac950a3d627817d09ade5cb60b2115f17a72182a3141e010b4bcc482a0c9",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "native_context": {
+          "project_configuration": "unknown",
+          "scope": "explicit_standalone_stdin",
+          "standard": "c++17",
+          "warning_profile": "clang-wall-extra-pedantic-v1"
+        },
+        "next_action": "按原工具、语言及明确标准复检；原生语法观察不替代项目clang-tidy、编译数据库、头文件/宏、安全或依赖检查。本入口尚未持久同步Clang原生任务，不凭零诊断关闭历史任务",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-actual-29557/a.cpp",
+        "reason": "native_project_coverage_unverified",
+        "report_type": "syntax_lint_feedback",
+        "schema_version": "0.2.0",
+        "selection": {
+          "category": "lint",
+          "language": "cpp"
+        },
+        "setup": {
+          "requirement": "required",
+          "task_id": null
+        },
+        "source_sha256": "5e5a5e7844574cd10ba86486e16e83ac397327d9c6b603f5cb7816c6fdd0997d",
+        "status": "incomplete",
+        "syntax_candidates": null,
+        "syntax_tasks": null,
+        "verification_command": [
+          "codeguard",
+          "lint",
+          "cpp",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-actual-29557/a.cpp",
+          "--clang-tool",
+          "/Library/Developer/CommandLineTools/usr/bin/clang",
+          "--standard",
+          "c++17",
+          "--format=json"
+        ]
+      },
+      {
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "findings": [],
+        "native": {
+          "diagnostics": [],
+          "reason": "clang_native_no_diagnostics",
+          "status": "completed",
+          "tool_sha256": "1590ac950a3d627817d09ade5cb60b2115f17a72182a3141e010b4bcc482a0c9",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "native_context": {
+          "project_configuration": "unknown",
+          "scope": "explicit_standalone_stdin",
+          "standard": "c++17",
+          "warning_profile": "clang-wall-extra-pedantic-v1"
+        },
+        "next_action": "按原工具、语言及明确标准复检；原生语法观察不替代项目clang-tidy、编译数据库、头文件/宏、安全或依赖检查。本入口尚未持久同步Clang原生任务，不凭零诊断关闭历史任务",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-actual-29557/a.cpp",
+        "reason": "native_project_coverage_unverified",
+        "report_type": "syntax_lint_feedback",
+        "schema_version": "0.2.0",
+        "selection": {
+          "category": "lint",
+          "language": "cpp"
+        },
+        "setup": {
+          "requirement": "required",
+          "task_id": null
+        },
+        "source_sha256": "996137ced8354c0b4b3730a96a1480001118944458519ab2d63f519546de97a4",
+        "status": "incomplete",
+        "syntax_candidates": null,
+        "syntax_tasks": null,
+        "verification_command": [
+          "codeguard",
+          "lint",
+          "cpp",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-clang-lint-actual-29557/a.cpp",
+          "--clang-tool",
+          "/Library/Developer/CommandLineTools/usr/bin/clang",
+          "--standard",
+          "c++17",
+          "--format=json"
+        ]
+      }
+    ]
+  }
+}

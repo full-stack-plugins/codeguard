@@ -1,11 +1,13 @@
-//! 尚无专用原生适配器的统一 lint 参数；来源：OpenSpec unified-cli-contract。
+//! 统一单文件 lint 参数及明确的原生上下文；来源：OpenSpec unified-cli-contract。
 use std::{collections::BTreeSet, path::PathBuf};
 
-/// 单文件候选入口请求；不接受原生工具执行参数或隐式安装。
+/// 单文件候选或明确Clang上下文请求；不接受自由argv或隐式安装。
 pub(crate) struct SyntaxLintArguments {
     pub(crate) language: String,
     pub(crate) source: PathBuf,
     pub(crate) workspace: Option<PathBuf>,
+    pub(crate) clang_tool: Option<PathBuf>,
+    pub(crate) standard: Option<String>,
     pub(crate) json: bool,
     pub(crate) timeout_ms: u64,
 }
@@ -24,6 +26,8 @@ impl SyntaxLintArguments {
             language: language.clone(),
             source: PathBuf::new(),
             workspace: None,
+            clang_tool: None,
+            standard: None,
             json: false,
             timeout_ms: crate::check_budget::DEFAULT_CHECK_TIMEOUT_MS,
         };
@@ -35,7 +39,11 @@ impl SyntaxLintArguments {
                 let (key, inline) = current
                     .split_once('=')
                     .map_or((current.as_str(), None), |(k, v)| (k, Some(v)));
-                if !matches!(key, "--workspace" | "--format" | "--timeout") || !seen.insert(key) {
+                if !matches!(
+                    key,
+                    "--workspace" | "--format" | "--timeout" | "--clang-tool" | "--standard"
+                ) || !seen.insert(key)
+                {
                     return Err("lint 参数未知或重复".into());
                 }
                 let value = match inline {
@@ -61,7 +69,19 @@ impl SyntaxLintArguments {
                     "--workspace" if PathBuf::from(value).is_absolute() => {
                         result.workspace = Some(PathBuf::from(value))
                     }
-                    _ => return Err("lint 格式或工作区路径无效".into()),
+                    "--clang-tool"
+                        if matches!(language.as_str(), "c" | "cpp")
+                            && PathBuf::from(value).is_absolute() =>
+                    {
+                        result.clang_tool = Some(PathBuf::from(value))
+                    }
+                    "--standard"
+                        if (language == "c" && value == "c11")
+                            || (language == "cpp" && value == "c++17") =>
+                    {
+                        result.standard = Some(value.to_owned())
+                    }
+                    _ => return Err("lint 格式、上下文或工具路径无效".into()),
                 }
             } else {
                 if !result.source.as_os_str().is_empty() || current.chars().any(char::is_control) {
@@ -73,6 +93,9 @@ impl SyntaxLintArguments {
         }
         if result.source.as_os_str().is_empty() {
             return Err("lint 需要显式源码文件".into());
+        }
+        if result.clang_tool.is_some() != result.standard.is_some() {
+            return Err("Clang工具与标准必须同时明确提供".into());
         }
         Ok(result)
     }

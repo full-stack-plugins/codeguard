@@ -1642,3 +1642,7 @@ runtime的有界直接同级绑定AST事实现接入WASM源码构建的`grammar 
 JavaScript 兜底须区分同范围确认任务确实不存在与历史无法核验。事实损坏、投影缺失、目录被替换或本地伪造 closed 状态时，保留必须原生确认及工作台未完成结果，提供固定的记录恢复原因；不从 Markdown 导入指令，不将本地状态作为关闭权威。
 
 统一独立lint分派器保留现有原生适配器，其余注册表规范ID进入单文件候选服务。请求仅接受源码、工作区、格式及总截止时间；无关工具参数、重复选项在执行前拒绝。适配缺口与工具缺失分开表达，配置保持unknown。CFML包含CFScript及明确CFQuery片段，歧义头文件或普通SQL不强选grammar。由于适配准备未确定，即使零候选也保留原生确认要求；任务身份与损坏历史恢复复用项目工作流。
+
+明确C11/C++17请求可用 `--clang-tool ABS_PATH --standard c11|c++17` 选择已实测Apple Clang21。Rust冻结源码字节，以stdin和私有cwd执行，清空继承环境、禁止默认配置和include搜索，调用 `-fsyntax-only`。SARIF必须匹配固定driver、同stdin制品及Unicode码点列，全部诊断核验后只投影规则ID和UTF-8字节位置。输入/工具变化、坏报告或执行失败不回退WASM；含预处理内容保留编译模型前置阻塞。本阶段尚未将Clang证据持久同步到任务，不替代clang-tidy或项目lint。
+
+原生警告档案明确启用Wall/Extra/Pedantic；退出0但存在warning仍为diagnostics_observed，保留error/warning等级；note亦核验，但不计作问题。
