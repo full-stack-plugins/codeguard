@@ -75,3 +75,42 @@ fn duplicate_keys_and_unknown_fields_are_rejected() {
         .is_err()
     );
 }
+
+#[test]
+fn every_language_and_core_rejects_missing_obligations_and_forged_readiness() {
+    let original = plan();
+    let languages = original["languages"].as_array().unwrap();
+    let cores = ["syntax", "documentation", "conventions", "vulnerabilities"];
+    let mut checked = 0;
+    for (index, language) in languages.iter().enumerate() {
+        for core in cores {
+            for mutation in 0..3 {
+                let mut doc = original.clone();
+                match mutation {
+                    0 => {
+                        doc["languages"][index]["capabilities"]
+                            .as_object_mut()
+                            .unwrap()
+                            .remove(core);
+                    }
+                    1 => {
+                        doc["languages"][index]["capabilities"][core]["qualification"] =
+                            "production_ready".into();
+                    }
+                    _ => {
+                        doc["languages"][index]["capabilities"][core]["build_paths"][0]["implementation_status"] =
+                            "production_ready".into();
+                    }
+                }
+                assert!(
+                    parse_production_acceptance_plan(&serde_json::to_vec(&doc).unwrap()).is_err(),
+                    "language {} core {core} mutation {mutation} must not bypass acceptance",
+                    language["language"]
+                );
+                checked += 1;
+            }
+        }
+    }
+    // 对全部228项义务逐项检验；不能只验证第一种语言或把局部状态升级为生产资格。
+    assert_eq!(checked, 57 * 4 * 3);
+}

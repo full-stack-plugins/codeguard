@@ -1954,6 +1954,7 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 延续同一 change，覆盖 native-tool-adapters / Every registered language SHALL qualify all four core production capabilities；与 S06/S07/S08/S12 的已有实现任务协同，不复制其实现勾选。目标包含57个canonical条目，旧planned状态不能免除目标；现有32个WASM可运行不构成生产验收。
 
 - [ ] 15.1 建立57语言×四核心能力×版本/方言×构建器×声明平台的验收映射；关联既有8.x逐语言任务、实际适配器和证据，列明缺口；不得用空目录或泛化覆盖替代。
+  2026-10-07验收加固：四核心逐语言硬要求已明确写入native-tool-adapters规范，详细注释必须包含缺失、空标签、模板及语义不符反例；原生、WASM、规范、真实依赖漏洞分别验收。production_acceptance_plan_contract逐一覆盖228项义务的删除核心/伪造资格/伪造实现状态共684个拒绝用例，4项目标测试通过；来源审计165份摘要与1312处任务引用通过。此增量只验证计划不越权，未授予任何核心生产资格，不勾选本项或15.2–15.7。当前状态见tests/acceptance/production-acceptance-plan.md。
 - [ ] 15.2 验收逐语言WASM语法和原生lint/编译器的联合路径：配置发现、原生优先、缺工具初检、版本/方言兼容、精确定位、取消/超时及安装指引；32个候选与其它语言缺口均须独立解决。
 - [ ] 15.3 验收逐语言详细文档注释：按语言规范检查用途、参数、返回、错误及行为契约等适用内容；Java覆盖类型/方法/字段Javadoc及Maven/Gradle项目配置；裸标签或空注释不能冒充合规。
 - [ ] 15.4 验收逐语言开发规范原生检查：Java P3C及各生态适用规范工具，覆盖实际配置/规则组、原生诊断、合法反例与误报纠正；formatter-only不能代替规范lint。
