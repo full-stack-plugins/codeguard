@@ -2434,3 +2434,11 @@ ESLint统一入口对JavaScript四种扩展接入原生优先及共享候选扫�
 最终受控3通过/1条件忽略及实际OTP显式1通过；18份受控和6份原生实际输出、4种schema篡改拒绝、372元定义通过，捕获绑定同一实际执行程序摘要。默认三个受影响目标42通过/4条件忽略；WASM七目标先前50通过/7条件忽略，最终协议字段修正后新目标与真实OTP重新通过；不叠加计数。默认/WASM全目标Clippy及最后测试辅助的目标Clippy、分层、OpenSpec strict、diff通过。详见[验收](../../../tests/acceptance/erlang-form-workbench.md)。
 
 未运行完整358例组合回放、独立语言精度或实际宿主；可信关闭、预处理与全项目语义及发行仍开放，资格0/32，父任务不勾选。受保护Erlang草稿摘要不变、未执行或提交。
+
+## 2026-10-06 当前358例组合结构规则测量
+
+使用同一worker的原始恢复与结构事实，明确JavaScript/Erlang显式结构入口，其它语言沿用已有候选；版本grammar_structure_evaluation0.1嵌套旧原始协议，不重写历史。全量目标1通过/0失败/0忽略，274.07秒，358样例32语言35来源组全部实际执行且程序稳定。原始73/1/10/269和3unknown/2pending保持；组合83/1/0/269和3unknown/2pending。十个Erlang回归漏检被补充规则检测，剩余VB.NET一例疑似误报、Kotlin/Swift三例unknown和CFQuery/COBOL两例pending。373元定义、实际新报告与六种篡改拒绝通过，源码/规则/分组归档回归见[验收](../../../tests/acceptance/grammar-combined-full-replay-2026-10-06.md)。
+
+取消/过期和程序变化不制造通过；pending不参与混淆计数。没有本轮原生oracle或独立holdout，语言资格0/32，普通关闭/宿主/发行及完整父任务仍开放。用户Erlang草稿未执行、未提交。
+
+最终默认与WASM全目标Clippy -D warnings均通过；所改Rust文件格式、分层、OpenSpec strict和diff检查通过。完整358例仅运行新组合入口一次，原始分类来自该轮相同worker，不冒充另一轮独立原生验收。
