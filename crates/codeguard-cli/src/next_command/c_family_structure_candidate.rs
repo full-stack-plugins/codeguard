@@ -19,8 +19,14 @@ fn read(root: &Path, run: &str, digest: Option<&str>) -> Result<Value, &'static 
     if digest.is_some_and(|s| s != hash) {
         return Err("clang_structure_origin_changed");
     }
-    let r = codeguard_adapters::parse_unique_json(&bytes)
+    let mut r = codeguard_adapters::parse_unique_json(&bytes)
         .map_err(|_| "clang_structure_origin_invalid")?;
+    if r["report_type"] == "clang_documentation_structure_task_recheck" {
+        if !crate::c_family_structure_task_recheck::valid_shape(root, &r) {
+            return Err("clang_structure_recheck_invalid");
+        }
+        r = crate::c_family_structure_task_recheck::normal(&r);
+    }
     if !valid_shape(&r) || r["run_id"] != run {
         return Err("clang_structure_origin_invalid");
     }
@@ -34,7 +40,7 @@ fn read(root: &Path, run: &str, digest: Option<&str>) -> Result<Value, &'static 
     }
     Ok(r)
 }
-/// 创建当前局部指引；同文件全部函数定位属于一个策略组，专用verify和尝试未接线。
+/// 创建当前局部指引；同文件全部函数定位属于一个策略组，专用verify记录局部观察，受控尝试未接线。
 pub(super) fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static str> {
     let run = fact["first_run_id"].as_str().ok_or("finding_run_invalid")?;
     let digest = fact["first_report_sha256"]
@@ -116,18 +122,15 @@ pub(super) fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate
     let actionable = status == "structural_deficits_observed";
     let argv = json!([
         "codeguard",
-        "comments",
-        first["language"],
-        root.join(first["path"].as_str().unwrap_or("")),
+        "task",
+        "verify",
+        id,
+        root,
         "--clang-tool",
         first["selected_tool"],
-        "--standard",
-        first["standard"],
-        "--workspace",
-        root,
         "--format=json"
     ]);
-    let brief = json!({"schema_version":"0.31.0","task_id":id,"kind":"finding","checker_id":checker(&first),"scope":first["path"],"source_sha256":latest["source_sha256"],"structural_rule_id":RULE,"rule_source":"codeguard_structural_policy","evidence_ref":{"first_run_id":run,"first_report_sha256":digest},"current_run_id":latest["run_id"],"observation_status":status,"structural_positions":if actionable {positions(&latest)}else{Vec::new()},"rule_basis":"函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。","constraints":["仅修改当前文件文档注释，保留API及行为","同名/重载定位属于文件策略组，不能据名字选择单一函数","不关闭检查器、不以占位文本或白名单自批代替修复"],"allowed_paths":if actionable {json!([first["path"]])}else{json!([])},"affected_paths":[first["path"]],"disposition":if actionable {"actionable"}else{"needs_decision"},"reason_code":status,"step":["按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。","使用绑定原工具、标准与工作区的comments原命令复扫；未知或失稳时先诊断，不按旧位置改源码。"],"recheck_argv":argv,"history":{"status":"native_structural_observations_only","task_verify":"not_integrated","attempt_journal":"not_integrated"},"closure_condition":"原命令局部复扫不关闭；仍须专用task verify、完整详细准确性/项目覆盖与可信关闭/复发验收。","authority":"local_unverified","delivery_decision":"not_evaluated"});
+    let brief = json!({"schema_version":"0.32.0","task_id":id,"kind":"finding","checker_id":checker(&first),"scope":first["path"],"source_sha256":latest["source_sha256"],"structural_rule_id":RULE,"rule_source":"codeguard_structural_policy","evidence_ref":{"first_run_id":run,"first_report_sha256":digest},"current_run_id":latest["run_id"],"observation_status":status,"structural_positions":if actionable {positions(&latest)}else{Vec::new()},"rule_basis":"函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。","constraints":["仅修改当前文件文档注释，保留API及行为","同名/重载定位属于文件策略组，不能据名字选择单一函数","不关闭检查器、不以占位文本或白名单自批代替修复"],"allowed_paths":if actionable {json!([first["path"]])}else{json!([])},"affected_paths":[first["path"]],"disposition":if actionable {"actionable"}else{"needs_decision"},"reason_code":status,"step":["按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。","使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"],"recheck_argv":argv,"history":{"status":"native_structural_observations_only","task_verify":"local_observation","attempt_journal":"not_integrated"},"closure_condition":"原命令局部复扫不关闭；专用task verify记录局部观察；仍须受控尝试、完整详细准确性/项目覆盖与可信关闭/复发验收。","authority":"local_unverified","delivery_decision":"not_evaluated"});
     Ok(Candidate {
         id: id.into(),
         priority: if actionable { 1 } else { 0 },

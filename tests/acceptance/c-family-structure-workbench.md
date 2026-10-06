@@ -52,3 +52,20 @@ Schema regression validates495 schemas,491 unchanged historical documents,20 fee
 专用task verify、受控attempt与无进展预算尚未接线，明确在启动错误检查器或租约动作之前拒绝；指引当前使用首次工具/标准/工作区的comments原命令复扫。本地候选消失不关闭，也不能因勾选自批白名单。全部对象详细准确性、项目配置/宏/源集、统一check/Hook、可信关闭/复发、独立精度、五平台/发行继续待完成；66完成/288未完成、228核心blocked、grammar0/32保持。
 
 Dedicated task verify, controlled attempts and no-progress budgets remain pending and are rejected before wrong-checker execution or lease mutations. Re-scan uses the original selected tool/standard/workspace comments command. Full accuracy/context, check/Hook, trusted closure, precision, platforms and releases are pending;66/288,228 blocked obligations and0/32 grammar qualification remain unchanged.
+
+## 原结构task verify增量 / Original structural task recheck
+
+结构任务现进入专用task verify路径，固定首次报告摘要/消费收据/开放事实/原Clang字节/标准；冻结当前源码，执行同一有界AST档案。报告0.1为结构recheck，公开verification0.37；局部still_present/incomplete/candidate_absent_unverified_policy均不关闭任务。共享租约、持久化前输入核验和取消/截止保持。
+
+Structural task verify binds original report/consumption receipt/open fact/compiler bytes/standard, freezes current source and executes the same bounded AST profile. Local results never close tasks. Shared leases, pre-persistence current-input checks and cancellation/deadline limits remain in force.
+
+本轮发现旧brief给出的comments --workspace不可执行；新brief0.32生成task verify原工具argv，真实测试直接执行该argv。task show0.6、绑定反馈0.8；495历史schema保持字节不变，新增5份schema。专用attempt仍拒绝，受控尝试预算、完整语义/项目/平台/独立精度与可信关闭继续缺失，66/288和228blocked、0/32保持。以上早期“verify未接线”和491历史schema为e77517a之前检查点。
+
+The previous brief included an unsupported comments --workspace argument. Brief0.32 supplies executable original-tool task-verify argv tested directly, with task-show0.6 and feedback0.8. All495 historical schemas remain unchanged. Attempts, complete semantics/project/platform/independent precision and trusted closure remain pending.
+
+本增量验证：默认/WASM各27个公开目标测试通过，另各一个真实原工具内部契约测试覆盖still_present、局部消失、源变化、原规则/工具/首次报告篡改、语法错误和截止耗尽。500份schema有效，495历史字节不变；20反馈/brief对、28结构报告、8公开verification、8内部原生复检、4task show及5伪造负例通过。独立标注精度和生产资格仍未授予。
+
+Current validation: both modes pass27 public target tests and one real internal contract test covering presence/absence/input changes, forged origins/rules/tools, syntax errors and expired deadlines.500 schemas are valid,495 unchanged;20 feedback/brief pairs,28 packets,8 public verifications,8 internal native reports and4 task-show reports validate, with five schema forgeries rejected. These do not grant independent precision or production qualification.
+
+- [原结构复检证据](evidence/c-family-structure-recheck-native.json)
+- [WASM构建复检契约证据](evidence/c-family-structure-recheck-native-wasm.json)

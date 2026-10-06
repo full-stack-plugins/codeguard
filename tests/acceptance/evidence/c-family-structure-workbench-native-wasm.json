@@ -95,66 +95,63 @@
             "allowed_paths": [],
             "authority": "local_unverified",
             "checker_id": "c.clang.documentation_structure",
-            "closure_condition": "原命令局部复扫不关闭；仍须专用task verify、完整详细准确性/项目覆盖与可信关闭/复发验收。",
+            "closure_condition": "原命令局部复扫不关闭；专用task verify记录局部观察；仍须受控尝试、完整详细准确性/项目覆盖与可信关闭/复发验收。",
             "constraints": [
               "仅修改当前文件文档注释，保留API及行为",
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-40168-0-1791327859536849000",
+            "current_run_id": "clangdocstruct-4533-0-1791328431182029000",
             "delivery_decision": "not_evaluated",
             "disposition": "needs_decision",
             "evidence_ref": {
-              "first_report_sha256": "dca7a8b7d16ef4df296a5b657940fb0e16395f5c373ee1662ddb4263b541e8e8",
-              "first_run_id": "clangdocstruct-39838-0-1791327859131138000"
+              "first_report_sha256": "424697cef6aa7845dd0ef65c87874e3ff6cbf395da2320bc6708c90845c31dec",
+              "first_run_id": "clangdocstruct-4511-0-1791328430648413000"
             },
             "history": {
               "attempt_journal": "not_integrated",
               "status": "native_structural_observations_only",
-              "task_verify": "not_integrated"
+              "task_verify": "local_observation"
             },
             "kind": "finding",
             "observation_status": "candidate_absent_unverified_policy",
             "reason_code": "candidate_absent_unverified_policy",
             "recheck_argv": [
               "codeguard",
-              "comments",
-              "c",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000/api.c",
+              "task",
+              "verify",
+              "CG-ef3353eb9363046a82888ed4e82534bf",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000",
               "--clang-tool",
               "/usr/bin/clang",
-              "--standard",
-              "c11",
-              "--workspace",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000",
               "--format=json"
             ],
             "rule_basis": "函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。",
             "rule_source": "codeguard_structural_policy",
-            "schema_version": "0.31.0",
+            "schema_version": "0.32.0",
             "scope": "api.c",
             "source_sha256": "f16d878a0358d671d189c7f94ccc0256aeb1d03747273026a32151b31978148f",
             "step": [
               "按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。",
-              "使用绑定原工具、标准与工作区的comments原命令复扫；未知或失稳时先诊断，不按旧位置改源码。"
+              "使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"
             ],
             "structural_positions": [],
             "structural_rule_id": "codeguard.documentation.function_structure_required",
             "task_id": "CG-ef3353eb9363046a82888ed4e82534bf"
           },
           "report_type": "repair_brief_preview",
-          "schema_version": "0.31.0"
+          "schema_version": "0.32.0"
         },
         "next_actions": [
-          "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify与可信关闭仍待实现。",
+          "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify已提供局部观察，受控尝试与可信关闭仍待实现。",
           "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。",
-          "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原comments命令复扫；专用结构task verify与可信关闭仍待接线，不把非空说明当准确性或关闭证据。"
+          "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试与可信关闭仍待接线，不把非空说明当准确性或关闭证据。"
         ],
         "operation": "comments",
-        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000/api.c",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000/api.c",
         "reason": "native_documentation_coverage_unverified",
         "report_type": "c_family_comments_feedback",
-        "schema_version": "0.7.0",
+        "schema_version": "0.8.0",
         "source_sha256": "f16d878a0358d671d189c7f94ccc0256aeb1d03747273026a32151b31978148f",
         "structural_next": {
           "authority": "local_unverified",
@@ -172,63 +169,60 @@
             "allowed_paths": [],
             "authority": "local_unverified",
             "checker_id": "c.clang.documentation_structure",
-            "closure_condition": "原命令局部复扫不关闭；仍须专用task verify、完整详细准确性/项目覆盖与可信关闭/复发验收。",
+            "closure_condition": "原命令局部复扫不关闭；专用task verify记录局部观察；仍须受控尝试、完整详细准确性/项目覆盖与可信关闭/复发验收。",
             "constraints": [
               "仅修改当前文件文档注释，保留API及行为",
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-40168-0-1791327859536849000",
+            "current_run_id": "clangdocstruct-4533-0-1791328431182029000",
             "delivery_decision": "not_evaluated",
             "disposition": "needs_decision",
             "evidence_ref": {
-              "first_report_sha256": "dca7a8b7d16ef4df296a5b657940fb0e16395f5c373ee1662ddb4263b541e8e8",
-              "first_run_id": "clangdocstruct-39838-0-1791327859131138000"
+              "first_report_sha256": "424697cef6aa7845dd0ef65c87874e3ff6cbf395da2320bc6708c90845c31dec",
+              "first_run_id": "clangdocstruct-4511-0-1791328430648413000"
             },
             "history": {
               "attempt_journal": "not_integrated",
               "status": "native_structural_observations_only",
-              "task_verify": "not_integrated"
+              "task_verify": "local_observation"
             },
             "kind": "finding",
             "observation_status": "candidate_absent_unverified_policy",
             "reason_code": "candidate_absent_unverified_policy",
             "recheck_argv": [
               "codeguard",
-              "comments",
-              "c",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000/api.c",
+              "task",
+              "verify",
+              "CG-ef3353eb9363046a82888ed4e82534bf",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000",
               "--clang-tool",
               "/usr/bin/clang",
-              "--standard",
-              "c11",
-              "--workspace",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000",
               "--format=json"
             ],
             "rule_basis": "函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。",
             "rule_source": "codeguard_structural_policy",
-            "schema_version": "0.31.0",
+            "schema_version": "0.32.0",
             "scope": "api.c",
             "source_sha256": "f16d878a0358d671d189c7f94ccc0256aeb1d03747273026a32151b31978148f",
             "step": [
               "按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。",
-              "使用绑定原工具、标准与工作区的comments原命令复扫；未知或失稳时先诊断，不按旧位置改源码。"
+              "使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"
             ],
             "structural_positions": [],
             "structural_rule_id": "codeguard.documentation.function_structure_required",
             "task_id": "CG-ef3353eb9363046a82888ed4e82534bf"
           },
           "report_type": "repair_brief_preview",
-          "schema_version": "0.31.0"
+          "schema_version": "0.32.0"
         },
         "structural_task_workflow_status": "partial",
         "structural_workbench": {
           "reason": null,
-          "run_id": "clangdocstruct-40168-0-1791327859536849000",
+          "run_id": "clangdocstruct-4533-0-1791328431182029000",
           "status": "synced_partial",
           "task_ids": [],
-          "workspace_id": "ws-da695853f2dae5d27d2378751a934f52"
+          "workspace_id": "ws-836e504e85482f27e6347b1c486d5b12"
         },
         "task_workflow_status": "partial",
         "unclassified_native_diagnostics": [],
@@ -236,7 +230,7 @@
           "codeguard",
           "comments",
           "c",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000/api.c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000/api.c",
           "--clang-tool",
           "/usr/bin/clang",
           "--standard",
@@ -244,22 +238,22 @@
           "--timeout",
           "1800000ms",
           "--workspace",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000",
           "--format=json"
         ],
         "workbench": {
           "reason": null,
-          "run_id": "clangdoc-40168-0-1791327859536849000",
+          "run_id": "clangdoc-4533-0-1791328431182029000",
           "status": "synced_partial",
           "sync": {
-            "already_consumed_reports": 8,
+            "already_consumed_reports": 9,
             "historical_findings": 0,
             "imported_reports": 1,
             "new_blockers": 0,
             "new_findings": 0
           },
           "task_ids": [],
-          "workspace_id": "ws-da695853f2dae5d27d2378751a934f52"
+          "workspace_id": "ws-836e504e85482f27e6347b1c486d5b12"
         },
         "workspace_binding": "bound"
       },
@@ -351,48 +345,45 @@
             ],
             "authority": "local_unverified",
             "checker_id": "c.clang.documentation_structure",
-            "closure_condition": "原命令局部复扫不关闭；仍须专用task verify、完整详细准确性/项目覆盖与可信关闭/复发验收。",
+            "closure_condition": "原命令局部复扫不关闭；专用task verify记录局部观察；仍须受控尝试、完整详细准确性/项目覆盖与可信关闭/复发验收。",
             "constraints": [
               "仅修改当前文件文档注释，保留API及行为",
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-39838-0-1791327859131138000",
+            "current_run_id": "clangdocstruct-4511-0-1791328430648413000",
             "delivery_decision": "not_evaluated",
             "disposition": "actionable",
             "evidence_ref": {
-              "first_report_sha256": "dca7a8b7d16ef4df296a5b657940fb0e16395f5c373ee1662ddb4263b541e8e8",
-              "first_run_id": "clangdocstruct-39838-0-1791327859131138000"
+              "first_report_sha256": "424697cef6aa7845dd0ef65c87874e3ff6cbf395da2320bc6708c90845c31dec",
+              "first_run_id": "clangdocstruct-4511-0-1791328430648413000"
             },
             "history": {
               "attempt_journal": "not_integrated",
               "status": "native_structural_observations_only",
-              "task_verify": "not_integrated"
+              "task_verify": "local_observation"
             },
             "kind": "finding",
             "observation_status": "structural_deficits_observed",
             "reason_code": "structural_deficits_observed",
             "recheck_argv": [
               "codeguard",
-              "comments",
-              "c",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000/api.c",
+              "task",
+              "verify",
+              "CG-ef3353eb9363046a82888ed4e82534bf",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000",
               "--clang-tool",
               "/usr/bin/clang",
-              "--standard",
-              "c11",
-              "--workspace",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000",
               "--format=json"
             ],
             "rule_basis": "函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。",
             "rule_source": "codeguard_structural_policy",
-            "schema_version": "0.31.0",
+            "schema_version": "0.32.0",
             "scope": "api.c",
             "source_sha256": "e2ca7838c4c4672dc8b1a65047a8a1487705ba8fec207abb6b1a25604b233029",
             "step": [
               "按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。",
-              "使用绑定原工具、标准与工作区的comments原命令复扫；未知或失稳时先诊断，不按旧位置改源码。"
+              "使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"
             ],
             "structural_positions": [
               {
@@ -428,18 +419,18 @@
             "task_id": "CG-ef3353eb9363046a82888ed4e82534bf"
           },
           "report_type": "repair_brief_preview",
-          "schema_version": "0.31.0"
+          "schema_version": "0.32.0"
         },
         "next_actions": [
-          "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify与可信关闭仍待实现。",
+          "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify已提供局部观察，受控尝试与可信关闭仍待实现。",
           "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。",
-          "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原comments命令复扫；专用结构task verify与可信关闭仍待接线，不把非空说明当准确性或关闭证据。"
+          "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试与可信关闭仍待接线，不把非空说明当准确性或关闭证据。"
         ],
         "operation": "comments",
-        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000/api.c",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000/api.c",
         "reason": "native_documentation_coverage_unverified",
         "report_type": "c_family_comments_feedback",
-        "schema_version": "0.7.0",
+        "schema_version": "0.8.0",
         "source_sha256": "e2ca7838c4c4672dc8b1a65047a8a1487705ba8fec207abb6b1a25604b233029",
         "structural_next": {
           "authority": "local_unverified",
@@ -459,48 +450,45 @@
             ],
             "authority": "local_unverified",
             "checker_id": "c.clang.documentation_structure",
-            "closure_condition": "原命令局部复扫不关闭；仍须专用task verify、完整详细准确性/项目覆盖与可信关闭/复发验收。",
+            "closure_condition": "原命令局部复扫不关闭；专用task verify记录局部观察；仍须受控尝试、完整详细准确性/项目覆盖与可信关闭/复发验收。",
             "constraints": [
               "仅修改当前文件文档注释，保留API及行为",
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-39838-0-1791327859131138000",
+            "current_run_id": "clangdocstruct-4511-0-1791328430648413000",
             "delivery_decision": "not_evaluated",
             "disposition": "actionable",
             "evidence_ref": {
-              "first_report_sha256": "dca7a8b7d16ef4df296a5b657940fb0e16395f5c373ee1662ddb4263b541e8e8",
-              "first_run_id": "clangdocstruct-39838-0-1791327859131138000"
+              "first_report_sha256": "424697cef6aa7845dd0ef65c87874e3ff6cbf395da2320bc6708c90845c31dec",
+              "first_run_id": "clangdocstruct-4511-0-1791328430648413000"
             },
             "history": {
               "attempt_journal": "not_integrated",
               "status": "native_structural_observations_only",
-              "task_verify": "not_integrated"
+              "task_verify": "local_observation"
             },
             "kind": "finding",
             "observation_status": "structural_deficits_observed",
             "reason_code": "structural_deficits_observed",
             "recheck_argv": [
               "codeguard",
-              "comments",
-              "c",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000/api.c",
+              "task",
+              "verify",
+              "CG-ef3353eb9363046a82888ed4e82534bf",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000",
               "--clang-tool",
               "/usr/bin/clang",
-              "--standard",
-              "c11",
-              "--workspace",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000",
               "--format=json"
             ],
             "rule_basis": "函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。",
             "rule_source": "codeguard_structural_policy",
-            "schema_version": "0.31.0",
+            "schema_version": "0.32.0",
             "scope": "api.c",
             "source_sha256": "e2ca7838c4c4672dc8b1a65047a8a1487705ba8fec207abb6b1a25604b233029",
             "step": [
               "按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。",
-              "使用绑定原工具、标准与工作区的comments原命令复扫；未知或失稳时先诊断，不按旧位置改源码。"
+              "使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"
             ],
             "structural_positions": [
               {
@@ -536,17 +524,17 @@
             "task_id": "CG-ef3353eb9363046a82888ed4e82534bf"
           },
           "report_type": "repair_brief_preview",
-          "schema_version": "0.31.0"
+          "schema_version": "0.32.0"
         },
         "structural_task_workflow_status": "partial",
         "structural_workbench": {
           "reason": null,
-          "run_id": "clangdocstruct-39838-0-1791327859131138000",
+          "run_id": "clangdocstruct-4511-0-1791328430648413000",
           "status": "synced_partial",
           "task_ids": [
             "CG-ef3353eb9363046a82888ed4e82534bf"
           ],
-          "workspace_id": "ws-da695853f2dae5d27d2378751a934f52"
+          "workspace_id": "ws-836e504e85482f27e6347b1c486d5b12"
         },
         "task_workflow_status": "partial",
         "unclassified_native_diagnostics": [],
@@ -554,7 +542,7 @@
           "codeguard",
           "comments",
           "c",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000/api.c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000/api.c",
           "--clang-tool",
           "/usr/bin/clang",
           "--standard",
@@ -562,12 +550,12 @@
           "--timeout",
           "1800000ms",
           "--workspace",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000",
           "--format=json"
         ],
         "workbench": {
           "reason": null,
-          "run_id": "clangdoc-39838-0-1791327859131138000",
+          "run_id": "clangdoc-4511-0-1791328430648413000",
           "status": "synced_partial",
           "sync": {
             "already_consumed_reports": 0,
@@ -577,7 +565,7 @@
             "new_findings": 0
           },
           "task_ids": [],
-          "workspace_id": "ws-da695853f2dae5d27d2378751a934f52"
+          "workspace_id": "ws-836e504e85482f27e6347b1c486d5b12"
         },
         "workspace_binding": "bound"
       },
@@ -670,48 +658,45 @@
             ],
             "authority": "local_unverified",
             "checker_id": "c.clang.documentation_structure",
-            "closure_condition": "原命令局部复扫不关闭；仍须专用task verify、完整详细准确性/项目覆盖与可信关闭/复发验收。",
+            "closure_condition": "原命令局部复扫不关闭；专用task verify记录局部观察；仍须受控尝试、完整详细准确性/项目覆盖与可信关闭/复发验收。",
             "constraints": [
               "仅修改当前文件文档注释，保留API及行为",
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-39954-0-1791327859345250000",
+            "current_run_id": "clangdocstruct-4525-0-1791328430979285000",
             "delivery_decision": "not_evaluated",
             "disposition": "actionable",
             "evidence_ref": {
-              "first_report_sha256": "dca7a8b7d16ef4df296a5b657940fb0e16395f5c373ee1662ddb4263b541e8e8",
-              "first_run_id": "clangdocstruct-39838-0-1791327859131138000"
+              "first_report_sha256": "424697cef6aa7845dd0ef65c87874e3ff6cbf395da2320bc6708c90845c31dec",
+              "first_run_id": "clangdocstruct-4511-0-1791328430648413000"
             },
             "history": {
               "attempt_journal": "not_integrated",
               "status": "native_structural_observations_only",
-              "task_verify": "not_integrated"
+              "task_verify": "local_observation"
             },
             "kind": "finding",
             "observation_status": "structural_deficits_observed",
             "reason_code": "structural_deficits_observed",
             "recheck_argv": [
               "codeguard",
-              "comments",
-              "c",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000/api.c",
+              "task",
+              "verify",
+              "CG-ef3353eb9363046a82888ed4e82534bf",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000",
               "--clang-tool",
               "/usr/bin/clang",
-              "--standard",
-              "c11",
-              "--workspace",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000",
               "--format=json"
             ],
             "rule_basis": "函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。",
             "rule_source": "codeguard_structural_policy",
-            "schema_version": "0.31.0",
+            "schema_version": "0.32.0",
             "scope": "api.c",
             "source_sha256": "364941db744410dcfa01e73991a89ff0178c13e93e830b7c966523a4c9c2c3bb",
             "step": [
               "按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。",
-              "使用绑定原工具、标准与工作区的comments原命令复扫；未知或失稳时先诊断，不按旧位置改源码。"
+              "使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"
             ],
             "structural_positions": [
               {
@@ -747,18 +732,18 @@
             "task_id": "CG-ef3353eb9363046a82888ed4e82534bf"
           },
           "report_type": "repair_brief_preview",
-          "schema_version": "0.31.0"
+          "schema_version": "0.32.0"
         },
         "next_actions": [
-          "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify与可信关闭仍待实现。",
+          "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify已提供局部观察，受控尝试与可信关闭仍待实现。",
           "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。",
-          "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原comments命令复扫；专用结构task verify与可信关闭仍待接线，不把非空说明当准确性或关闭证据。"
+          "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试与可信关闭仍待接线，不把非空说明当准确性或关闭证据。"
         ],
         "operation": "comments",
-        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000/api.c",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000/api.c",
         "reason": "native_documentation_coverage_unverified",
         "report_type": "c_family_comments_feedback",
-        "schema_version": "0.7.0",
+        "schema_version": "0.8.0",
         "source_sha256": "364941db744410dcfa01e73991a89ff0178c13e93e830b7c966523a4c9c2c3bb",
         "structural_next": {
           "authority": "local_unverified",
@@ -778,48 +763,45 @@
             ],
             "authority": "local_unverified",
             "checker_id": "c.clang.documentation_structure",
-            "closure_condition": "原命令局部复扫不关闭；仍须专用task verify、完整详细准确性/项目覆盖与可信关闭/复发验收。",
+            "closure_condition": "原命令局部复扫不关闭；专用task verify记录局部观察；仍须受控尝试、完整详细准确性/项目覆盖与可信关闭/复发验收。",
             "constraints": [
               "仅修改当前文件文档注释，保留API及行为",
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-39954-0-1791327859345250000",
+            "current_run_id": "clangdocstruct-4525-0-1791328430979285000",
             "delivery_decision": "not_evaluated",
             "disposition": "actionable",
             "evidence_ref": {
-              "first_report_sha256": "dca7a8b7d16ef4df296a5b657940fb0e16395f5c373ee1662ddb4263b541e8e8",
-              "first_run_id": "clangdocstruct-39838-0-1791327859131138000"
+              "first_report_sha256": "424697cef6aa7845dd0ef65c87874e3ff6cbf395da2320bc6708c90845c31dec",
+              "first_run_id": "clangdocstruct-4511-0-1791328430648413000"
             },
             "history": {
               "attempt_journal": "not_integrated",
               "status": "native_structural_observations_only",
-              "task_verify": "not_integrated"
+              "task_verify": "local_observation"
             },
             "kind": "finding",
             "observation_status": "structural_deficits_observed",
             "reason_code": "structural_deficits_observed",
             "recheck_argv": [
               "codeguard",
-              "comments",
-              "c",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000/api.c",
+              "task",
+              "verify",
+              "CG-ef3353eb9363046a82888ed4e82534bf",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000",
               "--clang-tool",
               "/usr/bin/clang",
-              "--standard",
-              "c11",
-              "--workspace",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000",
               "--format=json"
             ],
             "rule_basis": "函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。",
             "rule_source": "codeguard_structural_policy",
-            "schema_version": "0.31.0",
+            "schema_version": "0.32.0",
             "scope": "api.c",
             "source_sha256": "364941db744410dcfa01e73991a89ff0178c13e93e830b7c966523a4c9c2c3bb",
             "step": [
               "按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。",
-              "使用绑定原工具、标准与工作区的comments原命令复扫；未知或失稳时先诊断，不按旧位置改源码。"
+              "使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"
             ],
             "structural_positions": [
               {
@@ -855,17 +837,17 @@
             "task_id": "CG-ef3353eb9363046a82888ed4e82534bf"
           },
           "report_type": "repair_brief_preview",
-          "schema_version": "0.31.0"
+          "schema_version": "0.32.0"
         },
         "structural_task_workflow_status": "partial",
         "structural_workbench": {
           "reason": null,
-          "run_id": "clangdocstruct-39954-0-1791327859345250000",
+          "run_id": "clangdocstruct-4525-0-1791328430979285000",
           "status": "synced_partial",
           "task_ids": [
             "CG-ef3353eb9363046a82888ed4e82534bf"
           ],
-          "workspace_id": "ws-da695853f2dae5d27d2378751a934f52"
+          "workspace_id": "ws-836e504e85482f27e6347b1c486d5b12"
         },
         "task_workflow_status": "partial",
         "unclassified_native_diagnostics": [],
@@ -873,7 +855,7 @@
           "codeguard",
           "comments",
           "c",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000/api.c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000/api.c",
           "--clang-tool",
           "/usr/bin/clang",
           "--standard",
@@ -881,22 +863,22 @@
           "--timeout",
           "1800000ms",
           "--workspace",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000",
           "--format=json"
         ],
         "workbench": {
           "reason": null,
-          "run_id": "clangdoc-39954-0-1791327859345250000",
+          "run_id": "clangdoc-4525-0-1791328430979285000",
           "status": "synced_partial",
           "sync": {
-            "already_consumed_reports": 4,
+            "already_consumed_reports": 5,
             "historical_findings": 0,
             "imported_reports": 1,
             "new_blockers": 0,
             "new_findings": 0
           },
           "task_ids": [],
-          "workspace_id": "ws-da695853f2dae5d27d2378751a934f52"
+          "workspace_id": "ws-836e504e85482f27e6347b1c486d5b12"
         },
         "workspace_binding": "bound"
       },
@@ -917,76 +899,7 @@
           "path": "api.c",
           "profile": "clang-documentation-structure-v1",
           "report_type": "clang_documentation_structure_workbench_observation",
-          "run_id": "clangdocstruct-39852-0-1791327859235262000",
-          "schema_version": "0.1.0",
-          "selected_tool": "/usr/bin/clang",
-          "source_sha256": "e2ca7838c4c4672dc8b1a65047a8a1487705ba8fec207abb6b1a25604b233029",
-          "standard": "c11",
-          "structure": {
-            "native_raw_diagnostic_count": 0,
-            "observation": {
-              "authority": "local_unverified",
-              "coverage_proven": false,
-              "errors_and_behavior": "not_evaluated",
-              "functions": [
-                {
-                  "column_byte": 5,
-                  "comment_presence": "absent",
-                  "line": 1,
-                  "missing_components": [
-                    "documentation_comment"
-                  ],
-                  "name": "f",
-                  "offset_byte": 4,
-                  "parameters": [],
-                  "purpose_description": "unknown",
-                  "return_description": "unknown",
-                  "structure_status": "observed_supported_subset"
-                },
-                {
-                  "column_byte": 5,
-                  "comment_presence": "absent",
-                  "line": 2,
-                  "missing_components": [
-                    "documentation_comment"
-                  ],
-                  "name": "g",
-                  "offset_byte": 31,
-                  "parameters": [],
-                  "purpose_description": "unknown",
-                  "return_description": "unknown",
-                  "structure_status": "observed_supported_subset"
-                }
-              ],
-              "observation_type": "clang_function_documentation_structure",
-              "qualification": "not_granted",
-              "schema_version": "0.1.0",
-              "semantic_accuracy": "not_evaluated",
-              "unresolved_declaration_kinds": []
-            },
-            "reason": "clang_structure_observed",
-            "status": "observed"
-          },
-          "workspace_binding": "bound",
-          "workspace_id": "ws-da695853f2dae5d27d2378751a934f52"
-        },
-        {
-          "authority": "local_unverified",
-          "coverage_proven": false,
-          "delivery_decision": "not_evaluated",
-          "language": "c",
-          "local_scan_complete": true,
-          "native": {
-            "diagnostics": [],
-            "reason": "clang_native_no_diagnostics",
-            "status": "completed",
-            "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
-            "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
-          },
-          "path": "api.c",
-          "profile": "clang-documentation-structure-v1",
-          "report_type": "clang_documentation_structure_workbench_observation",
-          "run_id": "clangdocstruct-40055-0-1791327859428890000",
+          "run_id": "clangdocstruct-4529-0-1791328431075599000",
           "schema_version": "0.1.0",
           "selected_tool": "/usr/bin/clang",
           "source_sha256": "364941db744410dcfa01e73991a89ff0178c13e93e830b7c966523a4c9c2c3bb",
@@ -1037,7 +950,7 @@
             "status": "observed"
           },
           "workspace_binding": "bound",
-          "workspace_id": "ws-da695853f2dae5d27d2378751a934f52"
+          "workspace_id": "ws-836e504e85482f27e6347b1c486d5b12"
         },
         {
           "authority": "local_unverified",
@@ -1055,7 +968,376 @@
           "path": "api.c",
           "profile": "clang-documentation-structure-v1",
           "report_type": "clang_documentation_structure_workbench_observation",
-          "run_id": "clangdocstruct-40168-0-1791327859536849000",
+          "run_id": "clangdocstruct-4511-0-1791328430648413000",
+          "schema_version": "0.1.0",
+          "selected_tool": "/usr/bin/clang",
+          "source_sha256": "e2ca7838c4c4672dc8b1a65047a8a1487705ba8fec207abb6b1a25604b233029",
+          "standard": "c11",
+          "structure": {
+            "native_raw_diagnostic_count": 0,
+            "observation": {
+              "authority": "local_unverified",
+              "coverage_proven": false,
+              "errors_and_behavior": "not_evaluated",
+              "functions": [
+                {
+                  "column_byte": 5,
+                  "comment_presence": "absent",
+                  "line": 1,
+                  "missing_components": [
+                    "documentation_comment"
+                  ],
+                  "name": "f",
+                  "offset_byte": 4,
+                  "parameters": [],
+                  "purpose_description": "unknown",
+                  "return_description": "unknown",
+                  "structure_status": "observed_supported_subset"
+                },
+                {
+                  "column_byte": 5,
+                  "comment_presence": "absent",
+                  "line": 2,
+                  "missing_components": [
+                    "documentation_comment"
+                  ],
+                  "name": "g",
+                  "offset_byte": 31,
+                  "parameters": [],
+                  "purpose_description": "unknown",
+                  "return_description": "unknown",
+                  "structure_status": "observed_supported_subset"
+                }
+              ],
+              "observation_type": "clang_function_documentation_structure",
+              "qualification": "not_granted",
+              "schema_version": "0.1.0",
+              "semantic_accuracy": "not_evaluated",
+              "unresolved_declaration_kinds": []
+            },
+            "reason": "clang_structure_observed",
+            "status": "observed"
+          },
+          "workspace_binding": "bound",
+          "workspace_id": "ws-836e504e85482f27e6347b1c486d5b12"
+        },
+        {
+          "authority": "local_unverified",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "language": "c",
+          "local_scan_complete": true,
+          "native": {
+            "diagnostics": [],
+            "reason": "clang_native_no_diagnostics",
+            "status": "completed",
+            "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+            "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+          },
+          "path": "api.c",
+          "profile": "clang-documentation-structure-v1",
+          "report_type": "clang_documentation_structure_workbench_observation",
+          "run_id": "clangdocstruct-4525-0-1791328430979285000",
+          "schema_version": "0.1.0",
+          "selected_tool": "/usr/bin/clang",
+          "source_sha256": "364941db744410dcfa01e73991a89ff0178c13e93e830b7c966523a4c9c2c3bb",
+          "standard": "c11",
+          "structure": {
+            "native_raw_diagnostic_count": 0,
+            "observation": {
+              "authority": "local_unverified",
+              "coverage_proven": false,
+              "errors_and_behavior": "not_evaluated",
+              "functions": [
+                {
+                  "column_byte": 5,
+                  "comment_presence": "absent",
+                  "line": 3,
+                  "missing_components": [
+                    "documentation_comment"
+                  ],
+                  "name": "f",
+                  "offset_byte": 6,
+                  "parameters": [],
+                  "purpose_description": "unknown",
+                  "return_description": "unknown",
+                  "structure_status": "observed_supported_subset"
+                },
+                {
+                  "column_byte": 5,
+                  "comment_presence": "absent",
+                  "line": 4,
+                  "missing_components": [
+                    "documentation_comment"
+                  ],
+                  "name": "g",
+                  "offset_byte": 33,
+                  "parameters": [],
+                  "purpose_description": "unknown",
+                  "return_description": "unknown",
+                  "structure_status": "observed_supported_subset"
+                }
+              ],
+              "observation_type": "clang_function_documentation_structure",
+              "qualification": "not_granted",
+              "schema_version": "0.1.0",
+              "semantic_accuracy": "not_evaluated",
+              "unresolved_declaration_kinds": []
+            },
+            "reason": "clang_structure_observed",
+            "status": "observed"
+          },
+          "workspace_binding": "bound",
+          "workspace_id": "ws-836e504e85482f27e6347b1c486d5b12"
+        },
+        {
+          "authority": "local_unverified",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "input_stable": true,
+          "language": "c",
+          "local_scan_complete": true,
+          "native": {
+            "diagnostics": [],
+            "reason": "clang_native_no_diagnostics",
+            "status": "completed",
+            "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+            "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+          },
+          "original_ref": {
+            "run_id": "clangdocstruct-4511-0-1791328430648413000",
+            "sha256": "424697cef6aa7845dd0ef65c87874e3ff6cbf395da2320bc6708c90845c31dec"
+          },
+          "path": "api.c",
+          "profile": "clang-documentation-structure-v1",
+          "report_type": "clang_documentation_structure_task_recheck",
+          "run_id": "clangdocstruct-4519-0-1791328430877456000",
+          "schema_version": "0.1.0",
+          "selected_tool": "/usr/bin/clang",
+          "source_sha256": "e2ca7838c4c4672dc8b1a65047a8a1487705ba8fec207abb6b1a25604b233029",
+          "standard": "c11",
+          "structure": {
+            "native_raw_diagnostic_count": 0,
+            "observation": {
+              "authority": "local_unverified",
+              "coverage_proven": false,
+              "errors_and_behavior": "not_evaluated",
+              "functions": [
+                {
+                  "column_byte": 5,
+                  "comment_presence": "absent",
+                  "line": 1,
+                  "missing_components": [
+                    "documentation_comment"
+                  ],
+                  "name": "f",
+                  "offset_byte": 4,
+                  "parameters": [],
+                  "purpose_description": "unknown",
+                  "return_description": "unknown",
+                  "structure_status": "observed_supported_subset"
+                },
+                {
+                  "column_byte": 5,
+                  "comment_presence": "absent",
+                  "line": 2,
+                  "missing_components": [
+                    "documentation_comment"
+                  ],
+                  "name": "g",
+                  "offset_byte": 31,
+                  "parameters": [],
+                  "purpose_description": "unknown",
+                  "return_description": "unknown",
+                  "structure_status": "observed_supported_subset"
+                }
+              ],
+              "observation_type": "clang_function_documentation_structure",
+              "qualification": "not_granted",
+              "schema_version": "0.1.0",
+              "semantic_accuracy": "not_evaluated",
+              "unresolved_declaration_kinds": []
+            },
+            "reason": "clang_structure_observed",
+            "status": "observed"
+          },
+          "task_id": "CG-ef3353eb9363046a82888ed4e82534bf",
+          "task_kind": "finding",
+          "task_rule": "codeguard.documentation.function_structure_required",
+          "workspace_binding": "bound",
+          "workspace_id": "ws-836e504e85482f27e6347b1c486d5b12"
+        },
+        {
+          "authority": "local_unverified",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "input_stable": true,
+          "language": "c",
+          "local_scan_complete": true,
+          "native": {
+            "diagnostics": [],
+            "reason": "clang_native_no_diagnostics",
+            "status": "completed",
+            "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+            "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+          },
+          "original_ref": {
+            "run_id": "clangdocstruct-4511-0-1791328430648413000",
+            "sha256": "424697cef6aa7845dd0ef65c87874e3ff6cbf395da2320bc6708c90845c31dec"
+          },
+          "path": "api.c",
+          "profile": "clang-documentation-structure-v1",
+          "report_type": "clang_documentation_structure_task_recheck",
+          "run_id": "clangdocstruct-4540-0-1791328431286335000",
+          "schema_version": "0.1.0",
+          "selected_tool": "/usr/bin/clang",
+          "source_sha256": "f16d878a0358d671d189c7f94ccc0256aeb1d03747273026a32151b31978148f",
+          "standard": "c11",
+          "structure": {
+            "native_raw_diagnostic_count": 0,
+            "observation": {
+              "authority": "local_unverified",
+              "coverage_proven": false,
+              "errors_and_behavior": "not_evaluated",
+              "functions": [
+                {
+                  "column_byte": 5,
+                  "comment_presence": "present",
+                  "line": 5,
+                  "missing_components": [],
+                  "name": "f",
+                  "offset_byte": 70,
+                  "parameters": [
+                    {
+                      "description": "nonempty",
+                      "index": 0,
+                      "name": "x"
+                    }
+                  ],
+                  "purpose_description": "nonempty",
+                  "return_description": "nonempty",
+                  "structure_status": "observed_supported_subset"
+                },
+                {
+                  "column_byte": 5,
+                  "comment_presence": "present",
+                  "line": 10,
+                  "missing_components": [],
+                  "name": "g",
+                  "offset_byte": 169,
+                  "parameters": [
+                    {
+                      "description": "nonempty",
+                      "index": 0,
+                      "name": "x"
+                    }
+                  ],
+                  "purpose_description": "nonempty",
+                  "return_description": "nonempty",
+                  "structure_status": "observed_supported_subset"
+                }
+              ],
+              "observation_type": "clang_function_documentation_structure",
+              "qualification": "not_granted",
+              "schema_version": "0.1.0",
+              "semantic_accuracy": "not_evaluated",
+              "unresolved_declaration_kinds": []
+            },
+            "reason": "clang_structure_observed",
+            "status": "observed"
+          },
+          "task_id": "CG-ef3353eb9363046a82888ed4e82534bf",
+          "task_kind": "finding",
+          "task_rule": "codeguard.documentation.function_structure_required",
+          "workspace_binding": "bound",
+          "workspace_id": "ws-836e504e85482f27e6347b1c486d5b12"
+        },
+        {
+          "authority": "local_unverified",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "language": "c",
+          "local_scan_complete": true,
+          "native": {
+            "diagnostics": [],
+            "reason": "clang_native_no_diagnostics",
+            "status": "completed",
+            "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+            "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+          },
+          "path": "api.c",
+          "profile": "clang-documentation-structure-v1",
+          "report_type": "clang_documentation_structure_workbench_observation",
+          "run_id": "clangdocstruct-4515-0-1791328430772494000",
+          "schema_version": "0.1.0",
+          "selected_tool": "/usr/bin/clang",
+          "source_sha256": "e2ca7838c4c4672dc8b1a65047a8a1487705ba8fec207abb6b1a25604b233029",
+          "standard": "c11",
+          "structure": {
+            "native_raw_diagnostic_count": 0,
+            "observation": {
+              "authority": "local_unverified",
+              "coverage_proven": false,
+              "errors_and_behavior": "not_evaluated",
+              "functions": [
+                {
+                  "column_byte": 5,
+                  "comment_presence": "absent",
+                  "line": 1,
+                  "missing_components": [
+                    "documentation_comment"
+                  ],
+                  "name": "f",
+                  "offset_byte": 4,
+                  "parameters": [],
+                  "purpose_description": "unknown",
+                  "return_description": "unknown",
+                  "structure_status": "observed_supported_subset"
+                },
+                {
+                  "column_byte": 5,
+                  "comment_presence": "absent",
+                  "line": 2,
+                  "missing_components": [
+                    "documentation_comment"
+                  ],
+                  "name": "g",
+                  "offset_byte": 31,
+                  "parameters": [],
+                  "purpose_description": "unknown",
+                  "return_description": "unknown",
+                  "structure_status": "observed_supported_subset"
+                }
+              ],
+              "observation_type": "clang_function_documentation_structure",
+              "qualification": "not_granted",
+              "schema_version": "0.1.0",
+              "semantic_accuracy": "not_evaluated",
+              "unresolved_declaration_kinds": []
+            },
+            "reason": "clang_structure_observed",
+            "status": "observed"
+          },
+          "workspace_binding": "bound",
+          "workspace_id": "ws-836e504e85482f27e6347b1c486d5b12"
+        },
+        {
+          "authority": "local_unverified",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "language": "c",
+          "local_scan_complete": true,
+          "native": {
+            "diagnostics": [],
+            "reason": "clang_native_no_diagnostics",
+            "status": "completed",
+            "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+            "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+          },
+          "path": "api.c",
+          "profile": "clang-documentation-structure-v1",
+          "report_type": "clang_documentation_structure_workbench_observation",
+          "run_id": "clangdocstruct-4533-0-1791328431182029000",
           "schema_version": "0.1.0",
           "selected_tool": "/usr/bin/clang",
           "source_sha256": "f16d878a0358d671d189c7f94ccc0256aeb1d03747273026a32151b31978148f",
@@ -1114,145 +1396,7 @@
             "status": "observed"
           },
           "workspace_binding": "bound",
-          "workspace_id": "ws-da695853f2dae5d27d2378751a934f52"
-        },
-        {
-          "authority": "local_unverified",
-          "coverage_proven": false,
-          "delivery_decision": "not_evaluated",
-          "language": "c",
-          "local_scan_complete": true,
-          "native": {
-            "diagnostics": [],
-            "reason": "clang_native_no_diagnostics",
-            "status": "completed",
-            "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
-            "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
-          },
-          "path": "api.c",
-          "profile": "clang-documentation-structure-v1",
-          "report_type": "clang_documentation_structure_workbench_observation",
-          "run_id": "clangdocstruct-39838-0-1791327859131138000",
-          "schema_version": "0.1.0",
-          "selected_tool": "/usr/bin/clang",
-          "source_sha256": "e2ca7838c4c4672dc8b1a65047a8a1487705ba8fec207abb6b1a25604b233029",
-          "standard": "c11",
-          "structure": {
-            "native_raw_diagnostic_count": 0,
-            "observation": {
-              "authority": "local_unverified",
-              "coverage_proven": false,
-              "errors_and_behavior": "not_evaluated",
-              "functions": [
-                {
-                  "column_byte": 5,
-                  "comment_presence": "absent",
-                  "line": 1,
-                  "missing_components": [
-                    "documentation_comment"
-                  ],
-                  "name": "f",
-                  "offset_byte": 4,
-                  "parameters": [],
-                  "purpose_description": "unknown",
-                  "return_description": "unknown",
-                  "structure_status": "observed_supported_subset"
-                },
-                {
-                  "column_byte": 5,
-                  "comment_presence": "absent",
-                  "line": 2,
-                  "missing_components": [
-                    "documentation_comment"
-                  ],
-                  "name": "g",
-                  "offset_byte": 31,
-                  "parameters": [],
-                  "purpose_description": "unknown",
-                  "return_description": "unknown",
-                  "structure_status": "observed_supported_subset"
-                }
-              ],
-              "observation_type": "clang_function_documentation_structure",
-              "qualification": "not_granted",
-              "schema_version": "0.1.0",
-              "semantic_accuracy": "not_evaluated",
-              "unresolved_declaration_kinds": []
-            },
-            "reason": "clang_structure_observed",
-            "status": "observed"
-          },
-          "workspace_binding": "bound",
-          "workspace_id": "ws-da695853f2dae5d27d2378751a934f52"
-        },
-        {
-          "authority": "local_unverified",
-          "coverage_proven": false,
-          "delivery_decision": "not_evaluated",
-          "language": "c",
-          "local_scan_complete": true,
-          "native": {
-            "diagnostics": [],
-            "reason": "clang_native_no_diagnostics",
-            "status": "completed",
-            "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
-            "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
-          },
-          "path": "api.c",
-          "profile": "clang-documentation-structure-v1",
-          "report_type": "clang_documentation_structure_workbench_observation",
-          "run_id": "clangdocstruct-39954-0-1791327859345250000",
-          "schema_version": "0.1.0",
-          "selected_tool": "/usr/bin/clang",
-          "source_sha256": "364941db744410dcfa01e73991a89ff0178c13e93e830b7c966523a4c9c2c3bb",
-          "standard": "c11",
-          "structure": {
-            "native_raw_diagnostic_count": 0,
-            "observation": {
-              "authority": "local_unverified",
-              "coverage_proven": false,
-              "errors_and_behavior": "not_evaluated",
-              "functions": [
-                {
-                  "column_byte": 5,
-                  "comment_presence": "absent",
-                  "line": 3,
-                  "missing_components": [
-                    "documentation_comment"
-                  ],
-                  "name": "f",
-                  "offset_byte": 6,
-                  "parameters": [],
-                  "purpose_description": "unknown",
-                  "return_description": "unknown",
-                  "structure_status": "observed_supported_subset"
-                },
-                {
-                  "column_byte": 5,
-                  "comment_presence": "absent",
-                  "line": 4,
-                  "missing_components": [
-                    "documentation_comment"
-                  ],
-                  "name": "g",
-                  "offset_byte": 33,
-                  "parameters": [],
-                  "purpose_description": "unknown",
-                  "return_description": "unknown",
-                  "structure_status": "observed_supported_subset"
-                }
-              ],
-              "observation_type": "clang_function_documentation_structure",
-              "qualification": "not_granted",
-              "schema_version": "0.1.0",
-              "semantic_accuracy": "not_evaluated",
-              "unresolved_declaration_kinds": []
-            },
-            "reason": "clang_structure_observed",
-            "status": "observed"
-          },
-          "workspace_binding": "bound",
-          "workspace_id": "ws-da695853f2dae5d27d2378751a934f52"
+          "workspace_id": "ws-836e504e85482f27e6347b1c486d5b12"
         }
       ],
       "repeated": {
@@ -1343,48 +1487,45 @@
             ],
             "authority": "local_unverified",
             "checker_id": "c.clang.documentation_structure",
-            "closure_condition": "原命令局部复扫不关闭；仍须专用task verify、完整详细准确性/项目覆盖与可信关闭/复发验收。",
+            "closure_condition": "原命令局部复扫不关闭；专用task verify记录局部观察；仍须受控尝试、完整详细准确性/项目覆盖与可信关闭/复发验收。",
             "constraints": [
               "仅修改当前文件文档注释，保留API及行为",
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-39852-0-1791327859235262000",
+            "current_run_id": "clangdocstruct-4515-0-1791328430772494000",
             "delivery_decision": "not_evaluated",
             "disposition": "actionable",
             "evidence_ref": {
-              "first_report_sha256": "dca7a8b7d16ef4df296a5b657940fb0e16395f5c373ee1662ddb4263b541e8e8",
-              "first_run_id": "clangdocstruct-39838-0-1791327859131138000"
+              "first_report_sha256": "424697cef6aa7845dd0ef65c87874e3ff6cbf395da2320bc6708c90845c31dec",
+              "first_run_id": "clangdocstruct-4511-0-1791328430648413000"
             },
             "history": {
               "attempt_journal": "not_integrated",
               "status": "native_structural_observations_only",
-              "task_verify": "not_integrated"
+              "task_verify": "local_observation"
             },
             "kind": "finding",
             "observation_status": "structural_deficits_observed",
             "reason_code": "structural_deficits_observed",
             "recheck_argv": [
               "codeguard",
-              "comments",
-              "c",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000/api.c",
+              "task",
+              "verify",
+              "CG-ef3353eb9363046a82888ed4e82534bf",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000",
               "--clang-tool",
               "/usr/bin/clang",
-              "--standard",
-              "c11",
-              "--workspace",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000",
               "--format=json"
             ],
             "rule_basis": "函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。",
             "rule_source": "codeguard_structural_policy",
-            "schema_version": "0.31.0",
+            "schema_version": "0.32.0",
             "scope": "api.c",
             "source_sha256": "e2ca7838c4c4672dc8b1a65047a8a1487705ba8fec207abb6b1a25604b233029",
             "step": [
               "按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。",
-              "使用绑定原工具、标准与工作区的comments原命令复扫；未知或失稳时先诊断，不按旧位置改源码。"
+              "使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"
             ],
             "structural_positions": [
               {
@@ -1420,18 +1561,18 @@
             "task_id": "CG-ef3353eb9363046a82888ed4e82534bf"
           },
           "report_type": "repair_brief_preview",
-          "schema_version": "0.31.0"
+          "schema_version": "0.32.0"
         },
         "next_actions": [
-          "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify与可信关闭仍待实现。",
+          "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify已提供局部观察，受控尝试与可信关闭仍待实现。",
           "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。",
-          "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原comments命令复扫；专用结构task verify与可信关闭仍待接线，不把非空说明当准确性或关闭证据。"
+          "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试与可信关闭仍待接线，不把非空说明当准确性或关闭证据。"
         ],
         "operation": "comments",
-        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000/api.c",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000/api.c",
         "reason": "native_documentation_coverage_unverified",
         "report_type": "c_family_comments_feedback",
-        "schema_version": "0.7.0",
+        "schema_version": "0.8.0",
         "source_sha256": "e2ca7838c4c4672dc8b1a65047a8a1487705ba8fec207abb6b1a25604b233029",
         "structural_next": {
           "authority": "local_unverified",
@@ -1451,48 +1592,45 @@
             ],
             "authority": "local_unverified",
             "checker_id": "c.clang.documentation_structure",
-            "closure_condition": "原命令局部复扫不关闭；仍须专用task verify、完整详细准确性/项目覆盖与可信关闭/复发验收。",
+            "closure_condition": "原命令局部复扫不关闭；专用task verify记录局部观察；仍须受控尝试、完整详细准确性/项目覆盖与可信关闭/复发验收。",
             "constraints": [
               "仅修改当前文件文档注释，保留API及行为",
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-39852-0-1791327859235262000",
+            "current_run_id": "clangdocstruct-4515-0-1791328430772494000",
             "delivery_decision": "not_evaluated",
             "disposition": "actionable",
             "evidence_ref": {
-              "first_report_sha256": "dca7a8b7d16ef4df296a5b657940fb0e16395f5c373ee1662ddb4263b541e8e8",
-              "first_run_id": "clangdocstruct-39838-0-1791327859131138000"
+              "first_report_sha256": "424697cef6aa7845dd0ef65c87874e3ff6cbf395da2320bc6708c90845c31dec",
+              "first_run_id": "clangdocstruct-4511-0-1791328430648413000"
             },
             "history": {
               "attempt_journal": "not_integrated",
               "status": "native_structural_observations_only",
-              "task_verify": "not_integrated"
+              "task_verify": "local_observation"
             },
             "kind": "finding",
             "observation_status": "structural_deficits_observed",
             "reason_code": "structural_deficits_observed",
             "recheck_argv": [
               "codeguard",
-              "comments",
-              "c",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000/api.c",
+              "task",
+              "verify",
+              "CG-ef3353eb9363046a82888ed4e82534bf",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000",
               "--clang-tool",
               "/usr/bin/clang",
-              "--standard",
-              "c11",
-              "--workspace",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000",
               "--format=json"
             ],
             "rule_basis": "函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。",
             "rule_source": "codeguard_structural_policy",
-            "schema_version": "0.31.0",
+            "schema_version": "0.32.0",
             "scope": "api.c",
             "source_sha256": "e2ca7838c4c4672dc8b1a65047a8a1487705ba8fec207abb6b1a25604b233029",
             "step": [
               "按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。",
-              "使用绑定原工具、标准与工作区的comments原命令复扫；未知或失稳时先诊断，不按旧位置改源码。"
+              "使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"
             ],
             "structural_positions": [
               {
@@ -1528,17 +1666,17 @@
             "task_id": "CG-ef3353eb9363046a82888ed4e82534bf"
           },
           "report_type": "repair_brief_preview",
-          "schema_version": "0.31.0"
+          "schema_version": "0.32.0"
         },
         "structural_task_workflow_status": "partial",
         "structural_workbench": {
           "reason": null,
-          "run_id": "clangdocstruct-39852-0-1791327859235262000",
+          "run_id": "clangdocstruct-4515-0-1791328430772494000",
           "status": "synced_partial",
           "task_ids": [
             "CG-ef3353eb9363046a82888ed4e82534bf"
           ],
-          "workspace_id": "ws-da695853f2dae5d27d2378751a934f52"
+          "workspace_id": "ws-836e504e85482f27e6347b1c486d5b12"
         },
         "task_workflow_status": "partial",
         "unclassified_native_diagnostics": [],
@@ -1546,7 +1684,7 @@
           "codeguard",
           "comments",
           "c",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000/api.c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000/api.c",
           "--clang-tool",
           "/usr/bin/clang",
           "--standard",
@@ -1554,12 +1692,12 @@
           "--timeout",
           "1800000ms",
           "--workspace",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000",
           "--format=json"
         ],
         "workbench": {
           "reason": null,
-          "run_id": "clangdoc-39852-0-1791327859235262000",
+          "run_id": "clangdoc-4515-0-1791328430772494000",
           "status": "synced_partial",
           "sync": {
             "already_consumed_reports": 2,
@@ -1569,7 +1707,7 @@
             "new_findings": 0
           },
           "task_ids": [],
-          "workspace_id": "ws-da695853f2dae5d27d2378751a934f52"
+          "workspace_id": "ws-836e504e85482f27e6347b1c486d5b12"
         },
         "workspace_binding": "bound"
       },
@@ -1661,48 +1799,45 @@
             ],
             "authority": "local_unverified",
             "checker_id": "c.clang.documentation_structure",
-            "closure_condition": "原命令局部复扫不关闭；仍须专用task verify、完整详细准确性/项目覆盖与可信关闭/复发验收。",
+            "closure_condition": "原命令局部复扫不关闭；专用task verify记录局部观察；仍须受控尝试、完整详细准确性/项目覆盖与可信关闭/复发验收。",
             "constraints": [
               "仅修改当前文件文档注释，保留API及行为",
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-40055-0-1791327859428890000",
+            "current_run_id": "clangdocstruct-4529-0-1791328431075599000",
             "delivery_decision": "not_evaluated",
             "disposition": "actionable",
             "evidence_ref": {
-              "first_report_sha256": "dca7a8b7d16ef4df296a5b657940fb0e16395f5c373ee1662ddb4263b541e8e8",
-              "first_run_id": "clangdocstruct-39838-0-1791327859131138000"
+              "first_report_sha256": "424697cef6aa7845dd0ef65c87874e3ff6cbf395da2320bc6708c90845c31dec",
+              "first_run_id": "clangdocstruct-4511-0-1791328430648413000"
             },
             "history": {
               "attempt_journal": "not_integrated",
               "status": "native_structural_observations_only",
-              "task_verify": "not_integrated"
+              "task_verify": "local_observation"
             },
             "kind": "finding",
             "observation_status": "structural_deficits_observed",
             "reason_code": "structural_deficits_observed",
             "recheck_argv": [
               "codeguard",
-              "comments",
-              "c",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000/api.c",
+              "task",
+              "verify",
+              "CG-ef3353eb9363046a82888ed4e82534bf",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000",
               "--clang-tool",
               "/usr/bin/clang",
-              "--standard",
-              "c11",
-              "--workspace",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000",
               "--format=json"
             ],
             "rule_basis": "函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。",
             "rule_source": "codeguard_structural_policy",
-            "schema_version": "0.31.0",
+            "schema_version": "0.32.0",
             "scope": "api.c",
             "source_sha256": "364941db744410dcfa01e73991a89ff0178c13e93e830b7c966523a4c9c2c3bb",
             "step": [
               "按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。",
-              "使用绑定原工具、标准与工作区的comments原命令复扫；未知或失稳时先诊断，不按旧位置改源码。"
+              "使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"
             ],
             "structural_positions": [
               {
@@ -1738,18 +1873,18 @@
             "task_id": "CG-ef3353eb9363046a82888ed4e82534bf"
           },
           "report_type": "repair_brief_preview",
-          "schema_version": "0.31.0"
+          "schema_version": "0.32.0"
         },
         "next_actions": [
-          "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify与可信关闭仍待实现。",
+          "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify已提供局部观察，受控尝试与可信关闭仍待实现。",
           "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。",
-          "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原comments命令复扫；专用结构task verify与可信关闭仍待接线，不把非空说明当准确性或关闭证据。"
+          "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试与可信关闭仍待接线，不把非空说明当准确性或关闭证据。"
         ],
         "operation": "comments",
-        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000/api.c",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000/api.c",
         "reason": "native_documentation_coverage_unverified",
         "report_type": "c_family_comments_feedback",
-        "schema_version": "0.7.0",
+        "schema_version": "0.8.0",
         "source_sha256": "364941db744410dcfa01e73991a89ff0178c13e93e830b7c966523a4c9c2c3bb",
         "structural_next": {
           "authority": "local_unverified",
@@ -1769,48 +1904,45 @@
             ],
             "authority": "local_unverified",
             "checker_id": "c.clang.documentation_structure",
-            "closure_condition": "原命令局部复扫不关闭；仍须专用task verify、完整详细准确性/项目覆盖与可信关闭/复发验收。",
+            "closure_condition": "原命令局部复扫不关闭；专用task verify记录局部观察；仍须受控尝试、完整详细准确性/项目覆盖与可信关闭/复发验收。",
             "constraints": [
               "仅修改当前文件文档注释，保留API及行为",
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-40055-0-1791327859428890000",
+            "current_run_id": "clangdocstruct-4529-0-1791328431075599000",
             "delivery_decision": "not_evaluated",
             "disposition": "actionable",
             "evidence_ref": {
-              "first_report_sha256": "dca7a8b7d16ef4df296a5b657940fb0e16395f5c373ee1662ddb4263b541e8e8",
-              "first_run_id": "clangdocstruct-39838-0-1791327859131138000"
+              "first_report_sha256": "424697cef6aa7845dd0ef65c87874e3ff6cbf395da2320bc6708c90845c31dec",
+              "first_run_id": "clangdocstruct-4511-0-1791328430648413000"
             },
             "history": {
               "attempt_journal": "not_integrated",
               "status": "native_structural_observations_only",
-              "task_verify": "not_integrated"
+              "task_verify": "local_observation"
             },
             "kind": "finding",
             "observation_status": "structural_deficits_observed",
             "reason_code": "structural_deficits_observed",
             "recheck_argv": [
               "codeguard",
-              "comments",
-              "c",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000/api.c",
+              "task",
+              "verify",
+              "CG-ef3353eb9363046a82888ed4e82534bf",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000",
               "--clang-tool",
               "/usr/bin/clang",
-              "--standard",
-              "c11",
-              "--workspace",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000",
               "--format=json"
             ],
             "rule_basis": "函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。",
             "rule_source": "codeguard_structural_policy",
-            "schema_version": "0.31.0",
+            "schema_version": "0.32.0",
             "scope": "api.c",
             "source_sha256": "364941db744410dcfa01e73991a89ff0178c13e93e830b7c966523a4c9c2c3bb",
             "step": [
               "按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。",
-              "使用绑定原工具、标准与工作区的comments原命令复扫；未知或失稳时先诊断，不按旧位置改源码。"
+              "使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"
             ],
             "structural_positions": [
               {
@@ -1846,17 +1978,17 @@
             "task_id": "CG-ef3353eb9363046a82888ed4e82534bf"
           },
           "report_type": "repair_brief_preview",
-          "schema_version": "0.31.0"
+          "schema_version": "0.32.0"
         },
         "structural_task_workflow_status": "partial",
         "structural_workbench": {
           "reason": null,
-          "run_id": "clangdocstruct-40055-0-1791327859428890000",
+          "run_id": "clangdocstruct-4529-0-1791328431075599000",
           "status": "synced_partial",
           "task_ids": [
             "CG-ef3353eb9363046a82888ed4e82534bf"
           ],
-          "workspace_id": "ws-da695853f2dae5d27d2378751a934f52"
+          "workspace_id": "ws-836e504e85482f27e6347b1c486d5b12"
         },
         "task_workflow_status": "partial",
         "unclassified_native_diagnostics": [],
@@ -1864,7 +1996,7 @@
           "codeguard",
           "comments",
           "c",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000/api.c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000/api.c",
           "--clang-tool",
           "/usr/bin/clang",
           "--standard",
@@ -1872,22 +2004,22 @@
           "--timeout",
           "1800000ms",
           "--workspace",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000",
           "--format=json"
         ],
         "workbench": {
           "reason": null,
-          "run_id": "clangdoc-40055-0-1791327859428890000",
+          "run_id": "clangdoc-4529-0-1791328431075599000",
           "status": "synced_partial",
           "sync": {
-            "already_consumed_reports": 6,
+            "already_consumed_reports": 7,
             "historical_findings": 0,
             "imported_reports": 1,
             "new_blockers": 0,
             "new_findings": 0
           },
           "task_ids": [],
-          "workspace_id": "ws-da695853f2dae5d27d2378751a934f52"
+          "workspace_id": "ws-836e504e85482f27e6347b1c486d5b12"
         },
         "workspace_binding": "bound"
       },
@@ -1901,22 +2033,19 @@
         "next_actions": [
           [
             "codeguard",
-            "comments",
-            "c",
-            "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000/api.c",
+            "task",
+            "verify",
+            "CG-ef3353eb9363046a82888ed4e82534bf",
+            "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000",
             "--clang-tool",
             "/usr/bin/clang",
-            "--standard",
-            "c11",
-            "--workspace",
-            "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000",
             "--format=json"
           ]
         ],
         "operation": "task_show",
         "report_type": "task_show_preview",
-        "request_id": "view-39946-1791327859301339000",
-        "schema_version": "0.5.0",
+        "request_id": "view-4524-1791328430937984000",
+        "schema_version": "0.6.0",
         "state": "open",
         "task": {
           "affected_paths": [
@@ -1925,48 +2054,45 @@
           "allowed_paths": [],
           "authority": "local_unverified",
           "checker_id": "c.clang.documentation_structure",
-          "closure_condition": "原命令局部复扫不关闭；仍须专用task verify、完整详细准确性/项目覆盖与可信关闭/复发验收。",
+          "closure_condition": "原命令局部复扫不关闭；专用task verify记录局部观察；仍须受控尝试、完整详细准确性/项目覆盖与可信关闭/复发验收。",
           "constraints": [
             "仅修改当前文件文档注释，保留API及行为",
             "同名/重载定位属于文件策略组，不能据名字选择单一函数",
             "不关闭检查器、不以占位文本或白名单自批代替修复"
           ],
-          "current_run_id": "clangdocstruct-39852-0-1791327859235262000",
+          "current_run_id": "clangdocstruct-4519-0-1791328430877456000",
           "delivery_decision": "not_evaluated",
           "disposition": "needs_decision",
           "evidence_ref": {
-            "first_report_sha256": "dca7a8b7d16ef4df296a5b657940fb0e16395f5c373ee1662ddb4263b541e8e8",
-            "first_run_id": "clangdocstruct-39838-0-1791327859131138000"
+            "first_report_sha256": "424697cef6aa7845dd0ef65c87874e3ff6cbf395da2320bc6708c90845c31dec",
+            "first_run_id": "clangdocstruct-4511-0-1791328430648413000"
           },
           "history": {
             "attempt_journal": "not_integrated",
             "status": "native_structural_observations_only",
-            "task_verify": "not_integrated"
+            "task_verify": "local_observation"
           },
           "kind": "finding",
           "observation_status": "input_changed",
           "reason_code": "input_changed",
           "recheck_argv": [
             "codeguard",
-            "comments",
-            "c",
-            "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000/api.c",
+            "task",
+            "verify",
+            "CG-ef3353eb9363046a82888ed4e82534bf",
+            "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-4505-1791328428521921000",
             "--clang-tool",
             "/usr/bin/clang",
-            "--standard",
-            "c11",
-            "--workspace",
-            "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-c-39833-1791327859054170000",
             "--format=json"
           ],
           "rule_basis": "函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。",
           "rule_source": "codeguard_structural_policy",
-          "schema_version": "0.31.0",
+          "schema_version": "0.32.0",
           "scope": "api.c",
           "source_sha256": "e2ca7838c4c4672dc8b1a65047a8a1487705ba8fec207abb6b1a25604b233029",
           "step": [
             "按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。",
-            "使用绑定原工具、标准与工作区的comments原命令复扫；未知或失稳时先诊断，不按旧位置改源码。"
+            "使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"
           ],
           "structural_positions": [],
           "structural_rule_id": "codeguard.documentation.function_structure_required",
@@ -1974,7 +2100,213 @@
         },
         "task_id": "CG-ef3353eb9363046a82888ed4e82534bf"
       },
-      "task_id": "CG-ef3353eb9363046a82888ed4e82534bf"
+      "task_id": "CG-ef3353eb9363046a82888ed4e82534bf",
+      "verify_absent": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "delivery_decision": "not_evaluated",
+        "event_persisted": true,
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "source": "builtin_default",
+          "timeout_ms": 1800000
+        },
+        "exit_code": 3,
+        "kind": "finding",
+        "native_scan": {
+          "authority": "local_unverified",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "input_stable": true,
+          "language": "c",
+          "local_scan_complete": true,
+          "native": {
+            "diagnostics": [],
+            "reason": "clang_native_no_diagnostics",
+            "status": "completed",
+            "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+            "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+          },
+          "original_ref": {
+            "run_id": "clangdocstruct-4511-0-1791328430648413000",
+            "sha256": "424697cef6aa7845dd0ef65c87874e3ff6cbf395da2320bc6708c90845c31dec"
+          },
+          "path": "api.c",
+          "profile": "clang-documentation-structure-v1",
+          "report_type": "clang_documentation_structure_task_recheck",
+          "run_id": "clangdocstruct-4540-0-1791328431286335000",
+          "schema_version": "0.1.0",
+          "selected_tool": "/usr/bin/clang",
+          "source_sha256": "f16d878a0358d671d189c7f94ccc0256aeb1d03747273026a32151b31978148f",
+          "standard": "c11",
+          "structure": {
+            "native_raw_diagnostic_count": 0,
+            "observation": {
+              "authority": "local_unverified",
+              "coverage_proven": false,
+              "errors_and_behavior": "not_evaluated",
+              "functions": [
+                {
+                  "column_byte": 5,
+                  "comment_presence": "present",
+                  "line": 5,
+                  "missing_components": [],
+                  "name": "f",
+                  "offset_byte": 70,
+                  "parameters": [
+                    {
+                      "description": "nonempty",
+                      "index": 0,
+                      "name": "x"
+                    }
+                  ],
+                  "purpose_description": "nonempty",
+                  "return_description": "nonempty",
+                  "structure_status": "observed_supported_subset"
+                },
+                {
+                  "column_byte": 5,
+                  "comment_presence": "present",
+                  "line": 10,
+                  "missing_components": [],
+                  "name": "g",
+                  "offset_byte": 169,
+                  "parameters": [
+                    {
+                      "description": "nonempty",
+                      "index": 0,
+                      "name": "x"
+                    }
+                  ],
+                  "purpose_description": "nonempty",
+                  "return_description": "nonempty",
+                  "structure_status": "observed_supported_subset"
+                }
+              ],
+              "observation_type": "clang_function_documentation_structure",
+              "qualification": "not_granted",
+              "schema_version": "0.1.0",
+              "semantic_accuracy": "not_evaluated",
+              "unresolved_declaration_kinds": []
+            },
+            "reason": "clang_structure_observed",
+            "status": "observed"
+          },
+          "task_id": "CG-ef3353eb9363046a82888ed4e82534bf",
+          "task_kind": "finding",
+          "task_rule": "codeguard.documentation.function_structure_required",
+          "workspace_binding": "bound",
+          "workspace_id": "ws-836e504e85482f27e6347b1c486d5b12"
+        },
+        "next_actions": [
+          "inspect_native_recheck_and_policy_before_closure"
+        ],
+        "observation": "candidate_absent_unverified_policy",
+        "operation": "task_verify",
+        "reason": null,
+        "report_type": "task_verification_preview",
+        "schema_version": "0.37.0",
+        "task_id": "CG-ef3353eb9363046a82888ed4e82534bf"
+      },
+      "verify_present": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "delivery_decision": "not_evaluated",
+        "event_persisted": true,
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "source": "builtin_default",
+          "timeout_ms": 1800000
+        },
+        "exit_code": 3,
+        "kind": "finding",
+        "native_scan": {
+          "authority": "local_unverified",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "input_stable": true,
+          "language": "c",
+          "local_scan_complete": true,
+          "native": {
+            "diagnostics": [],
+            "reason": "clang_native_no_diagnostics",
+            "status": "completed",
+            "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+            "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+          },
+          "original_ref": {
+            "run_id": "clangdocstruct-4511-0-1791328430648413000",
+            "sha256": "424697cef6aa7845dd0ef65c87874e3ff6cbf395da2320bc6708c90845c31dec"
+          },
+          "path": "api.c",
+          "profile": "clang-documentation-structure-v1",
+          "report_type": "clang_documentation_structure_task_recheck",
+          "run_id": "clangdocstruct-4519-0-1791328430877456000",
+          "schema_version": "0.1.0",
+          "selected_tool": "/usr/bin/clang",
+          "source_sha256": "e2ca7838c4c4672dc8b1a65047a8a1487705ba8fec207abb6b1a25604b233029",
+          "standard": "c11",
+          "structure": {
+            "native_raw_diagnostic_count": 0,
+            "observation": {
+              "authority": "local_unverified",
+              "coverage_proven": false,
+              "errors_and_behavior": "not_evaluated",
+              "functions": [
+                {
+                  "column_byte": 5,
+                  "comment_presence": "absent",
+                  "line": 1,
+                  "missing_components": [
+                    "documentation_comment"
+                  ],
+                  "name": "f",
+                  "offset_byte": 4,
+                  "parameters": [],
+                  "purpose_description": "unknown",
+                  "return_description": "unknown",
+                  "structure_status": "observed_supported_subset"
+                },
+                {
+                  "column_byte": 5,
+                  "comment_presence": "absent",
+                  "line": 2,
+                  "missing_components": [
+                    "documentation_comment"
+                  ],
+                  "name": "g",
+                  "offset_byte": 31,
+                  "parameters": [],
+                  "purpose_description": "unknown",
+                  "return_description": "unknown",
+                  "structure_status": "observed_supported_subset"
+                }
+              ],
+              "observation_type": "clang_function_documentation_structure",
+              "qualification": "not_granted",
+              "schema_version": "0.1.0",
+              "semantic_accuracy": "not_evaluated",
+              "unresolved_declaration_kinds": []
+            },
+            "reason": "clang_structure_observed",
+            "status": "observed"
+          },
+          "task_id": "CG-ef3353eb9363046a82888ed4e82534bf",
+          "task_kind": "finding",
+          "task_rule": "codeguard.documentation.function_structure_required",
+          "workspace_binding": "bound",
+          "workspace_id": "ws-836e504e85482f27e6347b1c486d5b12"
+        },
+        "next_actions": [
+          "inspect_native_recheck_and_policy_before_closure"
+        ],
+        "observation": "still_present",
+        "operation": "task_verify",
+        "reason": null,
+        "report_type": "task_verification_preview",
+        "schema_version": "0.37.0",
+        "task_id": "CG-ef3353eb9363046a82888ed4e82534bf"
+      }
     },
     {
       "clean": {
@@ -2071,66 +2403,63 @@
             "allowed_paths": [],
             "authority": "local_unverified",
             "checker_id": "cpp.clang.documentation_structure",
-            "closure_condition": "原命令局部复扫不关闭；仍须专用task verify、完整详细准确性/项目覆盖与可信关闭/复发验收。",
+            "closure_condition": "原命令局部复扫不关闭；专用task verify记录局部观察；仍须受控尝试、完整详细准确性/项目覆盖与可信关闭/复发验收。",
             "constraints": [
               "仅修改当前文件文档注释，保留API及行为",
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-40606-0-1791327860059852000",
+            "current_run_id": "clangdocstruct-4569-0-1791328431942961000",
             "delivery_decision": "not_evaluated",
             "disposition": "needs_decision",
             "evidence_ref": {
-              "first_report_sha256": "8e52fd7cd4f2c82729c5ee519c23e8359664b497f2ce1972a534a465861435fe",
-              "first_run_id": "clangdocstruct-40302-0-1791327859665176000"
+              "first_report_sha256": "4e4fced8a4e5c97e05ca9b73ab41a1c98f61eeaa112309c2041bdc256dd92b44",
+              "first_run_id": "clangdocstruct-4547-0-1791328431422745000"
             },
             "history": {
               "attempt_journal": "not_integrated",
               "status": "native_structural_observations_only",
-              "task_verify": "not_integrated"
+              "task_verify": "local_observation"
             },
             "kind": "finding",
             "observation_status": "candidate_absent_unverified_policy",
             "reason_code": "candidate_absent_unverified_policy",
             "recheck_argv": [
               "codeguard",
-              "comments",
-              "cpp",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000/api.cpp",
+              "task",
+              "verify",
+              "CG-9ad3a53aac41e9b018a331cad18b2c49",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000",
               "--clang-tool",
               "/usr/bin/clang",
-              "--standard",
-              "c++17",
-              "--workspace",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000",
               "--format=json"
             ],
             "rule_basis": "函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。",
             "rule_source": "codeguard_structural_policy",
-            "schema_version": "0.31.0",
+            "schema_version": "0.32.0",
             "scope": "api.cpp",
             "source_sha256": "18f10fa8fa770bf145092e6ada19754e8da9580fd22b09b46b4b98481eec768d",
             "step": [
               "按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。",
-              "使用绑定原工具、标准与工作区的comments原命令复扫；未知或失稳时先诊断，不按旧位置改源码。"
+              "使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"
             ],
             "structural_positions": [],
             "structural_rule_id": "codeguard.documentation.function_structure_required",
             "task_id": "CG-9ad3a53aac41e9b018a331cad18b2c49"
           },
           "report_type": "repair_brief_preview",
-          "schema_version": "0.31.0"
+          "schema_version": "0.32.0"
         },
         "next_actions": [
-          "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify与可信关闭仍待实现。",
+          "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify已提供局部观察，受控尝试与可信关闭仍待实现。",
           "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。",
-          "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原comments命令复扫；专用结构task verify与可信关闭仍待接线，不把非空说明当准确性或关闭证据。"
+          "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试与可信关闭仍待接线，不把非空说明当准确性或关闭证据。"
         ],
         "operation": "comments",
-        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000/api.cpp",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000/api.cpp",
         "reason": "native_documentation_coverage_unverified",
         "report_type": "c_family_comments_feedback",
-        "schema_version": "0.7.0",
+        "schema_version": "0.8.0",
         "source_sha256": "18f10fa8fa770bf145092e6ada19754e8da9580fd22b09b46b4b98481eec768d",
         "structural_next": {
           "authority": "local_unverified",
@@ -2148,63 +2477,60 @@
             "allowed_paths": [],
             "authority": "local_unverified",
             "checker_id": "cpp.clang.documentation_structure",
-            "closure_condition": "原命令局部复扫不关闭；仍须专用task verify、完整详细准确性/项目覆盖与可信关闭/复发验收。",
+            "closure_condition": "原命令局部复扫不关闭；专用task verify记录局部观察；仍须受控尝试、完整详细准确性/项目覆盖与可信关闭/复发验收。",
             "constraints": [
               "仅修改当前文件文档注释，保留API及行为",
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-40606-0-1791327860059852000",
+            "current_run_id": "clangdocstruct-4569-0-1791328431942961000",
             "delivery_decision": "not_evaluated",
             "disposition": "needs_decision",
             "evidence_ref": {
-              "first_report_sha256": "8e52fd7cd4f2c82729c5ee519c23e8359664b497f2ce1972a534a465861435fe",
-              "first_run_id": "clangdocstruct-40302-0-1791327859665176000"
+              "first_report_sha256": "4e4fced8a4e5c97e05ca9b73ab41a1c98f61eeaa112309c2041bdc256dd92b44",
+              "first_run_id": "clangdocstruct-4547-0-1791328431422745000"
             },
             "history": {
               "attempt_journal": "not_integrated",
               "status": "native_structural_observations_only",
-              "task_verify": "not_integrated"
+              "task_verify": "local_observation"
             },
             "kind": "finding",
             "observation_status": "candidate_absent_unverified_policy",
             "reason_code": "candidate_absent_unverified_policy",
             "recheck_argv": [
               "codeguard",
-              "comments",
-              "cpp",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000/api.cpp",
+              "task",
+              "verify",
+              "CG-9ad3a53aac41e9b018a331cad18b2c49",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000",
               "--clang-tool",
               "/usr/bin/clang",
-              "--standard",
-              "c++17",
-              "--workspace",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000",
               "--format=json"
             ],
             "rule_basis": "函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。",
             "rule_source": "codeguard_structural_policy",
-            "schema_version": "0.31.0",
+            "schema_version": "0.32.0",
             "scope": "api.cpp",
             "source_sha256": "18f10fa8fa770bf145092e6ada19754e8da9580fd22b09b46b4b98481eec768d",
             "step": [
               "按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。",
-              "使用绑定原工具、标准与工作区的comments原命令复扫；未知或失稳时先诊断，不按旧位置改源码。"
+              "使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"
             ],
             "structural_positions": [],
             "structural_rule_id": "codeguard.documentation.function_structure_required",
             "task_id": "CG-9ad3a53aac41e9b018a331cad18b2c49"
           },
           "report_type": "repair_brief_preview",
-          "schema_version": "0.31.0"
+          "schema_version": "0.32.0"
         },
         "structural_task_workflow_status": "partial",
         "structural_workbench": {
           "reason": null,
-          "run_id": "clangdocstruct-40606-0-1791327860059852000",
+          "run_id": "clangdocstruct-4569-0-1791328431942961000",
           "status": "synced_partial",
           "task_ids": [],
-          "workspace_id": "ws-37ac5a9b6e41db3cdec60a6c4a3708ed"
+          "workspace_id": "ws-3a78be465303871c42454ee444c19a9c"
         },
         "task_workflow_status": "partial",
         "unclassified_native_diagnostics": [],
@@ -2212,7 +2538,7 @@
           "codeguard",
           "comments",
           "cpp",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000/api.cpp",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000/api.cpp",
           "--clang-tool",
           "/usr/bin/clang",
           "--standard",
@@ -2220,22 +2546,22 @@
           "--timeout",
           "1800000ms",
           "--workspace",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000",
           "--format=json"
         ],
         "workbench": {
           "reason": null,
-          "run_id": "clangdoc-40606-0-1791327860059852000",
+          "run_id": "clangdoc-4569-0-1791328431942961000",
           "status": "synced_partial",
           "sync": {
-            "already_consumed_reports": 8,
+            "already_consumed_reports": 9,
             "historical_findings": 0,
             "imported_reports": 1,
             "new_blockers": 0,
             "new_findings": 0
           },
           "task_ids": [],
-          "workspace_id": "ws-37ac5a9b6e41db3cdec60a6c4a3708ed"
+          "workspace_id": "ws-3a78be465303871c42454ee444c19a9c"
         },
         "workspace_binding": "bound"
       },
@@ -2327,48 +2653,45 @@
             ],
             "authority": "local_unverified",
             "checker_id": "cpp.clang.documentation_structure",
-            "closure_condition": "原命令局部复扫不关闭；仍须专用task verify、完整详细准确性/项目覆盖与可信关闭/复发验收。",
+            "closure_condition": "原命令局部复扫不关闭；专用task verify记录局部观察；仍须受控尝试、完整详细准确性/项目覆盖与可信关闭/复发验收。",
             "constraints": [
               "仅修改当前文件文档注释，保留API及行为",
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-40302-0-1791327859665176000",
+            "current_run_id": "clangdocstruct-4547-0-1791328431422745000",
             "delivery_decision": "not_evaluated",
             "disposition": "actionable",
             "evidence_ref": {
-              "first_report_sha256": "8e52fd7cd4f2c82729c5ee519c23e8359664b497f2ce1972a534a465861435fe",
-              "first_run_id": "clangdocstruct-40302-0-1791327859665176000"
+              "first_report_sha256": "4e4fced8a4e5c97e05ca9b73ab41a1c98f61eeaa112309c2041bdc256dd92b44",
+              "first_run_id": "clangdocstruct-4547-0-1791328431422745000"
             },
             "history": {
               "attempt_journal": "not_integrated",
               "status": "native_structural_observations_only",
-              "task_verify": "not_integrated"
+              "task_verify": "local_observation"
             },
             "kind": "finding",
             "observation_status": "structural_deficits_observed",
             "reason_code": "structural_deficits_observed",
             "recheck_argv": [
               "codeguard",
-              "comments",
-              "cpp",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000/api.cpp",
+              "task",
+              "verify",
+              "CG-9ad3a53aac41e9b018a331cad18b2c49",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000",
               "--clang-tool",
               "/usr/bin/clang",
-              "--standard",
-              "c++17",
-              "--workspace",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000",
               "--format=json"
             ],
             "rule_basis": "函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。",
             "rule_source": "codeguard_structural_policy",
-            "schema_version": "0.31.0",
+            "schema_version": "0.32.0",
             "scope": "api.cpp",
             "source_sha256": "db6657d525d119434e837bdfaca6f5bb2aaae5ec5e2f882acbc1a93bf0a24af7",
             "step": [
               "按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。",
-              "使用绑定原工具、标准与工作区的comments原命令复扫；未知或失稳时先诊断，不按旧位置改源码。"
+              "使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"
             ],
             "structural_positions": [
               {
@@ -2404,18 +2727,18 @@
             "task_id": "CG-9ad3a53aac41e9b018a331cad18b2c49"
           },
           "report_type": "repair_brief_preview",
-          "schema_version": "0.31.0"
+          "schema_version": "0.32.0"
         },
         "next_actions": [
-          "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify与可信关闭仍待实现。",
+          "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify已提供局部观察，受控尝试与可信关闭仍待实现。",
           "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。",
-          "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原comments命令复扫；专用结构task verify与可信关闭仍待接线，不把非空说明当准确性或关闭证据。"
+          "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试与可信关闭仍待接线，不把非空说明当准确性或关闭证据。"
         ],
         "operation": "comments",
-        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000/api.cpp",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000/api.cpp",
         "reason": "native_documentation_coverage_unverified",
         "report_type": "c_family_comments_feedback",
-        "schema_version": "0.7.0",
+        "schema_version": "0.8.0",
         "source_sha256": "db6657d525d119434e837bdfaca6f5bb2aaae5ec5e2f882acbc1a93bf0a24af7",
         "structural_next": {
           "authority": "local_unverified",
@@ -2435,48 +2758,45 @@
             ],
             "authority": "local_unverified",
             "checker_id": "cpp.clang.documentation_structure",
-            "closure_condition": "原命令局部复扫不关闭；仍须专用task verify、完整详细准确性/项目覆盖与可信关闭/复发验收。",
+            "closure_condition": "原命令局部复扫不关闭；专用task verify记录局部观察；仍须受控尝试、完整详细准确性/项目覆盖与可信关闭/复发验收。",
             "constraints": [
               "仅修改当前文件文档注释，保留API及行为",
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-40302-0-1791327859665176000",
+            "current_run_id": "clangdocstruct-4547-0-1791328431422745000",
             "delivery_decision": "not_evaluated",
             "disposition": "actionable",
             "evidence_ref": {
-              "first_report_sha256": "8e52fd7cd4f2c82729c5ee519c23e8359664b497f2ce1972a534a465861435fe",
-              "first_run_id": "clangdocstruct-40302-0-1791327859665176000"
+              "first_report_sha256": "4e4fced8a4e5c97e05ca9b73ab41a1c98f61eeaa112309c2041bdc256dd92b44",
+              "first_run_id": "clangdocstruct-4547-0-1791328431422745000"
             },
             "history": {
               "attempt_journal": "not_integrated",
               "status": "native_structural_observations_only",
-              "task_verify": "not_integrated"
+              "task_verify": "local_observation"
             },
             "kind": "finding",
             "observation_status": "structural_deficits_observed",
             "reason_code": "structural_deficits_observed",
             "recheck_argv": [
               "codeguard",
-              "comments",
-              "cpp",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000/api.cpp",
+              "task",
+              "verify",
+              "CG-9ad3a53aac41e9b018a331cad18b2c49",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000",
               "--clang-tool",
               "/usr/bin/clang",
-              "--standard",
-              "c++17",
-              "--workspace",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000",
               "--format=json"
             ],
             "rule_basis": "函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。",
             "rule_source": "codeguard_structural_policy",
-            "schema_version": "0.31.0",
+            "schema_version": "0.32.0",
             "scope": "api.cpp",
             "source_sha256": "db6657d525d119434e837bdfaca6f5bb2aaae5ec5e2f882acbc1a93bf0a24af7",
             "step": [
               "按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。",
-              "使用绑定原工具、标准与工作区的comments原命令复扫；未知或失稳时先诊断，不按旧位置改源码。"
+              "使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"
             ],
             "structural_positions": [
               {
@@ -2512,17 +2832,17 @@
             "task_id": "CG-9ad3a53aac41e9b018a331cad18b2c49"
           },
           "report_type": "repair_brief_preview",
-          "schema_version": "0.31.0"
+          "schema_version": "0.32.0"
         },
         "structural_task_workflow_status": "partial",
         "structural_workbench": {
           "reason": null,
-          "run_id": "clangdocstruct-40302-0-1791327859665176000",
+          "run_id": "clangdocstruct-4547-0-1791328431422745000",
           "status": "synced_partial",
           "task_ids": [
             "CG-9ad3a53aac41e9b018a331cad18b2c49"
           ],
-          "workspace_id": "ws-37ac5a9b6e41db3cdec60a6c4a3708ed"
+          "workspace_id": "ws-3a78be465303871c42454ee444c19a9c"
         },
         "task_workflow_status": "partial",
         "unclassified_native_diagnostics": [],
@@ -2530,7 +2850,7 @@
           "codeguard",
           "comments",
           "cpp",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000/api.cpp",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000/api.cpp",
           "--clang-tool",
           "/usr/bin/clang",
           "--standard",
@@ -2538,12 +2858,12 @@
           "--timeout",
           "1800000ms",
           "--workspace",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000",
           "--format=json"
         ],
         "workbench": {
           "reason": null,
-          "run_id": "clangdoc-40302-0-1791327859665176000",
+          "run_id": "clangdoc-4547-0-1791328431422745000",
           "status": "synced_partial",
           "sync": {
             "already_consumed_reports": 0,
@@ -2553,7 +2873,7 @@
             "new_findings": 0
           },
           "task_ids": [],
-          "workspace_id": "ws-37ac5a9b6e41db3cdec60a6c4a3708ed"
+          "workspace_id": "ws-3a78be465303871c42454ee444c19a9c"
         },
         "workspace_binding": "bound"
       },
@@ -2646,48 +2966,45 @@
             ],
             "authority": "local_unverified",
             "checker_id": "cpp.clang.documentation_structure",
-            "closure_condition": "原命令局部复扫不关闭；仍须专用task verify、完整详细准确性/项目覆盖与可信关闭/复发验收。",
+            "closure_condition": "原命令局部复扫不关闭；专用task verify记录局部观察；仍须受控尝试、完整详细准确性/项目覆盖与可信关闭/复发验收。",
             "constraints": [
               "仅修改当前文件文档注释，保留API及行为",
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-40549-0-1791327859876042000",
+            "current_run_id": "clangdocstruct-4561-0-1791328431732340000",
             "delivery_decision": "not_evaluated",
             "disposition": "actionable",
             "evidence_ref": {
-              "first_report_sha256": "8e52fd7cd4f2c82729c5ee519c23e8359664b497f2ce1972a534a465861435fe",
-              "first_run_id": "clangdocstruct-40302-0-1791327859665176000"
+              "first_report_sha256": "4e4fced8a4e5c97e05ca9b73ab41a1c98f61eeaa112309c2041bdc256dd92b44",
+              "first_run_id": "clangdocstruct-4547-0-1791328431422745000"
             },
             "history": {
               "attempt_journal": "not_integrated",
               "status": "native_structural_observations_only",
-              "task_verify": "not_integrated"
+              "task_verify": "local_observation"
             },
             "kind": "finding",
             "observation_status": "structural_deficits_observed",
             "reason_code": "structural_deficits_observed",
             "recheck_argv": [
               "codeguard",
-              "comments",
-              "cpp",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000/api.cpp",
+              "task",
+              "verify",
+              "CG-9ad3a53aac41e9b018a331cad18b2c49",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000",
               "--clang-tool",
               "/usr/bin/clang",
-              "--standard",
-              "c++17",
-              "--workspace",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000",
               "--format=json"
             ],
             "rule_basis": "函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。",
             "rule_source": "codeguard_structural_policy",
-            "schema_version": "0.31.0",
+            "schema_version": "0.32.0",
             "scope": "api.cpp",
             "source_sha256": "0a3883b9ce356607a01a21dd8544a9198f34ce155397ffdf247f76c2e56841bf",
             "step": [
               "按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。",
-              "使用绑定原工具、标准与工作区的comments原命令复扫；未知或失稳时先诊断，不按旧位置改源码。"
+              "使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"
             ],
             "structural_positions": [
               {
@@ -2723,18 +3040,18 @@
             "task_id": "CG-9ad3a53aac41e9b018a331cad18b2c49"
           },
           "report_type": "repair_brief_preview",
-          "schema_version": "0.31.0"
+          "schema_version": "0.32.0"
         },
         "next_actions": [
-          "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify与可信关闭仍待实现。",
+          "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify已提供局部观察，受控尝试与可信关闭仍待实现。",
           "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。",
-          "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原comments命令复扫；专用结构task verify与可信关闭仍待接线，不把非空说明当准确性或关闭证据。"
+          "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试与可信关闭仍待接线，不把非空说明当准确性或关闭证据。"
         ],
         "operation": "comments",
-        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000/api.cpp",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000/api.cpp",
         "reason": "native_documentation_coverage_unverified",
         "report_type": "c_family_comments_feedback",
-        "schema_version": "0.7.0",
+        "schema_version": "0.8.0",
         "source_sha256": "0a3883b9ce356607a01a21dd8544a9198f34ce155397ffdf247f76c2e56841bf",
         "structural_next": {
           "authority": "local_unverified",
@@ -2754,48 +3071,45 @@
             ],
             "authority": "local_unverified",
             "checker_id": "cpp.clang.documentation_structure",
-            "closure_condition": "原命令局部复扫不关闭；仍须专用task verify、完整详细准确性/项目覆盖与可信关闭/复发验收。",
+            "closure_condition": "原命令局部复扫不关闭；专用task verify记录局部观察；仍须受控尝试、完整详细准确性/项目覆盖与可信关闭/复发验收。",
             "constraints": [
               "仅修改当前文件文档注释，保留API及行为",
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-40549-0-1791327859876042000",
+            "current_run_id": "clangdocstruct-4561-0-1791328431732340000",
             "delivery_decision": "not_evaluated",
             "disposition": "actionable",
             "evidence_ref": {
-              "first_report_sha256": "8e52fd7cd4f2c82729c5ee519c23e8359664b497f2ce1972a534a465861435fe",
-              "first_run_id": "clangdocstruct-40302-0-1791327859665176000"
+              "first_report_sha256": "4e4fced8a4e5c97e05ca9b73ab41a1c98f61eeaa112309c2041bdc256dd92b44",
+              "first_run_id": "clangdocstruct-4547-0-1791328431422745000"
             },
             "history": {
               "attempt_journal": "not_integrated",
               "status": "native_structural_observations_only",
-              "task_verify": "not_integrated"
+              "task_verify": "local_observation"
             },
             "kind": "finding",
             "observation_status": "structural_deficits_observed",
             "reason_code": "structural_deficits_observed",
             "recheck_argv": [
               "codeguard",
-              "comments",
-              "cpp",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000/api.cpp",
+              "task",
+              "verify",
+              "CG-9ad3a53aac41e9b018a331cad18b2c49",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000",
               "--clang-tool",
               "/usr/bin/clang",
-              "--standard",
-              "c++17",
-              "--workspace",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000",
               "--format=json"
             ],
             "rule_basis": "函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。",
             "rule_source": "codeguard_structural_policy",
-            "schema_version": "0.31.0",
+            "schema_version": "0.32.0",
             "scope": "api.cpp",
             "source_sha256": "0a3883b9ce356607a01a21dd8544a9198f34ce155397ffdf247f76c2e56841bf",
             "step": [
               "按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。",
-              "使用绑定原工具、标准与工作区的comments原命令复扫；未知或失稳时先诊断，不按旧位置改源码。"
+              "使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"
             ],
             "structural_positions": [
               {
@@ -2831,17 +3145,17 @@
             "task_id": "CG-9ad3a53aac41e9b018a331cad18b2c49"
           },
           "report_type": "repair_brief_preview",
-          "schema_version": "0.31.0"
+          "schema_version": "0.32.0"
         },
         "structural_task_workflow_status": "partial",
         "structural_workbench": {
           "reason": null,
-          "run_id": "clangdocstruct-40549-0-1791327859876042000",
+          "run_id": "clangdocstruct-4561-0-1791328431732340000",
           "status": "synced_partial",
           "task_ids": [
             "CG-9ad3a53aac41e9b018a331cad18b2c49"
           ],
-          "workspace_id": "ws-37ac5a9b6e41db3cdec60a6c4a3708ed"
+          "workspace_id": "ws-3a78be465303871c42454ee444c19a9c"
         },
         "task_workflow_status": "partial",
         "unclassified_native_diagnostics": [],
@@ -2849,7 +3163,7 @@
           "codeguard",
           "comments",
           "cpp",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000/api.cpp",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000/api.cpp",
           "--clang-tool",
           "/usr/bin/clang",
           "--standard",
@@ -2857,22 +3171,22 @@
           "--timeout",
           "1800000ms",
           "--workspace",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000",
           "--format=json"
         ],
         "workbench": {
           "reason": null,
-          "run_id": "clangdoc-40549-0-1791327859876042000",
+          "run_id": "clangdoc-4561-0-1791328431732340000",
           "status": "synced_partial",
           "sync": {
-            "already_consumed_reports": 4,
+            "already_consumed_reports": 5,
             "historical_findings": 0,
             "imported_reports": 1,
             "new_blockers": 0,
             "new_findings": 0
           },
           "task_ids": [],
-          "workspace_id": "ws-37ac5a9b6e41db3cdec60a6c4a3708ed"
+          "workspace_id": "ws-3a78be465303871c42454ee444c19a9c"
         },
         "workspace_binding": "bound"
       },
@@ -2893,7 +3207,7 @@
           "path": "api.cpp",
           "profile": "clang-documentation-structure-v1",
           "report_type": "clang_documentation_structure_workbench_observation",
-          "run_id": "clangdocstruct-40443-0-1791327859769696000",
+          "run_id": "clangdocstruct-4551-0-1791328431531918000",
           "schema_version": "0.1.0",
           "selected_tool": "/usr/bin/clang",
           "source_sha256": "db6657d525d119434e837bdfaca6f5bb2aaae5ec5e2f882acbc1a93bf0a24af7",
@@ -2944,7 +3258,169 @@
             "status": "observed"
           },
           "workspace_binding": "bound",
-          "workspace_id": "ws-37ac5a9b6e41db3cdec60a6c4a3708ed"
+          "workspace_id": "ws-3a78be465303871c42454ee444c19a9c"
+        },
+        {
+          "authority": "local_unverified",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "input_stable": true,
+          "language": "cpp",
+          "local_scan_complete": true,
+          "native": {
+            "diagnostics": [],
+            "reason": "clang_native_no_diagnostics",
+            "status": "completed",
+            "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+            "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+          },
+          "original_ref": {
+            "run_id": "clangdocstruct-4547-0-1791328431422745000",
+            "sha256": "4e4fced8a4e5c97e05ca9b73ab41a1c98f61eeaa112309c2041bdc256dd92b44"
+          },
+          "path": "api.cpp",
+          "profile": "clang-documentation-structure-v1",
+          "report_type": "clang_documentation_structure_task_recheck",
+          "run_id": "clangdocstruct-4555-0-1791328431630320000",
+          "schema_version": "0.1.0",
+          "selected_tool": "/usr/bin/clang",
+          "source_sha256": "db6657d525d119434e837bdfaca6f5bb2aaae5ec5e2f882acbc1a93bf0a24af7",
+          "standard": "c++17",
+          "structure": {
+            "native_raw_diagnostic_count": 0,
+            "observation": {
+              "authority": "local_unverified",
+              "coverage_proven": false,
+              "errors_and_behavior": "not_evaluated",
+              "functions": [
+                {
+                  "column_byte": 5,
+                  "comment_presence": "absent",
+                  "line": 1,
+                  "missing_components": [
+                    "documentation_comment"
+                  ],
+                  "name": "f",
+                  "offset_byte": 4,
+                  "parameters": [],
+                  "purpose_description": "unknown",
+                  "return_description": "unknown",
+                  "structure_status": "observed_supported_subset"
+                },
+                {
+                  "column_byte": 5,
+                  "comment_presence": "absent",
+                  "line": 2,
+                  "missing_components": [
+                    "documentation_comment"
+                  ],
+                  "name": "f",
+                  "offset_byte": 31,
+                  "parameters": [],
+                  "purpose_description": "unknown",
+                  "return_description": "unknown",
+                  "structure_status": "observed_supported_subset"
+                }
+              ],
+              "observation_type": "clang_function_documentation_structure",
+              "qualification": "not_granted",
+              "schema_version": "0.1.0",
+              "semantic_accuracy": "not_evaluated",
+              "unresolved_declaration_kinds": []
+            },
+            "reason": "clang_structure_observed",
+            "status": "observed"
+          },
+          "task_id": "CG-9ad3a53aac41e9b018a331cad18b2c49",
+          "task_kind": "finding",
+          "task_rule": "codeguard.documentation.function_structure_required",
+          "workspace_binding": "bound",
+          "workspace_id": "ws-3a78be465303871c42454ee444c19a9c"
+        },
+        {
+          "authority": "local_unverified",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "input_stable": true,
+          "language": "cpp",
+          "local_scan_complete": true,
+          "native": {
+            "diagnostics": [],
+            "reason": "clang_native_no_diagnostics",
+            "status": "completed",
+            "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+            "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+          },
+          "original_ref": {
+            "run_id": "clangdocstruct-4547-0-1791328431422745000",
+            "sha256": "4e4fced8a4e5c97e05ca9b73ab41a1c98f61eeaa112309c2041bdc256dd92b44"
+          },
+          "path": "api.cpp",
+          "profile": "clang-documentation-structure-v1",
+          "report_type": "clang_documentation_structure_task_recheck",
+          "run_id": "clangdocstruct-4573-0-1791328432078423000",
+          "schema_version": "0.1.0",
+          "selected_tool": "/usr/bin/clang",
+          "source_sha256": "18f10fa8fa770bf145092e6ada19754e8da9580fd22b09b46b4b98481eec768d",
+          "standard": "c++17",
+          "structure": {
+            "native_raw_diagnostic_count": 0,
+            "observation": {
+              "authority": "local_unverified",
+              "coverage_proven": false,
+              "errors_and_behavior": "not_evaluated",
+              "functions": [
+                {
+                  "column_byte": 5,
+                  "comment_presence": "present",
+                  "line": 5,
+                  "missing_components": [],
+                  "name": "f",
+                  "offset_byte": 72,
+                  "parameters": [
+                    {
+                      "description": "nonempty",
+                      "index": 0,
+                      "name": "x"
+                    }
+                  ],
+                  "purpose_description": "nonempty",
+                  "return_description": "nonempty",
+                  "structure_status": "observed_supported_subset"
+                },
+                {
+                  "column_byte": 5,
+                  "comment_presence": "present",
+                  "line": 10,
+                  "missing_components": [],
+                  "name": "f",
+                  "offset_byte": 178,
+                  "parameters": [
+                    {
+                      "description": "nonempty",
+                      "index": 0,
+                      "name": "x"
+                    }
+                  ],
+                  "purpose_description": "nonempty",
+                  "return_description": "nonempty",
+                  "structure_status": "observed_supported_subset"
+                }
+              ],
+              "observation_type": "clang_function_documentation_structure",
+              "qualification": "not_granted",
+              "schema_version": "0.1.0",
+              "semantic_accuracy": "not_evaluated",
+              "unresolved_declaration_kinds": []
+            },
+            "reason": "clang_structure_observed",
+            "status": "observed"
+          },
+          "task_id": "CG-9ad3a53aac41e9b018a331cad18b2c49",
+          "task_kind": "finding",
+          "task_rule": "codeguard.documentation.function_structure_required",
+          "workspace_binding": "bound",
+          "workspace_id": "ws-3a78be465303871c42454ee444c19a9c"
         },
         {
           "authority": "local_unverified",
@@ -2962,7 +3438,7 @@
           "path": "api.cpp",
           "profile": "clang-documentation-structure-v1",
           "report_type": "clang_documentation_structure_workbench_observation",
-          "run_id": "clangdocstruct-40600-0-1791327859959152000",
+          "run_id": "clangdocstruct-4561-0-1791328431732340000",
           "schema_version": "0.1.0",
           "selected_tool": "/usr/bin/clang",
           "source_sha256": "0a3883b9ce356607a01a21dd8544a9198f34ce155397ffdf247f76c2e56841bf",
@@ -3013,7 +3489,7 @@
             "status": "observed"
           },
           "workspace_binding": "bound",
-          "workspace_id": "ws-37ac5a9b6e41db3cdec60a6c4a3708ed"
+          "workspace_id": "ws-3a78be465303871c42454ee444c19a9c"
         },
         {
           "authority": "local_unverified",
@@ -3031,76 +3507,7 @@
           "path": "api.cpp",
           "profile": "clang-documentation-structure-v1",
           "report_type": "clang_documentation_structure_workbench_observation",
-          "run_id": "clangdocstruct-40549-0-1791327859876042000",
-          "schema_version": "0.1.0",
-          "selected_tool": "/usr/bin/clang",
-          "source_sha256": "0a3883b9ce356607a01a21dd8544a9198f34ce155397ffdf247f76c2e56841bf",
-          "standard": "c++17",
-          "structure": {
-            "native_raw_diagnostic_count": 0,
-            "observation": {
-              "authority": "local_unverified",
-              "coverage_proven": false,
-              "errors_and_behavior": "not_evaluated",
-              "functions": [
-                {
-                  "column_byte": 5,
-                  "comment_presence": "absent",
-                  "line": 3,
-                  "missing_components": [
-                    "documentation_comment"
-                  ],
-                  "name": "f",
-                  "offset_byte": 6,
-                  "parameters": [],
-                  "purpose_description": "unknown",
-                  "return_description": "unknown",
-                  "structure_status": "observed_supported_subset"
-                },
-                {
-                  "column_byte": 5,
-                  "comment_presence": "absent",
-                  "line": 4,
-                  "missing_components": [
-                    "documentation_comment"
-                  ],
-                  "name": "f",
-                  "offset_byte": 33,
-                  "parameters": [],
-                  "purpose_description": "unknown",
-                  "return_description": "unknown",
-                  "structure_status": "observed_supported_subset"
-                }
-              ],
-              "observation_type": "clang_function_documentation_structure",
-              "qualification": "not_granted",
-              "schema_version": "0.1.0",
-              "semantic_accuracy": "not_evaluated",
-              "unresolved_declaration_kinds": []
-            },
-            "reason": "clang_structure_observed",
-            "status": "observed"
-          },
-          "workspace_binding": "bound",
-          "workspace_id": "ws-37ac5a9b6e41db3cdec60a6c4a3708ed"
-        },
-        {
-          "authority": "local_unverified",
-          "coverage_proven": false,
-          "delivery_decision": "not_evaluated",
-          "language": "cpp",
-          "local_scan_complete": true,
-          "native": {
-            "diagnostics": [],
-            "reason": "clang_native_no_diagnostics",
-            "status": "completed",
-            "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
-            "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
-          },
-          "path": "api.cpp",
-          "profile": "clang-documentation-structure-v1",
-          "report_type": "clang_documentation_structure_workbench_observation",
-          "run_id": "clangdocstruct-40606-0-1791327860059852000",
+          "run_id": "clangdocstruct-4569-0-1791328431942961000",
           "schema_version": "0.1.0",
           "selected_tool": "/usr/bin/clang",
           "source_sha256": "18f10fa8fa770bf145092e6ada19754e8da9580fd22b09b46b4b98481eec768d",
@@ -3159,7 +3566,7 @@
             "status": "observed"
           },
           "workspace_binding": "bound",
-          "workspace_id": "ws-37ac5a9b6e41db3cdec60a6c4a3708ed"
+          "workspace_id": "ws-3a78be465303871c42454ee444c19a9c"
         },
         {
           "authority": "local_unverified",
@@ -3177,7 +3584,7 @@
           "path": "api.cpp",
           "profile": "clang-documentation-structure-v1",
           "report_type": "clang_documentation_structure_workbench_observation",
-          "run_id": "clangdocstruct-40302-0-1791327859665176000",
+          "run_id": "clangdocstruct-4547-0-1791328431422745000",
           "schema_version": "0.1.0",
           "selected_tool": "/usr/bin/clang",
           "source_sha256": "db6657d525d119434e837bdfaca6f5bb2aaae5ec5e2f882acbc1a93bf0a24af7",
@@ -3228,7 +3635,76 @@
             "status": "observed"
           },
           "workspace_binding": "bound",
-          "workspace_id": "ws-37ac5a9b6e41db3cdec60a6c4a3708ed"
+          "workspace_id": "ws-3a78be465303871c42454ee444c19a9c"
+        },
+        {
+          "authority": "local_unverified",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "language": "cpp",
+          "local_scan_complete": true,
+          "native": {
+            "diagnostics": [],
+            "reason": "clang_native_no_diagnostics",
+            "status": "completed",
+            "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+            "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+          },
+          "path": "api.cpp",
+          "profile": "clang-documentation-structure-v1",
+          "report_type": "clang_documentation_structure_workbench_observation",
+          "run_id": "clangdocstruct-4565-0-1791328431831805000",
+          "schema_version": "0.1.0",
+          "selected_tool": "/usr/bin/clang",
+          "source_sha256": "0a3883b9ce356607a01a21dd8544a9198f34ce155397ffdf247f76c2e56841bf",
+          "standard": "c++17",
+          "structure": {
+            "native_raw_diagnostic_count": 0,
+            "observation": {
+              "authority": "local_unverified",
+              "coverage_proven": false,
+              "errors_and_behavior": "not_evaluated",
+              "functions": [
+                {
+                  "column_byte": 5,
+                  "comment_presence": "absent",
+                  "line": 3,
+                  "missing_components": [
+                    "documentation_comment"
+                  ],
+                  "name": "f",
+                  "offset_byte": 6,
+                  "parameters": [],
+                  "purpose_description": "unknown",
+                  "return_description": "unknown",
+                  "structure_status": "observed_supported_subset"
+                },
+                {
+                  "column_byte": 5,
+                  "comment_presence": "absent",
+                  "line": 4,
+                  "missing_components": [
+                    "documentation_comment"
+                  ],
+                  "name": "f",
+                  "offset_byte": 33,
+                  "parameters": [],
+                  "purpose_description": "unknown",
+                  "return_description": "unknown",
+                  "structure_status": "observed_supported_subset"
+                }
+              ],
+              "observation_type": "clang_function_documentation_structure",
+              "qualification": "not_granted",
+              "schema_version": "0.1.0",
+              "semantic_accuracy": "not_evaluated",
+              "unresolved_declaration_kinds": []
+            },
+            "reason": "clang_structure_observed",
+            "status": "observed"
+          },
+          "workspace_binding": "bound",
+          "workspace_id": "ws-3a78be465303871c42454ee444c19a9c"
         }
       ],
       "repeated": {
@@ -3319,48 +3795,45 @@
             ],
             "authority": "local_unverified",
             "checker_id": "cpp.clang.documentation_structure",
-            "closure_condition": "原命令局部复扫不关闭；仍须专用task verify、完整详细准确性/项目覆盖与可信关闭/复发验收。",
+            "closure_condition": "原命令局部复扫不关闭；专用task verify记录局部观察；仍须受控尝试、完整详细准确性/项目覆盖与可信关闭/复发验收。",
             "constraints": [
               "仅修改当前文件文档注释，保留API及行为",
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-40443-0-1791327859769696000",
+            "current_run_id": "clangdocstruct-4551-0-1791328431531918000",
             "delivery_decision": "not_evaluated",
             "disposition": "actionable",
             "evidence_ref": {
-              "first_report_sha256": "8e52fd7cd4f2c82729c5ee519c23e8359664b497f2ce1972a534a465861435fe",
-              "first_run_id": "clangdocstruct-40302-0-1791327859665176000"
+              "first_report_sha256": "4e4fced8a4e5c97e05ca9b73ab41a1c98f61eeaa112309c2041bdc256dd92b44",
+              "first_run_id": "clangdocstruct-4547-0-1791328431422745000"
             },
             "history": {
               "attempt_journal": "not_integrated",
               "status": "native_structural_observations_only",
-              "task_verify": "not_integrated"
+              "task_verify": "local_observation"
             },
             "kind": "finding",
             "observation_status": "structural_deficits_observed",
             "reason_code": "structural_deficits_observed",
             "recheck_argv": [
               "codeguard",
-              "comments",
-              "cpp",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000/api.cpp",
+              "task",
+              "verify",
+              "CG-9ad3a53aac41e9b018a331cad18b2c49",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000",
               "--clang-tool",
               "/usr/bin/clang",
-              "--standard",
-              "c++17",
-              "--workspace",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000",
               "--format=json"
             ],
             "rule_basis": "函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。",
             "rule_source": "codeguard_structural_policy",
-            "schema_version": "0.31.0",
+            "schema_version": "0.32.0",
             "scope": "api.cpp",
             "source_sha256": "db6657d525d119434e837bdfaca6f5bb2aaae5ec5e2f882acbc1a93bf0a24af7",
             "step": [
               "按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。",
-              "使用绑定原工具、标准与工作区的comments原命令复扫；未知或失稳时先诊断，不按旧位置改源码。"
+              "使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"
             ],
             "structural_positions": [
               {
@@ -3396,18 +3869,18 @@
             "task_id": "CG-9ad3a53aac41e9b018a331cad18b2c49"
           },
           "report_type": "repair_brief_preview",
-          "schema_version": "0.31.0"
+          "schema_version": "0.32.0"
         },
         "next_actions": [
-          "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify与可信关闭仍待实现。",
+          "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify已提供局部观察，受控尝试与可信关闭仍待实现。",
           "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。",
-          "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原comments命令复扫；专用结构task verify与可信关闭仍待接线，不把非空说明当准确性或关闭证据。"
+          "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试与可信关闭仍待接线，不把非空说明当准确性或关闭证据。"
         ],
         "operation": "comments",
-        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000/api.cpp",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000/api.cpp",
         "reason": "native_documentation_coverage_unverified",
         "report_type": "c_family_comments_feedback",
-        "schema_version": "0.7.0",
+        "schema_version": "0.8.0",
         "source_sha256": "db6657d525d119434e837bdfaca6f5bb2aaae5ec5e2f882acbc1a93bf0a24af7",
         "structural_next": {
           "authority": "local_unverified",
@@ -3427,48 +3900,45 @@
             ],
             "authority": "local_unverified",
             "checker_id": "cpp.clang.documentation_structure",
-            "closure_condition": "原命令局部复扫不关闭；仍须专用task verify、完整详细准确性/项目覆盖与可信关闭/复发验收。",
+            "closure_condition": "原命令局部复扫不关闭；专用task verify记录局部观察；仍须受控尝试、完整详细准确性/项目覆盖与可信关闭/复发验收。",
             "constraints": [
               "仅修改当前文件文档注释，保留API及行为",
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-40443-0-1791327859769696000",
+            "current_run_id": "clangdocstruct-4551-0-1791328431531918000",
             "delivery_decision": "not_evaluated",
             "disposition": "actionable",
             "evidence_ref": {
-              "first_report_sha256": "8e52fd7cd4f2c82729c5ee519c23e8359664b497f2ce1972a534a465861435fe",
-              "first_run_id": "clangdocstruct-40302-0-1791327859665176000"
+              "first_report_sha256": "4e4fced8a4e5c97e05ca9b73ab41a1c98f61eeaa112309c2041bdc256dd92b44",
+              "first_run_id": "clangdocstruct-4547-0-1791328431422745000"
             },
             "history": {
               "attempt_journal": "not_integrated",
               "status": "native_structural_observations_only",
-              "task_verify": "not_integrated"
+              "task_verify": "local_observation"
             },
             "kind": "finding",
             "observation_status": "structural_deficits_observed",
             "reason_code": "structural_deficits_observed",
             "recheck_argv": [
               "codeguard",
-              "comments",
-              "cpp",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000/api.cpp",
+              "task",
+              "verify",
+              "CG-9ad3a53aac41e9b018a331cad18b2c49",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000",
               "--clang-tool",
               "/usr/bin/clang",
-              "--standard",
-              "c++17",
-              "--workspace",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000",
               "--format=json"
             ],
             "rule_basis": "函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。",
             "rule_source": "codeguard_structural_policy",
-            "schema_version": "0.31.0",
+            "schema_version": "0.32.0",
             "scope": "api.cpp",
             "source_sha256": "db6657d525d119434e837bdfaca6f5bb2aaae5ec5e2f882acbc1a93bf0a24af7",
             "step": [
               "按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。",
-              "使用绑定原工具、标准与工作区的comments原命令复扫；未知或失稳时先诊断，不按旧位置改源码。"
+              "使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"
             ],
             "structural_positions": [
               {
@@ -3504,17 +3974,17 @@
             "task_id": "CG-9ad3a53aac41e9b018a331cad18b2c49"
           },
           "report_type": "repair_brief_preview",
-          "schema_version": "0.31.0"
+          "schema_version": "0.32.0"
         },
         "structural_task_workflow_status": "partial",
         "structural_workbench": {
           "reason": null,
-          "run_id": "clangdocstruct-40443-0-1791327859769696000",
+          "run_id": "clangdocstruct-4551-0-1791328431531918000",
           "status": "synced_partial",
           "task_ids": [
             "CG-9ad3a53aac41e9b018a331cad18b2c49"
           ],
-          "workspace_id": "ws-37ac5a9b6e41db3cdec60a6c4a3708ed"
+          "workspace_id": "ws-3a78be465303871c42454ee444c19a9c"
         },
         "task_workflow_status": "partial",
         "unclassified_native_diagnostics": [],
@@ -3522,7 +3992,7 @@
           "codeguard",
           "comments",
           "cpp",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000/api.cpp",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000/api.cpp",
           "--clang-tool",
           "/usr/bin/clang",
           "--standard",
@@ -3530,12 +4000,12 @@
           "--timeout",
           "1800000ms",
           "--workspace",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000",
           "--format=json"
         ],
         "workbench": {
           "reason": null,
-          "run_id": "clangdoc-40443-0-1791327859769696000",
+          "run_id": "clangdoc-4551-0-1791328431531918000",
           "status": "synced_partial",
           "sync": {
             "already_consumed_reports": 2,
@@ -3545,7 +4015,7 @@
             "new_findings": 0
           },
           "task_ids": [],
-          "workspace_id": "ws-37ac5a9b6e41db3cdec60a6c4a3708ed"
+          "workspace_id": "ws-3a78be465303871c42454ee444c19a9c"
         },
         "workspace_binding": "bound"
       },
@@ -3637,48 +4107,45 @@
             ],
             "authority": "local_unverified",
             "checker_id": "cpp.clang.documentation_structure",
-            "closure_condition": "原命令局部复扫不关闭；仍须专用task verify、完整详细准确性/项目覆盖与可信关闭/复发验收。",
+            "closure_condition": "原命令局部复扫不关闭；专用task verify记录局部观察；仍须受控尝试、完整详细准确性/项目覆盖与可信关闭/复发验收。",
             "constraints": [
               "仅修改当前文件文档注释，保留API及行为",
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-40600-0-1791327859959152000",
+            "current_run_id": "clangdocstruct-4565-0-1791328431831805000",
             "delivery_decision": "not_evaluated",
             "disposition": "actionable",
             "evidence_ref": {
-              "first_report_sha256": "8e52fd7cd4f2c82729c5ee519c23e8359664b497f2ce1972a534a465861435fe",
-              "first_run_id": "clangdocstruct-40302-0-1791327859665176000"
+              "first_report_sha256": "4e4fced8a4e5c97e05ca9b73ab41a1c98f61eeaa112309c2041bdc256dd92b44",
+              "first_run_id": "clangdocstruct-4547-0-1791328431422745000"
             },
             "history": {
               "attempt_journal": "not_integrated",
               "status": "native_structural_observations_only",
-              "task_verify": "not_integrated"
+              "task_verify": "local_observation"
             },
             "kind": "finding",
             "observation_status": "structural_deficits_observed",
             "reason_code": "structural_deficits_observed",
             "recheck_argv": [
               "codeguard",
-              "comments",
-              "cpp",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000/api.cpp",
+              "task",
+              "verify",
+              "CG-9ad3a53aac41e9b018a331cad18b2c49",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000",
               "--clang-tool",
               "/usr/bin/clang",
-              "--standard",
-              "c++17",
-              "--workspace",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000",
               "--format=json"
             ],
             "rule_basis": "函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。",
             "rule_source": "codeguard_structural_policy",
-            "schema_version": "0.31.0",
+            "schema_version": "0.32.0",
             "scope": "api.cpp",
             "source_sha256": "0a3883b9ce356607a01a21dd8544a9198f34ce155397ffdf247f76c2e56841bf",
             "step": [
               "按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。",
-              "使用绑定原工具、标准与工作区的comments原命令复扫；未知或失稳时先诊断，不按旧位置改源码。"
+              "使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"
             ],
             "structural_positions": [
               {
@@ -3714,18 +4181,18 @@
             "task_id": "CG-9ad3a53aac41e9b018a331cad18b2c49"
           },
           "report_type": "repair_brief_preview",
-          "schema_version": "0.31.0"
+          "schema_version": "0.32.0"
         },
         "next_actions": [
-          "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify与可信关闭仍待实现。",
+          "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify已提供局部观察，受控尝试与可信关闭仍待实现。",
           "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。",
-          "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原comments命令复扫；专用结构task verify与可信关闭仍待接线，不把非空说明当准确性或关闭证据。"
+          "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试与可信关闭仍待接线，不把非空说明当准确性或关闭证据。"
         ],
         "operation": "comments",
-        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000/api.cpp",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000/api.cpp",
         "reason": "native_documentation_coverage_unverified",
         "report_type": "c_family_comments_feedback",
-        "schema_version": "0.7.0",
+        "schema_version": "0.8.0",
         "source_sha256": "0a3883b9ce356607a01a21dd8544a9198f34ce155397ffdf247f76c2e56841bf",
         "structural_next": {
           "authority": "local_unverified",
@@ -3745,48 +4212,45 @@
             ],
             "authority": "local_unverified",
             "checker_id": "cpp.clang.documentation_structure",
-            "closure_condition": "原命令局部复扫不关闭；仍须专用task verify、完整详细准确性/项目覆盖与可信关闭/复发验收。",
+            "closure_condition": "原命令局部复扫不关闭；专用task verify记录局部观察；仍须受控尝试、完整详细准确性/项目覆盖与可信关闭/复发验收。",
             "constraints": [
               "仅修改当前文件文档注释，保留API及行为",
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-40600-0-1791327859959152000",
+            "current_run_id": "clangdocstruct-4565-0-1791328431831805000",
             "delivery_decision": "not_evaluated",
             "disposition": "actionable",
             "evidence_ref": {
-              "first_report_sha256": "8e52fd7cd4f2c82729c5ee519c23e8359664b497f2ce1972a534a465861435fe",
-              "first_run_id": "clangdocstruct-40302-0-1791327859665176000"
+              "first_report_sha256": "4e4fced8a4e5c97e05ca9b73ab41a1c98f61eeaa112309c2041bdc256dd92b44",
+              "first_run_id": "clangdocstruct-4547-0-1791328431422745000"
             },
             "history": {
               "attempt_journal": "not_integrated",
               "status": "native_structural_observations_only",
-              "task_verify": "not_integrated"
+              "task_verify": "local_observation"
             },
             "kind": "finding",
             "observation_status": "structural_deficits_observed",
             "reason_code": "structural_deficits_observed",
             "recheck_argv": [
               "codeguard",
-              "comments",
-              "cpp",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000/api.cpp",
+              "task",
+              "verify",
+              "CG-9ad3a53aac41e9b018a331cad18b2c49",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000",
               "--clang-tool",
               "/usr/bin/clang",
-              "--standard",
-              "c++17",
-              "--workspace",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000",
               "--format=json"
             ],
             "rule_basis": "函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。",
             "rule_source": "codeguard_structural_policy",
-            "schema_version": "0.31.0",
+            "schema_version": "0.32.0",
             "scope": "api.cpp",
             "source_sha256": "0a3883b9ce356607a01a21dd8544a9198f34ce155397ffdf247f76c2e56841bf",
             "step": [
               "按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。",
-              "使用绑定原工具、标准与工作区的comments原命令复扫；未知或失稳时先诊断，不按旧位置改源码。"
+              "使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"
             ],
             "structural_positions": [
               {
@@ -3822,17 +4286,17 @@
             "task_id": "CG-9ad3a53aac41e9b018a331cad18b2c49"
           },
           "report_type": "repair_brief_preview",
-          "schema_version": "0.31.0"
+          "schema_version": "0.32.0"
         },
         "structural_task_workflow_status": "partial",
         "structural_workbench": {
           "reason": null,
-          "run_id": "clangdocstruct-40600-0-1791327859959152000",
+          "run_id": "clangdocstruct-4565-0-1791328431831805000",
           "status": "synced_partial",
           "task_ids": [
             "CG-9ad3a53aac41e9b018a331cad18b2c49"
           ],
-          "workspace_id": "ws-37ac5a9b6e41db3cdec60a6c4a3708ed"
+          "workspace_id": "ws-3a78be465303871c42454ee444c19a9c"
         },
         "task_workflow_status": "partial",
         "unclassified_native_diagnostics": [],
@@ -3840,7 +4304,7 @@
           "codeguard",
           "comments",
           "cpp",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000/api.cpp",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000/api.cpp",
           "--clang-tool",
           "/usr/bin/clang",
           "--standard",
@@ -3848,22 +4312,22 @@
           "--timeout",
           "1800000ms",
           "--workspace",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000",
           "--format=json"
         ],
         "workbench": {
           "reason": null,
-          "run_id": "clangdoc-40600-0-1791327859959152000",
+          "run_id": "clangdoc-4565-0-1791328431831805000",
           "status": "synced_partial",
           "sync": {
-            "already_consumed_reports": 6,
+            "already_consumed_reports": 7,
             "historical_findings": 0,
             "imported_reports": 1,
             "new_blockers": 0,
             "new_findings": 0
           },
           "task_ids": [],
-          "workspace_id": "ws-37ac5a9b6e41db3cdec60a6c4a3708ed"
+          "workspace_id": "ws-3a78be465303871c42454ee444c19a9c"
         },
         "workspace_binding": "bound"
       },
@@ -3877,22 +4341,19 @@
         "next_actions": [
           [
             "codeguard",
-            "comments",
-            "cpp",
-            "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000/api.cpp",
+            "task",
+            "verify",
+            "CG-9ad3a53aac41e9b018a331cad18b2c49",
+            "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000",
             "--clang-tool",
             "/usr/bin/clang",
-            "--standard",
-            "c++17",
-            "--workspace",
-            "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000",
             "--format=json"
           ]
         ],
         "operation": "task_show",
         "report_type": "task_show_preview",
-        "request_id": "view-40544-1791327859830605000",
-        "schema_version": "0.5.0",
+        "request_id": "view-4560-1791328431691621000",
+        "schema_version": "0.6.0",
         "state": "open",
         "task": {
           "affected_paths": [
@@ -3901,48 +4362,45 @@
           "allowed_paths": [],
           "authority": "local_unverified",
           "checker_id": "cpp.clang.documentation_structure",
-          "closure_condition": "原命令局部复扫不关闭；仍须专用task verify、完整详细准确性/项目覆盖与可信关闭/复发验收。",
+          "closure_condition": "原命令局部复扫不关闭；专用task verify记录局部观察；仍须受控尝试、完整详细准确性/项目覆盖与可信关闭/复发验收。",
           "constraints": [
             "仅修改当前文件文档注释，保留API及行为",
             "同名/重载定位属于文件策略组，不能据名字选择单一函数",
             "不关闭检查器、不以占位文本或白名单自批代替修复"
           ],
-          "current_run_id": "clangdocstruct-40443-0-1791327859769696000",
+          "current_run_id": "clangdocstruct-4555-0-1791328431630320000",
           "delivery_decision": "not_evaluated",
           "disposition": "needs_decision",
           "evidence_ref": {
-            "first_report_sha256": "8e52fd7cd4f2c82729c5ee519c23e8359664b497f2ce1972a534a465861435fe",
-            "first_run_id": "clangdocstruct-40302-0-1791327859665176000"
+            "first_report_sha256": "4e4fced8a4e5c97e05ca9b73ab41a1c98f61eeaa112309c2041bdc256dd92b44",
+            "first_run_id": "clangdocstruct-4547-0-1791328431422745000"
           },
           "history": {
             "attempt_journal": "not_integrated",
             "status": "native_structural_observations_only",
-            "task_verify": "not_integrated"
+            "task_verify": "local_observation"
           },
           "kind": "finding",
           "observation_status": "input_changed",
           "reason_code": "input_changed",
           "recheck_argv": [
             "codeguard",
-            "comments",
-            "cpp",
-            "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000/api.cpp",
+            "task",
+            "verify",
+            "CG-9ad3a53aac41e9b018a331cad18b2c49",
+            "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-4505-1791328431349347000",
             "--clang-tool",
             "/usr/bin/clang",
-            "--standard",
-            "c++17",
-            "--workspace",
-            "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-work-cpp-39833-1791327859586813000",
             "--format=json"
           ],
           "rule_basis": "函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。",
           "rule_source": "codeguard_structural_policy",
-          "schema_version": "0.31.0",
+          "schema_version": "0.32.0",
           "scope": "api.cpp",
           "source_sha256": "db6657d525d119434e837bdfaca6f5bb2aaae5ec5e2f882acbc1a93bf0a24af7",
           "step": [
             "按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。",
-            "使用绑定原工具、标准与工作区的comments原命令复扫；未知或失稳时先诊断，不按旧位置改源码。"
+            "使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"
           ],
           "structural_positions": [],
           "structural_rule_id": "codeguard.documentation.function_structure_required",
@@ -3950,11 +4408,217 @@
         },
         "task_id": "CG-9ad3a53aac41e9b018a331cad18b2c49"
       },
-      "task_id": "CG-9ad3a53aac41e9b018a331cad18b2c49"
+      "task_id": "CG-9ad3a53aac41e9b018a331cad18b2c49",
+      "verify_absent": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "delivery_decision": "not_evaluated",
+        "event_persisted": true,
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "source": "builtin_default",
+          "timeout_ms": 1800000
+        },
+        "exit_code": 3,
+        "kind": "finding",
+        "native_scan": {
+          "authority": "local_unverified",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "input_stable": true,
+          "language": "cpp",
+          "local_scan_complete": true,
+          "native": {
+            "diagnostics": [],
+            "reason": "clang_native_no_diagnostics",
+            "status": "completed",
+            "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+            "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+          },
+          "original_ref": {
+            "run_id": "clangdocstruct-4547-0-1791328431422745000",
+            "sha256": "4e4fced8a4e5c97e05ca9b73ab41a1c98f61eeaa112309c2041bdc256dd92b44"
+          },
+          "path": "api.cpp",
+          "profile": "clang-documentation-structure-v1",
+          "report_type": "clang_documentation_structure_task_recheck",
+          "run_id": "clangdocstruct-4573-0-1791328432078423000",
+          "schema_version": "0.1.0",
+          "selected_tool": "/usr/bin/clang",
+          "source_sha256": "18f10fa8fa770bf145092e6ada19754e8da9580fd22b09b46b4b98481eec768d",
+          "standard": "c++17",
+          "structure": {
+            "native_raw_diagnostic_count": 0,
+            "observation": {
+              "authority": "local_unverified",
+              "coverage_proven": false,
+              "errors_and_behavior": "not_evaluated",
+              "functions": [
+                {
+                  "column_byte": 5,
+                  "comment_presence": "present",
+                  "line": 5,
+                  "missing_components": [],
+                  "name": "f",
+                  "offset_byte": 72,
+                  "parameters": [
+                    {
+                      "description": "nonempty",
+                      "index": 0,
+                      "name": "x"
+                    }
+                  ],
+                  "purpose_description": "nonempty",
+                  "return_description": "nonempty",
+                  "structure_status": "observed_supported_subset"
+                },
+                {
+                  "column_byte": 5,
+                  "comment_presence": "present",
+                  "line": 10,
+                  "missing_components": [],
+                  "name": "f",
+                  "offset_byte": 178,
+                  "parameters": [
+                    {
+                      "description": "nonempty",
+                      "index": 0,
+                      "name": "x"
+                    }
+                  ],
+                  "purpose_description": "nonempty",
+                  "return_description": "nonempty",
+                  "structure_status": "observed_supported_subset"
+                }
+              ],
+              "observation_type": "clang_function_documentation_structure",
+              "qualification": "not_granted",
+              "schema_version": "0.1.0",
+              "semantic_accuracy": "not_evaluated",
+              "unresolved_declaration_kinds": []
+            },
+            "reason": "clang_structure_observed",
+            "status": "observed"
+          },
+          "task_id": "CG-9ad3a53aac41e9b018a331cad18b2c49",
+          "task_kind": "finding",
+          "task_rule": "codeguard.documentation.function_structure_required",
+          "workspace_binding": "bound",
+          "workspace_id": "ws-3a78be465303871c42454ee444c19a9c"
+        },
+        "next_actions": [
+          "inspect_native_recheck_and_policy_before_closure"
+        ],
+        "observation": "candidate_absent_unverified_policy",
+        "operation": "task_verify",
+        "reason": null,
+        "report_type": "task_verification_preview",
+        "schema_version": "0.37.0",
+        "task_id": "CG-9ad3a53aac41e9b018a331cad18b2c49"
+      },
+      "verify_present": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "delivery_decision": "not_evaluated",
+        "event_persisted": true,
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "source": "builtin_default",
+          "timeout_ms": 1800000
+        },
+        "exit_code": 3,
+        "kind": "finding",
+        "native_scan": {
+          "authority": "local_unverified",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "input_stable": true,
+          "language": "cpp",
+          "local_scan_complete": true,
+          "native": {
+            "diagnostics": [],
+            "reason": "clang_native_no_diagnostics",
+            "status": "completed",
+            "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+            "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+          },
+          "original_ref": {
+            "run_id": "clangdocstruct-4547-0-1791328431422745000",
+            "sha256": "4e4fced8a4e5c97e05ca9b73ab41a1c98f61eeaa112309c2041bdc256dd92b44"
+          },
+          "path": "api.cpp",
+          "profile": "clang-documentation-structure-v1",
+          "report_type": "clang_documentation_structure_task_recheck",
+          "run_id": "clangdocstruct-4555-0-1791328431630320000",
+          "schema_version": "0.1.0",
+          "selected_tool": "/usr/bin/clang",
+          "source_sha256": "db6657d525d119434e837bdfaca6f5bb2aaae5ec5e2f882acbc1a93bf0a24af7",
+          "standard": "c++17",
+          "structure": {
+            "native_raw_diagnostic_count": 0,
+            "observation": {
+              "authority": "local_unverified",
+              "coverage_proven": false,
+              "errors_and_behavior": "not_evaluated",
+              "functions": [
+                {
+                  "column_byte": 5,
+                  "comment_presence": "absent",
+                  "line": 1,
+                  "missing_components": [
+                    "documentation_comment"
+                  ],
+                  "name": "f",
+                  "offset_byte": 4,
+                  "parameters": [],
+                  "purpose_description": "unknown",
+                  "return_description": "unknown",
+                  "structure_status": "observed_supported_subset"
+                },
+                {
+                  "column_byte": 5,
+                  "comment_presence": "absent",
+                  "line": 2,
+                  "missing_components": [
+                    "documentation_comment"
+                  ],
+                  "name": "f",
+                  "offset_byte": 31,
+                  "parameters": [],
+                  "purpose_description": "unknown",
+                  "return_description": "unknown",
+                  "structure_status": "observed_supported_subset"
+                }
+              ],
+              "observation_type": "clang_function_documentation_structure",
+              "qualification": "not_granted",
+              "schema_version": "0.1.0",
+              "semantic_accuracy": "not_evaluated",
+              "unresolved_declaration_kinds": []
+            },
+            "reason": "clang_structure_observed",
+            "status": "observed"
+          },
+          "task_id": "CG-9ad3a53aac41e9b018a331cad18b2c49",
+          "task_kind": "finding",
+          "task_rule": "codeguard.documentation.function_structure_required",
+          "workspace_binding": "bound",
+          "workspace_id": "ws-3a78be465303871c42454ee444c19a9c"
+        },
+        "next_actions": [
+          "inspect_native_recheck_and_policy_before_closure"
+        ],
+        "observation": "still_present",
+        "operation": "task_verify",
+        "reason": null,
+        "report_type": "task_verification_preview",
+        "schema_version": "0.37.0",
+        "task_id": "CG-9ad3a53aac41e9b018a331cad18b2c49"
+      }
     }
   ],
-  "codeguard_sha256": "5d036afa357832f48ec48183fd7c2b19c2cd0f1a7874302f64415ca8363136f7",
+  "codeguard_sha256": "a3dd3f8172afd105a32a4446ffb1c057c33e3962b23bd648a022e7300dc3c04e",
   "evidence_kind": "development_native_structure_workbench",
   "qualification": "not_granted",
-  "test_source_sha256": "ff17691ba49934272489ef6a27624af0e1f7eb21ff7dd4b06e057d8c5094d597"
+  "test_source_sha256": "dabf37a910c595fa17a4ce31c2e6b282c089dd642189ed6a609f7ac0eb7262fe"
 }

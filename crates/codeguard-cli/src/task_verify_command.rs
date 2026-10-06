@@ -95,21 +95,19 @@ pub fn run(args: &[String]) -> ExitCode {
         Err(reason) => return print_unavailable(&parsed, reason),
     };
     let gradle_cve_task = brief["checker_id"] == "java.gradle.dependency_check";
-    if matches!(
+    let c_structure_task = matches!(
         brief["checker_id"].as_str(),
         Some("c.clang.documentation_structure" | "cpp.clang.documentation_structure")
-    ) {
-        return print_unavailable(&parsed, "clang_structure_task_verify_not_integrated");
-    }
+    );
     let c_documentation_task = matches!(
         brief["checker_id"].as_str(),
         Some("c.clang.documentation" | "cpp.clang.documentation")
     );
-    if parsed.clang_tool.is_some() && !c_documentation_task {
+    if parsed.clang_tool.is_some() && !c_documentation_task && !c_structure_task {
         eprintln!("--clang-tool 仅用于C/C++文档任务");
         return ExitCode::from(2);
     }
-    if c_documentation_task {
+    if c_documentation_task || c_structure_task {
         if args.iter().filter(|s| s.starts_with("--")).any(|s| {
             !matches!(
                 s.as_str(),
@@ -125,11 +123,20 @@ pub fn run(args: &[String]) -> ExitCode {
             eprintln!("C/C++文档任务仅接受原工具及共享复检参数");
             return ExitCode::from(2);
         }
-        if let Err(reason) = crate::c_family_comments_task_recheck::preflight(
-            &root,
-            &brief,
-            parsed.clang_tool.as_deref(),
-        ) {
+        let preflight = if c_structure_task {
+            crate::c_family_structure_task_recheck::preflight(
+                &root,
+                &brief,
+                parsed.clang_tool.as_deref(),
+            )
+        } else {
+            crate::c_family_comments_task_recheck::preflight(
+                &root,
+                &brief,
+                parsed.clang_tool.as_deref(),
+            )
+        };
+        if let Err(reason) = preflight {
             return print_unavailable(&parsed, reason);
         }
     }
@@ -368,7 +375,15 @@ pub fn run(args: &[String]) -> ExitCode {
     } else {
         None
     };
-    let mut scan = if c_documentation_task {
+    let mut scan = if c_structure_task {
+        match crate::c_family_structure_task_recheck::run(&root, &brief, deadline) {
+            Ok(report) => report,
+            Err(reason) => {
+                let release = finish_verification(&root, &parsed.task_id, &lease);
+                return print_unavailable(&parsed, release.err().unwrap_or(reason));
+            }
+        }
+    } else if c_documentation_task {
         match crate::c_family_comments_task_recheck::run(&root, &brief, deadline) {
             Ok(report) => report,
             Err(reason) => {
@@ -896,6 +911,8 @@ pub fn run(args: &[String]) -> ExitCode {
             crate::rust_cve_task_recheck::classify(&brief, &scan)
         } else if brief["checker_id"] == "python.pip_audit" {
             crate::python_cve_task_recheck::classify(&brief, &scan)
+        } else if c_structure_task {
+            crate::c_family_structure_task_recheck::classify(&brief, &scan)
         } else if c_documentation_task {
             crate::c_family_comments_task_recheck::classify(&brief, &scan)
         } else if shell_task {
@@ -928,6 +945,9 @@ pub fn run(args: &[String]) -> ExitCode {
         } else {
             "0.34.0"
         });
+    }
+    if c_structure_task {
+        report["schema_version"] = json!("0.37.0");
     }
     if c_documentation_task {
         report["schema_version"] = json!("0.36.0");
@@ -997,12 +1017,18 @@ pub fn run(args: &[String]) -> ExitCode {
         match lock_verification(&root, &parsed.task_id, &lease) {
             Ok(_guard) => match latest_ready_attempt(&root, &parsed.task_id) {
                 Ok(current) if current == bound_attempt => {
-                    if (c_documentation_task
-                        && (!crate::c_family_comments_task_recheck::valid_shape(&root, &scan)
+                    if (c_structure_task
+                        && (!crate::c_family_structure_task_recheck::valid_shape(&root, &scan)
                             || (scan["input_stable"] == true
-                                && !crate::c_family_comments_task_recheck::inputs_current(
+                                && !crate::c_family_structure_task_recheck::inputs_current(
                                     &root, &scan,
                                 ))))
+                        || (c_documentation_task
+                            && (!crate::c_family_comments_task_recheck::valid_shape(&root, &scan)
+                                || (scan["input_stable"] == true
+                                    && !crate::c_family_comments_task_recheck::inputs_current(
+                                        &root, &scan,
+                                    ))))
                         || (gradle_cve_task
                             && (crate::gradle_cve_task_recheck::validate_binding(
                                 &root, &brief, &scan,
@@ -1069,7 +1095,11 @@ pub fn run(args: &[String]) -> ExitCode {
     if let Err(reason) = persist {
         if reason == "source_changed_before_verification_record" {
             report["observation"] = json!("incomplete");
-            report["native_scan"][if syntax_task || shell_task || c_documentation_task {
+            report["native_scan"][if syntax_task
+                || shell_task
+                || c_documentation_task
+                || c_structure_task
+            {
                 "input_stable"
             } else {
                 "task_input_stable"
@@ -1082,7 +1112,9 @@ pub fn run(args: &[String]) -> ExitCode {
     if let Err(reason) = finish_verification(&root, &parsed.task_id, &lease) {
         report["reason"] = json!(reason);
     }
-    if c_documentation_task && codeguard_runtime::sigint_cancellation_requested() {
+    if (c_documentation_task || c_structure_task)
+        && codeguard_runtime::sigint_cancellation_requested()
+    {
         report["command_status"] = json!("cancelled");
         report["exit_code"] = json!(130);
         report["reason"] = json!("request_cancelled");

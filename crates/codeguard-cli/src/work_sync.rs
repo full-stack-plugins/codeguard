@@ -618,8 +618,20 @@ fn parse_report(
     digest: String,
 ) -> Result<ReportInput, &'static str> {
     #[cfg(unix)]
-    if report["report_type"]=="clang_documentation_structure_workbench_observation" {
-        return c_family_structure_report::parse(root,workspace_id,path,report,digest);
+    if report["report_type"] == "clang_documentation_structure_task_recheck" {
+        if !crate::c_family_structure_task_recheck::valid_shape(root, report) {
+            return Err("clang_structure_recheck_invalid");
+        }
+        return c_family_structure_report::parse(
+            root,
+            workspace_id,
+            path,
+            &crate::c_family_structure_task_recheck::normal(report),
+            digest,
+        );
+    }
+    if report["report_type"] == "clang_documentation_structure_workbench_observation" {
+        return c_family_structure_report::parse(root, workspace_id, path, report, digest);
     }
     #[cfg(unix)]
     if report["report_type"] == "clang_documentation_task_recheck" {
@@ -2505,8 +2517,20 @@ fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
 }
 
 fn render_task(report: &ReportInput, finding: &FindingInput) -> String {
-    if matches!(finding.checker_id.as_str(),"c.clang.documentation_structure"|"cpp.clang.documentation_structure") {
-        return format!("# {} Codeguard函数文档结构策略任务\n\n- 问题证据：策略 {}，文件 {}，首次行 {}；全部当前函数组件见.codeguard/reports/{}.json，摘要 {}。\n- 规则依据：原生AST关联的Codeguard自有结构策略，不是原Clang警告或完整语义准确性证明。\n- 允许修改：仅当前文件文档注释，保留API及行为；先用next核对字节定位。\n- 修复步骤：根据真实声明和行为补齐所有缺失文档、用途、参数与适用返回组件，同名/重载属于文件策略组。\n- 复检命令：codeguard next . --format=json取得首次工具/标准/工作区comments原命令，复扫更新本任务；专用task verify仍待接线。\n- 历史尝试：首次run {}；扫描只追加局部观察，专用尝试日志与预算仍待接线。\n- 关闭条件：完整详细准确性/项目覆盖与可信关闭/复发；本地零缺失或勾选均不关闭。\n",finding.id,finding.rule_id,serde_json::to_string(&finding.path).unwrap(),finding.line,report.run_id,report.digest,report.run_id);
+    if matches!(
+        finding.checker_id.as_str(),
+        "c.clang.documentation_structure" | "cpp.clang.documentation_structure"
+    ) {
+        return format!(
+            "# {} Codeguard函数文档结构策略任务\n\n- 问题证据：策略 {}，文件 {}，首次行 {}；全部当前函数组件见.codeguard/reports/{}.json，摘要 {}。\n- 规则依据：原生AST关联的Codeguard自有结构策略，不是原Clang警告或完整语义准确性证明。\n- 允许修改：仅当前文件文档注释，保留API及行为；先用next核对字节定位。\n- 修复步骤：根据真实声明和行为补齐所有缺失文档、用途、参数与适用返回组件，同名/重载属于文件策略组。\n- 复检命令：codeguard next . --format=json取得固定首次工具/标准/工作区的task verify命令，记录原工具结构复检；局部观察不关闭本任务。\n- 历史尝试：首次run {}；扫描只追加局部观察，专用尝试日志与预算仍待接线。\n- 关闭条件：完整详细准确性/项目覆盖与可信关闭/复发；本地零缺失或勾选均不关闭。\n",
+            finding.id,
+            finding.rule_id,
+            serde_json::to_string(&finding.path).unwrap(),
+            finding.line,
+            report.run_id,
+            report.digest,
+            report.run_id
+        );
     }
     if matches!(
         finding.checker_id.as_str(),
