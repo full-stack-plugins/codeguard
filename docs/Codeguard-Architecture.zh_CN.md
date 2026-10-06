@@ -1419,3 +1419,5 @@ Gradle 文档的工作台基础现在提供独立 `gradle_javadoc_workbench::pro
 Gradle 文档工作台已接入开发期 `check java/all --gradle-javadoc`：原生运行前捕获选定输入，首次导入再次核对摘要/位置，保存局部报告并同步稳定问题与准备任务；重复扫描追加观察，缺失 Markdown 可从事实恢复。`next` / `task show` 使用原选定输入的 Gradle 复扫参数，工具路径须复核；check_feedback 0.65 与修复指引 0.22 独立消费，普通 Java 检查也能读取历史指引。`gradle_javadoc_tasks` 的计数范围为本次工作区同步，并非只统计 Gradle。三次真实公开检查验证发现、复用和修复后空诊断；原问题仍开放。`task_verify_status=not_integrated`，原任务复检/可信关闭/复发重开和完整规则/范围仍待验收。见 [工作台验收](../tests/acceptance/gradle-javadoc-workbench.md)。
 
 准备任务的存储原因码固定为 `gradle_javadoc_preparation_required`，最新诊断由消费收据和原报告绑定；执行失败、取消和恢复后的覆盖核验沿同一任务更新。最新诊断篡改时拒绝指引，不退回陈旧动作。
+
+内部 `gradle_javadoc_task_recheck` 服务已能绑定原已消费报告、任务范围/规则及选定输入；Java 字节允许修复，构建配置或已知工具身份变化停止原工具运行。局部观察区分仍存在、未受信消失、规则待复核与执行不完整，残缺原生报告不能冒充零问题。该服务尚未接入公开 `task verify`、复检报告同步及历史尝试，当前公开 `task_verify_status=not_integrated` 保持不变。见 [内部复检验收](../tests/acceptance/gradle-javadoc-task-recheck-service.md)。

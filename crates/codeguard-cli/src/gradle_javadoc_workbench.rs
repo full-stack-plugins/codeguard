@@ -160,7 +160,8 @@ pub fn project(
     }
     Ok((findings, blockers))
 }
-fn valid_native(v: &Value) -> Result<(), &'static str> {
+/// 校验局部原生报告的封闭字段、规则和状态，返回协议错误；不授予规则完整性。
+pub(crate) fn valid_native(v: &Value) -> Result<(), &'static str> {
     let schema: Value = serde_json::from_str(include_str!(
         "../../../schemas/gradle-javadoc-probe-v0.1.schema.json"
     ))
