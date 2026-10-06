@@ -881,3 +881,13 @@ The implementation SHALL derive return-outside-function facts from bounded AST t
 - **THEN** each JavaScript row binds `javascript_mode=module` and uses the explicit module worker
 - **AND** raw parser false negatives remain unchanged while duplicate binding and outer-return rules contribute only to combined candidates
 - **AND** wrong-mode/cross-language structure evidence or fabricated qualification is rejected by the versioned report contract
+
+### Requirement: Project JavaScript mode observation SHALL bind only bounded local evidence
+
+Before automatically activating module-only candidates, the implementation SHALL observe the exact source path and bytes within the selected physical workspace. `.mjs` SHALL identify module and `.cjs` SHALL identify CommonJS without package inheritance. For `.js`, only the nearest bounded readable ordinary `package.json` with an explicit unique `type` of `module` or `commonjs` SHALL identify the declared mode. Missing, invalid, duplicate, linked, ambiguous or unsupported input SHALL retain unknown mode, without inheriting past the nearest package or reading outside the selected root. Source and package digests, searched directories and incomplete reasons SHALL remain available for pre/post-scan continuity comparison. This static observation SHALL NOT prove native execution or project quality.
+
+#### Scenario: Nested package boundaries and negative evidence remain current
+- **WHEN** a source is inside a nested package or a previously absent nearer package is created
+- **THEN** the nearest package determines explicit declared mode or unknown state
+- **AND** creation/removal/change of the mode evidence changes the observation used to validate the scan
+- **AND** package/default uncertainty never produces a source violation or fabricated clean result

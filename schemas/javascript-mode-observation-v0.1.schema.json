@@ -1,0 +1,326 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:javascript-mode-observation:0.1.0",
+  "title": "Bounded local JavaScript declared mode evidence, no native or quality authority",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "mode",
+    "basis",
+    "source_path",
+    "source_sha256",
+    "package_path",
+    "package_sha256",
+    "searched_directories",
+    "reason",
+    "native_execution",
+    "delivery_decision"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "report_type": {
+      "const": "javascript_mode_observation"
+    },
+    "mode": {
+      "enum": [
+        "module",
+        "commonjs",
+        "unknown"
+      ]
+    },
+    "basis": {
+      "enum": [
+        "undetermined",
+        "extension_mjs",
+        "extension_cjs",
+        "nearest_package_type"
+      ]
+    },
+    "source_path": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/path"
+        }
+      ]
+    },
+    "source_sha256": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/digest"
+        }
+      ]
+    },
+    "package_path": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/path"
+        }
+      ]
+    },
+    "package_sha256": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/digest"
+        }
+      ]
+    },
+    "searched_directories": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "$ref": "#/$defs/path"
+      }
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[a-z0-9_]+$"
+    },
+    "native_execution": {
+      "const": "not_run"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    }
+  },
+  "$defs": {
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[^\\u0000-\\u001f\\u007f]+$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "basis": {
+            "const": "extension_mjs"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "mode": {
+            "const": "module"
+          },
+          "source_path": {
+            "type": "string",
+            "pattern": "\\.mjs$"
+          },
+          "source_sha256": {
+            "$ref": "#/$defs/digest"
+          },
+          "package_path": {
+            "type": "null"
+          },
+          "package_sha256": {
+            "type": "null"
+          },
+          "searched_directories": {
+            "maxItems": 0
+          },
+          "reason": {
+            "const": "explicit_extension_mode_native_confirmation_required"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "basis": {
+            "const": "extension_cjs"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "mode": {
+            "const": "commonjs"
+          },
+          "source_path": {
+            "type": "string",
+            "pattern": "\\.cjs$"
+          },
+          "source_sha256": {
+            "$ref": "#/$defs/digest"
+          },
+          "package_path": {
+            "type": "null"
+          },
+          "package_sha256": {
+            "type": "null"
+          },
+          "searched_directories": {
+            "maxItems": 0
+          },
+          "reason": {
+            "const": "explicit_extension_mode_native_confirmation_required"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "enum": [
+              "module",
+              "commonjs"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "source_path": {
+            "$ref": "#/$defs/path"
+          },
+          "source_sha256": {
+            "$ref": "#/$defs/digest"
+          },
+          "basis": {
+            "enum": [
+              "extension_mjs",
+              "extension_cjs",
+              "nearest_package_type"
+            ]
+          },
+          "reason": {
+            "enum": [
+              "explicit_extension_mode_native_confirmation_required",
+              "explicit_package_type_native_confirmation_required"
+            ]
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "basis": {
+            "enum": [
+              "undetermined",
+              "nearest_package_type"
+            ]
+          },
+          "reason": {
+            "not": {
+              "enum": [
+                "explicit_extension_mode_native_confirmation_required",
+                "explicit_package_type_native_confirmation_required"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "enum": [
+              "module",
+              "commonjs"
+            ]
+          },
+          "basis": {
+            "const": "nearest_package_type"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "source_path": {
+            "type": "string",
+            "pattern": "\\.js$"
+          },
+          "package_path": {
+            "type": "string",
+            "pattern": "(^|/)package\\.json$"
+          },
+          "package_sha256": {
+            "$ref": "#/$defs/digest"
+          },
+          "searched_directories": {
+            "minItems": 1
+          },
+          "reason": {
+            "const": "explicit_package_type_native_confirmation_required"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "source_sha256": {
+            "type": "null"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "mode": {
+            "const": "unknown"
+          },
+          "basis": {
+            "const": "undetermined"
+          },
+          "package_path": {
+            "type": "null"
+          },
+          "package_sha256": {
+            "type": "null"
+          },
+          "searched_directories": {
+            "maxItems": 0
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "package_sha256": {
+            "type": "string"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "package_path": {
+            "type": "string",
+            "pattern": "(^|/)package\\.json$"
+          },
+          "basis": {
+            "const": "nearest_package_type"
+          },
+          "searched_directories": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ]
+}

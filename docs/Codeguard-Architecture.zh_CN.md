@@ -1352,3 +1352,23 @@ flowchart LR
 ```
 
 该入口不自动推断项目模式，不安装工具，不执行源码，不取代原生lint或关闭任务。CommonJS的顶层return可合法，不能套用模块规则。旧报告schema保持不变；新字段/规则只能通过新协议消费。项目模式自动观察、任务与宿主接线仍需独立验收。见[局部验收](../tests/acceptance/javascript-module-worker-probe.md)。
+
+## 项目 JavaScript 声明模式证据接口
+
+源码模式观察接口已实现，返回`javascript_mode_observation`0.1：普通源码和物理工作区绑定后，`.mjs`/`.cjs`分别明确module/CommonJS，`.js`只读取工作区内最近包的唯一显式`type`。缺type、坏/重复JSON、链接、越界、超预算、loader模式未知时不猜测或继承外包。源码上限1MiB、清单256KiB、搜索64目录；源码/包摘要和已搜索目录保留，便于扫描前后发现近包变化。它不执行原生工具，也不证明生效ESLint配置。
+
+自动scanner/任务/Hook尚未消费此接口；下一步应将前后模式证据比较和失效原因接入候选及复检，不能把本批当作自动检查已完成。真实Node按文件路径的5例对照和21份协议观察见[局部验收](../tests/acceptance/javascript-project-mode.md)。
+
+```mermaid
+flowchart LR
+    A[物理工作区与普通源码] --> B{源码后缀}
+    B -->|mjs / cjs| C[明确后缀模式]
+    B -->|js| D[工作区内最近 package.json]
+    B -->|loader 或不支持| E[unknown 与原因]
+    D -->|唯一显式 type| F[包声明模式与摘要]
+    D -->|缺失 损坏 链接 超预算| E
+    C --> G[模式证据与源码摘要]
+    F --> G
+    E --> G
+    G -.待接线: 前后连续性核对.-> H[项目候选与稳定任务]
+```

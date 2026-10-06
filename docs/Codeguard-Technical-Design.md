@@ -1841,3 +1841,9 @@ The following is an excerpt from an actual module report. The full report also b
   "next_action": "confirm_candidate_structure_with_applicable_native_tool"
 }
 ```
+
+## Project JavaScript declared-mode evidence interface
+
+The mode observation interface now returns `javascript_mode_observation`0.1. It binds ordinary source and a physical workspace: `.mjs`/`.cjs` explicitly declare module/CommonJS, while `.js` reads only the nearest in-scope package's unique explicit `type`. Missing types, malformed/duplicate JSON, links, out-of-scope or over-budget inputs and unresolved loader modes remain unknown without outer-package inheritance. Limits are1MiB source,256KiB manifest and64 searched directories. Source/package digests and searched directories preserve evidence for detecting nearer-package changes before and after scanning. This does not execute native tools or prove effective ESLint configuration.
+
+Automatic scanners/tasks/hooks do not yet consume this interface. The next integration must compare mode evidence across execution and preserve invalidation reasons; this batch is not automatic project-check acceptance. See [limited acceptance](../tests/acceptance/javascript-project-mode.md) for5 actual Node file checks and21 protocol observations.

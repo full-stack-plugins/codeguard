@@ -496,3 +496,5 @@ mod clang_lint_feedback;
 
 #[cfg(feature = "wasm-precheck")]
 mod syntax_worker_mode;
+
+pub mod javascript_mode_observation;
