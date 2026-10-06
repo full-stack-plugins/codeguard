@@ -1,0 +1,58 @@
+{
+  "record_kind": "local_acceptance_summary",
+  "recorded_date": "2026-10-06",
+  "scope": "internal source-bound Gradle Javadoc projection; not persistent workbench integration",
+  "source_sha256": {
+    "crates/codeguard-cli/src/gradle_javadoc_workbench.rs": "61189a3240a0a0fcbb774658978b6fef694e259eeab121121b7571b29a38706a",
+    "crates/codeguard-cli/tests/gradle_javadoc_projection.rs": "9f99a4b75719f216f2067dd309ad0b484eccf3ff56c6a5c9c49bf61e3a68ba16",
+    "schemas/gradle-javadoc-probe-v0.1.schema.json": "7e106e3c005d8449314f8f52aa209fba8d37cb8b261bb241ae1f8da77a5600cd"
+  },
+  "tests": {
+    "default_gradle": {
+      "passed": 16,
+      "failed": 0,
+      "ignored": 6
+    },
+    "wasm_gradle": {
+      "passed": 16,
+      "failed": 0,
+      "ignored": 6,
+      "overlap_with_default": true
+    },
+    "actual_native_projection": {
+      "passed": 1,
+      "failed": 0,
+      "observations": 1,
+      "diagnostic_count": 2,
+      "preparation_count": 1
+    }
+  },
+  "evidence_boundary": {
+    "default_projector_tests": "constructed native fixtures; not actual tool executions",
+    "native_projection": "existing Gradle8.10.2/JDK21; snapshot captured before execution",
+    "identity": "same path/rule/trimmed source-line anchor; not whole-symbol identity",
+    "performance": "requested-line and anchor/source-digest caching; no performance benchmark"
+  },
+  "schema": {
+    "actual_native_report_valid": true,
+    "new_public_protocol": false
+  },
+  "checks": {
+    "default_clippy": "pass",
+    "wasm_clippy": "pass",
+    "layering": "pass",
+    "openspec_strict": "pass",
+    "diff": "pass"
+  },
+  "coverage_proven": false,
+  "rule_configuration_complete": false,
+  "production_qualified": false,
+  "delivery_decision": "not_evaluated",
+  "reports_sha256": "7543b3e277fcfc22f516305333c9b1f6ac2f90547bc0695b7c05eb5e38325baf",
+  "pending": [
+    "persistent Gradle workbench report and lifecycle integration",
+    "next guidance and original-native task verification/closure/reopen",
+    "complete detailed documentation rules and source/configuration/JDK closure",
+    "57-language production qualification and formal 32-grammar qualification"
+  ]
+}

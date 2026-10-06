@@ -1997,3 +1997,8 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 实际0.63有/无诊断报告均误报Java/comments未配置。新用例RED后，0.64按显式Gradle文档请求保留observed_unverified/native_incomplete、正确checker和Gradle复检指引；执行故障不当配置缺失。真实两组3/0诊断和缺工具/取消、封闭协议反例见tests/acceptance/gradle-javadoc-category-attribution.md。稳定Gradle修复任务/复检关闭仍未完成；6.x/8.x/15.3及生产资格保持未完成。
 
 同批补充：纯静态Gradle文档未知配置曾误报缺失，独立RED后保留configuration_unresolved及匹配构建根的配置核验指引；现有0.61协议消费有效，不增加原生任务或授予配置完整性。
+
+
+## 2026-10-06 Gradle文档源码绑定与问题投影基础
+
+延续15.3/15.6，内部独立投影接口先核对选定输入和原生快照，保持Gradle检查器/原生规则、相同定位归并与行锚点移动后的身份；环境/覆盖准备观察与源码问题分开。受控构造报告用于边界单元测试，真实已有Gradle/JDK另运行空参数/返回说明得到2条诊断。证据见tests/acceptance/gradle-javadoc-projection.md。目前未接入持久化/next/任务原工具复检关闭，不新增公开协议或勾选父任务，不改变0/32正式资格。

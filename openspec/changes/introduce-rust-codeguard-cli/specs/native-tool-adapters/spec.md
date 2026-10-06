@@ -833,3 +833,15 @@ The Gradle Javadoc application service SHALL select enabled tasks by the officia
 #### Scenario: Gradle static Javadoc configuration is unresolved
 - **WHEN** static discovery preserves an unknown or invalid Gradle Javadoc configuration without native documentation execution
 - **THEN** Java comments SHALL remain configuration_unresolved with build-root-aware Maven/Gradle guidance rather than missing configuration or a requirement to modify an unrelated build system
+
+### Requirement: Gradle documentation workbench projection SHALL preserve original input binding
+
+Gradle Javadoc repair observations SHALL use their own java.gradle.javadoc checker identity. Before first import, the selected build/source file set and every input digest SHALL be revalidated, including the native selected-input snapshot digest when present. Findings SHALL preserve native rule identity and validated source location with content-anchored identity independent of diagnostic line shifts; out-of-scope diagnostics and forged complete coverage/rules SHALL be rejected; repeated identical native locations SHALL merge into one finding. Environment incompleteness SHALL produce a separate stable preparation observation rather than a source finding. Empty diagnostics SHALL NOT close historical tasks or establish complete documentation compliance. Persistence, next guidance and original-native task verification SHALL retain this identity and remain separate acceptance obligations.
+
+#### Scenario: Source-bound Gradle diagnostics retain identity after line movement
+- **WHEN** the selected inputs and native snapshot match and the same diagnostic source anchor moves to another line
+- **THEN** projection SHALL retain the finding identity with updated location and source digest, merge duplicate identical locations, and reject stale input digests or out-of-scope diagnostics
+
+#### Scenario: Gradle preparation observations cannot close source findings
+- **WHEN** native execution is incomplete or empty diagnostics remain unqualified for complete rules and scope
+- **THEN** projection SHALL preserve a separate preparation observation and SHALL NOT close source findings, mark coverage complete or claim persistent task integration before that integration is independently implemented and verified

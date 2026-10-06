@@ -6,6 +6,8 @@ pub mod gradle_model_probe;
 pub mod gradle_model_probe_request;
 #[cfg(unix)]
 pub mod gradle_javadoc_probe;
+#[cfg(unix)]
+pub mod gradle_javadoc_workbench;
 
 pub mod agents_block;
 pub mod language_alias;
