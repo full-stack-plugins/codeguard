@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashSet};
 
 mod capability_validation;
+mod production_acceptance_plan;
 mod python_suite_rule;
 mod javascript_binding_rule;
 pub use javascript_binding_rule::{javascript_binding_node_kinds, javascript_binding_rule_sha256};
@@ -466,3 +467,5 @@ pub use gradle_javadoc_task_plan::GradleJavadocTaskPlan;
 pub use gradle_javadoc_plan::plan_gradle_javadoc_tasks;
 pub use gradle_javadoc_diagnostic::GradleJavadocDiagnostic;
 pub use gradle_javadoc_output::parse_gradle_javadoc_output;
+
+pub use production_acceptance_plan::parse_production_acceptance_plan;

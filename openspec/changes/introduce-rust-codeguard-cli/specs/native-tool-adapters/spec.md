@@ -901,3 +901,19 @@ Gradle Javadoc repair observations SHALL use their own java.gradle.javadoc check
 #### Scenario: Unconfigured preview rules and native legal exemptions
 - **WHEN** 项目未启用 DOC preview、或原工具按单行/抽象方法/stub/None 规则不生成诊断
 - **THEN** CodeGuard 不额外添加原参数、不模拟违规，保持范围未验收；保留原生合法反例与版本边界
+
+### Requirement: Production acceptance planning SHALL preserve every registered core obligation
+
+`capabilities --acceptance-plan` SHALL expose a separate read-only repository plan for all 57 canonical languages and syntax/documentation/conventions/vulnerabilities. Each language SHALL retain its concrete target ecosystems, version/dialect qualification gaps, all five candidate platforms, implementation and evidence references, existing task identities and blockers. Java Maven and Gradle SHALL be separate paths; configuration observation SHALL NOT become CVE execution. The view SHALL NOT execute tools, read project code or grant production qualification. The legacy capabilities protocol SHALL remain unchanged.
+
+#### Scenario: A filtered plan is mistaken for all-language readiness
+- **WHEN** a caller queries only Java's acceptance plan
+- **THEN** the result SHALL retain the full registry obligation count, label the selection, preserve both Maven/Gradle paths and block qualification; filtering SHALL NOT erase the release-wide gaps
+
+#### Scenario: Planning data forges qualification or loses required paths
+- **WHEN** the plan contains a missing language/core/platform, duplicate JSON keys or identities, promoted qualification, malformed references, or no Gradle vulnerability requirement
+- **THEN** parsing/auditing SHALL reject it rather than treating metadata or file existence as acceptance
+
+#### Scenario: Referenced implementation or acceptance evidence changes
+- **WHEN** a repository audit observes missing or changed referenced source/evidence bytes or unresolved task IDs
+- **THEN** the plan snapshot SHALL fail its audit and require refreshed mapping; the runtime read-only view SHALL explicitly remain a repository snapshot, not current-project verification

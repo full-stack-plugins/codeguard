@@ -509,3 +509,5 @@ mod clang_lint_feedback;
 mod syntax_worker_mode;
 
 pub mod javascript_mode_observation;
+
+pub mod production_acceptance_plan_command;

@@ -301,6 +301,9 @@ fn parse_detect_args(args: &[String]) -> Result<(PathBuf, bool), String> {
 }
 
 fn capabilities(args: &[String]) -> ExitCode {
+    if args.iter().any(|arg| arg == "--acceptance-plan") {
+        return codeguard_cli::production_acceptance_plan_command::run(args);
+    }
     let query = match parse_capabilities_args(args) {
         Ok(value) => value,
         Err(message) => {
