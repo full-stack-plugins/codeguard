@@ -957,3 +957,8 @@ Model capture, original task execution and report ownership observation SHALL sh
 #### Scenario: Gradle CVE preparation tasks recheck their consumed original context
 - **WHEN** task verify selects a stable Gradle CVE preparation task
 - **THEN** it SHALL validate the original byte receipt, workspace, task scope and selected inputs before invoking exactly the original task paths with explicit Gradle/JDK and the original cache selection; known tool/cache identity or original configuration changes SHALL stop execution and require review. Missing original tool identity SHALL remain unqualified. Verification SHALL preserve diagnostic observations and an open task, including zero advisories, without trusting editable Markdown or claiming database coverage.
+
+
+#### Scenario: Unified check schedules explicit Gradle OWASP independently from Maven
+- **WHEN** check all/java receives bounded original Gradle OWASP task paths, selected project files, explicit existing Gradle/JDK and an optional existing module cache
+- **THEN** it SHALL schedule the original native OWASP check within the shared request budget, preserve reports/active and native-suppressed advisories and expose the Gradle checker independently from Maven. It SHALL sync sanitized stable preparation tasks and provide original-task next guidance; model capture alone, zero advisories or native failure SHALL NOT become CVE acceptance. Explicit Gradle Javadoc and CVE MAY coexist using serialized Gradle resources. Lint-only or unrelated-language commands SHALL reject CVE options before launching tools; cancellation SHALL not persist a CVE scan.

@@ -1500,4 +1500,4 @@ flowchart LR
 Java Gradle 漏洞检查新增显式原任务入口 `codeguard cve java`；JSON 原配置与可选模块缓存保留，结果仍未受信，工作台和完整原生验收待完成。详见[Gradle OWASP](Codeguard-Gradle-Vulnerability-Checks.zh_CN.md).
 
 
-显式Gradle CVE已接入已初始化工作区的脱敏稳定准备任务，next/task show保留原输入/任务参数；空报告不关闭，task verify已接入冻结原上下文局部观察，统一check仍待接线。协议/执行路径与当前验收见[Gradle漏洞检查](Codeguard-Gradle-Vulnerability-Checks.zh_CN.md)。
+显式Gradle CVE已接入已初始化工作区的脱敏稳定准备任务，next/task show保留原输入/任务参数；空报告不关闭，task verify已接入冻结原上下文局部观察，统一check现支持显式原任务调度；自动发现与完整验收仍未完成。协议/执行路径与当前验收见[Gradle漏洞检查](Codeguard-Gradle-Vulnerability-Checks.zh_CN.md)。

@@ -27,6 +27,21 @@ pub fn partial_check_sarif(report: &Value) -> Value {
                     }
                 }
             }
+            if checker == "java_gradle_cve" {
+                for task in value["reports"].as_array().into_iter().flatten() {
+                    for advisory in task["advisories"].as_array().into_iter().flatten() {
+                        let mut row = sarif_observation(checker, advisory, results.len());
+                        row["properties"]["nativeSuppressionObserved"] =
+                            advisory["suppressed_by_native_tool"].clone();
+                        row["properties"]["nativeTaskDigest"] =
+                            json!(digest(task["task_path"].as_str().unwrap_or("").as_bytes()));
+                        if advisory["suppressed_by_native_tool"] == true {
+                            row["suppressions"] = json!([{"kind":"external","status":"underReview","justification":"Suppression observed in the native tool; CodeGuard policy approval remains unverified."}]);
+                        }
+                        results.push(row);
+                    }
+                }
+            }
             collect_findings(checker, value, &mut results);
         }
     }
