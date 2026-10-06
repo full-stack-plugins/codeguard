@@ -1,0 +1,167 @@
+{
+  "authority": "local_unverified",
+  "command_status": "incomplete",
+  "coverage_proven": false,
+  "delivery_decision": "not_evaluated",
+  "detailed_contract_qualification": "not_granted",
+  "documentation_configuration": {
+    "coverage_proven": false,
+    "files": [
+      {
+        "config_ref": "ruff.toml",
+        "config_sha256": "d95f54072c477cf2c90d74479aed21820e8b2282db4203b1bc0449890d23f7d2",
+        "globally_enabled_documentation_rules": [
+          "DOC201"
+        ],
+        "path": "app.py",
+        "per_file_ignores_present": false,
+        "reason": null,
+        "settings_sha256": "1e8956580f5cc0f136ad01e1913aa60a0ffb02380e4c7e6f9e50c1f2af74ddc7",
+        "source_sha256": "3b098a008d27cd64dc676167543788dbb9c96306089eb6ed0d4037b32f2e74c4",
+        "status": "selected",
+        "tool_sha256": "75a6cd9b73a7e3f17e73a83c0e65bae31b2eabc43ccd27bf139980fcba65b1c6"
+      }
+    ],
+    "next_action": "核对已观察文档规则、逐文件忽略及源码抑制；完整详细说明和语义覆盖仍须验收。",
+    "reason": null,
+    "scope": "global_rule_selection_only",
+    "selected_file_count": 1,
+    "source_file_count": 1,
+    "status": "observed",
+    "unavailable_file_count": 0,
+    "unselected_file_count": 0
+  },
+  "documentation_findings": [],
+  "documentation_rule_coverage": "unverified",
+  "execution_budget": {
+    "enforcement": "native_execution_only",
+    "source": "builtin_default",
+    "timeout_ms": 1800000
+  },
+  "exit_code": 3,
+  "language": "python",
+  "local_scan_complete": true,
+  "native_report": {
+    "adapter_sha256": null,
+    "backlog_status": "synced_partial",
+    "backlog_sync": {
+      "failed_reports": 0,
+      "historical_findings": 0,
+      "imported_reports": 1,
+      "new_blockers": 0,
+      "new_findings": 0
+    },
+    "checker_configurations": [
+      {
+        "build_root": ".",
+        "checker_id": "python.ruff",
+        "configuration": "configured",
+        "configuration_ref": "ruff.toml",
+        "next_action": "用原生 Ruff 核对生效规则、扫描范围和诊断"
+      }
+    ],
+    "command_status": "incomplete",
+    "delivery_decision": "not_evaluated",
+    "execution_budget": {
+      "enforcement": "native_execution_only",
+      "source": "builtin_default",
+      "timeout_ms": 1800000
+    },
+    "exit_code": 3,
+    "files": [
+      {
+        "config_sha256": "d95f54072c477cf2c90d74479aed21820e8b2282db4203b1bc0449890d23f7d2",
+        "configuration_ref": "ruff.toml",
+        "findings": [],
+        "path": "app.py",
+        "reason": null,
+        "recheck_argv": [
+          "ruff",
+          "check",
+          "app.py"
+        ],
+        "recheck_cwd": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-py-comments-55709-0",
+        "rule_settings": {
+          "coverage_proven": false,
+          "globally_enabled_mapped_rules": [
+            "F401"
+          ],
+          "per_file_ignores_present": false,
+          "settings_sha256": "1e8956580f5cc0f136ad01e1913aa60a0ffb02380e4c7e6f9e50c1f2af74ddc7"
+        },
+        "run_status": "passed",
+        "source_sha256": "3b098a008d27cd64dc676167543788dbb9c96306089eb6ed0d4037b32f2e74c4",
+        "suppression_audit": {
+          "audit_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+          "scope": "source_comments_only",
+          "suppressed_diagnostic_count": 0,
+          "suppressed_rule_ids": []
+        },
+        "tool_sha256": "75a6cd9b73a7e3f17e73a83c0e65bae31b2eabc43ccd27bf139980fcba65b1c6"
+      }
+    ],
+    "incomplete_reasons": [],
+    "language": "python",
+    "local_scan_complete": true,
+    "native_tool_version": "ruff 0.16.8",
+    "next": {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "verification_required",
+      "exit_code": 0,
+      "next_actions": [
+        [
+          "codeguard",
+          "check",
+          "all",
+          "."
+        ]
+      ],
+      "operation": "next",
+      "reason": "no_tasks_without_fresh_full_gate",
+      "repair_brief": null,
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.1.0"
+    },
+    "operation": "lint",
+    "repair_brief_reason": null,
+    "repair_brief_status": "available",
+    "report_type": "python_lint_feedback",
+    "rulepack_approval": "unverified",
+    "run_id": "lint-55735-1791317223333741000",
+    "schema_version": "0.12.0",
+    "scope": "local_native_scan_only",
+    "tool_approval": "unverified",
+    "workspace_binding": "bound",
+    "workspace_id": "ws-99c78aac58ec291e455dd28c3e61e170"
+  },
+  "next": {
+    "authority": "local_unverified",
+    "command_status": "complete",
+    "delivery_decision": "not_evaluated",
+    "disposition": "verification_required",
+    "exit_code": 0,
+    "next_actions": [
+      [
+        "codeguard",
+        "check",
+        "all",
+        "."
+      ]
+    ],
+    "operation": "next",
+    "reason": "no_selected_tasks_without_fresh_language_check",
+    "repair_brief": null,
+    "report_type": "repair_brief_preview",
+    "schema_version": "0.1.0"
+  },
+  "next_actions": [
+    "核对原项目 Ruff 文档规则和配置；不会隐式启用 preview 或改写规则选择。",
+    "按稳定任务使用 task verify 原工具复检；零诊断不证明文档规则完整启用、详细内容准确或任务已关闭。"
+  ],
+  "operation": "comments",
+  "reason": "native_documentation_coverage_unverified",
+  "report_type": "python_comments_feedback",
+  "schema_version": "0.2.0"
+}

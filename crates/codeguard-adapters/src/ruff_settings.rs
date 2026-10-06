@@ -30,6 +30,16 @@ impl RuffSettingsObservation {
         self.enabled_native_rules.contains(rule_id)
     }
 
+    /// 返回同轮设置全局启用的文档规则；结果不证明逐文件忽略、源码抑制或详细语义覆盖。
+    #[must_use]
+    pub fn globally_enabled_documentation_rules(&self) -> Vec<String> {
+        self.enabled_native_rules
+            .iter()
+            .filter(|rule| crate::is_ruff_documentation_rule(rule))
+            .cloned()
+            .collect()
+    }
+
     /// 返回同轮原生设置中的明确Python目标，或无法确定关闭目标的具体原因。
     /// 该值不证明项目目标来源或批准；调用者必须核对工具、配置与源码连续性。
     pub fn explicit_python_target(&self) -> Result<&str, &'static str> {

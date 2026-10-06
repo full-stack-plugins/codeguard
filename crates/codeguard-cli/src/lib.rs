@@ -539,3 +539,6 @@ pub mod gradle_cve_task_recheck;
 mod python_comments_arguments;
 #[cfg(unix)]
 pub mod python_comments_command;
+
+#[cfg(unix)]
+mod python_documentation_configuration;

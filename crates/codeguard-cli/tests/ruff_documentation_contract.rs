@@ -146,6 +146,10 @@ fn actual_pydoclint_rules_reach_comments_tasks_and_original_rechecks() {
             "{direct}"
         );
         assert_eq!(direct["detailed_contract_qualification"], "not_granted");
+        assert_eq!(
+            direct["documentation_configuration"]["files"][0]["globally_enabled_documentation_rules"],
+            json!([rule])
+        );
         let first = project.check(tool);
         let files = first["native_results"]["python_lint"]["files"]
             .as_array()
@@ -216,6 +220,16 @@ fn actual_pydoclint_rules_reach_comments_tasks_and_original_rechecks() {
             absent["observation"], "candidate_absent_unverified_policy",
             "{rule}: {absent}"
         );
+        let clean_comments = project.comments(tool);
+        assert_eq!(clean_comments["documentation_findings"], json!([]));
+        assert_eq!(
+            clean_comments["documentation_configuration"]["selected_file_count"],
+            1
+        );
+        assert_eq!(
+            clean_comments["documentation_configuration"]["files"][0]["globally_enabled_documentation_rules"],
+            json!([rule])
+        );
         let fact: Value = serde_json::from_slice(
             &fs::read(
                 project
@@ -226,7 +240,7 @@ fn actual_pydoclint_rules_reach_comments_tasks_and_original_rechecks() {
         )
         .unwrap();
         assert_eq!(fact["state"], "open");
-        evidence.push(json!({"codeguard_binary_sha256":binary_sha256,"rule":rule,"direct_comments":direct,"first":first,"next":next,"present":present,"suppressed":suppressed,"repeated":repeated,"absent":absent,"fact_state":fact["state"]}));
+        evidence.push(json!({"codeguard_binary_sha256":binary_sha256,"rule":rule,"direct_comments":direct,"clean_comments":clean_comments,"first":first,"next":next,"present":present,"suppressed":suppressed,"repeated":repeated,"absent":absent,"fact_state":fact["state"]}));
     }
     assert_eq!(
         binary_sha256,
@@ -320,6 +334,14 @@ fn actual_native_exemptions_and_implicit_exception_require_no_invented_violation
     .unwrap();
     let direct_unconfigured = project.comments(tool);
     assert_eq!(direct_unconfigured["documentation_findings"], json!([]));
+    assert_eq!(
+        direct_unconfigured["documentation_configuration"]["unselected_file_count"],
+        1
+    );
+    assert_eq!(
+        direct_unconfigured["documentation_configuration"]["files"][0]["status"],
+        "not_selected"
+    );
     assert_eq!(
         direct_unconfigured["documentation_rule_coverage"],
         "unverified"
