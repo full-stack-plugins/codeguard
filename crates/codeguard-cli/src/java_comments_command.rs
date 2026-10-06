@@ -208,7 +208,7 @@ pub fn run(args: &[String]) -> ExitCode {
     });
     if let Some(root) = root {
         let maven = report["native_observation"]["probe_mode"] == "maven_multifile";
-        report["schema_version"] = json!(if maven { "0.5.0" } else { "0.4.0" });
+        report["schema_version"] = json!(if maven { "0.6.0" } else { "0.4.0" });
         report["workbench"] = if maven {
             crate::maven_javadoc_workbench::connect(&root, &report, maven_snapshot.as_ref())
         } else {
@@ -218,7 +218,7 @@ pub fn run(args: &[String]) -> ExitCode {
         if maven {
             report["next_actions"] = json!([
                 "依据Maven原生诊断及稳定任务恢复环境或修复注释，使用相同原POM、Maven、JDK和固定离线仓库重跑comments java",
-                "Maven原任务task verify及可信关闭尚未接通，零诊断和勾选不能关闭任务"
+                "按原Maven任务运行task verify记录局部复检；可信关闭尚未验收，零诊断和勾选不能关闭任务"
             ]);
         }
         if !maven {

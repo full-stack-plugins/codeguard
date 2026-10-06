@@ -1,0 +1,53 @@
+{
+  "schema_version": "0.1.0",
+  "scope": "maven_javadoc_original_task_local_recheck",
+  "native_process": "controlled_fixture_not_actual_maven_plugin",
+  "regression": {
+    "passed": 110,
+    "failed": 0,
+    "ignored": 22,
+    "targets": 8
+  },
+  "schema": {
+    "new_meta_definitions": 5,
+    "actual_outputs": 17,
+    "rejected_false_coverage": 6,
+    "aggregate_0_57_runtime": "not_verified",
+    "aggregate_0_38_p3c_brief": "schema_mismatch_pending"
+  },
+  "authority": "local_unverified",
+  "coverage_proven": false,
+  "delivery_decision": "not_evaluated",
+  "source_sha256": {
+    "schemas/check-feedback-v0.57.schema.json": "df3566e6da1d74463794079ab49c1428d63880411e91aec81fb23fdb484cc8da",
+    "schemas/maven-javadoc-task-recheck-v0.1.schema.json": "66abe164541c2e27ae1f08163c466f825ce83a28dd40dbb671e98246485f6aab",
+    "schemas/maven-javadoc-repair-brief-preview-v0.2.schema.json": "cbe7ddc0e71425cbc607fb9b02e11fa358c73ab5f8737a0791ecc35bfd8c5a52",
+    "schemas/task-verification-preview-v0.28.schema.json": "27b1adeedc3f8883742abcfce151307ab7d94cfa4e9b664dc4aa462085191bbd",
+    "schemas/java-comments-feedback-v0.6.schema.json": "fb98ca8a9b7e1d24ff081a71f1c8ca41d48727d5a782d9df42921cd955e13c74",
+    "crates/codeguard-cli/src/maven_javadoc_task_recheck.rs": "6242888efca96783ee0242422e0087843a0f6653343767303bb0e83cbb0ebdef",
+    "crates/codeguard-cli/tests/maven_javadoc_input_stability.rs": "766031f5a1b4dee8bf152384a4a661100d49029583a558212818ad206adc3ce3"
+  },
+  "logs_sha256": {
+    "/private/tmp/cg-maven-task-verify-red.log": "8c29830092b48317a1b2945c8db0816baa94d397d2b6ade8ffae2106f596535a",
+    "/private/tmp/cg-maven-task-verify-attempts.log": "9523ead984e75b8d9a987ff68f486cade943cf3e5160471b8fbf8851c7c969d3",
+    "/private/tmp/cg-maven-task-verify-attempts-fixed.log": "21356d126b9bec83fe5b0efcfaa57da1919dadccdf32b011276fc46789d9cde2",
+    "/private/tmp/cg-maven-task-aggregate-current.log": "116d99c85e06fc50adb71ba7eab881e156966e5d47fabeb7dd9018cdf91cd23a",
+    "/private/tmp/cg-maven-task-recheck-final.log": "d6015c588d844962dca3ea5d8e0e6d34aa68a47e429403c8d36f498c494fd052",
+    "/private/tmp/cg-maven-task-clippy-current.log": "47b9136156df81104eb088bbf3668f9e674660793742827bde1894cfb7e11040"
+  },
+  "report_sha256": {
+    "verify-missing.json": "08b6031efb81e0ae696771663cf477ce83139abde9dc1d5c831e9ce5264b89e7",
+    "verify-absent.json": "998620887c527999c1afa1119f012094820cf48430ebe666c66e2638146e3a67",
+    "preparation-saved.json": "37986842bf2faba94a82b24b2421375075018a32a10c4e6d5953f91da8c8d7aa",
+    "verify-config-change.json": "c90993fe80086f704f42bdd99a303d7979a3912b50cd149b79a01d6d8c59148c",
+    "verify-tool-change.json": "87c07c482bdda11a89f8d83eb9ad04d420dd748e598f372d3a39c18f51e5fa93",
+    "next.json": "9b543503a5c5c7d00ae6681b1152570db49068a7b885fcbecfba7ad11dfb390d",
+    "complete-wrapper.json": "32410e9c54c72c33657a7621b7c33ee66bd310a041cf4ff023ac1b0a1614b4aa",
+    "aggregate.json": "4adbf8cb0f68838a1be3b781b86ede63a2b72583c8752e32f501eb3b393069f1",
+    "verify-still.json": "bb94224c5d2cb2df3e51b12056c92aaae66c65f3a0249c4eaa27815c01ec5667",
+    "complete-saved.json": "0f19234ab8c74ce267c385326e9a9215ffefc730bd89ffaaeaad49ed150b437a",
+    "preparation-wrapper.json": "e9d14461f63cd84720bdf80d07bb45231f54086ab1c899c389eaa83e63b024ef",
+    "verify-scope-change.json": "3509069725a6beb4d86cf26558cbba2357a172cd97b1ec6e18a0f80f02b66bb6"
+  },
+  "protected_erlang_draft_sha256": "2e3a296072e6a3aa34b561799c18c7d8b621d00f8786301d2612cee8cdab85b6"
+}

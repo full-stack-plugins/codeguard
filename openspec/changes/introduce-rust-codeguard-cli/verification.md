@@ -2504,3 +2504,7 @@ WASM CLI全目标Clippy -D warnings、定向rustfmt、分层、OpenSpec strict�
 ## 2026-10-06 Maven Javadoc 工作台接线
 
 扫描前源码/POM快照绑定原生多文件观察，导入复核输入、构建根、原POM、工具观察、规则位置及指纹，重复扫描复用任务；不完整执行只建准备任务。已消费历史报告按原字节收据保留，源码变化不重演历史。七目标88通过/0失败/22条件忽略，三新schema及两组实际包装/观察/简报、伪造coverage反例通过。严格Clippy、分层、OpenSpec strict、diff通过。没有真实Maven新工作台、完整模型、原任务复检或可信关闭证明，父任务保持开放。见 tests/acceptance/maven-javadoc-workbench.md。
+
+## 2026-10-06 Maven Javadoc 原任务复检局部验收
+
+原任务复检绑定首次报告/工作区/构建根/POM/Maven/JDK/离线仓库，重新执行既有多文件探针；缺工具及身份变化未完成，POM/源集变化要求覆盖复核，零诊断仅消失候选，范围外阻塞保留。租约下两次无进展转needs_decision。受控Maven夹具六项目标及八目标110通过/0失败/22条件忽略；五schema元定义、17实际输出、六伪造coverage反例、CLI全目标Clippy、分层及OpenSpec strict通过。真实check java聚合0.38的P3C准备简报不符合旧schema，独立记为待修复，未声称聚合或真实Maven插件验收通过。详见 tests/acceptance/maven-javadoc-task-recheck.md 及证据JSON。可信关闭/复发、复杂项目、宿主及完整目标保持未完成。

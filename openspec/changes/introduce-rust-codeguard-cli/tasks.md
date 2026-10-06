@@ -1879,3 +1879,11 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 - [x] 重复扫描、伪造指纹/覆盖、源码变化、缺前置准备、已消费历史收据、公开schema实例和受影响回归验收。
 
 见 [局部验收](../../../tests/acceptance/maven-javadoc-workbench.md)。88通过/0失败/22条件忽略；真实Maven新工作台、原任务复检、完整模型与可信关闭未验收，6.x/9.x父任务仍开放。
+
+## 2026-10-06 Maven Javadoc 原任务局部复检
+
+- [x] 接通Maven原任务task verify、首次报告与工具上下文绑定、POM/源集变化复核、原租约/尝试与next历史，不自动关闭。
+- [x] 六类复检输出、范围外阻塞、两次无进展及八目标回归、严格schema和Clippy验收；受控进程与真实工具验收明确区分。
+- [ ] 修复check java的P3C准备简报与聚合0.38 schema不兼容，并验证完整实际输出及拒绝反例。
+
+见 [验收](../../../tests/acceptance/maven-javadoc-task-recheck.md)。110通过/0失败/22条件忽略；真实Maven新工作台、复杂项目、可信关闭/复发与实际宿主未完成，6.x/9.x父任务仍开放。

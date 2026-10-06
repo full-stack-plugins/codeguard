@@ -153,6 +153,8 @@ mod javadoc_workbench;
 #[cfg(unix)]
 mod maven_javadoc_workbench;
 #[cfg(unix)]
+mod maven_javadoc_task_recheck;
+#[cfg(unix)]
 mod javadoc_task_recheck;
 mod java_javadoc_scan;
 #[cfg(unix)]

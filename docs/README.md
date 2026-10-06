@@ -41,3 +41,24 @@ The [consolidation record](../openspec/changes/introduce-rust-codeguard-cli/docu
 `@partme.ai/codeguard@0.1.4` is published for Apple Silicon macOS from clean source `1cd458f6e01a44a74388243e964e3f45290ac18e`. It includes all 32 runnable, unqualified grammars, bounded edited-file checks, stable native-confirmation tasks, native rechecks and `next` guidance. Registry hashes, a fresh-cache npx invocation, the actual public-package repair loop with Zig 0.16.0, and the source commit's Linux CI passed. Ordinary CLI clean output cannot close a task without trusted policy. The protected Zig SDK is a source integration API; npm does not expose a self-approval command. Plugin activation, installed-host acceptance, full precision, other platforms and complete gates remain open. Earlier 0.1.3 evidence is historical. See [0.1.4 acceptance](../tests/acceptance/npm-0.1.4-candidate.md).
 
 Native-first task creation, current evidence and recheck protocols: [Codeguard-Native-Repair-Workflow](Codeguard-Native-Repair-Workflow.md).
+
+## Maven Javadoc original-task verification (source implementation)
+
+Run `codeguard task verify CG-task-id . --maven-tool /absolute/mvn --java-home /absolute/jdk --maven-repo /absolute/offline-repository --repo-sha256 pinned-digest --format json`. Verification binds the original workspace, build root, POM, Maven, JDK and repository identity and reuses the native multi-file probe. Missing or changed tools yield incomplete feedback. POM or source-membership changes yield `rule_coverage_requires_review`. Remaining diagnostics produce `still_present`; local zero diagnostics after repair produce `candidate_absent_unverified_policy`, with the task remaining open. Completing the main-source probe cannot clear an out-of-scope preparation task.
+
+Verification uses existing leases and attempt history; two unchanged attempts lead to `next` returning `needs_decision`. Maven wrapper0.6, inner brief0.5, task container0.1 and public verification0.28 expose `task_verify_status=local_observation_only`; JDK protocols and historical schemas remain available. Aggregate0.57 strictly supports the new Maven brief; this batch's actual aggregate selected a higher-priority P3C preparation task and remained0.38; its historical schema rejected that P3C preparation brief. This defect is tracked separately and aggregate protocol acceptance is not claimed.
+
+```mermaid
+flowchart LR
+    A[Task and original report] --> B[Bind workspace root and tools]
+    B --> C[Original Maven multi-file probe]
+    C --> D{POM and source membership unchanged}
+    D -->|Changed| E[Keep task and review coverage]
+    D -->|Unchanged| F[Record remaining or absence candidate]
+    F --> G[Lease and attempt history]
+    G --> H{Repeated no progress}
+    H -->|Twice| I[Request concrete decision]
+    H -->|Below budget| J[Repair and recheck]
+```
+
+See [acceptance](../tests/acceptance/maven-javadoc-task-recheck.md). This increment uses controlled Maven process fixtures. Actual Maven-plugin workbench acceptance, effective models, trusted closure/recurrence, actual hosts and release acceptance remain incomplete.

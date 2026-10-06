@@ -858,7 +858,7 @@ codeguard comments java . --java-home /absolute/jdk21 --maven-tool /absolute/mvn
 
 The independent `java_comments_feedback 0.1.0` wrapper preserves the existing report under `native_observation`; the old `lint java --checker javadoc` protocol remains unchanged. Budget precedence is CLI, registered environment, project default, then built-in default. All native child work shares one deadline. Feedback exposes target kind, budget, observations and next actions. Zero local diagnostics still means `coverage_proven=false`, `delivery_decision=not_evaluated`, exit3 (130 on cancellation). No implicit installation or source changes occur.
 
-**Scope limitation:** Maven multi-file task synchronization is connected; Maven original-task verification, trusted closure/recurrence and actual host acceptance remain incomplete; standalone files can explicitly bind --workspace as described below. Trusted closure remains incomplete. This entry creates no fake tasks and does not close findings from a local probe. Replace the absolute tool paths and offline-repository digest with real current values.
+**Scope limitation:** Maven multi-file task synchronization is connected; trusted closure/recurrence and actual host acceptance remain incomplete; standalone files can explicitly bind --workspace as described below. Trusted closure remains incomplete. This entry creates no fake tasks and does not close findings from a local probe. Replace the absolute tool paths and offline-repository digest with real current values.
 
 ### Javadoc project workbench integration (source increment)
 
@@ -875,7 +875,7 @@ flowchart LR
     C -->|Failure| H[Visible persistence error without fake tasks]
 ```
 
-Missing configuration or incomplete execution creates preparation records, not source violations or new mandatory delivery obligations. Feedback exposes `workbench.status/new_findings/new_blockers/next`. Persistence failures return no fake tasks. Briefs and task text include evidence, rule basis, scope, steps, recheck and closure conditions. Local zero diagnostics leave prior tasks open with `task_verify_status=local_observation_only`; original-task rechecks are described below. Maven multi-file task synchronization is connected; Maven original-task verification, trusted closure/recurrence and actual host acceptance remain incomplete; explicit-file integration is described below, as do trusted closure and actual host acceptance.
+Missing configuration or incomplete execution creates preparation records, not source violations or new mandatory delivery obligations. Feedback exposes `workbench.status/new_findings/new_blockers/next`. Persistence failures return no fake tasks. Briefs and task text include evidence, rule basis, scope, steps, recheck and closure conditions. Local zero diagnostics leave prior tasks open with `task_verify_status=local_observation_only`; original-task rechecks are described below. Maven multi-file task synchronization is connected; trusted closure/recurrence and actual host acceptance remain incomplete; explicit-file integration is described below, as do trusted closure and actual host acceptance.
 
 ### Recheck the original Javadoc task (source increment)
 
@@ -898,7 +898,7 @@ flowchart LR
     F -->|No| H[Continue rule repair or environment recovery]
 ```
 
-Current protocols: bound-workbench wrapper `java_comments_feedback 0.4.0`, Javadoc brief0.3, native container `javadoc_task_recheck 0.2.0`, public `task_verification_preview 0.27.0`. Older schemas remain readable. `task_verify_status=local_observation_only` means local rechecks are connected; trusted closure remains unaccepted. Zero diagnostics after documentation repair only records an absence candidate and leaves the task open. Whitelist approval, full project-rule attribution and actual host acceptance remain independent work. Maven multi-file task synchronization is connected; Maven original-task verification, trusted closure/recurrence and actual host acceptance remain incomplete; explicit-file integration is described below.
+Current protocols: bound-workbench wrapper `java_comments_feedback 0.4.0`, Javadoc brief0.3, native container `javadoc_task_recheck 0.2.0`, public `task_verification_preview 0.27.0`. Older schemas remain readable. `task_verify_status=local_observation_only` means local rechecks are connected; trusted closure remains unaccepted. Zero diagnostics after documentation repair only records an absence candidate and leaves the task open. Whitelist approval, full project-rule attribution and actual host acceptance remain independent work. Maven multi-file task synchronization is connected; trusted closure/recurrence and actual host acceptance remain incomplete; explicit-file integration is described below.
 
 ### Explicit Java file workbench (source increment)
 
@@ -911,7 +911,7 @@ codeguard task verify CG-<task-identity> . --java-home /absolute/jdk21 --format 
 
 Observation0.2, brief0.3 and recheck0.2 add `observation_scope`: `explicit_file_probe` means an explicitly selected file and requires null configuration references; `configured_project_probe` still selects main sources through original project configuration. Task rechecks preserve the original mode. Adding a POM later cannot turn a file probe into a project check. Lines only locate evidence; original rule/file/anchor identity stays stable. A missing JDK creates preparation tasks only. Local zero diagnostics or synchronization never closes a task.
 
-The bound-workbench wrapper is now `java_comments_feedback 0.4.0`, public verification is `task_verification_preview 0.27.0`; older schemas remain available. Human output also shows workbench status, task identity, mode, next step and recheck arguments. Maven multi-file task synchronization is connected; Maven original-task verification, trusted closure/recurrence and actual host acceptance remain incomplete.
+The bound-workbench wrapper is now `java_comments_feedback 0.4.0`, public verification is `task_verification_preview 0.27.0`; older schemas remain available. Human output also shows workbench status, task identity, mode, next step and recheck arguments. Maven multi-file task synchronization is connected; trusted closure/recurrence and actual host acceptance remain incomplete.
 
 ### Maven Javadoc multi-file workbench (source increment)
 
@@ -922,6 +922,27 @@ codeguard comments java . --maven-tool /absolute/mvn --java-home /absolute/jdk21
 codeguard next . --format json
 ```
 
-The Maven-bound wrapper is `java_comments_feedback 0.5.0`, the saved observation is `maven_javadoc_workbench_observation 0.1.0`, and the inner repair brief is0.4 with `observation_scope=configured_maven_multifile_probe`. Existing JDK file/project wrappers and recheck protocols remain available. Feedback includes the stable task, evidence, native rule, allowed scope and original Maven rescan arguments. `task_verify_status=not_integrated` explicitly identifies the missing Maven task-verification integration; a JDK single-file check cannot substitute for it. Preparation tasks restore the environment, repeat scans reuse the task, and local zero diagnostics do not close historical tasks.
+The Maven-bound wrapper is `java_comments_feedback 0.6.0`, the saved observation is `maven_javadoc_workbench_observation 0.1.0`, and the inner repair brief is0.5 with `observation_scope=configured_maven_multifile_probe`. Existing JDK file/project wrappers and recheck protocols remain available. Feedback includes the stable task, evidence, native rule, allowed scope and original Maven rescan arguments. `task_verify_status=local_observation_only` identifies connected local Maven task verification; a JDK single-file check cannot substitute for it. Preparation tasks restore the environment, repeat scans reuse the task, and local zero diagnostics do not close historical tasks.
 
-This covers the existing simple static-POM direct-replay probe. Effective models, complex projects, Maven original-task verification, trusted closure/recurrence, actual hosts and release acceptance remain open. This increment uses controlled Maven process fixtures and does not claim actual plugin execution. See `tests/acceptance/maven-javadoc-workbench.md`.
+This covers the existing simple static-POM direct-replay probe. Effective models, complex projects, trusted closure/recurrence, actual hosts and release acceptance remain open. This increment uses controlled Maven process fixtures and does not claim actual plugin execution. See `tests/acceptance/maven-javadoc-workbench.md`.
+
+## Maven Javadoc original-task verification (source implementation)
+
+Run `codeguard task verify CG-task-id . --maven-tool /absolute/mvn --java-home /absolute/jdk --maven-repo /absolute/offline-repository --repo-sha256 pinned-digest --format json`. Verification binds the original workspace, build root, POM, Maven, JDK and repository identity and reuses the native multi-file probe. Missing or changed tools yield incomplete feedback. POM or source-membership changes yield `rule_coverage_requires_review`. Remaining diagnostics produce `still_present`; local zero diagnostics after repair produce `candidate_absent_unverified_policy`, with the task remaining open. Completing the main-source probe cannot clear an out-of-scope preparation task.
+
+Verification uses existing leases and attempt history; two unchanged attempts lead to `next` returning `needs_decision`. Maven wrapper0.6, inner brief0.5, task container0.1 and public verification0.28 expose `task_verify_status=local_observation_only`; JDK protocols and historical schemas remain available. Aggregate0.57 strictly supports the new Maven brief; this batch's actual aggregate selected a higher-priority P3C preparation task and remained0.38; its historical schema rejected that P3C preparation brief. This defect is tracked separately and aggregate protocol acceptance is not claimed.
+
+```mermaid
+flowchart LR
+    A[Task and original report] --> B[Bind workspace root and tools]
+    B --> C[Original Maven multi-file probe]
+    C --> D{POM and source membership unchanged}
+    D -->|Changed| E[Keep task and review coverage]
+    D -->|Unchanged| F[Record remaining or absence candidate]
+    F --> G[Lease and attempt history]
+    G --> H{Repeated no progress}
+    H -->|Twice| I[Request concrete decision]
+    H -->|Below budget| J[Repair and recheck]
+```
+
+See [acceptance](tests/acceptance/maven-javadoc-task-recheck.md). This increment uses controlled Maven process fixtures. Actual Maven-plugin workbench acceptance, effective models, trusted closure/recurrence, actual hosts and release acceptance remain incomplete.
