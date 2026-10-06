@@ -1,5 +1,10 @@
 //! CLI 共享的 Rust 开发期验收与命令应用服务入口。
 
+#[cfg(unix)]
+pub mod gradle_model_probe;
+#[cfg(unix)]
+pub mod gradle_model_probe_request;
+
 pub mod agents_block;
 pub mod language_alias;
 mod command_catalogue;

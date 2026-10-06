@@ -1397,3 +1397,10 @@ flowchart LR
 ## 同构建根的 Maven 与 Gradle 归属
 
 静态发现现逐份保留同一物理目录的Maven、Groovy Gradle、Kotlin Gradle配置引用。损坏POM不能遮蔽Gradle，两种Gradle脚本并存也分别保留。Java依赖/CVE/安全类别保留构建器混合或Gradle未解析状态，不再挂全范围Maven身份；已经取得的Maven局部依赖图和漏洞观察仍放在native_results。check反馈0.61保留普通检查/lint-only两个封闭契约，Java注释not_configured原因严格限于对应类别，旧schema不改。这是范围归属修复，不是原生Gradle插件执行或生产验收完成。本地缓存Gradle8.10.2版本命令已实际运行，所检查OWASP Gradle插件缓存路径不存在，本批未安装或下载。见[验收记录](../tests/acceptance/java-mixed-build-roots.md)。
+
+
+### Gradle 原生模型局部采集（开发期）
+
+Rust 应用服务 `gradle_model_probe::observe` 可通过固定 init 脚本、已有 Gradle 和独立离线工作目录，观察选定构建文件对应的真实插件及任务实现基类/启用状态。已实测 Gradle 8.10.2 的 Groovy 多子项目与 Kotlin DSL；普通同名任务不授予 OWASP 身份。完整 Gradle 制品树、选定源码及脚本前后核对，JDK 目前只核对入口和 release。报告协议为 `gradle-model-probe-v0.1.schema.json`，保持局部未受信配置观察；不证明完整配置覆盖或质量检查通过。
+
+该服务尚未接入公开命令，不改变 detect/config explain 的只读行为；后续仍需原生 Javadoc/规范/漏洞任务执行、报告归属、依赖图和漏洞库及修复闭环。真实测试与边界见 [原生模型局部采集验收](../tests/acceptance/gradle-native-model-probe.md)。
