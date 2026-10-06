@@ -40,7 +40,7 @@ fn read(root: &Path, run: &str, digest: Option<&str>) -> Result<Value, &'static 
     }
     Ok(r)
 }
-/// 创建当前局部指引；同文件全部函数定位属于一个策略组，专用verify记录局部观察，受控尝试未接线。
+/// 创建当前局部指引；同文件全部函数定位属于一个策略组，专用verify记录局部观察，受控尝试仅记录局部修复历史。
 pub(super) fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static str> {
     let run = fact["first_run_id"].as_str().ok_or("finding_run_invalid")?;
     let digest = fact["first_report_sha256"]
@@ -130,10 +130,47 @@ pub(super) fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate
         first["selected_tool"],
         "--format=json"
     ]);
-    let brief = json!({"schema_version":"0.32.0","task_id":id,"kind":"finding","checker_id":checker(&first),"scope":first["path"],"source_sha256":latest["source_sha256"],"structural_rule_id":RULE,"rule_source":"codeguard_structural_policy","evidence_ref":{"first_run_id":run,"first_report_sha256":digest},"current_run_id":latest["run_id"],"observation_status":status,"structural_positions":if actionable {positions(&latest)}else{Vec::new()},"rule_basis":"函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。","constraints":["仅修改当前文件文档注释，保留API及行为","同名/重载定位属于文件策略组，不能据名字选择单一函数","不关闭检查器、不以占位文本或白名单自批代替修复"],"allowed_paths":if actionable {json!([first["path"]])}else{json!([])},"affected_paths":[first["path"]],"disposition":if actionable {"actionable"}else{"needs_decision"},"reason_code":status,"step":["按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。","使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"],"recheck_argv":argv,"history":{"status":"native_structural_observations_only","task_verify":"local_observation","attempt_journal":"not_integrated"},"closure_condition":"原命令局部复扫不关闭；专用task verify记录局部观察；仍须受控尝试、完整详细准确性/项目覆盖与可信关闭/复发验收。","authority":"local_unverified","delivery_decision":"not_evaluated"});
+    let mut brief = json!({"schema_version":"0.33.0","task_id":id,"kind":"finding","checker_id":checker(&first),"scope":first["path"],"source_sha256":latest["source_sha256"],"structural_rule_id":RULE,"rule_source":"codeguard_structural_policy","evidence_ref":{"first_run_id":run,"first_report_sha256":digest},"current_run_id":latest["run_id"],"observation_status":status,"structural_positions":if actionable {positions(&latest)}else{Vec::new()},"rule_basis":"函数文档结构须包含文档、用途、命名参数及适用返回说明；原AST事实不是Clang警告或语义准确性证明。","constraints":["仅修改当前文件文档注释，保留API及行为","同名/重载定位属于文件策略组，不能据名字选择单一函数","不关闭检查器、不以占位文本或白名单自批代替修复"],"allowed_paths":if actionable {json!([first["path"]])}else{json!([])},"affected_paths":[first["path"]],"disposition":if actionable {"actionable"}else{"needs_decision"},"reason_code":status,"step":["按所有当前函数字节/行列证据，依据真实声明和行为补齐缺失组件。","使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"],"recheck_argv":argv,"closure_condition":"原命令局部复扫不关闭；专用task verify记录局部观察；仍须跨输入语义无进展、完整详细准确性/项目覆盖与可信关闭/复发验收。","authority":"local_unverified","delivery_decision":"not_evaluated"});
+    brief["action_id"] = json!(super::canonical_action_id(&brief)?);
+    let history = crate::task_attempt_command::attempt_history(root, id, &brief)?;
+    let mut priority = if actionable { 1 } else { 0 };
+    if history["open_attempt_id"].is_string() {
+        brief["disposition"] = json!("waiting");
+        brief["reason_code"] = json!("attempt_in_progress");
+        brief["step"] = json!(["由持有租约的执行者完成当前尝试并记录结果，不重复修改同一任务。"]);
+        priority = 0;
+    } else if history["awaiting_verification"] == true {
+        brief["disposition"] = json!("verification_required");
+        brief["reason_code"] = json!("original_verification_required");
+        brief["step"] = json!(["执行绑定原工具与标准的task verify；ready记录不能代替复检。"]);
+        priority = 0;
+    } else if history["unverified_prior_attempt_count"]
+        .as_u64()
+        .unwrap_or(0)
+        > 0
+    {
+        brief["disposition"] = json!("needs_decision");
+        brief["reason_code"] = json!("historical_verification_evidence_unavailable");
+        brief["step"] =
+            json!(["恢复早先尝试的原结构复检报告或调查失效原因；缺失证据不能恢复修复预算。"]);
+        priority = 0;
+    } else if history["no_progress_count"].as_u64().unwrap_or(0) >= 2 && actionable {
+        brief["disposition"] = json!("needs_decision");
+        brief["reason_code"] = json!("no_progress_budget_exhausted");
+        brief["step"] = json!([format!(
+            "原工具结构策略 {} 对同一输入两次复检仍存在；核对函数组件、未知声明和失败记录，提出具体修复或误报纠错决策，重复扫描不能重置预算。",
+            RULE
+        )]);
+        priority = 0;
+    }
+    if brief["disposition"] != "actionable" {
+        brief["allowed_paths"] = json!([]);
+        brief["structural_positions"] = json!([]);
+    }
+    brief["history"] = history;
     Ok(Candidate {
         id: id.into(),
-        priority: if actionable { 1 } else { 0 },
+        priority,
         brief,
     })
 }

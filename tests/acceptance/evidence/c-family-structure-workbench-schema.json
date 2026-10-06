@@ -1,12 +1,12 @@
 {
   "evidence_kind": "development_structure_workbench_schema",
   "qualification": "not_granted",
-  "schemas_valid": 500,
-  "historical_schemas_unchanged": 495,
+  "schemas_valid": 503,
+  "historical_schemas_unchanged": 500,
   "feedback_and_brief_pairs_valid": 20,
   "task_show_valid": 4,
-  "structural_packets_valid": 28,
+  "structural_packets_valid": 44,
   "helper_native_reports_valid": 8,
-  "task_verifications_valid": 8,
+  "task_verifications_valid": 16,
   "negative_cases_rejected": 5
 }

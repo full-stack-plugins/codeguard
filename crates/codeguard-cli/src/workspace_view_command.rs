@@ -177,7 +177,7 @@ pub fn run_show(args: &[String]) -> ExitCode {
         json!([["codeguard", "task", "verify", id, "."]])
     };
     let report = json!({
-        "schema_version":if c_structure {"0.6.0"}else if c_documentation {"0.4.0"}else if brief["checker_id"] == "shell.shellcheck" {"0.3.0"}else if brief["schema_version"] == "0.12.0" {"0.2.0"}else{"0.1.0"},"report_type":"task_show_preview",
+        "schema_version":if c_structure {"0.7.0"}else if c_documentation {"0.4.0"}else if brief["checker_id"] == "shell.shellcheck" {"0.3.0"}else if brief["schema_version"] == "0.12.0" {"0.2.0"}else{"0.1.0"},"report_type":"task_show_preview",
         "operation":"task_show","request_id":request_id(),"command_status":"complete","exit_code":0,
         "task_id":id,"task":brief,"state":"open",
         "evidence_freshness":"unverified","event_chain_status":"unverified",

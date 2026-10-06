@@ -69,3 +69,26 @@ Current validation: both modes pass27 public target tests and one real internal 
 
 - [原结构复检证据](evidence/c-family-structure-recheck-native.json)
 - [WASM构建复检契约证据](evidence/c-family-structure-recheck-native-wasm.json)
+
+## 结构尝试与失败预算 / Structural attempts and failure budget
+
+新结构任务尝试身份绑定当前源码、首次语言/标准/AST profile/自有策略与原工具状态/字节摘要；同一受控repair-source动作使用共享租约与追加事件。ready-to-verify之后先执行原结构task verify；两次仍存在的当前输入复检令next停止源码修复并提供具体诊断决策。缺报告不清除失败，事件结论须匹配实际结构报告与摘要。
+
+Attempt identity includes current source, original language/standard/AST profile/policy and compiler state/bytes. Shared leases and append-only journals control repair-source. Ready attempts require original structural verification; two still-present rechecks withdraw repair permission for unchanged inputs. Missing evidence does not remove failures; event outcomes must match actual report bytes and structure.
+
+```mermaid
+flowchart LR
+    A[领取租约] --> B[开始受控修复]
+    B --> C[记录ready]
+    C --> D[原结构task verify]
+    D -->|仍存在| E[保留失败尝试]
+    E -->|同一输入两次失败| F[停止重复动作 提供诊断决策]
+    D -->|局部消失| G[保留开放问题 继续政策核验]
+    D -->|证据缺失或篡改| H[撤回权限或拒绝]
+```
+
+新brief0.33/task show0.7/绑定反馈0.9，原verification0.37不变。此前attempt未接入的段落为7866920检查点。跨输入语义进展、完整API详细准确性、项目/平台/独立精度、可信关闭/复发仍缺；66完成/288未完成、228blocked、0/32保持。
+
+本轮真实验收：默认/WASM各27目标测试、各1内部原结构契约测试通过；覆盖C/C++各两次ready/原生仍存在、等待复检、预算耗尽、重命名/重扫/删投影不重置、缺私有报告/消费收据保持未验证及伪造收据/事件拒绝。原语法错误/截止/输入变化边界保留。共享任务回归38通过/10条件忽略，两种严格Clippy通过。503schema有效/500历史字节不变，44结构报告、16公开verification、8内部原生报告、20反馈/brief对、4task show及5协议伪造负例通过。上述是开发验收，未获得独立精度/生产资格。
+
+Native tests cover two ready/present cycles for each C/C++ context, required verification, exhausted budgets, rename/rescan/projection recovery, missing reports/receipts and forged receipt/event rejection. Both modes pass27 target tests and one internal native contract; shared task regression passes38 with10 conditional skips.503 schemas preserve500 historical documents, validating44 packets,16 public verifications,8 internal reports,20 feedback/brief pairs and4 task-show reports with five schema forgeries rejected. Qualification remains not_granted.
