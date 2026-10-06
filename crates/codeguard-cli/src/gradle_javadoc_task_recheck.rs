@@ -27,7 +27,7 @@ pub fn run(
         .duration_since(UNIX_EPOCH)
         .map_err(|_| "clock_unavailable")?
         .as_nanos();
-    let mut report = json!({"schema_version":"0.1.0","report_type":"gradle_javadoc_task_recheck","operation":"task_verify","run_id":format!("javadoc-gradle-task-{}-{nanos}",std::process::id()),"workspace_binding":"bound","workspace_id":first["workspace_id"],"checker_id":"java.gradle.javadoc","authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated","task_id":brief["task_id"],"task_path":brief["scope"],"task_rule":brief["native_rule_id"],"origin":brief["evidence_ref"],"scan":null,"input_bindings":[],"task_input_stable":false,"configuration_matches":false,"tool_identity_matches":false,"original_tool_identity_complete":false,"source_scope_matches":false,"reason":"gradle_javadoc_recheck_incomplete"});
+    let mut report = json!({"schema_version":"0.2.0","report_type":"gradle_javadoc_task_recheck","operation":"task_verify","run_id":format!("javadoc-gradle-task-{}-{nanos}",std::process::id()),"workspace_binding":"bound","workspace_id":first["workspace_id"],"checker_id":"java.gradle.javadoc","authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated","task_id":brief["task_id"],"task_path":brief["scope"],"task_rule":brief["native_rule_id"],"origin":brief["evidence_ref"],"scan":null,"input_bindings":[],"task_input_stable":false,"configuration_matches":false,"tool_identity_matches":false,"original_tool_identity_complete":false,"source_scope_matches":false,"reason":"gradle_javadoc_recheck_incomplete"});
     let rows = first["inputs"]
         .as_array()
         .filter(|r| !r.is_empty() && r.len() <= 128)
@@ -312,7 +312,7 @@ pub fn valid_shape(r: &Value) -> bool {
     ];
     r.as_object()
         .is_some_and(|o| o.len() == keys.len() && keys.iter().all(|k| o.contains_key(*k)))
-        && r["schema_version"] == "0.1.0"
+        && matches!(r["schema_version"].as_str(), Some("0.1.0" | "0.2.0"))
         && r["report_type"] == "gradle_javadoc_task_recheck"
         && r["operation"] == "task_verify"
         && r["workspace_binding"] == "bound"
@@ -390,7 +390,8 @@ fn valid_scan(r: &Value) -> bool {
     ];
     v.as_object()
         .is_some_and(|o| o.len() == keys.len() && keys.iter().all(|k| o.contains_key(*k)))
-        && v["schema_version"] == "0.1.0"
+        && v["schema_version"] == r["schema_version"]
+        && v["native"]["schema_version"] == v["schema_version"]
         && v["report_type"] == "gradle_javadoc_workbench_observation"
         && v["workspace_binding"] == "bound"
         && v["workspace_id"] == r["workspace_id"]

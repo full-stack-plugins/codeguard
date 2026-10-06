@@ -64,3 +64,36 @@ fn native_empty_tag_descriptions_are_not_treated_as_documented_code() {
     assert_eq!(parsed[0].rule_id, "JavadocEmptyParamDescription");
     assert_eq!(parsed[1].rule_id, "JavadocEmptyReturnDescription");
 }
+
+#[test]
+fn empty_comments_main_descriptions_and_throws_keep_distinct_native_rules() {
+    let sources = BTreeMap::from([(
+        "/project/A.java".into(),
+        b"public class A {}\n * @throws IllegalArgumentException\n/** @param value input\n"
+            .to_vec(),
+    )]);
+    let log = b"/project/A.java:1: warning: empty comment\npublic class A {}\n       ^\n/project/A.java:2: warning: no description for @throws\n * @throws IllegalArgumentException\n   ^\n/project/A.java:3: warning: no main description\n/** @param value input\n    ^\n3 warnings\n";
+    let parsed = parse_gradle_javadoc_output(log, &sources)
+        .expect("observed JDK21 description warnings must remain actionable native facts");
+    assert_eq!(
+        parsed.iter().map(|d| d.rule_id).collect::<Vec<_>>(),
+        [
+            "JavadocEmptyComment",
+            "JavadocEmptyThrowsDescription",
+            "JavadocMissingMainDescription"
+        ]
+    );
+    for bad in [
+        String::from_utf8(log.to_vec())
+            .unwrap()
+            .replace("empty comment", "possibly empty comment"),
+        String::from_utf8(log.to_vec())
+            .unwrap()
+            .replace("public class A {}", "public class B {}"),
+        String::from_utf8(log.to_vec())
+            .unwrap()
+            .replace("3 warnings", "2 warnings"),
+    ] {
+        assert!(parse_gradle_javadoc_output(bad.as_bytes(), &sources).is_err());
+    }
+}

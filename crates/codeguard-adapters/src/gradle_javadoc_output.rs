@@ -42,8 +42,14 @@ pub fn parse_gradle_javadoc_output(
                     return Err("gradle_javadoc_source_unresolved");
                 }
                 let (path, source) = matches[0];
-                // JDK21实际输出已验证的空标签描述；复用位置核验，不改变旧Javadoc协议的规则集合。
+                // JDK21实际输出已验证的描述缺失；复用位置核验，保留各规则身份，旧独立Javadoc协议不扩大。
                 let empty_description = [
+                    ("empty comment", "JavadocEmptyComment"),
+                    ("no main description", "JavadocMissingMainDescription"),
+                    (
+                        "no description for @throws",
+                        "JavadocEmptyThrowsDescription",
+                    ),
                     ("no description for @param", "JavadocEmptyParamDescription"),
                     (
                         "no description for @return",

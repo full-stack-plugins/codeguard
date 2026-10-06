@@ -2282,7 +2282,7 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
         .iter()
         .any(|entry| entry.checker_id.starts_with("java.gradle."));
     let mut report = json!({
-        "schema_version":if parsed.gradle_javadoc || next["schema_version"] == "0.23.0" {"0.66.0"}else if gradle_requested {"0.62.0"}else if gradle_model_unresolved {"0.61.0"}else if next["schema_version"] == "0.21.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row|row.get("javascript_mode_observation").is_some())) {"0.60.0"}else if lint_only {"0.59.0"}else if next["repair_brief"]["checker_id"] == "java.maven.p3c" && next["repair_brief"]["reason_code"] == "p3c_configuration_not_confirmed" {"0.58.0"}else if next["repair_brief"]["checker_id"] == "java.maven.javadoc" {"0.57.0"}else if next["repair_brief"]["checker_id"] == "rust.cargo_clippy" {"0.56.0"}else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"]=="erlang" && row.get("structural_observations").is_some())) {"0.55.0"} else if next["schema_version"] == "0.20.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"]=="javascript" && row.get("structural_observations").is_some())) {"0.54.0"}else if syntax_candidates["observations"].as_array().is_some_and(|rows|rows.iter().any(|row|row["language"]=="cfquery")) {"0.53.0"}else if shell_lint.is_object() || next["schema_version"]=="0.17.0" {"0.52.0"}else if ruby_lint.is_object() || next["schema_version"] == "0.15.0" {"0.51.0"} else if next["schema_version"] == "0.14.0" {"0.50.0"} else if next["schema_version"] == "0.13.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.49.0"} else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row.get("structural_observations").is_some())) {"0.48.0"} else if zig_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.12.0" {"0.47.0"}else if zig_lint.is_object() {"0.46.0"} else if matches!(parsed.selection, Selection::Language(_)) {"0.45.0"} else if swift_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.11.0" {"0.44.0"} else if swift_lint.is_object() {"0.43.0"} else if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
+        "schema_version":if parsed.gradle_javadoc || next["schema_version"] == "0.24.0" {"0.67.0"}else if gradle_requested {"0.62.0"}else if gradle_model_unresolved {"0.61.0"}else if next["schema_version"] == "0.21.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row|row.get("javascript_mode_observation").is_some())) {"0.60.0"}else if lint_only {"0.59.0"}else if next["repair_brief"]["checker_id"] == "java.maven.p3c" && next["repair_brief"]["reason_code"] == "p3c_configuration_not_confirmed" {"0.58.0"}else if next["repair_brief"]["checker_id"] == "java.maven.javadoc" {"0.57.0"}else if next["repair_brief"]["checker_id"] == "rust.cargo_clippy" {"0.56.0"}else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"]=="erlang" && row.get("structural_observations").is_some())) {"0.55.0"} else if next["schema_version"] == "0.20.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"]=="javascript" && row.get("structural_observations").is_some())) {"0.54.0"}else if syntax_candidates["observations"].as_array().is_some_and(|rows|rows.iter().any(|row|row["language"]=="cfquery")) {"0.53.0"}else if shell_lint.is_object() || next["schema_version"]=="0.17.0" {"0.52.0"}else if ruby_lint.is_object() || next["schema_version"] == "0.15.0" {"0.51.0"} else if next["schema_version"] == "0.14.0" {"0.50.0"} else if next["schema_version"] == "0.13.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.49.0"} else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row.get("structural_observations").is_some())) {"0.48.0"} else if zig_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.12.0" {"0.47.0"}else if zig_lint.is_object() {"0.46.0"} else if matches!(parsed.selection, Selection::Language(_)) {"0.45.0"} else if swift_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.11.0" {"0.44.0"} else if swift_lint.is_object() {"0.43.0"} else if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
         "operation":"check", "selection":parsed.selection.as_str(), "command_status":if request_cancelled { "cancelled" } else { "incomplete" },
         "exit_code":if request_cancelled { 130 } else { 3 }, "delivery_decision":if parsed.selection == Selection::All { "incomplete" } else { "not_evaluated" }, "authority":"local_unverified",
         "reason":if request_cancelled { "request_cancelled" } else if parsed.selection == Selection::All { "full_project_obligations_and_trusted_policy_unavailable" } else if parsed.selection == Selection::Java { "java_selection_obligations_and_trusted_policy_unavailable" } else { "language_selection_obligations_and_trusted_policy_unavailable" },
@@ -2302,7 +2302,7 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
     if gradle_requested {
         report["native_results"][gradle_result_key] = java_gradle_model;
     }
-    if report["schema_version"] == "0.66.0" {
+    if report["schema_version"] == "0.67.0" {
         report["gradle_javadoc_tasks"] = gradle_javadoc_tasks;
     }
     if zig_lint.is_object()
@@ -2328,7 +2328,7 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                     | "0.63.0"
                     | "0.64.0"
                     | "0.65.0"
-                    | "0.66.0"
+                    | "0.67.0"
             )
         )
     {
@@ -2362,7 +2362,7 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                 | "0.63.0"
                 | "0.64.0"
                 | "0.65.0"
-                | "0.66.0"
+                | "0.67.0"
         )
     ) {
         if let Some(native) = report["native_results"].as_object_mut() {
@@ -2395,7 +2395,7 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                 | "0.63.0"
                 | "0.64.0"
                 | "0.65.0"
-                | "0.66.0"
+                | "0.67.0"
         )
     ) {
         if let Some(native) = report["native_results"].as_object_mut() {
@@ -2420,7 +2420,7 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                 | "0.63.0"
                 | "0.64.0"
                 | "0.65.0"
-                | "0.66.0"
+                | "0.67.0"
         )
     ) {
         report["native_results"]["ruby_lint"] = ruby_lint.clone();
@@ -2442,7 +2442,7 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                 | "0.63.0"
                 | "0.64.0"
                 | "0.65.0"
-                | "0.66.0"
+                | "0.67.0"
         )
     ) {
         report["native_results"]["shell_lint"] = shell_lint.clone();
@@ -3362,7 +3362,7 @@ fn aborted_task_report(
         execution_tasks.push(json!({"id":"zig.lint","status":if native_results["zig_lint"]["local_parse_complete"]==true {"native_observed_unverified"}else{"native_incomplete"}}));
     }
     json!({
-        "schema_version":if native_results.get("java_gradle_javadoc").is_some() {"0.17.0"}else if native_results.get("java_gradle_model").is_some() {"0.16.0"}else if native_results["zig_lint"].is_object() {"0.15.0"}else if matches!(selection, Selection::Language(_)) {"0.14.0"} else {"0.13.0"}, "report_type":"check_aborted",
+        "schema_version":if native_results.get("java_gradle_javadoc").is_some() {if native_results["java_gradle_javadoc"]["schema_version"] == "0.2.0" {"0.18.0"}else{"0.17.0"}}else if native_results.get("java_gradle_model").is_some() {"0.16.0"}else if native_results["zig_lint"].is_object() {"0.15.0"}else if matches!(selection, Selection::Language(_)) {"0.14.0"} else {"0.13.0"}, "report_type":"check_aborted",
         "operation":"check", "selection":selection.as_str(),
         "command_status":if cancelled { "cancelled" } else { "internal_error" },
         "exit_code":if cancelled { 130 } else { 4 },
@@ -3948,6 +3948,28 @@ mod tests {
         assert!(!sarif.to_string().contains("Sample.java"));
         if let Some(path) = std::env::var_os("CODEGUARD_TEST_GRADLE_JAVADOC_ABORT_REPORT") {
             std::fs::write(path, serde_json::to_vec_pretty(&report).unwrap()).unwrap();
+        }
+
+        // 新描述协议的兄弟失败不能吞掉已有原生问题；此处仅构造反馈边界，不执行工具。
+        let mut expanded = report["native_results"].clone();
+        expanded["java_gradle_javadoc"]["schema_version"] = json!("0.2.0");
+        expanded["java_gradle_javadoc"]["findings"][0]["rule_id"] = json!("JavadocEmptyComment");
+        let current = aborted_task_report(
+            Selection::Java,
+            source["discovery"].clone(),
+            &outcomes,
+            expanded,
+            false,
+        );
+        assert_eq!(current["schema_version"], "0.18.0");
+        assert_eq!(
+            current["native_results"]["java_gradle_javadoc"]["findings"][0]["rule_id"],
+            "JavadocEmptyComment"
+        );
+        assert_eq!(current["delivery_decision"], "not_evaluated");
+        assert_eq!(current["exit_code"], 4);
+        if let Some(path) = std::env::var_os("CODEGUARD_TEST_GRADLE_JAVADOC_ABORT_V2_REPORT") {
+            std::fs::write(path, serde_json::to_vec_pretty(&current).unwrap()).unwrap();
         }
     }
 

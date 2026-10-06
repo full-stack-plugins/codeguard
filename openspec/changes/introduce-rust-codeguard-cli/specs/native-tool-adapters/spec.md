@@ -814,8 +814,8 @@ Rust SHALL interpret a versioned native Gradle configuration model per root/subp
 
 The Gradle Javadoc application service SHALL select enabled tasks by the official Javadoc implementation base class and an observed Java plugin, use fully qualified task paths, and preserve original doclint/doclet/access/source-set configuration. It MAY fix diagnostic JVM language in the private invocation. Native model capture and selected quality tasks SHALL share a single bounded offline Gradle invocation over the same immutable selected inputs. Unknown output, out-of-scope locations, unsupported JDK format, cancellation, tool/input changes and native execution failures SHALL remain incomplete rather than source violations or clean acceptance.
 
-#### Scenario: Empty parameter and return descriptions remain native findings
-- **WHEN** JDK21 reports missing descriptions for @param or @return in the selected source snapshot
+#### Scenario: Empty comments, purpose and tag descriptions remain native findings
+- **WHEN** JDK21 reports an empty comment, missing main description, or missing description for @param, @return or @throws in the selected source snapshot
 - **THEN** Gradle feedback preserves these native rule identities and exact validated locations, without widening historical standalone Javadoc protocols
 
 #### Scenario: Empty diagnostics do not prove detailed documentation compliance

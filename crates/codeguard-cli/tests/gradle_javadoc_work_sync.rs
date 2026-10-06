@@ -127,7 +127,7 @@ fn imported_gradle_tasks_are_stable_and_have_gradle_native_guidance() {
         .unwrap();
     assert_eq!(out.status.code(), Some(3));
     let historical: Value = serde_json::from_slice(&out.stdout).unwrap();
-    assert_eq!(historical["schema_version"], "0.66.0");
+    assert_eq!(historical["schema_version"], "0.67.0");
     assert!(historical["gradle_javadoc_tasks"].is_null());
     assert_eq!(
         historical["next"]["repair_brief"]["checker_id"],
@@ -189,7 +189,7 @@ fn actual_public_check_persists_and_reuses_gradle_documentation_tasks() {
         serde_json::from_slice::<Value>(&out.stdout).unwrap()
     };
     let first = run("java");
-    assert_eq!(first["schema_version"], "0.66.0");
+    assert_eq!(first["schema_version"], "0.67.0");
     assert_eq!(
         first["gradle_javadoc_tasks"]["status"], "synced_partial",
         "{first}"

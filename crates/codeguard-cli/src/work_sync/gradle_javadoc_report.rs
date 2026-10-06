@@ -28,7 +28,8 @@ pub(super) fn parse(
     if !report
         .as_object()
         .is_some_and(|o| o.len() == keys.len() && keys.iter().all(|k| o.contains_key(*k)))
-        || report["schema_version"] != "0.1.0"
+        || !matches!(report["schema_version"].as_str(), Some("0.1.0" | "0.2.0"))
+        || report["native"]["schema_version"] != report["schema_version"]
         || report["report_type"] != "gradle_javadoc_workbench_observation"
         || report["workspace_binding"] != "bound"
         || report["workspace_id"] != workspace

@@ -941,7 +941,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         )
     };
     if checker_id == "java.gradle.javadoc" {
-        brief["schema_version"] = json!("0.23.0");
+        brief["schema_version"] = json!("0.24.0");
         brief["observation_scope"] = json!("selected_gradle_javadoc_inputs");
         brief["task_verify_status"] = json!("local_observation_only");
         if let Some((reason, evidence)) = &gradle_preparation {
@@ -2267,7 +2267,7 @@ fn run_sequence(run_id: &str) -> Option<u128> {
 
 fn view(disposition: &str, reason: &str, brief: Value, actions: Value) -> Value {
     json!({
-        "schema_version":if brief["schema_version"] == "0.23.0" {json!("0.23.0")}else if brief["schema_version"] == "0.22.0" {json!("0.22.0")}else if brief["schema_version"] == "0.21.0" {json!("0.21.0")}else if brief["schema_version"] == "0.20.0" {json!("0.20.0")}else if brief["checker_id"] == "shell.shellcheck" {json!("0.17.0")} else if brief["checker_id"] == "go.vet" {json!("0.13.0")} else if brief["checker_id"] == "syntax.native_confirmation" {brief["schema_version"].clone()} else {json!("0.1.0")}, "report_type":"repair_brief_preview",
+        "schema_version":if brief["schema_version"] == "0.24.0" {json!("0.24.0")}else if brief["schema_version"] == "0.23.0" {json!("0.23.0")}else if brief["schema_version"] == "0.22.0" {json!("0.22.0")}else if brief["schema_version"] == "0.21.0" {json!("0.21.0")}else if brief["schema_version"] == "0.20.0" {json!("0.20.0")}else if brief["checker_id"] == "shell.shellcheck" {json!("0.17.0")} else if brief["checker_id"] == "go.vet" {json!("0.13.0")} else if brief["checker_id"] == "syntax.native_confirmation" {brief["schema_version"].clone()} else {json!("0.1.0")}, "report_type":"repair_brief_preview",
         "operation":"next", "command_status":"complete", "exit_code":0,
         "disposition":disposition, "reason":reason,
         "repair_brief":brief, "next_actions":actions,
