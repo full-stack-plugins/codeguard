@@ -73,7 +73,7 @@
     "crates/codeguard-cli/src/gradle_cve_workbench.rs": "04677889296923b95823b8c7127a4ca0a2b4dc8372c9e9adda5ba57207b56867",
     "crates/codeguard-cli/src/work_sync/gradle_cve_report.rs": "1b8478d43a02101112e2ac58ff5d53b9b3300b0dc05ceabd3e981425221ffe92",
     "crates/codeguard-cli/src/work_sync.rs": "f9eb6a4d19d0cc5558cb930c16c5ad4e3b5ca14827302ccb19378afe308b7130",
-    "crates/codeguard-cli/src/next_command.rs": "845b6c94996757c9b02ba48bb5dab25fdb3b4c2b6fe71efbc253c3fb38bdffea",
+    "crates/codeguard-cli/src/next_command.rs": "d2d5763b49165a725e1a2562c185c704103b0a7c405960093b735131092092a3",
     "crates/codeguard-cli/src/task_verify_command.rs": "3550968173682c00d23209625351912699fb7b845be188a53740abf541841639",
     "tests/acceptance/gradle-cve-workbench.md": "15aec15873a8f7894d69f97a66362238c87f7d703e0be375b28630695adb2cfd",
     "crates/codeguard-cli/src/gradle_cve_task_recheck.rs": "3229794e846ca217567f82fcb80a79790786ef46f5d90772fe919933d3b91708",
@@ -88,7 +88,10 @@
     "tests/acceptance/clang-preprocessor-context.md": "3af1710a54102c854824f2402e1ca15e14fd38c72299b9811398f4c486148565",
     "crates/codeguard-cli/src/grammar_native_differential.rs": "cc03129c80eef2b0d77f57f2abcc89b3a4a5107a6f81f723cebf98bcebfa26ab",
     "tests/acceptance/c-family-native-replay.md": "4785bd96ba17fa12f7958628ac2562301e6a04611b01a5065783d52afb9d6786",
-    "tests/acceptance/c-family-native-punctuation.md": "4465d86d3afaba9e2a54c3a58e5b5d2df102e670ccc487b1b26d125b704d08b3"
+    "tests/acceptance/c-family-native-punctuation.md": "4465d86d3afaba9e2a54c3a58e5b5d2df102e670ccc487b1b26d125b704d08b3",
+    "crates/codeguard-cli/tests/rust_clippy_documentation.rs": "37e37e15921cfd6aa3fbfcf5d17fa15850a91df9bfb1f553ef24785c56e7572f",
+    "tests/acceptance/clippy-documentation-contract.md": "7843e99c75b262710126c0c1b56596a0a004db563603b0575564e86416304060",
+    "crates/codeguard-cli/src/rust_lint_scan.rs": "d0d76dcfabafc6f6701bba6946b3130f23c3b053bf77bda7e7abaf10ca9d3e09"
   },
   "languages": [
     {
@@ -380,10 +383,14 @@
               "ecosystem": "cargo",
               "implementation_status": "partial",
               "adapter_refs": [
-                "crates/codeguard-cli/src/rust_comments_command.rs"
+                "crates/codeguard-cli/src/rust_comments_command.rs",
+                "crates/codeguard-cli/src/rust_lint_scan.rs",
+                "crates/codeguard-cli/src/next_command.rs"
               ],
               "evidence_refs": [
-                "tests/acceptance/rustdoc-task-recheck.md"
+                "tests/acceptance/rustdoc-task-recheck.md",
+                "tests/acceptance/clippy-documentation-contract.md",
+                "crates/codeguard-cli/tests/rust_clippy_documentation.rs"
               ],
               "blockers": [
                 "rust/cargo: Rustdoc用途/参数/返回/错误/Panics/Safety及目标特性的完整原生规则/合法反例/契约准确性未验收",

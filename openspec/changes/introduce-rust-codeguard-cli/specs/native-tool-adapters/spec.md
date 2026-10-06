@@ -120,6 +120,11 @@ Rustdoc逐问题反馈 MUST 提供问题证据、规则依据、允许修改的�
 - **THEN** 复用原生Clippy局部观察、共享预算和输入核对，仅执行lint而不执行rustdoc、build或CVE；初始化工作区自动保存报告、同步稳定任务并反馈下一步，零诊断不能关闭任务或签发完整通过
 - **AND** 显式入口无效或原生执行失败不得换用其它工具或WASM掩盖原生失败
 
+#### Scenario: Native Clippy documentation contracts guide the original repair task
+- **WHEN** 原项目启用的 Clippy 检出 missing_errors_doc、missing_panics_doc 或 missing_safety_doc
+- **THEN** 保留原生规则和同一稳定任务，分别要求说明实际错误及条件、panic 条件或 unsafe 调用前置条件；不得改变 API 行为或关闭规则迎合检查，使用原工具 task verify 复检
+- **AND** 不为普通检查强制启用 pedantic 规则；抑制对照仍保持任务开放，空章节标题的原生零诊断不代表详细说明合格或完整文档验收
+
 #### Scenario: Standalone Rust lint has no native Cargo
 - **WHEN** 未显式选择Cargo且绝对PATH没有可用Cargo
 - **THEN** WASM构建对有界Rust源码提供候选初检并同步确认任务；发现候选或范围/运行未完成时必须准备原生工具，完整有界范围零候选时推荐准备；不安装工具、不把候选认定为源码违规；无WASM构建明确初检不可用

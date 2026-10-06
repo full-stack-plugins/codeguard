@@ -2524,3 +2524,9 @@ Java验收分类器先检查truncated_files，隐藏恢复不计作干净。现�
 ## 2026-10-06 当前完整默认工作区回归
 
 第一轮因Rust注释测试把已支持comments java当作用法错误而退出101；修正为真正未知语言并增加合法Java入口未完成反馈与原生执行哨兵。目标16通过/0失败/1忽略；第二轮完整workspace/all-targets退出0：290组1565通过/0失败/142忽略。全工作区严格Clippy、分层/OpenSpec strict/diff及397schema元定义、实际grammar库存与别名plan协议通过。默认WASM目标零测试，不执行用户Erlang草稿，摘要保持。4445f06 CI37423582241 MSRV成功，gate因固定插件源dec5f9d不可达而在测试前失败，未解除锁。提案/实现基线过期状态已更新；全WASM、条件原生、独立精度、真实宿主/多平台及完整目标继续开放。证据见 tests/acceptance/default-workspace-comments-dispatch.md。
+
+## 2026-10-07 Clippy 文档契约指引
+
+三个原规则的真实工具回归补齐具体修复指引，保留原任务与抑制对照；实际空章节零诊断证明原生规则的内容精度缺口。详见[验收](../../../tests/acceptance/clippy-documentation-contract.md)。本批不授予完整文档资格或可信关闭。
+
+本批默认五目标30通过/4条件忽略、WASM31通过/4忽略；精确规则单元两配置各1通过，真实已有Clippy两配置各显式1通过。38实际报告与三种伪造资格经原协议验证，474历史schema原字节保持；双配置全工作区全目标严格Clippy、定向格式、分层、OpenSpec strict及80来源/1312任务引用通过。CI37506378833终态gate失败/MSRV成功，不算远端全通过；插件main固定目标推送仍待用户确认，无发布/合并。

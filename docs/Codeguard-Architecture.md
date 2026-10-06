@@ -1504,3 +1504,6 @@ Explicit Gradle CVE now syncs sanitized stable preparation tasks in initialized 
 
 
 The standalone C/C++ Clang entry now distinguishes literal/comment hashes and raw strings from preprocessing directives, including alternate tokens and line splices. Leading non-ASCII recovery remains conservatively unresolved. This bounded verification does not qualify project syntax, documentation, development conventions, or CVE coverage. See [acceptance limits](../tests/acceptance/clang-preprocessor-context.md).
+
+
+Native Clippy documentation findings now receive specific Errors/Panics/Safety repair guidance through stable tasks and original-tool suppression rechecks. The installed Clippy accepts bare headings: zero diagnostics do not qualify detailed documentation and facts remain open. Ordinary checks do not enable pedantic implicitly. `comments rust` remains a local Rustdoc probe; complete documentation contracts are not unified or qualified. See [acceptance and gaps](../tests/acceptance/clippy-documentation-contract.md).
