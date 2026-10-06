@@ -1099,3 +1099,20 @@ The Rust caller SHALL capture bounded content and physical path observations for
 #### Scenario: A selected advisory collection is redirected through a symlink
 - **WHEN** a crates or rust collection path is a symlink
 - **THEN** CodeGuard SHALL report database snapshot unavailability before native execution without interpreting this environment problem as a source vulnerability
+
+
+### Requirement: C-family documentation tasks SHALL recheck the original native context
+
+Public task verify SHALL bind the consumed first report, immutable task facts, language, standard, native rule group and selected tool path. A different tool path, changed previously observed tool bytes or foreign checker parameters SHALL be rejected before leasing or native execution. Repaired source bytes MAY be rechecked through a bounded snapshot. Same-run input instability, unknown native rules, timeout and cancellation SHALL prevent complete repair classification. Observations SHALL use the existing verification lease and append-only event storage without importing unrelated rule groups as new tasks. Zero diagnostics SHALL remain candidate_absent_unverified_policy and SHALL NOT close a task, grant detailed documentation coverage or approve delivery. Dedicated attempt journaling and trusted closure/reopen remain separate uncompleted obligations.
+
+#### Scenario: Native documentation rule disappears after editing comments
+- **WHEN** the original native checker rechecks repaired source with the same language, standard and tool identity and the original rule is absent
+- **THEN** the local event records unverified absence, next preserves the same open task and withdraws source-edit permissions pending full coverage and policy validation
+
+#### Scenario: A replacement checker is requested
+- **WHEN** task verify is given a different Clang path or the first observed tool bytes have changed
+- **THEN** no verification lease or native process is started and the original task remains open with a specific tool-binding reason
+
+#### Scenario: The caller cancels a native documentation recheck
+- **WHEN** SIGINT arrives during native task verification
+- **THEN** the process group is reaped, the command returns cancelled/130 and no verification event is persisted as completed repair

@@ -31,7 +31,7 @@ pub(crate) fn resolve_root(
 }
 /// 保存并同步局部观察；中断后不开始新的持久化阶段。
 pub(crate) fn connect(root: &Path, tool: &Path, report: &mut Value, deadline: Instant) {
-    report["schema_version"] = json!("0.2.0");
+    report["schema_version"] = json!("0.3.0");
     report["task_workflow_status"] = json!("partial");
     let argv = report["verification_command"]
         .as_array_mut()

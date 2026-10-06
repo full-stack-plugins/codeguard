@@ -229,7 +229,7 @@ fn linked_source_cannot_redirect_observation_storage_into_another_project() {
 }
 
 #[test]
-fn changed_tool_retracts_authority_and_unimplemented_task_services_do_not_acquire_leases() {
+fn changed_tool_retracts_authority_and_recheck_rejects_before_acquiring_leases() {
     let p = Project::new();
     let r = p.scan(&[2]);
     let id = r["workbench"]["task_ids"][0].as_str().unwrap();
@@ -251,7 +251,7 @@ fn changed_tool_retracts_authority_and_unimplemented_task_services_do_not_acquir
     assert!(
         String::from_utf8(out.stdout)
             .unwrap()
-            .contains("clang_documentation_task_verification_not_integrated")
+            .contains("clang_documentation_original_tool_changed")
     );
     assert!(!p.0.join(".codeguard/state/task_locks").exists());
 }
@@ -331,15 +331,42 @@ fn actual_clang_documentation_rules_reach_stable_workbench_tasks() {
             "native_rule_observed"
         );
         assert_eq!(r["coverage_proven"], false);
-        cases.push(r);
+        let id = r["workbench"]["task_ids"][0].as_str().unwrap();
+        let verify = || {
+            let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+                .args(["task", "verify", id])
+                .arg(&p.0)
+                .arg("--format=json")
+                .output()
+                .unwrap();
+            assert_eq!(out.status.code(), Some(3), "{out:?}");
+            let v: Value = serde_json::from_slice(&out.stdout).unwrap();
+            assert_eq!(v["event_persisted"], true, "{v}");
+            assert_eq!(v["native_scan"]["language"], language);
+            capture(&v);
+            v
+        };
+        let present = verify();
+        assert_eq!(present["observation"], "still_present");
+        let source = fs::read_to_string(p.0.join(filename)).unwrap();
+        fs::write(
+            p.0.join(filename),
+            source
+                .replace("@param value", "@param value First operand.")
+                .replace("@param other", "@param other Second operand."),
+        )
+        .unwrap();
+        let absent = verify();
+        assert_eq!(absent["observation"], "candidate_absent_unverified_policy");
+        cases.push(json!({"scan":r,"present":present,"absent":absent}));
     }
     for e in fs::read_dir(p.0.join(".codeguard/reports")).unwrap() {
         capture(&serde_json::from_slice::<Value>(&fs::read(e.unwrap().path()).unwrap()).unwrap());
     }
-    if let Some(path) = std::env::var_os("CODEGUARD_C_DOC_WORKBENCH_NATIVE_EVIDENCE") {
+    if let Some(path) = std::env::var_os("CODEGUARD_C_DOC_RECHECK_NATIVE_EVIDENCE") {
         use sha2::{Digest, Sha256};
         let binary = fs::read(env!("CARGO_BIN_EXE_codeguard")).unwrap();
-        let evidence = json!({"evidence_kind":"local_native_workbench_regression","qualification":"not_granted","independent_holdout":false,"codeguard_sha256":format!("{:x}",Sha256::digest(binary)),"test_source_sha256":format!("{:x}",Sha256::digest(include_bytes!("c_family_comments_workbench.rs"))),"cases":cases});
+        let evidence = json!({"evidence_kind":"local_native_task_recheck_regression","qualification":"not_granted","independent_holdout":false,"codeguard_sha256":format!("{:x}",Sha256::digest(binary)),"test_source_sha256":format!("{:x}",Sha256::digest(include_bytes!("c_family_comments_workbench.rs"))),"cases":cases});
         fs::write(path, serde_json::to_vec_pretty(&evidence).unwrap()).unwrap();
     }
 }
@@ -409,4 +436,188 @@ fn changed_input_retracts_positions_and_missing_projection_can_be_restored() {
     ] {
         assert!(task.contains(part), "{part}");
     }
+}
+
+#[test]
+fn original_documentation_task_recheck_records_presence_and_absence_without_closing() {
+    let p = Project::new();
+    let r = p.scan(&[2]);
+    let id = r["workbench"]["task_ids"][0].as_str().unwrap();
+    let verify = || {
+        let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(["task", "verify", id])
+            .arg(&p.0)
+            .arg("--format=json")
+            .output()
+            .unwrap();
+        assert_eq!(out.status.code(), Some(3), "{out:?}");
+        let v: Value = serde_json::from_slice(&out.stdout).unwrap();
+        capture(&v);
+        assert_eq!(
+            v["schema_version"],
+            "0.36.0",
+            "{v} STDERR {}",
+            String::from_utf8_lossy(&out.stderr)
+        );
+        assert_eq!(v["event_persisted"], true, "{v}");
+        assert_eq!(v["native_scan"]["task_id"], id);
+        assert_eq!(v["delivery_decision"], "not_evaluated");
+        v
+    };
+    assert_eq!(verify()["observation"], "still_present");
+    p.scan(&[]);
+    assert_eq!(
+        verify()["observation"],
+        "candidate_absent_unverified_policy"
+    );
+    let n = p.next();
+    assert_eq!(n["repair_brief"]["task_id"], id);
+    assert_eq!(n["repair_brief"]["allowed_paths"], json!([]));
+}
+
+#[test]
+fn different_tool_and_foreign_parameters_are_rejected_before_a_lease_or_native_launch() {
+    let p = Project::new();
+    let r = p.scan(&[2]);
+    let id = r["workbench"]["task_ids"][0].as_str().unwrap();
+    let other = p.0.join("other-clang");
+    fs::copy(p.0.join("clang"), &other).unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["task", "verify", id])
+        .arg(&p.0)
+        .arg("--clang-tool")
+        .arg(&other)
+        .arg("--format=json")
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(3));
+    let v: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(v["reason"], "clang_documentation_original_tool_required");
+    for flag in ["--ruff-tool", "--shellcheck-tool"] {
+        let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(["task", "verify", id])
+            .arg(&p.0)
+            .arg(flag)
+            .arg(&other)
+            .arg("--format=json")
+            .output()
+            .unwrap();
+        assert_eq!(out.status.code(), Some(2));
+    }
+    assert!(!p.0.join(".codeguard/state/task_locks").exists());
+}
+
+#[test]
+fn changed_source_can_be_rechecked_but_forged_task_binding_cannot_be_imported() {
+    let p = Project::new();
+    let r = p.scan(&[2]);
+    let id = r["workbench"]["task_ids"][0].as_str().unwrap();
+    let source = fs::read_to_string(p.0.join("api.c")).unwrap();
+    fs::write(p.0.join("api.c"), format!("{source}\n")).unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["task", "verify", id])
+        .arg(&p.0)
+        .arg("--format=json")
+        .output()
+        .unwrap();
+    let v: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(v["observation"], "still_present", "{v}");
+    assert_eq!(v["event_persisted"], true);
+    assert_ne!(v["native_scan"]["source_sha256"], r["source_sha256"]);
+    let mut forged = v["native_scan"].clone();
+    forged["task_id"] = json!("CG-00000000000000000000000000000000");
+    forged["run_id"] = json!("clangdoc-1-1-1");
+    fs::write(
+        p.0.join(".codeguard/reports/clangdoc-1-1-1.json"),
+        serde_json::to_vec_pretty(&forged).unwrap(),
+    )
+    .unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["work", "sync"])
+        .arg(&p.0)
+        .arg("--format=json")
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(3));
+    assert!(
+        !p.0.join(".codeguard/state/consumed/clangdoc-1-1-1.json")
+            .exists()
+    );
+}
+
+#[test]
+fn source_change_during_native_recheck_and_deadline_cannot_certify_the_task() {
+    let p = Project::new();
+    let tool = p.0.join("clang");
+    let original = fs::read_to_string(&tool).unwrap();
+    fs::write(&tool,original.replace("cat >/dev/null", &format!("cat >/dev/null\nif [ -f '{}' ]; then echo ' ' >> '{}'; fi\nif [ -f '{}' ]; then sleep 1; fi",p.0.join("mutate").display(),p.0.join("api.c").display(),p.0.join("slow").display()))).unwrap();
+    let r = p.scan(&[2]);
+    let id = r["workbench"]["task_ids"][0].as_str().unwrap();
+    let source_before = fs::read(p.0.join("api.c")).unwrap();
+    fs::write(p.0.join("mutate"), "").unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["task", "verify", id])
+        .arg(&p.0)
+        .arg("--format=json")
+        .output()
+        .unwrap();
+    let v: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(v["observation"], "incomplete", "{v}");
+    assert_eq!(v["native_scan"]["input_stable"], false);
+    assert_eq!(p.next()["repair_brief"]["allowed_paths"], json!([]));
+    fs::write(p.0.join("api.c"), source_before).unwrap();
+    assert_eq!(p.next()["repair_brief"]["allowed_paths"], json!([]));
+    fs::remove_file(p.0.join("mutate")).unwrap();
+    fs::write(p.0.join("slow"), "").unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["task", "verify", id])
+        .arg(&p.0)
+        .args(["--timeout", "50ms", "--format=json"])
+        .output()
+        .unwrap();
+    let v: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(v["observation"], "incomplete", "{v}");
+    assert_eq!(v["event_persisted"], false);
+    assert_eq!(v["reason"], "request_deadline_exceeded");
+}
+
+#[test]
+fn sigint_recheck_returns_cancelled_without_persisting_and_reaps_descendants() {
+    let p = Project::new();
+    let tool = p.0.join("clang");
+    let script = fs::read_to_string(&tool).unwrap();
+    fs::write(&tool,script.replace("cat >/dev/null", &format!("cat >/dev/null\nif [ -f '{}' ]; then : > '{}'; (sleep 2; echo ghost > '{}') & sleep 10; fi",p.0.join("slow").display(),p.0.join("scanning").display(),p.0.join("ghost").display()))).unwrap();
+    let r = p.scan(&[2]);
+    let id = r["workbench"]["task_ids"][0].as_str().unwrap();
+    fs::write(p.0.join("slow"), "").unwrap();
+    let mut child = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["task", "verify", id])
+        .arg(&p.0)
+        .args(["--timeout", "20s", "--format=json"])
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()
+        .unwrap();
+    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(8);
+    while !p.0.join("scanning").exists() {
+        assert!(child.try_wait().unwrap().is_none());
+        assert!(std::time::Instant::now() < deadline);
+        std::thread::sleep(std::time::Duration::from_millis(10));
+    }
+    assert!(
+        Command::new("/bin/kill")
+            .args(["-INT", &child.id().to_string()])
+            .status()
+            .unwrap()
+            .success()
+    );
+    let out = child.wait_with_output().unwrap();
+    assert_eq!(out.status.code(), Some(130), "{out:?}");
+    let v: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(v["command_status"], "cancelled");
+    assert_eq!(v["reason"], "request_cancelled");
+    assert_eq!(v["event_persisted"], false);
+    capture(&v);
+    std::thread::sleep(std::time::Duration::from_millis(2200));
+    assert!(!p.0.join("ghost").exists());
 }

@@ -1,0 +1,459 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:repair-brief-preview:0.29.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "command_status",
+    "exit_code",
+    "disposition",
+    "reason",
+    "repair_brief",
+    "next_actions",
+    "authority",
+    "delivery_decision"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.29.0"
+    },
+    "report_type": {
+      "const": "repair_brief_preview"
+    },
+    "operation": {
+      "const": "next"
+    },
+    "command_status": {
+      "enum": [
+        "complete",
+        "incomplete"
+      ]
+    },
+    "exit_code": {
+      "enum": [
+        0,
+        3
+      ]
+    },
+    "disposition": {
+      "enum": [
+        "actionable",
+        "waiting",
+        "needs_decision",
+        "verification_required",
+        "no_applicable_work"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repair_brief": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "task_id",
+        "kind",
+        "checker_id",
+        "scope",
+        "source_sha256",
+        "native_rule_id",
+        "evidence_ref",
+        "current_run_id",
+        "observation_status",
+        "native_positions",
+        "rule_basis",
+        "constraints",
+        "allowed_paths",
+        "disposition",
+        "reason_code",
+        "step",
+        "recheck_argv",
+        "history",
+        "closure_condition",
+        "authority",
+        "delivery_decision",
+        "native_reason",
+        "unclassified_native_diagnostics"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "0.29.0"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^CG-(B-)?[a-f0-9]{32}$"
+        },
+        "kind": {
+          "enum": [
+            "finding",
+            "blocker"
+          ]
+        },
+        "checker_id": {
+          "enum": [
+            "c.clang.documentation",
+            "cpp.clang.documentation"
+          ]
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_sha256": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          ]
+        },
+        "native_rule_id": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ]
+        },
+        "evidence_ref": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "first_run_id",
+            "first_report_sha256"
+          ],
+          "properties": {
+            "first_run_id": {
+              "type": "string",
+              "pattern": "^clangdoc-[0-9]+-[0-9]+-[0-9]+$"
+            },
+            "first_report_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        },
+        "current_run_id": {
+          "type": "string",
+          "pattern": "^clangdoc-[0-9]+-[0-9]+-[0-9]+$"
+        },
+        "observation_status": {
+          "enum": [
+            "input_changed",
+            "tool_or_standard_changed",
+            "native_incomplete",
+            "coverage_requires_review",
+            "candidate_absent_unverified",
+            "native_rule_observed"
+          ]
+        },
+        "native_positions": {
+          "$ref": "urn:codeguard:syntax-lint-feedback:0.2#/properties/native/properties/diagnostics"
+        },
+        "rule_basis": {
+          "type": "string",
+          "minLength": 1
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "allowed_paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "disposition": {
+          "enum": [
+            "actionable",
+            "needs_decision"
+          ]
+        },
+        "reason_code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "step": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "recheck_argv": {
+          "type": "array",
+          "minItems": 8,
+          "maxItems": 8,
+          "prefixItems": [
+            {
+              "const": "codeguard"
+            },
+            {
+              "const": "task"
+            },
+            {
+              "const": "verify"
+            },
+            {
+              "type": "string",
+              "pattern": "^CG-(B-)?[0-9a-f]{32}$"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "const": "--clang-tool"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "const": "--format=json"
+            }
+          ],
+          "items": false
+        },
+        "history": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "task_verify",
+            "attempt_journal"
+          ],
+          "properties": {
+            "status": {
+              "const": "native_observations_only"
+            },
+            "task_verify": {
+              "const": "partial"
+            },
+            "attempt_journal": {
+              "const": "not_integrated"
+            }
+          }
+        },
+        "closure_condition": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authority": {
+          "const": "local_unverified"
+        },
+        "delivery_decision": {
+          "const": "not_evaluated"
+        },
+        "native_reason": {
+          "type": "string",
+          "pattern": "^[a-z_]+$"
+        },
+        "unclassified_native_diagnostics": {
+          "$ref": "urn:codeguard:syntax-lint-feedback:0.2#/properties/native/properties/diagnostics"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "observation_status": {
+                "const": "input_changed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason_code": {
+                "const": "input_changed"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "observation_status": {
+                "const": "tool_or_standard_changed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason_code": {
+                "const": "tool_or_standard_changed"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "observation_status": {
+                "const": "native_incomplete"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason_code": {
+                "const": "native_incomplete"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "observation_status": {
+                "const": "coverage_requires_review"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason_code": {
+                "const": "coverage_requires_review"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "observation_status": {
+                "const": "candidate_absent_unverified"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason_code": {
+                "const": "candidate_absent_unverified"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "observation_status": {
+                "const": "native_rule_observed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason_code": {
+                "const": "native_rule_observed"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "observation_status": {
+                "const": "native_rule_observed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "kind": {
+                "const": "finding"
+              },
+              "disposition": {
+                "const": "actionable"
+              },
+              "native_rule_id": {
+                "type": "string",
+                "pattern": "^clang\\.[A-Za-z0-9_]+$"
+              },
+              "native_positions": {
+                "minItems": 1
+              },
+              "allowed_paths": {
+                "minItems": 1,
+                "maxItems": 1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "disposition": {
+                "const": "needs_decision"
+              },
+              "native_positions": {
+                "const": []
+              },
+              "allowed_paths": {
+                "const": []
+              }
+            }
+          }
+        }
+      ]
+    },
+    "next_actions": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "failed_reports": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "run_id",
+          "reason",
+          "report_ref"
+        ],
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,120}$"
+          },
+          "reason": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]{1,80}$"
+          },
+          "report_ref": {
+            "type": "string",
+            "pattern": "^\\.codeguard/reports/[A-Za-z0-9_-]{1,120}\\.json$"
+          }
+        }
+      }
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    }
+  }
+}
