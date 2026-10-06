@@ -13,6 +13,11 @@ pub(crate) fn examples(command: &str) -> &'static [&'static str] {
             "codeguard lint java File.java --maven-tool /absolute/mvn --java-home /absolute/jdk --maven-repo /absolute/repository --repo-sha256 SHA256 --format json",
             "codeguard lint typescript file.ts --node-tool /absolute/node --eslint-entry /absolute/eslint/bin/eslint.js --eslint-version VERSION --config /absolute/eslint.config.js --cwd /absolute/project --format json",
         ],
+        "comments" => &[
+            "codeguard comments java File.java --java-home /absolute/jdk21 --format json",
+            "codeguard comments java . --java-home /absolute/jdk21 --maven-tool /absolute/mvn --maven-repo /absolute/repository --repo-sha256 SHA256 --format json",
+            "codeguard comments rust . --cargo-tool /absolute/cargo --format json",
+        ],
         "task verify" => &[
             "codeguard task verify TASK_ID . --rustfmt-tool /absolute/toolchain/bin/rustfmt --format json",
             "codeguard task verify TASK_ID . --go-tool /absolute/sdk/bin/go --format json",

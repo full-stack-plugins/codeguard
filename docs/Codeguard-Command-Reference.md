@@ -333,3 +333,16 @@ Ruby edit feedback: source builds of `hook execute` / `hook claude post-tool-use
 Rust edit entry: source-built `hook execute ROOT --rustfmt-tool ABS_PATH --timeout 30s --format=json` and `hook claude post-tool-use` use selected-file Cargo edition with fixed Rustfmt1.9.0-stable. Without an explicit selection, only absolute PATH entries are searched; genuine absence retains built-in WASM prechecks when available. `next ROOT --format=json` returns a stable confirmation task and original-tool recheck arguments; `task verify TASK_ID ROOT --rustfmt-tool ABS_PATH --format=json` records the same task's observation. Rustfmt supplies parser observations; Clippy/type/full-build obligations remain pending, and zero diagnostics cannot close tasks. Selected failures stay incomplete, including unverified proxy versions. Source changes and offline installation tests do not update the public npm release.
 
 Rust edit dialogue now provides an executable post-batch Clippy command and explicitly states that project lint did not run during editing. Original-task repair-ready retains current rule/line feedback and withdraws changed-input guidance; this is not a background queue or authoritative closure. See [project lint follow-up](Rust-Project-Lint-Followup.md).
+
+## Unified Java comments entry (source increment, not released)
+
+`comments java [path]` reuses the existing native Javadoc probes. A file selects an explicit JDK21 local observation. A project selects recognized Javadoc configuration and its main sources only. Missing configuration does not launch Javadoc or produce comment violations. Explicit Maven context selects original-POM multi-file checking; failure never falls back to a single-file probe.
+
+```bash
+codeguard comments java File.java --java-home /absolute/jdk21 --format json
+codeguard comments java . --java-home /absolute/jdk21 --maven-tool /absolute/mvn --maven-repo /absolute/repository --repo-sha256 SHA256 --timeout 60s --format json
+```
+
+The independent `java_comments_feedback 0.1.0` wrapper preserves the existing report under `native_observation`; the old `lint java --checker javadoc` protocol remains unchanged. Budget precedence is CLI, registered environment, project default, then built-in default. All native child work shares one deadline. Feedback exposes target kind, budget, observations and next actions. Zero local diagnostics still means `coverage_proven=false`, `delivery_decision=not_evaluated`, exit3 (130 on cancellation). No implicit installation or source changes occur.
+
+**Current limitation:** `workbench_status=not_integrated`. Persistent Javadoc tasks, repair briefs and trusted closure remain to be connected. This entry creates no fake tasks and does not close findings from a local probe. Replace the absolute tool paths and offline-repository digest with real current values.

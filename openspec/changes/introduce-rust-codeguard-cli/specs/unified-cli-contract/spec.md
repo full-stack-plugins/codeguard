@@ -319,3 +319,19 @@ npm公开CVE入口 MUST 按CLI、登记环境变量、项目runtime.json、内�
 - **WHEN** 使用注册表规范语言请求独立单文件 lint，而该语言尚无专用原生适配器
 - **THEN** 返回版本化未完成报告，明确原生适配缺口及配置 unknown；不得宣称原生工具未安装或执行注册表中未经适配的历史命令。启用WASM时只对匹配的固定路由提供有界候选，未知ID、错参、无关工具参数在观察及持久化前拒绝
 - **AND** 疑似候选可复用项目确认任务及下一步；后续零候选不关闭历史任务，损坏历史保留恢复原因。无WASM构建明确能力不可用，不伪造lint通过。源码选择与grammar不匹配、歧义头文件或普通SQL不强选grammar
+
+### Requirement: Java comments entry SHALL preserve native scope and configuration boundaries
+
+`comments java [path]` MUST 提供独立注释检查入口，复用已有 JDK 单文件和 Maven 项目 Javadoc 原生能力。项目入口 MUST 先观察当前配置，只选择 Java 注释检查，不运行其他语言或检测类别。显式 Maven 上下文 MUST 不退回单文件探针。文件入口是显式局部诊断，不证明项目配置。共享预算、不可用工具与取消 MUST 明示；不隐式安装、不修改源码。尚未接通持久修复适配时 MUST 明示 `workbench_status=not_integrated`，不得伪造任务或关闭资格。
+
+#### Scenario: Java comments project lacks configuration
+- **WHEN** 项目有 Java 主源码，但没有确认的 Javadoc 配置
+- **THEN** 保留配置缺口，不启动 Javadoc，不生成源码违规，不声称检查通过
+
+#### Scenario: Java comments file produces native diagnostics
+- **WHEN** 显式 JDK 对单文件返回可解析的 Javadoc 诊断
+- **THEN** 独立 comments 报告保留原诊断、局部范围和复检指引，交付不作判定
+
+#### Scenario: Duplicate Java comments arguments
+- **WHEN** 同一选项重复、未知选项或预算无效
+- **THEN** 启动原生工具前以参数错误拒绝，不输出成功报告

@@ -2480,3 +2480,7 @@ WASM CLI全目标Clippy -D warnings、定向rustfmt、分层、OpenSpec strict�
 已有Ruff0.16.8显式执行work_sync两个条件用例2通过/0失败/0忽略，3.51秒；与138忽略中的两项重叠，单独记录。Ruff工具前后摘要稳定；程序摘要仅执行前捕获，归档时target目录不存在，执行后程序身份未复核且未重建。正常重复扫描稳定任务、存储故障保留F401和失败反馈。默认全工作区全目标Clippy -D warnings通过34.13秒；374schema元定义、分层、OpenSpec strict及diff检查通过，不把元定义校验当完整实例验收。
 
 [验收说明](../../../tests/acceptance/workspace-regression-20261006.md)与[日志/制品/来源身份](../../../tests/acceptance/evidence/default-workspace-regression-2026-10-06.json)保留各阶段区别。54e905c远端CI37414921955终态failure，msrv成功，gate失败于Check out corpus evidence source。用户草稿摘要不变，默认cfg下0项测试，未修改/纳入提交；未执行完整WASM/平台/工具链/宿主验收或发布，13.2等父任务仍开放。
+
+## 2026-10-06 Java comments 入口
+
+新增统一 `comments java` 的文件/项目局部原生入口及独立报告schema。三个回归目标15通过/0失败/2条件忽略，真实已有JDK21新目标另行1通过；后一目标与忽略项重叠，不作为第二套独立语料。初始真实样例漏补公共构造函数文档导致失败，补全测试样例后通过，产品规则未抑制。工作台明确not_integrated，父任务不勾选。见 tests/acceptance/java-comments-unified-entry.md。

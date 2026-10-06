@@ -234,9 +234,9 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             },
             executable: cfg!(unix),
             operation_kind: r#"check"#,
-            usage: r#"comments rust [path] [--cargo-tool ABS_PATH] [--timeout DURATION] [--format human|json]"#,
-            scope: r#"Rust库文档探针；完整文档政策与闭环尚缺"#,
-            languages: &[r#"rust"#],
+            usage: r#"comments <rust|java> [path] [--timeout DURATION] [--format human|json]"#,
+            scope: r#"Rust库文档与Java文件/项目Javadoc探针；完整文档政策与闭环尚缺"#,
+            languages: &[r#"rust"#, r#"java"#],
         },
         CommandDescriptor {
             tracking_id: Some(r#"C16"#),

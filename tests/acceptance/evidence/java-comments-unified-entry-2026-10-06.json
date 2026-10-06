@@ -1,0 +1,26 @@
+{
+  "evidence_type": "java_comments_unified_entry_local_acceptance",
+  "source_sha256": {
+    "crates/codeguard-cli/src/java_comments_command.rs": "6736d97c6db9c4cbc49479c9a560e70620981f6524ef39b1b9480802c50c6312",
+    "crates/codeguard-cli/tests/java_comments_cli.rs": "049bfaa99efe23a6e598510d0c6b939184aa68763b93f9aa6c3259400ba41e3d",
+    "schemas/java-comments-feedback.schema.json": "a0163cb0964a76920629a6ec96dabc0d32caed0768e2a72f03c03d7bee60b130"
+  },
+  "regression": {
+    "passed": 15,
+    "failed": 0,
+    "ignored": 2
+  },
+  "explicit_native_test": {
+    "passed": 1,
+    "failed": 0,
+    "ignored": 0,
+    "jdk_home": "/Users/wandl/Library/Java/JavaVirtualMachines/ms-21.0.12.1/Contents/Home",
+    "overlaps_regression_ignored": true
+  },
+  "schema_actual_reports_valid": 3,
+  "clippy": "passed",
+  "layering": "passed",
+  "openspec_strict": "passed",
+  "workbench_status": "not_integrated",
+  "delivery_decision": "not_evaluated"
+}

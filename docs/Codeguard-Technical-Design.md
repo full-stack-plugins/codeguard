@@ -1653,3 +1653,16 @@ The explicit Erlang probe adds worker 1.6/probe 0.7 for direct function-form ter
 Erlang project/edit integration uses check 0.55, confirmation 0.14 and Hook 0.28/fast 0.16. OTP runs first on the selected files; actual absence permits candidate fallback, whereas selected-tool failure remains native incomplete. Existing native/environment and later structural evidence share task identity. Consumed original reports stay bound to markers across source edits; fresh imports still verify current byte positions. See [workflow acceptance](../tests/acceptance/erlang-form-workbench.md).
 
 Project Rust CVE discovery: the existing rust.cve task selects its explicit override or the first existing entry in an absolute PATH directory. A broken selected entry does not fall through; the offline database remains explicit, and native execution plus tool/lock/manifest identity checks use the existing service. check_feedback0.56 references the dedicated closed Clippy brief schema when that brief is selected, preserving older protocols. Complete database, tool-lock/version and host trust remain open; see [actual acceptance](../tests/acceptance/cargo-audit-path-discovery.md).
+
+## Unified Java comments entry (source increment, not released)
+
+`comments java [path]` reuses the existing native Javadoc probes. A file selects an explicit JDK21 local observation. A project selects recognized Javadoc configuration and its main sources only. Missing configuration does not launch Javadoc or produce comment violations. Explicit Maven context selects original-POM multi-file checking; failure never falls back to a single-file probe.
+
+```bash
+codeguard comments java File.java --java-home /absolute/jdk21 --format json
+codeguard comments java . --java-home /absolute/jdk21 --maven-tool /absolute/mvn --maven-repo /absolute/repository --repo-sha256 SHA256 --timeout 60s --format json
+```
+
+The independent `java_comments_feedback 0.1.0` wrapper preserves the existing report under `native_observation`; the old `lint java --checker javadoc` protocol remains unchanged. Budget precedence is CLI, registered environment, project default, then built-in default. All native child work shares one deadline. Feedback exposes target kind, budget, observations and next actions. Zero local diagnostics still means `coverage_proven=false`, `delivery_decision=not_evaluated`, exit3 (130 on cancellation). No implicit installation or source changes occur.
+
+**Current limitation:** `workbench_status=not_integrated`. Persistent Javadoc tasks, repair briefs and trusted closure remain to be connected. This entry creates no fake tasks and does not close findings from a local probe. Replace the absolute tool paths and offline-repository digest with real current values.

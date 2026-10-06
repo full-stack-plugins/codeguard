@@ -1199,3 +1199,16 @@ flowchart LR
 
 
 Erlang项目/编辑路径已串起原生优先、有界WASM结构兜底与稳定任务复检。环境阻塞、候选及原生复检沿用同一身份，零诊断不自行关闭。见[工作流与执行图](../tests/acceptance/erlang-form-workbench.md)。
+
+## Java 注释统一入口（源码增量，尚未发布）
+
+`comments java [path]` 复用既有原生 Javadoc 探针：文件模式执行显式 JDK21 局部诊断；项目模式只选择已识别配置及所属主源码。缺配置不运行 Javadoc，也不生成注释违规。显式 Maven 上下文选择原 POM 多文件检查，失败不退回单文件探针。
+
+```bash
+codeguard comments java File.java --java-home /absolute/jdk21 --format json
+codeguard comments java . --java-home /absolute/jdk21 --maven-tool /absolute/mvn --maven-repo /absolute/repository --repo-sha256 SHA256 --timeout 60s --format json
+```
+
+独立包装协议 `java_comments_feedback 0.1.0` 保留 `native_observation` 原报告，不修改旧 `lint java --checker javadoc` 的协议。预算使用 CLI、登记环境变量、项目默认值、内置默认值的优先级；所有原生子任务共用截止时间。报告显示 `target_kind`、`execution_budget`、具体观察和下一步；局部零诊断仍是 `coverage_proven=false`、`delivery_decision=not_evaluated`，退出3（取消130）。不隐式安装或修改源码。
+
+**当前限制：** `workbench_status=not_integrated`。Javadoc 持久任务、修复简报及可信关闭还需接通，本入口不伪造任务，不据局部探针关闭问题。示例中的绝对工具路径和离线仓库摘要需替换为当前真实环境。
