@@ -1,0 +1,402 @@
+{
+  "authority": "local_unverified",
+  "category_candidates": [
+    {
+      "capability_status": "gap",
+      "category": "lint",
+      "checker_id": null,
+      "language": "java",
+      "legacy_status": "stable",
+      "next_action": null,
+      "reason": "native_scan_incomplete",
+      "status": "native_incomplete"
+    },
+    {
+      "capability_status": "gap",
+      "category": "comments",
+      "checker_id": null,
+      "language": "java",
+      "legacy_status": "stable",
+      "next_action": null,
+      "reason": "javadoc_checker_not_configured",
+      "status": "not_configured"
+    },
+    {
+      "capability_status": "gap",
+      "category": "dependencies",
+      "checker_id": null,
+      "language": "java",
+      "legacy_status": "stable",
+      "next_action": "\u8865\u9f50\u76ee\u6807\u6784\u5efa\u6839\u7684\u914d\u7f6e\u89c2\u5bdf\u540e\u91cd\u65b0\u68c0\u67e5",
+      "reason": "checker_configuration_not_observed",
+      "status": "configuration_unresolved"
+    },
+    {
+      "capability_status": "gap",
+      "category": "cve",
+      "checker_id": null,
+      "language": "java",
+      "legacy_status": "stable",
+      "next_action": "\u8865\u9f50\u76ee\u6807\u6784\u5efa\u6839\u7684\u914d\u7f6e\u89c2\u5bdf\u540e\u91cd\u65b0\u68c0\u67e5",
+      "reason": "checker_configuration_not_observed",
+      "status": "configuration_unresolved"
+    },
+    {
+      "capability_status": "gap",
+      "category": "security",
+      "checker_id": null,
+      "language": "java",
+      "legacy_status": "stable",
+      "next_action": "\u8865\u9f50\u76ee\u6807\u6784\u5efa\u6839\u7684\u914d\u7f6e\u89c2\u5bdf\u540e\u91cd\u65b0\u68c0\u67e5",
+      "reason": "checker_configuration_not_observed",
+      "status": "configuration_unresolved"
+    },
+    {
+      "capability_status": "gap",
+      "category": "build",
+      "checker_id": null,
+      "language": "java",
+      "legacy_status": "stable",
+      "next_action": null,
+      "reason": "native_adapter_not_integrated",
+      "status": "not_integrated"
+    }
+  ],
+  "command_status": "incomplete",
+  "delivery_decision": "not_evaluated",
+  "discovery": {
+    "blocked_paths": [],
+    "build_roots": [],
+    "checker_configurations": [],
+    "declared_versions": {},
+    "languages": [
+      {
+        "id": "java",
+        "manifests": [],
+        "source_files": [
+          "Foo.java"
+        ]
+      },
+      {
+        "id": "rust",
+        "manifests": [],
+        "source_files": [
+          "transport.rs"
+        ]
+      }
+    ],
+    "lockfiles": [],
+    "manifest_sha256": {},
+    "native_tool_candidates": [],
+    "observation_complete": true,
+    "observed_entries": 6,
+    "report_type": "discovery",
+    "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-1",
+    "schema_version": "0.4.0",
+    "scope_summary": {
+      "configuration_exception_files_observed": 0,
+      "dependency_roots_excluded": 0,
+      "dot_prefix_roots_excluded": 1,
+      "git_safety_status": "not_evaluated",
+      "ordinary_scan_policy": "project_sources_default_v2"
+    },
+    "source_set_candidates": [],
+    "unknown_conditions": [
+      "source_sets_not_fully_classified",
+      "dialects_not_classified"
+    ]
+  },
+  "execution_budget": {
+    "enforcement": "native_execution_only",
+    "jobs_limit": 4,
+    "jobs_source": "builtin_default",
+    "native_task_count": 1,
+    "source": "builtin_default",
+    "started_native_task_count": 1,
+    "timeout_ms": 1800000
+  },
+  "execution_tasks": [
+    {
+      "id": "java.p3c",
+      "status": "native_incomplete"
+    }
+  ],
+  "exit_code": 3,
+  "export": {
+    "reason_code": null,
+    "status": "not_requested"
+  },
+  "native_results": {
+    "erlang_lint": null,
+    "go_lint": null,
+    "java_cve": null,
+    "java_dependencies": null,
+    "java_javadoc": null,
+    "java_p3c": {
+      "authority": "local_unverified",
+      "backlog_status": "synced_partial",
+      "backlog_sync": {
+        "failed_reports": 0,
+        "historical_findings": 0,
+        "imported_reports": 1,
+        "new_blockers": 1,
+        "new_findings": 0
+      },
+      "category": "lint",
+      "checker_id": "java.maven.p3c",
+      "command_status": "incomplete",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "exit_code": 3,
+      "files": [
+        {
+          "build_root": ".",
+          "configuration": "unknown",
+          "configuration_ref": null,
+          "configuration_sha256": null,
+          "observation": null,
+          "path": "Foo.java",
+          "reason": "p3c_configuration_not_confirmed"
+        }
+      ],
+      "finding_count": 0,
+      "findings": [],
+      "language": "java",
+      "local_observation_complete": false,
+      "next": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "disposition": "needs_decision",
+        "exit_code": 0,
+        "next_actions": [],
+        "operation": "next",
+        "reason": "local_task_selected",
+        "repair_brief": {
+          "action_id": "review-project-policy",
+          "affected_paths": [
+            "Foo.java"
+          ],
+          "authority": "local_unverified",
+          "build_root": ".",
+          "checker_id": "java.maven.p3c",
+          "closure_condition": "\u539f\u751f\u5de5\u5177\u6309\u76f8\u540c\u53d7\u63a7\u7b56\u7565\u5b8c\u6574\u590d\u68c0\u5e76\u786e\u8ba4\u95ee\u9898\u5df2\u89e3\u51b3\uff1b\u5c40\u90e8\u67e5\u8be2\u4e0d\u80fd\u5173\u95ed\u4efb\u52a1",
+          "constraints": [
+            "\u5148\u6062\u590d\u68c0\u67e5\u5b8c\u6574\u6027",
+            "\u4e0d\u5f97\u5173\u95ed\u68c0\u67e5\u5668\u6216\u4fee\u6539\u65e0\u5173\u6e90\u7801"
+          ],
+          "disposition": "needs_decision",
+          "evidence_ref": {
+            "first_report_sha256": "d13e02b0d4e39c2744981d59d57d29294dcd23d5dfc5528180a96a8d636c1d7f",
+            "first_run_id": "java-p3c-18646-1791296249566986000-0"
+          },
+          "history": {
+            "attempt_count": 0,
+            "awaiting_verification": false,
+            "budget": 2,
+            "no_progress_count": 0,
+            "open_attempt_id": null,
+            "recent": []
+          },
+          "kind": "blocker",
+          "reason_code": "p3c_configuration_not_confirmed",
+          "recheck_argv": [
+            "codeguard",
+            "check",
+            "all",
+            ".",
+            "--maven-tool",
+            "<\u7edd\u5bf9\u8def\u5f84>",
+            "--java-home",
+            "<\u7edd\u5bf9\u8def\u5f84>",
+            "--maven-repo",
+            "<\u7edd\u5bf9\u8def\u5f84>",
+            "--repo-sha256",
+            "<\u56fa\u5b9a\u6458\u8981>"
+          ],
+          "schema_version": "0.1.0",
+          "scope": ".",
+          "step": "\u786e\u8ba4\u8be5 Maven \u6a21\u5757\u662f\u5426\u8981\u6c42 P3C\uff1b\u82e5\u8981\u6c42\uff0c\u4fee\u6b63\u539f\u751f\u63d2\u4ef6\u53ca\u89c4\u5219\u914d\u7f6e\u5e76\u590d\u626b\uff1b\u5426\u5219\u63d0\u4ea4\u53d7\u4fdd\u62a4\u7b56\u7565\u51b3\u7b56",
+          "task_id": "CG-B-4085aef64088761aff2b040e8a230d62"
+        },
+        "report_type": "repair_brief_preview",
+        "schema_version": "0.1.0"
+      },
+      "observed_file_count": 0,
+      "operation": "lint",
+      "report_type": "java_p3c_project_observation",
+      "rulepack_approval": "unverified",
+      "run_id": "java-p3c-18646-1791296249566986000-0",
+      "schema_version": "0.2.0",
+      "source_file_count": 1,
+      "tool_approval": "unverified",
+      "workspace_binding": "bound",
+      "workspace_id": "ws-0db782525b09aae9bd4c6e3105356e43"
+    },
+    "kotlin_lint": null,
+    "node_lint": null,
+    "npm_cve": [],
+    "python_cve": [],
+    "python_lint": null,
+    "ruby_lint": null,
+    "rust_build": null,
+    "rust_comments": null,
+    "rust_cve": null,
+    "rust_lint": null,
+    "shell_lint": null,
+    "swift_lint": null,
+    "zig_lint": null
+  },
+  "next": {
+    "authority": "local_unverified",
+    "command_status": "complete",
+    "delivery_decision": "not_evaluated",
+    "disposition": "actionable",
+    "exit_code": 0,
+    "next_actions": [],
+    "operation": "next",
+    "reason": "local_task_selected",
+    "repair_brief": {
+      "action_id": "repair-source",
+      "authority": "local_unverified",
+      "checker_id": "java.checkstyle",
+      "checkstyle_guidance": {
+        "checker_class": "com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck",
+        "configuration_current": true,
+        "observed_inputs": {
+          "config": {
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-1/checks.xml",
+            "sha256": "0084cefcef4a156bfe1cc898fb639faed38b4b787ab9855e3f07081860bf7e5d"
+          },
+          "jar": {
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-1/fixture.jar",
+            "sha256": "294fbce99942fcf856f72354f4d677e332494c8ac01e43726b5b1caec9f22f2d"
+          },
+          "java": {
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-1/transport",
+            "sha256": "d956f2dc89749e507bb3d1fbbf389d32f422ea0b00d63fd30cd7949df951d1f1"
+          },
+          "source": {
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-1/Foo.java",
+            "sha256": "626d55c191ca3a9f4467cc0564a4dffce3a4f3febd92d0df79814eeb4d8fec0d"
+          }
+        },
+        "original_configuration_input": {
+          "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-1/checks.xml",
+          "sha256": "0084cefcef4a156bfe1cc898fb639faed38b4b787ab9855e3f07081860bf7e5d"
+        },
+        "original_tool_inputs": {
+          "jar": {
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-1/fixture.jar",
+            "sha256": "294fbce99942fcf856f72354f4d677e332494c8ac01e43726b5b1caec9f22f2d"
+          },
+          "java": {
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-1/transport",
+            "sha256": "d956f2dc89749e507bb3d1fbbf389d32f422ea0b00d63fd30cd7949df951d1f1"
+          }
+        },
+        "recheck_argv": [
+          "codeguard",
+          "lint",
+          "java",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-1/Foo.java",
+          "--checker=checkstyle",
+          "--workspace",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-1",
+          "--config",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-1/checks.xml",
+          "--java-tool",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-1/transport",
+          "--checkstyle-jar",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-1/fixture.jar",
+          "--format=json"
+        ],
+        "repair_steps": [
+          "\u6309\u539f\u914d\u7f6e\u8865\u5145\u7c7b\u578b\u3001\u5b57\u6bb5\u3001\u65b9\u6cd5\u6216\u6784\u9020\u5668\u7684\u7528\u9014\u8bf4\u660e\uff0c\u6838\u5bf9\u9996\u53e5\u3001HTML\u4e0e\u7a7a\u63cf\u8ff0\uff1b\u4fdd\u7559\u539f\u89c4\u5219\u53c2\u6570\uff0c\u4e0d\u7528\u88f8\u6807\u7b7e\u6216\u5173\u95ed\u68c0\u67e5\u9003\u907f\u590d\u68c0",
+          "\u4f7f\u7528\u540c\u4e00\u539f\u914d\u7f6e\u548c\u539f\u68c0\u67e5\u5668\u590d\u68c0\uff1b\u96f6\u8bca\u65ad\u4e0d\u5355\u72ec\u4f5c\u4e3a\u9879\u76ee\u4ea4\u4ed8\u6216\u4efb\u52a1\u5173\u95ed\u6761\u4ef6"
+        ],
+        "rule_reference": "https://checkstyle.org/checks/javadoc/javadocstyle.html",
+        "rule_summary": "Javadoc\u63cf\u8ff0\u6216\u683c\u5f0f\u4e0d\u5b8c\u6574",
+        "source_sha256": "626d55c191ca3a9f4467cc0564a4dffce3a4f3febd92d0df79814eeb4d8fec0d"
+      },
+      "closure_condition": "\u539f\u751f\u5de5\u5177\u6309\u76f8\u540c\u53d7\u63a7\u7b56\u7565\u5b8c\u6574\u590d\u68c0\u5e76\u786e\u8ba4\u95ee\u9898\u5df2\u89e3\u51b3\uff1b\u5c40\u90e8\u67e5\u8be2\u4e0d\u80fd\u5173\u95ed\u4efb\u52a1",
+      "constraints": [
+        "\u4ec5\u4fee\u6539\u76ee\u6807\u6e90\u7801",
+        "\u4e0d\u5f97\u5ffd\u7565\u89c4\u5219\u6216\u5c06\u4efb\u52a1\u52fe\u9009\u5f53\u4f5c\u590d\u68c0"
+      ],
+      "disposition": "actionable",
+      "evidence_ref": {
+        "first_report_sha256": "ac187ea978b54ede199ae69025678179cddf3a50f1d4a5b61d85a5b91c41b016",
+        "first_run_id": "checkstyle-18630-1791296249278394000"
+      },
+      "history": {
+        "attempt_count": 0,
+        "awaiting_verification": false,
+        "budget": 2,
+        "no_progress_count": 0,
+        "open_attempt_id": null,
+        "recent": []
+      },
+      "kind": "finding",
+      "native_rule_id": "detailDocs",
+      "recheck_argv": [
+        "codeguard",
+        "lint",
+        "java",
+        "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-1/Foo.java",
+        "--checker=checkstyle",
+        "--workspace",
+        "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-1",
+        "--config",
+        "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-1/checks.xml",
+        "--java-tool",
+        "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-1/transport",
+        "--checkstyle-jar",
+        "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-1/fixture.jar",
+        "--format=json"
+      ],
+      "schema_version": "0.25.0",
+      "scope": "Foo.java",
+      "source_sha256": "626d55c191ca3a9f4467cc0564a4dffce3a4f3febd92d0df79814eeb4d8fec0d",
+      "step": "\u6309\u539f\u914d\u7f6e\u8865\u5145\u7c7b\u578b\u3001\u5b57\u6bb5\u3001\u65b9\u6cd5\u6216\u6784\u9020\u5668\u7684\u7528\u9014\u8bf4\u660e\uff0c\u6838\u5bf9\u9996\u53e5\u3001HTML\u4e0e\u7a7a\u63cf\u8ff0\uff1b\u4fdd\u7559\u539f\u89c4\u5219\u53c2\u6570\uff0c\u4e0d\u7528\u88f8\u6807\u7b7e\u6216\u5173\u95ed\u68c0\u67e5\u9003\u907f\u590d\u68c0",
+      "task_id": "CG-12e1811806015abdc977259d3721c4b7"
+    },
+    "report_type": "repair_brief_preview",
+    "schema_version": "0.25.0"
+  },
+  "obligation_status": "unresolved",
+  "operation": "check",
+  "reason": "java_selection_obligations_and_trusted_policy_unavailable",
+  "report_type": "check_feedback",
+  "required_obligations": null,
+  "schema_version": "0.70.0",
+  "selection": "java",
+  "syntax_candidates": {
+    "authority": "candidate_unqualified",
+    "delivery_decision": "incomplete",
+    "execution_phase": "after_native",
+    "native_preferred_count": 0,
+    "next_action": "\u4f7f\u7528\u5305\u542b\u56fa\u5b9a\u8bed\u6cd5\u8d44\u4ea7\u7684\u53d1\u884c\u5305\u8fd0\u884c\u5019\u9009\u521d\u68c0\uff0c\u5e76\u5b8c\u6210\u9002\u7528\u539f\u751f\u68c0\u67e5",
+    "observations": [],
+    "reason": "binary_without_wasm_precheck",
+    "skipped_count": 0,
+    "source_file_count": 1,
+    "status": "not_run",
+    "unrouted_count": 0
+  },
+  "syntax_tasks": {
+    "failures": [],
+    "new_blockers": 0,
+    "status": "synced_partial",
+    "tasks": []
+  },
+  "unresolved_conditions": [
+    "dialects_not_classified",
+    "java_p3c_task_incomplete",
+    "required_obligations_unresolved",
+    "source_sets_not_fully_classified",
+    "tool_lock_unverified",
+    "trusted_policy_unavailable"
+  ],
+  "gradle_javadoc_tasks": null
+}

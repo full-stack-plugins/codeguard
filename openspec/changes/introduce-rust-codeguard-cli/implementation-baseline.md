@@ -173,3 +173,5 @@ Java21增量原生差分及隐藏恢复分类已补齐：本轮作者样本不�
 独立JDK详细文档增量（2026-10-06）：五类原生描述消息由新版解析器进入文件/配置项目观察、稳定任务及原工具复检。当前原生0.2、项目0.4、工作台/复检0.3、comments0.7/0.8、brief0.4、任务预览0.31、check0.68/aborted0.19；旧协议不改写，Maven仍独立。实际两种模式各4/3/1/0诊断、16任务逐项存在及修复后消失仍open。详见 tests/acceptance/jdk-javadoc-detailed-descriptions.md；15.3/15.6父任务、可信关闭和逐语言生产验收不据此完成。
 
 Maven详细描述增量（2026-10-06）：原POM多文件原生消息进入稳定任务、详细指引及原任务复检，五类规则由独立新协议承载。相同文件/规则的新锚点要求复核；首次证据为包裹报告的新任务据消费收据复检。受控输出来回归全部五类，不冒充原插件验收；实际已有Maven空离线库的检查/环境复检两次均缺Javadoc插件，仅生成阻塞。真实插件详细描述条件测试待缓存完成，15.3/15.6和四核心生产资格继续未完成。见 tests/acceptance/maven-javadoc-detailed-descriptions.md。
+
+Checkstyle详细描述源码增量（2026-10-06）：原10.21.4配置的JavadocStyle、NonEmptyAtclauseDescription、SummaryJavadoc以独立反馈/工作台/复检/简报协议进入稳定任务和原工具复检；历史规则与schema保留。受控XML进程验证三类及准备恢复新任务，不冒充真实工具语义；JAR缺失，原生条件验收待执行。聚合实际0.58的Javadoc未配置原因码修复，选中详细Checkstyle的0.70仅构造协议验证。15.3/15.6、可信关闭和全部四核心资格不据此完成，见tests/acceptance/checkstyle-detailed-descriptions.md。

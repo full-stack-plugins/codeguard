@@ -1,0 +1,9 @@
+{
+  "meta_valid": 458,
+  "controlled_reports_valid": 30,
+  "constructed_aggregate_valid": 1,
+  "actual_native_detailed_reports_valid": 0,
+  "forgeries_rejected": 7,
+  "old_consumers_rejected": 7,
+  "old_schemas_byte_preserved": 450
+}

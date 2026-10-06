@@ -53,6 +53,21 @@ pub fn checkstyle_comment_rule_bindings(
                 "https://checkstyle.org/checks/javadoc/javadocmethod.html",
                 "核对注释归属以及参数、返回值和异常标签；继承/同一行声明等边界先复现",
             ),
+            "JavadocStyle" => (
+                "Javadoc描述或格式不完整",
+                "https://checkstyle.org/checks/javadoc/javadocstyle.html",
+                "按原配置补充类型、字段、方法或构造器的用途说明，核对首句、HTML与空描述；保留原规则参数，不用裸标签或关闭检查逃避复检",
+            ),
+            "NonEmptyAtclauseDescription" => (
+                "Javadoc标签缺少详细说明",
+                "https://checkstyle.org/checks/javadoc/nonemptyatclausedescription.html",
+                "按原配置为参数、返回、异常或弃用标签补充实际含义和行为说明；不编造契约，不删除标签或修改token范围逃避复检",
+            ),
+            "SummaryJavadoc" => (
+                "Javadoc摘要需要核对",
+                "https://checkstyle.org/checks/javadoc/summaryjavadoc.html",
+                "依据实际用途补充摘要并按原配置核对句末及禁用片段；复核合法继承和内联返回说明，不编造语义或降低规则",
+            ),
             _ => continue,
         };
         if node.tag_name().name() != "module" {
@@ -135,7 +150,10 @@ pub fn checkstyle_comment_config_local_eligible(bytes: &[u8]) -> bool {
                 || module(check, "JavadocMethod")
                 || module(check, "JavadocType")
                 || module(check, "MissingJavadocMethod")
-                || module(check, "JavadocVariable"))
+                || module(check, "JavadocVariable")
+                || module(check, "JavadocStyle")
+                || module(check, "NonEmptyAtclauseDescription")
+                || module(check, "SummaryJavadoc"))
             {
                 return false;
             }
@@ -208,12 +226,29 @@ fn property(n: Node<'_, '_>) -> bool {
                     || module(p, "MissingJavadocMethod")
                     || module(p, "MissingJavadocType")
                     || module(p, "JavadocType")
+                    || module(p, "JavadocStyle")
             }),
             (Some("tokens"), Some(v)) => {
                 v.len() <= 256
                     && n.parent_element().is_some_and(|p| {
                         v.split(',').map(str::trim).all(|token| {
-                            if module(p, "JavadocVariable") {
+                            if module(p, "JavadocStyle") {
+                                matches!(
+                                    token,
+                                    "ANNOTATION_DEF"
+                                        | "ANNOTATION_FIELD_DEF"
+                                        | "CLASS_DEF"
+                                        | "CTOR_DEF"
+                                        | "ENUM_CONSTANT_DEF"
+                                        | "ENUM_DEF"
+                                        | "INTERFACE_DEF"
+                                        | "METHOD_DEF"
+                                        | "PACKAGE_DEF"
+                                        | "VARIABLE_DEF"
+                                        | "RECORD_DEF"
+                                        | "COMPACT_CTOR_DEF"
+                                )
+                            } else if module(p, "JavadocVariable") {
                                 matches!(token, "VARIABLE_DEF" | "ENUM_CONSTANT_DEF")
                             } else if module(p, "MissingJavadocMethod")
                                 || module(p, "JavadocMethod")
@@ -261,6 +296,58 @@ fn property(n: Node<'_, '_>) -> bool {
                                         .all(|c| c.is_alphanumeric() || matches!(c, '_' | '$'))
                                 })
                         }))
+            }
+            (Some("javadocTokens"), Some(v)) => {
+                n.parent_element().is_some_and(|p| {
+                    module(p, "NonEmptyAtclauseDescription") || module(p, "SummaryJavadoc")
+                }) && v.len() <= 256
+                    && !v.trim().is_empty()
+                    && v.split(',').map(str::trim).all(|token| {
+                        n.parent_element().is_some_and(|p| {
+                            if module(p, "SummaryJavadoc") {
+                                token == "JAVADOC"
+                            } else {
+                                matches!(
+                                    token,
+                                    "PARAM_LITERAL"
+                                        | "RETURN_LITERAL"
+                                        | "THROWS_LITERAL"
+                                        | "EXCEPTION_LITERAL"
+                                        | "DEPRECATED_LITERAL"
+                                )
+                            }
+                        })
+                    })
+            }
+            (
+                Some(
+                    name @ ("checkEmptyJavadoc"
+                    | "checkFirstSentence"
+                    | "checkHtml"
+                    | "violateExecutionOnNonTightHtml"),
+                ),
+                Some(v),
+            ) => {
+                n.parent_element().is_some_and(|p| {
+                    if name == "violateExecutionOnNonTightHtml" {
+                        module(p, "NonEmptyAtclauseDescription") || module(p, "SummaryJavadoc")
+                    } else {
+                        module(p, "JavadocStyle")
+                    }
+                }) && (v.eq_ignore_ascii_case("true") || v.eq_ignore_ascii_case("false"))
+            }
+            (
+                Some(name @ ("endOfSentenceFormat" | "forbiddenSummaryFragments" | "period")),
+                Some(v),
+            ) => {
+                n.parent_element().is_some_and(|p| {
+                    if name == "endOfSentenceFormat" {
+                        module(p, "JavadocStyle")
+                    } else {
+                        module(p, "SummaryJavadoc")
+                    }
+                }) && v.len() <= 4096
+                    && !v.chars().any(char::is_control)
             }
             (Some("allowMissingPropertyJavadoc"), Some(v)) => {
                 n.parent_element()
@@ -347,6 +434,32 @@ fn canonical_module_name(name: &str) -> Option<&'static str> {
         | "com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck" => {
             Some("JavadocVariable")
         }
+        "JavadocStyle"
+        | "JavadocStyleCheck"
+        | "com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck" => {
+            Some("JavadocStyle")
+        }
+        "NonEmptyAtclauseDescription"
+        | "NonEmptyAtclauseDescriptionCheck"
+        | "com.puppycrawl.tools.checkstyle.checks.javadoc.NonEmptyAtclauseDescriptionCheck" => {
+            Some("NonEmptyAtclauseDescription")
+        }
+        "SummaryJavadoc"
+        | "SummaryJavadocCheck"
+        | "com.puppycrawl.tools.checkstyle.checks.javadoc.SummaryJavadocCheck" => {
+            Some("SummaryJavadoc")
+        }
         _ => None,
     }
+}
+
+/// 判断完整官方检查类是否属于独立详细描述协议。参数为原配置精确绑定的类名；返回值不授予覆盖资格。
+#[must_use]
+pub fn checkstyle_detailed_rule_class(class: &str) -> bool {
+    matches!(
+        class,
+        "com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck"
+            | "com.puppycrawl.tools.checkstyle.checks.javadoc.NonEmptyAtclauseDescriptionCheck"
+            | "com.puppycrawl.tools.checkstyle.checks.javadoc.SummaryJavadocCheck"
+    )
 }

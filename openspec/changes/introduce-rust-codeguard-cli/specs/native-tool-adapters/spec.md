@@ -869,3 +869,19 @@ Gradle Javadoc repair observations SHALL use their own java.gradle.javadoc check
 #### Scenario: Missing original Gradle tools redirects repair to preparation
 - **WHEN** public task verification has unchanged selected inputs but lacks explicit original Gradle/JDK context
 - **THEN** it SHALL persist an incomplete failure linked to the ready attempt, update a separate preparation task without pretending to execute native Javadoc, prioritize environment recovery in next, and reject repeated non-actionable source repair; changed inputs or tool bytes SHALL withdraw the old verification observation
+
+### Requirement: Detailed Checkstyle documentation modules SHALL preserve native configuration and repair evidence
+
+固定 Checkstyle 10.21.4 的静态注释适配 MUST 接入 JavadocStyle、NonEmptyAtclauseDescription 和 SummaryJavadoc，保留已识别官方参数、短名/完整名、自定义 source、原严重度及源码位置。检查由原生工具执行，Rust MUST NOT 从长度、标签存在或自写正则猜测详细说明合规。新增检查类 MUST 使用独立封闭协议，不扩大历史协议或将新规则藏在旧版本中。实际工具条件不可用时只能保留待验收，不用构造报告证明原生精度。
+
+#### Scenario: Original configured descriptions reach the repair loop
+- **WHEN** 原配置中的描述/摘要模块产生可定位的原生诊断
+- **THEN** SHALL 保存同一规则的稳定任务、详细修复指引并使用原工具/原配置复检；零诊断保持未受信，不能单独关闭
+
+#### Scenario: Properties or custom IDs are ambiguous
+- **WHEN** 模块借用其它模块参数、未知token、未知官方类或多个模块共享同一source
+- **THEN** MUST 保持上下文未解析，不挑选规则或制造源码违规
+
+#### Scenario: Extended classes are disguised under historical contracts
+- **WHEN** 新检查类的工作台/复检观察被降级为历史协议版本
+- **THEN** MUST 拒绝首次导入；不得生成额外问题或通过复检假称修复

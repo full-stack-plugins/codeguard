@@ -845,6 +845,17 @@ pub fn run(args: &[String]) -> ExitCode {
         "execution_budget":budget_record(parsed.timeout_ms, parsed.timeout_source),
         "next_actions":["inspect_native_recheck_and_policy_before_closure"]
     });
+    if matches!(
+        report["native_scan"]["report_type"].as_str(),
+        Some("checkstyle_task_recheck" | "checkstyle_preparation_recheck")
+    ) && report["native_scan"]["schema_version"] == "0.2.0"
+    {
+        report["schema_version"] = json!(if report["kind"] == "finding" {
+            "0.33.0"
+        } else {
+            "0.34.0"
+        });
+    }
     if gradle_javadoc_task {
         report["schema_version"] = json!("0.30.0");
     }

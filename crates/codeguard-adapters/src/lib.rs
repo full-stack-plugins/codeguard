@@ -131,7 +131,7 @@ pub use checker_configuration::{
 };
 pub use checkstyle_command::CheckstyleCommand;
 pub use checkstyle_config::checkstyle_comment_config_local_eligible;
-pub use checkstyle_config::checkstyle_comment_rule_bindings;
+pub use checkstyle_config::{checkstyle_comment_rule_bindings, checkstyle_detailed_rule_class};
 pub use checkstyle_diagnostic::CheckstyleDiagnostic;
 pub use checkstyle_failure::checkstyle_native_failure_reason;
 pub use checkstyle_parsed::{CheckstyleParsed, parse_checkstyle_xml};

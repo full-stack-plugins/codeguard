@@ -68,6 +68,7 @@ pub fn run(args: &[String]) -> ExitCode {
         match observe(source, &options, deadline) {
             Ok(observed) => {
                 input_bindings = observed["input_bindings"].clone();
+                report["schema_version"] = observed["schema_version"].clone();
                 report["path"] = observed["path"].clone();
                 report["local_status"] = observed["local_status"].clone();
                 report["reason"] = observed["reason"].clone();
@@ -265,6 +266,6 @@ pub(crate) fn observe(
         "java":{"path":java,"sha256":format!("{:x}",Sha256::digest(&bytes[&java]))},
         "jar":{"path":jar,"sha256":format!("{:x}",Sha256::digest(&bytes[&jar]))}});
     Ok(
-        json!({"path":source,"input_bindings":input_bindings,"local_status":"observed","reason":"project_configuration_and_quality_policy_unverified","findings":findings,"recheck_argv":recheck_argv}),
+        json!({"schema_version":if bindings.values().any(|b| codeguard_adapters::checkstyle_detailed_rule_class(&b.checker_class)) {"0.5.0"}else{"0.4.0"},"path":source,"input_bindings":input_bindings,"local_status":"observed","reason":"project_configuration_and_quality_policy_unverified","findings":findings,"recheck_argv":recheck_argv}),
     )
 }
