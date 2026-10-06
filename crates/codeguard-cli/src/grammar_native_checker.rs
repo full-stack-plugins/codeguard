@@ -17,6 +17,10 @@ pub(crate) enum GrammarNativeChecker {
     Go,
     /// 显式固定edition2024的Rustfmt解析；不是Clippy lint或项目编译。
     Rust,
+    /// 固定AppleClang21的C11独立源码观察。
+    C,
+    /// 固定AppleClang21的C++17独立源码观察。
+    Cpp,
 }
 
 impl GrammarNativeChecker {
@@ -32,6 +36,8 @@ impl GrammarNativeChecker {
             "ruby" => Some(Self::Ruby),
             "go" => Some(Self::Go),
             "rust" => Some(Self::Rust),
+            "c" => Some(Self::C),
+            "cpp" => Some(Self::Cpp),
             _ => None,
         }
     }
@@ -44,12 +50,14 @@ impl GrammarNativeChecker {
             Self::Ruby => "ruby 2.6.10p210",
             Self::Go => "go1.23.4",
             Self::Rust => "rustfmt 1.9.0-stable",
+            Self::C | Self::Cpp => "Apple clang version 21.0.0 (clang-2100.3.34.2)",
         }
     }
     /// 返回对应原生制品的有界字节预算；Node 独立预算不扩张其它工具权限。
     pub(crate) fn artifact_budget(self) -> u64 {
         match self {
             Self::Javascript => crate::javascript_syntax_probe::NODE_ARTIFACT_BUDGET,
+            Self::C | Self::Cpp => 256 * 1024 * 1024,
             _ => 64 * 1024 * 1024,
         }
     }
@@ -58,6 +66,32 @@ impl GrammarNativeChecker {
         match self {
             Self::Go => crate::go_syntax_probe::companion_identity(tool).map(Some),
             _ => Ok(None),
+        }
+    }
+    /// 保留语法与语义的边界；Clang仅明确解析规则可分类为语法无效，警告不是语法错误。
+    pub(crate) fn classify(self, native: &Value) -> Option<bool> {
+        if matches!(self, Self::C | Self::Cpp) {
+            if native["status"] == "completed" {
+                return Some(true);
+            }
+            if native["status"] != "diagnostics_observed" {
+                return None;
+            }
+            let rows = native["diagnostics"].as_array()?;
+            let mut syntax_error = false;
+            for row in rows {
+                match row["level"].as_str()? {
+                    "warning" | "note" => {}
+                    "error" if row["rule_id"] == "clang.err_expected_expression" => {
+                        syntax_error = true
+                    }
+                    // 类型、名称、扩展诊断及未审计解析规则不能被解释为grammar漏报。
+                    _ => return None,
+                }
+            }
+            Some(!syntax_error)
+        } else {
+            crate::grammar_native_differential::classify_native(native)
         }
     }
     /// 对冻结源码执行隔离语法观察；工具、源码与预算由差分入口绑定。
@@ -77,6 +111,18 @@ impl GrammarNativeChecker {
             Self::Ruby => crate::ruby_syntax_probe::observe(tool, source, deadline, cancelled),
             Self::Go => crate::go_syntax_probe::observe(tool, source, deadline, cancelled),
             Self::Rust => crate::rustfmt_syntax_probe::observe(tool, source, deadline, cancelled),
+            Self::C | Self::Cpp => crate::clang_syntax_probe::observe_with_cancellation(
+                tool,
+                if matches!(self, Self::C) { "c" } else { "cpp" },
+                if matches!(self, Self::C) {
+                    "c11"
+                } else {
+                    "c++17"
+                },
+                source,
+                deadline,
+                cancelled,
+            ),
             Self::Javascript => {
                 crate::javascript_syntax_probe::observe(tool, source, deadline, cancelled)
             }
@@ -99,6 +145,41 @@ mod tests {
     };
 
     #[test]
+    fn clang_syntax_labels_preserve_warning_and_semantic_boundaries() {
+        for checker in [GrammarNativeChecker::C, GrammarNativeChecker::Cpp] {
+            for (rows, expected) in [
+                (
+                    serde_json::json!([{"level":"warning","rule_id":"clang.warn_unused_variable"}]),
+                    Some(true),
+                ),
+                (
+                    serde_json::json!([{"level":"error","rule_id":"clang.err_expected_expression"}]),
+                    Some(false),
+                ),
+                (
+                    serde_json::json!([{"level":"error","rule_id":"clang.err_unknown_typename"}]),
+                    None,
+                ),
+                (
+                    serde_json::json!([{"level":"error","rule_id":"clang.err_expected_expression"},{"level":"error","rule_id":"clang.err_unknown_typename"}]),
+                    None,
+                ),
+                (
+                    serde_json::json!([{"rule_id":"clang.err_expected_expression"}]),
+                    None,
+                ),
+            ] {
+                assert_eq!(
+                    checker.classify(
+                        &serde_json::json!({"status":"diagnostics_observed","diagnostics":rows})
+                    ),
+                    expected
+                );
+            }
+        }
+    }
+
+    #[test]
     fn every_native_observer_cancels_version_and_scan_in_flight() {
         for language in [
             "zig",
@@ -110,6 +191,8 @@ mod tests {
             "ruby",
             "go",
             "rust",
+            "c",
+            "cpp",
         ] {
             for phase in ["version", "scan"] {
                 let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
@@ -125,6 +208,7 @@ mod tests {
                     "kotlin" => "printf 'info: kotlinc-jvm 2.4.10 (JRE fixture)\\n' >&2",
                     "python" => "printf 'ruff 0.16.8\\n'",
                     "ruby" => "printf 'ruby 2.6.10p210 (fixture) [fixture]\\n'",
+                    "c" | "cpp" => "printf 'Apple clang version 21.0.0 (clang-2100.3.34.2)\\n'",
                     "rust" => "printf 'rustfmt 1.9.0-stable (fixture)\\n'",
                     "go" => {
                         "if [ \"$#\" = 1 ]; then printf 'go version go1.23.4 fixture/fixture\\n'; else printf '%s: go1.23.4\\n' \"$2\"; fi"
@@ -200,6 +284,8 @@ mod tests {
             "ruby",
             "go",
             "rust",
+            "c",
+            "cpp",
         ] {
             for mode in ["alias", "replace"] {
                 let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
@@ -223,6 +309,7 @@ mod tests {
                     "kotlin" => "printf 'info: kotlinc-jvm 2.4.10 (JRE fixture)\\n' >&2",
                     "python" => "printf 'ruff 0.16.8\\n'",
                     "ruby" => "printf 'ruby 2.6.10p210 (fixture) [fixture]\\n'",
+                    "c" | "cpp" => "printf 'Apple clang version 21.0.0 (clang-2100.3.34.2)\\n'",
                     "rust" => "printf 'rustfmt 1.9.0-stable (fixture)\\n'",
                     "go" => {
                         "if [ \"$#\" = 1 ]; then printf 'go version go1.23.4 fixture/fixture\\n'; else printf '%s: go1.23.4\\n' \"$2\"; fi"
