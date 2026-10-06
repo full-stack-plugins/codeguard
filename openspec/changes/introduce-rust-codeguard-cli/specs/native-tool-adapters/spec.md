@@ -4,6 +4,32 @@
 
 ## ADDED Requirements
 
+### Requirement: Every registered language SHALL satisfy all four production cores independently
+
+全部57个canonical语言 MUST 分别完成syntax、documentation、conventions、vulnerabilities四项核心能力，共228项义务。每项 MUST 按声明的语言版本、方言、构建生态和目标平台取得真实原生运行与独立验收证据；局部实现、配置存在、工具退出0、任务勾选及模拟报告 MUST NOT 授予生产资格。Java Maven与Gradle MUST 分别完成文档、规范和依赖漏洞路径，不得以其中之一代替另一条路径。未完成项 MUST 保留blocked及具体缺口，不能改为不适用来消除既定义务。
+
+syntax MUST 集成适用的官方编译器或原生lint，并完成全部32个WASM grammar的加载、合法/非法源码、ERROR/MISSING、版本兼容和误报反证验收，包含Dart与Zig。原生优先；原生缺失时WASM只提供初检和原生工具准备指引。WASM初检通过 MUST NOT 证明类型、跨文件语义、原生规范或完整项目通过。
+
+documentation MUST 执行各生态原生文档规范工具并核对实际API契约，覆盖适用对象与公开方法的用途、参数、返回、异常/错误和行为约束。缺失注释、空标签、空标题、模板占位和与实现不符的说明 MUST 有独立负例；不适用的返回/异常字段 MUST 有合理正例，不能机械要求void方法含@return或为所有函数编造异常。仅注释存在或Javadoc/rustdoc/Clang零诊断 MUST NOT 证明详细注释合规。详细语义无法可靠判定时 MUST 输出待核验范围，不伪造原生违规或完整覆盖。
+
+conventions MUST 接入生态适用的原生规范检查器与项目规则配置，Java必须包含P3C；其他语言使用对应生态工具。formatter-only、WASM语法或正则匹配 MUST NOT 替代原生规范验收。原配置、规则覆盖、抑制和白名单决策 MUST 与复检证据绑定，规则被关闭不能视为修复。
+
+vulnerabilities MUST 从实际依赖声明、锁文件及适用解析图检查直接与传递依赖的已知漏洞，保留漏洞数据源版本、更新时间与检查范围；Java Maven和Gradle插件路径 MUST 分别验收。已知漏洞、修复版本、无漏洞、数据源不可用/过期、缺锁/未解析和工具失败 MUST 有真实运行或明确分层的故障证据。漏洞检查不能以普通代码lint、仅发现插件配置或未查数据库的零结果替代。
+
+各核心验收 MUST 独立覆盖有效正例、可定位负例、误报反证、环境失败、输入/工具/配置变化、修复后原工具复检与问题复发。生产资格 MUST 同时满足准确性、覆盖、资源预算、取消/故障恢复、任务闭环及声明平台/宿主/发行边界；不可通过单一聚合PASS掩盖任一未完成项。
+
+#### Scenario: A language has syntax support but lacks native documentation checks
+- **WHEN** 任意语言原生语法与WASM初检均成功，但详细文档或规范或漏洞路径尚未验收
+- **THEN** 对应核心及该语言生产资格仍为blocked，完整交付不得宣称100%生产就绪
+
+#### Scenario: Empty documentation tags pass an ecosystem tool
+- **WHEN** 原生文档工具对仅有空@param、空Returns标题或模板描述的源码返回零诊断
+- **THEN** 记录该原生工具的覆盖缺口并保持详细文档资格未授予，不把零诊断当成合规，不捏造原生错误码
+
+#### Scenario: A repository plan is edited to claim production readiness
+- **WHEN** 任意语言任意核心被移除，或将仓库计划中的qualification/implementation_status改为production_ready
+- **THEN** 计划读取拒绝该输入；仓库计划不能作为自身生产批准来源
+
 ### Requirement: Shell native rule groups SHALL persist without treating suppressions as repairs
 
 Shell单文件局部观察 MUST 在已初始化工作台复用脱敏报告消费、事实和追加事件；未初始化不得自动创建工作台。稳定任务单位 MUST 明确文件/方言/原SC规则位置组，全部位置保留，不能把同规则不同文件或方言混合；不声称组内多个位置是同一语义缺陷。环境原因变化 MUST 更新同一文件/方言环境任务，具体原因保留在原始本轮报告。源码或原配置过期 MUST 撤回直接修复指引；坏报告不得生成发现，当前源码范围必须位于绑定根内。零诊断、原生disable、任务投影或同步 MUST NOT 关闭任务；专用原工具复检和正式关闭流程必须独立完成。已持久化反馈 MUST 版本化提供真实任务引用和失败状态；next MUST 保留原方言及原显式rc，工具入口需要重新核验。

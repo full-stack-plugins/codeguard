@@ -968,6 +968,8 @@ flowchart LR
 
 生产目标要求57个canonical语言条目逐项验收语法、详细文档注释、开发规范和漏洞检查；历史planned仍是未完成目标。Java必须分别验收Maven/Gradle漏洞路径、详细Javadoc和原生P3C。配置存在、WASM可运行或模拟测试通过都不能证明生产就绪。独立标注评测、声明支持的版本/构建器/平台、原工具修复复检关闭与复发重开均为必需验收；当前WASM正式资格仍为0/32。详见OpenSpec任务15.1–15.7。
 
+四项均为硬验收条件：原生语法检查与全部32份WASM分别验收；详细文档必须检查适用的用途、参数、返回、错误和行为说明，并有缺失、空标签、模板及语义不符反例；开发规范使用生态原生规则，格式检查不能代替；漏洞检查绑定真实直接/传递依赖和可追溯数据源。原生工具无法覆盖详细语义时，报告必须明确待核验范围。仓库计划读取的回归逐一拒绝全部228项义务的缺失或伪造生产资格，共684个反例；这验证计划不能自批，不代表功能完成。见[正式要求](openspec/changes/introduce-rust-codeguard-cli/specs/native-tool-adapters/spec.md)及[当前验收状态](tests/acceptance/production-acceptance-plan.md)。
+
 当前源码把JavaScript声明模式证据接入项目检查、独立 `lint typescript`、`lint all` 与文件编辑反馈，适用原生ESLint仍优先。未覆盖的整文件 `.mjs` 和明确声明module的 `.js` 使用模块候选worker；CommonJS/未知模式继续原有有界初检，不启用函数外return模块规则。worker之后复核源码和模式证据；持久确认0.15、项目检查0.60、ESLint反馈0.7、Hook0.29/局部0.17与模块修复简报0.21使用独立版本契约。包声明改变时原任务复检报告上下文失效，不能沿用旧模块证据。重复检查复用稳定任务，清洁候选不能关闭任务。本批不声称新的npm/宿主发行或生产资格。见[接线验收](tests/acceptance/javascript-module-workbench.md)。
 
 ```mermaid

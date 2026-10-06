@@ -1,5 +1,9 @@
 # 四核心生产验收计划局部验收
 
+当前源码状态（2026-10-07）：57语言、228项核心义务全部blocked；364条构建生态路径为52 partial、26 wasm_candidate_only、286 not_integrated，来源摘要165份。OpenSpec任务66已完成、288未完成；正式grammar资格0/32。下面的49/50 partial与52/56份来源摘要是历史检查点，不代表当前完成度。
+
+本次强化：适配器契约逐项对57×4义务拒绝核心缺失、伪造qualification及伪造implementation_status，共684种输入；三类篡改不因语言位于清单末尾而漏检。真实工具、独立精度、详细注释、原任务复检和生产资格仍按原未完成任务继续推进，不因此勾选父任务。明确验收要求见[正式规范](../../openspec/changes/introduce-rust-codeguard-cli/specs/native-tool-adapters/spec.md)。
+
 对应现有 change 的 native-tool-adapters 新计划契约与 S15.1 进展。57 canonical 语言、四核心 228 项义务、五个候选平台及全部32 grammar 归属有明确仓库快照；版本/方言未授予支持资格。364 条构建生态×核心路径包含49 partial、26 wasm_candidate_only、1 configuration_only、288 not_integrated。全部核心资格保持 blocked。
 
 公开入口：`codeguard capabilities [language] --acceptance-plan --format=json`。筛选 Java 时完整义务仍228，Maven CVE partial、Gradle CVE configuration_only；旧capabilities 0.2保持兼容。入口无项目访问、原生执行、WASM加载和交付判定。退出0表示读取成功。
