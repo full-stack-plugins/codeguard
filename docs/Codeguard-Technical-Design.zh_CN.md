@@ -1654,3 +1654,16 @@ JavaScript 兜底须区分同范围确认任务确实不存在与历史无法核
 Erlang项目/编辑接线使用check0.55、确认0.14及Hook0.28/fast0.16。所选文件优先执行OTP，确实缺工具才补候选，选定工具失败保留原生未完成。原生/环境首次证据及后续结构观察共用任务身份；源码编辑后原报告仍绑定消费marker，首次导入仍核验当前字节坐标。见[工作流验收](../tests/acceptance/erlang-form-workbench.md)。
 
 项目 Rust CVE 工具发现增量：rust.cve 在原任务图中只读选择显式入口或绝对PATH首个存在入口；坏入口不回退，离线数据库仍独立指定，实际工具/锁/清单摘要与原生advisory检查复用旧服务。check_feedback0.56仅在选择既有Clippy简报时使用，引用其专用封闭schema而不修改旧协议；完整数据库、工具锁/版本和宿主信任仍未完成。详见[实际验收](../tests/acceptance/cargo-audit-path-discovery.md)。
+
+## Java 注释统一入口（源码增量，尚未发布）
+
+`comments java [path]` 复用既有原生 Javadoc 探针：文件模式执行显式 JDK21 局部诊断；项目模式只选择已识别配置及所属主源码。缺配置不运行 Javadoc，也不生成注释违规。显式 Maven 上下文选择原 POM 多文件检查，失败不退回单文件探针。
+
+```bash
+codeguard comments java File.java --java-home /absolute/jdk21 --format json
+codeguard comments java . --java-home /absolute/jdk21 --maven-tool /absolute/mvn --maven-repo /absolute/repository --repo-sha256 SHA256 --timeout 60s --format json
+```
+
+独立包装协议 `java_comments_feedback 0.1.0` 保留 `native_observation` 原报告，不修改旧 `lint java --checker javadoc` 的协议。预算使用 CLI、登记环境变量、项目默认值、内置默认值的优先级；所有原生子任务共用截止时间。报告显示 `target_kind`、`execution_budget`、具体观察和下一步；局部零诊断仍是 `coverage_proven=false`、`delivery_decision=not_evaluated`，退出3（取消130）。不隐式安装或修改源码。
+
+**当前限制：** `workbench_status=not_integrated`。Javadoc 持久任务、修复简报及可信关闭还需接通，本入口不伪造任务，不据局部探针关闭问题。示例中的绝对工具路径和离线仓库摘要需替换为当前真实环境。

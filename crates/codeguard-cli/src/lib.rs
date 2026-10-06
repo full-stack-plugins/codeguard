@@ -146,6 +146,8 @@ mod java_cve_scan;
 mod java_dependency_scan;
 #[cfg(unix)]
 pub mod java_javadoc_command;
+#[cfg(unix)]
+pub mod java_comments_command;
 mod java_javadoc_scan;
 #[cfg(unix)]
 pub mod java_lint_dispatch;

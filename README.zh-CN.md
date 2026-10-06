@@ -829,3 +829,16 @@ C/C++源码构建还支持明确的独立原生上下文：`codeguard lint c mai
 Erlang 项目与编辑检查已原生优先，缺工具时补充函数终止符候选并更新同一持久任务；所选工具失败不回退WASM，原工具复检保留历史。[验收](tests/acceptance/erlang-form-workbench.md)。
 
 源码增量（尚未发布）：项目 `check all` 的 Rust CVE 节点可发现绝对 PATH 中已有的 cargo-audit，显式 `--cargo-audit-tool` 优先；使用 `--rustsec-db /path/to/offline-db` 指定现有离线数据库。所选入口失败不换工具、不自动安装，数据库未核验仍不声明安全通过。见[验收](tests/acceptance/cargo-audit-path-discovery.md)。
+
+## Java 注释统一入口（源码增量，尚未发布）
+
+`comments java [path]` 复用既有原生 Javadoc 探针：文件模式执行显式 JDK21 局部诊断；项目模式只选择已识别配置及所属主源码。缺配置不运行 Javadoc，也不生成注释违规。显式 Maven 上下文选择原 POM 多文件检查，失败不退回单文件探针。
+
+```bash
+codeguard comments java File.java --java-home /absolute/jdk21 --format json
+codeguard comments java . --java-home /absolute/jdk21 --maven-tool /absolute/mvn --maven-repo /absolute/repository --repo-sha256 SHA256 --timeout 60s --format json
+```
+
+独立包装协议 `java_comments_feedback 0.1.0` 保留 `native_observation` 原报告，不修改旧 `lint java --checker javadoc` 的协议。预算使用 CLI、登记环境变量、项目默认值、内置默认值的优先级；所有原生子任务共用截止时间。报告显示 `target_kind`、`execution_budget`、具体观察和下一步；局部零诊断仍是 `coverage_proven=false`、`delivery_decision=not_evaluated`，退出3（取消130）。不隐式安装或修改源码。
+
+**当前限制：** `workbench_status=not_integrated`。Javadoc 持久任务、修复简报及可信关闭还需接通，本入口不伪造任务，不据局部探针关闭问题。示例中的绝对工具路径和离线仓库摘要需替换为当前真实环境。

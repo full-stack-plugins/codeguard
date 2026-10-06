@@ -834,3 +834,16 @@ Ruby 编辑快检接线：源码构建的 `hook execute` / `hook claude post-too
 Rust 编辑入口：源码构建的 `hook execute ROOT --rustfmt-tool ABS_PATH --timeout 30s --format=json` 和 `hook claude post-tool-use` 按选中文件 Cargo edition 调用固定 Rustfmt1.9.0-stable。未显式选择时查找绝对 PATH 入口；真正缺失才使用已构建的 WASM 初检。`next ROOT --format=json` 返回稳定确认任务和原工具复检参数，`task verify TASK_ID ROOT --rustfmt-tool ABS_PATH --format=json` 保存同任务观察。Rustfmt 是语法解析观察，Clippy/类型/完整构建仍待检查；零诊断不自动关闭。选定工具故障保留 incomplete，代理工具版本未认证不回退隐藏故障。公开 npm 版本未因源码或离线安装测试自动更新。
 
 Rust编辑后现提供可执行的批次后Clippy指令，明确编辑阶段未运行项目lint。原任务repair_ready保留当前规则/行号并撤回输入变化后的指引；这不是后台队列或可信关闭。见[项目lint后续流程](Rust-Project-Lint-Followup.zh_CN.md)。
+
+## Java 注释统一入口（源码增量，尚未发布）
+
+`comments java [path]` 复用既有原生 Javadoc 探针：文件模式执行显式 JDK21 局部诊断；项目模式只选择已识别配置及所属主源码。缺配置不运行 Javadoc，也不生成注释违规。显式 Maven 上下文选择原 POM 多文件检查，失败不退回单文件探针。
+
+```bash
+codeguard comments java File.java --java-home /absolute/jdk21 --format json
+codeguard comments java . --java-home /absolute/jdk21 --maven-tool /absolute/mvn --maven-repo /absolute/repository --repo-sha256 SHA256 --timeout 60s --format json
+```
+
+独立包装协议 `java_comments_feedback 0.1.0` 保留 `native_observation` 原报告，不修改旧 `lint java --checker javadoc` 的协议。预算使用 CLI、登记环境变量、项目默认值、内置默认值的优先级；所有原生子任务共用截止时间。报告显示 `target_kind`、`execution_budget`、具体观察和下一步；局部零诊断仍是 `coverage_proven=false`、`delivery_decision=not_evaluated`，退出3（取消130）。不隐式安装或修改源码。
+
+**当前限制：** `workbench_status=not_integrated`。Javadoc 持久任务、修复简报及可信关闭还需接通，本入口不伪造任务，不据局部探针关闭问题。示例中的绝对工具路径和离线仓库摘要需替换为当前真实环境。
