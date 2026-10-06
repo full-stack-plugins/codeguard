@@ -846,7 +846,7 @@ pub fn run(args: &[String]) -> ExitCode {
         "next_actions":["inspect_native_recheck_and_policy_before_closure"]
     });
     if gradle_javadoc_task {
-        report["schema_version"] = json!("0.29.0");
+        report["schema_version"] = json!("0.30.0");
     }
     if maven_javadoc_task {
         report["schema_version"] = json!("0.28.0");

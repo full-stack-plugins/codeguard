@@ -206,7 +206,7 @@ fn public_check_schedules_one_documentation_job_and_preserves_incomplete_feedbac
         let output = public_command(&project, selection).output().unwrap();
         assert_eq!(output.status.code(), Some(3), "{output:?}");
         let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
-        assert_eq!(report["schema_version"], "0.66.0");
+        assert_eq!(report["schema_version"], "0.67.0");
         let category = report["category_candidates"]
             .as_array()
             .unwrap()
@@ -313,7 +313,7 @@ fn actual_public_check_preserves_native_documentation_findings_without_coverage_
             .unwrap();
         assert_eq!(output.status.code(), Some(3), "{output:?}");
         let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
-        assert_eq!(report["schema_version"], "0.66.0");
+        assert_eq!(report["schema_version"], "0.67.0");
         let category = report["category_candidates"]
             .as_array()
             .unwrap()
@@ -398,7 +398,7 @@ fn public_javadoc_sigint_preserves_cancelled_native_observation() {
     let output = child.wait_with_output().unwrap();
     assert_eq!(output.status.code(), Some(130), "{output:?}");
     let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
-    assert_eq!(report["schema_version"], "0.66.0");
+    assert_eq!(report["schema_version"], "0.67.0");
     assert_eq!(
         report["native_results"]["java_gradle_javadoc"]["reason"],
         "request_cancelled"
@@ -459,5 +459,136 @@ fn unexecuted_gradle_documentation_configuration_remains_unknown_not_missing() {
             serde_json::to_vec_pretty(&report).unwrap(),
         )
         .unwrap();
+    }
+}
+
+#[test]
+#[ignore = "requires explicit existing Gradle8.10.2/JDK21; never installs"]
+fn actual_public_detailed_descriptions_create_recheckable_original_tasks() {
+    use serde_json::{Value, json};
+    use sha2::{Digest, Sha256};
+    let binary = env!("CARGO_BIN_EXE_codeguard");
+    let binary_sha256 = format!("{:x}", Sha256::digest(fs::read(binary).unwrap()));
+    let bundle =
+        PathBuf::from(std::env::var_os("CODEGUARD_TEST_GRADLE_BUNDLE").expect("existing Gradle"));
+    let jdk = PathBuf::from(std::env::var_os("CODEGUARD_TEST_JAVA_HOME").expect("existing JDK"));
+    let documented = "/** 提供数值计算示例。 */\npublic class Sample {\n /** 创建计算器。 */ public Sample() {}\n /** 输出结果的初始值。 */ public int value;\n /** 返回输入数值。\n  * @param input 待返回的输入数值\n  * @return {@code input} 的原值\n  * @throws IllegalArgumentException 输入为负数时抛出\n  */\n public int run(int input) throws IllegalArgumentException { if (input < 0) { throw new IllegalArgumentException(); } return input; }\n /** {@inheritDoc} */\n @Override public String toString() { return \"sample\"; }\n}\n";
+    let mut reports = Vec::new();
+    for (name, source, expected) in [
+        (
+            "empty_declarations",
+            "/** */\npublic class Sample {\n /** */ public Sample() {}\n /** */ public int value;\n /** */ public void run() {}\n}\n",
+            vec!["JavadocEmptyComment"; 4],
+        ),
+        (
+            "bare_tags",
+            "/** Sample API. */\npublic class Sample { /** Creates sample. */ public Sample() {}\n/** Computes value.\n * @param value\n * @return\n * @throws IllegalArgumentException\n */\npublic int run(int value) throws IllegalArgumentException { return value; } }\n",
+            vec![
+                "JavadocEmptyParamDescription",
+                "JavadocEmptyReturnDescription",
+                "JavadocEmptyThrowsDescription",
+            ],
+        ),
+        (
+            "tags_without_purpose",
+            "/** Sample API. */\npublic class Sample { /** Creates sample. */ public Sample() {}\n/** @param value the input\n * @return the value\n */\npublic int run(int value) { return value; } }\n",
+            vec!["JavadocMissingMainDescription"],
+        ),
+        ("documented_inheritance", documented, vec![]),
+    ] {
+        let project = Project::new(source);
+        let init = std::process::Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .arg("init")
+            .arg(&project.0)
+            .arg("--apply")
+            .output()
+            .unwrap();
+        assert_eq!(init.status.code(), Some(3));
+        let out = public_command_with_tools(&project, "java", &bundle, &jdk)
+            .output()
+            .unwrap();
+        assert_eq!(out.status.code(), Some(3));
+        let check: Value = serde_json::from_slice(&out.stdout).unwrap();
+        let native = &check["native_results"]["java_gradle_javadoc"];
+        assert_eq!(
+            native["native_status"],
+            if expected.is_empty() {
+                "empty_output_unverified"
+            } else {
+                "findings_observed_unverified"
+            },
+            "{name}: {check}"
+        );
+        let mut actual = native["findings"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|f| f["rule_id"].as_str().unwrap())
+            .collect::<Vec<_>>();
+        actual.sort_unstable();
+        let mut expected = expected;
+        expected.sort_unstable();
+        assert_eq!(actual, expected, "{name}");
+        assert_eq!(
+            check["gradle_javadoc_tasks"]["status"], "synced_partial",
+            "{check}"
+        );
+        let mut scans = Vec::new();
+        if !expected.is_empty() {
+            let fact_id = check["next"]["repair_brief"]["task_id"].as_str().unwrap();
+            assert_eq!(check["next"]["repair_brief"]["kind"], "finding");
+            let verify = || {
+                let out = std::process::Command::new(env!("CARGO_BIN_EXE_codeguard"))
+                    .args(["task", "verify", fact_id])
+                    .arg(&project.0)
+                    .arg("--gradle-bundle")
+                    .arg(&bundle)
+                    .arg("--java-home")
+                    .arg(&jdk)
+                    .arg("--format=json")
+                    .output()
+                    .unwrap();
+                assert_eq!(out.status.code(), Some(3));
+                serde_json::from_slice::<Value>(&out.stdout).unwrap()
+            };
+            let present = verify();
+            assert_eq!(present["observation"], "still_present", "{present}");
+            assert_eq!(present["event_persisted"], true);
+            scans.push(present);
+            if name == "empty_declarations" {
+                fs::write(project.0.join("src/main/java/Sample.java"), documented).unwrap();
+                let repaired = verify();
+                assert_eq!(
+                    repaired["observation"], "candidate_absent_unverified_policy",
+                    "{repaired}"
+                );
+                assert_eq!(repaired["event_persisted"], true);
+                scans.push(repaired);
+                let fact: Value = serde_json::from_slice(
+                    &fs::read(
+                        project
+                            .0
+                            .join(format!(".codeguard/findings/{fact_id}/finding.json")),
+                    )
+                    .unwrap(),
+                )
+                .unwrap();
+                assert_eq!(fact["state"], "open");
+            }
+        }
+        let raw = fs::read_dir(project.0.join(".codeguard/reports"))
+            .unwrap()
+            .map(|e| {
+                serde_json::from_slice::<Value>(&fs::read(e.unwrap().path()).unwrap()).unwrap()
+            })
+            .collect::<Vec<_>>();
+        reports.push(json!({"case":name,"source":source,"check":check,"rechecks":scans,"stored_reports":raw}));
+    }
+    if let Some(path) = std::env::var_os("CODEGUARD_TEST_GRADLE_DETAILED_REPORT") {
+        assert_eq!(
+            format!("{:x}", Sha256::digest(fs::read(binary).unwrap())),
+            binary_sha256
+        );
+        fs::write(path, serde_json::to_vec_pretty(&json!({"evidence_kind":"actual_existing_gradle_jdk_public_detailed_descriptions","codeguard_binary_sha256":binary_sha256,"reports":reports})).unwrap()).unwrap();
     }
 }

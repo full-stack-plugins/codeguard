@@ -277,7 +277,7 @@ fn public_missing_prerequisites_persist_a_bound_failure_and_next_guidance() {
     let id = brief["task_id"].as_str().unwrap();
     let (exit, report) = verify_cli(&dir.0, id, &[]);
     assert_eq!(exit, 3);
-    assert_eq!(report["schema_version"], "0.29.0");
+    assert_eq!(report["schema_version"], "0.30.0");
     assert_eq!(report["native_scan"]["reason"], "prerequisites_missing");
     assert_eq!(
         report["native_scan"]["scan"]["native"]["reason"],
@@ -298,7 +298,7 @@ fn public_missing_prerequisites_persist_a_bound_failure_and_next_guidance() {
     assert_eq!(report["observation"], "incomplete");
     assert_eq!(report["event_persisted"], true, "{report}");
     let next = read_task_brief(&dir.0, id).unwrap();
-    assert_eq!(next["schema_version"], "0.23.0");
+    assert_eq!(next["schema_version"], "0.24.0");
     assert_eq!(next["task_verify_status"], "local_observation_only");
     assert_eq!(next["verification_observation"], "incomplete");
     assert_eq!(next["recheck_argv"][1], "task");
@@ -480,6 +480,7 @@ fn first_recheck_import_rejects_forged_origin_scope_and_configuration_claims() {
         "configuration_claim",
         "input_digest",
         "foreign_fact_id",
+        "native_version_downgrade",
     ] {
         let (dir, brief) = fixture();
         let mut report = run(
@@ -496,6 +497,9 @@ fn first_recheck_import_rejects_forged_origin_scope_and_configuration_claims() {
             "task_path" => report["task_path"] = json!("other.java"),
             "scope_claim" => report["source_scope_matches"] = json!(false),
             "configuration_claim" => report["configuration_matches"] = json!(false),
+            "native_version_downgrade" => {
+                report["scan"]["native"]["schema_version"] = json!("0.1.0")
+            }
             "input_digest" => {
                 report["task_input_stable"] = json!(true);
                 report["input_bindings"][2]["sha256"] = json!("0".repeat(64));
@@ -589,7 +593,7 @@ fn actual_public_original_recheck_imports_wrapped_findings_and_invalidates_old_o
         java.to_str().unwrap(),
     ];
     let (_, present) = verify_cli(&dir.0, id, &args);
-    assert_eq!(present["schema_version"], "0.29.0");
+    assert_eq!(present["schema_version"], "0.30.0");
     assert_eq!(present["event_persisted"], true, "{present}");
     assert_eq!(present["observation"], "still_present");
     let present_next = read_task_brief(&dir.0, id).unwrap();
@@ -659,7 +663,7 @@ fn actual_public_original_recheck_imports_wrapped_findings_and_invalidates_old_o
         .unwrap();
     assert_eq!(out.status.code(), Some(3));
     let historical: Value = serde_json::from_slice(&out.stdout).unwrap();
-    assert_eq!(historical["schema_version"], "0.66.0");
+    assert_eq!(historical["schema_version"], "0.67.0");
     let fact: Value = serde_json::from_slice(
         &fs::read(dir.0.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
     )

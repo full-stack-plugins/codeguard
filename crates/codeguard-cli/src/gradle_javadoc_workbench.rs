@@ -162,17 +162,19 @@ pub fn project(
 }
 /// 校验局部原生报告的封闭字段、规则和状态，返回协议错误；不授予规则完整性。
 pub(crate) fn valid_native(v: &Value) -> Result<(), &'static str> {
-    let schema: Value = serde_json::from_str(include_str!(
-        "../../../schemas/gradle-javadoc-probe-v0.1.schema.json"
-    ))
-    .expect("内置原生协议JSON有效");
+    let schema_bytes = match v["schema_version"].as_str() {
+        Some("0.1.0") => include_str!("../../../schemas/gradle-javadoc-probe-v0.1.schema.json"),
+        Some("0.2.0") => include_str!("../../../schemas/gradle-javadoc-probe-v0.2.schema.json"),
+        _ => return Err("gradle_native_identity_invalid"),
+    };
+    let schema: Value = serde_json::from_str(schema_bytes).expect("内置原生协议JSON有效");
     let keys = schema["required"].as_array().expect("内置字段列表");
     if !v.as_object().is_some_and(|o| {
         o.len() == keys.len()
             && keys
                 .iter()
                 .all(|k| o.contains_key(k.as_str().expect("字段为字符串")))
-    }) || v["schema_version"] != "0.1.0"
+    }) || !matches!(v["schema_version"].as_str(), Some("0.1.0" | "0.2.0"))
         || v["report_type"] != "gradle_javadoc_probe"
         || v["coverage_proven"] != false
         || v["rule_configuration_complete"] != false
@@ -308,7 +310,7 @@ pub fn prepare(root: &Path, inputs: &Value, native: &Value) -> Result<Value, &'s
         .map_err(|_| "clock_unavailable")?
         .as_nanos();
     Ok(
-        json!({"schema_version":"0.1.0","report_type":"gradle_javadoc_workbench_observation","workspace_binding":"bound","workspace_id":id,"run_id":format!("javadoc-gradle-{}-{nanos}",std::process::id()),"checker_id":"java.gradle.javadoc","authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated","inputs":inputs,"native":native,"findings":findings,"blockers":blockers}),
+        json!({"schema_version":native["schema_version"],"report_type":"gradle_javadoc_workbench_observation","workspace_binding":"bound","workspace_id":id,"run_id":format!("javadoc-gradle-{}-{nanos}",std::process::id()),"checker_id":"java.gradle.javadoc","authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated","inputs":inputs,"native":native,"findings":findings,"blockers":blockers}),
     )
 }
 
@@ -462,7 +464,7 @@ pub(crate) fn latest_preparation(
                 "authority",
                 "diagnostic_reason",
             ],
-        ) || obs["schema_version"] != "0.1.0"
+        ) || !matches!(obs["schema_version"].as_str(), Some("0.1.0" | "0.2.0"))
             || obs["record_type"] != "local_blocker_observation"
             || obs["blocker_id"] != id
             || obs["workspace_id"] != fact["workspace_id"]

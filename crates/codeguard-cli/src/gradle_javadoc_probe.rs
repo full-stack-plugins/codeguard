@@ -273,5 +273,5 @@ fn private_scratch() -> Result<Scratch, ()> {
 
 /// 构造未提供原工具的准备失败观察，供绑定输入的修复任务使用；不宣称原生执行。
 pub(crate) fn missing_prerequisites() -> Value {
-    json!({"schema_version":"0.1.0","report_type":"gradle_javadoc_probe","native_status":"incomplete","reason":"prerequisites_missing","init_scripts_sha256":digest(format!("{MODEL_SCRIPT}\n{JAVADOC_SCRIPT}").as_bytes()),"model_report_sha256":null,"source_snapshot_sha256":null,"gradle_bundle_sha256":null,"java_entry_sha256":null,"jdk_release_sha256":null,"task_paths":[],"selected_java_file_count":0,"native_stdout_sha256":null,"native_stderr_sha256":null,"findings":[],"rule_configuration_complete":false,"coverage_proven":false,"authority":"local_unverified","delivery_decision":"not_evaluated"})
+    json!({"schema_version":"0.2.0","report_type":"gradle_javadoc_probe","native_status":"incomplete","reason":"prerequisites_missing","init_scripts_sha256":digest(format!("{MODEL_SCRIPT}\n{JAVADOC_SCRIPT}").as_bytes()),"model_report_sha256":null,"source_snapshot_sha256":null,"gradle_bundle_sha256":null,"java_entry_sha256":null,"jdk_release_sha256":null,"task_paths":[],"selected_java_file_count":0,"native_stdout_sha256":null,"native_stderr_sha256":null,"findings":[],"rule_configuration_complete":false,"coverage_proven":false,"authority":"local_unverified","delivery_decision":"not_evaluated"})
 }

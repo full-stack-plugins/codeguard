@@ -206,3 +206,22 @@ fn actual_gradle_empty_descriptions_project_with_original_snapshot_binding() {
         fs::write(path,serde_json::to_vec_pretty(&json!({"evidence_kind":"actual_native_projection","inputs":inputs,"native":native,"findings":findings,"blockers":blockers,"coverage_proven":false,"delivery_decision":"not_evaluated"})).unwrap()).unwrap();
     }
 }
+
+#[test]
+fn description_rules_require_the_new_native_protocol_without_widening_old_reports() {
+    let (dir, inputs, native) = fixture();
+    for rule in [
+        "JavadocEmptyComment",
+        "JavadocMissingMainDescription",
+        "JavadocEmptyThrowsDescription",
+    ] {
+        let mut current = native.clone();
+        current["findings"][0]["rule_id"] = json!(rule);
+        assert!(project(&dir.0, &inputs, &current).is_err());
+        current["schema_version"] = json!("0.2.0");
+        let findings = project(&dir.0, &inputs, &current).unwrap().0;
+        assert_eq!(findings[0]["rule_id"], rule);
+        current["schema_version"] = json!("0.3.0");
+        assert!(project(&dir.0, &inputs, &current).is_err());
+    }
+}
