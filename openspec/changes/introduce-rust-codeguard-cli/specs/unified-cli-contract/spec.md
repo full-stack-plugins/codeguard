@@ -314,3 +314,8 @@ npm公开CVE入口 MUST 按CLI、登记环境变量、项目runtime.json、内�
 #### Scenario: Unknown command or duplicated format is requested
 - **WHEN** 帮助查询有未知入口、重复format或不支持的sarif格式
 - **THEN** 执行前返回2且stdout不输出伪成功JSON
+
+#### Scenario: Registered standalone lint has no native adapter
+- **WHEN** 使用注册表规范语言请求独立单文件 lint，而该语言尚无专用原生适配器
+- **THEN** 返回版本化未完成报告，明确原生适配缺口及配置 unknown；不得宣称原生工具未安装或执行注册表中未经适配的历史命令。启用WASM时只对匹配的固定路由提供有界候选，未知ID、错参、无关工具参数在观察及持久化前拒绝
+- **AND** 疑似候选可复用项目确认任务及下一步；后续零候选不关闭历史任务，损坏历史保留恢复原因。无WASM构建明确能力不可用，不伪造lint通过。源码选择与grammar不匹配、歧义头文件或普通SQL不强选grammar

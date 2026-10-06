@@ -50,6 +50,22 @@ fn json_help_covers_all_tracking_ids_and_keeps_quality_unevaluated() {
         }
     );
     let lint = entries.iter().find(|r| r["command"] == "lint").unwrap();
+    let registry = codeguard_adapters::legacy_registry().unwrap();
+    let declared = lint["languages"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|value| value.as_str().unwrap())
+        .collect::<BTreeSet<_>>();
+    let registered = registry
+        .languages
+        .iter()
+        .map(|row| row.id.as_str())
+        .collect::<BTreeSet<_>>();
+    assert_eq!(
+        declared, registered,
+        "lint help must describe every canonical registered entry"
+    );
     assert_eq!(
         lint["support"],
         if cfg!(unix) {

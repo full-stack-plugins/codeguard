@@ -204,7 +204,7 @@ pub(crate) fn print_feedback(report: &Value) {
     }
     #[cfg(feature = "wasm-precheck")]
     if let Some(syntax) = report.get("syntax_candidates") {
-        crate::javascript_syntax_precheck::print_feedback(syntax);
+        crate::syntax_lint_feedback::print_feedback(syntax);
     }
     println!("工作台：{}", report["workbench_status"]);
     println!("下一步：{}", report["next_action"]);

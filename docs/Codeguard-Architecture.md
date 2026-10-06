@@ -1182,3 +1182,17 @@ flowchart LR
 ```
 
 Feedback 0.6 separates current observations from pending historical confirmation: an open task retains its ID and required native checking. Synchronization failures preserve candidates and identify workspace/report recovery. Actual hosts, full policy closure and all language qualifications remain pending. See [acceptance](../tests/acceptance/javascript-lint-candidate.md).
+
+For standalone lint, every registry ID has an honest entry point. A native adapter gap does not establish that the tool is absent. Candidate parsing, shared task synchronization and original native confirmation remain separate capabilities.
+
+```mermaid
+flowchart LR
+    A["lint language FILE"] --> B{Native adapter}
+    B -->|Integrated| C[Native-first language command]
+    B -->|Gap| D[Unknown native configuration]
+    D --> E{Matching WASM available}
+    E -->|Yes| F[Bounded candidate observation]
+    E -->|No| G[Explicit incomplete feedback]
+    F --> H[Shared stable confirmation task]
+    H --> I[Native confirmation or adapter decision]
+```

@@ -2414,3 +2414,7 @@ ESLint统一入口对JavaScript四种扩展接入原生优先及共享候选扫�
 ### JavaScript 历史记录恢复分流
 
 公开RED证明坏JSON导致错误推荐；修复后6项独立测试及受影响35项回归通过（重叠不累加），保留required、失败原因及空引用。已初始化无历史的正向对照通过。实际JSON/schema记录见tests/acceptance/javascript-history-recovery.md；不借用模拟历史证明真实ESLint、宿主、关闭或全语言精度。
+
+### 全注册表独立候选lint入口
+
+统一单文件服务实际调用剩余20grammar，与原专用入口分开；原生适配缺口输出unknown，不证明工具未安装。WASM四目标31通过、补充身份/路径反例后单目标5通过（重叠），默认四目标14通过/4忽略。实际报告/schema和验收记录在tests/acceptance/standalone-syntax-lint.md。未以此证据声称32语言原生lint、正式精度、完整关闭、真实宿主或发行完成。

@@ -817,3 +817,5 @@ WASM 首次闭环的实际执行路径、协议与误报分流见 [验收记录]
 JavaScript 回退候选已接入项目检查与确认编辑 Hook：重复顶层简单 let/const 绑定保留独立结构证据，沿用同一 ESLint 确认任务，并由 `next` 指导原生检查。独立 `lint typescript` 入口也已按 `.js`、`.mjs`、`.cjs`、`.jsx` 选择 JavaScript grammar，并优先调用原生 ESLint；只有无历史待确认任务的零候选观察才推荐安装 lint。真实宿主验收与 grammar 资格仍未完成。见[验收](tests/acceptance/javascript-binding-workbench.md)。
 
 以上为当前源码候选的新增能力，公开 npm 发行未包含本批修改。
+
+独立 `lint <注册表规范语言> FILE` 已接受全部规范语言ID：已有专用原生适配器保留原路径，其余输出 `syntax_lint_feedback`，明确原生适配缺口及配置未知。启用WASM的源码构建追加匹配的有界grammar候选，提供 `--workspace ABS_ROOT` 时复用 `.codeguard/` 原生确认任务。这是局部语法反馈，不代表原生lint全覆盖，也未更新公开npm能力。
