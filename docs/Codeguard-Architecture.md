@@ -1161,3 +1161,24 @@ flowchart LR
 This diagram describes the implemented source-level host-approved SDK path. Production automatic host approval integration remains pending; editable local history cannot grant project delivery permission.
 
 Incomplete parser feedback now directs the agent to check the original source with the applicable native tool. If native confirmation accepts the source, investigate grammar version/compatibility or scan budgets; only actual native diagnostics guide source changes. Truncation alone does not establish a grammar error. This applies to project output, edit context, persisted tasks and next/task show; task identity and closure requirements are unchanged. [Acceptance](../tests/acceptance/incomplete-syntax-guidance.md)
+
+### Shared JavaScript candidate entry points (current source candidate)
+
+Standalone `lint typescript` selects native-first JavaScript checking by file extension and reuses bounded project observations and edit-hook task synchronization. Automatic discovery stays within the selected workspace; it cannot execute a parent project's checker. A selected native failure remains visible. Versioned entry protocols share rule identities, byte/position validation and stable ESLint task identities. A candidate-free observation cannot replace native confirmation or the project gate.
+
+```mermaid
+flowchart LR
+    A[Standalone lint] --> B[Native-first within workspace]
+    C[Project check] --> D[Shared bounded observation]
+    E[Confirmed edit hook] --> D
+    B -->|Context absent| D
+    B -->|Entry available| N[Native ESLint]
+    D --> F[Stable task and next]
+    D --> G{No candidate and no pending task}
+    G -->|Yes| H[Recommend native lint]
+    G -->|No| F
+    F --> N
+    N --> I[Native recheck and existing closure contract]
+```
+
+Feedback 0.6 separates current observations from pending historical confirmation: an open task retains its ID and required native checking. Synchronization failures preserve candidates and identify workspace/report recovery. Actual hosts, full policy closure and all language qualifications remain pending. See [acceptance](../tests/acceptance/javascript-lint-candidate.md).

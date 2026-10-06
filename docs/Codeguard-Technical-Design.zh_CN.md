@@ -1634,3 +1634,7 @@ runtime的有界直接同级绑定AST事实现接入WASM源码构建的`grammar 
 ### JavaScript 重复直接绑定的项目候选与工作台
 
 项目检查与确认编辑Hook在原生优先之后复用JavaScript固定结构规则；原始恢复节点与重复顶层简单let/const名称候选分别展示。check反馈0.54、确认观察0.13、Hook0.27及next简报0.20保持旧协议封闭。重复检查沿用同一ESLint准备身份，next要求核对原方言/配置并进行适用原生确认；后续WASM零候选不关闭任务。结构规则不覆盖嵌套、var、解构或全部语义错误，真实宿主与独立lint接线仍待验收。见[本轮验收](../tests/acceptance/javascript-binding-workbench.md)。
+
+### JavaScript 独立 lint 与历史确认要求
+
+`lint typescript` 是当前ESLint统一入口；四种JavaScript扩展先在所选工作区内发现原生工具，没有本地上下文时复用项目的单文件WASM候选扫描与工作台，使用反馈0.6。结构/恢复位置分开，等号及分隔参数共用重复校验。当前零候选仅在没有同范围开放确认任务时推荐原生lint；已有任务则保留ID及required，避免从独立入口逃逸。所选原生失败不回退，任务同步故障保留候选并报告具体原因。新schema保持旧版本不变，真实宿主/完整资格/发行仍待验收。见[验收](../tests/acceptance/javascript-lint-candidate.md)。

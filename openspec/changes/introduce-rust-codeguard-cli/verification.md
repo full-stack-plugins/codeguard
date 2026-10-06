@@ -2402,3 +2402,11 @@ Clippy 现在在原生执行前冻结已观察源码及根配置/锁的字节或
 [验收与合成工作区实际报告](../../../tests/acceptance/javascript-binding-workbench.md)。完整默认工作区/358例/语言资格/真实宿主/独立lint/公开发布未在本批完成，父任务保留开放，受保护Erlang草稿保持原字节。已知远端插件source审计阻塞不由本批规避。
 
 最终源代码下新增端到端与next/work sync契约三目标：27 passed/0 failed/2 ignored。与前述目标有重叠，不累加为整体覆盖。
+
+## 2026-10-06 JavaScript 独立入口、历史确认与自动工具边界
+
+ESLint统一入口对JavaScript四种扩展接入原生优先及共享候选扫描/任务同步，公开0.6保持旧schema不改。无待办零候选为推荐；同范围历史确认仍开放则保留ID和required。独立参数RED修复等号写法及规范化重复拒绝；副作用RED修复自动发现越过子工作区启动父工具的问题，复用既有有界工具选择。工作区未初始化、记录路径symlink及外部源码均保留诊断/恢复步骤，不造任务或修改源码。
+
+最终四组WASM目标34 passed/0 failed/0 ignored，参数单目标1 passed（其他库目标过滤不计）；默认/WASM全目标Clippy -D warnings、格式/分层/OpenSpec strict/diff通过。366 schema元定义、19实际反馈/7伪造变体通过，新旧任务原身份复用。真实ESLint/宿主/语言资格/358语料与公开发行未在本批完成，父任务保持开放，受保护Erlang草稿保持原字节。上轮CI37401747231因固定插件源码dec5f9d远端不可达在gate早期失败，MSRV成功；不绕过该审计，不借其结果证明本轮成功。详情及实际报告见[验收](../../../tests/acceptance/javascript-lint-candidate.md)。
+
+本批默认原生入口三目标终态8 passed/0 failed/6 ignored；真实工具条件未执行不计原生验收。默认参数目标1 passed，与特性参数测试范围重叠，不累加；本批未执行全工作区。受保护Erlang草稿SHA-256保持原值。

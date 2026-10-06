@@ -818,3 +818,10 @@ Project Rust parser selection SHALL distinguish package edition, explicit worksp
 - **AND** next SHALL identify the bounded candidate rule and require applicable native checking with the original dialect and configuration
 - **AND** a later candidate observation without duplicates SHALL NOT close the existing task
 - **AND** forged rule, grammar, position or cross-language protocol identities SHALL be rejected by the report importer
+
+#### Scenario: Standalone JavaScript feedback preserves pending native confirmation
+- **WHEN** the ESLint unified entry checks a JavaScript source without usable native context
+- **THEN** it SHALL use the JavaScript grammar and the same bounded observation and task synchronization services as project checks
+- **AND** a candidate-free observation SHALL recommend native lint only when no validated open confirmation task remains for that workspace and scope
+- **AND** an existing open task SHALL retain its identity and required native confirmation even when the latest candidate observation contains no issue
+- **AND** automatic native discovery SHALL NOT search or execute beyond the selected workspace boundary

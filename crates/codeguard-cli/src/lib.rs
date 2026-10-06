@@ -264,6 +264,8 @@ pub mod tool_identity;
 pub mod tool_lock;
 #[cfg(feature = "wasm-precheck")]
 mod typescript_syntax_precheck;
+#[cfg(all(unix, feature = "wasm-precheck"))]
+mod javascript_syntax_precheck;
 pub mod whitelist_command;
 mod whitelist_correction_command;
 mod whitelist_correction_projection;

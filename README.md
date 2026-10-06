@@ -831,4 +831,6 @@ Native-first and WASM-first Rust syntax tasks now share a protected-host SDK con
 
 See [WASM-first acceptance](tests/acceptance/rust-wasm-task-resolution.md) for the actual execution path, protocols and counterexample routing.
 
-JavaScript fallback candidates now reach project checks and confirmed edit hooks: duplicate direct simple let/const bindings retain separate structural evidence, reuse one ESLint confirmation task, and produce native-check guidance through `next`. This is bounded candidate support; standalone lint integration, actual host acceptance and grammar qualification remain pending. See [acceptance](tests/acceptance/javascript-binding-workbench.md).
+JavaScript fallback candidates now reach project checks and confirmed edit hooks: duplicate direct simple let/const bindings retain separate structural evidence, reuse one ESLint confirmation task, and produce native-check guidance through `next`. The standalone `lint typescript` entry also selects the JavaScript grammar for `.js`, `.mjs`, `.cjs` and `.jsx`, with native ESLint first. Candidate-free observations recommend native lint only when no prior confirmation task remains. Actual host acceptance and grammar qualification remain pending. See [acceptance](tests/acceptance/javascript-binding-workbench.md).
+
+These additions describe the current source candidate; the public npm release is unchanged.
