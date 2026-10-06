@@ -101,7 +101,11 @@
     "crates/codeguard-adapters/src/cargo_documentation_workspace.rs": "0814890f213919c7a111ea520e26ced4110d6afa98b8583e1b99d79027aa6ebd",
     "tests/acceptance/cargo-documentation-workspace.md": "6be1ac870924db90f8d2b9aa6cfa298f4a825ce659f998d2121f4c7b4089b9a4",
     "crates/codeguard-adapters/src/cargo_workspace_reference.rs": "95f9ed06ac881ee17a124edca4ae3f6541690ef60aeabd0d1a6ffac0ede1cb02",
-    "tests/acceptance/cargo-documentation-explicit-workspace.md": "69a80fd1779e46228790530792a24168ad348ec5b1fe109f2991fe4e304769ad"
+    "tests/acceptance/cargo-documentation-explicit-workspace.md": "69a80fd1779e46228790530792a24168ad348ec5b1fe109f2991fe4e304769ad",
+    "tests/acceptance/java-native-tool-preparation-plan.md": "bff683f3debed09fc6632cf3fb140745bb99d971bec73a88326260e976959f9b",
+    "tests/fixtures/java_native_tool_bootstrap/pom.xml": "651bd2709304a8bf5a7371b5a7503bedf9482a2f915afd5d93cf36a5473410a5",
+    "tests/fixtures/java_native_tool_bootstrap/src/main/java/BootstrapDocs.java": "2cb6b78b759253536027b34afc500f751d1e4614420f77ddcd5623a9a7ab19fa",
+    "tests/acceptance/evidence/java-native-tool-source-inventory-2026-10-07.json": "b9d8e2bf5f16ccd370a699d9d4b177b1b108c55c85b981b7f9a42eeef7ce6cec"
   },
   "languages": [
     {
@@ -199,7 +203,11 @@
                 "crates/codeguard-cli/src/maven_javadoc_task_recheck.rs"
               ],
               "evidence_refs": [
-                "tests/acceptance/maven-javadoc-detailed-descriptions.md"
+                "tests/acceptance/maven-javadoc-detailed-descriptions.md",
+                "tests/acceptance/java-native-tool-preparation-plan.md",
+                "tests/fixtures/java_native_tool_bootstrap/pom.xml",
+                "tests/fixtures/java_native_tool_bootstrap/src/main/java/BootstrapDocs.java",
+                "tests/acceptance/evidence/java-native-tool-source-inventory-2026-10-07.json"
               ],
               "blockers": [
                 "java/maven: Javadoc用途/参数/返回/异常及继承/record/生成范围的完整原生规则/合法反例/契约准确性未验收",
