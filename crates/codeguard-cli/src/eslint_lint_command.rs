@@ -43,7 +43,12 @@ pub fn run(args: &[String]) -> ExitCode {
     }
     #[cfg(feature = "wasm-precheck")]
     if crate::typescript_syntax_precheck::eligible(&args) {
-        let report = match crate::eslint_native_first_candidate::observed_candidate(&args.source) {
+        let candidate = if let Some(workspace) = &args.workspace {
+            crate::eslint_native_first_candidate::observed_candidate_within(&args.source, workspace)
+        } else {
+            crate::eslint_native_first_candidate::observed_candidate(&args.source)
+        };
+        let report = match candidate {
             Ok(Some(candidate)) => {
                 let mut native_args = args.clone();
                 native_args.entry = Some(candidate.entry);
@@ -60,6 +65,9 @@ pub fn run(args: &[String]) -> ExitCode {
                         Some("eslint_node_runtime_unresolved"),
                     )
                 }
+            }
+            Ok(None) if crate::javascript_syntax_precheck::supported(&args) => {
+                crate::javascript_syntax_precheck::observe(&args, deadline)
             }
             Ok(None) => {
                 let mut report = crate::typescript_syntax_precheck::observe(&args, deadline);
@@ -193,6 +201,10 @@ pub(crate) fn print_feedback(report: &Value) {
                 observation["kind"], observation["start_line"], observation["start_column"]
             );
         }
+    }
+    #[cfg(feature = "wasm-precheck")]
+    if let Some(syntax) = report.get("syntax_candidates") {
+        crate::javascript_syntax_precheck::print_feedback(syntax);
     }
     println!("工作台：{}", report["workbench_status"]);
     println!("下一步：{}", report["next_action"]);
