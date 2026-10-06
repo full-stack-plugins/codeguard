@@ -2,11 +2,13 @@
   "evidence_kind": "development_structure_workbench_schema",
   "qualification": "not_granted",
   "schemas_valid": 503,
-  "historical_schemas_unchanged": 500,
+  "historical_schemas_unchanged": 503,
   "feedback_and_brief_pairs_valid": 20,
   "task_show_valid": 4,
   "structural_packets_valid": 44,
   "helper_native_reports_valid": 8,
   "task_verifications_valid": 16,
+  "workspace_feedback_valid": 2,
+  "unsupported_standard_argument_cases": 2,
   "negative_cases_rejected": 5
 }

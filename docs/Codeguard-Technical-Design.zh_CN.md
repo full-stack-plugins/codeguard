@@ -2037,9 +2037,9 @@ C/C++显式comments现同次原生扫描返回原警告及函数文档结构：�
 
 C/C++结构缺失现按文件/语言标准/Codeguard自有策略创建稳定修复任务，next给出全部当前函数定位与原comments复扫命令；重载和行号移动不重复创建，删除Markdown可恢复，局部消失仍open。专用task verify/attempt目前执行前拒绝，完整详细准确性与可信关闭仍未验收。见[结构任务验收](../tests/acceptance/c-family-structure-workbench.md)。
 
-C/C++结构原工具复检更新：结构任务现可执行绑定首次工具/标准的 `task verify`，记录 still_present、incomplete 或 candidate_absent_unverified_policy 局部观察；任务仍开放。新的brief0.32/task show0.6/反馈0.8/复检0.37修正原指引中未支持的 `comments --workspace` 参数，测试直接执行生成argv。结构attempt/无进展及可信关闭继续未完成，历史段落保留为检查点。
+C/C++结构原工具复检更新：结构任务现可执行绑定首次工具/标准的 `task verify`，记录 still_present、incomplete 或 candidate_absent_unverified_policy 局部观察；任务仍开放。新的brief0.32/task show0.6/反馈0.8/复检0.37将原comments复扫指引升级为任务绑定的原工具复检，测试直接执行生成argv。结构attempt/无进展及可信关闭继续未完成，历史段落保留为检查点。
 
-C/C++ structural rechecks now use the original compiler and standard through task verify, recording local observations without closing tasks. Brief0.32, task-show0.6, feedback0.8 and verification0.37 replace the unsupported comments --workspace guidance; native tests execute the generated argv. Controlled structural attempts, no-progress handling and trusted closure remain pending. Earlier sections are historical checkpoints.
+C/C++ structural rechecks now use the original compiler and standard through task verify, recording local observations without closing tasks. Brief0.32, task-show0.6, feedback0.8 and verification0.37 upgrade comments re-scan guidance to task-bound original-tool verification; native tests execute the generated argv. Controlled structural attempts, no-progress handling and trusted closure remain pending. Earlier sections are historical checkpoints.
 
 C/C++结构尝试更新：结构任务接入租约、repair-source尝试日志、ready后的原工具复检与同一输入两次失败预算。新brief0.33/task show0.7/绑定反馈0.9显示等待、必须复检或具体决策；重复扫描、删Markdown及重命名动作不能恢复预算。缺历史报告保持未验证，篡改事件拒绝。跨输入语义无进展、完整详细准确性/项目/平台/独立精度及可信关闭仍未验收。
 

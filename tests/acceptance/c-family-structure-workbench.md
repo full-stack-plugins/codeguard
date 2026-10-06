@@ -59,9 +59,9 @@ Dedicated task verify, controlled attempts and no-progress budgets remain pendin
 
 Structural task verify binds original report/consumption receipt/open fact/compiler bytes/standard, freezes current source and executes the same bounded AST profile. Local results never close tasks. Shared leases, pre-persistence current-input checks and cancellation/deadline limits remain in force.
 
-本轮发现旧brief给出的comments --workspace不可执行；新brief0.32生成task verify原工具argv，真实测试直接执行该argv。task show0.6、绑定反馈0.8；495历史schema保持字节不变，新增5份schema。专用attempt仍拒绝，受控尝试预算、完整语义/项目/平台/独立精度与可信关闭继续缺失，66/288和228blocked、0/32保持。以上早期“verify未接线”和491历史schema为e77517a之前检查点。
+更正早期归因：comments --workspace受支持，失败测试使用了不受支持的c17；新brief0.32生成task verify原工具argv，真实测试直接执行该argv。task show0.6、绑定反馈0.8；495历史schema保持字节不变，新增5份schema。专用attempt仍拒绝，受控尝试预算、完整语义/项目/平台/独立精度与可信关闭继续缺失，66/288和228blocked、0/32保持。以上早期“verify未接线”和491历史schema为e77517a之前检查点。
 
-The previous brief included an unsupported comments --workspace argument. Brief0.32 supplies executable original-tool task-verify argv tested directly, with task-show0.6 and feedback0.8. All495 historical schemas remain unchanged. Attempts, complete semantics/project/platform/independent precision and trusted closure remain pending.
+Correction: comments --workspace is supported; the failed test used unsupported c17. Brief0.32 supplies executable original-tool task-verify argv tested directly, with task-show0.6 and feedback0.8. All495 historical schemas remain unchanged. Attempts, complete semantics/project/platform/independent precision and trusted closure remain pending.
 
 本增量验证：默认/WASM各27个公开目标测试通过，另各一个真实原工具内部契约测试覆盖still_present、局部消失、源变化、原规则/工具/首次报告篡改、语法错误和截止耗尽。500份schema有效，495历史字节不变；20反馈/brief对、28结构报告、8公开verification、8内部原生复检、4task show及5伪造负例通过。独立标注精度和生产资格仍未授予。
 
@@ -92,3 +92,9 @@ flowchart LR
 本轮真实验收：默认/WASM各27目标测试、各1内部原结构契约测试通过；覆盖C/C++各两次ready/原生仍存在、等待复检、预算耗尽、重命名/重扫/删投影不重置、缺私有报告/消费收据保持未验证及伪造收据/事件拒绝。原语法错误/截止/输入变化边界保留。共享任务回归38通过/10条件忽略，两种严格Clippy通过。503schema有效/500历史字节不变，44结构报告、16公开verification、8内部原生报告、20反馈/brief对、4task show及5协议伪造负例通过。上述是开发验收，未获得独立精度/生产资格。
 
 Native tests cover two ready/present cycles for each C/C++ context, required verification, exhausted budgets, rename/rescan/projection recovery, missing reports/receipts and forged receipt/event rejection. Both modes pass27 target tests and one internal native contract; shared task regression passes38 with10 conditional skips.503 schemas preserve500 historical documents, validating44 packets,16 public verifications,8 internal reports,20 feedback/brief pairs and4 task-show reports with five schema forgeries rejected. Qualification remains not_granted.
+
+## 参数归因更正 / Argument diagnosis correction
+
+此前把真实测试的错参退出归因于comments --workspace是错误的。e77517a及当前SyntaxLintArguments均支持绝对--workspace；失败测试实际提供了不支持的c17，固定Clang档案只接受c11/c++17。真实契约测试现直接执行comments c FILE --standard c11 --workspace ROOT并绑定工作台，同时确认c17返回错参2。task verify仍保留，因为它提供首次任务/工具绑定、局部事件和受控尝试复检；不是因comments不支持工作区。
+
+Earlier attribution of the argument failure to --workspace was incorrect. Both e77517a and the current parser accept absolute --workspace; the failing test supplied unsupported c17. The explicit native profile accepts c11/c++17. The native contract now directly executes the workspace-bound c11 command and confirms c17 returns argument-error2. Task verify remains appropriate for task/tool binding, events and controlled-attempt verification, not because comments lacks workspace support.
