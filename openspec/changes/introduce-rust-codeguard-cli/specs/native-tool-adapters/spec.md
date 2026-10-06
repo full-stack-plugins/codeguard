@@ -467,6 +467,17 @@ Checkstyle XML 解析 MUST 保留完整 source（包括自定义模块 ID）、�
 - **WHEN** 原生 source 未在原配置映射中，或配置存在重复 ID 或未知版本语义
 - **THEN** 返回未完成，不按消息、短类名或顺序推测规则，不发布用于修改源码的 finding
 
+### Requirement: Javadoc source selection SHALL bind to the nearest build root
+Javadoc 的局部主源码探针 SHALL 以最近构建根为基准识别 `src/main/java/`，不得仅按完整路径中的同名片段借用外层 POM。Maven 多文件探针 SHALL 仅选择归属于本构建根的源码；更近构建根即使未配置或配置未知，也不得由外层配置代为扫描。未解析的自定义源集保留未完成，不能据排除或未执行签发通过。
+
+#### Scenario: A source-like directory is outside the selected build root's main source set
+- **WHEN** 外层 POM 配置 Javadoc，但源码位于没有独立 POM 的 `vendor/src/main/java/`
+- **THEN** 保留源码记录并反馈源集未确认，不启动单文件 Javadoc、不制造注释 finding
+
+#### Scenario: A nested build root is inside a parent's source directory
+- **WHEN** `src/main/java/nested/pom.xml` 定义更近构建根，内有独立主源码
+- **THEN** 外层 Maven Javadoc 探针不选择该源码；内层按自身配置和前置条件处理，不重复计入外层观察数量
+
 ### Requirement: Field Javadoc checking SHALL use the native configured Checkstyle rule
 Rust 的 Checkstyle 注释适配 SHALL 支持原配置的 JavadocVariable，保留原生自定义规则 ID、完整检查类、严重度、范围及精确目标，不用自写字段注释规则替代原工具。
 
