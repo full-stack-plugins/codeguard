@@ -13,3 +13,5 @@ API缺失时测试因未解析导入RED；实现后四项构造报告测试覆�
 另显式使用已有Gradle8.10.2/JDK21离线执行一个实际条件测试：执行前捕获选定输入快照，原项目开启doclint:missing；裸@param和@return产生两条空说明诊断，投影为两条问题和一条规则/范围准备观察。实际报告通过未修改的原生0.1 schema。见[原生投影报告](evidence/gradle-javadoc-projection-native-2026-10-06.json)与[源码绑定摘要](evidence/gradle-javadoc-projection-2026-10-06.json)。该测试使用临时源码，只调用原生服务与投影接口，不证明用户工作区任务持久化或CLI闭环。
 
 默认/WASM CLI全目标严格Clippy、分层、OpenSpec strict、diff通过；未执行受保护Erlang测试或完整工作区回归。还缺持久化报告和事件接线、next修复指引、原工具复检/关闭/复发重开、完整详细规则和源码/配置/JDK闭包、多项目/custom doclet与57语言四类生产验收。正式语法资格保持0/32，本批没有安装下载、发布、合并或远端CI通过声明。
+
+后续接线：开发CLI现已持久化并提供next，见[工作台验收](gradle-javadoc-workbench.md)。本文件及其报告保留首次投影基础的原始边界，不将后续接线算入之前测试；task verify/可信关闭仍缺。

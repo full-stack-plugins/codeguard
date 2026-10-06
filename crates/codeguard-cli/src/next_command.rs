@@ -429,6 +429,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                     | "rust.cargo_audit"
                     | "java.jdk.javadoc"
                     | "java.maven.javadoc"
+                    | "java.gradle.javadoc"
                     | "java.checkstyle"
                     | "java.checkstyle.preparation"
                     | "java.maven.p3c"
@@ -447,6 +448,16 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         .as_str()
         .filter(|sha| valid_sha256(sha))
         .ok_or("finding_report_invalid")?;
+    #[cfg(unix)]
+    let gradle_preparation = if checker_id == "java.gradle.javadoc" && kind == "blocker" {
+        Some(crate::gradle_javadoc_workbench::latest_preparation(
+            root, id, fact,
+        )?)
+    } else {
+        None
+    };
+    #[cfg(not(unix))]
+    let gradle_preparation: Option<(String, Value)> = None;
     let recheck = if checker_id == "syntax.native_confirmation" {
         json!(["codeguard", "task", "verify", id, ".", "--format", "json"])
     } else if matches!(checker_id, "node.eslint" | "node.eslint.preparation") {
@@ -636,6 +647,15 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             "--format",
             "json"
         ])
+    } else if checker_id == "java.gradle.javadoc" {
+        #[cfg(unix)]
+        {
+            crate::gradle_javadoc_workbench::recheck_argv(root, first_run, report_sha)?
+        }
+        #[cfg(not(unix))]
+        {
+            return Err("gradle_javadoc_platform_unsupported");
+        }
     } else if checker_id == "java.maven.javadoc" {
         json!([
             "codeguard",
@@ -786,6 +806,24 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                 "actionable",
                 "核对该 Python 构建根的标准锁、原生 pip-audit advisory 和解析版本；恢复工具或锁输入，验证漏洞源及时效。局部零漏洞与自写白名单均不能关闭任务",
             )
+        } else if checker_id == "java.gradle.javadoc" {
+            (
+                if gradle_preparation.as_ref().is_some_and(|(reason, _)| {
+                    reason == "selected_sources_and_complete_documentation_rules_unverified"
+                }) {
+                    4
+                } else {
+                    1
+                },
+                if gradle_preparation.as_ref().is_some_and(|(reason, _)| {
+                    reason == "selected_sources_and_complete_documentation_rules_unverified"
+                }) {
+                    "needs_decision"
+                } else {
+                    "actionable"
+                },
+                "核对原Gradle/JDK与原项目规则、源集；环境故障先恢复工具，规则/覆盖缺口须明确具体政策，不修改无关源码",
+            )
         } else if checker_id == "java.jdk.javadoc" {
             (
                 1,
@@ -901,6 +939,22 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             },
         )
     };
+    if checker_id == "java.gradle.javadoc" {
+        brief["schema_version"] = json!("0.22.0");
+        brief["observation_scope"] = json!("selected_gradle_javadoc_inputs");
+        brief["task_verify_status"] = json!("not_integrated");
+        if let Some((reason, evidence)) = &gradle_preparation {
+            brief["latest_diagnostic_reason"] = json!(reason);
+            brief["latest_preparation_ref"] = evidence.clone();
+        }
+
+        brief["rule_basis"] = json!("原Gradle官方Javadoc任务原生诊断；完整详细规则与源集尚未验收");
+        if kind == "finding" && disposition == "actionable" {
+            brief["step"] = json!(
+                "核对本轮原生规则和API契约，补齐用途、参数、返回及异常详细说明，裸标签不能代替内容；按相同所选输入及原Gradle/JDK复扫，不关闭规则或勾选关闭"
+            );
+        }
+    }
     if checker_id == "java.maven.javadoc" {
         brief["schema_version"] = json!("0.5.0");
         brief["observation_scope"] = json!("configured_maven_multifile_probe");
@@ -1674,7 +1728,10 @@ pub(crate) fn canonical_action_id(brief: &Value) -> Result<&'static str, &'stati
         }
         Some("blocker")
             if brief["reason_code"] == "project_ruff_config_not_found"
-                || brief["reason_code"] == "p3c_configuration_not_confirmed" =>
+                || brief["reason_code"] == "p3c_configuration_not_confirmed"
+                || (brief["checker_id"] == "java.gradle.javadoc"
+                    && brief["latest_diagnostic_reason"]
+                        == "selected_sources_and_complete_documentation_rules_unverified") =>
         {
             Ok("review-project-policy")
         }
@@ -2165,7 +2222,7 @@ fn run_sequence(run_id: &str) -> Option<u128> {
 
 fn view(disposition: &str, reason: &str, brief: Value, actions: Value) -> Value {
     json!({
-        "schema_version":if brief["schema_version"] == "0.21.0" {json!("0.21.0")}else if brief["schema_version"] == "0.20.0" {json!("0.20.0")}else if brief["checker_id"] == "shell.shellcheck" {json!("0.17.0")} else if brief["checker_id"] == "go.vet" {json!("0.13.0")} else if brief["checker_id"] == "syntax.native_confirmation" {brief["schema_version"].clone()} else {json!("0.1.0")}, "report_type":"repair_brief_preview",
+        "schema_version":if brief["schema_version"] == "0.22.0" {json!("0.22.0")}else if brief["schema_version"] == "0.21.0" {json!("0.21.0")}else if brief["schema_version"] == "0.20.0" {json!("0.20.0")}else if brief["checker_id"] == "shell.shellcheck" {json!("0.17.0")} else if brief["checker_id"] == "go.vet" {json!("0.13.0")} else if brief["checker_id"] == "syntax.native_confirmation" {brief["schema_version"].clone()} else {json!("0.1.0")}, "report_type":"repair_brief_preview",
         "operation":"next", "command_status":"complete", "exit_code":0,
         "disposition":disposition, "reason":reason,
         "repair_brief":brief, "next_actions":actions,
