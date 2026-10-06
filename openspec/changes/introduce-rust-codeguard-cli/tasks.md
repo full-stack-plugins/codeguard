@@ -1859,3 +1859,10 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 - [x] 缺工具和工具变化、参数隔离、重复无进展、真实JDK文档补齐和POM变更分流，以及公开报告schema与受影响回归。
 
 证据见 [Javadoc任务复检](../../../tests/acceptance/javadoc-task-recheck.md)。完整可信关闭、复发、Maven与文件工作台尚未完成；9.x父任务不勾选。
+
+## 2026-10-06 Javadoc 显式文件工作台（已验证局部实现）
+
+- [x] 显式 --workspace 单文件原生观察同步稳定任务，区分探针模式，原任务复检保留首次范围，human输出真实任务及下一步。
+- [x] 无POM、未初始化、工作区外、缺JDK、重复扫描、真实JDK新增无效POM后复检、实际协议及受影响回归验证。
+
+证据见 [显式文件工作台验收](../../../tests/acceptance/javadoc-explicit-file-workbench.md)。可信关闭、复发、Maven与完整宿主等父任务不勾选。

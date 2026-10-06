@@ -17,21 +17,28 @@ pub(super) fn parse(
     report: &Value,
     digest: String,
 ) -> Result<ReportInput, &'static str> {
-    if !exact_keys(
-        report,
-        &[
-            "schema_version",
-            "report_type",
-            "workspace_binding",
-            "workspace_id",
-            "run_id",
-            "checker_id",
-            "authority",
-            "coverage_proven",
-            "delivery_decision",
-            "sources",
-        ],
-    ) || report["schema_version"] != "0.1.0"
+    let mut keys = vec![
+        "schema_version",
+        "report_type",
+        "workspace_binding",
+        "workspace_id",
+        "run_id",
+        "checker_id",
+        "authority",
+        "coverage_proven",
+        "delivery_decision",
+        "sources",
+    ];
+    if report["schema_version"] == "0.2.0" {
+        keys.push("observation_scope");
+    }
+    if !exact_keys(report, &keys)
+        || !matches!(report["schema_version"].as_str(), Some("0.1.0" | "0.2.0"))
+        || (report["schema_version"] == "0.2.0"
+            && !matches!(
+                report["observation_scope"].as_str(),
+                Some("explicit_file_probe" | "configured_project_probe")
+            ))
         || report["report_type"] != "javadoc_workbench_observation"
         || report["workspace_binding"] != "bound"
         || report["workspace_id"] != workspace
@@ -53,6 +60,9 @@ pub(super) fn parse(
         .as_array()
         .filter(|r| r.len() <= 100_000)
         .ok_or("javadoc_sources_invalid")?;
+    if report["observation_scope"] == "explicit_file_probe" && rows.len() != 1 {
+        return Err("javadoc_explicit_probe_scope_invalid");
+    }
     let mut findings = Vec::new();
     let mut blockers = Vec::new();
     let mut seen = BTreeSet::new();
@@ -91,6 +101,11 @@ pub(super) fn parse(
         if row["source_sha256"] != sha {
             return Err("javadoc_source_changed");
         }
+        if report["observation_scope"] == "explicit_file_probe"
+            && (!row["configuration_ref"].is_null() || !row["configuration_sha256"].is_null())
+        {
+            return Err("javadoc_explicit_probe_has_fake_configuration");
+        }
         if let Some(config) = row["configuration_ref"].as_str() {
             if !safe_relative_path(config) {
                 return Err("javadoc_config_invalid");
@@ -112,6 +127,11 @@ pub(super) fn parse(
             .as_array()
             .ok_or("javadoc_findings_invalid")?;
         if complete {
+            if report["observation_scope"] != "explicit_file_probe"
+                && row["configuration_ref"].is_null()
+            {
+                return Err("javadoc_project_configuration_unbound");
+            }
             if !exact_keys(
                 native,
                 &[

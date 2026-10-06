@@ -2492,3 +2492,7 @@ WASM CLI全目标Clippy -D warnings、定向rustfmt、分层、OpenSpec strict�
 ## 2026-10-06 Javadoc 原任务复检
 
 七个受影响回归目标81通过/0失败/28条件忽略；真实已有JDK21原任务复检目标另行1通过，和忽略项重叠。原问题仍在、补齐注释后的局部消失、配置改变、缺工具分别记录局部结果，保持open。4份新schema及实际项目包装、next、四轮公开复检/原生容器通过schema，严格Clippy、分层、OpenSpec通过。未证明可信关闭、宿主或全语言交付。见 tests/acceptance/javadoc-task-recheck.md。
+
+## 2026-10-06 Javadoc 显式文件工作台
+
+八个受影响目标90通过/0失败/29条件忽略；真实已有JDK21四目标另行4通过，与条件忽略重叠。显式文件无需POM，后增无效POM不改变原任务模式；工作区外不启动工具，未初始化不自动创建，缺工具生成准备任务，局部消失保持open。5份新schema及真实文件/项目实例、伪造覆盖与配置反例通过，严格Clippy、分层、OpenSpec strict通过。详见 tests/acceptance/javadoc-explicit-file-workbench.md。父任务及可信关闭、Maven、宿主验收保持开放。

@@ -36,6 +36,7 @@ pub fn run(args: &[String]) -> ExitCode {
                     | "--repo-sha256"
                     | "--timeout"
                     | "--format"
+                    | "--workspace"
             ) || !seen.insert(key.to_owned())
             {
                 eprintln!("未知或重复参数：{key}");
@@ -70,6 +71,26 @@ pub fn run(args: &[String]) -> ExitCode {
         eprintln!("--format 仅支持 human/json");
         return ExitCode::from(2);
     }
+    let workspace = match options.get("--workspace") {
+        Some(value) => match PathBuf::from(value)
+            .canonicalize()
+            .ok()
+            .filter(|p| p.is_dir())
+        {
+            Some(root)
+                if target
+                    .canonicalize()
+                    .is_ok_and(|p| p.starts_with(&root) && (!p.is_dir() || p == root)) =>
+            {
+                Some(root)
+            }
+            _ => {
+                eprintln!("--workspace需要可读目录，文件须位于其中，项目目标须为同一根");
+                return ExitCode::from(2);
+            }
+        },
+        None => None,
+    };
     let timeout = options
         .get("--timeout")
         .map(|value| parse_check_timeout(value))
@@ -77,7 +98,9 @@ pub fn run(args: &[String]) -> ExitCode {
         .and_then(select_check_timeout)
         .and_then(|(value, source)| {
             resolve_project_default(
-                if target.is_file() {
+                if let Some(root) = workspace.as_deref() {
+                    root
+                } else if target.is_file() {
                     target.parent().unwrap_or(&target)
                 } else {
                     &target
@@ -155,16 +178,20 @@ pub fn run(args: &[String]) -> ExitCode {
             }
         }
     }
-    if let Ok(root) = target.canonicalize() {
-        if root.is_dir() && root.join(".codeguard/workspace.json").exists() {
-            report["schema_version"] = json!("0.3.0");
-            report["workbench"] = crate::javadoc_workbench::connect(&root, &report);
-            report["workbench_status"] = report["workbench"]["status"].clone();
-            report["next_actions"] = json!([
-                "依据原生诊断及工作台修复简报修复后，以相同JDK及原配置重新运行comments java",
-                "按原任务运行task verify保存原工具复检；可信关闭尚未接通，局部零诊断不能关闭任务"
-            ]);
-        }
+    let root = workspace.or_else(|| {
+        target
+            .canonicalize()
+            .ok()
+            .filter(|p| p.is_dir() && p.join(".codeguard/workspace.json").exists())
+    });
+    if let Some(root) = root {
+        report["schema_version"] = json!("0.4.0");
+        report["workbench"] = crate::javadoc_workbench::connect(&root, &report);
+        report["workbench_status"] = report["workbench"]["status"].clone();
+        report["next_actions"] = json!([
+            "按本次显式文件或项目配置模式核对原生诊断与工作台简报",
+            "按原任务运行task verify保存原工具复检；可信关闭尚未接通，局部零诊断不能关闭任务"
+        ]);
     }
     let exit = if codeguard_runtime::sigint_cancellation_requested()
         || report["reason"] == "request_cancelled"
@@ -186,6 +213,25 @@ pub fn run(args: &[String]) -> ExitCode {
             report["command_status"], report["target_kind"], report["reason"]
         );
         println!("原生观察：{}", report["native_observation"]);
+        if report["workbench"].is_object() {
+            println!(
+                "工作台：{}；新增问题 {}，准备任务 {}",
+                report["workbench"]["status"],
+                report["workbench"]["new_findings"],
+                report["workbench"]["new_blockers"]
+            );
+            let brief = &report["workbench"]["next"]["repair_brief"];
+            if brief.is_object() {
+                println!(
+                    "任务 {}；模式 {}；下一步 {}；复检参数 {}",
+                    brief["task_id"],
+                    brief["observation_scope"],
+                    brief["step"],
+                    brief["recheck_argv"]
+                );
+            }
+        }
+
         for action in report["next_actions"].as_array().into_iter().flatten() {
             println!("下一步：{action}");
         }
