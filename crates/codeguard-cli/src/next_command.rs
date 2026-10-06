@@ -414,6 +414,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                     | "rust.cargo_check"
                     | "rust.cargo_audit"
                     | "java.jdk.javadoc"
+                    | "java.maven.javadoc"
                     | "java.checkstyle"
                     | "java.checkstyle.preparation"
                     | "java.maven.p3c"
@@ -618,6 +619,23 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             ".",
             "--java-home",
             "<已核验的JDK21绝对路径>",
+            "--format",
+            "json"
+        ])
+    } else if checker_id == "java.maven.javadoc" {
+        json!([
+            "codeguard",
+            "comments",
+            "java",
+            ".",
+            "--maven-tool",
+            "<原Maven绝对路径>",
+            "--java-home",
+            "<原JDK21绝对路径>",
+            "--maven-repo",
+            "<原离线仓库绝对路径>",
+            "--repo-sha256",
+            "<复核的固定摘要>",
             "--format",
             "json"
         ])
@@ -868,6 +886,17 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             },
         )
     };
+    if checker_id == "java.maven.javadoc" {
+        brief["schema_version"] = json!("0.4.0");
+        brief["observation_scope"] = json!("configured_maven_multifile_probe");
+        brief["task_verify_status"] = json!("not_integrated");
+        brief["rule_basis"] = json!("原POM固定Javadoc多文件原生诊断；项目政策未核验");
+        brief["step"] = json!(if kind == "blocker" {
+            "恢复本构建根原POM、Maven、JDK21和固定离线仓库后重跑comments java；不得修改无关源码或关闭检查器"
+        } else {
+            "核对原生规则、位置及实际API契约，补齐注释后按原Maven多文件上下文重跑comments java；源码变化先复扫，不勾选关闭；task verify未接通"
+        });
+    }
     if checker_id == "java.jdk.javadoc" {
         brief["schema_version"] = json!("0.3.0");
         brief["observation_scope"] =

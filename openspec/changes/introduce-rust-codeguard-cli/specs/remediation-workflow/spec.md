@@ -653,3 +653,16 @@ Maven Javadoc observations SHALL revalidate the selected Java runtime executable
 - **WHEN** the selected JDK release file changes while Maven executes against the frozen private source copy
 - **THEN** CodeGuard discards the native diagnostics and reports a runtime identity change
 - **AND** the observation cannot close tasks or claim complete project coverage
+
+### Requirement: Maven Javadoc diagnostics SHALL join the stable workbench
+An initialized workspace SHALL persist native Maven Javadoc multi-file observations bound to a bounded pre-execution source/POM snapshot. Import SHALL revalidate current input hashes, build ownership, native rule locations and projected identities. Incomplete execution SHALL create preparation tasks without source findings. Local zero diagnostics SHALL NOT close tasks.
+
+#### Scenario: Repeated Maven diagnostics
+- **WHEN** the same original Maven context reports the same rule at the same source anchor again
+- **THEN** the existing stable task receives another observation
+- **AND** feedback includes native evidence and Maven rescan arguments with task verification explicitly marked not integrated
+
+#### Scenario: Changed or forged observation
+- **WHEN** input bytes change before persistence/import or a projected fingerprint is forged
+- **THEN** CodeGuard rejects the new observation without accepting source findings
+- **AND** previously consumed reports remain historical under their original digest receipts

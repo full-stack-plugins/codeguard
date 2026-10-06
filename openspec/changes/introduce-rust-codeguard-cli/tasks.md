@@ -1872,3 +1872,10 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 - [x] 补齐JDK release运行后字节复核，真实目标行为反例先失败后通过；原源码/POM变化已有快照拒绝，新增公开CLI回归保护。
 
 三目标47通过/0失败/10条件忽略；Maven工作台及原任务复检未完成，不勾选父任务。见 [验收](../../../tests/acceptance/maven-javadoc-input-stability.md)。
+
+## 2026-10-06 Maven Javadoc 多文件工作台
+
+- [x] comments java的Maven局部诊断和准备观察绑定扫描前输入、归并稳定任务、提供原Maven重扫指引及明确未集成task verify状态。
+- [x] 重复扫描、伪造指纹/覆盖、源码变化、缺前置准备、已消费历史收据、公开schema实例和受影响回归验收。
+
+见 [局部验收](../../../tests/acceptance/maven-javadoc-workbench.md)。88通过/0失败/22条件忽略；真实Maven新工作台、原任务复检、完整模型与可信关闭未验收，6.x/9.x父任务仍开放。

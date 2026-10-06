@@ -1,0 +1,171 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "workspace_binding",
+    "workspace_id",
+    "run_id",
+    "checker_id",
+    "authority",
+    "coverage_proven",
+    "delivery_decision",
+    "inputs",
+    "native",
+    "findings",
+    "blockers"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "report_type": {
+      "const": "maven_javadoc_workbench_observation"
+    },
+    "workspace_binding": {
+      "const": "bound"
+    },
+    "workspace_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^javadoc-maven-[A-Za-z0-9_-]+$"
+    },
+    "checker_id": {
+      "const": "java.maven.javadoc"
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "inputs": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 100001,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "native": {
+      "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/java_javadoc"
+    },
+    "findings": {
+      "type": "array",
+      "maxItems": 100000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "finding_id",
+          "finding_fingerprint",
+          "path",
+          "source_sha256",
+          "rule_id",
+          "line"
+        ],
+        "properties": {
+          "finding_id": {
+            "type": "string",
+            "pattern": "^CG-[0-9a-f]{32}$"
+          },
+          "finding_fingerprint": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "rule_id": {
+            "enum": [
+              "JavadocMissingComment",
+              "JavadocDefaultConstructorMissingComment",
+              "JavadocMissingParam",
+              "JavadocMissingReturn",
+              "JavadocMissingThrows"
+            ]
+          },
+          "line": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "maxItems": 100000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "fingerprint",
+          "build_root",
+          "scope",
+          "affected_paths",
+          "reason"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^CG-B-[0-9a-f]{32}$"
+          },
+          "fingerprint": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "build_root": {
+            "type": "string",
+            "minLength": 1
+          },
+          "scope": {
+            "type": "string",
+            "minLength": 1
+          },
+          "affected_paths": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "reason": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+$"
+          }
+        }
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:maven-javadoc-workbench-observation:0.1.0"
+}
