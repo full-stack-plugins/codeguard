@@ -1571,7 +1571,7 @@ fn explicit_maven_javadoc_missing_prerequisites_do_not_fall_back_to_single_file(
     ]);
     assert_eq!(exit, 3);
     let javadoc = &report["native_results"]["java_javadoc"];
-    assert_eq!(javadoc["schema_version"], "0.3.0");
+    assert_eq!(javadoc["schema_version"], "0.5.0");
     assert_eq!(javadoc["probe_mode"], "maven_multifile");
     assert_eq!(javadoc["checker_id"], "java.maven.javadoc");
     assert_eq!(

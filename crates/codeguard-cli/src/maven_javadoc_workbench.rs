@@ -55,7 +55,7 @@ pub(crate) fn prepare(
         .duration_since(UNIX_EPOCH)
         .map_err(|_| "clock_unavailable")?
         .as_nanos();
-    let report = json!({"schema_version":"0.1.0","report_type":"maven_javadoc_workbench_observation","workspace_binding":"bound","workspace_id":id,"run_id":format!("javadoc-maven-{}-{nanos}",std::process::id()),"checker_id":"java.maven.javadoc","authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated","inputs":inputs,"native":native,"findings":findings,"blockers":blockers});
+    let report = json!({"schema_version":"0.2.0","report_type":"maven_javadoc_workbench_observation","workspace_binding":"bound","workspace_id":id,"run_id":format!("javadoc-maven-{}-{nanos}",std::process::id()),"checker_id":"java.maven.javadoc","authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated","inputs":inputs,"native":native,"findings":findings,"blockers":blockers});
     Ok(report)
 }
 
@@ -118,7 +118,7 @@ pub(crate) fn project(
             "files",
             "maven_multifile_probes",
         ],
-    ) || native["schema_version"] != "0.3.0"
+    ) || !matches!(native["schema_version"].as_str(), Some("0.3.0" | "0.5.0"))
         || native["report_type"] != "java_javadoc_project_probe"
         || native["probe_mode"] != "maven_multifile"
         || native["checker_id"] != "java.maven.javadoc"
@@ -237,7 +237,12 @@ pub(crate) fn project(
         let shape = crate::maven_javadoc_probe::incomplete_observation("", 0);
         if obs.as_object().map(|o| o.keys().collect::<Vec<_>>())
             != shape.as_object().map(|o| o.keys().collect::<Vec<_>>())
-            || obs["schema_version"] != "0.1.0"
+            || obs["schema_version"]
+                != if native["schema_version"] == "0.5.0" {
+                    "0.2.0"
+                } else {
+                    "0.1.0"
+                }
             || obs["report_type"] != "maven_javadoc_multifile_probe"
             || obs["checker_id"] != "java.maven.javadoc"
             || obs["project_checker_attribution"] != "unverified"
@@ -294,6 +299,20 @@ pub(crate) fn project(
                 for candidate in candidates {
                     if !exact(candidate, &["path", "line", "column", "rule_id"]) {
                         return Err("maven_finding_shape_invalid");
+                    }
+                    if native["schema_version"] == "0.3.0"
+                        && !matches!(
+                            candidate["rule_id"].as_str(),
+                            Some(
+                                "JavadocMissingComment"
+                                    | "JavadocDefaultConstructorMissingComment"
+                                    | "JavadocMissingParam"
+                                    | "JavadocMissingReturn"
+                                    | "JavadocMissingThrows"
+                            )
+                        )
+                    {
+                        return Err("maven_rule_protocol_invalid");
                     }
                     let relative = candidate["path"]
                         .as_str()

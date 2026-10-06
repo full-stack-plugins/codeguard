@@ -957,14 +957,15 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         }
     }
     if checker_id == "java.maven.javadoc" {
-        brief["schema_version"] = json!("0.5.0");
+        brief["schema_version"] = json!("0.6.0");
         brief["observation_scope"] = json!("configured_maven_multifile_probe");
         brief["task_verify_status"] = json!("local_observation_only");
-        brief["rule_basis"] = json!("原POM固定Javadoc多文件原生诊断；项目政策未核验");
+        brief["rule_basis"] =
+            json!("原POM固定Javadoc多文件缺注释与详细描述原生诊断；项目政策未核验");
         brief["step"] = json!(if kind == "blocker" {
-            "恢复本构建根原POM、Maven、JDK21和固定离线仓库后按原任务运行task verify；不得修改无关源码或关闭检查器"
+            "核对本构建根原POM、Maven、JDK21及Javadoc3.12.0插件和依赖离线缓存，恢复后按原任务运行task verify；不得修改无关源码或关闭检查器"
         } else {
-            "核对原生规则、位置及实际API契约，补齐注释后按原Maven多文件上下文运行task verify；源码变化先复检，不勾选关闭；可信关闭未验收"
+            "核对原生规则、位置及实际API契约，补齐用途、参数、返回及异常详细说明，空注释和裸标签不能替代说明；按原Maven多文件上下文运行task verify；源码变化先复检，不勾选关闭；可信关闭未验收"
         });
     }
     if checker_id == "java.jdk.javadoc" {

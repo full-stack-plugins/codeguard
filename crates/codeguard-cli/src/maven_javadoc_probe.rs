@@ -9,7 +9,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{Instant, SystemTime, UNIX_EPOCH};
 
 use codeguard_adapters::{
-    MavenJavadocParseState, javadoc_pom_direct_replay_eligible, parse_maven_javadoc_output,
+    MavenJavadocParseState, javadoc_pom_direct_replay_eligible, parse_detailed_maven_javadoc_output,
 };
 use codeguard_runtime::{
     ProcessSpec, SourceSnapshot, Termination, read_bounded_regular_file, run_process_recorded,
@@ -208,7 +208,7 @@ pub(crate) fn observe(request: &Request<'_>) -> Value {
             )
         })
         .collect();
-    let parsed = parse_maven_javadoc_output(&outcome.stdout, exit, "3.12.0", &source_map);
+    let parsed = parse_detailed_maven_javadoc_output(&outcome.stdout, exit, "3.12.0", &source_map);
     if parsed.state == MavenJavadocParseState::Incomplete {
         return with_reason(
             report,
@@ -258,7 +258,7 @@ pub(crate) fn observe(request: &Request<'_>) -> Value {
 /// 为检查前配置变化生成同形状的未完成观察，避免宿主得到无法解析的局部对象。
 pub(crate) fn incomplete_observation(reason: &'static str, source_count: usize) -> Value {
     json!({
-        "schema_version":"0.1.0", "report_type":"maven_javadoc_multifile_probe",
+        "schema_version":"0.2.0", "report_type":"maven_javadoc_multifile_probe",
         "checker_id":"java.maven.javadoc", "native_status":"incomplete",
         "reason":reason, "source_count":source_count,
         "observed_source_count":0, "findings":[], "native_plan_sha256":null,

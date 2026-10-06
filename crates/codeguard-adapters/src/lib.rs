@@ -156,7 +156,8 @@ pub use maven_dependency_tree::{
     MavenDependencyNode, MavenDependencyTree, parse_maven_dependency_tree_json,
 };
 pub use maven_javadoc_output::{
-    MavenJavadocDiagnostic, MavenJavadocParseState, MavenJavadocParsed, parse_maven_javadoc_output,
+    MavenJavadocDiagnostic, MavenJavadocParseState, MavenJavadocParsed,
+    parse_detailed_maven_javadoc_output, parse_maven_javadoc_output,
 };
 pub use maven_module_model::MavenModuleModel;
 pub use maven_wrapper_candidate::MavenWrapperCandidate;
