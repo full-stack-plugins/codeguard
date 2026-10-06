@@ -1,0 +1,47 @@
+{
+  "schema_version": "0.1.0",
+  "tested_base_commit": "4445f06936b3ce7b5c91df4731d7e963f2e290f5",
+  "changed_test_sha256": "47d4de78cd26c4ac471c7893dcda440b2c0f12a6887b19b3eb15327ca8f8b57d",
+  "command": "cargo test --workspace --all-targets --offline --locked",
+  "environment": {
+    "CARGO_PROFILE_TEST_DEBUG": "0"
+  },
+  "feature": "default_no_wasm",
+  "exit_code": 0,
+  "groups": 290,
+  "passed": 1565,
+  "failed": 0,
+  "ignored": 142,
+  "first_full_run_exit_code": 101,
+  "first_full_run_failure": "rust_comments_cli::invalid_arguments_stop_before_tool_execution",
+  "schema_meta_count": 397,
+  "actual_protocol_validation": [
+    "grammar-inventory-v1.1",
+    "plan-preview canonical python alias"
+  ],
+  "ci": {
+    "run_id": 37423582241,
+    "head_sha": "4445f06936b3ce7b5c91df4731d7e963f2e290f5",
+    "msrv": "success",
+    "gate": "failure",
+    "failed_step": "Check out corpus evidence source",
+    "required_plugin_commit": "dec5f9d1361eefff493e120b4278939a243814a9"
+  },
+  "grammar_qualification": {
+    "candidate_count": 32,
+    "released_count": 0
+  },
+  "logs_sha256": {
+    "cg-workspace-4445f06-current.log": "2593bd004e59feb0a9cead8a42a01d2f620d4cc2c941a17339d27cdd20ca9cc9",
+    "cg-rust-java-comments-dispatch-green.log": "99f5dedc5e0268de5d93c8e8d0ee0123e5f075ff830b0399c772bf95d7ef2b3a",
+    "cg-workspace-comments-dispatch-current.log": "314e15a97397868a46ff3c07c62fb48240076042a3f39c0efddf71b78249bc3e",
+    "cg-workspace-comments-dispatch-clippy.log": "e07c38f7bb382e568642e7b2f19cb553fcb32175e7311233170ed394d8034bc5"
+  },
+  "report_sha256": {
+    "cg-grammar-status-4445f06.json": "5a477ec2fb270fef14c52c47bcfac464d422fcc8ef9fcb2aa25a78cf86f38ee7",
+    "cg-alias-plan-4445f06.json": "e68128784490a3ffbbcbf1d53fa9236dea88edd0469e70132ddd43d6602ed136",
+    "cg-ci-4445f06-current.json": "371c82b6ce9650ebd27c8b4d8a2d259f0a79623e1904bf3a19351eeb32fe23ba"
+  },
+  "protected_erlang_draft_sha256": "2e3a296072e6a3aa34b561799c18c7d8b621d00f8786301d2612cee8cdab85b6",
+  "full_objective_complete": false
+}

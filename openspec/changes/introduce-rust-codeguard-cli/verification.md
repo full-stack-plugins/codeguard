@@ -2520,3 +2520,7 @@ Java验收分类器先检查truncated_files，隐藏恢复不计作干净。现�
 ## 2026-10-06 公共CLI语言别名路由
 
 初始plan py因未知语言失败，新增共享Rust规范化后九别名只读计划通过，六组公开lint/check/cve/comments/build与原名对照保留相同报告协议/交付状态。仅语言位置归一，grammar/任务/路径/未知拼写保持，注册表九目标均存在。三CLI目标10通过与三单元通过，CLI全目标严格Clippy、分层/OpenSpec strict/diff通过；证据 tests/acceptance/language-alias-cli.md。没有安装/下载/发行，2.1完整政策义务和总体目标未完成。
+
+## 2026-10-06 当前完整默认工作区回归
+
+第一轮因Rust注释测试把已支持comments java当作用法错误而退出101；修正为真正未知语言并增加合法Java入口未完成反馈与原生执行哨兵。目标16通过/0失败/1忽略；第二轮完整workspace/all-targets退出0：290组1565通过/0失败/142忽略。全工作区严格Clippy、分层/OpenSpec strict/diff及397schema元定义、实际grammar库存与别名plan协议通过。默认WASM目标零测试，不执行用户Erlang草稿，摘要保持。4445f06 CI37423582241 MSRV成功，gate因固定插件源dec5f9d不可达而在测试前失败，未解除锁。提案/实现基线过期状态已更新；全WASM、条件原生、独立精度、真实宿主/多平台及完整目标继续开放。证据见 tests/acceptance/default-workspace-comments-dispatch.md。
