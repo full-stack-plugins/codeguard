@@ -1818,3 +1818,7 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 ## 2026-10-06 全32语种原始与组合结构规则回放
 
 12.11/14.17/14.19延续当前事实源：开发入口使用项目检查的结构worker，原始报告与组合分语言/来源计数并列，不覆盖parser历史。358例32语言35来源组显式实际回放1通过274.07秒，原始73TP/1FP/10FN/269TN、3unknown/2pending保留；组合83TP/1FP/0FN/269TN、3unknown/2pending，十项Erlang回归漏检由终止符规则补上。六项差异仍未解决，资格0/32，独立holdout、原生确认全矩阵、宿主及发行保持开放，父任务不勾选。见tests/acceptance/grammar-combined-full-replay-2026-10-06.md。
+
+## 2026-10-06 项目 Rust CVE 已有工具发现与聚合简报协议
+
+5.2/5.6/7.1/9.x/14.5：check all的rust.cve节点未指定工具时选择绝对PATH已有cargo-audit，显式或首个存在入口失败不换工具，未选择离线数据库单独反馈。真实已安装cargo-audit0.22.2与缓存RustSec两轮检出time0.1.40的RUSTSEC-2020-0071并复用同任务，未核验数据库不通过；独立cve/task verify仍显式指定。实际校验发现聚合next遗漏已有Clippy简报schema，新check0.56闭合引用且旧协议不修改。默认/WASM受影响四目标各40通过/7条件忽略，实际原生1通过；374元定义、两份实际聚合/嵌入报告、三篡改及旧消费者拒绝通过。见tests/acceptance/cargo-audit-path-discovery.md；完整工具锁/版本、数据库权威、CVE全覆盖/可信关闭、宿主和发行仍未完成，父任务不勾选。

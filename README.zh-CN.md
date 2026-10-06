@@ -815,3 +815,5 @@ C/C++源码构建还支持明确的独立原生上下文：`codeguard lint c mai
 
 
 Erlang 项目与编辑检查已原生优先，缺工具时补充函数终止符候选并更新同一持久任务；所选工具失败不回退WASM，原工具复检保留历史。[验收](tests/acceptance/erlang-form-workbench.md)。
+
+源码增量（尚未发布）：项目 `check all` 的 Rust CVE 节点可发现绝对 PATH 中已有的 cargo-audit，显式 `--cargo-audit-tool` 优先；使用 `--rustsec-db /path/to/offline-db` 指定现有离线数据库。所选入口失败不换工具、不自动安装，数据库未核验仍不声明安全通过。见[验收](tests/acceptance/cargo-audit-path-discovery.md)。
