@@ -469,3 +469,11 @@ mod shell_task_resolution_service;
 mod shell_resolution_evidence;
 pub use shell_task_resolution_request::ShellTaskResolutionRequest;
 pub use shell_task_resolution_service::verify_shell_task_resolution;
+
+#[cfg(unix)]
+mod syntax_lint_arguments;
+#[cfg(unix)]
+pub mod syntax_lint_command;
+
+#[cfg(all(unix, feature = "wasm-precheck"))]
+mod syntax_lint_feedback;

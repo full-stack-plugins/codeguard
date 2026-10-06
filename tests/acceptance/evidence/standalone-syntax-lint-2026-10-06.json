@@ -1,0 +1,1505 @@
+{
+  "evidence_scope": "actual_cli_candidate_routes_synthetic_source",
+  "actual_native_tool_verified": false,
+  "actual_host_verified": false,
+  "grammar_qualified_count": 0,
+  "feedback_count": 28,
+  "observed_languages": [
+    "arkts",
+    "c",
+    "cfml",
+    "cfquery",
+    "cfscript",
+    "cobol",
+    "cpp",
+    "csharp",
+    "dart",
+    "lua",
+    "luau",
+    "nix",
+    "objc",
+    "pascal",
+    "php",
+    "r",
+    "scala",
+    "solidity",
+    "terraform",
+    "vbnet"
+  ],
+  "reports": [
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过",
+      "reason": "native_adapter_not_integrated",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "lua"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "6d95607fc7d78964cfdf065ccb1ba76be5ed217c5ec0d0a3cace13c59fa1ae43",
+            "known_limitations": [
+              "Rust loader smoke and narrow fixtures passed; language versions, dialect corpus, native differential, resource isolation and release remain unqualified"
+            ],
+            "language": "lua",
+            "path": "a.lua",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "c12d03193f13f77ed652e44fa2d94fb6617f122e0419f7d692ab2dcc06eb2bbf",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": null
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过",
+      "reason": "native_adapter_not_integrated",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "scala"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "37d7fe5a91ca98941dc05493b0c05a0df0f36df5035890fa00b02497c68aaac3",
+            "known_limitations": [
+              "Pinned CodeGraph asset; only narrow syntax fixtures; native differential, language and dialect ranges, public lint route, resource budget and release remain unqualified"
+            ],
+            "language": "scala",
+            "path": "a.scala",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "6fa9d82774f4c8a748ca06d1588fce9250cc28bde5b4837cc691171dd541a642",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": null
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过",
+      "reason": "native_adapter_not_integrated",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "php"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "6545a9a110bc878e26ed329950147e190c83da038bb17e999de646fe6c4d6c82",
+            "known_limitations": [
+              "Full PHP grammar Rust loader and narrow mixed HTML/PHP fixture passed; broader PHP versions, native differential, isolation hardening and release remain unqualified"
+            ],
+            "language": "php",
+            "path": "a.php",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "a4bfdb4549e7c16f89a882819e9255a1e514f66e0e239d4c2ad7149187d5cce8",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": null
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过",
+      "reason": "native_adapter_not_integrated",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "cfml"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "e381db5d2b8a7744fc7d8e51b0a14ff03f86c8ff497cdfe32d1da467f19d4096",
+            "known_limitations": [
+              "Pinned CodeGraph asset; only narrow syntax fixtures; native differential, language and dialect ranges, public lint route, resource budget and release remain unqualified"
+            ],
+            "language": "cfscript",
+            "path": "a.cfs",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "3e18909ebb8d775ac00a851ff1da49580f7b5e6bf2c0233f949680fe59854c74",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": null
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过",
+      "reason": "native_adapter_not_integrated",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "dart"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "7dad281b3b24924d619cb7059a42b409e7690ebeb8ebbc82882e68167656e012",
+            "known_limitations": [
+              "Pinned Dart parser and real external scanner rebuilt with Zig and byte-pinned WASI import adaptation; only narrow syntax fixtures passed; native differential, language versions, host integration and release remain unqualified"
+            ],
+            "language": "dart",
+            "path": "a.dart",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "340c8ac2b0e649293267ee27410a6ec6904b9e6244717604f851f1191dab59c5",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": null
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过",
+      "reason": "native_adapter_not_integrated",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "solidity"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "ba02ba3c98c8ce976ed962d727ef48940b3a18dd2243830a8158b558de64b4f2",
+            "known_limitations": [
+              "Rust loader smoke passed after byte-pinned dylink metadata conversion; language versions, corpus differential, resource isolation and release remain unqualified"
+            ],
+            "language": "solidity",
+            "path": "a.sol",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "b2bc007b209d3463c9ca8f74a092adabc446b9cb134859af0a51b2bcf109b355",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": null
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过",
+      "reason": "native_adapter_not_integrated",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "cfml"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "17aeb294c58dd47045b470fc082ccceac3100c8e548b13764d4f3987a062322f",
+            "known_limitations": [
+              "Pinned CodeGraph asset; only narrow syntax fixtures; native differential, language and dialect ranges, public lint route, resource budget and release remain unqualified"
+            ],
+            "language": "cfml",
+            "path": "a.cfm",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "80fc125fb99991952e8d178cf85a67a43f3ed89068d2282cd23442cd24cad9cf",
+            "status": "candidate_observed"
+          },
+          {
+            "byte_offset": 18,
+            "fragment_source_sha256": "e004ebd5b5532a4b85984a62f8ad48a81aa3460c1ca07701f386135d72cdecf5",
+            "grammar_qualified": false,
+            "grammar_sha256": "9d4eaaec46eec7e6400d4b8d6c85fac7dfe33867ed5b4e5c218dfa7851c32558",
+            "known_limitations": [
+              "Pinned grammar has zero recovery for SELECT DISTINCT FROM users, rejected by PostgreSQL 18.6; SELECT FROM users is accepted by that dialect. Independent structural candidates require applicable native confirmation. Other dialects, systematic precision and release remain unqualified"
+            ],
+            "language": "cfquery",
+            "path": "a.cfm",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "cfquery_body",
+            "source_sha256": "80fc125fb99991952e8d178cf85a67a43f3ed89068d2282cd23442cd24cad9cf",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": null
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过",
+      "reason": "native_adapter_not_integrated",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "nix"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "4acffa1c013df751193a21ce429777ca214c7d3a7e3665085b6df00dad8869f0",
+            "known_limitations": [
+              "Rust loader and narrow fixtures passed; Nix language versions, dialect corpus, native differential, isolation and release remain unqualified"
+            ],
+            "language": "nix",
+            "path": "a.nix",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "0652d2a6c9eec00267e6d6fb445cdfa8d4e2017b20e06d2ccf1f91b1325a01c6",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": null
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过",
+      "reason": "native_adapter_not_integrated",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "r"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "2a8f5acd1c53d91e0ec5c01a6830d8ac7f5a7f96f0ac4b3768c016c8e9d07711",
+            "known_limitations": [
+              "Rust loader and narrow fixtures passed; R language versions, dialect corpus, native differential, isolation and release remain unqualified"
+            ],
+            "language": "r",
+            "path": "a.r",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "2429888e54c9330985e34c5658c090bcbfda645f11083b3c6b1b772ea3a9bd69",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": null
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过",
+      "reason": "native_adapter_not_integrated",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "objc"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "2606d4c5809fab61de44d328072d1371d53aa4aff5734436cb2a0ce8db7f2b0c",
+            "known_limitations": [
+              "Rust loader smoke passed after byte-pinned dylink metadata conversion; language versions, corpus differential, resource isolation and release remain unqualified"
+            ],
+            "language": "objc",
+            "path": "a.m",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "32c4ef24b9ada9322f29e1fa1701ac49cf6be1c90822abea4d46897c4262d3db",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": null
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "先核对固定 grammar 与当前源码的疑似证据。当前尚未接入 dart 的原生语法确认 adapter；提出该语言的具体能力决策，不换用其它语言工具。原生确认前不得修改源码，不凭安装或 WASM 零恢复关闭任务",
+      "reason": "native_adapter_not_integrated",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "dart"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": "CG-B-b0a981ed7a25e0da6d364dc620042358"
+      },
+      "status": "incomplete",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "7dad281b3b24924d619cb7059a42b409e7690ebeb8ebbc82882e68167656e012",
+            "known_limitations": [
+              "Pinned Dart parser and real external scanner rebuilt with Zig and byte-pinned WASI import adaptation; only narrow syntax fixtures passed; native differential, language versions, host integration and release remain unqualified"
+            ],
+            "language": "dart",
+            "path": "a.dart",
+            "reason": null,
+            "recoveries": [
+              {
+                "end_byte": 12,
+                "end_column_byte": 12,
+                "end_row": 0,
+                "kind": "ERROR",
+                "start_byte": 0,
+                "start_column_byte": 0,
+                "start_row": 0,
+                "syntax_kind": "ERROR"
+              }
+            ],
+            "recovery_count": 1,
+            "scope": "whole_file",
+            "source_sha256": "621d01b1d45ea09c5d6f2ecdb5457a78877a8f43dceb51544336d7b6a1acd352",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": {
+        "failures": [],
+        "new_blockers": 0,
+        "status": "synced_partial",
+        "tasks": [
+          {
+            "language": "dart",
+            "path": "a.dart",
+            "task_id": "CG-B-b0a981ed7a25e0da6d364dc620042358"
+          }
+        ]
+      }
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过",
+      "reason": "native_adapter_not_integrated",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "csharp"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "6f69e1cae44e1c32c1eccc170dc5a9778fb94ff716f71113fe1f8c4299aa2f40",
+            "known_limitations": [
+              "Rust loader smoke and narrow fixtures passed; language versions, dialect corpus, native differential, resource isolation and release remain unqualified"
+            ],
+            "language": "csharp",
+            "path": "a.cs",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "a4127100c72e204a2e27f5a8d29310899744c2e16642591e4656add6b9fac96a",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": null
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过",
+      "reason": "native_adapter_not_integrated",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "terraform"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "0d9ef3ae926acc0411bfecba9b34df4ea659061917b96455570a45a70824e890",
+            "known_limitations": [
+              "Rust loader and narrow fixtures passed; Terraform language versions, dialect corpus, native differential, isolation and release remain unqualified"
+            ],
+            "language": "terraform",
+            "path": "a.tf",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "0e417d8ad167a1c668a8bbdcfea221c964997b76595acf9f2c973ee7f39b96fb",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": null
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "先核对固定 grammar 与当前源码的疑似证据。当前尚未接入 dart 的原生语法确认 adapter；提出该语言的具体能力决策，不换用其它语言工具。原生确认前不得修改源码，不凭安装或 WASM 零恢复关闭任务",
+      "reason": "native_adapter_not_integrated",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "dart"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": "CG-B-b0a981ed7a25e0da6d364dc620042358"
+      },
+      "status": "incomplete",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "7dad281b3b24924d619cb7059a42b409e7690ebeb8ebbc82882e68167656e012",
+            "known_limitations": [
+              "Pinned Dart parser and real external scanner rebuilt with Zig and byte-pinned WASI import adaptation; only narrow syntax fixtures passed; native differential, language versions, host integration and release remain unqualified"
+            ],
+            "language": "dart",
+            "path": "a.dart",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "12e3f0ab9f3e6b936c95dcfe87f4f506f6b2e3108281ea220ce1e0360cfe739a",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": {
+        "failures": [],
+        "new_blockers": 0,
+        "status": "synced_partial",
+        "tasks": []
+      }
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过",
+      "reason": "source_scope_unavailable",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "php"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": null,
+      "syntax_tasks": null
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过",
+      "reason": "native_adapter_not_integrated",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "vbnet"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "e38a09e1826c7ec06340c0531a98bbb5ee79bdd710bba3d3349b79a19721e844",
+            "known_limitations": [
+              "Pinned CodeGraph asset reports MISSING ':' at row 1 column 30 for a valid unindented Public Function declaration inside Public Class; the same sample with indentation has zero recoveries. This is a known grammar false positive, not a confirmed source violation; native compiler comparison and grammar repair remain required",
+              "Only narrow syntax fixtures; language and dialect ranges, public lint route, resource budget and release remain unqualified"
+            ],
+            "language": "vbnet",
+            "path": "a.vb",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "d7bc464c7d07b244034e3e77ca2ffed7260e2c2ce2b2a7a88351d61c9cc6f26c",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": null
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过",
+      "reason": "source_path_symlink_disallowed",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "php"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": null,
+      "syntax_tasks": null
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "查看 syntax_tasks.failures，恢复原工作区受管身份及事实/任务/报告记录；保留原生确认要求，不修改无关源码或伪造关闭",
+      "reason": "native_adapter_not_integrated",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "dart"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "7dad281b3b24924d619cb7059a42b409e7690ebeb8ebbc82882e68167656e012",
+            "known_limitations": [
+              "Pinned Dart parser and real external scanner rebuilt with Zig and byte-pinned WASI import adaptation; only narrow syntax fixtures passed; native differential, language versions, host integration and release remain unqualified"
+            ],
+            "language": "dart",
+            "path": "a.dart",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "12e3f0ab9f3e6b936c95dcfe87f4f506f6b2e3108281ea220ce1e0360cfe739a",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": {
+        "failures": [
+          {
+            "language": "dart",
+            "path": "a.dart",
+            "reason": "task_record_unavailable"
+          }
+        ],
+        "new_blockers": 0,
+        "status": "incomplete",
+        "tasks": []
+      }
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过",
+      "reason": "native_adapter_not_integrated",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "cpp"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "70f5e2b9976dad56bdcd1fafcb3af8c839c7a92e7beaa437162bcf45f390e83d",
+            "known_limitations": [
+              "Rust loader smoke and narrow fixtures passed; language versions, dialect corpus, native differential, resource isolation and release remain unqualified"
+            ],
+            "language": "cpp",
+            "path": "a.cpp",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "adcdb5050e63aac39f1922983091484e6e2875549be1f3610b1543795c4d5c5d",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": null
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过",
+      "reason": "native_adapter_not_integrated",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "c"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "a271e584616c7c3c0ac663f01cd05dd5f1a6c2ce6d4cd23096548985a95d0ccb",
+            "known_limitations": [
+              "C11 Apple clang 21 differential agrees on 13 narrow syntax cases; other C versions, systematic precision, native-first lint route, resource budgets and release remain unqualified"
+            ],
+            "language": "c",
+            "path": "a.c",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "e9f20d074cab9059c2aee71c8f389d9dd5437bbb4809e599014e6f061a9ccc77",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": null
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过",
+      "reason": "native_adapter_not_integrated",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "dart"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "7dad281b3b24924d619cb7059a42b409e7690ebeb8ebbc82882e68167656e012",
+            "known_limitations": [
+              "Pinned Dart parser and real external scanner rebuilt with Zig and byte-pinned WASI import adaptation; only narrow syntax fixtures passed; native differential, language versions, host integration and release remain unqualified"
+            ],
+            "language": "dart",
+            "path": "a.dart",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "340c8ac2b0e649293267ee27410a6ec6904b9e6244717604f851f1191dab59c5",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": null
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过",
+      "reason": "selected_language_or_grammar_scope_unresolved",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "dart"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": null,
+      "syntax_tasks": null
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过",
+      "reason": "native_adapter_not_integrated",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "pascal"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "be3634fca99c19f5e1035a1a9c7d93d6ee82b35e6d5024f02be4883b71329c3e",
+            "known_limitations": [
+              "Pinned CodeGraph WASM and original dependency commit; only narrow Pascal syntax samples; Delphi/FreePascal dialect corpus, native differential, public lint route and release remain unqualified"
+            ],
+            "language": "pascal",
+            "path": "a.pas",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "d0e91096abb93ef89cb9da7380449805bf0e916edab57c44959bb81b48b5892d",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": null
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过",
+      "reason": "native_adapter_not_integrated",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "cobol"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "65b98799f92e831d8b5ed8cd811464c71fac31c4beabf66990a545a4f65e02f1",
+            "known_limitations": [
+              "16.4 MB fixed source WASM has uppercase export and high cold-load cost; fixed-format samples only; free-format normalization, native differential, resource budget, public lint and release remain unqualified"
+            ],
+            "language": "cobol",
+            "path": "a.cbl",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "d540ed839caebff4cd99d42a6ee98fecf01bea18c33df5f51ea21033fa057ee6",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": null
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过",
+      "reason": "native_adapter_not_integrated",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "luau"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "f1647052518f2bdfae8e8c0b033ffdeca1193d69d11c78ba20f84c8374fd0fe3",
+            "known_limitations": [
+              "Rust loader smoke and narrow fixtures passed; language versions, dialect corpus, native differential, resource isolation and release remain unqualified"
+            ],
+            "language": "luau",
+            "path": "a.luau",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "8d06a83bcd5cbf120687d960d2318070bf5789ebaf4e7f29e81fbef57decabf3",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": null
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "先核对固定 grammar 与当前源码的疑似证据。当前尚未接入 dart 的原生语法确认 adapter；提出该语言的具体能力决策，不换用其它语言工具。原生确认前不得修改源码，不凭安装或 WASM 零恢复关闭任务",
+      "reason": "native_adapter_not_integrated",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "dart"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": "CG-B-b0a981ed7a25e0da6d364dc620042358"
+      },
+      "status": "incomplete",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "7dad281b3b24924d619cb7059a42b409e7690ebeb8ebbc82882e68167656e012",
+            "known_limitations": [
+              "Pinned Dart parser and real external scanner rebuilt with Zig and byte-pinned WASI import adaptation; only narrow syntax fixtures passed; native differential, language versions, host integration and release remain unqualified"
+            ],
+            "language": "dart",
+            "path": "a.dart",
+            "reason": null,
+            "recoveries": [
+              {
+                "end_byte": 12,
+                "end_column_byte": 12,
+                "end_row": 0,
+                "kind": "ERROR",
+                "start_byte": 0,
+                "start_column_byte": 0,
+                "start_row": 0,
+                "syntax_kind": "ERROR"
+              }
+            ],
+            "recovery_count": 1,
+            "scope": "whole_file",
+            "source_sha256": "621d01b1d45ea09c5d6f2ecdb5457a78877a8f43dceb51544336d7b6a1acd352",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": {
+        "failures": [],
+        "new_blockers": 1,
+        "status": "synced_partial",
+        "tasks": [
+          {
+            "language": "dart",
+            "path": "a.dart",
+            "task_id": "CG-B-b0a981ed7a25e0da6d364dc620042358"
+          }
+        ]
+      }
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过",
+      "reason": "selected_language_or_grammar_scope_unresolved",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "c"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": null,
+      "syntax_tasks": null
+    },
+    {
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [],
+      "native": {
+        "configuration_status": "unknown",
+        "reason": "native_adapter_not_integrated",
+        "status": "not_run"
+      },
+      "next_action": "此语言的原生lint适配尚未接入；核对项目实际原生工具与配置，补齐适用适配或提出具体能力决策。本次不证明工具未安装，不运行历史注册表命令或自动安装，不授予交付通过",
+      "reason": "native_adapter_not_integrated",
+      "report_type": "syntax_lint_feedback",
+      "schema_version": "0.1.0",
+      "selection": {
+        "category": "lint",
+        "language": "arkts"
+      },
+      "setup": {
+        "requirement": "required",
+        "task_id": null
+      },
+      "status": "incomplete",
+      "syntax_candidates": {
+        "authority": "candidate_unqualified",
+        "delivery_decision": "incomplete",
+        "execution_phase": "after_native",
+        "native_preferred_count": 0,
+        "next_action": "核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过",
+        "observations": [
+          {
+            "byte_offset": 0,
+            "grammar_qualified": false,
+            "grammar_sha256": "db0812971109457d22b3fe9dcdb1cd8e614fba2a338e220670bd254485753623",
+            "known_limitations": [
+              "Rust loader and narrow fixtures passed; ArkTS language versions, dialect corpus, native differential, isolation and release remain unqualified"
+            ],
+            "language": "arkts",
+            "path": "a.ets",
+            "reason": null,
+            "recoveries": [],
+            "recovery_count": 0,
+            "scope": "whole_file",
+            "source_sha256": "bd9463eee2509f397276f67d02b8bfa39dc18626f1ba1bc48194c1a24a928444",
+            "status": "candidate_observed"
+          }
+        ],
+        "reason": "candidate_unqualified",
+        "skipped_count": 0,
+        "source_file_count": 1,
+        "status": "observed_partial",
+        "unrouted_count": 0
+      },
+      "syntax_tasks": null
+    }
+  ]
+}

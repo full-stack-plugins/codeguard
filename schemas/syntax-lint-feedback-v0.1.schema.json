@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:syntax-lint-feedback:0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "report_type": {
+      "const": "syntax_lint_feedback"
+    },
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "category",
+        "language"
+      ],
+      "properties": {
+        "category": {
+          "const": "lint"
+        },
+        "language": {
+          "enum": [
+            "java",
+            "rust",
+            "typescript",
+            "python",
+            "go",
+            "csharp",
+            "kotlin",
+            "swift",
+            "php",
+            "ruby",
+            "scala",
+            "shell",
+            "dockerfile",
+            "yaml",
+            "elixir",
+            "css",
+            "c",
+            "cpp",
+            "objc",
+            "dart",
+            "vue",
+            "svelte",
+            "astro",
+            "solidity",
+            "terraform",
+            "nix",
+            "html",
+            "sql",
+            "graphql",
+            "protobuf",
+            "markdown",
+            "toml",
+            "haskell",
+            "ocaml",
+            "fsharp",
+            "perl",
+            "groovy",
+            "clojure",
+            "powershell",
+            "zig",
+            "nim",
+            "crystal",
+            "julia",
+            "elm",
+            "lua",
+            "luau",
+            "pascal",
+            "r",
+            "cfml",
+            "cobol",
+            "vbnet",
+            "erlang",
+            "arkts",
+            "metal",
+            "liquid",
+            "cuda",
+            "ansible"
+          ]
+        }
+      }
+    },
+    "status": {
+      "const": "incomplete"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "findings": {
+      "const": []
+    },
+    "native": {
+      "const": {
+        "status": "not_run",
+        "reason": "native_adapter_not_integrated",
+        "configuration_status": "unknown"
+      }
+    },
+    "syntax_candidates": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "check-feedback-v0.54.schema.json#/properties/syntax_candidates"
+        }
+      ]
+    },
+    "syntax_tasks": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/syntax_tasks"
+        }
+      ]
+    },
+    "setup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement",
+        "task_id"
+      ],
+      "properties": {
+        "requirement": {
+          "const": "required"
+        },
+        "task_id": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^CG-B-[0-9a-f]{32}$"
+            }
+          ]
+        }
+      }
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "next_action": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "report_type",
+    "selection",
+    "status",
+    "coverage_proven",
+    "delivery_decision",
+    "findings",
+    "native",
+    "syntax_candidates",
+    "syntax_tasks",
+    "setup",
+    "reason",
+    "next_action"
+  ]
+}

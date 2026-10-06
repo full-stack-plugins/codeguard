@@ -1182,3 +1182,17 @@ flowchart LR
 ```
 
 独立反馈0.6将当前初检与历史待确认分开：有历史任务时保留ID和required；同步失败保留候选，先恢复工作区身份或报告路径。真实宿主、完整策略关闭和全部语言资格仍待验收。详见[验收](../tests/acceptance/javascript-lint-candidate.md)。
+
+独立lint为每个注册表规范ID提供明确入口；原生适配缺口不能证明工具未安装。候选解析、共享任务同步与原工具确认分别保留能力边界。
+
+```mermaid
+flowchart LR
+    A["lint language FILE"] --> B{Native adapter}
+    B -->|Integrated| C[Native-first language command]
+    B -->|Gap| D[Unknown native configuration]
+    D --> E{Matching WASM available}
+    E -->|Yes| F[Bounded candidate observation]
+    E -->|No| G[Explicit incomplete feedback]
+    F --> H[Shared stable confirmation task]
+    H --> I[Native confirmation or adapter decision]
+```
