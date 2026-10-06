@@ -469,3 +469,13 @@ pub use gradle_javadoc_diagnostic::GradleJavadocDiagnostic;
 pub use gradle_javadoc_output::parse_gradle_javadoc_output;
 
 pub use production_acceptance_plan::parse_production_acceptance_plan;
+
+mod gradle_dependency_check_task_plan;
+mod gradle_dependency_check_plan;
+pub use gradle_dependency_check_task_plan::GradleDependencyCheckTaskPlan;
+pub use gradle_dependency_check_plan::plan_gradle_dependency_check_tasks;
+
+mod gradle_owasp_report_ownership;
+mod gradle_owasp_report_ownership_parser;
+pub use gradle_owasp_report_ownership::GradleOwaspReportOwnership;
+pub use gradle_owasp_report_ownership_parser::parse_gradle_owasp_report_ownership;

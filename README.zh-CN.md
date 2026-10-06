@@ -1065,3 +1065,5 @@ flowchart LR
 真实七项规则已验证重复扫描身份、存在、noqa 抑制及文档修复后未受信消失，事实保持 open；另有原生豁免、隐式异常冲突和未选择 DOC 的边界。既有协议允许原规则 ID 和脱敏指引，本次不扩大历史 schema、受批准映射或关闭权限。验收与版本限制见 [Ruff DOC 验收](tests/acceptance/ruff-documentation-contract.md)。当前仍不是完整 Python 文档、独立误报评测、全平台或生产资格。
 
 四核心验收计划只读入口：`codeguard capabilities [language] --acceptance-plan --format=json`. 57 语言/228 义务保留未授予资格，筛选不缩减总义务。参见[acceptance plan](docs/Codeguard-Production-Acceptance-Plan.zh_CN.md).
+
+Java Gradle 漏洞检查新增显式原任务入口 `codeguard cve java`；JSON 原配置与可选模块缓存保留，结果仍未受信，工作台和完整原生验收待完成。详见[Gradle OWASP](docs/Codeguard-Gradle-Vulnerability-Checks.zh_CN.md).

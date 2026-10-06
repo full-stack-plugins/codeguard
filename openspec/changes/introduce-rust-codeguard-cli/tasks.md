@@ -2044,3 +2044,7 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 ## 2026-10-06 四核心生产验收计划查询进展
 
 对应15.1，57语言×四核心228义务显式映射364条生态/核心路径、五个候选平台与32 grammar归属；每路径记录适配器/证据/任务和阻塞，版本与资格未授予。新增只读capabilities --acceptance-plan公开JSON/human，Java Maven/Gradle分开，过滤不缩减完整义务。Rust审计核对52份来源摘要及1312处任务引用。新增契约3、公开default/WASM各3，旧库存/选择/帮助12通过；两份schema与实际报告/伪造资格反例、双构建严格Clippy通过。详见tests/acceptance/production-acceptance-plan.md。版本/方言/平台/独立精度/真实宿主/发行仍缺，15.1–15.7继续未完成，66完成/288待完成，不将仓库映射作为生产资格。
+
+## 2026-10-06 Gradle OWASP 原任务执行、缓存隔离与公开CVE入口
+
+延续6.4/15.5，显式原任务计划和输出归属契约先RED后补齐；公开cve java从误路由npm的RED接通原Gradle/JDK单次模型/扫描/报告路径。保留JSON原配置、官方任务所属插件/类型/enabled、唯一当前报告、活动与原生抑制漏洞，退出1有有效报告仍保留观察但不签发清洁。已有模块缓存显式有界只读复制，拒绝用户配置/符号链接/源缓存变化；原生缺工具/配置/报告、变化及取消均具体未完成。默认CLI29通过/3条件忽略、WASM19通过/1忽略，SIGINT两构建各1通过、适配器17通过；真实已有Gradle/JDK四次内部/公开缺插件与同名普通任务调用1条件用例通过，无真实OWASP正反例。最终29份受控原生/2份实际原生/3份公开及SIGINT反馈、两份schema/资格反例，双构建严格Clippy通过。详见tests/acceptance/gradle-dependency-check-probe.md。真实OWASP正反例、缓存闭包/库时效/完整依赖归属、普通check/work/next/task verify、可信关闭与平台/宿主/发行继续开放；生产映射Gradle更新partial，来源56，所有资格blocked，66完成/288待完成，父任务不勾选。

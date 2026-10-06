@@ -511,3 +511,15 @@ mod syntax_worker_mode;
 pub mod javascript_mode_observation;
 
 pub mod production_acceptance_plan_command;
+
+#[cfg(unix)]
+pub mod gradle_dependency_check_request;
+
+#[cfg(unix)]
+pub mod gradle_dependency_check_probe;
+
+#[cfg(unix)]
+pub mod java_gradle_cve_command;
+
+#[cfg(unix)]
+mod gradle_module_cache;

@@ -249,7 +249,7 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             },
             executable: cfg!(unix),
             operation_kind: r#"check"#,
-            usage: r#"cve <rust|python|typescript> [path] [--format human|json]"#,
+            usage: r#"cve <rust|python|typescript|java> [path] [--format human|json] (java: --gradle-bundle ABS --java-home ABS --gradle-owasp-task PATH --gradle-project-file FILE...)"#,
             scope: r#"原生审计需语言专用工具参数；时效和全覆盖未验收"#,
             languages: &[r#"rust"#, r#"python"#, r#"typescript"#],
         },
