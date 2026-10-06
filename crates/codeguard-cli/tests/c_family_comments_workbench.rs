@@ -332,10 +332,63 @@ fn actual_clang_documentation_rules_reach_stable_workbench_tasks() {
         );
         assert_eq!(r["coverage_proven"], false);
         let id = r["workbench"]["task_ids"][0].as_str().unwrap();
+        let (exit, lease) = task_command(&p, &["claim"], id, &["--owner", "native-doc"]);
+        assert_eq!(exit, 0, "{lease}");
+        let token = lease["lease_token"].as_str().unwrap();
+        let show = || {
+            let (exit, shown) = task_command(&p, &["show"], id, &[]);
+            assert_eq!(exit, 0, "{shown}");
+            assert_eq!(shown["task_id"], id);
+            assert_eq!(shown["schema_version"], "0.4.0");
+            assert_eq!(shown["next_actions"][0], shown["task"]["recheck_argv"]);
+            capture(&shown);
+            shown["task"].clone()
+        };
+        let start_attempt = || {
+            let (exit, start) = task_command(
+                &p,
+                &["attempt", "start"],
+                id,
+                &[
+                    "--owner",
+                    "native-doc",
+                    "--lease-token",
+                    token,
+                    "--action-id",
+                    "repair-source",
+                ],
+            );
+            assert_eq!(exit, 0, "{start}");
+            start
+        };
+        let finish_attempt = |start: &Value, note: &str| {
+            let (exit, finish) = task_command(
+                &p,
+                &["attempt", "finish"],
+                id,
+                &[
+                    "--owner",
+                    "native-doc",
+                    "--lease-token",
+                    token,
+                    "--attempt-id",
+                    start["attempt_id"].as_str().unwrap(),
+                    "--outcome",
+                    "ready-to-verify",
+                    "--note-code",
+                    note,
+                ],
+            );
+            assert_eq!(exit, 0, "{finish}");
+            finish
+        };
+        let first_start = start_attempt();
+        let first_finish = finish_attempt(&first_start, "no_change");
         let verify = || {
             let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
                 .args(["task", "verify", id])
                 .arg(&p.0)
+                .args(["--owner", "native-doc", "--lease-token", token])
                 .arg("--format=json")
                 .output()
                 .unwrap();
@@ -348,6 +401,8 @@ fn actual_clang_documentation_rules_reach_stable_workbench_tasks() {
         };
         let present = verify();
         assert_eq!(present["observation"], "still_present");
+        assert_eq!(show()["history"]["no_progress_count"], 1);
+        let second_start = start_attempt();
         let source = fs::read_to_string(p.0.join(filename)).unwrap();
         fs::write(
             p.0.join(filename),
@@ -356,9 +411,12 @@ fn actual_clang_documentation_rules_reach_stable_workbench_tasks() {
                 .replace("@param other", "@param other Second operand."),
         )
         .unwrap();
+        let second_finish = finish_attempt(&second_start, "source_edit");
+        assert_eq!(second_finish["observed_change"], true);
         let absent = verify();
         assert_eq!(absent["observation"], "candidate_absent_unverified_policy");
-        cases.push(json!({"scan":r,"present":present,"absent":absent}));
+        assert_eq!(show()["history"]["awaiting_verification"], false);
+        cases.push(json!({"scan":r,"present":present,"absent":absent,"attempts":[{"start":first_start,"finish":first_finish},{"start":second_start,"finish":second_finish}],"history":show()["history"]}));
     }
     for e in fs::read_dir(p.0.join(".codeguard/reports")).unwrap() {
         capture(&serde_json::from_slice::<Value>(&fs::read(e.unwrap().path()).unwrap()).unwrap());
@@ -620,4 +678,256 @@ fn sigint_recheck_returns_cancelled_without_persisting_and_reaps_descendants() {
     capture(&v);
     std::thread::sleep(std::time::Duration::from_millis(2200));
     assert!(!p.0.join("ghost").exists());
+}
+
+fn task_command(p: &Project, verb: &[&str], id: &str, extra: &[&str]) -> (i32, Value) {
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .arg("task")
+        .args(verb)
+        .arg(id)
+        .arg(&p.0)
+        .args(extra)
+        .arg("--format=json")
+        .output()
+        .unwrap();
+    (
+        out.status.code().unwrap(),
+        serde_json::from_slice(&out.stdout).unwrap_or_else(|_| panic!("{out:?}")),
+    )
+}
+
+#[test]
+fn failed_original_rechecks_consume_attempt_budget_and_action_renaming_cannot_reset_it() {
+    let p = Project::new();
+    let r = p.scan(&[2]);
+    let id = r["workbench"]["task_ids"][0].as_str().unwrap();
+    let (exit, lease) = task_command(&p, &["claim"], id, &["--owner", "doc-agent"]);
+    assert_eq!(exit, 0, "{lease}");
+    let token = lease["lease_token"].as_str().unwrap();
+    for count in 1..=2 {
+        let (exit, start) = task_command(
+            &p,
+            &["attempt", "start"],
+            id,
+            &[
+                "--owner",
+                "doc-agent",
+                "--lease-token",
+                token,
+                "--action-id",
+                "repair-source",
+            ],
+        );
+        assert_eq!(exit, 0, "{start}");
+        assert_eq!(p.next()["repair_brief"]["disposition"], "waiting");
+        let (exit, finish) = task_command(
+            &p,
+            &["attempt", "finish"],
+            id,
+            &[
+                "--owner",
+                "doc-agent",
+                "--lease-token",
+                token,
+                "--attempt-id",
+                start["attempt_id"].as_str().unwrap(),
+                "--outcome",
+                "ready-to-verify",
+                "--note-code",
+                "source_edit",
+            ],
+        );
+        assert_eq!(exit, 0, "{finish}");
+        let n = p.next();
+        assert_eq!(
+            n["repair_brief"]["disposition"], "verification_required",
+            "{n}"
+        );
+        let (exit, verify) = task_command(
+            &p,
+            &["verify"],
+            id,
+            &["--owner", "doc-agent", "--lease-token", token],
+        );
+        assert_eq!(exit, 3, "{verify}");
+        assert_eq!(verify["observation"], "still_present");
+        let n = p.next();
+        assert_eq!(
+            n["repair_brief"]["history"]["no_progress_count"], count,
+            "{n}"
+        );
+        assert_eq!(n["repair_brief"]["history"]["awaiting_verification"], false);
+    }
+    let n = p.next();
+    assert_eq!(n["repair_brief"]["disposition"], "needs_decision");
+    assert_eq!(n["repair_brief"]["allowed_paths"], json!([]));
+    let (exit, renamed) = task_command(
+        &p,
+        &["attempt", "start"],
+        id,
+        &[
+            "--owner",
+            "doc-agent",
+            "--lease-token",
+            token,
+            "--action-id",
+            "restore-checker-environment",
+        ],
+    );
+    assert_eq!(exit, 3);
+    assert_eq!(renamed["reason"], "action_id_invalid");
+    let (exit, exhausted) = task_command(
+        &p,
+        &["attempt", "start"],
+        id,
+        &[
+            "--owner",
+            "doc-agent",
+            "--lease-token",
+            token,
+            "--action-id",
+            "repair-source",
+        ],
+    );
+    assert_eq!(exit, 3);
+    assert_eq!(exhausted["reason"], "no_progress_budget_exhausted");
+    p.scan(&[2]);
+    assert_eq!(p.next()["repair_brief"]["history"]["no_progress_count"], 2);
+    let mut observed: Vec<Value> =
+        fs::read_dir(p.0.join(format!(".codeguard/findings/{id}/events")))
+            .unwrap()
+            .filter_map(|e| {
+                let path = e.unwrap().path();
+                if path
+                    .file_name()
+                    .unwrap()
+                    .to_str()
+                    .unwrap()
+                    .starts_with("verify-")
+                {
+                    Some(serde_json::from_slice(&fs::read(path).unwrap()).unwrap())
+                } else {
+                    None
+                }
+            })
+            .collect();
+    observed.sort_by_key(|e| {
+        e["run_id"]
+            .as_str()
+            .unwrap()
+            .rsplit('-')
+            .next()
+            .unwrap()
+            .parse::<u128>()
+            .unwrap()
+    });
+    let earlier = p.0.join(format!(
+        ".codeguard/reports/{}.json",
+        observed[0]["run_id"].as_str().unwrap()
+    ));
+    let retained = fs::read(&earlier).unwrap();
+    fs::remove_file(&earlier).unwrap();
+    let n = p.next();
+    assert_eq!(
+        n["repair_brief"]["reason_code"], "historical_verification_evidence_unavailable",
+        "{n}"
+    );
+    assert_eq!(
+        n["repair_brief"]["history"]["unverified_prior_attempt_count"],
+        1
+    );
+    assert_eq!(n["repair_brief"]["allowed_paths"], json!([]));
+    fs::write(&earlier, retained).unwrap();
+    assert_eq!(p.next()["repair_brief"]["history"]["no_progress_count"], 2);
+    let event_path = p.0.join(format!(
+        ".codeguard/findings/{id}/events/verify-{}.json",
+        observed[0]["run_id"].as_str().unwrap()
+    ));
+    let original_event = fs::read(&event_path).unwrap();
+    let mut forged: Value = serde_json::from_slice(&original_event).unwrap();
+    forged["observation"] = json!("candidate_absent_unverified_policy");
+    fs::write(&event_path, serde_json::to_vec_pretty(&forged).unwrap()).unwrap();
+    let (exit, shown) = task_command(&p, &["show"], id, &[]);
+    assert_eq!(exit, 3);
+    assert_eq!(shown["reason"], "verification_event_invalid");
+    fs::write(&event_path, original_event).unwrap();
+    assert_eq!(p.next()["repair_brief"]["history"]["no_progress_count"], 2);
+}
+
+#[test]
+fn restoring_the_original_missing_tool_is_recorded_as_environment_change_without_source_edits() {
+    let p = Project::new();
+    let tool = p.0.join("clang");
+    let original = fs::read(&tool).unwrap();
+    fs::remove_file(&tool).unwrap();
+    let r = p.scan(&[]);
+    let id = r["workbench"]["task_ids"][0].as_str().unwrap();
+    assert!(id.starts_with("CG-B-"));
+    let n = p.next();
+    assert_eq!(n["repair_brief"]["disposition"], "actionable", "{n}");
+    assert_eq!(
+        n["repair_brief"]["action_id"],
+        "restore-checker-environment"
+    );
+    assert_eq!(n["repair_brief"]["allowed_paths"], json!([]));
+    let (exit, lease) = task_command(&p, &["claim"], id, &["--owner", "env-agent"]);
+    assert_eq!(exit, 0, "{lease}");
+    let token = lease["lease_token"].as_str().unwrap();
+    let (exit, start) = task_command(
+        &p,
+        &["attempt", "start"],
+        id,
+        &[
+            "--owner",
+            "env-agent",
+            "--lease-token",
+            token,
+            "--action-id",
+            "restore-checker-environment",
+        ],
+    );
+    assert_eq!(exit, 0, "{start}");
+    let source = fs::read(p.0.join("api.c")).unwrap();
+    fs::write(&tool, original).unwrap();
+    fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
+    let (exit, finish) = task_command(
+        &p,
+        &["attempt", "finish"],
+        id,
+        &[
+            "--owner",
+            "env-agent",
+            "--lease-token",
+            token,
+            "--attempt-id",
+            start["attempt_id"].as_str().unwrap(),
+            "--outcome",
+            "ready-to-verify",
+            "--note-code",
+            "tool_restored",
+        ],
+    );
+    assert_eq!(exit, 0, "{finish}");
+    assert_eq!(finish["observed_change"], true);
+    assert_eq!(source, fs::read(p.0.join("api.c")).unwrap());
+    assert_eq!(
+        p.next()["repair_brief"]["disposition"],
+        "verification_required"
+    );
+    let (exit, verify) = task_command(
+        &p,
+        &["verify"],
+        id,
+        &["--owner", "env-agent", "--lease-token", token],
+    );
+    assert_eq!(exit, 3, "{verify}");
+    assert_eq!(verify["event_persisted"], true);
+    assert_eq!(
+        verify["observation"],
+        "environment_restored_unverified_policy"
+    );
+    let n = p.next();
+    assert_eq!(n["repair_brief"]["history"]["awaiting_verification"], false);
+    assert_eq!(n["repair_brief"]["task_id"], id);
+    assert_eq!(n["repair_brief"]["disposition"], "needs_decision");
 }

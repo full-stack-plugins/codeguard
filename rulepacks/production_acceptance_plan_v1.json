@@ -49,7 +49,7 @@
     "crates/codeguard-cli/src/kotlin_lint_command.rs": "f19e0babe23cc3cce52d69d6821416d6b9fdd7b6d8b484d3413e1368fef05ad8",
     "crates/codeguard-cli/src/maven_javadoc_task_recheck.rs": "d55951f3a1b960e8885a1027d5375909bbd4e7a33d6461ff724ad65d9d35febd",
     "crates/codeguard-cli/src/native_clang_profile.rs": "85e175638fae0898f2d49a9899712727b43851f74b127cc457980f90a151fcea",
-    "crates/codeguard-cli/src/next_command.rs": "9f98d3a6726c17c99849d3d6b112725942c73faa336e2aa4cbf94ffa460d74b7",
+    "crates/codeguard-cli/src/next_command.rs": "a2d3d8ba4883f92db3a6071c5a065fd6cbdeaa07673ab1075576ea90d06f3659",
     "crates/codeguard-cli/src/npm_audit_command.rs": "68a3cdf49008d6ad8b6a58b7aa07bf0a0dc65876160edef2213d30a1bc367b01",
     "crates/codeguard-cli/src/partial_sarif_feedback.rs": "957236601864e568e999288e39183420f0c10ea2c1c31fd9d29de8e176069e20",
     "crates/codeguard-cli/src/python_comments_arguments.rs": "49e2305246bb4f8ad84cf2b061b68065d0efb4fb642c66fb8ee8c94ad32280cd",
@@ -67,7 +67,7 @@
     "crates/codeguard-cli/src/rust_project_syntax.rs": "6c3a274337fb1b762ee0a73f7171b9e64f9a5d59be23a8f6645ff6d9e4bc2033",
     "crates/codeguard-cli/src/shell_lint_command.rs": "8e3d859a6c52e282296975751f9fe74e26eb7371105740f526f22990e79d72ae",
     "crates/codeguard-cli/src/swift_lint_command.rs": "182c8a6b43df9164f0c95c91f089bb2be921f56e54b6c6e81d35ae00f717d752",
-    "crates/codeguard-cli/src/task_attempt_command.rs": "178001ae9a0ae494d61602762cb95b00f3959547eb48282569225300c0dfa9d3",
+    "crates/codeguard-cli/src/task_attempt_command.rs": "0f2a947f927ac0ece78dbbbeb1a5b4314ac56b9467d340d6fa9282370e7df3a8",
     "crates/codeguard-cli/src/task_verify_command.rs": "fbdabdb5b3e16f3a0d247b90c7f6a24f2cb756f5be41cbc5a4a9afb5ac0eb673",
     "crates/codeguard-cli/src/work_sync.rs": "c7bf1d08e71d9afa78826b4bb0356139dbf717c8481a9df7ff70eb9372578388",
     "crates/codeguard-cli/src/work_sync/gradle_cve_report.rs": "1b8478d43a02101112e2ac58ff5d53b9b3300b0dc05ceabd3e981425221ffe92",
@@ -180,8 +180,8 @@
     "crates/codeguard-cli/src/command_examples.rs": "593a8afd342610ae5854725253be89f6a49ecc1f6d0b68b5f2f271a746cf9686",
     "tests/acceptance/c-family-comments-workbench.md": "621173255d5ee7b7f377c0d886e6653365aa2a6b60220d93987fe3b07f43a494",
     "schemas/c-family-comments-feedback-v0.2.schema.json": "effa6a0a8cb553a12e986e5ac30ae002c585efacf957e0fdce477f662979f5b2",
-    "crates/codeguard-cli/src/c_family_comments_workbench.rs": "07f2202384d41653ffff5989b6775239d97b3e240934ef5288d812e19788939b",
-    "crates/codeguard-cli/src/next_command/c_family_comments_candidate.rs": "b605e889f824fb643dcf1bdf8fd11006db3a86792df4b5ac4aaf7d519e2a4a4f",
+    "crates/codeguard-cli/src/c_family_comments_workbench.rs": "ce0f780ebc31ce7c04455af6976d0734e9d68cb0d1e18f6fb126e170fe5b9529",
+    "crates/codeguard-cli/src/next_command/c_family_comments_candidate.rs": "5c89e24f41bb8bfc6f48c8cc65a52c647dd1de6c060a76d716dc1be4b163eadf",
     "crates/codeguard-cli/src/work_sync/c_family_comments_report.rs": "f1b46bc67b85f4883c20df6261cfd3ca570fe1fe37db7fd050b0ecaeb824dd60",
     "tests/acceptance/evidence/c-family-comments-workbench-native.json": "a0c932b60a947d50516e9403386c434d4a361bbca15a8209dfed3226cc712569",
     "tests/acceptance/evidence/c-family-comments-workbench-native-wasm.json": "7dc69445e19c612abe9e74dcfc1f0963818298fe028d718c09174c2a7f775d99",
@@ -190,14 +190,20 @@
     "tests/acceptance/evidence/c-family-comments-workbench-schema.json": "b8549177571bfa65a069522cbb23ead94d913d99c81e648a93ba5728cf3f7847",
     "schemas/clang-documentation-workbench-observation-v0.1.schema.json": "cbde60cf037e29c6dce1c8754575b3aa0ddb0168306e1a9f0a12af5eab6c31c0",
     "crates/codeguard-cli/src/lib.rs": "6f9dee71fc74bc5462b23182866a8b8d974fabd66478f0e76c4cd74ee150d39b",
-    "crates/codeguard-cli/tests/c_family_comments_workbench.rs": "cbdf740a5f09271a5f65724875baf2eae52d60a5d60503df4c51b69698b69b7a",
-    "crates/codeguard-cli/src/c_family_comments_task_recheck.rs": "da123e9a831a2ce99f4091d19e1e9a8bca74e9b9eae7206cad91298cce66b383",
-    "tests/acceptance/c-family-comments-task-recheck.md": "5fda474d9f7378db6d697447087afa7c1ccc53900bf181a0de3c76b4aed13110",
+    "crates/codeguard-cli/tests/c_family_comments_workbench.rs": "ef1650aa60a45b87267a1fe598dc5abc6d4923ef3cdab9ca94ea62398e68cf6e",
+    "crates/codeguard-cli/src/c_family_comments_task_recheck.rs": "3f73145c7f736cecd254a7bb81cfa29cf94f0e0471adcc8e1384602b909a2e42",
+    "tests/acceptance/c-family-comments-task-recheck.md": "25002380c0040d3de6de4559f6a3eb80ec6520ea5079ff7e4cfd16c31ff46e25",
     "tests/c_family_comments_task_recheck_schema.py": "e8e43343991bae6dde3f012625e4843516c2ca389718cface1abeaa76c7b5870",
     "schemas/clang-documentation-task-recheck-v0.1.schema.json": "ffdfa03eb46042ef45215d4c645c28f97015deb8c35c7dce6b9dca52475ca7dc",
     "schemas/task-verification-preview-v0.36.schema.json": "2d0559d7a33b5e62180b61dc382d15bcf16cf4c7acb7aab7690b93930570e974",
     "schemas/repair-brief-preview-v0.29.schema.json": "e673c9d99170ae4bb343d58f1c25fbccd64a9f6061813a06ef0a2298320ea366",
-    "schemas/c-family-comments-feedback-v0.3.schema.json": "4e42f6f99f7f163da58254d0d16a4d3e2572e6c47ed978bb0d4afae33ed4eddf"
+    "schemas/c-family-comments-feedback-v0.3.schema.json": "4e42f6f99f7f163da58254d0d16a4d3e2572e6c47ed978bb0d4afae33ed4eddf",
+    "crates/codeguard-cli/src/workspace_view_command.rs": "37259f8d42bab7f029cffdbd3da2a1848c1db17a5e1b24246013060f6c5b214f",
+    "tests/acceptance/c-family-comments-attempt-history.md": "9131bcbbd48fb5c39e7fbcdef054891fa4af17996434f9bba412847c9344b447",
+    "tests/c_family_comments_attempt_schema.py": "5498a28648f80ae4016c93dda6c5e7110c94ec5973b185158a51c53b64ad8c2e",
+    "schemas/c-family-comments-feedback-v0.4.schema.json": "06d35235a87025ae2145a3c06d0953bfdcac7c64974213d0e12feadb9f362e42",
+    "schemas/repair-brief-preview-v0.30.schema.json": "e1f92d3a992d8bc61c235380c121178b50b74349ed959c34273e8455896fd482",
+    "schemas/task-show-preview-v0.4.schema.json": "4fbcb3edb1b0eeccb9ac10a0b50036cb6842047217a8cfb5361fec8f7b15b833"
   },
   "languages": [
     {
@@ -3000,7 +3006,8 @@
                 "crates/codeguard-cli/src/next_command.rs",
                 "crates/codeguard-cli/src/task_attempt_command.rs",
                 "crates/codeguard-cli/src/task_verify_command.rs",
-                "crates/codeguard-cli/src/c_family_comments_task_recheck.rs"
+                "crates/codeguard-cli/src/c_family_comments_task_recheck.rs",
+                "crates/codeguard-cli/src/workspace_view_command.rs"
               ],
               "evidence_refs": [
                 "crates/codeguard-adapters/tests/clang_documentation_contract.rs",
@@ -3026,7 +3033,12 @@
                 "schemas/clang-documentation-task-recheck-v0.1.schema.json",
                 "schemas/task-verification-preview-v0.36.schema.json",
                 "schemas/repair-brief-preview-v0.29.schema.json",
-                "schemas/c-family-comments-feedback-v0.3.schema.json"
+                "schemas/c-family-comments-feedback-v0.3.schema.json",
+                "tests/acceptance/c-family-comments-attempt-history.md",
+                "tests/c_family_comments_attempt_schema.py",
+                "schemas/c-family-comments-feedback-v0.4.schema.json",
+                "schemas/repair-brief-preview-v0.30.schema.json",
+                "schemas/task-show-preview-v0.4.schema.json"
               ],
               "blockers": [
                 "稳定文档任务与原命令复扫已接通；仅固定Apple Clang21/C11或C++17单文件，项目原配置/头文件/宏、全部API缺失与详细契约、专用task verify/尝试日志未完成",
@@ -3306,7 +3318,8 @@
                 "crates/codeguard-cli/src/next_command.rs",
                 "crates/codeguard-cli/src/task_attempt_command.rs",
                 "crates/codeguard-cli/src/task_verify_command.rs",
-                "crates/codeguard-cli/src/c_family_comments_task_recheck.rs"
+                "crates/codeguard-cli/src/c_family_comments_task_recheck.rs",
+                "crates/codeguard-cli/src/workspace_view_command.rs"
               ],
               "evidence_refs": [
                 "crates/codeguard-adapters/tests/clang_documentation_contract.rs",
@@ -3332,7 +3345,12 @@
                 "schemas/clang-documentation-task-recheck-v0.1.schema.json",
                 "schemas/task-verification-preview-v0.36.schema.json",
                 "schemas/repair-brief-preview-v0.29.schema.json",
-                "schemas/c-family-comments-feedback-v0.3.schema.json"
+                "schemas/c-family-comments-feedback-v0.3.schema.json",
+                "tests/acceptance/c-family-comments-attempt-history.md",
+                "tests/c_family_comments_attempt_schema.py",
+                "schemas/c-family-comments-feedback-v0.4.schema.json",
+                "schemas/repair-brief-preview-v0.30.schema.json",
+                "schemas/task-show-preview-v0.4.schema.json"
               ],
               "blockers": [
                 "稳定文档任务与原命令复扫已接通；仅固定Apple Clang21/C11或C++17单文件，项目原配置/头文件/宏、全部API缺失与详细契约、专用task verify/尝试日志未完成",

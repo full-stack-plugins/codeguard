@@ -128,13 +128,7 @@ fn execute(args: &Args) -> Result<Value, &'static str> {
     if !real_directory(&state) {
         return Err("workspace_state_unavailable");
     }
-    let initial = read_task_brief(&root, &args.task_id)?;
-    if matches!(
-        initial["checker_id"].as_str(),
-        Some("c.clang.documentation" | "cpp.clang.documentation")
-    ) {
-        return Err("clang_documentation_attempt_journal_not_integrated");
-    }
+    read_task_brief(&root, &args.task_id)?;
     let locks = state.join("task_locks");
     ensure_directory(&locks)?;
     let _lock = TaskFileLock::acquire(&locks.join(format!("{}.lock", args.task_id)))
@@ -302,11 +296,35 @@ pub(crate) fn attempt_history(root: &Path, id: &str, brief: &Value) -> Result<Va
             "observed_change":finish.map(|value| value.observed_change)})
         })
         .collect();
-    Ok(json!({"attempt_count":history.attempt_count,
+    let mut result = json!({"attempt_count":history.attempt_count,
         "no_progress_count":history.no_progress_count,
         "open_attempt_id":ledger.open_attempt().map(|start| start.attempt_id.as_str()),
         "awaiting_verification":awaiting_verification(&ledger, &rechecks, &input),
-        "budget":NO_PROGRESS_BUDGET, "recent":recent}))
+        "budget":NO_PROGRESS_BUDGET, "recent":recent});
+    if matches!(
+        brief["checker_id"].as_str(),
+        Some("c.clang.documentation" | "cpp.clang.documentation")
+    ) {
+        let latest = ledger
+            .starts
+            .values()
+            .max_by_key(|s| s.sequence)
+            .map(|s| s.attempt_id.as_str());
+        result["unverified_prior_attempt_count"] = json!(
+            ledger
+                .starts
+                .values()
+                .filter(|s| Some(s.attempt_id.as_str()) != latest
+                    && s.before_sha256 == input
+                    && ledger
+                        .finishes
+                        .get(&s.attempt_id)
+                        .is_some_and(|f| f.outcome == "ready-to-verify" && f.after_sha256 == input)
+                    && !rechecks.contains_key(&s.attempt_id))
+                .count()
+        );
+    }
+    Ok(result)
 }
 
 struct History {
@@ -451,6 +469,7 @@ fn verified_rechecks(
             || run_id.starts_with("npm-")
             || run_id.starts_with("rustdoc-")
             || run_id.starts_with("cargo-build-")
+            || run_id.starts_with("clangdoc-")
         {
             run_id
                 .rsplit('-')
@@ -577,7 +596,29 @@ fn verified_rechecks(
         {
             continue;
         }
-        let report_matches = if brief["checker_id"] == "java.gradle.dependency_check" {
+        let c_documentation = matches!(
+            brief["checker_id"].as_str(),
+            Some("c.clang.documentation" | "cpp.clang.documentation")
+        );
+        if c_documentation {
+            if event["report_sha256"] != digest(&report_bytes)
+                || !crate::c_family_comments_task_recheck::valid_shape(root, &report)
+                || report["task_id"] != id
+            {
+                return Err("verification_event_invalid");
+            }
+            if report["input_stable"] != true
+                || !crate::c_family_comments_task_recheck::inputs_current(root, &report)
+                || finish.after_sha256 != input_digest(root, brief)?
+            {
+                continue;
+            }
+        }
+        let report_matches = if c_documentation {
+            crate::c_family_comments_task_recheck::valid_shape(root, &report)
+                && event["observation"]
+                    == crate::c_family_comments_task_recheck::classify(brief, &report)
+        } else if brief["checker_id"] == "java.gradle.dependency_check" {
             crate::gradle_cve_task_recheck::validate_binding(root, brief, &report).is_ok()
                 && event["observation"] == crate::gradle_cve_task_recheck::classify(brief, &report)
         } else if brief["checker_id"] == "syntax.native_confirmation" {
@@ -888,6 +929,13 @@ fn action_fingerprint(task_id: &str, action_id: &str) -> String {
 }
 
 fn input_digest(root: &Path, brief: &Value) -> Result<String, &'static str> {
+    if matches!(
+        brief["checker_id"].as_str(),
+        Some("c.clang.documentation" | "cpp.clang.documentation")
+    ) {
+        return crate::c_family_comments_task_recheck::attempt_input_digest(root, brief);
+    }
+
     let paths: Vec<&str> = if brief["kind"] == "finding" {
         vec![brief["scope"].as_str().ok_or("attempt_scope_invalid")?]
     } else {

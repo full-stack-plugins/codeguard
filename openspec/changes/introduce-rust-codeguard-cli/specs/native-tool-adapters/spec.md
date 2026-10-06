@@ -1103,7 +1103,7 @@ The Rust caller SHALL capture bounded content and physical path observations for
 
 ### Requirement: C-family documentation tasks SHALL recheck the original native context
 
-Public task verify SHALL bind the consumed first report, immutable task facts, language, standard, native rule group and selected tool path. A different tool path, changed previously observed tool bytes or foreign checker parameters SHALL be rejected before leasing or native execution. Repaired source bytes MAY be rechecked through a bounded snapshot. Same-run input instability, unknown native rules, timeout and cancellation SHALL prevent complete repair classification. Observations SHALL use the existing verification lease and append-only event storage without importing unrelated rule groups as new tasks. Zero diagnostics SHALL remain candidate_absent_unverified_policy and SHALL NOT close a task, grant detailed documentation coverage or approve delivery. Dedicated attempt journaling and trusted closure/reopen remain separate uncompleted obligations.
+Public task verify SHALL bind the consumed first report, immutable task facts, language, standard, native rule group and selected tool path. A different tool path, changed previously observed tool bytes or foreign checker parameters SHALL be rejected before leasing or native execution. Repaired source bytes MAY be rechecked through a bounded snapshot. Same-run input instability, unknown native rules, timeout and cancellation SHALL prevent complete repair classification. Observations SHALL use the existing verification lease and append-only event storage without importing unrelated rule groups as new tasks. Zero diagnostics SHALL remain candidate_absent_unverified_policy and SHALL NOT close a task, grant detailed documentation coverage or approve delivery. Dedicated attempt journaling SHALL bind current source/tool context and preserve failed rechecks. Trusted closure/reopen remain separate uncompleted obligations.
 
 #### Scenario: Native documentation rule disappears after editing comments
 - **WHEN** the original native checker rechecks repaired source with the same language, standard and tool identity and the original rule is absent
@@ -1116,3 +1116,20 @@ Public task verify SHALL bind the consumed first report, immutable task facts, l
 #### Scenario: The caller cancels a native documentation recheck
 - **WHEN** SIGINT arrives during native task verification
 - **THEN** the process group is reaped, the command returns cancelled/130 and no verification event is persisted as completed repair
+
+
+### Requirement: C-family documentation attempts SHALL preserve bounded original-tool repair history
+
+C/C++ documentation task attempts SHALL reuse existing claim tokens, generation checks, task locks and append-only start/finish events. Their input digest SHALL include bounded current source bytes, the first language/standard/profile, selected tool path, canonical tool and observed/missing/unavailable tool state. Missing-tool restoration SHALL count as environment change without requiring source edits. Attempt-ready state SHALL require a matching original-task native recheck before retry. A recheck SHALL match immutable task facts, original consumed evidence, task/workspace/run identity, report digest, ready finish timing and current input before affecting the current-input budget. Two failed original rechecks under the same input/action SHALL stop repetitive source repair and expose concrete rule/native reasons and recent attempts. Changing action labels or rescanning SHALL NOT reset this budget. Unverifiable earlier ready attempts under current input SHALL remain visible and require investigation rather than being dropped as success. Local observations SHALL NOT close tasks, approve exceptions or grant detailed-contract qualification.
+
+#### Scenario: Two ready attempts still have the same documentation warning
+- **WHEN** both original-task rechecks still contain the same native rule under the same source/tool context
+- **THEN** next SHALL expose two no-progress attempts, withhold source-edit permissions and provide a concrete decision step; changing to another action label or rescanning SHALL NOT permit a third repair attempt
+
+#### Scenario: A selected tool was missing and is restored
+- **WHEN** the same selected tool path is restored while source bytes remain unchanged
+- **THEN** the attempt SHALL record observed_change, require original-tool verification and retain the same open environment task; local restoration SHALL NOT qualify complete documentation coverage
+
+#### Scenario: An earlier verification report is unavailable or its observation is forged
+- **WHEN** an earlier current-input ready attempt loses its local recheck report or its event contradicts the original report
+- **THEN** the missing evidence SHALL require investigation without resetting repair permission, and contradictory observations SHALL be rejected

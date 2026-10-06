@@ -45,3 +45,5 @@ CARGO_PROFILE_TEST_DEBUG=0 CODEGUARD_CLANG_BIN=/usr/bin/clang cargo test --offli
 本轮验证：默认与WASM构建专用工作台目标各14项通过（包含显式启用的真实Clang用例）；此前五个默认相关目标共56通过/12条件忽略。默认/WASM全工作区all-targets严格Clippy通过。封闭协议回放共485份schema，481份历史schema字节未变，18项负例拒绝。验收计划审计核对186份来源摘要及1312处任务引用，228项义务继续blocked；OpenSpec严格验证、层级检查及diff检查通过。
 
 远端8a80420的CI37535353443已确认failure：gate在固定插件审计源dec5f9d不可达处失败。未改低固定来源要求，也未推送待确认的插件main；本轮本地通过不能代替CI或完整生产验收。
+
+当前增量：专用尝试日志与当前输入预算已接通，next0.30、绑定comments0.4、task show0.4。本文0.29/0.3及未接通说明为33aa17b历史检查点；当前范围与缺口见[尝试日志验收](c-family-comments-attempt-history.md)。
