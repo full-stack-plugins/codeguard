@@ -2534,3 +2534,7 @@ Java验收分类器先检查truncated_files，隐藏恢复不计作干净。现�
 ## 2026-10-07 Rust聚合文档义务
 
 目标反例先RED后保留Clippy三精确文档规则和Rustdoc两独立comments行，不重复执行Clippy、不声称详细规则完整启用。默认五目标31通过/4条件忽略，WASM32通过/4忽略；新增Rustdoc失败的兄弟保留反例两配置复核各1通过，真实已有Clippy两配置各显式1通过。44实际报告通过原协议，474历史schema原字节保持；双配置全工作区全目标严格Clippy、定向格式、分层/OpenSpec strict通过。来源计划82文件/1312任务引用仍保留完整57语言×四核心；不勾选父任务或授予0/32以外正式资格。CI37508009119终态gate固定源检出失败/MSRV成功，插件main推送待用户确认。详见[验收](../../../tests/acceptance/clippy-documentation-aggregate.md)。
+
+## 2026-10-07 Cargo文档配置声明
+
+配置缺失目标先RED后增加逐构建根五精确声明与清单摘要绑定；未声明/继承/组/源码属性均unknown，不执行原生工具或修改清单。init沿用画像详情和AGENTS摘要引用，字节保持。默认/WASM六CLI目标各120通过/6条件忽略、已有原生工具两配置各显式1通过；默认畸形与源码变化单元各1通过，WASM Cargo相关单元另核验。12实际报告和474历史schema原字节通过，双配置全工作区全目标严格Clippy、定向格式/分层/OpenSpec strict通过。86来源/1312任务引用保留57语言四核心，66完成/288待完成、正式grammar资格0/32；全生效配置/详细契约/配置任务/可信闭环仍缺。CI37509019562终态MSRV成功/gate固定源检出失败，待确认插件main推送未执行，未发布或合并。见[验收](../../../tests/acceptance/cargo-documentation-declarations.md)。

@@ -2097,3 +2097,5 @@ CI37503859591终态MSRV通过、gate源码检出失败。确认语料9e4adb1远�
 2026-10-07 Rust Clippy 文档契约局部进展：延续7.1/15.3/15.6，原 Errors 指引测试先RED后补齐三个精确原规则指引，真实已有Clippy验证重复身份、仍存在、allow抑制及修复后未受信消失。空章节标题被本机原生接受，不能证明详细说明；未选pedantic不自动开启。源码事实仍open，comments rust仍独立Rustdoc探针；详细内容/全部构建组合/统一类别/独立精度/可信闭环仍未完成，不勾选父任务、不改变0/32资格。见tests/acceptance/clippy-documentation-contract.md。
 
 2026-10-07 Rust聚合文档分类进展：同一7.1/15.3/15.6反例先RED后保留Clippy三精确文档规则及Rustdoc两独立comments义务，原生失败的已有诊断不伪装完整；未知相似规则或零发现不声称规则启用。真实已有Clippy公开check rust验证三规则与原稳定身份，证据见tests/acceptance/clippy-documentation-aggregate.md。完整详细内容/统一comments入口/全组合/独立精度/可信闭环及逐语言生产资格仍未完成，不勾选父任务。
+
+2026-10-07 Cargo文档声明进展：延续7.1/15.3/15.6，配置记录缺失的目标RED后增加逐构建根五项精确声明与本次摘要绑定；未知继承/组/属性/未声明不判缺失或启用完整。init保留画像详情和AGENTS摘要引用，不改清单。真实已有Clippy的清单warn/allow与源码属性三组分别三/零/三诊断，状态仍unknown；来源变化反例和非法输入通过。详见tests/acceptance/cargo-documentation-declarations.md。完整生效模型、详细契约/配置稳定任务/独立精度/可信闭环及逐语言生产资格仍未完成，不勾选父任务。
