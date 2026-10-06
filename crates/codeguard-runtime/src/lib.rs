@@ -238,3 +238,12 @@ pub use wasm_form_terminator::WasmFormTerminator;
 mod wasm_form_terminator_scan;
 #[cfg(feature = "wasm-precheck")]
 pub use wasm_form_terminator_scan::scan_wasm_form_terminators;
+
+#[cfg(feature = "wasm-precheck")]
+mod wasm_outer_return;
+#[cfg(feature = "wasm-precheck")]
+pub use wasm_outer_return::WasmOuterReturn;
+#[cfg(feature = "wasm-precheck")]
+mod wasm_outer_return_scan;
+#[cfg(feature = "wasm-precheck")]
+pub use wasm_outer_return_scan::{WasmOuterReturnScan, scan_wasm_outer_returns};
