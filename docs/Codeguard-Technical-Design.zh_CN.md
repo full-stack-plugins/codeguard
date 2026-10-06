@@ -1788,3 +1788,5 @@ flowchart LR
 `lint all` 的 next 通过一次本地事实校验，在允许的 lint 检查器集合内选择；历史构建/CVE/注释任务不使有效 lint 指引变成空值，也不会被删除。语法确认后备只选择本轮产生的任务 ID。
 
 JavaScript WASM 回退遇到指定工作区外的源码时，反馈 source_outside_workspace，语法扫描不运行且不生成任务。部分显式原生上下文保留原生准备路径；完全缺失上下文的合法候选可推荐安装，不制造必需环境任务。
+
+当前源码29ec2e1的WASM扩展回归已结束：基础crate与CLI lib/bins、201个集成目标合计1879通过、0失败、177条件用例未执行，明确排除未提交Erlang草稿。严格Clippy通过；这不代表独立语料、原生工具全矩阵、宿主或发布验收。详见tests/acceptance/wasm-regression-29ec2e1.md；32个grammar仍为候选，正式资格0。

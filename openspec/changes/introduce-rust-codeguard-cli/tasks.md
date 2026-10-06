@@ -1924,3 +1924,7 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 ## 2026-10-06 WASM扩展回归与ESLint外部目标边界
 
 对应12.1/12.9/14.x：实际基础层WASM80组420通过/10忽略；排除用户Erlang草稿的CLI201目标在64组546通过/2失败/48忽略后终止。修复JS外部目标not_connected缺明确边界反馈，保留不扫描/不建任务；准备测试明确部分显式上下文，避免误把合法无上下文WASM回退当强制环境任务。定向WASM12通过/4忽略、默认6通过/4忽略，实际反馈schema、严格Clippy/分层/OpenSpec通过。见tests/acceptance/wasm-eslint-boundary-regression.md。完整CLI重跑未完成，不勾选父任务。
+
+## 2026-10-06 当前WASM扩展回归终态收口
+
+对应12.1/12.9/14.x：ESLint修正后CLI从头实际重跑，201个metadata登记集成目标及lib/bins全部终态退出0；排除用户Erlang草稿。CLI203组1459通过/167条件忽略，基础80组420通过/10忽略（基础源码逐路径未变），合计1879通过/0失败/177忽略。WASM全工作区严格Clippy、398schema元定义、实际库存1.1、分层/OpenSpec通过。见tests/acceptance/wasm-regression-29ec2e1.md。远端当前CI证据源checkout失败、独立回放/holdout/原生条件/真实宿主及资格0/32仍未完成，父任务不勾选。

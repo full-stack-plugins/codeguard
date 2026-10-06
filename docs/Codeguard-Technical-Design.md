@@ -1787,3 +1787,5 @@ Other-category history remains stored, but this invocation does not select its r
 `lint all` selects next within the allowed lint checker set in one local-fact validation pass. Historical build/CVE/comments tasks do not hide valid lint guidance and remain stored. Syntax-confirmation fallback selects only task IDs produced by this invocation.
 
 JavaScript WASM fallback reports source_outside_workspace for sources outside the explicit workspace, without syntax scanning or task creation. Partial explicit native context remains on the preparation path; clean candidates with no context may recommend installation without inventing a mandatory environment task.
+
+The WASM regression for source 29ec2e1 completed: foundation crates plus CLI lib/bins and 201 integration targets produced 1,879 passes, zero failures and 177 conditional tests not executed. The uncommitted Erlang draft was explicitly excluded. Strict Clippy passed. This does not qualify independent corpora, the full native-tool matrix, hosts or publication. See tests/acceptance/wasm-regression-29ec2e1.md; all 32 grammars remain candidates with zero formally qualified.
