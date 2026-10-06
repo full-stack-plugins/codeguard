@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeguard.dev/schemas/clang-function-documentation-structure-v0.1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "observation_type",
+    "authority",
+    "qualification",
+    "coverage_proven",
+    "functions",
+    "unresolved_declaration_kinds",
+    "semantic_accuracy",
+    "errors_and_behavior"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "observation_type": {
+      "const": "clang_function_documentation_structure"
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "qualification": {
+      "const": "not_granted"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "functions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "offset_byte",
+          "line",
+          "column_byte",
+          "comment_presence",
+          "purpose_description",
+          "parameters",
+          "return_description",
+          "missing_components",
+          "structure_status"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "offset_byte": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "line": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "column_byte": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "comment_presence": {
+            "enum": [
+              "present",
+              "absent",
+              "unknown_redeclaration"
+            ]
+          },
+          "purpose_description": {
+            "enum": [
+              "unknown",
+              "missing",
+              "nonempty"
+            ]
+          },
+          "parameters": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "index",
+                "name",
+                "description"
+              ],
+              "properties": {
+                "index": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "name": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "description": {
+                  "enum": [
+                    "nonempty",
+                    "missing",
+                    "unknown_unnamed"
+                  ]
+                }
+              }
+            }
+          },
+          "return_description": {
+            "enum": [
+              "unknown",
+              "missing",
+              "nonempty",
+              "not_applicable"
+            ]
+          },
+          "missing_components": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^(documentation_comment|purpose|return|parameter:.+)$"
+            }
+          },
+          "structure_status": {
+            "enum": [
+              "observed_supported_subset",
+              "unknown_redeclaration",
+              "unresolved_comment_structure"
+            ]
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "comment_presence": {
+                  "const": "absent"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "missing_components": {
+                  "const": [
+                    "documentation_comment"
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "structure_status": {
+                  "enum": [
+                    "unknown_redeclaration",
+                    "unresolved_comment_structure"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "missing_components": {
+                  "const": []
+                },
+                "purpose_description": {
+                  "const": "unknown"
+                },
+                "return_description": {
+                  "const": "unknown"
+                },
+                "parameters": {
+                  "const": []
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "unresolved_declaration_kinds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": ".+Decl$"
+      }
+    },
+    "semantic_accuracy": {
+      "const": "not_evaluated"
+    },
+    "errors_and_behavior": {
+      "const": "not_evaluated"
+    }
+  }
+}
