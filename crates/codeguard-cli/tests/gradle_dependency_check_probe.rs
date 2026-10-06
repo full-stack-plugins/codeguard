@@ -1063,3 +1063,522 @@ fn gradle_cve_empty_original_report_recheck_never_closes_preparation_task() {
     .unwrap();
     assert_eq!(fact["state"], "open");
 }
+
+#[test]
+fn unified_check_schedules_original_gradle_cve_and_exposes_native_advisories() {
+    use std::process::Command;
+    let fixture = Fixture::new(&script(&model(), &ownership(), &report(), "exit 0"));
+    let root = fixture.0.join("project");
+    Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["init", root.to_str().unwrap(), "--apply"])
+        .output()
+        .unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "check",
+            "java",
+            root.to_str().unwrap(),
+            "--gradle-bundle",
+            fixture.0.join("gradle").to_str().unwrap(),
+            "--java-home",
+            fixture.0.join("jdk").to_str().unwrap(),
+            "--gradle-project-file",
+            "settings.gradle",
+            "--gradle-project-file",
+            "build.gradle",
+            "--gradle-owasp-task",
+            ":dependencyCheckAnalyze",
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(
+        out.status.code(),
+        Some(3),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let value: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(value["schema_version"], "0.71.0");
+    assert_eq!(
+        value["native_results"]["java_gradle_cve"]["native_status"],
+        "reports_observed_unverified"
+    );
+    assert_eq!(
+        value["native_results"]["java_gradle_cve"]["reports"][0]["advisories"]
+            .as_array()
+            .unwrap()
+            .len(),
+        2
+    );
+    assert_eq!(value["gradle_cve_tasks"]["task_sync"], "synced");
+    assert_eq!(
+        value["next"]["repair_brief"]["checker_id"],
+        "java.gradle.dependency_check"
+    );
+    assert_eq!(value["delivery_decision"], "not_evaluated");
+    assert!(
+        value["category_candidates"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|c| c["checker_id"] == "java.gradle.dependency_check" && c["category"] == "cve")
+    );
+    if let Some(path) = std::env::var_os("CODEGUARD_TEST_GRADLE_CVE_CHECK_EVIDENCE") {
+        fs::write(path, &out.stdout).unwrap();
+    }
+}
+
+fn unified_command(f: &Fixture, selection: &str, format: &str) -> std::process::Command {
+    let mut cmd = std::process::Command::new(env!("CARGO_BIN_EXE_codeguard"));
+    cmd.args(["check", selection])
+        .arg(f.0.join("project"))
+        .arg("--gradle-bundle")
+        .arg(f.0.join("gradle"))
+        .arg("--java-home")
+        .arg(f.0.join("jdk"))
+        .args([
+            "--gradle-project-file",
+            "settings.gradle",
+            "--gradle-project-file",
+            "build.gradle",
+            "--gradle-owasp-task",
+            ":dependencyCheckAnalyze",
+            "--format",
+        ])
+        .arg(format);
+    cmd
+}
+fn initialized(f: &Fixture) {
+    let out = std::process::Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["init"])
+        .arg(f.0.join("project"))
+        .arg("--apply")
+        .output()
+        .unwrap();
+    assert!(
+        matches!(out.status.code(), Some(0 | 3)),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    assert!(f.0.join("project/.codeguard/workspace.json").is_file());
+}
+fn check_evidence(name: &str, bytes: &[u8]) {
+    if let Some(dir) = std::env::var_os("CODEGUARD_TEST_GRADLE_CVE_CHECK_ALL_EVIDENCE") {
+        fs::create_dir_all(&dir).unwrap();
+        fs::write(PathBuf::from(dir).join(format!("{name}.json")), bytes).unwrap();
+    }
+}
+#[test]
+fn unified_gradle_cve_repeat_zero_and_sarif_preserve_scope_without_closure() {
+    let f = Fixture::new(&script(&model(), &ownership(), &report(), "exit 0"));
+    initialized(&f);
+    for selection in ["java", "all"] {
+        let out = unified_command(&f, selection, "json").output().unwrap();
+        assert_eq!(out.status.code(), Some(3));
+        let value: Value = serde_json::from_slice(&out.stdout).unwrap();
+        assert_eq!(value["gradle_cve_tasks"]["task_sync"], "synced");
+        assert_eq!(
+            value["native_results"]["java_gradle_cve"]["reports"][0]["advisories"]
+                .as_array()
+                .unwrap()
+                .len(),
+            2
+        );
+        assert!(
+            value["execution_tasks"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|n| n["id"] == "java.gradle.dependency_check"
+                    && n["status"] == "native_observed_unverified")
+        );
+        assert_eq!(
+            value["execution_tasks"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .filter(|n| n["id"] == "java.gradle.model")
+                .count(),
+            0
+        );
+        assert_eq!(
+            value["execution_budget"]["native_task_count"],
+            value["execution_budget"]["started_native_task_count"]
+        );
+        check_evidence(selection, &out.stdout);
+    }
+    assert_eq!(
+        fs::read_dir(f.0.join("project/.codeguard/tasks"))
+            .unwrap()
+            .count(),
+        1
+    );
+    let out = unified_command(&f, "java", "human").output().unwrap();
+    let human = String::from_utf8(out.stdout).unwrap();
+    assert!(human.contains("CVE-2020-0001"));
+    assert!(human.contains("CVE-2020-0002"));
+    let out = unified_command(&f, "java", "sarif").output().unwrap();
+    let sarif: Value = serde_json::from_slice(&out.stdout).unwrap();
+    let results = sarif["runs"][0]["results"].as_array().unwrap();
+    assert_eq!(results.len(), 2);
+    assert_eq!(
+        results
+            .iter()
+            .filter(|r| r["properties"]["nativeSuppressionObserved"] == true)
+            .count(),
+        1
+    );
+    assert_eq!(
+        results
+            .iter()
+            .filter(|r| r["suppressions"].is_array())
+            .count(),
+        1
+    );
+    assert_eq!(
+        results
+            .iter()
+            .find(|r| r["suppressions"].is_array())
+            .unwrap()["suppressions"][0]["status"],
+        "underReview"
+    );
+    assert_eq!(
+        sarif["runs"][0]["invocations"][0]["executionSuccessful"],
+        false
+    );
+    assert!(!sarif.to_string().contains("pkg:maven"));
+    check_evidence("sarif", &out.stdout);
+    let mut empty = report();
+    empty["dependencies"] = json!([]);
+    let z = Fixture::new(&script(&model(), &ownership(), &empty, "exit 0"));
+    initialized(&z);
+    let out = unified_command(&z, "java", "json").output().unwrap();
+    assert_eq!(out.status.code(), Some(3));
+    let value: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(value["gradle_cve_tasks"]["task_sync"], "synced");
+    assert_eq!(
+        value["native_results"]["java_gradle_cve"]["reports"][0]["dependency_count"],
+        0
+    );
+    let id = value["next"]["repair_brief"]["task_id"].as_str().unwrap();
+    let fact: Value = serde_json::from_slice(
+        &fs::read(z.0.join(format!("project/.codeguard/findings/{id}/finding.json"))).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(fact["state"], "open");
+    check_evidence("zero", &out.stdout);
+}
+#[test]
+fn unified_gradle_cve_bad_selection_and_lint_options_never_launch() {
+    let f = Fixture::new("");
+    let marker = f.0.join("must-not-run");
+    fs::write(
+        f.0.join("gradle/bin/gradle"),
+        format!("#!/bin/sh\ntouch '{}'\nexit 0\n", marker.display()),
+    )
+    .unwrap();
+    for selection in ["rust", "python"] {
+        assert_eq!(
+            unified_command(&f, selection, "json")
+                .output()
+                .unwrap()
+                .status
+                .code(),
+            Some(2)
+        );
+    }
+    for flags in [
+        vec!["--gradle-owasp-task", ":dependencyCheckAnalyze"],
+        vec!["--gradle-owasp-task", "--bad"],
+        vec!["--gradle-module-cache", "relative"],
+    ] {
+        assert_eq!(
+            unified_command(&f, "java", "json")
+                .args(flags)
+                .output()
+                .unwrap()
+                .status
+                .code(),
+            Some(2)
+        );
+    }
+    let out = std::process::Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["lint", "all"])
+        .arg(f.0.join("project"))
+        .args(["--gradle-owasp-task", ":dependencyCheckAnalyze"])
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(2));
+    let out = std::process::Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["check", "java"])
+        .arg(f.0.join("project"))
+        .args(["--gradle-module-cache", "/unused"])
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(2));
+    assert!(!marker.exists());
+}
+#[test]
+fn unified_gradle_cve_native_failure_and_javadoc_coexistence_remain_separate() {
+    let mut native_model = model();
+    native_model["projects"][0]["plugins"] = json!([]);
+    let f = Fixture::new(&script(&native_model, &ownership(), &report(), "exit 0"));
+    fs::write(f.0.join("project/Test.java"), "public class Test {}\n").unwrap();
+    initialized(&f);
+    let out = unified_command(&f, "java", "json")
+        .arg("--gradle-javadoc")
+        .args(["--gradle-project-file", "Test.java"])
+        .args(["--jobs", "2"])
+        .output()
+        .unwrap();
+    assert_eq!(
+        out.status.code(),
+        Some(3),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let value: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(out.status.code(), Some(3));
+    assert_eq!(
+        value["native_results"]["java_gradle_cve"]["reason"],
+        "gradle_owasp_task_unavailable"
+    );
+    assert!(
+        value["native_results"]["java_gradle_cve"]["reports"]
+            .as_array()
+            .unwrap()
+            .is_empty()
+    );
+    assert!(value["native_results"]["java_gradle_javadoc"].is_object());
+    assert_eq!(
+        value["execution_tasks"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|n| n["id"] == "java.gradle.dependency_check")
+            .count(),
+        1
+    );
+    assert_eq!(
+        value["execution_tasks"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|n| n["id"] == "java.gradle.javadoc")
+            .count(),
+        1
+    );
+    assert_eq!(value["gradle_cve_tasks"]["task_sync"], "synced");
+    check_evidence("coexistence-blocked", &out.stdout);
+}
+
+#[test]
+fn unified_gradle_cve_sigint_never_persists_preparation_evidence() {
+    use std::{
+        process::{Command, Stdio},
+        thread,
+    };
+    let fixture = Fixture::new("");
+    initialized(&fixture);
+    let marker = fixture.0.join("native-started");
+    fs::write(
+        fixture.0.join("gradle/bin/gradle"),
+        format!(
+            "#!/bin/sh\nprintf started > '{}'\nwhile :; do sleep 1; done\n",
+            marker.display()
+        ),
+    )
+    .unwrap();
+    let mut child = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["check", "java"])
+        .arg(fixture.0.join("project"))
+        .arg("--gradle-bundle")
+        .arg(fixture.0.join("gradle"))
+        .arg("--java-home")
+        .arg(fixture.0.join("jdk"))
+        .args([
+            "--gradle-owasp-task",
+            ":dependencyCheckAnalyze",
+            "--gradle-project-file",
+            "settings.gradle",
+            "--gradle-project-file",
+            "build.gradle",
+            "--timeout",
+            "30s",
+            "--format=json",
+        ])
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    let deadline = Instant::now() + Duration::from_secs(10);
+    while !marker.exists() && Instant::now() < deadline {
+        assert!(child.try_wait().unwrap().is_none());
+        thread::sleep(Duration::from_millis(10));
+    }
+    if !marker.exists() {
+        let _ = child.kill();
+        panic!("native process did not start");
+    }
+    assert!(
+        Command::new("/bin/kill")
+            .args(["-INT", &child.id().to_string()])
+            .status()
+            .unwrap()
+            .success()
+    );
+    let output = child.wait_with_output().unwrap();
+    assert_eq!(
+        output.status.code(),
+        Some(130),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let feedback: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(
+        feedback["native_results"]["java_gradle_cve"]["reason"],
+        "request_cancelled"
+    );
+    assert_no_acceptance(&feedback["native_results"]["java_gradle_cve"]);
+    assert_eq!(feedback["gradle_cve_tasks"]["task_sync"], "incomplete");
+    assert_eq!(
+        fs::read_dir(fixture.0.join("project/.codeguard/reports"))
+            .unwrap()
+            .count(),
+        0
+    );
+    assert_eq!(
+        fs::read_dir(fixture.0.join("project/.codeguard/tasks"))
+            .unwrap()
+            .count(),
+        0
+    );
+    check_evidence("cancelled", &output.stdout);
+}
+
+#[test]
+#[ignore = "requires explicit existing Gradle8.10.2/JDK21; never installs OWASP"]
+fn actual_unified_gradle_cve_environment_blockers_and_original_task_recheck_stay_open() {
+    use std::process::Command;
+    let gradle =
+        PathBuf::from(std::env::var_os("CODEGUARD_TEST_GRADLE_BUNDLE").expect("existing Gradle"));
+    let java = PathBuf::from(std::env::var_os("CODEGUARD_TEST_JAVA_HOME").expect("existing JDK"));
+    for (name, build) in [
+        (
+            "ordinary_imitation",
+            "plugins { id 'java' }\ntasks.register('dependencyCheckAnalyze') { doLast { throw new GradleException('ordinary_task_must_not_run') } }\n",
+        ),
+        (
+            "missing_offline_plugin",
+            "plugins { id 'org.owasp.dependencycheck' version '12.1.0' }\n",
+        ),
+    ] {
+        let f = Fixture::new("");
+        fs::write(f.0.join("project/build.gradle"), build).unwrap();
+        initialized(&f);
+        let root = f.0.join("project");
+        let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(["check", "java"])
+            .arg(&root)
+            .arg("--gradle-bundle")
+            .arg(&gradle)
+            .arg("--java-home")
+            .arg(&java)
+            .args([
+                "--gradle-project-file",
+                "settings.gradle",
+                "--gradle-project-file",
+                "build.gradle",
+                "--gradle-owasp-task",
+                ":dependencyCheckAnalyze",
+                "--timeout",
+                "90s",
+                "--format=json",
+            ])
+            .output()
+            .unwrap();
+        assert_eq!(
+            out.status.code(),
+            Some(3),
+            "{name}: {}",
+            String::from_utf8_lossy(&out.stderr)
+        );
+        let value: Value = serde_json::from_slice(&out.stdout).unwrap();
+        let native = &value["native_results"]["java_gradle_cve"];
+        assert_eq!(native["native_status"], "incomplete");
+        assert_eq!(native["native_exit_code"], 1);
+        assert_no_acceptance(native);
+        assert!(native["reports"].as_array().unwrap().is_empty());
+        assert_eq!(value["gradle_cve_tasks"]["task_sync"], "synced", "{value}");
+        let id = value["next"]["repair_brief"]["task_id"].as_str().unwrap();
+        let recheck = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(["task", "verify", id])
+            .arg(&root)
+            .arg("--gradle-bundle")
+            .arg(&gradle)
+            .arg("--java-home")
+            .arg(&java)
+            .args(["--timeout", "90s", "--format=json"])
+            .output()
+            .unwrap();
+        let verify: Value = serde_json::from_slice(&recheck.stdout).unwrap();
+        assert_eq!(recheck.status.code(), Some(3));
+        assert_eq!(verify["event_persisted"], true, "{verify}");
+        assert_eq!(verify["observation"], "incomplete");
+        assert_eq!(verify["native_scan"]["scan"]["native_status"], "incomplete");
+        let fact: Value = serde_json::from_slice(
+            &fs::read(root.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
+        )
+        .unwrap();
+        assert_eq!(fact["state"], "open");
+        check_evidence(&format!("actual-{name}"), &out.stdout);
+        check_evidence(&format!("actual-{name}-verify"), &recheck.stdout);
+    }
+}
+
+#[test]
+fn unified_gradle_cve_keeps_maven_and_mixed_build_obligations_independent() {
+    let f = Fixture::new(&script(&model(), &ownership(), &report(), "exit 0"));
+    fs::write(f.0.join("project/pom.xml"), "<project><modelVersion>4.0.0</modelVersion><build><plugins><plugin><groupId>org.owasp</groupId><artifactId>dependency-check-maven</artifactId></plugin></plugins></build></project>").unwrap();
+    fs::create_dir_all(f.0.join("project/src/main/java")).unwrap();
+    fs::write(
+        f.0.join("project/src/main/java/Test.java"),
+        "public class Test {}\n",
+    )
+    .unwrap();
+    initialized(&f);
+    let out = unified_command(&f, "java", "json").output().unwrap();
+    assert_eq!(out.status.code(), Some(3));
+    let value: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert!(value["native_results"]["java_cve"].is_object());
+    assert_eq!(
+        value["native_results"]["java_gradle_cve"]["native_status"],
+        "reports_observed_unverified"
+    );
+    let candidates: Vec<&Value> = value["category_candidates"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|c| c["language"] == "java" && c["category"] == "cve")
+        .collect();
+    assert_eq!(candidates.len(), 2, "{value}");
+    assert!(
+        candidates
+            .iter()
+            .any(|c| c["checker_id"] == "java.gradle.dependency_check")
+    );
+    assert!(
+        candidates
+            .iter()
+            .any(|c| c["checker_id"].is_null() && c["reason"] == "checker_build_systems_mixed")
+    );
+    assert!(
+        value["execution_tasks"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|n| n["id"] == "java.cve")
+    );
+    check_evidence("mixed-maven-gradle", &out.stdout);
+}
