@@ -1,4 +1,6 @@
-use codeguard_adapters::{MavenJavadocParseState, parse_maven_javadoc_output};
+use codeguard_adapters::{
+    MavenJavadocParseState, parse_detailed_maven_javadoc_output, parse_maven_javadoc_output,
+};
 use std::collections::BTreeMap;
 
 const SOURCE: &[u8] = b"package demo;\npublic class Bad {}\n";
@@ -208,4 +210,93 @@ fn real_maven_clean_and_repeated_logs_remain_unverified() {
         );
     }
     fs::remove_dir_all(root).unwrap();
+}
+
+#[test]
+fn detailed_descriptions_survive_maven_success_and_warning_failure() {
+    for (message, rule) in [
+        ("empty comment", "JavadocEmptyComment"),
+        ("no main description", "JavadocMissingMainDescription"),
+        ("no description for @param", "JavadocEmptyParamDescription"),
+        (
+            "no description for @return",
+            "JavadocEmptyReturnDescription",
+        ),
+        (
+            "no description for @throws",
+            "JavadocEmptyThrowsDescription",
+        ),
+    ] {
+        for exit in [0, 1] {
+            let block =
+                WARNING_BLOCK.replace("warning: no comment", &format!("warning: {message}"));
+            let footer = if exit == 0 {
+                "[INFO] BUILD SUCCESS\n"
+            } else {
+                "[INFO] BUILD FAILURE\n[ERROR] Failed to execute goal org.apache.maven.plugins:maven-javadoc-plugin:3.12.0:javadoc (default-cli) on project demo: Project contains Javadoc Warnings -> [Help 1]\n"
+            };
+            let bytes = format!("{block}{footer}");
+            assert_eq!(
+                parse_maven_javadoc_output(bytes.as_bytes(), exit, "3.12.0", &sources()).state,
+                MavenJavadocParseState::Incomplete
+            );
+            let parsed =
+                parse_detailed_maven_javadoc_output(bytes.as_bytes(), exit, "3.12.0", &sources());
+            assert_eq!(
+                parsed.state,
+                MavenJavadocParseState::ValidDiagnostics,
+                "{message}"
+            );
+            assert_eq!(parsed.diagnostics[0].rule_id, rule);
+        }
+    }
+}
+
+#[test]
+fn detailed_parser_rejects_wrong_source_and_unknown_messages_without_findings() {
+    for log in [
+        WARNING_BLOCK.replace("warning: no comment", "warning: unknown detailed rule"),
+        WARNING_BLOCK
+            .replace("warning: no comment", "warning: empty comment")
+            .replace("public class Bad {}", "public class Other {}"),
+    ] {
+        let parsed = parse_detailed_maven_javadoc_output(
+            format!("{log}[INFO] BUILD SUCCESS\n").as_bytes(),
+            0,
+            "3.12.0",
+            &sources(),
+        );
+        assert_eq!(parsed.state, MavenJavadocParseState::Incomplete);
+        assert!(parsed.diagnostics.is_empty());
+    }
+}
+
+#[test]
+fn offline_missing_plugin_requires_the_exact_failure_and_preserves_legacy_contract() {
+    let log = "[INFO] Scanning for projects...\n[INFO] BUILD FAILURE\n[ERROR] Plugin org.apache.maven.plugins:maven-javadoc-plugin:3.12.0 or one of its dependencies could not be resolved:\n[ERROR] \tCannot access central (https://repo.maven.apache.org/maven2) in offline mode and the artifact org.apache.maven.plugins:maven-javadoc-plugin:jar:3.12.0 has not been downloaded from it before.\n";
+    let parsed = parse_detailed_maven_javadoc_output(log.as_bytes(), 1, "3.12.0", &sources());
+    assert_eq!(parsed.state, MavenJavadocParseState::Incomplete);
+    assert_eq!(
+        parsed.reason,
+        Some("maven_javadoc_offline_plugin_unavailable")
+    );
+    assert!(parsed.diagnostics.is_empty());
+    assert_eq!(
+        parse_maven_javadoc_output(log.as_bytes(), 1, "3.12.0", &sources()).reason,
+        Some("javadoc_goal_unverified")
+    );
+    for (bad, exit) in [
+        (log.to_string(), 0),
+        (log.replace("jar:3.12.0", "jar:3.11.0"), 1),
+        (log.replace(" in offline mode", " online"), 1),
+        (format!("{log}[INFO] BUILD SUCCESS\n"), 1),
+    ] {
+        let parsed =
+            parse_detailed_maven_javadoc_output(bad.as_bytes(), exit, "3.12.0", &sources());
+        assert_ne!(
+            parsed.reason,
+            Some("maven_javadoc_offline_plugin_unavailable")
+        );
+        assert!(parsed.diagnostics.is_empty());
+    }
 }

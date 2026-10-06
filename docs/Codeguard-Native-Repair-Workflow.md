@@ -289,4 +289,31 @@ When an explicit `grammar probe` sees a tree error without publicly traversable 
 The same pinned Kotlin/Swift assets reproduce the visibility gap in existing web-tree-sitter0.25.10. Changing the loader alone is not supported as a fix. A valid Kotlin object declaration can also produce a hidden semicolon, so has_error alone cannot justify a source violation. See [evidence and boundaries](../tests/acceptance/hidden-parser-error-guidance.md).
 
 
-The standalone JDK21 path now preserves empty comments, missing purpose and bare parameter/return/exception descriptions as five native rules in stable repair tasks. `lint java FILE --checker javadoc`, `comments java FILE --workspace .`, configured project comments and original-task verification share source-bound parsing. The legacy parser and Maven protocols remain unchanged. Separate contracts are native0.2, project0.4, workbench/recheck0.3, file feedback0.7/workbench feedback0.8, repair brief0.4, task preview0.31, aggregate0.68 and aborted0.19. Missing configuration/tools and unknown output remain incomplete. Actual JDK21 examples in both modes yield 4/3/1/0 diagnostics; all16 original tasks are rechecked while present and after repair, with absent candidates still open. Detailed Chinese and valid inherited documentation produce no diagnostics. Full Java behavior contracts, Maven description extensions, Checkstyle description modules, all-language qualification and trusted closure remain pending. See [standalone JDK description acceptance](../tests/acceptance/jdk-javadoc-detailed-descriptions.md).
+The standalone JDK21 path now preserves empty comments, missing purpose and bare parameter/return/exception descriptions as five native rules in stable repair tasks. `lint java FILE --checker javadoc`, `comments java FILE --workspace .`, configured project comments and original-task verification share source-bound parsing. The legacy parser and Maven protocols remain unchanged. Separate contracts are native0.2, project0.4, workbench/recheck0.3, file feedback0.7/workbench feedback0.8, repair brief0.4, task preview0.31, aggregate0.68 and aborted0.19. Missing configuration/tools and unknown output remain incomplete. Actual JDK21 examples in both modes yield 4/3/1/0 diagnostics; all16 original tasks are rechecked while present and after repair, with absent candidates still open. Detailed Chinese and valid inherited documentation produce no diagnostics. Full Java behavior contracts, actual Maven description acceptance, Checkstyle description modules, all-language qualification and trusted closure remain pending. See [standalone JDK description acceptance](../tests/acceptance/jdk-javadoc-detailed-descriptions.md).
+
+## Maven detailed Javadoc descriptions: implementation and qualification
+
+The original-POM multifile path now preserves five native description rules: empty comments, missing main purpose, and empty parameter, return and exception descriptions. The separate detailed parser binds messages, source lines, carets, locations and totals; historical parser/schema contracts are unchanged. Warnings remain findings even with BUILD SUCCESS. Unknown output, tool/configuration failures and the observed missing offline plugin remain incomplete preparation observations. A Maven failure cannot fall back to a single-file check.
+
+```mermaid
+flowchart TD
+    A[comments java / check java with original Maven context] --> B[Original POM multifile probe and input validation]
+    B --> C{Output}
+    C -->|Source-bound warning| D[Stable source task and detailed repair guidance]
+    C -->|Missing cache or unknown output| E[Preparation task]
+    D --> F[task verify with original tools and scope]
+    E --> F
+    F --> G{Original finding identity}
+    G -->|Same finding| H[still_present]
+    G -->|Same file/rule, different anchor| I[rule_coverage_requires_review]
+    G -->|No local diagnostic| J[candidate_absent_unverified_policy]
+    H --> K[Persist attempt; fact remains open]
+    I --> K
+    J --> K
+```
+
+Use `codeguard comments java . --maven-tool /absolute/mvn --java-home /absolute/jdk21 --maven-repo /absolute/offline-repo --repo-sha256 ACTUAL_DIGEST --format json`, then `codeguard task verify CG-task-id .` with the same explicit tool context. Replace paths/digests with actual existing identities. CodeGuard does not install plugins or weaken rules. Repair guidance requires meaningful purpose, parameter, return and exception descriptions, not bare tags.
+
+Separate closed protocols are Maven native/workbench/recheck0.2, project0.5, unbound/bound comments0.9/0.10, inner brief0.6/preview0.3, task preview0.32, aggregate0.69 and aborted0.20. First import recomputes rules/projections and rejects downgrade. Recheck verifies the consumed original report digest receipt and task scope/rule, including new tasks whose first evidence is a recheck wrapper. Zero diagnostics cannot close a task; trusted closure/recurrence remain unaccepted.
+
+Controlled process fixtures exercise all five rules with success and warning-failure exits through public checking, task reuse, original-task recheck and repaired untrusted absence. They are not actual plugin qualification. Existing Maven3.9.16/JDK21 ran twice against an empty offline repository: checking and environment-task recheck both identified the missing Javadoc3.12.0 plugin and emitted no source findings. The plugin cache is absent; actual detailed 4/3/1/0 cases and warning-failure configuration remain unexecuted conditional acceptance. Full Java behavior contracts, Checkstyle descriptions, all57 languages/four core capabilities, hosts/platforms and trusted closure remain pending. OpenSpec15.3/15.6 stay open; formal syntax qualification remains0/32. See [acceptance](../tests/acceptance/maven-javadoc-detailed-descriptions.md).

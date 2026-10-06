@@ -849,7 +849,7 @@ pub fn run(args: &[String]) -> ExitCode {
         report["schema_version"] = json!("0.30.0");
     }
     if maven_javadoc_task {
-        report["schema_version"] = json!("0.28.0");
+        report["schema_version"] = json!("0.32.0");
     }
     if javadoc_task {
         report["schema_version"] = json!("0.31.0");

@@ -47,7 +47,7 @@ pub(crate) fn run(
         .duration_since(UNIX_EPOCH)
         .map_err(|_| "clock_unavailable")?
         .as_nanos();
-    let mut report = json!({"schema_version":"0.1.0","report_type":"maven_javadoc_task_recheck","operation":"task_verify","run_id":format!("javadoc-maven-task-{}-{nanos}",std::process::id()),"workspace_binding":"bound","workspace_id":first["workspace_id"],"checker_id":"java.maven.javadoc","authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated","task_id":brief["task_id"],"task_path":task_path,"task_rule":brief["native_rule_id"],"origin":brief["evidence_ref"],"scan":null,"input_bindings":[],"task_input_stable":false,"configuration_matches":false,"tool_identity_matches":false,"source_scope_matches":false,"reason":"maven_javadoc_recheck_incomplete"});
+    let mut report = json!({"schema_version":"0.2.0","report_type":"maven_javadoc_task_recheck","operation":"task_verify","run_id":format!("javadoc-maven-task-{}-{nanos}",std::process::id()),"workspace_binding":"bound","workspace_id":first["workspace_id"],"checker_id":"java.maven.javadoc","authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated","task_id":brief["task_id"],"task_path":task_path,"task_rule":brief["native_rule_id"],"origin":brief["evidence_ref"],"scan":null,"input_bindings":[],"task_input_stable":false,"configuration_matches":false,"tool_identity_matches":false,"source_scope_matches":false,"reason":"maven_javadoc_recheck_incomplete"});
     let (Some(maven), Some(home), Some(repo), Some(repo_sha)) = (
         context.maven_tool,
         context.java_home,
@@ -248,11 +248,16 @@ pub(crate) fn classify(brief: &Value, report: &Value) -> &'static str {
         }
         return "candidate_absent_unverified_policy";
     }
-    if report["scan"]["findings"].as_array().is_some_and(|rows| {
+    if report["scan"]["findings"]
+        .as_array()
+        .is_some_and(|rows| rows.iter().any(|r| r["finding_id"] == brief["task_id"]))
+    {
+        "still_present"
+    } else if report["scan"]["findings"].as_array().is_some_and(|rows| {
         rows.iter()
             .any(|r| r["path"] == brief["scope"] && r["rule_id"] == brief["native_rule_id"])
     }) {
-        "still_present"
+        "rule_coverage_requires_review"
     } else {
         "candidate_absent_unverified_policy"
     }
@@ -284,7 +289,7 @@ pub(crate) fn valid_shape(r: &Value) -> bool {
     ];
     r.as_object()
         .is_some_and(|o| o.len() == keys.len() && keys.iter().all(|k| o.contains_key(*k)))
-        && r["schema_version"] == "0.1.0"
+        && matches!(r["schema_version"].as_str(), Some("0.1.0" | "0.2.0"))
         && r["report_type"] == "maven_javadoc_task_recheck"
         && r["operation"] == "task_verify"
         && r["workspace_binding"] == "bound"
@@ -330,7 +335,8 @@ pub(crate) fn valid_shape(r: &Value) -> bool {
                         )
                 })
         })
-        && (r["scan"].is_null() || r["scan"].is_object())
+        && (r["scan"].is_null()
+            || (r["scan"].is_object() && r["scan"]["schema_version"] == r["schema_version"]))
 }
 fn original(root: &Path, brief: &Value) -> Result<Value, &'static str> {
     let run = brief["evidence_ref"]["first_run_id"]
@@ -349,9 +355,28 @@ fn original(root: &Path, brief: &Value) -> Result<Value, &'static str> {
     if brief["evidence_ref"]["first_report_sha256"] != digest(&bytes) {
         return Err("maven_original_changed");
     }
-    let r = parse_unique_json(&bytes).map_err(|_| "maven_original_invalid")?;
+    let mut r = parse_unique_json(&bytes).map_err(|_| "maven_original_invalid")?;
+    if r["report_type"] == "maven_javadoc_task_recheck" {
+        if !valid_shape(&r)
+            || r["scan"]["run_id"] != run
+            || r["scan"]["workspace_id"] != r["workspace_id"]
+        {
+            return Err("maven_original_invalid");
+        }
+        r = r["scan"].clone();
+    }
+    let receipt = read_bounded_regular_file(
+        &root.join(format!(".codeguard/state/consumed/{run}.json")),
+        4096,
+    )
+    .map_err(|_| "maven_original_receipt_unavailable")?;
+    let expected = serde_json::to_vec_pretty(&json!({"schema_version":"0.1.0","workspace_id":r["workspace_id"],"run_id":run,"report_sha256":digest(&bytes)}))
+        .map_err(|_| "maven_original_encoding_invalid")?;
+    if receipt != expected {
+        return Err("maven_original_receipt_invalid");
+    }
     if r["report_type"] != "maven_javadoc_workbench_observation"
-        || r["schema_version"] != "0.1.0"
+        || !matches!(r["schema_version"].as_str(), Some("0.1.0" | "0.2.0"))
         || r["checker_id"] != "java.maven.javadoc"
         || r["run_id"] != run
         || !r[if brief["kind"] == "finding" {
@@ -367,6 +392,12 @@ fn original(root: &Path, brief: &Value) -> Result<Value, &'static str> {
                 } else {
                     "id"
                 }] == brief["task_id"]
+                    && row[if brief["kind"] == "finding" {
+                        "path"
+                    } else {
+                        "scope"
+                    }] == brief["scope"]
+                    && (brief["kind"] != "finding" || row["rule_id"] == brief["native_rule_id"])
             })
         })
     {

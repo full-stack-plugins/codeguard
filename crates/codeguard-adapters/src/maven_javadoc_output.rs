@@ -2,7 +2,7 @@
 
 use std::collections::BTreeMap;
 
-use crate::javadoc_output::{JavadocParseState, parse_javadoc_output};
+use crate::javadoc_output::{JavadocParseState, parse_detailed_javadoc_output, parse_javadoc_output};
 
 /// Maven Javadoc 输出是否可归属到已知源码和规则。
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -39,6 +39,28 @@ pub fn parse_maven_javadoc_output(
     plugin_version: &str,
     sources: &BTreeMap<String, Vec<u8>>,
 ) -> MavenJavadocParsed {
+    parse_output(bytes, native_exit, plugin_version, sources, false)
+}
+
+/// 解析Maven原POM的JDK21详细描述诊断；参数为有界日志、退出码、插件版本与源码快照。
+/// 返回源字节绑定的局部诊断；离线插件缺失属于环境阻塞，未知输出保持未完成。
+#[must_use]
+pub fn parse_detailed_maven_javadoc_output(
+    bytes: &[u8],
+    native_exit: i32,
+    plugin_version: &str,
+    sources: &BTreeMap<String, Vec<u8>>,
+) -> MavenJavadocParsed {
+    parse_output(bytes, native_exit, plugin_version, sources, true)
+}
+
+fn parse_output(
+    bytes: &[u8],
+    native_exit: i32,
+    plugin_version: &str,
+    sources: &BTreeMap<String, Vec<u8>>,
+    detailed: bool,
+) -> MavenJavadocParsed {
     if bytes.len() > 2 * 1024 * 1024
         || sources.is_empty()
         || plugin_version.is_empty()
@@ -62,6 +84,28 @@ pub fn parse_maven_javadoc_output(
         .lines()
         .map(|line| line.trim_end_matches('\r'))
         .collect();
+    // 仅识别已实测的原插件离线缺失消息；其它解析/构建错误不猜测根因。
+    let plugin_failure = format!(
+        "[ERROR] Plugin org.apache.maven.plugins:maven-javadoc-plugin:{plugin_version} or one of its dependencies could not be resolved:"
+    );
+    let offline_artifact = format!(
+        " in offline mode and the artifact org.apache.maven.plugins:maven-javadoc-plugin:jar:{plugin_version} has not been downloaded from it before."
+    );
+    if detailed
+        && native_exit == 1
+        && lines
+            .iter()
+            .filter(|line| **line == "[INFO] BUILD FAILURE")
+            .count()
+            == 1
+        && !lines.contains(&"[INFO] BUILD SUCCESS")
+        && lines.contains(&plugin_failure.as_str())
+        && lines.iter().any(|line| {
+            line.starts_with("[ERROR] \tCannot access ") && line.ends_with(&offline_artifact)
+        })
+    {
+        return incomplete("maven_javadoc_offline_plugin_unavailable");
+    }
     let goal_prefix = format!("[INFO] --- javadoc:{plugin_version}:javadoc ");
     let goal_positions: Vec<_> = lines
         .iter()
@@ -180,7 +224,11 @@ pub fn parse_maven_javadoc_output(
             return incomplete("javadoc_warning_format_invalid");
         };
         let raw = format!("{first}\n{source_line}\n{caret}\n1 warning\n");
-        let parsed = parse_javadoc_output(raw.as_bytes(), path, source);
+        let parsed = if detailed {
+            parse_detailed_javadoc_output(raw.as_bytes(), path, source)
+        } else {
+            parse_javadoc_output(raw.as_bytes(), path, source)
+        };
         if parsed.state != JavadocParseState::ValidDiagnostics || parsed.diagnostics.len() != 1 {
             return incomplete("javadoc_warning_rule_or_location_unverified");
         }

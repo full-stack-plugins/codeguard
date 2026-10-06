@@ -1,0 +1,17 @@
+{
+  "meta_valid": 450,
+  "controlled_transport_reports_valid": 101,
+  "actual_maven_environment_reports_valid": 3,
+  "constructed_aborted_valid": 1,
+  "forgeries_rejected": [
+    "coverage",
+    "version",
+    "rule",
+    "checker",
+    "location",
+    "authority",
+    "unexpected"
+  ],
+  "old_consumers_rejected": 5,
+  "old_schemas_byte_preserved": 440
+}

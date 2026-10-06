@@ -201,8 +201,8 @@ pub fn run(args: &[String]) -> ExitCode {
         }
     }
     if report["native_observation"]["probe_mode"] == "maven_multifile" {
-        // Maven保持独立既有协议，不借用JDK详细描述资格。
-        report["schema_version"] = json!("0.1.0");
+        // Maven采用独立详细描述协议，不借用JDK单文件覆盖资格。
+        report["schema_version"] = json!("0.9.0");
     }
     let root = workspace.or_else(|| {
         target
@@ -212,7 +212,7 @@ pub fn run(args: &[String]) -> ExitCode {
     });
     if let Some(root) = root {
         let maven = report["native_observation"]["probe_mode"] == "maven_multifile";
-        report["schema_version"] = json!(if maven { "0.6.0" } else { "0.8.0" });
+        report["schema_version"] = json!(if maven { "0.10.0" } else { "0.8.0" });
         report["workbench"] = if maven {
             crate::maven_javadoc_workbench::connect(&root, &report, maven_snapshot.as_ref())
         } else {
