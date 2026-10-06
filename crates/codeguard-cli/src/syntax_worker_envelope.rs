@@ -20,12 +20,12 @@ pub struct SyntaxWorkerEnvelope {
     pub source_sha256: String,
     /// 恢复节点或遍历预算是否截断。
     pub truncated: bool,
-    /// 1.4 版本明确记录不可定位的解析树错误；旧版本不得携带该字段。
+    /// 1.4/1.5明确记录不可定位的解析树错误；更旧版本不得携带该字段。
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub parser_error_location_unavailable: Option<bool>,
     /// ERROR/MISSING 恢复锚点。
     pub recoveries: Vec<SyntaxWorkerRecovery>,
-    /// Python1.1和Go整文件1.2的独立结构观察；历史1.0中不存在该字段。
+    /// Python1.1、Go1.2、CFQuery1.3及显式JavaScript1.5结构观察；1.0中不存在。
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub structural_observations: Vec<crate::syntax_worker_structure::SyntaxWorkerStructure>,
 }

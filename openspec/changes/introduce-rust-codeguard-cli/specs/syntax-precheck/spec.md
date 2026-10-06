@@ -807,3 +807,7 @@ Project Rust parser selection SHALL distinguish package edition, explicit worksp
 #### Scenario: Scope or declaration semantics differ
 - **WHEN** 同名声明位于嵌套块或函数、仅为var重复声明、出现在字符串/注释，或需解构/export/转义归一化和模块上下文解释
 - **THEN** 简单直接绑定事实扫描不把这些情况猜成相同作用域违规；未接线的语言规则与范围不声明已完成
+
+#### Scenario: Explicit probe exposes a bounded duplicate binding candidate
+- **WHEN** `grammar probe javascript FILE`观察到重复直接简单lexical绑定
+- **THEN** SHALL 输出独立版本化结构候选及固定规则配置摘要，保留原始恢复、grammar未验收和退出3，要求适用原生工具确认；旧版本消费者不猜成原生违规或普通通过。项目check/Hook/任务接线须分别验收，不能借probe结果宣称完成

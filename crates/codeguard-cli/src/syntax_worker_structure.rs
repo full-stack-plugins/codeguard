@@ -32,6 +32,12 @@ impl SyntaxWorkerStructure {
     /// 核对固定规则、父节点和原始源码位置；参数必须是同轮冻结源码与语言。
     pub fn valid(&self, language: &str, source: &[u8]) -> bool {
         let rule_valid = match language {
+            "javascript" => {
+                self.rule_id == "codeguard.javascript.duplicate_direct_lexical_binding"
+                    && self.rule_sha256 == codeguard_adapters::javascript_binding_rule_sha256()
+                    && self.parent_syntax_kind == "program"
+                    && self.start_byte < self.end_byte
+            }
             "python" => {
                 self.rule_id == "codeguard.python.required_suite"
                     && self.rule_sha256 == codeguard_adapters::python_suite_rule_sha256()

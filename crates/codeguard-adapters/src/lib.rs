@@ -8,6 +8,8 @@ use std::collections::{BTreeMap, HashSet};
 
 mod capability_validation;
 mod python_suite_rule;
+mod javascript_binding_rule;
+pub use javascript_binding_rule::{javascript_binding_node_kinds, javascript_binding_rule_sha256};
 pub use python_suite_rule::{is_required_python_suite_parent, python_suite_rule_sha256};
 mod go_package_rule;
 pub use go_package_rule::{go_package_rule_sha256, missing_go_package_candidate};

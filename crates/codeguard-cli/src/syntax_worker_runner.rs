@@ -27,6 +27,50 @@ pub fn run_syntax_worker_candidate(
     deadline: Instant,
     cancelled: &AtomicBool,
 ) -> Result<SyntaxWorkerCandidateObservation, String> {
+    run_candidate(
+        executable,
+        language,
+        relative_path,
+        source,
+        deadline,
+        cancelled,
+        false,
+    )
+}
+
+/// 显式观察JavaScript直接绑定规则；暂仅供probe接线，其它消费者沿用旧协议。
+/// 参数为当前二进制、语言、相对路径、冻结源码和统一预算；未知语言执行前拒绝。
+pub fn run_syntax_worker_binding_candidate(
+    executable: &Path,
+    language: &str,
+    relative_path: &str,
+    source: &[u8],
+    deadline: Instant,
+    cancelled: &AtomicBool,
+) -> Result<SyntaxWorkerCandidateObservation, String> {
+    if language != "javascript" {
+        return Err("syntax_binding_language_invalid".into());
+    }
+    run_candidate(
+        executable,
+        language,
+        relative_path,
+        source,
+        deadline,
+        cancelled,
+        true,
+    )
+}
+
+fn run_candidate(
+    executable: &Path,
+    language: &str,
+    relative_path: &str,
+    source: &[u8],
+    deadline: Instant,
+    cancelled: &AtomicBool,
+    bindings: bool,
+) -> Result<SyntaxWorkerCandidateObservation, String> {
     if !executable.is_absolute() || source.len() > 1024 * 1024 {
         return Err("syntax_worker_input_invalid".into());
     }
@@ -35,9 +79,13 @@ pub fn run_syntax_worker_candidate(
     let (asset, _) = bundled_grammar_candidate(language)
         .map_err(|reason| format!("syntax_worker_candidate_unavailable:{reason}"))?;
     let expected_sha = format!("{:x}", Sha256::digest(source));
+    let mut args = vec![OsString::from("__syntax-worker"), OsString::from(language)];
+    if bindings {
+        args.push(OsString::from("--direct-bindings"));
+    }
     let spec = ProcessSpec {
         executable: executable.to_path_buf(),
-        args: vec![OsString::from("__syntax-worker"), OsString::from(language)],
+        args,
         cwd: PathBuf::from("/"),
         env: BTreeMap::new(),
         stdin: Some(source.to_vec()),
@@ -59,7 +107,7 @@ pub fn run_syntax_worker_candidate(
     if value["schema_version"] == "1.0.0" && value.get("structural_observations").is_some() {
         return Err("syntax_worker_version_fields_mismatch".into());
     }
-    if value["schema_version"] != "1.4.0"
+    if !matches!(value["schema_version"].as_str(), Some("1.4.0" | "1.5.0"))
         && value.get("parser_error_location_unavailable").is_some()
     {
         return Err("syntax_worker_version_fields_mismatch".into());
@@ -68,7 +116,7 @@ pub fn run_syntax_worker_candidate(
         serde_json::from_value(value).map_err(|_| "syntax_worker_report_invalid")?;
     if !matches!(
         report.schema_version.as_str(),
-        "1.0.0" | "1.1.0" | "1.2.0" | "1.3.0" | "1.4.0"
+        "1.0.0" | "1.1.0" | "1.2.0" | "1.3.0" | "1.4.0" | "1.5.0"
     ) || (report.schema_version == "1.0.0" && !report.structural_observations.is_empty())
         || (report.schema_version == "1.1.0"
             && (language != "python" || report.structural_observations.is_empty()))
@@ -78,6 +126,15 @@ pub fn run_syntax_worker_candidate(
             && (language != "cfquery" || report.structural_observations.is_empty()))
         || (report.schema_version == "1.4.0"
             && (report.parser_error_location_unavailable != Some(true) || !report.truncated))
+        || (report.schema_version == "1.5.0"
+            && (!bindings || language != "javascript" || report.structural_observations.is_empty()))
+        || (language == "javascript"
+            && !report.structural_observations.is_empty()
+            && report.schema_version != "1.5.0")
+        || (report.schema_version == "1.5.0"
+            && report
+                .parser_error_location_unavailable
+                .is_some_and(|flag| !flag || !report.truncated))
         || report.report_type != "syntax_worker_candidate"
         || report.language != language
         || report.grammar_sha256 != asset.sha256

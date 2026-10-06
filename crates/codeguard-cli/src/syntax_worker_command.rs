@@ -16,9 +16,15 @@ const MAX_RECOVERIES: usize = 128;
 /// 在独立进程中解析一份 stdin 源码；参数仅允许固定候选语种。
 /// 返回原始恢复观察，不赋予 grammar 验收、原生 lint 或交付权威。
 pub fn run(args: &[String]) -> ExitCode {
-    let [language] = args else {
-        eprintln!("语法工作进程参数无效");
-        return ExitCode::from(2);
+    let (language, bindings) = match args {
+        [language] => (language, false),
+        [language, option] if language == "javascript" && option == "--direct-bindings" => {
+            (language, true)
+        }
+        _ => {
+            eprintln!("语法工作进程参数无效");
+            return ExitCode::from(2);
+        }
     };
     let mut source = Vec::new();
     match std::io::stdin()
@@ -40,7 +46,7 @@ pub fn run(args: &[String]) -> ExitCode {
         eprintln!("语法工作进程输入不是 UTF-8");
         return ExitCode::from(3);
     }
-    match observe(language, &source) {
+    match observe(language, &source, bindings) {
         Ok(report) => match serde_json::to_string(&report) {
             Ok(json) => {
                 println!("{json}");
@@ -55,7 +61,7 @@ pub fn run(args: &[String]) -> ExitCode {
     }
 }
 
-fn observe(language: &str, source: &[u8]) -> Result<SyntaxWorkerEnvelope, String> {
+fn observe(language: &str, source: &[u8], bindings: bool) -> Result<SyntaxWorkerEnvelope, String> {
     let (asset, wasm) = bundled_grammar_candidate(language)?;
     if asset.codeguard_runtime_validation != "rust_loader_smoke_passed" {
         return Err("grammar 与当前 Rust WASM 运行时不兼容".into());
@@ -70,6 +76,36 @@ fn observe(language: &str, source: &[u8]) -> Result<SyntaxWorkerEnvelope, String
     let scanned = scan_wasm_recoveries(&tree, MAX_RECOVERIES)?;
     let mut structural_observations = Vec::new();
     let mut structural_truncated = false;
+    if bindings {
+        let kinds = codeguard_adapters::javascript_binding_node_kinds()?;
+        let scanned_bindings = codeguard_runtime::scan_wasm_sibling_bindings(
+            &tree,
+            source,
+            kinds.each_ref().map(String::as_str),
+            MAX_RECOVERIES,
+            200_000,
+        )?;
+        structural_truncated = scanned_bindings.truncated;
+        for binding in scanned_bindings.duplicates {
+            if scanned.recoveries.len() + structural_observations.len() == MAX_RECOVERIES {
+                structural_truncated = true;
+                break;
+            }
+            structural_observations.push(crate::syntax_worker_structure::SyntaxWorkerStructure {
+                basis: "codeguard_structure_rule".into(),
+                rule_id: "codeguard.javascript.duplicate_direct_lexical_binding".into(),
+                rule_version: "1.0.0".into(),
+                rule_sha256: codeguard_adapters::javascript_binding_rule_sha256(),
+                parent_syntax_kind: binding.parent_syntax_kind,
+                start_byte: binding.start_byte,
+                end_byte: binding.end_byte,
+                start_row: binding.start_row,
+                start_column_byte: binding.start_column_byte,
+                end_row: binding.end_row,
+                end_column_byte: binding.end_column_byte,
+            });
+        }
+    }
     if language == "python" {
         let blocks = scan_wasm_empty_blocks(&tree, MAX_RECOVERIES)?;
         structural_truncated = blocks.truncated;
@@ -174,7 +210,9 @@ fn observe(language: &str, source: &[u8]) -> Result<SyntaxWorkerEnvelope, String
         })
         .collect();
     Ok(SyntaxWorkerEnvelope {
-        schema_version: if scanned.parser_error_location_unavailable {
+        schema_version: if bindings && !structural_observations.is_empty() {
+            "1.5.0"
+        } else if scanned.parser_error_location_unavailable {
             "1.4.0"
         } else if structural_observations.is_empty() {
             "1.0.0"

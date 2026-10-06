@@ -1629,4 +1629,4 @@ WASM 首次闭环的实际执行路径、协议与误报分流见 [验收记录]
 
 Javadoc主源码选择以最近观察到的构建根为基准；没有独立构建根的`vendor/src/main/java/`不能借用外层主源集配置。Maven多文件探针排除归属于更近构建根的源码，内层未确认Javadoc配置时也不借父配置扫描。未解析源码仍可见并保持覆盖未完成；自定义源目录和Maven effective模型仍待实现。[验收](../tests/acceptance/javadoc-build-root-source-scope.md)
 
-runtime新增有界直接同级绑定AST事实。JavaScript开发测试将重复直接let/const名称与Node的module/CommonJS模式对照，保留嵌套作用域及var反例。该基础设施尚未接入公开worker报告、CLI检查或修复任务；现有公开发现及差分计数不变。须补语言规则、报告版本和原生确认接线后，才能成为用户可用能力。[验收](../tests/acceptance/javascript-direct-binding-facts.md)
+runtime的有界直接同级绑定AST事实现接入WASM源码构建的`grammar probe javascript FILE --format=json`，绑定固定规则包身份、隔离且显式选择的worker1.5及probe0.6。结果保留原始解析器恢复，明确只观察直接简单lexical绑定候选并要求原生确认，不猜测顶层return的module/CommonJS语义。项目check/lint、Hook和持久任务尚未升级到本规则，既有报告及差分计数不变。[运行时验收](../tests/acceptance/javascript-direct-binding-facts.md) · [Probe验收](../tests/acceptance/javascript-binding-probe.md)

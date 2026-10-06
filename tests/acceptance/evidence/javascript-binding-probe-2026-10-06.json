@@ -1,0 +1,46 @@
+{
+  "delivery_decision": "not_evaluated",
+  "grammar_qualified": false,
+  "grammar_sha256": "7978e62bcc851ab1d1f6dcd4678f9eda79df2b3b3490e75f81dd819d9bccccfa",
+  "language": "javascript",
+  "native": {
+    "reason": "explicit_candidate_probe",
+    "status": "not_run"
+  },
+  "next_action": "confirm_candidate_structure_with_applicable_native_tool",
+  "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-js-binding-35611-0/input.js",
+  "precheck": {
+    "cancelled": false,
+    "checked_files": 1,
+    "incomplete_files": 0,
+    "scope_complete": true,
+    "selected_files": 1,
+    "status": "incomplete",
+    "suspected_recoveries": 0,
+    "truncated_files": 0,
+    "unqualified_files": 1,
+    "unsupported_files": 0
+  },
+  "precheck_scope": "raw_parser_recoveries_and_observation_budgets",
+  "recoveries": [],
+  "report_type": "grammar_candidate_probe",
+  "schema_version": "0.6.0",
+  "source_sha256": "0a2c7877e24c4c58e60f45ef6999c46dc2cad670658d1e9713ccc6b1c9cb2e18",
+  "status": "incomplete",
+  "structural_observations": [
+    {
+      "basis": "codeguard_structure_rule",
+      "end_byte": 18,
+      "end_column_byte": 18,
+      "end_row": 0,
+      "parent_syntax_kind": "program",
+      "rule_id": "codeguard.javascript.duplicate_direct_lexical_binding",
+      "rule_sha256": "6d450c14bd4f89f0f3798f458fba371fb455a2642034d836c8ef988ef44641a4",
+      "rule_version": "1.0.0",
+      "start_byte": 17,
+      "start_column_byte": 17,
+      "start_row": 0
+    }
+  ],
+  "structural_rule_scope": "direct_simple_lexical_names_only"
+}
