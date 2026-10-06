@@ -138,7 +138,12 @@ Rustdoc逐问题反馈 MUST 提供问题证据、规则依据、允许修改的�
 #### Scenario: Cargo workspace documentation declarations require member opt-in
 - **WHEN** 成员使用唯一的 `lints.workspace = true` 且同次摘要稳定的最近祖先/本根清单包含 workspace 文档规则
 - **THEN** 分别关联成员与 workspace 的精确声明，显式来源仍可复核，配置保持 unknown；成员未选择继承不能套用祖先规则
-- **AND** 祖先不可读/变化/非法、显式 package.workspace 尚未解析或超预算时不借用更远工作区；成员归属、exclude/glob/源码属性/group/priority/目标生效范围仍须原 Cargo 核验，不能授予完整配置或文档资格
+- **AND** 祖先不可读/变化/非法、显式 package.workspace 无法解析或超预算时不借用更远工作区；成员归属、exclude/glob/源码属性/group/priority/目标生效范围仍须原 Cargo 核验，不能授予完整配置或文档资格
+
+#### Scenario: Explicit Cargo workspace documentation reference overrides ancestors
+- **WHEN** 继承成员声明 package.workspace 指向项目范围内一份已观察工作区清单
+- **THEN** 只关联该显式来源，保留成员和工作区摘要；支持普通相对路径的点/父目录组件，但必须先核对遍历目录，不越过链接、缺失目录或项目根
+- **AND** 显式引用非法、超预算、逃逸、不可读、变化或目标没有workspace时保留unknown且不回退祖先；观察不证明成员归属或完整规则/目标生效，不增加安装或工具执行
 
 #### Scenario: Standalone Rust lint has no native Cargo
 - **WHEN** 未显式选择Cargo且绝对PATH没有可用Cargo
