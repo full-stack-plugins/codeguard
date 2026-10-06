@@ -66,3 +66,10 @@ See [acceptance](../tests/acceptance/maven-javadoc-task-recheck.md). This increm
 ### Aggregate protocol for P3C configuration preparation
 
 `check_feedback 0.58.0` strictly describes a selected `java.maven.p3c` / `p3c_configuration_not_confirmed` preparation brief while retaining historical schemas. It remains a blocker with the review-project-policy action; missing configuration is not a source violation or an automatically required check. The schema includes the existing Java-selection reason. Actual aggregate output and both embedded briefs validate; forged checker, finding kind, reason, source-repair action, approved authority and delivery allow are rejected. Other P3C findings/tool-blocker branches keep their existing versions; this is not complete P3C protocol acceptance. See [acceptance](../tests/acceptance/p3c-preparation-aggregate-schema.md).
+
+
+### Gradle native Javadoc application service (partial development capability)
+
+`gradle_javadoc_probe::observe` captures the native model and reruns enabled official Javadoc tasks in one offline Gradle invocation. It preserves project doclint/doclet/access/source-set settings and fixes only the diagnostic JVM language. Rust validates selected source bytes and diagnostic locations; native failures, unknown diagnostics and input changes remain incomplete. Four observations within one real Gradle 8.10.2/JDK21 conditional test produce 3 missing-comment, 2 missing-tag, 2 empty-description, and 0 diagnostics. These are not an independent precision corpus or production acceptance. Empty output remains `empty_output_unverified` with `rule_configuration_complete=false` and `coverage_proven=false`.
+
+This internal service is not connected to public check quality tasks, agent feedback or repair closure. Existing check_feedback 0.62 still carries only the Gradle configuration model. Complete detailed documentation rules, JDK/source closure, multi-project/custom-doclet cases, both Maven/Gradle paths and per-language acceptance remain open. See [Gradle Javadoc acceptance](../tests/acceptance/gradle-native-javadoc.md).

@@ -993,3 +993,10 @@ flowchart LR
 ### 开发期CLI的Gradle配置观察
 
 `check java` / `check all`可显式提供`--gradle-bundle`、`--java-home`及可重复的`--gradle-project-file`，使用已有Gradle观察选定构建输入。统一调度处理超时与取消，check_feedback0.62将局部模型与质量结果分开保存；`lint all`拒绝此组参数。模型成功不证明完整配置覆盖，也不执行质量/漏洞任务。见[命令参考](docs/Codeguard-Command-Reference.zh_CN.md)和[验收](tests/acceptance/gradle-public-model-check.md)；未发布npm包或授予生产资格。
+
+
+### Gradle 原生 Javadoc 应用服务（开发期局部能力）
+
+新增 `gradle_javadoc_probe::observe` 在一次离线 Gradle 调用中采集模型并重跑已启用的官方 Javadoc 任务，使用原项目 doclint/doclet/访问范围/源集，只固定诊断 JVM 的英语语言。Rust 校验选定源码及诊断位置，原生失败、未知诊断、输入变化等保持未完成。真实 Gradle 8.10.2/JDK21 四组样例得到 3 条缺注释、2 条缺标签、2 条空标签描述、0 条诊断；这是一个原生条件测试中的四次观察，不是独立精度语料或生产验收。无诊断报告仍为 `empty_output_unverified`，`rule_configuration_complete=false`、`coverage_proven=false`。
+
+此服务尚未接入公开 check 的质量任务、智能体反馈及修复关闭；现有 check_feedback 0.62 仍仅记录 Gradle 配置模型。完整详细注释规则、完整 JDK/源码闭包、跨项目/自定义 doclet、Maven/Gradle 双路径及各语言验收仍待完成。见 [Gradle Javadoc 验收记录](tests/acceptance/gradle-native-javadoc.md)。

@@ -1,0 +1,313 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:gradle-javadoc-probe:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "report_type": {
+      "const": "gradle_javadoc_probe"
+    },
+    "native_status": {
+      "enum": [
+        "incomplete",
+        "findings_observed_unverified",
+        "empty_output_unverified"
+      ]
+    },
+    "reason": {
+      "enum": [
+        "gradle_javadoc_task_scope_invalid",
+        "gradle_javadoc_task_unavailable",
+        "gradle_native_model_incomplete",
+        "gradle_native_model_invalid",
+        "jdk21_version_unresolved",
+        "native_execution_incomplete",
+        "native_identity_changed_during_task",
+        "native_identity_unavailable",
+        "native_javadoc_output_unresolved",
+        "native_javadoc_source_unresolved",
+        "native_prerequisite_unavailable",
+        "native_process_incomplete",
+        "native_stdout_diagnostics_unresolved",
+        "private_workspace_unavailable",
+        "request_cancelled",
+        "request_deadline_exceeded",
+        "root_build_inputs_missing",
+        "selected_inputs_changed_during_task",
+        "selected_inputs_unavailable",
+        "selected_java_sources_missing",
+        "prerequisites_missing",
+        "selected_sources_and_complete_documentation_rules_unverified"
+      ]
+    },
+    "init_scripts_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "model_report_sha256": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "source_snapshot_sha256": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "gradle_bundle_sha256": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "java_entry_sha256": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "jdk_release_sha256": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "native_stdout_sha256": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "native_stderr_sha256": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      ]
+    },
+    "task_paths": {
+      "type": "array",
+      "maxItems": 128,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 2,
+        "maxLength": 1280,
+        "pattern": "^:[^\\\\/\\u0000-\\u001f]+$"
+      }
+    },
+    "selected_java_file_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 128
+    },
+    "findings": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          "rule_id": {
+            "enum": [
+              "JavadocMissingComment",
+              "JavadocDefaultConstructorMissingComment",
+              "JavadocMissingReturn",
+              "JavadocMissingParam",
+              "JavadocMissingThrows",
+              "JavadocEmptyParamDescription",
+              "JavadocEmptyReturnDescription"
+            ]
+          },
+          "line": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "column": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "path",
+          "rule_id",
+          "line",
+          "column"
+        ]
+      }
+    },
+    "rule_configuration_complete": {
+      "const": false
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    }
+  },
+  "required": [
+    "schema_version",
+    "report_type",
+    "native_status",
+    "reason",
+    "init_scripts_sha256",
+    "model_report_sha256",
+    "source_snapshot_sha256",
+    "gradle_bundle_sha256",
+    "java_entry_sha256",
+    "jdk_release_sha256",
+    "native_stdout_sha256",
+    "native_stderr_sha256",
+    "task_paths",
+    "selected_java_file_count",
+    "findings",
+    "rule_configuration_complete",
+    "coverage_proven",
+    "authority",
+    "delivery_decision"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "native_status": {
+            "const": "incomplete"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "findings": {
+            "maxItems": 0
+          },
+          "reason": {
+            "not": {
+              "const": "selected_sources_and_complete_documentation_rules_unverified"
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "reason": {
+            "const": "selected_sources_and_complete_documentation_rules_unverified"
+          },
+          "task_paths": {
+            "minItems": 1
+          },
+          "selected_java_file_count": {
+            "minimum": 1
+          },
+          "model_report_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "source_snapshot_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "gradle_bundle_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "java_entry_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "jdk_release_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "native_stdout_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "native_stderr_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "native_status": {
+            "const": "findings_observed_unverified"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "findings": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "native_status": {
+            "const": "empty_output_unverified"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "findings": {
+            "maxItems": 0
+          }
+        }
+      }
+    }
+  ]
+}

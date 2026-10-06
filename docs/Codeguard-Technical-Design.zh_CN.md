@@ -1880,3 +1880,10 @@ flowchart LR
 Rust 应用服务 `gradle_model_probe::observe` 可通过固定 init 脚本、已有 Gradle 和独立离线工作目录，观察选定构建文件对应的真实插件及任务实现基类/启用状态。已实测 Gradle 8.10.2 的 Groovy 多子项目与 Kotlin DSL；普通同名任务不授予 OWASP 身份。完整 Gradle 制品树、选定源码及脚本前后核对，JDK 目前只核对入口和 release。报告协议为 `gradle-model-probe-v0.1.schema.json`，保持局部未受信配置观察；不证明完整配置覆盖或质量检查通过。
 
 开发期CLI已通过 `check java` / `check all` 接入选定输入观察：显式提供 `--gradle-bundle`、`--java-home` 和可重复的 `--gradle-project-file`。复用统一调度与截止时间，check_feedback 0.62 在 `native_results.java_gradle_model` 单独保存模型；`lint all` 拒绝这组模型参数。detect/config explain 保持只读；后续仍需原生 Javadoc/规范/漏洞任务执行、报告归属、依赖图和漏洞库及修复闭环。真实测试与边界见 [原生模型局部采集验收](../tests/acceptance/gradle-native-model-probe.md)。
+
+
+### Gradle 原生 Javadoc 应用服务（开发期局部能力）
+
+新增 `gradle_javadoc_probe::observe` 在一次离线 Gradle 调用中采集模型并重跑已启用的官方 Javadoc 任务，使用原项目 doclint/doclet/访问范围/源集，只固定诊断 JVM 的英语语言。Rust 校验选定源码及诊断位置，原生失败、未知诊断、输入变化等保持未完成。真实 Gradle 8.10.2/JDK21 四组样例得到 3 条缺注释、2 条缺标签、2 条空标签描述、0 条诊断；这是一个原生条件测试中的四次观察，不是独立精度语料或生产验收。无诊断报告仍为 `empty_output_unverified`，`rule_configuration_complete=false`、`coverage_proven=false`。
+
+此服务尚未接入公开 check 的质量任务、智能体反馈及修复关闭；现有 check_feedback 0.62 仍仅记录 Gradle 配置模型。完整详细注释规则、完整 JDK/源码闭包、跨项目/自定义 doclet、Maven/Gradle 双路径及各语言验收仍待完成。见 [Gradle Javadoc 验收记录](../tests/acceptance/gradle-native-javadoc.md)。

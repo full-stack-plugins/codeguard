@@ -1,0 +1,28 @@
+// 与模型观察脚本一起使用，只选择已启用的官方Javadoc任务，不修改其规则或源集。
+gradle.projectsEvaluated {
+    def root = gradle.rootProject
+    def aggregate = 'codeguardRunJavadoc'
+    if (root.tasks.findByName(aggregate) != null) { throw new GradleException('codeguard_reserved_task_collision') }
+    def model = root.tasks.named('codeguardObserveCheckerModel')
+    def selected = []
+    root.allprojects.each { project ->
+        if (project.plugins.hasPlugin('java') || project.plugins.hasPlugin('java-library')) {
+            project.tasks.each { task ->
+                def type = task.class
+                def official = false
+                while (type != null) {
+                    if (type.name == 'org.gradle.api.tasks.javadoc.Javadoc') { official = true; break }
+                    type = type.superclass
+                }
+                if (official && task.enabled) {
+                    // 只固定原生诊断语言，不替换doclint、doclet、访问范围或源集。
+                    task.options.jFlags('-Duser.language=en', '-Duser.country=US')
+                    selected.add(task); task.mustRunAfter(model)
+                }
+                if (selected.size() > 128) { throw new GradleException('codeguard_javadoc_task_budget') }
+            }
+        }
+    }
+    if (selected.isEmpty()) { throw new GradleException('codeguard_javadoc_task_unavailable') }
+    root.tasks.register(aggregate) { dependsOn(model); dependsOn(selected) }
+}
