@@ -1196,3 +1196,6 @@ flowchart LR
     F --> H[Shared stable confirmation task]
     H --> I[Native confirmation or adapter decision]
 ```
+
+
+Erlang项目/编辑路径已串起原生优先、有界WASM结构兜底与稳定任务复检。环境阻塞、候选及原生复检沿用同一身份，零诊断不自行关闭。见[工作流与执行图](../tests/acceptance/erlang-form-workbench.md)。

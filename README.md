@@ -841,3 +841,6 @@ C/C++ source builds also accept explicit standalone native context: `codeguard l
 
 
 Explicit `grammar probe erlang FILE --format=json` now adds bounded direct-function-form termination candidates, separately from parser recovery. Literal punctuation and valid clause continuations are preserved; project/Hook/task integration and native precision acceptance remain open. See [acceptance](tests/acceptance/erlang-form-candidates.md).
+
+
+Erlang project and edit checks now prefer OTP, use the form-termination candidate when the tool is absent, and update one persistent task. Selected-tool failures never fall back to WASM; task rechecks preserve history and require original native confirmation. [Acceptance](tests/acceptance/erlang-form-workbench.md).

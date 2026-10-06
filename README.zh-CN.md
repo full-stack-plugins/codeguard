@@ -824,3 +824,6 @@ C/C++源码构建还支持明确的独立原生上下文：`codeguard lint c mai
 
 
 显式 `grammar probe erlang FILE --format=json` 已补充直接函数form终止符候选，与原始解析恢复分开；字面量标点和合法子句续接不误判。项目/Hook/任务接线及原生精度验收仍开放，见[验收](tests/acceptance/erlang-form-candidates.md)。
+
+
+Erlang 项目与编辑检查已原生优先，缺工具时补充函数终止符候选并更新同一持久任务；所选工具失败不回退WASM，原工具复检保留历史。[验收](tests/acceptance/erlang-form-workbench.md)。

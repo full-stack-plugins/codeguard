@@ -2145,6 +2145,14 @@ fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
         );
     }
     if blocker.checker_id == "syntax.native_confirmation"
+        && blocker.diagnostic_reason.as_deref() == Some("erlang_form_terminator_candidate")
+    {
+        return format!(
+            "# {} Erlang 函数终止符原生确认任务\n\n- 问题证据：范围 `{}`；报告 `.codeguard/reports/{}.json`，摘要 `{}`；独立函数form结构候选保留缺失句点或末尾分号位置，与ERROR/MISSING分开。\n- 规则依据：codeguard.erlang.form_terminator 1.0.0，仅直接AST标点和可能子句续接，不是已确认源码违规。\n- 允许修改范围：先核对OTP版本、原源码和预处理上下文；原生诊断成立后仅修复对应源码，不修改无关文件或关闭检查器。\n- 修复步骤：核对候选原字节位置；准备适用OTP28 erl，原生scanner/parser确认后才修复。字符串、字符、浮点和注释的句点不当终止符，子句名称及参数语义仍交原生检查。\n- 复检命令：codeguard task verify {} . --erl-tool <next建议或已核验绝对路径> --format=json。\n- 历史尝试：首次run {}；重复扫描、失败和复检追加在同一稳定任务。\n- 关闭条件：适用原工具、当前输入与正式关闭策略满足；安装、零候选、勾选或局部零诊断不自行关闭。\n",
+            blocker.id, blocker.scope, report.run_id, report.digest, blocker.id, report.run_id
+        );
+    }
+    if blocker.checker_id == "syntax.native_confirmation"
         && blocker.diagnostic_reason.as_deref() == Some("go_package_structure_candidate")
     {
         return format!(

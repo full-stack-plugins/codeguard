@@ -55,7 +55,9 @@ pub(crate) fn persist(root: &Path, syntax: &Value, deadline: Instant) -> Value {
                 .iter()
                 .any(|row| row.get("structural_observations").is_some())
             {
-                if language == "javascript" {
+                if language == "erlang" {
+                    "0.14.0"
+                } else if language == "javascript" {
                     "0.13.0"
                 } else if language == "go" {
                     "0.8.0"
@@ -161,11 +163,12 @@ pub(crate) fn valid_source_snapshot(workspace: &str, report: &Value, bytes: &[u8
     let (checker, reason, fingerprint) = identity(workspace, path, language);
     if !matches!(
         report["schema_version"].as_str(),
-        Some("0.1.0" | "0.3.0" | "0.7.0" | "0.8.0" | "0.11.0" | "0.13.0")
+        Some("0.1.0" | "0.3.0" | "0.7.0" | "0.8.0" | "0.11.0" | "0.13.0" | "0.14.0")
     ) || (report["schema_version"] == "0.7.0" && language != "python")
         || (report["schema_version"] == "0.8.0" && language != "go")
         || (report["schema_version"] == "0.11.0" && language != "cfquery")
         || (report["schema_version"] == "0.13.0" && language != "javascript")
+        || (report["schema_version"] == "0.14.0" && language != "erlang")
         || report["report_type"] != "syntax_confirmation_observation"
         || report["workspace_binding"] != "bound"
         || report["workspace_id"] != workspace
@@ -212,7 +215,7 @@ pub(crate) fn valid_source_snapshot(workspace: &str, report: &Value, bytes: &[u8
     rows.iter().all(|row| {
         let structural = matches!(
             report["schema_version"].as_str(),
-            Some("0.7.0" | "0.8.0" | "0.13.0")
+            Some("0.7.0" | "0.8.0" | "0.13.0" | "0.14.0")
         ) || (report["schema_version"] == "0.11.0"
             && row.get("structural_observations").is_some());
         let mut row_keys = vec![

@@ -1648,3 +1648,6 @@ The native warning profile explicitly enables Wall/Extra/Pedantic. Exit zero wit
 
 
 The explicit Erlang probe adds worker 1.6/probe 0.7 for direct function-form termination. Bounded AST sibling/token visits preserve an unresolved continuation on truncation; punctuation inside literals/comments is excluded. This is a structural candidate requiring OTP confirmation, not parser recovery. Current project/Hook/workbench consumers retain prior protocols pending versioned integration; raw-parser evaluation remains unchanged.
+
+
+Erlang project/edit integration uses check 0.55, confirmation 0.14 and Hook 0.28/fast 0.16. OTP runs first on the selected files; actual absence permits candidate fallback, whereas selected-tool failure remains native incomplete. Existing native/environment and later structural evidence share task identity. Consumed original reports stay bound to markers across source edits; fresh imports still verify current byte positions. See [workflow acceptance](../tests/acceptance/erlang-form-workbench.md).

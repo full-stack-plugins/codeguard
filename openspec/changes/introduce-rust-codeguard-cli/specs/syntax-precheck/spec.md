@@ -841,3 +841,8 @@ The system SHALL inspect direct function-form terminal tokens in the pinned Erla
 #### Scenario: Legal punctuation and multiple clauses
 - **WHEN** literal punctuation, comments, or a semicolon continuing the next function clause occurs
 - **THEN** only direct AST punctuation determines the candidate, and legal forms do not receive a termination candidate
+
+#### Scenario: Erlang structural candidates enter project and edit repair workflow
+- **WHEN** native Erlang is unavailable and project scanning or a confirmed edit discovers a direct function form termination candidate
+- **THEN** the shared bounded worker emits the same versioned structural evidence and updates one stable native-confirmation task, with original-tool recheck instructions and preserved attempt history
+- **AND** subsequent zero candidates cannot close that task, changed source retains its original consumed evidence, and forged rule/source/position reports cannot be imported

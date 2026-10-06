@@ -265,8 +265,9 @@ pub(crate) fn original(root: &Path, brief: &Value) -> Result<Value, &'static str
     } else {
         matches!(
             report["schema_version"].as_str(),
-            Some("0.1.0" | "0.3.0" | "0.8.0" | "0.11.0")
-        ) && (report["schema_version"] != "0.8.0" || go_structure_history(&report))
+            Some("0.1.0" | "0.3.0" | "0.8.0" | "0.11.0" | "0.14.0")
+        ) && (report["schema_version"] != "0.14.0" || erlang_form_history(&report))
+            && (report["schema_version"] != "0.8.0" || go_structure_history(&report))
             && (report["schema_version"] != "0.11.0"
                 || crate::syntax_confirmation::valid_report(root, &workspace, &report))
             && report["language"].as_str().is_some_and(|lang| {
@@ -1044,6 +1045,8 @@ fn initial_guidance(root: &Path, brief: &Value) -> Option<Value> {
     // 0.3 的候选协议专门保留无法定位的恢复，不把任务归并 reason_code 当作节点原因。
     let location = if original["schema_version"] == "0.3.0" {
         "固定 grammar 的恢复扫描未完成或错误无法定位；不虚构源码位置。"
+    } else if original["schema_version"] == "0.14.0" {
+        "Erlang函数form存在缺失句点或末尾分号的独立结构候选；先核对原字节位置，不把候选当作原生违规。"
     } else {
         "先核对固定 grammar 与当前源码的疑似证据。"
     };
@@ -1144,4 +1147,52 @@ fn go_structure_history(report: &Value) -> bool {
             structures[0].clone(),
         )
         .is_ok_and(|structure| structure.valid("go", b""))
+}
+
+// 只用于已消费且摘要仍匹配的原始报告读取；当前源码可能已修复，不能拿旧位置验证新源码。
+// 首次导入仍由syntax_confirmation::valid_report完整核验当前源码及原字节位置。
+fn erlang_form_history(report: &Value) -> bool {
+    let Some(rows) = report["observations"]
+        .as_array()
+        .filter(|rows| rows.len() == 1)
+    else {
+        return false;
+    };
+    let row = &rows[0];
+    let Some(count) = row["structural_observation_count"]
+        .as_u64()
+        .filter(|n| (1..=128).contains(n))
+    else {
+        return false;
+    };
+    let Some(structures) = row["structural_observations"]
+        .as_array()
+        .filter(|rows| rows.len() == (count as usize).min(8))
+    else {
+        return false;
+    };
+    report["language"] == "erlang"
+        && report["authority"] == "local_unverified"
+        && report["coverage_proven"] == false
+        && report["delivery_decision"] == "not_evaluated"
+        && row["language"] == "erlang"
+        && row["path"] == report["scope"]
+        && row["scope"] == "whole_file"
+        && row["byte_offset"] == 0
+        && row["source_sha256"].as_str().is_some_and(valid_sha)
+        && structures.iter().all(|value| {
+            serde_json::from_value::<crate::syntax_worker_structure::SyntaxWorkerStructure>(
+                value.clone(),
+            )
+            .is_ok_and(|s| {
+                s.basis == "codeguard_structure_rule"
+                    && s.rule_id == "codeguard.erlang.form_terminator"
+                    && s.rule_version == "1.0.0"
+                    && s.rule_sha256 == codeguard_adapters::erlang_form_rule_sha256()
+                    && s.parent_syntax_kind == "fun_decl"
+                    && s.start_byte <= s.end_byte
+                    && s.end_byte - s.start_byte <= 1
+                    && s.end_byte <= 1024 * 1024
+            })
+        })
 }
