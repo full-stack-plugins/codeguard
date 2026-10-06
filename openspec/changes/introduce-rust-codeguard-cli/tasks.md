@@ -22,7 +22,7 @@
 依赖：S01。覆盖：unified-cli-contract、verdict-integrity。
 
 - [ ] 2.1 实现统一命令语法、canonical ID/别名及只读 plan；验收：错参无进程副作用、plan 不运行构建/扫描。
-  进行中：相邻 Rust CLI 新增 C06 的只读 `plan_preview` 0.1，先校验类别/canonical 语言 ID，再静态观察配置；缺可信策略和工具锁时只列候选、不给执行 argv/正式义务、退出 3。目标集成测试验证伪造 Ruff 工具未运行及项目无新增文件，见 `codeguard-cli/tests/acceptance/plan-readonly-preview.md`。别名、可信政策、全量义务/DAG 和正式 CheckPlan 仍缺，不勾选。
+  进行中：相邻 Rust CLI 新增 C06 的只读 `plan_preview` 0.1，先校验类别/canonical 语言 ID，再静态观察配置；缺可信策略和工具锁时只列候选、不给执行 argv/正式义务、退出 3。目标集成测试验证伪造 Ruff 工具未运行及项目无新增文件，见 `codeguard-cli/tests/acceptance/plan-readonly-preview.md`。公共CLI别名已接通（见language-alias-cli验收）；可信政策、全量义务/DAG 和正式 CheckPlan 仍缺，不勾选。
 - [x] 2.2 定义请求/计划/报告/工具锁 JSON schemas 与兼容版本策略，提供完整正反例；验收：未知 major/非法枚举不按 PASS 消费，运行报告区分项目检查器的 `configured/missing/invalid/unknown` 与本次原生结果。证据：相邻 `codeguard-cli/schemas/run-report.schema.json` 的 1.2 协议、`crates/codeguard-cli/src/run_report.rs` 与 `tests/run_report_contract.rs` 的正反例；1.0 历史报告仍可读取，1.1 起区分配置和运行，1.2 起 finding 要求定位且检查器状态按构建根区分。此项只完成协议，不代表项目配置探测或宿主对话接线已完成。
   公共协议输入加固：Rust 检查请求和 RunReport 现从原始字节递归拒绝重复 JSON 键，并复用 16 MiB 输入上限；`delivery_gate`/`decision` 和嵌套 `jobs` 重复键反例先失败后通过。此校验只保证结构消费，不验证报告来源或正式门禁。
 - [ ] 2.3 实现 findings 与 completion 双维聚合及新退出码；验收：混合违规/缺工具返回 3 并保留全部发现，取消/内部异常优先级正确。
@@ -1894,3 +1894,10 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 - [x] 用既有javac21新增Java21语法8例原生对照，绑定工具和源码摘要，单独统计3TP/5TN；作者语料不当作独立盲测，不提升32grammar资格。
 
 见 tests/acceptance/java21-native-differential.md。Java目标4通过/0失败/0忽略；独立holdout、既有六项争议、全语言及真实宿主父任务继续开放。
+
+## 2026-10-06 公共CLI规范语言别名
+
+- [x] 接通九项明确别名到已注册canonical ID，在公开检查/plan语言位置归一，路径/工具/grammar/未知拼写保持原值。
+- [x] 只读九别名plan、六组公开原入口对照、三项位置/注册表约束测试及帮助/计划回归、严格Clippy验收。
+
+见 tests/acceptance/language-alias-cli.md。10CLI+3单元通过；不提升语言能力或planned状态，未改变公开npm；完整可信plan/全量类别/多平台及2.1父任务仍开放。
