@@ -3,7 +3,13 @@ use codeguard_runtime::{ProcessSpec, Termination, read_bounded_regular_file, run
 use crate::native_clang_profile::NativeClangProfile;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
-use std::{collections::BTreeMap, ffi::OsString, path::Path, sync::atomic::AtomicBool, time::Instant};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    ffi::OsString,
+    path::Path,
+    sync::atomic::AtomicBool,
+    time::Instant,
+};
 
 /// 使用固定Clang21对指定标准执行原生语法观察。
 /// 参数为明确工具/语言/标准/冻结源码及共同截止时间；返回有界规则及位置，未解析预处理仅作上下文阻塞。
@@ -113,7 +119,12 @@ fn observe_profile(
                 env: BTreeMap::new(),
                 stdin,
                 deadline,
-                output_limit_bytes: 64 * 1024,
+                output_limit_bytes: if matches!(profile, NativeClangProfile::DocumentationStructure)
+                {
+                    8 * 1024 * 1024
+                } else {
+                    64 * 1024
+                },
             },
             cancelled,
         )
@@ -153,6 +164,12 @@ fn observe_profile(
     let mut args: Vec<OsString> = flags.into_iter().map(OsString::from).collect();
     args.insert(1, OsString::from(format!("-std={standard}")));
     args.splice(7..7, profile.warning_flags().iter().map(OsString::from));
+    if matches!(profile, NativeClangProfile::DocumentationStructure) {
+        args.splice(
+            1..1,
+            [OsString::from("-Xclang"), OsString::from("-ast-dump=json")],
+        );
+    }
     let output = invoke(args, Some(source.to_vec()));
     if Instant::now() >= deadline {
         report["reason"] = json!("clang_execution_incomplete");
@@ -166,7 +183,7 @@ fn observe_profile(
         report["reason"] = json!("clang_execution_incomplete");
         return report;
     }
-    if !output.stdout.is_empty() {
+    if !matches!(profile, NativeClangProfile::DocumentationStructure) && !output.stdout.is_empty() {
         report["reason"] = json!("clang_report_invalid");
         return report;
     }
@@ -175,7 +192,13 @@ fn observe_profile(
         source,
         output.termination == Termination::Exited(0),
     ) {
-        Ok(rows) => {
+        Ok(mut rows) => {
+            if matches!(profile, NativeClangProfile::DocumentationStructure) {
+                report["structure_raw_diagnostic_count"] = json!(rows.len());
+                // AST输出可触发Clang重新读取注释；按脱敏规则/行列/等级归并并保留原条数。
+                let mut seen = BTreeSet::new();
+                rows.retain(|row| seen.insert(row.to_string()));
+            }
             report["status"] = json!(if rows.is_empty() {
                 "completed"
             } else {
@@ -190,5 +213,56 @@ fn observe_profile(
         }
         Err(reason) => report["reason"] = json!(reason),
     }
+    if matches!(profile, NativeClangProfile::DocumentationStructure)
+        && matches!(
+            report["status"].as_str(),
+            Some("completed" | "diagnostics_observed")
+        )
+        && output.termination == Termination::Exited(0)
+        && !report["diagnostics"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .any(|row| row["level"] == "error")
+    {
+        report["structure_observation"] = match codeguard_adapters::parse_clang_documentation_ast(
+            &output.stdout,
+            source,
+        ) {
+            Ok(observation) => {
+                json!({"status":"observed","reason":"clang_structure_observed","observation":observation})
+            }
+            Err(_) => {
+                json!({"status":"incomplete","reason":"clang_structure_report_invalid","observation":null})
+            }
+        };
+    }
     report
+}
+
+/// 同一冻结stdin原生扫描采集警告与文档结构；参数为固定工具/标准/截止时间和取消令牌。
+/// 返回原警告及独立结构对象；工具失稳、超时或原生错误均不提供有效结构。
+pub(crate) fn observe_documentation_with_structure(
+    tool: &Path,
+    language: &str,
+    standard: &str,
+    source: &[u8],
+    deadline: Instant,
+    cancelled: &AtomicBool,
+) -> (Value, Value) {
+    let mut native = observe_profile(
+        tool,
+        language,
+        standard,
+        source,
+        deadline,
+        cancelled,
+        NativeClangProfile::DocumentationStructure,
+    );
+    let mut structure=native.as_object_mut().and_then(|n|n.remove("structure_observation")).unwrap_or(json!({"status":"incomplete","reason":"clang_structure_unavailable","observation":null}));
+    structure["native_raw_diagnostic_count"] = native
+        .as_object_mut()
+        .and_then(|n| n.remove("structure_raw_diagnostic_count"))
+        .unwrap_or(Value::Null);
+    (native, structure)
 }

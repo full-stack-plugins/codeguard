@@ -44,3 +44,7 @@ Parent tasks remain open. Full detailed documentation, project context, public r
 实际验证：六项结构反例、既有规则与SARIF两项回归通过；默认/WASM各一项真实集成测试覆盖30份AST；两种构建的严格Clippy通过；488份历史schema字节不变、60份真实观察有效、9个伪造结果拒绝。[协议回归证据](evidence/clang-documentation-structure-schema.json)。CLI公开接线仍未完成，这些结果不勾选父任务。
 
 Verified: six structural tests plus two existing adapter regressions; one native integration test per build mode with 30 AST observations; strict Clippy in both modes; 488 historical schemas unchanged, 60 native observations valid and nine forged reports rejected. Public CLI wiring remains pending.
+
+后续公开接线：原comments入口现可反馈结构（未绑定0.5、已绑定0.6），check/结构任务及复检仍待实现。本文前述底层验收为294690b历史检查点；当前状态见[公开结构反馈](c-family-comments-structure-cli.md)。
+
+Follow-up: explicit comments now exposes structure in0.5/0.6 feedback. Check and structural task integration remain pending. The preceding foundation evidence is the294690b checkpoint; see the public feedback record for current status.

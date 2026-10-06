@@ -211,7 +211,7 @@ fn linked_source_cannot_redirect_observation_storage_into_another_project() {
         .unwrap();
     assert_eq!(out.status.code(), Some(3));
     let r: Value = serde_json::from_slice(&out.stdout).unwrap();
-    assert_eq!(r["schema_version"], "0.1.0");
+    assert_eq!(r["schema_version"], "0.5.0");
     assert_eq!(r["workspace_binding"], "not_bound");
     assert_eq!(r["documentation_findings"], json!([]));
     assert_eq!(
