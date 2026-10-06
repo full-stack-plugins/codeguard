@@ -1,0 +1,46 @@
+{
+  "change": "introduce-rust-codeguard-cli",
+  "date": "2026-10-06",
+  "source_base": "814ad02033bf8e26139b31d671626f8d3d1d040d",
+  "scope": "lint all actual SIGINT with controlled native processes",
+  "regression": {
+    "passed": 23,
+    "failed": 0,
+    "ignored": 3
+  },
+  "wasm_cancellation": {
+    "passed": 2,
+    "failed": 0,
+    "ignored": 0
+  },
+  "overlap_not_added": true,
+  "actual_native_accuracy": false,
+  "schema_reports": 2,
+  "negative_status_variants_per_report": 2,
+  "logs": [
+    {
+      "path": "/private/tmp/cg-lint-cancel-default.log",
+      "sha256": "1d55aaa0451498bd42e202f25f86230be83c5aa9a8524eb0877226e28e8ae961"
+    },
+    {
+      "path": "/private/tmp/cg-lint-cancel-wasm.log",
+      "sha256": "bc0736ea2a905ae8f070ae941113bb95da206b6f59c86438c044a0b127036dd3"
+    },
+    {
+      "path": "/private/tmp/cg-lint-cancel-regression.log",
+      "sha256": "904d2f34432ee560d66fd39b14123dbb3162aedbbb68dcd1ad8fe0c6cf1d4b45"
+    },
+    {
+      "path": "/private/tmp/cg-lint-cancel-clippy.log",
+      "sha256": "1f059f9ab48b7a9333356dc57727d5128efd20b4aa0f50bdb308d38feb654c52"
+    },
+    {
+      "path": "/private/tmp/cg-lint-cancel-default.json",
+      "sha256": "a75c9150db8dd0ad615b8b0488b80c54ecef318382235a52524c4ab4b08e4c01"
+    },
+    {
+      "path": "/private/tmp/cg-lint-cancel-wasm.json",
+      "sha256": "2bb9fb4e23a72aabb5964a896416431795bc72637c5fec84ac3689f9a5f2640b"
+    }
+  ]
+}
