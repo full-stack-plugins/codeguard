@@ -423,3 +423,15 @@ codeguard check java . --gradle-bundle /absolute/gradle-8.10.2 --java-home /abso
 ```
 
 Select the actual Groovy or Kotlin DSL files explicitly. The model describes only the selected copy and does not establish complete project coverage or execute documentation, convention or vulnerability tasks. All options are required together; paths must be unique normal relative files. The check remains incomplete, preserving the model separately in check_feedback 0.62. `check all` accepts the same options; `lint all` rejects them. This is local development CLI acceptance, without an npm release claim. See [public Gradle model acceptance](../tests/acceptance/gradle-public-model-check.md).
+
+
+### Explicit Gradle native documentation check
+
+The development `check java` / `check all` entry now accepts explicit `--gradle-javadoc` with `--gradle-bundle`, `--java-home`, and repeatable `--gradle-project-file` inputs including root settings/build and Java files. One scheduled `java.gradle.javadoc` job captures the model and executes original documentation tasks in one native invocation. Check feedback 0.63 preserves `native_results.java_gradle_javadoc`; it does not launch a second model invocation. Model-only requests retain 0.62; `lint all` rejects documentation options. SIGINT preserves cancellation observations, and check_aborted 0.17 preserves documentation observations before a sibling failure. Public quality feedback is connected; automatic task persistence, repair recheck/closure, complete rules and JDK/source closure, multi-project/custom-doclet and per-language qualification remain open. See [public Javadoc acceptance](../tests/acceptance/gradle-public-javadoc-check.md).
+
+```bash
+codeguard check java . --gradle-javadoc \
+  --gradle-bundle /absolute/gradle --java-home /absolute/jdk21 \
+  --gradle-project-file settings.gradle --gradle-project-file build.gradle \
+  --gradle-project-file src/main/java/Example.java --format json
+```

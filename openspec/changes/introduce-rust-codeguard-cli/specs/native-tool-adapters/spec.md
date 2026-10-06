@@ -821,3 +821,7 @@ The Gradle Javadoc application service SHALL select enabled tasks by the officia
 #### Scenario: Empty diagnostics do not prove detailed documentation compliance
 - **WHEN** native Gradle Javadoc emits no recognized diagnostics
 - **THEN** feedback remains empty_output_unverified with rule_configuration_complete=false and coverage_proven=false; public repair integration and full detailed documentation acceptance remain separate obligations
+
+#### Scenario: Public Java or all check explicitly selects Gradle documentation tasks
+- **WHEN** check java/all receives --gradle-javadoc together with an existing Gradle/JDK and selected build and Java inputs
+- **THEN** one scheduled java.gradle.javadoc task SHALL perform native model capture and original Javadoc checking, preserve separate java_gradle_javadoc feedback, and SHALL NOT run an additional configuration-model invocation or upgrade complete rule/coverage/delivery acceptance; invalid prerequisites and lint-only requests SHALL fail before native execution

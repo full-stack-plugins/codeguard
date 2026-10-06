@@ -164,3 +164,241 @@ fn actual_gradle_javadoc_preserves_missing_comments_and_documented_counterexampl
         fs::write(path, serde_json::to_vec_pretty(&reports).unwrap()).unwrap();
     }
 }
+
+fn public_command(project: &Project, selection: &str) -> std::process::Command {
+    public_command_with_tools(
+        project,
+        selection,
+        std::path::Path::new("/unavailable/gradle"),
+        std::path::Path::new("/unavailable/jdk"),
+    )
+}
+fn public_command_with_tools(
+    project: &Project,
+    selection: &str,
+    bundle: &std::path::Path,
+    jdk: &std::path::Path,
+) -> std::process::Command {
+    let mut command = std::process::Command::new(env!("CARGO_BIN_EXE_codeguard"));
+    command
+        .args(["check", selection])
+        .arg(&project.0)
+        .args(["--gradle-javadoc", "--gradle-bundle"])
+        .arg(bundle)
+        .arg("--java-home")
+        .arg(jdk)
+        .args([
+            "--gradle-project-file",
+            "settings.gradle",
+            "--gradle-project-file",
+            "build.gradle",
+            "--gradle-project-file",
+            "src/main/java/Sample.java",
+            "--format=json",
+        ])
+        .env("PATH", "/no/tools");
+    command
+}
+#[test]
+fn public_check_schedules_one_documentation_job_and_preserves_incomplete_feedback() {
+    let project = Project::new("public class Sample {}\n");
+    for selection in ["java", "all"] {
+        let output = public_command(&project, selection).output().unwrap();
+        assert_eq!(output.status.code(), Some(3), "{output:?}");
+        let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+        assert_eq!(report["schema_version"], "0.63.0");
+        assert!(report["native_results"].get("java_gradle_model").is_none());
+        assert_eq!(
+            report["native_results"]["java_gradle_javadoc"]["native_status"],
+            "incomplete"
+        );
+        let gradle_jobs = report["execution_tasks"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|j| j["id"].as_str().unwrap().starts_with("java.gradle."))
+            .collect::<Vec<_>>();
+        assert_eq!(gradle_jobs.len(), 1);
+        assert_eq!(gradle_jobs[0]["id"], "java.gradle.javadoc");
+        assert_ne!(report["delivery_decision"], "allow");
+        if let Some(dir) = std::env::var_os("CODEGUARD_TEST_GRADLE_JAVADOC_PUBLIC_REPORTS") {
+            fs::create_dir_all(&dir).unwrap();
+            fs::write(
+                PathBuf::from(dir).join(format!("{selection}-incomplete.json")),
+                serde_json::to_vec_pretty(&report).unwrap(),
+            )
+            .unwrap();
+        }
+    }
+}
+
+#[test]
+fn public_javadoc_selection_rejects_missing_sources_duplicate_and_lint_scope() {
+    let project = Project::new("public class Sample {}\n");
+    for mut command in [
+        {
+            let mut c = public_command(&project, "java");
+            c.arg("--gradle-javadoc");
+            c
+        },
+        public_command(&project, "rust"),
+        {
+            let mut c = std::process::Command::new(env!("CARGO_BIN_EXE_codeguard"));
+            c.args(["check", "java"])
+                .arg(&project.0)
+                .arg("--gradle-javadoc");
+            c
+        },
+        {
+            let mut c = std::process::Command::new(env!("CARGO_BIN_EXE_codeguard"));
+            c.args(["lint", "all"])
+                .arg(&project.0)
+                .arg("--gradle-javadoc");
+            c
+        },
+        {
+            let mut c = std::process::Command::new(env!("CARGO_BIN_EXE_codeguard"));
+            c.args(["check", "java"]).arg(&project.0).args([
+                "--gradle-javadoc",
+                "--gradle-bundle",
+                "/unavailable/gradle",
+                "--java-home",
+                "/unavailable/jdk",
+                "--gradle-project-file",
+                "settings.gradle",
+                "--gradle-project-file",
+                "build.gradle",
+            ]);
+            c
+        },
+    ] {
+        let output = command.env("PATH", "/no/tools").output().unwrap();
+        assert_eq!(output.status.code(), Some(2), "{output:?}");
+        assert!(output.stdout.is_empty());
+    }
+}
+#[test]
+#[ignore = "requires explicit existing Gradle8.10.2/JDK21; never installs"]
+fn actual_public_check_preserves_native_documentation_findings_without_coverage_upgrade() {
+    let bundle =
+        PathBuf::from(std::env::var_os("CODEGUARD_TEST_GRADLE_BUNDLE").expect("existing Gradle"));
+    let jdk = PathBuf::from(std::env::var_os("CODEGUARD_TEST_JAVA_HOME").expect("existing JDK"));
+    for (name, source, expected_count, status) in [
+        (
+            "missing",
+            "public class Sample {\n    public Sample() {}\n    public int add(int value) { return value + 1; }\n}\n",
+            3,
+            "findings_observed_unverified",
+        ),
+        (
+            "documented",
+            "/** Provides an example. */\npublic class Sample {\n    /** Creates the example. */\n    public Sample() {}\n    /** Adds one.\n     * @param value input value\n     * @return incremented value\n     */\n    public int add(int value) { return value + 1; }\n}\n",
+            0,
+            "empty_output_unverified",
+        ),
+    ] {
+        let project = Project::new(source);
+        let output = public_command_with_tools(&project, "java", &bundle, &jdk)
+            .output()
+            .unwrap();
+        assert_eq!(output.status.code(), Some(3), "{output:?}");
+        let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+        assert_eq!(report["schema_version"], "0.63.0");
+        let native = &report["native_results"]["java_gradle_javadoc"];
+        assert_eq!(native["native_status"], status, "{report}");
+        assert_eq!(native["findings"].as_array().unwrap().len(), expected_count);
+        for finding in native["findings"].as_array().unwrap() {
+            assert_eq!(finding["rule_id"], "JavadocMissingComment");
+            assert_eq!(finding["path"], "src/main/java/Sample.java");
+        }
+        assert_eq!(native["coverage_proven"], false);
+        assert_eq!(native["rule_configuration_complete"], false);
+        assert_ne!(report["delivery_decision"], "allow");
+        assert!(report["native_results"].get("java_gradle_model").is_none());
+        assert_eq!(
+            report["execution_tasks"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .filter(|r| r["id"] == "java.gradle.javadoc")
+                .count(),
+            1
+        );
+        if let Some(dir) = std::env::var_os("CODEGUARD_TEST_GRADLE_JAVADOC_PUBLIC_REPORTS") {
+            fs::create_dir_all(&dir).unwrap();
+            fs::write(
+                PathBuf::from(dir).join(format!("{name}-native.json")),
+                serde_json::to_vec_pretty(&report).unwrap(),
+            )
+            .unwrap();
+        }
+    }
+}
+
+#[test]
+fn public_javadoc_sigint_preserves_cancelled_native_observation() {
+    use std::os::unix::fs::PermissionsExt;
+    let project = Project::new("public class Sample {}\n");
+    let bundle = project.0.join("native-gradle");
+    let jdk = project.0.join("native-jdk");
+    fs::create_dir_all(bundle.join("bin")).unwrap();
+    fs::create_dir_all(jdk.join("bin")).unwrap();
+    fs::write(jdk.join("bin/java"), "controlled fixture").unwrap();
+    fs::write(jdk.join("release"), "JAVA_VERSION=\"21\"\n").unwrap();
+    let marker = project.0.join("native-started");
+    fs::write(
+        bundle.join("bin/gradle"),
+        format!(
+            "#!/bin/sh\nprintf started > '{}'\nexec /bin/sleep 30\n",
+            marker.display()
+        ),
+    )
+    .unwrap();
+    fs::set_permissions(bundle.join("bin/gradle"), fs::Permissions::from_mode(0o700)).unwrap();
+    let child = public_command_with_tools(&project, "java", &bundle, &jdk)
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()
+        .unwrap();
+    let until = Instant::now() + Duration::from_secs(10);
+    while !marker.exists() && Instant::now() < until {
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    assert!(marker.exists(), "native process did not start");
+    assert!(
+        std::process::Command::new("/bin/kill")
+            .args(["-INT", &child.id().to_string()])
+            .status()
+            .unwrap()
+            .success()
+    );
+    let output = child.wait_with_output().unwrap();
+    assert_eq!(output.status.code(), Some(130), "{output:?}");
+    let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(report["schema_version"], "0.63.0");
+    assert_eq!(
+        report["native_results"]["java_gradle_javadoc"]["reason"],
+        "request_cancelled"
+    );
+    assert!(
+        report["native_results"]["java_gradle_javadoc"]["findings"]
+            .as_array()
+            .unwrap()
+            .is_empty()
+    );
+    assert!(
+        report["execution_tasks"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|r| r["id"] == "java.gradle.javadoc" && r["status"] == "cancelled")
+    );
+    if let Some(dir) = std::env::var_os("CODEGUARD_TEST_GRADLE_JAVADOC_PUBLIC_REPORTS") {
+        fs::create_dir_all(&dir).unwrap();
+        fs::write(
+            PathBuf::from(dir).join("sigint.json"),
+            serde_json::to_vec_pretty(&report).unwrap(),
+        )
+        .unwrap();
+    }
+}
