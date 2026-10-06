@@ -462,3 +462,10 @@ The Python documentation entry now returns wrapper 0.2 with `documentation_confi
 
 
 Rust CVE observations now check same-run stability of RustSec crates/rust contents, membership and physical entry identities. Changed or unreadable database input prevents local completion even with valid native exit/JSON; valid candidates remain visible as incomplete observations. Routine root lock/Git housekeeping is outside advisory content. Shared budgets and bounded reads do not qualify database source or freshness; original protocol 0.1 and not_evaluated remain. See [database stability acceptance](../tests/acceptance/cargo-audit-database-stability.md).
+
+
+### Standalone native C/C++ documentation entry (source increment, not released)
+
+`codeguard comments c api.c --clang-tool /absolute/clang --standard c11 --format=json`; C++ selects `comments cpp api.cpp --standard c++17` with the same tool argument. The measured Apple Clang 21 documentation profile requires an explicit tool and matching standard, without installation. Three precise native SARIF rules cover empty command descriptions, unknown parameter names and return tags on void functions, with repair steps, comment-only scope and original-tool verification argv. Unknown rules remain separate. Invalid reports, changed inputs, cancellation and unresolved preprocessing cannot become source violations.
+
+The dedicated `c_family_comments_feedback` 0.1 observation leaves project configuration unknown and detailed-contract qualification ungranted. Completely missing comments may yield zero native diagnostics. Persistent documentation tasks, project checks and Hooks are still missing here: `next=null`, exit3 or cancellation130, without automatic closure or delivery permission. See the [16-case native evidence, execution path and remaining gaps](../tests/acceptance/c-family-comments-native.md).

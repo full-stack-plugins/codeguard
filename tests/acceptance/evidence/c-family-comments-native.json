@@ -1,0 +1,1209 @@
+{
+  "cases": [
+    {
+      "case_id": "c-param",
+      "expected_documentation_diagnostics": 1,
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "detailed_contract_qualification": "not_granted",
+        "documentation_configuration": {
+          "comment_scope": "recognized_documentation_comments_only",
+          "origin": "explicit_probe_profile",
+          "profile": "clang-documentation-v1",
+          "project_configuration": "unknown",
+          "rule_coverage": "limited",
+          "standard": "c11"
+        },
+        "documentation_findings": [
+          {
+            "allowed_changes": "documentation_comment_only",
+            "closing_condition": "original_native_recheck_and_approved_complete_coverage_required",
+            "column_byte": 4,
+            "level": "warning",
+            "line": 2,
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-c-72541-0/api.c",
+            "repair_steps": [
+              "查看原生定位处的实际文档命令，补充其参数、返回或其他命令所需的准确说明。",
+              "说明必须依据真实声明和行为契约，不能只保留标签、填写占位词或改动接口来迎合注释。"
+            ],
+            "rule_id": "clang.warn_doc_block_command_empty_paragraph",
+            "rule_summary": "文档命令缺少非空说明段落"
+          }
+        ],
+        "exit_code": 3,
+        "language": "c",
+        "local_scan_complete": true,
+        "native": {
+          "diagnostics": [
+            {
+              "column_byte": 4,
+              "level": "warning",
+              "line": 2,
+              "rule_id": "clang.warn_doc_block_command_empty_paragraph"
+            }
+          ],
+          "reason": "clang_native_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "next": null,
+        "next_actions": [
+          "按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
+          "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。"
+        ],
+        "operation": "comments",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-c-72541-0/api.c",
+        "reason": "native_documentation_coverage_unverified",
+        "report_type": "c_family_comments_feedback",
+        "schema_version": "0.1.0",
+        "source_sha256": "21832648d8e1385a1078398d3a43c5a6344bb1c16a519c943b30fd69ba7091f9",
+        "unclassified_native_diagnostics": [],
+        "verification_command": [
+          "codeguard",
+          "comments",
+          "c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-c-72541-0/api.c",
+          "--clang-tool",
+          "/usr/bin/clang",
+          "--standard",
+          "c11",
+          "--timeout",
+          "1800000ms",
+          "--format=json"
+        ],
+        "workspace_binding": "not_bound"
+      }
+    },
+    {
+      "case_id": "c-name",
+      "expected_documentation_diagnostics": 1,
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "detailed_contract_qualification": "not_granted",
+        "documentation_configuration": {
+          "comment_scope": "recognized_documentation_comments_only",
+          "origin": "explicit_probe_profile",
+          "profile": "clang-documentation-v1",
+          "project_configuration": "unknown",
+          "rule_coverage": "limited",
+          "standard": "c11"
+        },
+        "documentation_findings": [
+          {
+            "allowed_changes": "documentation_comment_only",
+            "closing_condition": "original_native_recheck_and_approved_complete_coverage_required",
+            "column_byte": 11,
+            "level": "warning",
+            "line": 2,
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-c-72541-0/api.c",
+            "repair_steps": [
+              "核对原生定位处的参数名及其关联函数的实际参数声明。",
+              "修正文档中的参数名并保留准确用途说明；不要为了使注释通过而改动函数签名。"
+            ],
+            "rule_id": "clang.warn_doc_param_not_found",
+            "rule_summary": "文档参数名与实际函数声明不一致"
+          }
+        ],
+        "exit_code": 3,
+        "language": "c",
+        "local_scan_complete": true,
+        "native": {
+          "diagnostics": [
+            {
+              "column_byte": 11,
+              "level": "warning",
+              "line": 2,
+              "rule_id": "clang.warn_doc_param_not_found"
+            }
+          ],
+          "reason": "clang_native_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "next": null,
+        "next_actions": [
+          "按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
+          "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。"
+        ],
+        "operation": "comments",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-c-72541-0/api.c",
+        "reason": "native_documentation_coverage_unverified",
+        "report_type": "c_family_comments_feedback",
+        "schema_version": "0.1.0",
+        "source_sha256": "bc6b369cc0366b3b30c7cf3613dbbbdecf814d1ae1d21e006a97e1c2aee5db45",
+        "unclassified_native_diagnostics": [],
+        "verification_command": [
+          "codeguard",
+          "comments",
+          "c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-c-72541-0/api.c",
+          "--clang-tool",
+          "/usr/bin/clang",
+          "--standard",
+          "c11",
+          "--timeout",
+          "1800000ms",
+          "--format=json"
+        ],
+        "workspace_binding": "not_bound"
+      }
+    },
+    {
+      "case_id": "c-return",
+      "expected_documentation_diagnostics": 1,
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "detailed_contract_qualification": "not_granted",
+        "documentation_configuration": {
+          "comment_scope": "recognized_documentation_comments_only",
+          "origin": "explicit_probe_profile",
+          "profile": "clang-documentation-v1",
+          "project_configuration": "unknown",
+          "rule_coverage": "limited",
+          "standard": "c11"
+        },
+        "documentation_findings": [
+          {
+            "allowed_changes": "documentation_comment_only",
+            "closing_condition": "original_native_recheck_and_approved_complete_coverage_required",
+            "column_byte": 4,
+            "level": "warning",
+            "line": 3,
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-c-72541-0/api.c",
+            "repair_steps": [
+              "查看原生定位处的实际文档命令，补充其参数、返回或其他命令所需的准确说明。",
+              "说明必须依据真实声明和行为契约，不能只保留标签、填写占位词或改动接口来迎合注释。"
+            ],
+            "rule_id": "clang.warn_doc_block_command_empty_paragraph",
+            "rule_summary": "文档命令缺少非空说明段落"
+          }
+        ],
+        "exit_code": 3,
+        "language": "c",
+        "local_scan_complete": true,
+        "native": {
+          "diagnostics": [
+            {
+              "column_byte": 4,
+              "level": "warning",
+              "line": 3,
+              "rule_id": "clang.warn_doc_block_command_empty_paragraph"
+            }
+          ],
+          "reason": "clang_native_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "next": null,
+        "next_actions": [
+          "按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
+          "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。"
+        ],
+        "operation": "comments",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-c-72541-0/api.c",
+        "reason": "native_documentation_coverage_unverified",
+        "report_type": "c_family_comments_feedback",
+        "schema_version": "0.1.0",
+        "source_sha256": "78bace14cfc3515eb11c6ef401741d4c98ae274e8c30b0de55b35c83f710186b",
+        "unclassified_native_diagnostics": [],
+        "verification_command": [
+          "codeguard",
+          "comments",
+          "c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-c-72541-0/api.c",
+          "--clang-tool",
+          "/usr/bin/clang",
+          "--standard",
+          "c11",
+          "--timeout",
+          "1800000ms",
+          "--format=json"
+        ],
+        "workspace_binding": "not_bound"
+      }
+    },
+    {
+      "case_id": "c-void",
+      "expected_documentation_diagnostics": 1,
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "detailed_contract_qualification": "not_granted",
+        "documentation_configuration": {
+          "comment_scope": "recognized_documentation_comments_only",
+          "origin": "explicit_probe_profile",
+          "profile": "clang-documentation-v1",
+          "project_configuration": "unknown",
+          "rule_coverage": "limited",
+          "standard": "c11"
+        },
+        "documentation_findings": [
+          {
+            "allowed_changes": "documentation_comment_only",
+            "closing_condition": "original_native_recheck_and_approved_complete_coverage_required",
+            "column_byte": 4,
+            "level": "warning",
+            "line": 2,
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-c-72541-0/api.c",
+            "repair_steps": [
+              "核对实际返回类型与该文档注释的关联对象。",
+              "删除不适用的返回值标签，并按实际行为补充副作用或错误处理契约；不要改变返回类型绕过原规则。"
+            ],
+            "rule_id": "clang.warn_doc_returns_attached_to_a_void_function",
+            "rule_summary": "返回说明附着在void函数上"
+          }
+        ],
+        "exit_code": 3,
+        "language": "c",
+        "local_scan_complete": true,
+        "native": {
+          "diagnostics": [
+            {
+              "column_byte": 4,
+              "level": "warning",
+              "line": 2,
+              "rule_id": "clang.warn_doc_returns_attached_to_a_void_function"
+            }
+          ],
+          "reason": "clang_native_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "next": null,
+        "next_actions": [
+          "按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
+          "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。"
+        ],
+        "operation": "comments",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-c-72541-0/api.c",
+        "reason": "native_documentation_coverage_unverified",
+        "report_type": "c_family_comments_feedback",
+        "schema_version": "0.1.0",
+        "source_sha256": "40ce9aecdefc07dcc53549f313efeb109b1f2ef69d9951937dc7b072be4a0865",
+        "unclassified_native_diagnostics": [],
+        "verification_command": [
+          "codeguard",
+          "comments",
+          "c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-c-72541-0/api.c",
+          "--clang-tool",
+          "/usr/bin/clang",
+          "--standard",
+          "c11",
+          "--timeout",
+          "1800000ms",
+          "--format=json"
+        ],
+        "workspace_binding": "not_bound"
+      }
+    },
+    {
+      "case_id": "c-bare",
+      "expected_documentation_diagnostics": 2,
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "detailed_contract_qualification": "not_granted",
+        "documentation_configuration": {
+          "comment_scope": "recognized_documentation_comments_only",
+          "origin": "explicit_probe_profile",
+          "profile": "clang-documentation-v1",
+          "project_configuration": "unknown",
+          "rule_coverage": "limited",
+          "standard": "c11"
+        },
+        "documentation_findings": [
+          {
+            "allowed_changes": "documentation_comment_only",
+            "closing_condition": "original_native_recheck_and_approved_complete_coverage_required",
+            "column_byte": 5,
+            "level": "warning",
+            "line": 1,
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-c-72541-0/api.c",
+            "repair_steps": [
+              "查看原生定位处的实际文档命令，补充其参数、返回或其他命令所需的准确说明。",
+              "说明必须依据真实声明和行为契约，不能只保留标签、填写占位词或改动接口来迎合注释。"
+            ],
+            "rule_id": "clang.warn_doc_block_command_empty_paragraph",
+            "rule_summary": "文档命令缺少非空说明段落"
+          },
+          {
+            "allowed_changes": "documentation_comment_only",
+            "closing_condition": "original_native_recheck_and_approved_complete_coverage_required",
+            "column_byte": 4,
+            "level": "warning",
+            "line": 2,
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-c-72541-0/api.c",
+            "repair_steps": [
+              "查看原生定位处的实际文档命令，补充其参数、返回或其他命令所需的准确说明。",
+              "说明必须依据真实声明和行为契约，不能只保留标签、填写占位词或改动接口来迎合注释。"
+            ],
+            "rule_id": "clang.warn_doc_block_command_empty_paragraph",
+            "rule_summary": "文档命令缺少非空说明段落"
+          }
+        ],
+        "exit_code": 3,
+        "language": "c",
+        "local_scan_complete": true,
+        "native": {
+          "diagnostics": [
+            {
+              "column_byte": 5,
+              "level": "warning",
+              "line": 1,
+              "rule_id": "clang.warn_doc_block_command_empty_paragraph"
+            },
+            {
+              "column_byte": 4,
+              "level": "warning",
+              "line": 2,
+              "rule_id": "clang.warn_doc_block_command_empty_paragraph"
+            }
+          ],
+          "reason": "clang_native_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "next": null,
+        "next_actions": [
+          "按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
+          "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。"
+        ],
+        "operation": "comments",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-c-72541-0/api.c",
+        "reason": "native_documentation_coverage_unverified",
+        "report_type": "c_family_comments_feedback",
+        "schema_version": "0.1.0",
+        "source_sha256": "0456e1e57db420e07e0ddf4609c67092f34ffd5ea3934fcef9db91a62bd065c2",
+        "unclassified_native_diagnostics": [],
+        "verification_command": [
+          "codeguard",
+          "comments",
+          "c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-c-72541-0/api.c",
+          "--clang-tool",
+          "/usr/bin/clang",
+          "--standard",
+          "c11",
+          "--timeout",
+          "1800000ms",
+          "--format=json"
+        ],
+        "workspace_binding": "not_bound"
+      }
+    },
+    {
+      "case_id": "c-unicode",
+      "expected_documentation_diagnostics": 1,
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "detailed_contract_qualification": "not_granted",
+        "documentation_configuration": {
+          "comment_scope": "recognized_documentation_comments_only",
+          "origin": "explicit_probe_profile",
+          "profile": "clang-documentation-v1",
+          "project_configuration": "unknown",
+          "rule_coverage": "limited",
+          "standard": "c11"
+        },
+        "documentation_findings": [
+          {
+            "allowed_changes": "documentation_comment_only",
+            "closing_condition": "original_native_recheck_and_approved_complete_coverage_required",
+            "column_byte": 4,
+            "level": "warning",
+            "line": 2,
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-c-72541-0/api.c",
+            "repair_steps": [
+              "查看原生定位处的实际文档命令，补充其参数、返回或其他命令所需的准确说明。",
+              "说明必须依据真实声明和行为契约，不能只保留标签、填写占位词或改动接口来迎合注释。"
+            ],
+            "rule_id": "clang.warn_doc_block_command_empty_paragraph",
+            "rule_summary": "文档命令缺少非空说明段落"
+          }
+        ],
+        "exit_code": 3,
+        "language": "c",
+        "local_scan_complete": true,
+        "native": {
+          "diagnostics": [
+            {
+              "column_byte": 4,
+              "level": "warning",
+              "line": 2,
+              "rule_id": "clang.warn_doc_block_command_empty_paragraph"
+            }
+          ],
+          "reason": "clang_native_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "next": null,
+        "next_actions": [
+          "按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
+          "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。"
+        ],
+        "operation": "comments",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-c-72541-0/api.c",
+        "reason": "native_documentation_coverage_unverified",
+        "report_type": "c_family_comments_feedback",
+        "schema_version": "0.1.0",
+        "source_sha256": "161ce40b6eaff85a581e7c4f102cc5f6e5f8083776e091c2afae1a1b047fc4bb",
+        "unclassified_native_diagnostics": [],
+        "verification_command": [
+          "codeguard",
+          "comments",
+          "c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-c-72541-0/api.c",
+          "--clang-tool",
+          "/usr/bin/clang",
+          "--standard",
+          "c11",
+          "--timeout",
+          "1800000ms",
+          "--format=json"
+        ],
+        "workspace_binding": "not_bound"
+      }
+    },
+    {
+      "case_id": "c-good",
+      "expected_documentation_diagnostics": 0,
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "detailed_contract_qualification": "not_granted",
+        "documentation_configuration": {
+          "comment_scope": "recognized_documentation_comments_only",
+          "origin": "explicit_probe_profile",
+          "profile": "clang-documentation-v1",
+          "project_configuration": "unknown",
+          "rule_coverage": "limited",
+          "standard": "c11"
+        },
+        "documentation_findings": [],
+        "exit_code": 3,
+        "language": "c",
+        "local_scan_complete": true,
+        "native": {
+          "diagnostics": [],
+          "reason": "clang_native_no_diagnostics",
+          "status": "completed",
+          "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "next": null,
+        "next_actions": [
+          "按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
+          "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。"
+        ],
+        "operation": "comments",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-c-72541-0/api.c",
+        "reason": "native_documentation_coverage_unverified",
+        "report_type": "c_family_comments_feedback",
+        "schema_version": "0.1.0",
+        "source_sha256": "54755b588e6da23b011f0cfeb7e9c688d334d7f76625ddbfab65d5ff4a18ee6b",
+        "unclassified_native_diagnostics": [],
+        "verification_command": [
+          "codeguard",
+          "comments",
+          "c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-c-72541-0/api.c",
+          "--clang-tool",
+          "/usr/bin/clang",
+          "--standard",
+          "c11",
+          "--timeout",
+          "1800000ms",
+          "--format=json"
+        ],
+        "workspace_binding": "not_bound"
+      }
+    },
+    {
+      "case_id": "c-missing",
+      "expected_documentation_diagnostics": 0,
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "detailed_contract_qualification": "not_granted",
+        "documentation_configuration": {
+          "comment_scope": "recognized_documentation_comments_only",
+          "origin": "explicit_probe_profile",
+          "profile": "clang-documentation-v1",
+          "project_configuration": "unknown",
+          "rule_coverage": "limited",
+          "standard": "c11"
+        },
+        "documentation_findings": [],
+        "exit_code": 3,
+        "language": "c",
+        "local_scan_complete": true,
+        "native": {
+          "diagnostics": [],
+          "reason": "clang_native_no_diagnostics",
+          "status": "completed",
+          "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "next": null,
+        "next_actions": [
+          "按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
+          "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。"
+        ],
+        "operation": "comments",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-c-72541-0/api.c",
+        "reason": "native_documentation_coverage_unverified",
+        "report_type": "c_family_comments_feedback",
+        "schema_version": "0.1.0",
+        "source_sha256": "b1816a03bf1f31859af3acf3f3efaceca48519d9e7bd7fb1fa259af373825241",
+        "unclassified_native_diagnostics": [],
+        "verification_command": [
+          "codeguard",
+          "comments",
+          "c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-c-72541-0/api.c",
+          "--clang-tool",
+          "/usr/bin/clang",
+          "--standard",
+          "c11",
+          "--timeout",
+          "1800000ms",
+          "--format=json"
+        ],
+        "workspace_binding": "not_bound"
+      }
+    },
+    {
+      "case_id": "cpp-param",
+      "expected_documentation_diagnostics": 1,
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "detailed_contract_qualification": "not_granted",
+        "documentation_configuration": {
+          "comment_scope": "recognized_documentation_comments_only",
+          "origin": "explicit_probe_profile",
+          "profile": "clang-documentation-v1",
+          "project_configuration": "unknown",
+          "rule_coverage": "limited",
+          "standard": "c++17"
+        },
+        "documentation_findings": [
+          {
+            "allowed_changes": "documentation_comment_only",
+            "closing_condition": "original_native_recheck_and_approved_complete_coverage_required",
+            "column_byte": 4,
+            "level": "warning",
+            "line": 2,
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-cpp-72541-1/api.cpp",
+            "repair_steps": [
+              "查看原生定位处的实际文档命令，补充其参数、返回或其他命令所需的准确说明。",
+              "说明必须依据真实声明和行为契约，不能只保留标签、填写占位词或改动接口来迎合注释。"
+            ],
+            "rule_id": "clang.warn_doc_block_command_empty_paragraph",
+            "rule_summary": "文档命令缺少非空说明段落"
+          }
+        ],
+        "exit_code": 3,
+        "language": "cpp",
+        "local_scan_complete": true,
+        "native": {
+          "diagnostics": [
+            {
+              "column_byte": 4,
+              "level": "warning",
+              "line": 2,
+              "rule_id": "clang.warn_doc_block_command_empty_paragraph"
+            }
+          ],
+          "reason": "clang_native_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "next": null,
+        "next_actions": [
+          "按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
+          "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。"
+        ],
+        "operation": "comments",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-cpp-72541-1/api.cpp",
+        "reason": "native_documentation_coverage_unverified",
+        "report_type": "c_family_comments_feedback",
+        "schema_version": "0.1.0",
+        "source_sha256": "21832648d8e1385a1078398d3a43c5a6344bb1c16a519c943b30fd69ba7091f9",
+        "unclassified_native_diagnostics": [],
+        "verification_command": [
+          "codeguard",
+          "comments",
+          "cpp",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-cpp-72541-1/api.cpp",
+          "--clang-tool",
+          "/usr/bin/clang",
+          "--standard",
+          "c++17",
+          "--timeout",
+          "1800000ms",
+          "--format=json"
+        ],
+        "workspace_binding": "not_bound"
+      }
+    },
+    {
+      "case_id": "cpp-name",
+      "expected_documentation_diagnostics": 1,
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "detailed_contract_qualification": "not_granted",
+        "documentation_configuration": {
+          "comment_scope": "recognized_documentation_comments_only",
+          "origin": "explicit_probe_profile",
+          "profile": "clang-documentation-v1",
+          "project_configuration": "unknown",
+          "rule_coverage": "limited",
+          "standard": "c++17"
+        },
+        "documentation_findings": [
+          {
+            "allowed_changes": "documentation_comment_only",
+            "closing_condition": "original_native_recheck_and_approved_complete_coverage_required",
+            "column_byte": 11,
+            "level": "warning",
+            "line": 2,
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-cpp-72541-1/api.cpp",
+            "repair_steps": [
+              "核对原生定位处的参数名及其关联函数的实际参数声明。",
+              "修正文档中的参数名并保留准确用途说明；不要为了使注释通过而改动函数签名。"
+            ],
+            "rule_id": "clang.warn_doc_param_not_found",
+            "rule_summary": "文档参数名与实际函数声明不一致"
+          }
+        ],
+        "exit_code": 3,
+        "language": "cpp",
+        "local_scan_complete": true,
+        "native": {
+          "diagnostics": [
+            {
+              "column_byte": 11,
+              "level": "warning",
+              "line": 2,
+              "rule_id": "clang.warn_doc_param_not_found"
+            }
+          ],
+          "reason": "clang_native_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "next": null,
+        "next_actions": [
+          "按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
+          "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。"
+        ],
+        "operation": "comments",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-cpp-72541-1/api.cpp",
+        "reason": "native_documentation_coverage_unverified",
+        "report_type": "c_family_comments_feedback",
+        "schema_version": "0.1.0",
+        "source_sha256": "bc6b369cc0366b3b30c7cf3613dbbbdecf814d1ae1d21e006a97e1c2aee5db45",
+        "unclassified_native_diagnostics": [],
+        "verification_command": [
+          "codeguard",
+          "comments",
+          "cpp",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-cpp-72541-1/api.cpp",
+          "--clang-tool",
+          "/usr/bin/clang",
+          "--standard",
+          "c++17",
+          "--timeout",
+          "1800000ms",
+          "--format=json"
+        ],
+        "workspace_binding": "not_bound"
+      }
+    },
+    {
+      "case_id": "cpp-return",
+      "expected_documentation_diagnostics": 1,
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "detailed_contract_qualification": "not_granted",
+        "documentation_configuration": {
+          "comment_scope": "recognized_documentation_comments_only",
+          "origin": "explicit_probe_profile",
+          "profile": "clang-documentation-v1",
+          "project_configuration": "unknown",
+          "rule_coverage": "limited",
+          "standard": "c++17"
+        },
+        "documentation_findings": [
+          {
+            "allowed_changes": "documentation_comment_only",
+            "closing_condition": "original_native_recheck_and_approved_complete_coverage_required",
+            "column_byte": 4,
+            "level": "warning",
+            "line": 3,
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-cpp-72541-1/api.cpp",
+            "repair_steps": [
+              "查看原生定位处的实际文档命令，补充其参数、返回或其他命令所需的准确说明。",
+              "说明必须依据真实声明和行为契约，不能只保留标签、填写占位词或改动接口来迎合注释。"
+            ],
+            "rule_id": "clang.warn_doc_block_command_empty_paragraph",
+            "rule_summary": "文档命令缺少非空说明段落"
+          }
+        ],
+        "exit_code": 3,
+        "language": "cpp",
+        "local_scan_complete": true,
+        "native": {
+          "diagnostics": [
+            {
+              "column_byte": 4,
+              "level": "warning",
+              "line": 3,
+              "rule_id": "clang.warn_doc_block_command_empty_paragraph"
+            }
+          ],
+          "reason": "clang_native_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "next": null,
+        "next_actions": [
+          "按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
+          "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。"
+        ],
+        "operation": "comments",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-cpp-72541-1/api.cpp",
+        "reason": "native_documentation_coverage_unverified",
+        "report_type": "c_family_comments_feedback",
+        "schema_version": "0.1.0",
+        "source_sha256": "78bace14cfc3515eb11c6ef401741d4c98ae274e8c30b0de55b35c83f710186b",
+        "unclassified_native_diagnostics": [],
+        "verification_command": [
+          "codeguard",
+          "comments",
+          "cpp",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-cpp-72541-1/api.cpp",
+          "--clang-tool",
+          "/usr/bin/clang",
+          "--standard",
+          "c++17",
+          "--timeout",
+          "1800000ms",
+          "--format=json"
+        ],
+        "workspace_binding": "not_bound"
+      }
+    },
+    {
+      "case_id": "cpp-void",
+      "expected_documentation_diagnostics": 1,
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "detailed_contract_qualification": "not_granted",
+        "documentation_configuration": {
+          "comment_scope": "recognized_documentation_comments_only",
+          "origin": "explicit_probe_profile",
+          "profile": "clang-documentation-v1",
+          "project_configuration": "unknown",
+          "rule_coverage": "limited",
+          "standard": "c++17"
+        },
+        "documentation_findings": [
+          {
+            "allowed_changes": "documentation_comment_only",
+            "closing_condition": "original_native_recheck_and_approved_complete_coverage_required",
+            "column_byte": 4,
+            "level": "warning",
+            "line": 2,
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-cpp-72541-1/api.cpp",
+            "repair_steps": [
+              "核对实际返回类型与该文档注释的关联对象。",
+              "删除不适用的返回值标签，并按实际行为补充副作用或错误处理契约；不要改变返回类型绕过原规则。"
+            ],
+            "rule_id": "clang.warn_doc_returns_attached_to_a_void_function",
+            "rule_summary": "返回说明附着在void函数上"
+          }
+        ],
+        "exit_code": 3,
+        "language": "cpp",
+        "local_scan_complete": true,
+        "native": {
+          "diagnostics": [
+            {
+              "column_byte": 4,
+              "level": "warning",
+              "line": 2,
+              "rule_id": "clang.warn_doc_returns_attached_to_a_void_function"
+            }
+          ],
+          "reason": "clang_native_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "next": null,
+        "next_actions": [
+          "按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
+          "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。"
+        ],
+        "operation": "comments",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-cpp-72541-1/api.cpp",
+        "reason": "native_documentation_coverage_unverified",
+        "report_type": "c_family_comments_feedback",
+        "schema_version": "0.1.0",
+        "source_sha256": "40ce9aecdefc07dcc53549f313efeb109b1f2ef69d9951937dc7b072be4a0865",
+        "unclassified_native_diagnostics": [],
+        "verification_command": [
+          "codeguard",
+          "comments",
+          "cpp",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-cpp-72541-1/api.cpp",
+          "--clang-tool",
+          "/usr/bin/clang",
+          "--standard",
+          "c++17",
+          "--timeout",
+          "1800000ms",
+          "--format=json"
+        ],
+        "workspace_binding": "not_bound"
+      }
+    },
+    {
+      "case_id": "cpp-bare",
+      "expected_documentation_diagnostics": 2,
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "detailed_contract_qualification": "not_granted",
+        "documentation_configuration": {
+          "comment_scope": "recognized_documentation_comments_only",
+          "origin": "explicit_probe_profile",
+          "profile": "clang-documentation-v1",
+          "project_configuration": "unknown",
+          "rule_coverage": "limited",
+          "standard": "c++17"
+        },
+        "documentation_findings": [
+          {
+            "allowed_changes": "documentation_comment_only",
+            "closing_condition": "original_native_recheck_and_approved_complete_coverage_required",
+            "column_byte": 5,
+            "level": "warning",
+            "line": 1,
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-cpp-72541-1/api.cpp",
+            "repair_steps": [
+              "查看原生定位处的实际文档命令，补充其参数、返回或其他命令所需的准确说明。",
+              "说明必须依据真实声明和行为契约，不能只保留标签、填写占位词或改动接口来迎合注释。"
+            ],
+            "rule_id": "clang.warn_doc_block_command_empty_paragraph",
+            "rule_summary": "文档命令缺少非空说明段落"
+          },
+          {
+            "allowed_changes": "documentation_comment_only",
+            "closing_condition": "original_native_recheck_and_approved_complete_coverage_required",
+            "column_byte": 4,
+            "level": "warning",
+            "line": 2,
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-cpp-72541-1/api.cpp",
+            "repair_steps": [
+              "查看原生定位处的实际文档命令，补充其参数、返回或其他命令所需的准确说明。",
+              "说明必须依据真实声明和行为契约，不能只保留标签、填写占位词或改动接口来迎合注释。"
+            ],
+            "rule_id": "clang.warn_doc_block_command_empty_paragraph",
+            "rule_summary": "文档命令缺少非空说明段落"
+          }
+        ],
+        "exit_code": 3,
+        "language": "cpp",
+        "local_scan_complete": true,
+        "native": {
+          "diagnostics": [
+            {
+              "column_byte": 5,
+              "level": "warning",
+              "line": 1,
+              "rule_id": "clang.warn_doc_block_command_empty_paragraph"
+            },
+            {
+              "column_byte": 4,
+              "level": "warning",
+              "line": 2,
+              "rule_id": "clang.warn_doc_block_command_empty_paragraph"
+            }
+          ],
+          "reason": "clang_native_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "next": null,
+        "next_actions": [
+          "按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
+          "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。"
+        ],
+        "operation": "comments",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-cpp-72541-1/api.cpp",
+        "reason": "native_documentation_coverage_unverified",
+        "report_type": "c_family_comments_feedback",
+        "schema_version": "0.1.0",
+        "source_sha256": "0456e1e57db420e07e0ddf4609c67092f34ffd5ea3934fcef9db91a62bd065c2",
+        "unclassified_native_diagnostics": [],
+        "verification_command": [
+          "codeguard",
+          "comments",
+          "cpp",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-cpp-72541-1/api.cpp",
+          "--clang-tool",
+          "/usr/bin/clang",
+          "--standard",
+          "c++17",
+          "--timeout",
+          "1800000ms",
+          "--format=json"
+        ],
+        "workspace_binding": "not_bound"
+      }
+    },
+    {
+      "case_id": "cpp-unicode",
+      "expected_documentation_diagnostics": 1,
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "detailed_contract_qualification": "not_granted",
+        "documentation_configuration": {
+          "comment_scope": "recognized_documentation_comments_only",
+          "origin": "explicit_probe_profile",
+          "profile": "clang-documentation-v1",
+          "project_configuration": "unknown",
+          "rule_coverage": "limited",
+          "standard": "c++17"
+        },
+        "documentation_findings": [
+          {
+            "allowed_changes": "documentation_comment_only",
+            "closing_condition": "original_native_recheck_and_approved_complete_coverage_required",
+            "column_byte": 4,
+            "level": "warning",
+            "line": 2,
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-cpp-72541-1/api.cpp",
+            "repair_steps": [
+              "查看原生定位处的实际文档命令，补充其参数、返回或其他命令所需的准确说明。",
+              "说明必须依据真实声明和行为契约，不能只保留标签、填写占位词或改动接口来迎合注释。"
+            ],
+            "rule_id": "clang.warn_doc_block_command_empty_paragraph",
+            "rule_summary": "文档命令缺少非空说明段落"
+          }
+        ],
+        "exit_code": 3,
+        "language": "cpp",
+        "local_scan_complete": true,
+        "native": {
+          "diagnostics": [
+            {
+              "column_byte": 4,
+              "level": "warning",
+              "line": 2,
+              "rule_id": "clang.warn_doc_block_command_empty_paragraph"
+            }
+          ],
+          "reason": "clang_native_diagnostics",
+          "status": "diagnostics_observed",
+          "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "next": null,
+        "next_actions": [
+          "按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
+          "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。"
+        ],
+        "operation": "comments",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-cpp-72541-1/api.cpp",
+        "reason": "native_documentation_coverage_unverified",
+        "report_type": "c_family_comments_feedback",
+        "schema_version": "0.1.0",
+        "source_sha256": "161ce40b6eaff85a581e7c4f102cc5f6e5f8083776e091c2afae1a1b047fc4bb",
+        "unclassified_native_diagnostics": [],
+        "verification_command": [
+          "codeguard",
+          "comments",
+          "cpp",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-cpp-72541-1/api.cpp",
+          "--clang-tool",
+          "/usr/bin/clang",
+          "--standard",
+          "c++17",
+          "--timeout",
+          "1800000ms",
+          "--format=json"
+        ],
+        "workspace_binding": "not_bound"
+      }
+    },
+    {
+      "case_id": "cpp-good",
+      "expected_documentation_diagnostics": 0,
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "detailed_contract_qualification": "not_granted",
+        "documentation_configuration": {
+          "comment_scope": "recognized_documentation_comments_only",
+          "origin": "explicit_probe_profile",
+          "profile": "clang-documentation-v1",
+          "project_configuration": "unknown",
+          "rule_coverage": "limited",
+          "standard": "c++17"
+        },
+        "documentation_findings": [],
+        "exit_code": 3,
+        "language": "cpp",
+        "local_scan_complete": true,
+        "native": {
+          "diagnostics": [],
+          "reason": "clang_native_no_diagnostics",
+          "status": "completed",
+          "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "next": null,
+        "next_actions": [
+          "按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
+          "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。"
+        ],
+        "operation": "comments",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-cpp-72541-1/api.cpp",
+        "reason": "native_documentation_coverage_unverified",
+        "report_type": "c_family_comments_feedback",
+        "schema_version": "0.1.0",
+        "source_sha256": "54755b588e6da23b011f0cfeb7e9c688d334d7f76625ddbfab65d5ff4a18ee6b",
+        "unclassified_native_diagnostics": [],
+        "verification_command": [
+          "codeguard",
+          "comments",
+          "cpp",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-cpp-72541-1/api.cpp",
+          "--clang-tool",
+          "/usr/bin/clang",
+          "--standard",
+          "c++17",
+          "--timeout",
+          "1800000ms",
+          "--format=json"
+        ],
+        "workspace_binding": "not_bound"
+      }
+    },
+    {
+      "case_id": "cpp-missing",
+      "expected_documentation_diagnostics": 0,
+      "report": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "detailed_contract_qualification": "not_granted",
+        "documentation_configuration": {
+          "comment_scope": "recognized_documentation_comments_only",
+          "origin": "explicit_probe_profile",
+          "profile": "clang-documentation-v1",
+          "project_configuration": "unknown",
+          "rule_coverage": "limited",
+          "standard": "c++17"
+        },
+        "documentation_findings": [],
+        "exit_code": 3,
+        "language": "cpp",
+        "local_scan_complete": true,
+        "native": {
+          "diagnostics": [],
+          "reason": "clang_native_no_diagnostics",
+          "status": "completed",
+          "tool_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+          "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
+        },
+        "next": null,
+        "next_actions": [
+          "按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
+          "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。"
+        ],
+        "operation": "comments",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-cpp-72541-1/api.cpp",
+        "reason": "native_documentation_coverage_unverified",
+        "report_type": "c_family_comments_feedback",
+        "schema_version": "0.1.0",
+        "source_sha256": "b1816a03bf1f31859af3acf3f3efaceca48519d9e7bd7fb1fa259af373825241",
+        "unclassified_native_diagnostics": [],
+        "verification_command": [
+          "codeguard",
+          "comments",
+          "cpp",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-c-doc-cpp-72541-1/api.cpp",
+          "--clang-tool",
+          "/usr/bin/clang",
+          "--standard",
+          "c++17",
+          "--timeout",
+          "1800000ms",
+          "--format=json"
+        ],
+        "workspace_binding": "not_bound"
+      }
+    }
+  ],
+  "codeguard_sha256": "9a2cba528a4fdcc14bb21e56aa961961adb556191acdd3a6e25d46f96120fea6",
+  "evidence_kind": "local_native_development_regression",
+  "independent_holdout": false,
+  "qualification": "not_granted",
+  "test_source_sha256": "1716dc0359c16a2e3616c67e994452f7beab3e773e2793ef4cd3ce571defe67b"
+}

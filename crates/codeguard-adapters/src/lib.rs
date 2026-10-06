@@ -449,6 +449,8 @@ mod c_family_preprocessor_guard;
 pub use c_family_preprocessor_guard::has_c_family_preprocessor_directive;
 mod clang_sarif;
 pub use clang_sarif::parse_clang_stdin_sarif;
+mod clang_documentation_rule;
+pub use clang_documentation_rule::clang_documentation_guidance;
 
 mod erlang_form_rule;
 pub use erlang_form_rule::erlang_form_rule_sha256;

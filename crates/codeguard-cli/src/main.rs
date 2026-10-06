@@ -55,6 +55,14 @@ fn main() -> ExitCode {
             codeguard_cli::syntax_worker_command::run(rest)
         }
         #[cfg(unix)]
+        [command, language, rest @ ..]
+            if command == "comments" && matches!(language.as_str(), "c" | "cpp") =>
+        {
+            let mut request = vec![language.clone()];
+            request.extend_from_slice(rest);
+            codeguard_cli::c_family_comments_command::run(&request)
+        }
+        #[cfg(unix)]
         [command, language, rest @ ..] if command == "comments" && language == "python" => {
             codeguard_cli::python_comments_command::run(rest)
         }

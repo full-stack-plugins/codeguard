@@ -1,5 +1,6 @@
 //! 明确标准上下文的冻结stdin原生Clang观察；不构建或执行用户源码。
 use codeguard_runtime::{ProcessSpec, Termination, read_bounded_regular_file, run_process};
+use crate::native_clang_profile::NativeClangProfile;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::{collections::BTreeMap, ffi::OsString, path::Path, sync::atomic::AtomicBool, time::Instant};
@@ -31,6 +32,46 @@ pub(crate) fn observe_with_cancellation(
     source: &[u8],
     deadline: Instant,
     cancelled: &AtomicBool,
+) -> Value {
+    observe_profile(
+        tool,
+        language,
+        standard,
+        source,
+        deadline,
+        cancelled,
+        NativeClangProfile::Syntax,
+    )
+}
+
+/// 使用同一版本/制品/输入/报告边界执行文档警告档案；参数同语法观察，返回原生局部结果。
+pub(crate) fn observe_documentation(
+    tool: &Path,
+    language: &str,
+    standard: &str,
+    source: &[u8],
+    deadline: Instant,
+    cancelled: &AtomicBool,
+) -> Value {
+    observe_profile(
+        tool,
+        language,
+        standard,
+        source,
+        deadline,
+        cancelled,
+        NativeClangProfile::Documentation,
+    )
+}
+
+fn observe_profile(
+    tool: &Path,
+    language: &str,
+    standard: &str,
+    source: &[u8],
+    deadline: Instant,
+    cancelled: &AtomicBool,
+    profile: NativeClangProfile,
 ) -> Value {
     let mut report = json!({"status":"incomplete","reason":"clang_tool_unavailable","version":null,"tool_sha256":null,"diagnostics":[]});
     if Instant::now() >= deadline {
@@ -104,9 +145,6 @@ pub(crate) fn observe_with_cancellation(
         "-fno-caret-diagnostics",
         "-fdiagnostics-format=sarif",
         "-Wno-sarif-format-unstable",
-        "-Wall",
-        "-Wextra",
-        "-Wpedantic",
         "-nostdinc",
         "-x",
         language,
@@ -114,6 +152,7 @@ pub(crate) fn observe_with_cancellation(
     ];
     let mut args: Vec<OsString> = flags.into_iter().map(OsString::from).collect();
     args.insert(1, OsString::from(format!("-std={standard}")));
+    args.splice(7..7, profile.warning_flags().iter().map(OsString::from));
     let output = invoke(args, Some(source.to_vec()));
     if Instant::now() >= deadline {
         report["reason"] = json!("clang_execution_incomplete");

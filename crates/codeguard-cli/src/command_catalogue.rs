@@ -234,9 +234,9 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             },
             executable: cfg!(unix),
             operation_kind: r#"check"#,
-            usage: r#"comments <rust|java|python> [path] [--timeout DURATION] [--format human|json]"#,
-            scope: r#"Rust双原生、Java文件/项目Javadoc、Python原配置Ruff文档观察；完整政策与闭环尚缺"#,
-            languages: &[r#"rust"#, r#"java"#, r#"python"#],
+            usage: r#"comments <rust|java|python> [path] [--timeout DURATION] [--format human|json] | comments <c|cpp> FILE --clang-tool ABS --standard c11|c++17 [--timeout DURATION] [--format human|json]"#,
+            scope: r#"Rust双原生、Java文件/项目Javadoc、Python原配置Ruff、C/C++显式Clang文档观察；完整政策与闭环尚缺"#,
+            languages: &[r#"rust"#, r#"java"#, r#"python"#, r#"c"#, r#"cpp"#],
         },
         CommandDescriptor {
             tracking_id: Some(r#"C16"#),
