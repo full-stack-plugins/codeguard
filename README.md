@@ -1096,3 +1096,6 @@ The standalone C/C++ Clang entry now distinguishes literal/comment hashes and ra
 
 
 Native Clippy documentation findings now receive specific Errors/Panics/Safety repair guidance through stable tasks and original-tool suppression rechecks. The installed Clippy accepts bare headings: zero diagnostics do not qualify detailed documentation and facts remain open. Ordinary checks do not enable pedantic implicitly. `comments rust` remains a local Rustdoc probe; complete documentation contracts are not unified or qualified. See [acceptance and gaps](tests/acceptance/clippy-documentation-contract.md).
+
+
+`check rust/all` now retains a separate comments observation for the three native Clippy documentation rules alongside Rustdoc, preserving each tool obligation without another Clippy execution. Only exact known diagnostics participate; zero findings do not establish enabled or complete documentation contracts. See [aggregate acceptance](tests/acceptance/clippy-documentation-aggregate.md).

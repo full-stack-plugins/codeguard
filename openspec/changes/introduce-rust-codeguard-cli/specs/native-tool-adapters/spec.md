@@ -125,6 +125,11 @@ Rustdoc逐问题反馈 MUST 提供问题证据、规则依据、允许修改的�
 - **THEN** 保留原生规则和同一稳定任务，分别要求说明实际错误及条件、panic 条件或 unsafe 调用前置条件；不得改变 API 行为或关闭规则迎合检查，使用原工具 task verify 复检
 - **AND** 不为普通检查强制启用 pedantic 规则；抑制对照仍保持任务开放，空章节标题的原生零诊断不代表详细说明合格或完整文档验收
 
+#### Scenario: Aggregate Rust documentation preserves both native sources
+- **WHEN** check rust/all 收到三个已适配 Clippy 文档规则之一的原生发现
+- **THEN** comments 类别保留独立 Clippy 观察和原 Rustdoc 观察，不覆盖或丢失任一原工具义务；两者只提供局部未核验结果，任务仍复用原检查器身份
+- **AND** 原生失败后保留已有发现并标未完成；未知相似规则或零发现不能据此前缀声称详细文档规则完整启用
+
 #### Scenario: Standalone Rust lint has no native Cargo
 - **WHEN** 未显式选择Cargo且绝对PATH没有可用Cargo
 - **THEN** WASM构建对有界Rust源码提供候选初检并同步确认任务；发现候选或范围/运行未完成时必须准备原生工具，完整有界范围零候选时推荐准备；不安装工具、不把候选认定为源码违规；无WASM构建明确初检不可用
