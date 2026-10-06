@@ -2484,3 +2484,7 @@ WASM CLI全目标Clippy -D warnings、定向rustfmt、分层、OpenSpec strict�
 ## 2026-10-06 Java comments 入口
 
 新增统一 `comments java` 的文件/项目局部原生入口及独立报告schema。三个回归目标15通过/0失败/2条件忽略，真实已有JDK21新目标另行1通过；后一目标与忽略项重叠，不作为第二套独立语料。初始真实样例漏补公共构造函数文档导致失败，补全测试样例后通过，产品规则未抑制。工作台明确not_integrated，父任务不勾选。见 tests/acceptance/java-comments-unified-entry.md。
+
+## 2026-10-06 Javadoc 项目工作台
+
+已初始化Java项目JDK模式接通持久观察、稳定任务及next反馈。五个回归目标46通过/0失败/17条件忽略；真实已有JDK21项目目标另行1通过，与忽略项重叠。修复后局部零诊断保留历史任务open。3份新schema、实际包装/next及观察报告验证通过，严格Clippy、分层、OpenSpec通过。Maven、单文件工作台及task verify仍未接通，父任务不勾选。见 tests/acceptance/javadoc-project-workbench.md。

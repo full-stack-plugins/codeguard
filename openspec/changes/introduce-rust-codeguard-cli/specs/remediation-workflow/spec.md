@@ -609,3 +609,15 @@ Python确认任务的当前原生结果为still_present且输入未失效时 MUS
 #### Scenario: 规则放宽和原生反证不能关闭
 - **WHEN** 配置变化、添加禁用注释、原样本不含原规则或执行未完成
 - **THEN** SHALL 记录具体复核原因且不将任务标为已修复
+
+### Requirement: Javadoc local observations SHALL produce stable repair tasks
+
+已初始化的显式 Java 项目工作区 MUST 将 Javadoc 完整局部诊断同步为稳定问题，按规则、相对文件、源码锚点及同锚点序号归并，行号变化不单独新建任务。缺配置或原生未完成 MUST 生成检查准备记录，不生成源码违规。持久化或同步失败 MUST 在对话反馈中可见，不虚构任务身份。没有初始化的项目不自动初始化。局部零诊断不关闭历史问题；任务复检及可信关闭未接通时 MUST 明示该能力缺口。
+
+#### Scenario: Repeat a configured Javadoc project observation
+- **WHEN** 同一已配置主源码连续两次产生相同原生诊断
+- **THEN** 同步只保留一个任务、追加观察，提供 Java comments 复检指引及允许范围，任务保持开放
+
+#### Scenario: Project Javadoc configuration is absent
+- **WHEN** 用户显式选择 Java comments 而该项目没有确认的配置
+- **THEN** 保留一个可读准备任务，不运行工具、不报告源码违规，不将该建议升级为必需交付义务

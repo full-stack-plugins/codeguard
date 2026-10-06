@@ -1845,3 +1845,10 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 - [x] 参数拒绝、配置缺失不执行、Maven不退回单文件、源码不变及旧入口回归；真实JDK21缺注释到补齐注释的局部观察；独立wrapper schema验证。
 
 证据见 [Java comments入口验收](../../../tests/acceptance/java-comments-unified-entry.md)。6.x/9.x父任务仍未完成，不以新入口代替任务复检闭环、策略或宿主验收。
+
+## 2026-10-06 Javadoc 项目工作台（已验证局部实现）
+
+- [x] 已初始化项目JDK模式保存原生观察，归并稳定Javadoc任务，缺配置/未完成生成准备记录；对话反馈next，不自动关闭。
+- [x] 重复扫描、保存失败恢复、伪造指纹拒绝、真实JDK项目修复后仍开放及受影响工作台回归；新增报告与简报schema并验证实际输出。
+
+证据见 [Javadoc项目工作台](../../../tests/acceptance/javadoc-project-workbench.md)。Maven多文件与文件工作台、task verify和可信关闭仍需完成，9.x父任务保留未完成。

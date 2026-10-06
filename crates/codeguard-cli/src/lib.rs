@@ -148,6 +148,8 @@ mod java_dependency_scan;
 pub mod java_javadoc_command;
 #[cfg(unix)]
 pub mod java_comments_command;
+#[cfg(unix)]
+mod javadoc_workbench;
 mod java_javadoc_scan;
 #[cfg(unix)]
 pub mod java_lint_dispatch;
