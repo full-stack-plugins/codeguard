@@ -850,3 +850,11 @@ The system SHALL inspect direct function-form terminal tokens in the pinned Erla
 #### Scenario: Current full replay measures structural candidates separately
 - **WHEN** the fixed 32-language corpus is replayed with the same structural rules used by project checks, including explicit JavaScript and Erlang rules
 - **THEN** a versioned report preserves the original parser classification and separate combined classifications, rule identities and per-language/source-group counts; truncation, cancellation or program changes remain unknown, pending labels remain unevaluated, and no language qualification is granted
+
+### Requirement: JavaScript native differential SHALL measure the project binding candidate separately from parser recovery
+
+The native differential SHALL use the same frozen JavaScript binding worker as project checking for its combined observation. Raw recovery classification and counts SHALL remain unchanged. Versioned reports SHALL preserve the pinned rule identity and reject structures attributed to another language. Explicit Node module syntax SHALL NOT turn unknown project or CommonJS context into unconditional source violations.
+
+#### Scenario: Native-invalid duplicate declaration has a combined candidate
+- **WHEN** a frozen direct lexical duplicate is rejected by the selected Node syntax observer but has no parser recovery
+- **THEN** the raw comparison remains false_negative, the combined comparison is true_positive with the project rule evidence, and no grammar qualification or delivery permission is issued

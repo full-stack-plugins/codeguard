@@ -1932,3 +1932,7 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 ## 2026-10-06 九语言已有原生工具实际差分
 
 对应12.3/12.11/14.17/14.19：本机九语言10工具入口版本匹配，显式条件12测试全部通过，无安装/下载；Kotlin2/Swift1 unknown保留。JavaScript额外module语料仍2FN，其中重复绑定的组合测量没用项目结构入口，后续需对齐，module_return仍需模式条件。改三项归档测试写独立目录，29历史报告字节不变，七份本轮报告/输入新名归档。普通相关7通过/5忽略、实际六份报告与输入schema、严格Clippy/分层/OpenSpec通过。见tests/acceptance/native-current-nine-language.md。独立holdout/完整矩阵/宿主及资格0/32仍缺，不勾选父任务。
+
+## 2026-10-06 JavaScript 原生差分复用项目绑定候选
+
+延续12.11/14.17/14.19，父任务不勾选。JavaScript原生差分复用项目直接重复绑定worker，raw与combined分开；报告0.9按语言/规则摘要约束，旧协议不变。受控RED→GREEN，相关四目标15通过/6条件忽略，真实Node24.18.0显式1通过：18例raw5TP/11TN/0FP/2FN，combined6TP/11TN/0FP/1FN。module_return仍漏检，不扩大到CommonJS/未知模式；固定358指标不变。实际schema与三种篡改/旧消费者拒绝、严格Clippy修复后通过。见tests/acceptance/javascript-native-project-binding.md。独立holdout/正式资格0/32及完整发布验收仍缺。
