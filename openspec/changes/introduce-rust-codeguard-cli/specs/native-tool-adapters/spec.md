@@ -406,6 +406,10 @@ Rust CVE 检查 MUST 绑定实际解析的组件版本、依赖来源、advisory
 - **WHEN** 项目含 COBOL、ArkTS 或 Metal 源码并运行 `check all`
 - **THEN** 六类别候选均明确保留 `planned` 的旧登记状态与 `gap` 的当前能力含义，返回未完成和具体适配步骤；不能把无原生适配器解释为 `not_applicable`、空结果或质量通过
 
+#### Scenario: Counts cannot replace canonical identities
+- **WHEN** 候选旧v1清单保留57项或54 stable/3 planned数量，但替换规范ID、交换归属、追加重复ID的未知状态、改变版本或包含重复JSON键
+- **THEN** SHALL 拒绝其作为固定迁移基线；无害旧元数据可保留，但不能将损坏清单按新能力或质量通过消费
+
 ### Requirement: Adapters SHALL separate static observation from executable resolution
 
 adapter MUST 基于注入观察声明适用性、计划与报告解析，不自行spawn、联网或写文件。动态构建模型解析 MUST 作为有身份、预算、网络声明和证据的执行任务，由core经runtime port调用；静态detect/init/plan无法解析的条件保留unknown，不偷偷执行wrapper。模块/源集/方言与跨语言依赖映射 MUST 保留各自范围，不能用主语言覆盖其它构建根。

@@ -37,3 +37,5 @@ The [2026-09-24 audit](Codeguard-Legacy-Compatibility.zh_CN.md#legacy-audit-2026
 The Rust repository now owns Rust architecture, contracts and OpenSpec implementation planning. The plugin repository owns its live host packaging/hooks and references Rust documentation. Historic plugin paths in the audit remain provenance; they are not missing Rust source files or an instruction to move Python code into Rust.
 
 Migration requires preserving old consumer behavior where promised, making incomplete/unknown boundaries explicit, and validating actual host delivery. It does not authorize replacing native analyzers, weakening policy or claiming full coverage from compatibility tests.
+
+57-language field audit: [Codeguard-Legacy-Registry-Audit.md](Codeguard-Legacy-Registry-Audit.md)

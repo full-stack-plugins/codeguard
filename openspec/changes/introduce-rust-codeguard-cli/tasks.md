@@ -1756,3 +1756,7 @@ SP22完整默认终态：当前源码workspace all-targets 1500 passed / 0 faile
 ## 2026-10-06 SP26 隐藏解析错误的原生确认指引（反馈缺陷修复）
 
 对应14.5/14.11/14.17/14.19。本机已安装web-tree-sitter0.25.10对相同Kotlin/Swift字节也出现has_error、隐藏MISSING和零公开恢复；参考运行时及grammar摘要已留证，不引入产品Node解析依赖。runtime区分已访问的不可定位错误与预算耗尽，worker1.4严格版本/状态核验；显式probe0.5要求原字节原生确认后再分流源码修复或grammar调查，不制造位置、不把零恢复称通过。公开行为先RED后GREEN，runtime6通过无忽略；七个CLI相关目标75通过/0失败/4忽略，新schema实际报告及假通过反例2通过；默认/WASM两个受影响crate全目标严格Clippy、OpenSpec strict、分层、格式与diff通过。详见[隐藏错误指引](../../../tests/acceptance/hidden-parser-error-guidance.md)。全项目/Hook仍沿用已有恢复不完整协议；本批没有修复三例未知、重建grammar、通过原生holdout或授予32语言资格，父任务保持开放。
+
+## 2026-10-06 SP27 57语言身份及迁移字段核对（局部验收）
+
+固定插件dec5f9d的57语言快照，Rust工具逐字段核对并归档四项差异；保留扩展名纠偏覆盖，不将legacy命令直接执行。注册表解析拒绝规范身份替换、归属互换、重复未知状态行、未知版本及重复JSON键，实际五失败反例修复后通过。身份6项、适配器库9项和CLI关联46项通过，无失败/忽略。CI增加早期审计。1.1其它非语言行为/真实原生迁移仍开放，父任务不勾选；不改变WASM资格或发行。见[验收](../../../tests/acceptance/legacy-registry-identity-audit.md)。
