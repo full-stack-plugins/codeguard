@@ -117,6 +117,7 @@ mod pmd_xml;
 mod python_requirements;
 mod python_standard_lock;
 mod ruff;
+mod ruff_documentation_rule;
 mod ruff_rulepack;
 mod ruff_settings;
 
@@ -185,6 +186,7 @@ pub use ruff::{
     RuffDiagnostic, RuffLocation, RuffParseState, RuffParsed, is_ruff_pydocstyle_rule,
     parse_ruff_json,
 };
+pub use ruff_documentation_rule::{RuffDocumentationRule, is_ruff_documentation_rule};
 pub use ruff_rulepack::{RuffRuleMapping, RuffRulepack, bundled_ruff_rulepack, parse_ruff_rulepack};
 pub use ruff_settings::{RuffSettingsObservation, parse_ruff_settings};
 pub use rustdoc_finding::RustdocFinding;

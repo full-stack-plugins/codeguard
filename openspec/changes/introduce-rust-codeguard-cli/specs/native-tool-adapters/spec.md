@@ -885,3 +885,19 @@ Gradle Javadoc repair observations SHALL use their own java.gradle.javadoc check
 #### Scenario: Extended classes are disguised under historical contracts
 - **WHEN** 新检查类的工作台/复检观察被降级为历史协议版本
 - **THEN** MUST 拒绝首次导入；不得生成额外问题或通过复检假称修复
+
+### Requirement: Ruff pydoclint contract diagnostics SHALL retain documentation evidence
+
+对固定 Ruff 0.16.8 原生启用的 DOC102、DOC201、DOC202、DOC402、DOC403、DOC501、DOC502，CodeGuard MUST 保留原规则和位置并归入 Python 注释候选，进入稳定任务和原工具复检。Rust MUST NOT 自行模拟文档语义或自动启用 preview。报告规则不在同轮原生生效设置中时 MUST 保留未完成；未知 DOC 编号不得凭前缀取得已适配资格。空结果 MUST NOT 代表完整文档合规或可信关闭。
+
+#### Scenario: Original preview configuration reports missing return or yield documentation
+- **WHEN** 原项目明确启用 preview 和 DOC201/DOC402，原生 Ruff 检出缺失 Returns/Yields 契约
+- **THEN** 对话、任务和下一步给出符合实际返回/生成行为的详细说明修复，原工具复检保留存在或未受信消失；不得改变源码行为、忽略规则或删除用途说明来消除诊断
+
+#### Scenario: Native exception convention can conflict with implicit exceptions
+- **WHEN** 原生 DOC502 把文档列出的隐式异常视为多余，或 DOC501 要求直接 raise 的异常说明
+- **THEN** DOC501 指引补齐真实异常及触发条件；DOC502 保留诊断但要求调查调用链和项目约定，禁止自动删除实际可能抛出的异常说明；原生零诊断不证明全部异常行为已文档化
+
+#### Scenario: Unconfigured preview rules and native legal exemptions
+- **WHEN** 项目未启用 DOC preview、或原工具按单行/抽象方法/stub/None 规则不生成诊断
+- **THEN** CodeGuard 不额外添加原参数、不模拟违规，保持范围未验收；保留原生合法反例与版本边界

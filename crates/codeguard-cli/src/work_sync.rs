@@ -2594,11 +2594,13 @@ fn render_task(report: &ReportInput, finding: &FindingInput) -> String {
             report.run_id
         );
     }
+    let doc = codeguard_adapters::RuffDocumentationRule::from_code(&finding.rule_id);
     let step = match finding.rule_id.as_str() {
         "F401" => "核对导入是否仍被使用；确认后仅修改该文件的导入。",
         "E501" => "核对项目 Ruff 行长配置，保持语义并重排行内容。",
         "D100" => "确认该公共模块的用途，为模块补充准确的顶层 docstring。",
         "D101" => "确认该公共类的职责，为类补充准确的 docstring。",
+        _ if doc.is_some() => doc.as_ref().expect("已核对规则").step,
         _ => "查阅原生规则和私有诊断，先确认根因再修改。",
     };
     let path = serde_json::to_string(&finding.path).expect("路径可编码");
