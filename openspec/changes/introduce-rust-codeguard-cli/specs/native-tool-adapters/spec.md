@@ -938,7 +938,7 @@ Model capture, original task execution and report ownership observation SHALL sh
 
 #### Scenario: Public Java CVE explicitly selects original Gradle tasks
 - **WHEN** cve java receives explicit Gradle/JDK, selected build inputs and repeatable --gradle-owasp-task paths
-- **THEN** its feedback SHALL expose the bounded native observation and concrete follow-up without installing plugins, replacing project configuration, mutating the workbench, or granting delivery; invalid/duplicate options SHALL fail before native execution and local unverified results SHALL exit 3 (cancellation 130)
+- **THEN** its feedback SHALL expose the bounded native observation and concrete follow-up without installing plugins, replacing project configuration, implicitly initializing the workbench, or granting delivery; invalid/duplicate options SHALL fail before native execution and local unverified results SHALL exit 3 (cancellation 130)
 
 #### Scenario: An existing Gradle dependency cache enables offline original plugin resolution
 - **WHEN** --gradle-module-cache explicitly selects an existing caches/modules-2 directory
@@ -947,3 +947,8 @@ Model capture, original task execution and report ownership observation SHALL sh
 #### Scenario: Individually bounded native reports exceed aggregate resource limits
 - **WHEN** multiple selected OWASP tasks exceed16MiB cumulative report input,1000 cumulative advisory observations or2MiB serialized report feedback, including repeated package identifiers expanding small inputs
 - **THEN** the application service SHALL stop bounded aggregation with a concrete incomplete budget observation, SHALL NOT silently truncate reports or issue an empty-clean verdict, and SHALL check cancellation/deadline between report reads and feedback records
+
+
+#### Scenario: Explicit Gradle CVE feeds stable workbench preparation tasks
+- **WHEN** the explicit command runs in an already initialized workspace with unchanged bounded selected inputs
+- **THEN** it SHALL save a sanitized local observation and automatically sync one stable preparation task per selected input/task scope, expose the original repeatable task/input CLI flags in next/task show, preserve diagnostic history and reject report tampering or stale new imports; raw package identifiers and native output SHALL NOT enter committed task facts. Empty or unverified advisories SHALL NOT close tasks; unified check scheduling and task verify remain separate obligations.
