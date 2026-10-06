@@ -443,7 +443,7 @@ fn report(
         "authority":"candidate_unqualified","delivery_decision":"incomplete",
         "source_file_count":source_file_count,"skipped_count":skipped_count,
         "unrouted_count":unrouted_count,"native_preferred_count":native_preferred_count,"observations":observations,
-        "next_action":"核对适用语言版本与原生 lint/编译器；候选恢复节点不是已确认违规，零恢复也不表示完整通过"
+        "next_action":"核对适用语言版本，使用原生 lint/编译器对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；零恢复不表示完整通过"
     })
 }
 

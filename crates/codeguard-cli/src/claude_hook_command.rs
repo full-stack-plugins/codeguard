@@ -437,7 +437,7 @@ fn summarize(path: &str, report: &Value) -> String {
             "按当前原生字节位置修复语法，再使用原工具复检；完整 lint、类型和项目构建仍须检查"
         }
         Some("require_native_lint_confirmation") => {
-            "必须准备或修复适用的原生 lint/编译器，再确认疑似问题或恢复未完成检查；不要仅凭候选结果修改源码"
+            "必须准备或修复适用的原生 lint/编译器，对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复；不要仅凭候选结果修改源码"
         }
         Some("recommend_native_lint") => {
             "初检未发现恢复节点，建议安装适用原生 lint；这不表示完整检查通过"

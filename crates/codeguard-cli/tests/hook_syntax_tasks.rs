@@ -572,6 +572,8 @@ fn unlocated_recoveries_become_stable_environment_tasks_without_source_positions
             "历史尝试",
             "关闭条件",
             "无法定位",
+            "原生确认合法",
+            "原始源码",
             "不得修改源码",
         ] {
             assert!(body.contains(field), "{field}: {body}");
@@ -587,7 +589,9 @@ fn unlocated_recoveries_become_stable_environment_tasks_without_source_positions
         let brief: Value = serde_json::from_slice(&show.stdout).unwrap();
         let step = brief["task"]["step"].as_str().unwrap();
         assert!(
-            step.contains("无法定位") && step.contains("不得修改源码"),
+            step.contains("无法定位")
+                && step.contains("不得修改源码")
+                && step.contains("原生确认合法"),
             "{brief}"
         );
         assert!(
@@ -611,7 +615,9 @@ fn unlocated_recoveries_become_stable_environment_tasks_without_source_positions
             let stale: Value = serde_json::from_slice(&changed.stdout).unwrap();
             let step = stale["task"]["step"].as_str().unwrap();
             assert!(
-                step.contains("无法定位") && step.contains("不得修改源码"),
+                step.contains("无法定位")
+                    && step.contains("不得修改源码")
+                    && step.contains("原生确认合法"),
                 "{stale}"
             );
             assert_eq!(stale["task"]["native_diagnostic_positions"], json!([]));
@@ -838,6 +844,7 @@ fn unlocated_claude_context_explains_zero_positions_and_real_recovery_task() {
         context.contains("原生确认任务 CG-B-") && context.contains("codeguard task show"),
         "{context}"
     );
+    assert!(context.contains("原生确认合法"), "{context}");
     assert!(!context.contains("建议安装适用原生 lint"), "{context}");
     assert!(context.chars().count() <= 1200);
     assert!(context.ends_with("候选语法能力尚未完整验收，完整项目与交付未评估。"));

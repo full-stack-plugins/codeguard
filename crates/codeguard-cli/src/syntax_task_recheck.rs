@@ -869,7 +869,7 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
         && original(root, brief).is_ok_and(|original| original["schema_version"] == "0.3.0")
     {
         guidance["step"] = json!(format!(
-            "候选恢复扫描未完成或错误无法定位；原生确认前不得修改源码，不虚构错误位置。{step}"
+            "候选恢复扫描未完成或错误无法定位；对原始源码运行适用原生工具，原生确认合法时调查 grammar 版本/兼容性或扫描预算，诊断成立时才按真实位置修复。原生确认前不得修改源码，不虚构错误位置。{step}"
         ));
     }
     if report["target"]["language"] == "rust" {

@@ -2672,7 +2672,7 @@ pub fn run(args: &[String]) -> ExitCode {
                     .take(8)
                 {
                     println!(
-                        "  {} [{}] grammar 报告错误但恢复位置不完整；初检未完成，需适用原生工具确认。",
+                        "  {} [{}] 候选解析未完成，恢复位置无法完整核验；先对原始源码运行适用原生工具。原生确认合法时调查 grammar 版本/兼容性或扫描预算；原生诊断成立时才按真实位置修复。",
                         item["path"].as_str().unwrap_or("?"),
                         item["language"].as_str().unwrap_or("unknown")
                     );

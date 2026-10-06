@@ -1159,3 +1159,5 @@ flowchart LR
 ```
 
 This diagram describes the implemented source-level host-approved SDK path. Production automatic host approval integration remains pending; editable local history cannot grant project delivery permission.
+
+Incomplete parser feedback now directs the agent to check the original source with the applicable native tool. If native confirmation accepts the source, investigate grammar version/compatibility or scan budgets; only actual native diagnostics guide source changes. Truncation alone does not establish a grammar error. This applies to project output, edit context, persisted tasks and next/task show; task identity and closure requirements are unchanged. [Acceptance](../tests/acceptance/incomplete-syntax-guidance.md)
