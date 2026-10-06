@@ -173,7 +173,7 @@ fn run(mutation: &str, initialized: bool) -> Value {
                 .unwrap();
             assert_eq!(aggregate.status.code(), Some(3), "{aggregate:?}");
             let aggregate: Value = serde_json::from_slice(&aggregate.stdout).unwrap();
-            assert_eq!(aggregate["schema_version"], "0.38.0", "{aggregate}");
+            assert_eq!(aggregate["schema_version"], "0.58.0", "{aggregate}");
             assert_eq!(
                 aggregate["next"]["repair_brief"]["checker_id"],
                 "java.maven.p3c"

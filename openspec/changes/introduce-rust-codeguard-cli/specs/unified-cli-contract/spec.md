@@ -335,3 +335,10 @@ npm公开CVE入口 MUST 按CLI、登记环境变量、项目runtime.json、内�
 #### Scenario: Duplicate Java comments arguments
 - **WHEN** 同一选项重复、未知选项或预算无效
 - **THEN** 启动原生工具前以参数错误拒绝，不输出成功报告
+
+### Requirement: Aggregate feedback SHALL describe selected native preparation briefs exactly
+聚合报告 SHALL 使用能容纳选中准备简报的显式协议版本，保持历史schema；P3C未确认配置的简报 SHALL 保留blocker、原检查器及review-project-policy动作，不转述为源码违规或交付通过。完整实际聚合及内嵌简报须共同符合协议。
+
+#### Scenario: A Maven module has unconfirmed P3C configuration
+- **WHEN** check java选择java.maven.p3c的p3c_configuration_not_confirmed准备任务
+- **THEN** 返回0.58聚合协议，接受原Java选择原因码并明确配置策略复核；伪造finding、检查器、原因、修复动作或批准/allow不符合协议

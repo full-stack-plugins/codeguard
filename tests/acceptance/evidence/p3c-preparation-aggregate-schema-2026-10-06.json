@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1.0",
+  "scope": "p3c_configuration_preparation_aggregate_protocol",
+  "passed": 57,
+  "failed": 0,
+  "ignored": 10,
+  "targets": 4,
+  "actual_schema_validation": [
+    "aggregate",
+    "next",
+    "native_results.java_p3c.next"
+  ],
+  "rejected_forgery_count": 6,
+  "historical_consumer_rejects": true,
+  "native_maven_acceptance": false,
+  "source_sha256": {
+    "crates/codeguard-cli/src/check_command.rs": "854d36daab520c505b019186b4915bf43ef0e5b80d79ecfa8c5a42fb1d891885",
+    "crates/codeguard-cli/tests/maven_javadoc_input_stability.rs": "fc12c211c893c2649a5248ca3b81e345593a840659da0e93fe229d04568e46c3",
+    "schemas/check-feedback-v0.58.schema.json": "5cc2370fd25a8b40e8598e57b2c52a73a02596158a3dc84c7c36c663909e2218",
+    "schemas/p3c-configuration-repair-brief-preview-v0.1.schema.json": "e3d6df29b4b6bda2e3b2428da00a1a7fa674eb189769c1fe41f829f227369b47"
+  },
+  "report_sha256": "6aff5e244717f0b30d12fb28d863322857df2b8b20a9f25ce319d31b09150d86",
+  "logs_sha256": {
+    "cg-p3c-aggregate-schema-red.log": "182a63dfc1a3829675c2aea63cff2e8f2cd5fc5e0f309f07166cf6688df021e8",
+    "cg-p3c-aggregate-schema-green.log": "4b5cab8703d207022f9af4962fdd27e04647623bf3beaf22cb2c58a83871b7b1",
+    "cg-p3c-aggregate-schema-regression.log": "d32611a5752da4fb2c8ddc938e1b2439b0ed063484386852bd7a835db6d59143",
+    "cg-p3c-aggregate-schema-clippy.log": "7fcc5c48fc6ce5661530aeae80878708f35bd3ae22032870f5c36ff74ae5d37c"
+  }
+}

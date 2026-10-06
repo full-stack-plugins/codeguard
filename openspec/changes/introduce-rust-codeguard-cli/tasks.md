@@ -1884,6 +1884,6 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 
 - [x] 接通Maven原任务task verify、首次报告与工具上下文绑定、POM/源集变化复核、原租约/尝试与next历史，不自动关闭。
 - [x] 六类复检输出、范围外阻塞、两次无进展及八目标回归、严格schema和Clippy验收；受控进程与真实工具验收明确区分。
-- [ ] 修复check java的P3C准备简报与聚合0.38 schema不兼容，并验证完整实际输出及拒绝反例。
+- [x] 修复check java的P3C准备简报与聚合0.38 schema不兼容，并验证完整实际输出及拒绝反例（新增0.58，历史协议保留；见p3c-preparation-aggregate-schema验收）。
 
 见 [验收](../../../tests/acceptance/maven-javadoc-task-recheck.md)。110通过/0失败/22条件忽略；真实Maven新工作台、复杂项目、可信关闭/复发与实际宿主未完成，6.x/9.x父任务仍开放。
