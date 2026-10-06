@@ -2,6 +2,7 @@
 
 use crate::syntax_worker_candidate_observation::SyntaxWorkerCandidateObservation;
 use crate::syntax_worker_envelope::SyntaxWorkerEnvelope;
+use crate::syntax_worker_mode::SyntaxWorkerMode;
 use codeguard_adapters::bundled_grammar_candidate;
 use codeguard_core::{SyntaxFileObservation, SyntaxFileState, assess_syntax_precheck};
 #[cfg(not(target_os = "linux"))]
@@ -34,11 +35,11 @@ pub fn run_syntax_worker_candidate(
         source,
         deadline,
         cancelled,
-        false,
+        SyntaxWorkerMode::Default,
     )
 }
 
-/// 显式观察JavaScript直接绑定规则；暂仅供probe接线，其它消费者沿用旧协议。
+/// 显式观察JavaScript直接绑定规则；项目/probe/差分复用，保持旧模式范围。
 /// 参数为当前二进制、语言、相对路径、冻结源码和统一预算；未知语言执行前拒绝。
 pub fn run_syntax_worker_binding_candidate(
     executable: &Path,
@@ -58,7 +59,7 @@ pub fn run_syntax_worker_binding_candidate(
         source,
         deadline,
         cancelled,
-        true,
+        SyntaxWorkerMode::Bindings,
     )
 }
 
@@ -82,7 +83,31 @@ pub fn run_syntax_worker_form_candidate(
         source,
         deadline,
         cancelled,
-        true,
+        SyntaxWorkerMode::Bindings,
+    )
+}
+
+/// 显式module上下文的JavaScript候选；模式未知或CommonJS不得调用此入口。
+/// 参数为当前二进制、固定语种、相对路径、冻结源码和共享预算；返回原生待确认候选。
+pub fn run_syntax_worker_module_candidate(
+    executable: &Path,
+    language: &str,
+    relative_path: &str,
+    source: &[u8],
+    deadline: Instant,
+    cancelled: &AtomicBool,
+) -> Result<SyntaxWorkerCandidateObservation, String> {
+    if language != "javascript" {
+        return Err("syntax_module_language_invalid".into());
+    }
+    run_candidate(
+        executable,
+        language,
+        relative_path,
+        source,
+        deadline,
+        cancelled,
+        SyntaxWorkerMode::Module,
     )
 }
 
@@ -93,8 +118,10 @@ fn run_candidate(
     source: &[u8],
     deadline: Instant,
     cancelled: &AtomicBool,
-    bindings: bool,
+    mode: SyntaxWorkerMode,
 ) -> Result<SyntaxWorkerCandidateObservation, String> {
+    let bindings = mode != SyntaxWorkerMode::Default;
+    let module = mode == SyntaxWorkerMode::Module;
     if !executable.is_absolute() || source.len() > 1024 * 1024 {
         return Err("syntax_worker_input_invalid".into());
     }
@@ -105,7 +132,9 @@ fn run_candidate(
     let expected_sha = format!("{:x}", Sha256::digest(source));
     let mut args = vec![OsString::from("__syntax-worker"), OsString::from(language)];
     if bindings {
-        args.push(OsString::from(if language == "erlang" {
+        args.push(OsString::from(if module {
+            "--javascript-module"
+        } else if language == "erlang" {
             "--form-terminators"
         } else {
             "--direct-bindings"
@@ -137,17 +166,31 @@ fn run_candidate(
     }
     if !matches!(
         value["schema_version"].as_str(),
-        Some("1.4.0" | "1.5.0" | "1.6.0")
+        Some("1.4.0" | "1.5.0" | "1.6.0" | "1.7.0")
     ) && value.get("parser_error_location_unavailable").is_some()
     {
+        return Err("syntax_worker_version_fields_mismatch".into());
+    }
+    if value["schema_version"] != "1.7.0" && value.get("javascript_mode").is_some() {
         return Err("syntax_worker_version_fields_mismatch".into());
     }
     let report: SyntaxWorkerEnvelope =
         serde_json::from_value(value).map_err(|_| "syntax_worker_report_invalid")?;
     if !matches!(
         report.schema_version.as_str(),
-        "1.0.0" | "1.1.0" | "1.2.0" | "1.3.0" | "1.4.0" | "1.5.0" | "1.6.0"
-    ) || (report.schema_version == "1.0.0" && !report.structural_observations.is_empty())
+        "1.0.0" | "1.1.0" | "1.2.0" | "1.3.0" | "1.4.0" | "1.5.0" | "1.6.0" | "1.7.0"
+    ) || (module && report.schema_version != "1.7.0")
+        || (report.schema_version == "1.7.0"
+            && (!module
+                || language != "javascript"
+                || report.javascript_mode.as_deref() != Some("module")))
+        || (report.schema_version != "1.7.0" && report.javascript_mode.is_some())
+        || (!module
+            && report
+                .structural_observations
+                .iter()
+                .any(|row| row.rule_id == "codeguard.javascript.module_return_outside_function"))
+        || (report.schema_version == "1.0.0" && !report.structural_observations.is_empty())
         || (report.schema_version == "1.1.0"
             && (language != "python" || report.structural_observations.is_empty()))
         || (report.schema_version == "1.2.0"
@@ -165,8 +208,8 @@ fn run_candidate(
             && report.schema_version != "1.6.0")
         || (language == "javascript"
             && !report.structural_observations.is_empty()
-            && report.schema_version != "1.5.0")
-        || (matches!(report.schema_version.as_str(), "1.5.0" | "1.6.0")
+            && !matches!(report.schema_version.as_str(), "1.5.0" | "1.7.0"))
+        || (matches!(report.schema_version.as_str(), "1.5.0" | "1.6.0" | "1.7.0")
             && report
                 .parser_error_location_unavailable
                 .is_some_and(|flag| !flag || !report.truncated))

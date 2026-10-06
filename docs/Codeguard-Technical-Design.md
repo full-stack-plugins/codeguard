@@ -1789,3 +1789,55 @@ Other-category history remains stored, but this invocation does not select its r
 JavaScript WASM fallback reports source_outside_workspace for sources outside the explicit workspace, without syntax scanning or task creation. Partial explicit native context remains on the preparation path; clean candidates with no context may recommend installation without inventing a mandatory environment task.
 
 The WASM regression for source 29ec2e1 completed: foundation crates plus CLI lib/bins and 201 integration targets produced 1,879 passes, zero failures and 177 conditional tests not executed. The uncommitted Erlang draft was explicitly excluded. Strict Clippy passed. This does not qualify independent corpora, the full native-tool matrix, hosts or publication. See tests/acceptance/wasm-regression-29ec2e1.md; all 32 grammars remain candidates with zero formally qualified.
+
+## Explicit JavaScript module candidate boundary
+
+`grammar probe javascript FILE --module --format=json` binds an explicit module request to private worker1.7 and probe0.8. The worker reads frozen stdin and the pinned grammar, keeping raw ERROR/MISSING, direct duplicate bindings and returns outside functions as separate evidence. The parent validates mode/version/source/grammar/rule identities and byte positions. Legacy requests cannot consume module rules; wrong languages or unknown modes fail before parsing. Recovery and structure records share a total128-record output budget, with visible truncation. Zero candidates and input failures still retain the explicit mode and incomplete status.
+
+```mermaid
+flowchart LR
+    A[Explicit candidate request] --> B{Module mode declared?}
+    B -->|JavaScript --module| C[Parent binds mode and frozen input]
+    B -->|Undeclared| D[Existing recovery and binding candidates]
+    C --> E[Isolated worker 1.7]
+    E --> F[Raw parser recoveries]
+    E --> G[Duplicate bindings and outer returns]
+    F --> H[Parent validates identity and budgets]
+    G --> H
+    H --> I[Probe 0.8: incomplete and native confirmation]
+```
+
+This entry does not infer project mode, install tools, execute source, replace native lint or close tasks. CommonJS may permit outer returns. Existing schemas remain unchanged; new context and rules require the new protocol. Automatic project-mode observation and task/host wiring still need separate acceptance. See [limited acceptance](../tests/acceptance/javascript-module-worker-probe.md).
+
+The following is an excerpt from an actual module report. The full report also binds source/grammar identity and raw precheck counters; this excerpt does not replace protocol validation.
+
+```json
+{
+  "schema_version": "0.8.0",
+  "report_type": "grammar_candidate_probe",
+  "status": "incomplete",
+  "javascript_mode": "module",
+  "native": {
+    "reason": "explicit_candidate_probe",
+    "status": "not_run"
+  },
+  "recoveries": [],
+  "structural_observations": [
+    {
+      "basis": "codeguard_structure_rule",
+      "end_byte": 18,
+      "end_column_byte": 18,
+      "end_row": 0,
+      "parent_syntax_kind": "return_statement",
+      "rule_id": "codeguard.javascript.module_return_outside_function",
+      "rule_sha256": "a87fb74d19d215148c8be5c1785f7e872873f38fcf5e35a53631351a85455295",
+      "rule_version": "1.0.0",
+      "start_byte": 9,
+      "start_column_byte": 9,
+      "start_row": 0
+    }
+  ],
+  "delivery_decision": "not_evaluated",
+  "next_action": "confirm_candidate_structure_with_applicable_native_tool"
+}
+```

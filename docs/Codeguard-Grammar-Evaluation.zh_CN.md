@@ -181,3 +181,7 @@ Java差分验收先核对truncated_files，隐藏恢复保留unknown，避免空
 ## 模块 return 候选的 AST 事实基础
 
 runtime新增有界函数外return扫描：覆盖顶层控制流、跳过函数/生成器/箭头/方法子树、保留UTF-8字节位置和预算截断。真实Node24.18.0对11份源码在module/CommonJS下共22次对照，证明规则必须带模块模式条件。当前仅有事实层，公开worker/probe/项目模式/差分尚未接线，因此module_return仍漏检、资格0/32。见[局部验收](../tests/acceptance/javascript-module-return-ast.md)。
+
+## 显式module候选与原生组合差分接线
+
+`grammar probe javascript FILE --module --format=json`现在通过worker1.7/probe0.8观察函数外return；缺失模式的原入口不启用这条规则，零候选/读取失败也保留显式模式。开发Node差分固定module上下文，报告0.10复用同一worker：实际18例raw5TP/11TN/0FP/2FN，combined7TP/11TN/0FP/0FN。原始漏检不被抹除，固定358指标和正式资格0/32不变；这不是独立holdout。项目模式自动观察、任务和宿主接线仍开放。见[局部验收](../tests/acceptance/javascript-module-worker-probe.md)。

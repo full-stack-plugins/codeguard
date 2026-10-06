@@ -1940,3 +1940,7 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 ## 2026-10-06 JavaScript 模块 return 的 AST 事实基础
 
 延续12.11/14.17/14.19，父任务不勾选。runtime新增有界函数外return事实，覆盖顶层控制流并跳过函数/生成器/箭头/方法子树；预算截断和字节位置真实保留。新API缺失RED后实现，四目标16通过/2条件忽略，实际Node24.18.0显式1通过（11源码、22次module/CommonJS对照），严格WASM runtime/all-targets Clippy通过。公共worker/probe/项目模式/差分尚未接线，module_return漏检统计不变；禁止未知模式自启。见tests/acceptance/javascript-module-return-ast.md。40cc624 CI37431391905仍失败于固定插件证据源码checkout，后续门禁未运行。
+
+## 2026-10-06 JavaScript 显式module worker/probe与组合差分
+
+延续12.11/14.9/14.17/14.19，父任务不勾选。显式module请求固定worker1.7/probe0.8，绑定规则与模式、输出预算128；普通/未知/CommonJS路径不启用module规则，父进程拒绝模式/版本/身份伪装。公开grammar probe的参数、help、中英文README/架构/技术/评测已同步。Node差分固定module，接线0.10前真实RED，后18例raw5TP/11TN/0FP/2FN、combined7TP/11TN/0FP/0FN；原始和固定358指标不变。八相关WASM目标51通过/2条件忽略、实际Node另1通过、默认help5通过；14实际probe/1实际差分/401 schema与篡改/旧消费者拒绝、严格Clippy/分层/OpenSpec/diff通过。测试捕获目录竞态独立修复，失败日志保留。见tests/acceptance/javascript-module-worker-probe.md。项目mode自动观察、任务/宿主、独立holdout/正式资格0/32及发行仍缺。

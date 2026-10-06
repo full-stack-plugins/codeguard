@@ -1,7 +1,7 @@
 //! 开发期原生/WASM 差分回放；使用已支持的原生观察器，不授予独立 holdout 或语言资格。
 use crate::grammar_evaluation::{classify_probe, validate_corpus};
 use crate::grammar_native_checker::GrammarNativeChecker;
-use crate::syntax_worker_runner::{run_syntax_worker_binding_candidate, run_syntax_worker_candidate};
+use crate::syntax_worker_runner::{run_syntax_worker_module_candidate, run_syntax_worker_candidate};
 use codeguard_runtime::read_bounded_regular_file;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
@@ -131,7 +131,7 @@ pub fn replay_native_corpus(
             } else {
                 // 原始恢复和项目结构候选来自同一worker；仍分别保留两层指标。
                 let runner = if case.language == "javascript" {
-                    run_syntax_worker_binding_candidate
+                    run_syntax_worker_module_candidate
                 } else {
                     run_syntax_worker_candidate
                 };
@@ -166,6 +166,10 @@ pub fn replay_native_corpus(
             "native_elapsed_us":native_us,"wasm_classification":name(wasm_class),"wasm_recovery_count":recovery_count,"wasm_reason":wasm_reason,
             "wasm_elapsed_us":elapsed_us(wasm_started),"comparison":comparison(native_class,wasm_class),
             "fixture_native_disagreement":native_class.map(|valid|valid!=case.expected_valid)});
+        if case.language == "javascript" {
+            // Node开发观察器固定--input-type=module，不向未知项目模式推断。
+            row["javascript_mode"] = json!("module");
+        }
         if measure_structure {
             // 原始恢复统计保持不变，结构规则仅补充独立的候选层测量。
             let combined = combined_candidate(wasm_class, structures.as_ref().map(Vec::len));
@@ -245,7 +249,7 @@ pub fn replay_native_corpus(
             inventory.push(json!({"language":language,"grammar_sha256":asset["sha256"],"native_selected":false,"reason":if checker(language).is_some(){"explicit_native_tool_not_selected"}else{"native_differential_adapter_unavailable"},"grammar_qualified":false}));
         }
     }
-    let mut report = json!({"schema_version":if javascript_selected {"0.9.0"}else if rust_selected {"0.8.0"}else if go_selected {"0.7.0"}else if ruby_selected {"0.5.0"}else if measure_structure {"0.3.0"}else{"0.1.0"},"report_type":"native_grammar_differential","status":"incomplete","delivery_decision":"not_evaluated",
+    let mut report = json!({"schema_version":if javascript_selected {"0.10.0"}else if rust_selected {"0.8.0"}else if go_selected {"0.7.0"}else if ruby_selected {"0.5.0"}else if measure_structure {"0.3.0"}else{"0.1.0"},"report_type":"native_grammar_differential","status":"incomplete","delivery_decision":"not_evaluated",
         "authority":"development_native_differential_only","native_adapter_reused":!(javascript_selected || ruby_selected || go_selected || rust_selected),"independent_holdout":false,"grammar_qualified_count":0,
         "corpus_sha256":digest(corpus_bytes),"manifest_sha256":corpus.manifest_sha256,"program_sha256":program_sha,"program_stable":program_stable,
         "language_count":inventory.len(),"selected_language_count":frozen.len(),"sample_count":cases.len(),"languages":inventory,"cases":cases});

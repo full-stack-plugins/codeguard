@@ -115,7 +115,7 @@ cargo build --locked -p codeguard-cli
 
 ### npm 安装与一次性调用
 
-WASM源码构建现可通过`codeguard grammar probe javascript FILE --format=json`观察重复直接JavaScript let/const绑定候选。[Probe0.6](schemas/grammar-probe-v0.6.schema.json)保留原始解析器恢复，明确有限规则范围并要求原生确认。项目检查、Hook和修复任务尚未接入本规则；已发布npm0.1.4不含此增量。[验收](tests/acceptance/javascript-binding-probe.md)。
+WASM源码构建可通过`codeguard grammar probe javascript FILE --format=json`观察重复直接JavaScript let/const绑定候选；项目检查、独立lint和编辑Hook也已复用该规则。显式诊断`codeguard grammar probe javascript MODULE_FILE --module --format=json`另外观察函数边界外return。[Probe0.8](schemas/grammar-probe-v0.8.schema.json)绑定`javascript_mode=module`，原始恢复与结构候选分开，始终退出3/incomplete。未指定`--module`不启用该规则，不能推断CommonJS或未知项目模式；不授予原生完成、任务关闭或语言资格。公开npm0.1.4不含这些增量。[验收](tests/acceptance/javascript-module-worker-probe.md)。
 
 源码以 `--features wasm-precheck` 构建后，可显式运行 `codeguard grammar probe <language> <file> --format=json`，由隔离 worker 调用 32 份固定候选中的任意一份。命令始终以退出码 3 返回，并标记 `status=incomplete`、`native.status=not_run`、`delivery_decision=not_evaluated`；解析完成时还标记 `precheck.status=incomplete`。输入或 worker 失败也遵守同一份[封闭 JSON Schema](schemas/grammar-probe-v0.1.schema.json)。恢复锚点只是疑似观察。此诊断入口尚未把全部语种接入已验收的原生优先 `lint/check`；已发布 npm 包仅把它作为未验收候选提供。
 
