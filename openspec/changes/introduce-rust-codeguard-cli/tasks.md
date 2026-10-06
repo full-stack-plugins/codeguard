@@ -1964,3 +1964,7 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 ## 2026-10-06 JavaScript声明模块接入统一检查和稳定任务
 
 新增端到端RED证明项目扫描缺module候选；接通后项目check、独立lint typescript、lint all和编辑Hook复用同一稳定任务，CommonJS不启用module return规则。首导入核验模式/包/源码/规则证据，五类伪造拒绝；修复为无候选仍保留open。原包声明变化时原任务复检在Node启动前返回上下文失效。新报告使用独立封闭协议，七份实际报告和六类schema反例通过。详见tests/acceptance/javascript-module-workbench.md；本批不完成14.x/9.x/11.x生产任务，不改变0/32资格。新增四核心生产验收15.1–15.7继续保持未完成。
+
+## 2026-10-06 Maven/Gradle同根配置归属缺陷修复
+
+同目录if/else发现逻辑会丢弃Gradle及第二份Gradle脚本，三个新用例RED后修复。依赖/CVE/安全类别不再用已配置或已执行Maven覆盖Gradle未解析义务，Maven局部图和漏洞保留在native_results。新版check_feedback0.61封闭消费实际报告；默认50通过、WASM7通过（重叠，不合计独立样本），21报告/409schema验证通过。缓存Gradle8.10.2版本命令实测可用，OWASP插件缓存目录未找到，未安装下载。详见tests/acceptance/java-mixed-build-roots.md；6.x/8.x/15.5仍待真正Gradle插件运行及修复闭环，保持未完成。

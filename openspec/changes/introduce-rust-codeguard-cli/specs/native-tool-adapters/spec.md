@@ -787,3 +787,7 @@ Codeguard SHALL target every one of the 57 canonical registry entries for produc
 #### Scenario: A release makes an all-language production claim
 - **WHEN** Codeguard requests production release acceptance
 - **THEN** the gate SHALL require every claimed language/version/build/platform row to pass all four core capabilities, independent precision/recall and failure-mode evaluation, persistent repair/recheck/reopen behavior and installed host feedback; unresolved rows SHALL block that claim
+
+#### Scenario: Maven and Gradle manifests coexist in the same physical build root
+- **WHEN** 同一构建根同时存在pom.xml和build.gradle/build.gradle.kts，或两种Gradle脚本并存
+- **THEN** 静态发现 SHALL 保留每个脚本的检查器身份与configuration_ref，不因先发现POM而丢弃Gradle；Java依赖/CVE/安全类别 SHALL 保留构建模型混合或未解析状态，Maven局部执行结果不得覆盖Gradle义务；损坏POM也不能掩盖Gradle路径

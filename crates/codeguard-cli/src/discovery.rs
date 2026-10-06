@@ -250,9 +250,11 @@ pub fn discover<P: ObservationPort>(
                             .extend(inspect_maven_unreadable(build_root, manifest));
                     }
                 }
-            } else if let Some(manifest) = manifests
+            }
+            // 同根多构建器逐份保留身份，POM观察不能遮蔽Gradle脚本或其未解析义务。
+            for manifest in manifests
                 .iter()
-                .find(|name| name.ends_with("build.gradle") || name.ends_with("build.gradle.kts"))
+                .filter(|name| name.ends_with("build.gradle") || name.ends_with("build.gradle.kts"))
             {
                 report
                     .checker_configurations
