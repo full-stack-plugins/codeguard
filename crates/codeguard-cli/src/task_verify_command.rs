@@ -41,6 +41,7 @@ struct Arguments {
     kotlinc_tool: Option<PathBuf>,
     cargo_tool: Option<PathBuf>,
     shellcheck_tool: Option<PathBuf>,
+    clang_tool: Option<PathBuf>,
     cargo_audit_tool: Option<PathBuf>,
     rustsec_db: Option<PathBuf>,
     pip_audit_tool: Option<PathBuf>,
@@ -94,14 +95,37 @@ pub fn run(args: &[String]) -> ExitCode {
         Err(reason) => return print_unavailable(&parsed, reason),
     };
     let gradle_cve_task = brief["checker_id"] == "java.gradle.dependency_check";
-    if matches!(
+    let c_documentation_task = matches!(
         brief["checker_id"].as_str(),
         Some("c.clang.documentation" | "cpp.clang.documentation")
-    ) {
-        return print_unavailable(
-            &parsed,
-            "clang_documentation_task_verification_not_integrated",
-        );
+    );
+    if parsed.clang_tool.is_some() && !c_documentation_task {
+        eprintln!("--clang-tool 仅用于C/C++文档任务");
+        return ExitCode::from(2);
+    }
+    if c_documentation_task {
+        if args.iter().filter(|s| s.starts_with("--")).any(|s| {
+            !matches!(
+                s.as_str(),
+                "--clang-tool"
+                    | "--timeout"
+                    | "--format"
+                    | "--format=json"
+                    | "--format=human"
+                    | "--owner"
+                    | "--lease-token"
+            )
+        }) {
+            eprintln!("C/C++文档任务仅接受原工具及共享复检参数");
+            return ExitCode::from(2);
+        }
+        if let Err(reason) = crate::c_family_comments_task_recheck::preflight(
+            &root,
+            &brief,
+            parsed.clang_tool.as_deref(),
+        ) {
+            return print_unavailable(&parsed, reason);
+        }
     }
     let python_confirmation = brief["checker_id"] == "python.ruff"
         && brief["reason_code"] == "python_syntax_confirmation_needed";
@@ -338,7 +362,15 @@ pub fn run(args: &[String]) -> ExitCode {
     } else {
         None
     };
-    let mut scan = if syntax_task {
+    let mut scan = if c_documentation_task {
+        match crate::c_family_comments_task_recheck::run(&root, &brief, deadline) {
+            Ok(report) => report,
+            Err(reason) => {
+                let release = finish_verification(&root, &parsed.task_id, &lease);
+                return print_unavailable(&parsed, release.err().unwrap_or(reason));
+            }
+        }
+    } else if syntax_task {
         let recheck = if crate::syntax_task_recheck::original(&root, &brief)
             .is_ok_and(|original| original["language"] == "rust")
         {
@@ -858,6 +890,8 @@ pub fn run(args: &[String]) -> ExitCode {
             crate::rust_cve_task_recheck::classify(&brief, &scan)
         } else if brief["checker_id"] == "python.pip_audit" {
             crate::python_cve_task_recheck::classify(&brief, &scan)
+        } else if c_documentation_task {
+            crate::c_family_comments_task_recheck::classify(&brief, &scan)
         } else if shell_task {
             crate::shell_task_recheck::classify(&brief, &scan)
         } else if brief["checker_id"] == "rust.cargo_rustdoc" {
@@ -888,6 +922,9 @@ pub fn run(args: &[String]) -> ExitCode {
         } else {
             "0.34.0"
         });
+    }
+    if c_documentation_task {
+        report["schema_version"] = json!("0.36.0");
     }
     if gradle_cve_task {
         report["schema_version"] = json!("0.35.0");
@@ -954,11 +991,21 @@ pub fn run(args: &[String]) -> ExitCode {
         match lock_verification(&root, &parsed.task_id, &lease) {
             Ok(_guard) => match latest_ready_attempt(&root, &parsed.task_id) {
                 Ok(current) if current == bound_attempt => {
-                    if (gradle_cve_task
-                        && (crate::gradle_cve_task_recheck::validate_binding(&root, &brief, &scan)
+                    if (c_documentation_task
+                        && (!crate::c_family_comments_task_recheck::valid_shape(&root, &scan)
+                            || (scan["input_stable"] == true
+                                && !crate::c_family_comments_task_recheck::inputs_current(
+                                    &root, &scan,
+                                ))))
+                        || (gradle_cve_task
+                            && (crate::gradle_cve_task_recheck::validate_binding(
+                                &root, &brief, &scan,
+                            )
                             .is_err()
-                            || (scan["task_input_stable"] == true
-                                && !crate::gradle_cve_task_recheck::inputs_current(&root, &scan))))
+                                || (scan["task_input_stable"] == true
+                                    && !crate::gradle_cve_task_recheck::inputs_current(
+                                        &root, &scan,
+                                    ))))
                         || (python_confirmation
                             && (!crate::python_confirmation_recheck::valid_binding(&root, &scan)
                                 || (scan["task_input_stable"] == true
@@ -1016,7 +1063,7 @@ pub fn run(args: &[String]) -> ExitCode {
     if let Err(reason) = persist {
         if reason == "source_changed_before_verification_record" {
             report["observation"] = json!("incomplete");
-            report["native_scan"][if syntax_task || shell_task {
+            report["native_scan"][if syntax_task || shell_task || c_documentation_task {
                 "input_stable"
             } else {
                 "task_input_stable"
@@ -1028,6 +1075,11 @@ pub fn run(args: &[String]) -> ExitCode {
     }
     if let Err(reason) = finish_verification(&root, &parsed.task_id, &lease) {
         report["reason"] = json!(reason);
+    }
+    if c_documentation_task && codeguard_runtime::sigint_cancellation_requested() {
+        report["command_status"] = json!("cancelled");
+        report["exit_code"] = json!(130);
+        report["reason"] = json!("request_cancelled");
     }
     if parsed.json {
         println!("{report}");
@@ -1159,7 +1211,7 @@ pub fn run(args: &[String]) -> ExitCode {
             }
         }
     }
-    ExitCode::from(3)
+    ExitCode::from(if report["exit_code"] == 130 { 130 } else { 3 })
 }
 
 pub(crate) fn classify_doctor(brief: &Value, report: &Value) -> &'static str {
@@ -1736,6 +1788,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
     let mut kotlinc_tool = None;
     let mut cargo_tool = None;
     let mut shellcheck_tool = None;
+    let mut clang_tool = None;
     let mut cargo_audit_tool = None;
     let mut rustsec_db = None;
     let mut pip_audit_tool = None;
@@ -1780,6 +1833,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                 | "--ruby-tool"
                 | "--kotlinc-tool"
                 | "--cargo-tool"
+                | "--clang-tool"
                 | "--shellcheck-tool"
                 | "--cargo-audit-tool"
                 | "--rustsec-db"
@@ -1822,6 +1876,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                 "--ruby-tool" if ruby_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--kotlinc-tool" if kotlinc_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--cargo-tool" if cargo_tool.replace(PathBuf::from(value)).is_none() => {}
+                "--clang-tool" if clang_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--shellcheck-tool" if shellcheck_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--cargo-audit-tool"
                     if cargo_audit_tool.replace(PathBuf::from(value)).is_none() => {}
@@ -1905,6 +1960,9 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
     {
         return Err("Python CVE 工具与版本必须成对提供，工具路径必须为绝对路径".into());
     }
+    if clang_tool.as_ref().is_some_and(|p| !p.is_absolute()) {
+        return Err("--clang-tool 必须是绝对路径".into());
+    }
     if shellcheck_tool.as_ref().is_some_and(|p| !p.is_absolute()) {
         return Err("--shellcheck-tool 必须是绝对路径".into());
     }
@@ -1969,6 +2027,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
         kotlinc_tool,
         cargo_tool,
         shellcheck_tool,
+        clang_tool,
         cargo_audit_tool,
         rustsec_db,
         pip_audit_tool,

@@ -616,6 +616,26 @@ fn parse_report(
     digest: String,
 ) -> Result<ReportInput, &'static str> {
     #[cfg(unix)]
+    if report["report_type"] == "clang_documentation_task_recheck" {
+        if !crate::c_family_comments_task_recheck::valid_shape(root, report)
+            || report["workspace_id"] != workspace_id
+        {
+            return Err("clang_documentation_recheck_invalid");
+        }
+        let run = report["run_id"].as_str().ok_or("report_run_id_invalid")?;
+        if path.file_stem().and_then(|p| p.to_str()) != Some(run) {
+            return Err("report_run_id_invalid");
+        }
+        return Ok(ReportInput {
+            workspace_id: workspace_id.into(),
+            run_id: run.into(),
+            digest,
+            findings: Vec::new(),
+            blockers: Vec::new(),
+            historical_findings: 0,
+        });
+    }
+    #[cfg(unix)]
     if report["report_type"] == "clang_documentation_workbench_observation" {
         return c_family_comments_report::parse(root, workspace_id, path, report, digest);
     }

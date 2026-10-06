@@ -38,3 +38,5 @@ CARGO_PROFILE_TEST_DEBUG=0 cargo test --offline --locked -p codeguard-cli --test
 CODEGUARD_CLANG_BIN=/usr/bin/clang CARGO_PROFILE_TEST_DEBUG=0 cargo test --offline --locked -p codeguard-cli --features wasm-precheck --test c_family_comments_workbench -- --include-ignored
 python3 tests/c_family_comments_workbench_schema.py /absolute/development-report-directory
 ```
+
+当前增量：绑定反馈已为0.3、next0.29，原任务复检已接通。上文0.2/0.28和未接通说明为8a80420历史检查点；当前证据见[原任务复检](c-family-comments-task-recheck.md)。

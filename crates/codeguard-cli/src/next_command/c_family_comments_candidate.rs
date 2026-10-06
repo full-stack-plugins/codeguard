@@ -16,8 +16,15 @@ fn read(root: &Path, run: &str, expected: Option<&str>) -> Result<Value, &'stati
     if expected.is_some_and(|s| s != digest) {
         return Err("clang_documentation_origin_changed");
     }
-    let r = codeguard_adapters::parse_unique_json(&bytes)
+    let mut r = codeguard_adapters::parse_unique_json(&bytes)
         .map_err(|_| "clang_documentation_origin_invalid")?;
+    let recheck_input_stable = r.get("input_stable").cloned();
+    if r["report_type"] == "clang_documentation_task_recheck" {
+        if !crate::c_family_comments_task_recheck::valid_shape(root, &r) {
+            return Err("clang_documentation_recheck_invalid");
+        }
+        r = crate::c_family_comments_task_recheck::normal(&r);
+    }
     if !valid_shape(&r) || r["run_id"] != run {
         return Err("clang_documentation_origin_invalid");
     }
@@ -28,6 +35,9 @@ fn read(root: &Path, run: &str, expected: Option<&str>) -> Result<Value, &'stati
     )? != expected_marker
     {
         return Err("clang_documentation_observation_not_consumed");
+    }
+    if let Some(stable) = recheck_input_stable {
+        r["task_recheck_input_stable"] = stable;
     }
     Ok(r)
 }
@@ -130,7 +140,7 @@ pub(super) fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate
         .filter(|d| d["rule_id"] == rule)
         .cloned()
         .collect();
-    let status = if !current(root, &latest) {
+    let status = if latest["task_recheck_input_stable"] == false || !current(root, &latest) {
         "input_changed"
     } else if latest["local_scan_complete"] != true {
         "native_incomplete"
@@ -145,12 +155,12 @@ pub(super) fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate
     };
     let actionable = status == "native_rule_observed";
     let guidance = codeguard_adapters::clang_documentation_guidance(rule).unwrap_or(json!({"rule_summary":"原生文档检查未完成或存在未适配规则","repair_steps":["核对原生原因、工具与源码范围，再运行原文档检查。"]}));
-    let brief = json!({"schema_version":"0.28.0","task_id":id,"kind":kind,"checker_id":checker(&first),"scope":first["path"],"source_sha256":latest["source_sha256"],"native_rule_id":if kind == "finding" {json!(rule)} else {Value::Null},
+    let brief = json!({"schema_version":"0.29.0","task_id":id,"kind":kind,"checker_id":checker(&first),"scope":first["path"],"source_sha256":latest["source_sha256"],"native_rule_id":if kind == "finding" {json!(rule)} else {Value::Null},
         "evidence_ref":{"first_run_id":run,"first_report_sha256":digest},"current_run_id":latest["run_id"],"observation_status":status,"native_reason":latest["native"]["reason"],"native_positions":if actionable {json!(present)} else {json!([])},
         "unclassified_native_diagnostics":latest["native"]["diagnostics"].as_array().into_iter().flatten().filter(|d| d["rule_id"].as_str().is_some_and(|r| codeguard_adapters::clang_documentation_guidance(r).is_none())).cloned().collect::<Vec<_>>(),
         "rule_basis":guidance["rule_summary"],"constraints":["仅文档注释；保留源码API与行为","本地报告非可信政策，不能关闭任务或自批白名单"],"allowed_paths":if actionable {json!([first["path"]])} else {json!([])},
-        "disposition":if actionable {"actionable"} else {"needs_decision"},"reason_code":status,"step":guidance["repair_steps"],"recheck_argv":["codeguard","comments",first["language"],root.join(first["path"].as_str().unwrap_or("")),"--workspace",root,"--clang-tool",first["selected_tool"],"--standard",first["standard"],"--format=json"],
-        "history":{"status":"native_observations_only","task_verify":"not_integrated","attempt_journal":"not_integrated"},"closure_condition":"原工具专用任务复检、完整详细文档覆盖及可信关闭仍待完成；零诊断或勾选不关闭","authority":"local_unverified","delivery_decision":"not_evaluated"});
+        "disposition":if actionable {"actionable"} else {"needs_decision"},"reason_code":status,"step":guidance["repair_steps"],"recheck_argv":["codeguard","task","verify",id,root,"--clang-tool",first["selected_tool"],"--format=json"],
+        "history":{"status":"native_observations_only","task_verify":"partial","attempt_journal":"not_integrated"},"closure_condition":"原工具局部任务复检已接通；完整详细文档覆盖、尝试历史和可信关闭仍待完成；零诊断或勾选不关闭","authority":"local_unverified","delivery_decision":"not_evaluated"});
     Ok(Candidate {
         id: id.into(),
         priority: if actionable { 1 } else { 0 },
