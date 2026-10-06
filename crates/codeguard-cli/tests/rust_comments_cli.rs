@@ -32,7 +32,7 @@ impl Fixture {
     }
     fn tool(&self, body: &str) -> PathBuf {
         let path = self.0.join("fake-cargo");
-        fs::write(&path, format!("#!/bin/sh\n{body}\n")).unwrap();
+        fs::write(&path, format!("#!/bin/sh\ncase \"$1\" in clippy) printf '%s\\n' '{{\"reason\":\"build-finished\",\"success\":true}}'; exit 0;; esac\n{body}\n")).unwrap();
         fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
         path
     }
@@ -58,7 +58,8 @@ impl Fixture {
             .unwrap();
         (
             output.status.code().unwrap(),
-            serde_json::from_slice(&output.stdout).unwrap(),
+            serde_json::from_slice::<Value>(&output.stdout).unwrap()["native_results"]["rustdoc"]
+                .clone(),
         )
     }
     fn warning(&self) -> String {
@@ -384,10 +385,18 @@ fn initialized_missing_tool_creates_preparation_task_without_source_violation() 
         .unwrap()
         .flatten()
         .collect();
-    assert_eq!(tasks.len(), 1);
-    let text = fs::read_to_string(tasks[0].path()).unwrap();
-    assert!(text.contains("rustdoc"));
+    assert_eq!(tasks.len(), 2, "双原生入口分别保留两项准备任务");
+    let texts: Vec<_> = tasks
+        .iter()
+        .map(|task| fs::read_to_string(task.path()).unwrap())
+        .collect();
+    let text = texts.iter().find(|text| text.contains("rustdoc")).unwrap();
     assert!(text.contains("不是源码违规"));
+    assert!(
+        texts
+            .iter()
+            .any(|text| text.contains("Clippy") || text.contains("clippy"))
+    );
 }
 
 #[test]

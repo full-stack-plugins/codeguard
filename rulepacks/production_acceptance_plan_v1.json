@@ -35,7 +35,7 @@
     "crates/codeguard-cli/src/python_lint_scan.rs": "6ed700a772d82e2ce8c1493b0a1a943429f50329aa3fffc41d656aa800b64bf0",
     "crates/codeguard-cli/src/ruby_lint_command.rs": "b85253e501e65bcc251c8af0b52e00f8b26894ad1674da1c565644a84392a3aa",
     "crates/codeguard-cli/src/ruff_probe.rs": "bdfb0e11a92c82aecf8963ba8c06ad753830f37ad94ced038826a402dd8214bd",
-    "crates/codeguard-cli/src/rust_comments_command.rs": "fdc79636bd00778d832e5ddb82b705879dbec97d51503ff225043f83828834a8",
+    "crates/codeguard-cli/src/rust_comments_command.rs": "42e971bbf93963e35cd274e748792d4ad19d5bb69f019be96f0bd8f0a5b4e1e9",
     "crates/codeguard-cli/src/rust_lint_command.rs": "ebe8891a4081107ec9e7cde0802ec672efa75d86bc6578082a9f1f4fcb5110dc",
     "crates/codeguard-cli/src/rust_project_syntax.rs": "6c3a274337fb1b762ee0a73f7171b9e64f9a5d59be23a8f6645ff6d9e4bc2033",
     "crates/codeguard-cli/src/shell_lint_command.rs": "8e3d859a6c52e282296975751f9fe74e26eb7371105740f526f22990e79d72ae",
@@ -73,7 +73,7 @@
     "crates/codeguard-cli/src/gradle_cve_workbench.rs": "04677889296923b95823b8c7127a4ca0a2b4dc8372c9e9adda5ba57207b56867",
     "crates/codeguard-cli/src/work_sync/gradle_cve_report.rs": "1b8478d43a02101112e2ac58ff5d53b9b3300b0dc05ceabd3e981425221ffe92",
     "crates/codeguard-cli/src/work_sync.rs": "f9eb6a4d19d0cc5558cb930c16c5ad4e3b5ca14827302ccb19378afe308b7130",
-    "crates/codeguard-cli/src/next_command.rs": "d2d5763b49165a725e1a2562c185c704103b0a7c405960093b735131092092a3",
+    "crates/codeguard-cli/src/next_command.rs": "0c69ddba425f5796b358e980c694134211d7135f1b6c1da985b1c14a4f20b3f8",
     "crates/codeguard-cli/src/task_verify_command.rs": "3550968173682c00d23209625351912699fb7b845be188a53740abf541841639",
     "tests/acceptance/gradle-cve-workbench.md": "15aec15873a8f7894d69f97a66362238c87f7d703e0be375b28630695adb2cfd",
     "crates/codeguard-cli/src/gradle_cve_task_recheck.rs": "3229794e846ca217567f82fcb80a79790786ef46f5d90772fe919933d3b91708",
@@ -105,7 +105,14 @@
     "tests/acceptance/java-native-tool-preparation-plan.md": "bff683f3debed09fc6632cf3fb140745bb99d971bec73a88326260e976959f9b",
     "tests/fixtures/java_native_tool_bootstrap/pom.xml": "651bd2709304a8bf5a7371b5a7503bedf9482a2f915afd5d93cf36a5473410a5",
     "tests/fixtures/java_native_tool_bootstrap/src/main/java/BootstrapDocs.java": "2cb6b78b759253536027b34afc500f751d1e4614420f77ddcd5623a9a7ab19fa",
-    "tests/acceptance/evidence/java-native-tool-source-inventory-2026-10-07.json": "b9d8e2bf5f16ccd370a699d9d4b177b1b108c55c85b981b7f9a42eeef7ce6cec"
+    "tests/acceptance/evidence/java-native-tool-source-inventory-2026-10-07.json": "b9d8e2bf5f16ccd370a699d9d4b177b1b108c55c85b981b7f9a42eeef7ce6cec",
+    "crates/codeguard-cli/src/rust_documentation_command.rs": "be99260bb6cedf3b3f5bdf069dcbcd4779e86e28f14eeb20f7da678e113cae23",
+    "crates/codeguard-cli/tests/rust_comments_combined.rs": "fa46908244d31af51a0dea69ef681a33bc38be400d344f2d7b526ef4f9cc580d",
+    "schemas/rust-comments-feedback-v0.1.schema.json": "90a91bcf9654766eb3c758ba0520d15dc14e299e97a62de2a8b8daa240861963",
+    "tests/acceptance/rust-comments-combined.md": "2c7a3ff33ae5e6779446c630e81f3826c89357417fc1b3417a9156d8606d4d56",
+    "tests/acceptance/evidence/rust-comments-combined-native.json": "6f9c7fb273b5e348cd10afc0ce4b47d14d83876aaa60a6220ef4e9b5a5519335",
+    "tests/acceptance/evidence/rust-comments-combined-native-wasm.json": "194575fe21667cf461180589b98779dd9c571a3a3506dfa48d6ba81a5f78d693",
+    "tests/acceptance/evidence/rust-comments-combined-schema.json": "e8e1191d35a2ddcac8545334bde1231d39413c5aa016dffcda6def40bb0a10f9"
   },
   "languages": [
     {
@@ -407,7 +414,8 @@
                 "crates/codeguard-adapters/src/cargo_documentation_config.rs",
                 "crates/codeguard-cli/src/discovery.rs",
                 "crates/codeguard-adapters/src/cargo_documentation_workspace.rs",
-                "crates/codeguard-adapters/src/cargo_workspace_reference.rs"
+                "crates/codeguard-adapters/src/cargo_workspace_reference.rs",
+                "crates/codeguard-cli/src/rust_documentation_command.rs"
               ],
               "evidence_refs": [
                 "tests/acceptance/rustdoc-task-recheck.md",
@@ -418,7 +426,13 @@
                 "crates/codeguard-cli/tests/cargo_doc_config_cli.rs",
                 "tests/acceptance/cargo-documentation-declarations.md",
                 "tests/acceptance/cargo-documentation-workspace.md",
-                "tests/acceptance/cargo-documentation-explicit-workspace.md"
+                "tests/acceptance/cargo-documentation-explicit-workspace.md",
+                "crates/codeguard-cli/tests/rust_comments_combined.rs",
+                "schemas/rust-comments-feedback-v0.1.schema.json",
+                "tests/acceptance/rust-comments-combined.md",
+                "tests/acceptance/evidence/rust-comments-combined-native.json",
+                "tests/acceptance/evidence/rust-comments-combined-native-wasm.json",
+                "tests/acceptance/evidence/rust-comments-combined-schema.json"
               ],
               "blockers": [
                 "rust/cargo: Rustdoc用途/参数/返回/错误/Panics/Safety及目标特性的完整原生规则/合法反例/契约准确性未验收",

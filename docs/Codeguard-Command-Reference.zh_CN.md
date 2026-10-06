@@ -948,3 +948,5 @@ Gradle文档原生描述检查现补齐空注释、缺主描述和空异常说�
 四核心验收计划只读入口：`codeguard capabilities [language] --acceptance-plan --format=json`. 57 语言/228 义务保留未授予资格，筛选不缩减总义务。参见[acceptance plan](Codeguard-Production-Acceptance-Plan.zh_CN.md).
 
 Java Gradle 漏洞检查新增显式原任务入口 `codeguard cve java`；JSON 原配置与可选模块缓存保留，结果仍未受信，工作台和完整原生验收待完成。详见[Gradle OWASP](Codeguard-Gradle-Vulnerability-Checks.zh_CN.md).
+
+`comments rust` 现返回独立 `rust_comments_feedback` 0.1 封装，在 `native_results` 保留原 Rustdoc 0.4 与 Clippy 0.2 观察。两项顺序执行且共用截止时间，`next` 选择文档任务。原独立入口的 Rustdoc JSON 消费方须改读 `native_results.rustdoc`；已保存原生报告和原工具任务复检保持兼容。参见 [统一入口验收](../tests/acceptance/rust-comments-combined.md)。

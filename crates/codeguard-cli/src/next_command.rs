@@ -111,6 +111,16 @@ pub(crate) fn read_local_brief_for_checkers(
     build_view(root, Some(checker_ids), None)
 }
 
+/// 选择当前或历史开放的 Rust 文档任务；保留准备任务，不借用其它 Clippy 规则。
+pub(crate) fn read_rust_documentation_brief(root: &Path) -> Result<Value, &'static str> {
+    build_filtered_view(
+        root,
+        Some(&["rust.cargo_rustdoc", "rust.cargo_clippy"]),
+        None,
+        true,
+    )
+}
+
 /// 从本轮已同步的任务身份读取下一步；返回既有 next 协议，不扩大到其它历史任务。
 pub(crate) fn read_local_brief_for_tasks(
     root: &Path,
@@ -186,6 +196,15 @@ fn build_view(
     root: &Path,
     checker_ids: Option<&[&str]>,
     task_ids: Option<&std::collections::BTreeSet<String>>,
+) -> Result<Value, &'static str> {
+    build_filtered_view(root, checker_ids, task_ids, false)
+}
+
+fn build_filtered_view(
+    root: &Path,
+    checker_ids: Option<&[&str]>,
+    task_ids: Option<&std::collections::BTreeSet<String>>,
+    rust_documentation_only: bool,
 ) -> Result<Value, &'static str> {
     let baseline = read_workspace_baseline(root).map_err(|reason| {
         if reason == "legacy_workspace_requires_manual_migration" {
@@ -268,6 +287,17 @@ fn build_view(
                 .iter()
                 .any(|checker| candidate.brief["checker_id"] == *checker)
         }) && task_ids.is_none_or(|ids| ids.contains(&candidate.id))
+            && (!rust_documentation_only
+                || candidate.brief["kind"] == "blocker"
+                || candidate.brief["checker_id"] == "rust.cargo_rustdoc"
+                || matches!(
+                    candidate.brief["native_rule_id"].as_str(),
+                    Some(
+                        "clippy::missing_errors_doc"
+                            | "clippy::missing_panics_doc"
+                            | "clippy::missing_safety_doc"
+                    )
+                ))
         {
             candidates.push(candidate);
         }
