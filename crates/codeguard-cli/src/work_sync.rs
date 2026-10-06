@@ -20,6 +20,8 @@ use crate::workspace_refresh::read_workspace_baseline;
 
 const MAX_REPORT_BYTES: u64 = 16 * 1024 * 1024;
 mod checkstyle_report;
+#[cfg(unix)]
+mod javadoc_report;
 mod doctor_report;
 mod eslint_report;
 mod npm_preparation_report;
@@ -506,6 +508,7 @@ fn import_one(
                     | "eslint_task_recheck"
                     | "eslint_preparation_observation"
                     | "java_checkstyle_workbench_observation"
+                    | "javadoc_workbench_observation"
                     | "checkstyle_task_recheck"
                     | "checkstyle_preparation_observation"
                     | "checkstyle_preparation_recheck"
@@ -689,6 +692,10 @@ fn parse_report(
     }
     if report["report_type"] == "rust_clippy_local_observation" {
         return parse_rust_report(root, workspace_id, path, report, digest);
+    }
+    #[cfg(unix)]
+    if report["report_type"] == "javadoc_workbench_observation" {
+        return javadoc_report::parse(root, workspace_id, path, report, digest);
     }
     if report["report_type"] == "java_p3c_project_observation" {
         return parse_java_report(root, workspace_id, path, report, digest);
@@ -1964,7 +1971,10 @@ fn run_sequence(run_id: &str) -> Option<u128> {
             Some(last)
         };
     }
-    if run_id.starts_with("checkstyle-") || run_id.starts_with("eslint-") {
+    if run_id.starts_with("checkstyle-")
+        || run_id.starts_with("eslint-")
+        || run_id.starts_with("javadoc-")
+    {
         return run_id.rsplit('-').next()?.parse().ok();
     }
     if let Some(value) = run_id
@@ -2103,6 +2113,12 @@ fn persist_local_blocker_observation(
 }
 
 fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
+    if blocker.checker_id == "java.jdk.javadoc" {
+        return format!(
+            "# {} Javadoc 准备任务\n\n- 问题证据：原因 {}，范围 {}；报告 {}，摘要 {}。\n- 规则依据：原配置与完整原生观察前置；不是源码违规，不自动成为交付义务。\n- 允许范围：JDK21、原配置和环境，不能反复修改无关源码。\n- 修复步骤：核对配置和原工具版本，恢复适用检查能力。\n- 复检命令：codeguard comments java . --java-home <已核验JDK21绝对路径> --format json。\n- 历史尝试：首次run {}；用task attempt记录失败和具体诊断。\n- 关闭条件：原工具完整复检及可信策略；task verify适配待接通，安装、勾选或局部成功不关闭。\n",
+            blocker.id, blocker.reason, blocker.scope, report.run_id, report.digest, report.run_id
+        );
+    }
     if blocker.checker_id == "shell.shellcheck" {
         return format!(
             "# {} ShellCheck 环境恢复任务\n\n- 问题证据：报告 .codeguard/reports/{}.json，摘要 {}；范围 {}；原因 {}。\n- 规则依据：原生检查能力必须完整，环境故障不是源码违规。\n- 允许范围：仅检查环境、方言及原配置；不修改无关源码。\n- 修复步骤：核对原工具版本、source依赖、rc及输入稳定性，恢复后复扫；zsh/fish需要专用原生能力。\n- 复检命令：codeguard task verify {} . --shellcheck-tool <已核验绝对路径> --format=json。\n- 历史尝试：首次run {}，后续不同阻塞原因仍归同一任务；通过task attempt记录尝试，原工具复检绑定结果；task show/next查询当前历史。\n- 关闭条件：恢复原检查且正式复检流程通过；安装、勾选和零诊断不能自行关闭。\n",
@@ -2364,6 +2380,18 @@ fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
 }
 
 fn render_task(report: &ReportInput, finding: &FindingInput) -> String {
+    if finding.checker_id == "java.jdk.javadoc" {
+        return format!(
+            "# {} Javadoc 修复任务\n\n- 问题证据：原生规则 {}，首次行 {}；报告 {}，摘要 {}。\n- 规则依据：JDK21 Javadoc 原生注释和标签检查；项目政策未核验。\n- 允许范围：仅目标源码 {}，禁止关闭规则替代修复。\n- 修复步骤：核对API契约，补类、公共构造函数、参数、返回或异常文档；误报提交精确纠错。\n- 复检命令：codeguard comments java . --java-home <已核验JDK21绝对路径> --format json。\n- 历史尝试：首次run {}；后续观察保存到同一问题，task attempt记录尝试。\n- 关闭条件：原工具完整复检及可信策略；task verify适配尚未接通，零诊断与勾选不能关闭。\n",
+            finding.id,
+            finding.rule_id,
+            finding.line,
+            report.run_id,
+            report.digest,
+            finding.path,
+            report.run_id
+        );
+    }
     if finding.checker_id == "shell.shellcheck" {
         return format!(
             "# {} ShellCheck 规则组修复任务\n\n- 问题证据：原生 {}，首次行 {}；原报告 .codeguard/reports/{}.json，摘要 {}；同文件同方言同规则的多个位置作为一组，原位置在报告中保留。\n- 规则依据：https://www.shellcheck.net/wiki/{}；原项目rc与可信策略分开。\n- 允许范围：仅目标源码 {}；先核对当前证据，不能按历史位置修改。\n- 修复步骤：按原规则修复引用、展开或可移植性，保留行为；不关闭规则代替修复。\n- 复检命令：codeguard task verify {} . --shellcheck-tool <已核验绝对路径> --format=json；方言和显式rc由首次报告绑定。\n- 历史尝试：首次run {}；后续扫描追加在同一任务。task attempt记录失败及无进展，task show/next查询当前历史；可信关闭仍待验收。\n- 关闭条件：稳定输入的原工具复检、完整策略和正式关闭流程；零诊断、配置抑制、同步或勾选不能关闭。\n",

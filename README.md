@@ -846,4 +846,21 @@ codeguard comments java . --java-home /absolute/jdk21 --maven-tool /absolute/mvn
 
 The independent `java_comments_feedback 0.1.0` wrapper preserves the existing report under `native_observation`; the old `lint java --checker javadoc` protocol remains unchanged. Budget precedence is CLI, registered environment, project default, then built-in default. All native child work shares one deadline. Feedback exposes target kind, budget, observations and next actions. Zero local diagnostics still means `coverage_proven=false`, `delivery_decision=not_evaluated`, exit3 (130 on cancellation). No implicit installation or source changes occur.
 
-**Current limitation:** `workbench_status=not_integrated`. Persistent Javadoc tasks, repair briefs and trusted closure remain to be connected. This entry creates no fake tasks and does not close findings from a local probe. Replace the absolute tool paths and offline-repository digest with real current values.
+**Scope limitation:** Standalone-file and Maven multi-file workbench integration remain incomplete; initialized-project JDK integration is described below. Trusted closure remains incomplete. This entry creates no fake tasks and does not close findings from a local probe. Replace the absolute tool paths and offline-repository digest with real current values.
+
+### Javadoc project workbench integration (source increment)
+
+For initialized projects, `comments java .` in JDK single-file mode saves local observations and synchronizes stable tasks using wrapper protocol `java_comments_feedback 0.2.0`. Uninitialized projects, standalone files and unsupported scopes retain the 0.1 local feedback. Rule, relative file, source anchor and occurrence ordinal define identity; line numbers only locate evidence. Repeat scans append observations without duplicate tasks.
+
+```mermaid
+flowchart LR
+    A[Native Java comments observation] --> B{Initialized project and JDK mode}
+    B -->|Yes| C[Save digest-bound report]
+    C --> D[Recheck source configuration and identity]
+    D --> E[Merge source or preparation tasks]
+    E --> F[Display workbench.next in feedback]
+    B -->|No| G[Local feedback and concrete capability gap]
+    C -->|Failure| H[Visible persistence error without fake tasks]
+```
+
+Missing configuration or incomplete execution creates preparation records, not source violations or new mandatory delivery obligations. Feedback exposes `workbench.status/new_findings/new_blockers/next`. Persistence failures return no fake tasks. Briefs and task text include evidence, rule basis, scope, steps, recheck and closure conditions. Local zero diagnostics leave prior tasks open with `task_verify_status=not_integrated`. Maven multi-file and standalone-file workbench integration remain incomplete, as do trusted closure and actual host acceptance.

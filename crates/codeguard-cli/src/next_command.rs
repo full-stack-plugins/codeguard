@@ -413,6 +413,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                     | "rust.cargo_rustdoc"
                     | "rust.cargo_check"
                     | "rust.cargo_audit"
+                    | "java.jdk.javadoc"
                     | "java.checkstyle"
                     | "java.checkstyle.preparation"
                     | "java.maven.p3c"
@@ -608,6 +609,17 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             "--checkstyle-jar",
             "<原 JAR 绝对路径>"
         ])
+    } else if checker_id == "java.jdk.javadoc" {
+        json!([
+            "codeguard",
+            "comments",
+            "java",
+            ".",
+            "--java-home",
+            "<已核验的JDK21绝对路径>",
+            "--format",
+            "json"
+        ])
     } else if checker_id == "java.maven.p3c" {
         json!([
             "codeguard",
@@ -740,6 +752,12 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                 "actionable",
                 "核对该 Python 构建根的标准锁、原生 pip-audit advisory 和解析版本；恢复工具或锁输入，验证漏洞源及时效。局部零漏洞与自写白名单均不能关闭任务",
             )
+        } else if checker_id == "java.jdk.javadoc" {
+            (
+                1,
+                "actionable",
+                "核对Javadoc原配置与JDK21，恢复检查后重新运行comments java，不修改无关源码",
+            )
         } else if checker_id == "java.maven.p3c" {
             (
                 1,
@@ -849,6 +867,15 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             },
         )
     };
+    if checker_id == "java.jdk.javadoc" {
+        brief["task_verify_status"] = json!("not_integrated");
+        brief["rule_basis"] = json!("JDK21 Javadoc 原生缺注释和标签诊断；项目政策未核验");
+        brief["step"] = json!(if kind == "blocker" {
+            "核对原配置、JDK21和检查范围，恢复后重新运行comments java；不修改无关源码，不把缺配置当源码违规或必需交付义务"
+        } else {
+            "核对原生位置与实际API契约，补全类、公共构造函数、参数、返回值或异常文档；源码变化时先重新运行comments java确认；不得关闭规则或用勾选代替复检"
+        });
+    }
     if checker_id == "shell.shellcheck" {
         brief["step"] = json!(if kind == "blocker" {
             "核对原报告的ShellCheck版本、方言、source依赖和rc；先恢复检查能力，不修改无关源码。后续原生零诊断和配置抑制不能关闭此任务。"
@@ -1195,6 +1222,8 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                 }
             } else if checker_id == "rust.cargo_clippy" {
                 "Clippy 本轮未再报告原问题；核查 allow/cap-lints、Cargo lints、特性组合和工具身份后重新复检"
+            } else if checker_id == "java.jdk.javadoc" {
+                "Javadoc局部零诊断不关闭历史问题；用同一原配置和JDK复检，任务关闭适配仍待完成"
             } else if checker_id == "java.maven.p3c" {
                 "P3C 命名规则局部复检未再报告原问题；核查原生报告的文件覆盖、配置及工具身份，完成全规则与策略复检后再裁定"
             } else {

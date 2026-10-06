@@ -227,3 +227,186 @@ fn actual_jdk_comments_change_from_missing_to_documented() {
     assert_eq!(after["workbench_status"], "not_integrated");
     assert!(!f.root.join(".codeguard").exists());
 }
+
+fn initialize(f: &Fixture) {
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["init", f.root.to_str().unwrap(), "--apply", "--format=json"])
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(3));
+}
+
+#[test]
+fn initialized_project_syncs_one_stable_javadoc_task_and_real_next() {
+    let f = Fixture::new();
+    fs::create_dir_all(f.root.join("src/main/java")).unwrap();
+    fs::write(
+        f.root.join("src/main/java/Bad.java"),
+        "public class Bad {}\n",
+    )
+    .unwrap();
+    fs::write(f.root.join("pom.xml"), "<project><build><plugins><plugin><artifactId>maven-javadoc-plugin</artifactId><configuration><doclint>all</doclint></configuration></plugin></plugins></build></project>").unwrap();
+    initialize(&f);
+    let mut task = Value::Null;
+    for iteration in 0..2 {
+        let out = f.run(f.root.to_str().unwrap(), &[]);
+        assert_eq!(out.status.code(), Some(3));
+        let r: Value = serde_json::from_slice(&out.stdout).unwrap();
+        assert_eq!(r["workbench"]["status"], "synced_partial", "{r}");
+        assert_eq!(
+            r["workbench"]["new_findings"],
+            if iteration == 0 { 1 } else { 0 }
+        );
+        let brief = &r["workbench"]["next"]["repair_brief"];
+        assert_eq!(brief["checker_id"], "java.jdk.javadoc");
+        assert_eq!(brief["kind"], "finding");
+        assert_eq!(brief["recheck_argv"][1], "comments");
+        if iteration == 0 {
+            task = brief["task_id"].clone();
+        } else {
+            assert_eq!(task, brief["task_id"]);
+        }
+    }
+    assert_eq!(
+        fs::read_dir(f.root.join(".codeguard/tasks"))
+            .unwrap()
+            .count(),
+        1
+    );
+    let fact: Value = serde_json::from_slice(
+        &fs::read(f.root.join(format!(
+            ".codeguard/findings/{}/finding.json",
+            task.as_str().unwrap()
+        )))
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(fact["state"], "open");
+}
+
+#[test]
+fn initialized_project_missing_configuration_creates_only_environment_task() {
+    let f = Fixture::new();
+    fs::create_dir_all(f.root.join("src/main/java")).unwrap();
+    fs::write(
+        f.root.join("src/main/java/Bad.java"),
+        "public class Bad {}\n",
+    )
+    .unwrap();
+    initialize(&f);
+    let out = f.run(f.root.to_str().unwrap(), &[]);
+    let r: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(r["workbench"]["new_findings"], 0, "{r}");
+    assert_eq!(r["workbench"]["new_blockers"], 1);
+    assert_eq!(r["workbench"]["next"]["repair_brief"]["kind"], "blocker");
+    assert!(!f.home.join("invoked").exists());
+}
+
+fn configured_project() -> Fixture {
+    let f = Fixture::new();
+    fs::create_dir_all(f.root.join("src/main/java")).unwrap();
+    fs::write(
+        f.root.join("src/main/java/Bad.java"),
+        "public class Bad {}\n",
+    )
+    .unwrap();
+    fs::write(f.root.join("pom.xml"), "<project><build><plugins><plugin><artifactId>maven-javadoc-plugin</artifactId><configuration><doclint>all</doclint></configuration></plugin></plugins></build></project>").unwrap();
+    initialize(&f);
+    f
+}
+
+#[test]
+fn failed_report_persistence_is_visible_then_recovers_without_fake_tasks() {
+    let f = configured_project();
+    let reports = f.root.join(".codeguard/reports");
+    fs::remove_dir(&reports).unwrap();
+    fs::write(&reports, "blocked").unwrap();
+    let out = f.run(f.root.to_str().unwrap(), &[]);
+    let r: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_ne!(r["workbench"]["status"], "synced_partial");
+    assert_eq!(r["workbench"]["next"], Value::Null);
+    assert_eq!(
+        fs::read_dir(f.root.join(".codeguard/tasks"))
+            .unwrap()
+            .count(),
+        0
+    );
+    fs::remove_file(&reports).unwrap();
+    fs::create_dir(&reports).unwrap();
+    let out = f.run(f.root.to_str().unwrap(), &[]);
+    let r: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(r["workbench"]["new_findings"], 1);
+}
+
+#[test]
+fn forged_fingerprint_report_is_rejected_without_extra_task() {
+    let f = configured_project();
+    f.run(f.root.to_str().unwrap(), &[]);
+    let report = fs::read_dir(f.root.join(".codeguard/reports"))
+        .unwrap()
+        .next()
+        .unwrap()
+        .unwrap()
+        .path();
+    let mut data: Value = serde_json::from_slice(&fs::read(report).unwrap()).unwrap();
+    data["run_id"] = serde_json::json!("javadoc-forged-999999999999999999999");
+    data["sources"][0]["findings"][0]["finding_fingerprint"] = serde_json::json!("0".repeat(64));
+    fs::write(
+        f.root
+            .join(".codeguard/reports/javadoc-forged-999999999999999999999.json"),
+        serde_json::to_vec(&data).unwrap(),
+    )
+    .unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["work", "sync", f.root.to_str().unwrap(), "--format=json"])
+        .output()
+        .unwrap();
+    let r: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(r["failed_reports"], 1, "{r}");
+    assert_eq!(
+        fs::read_dir(f.root.join(".codeguard/tasks"))
+            .unwrap()
+            .count(),
+        1
+    );
+}
+
+#[test]
+#[ignore = "需要显式已有JDK21，验证工作台中的诊断消失不能自行关闭"]
+fn actual_jdk_project_clean_observation_keeps_previous_tasks_open() {
+    let f = configured_project();
+    let home = std::env::var("CODEGUARD_TEST_JAVA_HOME").unwrap();
+    let run = || {
+        let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args([
+                "comments",
+                "java",
+                f.root.to_str().unwrap(),
+                "--java-home",
+                &home,
+                "--format=json",
+            ])
+            .output()
+            .unwrap();
+        assert_eq!(out.status.code(), Some(3));
+        serde_json::from_slice::<Value>(&out.stdout).unwrap()
+    };
+    let first = run();
+    assert_eq!(first["workbench"]["status"], "synced_partial", "{first}");
+    assert!(first["workbench"]["new_findings"].as_u64().unwrap() > 0);
+    fs::write(f.root.join("src/main/java/Bad.java"),"/** Documented class. */\npublic class Bad { /** Documented constructor. */ public Bad() {} }\n").unwrap();
+    let second = run();
+    assert_eq!(second["workbench"]["status"], "synced_partial", "{second}");
+    assert_eq!(second["workbench"]["new_findings"], 0);
+    assert_eq!(
+        second["native_observation"]["files"][0]["observation"]["local_status"],
+        "clean_scope_unproven"
+    );
+    for entry in fs::read_dir(f.root.join(".codeguard/findings")).unwrap() {
+        let fact: Value =
+            serde_json::from_slice(&fs::read(entry.unwrap().path().join("finding.json")).unwrap())
+                .unwrap();
+        assert_eq!(fact["state"], "open");
+    }
+    assert_eq!(second["workbench"]["task_verify_status"], "not_integrated");
+}

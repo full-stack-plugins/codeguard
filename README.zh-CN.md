@@ -829,4 +829,21 @@ codeguard comments java . --java-home /absolute/jdk21 --maven-tool /absolute/mvn
 
 独立包装协议 `java_comments_feedback 0.1.0` 保留 `native_observation` 原报告，不修改旧 `lint java --checker javadoc` 的协议。预算使用 CLI、登记环境变量、项目默认值、内置默认值的优先级；所有原生子任务共用截止时间。报告显示 `target_kind`、`execution_budget`、具体观察和下一步；局部零诊断仍是 `coverage_proven=false`、`delivery_decision=not_evaluated`，退出3（取消130）。不隐式安装或修改源码。
 
-**当前限制：** `workbench_status=not_integrated`。Javadoc 持久任务、修复简报及可信关闭还需接通，本入口不伪造任务，不据局部探针关闭问题。示例中的绝对工具路径和离线仓库摘要需替换为当前真实环境。
+**范围限制：** 文件入口和Maven多文件模式的工作台适配尚未接通；已初始化项目JDK模式见下方工作台接线。可信关闭仍待完成，本入口不伪造任务，不据局部探针关闭问题。示例中的绝对工具路径和离线仓库摘要需替换为当前真实环境。
+
+### Javadoc 项目工作台接线（源码增量）
+
+已初始化项目的 `comments java .` 在 JDK 单文件模式中自动保存局部观察并同步稳定任务，包装协议升级为 `java_comments_feedback 0.2.0`；未初始化、独立文件及未接通范围仍沿用0.1局部反馈。行号用于定位；规则、文件、源码锚点和同锚点序号构成身份。重复扫描追加观察，不增加重复任务。
+
+```mermaid
+flowchart LR
+    A[Java comments原生观察] --> B{项目已初始化且为JDK模式}
+    B -->|是| C[保存摘要绑定报告]
+    C --> D[复核源码 配置与稳定身份]
+    D --> E[归并源码任务或准备任务]
+    E --> F[对话显示workbench.next]
+    B -->|否| G[局部报告与具体能力缺口]
+    C -->|失败| H[显示持久化错误 不虚构任务]
+```
+
+缺配置或原生未完成生成准备记录，不成为源码违规或自动新增交付义务。报告使用 `workbench.status/new_findings/new_blockers/next`，持久失败不返回虚构任务；`next` 和任务文字提供证据、规则、允许范围、步骤、复检和关闭条件。局部零诊断保留开放任务，`task_verify_status=not_integrated`；Maven多文件报告与文件入口的工作台适配尚未接通。完整可信关闭和宿主验收仍待完成。
