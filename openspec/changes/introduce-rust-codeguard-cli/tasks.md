@@ -1751,3 +1751,8 @@ SP22完整默认终态：当前源码workspace all-targets 1500 passed / 0 faile
 ## 2026-10-06 SP25 ShellCheck 原规则 SDK 关闭与复发（已验证切片）
 
 新增 ShellTaskResolutionRequest / verify_shell_task_resolution；策略1.10.0、证据0.11.0、普通 finding 收据0.2.0，旧0.1.0协议不改。原样本/当前样本固定工具、方言及配置复检；原规则消失可关闭同一任务，其它规则发现仍保留；幂等关闭、普通复检复发重开、禁用/配置复核、借用租约和尝试消费已验证。14个共享/Shell目标85通过/0失败/14忽略，新增租约用例1通过且无忽略；本机真实ShellCheck两个目标2通过且无忽略，三份实际报告归档；schema3通过，默认/WASM严格Clippy、OpenSpec strict、分层、格式及diff检查通过。详见[原规则验收](../../../tests/acceptance/shell-task-resolution.md)。宿主信任根仍为夹具，未改变普通CLI关闭权限，完整S09/S10/实际宿主与发行父任务保持开放。
+
+
+## 2026-10-06 SP26 隐藏解析错误的原生确认指引（反馈缺陷修复）
+
+对应14.5/14.11/14.17/14.19。本机已安装web-tree-sitter0.25.10对相同Kotlin/Swift字节也出现has_error、隐藏MISSING和零公开恢复；参考运行时及grammar摘要已留证，不引入产品Node解析依赖。runtime区分已访问的不可定位错误与预算耗尽，worker1.4严格版本/状态核验；显式probe0.5要求原字节原生确认后再分流源码修复或grammar调查，不制造位置、不把零恢复称通过。公开行为先RED后GREEN，runtime6通过无忽略；七个CLI相关目标75通过/0失败/4忽略，新schema实际报告及假通过反例2通过；默认/WASM两个受影响crate全目标严格Clippy、OpenSpec strict、分层、格式与diff通过。详见[隐藏错误指引](../../../tests/acceptance/hidden-parser-error-guidance.md)。全项目/Hook仍沿用已有恢复不完整协议；本批没有修复三例未知、重建grammar、通过原生holdout或授予32语言资格，父任务保持开放。

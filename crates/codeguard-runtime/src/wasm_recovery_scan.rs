@@ -10,6 +10,8 @@ pub struct WasmRecoveryScan {
     pub recoveries: Vec<WasmRecovery>,
     /// 诊断数量、遍历预算耗尽，或语法树错误无法定位；消费者须标记初检不完整。
     pub truncated: bool,
+    /// 已访问的错误分支未提供可遍历恢复节点；不等同于耗尽资源预算。
+    pub parser_error_location_unavailable: bool,
 }
 
 /// 遍历语法树中有错误的分支，提取 ERROR 与 MISSING 并去除精确重复节点。
@@ -107,6 +109,7 @@ pub fn scan_wasm_recoveries(tree: &Tree, max_records: usize) -> Result<WasmRecov
     Ok(WasmRecoveryScan {
         recoveries,
         truncated: truncated || unlocated_error,
+        parser_error_location_unavailable: unlocated_error,
     })
 }
 

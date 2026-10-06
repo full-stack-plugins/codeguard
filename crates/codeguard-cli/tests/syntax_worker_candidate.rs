@@ -623,3 +623,90 @@ fn output_flood_and_midflight_cancel_do_not_poison_later_observation() {
         .is_ok()
     );
 }
+
+#[test]
+fn unlocated_error_frames_are_versioned_and_cannot_claim_complete_scanning() {
+    use std::io::Write;
+    use std::process::{Command, Stdio};
+    let source = b"func f(_ x: ) {}\n";
+    let mut child = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["__syntax-worker", "swift"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .spawn()
+        .unwrap();
+    child.stdin.take().unwrap().write_all(source).unwrap();
+    let out = child.wait_with_output().unwrap();
+    assert!(out.status.success());
+    let original: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(original["schema_version"], "1.4.0");
+    assert_eq!(original["parser_error_location_unavailable"], true);
+    let actual = run_syntax_worker_candidate(
+        env!("CARGO_BIN_EXE_codeguard").as_ref(),
+        "swift",
+        "a.swift",
+        source,
+        deadline(),
+        &AtomicBool::new(false),
+    )
+    .unwrap();
+    assert!(actual.parser_error_location_unavailable);
+    for edit in ["old_version", "false_flag", "missing_flag", "complete"] {
+        let mut value = original.clone();
+        match edit {
+            "old_version" => value["schema_version"] = serde_json::json!("1.0.0"),
+            "false_flag" => value["parser_error_location_unavailable"] = serde_json::json!(false),
+            "missing_flag" => {
+                value
+                    .as_object_mut()
+                    .unwrap()
+                    .remove("parser_error_location_unavailable");
+            }
+            _ => value["truncated"] = serde_json::json!(false),
+        }
+        let quoted = value.to_string().replace('\'', "'\\''");
+        let fake = fake_worker(&format!("printf '%s' '{quoted}'"));
+        assert!(
+            run_syntax_worker_candidate(
+                &fake,
+                "swift",
+                "a.swift",
+                source,
+                deadline(),
+                &AtomicBool::new(false)
+            )
+            .is_err(),
+            "{edit}"
+        );
+        fs::remove_file(fake).unwrap();
+    }
+}
+
+#[test]
+fn rust_worker_matches_existing_web_runtime_on_hidden_error_fixtures() {
+    let reference: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../tests/acceptance/evidence/hidden-error-web-reference-2026-10-06.json"
+    ))
+    .unwrap();
+    assert_eq!(reference["runtime"], "web-tree-sitter");
+    assert_eq!(reference["version"], "0.25.10");
+    for row in reference["rows"].as_array().unwrap() {
+        let language = row["language"].as_str().unwrap();
+        let source = row["source"].as_str().unwrap().as_bytes();
+        let actual = run_syntax_worker_candidate(
+            env!("CARGO_BIN_EXE_codeguard").as_ref(),
+            language,
+            "sample.txt",
+            source,
+            deadline(),
+            &AtomicBool::new(false),
+        )
+        .unwrap();
+        assert_eq!(actual.grammar_sha256, row["grammar_sha256"]);
+        assert!(actual.parser_error_location_unavailable);
+        assert!(actual.recoveries.is_empty());
+        assert_eq!(row["has_error"], true);
+        assert_eq!(row["recoveries"], serde_json::json!([]));
+        assert!(row["sexp"].as_str().unwrap().contains("(MISSING "));
+    }
+}

@@ -59,11 +59,16 @@ pub fn run_syntax_worker_candidate(
     if value["schema_version"] == "1.0.0" && value.get("structural_observations").is_some() {
         return Err("syntax_worker_version_fields_mismatch".into());
     }
+    if value["schema_version"] != "1.4.0"
+        && value.get("parser_error_location_unavailable").is_some()
+    {
+        return Err("syntax_worker_version_fields_mismatch".into());
+    }
     let report: SyntaxWorkerEnvelope =
         serde_json::from_value(value).map_err(|_| "syntax_worker_report_invalid")?;
     if !matches!(
         report.schema_version.as_str(),
-        "1.0.0" | "1.1.0" | "1.2.0" | "1.3.0"
+        "1.0.0" | "1.1.0" | "1.2.0" | "1.3.0" | "1.4.0"
     ) || (report.schema_version == "1.0.0" && !report.structural_observations.is_empty())
         || (report.schema_version == "1.1.0"
             && (language != "python" || report.structural_observations.is_empty()))
@@ -71,6 +76,8 @@ pub fn run_syntax_worker_candidate(
             && (language != "go" || report.structural_observations.len() != 1))
         || (report.schema_version == "1.3.0"
             && (language != "cfquery" || report.structural_observations.is_empty()))
+        || (report.schema_version == "1.4.0"
+            && (report.parser_error_location_unavailable != Some(true) || !report.truncated))
         || report.report_type != "syntax_worker_candidate"
         || report.language != language
         || report.grammar_sha256 != asset.sha256
@@ -120,6 +127,9 @@ pub fn run_syntax_worker_candidate(
         source_sha256: expected_sha,
         grammar_sha256: asset.sha256.clone(),
         grammar_qualified: false,
+        parser_error_location_unavailable: report
+            .parser_error_location_unavailable
+            .unwrap_or(false),
         recoveries: report.recoveries,
         structural_observations: report.structural_observations,
         precheck,

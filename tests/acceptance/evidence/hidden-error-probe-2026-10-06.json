@@ -1,0 +1,106 @@
+{
+  "program_sha256": "3759075fc81d922e953f2101b67925b0436a71040fc57106981d827c505b269e",
+  "program_stable": true,
+  "source_state": "working tree before commit; no grammar bytes changed",
+  "reports": [
+    {
+      "delivery_decision": "not_evaluated",
+      "grammar_qualified": false,
+      "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+      "language": "kotlin",
+      "native": {
+        "reason": "explicit_candidate_probe",
+        "status": "not_run"
+      },
+      "next_action": "compare_original_source_with_native_tool_then_review_grammar",
+      "parser_error_location_unavailable": true,
+      "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-hidden-probe-report-w77f73hs/sample.txt",
+      "precheck": {
+        "cancelled": false,
+        "checked_files": 1,
+        "incomplete_files": 0,
+        "scope_complete": true,
+        "selected_files": 1,
+        "status": "incomplete",
+        "suspected_recoveries": 0,
+        "truncated_files": 1,
+        "unqualified_files": 1,
+        "unsupported_files": 0
+      },
+      "recoveries": [],
+      "report_type": "grammar_candidate_probe",
+      "schema_version": "0.5.0",
+      "source_sha256": "87fbb71a8f650a302ff4bdf216bc8a9835350f3b864b2b1c6a0d0fe5f3cdf9b5",
+      "status": "incomplete"
+    },
+    {
+      "delivery_decision": "not_evaluated",
+      "grammar_qualified": false,
+      "grammar_sha256": "c80c88867a589a1a0959bcea89de84b7e9684b3693b2cdb2944812458e62ff48",
+      "language": "kotlin",
+      "native": {
+        "reason": "explicit_candidate_probe",
+        "status": "not_run"
+      },
+      "next_action": "compare_original_source_with_native_tool_then_review_grammar",
+      "parser_error_location_unavailable": true,
+      "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-hidden-probe-report-w77f73hs/sample.txt",
+      "precheck": {
+        "cancelled": false,
+        "checked_files": 1,
+        "incomplete_files": 0,
+        "scope_complete": true,
+        "selected_files": 1,
+        "status": "incomplete",
+        "suspected_recoveries": 0,
+        "truncated_files": 1,
+        "unqualified_files": 1,
+        "unsupported_files": 0
+      },
+      "recoveries": [],
+      "report_type": "grammar_candidate_probe",
+      "schema_version": "0.5.0",
+      "source_sha256": "9a40dcd89c137534d57763addbb8d45368fed76bd046c5198c4fd3a016e6414a",
+      "status": "incomplete"
+    },
+    {
+      "delivery_decision": "not_evaluated",
+      "grammar_qualified": false,
+      "grammar_sha256": "cc77a63b8487956270e2f385e29a03ba0773ba532a3c8a8844a26b4c98793843",
+      "language": "swift",
+      "native": {
+        "reason": "explicit_candidate_probe",
+        "status": "not_run"
+      },
+      "next_action": "compare_original_source_with_native_tool_then_review_grammar",
+      "parser_error_location_unavailable": true,
+      "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-hidden-probe-report-w77f73hs/sample.txt",
+      "precheck": {
+        "cancelled": false,
+        "checked_files": 1,
+        "incomplete_files": 0,
+        "scope_complete": true,
+        "selected_files": 1,
+        "status": "incomplete",
+        "suspected_recoveries": 0,
+        "truncated_files": 1,
+        "unqualified_files": 1,
+        "unsupported_files": 0
+      },
+      "recoveries": [],
+      "report_type": "grammar_candidate_probe",
+      "schema_version": "0.5.0",
+      "source_sha256": "6f44da8b1f1db95bf1948aa134b683e1066a0c9ad8941138dc2de09e70958f03",
+      "status": "incomplete"
+    }
+  ],
+  "source_base_commit": "4ac890a710aeea78ce1f21230952c91838c8f026",
+  "changed_source_sha256": {
+    "crates/codeguard-runtime/src/wasm_recovery_scan.rs": "063d4c96196a9d92d1b7d4aaa67f5e7c87a2aea525d32587a79742440daf0aee",
+    "crates/codeguard-cli/src/syntax_worker_envelope.rs": "527fb985220dd1898e2a78c8f756103d58220593852848ba0e80b6714a93551f",
+    "crates/codeguard-cli/src/syntax_worker_candidate_observation.rs": "317fb1e9380ba54b729ceac919f42bab384070ed2f34a45f89a56579684a0a29",
+    "crates/codeguard-cli/src/syntax_worker_command.rs": "92f625aee444692125a1771f9cc570c55ae807385faa2a1d5202679416e03591",
+    "crates/codeguard-cli/src/syntax_worker_runner.rs": "962bfad305e048316c65273917c473c7405419dbc2713e399e0b22d826d1f2ac",
+    "crates/codeguard-cli/src/grammar_probe_command.rs": "cdd80f91709d1396bfa3561421ebab0aadd04fa0a02537ba80940d4239f9e1e8"
+  }
+}

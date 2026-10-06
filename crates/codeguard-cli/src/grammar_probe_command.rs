@@ -88,6 +88,12 @@ pub fn run(args: &[String]) -> ExitCode {
                     json!("confirm_candidate_structure_with_applicable_native_tool");
                 report["structural_observations"] = json!(observation.structural_observations);
             }
+            if observation.parser_error_location_unavailable {
+                report["schema_version"] = json!("0.5.0");
+                report["parser_error_location_unavailable"] = json!(true);
+                report["next_action"] =
+                    json!("compare_original_source_with_native_tool_then_review_grammar");
+            }
             println!("{report}");
             ExitCode::from(3)
         }
