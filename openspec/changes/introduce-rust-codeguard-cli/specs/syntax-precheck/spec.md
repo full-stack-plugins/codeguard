@@ -830,3 +830,14 @@ Project Rust parser selection SHALL distinguish package edition, explicit worksp
 - **WHEN** 独立 JavaScript 初检没有当前候选，但同范围历史任务的事实、投影、父目录或工作区身份无法核验
 - **THEN** 保留 required 原生确认要求，将工作台同步报告标记 incomplete，并输出具体记录恢复原因；不把读取失败当作没有任务，不读取链接目标的指令，不虚构任务引用或将本地 closed 字段当作有效关闭
 - **AND** 只有可核验工作区中同范围事实目录及任务投影确实均不存在，才按当前有界零候选观察提供推荐安装建议；后续完整门禁仍独立核对全部义务
+
+### Requirement: Erlang form termination observations remain separate from parser recovery
+The system SHALL inspect direct function-form terminal tokens in the pinned Erlang AST without classifying punctuation in strings, characters or comments as terminators. A semicolon followed by another function form SHALL remain a possible clause continuation; a missing terminator or final semicolon SHALL create a structural candidate requiring original native confirmation. Bounded traversal SHALL preserve incomplete status rather than infer termination across unvisited siblings.
+
+#### Scenario: Missing period with no parser error
+- **WHEN** pinned WASM parses a function without a terminal period without ERROR/MISSING
+- **THEN** the worker and explicit probe preserve a versioned structural candidate, source/grammar/rule identity and original byte position, without promoting it to native lint or language qualification
+
+#### Scenario: Legal punctuation and multiple clauses
+- **WHEN** literal punctuation, comments, or a semicolon continuing the next function clause occurs
+- **THEN** only direct AST punctuation determines the candidate, and legal forms do not receive a termination candidate

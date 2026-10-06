@@ -1,6 +1,9 @@
 //! 显式单文件候选语法观察；不将未经验收的 grammar 结果变为 lint 结论。
 
-use crate::syntax_worker_runner::{run_syntax_worker_candidate, run_syntax_worker_binding_candidate};
+use crate::syntax_worker_runner::{
+    run_syntax_worker_candidate, run_syntax_worker_binding_candidate,
+    run_syntax_worker_form_candidate,
+};
 use codeguard_adapters::bundled_grammar_candidate;
 use serde_json::json;
 use std::path::PathBuf;
@@ -42,6 +45,8 @@ pub fn run(args: &[String]) -> ExitCode {
     };
     let runner = if language == "javascript" {
         run_syntax_worker_binding_candidate
+    } else if language == "erlang" {
+        run_syntax_worker_form_candidate
     } else {
         run_syntax_worker_candidate
     };
@@ -75,7 +80,9 @@ pub fn run(args: &[String]) -> ExitCode {
                 }
             });
             if !observation.structural_observations.is_empty() {
-                report["schema_version"] = json!(if language == "javascript" {
+                report["schema_version"] = json!(if language == "erlang" {
+                    "0.7.0"
+                } else if language == "javascript" {
                     "0.6.0"
                 } else if language == "cfquery" {
                     "0.4.0"
@@ -90,6 +97,9 @@ pub fn run(args: &[String]) -> ExitCode {
                 if language == "javascript" {
                     report["structural_rule_scope"] = json!("direct_simple_lexical_names_only");
                 }
+                if language == "erlang" {
+                    report["source_scope"] = json!("direct_function_forms");
+                }
                 if language == "go" {
                     report["source_scope"] = json!("whole_file");
                 }
@@ -99,7 +109,7 @@ pub fn run(args: &[String]) -> ExitCode {
                 report["structural_observations"] = json!(observation.structural_observations);
             }
             if observation.parser_error_location_unavailable {
-                if report["schema_version"] != "0.6.0" {
+                if report["schema_version"] != "0.6.0" && report["schema_version"] != "0.7.0" {
                     report["schema_version"] = json!("0.5.0");
                 }
                 report["parser_error_location_unavailable"] = json!(true);

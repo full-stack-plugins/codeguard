@@ -826,3 +826,6 @@ These additions describe the current source candidate; the public npm release is
 Standalone `lint <registered-language> FILE` now accepts every canonical registry ID. Existing native language adapters keep their original paths; other languages return `syntax_lint_feedback` with an explicit native-adapter gap and unknown configuration. WASM-enabled source builds additionally run matching bounded grammar candidates and reuse `.codeguard/` confirmation tasks with `--workspace ABS_ROOT`. This is partial syntax feedback, not native lint coverage or a new published npm capability.
 
 C/C++ source builds also accept explicit standalone native context: `codeguard lint c main.c --clang-tool /ABS/PATH/clang --standard c11 --format=json` (C++ uses `cpp`/`c++17`). This measured Apple Clang 21 profile reports original native rules and byte positions plus a reusable verification argv. It does not yet synchronize Clang tasks or replace project lint; unresolved preprocessor context remains incomplete.
+
+
+Explicit `grammar probe erlang FILE --format=json` now adds bounded direct-function-form termination candidates, separately from parser recovery. Literal punctuation and valid clause continuations are preserved; project/Hook/task integration and native precision acceptance remain open. See [acceptance](tests/acceptance/erlang-form-candidates.md).

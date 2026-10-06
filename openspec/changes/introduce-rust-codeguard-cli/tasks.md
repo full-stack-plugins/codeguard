@@ -1804,3 +1804,8 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 ## C/C++ 明确标准的独立Clang原生观察
 
 8.26/8.29、14.5/14.6：显式Clang21及C11/C++17参数激活冻结stdin原生档案，SARIF核对同输入规则及字节定位，坏报告/预处理前置/输入变化不回退WASM或伪造源码违规。公开参数与human反馈RED后修复；实际已安装Clang对两个语言分别完成错误、Unicode位置、修复后零诊断，源码不变。见[验收](../../../tests/acceptance/clang-standalone-native.md)。工作台/项目/Hook复检、完整lint及其它类别、平台、宿主和发行仍缺，不勾选父任务。
+
+
+## 2026-10-06 Erlang 显式终止符结构候选
+
+对应12.11、14.4/14.17/14.19：固定WASM的直接fun_decl token缺少必需终止语义，新增有界Rust扫描及worker1.6/probe0.7。公开RED后24个既有样例实跑：13合法不新增候选、9种终止符非法保留独立候选、2个bare form保留原始恢复。预算与协议/回归证据见tests/acceptance/erlang-form-candidates.md。项目、Hook、工作台和组合差分尚未接线，十项raw漏检历史及父任务不勾选。
