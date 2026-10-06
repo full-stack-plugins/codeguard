@@ -12,6 +12,23 @@ pub fn inspect_cargo_documentation_config(
         .filter(|b| b.len() <= 256 * 1024)
         .and_then(|b| std::str::from_utf8(b).ok())
         .and_then(|s| s.parse::<toml::Value>().ok());
+    inspect_parsed(parsed, build_root, source)
+}
+
+/// 复用精确声明观察器处理已核对来源的 workspace.lints 投影，不授予生效状态。
+pub(super) fn inspect_workspace_projection(
+    parsed: toml::Value,
+    build_root: &str,
+    source: &str,
+) -> Vec<CheckerConfiguration> {
+    inspect_parsed(Some(parsed), build_root, source)
+}
+
+fn inspect_parsed(
+    parsed: Option<toml::Value>,
+    build_root: &str,
+    source: &str,
+) -> Vec<CheckerConfiguration> {
     let rustdoc_rules = [
         ("rust", "missing_docs"),
         ("rustdoc", "broken_intra_doc_links"),

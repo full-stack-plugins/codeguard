@@ -2538,3 +2538,7 @@ Java验收分类器先检查truncated_files，隐藏恢复不计作干净。现�
 ## 2026-10-07 Cargo文档配置声明
 
 配置缺失目标先RED后增加逐构建根五精确声明与清单摘要绑定；未声明/继承/组/源码属性均unknown，不执行原生工具或修改清单。init沿用画像详情和AGENTS摘要引用，字节保持。默认/WASM六CLI目标各120通过/6条件忽略、已有原生工具两配置各显式1通过；默认畸形与源码变化单元各1通过，WASM Cargo相关单元另核验。12实际报告和474历史schema原字节通过，双配置全工作区全目标严格Clippy、定向格式/分层/OpenSpec strict通过。86来源/1312任务引用保留57语言四核心，66完成/288待完成、正式grammar资格0/32；全生效配置/详细契约/配置任务/可信闭环仍缺。CI37509019562终态MSRV成功/gate固定源检出失败，待确认插件main推送未执行，未发布或合并。见[验收](../../../tests/acceptance/cargo-documentation-declarations.md)。
+
+2026-10-07 Cargo workspace文档候选来源：公开继承RED后GREEN，默认/WASM六目标各104通过/6条件忽略；精确lib祖先身份/I/O/链接/未观察清单/64级预算单元各1通过，真实已有Clippyworkspace oracle各1通过（共8次原Cargo运行）。四份实际discovery报告/474旧schema原字节保持验证通过，证据和失败记录见tests/acceptance/cargo-documentation-workspace.md。配置仍unknown，未证明完整归属/覆盖/详细内容/可信关闭，66/288与0/32不变。上一提交0b593ce的CI37511631874仍在固定插件审计来源checkout失败，不能把跳过的测试视为通过；不更改该门禁。
+
+定向Rustfmt、分层、OpenSpec strict及双配置全工作区全目标Clippy -D warnings验证；Clippy首次要求将返回None的let-else写为问号，按原义修正后两配置通过，未禁用规则。适配器根包继承/非法workspace等级与旧畸形边界两单元通过；本批不签发生产资格。

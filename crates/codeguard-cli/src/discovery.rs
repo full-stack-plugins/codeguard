@@ -272,13 +272,19 @@ pub fn discover<P: ObservationPort>(
                     report.observation_complete = false;
                     report.blocked_paths.push(manifest.clone());
                 }
-                report.checker_configurations.extend(
-                    codeguard_adapters::inspect_cargo_documentation_config(
-                        bytes.as_deref().filter(|_| stable),
-                        build_root,
-                        manifest,
-                    ),
+                let (configurations, blocked) = inspect_cargo_documentation_context(
+                    bytes.as_deref().filter(|_| stable),
+                    build_root,
+                    manifest,
+                    root,
+                    &report.manifest_sha256,
+                    observation,
                 );
+                if let Some(path) = blocked {
+                    report.observation_complete = false;
+                    report.blocked_paths.push(path);
+                }
+                report.checker_configurations.extend(configurations);
             }
         }
         report
@@ -353,6 +359,68 @@ pub(crate) fn empty_report(root: &Path) -> DiscoveryReport {
 /// 登记不可读取的 Ruff 候选，确保祖先配置不能越过该阻塞悄悄回退。
 pub(crate) fn record_unavailable_ruff_config(report: &mut DiscoveryReport, relative: &str) {
     report.ruff_config_files.insert(relative.into());
+}
+
+// 仅在本次已观察范围内搜索至多64级祖先，不越过项目根或借用不稳定清单。
+fn inspect_cargo_documentation_context<P: ObservationPort>(
+    bytes: Option<&[u8]>,
+    build_root: &str,
+    manifest: &str,
+    root: &Path,
+    hashes: &BTreeMap<String, String>,
+    observation: &P,
+) -> (Vec<CheckerConfiguration>, Option<String>) {
+    let original =
+        codeguard_adapters::inspect_cargo_documentation_config(bytes, build_root, manifest);
+    if !original
+        .iter()
+        .all(|r| r.reason == "cargo_doc_lints_workspace_inheritance_unresolved")
+    {
+        return (original, None);
+    }
+    let Some(member) = bytes else {
+        return (original, None);
+    };
+    let mut parent = Path::new(manifest).parent();
+    for _ in 0..64 {
+        let Some(directory) = parent else {
+            return (original, None);
+        };
+        let candidate = directory.join("Cargo.toml");
+        let name = candidate.to_string_lossy().replace('\\', "/");
+        let candidate_bytes = if name == manifest {
+            Some(member.to_vec())
+        } else {
+            match observation.classify(&root.join(&candidate)) {
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => None,
+                Ok(ObservedPathKind::File) => {
+                    match observation.read_bounded(&root.join(&candidate), MAX_MANIFEST_BYTES) {
+                        Ok(bytes) => Some(bytes),
+                        Err(_) => return (original, Some(name)),
+                    }
+                }
+                _ => return (original, Some(name)),
+            }
+        };
+        if let Some(candidate_bytes) = candidate_bytes {
+            if hashes.get(&name) != Some(&format!("{:x}", Sha256::digest(&candidate_bytes))) {
+                return (original, Some(name));
+            }
+            if let Some(rows) = codeguard_adapters::inspect_cargo_documentation_workspace(
+                member,
+                &candidate_bytes,
+                build_root,
+                manifest,
+                &name,
+            ) {
+                return (rows, None);
+            }
+        } else if hashes.contains_key(&name) {
+            return (original, Some(name));
+        }
+        parent = directory.parent();
+    }
+    (original, Some(manifest.into()))
 }
 
 fn managed_workspace_artifact(relative: &str) -> bool {
@@ -707,11 +775,108 @@ fn observe_java_source_set(report: &mut DiscoveryReport, relative: &str) {
 #[cfg(test)]
 mod tests {
     use super::discover;
+    use sha2::{Digest, Sha256};
     use codeguard_adapters::legacy_registry;
     use codeguard_core::{ObservationPort, ObservedPathKind};
     use std::collections::BTreeMap;
     use std::io;
     use std::path::{Path, PathBuf};
+
+    struct WorkspaceAncestorObservation {
+        kind: ObservedPathKind,
+        bytes: Result<Vec<u8>, io::ErrorKind>,
+    }
+    impl ObservationPort for WorkspaceAncestorObservation {
+        fn classify(&self, path: &Path) -> io::Result<ObservedPathKind> {
+            if path == Path::new("project/Cargo.toml") {
+                Ok(self.kind)
+            } else {
+                Err(io::Error::from(io::ErrorKind::NotFound))
+            }
+        }
+        fn children(&self, _path: &Path) -> io::Result<Vec<PathBuf>> {
+            Ok(Vec::new())
+        }
+        fn read_bounded(&self, _path: &Path, _limit: u64) -> io::Result<Vec<u8>> {
+            self.bytes.clone().map_err(io::Error::from)
+        }
+    }
+
+    #[test]
+    fn cargo_workspace_ancestor_identity_io_and_budget_remain_incomplete() {
+        let member = b"[package]\nname='a'\nversion='0.1.0'\n[lints]\nworkspace=true\n";
+        let workspace = b"[workspace]\nmembers=['member']\n[workspace.lints.clippy]\nmissing_errors_doc='warn'\n";
+        let mut hashes = BTreeMap::from([
+            (
+                "member/Cargo.toml".into(),
+                format!("{:x}", Sha256::digest(member)),
+            ),
+            (
+                "Cargo.toml".into(),
+                format!("{:x}", Sha256::digest(workspace)),
+            ),
+        ]);
+        for (kind, bytes) in [
+            (ObservedPathKind::File, Ok(workspace.to_vec())),
+            (ObservedPathKind::File, Ok(b"[workspace]\n".to_vec())),
+            (ObservedPathKind::File, Err(io::ErrorKind::PermissionDenied)),
+            (ObservedPathKind::Symlink, Ok(workspace.to_vec())),
+        ] {
+            let valid = kind == ObservedPathKind::File
+                && bytes
+                    .as_ref()
+                    .ok()
+                    .is_some_and(|b| b.as_slice() == workspace);
+            let port = WorkspaceAncestorObservation { kind, bytes };
+            let (rows, blocked) = super::inspect_cargo_documentation_context(
+                Some(member),
+                "member",
+                "member/Cargo.toml",
+                Path::new("project"),
+                &hashes,
+                &port,
+            );
+            assert_eq!(
+                blocked,
+                if valid {
+                    None
+                } else {
+                    Some("Cargo.toml".into())
+                }
+            );
+            assert!(rows.iter().all(|r| r.configuration == "unknown"));
+            assert_eq!(
+                rows[1].next_action.contains("missing_errors_doc=warn"),
+                valid
+            );
+        }
+        hashes.remove("Cargo.toml");
+        let port = WorkspaceAncestorObservation {
+            kind: ObservedPathKind::File,
+            bytes: Ok(workspace.to_vec()),
+        };
+        let (_, blocked) = super::inspect_cargo_documentation_context(
+            Some(member),
+            "member",
+            "member/Cargo.toml",
+            Path::new("project"),
+            &hashes,
+            &port,
+        );
+        assert_eq!(blocked, Some("Cargo.toml".into()));
+        let name = format!("{}Cargo.toml", "x/".repeat(65));
+        hashes.insert(name.clone(), format!("{:x}", Sha256::digest(member)));
+        let (rows, blocked) = super::inspect_cargo_documentation_context(
+            Some(member),
+            "deep",
+            &name,
+            Path::new("project"),
+            &hashes,
+            &port,
+        );
+        assert_eq!(blocked, Some(name));
+        assert!(!rows[1].next_action.contains("missing_errors_doc=warn"));
+    }
 
     struct ChangingCargoObservation(std::cell::Cell<usize>);
     impl ObservationPort for ChangingCargoObservation {
