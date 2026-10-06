@@ -26,15 +26,34 @@ pub(crate) fn prepare(root: &Path, feedback: &Value) -> Result<Value, &'static s
         .and_then(|b| b.workspace_id())
         .ok_or("workspace_not_initialized")?;
     let native = &feedback["native_observation"];
-    if native["report_type"] != "java_javadoc_project_probe"
-        || native["probe_mode"] != "jdk_single_file"
-    {
-        return Err("javadoc_workbench_scope_not_integrated");
-    }
-    let rows = native["files"]
-        .as_array()
-        .filter(|r| r.len() <= 100_000)
-        .ok_or("javadoc_observations_invalid")?;
+    let explicit = native["report_type"] == "java_javadoc_local_feedback";
+    let rows = if explicit {
+        let source = Path::new(native["path"].as_str().ok_or("javadoc_path_invalid")?)
+            .canonicalize()
+            .map_err(|_| "javadoc_source_unavailable")?;
+        let relative = source
+            .strip_prefix(root)
+            .map_err(|_| "source_outside_workspace")?
+            .to_str()
+            .ok_or("javadoc_path_invalid")?;
+        if !relative.ends_with(".java") {
+            return Err("javadoc_path_invalid");
+        }
+        vec![
+            json!({"path":relative,"reason":native["reason"],"configuration_ref":null,"configuration_sha256":null,"observation":native}),
+        ]
+    } else {
+        if native["report_type"] != "java_javadoc_project_probe"
+            || native["probe_mode"] != "jdk_single_file"
+        {
+            return Err("javadoc_workbench_scope_not_integrated");
+        }
+        native["files"]
+            .as_array()
+            .filter(|r| r.len() <= 100_000)
+            .ok_or("javadoc_observations_invalid")?
+            .clone()
+    };
     let mut sources = Vec::new();
     for row in rows {
         let relative = row["path"].as_str().ok_or("javadoc_path_invalid")?;
@@ -44,7 +63,9 @@ pub(crate) fn prepare(root: &Path, feedback: &Value) -> Result<Value, &'static s
         let mut findings = Vec::new();
         let observation = &row["observation"];
         if !observation.is_null() {
-            if observation["source_sha256"] != format!("{:x}", Sha256::digest(&bytes)) {
+            if !observation["source_sha256"].is_null()
+                && observation["source_sha256"] != format!("{:x}", Sha256::digest(&bytes))
+            {
                 return Err("javadoc_source_changed");
             }
             if matches!(
@@ -70,7 +91,7 @@ pub(crate) fn prepare(root: &Path, feedback: &Value) -> Result<Value, &'static s
         .map_err(|_| "clock_unavailable")?
         .as_nanos();
     Ok(
-        json!({"schema_version":"0.1.0","report_type":"javadoc_workbench_observation","workspace_binding":"bound","workspace_id":id,"run_id":format!("javadoc-{}-{nanos}",std::process::id()),"checker_id":"java.jdk.javadoc","authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated","sources":sources}),
+        json!({"schema_version":"0.2.0","observation_scope":if explicit {"explicit_file_probe"} else {"configured_project_probe"},"report_type":"javadoc_workbench_observation","workspace_binding":"bound","workspace_id":id,"run_id":format!("javadoc-{}-{nanos}",std::process::id()),"checker_id":"java.jdk.javadoc","authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated","sources":sources}),
     )
 }
 

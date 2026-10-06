@@ -654,3 +654,189 @@ fn actual_jdk_task_verify_absence_and_configuration_change_keep_open() {
     .unwrap();
     assert_eq!(fact["state"], "open");
 }
+
+#[test]
+fn explicit_file_workspace_syncs_stable_task_without_project_configuration() {
+    let f = Fixture::new();
+    let file = f.root.join("Bad.java");
+    fs::write(&file, "public class Bad {}\n").unwrap();
+    initialize(&f);
+    let mut id = String::new();
+    for i in 0..2 {
+        let out = f.run(
+            file.to_str().unwrap(),
+            &["--workspace", f.root.to_str().unwrap()],
+        );
+        assert_eq!(out.status.code(), Some(3));
+        let r: Value = serde_json::from_slice(&out.stdout).unwrap();
+        assert_eq!(r["workbench"]["status"], "synced_partial", "{r}");
+        assert_eq!(r["workbench"]["new_findings"], if i == 0 { 1 } else { 0 });
+        let current = r["workbench"]["next"]["repair_brief"]["task_id"]
+            .as_str()
+            .unwrap();
+        if i == 0 {
+            id = current.into();
+        } else {
+            assert_eq!(current, id);
+        }
+    }
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "task",
+            "verify",
+            &id,
+            f.root.to_str().unwrap(),
+            "--java-home",
+            f.home.to_str().unwrap(),
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    let r: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(r["observation"], "still_present", "{r}");
+    assert_eq!(r["event_persisted"], true);
+    assert!(!f.root.join("pom.xml").exists());
+    assert_eq!(
+        fs::read_dir(f.root.join(".codeguard/tasks"))
+            .unwrap()
+            .count(),
+        1
+    );
+}
+
+#[test]
+fn explicit_file_workspace_never_initializes_or_accepts_outside_source() {
+    let f = Fixture::new();
+    let file = f.root.join("Bad.java");
+    fs::write(&file, "public class Bad {}\n").unwrap();
+    let out = f.run(
+        file.to_str().unwrap(),
+        &["--workspace", f.root.to_str().unwrap()],
+    );
+    assert_eq!(out.status.code(), Some(3));
+    let r: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(r["workbench"]["status"], "workspace_not_initialized");
+    assert!(!f.root.join(".codeguard").exists());
+    fs::remove_file(f.home.join("invoked")).unwrap();
+    let outside = Fixture::new();
+    let out = f.run(
+        file.to_str().unwrap(),
+        &["--workspace", outside.root.to_str().unwrap()],
+    );
+    assert_eq!(out.status.code(), Some(2));
+    assert!(!f.home.join("invoked").exists());
+    assert!(out.stdout.is_empty());
+}
+
+#[test]
+fn explicit_file_missing_jdk_creates_preparation_task_without_source_finding() {
+    let f = Fixture::new();
+    let file = f.root.join("Bad.java");
+    fs::write(&file, "public class Bad {}\n").unwrap();
+    initialize(&f);
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "comments",
+            "java",
+            file.to_str().unwrap(),
+            "--workspace",
+            f.root.to_str().unwrap(),
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    let r: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(r["workbench"]["status"], "synced_partial", "{r}");
+    assert_eq!(r["workbench"]["new_findings"], 0);
+    assert_eq!(r["workbench"]["new_blockers"], 1);
+    assert_eq!(
+        r["workbench"]["next"]["repair_brief"]["observation_scope"],
+        "explicit_file_probe"
+    );
+    assert!(!f.home.join("invoked").exists());
+}
+
+#[test]
+#[ignore = "需要已有JDK21，验证显式文件模式不借用新增项目配置"]
+fn actual_jdk_explicit_file_task_preserves_probe_mode_after_pom_added() {
+    let f = Fixture::new();
+    let file = f.root.join("Bad.java");
+    fs::write(&file, "public class Bad {}\n").unwrap();
+    initialize(&f);
+    let home = std::env::var("CODEGUARD_TEST_JAVA_HOME").unwrap();
+    let root = f.root.to_str().unwrap();
+    let run = |args: &[&str]| {
+        let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(args)
+            .arg("--format=json")
+            .output()
+            .unwrap();
+        assert_eq!(out.status.code(), Some(3));
+        serde_json::from_slice::<Value>(&out.stdout).unwrap()
+    };
+    let initial = run(&[
+        "comments",
+        "java",
+        file.to_str().unwrap(),
+        "--workspace",
+        root,
+        "--java-home",
+        &home,
+    ]);
+    assert_eq!(initial["workbench"]["status"], "synced_partial");
+    let brief = &initial["workbench"]["next"]["repair_brief"];
+    let id = brief["task_id"].as_str().unwrap();
+    assert_eq!(brief["observation_scope"], "explicit_file_probe");
+    let still = run(&["task", "verify", id, root, "--java-home", &home]);
+    assert_eq!(still["observation"], "still_present", "{still}");
+    assert_eq!(still["event_persisted"], true);
+    fs::write(f.root.join("pom.xml"), "<project>invalid configuration").unwrap();
+    fs::write(&file,"/** Documented class. */\npublic class Bad { /** Documented constructor. */ public Bad() {} }\n").unwrap();
+    let fixed = run(&["task", "verify", id, root, "--java-home", &home]);
+    assert_eq!(
+        fixed["observation"], "candidate_absent_unverified_policy",
+        "{fixed}"
+    );
+    assert_eq!(
+        fixed["native_scan"]["observation_scope"],
+        "explicit_file_probe"
+    );
+    assert_eq!(fixed["event_persisted"], true);
+    let fact: Value = serde_json::from_slice(
+        &fs::read(
+            f.root
+                .join(format!(".codeguard/findings/{id}/finding.json")),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(fact["state"], "open");
+}
+
+#[test]
+fn human_file_workspace_feedback_includes_real_task_and_recheck() {
+    let f = Fixture::new();
+    let file = f.root.join("Bad.java");
+    fs::write(&file, "public class Bad {}\n").unwrap();
+    initialize(&f);
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "comments",
+            "java",
+            file.to_str().unwrap(),
+            "--workspace",
+            f.root.to_str().unwrap(),
+            "--java-home",
+            f.home.to_str().unwrap(),
+            "--format=human",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(3));
+    let text = String::from_utf8(out.stdout).unwrap();
+    assert!(text.contains("工作台："));
+    assert!(text.contains("synced_partial"));
+    assert!(text.contains("CG-"));
+    assert!(text.contains("explicit_file_probe"));
+    assert!(text.contains("verify"));
+}

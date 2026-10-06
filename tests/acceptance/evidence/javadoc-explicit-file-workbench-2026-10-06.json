@@ -1,0 +1,70 @@
+{
+  "schema_version": "0.1.0",
+  "scope": "javadoc_explicit_file_workbench_local_acceptance",
+  "date": "2026-10-06",
+  "base_commit": "141196c7ef915598459793c352619c772e8fdfcb",
+  "regression": {
+    "passed": 90,
+    "failed": 0,
+    "ignored": 29
+  },
+  "actual_jdk": {
+    "passed": 4,
+    "failed": 0,
+    "overlaps_regression_ignored": true
+  },
+  "schemas": {
+    "new_count": 5,
+    "actual_file_and_project_instances": "passed",
+    "fake_coverage_and_configuration": "rejected"
+  },
+  "logs": {
+    "final": {
+      "path": "/private/tmp/cg-javadoc-file-workbench-final.log",
+      "sha256": "b9c70e52e745e6e3fb3e4ca5ac2862276039a68026e525de302674aa1d1b007e",
+      "results": [
+        "test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.14s",
+        "test result: ok. 7 passed; 0 failed; 13 ignored; 0 measured; 0 filtered out; finished in 0.53s",
+        "test result: ok. 18 passed; 0 failed; 4 ignored; 0 measured; 0 filtered out; finished in 1.42s",
+        "test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.38s",
+        "test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.69s",
+        "test result: ok. 10 passed; 0 failed; 10 ignored; 0 measured; 0 filtered out; finished in 0.66s",
+        "test result: ok. 21 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 1.84s",
+        "test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s"
+      ]
+    },
+    "native-final": {
+      "path": "/private/tmp/cg-javadoc-file-workbench-native-final.log",
+      "sha256": "1cba69586653297115ade99a4bece8a17e57d653932ee0f11b96a60b06e18543",
+      "results": [
+        "test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 18 filtered out; finished in 3.25s"
+      ]
+    },
+    "clippy-final": {
+      "path": "/private/tmp/cg-javadoc-file-workbench-clippy-final.log",
+      "sha256": "9b7433faa4f4a11224c954db7d4c334a5b77f32b84d3f7484a1623ed8f6c633a",
+      "results": []
+    }
+  },
+  "delivery_decision": "not_evaluated",
+  "trusted_closure": false,
+  "remaining": [
+    "Maven workbench",
+    "trusted closure and recurrence",
+    "full project coverage",
+    "actual hosts",
+    "cross-platform acceptance"
+  ],
+  "protected_user_draft_sha256": "2e3a296072e6a3aa34b561799c18c7d8b621d00f8786301d2612cee8cdab85b6",
+  "source_sha256": {
+    "crates/codeguard-cli/src/command_examples.rs": "413c3669d14dfe51bee858fa22816470ce913c785861fbde2639da785fb435cd",
+    "crates/codeguard-cli/src/java_comments_command.rs": "f1de5ef71da3bb17c4d8960434b54dca0da7ba495b889d7fb8c4f9d7e8d020b1",
+    "crates/codeguard-cli/src/javadoc_task_recheck.rs": "a750a8177db1fe0f7d781c78bfb1bbce099bf8523f6efe218867963d259ad0fd",
+    "crates/codeguard-cli/src/javadoc_workbench.rs": "e916ab00f6a83300d4f0e5460c42cf5ee75cdeb83365b09f815c83a48d1cd4d0",
+    "crates/codeguard-cli/src/next_command.rs": "461d83c3b95a55557319b304666552fc7f72861ba1b1c4446746af04d2ec5240",
+    "crates/codeguard-cli/src/task_verify_command.rs": "c00ebfe857402bd4af6cd8cfe425d54d59253e70f2c7b5e65001e494c1892552",
+    "crates/codeguard-cli/src/work_sync/javadoc_report.rs": "83771ed6f34ccca44aa4e66d01e710d923b6e8d5adc5dac54f8732158cd2c97f",
+    "crates/codeguard-cli/tests/java_comments_cli.rs": "7a44eb9c61dd2a98ad8f13ecd1b6128a12769a834ea79b7de54c5438b2f5c40d"
+  },
+  "binary_sha256": "b73219c5260ab44ea36f14644f1edfd4f2a9a0bea20e8fdc5cd231d8c3457a06"
+}

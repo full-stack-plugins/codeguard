@@ -1,6 +1,7 @@
 //! Javadoc 任务原工具复检；绑定原配置及工具，保持局部观察和可信关闭分离。
 use crate::discovery::discover;
 use crate::java_javadoc_scan::{NativeContext, observe_project};
+use crate::java_javadoc_command::{Args, observe};
 use crate::javadoc_workbench::prepare;
 use codeguard_adapters::{legacy_registry, parse_unique_json};
 use codeguard_runtime::{NativeObservation, read_bounded_regular_file};
@@ -19,6 +20,7 @@ pub(crate) fn run(
     deadline: Instant,
 ) -> Result<Value, &'static str> {
     let original = original(root, brief)?;
+    let mode = scope_from_report(&original)?;
     let relative = brief["scope"]
         .as_str()
         .ok_or("javadoc_task_scope_invalid")?;
@@ -30,38 +32,62 @@ pub(crate) fn run(
             .map_err(|_| "clock_unavailable")?
             .as_nanos()
     );
-    let mut report = json!({"schema_version":"0.1.0","report_type":"javadoc_task_recheck","operation":"task_verify","run_id":run,"workspace_binding":"bound","workspace_id":original["workspace_id"],"checker_id":"java.jdk.javadoc","authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated","task_id":brief["task_id"],"task_path":relative,"task_rule":brief["native_rule_id"],"origin":brief["evidence_ref"],"scan":null,"native_observation":null,"input_bindings":[],"task_input_stable":false,"configuration_matches":false,"tool_identity_matches":false,"reason":"javadoc_recheck_incomplete"});
-    let registry = legacy_registry().map_err(|_| "language_registry_invalid")?;
-    let discovery = discover(root, &registry, &NativeObservation);
-    if !discovery.observation_complete {
-        report["reason"] = json!("source_discovery_incomplete");
-        return Ok(report);
-    }
-    if !discovery
-        .languages
-        .get("java")
-        .is_some_and(|language| language.source_files.contains(relative))
-    {
-        report["reason"] = json!("javadoc_task_source_not_selected");
-        return Ok(report);
-    }
-    let native = observe_project(
-        root,
-        &BTreeSet::from([relative.to_owned()]),
-        &discovery.checker_configurations,
-        &NativeContext {
-            manifest_sha256: &discovery.manifest_sha256,
-            java_home: home,
-            maven_tool: None,
-            maven_repo: None,
-            repo_sha256: None,
+    let mut report = json!({"schema_version":"0.2.0","observation_scope":mode,"report_type":"javadoc_task_recheck","operation":"task_verify","run_id":run,"workspace_binding":"bound","workspace_id":original["workspace_id"],"checker_id":"java.jdk.javadoc","authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated","task_id":brief["task_id"],"task_path":relative,"task_rule":brief["native_rule_id"],"origin":brief["evidence_ref"],"scan":null,"native_observation":null,"input_bindings":[],"task_input_stable":false,"configuration_matches":false,"tool_identity_matches":false,"reason":"javadoc_recheck_incomplete"});
+    let native = if mode == "explicit_file_probe" {
+        let path = root
+            .join(relative)
+            .canonicalize()
+            .map_err(|_| "javadoc_source_unavailable")?;
+        if !path.starts_with(root) || !path.is_file() {
+            return Err("javadoc_task_source_outside_workspace");
+        }
+        observe(
+            &Args {
+                source: path,
+                java_home: home.map(Path::to_owned),
+                json: true,
+            },
             deadline,
-            cancelled: &AtomicBool::new(false),
-        },
-    );
+            &AtomicBool::new(false),
+        )
+    } else {
+        let registry = legacy_registry().map_err(|_| "language_registry_invalid")?;
+        let discovery = discover(root, &registry, &NativeObservation);
+        if !discovery.observation_complete {
+            report["reason"] = json!("source_discovery_incomplete");
+            return Ok(report);
+        }
+        if !discovery
+            .languages
+            .get("java")
+            .is_some_and(|l| l.source_files.contains(relative))
+        {
+            report["reason"] = json!("javadoc_task_source_not_selected");
+            return Ok(report);
+        }
+        observe_project(
+            root,
+            &BTreeSet::from([relative.to_owned()]),
+            &discovery.checker_configurations,
+            &NativeContext {
+                manifest_sha256: &discovery.manifest_sha256,
+                java_home: home,
+                maven_tool: None,
+                maven_repo: None,
+                repo_sha256: None,
+                deadline,
+                cancelled: &AtomicBool::new(false),
+            },
+        )
+    };
     report["native_observation"] = native.clone();
-    let Some(row) = native["files"].as_array().and_then(|rows| rows.first()) else {
-        return Ok(report);
+    let row = if mode == "explicit_file_probe" {
+        json!({"path":relative,"configuration_ref":null,"configuration_sha256":null,"observation":native})
+    } else {
+        let Some(row) = native["files"].as_array().and_then(|r| r.first()) else {
+            return Ok(report);
+        };
+        row.clone()
     };
     let old = original["sources"]
         .as_array()
@@ -144,6 +170,8 @@ pub(crate) fn classify(brief: &Value, report: &Value) -> &'static str {
         || report["task_path"] != brief["scope"]
         || report["task_rule"] != brief["native_rule_id"]
         || report["origin"] != brief["evidence_ref"]
+        || (brief["observation_scope"].is_string()
+            && scope_from_report(report).ok() != brief["observation_scope"].as_str())
         || report["task_input_stable"] != true
     {
         return "incomplete";
@@ -186,7 +214,7 @@ pub(crate) fn classify(brief: &Value, report: &Value) -> &'static str {
 
 /// 校验有限复检容器；详细原生和源码绑定由工作台导入器再次验证。
 pub(crate) fn valid_shape(report: &Value) -> bool {
-    let keys = [
+    let mut keys = vec![
         "schema_version",
         "report_type",
         "operation",
@@ -209,10 +237,14 @@ pub(crate) fn valid_shape(report: &Value) -> bool {
         "tool_identity_matches",
         "reason",
     ];
+    if report["schema_version"] == "0.2.0" {
+        keys.push("observation_scope");
+    }
     report
         .as_object()
         .is_some_and(|o| o.len() == keys.len() && keys.iter().all(|k| o.contains_key(*k)))
-        && report["schema_version"] == "0.1.0"
+        && matches!(report["schema_version"].as_str(), Some("0.1.0" | "0.2.0"))
+        && (report["schema_version"] == "0.1.0" || scope_from_report(report).is_ok())
         && report["report_type"] == "javadoc_task_recheck"
         && report["operation"] == "task_verify"
         && report["workspace_binding"] == "bound"
@@ -266,4 +298,19 @@ fn safe_run_id(value: &str) -> bool {
         && value
             .bytes()
             .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'-' | b'_'))
+}
+
+/// 从原报告恢复固定模式；旧报告只能属于既有项目配置模式。
+pub(crate) fn original_scope(root: &Path, brief: &Value) -> Result<&'static str, &'static str> {
+    scope_from_report(&original(root, brief)?)
+}
+fn scope_from_report(report: &Value) -> Result<&'static str, &'static str> {
+    if report["schema_version"] == "0.1.0" {
+        return Ok("configured_project_probe");
+    }
+    match report["observation_scope"].as_str() {
+        Some("explicit_file_probe") => Ok("explicit_file_probe"),
+        Some("configured_project_probe") => Ok("configured_project_probe"),
+        _ => Err("javadoc_observation_scope_invalid"),
+    }
 }

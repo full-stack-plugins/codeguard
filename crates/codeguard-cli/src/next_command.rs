@@ -869,7 +869,9 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         )
     };
     if checker_id == "java.jdk.javadoc" {
-        brief["schema_version"] = json!("0.2.0");
+        brief["schema_version"] = json!("0.3.0");
+        brief["observation_scope"] =
+            json!(crate::javadoc_task_recheck::original_scope(root, &brief)?);
         brief["task_verify_status"] = json!("local_observation_only");
         brief["rule_basis"] = json!("JDK21 Javadoc 原生缺注释和标签诊断；项目政策未核验");
         brief["step"] = json!(if kind == "blocker" {

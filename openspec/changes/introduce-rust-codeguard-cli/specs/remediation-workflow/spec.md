@@ -633,3 +633,15 @@ Javadoc任务 MUST 支持显式JDK21的原工具复检，保存对应任务的�
 #### Scenario: Documented source has no original Javadoc diagnostic
 - **WHEN** 同工具及原配置下补齐文档后复检为零诊断
 - **THEN** 保存candidate_absent_unverified_policy，保留任务开放；配置或工具变更不能获得该结论
+
+### Requirement: Explicit Java file workspace SHALL preserve local probe scope
+
+`comments java FILE --workspace ROOT` MUST 在显式工作区中同步单文件原生诊断并支持原任务复检，不要求或伪造项目Javadoc配置。MUST 记录 `explicit_file_probe` 范围并与 `configured_project_probe` 区分；任务复检保持首次观察的模式。文件必须位于指定工作区，越界在原生启动前拒绝；没有初始化时反馈明确状态，不自动初始化。未完成原生检查只生成准备记录，局部零诊断不关闭任务。
+
+#### Scenario: Explicit file probe has no project Javadoc configuration
+- **WHEN** 已初始化工作区中的Java文件通过显式workspace运行JDK诊断
+- **THEN** 同步稳定局部任务，原任务复检沿显式文件模式运行，不凭不存在的POM阻断或宣称项目配置通过
+
+#### Scenario: File is outside the explicit workspace
+- **WHEN** 文件位于指定工作区外部
+- **THEN** 参数错误拒绝，原生工具未启动，工作台不写入

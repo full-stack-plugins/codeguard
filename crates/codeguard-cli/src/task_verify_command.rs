@@ -760,7 +760,7 @@ pub fn run(args: &[String]) -> ExitCode {
         "next_actions":["inspect_native_recheck_and_policy_before_closure"]
     });
     if javadoc_task {
-        report["schema_version"] = json!("0.26.0");
+        report["schema_version"] = json!("0.27.0");
     }
     if shell_task {
         report["schema_version"] = json!("0.24.0");

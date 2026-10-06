@@ -15,6 +15,7 @@ pub(crate) fn examples(command: &str) -> &'static [&'static str] {
         ],
         "comments" => &[
             "codeguard comments java File.java --java-home /absolute/jdk21 --format json",
+            "codeguard comments java File.java --workspace . --java-home /absolute/jdk21 --format json",
             "codeguard comments java . --java-home /absolute/jdk21 --maven-tool /absolute/mvn --maven-repo /absolute/repository --repo-sha256 SHA256 --format json",
             "codeguard comments rust . --cargo-tool /absolute/cargo --format json",
         ],
