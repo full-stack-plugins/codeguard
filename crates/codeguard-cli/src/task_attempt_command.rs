@@ -438,6 +438,7 @@ fn verified_rechecks(
                 .nth(1)
                 .and_then(|s| s.parse::<u128>().ok())
         } else if run_id.starts_with("syntax-native-")
+            || run_id.starts_with("cve-gradle-task-")
             || run_id.starts_with("checkstyle-")
             || run_id.starts_with("javadoc-")
             || run_id.starts_with("eslint-")
@@ -542,6 +543,13 @@ fn verified_rechecks(
         {
             continue;
         }
+        if brief["checker_id"] == "java.gradle.dependency_check"
+            && report["task_input_stable"] == true
+            && event["report_sha256"] == digest(&report_bytes)
+            && !crate::gradle_cve_task_recheck::inputs_current(root, &report)
+        {
+            continue;
+        }
         if brief["checker_id"] == "java.gradle.javadoc"
             && report["task_input_stable"] == true
             && event["report_sha256"] == digest(&report_bytes)
@@ -563,7 +571,10 @@ fn verified_rechecks(
         {
             continue;
         }
-        let report_matches = if brief["checker_id"] == "syntax.native_confirmation" {
+        let report_matches = if brief["checker_id"] == "java.gradle.dependency_check" {
+            crate::gradle_cve_task_recheck::validate_binding(root, brief, &report).is_ok()
+                && event["observation"] == crate::gradle_cve_task_recheck::classify(brief, &report)
+        } else if brief["checker_id"] == "syntax.native_confirmation" {
             crate::syntax_task_recheck::valid_shape(root, &report)
                 && event["observation"] == crate::syntax_task_recheck::classify(&report)
         } else if brief["checker_id"] == "python.ruff.doctor" {

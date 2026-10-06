@@ -25,7 +25,7 @@
     "crates/codeguard-cli/src/gradle_owasp_report_budget.rs": "55756e926335d8652005c88f993173f2fb053ca8a0f659d35b88efbf0a5d7985",
     "crates/codeguard-cli/src/grammar_native_checker.rs": "87f2f8a19ca1fc6016dd1d4affac87cd824a8d60f497479b2d94aeaf317548f6",
     "crates/codeguard-cli/src/java_cve_scan.rs": "98d4793d27c3b4d912b983c6a996a8ee8128bae97fe7ef0aa0f6375ed3c9d437",
-    "crates/codeguard-cli/src/java_gradle_cve_command.rs": "4a3bb88d4699bf619656f12e660f6042cf52a5be66e8de6d73231b4c58555015",
+    "crates/codeguard-cli/src/java_gradle_cve_command.rs": "26d64f03768697b050a08f2e227c1c87b22f1f8bf12643a81e28990a5cc685e6",
     "crates/codeguard-cli/src/java_p3c_scan.rs": "36e022ba1f7c157ff52a2839287d9b8497c9bdd5583212128a81df95f5fcf69e",
     "crates/codeguard-cli/src/javascript_syntax_probe.rs": "4ba09a558662332e953e89512d386642653d5cc59dd1336f8ec31b51137731e1",
     "crates/codeguard-cli/src/kotlin_lint_command.rs": "f19e0babe23cc3cce52d69d6821416d6b9fdd7b6d8b484d3413e1368fef05ad8",
@@ -70,12 +70,15 @@
     "tests/acceptance/swift-native-project.md": "4b7f9325aef989d4d00a13aedaf729ae472a6ab373bb9e9fb7c69268e48f1da0",
     "tests/acceptance/typescript-syntax-fallback-candidate.md": "88ddf10bc11776fb73b1006ad25157b5a14235a8ac000c329b233c3eb12f414c",
     "tests/acceptance/zig-native-differential.md": "3e67a9508411fa210897b22c36869500de5edad1ea3080c7e34592a37c44419c",
-    "crates/codeguard-cli/src/gradle_cve_workbench.rs": "75834c0fbef8b1f38acebdcfa71e6c619232a6fd0a215ccc330e5ef88f99eb36",
-    "crates/codeguard-cli/src/work_sync/gradle_cve_report.rs": "95a35ddd0e14135f2a0306b441cc09bbc68b6692f9ae8ecbd72d67da880ea9e9",
-    "crates/codeguard-cli/src/work_sync.rs": "59707f2da98ff08e095f71a9d4960c96dd37c53f877a2e3eb0d745bdae94536e",
-    "crates/codeguard-cli/src/next_command.rs": "b8027bbf429723d54e8e1fba89e020f0743b2766de61439610be8baa1a942353",
-    "crates/codeguard-cli/src/task_verify_command.rs": "68bd00d2aa7e06ca404fd2d558a0a96c5ecf741fdc31264262e1b974f3308761",
-    "tests/acceptance/gradle-cve-workbench.md": "15aec15873a8f7894d69f97a66362238c87f7d703e0be375b28630695adb2cfd"
+    "crates/codeguard-cli/src/gradle_cve_workbench.rs": "04677889296923b95823b8c7127a4ca0a2b4dc8372c9e9adda5ba57207b56867",
+    "crates/codeguard-cli/src/work_sync/gradle_cve_report.rs": "1b8478d43a02101112e2ac58ff5d53b9b3300b0dc05ceabd3e981425221ffe92",
+    "crates/codeguard-cli/src/work_sync.rs": "f9eb6a4d19d0cc5558cb930c16c5ad4e3b5ca14827302ccb19378afe308b7130",
+    "crates/codeguard-cli/src/next_command.rs": "845b6c94996757c9b02ba48bb5dab25fdb3b4c2b6fe71efbc253c3fb38bdffea",
+    "crates/codeguard-cli/src/task_verify_command.rs": "3550968173682c00d23209625351912699fb7b845be188a53740abf541841639",
+    "tests/acceptance/gradle-cve-workbench.md": "15aec15873a8f7894d69f97a66362238c87f7d703e0be375b28630695adb2cfd",
+    "crates/codeguard-cli/src/gradle_cve_task_recheck.rs": "3229794e846ca217567f82fcb80a79790786ef46f5d90772fe919933d3b91708",
+    "crates/codeguard-cli/src/task_attempt_command.rs": "93879ad17dddce9b90fdf6bc64c2e6e0feac8a26eb3ab0a663c667fd6c5d58d3",
+    "tests/acceptance/gradle-cve-task-recheck.md": "3ff19b9086f93816d54281c661126235c0fe4408ed9dd64d48dda4a9276cc238"
   },
   "languages": [
     {
@@ -276,17 +279,20 @@
                 "crates/codeguard-cli/src/work_sync/gradle_cve_report.rs",
                 "crates/codeguard-cli/src/work_sync.rs",
                 "crates/codeguard-cli/src/next_command.rs",
-                "crates/codeguard-cli/src/task_verify_command.rs"
+                "crates/codeguard-cli/src/task_verify_command.rs",
+                "crates/codeguard-cli/src/gradle_cve_task_recheck.rs",
+                "crates/codeguard-cli/src/task_attempt_command.rs"
               ],
               "evidence_refs": [
                 "tests/acceptance/gradle-dependency-check-probe.md",
                 "tests/acceptance/gradle-owasp-aggregate-budget.md",
-                "tests/acceptance/gradle-cve-workbench.md"
+                "tests/acceptance/gradle-cve-workbench.md",
+                "tests/acceptance/gradle-cve-task-recheck.md"
               ],
               "blockers": [
                 "真实OWASP有/无漏洞原生扫描、插件缓存闭包、漏洞库时效和完整依赖归属仍待验收；受控报告和实际缺插件阻塞不能授予资格",
-                "普通check调度、work/next/task verify、可信关闭/复发、版本/平台/宿主/发行仍未完成",
-                "java/gradle:脱敏稳定准备任务已接入显式cve；统一check/task verify、完整依赖/数据时效和可信关闭仍未验收"
+                "普通check调度、统一check与可信工作闭环、可信关闭/复发、版本/平台/宿主/发行仍未完成",
+                "java/gradle:脱敏稳定准备任务已接入显式cve；统一check、真实OWASP复检、完整依赖/数据时效和可信关闭仍未验收"
               ]
             }
           ]

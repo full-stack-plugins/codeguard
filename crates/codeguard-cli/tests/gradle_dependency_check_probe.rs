@@ -742,9 +742,7 @@ fn initialized_gradle_cve_syncs_one_stable_preparation_task_and_rejects_tamperin
         .output()
         .unwrap();
     assert_eq!(verify.status.code(), Some(3));
-    assert!(
-        String::from_utf8_lossy(&verify.stdout).contains("gradle_cve_task_verify_not_integrated")
-    );
+    assert!(String::from_utf8_lossy(&verify.stdout).contains("prerequisites_missing"));
     let mut value: Value = serde_json::from_slice(&fs::read(&reports[0]).unwrap()).unwrap();
     if let Some(directory) = std::env::var_os("CODEGUARD_TEST_GRADLE_CVE_WORKBENCH_EVIDENCE") {
         fs::create_dir_all(&directory).unwrap();
@@ -783,4 +781,285 @@ fn initialized_gradle_cve_syncs_one_stable_preparation_task_and_rejects_tamperin
         "{}",
         String::from_utf8_lossy(&sync.stdout)
     );
+}
+
+#[test]
+fn gradle_cve_task_verify_reuses_consumed_scope_and_rejects_changed_tools() {
+    use std::process::Command;
+    let fixture = Fixture::new(&script(&model(), &ownership(), &report(), "exit 0"));
+    let root = fixture.0.join("project");
+    Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["init", root.to_str().unwrap(), "--apply"])
+        .output()
+        .unwrap();
+    let scan = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "cve",
+            "java",
+            root.to_str().unwrap(),
+            "--gradle-bundle",
+            fixture.0.join("gradle").to_str().unwrap(),
+            "--java-home",
+            fixture.0.join("jdk").to_str().unwrap(),
+            "--gradle-project-file",
+            "settings.gradle",
+            "--gradle-project-file",
+            "build.gradle",
+            "--gradle-owasp-task",
+            ":dependencyCheckAnalyze",
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(
+        serde_json::from_slice::<Value>(&scan.stdout).unwrap()["task_sync"],
+        "synced"
+    );
+    let id = fs::read_dir(root.join(".codeguard/tasks"))
+        .unwrap()
+        .next()
+        .unwrap()
+        .unwrap()
+        .path()
+        .file_stem()
+        .unwrap()
+        .to_string_lossy()
+        .into_owned();
+    let verify = || {
+        Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args([
+                "task",
+                "verify",
+                &id,
+                root.to_str().unwrap(),
+                "--gradle-bundle",
+                fixture.0.join("gradle").to_str().unwrap(),
+                "--java-home",
+                fixture.0.join("jdk").to_str().unwrap(),
+                "--format=json",
+            ])
+            .output()
+            .unwrap()
+    };
+    let out = verify();
+    let value: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(out.status.code(), Some(3));
+    assert_eq!(value["event_persisted"], true, "{value}");
+    assert_eq!(value["observation"], "still_blocked");
+    assert_eq!(
+        value["native_scan"]["scan"]["task_paths"],
+        json!([":dependencyCheckAnalyze"])
+    );
+    let next = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["next", root.to_str().unwrap(), "--format=json"])
+        .output()
+        .unwrap();
+    assert!(
+        next.status.success(),
+        "{}",
+        String::from_utf8_lossy(&next.stdout)
+    );
+    if let Some(directory) = std::env::var_os("CODEGUARD_TEST_GRADLE_CVE_RECHECK_EVIDENCE") {
+        fs::create_dir_all(&directory).unwrap();
+        fs::write(PathBuf::from(&directory).join("verify.json"), &out.stdout).unwrap();
+        fs::write(PathBuf::from(&directory).join("next.json"), &next.stdout).unwrap();
+    }
+    let recheck_path = root.join(format!(
+        ".codeguard/reports/{}.json",
+        value["native_scan"]["run_id"].as_str().unwrap()
+    ));
+    let original_bytes = fs::read(&recheck_path).unwrap();
+    let mut forged: Value = serde_json::from_slice(&original_bytes).unwrap();
+    forged["input_bindings"] = json!([]);
+    fs::write(&recheck_path, serde_json::to_vec_pretty(&forged).unwrap()).unwrap();
+    let rejected = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["next", root.to_str().unwrap(), "--format=json"])
+        .output()
+        .unwrap();
+    assert_eq!(rejected.status.code(), Some(3));
+    fs::write(&recheck_path, original_bytes).unwrap();
+    fs::write(
+        fixture.0.join("gradle/bin/gradle"),
+        "#!/bin/sh\ntouch must-not-run\nexit 0\n",
+    )
+    .unwrap();
+    let out = verify();
+    let value: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(
+        value["native_scan"]["reason"], "original_tool_identity_mismatch",
+        "{value}"
+    );
+    assert!(!root.join("must-not-run").exists());
+    fs::write(
+        root.join("build.gradle"),
+        "plugins { id 'java' } // changed\n",
+    )
+    .unwrap();
+    let out = verify();
+    let value: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(
+        value["native_scan"]["reason"],
+        "original_configuration_changed"
+    );
+    assert_eq!(value["observation"], "rule_coverage_requires_review");
+    assert!(!root.join("must-not-run").exists());
+    let first = fs::read_dir(root.join(".codeguard/reports"))
+        .unwrap()
+        .map(|e| e.unwrap().path())
+        .find(|p| {
+            let name = p.file_name().unwrap().to_string_lossy();
+            name.starts_with("cve-gradle-") && !name.starts_with("cve-gradle-task-")
+        })
+        .unwrap();
+    let mut altered: Value = serde_json::from_slice(&fs::read(&first).unwrap()).unwrap();
+    altered["task_paths"] = json!([":otherTask"]);
+    fs::write(first, serde_json::to_vec_pretty(&altered).unwrap()).unwrap();
+    let out = verify();
+    assert_eq!(out.status.code(), Some(3));
+    assert!(String::from_utf8_lossy(&out.stdout).contains("gradle_cve_original_changed"));
+}
+
+#[test]
+fn gradle_cve_original_cache_selection_and_digest_are_required_before_launch() {
+    use std::process::Command;
+    let fixture = Fixture::new(&script(&model(), &ownership(), &report(), "exit 0"));
+    let root = fixture.0.join("project");
+    Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["init", root.to_str().unwrap(), "--apply"])
+        .output()
+        .unwrap();
+    let cache = fixture.0.join("modules-2");
+    let jar = cache.join("files-2.1/example/sample/1/hash/sample.jar");
+    fs::create_dir_all(jar.parent().unwrap()).unwrap();
+    fs::write(&jar, b"initial cache bytes").unwrap();
+    let mut request = fixture.request();
+    request.module_cache = Some(cache.clone());
+    let native = observe(&request, &AtomicBool::new(false));
+    assert_eq!(native["native_status"], "reports_observed_unverified");
+    assert!(
+        codeguard_cli::gradle_cve_workbench::persist(
+            &root,
+            &request.native.project_files,
+            &request.task_paths,
+            true,
+            &native
+        )
+        .unwrap()
+    );
+    let id = fs::read_dir(root.join(".codeguard/tasks"))
+        .unwrap()
+        .next()
+        .unwrap()
+        .unwrap()
+        .path()
+        .file_stem()
+        .unwrap()
+        .to_string_lossy()
+        .into_owned();
+    let invoke = |with_cache: bool| {
+        let mut c = Command::new(env!("CARGO_BIN_EXE_codeguard"));
+        c.args([
+            "task",
+            "verify",
+            &id,
+            root.to_str().unwrap(),
+            "--gradle-bundle",
+            fixture.0.join("gradle").to_str().unwrap(),
+            "--java-home",
+            fixture.0.join("jdk").to_str().unwrap(),
+            "--format=json",
+        ]);
+        if with_cache {
+            c.args(["--gradle-module-cache", cache.to_str().unwrap()]);
+        }
+        let out = c.output().unwrap();
+        assert_eq!(out.status.code(), Some(3));
+        serde_json::from_slice::<Value>(&out.stdout).unwrap()
+    };
+    assert_eq!(
+        invoke(false)["native_scan"]["reason"],
+        "original_cache_selection_changed"
+    );
+    assert_eq!(invoke(true)["observation"], "still_blocked");
+    fs::write(jar, b"changed cache bytes").unwrap();
+    assert_eq!(
+        invoke(true)["native_scan"]["reason"],
+        "original_cache_identity_mismatch"
+    );
+}
+
+#[test]
+fn gradle_cve_empty_original_report_recheck_never_closes_preparation_task() {
+    use std::process::Command;
+    let mut empty = report();
+    empty["dependencies"] = json!([]);
+    let fixture = Fixture::new(&script(&model(), &ownership(), &empty, "exit 0"));
+    let root = fixture.0.join("project");
+    Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["init", root.to_str().unwrap(), "--apply"])
+        .output()
+        .unwrap();
+    let scan = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "cve",
+            "java",
+            root.to_str().unwrap(),
+            "--gradle-bundle",
+            fixture.0.join("gradle").to_str().unwrap(),
+            "--java-home",
+            fixture.0.join("jdk").to_str().unwrap(),
+            "--gradle-project-file",
+            "settings.gradle",
+            "--gradle-project-file",
+            "build.gradle",
+            "--gradle-owasp-task",
+            ":dependencyCheckAnalyze",
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(
+        serde_json::from_slice::<Value>(&scan.stdout).unwrap()["task_sync"],
+        "synced"
+    );
+    let id = fs::read_dir(root.join(".codeguard/tasks"))
+        .unwrap()
+        .next()
+        .unwrap()
+        .unwrap()
+        .path()
+        .file_stem()
+        .unwrap()
+        .to_string_lossy()
+        .into_owned();
+    let verify = || {
+        Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args([
+                "task",
+                "verify",
+                &id,
+                root.to_str().unwrap(),
+                "--gradle-bundle",
+                fixture.0.join("gradle").to_str().unwrap(),
+                "--java-home",
+                fixture.0.join("jdk").to_str().unwrap(),
+                "--format=json",
+            ])
+            .output()
+            .unwrap()
+    };
+    let out = verify();
+    let value: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(out.status.code(), Some(3));
+    assert_eq!(value["event_persisted"], true, "{value}");
+    assert_eq!(value["observation"], "still_blocked");
+    assert_eq!(
+        value["native_scan"]["scan"]["task_paths"],
+        json!([":dependencyCheckAnalyze"])
+    );
+    let fact: Value = serde_json::from_slice(
+        &fs::read(root.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(fact["state"], "open");
 }

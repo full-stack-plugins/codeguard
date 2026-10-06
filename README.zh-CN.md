@@ -1066,4 +1066,4 @@ flowchart LR
 
 四核心验收计划只读入口：`codeguard capabilities [language] --acceptance-plan --format=json`. 57 语言/228 义务保留未授予资格，筛选不缩减总义务。参见[acceptance plan](docs/Codeguard-Production-Acceptance-Plan.zh_CN.md).
 
-Java Gradle 漏洞检查新增显式原任务入口 `codeguard cve java`；JSON 原配置与可选模块缓存保留，结果仍未受信；已初始化工作区自动同步脱敏稳定准备任务，next/task show列出原输入/任务复扫参数；task verify、统一check及完整原生验收待完成。详见[Gradle OWASP](docs/Codeguard-Gradle-Vulnerability-Checks.zh_CN.md).
+Java Gradle 漏洞检查新增显式原任务入口 `codeguard cve java`；JSON 原配置与可选模块缓存保留，结果仍未受信；已初始化工作区自动同步脱敏稳定准备任务，next/task show列出原输入/任务复扫参数；task verify已接入冻结上下文局部复检；统一check及完整原生验收待完成。详见[Gradle OWASP](docs/Codeguard-Gradle-Vulnerability-Checks.zh_CN.md).

@@ -48,3 +48,42 @@ pub(super) fn parse(
         }],
     })
 }
+
+/// 导入原范围复检收据；只记录观察，不导入漏洞finding或授予关闭。
+pub(super) fn parse_recheck(
+    root: &Path,
+    workspace: &str,
+    path: &Path,
+    r: &Value,
+    digest: String,
+) -> Result<ReportInput, &'static str> {
+    if !crate::gradle_cve_task_recheck::valid_shape(r)
+        || r["workspace_id"] != workspace
+        || r["run_id"].as_str() != path.file_stem().and_then(|p| p.to_str())
+    {
+        return Err("gradle_cve_recheck_invalid");
+    }
+    let id = r["task_id"].as_str().ok_or("gradle_cve_task_invalid")?;
+    let bytes = codeguard_runtime::read_bounded_regular_file(
+        &root.join(format!(".codeguard/findings/{id}/finding.json")),
+        128 * 1024,
+    )
+    .map_err(|_| "gradle_cve_task_unavailable")?;
+    let f = codeguard_adapters::parse_unique_json(&bytes).map_err(|_| "gradle_cve_task_invalid")?;
+    if f["id"] != id || f["workspace_id"] != workspace {
+        return Err("gradle_cve_task_invalid");
+    }
+    let brief = serde_json::json!({"task_id":id,"checker_id":f["checker_id"],"kind":f["kind"],"scope":f["scope"],"evidence_ref":{"first_run_id":f["first_run_id"],"first_report_sha256":f["first_report_sha256"]}});
+    crate::gradle_cve_task_recheck::validate_binding(root, &brief, r)?;
+    if r["task_input_stable"] == true && !crate::gradle_cve_task_recheck::inputs_current(root, r) {
+        return Err("gradle_cve_recheck_inputs_changed");
+    }
+    Ok(ReportInput {
+        workspace_id: workspace.into(),
+        run_id: r["run_id"].as_str().ok_or("gradle_cve_run_invalid")?.into(),
+        digest,
+        findings: Vec::new(),
+        blockers: Vec::new(),
+        historical_findings: 0,
+    })
+}

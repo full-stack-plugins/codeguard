@@ -10,22 +10,22 @@ use std::{
 };
 static NEXT: AtomicU64 = AtomicU64::new(0);
 
-/// 保存已绑定当前输入的脱敏观察并自动同步；未初始化返回false，错误不冒充同步成功。
-/// 参数为项目根、原选定输入及任务、可选缓存选择和本轮原生报告；返回是否完成同步。
-pub fn persist(
+/// 构造已绑定当前输入的脱敏观察；未初始化返回None，不在此函数写工作区。
+/// 参数为项目根、原选定输入及任务、可选缓存选择和本轮原生报告；返回待同步观察。
+pub(crate) fn prepare(
     root: &Path,
     paths: &BTreeSet<PathBuf>,
     tasks: &[String],
     cache: bool,
     native: &Value,
-) -> Result<bool, &'static str> {
+) -> Result<Option<Value>, &'static str> {
     if codeguard_runtime::sigint_cancellation_requested() {
         return Err("request_cancelled");
     }
     let baseline = crate::workspace_refresh::read_workspace_baseline(root)
         .map_err(|_| "gradle_cve_workspace_invalid")?;
     let Some(workspace) = baseline.and_then(|b| b.workspace_id().map(str::to_owned)) else {
-        return Ok(false);
+        return Ok(None);
     };
     let snapshot = SourceSnapshot::capture(
         root,
@@ -70,12 +70,7 @@ pub fn persist(
     if codeguard_runtime::sigint_cancellation_requested() {
         return Err("request_cancelled");
     }
-    crate::work_sync::save_local_report(root, &report)?;
-    let summary = crate::work_sync::sync_local_workspace(root)?;
-    if summary.failed_reports != 0 {
-        return Err("gradle_cve_sync_incomplete");
-    }
-    Ok(true)
+    Ok(Some(report))
 }
 
 /// 检查脱敏观察的封闭协议及当前输入；历史查询可保留原始输入，导入必须核对当前字节。
@@ -294,61 +289,6 @@ pub(crate) fn fingerprint(v: &Value) -> Result<String, &'static str> {
         .map_err(|_| "gradle_cve_encoding_invalid")?,
     ))
 }
-/// 从原报告摘要核对后构造具体原任务复检参数；占位工具需要重新核验，不能自动运行。
-pub(crate) fn recheck_argv(root: &Path, fact: &Value) -> Result<Value, &'static str> {
-    let run = fact["first_run_id"]
-        .as_str()
-        .filter(|s| {
-            s.starts_with("cve-gradle-")
-                && s.len() <= 256
-                && s.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'-')
-        })
-        .ok_or("gradle_cve_run_invalid")?;
-    let bytes = codeguard_runtime::read_bounded_regular_file(
-        &root.join(format!(".codeguard/reports/{run}.json")),
-        128 * 1024,
-    )
-    .map_err(|_| "gradle_cve_origin_unavailable")?;
-    if fact["first_report_sha256"] != hash(&bytes) {
-        return Err("gradle_cve_origin_changed");
-    }
-    let report =
-        codeguard_adapters::parse_unique_json(&bytes).map_err(|_| "gradle_cve_origin_invalid")?;
-    validate(root, &report, false)?;
-    if report["workspace_id"] != fact["workspace_id"]
-        || report["run_id"] != run
-        || fingerprint(&report)? != fact["fingerprint"]
-    {
-        return Err("gradle_cve_origin_invalid");
-    }
-    let mut args = vec![
-        json!("codeguard"),
-        json!("cve"),
-        json!("java"),
-        json!("."),
-        json!("--gradle-bundle"),
-        json!("<原Gradle绝对路径>"),
-        json!("--java-home"),
-        json!("<原JDK21绝对路径>"),
-    ];
-    for row in report["inputs"]
-        .as_array()
-        .ok_or("gradle_cve_inputs_invalid")?
-    {
-        args.extend([json!("--gradle-project-file"), row["path"].clone()]);
-    }
-    for t in report["task_paths"]
-        .as_array()
-        .ok_or("gradle_cve_tasks_invalid")?
-    {
-        args.extend([json!("--gradle-owasp-task"), t.clone()]);
-    }
-    if report["module_cache_selected"] == true {
-        args.extend([json!("--gradle-module-cache"), json!("<原缓存绝对路径>")]);
-    }
-    args.push(json!("--format=json"));
-    Ok(json!(args))
-}
 fn exact(v: &Value, keys: &[&str]) -> bool {
     v.as_object()
         .is_some_and(|o| o.len() == keys.len() && keys.iter().all(|k| o.contains_key(*k)))
@@ -380,4 +320,27 @@ fn safe_task(s: &str) -> bool {
 }
 fn hash(bytes: &[u8]) -> String {
     format!("{:x}", Sha256::digest(bytes))
+}
+
+/// 保存脱敏观察并自动同步已初始化工作区；参数和返回含义同prepare，未初始化返回false。
+pub fn persist(
+    root: &Path,
+    paths: &BTreeSet<PathBuf>,
+    tasks: &[String],
+    cache: bool,
+    native: &Value,
+) -> Result<bool, &'static str> {
+    let Some(report) = prepare(root, paths, tasks, cache, native)? else {
+        return Ok(false);
+    };
+    crate::work_sync::save_local_report(root, &report)?;
+    if crate::work_sync::sync_local_workspace(root)?.failed_reports != 0 {
+        return Err("gradle_cve_sync_incomplete");
+    }
+    Ok(true)
+}
+
+/// 选定输入只接受根内普通相对路径；复检和首次导入共享同一边界。
+pub(crate) fn safe_input_path(s: &str) -> bool {
+    safe_path(s)
 }

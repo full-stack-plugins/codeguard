@@ -518,6 +518,7 @@ fn import_one(
                     | "maven_javadoc_workbench_observation"
                     | "gradle_javadoc_workbench_observation"
                     | "gradle_cve_workbench_observation"
+                    | "gradle_cve_task_recheck"
                     | "gradle_javadoc_task_recheck"
                     | "maven_javadoc_task_recheck"
                     | "javadoc_task_recheck"
@@ -644,6 +645,10 @@ fn parse_report(
     }
     if report["report_type"] == "python_syntax_confirmation_observation" {
         return python_syntax_confirmation_report::parse(root, workspace_id, path, report, digest);
+    }
+    #[cfg(unix)]
+    if report["report_type"] == "gradle_cve_task_recheck" {
+        return gradle_cve_report::parse_recheck(root, workspace_id, path, report, digest);
     }
     #[cfg(unix)]
     if report["report_type"] == "gradle_cve_workbench_observation" {
@@ -2151,7 +2156,7 @@ fn persist_local_blocker_observation(
 fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
     if blocker.checker_id == "java.gradle.dependency_check" {
         return format!(
-            "# {} Gradle CVE准备任务\n\n- 问题证据：原报告 .codeguard/reports/{}.json，摘要 {}，具体原因 {}。\n- 规则依据：原生OWASP任务、数据库时效及依赖归属；未经确认的观察不是源码漏洞。\n- 允许范围：原Gradle/JDK21、选定输入、原任务及漏洞库；不修改无关源码。\n- 修复步骤：恢复原工具和配置，超预算按完整任务清单分批复检；观察到advisory后核验库与真实组件，不能删检查义务。\n- 复检命令：codeguard task show {} . --format=json读取完整原任务/选定输入参数，然后按recheck_argv运行codeguard cve java；task verify接线尚未完成，不虚构完成。\n- 历史尝试：首次run {}，重复扫描追加稳定任务的观察；失败需记录。\n- 关闭条件：原工具完整复检与可信策略均通过；空报告、勾选、删除任务或局部成功均不能关闭。\n",
+            "# {} Gradle CVE准备任务\n\n- 问题证据：原报告 .codeguard/reports/{}.json，摘要 {}，具体原因 {}。\n- 规则依据：原生OWASP任务、数据库时效及依赖归属；未经确认的观察不是源码漏洞。\n- 允许范围：原Gradle/JDK21、选定输入、原任务及漏洞库；不修改无关源码。\n- 修复步骤：恢复原工具和配置，超预算按完整任务清单分批复检；观察到advisory后核验库与真实组件，不能删检查义务。\n- 复检命令：codeguard task show {} . --format=json读取完整原任务/选定输入参数，然后按recheck_argv运行codeguard task verify；冻结原配置/工具/缓存，局部复检无可信关闭权威。\n- 历史尝试：首次run {}，重复扫描追加稳定任务的观察；失败需记录。\n- 关闭条件：原工具完整复检与可信策略均通过；空报告、勾选、删除任务或局部成功均不能关闭。\n",
             blocker.id,
             report.run_id,
             report.digest,
