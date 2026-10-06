@@ -19,6 +19,8 @@ pub(crate) fn examples(command: &str) -> &'static [&'static str] {
             "codeguard lint typescript file.ts --node-tool /absolute/node --eslint-entry /absolute/eslint/bin/eslint.js --eslint-version VERSION --config /absolute/eslint.config.js --cwd /absolute/project --format json",
         ],
         "comments" => &[
+            "codeguard comments c api.c --clang-tool /absolute/clang --standard c11 --format json",
+            "codeguard comments cpp api.cpp --clang-tool /absolute/clang --standard c++17 --format json",
             "codeguard comments java File.java --java-home /absolute/jdk21 --format json",
             "codeguard comments java File.java --workspace . --java-home /absolute/jdk21 --format json",
             "codeguard comments java . --java-home /absolute/jdk21 --maven-tool /absolute/mvn --maven-repo /absolute/repository --repo-sha256 SHA256 --format json",

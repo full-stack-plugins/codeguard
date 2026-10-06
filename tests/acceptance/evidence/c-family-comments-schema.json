@@ -1,0 +1,10 @@
+{
+  "status": "passed",
+  "schemas_checked": 478,
+  "historical_schemas_unchanged": 477,
+  "native_reports_validated": 32,
+  "controlled_transport_reports_validated": 26,
+  "forged_variants_rejected": 12,
+  "historical_syntax_consumer_rejects_new_report": true,
+  "production_qualification": "not_granted"
+}

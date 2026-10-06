@@ -789,6 +789,11 @@ Rust npm审计适配 MUST 核对具体原工具版本、auditReportVersion、冻
 
 Codeguard SHALL target every one of the 57 canonical registry entries for production qualification of syntax, documentation comments, development conventions and vulnerability checking. The historical stable/planned labels SHALL NOT establish qualification or exclude an entry from this target. Qualification SHALL be recorded per language, supported version/dialect, build ecosystem and advertised platform, with reproducible real-tool and end-to-end acceptance evidence. A candidate asset, formatter-only adapter, configured tool, zero findings, mocked process or passed unit suite SHALL NOT establish production readiness. Missing implementations SHALL remain explicit release blockers. These four capabilities SHALL supplement, not replace, existing dependency/security/build requirements.
 
+#### Scenario: Explicit C and C++ documentation probes preserve native diagnostic scope
+- **WHEN** comments c/cpp receives one explicit source file, a selected supported Clang entry and its matching C11/C++17 standard
+- **THEN** Rust SHALL invoke a separate fixed documentation warning profile on frozen stdin through the existing controlled runtime; native SARIF rules and UTF8 locations SHALL remain source/tool bound, and only individually supported documentation rules SHALL receive documentation repair guidance. Other native diagnostics SHALL remain separately visible, never become documentation findings by prefix
+- **AND** missing tools, unsupported versions, unresolved preprocessing, invalid reports, cancellation, deadline exhaustion or changed inputs SHALL remain incomplete without WASM fallback or source findings from invalid evidence. Zero diagnostics SHALL NOT establish mandatory comment presence, purpose/parameter/return/error/behavioral completeness, original project configuration, trusted task closure or production qualification. An uninitialized source probe SHALL NOT create a workspace or pretend to have persisted a repair task
+
 #### Scenario: All bundled parsers execute but native checks remain incomplete
 - **WHEN** all 32 bundled WASM assets execute and one language lacks its accepted native syntax checker
 - **THEN** that language SHALL remain unqualified and the all-language production claim SHALL be rejected

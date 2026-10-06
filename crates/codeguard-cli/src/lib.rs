@@ -505,6 +505,12 @@ mod syntax_lint_feedback;
 #[cfg(unix)]
 mod clang_syntax_probe;
 #[cfg(unix)]
+mod native_clang_profile;
+#[cfg(unix)]
+mod c_family_comments_arguments;
+#[cfg(unix)]
+pub mod c_family_comments_command;
+#[cfg(unix)]
 mod clang_lint_feedback;
 
 #[cfg(feature = "wasm-precheck")]
