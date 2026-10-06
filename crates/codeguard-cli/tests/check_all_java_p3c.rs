@@ -13,6 +13,82 @@ use sha2::{Digest, Sha256};
 static NEXT: AtomicU64 = AtomicU64::new(0);
 
 #[test]
+fn javadoc_main_source_scope_is_relative_to_its_build_root() {
+    let project = Project::new(false);
+    fs::remove_file(project.0.join("src/main/java/Bad_Name.java")).unwrap();
+    fs::write(project.0.join("pom.xml"), "<project><modelVersion>4.0.0</modelVersion><build><plugins><plugin><artifactId>maven-javadoc-plugin</artifactId><configuration><doclint>missing</doclint></configuration></plugin></plugins></build></project>").unwrap();
+    fs::create_dir_all(project.0.join("vendor/src/main/java")).unwrap();
+    fs::write(
+        project.0.join("vendor/src/main/java/Demo.java"),
+        "public class Demo {}\n",
+    )
+    .unwrap();
+    let (_, report) = project.check_java(&[]);
+    let javadoc = &report["native_results"]["java_javadoc"];
+    assert_eq!(
+        javadoc["files"][0]["configuration"], "configured",
+        "{report}"
+    );
+    assert_eq!(
+        javadoc["files"][0]["reason"], "javadoc_source_scope_unverified",
+        "{report}"
+    );
+    assert!(javadoc["files"][0]["observation"].is_null(), "{report}");
+    assert_eq!(javadoc["observed_file_count"], 0);
+    assert_eq!(javadoc["local_probe_complete"], false);
+}
+
+#[test]
+fn javadoc_multifile_does_not_borrow_nested_build_sources() {
+    let project = Project::new(false);
+    let pom = "<project><modelVersion>4.0.0</modelVersion><build><plugins><plugin><artifactId>maven-javadoc-plugin</artifactId><configuration><doclint>missing</doclint></configuration></plugin></plugins></build></project>";
+    fs::write(project.0.join("pom.xml"), pom).unwrap();
+    let nested = project.0.join("src/main/java/nested");
+    fs::create_dir_all(nested.join("src/main/java")).unwrap();
+    fs::write(nested.join("pom.xml"), pom).unwrap();
+    fs::write(
+        nested.join("src/main/java/Child.java"),
+        "public class Child {}\n",
+    )
+    .unwrap();
+    let missing = project.0.join("missing-maven");
+    let (_, report) = project.check_java(&["--maven-tool", missing.to_str().unwrap()]);
+    let probes = report["native_results"]["java_javadoc"]["maven_multifile_probes"]
+        .as_array()
+        .unwrap();
+    assert_eq!(probes.len(), 2, "{report}");
+    for probe in probes {
+        assert_eq!(probe["observation"]["source_count"], 1, "{report}");
+        assert_eq!(probe["observation"]["observed_source_count"], 0);
+    }
+    // 子构建根未配置仍遮蔽父根，不能借父配置重新纳入扫描。
+    fs::write(
+        nested.join("pom.xml"),
+        "<project><modelVersion>4.0.0</modelVersion></project>",
+    )
+    .unwrap();
+    let (_, shadowed) = project.check_java(&["--maven-tool", missing.to_str().unwrap()]);
+    let javadoc = &shadowed["native_results"]["java_javadoc"];
+    assert_eq!(
+        javadoc["maven_multifile_probes"].as_array().unwrap().len(),
+        1,
+        "{shadowed}"
+    );
+    assert_eq!(
+        javadoc["maven_multifile_probes"][0]["observation"]["source_count"],
+        1
+    );
+    let child = javadoc["files"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|file| file["path"] == "src/main/java/nested/src/main/java/Child.java")
+        .unwrap();
+    assert_eq!(child["configuration"], "missing");
+    assert_eq!(child["reason"], "javadoc_configuration_not_confirmed");
+}
+
+#[test]
 #[ignore = "requires explicit Maven, JDK 21 and isolated offline Javadoc plugin repository"]
 fn real_maven_javadoc_multifile_probe_keeps_project_authority_unverified() {
     let project = Project::new(false);
@@ -1431,6 +1507,12 @@ fn real_jdk_check_java_reports_javadoc_comment_probe() {
         "public class Bad_Name {}\n",
     )
     .unwrap();
+    fs::create_dir_all(project.0.join("vendor/src/main/java")).unwrap();
+    fs::write(
+        project.0.join("vendor/src/main/java/Vendor.java"),
+        "public class Vendor {}\n",
+    )
+    .unwrap();
     let java_home = std::env::var("CODEGUARD_JAVA_HOME").unwrap();
     let (exit, report) = project.check_java(&["--java-home", &java_home]);
     assert_eq!(exit, 3);
@@ -1448,6 +1530,17 @@ fn real_jdk_check_java_reports_javadoc_comment_probe() {
             .any(|finding| finding["rule_id"] == "JavadocMissingComment")
     );
     assert_eq!(javadoc["coverage_proven"], false);
+    let vendor = javadoc["files"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|file| file["path"] == "vendor/src/main/java/Vendor.java")
+        .unwrap();
+    assert_eq!(vendor["reason"], "javadoc_source_scope_unverified");
+    assert!(vendor["observation"].is_null());
+    assert_eq!(javadoc["source_file_count"], 2);
+    assert_eq!(javadoc["observed_file_count"], 1);
+    assert_eq!(javadoc["local_probe_complete"], false);
     assert_eq!(report["delivery_decision"], "not_evaluated");
 }
 

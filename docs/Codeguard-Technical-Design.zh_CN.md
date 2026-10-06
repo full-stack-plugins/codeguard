@@ -1626,3 +1626,5 @@ WASM 首次闭环的实际执行路径、协议与误报分流见 [验收记录]
 未完成解析反馈现明确要求对原始源码进行适用原生确认：原生确认合法时调查grammar版本/兼容性或扫描预算，诊断成立时才按真实位置修复。不能仅凭截断声称grammar已报告错误。项目输出、编辑对话、持久任务及next/task show共用此分流，任务身份和关闭要求保持原有语义。[Acceptance](../tests/acceptance/incomplete-syntax-guidance.md)
 
 完整局部原生复检没有语法诊断时，next/task show会比较首次WASM与本次源码摘要；同字节且原grammar引用有效，明确提示grammar反证候选并调查兼容/预算。输入改变和原生首次来源不套用此描述。任务仍开放，不据此自动白名单放行或批准交付。[Acceptance](../tests/acceptance/native-same-source-counterevidence.md)
+
+Javadoc主源码选择以最近观察到的构建根为基准；没有独立构建根的`vendor/src/main/java/`不能借用外层主源集配置。Maven多文件探针排除归属于更近构建根的源码，内层未确认Javadoc配置时也不借父配置扫描。未解析源码仍可见并保持覆盖未完成；自定义源目录和Maven effective模型仍待实现。[验收](../tests/acceptance/javadoc-build-root-source-scope.md)

@@ -1772,3 +1772,7 @@ SP22完整默认终态：当前源码workspace all-targets 1500 passed / 0 faile
 ## 2026-10-06 SP30 同字节原生零诊断反证指引（局部验收）
 
 next/task show在已核验当前原生零诊断、原grammar引用及同一源码摘要时，提示grammar反证候选而不是源码已修复；不同源码/过期/原生首次证据不套用。实际RED后受控Kotlin4项通过，已安装真实kotlinc2.4.10同字节1项通过、源码不变且任务open。工具仅launcher身份、不自动白名单或关闭，不改变32语言资格与完整14.x父任务。见[验收](../../../tests/acceptance/native-same-source-counterevidence.md)。
+
+## 2026-10-06 Javadoc 构建根源集归属修复
+
+6.1/6.3/6.6：两个CLI反例实际RED后修复，主源码目录相对最近POM而非路径任意片段；Maven多文件按最近根排除子构建源码，子根未配置仍遮蔽父配置。默认三目标51通过/0失败/7条件忽略，已安装JDK21实际混合源集1项通过、有效诊断保留且vendor范围未确认；完整Java模型、动态源集、原生Maven多文件及正式覆盖仍未完成。见[验收](../../../tests/acceptance/javadoc-build-root-source-scope.md)，不借此勾选父任务。
