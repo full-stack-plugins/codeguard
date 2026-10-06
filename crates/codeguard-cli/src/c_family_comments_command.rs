@@ -18,6 +18,17 @@ pub fn run(args: &[String]) -> ExitCode {
         }
     };
     let deadline = Instant::now() + Duration::from_millis(request.timeout_ms);
+    let workspace = match crate::c_family_comments_workbench::resolve_root(
+        &request.source,
+        request.workspace.as_deref(),
+    ) {
+        Ok(workspace) => workspace,
+        Err(reason) if request.workspace.is_some() => {
+            eprintln!("{reason}");
+            return ExitCode::from(2);
+        }
+        Err(_) => None,
+    };
     let path = request
         .source
         .canonicalize()
@@ -104,7 +115,7 @@ pub fn run(args: &[String]) -> ExitCode {
         Some("completed" | "diagnostics_observed")
     ) && !has_native_errors;
     let exit = if cancelled { 130 } else { 3 };
-    let report = json!({"schema_version":"0.1.0","report_type":"c_family_comments_feedback","operation":"comments","language":request.language,
+    let mut report = json!({"schema_version":"0.1.0","report_type":"c_family_comments_feedback","operation":"comments","language":request.language,
         "command_status":if cancelled {"cancelled"} else {"incomplete"},"exit_code":exit,"authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated",
         "local_scan_complete":complete,"detailed_contract_qualification":"not_granted","workspace_binding":"not_bound","next":null,
         "reason":if has_native_errors {"native_syntax_errors_limit_documentation"} else {"native_documentation_coverage_unverified"},
@@ -113,6 +124,17 @@ pub fn run(args: &[String]) -> ExitCode {
         "native":native,"documentation_findings":documentation_findings,"unclassified_native_diagnostics":unclassified,
         "next_actions":["按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
             "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。"]});
+    if let Some(root) = workspace {
+        crate::c_family_comments_workbench::connect(
+            &root,
+            request.clang_tool.as_deref().expect("工具已校验"),
+            &mut report,
+            deadline,
+        );
+        report["next_actions"][0] = json!(
+            "按当前原生规则和位置修正文档并运行原工具复扫；稳定任务已接入，专用task verify及可信关闭仍待实现。"
+        );
+    }
     if request.json {
         println!("{report}");
     } else {
@@ -124,6 +146,12 @@ pub fn run(args: &[String]) -> ExitCode {
             "原生状态 {}；原因 {}",
             report["native"]["status"], report["native"]["reason"]
         );
+        if !report["workbench"].is_null() {
+            println!(
+                "工作台 {}；任务 {}",
+                report["workbench"]["status"], report["workbench"]["task_ids"]
+            );
+        }
         for row in report["documentation_findings"]
             .as_array()
             .into_iter()

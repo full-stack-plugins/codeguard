@@ -511,6 +511,8 @@ mod c_family_comments_arguments;
 #[cfg(unix)]
 pub mod c_family_comments_command;
 #[cfg(unix)]
+mod c_family_comments_workbench;
+#[cfg(unix)]
 mod clang_lint_feedback;
 
 #[cfg(feature = "wasm-precheck")]

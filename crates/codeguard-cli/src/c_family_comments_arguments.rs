@@ -17,9 +17,6 @@ impl CFamilyCommentsArguments {
         if request.clang_tool.is_none() || request.standard.is_none() {
             return Err("C/C++文档检查必须提供--clang-tool绝对路径与匹配的--standard".into());
         }
-        if request.workspace.is_some() {
-            return Err("C/C++文档单文件探针尚未支持工作台导入；不接受--workspace".into());
-        }
         Ok(Self(request))
     }
 }

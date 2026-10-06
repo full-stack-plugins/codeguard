@@ -21,6 +21,8 @@ use crate::workspace_refresh::read_workspace_baseline;
 const MAX_REPORT_BYTES: u64 = 16 * 1024 * 1024;
 mod checkstyle_report;
 #[cfg(unix)]
+pub(crate) mod c_family_comments_report;
+#[cfg(unix)]
 mod javadoc_report;
 #[cfg(unix)]
 mod maven_javadoc_report;
@@ -613,6 +615,10 @@ fn parse_report(
     report: &Value,
     digest: String,
 ) -> Result<ReportInput, &'static str> {
+    #[cfg(unix)]
+    if report["report_type"] == "clang_documentation_workbench_observation" {
+        return c_family_comments_report::parse(root, workspace_id, path, report, digest);
+    }
     #[cfg(unix)]
     if report["report_type"] == "shellcheck_task_recheck" {
         return shell_report::parse_recheck(root, workspace_id, path, report, digest);
@@ -2154,6 +2160,20 @@ fn persist_local_blocker_observation(
 }
 
 fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
+    if matches!(
+        blocker.checker_id.as_str(),
+        "c.clang.documentation" | "cpp.clang.documentation"
+    ) {
+        return format!(
+            "# {} Clang文档环境/覆盖阻塞\n\n- 问题证据：原因 {}，范围 {}；原报告 .codeguard/reports/{}.json，摘要 {}。\n- 规则依据：原生检查完整性与规则映射要求；不是源码违规。\n- 允许修改的范围：仅核对该源码、原工具及匹配标准，先恢复原生检查。\n- 修复步骤：查看next中当前原因和原生观察；缺工具、语法受阻及未适配规则分别诊断，不修改无关源码。\n- 复检命令：codeguard next . --format=json读取首次上下文绑定的comments argv，核验原工具后重扫。\n- 历史尝试：首次run {}；重复阻塞更新同一范围，独立尝试日志尚未接通。\n- 关闭条件：专用原工具复检、完整覆盖和可信关闭；零诊断或任务勾选不能关闭。\n",
+            blocker.id,
+            blocker.reason,
+            serde_json::to_string(&blocker.scope).unwrap(),
+            report.run_id,
+            report.digest,
+            report.run_id
+        );
+    }
     if blocker.checker_id == "java.gradle.dependency_check" {
         return format!(
             "# {} Gradle CVE准备任务\n\n- 问题证据：原报告 .codeguard/reports/{}.json，摘要 {}，具体原因 {}。\n- 规则依据：原生OWASP任务、数据库时效及依赖归属；未经确认的观察不是源码漏洞。\n- 允许范围：原Gradle/JDK21、选定输入、原任务及漏洞库；不修改无关源码。\n- 修复步骤：恢复原工具和配置，超预算按完整任务清单分批复检；观察到advisory后核验库与真实组件，不能删检查义务。\n- 复检命令：codeguard task show {} . --format=json读取完整原任务/选定输入参数，然后按recheck_argv运行codeguard task verify；冻结原配置/工具/缓存，局部复检无可信关闭权威。\n- 历史尝试：首次run {}，重复扫描追加稳定任务的观察；失败需记录。\n- 关闭条件：原工具完整复检与可信策略均通过；空报告、勾选、删除任务或局部成功均不能关闭。\n",
@@ -2459,6 +2479,21 @@ fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
 }
 
 fn render_task(report: &ReportInput, finding: &FindingInput) -> String {
+    if matches!(
+        finding.checker_id.as_str(),
+        "c.clang.documentation" | "cpp.clang.documentation"
+    ) {
+        return format!(
+            "# {} Clang文档规则组修复任务\n\n- 问题证据：原生规则 {}，文件 {}，首次行 {}；同文件/语言标准/原规则的全部位置保存在 .codeguard/reports/{}.json；摘要 {}。\n- 规则依据：Clang固定文档档案；详细文档覆盖和项目配置仍未验收。\n- 允许修改的范围：仅本文件文档注释，保留API及行为；先用next核对当前输入。\n- 修复步骤：按当前原生规则补充实际契约，不能只填空标签或关闭规则。\n- 复检命令：codeguard next . --format=json取得绑定首次工具、语言标准和工作区的comments原命令，核验工具后复扫；专用task verify未接通。\n- 历史尝试：首次run {}；后续扫描归并同任务，独立尝试日志仍待接通。\n- 关闭条件：原工具专用任务复检、完整文档覆盖和可信关闭均须完成；本地零诊断和勾选不能关闭。\n",
+            finding.id,
+            finding.rule_id,
+            serde_json::to_string(&finding.path).unwrap(),
+            finding.line,
+            report.run_id,
+            report.digest,
+            report.run_id
+        );
+    }
     if finding.checker_id == "java.gradle.javadoc" {
         return format!(
             "# {} Gradle Javadoc修复任务\n\n- 问题证据：原生 {}，目标 {}，首次行 {}；报告 .codeguard/reports/{}.json，摘要 {}。\n- 规则依据：原Gradle官方Javadoc任务诊断，原doclint/doclet及源集保持，完整详细规则尚未验收。\n- 允许范围：仅该源码与真实API文档，不关闭检查器或添加抑制代替修复。\n- 修复步骤：核对本轮位置和实际契约，补齐用途、参数、返回或异常的详细说明，裸标签不能代替内容。\n- 复检命令：codeguard task verify {0} . --gradle-bundle <原Gradle绝对路径> --java-home <原JDK21绝对路径> --format=json；codeguard next . --format=json核对指引及原Gradle/JDK后复检；沿用原选定输入，记录局部观察和尝试，不授予可信关闭。\n- 历史尝试：首次run {}；重复扫描追加同一问题，记录失败和无进展，旧行号不能直接修改。\n- 关闭条件：原工具完整复检和可信政策；当前不自动关闭，零诊断和勾选均不能关闭。\n",

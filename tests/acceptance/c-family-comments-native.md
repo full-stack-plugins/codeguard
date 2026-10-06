@@ -53,3 +53,6 @@ WASM构建再加 `--features wasm-precheck`。原语法入口实际正反例同�
 最终验证：默认四个CLI目标22通过/3真实条件忽略；WASM四目标25通过/3条件忽略。忽略项另以已有Clang明确运行，两种构建各3个真实目标通过，其中文档各16例、原语法两个目标独立保留。适配器规则/生产映射4通过；默认/WASM全工作区all-targets Clippy严格通过。478份schema元定义有效、477份历史schema逐字节不变；默认/WASM共32份原生报告与26份受控运输报告有效，12类伪造被拒，原语法0.2消费者拒绝新文档协议。首轮新schema相对引用无法解析，改为历史schema的精确URN后重跑，没有改宽断言。分层、OpenSpec strict、两份架构文件命名和diff校验通过。
 
 生产映射仅C和C++的standalone文档路径更新partial，其余CMake/Conan/vcpkg文档路径仍not_integrated；总计52 partial、26 wasm_candidate_only、286 not_integrated构建路径。全部228语言核心义务仍blocked，66项完成/288项未完成，32grammar正式资格仍0。固定插件源可达性CI阻塞保持独立，不删审计或以本机回归冒充CI。
+## 当前协议范围说明
+
+下文的独立单文件0.1仍用于未绑定工作台的请求。已有工作台的0.2反馈、稳定任务与next0.28现已另行接通，见[工作台增量验收](c-family-comments-workbench.md)；专用task verify/尝试日志、完整项目覆盖和可信关闭仍未完成。不要将下文历史单文件缺口当作已初始化工作台的当前行为，也不能将新接线当作详细文档生产资格。

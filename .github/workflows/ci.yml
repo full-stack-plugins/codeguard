@@ -86,7 +86,7 @@ jobs:
           cargo test --locked -p codeguard-cli --features wasm-precheck --test grammar_evaluation --test grammar_native_differential --test javascript_native_differential --test ruby_native_differential --test go_native_differential --test rust_formatter_differential --test go_package_structure
           # C/C++明确标准的原生边界与受控错版本回放必须在WASM构建下验收。
           # Ubuntu宿主Clang不冒充固定AppleClang21；实际条件目标另需显式已有工具。
-          cargo test --locked -p codeguard-cli --features wasm-precheck --test clang_lint_cli --test c_family_comments_cli --test c_family_native_replay
+          cargo test --locked -p codeguard-cli --features wasm-precheck --test clang_lint_cli --test c_family_comments_cli --test c_family_comments_workbench --test c_family_native_replay
           # 固定 Rustfmt 解析器的协议反例；不把 CI 预装版本当作指定原生版本。
           cargo test --locked -p codeguard-cli --features wasm-precheck --lib rustfmt_syntax_probe
           cargo test --locked -p codeguard-cli --features wasm-precheck --lib python_syntax_probe
