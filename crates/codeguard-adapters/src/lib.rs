@@ -1,5 +1,7 @@
 //! 旧语言清单的只读迁移观察；清单不表示原生检查器已实现。
 
+mod legacy_language_identity;
+
 use codeguard_core::{CANDIDATE_PLATFORMS, CHECK_CATEGORIES};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashSet};
@@ -142,13 +144,9 @@ pub use go_candidate::{
 };
 pub use go_list_scope::{GoListScope, parse_go_list_scope};
 pub use go_vet::{GoVetFinding, GoVetParseState, GoVetParsed, parse_go_vet_json};
-pub use javadoc_output::{
-    JavadocDiagnostic, JavadocParseState, JavadocParsed, parse_javadoc_output,
-};
+pub use javadoc_output::{JavadocDiagnostic, JavadocParseState, JavadocParsed, parse_javadoc_output};
 pub use javadoc_replay_pom::javadoc_pom_direct_replay_eligible;
-pub use maven_dependency_pom::{
-    dependency_pom_direct_replay_eligible, dependency_pom_project_identity,
-};
+pub use maven_dependency_pom::{dependency_pom_direct_replay_eligible, dependency_pom_project_identity};
 pub use maven_dependency_tree::{
     MavenDependencyNode, MavenDependencyTree, parse_maven_dependency_tree_json,
 };
@@ -181,9 +179,7 @@ pub use ruff::{
     RuffDiagnostic, RuffLocation, RuffParseState, RuffParsed, is_ruff_pydocstyle_rule,
     parse_ruff_json,
 };
-pub use ruff_rulepack::{
-    RuffRuleMapping, RuffRulepack, bundled_ruff_rulepack, parse_ruff_rulepack,
-};
+pub use ruff_rulepack::{RuffRuleMapping, RuffRulepack, bundled_ruff_rulepack, parse_ruff_rulepack};
 pub use ruff_settings::{RuffSettingsObservation, parse_ruff_settings};
 pub use rustdoc_finding::RustdocFinding;
 pub use rustdoc_parsed::RustdocParsed;
@@ -283,7 +279,12 @@ pub fn legacy_registry() -> Result<LegacyRegistry, String> {
 
 /// 解析指定注册表字节并核对固定身份；供损坏发行清单反例使用。
 pub fn parse_legacy_registry(raw: &str) -> Result<LegacyRegistry, String> {
-    let registry: LegacyRegistry = serde_json::from_str(raw).map_err(|error| error.to_string())?;
+    let value = parse_unique_json(raw.as_bytes()).map_err(str::to_owned)?;
+    if value["version"] != 1 {
+        return Err("旧语言清单版本不匹配".into());
+    }
+    let registry: LegacyRegistry =
+        serde_json::from_value(value).map_err(|error| error.to_string())?;
     let ids: HashSet<&str> = registry
         .languages
         .iter()
@@ -299,7 +300,15 @@ pub fn parse_legacy_registry(raw: &str) -> Result<LegacyRegistry, String> {
         .iter()
         .filter(|language| language.status == "planned")
         .count();
-    if ids.len() != 57 || stable != 54 || planned != 3 {
+    if registry.languages.len() != 57
+        || ids.len() != 57
+        || stable != 54
+        || planned != 3
+        || registry
+            .languages
+            .iter()
+            .any(|language| !legacy_language_identity::matches(&language.id, &language.status))
+    {
         return Err(format!(
             "旧语言清单身份不匹配：unique={}, stable={stable}, planned={planned}",
             ids.len()

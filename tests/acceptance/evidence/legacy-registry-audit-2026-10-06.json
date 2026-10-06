@@ -1,0 +1,1263 @@
+{
+  "delivery_decision": "not_evaluated",
+  "field_difference_count": 4,
+  "language_count": 57,
+  "planned_count": 3,
+  "plugin_registry_sha256": "012370f9d83a2daeb3cc87fef292a7509e85b53540ce9adf1eaf171f0910d251",
+  "plugin_source_commit": "dec5f9d1361eefff493e120b4278939a243814a9",
+  "report_type": "legacy_registry_migration_audit",
+  "rows": [
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "ansible",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "arkts",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "planned",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "planned"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "astro",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "probe",
+        "requiresConfig",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "c",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "gate",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "cfml",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "gate",
+        "id",
+        "install_hint",
+        "lint",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "clojure",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "cobol",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "planned",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "planned"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [
+        {
+          "disposition": "preserve_corrected_coverage",
+          "field": "extensions",
+          "fixture_ref": "crates/codeguard-cli/tests/detect_cli.rs#detect_includes_r_and_cpp_explicit_suffixes_without_guessing_shared_headers",
+          "legacy": [
+            ".cpp",
+            ".hpp",
+            ".cc"
+          ],
+          "rust_snapshot": [
+            ".cpp",
+            ".hpp",
+            ".cc",
+            ".C",
+            ".cp",
+            ".CPP",
+            ".c++",
+            ".cxx",
+            ".hxx"
+          ],
+          "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/native-tool-adapters/spec.md#requirement-migration-shall-account-for-every-legacy-language-entry"
+        },
+        {
+          "disposition": "legacy_compatibility_only",
+          "field": "gate",
+          "fixture_ref": "crates/codeguard-cli/tests/legacy_v1_protocol_contract.rs",
+          "legacy": [
+            "bash",
+            "-c",
+            "find . \\( -name '*.cpp' -o -name '*.hpp' -o -name '*.cc' \\) -type f -print0 | xargs -0 -r clang-tidy --quiet"
+          ],
+          "rust_snapshot": [
+            "bash",
+            "-c",
+            "find . \\( -name '*.cpp' -o -name '*.hpp' -o -name '*.cc' -o -name '*.C' -o -name '*.cp' -o -name '*.CPP' -o -name '*.c++' -o -name '*.cxx' -o -name '*.hxx' \\) -type f -print0 | xargs -0 -r clang-tidy --quiet"
+          ],
+          "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/native-tool-adapters/spec.md#requirement-migration-shall-account-for-every-legacy-language-entry"
+        }
+      ],
+      "language": "cpp",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "crystal",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "requiresConfig",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "csharp",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "append_files",
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "markers",
+        "name",
+        "requiresConfig",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "css",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "probe",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "cuda",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "gate",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "dart",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "requiresConfig",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "dockerfile",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "file_names",
+        "format",
+        "gate",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "elixir",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "requiresConfig",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "elm",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "append_files",
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "markers",
+        "name",
+        "requiresConfig",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "erlang",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "requiresConfig",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "fsharp",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "go",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "append_files",
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "requiresConfig",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "graphql",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "markers",
+        "name",
+        "probe",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "groovy",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "gate",
+        "id",
+        "install_hint",
+        "lint",
+        "markers",
+        "name",
+        "requiresConfig",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "haskell",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "html",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "gate",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "probe",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "java",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "append_files",
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "requiresConfig",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "julia",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "kotlin",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "append_files",
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "requiresConfig",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "liquid",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "lua",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "luau",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "gate",
+        "id",
+        "install_hint",
+        "lint",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "markdown",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "probe",
+        "requiresConfig",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "metal",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "planned",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "planned"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "nim",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "nix",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "gate",
+        "id",
+        "install_hint",
+        "lint",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "objc",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "gate",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "ocaml",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "pascal",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "perl",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "gate",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "php",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "gate",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "powershell",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "protobuf",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "append_files",
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "requiresConfig",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "python",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [
+        {
+          "disposition": "preserve_corrected_coverage",
+          "field": "extensions",
+          "fixture_ref": "crates/codeguard-cli/tests/detect_cli.rs#detect_includes_r_and_cpp_explicit_suffixes_without_guessing_shared_headers",
+          "legacy": [
+            ".r"
+          ],
+          "rust_snapshot": [
+            ".r",
+            ".R"
+          ],
+          "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/native-tool-adapters/spec.md#requirement-migration-shall-account-for-every-legacy-language-entry"
+        }
+      ],
+      "language": "r",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "ruby",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "rust",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "append_files",
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "requiresConfig",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "scala",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "requiresConfig",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "shell",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "gate",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "solidity",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "sql",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "gate",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "svelte",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "probe",
+        "requiresConfig",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "swift",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "terraform",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "append_files",
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "toml",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "markers",
+        "name",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [
+        {
+          "disposition": "preserve_corrected_coverage",
+          "field": "extensions",
+          "fixture_ref": "crates/codeguard-cli/tests/detect_cli.rs#detect_includes_typescript_module_sources_without_package_manifest",
+          "legacy": [
+            ".ts",
+            ".tsx",
+            ".js",
+            ".jsx",
+            ".mjs",
+            ".cjs"
+          ],
+          "rust_snapshot": [
+            ".ts",
+            ".mts",
+            ".cts",
+            ".tsx",
+            ".js",
+            ".jsx",
+            ".mjs",
+            ".cjs"
+          ],
+          "spec_ref": "openspec/changes/introduce-rust-codeguard-cli/specs/native-tool-adapters/spec.md#requirement-migration-shall-account-for-every-legacy-language-entry"
+        }
+      ],
+      "language": "typescript",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "probe",
+        "requiresConfig",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "vbnet",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "append_files",
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "markers",
+        "name",
+        "requiresConfig",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "vue",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "probe",
+        "requiresConfig",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "yaml",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "linter_config_files",
+        "markers",
+        "name",
+        "requiresConfig",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    },
+    {
+      "capability_disposition": "not_qualified_by_legacy_registration",
+      "differences": [],
+      "language": "zig",
+      "legacy_commands_disposition": "legacy_compatibility_only",
+      "legacy_status": "stable",
+      "preserved_fields": [
+        "extensions",
+        "format",
+        "id",
+        "install_hint",
+        "lint",
+        "markers",
+        "name",
+        "probe",
+        "since",
+        "status"
+      ],
+      "rust_status": "stable"
+    }
+  ],
+  "rust_registry_sha256": "c1c649d7ac560a8726397cfef424cdce4e6cdf45010c84a7f48dbefecd0b7ceb",
+  "schema_version": "0.1.0",
+  "stable_count": 54
+}

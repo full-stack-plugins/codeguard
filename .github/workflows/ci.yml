@@ -43,6 +43,12 @@ jobs:
       - name: Build workspace
         run: cargo build --workspace --all-targets
 
+      - name: Verify canonical legacy identities and archived migration audit
+        run: |
+          cargo test --locked -p codeguard-adapters --test legacy_registry_identity
+          cargo test --locked -p codeguard-cli --example audit_legacy_registry
+          cargo run --locked -p codeguard-cli --example audit_legacy_registry -- --check tests/acceptance/evidence/legacy-registry-audit-2026-10-06.json
+
       - name: Preserve the binary without WASM for package rejection
         run: cp target/debug/codeguard "$RUNNER_TEMP/codeguard-no-wasm"
 
