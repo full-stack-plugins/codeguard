@@ -840,3 +840,241 @@ fn human_file_workspace_feedback_includes_real_task_and_recheck() {
     assert!(text.contains("explicit_file_probe"));
     assert!(text.contains("verify"));
 }
+
+#[test]
+fn detailed_workbench_rejects_native_protocol_downgrade_on_first_import() {
+    let f = configured_project();
+    let tool = f.home.join("bin/javadoc");
+    fs::write(&tool, "#!/bin/sh\nmkdir -p docs\nprintf '<html></html>' > docs/index.html\nprintf '%s:1: warning: empty comment\\npublic class Bad {}\\n       ^\\n1 warning\\n' \"$PWD/src/Bad.java\" >&2\n").unwrap();
+    let out = f.run(f.root.to_str().unwrap(), &[]);
+    let feedback: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(feedback["workbench"]["new_findings"], 1, "{feedback}");
+    let path = fs::read_dir(f.root.join(".codeguard/reports"))
+        .unwrap()
+        .next()
+        .unwrap()
+        .unwrap()
+        .path();
+    let report: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+    for (name, outer, inner) in [
+        ("outer", "0.2.0", "0.2.0"),
+        ("inner", "0.3.0", "0.1.0"),
+        ("both", "0.2.0", "0.1.0"),
+    ] {
+        let mut forged = report.clone();
+        let run = format!("javadoc-downgrade-{name}");
+        forged["run_id"] = serde_json::json!(run);
+        forged["schema_version"] = serde_json::json!(outer);
+        forged["sources"][0]["native"]["schema_version"] = serde_json::json!(inner);
+        fs::write(
+            f.root.join(format!(".codeguard/reports/{run}.json")),
+            serde_json::to_vec(&forged).unwrap(),
+        )
+        .unwrap();
+    }
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["work", "sync", f.root.to_str().unwrap(), "--format=json"])
+        .output()
+        .unwrap();
+    let sync: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(sync["failed_reports"], 3, "{sync}");
+    assert_eq!(
+        fs::read_dir(f.root.join(".codeguard/tasks"))
+            .unwrap()
+            .count(),
+        1
+    );
+}
+
+#[test]
+#[ignore = "需要显式已有JDK21，验证详细描述的公开检查、稳定任务及原工具复检"]
+fn actual_jdk_detailed_descriptions_file_and_configured_project() {
+    use serde_json::json;
+    use sha2::{Digest, Sha256};
+    let home = PathBuf::from(std::env::var_os("CODEGUARD_TEST_JAVA_HOME").unwrap());
+    let binary = env!("CARGO_BIN_EXE_codeguard");
+    let binary_sha = format!("{:x}", Sha256::digest(fs::read(binary).unwrap()));
+    let documented = "/** 提供数值计算示例。 */\npublic class Sample {\n /** 创建计算器。 */ public Sample() {}\n /** 输出结果的初始值。 */ public int value;\n /** 返回输入数值。\n  * @param input 待返回的输入数值\n  * @return {@code input} 的原值\n  * @throws IllegalArgumentException 输入为负数时抛出\n  */\n public int run(int input) throws IllegalArgumentException { if (input < 0) { throw new IllegalArgumentException(); } return input; }\n /** {@inheritDoc} */\n @Override public String toString() { return \"sample\"; }\n}\n";
+    let cases = [
+        (
+            "empty_declarations",
+            "/** */\npublic class Sample {\n /** */ public Sample() {}\n /** */ public int value;\n /** */ public void run() {}\n}\n",
+            vec!["JavadocEmptyComment"; 4],
+        ),
+        (
+            "bare_tags",
+            "/** Sample API. */\npublic class Sample { /** Creates sample. */ public Sample() {}\n/** Computes value.\n * @param value\n * @return\n * @throws IllegalArgumentException\n */\npublic int run(int value) throws IllegalArgumentException { return value; } }\n",
+            vec![
+                "JavadocEmptyParamDescription",
+                "JavadocEmptyReturnDescription",
+                "JavadocEmptyThrowsDescription",
+            ],
+        ),
+        (
+            "tags_without_purpose",
+            "/** Sample API. */\npublic class Sample { /** Creates sample. */ public Sample() {}\n/** @param value the input\n * @return the value\n */\npublic int run(int value) { return value; } }\n",
+            vec!["JavadocMissingMainDescription"],
+        ),
+        ("documented_inheritance", documented, vec![]),
+    ];
+    let mut evidence = Vec::new();
+    for (name, source, expected) in cases {
+        for mode in ["explicit_file_probe", "configured_project_probe"] {
+            let mut f = Fixture::new();
+            f.home = home.clone();
+            let relative = if mode == "explicit_file_probe" {
+                "Sample.java"
+            } else {
+                "src/main/java/Sample.java"
+            };
+            let file = f.root.join(relative);
+            fs::create_dir_all(file.parent().unwrap()).unwrap();
+            fs::write(&file, source).unwrap();
+            if mode == "configured_project_probe" {
+                fs::write(f.root.join("pom.xml"), "<project><build><plugins><plugin><artifactId>maven-javadoc-plugin</artifactId><configuration><doclint>all</doclint></configuration></plugin></plugins></build></project>").unwrap();
+            }
+            initialize(&f);
+            let run = |args: &[&str]| {
+                let out = Command::new(binary)
+                    .args(args)
+                    .arg("--format=json")
+                    .output()
+                    .unwrap();
+                assert!(
+                    out.status.code() == Some(3)
+                        || (args[0] == "next" && out.status.code() == Some(0)),
+                    "{}",
+                    String::from_utf8_lossy(&out.stderr)
+                );
+                serde_json::from_slice::<Value>(&out.stdout).unwrap()
+            };
+            let root = f.root.to_str().unwrap();
+            let java = home.to_str().unwrap();
+            let target = if mode == "explicit_file_probe" {
+                file.to_str().unwrap()
+            } else {
+                root
+            };
+            let feedback = run(&[
+                "comments",
+                "java",
+                target,
+                "--workspace",
+                root,
+                "--java-home",
+                java,
+            ]);
+            assert_eq!(feedback["schema_version"], "0.8.0");
+            assert_eq!(
+                feedback["workbench"]["status"], "synced_partial",
+                "{feedback}"
+            );
+            assert_eq!(
+                feedback["workbench"]["new_findings"],
+                expected.len(),
+                "{feedback}"
+            );
+            let observation = if mode == "explicit_file_probe" {
+                &feedback["native_observation"]
+            } else {
+                &feedback["native_observation"]["files"][0]["observation"]
+            };
+            let mut rules: Vec<_> = observation["findings"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|r| r["rule_id"].as_str().unwrap())
+                .collect();
+            let mut wanted = expected.clone();
+            rules.sort();
+            wanted.sort();
+            assert_eq!(rules, wanted, "{feedback}");
+            assert_eq!(
+                observation["local_status"],
+                if expected.is_empty() {
+                    "clean_scope_unproven"
+                } else {
+                    "findings_observed_untrusted"
+                }
+            );
+            let first_path = fs::read_dir(f.root.join(".codeguard/reports"))
+                .unwrap()
+                .next()
+                .unwrap()
+                .unwrap()
+                .path();
+            let first: Value = serde_json::from_slice(&fs::read(&first_path).unwrap()).unwrap();
+            let mut rechecks = Vec::new();
+            for finding in first["sources"][0]["findings"].as_array().unwrap() {
+                let id = finding["finding_id"].as_str().unwrap();
+                let present = run(&["task", "verify", id, root, "--java-home", java]);
+                assert_eq!(present["schema_version"], "0.31.0");
+                assert_eq!(present["observation"], "still_present", "{present}");
+                assert_eq!(present["event_persisted"], true);
+                rechecks.push(present);
+            }
+            let next = run(&["next", root]);
+            if !expected.is_empty() {
+                assert_eq!(next["repair_brief"]["schema_version"], "0.4.0");
+                assert!(
+                    next["repair_brief"]["step"]
+                        .as_str()
+                        .unwrap()
+                        .contains("详细说明")
+                );
+            }
+            fs::write(&file, documented).unwrap();
+            let mut repaired = Vec::new();
+            for finding in first["sources"][0]["findings"].as_array().unwrap() {
+                let id = finding["finding_id"].as_str().unwrap();
+                let absent = run(&["task", "verify", id, root, "--java-home", java]);
+                assert_eq!(
+                    absent["observation"], "candidate_absent_unverified_policy",
+                    "{absent}"
+                );
+                assert_eq!(absent["event_persisted"], true);
+                let fact: Value = serde_json::from_slice(
+                    &fs::read(
+                        f.root
+                            .join(format!(".codeguard/findings/{id}/finding.json")),
+                    )
+                    .unwrap(),
+                )
+                .unwrap();
+                assert_eq!(fact["state"], "open");
+                repaired.push(absent);
+            }
+            let direct = if mode == "explicit_file_probe" {
+                fs::write(&file, source).unwrap();
+                let scan = run(&[
+                    "lint",
+                    "java",
+                    file.to_str().unwrap(),
+                    "--checker",
+                    "javadoc",
+                    "--java-home",
+                    java,
+                ]);
+                assert_eq!(scan["findings"].as_array().unwrap().len(), expected.len());
+                scan
+            } else {
+                Value::Null
+            };
+            let aggregate = if mode == "configured_project_probe" {
+                let scan = run(&["check", "java", root, "--java-home", java]);
+                assert_eq!(scan["schema_version"], "0.68.0", "{scan}");
+                scan
+            } else {
+                Value::Null
+            };
+            evidence.push(json!({"direct":direct,"aggregate":aggregate,"case":name,"mode":mode,"source":source,"source_sha256":format!("{:x}",Sha256::digest(source.as_bytes())),"feedback":feedback,"workbench":first,"next":next,"present":rechecks,"repaired":repaired}));
+        }
+    }
+    assert_eq!(
+        format!("{:x}", Sha256::digest(fs::read(binary).unwrap())),
+        binary_sha
+    );
+    if let Some(path) = std::env::var_os("CODEGUARD_TEST_JDK_DETAILED_EVIDENCE") {
+        fs::write(path,serde_json::to_vec_pretty(&json!({"evidence_kind":"actual_existing_jdk_public_detailed_descriptions","codeguard_binary_sha256":binary_sha,"reports":evidence})).unwrap()).unwrap();
+    }
+}

@@ -63,6 +63,9 @@ pub(crate) fn prepare(root: &Path, feedback: &Value) -> Result<Value, &'static s
         let mut findings = Vec::new();
         let observation = &row["observation"];
         if !observation.is_null() {
+            if observation["schema_version"] != "0.2.0" {
+                return Err("javadoc_native_protocol_invalid");
+            }
             if !observation["source_sha256"].is_null()
                 && observation["source_sha256"] != format!("{:x}", Sha256::digest(&bytes))
             {
@@ -91,7 +94,7 @@ pub(crate) fn prepare(root: &Path, feedback: &Value) -> Result<Value, &'static s
         .map_err(|_| "clock_unavailable")?
         .as_nanos();
     Ok(
-        json!({"schema_version":"0.2.0","observation_scope":if explicit {"explicit_file_probe"} else {"configured_project_probe"},"report_type":"javadoc_workbench_observation","workspace_binding":"bound","workspace_id":id,"run_id":format!("javadoc-{}-{nanos}",std::process::id()),"checker_id":"java.jdk.javadoc","authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated","sources":sources}),
+        json!({"schema_version":"0.3.0","observation_scope":if explicit {"explicit_file_probe"} else {"configured_project_probe"},"report_type":"javadoc_workbench_observation","workspace_binding":"bound","workspace_id":id,"run_id":format!("javadoc-{}-{nanos}",std::process::id()),"checker_id":"java.jdk.javadoc","authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated","sources":sources}),
     )
 }
 
@@ -110,6 +113,11 @@ pub(crate) fn project_finding(
             | "JavadocMissingParam"
             | "JavadocMissingReturn"
             | "JavadocMissingThrows"
+            | "JavadocEmptyComment"
+            | "JavadocMissingMainDescription"
+            | "JavadocEmptyParamDescription"
+            | "JavadocEmptyReturnDescription"
+            | "JavadocEmptyThrowsDescription"
     ) {
         return None;
     }

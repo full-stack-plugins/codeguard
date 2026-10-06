@@ -29,12 +29,15 @@ pub(super) fn parse(
         "delivery_decision",
         "sources",
     ];
-    if report["schema_version"] == "0.2.0" {
+    if matches!(report["schema_version"].as_str(), Some("0.2.0" | "0.3.0")) {
         keys.push("observation_scope");
     }
     if !exact_keys(report, &keys)
-        || !matches!(report["schema_version"].as_str(), Some("0.1.0" | "0.2.0"))
-        || (report["schema_version"] == "0.2.0"
+        || !matches!(
+            report["schema_version"].as_str(),
+            Some("0.1.0" | "0.2.0" | "0.3.0")
+        )
+        || (matches!(report["schema_version"].as_str(), Some("0.2.0" | "0.3.0"))
             && !matches!(
                 report["observation_scope"].as_str(),
                 Some("explicit_file_probe" | "configured_project_probe")
@@ -162,7 +165,12 @@ pub(super) fn parse(
             {
                 return Err("javadoc_native_shape_invalid");
             }
-            if native["schema_version"] != "0.1.0"
+            if native["schema_version"]
+                != if report["schema_version"] == "0.3.0" {
+                    "0.2.0"
+                } else {
+                    "0.1.0"
+                }
                 || native["report_type"] != "java_javadoc_local_feedback"
                 || native["operation"] != "lint"
                 || native["language"] != "java"
@@ -204,6 +212,20 @@ pub(super) fn parse(
                 }
                 if candidate["path"] != native["path"] {
                     return Err("javadoc_native_path_invalid");
+                }
+                if report["schema_version"] != "0.3.0"
+                    && matches!(
+                        candidate["rule_id"].as_str(),
+                        Some(
+                            "JavadocEmptyComment"
+                                | "JavadocMissingMainDescription"
+                                | "JavadocEmptyParamDescription"
+                                | "JavadocEmptyReturnDescription"
+                                | "JavadocEmptyThrowsDescription"
+                        )
+                    )
+                {
+                    return Err("javadoc_rule_protocol_invalid");
                 }
                 let expected = project_finding(relative, &bytes, candidate, &mut occurrences)
                     .ok_or("javadoc_finding_invalid")?;

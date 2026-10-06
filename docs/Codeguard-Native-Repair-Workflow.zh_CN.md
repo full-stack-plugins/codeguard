@@ -287,3 +287,6 @@ Rust 读取并复核有界源码字节，通过冻结 stdin、固定 `/` cwd、�
 显式 `grammar probe` 遇到语法树 has_error、公开恢复节点不可定位时，使用0.5报告 `parser_error_location_unavailable=true`，要求用原字节做原生确认，再判断源码修复还是grammar调查；零位置不再只给常规lint建议。未确认前保留未完成，不生成虚构定位，不称初检通过。预算耗尽保持已有聚合但不冒充隐藏错误；普通和结构路径保留历史协议。
 
 同一Kotlin/Swift资产在已安装web-tree-sitter0.25.10也出现相同可见性缺口；切换加载器本身不能解决。合法Kotlin对象声明也可能触发隐藏分号，必须避免按has_error直接改源码。实际输出、兼容性及验收边界见[隐藏错误指引](../tests/acceptance/hidden-parser-error-guidance.md)。
+
+
+独立JDK21路径现按原生消息识别空注释、缺用途及裸参数/返回/异常描述，并保留五种原生规则到稳定修复任务。`lint java FILE --checker javadoc`、`comments java FILE --workspace .`、已识别配置的项目comments及原任务task verify共用源字节绑定解析器；旧解析器和Maven协议不扩大。新增JDK原生0.2、项目0.4、工作台/复检0.3、文件反馈0.7/工作台反馈0.8、修复指引0.4、任务预览0.31、聚合0.68和异常0.19；缺配置/工具/未知格式仍未完成。真实JDK21两种模式各运行4/3/1/0诊断样例，16张原任务逐项确认仍存在及修复后未受信消失，事实仍open；详细中文与合法继承说明不产生诊断。这不是全部Java详细行为契约或生产资格，Maven新增描述规则、Checkstyle描述模块、所有语言四核心和可信关闭仍待完成。见[独立JDK详细描述验收](../tests/acceptance/jdk-javadoc-detailed-descriptions.md)。

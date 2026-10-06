@@ -968,15 +968,16 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         });
     }
     if checker_id == "java.jdk.javadoc" {
-        brief["schema_version"] = json!("0.3.0");
+        brief["schema_version"] = json!("0.4.0");
         brief["observation_scope"] =
             json!(crate::javadoc_task_recheck::original_scope(root, &brief)?);
         brief["task_verify_status"] = json!("local_observation_only");
-        brief["rule_basis"] = json!("JDK21 Javadoc 原生缺注释和标签诊断；项目政策未核验");
+        brief["rule_basis"] =
+            json!("JDK21 Javadoc 原生缺注释、用途及标签详细描述诊断；项目政策未核验");
         brief["step"] = json!(if kind == "blocker" {
             "核对原配置、JDK21和检查范围，恢复后按本任务运行task verify；不修改无关源码，不把缺配置当源码违规或必需交付义务"
         } else {
-            "核对原生位置与实际API契约，补全类、公共构造函数、参数、返回值或异常文档；源码变化时先对本任务运行task verify确认；不得关闭规则或用勾选代替复检"
+            "核对原生位置与实际API契约，补全类、公共构造函数、参数、返回值或异常详细文档，空注释、缺用途或裸标签不能代替详细说明；源码变化时先对本任务运行task verify确认；不得关闭规则或用勾选代替复检"
         });
     }
     if checker_id == "shell.shellcheck" {
@@ -1719,6 +1720,13 @@ fn current_correction_refs(
 
 fn finding_repair_step(rule: &str) -> &'static str {
     match rule {
+        "JavadocEmptyComment"
+        | "JavadocMissingMainDescription"
+        | "JavadocEmptyParamDescription"
+        | "JavadocEmptyReturnDescription"
+        | "JavadocEmptyThrowsDescription" => {
+            "核对原生诊断与实际API契约，补齐用途、参数、返回及异常详细说明；空注释或裸标签不能代替说明，修复后按原任务原工具复检"
+        }
         "F401" => "核对导入是否仍被使用；确认后仅修改目标文件导入",
         "E501" => "核对已配置行长，保持语义并重排行内容",
         _ => "查阅原生规则与私有诊断，先确认根因再修复",

@@ -130,7 +130,7 @@ pub fn run(args: &[String]) -> ExitCode {
     let deadline = Instant::now() + Duration::from_millis(timeout);
     let cancelled = AtomicBool::new(false);
     let mut maven_snapshot = None;
-    let mut report = json!({"schema_version":"0.1.0", "report_type":"java_comments_feedback", "operation":"comments", "language":"java", "category":"comments", "target_kind":"unavailable", "command_status":"incomplete", "exit_code":3, "reason":"target_unavailable", "execution_budget":budget_record(timeout, source), "native_observation":null, "discovery":null, "coverage_proven":false, "authority":"local_unverified", "delivery_decision":"not_evaluated", "workbench_status":"not_integrated", "next_actions":["依据原生诊断修复注释或配置；使用相同原生上下文重新执行 comments java", "Javadoc 持久任务适配尚未接通，不能据此关闭任务"]});
+    let mut report = json!({"schema_version":"0.7.0", "report_type":"java_comments_feedback", "operation":"comments", "language":"java", "category":"comments", "target_kind":"unavailable", "command_status":"incomplete", "exit_code":3, "reason":"target_unavailable", "execution_budget":budget_record(timeout, source), "native_observation":null, "discovery":null, "coverage_proven":false, "authority":"local_unverified", "delivery_decision":"not_evaluated", "workbench_status":"not_integrated", "next_actions":["依据原生诊断修复注释或配置；使用相同原生上下文重新执行 comments java", "Javadoc 持久任务适配尚未接通，不能据此关闭任务"]});
     if let Ok(path) = target.canonicalize() {
         if path.is_file() {
             if maven_tool.is_some() || maven_repo.is_some() || options.contains_key("--repo-sha256")
@@ -200,6 +200,10 @@ pub fn run(args: &[String]) -> ExitCode {
             }
         }
     }
+    if report["native_observation"]["probe_mode"] == "maven_multifile" {
+        // Maven保持独立既有协议，不借用JDK详细描述资格。
+        report["schema_version"] = json!("0.1.0");
+    }
     let root = workspace.or_else(|| {
         target
             .canonicalize()
@@ -208,7 +212,7 @@ pub fn run(args: &[String]) -> ExitCode {
     });
     if let Some(root) = root {
         let maven = report["native_observation"]["probe_mode"] == "maven_multifile";
-        report["schema_version"] = json!(if maven { "0.6.0" } else { "0.4.0" });
+        report["schema_version"] = json!(if maven { "0.6.0" } else { "0.8.0" });
         report["workbench"] = if maven {
             crate::maven_javadoc_workbench::connect(&root, &report, maven_snapshot.as_ref())
         } else {

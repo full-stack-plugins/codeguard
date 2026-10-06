@@ -146,7 +146,10 @@ pub use go_candidate::{
 };
 pub use go_list_scope::{GoListScope, parse_go_list_scope};
 pub use go_vet::{GoVetFinding, GoVetParseState, GoVetParsed, parse_go_vet_json};
-pub use javadoc_output::{JavadocDiagnostic, JavadocParseState, JavadocParsed, parse_javadoc_output};
+pub use javadoc_output::{
+    JavadocDiagnostic, JavadocParseState, JavadocParsed, parse_detailed_javadoc_output,
+    parse_javadoc_output,
+};
 pub use javadoc_replay_pom::javadoc_pom_direct_replay_eligible;
 pub use maven_dependency_pom::{dependency_pom_direct_replay_eligible, dependency_pom_project_identity};
 pub use maven_dependency_tree::{
@@ -439,7 +442,9 @@ mod erlang_form_rule;
 pub use erlang_form_rule::erlang_form_rule_sha256;
 
 mod javascript_module_return_rule;
-pub use javascript_module_return_rule::{javascript_module_return_node_kinds, javascript_module_return_rule_sha256};
+pub use javascript_module_return_rule::{
+    javascript_module_return_node_kinds, javascript_module_return_rule_sha256,
+};
 
 mod gradle_checker_task;
 mod gradle_project_checker_model;

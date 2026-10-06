@@ -32,7 +32,7 @@ pub(crate) fn run(
             .map_err(|_| "clock_unavailable")?
             .as_nanos()
     );
-    let mut report = json!({"schema_version":"0.2.0","observation_scope":mode,"report_type":"javadoc_task_recheck","operation":"task_verify","run_id":run,"workspace_binding":"bound","workspace_id":original["workspace_id"],"checker_id":"java.jdk.javadoc","authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated","task_id":brief["task_id"],"task_path":relative,"task_rule":brief["native_rule_id"],"origin":brief["evidence_ref"],"scan":null,"native_observation":null,"input_bindings":[],"task_input_stable":false,"configuration_matches":false,"tool_identity_matches":false,"reason":"javadoc_recheck_incomplete"});
+    let mut report = json!({"schema_version":"0.3.0","observation_scope":mode,"report_type":"javadoc_task_recheck","operation":"task_verify","run_id":run,"workspace_binding":"bound","workspace_id":original["workspace_id"],"checker_id":"java.jdk.javadoc","authority":"local_unverified","coverage_proven":false,"delivery_decision":"not_evaluated","task_id":brief["task_id"],"task_path":relative,"task_rule":brief["native_rule_id"],"origin":brief["evidence_ref"],"scan":null,"native_observation":null,"input_bindings":[],"task_input_stable":false,"configuration_matches":false,"tool_identity_matches":false,"reason":"javadoc_recheck_incomplete"});
     let native = if mode == "explicit_file_probe" {
         let path = root
             .join(relative)
@@ -237,13 +237,16 @@ pub(crate) fn valid_shape(report: &Value) -> bool {
         "tool_identity_matches",
         "reason",
     ];
-    if report["schema_version"] == "0.2.0" {
+    if matches!(report["schema_version"].as_str(), Some("0.2.0" | "0.3.0")) {
         keys.push("observation_scope");
     }
     report
         .as_object()
         .is_some_and(|o| o.len() == keys.len() && keys.iter().all(|k| o.contains_key(*k)))
-        && matches!(report["schema_version"].as_str(), Some("0.1.0" | "0.2.0"))
+        && matches!(
+            report["schema_version"].as_str(),
+            Some("0.1.0" | "0.2.0" | "0.3.0")
+        )
         && (report["schema_version"] == "0.1.0" || scope_from_report(report).is_ok())
         && report["report_type"] == "javadoc_task_recheck"
         && report["operation"] == "task_verify"
@@ -256,6 +259,35 @@ pub(crate) fn valid_shape(report: &Value) -> bool {
         && report["configuration_matches"].is_boolean()
         && report["tool_identity_matches"].is_boolean()
         && report["input_bindings"].is_array()
+        && (report["scan"].is_null()
+            || report["scan"]["schema_version"]
+                == if report["schema_version"] == "0.3.0" {
+                    "0.3.0"
+                } else if report["schema_version"] == "0.2.0" {
+                    "0.2.0"
+                } else {
+                    "0.1.0"
+                })
+        && (report["native_observation"].is_null()
+            || match report["native_observation"]["report_type"].as_str() {
+                Some("java_javadoc_local_feedback") => {
+                    report["native_observation"]["schema_version"]
+                        == if report["schema_version"] == "0.3.0" {
+                            "0.2.0"
+                        } else {
+                            "0.1.0"
+                        }
+                }
+                Some("java_javadoc_project_probe") => {
+                    report["native_observation"]["schema_version"]
+                        == if report["schema_version"] == "0.3.0" {
+                            "0.4.0"
+                        } else {
+                            "0.3.0"
+                        }
+                }
+                _ => false,
+            })
 }
 
 fn original(root: &Path, brief: &Value) -> Result<Value, &'static str> {
