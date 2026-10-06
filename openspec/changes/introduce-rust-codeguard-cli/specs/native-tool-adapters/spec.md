@@ -791,3 +791,19 @@ Codeguard SHALL target every one of the 57 canonical registry entries for produc
 #### Scenario: Maven and Gradle manifests coexist in the same physical build root
 - **WHEN** 同一构建根同时存在pom.xml和build.gradle/build.gradle.kts，或两种Gradle脚本并存
 - **THEN** 静态发现 SHALL 保留每个脚本的检查器身份与configuration_ref，不因先发现POM而丢弃Gradle；Java依赖/CVE/安全类别 SHALL 保留构建模型混合或未解析状态，Maven局部执行结果不得覆盖Gradle义务；损坏POM也不能掩盖Gradle路径
+
+### Requirement: Gradle checker model observation SHALL preserve native project and task identities
+
+Rust SHALL interpret a versioned native Gradle configuration model per root/subproject, preserving the applied checker plugin IDs, actual task implementation types, enabled flags and bounded project/build directories. Matching task names alone SHALL NOT establish OWASP capability. Duplicate JSON fields, repeated identities, missing parent projects, unsupported protocols, oversized models and out-of-root directories SHALL remain incomplete. Included composite builds SHALL NOT be silently omitted. A selected-file model probe SHALL preserve its partial input scope and SHALL NOT claim complete project coverage, vulnerability results, detailed-documentation compliance or production readiness.
+
+#### Scenario: A normal task imitates the official vulnerability task name
+- **WHEN** a task nameddependencyCheckAnalyze has an ordinary Gradle task implementation
+- **THEN** the model SHALL preserve its identity but SHALL NOT select it as an official OWASP scan
+
+#### Scenario: A model contains independent nested projects
+- **WHEN** a native model contains root and several nested subprojects
+- **THEN** each project SHALL retain its own directory, plugins and tasks; parent declarations SHALL NOT be promoted to subproject capability
+
+#### Scenario: Native configuration fails or the input changes
+- **WHEN** the selected-file native model probe fails, times out, is cancelled, exceeds its budget or observes changed source/tool/script identity
+- **THEN** no model SHALL be accepted as current; the result SHALL remain incomplete with a concrete recovery reason and no source violation
