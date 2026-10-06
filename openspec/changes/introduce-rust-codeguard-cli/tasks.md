@@ -1768,3 +1768,7 @@ SP22完整默认终态：当前源码workspace all-targets 1500 passed / 0 faile
 ## 2026-10-06 SP29 未完成解析的原生确认分流（反馈纠错）
 
 项目终端不再将恢复截断一律描述为grammar已报错。候选下一步、Claude摘要、任务正文与next/task show均要求原始源码原生确认；合法时调查grammar版本/兼容性或扫描预算，诊断成立时按真实位置修复。三个入口实际RED复现后修复。任务身份、复检与关闭权限不变；不修饰32语言资格，不勾选完整14.x父任务。见[验收](../../../tests/acceptance/incomplete-syntax-guidance.md)。
+
+## 2026-10-06 SP30 同字节原生零诊断反证指引（局部验收）
+
+next/task show在已核验当前原生零诊断、原grammar引用及同一源码摘要时，提示grammar反证候选而不是源码已修复；不同源码/过期/原生首次证据不套用。实际RED后受控Kotlin4项通过，已安装真实kotlinc2.4.10同字节1项通过、源码不变且任务open。工具仅launcher身份、不自动白名单或关闭，不改变32语言资格与完整14.x父任务。见[验收](../../../tests/acceptance/native-same-source-counterevidence.md)。

@@ -792,3 +792,7 @@ Project Rust parser selection SHALL distinguish package edition, explicit worksp
 #### Scenario: 项目检查与智能体入口的未完成解析指引
 - **WHEN** 项目检查、编辑Hook或稳定任务反馈包含 syntax_recovery_incomplete，包括不可定位错误或扫描预算耗尽
 - **THEN** 人类输出不得仅凭截断声称grammar已确认错误；反馈、任务正文和next SHALL 要求对原始源码使用适用原生工具确认，原生确认合法时调查grammar版本/兼容性或扫描预算，原生诊断成立时才按真实位置修复；保留无位置、未完成和既有任务身份
+
+#### Scenario: 原始WASM候选与原生零诊断保持同一源码
+- **WHEN** 有效且当前的局部原生复检没有语法诊断，绑定的源码摘要仍等于首次WASM候选摘要，且原始grammar引用可核对
+- **THEN** next/task show SHALL 将此作为grammar反证候选处理，指导兼容性/预算调查而不是声称源码已修复；输入变化或原生首次来源不得套用同字节WASM反证描述，任务仍保留既有复检和关闭权威
