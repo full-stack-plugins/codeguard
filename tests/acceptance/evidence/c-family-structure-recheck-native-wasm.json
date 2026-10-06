@@ -14,13 +14,13 @@
       "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
     },
     "original_ref": {
-      "run_id": "clangdocstruct-96331-0-1791328346954265000",
-      "sha256": "d8a1664538197a13ca387081c67cac9fa26dd61e99e9d67b7db3069761fc4f18"
+      "run_id": "clangdocstruct-41468-0-1791328789085248000",
+      "sha256": "21b57d7879facf43f7944eec1cfafb5b828ccee9df229de41f09ee052f13a369"
     },
     "path": "sample.c",
     "profile": "clang-documentation-structure-v1",
     "report_type": "clang_documentation_structure_task_recheck",
-    "run_id": "clangdocstruct-96291-1-1791328347098921000",
+    "run_id": "clangdocstruct-41465-1-1791328789237142000",
     "schema_version": "0.1.0",
     "selected_tool": "/usr/bin/clang",
     "source_sha256": "3ef5c2572626706a3dcca7c5c6be4e185cad629c15ef7d0a80fb035c1c86572e",
@@ -64,7 +64,7 @@
     "task_kind": "finding",
     "task_rule": "codeguard.documentation.function_structure_required",
     "workspace_binding": "bound",
-    "workspace_id": "ws-977abcba2fc1eaf0dedb0f3efac682d1"
+    "workspace_id": "ws-3b903afa9b222bf863e9a32f6777e4b3"
   },
   "evidence_kind": "development_native_structural_recheck",
   "expired": {
@@ -82,13 +82,13 @@
       "version": null
     },
     "original_ref": {
-      "run_id": "clangdocstruct-96331-0-1791328346954265000",
-      "sha256": "d8a1664538197a13ca387081c67cac9fa26dd61e99e9d67b7db3069761fc4f18"
+      "run_id": "clangdocstruct-41468-0-1791328789085248000",
+      "sha256": "21b57d7879facf43f7944eec1cfafb5b828ccee9df229de41f09ee052f13a369"
     },
     "path": "sample.c",
     "profile": "clang-documentation-structure-v1",
     "report_type": "clang_documentation_structure_task_recheck",
-    "run_id": "clangdocstruct-96291-2-1791328347100540000",
+    "run_id": "clangdocstruct-41465-2-1791328789238780000",
     "schema_version": "0.1.0",
     "selected_tool": "/usr/bin/clang",
     "source_sha256": "3ef5c2572626706a3dcca7c5c6be4e185cad629c15ef7d0a80fb035c1c86572e",
@@ -103,7 +103,7 @@
     "task_kind": "finding",
     "task_rule": "codeguard.documentation.function_structure_required",
     "workspace_binding": "bound",
-    "workspace_id": "ws-977abcba2fc1eaf0dedb0f3efac682d1"
+    "workspace_id": "ws-3b903afa9b222bf863e9a32f6777e4b3"
   },
   "first": {
     "authority": "local_unverified",
@@ -120,13 +120,13 @@
       "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
     },
     "original_ref": {
-      "run_id": "clangdocstruct-96331-0-1791328346954265000",
-      "sha256": "d8a1664538197a13ca387081c67cac9fa26dd61e99e9d67b7db3069761fc4f18"
+      "run_id": "clangdocstruct-41468-0-1791328789085248000",
+      "sha256": "21b57d7879facf43f7944eec1cfafb5b828ccee9df229de41f09ee052f13a369"
     },
     "path": "sample.c",
     "profile": "clang-documentation-structure-v1",
     "report_type": "clang_documentation_structure_task_recheck",
-    "run_id": "clangdocstruct-96291-0-1791328347056407000",
+    "run_id": "clangdocstruct-41465-0-1791328789199507000",
     "schema_version": "0.1.0",
     "selected_tool": "/usr/bin/clang",
     "source_sha256": "1a0efe604440d96561e3075b2ec8bb90f8847d9709d24add37f9ea016221918c",
@@ -166,9 +166,9 @@
     "task_kind": "finding",
     "task_rule": "codeguard.documentation.function_structure_required",
     "workspace_binding": "bound",
-    "workspace_id": "ws-977abcba2fc1eaf0dedb0f3efac682d1"
+    "workspace_id": "ws-3b903afa9b222bf863e9a32f6777e4b3"
   },
-  "helper_source_sha256": "245b27c1ff4494359bd212106a5fd3fd102f8ac1c33dee9861f257a5e96f2bee",
+  "helper_source_sha256": "7541a9ba01011918b5b971126e39fb2d84d80ade422a04f94fc4c8063a0a859b",
   "negative_cases": [
     "source_changed_after_observation",
     "forged_structural_rule",
@@ -204,13 +204,13 @@
       "version": "Apple clang version 21.0.0 (clang-2100.3.34.2)"
     },
     "original_ref": {
-      "run_id": "clangdocstruct-96331-0-1791328346954265000",
-      "sha256": "d8a1664538197a13ca387081c67cac9fa26dd61e99e9d67b7db3069761fc4f18"
+      "run_id": "clangdocstruct-41468-0-1791328789085248000",
+      "sha256": "21b57d7879facf43f7944eec1cfafb5b828ccee9df229de41f09ee052f13a369"
     },
     "path": "sample.c",
     "profile": "clang-documentation-structure-v1",
     "report_type": "clang_documentation_structure_task_recheck",
-    "run_id": "clangdocstruct-96291-3-1791328347139173000",
+    "run_id": "clangdocstruct-41465-3-1791328789269215000",
     "schema_version": "0.1.0",
     "selected_tool": "/usr/bin/clang",
     "source_sha256": "0a2d5e870bc4f05be9a2f12a377b4ddf5fac2d0142839a476d5b61601a5d2a2e",
@@ -225,7 +225,7 @@
     "task_kind": "finding",
     "task_rule": "codeguard.documentation.function_structure_required",
     "workspace_binding": "bound",
-    "workspace_id": "ws-977abcba2fc1eaf0dedb0f3efac682d1"
+    "workspace_id": "ws-3b903afa9b222bf863e9a32f6777e4b3"
   },
-  "test_source_sha256": "b988e265c108df2e6bccc84df61e0a2c946d803e6047af2704f7de51b447f649"
+  "test_source_sha256": "f44832ff81c2160acb7d9f2925ccd782676c762f47b3f46cf811421450080fcc"
 }

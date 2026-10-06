@@ -87,25 +87,166 @@ fn structural_deficits_share_stable_file_tasks_and_original_rescan_does_not_clos
         let verify_present: Value = serde_json::from_slice(&verify.stdout).unwrap();
         assert_eq!(verify_present["observation"], "still_present");
         assert_eq!(verify_present["event_persisted"], true);
-        let attempt = Command::new(env!("CARGO_BIN_EXE_codeguard"))
-            .args(["task", "attempt", "start"])
-            .arg(&id)
-            .arg(&root)
-            .args([
+        let task_call = |words: &[&str], options: &[&str]| {
+            let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+                .arg("task")
+                .args(words)
+                .arg(&id)
+                .arg(&root)
+                .args(options)
+                .arg("--format=json")
+                .output()
+                .unwrap();
+            (
+                output.status.code(),
+                serde_json::from_slice::<Value>(&output.stdout).unwrap(),
+            )
+        };
+        let (claim_exit, lease) = task_call(&["claim"], &["--owner", "struct-agent"]);
+        assert_eq!(claim_exit, Some(0), "{lease}");
+        let token = lease["lease_token"].as_str().unwrap();
+        let show = || task_call(&["show"], &[]).1["task"].clone();
+        let mut attempts = Vec::new();
+        for count in 1..=2 {
+            let (exit, start) = task_call(
+                &["attempt", "start"],
+                &[
+                    "--owner",
+                    "struct-agent",
+                    "--lease-token",
+                    token,
+                    "--action-id",
+                    "repair-source",
+                ],
+            );
+            assert_eq!(exit, Some(0), "{start}");
+            assert_eq!(show()["disposition"], "waiting");
+            let (exit, finish) = task_call(
+                &["attempt", "finish"],
+                &[
+                    "--owner",
+                    "struct-agent",
+                    "--lease-token",
+                    token,
+                    "--attempt-id",
+                    start["attempt_id"].as_str().unwrap(),
+                    "--outcome",
+                    "ready-to-verify",
+                    "--note-code",
+                    "source_edit",
+                ],
+            );
+            assert_eq!(exit, Some(0), "{finish}");
+            assert_eq!(show()["disposition"], "verification_required");
+            let (exit, blocked_retry) = task_call(
+                &["attempt", "start"],
+                &[
+                    "--owner",
+                    "struct-agent",
+                    "--lease-token",
+                    token,
+                    "--action-id",
+                    "repair-source",
+                ],
+            );
+            assert_eq!(exit, Some(3));
+            assert_eq!(
+                blocked_retry["reason"],
+                "verification_required_before_retry"
+            );
+            let (exit, recheck) = task_call(
+                &["verify"],
+                &["--owner", "struct-agent", "--lease-token", token],
+            );
+            assert_eq!(exit, Some(3));
+            assert_eq!(recheck["observation"], "still_present");
+            assert_eq!(show()["history"]["no_progress_count"], count);
+            attempts.push(json!({"start":start,"finish":finish,"recheck":recheck}));
+        }
+        let exhausted = show();
+        assert_eq!(exhausted["reason_code"], "no_progress_budget_exhausted");
+        assert_eq!(exhausted["allowed_paths"], json!([]));
+        let (_, renamed) = task_call(
+            &["attempt", "start"],
+            &[
                 "--owner",
-                "agent",
+                "struct-agent",
                 "--lease-token",
-                &"a".repeat(64),
+                token,
+                "--action-id",
+                "restore-checker-environment",
+            ],
+        );
+        assert_eq!(renamed["reason"], "action_id_invalid");
+        let (_, retry) = task_call(
+            &["attempt", "start"],
+            &[
+                "--owner",
+                "struct-agent",
+                "--lease-token",
+                token,
                 "--action-id",
                 "repair-source",
-                "--format=json",
-            ])
-            .output()
+            ],
+        );
+        assert_eq!(retry["reason"], "no_progress_budget_exhausted");
+        let repeat_budget = scan();
+        assert_eq!(show()["history"]["no_progress_count"], 2);
+        fs::remove_file(root.join(format!(".codeguard/tasks/{id}.md"))).unwrap();
+        scan();
+        assert_eq!(show()["history"]["no_progress_count"], 2);
+        let first_recheck_run = attempts[0]["recheck"]["native_scan"]["run_id"]
+            .as_str()
             .unwrap();
-        assert_eq!(attempt.status.code(), Some(3));
-        assert!(
-            String::from_utf8_lossy(&attempt.stdout)
-                .contains("clang_structure_attempt_journal_not_integrated")
+        let report_path = root.join(format!(".codeguard/reports/{first_recheck_run}.json"));
+        let recheck_bytes = fs::read(&report_path).unwrap();
+        fs::remove_file(&report_path).unwrap();
+        let missing_history = show();
+        assert_eq!(
+            missing_history["reason_code"],
+            "historical_verification_evidence_unavailable"
+        );
+        assert_eq!(missing_history["allowed_paths"], json!([]));
+        fs::write(&report_path, &recheck_bytes).unwrap();
+        assert_eq!(show()["history"]["no_progress_count"], 2);
+        let receipt_path = root.join(format!(
+            ".codeguard/state/consumed/{first_recheck_run}.json"
+        ));
+        let receipt_bytes = fs::read(&receipt_path).unwrap();
+        fs::remove_file(&receipt_path).unwrap();
+        assert_eq!(
+            show()["reason_code"],
+            "historical_verification_evidence_unavailable"
+        );
+        fs::write(&receipt_path, &receipt_bytes).unwrap();
+        let mut forged_receipt = receipt_bytes.clone();
+        forged_receipt.push(b'\n');
+        fs::write(&receipt_path, forged_receipt).unwrap();
+        let (exit, bad_receipt) = task_call(&["show"], &[]);
+        assert_eq!(exit, Some(3));
+        assert_eq!(
+            bad_receipt["reason"],
+            "clang_structure_observation_not_consumed"
+        );
+        fs::write(&receipt_path, receipt_bytes).unwrap();
+        let event_path = root.join(format!(
+            ".codeguard/findings/{id}/events/verify-{first_recheck_run}.json"
+        ));
+        let event_bytes = fs::read(&event_path).unwrap();
+        let mut forged_event: Value = serde_json::from_slice(&event_bytes).unwrap();
+        forged_event["observation"] = json!("candidate_absent_unverified_policy");
+        fs::write(
+            &event_path,
+            serde_json::to_vec_pretty(&forged_event).unwrap(),
+        )
+        .unwrap();
+        let (exit, rejected) = task_call(&["show"], &[]);
+        assert_eq!(exit, Some(3));
+        assert_eq!(rejected["reason"], "verification_event_invalid");
+        fs::write(&event_path, event_bytes).unwrap();
+        task_call(
+            &["release"],
+            &["--owner", "struct-agent", "--lease-token", token],
         );
         fs::write(&source, format!("\n\n{initial}")).unwrap();
         let next = Command::new(env!("CARGO_BIN_EXE_codeguard"))
@@ -221,8 +362,8 @@ fn structural_deficits_share_stable_file_tasks_and_original_rescan_does_not_clos
             })
             .map(|p| serde_json::from_slice::<Value>(&fs::read(p).unwrap()).unwrap())
             .collect::<Vec<_>>();
-        assert_eq!(packets.len(), 7);
-        evidence.push(json!({"language":language,"task_id":id,"first":first,"repeated":second,"stale":stale,"moved":moved,"restored":restored,"clean":clean,"packets":packets,"verify_present":verify_present,"verify_absent":verify_absent}));
+        assert_eq!(packets.len(), 11);
+        evidence.push(json!({"language":language,"task_id":id,"first":first,"repeated":second,"stale":stale,"moved":moved,"restored":restored,"clean":clean,"packets":packets,"verify_present":verify_present,"verify_absent":verify_absent,"attempts":attempts,"exhausted":exhausted,"repeat_budget":repeat_budget,"missing_history":missing_history}));
     }
     if let Some(path) = std::env::var_os("CODEGUARD_STRUCTURE_WORKBENCH_EVIDENCE") {
         fs::write(path,serde_json::to_vec_pretty(&json!({"evidence_kind":"development_native_structure_workbench","qualification":"not_granted","test_source_sha256":format!("{:x}",Sha256::digest(include_bytes!("c_family_structure_workbench.rs"))),"codeguard_sha256":format!("{:x}",Sha256::digest(fs::read(env!("CARGO_BIN_EXE_codeguard")).unwrap())),"cases":evidence})).unwrap()).unwrap();

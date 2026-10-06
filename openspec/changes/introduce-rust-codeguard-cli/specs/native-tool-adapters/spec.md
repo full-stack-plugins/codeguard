@@ -1192,3 +1192,13 @@ A structural recheck SHALL bind the first consumed report and file-policy fact, 
 - **WHEN** a bound structural task is rechecked after its supported documentation deficits are corrected
 - **THEN** the observation SHALL preserve original task/rule/tool context and report only local unverified candidate absence
 - **AND** malformed origins, duplicate positions, changed tool bytes and incomplete structure SHALL remain rejected or incomplete
+
+
+### Requirement: Structural documentation attempts SHALL retain failed original rechecks
+
+Structural file-policy tasks SHALL use controlled leases and canonical repair-source actions. Input identity SHALL bind current source plus original language, standard, AST profile, policy and selected compiler identity. A ready attempt SHALL require a private, consumed original structural recheck before retry. Two failed rechecks for unchanged inputs SHALL withdraw repair permission and request concrete diagnosis; rescan/action renaming SHALL NOT reset that budget. Missing historical reports SHALL remain unverified; altered reports/events SHALL be rejected. Local attempt results SHALL NOT close tasks.
+
+#### Scenario: Unchanged structural repair attempts exhaust the retry budget
+- **WHEN** two ready-to-verify attempts receive original still_present structural rechecks for the same input context
+- **THEN** next SHALL expose the failed attempt history and stop repeating source repair
+- **AND** rescan, Markdown deletion and action renaming SHALL NOT remove or reset those failures

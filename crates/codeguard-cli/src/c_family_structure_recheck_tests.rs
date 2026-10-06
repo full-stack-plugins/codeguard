@@ -62,6 +62,8 @@ fn original_structure_recheck_preserves_task_and_rejects_changed_origin() {
     let brief = &report["structural_next"]["repair_brief"];
     assert!(brief["task_id"].is_string());
     let deadline = || Instant::now() + Duration::from_secs(30);
+    let input_before =
+        crate::c_family_structure_task_recheck::attempt_input_digest(&root, brief).unwrap();
     let first = crate::c_family_structure_task_recheck::run(&root, brief, deadline()).unwrap();
     assert_eq!(
         crate::c_family_structure_task_recheck::classify(brief, &first),
@@ -71,6 +73,10 @@ fn original_structure_recheck_preserves_task_and_rejects_changed_origin() {
         &root, &first
     ));
     fs::write(&source,"/** Return input.\n * @param x input value.\n * @return unchanged input.\n */\nint f(int x) { return x; }\n").unwrap();
+    assert_ne!(
+        input_before,
+        crate::c_family_structure_task_recheck::attempt_input_digest(&root, brief).unwrap()
+    );
     assert!(!crate::c_family_structure_task_recheck::inputs_current(
         &root, &first
     ));
