@@ -1776,3 +1776,7 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 ## 2026-10-06 Javadoc 构建根源集归属修复
 
 6.1/6.3/6.6：两个CLI反例实际RED后修复，主源码目录相对最近POM而非路径任意片段；Maven多文件按最近根排除子构建源码，子根未配置仍遮蔽父配置。默认三目标51通过/0失败/7条件忽略，已安装JDK21实际混合源集1项通过、有效诊断保留且vendor范围未确认；完整Java模型、动态源集、原生Maven多文件及正式覆盖仍未完成。见[验收](../../../tests/acceptance/javadoc-build-root-source-scope.md)，不借此勾选父任务。
+
+## 2026-10-06 JavaScript 重复直接绑定事实基础设施
+
+14.4/14.17/14.19：新增有界通用AST根作用域简单绑定扫描，四种节点类型由调用方指定，保留重复位置、记录/访问截断，不输出标识符文本或伪造ERROR/MISSING。API缺失RED后普通三项通过；显式Node24.18.0两种输入模式16轮对照通过，顶层return的module/CommonJS差异保持上下文要求。尚未接入公开worker/probe/check/Hook/任务及规则包/schema，已知原始与组合FN仍保留、不勾选父任务。见[验收](../../../tests/acceptance/javascript-direct-binding-facts.md)。
