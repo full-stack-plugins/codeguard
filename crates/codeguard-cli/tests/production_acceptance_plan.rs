@@ -62,7 +62,7 @@ fn filtered_java_plan_preserves_gradle_cve_gap_and_full_registry_obligations() {
             .any(|path| path["ecosystem"] == "maven" && path["implementation_status"] == "partial")
     );
     assert!(paths.iter().any(|path| path["ecosystem"] == "gradle"
-        && path["implementation_status"] == "configuration_only"));
+        && path["implementation_status"] == "partial"));
 }
 
 #[test]
@@ -81,4 +81,26 @@ fn legacy_inventory_stays_separate_and_ambiguous_plan_arguments_are_rejected() {
         argv.extend(args);
         assert_eq!(query(&argv).status.code(), Some(2));
     }
+}
+
+#[test]
+fn partial_gradle_cve_never_grants_native_scan_or_repair_qualification() {
+    let out = query(&["capabilities", "java", "--acceptance-plan", "--format=json"]);
+    let report: Value = serde_json::from_slice(&out.stdout).unwrap();
+    let cell = &report["plan"]["languages"][0]["capabilities"]["vulnerabilities"];
+    assert_eq!(cell["qualification"], "blocked");
+    let gradle = cell["build_paths"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|path| path["ecosystem"] == "gradle")
+        .unwrap();
+    assert_eq!(gradle["implementation_status"], "partial");
+    assert!(
+        gradle["blockers"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|reason| reason.as_str().unwrap().contains("真实OWASP"))
+    );
 }

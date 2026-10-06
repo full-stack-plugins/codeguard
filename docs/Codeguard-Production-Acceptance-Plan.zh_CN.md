@@ -9,7 +9,7 @@ codeguard capabilities java --acceptance-plan --format=json
 
 此入口不扫描项目、不运行工具、不加载 WASM、不授予资格。旧能力库存 0.2 协议保持不变。筛选只缩小显示，完整义务数仍为 228；不能与旧六类别筛选混用。机器结果明确输出 `qualification: not_granted`、`delivery_decision: not_evaluated`。
 
-语法必须分别验收 WASM 和原生工具；详细文档规范、开发规范和漏洞检查不能由语法解析替代。Java Maven/Gradle 独立登记，Gradle CVE 当前为配置探测，Maven 局部工具结果也不是完整生产验收。没有生态原生 CVE 工具的语言需明确实际部署/依赖扫描路径及限制，不能虚构“官方 lint”。
+语法必须分别验收 WASM 和原生工具；详细文档规范、开发规范和漏洞检查不能由语法解析替代。Java Maven/Gradle 独立登记，Gradle CVE 已有显式原任务/报告局部路径，但实际 OWASP 正反例仍缺；受控报告和真实缺插件阻塞不计完整扫描验收，Maven 局部工具结果也不是完整生产验收。没有生态原生 CVE 工具的语言需明确实际部署/依赖扫描路径及限制，不能虚构“官方 lint”。
 
 32 个 grammar 按语言归属登记；TypeScript 包含 JavaScript/TSX，CFML 包含 CFQuery/CFScript。候选资产不等于发布能力，正式资格仍为 0/32。原生工具缺失时的初检报告不能关闭原生验收义务。
 

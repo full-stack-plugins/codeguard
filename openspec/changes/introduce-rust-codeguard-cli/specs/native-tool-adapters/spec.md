@@ -917,3 +917,29 @@ Gradle Javadoc repair observations SHALL use their own java.gradle.javadoc check
 #### Scenario: Referenced implementation or acceptance evidence changes
 - **WHEN** a repository audit observes missing or changed referenced source/evidence bytes or unresolved task IDs
 - **THEN** the plan snapshot SHALL fail its audit and require refreshed mapping; the runtime read-only view SHALL explicitly remain a repository snapshot, not current-project verification
+
+### Requirement: Gradle OWASP native execution SHALL preserve original task and report ownership
+
+The Gradle vulnerability application service SHALL execute explicitly selected, enabled official Analyze/Aggregate task paths from a bounded native model, with the applied org.owasp.dependencycheck plugin in the owning project. It SHALL preserve original scan, suppression, severity and report-format settings. Missing JSON configuration, skipped tasks, unsupported configuration APIs, duplicate output ownership, pre-existing report files, escaped paths or mismatched report project attribution SHALL remain incomplete. No implicit task-name match or Maven fallback is permitted.
+
+Model capture, original task execution and report ownership observation SHALL share one bounded offline invocation over immutable selected inputs. Rust SHALL validate reports using the existing OWASP JSON parser and preserve native-suppressed advisories. Missing or invalid reports, analysis failure, cancellation, timeout and tool/input changes SHALL NOT become a clean CVE result. Source identities, original task paths and report digests SHALL remain explicit; database freshness, complete dependency attribution, production qualification and repair integration are separate obligations.
+
+#### Scenario: Ordinary Gradle tasks imitate OWASP names
+- **WHEN** an explicitly selected task lacks its owning OWASP plugin, official base class or enabled state
+- **THEN** no advisory SHALL be accepted and the application service SHALL return a concrete incomplete observation
+
+#### Scenario: Two scans write the same report or a supplied input impersonates a generated report
+- **WHEN** selected tasks share a JSON output path or the private snapshot already contains that output
+- **THEN** execution SHALL reject report ownership rather than consume a stale or ambiguous report
+
+#### Scenario: Native reports contain active and suppressed vulnerabilities
+- **WHEN** current native execution generates attributable valid OWASP reports
+- **THEN** Rust SHALL retain both active and suppressed observations with per-task report identity; it SHALL NOT claim database freshness, complete dependency coverage or vulnerability-free delivery
+
+#### Scenario: Public Java CVE explicitly selects original Gradle tasks
+- **WHEN** cve java receives explicit Gradle/JDK, selected build inputs and repeatable --gradle-owasp-task paths
+- **THEN** its feedback SHALL expose the bounded native observation and concrete follow-up without installing plugins, replacing project configuration, mutating the workbench, or granting delivery; invalid/duplicate options SHALL fail before native execution and local unverified results SHALL exit 3 (cancellation 130)
+
+#### Scenario: An existing Gradle dependency cache enables offline original plugin resolution
+- **WHEN** --gradle-module-cache explicitly selects an existing caches/modules-2 directory
+- **THEN** Rust SHALL take a bounded immutable dependency-cache snapshot into the private Gradle user directory, reject user configuration and symlink escapes, preserve the cache digest and reject source-cache changes; it SHALL NOT modify or implicitly select the user's Gradle home or install plugin dependencies

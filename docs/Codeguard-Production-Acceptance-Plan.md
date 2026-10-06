@@ -9,7 +9,7 @@ codeguard capabilities java --acceptance-plan --format=json
 
 The query does not scan projects, execute tools, load WASM, or evaluate delivery. The legacy 0.2 inventory stays unchanged. Filtering preserves the full 228 obligations; legacy category/platform filters cannot be combined with this view. Reports retain `qualification: not_granted` and `delivery_decision: not_evaluated`.
 
-Syntax requires separate WASM and native acceptance. Parsing cannot substitute for detailed documentation, development conventions, or vulnerability scans. Java Maven and Gradle are independent paths: Gradle CVE currently has configuration observation only. Partial Maven evidence is not production qualification. Ecosystems lacking native CVE engines require explicit deployment/dependency scanning boundaries; do not invent official lint tools.
+Syntax requires separate WASM and native acceptance. Parsing cannot substitute for detailed documentation, development conventions, or vulnerability scans. Java Maven and Gradle are independent paths: Gradle CVE now has a partial explicit native task/report path, with controlled reports and actual missing-plugin blockers; real OWASP positive/negative scans remain pending. Partial Maven evidence is not production qualification. Ecosystems lacking native CVE engines require explicit deployment/dependency scanning boundaries; do not invent official lint tools.
 
 All 32 grammar candidates are mapped. TypeScript owns JavaScript/TSX; CFML owns CFQuery/CFScript. Candidate assets do not imply released capability: qualification remains 0/32. Preliminary results cannot discharge missing native obligations.
 

@@ -1,0 +1,56 @@
+// 观察原生OWASP配置与输出归属；不更改格式、抑制、阈值、扫描范围或漏洞库。
+import groovy.json.JsonOutput
+
+gradle.projectsEvaluated {
+    if (!gradle.includedBuilds.isEmpty()) { throw new GradleException('codeguard_owasp_composite_build_unresolved') }
+    def root = gradle.rootProject
+    def requested = System.getProperty('codeguard.owasp.tasks', '').split(',').toList()
+    def selected = []
+    def officialTypes = ['org.owasp.dependencycheck.gradle.tasks.Analyze', 'org.owasp.dependencycheck.gradle.tasks.Aggregate']
+    requested.each { path ->
+        def task = root.tasks.findByPath(path)
+        if (task == null || !task.enabled || !task.project.plugins.hasPlugin('org.owasp.dependencycheck')) { throw new GradleException('codeguard_owasp_task_unavailable') }
+        def type = task.class
+        def implementation = null
+        while (type != null) {
+            if (officialTypes.contains(type.name)) { implementation = type.name; break }
+            type = type.superclass
+        }
+        if (implementation == null) { throw new GradleException('codeguard_owasp_task_unavailable') }
+        selected.add([task:task, implementation:implementation])
+    }
+    def prepareName = 'codeguardPrepareDependencyCheck'
+    def aggregateName = 'codeguardRunDependencyCheck'
+    if (root.tasks.findByName(prepareName) != null || root.tasks.findByName(aggregateName) != null) { throw new GradleException('codeguard_reserved_task_collision') }
+    def prepare = root.tasks.register(prepareName) {
+        dependsOn(root.tasks.named('codeguardObserveCheckerModel'))
+        doLast {
+            def base = root.projectDir.canonicalFile.toPath()
+            def owned = [] as Set
+            def records = selected.collect { entry ->
+                def task = entry.task
+                // 固定v12.1.0原生config接口；其它接口必须独立验收，不猜测属性。
+                if (!task.hasProperty('config') || task.config == null) { throw new GradleException('codeguard_owasp_configuration_api_unresolved') }
+                def config = task.config
+                if (config.skip != false) { throw new GradleException('codeguard_owasp_scan_skipped') }
+                def formats = []
+                if (config.format != null) { formats.add(config.format.toString().toUpperCase(Locale.ROOT)) }
+                config.formats?.each { formats.add(it.toString().toUpperCase(Locale.ROOT)) }
+                if (!formats.contains('JSON') && !formats.contains('ALL')) { throw new GradleException('codeguard_owasp_json_not_configured') }
+                def directory = task.project.file(config.outputDirectory).canonicalFile.toPath()
+                if (!directory.startsWith(base) || directory == base) { throw new GradleException('codeguard_owasp_report_outside_root') }
+                def output = directory.resolve('dependency-check-report.json')
+                if (!owned.add(output.toString())) { throw new GradleException('codeguard_owasp_report_ownership_duplicate') }
+                if (output.toFile().exists()) { throw new GradleException('codeguard_owasp_report_preexisting') }
+                [project_path:task.project.path,task_path:task.path,implementation:entry.implementation,report_project_name:task.determineDisplayName(),report_path:base.relativize(output).toString().replace(File.separatorChar, '/' as char)]
+            }
+            def bytes = JsonOutput.toJson([schema_version:'0.1.0',report_type:'gradle_owasp_report_ownership',tasks:records]).getBytes('UTF-8')
+            if (bytes.length > 1024 * 1024) { throw new GradleException('codeguard_owasp_output_budget') }
+            def output = new File(System.getProperty('codeguard.owasp.ownership'))
+            if (!output.createNewFile()) { throw new GradleException('codeguard_owasp_ownership_preexisting') }
+            output.bytes = bytes
+        }
+    }
+    selected.each { entry -> entry.task.mustRunAfter(prepare) }
+    root.tasks.register(aggregateName) { dependsOn(prepare); dependsOn(selected.collect { it.task }) }
+}

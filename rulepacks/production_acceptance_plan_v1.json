@@ -12,15 +12,19 @@
     "windows_x86_64"
   ],
   "source_hashes": {
+    "crates/codeguard-adapters/src/gradle_dependency_check_plan.rs": "dfb85a3dfcf6c5e0697bb3eb58ecbd8f2d47feb71f60db506f765b0ee86b23f3",
+    "crates/codeguard-adapters/src/gradle_owasp_report_ownership_parser.rs": "11d06f8905022307d99b50e68d1bfd44bd2f2fdd29d85872bef1d40864b83c00",
     "crates/codeguard-cli/src/cargo_audit_command.rs": "e49b53a19590f9bf2035f4d5902eaea4f3e90d29138b9c06c0a60c4101229970",
     "crates/codeguard-cli/src/clang_lint_feedback.rs": "654a0df42626c5ba1ed1db8b3ffb2232f1d1936b27d7cf4217ec54a59789a563",
     "crates/codeguard-cli/src/erlang_lint_command.rs": "0a223cbcd09923140a75c1b147f50e241adb5e722ee674e8bea0968921f76a37",
     "crates/codeguard-cli/src/eslint_lint_command.rs": "d89fd7c1da69c083beebabe3dca6222d3bb7247a558ea4c1e8caab930596ea2d",
     "crates/codeguard-cli/src/go_lint_command.rs": "34482e8c77d1ec997edcb1a4f912c997736b2848a784495850d2c9f2c7d7e800",
+    "crates/codeguard-cli/src/gradle_dependency_check_probe.rs": "773addd9d74f2b5b2ab1551a31bd10c48e9fcbf0abf2c8e21ac90c88fa1a3fb3",
     "crates/codeguard-cli/src/gradle_javadoc_task_recheck.rs": "0ffc0b45d197892862b5336bb2d85432233ded3033e6c2444b603589dc949bd3",
-    "crates/codeguard-cli/src/gradle_model_probe.rs": "330375e868befa667d9ce846c96d854cb2f9b8afedc308ac5f1f0303e2eb3269",
+    "crates/codeguard-cli/src/gradle_module_cache.rs": "5489b87236a0d7567225ebc6fcb34f368733e2a643c22ab5632b6142499128e6",
     "crates/codeguard-cli/src/grammar_native_checker.rs": "87f2f8a19ca1fc6016dd1d4affac87cd824a8d60f497479b2d94aeaf317548f6",
     "crates/codeguard-cli/src/java_cve_scan.rs": "98d4793d27c3b4d912b983c6a996a8ee8128bae97fe7ef0aa0f6375ed3c9d437",
+    "crates/codeguard-cli/src/java_gradle_cve_command.rs": "c36e9f3c1e510032ddaf2365d5842727922c6d98934104527d33116a8b6e8b33",
     "crates/codeguard-cli/src/java_p3c_scan.rs": "36e022ba1f7c157ff52a2839287d9b8497c9bdd5583212128a81df95f5fcf69e",
     "crates/codeguard-cli/src/javascript_syntax_probe.rs": "4ba09a558662332e953e89512d386642653d5cc59dd1336f8ec31b51137731e1",
     "crates/codeguard-cli/src/kotlin_lint_command.rs": "f19e0babe23cc3cce52d69d6821416d6b9fdd7b6d8b484d3413e1368fef05ad8",
@@ -44,8 +48,8 @@
     "tests/acceptance/eslint-directory-feedback.md": "8aa71fcd3bb1b7b5dde384b14e883cbc8190546e07e86c63d8d936ebfa42a05b",
     "tests/acceptance/go-native-differential.md": "cc29cb37f5464823e389e1085b5d766933e6212993f05a6eda1f2d61399971d8",
     "tests/acceptance/go-vet-json-local-probe.md": "907da8741a05e6d3321567cf0d2c9581e04954a6d2b6f7d749f2791d453ae379",
+    "tests/acceptance/gradle-dependency-check-probe.md": "cc8108e6362e6520514a6f339d2663cd3b0b219a6de8e4b5d510e6ed91d1f4d6",
     "tests/acceptance/gradle-javadoc-public-task-recheck.md": "cf8e14b866599424f70d17af8302c7e7e8540d375de63939b2b482a0708849a2",
-    "tests/acceptance/gradle-native-model-probe.md": "9ee90bfae78818dcb89fdb5067e7120e440b21f945f61ded3778196191a2bebe",
     "tests/acceptance/java-native-differential.md": "6be7abb2e2129409ce619c53875c845bad1c6e4f3ded6b6f86b85608106cf906",
     "tests/acceptance/java-p3c-cli-native-local.md": "e0d8d4b15c867d2dc5dbafd7ba26e034bc0d11d793530466af576f43fe1690b7",
     "tests/acceptance/kotlin-native-differential.md": "8273d9303d68d4e4e8fa4fe17828fa0e74760aa1d9c02c70d68b89510317deaf",
@@ -252,16 +256,20 @@
             },
             {
               "ecosystem": "gradle",
-              "implementation_status": "configuration_only",
+              "implementation_status": "partial",
               "adapter_refs": [
-                "crates/codeguard-cli/src/gradle_model_probe.rs"
+                "crates/codeguard-cli/src/java_gradle_cve_command.rs",
+                "crates/codeguard-cli/src/gradle_dependency_check_probe.rs",
+                "crates/codeguard-cli/src/gradle_module_cache.rs",
+                "crates/codeguard-adapters/src/gradle_dependency_check_plan.rs",
+                "crates/codeguard-adapters/src/gradle_owasp_report_ownership_parser.rs"
               ],
               "evidence_refs": [
-                "tests/acceptance/gradle-native-model-probe.md"
+                "tests/acceptance/gradle-dependency-check-probe.md"
               ],
               "blockers": [
-                "java/gradle:实际依赖图/锁、漏洞来源及时效、原生扫描与修复复检未完整验收",
-                "java/gradle/vulnerabilities:五平台、宿主反馈、可信关闭和复发重开未验收"
+                "真实OWASP有/无漏洞原生扫描、插件缓存闭包、漏洞库时效和完整依赖归属仍待验收；受控报告和实际缺插件阻塞不能授予资格",
+                "普通check调度、work/next/task verify、可信关闭/复发、版本/平台/宿主/发行仍未完成"
               ]
             }
           ]

@@ -77,6 +77,10 @@ fn main() -> ExitCode {
             codeguard_cli::python_cve_command::run(rest)
         }
         #[cfg(unix)]
+        [command, language, rest @ ..] if command == "cve" && language == "java" => {
+            codeguard_cli::java_gradle_cve_command::run(rest)
+        }
+        #[cfg(unix)]
         [command, rest @ ..] if command == "cve" => codeguard_cli::npm_audit_command::run(rest),
         [command, operation, rest @ ..] if command == "rules" && operation == "list" => {
             codeguard_cli::rules_list_command::run(rest)

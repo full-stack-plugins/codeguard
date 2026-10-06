@@ -9,3 +9,5 @@
 Rust仓库审计示例实际核对52份当前来源SHA256与1312处任务引用，返回mapping_complete_qualification_blocked。真实公开全量JSON归档在[evidence/production-acceptance-plan/all.json](evidence/production-acceptance-plan/all.json)。两份独立schema验证计划和实际输出；伪造qualification/delivery_decision拒绝。default/WASM全工作区all-targets严格Clippy均通过。
 
 边界：文件哈希和任务存在性不证明完整功能/独立精度，实际原生条件、版本、方言、平台、可信宿主和发行仍须完成。S15.1–15.7不勾选，正式grammar资格0/32。历史28e3760远端CI37481053826终态failure：gate固定插件审计源checkout失败，MSRV成功；不绕过审计源。
+
+后续Gradle原任务增量更新当前快照：364条路径为50 partial、26 wasm_candidate_only、288 not_integrated，全部资格继续blocked；来源摘要当前56份。前述52份/1 configuration_only是80a5058检查点的历史状态，原始报文可从该提交读取；当前同名全量报文由新CLI重跑更新。
