@@ -1032,3 +1032,15 @@ Model capture, original task execution and report ownership observation SHALL sh
 #### Scenario: A later scan is clean while a documentation task remains open
 - **WHEN** the native observation has zero documentation findings and a prior documentation task remains open
 - **THEN** the next view retains that task for verification or review and does not substitute an unrelated convention task or claim detailed-contract production qualification
+
+### Requirement: Python comments SHALL report native documentation rule selection independently of diagnostics
+
+The standalone comments report SHALL distinguish native documentation rules selected with zero diagnostics, rules not selected, and unavailable settings. The observation SHALL come from the same completed Ruff scan and validated settings used for the original diagnostics; it SHALL NOT run a second checker or infer selection from configuration text, diagnostic absence or a rule-name prefix. Each file SHALL retain original config/source/tool/settings identities, global documentation rule selection and the unresolved per-file-ignore boundary. Partial or unavailable native observations SHALL NOT count as observed configuration. This new projection SHALL NOT modify historical native protocols, stored scan facts, rulepack approval or detailed documentation qualification.
+
+#### Scenario: A clean native file has documentation rules enabled
+- **WHEN** Ruff completes with no diagnostics and its same-run settings explicitly enable DOC201
+- **THEN** comments SHALL report DOC201 as selected, retain zero findings and detailed-contract qualification not_granted; it SHALL NOT repeat native settings execution
+
+#### Scenario: A clean native file has only convention rules enabled
+- **WHEN** Ruff completes with only F401 enabled and no diagnostics
+- **THEN** comments SHALL report no selected documentation rules and a concrete configuration action; it SHALL NOT claim detailed documentation compliance or change the project configuration
