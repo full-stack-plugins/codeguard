@@ -1501,3 +1501,6 @@ Java Gradle vulnerability checks now expose explicit original tasks through `cod
 
 
 Explicit Gradle CVE now syncs sanitized stable preparation tasks in initialized workspaces, retaining original input/task flags in next/task show. Empty reports never close tasks; task verify records frozen original-context local observations; unified check now schedules explicit original tasks; automatic discovery and full acceptance remain pending. See [Gradle vulnerability checks](Codeguard-Gradle-Vulnerability-Checks.md) for current protocols, execution paths and acceptance.
+
+
+The standalone C/C++ Clang entry now distinguishes literal/comment hashes and raw strings from preprocessing directives, including alternate tokens and line splices. Leading non-ASCII recovery remains conservatively unresolved. This bounded verification does not qualify project syntax, documentation, development conventions, or CVE coverage. See [acceptance limits](../tests/acceptance/clang-preprocessor-context.md).

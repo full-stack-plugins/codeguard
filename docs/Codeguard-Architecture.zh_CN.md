@@ -1501,3 +1501,6 @@ Java Gradle 漏洞检查新增显式原任务入口 `codeguard cve java`；JSON 
 
 
 显式Gradle CVE已接入已初始化工作区的脱敏稳定准备任务，next/task show保留原输入/任务参数；空报告不关闭，task verify已接入冻结原上下文局部观察，统一check现支持显式原任务调度；自动发现与完整验收仍未完成。协议/执行路径与当前验收见[Gradle漏洞检查](Codeguard-Gradle-Vulnerability-Checks.zh_CN.md)。
+
+
+C/C++ 独立 Clang 入口已修复字符串、注释和原始字符串中的井号误判，并补预处理替代记号/续行防护；行首非 ASCII 恢复仍保守未解析。仅局部验收，完整项目语法、文档规范、开发规范、CVE 四核心生产门槛保持开放。见 [验收边界](../tests/acceptance/clang-preprocessor-context.md)。

@@ -203,3 +203,110 @@ fn native_warnings_are_retained_even_when_clang_exits_zero() {
     assert_eq!(r["native"]["status"], "diagnostics_observed", "{r}");
     assert_eq!(r["native"]["diagnostics"][0]["level"], "warning");
 }
+
+#[test]
+fn hash_literals_and_comments_do_not_require_preprocessor_context() {
+    let f = fixture("hash-literals");
+    let mut report = sarif();
+    report["runs"][0]["invocations"][0]["executionSuccessful"] = json!(true);
+    report["runs"][0]["results"] = json!([]);
+    let t = tool(&f, &report);
+    for (language, standard, source) in [
+        ("c", "c11", "const char *s = \"#text\";\n"),
+        ("c", "c11", "int x = '#'; /* #include \"no.h\" */\n"),
+        (
+            "cpp",
+            "c++17",
+            "const char *s=R\"cg(\n#include \"no.h\"\n)cg\";\n",
+        ),
+    ] {
+        let r = run(&f, &t, source, language, standard);
+        assert_eq!(r["native"]["status"], "completed", "{r}");
+        assert_eq!(r["coverage_proven"], false);
+        assert_eq!(r["syntax_candidates"], Value::Null);
+    }
+}
+
+#[test]
+fn alternate_preprocessing_directives_stop_before_native_tool_identity() {
+    let f = fixture("alternate-pp");
+    let t = tool(&f, &sarif());
+    for (language, standard, source) in [
+        ("c", "c11", "\u{feff}#error CODEGUARD_PP_PROBE\n"),
+        ("c", "c11", "\u{a0}#error CODEGUARD_PP_PROBE\n"),
+        ("cpp", "c++17", "%\\ \n:error CODEGUARD_PP_PROBE\n"),
+        ("c", "c11", "%:include \"missing.h\"\n"),
+        ("c", "c11", "??=include \"missing.h\"\n"),
+        ("cpp", "c++17", "%\\\n:include \"missing.h\"\n"),
+        (
+            "cpp",
+            "c++17",
+            "const char *s=R\"cg(#literal)cg\";\n#include \"missing.h\"\n",
+        ),
+    ] {
+        let r = run(&f, &t, source, language, standard);
+        assert_eq!(
+            r["native"]["reason"], "clang_preprocessor_context_unresolved",
+            "{r}"
+        );
+        assert_eq!(r["native"]["tool_sha256"], Value::Null);
+        assert_eq!(r["native"]["diagnostics"], json!([]));
+        assert_eq!(r["syntax_candidates"], Value::Null);
+    }
+}
+
+#[test]
+#[ignore = "requires explicit existing Apple Clang21 via CODEGUARD_CLANG_BIN; never installs"]
+fn actual_clang_literals_raw_translation_boundaries_and_directives_are_distinct() {
+    let f = fixture("actual-pp");
+    let t = PathBuf::from(std::env::var_os("CODEGUARD_CLANG_BIN").unwrap());
+    let mut evidence = Vec::new();
+    for (language, standard) in [("c", "c11"), ("cpp", "c++17")] {
+        for source in [
+            "const char *s=\"#text\";\n",
+            "int x='#'; /* #include \"missing.h\" */\n",
+            "/*\n#include \"missing.h\"\n*/ int x=1;\n",
+        ] {
+            let r = run(&f, &t, source, language, standard);
+            assert_eq!(r["native"]["status"], "completed", "{r}");
+            assert_eq!(r["native"]["reason"], "clang_native_no_diagnostics");
+            assert!(r["native"]["tool_sha256"].is_string());
+            evidence.push(json!({"source":source,"report":r}));
+        }
+        let bad = "const char *s=\"#text\"; int x = ;\n";
+        let r = run(&f, &t, bad, language, standard);
+        assert_eq!(r["native"]["status"], "diagnostics_observed", "{r}");
+        assert_eq!(
+            r["native"]["diagnostics"][0]["rule_id"],
+            "clang.err_expected_expression"
+        );
+        evidence.push(json!({"source":bad,"report":r}));
+        for source in [
+            "%:include \"missing.h\"\n",
+            "/* context */ #include \"missing.h\"\n",
+        ] {
+            let r = run(&f, &t, source, language, standard);
+            assert_eq!(
+                r["native"]["reason"],
+                "clang_preprocessor_context_unresolved"
+            );
+            assert_eq!(r["native"]["tool_sha256"], Value::Null);
+            assert_eq!(r["native"]["diagnostics"], json!([]));
+            evidence.push(json!({"source":source,"report":r}));
+        }
+    }
+    for source in [
+        "const char *s=R\"cg(\n#include \"missing.h\"\n)cg\";\n",
+        "const char *s=u8R\"cg(\n)cg\\\n\"\n#include \"missing.h\"\n)cg\";\n",
+        "const char *s=R\\\n\"cg(\n#include \"missing.h\"\n)cg\";\n",
+    ] {
+        let r = run(&f, &t, source, "cpp", "c++17");
+        assert_eq!(r["native"]["status"], "completed", "{r}");
+        assert_eq!(r["coverage_proven"], false);
+        assert_eq!(r["delivery_decision"], "not_evaluated");
+        evidence.push(json!({"source":source,"report":r}));
+    }
+    if let Some(path) = std::env::var_os("CODEGUARD_CLANG_CONTEXT_EVIDENCE") {
+        fs::write(path, serde_json::to_vec_pretty(&evidence).unwrap()).unwrap();
+    }
+}

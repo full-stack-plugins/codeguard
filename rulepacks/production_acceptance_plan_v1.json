@@ -82,7 +82,10 @@
     "crates/codeguard-cli/src/check_command.rs": "039092dab2d4409ac67ac9eb1fe1b0db2f4011f62c2d87cb6e7e31d6dd2561a7",
     "crates/codeguard-cli/src/partial_sarif_feedback.rs": "957236601864e568e999288e39183420f0c10ea2c1c31fd9d29de8e176069e20",
     "crates/codeguard-cli/src/command_catalogue.rs": "9a0a368513198cb30ae649bf93f7ef2d541dd5c527369966d87c195a071e6809",
-    "tests/acceptance/gradle-cve-unified-check.md": "20168de147524d603c3f47101e098cbf20b9469ae985fca68068a9f6bc5b620c"
+    "tests/acceptance/gradle-cve-unified-check.md": "20168de147524d603c3f47101e098cbf20b9469ae985fca68068a9f6bc5b620c",
+    "crates/codeguard-adapters/src/c_family_preprocessor_guard.rs": "1361b5ce4b9c2b6ee2d2142c4a87f19edfae512569118dc9fcb687fde435e3a6",
+    "crates/codeguard-cli/src/clang_syntax_probe.rs": "5cd0459f9621ba13a6f484dd8225213a2bd50057097b987e61c9e3511c2248fe",
+    "tests/acceptance/clang-preprocessor-context.md": "3af1710a54102c854824f2402e1ca15e14fd38c72299b9811398f4c486148565"
   },
   "languages": [
     {
@@ -2589,10 +2592,13 @@
               "ecosystem": "standalone",
               "implementation_status": "partial",
               "adapter_refs": [
-                "crates/codeguard-cli/src/clang_lint_feedback.rs"
+                "crates/codeguard-cli/src/clang_lint_feedback.rs",
+                "crates/codeguard-adapters/src/c_family_preprocessor_guard.rs",
+                "crates/codeguard-cli/src/clang_syntax_probe.rs"
               ],
               "evidence_refs": [
-                "tests/acceptance/clang-standalone-native.md"
+                "tests/acceptance/clang-standalone-native.md",
+                "tests/acceptance/clang-preprocessor-context.md"
               ],
               "blockers": [
                 "c/standalone:完整原生语法版本/方言、源集、WASM联合路径及独立精度未验收",
@@ -2846,10 +2852,13 @@
               "ecosystem": "standalone",
               "implementation_status": "partial",
               "adapter_refs": [
-                "crates/codeguard-cli/src/clang_lint_feedback.rs"
+                "crates/codeguard-cli/src/clang_lint_feedback.rs",
+                "crates/codeguard-adapters/src/c_family_preprocessor_guard.rs",
+                "crates/codeguard-cli/src/clang_syntax_probe.rs"
               ],
               "evidence_refs": [
-                "tests/acceptance/clang-standalone-native.md"
+                "tests/acceptance/clang-standalone-native.md",
+                "tests/acceptance/clang-preprocessor-context.md"
               ],
               "blockers": [
                 "cpp/standalone:完整原生语法版本/方言、源集、WASM联合路径及独立精度未验收",

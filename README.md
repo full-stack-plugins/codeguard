@@ -1102,3 +1102,6 @@ Real native tests cover all seven rules, repeated identity, presence, noqa suppr
 Read-only four-core acceptance plan: `codeguard capabilities [language] --acceptance-plan --format=json`. All 57 languages / 228 obligations remain unqualified; filtering preserves full obligations. See [acceptance plan](docs/Codeguard-Production-Acceptance-Plan.md).
 
 Java Gradle vulnerability checks now expose explicit original tasks through `codeguard cve java`, preserving JSON configuration and optional module-cache inputs. Observations remain unverified; initialized workspaces now sync sanitized stable preparation tasks; next/task show retain original input/task flags, while task verify now records frozen-context local observations; unified check now schedules explicit original tasks; full native acceptance remains pending. See [Gradle OWASP](docs/Codeguard-Gradle-Vulnerability-Checks.md).
+
+
+The standalone C/C++ Clang entry now distinguishes literal/comment hashes and raw strings from preprocessing directives, including alternate tokens and line splices. Leading non-ASCII recovery remains conservatively unresolved. This bounded verification does not qualify project syntax, documentation, development conventions, or CVE coverage. See [acceptance limits](tests/acceptance/clang-preprocessor-context.md).

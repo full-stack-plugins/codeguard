@@ -439,6 +439,8 @@ pub use shellcheck_json::parse_shellcheck_json1;
 mod cfquery_projection_rule;
 pub use cfquery_projection_rule::{cfquery_projection_rule_sha256, cfquery_projection_span_valid};
 
+mod c_family_preprocessor_guard;
+pub use c_family_preprocessor_guard::has_c_family_preprocessor_directive;
 mod clang_sarif;
 pub use clang_sarif::parse_clang_stdin_sarif;
 
