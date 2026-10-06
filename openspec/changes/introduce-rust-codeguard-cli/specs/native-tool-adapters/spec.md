@@ -1182,3 +1182,13 @@ For an initialized workspace, current native AST-associated missing comment/purp
 - **WHEN** source/tool/original report/consumption binding is stale, malformed or altered
 - **THEN** next SHALL withdraw source permissions or reject conflicting evidence
 - **AND** unsupported dedicated task verification/attempt recording SHALL fail before starting a wrong language checker; re-scan capability SHALL NOT imply trusted closure or full detailed accuracy
+
+
+### Requirement: C-family structure rechecks SHALL preserve the original task and compiler context
+
+A structural recheck SHALL bind the first consumed report and file-policy fact, freeze current source, and execute the original selected compiler and language standard with the same bounded AST profile. A tool override, altered first report or mismatched task SHALL be rejected before native execution. Unsupported AST coverage, changed inputs, cancellation or budget exhaustion SHALL NOT become candidate absence. Local absence SHALL NOT close the task or grant detailed-documentation qualification.
+
+#### Scenario: A supported component is corrected using the original compiler
+- **WHEN** a bound structural task is rechecked after its supported documentation deficits are corrected
+- **THEN** the observation SHALL preserve original task/rule/tool context and report only local unverified candidate absence
+- **AND** malformed origins, duplicate positions, changed tool bytes and incomplete structure SHALL remain rejected or incomplete

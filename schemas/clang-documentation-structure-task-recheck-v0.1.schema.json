@@ -1,0 +1,284 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "workspace_binding",
+    "workspace_id",
+    "run_id",
+    "path",
+    "language",
+    "standard",
+    "profile",
+    "selected_tool",
+    "source_sha256",
+    "local_scan_complete",
+    "native",
+    "authority",
+    "coverage_proven",
+    "delivery_decision",
+    "structure",
+    "task_id",
+    "task_kind",
+    "task_rule",
+    "original_ref",
+    "input_stable"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "report_type": {
+      "const": "clang_documentation_structure_task_recheck"
+    },
+    "workspace_binding": {
+      "const": "bound"
+    },
+    "workspace_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^clangdocstruct-[0-9]+-[0-9]+-[0-9]+$"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "language": {
+      "enum": [
+        "c",
+        "cpp"
+      ]
+    },
+    "standard": {
+      "enum": [
+        "c11",
+        "c++17"
+      ]
+    },
+    "profile": {
+      "const": "clang-documentation-structure-v1"
+    },
+    "selected_tool": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_sha256": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      ]
+    },
+    "local_scan_complete": {
+      "type": "boolean"
+    },
+    "native": {
+      "$ref": "urn:codeguard:syntax-lint-feedback:0.2#/properties/native"
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "structure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason",
+        "observation",
+        "native_raw_diagnostic_count"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "observed",
+            "incomplete"
+          ]
+        },
+        "reason": {
+          "enum": [
+            "clang_structure_observed",
+            "clang_structure_report_invalid",
+            "clang_structure_unavailable",
+            "clang_source_changed",
+            "request_cancelled",
+            "clang_execution_incomplete"
+          ]
+        },
+        "observation": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "clang-function-documentation-structure-v0.1.schema.json"
+            }
+          ]
+        },
+        "native_raw_diagnostic_count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "observed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reason": {
+                "const": "clang_structure_observed"
+              },
+              "observation": {
+                "$ref": "clang-function-documentation-structure-v0.1.schema.json"
+              },
+              "native_raw_diagnostic_count": {
+                "type": "integer"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "observation": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "task_id": {
+      "type": "string",
+      "pattern": "^CG-(B-)?[0-9a-f]{32}$"
+    },
+    "task_kind": {
+      "const": "finding"
+    },
+    "task_rule": {
+      "const": "codeguard.documentation.function_structure_required"
+    },
+    "original_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_id",
+        "sha256"
+      ],
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "pattern": "^clangdocstruct-[0-9]+-[0-9]+-[0-9]+$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "input_stable": {
+      "type": "boolean"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "language": {
+            "const": "c"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "standard": {
+            "const": "c11"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "language": {
+            "const": "cpp"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "standard": {
+            "const": "c++17"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "native": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "completed",
+                  "diagnostics_observed"
+                ]
+              },
+              "diagnostics": {
+                "not": {
+                  "contains": {
+                    "properties": {
+                      "level": {
+                        "const": "error"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "local_scan_complete": {
+            "const": true
+          },
+          "source_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "local_scan_complete": {
+            "const": false
+          }
+        }
+      }
+    }
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:clang-documentation-structure-task-recheck:0.1"
+}

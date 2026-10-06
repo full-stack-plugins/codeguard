@@ -84,10 +84,9 @@ fn structural_deficits_share_stable_file_tasks_and_original_rescan_does_not_clos
             .output()
             .unwrap();
         assert_eq!(verify.status.code(), Some(3));
-        assert!(
-            String::from_utf8_lossy(&verify.stdout)
-                .contains("clang_structure_task_verify_not_integrated")
-        );
+        let verify_present: Value = serde_json::from_slice(&verify.stdout).unwrap();
+        assert_eq!(verify_present["observation"], "still_present");
+        assert_eq!(verify_present["event_persisted"], true);
         let attempt = Command::new(env!("CARGO_BIN_EXE_codeguard"))
             .args(["task", "attempt", "start"])
             .arg(&id)
@@ -155,8 +154,38 @@ fn structural_deficits_share_stable_file_tasks_and_original_rescan_does_not_clos
         fs::write(&source, fixed).unwrap();
         let clean = scan();
         assert_eq!(clean["structural_workbench"]["task_ids"], json!([]));
+        assert!(
+            !clean["structural_next"]["repair_brief"].is_null(),
+            "{clean}"
+        );
         assert_eq!(
             clean["structural_next"]["repair_brief"]["observation_status"],
+            "candidate_absent_unverified_policy"
+        );
+        let argv = clean["structural_next"]["repair_brief"]["recheck_argv"]
+            .as_array()
+            .unwrap();
+        let verified = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(argv.iter().skip(1).map(|v| v.as_str().unwrap()))
+            .output()
+            .unwrap();
+        assert_eq!(verified.status.code(), Some(3));
+        let verify_absent: Value = serde_json::from_slice(&verified.stdout).unwrap();
+        assert_eq!(
+            verify_absent["observation"],
+            "candidate_absent_unverified_policy"
+        );
+        assert_eq!(verify_absent["event_persisted"], true);
+        let shown_after = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(["task", "show"])
+            .arg(&id)
+            .arg(&root)
+            .arg("--format=json")
+            .output()
+            .unwrap();
+        let current_after: Value = serde_json::from_slice(&shown_after.stdout).unwrap();
+        assert_eq!(
+            current_after["task"]["observation_status"],
             "candidate_absent_unverified_policy"
         );
         let fact: Value = serde_json::from_slice(
@@ -192,8 +221,8 @@ fn structural_deficits_share_stable_file_tasks_and_original_rescan_does_not_clos
             })
             .map(|p| serde_json::from_slice::<Value>(&fs::read(p).unwrap()).unwrap())
             .collect::<Vec<_>>();
-        assert_eq!(packets.len(), 5);
-        evidence.push(json!({"language":language,"task_id":id,"first":first,"repeated":second,"stale":stale,"moved":moved,"restored":restored,"clean":clean,"packets":packets}));
+        assert_eq!(packets.len(), 7);
+        evidence.push(json!({"language":language,"task_id":id,"first":first,"repeated":second,"stale":stale,"moved":moved,"restored":restored,"clean":clean,"packets":packets,"verify_present":verify_present,"verify_absent":verify_absent}));
     }
     if let Some(path) = std::env::var_os("CODEGUARD_STRUCTURE_WORKBENCH_EVIDENCE") {
         fs::write(path,serde_json::to_vec_pretty(&json!({"evidence_kind":"development_native_structure_workbench","qualification":"not_granted","test_source_sha256":format!("{:x}",Sha256::digest(include_bytes!("c_family_structure_workbench.rs"))),"codeguard_sha256":format!("{:x}",Sha256::digest(fs::read(env!("CARGO_BIN_EXE_codeguard")).unwrap())),"cases":evidence})).unwrap()).unwrap();

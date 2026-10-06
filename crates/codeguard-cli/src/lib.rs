@@ -557,3 +557,8 @@ mod python_documentation_configuration;
 
 #[cfg(unix)]
 mod cargo_audit_database_snapshot;
+
+#[cfg(all(test, unix))]
+mod c_family_structure_recheck_tests;
+
+mod c_family_structure_task_recheck;
