@@ -1397,3 +1397,10 @@ flowchart LR
 ## Maven and Gradle in the same build root
 
 Static discovery now retains every Maven/Groovy-Gradle/Kotlin-Gradle configuration reference in a shared physical directory. A malformed POM cannot hide Gradle, and two Gradle build scripts remain separate observations. Java dependency/CVE/security aggregates keep the mixed-build or unresolved-Gradle condition and no global Maven checker identity; any available Maven-local dependency graph and advisory observations remain in `native_results`. Check feedback0.61 preserves closed normal-check and lint-only contracts, including narrowly constrained Java comments `not_configured`; prior schemas remain unchanged. This fixes scope attribution, not native Gradle plugin execution or production acceptance. The local cached Gradle8.10.2 version command ran, while the inspected OWASP Gradle plugin cache paths were absent; no installation/download was performed. See [acceptance](../tests/acceptance/java-mixed-build-roots.md).
+
+
+### Gradle native model observation (development stage)
+
+The Rust application service `gradle_model_probe::observe` runs an existing Gradle distribution with a pinned init script in an isolated offline copy of explicitly selected build files. It observes applied plugins, canonical task implementation base classes, and enabled state. Real Gradle 8.10.2 tests cover a Groovy multi-project build and Kotlin DSL; similarly named ordinary tasks do not acquire OWASP identity. Selected source files, the script, and the complete Gradle distribution tree are checked before and after execution; JDK binding currently covers only the launcher and release file. The closed `gradle-model-probe-v0.1.schema.json` report remains an untrusted partial configuration observation, without project coverage or quality acceptance.
+
+The service is not wired into public commands and does not change the read-only behavior of detect/config explain. Native documentation, convention and vulnerability tasks, report attribution, dependency/database binding and repair closure remain open. See [native model observation acceptance](../tests/acceptance/gradle-native-model-probe.md).

@@ -1972,3 +1972,7 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 ## 2026-10-06 Gradle生效模型解析契约
 
 新增逐项目插件/目录/任务实现类/启用状态模型和严格Rust解析器，不按同名任务猜测OWASP能力；拒绝重复、越界、缺父项目、未知协议和未覆盖composite build。受控JSON四项测试覆盖官方身份组合与异常输入，详见tests/acceptance/gradle-checker-model.md。尚未原生采集或接入公开命令，不声称真实Gradle扫描或生产资格；6.x/8.x/15.5继续未完成。
+
+## 2026-10-06 Gradle原生模型局部采集应用服务
+
+延续上述解析契约，Rust应用服务以固定init脚本在选定文件私有副本中离线运行已有Gradle，核对源/脚本/Gradle制品树/JDK入口前后身份；实际观察任务继承链、插件及启用状态。默认故障/脱敏/变化/超时及真实Groovy多子项目、Kotlin DSL测试见tests/acceptance/gradle-native-model-probe.md。公开命令尚未接线，选定范围/完整JDK/原生漏洞扫描/修复闭环仍未验收，不改变父任务和正式资格。
