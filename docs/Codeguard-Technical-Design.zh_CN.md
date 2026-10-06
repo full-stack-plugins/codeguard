@@ -1988,4 +1988,18 @@ Rust 的详细文档任务现对原生 Clippy `missing_errors_doc`、`missing_pa
 
 Cargo 文档配置现在逐构建根记录五项精确 lint 的清单声明等级，绑定同次摘要；继承、组、源码属性和未声明均保留待核验。`init` 将详情写入项目画像，AGENTS 保留摘要与引用，不自行添加规则或授予详细文档合格。见[声明验收](../tests/acceptance/cargo-documentation-declarations.md)。
 
-Cargo文档配置发现现可将明确选择继承的成员与最近已观察workspace规则关联，保留两份清单身份及原成员配置引用；候选不可读或变化保持发现不完整，最近规则缺失/非法不能借用更远规则。显式workspace引用、完整成员归属与生效覆盖仍待核验，这项候选关联不授予生产资格。
+Cargo文档配置发现现可将明确选择继承的成员与最近已观察workspace规则关联，保留两份清单身份及原成员配置引用；候选不可读或变化保持发现不完整，最近规则缺失/非法不能借用更远规则。项目内便携相对package.workspace引用现只选择声明来源并核验有界遍历及摘要；绝对/非便携引用、完整成员归属与生效覆盖仍待核验，这项候选关联不授予生产资格。
+
+实际显式workspace发现记录（报告片段，配置仍为unknown）：
+
+```json
+{
+  "build_root": "external",
+  "category": "comments",
+  "checker_id": "rust.cargo_clippy",
+  "configuration": "unknown",
+  "configuration_ref": "external/Cargo.toml",
+  "next_action": "候选workspace清单：shared/Cargo.toml；成员继承声明：external/Cargo.toml；成员归属/排除/通配及完整生效范围待原Cargo核验；原清单精确声明：missing_errors_doc=warn；按原Cargo核验工作区继承、源码属性、lint组/priority与目标范围；未声明不等于未启用，不添加规则或修改无关源码，不把空章节或零诊断当详细文档合格",
+  "reason": "cargo_doc_lints_workspace_declared_scope_unverified"
+}
+```

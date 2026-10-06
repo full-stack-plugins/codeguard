@@ -95,11 +95,13 @@
     "tests/acceptance/clippy-documentation-aggregate.md": "99f0b90dafda408b755f414277b55313c453771131038adada6295e572f15cc6",
     "crates/codeguard-cli/tests/check_all_rust_native.rs": "7c108afc9a4bb1524601ce727315b22e771e234e4dd305416f2523baa1a3f7c1",
     "crates/codeguard-adapters/src/cargo_documentation_config.rs": "2544cb061cd0f89cd888b6e5de933c88ad6efd6a160e81c5d5869023bb67e8b6",
-    "crates/codeguard-cli/src/discovery.rs": "7cace1c2d55810d24601a1be2daad55d71ba3b9b84528dcabc32e5106f474283",
-    "crates/codeguard-cli/tests/cargo_doc_config_cli.rs": "ca5013c43756de2a024b64d77a51ada71cb9ef16cd24c850acce21d37d658245",
+    "crates/codeguard-cli/src/discovery.rs": "0da29090f8fc0a9338066a3a87c2527f3ba0b51bb0e67a7b5c02880ed3484f03",
+    "crates/codeguard-cli/tests/cargo_doc_config_cli.rs": "351019222c01bb8873a98a3fbe227643ea1e4ac00e99f5f3736637302acfda54",
     "tests/acceptance/cargo-documentation-declarations.md": "0c112b0a48dcdc90b19f9cee0e5dc774a2154896219fa62dff5b0ce873e31f13",
-    "crates/codeguard-adapters/src/cargo_documentation_workspace.rs": "122786bce4fa7c60ccb7ddd219c3a0025071386724aae888884f983065d736bc",
-    "tests/acceptance/cargo-documentation-workspace.md": "6be1ac870924db90f8d2b9aa6cfa298f4a825ce659f998d2121f4c7b4089b9a4"
+    "crates/codeguard-adapters/src/cargo_documentation_workspace.rs": "0814890f213919c7a111ea520e26ced4110d6afa98b8583e1b99d79027aa6ebd",
+    "tests/acceptance/cargo-documentation-workspace.md": "6be1ac870924db90f8d2b9aa6cfa298f4a825ce659f998d2121f4c7b4089b9a4",
+    "crates/codeguard-adapters/src/cargo_workspace_reference.rs": "95f9ed06ac881ee17a124edca4ae3f6541690ef60aeabd0d1a6ffac0ede1cb02",
+    "tests/acceptance/cargo-documentation-explicit-workspace.md": "69a80fd1779e46228790530792a24168ad348ec5b1fe109f2991fe4e304769ad"
   },
   "languages": [
     {
@@ -396,7 +398,8 @@
                 "crates/codeguard-cli/src/next_command.rs",
                 "crates/codeguard-adapters/src/cargo_documentation_config.rs",
                 "crates/codeguard-cli/src/discovery.rs",
-                "crates/codeguard-adapters/src/cargo_documentation_workspace.rs"
+                "crates/codeguard-adapters/src/cargo_documentation_workspace.rs",
+                "crates/codeguard-adapters/src/cargo_workspace_reference.rs"
               ],
               "evidence_refs": [
                 "tests/acceptance/rustdoc-task-recheck.md",
@@ -406,7 +409,8 @@
                 "crates/codeguard-cli/tests/check_all_rust_native.rs",
                 "crates/codeguard-cli/tests/cargo_doc_config_cli.rs",
                 "tests/acceptance/cargo-documentation-declarations.md",
-                "tests/acceptance/cargo-documentation-workspace.md"
+                "tests/acceptance/cargo-documentation-workspace.md",
+                "tests/acceptance/cargo-documentation-explicit-workspace.md"
               ],
               "blockers": [
                 "rust/cargo: Rustdoc用途/参数/返回/错误/Panics/Safety及目标特性的完整原生规则/合法反例/契约准确性未验收",

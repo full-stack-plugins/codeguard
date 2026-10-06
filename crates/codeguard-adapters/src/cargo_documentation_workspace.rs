@@ -1,9 +1,9 @@
 //! 工作区文档规则的候选来源关联；不计算 Cargo 成员归属或有效 lint 覆盖。
-use crate::{CheckerConfiguration, inspect_cargo_documentation_config};
+use crate::{CargoWorkspaceReference, CheckerConfiguration, inspect_cargo_documentation_config};
 
 /// 关联显式继承成员与一份已绑定摘要的工作区候选清单。
 /// 参数是成员/候选清单字节、成员构建根和两份来源；无 workspace 返回 None 以继续祖先搜索。
-/// 返回配置始终 unknown；显式 package.workspace、非法数据或缺规则均不能推断生效。
+/// 返回配置始终 unknown；显式引用必须匹配目标，非法数据或缺规则均不能推断生效。
 pub fn inspect_cargo_documentation_workspace(
     member: &[u8],
     candidate: &[u8],
@@ -19,15 +19,20 @@ pub fn inspect_cargo_documentation_workspace(
         return Some(rows);
     }
     let parsed_member = parse(member)?;
-    if parsed_member
-        .get("package")
-        .and_then(|p| p.get("workspace"))
-        .is_some()
-    {
-        for row in &mut rows {
-            row.reason = "cargo_doc_lints_explicit_workspace_reference_unresolved".into();
+    match CargoWorkspaceReference::observe(member, source) {
+        Ok(Some(reference)) if reference.manifest != workspace_source => {
+            for row in &mut rows {
+                row.reason = "cargo_doc_lints_explicit_workspace_reference_unresolved".into();
+            }
+            return Some(rows);
         }
-        return Some(rows);
+        Err(_) => {
+            for row in &mut rows {
+                row.reason = "cargo_doc_lints_explicit_workspace_reference_invalid".into();
+            }
+            return Some(rows);
+        }
+        _ => {}
     }
     let Some(parsed) = parse(candidate) else {
         for row in &mut rows {

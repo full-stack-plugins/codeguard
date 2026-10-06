@@ -20,18 +20,31 @@ impl Project {
         Self(root)
     }
     fn observe(&self, manifest: &str) -> Value {
+        self.observe_result(manifest, false)
+    }
+    fn observe_incomplete(&self, manifest: &str) -> Value {
+        self.observe_result(manifest, true)
+    }
+    fn observe_result(&self, manifest: &str, allow_incomplete: bool) -> Value {
         fs::write(self.0.join("Cargo.toml"), manifest).unwrap();
         let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
             .args(["detect", "--format=json"])
             .arg(&self.0)
             .output()
             .unwrap();
-        assert!(
-            out.status.success(),
+        let report: Value = serde_json::from_slice(&out.stdout).unwrap();
+        let expected = if allow_incomplete && report["observation_complete"] == false {
+            Some(3)
+        } else {
+            Some(0)
+        };
+        assert_eq!(
+            out.status.code(),
+            expected,
             "{}",
             String::from_utf8_lossy(&out.stderr)
         );
-        serde_json::from_slice(&out.stdout).unwrap()
+        report
     }
 }
 impl Drop for Project {
@@ -329,13 +342,19 @@ fn nearest_workspace_and_explicit_reference_do_not_borrow_farther_rules() {
         .unwrap();
     assert_eq!(
         c["reason"],
-        "cargo_doc_lints_explicit_workspace_reference_unresolved"
+        "cargo_doc_lints_workspace_declared_scope_unverified"
+    );
+    assert!(
+        c["next_action"]
+            .as_str()
+            .unwrap()
+            .contains("missing_errors_doc=forbid")
     );
     assert!(
         !c["next_action"]
             .as_str()
             .unwrap()
-            .contains("missing_errors_doc=forbid")
+            .contains("missing_errors_doc=allow")
     );
 }
 
@@ -441,5 +460,280 @@ fn native_workspace_documentation_opt_in_matches_cargo() {
     }
     if let Ok(path) = std::env::var("CODEGUARD_CARGO_DOC_WORKSPACE_EVIDENCE") {
         fs::write(path, serde_json::to_vec_pretty(&serde_json::json!({"qualification":"not_granted", "clippy_version": String::from_utf8(version.stdout).unwrap().trim(), "cli_sha256":format!("{:x}", Sha256::digest(fs::read(env!("CARGO_BIN_EXE_codeguard")).unwrap())), "cases": evidence})).unwrap()).unwrap();
+    }
+}
+
+#[test]
+fn explicit_workspace_reference_uses_only_the_declared_source() {
+    let p = Project::new();
+    fs::create_dir_all(p.0.join("external/src")).unwrap();
+    fs::write(p.0.join("external/src/lib.rs"), "pub fn f() {}\n").unwrap();
+    fs::create_dir_all(p.0.join("shared")).unwrap();
+    fs::write(p.0.join("shared/Cargo.toml"), "[workspace]\nmembers=['../external']\n[workspace.lints.clippy]\nmissing_errors_doc='allow'\n").unwrap();
+    fs::write(p.0.join("external/Cargo.toml"), "[package]\nname='external'\nversion='0.1.0'\nworkspace='../shared'\n[lints]\nworkspace=true\n").unwrap();
+    let root = "[workspace]\nmembers=[]\n[workspace.lints.clippy]\nmissing_errors_doc='forbid'\n";
+    let r = p.observe(root);
+    let c = r["checker_configurations"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|c| c["build_root"] == "external" && c["checker_id"] == "rust.cargo_clippy")
+        .unwrap();
+    assert_eq!(c["configuration"], "unknown");
+    assert_eq!(
+        c["reason"],
+        "cargo_doc_lints_workspace_declared_scope_unverified"
+    );
+    assert_eq!(c["configuration_ref"], "external/Cargo.toml");
+    assert!(
+        c["next_action"]
+            .as_str()
+            .unwrap()
+            .contains("shared/Cargo.toml")
+    );
+    assert!(
+        c["next_action"]
+            .as_str()
+            .unwrap()
+            .contains("missing_errors_doc=allow")
+    );
+    assert!(
+        !c["next_action"]
+            .as_str()
+            .unwrap()
+            .contains("missing_errors_doc=forbid")
+    );
+}
+
+#[test]
+fn invalid_missing_or_nonworkspace_explicit_targets_never_fall_back() {
+    let p = Project::new();
+    fs::create_dir_all(p.0.join("external/src")).unwrap();
+    fs::create_dir_all(p.0.join("shared")).unwrap();
+    fs::write(p.0.join("external/src/lib.rs"), "pub fn f() {}\n").unwrap();
+    let root = "[workspace]\nmembers=[]\n[workspace.lints.clippy]\nmissing_errors_doc='forbid'\n";
+    for (reference, target, reason, blocker) in [
+        (
+            "true",
+            "[workspace]\n",
+            "cargo_doc_lints_explicit_workspace_reference_invalid",
+            None,
+        ),
+        (
+            "'../../outside'",
+            "[workspace]\n",
+            "cargo_doc_lints_explicit_workspace_reference_invalid",
+            None,
+        ),
+        (
+            "'../missing'",
+            "[workspace]\n",
+            "cargo_doc_lints_workspace_inheritance_unresolved",
+            Some("missing"),
+        ),
+        (
+            "'../missing/../shared'",
+            "[workspace]\n",
+            "cargo_doc_lints_workspace_inheritance_unresolved",
+            Some("missing"),
+        ),
+        (
+            "'../shared'",
+            "[package]\nname='other'\nversion='0.1.0'\n",
+            "cargo_doc_lints_explicit_workspace_not_defined",
+            None,
+        ),
+        (
+            "'../shared'",
+            "[workspace",
+            "cargo_doc_lints_workspace_manifest_unavailable_or_invalid",
+            None,
+        ),
+    ] {
+        fs::write(p.0.join("shared/Cargo.toml"), target).unwrap();
+        fs::write(p.0.join("external/Cargo.toml"), format!("[package]\nname='external'\nversion='0.1.0'\nworkspace={reference}\n[lints]\nworkspace=true\n")).unwrap();
+        let r = p.observe_incomplete(root);
+        let c = r["checker_configurations"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|c| c["build_root"] == "external" && c["checker_id"] == "rust.cargo_clippy")
+            .unwrap();
+        assert_eq!(c["configuration"], "unknown");
+        assert_eq!(c["reason"], reason, "{r}");
+        assert!(
+            !c["next_action"]
+                .as_str()
+                .unwrap()
+                .contains("missing_errors_doc=forbid")
+        );
+        if let Some(blocker) = blocker {
+            assert_eq!(r["observation_complete"], false);
+            assert!(
+                r["blocked_paths"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .any(|p| p == blocker)
+            );
+        }
+    }
+}
+
+#[cfg(unix)]
+#[test]
+fn explicit_workspace_does_not_follow_a_linked_directory() {
+    let p = Project::new();
+    fs::create_dir_all(p.0.join("external/src")).unwrap();
+    fs::create_dir_all(p.0.join("shared")).unwrap();
+    fs::write(p.0.join("external/src/lib.rs"), "pub fn f() {}\n").unwrap();
+    fs::write(p.0.join("external/Cargo.toml"), "[package]\nname='external'\nversion='0.1.0'\nworkspace='../linked'\n[lints]\nworkspace=true\n").unwrap();
+    fs::write(
+        p.0.join("shared/Cargo.toml"),
+        "[workspace]\n[workspace.lints.clippy]\nmissing_errors_doc='allow'\n",
+    )
+    .unwrap();
+    std::os::unix::fs::symlink(p.0.join("shared"), p.0.join("linked")).unwrap();
+    let r = p
+        .observe_incomplete("[workspace]\n[workspace.lints.clippy]\nmissing_errors_doc='forbid'\n");
+    assert_eq!(r["observation_complete"], false);
+    assert!(
+        r["blocked_paths"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|p| p == "linked")
+    );
+    let c = r["checker_configurations"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|c| c["build_root"] == "external" && c["checker_id"] == "rust.cargo_clippy")
+        .unwrap();
+    assert_eq!(c["configuration"], "unknown");
+    assert!(
+        !c["next_action"]
+            .as_str()
+            .unwrap()
+            .contains("missing_errors_doc=allow")
+    );
+    assert!(
+        !c["next_action"]
+            .as_str()
+            .unwrap()
+            .contains("missing_errors_doc=forbid")
+    );
+}
+
+#[test]
+#[ignore = "requires explicit existing Cargo/Clippy; no installation"]
+fn native_explicit_workspace_reference_matches_cargo() {
+    let tool = std::env::var("CODEGUARD_TEST_CARGO").expect("select existing Cargo");
+    let p = Project::new();
+    fs::create_dir_all(p.0.join("external/src")).unwrap();
+    fs::create_dir_all(p.0.join("external/skip")).unwrap();
+    fs::create_dir_all(p.0.join("shared")).unwrap();
+    let source = "/// 返回固定错误。\npub fn failure() -> Result<(), &'static str> { Err(\"unavailable\") }\n";
+    fs::write(p.0.join("external/src/lib.rs"), source).unwrap();
+    fs::write(
+        p.0.join("shared/Cargo.lock"),
+        "version = 4\n[[package]]\nname=\"external\"\nversion=\"0.1.0\"\n",
+    )
+    .unwrap();
+    let version = Command::new(&tool)
+        .args(["clippy", "--version"])
+        .env("RUSTUP_AUTO_INSTALL", "0")
+        .output()
+        .unwrap();
+    assert!(version.status.success());
+    let mut evidence = Vec::new();
+    for level in ["warn", "allow"] {
+        fs::write(p.0.join("shared/Cargo.toml"), format!("[workspace]\nmembers=['../external']\nresolver='2'\n[workspace.lints.clippy]\nmissing_errors_doc='{level}'\n")).unwrap();
+        for reference in ["../shared", ".././shared/", "./skip/../../shared"] {
+            let member_manifest = format!(
+                "[package]\nname='external'\nversion='0.1.0'\nedition='2021'\nworkspace='{reference}'\n[lints]\nworkspace=true\n"
+            );
+            fs::write(p.0.join("external/Cargo.toml"), &member_manifest).unwrap();
+            let discovery = p.observe(
+                "[workspace]\nmembers=[]\n[workspace.lints.clippy]\nmissing_errors_doc='forbid'\n",
+            );
+            let row = discovery["checker_configurations"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|c| c["build_root"] == "external" && c["checker_id"] == "rust.cargo_clippy")
+                .unwrap();
+            assert_eq!(row["configuration"], "unknown");
+            assert_eq!(
+                row["reason"],
+                "cargo_doc_lints_workspace_declared_scope_unverified"
+            );
+            assert!(
+                row["next_action"]
+                    .as_str()
+                    .unwrap()
+                    .contains("shared/Cargo.toml")
+            );
+            assert!(
+                row["next_action"]
+                    .as_str()
+                    .unwrap()
+                    .contains(&format!("missing_errors_doc={level}"))
+            );
+            assert!(
+                !row["next_action"]
+                    .as_str()
+                    .unwrap()
+                    .contains("missing_errors_doc=forbid")
+            );
+            let out = Command::new(&tool)
+                .args([
+                    "clippy",
+                    "--offline",
+                    "--locked",
+                    "--message-format=json",
+                    "--manifest-path",
+                ])
+                .arg(p.0.join("external/Cargo.toml"))
+                .arg("--target-dir")
+                .arg(p.0.join(".native-target"))
+                .env("RUSTUP_AUTO_INSTALL", "0")
+                .env("CARGO_NET_OFFLINE", "true")
+                .output()
+                .unwrap();
+            assert!(
+                out.status.success(),
+                "{}",
+                String::from_utf8_lossy(&out.stderr)
+            );
+            let events: Vec<Value> = String::from_utf8(out.stdout)
+                .unwrap()
+                .lines()
+                .map(|l| serde_json::from_str(l).unwrap())
+                .collect();
+            assert_eq!(events.last().unwrap()["reason"], "build-finished");
+            assert_eq!(events.last().unwrap()["success"], true);
+            let findings: Vec<&Value> = events
+                .iter()
+                .filter(|e| {
+                    e["reason"] == "compiler-message"
+                        && e["message"]["code"]["code"] == "clippy::missing_errors_doc"
+                })
+                .collect();
+            assert_eq!(findings.len(), usize::from(level == "warn"));
+            assert!(findings.iter().all(|f| f["message"]["level"] == "warning"));
+            assert_eq!(
+                fs::read_to_string(p.0.join("external/src/lib.rs")).unwrap(),
+                source
+            );
+            assert_eq!(
+                fs::read_to_string(p.0.join("external/Cargo.toml")).unwrap(),
+                member_manifest
+            );
+            evidence.push(serde_json::json!({"level": level, "reference":reference, "discovery":discovery,"original_cargo_events":events}));
+        }
+    }
+    if let Ok(path) = std::env::var("CODEGUARD_CARGO_DOC_EXPLICIT_WORKSPACE_EVIDENCE") {
+        fs::write(path, serde_json::to_vec_pretty(&serde_json::json!({"qualification":"not_granted", "clippy_version":String::from_utf8(version.stdout).unwrap().trim(), "cli_sha256":format!("{:x}", Sha256::digest(fs::read(env!("CARGO_BIN_EXE_codeguard")).unwrap())), "cases":evidence})).unwrap()).unwrap();
     }
 }

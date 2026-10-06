@@ -2542,3 +2542,7 @@ Java验收分类器先检查truncated_files，隐藏恢复不计作干净。现�
 2026-10-07 Cargo workspace文档候选来源：公开继承RED后GREEN，默认/WASM六目标各104通过/6条件忽略；精确lib祖先身份/I/O/链接/未观察清单/64级预算单元各1通过，真实已有Clippyworkspace oracle各1通过（共8次原Cargo运行）。四份实际discovery报告/474旧schema原字节保持验证通过，证据和失败记录见tests/acceptance/cargo-documentation-workspace.md。配置仍unknown，未证明完整归属/覆盖/详细内容/可信关闭，66/288与0/32不变。上一提交0b593ce的CI37511631874仍在固定插件审计来源checkout失败，不能把跳过的测试视为通过；不更改该门禁。
 
 定向Rustfmt、分层、OpenSpec strict及双配置全工作区全目标Clippy -D warnings验证；Clippy首次要求将返回None的let-else写为问号，按原义修正后两配置通过，未禁用规则。适配器根包继承/非法workspace等级与旧畸形边界两单元通过；本批不签发生产资格。
+
+2026-10-07 Cargo显式workspace候选来源：公开非祖先引用先RED后GREEN，默认/WASM六相关目标各107通过/7条件忽略；三个发现端口边界单元各3通过，适配器Cargo3通过。已有Clippy显式oracle两配置各1通过，三路径×warn/allow共12原Cargo运行、12实际discovery报告/474历史schema原字节保持。缺目录/链接测试按现有partial exit3核验，未改CLI退出协议；实际报告片段同步中英文技术设计。完整成员/生效覆盖/详细内容/可信关闭及平台/宿主/发布仍未验收，66/288与0/32不变。上一提交6bd3b71的CI37513221175仍在固定审计来源checkout失败，插件远端main仍f09c074e，不绕过门禁。
+
+本批默认/WASM全工作区全目标Clippy -D warnings、定向格式、分层/OpenSpec strict通过；生产计划关联90份源码/证据指纹，保持全部生产义务和未验收状态。用户Erlang草稿不编辑/暂存/执行。

@@ -381,6 +381,59 @@ fn inspect_cargo_documentation_context<P: ObservationPort>(
     let Some(member) = bytes else {
         return (original, None);
     };
+    match codeguard_adapters::CargoWorkspaceReference::observe(member, manifest) {
+        Err(reason) => {
+            let mut rows = original;
+            for row in &mut rows {
+                row.reason = "cargo_doc_lints_explicit_workspace_reference_invalid".into();
+                row.next_action = format!(
+                    "显式workspace引用未解析：{reason}；核验原成员清单，不回退祖先规则、不修改无关源码"
+                );
+            }
+            return (rows, None);
+        }
+        Ok(Some(reference)) => {
+            for directory in &reference.traversal_directories {
+                if !matches!(
+                    observation.classify(&root.join(directory)),
+                    Ok(ObservedPathKind::Directory)
+                ) {
+                    return (original, Some(directory.clone()));
+                }
+            }
+            let name = &reference.manifest;
+            if !hashes.contains_key(name)
+                || !matches!(
+                    observation.classify(&root.join(name)),
+                    Ok(ObservedPathKind::File)
+                )
+            {
+                return (original, Some(name.clone()));
+            }
+            let Ok(candidate) = observation.read_bounded(&root.join(name), MAX_MANIFEST_BYTES)
+            else {
+                return (original, Some(name.clone()));
+            };
+            if hashes.get(name) != Some(&format!("{:x}", Sha256::digest(&candidate))) {
+                return (original, Some(name.clone()));
+            }
+            let rows = codeguard_adapters::inspect_cargo_documentation_workspace(
+                member, &candidate, build_root, manifest, name,
+            )
+            .unwrap_or_else(|| {
+                let mut rows = original;
+                for row in &mut rows {
+                    row.reason = "cargo_doc_lints_explicit_workspace_not_defined".into();
+                    row.next_action = format!(
+                        "显式候选清单{name}未声明workspace；核验原package.workspace，不回退祖先规则"
+                    );
+                }
+                rows
+            });
+            return (rows, None);
+        }
+        Ok(None) => {}
+    }
     let mut parent = Path::new(manifest).parent();
     for _ in 0..64 {
         let Some(directory) = parent else {
@@ -876,6 +929,111 @@ mod tests {
         );
         assert_eq!(blocked, Some(name));
         assert!(!rows[1].next_action.contains("missing_errors_doc=warn"));
+    }
+
+    struct ExplicitWorkspaceObservation {
+        directory_kind: ObservedPathKind,
+        file_kind: ObservedPathKind,
+        bytes: Result<Vec<u8>, io::ErrorKind>,
+    }
+    impl ObservationPort for ExplicitWorkspaceObservation {
+        fn classify(&self, path: &Path) -> io::Result<ObservedPathKind> {
+            match path.to_str() {
+                Some("project/." | "project/external") => Ok(ObservedPathKind::Directory),
+                Some("project/shared") => Ok(self.directory_kind),
+                Some("project/shared/Cargo.toml") => Ok(self.file_kind),
+                _ => Err(io::Error::from(io::ErrorKind::NotFound)),
+            }
+        }
+        fn children(&self, _path: &Path) -> io::Result<Vec<PathBuf>> {
+            Ok(Vec::new())
+        }
+        fn read_bounded(&self, _path: &Path, _limit: u64) -> io::Result<Vec<u8>> {
+            self.bytes.clone().map_err(io::Error::from)
+        }
+    }
+
+    #[test]
+    fn explicit_cargo_workspace_identity_io_and_links_cannot_borrow_ancestor_rules() {
+        let member = b"[package]\nname='external'\nversion='0.1.0'\nworkspace='../shared'\n[lints]\nworkspace=true\n";
+        let workspace = b"[workspace]\nmembers=['../external']\n[workspace.lints.clippy]\nmissing_errors_doc='warn'\n";
+        let mut hashes = BTreeMap::from([
+            (
+                "external/Cargo.toml".into(),
+                format!("{:x}", Sha256::digest(member)),
+            ),
+            (
+                "shared/Cargo.toml".into(),
+                format!("{:x}", Sha256::digest(workspace)),
+            ),
+        ]);
+        for (directory_kind, file_kind, bytes, blocked) in [
+            (
+                ObservedPathKind::Directory,
+                ObservedPathKind::File,
+                Ok(workspace.to_vec()),
+                None,
+            ),
+            (
+                ObservedPathKind::Directory,
+                ObservedPathKind::File,
+                Ok(b"[workspace]\n".to_vec()),
+                Some("shared/Cargo.toml"),
+            ),
+            (
+                ObservedPathKind::Directory,
+                ObservedPathKind::File,
+                Err(io::ErrorKind::PermissionDenied),
+                Some("shared/Cargo.toml"),
+            ),
+            (
+                ObservedPathKind::Symlink,
+                ObservedPathKind::File,
+                Ok(workspace.to_vec()),
+                Some("shared"),
+            ),
+            (
+                ObservedPathKind::Directory,
+                ObservedPathKind::Symlink,
+                Ok(workspace.to_vec()),
+                Some("shared/Cargo.toml"),
+            ),
+        ] {
+            let port = ExplicitWorkspaceObservation {
+                directory_kind,
+                file_kind,
+                bytes,
+            };
+            let (rows, actual) = super::inspect_cargo_documentation_context(
+                Some(member),
+                "external",
+                "external/Cargo.toml",
+                Path::new("project"),
+                &hashes,
+                &port,
+            );
+            assert_eq!(actual.as_deref(), blocked);
+            assert!(rows.iter().all(|r| r.configuration == "unknown"));
+            assert_eq!(
+                rows[1].next_action.contains("missing_errors_doc=warn"),
+                blocked.is_none()
+            );
+        }
+        hashes.remove("shared/Cargo.toml");
+        let port = ExplicitWorkspaceObservation {
+            directory_kind: ObservedPathKind::Directory,
+            file_kind: ObservedPathKind::File,
+            bytes: Ok(workspace.to_vec()),
+        };
+        let (_, blocked) = super::inspect_cargo_documentation_context(
+            Some(member),
+            "external",
+            "external/Cargo.toml",
+            Path::new("project"),
+            &hashes,
+            &port,
+        );
+        assert_eq!(blocked.as_deref(), Some("shared/Cargo.toml"));
     }
 
     struct ChangingCargoObservation(std::cell::Cell<usize>);

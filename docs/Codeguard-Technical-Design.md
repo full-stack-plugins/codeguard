@@ -1987,4 +1987,18 @@ Native Clippy documentation findings now receive specific Errors/Panics/Safety r
 
 Cargo documentation discovery now records manifest levels for five exact native lints per build root, bound to the observed manifest digest. Inheritance, groups, source attributes and absent declarations remain unresolved. Initialization stores details in the profile and retains AGENTS summaries/references; it does not add rules or qualify detailed documentation. See [declaration acceptance](../tests/acceptance/cargo-documentation-declarations.md).
 
-Cargo documentation discovery now associates an opted-in member with its nearest observed workspace lint declarations, retaining both manifest identities and the original member configuration reference. Unreadable or changed candidates are incomplete; nearer invalid/missing rules are not replaced with farther rules. Explicit workspace references and full membership/effective coverage remain unresolved. This candidate association grants no production qualification.
+Cargo documentation discovery now associates an opted-in member with its nearest observed workspace lint declarations, retaining both manifest identities and the original member configuration reference. Unreadable or changed candidates are incomplete; nearer invalid/missing rules are not replaced with farther rules. Project-local portable relative package.workspace references now select only their declared source, with bounded traversal and digest checks; absolute/nonportable references and full membership/effective coverage remain unresolved. This candidate association grants no production qualification.
+
+An actual explicit-workspace discovery row (a report fragment, with configuration still unknown):
+
+```json
+{
+  "build_root": "external",
+  "category": "comments",
+  "checker_id": "rust.cargo_clippy",
+  "configuration": "unknown",
+  "configuration_ref": "external/Cargo.toml",
+  "next_action": "候选workspace清单：shared/Cargo.toml；成员继承声明：external/Cargo.toml；成员归属/排除/通配及完整生效范围待原Cargo核验；原清单精确声明：missing_errors_doc=warn；按原Cargo核验工作区继承、源码属性、lint组/priority与目标范围；未声明不等于未启用，不添加规则或修改无关源码，不把空章节或零诊断当详细文档合格",
+  "reason": "cargo_doc_lints_workspace_declared_scope_unverified"
+}
+```
