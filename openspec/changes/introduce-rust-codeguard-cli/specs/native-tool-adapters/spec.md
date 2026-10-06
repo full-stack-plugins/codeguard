@@ -1020,3 +1020,15 @@ Model capture, original task execution and report ownership observation SHALL sh
 #### Scenario: A clean combined rescan retains an unverified historical documentation task
 - **WHEN** the current rustdoc and Clippy scans have no diagnostic but the workspace retains an open documentation task
 - **THEN** the documentation next view SHALL retain that original task for verification/review rather than infer task completion from absence; unrelated Clippy convention tasks SHALL remain outside this view
+
+### Requirement: Standalone Python comments SHALL reuse original configured Ruff evidence
+
+`comments python` SHALL expose the existing project Ruff observation through Rust orchestration, preserving original native rule selection, version, config and source bindings, rule settings checks, stable tasks and original-tool verification. It SHALL NOT enable preview, install tools or change project configuration. The public dedicated wrapper SHALL retain the original native conversation protocol and stored scan protocol, classify documentation using the existing D-style and seven precise DOC rules, and select only current/historical open documentation tasks and Ruff preparation tasks. Convention findings SHALL remain in the native report without taking the documentation next action. Zero diagnostics SHALL NOT establish complete enabled documentation policy, detailed semantic correctness or task closure. Missing configuration SHALL remain an environment/preparation observation and SHALL NOT execute a selected checker before configuration discovery.
+
+#### Scenario: A configured Ruff emits documentation and convention findings
+- **WHEN** comments python observes DOC201 and F401 from the same configured native Ruff
+- **THEN** both original findings remain in the native report, only DOC201 enters the documentation candidate list and next view; repeated scanning reuses original task identities and verification invokes original Ruff
+
+#### Scenario: A later scan is clean while a documentation task remains open
+- **WHEN** the native observation has zero documentation findings and a prior documentation task remains open
+- **THEN** the next view retains that task for verification or review and does not substitute an unrelated convention task or claim detailed-contract production qualification

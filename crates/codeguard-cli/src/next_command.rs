@@ -112,13 +112,20 @@ pub(crate) fn read_local_brief_for_checkers(
 }
 
 /// 选择当前或历史开放的 Rust 文档任务；保留准备任务，不借用其它 Clippy 规则。
+#[cfg(unix)]
 pub(crate) fn read_rust_documentation_brief(root: &Path) -> Result<Value, &'static str> {
     build_filtered_view(
         root,
         Some(&["rust.cargo_rustdoc", "rust.cargo_clippy"]),
         None,
-        true,
+        Some("rust"),
     )
+}
+
+/// 选择当前或历史开放的 Python 文档任务；复用原 Ruff 原生规则分类和准备任务。
+#[cfg(unix)]
+pub(crate) fn read_python_documentation_brief(root: &Path) -> Result<Value, &'static str> {
+    build_filtered_view(root, Some(&["python.ruff"]), None, Some("python"))
 }
 
 /// 从本轮已同步的任务身份读取下一步；返回既有 next 协议，不扩大到其它历史任务。
@@ -197,14 +204,14 @@ fn build_view(
     checker_ids: Option<&[&str]>,
     task_ids: Option<&std::collections::BTreeSet<String>>,
 ) -> Result<Value, &'static str> {
-    build_filtered_view(root, checker_ids, task_ids, false)
+    build_filtered_view(root, checker_ids, task_ids, None)
 }
 
 fn build_filtered_view(
     root: &Path,
     checker_ids: Option<&[&str]>,
     task_ids: Option<&std::collections::BTreeSet<String>>,
-    rust_documentation_only: bool,
+    documentation_language: Option<&str>,
 ) -> Result<Value, &'static str> {
     let baseline = read_workspace_baseline(root).map_err(|reason| {
         if reason == "legacy_workspace_requires_manual_migration" {
@@ -287,17 +294,25 @@ fn build_filtered_view(
                 .iter()
                 .any(|checker| candidate.brief["checker_id"] == *checker)
         }) && task_ids.is_none_or(|ids| ids.contains(&candidate.id))
-            && (!rust_documentation_only
-                || candidate.brief["kind"] == "blocker"
-                || candidate.brief["checker_id"] == "rust.cargo_rustdoc"
-                || matches!(
-                    candidate.brief["native_rule_id"].as_str(),
-                    Some(
-                        "clippy::missing_errors_doc"
-                            | "clippy::missing_panics_doc"
-                            | "clippy::missing_safety_doc"
-                    )
-                ))
+            && match documentation_language {
+                None => true,
+                Some(_) if candidate.brief["kind"] == "blocker" => true,
+                Some("rust") => {
+                    candidate.brief["checker_id"] == "rust.cargo_rustdoc"
+                        || matches!(
+                            candidate.brief["native_rule_id"].as_str(),
+                            Some(
+                                "clippy::missing_errors_doc"
+                                    | "clippy::missing_panics_doc"
+                                    | "clippy::missing_safety_doc"
+                            )
+                        )
+                }
+                Some("python") => candidate.brief["native_rule_id"]
+                    .as_str()
+                    .is_some_and(codeguard_adapters::is_ruff_documentation_rule),
+                Some(_) => false,
+            }
         {
             candidates.push(candidate);
         }

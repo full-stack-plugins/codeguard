@@ -1,0 +1,358 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:python-comments-feedback:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "language",
+    "command_status",
+    "exit_code",
+    "authority",
+    "coverage_proven",
+    "delivery_decision",
+    "local_scan_complete",
+    "reason",
+    "execution_budget",
+    "native_report",
+    "documentation_findings",
+    "next",
+    "documentation_rule_coverage",
+    "detailed_contract_qualification",
+    "next_actions"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "report_type": {
+      "const": "python_comments_feedback"
+    },
+    "operation": {
+      "const": "comments"
+    },
+    "language": {
+      "const": "python"
+    },
+    "command_status": {
+      "enum": [
+        "incomplete",
+        "cancelled"
+      ]
+    },
+    "exit_code": {
+      "enum": [
+        3,
+        130
+      ]
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "local_scan_complete": {
+      "type": "boolean"
+    },
+    "reason": {
+      "enum": [
+        "project_root_unavailable",
+        "language_registry_invalid",
+        "native_documentation_coverage_unverified"
+      ]
+    },
+    "execution_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timeout_ms",
+        "source",
+        "enforcement"
+      ],
+      "properties": {
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 86400000
+        },
+        "source": {
+          "enum": [
+            "cli",
+            "registered_environment",
+            "project_default",
+            "builtin_default"
+          ]
+        },
+        "enforcement": {
+          "const": "native_execution_only"
+        }
+      }
+    },
+    "native_report": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "python-lint-feedback-v0.12.schema.json"
+        }
+      ]
+    },
+    "documentation_findings": {
+      "type": "array",
+      "maxItems": 100000,
+      "items": {
+        "type": "object",
+        "required": [
+          "rule_id",
+          "path",
+          "line",
+          "column",
+          "rule_summary",
+          "finding_id",
+          "codeguard_rule_id",
+          "finding_fingerprint",
+          "next_action",
+          "rulepack_sha256",
+          "rulepack_status",
+          "repair_hint"
+        ],
+        "properties": {
+          "rule_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^D[0-9]{3}$"
+              },
+              {
+                "enum": [
+                  "DOC102",
+                  "DOC201",
+                  "DOC202",
+                  "DOC402",
+                  "DOC403",
+                  "DOC501",
+                  "DOC502"
+                ]
+              }
+            ]
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "line": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "column": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "rule_summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "finding_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^CG-[0-9a-f]{32}$"
+          },
+          "codeguard_rule_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "finding_fingerprint": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "next_action": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rulepack_sha256": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "rulepack_status": {
+            "type": "string",
+            "minLength": 1
+          },
+          "repair_hint": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "status",
+                  "step"
+                ],
+                "properties": {
+                  "status": {
+                    "const": "verification_required"
+                  },
+                  "step": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "status",
+                  "allowed_path",
+                  "source_sha256",
+                  "step",
+                  "closure_condition"
+                ],
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "bounded_repair_candidate",
+                      "investigation_required"
+                    ]
+                  },
+                  "allowed_path": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "source_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "step": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "closure_condition": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "next": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "python-lint-feedback-v0.12.schema.json#/$defs/next"
+        }
+      ]
+    },
+    "documentation_rule_coverage": {
+      "const": "unverified"
+    },
+    "detailed_contract_qualification": {
+      "const": "not_granted"
+    },
+    "next_actions": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 1024
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "local_scan_complete": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "native_report": {
+            "type": "object",
+            "required": [
+              "local_scan_complete"
+            ],
+            "properties": {
+              "local_scan_complete": {
+                "const": true
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "native_report": {
+            "type": "null"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "local_scan_complete": {
+            "const": false
+          },
+          "documentation_findings": {
+            "const": []
+          },
+          "next": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "exit_code": {
+            "const": 130
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "command_status": {
+            "const": "cancelled"
+          },
+          "local_scan_complete": {
+            "const": false
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "command_status": {
+            "const": "incomplete"
+          }
+        }
+      }
+    }
+  ]
+}

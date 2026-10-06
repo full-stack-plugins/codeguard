@@ -2002,3 +2002,10 @@ An actual explicit-workspace discovery row (a report fragment, with configuratio
   "reason": "cargo_doc_lints_workspace_declared_scope_unverified"
 }
 ```
+
+
+### Partial standalone Python documentation entry
+
+`codeguard comments python . --ruff-tool /absolute/path/to/ruff --format=json` reuses project-configured native Ruff and returns `python_comments_feedback` 0.1. `native_report` retains the complete sanitized 0.12 native conversation report. Top-level `documentation_findings` selects existing D### observations and seven explicitly mapped DOC rules; top-level `next` retains current and historical documentation tasks and preparation blockers. Other convention findings remain in the native child report. Zero diagnostics do not qualify detailed comments: documentation rule coverage stays `unverified`, detailed contract qualification stays `not_granted`, and the overall exit is 3. Missing configuration creates preparation work. It does not enable preview, modify configuration or substitute WASM for documentation checks. Initialized projects reuse stable tasks and original-tool `task verify`; native facts are not closed automatically.
+
+See [standalone entry and actual Ruff acceptance](../tests/acceptance/python-comments-cli.md).
