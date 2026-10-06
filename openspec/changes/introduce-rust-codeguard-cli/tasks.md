@@ -2115,3 +2115,6 @@ CI37503859591终态MSRV通过、gate源码检出失败。确认语料9e4adb1远�
 
 
 7.2 / 15.3 / 15.6 文档配置观察：comments python 0.2复用同轮最终Ruff设置对象，在零诊断时仍逐文件区分文档规则selected/not_selected/unavailable，保留配置、源码、工具、设置身份与忽略边界；多配置根不混淆，原生未完成不沿用旧设置。原0.12/工作台0.9及旧0.1 schema保持，不添加工具调用或改配置。详细契约、精确覆盖、可信关闭/复发和全语言平台验收仍缺，父任务未完成。详见tests/acceptance/python-documentation-configuration.md。
+
+
+7.1 / 15.5 / 15.6 Rust CVE输入补强：共享原调用函数对本地crates/rust集合做有界内容/成员/物理身份快照和复核，改写/增删/物理根替换/恢复原字节禁止局部完整；正常根级db.lock不误判。有效原生候选在后置库失稳时保留，原工作台接受未完成完整性观察，未关闭任务。集合链接或资源超限前置拒绝。真实已有cargo-audit0.22.2离线有/无漏洞锁已观察，来源/时效仍unverified。原0.1及历史schema不变；可信pin/时效、完整依赖图/平台、可信关闭/复发仍缺，父任务不勾选。详见tests/acceptance/cargo-audit-database-stability.md。

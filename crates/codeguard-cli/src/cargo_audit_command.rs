@@ -237,6 +237,20 @@ pub(crate) fn observe_for_check(
             return report;
         }
     };
+    let database_before =
+        match crate::cargo_audit_database_snapshot::CargoAuditDatabaseSnapshot::capture(
+            &database, deadline, cancelled,
+        ) {
+            Ok(snapshot) => snapshot,
+            Err(reason) => {
+                report["reason"] = json!(reason);
+                if reason == "request_cancelled" {
+                    report["command_status"] = json!("cancelled");
+                    report["exit_code"] = json!(130);
+                }
+                return report;
+            }
+        };
     let (Ok(tool_before), Ok(manifest_before), Ok(lock_before)) = (
         read_bounded_regular_file(&tool, 128 * 1024 * 1024),
         read_bounded_regular_file(&root.join("Cargo.toml"), 2 * 1024 * 1024),
@@ -301,6 +315,23 @@ pub(crate) fn observe_for_check(
         report["reason"] = json!("cargo_audit_input_changed");
         return report;
     }
+    let database_status =
+        crate::cargo_audit_database_snapshot::CargoAuditDatabaseSnapshot::capture(
+            &database, deadline, cancelled,
+        )
+        .and_then(|after| {
+            if after == database_before {
+                Ok(())
+            } else {
+                Err("cargo_audit_database_changed")
+            }
+        });
+    if database_status == Err("request_cancelled") {
+        report["reason"] = json!("request_cancelled");
+        report["command_status"] = json!("cancelled");
+        report["exit_code"] = json!(130);
+        return report;
+    }
     let (parsed, exit_contract_valid) = match output.termination {
         Termination::Exited(native_exit) => {
             match parse_cargo_audit_json(&output.stdout, Some(native_exit)) {
@@ -326,8 +357,10 @@ pub(crate) fn observe_for_check(
         report["reason"] = json!(reason);
         return report;
     }
-    report["local_scan_complete"] = json!(exit_contract_valid);
-    report["reason"] = json!(if exit_contract_valid {
+    report["local_scan_complete"] = json!(exit_contract_valid && database_status.is_ok());
+    report["reason"] = json!(if let Err(reason) = database_status {
+        reason
+    } else if exit_contract_valid {
         "database_freshness_unverified"
     } else {
         termination_reason

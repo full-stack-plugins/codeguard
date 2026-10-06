@@ -20,7 +20,8 @@
     "crates/codeguard-adapters/src/gradle_owasp_report_ownership_parser.rs": "11d06f8905022307d99b50e68d1bfd44bd2f2fdd29d85872bef1d40864b83c00",
     "crates/codeguard-adapters/src/ruff_settings.rs": "23736d55ef974a9f0b571d162365c6554001fa5ee3b2b69db6deb4507466af88",
     "crates/codeguard-adapters/tests/ruff_settings_contract.rs": "a34cd88caaf4d1d49688bcbc31d534ba21b5298f5e1a1c9bd59125ceda3e072a",
-    "crates/codeguard-cli/src/cargo_audit_command.rs": "e49b53a19590f9bf2035f4d5902eaea4f3e90d29138b9c06c0a60c4101229970",
+    "crates/codeguard-cli/src/cargo_audit_command.rs": "4d49405d1e69a55ba13046f463663443ef30c1a931451c044bed5b3b8d0c0749",
+    "crates/codeguard-cli/src/cargo_audit_database_snapshot.rs": "c21185f19669ab6a8568c2d00f218251bc1e6cb35a4057c401c4cee69713db8a",
     "crates/codeguard-cli/src/check_command.rs": "3332462348b2d973f0db1a7cd20d5ced5ef23903e9d8760fc715a070e53b5d80",
     "crates/codeguard-cli/src/clang_lint_feedback.rs": "654a0df42626c5ba1ed1db8b3ffb2232f1d1936b27d7cf4217ec54a59789a563",
     "crates/codeguard-cli/src/clang_syntax_probe.rs": "4821ac6a0177d89ba5d2c58b47cc2924cd7a6112f54ba11cec9836ffc2cba657",
@@ -65,7 +66,9 @@
     "crates/codeguard-cli/src/task_verify_command.rs": "3550968173682c00d23209625351912699fb7b845be188a53740abf541841639",
     "crates/codeguard-cli/src/work_sync.rs": "f9eb6a4d19d0cc5558cb930c16c5ad4e3b5ca14827302ccb19378afe308b7130",
     "crates/codeguard-cli/src/work_sync/gradle_cve_report.rs": "1b8478d43a02101112e2ac58ff5d53b9b3300b0dc05ceabd3e981425221ffe92",
+    "crates/codeguard-cli/src/work_sync/rust_cve_report.rs": "a5ed6b941bbf754ad6220095963c8705eab7761feaba0e2406d6511fd185ab86",
     "crates/codeguard-cli/src/zig_lint_command.rs": "5b8ba70c0d613c56f4db7ced0d09e5bcb75468ab8ea35fcfe269626d55549e3f",
+    "crates/codeguard-cli/tests/cargo_audit_cli.rs": "d4bed2e3a55056dc3e6ffe9c896e23376e5577297a0b880b8324b75fc8e65017",
     "crates/codeguard-cli/tests/cargo_doc_config_cli.rs": "351019222c01bb8873a98a3fbe227643ea1e4ac00e99f5f3736637302acfda54",
     "crates/codeguard-cli/tests/check_all_rust_native.rs": "7c108afc9a4bb1524601ce727315b22e771e234e4dd305416f2523baa1a3f7c1",
     "crates/codeguard-cli/tests/python_comments_cli.rs": "7c7ac7a3eca8019a81f196267090ebd4c37f1a9918d621a40ace93dd7221f116",
@@ -79,6 +82,7 @@
     "schemas/rust-comments-feedback-v0.1.schema.json": "90a91bcf9654766eb3c758ba0520d15dc14e299e97a62de2a8b8daa240861963",
     "tests/acceptance/c-family-native-punctuation.md": "4465d86d3afaba9e2a54c3a58e5b5d2df102e670ccc487b1b26d125b704d08b3",
     "tests/acceptance/c-family-native-replay.md": "4785bd96ba17fa12f7958628ac2562301e6a04611b01a5065783d52afb9d6786",
+    "tests/acceptance/cargo-audit-database-stability.md": "41872398f618a48e9ca3c65aab72563df769e2d5e6296ff14a0e2ad4b57dc2e8",
     "tests/acceptance/cargo-audit-native-observation.md": "993d811d66c7e5aa7a4242f93419bc8b16590a2567b97e662f8ffb3d291489f9",
     "tests/acceptance/cargo-documentation-declarations.md": "0c112b0a48dcdc90b19f9cee0e5dc774a2154896219fa62dff5b0ce873e31f13",
     "tests/acceptance/cargo-documentation-explicit-workspace.md": "69a80fd1779e46228790530792a24168ad348ec5b1fe109f2991fe4e304769ad",
@@ -89,6 +93,11 @@
     "tests/acceptance/clippy-documentation-contract.md": "7843e99c75b262710126c0c1b56596a0a004db563603b0575564e86416304060",
     "tests/acceptance/erlang-native-first-workbench.md": "3303eaec7903b193c5794901831b0b89fc0e6b6aae80086d60b0ef8b75b9d4d1",
     "tests/acceptance/eslint-directory-feedback.md": "8aa71fcd3bb1b7b5dde384b14e883cbc8190546e07e86c63d8d936ebfa42a05b",
+    "tests/acceptance/evidence/cargo-audit-database-native-wasm.json": "ff2f1f897badf28581547a0e35128b088d32848f78f2b0fea498cd7ad80bcfeb",
+    "tests/acceptance/evidence/cargo-audit-database-native.json": "ff2f1f897badf28581547a0e35128b088d32848f78f2b0fea498cd7ad80bcfeb",
+    "tests/acceptance/evidence/cargo-audit-database-schema.json": "fecfda2a359b4cb2d83b24d698cbc4a4756ec45d658aa284d2e27d508341fa5a",
+    "tests/acceptance/evidence/cargo-audit-database-stability-wasm.json": "1add956e49168260c1f710377a4b00b78e2bbdf8abd2217df1acbdadd8f00bc7",
+    "tests/acceptance/evidence/cargo-audit-database-stability.json": "866dd02f54689422cd44bb3527c54f00593172e8c00447df2b0e4936b16ae41d",
     "tests/acceptance/evidence/java-native-tool-source-inventory-2026-10-07.json": "b9d8e2bf5f16ccd370a699d9d4b177b1b108c55c85b981b7f9a42eeef7ce6cec",
     "tests/acceptance/evidence/python-comments-native-boundaries-wasm.json": "2bfd032700f6eea01e6d6598aba43bdb69d38f2053c034b6a76367b68afda342",
     "tests/acceptance/evidence/python-comments-native-boundaries.json": "db68fe0759b5f30f20b5291a254646b41536d33f79b094f9275ad6cf1f8142b0",
@@ -521,10 +530,19 @@
               "ecosystem": "cargo",
               "implementation_status": "partial",
               "adapter_refs": [
-                "crates/codeguard-cli/src/cargo_audit_command.rs"
+                "crates/codeguard-cli/src/cargo_audit_command.rs",
+                "crates/codeguard-cli/src/cargo_audit_database_snapshot.rs",
+                "crates/codeguard-cli/src/work_sync/rust_cve_report.rs"
               ],
               "evidence_refs": [
-                "tests/acceptance/cargo-audit-native-observation.md"
+                "tests/acceptance/cargo-audit-native-observation.md",
+                "tests/acceptance/cargo-audit-database-stability.md",
+                "crates/codeguard-cli/tests/cargo_audit_cli.rs",
+                "tests/acceptance/evidence/cargo-audit-database-stability.json",
+                "tests/acceptance/evidence/cargo-audit-database-native.json",
+                "tests/acceptance/evidence/cargo-audit-database-native-wasm.json",
+                "tests/acceptance/evidence/cargo-audit-database-stability-wasm.json",
+                "tests/acceptance/evidence/cargo-audit-database-schema.json"
               ],
               "blockers": [
                 "rust/cargo:实际依赖图/锁、漏洞来源及时效、原生扫描与修复复检未完整验收",

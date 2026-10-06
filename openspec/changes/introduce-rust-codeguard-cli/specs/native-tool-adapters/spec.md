@@ -1044,3 +1044,15 @@ The standalone comments report SHALL distinguish native documentation rules sele
 #### Scenario: A clean native file has only convention rules enabled
 - **WHEN** Ruff completes with only F401 enabled and no diagnostics
 - **THEN** comments SHALL report no selected documentation rules and a concrete configuration action; it SHALL NOT claim detailed documentation compliance or change the project configuration
+
+### Requirement: Rust CVE local completion SHALL require stable advisory database inputs
+
+The Rust caller SHALL capture bounded content and physical path observations for the selected local RustSec crates/rust collections before and after native cargo-audit execution, sharing the operation deadline and cancellation. Changed content, file membership or collection/root identity SHALL prevent local_scan_complete even if the native JSON and exit code are valid. Symlinks, special files, unreadable paths and exhausted resource budgets SHALL remain environment/integrity observations, not source violations. Valid parsed advisory candidates SHALL remain visible with incomplete status when post-execution database stability fails; no trusted source or freshness qualification SHALL be inferred from stability. Routine root-level database lock files and Git housekeeping SHALL NOT be treated as advisory content.
+
+#### Scenario: Native audit rewrites an advisory database entry
+- **WHEN** the selected native process returns a valid advisory but the same-run database snapshot changes
+- **THEN** CodeGuard SHALL retain the candidate with incomplete database integrity, keep the existing local-unverified protocol and refuse local completion
+
+#### Scenario: A selected advisory collection is redirected through a symlink
+- **WHEN** a crates or rust collection path is a symlink
+- **THEN** CodeGuard SHALL report database snapshot unavailability before native execution without interpreting this environment problem as a source vulnerability

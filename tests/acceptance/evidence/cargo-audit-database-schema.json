@@ -1,0 +1,31 @@
+{
+  "schema_meta_valid_count": 477,
+  "valid_report_count": 16,
+  "valid_reports": [
+    "cargo-audit-database-native.json:clean",
+    "cargo-audit-database-native.json:vulnerable",
+    "cargo-audit-database-stability.json:rewrite",
+    "cargo-audit-database-stability.json:remove",
+    "cargo-audit-database-stability.json:add",
+    "cargo-audit-database-stability.json:replace_root",
+    "cargo-audit-database-stability.json:revert_content",
+    "cargo-audit-database-stability.json:lock_housekeeping",
+    "cargo-audit-database-native-wasm.json:clean",
+    "cargo-audit-database-native-wasm.json:vulnerable",
+    "cargo-audit-database-stability-wasm.json:rewrite",
+    "cargo-audit-database-stability-wasm.json:remove",
+    "cargo-audit-database-stability-wasm.json:add",
+    "cargo-audit-database-stability-wasm.json:replace_root",
+    "cargo-audit-database-stability-wasm.json:revert_content",
+    "cargo-audit-database-stability-wasm.json:lock_housekeeping"
+  ],
+  "rejected_variant_count": 4,
+  "rejected_variants": [
+    "coverage_proven",
+    "database_freshness",
+    "delivery_decision",
+    "exit_code"
+  ],
+  "unchanged_historical_schema_count": 477,
+  "qualification": "not_granted"
+}
