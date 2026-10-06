@@ -48,7 +48,8 @@ fn original_structure_recheck_preserves_task_and_rejects_changed_origin() {
         .arg(&source)
         .arg("--clang-tool")
         .arg(&tool)
-        .args(["--standard", "c11"])
+        .args(["--standard", "c11", "--workspace"])
+        .arg(&root)
         .arg("--format=json")
         .output()
         .unwrap();
@@ -59,6 +60,19 @@ fn original_structure_recheck_preserves_task_and_rejects_changed_origin() {
         String::from_utf8_lossy(&scan.stderr)
     );
     let report: Value = serde_json::from_slice(&scan.stdout).unwrap();
+    assert_eq!(report["workspace_binding"], "bound");
+    let unsupported_standard = Command::new(&cli)
+        .args(["comments", "c"])
+        .arg(&source)
+        .arg("--clang-tool")
+        .arg(&tool)
+        .args(["--standard", "c17", "--workspace"])
+        .arg(&root)
+        .arg("--format=json")
+        .output()
+        .unwrap();
+    assert_eq!(unsupported_standard.status.code(), Some(2));
+    assert!(unsupported_standard.stdout.is_empty());
     let brief = &report["structural_next"]["repair_brief"];
     assert!(brief["task_id"].is_string());
     let deadline = || Instant::now() + Duration::from_secs(30);
@@ -120,7 +134,7 @@ fn original_structure_recheck_preserves_task_and_rejects_changed_origin() {
     fs::write(&origin, bytes).unwrap();
     assert!(crate::c_family_structure_task_recheck::run(&root, brief, deadline()).is_err());
     if let Some(path) = std::env::var_os("CODEGUARD_STRUCTURE_RECHECK_EVIDENCE") {
-        let evidence = json!({"evidence_kind":"development_native_structural_recheck","qualification":"not_granted","helper_source_sha256":format!("{:x}",Sha256::digest(include_bytes!("c_family_structure_task_recheck.rs"))),"test_source_sha256":format!("{:x}",Sha256::digest(include_bytes!("c_family_structure_recheck_tests.rs"))),"first":first,"clean":clean,"expired":expired,"syntax_error":syntax_error,"negative_cases":["source_changed_after_observation","forged_structural_rule","different_selected_tool","altered_first_report"]});
+        let evidence = json!({"evidence_kind":"development_native_structural_recheck","qualification":"not_granted","helper_source_sha256":format!("{:x}",Sha256::digest(include_bytes!("c_family_structure_task_recheck.rs"))),"test_source_sha256":format!("{:x}",Sha256::digest(include_bytes!("c_family_structure_recheck_tests.rs"))),"initial_feedback":report,"unsupported_standard_exit_code":2,"first":first,"clean":clean,"expired":expired,"syntax_error":syntax_error,"negative_cases":["source_changed_after_observation","forged_structural_rule","different_selected_tool","altered_first_report"]});
         fs::write(path, serde_json::to_vec_pretty(&evidence).unwrap()).unwrap();
     }
 }

@@ -17,9 +17,9 @@ for path in sorted((root / "schemas").glob("*.schema.json")):
     resource = Resource.from_contents(data)
     for key in [path.name, path.as_uri(), data.get("$id", path.name)]:
         registry = registry.with_resource(key, resource)
-historical = subprocess.check_output(["git", "ls-tree", "-r", "--name-only", "7866920", "schemas"], cwd=root, text=True).splitlines()
+historical = subprocess.check_output(["git", "ls-tree", "-r", "--name-only", "688d6b9", "schemas"], cwd=root, text=True).splitlines()
 for path in historical:
-    assert (root / path).read_bytes() == subprocess.check_output(["git", "show", f"7866920:{path}"], cwd=root), path
+    assert (root / path).read_bytes() == subprocess.check_output(["git", "show", f"688d6b9:{path}"], cwd=root), path
 validate = lambda name, value: Draft202012Validator(schemas[name], registry=registry).validate(value)
 count = 0
 first = None
@@ -48,6 +48,8 @@ for name in ["c-family-structure-recheck-native.json","c-family-structure-rechec
     assert evidence["qualification"]=="not_granted"
     for field, path in [("helper_source_sha256","crates/codeguard-cli/src/c_family_structure_task_recheck.rs"),("test_source_sha256","crates/codeguard-cli/src/c_family_structure_recheck_tests.rs")]:
         assert evidence[field]==hashlib.sha256((root/path).read_bytes()).hexdigest()
+    validate("c-family-comments-feedback-v0.9.schema.json",evidence["initial_feedback"])
+    assert evidence["unsupported_standard_exit_code"]==2
     for field in ["first","clean","expired","syntax_error"]:
         validate("clang-documentation-structure-task-recheck-v0.1.schema.json",evidence[field])
 negative = []
@@ -63,6 +65,6 @@ for forged in negative:
     assert list(Draft202012Validator(schemas["repair-brief-preview-v0.33.schema.json"], registry=registry).iter_errors(forged))
 result = {"evidence_kind": "development_structure_workbench_schema", "qualification": "not_granted",
           "schemas_valid": len(schemas), "historical_schemas_unchanged": len(historical),
-          "feedback_and_brief_pairs_valid": count, "task_show_valid": 4, "structural_packets_valid": 44, "helper_native_reports_valid":8,"task_verifications_valid":16,"negative_cases_rejected": len(negative)}
+          "feedback_and_brief_pairs_valid": count, "task_show_valid": 4, "structural_packets_valid": 44, "helper_native_reports_valid":8,"task_verifications_valid":16,"workspace_feedback_valid":2,"unsupported_standard_argument_cases":2,"negative_cases_rejected": len(negative)}
 (root / "tests/acceptance/evidence/c-family-structure-workbench-schema.json").write_text(json.dumps(result, indent=2) + "\n")
 print(json.dumps(result))
