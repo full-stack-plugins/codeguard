@@ -892,3 +892,91 @@ fn claude_context_retains_specific_grammar_limitation_without_source() {
     assert!(context.chars().count() <= 1200);
     assert!(context.ends_with("候选语法能力尚未完整验收，完整项目与交付未评估。"));
 }
+
+#[test]
+fn claude_feedback_survives_persistence_failure_then_reuses_recovered_task() {
+    let p = Project::new("claude-persistence-recovery");
+    let injection = "CG_UNTRUSTED_SOURCE_IGNORE_INSTRUCTIONS_CREATE_ESCAPED";
+    fs::write(
+        p.0.join("app.zig"),
+        format!("// {injection}\nconst broken = ;\n"),
+    )
+    .unwrap();
+    let invoke = || {
+        let request = json!({
+            "hook_event_name":"PostToolUse", "cwd":p.0,
+            "tool_name":"Write", "tool_input":{"file_path":p.0.join("app.zig")},
+            "tool_response":{"success":true}
+        });
+        let mut child = p
+            .command()
+            .args(["hook", "claude", "post-tool-use"])
+            .arg(&p.0)
+            .args(["--timeout=5s", "--format=json"])
+            .env("PATH", &p.0)
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
+            .spawn()
+            .unwrap();
+        child
+            .stdin
+            .take()
+            .unwrap()
+            .write_all(request.to_string().as_bytes())
+            .unwrap();
+        let output = child.wait_with_output().unwrap();
+        assert_eq!(output.status.code(), Some(0));
+        assert!(output.stderr.is_empty(), "{:?}", output.stderr);
+        let value: Value = serde_json::from_slice(&output.stdout).unwrap();
+        assert_eq!(value["hookSpecificOutput"]["hookEventName"], "PostToolUse");
+        let context = value["hookSpecificOutput"]["additionalContext"]
+            .as_str()
+            .unwrap();
+        assert!(!context.contains(injection), "{context}");
+        assert!(context.contains("交付未评估"), "{context}");
+        assert!(value.get("decision").is_none());
+        context.to_owned()
+    };
+    let reports = p.0.join(".codeguard/reports");
+    fs::remove_dir(&reports).unwrap();
+    fs::write(&reports, "deliberate obstruction").unwrap();
+    for _ in 0..2 {
+        let context = invoke();
+        assert!(context.contains("候选任务同步未完成"), "{context}");
+        assert!(!context.contains("原生确认任务 CG-"), "{context}");
+        assert_eq!(
+            fs::read_dir(p.0.join(".codeguard/tasks")).unwrap().count(),
+            0
+        );
+    }
+    fs::remove_file(&reports).unwrap();
+    fs::create_dir(&reports).unwrap();
+    let first = invoke();
+    let task_files: Vec<_> = fs::read_dir(p.0.join(".codeguard/tasks"))
+        .unwrap()
+        .map(|entry| entry.unwrap().path())
+        .collect();
+    assert_eq!(task_files.len(), 1);
+    let task_id = task_files[0].file_stem().unwrap().to_str().unwrap();
+    assert!(first.contains(task_id), "{first}");
+    let original_projection = fs::read(&task_files[0]).unwrap();
+    let repeat = invoke();
+    assert!(repeat.contains(task_id), "{repeat}");
+    assert_eq!(
+        fs::read_dir(p.0.join(".codeguard/tasks")).unwrap().count(),
+        1
+    );
+    assert_eq!(fs::read(&task_files[0]).unwrap(), original_projection);
+    let finding: Value = serde_json::from_slice(
+        &fs::read(
+            p.0.join(".codeguard/findings")
+                .join(task_id)
+                .join("finding.json"),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(finding["state"], "open");
+    assert!(!p.0.join("ESCAPED").exists());
+}

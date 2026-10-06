@@ -2450,3 +2450,11 @@ ESLint统一入口对JavaScript四种扩展接入原生优先及共享候选扫�
 未授予数据库时效/工具/策略/完整覆盖或任务关闭；未执行Erlang草稿和新全量grammar回放。上一提交994d4af的CI37412101222 MSRV成功、gate因远端缺固定插件提交dec5f9d失败，不能归因为本轮测试或取消来源审计。全部父任务保持开放。
 
 最终默认与WASM全目标Clippy -D warnings、分层、所改Rust文件格式、OpenSpec strict与diff检查通过。新CI须按本轮提交独立验收；完整父任务保持开放。
+
+## 2026-10-06 Claude 协议保存反馈的记录故障与恢复
+
+基于4d51c7d补充协议集成回归：新增目标1 passed / 0 failed / 0 ignored；受影响`claude_hook_cli`与`hook_syntax_tasks`合计30 passed / 0 failed / 1 ignored（与显式目标重叠，不累加）。条件忽略的用例未执行，不计通过。两目标WASM严格Clippy通过，所改测试文件定向rustfmt、分层、OpenSpec strict与diff检查通过。报告目录故障、重复事件、目录恢复、唯一任务及注释不回显均有实际断言，现有任务投影未被重复事件覆盖且finding保持open。未修改产品行为、grammar或发布锁。
+
+[验收说明](../../../tests/acceptance/claude-persistence-recovery-protocol.md)与[日志身份和范围](../../../tests/acceptance/evidence/claude-persistence-recovery-protocol-2026-10-06.json)记录本轮边界。旧实际Claude缓存缺active.json；本轮宿主尝试在init之前置阶段停止，没有启动模型会话、安装或下载。协议回归不替代真实宿主验收，11.17/14.14/14.19及插件2.4保留开放。保护的erlang_native_differential.rs摘要仍为2e3a296072e6a3aa34b561799c18c7d8b621d00f8786301d2612cee8cdab85b6，未纳入本次修改或执行。
+
+远端4d51c7d的CI37413646549终态：msrv成功，gate在Check out corpus evidence source失败，固定插件来源提交尚未进入远端；与此前相同来源阻塞。本轮不重复触发无变化的运行，不改写固定来源以绕过门禁。
