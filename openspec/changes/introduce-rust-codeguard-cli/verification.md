@@ -2516,3 +2516,7 @@ WASM CLI全目标Clippy -D warnings、定向rustfmt、分层、OpenSpec strict�
 ## 2026-10-06 Java差分隐藏恢复与Java21增量对照
 
 Java验收分类器先检查truncated_files，隐藏恢复不计作干净。现有JDK21.0.12.1对原13例release17和新增8例release21实际差分均一致；新增组3TP/5TN/0FP/0FN/0unknown，作者样本independent_holdout=false，与358固定回归不混计。整个Java目标4通过/0失败/0忽略；目标特性Clippy、diff/OpenSpec验证见对应验收与证据。未运行Erlang草稿或完整WASM/358回放，未安装/下载工具，资格和整体目标仍未完成。
+
+## 2026-10-06 公共CLI语言别名路由
+
+初始plan py因未知语言失败，新增共享Rust规范化后九别名只读计划通过，六组公开lint/check/cve/comments/build与原名对照保留相同报告协议/交付状态。仅语言位置归一，grammar/任务/路径/未知拼写保持，注册表九目标均存在。三CLI目标10通过与三单元通过，CLI全目标严格Clippy、分层/OpenSpec strict/diff通过；证据 tests/acceptance/language-alias-cli.md。没有安装/下载/发行，2.1完整政策义务和总体目标未完成。

@@ -342,3 +342,14 @@ npm公开CVE入口 MUST 按CLI、登记环境变量、项目runtime.json、内�
 #### Scenario: A Maven module has unconfirmed P3C configuration
 - **WHEN** check java选择java.maven.p3c的p3c_configuration_not_confirmed准备任务
 - **THEN** 返回0.58聚合协议，接受原Java选择原因码并明确配置策略复核；伪造finding、检查器、原因、修复动作或批准/allow不符合协议
+
+### Requirement: Public language aliases SHALL normalize only explicit language positions
+CLI检查类别/check/plan入口 SHALL 将已登记py/rs/ts/rb/kt/erl/golang/c++/c#分别归一为python/rust/typescript/ruby/kotlin/erlang/go/cpp/csharp，再执行既有参数校验和路由。路径、工具参数、任务身份及grammar探针方言不得重写。未知拼写保留并由原入口拒绝，不猜测JavaScript/TSX/bash等语言或方言映射；别名不增加检查能力或提升planned状态。
+
+#### Scenario: A short language name selects a read-only plan
+- **WHEN** plan lint py请求只读计划
+- **THEN** 返回规范python身份，与plan lint python相同，不运行工具、不写文件
+
+#### Scenario: A path or grammar dialect resembles an alias
+- **WHEN** 源码路径、工具路径或grammar探针的选择出现py/ts等字符串
+- **THEN** 路径和grammar方言保持原值，只有具名公开检查命令的语言位置归一

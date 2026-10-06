@@ -938,3 +938,7 @@ See [acceptance](tests/acceptance/maven-javadoc-task-recheck.md). This increment
 ### Aggregate protocol for P3C configuration preparation
 
 `check_feedback 0.58.0` strictly describes a selected `java.maven.p3c` / `p3c_configuration_not_confirmed` preparation brief while retaining historical schemas. It remains a blocker with the review-project-policy action; missing configuration is not a source violation or an automatically required check. The schema includes the existing Java-selection reason. Actual aggregate output and both embedded briefs validate; forged checker, finding kind, reason, source-repair action, approved authority and delivery allow are rejected. Other P3C findings/tool-blocker branches keep their existing versions; this is not complete P3C protocol acceptance. See [acceptance](tests/acceptance/p3c-preparation-aggregate-schema.md).
+
+## CLI language aliases (source builds)
+
+Public check categories and plan accept py→python, rs→rust, ts→typescript, rb→ruby, kt→kotlin, erl→erlang, golang→go, c++→cpp and c#→csharp. For example, `codeguard plan lint py . --format json` reports the canonical python identity; `codeguard lint py .` uses the existing Ruff entry. Only explicit language positions are normalized; source/tool paths remain unchanged. Grammar probes keep their distinct identities. JavaScript/TSX/bash mappings are not guessed, and unknown spellings retain existing validation. Aliases do not install tools, add capabilities, alter exit codes or promote planned languages.

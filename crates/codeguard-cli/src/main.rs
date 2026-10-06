@@ -14,7 +14,8 @@ fn main() -> ExitCode {
         eprintln!("无法登记 Ctrl-C 取消：{error}");
         return ExitCode::from(4);
     }
-    let args: Vec<String> = std::env::args().skip(1).collect();
+    let mut args: Vec<String> = std::env::args().skip(1).collect();
+    codeguard_cli::language_alias::normalize_arguments(&mut args);
     if let Some(selection) = codeguard_cli::help_command::trailing_selection(&args) {
         return codeguard_cli::help_command::run(&selection);
     }
