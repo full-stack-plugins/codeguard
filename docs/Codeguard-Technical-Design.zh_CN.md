@@ -1646,3 +1646,6 @@ JavaScript 兜底须区分同范围确认任务确实不存在与历史无法核
 明确C11/C++17请求可用 `--clang-tool ABS_PATH --standard c11|c++17` 选择已实测Apple Clang21。Rust冻结源码字节，以stdin和私有cwd执行，清空继承环境、禁止默认配置和include搜索，调用 `-fsyntax-only`。SARIF必须匹配固定driver、同stdin制品及Unicode码点列，全部诊断核验后只投影规则ID和UTF-8字节位置。输入/工具变化、坏报告或执行失败不回退WASM；含预处理内容保留编译模型前置阻塞。本阶段尚未将Clang证据持久同步到任务，不替代clang-tidy或项目lint。
 
 原生警告档案明确启用Wall/Extra/Pedantic；退出0但存在warning仍为diagnostics_observed，保留error/warning等级；note亦核验，但不计作问题。
+
+
+显式Erlang probe新增worker1.6/probe0.7直接函数form终止符候选。根兄弟/token访问有界，截断不把可能续接判作EOF，字面量/注释内容不作为结束标点。候选要求OTP确认，不冒充解析器恢复；项目/Hook/工作台消费者暂保持原协议，待版本化接线，原始parser评测不改。

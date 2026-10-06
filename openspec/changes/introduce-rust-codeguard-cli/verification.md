@@ -2422,3 +2422,7 @@ ESLint统一入口对JavaScript四种扩展接入原生优先及共享候选扫�
 ### C/C++显式原生入口
 
 默认两个目标7通过/1忽略、WASM四目标21通过/1忽略，解析器契约1通过；另显式真实Clang目标1通过（八份反馈）。参数/human问题均真实RED修复；固定driver/input/rule及Unicode字节位置保留，疑似编译上下文不当源码违规。报告0.2及源样例见tests/acceptance/clang-standalone-native.md；不借该限定结果证明完整C/C++ lint、项目模型、任务关闭或真实宿主完成。
+
+### Erlang 显式函数form终止符候选
+
+24样例公开RED/GREEN：13合法零终止符候选，9种终止符非法各有独立候选、2裸表达式保留原始恢复。runtime6通过、受影响CLI40通过/1条件忽略、显式Erlang目标1通过；24份实际反馈/6矛盾变体/369schema通过。固定WASM字节不改，项目/Hook/任务及全量组合差分未接线，十项raw漏检历史不消账，父任务保持开放。完整证据见tests/acceptance/erlang-form-candidates.md。

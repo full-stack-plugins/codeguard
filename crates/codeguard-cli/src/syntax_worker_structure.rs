@@ -38,6 +38,14 @@ impl SyntaxWorkerStructure {
                     && self.parent_syntax_kind == "program"
                     && self.start_byte < self.end_byte
             }
+            "erlang" => {
+                self.rule_id == "codeguard.erlang.form_terminator"
+                    && self.rule_sha256 == codeguard_adapters::erlang_form_rule_sha256()
+                    && self.parent_syntax_kind == "fun_decl"
+                    && source
+                        .get(self.start_byte..self.end_byte)
+                        .is_some_and(|span| span.is_empty() || span == b";")
+            }
             "python" => {
                 self.rule_id == "codeguard.python.required_suite"
                     && self.rule_sha256 == codeguard_adapters::python_suite_rule_sha256()

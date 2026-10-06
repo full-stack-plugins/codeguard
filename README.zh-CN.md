@@ -821,3 +821,6 @@ JavaScript 回退候选已接入项目检查与确认编辑 Hook：重复顶层�
 独立 `lint <注册表规范语言> FILE` 已接受全部规范语言ID：已有专用原生适配器保留原路径，其余输出 `syntax_lint_feedback`，明确原生适配缺口及配置未知。启用WASM的源码构建追加匹配的有界grammar候选，提供 `--workspace ABS_ROOT` 时复用 `.codeguard/` 原生确认任务。这是局部语法反馈，不代表原生lint全覆盖，也未更新公开npm能力。
 
 C/C++源码构建还支持明确的独立原生上下文：`codeguard lint c main.c --clang-tool /ABS/PATH/clang --standard c11 --format=json`（C++使用 `cpp`/`c++17`）。已实测Apple Clang21档案返回原生规则、字节位置及可复用复检argv；尚未同步Clang原生任务，不替代项目lint，预处理上下文未解析时保持未完成。
+
+
+显式 `grammar probe erlang FILE --format=json` 已补充直接函数form终止符候选，与原始解析恢复分开；字面量标点和合法子句续接不误判。项目/Hook/任务接线及原生精度验收仍开放，见[验收](tests/acceptance/erlang-form-candidates.md)。

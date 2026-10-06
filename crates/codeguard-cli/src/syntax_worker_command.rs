@@ -21,6 +21,9 @@ pub fn run(args: &[String]) -> ExitCode {
         [language, option] if language == "javascript" && option == "--direct-bindings" => {
             (language, true)
         }
+        [language, option] if language == "erlang" && option == "--form-terminators" => {
+            (language, true)
+        }
         _ => {
             eprintln!("语法工作进程参数无效");
             return ExitCode::from(2);
@@ -76,7 +79,7 @@ fn observe(language: &str, source: &[u8], bindings: bool) -> Result<SyntaxWorker
     let scanned = scan_wasm_recoveries(&tree, MAX_RECOVERIES)?;
     let mut structural_observations = Vec::new();
     let mut structural_truncated = false;
-    if bindings {
+    if bindings && language == "javascript" {
         let kinds = codeguard_adapters::javascript_binding_node_kinds()?;
         let scanned_bindings = codeguard_runtime::scan_wasm_sibling_bindings(
             &tree,
@@ -194,6 +197,34 @@ fn observe(language: &str, source: &[u8], bindings: bool) -> Result<SyntaxWorker
             });
         }
     }
+    if bindings && language == "erlang" && tree.root_node().kind() == "source_file" {
+        let (facts, truncated) = codeguard_runtime::scan_wasm_form_terminators(
+            &tree,
+            "fun_decl",
+            MAX_RECOVERIES,
+            200_000,
+        )?;
+        structural_truncated |= truncated;
+        for fact in facts {
+            if scanned.recoveries.len() + structural_observations.len() == MAX_RECOVERIES {
+                structural_truncated = true;
+                break;
+            }
+            structural_observations.push(crate::syntax_worker_structure::SyntaxWorkerStructure {
+                basis: "codeguard_structure_rule".into(),
+                rule_id: "codeguard.erlang.form_terminator".into(),
+                rule_version: "1.0.0".into(),
+                rule_sha256: codeguard_adapters::erlang_form_rule_sha256(),
+                parent_syntax_kind: fact.parent_syntax_kind,
+                start_byte: fact.start_byte,
+                end_byte: fact.end_byte,
+                start_row: fact.start_row,
+                start_column_byte: fact.start_column_byte,
+                end_row: fact.end_row,
+                end_column_byte: fact.end_column_byte,
+            });
+        }
+    }
     let recoveries = scanned
         .recoveries
         .into_iter()
@@ -210,20 +241,23 @@ fn observe(language: &str, source: &[u8], bindings: bool) -> Result<SyntaxWorker
         })
         .collect();
     Ok(SyntaxWorkerEnvelope {
-        schema_version: if bindings && !structural_observations.is_empty() {
-            "1.5.0"
-        } else if scanned.parser_error_location_unavailable {
-            "1.4.0"
-        } else if structural_observations.is_empty() {
-            "1.0.0"
-        } else if language == "cfquery" {
-            "1.3.0"
-        } else if language == "go" {
-            "1.2.0"
-        } else {
-            "1.1.0"
-        }
-        .into(),
+        schema_version:
+            if bindings && language == "erlang" && !structural_observations.is_empty() {
+                "1.6.0"
+            } else if bindings && !structural_observations.is_empty() {
+                "1.5.0"
+            } else if scanned.parser_error_location_unavailable {
+                "1.4.0"
+            } else if structural_observations.is_empty() {
+                "1.0.0"
+            } else if language == "cfquery" {
+                "1.3.0"
+            } else if language == "go" {
+                "1.2.0"
+            } else {
+                "1.1.0"
+            }
+            .into(),
         report_type: "syntax_worker_candidate".into(),
         language: language.into(),
         grammar_sha256: asset.sha256.clone(),

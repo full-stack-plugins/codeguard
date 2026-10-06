@@ -62,6 +62,30 @@ pub fn run_syntax_worker_binding_candidate(
     )
 }
 
+/// 显式观察Erlang直接form终止符；输入为冻结源码、固定语言和共享预算。
+/// 返回仅需原生确认的结构候选，项目级接线须使用相容报告协议。
+pub fn run_syntax_worker_form_candidate(
+    executable: &Path,
+    language: &str,
+    relative_path: &str,
+    source: &[u8],
+    deadline: Instant,
+    cancelled: &AtomicBool,
+) -> Result<SyntaxWorkerCandidateObservation, String> {
+    if language != "erlang" {
+        return Err("syntax_form_language_invalid".into());
+    }
+    run_candidate(
+        executable,
+        language,
+        relative_path,
+        source,
+        deadline,
+        cancelled,
+        true,
+    )
+}
+
 fn run_candidate(
     executable: &Path,
     language: &str,
@@ -81,7 +105,11 @@ fn run_candidate(
     let expected_sha = format!("{:x}", Sha256::digest(source));
     let mut args = vec![OsString::from("__syntax-worker"), OsString::from(language)];
     if bindings {
-        args.push(OsString::from("--direct-bindings"));
+        args.push(OsString::from(if language == "erlang" {
+            "--form-terminators"
+        } else {
+            "--direct-bindings"
+        }));
     }
     let spec = ProcessSpec {
         executable: executable.to_path_buf(),
@@ -107,8 +135,10 @@ fn run_candidate(
     if value["schema_version"] == "1.0.0" && value.get("structural_observations").is_some() {
         return Err("syntax_worker_version_fields_mismatch".into());
     }
-    if !matches!(value["schema_version"].as_str(), Some("1.4.0" | "1.5.0"))
-        && value.get("parser_error_location_unavailable").is_some()
+    if !matches!(
+        value["schema_version"].as_str(),
+        Some("1.4.0" | "1.5.0" | "1.6.0")
+    ) && value.get("parser_error_location_unavailable").is_some()
     {
         return Err("syntax_worker_version_fields_mismatch".into());
     }
@@ -116,7 +146,7 @@ fn run_candidate(
         serde_json::from_value(value).map_err(|_| "syntax_worker_report_invalid")?;
     if !matches!(
         report.schema_version.as_str(),
-        "1.0.0" | "1.1.0" | "1.2.0" | "1.3.0" | "1.4.0" | "1.5.0"
+        "1.0.0" | "1.1.0" | "1.2.0" | "1.3.0" | "1.4.0" | "1.5.0" | "1.6.0"
     ) || (report.schema_version == "1.0.0" && !report.structural_observations.is_empty())
         || (report.schema_version == "1.1.0"
             && (language != "python" || report.structural_observations.is_empty()))
@@ -128,10 +158,15 @@ fn run_candidate(
             && (report.parser_error_location_unavailable != Some(true) || !report.truncated))
         || (report.schema_version == "1.5.0"
             && (!bindings || language != "javascript" || report.structural_observations.is_empty()))
+        || (report.schema_version == "1.6.0"
+            && (!bindings || language != "erlang" || report.structural_observations.is_empty()))
+        || (language == "erlang"
+            && !report.structural_observations.is_empty()
+            && report.schema_version != "1.6.0")
         || (language == "javascript"
             && !report.structural_observations.is_empty()
             && report.schema_version != "1.5.0")
-        || (report.schema_version == "1.5.0"
+        || (matches!(report.schema_version.as_str(), "1.5.0" | "1.6.0")
             && report
                 .parser_error_location_unavailable
                 .is_some_and(|flag| !flag || !report.truncated))

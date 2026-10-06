@@ -229,3 +229,12 @@ mod download_test_server;
 mod wasm_keyword_sequence;
 #[cfg(feature = "wasm-precheck")]
 pub use wasm_keyword_sequence::{WasmKeywordSequence, scan_wasm_keyword_sequence};
+
+#[cfg(feature = "wasm-precheck")]
+mod wasm_form_terminator;
+#[cfg(feature = "wasm-precheck")]
+pub use wasm_form_terminator::WasmFormTerminator;
+#[cfg(feature = "wasm-precheck")]
+mod wasm_form_terminator_scan;
+#[cfg(feature = "wasm-precheck")]
+pub use wasm_form_terminator_scan::scan_wasm_form_terminators;
