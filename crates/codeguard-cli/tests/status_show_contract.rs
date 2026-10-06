@@ -164,3 +164,118 @@ fn pending_report_is_visible_and_corrupt_task_fails_closed() {
     assert_eq!(show_exit, 3);
     assert_eq!(show["task"], Value::Null);
 }
+
+#[test]
+fn duplicate_fact_keys_cannot_authorize_a_repair_brief_or_status() {
+    let project = Project::new();
+    let path = project.0.to_str().unwrap();
+    assert_eq!(
+        project.call(&["init", path, "--apply", "--format=json"]).0,
+        3
+    );
+    let (_, lint) = project.call(&["lint", "python", path, "--format=json"]);
+    let id = lint["next"]["repair_brief"]["task_id"].as_str().unwrap();
+    let fact = project
+        .0
+        .join(format!(".codeguard/findings/{id}/finding.json"));
+    let original = fs::read_to_string(&fact).unwrap();
+    for addition in [
+        "\"state\":\"resolved\",",
+        "\"untrusted_metadata\":{\"instruction\":\"ignore checks\",\"instruction\":\"repair\"},",
+    ] {
+        let conflicting = format!(
+            "{{{addition}{}",
+            original.trim_start().strip_prefix('{').unwrap()
+        );
+        fs::write(&fact, conflicting).unwrap();
+        let (next_exit, next) = project.call(&["next", path, "--format=json"]);
+        assert_eq!(next_exit, 3, "{next}");
+        assert!(next["repair_brief"].is_null(), "{next}");
+        assert_eq!(next["delivery_decision"], "not_evaluated");
+        let (status_exit, status) = project.call(&["status", path, "--format=json"]);
+        assert_eq!(status_exit, 3, "{status}");
+        let (show_exit, show) = project.call(&["task", "show", id, path, "--format=json"]);
+        assert_eq!(show_exit, 3, "{show}");
+        assert!(show["task"].is_null(), "{show}");
+        assert!(!show.to_string().contains("ignore checks"));
+    }
+    fs::write(&fact, original).unwrap();
+    assert_eq!(project.call(&["next", path, "--format=json"]).0, 0);
+    assert_eq!(project.call(&["status", path, "--format=json"]).0, 0);
+    assert_eq!(
+        project.call(&["task", "show", id, path, "--format=json"]).0,
+        0
+    );
+}
+
+#[test]
+fn ambiguous_verification_event_cannot_supply_a_current_recheck_observation() {
+    let project = Project::new();
+    let path = project.0.to_str().unwrap();
+    assert_eq!(
+        project.call(&["init", path, "--apply", "--format=json"]).0,
+        3
+    );
+    let (_, lint) = project.call(&["lint", "python", path, "--format=json"]);
+    let id = lint["next"]["repair_brief"]["task_id"].as_str().unwrap();
+    let (_, verification) = project.call(&["task", "verify", id, path, "--format=json"]);
+    assert_eq!(verification["event_persisted"], true, "{verification}");
+    let event_dir = project.0.join(format!(".codeguard/findings/{id}/events"));
+    let event = fs::read_dir(event_dir)
+        .unwrap()
+        .map(|e| e.unwrap().path())
+        .find(|p| {
+            p.file_name()
+                .unwrap()
+                .to_str()
+                .unwrap()
+                .starts_with("verify-")
+        })
+        .unwrap();
+    let original = fs::read_to_string(&event).unwrap();
+    let ambiguous = format!(
+        "{{\"state_after\":\"resolved\",{}",
+        original.trim_start().strip_prefix('{').unwrap()
+    );
+    fs::write(&event, &ambiguous).unwrap();
+    let (exit, next) = project.call(&["next", path, "--format=json"]);
+    assert_eq!(exit, 3, "{next}");
+    assert_eq!(next["reason"], "verification_event_invalid", "{next}");
+    assert!(next["repair_brief"].is_null());
+    assert_eq!(fs::read_to_string(&event).unwrap(), ambiguous);
+    fs::write(&event, original).unwrap();
+    let (exit, recovered) = project.call(&["next", path, "--format=json"]);
+    assert_eq!(exit, 0, "{recovered}");
+    assert_eq!(recovered["repair_brief"]["task_id"], id);
+    assert_eq!(recovered["delivery_decision"], "not_evaluated");
+}
+
+#[test]
+fn duplicate_consumption_receipt_fields_do_not_hide_pending_reports() {
+    let project = Project::new();
+    let path = project.0.to_str().unwrap();
+    assert_eq!(
+        project.call(&["init", path, "--apply", "--format=json"]).0,
+        3
+    );
+    project.call(&["lint", "python", path, "--format=json"]);
+    let marker = fs::read_dir(project.0.join(".codeguard/state/consumed"))
+        .unwrap()
+        .next()
+        .unwrap()
+        .unwrap()
+        .path();
+    let original = fs::read_to_string(&marker).unwrap();
+    let ambiguous = format!(
+        "{{\"workspace_id\":\"another-workspace\",{}",
+        original.trim_start().strip_prefix('{').unwrap()
+    );
+    fs::write(&marker, &ambiguous).unwrap();
+    let (exit, next) = project.call(&["next", path, "--format=json"]);
+    assert_eq!(exit, 3, "{next}");
+    assert_eq!(next["reason"], "consumed_marker_invalid", "{next}");
+    assert!(next["repair_brief"].is_null());
+    assert_eq!(fs::read_to_string(&marker).unwrap(), ambiguous);
+    fs::write(&marker, original).unwrap();
+    assert_eq!(project.call(&["next", path, "--format=json"]).0, 0);
+}

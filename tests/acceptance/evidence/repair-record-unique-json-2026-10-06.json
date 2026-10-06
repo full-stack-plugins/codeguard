@@ -1,0 +1,35 @@
+{
+  "evidence_type": "repair_record_duplicate_field_rejection",
+  "captured_at": "2026-10-06",
+  "base_commit": "d59e8aeb6b2bc3ae68c4ae60195edd0a44f9b5f0",
+  "changed_sources_sha256": {
+    "crates/codeguard-cli/src/next_command.rs": "cef836bd198337d35d6bff573ed265c84eb74f645c6dd8f263adce915c8ef0a4",
+    "crates/codeguard-cli/tests/status_show_contract.rs": "fa2b5d4e6a98e4653c4a7e5846830f05d612652dda38d8af8862eb3bc0bd6fdf"
+  },
+  "red": {
+    "test": "duplicate_fact_keys_cannot_authorize_a_repair_brief_or_status",
+    "observed_exit": 0,
+    "expected_exit": 3
+  },
+  "default_regression": {
+    "passed": 24,
+    "failed": 0,
+    "ignored": 10
+  },
+  "wasm_regression": {
+    "passed": 42,
+    "failed": 0,
+    "ignored": 10
+  },
+  "counts_overlap_between_builds": true,
+  "logs_sha256": {
+    "cg-fact-duplicate-red.log": "2e93a89935ec6b67ab9c140a4d103980f8929f24c1dca23974ec3733647be499",
+    "cg-fact-duplicate-default-final.log": "07a9b5601aaecbf76c9cbc82acb7862bc142492dfa74a471f3b307d355cfc99c",
+    "cg-fact-duplicate-wasm.log": "2a48b720355fc7cde6ba14203103a1398ed79a23f3618d35970ca9e4d02e4b9e",
+    "cg-fact-duplicate-clippy.log": "e9f3e980c0f09c31a1d0a973916c02e35c41a5fc0516061091061350918d31d1"
+  },
+  "clippy": "wasm_all_targets_passed",
+  "full_workspace_regression": false,
+  "host_acceptance": false,
+  "delivery_decision": "not_evaluated"
+}

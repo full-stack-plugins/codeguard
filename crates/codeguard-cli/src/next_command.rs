@@ -157,7 +157,7 @@ fn read_task_brief_inner(
     if !real_directory(&directory) || !projection_valid {
         return Err("task_record_unavailable");
     }
-    let fact: Value = serde_json::from_slice(&read_bounded(
+    let fact: Value = codeguard_adapters::parse_unique_json(&read_bounded(
         &directory.join("finding.json"),
         MAX_FACT_BYTES,
     )?)
@@ -238,9 +238,11 @@ fn build_view(
         if !safe_id(&id) {
             return Err("finding_id_invalid");
         }
-        let fact: Value =
-            serde_json::from_slice(&read_bounded(&path.join("finding.json"), MAX_FACT_BYTES)?)
-                .map_err(|_| "finding_fact_invalid")?;
+        let fact: Value = codeguard_adapters::parse_unique_json(&read_bounded(
+            &path.join("finding.json"),
+            MAX_FACT_BYTES,
+        )?)
+        .map_err(|_| "finding_fact_invalid")?;
         if fact["id"] != id
             || fact["workspace_id"] != workspace_id
             || fact["state"] != "open"
@@ -1514,7 +1516,7 @@ fn current_correction_refs(
         if format!("{:x}", Sha256::digest(&bytes)) != digest {
             continue;
         }
-        let Ok(event) = serde_json::from_slice::<Value>(&bytes) else {
+        let Ok(event) = codeguard_adapters::parse_unique_json(&bytes) else {
             continue;
         };
         if event["schema_version"] != "0.1.0"
@@ -1626,7 +1628,7 @@ fn latest_verification_observation(
             continue;
         }
         if is_verify {
-            let event: Value = serde_json::from_slice(&read_bounded(&path, 4096)?)
+            let event: Value = codeguard_adapters::parse_unique_json(&read_bounded(&path, 4096)?)
                 .map_err(|_| "verification_event_invalid")?;
             if !matches!(
                 event["schema_version"].as_str(),
@@ -1656,8 +1658,8 @@ fn latest_verification_observation(
                 }
                 Err(reason) => return Err(reason),
             };
-            let report: Value =
-                serde_json::from_slice(&report_bytes).map_err(|_| "verification_event_invalid")?;
+            let report: Value = codeguard_adapters::parse_unique_json(&report_bytes)
+                .map_err(|_| "verification_event_invalid")?;
             if brief["checker_id"] == "node.npm.audit" {
                 codeguard_adapters::parse_unique_json(&report_bytes)
                     .map_err(|_| "verification_event_invalid")?;
@@ -2079,8 +2081,9 @@ fn pending_reports(
                     .join("import-failures")
                     .join(format!("{run_id}-{digest}.json"));
                 if failure.exists() {
-                    let receipt: Value = serde_json::from_slice(&read_bounded(&failure, 4096)?)
-                        .map_err(|_| "import_failure_receipt_invalid")?;
+                    let receipt: Value =
+                        codeguard_adapters::parse_unique_json(&read_bounded(&failure, 4096)?)
+                            .map_err(|_| "import_failure_receipt_invalid")?;
                     if receipt["schema_version"] != "0.1.0"
                         || receipt["record_type"] != "local_import_failure"
                         || receipt["workspace_id"] != workspace_id
@@ -2102,8 +2105,9 @@ fn pending_reports(
                 }
                 continue;
             }
-            let marker: Value = serde_json::from_slice(&read_bounded(&marker, 4096)?)
-                .map_err(|_| "consumed_marker_invalid")?;
+            let marker: Value =
+                codeguard_adapters::parse_unique_json(&read_bounded(&marker, 4096)?)
+                    .map_err(|_| "consumed_marker_invalid")?;
             let bytes = read_bounded(&path, 16 * 1024 * 1024)?;
             if marker["schema_version"] != "0.1.0"
                 || marker["workspace_id"] != workspace_id

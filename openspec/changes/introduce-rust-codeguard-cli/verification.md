@@ -2458,3 +2458,9 @@ ESLint统一入口对JavaScript四种扩展接入原生优先及共享候选扫�
 [验收说明](../../../tests/acceptance/claude-persistence-recovery-protocol.md)与[日志身份和范围](../../../tests/acceptance/evidence/claude-persistence-recovery-protocol-2026-10-06.json)记录本轮边界。旧实际Claude缓存缺active.json；本轮宿主尝试在init之前置阶段停止，没有启动模型会话、安装或下载。协议回归不替代真实宿主验收，11.17/14.14/14.19及插件2.4保留开放。保护的erlang_native_differential.rs摘要仍为2e3a296072e6a3aa34b561799c18c7d8b621d00f8786301d2612cee8cdab85b6，未纳入本次修改或执行。
 
 远端4d51c7d的CI37413646549终态：msrv成功，gate在Check out corpus evidence source失败，固定插件来源提交尚未进入远端；与此前相同来源阻塞。本轮不重复触发无变化的运行，不改写固定来源以绕过门禁。
+
+## 2026-10-06 本地修复事实与收据唯一字段解析
+
+实际RED：加入冲突state后next仍退出0且发布正常简报；新增目标期望3失败。复用现有parse_unique_json后，顶层/嵌套问题事实、实际verify事件和消费收据反例拒绝；合法原件恢复后next/status/show恢复查询，交付未评估。验证事件和收据原件在错误查询后保持不变。next读取的原生报告、导入失败收据、纠错引用同步使用递归唯一字段解析；保留原有大小上限、错误原因和无效纠错过滤行为，不改动批准或关闭政策。
+
+默认status_show/next/task_verify三目标24 passed / 0 failed / 10 ignored；WASM加hook_syntax_tasks四目标42 passed / 0 failed / 10 ignored。两构建重叠不相加，忽略的条件原生用例不计通过。WASM CLI全目标严格Clippy、定向rustfmt、分层、OpenSpec strict和diff检查通过。详见[验收](../../../tests/acceptance/repair-record-unique-json.md)与[证据身份](../../../tests/acceptance/evidence/repair-record-unique-json-2026-10-06.json)。未运行完整工作区、精度、真实宿主或发布验收，不勾选9.x/12.5/12.9父任务。用户Erlang草稿摘要未变，不纳入提交或执行。
