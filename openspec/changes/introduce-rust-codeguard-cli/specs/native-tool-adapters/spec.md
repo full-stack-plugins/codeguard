@@ -751,3 +751,11 @@ Rust npm审计适配 MUST 核对具体原工具版本、auditReportVersion、冻
 - **WHEN** 对C/C++单文件明确提供固定Clang工具及已支持的标准上下文
 - **THEN** Rust runtime以冻结stdin、共同deadline、清空环境及禁止默认配置的固定argv执行原生语法检查，核验版本/制品及同输入SARIF身份。仅返回原生规则与有界UTF-8位置，诊断自由文本不注入对话；不执行源码、不生成对象文件或声称完整lint/build完成
 - **AND** 选定原生失败/报告无效不回退WASM。头文件、宏/预处理上下文未解析时保留环境/上下文阻塞而非源码违规；未知标准、无关工具参数和未配对上下文在执行前拒绝。当前完整配置、规则、工作台持久化及宿主接线仍须分别实现验收
+
+#### Scenario: Project Rust CVE check discovers an existing cargo-audit
+- **WHEN** check all has no explicit cargo-audit override and the caller PATH contains the native tool in an absolute directory
+- **THEN** the Rust CVE task selects that existing entry once without running a shell or installing anything; an explicit or selected-entry failure does not switch to a later tool, and missing/unverified offline database remains an independent blocker. Standalone cve and task verification retain their explicit original-tool arguments and historical report protocols
+
+#### Scenario: Aggregate check selects an existing Clippy repair brief
+- **WHEN** a bound project check selects the existing typed rust.cargo_clippy next brief
+- **THEN** a new aggregate protocol version references its dedicated closed schema; historical aggregate schemas remain unchanged, and actual reports must validate without dropping the sibling task or making next an arbitrary object

@@ -1652,3 +1652,5 @@ JavaScript 兜底须区分同范围确认任务确实不存在与历史无法核
 
 
 Erlang项目/编辑接线使用check0.55、确认0.14及Hook0.28/fast0.16。所选文件优先执行OTP，确实缺工具才补候选，选定工具失败保留原生未完成。原生/环境首次证据及后续结构观察共用任务身份；源码编辑后原报告仍绑定消费marker，首次导入仍核验当前字节坐标。见[工作流验收](../tests/acceptance/erlang-form-workbench.md)。
+
+项目 Rust CVE 工具发现增量：rust.cve 在原任务图中只读选择显式入口或绝对PATH首个存在入口；坏入口不回退，离线数据库仍独立指定，实际工具/锁/清单摘要与原生advisory检查复用旧服务。check_feedback0.56仅在选择既有Clippy简报时使用，引用其专用封闭schema而不修改旧协议；完整数据库、工具锁/版本和宿主信任仍未完成。详见[实际验收](../tests/acceptance/cargo-audit-path-discovery.md)。

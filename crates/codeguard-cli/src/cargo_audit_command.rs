@@ -160,6 +160,32 @@ fn input_identity(path: &Path, limit: u64) -> (&'static str, Value) {
     }
 }
 
+/// 项目检查只读选择已有cargo-audit；显式请求或首个存在入口固定后不尝试其它工具。
+/// 参数为可选显式路径；返回原请求或绝对PATH中的固定入口，不启动、不安装、不推断数据库。
+/// 独立cve与任务复检继续由调用者提供原工具参数。
+pub(crate) fn discover_for_project_check(requested: Option<&Path>) -> Option<PathBuf> {
+    if let Some(path) = requested {
+        return Some(path.to_path_buf());
+    }
+    let path = std::env::var_os("PATH")?;
+    let name = if cfg!(windows) {
+        "cargo-audit.exe"
+    } else {
+        "cargo-audit"
+    };
+    for directory in std::env::split_paths(&path) {
+        if !directory.is_absolute() {
+            continue;
+        }
+        let entry = directory.join(name);
+        match std::fs::symlink_metadata(&entry) {
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
+            _ => return Some(entry.canonicalize().unwrap_or(entry)),
+        }
+    }
+    None
+}
+
 /// 在调用者的统一截止时间和取消标记内取得原生 CVE 观察，不保存或批准任务。
 pub(crate) fn observe_for_check(
     root: &Path,

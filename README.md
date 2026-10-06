@@ -844,3 +844,5 @@ Explicit `grammar probe erlang FILE --format=json` now adds bounded direct-funct
 
 
 Erlang project and edit checks now prefer OTP, use the form-termination candidate when the tool is absent, and update one persistent task. Selected-tool failures never fall back to WASM; task rechecks preserve history and require original native confirmation. [Acceptance](tests/acceptance/erlang-form-workbench.md).
+
+Unreleased source update: the Rust CVE node in `check all` discovers an existing cargo-audit in absolute PATH directories; `--cargo-audit-tool` remains the explicit override. Select an existing offline database with `--rustsec-db /path/to/offline-db`. A selected-entry failure does not switch tools or install anything, and unverified database freshness does not grant a security pass. See [acceptance evidence](tests/acceptance/cargo-audit-path-discovery.md).

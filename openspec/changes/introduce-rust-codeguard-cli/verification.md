@@ -2442,3 +2442,11 @@ ESLint统一入口对JavaScript四种扩展接入原生优先及共享候选扫�
 取消/过期和程序变化不制造通过；pending不参与混淆计数。没有本轮原生oracle或独立holdout，语言资格0/32，普通关闭/宿主/发行及完整父任务仍开放。用户Erlang草稿未执行、未提交。
 
 最终默认与WASM全目标Clippy -D warnings均通过；所改Rust文件格式、分层、OpenSpec strict和diff检查通过。完整358例仅运行新组合入口一次，原始分类来自该轮相同worker，不冒充另一轮独立原生验收。
+
+## 2026-10-06 Rust CVE 原生已有工具发现
+
+安装状态误反馈先RED后修复：项目rust.cve复用原生服务，绝对PATH只读选择，显式及首个损坏入口不回退，不下载工具/数据库；缺数据库独立保留。默认/WASM四目标分别40通过/7条件忽略，实际cargo-audit0.22.2和已有离线库两轮RUSTSEC-2020-0071、同任务open目标显式1通过2.33秒。实际完整报告揭露check0.38未引用专用Clippy简报，新0.56增加该封闭类型，旧schema保留；374元定义、2聚合+2嵌入报告、3种伪造及旧消费者拒绝通过。详见[验收](../../../tests/acceptance/cargo-audit-path-discovery.md)。
+
+未授予数据库时效/工具/策略/完整覆盖或任务关闭；未执行Erlang草稿和新全量grammar回放。上一提交994d4af的CI37412101222 MSRV成功、gate因远端缺固定插件提交dec5f9d失败，不能归因为本轮测试或取消来源审计。全部父任务保持开放。
+
+最终默认与WASM全目标Clippy -D warnings、分层、所改Rust文件格式、OpenSpec strict与diff检查通过。新CI须按本轮提交独立验收；完整父任务保持开放。
