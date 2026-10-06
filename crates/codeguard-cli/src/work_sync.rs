@@ -2192,10 +2192,13 @@ fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
         );
     }
     if blocker.checker_id == "node.eslint.preparation"
-        && blocker.diagnostic_reason.as_deref() == Some("eslint_syntax_confirmation_needed")
+        && matches!(
+            blocker.diagnostic_reason.as_deref(),
+            Some("eslint_syntax_confirmation_needed" | "javascript_direct_binding_candidate")
+        )
     {
         return format!(
-            "# {} TypeScript 语法原生确认任务\n\n- 问题证据：源码范围 `{}` 的候选 WASM 初检尚未验收；脱敏疑似位置、源码及 grammar 摘要在 `.codeguard/reports/{}.json` 的 `syntax_evidence`，报告 SHA-256 `{}`。这些不是已确认源码违规。\n- 规则依据：Tree-sitter 恢复节点只提示疑似语法位置；原生 TypeScript/ESLint 能力和项目原配置仍须确认。\n- 允许范围：核对本源码、对应构建根、原生工具及配置；不得仅凭 WASM 恢复节点修改源码、增加忽略或白名单。\n- 修复步骤：先查看同 run 的脱敏位置，再恢复适用的原生语法检查；若原生反证，保留证据并进入 grammar 误报调查。\n- 复检命令：codeguard lint typescript <原源码> --workspace <原工作区> --node-tool <核验绝对路径> --eslint-entry <核验绝对路径> --eslint-version <核验版本> --config <原配置绝对路径> --cwd <原工作目录绝对路径>。\n- 历史尝试：首次 run `{}`；后续观察、尝试和复检保留在同一任务，首张 Markdown 不是完整历史。\n- 关闭条件：同输入、范围、方言及语法能力的原生复检和正式策略/覆盖核验均满足；安装、WASM 零恢复或任务勾选不能关闭。\n",
+            "# {} JavaScript/TypeScript 语法与结构原生确认任务\n\n- 问题证据：源码范围 `{}` 的候选 WASM 初检尚未验收；脱敏疑似位置、源码及 grammar 摘要在 `.codeguard/reports/{}.json` 中的脱敏语法/结构观察（`observations` 或 `syntax_evidence`），报告 SHA-256 `{}`。这些不是已确认源码违规。\n- 规则依据：Tree-sitter 恢复节点及有界结构规则只提示疑似问题；原生 JavaScript/TypeScript/ESLint 能力和项目原配置仍须确认。\n- 允许范围：核对本源码、对应构建根、原生工具及配置；不得仅凭 WASM 恢复节点修改源码、增加忽略或白名单。\n- 修复步骤：先查看同 run 的脱敏位置，再恢复适用的原生语法检查；若原生反证，保留证据并进入 grammar 误报调查。\n- 复检命令：codeguard lint typescript <原源码> --workspace <原工作区> --node-tool <核验绝对路径> --eslint-entry <核验绝对路径> --eslint-version <核验版本> --config <原配置绝对路径> --cwd <原工作目录绝对路径>。\n- 历史尝试：首次 run `{}`；后续观察、尝试和复检保留在同一任务，首张 Markdown 不是完整历史。\n- 关闭条件：同输入、范围、方言及语法能力的原生复检和正式策略/覆盖核验均满足；安装、WASM 零恢复或任务勾选不能关闭。\n",
             blocker.id, blocker.scope, report.run_id, report.digest, report.run_id
         );
     }
