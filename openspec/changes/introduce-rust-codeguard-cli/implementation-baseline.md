@@ -168,3 +168,6 @@ Maven Javadoc多文件工作台及原任务task verify已接通稳定任务、�
 Java21增量原生差分及隐藏恢复分类已补齐：本轮作者样本不作为独立holdout，32份grammar全部仍是候选，released_count=0。来源与版本证据见 [Java21验收](../../../tests/acceptance/java21-native-differential.md)。公开发行、独立精度、完整语言/项目模型、可信关闭及真实宿主分别验收，完整目标仍未完成。2026-09-28表是历史切片，不用旧“别名未实现”等描述覆盖后续证据。
 
 当前远端提交4445f06的CI37423582241：MSRV成功，gate在Check out corpus evidence source阶段失败，因锁定的插件提交dec5f9d远端不可达，未运行后续门禁；不称为CI通过。不能为消除失败修改语料锁或撤去检查。
+
+
+独立JDK详细文档增量（2026-10-06）：五类原生描述消息由新版解析器进入文件/配置项目观察、稳定任务及原工具复检。当前原生0.2、项目0.4、工作台/复检0.3、comments0.7/0.8、brief0.4、任务预览0.31、check0.68/aborted0.19；旧协议不改写，Maven仍独立。实际两种模式各4/3/1/0诊断、16任务逐项存在及修复后消失仍open。详见 tests/acceptance/jdk-javadoc-detailed-descriptions.md；15.3/15.6父任务、可信关闭和逐语言生产验收不据此完成。

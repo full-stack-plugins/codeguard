@@ -2019,3 +2019,8 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 ### Gradle详细文档描述诊断与公开闭环（2026-10-06）
 
 延续15.3/15.6，原JDK21实测确认empty comment、no main description及空throws说明；适配器和真实公开check入口均RED后补齐原消息映射及位置核验。新增三种原生规则保留到源码稳定任务/原工具task verify；真实四组样例分别4/3/1/0条，中文完整说明和合法继承文档无诊断；修复后零输出仍不关闭。原生/工作台/复检0.2、聚合0.67/异常0.18/修复0.24/任务0.30独立封闭协议，历史0.1和423份旧schema不扩大，拒绝新规则降级伪装。详见tests/acceptance/gradle-javadoc-detailed-descriptions.md。独立JDK/Maven新增规则、Checkstyle描述模块、完整详细行为契约及规则/源集/可信关闭、逐语言生产验收继续待完成，不勾选父任务，不改变0/32资格。
+
+
+### 独立JDK详细文档诊断与公开原任务复检（2026-10-06）
+
+延续15.3/15.6，empty comment原测试RED后增加独立详细解析器，保留旧JDK/Maven解析契约；新原生0.2/项目0.4经工作台0.3进入源码稳定任务，task verify复检0.3/预览0.31、brief0.4、comments0.7/0.8及聚合0.68/异常0.19独立协议。空注释、缺用途及裸参数/返回/异常描述均保留原生规则；未知输出和配置/工具故障不猜测违规。真实已有JDK21显式文件/配置项目两种模式各4/3/1/0诊断，16张原任务逐项存在和修复后零诊断仍open；完整中文与合法继承无诊断。首次schema检查发现旧brief复制Checkstyle运行编号，已纠正新JDK契约；一项聚合版本断言随新JDK观察更新，历史失败保留记录。验收见tests/acceptance/jdk-javadoc-detailed-descriptions.md；Maven新增描述规则、Checkstyle描述模块、全部详细行为契约/源集/平台与可信关闭、逐语言生产验收继续开放，不勾选父任务，不改变0/32资格。

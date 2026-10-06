@@ -852,7 +852,7 @@ pub fn run(args: &[String]) -> ExitCode {
         report["schema_version"] = json!("0.28.0");
     }
     if javadoc_task {
-        report["schema_version"] = json!("0.27.0");
+        report["schema_version"] = json!("0.31.0");
     }
     if shell_task {
         report["schema_version"] = json!("0.24.0");

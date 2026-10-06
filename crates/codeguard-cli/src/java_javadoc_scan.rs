@@ -176,7 +176,7 @@ pub(crate) fn observe_project(
             .sum();
     }
     json!({
-        "schema_version":"0.3.0",
+        "schema_version":if context.maven_tool.is_some() {"0.3.0"} else {"0.4.0"},
         "probe_mode":if context.maven_tool.is_some(){"maven_multifile"}else{"jdk_single_file"},
         "report_type":"java_javadoc_project_probe",
         "checker_id":if context.maven_tool.is_some(){"java.maven.javadoc"}else{"java.jdk.javadoc"},

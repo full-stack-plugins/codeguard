@@ -237,3 +237,14 @@ fn real_jdk21_javadoc_missing_and_documented_examples() {
     );
     fs::remove_dir_all(root).unwrap();
 }
+
+#[test]
+fn detailed_native_warning_is_not_an_unknown_diagnostic() {
+    let fixture = Fixture::new(
+        "#!/bin/sh\nmkdir -p docs\nprintf '<html></html>' > docs/index.html\nprintf '%s:1: warning: empty comment\\npublic class Bad {}\\n       ^\\n1 warning\\n' \"$PWD/src/Bad.java\" >&2\n",
+    );
+    let (_, report) = fixture.run();
+    assert_eq!(report["schema_version"], "0.2.0");
+    assert_eq!(report["local_status"], "findings_observed_untrusted");
+    assert_eq!(report["findings"][0]["rule_id"], "JavadocEmptyComment");
+}
