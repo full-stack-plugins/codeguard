@@ -13,6 +13,25 @@ pub(crate) fn observe(
     source: &[u8],
     deadline: Instant,
 ) -> Value {
+    observe_with_cancellation(
+        tool,
+        language,
+        standard,
+        source,
+        deadline,
+        &AtomicBool::new(false),
+    )
+}
+
+/// 对固定标准源码执行共享取消令牌的原生观察；参数与observe一致，额外令牌贯穿两个进程阶段。
+pub(crate) fn observe_with_cancellation(
+    tool: &Path,
+    language: &str,
+    standard: &str,
+    source: &[u8],
+    deadline: Instant,
+    cancelled: &AtomicBool,
+) -> Value {
     let mut report = json!({"status":"incomplete","reason":"clang_tool_unavailable","version":null,"tool_sha256":null,"diagnostics":[]});
     if Instant::now() >= deadline {
         report["reason"] = json!("clang_execution_incomplete");
@@ -44,7 +63,6 @@ pub(crate) fn observe(
         report["reason"] = json!("clang_scratch_unavailable");
         return report;
     };
-    let cancelled = AtomicBool::new(false);
     let invoke = |args: Vec<OsString>, stdin| {
         run_process(
             &ProcessSpec {
@@ -56,7 +74,7 @@ pub(crate) fn observe(
                 deadline,
                 output_limit_bytes: 64 * 1024,
             },
-            &cancelled,
+            cancelled,
         )
     };
     let version = invoke(vec![OsString::from("--version")], None);

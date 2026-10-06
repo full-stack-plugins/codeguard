@@ -69,7 +69,9 @@ pub fn replay_native_corpus(
     let ruby_selected = tools.contains_key("ruby");
     let go_selected = tools.contains_key("go");
     let rust_selected = tools.contains_key("rust");
-    let measure_structure = tools.contains_key("python")
+    let clang_selected = tools.contains_key("c") || tools.contains_key("cpp");
+    let measure_structure = clang_selected
+        || tools.contains_key("python")
         || javascript_selected
         || ruby_selected
         || go_selected
@@ -118,7 +120,7 @@ pub fn replay_native_corpus(
             && checker
                 .companion_identity(&tools[&case.language])
                 .is_ok_and(|current| current == *companion);
-        let native_class = tool_current.then(|| classify_native(&native)).flatten();
+        let native_class = tool_current.then(|| checker.classify(&native)).flatten();
         let wasm_started = Instant::now();
         let observation =
             if !admitted || cancelled.load(Ordering::Relaxed) || Instant::now() >= deadline {
@@ -166,6 +168,10 @@ pub fn replay_native_corpus(
             "native_elapsed_us":native_us,"wasm_classification":name(wasm_class),"wasm_recovery_count":recovery_count,"wasm_reason":wasm_reason,
             "wasm_elapsed_us":elapsed_us(wasm_started),"comparison":comparison(native_class,wasm_class),
             "fixture_native_disagreement":native_class.map(|valid|valid!=case.expected_valid)});
+        if matches!(case.language.as_str(), "c" | "cpp") {
+            row["native_standard"] = json!(if case.language == "c" { "c11" } else { "c++17" });
+            row["native_classification_policy"] = json!("clang-parse-expression-only-v1");
+        }
         if case.language == "javascript" {
             // Node开发观察器固定--input-type=module，不向未知项目模式推断。
             row["javascript_mode"] = json!("module");
@@ -249,7 +255,7 @@ pub fn replay_native_corpus(
             inventory.push(json!({"language":language,"grammar_sha256":asset["sha256"],"native_selected":false,"reason":if checker(language).is_some(){"explicit_native_tool_not_selected"}else{"native_differential_adapter_unavailable"},"grammar_qualified":false}));
         }
     }
-    let mut report = json!({"schema_version":if javascript_selected {"0.10.0"}else if rust_selected {"0.8.0"}else if go_selected {"0.7.0"}else if ruby_selected {"0.5.0"}else if measure_structure {"0.3.0"}else{"0.1.0"},"report_type":"native_grammar_differential","status":"incomplete","delivery_decision":"not_evaluated",
+    let mut report = json!({"schema_version":if clang_selected {"0.11.0"}else if javascript_selected {"0.10.0"}else if rust_selected {"0.8.0"}else if go_selected {"0.7.0"}else if ruby_selected {"0.5.0"}else if measure_structure {"0.3.0"}else{"0.1.0"},"report_type":"native_grammar_differential","status":"incomplete","delivery_decision":"not_evaluated",
         "authority":"development_native_differential_only","native_adapter_reused":!(javascript_selected || ruby_selected || go_selected || rust_selected),"independent_holdout":false,"grammar_qualified_count":0,
         "corpus_sha256":digest(corpus_bytes),"manifest_sha256":corpus.manifest_sha256,"program_sha256":program_sha,"program_stable":program_stable,
         "language_count":inventory.len(),"selected_language_count":frozen.len(),"sample_count":cases.len(),"languages":inventory,"cases":cases});

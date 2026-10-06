@@ -969,3 +969,8 @@ Model capture, original task execution and report ownership observation SHALL sh
 - **THEN** CodeGuard SHALL preserve native syntax checking rather than infer missing header/macro context from those literal characters. Real line-start preprocessing directives, including digraph spellings and C11 trigraphs, SHALL remain context-unresolved before native execution. Line splicing and raw-string translation boundaries SHALL not allow header reads or fabricate source findings. This guard SHALL not establish a complete preprocessing model or production qualification.
 
 - **AND** the fixed Clang guard SHALL account for initial UTF-8 BOM and LF, CR, CRLF, LFCR and horizontal-space splices within the 1MiB input budget. Uncertain leading Unicode recovery SHALL remain explicitly context-unresolved without source violations or qualification.
+
+
+#### Scenario: C11 and C++17 uniform native grammar replay keeps semantic diagnostics unknown
+- **WHEN** development corpus replay explicitly selects an existing fixed Apple Clang21 tool for c or cpp
+- **THEN** it SHALL reuse the isolated native service with c11 or c++17, shared deadline/cancellation and frozen original entry/artifact identity. It SHALL retain all 32 inventory rows, selected samples and unknown denominators. Version/tool/context failures SHALL NOT become syntax failures; warnings alone SHALL NOT become invalid syntax. Only independently audited parsing diagnostic rules MAY classify syntax errors, and mixed semantic/unknown errors SHALL remain unknown. Standard and classification policy SHALL be recorded in a new versioned report without changing historical report semantics, granting grammar qualification or claiming independent holdout.
