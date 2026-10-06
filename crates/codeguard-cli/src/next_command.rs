@@ -1001,12 +1001,21 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
     }
     // JavaScript 结构候选复用 ESLint 身份，但不能把非 ESLint 报告当作环境准备证据。
     if checker_id == "node.eslint.preparation"
-        && fact["first_diagnostic_reason"] == "javascript_direct_binding_candidate"
+        && matches!(
+            fact["first_diagnostic_reason"].as_str(),
+            Some("javascript_direct_binding_candidate" | "javascript_module_context_candidate")
+        )
     {
-        brief["schema_version"] = json!("0.20.0");
+        brief["schema_version"] = json!(if fact["first_diagnostic_reason"]
+            == "javascript_module_context_candidate"
+        {
+            "0.21.0"
+        } else {
+            "0.20.0"
+        });
         brief["disposition"] = json!("verification_required");
         brief["step"] = json!(
-            "查看原报告 codeguard.javascript.duplicate_direct_lexical_binding 的位置和摘要；核对原 JavaScript 方言、构建根及 ESLint 配置，恢复适用原生 lint 确认后才修复并复检。候选仅覆盖顶层简单 let/const 名称，WASM 零恢复不能关闭任务"
+            "查看原报告中 JavaScript 结构规则的位置和摘要；核对声明的 module 模式（如有）、构建根及 package.json/ESLint 配置身份，恢复适用原生 lint 确认后才修复并复检。直接绑定与模块函数外 return 均只属待确认候选，CommonJS/未知模式不启用 module 规则；WASM 零恢复不能关闭任务"
         );
         brief["preparation_guidance"] =
             json!({"disposition":"verification_required", "step":brief["step"]});
@@ -2156,7 +2165,7 @@ fn run_sequence(run_id: &str) -> Option<u128> {
 
 fn view(disposition: &str, reason: &str, brief: Value, actions: Value) -> Value {
     json!({
-        "schema_version":if brief["schema_version"] == "0.20.0" {json!("0.20.0")}else if brief["checker_id"] == "shell.shellcheck" {json!("0.17.0")} else if brief["checker_id"] == "go.vet" {json!("0.13.0")} else if brief["checker_id"] == "syntax.native_confirmation" {brief["schema_version"].clone()} else {json!("0.1.0")}, "report_type":"repair_brief_preview",
+        "schema_version":if brief["schema_version"] == "0.21.0" {json!("0.21.0")}else if brief["schema_version"] == "0.20.0" {json!("0.20.0")}else if brief["checker_id"] == "shell.shellcheck" {json!("0.17.0")} else if brief["checker_id"] == "go.vet" {json!("0.13.0")} else if brief["checker_id"] == "syntax.native_confirmation" {brief["schema_version"].clone()} else {json!("0.1.0")}, "report_type":"repair_brief_preview",
         "operation":"next", "command_status":"complete", "exit_code":0,
         "disposition":disposition, "reason":reason,
         "repair_brief":brief, "next_actions":actions,

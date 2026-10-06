@@ -1357,7 +1357,7 @@ This entry does not infer project mode, install tools, execute source, replace n
 
 The mode observation interface now returns `javascript_mode_observation`0.1. It binds ordinary source and a physical workspace: `.mjs`/`.cjs` explicitly declare module/CommonJS, while `.js` reads only the nearest in-scope package's unique explicit `type`. Missing types, malformed/duplicate JSON, links, out-of-scope or over-budget inputs and unresolved loader modes remain unknown without outer-package inheritance. Limits are1MiB source,256KiB manifest and64 searched directories. Source/package digests and searched directories preserve evidence for detecting nearer-package changes before and after scanning. This does not execute native tools or prove effective ESLint configuration.
 
-Automatic scanners/tasks/hooks do not yet consume this interface. The next integration must compare mode evidence across execution and preserve invalidation reasons; this batch is not automatic project-check acceptance. See [limited acceptance](../tests/acceptance/javascript-project-mode.md) for5 actual Node file checks and21 protocol observations.
+This interface-only checkpoint did not connect scanners/tasks/hooks. Current integration and its separate acceptance are documented below. See [limited acceptance](../tests/acceptance/javascript-project-mode.md) for5 actual Node file checks and21 protocol observations.
 
 ```mermaid
 flowchart LR
@@ -1370,5 +1370,26 @@ flowchart LR
     C --> G[Mode evidence and source digest]
     F --> G
     E --> G
-    G -.Pending continuity integration.-> H[Project candidates and stable tasks]
+    G --> H[Project candidates and stable tasks; current integration below]
+```
+
+## Core production acceptance and declared-module integration
+
+The production target now requires all 57 canonical language entries to qualify syntax, detailed documentation comments, development conventions and vulnerability checking. Historical planned entries remain unfinished targets. Java must qualify both Maven and Gradle vulnerability paths, detailed Javadoc and native P3C. A configured tool, runnable WASM or mocked test does not establish qualification. Independent labelled evaluation, supported versions/builds/platforms and the complete native repair/recheck/reopen path are mandatory; current formal WASM qualification remains 0/32. See OpenSpec tasks15.1–15.7.
+
+Current source integrates declared JavaScript module evidence into project checks, standalone `lint typescript`, `lint all` and file-edit feedback. Applicable native ESLint retains priority. Uncovered whole-file `.mjs` and explicitly module-typed `.js` use the module candidate worker, while CommonJS/unknown modes keep their existing precheck and never activate the outer-return module rule. Source and mode evidence are rechecked after worker execution. Persisted confirmation0.15, check0.60, ESLint feedback0.7, hook0.29/fast0.17 and module repair brief0.21 retain separate versioned contracts. Module context changes prevent native task recheck from reusing the old package boundary. Repeated checks reuse stable tasks; clean candidates cannot close them. No new npm/host publication or production qualification is claimed. See [integration acceptance](../tests/acceptance/javascript-module-workbench.md).
+
+```mermaid
+flowchart LR
+    A[Project lint or edit request] --> B{Applicable native ESLint}
+    B -->|Available| C[Original native checks]
+    B -->|Unavailable or uncovered| D[Observe source and declared mode]
+    D -->|Module| E[Module WASM candidate worker]
+    D -->|CommonJS or unknown| F[Existing bounded precheck]
+    E --> G[Recheck source and mode evidence]
+    F --> H[Incomplete precheck feedback]
+    G -->|Changed| H
+    G -->|Stable| I[Evidence-bound stable confirmation task]
+    I --> J[Agent feedback and original native verification]
+    J --> K[Closure requires accepted native repair evidence]
 ```

@@ -951,3 +951,24 @@ flowchart LR
 `lint all` 的 next 通过一次本地事实校验，在允许的 lint 检查器集合内选择；历史构建/CVE/注释任务不使有效 lint 指引变成空值，也不会被删除。语法确认后备只选择本轮产生的任务 ID。
 
 当前源码29ec2e1的WASM扩展回归已结束：基础crate与CLI lib/bins、201个集成目标合计1879通过、0失败、177条件用例未执行，明确排除未提交Erlang草稿。严格Clippy通过；这不代表独立语料、原生工具全矩阵、宿主或发布验收。详见tests/acceptance/wasm-regression-29ec2e1.md；32个grammar仍为候选，正式资格0。
+
+## 四类核心生产验收与声明模块接线
+
+生产目标要求57个canonical语言条目逐项验收语法、详细文档注释、开发规范和漏洞检查；历史planned仍是未完成目标。Java必须分别验收Maven/Gradle漏洞路径、详细Javadoc和原生P3C。配置存在、WASM可运行或模拟测试通过都不能证明生产就绪。独立标注评测、声明支持的版本/构建器/平台、原工具修复复检关闭与复发重开均为必需验收；当前WASM正式资格仍为0/32。详见OpenSpec任务15.1–15.7。
+
+当前源码把JavaScript声明模式证据接入项目检查、独立 `lint typescript`、`lint all` 与文件编辑反馈，适用原生ESLint仍优先。未覆盖的整文件 `.mjs` 和明确声明module的 `.js` 使用模块候选worker；CommonJS/未知模式继续原有有界初检，不启用函数外return模块规则。worker之后复核源码和模式证据；持久确认0.15、项目检查0.60、ESLint反馈0.7、Hook0.29/局部0.17与模块修复简报0.21使用独立版本契约。包声明改变时原任务复检报告上下文失效，不能沿用旧模块证据。重复检查复用稳定任务，清洁候选不能关闭任务。本批不声称新的npm/宿主发行或生产资格。见[接线验收](tests/acceptance/javascript-module-workbench.md)。
+
+```mermaid
+flowchart LR
+    A[项目lint或编辑请求] --> B{适用原生ESLint}
+    B -->|可用| C[原配置原生检查]
+    B -->|缺失或未覆盖| D[观察源码与声明模式]
+    D -->|Module| E[模块WASM候选worker]
+    D -->|CommonJS或未知| F[原有有界初检]
+    E --> G[复核源码与模式]
+    F --> H[未完成初检反馈]
+    G -->|变化| H
+    G -->|稳定| I[绑定证据的稳定确认任务]
+    I --> J[智能体反馈与原工具复检]
+    J --> K[关闭仍需通过原生修复验收]
+```

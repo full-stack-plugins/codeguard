@@ -407,6 +407,7 @@ fn summarize(path: &str, report: &Value) -> String {
                     | "codeguard.erlang.form_terminator"
                     | "codeguard.cfquery.distinct_projection"
                     | "codeguard.javascript.duplicate_direct_lexical_binding"
+                    | "codeguard.javascript.module_return_outside_function"
             )
         })
         .collect::<std::collections::BTreeSet<_>>();

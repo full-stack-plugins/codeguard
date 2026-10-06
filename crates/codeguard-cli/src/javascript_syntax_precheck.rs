@@ -78,6 +78,12 @@ pub(crate) fn observe(args: &EslintLintArguments, deadline: Instant) -> Value {
         deadline,
         None,
     );
+    if syntax["observations"].as_array().is_some_and(|rows| {
+        rows.iter()
+            .any(|row| row.get("javascript_mode_observation").is_some())
+    }) {
+        report["schema_version"] = json!("0.7.0");
+    }
     report["next_action"] = json!(
         "查看本次候选或检查未完成原因，恢复适用的原生 JavaScript/ESLint 上下文确认；不凭候选直接修改源码或关闭任务"
     );

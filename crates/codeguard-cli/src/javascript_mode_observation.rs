@@ -176,3 +176,63 @@ pub fn observe_javascript_mode(root: &Path, relative: &Path) -> JavascriptModeOb
     result.reason = "package_type_not_observed".into();
     result
 }
+
+/// 核验历史module观察与同一源码快照的内部一致性，不证明配置当前或批准来源。
+/// 参数为完整模式JSON、原相对路径和冻结字节；首次导入仍须与当前物理观察逐字段比较。
+pub(crate) fn valid_module_snapshot(value: &serde_json::Value, path: &str, source: &[u8]) -> bool {
+    let Ok(mode) = serde_json::from_value::<JavascriptModeObservation>(value.clone()) else {
+        return false;
+    };
+    if mode.schema_version != "0.1.0"
+        || mode.report_type != "javascript_mode_observation"
+        || mode.mode != "module"
+        || mode.source_path.as_deref() != Some(path)
+        || mode.source_sha256 != Some(format!("{:x}", Sha256::digest(source)))
+        || mode.native_execution != "not_run"
+        || mode.delivery_decision != "not_evaluated"
+    {
+        return false;
+    }
+    if mode.basis == "extension_mjs" {
+        return path.ends_with(".mjs")
+            && mode.package_path.is_none()
+            && mode.package_sha256.is_none()
+            && mode.searched_directories.is_empty()
+            && mode.reason == "explicit_extension_mode_native_confirmation_required";
+    }
+    if mode.basis != "nearest_package_type"
+        || !path.ends_with(".js")
+        || mode.reason != "explicit_package_type_native_confirmation_required"
+        || !(1..=64).contains(&mode.searched_directories.len())
+        || !mode.package_sha256.as_deref().is_some_and(|s| {
+            s.len() == 64
+                && s.bytes()
+                    .all(|b| b.is_ascii_hexdigit() && !b.is_ascii_uppercase())
+        })
+    {
+        return false;
+    }
+    let expected = Path::new(path)
+        .parent()
+        .into_iter()
+        .flat_map(Path::ancestors)
+        .take(mode.searched_directories.len())
+        .map(|p| {
+            if p.as_os_str().is_empty() {
+                ".".to_owned()
+            } else {
+                p.to_string_lossy().into_owned()
+            }
+        })
+        .collect::<Vec<_>>();
+    let Some(last) = expected.last() else {
+        return false;
+    };
+    expected == mode.searched_directories
+        && mode.package_path
+            == Some(if last == "." {
+                "package.json".into()
+            } else {
+                format!("{last}/package.json")
+            })
+}
