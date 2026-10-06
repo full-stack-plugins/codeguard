@@ -1004,3 +1004,19 @@ Model capture, original task execution and report ownership observation SHALL sh
 #### Scenario: Audited Clang punctuation rules preserve standard-specific extensions
 - **WHEN** C11/C++17 replay observes an audited punctuation error or a native extension warning
 - **THEN** it SHALL classify only exact audited parsing rule IDs, retain original diagnostics and keep semantic/unknown/mixed diagnostics unknown. Warning-only syntax classification SHALL require the audited non-syntax-warning rule set; extension warnings SHALL remain unknown. The same source MAY remain unknown for C11 and invalid for C++17. Expanded classification SHALL use a new report/policy version; historical expression-only reports SHALL remain unchanged and no production qualification SHALL be granted.
+
+### Requirement: Standalone Rust comments SHALL retain both native documentation observations
+
+`comments rust` SHALL execute the existing rustdoc library probe and project-configured Clippy all-targets observation through one selected Cargo entry and one shared deadline. It SHALL preserve each original native protocol, findings and task identity independently; failures from either checker SHALL NOT erase the sibling result or become a complete combined observation. The public wrapper SHALL use a dedicated closed schema, and historical native schemas SHALL remain unchanged. Uninitialized projects SHALL NOT gain a workspace implicitly. Clippy documentation candidates SHALL be selected only from the explicitly supported native missing_errors_doc, missing_panics_doc and missing_safety_doc rules; other Clippy diagnostics remain in the original report, and SHALL NOT become documentation findings by prefix or replace the documentation next action. Current observed inputs and the selected Cargo byte identity SHALL be checked across both observations. Each original task SHALL retain its original-tool verification. This entry SHALL NOT implicitly enable pedantic, accept bare headings as detailed contracts, close tasks or grant production qualification.
+
+#### Scenario: Both documentation checkers produce a diagnostic
+- **WHEN** standalone comments rust observes a rustdoc missing_docs finding and a configured Clippy missing_errors_doc finding
+- **THEN** both native records are retained and synchronized independently; repeated scanning reuses the same task IDs, and task verify invokes the respective original checker
+
+#### Scenario: The second documentation checker fails or inputs change
+- **WHEN** Clippy fails, the shared deadline expires, or the inputs/tool identity change between the two observations
+- **THEN** the combined observation remains incomplete, preserves the first checker evidence and reports the exact native failure; no clean result, trusted closure or all-language qualification is inferred
+
+#### Scenario: A clean combined rescan retains an unverified historical documentation task
+- **WHEN** the current rustdoc and Clippy scans have no diagnostic but the workspace retains an open documentation task
+- **THEN** the documentation next view SHALL retain that original task for verification/review rather than infer task completion from absence; unrelated Clippy convention tasks SHALL remain outside this view

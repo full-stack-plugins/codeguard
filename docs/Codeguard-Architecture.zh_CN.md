@@ -1506,7 +1506,7 @@ Java Gradle 漏洞检查新增显式原任务入口 `codeguard cve java`；JSON 
 C/C++ 独立 Clang 入口已修复字符串、注释和原始字符串中的井号误判，并补预处理替代记号/续行防护；行首非 ASCII 恢复仍保守未解析。仅局部验收，完整项目语法、文档规范、开发规范、CVE 四核心生产门槛保持开放。见 [验收边界](../tests/acceptance/clang-preprocessor-context.md)。
 
 
-Rust 的详细文档任务现对原生 Clippy `missing_errors_doc`、`missing_panics_doc`、`missing_safety_doc` 给出具体 Errors/Panics/Safety 修复指引，复用稳定任务及原工具抑制对照。已有 Clippy 实测接受空章节标题，因此零诊断不代表详细说明合格，事实继续 open；不会隐式启用 pedantic。`comments rust` 仍为 Rustdoc 局部探针，尚未统一完整文档契约。参见 [局部验收与缺口](../tests/acceptance/clippy-documentation-contract.md)。
+Rust 的详细文档任务现对原生 Clippy `missing_errors_doc`、`missing_panics_doc`、`missing_safety_doc` 给出具体 Errors/Panics/Safety 修复指引，复用稳定任务及原工具抑制对照。已有 Clippy 实测接受空章节标题，因此零诊断不代表详细说明合格，事实继续 open；不会隐式启用 pedantic。`comments rust` 现共用截止时间采集 Rustdoc 探针与原项目 Clippy，保留独立原生报告、任务和原工具复检；详细内容完整性仍未取得资格。参见 [统一入口验收](../tests/acceptance/rust-comments-combined.md)。参见 [局部验收与缺口](../tests/acceptance/clippy-documentation-contract.md)。
 
 
 `check rust/all` 现在把原生 Clippy 的三类文档诊断作为独立 comments 观察，与原 Rustdoc 行并存，不覆盖原工具阻塞或重复执行 Clippy；仅精确已知规则参与，零发现不证明详细契约启用。参见 [聚合验收](../tests/acceptance/clippy-documentation-aggregate.md)。

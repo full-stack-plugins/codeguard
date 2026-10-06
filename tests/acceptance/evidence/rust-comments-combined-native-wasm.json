@@ -1,0 +1,1201 @@
+{
+  "cases": [
+    {
+      "first": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "detailed_contract_qualification": "not_granted",
+        "documentation_findings": [
+          {
+            "column": 1,
+            "finding_fingerprint": "6776c5086e1934f671d3f97b20c5a0432006adeae734b4b088d3c7d5bde5222b",
+            "finding_id": "CG-6776c5086e1934f671d3f97b20c5a043",
+            "level": "warning",
+            "line": 5,
+            "path": "src/lib.rs",
+            "rule_id": "clippy::missing_errors_doc",
+            "source_sha256": "1bf06f4ce981be69230ae4971f8aae40cda4efccf0ef387e05714f8ca1e50158"
+          }
+        ],
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "source": "builtin_default",
+          "timeout_ms": 1800000
+        },
+        "exit_code": 3,
+        "input_stable": true,
+        "language": "rust",
+        "local_scan_complete": true,
+        "native_results": {
+          "clippy": {
+            "authority": "local_unverified",
+            "backlog_status": "synced_partial",
+            "backlog_sync": {
+              "failed_reports": 0,
+              "historical_findings": 0,
+              "imported_reports": 1,
+              "new_blockers": 0,
+              "new_findings": 2
+            },
+            "checker_id": "rust.cargo_clippy",
+            "command_status": "incomplete",
+            "configuration": "unknown",
+            "configuration_ref": null,
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "exit_code": 3,
+            "findings": [
+              {
+                "column": 1,
+                "finding_fingerprint": "f4d1b5a37d8a1ac9b45e0b329a808d67cffa4e506669fd8d63fe6e06036b3f64",
+                "finding_id": "CG-f4d1b5a37d8a1ac9b45e0b329a808d67",
+                "level": "warning",
+                "line": 3,
+                "path": "src/lib.rs",
+                "rule_id": "clippy::empty_line_after_doc_comments",
+                "source_sha256": "1bf06f4ce981be69230ae4971f8aae40cda4efccf0ef387e05714f8ca1e50158"
+              },
+              {
+                "column": 1,
+                "finding_fingerprint": "6776c5086e1934f671d3f97b20c5a0432006adeae734b4b088d3c7d5bde5222b",
+                "finding_id": "CG-6776c5086e1934f671d3f97b20c5a043",
+                "level": "warning",
+                "line": 5,
+                "path": "src/lib.rs",
+                "rule_id": "clippy::missing_errors_doc",
+                "source_sha256": "1bf06f4ce981be69230ae4971f8aae40cda4efccf0ef387e05714f8ca1e50158"
+              }
+            ],
+            "language": "rust",
+            "local_scan_complete": true,
+            "manifest_sha256": "b1cd5e7ffde5ac9ee089978488075fb1dce3d1dbcf4c8236aac6bb91048704e8",
+            "next": {
+              "authority": "local_unverified",
+              "command_status": "complete",
+              "delivery_decision": "not_evaluated",
+              "disposition": "actionable",
+              "exit_code": 0,
+              "next_actions": [],
+              "operation": "next",
+              "reason": "local_task_selected",
+              "repair_brief": {
+                "action_id": "repair-source",
+                "authority": "local_unverified",
+                "checker_id": "rust.cargo_clippy",
+                "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+                "constraints": [
+                  "仅修改目标源码",
+                  "不得忽略规则或将任务勾选当作复检"
+                ],
+                "disposition": "actionable",
+                "evidence_ref": {
+                  "first_report_sha256": "b74af4fbfff9d2f547cbe0de98c8815c01d632a6b6e51137a1c3253c6bfd1669",
+                  "first_run_id": "rust-lint-56001-1791315152276155000-0"
+                },
+                "history": {
+                  "attempt_count": 0,
+                  "awaiting_verification": false,
+                  "budget": 2,
+                  "no_progress_count": 0,
+                  "open_attempt_id": null,
+                  "recent": []
+                },
+                "kind": "finding",
+                "native_rule_id": "clippy::missing_errors_doc",
+                "recheck_argv": [
+                  "cargo",
+                  "clippy",
+                  "--locked",
+                  "--offline",
+                  "--all-targets",
+                  "--message-format=json"
+                ],
+                "schema_version": "0.1.0",
+                "scope": "src/lib.rs",
+                "source_sha256": "1bf06f4ce981be69230ae4971f8aae40cda4efccf0ef387e05714f8ca1e50158",
+                "step": "核对实际 Result 错误类型与触发条件，补齐 # Errors 的具体说明；章节标题不能代替内容，不改变返回类型或错误行为迎合检查；按原任务原 Cargo 运行 task verify，零诊断不代表详细契约或可信关闭",
+                "task_id": "CG-6776c5086e1934f671d3f97b20c5a043"
+              },
+              "report_type": "repair_brief_preview",
+              "schema_version": "0.1.0"
+            },
+            "operation": "lint",
+            "reason": "native_observed_unverified",
+            "recheck_command": "cargo clippy --locked --offline --all-targets --message-format=json",
+            "report_type": "rust_clippy_local_observation",
+            "rulepack_approval": "unverified",
+            "run_id": "rust-lint-56001-1791315152276155000-0",
+            "schema_version": "0.2.0",
+            "scope": "default_features_all_targets",
+            "tool_approval": "unverified",
+            "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+            "workspace_binding": "bound",
+            "workspace_id": "ws-4e4e59b7ce502150778b38df2fda446c"
+          },
+          "rustdoc": {
+            "authority": "local_unverified",
+            "backlog_status": "synced",
+            "backlog_sync": {
+              "failed_reports": 0,
+              "new_blockers": 0,
+              "new_findings": 0
+            },
+            "checker_id": "rust.cargo_rustdoc",
+            "command_status": "incomplete",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "execution_budget": {
+              "enforcement": "native_execution_only",
+              "source": "builtin_default",
+              "timeout_ms": 1800000
+            },
+            "exit_code": 3,
+            "findings": [],
+            "language": "rust",
+            "local_scan_complete": true,
+            "lock_sha256": "5224f04117bbfa7c41a592cfbac330c8ed6c5acd7eca62a15e0e3e6ec871b458",
+            "manifest_sha256": "b1cd5e7ffde5ac9ee089978488075fb1dce3d1dbcf4c8236aac6bb91048704e8",
+            "next_actions": [
+              "核对原生项目文档规则与目标范围；局部零诊断不证明修复或批准白名单",
+              "原工具复检后仍须完整交付检查"
+            ],
+            "operation": "comments",
+            "reason": "native_observed_unverified",
+            "recheck_argv": [
+              "cargo",
+              "rustdoc",
+              "--lib",
+              "--locked",
+              "--offline",
+              "--message-format=json",
+              "--",
+              "--warn",
+              "missing_docs",
+              "--warn",
+              "rustdoc::broken_intra_doc_links"
+            ],
+            "report_type": "rustdoc_local_observation",
+            "rule_selection": "explicit_probe_not_approved_project_policy",
+            "run_id": "rustdoc-56001-1791315152006109000",
+            "schema_version": "0.4.0",
+            "scope": "selected_root_library_default_features",
+            "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+            "workspace_binding": "bound",
+            "workspace_id": "ws-4e4e59b7ce502150778b38df2fda446c"
+          }
+        },
+        "next": {
+          "authority": "local_unverified",
+          "command_status": "complete",
+          "delivery_decision": "not_evaluated",
+          "disposition": "actionable",
+          "exit_code": 0,
+          "next_actions": [],
+          "operation": "next",
+          "reason": "local_task_selected",
+          "repair_brief": {
+            "action_id": "repair-source",
+            "authority": "local_unverified",
+            "checker_id": "rust.cargo_clippy",
+            "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+            "constraints": [
+              "仅修改目标源码",
+              "不得忽略规则或将任务勾选当作复检"
+            ],
+            "disposition": "actionable",
+            "evidence_ref": {
+              "first_report_sha256": "b74af4fbfff9d2f547cbe0de98c8815c01d632a6b6e51137a1c3253c6bfd1669",
+              "first_run_id": "rust-lint-56001-1791315152276155000-0"
+            },
+            "history": {
+              "attempt_count": 0,
+              "awaiting_verification": false,
+              "budget": 2,
+              "no_progress_count": 0,
+              "open_attempt_id": null,
+              "recent": []
+            },
+            "kind": "finding",
+            "native_rule_id": "clippy::missing_errors_doc",
+            "recheck_argv": [
+              "cargo",
+              "clippy",
+              "--locked",
+              "--offline",
+              "--all-targets",
+              "--message-format=json"
+            ],
+            "schema_version": "0.1.0",
+            "scope": "src/lib.rs",
+            "source_sha256": "1bf06f4ce981be69230ae4971f8aae40cda4efccf0ef387e05714f8ca1e50158",
+            "step": "核对实际 Result 错误类型与触发条件，补齐 # Errors 的具体说明；章节标题不能代替内容，不改变返回类型或错误行为迎合检查；按原任务原 Cargo 运行 task verify，零诊断不代表详细契约或可信关闭",
+            "task_id": "CG-6776c5086e1934f671d3f97b20c5a043"
+          },
+          "report_type": "repair_brief_preview",
+          "schema_version": "0.1.0"
+        },
+        "next_actions": [
+          "分别核对 rustdoc 探针规则和原项目 Clippy 文档规则；不会隐式启用 pedantic。",
+          "按稳定任务使用 task verify 原工具复检；裸章节标题或局部零诊断不证明详细文档合规。"
+        ],
+        "operation": "comments",
+        "report_type": "rust_comments_feedback",
+        "schema_version": "0.1.0",
+        "tool_identity_consistent": true
+      },
+      "present": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "delivery_decision": "not_evaluated",
+        "event_persisted": true,
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "source": "builtin_default",
+          "timeout_ms": 1800000
+        },
+        "exit_code": 3,
+        "kind": "finding",
+        "native_scan": {
+          "authority": "local_unverified",
+          "checker_id": "rust.cargo_clippy",
+          "command_status": "incomplete",
+          "configuration": "unknown",
+          "configuration_ref": null,
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "exit_code": 3,
+          "findings": [
+            {
+              "column": 1,
+              "finding_fingerprint": "f4d1b5a37d8a1ac9b45e0b329a808d67cffa4e506669fd8d63fe6e06036b3f64",
+              "finding_id": "CG-f4d1b5a37d8a1ac9b45e0b329a808d67",
+              "level": "warning",
+              "line": 3,
+              "path": "src/lib.rs",
+              "rule_id": "clippy::empty_line_after_doc_comments",
+              "source_sha256": "1bf06f4ce981be69230ae4971f8aae40cda4efccf0ef387e05714f8ca1e50158"
+            },
+            {
+              "column": 1,
+              "finding_fingerprint": "6776c5086e1934f671d3f97b20c5a0432006adeae734b4b088d3c7d5bde5222b",
+              "finding_id": "CG-6776c5086e1934f671d3f97b20c5a043",
+              "level": "warning",
+              "line": 5,
+              "path": "src/lib.rs",
+              "rule_id": "clippy::missing_errors_doc",
+              "source_sha256": "1bf06f4ce981be69230ae4971f8aae40cda4efccf0ef387e05714f8ca1e50158"
+            }
+          ],
+          "language": "rust",
+          "local_scan_complete": true,
+          "manifest_sha256": "b1cd5e7ffde5ac9ee089978488075fb1dce3d1dbcf4c8236aac6bb91048704e8",
+          "operation": "lint",
+          "reason": "native_observed_unverified",
+          "recheck_command": "cargo clippy --locked --offline --all-targets --message-format=json",
+          "report_type": "rust_clippy_local_observation",
+          "rulepack_approval": "unverified",
+          "run_id": "rust-lint-56014-1791315152533497000-0",
+          "schema_version": "0.2.0",
+          "scope": "default_features_all_targets",
+          "tool_approval": "unverified",
+          "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+          "workspace_binding": "bound",
+          "workspace_id": "ws-4e4e59b7ce502150778b38df2fda446c"
+        },
+        "next_actions": [
+          "inspect_native_recheck_and_policy_before_closure"
+        ],
+        "observation": "still_present",
+        "operation": "task_verify",
+        "reason": null,
+        "report_type": "task_verification_preview",
+        "schema_version": "0.6.0",
+        "task_id": "CG-6776c5086e1934f671d3f97b20c5a043"
+      },
+      "repaired": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "delivery_decision": "not_evaluated",
+        "event_persisted": true,
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "source": "builtin_default",
+          "timeout_ms": 1800000
+        },
+        "exit_code": 3,
+        "kind": "finding",
+        "native_scan": {
+          "authority": "local_unverified",
+          "checker_id": "rust.cargo_clippy",
+          "command_status": "incomplete",
+          "configuration": "unknown",
+          "configuration_ref": null,
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "exit_code": 3,
+          "findings": [],
+          "language": "rust",
+          "local_scan_complete": true,
+          "manifest_sha256": "b1cd5e7ffde5ac9ee089978488075fb1dce3d1dbcf4c8236aac6bb91048704e8",
+          "operation": "lint",
+          "reason": "native_observed_unverified",
+          "recheck_command": "cargo clippy --locked --offline --all-targets --message-format=json",
+          "report_type": "rust_clippy_local_observation",
+          "rulepack_approval": "unverified",
+          "run_id": "rust-lint-56022-1791315152772848000-0",
+          "schema_version": "0.3.0",
+          "scope": "default_features_all_targets",
+          "suppression_probe": {
+            "forced_scan": {
+              "authority": "local_unverified",
+              "checker_id": "rust.cargo_clippy",
+              "command_status": "incomplete",
+              "configuration": "unknown",
+              "configuration_ref": null,
+              "coverage_proven": false,
+              "delivery_decision": "not_evaluated",
+              "exit_code": 3,
+              "findings": [],
+              "language": "rust",
+              "local_scan_complete": true,
+              "manifest_sha256": "b1cd5e7ffde5ac9ee089978488075fb1dce3d1dbcf4c8236aac6bb91048704e8",
+              "operation": "lint",
+              "reason": "native_observed_unverified",
+              "recheck_command": "cargo clippy --locked --offline --all-targets --message-format=json -- --force-warn clippy::missing_errors_doc",
+              "report_type": "rust_clippy_local_observation",
+              "rulepack_approval": "unverified",
+              "run_id": "rust-lint-56022-1791315152941924000-1",
+              "schema_version": "0.2.0",
+              "scope": "default_features_all_targets",
+              "tool_approval": "unverified",
+              "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+              "workspace_binding": "bound",
+              "workspace_id": "ws-4e4e59b7ce502150778b38df2fda446c"
+            },
+            "input_stable": true,
+            "rule_id": "clippy::missing_errors_doc",
+            "source_sha256": "b1301713071283329c6f4438e15d6126bac6c3c7820248a95578a4cf107072a9",
+            "target_finding_id": "CG-6776c5086e1934f671d3f97b20c5a043",
+            "target_path": "src/lib.rs"
+          },
+          "tool_approval": "unverified",
+          "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+          "workspace_binding": "bound",
+          "workspace_id": "ws-4e4e59b7ce502150778b38df2fda446c"
+        },
+        "next_actions": [
+          "inspect_native_recheck_and_policy_before_closure"
+        ],
+        "observation": "candidate_absent_unverified_policy",
+        "operation": "task_verify",
+        "reason": null,
+        "report_type": "task_verification_preview",
+        "schema_version": "0.6.0",
+        "task_id": "CG-6776c5086e1934f671d3f97b20c5a043"
+      },
+      "rule": "clippy::missing_errors_doc",
+      "state": "open"
+    },
+    {
+      "first": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "detailed_contract_qualification": "not_granted",
+        "documentation_findings": [
+          {
+            "column": 1,
+            "finding_fingerprint": "7c44e3c4e64639e59e06b5d8b4e3aebe425b7a8fa1a01f006358b3d75f95c467",
+            "finding_id": "CG-7c44e3c4e64639e59e06b5d8b4e3aebe",
+            "level": "warning",
+            "line": 5,
+            "path": "src/lib.rs",
+            "rule_id": "clippy::missing_panics_doc",
+            "source_sha256": "7fb3d84f1948330fbf51f22ea4be85c3e9911b1a671012b2728b6f69abbc724a"
+          }
+        ],
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "source": "builtin_default",
+          "timeout_ms": 1800000
+        },
+        "exit_code": 3,
+        "input_stable": true,
+        "language": "rust",
+        "local_scan_complete": true,
+        "native_results": {
+          "clippy": {
+            "authority": "local_unverified",
+            "backlog_status": "synced_partial",
+            "backlog_sync": {
+              "failed_reports": 0,
+              "historical_findings": 0,
+              "imported_reports": 1,
+              "new_blockers": 0,
+              "new_findings": 2
+            },
+            "checker_id": "rust.cargo_clippy",
+            "command_status": "incomplete",
+            "configuration": "unknown",
+            "configuration_ref": null,
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "exit_code": 3,
+            "findings": [
+              {
+                "column": 1,
+                "finding_fingerprint": "f4d1b5a37d8a1ac9b45e0b329a808d67cffa4e506669fd8d63fe6e06036b3f64",
+                "finding_id": "CG-f4d1b5a37d8a1ac9b45e0b329a808d67",
+                "level": "warning",
+                "line": 3,
+                "path": "src/lib.rs",
+                "rule_id": "clippy::empty_line_after_doc_comments",
+                "source_sha256": "7fb3d84f1948330fbf51f22ea4be85c3e9911b1a671012b2728b6f69abbc724a"
+              },
+              {
+                "column": 1,
+                "finding_fingerprint": "7c44e3c4e64639e59e06b5d8b4e3aebe425b7a8fa1a01f006358b3d75f95c467",
+                "finding_id": "CG-7c44e3c4e64639e59e06b5d8b4e3aebe",
+                "level": "warning",
+                "line": 5,
+                "path": "src/lib.rs",
+                "rule_id": "clippy::missing_panics_doc",
+                "source_sha256": "7fb3d84f1948330fbf51f22ea4be85c3e9911b1a671012b2728b6f69abbc724a"
+              }
+            ],
+            "language": "rust",
+            "local_scan_complete": true,
+            "manifest_sha256": "b1cd5e7ffde5ac9ee089978488075fb1dce3d1dbcf4c8236aac6bb91048704e8",
+            "next": {
+              "authority": "local_unverified",
+              "command_status": "complete",
+              "delivery_decision": "not_evaluated",
+              "disposition": "actionable",
+              "exit_code": 0,
+              "next_actions": [],
+              "operation": "next",
+              "reason": "local_task_selected",
+              "repair_brief": {
+                "action_id": "repair-source",
+                "authority": "local_unverified",
+                "checker_id": "rust.cargo_clippy",
+                "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+                "constraints": [
+                  "仅修改目标源码",
+                  "不得忽略规则或将任务勾选当作复检"
+                ],
+                "disposition": "actionable",
+                "evidence_ref": {
+                  "first_report_sha256": "4705954ca60af5dfbe321f1f3cc0efe85d2b09bc25212b3dfac487f2c943c759",
+                  "first_run_id": "rust-lint-56038-1791315153433184000-0"
+                },
+                "history": {
+                  "attempt_count": 0,
+                  "awaiting_verification": false,
+                  "budget": 2,
+                  "no_progress_count": 0,
+                  "open_attempt_id": null,
+                  "recent": []
+                },
+                "kind": "finding",
+                "native_rule_id": "clippy::missing_panics_doc",
+                "recheck_argv": [
+                  "cargo",
+                  "clippy",
+                  "--locked",
+                  "--offline",
+                  "--all-targets",
+                  "--message-format=json"
+                ],
+                "schema_version": "0.1.0",
+                "scope": "src/lib.rs",
+                "source_sha256": "7fb3d84f1948330fbf51f22ea4be85c3e9911b1a671012b2728b6f69abbc724a",
+                "step": "核对实际 panic、unwrap、expect 及适用调用条件，补齐 # Panics 的具体说明；章节标题不能代替内容，不改变 API 行为迎合检查；按原任务原 Cargo 运行 task verify，隐式或跨调用 panic 仍需调查",
+                "task_id": "CG-7c44e3c4e64639e59e06b5d8b4e3aebe"
+              },
+              "report_type": "repair_brief_preview",
+              "schema_version": "0.1.0"
+            },
+            "operation": "lint",
+            "reason": "native_observed_unverified",
+            "recheck_command": "cargo clippy --locked --offline --all-targets --message-format=json",
+            "report_type": "rust_clippy_local_observation",
+            "rulepack_approval": "unverified",
+            "run_id": "rust-lint-56038-1791315153433184000-0",
+            "schema_version": "0.2.0",
+            "scope": "default_features_all_targets",
+            "tool_approval": "unverified",
+            "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+            "workspace_binding": "bound",
+            "workspace_id": "ws-96b8f541e8b656760214d1b15f0577b5"
+          },
+          "rustdoc": {
+            "authority": "local_unverified",
+            "backlog_status": "synced",
+            "backlog_sync": {
+              "failed_reports": 0,
+              "new_blockers": 0,
+              "new_findings": 0
+            },
+            "checker_id": "rust.cargo_rustdoc",
+            "command_status": "incomplete",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "execution_budget": {
+              "enforcement": "native_execution_only",
+              "source": "builtin_default",
+              "timeout_ms": 1800000
+            },
+            "exit_code": 3,
+            "findings": [],
+            "language": "rust",
+            "local_scan_complete": true,
+            "lock_sha256": "5224f04117bbfa7c41a592cfbac330c8ed6c5acd7eca62a15e0e3e6ec871b458",
+            "manifest_sha256": "b1cd5e7ffde5ac9ee089978488075fb1dce3d1dbcf4c8236aac6bb91048704e8",
+            "next_actions": [
+              "核对原生项目文档规则与目标范围；局部零诊断不证明修复或批准白名单",
+              "原工具复检后仍须完整交付检查"
+            ],
+            "operation": "comments",
+            "reason": "native_observed_unverified",
+            "recheck_argv": [
+              "cargo",
+              "rustdoc",
+              "--lib",
+              "--locked",
+              "--offline",
+              "--message-format=json",
+              "--",
+              "--warn",
+              "missing_docs",
+              "--warn",
+              "rustdoc::broken_intra_doc_links"
+            ],
+            "report_type": "rustdoc_local_observation",
+            "rule_selection": "explicit_probe_not_approved_project_policy",
+            "run_id": "rustdoc-56038-1791315153182087000",
+            "schema_version": "0.4.0",
+            "scope": "selected_root_library_default_features",
+            "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+            "workspace_binding": "bound",
+            "workspace_id": "ws-96b8f541e8b656760214d1b15f0577b5"
+          }
+        },
+        "next": {
+          "authority": "local_unverified",
+          "command_status": "complete",
+          "delivery_decision": "not_evaluated",
+          "disposition": "actionable",
+          "exit_code": 0,
+          "next_actions": [],
+          "operation": "next",
+          "reason": "local_task_selected",
+          "repair_brief": {
+            "action_id": "repair-source",
+            "authority": "local_unverified",
+            "checker_id": "rust.cargo_clippy",
+            "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+            "constraints": [
+              "仅修改目标源码",
+              "不得忽略规则或将任务勾选当作复检"
+            ],
+            "disposition": "actionable",
+            "evidence_ref": {
+              "first_report_sha256": "4705954ca60af5dfbe321f1f3cc0efe85d2b09bc25212b3dfac487f2c943c759",
+              "first_run_id": "rust-lint-56038-1791315153433184000-0"
+            },
+            "history": {
+              "attempt_count": 0,
+              "awaiting_verification": false,
+              "budget": 2,
+              "no_progress_count": 0,
+              "open_attempt_id": null,
+              "recent": []
+            },
+            "kind": "finding",
+            "native_rule_id": "clippy::missing_panics_doc",
+            "recheck_argv": [
+              "cargo",
+              "clippy",
+              "--locked",
+              "--offline",
+              "--all-targets",
+              "--message-format=json"
+            ],
+            "schema_version": "0.1.0",
+            "scope": "src/lib.rs",
+            "source_sha256": "7fb3d84f1948330fbf51f22ea4be85c3e9911b1a671012b2728b6f69abbc724a",
+            "step": "核对实际 panic、unwrap、expect 及适用调用条件，补齐 # Panics 的具体说明；章节标题不能代替内容，不改变 API 行为迎合检查；按原任务原 Cargo 运行 task verify，隐式或跨调用 panic 仍需调查",
+            "task_id": "CG-7c44e3c4e64639e59e06b5d8b4e3aebe"
+          },
+          "report_type": "repair_brief_preview",
+          "schema_version": "0.1.0"
+        },
+        "next_actions": [
+          "分别核对 rustdoc 探针规则和原项目 Clippy 文档规则；不会隐式启用 pedantic。",
+          "按稳定任务使用 task verify 原工具复检；裸章节标题或局部零诊断不证明详细文档合规。"
+        ],
+        "operation": "comments",
+        "report_type": "rust_comments_feedback",
+        "schema_version": "0.1.0",
+        "tool_identity_consistent": true
+      },
+      "present": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "delivery_decision": "not_evaluated",
+        "event_persisted": true,
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "source": "builtin_default",
+          "timeout_ms": 1800000
+        },
+        "exit_code": 3,
+        "kind": "finding",
+        "native_scan": {
+          "authority": "local_unverified",
+          "checker_id": "rust.cargo_clippy",
+          "command_status": "incomplete",
+          "configuration": "unknown",
+          "configuration_ref": null,
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "exit_code": 3,
+          "findings": [
+            {
+              "column": 1,
+              "finding_fingerprint": "f4d1b5a37d8a1ac9b45e0b329a808d67cffa4e506669fd8d63fe6e06036b3f64",
+              "finding_id": "CG-f4d1b5a37d8a1ac9b45e0b329a808d67",
+              "level": "warning",
+              "line": 3,
+              "path": "src/lib.rs",
+              "rule_id": "clippy::empty_line_after_doc_comments",
+              "source_sha256": "7fb3d84f1948330fbf51f22ea4be85c3e9911b1a671012b2728b6f69abbc724a"
+            },
+            {
+              "column": 1,
+              "finding_fingerprint": "7c44e3c4e64639e59e06b5d8b4e3aebe425b7a8fa1a01f006358b3d75f95c467",
+              "finding_id": "CG-7c44e3c4e64639e59e06b5d8b4e3aebe",
+              "level": "warning",
+              "line": 5,
+              "path": "src/lib.rs",
+              "rule_id": "clippy::missing_panics_doc",
+              "source_sha256": "7fb3d84f1948330fbf51f22ea4be85c3e9911b1a671012b2728b6f69abbc724a"
+            }
+          ],
+          "language": "rust",
+          "local_scan_complete": true,
+          "manifest_sha256": "b1cd5e7ffde5ac9ee089978488075fb1dce3d1dbcf4c8236aac6bb91048704e8",
+          "operation": "lint",
+          "reason": "native_observed_unverified",
+          "recheck_command": "cargo clippy --locked --offline --all-targets --message-format=json",
+          "report_type": "rust_clippy_local_observation",
+          "rulepack_approval": "unverified",
+          "run_id": "rust-lint-56051-1791315153695376000-0",
+          "schema_version": "0.2.0",
+          "scope": "default_features_all_targets",
+          "tool_approval": "unverified",
+          "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+          "workspace_binding": "bound",
+          "workspace_id": "ws-96b8f541e8b656760214d1b15f0577b5"
+        },
+        "next_actions": [
+          "inspect_native_recheck_and_policy_before_closure"
+        ],
+        "observation": "still_present",
+        "operation": "task_verify",
+        "reason": null,
+        "report_type": "task_verification_preview",
+        "schema_version": "0.6.0",
+        "task_id": "CG-7c44e3c4e64639e59e06b5d8b4e3aebe"
+      },
+      "repaired": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "delivery_decision": "not_evaluated",
+        "event_persisted": true,
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "source": "builtin_default",
+          "timeout_ms": 1800000
+        },
+        "exit_code": 3,
+        "kind": "finding",
+        "native_scan": {
+          "authority": "local_unverified",
+          "checker_id": "rust.cargo_clippy",
+          "command_status": "incomplete",
+          "configuration": "unknown",
+          "configuration_ref": null,
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "exit_code": 3,
+          "findings": [],
+          "language": "rust",
+          "local_scan_complete": true,
+          "manifest_sha256": "b1cd5e7ffde5ac9ee089978488075fb1dce3d1dbcf4c8236aac6bb91048704e8",
+          "operation": "lint",
+          "reason": "native_observed_unverified",
+          "recheck_command": "cargo clippy --locked --offline --all-targets --message-format=json",
+          "report_type": "rust_clippy_local_observation",
+          "rulepack_approval": "unverified",
+          "run_id": "rust-lint-56059-1791315153931665000-0",
+          "schema_version": "0.3.0",
+          "scope": "default_features_all_targets",
+          "suppression_probe": {
+            "forced_scan": {
+              "authority": "local_unverified",
+              "checker_id": "rust.cargo_clippy",
+              "command_status": "incomplete",
+              "configuration": "unknown",
+              "configuration_ref": null,
+              "coverage_proven": false,
+              "delivery_decision": "not_evaluated",
+              "exit_code": 3,
+              "findings": [],
+              "language": "rust",
+              "local_scan_complete": true,
+              "manifest_sha256": "b1cd5e7ffde5ac9ee089978488075fb1dce3d1dbcf4c8236aac6bb91048704e8",
+              "operation": "lint",
+              "reason": "native_observed_unverified",
+              "recheck_command": "cargo clippy --locked --offline --all-targets --message-format=json -- --force-warn clippy::missing_panics_doc",
+              "report_type": "rust_clippy_local_observation",
+              "rulepack_approval": "unverified",
+              "run_id": "rust-lint-56059-1791315154111143000-1",
+              "schema_version": "0.2.0",
+              "scope": "default_features_all_targets",
+              "tool_approval": "unverified",
+              "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+              "workspace_binding": "bound",
+              "workspace_id": "ws-96b8f541e8b656760214d1b15f0577b5"
+            },
+            "input_stable": true,
+            "rule_id": "clippy::missing_panics_doc",
+            "source_sha256": "e0731cd07d49b8d4c9f0397f71d9c5c74da1811b6e15c6059a143fd551391e4d",
+            "target_finding_id": "CG-7c44e3c4e64639e59e06b5d8b4e3aebe",
+            "target_path": "src/lib.rs"
+          },
+          "tool_approval": "unverified",
+          "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+          "workspace_binding": "bound",
+          "workspace_id": "ws-96b8f541e8b656760214d1b15f0577b5"
+        },
+        "next_actions": [
+          "inspect_native_recheck_and_policy_before_closure"
+        ],
+        "observation": "candidate_absent_unverified_policy",
+        "operation": "task_verify",
+        "reason": null,
+        "report_type": "task_verification_preview",
+        "schema_version": "0.6.0",
+        "task_id": "CG-7c44e3c4e64639e59e06b5d8b4e3aebe"
+      },
+      "rule": "clippy::missing_panics_doc",
+      "state": "open"
+    },
+    {
+      "first": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "detailed_contract_qualification": "not_granted",
+        "documentation_findings": [
+          {
+            "column": 1,
+            "finding_fingerprint": "e52f155735b92f240fa86c6ba89bf96e7b3d52d817a5433f24acfc25b2e5c457",
+            "finding_id": "CG-e52f155735b92f240fa86c6ba89bf96e",
+            "level": "warning",
+            "line": 5,
+            "path": "src/lib.rs",
+            "rule_id": "clippy::missing_safety_doc",
+            "source_sha256": "37fa6fdffce70da196d3f5b783dec35d9a28431ec37476b88a344e164877795e"
+          }
+        ],
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "source": "builtin_default",
+          "timeout_ms": 1800000
+        },
+        "exit_code": 3,
+        "input_stable": true,
+        "language": "rust",
+        "local_scan_complete": true,
+        "native_results": {
+          "clippy": {
+            "authority": "local_unverified",
+            "backlog_status": "synced_partial",
+            "backlog_sync": {
+              "failed_reports": 0,
+              "historical_findings": 0,
+              "imported_reports": 1,
+              "new_blockers": 0,
+              "new_findings": 2
+            },
+            "checker_id": "rust.cargo_clippy",
+            "command_status": "incomplete",
+            "configuration": "unknown",
+            "configuration_ref": null,
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "exit_code": 3,
+            "findings": [
+              {
+                "column": 1,
+                "finding_fingerprint": "f4d1b5a37d8a1ac9b45e0b329a808d67cffa4e506669fd8d63fe6e06036b3f64",
+                "finding_id": "CG-f4d1b5a37d8a1ac9b45e0b329a808d67",
+                "level": "warning",
+                "line": 3,
+                "path": "src/lib.rs",
+                "rule_id": "clippy::empty_line_after_doc_comments",
+                "source_sha256": "37fa6fdffce70da196d3f5b783dec35d9a28431ec37476b88a344e164877795e"
+              },
+              {
+                "column": 1,
+                "finding_fingerprint": "e52f155735b92f240fa86c6ba89bf96e7b3d52d817a5433f24acfc25b2e5c457",
+                "finding_id": "CG-e52f155735b92f240fa86c6ba89bf96e",
+                "level": "warning",
+                "line": 5,
+                "path": "src/lib.rs",
+                "rule_id": "clippy::missing_safety_doc",
+                "source_sha256": "37fa6fdffce70da196d3f5b783dec35d9a28431ec37476b88a344e164877795e"
+              }
+            ],
+            "language": "rust",
+            "local_scan_complete": true,
+            "manifest_sha256": "b1cd5e7ffde5ac9ee089978488075fb1dce3d1dbcf4c8236aac6bb91048704e8",
+            "next": {
+              "authority": "local_unverified",
+              "command_status": "complete",
+              "delivery_decision": "not_evaluated",
+              "disposition": "actionable",
+              "exit_code": 0,
+              "next_actions": [],
+              "operation": "next",
+              "reason": "local_task_selected",
+              "repair_brief": {
+                "action_id": "repair-source",
+                "authority": "local_unverified",
+                "checker_id": "rust.cargo_clippy",
+                "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+                "constraints": [
+                  "仅修改目标源码",
+                  "不得忽略规则或将任务勾选当作复检"
+                ],
+                "disposition": "actionable",
+                "evidence_ref": {
+                  "first_report_sha256": "87de9dc2c630ef720f3aa4f3169e88133f16be15de3f51f007259c24f0c30372",
+                  "first_run_id": "rust-lint-56075-1791315154615332000-0"
+                },
+                "history": {
+                  "attempt_count": 0,
+                  "awaiting_verification": false,
+                  "budget": 2,
+                  "no_progress_count": 0,
+                  "open_attempt_id": null,
+                  "recent": []
+                },
+                "kind": "finding",
+                "native_rule_id": "clippy::missing_safety_doc",
+                "recheck_argv": [
+                  "cargo",
+                  "clippy",
+                  "--locked",
+                  "--offline",
+                  "--all-targets",
+                  "--message-format=json"
+                ],
+                "schema_version": "0.1.0",
+                "scope": "src/lib.rs",
+                "source_sha256": "37fa6fdffce70da196d3f5b783dec35d9a28431ec37476b88a344e164877795e",
+                "step": "核对 unsafe API 的调用前置条件与调用者责任，补齐 # Safety 的具体说明；章节标题不能代替内容，不删除 unsafe 或改变 API 逃逸；按原任务原 Cargo 运行 task verify，说明的准确性仍需语义核验",
+                "task_id": "CG-e52f155735b92f240fa86c6ba89bf96e"
+              },
+              "report_type": "repair_brief_preview",
+              "schema_version": "0.1.0"
+            },
+            "operation": "lint",
+            "reason": "native_observed_unverified",
+            "recheck_command": "cargo clippy --locked --offline --all-targets --message-format=json",
+            "report_type": "rust_clippy_local_observation",
+            "rulepack_approval": "unverified",
+            "run_id": "rust-lint-56075-1791315154615332000-0",
+            "schema_version": "0.2.0",
+            "scope": "default_features_all_targets",
+            "tool_approval": "unverified",
+            "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+            "workspace_binding": "bound",
+            "workspace_id": "ws-fe4c3515543bef1478dec76cb2bfc7da"
+          },
+          "rustdoc": {
+            "authority": "local_unverified",
+            "backlog_status": "synced",
+            "backlog_sync": {
+              "failed_reports": 0,
+              "new_blockers": 0,
+              "new_findings": 0
+            },
+            "checker_id": "rust.cargo_rustdoc",
+            "command_status": "incomplete",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "execution_budget": {
+              "enforcement": "native_execution_only",
+              "source": "builtin_default",
+              "timeout_ms": 1800000
+            },
+            "exit_code": 3,
+            "findings": [],
+            "language": "rust",
+            "local_scan_complete": true,
+            "lock_sha256": "5224f04117bbfa7c41a592cfbac330c8ed6c5acd7eca62a15e0e3e6ec871b458",
+            "manifest_sha256": "b1cd5e7ffde5ac9ee089978488075fb1dce3d1dbcf4c8236aac6bb91048704e8",
+            "next_actions": [
+              "核对原生项目文档规则与目标范围；局部零诊断不证明修复或批准白名单",
+              "原工具复检后仍须完整交付检查"
+            ],
+            "operation": "comments",
+            "reason": "native_observed_unverified",
+            "recheck_argv": [
+              "cargo",
+              "rustdoc",
+              "--lib",
+              "--locked",
+              "--offline",
+              "--message-format=json",
+              "--",
+              "--warn",
+              "missing_docs",
+              "--warn",
+              "rustdoc::broken_intra_doc_links"
+            ],
+            "report_type": "rustdoc_local_observation",
+            "rule_selection": "explicit_probe_not_approved_project_policy",
+            "run_id": "rustdoc-56075-1791315154359769000",
+            "schema_version": "0.4.0",
+            "scope": "selected_root_library_default_features",
+            "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+            "workspace_binding": "bound",
+            "workspace_id": "ws-fe4c3515543bef1478dec76cb2bfc7da"
+          }
+        },
+        "next": {
+          "authority": "local_unverified",
+          "command_status": "complete",
+          "delivery_decision": "not_evaluated",
+          "disposition": "actionable",
+          "exit_code": 0,
+          "next_actions": [],
+          "operation": "next",
+          "reason": "local_task_selected",
+          "repair_brief": {
+            "action_id": "repair-source",
+            "authority": "local_unverified",
+            "checker_id": "rust.cargo_clippy",
+            "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+            "constraints": [
+              "仅修改目标源码",
+              "不得忽略规则或将任务勾选当作复检"
+            ],
+            "disposition": "actionable",
+            "evidence_ref": {
+              "first_report_sha256": "87de9dc2c630ef720f3aa4f3169e88133f16be15de3f51f007259c24f0c30372",
+              "first_run_id": "rust-lint-56075-1791315154615332000-0"
+            },
+            "history": {
+              "attempt_count": 0,
+              "awaiting_verification": false,
+              "budget": 2,
+              "no_progress_count": 0,
+              "open_attempt_id": null,
+              "recent": []
+            },
+            "kind": "finding",
+            "native_rule_id": "clippy::missing_safety_doc",
+            "recheck_argv": [
+              "cargo",
+              "clippy",
+              "--locked",
+              "--offline",
+              "--all-targets",
+              "--message-format=json"
+            ],
+            "schema_version": "0.1.0",
+            "scope": "src/lib.rs",
+            "source_sha256": "37fa6fdffce70da196d3f5b783dec35d9a28431ec37476b88a344e164877795e",
+            "step": "核对 unsafe API 的调用前置条件与调用者责任，补齐 # Safety 的具体说明；章节标题不能代替内容，不删除 unsafe 或改变 API 逃逸；按原任务原 Cargo 运行 task verify，说明的准确性仍需语义核验",
+            "task_id": "CG-e52f155735b92f240fa86c6ba89bf96e"
+          },
+          "report_type": "repair_brief_preview",
+          "schema_version": "0.1.0"
+        },
+        "next_actions": [
+          "分别核对 rustdoc 探针规则和原项目 Clippy 文档规则；不会隐式启用 pedantic。",
+          "按稳定任务使用 task verify 原工具复检；裸章节标题或局部零诊断不证明详细文档合规。"
+        ],
+        "operation": "comments",
+        "report_type": "rust_comments_feedback",
+        "schema_version": "0.1.0",
+        "tool_identity_consistent": true
+      },
+      "present": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "delivery_decision": "not_evaluated",
+        "event_persisted": true,
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "source": "builtin_default",
+          "timeout_ms": 1800000
+        },
+        "exit_code": 3,
+        "kind": "finding",
+        "native_scan": {
+          "authority": "local_unverified",
+          "checker_id": "rust.cargo_clippy",
+          "command_status": "incomplete",
+          "configuration": "unknown",
+          "configuration_ref": null,
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "exit_code": 3,
+          "findings": [
+            {
+              "column": 1,
+              "finding_fingerprint": "f4d1b5a37d8a1ac9b45e0b329a808d67cffa4e506669fd8d63fe6e06036b3f64",
+              "finding_id": "CG-f4d1b5a37d8a1ac9b45e0b329a808d67",
+              "level": "warning",
+              "line": 3,
+              "path": "src/lib.rs",
+              "rule_id": "clippy::empty_line_after_doc_comments",
+              "source_sha256": "37fa6fdffce70da196d3f5b783dec35d9a28431ec37476b88a344e164877795e"
+            },
+            {
+              "column": 1,
+              "finding_fingerprint": "e52f155735b92f240fa86c6ba89bf96e7b3d52d817a5433f24acfc25b2e5c457",
+              "finding_id": "CG-e52f155735b92f240fa86c6ba89bf96e",
+              "level": "warning",
+              "line": 5,
+              "path": "src/lib.rs",
+              "rule_id": "clippy::missing_safety_doc",
+              "source_sha256": "37fa6fdffce70da196d3f5b783dec35d9a28431ec37476b88a344e164877795e"
+            }
+          ],
+          "language": "rust",
+          "local_scan_complete": true,
+          "manifest_sha256": "b1cd5e7ffde5ac9ee089978488075fb1dce3d1dbcf4c8236aac6bb91048704e8",
+          "operation": "lint",
+          "reason": "native_observed_unverified",
+          "recheck_command": "cargo clippy --locked --offline --all-targets --message-format=json",
+          "report_type": "rust_clippy_local_observation",
+          "rulepack_approval": "unverified",
+          "run_id": "rust-lint-56088-1791315154877860000-0",
+          "schema_version": "0.2.0",
+          "scope": "default_features_all_targets",
+          "tool_approval": "unverified",
+          "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+          "workspace_binding": "bound",
+          "workspace_id": "ws-fe4c3515543bef1478dec76cb2bfc7da"
+        },
+        "next_actions": [
+          "inspect_native_recheck_and_policy_before_closure"
+        ],
+        "observation": "still_present",
+        "operation": "task_verify",
+        "reason": null,
+        "report_type": "task_verification_preview",
+        "schema_version": "0.6.0",
+        "task_id": "CG-e52f155735b92f240fa86c6ba89bf96e"
+      },
+      "repaired": {
+        "authority": "local_unverified",
+        "command_status": "incomplete",
+        "delivery_decision": "not_evaluated",
+        "event_persisted": true,
+        "execution_budget": {
+          "enforcement": "native_execution_only",
+          "source": "builtin_default",
+          "timeout_ms": 1800000
+        },
+        "exit_code": 3,
+        "kind": "finding",
+        "native_scan": {
+          "authority": "local_unverified",
+          "checker_id": "rust.cargo_clippy",
+          "command_status": "incomplete",
+          "configuration": "unknown",
+          "configuration_ref": null,
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "exit_code": 3,
+          "findings": [],
+          "language": "rust",
+          "local_scan_complete": true,
+          "manifest_sha256": "b1cd5e7ffde5ac9ee089978488075fb1dce3d1dbcf4c8236aac6bb91048704e8",
+          "operation": "lint",
+          "reason": "native_observed_unverified",
+          "recheck_command": "cargo clippy --locked --offline --all-targets --message-format=json",
+          "report_type": "rust_clippy_local_observation",
+          "rulepack_approval": "unverified",
+          "run_id": "rust-lint-56096-1791315155113382000-0",
+          "schema_version": "0.3.0",
+          "scope": "default_features_all_targets",
+          "suppression_probe": {
+            "forced_scan": {
+              "authority": "local_unverified",
+              "checker_id": "rust.cargo_clippy",
+              "command_status": "incomplete",
+              "configuration": "unknown",
+              "configuration_ref": null,
+              "coverage_proven": false,
+              "delivery_decision": "not_evaluated",
+              "exit_code": 3,
+              "findings": [],
+              "language": "rust",
+              "local_scan_complete": true,
+              "manifest_sha256": "b1cd5e7ffde5ac9ee089978488075fb1dce3d1dbcf4c8236aac6bb91048704e8",
+              "operation": "lint",
+              "reason": "native_observed_unverified",
+              "recheck_command": "cargo clippy --locked --offline --all-targets --message-format=json -- --force-warn clippy::missing_safety_doc",
+              "report_type": "rust_clippy_local_observation",
+              "rulepack_approval": "unverified",
+              "run_id": "rust-lint-56096-1791315155283997000-1",
+              "schema_version": "0.2.0",
+              "scope": "default_features_all_targets",
+              "tool_approval": "unverified",
+              "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+              "workspace_binding": "bound",
+              "workspace_id": "ws-fe4c3515543bef1478dec76cb2bfc7da"
+            },
+            "input_stable": true,
+            "rule_id": "clippy::missing_safety_doc",
+            "source_sha256": "ba66450aeba26104620e6dba96f04cebf3187b7e6f210dcefa507af3a9c0575b",
+            "target_finding_id": "CG-e52f155735b92f240fa86c6ba89bf96e",
+            "target_path": "src/lib.rs"
+          },
+          "tool_approval": "unverified",
+          "tool_sha256": "9dada6167fb0bc26e44e23f09179ea15b4d9a8ec491fef1ac5a16484699540ac",
+          "workspace_binding": "bound",
+          "workspace_id": "ws-fe4c3515543bef1478dec76cb2bfc7da"
+        },
+        "next_actions": [
+          "inspect_native_recheck_and_policy_before_closure"
+        ],
+        "observation": "candidate_absent_unverified_policy",
+        "operation": "task_verify",
+        "reason": null,
+        "report_type": "task_verification_preview",
+        "schema_version": "0.6.0",
+        "task_id": "CG-e52f155735b92f240fa86c6ba89bf96e"
+      },
+      "rule": "clippy::missing_safety_doc",
+      "state": "open"
+    }
+  ],
+  "cli_sha256": "91a16547c01b61ae0e4c9c2aa0359dfe6d2ccb4182a1d444c5cb55e6d0b6e11c",
+  "clippy_version": "clippy 0.1.98 (48a229ceae 2026-09-01)",
+  "qualification": "not_granted"
+}

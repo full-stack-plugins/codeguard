@@ -447,3 +447,5 @@ Gradle native documentation feedback now preserves empty comments, missing main 
 Read-only four-core acceptance plan: `codeguard capabilities [language] --acceptance-plan --format=json`. All 57 languages / 228 obligations remain unqualified; filtering preserves full obligations. See [acceptance plan](Codeguard-Production-Acceptance-Plan.md).
 
 Java Gradle vulnerability checks now expose explicit original tasks through `codeguard cve java`, preserving JSON configuration and optional module-cache inputs. Observations remain unverified; workbench integration and full native acceptance are pending. See [Gradle OWASP](Codeguard-Gradle-Vulnerability-Checks.md).
+
+`comments rust` now returns the dedicated `rust_comments_feedback` 0.1 wrapper, retaining original Rustdoc 0.4 and Clippy 0.2 observations under `native_results`. It runs both sequentially within one deadline and selects documentation tasks for `next`. Consumers of the former standalone Rustdoc JSON must read `native_results.rustdoc`; stored native reports and original-tool task verification remain compatible. See [combined-entry acceptance](../tests/acceptance/rust-comments-combined.md).

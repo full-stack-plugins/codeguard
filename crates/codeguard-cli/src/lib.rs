@@ -237,6 +237,8 @@ pub mod rust_build_command;
 pub(crate) mod rust_build_task_recheck;
 #[cfg(unix)]
 pub mod rust_comments_command;
+#[cfg(unix)]
+mod rust_documentation_command;
 pub(crate) mod rust_cve_task_recheck;
 #[cfg(unix)]
 mod rust_lint_inputs;
