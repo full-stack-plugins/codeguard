@@ -823,7 +823,18 @@ pub(crate) fn guidance(root: &Path, brief: &Value) -> Option<Value> {
     } else if classify(&report) == "candidate_absent_unverified_policy" {
         (
             "verification_required",
-            "原生语法复检未发现诊断；核对原输入的反证或修复归因及正式策略/覆盖，保留证据，不重复源码修复或安装工具，也不自动关闭",
+            // 只把已核验的同字节WASM来源当作反证候选，不能误报源码已修复。
+            if report["original_report"]["grammar_sha256"]
+                .as_str()
+                .is_some_and(valid_sha)
+                && report["original_report"]["source_sha256"]
+                    .as_str()
+                    .is_some_and(|sha| report["target"]["source_sha256"] == sha)
+            {
+                "原生语法复检未发现诊断，与首次WASM候选是同一源码；当前是grammar反证候选，不是源码已修复。调查grammar版本/兼容性或扫描预算，保留原字节与原生证据；不重复修改源码或安装工具，也不自动白名单放行或关闭任务"
+            } else {
+                "原生语法复检未发现诊断；核对原输入的反证或修复归因及正式策略/覆盖，保留证据，不重复源码修复或安装工具，也不自动关闭"
+            },
         )
     } else {
         (
