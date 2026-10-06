@@ -312,8 +312,13 @@ pub fn prepare(root: &Path, inputs: &Value, native: &Value) -> Result<Value, &'s
     )
 }
 
-/// 从原报告字节构造静态复扫参数；参数为工作区、首次run和摘要，返回指引，不执行工具。
-pub(crate) fn recheck_argv(root: &Path, run: &str, expected: &str) -> Result<Value, &'static str> {
+/// 核对原报告后构造原任务复检参数；参数为工作区、任务ID、首次run和摘要，不执行工具。
+pub(crate) fn recheck_argv(
+    root: &Path,
+    task_id: &str,
+    run: &str,
+    expected: &str,
+) -> Result<Value, &'static str> {
     let bytes = codeguard_runtime::read_bounded_regular_file(
         &root.join(format!(".codeguard/reports/{run}.json")),
         16 * 1024 * 1024,
@@ -322,8 +327,14 @@ pub(crate) fn recheck_argv(root: &Path, run: &str, expected: &str) -> Result<Val
     if digest(&bytes) != expected {
         return Err("gradle_original_report_changed");
     }
-    let report = codeguard_adapters::parse_unique_json(&bytes)
+    let mut report = codeguard_adapters::parse_unique_json(&bytes)
         .map_err(|_| "gradle_original_report_invalid")?;
+    if report["report_type"] == "gradle_javadoc_task_recheck" {
+        if !crate::gradle_javadoc_task_recheck::valid_shape(&report) {
+            return Err("gradle_original_report_invalid");
+        }
+        report = report["scan"].clone();
+    }
     let baseline =
         crate::workspace_refresh::read_workspace_baseline(root).map_err(|_| "workspace_invalid")?;
     if report["report_type"] != "gradle_javadoc_workbench_observation"
@@ -337,27 +348,24 @@ pub(crate) fn recheck_argv(root: &Path, run: &str, expected: &str) -> Result<Val
         .as_array()
         .filter(|r| !r.is_empty() && r.len() <= 128)
         .ok_or("gradle_original_inputs_invalid")?;
-    let mut argv = vec![
-        json!("codeguard"),
-        json!("check"),
-        json!("java"),
-        json!(root),
-        json!("--gradle-javadoc"),
-        json!("--gradle-bundle"),
-        json!("<已核验原Gradle绝对路径>"),
-        json!("--java-home"),
-        json!("<已核验原JDK21绝对路径>"),
-    ];
     for row in rows {
-        let path = row["path"]
-            .as_str()
-            .filter(|p| safe(p))
-            .ok_or("gradle_original_input_invalid")?;
-        argv.push(json!("--gradle-project-file"));
-        argv.push(json!(path));
+        if !row["path"].as_str().is_some_and(safe) {
+            return Err("gradle_original_input_invalid");
+        }
     }
-    argv.push(json!("--format=json"));
-    Ok(json!(argv))
+    Ok(json!([
+        "codeguard",
+        "task",
+        "verify",
+        task_id,
+        ".",
+        "--gradle-bundle",
+        "<已核验原Gradle绝对路径>",
+        "--java-home",
+        "<已核验原JDK21绝对路径>",
+        "--format",
+        "json"
+    ]))
 }
 
 /// 保存和同步扫描前快照绑定的局部观察；返回更新计数，未初始化时不自动建工作区。
@@ -378,10 +386,10 @@ pub(crate) fn connect(root: &Path, snapshot: Option<&SourceSnapshot>, native: &V
         crate::work_sync::save_local_report(root, &report)?;
         let summary = crate::work_sync::sync_local_workspace(root)?;
         Ok(
-            json!({"status":if summary.failed_reports==0 {"synced_partial"} else {"sync_incomplete"},"new_findings":summary.new_findings,"new_blockers":summary.new_blockers,"task_verify_status":"not_integrated","summary_scope":"workspace_sync"}),
+            json!({"status":if summary.failed_reports==0 {"synced_partial"} else {"sync_incomplete"},"new_findings":summary.new_findings,"new_blockers":summary.new_blockers,"task_verify_status":"local_observation_only","summary_scope":"workspace_sync"}),
         )
     })();
-    result.unwrap_or_else(|reason|json!({"status":reason,"new_findings":0,"new_blockers":0,"task_verify_status":"not_integrated","summary_scope":"workspace_sync"}))
+    result.unwrap_or_else(|reason|json!({"status":reason,"new_findings":0,"new_blockers":0,"task_verify_status":"local_observation_only","summary_scope":"workspace_sync"}))
 }
 
 /// 核对消费收据、原报告字节和准备观察，返回最新诊断及证据引用；不沿用未消费或篡改记录。
@@ -482,8 +490,14 @@ pub(crate) fn latest_preparation(
         if digest(&report_bytes) != expected {
             return Err("gradle_preparation_report_changed");
         }
-        let report = codeguard_adapters::parse_unique_json(&report_bytes)
+        let mut report = codeguard_adapters::parse_unique_json(&report_bytes)
             .map_err(|_| "gradle_preparation_report_invalid")?;
+        if report["report_type"] == "gradle_javadoc_task_recheck" {
+            if !crate::gradle_javadoc_task_recheck::valid_shape(&report) {
+                return Err("gradle_preparation_report_invalid");
+            }
+            report = report["scan"].clone();
+        }
         if report["report_type"] != "gradle_javadoc_workbench_observation"
             || report["workspace_id"] != fact["workspace_id"]
             || report["run_id"] != run

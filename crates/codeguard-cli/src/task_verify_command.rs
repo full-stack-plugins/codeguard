@@ -47,6 +47,7 @@ struct Arguments {
     pip_audit_version: Option<String>,
     go_tool: Option<PathBuf>,
     maven_tool: Option<PathBuf>,
+    gradle_bundle: Option<PathBuf>,
     java_home: Option<PathBuf>,
     java_tool: Option<PathBuf>,
     checkstyle_jar: Option<PathBuf>,
@@ -103,6 +104,40 @@ pub fn run(args: &[String]) -> ExitCode {
     };
     let javadoc_task = brief["checker_id"] == "java.jdk.javadoc";
     let maven_javadoc_task = brief["checker_id"] == "java.maven.javadoc";
+    let gradle_javadoc_task = brief["checker_id"] == "java.gradle.javadoc";
+    if parsed.gradle_bundle.is_some() && !gradle_javadoc_task {
+        eprintln!("--gradle-bundle 仅用于Gradle Javadoc任务");
+        return ExitCode::from(2);
+    }
+    if gradle_javadoc_task
+        && (parsed.ruff_tool.is_some()
+            || parsed.zig_tool.is_some()
+            || parsed.erl_tool.is_some()
+            || parsed.swift_tool.is_some()
+            || parsed.ruby_tool.is_some()
+            || parsed.rustfmt_tool.is_some()
+            || parsed.kotlinc_tool.is_some()
+            || parsed.cargo_tool.is_some()
+            || parsed.shellcheck_tool.is_some()
+            || parsed.cargo_audit_tool.is_some()
+            || parsed.rustsec_db.is_some()
+            || parsed.pip_audit_tool.is_some()
+            || parsed.pip_audit_version.is_some()
+            || parsed.go_tool.is_some()
+            || parsed.maven_tool.is_some()
+            || parsed.java_tool.is_some()
+            || parsed.checkstyle_jar.is_some()
+            || parsed.checkstyle_config.is_some()
+            || parsed.maven_repo.is_some()
+            || parsed.repo_sha256.is_some()
+            || parsed.cve_data_dir.is_some()
+            || parsed.cve_data_sha256.is_some()
+            || !parsed.eslint_options.is_empty()
+            || !parsed.npm_options.is_empty())
+    {
+        eprintln!("Gradle Javadoc任务仅接受原Gradle分发、JDK路径和共享参数");
+        return ExitCode::from(2);
+    }
     if maven_javadoc_task
         && (parsed.ruff_tool.is_some()
             || parsed.cargo_tool.is_some()
@@ -363,6 +398,21 @@ pub fn run(args: &[String]) -> ExitCode {
             crate::checkstyle_preparation_recheck::run(&root, &brief, &options, deadline)
         } else {
             crate::checkstyle_task_recheck::run(&root, &brief, &options, deadline)
+        }
+    } else if gradle_javadoc_task {
+        match crate::gradle_javadoc_task_recheck::run(
+            &root,
+            &brief,
+            parsed.gradle_bundle.as_deref(),
+            parsed.java_home.as_deref(),
+            deadline,
+            &std::sync::atomic::AtomicBool::new(false),
+        ) {
+            Ok(report) => report,
+            Err(reason) => {
+                let release = finish_verification(&root, &parsed.task_id, &lease);
+                return print_unavailable(&parsed, release.err().unwrap_or(reason));
+            }
         }
     } else if maven_javadoc_task {
         match crate::maven_javadoc_task_recheck::run(
@@ -751,6 +801,8 @@ pub fn run(args: &[String]) -> ExitCode {
             crate::npm_task_recheck::classify(&root, &brief, &scan)
         } else if eslint_task {
             crate::eslint_task_recheck::classify(&brief, &scan)
+        } else if gradle_javadoc_task {
+            crate::gradle_javadoc_task_recheck::classify(&brief, &scan)
         } else if maven_javadoc_task {
             crate::maven_javadoc_task_recheck::classify(&brief, &scan)
         } else if javadoc_task {
@@ -793,6 +845,9 @@ pub fn run(args: &[String]) -> ExitCode {
         "execution_budget":budget_record(parsed.timeout_ms, parsed.timeout_source),
         "next_actions":["inspect_native_recheck_and_policy_before_closure"]
     });
+    if gradle_javadoc_task {
+        report["schema_version"] = json!("0.29.0");
+    }
     if maven_javadoc_task {
         report["schema_version"] = json!("0.28.0");
     }
@@ -875,6 +930,9 @@ pub fn run(args: &[String]) -> ExitCode {
                         || (brief["checker_id"] == "rust.cargo_rustdoc"
                             && scan["input_stable"] == true
                             && !crate::rustdoc_task_recheck::inputs_current(&root, &scan))
+                        || (gradle_javadoc_task
+                            && scan["task_input_stable"] == true
+                            && !crate::gradle_javadoc_task_recheck::inputs_current(&root, &scan))
                         || (maven_javadoc_task
                             && scan["task_input_stable"] == true
                             && !crate::maven_javadoc_task_recheck::inputs_current(&root, &scan))
@@ -1632,6 +1690,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
     let mut pip_audit_version = None;
     let mut go_tool = None;
     let mut maven_tool = None;
+    let mut gradle_bundle = None;
     let mut java_home = None;
     let mut java_tool = None;
     let mut checkstyle_jar = None;
@@ -1675,6 +1734,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                 | "--pip-audit-version"
                 | "--go-tool"
                 | "--maven-tool"
+                | "--gradle-bundle"
                 | "--java-home"
                 | "--java-tool"
                 | "--checkstyle-jar"
@@ -1716,6 +1776,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                 "--pip-audit-version" if pip_audit_version.replace(value.clone()).is_none() => {}
                 "--go-tool" if go_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--maven-tool" if maven_tool.replace(PathBuf::from(value)).is_none() => {}
+                "--gradle-bundle" if gradle_bundle.replace(PathBuf::from(value)).is_none() => {}
                 "--java-home" if java_home.replace(PathBuf::from(value)).is_none() => {}
                 "--java-tool" if java_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--checkstyle-jar" if checkstyle_jar.replace(PathBuf::from(value)).is_none() => {}
@@ -1793,6 +1854,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
     }
     if [
         maven_tool.as_ref(),
+        gradle_bundle.as_ref(),
         java_home.as_ref(),
         java_tool.as_ref(),
         checkstyle_jar.as_ref(),
@@ -1856,6 +1918,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
         pip_audit_version,
         go_tool,
         maven_tool,
+        gradle_bundle,
         java_home,
         java_tool,
         checkstyle_jar,

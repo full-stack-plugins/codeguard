@@ -27,6 +27,7 @@ struct Candidate {
 }
 
 struct VerificationObservation {
+    gradle_inputs_stale: bool,
     outcome: String,
     run_id: String,
     report_sha256: String,
@@ -650,7 +651,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
     } else if checker_id == "java.gradle.javadoc" {
         #[cfg(unix)]
         {
-            crate::gradle_javadoc_workbench::recheck_argv(root, first_run, report_sha)?
+            crate::gradle_javadoc_workbench::recheck_argv(root, id, first_run, report_sha)?
         }
         #[cfg(not(unix))]
         {
@@ -940,9 +941,9 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         )
     };
     if checker_id == "java.gradle.javadoc" {
-        brief["schema_version"] = json!("0.22.0");
+        brief["schema_version"] = json!("0.23.0");
         brief["observation_scope"] = json!("selected_gradle_javadoc_inputs");
-        brief["task_verify_status"] = json!("not_integrated");
+        brief["task_verify_status"] = json!("local_observation_only");
         if let Some((reason, evidence)) = &gradle_preparation {
             brief["latest_diagnostic_reason"] = json!(reason);
             brief["latest_preparation_ref"] = evidence.clone();
@@ -951,7 +952,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         brief["rule_basis"] = json!("原Gradle官方Javadoc任务原生诊断；完整详细规则与源集尚未验收");
         if kind == "finding" && disposition == "actionable" {
             brief["step"] = json!(
-                "核对本轮原生规则和API契约，补齐用途、参数、返回及异常详细说明，裸标签不能代替内容；按相同所选输入及原Gradle/JDK复扫，不关闭规则或勾选关闭"
+                "核对本轮原生规则和API契约，补齐用途、参数、返回及异常详细说明，裸标签不能代替内容；对原任务运行task verify，复用原选定输入及原Gradle/JDK，不关闭规则或勾选关闭"
             );
         }
     }
@@ -1201,7 +1202,22 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                         .is_some_and(|bytes| format!("{:x}", Sha256::digest(bytes)) == *sha)
                 })
             });
-        if checkstyle_tools_changed {
+        if checker_id == "java.gradle.javadoc" && observation.gradle_inputs_stale {
+            brief["verification_invalidated_reason"] =
+                json!("gradle_inputs_changed_or_unavailable");
+            brief["disposition"] = json!("verification_required");
+            brief["step"] = json!(
+                "Gradle复检后的所选源码、配置或工具已变化或不可用；重新核对原上下文并运行原任务，不沿用旧诊断或消失结论"
+            );
+            priority = 0;
+        } else if checker_id == "java.gradle.javadoc" && outcome == "incomplete" {
+            brief["verification_observation"] = json!(outcome);
+            brief["disposition"] = json!("verification_required");
+            brief["step"] = json!(
+                "Gradle原任务复检不完整；查看绑定报告的具体工具、配置或输入原因，恢复后对原任务复检，不修改无关源码"
+            );
+            priority = if kind == "finding" { 2 } else { 0 };
+        } else if checkstyle_tools_changed {
             brief["verification_invalidated_reason"] = json!("tool_inputs_changed_or_unavailable");
             brief["disposition"] = json!("verification_required");
             brief["step"] = json!(
@@ -1333,6 +1349,8 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                 }
             } else if checker_id == "rust.cargo_clippy" {
                 "Clippy 本轮未再报告原问题；核查 allow/cap-lints、Cargo lints、特性组合和工具身份后重新复检"
+            } else if checker_id == "java.gradle.javadoc" {
+                "原Gradle构建配置、工具或规则/范围需要复核；核对原报告与本轮输入差异，恢复原受批准配置后对同一任务复检，不凭局部输出关闭"
             } else if checker_id == "java.jdk.javadoc" {
                 "Javadoc局部零诊断不关闭历史问题；用同一原配置和JDK复检，可信关闭仍待完成"
             } else if checker_id == "java.maven.p3c" {
@@ -1409,7 +1427,11 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             brief["source_sha256"] = json!(observation.source_sha256);
             brief["verification_observation"] = json!(outcome);
             brief["disposition"] = json!("actionable");
-            brief["step"] = if checker_id == "java.checkstyle" {
+            brief["step"] = if checker_id == "java.gradle.javadoc" {
+                json!(
+                    "原Gradle任务仍报告该原生文档规则；核对当前位置及API契约，补齐详细用途和适用参数/返回/异常说明后对原任务复检，不关闭规则"
+                )
+            } else if checker_id == "java.checkstyle" {
                 brief["checkstyle_guidance"]["repair_steps"][0].clone()
             } else {
                 json!(finding_repair_step(
@@ -1727,6 +1749,18 @@ pub(crate) fn canonical_action_id(brief: &Value) -> Result<&'static str, &'stati
             Ok("repair-source")
         }
         Some("blocker")
+            if brief["checker_id"] == "java.gradle.javadoc"
+                && brief["verification_observation"] == "incomplete" =>
+        {
+            Ok("restore-checker-environment")
+        }
+        Some("blocker")
+            if brief["checker_id"] == "java.gradle.javadoc"
+                && brief["verification_observation"] == "rule_coverage_requires_review" =>
+        {
+            Ok("review-project-policy")
+        }
+        Some("blocker")
             if brief["reason_code"] == "project_ruff_config_not_found"
                 || brief["reason_code"] == "p3c_configuration_not_confirmed"
                 || (brief["checker_id"] == "java.gradle.javadoc"
@@ -1906,6 +1940,10 @@ fn latest_verification_observation(
                     )
                     && report["checker_id"] == "go.vet"
                     && event["observation"] == classify_go(brief, &report)
+            } else if brief["checker_id"] == "java.gradle.javadoc" {
+                crate::gradle_javadoc_task_recheck::valid_shape(&report)
+                    && event["observation"]
+                        == crate::gradle_javadoc_task_recheck::classify(brief, &report)
             } else if brief["checker_id"] == "java.maven.javadoc" {
                 crate::maven_javadoc_task_recheck::valid_shape(&report)
                     && event["observation"]
@@ -2023,7 +2061,8 @@ fn latest_verification_observation(
                 || checkstyle_report
                 || brief["checker_id"] == "shell.shellcheck"
                 || brief["checker_id"] == "java.jdk.javadoc"
-                || brief["checker_id"] == "java.maven.javadoc")
+                || brief["checker_id"] == "java.maven.javadoc"
+                || brief["checker_id"] == "java.gradle.javadoc")
                 && outcome == "rule_coverage_requires_review"))
                 && brief["kind"] == "finding"
             {
@@ -2039,7 +2078,7 @@ fn latest_verification_observation(
                             .to_owned()
                     } else if matches!(
                         brief["checker_id"].as_str(),
-                        Some("java.jdk.javadoc" | "java.maven.javadoc")
+                        Some("java.jdk.javadoc" | "java.maven.javadoc" | "java.gradle.javadoc")
                     ) {
                         report["input_bindings"]
                             .as_array()
@@ -2107,6 +2146,9 @@ fn latest_verification_observation(
                 None
             };
             latest_verify = Some(VerificationObservation {
+                gradle_inputs_stale: brief["checker_id"] == "java.gradle.javadoc"
+                    && report["task_input_stable"] == true
+                    && !crate::gradle_javadoc_task_recheck::inputs_current(root, &report),
                 outcome,
                 run_id: run_id.to_owned(),
                 report_sha256: event["report_sha256"]
@@ -2128,7 +2170,10 @@ fn latest_verification_observation(
                 } else {
                     None
                 },
-                checkstyle_reason: if checkstyle_report || preparation_report {
+                checkstyle_reason: if checkstyle_report
+                    || preparation_report
+                    || brief["checker_id"] == "java.gradle.javadoc"
+                {
                     report["reason"].as_str().map(str::to_owned)
                 } else {
                     None
@@ -2222,7 +2267,7 @@ fn run_sequence(run_id: &str) -> Option<u128> {
 
 fn view(disposition: &str, reason: &str, brief: Value, actions: Value) -> Value {
     json!({
-        "schema_version":if brief["schema_version"] == "0.22.0" {json!("0.22.0")}else if brief["schema_version"] == "0.21.0" {json!("0.21.0")}else if brief["schema_version"] == "0.20.0" {json!("0.20.0")}else if brief["checker_id"] == "shell.shellcheck" {json!("0.17.0")} else if brief["checker_id"] == "go.vet" {json!("0.13.0")} else if brief["checker_id"] == "syntax.native_confirmation" {brief["schema_version"].clone()} else {json!("0.1.0")}, "report_type":"repair_brief_preview",
+        "schema_version":if brief["schema_version"] == "0.23.0" {json!("0.23.0")}else if brief["schema_version"] == "0.22.0" {json!("0.22.0")}else if brief["schema_version"] == "0.21.0" {json!("0.21.0")}else if brief["schema_version"] == "0.20.0" {json!("0.20.0")}else if brief["checker_id"] == "shell.shellcheck" {json!("0.17.0")} else if brief["checker_id"] == "go.vet" {json!("0.13.0")} else if brief["checker_id"] == "syntax.native_confirmation" {brief["schema_version"].clone()} else {json!("0.1.0")}, "report_type":"repair_brief_preview",
         "operation":"next", "command_status":"complete", "exit_code":0,
         "disposition":disposition, "reason":reason,
         "repair_brief":brief, "next_actions":actions,

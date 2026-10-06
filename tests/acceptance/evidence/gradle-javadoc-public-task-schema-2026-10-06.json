@@ -1,0 +1,7 @@
+{
+  "meta_valid": 423,
+  "reports_valid": 25,
+  "forgeries_rejected": 8,
+  "old_consumers_rejected": 3,
+  "old_schemas_byte_preserved": 420
+}
