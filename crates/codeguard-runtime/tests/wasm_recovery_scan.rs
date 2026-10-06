@@ -25,6 +25,7 @@ fn hidden_swift_missing_type_is_incomplete_even_with_zero_records() {
     assert!(tree.root_node().has_error());
     let scan = scan_wasm_recoveries(&tree, 128).unwrap();
     assert!(scan.recoveries.is_empty());
+    assert!(scan.parser_error_location_unavailable);
     assert!(
         scan.truncated,
         "a hidden token cannot be classified as valid syntax"
@@ -33,6 +34,7 @@ fn hidden_swift_missing_type_is_incomplete_even_with_zero_records() {
     let scan = scan_wasm_recoveries(&tree, 128).unwrap();
     assert!(scan.recoveries.is_empty());
     assert!(!scan.truncated);
+    assert!(!scan.parser_error_location_unavailable);
 }
 
 #[test]
@@ -48,6 +50,7 @@ fn hidden_kotlin_missing_tokens_do_not_look_clean() {
         let tree = grammar.parse(source.as_bytes()).unwrap();
         assert!(tree.root_node().has_error());
         let scan = scan_wasm_recoveries(&tree, 128).unwrap();
+        assert!(scan.parser_error_location_unavailable);
         assert!(
             scan.truncated,
             "hidden grammar error must remain incomplete"
@@ -141,6 +144,10 @@ fn wide_error_branch_counts_normal_siblings_against_traversal_budget() {
     assert!(
         scan.truncated,
         "inspecting normal siblings must consume the bounded traversal budget"
+    );
+    assert!(
+        !scan.parser_error_location_unavailable,
+        "budget exhaustion is not hidden token evidence"
     );
     let smaller = grammar.parse(b"class A { ; ; int x = ; }").unwrap();
     let complete = scan_wasm_recoveries(&smaller, 32).unwrap();

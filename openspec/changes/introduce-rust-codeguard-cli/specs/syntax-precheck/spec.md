@@ -775,3 +775,16 @@ Project Rust parser selection SHALL distinguish package edition, explicit worksp
 #### Scenario: Declaration changes during tool version detection
 - **WHEN** a nearer manifest appears or package/workspace declaration or source bytes change during the native version invocation
 - **THEN** withdraw current diagnostics and do not start the second parser invocation; retain an incomplete observation without task closure
+
+
+### Requirement: 隐藏解析错误必须指导原生确认
+
+语法树存在错误但公开恢复遍历无法定位时 MUST 保留初检未完成，不生成虚构 ERROR/MISSING 位置或将零恢复当作通过。私有工作进程 SHALL 用独立版本区分不可定位错误与资源预算耗尽；显式 grammar probe SHALL 提供同字节原生确认和 grammar 复核指引。此观察不独立证明源码违规，也不提升 grammar 资格。
+
+#### Scenario: 隐藏错误与合法反例
+- **WHEN** 固定 Kotlin/Swift grammar 产生隐藏 MISSING 且公开遍历没有恢复节点
+- **THEN** SHALL 返回 parser_error_location_unavailable=true 和原生确认动作，保持原字节、零虚构位置、incomplete/not_evaluated
+
+#### Scenario: 预算耗尽不冒充隐藏错误
+- **WHEN** 正常兄弟节点检查耗尽扫描预算且没有已确认的不可定位错误
+- **THEN** SHALL 保留截断未完成状态，不声称存在隐藏 token；旧工作进程版本不得携带新字段，新字段矛盾时 SHALL 拒绝报告

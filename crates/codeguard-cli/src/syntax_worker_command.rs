@@ -174,7 +174,9 @@ fn observe(language: &str, source: &[u8]) -> Result<SyntaxWorkerEnvelope, String
         })
         .collect();
     Ok(SyntaxWorkerEnvelope {
-        schema_version: if structural_observations.is_empty() {
+        schema_version: if scanned.parser_error_location_unavailable {
+            "1.4.0"
+        } else if structural_observations.is_empty() {
             "1.0.0"
         } else if language == "cfquery" {
             "1.3.0"
@@ -190,6 +192,9 @@ fn observe(language: &str, source: &[u8]) -> Result<SyntaxWorkerEnvelope, String
         grammar_abi_version: asset.abi_version,
         source_sha256: format!("{:x}", Sha256::digest(source)),
         truncated: scanned.truncated || structural_truncated,
+        parser_error_location_unavailable: scanned
+            .parser_error_location_unavailable
+            .then_some(true),
         recoveries,
         structural_observations,
     })
