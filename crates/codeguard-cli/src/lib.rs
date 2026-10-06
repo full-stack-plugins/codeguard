@@ -529,3 +529,6 @@ mod gradle_owasp_report_budget;
 
 #[cfg(unix)]
 pub mod gradle_cve_workbench;
+
+#[cfg(unix)]
+pub mod gradle_cve_task_recheck;

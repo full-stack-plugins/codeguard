@@ -48,6 +48,7 @@ struct Arguments {
     go_tool: Option<PathBuf>,
     maven_tool: Option<PathBuf>,
     gradle_bundle: Option<PathBuf>,
+    gradle_module_cache: Option<PathBuf>,
     java_home: Option<PathBuf>,
     java_tool: Option<PathBuf>,
     checkstyle_jar: Option<PathBuf>,
@@ -92,9 +93,7 @@ pub fn run(args: &[String]) -> ExitCode {
         Ok(brief) => brief,
         Err(reason) => return print_unavailable(&parsed, reason),
     };
-    if brief["checker_id"] == "java.gradle.dependency_check" {
-        return print_unavailable(&parsed, "gradle_cve_task_verify_not_integrated");
-    }
+    let gradle_cve_task = brief["checker_id"] == "java.gradle.dependency_check";
     let python_confirmation = brief["checker_id"] == "python.ruff"
         && brief["reason_code"] == "python_syntax_confirmation_needed";
     let python_original = if python_confirmation {
@@ -108,11 +107,15 @@ pub fn run(args: &[String]) -> ExitCode {
     let javadoc_task = brief["checker_id"] == "java.jdk.javadoc";
     let maven_javadoc_task = brief["checker_id"] == "java.maven.javadoc";
     let gradle_javadoc_task = brief["checker_id"] == "java.gradle.javadoc";
-    if parsed.gradle_bundle.is_some() && !gradle_javadoc_task {
-        eprintln!("--gradle-bundle 仅用于Gradle Javadoc任务");
+    if parsed.gradle_module_cache.is_some() && !gradle_cve_task {
+        eprintln!("--gradle-module-cache 仅用于Gradle CVE任务");
         return ExitCode::from(2);
     }
-    if gradle_javadoc_task
+    if parsed.gradle_bundle.is_some() && !gradle_javadoc_task && !gradle_cve_task {
+        eprintln!("--gradle-bundle 仅用于Gradle Javadoc/CVE任务");
+        return ExitCode::from(2);
+    }
+    if (gradle_javadoc_task || gradle_cve_task)
         && (parsed.ruff_tool.is_some()
             || parsed.zig_tool.is_some()
             || parsed.erl_tool.is_some()
@@ -401,6 +404,22 @@ pub fn run(args: &[String]) -> ExitCode {
             crate::checkstyle_preparation_recheck::run(&root, &brief, &options, deadline)
         } else {
             crate::checkstyle_task_recheck::run(&root, &brief, &options, deadline)
+        }
+    } else if gradle_cve_task {
+        match crate::gradle_cve_task_recheck::run(
+            &root,
+            &brief,
+            parsed.gradle_bundle.as_deref(),
+            parsed.java_home.as_deref(),
+            parsed.gradle_module_cache.as_deref(),
+            deadline,
+            &std::sync::atomic::AtomicBool::new(false),
+        ) {
+            Ok(report) => report,
+            Err(reason) => {
+                let release = finish_verification(&root, &parsed.task_id, &lease);
+                return print_unavailable(&parsed, release.err().unwrap_or(reason));
+            }
         }
     } else if gradle_javadoc_task {
         match crate::gradle_javadoc_task_recheck::run(
@@ -804,6 +823,8 @@ pub fn run(args: &[String]) -> ExitCode {
             crate::npm_task_recheck::classify(&root, &brief, &scan)
         } else if eslint_task {
             crate::eslint_task_recheck::classify(&brief, &scan)
+        } else if gradle_cve_task {
+            crate::gradle_cve_task_recheck::classify(&brief, &scan)
         } else if gradle_javadoc_task {
             crate::gradle_javadoc_task_recheck::classify(&brief, &scan)
         } else if maven_javadoc_task {
@@ -858,6 +879,9 @@ pub fn run(args: &[String]) -> ExitCode {
         } else {
             "0.34.0"
         });
+    }
+    if gradle_cve_task {
+        report["schema_version"] = json!("0.35.0");
     }
     if gradle_javadoc_task {
         report["schema_version"] = json!("0.30.0");
@@ -921,12 +945,17 @@ pub fn run(args: &[String]) -> ExitCode {
         match lock_verification(&root, &parsed.task_id, &lease) {
             Ok(_guard) => match latest_ready_attempt(&root, &parsed.task_id) {
                 Ok(current) if current == bound_attempt => {
-                    if (python_confirmation
-                        && (!crate::python_confirmation_recheck::valid_binding(&root, &scan)
+                    if (gradle_cve_task
+                        && (crate::gradle_cve_task_recheck::validate_binding(&root, &brief, &scan)
+                            .is_err()
                             || (scan["task_input_stable"] == true
-                                && !crate::python_confirmation_recheck::inputs_current(
-                                    &root, &scan,
-                                ))))
+                                && !crate::gradle_cve_task_recheck::inputs_current(&root, &scan))))
+                        || (python_confirmation
+                            && (!crate::python_confirmation_recheck::valid_binding(&root, &scan)
+                                || (scan["task_input_stable"] == true
+                                    && !crate::python_confirmation_recheck::inputs_current(
+                                        &root, &scan,
+                                    ))))
                         || (syntax_task
                             && scan["input_stable"] == true
                             && !crate::syntax_task_recheck::inputs_current(&root, &scan))
@@ -1705,6 +1734,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
     let mut go_tool = None;
     let mut maven_tool = None;
     let mut gradle_bundle = None;
+    let mut gradle_module_cache = None;
     let mut java_home = None;
     let mut java_tool = None;
     let mut checkstyle_jar = None;
@@ -1749,6 +1779,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                 | "--go-tool"
                 | "--maven-tool"
                 | "--gradle-bundle"
+                | "--gradle-module-cache"
                 | "--java-home"
                 | "--java-tool"
                 | "--checkstyle-jar"
@@ -1790,6 +1821,8 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                 "--pip-audit-version" if pip_audit_version.replace(value.clone()).is_none() => {}
                 "--go-tool" if go_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--maven-tool" if maven_tool.replace(PathBuf::from(value)).is_none() => {}
+                "--gradle-module-cache"
+                    if gradle_module_cache.replace(PathBuf::from(value)).is_none() => {}
                 "--gradle-bundle" if gradle_bundle.replace(PathBuf::from(value)).is_none() => {}
                 "--java-home" if java_home.replace(PathBuf::from(value)).is_none() => {}
                 "--java-tool" if java_tool.replace(PathBuf::from(value)).is_none() => {}
@@ -1869,6 +1902,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
     if [
         maven_tool.as_ref(),
         gradle_bundle.as_ref(),
+        gradle_module_cache.as_ref(),
         java_home.as_ref(),
         java_tool.as_ref(),
         checkstyle_jar.as_ref(),
@@ -1933,6 +1967,7 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
         go_tool,
         maven_tool,
         gradle_bundle,
+        gradle_module_cache,
         java_home,
         java_tool,
         checkstyle_jar,

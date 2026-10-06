@@ -952,3 +952,8 @@ Model capture, original task execution and report ownership observation SHALL sh
 #### Scenario: Explicit Gradle CVE feeds stable workbench preparation tasks
 - **WHEN** the explicit command runs in an already initialized workspace with unchanged bounded selected inputs
 - **THEN** it SHALL save a sanitized local observation and automatically sync one stable preparation task per selected input/task scope, expose the original repeatable task/input CLI flags in next/task show, preserve diagnostic history and reject report tampering or stale new imports; raw package identifiers and native output SHALL NOT enter committed task facts. Empty or unverified advisories SHALL NOT close tasks; unified check scheduling and task verify remain separate obligations.
+
+
+#### Scenario: Gradle CVE preparation tasks recheck their consumed original context
+- **WHEN** task verify selects a stable Gradle CVE preparation task
+- **THEN** it SHALL validate the original byte receipt, workspace, task scope and selected inputs before invoking exactly the original task paths with explicit Gradle/JDK and the original cache selection; known tool/cache identity or original configuration changes SHALL stop execution and require review. Missing original tool identity SHALL remain unqualified. Verification SHALL preserve diagnostic observations and an open task, including zero advisories, without trusting editable Markdown or claiming database coverage.

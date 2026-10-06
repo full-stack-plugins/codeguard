@@ -84,7 +84,7 @@ pub fn run(args: &[String]) -> ExitCode {
     let next_action = if native["reason"] == "gradle_owasp_report_budget_exceeded" {
         "累计报告或反馈超出预算；保留完整任务清单，将原任务分批执行并汇总所有分批结果。不得删除检查义务、降低规则或把未读取报告当作无漏洞；超大单任务需要独立的大报告处理方案，当前交付仍未评估"
     } else if native["native_status"] == "reports_observed_unverified" {
-        "按原任务报告调查活动与原生抑制的漏洞，核对真实依赖归属和漏洞库时效；使用相同工具、输入、原任务复检。空报告不能证明无漏洞，已初始化工作区可用next/task show查询准备任务；task verify与可信关闭仍未接线"
+        "按原任务报告调查活动与原生抑制的漏洞，核对真实依赖归属和漏洞库时效；使用相同工具、输入、原任务复检。空报告不能证明无漏洞，已初始化工作区可用next/task show查询准备任务；task verify可记录冻结原上下文局部复检，可信关闭仍未验收"
     } else {
         "读取原生reason恢复已有Gradle/JDK、原OWASP任务、原JSON配置和选定输入；缺插件或漏洞库属于环境阻塞，不修改无关源码。恢复后使用相同原任务复检"
     };

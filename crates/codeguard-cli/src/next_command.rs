@@ -589,7 +589,28 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
     } else if checker_id == "java.gradle.dependency_check" {
         #[cfg(unix)]
         {
-            crate::gradle_cve_workbench::recheck_argv(root, fact)?
+            {
+                let original = crate::gradle_cve_task_recheck::original(
+                    root,
+                    &json!({"checker_id":checker_id,"kind":kind,"scope":fact["scope"],"task_id":id,"evidence_ref":{"first_run_id":first_run,"first_report_sha256":report_sha}}),
+                )?;
+                let mut args = vec![
+                    json!("codeguard"),
+                    json!("task"),
+                    json!("verify"),
+                    json!(id),
+                    json!("."),
+                    json!("--gradle-bundle"),
+                    json!("<原Gradle绝对路径>"),
+                    json!("--java-home"),
+                    json!("<原JDK21绝对路径>"),
+                ];
+                if original["module_cache_selected"] == true {
+                    args.extend([json!("--gradle-module-cache"), json!("<原缓存绝对路径>")]);
+                }
+                args.push(json!("--format=json"));
+                json!(args)
+            }
         }
         #[cfg(not(unix))]
         {
@@ -803,7 +824,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             (
                 5,
                 "actionable",
-                "按原任务/选定输入恢复Gradle OWASP；超限保留全部任务分批执行，核验漏洞库和依赖归属；未确认advisory不作为源码漏洞，task verify尚未接线，原命令复扫不可信关闭",
+                "按原task verify冻结范围恢复Gradle OWASP；配置/工具变化先审查并重扫，超限保留全部义务；核验漏洞库和依赖归属，局部观察及空报告无可信关闭权威",
             )
         } else if checker_id == "java.maven.dependency_check" {
             (
@@ -958,10 +979,15 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         )
     };
     if checker_id == "java.gradle.dependency_check" {
-        brief["schema_version"] = json!("0.26.0");
-        brief["task_verify_status"] = json!("not_integrated");
+        brief["schema_version"] = json!("0.27.0");
+        brief["task_verify_status"] = json!("local_observation_only");
+        #[cfg(unix)]
+        {
+            let original = crate::gradle_cve_task_recheck::original(root, &brief)?;
+            brief["original_context"] = json!({"inputs":original["inputs"],"task_paths":original["task_paths"],"module_cache_selected":original["module_cache_selected"]});
+        }
         brief["closure_condition"] = json!(
-            "原工具完整复检、漏洞库与依赖归属及可信策略均核验；task verify尚未接线，当前观察无关闭权威"
+            "原工具完整复检、漏洞库与依赖归属及可信策略均核验；当前task verify只记录原上下文局部观察，无关闭权威"
         );
     }
     if checker_id == "java.gradle.javadoc" {
@@ -1173,6 +1199,9 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
     };
     if let Some(observation) = verification_observation.as_ref() {
         let outcome = observation.outcome.as_str();
+        if checker_id == "java.gradle.dependency_check" {
+            brief["verification_observation"] = json!(outcome);
+        }
         brief["verification_run_id"] = json!(observation.run_id);
         if let Some(reason) = observation.checkstyle_reason.as_ref() {
             brief["verification_reason"] = json!(reason);
@@ -1956,6 +1985,15 @@ fn latest_verification_observation(
                 latest_run = sequence;
                 continue;
             }
+            if brief["checker_id"] == "java.gradle.dependency_check"
+                && event["report_sha256"] == format!("{:x}", Sha256::digest(&report_bytes))
+                && report["task_input_stable"] == true
+                && !crate::gradle_cve_task_recheck::inputs_current(root, &report)
+            {
+                latest_verify = None;
+                latest_run = sequence;
+                continue;
+            }
             let python_scoped_report = brief["checker_id"] == "python.ruff"
                 && matches!(report["schema_version"].as_str(), Some("0.18.0" | "0.19.0"));
             let go_report = brief["checker_id"] == "go.vet";
@@ -1964,7 +2002,11 @@ fn latest_verification_observation(
             let checkstyle_report = brief["checker_id"] == "java.checkstyle";
             let preparation_report = brief["checker_id"] == "java.checkstyle.preparation";
             let cve_report = brief["checker_id"] == "java.maven.dependency_check";
-            let report_shape_valid = if brief["checker_id"] == "python.ruff.doctor" {
+            let report_shape_valid = if brief["checker_id"] == "java.gradle.dependency_check" {
+                crate::gradle_cve_task_recheck::validate_binding(root, brief, &report).is_ok()
+                    && event["observation"]
+                        == crate::gradle_cve_task_recheck::classify(brief, &report)
+            } else if brief["checker_id"] == "python.ruff.doctor" {
                 crate::work_sync::valid_doctor_report(&report)
                     && event["observation"] == classify_doctor(brief, &report)
             } else if matches!(
@@ -2218,6 +2260,7 @@ fn latest_verification_observation(
                 checkstyle_reason: if checkstyle_report
                     || preparation_report
                     || brief["checker_id"] == "java.gradle.javadoc"
+                    || brief["checker_id"] == "java.gradle.dependency_check"
                 {
                     report["reason"].as_str().map(str::to_owned)
                 } else {
@@ -2273,6 +2316,12 @@ fn latest_verification_observation(
 }
 
 fn run_sequence(run_id: &str) -> Option<u128> {
+    if run_id.starts_with("cve-gradle-task-") {
+        return run_id.rsplit('-').next()?.parse().ok();
+    }
+    if run_id.starts_with("cve-gradle-") {
+        return run_id.rsplit('-').nth(1)?.parse().ok();
+    }
     if let Some(value) = run_id.strip_prefix("shellcheck-") {
         return value.split('-').next()?.parse().ok();
     }
@@ -2312,7 +2361,7 @@ fn run_sequence(run_id: &str) -> Option<u128> {
 
 fn view(disposition: &str, reason: &str, brief: Value, actions: Value) -> Value {
     json!({
-        "schema_version":if brief["schema_version"] == "0.26.0" {json!("0.26.0")}else if brief["schema_version"] == "0.25.0" {json!("0.25.0")}else if brief["schema_version"] == "0.24.0" {json!("0.24.0")}else if brief["schema_version"] == "0.23.0" {json!("0.23.0")}else if brief["schema_version"] == "0.22.0" {json!("0.22.0")}else if brief["schema_version"] == "0.21.0" {json!("0.21.0")}else if brief["schema_version"] == "0.20.0" {json!("0.20.0")}else if brief["checker_id"] == "shell.shellcheck" {json!("0.17.0")} else if brief["checker_id"] == "go.vet" {json!("0.13.0")} else if brief["checker_id"] == "syntax.native_confirmation" {brief["schema_version"].clone()} else {json!("0.1.0")}, "report_type":"repair_brief_preview",
+        "schema_version":if brief["schema_version"] == "0.27.0" {json!("0.27.0")}else if brief["schema_version"] == "0.26.0" {json!("0.26.0")}else if brief["schema_version"] == "0.25.0" {json!("0.25.0")}else if brief["schema_version"] == "0.24.0" {json!("0.24.0")}else if brief["schema_version"] == "0.23.0" {json!("0.23.0")}else if brief["schema_version"] == "0.22.0" {json!("0.22.0")}else if brief["schema_version"] == "0.21.0" {json!("0.21.0")}else if brief["schema_version"] == "0.20.0" {json!("0.20.0")}else if brief["checker_id"] == "shell.shellcheck" {json!("0.17.0")} else if brief["checker_id"] == "go.vet" {json!("0.13.0")} else if brief["checker_id"] == "syntax.native_confirmation" {brief["schema_version"].clone()} else {json!("0.1.0")}, "report_type":"repair_brief_preview",
         "operation":"next", "command_status":"complete", "exit_code":0,
         "disposition":disposition, "reason":reason,
         "repair_brief":brief, "next_actions":actions,
