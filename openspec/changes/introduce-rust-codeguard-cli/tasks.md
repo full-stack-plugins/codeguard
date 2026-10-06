@@ -1866,3 +1866,9 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 - [x] 无POM、未初始化、工作区外、缺JDK、重复扫描、真实JDK新增无效POM后复检、实际协议及受影响回归验证。
 
 证据见 [显式文件工作台验收](../../../tests/acceptance/javadoc-explicit-file-workbench.md)。可信关闭、复发、Maven与完整宿主等父任务不勾选。
+
+## 2026-10-06 Maven Javadoc 运行后身份复核
+
+- [x] 补齐JDK release运行后字节复核，真实目标行为反例先失败后通过；原源码/POM变化已有快照拒绝，新增公开CLI回归保护。
+
+三目标47通过/0失败/10条件忽略；Maven工作台及原任务复检未完成，不勾选父任务。见 [验收](../../../tests/acceptance/maven-javadoc-input-stability.md)。

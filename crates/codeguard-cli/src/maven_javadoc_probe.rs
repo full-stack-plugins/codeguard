@@ -180,6 +180,10 @@ pub(crate) fn observe(request: &Request<'_>) -> Value {
             .ok()
             .as_deref()
             != Some(java_bytes.as_slice())
+        || read_bounded_regular_file(&java_home.join("release"), 64 * 1024)
+            .ok()
+            .as_deref()
+            != Some(release_bytes.as_slice())
         || hash_bundle_tree(&repo).ok().as_deref() != Some(repo_digest)
     {
         return with_reason(report, "native_identity_changed_during_scan");

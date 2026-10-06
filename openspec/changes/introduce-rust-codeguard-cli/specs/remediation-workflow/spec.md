@@ -645,3 +645,11 @@ Javadoc任务 MUST 支持显式JDK21的原工具复检，保存对应任务的�
 #### Scenario: File is outside the explicit workspace
 - **WHEN** 文件位于指定工作区外部
 - **THEN** 参数错误拒绝，原生工具未启动，工作台不写入
+
+### Requirement: Maven Javadoc observations SHALL reject runtime identity drift
+Maven Javadoc observations SHALL revalidate the selected Java runtime executable and JDK release metadata against pre-execution bytes before accepting native diagnostics. Unavailable or changed metadata SHALL produce an incomplete observation without source findings.
+
+#### Scenario: JDK release changes during a private Maven probe
+- **WHEN** the selected JDK release file changes while Maven executes against the frozen private source copy
+- **THEN** CodeGuard discards the native diagnostics and reports a runtime identity change
+- **AND** the observation cannot close tasks or claim complete project coverage
