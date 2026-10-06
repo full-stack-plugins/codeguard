@@ -33,3 +33,5 @@ flowchart LR
 WASM构建相同Gradle目标11通过、0失败、5条件忽略，与默认重叠。五份实际CLI报告（Java/all缺工具、两次真实原生、SIGINT）及一份单元构造异常报告见[报告包](evidence/gradle-public-javadoc-reports-2026-10-06.json)，分别通过0.63/0.17；七类交付、跨语言、覆盖、规则、额外模型、未来协议及状态矛盾伪造被拒绝，0.62旧消费者拒绝新报告。415份schema元定义有效。默认/WASM CLI全目标Clippy、分层、OpenSpec strict与diff检查通过，见[摘要](evidence/gradle-public-javadoc-2026-10-06.json)。未安装下载工具、发布npm、合并或执行/改动用户Erlang草稿。
 
 剩余：自动修复任务持久化及同原工具复检关闭、完整详细注释规则、完整源码配置/JDK闭包、多子项目/自定义doclet及完整取消清理、Maven/Gradle双路径和57语言四核心生产资格。父任务15.3保持未完成，正式语法资格仍0/32；本批没有新的全工作区、远端CI或发布验收证据。
+
+后续0.64修正了此批次Java注释类别仍误报未配置的问题，见[类别归属修复](gradle-javadoc-category-attribution.md)。本批次记录保留0.63原始证据。

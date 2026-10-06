@@ -1,0 +1,65 @@
+{
+  "record_kind": "local_acceptance_summary",
+  "recorded_date": "2026-10-06",
+  "scope": "explicit Gradle Javadoc category attribution; no new task persistence or closure",
+  "source_sha256": {
+    "crates/codeguard-cli/src/check_command.rs": "eda26111836eebe36175a308abd02dd771bde626e28aa85a039ce3682ae232ac",
+    "crates/codeguard-cli/tests/gradle_javadoc_probe.rs": "67198da010da1cbb49e2976d331565f61b8fada96eb7b090fb5afbd6973285d3",
+    "schemas/check-feedback-v0.64.schema.json": "d1e47b6e0469e21121d8787662dbacc51813e4d2503722ffd62dbf8a710cf6a8"
+  },
+  "tests": {
+    "default_gradle": {
+      "passed": 12,
+      "failed": 0,
+      "ignored": 5
+    },
+    "mixed_root_and_selection": {
+      "passed": 6,
+      "failed": 0,
+      "ignored": 1
+    },
+    "actual_public_gradle": {
+      "passed": 1,
+      "failed": 0,
+      "observations": 2,
+      "diagnostic_counts": [
+        3,
+        0
+      ]
+    },
+    "wasm_gradle": {
+      "passed": 12,
+      "failed": 0,
+      "ignored": 5,
+      "overlap_with_default": true
+    }
+  },
+  "schema": {
+    "meta_valid": 416,
+    "actual_cli_reports_valid": 6,
+    "forgeries_rejected": 9,
+    "old_consumer_rejected": true,
+    "report_protocols": {
+      "0.64.0": 5,
+      "0.61.0": 1
+    }
+  },
+  "checks": {
+    "default_clippy": "pass",
+    "wasm_clippy": "pass",
+    "layering": "pass",
+    "openspec_strict": "pass",
+    "diff": "pass"
+  },
+  "coverage_proven": false,
+  "rule_configuration_complete": false,
+  "production_qualified": false,
+  "delivery_decision": "not_evaluated",
+  "reports_sha256": "daee31dc629743c2ada9da846d301df2266e573ead45151acc3493cc70d4c0e9",
+  "pending": [
+    "automatic stable Gradle repair tasks and native recheck closure",
+    "complete detailed documentation rules and original configuration/source/JDK closure",
+    "multi-project/custom-doclet quality coverage",
+    "57-language production qualification and formal 32-grammar qualification"
+  ]
+}

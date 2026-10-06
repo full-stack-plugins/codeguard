@@ -246,8 +246,10 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
         && java_present
         && !javadoc_configured
         && discovery.checker_configurations.iter().any(|entry| {
-            entry.checker_id == "java.maven.javadoc"
-                && matches!(entry.configuration.as_str(), "unknown" | "invalid")
+            matches!(
+                entry.checker_id.as_str(),
+                "java.maven.javadoc" | "java.gradle.javadoc"
+            ) && matches!(entry.configuration.as_str(), "unknown" | "invalid")
         });
     let mut npm_roots: BTreeMap<String, (String, Option<String>)> = BTreeMap::new();
     let python_cve_roots: BTreeMap<String, String> =
@@ -1537,6 +1539,36 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                 "status": if observed { "observed_unverified" } else if npm_selected || python_lint_selected || rust_lint_selected || rust_comments_selected || rust_build_selected || rust_cve_selected || go_lint_selected || java_lint_selected || java_comments_selected || (language == "java" && category == "dependencies" && dependency_configured) || (cve_scope_configured) { "native_incomplete" } else if language == "java" && category == "comments" { if javadoc_configuration_unresolved { "configuration_unresolved" } else { "not_configured" } } else if let Some(candidate) = java_checker.as_ref() { candidate.status } else { "not_integrated" },
                 "reason": if rust_cve_selected { if observed { "rust_cve_database_freshness_unverified" } else { "rust_cve_native_incomplete" } } else if npm_selected { "npm_advisory_coverage_and_freshness_unverified" } else if planned_language { "planned_language_adapter_gap" } else if observed { "trusted_policy_and_coverage_unavailable" } else if java_lint_selected && java_p3c["local_observation_complete"] == true { "p3c_declared_rulesets_unverified_coverage" } else if java_comments_selected && java_javadoc["maven_multifile_probes"].as_array().is_some_and(|probes| probes.iter().any(|probe| matches!(probe["observation"]["native_status"].as_str(), Some("findings_observed_untrusted" | "clean_log_unverified")))) { "javadoc_multifile_probe_unverified_project_coverage" } else if java_comments_selected && java_javadoc["local_probe_complete"] == true { "javadoc_single_file_probe_unverified_coverage" } else if language == "java" && category == "dependencies" && java_dependencies["observed_graph_count"].as_u64().is_some_and(|count| count > 0) { "dependency_graph_observed_unverified_coverage" } else if cve_scope_configured && java_cve["observed_report_count"].as_u64().is_some_and(|count| count > 0) { "cve_report_observed_database_unverified" } else if (language == "java" && category == "dependencies" && dependency_configured) || cve_scope_configured || python_lint_selected || rust_lint_selected || rust_comments_selected || rust_build_selected || go_lint_selected || java_lint_selected || java_comments_selected { "native_scan_incomplete" } else if language == "java" && category == "comments" { if javadoc_configuration_unresolved { "javadoc_configuration_unresolved" } else { "not_configured" } } else if let Some(candidate) = java_checker.as_ref() { candidate.reason } else { "native_adapter_not_integrated" }
             });
+            if language == "java" && category == "comments" && javadoc_configuration_unresolved {
+                candidate["next_action"] = json!(
+                    "按源码最近构建根核验 Maven/Gradle 的生效 Javadoc 配置、doclint/doclet 和源集；当前静态观察未知，不判配置缺失，也不要求修改无关构建器"
+                );
+            }
+            // 显式Gradle文档检查不能被Maven配置探测的“未配置”覆盖。
+            // 此处只归属所选适配器的局部观察，完整规则/原项目覆盖仍未验收。
+            if language == "java" && category == "comments" && parsed.gradle_javadoc {
+                let gradle_observed = gradle_model_outcome == Some(TaskOutcome::Succeeded)
+                    && matches!(
+                        java_gradle_model["native_status"].as_str(),
+                        Some("findings_observed_unverified" | "empty_output_unverified")
+                    );
+                candidate["checker_id"] = json!("java.gradle.javadoc");
+                candidate["status"] = json!(if gradle_observed {
+                    "observed_unverified"
+                } else {
+                    "native_incomplete"
+                });
+                candidate["reason"] = json!(if gradle_observed {
+                    "gradle_javadoc_selected_inputs_and_rules_unverified"
+                } else {
+                    "gradle_javadoc_native_incomplete"
+                });
+                candidate["next_action"] = json!(if gradle_observed {
+                    "读取 native_results.java_gradle_javadoc 的原生诊断；按用途、参数和返回等规则修复，用相同 Gradle/JDK/选定输入复检；无诊断仍须核验原项目 doclint、源集和完整规则，不签发合规"
+                } else {
+                    "读取 native_results.java_gradle_javadoc 的具体阻塞，恢复已有 Gradle/JDK、选定构建和 Java 输入或取消/超时原因，再用相同原生任务复检；不能据执行故障判断配置缺失或修改无关源码"
+                });
+            }
             // 原生Maven局部结果继续保留，但不能覆盖同一源码范围的Gradle未解析义务。
             if let Some(scope) = java_checker.as_ref().filter(|scope| {
                 language == "java"
@@ -2218,7 +2250,7 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
         .iter()
         .any(|entry| entry.checker_id.starts_with("java.gradle."));
     let mut report = json!({
-        "schema_version":if parsed.gradle_javadoc {"0.63.0"}else if gradle_requested {"0.62.0"}else if gradle_model_unresolved {"0.61.0"}else if next["schema_version"] == "0.21.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row|row.get("javascript_mode_observation").is_some())) {"0.60.0"}else if lint_only {"0.59.0"}else if next["repair_brief"]["checker_id"] == "java.maven.p3c" && next["repair_brief"]["reason_code"] == "p3c_configuration_not_confirmed" {"0.58.0"}else if next["repair_brief"]["checker_id"] == "java.maven.javadoc" {"0.57.0"}else if next["repair_brief"]["checker_id"] == "rust.cargo_clippy" {"0.56.0"}else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"]=="erlang" && row.get("structural_observations").is_some())) {"0.55.0"} else if next["schema_version"] == "0.20.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"]=="javascript" && row.get("structural_observations").is_some())) {"0.54.0"}else if syntax_candidates["observations"].as_array().is_some_and(|rows|rows.iter().any(|row|row["language"]=="cfquery")) {"0.53.0"}else if shell_lint.is_object() || next["schema_version"]=="0.17.0" {"0.52.0"}else if ruby_lint.is_object() || next["schema_version"] == "0.15.0" {"0.51.0"} else if next["schema_version"] == "0.14.0" {"0.50.0"} else if next["schema_version"] == "0.13.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.49.0"} else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row.get("structural_observations").is_some())) {"0.48.0"} else if zig_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.12.0" {"0.47.0"}else if zig_lint.is_object() {"0.46.0"} else if matches!(parsed.selection, Selection::Language(_)) {"0.45.0"} else if swift_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.11.0" {"0.44.0"} else if swift_lint.is_object() {"0.43.0"} else if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
+        "schema_version":if parsed.gradle_javadoc {"0.64.0"}else if gradle_requested {"0.62.0"}else if gradle_model_unresolved {"0.61.0"}else if next["schema_version"] == "0.21.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row|row.get("javascript_mode_observation").is_some())) {"0.60.0"}else if lint_only {"0.59.0"}else if next["repair_brief"]["checker_id"] == "java.maven.p3c" && next["repair_brief"]["reason_code"] == "p3c_configuration_not_confirmed" {"0.58.0"}else if next["repair_brief"]["checker_id"] == "java.maven.javadoc" {"0.57.0"}else if next["repair_brief"]["checker_id"] == "rust.cargo_clippy" {"0.56.0"}else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"]=="erlang" && row.get("structural_observations").is_some())) {"0.55.0"} else if next["schema_version"] == "0.20.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"]=="javascript" && row.get("structural_observations").is_some())) {"0.54.0"}else if syntax_candidates["observations"].as_array().is_some_and(|rows|rows.iter().any(|row|row["language"]=="cfquery")) {"0.53.0"}else if shell_lint.is_object() || next["schema_version"]=="0.17.0" {"0.52.0"}else if ruby_lint.is_object() || next["schema_version"] == "0.15.0" {"0.51.0"} else if next["schema_version"] == "0.14.0" {"0.50.0"} else if next["schema_version"] == "0.13.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.49.0"} else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row.get("structural_observations").is_some())) {"0.48.0"} else if zig_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.12.0" {"0.47.0"}else if zig_lint.is_object() {"0.46.0"} else if matches!(parsed.selection, Selection::Language(_)) {"0.45.0"} else if swift_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.11.0" {"0.44.0"} else if swift_lint.is_object() {"0.43.0"} else if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
         "operation":"check", "selection":parsed.selection.as_str(), "command_status":if request_cancelled { "cancelled" } else { "incomplete" },
         "exit_code":if request_cancelled { 130 } else { 3 }, "delivery_decision":if parsed.selection == Selection::All { "incomplete" } else { "not_evaluated" }, "authority":"local_unverified",
         "reason":if request_cancelled { "request_cancelled" } else if parsed.selection == Selection::All { "full_project_obligations_and_trusted_policy_unavailable" } else if parsed.selection == Selection::Java { "java_selection_obligations_and_trusted_policy_unavailable" } else { "language_selection_obligations_and_trusted_policy_unavailable" },
@@ -2259,6 +2291,7 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                     | "0.61.0"
                     | "0.62.0"
                     | "0.63.0"
+                    | "0.64.0"
             )
         )
     {
@@ -2290,6 +2323,7 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                 | "0.61.0"
                 | "0.62.0"
                 | "0.63.0"
+                | "0.64.0"
         )
     ) {
         if let Some(native) = report["native_results"].as_object_mut() {
@@ -2320,6 +2354,7 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                 | "0.61.0"
                 | "0.62.0"
                 | "0.63.0"
+                | "0.64.0"
         )
     ) {
         if let Some(native) = report["native_results"].as_object_mut() {
@@ -2342,6 +2377,7 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                 | "0.61.0"
                 | "0.62.0"
                 | "0.63.0"
+                | "0.64.0"
         )
     ) {
         report["native_results"]["ruby_lint"] = ruby_lint.clone();
@@ -2361,6 +2397,7 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                 | "0.61.0"
                 | "0.62.0"
                 | "0.63.0"
+                | "0.64.0"
         )
     ) {
         report["native_results"]["shell_lint"] = shell_lint.clone();
