@@ -1783,3 +1783,5 @@ Normal feedback uses check_feedback version 0.59.0 with requested_categories=["l
 ```
 
 Other-category history remains stored, but this invocation does not select its repair briefs as next. Missing tools, unsupported languages and unqualified WASM candidates remain incomplete. Zero native diagnostics cannot issue project-wide allow. Actual SIGINT tests qualify lint-mode cancellation: exit 130, completed sibling diagnostics retained, and descendant cleanup checked. Internal faults retain check_aborted and are not separately qualified for lint mode. Source implementation does not establish npm publication.
+
+`lint all` selects next within the allowed lint checker set in one local-fact validation pass. Historical build/CVE/comments tasks do not hide valid lint guidance and remain stored. Syntax-confirmation fallback selects only task IDs produced by this invocation.
