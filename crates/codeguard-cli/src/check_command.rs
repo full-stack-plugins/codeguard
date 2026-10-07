@@ -2636,7 +2636,15 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
         "exit_code":if request_cancelled { 130 } else { 3 }, "delivery_decision":if parsed.selection == Selection::All { "incomplete" } else { "not_evaluated" }, "authority":"local_unverified",
         "reason":if request_cancelled { "request_cancelled" } else if parsed.selection == Selection::All { "full_project_obligations_and_trusted_policy_unavailable" } else if parsed.selection == Selection::Java { "java_selection_obligations_and_trusted_policy_unavailable" } else { "language_selection_obligations_and_trusted_policy_unavailable" },
         "discovery":discovery.to_json(),
-        "native_results":{"node_lint":node_lint,"python_lint":python_lint,"python_cve":python_cve,"rust_lint":rust_lint,"rust_comments":rust_comments,"rust_build":rust_build,"rust_cve":rust_cve,"go_lint":go_lint,"erlang_lint":erlang_lint,"kotlin_lint":kotlin_lint,"swift_lint":swift_lint,"java_p3c":java_p3c,"java_javadoc":java_javadoc,"java_dependencies":java_dependencies,"java_cve":java_cve,"npm_cve":npm_cve}, "execution_tasks":execution_tasks,
+        "native_results":crate::check_native_results::assemble(vec![
+            ("node_lint",node_lint),("python_lint",python_lint),("python_cve",json!(python_cve)),
+            ("rust_lint",rust_lint),("rust_comments",rust_comments),("rust_build",rust_build),
+            ("rust_cve",rust_cve),("go_lint",go_lint),("erlang_lint",erlang_lint),
+            // kotlin_lint / swift_lint 在下方 execution_budget 仍被借用，此处克隆以避免 move。
+            ("kotlin_lint",kotlin_lint.clone()),("swift_lint",swift_lint.clone()),("java_p3c",java_p3c),
+            ("java_javadoc",java_javadoc),("java_dependencies",java_dependencies),
+            ("java_cve",java_cve),("npm_cve",json!(npm_cve))
+        ]), "execution_tasks":execution_tasks,
         "obligation_status":"unresolved", "required_obligations":null,
         "category_candidates":candidates, "unresolved_conditions":unresolved,
         "syntax_candidates":syntax_candidates,
