@@ -673,3 +673,4 @@ pub mod architecture_profile;
 pub mod architecture_md;
 pub mod agents_block_merge;
 pub mod init_transaction;
+pub mod profile_refresh;
