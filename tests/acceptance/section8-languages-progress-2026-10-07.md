@@ -58,3 +58,59 @@
 Section 8 已完成 Go 和 Kotlin 的核心验证。
 C# 的 WASM grammar 有真实局限性，需依赖原生工具。
 剩余语言需外部工具环境。
+
+## 补充：更多语言验收（2026-10-07）
+
+| 语言 | 测试数 | 通过 | 忽略 | 状态 |
+|---|---|---|---|---|
+| **Swift** | 32 | **29** | 3 | ✅ |
+| **Ruby** | 40 | **36** | 4 | ✅ |
+| **Zig** | 26 | **22** | 4 | ✅ |
+| **Shell** | 28 | **25** | 3 | ✅ |
+
+### Swift (8.10-8.12) ✅
+- swift_lint_cli: 9 passed
+- swift_native_differential: 1 passed
+- swift_native_hook: 6 passed
+- swift_native_workbench: 2 passed
+- swift_syntax_task_verify: 7 passed
+- swift_task_resolution_service: 4 passed
+
+### Ruby (8.17-8.18) ✅
+- ruby_lint_cli: 12 passed
+- ruby_native_differential: 2 passed
+- ruby_native_hook: 6 passed
+- ruby_project_version: 9 passed
+- ruby_task_resolution_service: 7 passed
+
+### Zig (8.100-8.102) ✅
+- zig_lint_cli: 5 passed
+- zig_native_cli: 2 passed
+- zig_native_discovery: 6 passed
+- zig_native_first_resolution: 4 passed
+- zig_native_hook: 2 passed
+- zig_native_workbench: 3 passed
+
+### Shell (7.4) ✅
+- shell_lint_cli: 8 passed
+- shell_native_hook: 6 passed
+- shell_task_resolution_service: 4 passed
+- shell_workbench: 7 passed
+
+---
+
+## Section 8 最终汇总（2026-10-07）
+
+| 语言 | 测试数 | 通过 | 忽略 | 状态 |
+|---|---|---|---|---|
+| **Go** | 64 | **53** | 11 | ✅ |
+| **Kotlin** | 29 | **26** | 3 | ✅ |
+| **Swift** | 32 | **29** | 3 | ✅ |
+| **Ruby** | 40 | **36** | 4 | ✅ |
+| **Zig** | 26 | **22** | 4 | ✅ |
+| **Shell** | 28 | **25** | 3 | ✅ |
+| **总计** | **219** | **191** | **28** | ✅ |
+
+**Section 8 核心验证完成率：191/219 = 87%**
+
+剩余 28 个忽略测试需外部工具（golangci-lint/govulncheck/SwiftLint/RuboCop 等）。
