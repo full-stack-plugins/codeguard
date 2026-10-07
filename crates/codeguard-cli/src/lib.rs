@@ -434,7 +434,6 @@ pub mod grammar_native_differential;
 pub mod syntax_worker_structure;
 
 mod agents_block_merge;
-mod architecture_md;
 mod archive_bundle;
 mod c_dependency_scan;
 mod check_arkts_native_scan;
@@ -673,3 +672,4 @@ pub mod project_schema;
 pub mod manifest_lock_observer;
 pub mod typed_module_graph;
 pub mod architecture_profile;
+pub mod architecture_md;
