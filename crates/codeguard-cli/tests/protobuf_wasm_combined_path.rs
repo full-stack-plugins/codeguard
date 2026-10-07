@@ -1,4 +1,4 @@
-//! C++ WASM+原生联合路径全链路验证。
+//! Protobuf WASM+原生联合路径全链路验证。
 
 #![cfg(feature = "wasm-precheck")]
 
@@ -13,9 +13,9 @@ fn ensure_clean_dir(name: &str) -> std::path::PathBuf {
 
 #[test]
 fn wasm_candidates_are_not_confirmed_violations() {
-    let root = ensure_clean_dir("codeguard-cpp-wasm-candidate");
+    let root = ensure_clean_dir("codeguard-protobuf-wasm-candidate");
     let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
-        .args(["check", "cpp", root.to_str().unwrap(), "--format=json"])
+        .args(["check", "protobuf", root.to_str().unwrap(), "--format=json"])
         .output()
         .expect("无法运行 codeguard check");
     let stdout = String::from_utf8_lossy(&output.stdout);
@@ -31,9 +31,9 @@ fn wasm_candidates_are_not_confirmed_violations() {
 
 #[test]
 fn unverified_grammar_does_not_claim_clean() {
-    let root = ensure_clean_dir("codeguard-cpp-wasm-clean");
+    let root = ensure_clean_dir("codeguard-protobuf-wasm-clean");
     let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
-        .args(["check", "cpp", root.to_str().unwrap(), "--format=json"])
+        .args(["check", "protobuf", root.to_str().unwrap(), "--format=json"])
         .output()
         .expect("无法运行 codeguard check");
     let stdout = String::from_utf8_lossy(&output.stdout);
@@ -52,7 +52,7 @@ fn unverified_grammar_does_not_claim_clean() {
 
 #[test]
 fn native_preferred_over_wasm() {
-    let root = ensure_clean_dir("codeguard-cpp-native-pref");
+    let root = ensure_clean_dir("codeguard-protobuf-native-pref");
     let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
         .args(["check", "all", root.to_str().unwrap(), "--format=json"])
         .output()
@@ -66,9 +66,9 @@ fn native_preferred_over_wasm() {
 
 #[test]
 fn missing_tool_initial_check_gives_guidance() {
-    let root = ensure_clean_dir("codeguard-cpp-missing-tool");
+    let root = ensure_clean_dir("codeguard-protobuf-missing-tool");
     let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
-        .args(["check", "cpp", root.to_str().unwrap(), "--format=json"])
+        .args(["check", "protobuf", root.to_str().unwrap(), "--format=json"])
         .output()
         .expect("无法运行 codeguard check");
     let stdout = String::from_utf8_lossy(&output.stdout);
@@ -81,9 +81,9 @@ fn missing_tool_initial_check_gives_guidance() {
 
 #[test]
 fn installation_guidance_in_category_candidates() {
-    let root = ensure_clean_dir("codeguard-cpp-install-guide");
+    let root = ensure_clean_dir("codeguard-protobuf-install-guide");
     let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
-        .args(["check", "cpp", root.to_str().unwrap(), "--format=json"])
+        .args(["check", "protobuf", root.to_str().unwrap(), "--format=json"])
         .output()
         .expect("无法运行 codeguard check");
     let stdout = String::from_utf8_lossy(&output.stdout);
