@@ -3032,44 +3032,35 @@
             },
             {
               "ecosystem": "cmake",
-              "implementation_status": "partial",
-              "adapter_refs": [
-                "crates/codeguard-cli/src/clang_lint_feedback.rs"
-              ],
-              "evidence_refs": [
-                "tests/acceptance/clang-standalone-native.md"
-              ],
+              "implementation_status": "not_integrated",
+              "adapter_refs": [],
+              "evidence_refs": [],
               "blockers": [
                 "c/cmake:完整原生语法版本/方言、源集、WASM联合路径及独立精度未验收",
-                "c/cmake/syntax:五平台、宿主反馈、可信关闭和复发重开未验收"
+                "c/cmake/syntax:五平台、宿主反馈、可信关闭和复发重开未验收",
+                "尚未接通该构建器的编译上下文；关联的独立文件Clang证据仅为参考，不能证明项目配置、头文件、宏或依赖源集已检查"
               ]
             },
             {
               "ecosystem": "conan",
-              "implementation_status": "partial",
-              "adapter_refs": [
-                "crates/codeguard-cli/src/clang_lint_feedback.rs"
-              ],
-              "evidence_refs": [
-                "tests/acceptance/clang-standalone-native.md"
-              ],
+              "implementation_status": "not_integrated",
+              "adapter_refs": [],
+              "evidence_refs": [],
               "blockers": [
                 "c/conan:完整原生语法版本/方言、源集、WASM联合路径及独立精度未验收",
-                "c/conan/syntax:五平台、宿主反馈、可信关闭和复发重开未验收"
+                "c/conan/syntax:五平台、宿主反馈、可信关闭和复发重开未验收",
+                "尚未接通该构建器的编译上下文；关联的独立文件Clang证据仅为参考，不能证明项目配置、头文件、宏或依赖源集已检查"
               ]
             },
             {
               "ecosystem": "vcpkg",
-              "implementation_status": "partial",
-              "adapter_refs": [
-                "crates/codeguard-cli/src/clang_lint_feedback.rs"
-              ],
-              "evidence_refs": [
-                "tests/acceptance/clang-standalone-native.md"
-              ],
+              "implementation_status": "not_integrated",
+              "adapter_refs": [],
+              "evidence_refs": [],
               "blockers": [
                 "c/vcpkg:完整原生语法版本/方言、源集、WASM联合路径及独立精度未验收",
-                "c/vcpkg/syntax:五平台、宿主反馈、可信关闭和复发重开未验收"
+                "c/vcpkg/syntax:五平台、宿主反馈、可信关闭和复发重开未验收",
+                "尚未接通该构建器的编译上下文；关联的独立文件Clang证据仅为参考，不能证明项目配置、头文件、宏或依赖源集已检查"
               ]
             }
           ]
@@ -3436,44 +3427,35 @@
             },
             {
               "ecosystem": "cmake",
-              "implementation_status": "partial",
-              "adapter_refs": [
-                "crates/codeguard-cli/src/clang_lint_feedback.rs"
-              ],
-              "evidence_refs": [
-                "tests/acceptance/clang-standalone-native.md"
-              ],
+              "implementation_status": "not_integrated",
+              "adapter_refs": [],
+              "evidence_refs": [],
               "blockers": [
                 "cpp/cmake:完整原生语法版本/方言、源集、WASM联合路径及独立精度未验收",
-                "cpp/cmake/syntax:五平台、宿主反馈、可信关闭和复发重开未验收"
+                "cpp/cmake/syntax:五平台、宿主反馈、可信关闭和复发重开未验收",
+                "尚未接通该构建器的编译上下文；关联的独立文件Clang证据仅为参考，不能证明项目配置、头文件、宏或依赖源集已检查"
               ]
             },
             {
               "ecosystem": "conan",
-              "implementation_status": "partial",
-              "adapter_refs": [
-                "crates/codeguard-cli/src/clang_lint_feedback.rs"
-              ],
-              "evidence_refs": [
-                "tests/acceptance/clang-standalone-native.md"
-              ],
+              "implementation_status": "not_integrated",
+              "adapter_refs": [],
+              "evidence_refs": [],
               "blockers": [
                 "cpp/conan:完整原生语法版本/方言、源集、WASM联合路径及独立精度未验收",
-                "cpp/conan/syntax:五平台、宿主反馈、可信关闭和复发重开未验收"
+                "cpp/conan/syntax:五平台、宿主反馈、可信关闭和复发重开未验收",
+                "尚未接通该构建器的编译上下文；关联的独立文件Clang证据仅为参考，不能证明项目配置、头文件、宏或依赖源集已检查"
               ]
             },
             {
               "ecosystem": "vcpkg",
-              "implementation_status": "partial",
-              "adapter_refs": [
-                "crates/codeguard-cli/src/clang_lint_feedback.rs"
-              ],
-              "evidence_refs": [
-                "tests/acceptance/clang-standalone-native.md"
-              ],
+              "implementation_status": "not_integrated",
+              "adapter_refs": [],
+              "evidence_refs": [],
               "blockers": [
                 "cpp/vcpkg:完整原生语法版本/方言、源集、WASM联合路径及独立精度未验收",
-                "cpp/vcpkg/syntax:五平台、宿主反馈、可信关闭和复发重开未验收"
+                "cpp/vcpkg/syntax:五平台、宿主反馈、可信关闭和复发重开未验收",
+                "尚未接通该构建器的编译上下文；关联的独立文件Clang证据仅为参考，不能证明项目配置、头文件、宏或依赖源集已检查"
               ]
             }
           ]

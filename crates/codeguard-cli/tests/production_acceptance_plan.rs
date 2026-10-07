@@ -124,3 +124,28 @@ fn cpp_standalone_replay_is_traceable_without_project_qualification() {
     }
     assert!(plan["source_hashes"][evidence].is_string());
 }
+
+#[test]
+fn standalone_clang_evidence_does_not_imply_build_ecosystem_integration() {
+    for language in ["c", "cpp"] {
+        let out = query(&[
+            "capabilities",
+            language,
+            "--acceptance-plan",
+            "--format=json",
+        ]);
+        assert!(out.status.success());
+        let report: Value = serde_json::from_slice(&out.stdout).unwrap();
+        for path in report["plan"]["languages"][0]["capabilities"]["syntax"]["build_paths"]
+            .as_array()
+            .unwrap()
+        {
+            if path["ecosystem"] != "standalone" {
+                assert_eq!(
+                    path["implementation_status"], "not_integrated",
+                    "{language}: {path}"
+                );
+            }
+        }
+    }
+}
