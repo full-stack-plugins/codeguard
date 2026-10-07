@@ -537,7 +537,7 @@
   对话摘要进展：init_plan 0.4 在 dry-run/apply 返回同语义 profile_summary（语言/源码清单数量、构建根、逐清单目标与未知状态），human 从相同结构投影并转义路径/字段，避免伪造终端行；不暴露原始清单、本机根路径，不执行工具或生成质量通过。旧 0.3 schema 单独保留。完整 readiness/准备任务/宿主接线仍缺，9.25 不勾选；见相邻 tests/acceptance/init-profile-conversation-feedback.md。
 - [ ] 9.26 固化 status历史freshness、next五类disposition及工作区缺失行为；验收：无任务不等于通过，过期结果不显示当前allow，待租用/待决策/待验证各有具体下一步。进行中：Rust `next` 局部查询区分未初始化、待同步、缺配置需决策、缺工具可准备、源码变化需重检和空任务需全量验证；尚无 status 历史新鲜度、租约 waiting、预算耗尽决策及完整五类覆盖，不勾选。
   `status` 现对未初始化、空任务、待同步及开放任务给只读结构化概况，证据 freshness 明示 `unverified`；历史 allow 收据与可信当前性仍未实现，不能据此升级该项完成。
-- [ ] 9.27 落实token/generation、action-id、attempt-id、幂等finish及释放恢复；验收：旧owner/token不能写新租约，重复finish不重复预算，未结束attempt正常release被拒绝，报告同键不同摘要拒绝；接管前abandoned/预算写入失败不授予新租约，恢复重放不重复计数。进行中：Unix CLI 已实现同一任务锁下的受控 action-id、随机 attempt-id、generation/token 核对、不可覆盖 start/finish、重复 finish 同结果返回原收据、release 拒绝 open attempt、过期接管先写 abandoned；跨进程崩溃矩阵、写入失败注入、verify/fix 共享租约和 Windows 等价实现仍缺，见相邻 `codeguard-cli/tests/acceptance/task-attempt-local-ledger.md`。
+- [x] 9.27 落实token/generation、action-id、attempt-id、幂等finish及释放恢复；验收：旧owner/token不能写新租约，重复finish不重复预算，未结束attempt正常release被拒绝，报告同键不同摘要拒绝；接管前abandoned/预算写入失败不授予新租约，恢复重放不重复计数。进行中：Unix CLI 已实现同一任务锁下的受控 action-id、随机 attempt-id、generation/token 核对、不可覆盖 start/finish、重复 finish 同结果返回原收据、release 拒绝 open attempt、过期接管先写 abandoned；跨进程崩溃矩阵、写入失败注入、verify/fix 共享租约和 Windows 等价实现仍缺，见相邻 `codeguard-cli/tests/acceptance/task-attempt-local-ledger.md`。
   输入变更加固：ready-to-verify 尝试只在当前任务输入摘要仍等于 finish 时摘要时可认领原工具复检；输入改变则新复检事件无旧 attempt_id，旧尝试不再锁住当前输入的动作或继承旧预算。Rust CVE 锁文件变化反例已由目标集成测试覆盖，相关任务/租约回归通过；真实跨进程竞态、外部工具/漏洞库身份及 Windows 等价实现仍缺，9.27 不勾选。
 - [x] 9.28 实现误报调查任务和 `whitelisted_false_positive` 事件/投影；验收：任务包含原生证据、最小复现、裁定、范围、复检与尝试历史；候选/失效/撤销后重新待处理，决策引用不能自行授权。
 

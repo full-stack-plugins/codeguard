@@ -681,3 +681,4 @@ pub mod dot_prefix_policy;
 pub mod whitelist_commands;
 pub mod whitelist_correction;
 pub mod false_positive_investigation;
+pub mod attempt_ledger;
