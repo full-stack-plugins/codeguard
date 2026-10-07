@@ -59,22 +59,19 @@ pub(crate) fn extract_archive(
     if tree_digest != expected_digest {
         return ExtractResult::TreeDigestMismatch;
     }
-    
+
     // 路径安全检查
     for path in paths {
         if path.contains("..") || path.starts_with('/') {
             return ExtractResult::UnsafePath;
         }
     }
-    
+
     ExtractResult::Success
 }
 
 /// bundle 发布。
-pub(crate) fn publish_bundle(
-    install_dir: &str,
-    existing_dirs: &[String],
-) -> PublishResult {
+pub(crate) fn publish_bundle(install_dir: &str, existing_dirs: &[String]) -> PublishResult {
     if existing_dirs.contains(&install_dir.to_string()) {
         return PublishResult::AlreadyExists;
     }

@@ -62,7 +62,7 @@ pub(crate) struct Attribution {
 pub(crate) fn attribute_finding(finding: &Value) -> Attribution {
     let reason_code = finding["reason_code"].as_str().unwrap_or("");
     let checker_id = finding["checker_id"].as_str().unwrap_or("");
-    
+
     // 环境问题：工具缺失、配置缺失
     if reason_code.contains("tool_not_found")
         || reason_code.contains("config_not_found")
@@ -76,9 +76,12 @@ pub(crate) fn attribute_finding(finding: &Value) -> Attribution {
             exception_expiry: None,
         };
     }
-    
+
     // 依赖问题：CVE、漏洞、依赖缺失
-    if reason_code.contains("cve") || reason_code.contains("vulnerability") || reason_code.contains("dependency") {
+    if reason_code.contains("cve")
+        || reason_code.contains("vulnerability")
+        || reason_code.contains("dependency")
+    {
         return Attribution {
             disposition: Disposition::Dependency,
             reason: reason_code.to_string(),
@@ -86,9 +89,12 @@ pub(crate) fn attribute_finding(finding: &Value) -> Attribution {
             exception_expiry: None,
         };
     }
-    
+
     // 策略问题：规则禁用、策略调整
-    if reason_code.contains("policy") || reason_code.contains("rule_disabled") || reason_code.contains("suppressed") {
+    if reason_code.contains("policy")
+        || reason_code.contains("rule_disabled")
+        || reason_code.contains("suppressed")
+    {
         return Attribution {
             disposition: Disposition::Policy,
             reason: reason_code.to_string(),
@@ -96,7 +102,7 @@ pub(crate) fn attribute_finding(finding: &Value) -> Attribution {
             exception_expiry: None,
         };
     }
-    
+
     // 目标问题：构建目标、平台
     if reason_code.contains("target") || reason_code.contains("platform") {
         return Attribution {
@@ -106,7 +112,7 @@ pub(crate) fn attribute_finding(finding: &Value) -> Attribution {
             exception_expiry: None,
         };
     }
-    
+
     // 默认：代码问题
     Attribution {
         disposition: Disposition::Code,
@@ -123,7 +129,7 @@ pub(crate) fn attribution_report(findings: &[Value]) -> Value {
     let mut environment_count = 0;
     let mut target_count = 0;
     let mut policy_count = 0;
-    
+
     for finding in findings {
         let attr = attribute_finding(finding);
         match attr.disposition {
@@ -134,7 +140,7 @@ pub(crate) fn attribution_report(findings: &[Value]) -> Value {
             Disposition::Policy => policy_count += 1,
         }
     }
-    
+
     json!({
         "schema_version": "0.1.0",
         "report_type": "disposition_attribution",
@@ -168,7 +174,8 @@ mod tests {
 
     #[test]
     fn cve_finding_attributed_to_dependency() {
-        let finding = json!({"reason_code": "cve_vulnerability_found", "checker_id": "composer_audit"});
+        let finding =
+            json!({"reason_code": "cve_vulnerability_found", "checker_id": "composer_audit"});
         let attr = attribute_finding(&finding);
         assert_eq!(attr.disposition, Disposition::Dependency);
     }

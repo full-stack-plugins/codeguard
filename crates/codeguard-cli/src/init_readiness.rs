@@ -36,14 +36,17 @@ pub(crate) struct ReadinessCheck {
 /// 评估就绪状态。
 pub(crate) fn assess_readiness(checks: &[ReadinessCheck]) -> Readiness {
     let required_checks: Vec<&ReadinessCheck> = checks.iter().filter(|c| c.required).collect();
-    
+
     if required_checks.is_empty() {
         return Readiness::Ready;
     }
-    
+
     if required_checks.iter().all(|c| c.status == Readiness::Ready) {
         Readiness::Ready
-    } else if required_checks.iter().any(|c| c.status == Readiness::Incomplete) {
+    } else if required_checks
+        .iter()
+        .any(|c| c.status == Readiness::Incomplete)
+    {
         Readiness::Incomplete
     } else {
         Readiness::Unknown

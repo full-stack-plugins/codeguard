@@ -6,7 +6,10 @@ use codeguard_adapters::generate_precision_validation;
 use sha2::Digest;
 use std::path::Path;
 
-fn classify_from_grammar(grammar: &mut codeguard_runtime::WasmGrammar, source: &[u8]) -> Option<bool> {
+fn classify_from_grammar(
+    grammar: &mut codeguard_runtime::WasmGrammar,
+    source: &[u8],
+) -> Option<bool> {
     match grammar.parse(source) {
         Ok(tree) => {
             let mut has_error = false;
@@ -55,22 +58,22 @@ fn css_grammar_precision() {
 
     // 违规 CSS（300）- 语法级错误
     for i in 0..60 {
-        invalid.push(format!(".class{} {{ color: red \n", i));  // 缺少 }
+        invalid.push(format!(".class{} {{ color: red \n", i)); // 缺少 }
     }
     for i in 0..60 {
-        invalid.push(format!(".class{} color: red; }}\n", i));  // 缺少 {
+        invalid.push(format!(".class{} color: red; }}\n", i)); // 缺少 {
     }
     for i in 0..60 {
-        invalid.push(format!(".class{{ color: red; }}\n"));  // 缺少类名
+        invalid.push(format!(".class{{ color: red; }}\n")); // 缺少类名
     }
     for i in 0..60 {
-        invalid.push(format!(".class{} {{ color: red; }} extra\n", i));  // 多余内容
+        invalid.push(format!(".class{} {{ color: red; }} extra\n", i)); // 多余内容
     }
     for i in 0..60 {
-        invalid.push(format!(".class{} {{ color: }}\n", i));  // 缺少值
+        invalid.push(format!(".class{} {{ color: }}\n", i)); // 缺少值
     }
     for i in 0..100 {
-        invalid.push(format!(".class{} {{ color: red; \n", i));  // 缺少 }
+        invalid.push(format!(".class{} {{ color: red; \n", i)); // 缺少 }
     }
 
     // 构建语料
@@ -108,7 +111,11 @@ fn css_grammar_precision() {
 
     // 加载 CSS grammar
     let wasm_path = Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("..").join("..").join("grammars").join("css").join("parser.wasm");
+        .join("..")
+        .join("..")
+        .join("grammars")
+        .join("css")
+        .join("parser.wasm");
     let wasm_bytes = std::fs::read(&wasm_path).expect("CSS WASM 文件不存在");
     let wasm_sha256 = format!("{:x}", sha2::Sha256::digest(&wasm_bytes));
     let mut grammar = codeguard_runtime::WasmGrammar::load("css", &wasm_bytes, &wasm_sha256, 15)
@@ -138,20 +145,33 @@ fn css_grammar_precision() {
     println!("TP={tp} FP={fp} FN={fn_count} TN={tn} unknown={unknown}");
 
     let evidence = generate_precision_validation(
-        "2026-10-07", corpus["cases"].as_array().unwrap().len() as u32,
-        tp, fp, fn_count, tn, unknown,
-        "tests/acceptance/css-grammar-precision-2026-10-07.md", None,
+        "2026-10-07",
+        corpus["cases"].as_array().unwrap().len() as u32,
+        tp,
+        fp,
+        fn_count,
+        tn,
+        unknown,
+        "tests/acceptance/css-grammar-precision-2026-10-07.md",
+        None,
     );
 
     match evidence {
         Ok(ev) => {
-            println!("✅ CSS PASS! Wilson 下界 = {:.4}", ev.precision_wilson_lower_bound);
+            println!(
+                "✅ CSS PASS! Wilson 下界 = {:.4}",
+                ev.precision_wilson_lower_bound
+            );
             let doc = format!(
                 "# CSS Grammar 精度验证证据\n\n> 日期：2026-10-07。\n\n| 指标 | 值 |\n|---|---|\n| 总样本 | {} |\n| TP | {tp} |\n| FP | {fp} |\n| FN | {fn_count} |\n| TN | {tn} |\n| Wilson 下界 (95%) | {:.4} |\n| 结果 | **PASS** |\n",
-                corpus["cases"].as_array().unwrap().len(), ev.precision_wilson_lower_bound
+                corpus["cases"].as_array().unwrap().len(),
+                ev.precision_wilson_lower_bound
             );
             let doc_path = Path::new(env!("CARGO_MANIFEST_DIR"))
-                .join("..").join("..").join("tests").join("acceptance")
+                .join("..")
+                .join("..")
+                .join("tests")
+                .join("acceptance")
                 .join("css-grammar-precision-2026-10-07.md");
             std::fs::write(&doc_path, doc).unwrap();
         }

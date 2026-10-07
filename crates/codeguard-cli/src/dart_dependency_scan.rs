@@ -39,7 +39,11 @@ pub(crate) fn applicability_profile() -> Value {
 
 fn observe_config(root: &Path) -> Value {
     let config_file = root.join("pubspec.yaml");
-    let config = if config_file.exists() { "configured" } else { "unknown" };
+    let config = if config_file.exists() {
+        "configured"
+    } else {
+        "unknown"
+    };
     json!({
         "status": config,
         "config_ref": if config_file.exists() { "pubspec.yaml" } else { "." },

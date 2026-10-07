@@ -103,7 +103,10 @@ mod tests {
         let profile = profile_architecture(
             vec![
                 (ArchitectureDimension::Domain, "UserService".to_string()),
-                (ArchitectureDimension::Controller, "UserController".to_string()),
+                (
+                    ArchitectureDimension::Controller,
+                    "UserController".to_string(),
+                ),
             ],
             true,
             false,

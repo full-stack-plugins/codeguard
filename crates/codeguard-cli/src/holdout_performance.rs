@@ -40,10 +40,7 @@ pub(crate) fn measure_performance(
     let mut sorted = latencies.to_vec();
     sorted.sort_unstable();
     let p50 = sorted.get(sorted.len() / 2).copied().unwrap_or(0);
-    let p95 = sorted
-        .get((sorted.len() * 95) / 100)
-        .copied()
-        .unwrap_or(0);
+    let p95 = sorted.get((sorted.len() * 95) / 100).copied().unwrap_or(0);
 
     PerformanceMetrics {
         cold_start_ms,
@@ -55,10 +52,7 @@ pub(crate) fn measure_performance(
 }
 
 /// 生成性能报告。
-pub(crate) fn performance_report(
-    holdout: &HoldoutSplit,
-    metrics: &PerformanceMetrics,
-) -> Value {
+pub(crate) fn performance_report(holdout: &HoldoutSplit, metrics: &PerformanceMetrics) -> Value {
     json!({
         "schema_version": "0.1.0",
         "report_type": "holdout_performance",

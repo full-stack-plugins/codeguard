@@ -7,13 +7,16 @@
 #![cfg(feature = "wasm-precheck")]
 
 use codeguard_adapters::generate_precision_validation;
-use sha2::Digest;
 use serde_json::Value;
+use sha2::Digest;
 use std::path::Path;
 
 /// 从 grammar 解析结果中提取分类。
 /// 返回 Some(true) = 有效（无恢复节点），Some(false) = 无效（有恢复节点），None = 未知。
-fn classify_from_grammar(grammar: &mut codeguard_runtime::WasmGrammar, source: &[u8]) -> Option<bool> {
+fn classify_from_grammar(
+    grammar: &mut codeguard_runtime::WasmGrammar,
+    source: &[u8],
+) -> Option<bool> {
     match grammar.parse(source) {
         Ok(tree) => {
             // 检查是否有 ERROR 或 MISSING 节点
@@ -76,20 +79,29 @@ fn java_corpus_expansion_meets_precision_threshold() {
         let classification = classify_from_grammar(&mut grammar, source.as_bytes());
 
         match (expected_valid, classification) {
-            (false, Some(false)) => tp += 1,  // 期望违规，检出违规 = TP
-            (true, Some(false)) => fp += 1,    // 期望合法，误报违规 = FP
+            (false, Some(false)) => tp += 1,      // 期望违规，检出违规 = TP
+            (true, Some(false)) => fp += 1,       // 期望合法，误报违规 = FP
             (false, Some(true)) => fn_count += 1, // 期望违规，漏检为合法 = FN
-            (true, Some(true)) => tn += 1,     // 期望合法，正确判为合法 = TN
-            _ => unknown += 1,                 // 未知 = unknown
+            (true, Some(true)) => tn += 1,        // 期望合法，正确判为合法 = TN
+            _ => unknown += 1,                    // 未知 = unknown
         }
     }
 
     println!("\n=== Java 扩展语料回放结果 ===");
     println!("总样本: {}", cases.len());
-    println!("TP(真阳性)={tp} FP(假阳性)={fp} FN(假阴性)={fn_count} TN(真阴性)={tn} unknown={unknown}");
+    println!(
+        "TP(真阳性)={tp} FP(假阳性)={fp} FN(假阴性)={fn_count} TN(真阴性)={tn} unknown={unknown}"
+    );
     println!("正样本(违规)总数: {}", tp + fn_count);
     println!("负样本(合法)总数: {}", tn + fp);
-    println!("精度(precision) = TP/(TP+FP) = {}", if tp + fp > 0 { tp as f64 / (tp + fp) as f64 } else { 0.0 });
+    println!(
+        "精度(precision) = TP/(TP+FP) = {}",
+        if tp + fp > 0 {
+            tp as f64 / (tp + fp) as f64
+        } else {
+            0.0
+        }
+    );
 
     // 生成精度验证证据
     let evidence = generate_precision_validation(
@@ -106,8 +118,14 @@ fn java_corpus_expansion_meets_precision_threshold() {
 
     match evidence {
         Ok(ev) => {
-            println!("\n✅ 精度验证通过！Wilson 下界 = {:.4}", ev.precision_wilson_lower_bound);
-            println!("   满足门槛 >= 0.98: {}", ev.precision_wilson_lower_bound >= 0.98);
+            println!(
+                "\n✅ 精度验证通过！Wilson 下界 = {:.4}",
+                ev.precision_wilson_lower_bound
+            );
+            println!(
+                "   满足门槛 >= 0.98: {}",
+                ev.precision_wilson_lower_bound >= 0.98
+            );
 
             // 写入验收文档
             let doc_path = Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -139,9 +157,18 @@ fn java_corpus_expansion_meets_precision_threshold() {
                  ## 资格判定\n\n\
                  本证据满足 grammar 资格的精度门槛（Wilson 下界 >= 0.98）。\n\
                  但 `release_status` 标记需要在 `grammars/manifest.json` 中显式写入。\n",
-                cases.len(), tp, fp, fn_count, tn, unknown,
+                cases.len(),
+                tp,
+                fp,
+                fn_count,
+                tn,
+                unknown,
                 ev.precision_wilson_lower_bound,
-                if ev.precision_wilson_lower_bound >= 0.98 { "PASS" } else { "FAIL" },
+                if ev.precision_wilson_lower_bound >= 0.98 {
+                    "PASS"
+                } else {
+                    "FAIL"
+                },
             );
             std::fs::write(&doc_path, doc).expect("无法写入验收文档");
             println!("\n📄 验收文档已写入: {}", doc_path.display());

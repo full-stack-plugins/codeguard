@@ -69,12 +69,12 @@ pub(crate) fn install(
     if !sig.valid {
         return InstallResult::SignatureFailed;
     }
-    
+
     // 平台检查
     if target_platform != current_platform {
         return InstallResult::PlatformMismatch;
     }
-    
+
     InstallResult::Success
 }
 

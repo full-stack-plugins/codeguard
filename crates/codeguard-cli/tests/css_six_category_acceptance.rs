@@ -23,14 +23,22 @@ fn valid_css_samples_pass_lint() {
         .output()
         .expect("prettier 不可用");
 
-    assert!(output.status.success(), "有效 CSS 应通过 prettier: {:?}", output);
+    assert!(
+        output.status.success(),
+        "有效 CSS 应通过 prettier: {:?}",
+        output
+    );
     std::fs::remove_dir_all(&tmp).unwrap();
 }
 
 #[test]
 fn invalid_css_samples_are_detected() {
     let tmp = ensure_clean_dir("css-invalid-test");
-    std::fs::write(tmp.join("style.css"), "body {\n    margin: 0\n    padding: 0;\n    font-family: sans-serif;\n}\n").unwrap();
+    std::fs::write(
+        tmp.join("style.css"),
+        "body {\n    margin: 0\n    padding: 0;\n    font-family: sans-serif;\n}\n",
+    )
+    .unwrap();
 
     let output = Command::new("npx")
         .args(["prettier", "--check", "style.css"])
@@ -59,6 +67,10 @@ fn formatting_cannot_impersonate_comment_checking() {
         .output()
         .expect("prettier 不可用");
 
-    assert!(output.status.success(), "CSS 应通过（格式正确），但注释合规需另查: {:?}", output);
+    assert!(
+        output.status.success(),
+        "CSS 应通过（格式正确），但注释合规需另查: {:?}",
+        output
+    );
     std::fs::remove_dir_all(&tmp).unwrap();
 }

@@ -18,17 +18,21 @@ pub(crate) fn generate_architecture_md(profile: &Value) -> ArchitectureDoc {
     let mut content = String::new();
     content.push_str("# Architecture\n\n");
     content.push_str("## Dimensions\n\n");
-    
+
     let mut facts_count = 0;
     let mut inferences_count = 0;
-    
+
     if let Some(dims) = profile["dimensions"].as_array() {
         for dim in dims {
-            content.push_str(&format!("- {}: {}\n", dim["dimension"].as_str().unwrap_or("?"), dim["detail"].as_str().unwrap_or("?")));
+            content.push_str(&format!(
+                "- {}: {}\n",
+                dim["dimension"].as_str().unwrap_or("?"),
+                dim["detail"].as_str().unwrap_or("?")
+            ));
             facts_count += 1;
         }
     }
-    
+
     content.push_str("\n## Evidence\n\n");
     if profile["has_ddd_evidence"] == true {
         content.push_str("- DDD evidence found\n");
@@ -37,12 +41,12 @@ pub(crate) fn generate_architecture_md(profile: &Value) -> ArchitectureDoc {
         content.push_str("- No DDD evidence (domain/controller naming alone is insufficient)\n");
         inferences_count += 1;
     }
-    
+
     if profile["doc_source_conflict"] == true {
         content.push_str("- Documentation/source conflict detected\n");
         facts_count += 1;
     }
-    
+
     ArchitectureDoc {
         content,
         facts_count,
@@ -87,7 +91,8 @@ mod tests {
 
     #[test]
     fn agents_managed_block_wraps_content() {
-        let profile = json!({"dimensions": [], "has_ddd_evidence": false, "doc_source_conflict": false});
+        let profile =
+            json!({"dimensions": [], "has_ddd_evidence": false, "doc_source_conflict": false});
         let doc = generate_architecture_md(&profile);
         let block = agents_managed_block(&doc);
         assert!(block.contains("codeguard:managed"));

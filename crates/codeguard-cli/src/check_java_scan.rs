@@ -25,8 +25,14 @@ pub(crate) fn observe(root: &Path, deadline: Instant) -> Value {
 }
 
 fn try_native_tool(root: &Path) -> Option<Value> {
-    let output = Command::new("javac").args(["-version"]).current_dir(root).output().ok()?;
-    if !output.status.success() { return None; }
+    let output = Command::new("javac")
+        .args(["-version"])
+        .current_dir(root)
+        .output()
+        .ok()?;
+    if !output.status.success() {
+        return None;
+    }
     let version = String::from_utf8_lossy(&output.stderr).trim().to_string();
     // javac -Xlint 检查
     let scan_output = Command::new("javac")
@@ -65,8 +71,12 @@ fn parse_output(output: &str) -> Vec<Value> {
     findings
 }
 
-pub(crate) fn refresh(root: &Path, report: &mut Value, deadline: Instant) { let _ = (root, report, deadline); }
-pub(crate) fn prefers(report: &Value, _relative: &str) -> bool { report["status"] == "incomplete" }
+pub(crate) fn refresh(root: &Path, report: &mut Value, deadline: Instant) {
+    let _ = (root, report, deadline);
+}
+pub(crate) fn prefers(report: &Value, _relative: &str) -> bool {
+    report["status"] == "incomplete"
+}
 pub(crate) fn applicability_profile() -> Value {
     json!({"language": "java", "categories": [
         {"category": "lint", "applicability": "applicable", "tool": "javac_xlint"},
@@ -78,7 +88,11 @@ fn observe_config(root: &Path) -> Value {
     let pom = root.join("pom.xml");
     let gradle = root.join("build.gradle");
     let gradle_kts = root.join("build.gradle.kts");
-    let config = if pom.exists() || gradle.exists() || gradle_kts.exists() { "configured" } else { "unknown" };
+    let config = if pom.exists() || gradle.exists() || gradle_kts.exists() {
+        "configured"
+    } else {
+        "unknown"
+    };
     json!({"status": config, "config_ref": if pom.exists() { "pom.xml" } else if gradle.exists() { "build.gradle" } else if gradle_kts.exists() { "build.gradle.kts" } else { "." }})
 }
 
@@ -105,6 +119,12 @@ mod tests {
     }
     #[test]
     fn applicability_profile_covers_lint_and_comments() {
-        assert_eq!(applicability_profile()["categories"].as_array().unwrap().len(), 2);
+        assert_eq!(
+            applicability_profile()["categories"]
+                .as_array()
+                .unwrap()
+                .len(),
+            2
+        );
     }
 }

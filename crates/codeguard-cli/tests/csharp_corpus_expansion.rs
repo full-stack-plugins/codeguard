@@ -7,7 +7,10 @@ use serde_json::Value;
 use sha2::Digest;
 use std::path::Path;
 
-fn classify_from_grammar(grammar: &mut codeguard_runtime::WasmGrammar, source: &[u8]) -> Option<bool> {
+fn classify_from_grammar(
+    grammar: &mut codeguard_runtime::WasmGrammar,
+    source: &[u8],
+) -> Option<bool> {
     match grammar.parse(source) {
         Ok(tree) => {
             let mut has_error = false;
@@ -31,18 +34,26 @@ fn classify_from_grammar(grammar: &mut codeguard_runtime::WasmGrammar, source: &
 #[test]
 fn csharp_grammar_precision() {
     let corpus_path = Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("..").join("..").join("tests").join("fixtures")
+        .join("..")
+        .join("..")
+        .join("tests")
+        .join("fixtures")
         .join("csharp_grammar_corpus_expanded.json");
     let corpus_bytes = std::fs::read(&corpus_path).expect("csharp 语料文件不存在");
     let corpus: Value = serde_json::from_slice(&corpus_bytes).expect("语料 JSON 无效");
     let cases = corpus["cases"].as_array().expect("cases 字段缺失");
 
     let wasm_path = Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("..").join("..").join("grammars").join("csharp").join("parser.wasm");
+        .join("..")
+        .join("..")
+        .join("grammars")
+        .join("csharp")
+        .join("parser.wasm");
     let wasm_bytes = std::fs::read(&wasm_path).expect("csharp WASM 文件不存在");
     let wasm_sha256 = format!("{:x}", sha2::Sha256::digest(&wasm_bytes));
-    let mut grammar = codeguard_runtime::WasmGrammar::load("c_sharp", &wasm_bytes, &wasm_sha256, 15)
-        .expect("csharp grammar 加载失败");
+    let mut grammar =
+        codeguard_runtime::WasmGrammar::load("c_sharp", &wasm_bytes, &wasm_sha256, 15)
+            .expect("csharp grammar 加载失败");
 
     let mut tp = 0u32;
     let mut fp = 0u32;
@@ -68,18 +79,33 @@ fn csharp_grammar_precision() {
     println!("TP={tp} FP={fp} FN={fn_count} TN={tn} unknown={unknown}");
 
     let evidence = generate_precision_validation(
-        "2026-10-07", cases.len() as u32, tp, fp, fn_count, tn, unknown,
-        "tests/acceptance/csharp-grammar-precision-2026-10-07.md", None,
+        "2026-10-07",
+        cases.len() as u32,
+        tp,
+        fp,
+        fn_count,
+        tn,
+        unknown,
+        "tests/acceptance/csharp-grammar-precision-2026-10-07.md",
+        None,
     );
 
     match evidence {
         Ok(ev) => {
-            println!("✅ csharp PASS! Wilson 下界 = {:.4}", ev.precision_wilson_lower_bound);
+            println!(
+                "✅ csharp PASS! Wilson 下界 = {:.4}",
+                ev.precision_wilson_lower_bound
+            );
             let doc = format!(
                 "# C# Grammar 精度验证证据\n\n> 日期：2026-10-07。\n\n| 指标 | 值 |\n|---|---|\n| 总样本 | {} |\n| TP | {tp} |\n| FP | {fp} |\n| FN | {fn_count} |\n| TN | {tn} |\n| Wilson 下界 (95%) | {:.4} |\n| 结果 | **PASS** |\n",
-                cases.len(), ev.precision_wilson_lower_bound
+                cases.len(),
+                ev.precision_wilson_lower_bound
             );
-            std::fs::write("tests/acceptance/csharp-grammar-precision-2026-10-07.md", doc).unwrap();
+            std::fs::write(
+                "tests/acceptance/csharp-grammar-precision-2026-10-07.md",
+                doc,
+            )
+            .unwrap();
         }
         Err(e) => panic!("csharp 精度验证未通过: {e}"),
     }

@@ -26,7 +26,7 @@ pub(crate) fn merge_agents_block(
             detail: "duplicate_markers_detected".to_string(),
         };
     }
-    
+
     if has_manual_changes {
         return MergeResult {
             success: false,
@@ -34,12 +34,15 @@ pub(crate) fn merge_agents_block(
             detail: "manual_changes_detected".to_string(),
         };
     }
-    
+
     // 查找现有 managed block 并替换
     let start_marker = "<!-- codeguard:managed -->";
     let end_marker = "<!-- /codeguard:managed -->";
-    
-    if let (Some(start), Some(end)) = (existing_content.find(start_marker), existing_content.find(end_marker)) {
+
+    if let (Some(start), Some(end)) = (
+        existing_content.find(start_marker),
+        existing_content.find(end_marker),
+    ) {
         let before = &existing_content[..start];
         let after = &existing_content[end + end_marker.len()..];
         let new_content = format!("{}{}{}", before, managed_block, after);
@@ -76,7 +79,12 @@ mod tests {
 
     #[test]
     fn merge_without_existing_block() {
-        let result = merge_agents_block("# AGENTS", "<!-- codeguard:managed -->test<!-- /codeguard:managed -->", false, false);
+        let result = merge_agents_block(
+            "# AGENTS",
+            "<!-- codeguard:managed -->test<!-- /codeguard:managed -->",
+            false,
+            false,
+        );
         assert!(result.success);
         assert!(!result.conflict);
     }
@@ -84,27 +92,47 @@ mod tests {
     #[test]
     fn merge_with_existing_block() {
         let existing = "# AGENTS\n<!-- codeguard:managed -->old<!-- /codeguard:managed -->\ntail";
-        let result = merge_agents_block(existing, "<!-- codeguard:managed -->new<!-- /codeguard:managed -->", false, false);
+        let result = merge_agents_block(
+            existing,
+            "<!-- codeguard:managed -->new<!-- /codeguard:managed -->",
+            false,
+            false,
+        );
         assert!(result.success);
     }
 
     #[test]
     fn manual_changes_detected() {
-        let result = merge_agents_block("# AGENTS", "<!-- codeguard:managed -->test<!-- /codeguard:managed -->", true, false);
+        let result = merge_agents_block(
+            "# AGENTS",
+            "<!-- codeguard:managed -->test<!-- /codeguard:managed -->",
+            true,
+            false,
+        );
         assert!(!result.success);
         assert!(result.conflict);
     }
 
     #[test]
     fn duplicate_markers_detected() {
-        let result = merge_agents_block("# AGENTS", "<!-- codeguard:managed -->test<!-- /codeguard:managed -->", false, true);
+        let result = merge_agents_block(
+            "# AGENTS",
+            "<!-- codeguard:managed -->test<!-- /codeguard:managed -->",
+            false,
+            true,
+        );
         assert!(!result.success);
         assert!(result.conflict);
     }
 
     #[test]
     fn merge_report_contains_status() {
-        let result = merge_agents_block("# AGENTS", "<!-- codeguard:managed -->test<!-- /codeguard:managed -->", false, false);
+        let result = merge_agents_block(
+            "# AGENTS",
+            "<!-- codeguard:managed -->test<!-- /codeguard:managed -->",
+            false,
+            false,
+        );
         let report = merge_report(&result);
         assert_eq!(report["success"], true);
     }

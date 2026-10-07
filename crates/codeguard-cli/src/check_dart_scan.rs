@@ -11,7 +11,7 @@ pub(crate) fn observe(root: &Path, deadline: Instant) -> Value {
     let _ = deadline;
     let config = observe_config(root);
     let tool_result = try_native_tool(root);
-    
+
     match tool_result {
         Some(result) => result,
         None => json!({
@@ -31,22 +31,22 @@ fn try_native_tool(root: &Path) -> Option<Value> {
         .current_dir(root)
         .output()
         .ok()?;
-    
+
     if !output.status.success() {
         return None;
     }
-    
+
     let version = String::from_utf8_lossy(&output.stdout).trim().to_string();
-    
+
     let scan_output = Command::new("dart")
         .args(["analyze", "--format=json"])
         .current_dir(root)
         .output()
         .ok()?;
-    
+
     let stdout = String::from_utf8_lossy(&scan_output.stdout).to_string();
     let findings = parse_dart_json(&stdout);
-    
+
     Some(json!({
         "schema_version": "0.1.0",
         "report_type": "dart_lint_scan",
@@ -60,7 +60,7 @@ fn try_native_tool(root: &Path) -> Option<Value> {
 
 fn parse_dart_json(output: &str) -> Vec<Value> {
     let mut findings = Vec::new();
-    
+
     if let Ok(json) = serde_json::from_str::<Value>(output) {
         if let Some(diagnostics) = json["diagnostics"].as_array() {
             for diag in diagnostics {
@@ -75,7 +75,7 @@ fn parse_dart_json(output: &str) -> Vec<Value> {
             }
         }
     }
-    
+
     findings
 }
 
@@ -100,7 +100,13 @@ pub(crate) fn applicability_profile() -> Value {
 fn observe_config(root: &Path) -> Value {
     let analysis_options = root.join("analysis_options.yaml");
     let pubspec = root.join("pubspec.yaml");
-    let config = if analysis_options.exists() { "configured" } else if pubspec.exists() { "missing" } else { "unknown" };
+    let config = if analysis_options.exists() {
+        "configured"
+    } else if pubspec.exists() {
+        "missing"
+    } else {
+        "unknown"
+    };
     json!({
         "status": config,
         "config_ref": if analysis_options.exists() { "analysis_options.yaml" } else if pubspec.exists() { "pubspec.yaml" } else { "." },

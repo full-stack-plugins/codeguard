@@ -1,0 +1,52 @@
+{
+  "schema_version": "0.1.0",
+  "corpus_type": "grammar_regression",
+  "manifest_sha256": "9fe2fa77181aedd74755a2ac5b8fe694b2d4f2d33f03518d814476a911b2a610",
+  "cases": [
+    {
+      "id": "test_missing_brace",
+      "language": "csharp",
+      "source": "class C { int M( { return 1; } }",
+      "source_sha256": "2b6fd506f9990eaefa2d6d2fe890d3e4cbc732aab16870611c04308807cd2b7c",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "test"
+    },
+    {
+      "id": "test_missing_semicolon",
+      "language": "csharp",
+      "source": "class C { int M() { return 1 } }",
+      "source_sha256": "aef5ffee5b02cf54904f6d1abcfb4178f22fdd993257a71352c0d98d282a6650",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "test"
+    },
+    {
+      "id": "test_unclosed_paren",
+      "language": "csharp",
+      "source": "class C { int M( return 1; }",
+      "source_sha256": "38a406cd93646cf8d755ae67e79fb13145d54f2c37669d6a8c9175e3d53171ec",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "test"
+    },
+    {
+      "id": "test_wrong_keyword",
+      "language": "csharp",
+      "source": "class C { val x = 1; }",
+      "source_sha256": "dbccb2e64d50e921fe154c2d0c03575400fde865d1e356e6972da2875d2c2dcf",
+      "expected_valid": false,
+      "label": "regression",
+      "origin": "test"
+    },
+    {
+      "id": "test_valid",
+      "language": "csharp",
+      "source": "class C { int M() { return 1; } }",
+      "source_sha256": "6bab2a1ba91a8c37e3f6c9ddc3b7c2bfc63a18a09498575da9aa25dd130fb3f3",
+      "expected_valid": true,
+      "label": "regression",
+      "origin": "test"
+    }
+  ]
+}

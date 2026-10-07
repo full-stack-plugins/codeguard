@@ -12,7 +12,7 @@ pub(crate) fn observe(root: &Path, deadline: Instant) -> Value {
     let _ = deadline;
     let config = observe_config(root);
     let tool_result = try_native_tool(root);
-    
+
     match tool_result {
         Some(result) => result,
         None => json!({
@@ -34,13 +34,13 @@ fn try_native_tool(root: &Path) -> Option<Value> {
         .current_dir(root)
         .output()
         .ok()?;
-    
+
     if !output.status.success() {
         return None;
     }
-    
+
     let version = String::from_utf8_lossy(&output.stdout).trim().to_string();
-    
+
     // 调用 sbt scalafix 进行扫描
     let scan_output = Command::new("sbt")
         .args([
@@ -51,13 +51,13 @@ fn try_native_tool(root: &Path) -> Option<Value> {
         .current_dir(root)
         .output()
         .ok()?;
-    
+
     let stdout = String::from_utf8_lossy(&scan_output.stdout).to_string();
     let stderr = String::from_utf8_lossy(&scan_output.stderr).to_string();
-    
+
     // 解析 Scalafix 输出
     let findings = parse_scalafix_output(&stdout, &stderr);
-    
+
     Some(json!({
         "schema_version": "0.1.0",
         "report_type": "scala_lint_scan",
@@ -72,17 +72,19 @@ fn try_native_tool(root: &Path) -> Option<Value> {
 /// 解析 Scalafix 输出。
 fn parse_scalafix_output(stdout: &str, stderr: &str) -> Vec<Value> {
     let mut findings = Vec::new();
-    
+
     // Scalafix 输出格式：文件:行:列: 规则: 消息
     for line in stdout.lines().chain(stderr.lines()) {
         if let Some(idx) = line.find(": ") {
             let location = &line[..idx];
             let message = &line[idx + 2..];
-            
+
             // 解析 文件:行:列
             let parts: Vec<&str> = location.split(':').collect();
             if parts.len() >= 3 {
-                if let (Ok(line_num), Ok(col_num)) = (parts[1].parse::<u32>(), parts[2].parse::<u32>()) {
+                if let (Ok(line_num), Ok(col_num)) =
+                    (parts[1].parse::<u32>(), parts[2].parse::<u32>())
+                {
                     findings.push(json!({
                         "path": parts[0],
                         "line": line_num,
@@ -94,7 +96,7 @@ fn parse_scalafix_output(stdout: &str, stderr: &str) -> Vec<Value> {
             }
         }
     }
-    
+
     findings
 }
 

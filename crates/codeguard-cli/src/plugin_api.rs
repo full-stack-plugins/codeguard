@@ -128,7 +128,12 @@ mod tests {
         let result = scan_sync_brief("root", findings);
         assert_eq!(result["scan"]["findings_count"], 1);
         assert_eq!(result["sync"]["synced"], true);
-        assert!(result["brief"]["next_action"].as_str().unwrap().contains("修复"));
+        assert!(
+            result["brief"]["next_action"]
+                .as_str()
+                .unwrap()
+                .contains("修复")
+        );
     }
 
     #[test]

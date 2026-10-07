@@ -18,7 +18,11 @@ fn valid_yaml_samples_pass_lint() {
         .output()
         .expect("yamllint 不可用");
 
-    assert!(output.status.success(), "有效 YAML 应通过 lint: {:?}", output);
+    assert!(
+        output.status.success(),
+        "有效 YAML 应通过 lint: {:?}",
+        output
+    );
     std::fs::remove_dir_all(&tmp).unwrap();
 }
 
@@ -49,6 +53,10 @@ fn formatting_cannot_impersonate_comment_checking() {
         .output()
         .expect("yamllint 不可用");
 
-    assert!(output.status.success(), "YAML 应通过（格式正确），但注释合规需另查: {:?}", output);
+    assert!(
+        output.status.success(),
+        "YAML 应通过（格式正确），但注释合规需另查: {:?}",
+        output
+    );
     std::fs::remove_dir_all(&tmp).unwrap();
 }

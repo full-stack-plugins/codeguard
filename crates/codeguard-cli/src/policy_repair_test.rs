@@ -54,10 +54,7 @@ pub(crate) fn test_repair_boundary(
 }
 
 /// 生成测试报告。
-pub(crate) fn test_report(
-    policy: &TestResult,
-    repair: &TestResult,
-) -> Value {
+pub(crate) fn test_report(policy: &TestResult, repair: &TestResult) -> Value {
     json!({
         "schema_version": "0.1.0",
         "report_type": "policy_repair_test",

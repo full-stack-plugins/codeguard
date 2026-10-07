@@ -27,14 +27,19 @@ fn wasm_candidates_are_not_confirmed_violations() {
     let stdout = String::from_utf8_lossy(&output.stdout);
     let report: serde_json::Value = serde_json::from_str(&stdout).expect("JSON 解析失败");
 
-    println!("WASM 候选报告: {}", serde_json::to_string_pretty(&report).unwrap());
+    println!(
+        "WASM 候选报告: {}",
+        serde_json::to_string_pretty(&report).unwrap()
+    );
 
     // 验证：观察应标记为 candidate，而非 confirmed
     if let Some(observations) = report["observations"].as_array() {
         for obs in observations {
             let status = obs["status"].as_str().unwrap_or("");
             assert!(
-                status.starts_with("candidate") || status == "observed_partial" || status == "not_run",
+                status.starts_with("candidate")
+                    || status == "observed_partial"
+                    || status == "not_run",
                 "WASM 观察不应标记为已确认违规: {status}"
             );
         }
@@ -72,7 +77,10 @@ fn unverified_grammar_does_not_claim_clean() {
         }
     }
 
-    println!("零恢复验证通过: {}", serde_json::to_string_pretty(&report).unwrap());
+    println!(
+        "零恢复验证通过: {}",
+        serde_json::to_string_pretty(&report).unwrap()
+    );
 
     let _ = std::fs::remove_dir_all(&root);
 }

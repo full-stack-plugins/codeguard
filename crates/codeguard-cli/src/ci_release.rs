@@ -71,10 +71,7 @@ pub(crate) fn verify_release(
 }
 
 /// 生成 CI 发行报告。
-pub(crate) fn ci_release_report(
-    ci_result: &CiResult,
-    release: &ReleaseVerification,
-) -> Value {
+pub(crate) fn ci_release_report(ci_result: &CiResult, release: &ReleaseVerification) -> Value {
     json!({
         "schema_version": "0.1.0",
         "report_type": "ci_release",

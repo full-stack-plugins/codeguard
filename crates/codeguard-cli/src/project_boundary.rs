@@ -13,7 +13,11 @@ pub(crate) struct ProjectBoundary {
 }
 
 /// 生成项目边界画像。
-pub(crate) fn profile_boundary(root: &str, build_roots: Vec<String>, languages: Vec<String>) -> ProjectBoundary {
+pub(crate) fn profile_boundary(
+    root: &str,
+    build_roots: Vec<String>,
+    languages: Vec<String>,
+) -> ProjectBoundary {
     let is_monorepo = build_roots.len() > 1;
     let is_worktree = root.contains(".git/worktrees");
     ProjectBoundary {
@@ -38,7 +42,10 @@ pub(crate) fn boundary_report(boundary: &ProjectBoundary) -> Value {
 
 /// 检查边界是否越界。
 pub(crate) fn check_boundary(boundary: &ProjectBoundary, target_path: &str) -> bool {
-    boundary.build_roots.iter().any(|root| target_path.starts_with(root.as_str()))
+    boundary
+        .build_roots
+        .iter()
+        .any(|root| target_path.starts_with(root.as_str()))
 }
 
 #[cfg(test)]
@@ -47,7 +54,8 @@ mod tests {
 
     #[test]
     fn profile_single_build_root() {
-        let boundary = profile_boundary("/project", vec![".".to_string()], vec!["rust".to_string()]);
+        let boundary =
+            profile_boundary("/project", vec![".".to_string()], vec!["rust".to_string()]);
         assert!(!boundary.is_monorepo);
         assert!(!boundary.is_worktree);
     }
@@ -64,14 +72,19 @@ mod tests {
 
     #[test]
     fn check_boundary_detects_within() {
-        let boundary = profile_boundary("/project", vec!["./src".to_string()], vec!["rust".to_string()]);
+        let boundary = profile_boundary(
+            "/project",
+            vec!["./src".to_string()],
+            vec!["rust".to_string()],
+        );
         assert!(check_boundary(&boundary, "./src/main.rs"));
         assert!(!check_boundary(&boundary, "./tests/main.rs"));
     }
 
     #[test]
     fn boundary_report_contains_roots() {
-        let boundary = profile_boundary("/project", vec![".".to_string()], vec!["rust".to_string()]);
+        let boundary =
+            profile_boundary("/project", vec![".".to_string()], vec!["rust".to_string()]);
         let report = boundary_report(&boundary);
         assert_eq!(report["build_roots"].as_array().unwrap().len(), 1);
     }

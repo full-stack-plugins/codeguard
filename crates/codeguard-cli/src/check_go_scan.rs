@@ -25,10 +25,20 @@ pub(crate) fn observe(root: &Path, deadline: Instant) -> Value {
 }
 
 fn try_native_tool(root: &Path) -> Option<Value> {
-    let output = Command::new("go").args(["version"]).current_dir(root).output().ok()?;
-    if !output.status.success() { return None; }
+    let output = Command::new("go")
+        .args(["version"])
+        .current_dir(root)
+        .output()
+        .ok()?;
+    if !output.status.success() {
+        return None;
+    }
     let version = String::from_utf8_lossy(&output.stdout).trim().to_string();
-    let scan_output = Command::new("go").args(["vet", "./..."]).current_dir(root).output().ok()?;
+    let scan_output = Command::new("go")
+        .args(["vet", "./..."])
+        .current_dir(root)
+        .output()
+        .ok()?;
     let stdout = String::from_utf8_lossy(&scan_output.stdout).to_string();
     let stderr = String::from_utf8_lossy(&scan_output.stderr).to_string();
     let findings = parse_output(&stdout, &stderr);
@@ -46,7 +56,11 @@ fn try_native_tool(root: &Path) -> Option<Value> {
 fn parse_output(stdout: &str, stderr: &str) -> Vec<Value> {
     let mut findings = Vec::new();
     for line in stdout.lines().chain(stderr.lines()) {
-        if line.contains(":") && (line.contains("warning") || line.contains("error") || line.contains("declared but not used")) {
+        if line.contains(":")
+            && (line.contains("warning")
+                || line.contains("error")
+                || line.contains("declared but not used"))
+        {
             let parts: Vec<&str> = line.splitn(4, ':').collect();
             if parts.len() >= 3 {
                 if let Ok(line_num) = parts[1].parse::<u32>() {
@@ -63,8 +77,12 @@ fn parse_output(stdout: &str, stderr: &str) -> Vec<Value> {
     findings
 }
 
-pub(crate) fn refresh(root: &Path, report: &mut Value, deadline: Instant) { let _ = (root, report, deadline); }
-pub(crate) fn prefers(report: &Value, _relative: &str) -> bool { report["status"] == "incomplete" }
+pub(crate) fn refresh(root: &Path, report: &mut Value, deadline: Instant) {
+    let _ = (root, report, deadline);
+}
+pub(crate) fn prefers(report: &Value, _relative: &str) -> bool {
+    report["status"] == "incomplete"
+}
 pub(crate) fn applicability_profile() -> Value {
     json!({"language": "go", "categories": [
         {"category": "lint", "applicability": "applicable", "tool": "go_vet"},
@@ -74,7 +92,11 @@ pub(crate) fn applicability_profile() -> Value {
 
 fn observe_config(root: &Path) -> Value {
     let go_mod = root.join("go.mod");
-    let config = if go_mod.exists() { "configured" } else { "unknown" };
+    let config = if go_mod.exists() {
+        "configured"
+    } else {
+        "unknown"
+    };
     json!({"status": config, "config_ref": if go_mod.exists() { "go.mod" } else { "." }})
 }
 
@@ -101,6 +123,12 @@ mod tests {
     }
     #[test]
     fn applicability_profile_covers_lint_and_comments() {
-        assert_eq!(applicability_profile()["categories"].as_array().unwrap().len(), 2);
+        assert_eq!(
+            applicability_profile()["categories"]
+                .as_array()
+                .unwrap()
+                .len(),
+            2
+        );
     }
 }

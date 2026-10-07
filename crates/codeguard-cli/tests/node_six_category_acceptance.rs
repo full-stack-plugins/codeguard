@@ -18,7 +18,11 @@ fn valid_node_samples_pass_syntax_check() {
         .output()
         .expect("node 不可用");
 
-    assert!(output.status.success(), "有效 JS 代码应通过 node --check: {:?}", output);
+    assert!(
+        output.status.success(),
+        "有效 JS 代码应通过 node --check: {:?}",
+        output
+    );
     std::fs::remove_dir_all(&tmp).unwrap();
 }
 
@@ -49,6 +53,10 @@ fn formatting_cannot_impersonate_comment_checking() {
         .output()
         .expect("node 不可用");
 
-    assert!(output.status.success(), "node --check 应通过（语法正确），但文档合规需另查: {:?}", output);
+    assert!(
+        output.status.success(),
+        "node --check 应通过（语法正确），但文档合规需另查: {:?}",
+        output
+    );
     std::fs::remove_dir_all(&tmp).unwrap();
 }

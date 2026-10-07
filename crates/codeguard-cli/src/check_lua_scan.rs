@@ -12,7 +12,7 @@ pub(crate) fn observe(root: &Path, deadline: Instant) -> Value {
     let _ = deadline;
     let config = observe_config(root);
     let tool_result = try_native_tool(root);
-    
+
     match tool_result {
         Some(result) => result,
         None => json!({
@@ -34,29 +34,25 @@ fn try_native_tool(root: &Path) -> Option<Value> {
         .current_dir(root)
         .output()
         .ok()?;
-    
+
     if !output.status.success() {
         return None;
     }
-    
+
     let version = String::from_utf8_lossy(&output.stdout).trim().to_string();
-    
+
     // 调用 luacheck 进行扫描
     let scan_output = Command::new("luacheck")
-        .args([
-            "--formatter=json",
-            "--no-color",
-            ".",
-        ])
+        .args(["--formatter=json", "--no-color", "."])
         .current_dir(root)
         .output()
         .ok()?;
-    
+
     let stdout = String::from_utf8_lossy(&scan_output.stdout).to_string();
-    
+
     // 解析 luacheck JSON 输出
     let findings = parse_luacheck_json(&stdout);
-    
+
     Some(json!({
         "schema_version": "0.1.0",
         "report_type": "lua_lint_scan",
@@ -71,7 +67,7 @@ fn try_native_tool(root: &Path) -> Option<Value> {
 /// 解析 luacheck JSON 输出。
 fn parse_luacheck_json(output: &str) -> Vec<Value> {
     let mut findings = Vec::new();
-    
+
     if let Ok(json) = serde_json::from_str::<Value>(output) {
         if let Some(warnings) = json.as_array() {
             for file_warnings in warnings {
@@ -91,7 +87,7 @@ fn parse_luacheck_json(output: &str) -> Vec<Value> {
             }
         }
     }
-    
+
     findings
 }
 
@@ -115,7 +111,11 @@ pub(crate) fn applicability_profile() -> Value {
 
 fn observe_config(root: &Path) -> Value {
     let luacheckrc = root.join(".luacheckrc");
-    let config = if luacheckrc.exists() { "configured" } else { "unknown" };
+    let config = if luacheckrc.exists() {
+        "configured"
+    } else {
+        "unknown"
+    };
     json!({
         "status": config,
         "config_ref": if luacheckrc.exists() { ".luacheckrc" } else { "." },
