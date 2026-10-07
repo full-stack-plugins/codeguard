@@ -1349,7 +1349,7 @@
       "language": "go",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [
           "go.mod"
@@ -1372,7 +1372,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.1",
             "8.2",
@@ -1399,7 +1399,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.1",
             "8.2",
@@ -1422,7 +1422,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.1",
             "8.2",
@@ -1449,7 +1449,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.1",
             "8.2",
@@ -1477,7 +1477,7 @@
       "language": "csharp",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "XML documentation与参数/返回/异常及生成代码",
@@ -1498,7 +1498,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.4",
             "8.5",
@@ -1521,7 +1521,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.4",
             "8.5",
@@ -1544,7 +1544,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.4",
             "8.5",
@@ -1567,7 +1567,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.4",
             "8.5",
@@ -1595,7 +1595,7 @@
       "language": "kotlin",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "KDoc与参数/返回/异常及Java互操作",
@@ -1616,7 +1616,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.7",
             "8.8",
@@ -1657,7 +1657,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.7",
             "8.8",
@@ -1690,7 +1690,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.7",
             "8.8",
@@ -1723,7 +1723,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.7",
             "8.8",
@@ -1761,7 +1761,7 @@
       "language": "swift",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [
           "Package.swift"
@@ -1783,7 +1783,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.10",
             "8.11",
@@ -1824,7 +1824,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.10",
             "8.11",
@@ -1857,7 +1857,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.10",
             "8.11",
@@ -1890,7 +1890,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.10",
             "8.11",
@@ -2048,7 +2048,7 @@
       "language": "ruby",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [
           "Gemfile"
@@ -2070,7 +2070,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.16",
             "8.17",
@@ -2111,7 +2111,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.16",
             "8.17",
@@ -2144,7 +2144,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.16",
             "8.17",
@@ -2177,7 +2177,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.16",
             "8.17",
@@ -2376,7 +2376,7 @@
       "language": "shell",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "shell函数/脚本用途、参数、退出码和环境副作用",
@@ -2396,7 +2396,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "7.4",
             "15.2",
@@ -2435,7 +2435,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "7.4",
             "15.3",
@@ -2466,7 +2466,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "7.4",
             "15.4",
@@ -2505,7 +2505,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "7.4",
             "15.5",
@@ -2541,7 +2541,7 @@
       "language": "dockerfile",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "构建阶段/镜像依赖/运行入口和安全假设说明",
@@ -2559,7 +2559,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "7.4",
             "15.2",
@@ -2580,7 +2580,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "7.4",
             "15.3",
@@ -2601,7 +2601,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "7.4",
             "15.4",
@@ -2622,7 +2622,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "7.4",
             "15.5",
@@ -2648,7 +2648,7 @@
       "language": "yaml",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "所属配置schema、字段用途、默认值和安全约束说明",
@@ -2666,7 +2666,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.70",
             "8.71",
@@ -2689,7 +2689,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.70",
             "8.71",
@@ -2712,7 +2712,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.70",
             "8.71",
@@ -2735,7 +2735,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.70",
             "8.71",
@@ -2763,7 +2763,7 @@
       "language": "elixir",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [
           "mix.exs"
@@ -2784,7 +2784,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.22",
             "8.23",
@@ -2807,7 +2807,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.22",
             "8.23",
@@ -2830,7 +2830,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.22",
             "8.23",
@@ -2853,7 +2853,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.22",
             "8.23",
@@ -2998,7 +2998,7 @@
       "language": "c",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "Doxygen/API用途/参数/返回/错误与内存所有权",
@@ -3022,7 +3022,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.25",
             "8.26",
@@ -3092,7 +3092,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.25",
             "8.26",
@@ -3299,7 +3299,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.25",
             "8.26",
@@ -3352,7 +3352,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.25",
             "8.26",
@@ -3410,7 +3410,7 @@
       "language": "cpp",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "Doxygen/API用途/模板/异常/生命周期与线程安全",
@@ -3434,7 +3434,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.28",
             "8.29",
@@ -3504,7 +3504,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.28",
             "8.29",
@@ -3720,7 +3720,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.28",
             "8.29",
@@ -3773,7 +3773,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.28",
             "8.29",
@@ -4150,7 +4150,7 @@
       "language": "vue",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "Vue组件props/events/slots及脚本公共API",
@@ -4172,7 +4172,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.37",
             "8.38",
@@ -4195,7 +4195,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.37",
             "8.38",
@@ -4218,7 +4218,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.37",
             "8.38",
@@ -4241,7 +4241,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.37",
             "8.38",
@@ -4269,7 +4269,7 @@
       "language": "svelte",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "Svelte组件props/events及生成代码边界",
@@ -4289,7 +4289,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.40",
             "8.41",
@@ -4312,7 +4312,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.40",
             "8.41",
@@ -4335,7 +4335,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.40",
             "8.41",
@@ -4358,7 +4358,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.40",
             "8.41",
@@ -4386,7 +4386,7 @@
       "language": "astro",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "Astro组件props/slots与客户端服务端行为",
@@ -4406,7 +4406,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.43",
             "8.44",
@@ -4429,7 +4429,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.43",
             "8.44",
@@ -4452,7 +4452,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.43",
             "8.44",
@@ -4475,7 +4475,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.43",
             "8.44",
@@ -4937,7 +4937,7 @@
       "language": "html",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "组件/模板用途、属性、可访问性与嵌入脚本边界",
@@ -4957,7 +4957,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.49",
             "8.50",
@@ -4980,7 +4980,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.49",
             "8.50",
@@ -5003,7 +5003,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.49",
             "8.50",
@@ -5026,7 +5026,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.49",
             "8.50",
@@ -5054,7 +5054,7 @@
       "language": "sql",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "schema/过程/查询用途、参数、事务与错误条件",
@@ -5073,7 +5073,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.64",
             "8.65",
@@ -5096,7 +5096,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.64",
             "8.65",
@@ -5119,7 +5119,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.64",
             "8.65",
@@ -5142,7 +5142,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.64",
             "8.65",
@@ -5170,7 +5170,7 @@
       "language": "graphql",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "schema description与字段/参数/返回/弃用约束",
@@ -5192,7 +5192,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.52",
             "8.53",
@@ -5215,7 +5215,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.52",
             "8.53",
@@ -5238,7 +5238,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.52",
             "8.53",
@@ -5261,7 +5261,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.52",
             "8.53",
@@ -5289,7 +5289,7 @@
       "language": "protobuf",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "message/field/service/rpc契约及兼容性",
@@ -5308,7 +5308,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.67",
             "8.68",
@@ -5341,7 +5341,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.67",
             "8.68",
@@ -5374,7 +5374,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.67",
             "8.68",
@@ -5407,7 +5407,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.67",
             "8.68",
@@ -5445,7 +5445,7 @@
       "language": "markdown",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "文档结构、示例有效性和事实时效，不冒充API源码检查",
@@ -5466,7 +5466,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.73",
             "8.74",
@@ -5489,7 +5489,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.73",
             "8.74",
@@ -5512,7 +5512,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.73",
             "8.74",
@@ -5535,7 +5535,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.73",
             "8.74",
@@ -5563,7 +5563,7 @@
       "language": "toml",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "所属manifest/config字段、默认值及依赖范围说明",
@@ -5582,7 +5582,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.76",
             "8.77",
@@ -5605,7 +5605,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.76",
             "8.77",
@@ -5628,7 +5628,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.76",
             "8.77",
@@ -5651,7 +5651,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.76",
             "8.77",
@@ -5679,7 +5679,7 @@
       "language": "haskell",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [
           "stack.yaml",
@@ -5701,7 +5701,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.79",
             "8.80",
@@ -5734,7 +5734,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.79",
             "8.80",
@@ -5767,7 +5767,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.79",
             "8.80",
@@ -5800,7 +5800,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.79",
             "8.80",
@@ -5838,7 +5838,7 @@
       "language": "ocaml",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "odoc与参数/返回/异常和模块签名",
@@ -5858,7 +5858,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.82",
             "8.83",
@@ -5891,7 +5891,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.82",
             "8.83",
@@ -5924,7 +5924,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.82",
             "8.83",
@@ -5957,7 +5957,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.82",
             "8.83",
@@ -5995,7 +5995,7 @@
       "language": "fsharp",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "XML/API文档与参数/返回/异常契约",
@@ -6014,7 +6014,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.85",
             "8.86",
@@ -6037,7 +6037,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.85",
             "8.86",
@@ -6060,7 +6060,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.85",
             "8.86",
@@ -6083,7 +6083,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.85",
             "8.86",
@@ -6111,7 +6111,7 @@
       "language": "perl",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "POD公共接口、参数/返回/错误及上下文",
@@ -6130,7 +6130,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.88",
             "8.89",
@@ -6163,7 +6163,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.88",
             "8.89",
@@ -6196,7 +6196,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.88",
             "8.89",
@@ -6229,7 +6229,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.88",
             "8.89",
@@ -6267,7 +6267,7 @@
       "language": "groovy",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "Groovydoc/DSL用途和Java互操作契约",
@@ -6286,7 +6286,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.91",
             "8.92",
@@ -6319,7 +6319,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.91",
             "8.92",
@@ -6352,7 +6352,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.91",
             "8.92",
@@ -6385,7 +6385,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.91",
             "8.92",
@@ -6423,7 +6423,7 @@
       "language": "clojure",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [
           "deps.edn",
@@ -6446,7 +6446,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.94",
             "8.95",
@@ -6479,7 +6479,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.94",
             "8.95",
@@ -6512,7 +6512,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.94",
             "8.95",
@@ -6545,7 +6545,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.94",
             "8.95",
@@ -6583,7 +6583,7 @@
       "language": "powershell",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "comment-based help参数/输出/错误和权限",
@@ -6603,7 +6603,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.97",
             "8.98",
@@ -6626,7 +6626,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.97",
             "8.98",
@@ -6649,7 +6649,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.97",
             "8.98",
@@ -6672,7 +6672,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.97",
             "8.98",
@@ -6700,7 +6700,7 @@
       "language": "zig",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [
           "build.zig"
@@ -6724,7 +6724,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.100",
             "8.101",
@@ -6751,7 +6751,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.100",
             "8.101",
@@ -6774,7 +6774,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.100",
             "8.101",
@@ -6797,7 +6797,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.100",
             "8.101",
@@ -6825,7 +6825,7 @@
       "language": "nim",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [
           ".nimble"
@@ -6846,7 +6846,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.103",
             "8.104",
@@ -6869,7 +6869,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.103",
             "8.104",
@@ -6892,7 +6892,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.103",
             "8.104",
@@ -6915,7 +6915,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.103",
             "8.104",
@@ -6943,7 +6943,7 @@
       "language": "crystal",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [
           "shard.yml"
@@ -6962,7 +6962,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.106",
             "8.107",
@@ -6985,7 +6985,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.106",
             "8.107",
@@ -7008,7 +7008,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.106",
             "8.107",
@@ -7031,7 +7031,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.106",
             "8.107",
@@ -7059,7 +7059,7 @@
       "language": "julia",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [
           "Project.toml"
@@ -7076,7 +7076,7 @@
       "legacy_lint_candidate": null,
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.109",
             "8.110",
@@ -7099,7 +7099,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.109",
             "8.110",
@@ -7122,7 +7122,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.109",
             "8.110",
@@ -7145,7 +7145,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.109",
             "8.110",
@@ -7173,7 +7173,7 @@
       "language": "elm",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [
           "elm.json"
@@ -7192,7 +7192,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.112",
             "8.113",
@@ -7215,7 +7215,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.112",
             "8.113",
@@ -7238,7 +7238,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.112",
             "8.113",
@@ -7261,7 +7261,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.112",
             "8.113",
@@ -7919,7 +7919,7 @@
       "language": "cfml",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "CFML函数/组件文档与参数/返回/异常及嵌入SQL",
@@ -7941,7 +7941,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.127",
             "8.128",
@@ -7964,7 +7964,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.127",
             "8.128",
@@ -7987,7 +7987,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.127",
             "8.128",
@@ -8010,7 +8010,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.127",
             "8.128",
@@ -8185,7 +8185,7 @@
       "language": "vbnet",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "XML API文档与参数/返回/异常及生成代码",
@@ -8206,7 +8206,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.130",
             "8.131",
@@ -8229,7 +8229,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.130",
             "8.131",
@@ -8252,7 +8252,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.130",
             "8.131",
@@ -8275,7 +8275,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.130",
             "8.131",
@@ -8303,7 +8303,7 @@
       "language": "erlang",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [
           "rebar.config"
@@ -8326,7 +8326,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.133",
             "8.134",
@@ -8367,7 +8367,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.133",
             "8.134",
@@ -8400,7 +8400,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.133",
             "8.134",
@@ -8433,7 +8433,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.133",
             "8.134",
@@ -8681,7 +8681,7 @@
       "language": "liquid",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "Liquid模板/过滤器接口及宿主输入输出约束",
@@ -8700,7 +8700,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.136",
             "8.137",
@@ -8733,7 +8733,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.136",
             "8.137",
@@ -8766,7 +8766,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.136",
             "8.137",
@@ -8799,7 +8799,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.136",
             "8.137",
@@ -8837,7 +8837,7 @@
       "language": "cuda",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [],
         "dialect_requirement": "CUDA API文档、内存、kernel参数与同步/错误条件",
@@ -8857,7 +8857,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.139",
             "8.140",
@@ -8890,7 +8890,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.139",
             "8.140",
@@ -8923,7 +8923,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.139",
             "8.140",
@@ -8956,7 +8956,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.139",
             "8.140",
@@ -8994,7 +8994,7 @@
       "language": "ansible",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [
           "ansible.cfg",
@@ -9014,7 +9014,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.142",
             "8.143",
@@ -9037,7 +9037,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.142",
             "8.143",
@@ -9060,7 +9060,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.142",
             "8.143",
@@ -9083,7 +9083,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "8.142",
             "8.143",
