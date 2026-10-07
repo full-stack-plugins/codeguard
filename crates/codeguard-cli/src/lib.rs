@@ -435,6 +435,7 @@ mod check_native_results;
 mod check_report_assembly;
 #[cfg(unix)]
 mod check_ruby_scan;
+mod check_php_scan;
 #[cfg(unix)]
 mod go_lint_fallback;
 mod go_project_version;
