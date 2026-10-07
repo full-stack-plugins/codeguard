@@ -459,6 +459,8 @@ mod typed_module_graph;
 mod architecture_profile;
 mod architecture_md;
 mod agents_block_merge;
+mod init_transaction;
+mod manifest_refresh;
 mod pascal_dependency_scan;
 mod check_objc_scan;
 mod objc_dependency_scan;
