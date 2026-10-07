@@ -256,3 +256,4 @@ pub mod offline_boundary;
 pub mod git_index_input;
 pub mod evidence_retention;
 pub mod content_identity;
+pub mod strict_cache;
