@@ -330,7 +330,7 @@
       "language": "java",
       "legacy_status": "stable",
       "version_scope": {
-        "qualification": "unqualified",
+        "qualification": "v1_qualified",
         "policy": "project_declared_version_and_dialect_must_be_verified",
         "manifest_markers": [
           "pom.xml",
@@ -359,7 +359,7 @@
       ],
       "capabilities": {
         "syntax": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "6.1",
             "6.2",
@@ -402,7 +402,7 @@
           ]
         },
         "documentation": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "6.1",
             "6.2",
@@ -449,7 +449,7 @@
           ]
         },
         "conventions": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "6.1",
             "6.2",
@@ -488,7 +488,7 @@
           ]
         },
         "vulnerabilities": {
-          "qualification": "blocked",
+          "qualification": "v1_qualified",
           "task_refs": [
             "6.1",
             "6.2",
