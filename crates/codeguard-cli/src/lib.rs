@@ -667,3 +667,4 @@ pub mod finding_identity;
 pub mod run_id_cursor;
 pub mod append_only_events;
 pub mod task_dependency_merge;
+pub mod repair_brief;
