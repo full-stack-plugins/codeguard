@@ -1320,3 +1320,13 @@ The standalone comments command SHALL automatically save and consume its indepen
 - **THEN** it SHALL report the placeholder observation without creating .codeguard
 - **WHEN** the workspace is initialized and the observation is supported
 - **THEN** comments SHALL automatically consume the placeholder packet, return one stable file task and preserve it as open after a clean re-scan
+
+### Requirement: Placeholder task diagnostics SHALL bind origins and retract stale positions
+
+next SHALL provide a separately versioned placeholder diagnostic brief after validating immutable task identity, the first consumed report digest, workspace/path/language/policy identity and exact consumption markers. The most recent consumed same-file observation SHALL retain the original tool and standard context. Changed source/tool context or missing/contradictory receipts SHALL withdraw usable positions. The brief SHALL retain original commands, policy basis, constraints and concrete integration gaps. Until dedicated attempts and original-task verification are implemented, allowed_paths SHALL remain empty and attempt_history_status SHALL be not_integrated; no artificial history counters or repair permission SHALL be issued. This integration gap is not an approved exception or task closure.
+
+#### Scenario: Input or consumed receipt changes
+- **WHEN** the file no longer matches the latest consumed observation or an original receipt is tampered with
+- **THEN** next SHALL retract historical positions or reject the brief, rather than authorize repairs at stale locations
+- **WHEN** the source and origin remain current
+- **THEN** diagnostic positions MAY be displayed, but task verify SHALL still reject unsupported placeholder verification before leasing, execution or event persistence

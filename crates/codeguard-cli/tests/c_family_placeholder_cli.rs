@@ -98,6 +98,55 @@ fn check_language(language: &str, standard: &str, extension: &str) {
         .as_array()
         .unwrap();
     assert_eq!(ids.len(), 1);
+    let next = || {
+        let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .arg("next")
+            .arg(&root)
+            .arg("--format=json")
+            .output()
+            .unwrap();
+        assert!(matches!(output.status.code(), Some(0 | 3)));
+        serde_json::from_slice::<Value>(&output.stdout).unwrap()
+    };
+    let guidance = next();
+    assert_eq!(guidance["schema_version"], "0.34.0");
+    assert_eq!(guidance["repair_brief"]["task_id"], ids[0]);
+    assert_eq!(
+        guidance["repair_brief"]["placeholder_positions"]
+            .as_array()
+            .unwrap()
+            .len(),
+        3
+    );
+    assert_eq!(
+        guidance["repair_brief"]["allowed_paths"],
+        serde_json::json!([])
+    );
+    assert_eq!(
+        guidance["repair_brief"]["attempt_history_status"],
+        "not_integrated"
+    );
+    fs::write(&source, "int changed(int x);\n").unwrap();
+    let stale_guidance = next();
+    assert_eq!(
+        stale_guidance["repair_brief"]["observation_status"],
+        "input_changed"
+    );
+    assert_eq!(
+        stale_guidance["repair_brief"]["placeholder_positions"],
+        serde_json::json!([])
+    );
+    fs::write(
+        &source,
+        "/// TODO.\n/// @param x TBD\n/// @return FIXME!\nint f(int x);\n",
+    )
+    .unwrap();
+    let first_run = bound["placeholder_workbench"]["run_id"].as_str().unwrap();
+    let marker = root.join(format!(".codeguard/state/consumed/{first_run}.json"));
+    let marker_bytes = fs::read(&marker).unwrap();
+    fs::write(&marker, b"{}").unwrap();
+    assert!(next()["repair_brief"].is_null());
+    fs::write(&marker, marker_bytes).unwrap();
     let repeated = scan(&tool);
     assert_eq!(
         repeated["placeholder_workbench"]["task_ids"],
@@ -129,6 +178,14 @@ fn check_language(language: &str, standard: &str, extension: &str) {
         blocked["placeholder_workbench"]["task_ids"],
         serde_json::json!([])
     );
+    if let Ok(destination) = std::env::var("CODEGUARD_PLACEHOLDER_NEXT_EVIDENCE") {
+        assert!(std::path::Path::new(&destination).is_absolute());
+        fs::write(
+            destination,
+            serde_json::to_vec_pretty(&serde_json::json!([guidance, stale_guidance])).unwrap(),
+        )
+        .unwrap();
+    }
     if let Ok(destination) = std::env::var("CODEGUARD_PLACEHOLDER_CLI_EVIDENCE") {
         assert!(std::path::Path::new(&destination).is_absolute());
         fs::write(
