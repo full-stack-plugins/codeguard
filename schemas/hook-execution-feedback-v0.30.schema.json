@@ -1226,6 +1226,82 @@
               }
             }
           }
+        },
+        {
+          "if": {
+            "properties": {
+              "checker_id": {
+                "const": "c.clang.documentation"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "documentation_standard": {
+                "const": "c11"
+              },
+              "documentation_rule_source": {
+                "const": "native_clang_warning"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "checker_id": {
+                "const": "c.clang.documentation_structure"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "documentation_standard": {
+                "const": "c11"
+              },
+              "documentation_rule_source": {
+                "const": "codeguard_structural_policy"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "checker_id": {
+                "const": "cpp.clang.documentation"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "documentation_standard": {
+                "const": "c++17"
+              },
+              "documentation_rule_source": {
+                "const": "native_clang_warning"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "checker_id": {
+                "const": "cpp.clang.documentation_structure"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "documentation_standard": {
+                "const": "c++17"
+              },
+              "documentation_rule_source": {
+                "const": "codeguard_structural_policy"
+              }
+            }
+          }
         }
       ]
     },

@@ -74,6 +74,7 @@ fn every_registered_checker_configuration_is_inert_after_failed_write() {
         "--rustsec-db",
         "--pip-audit-tool",
         "--go-tool",
+        "--clang-tool",
         "--zig-tool",
         "--erl-tool",
         "--swift-tool",
@@ -125,6 +126,9 @@ fn failed_write_still_rejects_ownership_and_malformed_arguments() {
         vec![("--owner", "agent")],
         vec![("--lease-token", "token")],
         vec![("--go-tool", "relative")],
+        vec![("--clang-tool", "relative")],
+        vec![("--clang-tool", "/missing"), ("--clang-tool", "/other")],
+        vec![("--standard", "c17")],
         vec![("--npm-version", "")],
         vec![("--npm-version", oversized.as_str())],
         vec![("--go-tool", "/missing"), ("--go-tool", "/other")],
@@ -150,5 +154,19 @@ fn confirmed_edit_reports_selected_go_failure_without_ignoring_it() {
         report["local_feedback"]["go_syntax"]["files"][0]["native"]["status"],
         "incomplete"
     );
+    assert!(!p.0.join(".codeguard").exists());
+}
+
+#[test]
+fn confirmed_edit_rejects_repair_only_clang_option_before_execution() {
+    let p = Project::new();
+    let marker = p.0.join("clang-ran");
+    let tool = p.0.join("clang");
+    fs::write(&tool, format!("#!/bin/sh\ntouch '{}'\nexit 99\n", marker.display())).unwrap();
+    fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
+    let out = p.invoke(&[("--clang-tool", tool.to_str().unwrap())], "confirmed");
+    assert_eq!(out.status.code(), Some(2), "{out:?}");
+    assert!(out.stdout.is_empty(), "{out:?}");
+    assert!(!marker.exists());
     assert!(!p.0.join(".codeguard").exists());
 }

@@ -264,12 +264,12 @@
     "crates/codeguard-cli/src/c_family_documentation_hook_feedback.rs": "1383e431164354baa5fa409b6e7f1663350b749f609a2036c29e6c91def1044b",
     "crates/codeguard-cli/src/hook_execute_command.rs": "ef5e584e315bad8f3b2a1b6aa9b5d05dd4cf3fa84ba23a02b7dff5397664850e",
     "crates/codeguard-cli/tests/c_family_documentation_hook.rs": "00d91adc6dd94d585aa2719c99bee71ae04e182839acc76264e634d2bac71940",
-    "schemas/hook-execution-feedback-v0.30.schema.json": "496687f6ed4fd4fb2f48ed65a94871b9b3f3c984cc85cc7e2b29cf23175aaa2b",
-    "tests/c_family_documentation_hook_schema.py": "1706a828a290c1fc38a16f59404e60fcbc66343093eaa6402d7b4dc04bcfdebb",
-    "tests/acceptance/c-family-documentation-hook.md": "0fe7b1c2c70d1ba5c700295498fb12e68efcc475acdaf50a3040b66e7f81cbdf",
+    "schemas/hook-execution-feedback-v0.30.schema.json": "2b77786ade6bd6148ec54534a4b7761ac41f00d6d6119f1e95ea9d59f2f3b4d3",
+    "tests/c_family_documentation_hook_schema.py": "7952a67c0052b993ec8281d50c7eb4a35f897756101b09d377bb5b19d9e5a1da",
+    "tests/acceptance/c-family-documentation-hook.md": "b485ed377737804c72222ee93daf5aade73c6ec46987ef2e7bc73ac2aa32eb50",
     "tests/acceptance/evidence/c-family-documentation-hook-default.json": "418e39790d61b891cca7885c66c9e311ab33dbbdd836bc3241cae0c11b0b9244",
     "tests/acceptance/evidence/c-family-documentation-hook-wasm.json": "d4b7b4806d9786280f7d4f3f60f47cd9e7e2882d839e43b7044d96fcef454698",
-    "tests/acceptance/evidence/c-family-documentation-hook-schema.json": "dfef8141c030d5256c3bea6537261673448671676a616adf0c4e2acca8d07c08"
+    "tests/acceptance/evidence/c-family-documentation-hook-schema.json": "a7e733a30ea12e3aa1fac96e634c94b049ca313b93a4282e6d3971c046656218"
   },
   "languages": [
     {

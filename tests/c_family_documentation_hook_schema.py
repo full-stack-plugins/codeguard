@@ -28,6 +28,11 @@ for field,value in [('task_closure','closed'),('detailed_contract_qualification'
     forged=copy.deepcopy(sample);forged['local_feedback'][field]=value;negative.append(forged)
 forged=copy.deepcopy(sample);forged['local_feedback']['documentation_input_current']=False;negative.append(forged)
 forged=copy.deepcopy(sample);forged['local_feedback']['event_persisted']=False;negative.append(forged)
+for field,value in [
+    ('documentation_standard', 'c11' if sample['local_feedback']['documentation_standard']=='c++17' else 'c++17'),
+    ('documentation_rule_source', 'native_clang_warning' if sample['local_feedback']['documentation_rule_source']=='codeguard_structural_policy' else 'codeguard_structural_policy'),
+]:
+    forged=copy.deepcopy(sample);forged['local_feedback'][field]=value;negative.append(forged)
 for forged in negative:assert list(validator.iter_errors(forged))
 result={'evidence_kind':'development_c_documentation_hook_schema','qualification':'not_granted','reports_valid':count,'negative_cases_rejected':len(negative),'schemas_valid':len(schemas)}
 (root/'tests/acceptance/evidence/c-family-documentation-hook-schema.json').write_text(json.dumps(result,indent=2)+'\n')
