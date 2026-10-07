@@ -1140,3 +1140,6 @@ C/C++文档修复Hook当前增量：`repair_ready`按首次任务恢复原Clang/
 
 
 C/C++已确认编辑事件已接入有界文档观察：`hook execute PATH --clang-tool ABS --c-standard c11 --cpp-standard c++17 --format=json`，事件仍从stdin JSON输入。缺上下文保留context_required；已有工作区可同步稳定文档任务。此路径保留原生语法覆盖缺口，不证明已安装宿主验收；repair_ready标准仍由原任务恢复。
+
+
+Claude协议适配器现将C/C++编辑文档观察投影为有界对话指引：展示当前原生规则/位置，独立标记结构规则及已核验任务引用；不回显源码/注释或过期定位。局部无问题不要求修改源码，也不关闭历史任务。已有Clang的受控PostToolUse协议测试不代表真实宿主安装或配置自动发现验收。

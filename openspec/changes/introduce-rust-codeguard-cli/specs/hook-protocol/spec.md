@@ -240,3 +240,15 @@ Confirmed file edits SHALL expose bounded C/C++ documentation observations using
 #### Scenario: Explicit standalone documentation profile
 - **WHEN** a confirmed C/C++ edit supplies an existing Clang and supported explicit standard
 - **THEN** selected files receive bounded native documentation observations, with structural policy kept distinct and native syntax coverage gaps retained
+
+
+### Requirement: C-family edit documentation SHALL have bounded conversation guidance
+The Claude event adapter SHALL project current C/C++ documentation observations into bounded agent context, separating native warning rules from structural policy and retaining incomplete context. Source text, comment descriptions, editable task Markdown and unvalidated task identifiers SHALL NOT be echoed. Stale or incomplete native observations SHALL NOT supply repair positions. Projection SHALL NOT grant task closure or delivery qualification.
+
+#### Scenario: Missing C-family documentation context in conversation
+- **WHEN** a confirmed C/C++ edit lacks a required explicit documentation profile
+- **THEN** the conversation reports the context gap and does not direct unrelated source edits
+
+#### Scenario: Current native documentation observations
+- **WHEN** the adapter receives current supported native observations
+- **THEN** it provides bounded rules, positions and validated task references without source or comment text

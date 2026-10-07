@@ -56,7 +56,7 @@
     "crates/codeguard-cli/src/java_p3c_scan.rs": "36e022ba1f7c157ff52a2839287d9b8497c9bdd5583212128a81df95f5fcf69e",
     "crates/codeguard-cli/src/javascript_syntax_probe.rs": "4ba09a558662332e953e89512d386642653d5cc59dd1336f8ec31b51137731e1",
     "crates/codeguard-cli/src/kotlin_lint_command.rs": "f19e0babe23cc3cce52d69d6821416d6b9fdd7b6d8b484d3413e1368fef05ad8",
-    "crates/codeguard-cli/src/lib.rs": "d06523c8efd6e0822373df350323d698619969e1406301c458ad5b879ad60d8b",
+    "crates/codeguard-cli/src/lib.rs": "72e69dceae578d2ccd435342abd69a7a7b4dbdfda17b5d4a801a3d2bf5206ae8",
     "crates/codeguard-cli/src/maven_javadoc_task_recheck.rs": "d55951f3a1b960e8885a1027d5375909bbd4e7a33d6461ff724ad65d9d35febd",
     "crates/codeguard-cli/src/native_clang_profile.rs": "64c0f8f37d2786dea44ef17bc9e3dbfa85d5d23455974bdc098547c96b372acf",
     "crates/codeguard-cli/src/next_command.rs": "b4277ef72e042ce7131efaf4022e05c74deb3fc69646f1d8a922db95fad8ea5a",
@@ -284,7 +284,17 @@
     "schemas/hook-execution-feedback-v0.31.schema.json": "6a6aa4a31a56adf1c4e751c2a0882173593b781f28a1f278755bf9a764c55f50",
     "tests/acceptance/evidence/c-family-edit-wasm-c.json": "0a1c17c72d418168cb1136c1b77abfdb9444e6ad1092c0fadb5fb7e330c2280c",
     "tests/acceptance/evidence/c-family-edit-wasm-cpp.json": "a6889c78112e0ed4e032f319b288a3a80acedf2f094750de52ee29d83af7e95f",
-    "crates/codeguard-cli/tests/hook_failed_write_options.rs": "3eee32e4a9675bf91e2d9068646f7c2cc06275b6a631ebc1697e3bf47d0224d0"
+    "crates/codeguard-cli/tests/hook_failed_write_options.rs": "3eee32e4a9675bf91e2d9068646f7c2cc06275b6a631ebc1697e3bf47d0224d0",
+    "tests/acceptance/evidence/c-family-host-default-c.json": "6389acece42b6f4b99601ec66a4d4f5fa08d8a1b4bdf58dc828af568f9b886d0",
+    "crates/codeguard-cli/src/c_family_documentation_host_guidance.rs": "ded9f6e95cb1c18f212515649b3433020ffc576cda7ac3ef610bf4941b068a7b",
+    "tests/acceptance/evidence/c-family-host-default-cpp.json": "16c57d07b552457d0fcf5c6308e0a009e792c75df667de2294b6f2a01b91ffe0",
+    "tests/c_family_documentation_host_evidence.py": "e08f545d1342208c9100b13c56bc735355d4d1b3ec7ef262da6b9701eccf8057",
+    "crates/codeguard-cli/tests/claude_hook_cli.rs": "f1423466d11280c0f6b4103ce4e5ffe0d3a47721bd9b571d03bc98d270c7eee8",
+    "crates/codeguard-cli/src/claude_hook_command.rs": "189ddd749e88418c91a88c1545dc0f745e3cfe982c1e840b371d848e144eefe9",
+    "tests/acceptance/c-family-documentation-host-guidance.md": "e9d50265f5a9deb3f956950be0c3f68792f1952ccc319cbb94021f4a233eca28",
+    "tests/acceptance/evidence/c-family-host-validation.json": "9bf097a7054421afb0be2b7ca5971ee763c387e5074c273aadc036cf954b044e",
+    "tests/acceptance/evidence/c-family-host-wasm-c.json": "5a188d24775e5e3c31b7f3a54c17bf8a72bbf93e512511f9007d62bd2f867e8c",
+    "tests/acceptance/evidence/c-family-host-wasm-cpp.json": "f74c2694ebcc72342040e19603d3282742eac3b835252601663b0380942d7997"
   },
   "languages": [
     {
@@ -3104,7 +3114,9 @@
                 "crates/codeguard-cli/src/c_family_documentation_hook_feedback.rs",
                 "crates/codeguard-cli/src/hook_execute_command.rs",
                 "crates/codeguard-cli/src/hook_fast_scan.rs",
-                "crates/codeguard-cli/src/hook_native_tools.rs"
+                "crates/codeguard-cli/src/hook_native_tools.rs",
+                "crates/codeguard-cli/src/c_family_documentation_host_guidance.rs",
+                "crates/codeguard-cli/src/claude_hook_command.rs"
               ],
               "evidence_refs": [
                 "crates/codeguard-adapters/tests/clang_documentation_contract.rs",
@@ -3200,7 +3212,15 @@
                 "tests/acceptance/evidence/c-family-edit-default-cpp.json",
                 "tests/acceptance/evidence/c-family-edit-wasm-c.json",
                 "tests/acceptance/evidence/c-family-edit-wasm-cpp.json",
-                "crates/codeguard-cli/tests/hook_failed_write_options.rs"
+                "crates/codeguard-cli/tests/hook_failed_write_options.rs",
+                "crates/codeguard-cli/tests/claude_hook_cli.rs",
+                "tests/acceptance/c-family-documentation-host-guidance.md",
+                "tests/c_family_documentation_host_evidence.py",
+                "tests/acceptance/evidence/c-family-host-validation.json",
+                "tests/acceptance/evidence/c-family-host-default-c.json",
+                "tests/acceptance/evidence/c-family-host-default-cpp.json",
+                "tests/acceptance/evidence/c-family-host-wasm-c.json",
+                "tests/acceptance/evidence/c-family-host-wasm-cpp.json"
               ],
               "blockers": [
                 "C/C++结构文件策略任务、原工具task verify、受控repair-source尝试及同一输入两次失败预算已接线；跨输入语义无进展、可信关闭/复发、check/Hook与详细语义/完整项目/独立精度仍未验收。",
@@ -3495,7 +3515,9 @@
                 "crates/codeguard-cli/src/c_family_documentation_hook_feedback.rs",
                 "crates/codeguard-cli/src/hook_execute_command.rs",
                 "crates/codeguard-cli/src/hook_fast_scan.rs",
-                "crates/codeguard-cli/src/hook_native_tools.rs"
+                "crates/codeguard-cli/src/hook_native_tools.rs",
+                "crates/codeguard-cli/src/c_family_documentation_host_guidance.rs",
+                "crates/codeguard-cli/src/claude_hook_command.rs"
               ],
               "evidence_refs": [
                 "crates/codeguard-adapters/tests/clang_documentation_contract.rs",
@@ -3591,7 +3613,15 @@
                 "tests/acceptance/evidence/c-family-edit-default-cpp.json",
                 "tests/acceptance/evidence/c-family-edit-wasm-c.json",
                 "tests/acceptance/evidence/c-family-edit-wasm-cpp.json",
-                "crates/codeguard-cli/tests/hook_failed_write_options.rs"
+                "crates/codeguard-cli/tests/hook_failed_write_options.rs",
+                "crates/codeguard-cli/tests/claude_hook_cli.rs",
+                "tests/acceptance/c-family-documentation-host-guidance.md",
+                "tests/c_family_documentation_host_evidence.py",
+                "tests/acceptance/evidence/c-family-host-validation.json",
+                "tests/acceptance/evidence/c-family-host-default-c.json",
+                "tests/acceptance/evidence/c-family-host-default-cpp.json",
+                "tests/acceptance/evidence/c-family-host-wasm-c.json",
+                "tests/acceptance/evidence/c-family-host-wasm-cpp.json"
               ],
               "blockers": [
                 "C/C++结构文件策略任务、原工具task verify、受控repair-source尝试及同一输入两次失败预算已接线；跨输入语义无进展、可信关闭/复发、check/Hook与详细语义/完整项目/独立精度仍未验收。",

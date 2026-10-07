@@ -302,7 +302,9 @@ fn summarize(path: &str, report: &Value) -> String {
     }
     let feedback = &report["local_feedback"];
     let mut rules = Vec::new();
-    let mut count = 0;
+    let (documentation_count, documentation_guidance) =
+        crate::c_family_documentation_host_guidance::project(feedback);
+    let mut count = documentation_count;
     let python = feedback["python_lint"]["files"]
         .as_array()
         .into_iter()
@@ -458,7 +460,7 @@ fn summarize(path: &str, report: &Value) -> String {
     let unwired = feedback["native_unwired_files"]
         .as_array()
         .map_or(0, Vec::len);
-    let mut repair = String::new();
+    let mut repair = documentation_guidance;
     if feedback["zig_lint"].is_object() {
         for file in feedback["zig_lint"]["files"]
             .as_array()
