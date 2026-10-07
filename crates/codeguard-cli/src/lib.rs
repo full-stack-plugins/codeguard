@@ -438,6 +438,9 @@ mod check_ruby_scan;
 mod check_php_scan;
 mod check_scala_scan;
 mod check_elixir_scan;
+mod php_dependency_scan;
+mod scala_dependency_scan;
+mod elixir_dependency_scan;
 #[cfg(unix)]
 mod go_lint_fallback;
 mod go_project_version;
