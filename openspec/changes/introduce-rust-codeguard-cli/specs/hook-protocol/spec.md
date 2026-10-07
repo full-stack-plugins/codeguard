@@ -216,3 +216,15 @@ Clippy repair-ready SHALL reuse task-bound Cargo verification and preserve bound
 #### Scenario: Original Clippy finding remains after repair-ready
 - **WHEN** a current same-task Cargo recheck reports the original rule and source identity
 - **THEN** repair feedback carries only validated rule and line; input changes withdraw positions, and local absence does not close the task
+
+### Requirement: Repair-ready hooks SHALL recheck C-family documentation through the original task contract
+
+`repair_ready` for C/C++ native-warning and structural-documentation tasks SHALL delegate to the task-bound original Clang/standard verification contract within the shared hook deadline and output/history budgets. Explicit Clang selection SHALL be absolute and must match the original task; foreign tool/standard/parameter overrides SHALL fail before leasing or process execution. Hooks SHALL not execute task Markdown or infer replacement compiler arguments. The summary SHALL retain source-currentness, original native versus CodeGuard structural rule authority, local presence/absence/incomplete status and a verified persisted report reference. Input/tool changes, invalid bindings or missing receipts SHALL withdraw locations and next-step authority. Zero diagnostics or disappearance SHALL keep tasks open and SHALL NOT qualify detailed documentation or delivery. This path SHALL NOT silently enable unsupported fast-edit Clang options or claim installed-host acceptance.
+
+#### Scenario: A structural task is ready after an edit
+- **WHEN** a bound C/C++ structural documentation task triggers repair_ready
+- **THEN** use its original compiler and standard, validate the returned task/source/report identity, project a bounded local summary and preserve the open fact
+
+#### Scenario: Native warnings disappear after documentation is repaired
+- **WHEN** the original documentation warning is not observed in a fresh task-bound native scan
+- **THEN** preserve candidate_absent_unverified_policy and a consumed report reference; do not close the task or grant production qualification

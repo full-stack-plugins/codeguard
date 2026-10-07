@@ -1147,3 +1147,5 @@ codeguard check c . --clang-tool /usr/bin/clang --c-standard c11 --format=json
 仅用于已验证的 Apple Clang 21 独立源码档案。`c.comments`、`cpp.comments` 在同一任务图中共享截止时间、取消和 jobs，上述两个任务共用编译器资源锁；每语言最多观察64文件，累计反馈包含任务投影且限制16MiB。报告0.72的 `native_results.c_family_comments` 区分上下文缺失、未执行、局部观察和未观察尾部；不能据此推断头文件、预处理或完整构建配置。
 
 全项目输入复核后才接入原警告和结构稳定任务；源码、工具、范围变化或取消撤回当前定位及下一步权限。未初始化项目不创建`.codeguard/`，缺工具不会生成源码违规。JSON/human/SARIF保留局部结果，SARIF分别标记原生发现与CodeGuard自有结构策略。退出3；取消130。详细准确性、完整项目覆盖、可信关闭、Hook、跨平台/独立精度及四核心生产验收仍未完成。实际测试及报告见[统一入口验收](tests/acceptance/check-c-family-documentation.md)。
+
+C/C++文档修复Hook当前增量：`repair_ready`按首次任务恢复原Clang/标准，外层反馈0.30与摘要0.9区分原警告和CodeGuard结构策略，最多8处定位并保留总数。当前输入变化、期限耗尽或消费收据失效撤回定位/报告引用；消失仍保持任务open，不授予详细准确性或可信关闭。已完成默认/WASM真实Clang及过期/篡改回归；自动编辑、已安装宿主和完整生产资格仍缺。见[局部验收](tests/acceptance/c-family-documentation-hook.md)。
