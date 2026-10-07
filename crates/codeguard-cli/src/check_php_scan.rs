@@ -12,10 +12,10 @@ use std::time::Instant;
 pub(crate) fn observe(root: &Path, deadline: Instant) -> Value {
     let _ = deadline;
     let config = observe_config(root);
-    
+
     // 尝试调用真实 PHP_CodeSniffer
     let tool_result = try_native_tool(root);
-    
+
     match tool_result {
         Some(result) => result,
         None => json!({
@@ -37,13 +37,13 @@ fn try_native_tool(root: &Path) -> Option<Value> {
         .current_dir(root)
         .output()
         .ok()?;
-    
+
     if !output.status.success() {
         return None;
     }
-    
+
     let version = String::from_utf8_lossy(&output.stdout).trim().to_string();
-    
+
     // 调用 phpcs 进行扫描
     let scan_output = Command::new("phpcs")
         .args([
@@ -55,7 +55,7 @@ fn try_native_tool(root: &Path) -> Option<Value> {
         .current_dir(root)
         .output()
         .ok()?;
-    
+
     if !scan_output.status.success() {
         // phpcs 返回非零表示有违规
         let stdout = String::from_utf8_lossy(&scan_output.stdout);
@@ -63,7 +63,7 @@ fn try_native_tool(root: &Path) -> Option<Value> {
             return Some(parse_phpcs_report(&json, &version));
         }
     }
-    
+
     // 无违规
     Some(json!({
         "schema_version": "0.1.0",
@@ -79,7 +79,7 @@ fn try_native_tool(root: &Path) -> Option<Value> {
 /// 解析 PHP_CodeSniffer JSON 报告。
 fn parse_phpcs_report(report: &Value, version: &str) -> Value {
     let mut findings = Vec::new();
-    
+
     if let Some(files) = report["files"].as_object() {
         for (path, file_data) in files {
             if let Some(messages) = file_data["messages"].as_array() {
@@ -97,7 +97,7 @@ fn parse_phpcs_report(report: &Value, version: &str) -> Value {
             }
         }
     }
-    
+
     json!({
         "schema_version": "0.1.0",
         "report_type": "php_lint_scan",

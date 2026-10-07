@@ -25,10 +25,20 @@ pub(crate) fn observe(root: &Path, deadline: Instant) -> Value {
 }
 
 fn try_native_tool(root: &Path) -> Option<Value> {
-    let output = Command::new("lintr").args(["--version"]).current_dir(root).output().ok()?;
-    if !output.status.success() { return None; }
+    let output = Command::new("lintr")
+        .args(["--version"])
+        .current_dir(root)
+        .output()
+        .ok()?;
+    if !output.status.success() {
+        return None;
+    }
     let version = String::from_utf8_lossy(&output.stdout).trim().to_string();
-    let scan_output = Command::new("lintr").args(["."]).current_dir(root).output().ok()?;
+    let scan_output = Command::new("lintr")
+        .args(["."])
+        .current_dir(root)
+        .output()
+        .ok()?;
     let stdout = String::from_utf8_lossy(&scan_output.stdout).to_string();
     let findings = parse_output(&stdout);
     Some(json!({
@@ -85,7 +95,13 @@ pub(crate) fn applicability_profile() -> Value {
 fn observe_config(root: &Path) -> Value {
     let config_file = root.join(".lintr");
     let fallback = root.join("DESCRIPTION");
-    let config = if config_file.exists() { "configured" } else if fallback.exists() { "missing" } else { "unknown" };
+    let config = if config_file.exists() {
+        "configured"
+    } else if fallback.exists() {
+        "missing"
+    } else {
+        "unknown"
+    };
     json!({
         "status": config,
         "config_ref": if config_file.exists() { ".lintr" } else if fallback.exists() { "DESCRIPTION" } else { "." },

@@ -10,14 +10,18 @@ fn valid_go_samples_pass_vet() {
     std::fs::create_dir_all(tmp.clone()).unwrap();
     std::fs::write(tmp.join("go.mod"), "module example\ngo 1.21\n").unwrap();
     std::fs::write(tmp.join("main.go"), "package main\n\nfunc main() {}\n").unwrap();
-    
+
     let output = Command::new("go")
         .args(["vet", "./..."])
         .current_dir(&tmp)
         .output()
         .expect("go 不可用");
-    
-    assert!(output.status.success(), "正确 Go 样本应通过 vet: {:?}", output);
+
+    assert!(
+        output.status.success(),
+        "正确 Go 样本应通过 vet: {:?}",
+        output
+    );
     std::fs::remove_dir_all(&tmp).unwrap();
 }
 
@@ -30,13 +34,13 @@ fn invalid_go_samples_are_detected() {
     std::fs::write(tmp.join("go.mod"), "module example\ngo 1.21\n").unwrap();
     // 语法错误
     std::fs::write(tmp.join("main.go"), "package main\n\nfunc main( { }\n").unwrap();
-    
+
     let output = Command::new("go")
         .args(["vet", "./..."])
         .current_dir(&tmp)
         .output()
         .expect("go 不可用");
-    
+
     assert!(!output.status.success(), "违规 Go 样本应被 vet 检出");
     std::fs::remove_dir_all(&tmp).unwrap();
 }

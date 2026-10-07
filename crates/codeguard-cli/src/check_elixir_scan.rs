@@ -12,7 +12,7 @@ pub(crate) fn observe(root: &Path, deadline: Instant) -> Value {
     let _ = deadline;
     let config = observe_config(root);
     let tool_result = try_native_tool(root);
-    
+
     match tool_result {
         Some(result) => result,
         None => json!({
@@ -34,29 +34,25 @@ fn try_native_tool(root: &Path) -> Option<Value> {
         .current_dir(root)
         .output()
         .ok()?;
-    
+
     if !output.status.success() {
         return None;
     }
-    
+
     let version = String::from_utf8_lossy(&output.stdout).trim().to_string();
-    
+
     // 调用 mix credo 进行扫描
     let scan_output = Command::new("mix")
-        .args([
-            "credo",
-            "--strict",
-            "--format=json",
-        ])
+        .args(["credo", "--strict", "--format=json"])
         .current_dir(root)
         .output()
         .ok()?;
-    
+
     let stdout = String::from_utf8_lossy(&scan_output.stdout).to_string();
-    
+
     // 解析 Credo JSON 输出
     let findings = parse_credo_json(&stdout);
-    
+
     Some(json!({
         "schema_version": "0.1.0",
         "report_type": "elixir_lint_scan",
@@ -71,7 +67,7 @@ fn try_native_tool(root: &Path) -> Option<Value> {
 /// 解析 Credo JSON 输出。
 fn parse_credo_json(output: &str) -> Vec<Value> {
     let mut findings = Vec::new();
-    
+
     if let Ok(json) = serde_json::from_str::<Value>(output) {
         if let Some(issues) = json["issues"].as_array() {
             for issue in issues {
@@ -87,7 +83,7 @@ fn parse_credo_json(output: &str) -> Vec<Value> {
             }
         }
     }
-    
+
     findings
 }
 

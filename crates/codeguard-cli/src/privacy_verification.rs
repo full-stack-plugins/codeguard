@@ -87,7 +87,10 @@ mod tests {
 
     #[test]
     fn check_gitignore_detects_sensitive_paths() {
-        assert!(check_gitignore(&[".codeguard/reports/", ".codeguard/logs/"]));
+        assert!(check_gitignore(&[
+            ".codeguard/reports/",
+            ".codeguard/logs/"
+        ]));
         assert!(!check_gitignore(&["src/main.rs"]));
     }
 

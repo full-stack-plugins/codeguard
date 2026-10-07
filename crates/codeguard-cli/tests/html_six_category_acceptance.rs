@@ -23,7 +23,11 @@ fn valid_html_samples_pass_lint() {
         .output()
         .expect("prettier 不可用");
 
-    assert!(output.status.success(), "有效 HTML 应通过 prettier: {:?}", output);
+    assert!(
+        output.status.success(),
+        "有效 HTML 应通过 prettier: {:?}",
+        output
+    );
     std::fs::remove_dir_all(&tmp).unwrap();
 }
 
@@ -39,7 +43,10 @@ fn invalid_html_samples_are_detected() {
         .expect("prettier 不可用");
 
     // prettier 会报告格式问题或解析错误
-    assert!(!output.status.success() || !output.stderr.is_empty(), "格式错误应被检出");
+    assert!(
+        !output.status.success() || !output.stderr.is_empty(),
+        "格式错误应被检出"
+    );
     std::fs::remove_dir_all(&tmp).unwrap();
 }
 
@@ -60,6 +67,10 @@ fn formatting_cannot_impersonate_comment_checking() {
         .output()
         .expect("prettier 不可用");
 
-    assert!(output.status.success(), "HTML 应通过（格式正确），但注释合规需另查: {:?}", output);
+    assert!(
+        output.status.success(),
+        "HTML 应通过（格式正确），但注释合规需另查: {:?}",
+        output
+    );
     std::fs::remove_dir_all(&tmp).unwrap();
 }

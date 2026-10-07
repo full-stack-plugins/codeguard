@@ -25,9 +25,9 @@ pub(crate) fn observe_manifest(root: &Path, manifest_name: &str) -> ManifestObse
             status: "missing".to_string(),
         };
     }
-    
+
     let content = std::fs::read_to_string(&manifest_path).unwrap_or_default();
-    
+
     // 提取声明版本（简单解析）
     let declared_version = if manifest_name == "package.json" {
         extract_json_field(&content, "version")
@@ -38,7 +38,7 @@ pub(crate) fn observe_manifest(root: &Path, manifest_name: &str) -> ManifestObse
     } else {
         None
     };
-    
+
     ManifestObservation {
         manifest_type: manifest_name.to_string(),
         declared_version,

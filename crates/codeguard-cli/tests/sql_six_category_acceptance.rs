@@ -18,7 +18,11 @@ fn valid_sql_samples_pass_syntax_check() {
         .output()
         .expect("sqlite3 不可用");
 
-    assert!(output.status.success(), "有效 SQL 应通过语法检查: {:?}", output);
+    assert!(
+        output.status.success(),
+        "有效 SQL 应通过语法检查: {:?}",
+        output
+    );
     std::fs::remove_dir_all(&tmp).unwrap();
 }
 
@@ -49,6 +53,10 @@ fn formatting_cannot_impersonate_comment_checking() {
         .output()
         .expect("sqlite3 不可用");
 
-    assert!(output.status.success(), "SQL 应通过（语法正确），但注释合规需另查: {:?}", output);
+    assert!(
+        output.status.success(),
+        "SQL 应通过（语法正确），但注释合规需另查: {:?}",
+        output
+    );
     std::fs::remove_dir_all(&tmp).unwrap();
 }

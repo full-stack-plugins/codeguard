@@ -21,10 +21,15 @@ fn verify_observe_metadata(report: &Value, language: &str, report_type: &str) {
 
 /// 测试 applicability_profile 覆盖类别。
 fn verify_applicability_categories(profile: &Value, expected_count: usize) {
-    let cats = profile["categories"].as_array().expect("categories 应为数组");
+    let cats = profile["categories"]
+        .as_array()
+        .expect("categories 应为数组");
     assert_eq!(cats.len(), expected_count, "类别数量不匹配");
     for cat in cats {
-        assert_eq!(cat["applicability"], "applicable", "类别应标记为 applicable");
+        assert_eq!(
+            cat["applicability"], "applicable",
+            "类别应标记为 applicable"
+        );
     }
 }
 
@@ -45,7 +50,7 @@ fn all_adapters_produce_valid_metadata() {
         ("go", "go_lint_scan"),
         ("java", "java_lint_scan"),
     ];
-    
+
     for (lang, report_type) in adapters {
         // 这里只验证数据结构，不实际调用工具
         let report = serde_json::json!({
@@ -71,7 +76,7 @@ fn all_adapters_cover_required_categories() {
         });
         verify_applicability_categories(&profile, 2);
     }
-    
+
     // dependency 适配器应覆盖 4 个类别
     let dep_adapters = vec!["php", "scala", "elixir", "lua", "dart", "go", "java"];
     for _lang in dep_adapters {
@@ -104,7 +109,7 @@ fn config_detection_identifies_config_files() {
     // 配置检测应正确识别各类配置文件
     let config = serde_json::json!({"status": "configured", "config_ref": "package.json"});
     verify_config_detection(&config, "configured");
-    
+
     let config = serde_json::json!({"status": "unknown", "config_ref": "."});
     verify_config_detection(&config, "unknown");
 }
@@ -121,7 +126,7 @@ fn applicability_profile_reports_correct_tools() {
         ("go", "go_vet"),
         ("java", "javac_xlint"),
     ];
-    
+
     for (lang, expected_tool) in expected_tools {
         let profile = serde_json::json!({
             "language": lang,

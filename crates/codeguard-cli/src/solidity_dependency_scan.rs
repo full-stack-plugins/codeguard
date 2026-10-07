@@ -39,7 +39,11 @@ pub(crate) fn applicability_profile() -> Value {
 
 fn observe_config(root: &Path) -> Value {
     let config_file = root.join("config.toml");
-    let config = if config_file.exists() { "configured" } else { "unknown" };
+    let config = if config_file.exists() {
+        "configured"
+    } else {
+        "unknown"
+    };
     json!({"status": config, "config_ref": "."})
 }
 
@@ -58,6 +62,12 @@ mod tests {
 
     #[test]
     fn applicability_profile_covers_four_categories() {
-        assert_eq!(applicability_profile()["categories"].as_array().unwrap().len(), 4);
+        assert_eq!(
+            applicability_profile()["categories"]
+                .as_array()
+                .unwrap()
+                .len(),
+            4
+        );
     }
 }

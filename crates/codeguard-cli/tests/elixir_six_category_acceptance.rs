@@ -18,14 +18,22 @@ fn valid_elixir_samples_pass_compile() {
         .output()
         .expect("elixir 不可用");
 
-    assert!(output.status.success(), "有效 Elixir 代码应通过编译: {:?}", output);
+    assert!(
+        output.status.success(),
+        "有效 Elixir 代码应通过编译: {:?}",
+        output
+    );
     std::fs::remove_dir_all(&tmp).unwrap();
 }
 
 #[test]
 fn invalid_elixir_samples_are_detected() {
     let tmp = ensure_clean_dir("elixir-invalid-test");
-    std::fs::write(tmp.join("example.ex"), "defmodule Example do\n  def add(a, b) do\n    a + b + undefined_function()\n  end\nend\n").unwrap();
+    std::fs::write(
+        tmp.join("example.ex"),
+        "defmodule Example do\n  def add(a, b) do\n    a + b + undefined_function()\n  end\nend\n",
+    )
+    .unwrap();
 
     let output = Command::new("elixirc")
         .args(["example.ex"])
@@ -49,6 +57,10 @@ fn formatting_cannot_impersonate_comment_checking() {
         .output()
         .expect("elixir 不可用");
 
-    assert!(output.status.success(), "elixir 应通过（代码正确），但文档合规需另查: {:?}", output);
+    assert!(
+        output.status.success(),
+        "elixir 应通过（代码正确），但文档合规需另查: {:?}",
+        output
+    );
     std::fs::remove_dir_all(&tmp).unwrap();
 }

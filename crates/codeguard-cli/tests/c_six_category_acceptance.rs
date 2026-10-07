@@ -18,14 +18,22 @@ fn valid_c_samples_pass_compile() {
         .output()
         .expect("cc 不可用");
 
-    assert!(output.status.success(), "有效 C 代码应通过编译: {:?}", output);
+    assert!(
+        output.status.success(),
+        "有效 C 代码应通过编译: {:?}",
+        output
+    );
     std::fs::remove_dir_all(&tmp).unwrap();
 }
 
 #[test]
 fn invalid_c_samples_are_detected() {
     let tmp = ensure_clean_dir("c-invalid-test");
-    std::fs::write(tmp.join("main.c"), "int main(void) {\n    undefined_function();\n    return 0;\n}\n").unwrap();
+    std::fs::write(
+        tmp.join("main.c"),
+        "int main(void) {\n    undefined_function();\n    return 0;\n}\n",
+    )
+    .unwrap();
 
     let output = Command::new("cc")
         .args(["-Wall", "-Wextra", "-c", "main.c", "-o", "main.o"])
@@ -35,7 +43,11 @@ fn invalid_c_samples_are_detected() {
 
     assert!(!output.status.success(), "未声明函数应被检出");
     let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(stderr.contains("implicit") || stderr.contains("undefined"), "应报告未声明: {}", stderr);
+    assert!(
+        stderr.contains("implicit") || stderr.contains("undefined"),
+        "应报告未声明: {}",
+        stderr
+    );
     std::fs::remove_dir_all(&tmp).unwrap();
 }
 
@@ -51,6 +63,10 @@ fn formatting_cannot_impersonate_comment_checking() {
         .output()
         .expect("cc 不可用");
 
-    assert!(output.status.success(), "cc 应通过（代码正确），但文档合规需另查: {:?}", output);
+    assert!(
+        output.status.success(),
+        "cc 应通过（代码正确），但文档合规需另查: {:?}",
+        output
+    );
     std::fs::remove_dir_all(&tmp).unwrap();
 }

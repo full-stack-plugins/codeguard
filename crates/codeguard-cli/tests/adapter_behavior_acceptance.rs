@@ -22,7 +22,7 @@ fn go_vet_output_parsing() {
             })
         })
         .collect();
-    
+
     assert_eq!(findings.len(), 2);
     assert_eq!(findings[0]["path"], "src/main.go");
     assert_eq!(findings[0]["line"], 10);
@@ -37,15 +37,17 @@ fn phpcs_json_output_parsing() {
         .as_array()
         .unwrap()
         .iter()
-        .map(|msg| json!({
-            "path": "test.php",
-            "line": msg["line"],
-            "column": msg["column"],
-            "message": msg["message"],
-            "source": msg["source"],
-        }))
+        .map(|msg| {
+            json!({
+                "path": "test.php",
+                "line": msg["line"],
+                "column": msg["column"],
+                "message": msg["message"],
+                "source": msg["source"],
+            })
+        })
         .collect();
-    
+
     assert_eq!(findings.len(), 1);
     assert_eq!(findings[0]["line"], 5);
     assert_eq!(findings[0]["source"], "PSR12");
@@ -60,14 +62,16 @@ fn credo_json_output_parsing() {
         .as_array()
         .unwrap()
         .iter()
-        .map(|issue| json!({
-            "path": issue["filename"],
-            "line": issue["line_no"],
-            "message": issue["message"],
-            "source": issue["check"],
-        }))
+        .map(|issue| {
+            json!({
+                "path": issue["filename"],
+                "line": issue["line_no"],
+                "message": issue["message"],
+                "source": issue["check"],
+            })
+        })
         .collect();
-    
+
     assert_eq!(findings.len(), 1);
     assert_eq!(findings[0]["path"], "lib/main.ex");
 }
@@ -89,7 +93,7 @@ fn config_detection_patterns() {
     assert_eq!(php_config(&[".phpcs.xml"]), "configured");
     assert_eq!(php_config(&["composer.json"]), "missing");
     assert_eq!(php_config(&[]), "unknown");
-    
+
     // Scala: .scalafix.conf / build.sbt
     let scala_config = |exists: &[&str]| {
         if exists.contains(&".scalafix.conf") {
@@ -108,8 +112,15 @@ fn config_detection_patterns() {
 #[test]
 fn category_coverage_completeness() {
     // 每种语言应覆盖 6 个类别
-    let categories = vec!["lint", "comments", "dependencies", "cve", "security", "build"];
-    
+    let categories = vec![
+        "lint",
+        "comments",
+        "dependencies",
+        "cve",
+        "security",
+        "build",
+    ];
+
     // lint/comments 适配器
     let lint_profile = json!({
         "categories": [
@@ -125,7 +136,7 @@ fn category_coverage_completeness() {
         .collect();
     assert!(lint_cats.contains(&"lint"));
     assert!(lint_cats.contains(&"comments"));
-    
+
     // dependency 适配器
     let dep_profile = json!({
         "categories": [
@@ -142,7 +153,7 @@ fn category_coverage_completeness() {
         .map(|c| c["category"].as_str().unwrap())
         .collect();
     assert_eq!(dep_cats.len(), 4);
-    
+
     // 六类别全覆盖
     let all_cats: Vec<&str> = categories.iter().copied().collect();
     assert_eq!(all_cats.len(), 6);

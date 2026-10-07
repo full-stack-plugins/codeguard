@@ -24,7 +24,7 @@ pub(crate) struct PrecisionResult {
 pub(crate) fn calculate_precision(counts: &EvaluationCounts) -> PrecisionResult {
     let tp = counts.true_positives as f64;
     let fp = counts.false_positives as f64;
-    
+
     if tp + fp == 0.0 {
         return PrecisionResult {
             precision: 0.0,
@@ -32,7 +32,7 @@ pub(crate) fn calculate_precision(counts: &EvaluationCounts) -> PrecisionResult 
             valid: false,
         };
     }
-    
+
     let precision = tp / (tp + fp);
     let n = tp + fp;
     let z = 1.96;
@@ -40,7 +40,7 @@ pub(crate) fn calculate_precision(counts: &EvaluationCounts) -> PrecisionResult 
     let wilson_lower = (precision + z2 / (2.0 * n)
         - z * ((precision * (1.0 - precision) / n + z2 / (4.0 * n * n)).sqrt()))
         / (1.0 + z2 / n);
-    
+
     PrecisionResult {
         precision,
         wilson_lower_95: wilson_lower,

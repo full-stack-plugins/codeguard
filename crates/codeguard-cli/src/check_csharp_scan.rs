@@ -25,10 +25,20 @@ pub(crate) fn observe(root: &Path, deadline: Instant) -> Value {
 }
 
 fn try_native_tool(root: &Path) -> Option<Value> {
-    let output = Command::new("dotnet").args(["--version"]).current_dir(root).output().ok()?;
-    if !output.status.success() { return None; }
+    let output = Command::new("dotnet")
+        .args(["--version"])
+        .current_dir(root)
+        .output()
+        .ok()?;
+    if !output.status.success() {
+        return None;
+    }
     let version = String::from_utf8_lossy(&output.stdout).trim().to_string();
-    let scan_output = Command::new("dotnet").args(["build", "--no-restore", "-v", "q"]).current_dir(root).output().ok()?;
+    let scan_output = Command::new("dotnet")
+        .args(["build", "--no-restore", "-v", "q"])
+        .current_dir(root)
+        .output()
+        .ok()?;
     let stdout = String::from_utf8_lossy(&scan_output.stdout).to_string();
     let findings = parse_output(&stdout);
     Some(json!({
@@ -52,8 +62,12 @@ fn parse_output(output: &str) -> Vec<Value> {
     findings
 }
 
-pub(crate) fn refresh(root: &Path, report: &mut Value, deadline: Instant) { let _ = (root, report, deadline); }
-pub(crate) fn prefers(report: &Value, _relative: &str) -> bool { report["status"] == "incomplete" }
+pub(crate) fn refresh(root: &Path, report: &mut Value, deadline: Instant) {
+    let _ = (root, report, deadline);
+}
+pub(crate) fn prefers(report: &Value, _relative: &str) -> bool {
+    report["status"] == "incomplete"
+}
 pub(crate) fn applicability_profile() -> Value {
     json!({"language": "csharp", "categories": [
         {"category": "lint", "applicability": "applicable", "tool": "roslyn_analyzers"},
@@ -64,7 +78,11 @@ pub(crate) fn applicability_profile() -> Value {
 fn observe_config(root: &Path) -> Value {
     let csproj = root.join("*.csproj");
     let sln = root.join("*.sln");
-    let config = if csproj.exists() || sln.exists() { "configured" } else { "unknown" };
+    let config = if csproj.exists() || sln.exists() {
+        "configured"
+    } else {
+        "unknown"
+    };
     json!({"status": config, "config_ref": "."})
 }
 
@@ -81,6 +99,12 @@ mod tests {
     }
     #[test]
     fn applicability_profile_covers_lint_and_comments() {
-        assert_eq!(applicability_profile()["categories"].as_array().unwrap().len(), 2);
+        assert_eq!(
+            applicability_profile()["categories"]
+                .as_array()
+                .unwrap()
+                .len(),
+            2
+        );
     }
 }

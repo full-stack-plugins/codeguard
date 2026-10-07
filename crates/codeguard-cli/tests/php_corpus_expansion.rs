@@ -7,7 +7,10 @@ use serde_json::Value;
 use sha2::Digest;
 use std::path::Path;
 
-fn classify_from_grammar(grammar: &mut codeguard_runtime::WasmGrammar, source: &[u8]) -> Option<bool> {
+fn classify_from_grammar(
+    grammar: &mut codeguard_runtime::WasmGrammar,
+    source: &[u8],
+) -> Option<bool> {
     match grammar.parse(source) {
         Ok(tree) => {
             let mut has_error = false;
@@ -55,19 +58,19 @@ fn php_grammar_precision() {
 
     // 违规 PHP（300）- 语法级错误
     for i in 0..60 {
-        invalid.push(format!("<?php\nclass C{} {{ public $x = {}; \n", i, i));  // 缺少 }
+        invalid.push(format!("<?php\nclass C{} {{ public $x = {}; \n", i, i)); // 缺少 }
     }
     for i in 0..60 {
-        invalid.push(format!("<?php\nfunction f{}( {{ return {}; }}\n", i, i));  // 缺少 )
+        invalid.push(format!("<?php\nfunction f{}( {{ return {}; }}\n", i, i)); // 缺少 )
     }
     for i in 0..60 {
-        invalid.push(format!("<?php\nclass {{ public $x; }}\n"));  // 缺少类名
+        invalid.push(format!("<?php\nclass {{ public $x; }}\n")); // 缺少类名
     }
     for i in 0..60 {
-        invalid.push(format!("<?php\n$x = ;\n"));  // 缺少值
+        invalid.push(format!("<?php\n$x = ;\n")); // 缺少值
     }
     for i in 0..60 {
-        invalid.push(format!("<?php\necho \"unclosed;\n"));  // 未闭合字符串
+        invalid.push(format!("<?php\necho \"unclosed;\n")); // 未闭合字符串
     }
 
     let manifest_sha256 = format!("{:x}", sha2::Sha256::digest(b"php-grammar-v1"));
@@ -93,7 +96,11 @@ fn php_grammar_precision() {
     });
 
     let wasm_path = Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("..").join("..").join("grammars").join("php").join("parser.wasm");
+        .join("..")
+        .join("..")
+        .join("grammars")
+        .join("php")
+        .join("parser.wasm");
     let wasm_bytes = std::fs::read(&wasm_path).expect("PHP WASM 文件不存在");
     let wasm_sha256 = format!("{:x}", sha2::Sha256::digest(&wasm_bytes));
     let mut grammar = codeguard_runtime::WasmGrammar::load("php", &wasm_bytes, &wasm_sha256, 15)
@@ -123,20 +130,33 @@ fn php_grammar_precision() {
     println!("TP={tp} FP={fp} FN={fn_count} TN={tn} unknown={unknown}");
 
     let evidence = generate_precision_validation(
-        "2026-10-07", corpus["cases"].as_array().unwrap().len() as u32,
-        tp, fp, fn_count, tn, unknown,
-        "tests/acceptance/php-grammar-precision-2026-10-07.md", None,
+        "2026-10-07",
+        corpus["cases"].as_array().unwrap().len() as u32,
+        tp,
+        fp,
+        fn_count,
+        tn,
+        unknown,
+        "tests/acceptance/php-grammar-precision-2026-10-07.md",
+        None,
     );
 
     match evidence {
         Ok(ev) => {
-            println!("✅ PHP PASS! Wilson 下界 = {:.4}", ev.precision_wilson_lower_bound);
+            println!(
+                "✅ PHP PASS! Wilson 下界 = {:.4}",
+                ev.precision_wilson_lower_bound
+            );
             let doc = format!(
                 "# PHP Grammar 精度验证证据\n\n> 日期：2026-10-07。\n\n| 指标 | 值 |\n|---|---|\n| 总样本 | {} |\n| TP | {tp} |\n| FP | {fp} |\n| FN | {fn_count} |\n| TN | {tn} |\n| Wilson 下界 (95%) | {:.4} |\n| 结果 | **PASS** |\n",
-                corpus["cases"].as_array().unwrap().len(), ev.precision_wilson_lower_bound
+                corpus["cases"].as_array().unwrap().len(),
+                ev.precision_wilson_lower_bound
             );
             let doc_path = Path::new(env!("CARGO_MANIFEST_DIR"))
-                .join("..").join("..").join("tests").join("acceptance")
+                .join("..")
+                .join("..")
+                .join("tests")
+                .join("acceptance")
                 .join("php-grammar-precision-2026-10-07.md");
             std::fs::write(&doc_path, doc).unwrap();
         }

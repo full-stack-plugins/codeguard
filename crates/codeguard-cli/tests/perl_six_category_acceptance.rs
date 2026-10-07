@@ -18,7 +18,11 @@ fn valid_perl_samples_pass_syntax_check() {
         .output()
         .expect("perl 不可用");
 
-    assert!(output.status.success(), "有效 Perl 代码应通过语法检查: {:?}", output);
+    assert!(
+        output.status.success(),
+        "有效 Perl 代码应通过语法检查: {:?}",
+        output
+    );
     std::fs::remove_dir_all(&tmp).unwrap();
 }
 
@@ -49,6 +53,10 @@ fn formatting_cannot_impersonate_comment_checking() {
         .output()
         .expect("perl 不可用");
 
-    assert!(output.status.success(), "perl 应通过（语法正确），但文档合规需另查: {:?}", output);
+    assert!(
+        output.status.success(),
+        "perl 应通过（语法正确），但文档合规需另查: {:?}",
+        output
+    );
     std::fs::remove_dir_all(&tmp).unwrap();
 }

@@ -25,10 +25,20 @@ pub(crate) fn observe(root: &Path, deadline: Instant) -> Value {
 }
 
 fn try_native_tool(root: &Path) -> Option<Value> {
-    let output = Command::new("tsc").args(["--version"]).current_dir(root).output().ok()?;
-    if !output.status.success() { return None; }
+    let output = Command::new("tsc")
+        .args(["--version"])
+        .current_dir(root)
+        .output()
+        .ok()?;
+    if !output.status.success() {
+        return None;
+    }
     let version = String::from_utf8_lossy(&output.stdout).trim().to_string();
-    let scan_output = Command::new("tsc").args(["."]).current_dir(root).output().ok()?;
+    let scan_output = Command::new("tsc")
+        .args(["."])
+        .current_dir(root)
+        .output()
+        .ok()?;
     let stdout = String::from_utf8_lossy(&scan_output.stdout).to_string();
     let stderr = String::from_utf8_lossy(&scan_output.stderr).to_string();
     let findings = parse_output(&stdout, &stderr);
@@ -53,8 +63,12 @@ fn parse_output(stdout: &str, stderr: &str) -> Vec<Value> {
     findings
 }
 
-pub(crate) fn refresh(root: &Path, report: &mut Value, deadline: Instant) { let _ = (root, report, deadline); }
-pub(crate) fn prefers(report: &Value, _relative: &str) -> bool { report["status"] == "incomplete" }
+pub(crate) fn refresh(root: &Path, report: &mut Value, deadline: Instant) {
+    let _ = (root, report, deadline);
+}
+pub(crate) fn prefers(report: &Value, _relative: &str) -> bool {
+    report["status"] == "incomplete"
+}
 pub(crate) fn applicability_profile() -> Value {
     json!({"language": "typescript", "categories": [
         {"category": "lint", "applicability": "applicable", "tool": "tsc"},
@@ -64,7 +78,11 @@ pub(crate) fn applicability_profile() -> Value {
 
 fn observe_config(root: &Path) -> Value {
     let config_file = root.join("tsconfig.json");
-    let config = if config_file.exists() { "configured" } else { "unknown" };
+    let config = if config_file.exists() {
+        "configured"
+    } else {
+        "unknown"
+    };
     json!({"status": config, "config_ref": if config_file.exists() { "tsconfig.json" } else { "." }})
 }
 
@@ -82,6 +100,12 @@ mod tests {
     }
     #[test]
     fn applicability_profile_covers_lint_and_comments() {
-        assert_eq!(applicability_profile()["categories"].as_array().unwrap().len(), 2);
+        assert_eq!(
+            applicability_profile()["categories"]
+                .as_array()
+                .unwrap()
+                .len(),
+            2
+        );
     }
 }

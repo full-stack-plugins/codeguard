@@ -13,12 +13,23 @@ fn valid_zig_samples_pass_build() {
     std::fs::write(tmp.join("main.zig"), "const std = @import(\"std\");\n\n/// Adds two integers.\nfn add(a: i32, b: i32) i32 {\n    return a + b;\n}\n\npub fn main() void {\n    std.debug.print(\"{}\\n\", .{add(1, 2)});\n}\n").unwrap();
 
     let output = Command::new("zig")
-        .args(["build-exe", "main.zig", "--cache-dir", ".zig-cache", "--global-cache-dir", ".zig-global-cache"])
+        .args([
+            "build-exe",
+            "main.zig",
+            "--cache-dir",
+            ".zig-cache",
+            "--global-cache-dir",
+            ".zig-global-cache",
+        ])
         .current_dir(&tmp)
         .output()
         .expect("zig 不可用");
 
-    assert!(output.status.success(), "有效 Zig 代码应通过编译: {:?}", output);
+    assert!(
+        output.status.success(),
+        "有效 Zig 代码应通过编译: {:?}",
+        output
+    );
     std::fs::remove_dir_all(&tmp).unwrap();
 }
 
@@ -28,7 +39,14 @@ fn invalid_zig_samples_are_detected() {
     std::fs::write(tmp.join("main.zig"), "const std = @import(\"std\");\n\npub fn main() void {\n    const x: i32 = \"not a number\";\n    _ = x;\n}\n").unwrap();
 
     let output = Command::new("zig")
-        .args(["build-exe", "main.zig", "--cache-dir", ".zig-cache", "--global-cache-dir", ".zig-global-cache"])
+        .args([
+            "build-exe",
+            "main.zig",
+            "--cache-dir",
+            ".zig-cache",
+            "--global-cache-dir",
+            ".zig-global-cache",
+        ])
         .current_dir(&tmp)
         .output()
         .expect("zig 不可用");
@@ -44,11 +62,22 @@ fn formatting_cannot_impersonate_comment_checking() {
     std::fs::write(tmp.join("main.zig"), "const std = @import(\"std\");\n\nfn undocumented(a: i32) i32 {\n    return a * 2;\n}\n\n/// Has docs.\nfn documented(a: i32) i32 {\n    return a + 1;\n}\n\npub fn main() void {\n    std.debug.print(\"{}\\n\", .{undocumented(5) + documented(3)});\n}\n").unwrap();
 
     let output = Command::new("zig")
-        .args(["build-exe", "main.zig", "--cache-dir", ".zig-cache", "--global-cache-dir", ".zig-global-cache"])
+        .args([
+            "build-exe",
+            "main.zig",
+            "--cache-dir",
+            ".zig-cache",
+            "--global-cache-dir",
+            ".zig-global-cache",
+        ])
         .current_dir(&tmp)
         .output()
         .expect("zig 不可用");
 
-    assert!(output.status.success(), "zig 应通过（代码正确），但文档合规需另查: {:?}", output);
+    assert!(
+        output.status.success(),
+        "zig 应通过（代码正确），但文档合规需另查: {:?}",
+        output
+    );
     std::fs::remove_dir_all(&tmp).unwrap();
 }

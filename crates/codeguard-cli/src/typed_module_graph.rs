@@ -41,7 +41,9 @@ pub(crate) struct TypedModuleGraph {
 
 /// 构建分类型模块图。
 pub(crate) fn build_typed_graph(edges: Vec<DependencyEdge>) -> TypedModuleGraph {
-    let incomplete = edges.iter().any(|e| matches!(e.kind, DependencyKind::Dynamic));
+    let incomplete = edges
+        .iter()
+        .any(|e| matches!(e.kind, DependencyKind::Dynamic));
     TypedModuleGraph { edges, incomplete }
 }
 

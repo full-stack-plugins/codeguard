@@ -18,7 +18,11 @@ fn valid_protobuf_samples_pass_compile() {
         .output()
         .expect("protoc 不可用");
 
-    assert!(output.status.success(), "有效 Protobuf 应通过编译: {:?}", output);
+    assert!(
+        output.status.success(),
+        "有效 Protobuf 应通过编译: {:?}",
+        output
+    );
     std::fs::remove_dir_all(&tmp).unwrap();
 }
 
@@ -49,6 +53,10 @@ fn formatting_cannot_impersonate_comment_checking() {
         .output()
         .expect("protoc 不可用");
 
-    assert!(output.status.success(), "Protobuf 应通过（语法正确），但注释合规需另查: {:?}", output);
+    assert!(
+        output.status.success(),
+        "Protobuf 应通过（语法正确），但注释合规需另查: {:?}",
+        output
+    );
     std::fs::remove_dir_all(&tmp).unwrap();
 }
