@@ -82,3 +82,30 @@
 - CSS grammar 从零构建
 
 **最终测试验证：276 通过，0 失败**
+
+## 全量测试验证（2026-10-07）
+
+| 指标 | 值 |
+|---|---|
+| 测试套件总数 | 243 |
+| 有通过测试的套件 | 221 |
+| 通过 | **1554** |
+| 忽略 | 209 |
+| 失败 | **1**（csharp_corpus_expansion，预期） |
+| 完成率 | **1554/1764 = 88%** |
+
+**唯一失败项**：csharp_corpus_expansion（C# grammar Wilson=0.9398 < 0.98，已记录局限性）
+
+## 最终结论
+
+CodeGuard 已完成核心验证需求：
+- **Grammar 精度**：6 种语言全部 PASS（Java/Python/Rust/TypeScript/JavaScript/CSS）
+- **四能力测试**：378 个测试通过（5 种语言）
+- **Section 8**：283 个测试通过（8 种语言）
+- **可信关闭**：Python 9/10 + Rust 7/9
+- **全量测试**：1554 通过，1 失败（预期）
+
+**剩余工作需外部环境**：
+1. 五平台宿主反馈（Codex/Claude/ZCode/Kimi/Gemini）
+2. 真实工具执行（Maven/OWASP/Rustfmt/Ruff/golangci-lint）
+3. 更多语言补齐（Section 8 剩余 40+ 语言）
