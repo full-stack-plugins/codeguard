@@ -210,6 +210,36 @@ pub(crate) fn observe(
             crate::check_erlang_scan::refresh(root, &mut erlang_lint, deadline);
         }
     }
+    let mut c_documentation = Value::Null;
+    let mut cpp_documentation = Value::Null;
+    for (language, standard, report) in [
+        ("c", tools.c_standard, &mut c_documentation),
+        ("cpp", tools.cpp_standard, &mut cpp_documentation),
+    ] {
+        let paths = selected
+            .iter()
+            .filter(|p| {
+                if language == "c" {
+                    p.ends_with(".c")
+                } else {
+                    p.ends_with(".cpp") || p.ends_with(".cc") || p.ends_with(".cxx")
+                }
+            })
+            .cloned()
+            .collect::<BTreeSet<_>>();
+        if !paths.is_empty() {
+            *report = crate::check_c_family_comments::observe(
+                root,
+                language,
+                &paths,
+                tools.clang,
+                standard,
+                deadline,
+                &cancelled,
+            );
+            crate::check_c_family_comments::connect(root, report, deadline);
+        }
+    }
     // 所选原生入口故障不能以WASM掩盖；确实缺入口才允许候选初检。
     #[cfg(feature = "wasm-precheck")]
     let syntax_selected = selected
@@ -440,6 +470,20 @@ pub(crate) fn observe(
         Some("0.16.0" | "0.17.0")
     ) {
         feedback["erlang_lint"] = erlang_lint;
+    }
+    if c_documentation.is_object() || cpp_documentation.is_object() {
+        for report in [&mut c_documentation, &mut cpp_documentation] {
+            if report.is_object() {
+                crate::check_c_family_comments::refresh(root, report, deadline);
+            }
+        }
+        feedback["schema_version"] = json!("0.18.0");
+        feedback["c_family_documentation"] =
+            json!({"scope":"selected_files","c":c_documentation,"cpp":cpp_documentation});
+        // 文档检查不消除原生语法缺口；统一后续动作仍要求处理未完成检查。
+        if feedback["next_action"] != "require_native_lint_confirmation" {
+            feedback["next_action"] = json!("review_native_results_and_resolve_incomplete_checks");
+        }
     }
     feedback
 }

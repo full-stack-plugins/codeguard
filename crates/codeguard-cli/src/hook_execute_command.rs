@@ -106,7 +106,10 @@ fn execute_parsed(
             plan.action != HookTriggerAction::FastFileCheck
                 || !matches!(
                     key.as_str(),
-                    "--go-tool"
+                    "--clang-tool"
+                        | "--c-standard"
+                        | "--cpp-standard"
+                        | "--go-tool"
                         | "--erl-tool"
                         | "--rustfmt-tool"
                         | "--node-tool"
@@ -161,6 +164,15 @@ fn execute_parsed(
                 root,
                 &plan.target_paths,
                 crate::hook_native_tools::HookNativeTools {
+                    clang: arguments.verify_options.get("--clang-tool").map(Path::new),
+                    c_standard: arguments
+                        .verify_options
+                        .get("--c-standard")
+                        .map(String::as_str),
+                    cpp_standard: arguments
+                        .verify_options
+                        .get("--cpp-standard")
+                        .map(String::as_str),
                     erl: arguments.verify_options.get("--erl-tool").map(Path::new),
                     rustfmt: arguments
                         .verify_options
@@ -254,7 +266,7 @@ fn execute_parsed(
     };
     Ok((
         json!({
-            "schema_version":if feedback["schema_version"]=="0.9.0" && feedback["report_type"]=="hook_task_verification_summary" || reason.is_some_and(|r|r.starts_with("clang_")){"0.30.0"}else if feedback["schema_version"]=="0.17.0" && feedback["report_type"]=="hook_fast_feedback" {"0.29.0"}else if feedback["schema_version"]=="0.16.0" && feedback["report_type"]=="hook_fast_feedback" {"0.28.0"}else if feedback["schema_version"]=="0.15.0" && feedback["report_type"]=="hook_fast_feedback" {"0.27.0"}else if feedback["schema_version"]=="0.8.0" && feedback["report_type"]=="hook_task_verification_summary" {"0.26.0"}else if feedback["schema_version"]=="0.7.0" && feedback["report_type"]=="hook_task_verification_summary" {"0.25.0"}else if feedback["schema_version"]=="0.14.0" && feedback["report_type"]=="hook_fast_feedback" {"0.24.0"} else if feedback["schema_version"]=="0.13.0" && feedback["report_type"]=="hook_fast_feedback" {"0.23.0"} else if feedback["schema_version"] == "0.12.0" && feedback["report_type"] == "hook_fast_feedback" {"0.22.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.11.0" {"0.21.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.10.0" {"0.19.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.6.0" {"0.20.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.9.0" {"0.18.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.8.0" {"0.17.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.7.0" {"0.16.0"}else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.5.0" {"0.15.0"}else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.6.0" {"0.14.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.5.0" {"0.13.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.4.0" {"0.12.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.3.0" {"0.11.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.4.0" {"0.10.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.2.0" {"0.8.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.3.0" {"0.9.0"} else {"0.7.0"}, "report_type":"hook_execution_feedback",
+            "schema_version":if feedback["schema_version"]=="0.18.0" && feedback["report_type"]=="hook_fast_feedback" {"0.31.0"}else if feedback["schema_version"]=="0.9.0" && feedback["report_type"]=="hook_task_verification_summary" || reason.is_some_and(|r|r.starts_with("clang_")){"0.30.0"}else if feedback["schema_version"]=="0.17.0" && feedback["report_type"]=="hook_fast_feedback" {"0.29.0"}else if feedback["schema_version"]=="0.16.0" && feedback["report_type"]=="hook_fast_feedback" {"0.28.0"}else if feedback["schema_version"]=="0.15.0" && feedback["report_type"]=="hook_fast_feedback" {"0.27.0"}else if feedback["schema_version"]=="0.8.0" && feedback["report_type"]=="hook_task_verification_summary" {"0.26.0"}else if feedback["schema_version"]=="0.7.0" && feedback["report_type"]=="hook_task_verification_summary" {"0.25.0"}else if feedback["schema_version"]=="0.14.0" && feedback["report_type"]=="hook_fast_feedback" {"0.24.0"} else if feedback["schema_version"]=="0.13.0" && feedback["report_type"]=="hook_fast_feedback" {"0.23.0"} else if feedback["schema_version"] == "0.12.0" && feedback["report_type"] == "hook_fast_feedback" {"0.22.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.11.0" {"0.21.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.10.0" {"0.19.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.6.0" {"0.20.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.9.0" {"0.18.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.8.0" {"0.17.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.7.0" {"0.16.0"}else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.5.0" {"0.15.0"}else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.6.0" {"0.14.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.5.0" {"0.13.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.4.0" {"0.12.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.3.0" {"0.11.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.4.0" {"0.10.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.2.0" {"0.8.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.3.0" {"0.9.0"} else {"0.7.0"}, "report_type":"hook_execution_feedback",
             "plan":plan, "execution":execution, "reason":reason,
             "local_feedback":feedback, "delivery_decision":"not_evaluated",
             "host_blocking_verified":false, "soft_result_reused":false
@@ -784,6 +796,14 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                     return Err("--git-tool 必须为绝对路径".into());
                 }
                 git_tool = Some(path);
+            }
+            "--c-standard" | "--cpp-standard" if !verify_options.contains_key(key) => {
+                if (key == "--c-standard" && value != "c11")
+                    || (key == "--cpp-standard" && value != "c++17")
+                {
+                    return Err("文档快检仅接受显式c11/c++17档案".into());
+                }
+                verify_options.insert(key.to_owned(), value);
             }
             "--clang-tool"
             | "--rustfmt-tool"

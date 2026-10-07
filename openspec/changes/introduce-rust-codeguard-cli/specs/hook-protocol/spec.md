@@ -228,3 +228,15 @@ Clippy repair-ready SHALL reuse task-bound Cargo verification and preserve bound
 #### Scenario: Native warnings disappear after documentation is repaired
 - **WHEN** the original documentation warning is not observed in a fresh task-bound native scan
 - **THEN** preserve candidate_absent_unverified_policy and a consumed report reference; do not close the task or grant production qualification
+
+
+### Requirement: Confirmed C-family edits preserve explicit documentation context
+Confirmed file edits SHALL expose bounded C/C++ documentation observations using the same native Clang adapter and shared deadline as unified checks. Standards SHALL be explicit c11/c++17 profiles; missing tool or standard SHALL remain context_required rather than a source violation. Documentation observations SHALL NOT remove native syntax coverage gaps, grant qualification or delivery, or initialize a workspace implicitly. Failed writes SHALL consume no checker configuration. Repair-ready verification SHALL retain the original task standard and reject edit-profile overrides.
+
+#### Scenario: Missing edit documentation profile
+- **WHEN** a confirmed C/C++ edit has no explicit Clang and language standard
+- **THEN** its documentation observation reports context_required without executing Clang or generating source violations
+
+#### Scenario: Explicit standalone documentation profile
+- **WHEN** a confirmed C/C++ edit supplies an existing Clang and supported explicit standard
+- **THEN** selected files receive bounded native documentation observations, with structural policy kept distinct and native syntax coverage gaps retained

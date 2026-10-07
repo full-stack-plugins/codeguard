@@ -1583,3 +1583,6 @@ flowchart TD
 ```
 
 C/C++文档修复Hook当前增量：`repair_ready`按首次任务恢复原Clang/标准，外层反馈0.30与摘要0.9区分原警告和CodeGuard结构策略，最多8处定位并保留总数。当前输入变化、期限耗尽或消费收据失效撤回定位/报告引用；消失仍保持任务open，不授予详细准确性或可信关闭。已完成默认/WASM真实Clang及过期/篡改回归；自动编辑、已安装宿主和完整生产资格仍缺。见[局部验收](../tests/acceptance/c-family-documentation-hook.md)。
+
+
+已确认的C/C++编辑事件可通过 `hook execute PATH --clang-tool ABS --c-standard c11 --cpp-standard c++17 --format=json` 接入有界文档观察。事件仍从stdin JSON输入，不由选项推断。缺工具/标准保留context_required；原生警告与自有结构规则分开，文档检查不消除原生语法缺口、不授予交付资格。当前仅检查所选独立源码，不覆盖项目编译参数或头文件。repair_ready仍恢复原任务标准并拒绝编辑档案覆盖。此为CLI协议候选，不代表已安装宿主验收。
