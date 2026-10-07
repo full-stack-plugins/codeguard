@@ -453,6 +453,7 @@ mod disposition_attribution;
 mod controlled_fix;
 mod plugin_api;
 mod privacy_verification;
+mod project_boundary;
 mod pascal_dependency_scan;
 mod check_objc_scan;
 mod objc_dependency_scan;
