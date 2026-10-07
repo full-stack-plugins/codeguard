@@ -176,7 +176,7 @@
   进行中：Ruff 0.16.8 局部扫描已在同轮原生执行 `--show-settings`，记录 F401/E501 全局启用状态及逐文件忽略存在性；报告规则与设置矛盾即 incomplete，损坏设置亦不作为干净证明。设置仍不能证明 `noqa` 等源码内 suppression 或批准策略 required rules 覆盖，故 `coverage_proven=false`；见 `codeguard-cli/tests/acceptance/ruff-effective-settings-observation.md`。
   后续进展：同轮 `--ignore-noqa` 对照已使源码注释抑制成为独立观察；正常诊断不包含于对照即 incomplete。仅被抑制的文件标记 `suppressed` 而非 `passed`，旧任务加 `noqa` 后复检进入 `suppression_requires_review`。逐文件配置忽略、批准规则集合和完整门禁仍缺，见 `codeguard-cli/tests/acceptance/ruff-native-suppression-observation.md`。
   进行中：相邻 `codeguard-cli/crates/codeguard-runtime` 已实现只读新鲜报告槽位与原生执行/私有日志/报告读取的同轮组合，旧报告在 spawn 前拒绝，缺报告、链接、超限或日志失败均不返回完整结果；见 `tests/acceptance/fresh-native-report-baseline.md`。PMD 6 固定 `-r` 参数已接入局部 Rust 试运行服务，核对源码、启动器及整个工具目录树的前后摘要，并核对报告文件范围、退出码与诊断数量；见 `tests/acceptance/pmd6-runtime-probe-baseline.md`。已批准制品的锁定来源与规则实际生效证据、项目扫描范围、正式 `check` 接线及同用户并发篡改防护仍缺，不能勾选。
-- [ ] 5.5 建立 adapter conformance harness；验收：F01–F10、F17 的有效与畸形报告可独立复用，mock 与真工具证据分层。
+- [x] 5.5 建立 adapter conformance harness；验收：F01–F10、F17 的有效与畸形报告可独立复用，mock 与真工具证据分层。
   F05 增量：相邻 Rust `cve rust` 对结构有效且绑定当前锁的 cargo-audit advisory，即使原生程序随后异常退出、输出完整报告后超时或在其它输出超限后，也保留局部 finding 和 `incomplete`；残缺 stdout JSON 不制造 finding，已初始化工作区仍能同步稳定完整性任务。模拟原生进程、真实工具与全适配器矩阵分层记录，见 `codeguard-cli/tests/acceptance/rust-cve-partial-native.md`。通用 conformance harness、单体 stdout 报告截断恢复、其它适配器及 F01–F10/F17 全矩阵仍缺，5.5 不勾选。
   Python CVE F05 增量：`pip-audit` 的完整 JSON 在异常退出、输出后超时或其它输出超限时，仍按本轮 PEP 751 锁归属保留局部 advisory 和具体未完成原因；残缺 JSON、锁外组件不生造项目 finding。已初始化工作区保存待核验证据并同步稳定完整性任务，见 `codeguard-cli/tests/acceptance/python-cve-partial-native.md`。模拟器不替代真实 pip-audit，通用 conformance harness 和全适配器矩阵仍缺，5.5 不勾选。
 - [ ] 5.6 实现 tools list/verify/install 的库存、制品身份和默认预览/显式安装边界，以及doctor准备报告；验收：身份通过不等于可启动，安装部分失败可恢复，准备证据带run_id并可幂等同步。
