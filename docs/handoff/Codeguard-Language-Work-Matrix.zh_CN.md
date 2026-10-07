@@ -9771,5 +9771,3 @@ OpenSpec任务：8.142, 8.143, 8.144, 15.5, 15.6, 15.7。
 - ansible/ansible-collections:实际依赖图/锁、漏洞来源及时效、原生扫描与修复复检未完整验收
 
 - ansible/ansible-collections/vulnerabilities:五平台、宿主反馈、可信关闭和复发重开未验收
-
-
