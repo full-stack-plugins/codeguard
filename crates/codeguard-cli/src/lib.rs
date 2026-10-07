@@ -436,6 +436,8 @@ mod check_report_assembly;
 #[cfg(unix)]
 mod check_ruby_scan;
 mod check_php_scan;
+mod check_scala_scan;
+mod check_elixir_scan;
 #[cfg(unix)]
 mod go_lint_fallback;
 mod go_project_version;
