@@ -300,7 +300,7 @@
   报告协议进展：新增 Rust ESLint 10 JSON 有界观察，按具体版本/冻结文件与计数解释 0/1/2、max-warnings、fatal/无 ruleId 和 suppression；合法 warning 与部分规则保留，坏范围/版本/重复/计数不自成干净结果。缺 API 先 RED，dot 路径因自动折叠再 RED 后修正；本轮只做协议夹具，不安装或执行 ESLint。CLI/Node 闭包/有效 parser/config/monorepo/依赖和任务门禁仍缺，7.3 不勾选；见相邻 tests/acceptance/eslint-json-observation.md。
 - [x] 7.4 实现 Shell（shell）方言与 Dockerfile（dockerfile）/IaC 基础；验收：zsh 不静默丢弃、Hadolint 与配置安全报告不互相掩盖故障。
 - [x] 7.5 实现 CVE 共享生态映射、依赖归并和数据库 freshness；验收：UNKNOWN/离线/原生缺失/重复依赖均符合规格。
-- [ ] 7.6 实现跨生态静态检查配置识别与原生结果归类；验收：注释/API 文档、依赖治理、SAST/秘密/IaC/容器等检查器在已配置时运行并反馈，未配置/无效/不可用分开解释，修复后按原工具复检。
+- [x] 7.6 实现跨生态静态检查配置识别与原生结果归类；验收：注释/API 文档、依赖治理、SAST/秘密/IaC/容器等检查器在已配置时运行并反馈，未配置/无效/不可用分开解释，修复后按原工具复检。
 
 ## 8. S08 全语言补齐
 
