@@ -687,3 +687,4 @@ pub mod service_boundary;
 pub mod kotlin_applicability;
 pub mod language_applicability;
 pub mod zig_applicability;
+pub mod remaining_language_applicability;
