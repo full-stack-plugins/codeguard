@@ -104,3 +104,23 @@ fn partial_gradle_cve_never_grants_native_scan_or_repair_qualification() {
             .any(|reason| reason.as_str().unwrap().contains("真实OWASP"))
     );
 }
+
+#[test]
+fn cpp_standalone_replay_is_traceable_without_project_qualification() {
+    let out = query(&["capabilities", "cpp", "--acceptance-plan", "--format=json"]);
+    assert!(out.status.success());
+    let report: Value = serde_json::from_slice(&out.stdout).unwrap();
+    let plan = &report["plan"];
+    let capability = &plan["languages"][0]["capabilities"]["syntax"];
+    assert_eq!(capability["qualification"], "blocked");
+    let evidence = "tests/acceptance/evidence/cpp17-native-wasm-differential.json";
+    for path in capability["build_paths"].as_array().unwrap() {
+        let included = path["evidence_refs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|entry| entry == evidence);
+        assert_eq!(included, path["ecosystem"] == "standalone");
+    }
+    assert!(plan["source_hashes"][evidence].is_string());
+}
