@@ -446,6 +446,8 @@ mod r_dependency_scan;
 mod check_pascal_scan;
 mod check_solidity_scan;
 mod check_terraform_scan;
+mod check_csharp_scan;
+mod check_vbnet_scan;
 mod pascal_dependency_scan;
 mod check_objc_scan;
 mod objc_dependency_scan;
