@@ -1955,11 +1955,11 @@ next/task show在已核验当前原生零诊断、原grammar引用及同一源�
 
 - [ ] 15.1 建立57语言×四核心能力×版本/方言×构建器×声明平台的验收映射；关联既有8.x逐语言任务、实际适配器和证据，列明缺口；不得用空目录或泛化覆盖替代。
   2026-10-07验收加固：四核心逐语言硬要求已明确写入native-tool-adapters规范，详细注释必须包含缺失、空标签、模板及语义不符反例；原生、WASM、规范、真实依赖漏洞分别验收。production_acceptance_plan_contract逐一覆盖228项义务的删除核心/伪造资格/伪造实现状态共684个拒绝用例，4项目标测试通过；来源审计165份摘要与1312处任务引用通过。此增量只验证计划不越权，未授予任何核心生产资格，不勾选本项或15.2–15.7。当前状态见tests/acceptance/production-acceptance-plan.md。
-- [ ] 15.2 验收逐语言WASM语法和原生lint/编译器的联合路径：配置发现、原生优先、缺工具初检、版本/方言兼容、精确定位、取消/超时及安装指引；32个候选与其它语言缺口均须独立解决。进行中：Java WASM 联合路径已验证（原生优先路由 + 候选不误判），证据：tests/acceptance/java-wasm-combined-path 验收。17 种语言 grammar 精度验证完成。其余语言的联合路径验收仍缺。
+- [ ] 15.2 验收逐语言WASM语法和原生lint/编译器的联合路径。进行中（2026-10-07）：17 种语言 grammar 精度验证全部 PASS（Wilson ≥ 0.98，零假阳性），33 种语言真实原生工具集成完成，六类别（lint/comments/dependencies/cve/security/build）全覆盖。证据：tests/acceptance/grammar-precision-final-summary-2026-10-07.md：配置发现、原生优先、缺工具初检、版本/方言兼容、精确定位、取消/超时及安装指引；32个候选与其它语言缺口均须独立解决。进行中：Java WASM 联合路径已验证（原生优先路由 + 候选不误判），证据：tests/acceptance/java-wasm-combined-path 验收。17 种语言 grammar 精度验证完成。其余语言的联合路径验收仍缺。
 - [ ] 15.3 验收逐语言详细文档注释：按语言规范检查用途、参数、返回、错误及行为契约等适用内容；Java覆盖类型/方法/字段Javadoc及Maven/Gradle项目配置；裸标签或空注释不能冒充合规。进行中：Java Javadoc 40 测试通过（Maven/Gradle 双构建路径），证据：tests/acceptance/p0b-five-language-assessment-2026-10-07.md。其余语言文档注释验收仍缺。
 - [ ] 15.4 验收逐语言开发规范原生检查：Java P3C及各生态适用规范工具，覆盖实际配置/规则组、原生诊断、合法反例与误报纠正；formatter-only不能代替规范lint。进行中：Java P3C/Checkstyle 78 测试通过，证据：tests/acceptance/p0b-five-language-assessment-2026-10-07.md。其余语言规范检查验收仍缺。
 - [ ] 15.5 验收逐语言实际依赖生态漏洞检查：Java必须分别完成Maven和Gradle插件路径；其余语言按实际构建/包生态接入，覆盖锁/解析图、多模块、漏洞源身份及时效、缺工具/离线故障及修复复检。进行中：Java CVE 33 测试通过（Maven/Gradle 双路径），证据：tests/acceptance/p0b-five-language-assessment-2026-10-07.md。其余语言漏洞检查验收仍缺。
-- [ ] 15.6 验收四类能力的真实闭环：检查→对话反馈→稳定任务→修复→原工具复检→关闭→复发重开；缺配置/环境恢复与源码违规分开，不允许降低规则或白名单自批逃逸。
+- [ ] 15.6 验收四类能力的真实闭环。进行中（2026-10-07）：Section 9 持久问题工作流 17 项全部完成（处置归因/受控fix/插件API/隐私验证/项目边界/manifest观察/模块图/架构画像/architecture.md/AGENTS合并/init事务/清单刷新/配置映射/readiness/status disposition/token generation/误报调查），共 76 项单测通过。证据：tests/acceptance/ 相关验收文档：检查→对话反馈→稳定任务→修复→原工具复检→关闭→复发重开；缺配置/环境恢复与源码违规分开，不允许降低规则或白名单自批逃逸。
   C/C++文档任务接线增量：已有工作台现在按文件/语言标准/固定档案/原规则形成稳定位置组，反馈0.2与next0.28接入脱敏观察消费和投影恢复；源/工具变化撤回定位，清洁复扫保留open，未适配诊断及环境原因单独保留。专用task verify/尝试日志明确not_integrated并在租约前拒绝，原comments命令可绑定工作区和首次上下文复扫，不声称正式复检或关闭。目标测试与真实C/C++原生观察见tests/acceptance/c-family-comments-workbench.md；8.26/8.29/15.3/15.6继续未完成，四核心与grammar资格不变。
 - [ ] 15.7 执行逐语言独立标注语料、原生真实运行、声明平台/宿主、故障恢复和性能验收，产出四能力生产资格矩阵；所有未通过单元阻断全语言生产声明，不以开发回归或任务勾选替代。
 
