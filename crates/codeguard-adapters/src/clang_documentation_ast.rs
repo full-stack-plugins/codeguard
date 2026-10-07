@@ -306,3 +306,50 @@ fn function(node: &Value, source: &str) -> Result<Value, &'static str> {
         "structure_status":if inherited {"unknown_redeclaration"}else if !supported {"unresolved_comment_structure"}else{"observed_supported_subset"}}),
     )
 }
+
+/// 返回编译进当前适配器的解析器与结构校验器身份；不读取可被项目修改的运行时文件。
+/// 返回带域及文件边界的SHA256，用于区分检查引擎升级前后的尝试输入，不授予资格。
+pub fn clang_documentation_structure_engine_sha256() -> String {
+    engine_sha256(
+        include_bytes!("clang_documentation_ast.rs"),
+        include_bytes!("clang_documentation_structure.rs"),
+    )
+}
+
+fn engine_sha256(parser: &[u8], validator: &[u8]) -> String {
+    use sha2::{Digest, Sha256};
+    let mut digest = Sha256::new();
+    digest.update(b"codeguard-clang-documentation-structure-engine-v1\0");
+    for bytes in [parser, validator] {
+        digest.update((bytes.len() as u64).to_le_bytes());
+        digest.update(bytes);
+    }
+    format!("{:x}", digest.finalize())
+}
+
+#[cfg(test)]
+mod engine_identity_tests {
+    #[test]
+    fn engine_identity_changes_for_each_component_and_preserves_file_boundaries() {
+        let baseline = super::engine_sha256(b"parser-v1", b"validator-v1");
+        assert_ne!(
+            baseline,
+            super::engine_sha256(b"parser-v2", b"validator-v1")
+        );
+        assert_ne!(
+            baseline,
+            super::engine_sha256(b"parser-v1", b"validator-v2")
+        );
+        assert_ne!(
+            super::engine_sha256(b"ab", b"c"),
+            super::engine_sha256(b"a", b"bc")
+        );
+        let compiled = super::clang_documentation_structure_engine_sha256();
+        assert_eq!(compiled.len(), 64);
+        assert!(
+            compiled
+                .bytes()
+                .all(|byte| byte.is_ascii_hexdigit() && !byte.is_ascii_uppercase())
+        );
+    }
+}

@@ -1264,3 +1264,11 @@ Free operator declarations whose Clang semantic names are not ordinary source id
 #### Scenario: Operator and ordinary function coexist
 - **WHEN** an AST contains a free operator+ declaration and a supported ordinary function
 - **THEN** the adapter SHALL keep the operator's FunctionDecl kind unresolved, retain the ordinary function's source-bound observation and leave coverage unproven
+
+### Requirement: Structural documentation attempt identity SHALL bind the compiled engine
+
+Current attempt input identity SHALL include the compiled structural parser and validator fingerprint and the compiled recheck implementation identity, in addition to original scope/standard/profile, frozen source and native tool identity. The engine fingerprint SHALL separate file boundaries and be embedded from build inputs rather than reading project-editable source files at runtime. Engine changes SHALL distinguish current-input accounting without deleting prior attempts, authorizing rule edits or closing unqualified tasks. Legacy input-v1 history SHALL remain visible and SHALL NOT be rewritten as current input-v2 evidence.
+
+#### Scenario: Structural engine upgrade with unchanged source
+- **WHEN** a structural parser, validator or recheck implementation changes while project source and Clang remain unchanged
+- **THEN** the current attempt input SHALL have a different identity, retain previous history and require current original-tool observation rather than reuse old evidence as a trusted current result

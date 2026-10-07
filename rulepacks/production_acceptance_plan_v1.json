@@ -16,12 +16,12 @@
     "crates/codeguard-adapters/src/cargo_documentation_config.rs": "2544cb061cd0f89cd888b6e5de933c88ad6efd6a160e81c5d5869023bb67e8b6",
     "crates/codeguard-adapters/src/cargo_documentation_workspace.rs": "0814890f213919c7a111ea520e26ced4110d6afa98b8583e1b99d79027aa6ebd",
     "crates/codeguard-adapters/src/cargo_workspace_reference.rs": "95f9ed06ac881ee17a124edca4ae3f6541690ef60aeabd0d1a6ffac0ede1cb02",
-    "crates/codeguard-adapters/src/clang_documentation_ast.rs": "78abc5ba64dd50f6badc7a7c0b10cb27cbf636eb02497486375011cf2c743af7",
+    "crates/codeguard-adapters/src/clang_documentation_ast.rs": "8821e76706b91ee2e880c154fbc92f39249c9940190f84d7a081a0b784c1f915",
     "crates/codeguard-adapters/src/clang_documentation_rule.rs": "4e7a99010c5a62fdd6812ce16068749863a5777df1103e304055ad8e3d8f834c",
     "crates/codeguard-adapters/src/clang_documentation_structure.rs": "368112aafedb8144d38cc05466586e7b3a21e6e937ceaade76133b9113fd005a",
     "crates/codeguard-adapters/src/gradle_dependency_check_plan.rs": "dfb85a3dfcf6c5e0697bb3eb58ecbd8f2d47feb71f60db506f765b0ee86b23f3",
     "crates/codeguard-adapters/src/gradle_owasp_report_ownership_parser.rs": "11d06f8905022307d99b50e68d1bfd44bd2f2fdd29d85872bef1d40864b83c00",
-    "crates/codeguard-adapters/src/lib.rs": "c312683cf5f82653095f8ef00b9a824bef76655f4878b9691a077387a3cf18c9",
+    "crates/codeguard-adapters/src/lib.rs": "b76e26cd65a1fcffdad8a177ffd6e1e5e9bdd4e710f03d6e88c1a4cef7f321e7",
     "crates/codeguard-adapters/src/ruff_settings.rs": "23736d55ef974a9f0b571d162365c6554001fa5ee3b2b69db6deb4507466af88",
     "crates/codeguard-adapters/tests/clang_documentation_ast_contract.rs": "af58dd3eede7b054aeab43fc873967d0416091616068a022fde9adc868ace36b",
     "crates/codeguard-adapters/tests/clang_documentation_contract.rs": "9d603b7ccb435c5e55837156e76d506573e8703aadf7017be07b6cf28281e261",
@@ -34,7 +34,7 @@
     "crates/codeguard-cli/src/c_family_documentation_hook_feedback.rs": "1383e431164354baa5fa409b6e7f1663350b749f609a2036c29e6c91def1044b",
     "crates/codeguard-cli/src/c_family_documentation_host_guidance.rs": "ded9f6e95cb1c18f212515649b3433020ffc576cda7ac3ef610bf4941b068a7b",
     "crates/codeguard-cli/src/c_family_structure_recheck_tests.rs": "5ac88014e68edb0942630301d57c8fa681224e047ab4eb86102c8c28ba9e4fd0",
-    "crates/codeguard-cli/src/c_family_structure_task_recheck.rs": "7541a9ba01011918b5b971126e39fb2d84d80ade422a04f94fc4c8063a0a859b",
+    "crates/codeguard-cli/src/c_family_structure_task_recheck.rs": "aec51557f6e73cab32557c13993fec93a04be271715d86a09479d8dcfe9c9f97",
     "crates/codeguard-cli/src/c_family_structure_workbench.rs": "4b03b9ac3d7dbd1f02ca6ea0461ee99ae71ff84637d3ef03b24366caf550466f",
     "crates/codeguard-cli/src/cargo_audit_command.rs": "4d49405d1e69a55ba13046f463663443ef30c1a931451c044bed5b3b8d0c0749",
     "crates/codeguard-cli/src/cargo_audit_database_snapshot.rs": "c21185f19669ab6a8568c2d00f218251bc1e6cb35a4057c401c4cee69713db8a",
@@ -173,6 +173,7 @@
     "tests/acceptance/cargo-documentation-explicit-workspace.md": "69a80fd1779e46228790530792a24168ad348ec5b1fe109f2991fe4e304769ad",
     "tests/acceptance/cargo-documentation-workspace.md": "6be1ac870924db90f8d2b9aa6cfa298f4a825ce659f998d2121f4c7b4089b9a4",
     "tests/acceptance/check-c-family-documentation.md": "80e07e8dba544f8b477f232bac9ca19b2d0c1f1dffd163445b0887e56a31873d",
+    "tests/acceptance/clang-documentation-engine-identity.md": "a6f30a2f10af5ef45b20716ac6f9d885e39aafcddd597dad819a90162cfd1e8b",
     "tests/acceptance/clang-documentation-structure.md": "bbcb5fd87cbbf99054b5639caa56d212ef83cf3135d8867eb99ace74a0c86e10",
     "tests/acceptance/clang-preprocessor-context.md": "3af1710a54102c854824f2402e1ca15e14fd38c72299b9811398f4c486148565",
     "tests/acceptance/clang-standalone-native.md": "155e64133bc4353cdbfe223c8e2c5bf1d2ab2c3e95c7c2e0232e9931988db017",
@@ -3223,7 +3224,8 @@
                 "tests/acceptance/evidence/c-family-host-default-c.json",
                 "tests/acceptance/evidence/c-family-host-default-cpp.json",
                 "tests/acceptance/evidence/c-family-host-wasm-c.json",
-                "tests/acceptance/evidence/c-family-host-wasm-cpp.json"
+                "tests/acceptance/evidence/c-family-host-wasm-cpp.json",
+                "tests/acceptance/clang-documentation-engine-identity.md"
               ],
               "blockers": [
                 "C/C++结构文件策略任务、原工具task verify、受控repair-source尝试及同一输入两次失败预算已接线；跨输入语义无进展、可信关闭/复发、check/Hook与详细语义/完整项目/独立精度仍未验收。",
@@ -3627,7 +3629,8 @@
                 "tests/acceptance/cpp17-member-workbench.md",
                 "tests/acceptance/evidence/cpp17-member-workbench-default.json",
                 "tests/acceptance/evidence/cpp17-member-workbench-wasm.json",
-                "tests/acceptance/evidence/cpp17-member-workbench-schema.json"
+                "tests/acceptance/evidence/cpp17-member-workbench-schema.json",
+                "tests/acceptance/clang-documentation-engine-identity.md"
               ],
               "blockers": [
                 "C/C++结构文件策略任务、原工具task verify、受控repair-source尝试及同一输入两次失败预算已接线；跨输入语义无进展、可信关闭/复发、check/Hook与详细语义/完整项目/独立精度仍未验收。",

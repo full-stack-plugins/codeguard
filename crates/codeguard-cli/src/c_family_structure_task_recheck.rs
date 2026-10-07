@@ -311,7 +311,7 @@ pub(crate) fn attempt_input_digest(root: &Path, brief: &Value) -> Result<String,
     } else {
         "unavailable"
     };
-    let payload = json!({"version":"clang-documentation-structure-attempt-input-v1","scope":path,"language":first["language"],"standard":first["standard"],"profile":first["profile"],"policy":contract::RULE,"source_sha256":format!("{:x}",Sha256::digest(bytes)),"selected_tool":first["selected_tool"],"canonical_tool":canonical,"tool_state":state,"tool_sha256":tool_bytes.as_ref().map(|b|format!("{:x}",Sha256::digest(b)))});
+    let payload = json!({"version":"clang-documentation-structure-attempt-input-v2","scope":path,"language":first["language"],"standard":first["standard"],"profile":first["profile"],"policy":contract::RULE,"structure_engine_sha256":codeguard_adapters::clang_documentation_structure_engine_sha256(),"recheck_engine_sha256":format!("{:x}", Sha256::digest(include_bytes!("c_family_structure_task_recheck.rs"))),"source_sha256":format!("{:x}",Sha256::digest(bytes)),"selected_tool":first["selected_tool"],"canonical_tool":canonical,"tool_state":state,"tool_sha256":tool_bytes.as_ref().map(|b|format!("{:x}",Sha256::digest(b)))});
     let bytes = serde_json::to_vec(&payload).map_err(|_| "attempt_input_encoding_failed")?;
     Ok(format!("{:x}", Sha256::digest(bytes)))
 }
