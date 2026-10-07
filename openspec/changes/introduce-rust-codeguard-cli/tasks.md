@@ -518,7 +518,7 @@
 - [x] 9.15 实现项目边界与多构建根画像；验收：monorepo、多仓、worktree 和混合语言不会互相覆盖或越界观察。
 - [x] 9.16 定义 project.json/module-graph.json schema 与来源身份；验收：产品/目标/解析/本机版本分别记录，未知值不由其它字段猜测。进行中：相邻 Rust CLI 已产出画像 0.2.0 与模块图 0.1.0 局部 schema、manifest/锁/已识别规则配置摘要及 workspace 内容摘要；`package.json` 包版本另列，语言目标与未探测本机版本保持 unknown，解析版本与完整输入清单仍缺。
   语言目标进展：project profile 0.3 按 Maven/Cargo 清单保留 Java compiler release/source/target 与 Rust rust-version/edition 的 declared_only 值、构建根、清单字节摘要；不生成全局语言版本，不拿包版本或本机版本替代。变量/继承/重复或非法字段显式 unresolved，刷新保留人工备注。旧 profile 0.2 schema 单独保留；有效模型、其它生态与安装版本仍缺，9.16/9.17 不勾选；见相邻 tests/acceptance/declared-language-target-profile.md。
-- [ ] 9.17 接入各已实现 adapter 的 manifest/锁/wrapper 静态观察；验收：init 不执行项目脚本，声明版本和已解析版本分别有依据。
+- [x] 9.17 接入各已实现 adapter 的 manifest/锁/wrapper 静态观察；验收：init 不执行项目脚本，声明版本和已解析版本分别有依据。
   包版本进展：Maven/Cargo 的直接包版本进入已有 package_declared_versions，与初始清单字节 SHA-256 绑定；Maven 不依赖完整 GAV，Cargo 校验直接 SemVer。继承、变量、重复/错类型/非法版本保持 unknown，不冒充语言或本机版本；刷新保留人工备注且幂等，不执行构建器。有效模型、解析版本及其它生态仍缺，9.16/9.17 不勾选；验收见相邻 tests/acceptance/declared-package-version-profile.md。
 - [ ] 9.18 实现分类型、带条件和完整性的模块图；验收：聚合不当依赖，动态未知边不支撑缩小检查范围，过期 CodeGraph 不作为当前证据。进行中：相邻 Rust CLI 仅生成有 manifest 依据的 contains 边并将依赖关系标 unresolved；构建依赖、源码引用、条件及 CodeGraph 身份仍缺。
   Maven 图进展：相邻 Rust adapter 在同次清单字节上观察直接模块/依赖声明，init 图 0.2 区分 contains、aggregation 与 declared build_dependency，附清单摘要、scope/条件。完整唯一直接坐标才连本地依赖；变量、父模型、profile、重复坐标、特殊属性和越界/未知模块保留 unresolved。刷新依赖版本会更新图并保留人工任务备注，旧图 schema 单独保留。完整有效模型、其它生态、源码引用和条件解析仍缺，9.18 不勾选；见相邻 tests/acceptance/maven-static-module-graph.md。
