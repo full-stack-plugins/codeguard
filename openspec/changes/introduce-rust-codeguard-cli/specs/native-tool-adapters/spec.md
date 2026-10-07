@@ -1358,3 +1358,11 @@ The C/C++ placeholder policy SHALL use the existing lease-protected append-only 
 - **WHEN** two lease-bound attempts report ready-to-verify and their original placeholder rechecks still observe the same policy on the same input
 - **THEN** the brief exposes the retained failure history and exhausted budget, mutation scope is empty, and another start is rejected
 - **AND** rescanning or regenerating the readable task does not restore the budget
+### Requirement: Failed placeholder rechecks SHALL retain bounded diagnostic observations
+
+After a valid original-task preflight, a completed native execution attempt that cannot establish a placeholder observation SHALL produce a versioned incomplete recheck with its native diagnostics and explicit placeholder failure state. Syntax errors, unavailable AST and exhausted native execution budgets SHALL NOT become empty-clean results or reuse historical positions. The original open task SHALL remain open. Failure observation persistence MAY finish synchronously under the existing verification lock after the native execution deadline, without starting another process or granting quality authority; cancellation SHALL still prevent persistence. The report, consumption receipt and append-only verification event SHALL remain linked. Current incomplete evidence SHALL withdraw repair permission; a later original successful observation MAY restore only local task guidance.
+
+#### Scenario: Native error and native timeout preserve diagnostic state
+- **WHEN** a bound original C/C++ placeholder task is rechecked against a source syntax error or a native timeout
+- **THEN** its incomplete native observation, receipt and task event are retained synchronously
+- **AND** the current brief has no placeholder positions or mutation scope, the finding stays open, and neither failure is reported as candidate absence

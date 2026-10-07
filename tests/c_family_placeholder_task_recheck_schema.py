@@ -15,7 +15,7 @@ for path in sorted((root / "schemas").glob("*.schema.json")):
     registry = registry.with_resource(path.name, resource)
     if "$id" in schema:
         registry = registry.with_resource(schema["$id"], resource)
-schema = json.loads((root / "schemas/task-verification-preview-v0.38.schema.json").read_text())
+schema = json.loads((root / "schemas/task-verification-preview-v0.39.schema.json").read_text())
 Draft202012Validator.check_schema(schema)
 validator = Draft202012Validator(schema, registry=registry)
 assert len(sys.argv) == 3, "显式传入实际C、C++公开复检JSON"

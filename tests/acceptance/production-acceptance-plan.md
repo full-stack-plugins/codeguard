@@ -1,6 +1,6 @@
 # 四核心生产验收计划局部验收
 
-当前源码状态（2026-10-07）：57语言、228项核心义务全部blocked；364条构建生态路径为52 partial、26 wasm_candidate_only、286 not_integrated，来源摘要283份。OpenSpec任务66已完成、288未完成；正式grammar资格0/32。下面的49/50 partial与52/56份来源摘要是历史检查点，不代表当前完成度。
+当前源码状态（2026-10-07）：57语言、228项核心义务全部blocked；364条构建生态路径为46 partial、26 wasm_candidate_only、292 not_integrated，来源摘要312份。六条仅配置发现的路径已纠正为not_integrated，不计作执行能力。OpenSpec任务66已完成、288未完成；正式grammar资格0/32。下面的49/50 partial与52/56份来源摘要是历史检查点，不代表当前完成度。
 
 本次强化：适配器契约逐项对57×4义务拒绝核心缺失、伪造qualification及伪造implementation_status，共684种输入；三类篡改不因语言位于清单末尾而漏检。真实工具、独立精度、详细注释、原任务复检和生产资格仍按原未完成任务继续推进，不因此勾选父任务。明确验收要求见[正式规范](../../openspec/changes/introduce-rust-codeguard-cli/specs/native-tool-adapters/spec.md)。
 
