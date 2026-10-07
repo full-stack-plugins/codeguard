@@ -329,7 +329,9 @@ fn replay_expanded_cohorts_and_archive_current_evidence() {
     for row in report["cases"].as_array().unwrap() {
         assert_eq!(row["attempted"], true, "{row}");
         assert!(
-            row["reason"].is_null() || row["reason"] == "syntax_recovery_incomplete",
+            row["reason"].is_null()
+                || row["reason"] == "syntax_recovery_incomplete"
+                || row["reason"] == "parser_error_location_unavailable",
             "{row}"
         );
     }
@@ -511,7 +513,9 @@ fn replay_every_bundled_language_and_archive_current_evidence() {
     for row in cases {
         assert_eq!(row["attempted"], true, "{row}");
         assert!(
-            row["reason"].is_null() || row["reason"] == "syntax_recovery_incomplete",
+            row["reason"].is_null()
+                || row["reason"] == "syntax_recovery_incomplete"
+                || row["reason"] == "parser_error_location_unavailable",
             "{row}"
         );
     }

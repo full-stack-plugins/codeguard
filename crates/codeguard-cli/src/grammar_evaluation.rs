@@ -204,7 +204,7 @@ mod replay {
                     (
                         classify_probe(obs.recoveries.len(), truncated),
                         Some(obs.recoveries.len()),
-                        truncated.then_some("syntax_recovery_incomplete".to_owned()),
+                        obs.evaluation_incomplete_reason().map(str::to_owned),
                         true,
                     )
                 }
