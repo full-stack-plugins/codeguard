@@ -683,3 +683,4 @@ pub mod false_positive_investigation;
 pub mod attempt_ledger;
 pub mod status_disposition;
 pub mod unified_command;
+pub mod service_boundary;

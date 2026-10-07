@@ -15,7 +15,7 @@
 - [x] 1.3 建立 crate 依赖方向检查；验收：core→runtime、adapters→runtime、宿主 SDK 入 core 等反例均被拒绝。证据：相邻 `codeguard-cli/crates/codeguard-cli/tests/crate_boundaries.rs` 与工程基线验收记录；检查器已改用 Rust 消费 Cargo metadata。
 - [x] 1.4 创建真实语料登记、脱敏和 oracle 格式，收录当前误判/假通过最小样本；验收：源码/工具/规则身份可复现，争议样本独立标记。证据：相邻 `codeguard-cli/tests/acceptance/corpus-baseline.md`；Rust 语料验证与真实 Ruff/Maven 回放已替代新工程的 Python 辅助脚本，历史未复现样本不计入已接受 oracle。
 - [x] 1.5 定义 language×category×platform 能力 schema 和生成文档入口；验收：54 stable/3 planned 全覆盖，formatter-only 不能伪装 lint。证据：相邻 `codeguard-cli/tests/acceptance/capability-inventory.md`；当前全部单元诚实标记为 gap。
-- [ ] 1.6 固化应用服务与ports边界：观察/政策/计划/检查/交付/存储/租约/修复及schema所有权；交付：真实领域契约和依赖测试；验收：CLI/MCP共用服务、core无基础设施依赖，新CLI与验收工具为Rust实现，P3C/Maven等通过Rust runtime调用其原生命令，不以空stub计功能完成。
+- [x] 1.6 固化应用服务与ports边界：观察/政策/计划/检查/交付/存储/租约/修复及schema所有权；交付：真实领域契约和依赖测试；验收：CLI/MCP共用服务、core无基础设施依赖，新CLI与验收工具为Rust实现，P3C/Maven等通过Rust runtime调用其原生命令，不以空stub计功能完成。
 
 ## 2. S02 CLI、结果模型与门禁
 
