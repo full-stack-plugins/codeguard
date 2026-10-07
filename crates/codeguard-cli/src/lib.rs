@@ -676,3 +676,4 @@ pub mod init_readiness;
 pub mod token_generation;
 pub mod rules_config_commands;
 pub mod whitelist_matcher;
+pub mod run_config_policy;
