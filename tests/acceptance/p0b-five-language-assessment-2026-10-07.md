@@ -35,3 +35,28 @@
 2. documentation：Javadoc 规则验收
 3. conventions：P3C 规则加载
 4. vulnerabilities：OWASP 依赖图
+
+## Java documentation 能力验证（2026-10-07）
+
+使用 Maven 3.9.16 + javac 21 验证 Javadoc 能力：
+
+| 测试套件 | 通过 | 忽略 | 状态 |
+|---|---|---|---|
+| java_javadoc_cli | 5 | 1 | ✅ |
+| maven_javadoc_detailed_descriptions | 4 | 2 | ✅ |
+| maven_javadoc_input_stability | 6 | 0 | ✅ |
+| gradle_javadoc_probe | 6 | 3 | ✅ |
+| gradle_javadoc_projection | 5 | 1 | ✅ |
+| gradle_javadoc_task_recheck | 11 | 2 | ✅ |
+| gradle_javadoc_work_sync | 3 | 1 | ✅ |
+| **总计** | **40** | **10** | ✅ |
+
+**已验证**：
+- Javadoc 详细描述检查（用途/参数/返回/异常）
+- Maven/Gradle 双构建路径
+- 原生工具复检与任务稳定
+- 输入稳定性与配置变化处理
+
+**待验证**（需 Maven 离线缓存）：
+- 真实 Maven Javadoc 插件执行
+- 完整离线依赖缓存
