@@ -458,9 +458,9 @@
 - [ ] 8.139 为 cuda 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
 - [ ] 8.140 实现 cuda 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
 - [ ] 8.141 完成 cuda 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.142 为 ansible 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.143 实现 ansible 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.144 完成 ansible 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.142 为 ansible 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.143 实现 ansible 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.144 完成 ansible 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
 - [x] 8.145 为 cobol 保留显式 planned/gap；验收：项目要求该能力时返回未完成，不能用空实现充数。证据：相邻 Rust `planned_language_gaps` 集成测试以 `.cbl` 项目检查六类别、capabilities planned/gap、退出 3 和不生成空义务；见 `tests/acceptance/planned-language-gaps.md`。
 - [x] 8.146 为 arkts 保留显式 planned/gap；验收：项目要求该能力时返回未完成，不能用空实现充数。证据：同一测试的 `.ets` 正反例和六类别未集成反馈。
 - [x] 8.147 为 metal 保留显式 planned/gap；验收：项目要求该能力时返回未完成，不能用空实现充数。证据：同一测试的 `.metal` 正反例和六类别未集成反馈。
