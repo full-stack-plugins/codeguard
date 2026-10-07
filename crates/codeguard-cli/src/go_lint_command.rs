@@ -62,7 +62,11 @@ pub fn run(args: &[String]) -> ExitCode {
     let deadline = started + Duration::from_millis(arguments.timeout_ms);
     let root = match arguments.root.canonicalize() {
         Ok(path) if path.is_dir() => path,
-        _ => return emit(empty_feedback(), arguments.json),
+        _ => {
+            let mut feedback = empty_feedback();
+            mark_request_cancellation(&mut feedback);
+            return emit(feedback, arguments.json);
+        }
     };
     let cancelled = AtomicBool::new(false);
     let selection = crate::go_tool_selection::GoToolSelection::discover(arguments.tool);
@@ -77,7 +81,19 @@ pub fn run(args: &[String]) -> ExitCode {
             arguments.json,
         );
     }
+    // 持久化身份保持可导入的 incomplete/3；公开反馈按取消契约标 130。
+    mark_request_cancellation(&mut feedback);
     emit(feedback, arguments.json)
+}
+
+/// 请求取消只改公开反馈的退出语义；不撤销已观察的原生结果或发现。
+pub(crate) fn mark_request_cancellation(feedback: &mut Value) {
+    if feedback["reason"] == "request_cancelled"
+        || codeguard_runtime::sigint_cancellation_requested()
+    {
+        feedback["command_status"] = json!("cancelled");
+        feedback["exit_code"] = json!(130);
+    }
 }
 
 /// 与 `check all` 共用同一受控 Go 观察，不赋予策略或门禁权威。
@@ -910,9 +926,13 @@ fn parse_go_version(stdout: &[u8]) -> Option<&str> {
 }
 
 fn emit(feedback: Value, json_format: bool) -> ExitCode {
+    let exit = feedback["exit_code"].as_u64().unwrap_or(3) as u8;
     if json_format {
         println!("{feedback}");
     } else {
+        if feedback["command_status"] == "cancelled" {
+            println!("Go 检查已取消（退出 130）；保留已观察结果，不签发任何通过结论");
+        }
         println!(
             "Go vet：{}",
             feedback["native_status"].as_str().unwrap_or("incomplete")
@@ -941,5 +961,5 @@ fn emit(feedback: Value, json_format: bool) -> ExitCode {
             feedback["reason"].as_str().unwrap_or("unknown")
         );
     }
-    ExitCode::from(3)
+    ExitCode::from(exit)
 }

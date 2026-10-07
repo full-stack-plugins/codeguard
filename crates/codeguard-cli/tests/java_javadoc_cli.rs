@@ -223,6 +223,78 @@ fn real_jdk21_javadoc_missing_and_documented_examples() {
         documented_record["local_status"], "clean_scope_unproven",
         "{documented_record}"
     );
+    // 重载：已文档化的重载不得误报，未文档化的重载必须逐参数/返回定位。
+    fs::write(
+        &source,
+        "/** Calculator. */\npublic class Bad {\n  /** Creates the calculator. */ public Bad() {}\n  /** Adds two ints.\n   * @param a first addend\n   * @param b second addend\n   * @return the sum\n   */\n  public int add(int a, int b) { return a + b; }\n  /** Adds two longs. */\n  public int add(long a, long b) { return (int) (a + b); }\n}\n",
+    )
+    .unwrap();
+    let overloads = run(&source);
+    assert_eq!(
+        overloads["local_status"], "findings_observed_untrusted",
+        "{overloads}"
+    );
+    let overload_findings = overloads["findings"].as_array().unwrap().clone();
+    let mut overload_rules: Vec<_> = overload_findings
+        .iter()
+        .map(|finding| finding["rule_id"].as_str().unwrap().to_owned())
+        .collect();
+    overload_rules.sort_unstable();
+    assert_eq!(
+        overload_rules,
+        [
+            "JavadocMissingParam",
+            "JavadocMissingParam",
+            "JavadocMissingReturn"
+        ],
+        "{overloads}"
+    );
+    for finding in &overload_findings {
+        // 全部诊断必须锚定在未文档化的 long 重载行，而不是已文档化的 int 重载。
+        assert_eq!(finding["line"], 11, "{finding}");
+    }
+    fs::write(
+        &source,
+        "/** Calculator. */\npublic class Bad {\n  /** Creates the calculator. */ public Bad() {}\n  /** Adds two ints.\n   * @param a first addend\n   * @param b second addend\n   * @return the sum\n   */\n  public int add(int a, int b) { return a + b; }\n  /** Adds two longs.\n   * @param a first addend\n   * @param b second addend\n   * @return the sum\n   */\n  public int add(long a, long b) { return (int) (a + b); }\n}\n",
+    )
+    .unwrap();
+    let documented_overloads = run(&source);
+    assert_eq!(
+        documented_overloads["local_status"], "clean_scope_unproven",
+        "{documented_overloads}"
+    );
+    assert!(
+        documented_overloads["findings"]
+            .as_array()
+            .unwrap()
+            .is_empty(),
+        "{documented_overloads}"
+    );
+    // 完整中文文档不得产生误报。
+    fs::write(
+        &source,
+        "/** 计算器示例。 */\npublic class Bad {\n  /** 创建计算器。 */ public Bad() {}\n  /** 返回输入数值。\n   * @param value 输入的整数\n   * @return 原值返回\n   * @throws IllegalArgumentException 输入为负时抛出\n   */\n  public int run(int value) throws IllegalArgumentException { if (value < 0) { throw new IllegalArgumentException(); } return value; }\n}\n",
+    )
+    .unwrap();
+    let chinese = run(&source);
+    assert_eq!(chinese["local_status"], "clean_scope_unproven", "{chinese}");
+    assert!(
+        chinese["findings"].as_array().unwrap().is_empty(),
+        "{chinese}"
+    );
+    if let Some(path) = std::env::var_os("CODEGUARD_JAVADOC_NATIVE_REPORT") {
+        fs::write(
+            path,
+            serde_json::to_vec_pretty(&serde_json::json!([
+                {"case": "record_documented", "report": documented_record},
+                {"case": "overloads_undocumented", "report": overloads},
+                {"case": "overloads_documented", "report": documented_overloads},
+                {"case": "chinese_documented", "report": chinese}
+            ]))
+            .unwrap(),
+        )
+        .unwrap();
+    }
     fs::write(&source, "import lombok.Data;\n/** Lombok model. */\n@Data public class Bad { private int value; }\n").unwrap();
     let unresolved_classpath = run(&source);
     assert_eq!(

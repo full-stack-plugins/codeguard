@@ -32,16 +32,21 @@ pub fn run(args: &[String]) -> ExitCode {
     let selection = ZigToolSelection::discover(args.zig_tool.clone());
     let selected_target = selection.tool().and_then(|p| p.canonicalize().ok());
     let mut report = json!({
-        "schema_version":"0.2.0", "report_type":"zig_lint_feedback",
+        "schema_version":"0.3.0", "report_type":"zig_lint_feedback",
         "tool_selection":selection.report(), "source_current":false,
         "operation":"lint", "language":"zig", "path":args.source,
-        "status":"incomplete", "coverage_proven":false,
+        "status":"incomplete", "command_status":"incomplete", "exit_code":3,
+        "coverage_proven":false,
         "delivery_decision":"not_evaluated", "authority":"local_unverified",
         "source_sha256":null,
         "native":{"status":"not_run","reason":"zig_tool_not_found_on_path","version":null,"tool_sha256":null,"diagnostics":[]},
         "syntax_precheck":null,
         "next_action":"提供适用的 Zig 0.16.0 原生工具并运行 ast-check；候选语法初检不能代替完整 lint、编译或测试"
     });
+    // 取消先于任何工具或候选执行；不得在取消后继续启动新检查。
+    if codeguard_runtime::sigint_cancellation_requested() {
+        return cancelled(&mut report, args.json);
+    }
     if args
         .source
         .extension()
@@ -91,6 +96,12 @@ pub fn run(args: &[String]) -> ExitCode {
                 Some("completed" | "diagnostics_observed")
             );
             report["native"] = native;
+            // 原生阶段被取消时不落入 WASM 候选初检；保留取消语义并返回 130。
+            if report["native"]["reason"] == "request_cancelled"
+                || codeguard_runtime::sigint_cancellation_requested()
+            {
+                return cancelled(&mut report, args.json);
+            }
             if completed {
                 report["next_action"] =
                     json!(if report["native"]["status"] == "diagnostics_observed" {
@@ -173,8 +184,26 @@ pub fn run(args: &[String]) -> ExitCode {
     if selection.tool().is_some() && report["source_current"] == true {
         crate::native_syntax_confirmation::connect_file(&args.source, &mut report, deadline);
     }
+    // 候选初检期间收到的取消同样不签发任何通过结论。
+    if codeguard_runtime::sigint_cancellation_requested() {
+        return cancelled(&mut report, args.json);
+    }
     emit(&report, args.json);
     ExitCode::from(3)
+}
+
+/// 记录取消终态并返回 130；不缓存 clean，不把取消解释成检查通过或工具缺陷。
+fn cancelled(report: &mut Value, json_format: bool) -> ExitCode {
+    report["status"] = json!("cancelled");
+    report["command_status"] = json!("cancelled");
+    report["exit_code"] = json!(130);
+    report["coverage_proven"] = json!(false);
+    report["delivery_decision"] = json!("not_evaluated");
+    report["next_action"] = json!(
+        "请求已取消；保留取消状态，不缓存也不签发 clean；需要时以同一工具和输入重新执行原检查"
+    );
+    emit(report, json_format);
+    ExitCode::from(130)
 }
 
 fn observe_native(tool: &Path, source: &[u8], deadline: Instant) -> Option<Value> {
@@ -218,6 +247,9 @@ fn emit(report: &Value, json_format: bool) {
     if json_format {
         println!("{report}");
     } else {
+        if report["command_status"] == "cancelled" {
+            println!("Zig 检查已取消（退出 130）；不缓存 clean，不签发任何通过结论");
+        }
         println!(
             "Zig 局部检查未完成：原生 {}，候选语法 {}；{}",
             report["native"]["status"].as_str().unwrap_or("incomplete"),

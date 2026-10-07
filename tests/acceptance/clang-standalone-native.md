@@ -17,3 +17,7 @@ SARIF固定同stdin的file://制品、driver版本、Unicode码点列、规则�
 warning退出0仍有原生诊断的公开反例先RED；最终启用Wall/Extra/Pedantic及等级化读者，保留warning而不当作无诊断。真实档案八份反馈与受控四份反馈分开；旧语法差分语料不因为警告档案升级改变oracle。
 
 最终封闭协议校验：受控四份和真实八份报告共十二份通过0.2 schema，八种矛盾变体被拒绝；368份schema元定义通过。默认及WASM的CLI/adapters全目标Clippy -D warnings均终态通过；crate分层、OpenSpec strict及diff检查通过。以上只验收明确标准的独立原生入口，项目及工作台父任务继续开放。
+
+## 2026-10-07 增量：显式头文件进入独立语法入口
+
+`lint c|cpp` 的明确标准入口此前把头文件一律挡在 `clang_source_scope_unavailable`；先写 RED（受控工具下 `a.h`/`a.hpp`/`a.hh`/`a.hxx` 均未进入原生观察）后，同语言扩展表纳入 `c:h` 与 `cpp:hpp|hh|hxx|H|h++`。`.h` 在 cpp 语言下保持 C/C++ 双重身份歧义、显式拒绝，不猜语言。头文件与源文件共用同一预处理守卫：`#include` 指令仍为 `clang_preprocessor_context_unresolved`，不制造源码违规，头文件/宏上下文义务继续开放。受控目标 8 通过、0 失败、3 忽略；真实 `/usr/bin/clang`（Apple clang 21.0.0 (clang-2100.3.34.2)）头文件目标通过：四个扩展的 `int x = ;` 得到 `clang.err_expected_expression` 诊断、`int x = 1;` 零诊断，cpp+`.h` 保持 scope 拒绝，证据存 `/tmp/cg-clang-header-evidence/headers.json`。编译数据库接入原生执行、模板/析构/类声明的文档解析仍在其它模块归属下开放，8.25–8.30 父任务不因此勾选。

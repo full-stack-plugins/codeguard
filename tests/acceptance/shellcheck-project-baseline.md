@@ -48,3 +48,7 @@ SARIF反例先因原生Shell结果未进入投影而失败；修复后只保留i
 ## 仍开放的验收范围
 
 完整源文件source跟随和项目义务、可信政策关闭与复发、其他Shell专用工具、Dockerfile/IaC、跨平台、实际宿主对话和发行验收仍未完成。全量语言任务与7.4/S09不能根据本局部报告勾选。任务删除、诊断为零或工具安装成功不允许签发项目allow。
+
+## 2026-10-07 增量：方言保留与配置安全反例
+
+`check_all_shell` 新增两项回归锁定（均为既有正确行为加锁，不是新修复）：`env -S zsh`/`env zsh` shebang 与 `.zsh` 扩展一样保留 `dialect=zsh` 并以 `shell_dialect_unsupported` 阻塞原生执行，不被默认方言吞掉也不产生诊断；根 `.shellcheckrc` 启用 `external-sources=true` 时只阻塞受它影响的根文件（`native.reason=shellcheck_external_sources_unverified`、`project_configuration.status=unknown` 且不暴露为已选配置），同轮嵌套目录选到自己的干净 rc 的文件原生观察照常完成——配置安全故障与原生结果互不掩盖，也不冒充缺工具或无问题。本轮受控工具 10 通过、0 失败；真实 ShellCheck 0.11.0 单文件目标（配置抑制/不执行源码）另行通过。Dockerfile/Hadolint 仍未接入，7.4 对应半项保持开放。

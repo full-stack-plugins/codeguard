@@ -5,7 +5,7 @@ use crate::workspace_refresh::read_workspace_baseline;
 use codeguard_runtime::read_bounded_regular_file;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::Path;
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -55,10 +55,20 @@ pub(crate) fn prepare(root: &Path, feedback: &Value) -> Result<Value, &'static s
             .clone()
     };
     let mut sources = Vec::new();
+    let mut seen_paths = BTreeSet::new();
+    let mut total_bytes = 0_usize;
     for row in rows {
         let relative = row["path"].as_str().ok_or("javadoc_path_invalid")?;
+        if !seen_paths.insert(relative.to_owned()) {
+            return Err("javadoc_source_duplicate");
+        }
         let bytes = read_bounded_regular_file(&root.join(relative), 16 * 1024 * 1024)
             .map_err(|_| "javadoc_source_unavailable")?;
+        // 与 Maven 工作台相同的总量字节预算；超限保持整体拒绝而非裁剪输入。
+        total_bytes = total_bytes
+            .checked_add(bytes.len())
+            .filter(|total| *total <= 128 * 1024 * 1024)
+            .ok_or("javadoc_sources_byte_budget_exceeded")?;
         let reason = row["reason"].as_str().ok_or("javadoc_reason_invalid")?;
         let mut findings = Vec::new();
         let observation = &row["observation"];
@@ -149,4 +159,139 @@ pub(crate) fn project_finding(
     Some(
         json!({"finding_id":format!("CG-{}",&fingerprint[..32]),"finding_fingerprint":fingerprint,"path":relative,"source_sha256":format!("{:x}",Sha256::digest(bytes)),"rule_id":rule,"line":line}),
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::prepare;
+    use serde_json::{Value, json};
+    use std::fs;
+    use std::sync::atomic::{AtomicU64, Ordering};
+
+    static NEXT: AtomicU64 = AtomicU64::new(0);
+
+    /// 构造带有效 workspace.json 的临时工作区；不执行任何 CLI 命令。
+    fn workspace() -> std::path::PathBuf {
+        let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
+            "cg-javadoc-workbench-unit-{}-{}",
+            std::process::id(),
+            NEXT.fetch_add(1, Ordering::Relaxed)
+        ));
+        fs::create_dir_all(root.join(".codeguard")).unwrap();
+        let sha = "0".repeat(64);
+        let document = json!({
+            "schema_version":"0.3.0",
+            "document_type":"codeguard_workspace",
+            "workspace_id":format!("ws-{}", "1".repeat(32)),
+            "project_root":".",
+            "managed_files":[".gitignore","README.md","workspace.json","project.json","module-graph.json","architecture.md"],
+            "project_sha256":sha,
+            "module_graph_sha256":sha,
+            "planned_agents_block_sha256":sha,
+            "managed_sha256":{
+                ".gitignore":sha,"README.md":sha,"project.json":sha,
+                "module-graph.json":sha,"architecture.md":sha
+            },
+            "workflow_status":"initialization_partial",
+            "quality_gate":"not_evaluated"
+        });
+        fs::write(
+            root.join(".codeguard/workspace.json"),
+            serde_json::to_vec(&document).unwrap(),
+        )
+        .unwrap();
+        root
+    }
+
+    /// JDK 单文件项目探针形状的反馈；observation 为空时只需 path/reason。
+    fn feedback(rows: &[Value]) -> Value {
+        json!({"native_observation":{
+            "schema_version":"0.4.0",
+            "probe_mode":"jdk_single_file",
+            "report_type":"java_javadoc_project_probe",
+            "files":rows
+        }})
+    }
+
+    fn row(path: &str) -> Value {
+        json!({
+            "path":path,
+            "reason":"javadoc_configuration_not_confirmed",
+            "configuration_ref":null,
+            "configuration_sha256":null,
+            "observation":null
+        })
+    }
+
+    struct Temp(std::path::PathBuf);
+    impl Drop for Temp {
+        fn drop(&mut self) {
+            let _ = fs::remove_dir_all(&self.0);
+        }
+    }
+
+    #[test]
+    fn duplicate_project_rows_are_rejected_instead_of_duplicating_findings() {
+        let root = workspace();
+        let _guard = Temp(root.clone());
+        fs::write(root.join("Bad.java"), b"public class Bad {}\n").unwrap();
+        let feedback = feedback(&[row("Bad.java"), row("Bad.java")]);
+        let error = prepare(&root, &feedback).expect_err("重复路径行必须整体拒绝，不能导入重复源");
+        assert_eq!(error, "javadoc_source_duplicate");
+    }
+
+    #[test]
+    fn project_rows_beyond_the_total_byte_budget_are_rejected() {
+        let root = workspace();
+        let _guard = Temp(root.clone());
+        let mut rows = Vec::new();
+        for index in 0..9 {
+            let name = format!("Big{index}.java");
+            let file = fs::File::create(root.join(&name)).unwrap();
+            // 稀疏文件：磁盘占用极小，但读取长度为 15 MiB。
+            file.set_len(15 * 1024 * 1024).unwrap();
+            drop(file);
+            rows.push(row(&name));
+        }
+        let error =
+            prepare(&root, &feedback(&rows)).expect_err("9 x 15 MiB 超过 128 MiB 总预算必须拒绝");
+        assert_eq!(error, "javadoc_sources_byte_budget_exceeded");
+        // 预算内的 8 个文件仍可导入。
+        let within = prepare(&root, &feedback(&rows[..8]));
+        assert!(within.is_ok(), "{within:?}");
+    }
+
+    /// 重载与同行多参数：同规则同行用序号区分，不同行用锚点区分，身份可复现。
+    #[test]
+    fn same_line_and_cross_line_findings_keep_distinct_stable_identities() {
+        use super::project_finding;
+        use std::collections::BTreeMap;
+        let bytes = b"public class Bad {\n  public int add(long a, long b) { return 0; }\n}\n";
+        let native = |line: u64| json!({"rule_id":"JavadocMissingParam","line":line});
+        let identities = || {
+            let mut occurrences = BTreeMap::new();
+            (
+                project_finding("Bad.java", bytes, &native(2), &mut occurrences)
+                    .unwrap()
+                    .clone(),
+                project_finding("Bad.java", bytes, &native(2), &mut occurrences)
+                    .unwrap()
+                    .clone(),
+            )
+        };
+        let (first, second) = identities();
+        assert_ne!(
+            first["finding_fingerprint"], second["finding_fingerprint"],
+            "同一重载行上的两个缺参数诊断必须可区分"
+        );
+        assert_eq!((first.clone(), second.clone()), identities());
+        let mut occurrences = BTreeMap::new();
+        let other_line = project_finding("Bad.java", bytes, &native(1), &mut occurrences)
+            .unwrap()
+            .clone();
+        assert_ne!(
+            other_line["finding_fingerprint"], first["finding_fingerprint"],
+            "不同行的重载诊断必须锚点区分"
+        );
+    }
 }

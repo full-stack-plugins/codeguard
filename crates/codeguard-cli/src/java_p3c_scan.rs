@@ -57,6 +57,9 @@ pub(crate) fn observe_project(
             })
             .max_by_key(|entry| entry.build_root.len());
         let config_status = configuration.map_or("unknown", |entry| entry.configuration.as_str());
+        // 配置存在不等于生效：携带发现器给出的底层原因与建议，区分 invalid/missing/unknown。
+        let config_reason = configuration.map(|entry| entry.reason.as_str());
+        let config_next_action = configuration.map(|entry| entry.next_action.as_str());
         let pom_ref = configuration.map(|entry| entry.configuration_ref.as_str());
         let pom_bytes = pom_ref.and_then(|reference| {
             read_bounded_regular_file(&root.join(reference), 4 * 1024 * 1024).ok()
@@ -102,7 +105,8 @@ pub(crate) fn observe_project(
             if !pom_still_stable {
                 files.push(json!({
                     "path":relative, "build_root":configuration.map_or(".", |entry| entry.build_root.as_str()),
-                    "configuration":config_status, "configuration_ref":pom_ref,
+                    "configuration":config_status, "configuration_reason":config_reason,
+                    "configuration_next_action":config_next_action, "configuration_ref":pom_ref,
                     "configuration_sha256":pom_sha,
                     "reason":"p3c_configuration_changed_during_scan", "observation":null
                 }));
@@ -149,6 +153,8 @@ pub(crate) fn observe_project(
             "path":relative,
             "build_root":configuration.map_or(".", |entry| entry.build_root.as_str()),
             "configuration":config_status,
+            "configuration_reason":config_reason,
+            "configuration_next_action":config_next_action,
             "configuration_ref":configuration.map(|entry| entry.configuration_ref.as_str()),
             "configuration_sha256":pom_sha,
             "reason":reason,

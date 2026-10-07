@@ -174,3 +174,51 @@ fn launcher_outside_locked_bundle_is_rejected() {
     assert_eq!(result.state, Pmd6ProbeState::Incomplete);
     assert_eq!(result.reason, Some("launcher_outside_bundle"));
 }
+
+/// 坏 XML：截断或非 XML 报告不得解析为通过，也不得当成源码违规。
+#[test]
+fn malformed_xml_report_is_incomplete_and_not_a_violation() {
+    for garbage in ["<pmd xmlns=\"http://pmd.sourceforge.net", "not-xml-at-all"] {
+        let fixture = Fixture::new("placeholder", 4);
+        fs::write(&fixture.launcher, format!("#!/bin/sh\nreport=\nwhile [ \"$#\" -gt 0 ]; do\n if [ \"$1\" = -r ]; then shift; report=$1; fi\n shift\ndone\nprintf '%s' '{garbage}' > \"$report\"\nexit 4\n")).expect("launcher");
+        let result = run_pmd6_probe(&fixture.request(), &AtomicBool::new(false));
+        assert_eq!(result.state, Pmd6ProbeState::Incomplete, "{garbage}");
+        assert_eq!(result.reason, Some("invalid_xml_report"), "{garbage}");
+        assert!(
+            result
+                .parsed
+                .expect("局部解析证据保留")
+                .diagnostics
+                .is_empty(),
+            "{garbage}"
+        );
+    }
+}
+
+/// 版本不符：报告声明的 PMD 版本与锁定预期不一致时保持未完成。
+#[test]
+fn version_mismatched_report_is_incomplete() {
+    let fixture = Fixture::new("placeholder", 4);
+    let versioned = xml(&fixture.source, true).replace("version=\"6.15.0\"", "version=\"6.55.0\"");
+    fs::write(&fixture.launcher, format!("#!/bin/sh\nreport=\nwhile [ \"$#\" -gt 0 ]; do\n if [ \"$1\" = -r ]; then shift; report=$1; fi\n shift\ndone\nprintf '%s' '{}' > \"$report\"\nexit 4\n", versioned)).expect("launcher");
+    let result = run_pmd6_probe(&fixture.request(), &AtomicBool::new(false));
+    assert_eq!(result.state, Pmd6ProbeState::Incomplete);
+    assert_eq!(result.reason, Some("pmd_version_mismatch"));
+}
+
+/// 原生处理错误：报告含 <error> 时保留可验证诊断但不签发局部一致。
+#[test]
+fn processing_error_report_retains_diagnostics_without_passing() {
+    let fixture = Fixture::new("placeholder", 4);
+    let report = xml(&fixture.source, true).replace(
+        "</file>",
+        "</file><error filename=\"render.pm\" msg=\"could not parse\"/>",
+    );
+    fs::write(&fixture.launcher, format!("#!/bin/sh\nreport=\nwhile [ \"$#\" -gt 0 ]; do\n if [ \"$1\" = -r ]; then shift; report=$1; fi\n shift\ndone\nprintf '%s' '{}' > \"$report\"\nexit 4\n", report)).expect("launcher");
+    let result = run_pmd6_probe(&fixture.request(), &AtomicBool::new(false));
+    assert_eq!(result.state, Pmd6ProbeState::Incomplete);
+    assert_eq!(result.reason, Some("native_processing_error"));
+    let parsed = result.parsed.expect("局部解析证据保留");
+    assert_eq!(parsed.diagnostics.len(), 1);
+    assert_eq!(parsed.processing_errors, 1);
+}
