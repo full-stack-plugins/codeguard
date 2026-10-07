@@ -2068,3 +2068,5 @@ flowchart TD
   F --> I
   H --> I
 ```
+
+C/C++ documentation repair-hook source update: `repair_ready` restores the original task compiler and standard. Feedback0.30 and summary0.9 distinguish native warnings from CodeGuard structural policy, with at most eight positions and an explicit total. Changed inputs, expired deadlines or invalid consumed receipts withdraw positions/report references. Disappearance keeps tasks open and cannot qualify accuracy or trusted closure. Default/WASM native Clang and stale/tampered evidence regressions passed; automatic editing, installed-host acceptance and production qualification remain open. See [local acceptance](../tests/acceptance/c-family-documentation-hook.md).

@@ -1,0 +1,7 @@
+{
+  "evidence_kind": "development_c_documentation_hook_schema",
+  "qualification": "not_granted",
+  "reports_valid": 24,
+  "negative_cases_rejected": 6,
+  "schemas_valid": 508
+}

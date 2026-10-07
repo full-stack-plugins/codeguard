@@ -2069,3 +2069,5 @@ flowchart TD
   F --> I
   H --> I
 ```
+
+C/C++文档修复Hook当前增量：`repair_ready`按首次任务恢复原Clang/标准，外层反馈0.30与摘要0.9区分原警告和CodeGuard结构策略，最多8处定位并保留总数。当前输入变化、期限耗尽或消费收据失效撤回定位/报告引用；消失仍保持任务open，不授予详细准确性或可信关闭。已完成默认/WASM真实Clang及过期/篡改回归；自动编辑、已安装宿主和完整生产资格仍缺。见[局部验收](../tests/acceptance/c-family-documentation-hook.md)。

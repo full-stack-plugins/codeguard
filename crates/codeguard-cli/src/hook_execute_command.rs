@@ -254,7 +254,7 @@ fn execute_parsed(
     };
     Ok((
         json!({
-            "schema_version":if feedback["schema_version"]=="0.17.0" && feedback["report_type"]=="hook_fast_feedback" {"0.29.0"}else if feedback["schema_version"]=="0.16.0" && feedback["report_type"]=="hook_fast_feedback" {"0.28.0"}else if feedback["schema_version"]=="0.15.0" && feedback["report_type"]=="hook_fast_feedback" {"0.27.0"}else if feedback["schema_version"]=="0.8.0" && feedback["report_type"]=="hook_task_verification_summary" {"0.26.0"}else if feedback["schema_version"]=="0.7.0" && feedback["report_type"]=="hook_task_verification_summary" {"0.25.0"}else if feedback["schema_version"]=="0.14.0" && feedback["report_type"]=="hook_fast_feedback" {"0.24.0"} else if feedback["schema_version"]=="0.13.0" && feedback["report_type"]=="hook_fast_feedback" {"0.23.0"} else if feedback["schema_version"] == "0.12.0" && feedback["report_type"] == "hook_fast_feedback" {"0.22.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.11.0" {"0.21.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.10.0" {"0.19.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.6.0" {"0.20.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.9.0" {"0.18.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.8.0" {"0.17.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.7.0" {"0.16.0"}else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.5.0" {"0.15.0"}else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.6.0" {"0.14.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.5.0" {"0.13.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.4.0" {"0.12.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.3.0" {"0.11.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.4.0" {"0.10.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.2.0" {"0.8.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.3.0" {"0.9.0"} else {"0.7.0"}, "report_type":"hook_execution_feedback",
+            "schema_version":if feedback["schema_version"]=="0.9.0" && feedback["report_type"]=="hook_task_verification_summary" || reason.is_some_and(|r|r.starts_with("clang_")){"0.30.0"}else if feedback["schema_version"]=="0.17.0" && feedback["report_type"]=="hook_fast_feedback" {"0.29.0"}else if feedback["schema_version"]=="0.16.0" && feedback["report_type"]=="hook_fast_feedback" {"0.28.0"}else if feedback["schema_version"]=="0.15.0" && feedback["report_type"]=="hook_fast_feedback" {"0.27.0"}else if feedback["schema_version"]=="0.8.0" && feedback["report_type"]=="hook_task_verification_summary" {"0.26.0"}else if feedback["schema_version"]=="0.7.0" && feedback["report_type"]=="hook_task_verification_summary" {"0.25.0"}else if feedback["schema_version"]=="0.14.0" && feedback["report_type"]=="hook_fast_feedback" {"0.24.0"} else if feedback["schema_version"]=="0.13.0" && feedback["report_type"]=="hook_fast_feedback" {"0.23.0"} else if feedback["schema_version"] == "0.12.0" && feedback["report_type"] == "hook_fast_feedback" {"0.22.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.11.0" {"0.21.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.10.0" {"0.19.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.6.0" {"0.20.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.9.0" {"0.18.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.8.0" {"0.17.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.7.0" {"0.16.0"}else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.5.0" {"0.15.0"}else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.6.0" {"0.14.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.5.0" {"0.13.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.4.0" {"0.12.0"} else if feedback["report_type"] == "hook_fast_feedback" && feedback["schema_version"] == "0.3.0" {"0.11.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.4.0" {"0.10.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.2.0" {"0.8.0"} else if feedback["report_type"] == "hook_task_verification_summary" && feedback["schema_version"] == "0.3.0" {"0.9.0"} else {"0.7.0"}, "report_type":"hook_execution_feedback",
             "plan":plan, "execution":execution, "reason":reason,
             "local_feedback":feedback, "delivery_decision":"not_evaluated",
             "host_blocking_verified":false, "soft_result_reused":false
@@ -282,6 +282,22 @@ fn task_verification_summary(
             .any(|key| !verify_option_matches_checker(key, checker_id))
     {
         return Err(("verification_arguments_invalid", 3));
+    }
+    let c_documentation = matches!(
+        checker_id,
+        "c.clang.documentation"
+            | "cpp.clang.documentation"
+            | "c.clang.documentation_structure"
+            | "cpp.clang.documentation_structure"
+    );
+    if c_documentation {
+        let tool = arguments.verify_options.get("--clang-tool").map(Path::new);
+        let result = if checker_id.ends_with("_structure") {
+            crate::c_family_structure_task_recheck::preflight(root, &brief, tool)
+        } else {
+            crate::c_family_comments_task_recheck::preflight(root, &brief, tool)
+        };
+        result.map_err(|reason| (reason, 3))?;
     }
     let clippy_tool = if checker_id == "rust.cargo_clippy" {
         crate::cargo_tool_selection::resolve_cargo_tool(
@@ -386,6 +402,21 @@ fn task_verification_summary(
         "authority":"local_unverified", "delivery_decision":"not_evaluated"
     });
     let scan = &report["native_scan"];
+    if c_documentation && scan.is_object() {
+        let projected =
+            crate::c_family_documentation_hook_feedback::project(root, &brief, &report, deadline)
+                .map_err(|reason| (reason, 4))?;
+        if projected["documentation_input_current"] != true {
+            summary["observation"] = json!("incomplete");
+            summary["reason"] = json!("clang_documentation_hook_inputs_changed");
+        }
+        for (key, value) in projected
+            .as_object()
+            .ok_or(("verification_report_invalid", 4))?
+        {
+            summary[key] = value.clone();
+        }
+    }
     if checker_id == "rust.cargo_clippy" {
         let projected = crate::clippy_hook_feedback::project(
             root,
@@ -575,6 +606,10 @@ fn verify_option_matches_checker(key: &str, checker_id: &str) -> bool {
         return true;
     }
     match checker_id {
+        "c.clang.documentation"
+        | "cpp.clang.documentation"
+        | "c.clang.documentation_structure"
+        | "cpp.clang.documentation_structure" => key == "--clang-tool",
         "shell.shellcheck" => key == "--shellcheck-tool",
         "node.eslint" | "node.eslint.preparation" => matches!(
             key,
@@ -750,7 +785,8 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                 }
                 git_tool = Some(path);
             }
-            "--rustfmt-tool"
+            "--clang-tool"
+            | "--rustfmt-tool"
             | "--cargo-tool"
             | "--cargo-audit-tool"
             | "--rustsec-db"
@@ -787,7 +823,8 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
             {
                 if matches!(
                     key,
-                    "--rustfmt-tool"
+                    "--clang-tool"
+                        | "--rustfmt-tool"
                         | "--cargo-tool"
                         | "--cargo-audit-tool"
                         | "--rustsec-db"

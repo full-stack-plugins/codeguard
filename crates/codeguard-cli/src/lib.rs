@@ -564,3 +564,5 @@ mod c_family_structure_recheck_tests;
 mod c_family_structure_task_recheck;
 
 mod check_c_family_comments;
+
+mod c_family_documentation_hook_feedback;
