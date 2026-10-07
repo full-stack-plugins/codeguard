@@ -39,7 +39,7 @@ pub(crate) fn valid_shape(report: &Value) -> bool {
         )
 }
 
-fn fingerprint(report: &Value) -> String {
+pub(crate) fn fingerprint(report: &Value) -> String {
     let mut digest = Sha256::new();
     for part in [
         "clang-documentation-placeholder-policy-v1",
@@ -52,6 +52,27 @@ fn fingerprint(report: &Value) -> String {
         digest.update(part.as_bytes());
     }
     format!("{:x}", digest.finalize())
+}
+
+/// 返回独立占位检查器身份，不能复用原警告或缺失组件检查器。
+pub(crate) fn checker(report: &Value) -> &'static str {
+    if report["language"] == "c" {
+        "c.clang.documentation_placeholder"
+    } else {
+        "cpp.clang.documentation_placeholder"
+    }
+}
+/// 核验当前源码、工具及原生结构关联；不以当前状态证明可信执行。
+pub(crate) fn current(root: &Path, report: &Value) -> bool {
+    valid_shape(report)
+        && super::c_family_structure_report::current(root, &structure_packet(report))
+}
+/// 返回独立占位组件位置，仅供已验证观察的诊断投影。
+pub(crate) fn positions(report: &Value) -> Vec<Value> {
+    report["placeholders"]["positions"]
+        .as_array()
+        .cloned()
+        .unwrap_or_default()
 }
 
 /// 返回当前局部观察对应的稳定文件任务；只供持久化状态投影，不授予修复权限。

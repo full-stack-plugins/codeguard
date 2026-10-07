@@ -94,6 +94,9 @@ pub fn run(args: &[String]) -> ExitCode {
         Ok(brief) => brief,
         Err(reason) => return print_unavailable(&parsed, reason),
     };
+    if matches!(brief["checker_id"].as_str(), Some("c.clang.documentation_placeholder" | "cpp.clang.documentation_placeholder")) {
+        return print_unavailable(&parsed, "clang_placeholder_task_workflow_not_integrated");
+    }
     let gradle_cve_task = brief["checker_id"] == "java.gradle.dependency_check";
     let c_structure_task = matches!(
         brief["checker_id"].as_str(),
