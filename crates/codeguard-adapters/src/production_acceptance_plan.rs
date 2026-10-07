@@ -102,8 +102,10 @@ pub fn parse_production_acceptance_plan(raw: &[u8]) -> Result<Value, String> {
                 "blockers",
             ],
         )?;
-        if row["version_scope"]["qualification"] != "unqualified"
-            || row["version_scope"]["policy"]
+        if !matches!(
+            row["version_scope"]["qualification"].as_str(),
+            Some("unqualified") | Some("v1_qualified")
+        ) || row["version_scope"]["policy"]
                 != "project_declared_version_and_dialect_must_be_verified"
             || row["version_scope"]["manifest_markers"] != original["markers"]
             || !bounded_text(&row["version_scope"]["dialect_requirement"])
@@ -135,7 +137,11 @@ pub fn parse_production_acceptance_plan(raw: &[u8]) -> Result<Value, String> {
         )?;
         for (cap, cell) in row["capabilities"].as_object().ok_or("缺核心能力")? {
             exact_keys(cell, &["qualification", "task_refs", "build_paths"])?;
-            if cell["qualification"] != "blocked" || strings(&cell["task_refs"])?.is_empty() {
+            if !matches!(
+                cell["qualification"].as_str(),
+                Some("blocked") | Some("v1_qualified")
+            ) || strings(&cell["task_refs"])?.is_empty()
+            {
                 return Err("核心能力越权或缺任务归属".into());
             }
             if strings(&cell["task_refs"])?
