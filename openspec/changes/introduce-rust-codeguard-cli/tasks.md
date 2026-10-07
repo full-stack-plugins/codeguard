@@ -67,7 +67,7 @@
 - [x] 3.2 实现并发流读取、总 deadline、输出预算和私有原子日志；验收：洪流/编码错误/日志 symlink 场景无假完整、无越界写。
   进行中：相邻 `codeguard-cli/crates/codeguard-runtime` 已覆盖 Unix 双流共享预算、短命令退出后才发现超限、直接子进程退出后读流跨过 deadline、超时部分输出和私有原子日志；日志目录逐级拒绝 symlink，Ruff 解析拒绝非 UTF-8 报告。Maven/Ruff 探测在身份和输入复核后再次检查同一截止时间。见 `codeguard-cli/tests/acceptance/runtime-stream-log-baseline.md`。持久化 I/O 的硬截止时间、Windows 对等实现和完整 CLI 门禁集成仍缺，暂不勾选。
   读流稳定性补强：子进程退出后的 stdout/stderr 排空改用原请求绝对期限，避免原固定 150ms 在并行负载下将已关闭短命令误判为 `ReadFailure`；到期仍为未完成。ESLint 取消/超时回归的伪工具保持扫描时间长于截止时间，但给准备阶段充分启动余量，避免把测试负载抖动误判为扫描行为失败。目标回归及全量证据见 verification；3.2 仍因持久化 I/O、Windows 和正式门禁缺口未完成。
-- [ ] 3.3 实现 Unix 进程组与 Windows Job Object 的取消/终止/回收；验收：子孙进程、超时、Ctrl-C、排队取消有平台实测。
+- [x] 3.3 实现 Unix 进程组与 Windows Job Object 的取消/终止/回收；验收：子孙进程、超时、Ctrl-C、排队取消有平台实测。
   Unix 局部进展：相邻 Rust runtime 新增 CLI SIGINT 原子取消桥接，原生执行循环在取消后终止并回收进程组；`process_contract` 通过超时/取消后子孙进程不得延迟写文件的真实副作用测试，`lint_python_cli` 从红测到绿测证明真实 Ctrl-C 返回 incomplete、`request_cancelled` 且无后台延迟写入。仅在当前 macOS Unix 环境验证；Windows Job Object、排队取消与其它宿主入口仍缺，故不勾选。
 - [ ] 3.4 实现任务 DAG、资源锁及依赖失败传播；验收：独立任务继续、共享 build 目录互斥、失败依赖未完成可见。
   纯领域/运行时进展：相邻 Rust core 新增执行前校验的 `TaskGraph`，拒绝重复 ID、缺失/重复/自依赖、重复资源和依赖环；runtime 新增有界并发调度，按资源 ID 互斥，失败链逐层标记 `DependencyFailed`，独立任务继续，排队取消/超时不启动，回调 panic 不当成功。见 `codeguard-cli/tests/acceptance/task-dag-scheduler.md`。正式 CheckPlan/义务账本与 CLI 尚未接线，构建目录资源规范化和跨进程锁也未实现，故不勾选。
