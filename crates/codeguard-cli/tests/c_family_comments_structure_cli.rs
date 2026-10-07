@@ -54,7 +54,7 @@ fn public_comments_exposes_absent_empty_and_valid_structural_descriptions() {
             assert_eq!(out.status.code(), Some(3));
             let report: Value = serde_json::from_slice(&out.stdout).unwrap();
             assert_eq!(report["documentation_structure"]["status"], "observed");
-            assert_eq!(report["schema_version"], "0.10.0");
+            assert_eq!(report["schema_version"], if report.get("placeholder_workbench").is_some() {"0.11.0"} else {"0.10.0"});
             assert_eq!(
                 report["documentation_structure"]["observation"]["functions"][0]["missing_components"],
                 json!(expected)
@@ -96,7 +96,7 @@ fn public_comments_exposes_absent_empty_and_valid_structural_descriptions() {
                 .unwrap();
             assert_eq!(out.status.code(), Some(3));
             let report: Value = serde_json::from_slice(&out.stdout).unwrap();
-            assert_eq!(report["schema_version"], "0.10.0");
+            assert_eq!(report["schema_version"], if report.get("placeholder_workbench").is_some() {"0.11.0"} else {"0.10.0"});
             assert_eq!(report["workspace_binding"], "bound");
             assert_eq!(report["structural_task_workflow_status"], "partial");
             if missing_tool {

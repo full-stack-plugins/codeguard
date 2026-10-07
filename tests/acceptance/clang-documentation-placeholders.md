@@ -37,3 +37,11 @@ work sync 已接入 clang_documentation_placeholder_workbench_observation 0.1，
 真实Clang公开扫描输出构造局部导入包的CLI集成测试1项通过，验证3次合法消费、稳定身份、open保留、伪造组件拒绝及专用复检缺口。首轮测试因运行ID不符合已有四段数字契约而失败，修正测试输入后通过。此为本地报告导入验收，不是独立精度或发布资格。
 
 当前next/task verify对该独立检查器明确返回clang_placeholder_task_workflow_not_integrated，不执行其他检查器或写复检事件。公开comments的自动持久化、完整任务指引和专用原工具复检仍待接线，父任务继续未完成。
+
+## 公开自动持久化
+
+公开comments c/cpp在已初始化绑定工作区自动保存并消费独立占位包，反馈0.11返回placeholder_workbench状态和最多一个稳定任务ID；未初始化反馈继续0.10且不建目录。不可用观察不保存有效占位包、不返回任务ID。局部消失仅清空本轮ID，历史fact仍open；专用next/verify保持具体未接入原因。
+
+默认和WASM各1项真实测试均覆盖C11/C++17的未初始化、修复/缺工具、初始化、重复稳定任务、消费收据、清空保留open及缺工具持久化未完成。7份实际公开反馈通过0.10/0.11封闭schema校验；既有结构公开回归默认/WASM各1项通过。扩展C++测试时首次误用C11标准，修正为C++17后通过。适配器和协议来源纳入c/cpp standalone documentation的部分实现引用，未提升资格。
+
+当前未完成：专用任务当前定位/历史撤权、受控尝试与原工具task verify、可信关闭和复发重开、共享check/hook自动触发、白名单及独立跨平台精度验收。之前各节的缺口描述属于相应历史检查点，以本节为当前接入状态。

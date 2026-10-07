@@ -1,7 +1,7 @@
 {
   "evidence_kind": "development_public_structure_schema",
   "qualification": "not_granted",
-  "schemas_valid": 511,
+  "schemas_valid": 513,
   "historical_schemas_unchanged": 489,
   "feedback_valid": 24,
   "negative_cases_rejected": 12,
