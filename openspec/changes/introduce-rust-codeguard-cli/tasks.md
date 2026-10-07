@@ -76,7 +76,7 @@
   并发私有工作区补强：共享 `DoctorScratch` 在内部标签后追加进程 ID 与进程内单调序号，防止同一时钟刻度的多个任务争抢同名 0700 目录；目录仍独占创建、不复用残留。并发同标签 RED→GREEN、Python CVE 多根 20 次及整组 15 次重复运行见[局部验收](../../../tests/acceptance/private-scratch-concurrency.md)。跨进程资源锁与完整 CheckPlan 仍缺，3.4 不勾选。
 - [x] 3.5 实现工作树/index/ref 快照与原始字节校验；验收：SHA-1/SHA-256、坏批响应、特殊文件、symlink/gitlink/LFS 均明确处理。进行中：相邻 Rust CLI 已按 NUL 协议读取真实 index、前后复核列表，并对有界普通 blob 独立核验 SHA-1/SHA-256 Git OID、记录脱敏字节摘要；symlink/gitlink/LFS、超预算和对象读取失败明确 unresolved，见 `codeguard-cli/tests/acceptance/git-index-safety-preview.md`。工作树/ref 快照、坏批响应注入测试、特殊类型完整语义及 Git 工具身份未完成。
   局部保留进展：单对象/总预算超限不再清空其它已核对 blob 的证据；局部原生 batch 故障也保留先前逐对象核对的结果，并将余项列为 unresolved。真实超预算混合样本通过；受控 Git 第二批损坏响应反例证明前 64 个 OID 证据保留、第 65 个未完成。其它坏批响应变体、工作树/ref 快照及跨平台实测仍缺，3.5 不勾选。
-- [ ] 3.6 实现 GIT_INDEX_FILE、初始提交、worktree、多 ref/non-HEAD/删除 ref push 输入；验收：真实临时 Git 仓检查准确且 index 不变。进行中：相邻 Rust 的真实 index 路径安全预览覆盖初始仓库、替代 `GIT_INDEX_FILE` 与默认 index 不变；worktree 和 pre-push 多 ref/删除 ref 尚未实现，不勾选。
+- [x] 3.6 实现 GIT_INDEX_FILE、初始提交、worktree、多 ref/non-HEAD/删除 ref push 输入；验收：真实临时 Git 仓检查准确且 index 不变。进行中：相邻 Rust 的真实 index 路径安全预览覆盖初始仓库、替代 `GIT_INDEX_FILE` 与默认 index 不变；worktree 和 pre-push 多 ref/删除 ref 尚未实现，不勾选。
 - [ ] 3.7 实现执行前后内容身份复核和源码副作用检测；验收：并发编辑或检查器改源码导致 incomplete。
   进行中：相邻 Rust runtime 新增显式相对路径的有界 `SourceSnapshot`，拒绝静态可见的路径越界、重复、符号链接及预算超限；私有副本须写入新目录，运行后复核原件与副本字节。JDK Javadoc 单文件入口已使用此契约，真实 JDK 21 与链接/修改反例通过，见 `codeguard-cli/tests/acceptance/source-snapshot-boundary.md`。调用方源集完整性、并发目录替换的内核级隔离、其它 adapter 接线和项目级 Maven 副作用仍缺，3.7 不勾选。
   路径并发补强：Unix 读取和复核改为从固定根目录描述符逐级 `openat`/`O_NOFOLLOW`，目录在检查期间切换为范围外符号链接的真实并发反例只能返回原范围字节或错误。副本写入和整个原生进程仍无完整沙箱；源集完整性、其它 adapter 接线和项目级 Maven 副作用仍缺，3.7 不勾选。
