@@ -1,4 +1,4 @@
-//! 占位文件任务诊断指引绑定首次报告、收据与当前输入；专用修复权限仍待验证闭环。
+//! 占位文件任务绑定首次报告、收据、当前输入及受控尝试；局部复检不授予可信关闭。
 use super::Candidate;
 use crate::work_sync::c_family_placeholder_report::{
     checker, current, fingerprint, positions, valid_shape, RULE,
@@ -40,7 +40,7 @@ fn read(root: &Path, run: &str, digest: Option<&str>) -> Result<Value, &'static 
     }
     Ok(r)
 }
-/// 创建收据绑定的诊断指引；专用验证/尝试未接入时不授予允许修改范围。
+/// 创建当前修复指引；仅有效原观察且预算可用时授予当前文件范围，失败历史不因重扫清空。
 pub(super) fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static str> {
     let run = fact["first_run_id"].as_str().ok_or("finding_run_invalid")?;
     let digest = fact["first_report_sha256"]
@@ -117,11 +117,58 @@ pub(super) fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate
     } else {
         "placeholder_descriptions_observed"
     };
-    let observed = status == "placeholder_descriptions_observed";
-    let brief = json!({"schema_version":"0.34.0","task_id":id,"kind":"finding","checker_id":checker(&first),"scope":first["path"],"source_sha256":latest["source_sha256"],"placeholder_rule_id":RULE,"rule_source":"codeguard_structural_policy","evidence_ref":{"first_run_id":run,"first_report_sha256":digest},"current_run_id":latest["run_id"],"observation_status":status,"placeholder_positions":if observed {positions(&latest)}else{Vec::new()},"rule_basis":"整个用途、参数或适用返回说明仅为明确占位标记，不等于API契约说明；本规则不是Clang警告。","constraints":["不修改API或行为，不关闭检查器或自行批准白名单","专用尝试历史尚未接入；task verify提供局部复检观察，本视图不授予任务修复权限"],"allowed_paths":[],"affected_paths":[first["path"]],"disposition":"needs_decision","reason_code":if observed {"clang_placeholder_task_workflow_not_integrated"}else{status},"step":["依据当前组件与真实API核对占位说明；专用修复闭环未接入前保留任务。","使用绑定原工具、标准与工作区的comments命令诊断复扫；源码或工具失稳时不按历史定位修改。"],"recheck_argv":["codeguard","comments",first["language"],root.join(first["path"].as_str().ok_or("clang_placeholder_scope_invalid")?),"--clang-tool",first["selected_tool"],"--standard",first["standard"],"--workspace",root,"--format=json"],"attempt_history_status":"not_integrated","closure_condition":"原命令局部复扫不关闭任务；原工具task verify仅提供局部观察；专用受控尝试及可信关闭仍须实现并验收。","authority":"local_unverified","delivery_decision":"not_evaluated"});
+    let actionable = status == "placeholder_descriptions_observed";
+    let argv = json!([
+        "codeguard",
+        "task",
+        "verify",
+        id,
+        root,
+        "--clang-tool",
+        first["selected_tool"],
+        "--format=json"
+    ]);
+    let mut brief = json!({"schema_version":"0.35.0","task_id":id,"kind":"finding","checker_id":checker(&first),"scope":first["path"],"source_sha256":latest["source_sha256"],"placeholder_rule_id":RULE,"rule_source":"codeguard_structural_policy","evidence_ref":{"first_run_id":run,"first_report_sha256":digest},"current_run_id":latest["run_id"],"observation_status":status,"placeholder_positions":if actionable {positions(&latest)}else{Vec::new()},"rule_basis":"整个用途、参数或适用返回说明仅为明确占位标记，不等于API契约说明；本规则不是Clang警告或完整语义准确性证明。","constraints":["仅修改当前文件文档注释，保留API及行为","以当前字节位置核对各占位组件，不按函数名字单独匹配","不关闭检查器、不以占位文本或白名单自批代替修复"],"allowed_paths":if actionable {json!([first["path"]])}else{json!([])},"affected_paths":[first["path"]],"disposition":if actionable {"actionable"}else{"needs_decision"},"reason_code":status,"step":["按所有当前函数字节/行列证据，依据真实声明和行为替换占位组件为真实用途、契约和行为说明。","使用绑定原工具、标准与工作区的task verify复检；未知或失稳时先诊断，不按旧位置改源码。"],"recheck_argv":argv,"closure_condition":"原命令局部复扫不关闭；专用task verify记录局部观察；仍须跨输入语义无进展、完整详细准确性/项目覆盖与可信关闭/复发验收。","authority":"local_unverified","delivery_decision":"not_evaluated"});
+    brief["action_id"] = json!(super::canonical_action_id(&brief)?);
+    let history = crate::task_attempt_command::attempt_history(root, id, &brief)?;
+    let mut priority = if actionable { 1 } else { 0 };
+    if history["open_attempt_id"].is_string() {
+        brief["disposition"] = json!("waiting");
+        brief["reason_code"] = json!("attempt_in_progress");
+        brief["step"] = json!(["由持有租约的执行者完成当前尝试并记录结果，不重复修改同一任务。"]);
+        priority = 0;
+    } else if history["awaiting_verification"] == true {
+        brief["disposition"] = json!("verification_required");
+        brief["reason_code"] = json!("original_verification_required");
+        brief["step"] = json!(["执行绑定原工具与标准的task verify；ready记录不能代替复检。"]);
+        priority = 0;
+    } else if history["unverified_prior_attempt_count"]
+        .as_u64()
+        .unwrap_or(0)
+        > 0
+    {
+        brief["disposition"] = json!("needs_decision");
+        brief["reason_code"] = json!("historical_verification_evidence_unavailable");
+        brief["step"] =
+            json!(["恢复早先尝试的原占位复检报告或调查失效原因；缺失证据不能恢复修复预算。"]);
+        priority = 0;
+    } else if history["no_progress_count"].as_u64().unwrap_or(0) >= 2 && actionable {
+        brief["disposition"] = json!("needs_decision");
+        brief["reason_code"] = json!("no_progress_budget_exhausted");
+        brief["step"] = json!([format!(
+            "原工具占位策略 {} 对同一输入两次复检仍存在；核对函数组件、未知声明和失败记录，提出具体修复或误报纠错决策，重复扫描不能重置预算。",
+            RULE
+        )]);
+        priority = 0;
+    }
+    if brief["disposition"] != "actionable" {
+        brief["allowed_paths"] = json!([]);
+        brief["placeholder_positions"] = json!([]);
+    }
+    brief["history"] = history;
     Ok(Candidate {
         id: id.into(),
-        priority: 0,
+        priority,
         brief,
     })
 }

@@ -122,7 +122,7 @@ fn check_language(language: &str, standard: &str, extension: &str) {
         serde_json::from_slice::<Value>(&output.stdout).unwrap()
     };
     let guidance = next();
-    assert_eq!(guidance["schema_version"], "0.34.0");
+    assert_eq!(guidance["schema_version"], "0.35.0");
     assert_eq!(guidance["repair_brief"]["task_id"], ids[0]);
     assert_eq!(
         guidance["repair_brief"]["placeholder_positions"]
@@ -133,12 +133,9 @@ fn check_language(language: &str, standard: &str, extension: &str) {
     );
     assert_eq!(
         guidance["repair_brief"]["allowed_paths"],
-        serde_json::json!([])
+        serde_json::json!([format!("api.{extension}")])
     );
-    assert_eq!(
-        guidance["repair_brief"]["attempt_history_status"],
-        "not_integrated"
-    );
+    assert_eq!(guidance["repair_brief"]["history"]["no_progress_count"], 0);
     fs::write(&source, "int changed(int x);\n").unwrap();
     let stale_guidance = next();
     assert_eq!(

@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:task-show-preview:0.8.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "request_id",
+    "command_status",
+    "exit_code",
+    "task",
+    "next_actions",
+    "authority",
+    "delivery_decision",
+    "task_id",
+    "state",
+    "evidence_freshness",
+    "event_chain_status"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.8.0"
+    },
+    "report_type": {
+      "const": "task_show_preview"
+    },
+    "operation": {
+      "const": "task_show"
+    },
+    "request_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "command_status": {
+      "const": "complete"
+    },
+    "exit_code": {
+      "const": 0
+    },
+    "reason": {
+      "type": "string"
+    },
+    "task_id": {
+      "type": "string",
+      "pattern": "^CG-(B-)?[0-9a-f]{32}$"
+    },
+    "task": {
+      "$ref": "repair-brief-preview-v0.35.schema.json#/properties/repair_brief"
+    },
+    "state": {
+      "const": "open"
+    },
+    "evidence_freshness": {
+      "const": "unverified"
+    },
+    "event_chain_status": {
+      "const": "unverified"
+    },
+    "next_actions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {
+        "type": "array",
+        "minItems": 8,
+        "maxItems": 8,
+        "prefixItems": [
+          {
+            "const": "codeguard"
+          },
+          {
+            "const": "task"
+          },
+          {
+            "const": "verify"
+          },
+          {
+            "type": "string",
+            "pattern": "^CG-[0-9a-f]{32}$"
+          },
+          {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          {
+            "const": "--clang-tool"
+          },
+          {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
+          },
+          {
+            "const": "--format=json"
+          }
+        ],
+        "items": false
+      }
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    }
+  }
+}

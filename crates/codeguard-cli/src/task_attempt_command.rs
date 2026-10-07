@@ -308,6 +308,8 @@ pub(crate) fn attempt_history(root: &Path, id: &str, brief: &Value) -> Result<Va
                 | "cpp.clang.documentation"
                 | "c.clang.documentation_structure"
                 | "cpp.clang.documentation_structure"
+                | "c.clang.documentation_placeholder"
+                | "cpp.clang.documentation_placeholder"
         )
     ) {
         let latest = ledger
@@ -476,6 +478,7 @@ fn verified_rechecks(
             || run_id.starts_with("cargo-build-")
             || run_id.starts_with("clangdoc-")
             || run_id.starts_with("clangdocstruct-")
+            || run_id.starts_with("clangdocplaceholder-")
         {
             run_id
                 .rsplit('-')
@@ -648,7 +651,39 @@ fn verified_rechecks(
                 continue;
             }
         }
-        let report_matches = if c_structure {
+        let c_placeholder = matches!(
+            brief["checker_id"].as_str(),
+            Some("c.clang.documentation_placeholder" | "cpp.clang.documentation_placeholder")
+        );
+        if c_placeholder {
+            let marker_path = root.join(format!(".codeguard/state/consumed/{run_id}.json"));
+            let marker = match bounded_regular(&marker_path, 4096) {
+                Ok(b) => b,
+                Err("verification_evidence_unavailable") if !marker_path.exists() => continue,
+                Err(_) => return Err("verification_event_invalid"),
+            };
+            let expected=serde_json::to_vec_pretty(&json!({"schema_version":"0.1.0","workspace_id":report["workspace_id"],"run_id":run_id,"report_sha256":digest(&report_bytes)})).map_err(|_|"verification_event_invalid")?;
+            if marker != expected {
+                return Err("verification_event_invalid");
+            }
+            if event["report_sha256"] != digest(&report_bytes)
+                || !crate::c_family_placeholder_task_recheck::valid_shape(root, &report)
+                || report["task_id"] != id
+            {
+                return Err("verification_event_invalid");
+            }
+            if report["input_stable"] != true
+                || !crate::c_family_placeholder_task_recheck::inputs_current(root, &report)
+                || finish.after_sha256 != input_digest(root, brief)?
+            {
+                continue;
+            }
+        }
+        let report_matches = if c_placeholder {
+            crate::c_family_placeholder_task_recheck::valid_shape(root, &report)
+                && event["observation"]
+                    == crate::c_family_placeholder_task_recheck::classify(brief, &report)
+        } else if c_structure {
             crate::c_family_structure_task_recheck::valid_shape(root, &report)
                 && event["observation"]
                     == crate::c_family_structure_task_recheck::classify(brief, &report)
@@ -967,6 +1002,12 @@ fn action_fingerprint(task_id: &str, action_id: &str) -> String {
 }
 
 fn input_digest(root: &Path, brief: &Value) -> Result<String, &'static str> {
+    if matches!(
+        brief["checker_id"].as_str(),
+        Some("c.clang.documentation_placeholder" | "cpp.clang.documentation_placeholder")
+    ) {
+        return crate::c_family_placeholder_task_recheck::attempt_input_digest(root, brief);
+    }
     if matches!(
         brief["checker_id"].as_str(),
         Some("c.clang.documentation_structure" | "cpp.clang.documentation_structure")

@@ -2,6 +2,23 @@
 use crate::clang_documentation_ast::parse_clang_documentation_ast;
 use serde_json::{Value, json};
 use std::collections::BTreeMap;
+use sha2::{Digest, Sha256};
+
+/// 返回编译进当前制品的占位解析与核验实现身份；返回值为SHA-256摘要，无输入参数。
+/// 同时绑定底层结构解析，避免策略实现升级仍复用旧输入上的失败预算。
+pub fn clang_documentation_placeholder_engine_sha256() -> String {
+    let mut hash = Sha256::new();
+    hash.update(b"clang-documentation-placeholder-engine-v1\0");
+    for source in [
+        include_bytes!("clang_documentation_placeholders.rs").as_slice(),
+        include_bytes!("clang_placeholder_validation.rs").as_slice(),
+    ] {
+        hash.update((source.len() as u64).to_le_bytes());
+        hash.update(source);
+    }
+    hash.update(crate::clang_documentation_ast::clang_documentation_structure_engine_sha256());
+    format!("{:x}", hash.finalize())
+}
 
 /// 观察用途、命名参数及适用返回说明中的明确占位标记。
 /// 参数为有界原生AST和冻结源码；返回脱敏位置，错误沿用原生关联/预算错误。
