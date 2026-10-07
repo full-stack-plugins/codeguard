@@ -1272,3 +1272,13 @@ Current attempt input identity SHALL include the compiled structural parser and 
 #### Scenario: Structural engine upgrade with unchanged source
 - **WHEN** a structural parser, validator or recheck implementation changes while project source and Clang remain unchanged
 - **THEN** the current attempt input SHALL have a different identity, retain previous history and require current original-tool observation rather than reuse old evidence as a trusted current result
+
+### Requirement: C-family placeholder observations SHALL remain a separate conservative policy
+
+The adapter SHALL expose a separately versioned, source-associated placeholder observation from the original bounded Clang AST. Only an entire supported purpose, named parameter or applicable return description equal to TODO, TBD, FIXME, 待补充 or 待完善 after whitespace and terminal sentence punctuation normalization SHALL produce codeguard.documentation.placeholder_description. Existing nonempty structure facts SHALL retain their meaning. Unsupported comments/redeclarations SHALL not produce guesses. This policy SHALL not claim native warning authority, semantic accuracy or full coverage. Public feedback/task/recheck integration remains required before this adapter capability counts as an integrated production path.
+
+#### Scenario: Placeholder and explanatory mention are distinct
+- **WHEN** a supported description consists only of TODO or 待补充 with terminal punctuation
+- **THEN** the observation SHALL retain the precise function position and component without copying comment text
+- **WHEN** TODO appears within an explanatory sentence or a void return is not applicable
+- **THEN** this rule SHALL not invent a placeholder or required return finding
