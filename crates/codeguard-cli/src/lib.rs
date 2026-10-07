@@ -449,6 +449,7 @@ mod check_terraform_scan;
 mod check_csharp_scan;
 mod check_vbnet_scan;
 mod check_go_scan;
+mod disposition_attribution;
 mod pascal_dependency_scan;
 mod check_objc_scan;
 mod objc_dependency_scan;
