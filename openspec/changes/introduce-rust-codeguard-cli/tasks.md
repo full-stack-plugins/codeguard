@@ -392,9 +392,9 @@
 - [ ] 8.73 为 markdown 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
 - [ ] 8.74 实现 markdown 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
 - [ ] 8.75 完成 markdown 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.76 为 toml 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.77 实现 toml 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.78 完成 toml 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.76 为 toml 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.77 实现 toml 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.78 完成 toml 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
 - [ ] 8.79 为 haskell 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
 - [ ] 8.80 实现 haskell 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
 - [ ] 8.81 完成 haskell 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
