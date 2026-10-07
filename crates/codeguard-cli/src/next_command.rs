@@ -448,12 +448,18 @@ fn independent_source_task_index(root: &Path, candidates: &[Candidate]) -> Optio
 }
 
 fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static str> {
-    if matches!(fact["checker_id"].as_str(), Some("c.clang.documentation_placeholder" | "cpp.clang.documentation_placeholder")) {
+    if matches!(
+        fact["checker_id"].as_str(),
+        Some("c.clang.documentation_placeholder" | "cpp.clang.documentation_placeholder")
+    ) {
         return c_family_placeholder_candidate::candidate(root, id, fact);
     }
     #[cfg(unix)]
-    if matches!(fact["checker_id"].as_str(),Some("c.clang.documentation_structure"|"cpp.clang.documentation_structure")) {
-        return c_family_structure_candidate::candidate(root,id,fact);
+    if matches!(
+        fact["checker_id"].as_str(),
+        Some("c.clang.documentation_structure" | "cpp.clang.documentation_structure")
+    ) {
+        return c_family_structure_candidate::candidate(root, id, fact);
     }
     #[cfg(unix)]
     if matches!(
@@ -2439,7 +2445,7 @@ fn run_sequence(run_id: &str) -> Option<u128> {
 
 fn view(disposition: &str, reason: &str, brief: Value, actions: Value) -> Value {
     json!({
-        "schema_version":if brief["schema_version"] == "0.34.0" {json!("0.34.0")}else if brief["schema_version"] == "0.33.0" {json!("0.33.0")}else if brief["schema_version"] == "0.32.0" {json!("0.32.0")}else if brief["schema_version"] == "0.31.0" {json!("0.31.0")}else if brief["schema_version"] == "0.30.0" {json!("0.30.0")}else if brief["schema_version"] == "0.29.0" {json!("0.29.0")}else if brief["schema_version"] == "0.28.0" {json!("0.28.0")}else if brief["schema_version"] == "0.27.0" {json!("0.27.0")}else if brief["schema_version"] == "0.26.0" {json!("0.26.0")}else if brief["schema_version"] == "0.25.0" {json!("0.25.0")}else if brief["schema_version"] == "0.24.0" {json!("0.24.0")}else if brief["schema_version"] == "0.23.0" {json!("0.23.0")}else if brief["schema_version"] == "0.22.0" {json!("0.22.0")}else if brief["schema_version"] == "0.21.0" {json!("0.21.0")}else if brief["schema_version"] == "0.20.0" {json!("0.20.0")}else if brief["checker_id"] == "shell.shellcheck" {json!("0.17.0")} else if brief["checker_id"] == "go.vet" {json!("0.13.0")} else if brief["checker_id"] == "syntax.native_confirmation" {brief["schema_version"].clone()} else {json!("0.1.0")}, "report_type":"repair_brief_preview",
+        "schema_version":if brief["schema_version"] == "0.35.0" {json!("0.35.0")}else if brief["schema_version"] == "0.34.0" {json!("0.34.0")}else if brief["schema_version"] == "0.33.0" {json!("0.33.0")}else if brief["schema_version"] == "0.32.0" {json!("0.32.0")}else if brief["schema_version"] == "0.31.0" {json!("0.31.0")}else if brief["schema_version"] == "0.30.0" {json!("0.30.0")}else if brief["schema_version"] == "0.29.0" {json!("0.29.0")}else if brief["schema_version"] == "0.28.0" {json!("0.28.0")}else if brief["schema_version"] == "0.27.0" {json!("0.27.0")}else if brief["schema_version"] == "0.26.0" {json!("0.26.0")}else if brief["schema_version"] == "0.25.0" {json!("0.25.0")}else if brief["schema_version"] == "0.24.0" {json!("0.24.0")}else if brief["schema_version"] == "0.23.0" {json!("0.23.0")}else if brief["schema_version"] == "0.22.0" {json!("0.22.0")}else if brief["schema_version"] == "0.21.0" {json!("0.21.0")}else if brief["schema_version"] == "0.20.0" {json!("0.20.0")}else if brief["checker_id"] == "shell.shellcheck" {json!("0.17.0")} else if brief["checker_id"] == "go.vet" {json!("0.13.0")} else if brief["checker_id"] == "syntax.native_confirmation" {brief["schema_version"].clone()} else {json!("0.1.0")}, "report_type":"repair_brief_preview",
         "operation":"next", "command_status":"complete", "exit_code":0,
         "disposition":disposition, "reason":reason,
         "repair_brief":brief, "next_actions":actions,

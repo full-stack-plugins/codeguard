@@ -1350,3 +1350,11 @@ The dedicated verifier SHALL reuse verification leases/locks, freeze the current
 - **THEN** a consumed still_present event SHALL be recorded for current placeholders
 - **WHEN** actual description replaces the placeholder under stable inputs
 - **THEN** local candidate absence MAY be recorded, but the same historical fact SHALL remain open
+### Requirement: Placeholder repair attempts SHALL consume their own original rechecks
+
+The C/C++ placeholder policy SHALL use the existing lease-protected append-only attempt ledger. Its input identity SHALL bind source, original language and standard, current tool bytes, placeholder parser and validator implementation, and the recheck implementation. A ready-to-verify record SHALL require the original placeholder recheck before another repair attempt. Two still-present rechecks on the same input SHALL withdraw mutation scope and require a concrete decision. Repeated scans and task projection deletion SHALL NOT reset this budget. Missing or modified historical evidence SHALL NOT grant new permission. Native structural deficits and placeholder findings SHALL NOT consume one another's verification evidence. Local absence SHALL NOT close a finding.
+
+#### Scenario: Repeated unsuccessful placeholder repair remains visible
+- **WHEN** two lease-bound attempts report ready-to-verify and their original placeholder rechecks still observe the same policy on the same input
+- **THEN** the brief exposes the retained failure history and exhausted budget, mutation scope is empty, and another start is rejected
+- **AND** rescanning or regenerating the readable task does not restore the budget
