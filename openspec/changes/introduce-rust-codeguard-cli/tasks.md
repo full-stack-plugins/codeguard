@@ -320,9 +320,9 @@
   多模块进展：局部 CLI 现按发现的 Go Module 根逐一运行原生 vet，记录每模块状态并保留前一完整模块的 finding；双模块真实违规与后续编译失败样本通过。逐模块输入摘要和发现归属复核仍只构成局部观察；build tags/平台矩阵、可信工具与规则策略、注释适配和完整验收仍缺，8.2 不勾选。
   统一检查进展：`check all --go-tool` 复用同一观察服务并纳入共享调度/执行预算、候选类别及 JSON/human/SARIF 局部反馈。缺工具与预算耗尽有明确状态，真实 Go finding 可见但不签发完整通过；持久任务与正式义务、规则/平台证明仍缺，8.2 不勾选。
 - [x] 8.3 完成 go 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.4 为 csharp 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.5 实现 csharp 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.6 完成 csharp 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.4 为 csharp 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.5 实现 csharp 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.6 完成 csharp 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
 - [ ] 8.7 为 kotlin 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
 - [x] 8.8 实现 kotlin 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
 - [x] 8.9 完成 kotlin 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
@@ -407,9 +407,9 @@
 - [x] 8.88 为 perl 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
 - [x] 8.89 实现 perl 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
 - [x] 8.90 完成 perl 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.91 为 groovy 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.92 实现 groovy 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.93 完成 groovy 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.91 为 groovy 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.92 实现 groovy 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.93 完成 groovy 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
 - [ ] 8.94 为 clojure 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
 - [ ] 8.95 实现 clojure 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
 - [ ] 8.96 完成 clojure 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
