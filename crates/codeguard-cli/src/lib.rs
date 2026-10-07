@@ -473,6 +473,7 @@ mod check_rust_native_scan;
 mod check_tsx_native_scan;
 mod distribution_installer;
 mod archive_bundle;
+mod mcp_integration;
 mod check_luau_native_scan;
 mod check_cobol_native_scan;
 mod check_cfscript_native_scan;
