@@ -38,3 +38,113 @@ fn structural_import_requires_exact_components_and_actual_source_positions() {
     forged["qualification"] = json!("granted");
     assert!(!valid_clang_documentation_structure(&forged, None));
 }
+
+#[test]
+fn ordinary_cpp_class_methods_are_observed_without_claiming_class_contracts() {
+    let source = b"struct Box { int read(int x); };";
+    let offset = source.windows(4).position(|w| w == b"read").unwrap();
+    let ast = json!({"kind":"TranslationUnitDecl","inner":[{"kind":"CXXRecordDecl","name":"Box","inner":[
+        {"kind":"CXXRecordDecl","name":"Box","isImplicit":true},
+        {"kind":"CXXMethodDecl","name":"read","loc":{"offset":offset,"tokLen":4},"type":{"qualType":"int (int)"},"inner":[{"kind":"ParmVarDecl","name":"x"}]}
+    ]}]});
+    let observed =
+        parse_clang_documentation_ast(&serde_json::to_vec(&ast).unwrap(), source).unwrap();
+    assert_eq!(observed["functions"].as_array().unwrap().len(), 1);
+    assert_eq!(observed["functions"][0]["name"], "read");
+    assert_eq!(
+        observed["functions"][0]["missing_components"],
+        json!(["documentation_comment"])
+    );
+    assert!(
+        observed["unresolved_declaration_kinds"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|v| v == "CXXRecordDecl")
+    );
+    assert!(valid_clang_documentation_structure(&observed, Some(source)));
+    assert_eq!(observed["coverage_proven"], false);
+}
+
+#[test]
+#[ignore = "requires explicit existing Apple Clang21 via CODEGUARD_CLANG_BIN"]
+fn actual_cpp17_ast_retains_method_descriptions_and_unsupported_contracts() {
+    use std::io::Write;
+    use std::process::{Command, Stdio};
+    let clang = std::env::var("CODEGUARD_CLANG_BIN").expect("explicit existing Clang");
+    let version = Command::new(&clang).arg("--version").output().unwrap();
+    assert!(version.status.success());
+    assert!(
+        String::from_utf8_lossy(&version.stdout)
+            .starts_with("Apple clang version 21.0.0 (clang-2100.3.34.2)")
+    );
+    let source = b"struct Box {\n/// Read a value.\n/// @param x Input value.\n/// @return The value.\nint read(int x);\n/// Clear the box.\nvoid clear();\nint undocumented();\nBox();\nint operator+(int x);\n};\n";
+    let mut child = Command::new(&clang)
+        .args([
+            "-fsyntax-only",
+            "-x",
+            "c++",
+            "-std=c++17",
+            "-fparse-all-comments",
+            "-Xclang",
+            "-ast-dump=json",
+            "-",
+        ])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    child.stdin.take().unwrap().write_all(source).unwrap();
+    let native = child.wait_with_output().unwrap();
+    assert!(
+        native.status.success(),
+        "{}",
+        String::from_utf8_lossy(&native.stderr)
+    );
+    let observed = parse_clang_documentation_ast(&native.stdout, source).unwrap();
+    assert!(
+        valid_clang_documentation_structure(&observed, Some(source)),
+        "{observed}"
+    );
+    let functions = observed["functions"].as_array().unwrap();
+    assert_eq!(functions.len(), 3, "{observed}");
+    for name in ["read", "clear"] {
+        let method = functions.iter().find(|m| m["name"] == name).unwrap();
+        assert_eq!(method["missing_components"], json!([]));
+    }
+    let undocumented = functions
+        .iter()
+        .find(|m| m["name"] == "undocumented")
+        .unwrap();
+    assert_eq!(
+        undocumented["missing_components"],
+        json!(["documentation_comment"])
+    );
+    for kind in ["CXXRecordDecl", "CXXConstructorDecl", "CXXMethodDecl"] {
+        assert!(
+            observed["unresolved_declaration_kinds"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|v| v == kind)
+        );
+    }
+    assert_eq!(observed["qualification"], "not_granted");
+    if let Ok(destination) = std::env::var("CODEGUARD_CPP_METHOD_EVIDENCE") {
+        use sha2::{Digest, Sha256};
+        let path = std::path::Path::new(&destination);
+        assert!(path.is_absolute());
+        let evidence = json!({
+            "qualification":"not_granted",
+            "scope":"cpp17_ordinary_in_class_methods_only",
+            "source_sha256":format!("{:x}", Sha256::digest(source)),
+            "test_source_sha256":format!("{:x}", Sha256::digest(include_bytes!("clang_documentation_structure_contract.rs"))),
+            "compiler_version":String::from_utf8_lossy(&version.stdout).trim(),
+            "compiler_sha256":format!("{:x}", Sha256::digest(std::fs::read(&clang).unwrap())),
+            "native_ast_sha256":format!("{:x}", Sha256::digest(&native.stdout)),
+            "observation":observed
+        });
+        std::fs::write(path, serde_json::to_vec_pretty(&evidence).unwrap()).unwrap();
+    }
+}
