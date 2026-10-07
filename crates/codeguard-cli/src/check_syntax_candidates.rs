@@ -377,8 +377,7 @@ fn candidate_result(
                 .next()
                 .map_or(0, <[u8]>::len);
             let recovery_count = observation.recoveries.len();
-            let incomplete_reason =
-                (observation.precheck.truncated_files > 0).then_some("syntax_recovery_incomplete");
+            let incomplete_reason = observation.evaluation_incomplete_reason();
             let recoveries: Vec<Value> = observation.recoveries.iter().take(MAX_VISIBLE_RECOVERIES).map(|recovery| {
                 json!({
                     "kind":recovery.kind,

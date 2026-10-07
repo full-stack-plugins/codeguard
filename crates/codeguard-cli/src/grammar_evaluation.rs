@@ -198,24 +198,27 @@ mod replay {
                 .as_ref()
                 .ok()
                 .map(|obs| obs.grammar_sha256.clone());
-            let (classification, recovery_count, reason, attempted) = match observation {
-                Ok(obs) => {
-                    let truncated = obs.precheck.truncated_files > 0;
-                    (
-                        classify_probe(obs.recoveries.len(), truncated),
-                        Some(obs.recoveries.len()),
-                        obs.evaluation_incomplete_reason().map(str::to_owned),
-                        true,
-                    )
-                }
-                Err(reason) => {
-                    let attempted = !matches!(
-                        reason.as_str(),
-                        "request_cancelled" | "request_deadline_exceeded"
-                    );
-                    (None, None, Some(reason), attempted)
-                }
-            };
+            let (classification, recovery_count, reason, reason_detail, attempted) =
+                match observation {
+                    Ok(obs) => {
+                        let truncated = obs.precheck.truncated_files > 0;
+                        (
+                            classify_probe(obs.recoveries.len(), truncated),
+                            Some(obs.recoveries.len()),
+                            obs.evaluation_incomplete_reason().map(str::to_owned),
+                            obs.evaluation_incomplete_reason_detail()
+                                .map(str::to_owned),
+                            true,
+                        )
+                    }
+                    Err(reason) => {
+                        let attempted = !matches!(
+                            reason.as_str(),
+                            "request_cancelled" | "request_deadline_exceeded"
+                        );
+                        (None, None, Some(reason), None, attempted)
+                    }
+                };
             // 每个样本至多一个“存在语法异常”事件；不是精确规则实例召回率。
             let finding = format!("{}:syntax", case.id);
             evaluations.push(EvaluationCase {
@@ -249,8 +252,12 @@ mod replay {
                 "classification":classification_name(classification),"recovery_count":recovery_count,
                 "reason":reason,"attempted":attempted,"elapsed_us":started.elapsed().as_micros().min(u64::MAX as u128) as u64}));
             if corpus.schema_version == "0.2.0" {
-                rows.last_mut().ok_or("grammar_evaluation_row_missing")?["cohort"] =
-                    json!(case.cohort);
+                let row = rows.last_mut().ok_or("grammar_evaluation_row_missing")?;
+                row["cohort"] = json!(case.cohort);
+                // 精确细分只进入版本化报告；0.1.0 的行形状保持不变。
+                row["reason_detail"] = reason_detail
+                    .clone()
+                    .map_or(Value::Null, |detail| json!(detail));
             }
             if structures {
                 let combined =
@@ -267,6 +274,10 @@ mod replay {
                 row["classification"] = json!("unknown");
                 row["recovery_count"] = Value::Null;
                 row["reason"] = json!("grammar_evaluation_program_changed");
+                // 覆盖原因后必须清空细分，避免留下与新 reason 矛盾的旧细分。
+                if row.get("reason_detail").is_some() {
+                    row["reason_detail"] = Value::Null;
+                }
                 evaluation.observed_complete = false;
                 evaluation.observed_findings.clear();
             }
