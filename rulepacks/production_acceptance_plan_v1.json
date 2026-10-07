@@ -111,6 +111,7 @@
     "crates/codeguard-cli/tests/check_c_family_comments.rs": "b44559e0cc7c657c16a5456a328014bf24ba810beccd6c15aa027b8c130c86c4",
     "crates/codeguard-cli/tests/clang_documentation_structure_native.rs": "e79cf2b5618220674a73a2090090b236002d594325e88e66f6902402e9248bff",
     "crates/codeguard-cli/tests/claude_hook_cli.rs": "f1423466d11280c0f6b4103ce4e5ffe0d3a47721bd9b571d03bc98d270c7eee8",
+    "crates/codeguard-cli/tests/cpp_documentation_workbench.rs": "f300c7ee467c176b8246d101cbb4949869eda78c1dae77856f08fdd7e5f17d89",
     "crates/codeguard-cli/tests/cpp_native_differential.rs": "10c540b6e49de7fad3551dc34578f040721d961481442fc2663a3a38ffd4f867",
     "crates/codeguard-cli/tests/hook_failed_write_options.rs": "3eee32e4a9675bf91e2d9068646f7c2cc06275b6a631ebc1697e3bf47d0224d0",
     "crates/codeguard-cli/tests/python_comments_cli.rs": "7c7ac7a3eca8019a81f196267090ebd4c37f1a9918d621a40ace93dd7221f116",
@@ -177,6 +178,7 @@
     "tests/acceptance/clang-standalone-native.md": "155e64133bc4353cdbfe223c8e2c5bf1d2ab2c3e95c7c2e0232e9931988db017",
     "tests/acceptance/clippy-documentation-aggregate.md": "99f0b90dafda408b755f414277b55313c453771131038adada6295e572f15cc6",
     "tests/acceptance/clippy-documentation-contract.md": "7843e99c75b262710126c0c1b56596a0a004db563603b0575564e86416304060",
+    "tests/acceptance/cpp17-member-workbench.md": "ee7ff479f6e382a60a81099d02033781e851c43dc98744b5914d5b513427dd8d",
     "tests/acceptance/cpp17-method-documentation.md": "eb79275ca92cf70dddd6c001c3cc003cc70b0ee6ca64bbedc1ccc3efb0b246eb",
     "tests/acceptance/cpp17-native-wasm-differential.md": "5177a5877bcba9d417c18d373a9431f86e95cfdea26d0f91a12241a5e8881f3e",
     "tests/acceptance/erlang-native-first-workbench.md": "3303eaec7903b193c5794901831b0b89fc0e6b6aae80086d60b0ef8b75b9d4d1",
@@ -222,6 +224,9 @@
     "tests/acceptance/evidence/clang-documentation-structure-native.json": "9749be2e060aed4c529cab0f61444a89a34e3c0365938c7df0cd5845272218cf",
     "tests/acceptance/evidence/clang-documentation-structure-schema.json": "1c522b5fef58da2d81d556242d0c6f2d707e2e3e67dc4abde5ba3a214dbfea8a",
     "tests/acceptance/evidence/cpp17-free-operator-documentation.json": "2b560a1253ebc06bf6920090f0bbd0324daf923a8bcf0e1d322796c6e849dc53",
+    "tests/acceptance/evidence/cpp17-member-workbench-default.json": "fba7c70ba187240e2109c5a7c146de66ab98c7eba82de7905f4b3909da6a9298",
+    "tests/acceptance/evidence/cpp17-member-workbench-schema.json": "740709f74a81c887d1aae180adbbf7a5369073be86fd5be76f5dee070b6b9392",
+    "tests/acceptance/evidence/cpp17-member-workbench-wasm.json": "fed33eef6b950b7c84a3a8cc44a3ea93b42ffe83e3e7d0ff41dbe24d1ea86496",
     "tests/acceptance/evidence/cpp17-method-documentation.json": "6225cb81215c7ed0ba1e727f50b3fd463c5a428d91766545357c51fc81141ba2",
     "tests/acceptance/evidence/cpp17-native-wasm-differential.json": "b0faaeca50331a007993217a685d65e7d2aa5468a60e95a171c5f0a60f2d8d99",
     "tests/acceptance/evidence/java-native-tool-source-inventory-2026-10-07.json": "b9d8e2bf5f16ccd370a699d9d4b177b1b108c55c85b981b7f9a42eeef7ce6cec",
@@ -299,6 +304,7 @@
     "tests/c_family_structure_workbench_schema.py": "cceefe69a21d524b2b87a49efc3b52eb557aa8d0497e18c6430c016455eed002",
     "tests/check_c_family_documentation_schema.py": "3bfe503b305e558afcf258595a77255b183bbf6fae17c5a4eefbe588dd9212ae",
     "tests/clang_documentation_structure_schema.py": "ea4fecb1b7ff2fc4731c0dced9f60ad43a45b0100456e29360c69cab5f4d395a",
+    "tests/cpp_documentation_workbench_schema.py": "740372a660dc1b97150ec43411155d0f12a92aaca17ca947084e2674f4dca4f5",
     "tests/fixtures/java_native_tool_bootstrap/pom.xml": "651bd2709304a8bf5a7371b5a7503bedf9482a2f915afd5d93cf36a5473410a5",
     "tests/fixtures/java_native_tool_bootstrap/src/main/java/BootstrapDocs.java": "2cb6b78b759253536027b34afc500f751d1e4614420f77ddcd5623a9a7ab19fa"
   },
@@ -3615,7 +3621,13 @@
                 "tests/acceptance/evidence/c-family-host-wasm-cpp.json",
                 "tests/acceptance/cpp17-method-documentation.md",
                 "tests/acceptance/evidence/cpp17-method-documentation.json",
-                "tests/acceptance/evidence/cpp17-free-operator-documentation.json"
+                "tests/acceptance/evidence/cpp17-free-operator-documentation.json",
+                "crates/codeguard-cli/tests/cpp_documentation_workbench.rs",
+                "tests/cpp_documentation_workbench_schema.py",
+                "tests/acceptance/cpp17-member-workbench.md",
+                "tests/acceptance/evidence/cpp17-member-workbench-default.json",
+                "tests/acceptance/evidence/cpp17-member-workbench-wasm.json",
+                "tests/acceptance/evidence/cpp17-member-workbench-schema.json"
               ],
               "blockers": [
                 "C/C++结构文件策略任务、原工具task verify、受控repair-source尝试及同一输入两次失败预算已接线；跨输入语义无进展、可信关闭/复发、check/Hook与详细语义/完整项目/独立精度仍未验收。",
