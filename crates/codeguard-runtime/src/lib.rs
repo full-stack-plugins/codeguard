@@ -253,3 +253,4 @@ pub mod task_dag;
 pub mod work_tree_snapshot;
 pub mod evidence_index;
 pub mod offline_boundary;
+pub mod git_index_input;
