@@ -119,8 +119,11 @@ fn observe_profile(
                 env: BTreeMap::new(),
                 stdin,
                 deadline,
-                output_limit_bytes: if matches!(profile, NativeClangProfile::DocumentationStructure)
-                {
+                output_limit_bytes: if matches!(
+                    profile,
+                    NativeClangProfile::DocumentationStructure
+                        | NativeClangProfile::DocumentationPlaceholders
+                ) {
                     8 * 1024 * 1024
                 } else {
                     64 * 1024
@@ -164,7 +167,10 @@ fn observe_profile(
     let mut args: Vec<OsString> = flags.into_iter().map(OsString::from).collect();
     args.insert(1, OsString::from(format!("-std={standard}")));
     args.splice(7..7, profile.warning_flags().iter().map(OsString::from));
-    if matches!(profile, NativeClangProfile::DocumentationStructure) {
+    if matches!(
+        profile,
+        NativeClangProfile::DocumentationStructure | NativeClangProfile::DocumentationPlaceholders
+    ) {
         args.splice(
             1..1,
             [OsString::from("-Xclang"), OsString::from("-ast-dump=json")],
@@ -183,7 +189,11 @@ fn observe_profile(
         report["reason"] = json!("clang_execution_incomplete");
         return report;
     }
-    if !matches!(profile, NativeClangProfile::DocumentationStructure) && !output.stdout.is_empty() {
+    if !matches!(
+        profile,
+        NativeClangProfile::DocumentationStructure | NativeClangProfile::DocumentationPlaceholders
+    ) && !output.stdout.is_empty()
+    {
         report["reason"] = json!("clang_report_invalid");
         return report;
     }
@@ -193,7 +203,11 @@ fn observe_profile(
         output.termination == Termination::Exited(0),
     ) {
         Ok(mut rows) => {
-            if matches!(profile, NativeClangProfile::DocumentationStructure) {
+            if matches!(
+                profile,
+                NativeClangProfile::DocumentationStructure
+                    | NativeClangProfile::DocumentationPlaceholders
+            ) {
                 report["structure_raw_diagnostic_count"] = json!(rows.len());
                 // AST输出可触发Clang重新读取注释；按脱敏规则/行列/等级归并并保留原条数。
                 let mut seen = BTreeSet::new();
@@ -213,18 +227,33 @@ fn observe_profile(
         }
         Err(reason) => report["reason"] = json!(reason),
     }
-    if matches!(profile, NativeClangProfile::DocumentationStructure)
-        && matches!(
-            report["status"].as_str(),
-            Some("completed" | "diagnostics_observed")
-        )
-        && output.termination == Termination::Exited(0)
+    if matches!(
+        profile,
+        NativeClangProfile::DocumentationStructure | NativeClangProfile::DocumentationPlaceholders
+    ) && matches!(
+        report["status"].as_str(),
+        Some("completed" | "diagnostics_observed")
+    ) && output.termination == Termination::Exited(0)
         && !report["diagnostics"]
             .as_array()
             .into_iter()
             .flatten()
             .any(|row| row["level"] == "error")
     {
+        if matches!(profile, NativeClangProfile::DocumentationPlaceholders) {
+            report["placeholder_observation"] =
+                match codeguard_adapters::parse_clang_documentation_placeholders(
+                    &output.stdout,
+                    source,
+                ) {
+                    Ok(observation) => {
+                        json!({"status":"observed","reason":"clang_placeholder_observed","observation":observation})
+                    }
+                    Err(_) => {
+                        json!({"status":"incomplete","reason":"clang_placeholder_report_invalid","observation":null})
+                    }
+                };
+        }
         report["structure_observation"] = match codeguard_adapters::parse_clang_documentation_ast(
             &output.stdout,
             source,
@@ -250,6 +279,22 @@ pub(crate) fn observe_documentation_with_structure(
     deadline: Instant,
     cancelled: &AtomicBool,
 ) -> (Value, Value) {
+    let (native, structure, _) = observe_documentation_with_placeholders(
+        tool, language, standard, source, deadline, cancelled, false,
+    );
+    (native, structure)
+}
+
+/// 同次原生扫描的独立占位策略观察；enable为false时不执行新增解析，不改变历史消费协议。
+pub(crate) fn observe_documentation_with_placeholders(
+    tool: &Path,
+    language: &str,
+    standard: &str,
+    source: &[u8],
+    deadline: Instant,
+    cancelled: &AtomicBool,
+    enable: bool,
+) -> (Value, Value, Value) {
     let mut native = observe_profile(
         tool,
         language,
@@ -257,12 +302,17 @@ pub(crate) fn observe_documentation_with_structure(
         source,
         deadline,
         cancelled,
-        NativeClangProfile::DocumentationStructure,
+        if enable {
+            NativeClangProfile::DocumentationPlaceholders
+        } else {
+            NativeClangProfile::DocumentationStructure
+        },
     );
     let mut structure=native.as_object_mut().and_then(|n|n.remove("structure_observation")).unwrap_or(json!({"status":"incomplete","reason":"clang_structure_unavailable","observation":null}));
     structure["native_raw_diagnostic_count"] = native
         .as_object_mut()
         .and_then(|n| n.remove("structure_raw_diagnostic_count"))
         .unwrap_or(Value::Null);
-    (native, structure)
+    let placeholder = native.as_object_mut().and_then(|n| n.remove("placeholder_observation")).unwrap_or(json!({"status":"incomplete","reason":"clang_placeholder_unavailable","observation":null}));
+    (native, structure, placeholder)
 }

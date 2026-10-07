@@ -9,15 +9,17 @@ pub(crate) enum NativeClangProfile {
     Documentation,
     /// 同次原生扫描输出警告和函数文档AST，结构事实不冒充原警告或完整政策。
     DocumentationStructure,
+    /// 公开单文件文档反馈同次AST的独立占位策略，不修改历史结构协议。
+    DocumentationPlaceholders,
 }
 impl NativeClangProfile {
     /// 返回固定原生警告参数；无运行输入，返回静态字面argv列表。
     pub(crate) fn warning_flags(self) -> &'static [&'static str] {
         match self {
             Self::Syntax => &["-Wall", "-Wextra", "-Wpedantic"],
-            Self::Documentation | Self::DocumentationStructure => {
-                &["-Wdocumentation", "-Wdocumentation-pedantic"]
-            }
+            Self::Documentation
+            | Self::DocumentationStructure
+            | Self::DocumentationPlaceholders => &["-Wdocumentation", "-Wdocumentation-pedantic"],
         }
     }
 }
