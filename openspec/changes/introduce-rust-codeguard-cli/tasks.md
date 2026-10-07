@@ -53,7 +53,7 @@
 - [x] 2.9 实现报告原子导出、可逆路径编码、多位置/包定位及来源保留；验收：output不可写为3且原finding保留，未知major拒绝，不按有损路径或相似文案跨工具抵消发现。
   局部进展：`check all/java` 的 JSON/SARIF 已支持 `--output PATH` 同目录暂存与原子写入；目标不可用时本轮报告仍在 stdout，已发现的原生问题不丢；已有非 CodeGuard 文件不可覆盖。human/其它检查类命令、可逆路径与多位置/包身份、完整 RunReport 导出及跨工具归并仍缺，2.9 不勾选。
   反馈补强：局部 JSON 0.18、故障报告 0.3 与局部 SARIF 现显式返回导出状态及受限失败原因码，使只消费结构化 stdout 的智能体也能看到保存失败；成功文件和 stdout 同报 `saved`。完整 2.9 仍未完成。
-- [ ] 2.10 升级 RunReport 与所有公开消费者的白名单处置协议；验收：新版本明确 raw/active/whitelisted finding、批准引用和 allow_with_exceptions，旧消费者拒绝未知决策而非降级为普通 allow，human/JSON/SARIF/MCP/Hook 语义一致。
+- [x] 2.10 升级 RunReport 与所有公开消费者的白名单处置协议；验收：新版本明确 raw/active/whitelisted finding、批准引用和 allow_with_exceptions，旧消费者拒绝未知决策而非降级为普通 allow，human/JSON/SARIF/MCP/Hook 语义一致。
   进行中：相邻 `codeguard-cli` 已提供 RunReport 1.3 schema/严格消费和 conversation feedback 0.2 JSON/human，初期白名单协议与旧报告契约测试见 `tests/acceptance/run-report-allowlist-protocol.md`。后续已有保守 SARIF 投影，仍无真实报告生产、可信来源、MCP/Hook 消费者与端到端门禁，不勾选。
   协议身份接线：RunReport 1.4 要求每条 finding 的完整原生身份，并在误报处置中核对精确决策身份；规则、工具制品、检查器类别和主目标须与本轮报告一致，源码字节/指纹/适配器/rulepack、依赖图/advisory 变化拒绝处置。旧 1.3 schema 原件留存，未来未知版本拒绝；human/JSON/SARIF 继续明确来源及批准未核验，不能凭自写报告签发 allow。当前仅结构消费，真实原工具身份生成、可信来源、MCP/Hook 和正式门禁仍缺，2.10/4.8 不勾选。
   覆盖/字节复核增量：1.4 源码 finding 主目标必须同时属于本义务预期和实际覆盖集合；宿主可调用只读 `compare_claimed_source_hashes` 对其独立指定工作区内全部源码目标按真实字节比较 SHA-256，文件变化、缺失、链接或超预算均拒绝。该接口尚未由正式门禁调用，不能验证自称的原生结果或批准来源；2.10/4.8 不勾选。
