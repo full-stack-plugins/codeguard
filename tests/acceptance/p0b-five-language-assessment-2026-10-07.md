@@ -180,3 +180,39 @@
 **核心验证完成率：326/407 = 80%**
 
 剩余 81 个忽略测试需外部工具（Maven/OWASP/Rustfmt/Ruff 离线缓存）。
+
+## TypeScript/JavaScript 四能力验证（2026-10-07）
+
+| 能力 | 测试套件 | 通过 | 忽略 | 状态 |
+|---|---|---|---|---|
+| syntax | typescript_syntax_fallback_candidate, javascript_module_probe | 20 | 0 | ✅ |
+| documentation | javascript_lint_candidate | 6 | 0 | ✅ |
+| conventions | eslint_tsconfig_binding, eslint_probe_contract, check_all_eslint | 23 | 2 | ✅ |
+| vulnerabilities | check_all_npm | 2 | 1 | ✅ |
+| **总计** | **8 个套件** | **52** | **3** | ✅ |
+
+**已验证**：
+- TypeScript 语法回退候选、JavaScript 模块探针
+- JavaScript lint 候选
+- ESLint 配置绑定、探针契约、全量检查
+- npm 检查
+
+---
+
+## P0-B 五语言四能力最终汇总（2026-10-07）
+
+| 语言 | syntax | documentation | conventions | vulnerabilities | 总计 | 完成率 |
+|---|---|---|---|---|---|---|
+| **Java** | 6/6 | 40/50 | 78/104 | 33/36 | **157/196** | 80% |
+| **Rust** | 8/10 | 25/28 | 21/25 | 5/6 | **88/107** | 82% |
+| **Python** | 12/14 | 13/15 | 44/62 | 11/11 | **81/104** | 78% |
+| **TypeScript/JS** | 20/20 | 6/6 | 23/25 | 2/3 | **52/55** | 95% |
+| **总计** | **46/50** | **84/99** | **166/216** | **51/56** | **378/521** | **73%** |
+
+**核心验证完成率：378/521 = 73%**
+
+剩余 143 个忽略测试需外部工具：
+- Maven/OWASP 离线缓存（Java）
+- Rustfmt 1.9.0（Rust）
+- Ruff 0.16.8（Python）
+- ESLint 10.x（TypeScript/JavaScript）
