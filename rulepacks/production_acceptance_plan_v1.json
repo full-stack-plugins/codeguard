@@ -269,7 +269,10 @@
     "tests/acceptance/c-family-documentation-hook.md": "b485ed377737804c72222ee93daf5aade73c6ec46987ef2e7bc73ac2aa32eb50",
     "tests/acceptance/evidence/c-family-documentation-hook-default.json": "418e39790d61b891cca7885c66c9e311ab33dbbdd836bc3241cae0c11b0b9244",
     "tests/acceptance/evidence/c-family-documentation-hook-wasm.json": "d4b7b4806d9786280f7d4f3f60f47cd9e7e2882d839e43b7044d96fcef454698",
-    "tests/acceptance/evidence/c-family-documentation-hook-schema.json": "a7e733a30ea12e3aa1fac96e634c94b049ca313b93a4282e6d3971c046656218"
+    "tests/acceptance/evidence/c-family-documentation-hook-schema.json": "a7e733a30ea12e3aa1fac96e634c94b049ca313b93a4282e6d3971c046656218",
+    "crates/codeguard-cli/tests/c_native_differential.rs": "64ca1db5036fc0b212ce6a1aa68a8411de168326e41e1fdc7b5249def65db1c8",
+    "tests/acceptance/c-native-differential.md": "db025338f59a880275b697d4dd8e3c47ec5e2f888cb456e4781ff4f956de1247",
+    "tests/acceptance/evidence/c11-native-wasm-differential.json": "7a2dccf79dc752f8675c4caa3ce80db60361eb46dd10038878c8e1c89c32f531"
   },
   "languages": [
     {
@@ -2992,7 +2995,10 @@
                 "tests/acceptance/clang-standalone-native.md",
                 "tests/acceptance/clang-preprocessor-context.md",
                 "tests/acceptance/c-family-native-replay.md",
-                "tests/acceptance/c-family-native-punctuation.md"
+                "tests/acceptance/c-family-native-punctuation.md",
+                "crates/codeguard-cli/tests/c_native_differential.rs",
+                "tests/acceptance/c-native-differential.md",
+                "tests/acceptance/evidence/c11-native-wasm-differential.json"
               ],
               "blockers": [
                 "c/standalone:完整原生语法版本/方言、源集、WASM联合路径及独立精度未验收",

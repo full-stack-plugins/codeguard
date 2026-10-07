@@ -1,0 +1,148 @@
+{
+  "case_count": 19,
+  "cases": [
+    {
+      "candidate_valid": true,
+      "case": "function",
+      "expected_valid": true,
+      "native_exit": 0,
+      "source_sha256": "2ad75d95660563887d8d3f1d0ae1dcf18c2379cbd83a5c72f5ab276351ee6949"
+    },
+    {
+      "candidate_valid": true,
+      "case": "pointer",
+      "expected_valid": true,
+      "native_exit": 0,
+      "source_sha256": "cf6844dae4e58b7b5086281300686d9956587fd656cfc903b6ca4205ab8b05cf"
+    },
+    {
+      "candidate_valid": true,
+      "case": "structure",
+      "expected_valid": true,
+      "native_exit": 0,
+      "source_sha256": "ae291bd67be51e38548f08b410a8e7a2f5390fdf56b8fde16b439dcb0ddae9c6"
+    },
+    {
+      "candidate_valid": true,
+      "case": "typedef",
+      "expected_valid": true,
+      "native_exit": 0,
+      "source_sha256": "71a8c9fe077a5757900051c50d3d1584eec77fa9f1b40ec9a958ff90768f687c"
+    },
+    {
+      "candidate_valid": true,
+      "case": "enumeration",
+      "expected_valid": true,
+      "native_exit": 0,
+      "source_sha256": "dae545f9c672322cc57cab11dee9937773259c19b57296da966f92af81414422"
+    },
+    {
+      "candidate_valid": true,
+      "case": "compound_literal",
+      "expected_valid": true,
+      "native_exit": 0,
+      "source_sha256": "0262f0063ca13190d16558e60e8589a408abc64c2626d11f5f30bfc79bc09b30"
+    },
+    {
+      "candidate_valid": true,
+      "case": "designated",
+      "expected_valid": true,
+      "native_exit": 0,
+      "source_sha256": "952e976574117940e84983d6c6f80d4f9ccca2f96171b696ddc578c700fcd39a"
+    },
+    {
+      "candidate_valid": true,
+      "case": "preprocessor",
+      "expected_valid": true,
+      "native_exit": 0,
+      "source_sha256": "26a62ddd5446e54b587276346a4ea2815d50ae217985691507b50889b06cf423"
+    },
+    {
+      "candidate_valid": true,
+      "case": "static_assert",
+      "expected_valid": true,
+      "native_exit": 0,
+      "source_sha256": "fd57efb0face93373fd077f54a09e989f5b1db7c937e2f67ce69b28ac6a2794f"
+    },
+    {
+      "candidate_valid": true,
+      "case": "generic_selection",
+      "expected_valid": true,
+      "native_exit": 0,
+      "source_sha256": "7616705e6ccf55899656233238014467f55b02b1ec90ab4a9a3e9df189ad46f3"
+    },
+    {
+      "candidate_valid": true,
+      "case": "variable_length_array",
+      "expected_valid": true,
+      "native_exit": 0,
+      "source_sha256": "a47e13a2950f0953b23003fa27b2a485a406b64bec58a2a970b013f487d4b76f"
+    },
+    {
+      "candidate_valid": true,
+      "case": "function_pointer",
+      "expected_valid": true,
+      "native_exit": 0,
+      "source_sha256": "d6f9e9ed000becea0545dbc8b4d09e5cd7dee181039ea0e9cc64823571858743"
+    },
+    {
+      "candidate_valid": false,
+      "case": "broken_static_assert",
+      "expected_valid": false,
+      "native_exit": 1,
+      "source_sha256": "c74d6e9eaf83961df67c2ab8bf12d871776d78e3f047ec912fc735858945c725"
+    },
+    {
+      "candidate_valid": false,
+      "case": "broken_generic",
+      "expected_valid": false,
+      "native_exit": 1,
+      "source_sha256": "f2c9bc0f10b535a9afed22dbd9148facbde9f3dabcc03b76f7d40d8d42f8692b"
+    },
+    {
+      "candidate_valid": false,
+      "case": "missing_brace",
+      "expected_valid": false,
+      "native_exit": 1,
+      "source_sha256": "0bc3da61edcc941a330fc090fc3390a7ea28f7136fbc60e934fd2cc54c83f4a0"
+    },
+    {
+      "candidate_valid": false,
+      "case": "missing_semicolon",
+      "expected_valid": false,
+      "native_exit": 1,
+      "source_sha256": "e7f9512d79642a7d530ad4765b233b53c5aec858ee408ad48fcadd7f639634f8"
+    },
+    {
+      "candidate_valid": false,
+      "case": "missing_expr",
+      "expected_valid": false,
+      "native_exit": 1,
+      "source_sha256": "e1f3b4ab3ae6a0b2e7b60ba21a983545382a41487282a37c0eba1698250b5950"
+    },
+    {
+      "candidate_valid": false,
+      "case": "unclosed_string",
+      "expected_valid": false,
+      "native_exit": 1,
+      "source_sha256": "74a2152326de9077ec6bfd8f276986cda9d4b718701c2bb64a4dfad1df694c5a"
+    },
+    {
+      "candidate_valid": false,
+      "case": "bad_declarator",
+      "expected_valid": false,
+      "native_exit": 1,
+      "source_sha256": "f11f99927226d3ebc8b6c8c49ab1379403f9232234c3c9f4c911c9c29bde474f"
+    }
+  ],
+  "cli_sha256": "fc1afbd09cfa06138c2726aee904e5399e0216004571c69b8a0a14a2ee22f800",
+  "compiler_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+  "compiler_version": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin\n",
+  "delivery_decision": "not_evaluated",
+  "evidence_kind": "development_c11_native_wasm_differential",
+  "grammar_manifest_sha256": "9fe2fa77181aedd74755a2ac5b8fe694b2d4f2d33f03518d814476a911b2a610",
+  "independent_holdout": false,
+  "qualification": "not_granted",
+  "standard": "c11",
+  "test_source_sha256": "64ca1db5036fc0b212ce6a1aa68a8411de168326e41e1fdc7b5249def65db1c8"
+}
