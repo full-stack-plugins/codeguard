@@ -116,7 +116,7 @@ pub use replay::{replay_corpus, replay_corpus_with_structures};
 mod replay {
     use super::{MANIFEST, classify_probe, digest, validate_corpus};
     use crate::syntax_worker_runner::{
-        run_syntax_worker_candidate, run_syntax_worker_binding_candidate,
+        run_syntax_worker_binding_candidate, run_syntax_worker_candidate,
         run_syntax_worker_form_candidate,
     };
     use codeguard_core::{
@@ -206,8 +206,7 @@ mod replay {
                             classify_probe(obs.recoveries.len(), truncated),
                             Some(obs.recoveries.len()),
                             obs.evaluation_incomplete_reason().map(str::to_owned),
-                            obs.evaluation_incomplete_reason_detail()
-                                .map(str::to_owned),
+                            obs.evaluation_incomplete_reason_detail().map(str::to_owned),
                             true,
                         )
                     }

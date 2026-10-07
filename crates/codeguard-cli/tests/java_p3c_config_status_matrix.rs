@@ -135,8 +135,7 @@ fn p3c_disabled_plugin_is_invalid_and_never_launches_native() {
         "{java}"
     );
     assert_eq!(
-        file["configuration_next_action"],
-        "移除 Maven PMD 的 skip=true 并重新探测",
+        file["configuration_next_action"], "移除 Maven PMD 的 skip=true 并重新探测",
         "{java}"
     );
     assert_eq!(file["reason"], "p3c_configuration_not_confirmed");
@@ -264,8 +263,7 @@ fn clean_counterpart_opposes_the_violating_sentinel_under_one_probe() {
     let java = project.report_java(&positive);
     assert_eq!(java["finding_count"], 1, "{java}");
     assert_eq!(
-        java["files"][0]["observation"]["findings"][0]["rule_id"],
-        "ClassNamingShouldBeCamelRule",
+        java["files"][0]["observation"]["findings"][0]["rule_id"], "ClassNamingShouldBeCamelRule",
         "{java}"
     );
     assert_eq!(java["local_observation_complete"], true);
@@ -286,8 +284,7 @@ fn clean_counterpart_opposes_the_violating_sentinel_under_one_probe() {
         "{java}"
     );
     assert_eq!(
-        java["files"][0]["observation"]["reason"],
-        "clean_report_has_no_file_attestation",
+        java["files"][0]["observation"]["reason"], "clean_report_has_no_file_attestation",
         "{java}"
     );
     assert_eq!(java["coverage_proven"], false);

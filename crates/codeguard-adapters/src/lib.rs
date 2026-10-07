@@ -7,9 +7,9 @@ use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashSet};
 
 mod capability_validation;
+mod javascript_binding_rule;
 mod production_acceptance_plan;
 mod python_suite_rule;
-mod javascript_binding_rule;
 pub use javascript_binding_rule::{javascript_binding_node_kinds, javascript_binding_rule_sha256};
 pub use python_suite_rule::{is_required_python_suite_parent, python_suite_rule_sha256};
 mod go_package_rule;
@@ -27,10 +27,10 @@ pub use cargo_build_parsed::CargoBuildParsed;
 mod cargo_clippy;
 mod cargo_documentation_config;
 mod cargo_documentation_workspace;
-mod cargo_workspace_reference;
-mod cargo_module_model;
 mod cargo_edition_declaration;
+mod cargo_module_model;
 mod cargo_rustdoc;
+mod cargo_workspace_reference;
 mod checker_configuration;
 mod checkstyle_command;
 mod checkstyle_config;
@@ -81,12 +81,12 @@ mod eslint_json;
 mod eslint_message_report;
 mod eslint_parsed;
 mod go_candidate;
+mod grammar_asset_manifest;
+mod legacy_dylink_compat;
 mod ruby_candidate;
 mod ruby_candidate_profile;
 mod ruby_candidate_slot;
 mod ruby_candidate_tool;
-mod grammar_asset_manifest;
-mod legacy_dylink_compat;
 mod zig_wasm_compat;
 pub use dart_wasm_compat::adapt_dart_wasm;
 pub use grammar_asset_manifest::{
@@ -129,10 +129,10 @@ pub use capability_validation::validate_capability_inventory;
 pub use cargo_clippy::{ClippyFinding, ClippyParsed, parse_cargo_clippy_json};
 pub use cargo_documentation_config::inspect_cargo_documentation_config;
 pub use cargo_documentation_workspace::inspect_cargo_documentation_workspace;
-pub use cargo_workspace_reference::CargoWorkspaceReference;
-pub use cargo_module_model::CargoModuleModel;
 pub use cargo_edition_declaration::CargoEditionDeclaration;
+pub use cargo_module_model::CargoModuleModel;
 pub use cargo_rustdoc::parse_cargo_rustdoc_json;
+pub use cargo_workspace_reference::CargoWorkspaceReference;
 pub use checker_configuration::{
     CheckerConfiguration, configured_p3c_rulesets, inspect_gradle_unknown, inspect_maven_pom,
     inspect_maven_unreadable, inspect_ruff_config, inspect_ruff_missing, inspect_ruff_unknown,
@@ -159,7 +159,9 @@ pub use javadoc_output::{
     parse_javadoc_output,
 };
 pub use javadoc_replay_pom::javadoc_pom_direct_replay_eligible;
-pub use maven_dependency_pom::{dependency_pom_direct_replay_eligible, dependency_pom_project_identity};
+pub use maven_dependency_pom::{
+    dependency_pom_direct_replay_eligible, dependency_pom_project_identity,
+};
 pub use maven_dependency_tree::{
     MavenDependencyNode, MavenDependencyTree, parse_maven_dependency_tree_json,
 };
@@ -194,7 +196,9 @@ pub use ruff::{
     parse_ruff_json,
 };
 pub use ruff_documentation_rule::{RuffDocumentationRule, is_ruff_documentation_rule};
-pub use ruff_rulepack::{RuffRuleMapping, RuffRulepack, bundled_ruff_rulepack, parse_ruff_rulepack};
+pub use ruff_rulepack::{
+    RuffRuleMapping, RuffRulepack, bundled_ruff_rulepack, parse_ruff_rulepack,
+};
 pub use ruff_settings::{RuffSettingsObservation, parse_ruff_settings};
 pub use rustdoc_finding::RustdocFinding;
 pub use rustdoc_parsed::RustdocParsed;
@@ -436,11 +440,11 @@ pub use ruby_candidate_slot::RubyCandidateSlot;
 pub use ruby_candidate_tool::RubyCandidateTool;
 
 mod shellcheck_diagnostic;
-mod shellcheck_parsed;
 mod shellcheck_json;
+mod shellcheck_parsed;
 pub use shellcheck_diagnostic::ShellCheckDiagnostic;
-pub use shellcheck_parsed::ShellCheckParsed;
 pub use shellcheck_json::parse_shellcheck_json1;
+pub use shellcheck_parsed::ShellCheckParsed;
 
 mod cfquery_projection_rule;
 pub use cfquery_projection_rule::{cfquery_projection_rule_sha256, cfquery_projection_span_valid};
@@ -464,30 +468,30 @@ pub use javascript_module_return_rule::{
     javascript_module_return_node_kinds, javascript_module_return_rule_sha256,
 };
 
-mod gradle_checker_task;
-mod gradle_project_checker_model;
 mod gradle_checker_model;
 mod gradle_checker_model_parser;
-pub use gradle_checker_task::GradleCheckerTask;
-pub use gradle_project_checker_model::GradleProjectCheckerModel;
+mod gradle_checker_task;
+mod gradle_project_checker_model;
 pub use gradle_checker_model::GradleCheckerModel;
 pub use gradle_checker_model_parser::parse_gradle_checker_model;
+pub use gradle_checker_task::GradleCheckerTask;
+pub use gradle_project_checker_model::GradleProjectCheckerModel;
 
-mod gradle_javadoc_task_plan;
-mod gradle_javadoc_plan;
 mod gradle_javadoc_diagnostic;
 mod gradle_javadoc_output;
-pub use gradle_javadoc_task_plan::GradleJavadocTaskPlan;
-pub use gradle_javadoc_plan::plan_gradle_javadoc_tasks;
+mod gradle_javadoc_plan;
+mod gradle_javadoc_task_plan;
 pub use gradle_javadoc_diagnostic::GradleJavadocDiagnostic;
 pub use gradle_javadoc_output::parse_gradle_javadoc_output;
+pub use gradle_javadoc_plan::plan_gradle_javadoc_tasks;
+pub use gradle_javadoc_task_plan::GradleJavadocTaskPlan;
 
 pub use production_acceptance_plan::parse_production_acceptance_plan;
 
-mod gradle_dependency_check_task_plan;
 mod gradle_dependency_check_plan;
-pub use gradle_dependency_check_task_plan::GradleDependencyCheckTaskPlan;
+mod gradle_dependency_check_task_plan;
 pub use gradle_dependency_check_plan::plan_gradle_dependency_check_tasks;
+pub use gradle_dependency_check_task_plan::GradleDependencyCheckTaskPlan;
 
 mod gradle_owasp_report_ownership;
 mod gradle_owasp_report_ownership_parser;
@@ -495,7 +499,9 @@ pub use gradle_owasp_report_ownership::GradleOwaspReportOwnership;
 pub use gradle_owasp_report_ownership_parser::parse_gradle_owasp_report_ownership;
 
 mod c_family_compilation_entry;
-pub use c_family_compilation_entry::{CFamilyCompilationEntry, parse_c_family_compilation_database};
+pub use c_family_compilation_entry::{
+    CFamilyCompilationEntry, parse_c_family_compilation_database,
+};
 
 pub use clang_documentation_ast::clang_documentation_structure_engine_sha256;
 

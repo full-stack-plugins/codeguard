@@ -1,10 +1,10 @@
 use serde_json::{Value, json};
+use sha2::{Digest, Sha256};
 use std::{
     path::{Component, Path},
     sync::atomic::AtomicBool,
     time::Instant,
 };
-use sha2::{Digest, Sha256};
 
 /// 按已确定的项目上下文观察冻结Rust文件，输出可持久化脱敏原生证据。
 /// 参数含根、相对文件、显式已选工具与共同预算；不运行Cargo/源码或提供关闭批准。

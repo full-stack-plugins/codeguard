@@ -770,7 +770,7 @@ mod applicability_tests {
             )["reason"],
             "request_deadline_exceeded"
         );
-        assert_eq!(cancelled.load(Ordering::Relaxed), true);
+        assert!(cancelled.load(Ordering::Relaxed));
         std::fs::remove_dir_all(root).unwrap();
     }
 

@@ -1,4 +1,14 @@
 //! 执行显式Gradle OWASP原任务并读取本轮唯一原生报告；不签发漏洞清洁结论。
+use crate::{gradle_dependency_check_request::Request, tool_identity::hash_bundle_tree};
+use codeguard_adapters::{
+    parse_gradle_checker_model, parse_gradle_owasp_report_ownership,
+    parse_owasp_dependency_check_json, plan_gradle_dependency_check_tasks,
+};
+use codeguard_runtime::{
+    ProcessSpec, SourceSnapshot, Termination, read_bounded_regular_file, run_process_recorded,
+};
+use serde_json::{Value, json};
+use sha2::{Digest, Sha256};
 use std::{
     collections::BTreeMap,
     ffi::OsString,
@@ -8,16 +18,6 @@ use std::{
     sync::atomic::{AtomicBool, AtomicU64, Ordering},
     time::{Instant, SystemTime, UNIX_EPOCH},
 };
-use codeguard_adapters::{
-    parse_gradle_checker_model, plan_gradle_dependency_check_tasks,
-    parse_gradle_owasp_report_ownership, parse_owasp_dependency_check_json,
-};
-use codeguard_runtime::{
-    ProcessSpec, SourceSnapshot, Termination, read_bounded_regular_file, run_process_recorded,
-};
-use serde_json::{Value, json};
-use sha2::{Digest, Sha256};
-use crate::{gradle_dependency_check_request::Request, tool_identity::hash_bundle_tree};
 static NEXT: AtomicU64 = AtomicU64::new(0);
 struct Scratch(PathBuf);
 impl Drop for Scratch {

@@ -6,7 +6,7 @@ use crate::grammar_probe_command::read_plain_source;
 use crate::grammar_route::route_source;
 use crate::syntax_worker_candidate_observation::SyntaxWorkerCandidateObservation;
 use crate::syntax_worker_runner::{
-    run_syntax_worker_candidate, run_syntax_worker_binding_candidate,
+    run_syntax_worker_binding_candidate, run_syntax_worker_candidate,
     run_syntax_worker_form_candidate, run_syntax_worker_module_candidate,
 };
 use codeguard_adapters::bundled_grammar_metadata;

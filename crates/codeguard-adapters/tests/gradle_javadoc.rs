@@ -1,8 +1,8 @@
-use std::collections::BTreeMap;
 use codeguard_adapters::{
-    parse_gradle_checker_model, plan_gradle_javadoc_tasks, parse_gradle_javadoc_output,
+    parse_gradle_checker_model, parse_gradle_javadoc_output, plan_gradle_javadoc_tasks,
 };
 use serde_json::json;
+use std::collections::BTreeMap;
 
 #[test]
 fn only_enabled_official_javadoc_tasks_in_java_projects_become_fully_qualified_paths() {

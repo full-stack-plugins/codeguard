@@ -1,7 +1,7 @@
 #![cfg(all(feature = "wasm-precheck", unix))]
 
-use std::fs;
 use sha2::{Digest, Sha256};
+use std::fs;
 use std::path::Path;
 use std::process::Command;
 
@@ -31,12 +31,32 @@ fn corpus() -> [(&'static str, &'static str, bool); 19] {
             "#define VALUE 1\nint f(void) { return VALUE; }\n",
             true,
         ),
-        ("static_assert", "_Static_assert(sizeof(int) > 0, \"int size\");\n" , true),
-        ("generic_selection", "int f(void) { return _Generic(1, int: 2, default: 0); }\n", true),
-        ("variable_length_array", "int f(int n) { int values[n]; return sizeof(values) > 0; }\n", true),
+        (
+            "static_assert",
+            "_Static_assert(sizeof(int) > 0, \"int size\");\n",
+            true,
+        ),
+        (
+            "generic_selection",
+            "int f(void) { return _Generic(1, int: 2, default: 0); }\n",
+            true,
+        ),
+        (
+            "variable_length_array",
+            "int f(int n) { int values[n]; return sizeof(values) > 0; }\n",
+            true,
+        ),
         ("function_pointer", "int (*handler)(int);\n", true),
-        ("broken_static_assert", "_Static_assert(, \"broken\");\n", false),
-        ("broken_generic", "int f(void) { return _Generic(1, int: ); }\n", false),
+        (
+            "broken_static_assert",
+            "_Static_assert(, \"broken\");\n",
+            false,
+        ),
+        (
+            "broken_generic",
+            "int f(void) { return _Generic(1, int: ); }\n",
+            false,
+        ),
         ("missing_brace", "int main(void) { return 0;\n", false),
         ("missing_semicolon", "int x = 1\n", false),
         (

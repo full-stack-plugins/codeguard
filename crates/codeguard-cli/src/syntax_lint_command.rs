@@ -1,14 +1,14 @@
 //! 注册表语言的局部候选 lint 入口；原生适配缺口不被误称为未安装。
 use crate::syntax_lint_arguments::SyntaxLintArguments;
-use serde_json::json;
 #[cfg(feature = "wasm-precheck")]
 use serde_json::Value;
+use serde_json::json;
+#[cfg(feature = "wasm-precheck")]
+use std::collections::BTreeSet;
 use std::{
     process::ExitCode,
     time::{Duration, Instant},
 };
-#[cfg(feature = "wasm-precheck")]
-use std::collections::BTreeSet;
 
 /// 为注册表语言返回明确Clang原生观察或局部候选与修复任务；不执行注册表历史命令。
 /// 参数只允许明确文件与预算/工作区/格式；返回3或取消130，绝不签发通过。

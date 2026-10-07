@@ -433,7 +433,6 @@ pub mod syntax_worker_structure;
 mod check_go_syntax_scan;
 mod check_native_results;
 mod check_report_assembly;
-mod schema_freeze;
 #[cfg(unix)]
 mod check_ruby_scan;
 #[cfg(unix)]
@@ -459,6 +458,7 @@ mod ruby_project_version;
 mod ruby_syntax_probe;
 #[cfg(unix)]
 mod ruby_tool_selection;
+mod schema_freeze;
 
 #[cfg(unix)]
 mod rust_lint_arguments;

@@ -159,7 +159,7 @@ fn actual_gradle_empty_descriptions_project_with_original_snapshot_binding() {
     use std::{
         collections::BTreeSet,
         sync::atomic::AtomicBool,
-        time::{Instant, Duration},
+        time::{Duration, Instant},
     };
     let (dir, _, _) = fixture();
     fs::write(dir.0.join("build.gradle"),"plugins { id 'java' }\ntasks.named('javadoc') { options.addBooleanOption('Xdoclint:missing',true); options.addBooleanOption('quiet',true) }\n").unwrap();

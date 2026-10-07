@@ -1,7 +1,7 @@
 //! 显式单文件候选语法观察；不将未经验收的 grammar 结果变为 lint 结论。
 
 use crate::syntax_worker_runner::{
-    run_syntax_worker_candidate, run_syntax_worker_binding_candidate,
+    run_syntax_worker_binding_candidate, run_syntax_worker_candidate,
     run_syntax_worker_form_candidate, run_syntax_worker_module_candidate,
 };
 use codeguard_adapters::bundled_grammar_candidate;

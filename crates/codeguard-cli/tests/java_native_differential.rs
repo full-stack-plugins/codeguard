@@ -1,7 +1,7 @@
 #![cfg(all(feature = "wasm-precheck", unix))]
 
-use std::fs;
 use sha2::Digest;
+use std::fs;
 use std::path::Path;
 use std::process::Command;
 

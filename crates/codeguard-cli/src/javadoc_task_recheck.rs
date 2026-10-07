@@ -1,7 +1,7 @@
 //! Javadoc 任务原工具复检；绑定原配置及工具，保持局部观察和可信关闭分离。
 use crate::discovery::discover;
-use crate::java_javadoc_scan::{NativeContext, observe_project};
 use crate::java_javadoc_command::{Args, observe};
+use crate::java_javadoc_scan::{NativeContext, observe_project};
 use crate::javadoc_workbench::prepare;
 use codeguard_adapters::{legacy_registry, parse_unique_json};
 use codeguard_runtime::{NativeObservation, read_bounded_regular_file};

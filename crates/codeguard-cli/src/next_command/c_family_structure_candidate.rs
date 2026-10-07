@@ -1,7 +1,7 @@
 //! 当前结构文件策略组与原始收据绑定；原工具复扫不等于可信关闭。
 use super::Candidate;
 use crate::work_sync::c_family_structure_report::{
-    checker, current, fingerprint, positions, valid_shape, RULE,
+    RULE, checker, current, fingerprint, positions, valid_shape,
 };
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};

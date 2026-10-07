@@ -2,7 +2,9 @@
 
 use std::collections::BTreeMap;
 
-use crate::javadoc_output::{JavadocParseState, parse_detailed_javadoc_output, parse_javadoc_output};
+use crate::javadoc_output::{
+    JavadocParseState, parse_detailed_javadoc_output, parse_javadoc_output,
+};
 
 /// Maven Javadoc 输出是否可归属到已知源码和规则。
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]

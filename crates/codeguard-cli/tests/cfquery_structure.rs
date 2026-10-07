@@ -74,8 +74,8 @@ fn literals_comments_interpolation_and_valid_projection_do_not_match() {
 
 #[test]
 fn embedded_structure_reuses_task_and_restores_whole_file_identity_and_positions() {
-    use std::fs;
     use serde_json::json;
+    use std::fs;
     let temp = std::env::temp_dir()
         .canonicalize()
         .unwrap()

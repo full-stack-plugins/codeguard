@@ -1,4 +1,12 @@
 //! 调用已有Gradle观察选定构建输入的原生模型；配置执行不等于质量检查。
+pub use crate::gradle_model_probe_request::Request;
+use crate::tool_identity::hash_bundle_tree;
+use codeguard_adapters::parse_gradle_checker_model;
+use codeguard_runtime::{
+    ProcessSpec, SourceSnapshot, Termination, read_bounded_regular_file, run_process_recorded,
+};
+use serde_json::{Value, json};
+use sha2::{Digest, Sha256};
 use std::{
     collections::BTreeMap,
     ffi::OsString,
@@ -8,14 +16,6 @@ use std::{
     sync::atomic::{AtomicBool, AtomicU64, Ordering},
     time::{Instant, SystemTime, UNIX_EPOCH},
 };
-use codeguard_adapters::parse_gradle_checker_model;
-use codeguard_runtime::{
-    ProcessSpec, SourceSnapshot, Termination, read_bounded_regular_file, run_process_recorded,
-};
-use serde_json::{Value, json};
-use sha2::{Digest, Sha256};
-use crate::tool_identity::hash_bundle_tree;
-pub use crate::gradle_model_probe_request::Request;
 const SCRIPT: &str = include_str!("../resources/gradle_checker_model.init.gradle");
 static NEXT_SCRATCH: AtomicU64 = AtomicU64::new(0);
 struct Scratch(PathBuf);

@@ -2658,23 +2658,24 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
     });
     // 报告形状决策：条件槽位、schema_version 兼容修剪、lint_only 收窄。
     // 逻辑在 check_report_assembly 模块，此处只传入决定形状的条件与结果。
-    crate::check_report_assembly::finalize(&mut report, crate::check_report_assembly::ReportShapeInput {
-        c_paths_nonempty: !c_paths.is_empty(),
-        c_family_comments,
-        gradle_cve_requested,
-        gradle_requested,
-        gradle_result_key: &gradle_result_key,
-        java_gradle_cve,
-        gradle_cve_tasks,
-        java_gradle_model,
-        gradle_javadoc_tasks,
-        zig_lint,
-        ruby_lint,
-        shell_lint,
-        kotlin_lint,
-        swift_lint,
-        lint_only,
-    });
+    crate::check_report_assembly::finalize(
+        &mut report,
+        crate::check_report_assembly::ReportShapeInput {
+            c_paths_nonempty: !c_paths.is_empty(),
+            c_family_comments,
+            gradle_cve_requested,
+            gradle_requested,
+            gradle_result_key,
+            java_gradle_cve,
+            gradle_cve_tasks,
+            java_gradle_model,
+            gradle_javadoc_tasks,
+            zig_lint,
+            ruby_lint,
+            shell_lint,
+            lint_only,
+        },
+    );
     if parsed.format != OutputFormat::Human {
         emit_structured(&report, &parsed);
     } else {
