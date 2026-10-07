@@ -59,3 +59,26 @@
 1. 先完成 WASM 联合路径的代码集成（可在当前环境验证）
 2. 再做原生语法版本/方言验收（需要 JDK 环境）
 3. 最后做五平台宿主验证（需要宿主环境）
+
+## 更新：原生语法版本/方言验收通过（2026-10-07）
+
+使用真实 javac 21.0.12.1 运行 Java 原生差分测试：
+
+| 测试 | 结果 |
+|---|---|
+| java21_language_forms_match_existing_native_compiler | ✅ PASS |
+| pinned_java_worker_matches_native_javac_on_syntax_corpus | ✅ PASS |
+
+**结论**：Java 语法版本/方言验收通过，原生 javac 21 与 WASM grammar 的
+语法分类一致。这是 Java syntax 能力从 partial 到 qualified 的关键一步。
+
+### 已完成的 Java syntax 能力验证
+
+1. Grammar 精度：Wilson=0.9849，零假阳性 ✅
+2. WASM 联合路径：原生优先路由 + 候选不误判 ✅
+3. 原生语法版本/方言：javac 21 与 WASM 一致 ✅
+
+### 剩余（需外部环境）
+
+1. 五平台宿主反馈：需 Codex/Claude/ZCode/Kimi/Gemini 环境
+2. 可信关闭/复发重开：可参照 Python/Rust 流程
