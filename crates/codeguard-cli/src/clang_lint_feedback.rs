@@ -49,12 +49,26 @@ pub(crate) fn observe(args: &SyntaxLintArguments, deadline: Instant) -> Value {
     }) {
         return report;
     }
-    if !((args.language == "c" && path.extension().is_some_and(|s| s == "c"))
+    // 头文件进入同语言显式观察；`.h` 在 cpp 语言下保持 C/C++ 歧义拒绝，不猜语言。
+    if !((args.language == "c" && path.extension().is_some_and(|s| s == "c" || s == "h"))
         || (args.language == "cpp"
-            && path
-                .extension()
-                .and_then(|s| s.to_str())
-                .is_some_and(|s| matches!(s, "cpp" | "cc" | "cxx" | "C" | "CPP" | "cp" | "c++"))))
+            && path.extension().and_then(|s| s.to_str()).is_some_and(|s| {
+                matches!(
+                    s,
+                    "cpp"
+                        | "cc"
+                        | "cxx"
+                        | "C"
+                        | "CPP"
+                        | "cp"
+                        | "c++"
+                        | "hpp"
+                        | "hh"
+                        | "hxx"
+                        | "H"
+                        | "h++"
+                )
+            })))
     {
         return report;
     }

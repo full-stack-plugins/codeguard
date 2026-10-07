@@ -2,9 +2,9 @@
 use serde_json::{Value, json};
 use std::{
     fs,
+    os::unix::fs::PermissionsExt,
     path::{Path, PathBuf},
     process::Command,
-    os::unix::fs::PermissionsExt,
 };
 struct Fixture(PathBuf);
 impl Drop for Fixture {
@@ -202,6 +202,109 @@ fn native_warnings_are_retained_even_when_clang_exits_zero() {
     );
     assert_eq!(r["native"]["status"], "diagnostics_observed", "{r}");
     assert_eq!(r["native"]["diagnostics"][0]["level"], "warning");
+}
+
+fn run_named(
+    f: &Fixture,
+    tool: &Path,
+    source: &str,
+    language: &str,
+    standard: &str,
+    name: &str,
+) -> Value {
+    let p = f.0.join(name);
+    fs::write(&p, source).unwrap();
+    let o = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["lint", language])
+        .arg(&p)
+        .args([
+            "--clang-tool",
+            tool.to_str().unwrap(),
+            "--standard",
+            standard,
+            "--format=json",
+        ])
+        .output()
+        .unwrap();
+    assert_eq!(o.status.code(), Some(3), "{o:?}");
+    serde_json::from_slice(&o.stdout).unwrap()
+}
+
+#[test]
+fn explicit_header_files_run_native_clang_and_keep_ambiguity_honest() {
+    let f = fixture("header");
+    let t = tool(&f, &sarif());
+    for (language, name, standard) in [
+        ("c", "a.h", "c11"),
+        ("cpp", "a.hpp", "c++17"),
+        ("cpp", "b.hh", "c++17"),
+        ("cpp", "c.hxx", "c++17"),
+    ] {
+        let r = run_named(&f, &t, "int x = ;\n", language, standard, name);
+        assert_eq!(r["native"]["status"], "diagnostics_observed", "{name}: {r}");
+        assert_eq!(
+            r["native"]["diagnostics"][0]["rule_id"], "clang.err_expected_expression",
+            "{name}"
+        );
+        assert!(r["source_sha256"].is_string(), "{name}: {r}");
+    }
+    // 预处理守卫对头文件同样生效：include 指令保持上下文未解析，不制造源码违规。
+    let r = run_named(
+        &f,
+        &t,
+        "#include \"missing.h\"\nint x = ;\n",
+        "cpp",
+        "c++17",
+        "d.hpp",
+    );
+    assert_eq!(
+        r["native"]["reason"], "clang_preprocessor_context_unresolved",
+        "{r}"
+    );
+    assert_eq!(r["native"]["diagnostics"], json!([]));
+    // `.h` 在 cpp 语言下仍有 C/C++ 双重身份歧义；显式拒绝而不是猜成 C++。
+    let r = run_named(&f, &t, "int x = ;\n", "cpp", "c++17", "e.h");
+    assert_eq!(r["native"]["status"], "incomplete", "{r}");
+    assert_eq!(r["native"]["reason"], "clang_source_scope_unavailable");
+    assert_eq!(r["source_sha256"], Value::Null);
+}
+
+#[test]
+#[ignore = "requires explicit existing Apple Clang21 via CODEGUARD_CLANG_BIN; never installs"]
+fn actual_clang_headers_report_syntax_then_clean_repair() {
+    let f = fixture("actual-header");
+    let t = PathBuf::from(std::env::var_os("CODEGUARD_CLANG_BIN").unwrap());
+    let mut evidence = Vec::new();
+    for (language, name, standard) in [
+        ("c", "a.h", "c11"),
+        ("cpp", "a.hpp", "c++17"),
+        ("cpp", "b.hh", "c++17"),
+        ("cpp", "c.hxx", "c++17"),
+    ] {
+        let bad = run_named(&f, &t, "int x = ;\n", language, standard, name);
+        assert_eq!(
+            bad["native"]["status"], "diagnostics_observed",
+            "{name}: {bad}"
+        );
+        assert_eq!(
+            bad["native"]["diagnostics"][0]["rule_id"], "clang.err_expected_expression",
+            "{name}"
+        );
+        let good = run_named(&f, &t, "int x = 1;\n", language, standard, name);
+        assert_eq!(good["native"]["status"], "completed", "{name}: {good}");
+        assert_eq!(good["native"]["reason"], "clang_native_no_diagnostics");
+        assert_eq!(good["coverage_proven"], false);
+        evidence.push(json!({"name":name,"bad":bad,"good":good}));
+    }
+    let ambiguous = run_named(&f, &t, "int x = ;\n", "cpp", "c++17", "d.h");
+    assert_eq!(
+        ambiguous["native"]["reason"],
+        "clang_source_scope_unavailable"
+    );
+    evidence.push(json!({"name":"d.h","ambiguous_cpp_h":ambiguous}));
+    if let Some(path) = std::env::var_os("CODEGUARD_CLANG_HEADER_EVIDENCE") {
+        fs::write(path, serde_json::to_vec_pretty(&evidence).unwrap()).unwrap();
+    }
 }
 
 #[test]

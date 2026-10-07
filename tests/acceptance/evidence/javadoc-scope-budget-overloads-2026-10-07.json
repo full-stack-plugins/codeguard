@@ -1,0 +1,198 @@
+{
+  "codeguard_binary_sha256": "bd818f224568ae655e3e5cb3dc90713bd046fdc5bf76dd3c106efdaf1aa61ce5",
+  "evidence_kind": "actual_existing_jdk21_javadoc_overload_chinese_and_scope_budget",
+  "real_jdk21_reports": [
+    {
+      "case": "record_documented",
+      "report": {
+        "authority": "local_unverified",
+        "category": "comments",
+        "checker_identity": "unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "exit_code": 3,
+        "findings": [],
+        "java_runtime_sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e",
+        "javadoc_tool_sha256": "92af6df3c4d978af9730925a0e28279acb9df876b3cad749ea9b135203f47820",
+        "jdk_release_sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583",
+        "language": "java",
+        "local_status": "clean_scope_unproven",
+        "next_actions": [
+          "verify_project_javadoc_configuration_and_source_scope",
+          "bind_approved_tool_and_quality_policy"
+        ],
+        "operation": "lint",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-javadoc-native-80976-0/Bad.java",
+        "reason": "single_file_no_missing_doc_diagnostic",
+        "report_type": "java_javadoc_local_feedback",
+        "schema_version": "0.2.0",
+        "source_sha256": "7efcf654fe1b2b851acfe53fa939d6d795e9e3b90b2ea0e4d8a79fdfe0546566"
+      }
+    },
+    {
+      "case": "overloads_undocumented",
+      "report": {
+        "authority": "local_unverified",
+        "category": "comments",
+        "checker_identity": "unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "exit_code": 3,
+        "findings": [
+          {
+            "column": 14,
+            "line": 11,
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-javadoc-native-80976-0/Bad.java",
+            "rule_id": "JavadocMissingParam",
+            "rule_summary": "JDK Javadoc 缺失注释、用途或标签详细说明；核对实际API契约后复检"
+          },
+          {
+            "column": 14,
+            "line": 11,
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-javadoc-native-80976-0/Bad.java",
+            "rule_id": "JavadocMissingParam",
+            "rule_summary": "JDK Javadoc 缺失注释、用途或标签详细说明；核对实际API契约后复检"
+          },
+          {
+            "column": 14,
+            "line": 11,
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-javadoc-native-80976-0/Bad.java",
+            "rule_id": "JavadocMissingReturn",
+            "rule_summary": "JDK Javadoc 缺失注释、用途或标签详细说明；核对实际API契约后复检"
+          }
+        ],
+        "java_runtime_sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e",
+        "javadoc_tool_sha256": "92af6df3c4d978af9730925a0e28279acb9df876b3cad749ea9b135203f47820",
+        "jdk_release_sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583",
+        "language": "java",
+        "local_status": "findings_observed_untrusted",
+        "next_actions": [
+          "verify_project_javadoc_configuration_and_source_scope",
+          "bind_approved_tool_and_quality_policy"
+        ],
+        "operation": "lint",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-javadoc-native-80976-0/Bad.java",
+        "reason": "native_findings_require_approved_context",
+        "report_type": "java_javadoc_local_feedback",
+        "schema_version": "0.2.0",
+        "source_sha256": "63032227d4fb56f6e16ef6abdeb7f9ced2e43b8ee55742e3b1758a5ba58da87c"
+      }
+    },
+    {
+      "case": "overloads_documented",
+      "report": {
+        "authority": "local_unverified",
+        "category": "comments",
+        "checker_identity": "unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "exit_code": 3,
+        "findings": [],
+        "java_runtime_sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e",
+        "javadoc_tool_sha256": "92af6df3c4d978af9730925a0e28279acb9df876b3cad749ea9b135203f47820",
+        "jdk_release_sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583",
+        "language": "java",
+        "local_status": "clean_scope_unproven",
+        "next_actions": [
+          "verify_project_javadoc_configuration_and_source_scope",
+          "bind_approved_tool_and_quality_policy"
+        ],
+        "operation": "lint",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-javadoc-native-80976-0/Bad.java",
+        "reason": "single_file_no_missing_doc_diagnostic",
+        "report_type": "java_javadoc_local_feedback",
+        "schema_version": "0.2.0",
+        "source_sha256": "f3efafaf2ec4ef05d0cee6b54e8c8bc374f4b9d4a8e91883a5ed555c4bb04aa2"
+      }
+    },
+    {
+      "case": "chinese_documented",
+      "report": {
+        "authority": "local_unverified",
+        "category": "comments",
+        "checker_identity": "unverified",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "exit_code": 3,
+        "findings": [],
+        "java_runtime_sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e",
+        "javadoc_tool_sha256": "92af6df3c4d978af9730925a0e28279acb9df876b3cad749ea9b135203f47820",
+        "jdk_release_sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583",
+        "language": "java",
+        "local_status": "clean_scope_unproven",
+        "next_actions": [
+          "verify_project_javadoc_configuration_and_source_scope",
+          "bind_approved_tool_and_quality_policy"
+        ],
+        "operation": "lint",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-javadoc-native-80976-0/Bad.java",
+        "reason": "single_file_no_missing_doc_diagnostic",
+        "report_type": "java_javadoc_local_feedback",
+        "schema_version": "0.2.0",
+        "source_sha256": "968e226e9b47127a939410e65452deb899f69e2aade5f5e80a65b0053a3ab58d"
+      }
+    }
+  ],
+  "controlled_regressions": {
+    "command": "CARGO_PROFILE_TEST_DEBUG=0 cargo test --offline --locked -p codeguard-cli --features wasm-precheck --lib javadoc",
+    "cases": [
+      {
+        "case": "javadoc_workbench_duplicate_rows_red_green",
+        "result": "passed",
+        "reason_rejected": "javadoc_source_duplicate"
+      },
+      {
+        "case": "javadoc_workbench_total_byte_budget_red_green",
+        "result": "passed",
+        "reason_rejected": "javadoc_sources_byte_budget_exceeded",
+        "fixture": "9 x 15MiB sparse > 128MiB; 8 x 15MiB accepted"
+      },
+      {
+        "case": "maven_probe_generated_sources_scope",
+        "result": "passed",
+        "reason": "main_java_source_scope_invalid",
+        "inputs": [
+          "target/generated-sources/Gen.java",
+          "src/test/java/Gen.java",
+          "Gen.java"
+        ]
+      },
+      {
+        "case": "maven_probe_snapshot_entry_budget",
+        "result": "passed",
+        "reason": "source_snapshot_unavailable",
+        "fixture": "2002 sources + pom > 2001 entries"
+      },
+      {
+        "case": "maven_workbench_byte_budget",
+        "result": "passed",
+        "reason_rejected": "maven_inputs_byte_budget_exceeded"
+      },
+      {
+        "case": "maven_workbench_duplicate_inputs",
+        "result": "passed",
+        "reason_rejected": "maven_input_duplicate"
+      },
+      {
+        "case": "gradle_probe_selected_file_budget",
+        "result": "passed",
+        "reason": "selected_inputs_unavailable",
+        "fixture": "130 java + 2 build scripts > 128 entries"
+      },
+      {
+        "case": "overload_fingerprint_distinctness",
+        "result": "passed",
+        "detail": "same rule+line ordinal distinct; cross-line anchor distinct; reproducible"
+      }
+    ]
+  },
+  "environment": {
+    "jdk": "Microsoft OpenJDK 21.0.12.1 (existing installation; not downloaded)",
+    "java_home": "/Users/wandl/Library/Java/JavaVirtualMachines/ms-21.0.12.1/Contents/Home",
+    "date": "2026-10-07"
+  }
+}

@@ -306,6 +306,289 @@ printf '[INFO] --- dependency-check:12.1.0:check (default-cli) @ app ---\n[INFO]
 }
 
 #[test]
+fn owasp_probe_invokes_real_plugin_online_semantics_with_unroutable_mirror() {
+    let project = Project::new();
+    project.init();
+    let marker = project.0.join("invocation");
+    fs::create_dir(&marker).unwrap();
+    let maven = project.0.join("mvn");
+    fs::write(
+        &maven,
+        format!(
+            r#"#!/bin/sh
+printf '%s\n' "$@" > '{}/args'
+prev=
+for arg in "$@"; do
+ if [ "$prev" = "-s" ]; then cp "$arg" '{}/settings'; fi
+ prev=$arg
+done
+printf '[INFO] --- dependency-check:12.1.0:check (default-cli) @ app ---\n[INFO] BUILD SUCCESS\n'
+"#,
+            marker.display(),
+            marker.display()
+        ),
+    )
+    .unwrap();
+    fs::set_permissions(&maven, fs::Permissions::from_mode(0o700)).unwrap();
+    let jdk = project.0.join("jdk");
+    fs::create_dir_all(jdk.join("bin")).unwrap();
+    fs::write(jdk.join("bin/java"), b"fake java").unwrap();
+    fs::write(jdk.join("release"), b"JAVA_VERSION=21\n").unwrap();
+    let repo = project.0.join("repo");
+    fs::create_dir(&repo).unwrap();
+    fs::write(repo.join("marker"), b"repo-content").unwrap();
+    let db = project.0.join("db");
+    fs::create_dir(&db).unwrap();
+    fs::write(db.join("odc.mv.db"), b"test-db").unwrap();
+    let repo_sha = hash_bundle_tree(&repo).unwrap();
+    let db_sha = hash_bundle_tree(&db).unwrap();
+    let (exit, report) = project.check(&[
+        "--maven-tool",
+        maven.to_str().unwrap(),
+        "--java-home",
+        jdk.to_str().unwrap(),
+        "--maven-repo",
+        repo.to_str().unwrap(),
+        "--repo-sha256",
+        &repo_sha,
+        "--cve-data-dir",
+        db.to_str().unwrap(),
+        "--cve-data-sha256",
+        &db_sha,
+    ]);
+    assert_eq!(exit, 3);
+    assert!(marker.join("args").exists(), "{report}");
+    let args = fs::read_to_string(marker.join("args")).unwrap();
+    let offline_flag = args.lines().any(|arg| arg == "-o" || arg == "--offline");
+    assert!(
+        !offline_flag,
+        "真实 dependency-check 插件声明 requiresOnline，探针不得传 -o：{args}"
+    );
+    assert!(args.lines().any(|arg| arg == "-DautoUpdate=false"));
+    let settings = fs::read_to_string(marker.join("settings")).unwrap();
+    assert!(
+        settings.contains("127.0.0.1:9"),
+        "隔离镜像必须不可路由以防静默联网下载：{settings}"
+    );
+    assert!(
+        !settings.contains("aliyun.com"),
+        "隔离镜像不得指向真实远端：{settings}"
+    );
+    assert!(
+        settings.contains("<id>nexus-aliyun</id>"),
+        "镜像 id 需与离线仓库元数据来源一致：{settings}"
+    );
+}
+
+#[test]
+#[ignore = "requires real Maven/JDK plus CODEGUARD_OWASP_MAVEN_REPO (offline plugin closure), CODEGUARD_OWASP_DATA_DIR (real local NVD data) and optional CODEGUARD_OWASP_PLUGIN_VERSION"]
+fn real_owasp_engine_database_mismatch_stays_incomplete_never_clean() {
+    let maven = std::env::var("CODEGUARD_MAVEN_BIN").unwrap();
+    let java_home = std::env::var("CODEGUARD_JAVA_HOME").unwrap();
+    let repo = std::env::var("CODEGUARD_OWASP_MAVEN_REPO").unwrap();
+    let data_dir = std::env::var("CODEGUARD_OWASP_DATA_DIR").unwrap();
+    let plugin_version =
+        std::env::var("CODEGUARD_OWASP_PLUGIN_VERSION").unwrap_or_else(|_| "10.0.4".into());
+    let project = Project::new();
+    project.init();
+    let pom = format!(
+        "<project><modelVersion>4.0.0</modelVersion><groupId>demo</groupId><artifactId>app</artifactId><version>1</version><build><plugins><plugin><groupId>org.owasp</groupId><artifactId>dependency-check-maven</artifactId><version>{plugin_version}</version></plugin></plugins></build><dependencies><dependency><groupId>com.fasterxml.jackson.core</groupId><artifactId>jackson-databind</artifactId><version>2.13.0</version></dependency></dependencies></project>"
+    );
+    fs::write(project.0.join("pom.xml"), pom).unwrap();
+    let repo_sha = hash_bundle_tree(&PathBuf::from(&repo)).unwrap();
+    let db_sha = hash_bundle_tree(&PathBuf::from(&data_dir)).unwrap();
+    let (exit, report) = project.check(&[
+        "--maven-tool",
+        &maven,
+        "--java-home",
+        &java_home,
+        "--maven-repo",
+        &repo,
+        "--repo-sha256",
+        &repo_sha,
+        "--cve-data-dir",
+        &data_dir,
+        "--cve-data-sha256",
+        &db_sha,
+    ]);
+    let cve = &report["native_results"]["java_cve"]["probes"][0]["observation"];
+    assert_eq!(cve["native_status"], "incomplete", "{report}");
+    assert!(
+        matches!(
+            cve["reason"].as_str(),
+            Some("native_execution_incomplete" | "native_goal_unverified")
+        ),
+        "真实工具库不匹配必须暴露为执行未完成：{cve}"
+    );
+    assert!(cve["advisories"].as_array().unwrap().is_empty());
+    assert_eq!(cve["database_freshness"], "unverified");
+    assert_ne!(cve["native_status"], "findings_observed_untrusted");
+    assert_eq!(exit, 3);
+    assert_eq!(report["delivery_decision"], "not_evaluated");
+}
+
+#[test]
+fn fixed_version_recheck_with_original_tool_never_becomes_clean_acceptance() {
+    let project = Project::new();
+    project.init();
+    let vulnerable = r#"{"reportSchema":"1.1","scanInfo":{"engineVersion":"12.1.0","dataSource":[{"name":"NVD","timestamp":"2026-09-25T00:00:00Z"}]},"projectInfo":{"name":"app","reportDate":"2026-09-26T00:00:00Z"},"dependencies":[{"fileName":"lib.jar","isVirtual":false,"sha256":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","packages":[{"id":"pkg:maven/org.demo/lib@2.0"}],"vulnerabilities":[{"source":"NVD","name":"CVE-2026-1234","cvssv3":{"baseScore":8.0}}]}]}"#;
+    let fixed = r#"{"reportSchema":"1.1","scanInfo":{"engineVersion":"12.1.0","dataSource":[{"name":"NVD","timestamp":"2026-09-25T00:00:00Z"}]},"projectInfo":{"name":"app","reportDate":"2026-09-26T00:00:00Z"},"dependencies":[{"fileName":"lib.jar","isVirtual":false,"sha256":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb","packages":[{"id":"pkg:maven/org.demo/lib@2.1"}],"vulnerabilities":[]}]}"#;
+    let maven = project.0.join("mvn");
+    fs::write(
+        &maven,
+        format!(
+            r#"#!/bin/sh
+out=
+for arg in "$@"; do
+ case "$arg" in -Dodc.outputDirectory=*) out=${{arg#-Dodc.outputDirectory=}} ;; esac
+done
+mkdir -p "$out"
+if grep -q '<version>2.0</version>' pom.xml; then
+  printf '%s\n' {vulnerable:?} > "$out/dependency-check-report.json"
+else
+  printf '%s\n' {fixed:?} > "$out/dependency-check-report.json"
+fi
+printf '[INFO] --- dependency-check:12.1.0:check (default-cli) @ app ---\n[INFO] BUILD SUCCESS\n'
+"#
+        ),
+    )
+    .unwrap();
+    fs::set_permissions(&maven, fs::Permissions::from_mode(0o700)).unwrap();
+    let jdk = project.0.join("jdk");
+    fs::create_dir_all(jdk.join("bin")).unwrap();
+    fs::write(jdk.join("bin/java"), b"fake java").unwrap();
+    fs::write(jdk.join("release"), b"JAVA_VERSION=21\n").unwrap();
+    let repo = project.0.join("repo");
+    fs::create_dir(&repo).unwrap();
+    fs::write(repo.join("marker"), b"repo-content").unwrap();
+    let db = project.0.join("db");
+    fs::create_dir(&db).unwrap();
+    fs::write(db.join("odc.mv.db"), b"test-db").unwrap();
+    let repo_sha = hash_bundle_tree(&repo).unwrap();
+    let db_sha = hash_bundle_tree(&db).unwrap();
+    let args: Vec<String> = [
+        "--maven-tool",
+        maven.to_str().unwrap(),
+        "--java-home",
+        jdk.to_str().unwrap(),
+        "--maven-repo",
+        repo.to_str().unwrap(),
+        "--repo-sha256",
+        &repo_sha,
+        "--cve-data-dir",
+        db.to_str().unwrap(),
+        "--cve-data-sha256",
+        &db_sha,
+    ]
+    .iter()
+    .map(|value| (*value).to_owned())
+    .collect();
+    let check_args: Vec<&str> = args.iter().map(String::as_str).collect();
+    let (_, first) = project.check(&check_args);
+    let cve = &first["native_results"]["java_cve"]["probes"][0]["observation"];
+    assert_eq!(
+        cve["native_status"], "findings_observed_untrusted",
+        "{first}"
+    );
+    let task_id = first["native_results"]["java_cve"]["next"]["repair_brief"]["task_id"]
+        .as_str()
+        .unwrap()
+        .to_owned();
+    let pom = fs::read_to_string(project.0.join("pom.xml")).unwrap();
+    fs::write(
+        project.0.join("pom.xml"),
+        pom.replace("<version>2.0</version>", "<version>2.1</version>"),
+    )
+    .unwrap();
+    let (_, second) = project.check(&check_args);
+    let observation = &second["native_results"]["java_cve"]["probes"][0]["observation"];
+    assert_eq!(
+        observation["native_status"], "empty_report_unverified",
+        "修复后零漏洞报告只能是未验证观察：{observation}"
+    );
+    assert_eq!(observation["advisories"].as_array().unwrap().len(), 0);
+    assert_eq!(observation["database_freshness"], "unverified");
+    let verify = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args([
+            "task",
+            "verify",
+            &task_id,
+            project.0.to_str().unwrap(),
+            "--format=json",
+        ])
+        .args(&args)
+        .output()
+        .unwrap();
+    assert_eq!(verify.status.code(), Some(3));
+    let verify: Value = serde_json::from_slice(&verify.stdout).unwrap();
+    assert_eq!(verify["observation"], "still_blocked", "{verify}");
+    let fact: Value = serde_json::from_slice(
+        &fs::read(
+            project
+                .0
+                .join(format!(".codeguard/findings/{task_id}/finding.json")),
+        )
+        .unwrap(),
+    )
+    .unwrap();
+    assert_eq!(fact["state"], "open");
+}
+
+#[test]
+fn pom_with_dependency_exclusions_stays_replay_ineligible_without_silent_drop() {
+    let project = Project::new();
+    project.init();
+    let pom = fs::read_to_string(project.0.join("pom.xml")).unwrap();
+    fs::write(
+        project.0.join("pom.xml"),
+        pom.replace(
+            "</dependency></dependencies></project>",
+            "<exclusions><exclusion><groupId>org.demo</groupId><artifactId>transitive</artifactId></exclusion></exclusions></dependency></dependencies></project>",
+        ),
+    )
+    .unwrap();
+    let marker = project.0.join("native-started");
+    let maven = project.0.join("mvn");
+    fs::write(&maven, format!("#!/bin/sh\ntouch '{}'\n", marker.display())).unwrap();
+    fs::set_permissions(&maven, fs::Permissions::from_mode(0o700)).unwrap();
+    let jdk = project.0.join("jdk");
+    fs::create_dir_all(jdk.join("bin")).unwrap();
+    fs::write(jdk.join("bin/java"), b"fake java").unwrap();
+    fs::write(jdk.join("release"), b"JAVA_VERSION=21\n").unwrap();
+    let repo = project.0.join("repo");
+    fs::create_dir(&repo).unwrap();
+    fs::write(repo.join("marker"), b"repo-content").unwrap();
+    let db = project.0.join("db");
+    fs::create_dir(&db).unwrap();
+    fs::write(db.join("odc.mv.db"), b"test-db").unwrap();
+    let repo_sha = hash_bundle_tree(&repo).unwrap();
+    let db_sha = hash_bundle_tree(&db).unwrap();
+    let (exit, report) = project.check(&[
+        "--maven-tool",
+        maven.to_str().unwrap(),
+        "--java-home",
+        jdk.to_str().unwrap(),
+        "--maven-repo",
+        repo.to_str().unwrap(),
+        "--repo-sha256",
+        &repo_sha,
+        "--cve-data-dir",
+        db.to_str().unwrap(),
+        "--cve-data-sha256",
+        &db_sha,
+    ]);
+    assert_eq!(exit, 3);
+    let observation = &report["native_results"]["java_cve"]["probes"][0]["observation"];
+    assert_eq!(observation["native_status"], "incomplete", "{report}");
+    assert_eq!(
+        observation["reason"], "project_pom_replay_ineligible",
+        "排除语义无法静态重放时必须整体拒绝，不得静默丢弃：{observation}"
+    );
+    assert!(observation["advisories"].as_array().unwrap().is_empty());
+    assert!(!marker.exists(), "原生命令不得启动");
+}
+
+#[test]
 fn missing_database_keeps_configured_checker_incomplete_before_native_start() {
     let project = Project::new();
     project.init();

@@ -22,3 +22,17 @@ CARGO_PROFILE_TEST_DEBUG=0 cargo test --offline --locked -p codeguard-cli \
 当前普通check调度、work/next/task verify、依赖图及数据源可信时效、真实OWASP正反例/独立精度、多平台、完整宿主及发行仍未完成；原工作台不变，用户Erlang草稿不执行或修改。全部父任务保持开放，正式grammar资格0/32。
 
 最终回归：默认CLI五目标29通过/3条件忽略，WASM三目标19通过/1条件忽略；新增公开SIGINT默认/WASM各1通过。适配器五目标17通过。原生环境条件用例另1通过/0忽略，四次真实Gradle调用；不与受控报告计数合并为原生精度。29份最终受控原生、2份实际原生、3份公开报文及实际SIGINT反馈通过两份schema，五类资格伪造拒绝。默认/WASM全工作区all-targets严格Clippy通过。计划视图更新为Gradle局部执行、资格blocked；初次回归因旧configuration_only断言失败后按实际新增能力修正并添加不得升级原生资格的反例，默认/WASM各4通过。
+
+## 2026-10-07 真实 Gradle 阻塞路径复验
+
+同日 Maven OWASP 探针修复（见 `owasp-maven-check-java.md`）后，用本机真实 Gradle 8.10.2 分发（`~/.gradle/wrapper/dists`，未安装/下载任何插件）与 Microsoft OpenJDK 21.0.12.1 重跑两条环境条件用例并全部通过（零联网）：
+
+```
+CARGO_PROFILE_TEST_DEBUG=0 CODEGUARD_TEST_GRADLE_BUNDLE=<分发路径> \
+CODEGUARD_TEST_JAVA_HOME=<JDK21> cargo test --offline --locked -p codeguard-cli \
+  --features wasm-precheck --test gradle_dependency_check_probe actual_ -- --ignored
+# actual_gradle_rejects_imitation_task_and_missing_offline_plugin_without_advisories ... ok
+# actual_unified_gradle_cve_environment_blockers_and_original_task_recheck_stay_open ... ok
+```
+
+普通任务假冒 OWASP 名、`--offline` 下插件缺失仍分别为 `native_exit_code=1` 的诚实未完成，无 advisory、无验收；统一 check 与 task verify 后任务保持 open。该复验只覆盖真实工具的阻塞/拒绝路径；真实 Gradle OWASP 插件正反例（需要下载 `org.owasp.dependencycheck` 12.x 及其模块缓存进隔离目录，或提供已含该插件的宿主缓存）仍未运行，15.5 的 Gradle 正例保持未完成。

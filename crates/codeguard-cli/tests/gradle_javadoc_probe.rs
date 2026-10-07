@@ -1,5 +1,5 @@
 #![cfg(unix)]
-use codeguard_cli::{gradle_model_probe::Request, gradle_javadoc_probe::observe};
+use codeguard_cli::{gradle_javadoc_probe::observe, gradle_model_probe::Request};
 use std::{
     collections::BTreeSet,
     fs,
@@ -44,6 +44,25 @@ impl Drop for Project {
     fn drop(&mut self) {
         let _ = fs::remove_dir_all(&self.0);
     }
+}
+
+#[test]
+fn more_than_128_selected_files_exceed_the_snapshot_budget_without_native_launch() {
+    let project = Project::new("public class Sample {}\n");
+    let mut request = project.request();
+    for index in 0..130 {
+        let path = format!("src/main/java/Extra{index:03}.java");
+        fs::write(project.0.join(&path), "public class Extra {}\n").unwrap();
+        request.project_files.insert(PathBuf::from(path));
+    }
+    let report = observe(&request, &AtomicBool::new(false));
+    assert_eq!(report["native_status"], "incomplete", "{report}");
+    assert_eq!(report["reason"], "selected_inputs_unavailable");
+    assert!(report["findings"].as_array().unwrap().is_empty());
+    // 快照未建立时不得携带任何原生身份或诊断。
+    assert!(report["source_snapshot_sha256"].is_null());
+    assert!(report["model_report_sha256"].is_null());
+    assert_eq!(report["coverage_proven"], false);
 }
 
 #[test]

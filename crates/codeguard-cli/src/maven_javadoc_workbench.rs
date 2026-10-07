@@ -408,3 +408,70 @@ fn safe(p: &str) -> bool {
 fn sha(s: &str) -> bool {
     s.len() == 64 && s.bytes().all(|b| b.is_ascii_hexdigit())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::project;
+    use serde_json::{Value, json};
+    use sha2::{Digest, Sha256};
+    use std::fs;
+    use std::sync::atomic::{AtomicU64, Ordering};
+
+    static NEXT: AtomicU64 = AtomicU64::new(0);
+
+    struct Temp(std::path::PathBuf);
+    impl Drop for Temp {
+        fn drop(&mut self) {
+            let _ = fs::remove_dir_all(&self.0);
+        }
+    }
+
+    fn root() -> Temp {
+        let path = std::env::temp_dir().canonicalize().unwrap().join(format!(
+            "cg-maven-javadoc-wb-unit-{}-{}",
+            std::process::id(),
+            NEXT.fetch_add(1, Ordering::Relaxed)
+        ));
+        fs::create_dir_all(&path).unwrap();
+        Temp(path)
+    }
+
+    fn tiny_input(root: &std::path::Path, name: &str) -> Value {
+        let bytes = format!("public class {name} {{}}\n");
+        fs::write(root.join(name), &bytes).unwrap();
+        json!({"path":name,"sha256":format!("{:x}", Sha256::digest(bytes.as_bytes()))})
+    }
+
+    /// 9 x 15 MiB 超过 128 MiB 总预算：投影必须拒绝而不是吞掉输入。
+    #[test]
+    fn inputs_beyond_the_total_byte_budget_are_rejected() {
+        let guard = root();
+        let root = &guard.0;
+        let mut inputs = Vec::new();
+        for index in 0..9 {
+            let name = format!("Big{index}.java");
+            let file = fs::File::create(root.join(&name)).unwrap();
+            file.set_len(15 * 1024 * 1024).unwrap();
+            drop(file);
+            let bytes = fs::read(root.join(&name)).unwrap();
+            inputs.push(json!({
+                "path":name,
+                "sha256":format!("{:x}", Sha256::digest(&bytes))
+            }));
+        }
+        let error =
+            project(root, &json!(inputs), &json!({})).expect_err("9 x 15 MiB 超预算必须拒绝");
+        assert_eq!(error, "maven_inputs_byte_budget_exceeded");
+    }
+
+    /// 同一路径重复输入必须拒绝，防止同一源文件投影出重复问题。
+    #[test]
+    fn duplicate_input_paths_are_rejected() {
+        let guard = root();
+        let root = &guard.0;
+        let input = tiny_input(root, "Dup.java");
+        let error = project(root, &json!([input.clone(), input]), &json!({}))
+            .expect_err("重复路径必须拒绝");
+        assert_eq!(error, "maven_input_duplicate");
+    }
+}

@@ -227,6 +227,80 @@ fn explicit_shell_default_does_not_override_a_declared_unsupported_dialect() {
 }
 
 #[test]
+fn env_shebang_zsh_is_reported_as_unsupported_not_dropped_or_defaulted() {
+    let p = Project::new();
+    fs::write(
+        p.0.join("a.sh"),
+        "#!/usr/bin/env -S zsh -o pipefail\necho $1\n",
+    )
+    .unwrap();
+    fs::write(p.0.join("b.sh"), "#!/usr/bin/env zsh\necho $1\n").unwrap();
+    let tool = p.tool();
+    let report = p.run("shell", Some(&tool));
+    let files = report["native_results"]["shell_lint"]["files"]
+        .as_array()
+        .unwrap();
+    for f in files {
+        assert_eq!(f["dialect"], "zsh", "{f}");
+        assert_eq!(f["native"]["status"], "incomplete");
+        assert_eq!(f["native"]["reason"], "shell_dialect_unsupported");
+    }
+    assert!(!files.iter().any(|f| {
+        f["native"]["diagnostics"]
+            .as_array()
+            .is_some_and(|rows| !rows.is_empty())
+    }));
+    assert_eq!(
+        report["native_results"]["shell_lint"]["local_check_complete"],
+        false
+    );
+}
+
+#[test]
+fn project_external_sources_rc_blocks_only_its_files_and_never_masks_results() {
+    let p = Project::new();
+    p.init();
+    let nested = p.0.join("nested");
+    fs::create_dir(&nested).unwrap();
+    fs::write(nested.join("c.sh"), "#!/bin/bash\necho $1\n").unwrap();
+    // 根 rc 启用 external-sources：根文件必须带具体原因阻塞，不能伪装成缺工具或无问题。
+    fs::write(p.0.join(".shellcheckrc"), "external-sources=true\n").unwrap();
+    // 嵌套目录自己的干净 rc 先被选中：该文件的原生观察必须照常执行。
+    fs::write(nested.join(".shellcheckrc"), "disable=SC2086\n").unwrap();
+    let tool = p.tool();
+    let report = p.run("shell", Some(&tool));
+    let scan = &report["native_results"]["shell_lint"];
+    let files = scan["files"].as_array().unwrap();
+    let root = files
+        .iter()
+        .find(|f| f["path"] == "a.sh")
+        .expect("根文件仍在观察范围内");
+    assert_eq!(
+        root["native"]["reason"],
+        "shellcheck_external_sources_unverified"
+    );
+    assert_eq!(root["native"]["status"], "incomplete");
+    assert_eq!(root["project_configuration"]["status"], "unknown");
+    assert_eq!(
+        root["project_configuration"]["reason"],
+        "shellcheck_external_sources_unverified"
+    );
+    assert_eq!(
+        root["project_configuration"]["source_path"],
+        Value::Null,
+        "未验证的外部 source 配置不得暴露为已选配置"
+    );
+    let nested_file = files
+        .iter()
+        .find(|f| f["path"] == "nested/c.sh")
+        .expect("嵌套文件仍在观察范围内");
+    assert_eq!(nested_file["native"]["status"], "diagnostics_observed");
+    assert_eq!(nested_file["native"]["reason"], "shellcheck_diagnostics");
+    assert_eq!(nested_file["project_configuration"]["status"], "configured");
+    assert_eq!(scan["local_check_complete"], false);
+}
+
+#[test]
 fn cancelled_project_scan_does_not_create_environment_repair_tasks() {
     let p = Project::new();
     p.init();

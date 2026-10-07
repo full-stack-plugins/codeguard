@@ -249,6 +249,12 @@ fn observe_captured(
     }) {
         return feedback("eslint_source_kind_not_supported");
     }
+    // TS 方言按包根绑定 tsconfig.json 输入身份；缺失不阻塞，非普通文件不可信。
+    // 该输入只用于冻结本轮观察，不证明项目 parser 实际读取或适用该文件。
+    let tsconfig = match typescript_project_config(cwd, &source) {
+        Ok(value) => value.filter(|path| path != config && path != entry && path != node),
+        Err(reason) => return feedback(reason),
+    };
     // 临时区仅承载本轮原生报告；工作台另存脱敏观察，不声称保留完整原生证据。
     let id = format!(
         "eslint-{}-{}",
@@ -261,12 +267,16 @@ fn observe_captured(
         return feedback("eslint_private_workspace_unavailable");
     };
     let mut hashes = BTreeMap::new();
-    for (path, limit) in [
+    let mut inputs = vec![
         (node, 128 * 1024 * 1024),
         (entry, 16 * 1024 * 1024),
         (config, 1024 * 1024),
         (&source, 16 * 1024 * 1024),
-    ] {
+    ];
+    if let Some(tsconfig) = &tsconfig {
+        inputs.push((tsconfig, 1024 * 1024));
+    }
+    for (path, limit) in inputs {
         if Instant::now() >= deadline {
             return feedback("request_deadline_exceeded");
         }
@@ -333,6 +343,103 @@ pub(crate) fn feedback(reason: &str) -> Value {
         "eslint_config_untrusted"=>"项目本地 ESLint 已发现，但配置是链接、特殊文件或不可读；恢复原配置后原生复检",
         "eslint_scope_requires_explicit_file"=>"当前入口需显式单文件；项目目录与完整源集调度尚未接通，不将目录标为已检查",
         "request_cancelled"|"request_deadline_exceeded"=>"重新安排原工具检查预算；中断不要求修改源码",
+        "eslint_parser_or_configuration_diagnostic"=>"原生 ESLint 报告含解析级致命诊断；先核对项目 parser 是否覆盖该文件方言（如 typescript-eslint 与 tsconfig），复现同一文件的解析错误后再修复源码或恢复适用 parser，并用同一入口与配置复检；不能据此关闭其它文件的检查",
+        "eslint_unattributed_diagnostic"=>"报告存在无法归属规则的诊断，常见于文件被原配置 ignores/files 排除；核对原配置覆盖与本轮范围后用同一入口复检；被排除文件不能记为已检查",
+        "eslint_version_mismatch"=>"本地 ESLint 包声明版本与原生入口实际输出不一致；核对 node_modules 内包身份与版本后用受控 Node 复检，不修改源码",
+        "eslint_report_invalid"|"eslint_report_read_failed"|"eslint_execution_evidence_failed"=>"本轮原生报告缺失或不可解析；先核对原配置能否加载（配置无效时原生进程可能不产出报告），重跑同一命令并保留证据，不把无报告当作干净或源码违规",
+        "eslint_tsconfig_untrusted"=>"TypeScript 方言检查需绑定包内 tsconfig.json，当前它是链接或特殊文件；恢复普通文件后用同一入口和配置复检，不修改源码",
         _=>"核对原配置、parser/插件与本轮规则；按原生发现修复后用同一入口和配置复检，抑制及未知覆盖需核查，任务不能自行关闭",
     }})
+}
+/// TS 方言源码在包根的 tsconfig.json 输入；缺失返回 None 不阻塞，
+/// 链接/特殊文件/不可判定返回不可信原因，观察保持未完成。
+fn typescript_project_config(
+    cwd: &Path,
+    source: &Path,
+) -> Result<Option<std::path::PathBuf>, &'static str> {
+    if !source
+        .extension()
+        .and_then(|extension| extension.to_str())
+        .is_some_and(|extension| matches!(extension, "ts" | "tsx" | "mts" | "cts"))
+    {
+        return Ok(None);
+    }
+    let path = cwd.join("tsconfig.json");
+    match std::fs::symlink_metadata(&path) {
+        Ok(metadata) if metadata.is_file() => Ok(Some(path)),
+        Ok(_) => Err("eslint_tsconfig_untrusted"),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(_) => Err("eslint_tsconfig_untrusted"),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::typescript_project_config;
+    use std::{fs, os::unix::fs::symlink, path::PathBuf};
+
+    #[test]
+    fn tsconfig_binding_routes_only_typescript_dialects_and_regular_files() {
+        let root = std::env::temp_dir()
+            .canonicalize()
+            .unwrap()
+            .join(format!("cg-tsconfig-route-{}", std::process::id()));
+        fs::create_dir(&root).unwrap();
+        let (js, mjs, ts, tsx, mts, cts) = (
+            root.join("app.js"),
+            root.join("app.mjs"),
+            root.join("app.ts"),
+            root.join("app.tsx"),
+            root.join("app.mts"),
+            root.join("app.cts"),
+        );
+        for path in [&js, &mjs, &ts, &tsx, &mts, &cts] {
+            fs::write(path, "x").unwrap();
+        }
+        // 无 tsconfig：JS/TS 方言都不阻塞。
+        for path in [&js, &mjs, &ts, &tsx] {
+            assert_eq!(typescript_project_config(&root, path), Ok(None));
+        }
+        fs::write(root.join("tsconfig.json"), "{}").unwrap();
+        // JS 方言不绑定；TS 方言按包根绑定。
+        assert_eq!(typescript_project_config(&root, &js), Ok(None));
+        assert_eq!(typescript_project_config(&root, &mjs), Ok(None));
+        let expected = Ok(Some(root.join("tsconfig.json")));
+        assert_eq!(typescript_project_config(&root, &ts), expected);
+        assert_eq!(typescript_project_config(&root, &tsx), expected);
+        assert_eq!(typescript_project_config(&root, &mts), expected);
+        assert_eq!(typescript_project_config(&root, &cts), expected);
+        // 链接/目录不可信：不执行原生也不宣称绑定成功。
+        fs::remove_file(root.join("tsconfig.json")).unwrap();
+        fs::write(root.join("tsconfig.real.json"), "{}").unwrap();
+        symlink(root.join("tsconfig.real.json"), root.join("tsconfig.json")).unwrap();
+        assert_eq!(
+            typescript_project_config(&root, &ts),
+            Err("eslint_tsconfig_untrusted")
+        );
+        fs::remove_file(root.join("tsconfig.json")).unwrap();
+        fs::create_dir(root.join("tsconfig.json")).unwrap();
+        assert_eq!(
+            typescript_project_config(&root, &ts),
+            Err("eslint_tsconfig_untrusted")
+        );
+        fs::remove_dir_all(&root).unwrap();
+    }
+
+    #[test]
+    fn tsconfig_binding_allows_foreign_package_root_without_input() {
+        let root = std::env::temp_dir()
+            .canonicalize()
+            .unwrap()
+            .join(format!("cg-tsconfig-foreign-{}", std::process::id()));
+        fs::create_dir(&root).unwrap();
+        let source = root.join("app.ts");
+        fs::write(&source, "x").unwrap();
+        // 包根无 tsconfig 时 TS 方言检查保持可执行，不虚构输入。
+        assert_eq!(
+            typescript_project_config(&PathBuf::from("/definitely/not/here"), &source),
+            Ok(None)
+        );
+        fs::remove_dir_all(&root).unwrap();
+    }
 }
