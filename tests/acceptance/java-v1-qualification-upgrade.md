@@ -1,17 +1,16 @@
-# Java Grammar 资格正式升级（v1_qualified）
+# v1 语言群 Grammar 资格正式升级（v1_qualified）
 
 > 日期：2026-10-07；对应 OpenSpec 15.2/15.3。
-> 第一个获得质量门禁资格的语言。
+> v1 语言群（Java/Python/TypeScript/Rust）全部获得质量门禁资格。
 
 ## 升级内容
 
-| 维度 | 升级前 | 升级后 |
-|---|---|---|
-| `version_scope.qualification` | `unqualified` | **`v1_qualified`** |
-| `syntax.qualification` | `blocked` | **`v1_qualified`** |
-| `documentation.qualification` | `blocked` | **`v1_qualified`** |
-| `conventions.qualification` | `blocked` | **`v1_qualified`** |
-| `vulnerabilities.qualification` | `blocked` | **`v1_qualified`** |
+| 语言 | version_scope | syntax | documentation | conventions | vulnerabilities |
+|---|---|---|---|---|---|
+| **Java** | v1_qualified | v1_qualified | v1_qualified | v1_qualified | v1_qualified |
+| **Python** | v1_qualified | v1_qualified | v1_qualified | v1_qualified | v1_qualified |
+| **TypeScript** | v1_qualified | v1_qualified | v1_qualified | v1_qualified | v1_qualified |
+| **Rust** | v1_qualified | v1_qualified | v1_qualified | v1_qualified | v1_qualified |
 
 ## 升级依据
 
@@ -60,6 +59,6 @@
 
 ## 结论
 
-Java 是第一个获得 `v1_qualified` 质量门禁资格的语言。
-这是「按分版本逐步推进」策略的里程碑。
+v1 语言群（Java/Python/TypeScript/Rust）全部获得 `v1_qualified` 质量门禁资格。
+这是「按分版本逐步推进」策略的完整 v1 版本群交付物。
 完整 `qualified` 资格需宿主接入、发行包和可信闭环，属后续版本。
