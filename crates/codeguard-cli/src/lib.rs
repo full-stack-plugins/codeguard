@@ -680,3 +680,4 @@ pub mod run_config_policy;
 pub mod baseline_classifier;
 pub mod dot_prefix_policy;
 pub mod whitelist_commands;
+pub mod whitelist_correction;
