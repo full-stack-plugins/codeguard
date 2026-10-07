@@ -1,0 +1,145 @@
+{
+  "cases": [
+    {
+      "delivery_decision": "not_evaluated",
+      "expected_native_valid": true,
+      "expected_wasm_valid": true,
+      "grammar_qualified": false,
+      "name": "namespace",
+      "native_exit_code": 0,
+      "native_valid": true,
+      "source_sha256": "a8aa0d1bea17602986a75232c927433f53158dcfe20c149cce11b5f4410da32e",
+      "wasm_valid": true
+    },
+    {
+      "delivery_decision": "not_evaluated",
+      "expected_native_valid": true,
+      "expected_wasm_valid": true,
+      "grammar_qualified": false,
+      "name": "template",
+      "native_exit_code": 0,
+      "native_valid": true,
+      "source_sha256": "ef12cb4ccdc5736c4177fee0aad6b1a947deeda5118d337f0902b898e0bd02d7",
+      "wasm_valid": true
+    },
+    {
+      "delivery_decision": "not_evaluated",
+      "expected_native_valid": true,
+      "expected_wasm_valid": true,
+      "grammar_qualified": false,
+      "name": "lambda",
+      "native_exit_code": 0,
+      "native_valid": true,
+      "source_sha256": "5477ba29161c26796f382d8c5cdefe08a918271fe564ac76f053f368e0427f8a",
+      "wasm_valid": true
+    },
+    {
+      "delivery_decision": "not_evaluated",
+      "expected_native_valid": true,
+      "expected_wasm_valid": true,
+      "grammar_qualified": false,
+      "name": "structured_binding",
+      "native_exit_code": 0,
+      "native_valid": true,
+      "source_sha256": "5e9da4f80d1acc11a8f9e6fbc0ba26cb02ec74770728fb71752f1d56ef1e1273",
+      "wasm_valid": true
+    },
+    {
+      "delivery_decision": "not_evaluated",
+      "expected_native_valid": true,
+      "expected_wasm_valid": true,
+      "grammar_qualified": false,
+      "name": "constexpr_if",
+      "native_exit_code": 0,
+      "native_valid": true,
+      "source_sha256": "55596de93b3a07be196063e140b56564b13c92937f42028e2d40e8806cbdb7c2",
+      "wasm_valid": true
+    },
+    {
+      "delivery_decision": "not_evaluated",
+      "expected_native_valid": true,
+      "expected_wasm_valid": true,
+      "grammar_qualified": false,
+      "name": "fold_expression",
+      "native_exit_code": 0,
+      "native_valid": true,
+      "source_sha256": "94b696a15c508b5c38dc4533832437d481885c483010ea2ba9995daa5737f9cf",
+      "wasm_valid": true
+    },
+    {
+      "delivery_decision": "not_evaluated",
+      "expected_native_valid": true,
+      "expected_wasm_valid": true,
+      "grammar_qualified": false,
+      "name": "raw_string",
+      "native_exit_code": 0,
+      "native_valid": true,
+      "source_sha256": "01da61bc2350409913e1f96cf53b57128032269cff0580e5c7204eebf56c341e",
+      "wasm_valid": true
+    },
+    {
+      "delivery_decision": "not_evaluated",
+      "expected_native_valid": false,
+      "expected_wasm_valid": false,
+      "grammar_qualified": false,
+      "name": "missing_brace",
+      "native_exit_code": 1,
+      "native_valid": false,
+      "source_sha256": "534e5f4b9fdd0986541bc66ecad7ec916eb7c06aeee84a86995bff07a3945bd4",
+      "wasm_valid": false
+    },
+    {
+      "delivery_decision": "not_evaluated",
+      "expected_native_valid": false,
+      "expected_wasm_valid": false,
+      "grammar_qualified": false,
+      "name": "missing_expression",
+      "native_exit_code": 1,
+      "native_valid": false,
+      "source_sha256": "2c3141ba22c384ba74e89a0ef76ef8979f5fd7d895b62dcdca7a7436cf22d1a6",
+      "wasm_valid": false
+    },
+    {
+      "delivery_decision": "not_evaluated",
+      "expected_native_valid": false,
+      "expected_wasm_valid": false,
+      "grammar_qualified": false,
+      "name": "missing_semicolon",
+      "native_exit_code": 1,
+      "native_valid": false,
+      "source_sha256": "8e9828d992585a4df8f1203ac81f02e5c363c4f7f18f4652557349816cd6a8b1",
+      "wasm_valid": false
+    },
+    {
+      "delivery_decision": "not_evaluated",
+      "expected_native_valid": false,
+      "expected_wasm_valid": true,
+      "grammar_qualified": false,
+      "name": "type_mismatch",
+      "native_exit_code": 1,
+      "native_valid": false,
+      "source_sha256": "7d26cfc2c895e133a0599c85fb083288f395adc723a2576bc10882e81a9c69d6",
+      "wasm_valid": true
+    },
+    {
+      "delivery_decision": "not_evaluated",
+      "expected_native_valid": false,
+      "expected_wasm_valid": true,
+      "grammar_qualified": false,
+      "name": "unknown_symbol",
+      "native_exit_code": 1,
+      "native_valid": false,
+      "source_sha256": "c10b9dcacad024a1a37eab09f2b1bda22f030fdfe4cd8dcdbfa39f819871a4ff",
+      "wasm_valid": true
+    }
+  ],
+  "cli_sha256": "4efcd15e4b21b2fa25f081493e0c567a87b814348f17ac944bdae9e9fe3948c2",
+  "compiler_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+  "compiler_version": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin",
+  "corpus_kind": "author_regression_not_independent_holdout",
+  "language": "cpp",
+  "qualification": "not_granted",
+  "schema_version": "0.1",
+  "standard": "c++17",
+  "test_source_sha256": "10c540b6e49de7fad3551dc34578f040721d961481442fc2663a3a38ffd4f867"
+}
