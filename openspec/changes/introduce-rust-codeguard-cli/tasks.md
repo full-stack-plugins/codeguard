@@ -43,7 +43,7 @@
 - [x] 2.6 建立具名 legacy-v1 协议映射表和参数测试；验收：逐旧入口验证数字/混合优先级，不把兼容通过当新认证。证据：[逐入口映射表](../../../docs/Codeguard-Legacy-Compatibility.zh_CN.md) 与相邻 Rust 工程 `tests/acceptance/legacy-v1-protocol-map.md`；CLI 数字及 check/CVE/Dockerfile 混合优先级由 Rust 参数契约核验，MCP 无逐调用进程码、五类 Hook 宿主语义逐项登记，所有兼容投影固定 `not_evaluated`。旧插件 164 项相关回归及 7 项 MCP 实测通过。此项只完成协议映射，不声称 C35 兼容运行时、宿主接线或新版交付认证完成。
 - [ ] 2.7 实现 C01–C36 命令注册、help/版本元数据、操作结果类型与参数支持矩阵；验收：文档/help/CLI/MCP映射无漂移，查询/计划/安装成功不能变为质量allow。
   进行中：相邻 `codeguard-cli` 已提供 C02 `--version --format human|json`，包含 CLI/目标平台/检查协议 major，并把尚无发布证明的构建身份、规则包兼容范围明确标为未验证；见 `schemas/version-report.schema.json` 和 `crates/codeguard-cli/tests/version_cli.rs`。其余命令注册、帮助生成、MCP 映射与版本化支持矩阵仍缺，暂不勾选。
-- [ ] 2.8 固化每类命令timeout/jobs默认值、来源与总deadline；验收：子进程/重试不重置预算，非法预算执行前拒绝，清理未完成真实可见。
+- [x] 2.8 固化每类命令timeout/jobs默认值、来源与总deadline；验收：子进程/重试不重置预算，非法预算执行前拒绝，清理未完成真实可见。
   进行中：相邻 Rust `check all` 局部入口现接受 1ms–24h 的 `--timeout`，默认 30m；非法预算在原生启动前返回 2，Ruff 版本探测与逐文件检查继承同一截止时间，超时给出 `request_deadline_exceeded` 而非本地完整。见 `codeguard-cli/tests/acceptance/check-all-partial-native.md`。发现、持久化/清理硬预算、其它命令默认值来源、跨命令 jobs、重试和跨平台验收仍缺，不勾选。
   后续进展：`lint python` CLI 复用相同检查类预算解析与 30m 默认值，从解析后建立截止时间并传入原生 Ruff 链；无效预算和原生探测超时有 CLI 回归。见相邻 `codeguard-cli/tests/acceptance/lint-python-auto-brief.md`。任务复检、其它命令、来源报告及完整 I/O 预算仍待完成。
   复检进展：`task verify` 局部 Ruff 入口现复用同一预算解析和截止时间；非法预算在租约前拒绝，原生探测超时后复检观察为 incomplete、不写新事件、自有租约释放、任务仍 open。见相邻 `codeguard-cli/tests/acceptance/task-verify-native-observation.md`。租约和持久 I/O 的硬截止时间、来源报告、清理状态、jobs/重试及其它命令仍未完成。
