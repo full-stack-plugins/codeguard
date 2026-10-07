@@ -477,6 +477,7 @@ mod mcp_integration;
 mod host_entry;
 mod ci_release;
 mod quality_evaluation;
+mod holdout_performance;
 mod check_luau_native_scan;
 mod check_cobol_native_scan;
 mod check_cfscript_native_scan;
