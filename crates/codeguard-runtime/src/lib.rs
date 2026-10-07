@@ -257,3 +257,4 @@ pub mod git_index_input;
 pub mod evidence_retention;
 pub mod content_identity;
 pub mod strict_cache;
+pub mod correlation_trace;
