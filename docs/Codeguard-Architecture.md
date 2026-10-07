@@ -1583,3 +1583,6 @@ flowchart TD
 ```
 
 C/C++ documentation repair-hook source update: `repair_ready` restores the original task compiler and standard. Feedback0.30 and summary0.9 distinguish native warnings from CodeGuard structural policy, with at most eight positions and an explicit total. Changed inputs, expired deadlines or invalid consumed receipts withdraw positions/report references. Disappearance keeps tasks open and cannot qualify accuracy or trusted closure. Default/WASM native Clang and stale/tampered evidence regressions passed; automatic editing, installed-host acceptance and production qualification remain open. See [local acceptance](../tests/acceptance/c-family-documentation-hook.md).
+
+
+Confirmed C/C++ file edits now expose a bounded documentation observation through `hook execute PATH --clang-tool ABS --c-standard c11 --cpp-standard c++17 --format=json`. The event remains stdin JSON; it is not inferred from the flags. Missing tool/standard stays `context_required`. Native warnings and Codeguard structural policy remain distinct; documentation does not erase native syntax gaps or qualify delivery. The entry checks selected standalone sources, not project compile commands or headers. Repair-ready verification still restores the original task standard and rejects these edit-profile overrides. This is a CLI protocol candidate, not installed-host acceptance.

@@ -1149,3 +1149,6 @@ codeguard check c . --clang-tool /usr/bin/clang --c-standard c11 --format=json
 全项目输入复核后才接入原警告和结构稳定任务；源码、工具、范围变化或取消撤回当前定位及下一步权限。未初始化项目不创建`.codeguard/`，缺工具不会生成源码违规。JSON/human/SARIF保留局部结果，SARIF分别标记原生发现与CodeGuard自有结构策略。退出3；取消130。详细准确性、完整项目覆盖、可信关闭、Hook、跨平台/独立精度及四核心生产验收仍未完成。实际测试及报告见[统一入口验收](tests/acceptance/check-c-family-documentation.md)。
 
 C/C++文档修复Hook当前增量：`repair_ready`按首次任务恢复原Clang/标准，外层反馈0.30与摘要0.9区分原警告和CodeGuard结构策略，最多8处定位并保留总数。当前输入变化、期限耗尽或消费收据失效撤回定位/报告引用；消失仍保持任务open，不授予详细准确性或可信关闭。已完成默认/WASM真实Clang及过期/篡改回归；自动编辑、已安装宿主和完整生产资格仍缺。见[局部验收](tests/acceptance/c-family-documentation-hook.md)。
+
+
+C/C++已确认编辑事件已接入有界文档观察：`hook execute PATH --clang-tool ABS --c-standard c11 --cpp-standard c++17 --format=json`，事件仍从stdin JSON输入。缺上下文保留context_required；已有工作区可同步稳定文档任务。此路径保留原生语法覆盖缺口，不证明已安装宿主验收；repair_ready标准仍由原任务恢复。

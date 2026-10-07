@@ -107,6 +107,8 @@ fn every_registered_checker_configuration_is_inert_after_failed_write() {
     ] {
         options.push((key, "configured"));
     }
+    options.push(("--c-standard", "c11"));
+    options.push(("--cpp-standard", "c++17"));
     let out = p.invoke(&options, "failed");
     assert_eq!(out.status.code(), Some(3), "{out:?}");
     assert!(out.stderr.is_empty(), "{out:?}");
@@ -129,6 +131,9 @@ fn failed_write_still_rejects_ownership_and_malformed_arguments() {
         vec![("--clang-tool", "relative")],
         vec![("--clang-tool", "/missing"), ("--clang-tool", "/other")],
         vec![("--standard", "c17")],
+        vec![("--c-standard", "c17")],
+        vec![("--cpp-standard", "c11")],
+        vec![("--c-standard", "c11"), ("--c-standard", "c11")],
         vec![("--npm-version", "")],
         vec![("--npm-version", oversized.as_str())],
         vec![("--go-tool", "/missing"), ("--go-tool", "/other")],
@@ -158,13 +163,23 @@ fn confirmed_edit_reports_selected_go_failure_without_ignoring_it() {
 }
 
 #[test]
-fn confirmed_edit_rejects_repair_only_clang_option_before_execution() {
+fn confirmed_edit_rejects_unchecked_standard_before_clang_execution() {
     let p = Project::new();
     let marker = p.0.join("clang-ran");
     let tool = p.0.join("clang");
-    fs::write(&tool, format!("#!/bin/sh\ntouch '{}'\nexit 99\n", marker.display())).unwrap();
+    fs::write(
+        &tool,
+        format!("#!/bin/sh\ntouch '{}'\nexit 99\n", marker.display()),
+    )
+    .unwrap();
     fs::set_permissions(&tool, fs::Permissions::from_mode(0o700)).unwrap();
-    let out = p.invoke(&[("--clang-tool", tool.to_str().unwrap())], "confirmed");
+    let out = p.invoke(
+        &[
+            ("--clang-tool", tool.to_str().unwrap()),
+            ("--standard", "c17"),
+        ],
+        "confirmed",
+    );
     assert_eq!(out.status.code(), Some(2), "{out:?}");
     assert!(out.stdout.is_empty(), "{out:?}");
     assert!(!marker.exists());

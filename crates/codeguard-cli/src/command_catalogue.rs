@@ -557,7 +557,7 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             },
             executable: cfg!(unix),
             operation_kind: r#"host"#,
-            usage: r#"hook execute PATH [--timeout DURATION] [--format=json] [TOOL_OPTIONS]"#,
+            usage: r#"hook execute PATH [--timeout DURATION] [--format=json] [TOOL_OPTIONS] [--clang-tool ABS --c-standard c11 --cpp-standard c++17]"#,
             scope: r#"stdin局部事件执行；不代表真实宿主或完整交付"#,
             languages: &[],
         },
