@@ -670,3 +670,4 @@ pub mod repair_brief;
 pub mod process_lease;
 pub mod disposition_attribution;
 pub mod attempt_tracking;
+pub mod controlled_fix_events;
