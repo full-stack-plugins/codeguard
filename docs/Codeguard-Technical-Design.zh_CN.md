@@ -2044,3 +2044,28 @@ C/C++ structural rechecks now use the original compiler and standard through tas
 C/C++结构尝试更新：结构任务接入租约、repair-source尝试日志、ready后的原工具复检与同一输入两次失败预算。新brief0.33/task show0.7/绑定反馈0.9显示等待、必须复检或具体决策；重复扫描、删Markdown及重命名动作不能恢复预算。缺历史报告保持未验证，篡改事件拒绝。跨输入语义无进展、完整详细准确性/项目/平台/独立精度及可信关闭仍未验收。
 
 C/C++ structural tasks now use leases, repair-source journals, original rechecks after ready attempts and a two-failure budget for unchanged inputs. Brief0.33/task-show0.7/feedback0.9 show waiting, required verification or a concrete decision. Rescans, projection deletion and action renaming cannot reset failures; missing reports remain unverified and forged events are rejected. Cross-input semantic progress, full accuracy/context/platform/independent precision and trusted closure remain unqualified.
+
+### C/C++ 统一检查入口（当前源码，局部验收）
+
+```bash
+codeguard check all . --clang-tool /usr/bin/clang --c-standard c11 --cpp-standard c++17 --jobs 4 --format=json
+codeguard check c . --clang-tool /usr/bin/clang --c-standard c11 --format=json
+```
+
+仅用于已验证的 Apple Clang 21 独立源码档案。`c.comments`、`cpp.comments` 在同一任务图中共享截止时间、取消和 jobs，上述两个任务共用编译器资源锁；每语言最多观察64文件，累计反馈包含任务投影且限制16MiB。报告0.72的 `native_results.c_family_comments` 区分上下文缺失、未执行、局部观察和未观察尾部；不能据此推断头文件、预处理或完整构建配置。
+
+全项目输入复核后才接入原警告和结构稳定任务；源码、工具、范围变化或取消撤回当前定位及下一步权限。未初始化项目不创建`.codeguard/`，缺工具不会生成源码违规。JSON/human/SARIF保留局部结果，SARIF分别标记原生发现与CodeGuard自有结构策略。退出3；取消130。详细准确性、完整项目覆盖、可信关闭、Hook、跨平台/独立精度及四核心生产验收仍未完成。实际测试及报告见[统一入口验收](../tests/acceptance/check-c-family-documentation.md)。
+
+```mermaid
+flowchart TD
+  A[发现所选 C/C++ 源码并冻结范围] --> B{原 Clang 与明确标准可用?}
+  B -->|否| C[记录上下文/环境阻塞，不生成源码违规]
+  B -->|是| D[共享任务图预算，串行原生文档警告及 AST 观察]
+  D --> E{全项目输入及原工具仍一致?}
+  E -->|否/取消| F[撤回定位和下一步权限，保留未完成]
+  E -->|是| G[在已有工作台更新原警告与结构稳定任务]
+  G --> H[返回局部反馈和任务绑定原工具复检指引]
+  C --> I[项目覆盖及生产资格仍未完成]
+  F --> I
+  H --> I
+```
