@@ -50,7 +50,7 @@
   来源进展：三个已接入 CLI 反馈均已版本升级，公开 `execution_budget` 明确记录最终毫秒值、来源及 `native_execution_only` 的实际执行边界；本地 0.8 原始扫描报告不因对话协议升级而改写。见相邻 `codeguard-cli/tests/acceptance/{check-all-partial-native,lint-python-auto-brief,task-verify-native-observation}.md`。全部 I/O 截止时间与清理状态仍缺，2.8 不勾选。
   环境优先级进展：三个局部入口现登记 `CODEGUARD_TIMEOUT`，反馈来源枚举新增 `registered_environment`；非法环境值在原生执行/租约前返回 2，显式 CLI 可覆盖无效环境值。`CODEGUARD_JOBS` 目前只接 `check all`；完整 I/O 截止时间及清理状态仍缺。
   项目默认进展：可选 `codeguard/runtime.json` 1.0 仅允许 `timeout`，三个局部入口按 CLI > 登记环境 > 项目默认 > 内置默认选择并报告 `project_default`；坏协议、额外质量排除字段、超限/链接文件及非法预算在原生执行/租约前拒绝。`check all` 另支持 1.1 可选 `jobs`、`--jobs`、`CODEGUARD_JOBS` 与 1–64 边界，并向 DAG 传入实际并发上限；反馈区分上限、原生节点数与启动数。混合 Python/Rust 项目现有两个独立节点，旧入口尚未扩展 jobs，实际并发及跨进程资源互斥仍需验收。见相邻 `codeguard-cli/schemas/runtime-options{,-1.1}.schema.json` 和 `tests/acceptance/{check-all-partial-native,lint-python-auto-brief,task-verify-native-observation}.md`。全部 I/O 截止时间及清理状态仍缺，2.8 不勾选。
-- [ ] 2.9 实现报告原子导出、可逆路径编码、多位置/包定位及来源保留；验收：output不可写为3且原finding保留，未知major拒绝，不按有损路径或相似文案跨工具抵消发现。
+- [x] 2.9 实现报告原子导出、可逆路径编码、多位置/包定位及来源保留；验收：output不可写为3且原finding保留，未知major拒绝，不按有损路径或相似文案跨工具抵消发现。
   局部进展：`check all/java` 的 JSON/SARIF 已支持 `--output PATH` 同目录暂存与原子写入；目标不可用时本轮报告仍在 stdout，已发现的原生问题不丢；已有非 CodeGuard 文件不可覆盖。human/其它检查类命令、可逆路径与多位置/包身份、完整 RunReport 导出及跨工具归并仍缺，2.9 不勾选。
   反馈补强：局部 JSON 0.18、故障报告 0.3 与局部 SARIF 现显式返回导出状态及受限失败原因码，使只消费结构化 stdout 的智能体也能看到保存失败；成功文件和 stdout 同报 `saved`。完整 2.9 仍未完成。
 - [ ] 2.10 升级 RunReport 与所有公开消费者的白名单处置协议；验收：新版本明确 raw/active/whitelisted finding、批准引用和 allow_with_exceptions，旧消费者拒绝未知决策而非降级为普通 allow，human/JSON/SARIF/MCP/Hook 语义一致。
