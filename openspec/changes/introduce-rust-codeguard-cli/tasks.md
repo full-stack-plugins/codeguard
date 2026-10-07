@@ -151,7 +151,7 @@
 
   进行中：相邻 `codeguard-cli/crates/codeguard-cli/src/tool_identity.rs` 和 `crates/codeguard-cli/tests/tool_identity_contract.rs` 已对三种 origin 的入口、基础可执行位、独立运行时及有界目录树 bundle 摘要作只读核验；真实 Maven libexec 全树通过本地测试锁核对，委托 jar 篡改被拒绝；见 `codeguard-cli/tests/acceptance/tool-identity-baseline.md`。可信锁来源、完整动态依赖闭包、doctor 与恢复步骤仍缺，不能勾选 5.2。
   Ruff 局部原生报告另记录完成文件的工具/配置字节摘要并在整轮末复核，未完成文件不声称身份；尚未接受保护工具锁，见 `codeguard-cli/tests/acceptance/ruff-observed-artifact-identity.md`。
-- [ ] 5.3 实现独立 tools install 流程、下载清单与校验；验收：普通 check/plan/doctor 不隐式安装；真实主动联网 wrapper 在离线隔离中被阻止，无法隔离则启动前 incomplete。
+- [x] 5.3 实现独立 tools install 流程、下载清单与校验；验收：普通 check/plan/doctor 不隐式安装；真实主动联网 wrapper 在离线隔离中被阻止，无法隔离则启动前 incomplete。
   网络编排进展：download_and_publish_signed_distribution 请求前核对签名/本机平台/精确工具/完整定位及宿主精确站点许可，下载后共享预算进入签名发布服务。拒绝无许可/通配等五类前置反例；另显式固定 Rust 官方仓库提交 LICENSE-MIT 的真实公共 HTTPS、摘要和临时发布 1 项通过（0.70 秒），不执行内容、测试 key 不是真实发行批准。真实宿主来源、正式 CLI apply/运行时/恢复/跨平台仍缺，5.3 不勾选，见相邻 tests/acceptance/signed-network-publication.md。
   签名发布编排进展：新增明确调用的离线包发布入口，按本机平台、精确工具绑定签名/原锁，raw 或完整布局关联后独立缓存发布；前/发布前/发布后时钟复核，拒绝回退，全部阶段共享预算取消。5 项目标契约通过，覆盖 raw/ZIP 原定位与复用、错误身份/包/签名/平台/工具/时钟、已有损坏目标保留，以及发布后时钟缺失失败再重验。尚无真实宿主信任/网络/正式 CLI 安装/运行时/恢复闭环，5.3 不勾选，见相邻 tests/acceptance/signed-package-publication.md。
   发行签名进展：新增独立 distribution.v1 Ed25519 域，绑定原始清单/锁、发行者/通道/平台、序号及有效期，严格清单/锁关联后返回只读结果。宿主公钥/撤销/时钟/最低序号真实性仍外置；无项目自批或签发命令。可信宿主和正式下载/install 编排尚缺，5.3 不勾选；见相邻 tests/acceptance/signed-distribution-binding.md。
