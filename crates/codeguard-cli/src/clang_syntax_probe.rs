@@ -265,6 +265,16 @@ fn observe_profile(
                 json!({"status":"incomplete","reason":"clang_structure_report_invalid","observation":null})
             }
         };
+        if report.get("placeholder_observation").is_some()
+            && (report["structure_observation"]["status"] != "observed"
+                || !codeguard_adapters::valid_clang_documentation_placeholders(
+                    &report["placeholder_observation"]["observation"],
+                    &report["structure_observation"]["observation"],
+                    Some(source),
+                ))
+        {
+            report["placeholder_observation"] = json!({"status":"incomplete","reason":"clang_placeholder_report_invalid","observation":null});
+        }
     }
     report
 }

@@ -501,3 +501,6 @@ pub use clang_documentation_ast::clang_documentation_structure_engine_sha256;
 
 mod clang_documentation_placeholders;
 pub use clang_documentation_placeholders::parse_clang_documentation_placeholders;
+
+mod clang_placeholder_validation;
+pub use clang_placeholder_validation::valid_clang_documentation_placeholders;
