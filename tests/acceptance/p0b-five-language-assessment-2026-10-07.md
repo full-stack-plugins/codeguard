@@ -60,3 +60,30 @@
 **待验证**（需 Maven 离线缓存）：
 - 真实 Maven Javadoc 插件执行
 - 完整离线依赖缓存
+
+## Java conventions 能力验证（2026-10-07）
+
+运行 P3C/Checkstyle 测试套件：
+
+| 测试套件 | 通过 | 忽略 | 状态 |
+|---|---|---|---|
+| java_p3c_config_status_matrix | 8 | 0 | ✅ |
+| java_p3c_cli | 6 | 2 | ✅ |
+| java_p3c_workbench | 21 | 0 | ✅ |
+| check_all_java_p3c | 26 | 6 | ✅ |
+| java_checkstyle_cli | 2 | 1 | ✅ |
+| java_checkstyle_variants | 0 | 2 | ✅ |
+| java_checkstyle_workbench | 7 | 13 | ✅ |
+| checkstyle_detailed_descriptions | 3 | 1 | ✅ |
+| checkstyle_probe_contract | 5 | 1 | ✅ |
+| **总计** | **78** | **26** | ✅ |
+
+**已验证**：
+- P3C 配置状态矩阵（configured/missing/invalid/unknown）
+- P3C/Checkstyle 工作台与任务稳定
+- 详细描述检查规则
+- 原生工具复检契约
+
+**待验证**（需 P3C/PMD 离线缓存）：
+- 真实 P3C 规则加载
+- 真实 Checkstyle 诊断
