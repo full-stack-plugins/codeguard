@@ -251,3 +251,4 @@ pub mod concurrent_stream;
 pub mod process_cancellation;
 pub mod task_dag;
 pub mod work_tree_snapshot;
+pub mod evidence_index;
