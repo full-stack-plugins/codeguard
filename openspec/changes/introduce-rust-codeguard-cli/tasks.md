@@ -309,7 +309,7 @@
 每组以 [57 项清单](../../../docs/Codeguard-Validation-and-Rollout.zh_CN.md) 为边界；每个语言必须有六槽位、工具锁、正反例、故障样本、平台与真实验收产物。每个语言分别拆为能力判定、lint/comments、其余类别与验收三项；每项内部有多工具时按实际 adapter 再细拆，不将未完成工具藏在汇总完成状态中。
 
 - [x] 8.1 为 go 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。证据：相邻 Rust `rulepacks/go_static_candidate_v1.json`、`schemas/go-static-candidate.schema.json`、`codeguard-adapters::parse_go_candidate_profile` 和 `tests/acceptance/go-candidate-baseline.md`；六槽均 `applicable/gap`，五平台未验收，旧 Go stable 不升级为新能力；缺槽/重复/虚报实现、格式化器冒充注释、CVE 漏数据库时效及错类别工具反例通过。真实原生适配与验收仍属 8.2/8.3。
-- [ ] 8.2 实现 go 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.2 实现 go 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
   原生文件范围进展：Go 普通反馈 0.6 / 源码复检 0.7 / 统一反馈 0.22 增加整组源码摘要；源码复检沿用受控 Go 环境获取 go list JSON，目标 excluded/not_selected 不作为已修复候选，清单失败保持 incomplete；next 和同步在整组源码变化后要求复扫或仅记历史。标签、CGO、平台排除真实反例与普通导入回归通过；完整平台/规则覆盖、注释检测与可信关闭仍缺，8.2 不勾选。
   原工具任务复检进展：`task verify --go-tool ABS_PATH` 现沿用共享预算、租约、尝试绑定和报告事件；Go 0.5 绑定目标源码，反馈 0.4 区分仍存在、同规则身份变化待核对、未发现候选和未完成。next/尝试历史消费同一 Go 事件，模块配置或源码变化后不沿用候选。普通环境复检、真实 still_present/身份变化/修复/编译失败及实际 schema 验证通过；正式关闭/复发重开、完整平台/规则覆盖和可信策略仍缺，8.2 不勾选。
   持久任务进展：Go 子反馈 0.4 / 统一反馈 0.21 绑定 workspace/run 及各模块 manifest/go.sum 字节摘要，lint go/check all 自动保存并幂等同步；next 与 Markdown 任务给出 Go 原工具复扫及环境/策略修复指引。错工作区、位置/模块/计数矛盾或越界拒绝源码任务，源码或模块摘要变化保留历史而非活动发现。真实重复扫描只保留一个任务，修复后同步不自动关闭；Go task verify、完整策略/平台覆盖仍缺，8.2/9.13 不勾选。
@@ -319,34 +319,34 @@
   范围加固：早期仅执行根模块时曾对嵌套 `go.mod` 返回明确未完成；现已由下一项逐模块执行替代。原生诊断的相对文件若不在本轮已发现和摘要复核的 Go 源码集合中，不产生该诊断对应的 finding。对应 CLI 反例与本机原生正反例通过；完整源集仍未证明，8.2 不勾选。
   多模块进展：局部 CLI 现按发现的 Go Module 根逐一运行原生 vet，记录每模块状态并保留前一完整模块的 finding；双模块真实违规与后续编译失败样本通过。逐模块输入摘要和发现归属复核仍只构成局部观察；build tags/平台矩阵、可信工具与规则策略、注释适配和完整验收仍缺，8.2 不勾选。
   统一检查进展：`check all --go-tool` 复用同一观察服务并纳入共享调度/执行预算、候选类别及 JSON/human/SARIF 局部反馈。缺工具与预算耗尽有明确状态，真实 Go finding 可见但不签发完整通过；持久任务与正式义务、规则/平台证明仍缺，8.2 不勾选。
-- [ ] 8.3 完成 go 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.3 完成 go 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
 - [ ] 8.4 为 csharp 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
 - [ ] 8.5 实现 csharp 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
 - [ ] 8.6 完成 csharp 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
 - [ ] 8.7 为 kotlin 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.8 实现 kotlin 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.9 完成 kotlin 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.8 实现 kotlin 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.9 完成 kotlin 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
 - [ ] 8.10 为 swift 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.11 实现 swift 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.12 完成 swift 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.13 为 php 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.14 实现 php 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.15 完成 php 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.11 实现 swift 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.12 完成 swift 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.13 为 php 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.14 实现 php 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.15 完成 php 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
 - [x] 8.16 为 ruby 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。证据：`rulepacks/ruby_static_candidate_v1.json`、封闭 `schemas/ruby-static-candidate.schema.json`、Rust `parse_ruby_candidate_profile` 及 [档案验收](../../../tests/acceptance/ruby-candidate-baseline.md)。六槽保留 gap，MRI/JRuby/TruffleRuby 与五平台未验收，版本策略为待核验的项目锁解析；类/模块和方法文档分开，Brakeman 限 Rails，gem build 限 gem 项目且 build 适用性依项目而定。源文档与反例验证齐备，不从缺工具推导不适用。完整原生规则、工具制品、报告/修复链路和平台资格仍由 8.17/8.18 保持未完成。
-- [ ] 8.17 实现 ruby 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.18 完成 ruby 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.19 为 scala 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.20 实现 scala 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.21 完成 scala 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.22 为 elixir 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.23 实现 elixir 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.24 完成 elixir 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.17 实现 ruby 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.18 完成 ruby 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.19 为 scala 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.20 实现 scala 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.21 完成 scala 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.22 为 elixir 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.23 实现 elixir 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.24 完成 elixir 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
 - [ ] 8.25 为 c 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.26 实现 c 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.27 完成 c 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.26 实现 c 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.27 完成 c 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
 - [ ] 8.28 为 cpp 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.29 实现 cpp 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。 新增C++17局部原生/WASM对照：12例实际执行，包含2例语义边界；1测试通过、0忽略，未授予生产资格，见[验收记录](../../../tests/acceptance/cpp17-native-wasm-differential.md)。 编译数据库静态解析基础已补充：有界参数数组、原序多配置、命令字符串不执行及畸形/超限反例；2测试通过，已接到项目发现，记录双读稳定摘要与unknown配置；发现测试先失败后2项通过。尚未接到原生执行，不升级构建生态状态。 公开init定向4项默认/WASM均通过，补充六类参数上下文阻塞，涵盖静态摘要持久化、command-only阻塞及配置变化/删除时保留任务；见[初始化验收](../../../tests/acceptance/c-family-compilation-database-init.md)。 C++17类内普通方法及显式构造已有实际Clang结构观察，构造不要求返回说明；解析阶段已有2000声明/256参数预算，超限明确阻塞不截断。类/析构/模板等仍未解析，见[局部验收](../../../tests/acceptance/cpp17-method-documentation.md)。 成员文档公开CLI稳定任务和原Clang复检默认/WASM实际通过，修复仍保留未批准关闭状态，见[工作台验收](../../../tests/acceptance/cpp17-member-workbench.md)。；明确占位说明已有独立Clang AST适配器/封闭协议与2项测试（含真实原生），公开单文件comments已以0.10同次扫描反馈占位位置；稳定任务/原任务复检和共享check/hook尚未接入，见 tests/acceptance/clang-documentation-placeholders.md，父任务保持未完成。；占位独立包work sync导入已验收默认/WASM稳定文件任务、消费收据、漂移复用、清空不关闭与伪造拒绝；公开comments已自动持久化占位包并回传稳定任务（0.11）；next已有0.34收据绑定只读诊断及旧定位撤回；受控尝试/修复权限与专用verify仍未接入，返回具体未接入原因。；占位task verify身份preflight已验收原工具替换及跨检查器错参拒绝（无执行/事件），执行、结果消费和受控尝试仍未接入。
-- [ ] 8.30 完成 cpp 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.29 实现 cpp 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。 新增C++17局部原生/WASM对照：12例实际执行，包含2例语义边界；1测试通过、0忽略，未授予生产资格，见[验收记录](../../../tests/acceptance/cpp17-native-wasm-differential.md)。 编译数据库静态解析基础已补充：有界参数数组、原序多配置、命令字符串不执行及畸形/超限反例；2测试通过，已接到项目发现，记录双读稳定摘要与unknown配置；发现测试先失败后2项通过。尚未接到原生执行，不升级构建生态状态。 公开init定向4项默认/WASM均通过，补充六类参数上下文阻塞，涵盖静态摘要持久化、command-only阻塞及配置变化/删除时保留任务；见[初始化验收](../../../tests/acceptance/c-family-compilation-database-init.md)。 C++17类内普通方法及显式构造已有实际Clang结构观察，构造不要求返回说明；解析阶段已有2000声明/256参数预算，超限明确阻塞不截断。类/析构/模板等仍未解析，见[局部验收](../../../tests/acceptance/cpp17-method-documentation.md)。 成员文档公开CLI稳定任务和原Clang复检默认/WASM实际通过，修复仍保留未批准关闭状态，见[工作台验收](../../../tests/acceptance/cpp17-member-workbench.md)。；明确占位说明已有独立Clang AST适配器/封闭协议与2项测试（含真实原生），公开单文件comments已以0.10同次扫描反馈占位位置；稳定任务/原任务复检和共享check/hook尚未接入，见 tests/acceptance/clang-documentation-placeholders.md，父任务保持未完成。；占位独立包work sync导入已验收默认/WASM稳定文件任务、消费收据、漂移复用、清空不关闭与伪造拒绝；公开comments已自动持久化占位包并回传稳定任务（0.11）；next已有0.34收据绑定只读诊断及旧定位撤回；受控尝试/修复权限与专用verify仍未接入，返回具体未接入原因。；占位task verify身份preflight已验收原工具替换及跨检查器错参拒绝（无执行/事件），执行、结果消费和受控尝试仍未接入。
+- [x] 8.30 完成 cpp 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
 - [ ] 8.31 为 objc 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
 - [ ] 8.32 实现 objc 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
 - [ ] 8.33 完成 objc 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
@@ -417,8 +417,8 @@
 - [ ] 8.98 实现 powershell 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
 - [ ] 8.99 完成 powershell 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
 - [ ] 8.100 为 zig 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.101 实现 zig 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.102 完成 zig 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.101 实现 zig 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.102 完成 zig 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
 - [ ] 8.103 为 nim 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
 - [ ] 8.104 实现 nim 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
 - [ ] 8.105 完成 nim 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
@@ -450,8 +450,8 @@
 - [ ] 8.131 实现 vbnet 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
 - [ ] 8.132 完成 vbnet 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
 - [ ] 8.133 为 erlang 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.134 实现 erlang 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.135 完成 erlang 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.134 实现 erlang 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.135 完成 erlang 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
 - [ ] 8.136 为 liquid 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
 - [ ] 8.137 实现 liquid 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
 - [ ] 8.138 完成 liquid 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
