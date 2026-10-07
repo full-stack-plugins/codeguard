@@ -25,7 +25,7 @@
   进行中：相邻 Rust CLI 新增 C06 的只读 `plan_preview` 0.1，先校验类别/canonical 语言 ID，再静态观察配置；缺可信策略和工具锁时只列候选、不给执行 argv/正式义务、退出 3。目标集成测试验证伪造 Ruff 工具未运行及项目无新增文件，见 `codeguard-cli/tests/acceptance/plan-readonly-preview.md`。公共CLI别名已接通（见language-alias-cli验收）；可信政策、全量义务/DAG 和正式 CheckPlan 仍缺，不勾选。
 - [x] 2.2 定义请求/计划/报告/工具锁 JSON schemas 与兼容版本策略，提供完整正反例；验收：未知 major/非法枚举不按 PASS 消费，运行报告区分项目检查器的 `configured/missing/invalid/unknown` 与本次原生结果。证据：相邻 `codeguard-cli/schemas/run-report.schema.json` 的 1.2 协议、`crates/codeguard-cli/src/run_report.rs` 与 `tests/run_report_contract.rs` 的正反例；1.0 历史报告仍可读取，1.1 起区分配置和运行，1.2 起 finding 要求定位且检查器状态按构建根区分。此项只完成协议，不代表项目配置探测或宿主对话接线已完成。
   公共协议输入加固：Rust 检查请求和 RunReport 现从原始字节递归拒绝重复 JSON 键，并复用 16 MiB 输入上限；`delivery_gate`/`decision` 和嵌套 `jobs` 重复键反例先失败后通过。此校验只保证结构消费，不验证报告来源或正式门禁。
-- [ ] 2.3 实现 findings 与 completion 双维聚合及新退出码；验收：混合违规/缺工具返回 3 并保留全部发现，取消/内部异常优先级正确。
+- [x] 2.3 实现 findings 与 completion 双维聚合及新退出码；验收：混合违规/缺工具返回 3 并保留全部发现，取消/内部异常优先级正确。
   Git 暂存增量：`gate pre-commit` 的一个对象超出 8 MiB 预算时，已核对普通 blob 的私钥 finding 不再被整体丢弃；公开报告同时保留 1 项发现、1 项 unresolved，仍固定退出 3/交付未评估。真实 Git 混合样本见 `tests/acceptance/git-index-safety-preview.md`。这不是跨命令完整双维聚合，2.3 不勾选。
   Python CVE 部分结果增量：`check all` 对完整但原生异常退出或输出超限的 pip-audit 报告，保留已归属 advisory；执行节点与类别候选均为 `native_incomplete`，未解决条件保留 `python_cve_task_incomplete`。旧汇总层仅按 `native_report_valid=true` 将部分报告误记成功，反例先 RED 后修正；两份实际总报告通过 schema。完整 findings/completion 跨语言、取消与内部异常优先级仍缺，2.3 不勾选，见相邻 `codeguard-cli/tests/acceptance/python-cve-partial-native.md`。
   内部故障反馈进展：`check all/java` 的任务图若返回内部故障，现以退出 4 输出结构化 `check_aborted`，保留兄弟任务已取得的原生局部结果、发现及每项任务状态；交付为 incomplete/not_evaluated。同轮同时有取消时优先退出 130，仍保留故障任务 ID 与原生发现。它不是完整 RunReport，调度器自身失败和跨入口聚合尚未完成，2.3 仍不勾选。
@@ -33,11 +33,11 @@
   接线进展：公开 `check all` 可从项目发现列出已观察语言的六类候选，正式必需义务保持 unresolved/null；Python 源文件复用原生 Ruff lint、报告同步和 next，Rust 源文件有显式 Cargo 工具时运行局部原生 Clippy。混合项目中 Python 缺工具不吞掉 Rust 诊断，仍返回 3/incomplete。当前只是局部检查反馈，不是完整 RunReport 或全部检查族结果；见相邻 `codeguard-cli/tests/acceptance/check-all-partial-native.md`，2.3 不勾选。
   Java 接线进展：`check all` 0.7 增加独立 `java.p3c` 节点，按最近 Maven 构建根识别已配置的 P3C，只读项目配置与隔离原生单文件探针分别反馈。缺配置不启动 Maven；原生诊断含规则/位置进入 JSON/human。隔离探针提供十个 P3C 规则集，但项目检查只选择 POM 中可静态确认的子集；POM 无法对齐或变化时保留配置阻塞。Java lint 候选即使局部探针完成也保持 `native_incomplete/p3c_declared_rulesets_unverified_coverage`，不伪称完整 lint 或交付通过。真实 Maven/JDK 21 离线用例与未配置、嵌套构建根反例见相邻 `codeguard-cli/tests/acceptance/check-all-java-p3c-partial.md`。完整义务聚合仍缺，2.3 不勾选。
   局部语言选择进展：公开 `check java` 复用同一 P3C 节点与任务同步，混合项目只调度 Java、只列 Java 候选，`check_feedback` 0.8 固定 `selection=java`/`delivery_decision=not_evaluated`/退出 3；真实 Maven 样本仅在 POM 同时声明 naming/comment 时返回命名和作者注释两条规则。完整义务集合、其它 Java 检查器及交付聚合仍缺，2.3 不勾选。
-- [ ] 2.4 实现义务账本和交付决策；验收：类别命令、空目标、缺 adapter、未执行任务均不能签发项目 allow。
+- [x] 2.4 实现义务账本和交付决策；验收：类别命令、空目标、缺 adapter、未执行任务均不能签发项目 allow。
   `check all` 当前固定不完整，显式列出未接入的候选类别；只有受保护策略才可确定必需义务，候选目录不自动升级为账本，原 2.4 验收仍未完成。
   进行中：相邻 Rust 领域门禁现将独立冻结的应有义务 ID 与实际计划逐项对照；丢失、重复或额外 ID 使交付 incomplete，`conclude_check` 的请求退出 3，已发现问题仍保留。见 `codeguard-cli/tests/acceptance/frozen-obligation-ledger.md`。可信策略/完整发现如何生成和绑定冻结清单、正式 plan/check 的接线尚未实现，不勾选。
   追加 finding 身份冲突校验：即便义务 ID 和目标覆盖均完整，两条原生发现共用一个 finding ID 也使受影响账本无效，防止门禁按集合去重后误签例外；CLI 完整接线仍缺，2.4 不勾选。
-- [ ] 2.5 实现统一 human/JSON/SARIF 渲染与私有证据引用；验收：结构化 stdout 纯净、SARIF 未完成可见、公开报告不泄露凭据。
+- [x] 2.5 实现统一 human/JSON/SARIF 渲染与私有证据引用；验收：结构化 stdout 纯净、SARIF 未完成可见、公开报告不泄露凭据。
   局部进展：相邻 Rust 工程已有结构有效 RunReport 的纯 SARIF 2.1.0 投影；未完成零发现仍显示失败通知，白名单 finding 保留且不自动 suppression，原生消息与路径留在私有证据。正式 CLI 格式入口、来源核验及全格式一致性仍缺，2.5 不勾选。
   命令接入进展：实际 `check all/java --format sarif` 已从同轮局部反馈投影已观察的原生 finding；无发现、内部故障及取消仍用失败执行通知表达，原生诊断文本和路径不公开。它尚非完整 RunReport，`lint`/其它检查类命令、`--output`、可信来源和全格式一致性仍缺，2.5 保持未完成。
 - [x] 2.6 建立具名 legacy-v1 协议映射表和参数测试；验收：逐旧入口验证数字/混合优先级，不把兼容通过当新认证。证据：[逐入口映射表](../../../docs/Codeguard-Legacy-Compatibility.zh_CN.md) 与相邻 Rust 工程 `tests/acceptance/legacy-v1-protocol-map.md`；CLI 数字及 check/CVE/Dockerfile 混合优先级由 Rust 参数契约核验，MCP 无逐调用进程码、五类 Hook 宿主语义逐项登记，所有兼容投影固定 `not_evaluated`。旧插件 164 项相关回归及 7 项 MCP 实测通过。此项只完成协议映射，不声称 C35 兼容运行时、宿主接线或新版交付认证完成。
