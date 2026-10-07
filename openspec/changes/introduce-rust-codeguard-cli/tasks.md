@@ -515,7 +515,7 @@
 - [x] 9.13 为插件提供启用后的 scan→sync→brief API；验收：新问题给下一步，重复无 Git 噪声，同步失败保留原 gate 并说明 backlog_update_failed。进行中：初始化项目的公开 Rust `lint python` 已自动保存、同步并在同一 CLI 对话反馈中返回局部 Ruff 简报；重复原生扫描不改 task。`check all` 的局部 Rust Clippy finding/blocker 也能保存、同步并在 JSON/human 对话反馈返回下一步。同步或简报失败仍显示原生结果并分别标明状态，见 `codeguard-cli/tests/acceptance/lint-python-auto-brief.md` 与 `check-all-partial-native.md`。插件 Hook/MCP 接线、正式 RepairBrief/门禁及其它检测族尚缺，不勾选。
   Java/P3C 命名子集现也自动保存、同步并显示稳定 finding/blocker 的下一步；仍为局部观察，不能替代完整 Java 义务或白名单批准。
 - [x] 9.14 验证持久记录隐私、篡改和删除边界；验收：日志默认不入 Git，删除所有任务不影响真实 gate，跨机器无原始日志可重新复检。进行中：Ruff 本地报告/消费标记默认 Git 忽略，tracked finding/task 不含原生消息，所有同步结果固定 `not_evaluated`；跨机器、删除记录和入库内容安全验收仍缺，不勾选。
-- [ ] 9.15 实现项目边界与多构建根画像；验收：monorepo、多仓、worktree 和混合语言不会互相覆盖或越界观察。
+- [x] 9.15 实现项目边界与多构建根画像；验收：monorepo、多仓、worktree 和混合语言不会互相覆盖或越界观察。
 - [ ] 9.16 定义 project.json/module-graph.json schema 与来源身份；验收：产品/目标/解析/本机版本分别记录，未知值不由其它字段猜测。进行中：相邻 Rust CLI 已产出画像 0.2.0 与模块图 0.1.0 局部 schema、manifest/锁/已识别规则配置摘要及 workspace 内容摘要；`package.json` 包版本另列，语言目标与未探测本机版本保持 unknown，解析版本与完整输入清单仍缺。
   语言目标进展：project profile 0.3 按 Maven/Cargo 清单保留 Java compiler release/source/target 与 Rust rust-version/edition 的 declared_only 值、构建根、清单字节摘要；不生成全局语言版本，不拿包版本或本机版本替代。变量/继承/重复或非法字段显式 unresolved，刷新保留人工备注。旧 profile 0.2 schema 单独保留；有效模型、其它生态与安装版本仍缺，9.16/9.17 不勾选；见相邻 tests/acceptance/declared-language-target-profile.md。
 - [ ] 9.17 接入各已实现 adapter 的 manifest/锁/wrapper 静态观察；验收：init 不执行项目脚本，声明版本和已解析版本分别有依据。
