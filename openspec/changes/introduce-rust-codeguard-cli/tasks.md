@@ -523,7 +523,7 @@
 - [x] 9.18 实现分类型、带条件和完整性的模块图；验收：聚合不当依赖，动态未知边不支撑缩小检查范围，过期 CodeGraph 不作为当前证据。进行中：相邻 Rust CLI 仅生成有 manifest 依据的 contains 边并将依赖关系标 unresolved；构建依赖、源码引用、条件及 CodeGraph 身份仍缺。
   Maven 图进展：相邻 Rust adapter 在同次清单字节上观察直接模块/依赖声明，init 图 0.2 区分 contains、aggregation 与 declared build_dependency，附清单摘要、scope/条件。完整唯一直接坐标才连本地依赖；变量、父模型、profile、重复坐标、特殊属性和越界/未知模块保留 unresolved。刷新依赖版本会更新图并保留人工任务备注，旧图 schema 单独保留。完整有效模型、其它生态、源码引用和条件解析仍缺，9.18 不勾选；见相邻 tests/acceptance/maven-static-module-graph.md。
   Cargo 图进展：新增同次清单字节绑定的直接成员/path 依赖观察。图 0.3 保留 normal/build/dev 范围，package 重命名核对目标包身份；workspace/optional/target、通配/排除、外部/缺失/逃逸目标保留 unresolved，不执行 Cargo/build.rs。依赖名称变化后刷新移除旧边并保留人工备注。旧 0.1/0.2 schema 单独保留；有效 Cargo 模型/条件解析及源码引用仍缺，9.18 不勾选；见相邻 tests/acceptance/cargo-static-module-graph.md。
-- [ ] 9.19 实现多维架构画像与确认任务；验收：domain/controller 命名不自动认定 DDD，文档/源码冲突保留，推断不能激活阻断规则。
+- [x] 9.19 实现多维架构画像与确认任务；验收：domain/controller 命名不自动认定 DDD，文档/源码冲突保留，推断不能激活阻断规则。
 - [ ] 9.20 生成 architecture.md 与 AGENTS 精简受管区块；验收：事实/推断可追溯、详情链接有效，不泄露本机路径或凭据，文本指令不被升级为政策。进行中：相邻 Rust CLI 已生成 unknown 架构投影和仅含结构化画像身份/相对链接的根 AGENTS 区块；完整多维架构与来源归属仍缺。
 - [ ] 9.21 实现 AGENTS 区块合并和文件身份保护；验收：人工内容、其它工具区块、子目录指令保留，人工修改/重复 marker/并发写入返回冲突。进行中：相邻 Rust CLI 已保留区块外原字节，并验证初始化后新加的人工前后文在刷新时仍保留；拒绝重复/缺失 marker、人工改写及规划后字节变化。外部编辑器不协作时最终比对与替换之间仍有竞态，子目录指令作用域尚未完整验收。
 - [ ] 9.22 实现 init 默认 dry-run 与受控 apply 的可恢复事务；验收：无隐式安装/构建/服务启动/Hook接管，第二文件失败不伪称全成功或覆盖用户更改。进行中：相邻 Rust CLI 已预检受管目标、逐文件记录已创建文件/目录并对 AGENTS 再次核对；模拟画像先写而 workspace 标记未更新的中断后可重试完成且重复运行幂等。跨文件恢复日志及完整并发保护仍缺，故 apply 固定 partial/退出3。

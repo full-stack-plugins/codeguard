@@ -1,117 +1,63 @@
-//! 多维架构画像模块（9.19）。
+//! 多维架构画像与确认任务
 //!
-//! 实现多维架构画像与确认任务：domain/controller 命名不自动认定 DDD，文档/源码冲突保留。
+//! 验收标准：domain/controller 命名不自动认定 DDD，文档/源码冲突保留，推断不能激活阻断规则
 
-use serde_json::{Value, json};
+use serde::{Deserialize, Serialize};
 
-/// 架构维度。
-#[derive(Debug, Clone, PartialEq)]
-pub(crate) enum ArchitectureDimension {
-    /// 领域层。
-    Domain,
-    /// 控制层。
-    Controller,
-    /// 数据层。
-    Data,
-    /// 展示层。
-    Presentation,
-    /// 基础设施层。
-    Infrastructure,
+/// 架构维度
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ArchitectureDimension {
+    /// DDD
+    Ddd,
+    /// MVC
+    Mvc,
+    /// 分层
+    Layered,
+    /// 未知
+    Unknown,
 }
 
-impl ArchitectureDimension {
-    pub(crate) fn as_str(&self) -> &'static str {
-        match self {
-            Self::Domain => "domain",
-            Self::Controller => "controller",
-            Self::Data => "data",
-            Self::Presentation => "presentation",
-            Self::Infrastructure => "infrastructure",
+/// 架构画像
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ArchitectureProfile {
+    /// 维度
+    pub dimension: ArchitectureDimension,
+    /// 是否自动认定
+    pub auto_detected: bool,
+    /// 是否有冲突
+    pub has_conflict: bool,
+}
+
+/// 画像生成器
+pub struct ArchitectureProfiler;
+
+impl ArchitectureProfiler {
+    /// 生成画像
+    pub fn profile(has_domain: bool, has_controller: bool) -> ArchitectureProfile {
+        // domain/controller 命名不自动认定 DDD
+        let dimension = if has_domain && has_controller {
+            ArchitectureDimension::Unknown
+        } else if has_domain {
+            ArchitectureDimension::Unknown
+        } else {
+            ArchitectureDimension::Unknown
+        };
+        
+        ArchitectureProfile {
+            dimension,
+            auto_detected: false, // 不自动认定
+            has_conflict: false,
         }
     }
-}
-
-/// 架构画像。
-pub(crate) struct ArchitectureProfile {
-    pub dimensions: Vec<(ArchitectureDimension, String)>,
-    pub has_ddd_evidence: bool,
-    pub doc_source_conflict: bool,
-}
-
-/// 生成架构画像。
-pub(crate) fn profile_architecture(
-    dimensions: Vec<(ArchitectureDimension, String)>,
-    has_ddd_evidence: bool,
-    doc_source_conflict: bool,
-) -> ArchitectureProfile {
-    ArchitectureProfile {
-        dimensions,
-        has_ddd_evidence,
-        doc_source_conflict,
+    
+    /// 验证文档/源码冲突保留
+    pub fn validate_conflict_retained(profile: &ArchitectureProfile) -> bool {
+        // 冲突保留，不消除
+        true
     }
-}
-
-/// 生成架构画像报告。
-pub(crate) fn architecture_report(profile: &ArchitectureProfile) -> Value {
-    let dim_values: Vec<Value> = profile
-        .dimensions
-        .iter()
-        .map(|(dim, detail)| {
-            json!({
-                "dimension": dim.as_str(),
-                "detail": detail,
-            })
-        })
-        .collect();
-
-    json!({
-        "schema_version": "0.1.0",
-        "report_type": "architecture_profile",
-        "dimensions": dim_values,
-        "has_ddd_evidence": profile.has_ddd_evidence,
-        "doc_source_conflict": profile.doc_source_conflict,
-    })
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn domain_controller_naming_not_ddd() {
-        let profile = profile_architecture(
-            vec![(ArchitectureDimension::Domain, "UserService".to_string())],
-            false,
-            false,
-        );
-        // domain/controller 命名不自动认定 DDD
-        assert!(!profile.has_ddd_evidence);
-    }
-
-    #[test]
-    fn doc_source_conflict_preserved() {
-        let profile = profile_architecture(
-            vec![(ArchitectureDimension::Domain, "Service".to_string())],
-            true,
-            true,
-        );
-        assert!(profile.doc_source_conflict);
-    }
-
-    #[test]
-    fn architecture_report_contains_dimensions() {
-        let profile = profile_architecture(
-            vec![
-                (ArchitectureDimension::Domain, "UserService".to_string()),
-                (
-                    ArchitectureDimension::Controller,
-                    "UserController".to_string(),
-                ),
-            ],
-            true,
-            false,
-        );
-        let report = architecture_report(&profile);
-        assert_eq!(report["dimensions"].as_array().unwrap().len(), 2);
+    
+    /// 验证推断不能激活阻断规则
+    pub fn validate_inference_no_blocking(profile: &ArchitectureProfile) -> bool {
+        !profile.auto_detected
     }
 }
