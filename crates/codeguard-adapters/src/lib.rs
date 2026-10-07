@@ -498,3 +498,6 @@ mod c_family_compilation_entry;
 pub use c_family_compilation_entry::{CFamilyCompilationEntry, parse_c_family_compilation_database};
 
 pub use clang_documentation_ast::clang_documentation_structure_engine_sha256;
+
+mod clang_documentation_placeholders;
+pub use clang_documentation_placeholders::parse_clang_documentation_placeholders;
