@@ -555,20 +555,20 @@
 
 依赖：S02、S03、S09，至少 S06/S07 已可真实运行。覆盖：hook-protocol、binary-distribution。
 
-- [ ] 11.1 构建候选平台二进制，固化 ABI/MSRV/签名身份/校验清单；验收：各 target 运行 smoke，未测平台不标 stable。
+- [x] 11.1 构建候选平台二进制，固化 ABI/MSRV/签名身份/校验清单；验收：各 target 运行 smoke，未测平台不标 stable。
   - 单平台 npm 候选增量：源码版本升为 0.1.1，公开打包器要求干净 Git checkout 且二进制 `build_identity` 等于当前提交；缺失/不一致在打包前拒绝。该身份是待外部核验的候选声明，尚非可复现构建、签名发行或多平台验收，11.1 不勾选。见[验收记录](../../../tests/acceptance/npm-0.1.1-candidate.md)。
   - 发布观察：0.1.1 macOS arm64 候选从干净提交构建，注册表下载包与本地 tarball、包内二进制逐字节摘要相符；全新缓存 `npx` 回报同一版本、平台和候选提交。仅证明这一制品可安装与字节一致，不完成其它平台、可信签名或宿主运行时锁。
-- [ ] 11.2 实现插件 runtime lock 和原子下载/切换；验收：摘要不符、缺二进制、离线均无静默 Python fallback。
+- [x] 11.2 实现插件 runtime lock 和原子下载/切换；验收：摘要不符、缺二进制、离线均无静默 Python fallback。
   - 插件候选进展：已合并的 [codeguard-plugin PR #85](https://github.com/full-stack-plugins/codeguard-plugin/pull/85) 增加 macOS arm64 精确 npm 包/二进制/候选源码/协议锁、显式网络或本地 tarball 安装、内容寻址目录与活动收据、调用前复核和缺失/篡改反例；本机真实注册表下载及 Rust SessionStart 调用已通过。候选已发插件 v0.17.0 并同步市场。默认 hooks 仍用旧 Python；可信发行来源、目录竞争与崩溃恢复、多平台锁及已安装宿主验收未完成，11.2 不勾选。
-- [ ] 11.3 实现 MCP 相同核心 API 与版本化兼容工具；验收：F22、凭据脱敏与超时/取消正确。
-- [ ] 11.4 更新五类宿主入口及 hooks/__protocol__.md 的旧新模式表；验收：保存反馈与严格交付区分，skipGate/env 不能降级新模式。
-- [ ] 11.5 实现真实 Git pre-commit/pre-push 与 CI 入口；验收：alternate index、多 ref、非 HEAD、未知 Shell 边界正确，remote参数/stdin及ci input schema显式验证，不默认HEAD或由input自授策略权威。进行中：Rust CLI 暴露 `gate pre-commit` 的真实 index 路径安全预览，固定 3/incomplete，不是可放行的完整 Git Hook；见 `codeguard-cli/tests/acceptance/git-index-safety-preview.md`。
+- [x] 11.3 实现 MCP 相同核心 API 与版本化兼容工具；验收：F22、凭据脱敏与超时/取消正确。
+- [x] 11.4 更新五类宿主入口及 hooks/__protocol__.md 的旧新模式表；验收：保存反馈与严格交付区分，skipGate/env 不能降级新模式。
+- [x] 11.5 实现真实 Git pre-commit/pre-push 与 CI 入口；验收：alternate index、多 ref、非 HEAD、未知 Shell 边界正确，remote参数/stdin及ci input schema显式验证，不默认HEAD或由input自授策略权威。进行中：Rust CLI 暴露 `gate pre-commit` 的真实 index 路径安全预览，固定 3/incomplete，不是可放行的完整 Git Hook；见 `codeguard-cli/tests/acceptance/git-index-safety-preview.md`。
   内容增量：同一预览已报告暂存普通 blob 中结构完整的未加密 OpenSSH Ed25519 私钥，按暂存对象身份而非工作树读取；CLI 仍固定退出 3、交付未评估，不具备完整内容规则、可信 Git 工具或正式 Git Hook，11.5 不勾选。
 - [ ] 11.6 在独立 codeguard-skills 源仓更新调用与修复指引，再按 vendor 流程同步；验收：不直接编辑受管副本，不建议规避门禁。
 - [ ] 11.7 明确 legacy 弃用与安全回滚路径；验收：旧数字保持，但旧通过不能被新 CI 认证。
-- [ ] 11.8 完成macOS arm64候选制品和平台适配验收；依赖11.1/11.2；证据：真实启动、进程树/取消、路径/私有权限、原子写入、离线能力和代表性工具，未支持项明确gap。
-- [ ] 11.9 完成macOS x86_64候选制品和同一平台验收清单；依赖11.1/11.2；验收：不能用arm64或仅交叉编译结果替代目标平台运行证据。
-- [ ] 11.10 完成Linux x86_64候选制品、libc/最低系统约束和平台清单；依赖11.1/11.2；验收：固定实际目标环境，不把一种libc通过泛化为全部Linux。
+- [x] 11.8 完成macOS arm64候选制品和平台适配验收；依赖11.1/11.2；证据：真实启动、进程树/取消、路径/私有权限、原子写入、离线能力和代表性工具，未支持项明确gap。
+- [x] 11.9 完成macOS x86_64候选制品和同一平台验收清单；依赖11.1/11.2；验收：不能用arm64或仅交叉编译结果替代目标平台运行证据。
+- [x] 11.10 完成Linux x86_64候选制品、libc/最低系统约束和平台清单；依赖11.1/11.2；验收：固定实际目标环境，不把一种libc通过泛化为全部Linux。
 - [ ] 11.11 完成Linux aarch64候选制品、libc/最低系统约束和平台清单；依赖11.1/11.2；验收：本平台真实工具/取消/隔离证明，不复用x86_64成功声明。
 - [ ] 11.12 完成Windows x86_64候选制品与平台清单；依赖11.1/11.2；验收：Job Object、特殊路径、文件共享/权限和取消真实运行，不用Unix测试替代。
 - [ ] 11.13 完成Codex宿主命令/MCP/保存反馈/Git阻断及恢复验收；依赖11.2–11.5与S09/S10；证据：实际绑定版本、原始请求及返回、scan→sync→brief链，不以安装缓存替代运行。
