@@ -185,3 +185,39 @@ fn parser_stops_at_report_function_and_parameter_limits() {
             .is_ok()
     );
 }
+
+#[test]
+fn unsupported_free_operator_keeps_other_function_observations() {
+    let source = "struct Box {}; Box operator+(Box a, Box b); int ordinary();";
+    let offset = source.find("ordinary").unwrap();
+    let ast = json!({"kind":"TranslationUnitDecl","inner":[
+        {"kind":"FunctionDecl","name":"operator+","loc":{"offset":source.find("operator").unwrap(),"tokLen":8},"type":{"qualType":"Box (Box, Box)"}},
+        {"kind":"FunctionDecl","name":"ordinary","loc":{"offset":offset,"tokLen":8},"type":{"qualType":"int ()"}}
+    ]});
+    let result =
+        parse_clang_documentation_ast(&serde_json::to_vec(&ast).unwrap(), source.as_bytes());
+    assert!(
+        result.is_ok(),
+        "unsupported operator must remain unresolved"
+    );
+    let report = result.unwrap();
+    assert_eq!(report["functions"].as_array().unwrap().len(), 1);
+    assert_eq!(report["functions"][0]["name"], "ordinary");
+    assert_eq!(
+        report["unresolved_declaration_kinds"],
+        json!(["FunctionDecl"])
+    );
+    assert_eq!(report["coverage_proven"], false);
+}
+
+#[test]
+fn c_function_named_operator_is_an_ordinary_identifier() {
+    let source = "int operator(int x);";
+    let ast = function(source, "operator", vec![]);
+    let observed =
+        parse_clang_documentation_ast(&serde_json::to_vec(&ast).unwrap(), source.as_bytes())
+            .unwrap();
+    assert_eq!(observed["functions"].as_array().unwrap().len(), 1);
+    assert_eq!(observed["functions"][0]["name"], "operator");
+    assert_eq!(observed["unresolved_declaration_kinds"], json!([]));
+}

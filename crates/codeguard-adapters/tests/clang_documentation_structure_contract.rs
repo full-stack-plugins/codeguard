@@ -187,3 +187,76 @@ fn explicit_constructor_requires_parameters_but_never_invents_return_contract() 
         json!(["CXXConstructorDecl"])
     );
 }
+
+#[test]
+#[ignore = "requires explicit existing Apple Clang21 via CODEGUARD_CLANG_BIN"]
+fn actual_free_operator_does_not_erase_ordinary_identifier_documentation() {
+    use std::io::Write;
+    use std::process::{Command, Stdio};
+    let clang = std::env::var("CODEGUARD_CLANG_BIN").expect("explicit existing Clang");
+    let version = Command::new(&clang).arg("--version").output().unwrap();
+    assert!(version.status.success());
+    assert!(
+        String::from_utf8_lossy(&version.stdout)
+            .starts_with("Apple clang version 21.0.0 (clang-2100.3.34.2)")
+    );
+    let source =
+        b"struct Box {}; Box operator+(Box a, Box b); int ordinary(); int operator_helper();";
+    let mut child = Command::new(&clang)
+        .args([
+            "-fsyntax-only",
+            "-x",
+            "c++",
+            "-std=c++17",
+            "-fparse-all-comments",
+            "-Xclang",
+            "-ast-dump=json",
+            "-",
+        ])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    child.stdin.take().unwrap().write_all(source).unwrap();
+    let native = child.wait_with_output().unwrap();
+    assert!(
+        native.status.success(),
+        "{}",
+        String::from_utf8_lossy(&native.stderr)
+    );
+    let observed = parse_clang_documentation_ast(&native.stdout, source).unwrap();
+    assert!(
+        valid_clang_documentation_structure(&observed, Some(source)),
+        "{observed}"
+    );
+    let functions = observed["functions"].as_array().unwrap();
+    assert_eq!(functions.len(), 2);
+    for name in ["ordinary", "operator_helper"] {
+        assert!(functions.iter().any(|f| f["name"] == name));
+    }
+    assert!(
+        observed["unresolved_declaration_kinds"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|kind| kind == "FunctionDecl")
+    );
+    assert_eq!(observed["coverage_proven"], false);
+    if let Ok(destination) = std::env::var("CODEGUARD_CPP_FREE_OPERATOR_EVIDENCE") {
+        use sha2::{Digest, Sha256};
+        let path = std::path::Path::new(&destination);
+        assert!(path.is_absolute());
+        let evidence = json!({
+            "qualification":"not_granted",
+            "scope":"unsupported_free_operator_preserves_ordinary_functions",
+            "source_sha256":format!("{:x}", Sha256::digest(source)),
+            "test_source_sha256":format!("{:x}", Sha256::digest(include_bytes!("clang_documentation_structure_contract.rs"))),
+            "compiler_version":String::from_utf8_lossy(&version.stdout).trim(),
+            "compiler_sha256":format!("{:x}", Sha256::digest(std::fs::read(&clang).unwrap())),
+            "native_ast_sha256":format!("{:x}", Sha256::digest(&native.stdout)),
+            "observation":observed
+        });
+        std::fs::write(path, serde_json::to_vec_pretty(&evidence).unwrap()).unwrap();
+    }
+}
