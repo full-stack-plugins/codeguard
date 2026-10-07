@@ -567,3 +567,5 @@ mod check_c_family_comments;
 
 mod c_family_documentation_hook_feedback;
 mod c_family_documentation_host_guidance;
+
+mod c_family_compilation_discovery;

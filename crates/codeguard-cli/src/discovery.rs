@@ -524,6 +524,10 @@ pub(crate) fn observe_file<P: ObservationPort>(
         report.blocked_paths.push(relative.into());
         return;
     };
+    if name == "compile_commands.json" {
+        crate::c_family_compilation_discovery::observe(report, observation, path, relative);
+        return;
+    }
     if LOCK_NAMES.contains(&name) || is_standard_python_lock_name(name) {
         report.lockfiles.insert(relative.into());
         match observation.read_bounded(path, 8 * 1024 * 1024) {
