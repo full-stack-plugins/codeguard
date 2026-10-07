@@ -258,3 +258,4 @@ pub mod evidence_retention;
 pub mod content_identity;
 pub mod strict_cache;
 pub mod correlation_trace;
+pub mod offline_boundary_v2;
