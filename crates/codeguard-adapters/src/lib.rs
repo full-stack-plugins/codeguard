@@ -493,3 +493,6 @@ mod gradle_owasp_report_ownership;
 mod gradle_owasp_report_ownership_parser;
 pub use gradle_owasp_report_ownership::GradleOwaspReportOwnership;
 pub use gradle_owasp_report_ownership_parser::parse_gradle_owasp_report_ownership;
+
+mod c_family_compilation_entry;
+pub use c_family_compilation_entry::{CFamilyCompilationEntry, parse_c_family_compilation_database};

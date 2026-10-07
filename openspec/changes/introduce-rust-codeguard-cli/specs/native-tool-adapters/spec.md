@@ -1212,3 +1212,15 @@ check c/cpp/all SHALL expose original warning and structural documentation obser
 - **WHEN** check selects discovered C/C++ source with an explicit original compiler and applicable c11/c++17 profile
 - **THEN** original native warning and structural facts SHALL be returned and current initialized workspaces SHALL receive stable tasks and original task-verification guidance
 - **AND** headers, preprocessing, full project options, detailed semantic accuracy and trusted closure SHALL remain distinct unresolved obligations
+
+### Requirement: C-family compilation database observation SHALL preserve unexecuted context
+
+The adapter SHALL parse bounded compilation database bytes without filesystem access or command execution. Each accepted entry SHALL preserve its directory, source file and full argument vector; it SHALL NOT infer a missing language standard, resolve headers/macros, choose among duplicate source configurations or claim project integration. Command-string-only entries SHALL remain unresolved rather than being split using a shell. Invalid, oversized or ambiguous entry shapes SHALL fail observation rather than silently yielding an empty clean scope. Later execution SHALL independently validate tool identity, paths, response files, compiler plugins, flags and immutable inputs; parsing SHALL NOT authorize arbitrary arguments.
+
+#### Scenario: Multiple configurations for one translation unit
+- **WHEN** a compilation database contains two argument-vector entries for one file with different include paths and macros
+- **THEN** observation retains both entries in their original order and neither selects one nor declares project coverage
+
+#### Scenario: Command string cannot provide trusted arguments
+- **WHEN** an entry has only a command string, malformed argument fields or no working directory
+- **THEN** observation is unresolved, no shell command executes and no default language standard is assigned
