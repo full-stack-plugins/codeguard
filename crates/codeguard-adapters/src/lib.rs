@@ -521,3 +521,4 @@ pub mod conformance_harness;
 pub mod tool_resolution;
 pub mod tools_install;
 pub mod report_freshness;
+pub mod tools_inventory;
