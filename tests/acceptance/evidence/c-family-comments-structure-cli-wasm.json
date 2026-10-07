@@ -79,10 +79,10 @@
           "按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
           "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。",
           "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试记录已接入，可信关闭仍待接线，不把非空说明当准确性或关闭证据。",
-          "按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则稳定任务与专用复检尚未接入，不以结构任务消失关闭占位问题。"
+          "按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则已初始化工作区自动保存稳定任务，专用指引与复检尚未接入，不以结构任务消失关闭占位问题。"
         ],
         "operation": "comments",
-        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/absent.c",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/absent.c",
         "placeholder_task_workflow_status": "not_integrated",
         "reason": "native_documentation_coverage_unverified",
         "report_type": "c_family_comments_feedback",
@@ -94,7 +94,7 @@
           "codeguard",
           "comments",
           "c",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/absent.c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/absent.c",
           "--clang-tool",
           "/usr/bin/clang",
           "--standard",
@@ -193,10 +193,10 @@
           "按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
           "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。",
           "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试记录已接入，可信关闭仍待接线，不把非空说明当准确性或关闭证据。",
-          "按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则稳定任务与专用复检尚未接入，不以结构任务消失关闭占位问题。"
+          "按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则已初始化工作区自动保存稳定任务，专用指引与复检尚未接入，不以结构任务消失关闭占位问题。"
         ],
         "operation": "comments",
-        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/empty.c",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/empty.c",
         "placeholder_task_workflow_status": "not_integrated",
         "reason": "native_documentation_coverage_unverified",
         "report_type": "c_family_comments_feedback",
@@ -208,7 +208,7 @@
           "codeguard",
           "comments",
           "c",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/empty.c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/empty.c",
           "--clang-tool",
           "/usr/bin/clang",
           "--standard",
@@ -303,10 +303,10 @@
           "按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
           "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。",
           "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试记录已接入，可信关闭仍待接线，不把非空说明当准确性或关闭证据。",
-          "按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则稳定任务与专用复检尚未接入，不以结构任务消失关闭占位问题。"
+          "按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则已初始化工作区自动保存稳定任务，专用指引与复检尚未接入，不以结构任务消失关闭占位问题。"
         ],
         "operation": "comments",
-        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/complete.c",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/complete.c",
         "placeholder_task_workflow_status": "not_integrated",
         "reason": "native_documentation_coverage_unverified",
         "report_type": "c_family_comments_feedback",
@@ -318,7 +318,7 @@
           "codeguard",
           "comments",
           "c",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/complete.c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/complete.c",
           "--clang-tool",
           "/usr/bin/clang",
           "--standard",
@@ -354,7 +354,7 @@
             "column_byte": 4,
             "level": "warning",
             "line": 2,
-            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/bare_param.c",
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/bare_param.c",
             "repair_steps": [
               "查看原生定位处的实际文档命令，补充其参数、返回或其他命令所需的准确说明。",
               "说明必须依据真实声明和行为契约，不能只保留标签、填写占位词或改动接口来迎合注释。"
@@ -437,10 +437,10 @@
           "按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
           "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。",
           "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试记录已接入，可信关闭仍待接线，不把非空说明当准确性或关闭证据。",
-          "按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则稳定任务与专用复检尚未接入，不以结构任务消失关闭占位问题。"
+          "按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则已初始化工作区自动保存稳定任务，专用指引与复检尚未接入，不以结构任务消失关闭占位问题。"
         ],
         "operation": "comments",
-        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/bare_param.c",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/bare_param.c",
         "placeholder_task_workflow_status": "not_integrated",
         "reason": "native_documentation_coverage_unverified",
         "report_type": "c_family_comments_feedback",
@@ -452,7 +452,7 @@
           "codeguard",
           "comments",
           "c",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/bare_param.c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/bare_param.c",
           "--clang-tool",
           "/usr/bin/clang",
           "--standard",
@@ -543,10 +543,10 @@
           "按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
           "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。",
           "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试记录已接入，可信关闭仍待接线，不把非空说明当准确性或关闭证据。",
-          "按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则稳定任务与专用复检尚未接入，不以结构任务消失关闭占位问题。"
+          "按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则已初始化工作区自动保存稳定任务，专用指引与复检尚未接入，不以结构任务消失关闭占位问题。"
         ],
         "operation": "comments",
-        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/absent.cpp",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/absent.cpp",
         "placeholder_task_workflow_status": "not_integrated",
         "reason": "native_documentation_coverage_unverified",
         "report_type": "c_family_comments_feedback",
@@ -558,7 +558,7 @@
           "codeguard",
           "comments",
           "cpp",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/absent.cpp",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/absent.cpp",
           "--clang-tool",
           "/usr/bin/clang",
           "--standard",
@@ -657,10 +657,10 @@
           "按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
           "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。",
           "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试记录已接入，可信关闭仍待接线，不把非空说明当准确性或关闭证据。",
-          "按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则稳定任务与专用复检尚未接入，不以结构任务消失关闭占位问题。"
+          "按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则已初始化工作区自动保存稳定任务，专用指引与复检尚未接入，不以结构任务消失关闭占位问题。"
         ],
         "operation": "comments",
-        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/empty.cpp",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/empty.cpp",
         "placeholder_task_workflow_status": "not_integrated",
         "reason": "native_documentation_coverage_unverified",
         "report_type": "c_family_comments_feedback",
@@ -672,7 +672,7 @@
           "codeguard",
           "comments",
           "cpp",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/empty.cpp",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/empty.cpp",
           "--clang-tool",
           "/usr/bin/clang",
           "--standard",
@@ -767,10 +767,10 @@
           "按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
           "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。",
           "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试记录已接入，可信关闭仍待接线，不把非空说明当准确性或关闭证据。",
-          "按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则稳定任务与专用复检尚未接入，不以结构任务消失关闭占位问题。"
+          "按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则已初始化工作区自动保存稳定任务，专用指引与复检尚未接入，不以结构任务消失关闭占位问题。"
         ],
         "operation": "comments",
-        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/complete.cpp",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/complete.cpp",
         "placeholder_task_workflow_status": "not_integrated",
         "reason": "native_documentation_coverage_unverified",
         "report_type": "c_family_comments_feedback",
@@ -782,7 +782,7 @@
           "codeguard",
           "comments",
           "cpp",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/complete.cpp",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/complete.cpp",
           "--clang-tool",
           "/usr/bin/clang",
           "--standard",
@@ -818,7 +818,7 @@
             "column_byte": 4,
             "level": "warning",
             "line": 2,
-            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/bare_param.cpp",
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/bare_param.cpp",
             "repair_steps": [
               "查看原生定位处的实际文档命令，补充其参数、返回或其他命令所需的准确说明。",
               "说明必须依据真实声明和行为契约，不能只保留标签、填写占位词或改动接口来迎合注释。"
@@ -901,10 +901,10 @@
           "按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
           "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。",
           "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试记录已接入，可信关闭仍待接线，不把非空说明当准确性或关闭证据。",
-          "按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则稳定任务与专用复检尚未接入，不以结构任务消失关闭占位问题。"
+          "按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则已初始化工作区自动保存稳定任务，专用指引与复检尚未接入，不以结构任务消失关闭占位问题。"
         ],
         "operation": "comments",
-        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/bare_param.cpp",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/bare_param.cpp",
         "placeholder_task_workflow_status": "not_integrated",
         "reason": "native_documentation_coverage_unverified",
         "report_type": "c_family_comments_feedback",
@@ -916,7 +916,7 @@
           "codeguard",
           "comments",
           "cpp",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/bare_param.cpp",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/bare_param.cpp",
           "--clang-tool",
           "/usr/bin/clang",
           "--standard",
@@ -1027,12 +1027,12 @@
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-4591-0-1791344252657192000",
+            "current_run_id": "clangdocstruct-41858-0-1791345041817322000",
             "delivery_decision": "not_evaluated",
             "disposition": "actionable",
             "evidence_ref": {
-              "first_report_sha256": "8b46e4c7458f95578d56912d0ad76ab03521772cd28e26a3503c04e44477bcd0",
-              "first_run_id": "clangdocstruct-4591-0-1791344252657192000"
+              "first_report_sha256": "4146311b7991815391173ea0e8b0df3017483d4d10f1fe03182d8ca2fb77def1",
+              "first_run_id": "clangdocstruct-41858-0-1791345041817322000"
             },
             "history": {
               "attempt_count": 0,
@@ -1051,7 +1051,7 @@
               "task",
               "verify",
               "CG-9297030c422bebe2b3d4ffceadeb39e3",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000",
               "--clang-tool",
               "/usr/bin/clang",
               "--format=json"
@@ -1091,14 +1091,21 @@
           "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify已提供局部观察，受控尝试记录已接入，可信关闭仍待实现。",
           "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。",
           "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试记录已接入，可信关闭仍待接线，不把非空说明当准确性或关闭证据。",
-          "按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则稳定任务与专用复检尚未接入，不以结构任务消失关闭占位问题。"
+          "按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则已初始化工作区自动保存稳定任务，专用指引与复检尚未接入，不以结构任务消失关闭占位问题。"
         ],
         "operation": "comments",
-        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/absent.c",
-        "placeholder_task_workflow_status": "not_integrated",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/absent.c",
+        "placeholder_task_workflow_status": "partial",
+        "placeholder_workbench": {
+          "reason": null,
+          "run_id": "clangdocplaceholder-41858-0-1791345041817322000",
+          "status": "synced_partial",
+          "task_ids": [],
+          "workspace_id": "ws-d246578f2d2fd45488fd9c3cab65a1ed"
+        },
         "reason": "native_documentation_coverage_unverified",
         "report_type": "c_family_comments_feedback",
-        "schema_version": "0.10.0",
+        "schema_version": "0.11.0",
         "source_sha256": "7bf024eee88707a82f52c3cccc61183794964679fd595c1258814ec0446c4f46",
         "structural_next": {
           "authority": "local_unverified",
@@ -1125,12 +1132,12 @@
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-4591-0-1791344252657192000",
+            "current_run_id": "clangdocstruct-41858-0-1791345041817322000",
             "delivery_decision": "not_evaluated",
             "disposition": "actionable",
             "evidence_ref": {
-              "first_report_sha256": "8b46e4c7458f95578d56912d0ad76ab03521772cd28e26a3503c04e44477bcd0",
-              "first_run_id": "clangdocstruct-4591-0-1791344252657192000"
+              "first_report_sha256": "4146311b7991815391173ea0e8b0df3017483d4d10f1fe03182d8ca2fb77def1",
+              "first_run_id": "clangdocstruct-41858-0-1791345041817322000"
             },
             "history": {
               "attempt_count": 0,
@@ -1149,7 +1156,7 @@
               "task",
               "verify",
               "CG-9297030c422bebe2b3d4ffceadeb39e3",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000",
               "--clang-tool",
               "/usr/bin/clang",
               "--format=json"
@@ -1188,12 +1195,12 @@
         "structural_task_workflow_status": "partial",
         "structural_workbench": {
           "reason": null,
-          "run_id": "clangdocstruct-4591-0-1791344252657192000",
+          "run_id": "clangdocstruct-41858-0-1791345041817322000",
           "status": "synced_partial",
           "task_ids": [
             "CG-9297030c422bebe2b3d4ffceadeb39e3"
           ],
-          "workspace_id": "ws-246569bcaa7eb9aecebbebef0112523f"
+          "workspace_id": "ws-d246578f2d2fd45488fd9c3cab65a1ed"
         },
         "task_workflow_status": "partial",
         "unclassified_native_diagnostics": [],
@@ -1201,7 +1208,7 @@
           "codeguard",
           "comments",
           "c",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/absent.c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/absent.c",
           "--clang-tool",
           "/usr/bin/clang",
           "--standard",
@@ -1209,12 +1216,12 @@
           "--timeout",
           "1800000ms",
           "--workspace",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000",
           "--format=json"
         ],
         "workbench": {
           "reason": null,
-          "run_id": "clangdoc-4591-0-1791344252657192000",
+          "run_id": "clangdoc-41858-0-1791345041817322000",
           "status": "synced_partial",
           "sync": {
             "already_consumed_reports": 0,
@@ -1224,7 +1231,7 @@
             "new_findings": 0
           },
           "task_ids": [],
-          "workspace_id": "ws-246569bcaa7eb9aecebbebef0112523f"
+          "workspace_id": "ws-d246578f2d2fd45488fd9c3cab65a1ed"
         },
         "workspace_binding": "bound"
       }
@@ -1290,12 +1297,12 @@
               "仅文档注释；保留源码API与行为",
               "本地报告非可信政策，不能关闭任务或自批白名单"
             ],
-            "current_run_id": "clangdoc-4595-0-1791344252730347000",
+            "current_run_id": "clangdoc-41966-0-1791345041922875000",
             "delivery_decision": "not_evaluated",
             "disposition": "actionable",
             "evidence_ref": {
-              "first_report_sha256": "4f14a92ca8267ac6a6993d47f7907add888e1f8ef2be692db8f7123860f99321",
-              "first_run_id": "clangdoc-4595-0-1791344252730347000"
+              "first_report_sha256": "4bca34eeb31d3d1710a4d751c3d416e013cd6159cfc386310f21857d199740f5",
+              "first_run_id": "clangdoc-41966-0-1791345041922875000"
             },
             "history": {
               "attempt_count": 0,
@@ -1317,9 +1324,9 @@
               "task",
               "verify",
               "CG-B-8bcb2f7f84f426555172cca3545acc21",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000",
               "--clang-tool",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/missing-clang",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/missing-clang",
               "--format=json"
             ],
             "rule_basis": "原生文档检查未完成或存在未适配规则",
@@ -1327,7 +1334,7 @@
             "scope": "absent.c",
             "source_sha256": "7bf024eee88707a82f52c3cccc61183794964679fd595c1258814ec0446c4f46",
             "step": [
-              "恢复首次选择的原工具路径 /private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/missing-clang，核对Apple Clang21与固定标准，再执行原任务复检；不修改无关源码。"
+              "恢复首次选择的原工具路径 /private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/missing-clang，核对Apple Clang21与固定标准，再执行原任务复检；不修改无关源码。"
             ],
             "task_id": "CG-B-8bcb2f7f84f426555172cca3545acc21",
             "unclassified_native_diagnostics": []
@@ -1339,14 +1346,21 @@
           "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify已提供局部观察，受控尝试记录已接入，可信关闭仍待实现。",
           "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。",
           "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试记录已接入，可信关闭仍待接线，不把非空说明当准确性或关闭证据。",
-          "按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则稳定任务与专用复检尚未接入，不以结构任务消失关闭占位问题。"
+          "按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则已初始化工作区自动保存稳定任务，专用指引与复检尚未接入，不以结构任务消失关闭占位问题。"
         ],
         "operation": "comments",
-        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/absent.c",
-        "placeholder_task_workflow_status": "not_integrated",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/absent.c",
+        "placeholder_task_workflow_status": "partial",
+        "placeholder_workbench": {
+          "reason": "clang_placeholder_observation_unavailable",
+          "run_id": "clangdocplaceholder-41966-0-1791345041922875000",
+          "status": "incomplete",
+          "task_ids": [],
+          "workspace_id": "ws-d246578f2d2fd45488fd9c3cab65a1ed"
+        },
         "reason": "native_documentation_coverage_unverified",
         "report_type": "c_family_comments_feedback",
-        "schema_version": "0.10.0",
+        "schema_version": "0.11.0",
         "source_sha256": "7bf024eee88707a82f52c3cccc61183794964679fd595c1258814ec0446c4f46",
         "structural_next": {
           "authority": "local_unverified",
@@ -1371,12 +1385,12 @@
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-4595-0-1791344252730347000",
+            "current_run_id": "clangdocstruct-41966-0-1791345041922875000",
             "delivery_decision": "not_evaluated",
             "disposition": "needs_decision",
             "evidence_ref": {
-              "first_report_sha256": "8b46e4c7458f95578d56912d0ad76ab03521772cd28e26a3503c04e44477bcd0",
-              "first_run_id": "clangdocstruct-4591-0-1791344252657192000"
+              "first_report_sha256": "4146311b7991815391173ea0e8b0df3017483d4d10f1fe03182d8ca2fb77def1",
+              "first_run_id": "clangdocstruct-41858-0-1791345041817322000"
             },
             "history": {
               "attempt_count": 0,
@@ -1395,7 +1409,7 @@
               "task",
               "verify",
               "CG-9297030c422bebe2b3d4ffceadeb39e3",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000",
               "--clang-tool",
               "/usr/bin/clang",
               "--format=json"
@@ -1419,10 +1433,10 @@
         "structural_task_workflow_status": "partial",
         "structural_workbench": {
           "reason": null,
-          "run_id": "clangdocstruct-4595-0-1791344252730347000",
+          "run_id": "clangdocstruct-41966-0-1791345041922875000",
           "status": "synced_partial",
           "task_ids": [],
-          "workspace_id": "ws-246569bcaa7eb9aecebbebef0112523f"
+          "workspace_id": "ws-d246578f2d2fd45488fd9c3cab65a1ed"
         },
         "task_workflow_status": "partial",
         "unclassified_native_diagnostics": [],
@@ -1430,23 +1444,23 @@
           "codeguard",
           "comments",
           "c",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/absent.c",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/absent.c",
           "--clang-tool",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/missing-clang",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/missing-clang",
           "--standard",
           "c11",
           "--timeout",
           "1800000ms",
           "--workspace",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000",
           "--format=json"
         ],
         "workbench": {
           "reason": null,
-          "run_id": "clangdoc-4595-0-1791344252730347000",
+          "run_id": "clangdoc-41966-0-1791345041922875000",
           "status": "synced_partial",
           "sync": {
-            "already_consumed_reports": 2,
+            "already_consumed_reports": 3,
             "historical_findings": 0,
             "imported_reports": 1,
             "new_blockers": 1,
@@ -1455,7 +1469,7 @@
           "task_ids": [
             "CG-B-8bcb2f7f84f426555172cca3545acc21"
           ],
-          "workspace_id": "ws-246569bcaa7eb9aecebbebef0112523f"
+          "workspace_id": "ws-d246578f2d2fd45488fd9c3cab65a1ed"
         },
         "workspace_binding": "bound"
       }
@@ -1559,12 +1573,12 @@
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-4596-0-1791344252862278000",
+            "current_run_id": "clangdocstruct-42014-0-1791345042060749000",
             "delivery_decision": "not_evaluated",
             "disposition": "actionable",
             "evidence_ref": {
-              "first_report_sha256": "7f117bcb27fe3db1b7bc6ae673c714a93eccbb8b26190e3b8097fd1ab49fe0b8",
-              "first_run_id": "clangdocstruct-4596-0-1791344252862278000"
+              "first_report_sha256": "faafc657cd6da6be5332e02482769d19c35ad3077af2ec1e51581f10c1665a87",
+              "first_run_id": "clangdocstruct-42014-0-1791345042060749000"
             },
             "history": {
               "attempt_count": 0,
@@ -1583,7 +1597,7 @@
               "task",
               "verify",
               "CG-be1ad4450eb9274558a478ed58bf7800",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000",
               "--clang-tool",
               "/usr/bin/clang",
               "--format=json"
@@ -1623,14 +1637,21 @@
           "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify已提供局部观察，受控尝试记录已接入，可信关闭仍待实现。",
           "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。",
           "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试记录已接入，可信关闭仍待接线，不把非空说明当准确性或关闭证据。",
-          "按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则稳定任务与专用复检尚未接入，不以结构任务消失关闭占位问题。"
+          "按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则已初始化工作区自动保存稳定任务，专用指引与复检尚未接入，不以结构任务消失关闭占位问题。"
         ],
         "operation": "comments",
-        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/absent.cpp",
-        "placeholder_task_workflow_status": "not_integrated",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/absent.cpp",
+        "placeholder_task_workflow_status": "partial",
+        "placeholder_workbench": {
+          "reason": null,
+          "run_id": "clangdocplaceholder-42014-0-1791345042060749000",
+          "status": "synced_partial",
+          "task_ids": [],
+          "workspace_id": "ws-d246578f2d2fd45488fd9c3cab65a1ed"
+        },
         "reason": "native_documentation_coverage_unverified",
         "report_type": "c_family_comments_feedback",
-        "schema_version": "0.10.0",
+        "schema_version": "0.11.0",
         "source_sha256": "7bf024eee88707a82f52c3cccc61183794964679fd595c1258814ec0446c4f46",
         "structural_next": {
           "authority": "local_unverified",
@@ -1657,12 +1678,12 @@
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-4596-0-1791344252862278000",
+            "current_run_id": "clangdocstruct-42014-0-1791345042060749000",
             "delivery_decision": "not_evaluated",
             "disposition": "actionable",
             "evidence_ref": {
-              "first_report_sha256": "7f117bcb27fe3db1b7bc6ae673c714a93eccbb8b26190e3b8097fd1ab49fe0b8",
-              "first_run_id": "clangdocstruct-4596-0-1791344252862278000"
+              "first_report_sha256": "faafc657cd6da6be5332e02482769d19c35ad3077af2ec1e51581f10c1665a87",
+              "first_run_id": "clangdocstruct-42014-0-1791345042060749000"
             },
             "history": {
               "attempt_count": 0,
@@ -1681,7 +1702,7 @@
               "task",
               "verify",
               "CG-be1ad4450eb9274558a478ed58bf7800",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000",
               "--clang-tool",
               "/usr/bin/clang",
               "--format=json"
@@ -1720,12 +1741,12 @@
         "structural_task_workflow_status": "partial",
         "structural_workbench": {
           "reason": null,
-          "run_id": "clangdocstruct-4596-0-1791344252862278000",
+          "run_id": "clangdocstruct-42014-0-1791345042060749000",
           "status": "synced_partial",
           "task_ids": [
             "CG-be1ad4450eb9274558a478ed58bf7800"
           ],
-          "workspace_id": "ws-246569bcaa7eb9aecebbebef0112523f"
+          "workspace_id": "ws-d246578f2d2fd45488fd9c3cab65a1ed"
         },
         "task_workflow_status": "partial",
         "unclassified_native_diagnostics": [],
@@ -1733,7 +1754,7 @@
           "codeguard",
           "comments",
           "cpp",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/absent.cpp",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/absent.cpp",
           "--clang-tool",
           "/usr/bin/clang",
           "--standard",
@@ -1741,22 +1762,22 @@
           "--timeout",
           "1800000ms",
           "--workspace",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000",
           "--format=json"
         ],
         "workbench": {
           "reason": null,
-          "run_id": "clangdoc-4596-0-1791344252862278000",
+          "run_id": "clangdoc-42014-0-1791345042060749000",
           "status": "synced_partial",
           "sync": {
-            "already_consumed_reports": 4,
+            "already_consumed_reports": 5,
             "historical_findings": 0,
             "imported_reports": 1,
             "new_blockers": 0,
             "new_findings": 0
           },
           "task_ids": [],
-          "workspace_id": "ws-246569bcaa7eb9aecebbebef0112523f"
+          "workspace_id": "ws-d246578f2d2fd45488fd9c3cab65a1ed"
         },
         "workspace_binding": "bound"
       }
@@ -1822,12 +1843,12 @@
               "仅文档注释；保留源码API与行为",
               "本地报告非可信政策，不能关闭任务或自批白名单"
             ],
-            "current_run_id": "clangdoc-4600-0-1791344252951199000",
+            "current_run_id": "clangdoc-42032-0-1791345042166959000",
             "delivery_decision": "not_evaluated",
             "disposition": "actionable",
             "evidence_ref": {
-              "first_report_sha256": "e8841e794a033d071fb7d046a497b172e023852e57959b1029ce4760e9aa51fe",
-              "first_run_id": "clangdoc-4600-0-1791344252951199000"
+              "first_report_sha256": "64df9ab0e3759a5853a6c38b354fbb379b225f0948638d05271bac5af40fbf48",
+              "first_run_id": "clangdoc-42032-0-1791345042166959000"
             },
             "history": {
               "attempt_count": 0,
@@ -1849,9 +1870,9 @@
               "task",
               "verify",
               "CG-B-39346dfc71e80aa50a83525b94f86d85",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000",
               "--clang-tool",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/missing-clang",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/missing-clang",
               "--format=json"
             ],
             "rule_basis": "原生文档检查未完成或存在未适配规则",
@@ -1859,7 +1880,7 @@
             "scope": "absent.cpp",
             "source_sha256": "7bf024eee88707a82f52c3cccc61183794964679fd595c1258814ec0446c4f46",
             "step": [
-              "恢复首次选择的原工具路径 /private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/missing-clang，核对Apple Clang21与固定标准，再执行原任务复检；不修改无关源码。"
+              "恢复首次选择的原工具路径 /private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/missing-clang，核对Apple Clang21与固定标准，再执行原任务复检；不修改无关源码。"
             ],
             "task_id": "CG-B-39346dfc71e80aa50a83525b94f86d85",
             "unclassified_native_diagnostics": []
@@ -1871,14 +1892,21 @@
           "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify已提供局部观察，受控尝试记录已接入，可信关闭仍待实现。",
           "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。",
           "读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试记录已接入，可信关闭仍待接线，不把非空说明当准确性或关闭证据。",
-          "按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则稳定任务与专用复检尚未接入，不以结构任务消失关闭占位问题。"
+          "按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则已初始化工作区自动保存稳定任务，专用指引与复检尚未接入，不以结构任务消失关闭占位问题。"
         ],
         "operation": "comments",
-        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/absent.cpp",
-        "placeholder_task_workflow_status": "not_integrated",
+        "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/absent.cpp",
+        "placeholder_task_workflow_status": "partial",
+        "placeholder_workbench": {
+          "reason": "clang_placeholder_observation_unavailable",
+          "run_id": "clangdocplaceholder-42032-0-1791345042166959000",
+          "status": "incomplete",
+          "task_ids": [],
+          "workspace_id": "ws-d246578f2d2fd45488fd9c3cab65a1ed"
+        },
         "reason": "native_documentation_coverage_unverified",
         "report_type": "c_family_comments_feedback",
-        "schema_version": "0.10.0",
+        "schema_version": "0.11.0",
         "source_sha256": "7bf024eee88707a82f52c3cccc61183794964679fd595c1258814ec0446c4f46",
         "structural_next": {
           "authority": "local_unverified",
@@ -1903,12 +1931,12 @@
               "同名/重载定位属于文件策略组，不能据名字选择单一函数",
               "不关闭检查器、不以占位文本或白名单自批代替修复"
             ],
-            "current_run_id": "clangdocstruct-4600-0-1791344252951199000",
+            "current_run_id": "clangdocstruct-42032-0-1791345042166959000",
             "delivery_decision": "not_evaluated",
             "disposition": "needs_decision",
             "evidence_ref": {
-              "first_report_sha256": "7f117bcb27fe3db1b7bc6ae673c714a93eccbb8b26190e3b8097fd1ab49fe0b8",
-              "first_run_id": "clangdocstruct-4596-0-1791344252862278000"
+              "first_report_sha256": "faafc657cd6da6be5332e02482769d19c35ad3077af2ec1e51581f10c1665a87",
+              "first_run_id": "clangdocstruct-42014-0-1791345042060749000"
             },
             "history": {
               "attempt_count": 0,
@@ -1927,7 +1955,7 @@
               "task",
               "verify",
               "CG-be1ad4450eb9274558a478ed58bf7800",
-              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000",
+              "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000",
               "--clang-tool",
               "/usr/bin/clang",
               "--format=json"
@@ -1951,10 +1979,10 @@
         "structural_task_workflow_status": "partial",
         "structural_workbench": {
           "reason": null,
-          "run_id": "clangdocstruct-4600-0-1791344252951199000",
+          "run_id": "clangdocstruct-42032-0-1791345042166959000",
           "status": "synced_partial",
           "task_ids": [],
-          "workspace_id": "ws-246569bcaa7eb9aecebbebef0112523f"
+          "workspace_id": "ws-d246578f2d2fd45488fd9c3cab65a1ed"
         },
         "task_workflow_status": "partial",
         "unclassified_native_diagnostics": [],
@@ -1962,23 +1990,23 @@
           "codeguard",
           "comments",
           "cpp",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/absent.cpp",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/absent.cpp",
           "--clang-tool",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000/missing-clang",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000/missing-clang",
           "--standard",
           "c++17",
           "--timeout",
           "1800000ms",
           "--workspace",
-          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-3937-1791344250450989000",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-structure-cli-41213-1791345038330914000",
           "--format=json"
         ],
         "workbench": {
           "reason": null,
-          "run_id": "clangdoc-4600-0-1791344252951199000",
+          "run_id": "clangdoc-42032-0-1791345042166959000",
           "status": "synced_partial",
           "sync": {
-            "already_consumed_reports": 6,
+            "already_consumed_reports": 8,
             "historical_findings": 0,
             "imported_reports": 1,
             "new_blockers": 1,
@@ -1987,14 +2015,14 @@
           "task_ids": [
             "CG-B-39346dfc71e80aa50a83525b94f86d85"
           ],
-          "workspace_id": "ws-246569bcaa7eb9aecebbebef0112523f"
+          "workspace_id": "ws-d246578f2d2fd45488fd9c3cab65a1ed"
         },
         "workspace_binding": "bound"
       }
     }
   ],
-  "codeguard_sha256": "933b9e5b05d09ea4aa5adfe0aea90dfcba15f7325b7250ae0a425177fb1301c0",
+  "codeguard_sha256": "bdee626d23eeac167e19adb727f18bc6133bfbb12e41ba0d697f87f9008184e8",
   "evidence_kind": "development_native_public_structure",
   "qualification": "not_granted",
-  "test_source_sha256": "0b6650f40ef9be0a20ed12cfb89129d7078e19e687aaf9393daa59177d2322ea"
+  "test_source_sha256": "7b62b10fa57cfbaa07dc2846699f817f90aab11d5de9807289e2098047b6f327"
 }

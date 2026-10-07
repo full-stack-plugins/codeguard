@@ -241,6 +241,10 @@ fn observe_policy(
         "next_actions":["按原生规则和位置修正文档，再使用本报告原工具与标准命令复检；完整项目文档政策和任务持久闭环仍须接入。",
             "Clang此档案不检查所有缺失注释或用途/异常/行为说明；零诊断不能证明详细文档合规，不能关闭历史任务或授予生产资格。"]});
     report["documentation_structure"] = structure.clone();
+    if placeholders {
+        report["documentation_placeholders"] = placeholder.clone();
+    }
+
     if let Some(root) = workspace.filter(|_| persist) {
         crate::c_family_comments_workbench::connect(
             &root,
@@ -254,6 +258,14 @@ fn observe_policy(
             &mut report,
             deadline,
         );
+        if placeholders {
+            crate::c_family_placeholder_workbench::connect(
+                &root,
+                request.clang_tool.as_deref().expect("工具已校验"),
+                &mut report,
+                deadline,
+            );
+        }
         report["next_actions"][0] = json!(
             "按当前原生规则和位置修正文档并运行原工具复扫；原警告稳定任务及局部task verify已接入；结构任务按工作台状态提供指引，专用结构task verify已提供局部观察，受控尝试记录已接入，可信关闭仍待实现。"
         );
@@ -269,10 +281,16 @@ fn observe_policy(
     }
     report["next_actions"].as_array_mut().expect("固定反馈动作").push(json!("读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试记录已接入，可信关闭仍待接线，不把非空说明当准确性或关闭证据。"));
     if placeholders {
-        report["schema_version"] = json!("0.10.0");
+        report["schema_version"] = json!(if report.get("placeholder_workbench").is_some() {
+            "0.11.0"
+        } else {
+            "0.10.0"
+        });
         report["documentation_placeholders"] = placeholder;
-        report["placeholder_task_workflow_status"] = json!("not_integrated");
-        report["next_actions"].as_array_mut().expect("固定反馈动作").push(json!("按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则稳定任务与专用复检尚未接入，不以结构任务消失关闭占位问题。"));
+        if report.get("placeholder_workbench").is_none() {
+            report["placeholder_task_workflow_status"] = json!("not_integrated");
+        }
+        report["next_actions"].as_array_mut().expect("固定反馈动作").push(json!("按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则已初始化工作区自动保存稳定任务，专用指引与复检尚未接入，不以结构任务消失关闭占位问题。"));
     }
     Ok(report)
 }

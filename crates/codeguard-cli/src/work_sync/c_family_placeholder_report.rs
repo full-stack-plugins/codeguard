@@ -54,6 +54,20 @@ fn fingerprint(report: &Value) -> String {
     format!("{:x}", digest.finalize())
 }
 
+/// 返回当前局部观察对应的稳定文件任务；只供持久化状态投影，不授予修复权限。
+pub(crate) fn task_ids(root: &Path, report: &Value) -> Vec<String> {
+    if valid_shape(report)
+        && super::c_family_structure_report::current(root, &structure_packet(report))
+        && report["placeholders"]["positions"]
+            .as_array()
+            .is_some_and(|positions| !positions.is_empty())
+    {
+        vec![format!("CG-{}", &fingerprint(report)[..32])]
+    } else {
+        Vec::new()
+    }
+}
+
 /// 导入当前源码关联的占位文件任务；位置漂移复用身份，消失仍不关闭历史任务。
 pub(super) fn parse(
     root: &Path,

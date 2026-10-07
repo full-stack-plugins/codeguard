@@ -38,7 +38,7 @@ for directory in [Path("/tmp/cg-structure-public-default"), Path("/tmp/cg-struct
             reports.append(report)
 for report in reports:
     version = report["schema_version"].removesuffix(".0")
-    assert version in ["0.5", "0.6", "0.9", "0.10"]
+    assert version in ["0.5", "0.6", "0.9", "0.10", "0.11"]
     validator(version).validate(report)
     assert list(validator("0.1").iter_errors(report))
     assert list(validator("0.4").iter_errors(report))

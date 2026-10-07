@@ -1310,3 +1310,13 @@ work sync SHALL consume a separately versioned placeholder packet only after ori
 - **THEN** work sync SHALL reuse the original file task and keep its fact open rather than close on local absence
 - **WHEN** a report inserts a foreign parameter component
 - **THEN** work sync SHALL reject consumption and retain existing facts
+
+### Requirement: Public placeholder observations SHALL persist automatically in initialized workspaces
+
+The standalone comments command SHALL automatically save and consume its independent placeholder packet when an initialized bound workspace and a complete same-scan observation are available. It SHALL return separately versioned bounded persistence status and stable task IDs. Uninitialized projects SHALL remain read-only; failed or unavailable observations SHALL remain incomplete without usable IDs. Repeated scans SHALL reuse the file task; clean scans SHALL preserve open historical facts. Shared check/hook integration, dedicated task guidance and original-task verification SHALL remain explicitly incomplete until implemented, and persistence alone SHALL not authorize closure or detailed qualification.
+
+#### Scenario: Public comments runs before and after initialization
+- **WHEN** comments c/cpp runs outside an initialized workspace
+- **THEN** it SHALL report the placeholder observation without creating .codeguard
+- **WHEN** the workspace is initialized and the observation is supported
+- **THEN** comments SHALL automatically consume the placeholder packet, return one stable file task and preserve it as open after a clean re-scan
