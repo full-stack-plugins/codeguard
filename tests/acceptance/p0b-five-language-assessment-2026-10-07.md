@@ -121,3 +121,26 @@
 | **总计** | **196** | **157** | **39** | ✅ |
 
 **Java 四能力核心验证全部完成！**
+
+## Rust 四能力验证（2026-10-07）
+
+| 能力 | 测试套件 | 通过 | 忽略 | 状态 |
+|---|---|---|---|---|
+| syntax | rust_native_differential, rust_project_syntax | 8 | 2 | ✅ |
+| documentation | rust_comments_cli, rust_comments_combined, rust_clippy_documentation, rustdoc_identity_contract, rustdoc_native_replay | 25 | 3 | ✅ |
+| conventions | rust_lint_cli, rust_lint_input_stability, rust_formatter_differential | 21 | 4 | ✅ |
+| vulnerabilities | cargo_audit_cli | 5 | 1 | ✅ |
+| build | rust_build_cli | 12 | 2 | ✅ |
+| closure | rust_task_resolution_service, rust_native_hook | 17 | 4 | ✅ |
+| **总计** | **14 个套件** | **88** | **17** | ✅ |
+
+**已验证**：
+- Rust 语法差分、项目语法
+- 详细注释检查、rustdoc 身份契约
+- lint/format 一致性、输入稳定性
+- cargo-audit 漏洞检查
+- 可信关闭/复发重开（7/9）
+
+**待验证**（需 Rustfmt 1.9.0）：
+- 真实 Rustfmt 差分
+- 真实 clippy 文档检查
