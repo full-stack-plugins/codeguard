@@ -54,3 +54,18 @@ Grammar 精度验证的核心目标（零假阳性、Wilson ≥ 0.98）已达成
 - **未验证**：4 种语言（Solidity/Terraform/VB.NET/C#）
 - **总样本**：8,700 个语法样本
 - **零假阳性**：15/15 = 100%
+
+## 最终尝试：完整语法（2026-10-07）
+
+尝试使用更完整的语法（Solidity 加 pragma、Terraform 加 terraform 块），
+但 grammar 仍全部标记为非法（FP=200）。
+
+**根本性结论**：
+- Solidity/Terraform grammar **无法识别我构造的任何语法**
+- 需要查看 grammar 的实际测试语料或上游示例
+- 或依赖原生工具（Solidity Compiler/Terraform）进行语法检查
+
+**最终统计**：
+- **已验证**：15 种语言，全部 PASS（零假阳性，Wilson ≥ 0.98）
+- **未验证**：4 种语言（Solidity/Terraform/VB.NET/C#）
+- **总样本**：8,700 个语法样本
