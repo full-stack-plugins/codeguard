@@ -6,7 +6,7 @@ use std::{
     collections::BTreeSet,
     path::{Path, PathBuf},
     sync::atomic::AtomicBool,
-    time::{Instant, Duration, SystemTime, UNIX_EPOCH},
+    time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 
 /// 核对已消费的首次证据、工作区与稳定范围；参数是根与结构化任务，不信任Markdown。

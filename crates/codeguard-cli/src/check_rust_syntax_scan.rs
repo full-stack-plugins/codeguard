@@ -1,11 +1,11 @@
 use serde_json::{Value, json};
+use sha2::{Digest, Sha256};
 use std::{
     collections::BTreeSet,
     path::{Path, PathBuf},
     sync::atomic::{AtomicBool, Ordering},
     time::Instant,
 };
-use sha2::{Digest, Sha256};
 
 /// 只观察选中的Rust完整文件；最多64文件，共同预算，原生优先且故障不换工具。
 pub(crate) fn observe(

@@ -832,9 +832,9 @@ fn observe_java_source_set(report: &mut DiscoveryReport, relative: &str) {
 #[cfg(test)]
 mod tests {
     use super::discover;
-    use sha2::{Digest, Sha256};
     use codeguard_adapters::legacy_registry;
     use codeguard_core::{ObservationPort, ObservedPathKind};
+    use sha2::{Digest, Sha256};
     use std::collections::BTreeMap;
     use std::io;
     use std::path::{Path, PathBuf};

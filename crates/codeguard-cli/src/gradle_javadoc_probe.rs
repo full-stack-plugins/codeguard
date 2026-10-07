@@ -1,4 +1,13 @@
 //! 执行原项目已观察到的Gradle Javadoc任务；不替换项目规则或签发注释合规。
+use crate::{gradle_model_probe::Request, tool_identity::hash_bundle_tree};
+use codeguard_adapters::{
+    parse_gradle_checker_model, parse_gradle_javadoc_output, plan_gradle_javadoc_tasks,
+};
+use codeguard_runtime::{
+    ProcessSpec, SourceSnapshot, Termination, read_bounded_regular_file, run_process_recorded,
+};
+use serde_json::{Value, json};
+use sha2::{Digest, Sha256};
 use std::{
     collections::BTreeMap,
     ffi::OsString,
@@ -8,15 +17,6 @@ use std::{
     sync::atomic::{AtomicBool, AtomicU64, Ordering},
     time::{Instant, SystemTime, UNIX_EPOCH},
 };
-use codeguard_adapters::{
-    parse_gradle_checker_model, plan_gradle_javadoc_tasks, parse_gradle_javadoc_output,
-};
-use codeguard_runtime::{
-    ProcessSpec, SourceSnapshot, Termination, read_bounded_regular_file, run_process_recorded,
-};
-use serde_json::{Value, json};
-use sha2::{Digest, Sha256};
-use crate::{gradle_model_probe::Request, tool_identity::hash_bundle_tree};
 static NEXT: AtomicU64 = AtomicU64::new(0);
 struct Scratch(PathBuf);
 impl Drop for Scratch {

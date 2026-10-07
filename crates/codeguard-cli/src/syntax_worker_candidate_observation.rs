@@ -7,7 +7,6 @@ use crate::syntax_worker_recovery::SyntaxWorkerRecovery;
 /// 候选语法初检“未完成”原因的字面量契约定义在 codeguard-core：
 /// 消费方（工作台导入、next 指引、任务正文）在默认构建下也要用它，
 /// 不能依赖仅在 `wasm-precheck` 下存在的本模块。
-
 /// 经父进程核验的本轮候选语法观察；不具备原生 lint 或交付权威。
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct SyntaxWorkerCandidateObservation {

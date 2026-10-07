@@ -3,7 +3,7 @@ use crate::{
     gradle_javadoc_workbench::prepare, gradle_model_probe::Request, tool_identity::hash_bundle_tree,
 };
 use codeguard_runtime::{SourceSnapshot, read_bounded_regular_file};
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::{
     collections::BTreeSet,

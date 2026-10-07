@@ -37,10 +37,6 @@ pub(crate) struct ReportShapeInput<'a> {
     pub ruby_lint: Value,
     /// Shell lint 结果。
     pub shell_lint: Value,
-    /// Kotlin lint 结果。
-    pub kotlin_lint: Value,
-    /// Swift lint 结果。
-    pub swift_lint: Value,
     /// 本轮只跑 lint 类别。
     pub lint_only: bool,
 }
@@ -193,8 +189,6 @@ mod tests {
             zig_lint: Value::Null,
             ruby_lint: Value::Null,
             shell_lint: Value::Null,
-            kotlin_lint: Value::Null,
-            swift_lint: Value::Null,
             lint_only: false,
         }
     }

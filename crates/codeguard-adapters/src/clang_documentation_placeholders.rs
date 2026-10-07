@@ -1,8 +1,8 @@
 //! 从已关联的原生Clang AST观察完整说明仅为占位标记的情况，属于自有规则。
 use crate::clang_documentation_ast::parse_clang_documentation_ast;
 use serde_json::{Value, json};
-use std::collections::BTreeMap;
 use sha2::{Digest, Sha256};
+use std::collections::BTreeMap;
 
 /// 返回编译进当前制品的占位解析与核验实现身份；返回值为SHA-256摘要，无输入参数。
 /// 同时绑定底层结构解析，避免策略实现升级仍复用旧输入上的失败预算。

@@ -1,7 +1,7 @@
 //! 占位文件任务绑定首次报告、收据、当前输入及受控尝试；局部复检不授予可信关闭。
 use super::Candidate;
 use crate::work_sync::c_family_placeholder_report::{
-    checker, fingerprint, positions, valid_shape, RULE,
+    RULE, checker, fingerprint, positions, valid_shape,
 };
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};

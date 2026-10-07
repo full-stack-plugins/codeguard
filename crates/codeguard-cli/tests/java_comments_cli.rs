@@ -1,12 +1,12 @@
 #![cfg(unix)]
 use serde_json::Value;
+use std::os::unix::fs::PermissionsExt;
 use std::{
     fs,
     path::PathBuf,
     process::Command,
     sync::atomic::{AtomicU64, Ordering},
 };
-use std::os::unix::fs::PermissionsExt;
 static NEXT: AtomicU64 = AtomicU64::new(0);
 struct Fixture {
     root: PathBuf,

@@ -1,6 +1,6 @@
 //! 明确标准上下文的冻结stdin原生Clang观察；不构建或执行用户源码。
-use codeguard_runtime::{ProcessSpec, Termination, read_bounded_regular_file, run_process};
 use crate::native_clang_profile::NativeClangProfile;
+use codeguard_runtime::{ProcessSpec, Termination, read_bounded_regular_file, run_process};
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::{

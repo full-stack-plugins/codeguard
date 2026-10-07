@@ -357,8 +357,8 @@ fn project_input_change_retracts_c_documentation_before_task_persistence() {
 fn check_c_documentation_sigint_uses_shared_cancellation_and_preserves_incomplete_feedback() {
     use std::{
         os::unix::fs::PermissionsExt,
-        time::{Duration, Instant},
         process::Stdio,
+        time::{Duration, Instant},
     };
     let root = std::env::temp_dir().join(format!(
         "cg-check-c-doc-cancel-{}-{}",

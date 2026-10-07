@@ -1,7 +1,9 @@
 //! ShellCheck原规则的宿主限定修复闭环；局部收据不签发项目许可。
+use crate::task_lifecycle_store::digest;
 use crate::{
-    ShellTaskResolutionRequest, doctor_scratch::DoctorScratch, shellcheck_config::ShellCheckConfig,
+    ShellTaskResolutionRequest, doctor_scratch::DoctorScratch,
     shell_task_resolution_policy_input::ShellTaskResolutionPolicyInput,
+    shellcheck_config::ShellCheckConfig,
 };
 use codeguard_core::{ResolutionCause, ResolutionEvidence};
 use codeguard_runtime::read_bounded_regular_file;
@@ -9,9 +11,8 @@ use serde_json::{Value, json};
 use std::{
     path::Path,
     sync::atomic::AtomicBool,
-    time::{Instant, Duration},
+    time::{Duration, Instant},
 };
-use crate::task_lifecycle_store::digest;
 
 /// 验签原规则、方言与配置，复检原样本及当前源码并维护同一任务生命周期。
 /// 参数来自独立宿主；返回限定收据，配置放宽或原生反证不能认定修复。

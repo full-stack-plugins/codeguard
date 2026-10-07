@@ -51,7 +51,7 @@ impl GradleOwaspReportBudget {
 }
 #[cfg(test)]
 mod tests {
-    use super::{GradleOwaspReportBudget, MAX_INPUT_BYTES, MAX_ADVISORIES};
+    use super::{GradleOwaspReportBudget, MAX_ADVISORIES, MAX_INPUT_BYTES};
     #[test]
     fn exact_input_boundary_and_overflow_do_not_wrap_or_erase_budget() {
         let mut budget = GradleOwaspReportBudget::default();

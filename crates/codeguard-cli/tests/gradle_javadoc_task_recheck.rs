@@ -1,18 +1,18 @@
 #![cfg(unix)]
 use codeguard_cli::{
-    gradle_javadoc_task_recheck::{run, classify},
+    gradle_javadoc_task_recheck::{classify, run},
     gradle_javadoc_workbench::prepare,
-    work_sync::{save_local_report, sync_local_workspace},
     next_command::read_task_brief,
+    work_sync::{save_local_report, sync_local_workspace},
 };
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::{
     fs,
     path::PathBuf,
     process::Command,
-    sync::atomic::{AtomicU64, Ordering, AtomicBool},
-    time::{Instant, Duration},
+    sync::atomic::{AtomicBool, AtomicU64, Ordering},
+    time::{Duration, Instant},
 };
 static NEXT: AtomicU64 = AtomicU64::new(0);
 struct Workspace(PathBuf);

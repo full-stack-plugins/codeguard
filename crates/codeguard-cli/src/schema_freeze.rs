@@ -14,6 +14,7 @@
 //! 3. 在 commit message 中说明为什么不兼容变更必须做。
 
 /// 当前各协议族的版本集合。新增条目即解冻，需在 commit message 中说明理由。
+#[cfg(test)]
 pub(crate) const FROZEN_FAMILIES: &[(&str, &[&str])] = &[
     ("approval-snapshot", &["unversioned", "1.1"]),
     ("blocker-observed-event", &["unversioned"]),
@@ -514,6 +515,7 @@ pub(crate) const FROZEN_FAMILIES: &[(&str, &[&str])] = &[
 
 /// 从 schema 文件名切出 (协议族, 版本)。没有版本后缀时版本为 `"unversioned"`。
 /// 同时处理 `-v` 前缀（如 `approval-snapshot-v1.1`）。
+#[cfg(test)]
 fn split_schema_name(base: &str) -> (&str, &str) {
     if let Some(dash_pos) = base.rfind('-') {
         let after_dash = &base[dash_pos + 1..];
@@ -527,6 +529,7 @@ fn split_schema_name(base: &str) -> (&str, &str) {
 }
 
 /// 检查字符串是否为 `X.Y` 或 `X.Y.Z` 形式。
+#[cfg(test)]
 fn is_version(s: &str) -> bool {
     let parts: Vec<&str> = s.split('.').collect();
     parts.len() >= 2

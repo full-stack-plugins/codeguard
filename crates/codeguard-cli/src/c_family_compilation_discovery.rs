@@ -71,9 +71,9 @@ pub(crate) fn observe<P: ObservationPort>(
 #[cfg(test)]
 mod tests {
     use codeguard_core::{ObservationPort, ObservedPathKind};
+    use std::cell::Cell;
     use std::io;
     use std::path::{Path, PathBuf};
-    use std::cell::Cell;
 
     struct DatabaseObservation {
         bytes: &'static [u8],

@@ -1,5 +1,5 @@
 #![cfg(all(feature = "wasm-precheck", unix))]
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use std::{
     fs,
     io::Write,

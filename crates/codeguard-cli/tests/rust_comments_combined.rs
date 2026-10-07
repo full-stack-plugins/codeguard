@@ -2,8 +2,8 @@
 //! 独立注释入口的双原生检查契约；受控进程不授予真实工具资格。
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
-use std::{fs, os::unix::fs::PermissionsExt, path::PathBuf, process::Command};
 use std::sync::atomic::{AtomicU64, Ordering};
+use std::{fs, os::unix::fs::PermissionsExt, path::PathBuf, process::Command};
 
 static NEXT: AtomicU64 = AtomicU64::new(0);
 struct Project(PathBuf);

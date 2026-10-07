@@ -1,6 +1,6 @@
 //! Javadoc 队列报告的严格归属与当前输入复核；不执行报告内指令。
 use super::{
-    BlockerInput, FindingInput, ReportInput, safe_relative_path, safe_reason, safe_run_id,
+    BlockerInput, FindingInput, ReportInput, safe_reason, safe_relative_path, safe_run_id,
     valid_sha256,
 };
 use crate::javadoc_workbench::project_finding;

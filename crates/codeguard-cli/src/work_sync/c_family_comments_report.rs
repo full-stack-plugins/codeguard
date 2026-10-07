@@ -1,5 +1,7 @@
 //! Clang文档局部观察的封闭导入契约；任务为文件/语言标准/原生规则位置组。
-use super::{BlockerInput, FindingInput, ReportInput, safe_relative_path, safe_run_id, valid_sha256};
+use super::{
+    BlockerInput, FindingInput, ReportInput, safe_relative_path, safe_run_id, valid_sha256,
+};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 use std::{

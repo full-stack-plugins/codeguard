@@ -15,7 +15,9 @@ use crate::check_budget::{
 };
 use crate::discovery::discover;
 use crate::java_cve_attribution::attach_candidates;
-use crate::java_cve_scan::{NativeContext as CveNativeContext, observe_project as observe_cve_project};
+use crate::java_cve_scan::{
+    NativeContext as CveNativeContext, observe_project as observe_cve_project,
+};
 use crate::java_p3c_command::has_projectable_findings;
 use crate::java_p3c_scan::{NativeContext, observe_project};
 use crate::next_command::read_task_brief;

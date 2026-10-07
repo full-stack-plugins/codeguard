@@ -1,7 +1,9 @@
 //! 开发期原生/WASM 差分回放；使用已支持的原生观察器，不授予独立 holdout 或语言资格。
 use crate::grammar_evaluation::{classify_probe, validate_corpus};
 use crate::grammar_native_checker::GrammarNativeChecker;
-use crate::syntax_worker_runner::{run_syntax_worker_module_candidate, run_syntax_worker_candidate};
+use crate::syntax_worker_runner::{
+    run_syntax_worker_candidate, run_syntax_worker_module_candidate,
+};
 use codeguard_runtime::read_bounded_regular_file;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
@@ -153,7 +155,9 @@ pub fn replay_native_corpus(
                     (
                         classify_probe(observation.recoveries.len(), truncated),
                         Some(observation.recoveries.len()),
-                        observation.evaluation_incomplete_reason().map(str::to_owned),
+                        observation
+                            .evaluation_incomplete_reason()
+                            .map(str::to_owned),
                         observation
                             .evaluation_incomplete_reason_detail()
                             .map(str::to_owned),

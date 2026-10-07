@@ -1,6 +1,6 @@
 //! Gradle转发的英语JDK21缺注释warning块解析，未知输出不猜测源码违规。
-use std::collections::BTreeMap;
 use crate::{GradleJavadocDiagnostic, JavadocParseState, parse_javadoc_output};
+use std::collections::BTreeMap;
 /// 按每次Javadoc的warning汇总解析多个连续块，精确核对已选源码字节。
 /// 参数为原生stderr和绝对源码映射；返回局部位置，空输出不证明任务执行或规则完整。
 pub fn parse_gradle_javadoc_output(

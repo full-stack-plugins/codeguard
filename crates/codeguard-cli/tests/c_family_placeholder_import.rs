@@ -1,5 +1,5 @@
 use serde_json::{Value, json};
-use std::{fs, process::Command, path::Path};
+use std::{fs, path::Path, process::Command};
 
 #[test]
 #[ignore = "requires explicit existing Clang via CODEGUARD_CLANG_BIN"]

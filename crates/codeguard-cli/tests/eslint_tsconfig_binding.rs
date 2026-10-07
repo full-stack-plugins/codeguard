@@ -138,22 +138,20 @@ fn tsconfig_mutation_after_report_invalidates_native_observation() {
     let mutated = project("mutate-active", "mutate_all");
     let report = check(&mutated.0);
     let row = app_row(&report);
-    assert_eq!(
-        row["feedback"]["reason"],
-        "eslint_input_changed",
-        "{row}"
-    );
+    assert_eq!(row["feedback"]["reason"], "eslint_input_changed", "{row}");
     assert_eq!(row["feedback"]["local_coherent"], false);
     assert_eq!(row["source_sha256"], Value::Null);
     #[cfg(feature = "wasm-precheck")]
     {
         // 夹具自身的 eslint.config.cjs 是另一个 JS 方言源文件，可以独立一致；
         // 但被篡改 tsconfig 失效的 app.ts 不能被 WASM 初检替代或掩盖。
-        assert!(report["syntax_candidates"]["observations"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .any(|observation| observation["path"] == "frontend/app.ts"));
+        assert!(
+            report["syntax_candidates"]["observations"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|observation| observation["path"] == "frontend/app.ts")
+        );
     }
     assert_eq!(report["delivery_decision"], "incomplete");
 }
@@ -169,8 +167,7 @@ fn symlinked_tsconfig_is_untrusted_and_blocks_native_execution() {
     let report = check(&p.0);
     let row = app_row(&report);
     assert_eq!(
-        row["feedback"]["reason"],
-        "eslint_tsconfig_untrusted",
+        row["feedback"]["reason"], "eslint_tsconfig_untrusted",
         "{row}"
     );
     assert_eq!(row["feedback"]["local_coherent"], false);
@@ -201,8 +198,7 @@ fn monorepo_tsconfig_mutation_only_invalidates_its_own_package() {
         .find(|row| row["path"] == "backend/app.ts")
         .unwrap();
     assert_eq!(
-        backend_row["feedback"]["reason"],
-        "eslint_input_changed",
+        backend_row["feedback"]["reason"], "eslint_input_changed",
         "{backend_row}"
     );
     assert_eq!(backend_row["feedback"]["local_coherent"], false);
@@ -214,8 +210,7 @@ fn ts_parser_fatal_keeps_incomplete_and_names_parser_guidance() {
     let report = check(&p.0);
     let row = app_row(&report);
     assert_eq!(
-        row["feedback"]["reason"],
-        "eslint_parser_or_configuration_diagnostic",
+        row["feedback"]["reason"], "eslint_parser_or_configuration_diagnostic",
         "{row}"
     );
     assert_eq!(row["feedback"]["local_coherent"], false);
@@ -262,8 +257,7 @@ fn native_version_mismatch_is_reported_and_not_laundered() {
     let report = check(&p.0);
     let row = app_row(&report);
     assert_eq!(
-        row["feedback"]["reason"],
-        "eslint_version_mismatch",
+        row["feedback"]["reason"], "eslint_version_mismatch",
         "{row}"
     );
     assert_eq!(row["feedback"]["local_coherent"], false);
