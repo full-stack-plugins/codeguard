@@ -2746,9 +2746,10 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
             native.remove("kotlin_lint");
         }
     }
-    // 槽位存在但没有结果时，报告里必须同样不出现该键：schema_version 只反映优先级分支，
-    // 不反映该语言是否真的产出了结果（如 gradle 未解析时 schema 已是 0.61.0，与 Kotlin 无关），
-    // 仅靠版本列表会让「本项目没有 Kotlin 源码」留下一个 kotlin_lint: null 的假槽位。
+    // 防御性冗余：kotlin_lint 现在只经 check_native_results::assemble 进入报告，而该函数
+    // 保证 null 不产生槽位，因此这条判断当前不可达。保留它是为了兜住 2651 之后那些直接写
+    // report["native_results"] 的条件插入点——将来若有人绕过装配直接写入 null，这里仍能拦住。
+    // 槽位存在性规则本身以 assemble 为唯一事实源，不要在这里新增语言专属规则。
     if report["native_results"]["kotlin_lint"].is_null() {
         if let Some(native) = report["native_results"].as_object_mut() {
             native.remove("kotlin_lint");
