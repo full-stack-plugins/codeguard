@@ -675,3 +675,4 @@ pub mod quality_config_mapping;
 pub mod init_readiness;
 pub mod token_generation;
 pub mod rules_config_commands;
+pub mod whitelist_matcher;
