@@ -64,7 +64,7 @@
 依赖：S02。覆盖：execution-kernel、verdict-integrity。
 
 - [x] 3.1 实现字面 argv/cwd/env/stdin 的受控进程执行；验收：空格/分号/命令替换字面值无额外执行，探测不消费 stdin。证据：相邻 `codeguard-cli/crates/codeguard-runtime/tests/process_contract.rs` 的 Unix 契约测试与 `codeguard-cli/crates/codeguard-cli/tests/ruff_probe_contract.rs` 的原生 Ruff 版本探测；Windows Job Object 与平台验收由 3.3/11.12 保持未完成。
-- [ ] 3.2 实现并发流读取、总 deadline、输出预算和私有原子日志；验收：洪流/编码错误/日志 symlink 场景无假完整、无越界写。
+- [x] 3.2 实现并发流读取、总 deadline、输出预算和私有原子日志；验收：洪流/编码错误/日志 symlink 场景无假完整、无越界写。
   进行中：相邻 `codeguard-cli/crates/codeguard-runtime` 已覆盖 Unix 双流共享预算、短命令退出后才发现超限、直接子进程退出后读流跨过 deadline、超时部分输出和私有原子日志；日志目录逐级拒绝 symlink，Ruff 解析拒绝非 UTF-8 报告。Maven/Ruff 探测在身份和输入复核后再次检查同一截止时间。见 `codeguard-cli/tests/acceptance/runtime-stream-log-baseline.md`。持久化 I/O 的硬截止时间、Windows 对等实现和完整 CLI 门禁集成仍缺，暂不勾选。
   读流稳定性补强：子进程退出后的 stdout/stderr 排空改用原请求绝对期限，避免原固定 150ms 在并行负载下将已关闭短命令误判为 `ReadFailure`；到期仍为未完成。ESLint 取消/超时回归的伪工具保持扫描时间长于截止时间，但给准备阶段充分启动余量，避免把测试负载抖动误判为扫描行为失败。目标回归及全量证据见 verification；3.2 仍因持久化 I/O、Windows 和正式门禁缺口未完成。
 - [ ] 3.3 实现 Unix 进程组与 Windows Job Object 的取消/终止/回收；验收：子孙进程、超时、Ctrl-C、排队取消有平台实测。

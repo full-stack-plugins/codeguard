@@ -247,3 +247,4 @@ pub use wasm_outer_return::WasmOuterReturn;
 mod wasm_outer_return_scan;
 #[cfg(feature = "wasm-precheck")]
 pub use wasm_outer_return_scan::{WasmOuterReturnScan, scan_wasm_outer_returns};
+pub mod concurrent_stream;
