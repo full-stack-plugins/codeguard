@@ -432,6 +432,7 @@ pub mod syntax_worker_structure;
 
 mod check_go_syntax_scan;
 mod check_native_results;
+mod check_report_assembly;
 #[cfg(unix)]
 mod check_ruby_scan;
 #[cfg(unix)]
