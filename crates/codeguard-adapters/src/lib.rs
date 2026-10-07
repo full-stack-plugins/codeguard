@@ -522,3 +522,4 @@ pub mod tool_resolution;
 pub mod tools_install;
 pub mod report_freshness;
 pub mod tools_inventory;
+pub mod build_model_resolution;
