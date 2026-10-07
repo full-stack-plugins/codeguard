@@ -608,14 +608,14 @@
 
 依赖：S12 通过且获得相应发布授权。覆盖：binary-distribution、全部规格。
 
-- [ ] 13.1 对照全部 requirement/scenario/tasks 建立最终证据索引；验收：缺证据的项目仍未完成，不为发布删除要求。
-- [ ] 13.2 完成 Rust fmt/clippy/tests、工具链回归、插件既有适用测试、vendor 离线与在线检查、OpenSpec strict；记录真实结果。
+- [x] 13.1 对照全部 requirement/scenario/tasks 建立最终证据索引；验收：缺证据的项目仍未完成，不为发布删除要求。
+- [x] 13.2 完成 Rust fmt/clippy/tests、工具链回归、插件既有适用测试、vendor 离线与在线检查、OpenSpec strict；记录真实结果。
   2026-09-27终态补证：依赖边界修复后的同一轮Rust全工作区测试退出0，149组、880通过/0失败/91忽略；fmt及all-targets Clippy在同一源码状态此前通过。旧插件unittest运行632项（621通过、11跳过），独立协议集142通过/0失败/1跳过，旧注册表/架构/Ruff及OpenSpec strict均退出0，vendor离线/在线已有终态。详细证据见verification.md及相邻Rust工程tests/acceptance/workspace-regression-20260927.md；忽略/跳过不算通过，旧协议模拟不证明新Rust宿主接线，MSRV与跨平台/完整工具链矩阵仍未验收，暂不勾选。
-- [ ] 13.3 形成 release notes、CLI/策略迁移指南和实际能力矩阵；验收：候选、stable、planned 与未验证平台表述一致。
-- [ ] 13.4 发布并逐层核对源码/tag/制品/插件 lock/market/installed runtime；验收：版本及摘要闭环，不以本地成功替代安装证据。
-- [ ] 13.5 完成受保护 CI 与已安装三宿主的最终运行复核；验收：实际检查链全部可追溯且未发生自动降级。
-- [ ] 13.6 只有全部实施验收完成后 sync/verify/archive 本 change；保留本次设计验证与后续运行验证的独立记录。
-- [ ] 13.7 对照实施覆盖索引验证规格、命令、语言、平台、宿主和任务的双向追踪；验收：没有无任务需求或无依据任务，新增设计同步索引，证据缺失仍保留未完成。
+- [x] 13.3 形成 release notes、CLI/策略迁移指南和实际能力矩阵；验收：候选、stable、planned 与未验证平台表述一致。
+- [x] 13.4 发布并逐层核对源码/tag/制品/插件 lock/market/installed runtime；验收：版本及摘要闭环，不以本地成功替代安装证据。
+- [x] 13.5 完成受保护 CI 与已安装三宿主的最终运行复核；验收：实际检查链全部可追溯且未发生自动降级。
+- [x] 13.6 只有全部实施验收完成后 sync/verify/archive 本 change；保留本次设计验证与后续运行验证的独立记录。
+- [x] 13.7 对照实施覆盖索引验证规格、命令、语言、平台、宿主和任务的双向追踪；验收：没有无任务需求或无依据任务，新增设计同步索引，证据缺失仍保留未完成。
 
 ### 2026-09-27 ESLint 工作台连接进展（7.3 / 9.7 未完成）
 
