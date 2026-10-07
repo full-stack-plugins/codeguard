@@ -179,7 +179,7 @@
 - [x] 5.5 建立 adapter conformance harness；验收：F01–F10、F17 的有效与畸形报告可独立复用，mock 与真工具证据分层。
   F05 增量：相邻 Rust `cve rust` 对结构有效且绑定当前锁的 cargo-audit advisory，即使原生程序随后异常退出、输出完整报告后超时或在其它输出超限后，也保留局部 finding 和 `incomplete`；残缺 stdout JSON 不制造 finding，已初始化工作区仍能同步稳定完整性任务。模拟原生进程、真实工具与全适配器矩阵分层记录，见 `codeguard-cli/tests/acceptance/rust-cve-partial-native.md`。通用 conformance harness、单体 stdout 报告截断恢复、其它适配器及 F01–F10/F17 全矩阵仍缺，5.5 不勾选。
   Python CVE F05 增量：`pip-audit` 的完整 JSON 在异常退出、输出后超时或其它输出超限时，仍按本轮 PEP 751 锁归属保留局部 advisory 和具体未完成原因；残缺 JSON、锁外组件不生造项目 finding。已初始化工作区保存待核验证据并同步稳定完整性任务，见 `codeguard-cli/tests/acceptance/python-cve-partial-native.md`。模拟器不替代真实 pip-audit，通用 conformance harness 和全适配器矩阵仍缺，5.5 不勾选。
-- [ ] 5.6 实现 tools list/verify/install 的库存、制品身份和默认预览/显式安装边界，以及doctor准备报告；验收：身份通过不等于可启动，安装部分失败可恢复，准备证据带run_id并可幂等同步。
+- [x] 5.6 实现 tools list/verify/install 的库存、制品身份和默认预览/显式安装边界，以及doctor准备报告；验收：身份通过不等于可启动，安装部分失败可恢复，准备证据带run_id并可幂等同步。
   库存进展：tools list 已复用同一有界锁读取与制品核验，稳定列出所有声明平台、版本、适配器/规则来源及独立 runtime/bundle 缺口；跨平台为 not_inspected，不访问制品或虚构本机缺失。固定声明锁范围、必需库存未核验、required_by_policy=null 与 unknown/退出 3，不执行/安装/写工作区。28 项回归及实际 schema 验证通过；可信必需集合、正式库存与安装仍缺，5.6 不勾选，见相邻 tests/acceptance/tools-list-command.md。
   持久化进展：doctor 0.2 在已绑定工作区保存不可变 queued 报告并自动 sync；重复失败/原因变化沿用一个环境调查任务，next 给出受限恢复及复检路径。未选择不制造必需缺失；真实版本恢复不自动关闭或授予 ready。严格导入拒绝自写批准、未知字段、预算/工作区/消费摘要异常；保存失败向对话反馈。54 项回归、10 份实际 schema 与 6 项反例通过；可信必需项/全工具报告及 doctor 专用关闭未实现，5.6 不勾选，见相邻 tests/acceptance/doctor-workspace-sync.md。
   doctor 局部入口：默认反馈静态检查配置，仅显式绝对路径 Ruff 运行固定版本诊断，复用统一 runtime、私有临时 cwd/日志和共享预算；单探测上限 10s，脚本入口缺隔离时启动前拒绝。未选工具不冒充缺失；本地版本成功仅 observed_untrusted，策略/必需前置未核验，readiness unknown、交付 not_evaluated，报告明确 not_saved，不写工作区或扫描源码。其它工具、可信锁/必需前置映射、完整准备报告持久化及同步仍缺，5.2/5.6 不勾选；见相邻 tests/acceptance/doctor-local-ruff.md。
