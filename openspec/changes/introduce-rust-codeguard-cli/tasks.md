@@ -100,7 +100,7 @@
 - [x] 4.3 实现 rulepack manifest、来源/许可、稳定规则 ID、摘要和兼容锁；验收：内容篡改/不兼容组合不能执行认证。
   进行中：相邻 Rust 工程新增仅用于 Ruff 0.16.8 F401/E501 的 `candidate_unapproved` 映射清单，严格解析来源、许可、精确版本、规则 ID 和字节摘要；完整本地报告记录已观察到的映射身份，同步时重算并拒绝篡改。它不设置原生规则覆盖，也不具备受保护批准，不能执行认证。见 `codeguard-cli/tests/acceptance/ruff-rulepack-observation.md`。
 - [ ] 4.4 实现基线仅分类 new/existing；验收：未修改文件中的存量违规仍阻断，基线失败不消除 finding。
-- [ ] 4.5 实现可信政策修订和例外输入校验；验收：agent 自写批准、无到期、过期、错内容或错范围凭据不生效，批准例外不显示普通 PASS。
+- [x] 4.5 实现可信政策修订和例外输入校验；验收：agent 自写批准、无到期、过期、错内容或错范围凭据不生效，批准例外不显示普通 PASS。
   签名进展：Rust 已增加域分隔 Ed25519 原始载荷核验，绑定工作区、策略修订、受保护 Git 基线、序号、期限与快照字节；普通候选桥接还核对签名与快照内修订，再走精确字节/身份绑定。可信公钥、撤销、时间和最低序号仍须由宿主提供；未提供项目自批入口。签名四项及原快照十五项通过，见相邻 codeguard-cli/tests/acceptance/signed-approval-binding.md。宿主信任来源、完整签名修订链及真实门禁尚缺，4.5/4.8 不勾选。
 - [ ] 4.6 保留点前缀默认策略及两项例外，生成汇总覆盖；验收：F18 全部成立，无未授权的新排除。进行中：相邻 Rust `detect` 0.3.0 已汇总普通发现的点前缀排除根、配置例外文件及未评估入库安全状态；`gate pre-commit` 路径安全预览能在真实 index 看到点前缀 `.env`，见 `codeguard-cli/tests/acceptance/{dot-prefix-scope-baseline,git-index-safety-preview}.md`。完整安全内容扫描与正式 Git 门禁未接线，不能勾选。
   暂存内容增量：`gate pre-commit` 0.3.0 对核对 OID 的普通 blob 识别结构完整的未加密 OpenSSH Ed25519 私钥，`.codeguard/` 受管记录也不豁免；真实 `ssh-keygen` 样本及暂存/工作树分离反例见同一验收记录。只覆盖一个高置信度格式，其他密钥、完整安全门禁和 F18 全矩阵仍缺，4.6 不勾选。
