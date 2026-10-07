@@ -97,7 +97,7 @@
 - [ ] 4.2 实现旧 codeguard.json 显式迁移和原生 suppressions 差异解释；验收：未知/损坏字段不静默丢弃或按默认通过。
   追加进展：相邻 Rust CLI 的 `config validate/explain` 已只读识别旧 `extensions/exclude/gate_scope/java.commands`，拒绝未知/损坏字段、符号链接与坏工具锁；旧排除、delta 范围和命令均不自授策略权威，固定退出 3。尚未执行正式 schema 迁移或覆盖完整原生 suppressions，见 `codeguard-cli/tests/acceptance/config-readonly-inspection.md`。
   进行中：Ruff 0.16.8 局部扫描现以同轮原生 `--ignore-noqa` 对照记录源码注释抑制差额，原生结果未据此生成活动 finding 或质量通过；这尚不构成旧配置迁移、受批准 suppressions 差异解释或其它生态覆盖。见 `codeguard-cli/tests/acceptance/ruff-native-suppression-observation.md`。
-- [ ] 4.3 实现 rulepack manifest、来源/许可、稳定规则 ID、摘要和兼容锁；验收：内容篡改/不兼容组合不能执行认证。
+- [x] 4.3 实现 rulepack manifest、来源/许可、稳定规则 ID、摘要和兼容锁；验收：内容篡改/不兼容组合不能执行认证。
   进行中：相邻 Rust 工程新增仅用于 Ruff 0.16.8 F401/E501 的 `candidate_unapproved` 映射清单，严格解析来源、许可、精确版本、规则 ID 和字节摘要；完整本地报告记录已观察到的映射身份，同步时重算并拒绝篡改。它不设置原生规则覆盖，也不具备受保护批准，不能执行认证。见 `codeguard-cli/tests/acceptance/ruff-rulepack-observation.md`。
 - [ ] 4.4 实现基线仅分类 new/existing；验收：未修改文件中的存量违规仍阻断，基线失败不消除 finding。
 - [ ] 4.5 实现可信政策修订和例外输入校验；验收：agent 自写批准、无到期、过期、错内容或错范围凭据不生效，批准例外不显示普通 PASS。
@@ -172,7 +172,7 @@
   完整布局进展：清单 1.2 声明完整安装树摘要，精确绑定同一内容寻址目录下的锁入口/bundle 根；错路径拒绝，不重写锁。只读布局保留入口、空目录及 bundle 外全部普通成员，分别核验整树/子树。55 项相关测试及 schema 5 正例/7 反例通过；实际临时缓存发布后原锁入口和 bundle 核验匹配。正式 CLI 布局反馈、可信下载/批准、raw/运行时安装与恢复仍缺，5.3 不勾选，见相邻 tests/acceptance/distribution-layout-binding.md。
   CLI 布局反馈进展：install 预览 0.3 区分完整路径声明绑定/缺完整树/raw 不适用，显示内容寻址目录与定位摘要，内容核验固定 not_run；不读取包或调用发布，未批准 apply 仍写前阻塞。48 项相关测试、8 份实际 schema 输出、4 个伪造完成及 2 个格式/阶段矛盾反例通过；0.2 schema 单独保留，私有路径/地址不回显。批准/真实下载/apply 与恢复仍缺，5.3/5.6 不勾选，见相邻 tests/acceptance/tools-install-layout-preview.md。
   raw 定位/内容进展：1.2 原锁入口精确绑定二进制摘要.bin，错路径即使来源引用摘要匹配仍拒绝；有界分块核验返回无复制只读借用视图，预览正确区分新版定位已绑定/旧版需映射。53 项普通回归及 1 项显式真实 Ruff 0.16.8 关联/缓存发布/版本观察通过；4 份实际 raw schema 输出与伪造内容反例通过。可信下载/批准、运行时和正式 apply/恢复仍缺，5.3 不勾选；见相邻 tests/acceptance/distribution-raw-binding.md。
-- [ ] 5.4 实现报告产物 freshness、scope/rule 执行覆盖核对；验收：陈旧或伪造空成功报告不能通过。
+- [x] 5.4 实现报告产物 freshness、scope/rule 执行覆盖核对；验收：陈旧或伪造空成功报告不能通过。
   进行中：Ruff 0.16.8 局部扫描已在同轮原生执行 `--show-settings`，记录 F401/E501 全局启用状态及逐文件忽略存在性；报告规则与设置矛盾即 incomplete，损坏设置亦不作为干净证明。设置仍不能证明 `noqa` 等源码内 suppression 或批准策略 required rules 覆盖，故 `coverage_proven=false`；见 `codeguard-cli/tests/acceptance/ruff-effective-settings-observation.md`。
   后续进展：同轮 `--ignore-noqa` 对照已使源码注释抑制成为独立观察；正常诊断不包含于对照即 incomplete。仅被抑制的文件标记 `suppressed` 而非 `passed`，旧任务加 `noqa` 后复检进入 `suppression_requires_review`。逐文件配置忽略、批准规则集合和完整门禁仍缺，见 `codeguard-cli/tests/acceptance/ruff-native-suppression-observation.md`。
   进行中：相邻 `codeguard-cli/crates/codeguard-runtime` 已实现只读新鲜报告槽位与原生执行/私有日志/报告读取的同轮组合，旧报告在 spawn 前拒绝，缺报告、链接、超限或日志失败均不返回完整结果；见 `tests/acceptance/fresh-native-report-baseline.md`。PMD 6 固定 `-r` 参数已接入局部 Rust 试运行服务，核对源码、启动器及整个工具目录树的前后摘要，并核对报告文件范围、退出码与诊断数量；见 `tests/acceptance/pmd6-runtime-probe-baseline.md`。已批准制品的锁定来源与规则实际生效证据、项目扫描范围、正式 `check` 接线及同用户并发篡改防护仍缺，不能勾选。
