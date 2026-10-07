@@ -41,14 +41,28 @@ impl CFamilyCompilationEntry {
         }
         let standards: Vec<_> = args
             .iter()
-            .filter(|a| a.starts_with("-std") || a.starts_with("--std"))
+            .filter(|a| {
+                matches!(a.as_str(), "-std" | "--std")
+                    || a.starts_with("-std=")
+                    || a.starts_with("--std=")
+            })
             .collect();
         if standards.len() > 1 {
             return Some("compilation_database_standard_ambiguous");
         }
         match standards.first().map(|a| a.as_str()) {
             None => Some("compilation_database_standard_missing"),
-            Some("-std=c11" | "-std=c++17") => None,
+            Some("-std=c11" | "-std=c++17" | "--std=c11" | "--std=c++17") => None,
+            Some("--std") => {
+                let index = args
+                    .iter()
+                    .position(|a| a == "--std")
+                    .expect("已匹配原参数");
+                match args.get(index + 1).map(String::as_str) {
+                    Some("c11" | "c++17") => None,
+                    _ => Some("compilation_database_standard_unsupported"),
+                }
+            }
             Some(_) => Some("compilation_database_standard_unsupported"),
         }
     }
@@ -142,6 +156,22 @@ mod tests {
         }
         let entries = parse_c_family_compilation_database(br#"[{"directory":"/build","file":"file.cpp","arguments":["clang++","-std=c++17","-Iinclude","file.cpp"]}]"#).unwrap();
         assert_eq!(entries[0].execution_context_blocker(), None);
+    }
+
+    #[test]
+    fn standard_library_selection_is_not_a_language_standard_conflict() {
+        for arguments in [
+            vec!["clang++", "-std=c++17", "-stdlib=libc++", "file.cpp"],
+            vec!["clang++", "--std=c++17", "file.cpp"],
+            vec!["clang++", "--std", "c++17", "file.cpp"],
+            vec!["clang++", "-stdlib=libstdc++", "-std=c++17", "file.cpp"],
+        ] {
+            let input =
+                serde_json::json!([{"directory":"/build","file":"file.cpp","arguments":arguments}]);
+            let entries =
+                parse_c_family_compilation_database(&serde_json::to_vec(&input).unwrap()).unwrap();
+            assert_eq!(entries[0].execution_context_blocker(), None);
+        }
     }
 
     #[test]

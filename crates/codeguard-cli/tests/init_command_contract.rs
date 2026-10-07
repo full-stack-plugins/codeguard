@@ -1742,3 +1742,29 @@ fn init_exposes_compilation_argument_blockers_without_running_compiler() {
         assert!(!project.0.join(".codeguard").exists());
     }
 }
+
+#[test]
+fn init_does_not_confuse_standard_library_or_native_standard_aliases() {
+    let project = Project::new();
+    for arguments in [
+        vec!["clang++", "-std=c++17", "-stdlib=libc++", "main.cpp"],
+        vec!["clang++", "--std=c++17", "main.cpp"],
+        vec!["clang++", "--std", "c++17", "main.cpp"],
+    ] {
+        fs::write(project.0.join("compile_commands.json"), serde_json::to_vec(&serde_json::json!([{"directory":"/build","file":"main.cpp","arguments":arguments}])).unwrap()).unwrap();
+        let (exit, report) = project.run(&["--format=json"]);
+        assert_eq!(exit, 0);
+        let checker = report["profile_summary"]["checkers"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|c| c["checker_id"] == "c_family.compilation_database")
+            .unwrap();
+        assert_eq!(
+            checker["reason"],
+            "compilation_database_arguments_observed_execution_context_unverified"
+        );
+        assert_eq!(checker["configuration"], "unknown");
+        assert_eq!(checker["execution"], "not_run");
+    }
+}
