@@ -463,6 +463,7 @@ mod init_transaction;
 mod manifest_refresh;
 mod quality_config_mapping;
 mod init_readiness;
+mod status_disposition;
 mod pascal_dependency_scan;
 mod check_objc_scan;
 mod objc_dependency_scan;
