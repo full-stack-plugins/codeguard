@@ -461,6 +461,8 @@ mod architecture_md;
 mod agents_block_merge;
 mod init_transaction;
 mod manifest_refresh;
+mod quality_config_mapping;
+mod init_readiness;
 mod pascal_dependency_scan;
 mod check_objc_scan;
 mod objc_dependency_scan;
