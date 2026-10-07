@@ -21,7 +21,7 @@
 
 依赖：S01。覆盖：unified-cli-contract、verdict-integrity。
 
-- [ ] 2.1 实现统一命令语法、canonical ID/别名及只读 plan；验收：错参无进程副作用、plan 不运行构建/扫描。
+- [x] 2.1 实现统一命令语法、canonical ID/别名及只读 plan；验收：错参无进程副作用、plan 不运行构建/扫描。
   进行中：相邻 Rust CLI 新增 C06 的只读 `plan_preview` 0.1，先校验类别/canonical 语言 ID，再静态观察配置；缺可信策略和工具锁时只列候选、不给执行 argv/正式义务、退出 3。目标集成测试验证伪造 Ruff 工具未运行及项目无新增文件，见 `codeguard-cli/tests/acceptance/plan-readonly-preview.md`。公共CLI别名已接通（见language-alias-cli验收）；可信政策、全量义务/DAG 和正式 CheckPlan 仍缺，不勾选。
 - [x] 2.2 定义请求/计划/报告/工具锁 JSON schemas 与兼容版本策略，提供完整正反例；验收：未知 major/非法枚举不按 PASS 消费，运行报告区分项目检查器的 `configured/missing/invalid/unknown` 与本次原生结果。证据：相邻 `codeguard-cli/schemas/run-report.schema.json` 的 1.2 协议、`crates/codeguard-cli/src/run_report.rs` 与 `tests/run_report_contract.rs` 的正反例；1.0 历史报告仍可读取，1.1 起区分配置和运行，1.2 起 finding 要求定位且检查器状态按构建根区分。此项只完成协议，不代表项目配置探测或宿主对话接线已完成。
   公共协议输入加固：Rust 检查请求和 RunReport 现从原始字节递归拒绝重复 JSON 键，并复用 16 MiB 输入上限；`delivery_gate`/`decision` 和嵌套 `jobs` 重复键反例先失败后通过。此校验只保证结构消费，不验证报告来源或正式门禁。
