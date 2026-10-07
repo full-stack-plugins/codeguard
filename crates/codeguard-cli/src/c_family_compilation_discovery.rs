@@ -14,6 +14,7 @@ pub(crate) fn observe<P: ObservationPort>(
     relative: &str,
 ) {
     let mut reason = "compilation_database_unreadable";
+    let mut parsed = false;
     if let Ok(bytes) = observation.read_bounded(path, 1024 * 1024) {
         if observation
             .read_bounded(path, 1024 * 1024)
@@ -23,14 +24,22 @@ pub(crate) fn observe<P: ObservationPort>(
                 .checker_config_sha256
                 .insert(relative.into(), format!("{:x}", Sha256::digest(&bytes)));
             reason = match parse_c_family_compilation_database(&bytes) {
-                Ok(_) => "compilation_database_arguments_observed_execution_context_unverified",
+                Ok(entries) => {
+                    parsed = true;
+                    entries
+                        .iter()
+                        .find_map(|entry| entry.execution_context_blocker())
+                        .unwrap_or(
+                            "compilation_database_arguments_observed_execution_context_unverified",
+                        )
+                }
                 Err(reason) => reason,
             };
         } else {
             reason = "compilation_database_changed";
         }
     }
-    if reason != "compilation_database_arguments_observed_execution_context_unverified" {
+    if !parsed {
         report.observation_complete = false;
         report.blocked_paths.push(relative.into());
     }

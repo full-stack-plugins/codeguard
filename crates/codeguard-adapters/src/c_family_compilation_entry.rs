@@ -18,6 +18,42 @@ pub struct CFamilyCompilationEntry {
     pub output: Option<String>,
 }
 
+impl CFamilyCompilationEntry {
+    /// 返回已知的执行上下文阻塞原因；None只表示未命中这些规则，绝不授权执行。
+    /// 不展开响应文件，不加载插件，不核验工具、路径、源集或其他未知选项。
+    pub fn execution_context_blocker(&self) -> Option<&'static str> {
+        let args = self.arguments.get(1..).unwrap_or_default();
+        if args.iter().any(|a| a.starts_with('@')) {
+            return Some("compilation_database_response_file_unresolved");
+        }
+        if args.iter().any(|a| {
+            matches!(a.as_str(), "-Xclang" | "-Xpreprocessor" | "-cc1")
+                || a.starts_with("-Xclang=")
+                || a.starts_with("-Wp,")
+        }) {
+            return Some("compilation_database_frontend_passthrough_unresolved");
+        }
+        if args
+            .iter()
+            .any(|a| a.starts_with("-fplugin") || a.starts_with("-fpass-plugin") || a == "-load")
+        {
+            return Some("compilation_database_plugin_unresolved");
+        }
+        let standards: Vec<_> = args
+            .iter()
+            .filter(|a| a.starts_with("-std") || a.starts_with("--std"))
+            .collect();
+        if standards.len() > 1 {
+            return Some("compilation_database_standard_ambiguous");
+        }
+        match standards.first().map(|a| a.as_str()) {
+            None => Some("compilation_database_standard_missing"),
+            Some("-std=c11" | "-std=c++17") => None,
+            Some(_) => Some("compilation_database_standard_unsupported"),
+        }
+    }
+}
+
 /// 读取最多1MiB、4096条的静态数据库；返回完整原序条目或明确阻塞原因。
 /// 不读取路径、不执行参数，不隐式补标准，不合并同文件的不同配置。
 pub fn parse_c_family_compilation_database(
@@ -68,6 +104,44 @@ mod tests {
         assert_eq!(entries[1].arguments[3], "@flags.rsp");
         assert_eq!(entries[1].arguments[4], "$(touch forbidden)");
         assert!(!entries[1].arguments.iter().any(|a| a.starts_with("-std=")));
+    }
+
+    #[test]
+    fn execution_context_blockers_do_not_trust_standard_flags() {
+        for (arguments, reason) in [
+            (
+                vec!["clang++", "-std=c++17", "@flags.rsp"],
+                "compilation_database_response_file_unresolved",
+            ),
+            (
+                vec!["clang++", "-std=c++17", "-Xclang", "-load", "plugin.so"],
+                "compilation_database_frontend_passthrough_unresolved",
+            ),
+            (
+                vec!["clang++", "-std=c++17", "-fplugin=plugin.so"],
+                "compilation_database_plugin_unresolved",
+            ),
+            (
+                vec!["clang++", "-std=c++17", "-std=c++20"],
+                "compilation_database_standard_ambiguous",
+            ),
+            (
+                vec!["clang++", "file.cpp"],
+                "compilation_database_standard_missing",
+            ),
+            (
+                vec!["clang++", "-std=c++20"],
+                "compilation_database_standard_unsupported",
+            ),
+        ] {
+            let input =
+                serde_json::json!([{"directory":"/build","file":"file.cpp","arguments":arguments}]);
+            let entries =
+                parse_c_family_compilation_database(&serde_json::to_vec(&input).unwrap()).unwrap();
+            assert_eq!(entries[0].execution_context_blocker(), Some(reason));
+        }
+        let entries = parse_c_family_compilation_database(br#"[{"directory":"/build","file":"file.cpp","arguments":["clang++","-std=c++17","-Iinclude","file.cpp"]}]"#).unwrap();
+        assert_eq!(entries[0].execution_context_blocker(), None);
     }
 
     #[test]
