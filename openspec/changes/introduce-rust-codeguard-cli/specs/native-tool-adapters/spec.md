@@ -1292,3 +1292,11 @@ The standalone comments entry SHALL use the original frozen stdin Clang AST for 
 - **THEN** separately versioned feedback SHALL expose the policy positions without inventing a native diagnostic or claiming detailed qualification
 - **WHEN** the original tool is unavailable or the source changes during scanning
 - **THEN** placeholder observation SHALL be incomplete with no usable positions
+
+### Requirement: Placeholder consumption SHALL reject forged component associations
+
+Before exposing usable placeholder positions, the native probe SHALL validate the closed placeholder protocol against the same source-associated supported Clang structure. Positions SHALL match function byte offset, line and byte column; components SHALL refer only to observed nonempty purpose, applicable return or actual named parameter descriptions. Duplicate position/component pairs, unsupported declarations, unknown parameters and claimed native/trusted authority SHALL be rejected. This association validation SHALL NOT prove comment text from editable local reports; original AST/tool identity and consumed report binding remain required for future task import.
+
+#### Scenario: A forged return or parameter is inserted
+- **WHEN** a placeholder position names a void return, unknown parameter, foreign source token or duplicate component
+- **THEN** the validator SHALL reject it and the probe SHALL withdraw invalid placeholder observations instead of producing repair authority
