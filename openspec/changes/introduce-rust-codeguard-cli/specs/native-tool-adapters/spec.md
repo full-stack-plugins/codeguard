@@ -1232,3 +1232,11 @@ The adapter SHALL parse bounded compilation database bytes without filesystem ac
 #### Scenario: Distinct blockers across compilation configurations remain visible
 - **WHEN** multiple argument-vector entries have different known execution-context blockers
 - **THEN** observation SHALL retain each distinct per-entry blocker in unknown conditions, deduplicate identical reasons, and SHALL NOT stop reporting after the first entry or claim complete flag auditing
+
+### Requirement: C++ ordinary class methods SHALL retain partial documentation observations
+
+Clang documentation observation SHALL inspect non-implicit ordinary identifier-named methods inside explicit CXXRecordDecl contexts using the same frozen-source location, comment, parameter and supported return-type checks as ordinary functions. It SHALL retain unresolved class documentation and unsupported constructors, operators, templates and out-of-class method contexts rather than infer full C++ contract coverage. New method observations SHALL NOT grant semantic accuracy, exceptions/behavior qualification or production support.
+
+#### Scenario: Class member with missing documentation
+- **WHEN** an explicit C++ class contains a directly located ordinary method without a documentation comment
+- **THEN** the adapter SHALL retain its location and missing-comment observation while keeping class documentation unresolved and coverage unproven

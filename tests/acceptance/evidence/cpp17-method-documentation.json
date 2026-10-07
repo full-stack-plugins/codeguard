@@ -1,0 +1,69 @@
+{
+  "compiler_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+  "compiler_version": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin",
+  "native_ast_sha256": "bb780891570bdbc66c2b83ff0c4947455c4ef0772ea59fb43ce213d8d7066efb",
+  "observation": {
+    "authority": "local_unverified",
+    "coverage_proven": false,
+    "errors_and_behavior": "not_evaluated",
+    "functions": [
+      {
+        "column_byte": 5,
+        "comment_presence": "present",
+        "line": 5,
+        "missing_components": [],
+        "name": "read",
+        "offset_byte": 84,
+        "parameters": [
+          {
+            "description": "nonempty",
+            "index": 0,
+            "name": "x"
+          }
+        ],
+        "purpose_description": "nonempty",
+        "return_description": "nonempty",
+        "structure_status": "observed_supported_subset"
+      },
+      {
+        "column_byte": 6,
+        "comment_presence": "present",
+        "line": 7,
+        "missing_components": [],
+        "name": "clear",
+        "offset_byte": 121,
+        "parameters": [],
+        "purpose_description": "nonempty",
+        "return_description": "not_applicable",
+        "structure_status": "observed_supported_subset"
+      },
+      {
+        "column_byte": 5,
+        "comment_presence": "absent",
+        "line": 8,
+        "missing_components": [
+          "documentation_comment"
+        ],
+        "name": "undocumented",
+        "offset_byte": 134,
+        "parameters": [],
+        "purpose_description": "unknown",
+        "return_description": "unknown",
+        "structure_status": "observed_supported_subset"
+      }
+    ],
+    "observation_type": "clang_function_documentation_structure",
+    "qualification": "not_granted",
+    "schema_version": "0.1.0",
+    "semantic_accuracy": "not_evaluated",
+    "unresolved_declaration_kinds": [
+      "CXXConstructorDecl",
+      "CXXMethodDecl",
+      "CXXRecordDecl"
+    ]
+  },
+  "qualification": "not_granted",
+  "scope": "cpp17_ordinary_in_class_methods_only",
+  "source_sha256": "a8d5b93ced2efa3bcbdf6ae647df192652dd1a8daf2059b3410ce5140534a556",
+  "test_source_sha256": "8b6a58a8a4d1c2a62bb1089c70466be0dc73c0715c205cbc0addc2ececd551f8"
+}

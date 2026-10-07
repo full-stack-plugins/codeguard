@@ -13,11 +13,11 @@ pub fn parse_clang_documentation_ast(raw: &[u8], source: &[u8]) -> Result<Value,
     if ast["kind"] != "TranslationUnitDecl" {
         return Err("clang_documentation_ast_invalid");
     }
-    let mut stack = vec![(&ast, 0usize)];
+    let mut stack = vec![(&ast, 0usize, false)];
     let mut visited = 0;
     let mut functions = Vec::new();
     let mut unresolved = BTreeSet::new();
-    while let Some((node, depth)) = stack.pop() {
+    while let Some((node, depth, class_context)) = stack.pop() {
         visited += 1;
         if visited > 50_000 || depth > 64 {
             return Err("clang_documentation_ast_budget_exceeded");
@@ -28,16 +28,30 @@ pub fn parse_clang_documentation_ast(raw: &[u8], source: &[u8]) -> Result<Value,
         if node["isImplicit"] == true {
             continue;
         }
-        if kind == "FunctionDecl" {
+        let ordinary_method = kind == "CXXMethodDecl"
+            && class_context
+            && node["name"].as_str().is_some_and(|name| {
+                !name.is_empty()
+                    && name.bytes().enumerate().all(|(index, byte)| {
+                        byte.is_ascii_alphabetic()
+                            || byte == b'_'
+                            || (index > 0 && byte.is_ascii_digit())
+                    })
+            });
+        if kind == "FunctionDecl" || ordinary_method {
             functions.push(function(node, text)?);
             continue;
         }
         if matches!(
             kind,
-            "TranslationUnitDecl" | "NamespaceDecl" | "LinkageSpecDecl"
+            "TranslationUnitDecl" | "NamespaceDecl" | "LinkageSpecDecl" | "CXXRecordDecl"
         ) {
+            // 类本身的契约仍未核验；只扩展有明确类上下文的普通方法。
+            if kind == "CXXRecordDecl" {
+                unresolved.insert(kind.to_owned());
+            }
             for child in children(node)?.iter().rev() {
-                stack.push((child, depth + 1));
+                stack.push((child, depth + 1, kind == "CXXRecordDecl"));
             }
         } else if kind.ends_with("Decl")
             && !matches!(kind, "TypedefDecl" | "UsingDirectiveDecl" | "EmptyDecl")
