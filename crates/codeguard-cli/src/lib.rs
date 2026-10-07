@@ -444,6 +444,8 @@ mod elixir_dependency_scan;
 mod check_r_scan;
 mod r_dependency_scan;
 mod check_pascal_scan;
+mod check_solidity_scan;
+mod check_terraform_scan;
 mod pascal_dependency_scan;
 mod check_objc_scan;
 mod objc_dependency_scan;
