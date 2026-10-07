@@ -669,3 +669,4 @@ pub mod task_dependency_merge;
 pub mod repair_brief;
 pub mod process_lease;
 pub mod disposition_attribution;
+pub mod attempt_tracking;
