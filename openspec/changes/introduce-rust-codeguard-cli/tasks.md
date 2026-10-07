@@ -145,7 +145,7 @@
 
 依赖：S03、S04。覆盖：native-tool-adapters、language-gate-commands。
 
-- [ ] 5.1 实现 capability/discover/resolve/plan/parse/coverage/fix 协议与编译期注册；验收：adapter 不绕开运行时启动进程或联网。
+- [x] 5.1 实现 capability/discover/resolve/plan/parse/coverage/fix 协议与编译期注册；验收：adapter 不绕开运行时启动进程或联网。
 - [x] 5.2 实现工具解析、二进制身份、doctor 和 tool lock 验证；验收：wrapper/受管缓存/系统工具均匹配锁，缺工具返回恢复步骤。
   原生版本进展：统一 runtime 版本探测核对固定参数、工具前后字节、精确 stdout 与私有日志，共享截止时间；超时/取消/spawn/signal/超限/非零退出、版本/stderr/字节变化/日志失败分别保留诊断。现有 Ruff 启动阶段已复用，不完整时不扫描源码。真实 Ruff 0.16.8 版本调用验收与模拟故障分层；doctor CLI、可信锁、完整兼容/环境及准备报告仍缺，5.2/5.6 不勾选；见相邻 tests/acceptance/native-version-diagnostics.md。
 
