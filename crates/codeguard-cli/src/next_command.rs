@@ -16,9 +16,9 @@ const MAX_FACT_BYTES: u64 = 128 * 1024;
 const MAX_SOURCE_BYTES: u64 = 16 * 1024 * 1024;
 #[cfg(unix)]
 mod c_family_comments_candidate;
+mod c_family_placeholder_candidate;
 #[cfg(unix)]
 mod c_family_structure_candidate;
-mod c_family_placeholder_candidate;
 
 struct Arguments {
     root: PathBuf,
@@ -846,9 +846,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                     "Go整文件候选未发现package声明；先恢复适用原生Go lint或编译器确认完整文件范围，核对声明应属于哪个包。注释或字符串不算声明；不得凭候选删除函数、猜包名或关闭任务，原生确认后只修复目标源码并复检"
                 } else if fact["first_diagnostic_reason"]
                     .as_str()
-                    .is_some_and(
-                        crate::syntax_worker_candidate_observation::is_incomplete_syntax_reason,
-                    )
+                    .is_some_and(codeguard_core::is_incomplete_syntax_reason)
                 {
                     "固定 grammar 的恢复扫描未完成或错误无法定位；恢复适用原生 lint/编译器，对原始源码确认。原生确认合法时调查 grammar 版本/兼容性或扫描预算；原生诊断成立时才按真实位置修复。缺 adapter 提出具体能力决策；原生确认前不得修改源码，不虚构错误位置，不凭零恢复关闭任务"
                 } else {

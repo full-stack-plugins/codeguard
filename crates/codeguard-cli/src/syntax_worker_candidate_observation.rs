@@ -1,30 +1,12 @@
-use codeguard_core::SyntaxPrecheckOutcome;
+use codeguard_core::{
+    INCOMPLETE_REASON, REASON_PARSER_ERROR_UNLOCATED, REASON_SCAN_TRUNCATED, SyntaxPrecheckOutcome,
+};
 
 use crate::syntax_worker_recovery::SyntaxWorkerRecovery;
 
-/// 公开协议里表示“本轮候选初检未完成”的兼容 reason。
-///
-/// 已落盘的工作台报告与既有消费者只识别该值；把它替换成更精确的字符串会让按 reason
-/// 过滤的消费者静默丢掉本应保留的行。精确语义一律经 [`REASON_PARSER_ERROR_UNLOCATED`]
-/// 与 [`REASON_SCAN_TRUNCATED`] 细分字段表达，不改写兼容值本身。
-pub const INCOMPLETE_REASON: &str = "syntax_recovery_incomplete";
-
-/// 精确细分：解析树有错误但公开遍历无法定位；保持 unknown/incomplete 并要求原生确认。
-pub const REASON_PARSER_ERROR_UNLOCATED: &str = "parser_error_location_unavailable";
-
-/// 精确细分：观察预算截断，恢复节点不完整。
-pub const REASON_SCAN_TRUNCATED: &str = "scan_budget_truncated";
-
-/// 判定一个诊断原因是否属于“候选语法初检未完成”族。
-///
-/// 兼容值 [`INCOMPLETE_REASON`] 与两个精确细分都必须命中：工作台里既有历史 blocker
-/// 保存的是兼容值，新导入的报告可能带细分值。任何按字面量判断的消费者都应改用这里，
-/// 否则会把细分值当成未知类型，静默丢掉本应出现的指引正文。
-pub(crate) fn is_incomplete_syntax_reason(reason: &str) -> bool {
-    reason == INCOMPLETE_REASON
-        || reason == REASON_PARSER_ERROR_UNLOCATED
-        || reason == REASON_SCAN_TRUNCATED
-}
+/// 候选语法初检“未完成”原因的字面量契约定义在 codeguard-core：
+/// 消费方（工作台导入、next 指引、任务正文）在默认构建下也要用它，
+/// 不能依赖仅在 `wasm-precheck` 下存在的本模块。
 
 /// 经父进程核验的本轮候选语法观察；不具备原生 lint 或交付权威。
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -70,8 +52,8 @@ impl SyntaxWorkerCandidateObservation {
 #[cfg(test)]
 mod tests {
     use super::{
-        SyntaxWorkerCandidateObservation, INCOMPLETE_REASON, REASON_PARSER_ERROR_UNLOCATED,
-        REASON_SCAN_TRUNCATED,
+        INCOMPLETE_REASON, REASON_PARSER_ERROR_UNLOCATED, REASON_SCAN_TRUNCATED,
+        SyntaxWorkerCandidateObservation,
     };
     use codeguard_core::{SyntaxPrecheckOutcome, SyntaxPrecheckStatus};
 
@@ -134,7 +116,10 @@ mod tests {
             Some(REASON_PARSER_ERROR_UNLOCATED),
             "两种情况同时成立时必须暴露更具体的不可定位原因"
         );
-        assert_eq!(REASON_PARSER_ERROR_UNLOCATED, "parser_error_location_unavailable");
+        assert_eq!(
+            REASON_PARSER_ERROR_UNLOCATED,
+            "parser_error_location_unavailable"
+        );
         assert_eq!(REASON_SCAN_TRUNCATED, "scan_budget_truncated");
     }
 
@@ -149,7 +134,10 @@ mod tests {
         // 候选 grammar 未完成语言/方言验收前不得授予资格。
         assert!(!observation.grammar_qualified);
         // 状态保持 incomplete，不得因为范围覆盖完整就报 clean。
-        assert_eq!(observation.precheck.status, SyntaxPrecheckStatus::Incomplete);
+        assert_eq!(
+            observation.precheck.status,
+            SyntaxPrecheckStatus::Incomplete
+        );
         assert_eq!(observation.precheck.incomplete_files, 1);
         assert_eq!(
             observation.evaluation_incomplete_reason_detail(),

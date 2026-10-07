@@ -19,22 +19,22 @@ use crate::java_p3c_scan::finding_record;
 use crate::workspace_refresh::read_workspace_baseline;
 
 const MAX_REPORT_BYTES: u64 = 16 * 1024 * 1024;
-mod checkstyle_report;
 #[cfg(unix)]
 pub(crate) mod c_family_comments_report;
+pub(crate) mod c_family_placeholder_report;
 #[cfg(unix)]
 pub(crate) mod c_family_structure_report;
-pub(crate) mod c_family_placeholder_report;
+mod checkstyle_report;
+mod doctor_report;
+mod eslint_report;
+#[cfg(unix)]
+mod gradle_cve_report;
+#[cfg(unix)]
+mod gradle_javadoc_report;
 #[cfg(unix)]
 mod javadoc_report;
 #[cfg(unix)]
 mod maven_javadoc_report;
-#[cfg(unix)]
-mod gradle_javadoc_report;
-#[cfg(unix)]
-mod gradle_cve_report;
-mod doctor_report;
-mod eslint_report;
 mod npm_preparation_report;
 mod npm_report;
 mod python_cve_report;
@@ -2303,7 +2303,7 @@ fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
     if blocker
         .diagnostic_reason
         .as_deref()
-        .is_some_and(crate::syntax_worker_candidate_observation::is_incomplete_syntax_reason)
+        .is_some_and(codeguard_core::is_incomplete_syntax_reason)
     {
         return format!(
             "# {} 语法检查能力恢复任务\n\n- 问题证据：范围 `{}`；报告 `.codeguard/reports/{}.json`，摘要 `{}`；固定 grammar 的恢复扫描未完成或错误无法定位，恢复节点数组为空；报告保留源码和 grammar 身份，没有可用的源码错误位置。\n- 规则依据：初检完整性与原生确认要求；零恢复不能代表语法通过，本任务不是已确认源码违规。\n- 允许修改范围：适用检查工具、语言版本和 grammar 配置；原生确认前不得修改源码，不关闭检查器，不伪造定位。\n- 修复步骤：核对原报告的语言、版本与已知限制，恢复适用原生 lint/编译器并对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，原生诊断成立时才按真实位置修复。确认 adapter 缺失时提出具体能力决策，不重复无依据的源码修补。\n- 复检命令：codeguard task verify {} . --format=json；codeguard next . --format=json 显示当前能力缺口，恢复检查后再对同一范围复扫。\n- 历史尝试：首次 run {}；后续扫描和失败尝试保留在同一任务，正文不代表完整历史。\n- 关闭条件：同一源码范围的有效原生确认、完整覆盖及既有关闭策略均满足；安装、WASM 零恢复或勾选均不能关闭。\n",
