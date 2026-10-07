@@ -24,6 +24,7 @@ mod checkstyle_report;
 pub(crate) mod c_family_comments_report;
 #[cfg(unix)]
 pub(crate) mod c_family_structure_report;
+pub(crate) mod c_family_placeholder_report;
 #[cfg(unix)]
 mod javadoc_report;
 #[cfg(unix)]
@@ -629,6 +630,9 @@ fn parse_report(
             &crate::c_family_structure_task_recheck::normal(report),
             digest,
         );
+    }
+    if report["report_type"] == "clang_documentation_placeholder_workbench_observation" {
+        return c_family_placeholder_report::parse(root, workspace_id, path, report, digest);
     }
     if report["report_type"] == "clang_documentation_structure_workbench_observation" {
         return c_family_structure_report::parse(root, workspace_id, path, report, digest);

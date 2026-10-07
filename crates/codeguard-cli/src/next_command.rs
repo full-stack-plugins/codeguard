@@ -447,6 +447,9 @@ fn independent_source_task_index(root: &Path, candidates: &[Candidate]) -> Optio
 }
 
 fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static str> {
+    if matches!(fact["checker_id"].as_str(), Some("c.clang.documentation_placeholder" | "cpp.clang.documentation_placeholder")) {
+        return Err("clang_placeholder_task_workflow_not_integrated");
+    }
     #[cfg(unix)]
     if matches!(fact["checker_id"].as_str(),Some("c.clang.documentation_structure"|"cpp.clang.documentation_structure")) {
         return c_family_structure_candidate::candidate(root,id,fact);
