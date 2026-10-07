@@ -144,3 +144,44 @@ fn oversized_inputs_macro_locations_and_malformed_child_lists_are_rejected() {
             .is_err()
     );
 }
+
+#[test]
+fn parser_stops_at_report_function_and_parameter_limits() {
+    let mut source = String::new();
+    let mut declarations = Vec::new();
+    for index in 0..2001 {
+        let name = format!("f{index}");
+        let offset = source.len() + 4;
+        source.push_str(&format!("int {name}();\n"));
+        declarations.push(json!({"kind":"FunctionDecl","name":name,"loc":{"offset":offset,"tokLen":name.len()},"type":{"qualType":"int ()"}}));
+    }
+    let mut ast = json!({"kind":"TranslationUnitDecl","inner":declarations});
+    assert_eq!(
+        parse_clang_documentation_ast(&serde_json::to_vec(&ast).unwrap(), source.as_bytes()).err(),
+        Some("clang_documentation_ast_budget_exceeded")
+    );
+    ast["inner"].as_array_mut().unwrap().pop();
+    assert_eq!(
+        parse_clang_documentation_ast(&serde_json::to_vec(&ast).unwrap(), source.as_bytes())
+            .unwrap()["functions"]
+            .as_array()
+            .unwrap()
+            .len(),
+        2000
+    );
+    let source = "int f(int x);";
+    let mut ast = function(source, "f", vec![]);
+    let params: Vec<_> = (0..257)
+        .map(|index| json!({"kind":"ParmVarDecl","name":format!("x{index}")}))
+        .collect();
+    ast["inner"][0]["inner"] = json!(params);
+    assert_eq!(
+        parse_clang_documentation_ast(&serde_json::to_vec(&ast).unwrap(), source.as_bytes()).err(),
+        Some("clang_documentation_ast_budget_exceeded")
+    );
+    ast["inner"][0]["inner"].as_array_mut().unwrap().pop();
+    assert!(
+        parse_clang_documentation_ast(&serde_json::to_vec(&ast).unwrap(), source.as_bytes())
+            .is_ok()
+    );
+}
