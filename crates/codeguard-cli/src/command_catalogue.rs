@@ -290,7 +290,7 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             },
             executable: cfg!(unix),
             operation_kind: r#"check"#,
-            usage: r#"check <all|LANGUAGE_ID> [path] [--timeout DURATION] [--jobs N] [--format human|json|sarif] [--output PATH] [--gradle-owasp-task PATH --gradle-bundle ABS --java-home ABS --gradle-project-file FILE...]"#,
+            usage: r#"check <all|LANGUAGE_ID> [path] [--timeout DURATION] [--jobs N] [--format human|json|sarif] [--output PATH] [--gradle-owasp-task PATH --gradle-bundle ABS --java-home ABS --gradle-project-file FILE...] [--clang-tool ABS --c-standard c11 --cpp-standard c++17]"#,
             scope: r#"支持57个规范ID的选择；仅已接入节点执行，其它义务保持gap"#,
             languages: &[],
         },

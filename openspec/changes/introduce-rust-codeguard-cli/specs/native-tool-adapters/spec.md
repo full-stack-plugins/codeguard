@@ -1202,3 +1202,13 @@ Structural file-policy tasks SHALL use controlled leases and canonical repair-so
 - **WHEN** two ready-to-verify attempts receive original still_present structural rechecks for the same input context
 - **THEN** next SHALL expose the failed attempt history and stop repeating source repair
 - **AND** rescan, Markdown deletion and action renaming SHALL NOT remove or reset those failures
+
+
+### Requirement: Unified check SHALL schedule bounded C-family documentation without guessing project context
+
+check c/cpp/all SHALL expose original warning and structural documentation observations for selected discovered files. An explicitly selected compiler and language-specific standard SHALL be required for the current standalone profile; missing project/compiler context SHALL remain unconfigured, not a source violation. C and C++ jobs SHALL share the check deadline/cancellation/jobs limit and serialize compiler use. Each job SHALL limit files and aggregate report bytes. Stable input observations SHALL connect existing workbench tasks; changed scope/source/tool, cancellation or expired budget SHALL withdraw repair permissions and avoid new persistence. Uninitialized workspaces SHALL remain uninitialized.
+
+#### Scenario: Explicit native documentation context enters unified check
+- **WHEN** check selects discovered C/C++ source with an explicit original compiler and applicable c11/c++17 profile
+- **THEN** original native warning and structural facts SHALL be returned and current initialized workspaces SHALL receive stable tasks and original task-verification guidance
+- **AND** headers, preprocessing, full project options, detailed semantic accuracy and trusted closure SHALL remain distinct unresolved obligations

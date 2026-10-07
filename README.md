@@ -1147,3 +1147,14 @@ C/C++ structural rechecks now use the original compiler and standard through tas
 C/C++结构尝试更新：结构任务接入租约、repair-source尝试日志、ready后的原工具复检与同一输入两次失败预算。新brief0.33/task show0.7/绑定反馈0.9显示等待、必须复检或具体决策；重复扫描、删Markdown及重命名动作不能恢复预算。缺历史报告保持未验证，篡改事件拒绝。跨输入语义无进展、完整详细准确性/项目/平台/独立精度及可信关闭仍未验收。
 
 C/C++ structural tasks now use leases, repair-source journals, original rechecks after ready attempts and a two-failure budget for unchanged inputs. Brief0.33/task-show0.7/feedback0.9 show waiting, required verification or a concrete decision. Rescans, projection deletion and action renaming cannot reset failures; missing reports remain unverified and forged events are rejected. Cross-input semantic progress, full accuracy/context/platform/independent precision and trusted closure remain unqualified.
+
+### C/C++ documentation through unified check (current source, partial acceptance)
+
+```bash
+codeguard check all . --clang-tool /usr/bin/clang --c-standard c11 --cpp-standard c++17 --jobs 4 --format=json
+codeguard check c . --clang-tool /usr/bin/clang --c-standard c11 --format=json
+```
+
+These commands use the tested Apple Clang 21 standalone-source profile. `c.comments` and `cpp.comments` share the task graph deadline, cancellation and jobs; both serialize on the compiler resource. Each language observes at most 64 files with a 16 MiB aggregate feedback budget including task projections. Check feedback 0.72 exposes `native_results.c_family_comments`, missing context, not-started work and the unobserved tail. Header/preprocessor/full build context remains unknown.
+
+Original warnings and structural tasks connect only after project input revalidation. Changed source/tool/scope or cancellation withdraw current locations and next-step authority. An uninitialized project is not initialized implicitly; missing tools do not create source violations. JSON/human/SARIF retain local observations; SARIF distinguishes native findings from CodeGuard structural policy. Exit 3 or 130 for cancellation. Full accuracy/project coverage, trusted closure, hooks, platforms, independent precision and four-core production qualification remain open. See [acceptance evidence](tests/acceptance/check-c-family-documentation.md).

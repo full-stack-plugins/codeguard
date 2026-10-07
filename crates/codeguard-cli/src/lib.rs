@@ -562,3 +562,5 @@ mod cargo_audit_database_snapshot;
 mod c_family_structure_recheck_tests;
 
 mod c_family_structure_task_recheck;
+
+mod check_c_family_comments;
