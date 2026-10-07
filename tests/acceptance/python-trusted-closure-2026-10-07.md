@@ -47,3 +47,24 @@
 
 可信关闭/复发重开的核心机制已验证（9/10）。
 剩余 1 项是 `next` 命令与 verify 发现的关联问题，属于 P0-B 的待修复项。
+
+## 补充：next 命令的任务选择缺口（2026-10-07）
+
+验证发现：verify 后 `next` 应优先显示新发现（actionable finding），
+但当前实现总是优先显示 blocker（环境问题）。
+
+**预期行为**：
+1. 环境正常时（ruff.toml 存在）：`next` 显示 finding（actionable）
+2. 环境退化时（ruff.toml 移除）：`next` 显示 blocker（needs_decision）
+
+**实际行为**：
+- 环境正常时：`next` 显示 blocker（needs_decision）❌
+- 环境退化时：`next` 显示 blocker（needs_decision）✅
+
+**根因**：任务选择按 priority 排序（blocker priority=0 < finding priority=2），
+不考虑环境状态。需要上下文感知的排序逻辑。
+
+**影响**：verify 后的新发现不能通过 `next` 引导修复。
+
+**修复方向**：排序应根据环境状态动态调整——环境正常时优先 finding，
+环境退化时优先 blocker。这需要在排序时检查当前环境配置。
