@@ -1586,3 +1586,6 @@ C/C++ documentation repair-hook source update: `repair_ready` restores the origi
 
 
 Confirmed C/C++ file edits now expose a bounded documentation observation through `hook execute PATH --clang-tool ABS --c-standard c11 --cpp-standard c++17 --format=json`. The event remains stdin JSON; it is not inferred from the flags. Missing tool/standard stays `context_required`. Native warnings and Codeguard structural policy remain distinct; documentation does not erase native syntax gaps or qualify delivery. The entry checks selected standalone sources, not project compile commands or headers. Repair-ready verification still restores the original task standard and rejects these edit-profile overrides. This is a CLI protocol candidate, not installed-host acceptance.
+
+
+The Claude protocol adapter now projects C/C++ edit documentation observations into bounded conversation guidance: current native rules/positions, separate structural policy, and validated task references. It suppresses source/comment text and stale positions; clean local observations do not request source edits or close historical tasks. Controlled PostToolUse tests with existing Clang do not establish installed-host acceptance or automatic configuration discovery.
