@@ -26,6 +26,15 @@ pub(crate) fn observe<P: ObservationPort>(
             reason = match parse_c_family_compilation_database(&bytes) {
                 Ok(entries) => {
                     parsed = true;
+                    let blockers: std::collections::BTreeSet<_> = entries
+                        .iter()
+                        .filter_map(|entry| entry.execution_context_blocker())
+                        .collect();
+                    for blocker in &blockers {
+                        report
+                            .unknown_conditions
+                            .push(format!("{blocker}:{relative}"));
+                    }
                     entries
                         .iter()
                         .find_map(|entry| entry.execution_context_blocker())
@@ -43,9 +52,10 @@ pub(crate) fn observe<P: ObservationPort>(
         report.observation_complete = false;
         report.blocked_paths.push(relative.into());
     }
-    report
-        .unknown_conditions
-        .push(format!("{reason}:{relative}"));
+    let condition = format!("{reason}:{relative}");
+    if !report.unknown_conditions.contains(&condition) {
+        report.unknown_conditions.push(condition);
+    }
     let build_root = relative.rsplit_once('/').map_or(".", |(parent, _)| parent);
     report.checker_configurations.push(CheckerConfiguration {
         build_root: build_root.into(),
@@ -108,6 +118,41 @@ mod tests {
         assert_eq!(report.checker_configurations[0].build_root, "build");
         assert!(report.declared_versions.is_empty());
         assert!(report.build_roots.is_empty());
+    }
+
+    #[test]
+    fn multiple_compilation_contexts_keep_each_distinct_blocker() {
+        let mut report = crate::discovery::empty_report(Path::new("project"));
+        let observation = DatabaseObservation {
+            bytes: br#"[
+              {"directory":"/a","file":"a.cpp","arguments":["clang++","-std=c++17","@flags.rsp"]},
+              {"directory":"/b","file":"a.cpp","arguments":["clang++","a.cpp"]},
+              {"directory":"/c","file":"a.cpp","arguments":["clang++","-std=c++17","@other.rsp"]}
+            ]"#,
+            changed: false,
+            reads: Cell::new(0),
+        };
+        super::observe(
+            &mut report,
+            &observation,
+            Path::new("project/compile_commands.json"),
+            "compile_commands.json",
+        );
+        for reason in [
+            "compilation_database_response_file_unresolved",
+            "compilation_database_standard_missing",
+        ] {
+            assert_eq!(
+                report
+                    .unknown_conditions
+                    .iter()
+                    .filter(|entry| *entry == &format!("{reason}:compile_commands.json"))
+                    .count(),
+                1
+            );
+        }
+        assert_eq!(report.checker_configurations[0].configuration, "unknown");
+        assert!(report.observation_complete);
     }
 
     #[test]

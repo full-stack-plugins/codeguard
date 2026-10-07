@@ -1228,3 +1228,7 @@ The adapter SHALL parse bounded compilation database bytes without filesystem ac
 #### Scenario: Static compilation arguments expose unresolved execution context
 - **WHEN** the argument vector uses response files, frontend passthrough, compiler plugins or ambiguous/missing/unsupported explicit standards
 - **THEN** initialization SHALL preserve configuration unknown and execution not_run, expose a concrete context blocker, and SHALL NOT classify that blocker as a source violation. No known blocker SHALL NOT imply execution authorization or verified project coverage.
+
+#### Scenario: Distinct blockers across compilation configurations remain visible
+- **WHEN** multiple argument-vector entries have different known execution-context blockers
+- **THEN** observation SHALL retain each distinct per-entry blocker in unknown conditions, deduplicate identical reasons, and SHALL NOT stop reporting after the first entry or claim complete flag auditing
