@@ -685,3 +685,4 @@ pub mod status_disposition;
 pub mod unified_command;
 pub mod service_boundary;
 pub mod kotlin_applicability;
+pub mod language_applicability;
