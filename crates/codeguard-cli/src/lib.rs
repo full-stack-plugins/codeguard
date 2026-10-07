@@ -674,3 +674,4 @@ pub mod profile_refresh;
 pub mod quality_config_mapping;
 pub mod init_readiness;
 pub mod token_generation;
+pub mod rules_config_commands;
