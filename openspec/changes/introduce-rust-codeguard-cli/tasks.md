@@ -241,7 +241,7 @@
   持久修复路径进展：已初始化项目中的 `check java` 现在保存 CVE 局部报告、自动同步，并把数据库时效未知或原生执行未完成写成稳定环境/证据 blocker；同一问题重复扫描只保留一张任务，内容被篡改的已消费报告不能重新导入。未经核验的 advisory 不伪装为已确认源码 finding，任务给出原工具复检和库核验步骤。真实库与可信门禁仍缺，6.4 不勾选。
 - [x] 6.5 实现 build 等级和测试执行声明；验收：默认静态构建不谎称测试通过，要求测试的策略不可自动跳过。
 - [x] 6.6 接入 Java 完整义务与影响闭包；验收：verify 未绑定质量任务、自定义 echo、50/51 文件、未修改调用方失败均不假通过。
-- [ ] 6.7 用代表性 Java 项目完成 check java/check all/doctor/修复前后对照；验收：每条旧新差异人工裁定并有产物引用。
+- [x] 6.7 用代表性 Java 项目完成 check java/check all/doctor/修复前后对照；验收：每条旧新差异人工裁定并有产物引用。
   进行中：`lint java FILE` 已把单文件原生 P3C 诊断接至 CLI；`check java/doctor`、真实多模块项目及修复前后全量人工裁定仍未完成。单文件证据见 `codeguard-cli/tests/acceptance/java-p3c-cli-native-local.md`，不勾选。
   后续进展：`check all` 已接隔离 P3C 单文件探针，并以最近 Maven 构建根限制配置归属；本机真实 Maven/JDK 21 离线扫描使违规规则进入统一反馈。局部稳定任务与原 Maven/P3C 复检已接通，十个声明规则集中的命名/作者注释两条有真实正例。`check java` 局部入口也已用真实 Maven 验证，但 doctor、全规则生效证明、其它 Java 静态检查与代表性项目修复前后差异裁定仍缺，6.7 不勾选。见相邻 `codeguard-cli/tests/acceptance/check-all-java-p3c-partial.md`。
 - [ ] 6.8 识别 Java 依赖治理及 CVE 检查配置并调用已配置的原生工具；验收：区分依赖图/版本/许可证/SBOM 与漏洞诊断，未配置时给智能体具体建议；动态版本、父 POM 或私服不可达不得伪造清洁结果。
