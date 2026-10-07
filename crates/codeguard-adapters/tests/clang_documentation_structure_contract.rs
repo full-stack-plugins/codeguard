@@ -78,7 +78,7 @@ fn actual_cpp17_ast_retains_method_descriptions_and_unsupported_contracts() {
         String::from_utf8_lossy(&version.stdout)
             .starts_with("Apple clang version 21.0.0 (clang-2100.3.34.2)")
     );
-    let source = b"struct Box {\n/// Read a value.\n/// @param x Input value.\n/// @return The value.\nint read(int x);\n/// Clear the box.\nvoid clear();\nint undocumented();\nBox();\nint operator+(int x);\n};\n";
+    let source = b"struct Box {\n/// Read a value.\n/// @param x Input value.\n/// @return The value.\nint read(int x);\n/// Clear the box.\nvoid clear();\nint undocumented();\n/// Create the box.\n/// @param size Initial size.\nBox(int size);\nint operator+(int x);\n};\n";
     let mut child = Command::new(&clang)
         .args([
             "-fsyntax-only",
@@ -108,8 +108,8 @@ fn actual_cpp17_ast_retains_method_descriptions_and_unsupported_contracts() {
         "{observed}"
     );
     let functions = observed["functions"].as_array().unwrap();
-    assert_eq!(functions.len(), 3, "{observed}");
-    for name in ["read", "clear"] {
+    assert_eq!(functions.len(), 4, "{observed}");
+    for name in ["read", "clear", "Box"] {
         let method = functions.iter().find(|m| m["name"] == name).unwrap();
         assert_eq!(method["missing_components"], json!([]));
     }
@@ -121,7 +121,7 @@ fn actual_cpp17_ast_retains_method_descriptions_and_unsupported_contracts() {
         undocumented["missing_components"],
         json!(["documentation_comment"])
     );
-    for kind in ["CXXRecordDecl", "CXXConstructorDecl", "CXXMethodDecl"] {
+    for kind in ["CXXRecordDecl", "CXXMethodDecl"] {
         assert!(
             observed["unresolved_declaration_kinds"]
                 .as_array()
@@ -137,7 +137,7 @@ fn actual_cpp17_ast_retains_method_descriptions_and_unsupported_contracts() {
         assert!(path.is_absolute());
         let evidence = json!({
             "qualification":"not_granted",
-            "scope":"cpp17_ordinary_in_class_methods_only",
+            "scope":"cpp17_ordinary_in_class_methods_and_explicit_constructors",
             "source_sha256":format!("{:x}", Sha256::digest(source)),
             "test_source_sha256":format!("{:x}", Sha256::digest(include_bytes!("clang_documentation_structure_contract.rs"))),
             "compiler_version":String::from_utf8_lossy(&version.stdout).trim(),
@@ -147,4 +147,43 @@ fn actual_cpp17_ast_retains_method_descriptions_and_unsupported_contracts() {
         });
         std::fs::write(path, serde_json::to_vec_pretty(&evidence).unwrap()).unwrap();
     }
+}
+
+#[test]
+fn explicit_constructor_requires_parameters_but_never_invents_return_contract() {
+    let source = b"struct Box { Box(int size); };";
+    let offset = source.windows(3).rposition(|w| w == b"Box").unwrap();
+    let constructor = json!({"kind":"CXXConstructorDecl","name":"Box","loc":{"offset":offset,"tokLen":3},"type":{"qualType":"void (int)"},"inner":[
+        {"kind":"ParmVarDecl","name":"size"},
+        {"kind":"FullComment","inner":[
+            {"kind":"ParagraphComment","inner":[{"kind":"TextComment","text":"Create the box."}]},
+            {"kind":"ParamCommandComment","param":"size","paramIdx":0,"inner":[{"kind":"ParagraphComment","inner":[{"kind":"TextComment","text":"Initial size."}]}]}
+        ]}
+    ]});
+    let mut ast = json!({"kind":"TranslationUnitDecl","inner":[{"kind":"CXXRecordDecl","name":"Box","inner":[constructor.clone()]}]});
+    let observed =
+        parse_clang_documentation_ast(&serde_json::to_vec(&ast).unwrap(), source).unwrap();
+    assert_eq!(observed["functions"].as_array().unwrap().len(), 1);
+    assert_eq!(
+        observed["functions"][0]["return_description"],
+        "not_applicable"
+    );
+    assert_eq!(observed["functions"][0]["missing_components"], json!([]));
+    assert!(valid_clang_documentation_structure(&observed, Some(source)));
+    ast["inner"][0]["inner"][0]["inner"][1]["inner"][1]["inner"][0]["inner"][0]["text"] =
+        json!(" ");
+    let observed =
+        parse_clang_documentation_ast(&serde_json::to_vec(&ast).unwrap(), source).unwrap();
+    assert_eq!(
+        observed["functions"][0]["missing_components"],
+        json!(["parameter:size"])
+    );
+    let outside = json!({"kind":"TranslationUnitDecl","inner":[constructor]});
+    let observed =
+        parse_clang_documentation_ast(&serde_json::to_vec(&outside).unwrap(), source).unwrap();
+    assert_eq!(observed["functions"], json!([]));
+    assert_eq!(
+        observed["unresolved_declaration_kinds"],
+        json!(["CXXConstructorDecl"])
+    );
 }
