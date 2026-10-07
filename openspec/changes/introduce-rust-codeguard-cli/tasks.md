@@ -197,7 +197,7 @@
 
 依赖：S05。覆盖：native-tool-adapters、language-gate-commands。
 
-- [ ] 6.1 实现 Maven/Gradle/JDK/wrapper/profile/module/source-set 观察；验收：多模块、父 POM、动态未知范围与错误 JDK 有真实样本。
+- [x] 6.1 实现 Maven/Gradle/JDK/wrapper/profile/module/source-set 观察；验收：多模块、父 POM、动态未知范围与错误 JDK 有真实样本。
   探测诊断进展：Maven 版本阶段现区分运行时超时/启动前预算耗尽/无法启动/取消/输出及管道故障等原因。两个新反例先暴露通用错误提示，再通过具体原因返回；失败不启动 validate，不产生源码违规。原全量回归的 bundle mutation 偶发失败仍需具体原因复现才能归因，不能凭单独重跑推断解决。
 
   进行中：相邻 `codeguard-cli/crates/codeguard-cli/src/maven_probe.rs` 已通过统一 Rust runtime 调用 Maven 原生 `--version` 和离线 `validate`，复核启动脚本与 POM 内容，并对真实 POM 4.1 错误、无质量绑定 POM 的 validate 成功分别留局部证据；见 `codeguard-cli/tests/acceptance/maven-native-probe.md`。Maven 发行包/JDK 身份锁、Gradle、wrapper、profile、多模块、父 POM 与动态范围仍未完成，不能勾选 6.1 或把 validate 当质量通过。
@@ -547,7 +547,7 @@
 
 - [ ] 10.1 实现 dry-run 计划与隔离副本修复、变化清单；验收：只读请求不改源码，计划包含内容身份与副作用范围。
 - [ ] 10.2 实现前置哈希核对和受控 patch 应用；验收：用户并发编辑不被覆盖，路径逃逸不执行。
-- [ ] 10.3 实现同策略复检和修复归因；验收：noop/失败后部分修改/复检器副作用分别呈现，不虚报 fixed。
+- [x] 10.3 实现同策略复检和修复归因；验收：noop/失败后部分修改/复检器副作用分别呈现，不虚报 fixed。
 - [ ] 10.4 将依赖升级和规则调整分开；验收：修 CVE 不自动放松阈值，修 lint 不关闭规则或更改测试真值。
 - [ ] 10.5 实现fix的task/owner/token接入及租约所有权；验收：复用已领取任务不重复attempt，批量租约冲突在应用前失败，dry-run不消耗预算，verify关闭原问题时仍保留新发现。
 
