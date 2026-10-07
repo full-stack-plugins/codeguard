@@ -663,3 +663,4 @@ pub mod run_config;
 pub mod baseline_classification;
 pub mod init_dry_run;
 pub mod artifact_scope;
+pub mod finding_identity;
