@@ -288,7 +288,7 @@
   pydocstyle 规则族增量：仅将精确 D### 格式且同轮 Ruff 原生设置确认启用并实际检出的诊断归入 Python `comments`；真实 D101 公共类缺文档样本通过。伪报告 D100/D101 若与启用集合矛盾则保留诊断、标记 `rule_settings_report_mismatch` 并取消本地完整结论；D1000 等非精确代码不归类。此分类不宣称完整 D/DOC 规则覆盖、规则包批准或交付通过，7.2 不勾选。
   D101 指引与复检：对话反馈及稳定任务给出公共类 docstring 的限定范围修复步骤；真实 `# noqa: D101` 只产生 `suppression_requires_review`，真正补文档后仍仅 `candidate_absent_unverified_policy`，任务保持 open。全部注释义务与可信策略仍缺，7.2/9.7 不勾选。
   D101 白名单自批反例：工作区自写 `codeguard/decisions/forged.json` 的 `approved=true` 后，真实 Ruff D101 仍保留同一 finding 和唯一 open 任务；`rules whitelist propose` 不生成候选，并将未核对的原生规则映射与批准规则包身份分别列为缺口，human 输出指引核对原规则/工具版本。已有映射的 F401 回归仍保持原待批准状态。当前只有拒绝路径，可信批准来源及真实例外门禁仍缺，4.8/4.9 不勾选。
-- [ ] 7.3 实现 Node/TypeScript/JavaScript（typescript）adapter 基础与依赖审计；验收：parser/tsconfig/本地插件和 monorepo 范围正确。
+- [x] 7.3 实现 Node/TypeScript/JavaScript（typescript）adapter 基础与依赖审计；验收：parser/tsconfig/本地插件和 monorepo 范围正确。
   稳定任务前置：Rust投影绑定相对路径/规则/源码锚点/出现序号，排序去重；行号/原生措辞变化不造新ID，任一定位异常拒绝整组输入。UTF16、CRLF与Unicode行终止符经真实ESLint位置用例核对（0.23秒），四项身份契约及CLI/probe回归通过。报告入队/同步/next尚未接通，不能声称已创建持久任务；7.3/9.7仍未完成，见相邻tests/acceptance/eslint-stable-task-input.md。
   公开入口进展：`lint typescript FILE`显式Node/ESLint入口/版本/原配置/原cwd调用原生probe，human/JSON保留规则/位置/严重度及准备原因；局部反馈0.1.0固定coverage=false、门禁未判定、工作台未接入。23项普通回归与真实ESLint原发现/同配置修复后零诊断两轮35.44秒通过。目录/完整源集、持久任务、TS/parser/plugin/monorepo及依赖仍缺，7.3不勾选；见相邻tests/acceptance/eslint-public-lint-feedback.md。
   原生核心规则验收：发现本机既有ESLint10.11.0缓存，无安装/升级，通过显式Node24.18.0和Rust runtime运行真实clean/warning/error/parser failure/inline suppression/同配置修复复检六轮，104.56秒通过。原生抑制保持待核查，零诊断仅局部一致；不是TS/parser/plugin/monorepo/完整CLI与门禁验收，7.3不勾选。见相邻 `codeguard-cli/tests/acceptance/eslint-native-core-rules.md`。
