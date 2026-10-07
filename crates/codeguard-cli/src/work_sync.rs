@@ -631,6 +631,18 @@ fn parse_report(
             digest,
         );
     }
+    if report["report_type"] == "clang_documentation_placeholder_task_recheck" {
+        if !crate::c_family_placeholder_task_recheck::valid_shape(root, report) {
+            return Err("clang_placeholder_recheck_invalid");
+        }
+        return c_family_placeholder_report::parse(
+            root,
+            workspace_id,
+            path,
+            &crate::c_family_placeholder_task_recheck::normal(report),
+            digest,
+        );
+    }
     if report["report_type"] == "clang_documentation_placeholder_workbench_observation" {
         return c_family_placeholder_report::parse(root, workspace_id, path, report, digest);
     }
