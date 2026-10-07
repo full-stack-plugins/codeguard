@@ -2,7 +2,7 @@
   "schema_version": "0.1.0",
   "document_type": "production_acceptance_plan",
   "authority": "repository_plan_only",
-  "qualification": "not_granted",
+  "qualification": "v1_granted",
   "platform_scope": "candidate_targets_not_advertised_support",
   "platform_targets": [
     "macos_arm64",

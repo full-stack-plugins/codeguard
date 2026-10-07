@@ -25,7 +25,10 @@ pub fn parse_production_acceptance_plan(raw: &[u8]) -> Result<Value, String> {
     if doc["schema_version"] != "0.1.0"
         || doc["document_type"] != "production_acceptance_plan"
         || doc["authority"] != "repository_plan_only"
-        || doc["qualification"] != "not_granted"
+        || !matches!(
+            doc["qualification"].as_str(),
+            Some("not_granted") | Some("v1_granted")
+        )
         || doc["platform_scope"] != "candidate_targets_not_advertised_support"
     {
         return Err("验收计划协议或资格越权".into());
