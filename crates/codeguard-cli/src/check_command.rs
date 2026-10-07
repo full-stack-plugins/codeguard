@@ -2656,221 +2656,25 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
         "next":next,
         "export":{"status":"not_requested","reason_code":null}
     });
-    if !c_paths.is_empty() {
-        report["native_results"]["c_family_comments"] = c_family_comments;
-    }
-    if gradle_cve_requested {
-        report["native_results"]["java_gradle_cve"] = java_gradle_cve;
-        report["gradle_cve_tasks"] = gradle_cve_tasks;
-    }
-    if gradle_requested {
-        report["native_results"][gradle_result_key] = java_gradle_model;
-    }
-    if matches!(
-        report["schema_version"].as_str(),
-        Some("0.67.0" | "0.68.0" | "0.69.0" | "0.70.0" | "0.71.0" | "0.72.0")
-    ) {
-        report["gradle_javadoc_tasks"] = gradle_javadoc_tasks;
-    }
-    if zig_lint.is_object()
-        || matches!(
-            report["schema_version"].as_str(),
-            Some(
-                "0.47.0"
-                    | "0.48.0"
-                    | "0.49.0"
-                    | "0.50.0"
-                    | "0.51.0"
-                    | "0.52.0"
-                    | "0.53.0"
-                    | "0.54.0"
-                    | "0.55.0"
-                    | "0.56.0"
-                    | "0.57.0"
-                    | "0.58.0"
-                    | "0.59.0"
-                    | "0.60.0"
-                    | "0.61.0"
-                    | "0.62.0"
-                    | "0.63.0"
-                    | "0.64.0"
-                    | "0.65.0"
-                    | "0.67.0"
-                    | "0.68.0"
-                    | "0.69.0"
-                    | "0.70.0"
-                    | "0.71.0"
-                    | "0.72.0"
-            )
-        )
-    {
-        report["native_results"]["zig_lint"] = zig_lint.clone();
-    }
-    // 历史报告维持封闭协议；只有新 Kotlin 报告携带新增原生字段。
-    if !matches!(
-        report["schema_version"].as_str(),
-        Some(
-            "0.42.0"
-                | "0.43.0"
-                | "0.44.0"
-                | "0.45.0"
-                | "0.46.0"
-                | "0.47.0"
-                | "0.48.0"
-                | "0.49.0"
-                | "0.50.0"
-                | "0.51.0"
-                | "0.52.0"
-                | "0.53.0"
-                | "0.54.0"
-                | "0.55.0"
-                | "0.56.0"
-                | "0.57.0"
-                | "0.58.0"
-                | "0.59.0"
-                | "0.60.0"
-                | "0.61.0"
-                | "0.62.0"
-                | "0.63.0"
-                | "0.64.0"
-                | "0.65.0"
-                | "0.67.0"
-                | "0.68.0"
-                | "0.69.0"
-                | "0.70.0"
-                | "0.71.0"
-                | "0.72.0"
-        )
-    ) {
-        if let Some(native) = report["native_results"].as_object_mut() {
-            native.remove("kotlin_lint");
-        }
-    }
-    // 防御性冗余：kotlin_lint 现在只经 check_native_results::assemble 进入报告，而该函数
-    // 保证 null 不产生槽位，因此这条判断当前不可达。保留它是为了兜住 2651 之后那些直接写
-    // report["native_results"] 的条件插入点——将来若有人绕过装配直接写入 null，这里仍能拦住。
-    // 槽位存在性规则本身以 assemble 为唯一事实源，不要在这里新增语言专属规则。
-    if report["native_results"]["kotlin_lint"].is_null() {
-        if let Some(native) = report["native_results"].as_object_mut() {
-            native.remove("kotlin_lint");
-        }
-    }
-    if !matches!(
-        report["schema_version"].as_str(),
-        Some(
-            "0.43.0"
-                | "0.44.0"
-                | "0.45.0"
-                | "0.46.0"
-                | "0.47.0"
-                | "0.48.0"
-                | "0.49.0"
-                | "0.50.0"
-                | "0.51.0"
-                | "0.52.0"
-                | "0.53.0"
-                | "0.54.0"
-                | "0.55.0"
-                | "0.56.0"
-                | "0.57.0"
-                | "0.58.0"
-                | "0.59.0"
-                | "0.60.0"
-                | "0.61.0"
-                | "0.62.0"
-                | "0.63.0"
-                | "0.64.0"
-                | "0.65.0"
-                | "0.67.0"
-                | "0.68.0"
-                | "0.69.0"
-                | "0.70.0"
-                | "0.71.0"
-                | "0.72.0"
-        )
-    ) {
-        if let Some(native) = report["native_results"].as_object_mut() {
-            native.remove("swift_lint");
-        }
-    }
-    if matches!(
-        report["schema_version"].as_str(),
-        Some(
-            "0.51.0"
-                | "0.52.0"
-                | "0.53.0"
-                | "0.54.0"
-                | "0.55.0"
-                | "0.56.0"
-                | "0.57.0"
-                | "0.58.0"
-                | "0.59.0"
-                | "0.60.0"
-                | "0.61.0"
-                | "0.62.0"
-                | "0.63.0"
-                | "0.64.0"
-                | "0.65.0"
-                | "0.67.0"
-                | "0.68.0"
-                | "0.69.0"
-                | "0.70.0"
-                | "0.71.0"
-                | "0.72.0"
-        )
-    ) {
-        report["native_results"]["ruby_lint"] = ruby_lint.clone();
-    }
-    if matches!(
-        report["schema_version"].as_str(),
-        Some(
-            "0.52.0"
-                | "0.53.0"
-                | "0.54.0"
-                | "0.55.0"
-                | "0.56.0"
-                | "0.57.0"
-                | "0.58.0"
-                | "0.59.0"
-                | "0.60.0"
-                | "0.61.0"
-                | "0.62.0"
-                | "0.63.0"
-                | "0.64.0"
-                | "0.65.0"
-                | "0.67.0"
-                | "0.68.0"
-                | "0.69.0"
-                | "0.70.0"
-                | "0.71.0"
-                | "0.72.0"
-        )
-    ) {
-        report["native_results"]["shell_lint"] = shell_lint.clone();
-    }
-    if lint_only {
-        report["requested_categories"] = json!(["lint"]);
-        // 全量历史同步保留其它类别事实，但本次简报不能指导执行独立CVE/构建/注释任务。
-        if report["next"]["repair_brief"]["checker_id"]
-            .as_str()
-            .is_some_and(|checker| {
-                !matches!(
-                    checker,
-                    "python.ruff"
-                        | "python.ruff.doctor"
-                        | "rust.cargo_clippy"
-                        | "node.eslint"
-                        | "node.eslint.preparation"
-                        | "java.maven.p3c"
-                        | "go.vet"
-                        | "shell.shellcheck"
-                        | "syntax.native_confirmation"
-                )
-            })
-        {
-            report["next"] = Value::Null;
-        }
-    }
+    // 报告形状决策：条件槽位、schema_version 兼容修剪、lint_only 收窄。
+    // 逻辑在 check_report_assembly 模块，此处只传入决定形状的条件与结果。
+    crate::check_report_assembly::finalize(&mut report, crate::check_report_assembly::ReportShapeInput {
+        c_paths_nonempty: !c_paths.is_empty(),
+        c_family_comments,
+        gradle_cve_requested,
+        gradle_requested,
+        gradle_result_key: &gradle_result_key,
+        java_gradle_cve,
+        gradle_cve_tasks,
+        java_gradle_model,
+        gradle_javadoc_tasks,
+        zig_lint,
+        ruby_lint,
+        shell_lint,
+        kotlin_lint,
+        swift_lint,
+        lint_only,
+    });
     if parsed.format != OutputFormat::Human {
         emit_structured(&report, &parsed);
     } else {
