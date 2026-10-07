@@ -114,3 +114,45 @@ C# 的 WASM grammar 有真实局限性，需依赖原生工具。
 **Section 8 核心验证完成率：191/219 = 87%**
 
 剩余 28 个忽略测试需外部工具（golangci-lint/govulncheck/SwiftLint/RuboCop 等）。
+
+## 补充：C 和 Erlang 验收（2026-10-07）
+
+| 语言 | 测试数 | 通过 | 忽略 | 状态 |
+|---|---|---|---|---|
+| **C/C++** | 35 | **25** | 10 | ✅ |
+| **Erlang** | 76 | **67** | 9 | ✅ |
+
+### C/C++ (8.25-8.30) ✅
+- c_family_comments_cli: 8 passed
+- c_family_comments_workbench: 15 passed
+- c_family_documentation_edit_hook: 1 passed
+- c_family_native_replay: 1 passed
+
+### Erlang (8.133-8.135) ✅
+- check_all_erlang: 11 passed
+- erlang_form_candidates: 1 passed
+- erlang_form_workbench: 3 passed
+- erlang_lint_cli: 11 passed
+- erlang_native_differential: 1 passed
+- erlang_native_discovery: 5 passed
+- erlang_native_workbench: 13 passed
+- erlang_syntax_task_verify: 13 passed
+- erlang_task_resolution_service: 9 passed
+
+---
+
+## Section 8 最终汇总（2026-10-07）
+
+| 语言 | 测试数 | 通过 | 忽略 | 状态 |
+|---|---|---|---|---|
+| **Go** | 64 | **53** | 11 | ✅ |
+| **Kotlin** | 29 | **26** | 3 | ✅ |
+| **Swift** | 32 | **29** | 3 | ✅ |
+| **Ruby** | 40 | **36** | 4 | ✅ |
+| **Zig** | 26 | **22** | 4 | ✅ |
+| **Shell** | 28 | **25** | 3 | ✅ |
+| **C/C++** | 35 | **25** | 10 | ✅ |
+| **Erlang** | 76 | **67** | 9 | ✅ |
+| **总计** | **330** | **283** | **47** | **86%** |
+
+**Section 8 核心验证完成率：283/330 = 86%**
