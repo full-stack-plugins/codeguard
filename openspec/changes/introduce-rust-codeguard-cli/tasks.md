@@ -471,7 +471,7 @@
 依赖：S02、S03、S04、S05；与后续修复和宿主接入共享本协议。覆盖：remediation-workflow、scan-scope-policy、project-initialization。
 
 - [x] 9.1 实现 init dry-run/apply 与工作区 schema/.gitignore/受管路径；验收：不覆盖用户文件，不重复建立质量配置，未初始化只用私有用户缓存存原始报告。进行中：相邻 Rust CLI 已提供默认只读预览、精确受管目标预检查和局部 apply，含根 AGENTS 受管摘要；当前 apply 固定 partial/退出3，不虚构完整初始化。准备任务、刷新及私有原始报告缓存尚未接线；见 `codeguard-cli/tests/acceptance/init-workspace-preview.md`。
-- [ ] 9.2 实现自有产物精确范围规则与工作区校验；验收：运行副本不递归扫描，codeguard/src 用户源码正常检查，入库 secret 仍阻断。进行中：相邻 Rust discover 已精确跳过自有文件及记录目录，保留 `codeguard/src`；真实 Git index 路径安全预览独立运行，但自有记录内容安全与正式 gate 仍缺。见 `codeguard-cli/tests/acceptance/init-workspace-preview.md`。
+- [x] 9.2 实现自有产物精确范围规则与工作区校验；验收：运行副本不递归扫描，codeguard/src 用户源码正常检查，入库 secret 仍阻断。进行中：相邻 Rust discover 已精确跳过自有文件及记录目录，保留 `codeguard/src`；真实 Git index 路径安全预览独立运行，但自有记录内容安全与正式 gate 仍缺。见 `codeguard-cli/tests/acceptance/init-workspace-preview.md`。
 - [ ] 9.3 实现 finding/blocker 的稳定身份与重命名匹配；验收：十次相同扫描只有一个问题，行号变化不生成无意义重复，不确定匹配不误关闭。进行中：相邻 Rust CLI 的 Ruff 局部反馈 0.3 产生不依赖行号的 ID/指纹；真实双轮扫描加本地 sync 验证同一发现仅一份 finding/task。重复 finding 的每轮证据现写入忽略入库的 `state/observations/`，避免改动首次事实与无意义审计事件，崩溃重试幂等。局部 Ruff 环境 blocker 以 checker、构建根、原因和范围生成稳定 ID，重复扫描复用任务。Rust Clippy 局部 finding 现按原生规则、目标与源码行内容形成稳定身份；重复扫描只保留一张任务，缺 Cargo blocker 同样稳定。重命名关联、跨工具身份和不确定匹配协调仍缺，不勾选。
   Java/P3C 命名子集现也按原生规则、目标和源码锚点形成稳定 finding，缺 P3C 配置按 Maven 构建根/原因形成 blocker；初始化工作区两次扫描只保留一张任务。仍无重命名关联或不确定匹配协调。
   CVE/Java/Ruff 等现有 blocker 的重复报告逐轮保存到忽略入库的 `state/observations/`，只有首次或复检后再现追加 tracked 事件；重复扫描任务及 tracked 事件均稳定。跨模块公共前置依赖和完整事件状态机仍缺，不勾选。

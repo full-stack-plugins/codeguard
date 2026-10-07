@@ -662,3 +662,4 @@ mod c_family_placeholder_task_recheck;
 pub mod run_config;
 pub mod baseline_classification;
 pub mod init_dry_run;
+pub mod artifact_scope;
