@@ -92,7 +92,7 @@
 
 依赖：S02。覆盖：rulepack-governance。
 
-- [ ] 4.1 实现运行配置与批准质量策略的独立解析及 config explain；验收：CLI/env 无法弱化 required/threshold/exclude。
+- [x] 4.1 实现运行配置与批准质量策略的独立解析及 config explain；验收：CLI/env 无法弱化 required/threshold/exclude。
   进行中：相邻 Rust CLI 已有 `quality-policy-candidate` 1.0 严格解析，并在 `config validate/explain --policy-candidate` 只读显示必需检查、规则包/工具锁摘要、时效和精确内容绑定排除；重复、未知、自批和通配被拒。候选即使与本地工具锁字节匹配仍固定 `candidate_unverified`，不形成有效策略。运行参数与受保护批准策略的绑定及真实覆盖仍缺，见 `codeguard-cli/tests/acceptance/config-readonly-inspection.md`，4.1 不勾选。
 - [x] 4.2 实现旧 codeguard.json 显式迁移和原生 suppressions 差异解释；验收：未知/损坏字段不静默丢弃或按默认通过。
   追加进展：相邻 Rust CLI 的 `config validate/explain` 已只读识别旧 `extensions/exclude/gate_scope/java.commands`，拒绝未知/损坏字段、符号链接与坏工具锁；旧排除、delta 范围和命令均不自授策略权威，固定退出 3。尚未执行正式 schema 迁移或覆盖完整原生 suppressions，见 `codeguard-cli/tests/acceptance/config-readonly-inspection.md`。
