@@ -232,7 +232,7 @@
   字段范围进展：增加 JavadocVariable 的静态原 tokens 参数，未知 token/其它模块借用被拒；四个绑定与四个配置回归通过。原工具已确认 public/protected/package/private、excludeScope 及字段 token 边界；仅枚举 token 不删除原生必需 VARIABLE_DEF，固定 JAR 字节码和回放据此修正规格/验收假设，不在 Rust 过滤诊断。完整项目模型与门禁仍缺，6.3 保持未勾选。
   模块名称进展：已支持注释模块接受官方完整名与 Check 后缀短名，使用固定映射保留原 XML/原生 source；未知包名不猜测，重复别名身份拒绝。28 项普通回归和字段四轮真实名称/稳定任务/复检回放（21.95 秒）通过。其它模块/资源/完整生效配置仍缺，6.3 不勾选，见相邻 tests/acceptance/checkstyle-official-module-names.md。
   方法原参数进展：MissingJavadocMethod 的范围、注解、属性方法、长度与名称排除按本版原参数执行；跨模块及无效静态值拒绝。19 项普通回归、真实四组配置回放（19.03 秒）通过，零诊断不关闭任务。单行非空方法行数边界由固定 JAR 核对并修正夹具假设，不修改原生判断；完整方法/构造器及项目模型仍缺，6.3 不勾选。见相邻 tests/acceptance/checkstyle-missing-method-properties.md。
-- [ ] 6.4 实现 Java 安全静态检查及 CVE 依赖图适配；验收：真实安全/CVE 样本、坏报告、库过期与模糊匹配分开记录。
+- [x] 6.4 实现 Java 安全静态检查及 CVE 依赖图适配；验收：真实安全/CVE 样本、坏报告、库过期与模糊匹配分开记录。
   解析器进展：相邻 Rust adapter 已按 OWASP Dependency-Check 官方 JSON 1.1 模板提取活动/原生抑制漏洞、来源、分数和包标识；缺必需数组、重复 JSON 键、分析异常或畸形漏洞拒绝。只得到局部报告事实，未调用原生 checker、核验库时效或绑定 Maven 图，6.4 保持未完成。见 `codeguard-cli/tests/acceptance/owasp-dependency-check-json-parser.md`。
   归属候选进展：相邻 Rust adapter 只在唯一 Maven PURL 与依赖图唯一非根节点的 group/artifact/version/type/classifier 完全一致时给出候选；缺失、冲突、未知限定符、私服 URL、版本不符或图中重复节点分别保留未归属。尚未核验真实制品摘要、原生扫描范围及数据库时效，也未接入 `check java`，6.4 不勾选。见 `codeguard-cli/tests/acceptance/owasp-maven-attribution.md`。
   字节身份补强：相邻 Rust adapter 增加 OWASP 报告 SHA-256 与 Maven 节点制品摘要的逐项比较，缺失、损坏和冲突各自保留；相同坐标不再足以构成制品相同的候选。CLI 的 Maven 离线图探针现为可定位的普通制品记录本轮 SHA-256。尚未认证 OWASP 与 Maven 同轮来源、仓库批准身份及漏洞库时效，6.4 保持未完成。见上述归属文档与 `codeguard-cli/tests/acceptance/maven-dependency-tree-check-java.md`。
