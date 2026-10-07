@@ -23,7 +23,7 @@
     "crates/codeguard-adapters/src/clang_placeholder_validation.rs": "f252c022a88c78912224af8382f0d59bee1a3402c1918c98304164a10e1ea7d1",
     "crates/codeguard-adapters/src/gradle_dependency_check_plan.rs": "dfb85a3dfcf6c5e0697bb3eb58ecbd8f2d47feb71f60db506f765b0ee86b23f3",
     "crates/codeguard-adapters/src/gradle_owasp_report_ownership_parser.rs": "11d06f8905022307d99b50e68d1bfd44bd2f2fdd29d85872bef1d40864b83c00",
-    "crates/codeguard-adapters/src/lib.rs": "61684af2eb29110f4f1da6fce898eef38017b14e6c2d398421080c5cd16a2a27",
+    "crates/codeguard-adapters/src/lib.rs": "e8ecceb6e1b991e4af936e063844a8119b315ca52f3e5a61a7b9ca21b7262d1c",
     "crates/codeguard-adapters/src/ruff_settings.rs": "23736d55ef974a9f0b571d162365c6554001fa5ee3b2b69db6deb4507466af88",
     "crates/codeguard-adapters/tests/clang_documentation_ast_contract.rs": "af58dd3eede7b054aeab43fc873967d0416091616068a022fde9adc868ace36b",
     "crates/codeguard-adapters/tests/clang_documentation_contract.rs": "9d603b7ccb435c5e55837156e76d506573e8703aadf7017be07b6cf28281e261",

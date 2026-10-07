@@ -82,6 +82,7 @@ mod eslint_message_report;
 mod eslint_parsed;
 mod go_candidate;
 mod grammar_asset_manifest;
+mod grammar_precision_validation;
 mod legacy_dylink_compat;
 mod ruby_candidate;
 mod ruby_candidate_profile;
@@ -93,6 +94,7 @@ pub use grammar_asset_manifest::{
     GrammarAsset, GrammarAssetManifest, bundled_grammar_candidate, bundled_grammar_candidates,
     bundled_grammar_metadata, parse_grammar_asset_manifest, verify_grammar_asset,
 };
+pub use grammar_precision_validation::{generate_precision_validation, MIN_PRECISION_WILSON_LOWER_BOUND};
 pub use legacy_dylink_compat::adapt_legacy_dylink;
 pub use zig_wasm_compat::adapt_zig_wasm;
 mod go_list_package;
