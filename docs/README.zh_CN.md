@@ -105,3 +105,7 @@ Gradle 文档工作台已接入开发期 `check java/all --gradle-javadoc`：原
 当前公开复检证据、尝试关联和失效处理见 [验收](../tests/acceptance/gradle-javadoc-public-task-recheck.md)。
 
 Gradle文档原生描述检查现补齐空注释、缺主描述和空异常说明，分别保留 `JavadocEmptyComment`、`JavadocMissingMainDescription`、`JavadocEmptyThrowsDescription`；原参数/返回空描述规则继续保留。由原JDK21输出定位，经源码快照核验后进入稳定任务和原工具复检，不把注释文字存在等同于业务契约充分。原生、工作台和复检协议使用独立0.2，历史0.1不扩大；聚合0.67、异常0.18、修复0.24和任务复检0.30封闭消费。真实空类型/构造器/字段/方法注释4条、裸标签3条、缺用途1条；中文完整注释与合法继承文档0条，零诊断仍未受信。独立JDK/Maven旧协议尚未接入这些新增规则，完整详细注释验收继续待完成。见[详细描述验收](../tests/acceptance/gradle-javadoc-detailed-descriptions.md)。
+
+## 编码交接与完整待办
+
+[实施交接手册](handoff/Codeguard-Implementation-Handoff.zh_CN.md) 包含执行顺序、逐语言四能力矩阵、全部OpenSpec未完成任务快照及可运行验证命令。该包不替代正式规格，也不授予生产资格。

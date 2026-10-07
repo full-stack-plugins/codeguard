@@ -62,7 +62,7 @@
     "crates/codeguard-cli/src/gradle_module_cache.rs": "5489b87236a0d7567225ebc6fcb34f368733e2a643c22ab5632b6142499128e6",
     "crates/codeguard-cli/src/gradle_owasp_report_budget.rs": "55756e926335d8652005c88f993173f2fb053ca8a0f659d35b88efbf0a5d7985",
     "crates/codeguard-cli/src/grammar_native_checker.rs": "b6e3136a18b69822400538bea19dc993edf3716bb50e7a19d1fbd8757834589c",
-    "crates/codeguard-cli/src/grammar_native_differential.rs": "cc03129c80eef2b0d77f57f2abcc89b3a4a5107a6f81f723cebf98bcebfa26ab",
+    "crates/codeguard-cli/src/grammar_native_differential.rs": "392c97749beee2fb2b36ccd9b56b5f6ae61713b7428ded03d8c50172e6445995",
     "crates/codeguard-cli/src/hook_execute_command.rs": "845875992118003a6af22f0b9257b579dd27e537349538537b72fa1f80249f74",
     "crates/codeguard-cli/src/hook_fast_scan.rs": "0e21134fc47e233b58ad487bdb3c8600275905f8fdd3897e57b08fc6d2652d5a",
     "crates/codeguard-cli/src/hook_native_tools.rs": "2fea8a0f8822344b3b6be359d02526690d4e28ca098dc6cdf65a7ac6ac42f133",

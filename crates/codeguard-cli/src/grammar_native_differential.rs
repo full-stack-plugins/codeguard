@@ -152,7 +152,9 @@ pub fn replay_native_corpus(
                 (
                     classify_probe(observation.recoveries.len(), truncated),
                     Some(observation.recoveries.len()),
-                    truncated.then_some("syntax_recovery_incomplete".to_owned()),
+                    observation
+                        .evaluation_incomplete_reason()
+                        .map(str::to_owned),
                     Some(observation.structural_observations),
                 )
             }

@@ -20,3 +20,60 @@ pub struct SyntaxWorkerCandidateObservation {
     /// 初检状态聚合；当前候选资产不能成为 clean。
     pub precheck: SyntaxPrecheckOutcome,
 }
+
+impl SyntaxWorkerCandidateObservation {
+    /// 返回开发评测的精确未完成原因；不改变公开任务协议或赋予生产资格。
+    /// 不可定位错误优先于普通预算截断；无这两种情况时返回 None。
+    pub(crate) fn evaluation_incomplete_reason(&self) -> Option<&'static str> {
+        if self.parser_error_location_unavailable {
+            Some("parser_error_location_unavailable")
+        } else if self.precheck.truncated_files > 0 {
+            Some("syntax_recovery_incomplete")
+        } else {
+            None
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::SyntaxWorkerCandidateObservation;
+    use codeguard_core::{SyntaxPrecheckOutcome, SyntaxPrecheckStatus};
+
+    #[test]
+    fn evaluation_reason_distinguishes_hidden_error_from_budget_truncation() {
+        let mut observation = SyntaxWorkerCandidateObservation {
+            source_sha256: "a".repeat(64),
+            grammar_sha256: "b".repeat(64),
+            grammar_qualified: false,
+            parser_error_location_unavailable: false,
+            recoveries: Vec::new(),
+            structural_observations: Vec::new(),
+            precheck: SyntaxPrecheckOutcome {
+                status: SyntaxPrecheckStatus::Incomplete,
+                scope_complete: true,
+                cancelled: false,
+                selected_files: 1,
+                checked_files: 1,
+                incomplete_files: 1,
+                unsupported_files: 0,
+                unqualified_files: 1,
+                truncated_files: 0,
+                suspected_recoveries: 0,
+            },
+        };
+        assert_eq!(observation.evaluation_incomplete_reason(), None);
+        observation.precheck.truncated_files = 1;
+        assert_eq!(
+            observation.evaluation_incomplete_reason(),
+            Some("syntax_recovery_incomplete")
+        );
+        observation.parser_error_location_unavailable = true;
+        assert_eq!(
+            observation.evaluation_incomplete_reason(),
+            Some("parser_error_location_unavailable")
+        );
+        assert_eq!(observation.recoveries.len(), 0);
+        assert!(!observation.grammar_qualified);
+    }
+}
