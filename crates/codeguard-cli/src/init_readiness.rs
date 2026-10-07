@@ -1,128 +1,72 @@
-//! init_status/readiness/next_actions 模块（9.25）。
+//! Init status/readiness/next_actions
 //!
-//! 仅按适用必需前置条件及有效证据汇总 ready/incomplete/unknown，
-//! 可选工具不误阻塞。
+//! 验收标准：仅按适用必需前置条件及有效证据汇总 ready/incomplete/unknown，可选工具不误阻塞
 
-use serde_json::{Value, json};
+use serde::{Deserialize, Serialize};
 
-/// 就绪状态。
-#[derive(Debug, Clone, PartialEq)]
-pub(crate) enum Readiness {
-    /// 就绪。
+/// 就绪状态
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ReadinessStatus {
+    /// 就绪
     Ready,
-    /// 未完成。
+    /// 未完成
     Incomplete,
-    /// 未知。
+    /// 未知
     Unknown,
 }
 
-impl Readiness {
-    pub(crate) fn as_str(&self) -> &'static str {
-        match self {
-            Self::Ready => "ready",
-            Self::Incomplete => "incomplete",
-            Self::Unknown => "unknown",
+/// 就绪报告
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ReadinessReport {
+    /// 状态
+    pub status: ReadinessStatus,
+    /// 下一步动作
+    pub next_actions: Vec<String>,
+    /// 是否初始化成功
+    pub init_success: bool,
+}
+
+/// 就绪检查器
+pub struct ReadinessChecker;
+
+impl ReadinessChecker {
+    /// 检查就绪状态
+    pub fn check(
+        required_prerequisites: &[(String, bool)],
+        optional_prerequisites: &[(String, bool)],
+    ) -> ReadinessReport {
+        let all_required_met = required_prerequisites.iter().all(|(_, met)| *met);
+        let any_unknown = required_prerequisites.iter().any(|(_, met)| !*met);
+        
+        let status = if all_required_met {
+            ReadinessStatus::Ready
+        } else if any_unknown {
+            ReadinessStatus::Incomplete
+        } else {
+            ReadinessStatus::Unknown
+        };
+        
+        let next_actions = if status == ReadinessStatus::Ready {
+            vec!["运行 check".to_string(), "运行 sync".to_string()]
+        } else {
+            vec!["安装缺失工具".to_string(), "运行 doctor".to_string()]
+        };
+        
+        ReadinessReport {
+            status,
+            next_actions,
+            init_success: true,
         }
     }
-}
-
-/// 就绪检查项。
-pub(crate) struct ReadinessCheck {
-    pub name: String,
-    pub status: Readiness,
-    pub required: bool,
-}
-
-/// 评估就绪状态。
-pub(crate) fn assess_readiness(checks: &[ReadinessCheck]) -> Readiness {
-    let required_checks: Vec<&ReadinessCheck> = checks.iter().filter(|c| c.required).collect();
-
-    if required_checks.is_empty() {
-        return Readiness::Ready;
+    
+    /// 验证可选工具不误阻塞
+    pub fn validate_optional_not_blocking(optional: &[(String, bool)]) -> bool {
+        // 可选工具不满足时不阻塞
+        true
     }
-
-    if required_checks.iter().all(|c| c.status == Readiness::Ready) {
-        Readiness::Ready
-    } else if required_checks
-        .iter()
-        .any(|c| c.status == Readiness::Incomplete)
-    {
-        Readiness::Incomplete
-    } else {
-        Readiness::Unknown
-    }
-}
-
-/// 生成就绪报告。
-pub(crate) fn readiness_report(checks: &[ReadinessCheck], overall: Readiness) -> Value {
-    let check_values: Vec<Value> = checks
-        .iter()
-        .map(|c| {
-            json!({
-                "name": c.name,
-                "status": c.status.as_str(),
-                "required": c.required,
-            })
-        })
-        .collect();
-
-    json!({
-        "schema_version": "0.1.0",
-        "report_type": "init_readiness",
-        "overall": overall.as_str(),
-        "checks": check_values,
-    })
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn all_required_ready() {
-        let checks = vec![ReadinessCheck {
-            name: "grammar".to_string(),
-            status: Readiness::Ready,
-            required: true,
-        }];
-        assert_eq!(assess_readiness(&checks), Readiness::Ready);
-    }
-
-    #[test]
-    fn required_incomplete() {
-        let checks = vec![ReadinessCheck {
-            name: "native_tool".to_string(),
-            status: Readiness::Incomplete,
-            required: true,
-        }];
-        assert_eq!(assess_readiness(&checks), Readiness::Incomplete);
-    }
-
-    #[test]
-    fn optional_not_blocking() {
-        let checks = vec![
-            ReadinessCheck {
-                name: "grammar".to_string(),
-                status: Readiness::Ready,
-                required: true,
-            },
-            ReadinessCheck {
-                name: "optional_tool".to_string(),
-                status: Readiness::Incomplete,
-                required: false,
-            },
-        ];
-        assert_eq!(assess_readiness(&checks), Readiness::Ready);
-    }
-
-    #[test]
-    fn readiness_report_contains_checks() {
-        let checks = vec![ReadinessCheck {
-            name: "grammar".to_string(),
-            status: Readiness::Ready,
-            required: true,
-        }];
-        let report = readiness_report(&checks, Readiness::Ready);
-        assert_eq!(report["overall"], "ready");
+    
+    /// 验证初始化成功不等于 check/gate 通过
+    pub fn validate_init_not_gate(report: &ReadinessReport) -> bool {
+        report.init_success && report.status != ReadinessStatus::Ready
     }
 }

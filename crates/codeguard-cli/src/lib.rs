@@ -492,7 +492,6 @@ mod go_tool_selection;
 mod grammar_native_checker;
 mod holdout_performance;
 mod host_entry;
-mod init_readiness;
 mod javascript_dependency_scan;
 #[cfg(all(feature = "wasm-precheck", unix))]
 mod javascript_syntax_probe;
@@ -674,3 +673,4 @@ pub mod agents_block_merge;
 pub mod init_transaction;
 pub mod profile_refresh;
 pub mod quality_config_mapping;
+pub mod init_readiness;
