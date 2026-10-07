@@ -1586,3 +1586,113 @@ fn unresolved_package_versions_refresh_without_erasing_work_or_guessing_inherita
     assert!(!project.0.join("Cargo.lock").exists());
     assert!(!project.0.join("target").exists());
 }
+
+#[test]
+fn compilation_database_init_persists_identity_without_executing_commands() {
+    let project = Project::new();
+    fs::create_dir(project.0.join("build")).unwrap();
+    fs::write(project.0.join("main.cpp"), "int main() { return 0; }").unwrap();
+    let bytes = br#"[{"directory":"/unverified/build","file":"main.cpp","arguments":["clang++","-Iprivate","-DMODE=1","main.cpp"],"command":"touch compiler-ran"}]"#;
+    fs::write(project.0.join("build/compile_commands.json"), bytes).unwrap();
+    let (exit, dry) = project.run(&["--format=json"]);
+    assert_eq!(exit, 0);
+    assert!(!project.0.join(".codeguard").exists());
+    let checker = dry["profile_summary"]["checkers"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|c| c["checker_id"] == "c_family.compilation_database")
+        .unwrap();
+    assert_eq!(checker["configuration"], "unknown");
+    assert_eq!(checker["execution"], "not_run");
+    let (exit, _) = project.run(&["--apply", "--format=json"]);
+    assert_eq!(exit, 3);
+    let observed: Value =
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/project.json")).unwrap())
+            .unwrap();
+    assert_eq!(
+        observed["checker_config_sha256"]["build/compile_commands.json"],
+        format!("{:x}", Sha256::digest(bytes))
+    );
+    assert_eq!(observed["delivery_decision"], "not_evaluated");
+    assert!(!project.0.join("compiler-ran").exists());
+    assert_eq!(
+        fs::read(project.0.join("build/compile_commands.json")).unwrap(),
+        bytes
+    );
+    assert!(
+        observed["package_declared_versions"]
+            .as_object()
+            .unwrap()
+            .is_empty()
+    );
+}
+
+#[test]
+fn command_only_compilation_database_init_retains_environment_blocker() {
+    let project = Project::new();
+    fs::write(project.0.join("main.cpp"), "int main() { return 0; }").unwrap();
+    fs::write(
+        project.0.join("compile_commands.json"),
+        br#"[{"directory":"/build","file":"main.cpp","command":"touch compiler-ran"}]"#,
+    )
+    .unwrap();
+    let (exit, _) = project.run(&["--apply", "--format=json"]);
+    assert_eq!(exit, 3);
+    let observed: Value =
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/project.json")).unwrap())
+            .unwrap();
+    assert_eq!(observed["observation_complete"], false);
+    assert!(
+        observed["blocked_paths"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|p| p == "compile_commands.json")
+    );
+    let checker = observed["checker_configurations"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|c| c["checker_id"] == "c_family.compilation_database")
+        .unwrap();
+    assert_eq!(checker["configuration"], "unknown");
+    assert_eq!(checker["reason"], "compilation_database_shape_unresolved");
+    assert!(!project.0.join("compiler-ran").exists());
+}
+
+#[test]
+fn compilation_database_changes_refresh_profile_without_erasing_tasks() {
+    let project = Project::new();
+    let database = project.0.join("compile_commands.json");
+    let original = br#"[{"directory":"/build","file":"main.cpp","arguments":["clang++","-DMODE=1","main.cpp"]}]"#;
+    fs::write(&database, original).unwrap();
+    assert_eq!(project.run(&["--apply", "--format=json"]).0, 3);
+    let task = project.0.join(".codeguard/tasks/preserved.md");
+    fs::write(&task, "existing repair history").unwrap();
+    let changed = br#"[{"directory":"/build","file":"main.cpp","arguments":["clang++","-DMODE=2","main.cpp"]}]"#;
+    fs::write(&database, changed).unwrap();
+    let (exit, report) = project.run(&["--apply", "--format=json"]);
+    assert_eq!(exit, 3);
+    assert_eq!(report["profile_stale"], true);
+    let observed: Value =
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/project.json")).unwrap())
+            .unwrap();
+    assert_eq!(
+        observed["checker_config_sha256"]["compile_commands.json"],
+        format!("{:x}", Sha256::digest(changed))
+    );
+    fs::remove_file(database).unwrap();
+    let (exit, report) = project.run(&["--apply", "--format=json"]);
+    assert_eq!(exit, 3);
+    assert_eq!(report["profile_stale"], true);
+    let observed: Value =
+        serde_json::from_slice(&fs::read(project.0.join(".codeguard/project.json")).unwrap())
+            .unwrap();
+    assert!(
+        observed["checker_config_sha256"]
+            .get("compile_commands.json")
+            .is_none()
+    );
+    assert_eq!(fs::read_to_string(task).unwrap(), "existing repair history");
+}
