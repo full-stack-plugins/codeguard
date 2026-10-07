@@ -239,7 +239,7 @@
   原生局部接线：`check java`/`check all` 已为静态配置的 OWASP Maven 插件建立 `java.cve` 任务，在固定版本的简单原 POM 与私有离线数据库副本中调用原生 goal 并解析 JSON 1.1；human/JSON 反馈展示脱敏 advisory、UNKNOWN 分数和原生 suppression。缺数据库、坏报告、POM 复杂、项目身份错配或数据库变化保持 incomplete。模拟 Maven 正反例通过；尚未以真实 OWASP/合格数据库验收，也缺可信时效、图/制品同轮绑定和正式门禁，6.4 不勾选。见 `codeguard-cli/tests/acceptance/owasp-maven-check-java.md`。
   同轮候选接线：同一 `check` 调用中的 OWASP 与 Maven 图报告现在按相同构建根、POM、Maven/JDK、仓库摘要交叉核对，再逐条复用坐标/制品摘要匹配器；结果写入 `attribution_probes` 并进入 human/JSON 反馈。模拟双插件原生报告的摘要一致、摘要不一致和私服 PURL 脱敏反例通过；这仍只是本地候选，数据库时效、真实原生工具和可信门禁未验收，6.4 不勾选。
   持久修复路径进展：已初始化项目中的 `check java` 现在保存 CVE 局部报告、自动同步，并把数据库时效未知或原生执行未完成写成稳定环境/证据 blocker；同一问题重复扫描只保留一张任务，内容被篡改的已消费报告不能重新导入。未经核验的 advisory 不伪装为已确认源码 finding，任务给出原工具复检和库核验步骤。真实库与可信门禁仍缺，6.4 不勾选。
-- [ ] 6.5 实现 build 等级和测试执行声明；验收：默认静态构建不谎称测试通过，要求测试的策略不可自动跳过。
+- [x] 6.5 实现 build 等级和测试执行声明；验收：默认静态构建不谎称测试通过，要求测试的策略不可自动跳过。
 - [ ] 6.6 接入 Java 完整义务与影响闭包；验收：verify 未绑定质量任务、自定义 echo、50/51 文件、未修改调用方失败均不假通过。
 - [ ] 6.7 用代表性 Java 项目完成 check java/check all/doctor/修复前后对照；验收：每条旧新差异人工裁定并有产物引用。
   进行中：`lint java FILE` 已把单文件原生 P3C 诊断接至 CLI；`check java/doctor`、真实多模块项目及修复前后全量人工裁定仍未完成。单文件证据见 `codeguard-cli/tests/acceptance/java-p3c-cli-native-local.md`，不勾选。
