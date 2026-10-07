@@ -1300,3 +1300,13 @@ Before exposing usable placeholder positions, the native probe SHALL validate th
 #### Scenario: A forged return or parameter is inserted
 - **WHEN** a placeholder position names a void return, unknown parameter, foreign source token or duplicate component
 - **THEN** the validator SHALL reject it and the probe SHALL withdraw invalid placeholder observations instead of producing repair authority
+
+### Requirement: Placeholder workbench import SHALL retain a separate stable open file task
+
+work sync SHALL consume a separately versioned placeholder packet only after original native/structural shape, workspace/run identity, current tool/source association and placeholder component validation. File path, language, standard and placeholder policy SHALL define one stable task independent of source digest and line drift; this task SHALL have a distinct checker and rule identity from missing-component and native-warning tasks. Clean observations SHALL retain historical open facts. Forged component packets SHALL not obtain a consumption marker or new task. Until a dedicated candidate and original-task verifier exist, next/task verify SHALL report clang_placeholder_task_workflow_not_integrated without invoking another checker or recording a verification event. Public automatic persistence remains an uncompleted integration requirement.
+
+#### Scenario: A placeholder moves and is later replaced by real documentation
+- **WHEN** repeated current native observations move the function to another line, then report no placeholder positions
+- **THEN** work sync SHALL reuse the original file task and keep its fact open rather than close on local absence
+- **WHEN** a report inserts a foreign parameter component
+- **THEN** work sync SHALL reject consumption and retain existing facts
