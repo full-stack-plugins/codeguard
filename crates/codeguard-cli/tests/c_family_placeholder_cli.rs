@@ -98,6 +98,19 @@ fn check_language(language: &str, standard: &str, extension: &str) {
         .as_array()
         .unwrap();
     assert_eq!(ids.len(), 1);
+    let verify = || {
+        let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(["task", "verify", ids[0].as_str().unwrap()])
+            .arg(&root)
+            .arg("--format=json")
+            .output()
+            .unwrap();
+        assert_eq!(output.status.code(), Some(3));
+        serde_json::from_slice::<Value>(&output.stdout).unwrap()
+    };
+    let present_recheck = verify();
+    assert_eq!(present_recheck["observation"], "still_present");
+    assert_eq!(present_recheck["event_persisted"], true);
     let next = || {
         let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
             .arg("next")
@@ -163,6 +176,12 @@ fn check_language(language: &str, standard: &str, extension: &str) {
         clean["placeholder_workbench"]["task_ids"],
         serde_json::json!([])
     );
+    let absent_recheck = verify();
+    assert_eq!(
+        absent_recheck["observation"],
+        "candidate_absent_unverified_policy"
+    );
+    assert_eq!(absent_recheck["event_persisted"], true);
     let fact: Value = serde_json::from_slice(
         &fs::read(root.join(format!(
             ".codeguard/findings/{}/finding.json",
@@ -178,6 +197,15 @@ fn check_language(language: &str, standard: &str, extension: &str) {
         blocked["placeholder_workbench"]["task_ids"],
         serde_json::json!([])
     );
+    if let Ok(destination) = std::env::var("CODEGUARD_PLACEHOLDER_RECHECK_EVIDENCE") {
+        assert!(std::path::Path::new(&destination).is_absolute());
+        fs::write(
+            format!("{destination}.{language}.json"),
+            serde_json::to_vec_pretty(&serde_json::json!([present_recheck, absent_recheck]))
+                .unwrap(),
+        )
+        .unwrap();
+    }
     if let Ok(destination) = std::env::var("CODEGUARD_PLACEHOLDER_NEXT_EVIDENCE") {
         assert!(std::path::Path::new(&destination).is_absolute());
         fs::write(

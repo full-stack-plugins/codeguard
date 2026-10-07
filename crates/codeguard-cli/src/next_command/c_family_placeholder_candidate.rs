@@ -19,8 +19,14 @@ fn read(root: &Path, run: &str, digest: Option<&str>) -> Result<Value, &'static 
     if digest.is_some_and(|s| s != hash) {
         return Err("clang_placeholder_origin_changed");
     }
-    let r = codeguard_adapters::parse_unique_json(&bytes)
+    let mut r = codeguard_adapters::parse_unique_json(&bytes)
         .map_err(|_| "clang_placeholder_origin_invalid")?;
+    if r["report_type"] == "clang_documentation_placeholder_task_recheck" {
+        if !crate::c_family_placeholder_task_recheck::valid_shape(root, &r) {
+            return Err("clang_placeholder_recheck_invalid");
+        }
+        r = crate::c_family_placeholder_task_recheck::normal(&r);
+    }
     if !valid_shape(&r) || r["run_id"] != run {
         return Err("clang_placeholder_origin_invalid");
     }
@@ -112,7 +118,7 @@ pub(super) fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate
         "placeholder_descriptions_observed"
     };
     let observed = status == "placeholder_descriptions_observed";
-    let brief = json!({"schema_version":"0.34.0","task_id":id,"kind":"finding","checker_id":checker(&first),"scope":first["path"],"source_sha256":latest["source_sha256"],"placeholder_rule_id":RULE,"rule_source":"codeguard_structural_policy","evidence_ref":{"first_run_id":run,"first_report_sha256":digest},"current_run_id":latest["run_id"],"observation_status":status,"placeholder_positions":if observed {positions(&latest)}else{Vec::new()},"rule_basis":"整个用途、参数或适用返回说明仅为明确占位标记，不等于API契约说明；本规则不是Clang警告。","constraints":["不修改API或行为，不关闭检查器或自行批准白名单","专用尝试历史与task verify尚未接入，本视图不授予任务修复权限"],"allowed_paths":[],"affected_paths":[first["path"]],"disposition":"needs_decision","reason_code":if observed {"clang_placeholder_task_workflow_not_integrated"}else{status},"step":["依据当前组件与真实API核对占位说明；专用修复闭环未接入前保留任务。","使用绑定原工具、标准与工作区的comments命令诊断复扫；源码或工具失稳时不按历史定位修改。"],"recheck_argv":["codeguard","comments",first["language"],root.join(first["path"].as_str().ok_or("clang_placeholder_scope_invalid")?),"--clang-tool",first["selected_tool"],"--standard",first["standard"],"--workspace",root,"--format=json"],"attempt_history_status":"not_integrated","closure_condition":"原命令局部复扫不关闭任务；专用受控尝试、原工具task verify及可信关闭仍须实现并验收。","authority":"local_unverified","delivery_decision":"not_evaluated"});
+    let brief = json!({"schema_version":"0.34.0","task_id":id,"kind":"finding","checker_id":checker(&first),"scope":first["path"],"source_sha256":latest["source_sha256"],"placeholder_rule_id":RULE,"rule_source":"codeguard_structural_policy","evidence_ref":{"first_run_id":run,"first_report_sha256":digest},"current_run_id":latest["run_id"],"observation_status":status,"placeholder_positions":if observed {positions(&latest)}else{Vec::new()},"rule_basis":"整个用途、参数或适用返回说明仅为明确占位标记，不等于API契约说明；本规则不是Clang警告。","constraints":["不修改API或行为，不关闭检查器或自行批准白名单","专用尝试历史尚未接入；task verify提供局部复检观察，本视图不授予任务修复权限"],"allowed_paths":[],"affected_paths":[first["path"]],"disposition":"needs_decision","reason_code":if observed {"clang_placeholder_task_workflow_not_integrated"}else{status},"step":["依据当前组件与真实API核对占位说明；专用修复闭环未接入前保留任务。","使用绑定原工具、标准与工作区的comments命令诊断复扫；源码或工具失稳时不按历史定位修改。"],"recheck_argv":["codeguard","comments",first["language"],root.join(first["path"].as_str().ok_or("clang_placeholder_scope_invalid")?),"--clang-tool",first["selected_tool"],"--standard",first["standard"],"--workspace",root,"--format=json"],"attempt_history_status":"not_integrated","closure_condition":"原命令局部复扫不关闭任务；原工具task verify仅提供局部观察；专用受控尝试及可信关闭仍须实现并验收。","authority":"local_unverified","delivery_decision":"not_evaluated"});
     Ok(Candidate {
         id: id.into(),
         priority: 0,

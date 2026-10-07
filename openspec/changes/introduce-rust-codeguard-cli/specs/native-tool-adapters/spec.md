@@ -1340,3 +1340,13 @@ Before leasing or executing a placeholder task recheck, the verifier SHALL valid
 - **THEN** it SHALL reject the override without executing it or persisting an event
 - **WHEN** unrelated Ruff or other checker options are supplied
 - **THEN** it SHALL return an argument error before any original-checker execution or lease acquisition
+
+### Requirement: Placeholder task verify SHALL execute and consume an original bounded recheck
+
+The dedicated verifier SHALL reuse verification leases/locks, freeze the current single-file source, execute the first selected Clang and language standard with the same bounded AST profile, and classify only the original placeholder policy. Current source/tool and first task binding SHALL be revalidated before append-only report consumption and verification event persistence. Supported present positions SHALL yield still_present; supported local absence SHALL yield candidate_absent_unverified_policy while the fact remains open. Instability, unknown/failed AST or native failure SHALL not become absence. This local execution SHALL not enable source repair permissions, fake attempt history, trusted closure or detailed documentation qualification.
+
+#### Scenario: The original placeholder is present and then corrected
+- **WHEN** task verify rechecks the same open file task with the original compiler/standard
+- **THEN** a consumed still_present event SHALL be recorded for current placeholders
+- **WHEN** actual description replaces the placeholder under stable inputs
+- **THEN** local candidate absence MAY be recorded, but the same historical fact SHALL remain open

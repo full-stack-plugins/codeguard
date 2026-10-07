@@ -129,11 +129,15 @@ fn placeholder_import_reuses_file_identity_and_never_closes_on_clean_observation
         task_id.into(),
         root.display().to_string(),
     ]);
+    assert_eq!(verification["reason"], "backlog_sync_incomplete");
     assert_eq!(
-        verification["reason"],
-        "clang_placeholder_task_workflow_not_integrated"
+        verification["observation"],
+        "candidate_absent_unverified_policy"
     );
-    assert!(verification["native_scan"].is_null());
+    assert_eq!(
+        verification["native_scan"]["report_type"],
+        "clang_documentation_placeholder_task_recheck"
+    );
     assert_eq!(verification["event_persisted"], false);
     let override_tool = cli(vec![
         "task".into(),

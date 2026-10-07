@@ -59,3 +59,13 @@ next的独立0.34诊断视图核验首次不可变事实、报告摘要、工作
 专用preflight已核验首次独立占位包及摘要、精确消费收据、open不可变任务身份/路径/工作区/规则/原源码与报告摘要，并要求原工具路径及原观测工具字节。替换路径在租约/执行前拒绝；其他检查器参数返回错参2，不执行检查器或持久化复检事件。健康身份仍返回workflow-not-integrated，实际执行/结果消费/受控尝试未接入，不把身份检查当复检成功。
 
 真实Clang导入/任务测试通过原工具未接入状态、替换工具拒绝、外来Ruff参数拒绝及无native_scan/event；既有稳定身份、源码修复局部消失不关闭与伪造包拒绝保持。父任务和生产资格未提升。
+
+## 原工具执行与局部事件（当前增量）
+
+`task verify` 已接入首次报告及原工具身份绑定后的实际有界复检，使用既有租约、锁、工作同步和追加事件事务。当前C11/C++17真实公开测试覆盖仍存在与修复后局部消失；后者仅为 `candidate_absent_unverified_policy`，历史事实保持 open。伪造待消费报告使同步返回 `backlog_sync_incomplete`，复检报告保留局部结果但不声称事件已持久化，不删除或绕过非法历史。
+
+内部协议为 [placeholder task recheck 0.1](../../schemas/clang-documentation-placeholder-task-recheck-v0.1.schema.json)，公开协议为 [task verification 0.38](../../schemas/task-verification-preview-v0.38.schema.json)。真实报文及反例验证入口是 [协议验证器](../c_family_placeholder_task_recheck_schema.py)；设置 `CODEGUARD_PLACEHOLDER_RECHECK_EVIDENCE` 为绝对前缀，公开测试输出 `.c.json` 和 `.cpp.json`，避免两语言证据相互覆盖。协议通过不能证明内容语义准确或可信修复完成。
+
+受控尝试与无进展预算尚未接入；执行失败、超时及AST不可用返回 incomplete，但完整失败观察的持久化仍须补齐。可信关闭/复发、白名单、共享check/hook、独立精度及平台发行验收继续未完成。此前未执行的描述是历史检查点，不是当前状态。
+
+本增量验证：默认/WASM模式公开两语言占位任务测试各1通过，导入/非法历史阻塞测试各1通过，计划回归各6通过；实际C与C++四份0.38报文通过封闭schema，24项资格/字段/失稳篡改被拒绝。WASM全工作区all-targets严格Clippy、分层检查及OpenSpec严格验证通过。以上仅为本增量开发验证，未授予生产资格。
