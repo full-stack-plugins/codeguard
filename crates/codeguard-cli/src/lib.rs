@@ -527,7 +527,6 @@ mod solidity_dependency_scan;
 mod status_disposition;
 mod swift_dependency_scan;
 mod terraform_dependency_scan;
-mod token_generation;
 mod typescript_dependency_scan;
 mod zig_dependency_scan;
 
@@ -674,3 +673,4 @@ pub mod init_transaction;
 pub mod profile_refresh;
 pub mod quality_config_mapping;
 pub mod init_readiness;
+pub mod token_generation;
