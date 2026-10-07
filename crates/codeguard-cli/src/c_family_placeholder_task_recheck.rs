@@ -15,6 +15,8 @@ const EXTRA: &[&str] = &[
     "task_rule",
     "original_ref",
     "input_stable",
+    "placeholder_observation_status",
+    "placeholder_observation_reason",
 ];
 
 fn reference(brief: &Value) -> Value {
@@ -184,11 +186,23 @@ pub(crate) fn run(root: &Path, brief: &Value, deadline: Instant) -> Result<Value
         structure["reason"] = json!("clang_execution_incomplete");
         structure["observation"] = Value::Null;
     }
-    if !complete || structure["status"] != "observed" || placeholders["status"] != "observed" {
-        return Err("clang_placeholder_recheck_incomplete");
-    }
     let mut r = first.clone();
-    r["placeholders"] = placeholders["observation"].clone();
+    let observed =
+        complete && structure["status"] == "observed" && placeholders["status"] == "observed";
+    r["schema_version"] = json!("0.2.0");
+    r["placeholder_observation_status"] = json!(if observed { "observed" } else { "incomplete" });
+    r["placeholder_observation_reason"] = if observed {
+        json!("clang_placeholder_observed")
+    } else if !complete {
+        json!("clang_execution_incomplete")
+    } else {
+        placeholders["reason"].clone()
+    };
+    r["placeholders"] = if observed {
+        placeholders["observation"].clone()
+    } else {
+        Value::Null
+    };
     r["report_type"] = json!("clang_documentation_placeholder_task_recheck");
     r["run_id"] = json!(format!(
         "clangdocplaceholder-{}-{}-{}",
@@ -206,7 +220,7 @@ pub(crate) fn run(root: &Path, brief: &Value, deadline: Instant) -> Result<Value
     r["task_kind"] = json!("finding");
     r["task_rule"] = json!(contract::RULE);
     r["original_ref"] = reference(brief);
-    r["input_stable"] = json!(contract::current(root, &normal(&r)) && tool_current(&first));
+    r["input_stable"] = json!(normal_inputs_current(root, &normal(&r)) && tool_current(&first));
     if !valid_shape(root, &r) {
         return Err("clang_placeholder_recheck_invalid");
     }
@@ -219,6 +233,7 @@ pub(crate) fn normal(r: &Value) -> Value {
         for k in EXTRA {
             o.remove(*k);
         }
+        o.insert("schema_version".into(), json!("0.1.0"));
         o.insert(
             "report_type".into(),
             json!("clang_documentation_placeholder_workbench_observation"),
@@ -226,16 +241,66 @@ pub(crate) fn normal(r: &Value) -> Value {
     }
     n
 }
+/// 校验规范化的当前观察；失败只能携带空占位数据，不会成为干净候选。
+pub(crate) fn valid_normal_shape(r: &Value) -> bool {
+    if r["placeholders"].is_null() {
+        r.is_object()
+            && r["report_type"] == "clang_documentation_placeholder_workbench_observation"
+            && r["profile"] == "clang-documentation-placeholder-v1"
+            && r["run_id"]
+                .as_str()
+                .is_some_and(|s| s.starts_with("clangdocplaceholder-"))
+            && crate::work_sync::c_family_structure_report::valid_shape(
+                &contract::structure_packet(r),
+            )
+    } else {
+        contract::valid_shape(r)
+    }
+}
+/// 检查失败观察的源码与底层结构关联；没有占位数据时不验证任何旧占位位置。
+pub(crate) fn normal_inputs_current(root: &Path, r: &Value) -> bool {
+    valid_normal_shape(r)
+        && if r["placeholders"].is_null() {
+            crate::work_sync::c_family_structure_report::current(
+                root,
+                &contract::structure_packet(r),
+            )
+        } else {
+            contract::current(root, r)
+        }
+}
 /// 绑定首次报告、原策略及开放任务；拒绝额外字段与身份篡改。
 pub(crate) fn valid_shape(root: &Path, r: &Value) -> bool {
-    if !r
-        .as_object()
-        .is_some_and(|o| o.len() == 23 && EXTRA.iter().all(|k| o.contains_key(*k)))
-        || r["report_type"] != "clang_documentation_placeholder_task_recheck"
+    if !r.as_object().is_some_and(|o| {
+        if r["schema_version"] == "0.1.0" {
+            o.len() == 23 && EXTRA[..5].iter().all(|k| o.contains_key(*k))
+        } else {
+            r["schema_version"] == "0.2.0"
+                && o.len() == 25
+                && EXTRA.iter().all(|k| o.contains_key(*k))
+        }
+    }) || r["report_type"] != "clang_documentation_placeholder_task_recheck"
         || r["task_kind"] != "finding"
         || r["task_rule"] != contract::RULE
         || !r["input_stable"].is_boolean()
-        || !contract::valid_shape(&normal(r))
+        || (r["schema_version"] == "0.1.0" && !contract::valid_shape(&normal(r)))
+        || !valid_normal_shape(&normal(r))
+        || (r["schema_version"] == "0.2.0"
+            && !((r["placeholder_observation_status"] == "observed"
+                && r["placeholder_observation_reason"] == "clang_placeholder_observed"
+                && contract::valid_shape(&normal(r)))
+                || (r["placeholder_observation_status"] == "incomplete"
+                    && r["placeholders"].is_null()
+                    && matches!(
+                        r["placeholder_observation_reason"].as_str(),
+                        Some(
+                            "clang_placeholder_unavailable"
+                                | "clang_placeholder_report_invalid"
+                                | "clang_source_changed"
+                                | "request_cancelled"
+                                | "clang_execution_incomplete"
+                        )
+                    ))))
     {
         return false;
     }
@@ -270,9 +335,9 @@ pub(crate) fn valid_shape(root: &Path, r: &Value) -> bool {
 /// 持久化前重新核对当前源码和原工具，防止竞态变成完整复检。
 pub(crate) fn inputs_current(root: &Path, r: &Value) -> bool {
     valid_shape(root, r)
-        && contract::current(root, &normal(r))
+        && normal_inputs_current(root, &normal(r))
         && original(root, &r["original_ref"]).is_ok_and(|first| tool_current(&first))
-        && tool_current(r)
+        && (r["native"]["tool_sha256"].is_null() || tool_current(r))
 }
 /// 分类占位组件局部结果，未知或失稳不得变成消失或可信关闭。
 pub(crate) fn classify(brief: &Value, r: &Value) -> &'static str {
@@ -280,6 +345,7 @@ pub(crate) fn classify(brief: &Value, r: &Value) -> &'static str {
         || r["input_stable"] != true
         || r["local_scan_complete"] != true
         || r["structure"]["status"] != "observed"
+        || r["placeholders"].is_null()
     {
         "incomplete"
     } else if contract::positions(&normal(r)).is_empty() {

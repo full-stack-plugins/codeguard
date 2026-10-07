@@ -7,7 +7,7 @@ use std::path::{Path, PathBuf};
 /// 占位描述自有规则，与原生警告及缺失组件策略保持不同身份。
 pub(crate) const RULE: &str = "codeguard.documentation.placeholder_description";
 
-fn structure_packet(report: &Value) -> Value {
+pub(crate) fn structure_packet(report: &Value) -> Value {
     let mut packet = report.clone();
     if let Some(object) = packet.as_object_mut() {
         object.remove("placeholders");

@@ -635,6 +635,23 @@ fn parse_report(
         if !crate::c_family_placeholder_task_recheck::valid_shape(root, report) {
             return Err("clang_placeholder_recheck_invalid");
         }
+        if report["placeholders"].is_null() {
+            let run = report["run_id"].as_str().ok_or("report_run_id_invalid")?;
+            if report["workspace_id"] != workspace_id
+                || path.file_stem().and_then(|s| s.to_str()) != Some(run)
+            {
+                return Err("clang_placeholder_recheck_invalid");
+            }
+            // 不完整复检只消费脱敏诊断和事件，不制造结构/占位违规，也不关闭原事实。
+            return Ok(ReportInput {
+                workspace_id: workspace_id.into(),
+                run_id: run.into(),
+                digest,
+                findings: Vec::new(),
+                blockers: Vec::new(),
+                historical_findings: 0,
+            });
+        }
         return c_family_placeholder_report::parse(
             root,
             workspace_id,

@@ -971,7 +971,7 @@ pub fn run(args: &[String]) -> ExitCode {
         });
     }
     if c_placeholder_task {
-        report["schema_version"] = json!("0.38.0");
+        report["schema_version"] = json!("0.39.0");
     }
     if c_structure_task {
         report["schema_version"] = json!("0.37.0");
@@ -1038,7 +1038,11 @@ pub fn run(args: &[String]) -> ExitCode {
     }
     let persist = if codeguard_runtime::sigint_cancellation_requested() {
         Err("request_cancelled")
-    } else if Instant::now() >= deadline {
+    } else if Instant::now() >= deadline
+        && !(c_placeholder_task
+            && scan["schema_version"] == "0.2.0"
+            && scan["placeholder_observation_status"] == "incomplete")
+    {
         Err("request_deadline_exceeded")
     } else {
         match lock_verification(&root, &parsed.task_id, &lease) {

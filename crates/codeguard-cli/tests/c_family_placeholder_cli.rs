@@ -122,7 +122,7 @@ fn check_language(language: &str, standard: &str, extension: &str) {
         serde_json::from_slice::<Value>(&output.stdout).unwrap()
     };
     let guidance = next();
-    assert_eq!(guidance["schema_version"], "0.35.0");
+    assert_eq!(guidance["schema_version"], "0.36.0");
     assert_eq!(guidance["repair_brief"]["task_id"], ids[0]);
     assert_eq!(
         guidance["repair_brief"]["placeholder_positions"]

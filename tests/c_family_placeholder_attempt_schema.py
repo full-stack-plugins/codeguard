@@ -15,10 +15,10 @@ for path in sorted((root / "schemas").glob("*.schema.json")):
     registry = registry.with_resource(path.name, resource)
     if "$id" in schema:
         registry = registry.with_resource(schema["$id"], resource)
-schema = json.loads((root / "schemas/repair-brief-preview-v0.35.schema.json").read_text())
+schema = json.loads((root / "schemas/repair-brief-preview-v0.36.schema.json").read_text())
 validator = Draft202012Validator(schema["properties"]["repair_brief"], registry=registry)
-verify = Draft202012Validator(json.loads((root / "schemas/task-verification-preview-v0.38.schema.json").read_text()), registry=registry)
-show = Draft202012Validator(json.loads((root / "schemas/task-show-preview-v0.8.schema.json").read_text()), registry=registry)
+verify = Draft202012Validator(json.loads((root / "schemas/task-verification-preview-v0.39.schema.json").read_text()), registry=registry)
+show = Draft202012Validator(json.loads((root / "schemas/task-show-preview-v0.9.schema.json").read_text()), registry=registry)
 assert len(sys.argv) == 3
 count = rejected = 0
 for argument, language in zip(sys.argv[1:], ["c", "cpp"]):

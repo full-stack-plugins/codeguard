@@ -59,7 +59,7 @@ fn placeholder_attempts_require_original_verification_and_preserve_failure_budge
         let show = || task(&["show"], &[]).1["task"].clone();
         let initial_show = task(&["show"], &[]).1;
         let initial = initial_show["task"].clone();
-        assert_eq!(initial_show["schema_version"], "0.8.0");
+        assert_eq!(initial_show["schema_version"], "0.9.0");
         assert_eq!(initial_show["next_actions"][0], initial["recheck_argv"]);
         assert_eq!(initial["disposition"], "actionable");
         assert_eq!(
