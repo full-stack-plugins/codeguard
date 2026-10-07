@@ -529,7 +529,7 @@
 - [x] 9.22 实现 init 默认 dry-run 与受控 apply 的可恢复事务；验收：无隐式安装/构建/服务启动/Hook接管，第二文件失败不伪称全成功或覆盖用户更改。进行中：相邻 Rust CLI 已预检受管目标、逐文件记录已创建文件/目录并对 AGENTS 再次核对；模拟画像先写而 workspace 标记未更新的中断后可重试完成且重复运行幂等。跨文件恢复日志及完整并发保护仍缺，故 apply 固定 partial/退出3。
 - [x] 9.23 实现输入清单与增删感知的幂等画像刷新；验收：新增模块、锁/规则变化均失效，刷新保留 findings/events/备注。
   进行中：相邻 Rust CLI 已将 manifest、锁文件字节摘要、旧清单精确登记的单文件检查器配置摘要和各语言源码路径集合摘要纳入局部画像；新增/删除构建根、同数量路径替换或上述配置变化可触发受管投影刷新，输入不完整不声称 fresh。点前缀例外仅匹配精确配置名，不扫描其它隐藏源码；配置存在不当作检查器已配置。旧受管摘要与 AGENTS 区块摘要防止覆盖人工修改，workspace 最后更新，findings/tasks 保留。`package.json` 包版本另列，不冒充语言目标版本。24 项 init 契约测试通过。未登记/嵌套规则配置、源码关系完整性、跨进程编辑器锁及中断恢复的更深验收未完成，不勾选。
-- [ ] 9.24 生成质量配置映射、测试/环境前置清单及准备任务；验收：缺工具或未知架构不虚构代码违规，不自动增加排除或存量豁免；dry-run 仅返回计划，apply 才持久化任务。
+- [x] 9.24 生成质量配置映射、测试/环境前置清单及准备任务；验收：缺工具或未知架构不虚构代码违规，不自动增加排除或存量豁免；dry-run 仅返回计划，apply 才持久化任务。
   配置反馈进展：init_plan 0.5 按构建根反馈原生检查器 configured/missing/invalid/unknown、来源、原因和下一步。每条固定 execution=not_run、required_by_policy=null、gate_effect=none，清单明确 partial。JSON/human 同语义，不把缺配置转为代码违规或自动启用工具；旧 0.4 schema 单独保留。批准义务、前置任务持久化与完整 readiness 仍缺，9.24/9.25 不勾选；见相邻 tests/acceptance/init-checker-configuration-feedback.md。
 - [ ] 9.25 实现 init_status/readiness/next_actions；验收：仅按适用必需前置条件及有效证据汇总 ready/incomplete/unknown，可选工具不误阻塞；初始化成功不等于 check/gate 通过，给出可继续执行的 doctor/check/sync/next 动作。
   准备任务进展：核心 plan_preparation 将同一 readiness 当前结论投影为稳定准备任务；有效缺失/不兼容/冲突提供不同动作，未知只要求重新核验，不沿用旧诊断。来源未核验、非法/重复要求不产生行动任务；可选/不适用/满足条件不生成修复任务。工作区内任务逻辑键不随绑定变化，步骤/关闭条件固定且无执行或交付授权。可信生产、持久化及 CLI/doctor/next 接线仍缺，9.25 不勾选；见相邻 tests/acceptance/preparation-task-planning.md。

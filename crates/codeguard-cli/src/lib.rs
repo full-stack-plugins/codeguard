@@ -508,7 +508,6 @@ mod policy_repair_test;
 mod python_dependency_scan;
 #[cfg(unix)]
 mod python_syntax_probe;
-mod quality_config_mapping;
 mod quality_evaluation;
 mod r_dependency_scan;
 mod ruby_dependency_scan;
@@ -674,3 +673,4 @@ pub mod architecture_md;
 pub mod agents_block_merge;
 pub mod init_transaction;
 pub mod profile_refresh;
+pub mod quality_config_mapping;
