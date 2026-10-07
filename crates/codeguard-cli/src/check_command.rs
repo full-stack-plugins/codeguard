@@ -7,7 +7,9 @@ use std::time::{Duration, Instant};
 
 use codeguard_adapters::{capability_row, legacy_registry};
 use codeguard_core::{CHECK_CATEGORIES, TaskGraph, TaskNode};
-use codeguard_runtime::{NativeObservation, SourceSnapshot, TaskExecution, TaskOutcome, run_task_graph};
+use codeguard_runtime::{
+    NativeObservation, SourceSnapshot, TaskExecution, TaskOutcome, run_task_graph,
+};
 use serde_json::{Value, json};
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -21,7 +23,9 @@ use crate::discovery::{DiscoveryReport, discover};
 use crate::go_lint_command::observe_for_check as observe_go_vet;
 use crate::java_checker_config_status::{checker_for_category, summarize};
 use crate::java_cve_attribution::attach_candidates;
-use crate::java_cve_scan::{NativeContext as CveNativeContext, observe_project as observe_cve_project};
+use crate::java_cve_scan::{
+    NativeContext as CveNativeContext, observe_project as observe_cve_project,
+};
 use crate::java_dependency_scan::{
     NativeContext as DependencyNativeContext, observe_project as observe_dependency_project,
 };
@@ -31,7 +35,9 @@ use crate::java_javadoc_scan::{
 use crate::java_p3c_scan::{NativeContext, observe_project};
 use crate::next_command::{read_local_brief, read_local_brief_for_checker};
 use crate::partial_sarif_feedback::partial_check_sarif;
-use crate::python_lint_command::{annotate_conversation_budget, scan_and_sync_report_with_deadline};
+use crate::python_lint_command::{
+    annotate_conversation_budget, scan_and_sync_report_with_deadline,
+};
 use crate::report_export::export_report;
 use crate::rust_lint_scan::observe_cargo_clippy_with_coverage;
 use crate::work_sync::{save_local_report, sync_local_workspace};
@@ -1225,11 +1231,19 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
             }
             if gradle_requested {
                 native_results[gradle_result_key] = snapshot_native_slot(&gradle_model_slot);
-                native_results["kotlin_lint"] = kotlin_lint.clone();
-                native_results["swift_lint"] = swift_lint.clone();
-                native_results["ruby_lint"] = ruby_lint.clone();
-                native_results["shell_lint"] = shell_lint.clone();
-                native_results["zig_lint"] = zig_lint.clone();
+                // 只在该语言确实产出结果时写入槽位。无条件写入 null 会让「本项目没有该语言
+                // 源码」与「该语言结果为 null」在报告里不可区分，下游据此误判覆盖范围。
+                for (key, value) in [
+                    ("kotlin_lint", &kotlin_lint),
+                    ("swift_lint", &swift_lint),
+                    ("ruby_lint", &ruby_lint),
+                    ("shell_lint", &shell_lint),
+                    ("zig_lint", &zig_lint),
+                ] {
+                    if value.is_object() {
+                        native_results[key] = value.clone();
+                    }
+                }
             }
             if zig_lint.is_object() {
                 crate::check_zig_scan::refresh(&root, &mut zig_lint, deadline);
@@ -2720,6 +2734,14 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                 | "0.72.0"
         )
     ) {
+        if let Some(native) = report["native_results"].as_object_mut() {
+            native.remove("kotlin_lint");
+        }
+    }
+    // 槽位存在但没有结果时，报告里必须同样不出现该键：schema_version 只反映优先级分支，
+    // 不反映该语言是否真的产出了结果（如 gradle 未解析时 schema 已是 0.61.0，与 Kotlin 无关），
+    // 仅靠版本列表会让「本项目没有 Kotlin 源码」留下一个 kotlin_lint: null 的假槽位。
+    if report["native_results"]["kotlin_lint"].is_null() {
         if let Some(native) = report["native_results"].as_object_mut() {
             native.remove("kotlin_lint");
         }
