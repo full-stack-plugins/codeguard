@@ -1248,3 +1248,11 @@ The C++ adapter SHALL observe explicitly declared, identifier-named constructors
 #### Scenario: Constructor parameter description is empty
 - **WHEN** an explicit in-class constructor has a purpose but an empty description for a named parameter
 - **THEN** observation SHALL retain the missing parameter component, mark return description not_applicable, and SHALL NOT invent a return obligation or grant semantic qualification
+
+### Requirement: Clang documentation parsing SHALL enforce report cardinality budgets
+
+Parsing SHALL stop with an explicit budget failure before producing more than 2000 function/method/constructor observations or processing more than 256 direct parameters for any observed declaration. Exceeding either limit SHALL NOT truncate into a clean or complete report; inputs exactly at the limits SHALL remain eligible for the existing source, structure and qualification checks.
+
+#### Scenario: Oversized declaration inventory
+- **WHEN** an AST has 2001 supported declarations or a supported declaration has 257 parameters
+- **THEN** parsing SHALL return clang_documentation_ast_budget_exceeded and SHALL NOT produce an apparently complete partial inventory

@@ -39,6 +39,9 @@ pub fn parse_clang_documentation_ast(raw: &[u8], source: &[u8]) -> Result<Value,
                     })
             });
         if kind == "FunctionDecl" || ordinary_method {
+            if functions.len() >= 2000 {
+                return Err("clang_documentation_ast_budget_exceeded");
+            }
             functions.push(function(node, text)?);
             continue;
         }
@@ -140,6 +143,9 @@ fn function(node: &Value, source: &str) -> Result<Value, &'static str> {
         .iter()
         .filter(|p| p["kind"] == "ParmVarDecl")
         .collect();
+    if params.len() > 256 {
+        return Err("clang_documentation_ast_budget_exceeded");
+    }
     let comments: Vec<&Value> = parts
         .iter()
         .filter(|p| p["kind"] == "FullComment")
