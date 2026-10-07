@@ -173,7 +173,7 @@
     "tests/acceptance/cargo-documentation-explicit-workspace.md": "69a80fd1779e46228790530792a24168ad348ec5b1fe109f2991fe4e304769ad",
     "tests/acceptance/cargo-documentation-workspace.md": "6be1ac870924db90f8d2b9aa6cfa298f4a825ce659f998d2121f4c7b4089b9a4",
     "tests/acceptance/check-c-family-documentation.md": "80e07e8dba544f8b477f232bac9ca19b2d0c1f1dffd163445b0887e56a31873d",
-    "tests/acceptance/clang-documentation-engine-identity.md": "a6f30a2f10af5ef45b20716ac6f9d885e39aafcddd597dad819a90162cfd1e8b",
+    "tests/acceptance/clang-documentation-engine-identity.md": "e4bbbed91707daf839e446f482a7db417b0bfc753a0bd885da43a60266f2b461",
     "tests/acceptance/clang-documentation-structure.md": "bbcb5fd87cbbf99054b5639caa56d212ef83cf3135d8867eb99ace74a0c86e10",
     "tests/acceptance/clang-preprocessor-context.md": "3af1710a54102c854824f2402e1ca15e14fd38c72299b9811398f4c486148565",
     "tests/acceptance/clang-standalone-native.md": "155e64133bc4353cdbfe223c8e2c5bf1d2ab2c3e95c7c2e0232e9931988db017",
