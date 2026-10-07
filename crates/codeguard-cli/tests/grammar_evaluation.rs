@@ -328,12 +328,20 @@ fn replay_expanded_cohorts_and_archive_current_evidence() {
     assert_eq!(report["program_stable"], true);
     for row in report["cases"].as_array().unwrap() {
         assert_eq!(row["attempted"], true, "{row}");
+        // 兼容 reason 不得改写：按该字面量过滤的既有消费者依赖它不丢行。
         assert!(
-            row["reason"].is_null()
-                || row["reason"] == "syntax_recovery_incomplete"
-                || row["reason"] == "parser_error_location_unavailable",
+            row["reason"].is_null() || row["reason"] == "syntax_recovery_incomplete",
             "{row}"
         );
+        let detail = &row["reason_detail"];
+        assert!(
+            detail.is_null()
+                || detail == "scan_budget_truncated"
+                || detail == "parser_error_location_unavailable",
+            "{row}"
+        );
+        // 细分与兼容 reason 必须同时出现或同时缺席，不能出现半截原因。
+        assert_eq!(detail.is_null(), row["reason"].is_null(), "{row}");
     }
     println!("GRAMMAR_COHORT_EVALUATION_REPORT={report}");
 }
@@ -512,12 +520,19 @@ fn replay_every_bundled_language_and_archive_current_evidence() {
     let cases = report["cases"].as_array().unwrap();
     for row in cases {
         assert_eq!(row["attempted"], true, "{row}");
+        // 兼容 reason 不得改写：按该字面量过滤的既有消费者依赖它不丢行。
         assert!(
-            row["reason"].is_null()
-                || row["reason"] == "syntax_recovery_incomplete"
-                || row["reason"] == "parser_error_location_unavailable",
+            row["reason"].is_null() || row["reason"] == "syntax_recovery_incomplete",
             "{row}"
         );
+        let detail = &row["reason_detail"];
+        assert!(
+            detail.is_null()
+                || detail == "scan_budget_truncated"
+                || detail == "parser_error_location_unavailable",
+            "{row}"
+        );
+        assert_eq!(detail.is_null(), row["reason"].is_null(), "{row}");
     }
     // 不把已知缺陷断言成正确行为；回放输出保留差异，资格和批准另行验收。
     assert_eq!(

@@ -146,20 +146,22 @@ pub fn replay_native_corpus(
                     cancelled,
                 )
             };
-        let (wasm_class, recovery_count, wasm_reason, structures) = match observation {
-            Ok(observation) => {
-                let truncated = observation.precheck.truncated_files > 0;
-                (
-                    classify_probe(observation.recoveries.len(), truncated),
-                    Some(observation.recoveries.len()),
-                    observation
-                        .evaluation_incomplete_reason()
-                        .map(str::to_owned),
-                    Some(observation.structural_observations),
-                )
-            }
-            Err(reason) => (None, None, Some(reason), None),
-        };
+        let (wasm_class, recovery_count, wasm_reason, wasm_reason_detail, structures) =
+            match observation {
+                Ok(observation) => {
+                    let truncated = observation.precheck.truncated_files > 0;
+                    (
+                        classify_probe(observation.recoveries.len(), truncated),
+                        Some(observation.recoveries.len()),
+                        observation.evaluation_incomplete_reason().map(str::to_owned),
+                        observation
+                            .evaluation_incomplete_reason_detail()
+                            .map(str::to_owned),
+                        Some(observation.structural_observations),
+                    )
+                }
+                Err(reason) => (None, None, Some(reason), None, None),
+            };
         let asset = manifest["assets"]
             .as_array()
             .and_then(|assets| assets.iter().find(|a| a["language"] == case.language))
@@ -168,6 +170,8 @@ pub fn replay_native_corpus(
             "source_sha256":case.source_sha256,"grammar_sha256":asset["sha256"],"fixture_expected_valid":case.expected_valid,"fixture_label":case.label,
             "native_attempted":native_attempted,"native":native,"native_classification":name(native_class),"native_identity_current":tool_current,
             "native_elapsed_us":native_us,"wasm_classification":name(wasm_class),"wasm_recovery_count":recovery_count,"wasm_reason":wasm_reason,
+            // 兼容 reason 不变；精确细分独立成字段，便于逐语言区分隐藏错误与预算截断。
+            "wasm_reason_detail":wasm_reason_detail,
             "wasm_elapsed_us":elapsed_us(wasm_started),"comparison":comparison(native_class,wasm_class),
             "fixture_native_disagreement":native_class.map(|valid|valid!=case.expected_valid)});
         if matches!(case.language.as_str(), "c" | "cpp") {
@@ -219,6 +223,8 @@ pub fn replay_native_corpus(
                     row["wasm_classification"] = json!("unknown");
                     row["wasm_recovery_count"] = Value::Null;
                     row["wasm_reason"] = json!("grammar_evaluation_program_changed");
+                    // 覆盖原因后清空细分，避免与新 reason 矛盾的旧细分留在行里。
+                    row["wasm_reason_detail"] = Value::Null;
                     if measure_structure {
                         row["structural_observations"] = Value::Null;
                         row["combined_candidate_classification"] = json!("unknown");

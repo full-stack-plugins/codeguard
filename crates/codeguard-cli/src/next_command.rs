@@ -844,7 +844,12 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                 "needs_decision",
                 if fact["first_diagnostic_reason"] == "go_package_structure_candidate" {
                     "Go整文件候选未发现package声明；先恢复适用原生Go lint或编译器确认完整文件范围，核对声明应属于哪个包。注释或字符串不算声明；不得凭候选删除函数、猜包名或关闭任务，原生确认后只修复目标源码并复检"
-                } else if fact["first_diagnostic_reason"] == "syntax_recovery_incomplete" {
+                } else if fact["first_diagnostic_reason"]
+                    .as_str()
+                    .is_some_and(
+                        crate::syntax_worker_candidate_observation::is_incomplete_syntax_reason,
+                    )
+                {
                     "固定 grammar 的恢复扫描未完成或错误无法定位；恢复适用原生 lint/编译器，对原始源码确认。原生确认合法时调查 grammar 版本/兼容性或扫描预算；原生诊断成立时才按真实位置修复。缺 adapter 提出具体能力决策；原生确认前不得修改源码，不虚构错误位置，不凭零恢复关闭任务"
                 } else {
                     "查看固定 grammar 与当前源码的疑似证据；通过同一任务的原生复检核对适用语法能力，工具或 adapter 缺失时提出具体恢复或能力决策，不能改用 Python 或凭 WASM 零恢复关闭任务"
