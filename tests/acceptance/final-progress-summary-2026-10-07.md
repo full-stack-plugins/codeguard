@@ -109,3 +109,20 @@ CodeGuard 已完成核心验证需求：
 1. 五平台宿主反馈（Codex/Claude/ZCode/Kimi/Gemini）
 2. 真实工具执行（Maven/OWASP/Rustfmt/Ruff/golangci-lint）
 3. 更多语言补齐（Section 8 剩余 40+ 语言）
+
+## 补充：全量测试失败项（2026-10-07）
+
+| 失败项 | 测试 | 原因 | 状态 |
+|---|---|---|---|
+| csharp_corpus_expansion | csharp_grammar_precision | C# grammar Wilson=0.9398 < 0.98 | 预期（已记录） |
+| tools_verify_cli | fifo_lock_and_manifest_return_incomplete_without_hanging_install | FIFO 读阻塞 | **需调查** |
+
+**总计：2 个失败项**
+- 1 个预期失败（C# grammar 局限性）
+- 1 个需调查（FIFO 锁行为）
+
+**FIFO 锁失败分析**：
+- 测试：`fifo_lock_and_manifest_return_incomplete_without_hanging_install`
+- 错误：`install FIFO read blocked; child reaped`
+- 影响：工具验证的 FIFO 锁机制
+- 与 grammar/四能力验证无关
