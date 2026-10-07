@@ -466,6 +466,7 @@ mod init_readiness;
 mod status_disposition;
 mod token_generation;
 mod false_positive_investigation;
+mod check_java_scan;
 mod pascal_dependency_scan;
 mod check_objc_scan;
 mod objc_dependency_scan;
