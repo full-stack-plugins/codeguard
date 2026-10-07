@@ -1282,3 +1282,13 @@ The adapter SHALL expose a separately versioned, source-associated placeholder o
 - **THEN** the observation SHALL retain the precise function position and component without copying comment text
 - **WHEN** TODO appears within an explanatory sentence or a void return is not applicable
 - **THEN** this rule SHALL not invent a placeholder or required return finding
+
+### Requirement: Public standalone comments SHALL expose same-scan placeholder observations without false task coverage
+
+The standalone comments entry SHALL use the original frozen stdin Clang AST for a separately versioned placeholder observation. It SHALL NOT launch another compiler scan. Source instability, tool failure, cancellation or expired deadline SHALL withdraw that observation. Feedback SHALL distinguish this Codeguard policy from native warnings and retain exact function/component positions and original-tool re-scan guidance. Historical shared check/hook and stored structural protocols SHALL remain unchanged until their own integration is accepted. Until stable placeholder tasks and original-task verification are implemented, feedback SHALL explicitly report placeholder_task_workflow_status=not_integrated and SHALL NOT equate absence of structural tasks with resolution of a placeholder issue.
+
+#### Scenario: The native compiler emits no warning for a placeholder description
+- **WHEN** public comments reads a supported full description consisting of an explicit placeholder
+- **THEN** separately versioned feedback SHALL expose the policy positions without inventing a native diagnostic or claiming detailed qualification
+- **WHEN** the original tool is unavailable or the source changes during scanning
+- **THEN** placeholder observation SHALL be incomplete with no usable positions

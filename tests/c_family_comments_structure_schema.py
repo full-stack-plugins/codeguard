@@ -38,7 +38,7 @@ for directory in [Path("/tmp/cg-structure-public-default"), Path("/tmp/cg-struct
             reports.append(report)
 for report in reports:
     version = report["schema_version"].removesuffix(".0")
-    assert version in ["0.5", "0.6"]
+    assert version in ["0.5", "0.6", "0.9", "0.10"]
     validator(version).validate(report)
     assert list(validator("0.1").iter_errors(report))
     assert list(validator("0.4").iter_errors(report))
@@ -57,6 +57,10 @@ for field, value in [("observation", None), ("native_raw_diagnostic_count", None
 for field, value in [("semantic_accuracy", "proven"), ("coverage_proven", True)]:
     forged = copy.deepcopy(first)
     forged["documentation_structure"]["observation"][field] = value
+    negative.append(forged)
+for field, value in [("authority", "native_tool"), ("qualification", "granted"), ("coverage_proven", True)]:
+    forged = copy.deepcopy(first)
+    forged["documentation_placeholders"]["observation"][field] = value
     negative.append(forged)
 for forged in negative:
     assert list(validator(first["schema_version"].removesuffix(".0")).iter_errors(forged))

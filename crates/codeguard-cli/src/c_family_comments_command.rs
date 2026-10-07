@@ -18,7 +18,7 @@ pub fn run(args: &[String]) -> ExitCode {
         }
     };
     let deadline = Instant::now() + Duration::from_millis(request.timeout_ms);
-    let report = match observe(&request, deadline, &AtomicBool::new(false), true) {
+    let report = match observe_policy(&request, deadline, &AtomicBool::new(false), true, true) {
         Ok(report) => report,
         Err(reason) => {
             eprintln!("{reason}");
@@ -57,6 +57,17 @@ pub fn run(args: &[String]) -> ExitCode {
                 row["column_byte"],
                 row["missing_components"],
                 row["structure_status"]
+            );
+        }
+        for row in report["documentation_placeholders"]["observation"]["positions"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .take(8)
+        {
+            println!(
+                "自有占位规则：{}:{}:{}；组件 {}",
+                report["path"], row["line"], row["column_byte"], row["component"]
             );
         }
         if !report["workbench"].is_null() {
@@ -104,6 +115,16 @@ pub(crate) fn observe(
     cancellation: &AtomicBool,
     persist: bool,
 ) -> Result<Value, String> {
+    observe_policy(request, deadline, cancellation, persist, false)
+}
+
+fn observe_policy(
+    request: &crate::syntax_lint_arguments::SyntaxLintArguments,
+    deadline: Instant,
+    cancellation: &AtomicBool,
+    persist: bool,
+    placeholders: bool,
+) -> Result<Value, String> {
     let workspace = match crate::c_family_comments_workbench::resolve_root(
         &request.source,
         request.workspace.as_deref(),
@@ -134,6 +155,8 @@ pub(crate) fn observe(
     let mut native = json!({"status":"incomplete","reason":"clang_source_scope_unavailable","version":null,"tool_sha256":null,"diagnostics":[]});
     let mut source_sha256 = Value::Null;
     let mut structure = json!({"status":"incomplete","reason":"clang_structure_unavailable","observation":null,"native_raw_diagnostic_count":null});
+    let mut placeholder =
+        json!({"status":"incomplete","reason":"clang_placeholder_unavailable","observation":null});
     let source_observation = crate::plain_syntax_source::read_plain_source(&request.source);
     if let Ok(source) = &source_observation {
         let extension = path.extension().and_then(|extension| extension.to_str());
@@ -146,20 +169,23 @@ pub(crate) fn observe(
         };
         if applicable {
             source_sha256 = json!(format!("{:x}", Sha256::digest(source)));
-            (native, structure) = crate::clang_syntax_probe::observe_documentation_with_structure(
-                request.clang_tool.as_deref().expect("工具上下文已校验"),
-                &request.language,
-                request.standard.as_deref().expect("标准上下文已校验"),
-                source,
-                deadline,
-                cancellation,
-            );
+            (native, structure, placeholder) =
+                crate::clang_syntax_probe::observe_documentation_with_placeholders(
+                    request.clang_tool.as_deref().expect("工具上下文已校验"),
+                    &request.language,
+                    request.standard.as_deref().expect("标准上下文已校验"),
+                    source,
+                    deadline,
+                    cancellation,
+                    placeholders,
+                );
             if !crate::plain_syntax_source::read_plain_source(&request.source)
                 .is_ok_and(|current| current == *source)
             {
                 native["status"] = json!("incomplete");
                 native["reason"] = json!("clang_source_changed");
                 native["diagnostics"] = json!([]);
+                placeholder = json!({"status":"incomplete","reason":"clang_source_changed","observation":null});
                 structure = json!({"status":"incomplete","reason":"clang_source_changed","observation":null,"native_raw_diagnostic_count":null});
             }
         }
@@ -176,6 +202,7 @@ pub(crate) fn observe(
             "clang_execution_incomplete"
         });
         native["diagnostics"] = json!([]);
+        placeholder = json!({"status":"incomplete","reason":if cancelled {"request_cancelled"}else{"clang_execution_incomplete"},"observation":null});
         structure = json!({"status":"incomplete","reason":if cancelled {"request_cancelled"}else{"clang_execution_incomplete"},"observation":null,"native_raw_diagnostic_count":null});
     }
     let mut documentation_findings = Vec::new();
@@ -241,5 +268,11 @@ pub(crate) fn observe(
         report["structural_task_workflow_status"] = json!("not_integrated");
     }
     report["next_actions"].as_array_mut().expect("固定反馈动作").push(json!("读取原生AST结构观察中的缺失文档/用途/参数/返回组件并依据真实API补充说明；已初始化工作区可读取结构任务的当前定位并运行原工具task verify；受控尝试记录已接入，可信关闭仍待接线，不把非空说明当准确性或关闭证据。"));
+    if placeholders {
+        report["schema_version"] = json!("0.10.0");
+        report["documentation_placeholders"] = placeholder;
+        report["placeholder_task_workflow_status"] = json!("not_integrated");
+        report["next_actions"].as_array_mut().expect("固定反馈动作").push(json!("按占位观察的位置和组件补充真实用途、参数或返回说明，再以本报告原工具与标准复扫；占位规则稳定任务与专用复检尚未接入，不以结构任务消失关闭占位问题。"));
+    }
     Ok(report)
 }
