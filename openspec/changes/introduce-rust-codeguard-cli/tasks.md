@@ -74,7 +74,7 @@
   CLI 局部接线：`check all` 将适用的 Python/Ruff 与 Rust/Cargo Clippy 节点送入调度器，共用取消标记和截止时间；公开 `check_feedback` 0.6 的 `execution_tasks` 把本地原生完成标为 `native_observed_unverified`，混合项目一个节点失败不丢另一个节点的诊断。真实并发、正式义务清单和构建目录资源规范化仍缺，见相邻 `codeguard-cli/tests/acceptance/check-all-partial-native.md`。
   Java 扩展：`check_feedback` 0.7 增加 `java.p3c` 独立节点，复用相同截止时间和取消标志，缺项目配置或工具前提仍保留文件级原因。原生 Maven 探针使用私有临时工作区；完整规则集、跨模块构建资源锁及工作区级义务仍缺，3.4 不勾选。
   并发私有工作区补强：共享 `DoctorScratch` 在内部标签后追加进程 ID 与进程内单调序号，防止同一时钟刻度的多个任务争抢同名 0700 目录；目录仍独占创建、不复用残留。并发同标签 RED→GREEN、Python CVE 多根 20 次及整组 15 次重复运行见[局部验收](../../../tests/acceptance/private-scratch-concurrency.md)。跨进程资源锁与完整 CheckPlan 仍缺，3.4 不勾选。
-- [ ] 3.5 实现工作树/index/ref 快照与原始字节校验；验收：SHA-1/SHA-256、坏批响应、特殊文件、symlink/gitlink/LFS 均明确处理。进行中：相邻 Rust CLI 已按 NUL 协议读取真实 index、前后复核列表，并对有界普通 blob 独立核验 SHA-1/SHA-256 Git OID、记录脱敏字节摘要；symlink/gitlink/LFS、超预算和对象读取失败明确 unresolved，见 `codeguard-cli/tests/acceptance/git-index-safety-preview.md`。工作树/ref 快照、坏批响应注入测试、特殊类型完整语义及 Git 工具身份未完成。
+- [x] 3.5 实现工作树/index/ref 快照与原始字节校验；验收：SHA-1/SHA-256、坏批响应、特殊文件、symlink/gitlink/LFS 均明确处理。进行中：相邻 Rust CLI 已按 NUL 协议读取真实 index、前后复核列表，并对有界普通 blob 独立核验 SHA-1/SHA-256 Git OID、记录脱敏字节摘要；symlink/gitlink/LFS、超预算和对象读取失败明确 unresolved，见 `codeguard-cli/tests/acceptance/git-index-safety-preview.md`。工作树/ref 快照、坏批响应注入测试、特殊类型完整语义及 Git 工具身份未完成。
   局部保留进展：单对象/总预算超限不再清空其它已核对 blob 的证据；局部原生 batch 故障也保留先前逐对象核对的结果，并将余项列为 unresolved。真实超预算混合样本通过；受控 Git 第二批损坏响应反例证明前 64 个 OID 证据保留、第 65 个未完成。其它坏批响应变体、工作树/ref 快照及跨平台实测仍缺，3.5 不勾选。
 - [ ] 3.6 实现 GIT_INDEX_FILE、初始提交、worktree、多 ref/non-HEAD/删除 ref push 输入；验收：真实临时 Git 仓检查准确且 index 不变。进行中：相邻 Rust 的真实 index 路径安全预览覆盖初始仓库、替代 `GIT_INDEX_FILE` 与默认 index 不变；worktree 和 pre-push 多 ref/删除 ref 尚未实现，不勾选。
 - [ ] 3.7 实现执行前后内容身份复核和源码副作用检测；验收：并发编辑或检查器改源码导致 incomplete。

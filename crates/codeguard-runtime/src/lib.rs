@@ -250,3 +250,4 @@ pub use wasm_outer_return_scan::{WasmOuterReturnScan, scan_wasm_outer_returns};
 pub mod concurrent_stream;
 pub mod process_cancellation;
 pub mod task_dag;
+pub mod work_tree_snapshot;
