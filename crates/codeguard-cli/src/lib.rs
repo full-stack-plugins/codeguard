@@ -471,6 +471,7 @@ mod check_ruby_native_scan;
 mod check_cpp_native_scan;
 mod check_rust_native_scan;
 mod check_tsx_native_scan;
+mod distribution_installer;
 mod check_luau_native_scan;
 mod check_cobol_native_scan;
 mod check_cfscript_native_scan;
