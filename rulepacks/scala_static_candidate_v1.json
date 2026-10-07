@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0.0",
+  "language": "scala",
+  "dialect": "scala_2_13",
+  "platforms": ["macos_arm64", "macos_x86_64", "linux_x86_64", "linux_aarch64", "windows_x86_64"],
+  "platform_validation": "unverified",
+  "categories": [
+    {
+      "category": "lint",
+      "applicability": "applicable",
+      "status": "gap",
+      "candidate_tool": "scalafix",
+      "candidate_version": "project_toolchain",
+      "version_status": "resolved_at_run",
+      "candidate_argv": ["sbt", "scalafix", "--check"],
+      "requires_database_freshness": false,
+      "sources": ["https://scalacenter.github.io/scalafix/"],
+      "coverage_gaps": ["native_adapter_unvalidated", "scala_dialect_unvalidated"]
+    },
+    {
+      "category": "comments",
+      "applicability": "applicable",
+      "status": "gap",
+      "candidate_tool": "scalafix",
+      "candidate_version": "project_toolchain",
+      "version_status": "resolved_at_run",
+      "candidate_argv": ["sbt", "scalafix", "--check", "--rules=DisableSyntax"],
+      "requires_database_freshness": false,
+      "sources": ["https://scalacenter.github.io/scalafix/"],
+      "coverage_gaps": ["comment_rules_unvalidated", "scaladoc_convention_unvalidated"]
+    },
+    {
+      "category": "dependencies",
+      "applicability": "applicable",
+      "status": "gap",
+      "candidate_tool": "sbt_dependency_check",
+      "candidate_version": "project_toolchain",
+      "version_status": "resolved_at_run",
+      "candidate_argv": ["sbt", "dependencyCheck"],
+      "requires_database_freshness": true,
+      "sources": ["https://github.com/sbt/sbt-dependency-check"],
+      "coverage_gaps": ["dependency_graph_unvalidated", "sbt_version_unvalidated"]
+    },
+    {
+      "category": "cve",
+      "applicability": "applicable",
+      "status": "gap",
+      "candidate_tool": "sbt_dependency_check",
+      "candidate_version": "project_toolchain",
+      "version_status": "resolved_at_run",
+      "candidate_argv": ["sbt", "dependencyCheck"],
+      "requires_database_freshness": true,
+      "sources": ["https://github.com/sbt/sbt-dependency-check"],
+      "coverage_gaps": ["cve_database_freshness_unvalidated", "vulnerability_mapping_unvalidated"]
+    },
+    {
+      "category": "security",
+      "applicability": "applicable",
+      "status": "gap",
+      "candidate_tool": "sbt_dependency_check",
+      "candidate_version": "project_toolchain",
+      "version_status": "resolved_at_run",
+      "candidate_argv": ["sbt", "dependencyCheck"],
+      "requires_database_freshness": true,
+      "sources": ["https://github.com/sbt/sbt-dependency-check"],
+      "coverage_gaps": ["security_rules_unvalidated", "sast_unvalidated"]
+    },
+    {
+      "category": "build",
+      "applicability": "applicable",
+      "status": "gap",
+      "candidate_tool": "sbt",
+      "candidate_version": "project_toolchain",
+      "version_status": "resolved_at_run",
+      "candidate_argv": ["sbt", "compile"],
+      "requires_database_freshness": false,
+      "sources": ["https://www.scala-sbt.org/"],
+      "coverage_gaps": ["build_verification_unvalidated", "sbt_version_unvalidated"]
+    }
+  ]
+}
