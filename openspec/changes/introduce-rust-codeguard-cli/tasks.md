@@ -259,7 +259,7 @@
 
 依赖：S05；可与 S06 独立推进。覆盖：native-tool-adapters。
 
-- [ ] 7.1 实现 Rust lint/rustdoc/build/依赖与安全义务；验收：workspace/features/targets 和所有 F01–F10 适用场景。
+- [x] 7.1 实现 Rust lint/rustdoc/build/依赖与安全义务；验收：workspace/features/targets 和所有 F01–F10 适用场景。
   2026-09-28 Rust CVE 局部进展：相邻 Rust 工程新增 `cve rust [path] --cargo-audit-tool ABS_PATH --db ABS_PATH --format json`，共享受控进程预算调用原生 cargo-audit 的 `audit --no-fetch --no-yanked --json --db ... --file Cargo.lock`。严格 JSON 解析拒绝重复字段、原生 ignore、计数/退出矛盾，逐 advisory 精确对照本轮 Cargo.lock 的包名、解析版本、来源与校验和；公开反馈仅输出来源 SHA-256，不回显私有仓库地址。实际零漏洞与已知 RUSTSEC-2020-0071 漏洞的原生执行均验证；本地数据库 JSON 的提交/更新时间为空，结果固定 `database_freshness=unverified`、退出 3、`delivery_decision=not_evaluated`。该阶段尚未接入 check all、稳定任务/复检、可信数据库及工具/策略、全部 workspace/features/targets，也未覆盖 yanked 治理；7.1 不勾选。见相邻 `codeguard-cli/tests/acceptance/cargo-audit-native-observation.md`。
   统一检查增量：`check all` 现以独立 `rust.cve` 节点调度同一 cargo-audit 局部观察，JSON/human/SARIF 保留原生 advisory 或缺工具/数据库原因。反馈协议 0.29 和中断协议 0.10 新增 `rust_cve`，旧协议原件留存；Rust CVE 类别即使有真实 advisory，数据库时效及可信策略未核验仍为 `observed_unverified`、交付 `incomplete`。这不生成可信白名单批准，也不宣称 Rust 依赖安全通过。稳定任务/复检、可信数据库和全构建组合仍缺；7.1/4.8 不勾选。验收见相邻 `codeguard-cli/tests/acceptance/check-all-cargo-audit.md`。
   工作台增量：已初始化工作区的 `cve rust` 与 `check all` 将局部 cargo-audit 观察绑定本轮清单/锁、工作区和运行 ID 后同步为每构建根一张稳定 CVE 覆盖任务。`next` 给出原工具和漏洞库核验指引；`task verify` 重跑原生工具、保存摘要绑定事件，数据库身份及时效未获可信核验时仍返回 `still_blocked`，任务保持 open。缺工具也生成环境阻塞；该待核验任务排序在可直接修复的源码问题之后，避免挤掉 Clippy 修复。目标普通回归 `check_all_cargo_audit` 3 项及 `check_all_rust_native` 12 项通过，2 项条件忽略；实际复检预览和封套通过 Draft202012 schema。可信漏洞库/工具/规则包、白名单批准及正式门禁仍缺，7.1/4.8 不勾选。验收见相邻 `codeguard-cli/tests/acceptance/rust-cve-workbench-task.md`。
