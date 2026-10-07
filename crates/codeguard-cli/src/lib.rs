@@ -534,7 +534,6 @@ mod status_disposition;
 mod swift_dependency_scan;
 mod terraform_dependency_scan;
 mod token_generation;
-mod typed_module_graph;
 mod typescript_dependency_scan;
 mod zig_dependency_scan;
 
@@ -673,3 +672,4 @@ pub mod privacy_verification;
 pub mod project_boundary;
 pub mod project_schema;
 pub mod manifest_lock_observer;
+pub mod typed_module_graph;
