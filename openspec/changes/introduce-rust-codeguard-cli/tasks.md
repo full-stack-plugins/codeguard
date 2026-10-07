@@ -510,7 +510,7 @@
   后续进展：原任务被 `# noqa` 遮蔽时，复检 0.2 返回 `suppression_requires_review`，`next` 指向抑制核查且 fact 保持 open；真实删除违规仍仅是待策略核验候选，见 `codeguard-cli/tests/acceptance/ruff-native-suppression-observation.md`。
   再次补充：真实 Ruff 复检中，原 F401 被配置禁用时返回 `rule_coverage_requires_review`，新增逐文件 ignore 时返回 `suppression_requires_review`；两者均不关闭任务，也不把零诊断伪装成修复。逐文件匹配范围和受批准策略来源仍待验收。
   CVE blocker 复检进展：`task verify` 已按任务检查器重跑原生 OWASP Maven，接受与 `check java` 一致的离线 Maven/JDK/仓库/漏洞库参数；报告经 sync 保留新阻塞，事件和尝试历史核对原报告摘要。缺前置条件或漏洞库时效未核验均保持 `still_blocked` 和 open，POM 变更后要求重跑。模拟报告与缺数据库正例见相邻 `codeguard-cli/tests/acceptance/owasp-maven-check-java.md`；真实数据库、可信政策和正式关闭/重开仍缺，不勾选。
-- [ ] 9.11 实现 code/dependency/environment/target/policy 的处置归因与例外标签；验收：policy_resolved 不计代码修复，例外保留未解决事实和期限。
+- [x] 9.11 实现 code/dependency/environment/target/policy 的处置归因与例外标签；验收：policy_resolved 不计代码修复，例外保留未解决事实和期限。
 - [ ] 9.12 提供受控 fix 的 attempt 与验证事件接口；验收：noop、部分修改失败及并发编辑的事件样本分别记录且不生成假修复；真实 formatter 接线在 S10 完成。
 - [ ] 9.13 为插件提供启用后的 scan→sync→brief API；验收：新问题给下一步，重复无 Git 噪声，同步失败保留原 gate 并说明 backlog_update_failed。进行中：初始化项目的公开 Rust `lint python` 已自动保存、同步并在同一 CLI 对话反馈中返回局部 Ruff 简报；重复原生扫描不改 task。`check all` 的局部 Rust Clippy finding/blocker 也能保存、同步并在 JSON/human 对话反馈返回下一步。同步或简报失败仍显示原生结果并分别标明状态，见 `codeguard-cli/tests/acceptance/lint-python-auto-brief.md` 与 `check-all-partial-native.md`。插件 Hook/MCP 接线、正式 RepairBrief/门禁及其它检测族尚缺，不勾选。
   Java/P3C 命名子集现也自动保存、同步并显示稳定 finding/blocker 的下一步；仍为局部观察，不能替代完整 Java 义务或白名单批准。
