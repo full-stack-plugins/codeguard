@@ -15,7 +15,7 @@
 use std::process::Command;
 
 fn ensure_clean_dir(name: &str) -> std::path::PathBuf {
-    let tmp = std::env::temp_dir().join(name);
+    let tmp = std::env::temp_dir().join(format!("{}-{}", name, std::process::id()));
     let _ = std::fs::remove_dir_all(&tmp);
     std::fs::create_dir_all(&tmp).unwrap();
     tmp
