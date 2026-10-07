@@ -480,7 +480,6 @@ mod dart_dependency_scan;
 mod distribution_installer;
 mod elixir_dependency_scan;
 mod erlang_dependency_scan;
-mod false_positive_investigation;
 #[cfg(unix)]
 mod go_lint_fallback;
 mod go_project_version;
@@ -681,3 +680,4 @@ pub mod baseline_classifier;
 pub mod dot_prefix_policy;
 pub mod whitelist_commands;
 pub mod whitelist_correction;
+pub mod false_positive_investigation;
