@@ -1,7 +1,7 @@
 {
   "compiler_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
   "compiler_version": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin",
-  "native_ast_sha256": "bb780891570bdbc66c2b83ff0c4947455c4ef0772ea59fb43ce213d8d7066efb",
+  "native_ast_sha256": "59a3867d4c2532316ebdb7534779653c18fcb58fe36c874d8b3276f17087ca3a",
   "observation": {
     "authority": "local_unverified",
     "coverage_proven": false,
@@ -50,6 +50,24 @@
         "purpose_description": "unknown",
         "return_description": "unknown",
         "structure_status": "observed_supported_subset"
+      },
+      {
+        "column_byte": 1,
+        "comment_presence": "present",
+        "line": 11,
+        "missing_components": [],
+        "name": "Box",
+        "offset_byte": 200,
+        "parameters": [
+          {
+            "description": "nonempty",
+            "index": 0,
+            "name": "size"
+          }
+        ],
+        "purpose_description": "nonempty",
+        "return_description": "not_applicable",
+        "structure_status": "observed_supported_subset"
       }
     ],
     "observation_type": "clang_function_documentation_structure",
@@ -57,13 +75,12 @@
     "schema_version": "0.1.0",
     "semantic_accuracy": "not_evaluated",
     "unresolved_declaration_kinds": [
-      "CXXConstructorDecl",
       "CXXMethodDecl",
       "CXXRecordDecl"
     ]
   },
   "qualification": "not_granted",
-  "scope": "cpp17_ordinary_in_class_methods_only",
-  "source_sha256": "a8d5b93ced2efa3bcbdf6ae647df192652dd1a8daf2059b3410ce5140534a556",
-  "test_source_sha256": "8b6a58a8a4d1c2a62bb1089c70466be0dc73c0715c205cbc0addc2ececd551f8"
+  "scope": "cpp17_ordinary_in_class_methods_and_explicit_constructors",
+  "source_sha256": "6049fae8aec9786b36e75a684c195db4b55155fe2281ad8e6bd0b1504a76b13c",
+  "test_source_sha256": "d27769a0da59999d186cbe3b5a6c059e2a1269e00708c1f967c5f24f25367141"
 }

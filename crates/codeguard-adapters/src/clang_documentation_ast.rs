@@ -28,7 +28,7 @@ pub fn parse_clang_documentation_ast(raw: &[u8], source: &[u8]) -> Result<Value,
         if node["isImplicit"] == true {
             continue;
         }
-        let ordinary_method = kind == "CXXMethodDecl"
+        let ordinary_method = matches!(kind, "CXXMethodDecl" | "CXXConstructorDecl")
             && class_context
             && node["name"].as_str().is_some_and(|name| {
                 !name.is_empty()
@@ -46,7 +46,7 @@ pub fn parse_clang_documentation_ast(raw: &[u8], source: &[u8]) -> Result<Value,
             kind,
             "TranslationUnitDecl" | "NamespaceDecl" | "LinkageSpecDecl" | "CXXRecordDecl"
         ) {
-            // 类本身的契约仍未核验；只扩展有明确类上下文的普通方法。
+            // 类本身的契约仍未核验；只扩展有明确类上下文的普通方法与显式构造函数。
             if kind == "CXXRecordDecl" {
                 unresolved.insert(kind.to_owned());
             }

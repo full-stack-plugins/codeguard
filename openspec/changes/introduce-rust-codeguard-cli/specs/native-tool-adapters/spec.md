@@ -1240,3 +1240,11 @@ Clang documentation observation SHALL inspect non-implicit ordinary identifier-n
 #### Scenario: Class member with missing documentation
 - **WHEN** an explicit C++ class contains a directly located ordinary method without a documentation comment
 - **THEN** the adapter SHALL retain its location and missing-comment observation while keeping class documentation unresolved and coverage unproven
+
+### Requirement: Explicit in-class constructor documentation SHALL omit return obligations
+
+The C++ adapter SHALL observe explicitly declared, identifier-named constructors within verified ordinary record traversal using frozen-source positions and actual parameter-comment binding. Constructor purpose and applicable parameter descriptions SHALL be checked structurally; no return description SHALL be required for Clang's void constructor type. Implicit constructors, out-of-class contexts, template-dependent names and unsupported contracts SHALL remain unqualified or unresolved.
+
+#### Scenario: Constructor parameter description is empty
+- **WHEN** an explicit in-class constructor has a purpose but an empty description for a named parameter
+- **THEN** observation SHALL retain the missing parameter component, mark return description not_applicable, and SHALL NOT invent a return obligation or grant semantic qualification
