@@ -71,7 +71,7 @@
     "crates/codeguard-cli/src/java_p3c_scan.rs": "de6b96288d0a24b75e2c52b43b417635d44d3deaaaee22af8bfd86ff063a9c9a",
     "crates/codeguard-cli/src/javascript_syntax_probe.rs": "4ba09a558662332e953e89512d386642653d5cc59dd1336f8ec31b51137731e1",
     "crates/codeguard-cli/src/kotlin_lint_command.rs": "f19e0babe23cc3cce52d69d6821416d6b9fdd7b6d8b484d3413e1368fef05ad8",
-    "crates/codeguard-cli/src/lib.rs": "29a94cb96ff03c039064edf409cb3a84bf6791b053ea07303ccb224b432b99b8",
+    "crates/codeguard-cli/src/lib.rs": "4d563669232b229dae79dd739a23bd85d9855011c112f94c17d4c7f7821c9948",
     "crates/codeguard-cli/src/maven_javadoc_task_recheck.rs": "d55951f3a1b960e8885a1027d5375909bbd4e7a33d6461ff724ad65d9d35febd",
     "crates/codeguard-cli/src/native_clang_profile.rs": "451b4897610323e3df049df6e46e5f65d0d7aa61cf05146df3bb3dc0975c68a6",
     "crates/codeguard-cli/src/next_command.rs": "f11a847d2f5f05d5921369f05278e69f53f4fb6e49c3d28d69cdd9e7b2ca2762",
