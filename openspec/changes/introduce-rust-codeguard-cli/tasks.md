@@ -41,7 +41,7 @@
   局部进展：相邻 Rust 工程已有结构有效 RunReport 的纯 SARIF 2.1.0 投影；未完成零发现仍显示失败通知，白名单 finding 保留且不自动 suppression，原生消息与路径留在私有证据。正式 CLI 格式入口、来源核验及全格式一致性仍缺，2.5 不勾选。
   命令接入进展：实际 `check all/java --format sarif` 已从同轮局部反馈投影已观察的原生 finding；无发现、内部故障及取消仍用失败执行通知表达，原生诊断文本和路径不公开。它尚非完整 RunReport，`lint`/其它检查类命令、`--output`、可信来源和全格式一致性仍缺，2.5 保持未完成。
 - [x] 2.6 建立具名 legacy-v1 协议映射表和参数测试；验收：逐旧入口验证数字/混合优先级，不把兼容通过当新认证。证据：[逐入口映射表](../../../docs/Codeguard-Legacy-Compatibility.zh_CN.md) 与相邻 Rust 工程 `tests/acceptance/legacy-v1-protocol-map.md`；CLI 数字及 check/CVE/Dockerfile 混合优先级由 Rust 参数契约核验，MCP 无逐调用进程码、五类 Hook 宿主语义逐项登记，所有兼容投影固定 `not_evaluated`。旧插件 164 项相关回归及 7 项 MCP 实测通过。此项只完成协议映射，不声称 C35 兼容运行时、宿主接线或新版交付认证完成。
-- [ ] 2.7 实现 C01–C36 命令注册、help/版本元数据、操作结果类型与参数支持矩阵；验收：文档/help/CLI/MCP映射无漂移，查询/计划/安装成功不能变为质量allow。
+- [x] 2.7 实现 C01–C36 命令注册、help/版本元数据、操作结果类型与参数支持矩阵；验收：文档/help/CLI/MCP映射无漂移，查询/计划/安装成功不能变为质量allow。
   进行中：相邻 `codeguard-cli` 已提供 C02 `--version --format human|json`，包含 CLI/目标平台/检查协议 major，并把尚无发布证明的构建身份、规则包兼容范围明确标为未验证；见 `schemas/version-report.schema.json` 和 `crates/codeguard-cli/tests/version_cli.rs`。其余命令注册、帮助生成、MCP 映射与版本化支持矩阵仍缺，暂不勾选。
 - [x] 2.8 固化每类命令timeout/jobs默认值、来源与总deadline；验收：子进程/重试不重置预算，非法预算执行前拒绝，清理未完成真实可见。
   进行中：相邻 Rust `check all` 局部入口现接受 1ms–24h 的 `--timeout`，默认 30m；非法预算在原生启动前返回 2，Ruff 版本探测与逐文件检查继承同一截止时间，超时给出 `request_deadline_exceeded` 而非本地完整。见 `codeguard-cli/tests/acceptance/check-all-partial-native.md`。发现、持久化/清理硬预算、其它命令默认值来源、跨命令 jobs、重试和跨平台验收仍缺，不勾选。
