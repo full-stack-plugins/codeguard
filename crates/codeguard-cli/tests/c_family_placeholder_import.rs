@@ -135,4 +135,26 @@ fn placeholder_import_reuses_file_identity_and_never_closes_on_clean_observation
     );
     assert!(verification["native_scan"].is_null());
     assert_eq!(verification["event_persisted"], false);
+    let override_tool = cli(vec![
+        "task".into(),
+        "verify".into(),
+        task_id.into(),
+        root.display().to_string(),
+        "--clang-tool".into(),
+        root.join("foreign-clang").display().to_string(),
+    ]);
+    assert_eq!(
+        override_tool["reason"],
+        "clang_placeholder_original_tool_required"
+    );
+    assert!(override_tool["native_scan"].is_null());
+    assert_eq!(override_tool["event_persisted"], false);
+    let foreign = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["task", "verify", task_id])
+        .arg(&root)
+        .args(["--ruff-tool", "foreign-ruff", "--format=json"])
+        .output()
+        .unwrap();
+    assert_eq!(foreign.status.code(), Some(2));
+    assert!(foreign.stdout.is_empty());
 }

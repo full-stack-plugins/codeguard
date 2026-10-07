@@ -37,6 +37,7 @@
     "crates/codeguard-cli/src/c_family_comments_workbench.rs": "ce0f780ebc31ce7c04455af6976d0734e9d68cb0d1e18f6fb126e170fe5b9529",
     "crates/codeguard-cli/src/c_family_documentation_hook_feedback.rs": "1383e431164354baa5fa409b6e7f1663350b749f609a2036c29e6c91def1044b",
     "crates/codeguard-cli/src/c_family_documentation_host_guidance.rs": "ded9f6e95cb1c18f212515649b3433020ffc576cda7ac3ef610bf4941b068a7b",
+    "crates/codeguard-cli/src/c_family_placeholder_task_recheck.rs": "1ea7ea6b0452d7625278044e6b33ab313c7d8a37e49e135ad344dd260b5dea4e",
     "crates/codeguard-cli/src/c_family_placeholder_workbench.rs": "d2b3e7a9675331aaea2124e942bb553e4a75756a0d10b435263f7ea8c64e7a9e",
     "crates/codeguard-cli/src/c_family_structure_recheck_tests.rs": "5ac88014e68edb0942630301d57c8fa681224e047ab4eb86102c8c28ba9e4fd0",
     "crates/codeguard-cli/src/c_family_structure_task_recheck.rs": "aec51557f6e73cab32557c13993fec93a04be271715d86a09479d8dcfe9c9f97",
@@ -70,7 +71,7 @@
     "crates/codeguard-cli/src/java_p3c_scan.rs": "36e022ba1f7c157ff52a2839287d9b8497c9bdd5583212128a81df95f5fcf69e",
     "crates/codeguard-cli/src/javascript_syntax_probe.rs": "4ba09a558662332e953e89512d386642653d5cc59dd1336f8ec31b51137731e1",
     "crates/codeguard-cli/src/kotlin_lint_command.rs": "f19e0babe23cc3cce52d69d6821416d6b9fdd7b6d8b484d3413e1368fef05ad8",
-    "crates/codeguard-cli/src/lib.rs": "5c5f22537c5446c031f0dfbf966a40bd8b815d48148c9b97c0e77e1d4f16397e",
+    "crates/codeguard-cli/src/lib.rs": "090d184a67112bab26854dec9c83e74bd9f01828cf8438051acc599a4faf20f9",
     "crates/codeguard-cli/src/maven_javadoc_task_recheck.rs": "d55951f3a1b960e8885a1027d5375909bbd4e7a33d6461ff724ad65d9d35febd",
     "crates/codeguard-cli/src/native_clang_profile.rs": "451b4897610323e3df049df6e46e5f65d0d7aa61cf05146df3bb3dc0975c68a6",
     "crates/codeguard-cli/src/next_command.rs": "ab4ea536a18d0a10e64058734dc6875a5e870dceb2221b3390340b2d0c5855de",
@@ -95,7 +96,7 @@
     "crates/codeguard-cli/src/shell_lint_command.rs": "8e3d859a6c52e282296975751f9fe74e26eb7371105740f526f22990e79d72ae",
     "crates/codeguard-cli/src/swift_lint_command.rs": "182c8a6b43df9164f0c95c91f089bb2be921f56e54b6c6e81d35ae00f717d752",
     "crates/codeguard-cli/src/task_attempt_command.rs": "220245190fbaf74456628318c0a2988e93fa7af1fe3ae274ed12d47bc38d300a",
-    "crates/codeguard-cli/src/task_verify_command.rs": "13777359c346bf0ebfb2d1e20c93e3b76750449e4c666aa632213a7c513bca14",
+    "crates/codeguard-cli/src/task_verify_command.rs": "15f7b5af3866a45788c4e908373f69d0d0f1890015982d80cafda6089678788c",
     "crates/codeguard-cli/src/work_sync.rs": "4fbbbf9a9db21c56aff9c27ec83f7b55a3895ed318979abba43a9feb03486bba",
     "crates/codeguard-cli/src/work_sync/c_family_comments_report.rs": "f1b46bc67b85f4883c20df6261cfd3ca570fe1fe37db7fd050b0ecaeb824dd60",
     "crates/codeguard-cli/src/work_sync/c_family_placeholder_report.rs": "f856167d9422a27fdac1fd3118e64606ccd3b1e1224f48821a478aeade992e6d",
@@ -111,7 +112,7 @@
     "crates/codeguard-cli/tests/c_family_documentation_edit_hook.rs": "df674648de1007f227944a30fd7d41fc3b5711e6444ca8fe2d07de8a1f991e79",
     "crates/codeguard-cli/tests/c_family_documentation_hook.rs": "00d91adc6dd94d585aa2719c99bee71ae04e182839acc76264e634d2bac71940",
     "crates/codeguard-cli/tests/c_family_placeholder_cli.rs": "e45d2f80bdfabb1bb836881d765cb3855567e488924ca4d3fec9376b5fe006dd",
-    "crates/codeguard-cli/tests/c_family_placeholder_import.rs": "eaac174572dd58096502dc11c478efc3ade8457e70900a1a5a62b8023d866d38",
+    "crates/codeguard-cli/tests/c_family_placeholder_import.rs": "429267d41e480f03443e44f0f71eabd7568b13f49aeecfa70b276c515c2a4705",
     "crates/codeguard-cli/tests/c_family_structure_workbench.rs": "565c958d05a79480f1db7a35027bd69076ba197a7cbc16d704c3435883369a8c",
     "crates/codeguard-cli/tests/c_native_differential.rs": "64ca1db5036fc0b212ce6a1aa68a8411de168326e41e1fdc7b5249def65db1c8",
     "crates/codeguard-cli/tests/cargo_audit_cli.rs": "d4bed2e3a55056dc3e6ffe9c896e23376e5577297a0b880b8324b75fc8e65017",
@@ -188,7 +189,7 @@
     "tests/acceptance/cargo-documentation-workspace.md": "6be1ac870924db90f8d2b9aa6cfa298f4a825ce659f998d2121f4c7b4089b9a4",
     "tests/acceptance/check-c-family-documentation.md": "80e07e8dba544f8b477f232bac9ca19b2d0c1f1dffd163445b0887e56a31873d",
     "tests/acceptance/clang-documentation-engine-identity.md": "e4bbbed91707daf839e446f482a7db417b0bfc753a0bd885da43a60266f2b461",
-    "tests/acceptance/clang-documentation-placeholders.md": "73cc626936e0580cdb957b73400ed88d2457afab12dad78c4598d0102ec081f6",
+    "tests/acceptance/clang-documentation-placeholders.md": "518d3d095b49514c15b63de864105367e110cbf42a3bb770ec0bc2dc3d6afb1f",
     "tests/acceptance/clang-documentation-structure.md": "bbcb5fd87cbbf99054b5639caa56d212ef83cf3135d8867eb99ace74a0c86e10",
     "tests/acceptance/clang-preprocessor-context.md": "3af1710a54102c854824f2402e1ca15e14fd38c72299b9811398f4c486148565",
     "tests/acceptance/clang-standalone-native.md": "155e64133bc4353cdbfe223c8e2c5bf1d2ab2c3e95c7c2e0232e9931988db017",
@@ -3255,7 +3256,8 @@
                 "schemas/c-family-comments-feedback-v0.11.schema.json",
                 "tests/acceptance/clang-documentation-placeholders.md",
                 "crates/codeguard-cli/src/next_command/c_family_placeholder_candidate.rs",
-                "schemas/repair-brief-preview-v0.34.schema.json"
+                "schemas/repair-brief-preview-v0.34.schema.json",
+                "crates/codeguard-cli/src/c_family_placeholder_task_recheck.rs"
               ],
               "blockers": [
                 "C/C++结构文件策略任务、原工具task verify、受控repair-source尝试及同一输入两次失败预算已接线；跨输入语义无进展、可信关闭/复发、check/Hook与详细语义/完整项目/独立精度仍未验收。",
@@ -3675,7 +3677,8 @@
                 "schemas/c-family-comments-feedback-v0.11.schema.json",
                 "tests/acceptance/clang-documentation-placeholders.md",
                 "crates/codeguard-cli/src/next_command/c_family_placeholder_candidate.rs",
-                "schemas/repair-brief-preview-v0.34.schema.json"
+                "schemas/repair-brief-preview-v0.34.schema.json",
+                "crates/codeguard-cli/src/c_family_placeholder_task_recheck.rs"
               ],
               "blockers": [
                 "C/C++结构文件策略任务、原工具task verify、受控repair-source尝试及同一输入两次失败预算已接线；跨输入语义无进展、可信关闭/复发、check/Hook与详细语义/完整项目/独立精度仍未验收。",

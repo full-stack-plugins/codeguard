@@ -1330,3 +1330,13 @@ next SHALL provide a separately versioned placeholder diagnostic brief after val
 - **THEN** next SHALL retract historical positions or reject the brief, rather than authorize repairs at stale locations
 - **WHEN** the source and origin remain current
 - **THEN** diagnostic positions MAY be displayed, but task verify SHALL still reject unsupported placeholder verification before leasing, execution or event persistence
+
+### Requirement: Placeholder verification preflight SHALL reject changed origin identity before execution
+
+Before leasing or executing a placeholder task recheck, the verifier SHALL validate the first independent placeholder report, exact consumed marker, immutable open task fingerprint/path/workspace/rule/source/report identity and original selected tool bytes. A supplied different tool path SHALL be rejected even if it might invoke another Clang binary. Foreign checker parameters SHALL fail as argument errors before leasing or execution. Until the dedicated execution/result/attempt integration exists, a healthy preflight SHALL still return the explicit workflow-not-integrated state with no native scan or verification event.
+
+#### Scenario: Tool override and foreign checker options
+- **WHEN** task verify selects a different Clang path for a placeholder task
+- **THEN** it SHALL reject the override without executing it or persisting an event
+- **WHEN** unrelated Ruff or other checker options are supplied
+- **THEN** it SHALL return an argument error before any original-checker execution or lease acquisition

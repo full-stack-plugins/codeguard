@@ -95,6 +95,13 @@ pub fn run(args: &[String]) -> ExitCode {
         Err(reason) => return print_unavailable(&parsed, reason),
     };
     if matches!(brief["checker_id"].as_str(), Some("c.clang.documentation_placeholder" | "cpp.clang.documentation_placeholder")) {
+        if args.iter().filter(|argument|argument.starts_with("--")).any(|argument| !matches!(argument.as_str(),"--clang-tool"|"--timeout"|"--format"|"--format=json"|"--format=human"|"--owner"|"--lease-token")) {
+            eprintln!("占位文档任务仅接受原Clang工具及共享复检参数");
+            return ExitCode::from(2);
+        }
+        if let Err(reason)=crate::c_family_placeholder_task_recheck::preflight(&root,&brief,parsed.clang_tool.as_deref()) {
+            return print_unavailable(&parsed,reason);
+        }
         return print_unavailable(&parsed, "clang_placeholder_task_workflow_not_integrated");
     }
     let gradle_cve_task = brief["checker_id"] == "java.gradle.dependency_check";
