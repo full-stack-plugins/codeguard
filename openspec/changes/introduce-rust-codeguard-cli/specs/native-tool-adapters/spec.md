@@ -1256,3 +1256,11 @@ Parsing SHALL stop with an explicit budget failure before producing more than 20
 #### Scenario: Oversized declaration inventory
 - **WHEN** an AST has 2001 supported declarations or a supported declaration has 257 parameters
 - **THEN** parsing SHALL return clang_documentation_ast_budget_exceeded and SHALL NOT produce an apparently complete partial inventory
+
+### Requirement: Unsupported C++ free operators SHALL not invalidate unrelated documentation
+
+Free operator declarations whose Clang semantic names are not ordinary source identifiers SHALL remain unresolved until dedicated operator source mapping is implemented. Their presence SHALL NOT discard supported function observations in the same AST or imply full coverage. Ordinary identifiers that merely begin with operator SHALL retain existing behavior; malformed supported declarations SHALL still fail source binding.
+
+#### Scenario: Operator and ordinary function coexist
+- **WHEN** an AST contains a free operator+ declaration and a supported ordinary function
+- **THEN** the adapter SHALL keep the operator's FunctionDecl kind unresolved, retain the ordinary function's source-bound observation and leave coverage unproven

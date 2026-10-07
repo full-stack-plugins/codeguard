@@ -28,6 +28,20 @@ pub fn parse_clang_documentation_ast(raw: &[u8], source: &[u8]) -> Result<Value,
         if node["isImplicit"] == true {
             continue;
         }
+        // 运算符的语义名称与源码token不同，专用定位尚未实现，不能拖垮普通函数。
+        let free_operator = kind == "FunctionDecl"
+            && node["name"].as_str().is_some_and(|name| {
+                name.strip_prefix("operator").is_some_and(|suffix| {
+                    suffix
+                        .chars()
+                        .next()
+                        .is_some_and(|first| first != '_' && !first.is_alphanumeric())
+                })
+            });
+        if free_operator {
+            unresolved.insert(kind.to_owned());
+            continue;
+        }
         let ordinary_method = matches!(kind, "CXXMethodDecl" | "CXXConstructorDecl")
             && class_context
             && node["name"].as_str().is_some_and(|name| {

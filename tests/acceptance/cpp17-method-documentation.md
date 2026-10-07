@@ -9,3 +9,5 @@
 当前显式构造函数增量：新测试先失败后通过，空参数描述产生parameter:size而不产生return；类外构造上下文仍未解析。真实Clang样例包含有用途及参数说明的Box(int size)，read/clear/Box三者无缺失组件，undocumented缺少注释，类/运算符仍未解析。最终AST6项、结构合约含真实工具4项实际通过、0忽略；同名机器证据已更新为本次输入、测试及AST摘要，历史记录可从b455217读取。
 
 解析资源增量：合成AST反例先复现2001声明被完整返回，随后在解析阶段加2000声明/256直接参数上限；2001/257返回明确预算错误，2000/256仍可解析。不截断成完整报告。最终AST7项、结构合约含真实Clang4项通过；这是边界功能验收，不是生产吞吐或延迟基准。
+
+自由运算符边界：operator+保留FunctionDecl未解析，不再使同文件普通函数观察失败；真实Clang同时保留ordinary与operator_helper。C11裸operator函数名经Clang实际接受，合成AST反例确保不被误跳过。新增反例先失败，最终AST9项、结构合约含两项真实Clang5项通过、0忽略。新[自由运算符机器证据](evidence/cpp17-free-operator-documentation.json)保存真实AST/工具/源码/当前测试摘要；原方法证据同步重采集，资格仍未授予。
