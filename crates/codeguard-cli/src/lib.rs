@@ -510,7 +510,6 @@ mod objc_dependency_scan;
 mod pascal_dependency_scan;
 mod php_dependency_scan;
 mod policy_repair_test;
-mod privacy_verification;
 mod project_boundary;
 mod python_dependency_scan;
 #[cfg(unix)]
@@ -672,3 +671,4 @@ pub mod attempt_tracking;
 pub mod controlled_fix_events;
 pub mod plugin_api;
 pub mod task_verification;
+pub mod privacy_verification;
