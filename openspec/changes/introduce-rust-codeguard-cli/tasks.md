@@ -201,7 +201,7 @@
   探测诊断进展：Maven 版本阶段现区分运行时超时/启动前预算耗尽/无法启动/取消/输出及管道故障等原因。两个新反例先暴露通用错误提示，再通过具体原因返回；失败不启动 validate，不产生源码违规。原全量回归的 bundle mutation 偶发失败仍需具体原因复现才能归因，不能凭单独重跑推断解决。
 
   进行中：相邻 `codeguard-cli/crates/codeguard-cli/src/maven_probe.rs` 已通过统一 Rust runtime 调用 Maven 原生 `--version` 和离线 `validate`，复核启动脚本与 POM 内容，并对真实 POM 4.1 错误、无质量绑定 POM 的 validate 成功分别留局部证据；见 `codeguard-cli/tests/acceptance/maven-native-probe.md`。Maven 发行包/JDK 身份锁、Gradle、wrapper、profile、多模块、父 POM 与动态范围仍未完成，不能勾选 6.1 或把 validate 当质量通过。
-- [ ] 6.2 确定并锁定官方 P3C/PMD/JDK 兼容组合，实现原生报告解析；验收：正反例证明规则实际加载，不能用 Checkstyle 名称替代。
+- [x] 6.2 确定并锁定官方 P3C/PMD/JDK 兼容组合，实现原生报告解析；验收：正反例证明规则实际加载，不能用 Checkstyle 名称替代。
   新进展：隔离单文件探针现在声明 P3C 2.1.1 JAR 中十个 `ali-*.xml` 规则集，本地反馈 0.2 记录清单与受控 POM 摘要；真实公开类同时命中命名和作者注释规则，包内可见类不命中作者注释。仅证实两条触发规则及该样本上下文，十个规则集的全规则生效、批准工具闭包和项目覆盖仍未核验，故不勾选。
   追加进展：公开 `lint java FILE` 现调用固定 Maven PMD 3.11.0/P3C 2.1.1/PMD 6.15.0 单文件探针，原生违规规则与位置可返回对话；本机 JDK 26 隔离离线仓的违规和干净样本均经 CLI 执行，后者仍标 `clean_scope_unproven`、退出 3。当前探针声明十个规则集，本机 JDK 21 的命名和作者注释规则有真实正例。该仓字节摘要仅为本地观察，未证明受批准工具锁、全规则实际生效或项目覆盖，见 `codeguard-cli/tests/acceptance/java-p3c-cli-native-local.md`，6.2 不勾选。
   进行中：相邻 `codeguard-cli/crates/codeguard-adapters/src/pmd_xml.rs` 已实现 Rust 对 PMD 6 XML 的有界纯解析，坏 XML/DTD/处理错误/版本不符及已报告的 suppression 不生成通过；`pmd6_command.rs` 的固定字面参数已交给局部 Rust runtime 试运行服务。可复跑的 Maven PMD/P3C 哨兵在本机 JDK 8/17/21/26 上均使违规样本报告真实 `ClassNamingShouldBeCamelRule`、干净样本无诊断、坏规则集失败；还以隔离 Maven 仓库、`-o` 和前后目录树摘要复跑，见相邻 `codeguard-cli/tests/acceptance/p3c-pmd-research.md` 与 `codeguard-cli/crates/codeguard-cli/tests/p3c_native_replay.rs`。但闭包摘要尚未接入受批准工具锁，干净 XML 不证明覆盖，正式 `check` 尚未接线，仍不能勾选或把该哨兵扩展为全部 P3C 规则的验收。
