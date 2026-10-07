@@ -441,6 +441,12 @@ mod check_elixir_scan;
 mod php_dependency_scan;
 mod scala_dependency_scan;
 mod elixir_dependency_scan;
+mod check_r_scan;
+mod r_dependency_scan;
+mod check_dart_scan;
+mod dart_dependency_scan;
+mod check_lua_scan;
+mod lua_dependency_scan;
 #[cfg(unix)]
 mod go_lint_fallback;
 mod go_project_version;
