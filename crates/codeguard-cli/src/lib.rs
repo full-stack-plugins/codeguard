@@ -672,3 +672,4 @@ pub mod plugin_api;
 pub mod task_verification;
 pub mod privacy_verification;
 pub mod project_boundary;
+pub mod project_schema;
