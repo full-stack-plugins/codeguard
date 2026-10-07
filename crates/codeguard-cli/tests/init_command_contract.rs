@@ -1696,3 +1696,49 @@ fn compilation_database_changes_refresh_profile_without_erasing_tasks() {
     );
     assert_eq!(fs::read_to_string(task).unwrap(), "existing repair history");
 }
+
+#[test]
+fn init_exposes_compilation_argument_blockers_without_running_compiler() {
+    let project = Project::new();
+    for (arguments, reason) in [
+        (
+            vec!["clang++", "-std=c++17", "@flags.rsp"],
+            "compilation_database_response_file_unresolved",
+        ),
+        (
+            vec!["clang++", "-std=c++17", "-Xclang", "-load", "plugin.so"],
+            "compilation_database_frontend_passthrough_unresolved",
+        ),
+        (
+            vec!["clang++", "-std=c++17", "-fplugin=plugin.so"],
+            "compilation_database_plugin_unresolved",
+        ),
+        (
+            vec!["clang++", "-std=c++17", "-std=c++20"],
+            "compilation_database_standard_ambiguous",
+        ),
+        (
+            vec!["clang++", "main.cpp"],
+            "compilation_database_standard_missing",
+        ),
+        (
+            vec!["clang++", "-std=c++20"],
+            "compilation_database_standard_unsupported",
+        ),
+    ] {
+        let bytes = serde_json::to_vec(&serde_json::json!([{"directory":"/unverified/build","file":"main.cpp","arguments":arguments}])).unwrap();
+        fs::write(project.0.join("compile_commands.json"), bytes).unwrap();
+        let (exit, report) = project.run(&["--format=json"]);
+        assert_eq!(exit, 0);
+        let checker = report["profile_summary"]["checkers"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|c| c["checker_id"] == "c_family.compilation_database")
+            .unwrap();
+        assert_eq!(checker["reason"], reason);
+        assert_eq!(checker["configuration"], "unknown");
+        assert_eq!(checker["execution"], "not_run");
+        assert!(!project.0.join(".codeguard").exists());
+    }
+}

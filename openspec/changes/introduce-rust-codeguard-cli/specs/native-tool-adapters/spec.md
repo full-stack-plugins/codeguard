@@ -1224,3 +1224,7 @@ The adapter SHALL parse bounded compilation database bytes without filesystem ac
 #### Scenario: Command string cannot provide trusted arguments
 - **WHEN** an entry has only a command string, malformed argument fields or no working directory
 - **THEN** observation is unresolved, no shell command executes and no default language standard is assigned
+
+#### Scenario: Static compilation arguments expose unresolved execution context
+- **WHEN** the argument vector uses response files, frontend passthrough, compiler plugins or ambiguous/missing/unsupported explicit standards
+- **THEN** initialization SHALL preserve configuration unknown and execution not_run, expose a concrete context blocker, and SHALL NOT classify that blocker as a source violation. No known blocker SHALL NOT imply execution authorization or verified project coverage.

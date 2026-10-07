@@ -6,6 +6,8 @@
 
 公开init只读模式不创建工作区，配置状态unknown、execution为not_run；apply退出3保持partial，把稳定数据库SHA256写入project.json，输入文件不改动，不运行command字符串。command-only数据库阻塞观察完整性。数据库宏变化与删除更新画像，保留用户任务文字；不把参数观察视为标准确认、头文件解析或完整项目覆盖。
 
-当前测试源码SHA256：`db6c07b3d24229a9f3910765981d9439f66e3ba1b851032f98c82fb0e7196733`。
+当前测试源码SHA256：`d336dde9bd839e755b0c25dfdfe8eda1a97f99fd31aa1de38b80c511238150c1`。
 
 本轮使用CLI临时项目，没有运行原生编译器、clang-tidy或真实安装宿主，不授予生产资格。当前46 partial、26 wasm_candidate_only、292 not_integrated为公开计划中的364条路径；旧52 partial记录为纠正前历史检查点。
+
+新增上下文诊断：响应文件、前端透传、插件、重复标准、缺标准、不支持标准6类参数反例通过。适配器3项测试通过；当前公开CLI定向4项默认/WASM各通过（WASM 2.00秒），严格Clippy通过。配置可读不等于执行上下文可用；未命中已知阻塞也不授权运行。
