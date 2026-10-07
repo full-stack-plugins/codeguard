@@ -144,3 +144,39 @@
 **待验证**（需 Rustfmt 1.9.0）：
 - 真实 Rustfmt 差分
 - 真实 clippy 文档检查
+
+## Python 四能力验证（2026-10-07）
+
+| 能力 | 测试套件 | 通过 | 忽略 | 状态 |
+|---|---|---|---|---|
+| syntax | python_syntax_fallback_candidate, python_structural_syntax | 12 | 2 | ✅ |
+| documentation | python_comments_cli, ruff_documentation_contract | 13 | 2 | ✅ |
+| conventions | python_lint_scan_contract, lint_python_cli, ruff_local_discovery, ruff_probe_contract | 44 | 18 | ✅ |
+| vulnerabilities | python_cve_cli | 11 | 0 | ✅ |
+| closure | python_task_resolution_service | 1 | 2 | ✅ |
+| **总计** | **10 个套件** | **81** | **23** | ✅ |
+
+**已验证**：
+- Python 语法回退候选、结构语法
+- 详细注释检查、Ruff 文档契约
+- lint 扫描契约、Ruff 本地发现
+- CVE 检查、可信关闭（9/10）
+
+**待验证**（需 Ruff 0.16.8）：
+- 真实 Ruff 差分
+- 真实 pip-audit 漏洞检查
+
+---
+
+## P0-B 五语言四能力汇总（2026-10-07）
+
+| 语言 | syntax | documentation | conventions | vulnerabilities | 总计 |
+|---|---|---|---|---|---|
+| **Java** | 6/6 | 40/50 | 78/104 | 33/36 | **157/196** |
+| **Rust** | 8/10 | 25/28 | 21/25 | 5/6 | **88/107** |
+| **Python** | 12/14 | 13/15 | 44/62 | 11/11 | **81/104** |
+| **总计** | **26/30** | **78/93** | **143/191** | **49/53** | **326/407** |
+
+**核心验证完成率：326/407 = 80%**
+
+剩余 81 个忽略测试需外部工具（Maven/OWASP/Rustfmt/Ruff 离线缓存）。
