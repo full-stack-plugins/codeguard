@@ -519,3 +519,4 @@ pub use clang_placeholder_validation::valid_clang_documentation_placeholders;
 pub mod adapter_protocol;
 pub mod conformance_harness;
 pub mod tool_resolution;
+pub mod tools_install;
