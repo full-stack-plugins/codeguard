@@ -29,6 +29,7 @@ fn main() -> ExitCode {
         [command, rest @ ..] if command == "init" => codeguard_cli::init_command::run(rest),
         [command, rest @ ..] if command == "config" => codeguard_cli::config_command::run(rest),
         [command, rest @ ..] if command == "tools" => codeguard_cli::tools_command::run(rest),
+        [command, rest @ ..] if command == "format" => codeguard_cli::format_command::run(rest),
         [command, operation, rest @ ..] if command == "grammar" && operation == "status" => {
             codeguard_cli::grammar_status_command::run(rest)
         }

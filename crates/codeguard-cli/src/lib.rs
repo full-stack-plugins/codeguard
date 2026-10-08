@@ -128,6 +128,7 @@ pub mod config_command;
 mod config_project_observation;
 pub mod conversation_feedback;
 pub mod corpus;
+pub mod format_command;
 mod csharp_dependency_scan;
 pub mod discovery;
 pub mod false_positive_decision;

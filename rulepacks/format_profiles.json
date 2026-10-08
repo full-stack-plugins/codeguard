@@ -1,0 +1,801 @@
+{
+  "schema_version": "0.1.0",
+  "document_type": "format_profiles",
+  "authority": "repository_profile_only",
+  "qualification": "not_granted",
+  "category": "format",
+  "separation_note": "format 类别独立于 lint/comments/conventions/vulnerabilities；格式化不能冒充注释或规范检查",
+  "policy": "format_check_reports_style_only_never_claims_semantic_compliance",
+  "languages": [
+    {
+      "language": "java",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "formatter": "rustfmt",
+      "tool_key": "rustfmt",
+      "check_argv": [
+        "--check",
+        "--edition",
+        "{edition}",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--edition",
+        "{edition}",
+        "{file}"
+      ],
+      "config_markers": [
+        "rustfmt.toml",
+        ".rustfmt.toml"
+      ],
+      "extensions": [
+        ".rs"
+      ],
+      "dialects": {
+        "edition": "2021"
+      },
+      "notes": "rustfmt 是 Rust 官方格式化器；--check 只读检查不改源码",
+      "language": "rust",
+      "status": "integrated"
+    },
+    {
+      "formatter": "prettier",
+      "tool_key": "prettier",
+      "check_argv": [
+        "--check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--write",
+        "{file}"
+      ],
+      "config_markers": [
+        ".prettierrc",
+        ".prettierrc.json",
+        ".prettierrc.yaml",
+        "prettier.config.js"
+      ],
+      "extensions": [
+        ".ts",
+        ".tsx"
+      ],
+      "dialects": {},
+      "notes": "prettier 读项目 prettier 配置；--check 只读",
+      "language": "typescript",
+      "status": "integrated"
+    },
+    {
+      "formatter": "ruff",
+      "tool_key": "ruff",
+      "check_argv": [
+        "format",
+        "--check",
+        "--quiet",
+        "{file}"
+      ],
+      "apply_argv": [
+        "format",
+        "--quiet",
+        "{file}"
+      ],
+      "config_markers": [
+        "pyproject.toml",
+        "ruff.toml",
+        ".ruff.toml"
+      ],
+      "extensions": [
+        ".py",
+        ".pyi"
+      ],
+      "dialects": {},
+      "notes": "ruff format 是 Black 兼容格式化器；只判格式，不冒充 lint 规则",
+      "language": "python",
+      "status": "integrated"
+    },
+    {
+      "formatter": "gofmt",
+      "tool_key": "gofmt",
+      "check_argv": [
+        "-l",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-w",
+        "{file}"
+      ],
+      "config_markers": [],
+      "extensions": [
+        ".go"
+      ],
+      "dialects": {},
+      "notes": "gofmt 是 Go 官方格式化器；-l 列出不合规文件（stdout 非空即不合规），-w 就地写入",
+      "language": "go",
+      "status": "integrated"
+    },
+    {
+      "language": "csharp",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "kotlin",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "swift",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "php",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "ruby",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "scala",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "shell",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "dockerfile",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "yaml",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "elixir",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "css",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "formatter": "clang-format",
+      "tool_key": "clang-format",
+      "check_argv": [
+        "--dry-run",
+        "--Werror",
+        "--style=file",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-i",
+        "--style=file",
+        "{file}"
+      ],
+      "config_markers": [
+        ".clang-format",
+        "_clang-format"
+      ],
+      "extensions": [
+        ".c",
+        ".h"
+      ],
+      "dialects": {
+        "standard": "c11"
+      },
+      "notes": "clang-format 读 .clang-format；--dry-run --Werror 只读检查",
+      "language": "c",
+      "status": "integrated"
+    },
+    {
+      "formatter": "clang-format",
+      "tool_key": "clang-format",
+      "check_argv": [
+        "--dry-run",
+        "--Werror",
+        "--style=file",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-i",
+        "--style=file",
+        "{file}"
+      ],
+      "config_markers": [
+        ".clang-format",
+        "_clang-format"
+      ],
+      "extensions": [
+        ".cpp",
+        ".cc",
+        ".cxx",
+        ".hpp",
+        ".hh",
+        ".hxx"
+      ],
+      "dialects": {
+        "standard": "c++17"
+      },
+      "notes": "clang-format 读 .clang-format；--dry-run --Werror 只读检查",
+      "language": "cpp",
+      "status": "integrated"
+    },
+    {
+      "formatter": "clang-format",
+      "tool_key": "clang-format",
+      "check_argv": [
+        "--dry-run",
+        "--Werror",
+        "--style=file",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-i",
+        "--style=file",
+        "{file}"
+      ],
+      "config_markers": [
+        ".clang-format"
+      ],
+      "extensions": [
+        ".m",
+        ".mm"
+      ],
+      "dialects": {},
+      "notes": "clang-format 读 .clang-format",
+      "language": "objc",
+      "status": "integrated"
+    },
+    {
+      "language": "dart",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "vue",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "svelte",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "astro",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "solidity",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "terraform",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "nix",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "html",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "sql",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "graphql",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "protobuf",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "markdown",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "toml",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "haskell",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "ocaml",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "fsharp",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "perl",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "groovy",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "clojure",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "powershell",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "zig",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "nim",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "crystal",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "julia",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "elm",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "lua",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "luau",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "pascal",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "r",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "cfml",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "cobol",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "vbnet",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "erlang",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "arkts",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "metal",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "liquid",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "cuda",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    },
+    {
+      "language": "ansible",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "尚未接入原生格式化器；format 命令对该语言如实返回 not_integrated，不静默通过"
+    }
+  ]
+}

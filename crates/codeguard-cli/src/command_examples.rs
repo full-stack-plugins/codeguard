@@ -1,6 +1,17 @@
 /// 按固定入口提供已接线的参数示例；占位路径须由调用者替换并由命令本身核对。
 pub(crate) fn examples(command: &str) -> &'static [&'static str] {
     match command {
+        "format list" => &["codeguard format list"],
+        "format check" => &[
+            "codeguard format check all . --format json",
+            "codeguard format check rust . --tool rustfmt=/absolute/rustfmt --format json",
+            "codeguard format check go . --tool gofmt=/absolute/sdk/bin/gofmt --format json",
+            "codeguard format check cpp . --tool clang-format=/usr/bin/clang-format --format json",
+        ],
+        "format apply" => &[
+            "codeguard format apply all .",
+            "codeguard format apply rust . --tool rustfmt=/absolute/rustfmt",
+        ],
         "grammar probe" => &[
             "codeguard grammar probe javascript FILE --format=json",
             "codeguard grammar probe javascript MODULE_FILE --module --format=json",
