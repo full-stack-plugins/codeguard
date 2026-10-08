@@ -418,10 +418,10 @@ fn every_language_has_executable_or_evidenced_disposition() {
     );
 }
 
-/// 交付口径必须自洽：57 = 已接入 + planned 排除 + 显式归口，无第四类、无静默遗漏。
+/// 交付口径必须自洽：54 种 stable 全部具备可执行门禁，3 种 planned 正式排除。
 ///
 /// 这是对「剩余 50 种全部接入」的可审计回答：planned 语言从未进入 stable 交付口径，
-/// 显式归口语言（ansible→yaml）不是未完成项，两类都必须有机器可读的理由与证据引用。
+/// 路由条目（ansible→yaml）是可执行的真实门禁而非缺口声明。
 #[test]
 fn format_gate_scope_accounting_is_complete_and_auditable() {
     let scope: serde_json::Value = serde_json::from_str(include_str!(
@@ -438,21 +438,30 @@ fn format_gate_scope_accounting_is_complete_and_auditable() {
     )
     .expect("JSON 解析失败");
 
-    // 口径内部自洽
-    assert_eq!(scope["registry_total"], 57);
-    let stable = scope["registry_stable"].as_u64().expect("registry_stable 应为数字");
-    let planned = scope["registry_planned"].as_u64().expect("registry_planned 应为数字");
-    let total = scope["registry_total"].as_u64().expect("registry_total 应为数字");
-    assert_eq!(stable + planned, total);
+    let total = scope["registry_total"].as_u64().expect("registry_total");
+    let stable = scope["registry_stable"].as_u64().expect("registry_stable");
+    let planned = scope["registry_planned"].as_u64().expect("registry_planned");
+    let integrated = scope["integrated_count"].as_u64().expect("integrated_count");
     let excluded = scope["planned_excluded"].as_array().expect("planned 排除列表");
     let gaps = scope["explicit_gaps"].as_array().expect("显式归口列表");
-    assert_eq!(
-        scope["integrated_count"].as_u64().unwrap() as usize + excluded.len() + gaps.len(),
-        57,
-        "已接入 + planned 排除 + 显式归口必须恰好等于 57，不允许第四类"
-    );
 
-    // planned 排除项必须真为 planned 且引用证据
+    // 注册表口径自洽
+    assert_eq!(stable + planned, total, "stable + planned 必须等于总数");
+    // 全部 stable 必须有可执行门禁，不允许留缺口
+    assert_eq!(
+        integrated,
+        stable,
+        "全部 {stable} 种 stable 语言必须具备可执行格式门禁，当前仅 {integrated}"
+    );
+    // 三类恰好穷尽：已接入 + planned 排除 + 显式缺口
+    assert_eq!(
+        integrated as usize + excluded.len() + gaps.len(),
+        total as usize,
+        "已接入 + planned 排除 + 显式缺口必须恰好穷尽 57，不允许静默遗漏"
+    );
+    assert!(gaps.is_empty(), "stable 语言不应留有显式缺口");
+
+    // planned 排除项必须真为 planned 且引用仓库内可验证证据
     for entry in excluded {
         let language = entry["language"].as_str().unwrap();
         assert_eq!(
@@ -465,20 +474,22 @@ fn format_gate_scope_accounting_is_complete_and_auditable() {
         );
     }
 
-    // 显式归口项必须说明归口目标
-    for entry in gaps {
+    // 路由条目必须指向已接入的目标通道，且带可执行 argv（不是缺口声明）
+    for entry in scope["routed_entries"].as_array().unwrap_or(&vec![]) {
         let language = entry["language"].as_str().unwrap();
+        let target = entry["routed_to"].as_str().unwrap();
+        assert_ne!(language, target, "{language} 不应路由到自身");
         assert!(
-            entry["reason"].as_str().is_some_and(|r| r.len() >= 10),
-            "{language} 的显式归口必须写明理由"
-        );
-        assert!(
-            entry["routed_to"].is_string(),
-            "{language} 显式归口必须指向承载通道（排除自主缺口）"
+            scope["integrated_languages"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|v| v.as_str() == Some(target)),
+            "{language} 的路由目标 {target} 必须本身是已接入通道"
         );
     }
 
-    // 口径声明的已接入集合必须与真实档案逐字一致（防止口径与实现漂移）
+    // 口径声明的已接入集合必须与真实档案逐字同序（防止口径与实现漂移）
     let actual: Vec<&str> = inventory["languages"]
         .as_array()
         .unwrap()

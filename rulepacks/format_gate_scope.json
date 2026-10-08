@@ -1,8 +1,8 @@
 {
-  "schema_version": "0.1.0",
+  "schema_version": "0.2.0",
   "document_type": "format_gate_scope",
   "authority": "repository_scope_declaration",
-  "target_statement": "57 语言中全部 stable 语言具备可执行格式门禁或显式归口；planned 语言不计入交付口径",
+  "target_statement": "54 种 stable 语言全部具备可执行格式门禁；3 种 planned 语言按设计排除且不计入交付口径",
   "registry_total": 57,
   "registry_stable": 54,
   "registry_planned": 3,
@@ -59,9 +59,17 @@
     "vbnet",
     "erlang",
     "liquid",
-    "cuda"
+    "cuda",
+    "ansible"
   ],
-  "integrated_count": 53,
+  "integrated_count": 54,
+  "routed_entries": [
+    {
+      "language": "ansible",
+      "routed_to": "yaml",
+      "formatter": "prettier"
+    }
+  ],
   "planned_excluded": [
     {
       "language": "cobol",
@@ -91,13 +99,6 @@
       ]
     }
   ],
-  "explicit_gaps": [
-    {
-      "language": "ansible",
-      "reason": "无满足只读检查与退出码契约的专属格式化器",
-      "registry_status": "stable",
-      "routed_to": "yaml"
-    }
-  ],
-  "separation_note": "planned 排除与显式归口均不是「未完成」，而是可审计的正式分类；禁止把无工具语言计入接入率分母外的静默遗漏"
+  "explicit_gaps": [],
+  "separation_note": "planned 排除不是未完成项而是可审计的正式分类；routed 条目是可执行的真实门禁（非缺口声明），点名单选时真正执行并给出 deny/allow，all 模式下不与目标通道重复跑"
 }

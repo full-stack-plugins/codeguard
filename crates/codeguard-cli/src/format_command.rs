@@ -194,13 +194,39 @@ fn execute(args: &[String], mode: Mode) -> std::process::ExitCode {
     let selected: Vec<Value> = if request.selection == "all" {
         all.iter()
             .filter(|row| row["status"] == "integrated")
+            // 路由条目（如 ansible→yaml）在 all 模式下不重复执行：
+            // 目标通道已在同一轮被检查，再跑一次会重复格式化同一批文件，
+            // 并可能在两侧配置漂移时产生互相矛盾的风格判定。
+            .filter(|row| row["routed_to"].is_null())
             .cloned()
             .collect()
     } else {
-        all.iter()
+        // 点名选择：支持路由。ansible 无专属格式化器但其 playbook 是 YAML，
+        // 归口 yaml 通道执行，使 `format check ansible` 真正可用而非仅声明缺口。
+        let direct: Vec<Value> = all
+            .iter()
             .filter(|row| row["language"] == request.selection)
             .cloned()
-            .collect()
+            .collect();
+        if let Some(target) = direct
+            .first()
+            .and_then(|row| row["routed_to"].as_str())
+        {
+            let resolved: Vec<Value> = all
+                .iter()
+                .filter(|row| row["language"] == target && row["status"] == "integrated")
+                .cloned()
+                .collect();
+            if let Some(mut base) = resolved.first().cloned() {
+                base["routed_from"] = json!(request.selection);
+                base["routed_to"] = json!(target);
+                vec![base]
+            } else {
+                Vec::new()
+            }
+        } else {
+            direct
+        }
     };
 
     if selected.is_empty() {
@@ -278,6 +304,8 @@ fn execute(args: &[String], mode: Mode) -> std::process::ExitCode {
         language_results.push(json!({
             "language": language,
             "formatter": profile["formatter"],
+            "routed_from": profile["routed_from"],
+            "routed_to": profile["routed_to"],
             "status": result["status"],
             "reason": result["reason"],
             "tool_version": result["tool_version"],
