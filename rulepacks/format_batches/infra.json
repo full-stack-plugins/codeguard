@@ -59,7 +59,7 @@
     },
     {
       "language": "ansible",
-      "status": "not_integrated",
+      "status": "integrated",
       "formatter": "prettier",
       "tool_key": "prettier",
       "check_argv": [
@@ -85,11 +85,12 @@
       "unparsable_detection": "none",
       "unformatted_exit_codes": [
         1
-      ]
+      ],
+      "routed_to": "yaml"
     },
     {
       "language": "dockerfile",
-      "status": "not_integrated",
+      "status": "integrated",
       "formatter": "dprint",
       "tool_key": "dprint",
       "check_argv": [
@@ -109,7 +110,10 @@
       "extensions": [
         ".dockerfile"
       ],
-      "dialects": {},
+      "dialects": {
+        "dprint": "0.61.1",
+        "dprint-plugin-dockerfile": "0.3.2"
+      },
       "notes": "退出码实测（本机 2026-10-08 直测）：dprint check 合规退 0、需重排退 20、未认领退 14。 【本机复验 2026-10-08】直测 dprint check（插件取自 dprint-plugin-dockerfile releases 实际发布的 0.7.0，文件名 plugin.wasm；此前 notes 记述的 0.3.2 版本号有误）：合规退 0、排版不合规退 20、未认领退 14。⚠️ 已知限制：dprint 对**无法解析的 Dockerfile 一律退 0**（实测 `FROM alpine\\nRUN ((` 退 0 且 fmt 不改动），与 clang-format 同类——Dockerfile 的语法损坏须由 syntax 核心能力（docker build / hadolint）拦截，format 门禁不覆盖该类。 退出码约定：需格式化时 dprint check 退出 20（非 1），已显式声明为不合规码；文件未被插件认领退出 14、语法损坏退出 0（见上方已知限制），二者均不入码集。",
       "unformatted_exit_codes": [
         20

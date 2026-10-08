@@ -5,17 +5,18 @@
     {
       "language": "ruby",
       "status": "integrated",
-      "formatter": "rubocop",
-      "tool_key": "rubocop",
+      "formatter": "sh",
+      "tool_key": "sh",
       "check_argv": [
-        "--only",
-        "Layout",
+        "-c",
+        "#!/bin/sh\n# rubocop 只读检查：丢弃 stdout，判定纯粹由退出码承担。\n#\n# 本机 1.91.0 实测：rubocop 判定通过时仍打印「Inspecting 1 file…」等进度摘要，\n# 而运行时把「退出 0 且 stdout 非空」判为 A 类语义（gofmt -l 那种），\n# 会把每一个合规的 Ruby 文件误判为需重排。\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\ncommand -v rubocop >/dev/null 2>&1 || exit 2\nrubocop --only Layout -f quiet \"$f\" >/dev/null 2>&1\nexit $?\n",
+        "codeguard",
         "{file}"
       ],
       "apply_argv": [
-        "--only",
-        "Layout",
-        "--autocorrect",
+        "-c",
+        "#!/bin/sh\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\ncommand -v rubocop >/dev/null 2>&1 || exit 2\nrubocop --only Layout --autocorrect -f quiet \"$f\" >/dev/null 2>&1\nexit $?\n",
+        "codeguard",
         "{file}"
       ],
       "config_markers": [
@@ -26,7 +27,7 @@
         ".rb"
       ],
       "dialects": {},
-      "notes": "rubocop 本机实跑验证（gem 安装 1.91.0，B 类：0=合规、1=不合规、≥2=工具故障）。check 不带任何 autocorrect 参数、纯只读，已实测不改动源文件；限定 --only Layout 只判排版 cops，不覆盖 Style/Lint 等语义 lint；语法错误的 .rb 文件 check 也返回 1（按不合规处理而非工具故障）。apply 同样限定 Layout 并用 --autocorrect（仅应用安全修正，实测修正后退出 0）；刻意不用 -A/--autocorrect-all：它会连不安全修正一起应用，可能改变代码行为。rubocop 无纯 --check 模式，也不能像 gofmt -l 那样在 stdout 列文件清单，故归 B 类。无法自动修正的残留 offense 会使退出码非 0，但文件已被改写。",
+      "notes": "rubocop 是 Ruby 生态事实标准（布局由 Layout cops 集合覆盖）。检查与修复均限定 --only Layout（仅排版类规则），刻意不用 -A——unsafe 修正可能改变代码行为。**必须经 wrapper 丢弃 stdout**：本机 1.91.0 实测 rubocop 判定通过时仍打印「Inspecting 1 file…」等进度摘要，而运行时把「退出 0 且 stdout 非空」判为 A 类语义（gofmt -l 那种），直接调用会把每一个合规的 Ruby 文件误判为需重排。",
       "unparsable_detection": "none",
       "unformatted_exit_codes": [
         1
@@ -68,18 +69,18 @@
     {
       "language": "php",
       "status": "integrated",
-      "formatter": "php-cs-fixer",
-      "tool_key": "php-cs-fixer",
+      "formatter": "sh",
+      "tool_key": "sh",
       "check_argv": [
-        "fix",
-        "--dry-run",
-        "--diff",
-        "--using-cache=no",
+        "-c",
+        "#!/bin/sh\n# php-cs-fixer 只读检查\n#\n# 前置条件：项目必须提供 .php-cs-fixer.dist.php 或 .php-cs-fixer.php。\n# 本机 3.95.27 实测：无配置时它创建 .gitignore 并退 0 却不格式化（静默无效），\n# 不拦截会把未检查当合规，故无配置返回 2。\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\ncommand -v php-cs-fixer >/dev/null 2>&1 || exit 2\n[ -f .php-cs-fixer.dist.php ] || [ -f .php-cs-fixer.php ] || exit 2\nphp-cs-fixer fix --dry-run --using-cache=no \"$f\" >/dev/null 2>&1\nexit $?\n",
+        "codeguard",
         "{file}"
       ],
       "apply_argv": [
-        "fix",
-        "--using-cache=no",
+        "-c",
+        "#!/bin/sh\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\ncommand -v php-cs-fixer >/dev/null 2>&1 || exit 2\n[ -f .php-cs-fixer.dist.php ] || [ -f .php-cs-fixer.php ] || exit 2\nphp-cs-fixer fix --using-cache=no \"$f\" >/dev/null 2>&1\nexit $?\n",
+        "codeguard",
         "{file}"
       ],
       "config_markers": [
@@ -90,10 +91,11 @@
         ".php"
       ],
       "dialects": {},
-      "notes": "php-cs-fixer 本机未安装（机器上无 php/composer），参数依据官方文档 cs.symfony.com/doc/usage.html 核实，本机未实跑。当前版本退出码是位掩码：0=无需修复；8=存在可修复问题（仅 dry-run/check）；4=存在无法修复的问题/语法错误（仅 dry-run）；1/16/32/64 为真实故障。因此 check（fix --dry-run）遇到未格式化文件返回 8，按运行时 B 类语义（≥2 视为工具故障/未完成）不会显式标「不合规」，但绝不误判合规；真实 fix 成功修复后返回 0，apply 语义成立。--using-cache=no 禁用缓存，避免 dry-run 写出 .php-cs-fixer.cache，保证 check 只读。未提供项目配置时使用内置默认规则集，建议项目内放 .php-cs-fixer.dist.php 固定规则。只做代码风格修复，不校验业务逻辑；语法解析失败的文件在 dry-run 下返回 4（≥2，按未完成处理）。",
+      "notes": "php-cs-fixer 是 PHP 生态事实标准。**退出码实测（本机 3.95.27）**：需修复时 `fix --dry-run` 返回位掩码 8（非 1），已并入码集 [1, 8]；语法错误与无配置均不入码集。**项目须提供 .php-cs-fixer.dist.php（或 .php-cs-fixer.php）**：本机实测无配置时它会创建 .gitignore 并退出 0 却**不做任何格式化**——属静默无效，wrapper 在无配置时返回 2（工具故障）而非 0，避免把未检查当合规。同时丢弃 stdout 以避免 A 类误判（php-cs-fixer 判定通过时仍打印进度摘要）。",
       "unparsable_detection": "none",
       "unformatted_exit_codes": [
-        1
+        1,
+        8
       ]
     },
     {

@@ -4,7 +4,7 @@
   "languages": [
     {
       "language": "cfml",
-      "status": "not_integrated",
+      "status": "integrated",
       "formatter": "cfformat",
       "tool_key": "cfformat",
       "check_argv": [
@@ -23,7 +23,9 @@
         ".cfm",
         ".cfs"
       ],
-      "dialects": {},
+      "dialects": {
+        "cfformat": "0.3.1"
+      },
       "notes": "integrated：cfformat（CommandBox cfformat 模块的 Rust 重写，同作者 jcberquist，0.3.1 于 2026-10-05 发布，本机源码构建实跑验证）是 CFML 生态事实标准格式化器：单二进制、无 JVM 依赖、活跃维护。B 类三态实测：已格式化退出 0 且 stdout 为空；不合规退出 1 并在 stdout 列出文件路径；文件缺失/不可读/非 UTF-8/.cfformat.json 配置错误/内部错误退出 2（工具故障类真实存在；唯语法损坏文件与不合规同码退出 1，按不合规处理，不会把损坏误判为合规）。check 全程只读（实测 md5 不变）；apply 为 -w 就地写回退出 0，实测幂等，2.3MB 文件 0.2s；.cfc/.cfm/.cfs 作为显式文件均实测可用（--cfm 标志只作用于目录遍历，对单文件报参数错误退出 2，故 check_argv 不带它；单文件按内容嗅探 script/tags 模式）。设置按被检查文件向上查找最近的 .cfformat.json（实测 tab_indent 设置生效），另有 ~/.cfformat.json 兜底，配置损坏退出 2 不静默放行。限制：默认风格为 4 空格缩进、字符串单引号化、CRLF 归一为 LF（Windows 来源文件会整文件重写）；空文件视为合规；tag 模式里的 <script> 岛由内置 oxc（Prettier 打印器）处理，读项目 .prettierrc 但只认其部分键；只排版不做 lint。安装：release 提供 macOS universal 二进制（curl -fL -o ~/.local/bin/cfformat https://github.com/jcberquist/cfformat/releases/latest/download/cfformat_macos），或 cargo install --locked --git https://github.com/jcberquist/cfformat cfformat-cli（本机 Rust 1.98.1 构建通过，要求 ≥1.97）。旧档案『社区尝试小众且久未维护』的结论已过时；Adobe ColdFusion Builder 的 CodeFormatter 经复核确无独立 CLI。",
       "unparsable_detection": "none",
       "unformatted_exit_codes": [
@@ -32,7 +34,7 @@
     },
     {
       "language": "vbnet",
-      "status": "not_integrated",
+      "status": "integrated",
       "formatter": "bash",
       "tool_key": "bash",
       "check_argv": [
@@ -51,7 +53,9 @@
       "extensions": [
         ".vb"
       ],
-      "dialects": {},
+      "dialects": {
+        "dotnet_sdk": "10.0.401"
+      },
       "notes": "integrated：bash 包装 dotnet fsi（.NET SDK 自带 F# Interactive）加载 SDK 自带的 dotnet-format 捆绑 Roslyn 程序集（DotnetTools/dotnet-format/ 下的 Microsoft.CodeAnalysis.VisualBasic(.Workspaces)/Workspaces），用 VisualBasicSyntaxTree.ParseText 解析 + Formatter.Format 与源码逐字对比，逐文件判定——无需安装任何额外工具，只要求 .NET SDK 6+（不是仅运行时：fsi 与程序集都随 SDK 分发；SDK 发现走 dotnet --list-sdks，缺失即退出 2 工具故障）。选型原因：dotnet format 直连已实测不可用（.NET SDK 10.0.401 复现）——--include 传绝对路径对脏文件退出 0 且 stdout/stderr 全空（静默假阴性），语法损坏的 .vb verify 与 apply 均退出 0 且不改文件（静默假通过），无 MSBuild 工程的裸 .vb 抛未处理异常退出 1；本包装在三态上都实测封堵：check 合规退出 0（stdout 0 字节，已重定向）、需格式化退出 1、语法解析错误/文件不可读/SDK 缺失退出 2（工具故障，不静默通过），check 全程只读（实测前后 md5 一致），apply 退出 0 就地写回且幂等、解析坏文件退出 2 且不改动。退出码为标准 B 类 [1]；fsi 内 Environment.Exit 经 bash 透传为进程退出码（实测）。限制：只做 Roslyn 默认选项的空白/缩进/换行排版（Formatter.Format），不读项目 .editorconfig（config_markers 为空的原因），不做类型检查/编译/语义诊断——语义报错但语法合法的文件照常检查（与 fsharp fantomas、powershell Invoke-Formatter 档位同级）；每文件约 1.5-2.5 秒（fsi 冷启动开销，与 julia 档位同级），批量检查耗时明显；带 BOM 的文件 check 正常，apply 会以无 BOM UTF-8 重写；apply 失败时不写文件（坏文件不会写半截）。",
       "unparsable_detection": "none",
       "unformatted_exit_codes": [
@@ -60,7 +64,7 @@
     },
     {
       "language": "powershell",
-      "status": "not_integrated",
+      "status": "integrated",
       "formatter": "pwsh",
       "tool_key": "pwsh",
       "check_argv": [
@@ -78,7 +82,10 @@
         ".ps1",
         ".psm1"
       ],
-      "dialects": {},
+      "dialects": {
+        "pwsh": "7.6.6",
+        "psscriptanalyzer": "1.25.0"
+      },
       "notes": "PowerShell 官方格式化入口是 PSScriptAnalyzer 模块的 Invoke-Formatter 命令（本机 pwsh 7.6.6 + PSScriptAnalyzer 1.25.0，Install-Module -Scope CurrentUser 实装后实测），它不是独立可执行文件，故 formatter 绑定 pwsh 解释器、以 -Command 包装调用（与 julia/Rscript 档位同构）。包装脚本先用 PowerShell 自带 Parser 做语法校验：已格式化退出 0、有排版差异退出 1、解析错误/读文件失败/模块缺失退出 2（工具故障）——三态均实测，解决了『语法错误与不合规混淆』问题；check 全程只读（实测文件 md5 不变、stdout 0 字节）；apply 就地写回退出 0，实测幂等、解析损坏文件不改动并退出 2。前置条件：须先安装模块（Install-Module PSScriptAnalyzer），未安装时 Invoke-Formatter 命令不存在 → 退出 2 工具故障，不静默通过。限制：使用 Invoke-Formatter 默认格式化规则，不读项目 PSScriptAnalyzerSettings.psd1（无项目级风格配置，config_markers 为空）；{file} 以单引号内嵌于命令文本，路径含单引号会破坏命令（实测含 $ 与空格的路径均正常）；只排版，不做 lint 规则检查（那是 Invoke-ScriptAnalyzer 的职责）。",
       "unparsable_detection": "none",
       "unformatted_exit_codes": [
@@ -120,7 +127,7 @@
     },
     {
       "language": "pascal",
-      "status": "not_integrated",
+      "status": "integrated",
       "formatter": "pasfmt",
       "tool_key": "pasfmt",
       "check_argv": [
@@ -139,7 +146,9 @@
         ".dpk",
         ".lpr"
       ],
-      "dialects": {},
+      "dialects": {
+        "pasfmt": "0.7.0"
+      },
       "notes": "integrated：pasfmt 本机源码构建实跑验证（git main=0.7.0+dev，Rust 实现的 Delphi 生态主流格式化器，0.7.0 于 2025-11 发布）。它并非『无 check 模式』：CLI 原生 --mode=check（README 未写但 CHANGELOG、--help 与源码测试均确认，随 0.7.0 版本发布）。B 类三态实测：已格式化退出 0 且 stdout 为空；不合规退出 1 并在 stderr 打 'ERROR CHECK: … has incorrect formatting'；check 全程只读（实测 md5 不变）；apply 为默认 files 模式就地写回退出 0，实测幂等（二次 apply 字节不变），1MB 文件 0.64s；UTF-8 内容（中文/变音符）实测无损；.lpr 作为显式文件实测可检查可写回（其目录遍历只认 .pas/.dpr/.dpk，运行时恰为逐文件显式调用，四种扩展全覆盖）。限制：语法损坏文件也退出 1（与不合规同码，按不合规处理而非工具故障，但不会把损坏误判为合规），常规路径无 ≥2 工具故障码（仅参数错误退出 2）；pasfmt.toml 从进程当前目录向上查找，codeguard 工作目录不在项目内时读不到项目配置（退回默认风格）；apply 会把 CRLF 归一为 LF、把 0 字节文件写成单个换行（空文件按不合规报告）；只排版不做任何 lint。安装摩擦：GitHub release 仅发 Windows/Linux 二进制，macOS 需 cargo install --locked --git https://github.com/integrated-application-development/pasfmt（本机 Rust 1.98.1 构建通过，要求 ≥1.82）。已实测并否决的替代方案：FPC 自带 ptop（brew，v1.2，2005 年）退出码完全不可信（损坏/缺失输入均退 0），二进制垃圾输入会无界写出（实测写出 37GB 才异常终止），只能靠 bash wrapper（临时副本→ptop→字节比对 + ulimit 封顶输出）满足契约——wrapper 已完整实测（ptop 一遍收敛幂等成立、三态退出码正确、check 只读），但 ptop 风格侵入性强（关键字改大小写、插前导空行），且字节比对属合成 check 而非工具原生能力，故选 pasfmt。",
       "unparsable_detection": "none",
       "unformatted_exit_codes": [

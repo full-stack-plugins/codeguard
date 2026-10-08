@@ -60,7 +60,7 @@
     },
     {
       "language": "haskell",
-      "status": "not_integrated",
+      "status": "integrated",
       "formatter": "fourmolu",
       "tool_key": "fourmolu",
       "check_argv": [
@@ -116,7 +116,7 @@
     },
     {
       "language": "fsharp",
-      "status": "not_integrated",
+      "status": "integrated",
       "formatter": "fantomas",
       "tool_key": "fantomas",
       "check_argv": [
@@ -145,14 +145,18 @@
     {
       "language": "elm",
       "status": "integrated",
-      "formatter": "elm-format",
-      "tool_key": "elm-format",
+      "formatter": "sh",
+      "tool_key": "sh",
       "check_argv": [
-        "--validate",
+        "-c",
+        "#!/bin/sh\n# elm-format 只读检查：丢弃 stdout，判定纯粹由退出码承担。\n#\n# 本机 0.8.8 实测：elm-format --validate 判定通过时仍向 stdout 打印 \"[]\"，\n# 而运行时把「退出 0 且 stdout 非空」判为 A 类语义（gofmt -l 那种），\n# 会把每一个合规的 Elm 文件误判为需重排。\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\ncommand -v elm-format >/dev/null 2>&1 || exit 2\nelm-format --validate \"$f\" >/dev/null 2>&1\nexit $?\n",
+        "codeguard",
         "{file}"
       ],
       "apply_argv": [
-        "--yes",
+        "-c",
+        "#!/bin/sh\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\ncommand -v elm-format >/dev/null 2>&1 || exit 2\nelm-format --yes \"$f\" >/dev/null 2>&1\nexit $?\n",
+        "codeguard",
         "{file}"
       ],
       "config_markers": [
@@ -162,7 +166,7 @@
         ".elm"
       ],
       "dialects": {},
-      "notes": "elm-format 是 Elm 社区标准格式化器（gofmt 风格、设计上无可配置项，brew install elm-format，本机实测 0.8.8）。属 B 类，已真实验证：--validate 对未格式化文件退出 1、已格式化退出 0；--yes 就地格式化退出 0。限制：仅支持 Elm 0.18/0.19，版本默认自动探测（本机无 elm.json 时按默认 0.19 处理成功）；语法错误文件 --validate 与 --yes 均退出 1，check 侧与未格式化同码、无法区分（方向保守）；输出固定为官方风格（4 空格缩进），不支持行宽等定制；只判格式，不检查注释完整性。",
+      "notes": "elm-format 是 Elm 官方格式化器。**必须经 wrapper 丢弃 stdout**：本机 0.8.8 实测 `elm-format --validate` 判定通过时仍向 stdout 打印 `[]`，而运行时把「退出 0 且 stdout 非空」判为 A 类语义（gofmt -l 那种），直接调用会把每一个合规的 Elm 文件误判为需重排。限制：只处理排版，不做类型检查或 lint 规则检查。",
       "unparsable_detection": "none",
       "unformatted_exit_codes": [
         1

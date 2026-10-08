@@ -76,6 +76,24 @@ def validate(entry: dict, source: str, known_ids: set) -> None:
             fail(f"{source}: {language} {field} 元素必须全部是字符串")
         if not any("{file}" in token for token in argv):
             fail(f"{source}: {language} {field} 必须含 {{file}} 占位")
+        # 脚本型 argv（解释器 wrapper）：整段脚本在单个 argv 元素里，
+        # 必须是完整可执行脚本而非被截断的残片——否则运行时静默失败。
+        for token in argv:
+            if token.startswith("#!") or token.startswith("\n#!"):
+                body = token
+                break
+        else:
+            body = None
+        if body is not None:
+            # 目标文件通过两种方式之一到达脚本：
+            #   ① 独立 argv 元素 {file}（脚本用 "$@" 或 shift 取）
+            #   ② 脚本内联 $f='{file}'（运行时替换后作为字面量）
+            # 至少满足其一即可；两者都无说明脚本根本拿不到被检文件。
+            inline = "{file}" in body
+            positional = any(token == "{file}" for token in argv)
+            if not (inline or positional):
+                fail(f"{source}: {language} {field} 的 wrapper 脚本无法取得被检文件"
+                     "（需独立 {file} 参数或脚本内联 {file}）")
 
     for ext in entry["extensions"]:
         if not isinstance(ext, str) or not ext.startswith("."):

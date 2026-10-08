@@ -4,7 +4,7 @@
   "languages": [
     {
       "language": "cobol",
-      "status": "not_integrated",
+      "status": "integrated",
       "formatter": "sh",
       "tool_key": "sh",
       "check_argv": [
@@ -29,7 +29,10 @@
         ".ccp",
         ".cobol"
       ],
-      "dialects": {},
+      "dialects": {
+        "fixed_format": "COBOL-85",
+        "free_format": "COBOL-2002"
+      },
       "notes": "COBOL 无任何可用的开源/CLI 格式化器（穷尽检索：npm cobol-formatter/cobolfmt/cobol-pretty-print 均无结果；PyPI cobol-formatter/cobolfmt 404；Maven Central 17 个 COBOL artifact 全为 parser 或分析器（cobol2j/cobrix/emf.cobol）无格式化能力；GitHub 无带 release 的 COBOL formatter；商业方案 COBClean/IBM Z Open Editor 为 Windows GUI 或商业产品）。本条目改用 **GnuCOBOL 编译器（cobc）作为排版规则执行器**——这是 COBOL 生态中唯一能对源码给出确定性判定的 CLI 工具，且 COBOL-85 固定格式的列区约定（源码必须位于第 7-72 列，1-6 列为序号区）本身就是排版规范，由编译器强制执行比自建格式化器更可信。**方言双探针解决退出码歧义**：cobc 对「列区违规」与「语法错误」一律退 1，直接使用会把损坏 COBOL 误报为「需重排」；因此分别以 -free（无列区约束）与 -fixed（有列区约束）各编译一次：两者皆过→0 合规；free 过而 fixed 挂→1 列区排版违规；两者皆挂→2 语法错误，降级为未完成而不误判为格式问题。实测三态正确。检查全程只读（-fsyntax-only 不产出目标文件）。**apply 模式如实拒绝自动修复**：cobc 不提供源码重排，而 COBOL 固定格式的列区重分配涉及序号区与代码区边界，自动改写存在改坏语义的风险，因此返回退出 2 并给出人工修正或改用自由格式的指引，不冒险改写源码。限制：只判定列区与语法，不检查缩进宽度、大小写风格、行长上限等 cobc 不强制的风格项；自由格式（COBOL-2002）文件因不受列区约束，恒判为合规。",
       "unparsable_detection": "none",
       "unformatted_exit_codes": [
@@ -38,7 +41,7 @@
     },
     {
       "language": "arkts",
-      "status": "not_integrated",
+      "status": "integrated",
       "formatter": "node",
       "tool_key": "node",
       "check_argv": [
@@ -57,7 +60,9 @@
       "extensions": [
         ".ets"
       ],
-      "dialects": {},
+      "dialects": {
+        "oxk": "0.9.0"
+      },
       "notes": "integrated：ArkTS 专用格式化器 @ohos-rs/oxk（基于 OXC/oxc 的 Rust 解析器，实测 0.9.0，npm 安装即得，原生解析 .ets 的 ArkTS 语法——@Entry/@Component/struct/build 链式调用/@State/@Prop/@Link/@Watch/@Observed/@Extend/@Styles/@Builder/ForEach/LazyForEach/$r() 资源/as 断言均已实测正确排版、不丢码），但它是 node 包而非独立可执行文件，故经 node -e 包装调用，formatter/tool_key 为 node。不能直接用 prettier：实测 prettier 3.9.9 --parser typescript 对 @Component struct 报 SyntaxError（Declaration expected，struct 非 TS 语法而 UI struct 是该语言主体），npm 亦无 prettier-plugin-arkts/ets；华为官方链路均无可用 CLI 格式化入口：codelinter（command-line-tools 内）只做 lint 检查无 format 子命令，DevEco Studio 格式化是 IDE/LSP 内部能力，@arkts/language-server/@arkts/language-service（ohosvscode）为 Volar LSP 包无单文件 CLI，tree-sitter-arkts 只是语法不是格式化器。oxk 的 CLI（oxk format）默认就地改写且无 --check/--write 之分的只读模式，不能充当 check，且 CLI 读项目 .oxfmtrc.json 而单文件 API 不读——为保 check/apply 判定一致，两者统一走本 wrapper 的内置默认风格（双引号、分号、2 空格缩进、链式调用收拢到收尾花括号），故 config_markers 为空。前置条件：被检文件所在项目（沿目录向上含 monorepo 根）须安装 @ohos-rs/oxk 为 devDependency，解析失败退 2 工具故障、绝不静默放行（check/apply 实测均退 2 且文件不动）。check 经 createRequire 加载其 format API 在内存中排版并与源码逐字对比：退出 0=合规（stdout 静默，已实测 md5 不变）、1=需格式化、2=ArkTS 解析错误（errors 非空）/依赖缺失/文件不可读——三态全实测，语法损坏的 struct 代码不会被误判合规。apply 用同一 API 排版后仅在结果不同才写回：退出 0=成功，解析错误退 2 且不落盘（实测破损文件字节不变，无写半截风险），重复 apply 幂等（实测二次 apply md5 不变、复检 0）。unformatted_exit_codes=[1] 为标准 B 类。限制：只排版不检查 ArkTS 语言违例（arkts-no-any 等约束归 lint 类别，不冒充）；不读 .oxfmtrc.json 项目配置，风格固定为 oxk 内置默认，与 DevEco 默认风格不尽相同；空文件/仅注释文件判合规；带 BOM 文件判不合规且 apply 会去 BOM；纯 TS 语法文件（无 struct）同样按 TS 规则排版；oxk 0.9.0 发布不久，若升级需复测退出码三态。",
       "unparsable_detection": "none",
       "unformatted_exit_codes": [
@@ -66,7 +71,7 @@
     },
     {
       "language": "metal",
-      "status": "not_integrated",
+      "status": "integrated",
       "formatter": "clang-format",
       "tool_key": "clang-format",
       "check_argv": [
