@@ -417,3 +417,83 @@ fn every_language_has_executable_or_evidenced_disposition() {
         "可执行门禁应覆盖至少 50 种语言，当前 {executable}"
     );
 }
+
+/// 交付口径必须自洽：57 = 已接入 + planned 排除 + 显式归口，无第四类、无静默遗漏。
+///
+/// 这是对「剩余 50 种全部接入」的可审计回答：planned 语言从未进入 stable 交付口径，
+/// 显式归口语言（ansible→yaml）不是未完成项，两类都必须有机器可读的理由与证据引用。
+#[test]
+fn format_gate_scope_accounting_is_complete_and_auditable() {
+    let scope: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../rulepacks/format_gate_scope.json"
+    ))
+    .expect("format_gate_scope.json 应可解析");
+
+    let inventory: serde_json::Value = serde_json::from_slice(
+        &Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(["format", "list", "--format=json"])
+            .output()
+            .expect("无法运行 codeguard format list")
+            .stdout,
+    )
+    .expect("JSON 解析失败");
+
+    // 口径内部自洽
+    assert_eq!(scope["registry_total"], 57);
+    let stable = scope["registry_stable"].as_u64().expect("registry_stable 应为数字");
+    let planned = scope["registry_planned"].as_u64().expect("registry_planned 应为数字");
+    let total = scope["registry_total"].as_u64().expect("registry_total 应为数字");
+    assert_eq!(stable + planned, total);
+    let excluded = scope["planned_excluded"].as_array().expect("planned 排除列表");
+    let gaps = scope["explicit_gaps"].as_array().expect("显式归口列表");
+    assert_eq!(
+        scope["integrated_count"].as_u64().unwrap() as usize + excluded.len() + gaps.len(),
+        57,
+        "已接入 + planned 排除 + 显式归口必须恰好等于 57，不允许第四类"
+    );
+
+    // planned 排除项必须真为 planned 且引用证据
+    for entry in excluded {
+        let language = entry["language"].as_str().unwrap();
+        assert_eq!(
+            entry["registry_status"], "planned",
+            "{language} 被排除但注册表状态非 planned"
+        );
+        assert!(
+            !entry["evidence"].as_array().unwrap_or(&vec![]).is_empty(),
+            "{language} 的 planned 排除必须引用仓库内可验证证据"
+        );
+    }
+
+    // 显式归口项必须说明归口目标
+    for entry in gaps {
+        let language = entry["language"].as_str().unwrap();
+        assert!(
+            entry["reason"].as_str().is_some_and(|r| r.len() >= 10),
+            "{language} 的显式归口必须写明理由"
+        );
+        assert!(
+            entry["routed_to"].is_string(),
+            "{language} 显式归口必须指向承载通道（排除自主缺口）"
+        );
+    }
+
+    // 口径声明的已接入集合必须与真实档案逐字一致（防止口径与实现漂移）
+    let actual: Vec<&str> = inventory["languages"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|r| r["status"] == "integrated")
+        .map(|r| r["language"].as_str().unwrap())
+        .collect();
+    let declared: Vec<&str> = scope["integrated_languages"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|v| v.as_str().unwrap())
+        .collect();
+    assert_eq!(
+        actual, declared,
+        "口径声明的已接入集合必须与 format list 实际输出逐字一致"
+    );
+}
