@@ -46,12 +46,18 @@ fn format_list_reports_integration_status() {
     );
 }
 
-/// 未接入格式化的语言必须如实返回 not_integrated，不得静默通过。
+/// 选中的语言不在注册表内时必须如实拒绝，不得静默通过或伪造报告。
 #[test]
-fn unintegrated_language_is_disclosed_not_silently_passed() {
-    let root = ensure_clean_dir("cg-format-unintegrated");
+fn unregistered_language_is_explicitly_rejected() {
+    let root = ensure_clean_dir("cg-format-unregistered");
     let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
-        .args(["format", "check", "cobol", root.to_str().unwrap(), "--format=json"])
+        .args([
+            "format",
+            "check",
+            "not-a-registered-language",
+            root.to_str().unwrap(),
+            "--format=json",
+        ])
         .output()
         .expect("无法运行 codeguard format check");
     let stdout = String::from_utf8_lossy(&output.stdout);
@@ -60,12 +66,11 @@ fn unintegrated_language_is_disclosed_not_silently_passed() {
     assert_eq!(report["status"], "not_integrated");
     assert_eq!(report["delivery_decision"], "not_evaluated");
     assert_eq!(report["exit_code"], 3);
-    assert_eq!(output.status.code(), Some(3), "未接入语言应退出 3");
+    assert_eq!(output.status.code(), Some(3), "未注册语言应退出 3");
+    // 报告不得凭空出现语言明细（避免伪造「已检查」）
     assert!(
-        report["not_integrated_languages"]
-            .as_array()
-            .is_some_and(|langs| langs.iter().any(|l| l == "cobol")),
-        "应列出未接入语言"
+        report["languages"].as_array().map(Vec::is_empty).unwrap_or(true),
+        "未注册语言不得产生语言执行明细"
     );
     let _ = std::fs::remove_dir_all(&root);
 }
