@@ -4,3 +4,10 @@
 /.ruff_cache/
 **/__pycache__/
 *.pyc
+
+# 插件运行时产物（非源码）
+.video_agent/
+
+# 未接线的孤儿模块：与已接线的 task_verify_command 不同，
+# 此文件未在 lib.rs 声明，编译不依赖它，提交会造成「已接线」错觉
+crates/codeguard-cli/src/task_verify.rs
