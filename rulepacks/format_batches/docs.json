@@ -1,0 +1,47 @@
+{
+  "schema_version": "0.1.0",
+  "batch": "docs",
+  "languages": [
+    {
+      "language": "markdown",
+      "status": "integrated",
+      "formatter": "prettier",
+      "tool_key": "prettier",
+      "check_argv": [
+        "--list-different",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--write",
+        "{file}"
+      ],
+      "config_markers": [
+        ".prettierrc",
+        ".prettierrc.json",
+        ".prettierrc.yaml",
+        ".prettierrc.yml",
+        ".prettierrc.toml",
+        "prettier.config.js",
+        ".editorconfig"
+      ],
+      "extensions": [
+        ".md",
+        ".markdown"
+      ],
+      "dialects": {},
+      "notes": "prettier 是 Markdown 生态事实标准格式化器，同时支持 .md 与 .markdown 扩展名。check_argv 刻意选 --list-different 而非 --check：实测 prettier 3.9.9 的 --check 在全部合规时仍向 stdout 打印「All matched files use Prettier code style!」，与「退出 0 且 stdout 为空 → 合规」的判定冲突；--list-different 合规时退出 0 且 stdout 为空，不合规时退出 1 并在 stdout 逐行列出文件路径，同时满足 A 类（stdout 列出不合规文件）与 B 类（退出 1 = 不合规）语义，退出 ≥2 视为工具故障。实测记录（npx prettier@3.9.9）：脏文件 --list-different 退出 1 且 stdout 为该文件路径；干净文件退出 0 且无输出；--write 对脏文件退出 0 并就地改写，对合规文件退出 0 且内容不变。prettier 读项目 prettier 配置与 .editorconfig 决定缩进/折行。限制：只重排版面（标题、列表、表格、换行、代码块围栏），不校验 Markdown 语法正确性、链接有效性、frontmatter 内容或文档结构完整性，不能替代 markdownlint 类 lint。本档案与 typescript 档案同为 prettier，但 language 不同，各自独立成档、互不冲突。"
+    },
+    {
+      "language": "liquid",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "Liquid 生态无开箱即用的公认格式化器，故 format 检查如实返回 not_integrated，不静默通过。实测 prettier 3.9.9 原生不支持 liquid 语法（--parser liquid 报 Couldn't resolve parser）；官方方案 @shopify/prettier-plugin-liquid 必须预先安装进项目 node_modules，npx 现场解析失败（Cannot find package），且报错退出码为 1，会与「退出 1 = 不合规」的判定混淆，存在把工具故障误判为不合规的风险；Shopify 官方 theme-check 仅为 linter，不做格式化。待插件可稳定通过统一工具绑定（--tool NAME=ABS_PATH）后可再接入。"
+    }
+  ]
+}

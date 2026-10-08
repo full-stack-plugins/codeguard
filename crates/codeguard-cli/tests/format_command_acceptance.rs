@@ -271,3 +271,76 @@ fn unknown_argument_is_rejected() {
         .expect("无法运行 codeguard format check");
     assert_eq!(output.status.code(), Some(2), "参数错误应退出 2");
 }
+/// 多语言混合目录：format all 应分别路由到各语言原生格式化器。
+#[test]
+fn format_all_routes_per_language_formatters() {
+    let root = ensure_clean_dir("cg-format-multi");
+    std::fs::write(root.join("main.rs"), FORMATTED_RS).unwrap();
+    std::fs::write(root.join("a.tf"), "resource \"null_resource\" \"a\" {\n}\n").unwrap();
+    std::fs::write(root.join("q.sql"), "SELECT 1;\n").unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["format", "check", "all", root.to_str().unwrap(), "--format=json"])
+        .output()
+        .expect("无法运行 codeguard format check all");
+    let report: serde_json::Value =
+        serde_json::from_str(&String::from_utf8_lossy(&output.stdout)).expect("JSON 解析失败");
+
+    assert_eq!(report["selection"], "all");
+    let languages = report["languages"].as_array().expect("应有语言明细");
+    // 每个被路由的语言都应绑定到一个具体格式化器，且不得是未接入项
+    for language in languages {
+        assert_ne!(
+            language["status"], "not_integrated",
+            "format all 不应路由到未接入语言: {}",
+            language["language"]
+        );
+        assert!(
+            language["formatter"].as_str().is_some_and(|f| !f.is_empty()),
+            "每个语言应绑定具体格式化器"
+        );
+        // 报告明细投影工具身份与扫描结果（argv 从 format list 查，不重复投影）
+        assert!(
+            language["file_count"].is_number(),
+            "{} 应报告扫描文件数",
+            language["language"]
+        );
+        assert!(
+            language["tool_version"].is_string() || language["tool_version"].is_null(),
+            "{} 应报告工具版本（缺工具时为 null）",
+            language["language"]
+        );
+    }
+    let _ = std::fs::remove_dir_all(&root);
+}
+
+/// 未接入语言永不随 format all 静默参与。
+#[test]
+fn format_all_never_includes_not_integrated() {
+    let root = ensure_clean_dir("cg-format-all-gap");
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["format", "list", "--format=json"])
+        .output()
+        .expect("无法运行 codeguard format list");
+    let inventory: serde_json::Value =
+        serde_json::from_str(&String::from_utf8_lossy(&output.stdout)).expect("JSON 解析失败");
+
+    let all_rows = inventory["languages"].as_array().expect("档案列表");
+    let integrated = all_rows
+        .iter()
+        .filter(|r| r["status"] == "integrated")
+        .count();
+    let gap = all_rows
+        .iter()
+        .filter(|r| r["status"] == "not_integrated")
+        .count();
+    assert_eq!(integrated + gap, 57, "档案应覆盖 57 语言且无第三种状态");
+    // 未接入语言必须保留 formatter=null，杜绝编译期伪造
+    for row in all_rows.iter().filter(|r| r["status"] == "not_integrated") {
+        assert!(
+            row["formatter"].is_null(),
+            "{} 未接入时 formatter 必须为 null",
+            row["language"]
+        );
+    }
+    let _ = std::fs::remove_dir_all(&root);
+}

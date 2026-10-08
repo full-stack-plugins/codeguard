@@ -1,0 +1,42 @@
+{
+  "schema_version": "0.1.0",
+  "batch": "planned",
+  "languages": [
+    {
+      "language": "arkts",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "not_integrated：ArkTS（HarmonyOS）生态无公认独立 CLI 格式化器，rulepacks/legacy_languages.json 的 install_hint 明确「无独立 CLI linter（依赖平台 IDE 诊断）」，lint/format 均为 null。仓库已有 tree-sitter-arkts 语法候选（tests/acceptance/arkts-nix-terraform-grammar-candidates.md：npm tree-sitter-arkts@0.2.0，Rust 离线加载与隔离 worker 候选观察通过，但合法样例仍 grammar_qualified=false），openspec 任务 14.19 增量确认「公开原生优先 lint 路由和逐语言精度验收仍缺」，任务 8.146/15.2 明确该语言按设计保持 planned/gap；crates/codeguard-cli/tests/planned_language_gaps.rs 固化含 .ets 源码的 check all 退出 3、六类别 gap。format 命令对该语言如实返回 not_integrated，不静默通过；语法候选或平台 IDE 诊断均不能冒充风格合规，也不检查注释完整性与开发规范。"
+    },
+    {
+      "language": "cobol",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "not_integrated：COBOL 生态无公认 CLI 格式化器，rulepacks/legacy_languages.json 的 install_hint 明确「无独立 CLI linter（依赖平台 IDE 诊断）」。其 tree-sitter grammar WASM 为 16.4 MB（grammars/codegraph-coverage.json 中 tree-sitter-cobol.wasm 16,355,286 字节），超出当前 8 MiB 加载限额——openspec/changes/introduce-rust-codeguard-cli/tasks.md 14.1/14.19 记录「COBOL 的 16.4 MB 超出当前 8 MiB 加载限额」「COBOL 超出 8 MiB 上限」，后续增量确认仅能以受限 20 MiB 输入加载且冷启动/内存成本高，固定/自由源格式尚未验收，全量回放中 COBOL 样例仍为 pending。任务 8.145 要求为其保留显式 planned/gap，crates/codeguard-cli/tests/planned_language_gaps.rs 与 tests/acceptance/planned-language-gaps.md 固化含 .cbl 源码的 check all 退出 3、六类别 gap。format 命令对该语言如实返回 not_integrated，不静默通过，也不能以未验收语法候选冒充风格合规。"
+    },
+    {
+      "language": "metal",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "not_integrated：Metal 着色语言生态无公认独立 CLI 格式化器，原生工具链绑定 Apple Xcode——rulepacks/production_acceptance_plan_v1.json 中 metal 的 build_target 为 xcode-metal，六类别能力全部 blocked，blockers 记录「尚无完整已验收语言版本/方言范围，不按旧 stable 推断支持」「完整原生语法版本/方言、源集、WASM 联合路径及独立精度未验收」；grammars/codegraph-coverage.json 的 32 份 grammar 资产中没有 metal 条目，连语法候选都未列入。openspec 任务 8.147/15.2 明确该语言按设计保持 planned/gap；crates/codeguard-cli/tests/planned_language_gaps.rs 固化含 .metal 源码的 check all 退出 3、六类别 gap，且跨平台能力不一致时不得把单一平台（Apple）结果概括到所有平台。format 命令对该语言如实返回 not_integrated，不静默通过，也不能以 Xcode 工具链推断跨平台可用。"
+    }
+  ]
+}

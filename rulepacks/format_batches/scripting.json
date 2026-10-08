@@ -1,0 +1,162 @@
+{
+  "schema_version": "0.1.0",
+  "batch": "scripting",
+  "languages": [
+    {
+      "language": "ruby",
+      "status": "integrated",
+      "formatter": "rubocop",
+      "tool_key": "rubocop",
+      "check_argv": [
+        "--only",
+        "Layout",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--only",
+        "Layout",
+        "--autocorrect",
+        "{file}"
+      ],
+      "config_markers": [
+        ".rubocop.yml",
+        ".rubocop.yaml"
+      ],
+      "extensions": [
+        ".rb"
+      ],
+      "dialects": {},
+      "notes": "rubocop 本机实跑验证（gem 安装 1.91.0，B 类：0=合规、1=不合规、≥2=工具故障）。check 不带任何 autocorrect 参数、纯只读，已实测不改动源文件；限定 --only Layout 只判排版 cops，不覆盖 Style/Lint 等语义 lint；语法错误的 .rb 文件 check 也返回 1（按不合规处理而非工具故障）。apply 同样限定 Layout 并用 --autocorrect（仅应用安全修正，实测修正后退出 0）；刻意不用 -A/--autocorrect-all：它会连不安全修正一起应用，可能改变代码行为。rubocop 无纯 --check 模式，也不能像 gofmt -l 那样在 stdout 列文件清单，故归 B 类。无法自动修正的残留 offense 会使退出码非 0，但文件已被改写。"
+    },
+    {
+      "language": "perl",
+      "status": "integrated",
+      "formatter": "perltidy",
+      "tool_key": "perltidy",
+      "check_argv": [
+        "-ast",
+        "-se",
+        "-st",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-b",
+        "-bext=/",
+        "-se",
+        "{file}"
+      ],
+      "config_markers": [
+        ".perltidyrc"
+      ],
+      "extensions": [
+        ".pl",
+        ".pm",
+        ".t"
+      ],
+      "dialects": {},
+      "notes": "perltidy 本机实跑验证（Homebrew 安装 v20260826）。check 用其内置断言 -ast（--assert-tidy）：0=已合规、非零=未合规，单条命令内部完成「格式化预期输出 vs 原文」比对，无需外部临时文件。实测断言失败返回 2 而非 1：按契约 B 类语义会归入「工具故障/未完成」，方向保守、绝不误判合规，但不会显式标「不合规」——这是本批档案中与标准 B 类退出码唯一有偏差的档位。-se 把错误送 stderr、-st 把格式化输出送 stdout（运行时按 B 类只看退出码），三者组合实测不产生 .tdy/.bak/.ERR 副作用文件，纯只读；语法解析失败的文件同样返回 2。apply 用 -b 就地改写、-bext=/ 保证成功后不留 .bak，实测幂等且成功退出 0。-st 仅支持单文件输入，运行时必须按 {file} 逐个调用。perltidy 只管排版，不做 perlcritic 风格/最佳实践审查；项目可用 .perltidyrc 定制排版规则。"
+    },
+    {
+      "language": "php",
+      "status": "integrated",
+      "formatter": "php-cs-fixer",
+      "tool_key": "php-cs-fixer",
+      "check_argv": [
+        "fix",
+        "--dry-run",
+        "--diff",
+        "--using-cache=no",
+        "{file}"
+      ],
+      "apply_argv": [
+        "fix",
+        "--using-cache=no",
+        "{file}"
+      ],
+      "config_markers": [
+        ".php-cs-fixer.php",
+        ".php-cs-fixer.dist.php"
+      ],
+      "extensions": [
+        ".php"
+      ],
+      "dialects": {},
+      "notes": "php-cs-fixer 本机未安装（机器上无 php/composer），参数依据官方文档 cs.symfony.com/doc/usage.html 核实，本机未实跑。当前版本退出码是位掩码：0=无需修复；8=存在可修复问题（仅 dry-run/check）；4=存在无法修复的问题/语法错误（仅 dry-run）；1/16/32/64 为真实故障。因此 check（fix --dry-run）遇到未格式化文件返回 8，按运行时 B 类语义（≥2 视为工具故障/未完成）不会显式标「不合规」，但绝不误判合规；真实 fix 成功修复后返回 0，apply 语义成立。--using-cache=no 禁用缓存，避免 dry-run 写出 .php-cs-fixer.cache，保证 check 只读。未提供项目配置时使用内置默认规则集，建议项目内放 .php-cs-fixer.dist.php 固定规则。只做代码风格修复，不校验业务逻辑；语法解析失败的文件在 dry-run 下返回 4（≥2，按未完成处理）。"
+    },
+    {
+      "language": "lua",
+      "status": "integrated",
+      "formatter": "stylua",
+      "tool_key": "stylua",
+      "check_argv": [
+        "--check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "{file}"
+      ],
+      "config_markers": [
+        "stylua.toml",
+        ".stylua.toml"
+      ],
+      "extensions": [
+        ".lua"
+      ],
+      "dialects": {},
+      "notes": "stylua 本机实跑验证（Homebrew 安装 2.5.2，B 类：0=合规、1=不合规、≥2=工具故障）。--check 只读，已实测不改动源文件且退出码三态正确（含语法坏文件返回 2）。默认 --syntax All、缩进为 Tab；项目可用 stylua.toml / .stylua.toml（向上查找）或 .editorconfig 覆盖。apply 不带参数直接对 {file} 就地格式化，实测退出 0。只做排版，不检查逻辑与未定义变量。不解析 Luau 扩展语法，Luau 代码请用本批 luau 档位。"
+    },
+    {
+      "language": "luau",
+      "status": "integrated",
+      "formatter": "stylua",
+      "tool_key": "stylua",
+      "check_argv": [
+        "--check",
+        "--syntax",
+        "luau",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--syntax",
+        "luau",
+        "{file}"
+      ],
+      "config_markers": [
+        "stylua.toml",
+        ".stylua.toml"
+      ],
+      "extensions": [
+        ".luau"
+      ],
+      "dialects": {
+        "syntax": "luau"
+      },
+      "notes": "与 lua 档位共用同一 stylua 可执行（实测 2.5.2），但必须带 --syntax luau 才能解析 Luau 扩展语法（类型标注、复合赋值等）；实测省略该 flag 时 Luau 文件解析失败返回 2，该参数不可省。check/apply 退出码语义与 lua 档位一致（0/1/2），check 只读不改文件已实测。stylua.toml 亦支持 syntax = \"Luau\" 持久化方言设置。只做排版，类型检查需 luau-analyze，不在 format 档案范围内。"
+    },
+    {
+      "language": "r",
+      "status": "integrated",
+      "formatter": "Rscript",
+      "tool_key": "Rscript",
+      "check_argv": [
+        "-e",
+        "f<-commandArgs(TRUE)[1]; t<-tempfile(fileext='.R'); ok<-invisible(file.copy(f,t,overwrite=TRUE)); res<-try(withCallingHandlers(invisible(capture.output(suppressMessages(styler::style_file(t)))),warning=function(w) stop(conditionMessage(w))),silent=TRUE); if(!isTRUE(ok)||inherits(res,'try-error')||!file.exists(t)) quit(status=2L); same<-identical(readBin(f,'raw',file.size(f)),readBin(t,'raw',file.size(t))); unlink(t); quit(status=if(same) 0L else 1L)",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-e",
+        "f<-commandArgs(TRUE)[1]; res<-try(withCallingHandlers(invisible(capture.output(suppressMessages(styler::style_file(f)))),warning=function(w) stop(conditionMessage(w))),silent=TRUE); quit(status=if(inherits(res,'try-error')) 2L else 0L)",
+        "{file}"
+      ],
+      "config_markers": [],
+      "extensions": [
+        ".r",
+        ".R"
+      ],
+      "dialects": {
+        "style_guide": "tidyverse"
+      },
+      "notes": "R 生态无独立格式化器可执行文件，采用事实标准 styler 包（tidyverse 风格）经 Rscript 调用，因此 formatter/tool_key 为 Rscript，用 --tool Rscript=<abs> 绑定；styler 包必须已安装（Rscript -e 'install.packages(\"styler\")'）。本机 R 4.6.1 + CRAN styler 实测通过。check 表达式：文件复制到临时副本→styler::style_file(副本)→与原文件按字节比对——相同 0、不同 1、复制失败或样式化报错（含语法解析失败）2，标准 B 类三态，且已实测 check 全程绝不改动原文件（warning 也升级为失败，防止解析坏文件误判合规）。apply 用 style_file 就地改写，实测幂等，语法坏文件返回 2 而非假成功。style_file 依扩展名识别文件类型，.r 与 .R 均实测可用；非 UTF-8 或带 BOM 文件按字节比对可能误报不合规。styler 无独立配置文件（config_markers 为空），排版偏好经 R options 设置；只管排版，不做 lintr 检查。"
+    }
+  ]
+}
