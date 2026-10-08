@@ -434,6 +434,14 @@ fn run_language(profile: &Value, request: &Request, mode: Mode) -> Value {
     .map(str::to_owned)
     .collect();
 
+    // 读取该语言声明的「不合规」退出码集合；缺省为 B 类标准的 [1]。
+    // 档案显式声明是必要的：terraform fmt -check=3、perltidy -ast=2、php-cs-fixer=8。
+    let unformatted_codes: Vec<i32> = profile["unformatted_exit_codes"]
+        .as_array()
+        .map(|codes| codes.iter().filter_map(Value::as_i64).map(|c| c as i32).collect())
+        .filter(|codes: &Vec<i32>| !codes.is_empty())
+        .unwrap_or_else(|| vec![1]);
+
     let mut unformatted = Vec::new();
     let mut reformatted = Vec::new();
     let mut failed = Vec::new();
@@ -460,7 +468,7 @@ fn run_language(profile: &Value, request: &Request, mode: Mode) -> Value {
         let output = Command::new(&tool).args(&argv).output();
         match output {
             Ok(result) if result.status.success() => {
-                // gofmt -l 风格：stdout 非空即列出不合规文件。
+                // A 类语义：退出 0 但 stdout 列出文件（gofmt -l / prettier --list-different）。
                 let stdout = String::from_utf8_lossy(&result.stdout);
                 if mode == Mode::Check && !stdout.trim().is_empty() {
                     unformatted.push(file.to_string_lossy().to_string());
@@ -468,8 +476,15 @@ fn run_language(profile: &Value, request: &Request, mode: Mode) -> Value {
                     reformatted.push(file.to_string_lossy().to_string());
                 }
             }
-            Ok(result) if mode == Mode::Check && result.status.code() == Some(1) => {
-                // clang-format --dry-run --Werror 用退出码 1 表示不合规。
+            // B 类语义：退出码表示不合规。多数工具用 1，但部分工具（terraform fmt -check=3、
+            // perltidy -ast=2、php-cs-fixer dry-run=8）用其它非零码，必须按档案声明的码集合判定，
+            // 否则真实的不合规会被误报为工具故障。
+            Ok(result) if mode == Mode::Check
+                && result
+                    .status
+                    .code()
+                    .is_some_and(|code| unformatted_codes.contains(&code)) =>
+            {
                 unformatted.push(file.to_string_lossy().to_string());
             }
             Ok(_) => failed.push(file.to_string_lossy().to_string()),
@@ -637,8 +652,93 @@ mod tests {
                 row["language"]
             );
             assert!(
-                row["notes"].as_str().is_some_and(|n| n.contains("not_integrated")),
-                "{} 未接入说明应披露缺口",
+                row["check_argv"].is_null() && row["apply_argv"].is_null(),
+                "{} 未接入时不应声明检查/应用参数",
+                row["language"]
+            );
+            let notes = row["notes"].as_str().unwrap_or("");
+            assert!(
+                notes.len() >= 20,
+                "{} 未接入说明应写明具体缺口理由: {notes}",
+                row["language"]
+            );
+        }
+    }
+
+    #[test]
+    fn every_profile_declares_unformatted_exit_codes() {
+        // 退出码契约：多数工具用 1，terraform=3、perltidy=2、php-cs-fixer=8。
+        // 缺省为 [1]；档案显式声明非标准码，避免真实不合规被误判为工具故障。
+        for row in profiles().iter().filter(|r| r["status"] == "integrated") {
+            let codes: Vec<i64> = row["unformatted_exit_codes"]
+                .as_array()
+                .map(|c| c.iter().filter_map(Value::as_i64).collect())
+                .unwrap_or_default();
+            assert!(
+                !codes.is_empty(),
+                "{} 应声明 unformatted_exit_codes",
+                row["language"]
+            );
+            assert!(
+                codes.iter().all(|code| *code > 0),
+                "{} 的不合规退出码必须为正数: {codes:?}",
+                row["language"]
+            );
+            assert!(
+                !codes.contains(&0),
+                "{} 不得把退出 0 声明为不合规",
+                row["language"]
+            );
+        }
+    }
+
+    #[test]
+    fn non_standard_exit_codes_are_justified_in_notes() {
+        // 非标准不合规退出码必须在 notes 中说明来源，否则是无法审计的特例。
+        for row in profiles().iter().filter(|r| r["status"] == "integrated") {
+            let codes: Vec<i64> = row["unformatted_exit_codes"]
+                .as_array()
+                .map(|c| c.iter().filter_map(Value::as_i64).collect())
+                .unwrap_or_default();
+            if codes.iter().any(|code| *code != 1) {
+                let notes = row["notes"].as_str().unwrap_or("");
+                assert!(
+                    notes.contains("退出") || notes.contains("exit"),
+                    "{} 使用非标准不合规退出码 {codes:?}，notes 应说明实测依据",
+                    row["language"]
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn every_integrated_profile_has_file_placeholder() {
+        for row in profiles().iter().filter(|r| r["status"] == "integrated") {
+            for field in ["check_argv", "apply_argv"] {
+                let argv: Vec<&str> = row[field]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .filter_map(Value::as_str)
+                    .collect();
+                assert!(
+                    argv.iter().any(|token| token.contains("{file}")),
+                    "{} 的 {field} 必须含 {{file}} 占位",
+                    row["language"]
+                );
+            }
+            let extensions = row["extensions"].as_array().cloned().unwrap_or_default();
+            assert!(
+                !extensions.is_empty(),
+                "{} 已接入时必须声明扩展名",
+                row["language"]
+            );
+            assert!(
+                extensions
+                    .iter()
+                    .filter_map(Value::as_str)
+                    .all(|ext| ext.starts_with('.')),
+                "{} 扩展名必须带前导点",
                 row["language"]
             );
         }

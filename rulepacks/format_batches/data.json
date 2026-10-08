@@ -1,0 +1,136 @@
+{
+  "schema_version": "0.1.0",
+  "batch": "data",
+  "languages": [
+    {
+      "language": "sql",
+      "status": "integrated",
+      "formatter": "sqlfluff",
+      "tool_key": "sqlfluff",
+      "check_argv": [
+        "lint",
+        "-q",
+        "--dialect",
+        "postgres",
+        "{file}"
+      ],
+      "apply_argv": [
+        "fix",
+        "-q",
+        "--dialect",
+        "postgres",
+        "{file}"
+      ],
+      "config_markers": [
+        ".sqlfluff",
+        ".sqlfluffignore",
+        "pyproject.toml",
+        "setup.cfg",
+        "tox.ini"
+      ],
+      "extensions": [
+        ".sql"
+      ],
+      "dialects": {
+        "default": "postgres",
+        "supported": [
+          "ansi",
+          "athena",
+          "bigquery",
+          "clickhouse",
+          "databricks",
+          "db2",
+          "doris",
+          "duckdb",
+          "exasol",
+          "flink",
+          "greenplum",
+          "hive",
+          "impala",
+          "mariadb",
+          "materialize",
+          "mysql",
+          "oracle",
+          "postgres",
+          "redshift",
+          "snowflake",
+          "soql",
+          "sparksql",
+          "sqlite",
+          "starrocks",
+          "teradata",
+          "trino",
+          "tsql",
+          "vertica"
+        ]
+      },
+      "notes": "sqlfluff 是 SQL 生态最主流的开源格式化器（在 4.4.0 实测）。只读检查用 lint -q：退出 0 且 stdout 为空=合规，退出 1=存在风格违规，退出 ≥2=工具故障（如未指定 dialect），属 B 类；-q 必不可少，否则合规文件也会向 stdout 输出 All Finished! 而被误判为不合规。就地为格式化用 fix：退出 0=成功；含语法/模板错误（默认 jinja 模板器）的文件不会被修改并以退出 1 如实标记为失败，不静默放行。限制：只判排版与可自动修复的风格项，不校验 SQL 逻辑正确性；check_argv/apply_argv 硬编码 --dialect postgres，命令行优先级高于 .sqlfluff 项目配置，非 postgres 项目暂无法经本入口切换方言（sqlfluff 另支持 ansi/bigquery/mysql/oracle/snowflake/tsql 等 28 种方言，见 dialects.supported）；项目自定义规则经 .sqlfluff 配置仍对 check 与 apply 同时生效。注意：sqlfluff 4.x 的 fix --check 并非只读模式（会询问确认并批量应用修复，非交互环境直接崩溃），只读检查必须用 lint。"
+    },
+    {
+      "language": "graphql",
+      "status": "integrated",
+      "formatter": "prettier",
+      "tool_key": "prettier",
+      "check_argv": [
+        "--list-different",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--write",
+        "{file}"
+      ],
+      "config_markers": [
+        ".prettierrc",
+        ".prettierrc.json",
+        ".prettierrc.yaml",
+        ".prettierrc.yml",
+        ".prettierrc.toml",
+        ".prettierrc.js",
+        ".prettierrc.cjs",
+        ".prettierrc.mjs",
+        "prettier.config.js",
+        "prettier.config.cjs",
+        "prettier.config.mjs",
+        "prettier.config.toml",
+        ".prettierignore"
+      ],
+      "extensions": [
+        ".graphql",
+        ".gql"
+      ],
+      "dialects": {},
+      "notes": "prettier 内置 GraphQL 解析器，原生支持 .graphql/.gql，无需插件（在 3.6.2 实测）。check 用 --list-different：合规时退出 0 且 stdout 为空，不合规时退出 1 并在 stdout 列出文件路径，语法错误退出 2 归为工具故障；退出码与 stdout 双信号都落在不合规侧，无静默放行路径。不要改用 --check：它合规时也会向 stdout 输出 All matched files use Prettier code style! 汇总文案，会被检查运行时误判为不合规。apply 用 --write 就地格式化，退出 0=成功。限制：只做排版不校验 schema 语义（字段类型引用、循环依赖等需另行 graphql-eslint lint）；读项目 prettier 配置，无配置时用 prettier 默认风格。"
+    },
+    {
+      "language": "protobuf",
+      "status": "integrated",
+      "formatter": "clang-format",
+      "tool_key": "clang-format",
+      "check_argv": [
+        "--dry-run",
+        "--Werror",
+        "--style=file",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-i",
+        "--style=file",
+        "{file}"
+      ],
+      "config_markers": [
+        ".clang-format",
+        "_clang-format"
+      ],
+      "extensions": [
+        ".proto"
+      ],
+      "dialects": {
+        "syntax": [
+          "proto2",
+          "proto3"
+        ]
+      },
+      "notes": "clang-format 原生把 .proto 识别为 Proto 语言，与主档案 c/cpp/objc 共用同一 tool_key，一条 --tool clang-format=ABS_PATH 绑定即可覆盖四种语言（在 Apple clang-format 21 与 LLVM clang-format 23 双版本实测行为一致）。check 用 --dry-run --Werror：退出 0=合规、1=排版不合规、≥2=工具故障，B 类，argv 与 c/cpp/objc 完全一致；--style=file 读项目 .clang-format（可写 Language: Proto 段），无配置文件时自动回退内置风格（实测不报错）。apply 用 -i 就地写入，退出 0=成功，apply 后复检退出 0 收敛。限制：只判空白与排版、不做完整语法解析，语法错误的 .proto 仍可能通过格式检查（编译正确性由 protoc 负责）；其 Proto 排版风格与 buf format 的官方风格存在差异（如单字段 message 可能被并为一行）。曾实测 buf 1.73.0 的 format -d/-w 对单文件免 workspace 配置可用，但其 -d 有差异时也退出 0、解析错误却退出 1，退出码分类不如 clang-format 干净，且需额外安装，故未采用。"
+    }
+  ]
+}

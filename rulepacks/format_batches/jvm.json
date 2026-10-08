@@ -1,0 +1,112 @@
+{
+  "schema_version": "0.1.0",
+  "batch": "jvm",
+  "languages": [
+    {
+      "language": "java",
+      "status": "integrated",
+      "formatter": "google-java-format",
+      "tool_key": "google-java-format",
+      "check_argv": [
+        "--dry-run",
+        "--set-exit-if-changed",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--replace",
+        "{file}"
+      ],
+      "config_markers": [],
+      "extensions": [
+        ".java"
+      ],
+      "dialects": {
+        "style": "google"
+      },
+      "notes": "Google 官方 Java 格式化器（实测 1.27.0）。check_argv 属 B 类：--dry-run --set-exit-if-changed 对未格式化文件退出 1 并在 stdout 列出文件路径，合规时退出 0 且无输出，退出码 ≥2 为工具故障；apply_argv 的 --replace 就地重写并退出 0（两个方向的退出码均在本机 Java 21 + 官方 all-deps jar 下实跑验证）。只负责排版与 import 排序/去重，不检查语义、编译错误或注释内容；风格固定为 Google Style，不可用配置文件自定义（仅 --aosp 切换 4 空格 AOSP 变体），故无 config_markers。独立可执行文件可 brew install google-java-format 或从 GitHub release 获取，需较新 JRE 运行。"
+    },
+    {
+      "language": "kotlin",
+      "status": "integrated",
+      "formatter": "ktlint",
+      "tool_key": "ktlint",
+      "check_argv": [
+        "{file}"
+      ],
+      "apply_argv": [
+        "--format",
+        "{file}"
+      ],
+      "config_markers": [
+        ".editorconfig"
+      ],
+      "extensions": [
+        ".kt",
+        ".kts"
+      ],
+      "dialects": {},
+      "notes": "Kotlin 生态主流格式化/风格检查器（实测 ktlint 1.8.0）。check_argv 属 B 类：默认 lint 模式对违规文件退出 1 并在 stdout 输出违规明细（file:line:col 规则），合规时退出 0 且无输出；apply_argv 为 --format（旧别名 -F 已弃用），就地改写并退出 0，.kt 与 .kts 两个方向均在本机实跑验证。通过 .editorconfig 配置（ktlint_code_style 等），无 .editorconfig 时使用内置默认风格。只检查风格/格式规则，不做类型或语义检查；对语法错误的文件也退出 1（按不合规处理而非故障）；路径未匹配到任何文件时仅输出警告并退出 0（会被视为合规）。本机经 GitHub release 自包含 jar + Java 21 实跑验证。"
+    },
+    {
+      "language": "scala",
+      "status": "integrated",
+      "formatter": "scalafmt",
+      "tool_key": "scalafmt",
+      "check_argv": [
+        "--test",
+        "{file}"
+      ],
+      "apply_argv": [
+        "{file}"
+      ],
+      "config_markers": [
+        ".scalafmt.conf"
+      ],
+      "extensions": [
+        ".scala",
+        ".sc"
+      ],
+      "dialects": {
+        "runner.dialect": "scala213"
+      },
+      "notes": "Scala 事实标准格式化器（实测 scalafmt 3.9.6）。check_argv 属 B 类：--test 对未格式化文件打印 diff 并退出 1，全部合规时退出 0；退出码 ≥2 为工具故障（实测：文件不存在=8，缺少 .scalafmt.conf=16）。apply_argv 直接跟 {file}（无额外标志）即就地格式化并退出 0。.scalafmt.conf 为强制项，缺失时拒绝运行（表现为故障码而非误判合规），方言由 runner.dialect 指定（实测 scala213 通过），.scala 与 .sc 均实测支持。只排版不检查语义，无法修复编译错误；不能在未提供 .scalafmt.conf 的项目中运行。本机经 Maven Central 的 scalafmt-cli_2.13 jar + Java 21 实跑验证；独立可执行文件可 coursier install scalafmt 获取。"
+    },
+    {
+      "language": "groovy",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "该生态无公认的独立格式化器，format 检查如实不适用。实测证据：google-java-format 1.27.0 已移除 Groovy 支持，对 .groovy 文件直接跳过（输出 'Skipping non-Java file'）且检查/应用均退出 0，会造成假阴性，不可用（jar 内无任何 Groovy 类）；npm-groovy-lint（CodeNarc 3.7.0 内核，npx 实测）是 linter 附带局部 autofix，默认退出码恒为 0（即使报告 error），其 --failon 基于 lint 严重级别而非『是否会被格式化』，无法映射 A/B 类退出码契约，且把未使用变量等 lint 违规与格式问题混为一谈；spotless 仅以 Maven/Gradle 插件形态存在，项目未配置插件时构建失败退出 1，会与 B 类『不合规』混淆，不适合统一档案；Apache Groovy 官方也未内置格式化器。"
+    },
+    {
+      "language": "clojure",
+      "status": "integrated",
+      "formatter": "cljfmt",
+      "tool_key": "cljfmt",
+      "check_argv": [
+        "check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "fix",
+        "{file}"
+      ],
+      "config_markers": [
+        ".cljfmt.edn"
+      ],
+      "extensions": [
+        ".clj",
+        ".cljs",
+        ".cljc",
+        ".edn"
+      ],
+      "dialects": {},
+      "notes": "Clojure 社区主流格式化器 cljfmt（实测 0.16.6）。check_argv 属 B 类：check 子命令对未格式化文件打印 diff 并退出 1，合规时输出 'All source files formatted correctly' 并退出 0；apply_argv 为 fix 子命令，就地重写并退出 0。独立可执行文件可 brew install cljfmt（homebrew-core bottled 0.16.6）；本机经 clojure CLI（clojure -M -m cljfmt.main）以相同版本实跑验证两个方向的退出码，并经差分测试确认 .cljfmt.edn 项目配置真实生效（如 remove-trailing-whitespace? 开关）。只按内置/配置规则排版（缩进、缺失空格、尾随空白等），不做语义或宏展开检查；默认不删除表内多余空格（如 (a  b) 双空格实测不判违规）；对不存在的路径退出 1，与『不合规』同码而非故障码。"
+    }
+  ]
+}

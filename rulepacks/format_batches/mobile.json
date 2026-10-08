@@ -1,0 +1,54 @@
+{
+  "schema_version": "0.1.0",
+  "batch": "mobile",
+  "languages": [
+    {
+      "language": "swift",
+      "status": "integrated",
+      "formatter": "swift-format",
+      "tool_key": "swift-format",
+      "check_argv": [
+        "lint",
+        "--strict",
+        "{file}"
+      ],
+      "apply_argv": [
+        "format",
+        "--in-place",
+        "{file}"
+      ],
+      "config_markers": [
+        ".swift-format"
+      ],
+      "extensions": [
+        ".swift"
+      ],
+      "dialects": {},
+      "notes": "Apple 官方 Swift 格式化器（swiftlang/swift-format），随 Xcode/CommandLineTools 工具链自带，也可 `brew install swift-format` 独立安装。B 类检查：`lint --strict` 退出 0=合规、退出 1=有风格违规；参数与退出码已在本机实跑验证（CommandLineTools 捆绑版，Swift 6.4 工具链）。限制：只做源码排版/风格检查与重排，不做编译检查、不修复语义问题、不检查注释内容；对不存在的文件路径静默退出 0 不报错；对语法解析失败的文件 lint/format 均退出 1，无法在退出码上区分「不合规」与「源码损坏」；配置从当前目录或祖先目录的 .swift-format（JSON，含 lineLength 等字段）自动发现，实测确认生效。"
+    },
+    {
+      "language": "dart",
+      "status": "integrated",
+      "formatter": "dart",
+      "tool_key": "dart",
+      "check_argv": [
+        "format",
+        "--output=none",
+        "--set-exit-if-changed",
+        "{file}"
+      ],
+      "apply_argv": [
+        "format",
+        "{file}"
+      ],
+      "config_markers": [
+        "analysis_options.yaml"
+      ],
+      "extensions": [
+        ".dart"
+      ],
+      "dialects": {},
+      "notes": "Dart SDK 内置格式化器 `dart format`（Flutter 项目同样适用），接受目录或文件路径，目录会递归处理。B 类检查：`format --output=none --set-exit-if-changed` 退出 0=无需改动（合规）、退出 1=有需格式化的变化（不合规）；--output=none 与 --set-exit-if-changed 必须同时使用，前者保证只读不改写、后者以退出码报告结果。apply_argv 默认即原地覆写，退出 0=成功。默认行宽 80，可在 analysis_options.yaml 顶层 formatter 段（如 page_width）项目级配置（需语言版本 >=3.7），也可在文件顶部用 `// dart format width=NNN` 注释逐文件覆盖。限制：只统一排版，不做 lint 分析、不检查空安全或其他语义问题；格式风格（tall/short）由包语言版本自动决定，无法用命令行参数切换。本机未安装 Dart SDK（brew 无 dart formula，也无 dart-sdk cask），参数与退出码语义依据官方文档 dart.dev/tools/dart-format，未实跑验证。"
+    }
+  ]
+}

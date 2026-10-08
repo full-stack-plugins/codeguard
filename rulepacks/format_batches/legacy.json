@@ -1,0 +1,83 @@
+{
+  "schema_version": "0.1.0",
+  "batch": "legacy",
+  "languages": [
+    {
+      "language": "cfml",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "该生态无公认格式化器，format 检查如实不适用：Adobe ColdFusion Builder 的 CodeFormatter 仅是 IDE 内置功能，无可独立运行的 CLI；社区格式化尝试（VS Code cfml 扩展等）小众且久未维护，无法核实其稳定性与退出码契约。注册表中 cfml 的 format 亦为 null（仅接入 cflint 做 lint）。按契约如实标 not_integrated，不静默通过。"
+    },
+    {
+      "language": "vbnet",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "dotnet format 仅支持 MSBuild 项目/解决方案上下文，与契约的 {file} 单文件模板不兼容，故如实不接入。实测（.NET SDK 10.0.401）：对无项目的独立 .vb 执行 dotnet format --verify-no-changes --include x.vb 抛未处理异常（找不到 MSBuild 项目或解决方案），退出码为 1——在 B 类语义下工具故障会被误判为不合规；在最小 vbproj 项目内实测，待格式化文件使 --verify-no-changes 退出 2（B 类会视为工具故障而非不合规），即退出码 1/2 的含义与契约 B 类完全错位，两个方向都会误判。该工具只能作用于整个工程，无法给出语义正确的单文件 check_argv/apply_argv。"
+    },
+    {
+      "language": "powershell",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "Invoke-Formatter 是 PSScriptAnalyzer 模块命令而非独立可执行文件，无法按契约绑定 formatter 可执行文件，故如实不接入。实测本机 pwsh 7.6.6 已安装但 PSScriptAnalyzer 模块未安装（Get-Command Invoke-Formatter 报命令不存在）。其签名为 Invoke-Formatter -ScriptDefinition <string> -Settings <object>：只接受脚本文本、不接受文件路径参数，也无 --check/--dry-run 只读模式；接入只能用 pwsh -Command 包装读文件、格式化、比对、写回的脚本，但 pwsh 脚本抛错与格式差异都返回退出码 1，违反契约 B 类「退出 ≥2 才算工具故障」的区分要求，且文件路径含引号时 -Command 字符串拼接会碎裂。退出码语义无法诚实表达，宁可如实 not_integrated，不静默通过。"
+    },
+    {
+      "language": "cuda",
+      "status": "integrated",
+      "formatter": "clang-format",
+      "tool_key": "clang-format",
+      "check_argv": [
+        "--dry-run",
+        "--Werror",
+        "--style=file",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-i",
+        "--style=file",
+        "{file}"
+      ],
+      "config_markers": [
+        ".clang-format",
+        "_clang-format"
+      ],
+      "extensions": [
+        ".cu",
+        ".cuh"
+      ],
+      "dialects": {
+        "standard": "c++17"
+      },
+      "notes": "clang-format 内核原生把 .cu/.cuh 识别为 CUDA C++，与主档案 c/cpp/objc 共用同一工具与参数，check 为 B 类（--dry-run --Werror：退出 0=合规、1=不合规、≥2=工具故障），apply 用 -i 就地写入。已在 Homebrew llvm clang-format 23.1.2 与 Apple CLT 21.0.0 实测：.cu 就地格式化、.cu/.cuh 违规检出、__global__/__device__ 均正常解析。限制：只做排版格式化，不检查 CUDA 语义、线程安全或内存正确性；项目无 .clang-format 时回退 LLVM 内置风格，可能与团队风格不一致；运行时仍需通过 --tool clang-format=ABS_PATH 绑定实际二进制。"
+    },
+    {
+      "language": "pascal",
+      "status": "not_integrated",
+      "formatter": null,
+      "tool_key": null,
+      "check_argv": null,
+      "apply_argv": null,
+      "config_markers": [],
+      "extensions": [],
+      "dialects": {},
+      "notes": "该生态无公认格式化器，format 检查如实不适用。实测本机 FPC 自带的 ptop：语义为 ptop [opts] infile outfile 双文件转换，无任何只读/检查模式，A/B 类 check_argv 无法表达；且实测 ptop 对不存在的输入文件抛运行时异常后退出码仍为 0，退出码不可信。新兴的 pasfmt（IAD 维护的 Delphi 格式化器，Rust 实现）尚非生态公认标准：README 未记载 check 模式与退出码契约，默认就地改写、不支持 .lpr，本机未安装无法验证。fpc 编译器本身不做格式化。故如实 not_integrated，不静默通过。"
+    }
+  ]
+}
