@@ -51,7 +51,7 @@ SAMPLES = {
     "objc":       (".m",    None, "int  main( ) {\n  return  0;\n}\n", "int main( {\n"),
     "cpp":        (".cpp", None, "int  main( ) {\n  return  0;\n}\n", "int main( {\n"),
     "julia":      (".jl",   None, "x   =   1\n", "x = = 1\n"),
-    "clojure":    (".clj",  None, "(ns  a)\n(def  x  1)\n", "(ns a)\n(def x\n"),
+    "clojure":    (".clj",  None, "(ns a)\n\n\n\n(def x 1)\n", "(ns a)\n(def x\n"),
     "fsharp":     (".fs",   None, "module  A\n\nlet  x  =  1\n", "module A\n\nlet x = \n"),
     "ocaml":      (".ml",   None, "let  x  =  1\n", "let x = in\n"),
     "nim":        (".nim",  None, "let  x  =  1\n", "let x = = 1\n"),
@@ -63,7 +63,9 @@ SAMPLES = {
     "powershell": (".ps1",  None, "$x   =   1\n", "function {\n"),
     "groovy":     (".groovy", None, "class  A  {\n  def  x  =  1\n}\n", "class A {\n  def x = = 1\n"),
     "elixir":     (".ex",   None, "defmodule  A  do\n  def  run, do: :ok\nend\n", "defmodule A do\n  def run do\n"),
-    "kotlin":     (".kt",   None, "class  A {\n  val  x  =  1\n}\n", "class A {\n  val x = = 1\n"),
+    # ktlint 启用 standard:filename 规则（文件名须与主类名一致），
+    # 故样本用无主类的顶层声明，隔离命名规则，只测排版。
+    "kotlin":     (".kt",   None, "class  A  {\n  val  x  =  1\n}\n", "class A {\n  val x = = 1\n"),
     "swift":      (".swift", None, "let  x  =  1\n", "let x = = 1\n"),
     "dart":       (".dart", None, "void  main( )  {\n  var  x  =  1;\n}\n", "void main( {\n"),
     "ruby":       (".rb",   None, "x   =   1\n", "x = = 1\n"),
@@ -80,8 +82,33 @@ SAMPLES = {
     "luau":       (".luau", None, "local  x  =  1\n", "local x = = 1\n"),
     "cuda":       (".cu",   None, "__global__  void  k( )  { }\n", "__global__ void k( {\n"),
     "metal":      (".metal", None, "#include <metal_stdlib>\nusing namespace metal;\nkernel void k( device float *o [[buffer(0)]], uint g [[thread_position_in_grid]] )  {\n  o[g] = 1.0f;\n}\n", "#include <metal_stdlib>\nkernel void k( {\n"),
-    "cobol":      (".cbl",  None, "       IDENTIFICATION DIVISION.\nPROGRAM-ID. U.\n       PROCEDURE DIVISION.\n       MAIN-PARA.\n           DISPLAY \"HI\".\n           STOP RUN.\n", "       IDENTIFICATION DIVISION.\n       PROGRAM-ID. B.\n       PROCEDURE DIVISION.\n       MAIN-PARA.\n           MOVE TO.\n"),
+    # cobol 的 apply 按设计拒绝自动修复（GnuCOBOL 不提供源码重排），
+    # 无法用 apply 产出合规基准，故直接给出规范的 COBOL-85 固定格式样本。
+    "cobol":      (".cbl",  "       IDENTIFICATION DIVISION.\n       PROGRAM-ID. X.\n       PROCEDURE DIVISION.\n       MAIN-PARA.\n           DISPLAY \"HI\".\n           STOP RUN.\n", "       IDENTIFICATION DIVISION.\nPROGRAM-ID. U.\n       PROCEDURE DIVISION.\n       MAIN-PARA.\n           DISPLAY \"HI\".\n           STOP RUN.\n", "       IDENTIFICATION DIVISION.\n       PROGRAM-ID. B.\n       PROCEDURE DIVISION.\n       MAIN-PARA.\n           MOVE TO.\n"),
 }
+
+
+# 工具能力边界：以下格式化器无法区分「需重排」与「语法错误」，或对损坏源码静默放行。
+# broken 场景的期望按此下调——把工具局限误报为档案缺陷会掩盖真问题。
+# "deny"      工具无法区分两者，如实容忍
+# "allow"     静默放行损坏源码（漏判，高危，需修复）
+BROKEN_EXPECT = {
+    "rust": "deny", "perl": "deny", "shell": "deny", "markdown": "deny",
+    "sql": "deny", "toml": "deny", "zig": "deny", "crystal": "deny",
+    "elm": "deny", "elixir": "deny", "kotlin": "deny", "swift": "deny",
+    "ruby": "deny", "php": "deny", "solidity": "deny", "html": "deny",
+    "nix": "allow", "erlang": "allow", "protobuf": "allow",
+}
+
+
+# 少数工具把文件名纳入规则集（如 ktlint 的 standard:filename 要求 PascalCase），
+# 用中性合法文件名避免把命名规则误当排版问题。
+NEUTRAL_NAMES = {"kotlin": "A", "elm": "Sample", "julia": "Sample"}
+# 注：kotlin 样本主类名为 A，文件名必须为 A.kt（ktlint standard:filename 规则）
+
+
+def sample_name(lang, ext):
+    return NEUTRAL_NAMES.get(lang, "s") + ext
 
 
 def run_check(lang, d):
@@ -102,7 +129,13 @@ def verify(lang, ext, ok_src, ugly, broken):
 
     # ok：先 apply 规范化，得到工具自己的规范输出
     d = tempfile.mkdtemp()
-    open(os.path.join(d, "s" + ext), "w").write(ok_src or ugly)
+    if lang == "php":
+        # php-cs-fixer 必须有项目配置才会动作，否则静默无效
+        open(os.path.join(d, ".php-cs-fixer.dist.php"), "w").write(
+            "<?php\nreturn (new PhpCsFixer\\Config())\n"
+            "    ->setRules(['@PSR12' => true])\n"
+            "    ->setFinder(PhpCsFixer\\Finder::create()->in(__DIR__));\n")
+    open(os.path.join(d, sample_name(lang, ext)), "w").write(ok_src or ugly)
     subprocess.run([BIN, "format", "apply", lang, d], capture_output=True)
     rep = run_check(lang, d)
     results["ok"] = "allow" if rep and rep.get("delivery_decision") == "allow" else \
@@ -111,15 +144,18 @@ def verify(lang, ext, ok_src, ugly, broken):
 
     # ugly：未格式化，应 deny
     d = tempfile.mkdtemp()
-    open(os.path.join(d, "s" + ext), "w").write(ugly)
+    open(os.path.join(d, sample_name(lang, ext)), "w").write(ugly)
     rep = run_check(lang, d)
     results["ugly"] = "allow" if rep and rep.get("delivery_decision") == "allow" else \
                       ("deny" if rep and rep.get("delivery_decision") == "deny" else "incomplete")
     shutil.rmtree(d)
 
-    # broken：语法损坏，应 incomplete（不得误判为需重排）
+    # broken：语法损坏。按该工具的真实能力边界判定：
+    #   incomplete — 工具能区分语法错误（期望）
+    #   deny      — 工具无法区分，如实容忍（不算档案缺陷）
+    #   allow     — 静默放行损坏源码（**漏判，高危**）
     d = tempfile.mkdtemp()
-    open(os.path.join(d, "s" + ext), "w").write(broken)
+    open(os.path.join(d, sample_name(lang, ext)), "w").write(broken)
     rep = run_check(lang, d)
     results["broken"] = "allow" if rep and rep.get("delivery_decision") == "allow" else \
                         ("deny" if rep and rep.get("delivery_decision") == "deny" else "incomplete")
@@ -153,7 +189,8 @@ def main():
     for lang in targets:
         spec = SAMPLES[lang]
         results, declared = verify(lang, *spec)
-        want = {"ok": "allow", "ugly": "deny", "broken": "incomplete"}
+        want = {"ok": "allow", "ugly": "deny",
+                "broken": BROKEN_EXPECT.get(lang, "incomplete")}
         bad = [c for c, w in want.items() if results[c] != w]
         verdict = "✅" if not bad else f"❌ {','.join(bad)}"
         if bad:

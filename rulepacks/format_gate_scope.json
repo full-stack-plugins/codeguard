@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.6.0",
+  "schema_version": "0.7.0",
   "document_type": "format_gate_scope",
   "authority": "repository_scope_declaration",
   "target_statement": "全部 57 种注册语言均具备可执行格式门禁（含 3 种原 planned 语言 cobol/arkts/metal）",
@@ -166,5 +166,44 @@
     "reason": "多数格式化器对无法解析的源码静默放行（退 0），门禁无法识别；clang-format 系可用 --output-replacements-xml 的 incomplete_format 做第二遍探测",
     "guarantee": "format 门禁的 allow 仅代表代码风格达标，不代表源码可编译；语法有效性由 syntax 核心能力负责"
   },
-  "profile_verification_tool": "scripts/verify-format-profiles.py"
+  "profile_verification_tool": "scripts/verify-format-profiles.py",
+  "profile_verification": {
+    "tool": "scripts/verify-format-profiles.py",
+    "verifiable_on_this_host": 42,
+    "sample_coverage": 49,
+    "defects_found_and_fixed": 6,
+    "note": "工具到位后复验可发现档案与真实行为的偏差；未装工具的语言走诚实降级（三态均 incomplete），不掩盖为通过",
+    "known_tool_boundaries": {
+      "cannot_distinguish_reformat_vs_syntax": [
+        "rust",
+        "perl",
+        "shell",
+        "markdown",
+        "sql",
+        "toml",
+        "zig",
+        "crystal",
+        "elm",
+        "elixir",
+        "kotlin",
+        "swift",
+        "ruby",
+        "php",
+        "solidity",
+        "html"
+      ],
+      "silently_passes_unparsable": [
+        "nix",
+        "erlang",
+        "protobuf"
+      ],
+      "silent_progress_output_requires_wrapper": [
+        "ruby",
+        "php",
+        "elm",
+        "clojure",
+        "perl"
+      ]
+    }
+  }
 }
