@@ -800,3 +800,76 @@ mod tests {
         assert!(!a.is_empty(), "摘要不得为空");
     }
 }
+#[cfg(test)]
+mod format_selection_tests {
+    use super::profiles;
+    use serde_json::Value;
+
+    /// Java 选型必须说明为何不用 spotless / palantir-java-format。
+    /// 这不是偏好问题：codeguard 以 {file} 逐文件驱动，需要单文件可判定的独立 CLI。
+    #[test]
+    fn java_records_formatter_selection_rationale() {
+        let java = profiles()
+            .into_iter()
+            .find(|row| row["language"] == "java")
+            .expect("应有 java 档案");
+        assert_eq!(java["status"], "integrated");
+        assert_eq!(java["formatter"], "google-java-format");
+        let notes = java["notes"].as_str().unwrap_or("");
+        assert!(
+            notes.contains("spotless"),
+            "Java 选型说明应解释为何不用 spotless"
+        );
+        assert!(
+            notes.contains("palantir"),
+            "Java 选型说明应解释 palantir-java-format 的关系"
+        );
+        assert!(
+            notes.contains("逐文件") || notes.contains("单文件"),
+            "Java 选型说明应点明逐文件调用契约这一根本约束"
+        );
+    }
+
+    /// 已接入语言不得声称有非标准退出码却不声明。
+    #[test]
+    fn integrated_languages_never_silently_claim_standard_codes() {
+        for row in profiles().iter().filter(|r| r["status"] == "integrated") {
+            let codes: Vec<i64> = row["unformatted_exit_codes"]
+                .as_array()
+                .map(|c| c.iter().filter_map(Value::as_i64).collect())
+                .unwrap_or_default();
+            assert!(
+                !codes.is_empty(),
+                "{} 必须显式声明不合规退出码",
+                row["language"]
+            );
+        }
+    }
+
+    /// wrapper 型档案（解释器 + 内联脚本）必须能对单文件判定。
+    #[test]
+    fn interpreter_wrapper_profiles_target_single_file() {
+        // 解释器 wrapper 模式：check_argv 形如 [解释器, -e, '<脚本>', '{file}']
+        for row in profiles().iter().filter(|r| r["status"] == "integrated") {
+            let argv: Vec<String> = row["check_argv"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .filter_map(|v| v.as_str().map(str::to_owned))
+                .collect();
+            let is_wrapper = argv.iter().any(|a| a == "-e" || a == "-Command" || a == "-c");
+            if is_wrapper {
+                // {file} 可以是独立 argv，也可以嵌在解释器脚本字符串内部
+                // （例如 pwsh -Command "... $f='{file}' ..."）。两种都必须能替换。
+                let has_file = argv
+                    .iter()
+                    .any(|token| token.contains("{file}"));
+                assert!(
+                    has_file,
+                    "{} 的 wrapper 脚本必须能收到 {{file}} 参数",
+                    row["language"]
+                );
+            }
+        }
+    }
+}

@@ -1,0 +1,64 @@
+{
+  "schema_version": "0.1.0",
+  "batch": "pascal_cfml",
+  "languages": [
+    {
+      "language": "pascal",
+      "status": "integrated",
+      "formatter": "pasfmt",
+      "tool_key": "pasfmt",
+      "check_argv": [
+        "--mode=check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "{file}"
+      ],
+      "config_markers": [
+        "pasfmt.toml"
+      ],
+      "extensions": [
+        ".pas",
+        ".dpr",
+        ".dpk",
+        ".lpr"
+      ],
+      "dialects": {
+        "pasfmt": "0.7.0"
+      },
+      "notes": "integrated：pasfmt 本机源码构建实跑验证（git main=0.7.0+dev，Rust 实现的 Delphi 生态主流格式化器，0.7.0 于 2025-11 发布）。它并非『无 check 模式』：CLI 原生 --mode=check（README 未写但 CHANGELOG、--help 与源码测试均确认，随 0.7.0 版本发布）。B 类三态实测：已格式化退出 0 且 stdout 为空；不合规退出 1 并在 stderr 打 'ERROR CHECK: … has incorrect formatting'；check 全程只读（实测 md5 不变）；apply 为默认 files 模式就地写回退出 0，实测幂等（二次 apply 字节不变），1MB 文件 0.64s；UTF-8 内容（中文/变音符）实测无损；.lpr 作为显式文件实测可检查可写回（其目录遍历只认 .pas/.dpr/.dpk，运行时恰为逐文件显式调用，四种扩展全覆盖）。限制：语法损坏文件也退出 1（与不合规同码，按不合规处理而非工具故障，但不会把损坏误判为合规），常规路径无 ≥2 工具故障码（仅参数错误退出 2）；pasfmt.toml 从进程当前目录向上查找，codeguard 工作目录不在项目内时读不到项目配置（退回默认风格）；apply 会把 CRLF 归一为 LF、把 0 字节文件写成单个换行（空文件按不合规报告）；只排版不做任何 lint。安装摩擦：GitHub release 仅发 Windows/Linux 二进制，macOS 需 cargo install --locked --git https://github.com/integrated-application-development/pasfmt（本机 Rust 1.98.1 构建通过，要求 ≥1.82）。已实测并否决的替代方案：FPC 自带 ptop（brew，v1.2，2005 年）退出码完全不可信（损坏/缺失输入均退 0），二进制垃圾输入会无界写出（实测写出 37GB 才异常终止），只能靠 bash wrapper（临时副本→ptop→字节比对 + ulimit 封顶输出）满足契约——wrapper 已完整实测（ptop 一遍收敛幂等成立、三态退出码正确、check 只读），但 ptop 风格侵入性强（关键字改大小写、插前导空行），且字节比对属合成 check 而非工具原生能力，故选 pasfmt。",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "cfml",
+      "status": "integrated",
+      "formatter": "cfformat",
+      "tool_key": "cfformat",
+      "check_argv": [
+        "--check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-w",
+        "{file}"
+      ],
+      "config_markers": [
+        ".cfformat.json"
+      ],
+      "extensions": [
+        ".cfc",
+        ".cfm",
+        ".cfs"
+      ],
+      "dialects": {
+        "cfformat": "0.3.1"
+      },
+      "notes": "integrated：cfformat（CommandBox cfformat 模块的 Rust 重写，同作者 jcberquist，0.3.1 于 2026-10-05 发布，本机源码构建实跑验证）是 CFML 生态事实标准格式化器：单二进制、无 JVM 依赖、活跃维护。B 类三态实测：已格式化退出 0 且 stdout 为空；不合规退出 1 并在 stdout 列出文件路径；文件缺失/不可读/非 UTF-8/.cfformat.json 配置错误/内部错误退出 2（工具故障类真实存在；唯语法损坏文件与不合规同码退出 1，按不合规处理，不会把损坏误判为合规）。check 全程只读（实测 md5 不变）；apply 为 -w 就地写回退出 0，实测幂等，2.3MB 文件 0.2s；.cfc/.cfm/.cfs 作为显式文件均实测可用（--cfm 标志只作用于目录遍历，对单文件报参数错误退出 2，故 check_argv 不带它；单文件按内容嗅探 script/tags 模式）。设置按被检查文件向上查找最近的 .cfformat.json（实测 tab_indent 设置生效），另有 ~/.cfformat.json 兜底，配置损坏退出 2 不静默放行。限制：默认风格为 4 空格缩进、字符串单引号化、CRLF 归一为 LF（Windows 来源文件会整文件重写）；空文件视为合规；tag 模式里的 <script> 岛由内置 oxc（Prettier 打印器）处理，读项目 .prettierrc 但只认其部分键；只排版不做 lint。安装：release 提供 macOS universal 二进制（curl -fL -o ~/.local/bin/cfformat https://github.com/jcberquist/cfformat/releases/latest/download/cfformat_macos），或 cargo install --locked --git https://github.com/jcberquist/cfformat cfformat-cli（本机 Rust 1.98.1 构建通过，要求 ≥1.97）。旧档案『社区尝试小众且久未维护』的结论已过时；Adobe ColdFusion Builder 的 CodeFormatter 经复核确无独立 CLI。",
+      "unformatted_exit_codes": [
+        1
+      ]
+    }
+  ]
+}

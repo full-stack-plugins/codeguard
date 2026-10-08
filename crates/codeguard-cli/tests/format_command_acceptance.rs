@@ -344,3 +344,76 @@ fn format_all_never_includes_not_integrated() {
     }
     let _ = std::fs::remove_dir_all(&root);
 }
+
+/// 57 语言必须全部有明确 disposition：要么可执行（有 formatter + argv + 退出码），
+/// 要么如实未接入（工具字段为 null + 具体阻塞证据）。不允许第三种状态。
+#[test]
+fn every_language_has_executable_or_evidenced_disposition() {
+    let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["format", "list", "--format=json"])
+        .output()
+        .expect("无法运行 codeguard format list");
+    let report: serde_json::Value =
+        serde_json::from_str(&String::from_utf8_lossy(&output.stdout)).expect("JSON 解析失败");
+
+    let rows = report["languages"].as_array().expect("档案列表");
+    assert_eq!(rows.len(), 57, "档案应覆盖 57 语言");
+
+    let mut executable = 0usize;
+    let mut disclosed = 0usize;
+    for row in rows {
+        let language = row["language"].as_str().unwrap_or("?");
+        let notes = row["notes"].as_str().unwrap_or("");
+        assert!(notes.len() >= 20, "{language} 应有实质 notes 依据");
+
+        match row["status"].as_str() {
+            Some("integrated") => {
+                executable += 1;
+                assert!(
+                    row["formatter"].as_str().is_some_and(|f| !f.is_empty()),
+                    "{language} integrated 但缺 formatter"
+                );
+                assert!(
+                    row["check_argv"].as_array().is_some_and(|a| !a.is_empty()),
+                    "{language} integrated 但缺 check_argv"
+                );
+                assert!(
+                    row["apply_argv"].as_array().is_some_and(|a| !a.is_empty()),
+                    "{language} integrated 但缺 apply_argv"
+                );
+                assert!(
+                    row["unformatted_exit_codes"]
+                        .as_array()
+                        .is_some_and(|c| !c.is_empty()),
+                    "{language} integrated 但缺 unformatted_exit_codes"
+                );
+                assert!(
+                    !row["extensions"].as_array().unwrap_or(&vec![]).is_empty(),
+                    "{language} integrated 但缺 extensions"
+                );
+            }
+            Some("not_integrated") => {
+                disclosed += 1;
+                // 未接入必须工具字段为 null，杜绝编译期伪造
+                assert!(
+                    row["formatter"].is_null() && row["tool_key"].is_null(),
+                    "{language} 未接入时 formatter/tool_key 必须为 null"
+                );
+                assert!(
+                    row["check_argv"].is_null() && row["apply_argv"].is_null(),
+                    "{language} 未接入时 check_argv/apply_argv 必须为 null"
+                );
+            }
+            other => panic!("{language} 出现非法 status: {other:?}（只允许 integrated / not_integrated）"),
+        }
+    }
+    assert_eq!(
+        executable + disclosed,
+        57,
+        "每种语言必须有且仅有一种 disposition"
+    );
+    assert!(
+        executable >= 50,
+        "可执行门禁应覆盖至少 50 种语言，当前 {executable}"
+    );
+}

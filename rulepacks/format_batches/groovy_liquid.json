@@ -1,0 +1,63 @@
+{
+  "schema_version": "0.1.0",
+  "batch": "groovy_liquid",
+  "languages": [
+    {
+      "language": "groovy",
+      "status": "integrated",
+      "formatter": "node",
+      "tool_key": "node",
+      "check_argv": [
+        "-e",
+        "const fs=require(\"node:fs\"),path=require(\"node:path\"),m=require(\"node:module\"),u=require(\"node:url\");\n(async()=>{\ntry{\nconst file=path.resolve(process.argv[2]||process.argv[1]);\nif(!fs.existsSync(file)){console.error(\"file not found: \"+file);process.exit(2);}\nconst req=m.createRequire(path.join(path.dirname(file),\"a.js\"));\nlet entry;\ntry{entry=req.resolve(\"npm-groovy-lint\");}catch(e){console.error(\"npm-groovy-lint not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\nconst mod=await import(u.pathToFileURL(entry).href);\nconst NpmGroovyLint=mod.default;\nconst RULES=\"ElseBlockBraces,ForStatementBraces,IfStatementBraces,WhileStatementBraces,NoTabCharacter,BlankLineBeforePackage,BlockEndsWithBlankLine,BlockStartsWithBlankLine,BracesForClass,BracesForForLoop,BracesForIfElse,BracesForMethod,BracesForTryCatchFinally,ClassEndsWithBlankLine,ClassStartsWithBlankLine,ClosureStatementOnOpeningLineOfMultipleLineClosure,ConsecutiveBlankLines,FileEndsWithoutNewline,Indentation,MissingBlankLineAfterImports,MissingBlankLineAfterPackage,SpaceAfterCatch,SpaceAfterClosingBrace,SpaceAfterComma,SpaceAfterFor,SpaceAfterIf,SpaceAfterMethodCallName,SpaceAfterOpeningBrace,SpaceAfterSemicolon,SpaceAfterSwitch,SpaceAfterWhile,SpaceAroundClosureArrow,SpaceAroundMapEntryColon,SpaceAroundOperator,SpaceBeforeClosingBrace,SpaceBeforeOpeningBrace,SpaceInsideParentheses,TrailingWhitespace,UnnecessaryGString,UnnecessarySemicolon\";\nconst linter=new NpmGroovyLint([process.execPath,\"npm-groovy-lint\",file,\"--rulesets\",RULES,\"--failon\",\"none\",\"--output\",\"json\",\"--noserver\"],{origin:\"codeguard\",parseOptions:true});\nconst realWrite=process.stdout.write.bind(process.stdout);\nprocess.stdout.write=()=>true;\nlet err=null;\ntry{await linter.run();}catch(e){err=e;}\nprocess.stdout.write=realWrite;\nif(err){console.error(\"npm-groovy-lint threw: \"+err.message);process.exit(2);}\nif(linter.status===2){console.error(\"npm-groovy-lint unexpected failure (check java/CodeNarc availability)\");process.exit(2);}\nconst result=linter.lintResult||{};\nlet violations=0,parseErrors=0;\nconst files=(result&&result.files)||{};\nfor(const key of Object.keys(files)){\nfor(const issue of (files[key].errors||[])){\nconst rule=issue&&issue.rule;\nif(rule===\"NglParseError\"){parseErrors++;}else{violations++;}\n}}\nif(parseErrors>0){console.error(\"groovy parse error: cannot judge formatting\");process.exit(2);}\nif(linter.status!==0&&violations===0){console.error(\"npm-groovy-lint status \"+linter.status+\" with no violations\");process.exit(2);}\nprocess.exit(violations>0?1:0);\n}catch(e){console.error(\"wrapper error: \"+(e&&e.message));process.exit(2);}\n})();",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-e",
+        "const fs=require(\"node:fs\"),path=require(\"node:path\"),m=require(\"node:module\"),u=require(\"node:url\");\n(async()=>{\ntry{\nconst file=path.resolve(process.argv[2]||process.argv[1]);\nif(!fs.existsSync(file)){console.error(\"file not found: \"+file);process.exit(2);}\nconst req=m.createRequire(path.join(path.dirname(file),\"a.js\"));\nlet entry;\ntry{entry=req.resolve(\"npm-groovy-lint\");}catch(e){console.error(\"npm-groovy-lint not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\nconst mod=await import(u.pathToFileURL(entry).href);\nconst NpmGroovyLint=mod.default;\nconst quietRun=async(argv)=>{\nconst linter=new NpmGroovyLint(argv,{origin:\"codeguard\",parseOptions:true});\nconst realWrite=process.stdout.write.bind(process.stdout);\nprocess.stdout.write=()=>true;\nlet err=null;\ntry{await linter.run();}catch(e){err=e;}\nprocess.stdout.write=realWrite;\nreturn {linter,err};\n};\nconst countParseErrors=(linter)=>{\nconst result=linter.lintResult||{};\nlet parseErrors=0;\nconst files=(result&&result.files)||{};\nfor(const key of Object.keys(files)){\nfor(const issue of (files[key].errors||[])){\nif(issue&&issue.rule===\"NglParseError\"){parseErrors++;}\n}}\nreturn parseErrors;\n};\nconst pre=[process.execPath,\"npm-groovy-lint\",file,\"--parse\",\"--failon\",\"none\",\"--output\",\"json\",\"--noserver\"];\nconst pre1=await quietRun(pre);\nif(pre1.err){console.error(\"npm-groovy-lint threw: \"+pre1.err.message);process.exit(2);}\nif(pre1.linter.status===2){console.error(\"npm-groovy-lint unexpected failure (check java/CodeNarc availability)\");process.exit(2);}\nif(countParseErrors(pre1.linter)>0){console.error(\"groovy parse error: formatting refused, file untouched\");process.exit(2);}\nconst main=[process.execPath,\"npm-groovy-lint\",file,\"--format\",\"--nolintafter\",\"--parse\",\"--failon\",\"none\",\"--output\",\"json\",\"--noserver\"];\nconst main1=await quietRun(main);\nif(main1.err){console.error(\"npm-groovy-lint threw: \"+main1.err.message);process.exit(2);}\nif(main1.linter.status===2){console.error(\"npm-groovy-lint unexpected failure during format\");process.exit(2);}\nif(countParseErrors(main1.linter)>0){console.error(\"groovy parse error during format\");process.exit(2);}\nprocess.exit(0);\n}catch(e){console.error(\"wrapper error: \"+(e&&e.message));process.exit(2);}\n})();",
+        "{file}"
+      ],
+      "config_markers": [
+        ".groovylintrc-format.json"
+      ],
+      "extensions": [
+        ".groovy"
+      ],
+      "dialects": {},
+      "notes": "Groovy 生态无独立格式化器可执行文件：google-java-format 已移除 Groovy 支持（实测对 .groovy 输出 Skipping non-Java file 且恒退 0），故采用事实标准 npm-groovy-lint（18.0.0，内嵌 CodeNarc 3.7.0，需本机 java）经 node -e 包装调用，formatter/tool_key 为 node（与 julia/Rscript/pwsh 档位同构）。前置条件：被检文件所在项目须安装 npm-groovy-lint（devDependency），依赖解析失败退 2 工具故障、绝不静默放行。check 通过 API 以 --rulesets 显式限定 npm-groovy-lint 内置 .groovylintrc-format.json 的全部 40 条 formatting/braces/convention 规则做只读 lint：0=合规、1=存在格式违规、2=语法解析错误(NglParseError)/java 或依赖缺失/内部失败，三态本机全实测（check 全程 stdout 静默，md5 不变）。不能直接用其 CLI：默认规则集混入 NoDef/CompileStatic 等非格式规则且 --failon 默认 info 导致 clean 文件也退 1；--rulesets \"ruleset:formatting\"/ruleset XML 文件等形态经其 JSON 规则读取器解析会崩溃退 2（No such rule named [ruleset:formatting]）。apply 用 API --format（npm-groovy-lint 官方格式化模式，自动应用内置格式规则集修复）：已实测修复空行/尾随空格/分号/空格违规、幂等；因实测 --format 会部分改写语法残缺文件，apply 先做只读 parse 预检，含 NglParseError 时退 2 且文件不动（实测 md5 不变）。限制：--noserver 每次调用冷启动 java 有秒级延迟；check 硬编码与内置 format 配置一致的 40 条规则、不读项目级 .groovylintrc-format.json（项目同名配置只影响 apply 的格式化行为，改写后可能与 check 规则不一致）；只排版，不检查默认规则集中的代码质量项（NoDef、CompileStatic 等被刻意排除），不能替代 CodeNarc 完整 lint。",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "liquid",
+      "status": "integrated",
+      "formatter": "node",
+      "tool_key": "node",
+      "check_argv": [
+        "-e",
+        "const fs=require(\"node:fs\"),path=require(\"node:path\"),m=require(\"node:module\"),u=require(\"node:url\");\n(async()=>{\ntry{\nconst file=path.resolve(process.argv[2]||process.argv[1]);\nif(!fs.existsSync(file)){console.error(\"file not found: \"+file);process.exit(2);}\nconst req=m.createRequire(path.join(path.dirname(file),\"a.js\"));\nlet prettierPath,pluginPath;\ntry{prettierPath=req.resolve(\"prettier\");}catch(e){console.error(\"prettier not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\ntry{pluginPath=req.resolve(\"@shopify/prettier-plugin-liquid\");}catch(e){console.error(\"@shopify/prettier-plugin-liquid not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\nconst prettier=req(prettierPath);\nlet plugin=await import(u.pathToFileURL(pluginPath).href);\nplugin=plugin.default||plugin;\nconst src=fs.readFileSync(file,\"utf8\");\nlet config=null;\ntry{config=await prettier.resolveConfig(file);}catch(e){config=null;}\nconst options=Object.assign({},config||{},{parser:\"liquid-html\",plugins:[plugin]});\nlet out;\ntry{out=await prettier.format(src,options);}catch(e){console.error(\"prettier format error: \"+e.message);process.exit(2);}\nprocess.exit(out===src?0:1);\n}catch(e){console.error(\"wrapper error: \"+(e&&e.message));process.exit(2);}\n})();",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-e",
+        "const fs=require(\"node:fs\"),path=require(\"node:path\"),m=require(\"node:module\"),u=require(\"node:url\");\n(async()=>{\ntry{\nconst file=path.resolve(process.argv[2]||process.argv[1]);\nif(!fs.existsSync(file)){console.error(\"file not found: \"+file);process.exit(2);}\nconst req=m.createRequire(path.join(path.dirname(file),\"a.js\"));\nlet prettierPath,pluginPath;\ntry{prettierPath=req.resolve(\"prettier\");}catch(e){console.error(\"prettier not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\ntry{pluginPath=req.resolve(\"@shopify/prettier-plugin-liquid\");}catch(e){console.error(\"@shopify/prettier-plugin-liquid not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\nconst prettier=req(prettierPath);\nlet plugin=await import(u.pathToFileURL(pluginPath).href);\nplugin=plugin.default||plugin;\nconst src=fs.readFileSync(file,\"utf8\");\nlet config=null;\ntry{config=await prettier.resolveConfig(file);}catch(e){config=null;}\nconst options=Object.assign({},config||{},{parser:\"liquid-html\",plugins:[plugin]});\nlet out;\ntry{out=await prettier.format(src,options);}catch(e){console.error(\"prettier format error: file left untouched, \"+e.message);process.exit(2);}\nfs.writeFileSync(file,out);\nprocess.exit(0);\n}catch(e){console.error(\"wrapper error: \"+(e&&e.message));process.exit(2);}\n})();",
+        "{file}"
+      ],
+      "config_markers": [
+        ".prettierrc",
+        ".prettierrc.json",
+        ".prettierrc.yaml",
+        "prettier.config.js"
+      ],
+      "extensions": [
+        ".liquid"
+      ],
+      "dialects": {},
+      "notes": "Liquid 模板的事实标准格式化器是 prettier + Shopify 官方插件 @shopify/prettier-plugin-liquid（实测 prettier 3.9.9 + 插件 3.x，parser 名为 liquid-html 而非 liquid），但插件是 node 包而非独立可执行文件，故经 node -e 包装调用，formatter/tool_key 为 node。不能直接用 prettier CLI：实测显式 --plugin 指定插件但项目未安装时，prettier 退 1 且 stdout 为空（Cannot find package 打在 stderr），与本工具「退 1=不合规」同码，会对未配置项目全量误报；不带插件则 No parser could be inferred 退 2。包装器先用 createRequire 从被检文件所在项目解析 prettier 与插件：任一缺失退 2（工具故障/未配置，绝不静默放行，实测 check/apply 均退 2 且文件不动）；随后调 prettier.format 与原文对比：0=合规、1=需格式化、prettier 抛错退 2，check 全程只读（实测 md5 不变、stdout 静默），apply 就地写回、实测幂等且解析失败不落盘。resolveConfig 已实测读取项目 .prettierrc（printWidth 改动会改变判定），config_markers 据此声明。限制：liquid-html 解析器宽松，残缺模板（未闭合 if 等）多数不会抛错而是被当作需格式化（check 退 1、apply 会重写补全，与官方 CLI --write 行为一致），不能依赖它做语法校验；只排版，不覆盖 theme-check 的 lint 规则；需项目预装 prettier 与插件两个 devDependency。",
+      "unformatted_exit_codes": [
+        1
+      ]
+    }
+  ]
+}
