@@ -1607,15 +1607,33 @@
     },
     {
       "language": "liquid",
-      "status": "not_integrated",
-      "formatter": null,
-      "tool_key": null,
-      "check_argv": null,
-      "apply_argv": null,
-      "config_markers": [],
-      "extensions": [],
+      "status": "integrated",
+      "formatter": "node",
+      "tool_key": "node",
+      "check_argv": [
+        "-e",
+        "const fs=require(\"node:fs\"),path=require(\"node:path\"),m=require(\"node:module\"),u=require(\"node:url\");\n(async()=>{\ntry{\nconst file=path.resolve(process.argv[2]||process.argv[1]);\nif(!fs.existsSync(file)){console.error(\"file not found: \"+file);process.exit(2);}\nconst req=m.createRequire(path.join(path.dirname(file),\"a.js\"));\nlet prettierPath,pluginPath;\ntry{prettierPath=req.resolve(\"prettier\");}catch(e){console.error(\"prettier not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\ntry{pluginPath=req.resolve(\"@shopify/prettier-plugin-liquid\");}catch(e){console.error(\"@shopify/prettier-plugin-liquid not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\nconst prettier=req(prettierPath);\nlet plugin=await import(u.pathToFileURL(pluginPath).href);\nplugin=plugin.default||plugin;\nconst src=fs.readFileSync(file,\"utf8\");\nlet config=null;\ntry{config=await prettier.resolveConfig(file);}catch(e){config=null;}\nconst options=Object.assign({},config||{},{parser:\"liquid-html\",plugins:[plugin]});\nlet out;\ntry{out=await prettier.format(src,options);}catch(e){console.error(\"prettier format error: \"+e.message);process.exit(2);}\nprocess.exit(out===src?0:1);\n}catch(e){console.error(\"wrapper error: \"+(e&&e.message));process.exit(2);}\n})();",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-e",
+        "const fs=require(\"node:fs\"),path=require(\"node:path\"),m=require(\"node:module\"),u=require(\"node:url\");\n(async()=>{\ntry{\nconst file=path.resolve(process.argv[2]||process.argv[1]);\nif(!fs.existsSync(file)){console.error(\"file not found: \"+file);process.exit(2);}\nconst req=m.createRequire(path.join(path.dirname(file),\"a.js\"));\nlet prettierPath,pluginPath;\ntry{prettierPath=req.resolve(\"prettier\");}catch(e){console.error(\"prettier not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\ntry{pluginPath=req.resolve(\"@shopify/prettier-plugin-liquid\");}catch(e){console.error(\"@shopify/prettier-plugin-liquid not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\nconst prettier=req(prettierPath);\nlet plugin=await import(u.pathToFileURL(pluginPath).href);\nplugin=plugin.default||plugin;\nconst src=fs.readFileSync(file,\"utf8\");\nlet config=null;\ntry{config=await prettier.resolveConfig(file);}catch(e){config=null;}\nconst options=Object.assign({},config||{},{parser:\"liquid-html\",plugins:[plugin]});\nlet out;\ntry{out=await prettier.format(src,options);}catch(e){console.error(\"prettier format error: file left untouched, \"+e.message);process.exit(2);}\nfs.writeFileSync(file,out);\nprocess.exit(0);\n}catch(e){console.error(\"wrapper error: \"+(e&&e.message));process.exit(2);}\n})();",
+        "{file}"
+      ],
+      "config_markers": [
+        ".prettierrc",
+        ".prettierrc.json",
+        ".prettierrc.yaml",
+        "prettier.config.js"
+      ],
+      "extensions": [
+        ".liquid"
+      ],
       "dialects": {},
-      "notes": "not_integrated：复核既有结论（docs.json/leftover.json 同判）并补充实测。prettier 3.x + @shopify/prettier-plugin-liquid 1.11.2（npm 装入临时项目实测）：仅当插件在项目 node_modules 且 cwd=项目根时 happy path 成立——--plugin @shopify/prettier-plugin-liquid --list-different 对合规文件退出 0 且 stdout 空、乱排文件退出 1 并列文件名，--write 退出 0 并完成重排；但插件是经 cwd 生成的 noop.js 动态解析（实测换 cwd 后即使传绝对插件路径也报 Couldn't resolve parser \"liquid\"），插件缺包时报 Cannot find package 且退出 1——与「需格式化」同码，未配置项目里所有 .liquid 都会被误判为不合规；完全无插件时报 No parser could be inferred 退出 2。theme-check 1.15.0（gem 实测）是 linter 而非 formatter：-a/--auto-correct 实测只修部分规则类（如 SpaceInsideBraces，31 处修正）不产出规范缩进排版，退出码按 lint 违规计（残留不可自动修复违规时退出 1，违反 apply 契约），且对非主题目录的单个 .liquid 报 No theme files found 并退出 0——空转会被误读为合规。需格式化与工具故障同码、依赖统一工具绑定无法保证的项目内插件安装与 cwd，维持 not_integrated，不静默通过。"
+      "notes": "Liquid 模板的事实标准格式化器是 prettier + Shopify 官方插件 @shopify/prettier-plugin-liquid（实测 prettier 3.9.9 + 插件 3.x，parser 名为 liquid-html 而非 liquid），但插件是 node 包而非独立可执行文件，故经 node -e 包装调用，formatter/tool_key 为 node。不能直接用 prettier CLI：实测显式 --plugin 指定插件但项目未安装时，prettier 退 1 且 stdout 为空（Cannot find package 打在 stderr），与本工具「退 1=不合规」同码，会对未配置项目全量误报；不带插件则 No parser could be inferred 退 2。包装器先用 createRequire 从被检文件所在项目解析 prettier 与插件：任一缺失退 2（工具故障/未配置，绝不静默放行，实测 check/apply 均退 2 且文件不动）；随后调 prettier.format 与原文对比：0=合规、1=需格式化、prettier 抛错退 2，check 全程只读（实测 md5 不变、stdout 静默），apply 就地写回、实测幂等且解析失败不落盘。resolveConfig 已实测读取项目 .prettierrc（printWidth 改动会改变判定），config_markers 据此声明。限制：liquid-html 解析器宽松，残缺模板（未闭合 if 等）多数不会抛错而是被当作需格式化（check 退 1、apply 会重写补全，与官方 CLI --write 行为一致），不能依赖它做语法校验；只排版，不覆盖 theme-check 的 lint 规则；需项目预装 prettier 与插件两个 devDependency。 【2026-10-08 复核修正】此前 final_five 分片据 prettier CLI 测试判为 not_integrated，理由是「插件缺失与需格式化同为退出 1」。该结论只覆盖 CLI 路径，未覆盖本档案的 node wrapper。实测 wrapper 四场景全部正确：合规 0；不合规 1；移走 node_modules 后依赖解析失败退 2（工具故障，不误判为不合规）；文件不存在退 2。apply 实测就地重排退出 0、复检 0 幂等。wrapper 用 createRequire 从被检文件所在目录解析依赖，正是它把「依赖缺失」与「需格式化」彻底分离，因此本条目维持 integrated。",
+      "unformatted_exit_codes": [
+        1
+      ]
     },
     {
       "language": "cuda",
@@ -1659,7 +1677,7 @@
       "config_markers": [],
       "extensions": [],
       "dialects": {},
-      "notes": "not_integrated：ansible 无独立格式化器，playbook 本质是 YAML 且无独立扩展名（rulepacks/legacy_languages.json ansible 条目 extensions=[]，仅 markers），排版由 yaml 通道（format_profiles.json yaml 条目 prettier --list-different/--write）覆盖；若另接 ansible 通道需认领 .yml/.yaml，会在同一批文件上与 yaml 通道双跑两套风格规则且结论可能互相矛盾。实测 ansible-lint 26.9.0（本机 venv + ansible-core 2.21.5）：--fix、--fix=yaml、--fix=none 确实执行 YAML 重排（帮助文本明确「YAML reformatting happens whenever --fix or --fix= is used」，--fix=none 实测仍完成重排），但残留语义违规（fqcn[action-core]、name[casing] 等）时一律退出 2，不存在「修完即退出 0」的调用，违反 apply「退出 0=成功格式化」契约；--tags yaml 只读检查退出 0/2，其中 2 与 YAML 解析错误不可区分（broken.yml 实测同退 2），坏文件会被误报为「需格式化」而非工具故障；且 yaml 标签混入 yaml[truthy]/yaml[octal-values]/yaml[line-length] 等语义与策略规则，属 lint 判定而非 formatter 规范输出。规则语义检查应走 lint 通道而非 format。该生态 format 检查如实不适用，不静默通过。"
+      "notes": "Ansible 无专属格式化器，按项目既有架构决策归口 yaml 通道——rulepacks/legacy_languages.json 的 ansible 条目自身即写明：extensions 为空数组、install_hint 为「playbook 检查由 ansible-lint 承接（yaml 通道）」、markers 含 playbook.yml。Ansible playbook 本质是 YAML，其排版由 format_profiles.json 的 yaml 条目（prettier --list-different）统一处理，因此 **不重复声明第二条 ansible 通道**：同一批 .yml/.yaml 若被两个语言条目各跑一次，既浪费预算又可能在配置漂移时产生互相矛盾的风格判定。实测否决 ansible-lint 作为格式化器：ansible-lint 26.9.0 的 --fix / --fix=yaml / --fix=none 三种形态都会重排 YAML，但只要残留 fqcn、name[casing] 等语义违规就一律退 2，不存在「修完即退 0」的调用形态，无法满足 apply 的「退出 0 = 成功」契约；其 --tags yaml 只读检查虽退 0/2，但 2 与 YAML 解析错误同码，损坏文件会被误报为需格式化（实测 broken.yml 确认）。结论：ansible 不提供独立 format 通道，其文件已由 yaml 通道覆盖，属显式架构归口而非未完成项。语义级检查（ansible-lint 规则）属 lint 类别，不在本档案职责内。"
     }
   ]
 }

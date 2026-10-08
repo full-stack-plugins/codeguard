@@ -1,0 +1,103 @@
+{
+  "schema_version": "0.1.0",
+  "document_type": "format_gate_scope",
+  "authority": "repository_scope_declaration",
+  "target_statement": "57 语言中全部 stable 语言具备可执行格式门禁或显式归口；planned 语言不计入交付口径",
+  "registry_total": 57,
+  "registry_stable": 54,
+  "registry_planned": 3,
+  "integrated_languages": [
+    "java",
+    "rust",
+    "typescript",
+    "python",
+    "go",
+    "csharp",
+    "kotlin",
+    "swift",
+    "php",
+    "ruby",
+    "scala",
+    "shell",
+    "dockerfile",
+    "yaml",
+    "elixir",
+    "css",
+    "c",
+    "cpp",
+    "objc",
+    "dart",
+    "vue",
+    "svelte",
+    "astro",
+    "solidity",
+    "terraform",
+    "nix",
+    "html",
+    "sql",
+    "graphql",
+    "protobuf",
+    "markdown",
+    "toml",
+    "haskell",
+    "ocaml",
+    "fsharp",
+    "perl",
+    "groovy",
+    "clojure",
+    "powershell",
+    "zig",
+    "nim",
+    "crystal",
+    "julia",
+    "elm",
+    "lua",
+    "luau",
+    "pascal",
+    "r",
+    "cfml",
+    "vbnet",
+    "erlang",
+    "liquid",
+    "cuda"
+  ],
+  "integrated_count": 53,
+  "planned_excluded": [
+    {
+      "language": "cobol",
+      "reason": "注册表 planned 状态：语言生态或工具链未稳定，从未进入 stable 交付口径",
+      "registry_status": "planned",
+      "evidence": [
+        "rulepacks/legacy_languages.json 该条目 status=planned",
+        "crates/codeguard-cli/tests/planned_language_gaps.rs 验证 check 退出 3 且不生成空义务"
+      ]
+    },
+    {
+      "language": "arkts",
+      "reason": "注册表 planned 状态：语言生态或工具链未稳定，从未进入 stable 交付口径",
+      "registry_status": "planned",
+      "evidence": [
+        "rulepacks/legacy_languages.json 该条目 status=planned",
+        "crates/codeguard-cli/tests/planned_language_gaps.rs 验证 check 退出 3 且不生成空义务"
+      ]
+    },
+    {
+      "language": "metal",
+      "reason": "注册表 planned 状态：语言生态或工具链未稳定，从未进入 stable 交付口径",
+      "registry_status": "planned",
+      "evidence": [
+        "rulepacks/legacy_languages.json 该条目 status=planned",
+        "crates/codeguard-cli/tests/planned_language_gaps.rs 验证 check 退出 3 且不生成空义务"
+      ]
+    }
+  ],
+  "explicit_gaps": [
+    {
+      "language": "ansible",
+      "reason": "无满足只读检查与退出码契约的专属格式化器",
+      "registry_status": "stable",
+      "routed_to": "yaml"
+    }
+  ],
+  "separation_note": "planned 排除与显式归口均不是「未完成」，而是可审计的正式分类；禁止把无工具语言计入接入率分母外的静默遗漏"
+}
