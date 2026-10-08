@@ -100,8 +100,13 @@ def main() -> None:
 
     # 收尾分片必须最后处理：它基于更晚的实测证据，覆盖先前分片的判定。
     # 不能依赖 glob 字母序（leftover < legacy，顺序恰好相反）。
-    tail = [f for f in batch_files if f.stem == "leftover"]
-    batch_files = [f for f in batch_files if f.stem != "leftover"] + tail
+    # 收尾分片按显式顺序处理：列表中越靠后优先级越高。
+    # 依据：先做生态普适判定（groovy_liquid/pascal_cfml/vbnet_fix），
+    # 再做逐语言深度复核（final_five）——深度复核只在没有更好方案时推翻前者。
+    tail_order = ["leftover", "vbnet_fix", "pascal_cfml", "groovy_liquid", "final_five"]
+    tail = [BATCH_DIR / f"{stem}.json" for stem in tail_order if (BATCH_DIR / f"{stem}.json").exists()]
+    tail_names = {f.stem for f in tail}
+    batch_files = [f for f in batch_files if f.stem not in tail_names] + tail
 
     # leftover 分片允许覆盖先前判定（它最后处理，携带更新的实测证据）。
     overrides = {
@@ -130,6 +135,14 @@ def main() -> None:
     if missing:
         fail(f"以下语言没有任何档案: {missing}")
 
+    # 规范化：integrated 档案必须显式声明不合规退出码。
+    # 运行时缺省为 [1]，但显式声明让档案可被静态审计（Rust 侧有对应测试）。
+    backfilled = []
+    for row in merged.values():
+        if row["status"] == "integrated" and not row.get("unformatted_exit_codes"):
+            row["unformatted_exit_codes"] = [1]
+            backfilled.append(row["language"])
+
     current["languages"] = [merged[i] for i in ordered_ids]
     TARGET.write_text(
         json.dumps(current, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
@@ -138,6 +151,8 @@ def main() -> None:
     integrated = [row["language"] for row in current["languages"] if row["status"] == "integrated"]
     print(f"合并完成: {len(batch_files)} 个分片, {len(contributors)} 条档案")
     print(f"总计 {len(current['languages'])} 语言, 已接入 {len(integrated)}")
+    if backfilled:
+        print(f"补齐 unformatted_exit_codes（缺省 [1]）: {', '.join(backfilled)}")
     print(f"已接入: {', '.join(integrated)}")
 
 

@@ -16,14 +16,19 @@
         "--replace",
         "{file}"
       ],
-      "config_markers": [],
+      "config_markers": [
+        ".editorconfig",
+        "pom.xml",
+        "build.gradle",
+        "build.gradle.kts"
+      ],
       "extensions": [
         ".java"
       ],
       "dialects": {
         "style": "google"
       },
-      "notes": "Google 官方 Java 格式化器（实测 1.27.0）。check_argv 属 B 类：--dry-run --set-exit-if-changed 对未格式化文件退出 1 并在 stdout 列出文件路径，合规时退出 0 且无输出，退出码 ≥2 为工具故障；apply_argv 的 --replace 就地重写并退出 0（两个方向的退出码均在本机 Java 21 + 官方 all-deps jar 下实跑验证）。只负责排版与 import 排序/去重，不检查语义、编译错误或注释内容；风格固定为 Google Style，不可用配置文件自定义（仅 --aosp 切换 4 空格 AOSP 变体），故无 config_markers。独立可执行文件可 brew install google-java-format 或从 GitHub release 获取，需较新 JRE 运行。"
+      "notes": "Java 选 google-java-format（GJF）而非 spotless / palantir-java-format，理由是逐文件调用契约：codeguard format 以 {file} 逐文件驱动格式化器，需要可直接对单文件判定合规性的独立 CLI。① spotless 是 Maven/Gradle 插件形态，只能通过 mvn spotless:check / gradle spotlessCheck 驱动整个项目生命周期，无法对单个 .java 文件给出独立退出码，且项目未配置插件时命令直接失败（退出 1 会与「不合规」混淆）；② palantir-java-format 是 GJF 的 fork，check/apply 语义与 GJF 完全一致（--dry-run --set-exit-if-changed / --replace），选 GJF 是因为它是 upstream 且发行形态最稳定；项目若偏好 palantir 风格，可用 --tool google-java-format=<palantir 绝对路径> 替换绑定，无需改档案；③ GJF 对 .groovy 输出 Skipping non-Java file 且恒退 0，故 groovy 不复用本条目，改走 npm-groovy-lint 包装器。实测（本机 google-java-format 1.27.0 + JDK 21）：不合规退出 1 且 stdout 列出文件、已格式化退出 0、--replace 就地重写后复检退出 0。限制：GJF 无自身配置文件（仅 --aosp 风格变体），缩进/换行由内置风格决定；只重排版面，不做 import 顺序治理、不检查注释完整性、不做静态分析，不能替代 Checkstyle/P3C（那是 conventions 核心能力的职责）。"
     },
     {
       "language": "kotlin",

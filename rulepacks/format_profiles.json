@@ -21,14 +21,19 @@
         "--replace",
         "{file}"
       ],
-      "config_markers": [],
+      "config_markers": [
+        ".editorconfig",
+        "pom.xml",
+        "build.gradle",
+        "build.gradle.kts"
+      ],
       "extensions": [
         ".java"
       ],
       "dialects": {
         "style": "google"
       },
-      "notes": "Google 官方 Java 格式化器（实测 1.27.0）。check_argv 属 B 类：--dry-run --set-exit-if-changed 对未格式化文件退出 1 并在 stdout 列出文件路径，合规时退出 0 且无输出，退出码 ≥2 为工具故障；apply_argv 的 --replace 就地重写并退出 0（两个方向的退出码均在本机 Java 21 + 官方 all-deps jar 下实跑验证）。只负责排版与 import 排序/去重，不检查语义、编译错误或注释内容；风格固定为 Google Style，不可用配置文件自定义（仅 --aosp 切换 4 空格 AOSP 变体），故无 config_markers。独立可执行文件可 brew install google-java-format 或从 GitHub release 获取，需较新 JRE 运行。",
+      "notes": "Java 选 google-java-format（GJF）而非 spotless / palantir-java-format，理由是逐文件调用契约：codeguard format 以 {file} 逐文件驱动格式化器，需要可直接对单文件判定合规性的独立 CLI。① spotless 是 Maven/Gradle 插件形态，只能通过 mvn spotless:check / gradle spotlessCheck 驱动整个项目生命周期，无法对单个 .java 文件给出独立退出码，且项目未配置插件时命令直接失败（退出 1 会与「不合规」混淆）；② palantir-java-format 是 GJF 的 fork，check/apply 语义与 GJF 完全一致（--dry-run --set-exit-if-changed / --replace），选 GJF 是因为它是 upstream 且发行形态最稳定；项目若偏好 palantir 风格，可用 --tool google-java-format=<palantir 绝对路径> 替换绑定，无需改档案；③ GJF 对 .groovy 输出 Skipping non-Java file 且恒退 0，故 groovy 不复用本条目，改走 npm-groovy-lint 包装器。实测（本机 google-java-format 1.27.0 + JDK 21）：不合规退出 1 且 stdout 列出文件、已格式化退出 0、--replace 就地重写后复检退出 0。限制：GJF 无自身配置文件（仅 --aosp 风格变体），缩进/换行由内置风格决定；只重排版面，不做 import 顺序治理、不检查注释完整性、不做静态分析，不能替代 Checkstyle/P3C（那是 conventions 核心能力的职责）。",
       "unformatted_exit_codes": [
         1
       ]
@@ -1155,15 +1160,27 @@
     },
     {
       "language": "groovy",
-      "status": "not_integrated",
-      "formatter": null,
-      "tool_key": null,
-      "check_argv": null,
-      "apply_argv": null,
-      "config_markers": [],
-      "extensions": [],
+      "status": "integrated",
+      "formatter": "node",
+      "tool_key": "node",
+      "check_argv": [
+        "-e",
+        "const fs=require(\"node:fs\"),path=require(\"node:path\"),m=require(\"node:module\"),u=require(\"node:url\");\n(async()=>{\ntry{\nconst file=path.resolve(process.argv[2]||process.argv[1]);\nif(!fs.existsSync(file)){console.error(\"file not found: \"+file);process.exit(2);}\nconst req=m.createRequire(path.join(path.dirname(file),\"a.js\"));\nlet entry;\ntry{entry=req.resolve(\"npm-groovy-lint\");}catch(e){console.error(\"npm-groovy-lint not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\nconst mod=await import(u.pathToFileURL(entry).href);\nconst NpmGroovyLint=mod.default;\nconst RULES=\"ElseBlockBraces,ForStatementBraces,IfStatementBraces,WhileStatementBraces,NoTabCharacter,BlankLineBeforePackage,BlockEndsWithBlankLine,BlockStartsWithBlankLine,BracesForClass,BracesForForLoop,BracesForIfElse,BracesForMethod,BracesForTryCatchFinally,ClassEndsWithBlankLine,ClassStartsWithBlankLine,ClosureStatementOnOpeningLineOfMultipleLineClosure,ConsecutiveBlankLines,FileEndsWithoutNewline,Indentation,MissingBlankLineAfterImports,MissingBlankLineAfterPackage,SpaceAfterCatch,SpaceAfterClosingBrace,SpaceAfterComma,SpaceAfterFor,SpaceAfterIf,SpaceAfterMethodCallName,SpaceAfterOpeningBrace,SpaceAfterSemicolon,SpaceAfterSwitch,SpaceAfterWhile,SpaceAroundClosureArrow,SpaceAroundMapEntryColon,SpaceAroundOperator,SpaceBeforeClosingBrace,SpaceBeforeOpeningBrace,SpaceInsideParentheses,TrailingWhitespace,UnnecessaryGString,UnnecessarySemicolon\";\nconst linter=new NpmGroovyLint([process.execPath,\"npm-groovy-lint\",file,\"--rulesets\",RULES,\"--failon\",\"none\",\"--output\",\"json\",\"--noserver\"],{origin:\"codeguard\",parseOptions:true});\nconst realWrite=process.stdout.write.bind(process.stdout);\nprocess.stdout.write=()=>true;\nlet err=null;\ntry{await linter.run();}catch(e){err=e;}\nprocess.stdout.write=realWrite;\nif(err){console.error(\"npm-groovy-lint threw: \"+err.message);process.exit(2);}\nif(linter.status===2){console.error(\"npm-groovy-lint unexpected failure (check java/CodeNarc availability)\");process.exit(2);}\nconst result=linter.lintResult||{};\nlet violations=0,parseErrors=0;\nconst files=(result&&result.files)||{};\nfor(const key of Object.keys(files)){\nfor(const issue of (files[key].errors||[])){\nconst rule=issue&&issue.rule;\nif(rule===\"NglParseError\"){parseErrors++;}else{violations++;}\n}}\nif(parseErrors>0){console.error(\"groovy parse error: cannot judge formatting\");process.exit(2);}\nif(linter.status!==0&&violations===0){console.error(\"npm-groovy-lint status \"+linter.status+\" with no violations\");process.exit(2);}\nprocess.exit(violations>0?1:0);\n}catch(e){console.error(\"wrapper error: \"+(e&&e.message));process.exit(2);}\n})();",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-e",
+        "const fs=require(\"node:fs\"),path=require(\"node:path\"),m=require(\"node:module\"),u=require(\"node:url\");\n(async()=>{\ntry{\nconst file=path.resolve(process.argv[2]||process.argv[1]);\nif(!fs.existsSync(file)){console.error(\"file not found: \"+file);process.exit(2);}\nconst req=m.createRequire(path.join(path.dirname(file),\"a.js\"));\nlet entry;\ntry{entry=req.resolve(\"npm-groovy-lint\");}catch(e){console.error(\"npm-groovy-lint not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\nconst mod=await import(u.pathToFileURL(entry).href);\nconst NpmGroovyLint=mod.default;\nconst quietRun=async(argv)=>{\nconst linter=new NpmGroovyLint(argv,{origin:\"codeguard\",parseOptions:true});\nconst realWrite=process.stdout.write.bind(process.stdout);\nprocess.stdout.write=()=>true;\nlet err=null;\ntry{await linter.run();}catch(e){err=e;}\nprocess.stdout.write=realWrite;\nreturn {linter,err};\n};\nconst countParseErrors=(linter)=>{\nconst result=linter.lintResult||{};\nlet parseErrors=0;\nconst files=(result&&result.files)||{};\nfor(const key of Object.keys(files)){\nfor(const issue of (files[key].errors||[])){\nif(issue&&issue.rule===\"NglParseError\"){parseErrors++;}\n}}\nreturn parseErrors;\n};\nconst pre=[process.execPath,\"npm-groovy-lint\",file,\"--parse\",\"--failon\",\"none\",\"--output\",\"json\",\"--noserver\"];\nconst pre1=await quietRun(pre);\nif(pre1.err){console.error(\"npm-groovy-lint threw: \"+pre1.err.message);process.exit(2);}\nif(pre1.linter.status===2){console.error(\"npm-groovy-lint unexpected failure (check java/CodeNarc availability)\");process.exit(2);}\nif(countParseErrors(pre1.linter)>0){console.error(\"groovy parse error: formatting refused, file untouched\");process.exit(2);}\nconst main=[process.execPath,\"npm-groovy-lint\",file,\"--format\",\"--nolintafter\",\"--parse\",\"--failon\",\"none\",\"--output\",\"json\",\"--noserver\"];\nconst main1=await quietRun(main);\nif(main1.err){console.error(\"npm-groovy-lint threw: \"+main1.err.message);process.exit(2);}\nif(main1.linter.status===2){console.error(\"npm-groovy-lint unexpected failure during format\");process.exit(2);}\nif(countParseErrors(main1.linter)>0){console.error(\"groovy parse error during format\");process.exit(2);}\nprocess.exit(0);\n}catch(e){console.error(\"wrapper error: \"+(e&&e.message));process.exit(2);}\n})();",
+        "{file}"
+      ],
+      "config_markers": [
+        ".groovylintrc-format.json"
+      ],
+      "extensions": [
+        ".groovy"
+      ],
       "dialects": {},
-      "notes": "not_integrated：实测 npm-groovy-lint 18.0.0（内嵌 CodeNarc 3.7.0，npx 现场拉取，依赖 Java/CodeNarcServer）无法给出诚实的 check：默认配置下退出 1 的语义是『存在任一 lint 违规（含 info 级）』而非『需格式化』——实测连完全合规的 clean.groovy 也退出 1，lint 与 format 混淆且合规文件必误报；尝试用 -r 把规则收敛到 formatting 范畴的三种形态全部崩溃退出 2（CodeNarc ruleset-ref 名 'formatting'、含 <ruleset-ref> 的 ruleset XML 文件、逗号分隔规则 ID 列表，均报 CodeNarcServer 异常），即无法在 CLI 层把检查范围限制到『--format 会修的内容』；--format --nolintafter 退出 0（apply 方向可行）但没有诚实配对的 check 无法成对接入。spotless 仍仅以 Maven/Gradle 插件形态存在，项目未配置插件时构建失败退出 1 与不合规同码；google-java-format 1.27.0 已移除 Groovy 支持（对 .groovy 跳过并退出 0，假阴性）；Groovy 官方无内置格式化器。维持 not_integrated，不静默通过。",
+      "notes": "Groovy 生态无独立格式化器可执行文件：google-java-format 已移除 Groovy 支持（实测对 .groovy 输出 Skipping non-Java file 且恒退 0），故采用事实标准 npm-groovy-lint（18.0.0，内嵌 CodeNarc 3.7.0，需本机 java）经 node -e 包装调用，formatter/tool_key 为 node（与 julia/Rscript/pwsh 档位同构）。前置条件：被检文件所在项目须安装 npm-groovy-lint（devDependency），依赖解析失败退 2 工具故障、绝不静默放行。check 通过 API 以 --rulesets 显式限定 npm-groovy-lint 内置 .groovylintrc-format.json 的全部 40 条 formatting/braces/convention 规则做只读 lint：0=合规、1=存在格式违规、2=语法解析错误(NglParseError)/java 或依赖缺失/内部失败，三态本机全实测（check 全程 stdout 静默，md5 不变）。不能直接用其 CLI：默认规则集混入 NoDef/CompileStatic 等非格式规则且 --failon 默认 info 导致 clean 文件也退 1；--rulesets \"ruleset:formatting\"/ruleset XML 文件等形态经其 JSON 规则读取器解析会崩溃退 2（No such rule named [ruleset:formatting]）。apply 用 API --format（npm-groovy-lint 官方格式化模式，自动应用内置格式规则集修复）：已实测修复空行/尾随空格/分号/空格违规、幂等；因实测 --format 会部分改写语法残缺文件，apply 先做只读 parse 预检，含 NglParseError 时退 2 且文件不动（实测 md5 不变）。限制：--noserver 每次调用冷启动 java 有秒级延迟；check 硬编码与内置 format 配置一致的 40 条规则、不读项目级 .groovylintrc-format.json（项目同名配置只影响 apply 的格式化行为，改写后可能与 check 规则不一致）；只排版，不检查默认规则集中的代码质量项（NoDef、CompileStatic 等被刻意排除），不能替代 CodeNarc 完整 lint。",
       "unformatted_exit_codes": [
         1
       ]
@@ -1413,15 +1430,29 @@
     },
     {
       "language": "pascal",
-      "status": "not_integrated",
-      "formatter": null,
-      "tool_key": null,
-      "check_argv": null,
-      "apply_argv": null,
-      "config_markers": [],
-      "extensions": [],
-      "dialects": {},
-      "notes": "not_integrated：该生态无公认格式化器，复核维持结论。FPC 自带 ptop（本机实测）：语义为 ptop infile outfile 双文件转换，无只读/检查模式；退出码完全不可信——解析损坏的 .pas 与不存在的输入文件均实测退出 0，工具自身故障无法探测；且对常见手写风格实测输出与输入不同（固定风格漂移），即便以 /bin/sh 包装做 diff 比对，也无法把『风格不同』与『工具已损坏输入』区分开，包装逻辑会沦为 codeguard 自己实现的格式化器而非对 ptop 的诚实暴露。新兴 pasfmt（integrated-application-development 维护的 Delphi 格式化器，Rust 实现）：README 无 check/dry-run 模式与退出码契约（仅就地改写），brew 无 formula、本机未安装无法实测，且前档实测不支持 .lpr，覆盖面窄于注册表方言（.pas/.dpr/.dpk/.lpr）。fpc 编译器本身不做格式化。format 检查如实不适用，不静默通过。",
+      "status": "integrated",
+      "formatter": "pasfmt",
+      "tool_key": "pasfmt",
+      "check_argv": [
+        "--mode=check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "{file}"
+      ],
+      "config_markers": [
+        "pasfmt.toml"
+      ],
+      "extensions": [
+        ".pas",
+        ".dpr",
+        ".dpk",
+        ".lpr"
+      ],
+      "dialects": {
+        "pasfmt": "0.7.0"
+      },
+      "notes": "integrated：pasfmt 本机源码构建实跑验证（git main=0.7.0+dev，Rust 实现的 Delphi 生态主流格式化器，0.7.0 于 2025-11 发布）。它并非『无 check 模式』：CLI 原生 --mode=check（README 未写但 CHANGELOG、--help 与源码测试均确认，随 0.7.0 版本发布）。B 类三态实测：已格式化退出 0 且 stdout 为空；不合规退出 1 并在 stderr 打 'ERROR CHECK: … has incorrect formatting'；check 全程只读（实测 md5 不变）；apply 为默认 files 模式就地写回退出 0，实测幂等（二次 apply 字节不变），1MB 文件 0.64s；UTF-8 内容（中文/变音符）实测无损；.lpr 作为显式文件实测可检查可写回（其目录遍历只认 .pas/.dpr/.dpk，运行时恰为逐文件显式调用，四种扩展全覆盖）。限制：语法损坏文件也退出 1（与不合规同码，按不合规处理而非工具故障，但不会把损坏误判为合规），常规路径无 ≥2 工具故障码（仅参数错误退出 2）；pasfmt.toml 从进程当前目录向上查找，codeguard 工作目录不在项目内时读不到项目配置（退回默认风格）；apply 会把 CRLF 归一为 LF、把 0 字节文件写成单个换行（空文件按不合规报告）；只排版不做任何 lint。安装摩擦：GitHub release 仅发 Windows/Linux 二进制，macOS 需 cargo install --locked --git https://github.com/integrated-application-development/pasfmt（本机 Rust 1.98.1 构建通过，要求 ≥1.82）。已实测并否决的替代方案：FPC 自带 ptop（brew，v1.2，2005 年）退出码完全不可信（损坏/缺失输入均退 0），二进制垃圾输入会无界写出（实测写出 37GB 才异常终止），只能靠 bash wrapper（临时副本→ptop→字节比对 + ulimit 封顶输出）满足契约——wrapper 已完整实测（ptop 一遍收敛幂等成立、三态退出码正确、check 只读），但 ptop 风格侵入性强（关键字改大小写、插前导空行），且字节比对属合成 check 而非工具原生能力，故选 pasfmt。",
       "unformatted_exit_codes": [
         1
       ]
@@ -1456,15 +1487,29 @@
     },
     {
       "language": "cfml",
-      "status": "not_integrated",
-      "formatter": null,
-      "tool_key": null,
-      "check_argv": null,
-      "apply_argv": null,
-      "config_markers": [],
-      "extensions": [],
-      "dialects": {},
-      "notes": "not_integrated：该生态无公认格式化器，format 检查如实不适用。Adobe ColdFusion Builder 的 CodeFormatter 仅是 IDE 内置功能，无可独立运行的 CLI；社区格式化尝试（VS Code cfml 扩展等）小众且久未维护，无法核实其稳定性与退出码契约。legacy_languages.json 中 cfml 的 format 为 null，install_hint 的 cflint 是 linter（本机亦无 cflint 可执行），仅 lint 通道承接。按契约如实标 not_integrated，不静默通过。",
+      "status": "integrated",
+      "formatter": "cfformat",
+      "tool_key": "cfformat",
+      "check_argv": [
+        "--check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-w",
+        "{file}"
+      ],
+      "config_markers": [
+        ".cfformat.json"
+      ],
+      "extensions": [
+        ".cfc",
+        ".cfm",
+        ".cfs"
+      ],
+      "dialects": {
+        "cfformat": "0.3.1"
+      },
+      "notes": "integrated：cfformat（CommandBox cfformat 模块的 Rust 重写，同作者 jcberquist，0.3.1 于 2026-10-05 发布，本机源码构建实跑验证）是 CFML 生态事实标准格式化器：单二进制、无 JVM 依赖、活跃维护。B 类三态实测：已格式化退出 0 且 stdout 为空；不合规退出 1 并在 stdout 列出文件路径；文件缺失/不可读/非 UTF-8/.cfformat.json 配置错误/内部错误退出 2（工具故障类真实存在；唯语法损坏文件与不合规同码退出 1，按不合规处理，不会把损坏误判为合规）。check 全程只读（实测 md5 不变）；apply 为 -w 就地写回退出 0，实测幂等，2.3MB 文件 0.2s；.cfc/.cfm/.cfs 作为显式文件均实测可用（--cfm 标志只作用于目录遍历，对单文件报参数错误退出 2，故 check_argv 不带它；单文件按内容嗅探 script/tags 模式）。设置按被检查文件向上查找最近的 .cfformat.json（实测 tab_indent 设置生效），另有 ~/.cfformat.json 兜底，配置损坏退出 2 不静默放行。限制：默认风格为 4 空格缩进、字符串单引号化、CRLF 归一为 LF（Windows 来源文件会整文件重写）；空文件视为合规；tag 模式里的 <script> 岛由内置 oxc（Prettier 打印器）处理，读项目 .prettierrc 但只认其部分键；只排版不做 lint。安装：release 提供 macOS universal 二进制（curl -fL -o ~/.local/bin/cfformat https://github.com/jcberquist/cfformat/releases/latest/download/cfformat_macos），或 cargo install --locked --git https://github.com/jcberquist/cfformat cfformat-cli（本机 Rust 1.98.1 构建通过，要求 ≥1.97）。旧档案『社区尝试小众且久未维护』的结论已过时；Adobe ColdFusion Builder 的 CodeFormatter 经复核确无独立 CLI。",
       "unformatted_exit_codes": [
         1
       ]
@@ -1479,22 +1524,33 @@
       "config_markers": [],
       "extensions": [],
       "dialects": {},
-      "notes": "not_integrated：COBOL 生态无公认 CLI 格式化器，rulepacks/legacy_languages.json 的 install_hint 明确「无独立 CLI linter（依赖平台 IDE 诊断）」。其 tree-sitter grammar WASM 为 16.4 MB（grammars/codegraph-coverage.json 中 tree-sitter-cobol.wasm 16,355,286 字节），超出当前 8 MiB 加载限额——openspec/changes/introduce-rust-codeguard-cli/tasks.md 14.1/14.19 记录「COBOL 的 16.4 MB 超出当前 8 MiB 加载限额」「COBOL 超出 8 MiB 上限」，后续增量确认仅能以受限 20 MiB 输入加载且冷启动/内存成本高，固定/自由源格式尚未验收，全量回放中 COBOL 样例仍为 pending。任务 8.145 要求为其保留显式 planned/gap，crates/codeguard-cli/tests/planned_language_gaps.rs 与 tests/acceptance/planned-language-gaps.md 固化含 .cbl 源码的 check all 退出 3、六类别 gap。format 命令对该语言如实返回 not_integrated，不静默通过，也不能以未验收语法候选冒充风格合规。",
-      "unformatted_exit_codes": [
-        1
-      ]
+      "notes": "not_integrated：本机与各注册表复核后无可实测接入的 COBOL 格式化器——npm 检索 cobol-formatter/cobol-fmt 均 404，PyPI 无 cobol-formatter/cobfmt，crates.io 仅有 ironwork 实验编译器套件与 tree-sitter grammar，无 formatter；已知候选要么是 Windows 免费软件（screenio.com 的 COBClean），要么是商业或 IDE 工具（cobolproducts.com Cobol Beautifier、IBM Z Open Editor 实验性格式化、Semantic Designs），本机无 cobc/cobfmt 可执行文件，GnuCOBOL 的 cobc 是编译器无格式化模式，均无法在本机实测退出码。仓库阻塞维持：rulepacks/legacy_languages.json cobol 条目 status=planned、无 linter_config_files、install_hint「无独立 CLI linter（依赖平台 IDE 诊断）」；grammars/codegraph-coverage.json assets[5] 记录 tree-sitter-cobol.wasm bytes=16355286（16.4 MB），超出 8 MiB 加载限额——openspec/changes/introduce-rust-codeguard-cli/tasks.md 14.1「COBOL 的 16.4 MB 超出当前 8 MiB 加载限额」、14.19「COBOL 超出 8 MiB 上限」，后续增量确认仅能以受限 20 MiB 输入加载且冷启动/内存成本高，固定/自由源格式尚未验收；任务 8.145（tasks.md L464）要求保留显式 planned/gap，crates/codeguard-cli/tests/planned_language_gaps.rs L47/L51-L77 固化含 .cbl 项目的 check all 退出 3、六类别 capability_status=gap/status=not_integrated。format 命令对该语言如实返回 not_integrated，不静默通过，也不能以 IDE/商业工具或未验收语法候选冒充风格合规。"
     },
     {
       "language": "vbnet",
-      "status": "not_integrated",
-      "formatter": null,
-      "tool_key": null,
-      "check_argv": null,
-      "apply_argv": null,
+      "status": "integrated",
+      "formatter": "bash",
+      "tool_key": "bash",
+      "check_argv": [
+        "-c",
+        "f=\"$1\"; { [ -n \"$f\" ] && [ -f \"$f\" ]; } || exit 2\nline=\"$(dotnet --list-sdks 2>/dev/null | tail -1)\"; [ -n \"$line\" ] || exit 2\nver=\"${line%% *}\"; root=\"${line#*\\[}\"; root=\"${root%\\]}\"\nrb=\"$root/$ver/DotnetTools/dotnet-format\"\n[ -f \"$rb/Microsoft.CodeAnalysis.VisualBasic.Workspaces.dll\" ] || rb=\"$(find \"$root/$ver\" -type d -name dotnet-format 2>/dev/null | head -1)\"\n[ -f \"$rb/Microsoft.CodeAnalysis.VisualBasic.Workspaces.dll\" ] || exit 2\nt=\"$(mktemp -d \"${TMPDIR:-/tmp}/cg-vbnet.XXXXXX\")\" || exit 2\ntrap 'rm -rf \"$t\"' EXIT\n{ printf '#r \"%s/Microsoft.CodeAnalysis.dll\"\\n#r \"%s/Microsoft.CodeAnalysis.VisualBasic.dll\"\\n#r \"%s/Microsoft.CodeAnalysis.Workspaces.dll\"\\n#r \"%s/Microsoft.CodeAnalysis.VisualBasic.Workspaces.dll\"\\n' \"$rb\" \"$rb\" \"$rb\" \"$rb\"; cat <<'FSX'\nopen System\nopen System.IO\nopen Microsoft.CodeAnalysis\nopen Microsoft.CodeAnalysis.VisualBasic\nopen Microsoft.CodeAnalysis.Formatting\nlet path = Environment.GetEnvironmentVariable \"CG_VBNET_FILE\"\nlet mode = Environment.GetEnvironmentVariable \"CG_VBNET_MODE\"\ntry\n    if isNull path || not (File.Exists path) then\n        eprintfn \"file not found\"\n        Environment.Exit 2\n    let src = File.ReadAllText path\n    let tree = VisualBasicSyntaxTree.ParseText(src)\n    let errs =\n        tree.GetDiagnostics()\n        |> Seq.filter (fun d -> d.Severity = DiagnosticSeverity.Error)\n        |> Seq.toList\n    if not errs.IsEmpty then\n        eprintfn \"VB parse errors: %d\" errs.Length\n        Environment.Exit 2\n    let ws = new AdhocWorkspace()\n    let formatted = (Formatter.Format(tree.GetRoot(), ws)).ToFullString()\n    if mode = \"apply\" then\n        if formatted <> src then File.WriteAllText(path, formatted)\n        Environment.Exit 0\n    else\n        if formatted = src then Environment.Exit 0 else Environment.Exit 1\nwith\n| ex ->\n    eprintfn \"wrapper error: %s\" ex.Message\n    Environment.Exit 2\nFSX\n} > \"$t/vbfmt.fsx\" || exit 2\nCG_VBNET_FILE=\"$f\" CG_VBNET_MODE=check dotnet fsi --exec \"$t/vbfmt.fsx\" >/dev/null\n",
+        "codeguard",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-c",
+        "f=\"$1\"; { [ -n \"$f\" ] && [ -f \"$f\" ]; } || exit 2\nline=\"$(dotnet --list-sdks 2>/dev/null | tail -1)\"; [ -n \"$line\" ] || exit 2\nver=\"${line%% *}\"; root=\"${line#*\\[}\"; root=\"${root%\\]}\"\nrb=\"$root/$ver/DotnetTools/dotnet-format\"\n[ -f \"$rb/Microsoft.CodeAnalysis.VisualBasic.Workspaces.dll\" ] || rb=\"$(find \"$root/$ver\" -type d -name dotnet-format 2>/dev/null | head -1)\"\n[ -f \"$rb/Microsoft.CodeAnalysis.VisualBasic.Workspaces.dll\" ] || exit 2\nt=\"$(mktemp -d \"${TMPDIR:-/tmp}/cg-vbnet.XXXXXX\")\" || exit 2\ntrap 'rm -rf \"$t\"' EXIT\n{ printf '#r \"%s/Microsoft.CodeAnalysis.dll\"\\n#r \"%s/Microsoft.CodeAnalysis.VisualBasic.dll\"\\n#r \"%s/Microsoft.CodeAnalysis.Workspaces.dll\"\\n#r \"%s/Microsoft.CodeAnalysis.VisualBasic.Workspaces.dll\"\\n' \"$rb\" \"$rb\" \"$rb\" \"$rb\"; cat <<'FSX'\nopen System\nopen System.IO\nopen Microsoft.CodeAnalysis\nopen Microsoft.CodeAnalysis.VisualBasic\nopen Microsoft.CodeAnalysis.Formatting\nlet path = Environment.GetEnvironmentVariable \"CG_VBNET_FILE\"\nlet mode = Environment.GetEnvironmentVariable \"CG_VBNET_MODE\"\ntry\n    if isNull path || not (File.Exists path) then\n        eprintfn \"file not found\"\n        Environment.Exit 2\n    let src = File.ReadAllText path\n    let tree = VisualBasicSyntaxTree.ParseText(src)\n    let errs =\n        tree.GetDiagnostics()\n        |> Seq.filter (fun d -> d.Severity = DiagnosticSeverity.Error)\n        |> Seq.toList\n    if not errs.IsEmpty then\n        eprintfn \"VB parse errors: %d\" errs.Length\n        Environment.Exit 2\n    let ws = new AdhocWorkspace()\n    let formatted = (Formatter.Format(tree.GetRoot(), ws)).ToFullString()\n    if mode = \"apply\" then\n        if formatted <> src then File.WriteAllText(path, formatted)\n        Environment.Exit 0\n    else\n        if formatted = src then Environment.Exit 0 else Environment.Exit 1\nwith\n| ex ->\n    eprintfn \"wrapper error: %s\" ex.Message\n    Environment.Exit 2\nFSX\n} > \"$t/vbfmt.fsx\" || exit 2\nCG_VBNET_FILE=\"$f\" CG_VBNET_MODE=apply dotnet fsi --exec \"$t/vbfmt.fsx\" >/dev/null\n",
+        "codeguard",
+        "{file}"
+      ],
       "config_markers": [],
-      "extensions": [],
-      "dialects": {},
-      "notes": "not_integrated：dotnet format 的退出码本身已可经 unformatted_exit_codes 映射——在 VB 工程目录内实测（.NET SDK 10.0.401）：dotnet format whitespace --include <file> --verify-no-changes 合规退出 0、需格式化退出 2（官方文档行为）、apply 退出 0 就地改写且幂等，声明 [2] 即可。但复核发现两个不可接受的静默失败面，故维持不接入：其一，--include 传绝对路径时静默不匹配——实测对同一脏文件传 $PWD/absdirty.vb 退出 0（假阴性、不报警），而运行时按用户传入的路径原样调用工具，绝对路径场景必然静默放行，违反『不静默通过』；其二，解析损坏的 .vb 文件 verify 与 apply 均退出 0 且不改文件（假通过）。另有工程上下文硬依赖：无 MSBuild 项目的独立 .vb 抛未处理异常退出 1（实测复现），运行目录在工程外同样退出 1。单文件 {file} 模板在路径语义与退出码语义两个维度都无法诚实表达，不静默通过。",
+      "extensions": [
+        ".vb"
+      ],
+      "dialects": {
+        "dotnet_sdk": "10.0.401"
+      },
+      "notes": "integrated：bash 包装 dotnet fsi（.NET SDK 自带 F# Interactive）加载 SDK 自带的 dotnet-format 捆绑 Roslyn 程序集（DotnetTools/dotnet-format/ 下的 Microsoft.CodeAnalysis.VisualBasic(.Workspaces)/Workspaces），用 VisualBasicSyntaxTree.ParseText 解析 + Formatter.Format 与源码逐字对比，逐文件判定——无需安装任何额外工具，只要求 .NET SDK 6+（不是仅运行时：fsi 与程序集都随 SDK 分发；SDK 发现走 dotnet --list-sdks，缺失即退出 2 工具故障）。选型原因：dotnet format 直连已实测不可用（.NET SDK 10.0.401 复现）——--include 传绝对路径对脏文件退出 0 且 stdout/stderr 全空（静默假阴性），语法损坏的 .vb verify 与 apply 均退出 0 且不改文件（静默假通过），无 MSBuild 工程的裸 .vb 抛未处理异常退出 1；本包装在三态上都实测封堵：check 合规退出 0（stdout 0 字节，已重定向）、需格式化退出 1、语法解析错误/文件不可读/SDK 缺失退出 2（工具故障，不静默通过），check 全程只读（实测前后 md5 一致），apply 退出 0 就地写回且幂等、解析坏文件退出 2 且不改动。退出码为标准 B 类 [1]；fsi 内 Environment.Exit 经 bash 透传为进程退出码（实测）。限制：只做 Roslyn 默认选项的空白/缩进/换行排版（Formatter.Format），不读项目 .editorconfig（config_markers 为空的原因），不做类型检查/编译/语义诊断——语义报错但语法合法的文件照常检查（与 fsharp fantomas、powershell Invoke-Formatter 档位同级）；每文件约 1.5-2.5 秒（fsi 冷启动开销，与 julia 档位同级），批量检查耗时明显；带 BOM 的文件 check 正常，apply 会以无 BOM UTF-8 重写；apply 失败时不写文件（坏文件不会写半截）。",
       "unformatted_exit_codes": [
         1
       ]
@@ -1535,10 +1591,7 @@
       "config_markers": [],
       "extensions": [],
       "dialects": {},
-      "notes": "not_integrated：ArkTS（HarmonyOS）生态无公认独立 CLI 格式化器，rulepacks/legacy_languages.json 的 install_hint 明确「无独立 CLI linter（依赖平台 IDE 诊断）」，lint/format 均为 null。仓库已有 tree-sitter-arkts 语法候选（tests/acceptance/arkts-nix-terraform-grammar-candidates.md：npm tree-sitter-arkts@0.2.0，Rust 离线加载与隔离 worker 候选观察通过，但合法样例仍 grammar_qualified=false），openspec 任务 14.19 增量确认「公开原生优先 lint 路由和逐语言精度验收仍缺」，任务 8.146/15.2 明确该语言按设计保持 planned/gap；crates/codeguard-cli/tests/planned_language_gaps.rs 固化含 .ets 源码的 check all 退出 3、六类别 gap。format 命令对该语言如实返回 not_integrated，不静默通过；语法候选或平台 IDE 诊断均不能冒充风格合规，也不检查注释完整性与开发规范。",
-      "unformatted_exit_codes": [
-        1
-      ]
+      "notes": "not_integrated：ArkTS（HarmonyOS）无独立 CLI 格式化器——实测 prettier 3.x --parser typescript 对典型 ArkTS UI 声明（@Entry/@Component struct Index{build(){...}}）报 SyntaxError「Declaration expected」退出 2（struct 组件声明不是合法 TS 语法，而 UI struct 文件恰是该语言主体），仅纯 TS 风格 .ets 模型类可被格式化，覆盖不完整；npm registry 检索 ets-formatter/arkts-formatter/@ohos/ets-formatter 均 404，官方 codelinter 是 lint 工具且经 DevEco command-line-tools 分发，DevEco Studio 的代码格式化仅存在于 IDE 内，均无可用 CLI formatter。仓库阻塞维持：rulepacks/legacy_languages.json arkts 条目 status=planned、无 linter_config_files、install_hint「无独立 CLI linter（依赖平台 IDE 诊断）」；tests/acceptance/arkts-nix-terraform-grammar-candidates.md 记录 tree-sitter-arkts@0.2.0 候选观察通过但 grammar_qualified=false；openspec 任务 8.146（tasks.md L465）与 14.19/15.2 按设计保持 planned/gap；crates/codeguard-cli/tests/planned_language_gaps.rs L47/L51-L77 固化含 .ets 项目的 check all 退出 3、六类别 gap。format 命令对该语言如实返回 not_integrated，不静默通过，也不检查注释完整性与开发规范。"
     },
     {
       "language": "metal",
@@ -1550,10 +1603,7 @@
       "config_markers": [],
       "extensions": [],
       "dialects": {},
-      "notes": "not_integrated：Metal 着色语言生态无公认独立 CLI 格式化器，原生工具链绑定 Apple Xcode——rulepacks/production_acceptance_plan_v1.json 中 metal 的 build_target 为 xcode-metal，六类别能力全部 blocked，blockers 记录「尚无完整已验收语言版本/方言范围，不按旧 stable 推断支持」「完整原生语法版本/方言、源集、WASM 联合路径及独立精度未验收」；grammars/codegraph-coverage.json 的 32 份 grammar 资产中没有 metal 条目，连语法候选都未列入。openspec 任务 8.147/15.2 明确该语言按设计保持 planned/gap；crates/codeguard-cli/tests/planned_language_gaps.rs 固化含 .metal 源码的 check all 退出 3、六类别 gap，且跨平台能力不一致时不得把单一平台（Apple）结果概括到所有平台。format 命令对该语言如实返回 not_integrated，不静默通过，也不能以 Xcode 工具链推断跨平台可用。",
-      "unformatted_exit_codes": [
-        1
-      ]
+      "notes": "not_integrated：Metal 着色语言生态无专用格式化器——网络检索确认不存在第三方 .metal formatter（Apple 的 metal/xcrun 工具链与 Metal Shader Converter 只编译/转换不做排版，metal-analyzer 等 VS Code 插件仅提供诊断）；实测本机 clang-format 23.1.3 能把 .metal 按 C++ 系语法解析并给出干净退出码（--dry-run --Werror 对乱排样例退出 1、clang-format 自身输出的样例退出 0），但这是把 Metal 当 C++ 排版的借用方案：不是 Metal 专用格式化器，不校验 Metal 任何版本/方言，按 SCHEMA「无公认格式化器（例如 Metal）」及任务 8.147 的设计缺口维持不接入。仓库证据：rulepacks/legacy_languages.json metal 条目 status=planned、无 linter_config_files、install_hint「无独立 CLI linter（依赖平台 IDE 诊断）」；rulepacks/production_acceptance_plan_v1.json languages[53] 中 metal 的 build_targets=[\"xcode-metal\"]、六类别 capability 全部 blocked，blockers 含「尚无完整已验收语言版本/方言范围，不按旧stable推断支持」「完整原生语法版本/方言、源集、WASM联合路径及独立精度未验收」；grammars/codegraph-coverage.json 32 份资产中无 metal 条目，连语法候选都未列入；openspec 任务 8.147（tasks.md L466）/15.2 按设计保持 planned/gap；crates/codeguard-cli/tests/planned_language_gaps.rs L47/L51-L77 固化含 .metal 项目的 check all 退出 3、六类别 gap。format 命令对该语言如实返回 not_integrated，不静默通过，也不把单一平台的 C++ 借用方案概括为跨平台 Metal 能力。"
     },
     {
       "language": "liquid",
@@ -1565,10 +1615,7 @@
       "config_markers": [],
       "extensions": [],
       "dialects": {},
-      "notes": "not_integrated：Liquid 生态无开箱即用的公认格式化器。实测 prettier 3.9.9 + @shopify/prettier-plugin-liquid：插件解析是 cwd 相对的（prettier 在 cwd 生成 noop.js 动态 import 插件），项目 node_modules 未安装该插件时报 'Cannot find package' 并退出 1——与 --list-different『需格式化』的退出 1 是同一个码，未配置项目里所有 .liquid 都会被误报为不合规（工具故障冒充风格问题）；实测 .prettierrc.json 的 plugins 字段声明缺包同样退出 1；npx -p prettier -p @shopify/prettier-plugin-liquid 组合也因同一 cwd 解析机制失败（仍从 cwd 的 noop.js 解析）。无插件时 .liquid 报 No parser could be inferred 退出 2（工具故障，这是唯一诚实的信号，但此时无法完成检查）。Shopify 官方 theme-check 仅为 linter 不做格式化。待插件可稳定经统一工具绑定解析后可再接入；维持 not_integrated，不静默通过。",
-      "unformatted_exit_codes": [
-        1
-      ]
+      "notes": "not_integrated：复核既有结论（docs.json/leftover.json 同判）并补充实测。prettier 3.x + @shopify/prettier-plugin-liquid 1.11.2（npm 装入临时项目实测）：仅当插件在项目 node_modules 且 cwd=项目根时 happy path 成立——--plugin @shopify/prettier-plugin-liquid --list-different 对合规文件退出 0 且 stdout 空、乱排文件退出 1 并列文件名，--write 退出 0 并完成重排；但插件是经 cwd 生成的 noop.js 动态解析（实测换 cwd 后即使传绝对插件路径也报 Couldn't resolve parser \"liquid\"），插件缺包时报 Cannot find package 且退出 1——与「需格式化」同码，未配置项目里所有 .liquid 都会被误判为不合规；完全无插件时报 No parser could be inferred 退出 2。theme-check 1.15.0（gem 实测）是 linter 而非 formatter：-a/--auto-correct 实测只修部分规则类（如 SpaceInsideBraces，31 处修正）不产出规范缩进排版，退出码按 lint 违规计（残留不可自动修复违规时退出 1，违反 apply 契约），且对非主题目录的单个 .liquid 报 No theme files found 并退出 0——空转会被误读为合规。需格式化与工具故障同码、依赖统一工具绑定无法保证的项目内插件安装与 cwd，维持 not_integrated，不静默通过。"
     },
     {
       "language": "cuda",
@@ -1612,10 +1659,7 @@
       "config_markers": [],
       "extensions": [],
       "dialects": {},
-      "notes": "not_integrated：ansible 无独立格式化器，维持既有结论——playbook 本质是 YAML，排版由本批 yaml 通道（prettier）覆盖；ansible-lint 是 lint 工具而非 formatter，其 --fix 只自动修部分规则且修完仍有违规时退出非 0，不满足 apply『退出 0=成功格式化』契约；规则语义检查应走 lint 通道而非 format。该生态 format 检查如实不适用，不静默通过。",
-      "unformatted_exit_codes": [
-        1
-      ]
+      "notes": "not_integrated：ansible 无独立格式化器，playbook 本质是 YAML 且无独立扩展名（rulepacks/legacy_languages.json ansible 条目 extensions=[]，仅 markers），排版由 yaml 通道（format_profiles.json yaml 条目 prettier --list-different/--write）覆盖；若另接 ansible 通道需认领 .yml/.yaml，会在同一批文件上与 yaml 通道双跑两套风格规则且结论可能互相矛盾。实测 ansible-lint 26.9.0（本机 venv + ansible-core 2.21.5）：--fix、--fix=yaml、--fix=none 确实执行 YAML 重排（帮助文本明确「YAML reformatting happens whenever --fix or --fix= is used」，--fix=none 实测仍完成重排），但残留语义违规（fqcn[action-core]、name[casing] 等）时一律退出 2，不存在「修完即退出 0」的调用，违反 apply「退出 0=成功格式化」契约；--tags yaml 只读检查退出 0/2，其中 2 与 YAML 解析错误不可区分（broken.yml 实测同退 2），坏文件会被误报为「需格式化」而非工具故障；且 yaml 标签混入 yaml[truthy]/yaml[octal-values]/yaml[line-length] 等语义与策略规则，属 lint 判定而非 formatter 规范输出。规则语义检查应走 lint 通道而非 format。该生态 format 检查如实不适用，不静默通过。"
     }
   ]
 }
