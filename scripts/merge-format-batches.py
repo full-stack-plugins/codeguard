@@ -103,7 +103,8 @@ def main() -> None:
     # 收尾分片按显式顺序处理：列表中越靠后优先级越高。
     # 依据：先做生态普适判定（groovy_liquid/pascal_cfml/vbnet_fix），
     # 再做逐语言深度复核（final_five）——深度复核只在没有更好方案时推翻前者。
-    tail_order = ["leftover", "vbnet_fix", "pascal_cfml", "groovy_liquid", "final_five"]
+    tail_order = ["leftover", "vbnet_fix", "pascal_cfml", "groovy_liquid",
+                  "final_five", "metal_impl", "arkts_impl", "cobol_impl"]
     tail = [BATCH_DIR / f"{stem}.json" for stem in tail_order if (BATCH_DIR / f"{stem}.json").exists()]
     tail_names = {f.stem for f in tail}
     batch_files = [f for f in batch_files if f.stem not in tail_names] + tail

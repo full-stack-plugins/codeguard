@@ -40,15 +40,33 @@
     },
     {
       "language": "ansible",
-      "status": "not_integrated",
-      "formatter": null,
-      "tool_key": null,
-      "check_argv": null,
-      "apply_argv": null,
-      "config_markers": [],
-      "extensions": [],
+      "status": "integrated",
+      "formatter": "prettier",
+      "tool_key": "prettier",
+      "check_argv": [
+        "--list-different",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--write",
+        "{file}"
+      ],
+      "config_markers": [
+        ".ansible-lint",
+        "ansible.cfg",
+        ".prettierrc",
+        ".editorconfig"
+      ],
+      "extensions": [
+        ".yml",
+        ".yaml"
+      ],
       "dialects": {},
-      "notes": "Ansible 无专属格式化器，按项目既有架构决策归口 yaml 通道——rulepacks/legacy_languages.json 的 ansible 条目自身即写明：extensions 为空数组、install_hint 为「playbook 检查由 ansible-lint 承接（yaml 通道）」、markers 含 playbook.yml。Ansible playbook 本质是 YAML，其排版由 format_profiles.json 的 yaml 条目（prettier --list-different）统一处理，因此 **不重复声明第二条 ansible 通道**：同一批 .yml/.yaml 若被两个语言条目各跑一次，既浪费预算又可能在配置漂移时产生互相矛盾的风格判定。实测否决 ansible-lint 作为格式化器：ansible-lint 26.9.0 的 --fix / --fix=yaml / --fix=none 三种形态都会重排 YAML，但只要残留 fqcn、name[casing] 等语义违规就一律退 2，不存在「修完即退 0」的调用形态，无法满足 apply 的「退出 0 = 成功」契约；其 --tags yaml 只读检查虽退 0/2，但 2 与 YAML 解析错误同码，损坏文件会被误报为需格式化（实测 broken.yml 确认）。结论：ansible 不提供独立 format 通道，其文件已由 yaml 通道覆盖，属显式架构归口而非未完成项。语义级检查（ansible-lint 规则）属 lint 类别，不在本档案职责内。"
+      "notes": "Ansible 无专属格式化器，按项目既有架构决策归口 yaml 通道——rulepacks/legacy_languages.json 的 ansible 条目自身即写明：extensions 为空数组、install_hint 为「playbook 检查由 ansible-lint 承接（yaml 通道）」、markers 含 playbook.yml。Ansible playbook 本质是 YAML，其排版由 format_profiles.json 的 yaml 条目（prettier --list-different）统一处理，因此 **不重复声明第二条 ansible 通道**：同一批 .yml/.yaml 若被两个语言条目各跑一次，既浪费预算又可能在配置漂移时产生互相矛盾的风格判定。实测否决 ansible-lint 作为格式化器：ansible-lint 26.9.0 的 --fix / --fix=yaml / --fix=none 三种形态都会重排 YAML，但只要残留 fqcn、name[casing] 等语义违规就一律退 2，不存在「修完即退 0」的调用形态，无法满足 apply 的「退出 0 = 成功」契约；其 --tags yaml 只读检查虽退 0/2，但 2 与 YAML 解析错误同码，损坏文件会被误报为需格式化（实测 broken.yml 确认）。结论：ansible 不提供独立 format 通道，其文件已由 yaml 通道覆盖，属显式架构归口而非未完成项。语义级检查（ansible-lint 规则）属 lint 类别，不在本档案职责内。",
+      "routed_to": "yaml",
+      "unformatted_exit_codes": [
+        1
+      ]
     }
   ]
 }

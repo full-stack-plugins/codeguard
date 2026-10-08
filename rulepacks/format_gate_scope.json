@@ -1,8 +1,8 @@
 {
-  "schema_version": "0.3.0",
+  "schema_version": "0.4.0",
   "document_type": "format_gate_scope",
   "authority": "repository_scope_declaration",
-  "target_statement": "全部 stable 语言 + 可用工具链的 planned 语言均具备可执行格式门禁；工具调研未果的 planned 语言如实排除",
+  "target_statement": "全部 stable 语言 + 工具链可用的 planned 语言均具备可执行格式门禁；调研未果的 planned 语言如实排除",
   "registry_total": 57,
   "registry_stable": 54,
   "registry_planned": 3,
@@ -58,12 +58,13 @@
     "cfml",
     "vbnet",
     "erlang",
+    "arkts",
     "metal",
     "liquid",
     "cuda",
     "ansible"
   ],
-  "integrated_count": 55,
+  "integrated_count": 56,
   "routed_entries": [
     {
       "language": "ansible",
@@ -74,15 +75,7 @@
   "planned_excluded": [
     {
       "language": "cobol",
-      "reason": "注册表 planned 状态；正在进行工具调研，未接入前如实排除",
-      "registry_status": "planned",
-      "evidence": [
-        "rulepacks/legacy_languages.json 该条目 status=planned"
-      ]
-    },
-    {
-      "language": "arkts",
-      "reason": "注册表 planned 状态；正在进行工具调研，未接入前如实排除",
+      "reason": "注册表 planned 状态；工具调研未果前如实排除",
       "registry_status": "planned",
       "evidence": [
         "rulepacks/legacy_languages.json 该条目 status=planned"
