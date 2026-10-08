@@ -36,7 +36,8 @@
       "unformatted_exit_codes": [
         1
       ],
-      "notes": "COBOL 无任何可用的开源/CLI 格式化器（穷尽检索：npm cobol-formatter/cobolfmt/cobol-pretty-print 均无结果；PyPI cobol-formatter/cobolfmt 404；Maven Central 17 个 COBOL artifact 全为 parser 或分析器（cobol2j/cobrix/emf.cobol）无格式化能力；GitHub 无带 release 的 COBOL formatter；商业方案 COBClean/IBM Z Open Editor 为 Windows GUI 或商业产品）。本条目改用 **GnuCOBOL 编译器（cobc）作为排版规则执行器**——这是 COBOL 生态中唯一能对源码给出确定性判定的 CLI 工具，且 COBOL-85 固定格式的列区约定（源码必须位于第 7-72 列，1-6 列为序号区）本身就是排版规范，由编译器强制执行比自建格式化器更可信。**方言双探针解决退出码歧义**：cobc 对「列区违规」与「语法错误」一律退 1，直接使用会把损坏 COBOL 误报为「需重排」；因此分别以 -free（无列区约束）与 -fixed（有列区约束）各编译一次：两者皆过→0 合规；free 过而 fixed 挂→1 列区排版违规；两者皆挂→2 语法错误，降级为未完成而不误判为格式问题。实测三态正确。检查全程只读（-fsyntax-only 不产出目标文件）。**apply 模式如实拒绝自动修复**：cobc 不提供源码重排，而 COBOL 固定格式的列区重分配涉及序号区与代码区边界，自动改写存在改坏语义的风险，因此返回退出 2 并给出人工修正或改用自由格式的指引，不冒险改写源码。限制：只判定列区与语法，不检查缩进宽度、大小写风格、行长上限等 cobc 不强制的风格项；自由格式（COBOL-2002）文件因不受列区约束，恒判为合规。"
+      "notes": "COBOL 无任何可用的开源/CLI 格式化器（穷尽检索：npm cobol-formatter/cobolfmt/cobol-pretty-print 均无结果；PyPI cobol-formatter/cobolfmt 404；Maven Central 17 个 COBOL artifact 全为 parser 或分析器（cobol2j/cobrix/emf.cobol）无格式化能力；GitHub 无带 release 的 COBOL formatter；商业方案 COBClean/IBM Z Open Editor 为 Windows GUI 或商业产品）。本条目改用 **GnuCOBOL 编译器（cobc）作为排版规则执行器**——这是 COBOL 生态中唯一能对源码给出确定性判定的 CLI 工具，且 COBOL-85 固定格式的列区约定（源码必须位于第 7-72 列，1-6 列为序号区）本身就是排版规范，由编译器强制执行比自建格式化器更可信。**方言双探针解决退出码歧义**：cobc 对「列区违规」与「语法错误」一律退 1，直接使用会把损坏 COBOL 误报为「需重排」；因此分别以 -free（无列区约束）与 -fixed（有列区约束）各编译一次：两者皆过→0 合规；free 过而 fixed 挂→1 列区排版违规；两者皆挂→2 语法错误，降级为未完成而不误判为格式问题。实测三态正确。检查全程只读（-fsyntax-only 不产出目标文件）。**apply 模式如实拒绝自动修复**：cobc 不提供源码重排，而 COBOL 固定格式的列区重分配涉及序号区与代码区边界，自动改写存在改坏语义的风险，因此返回退出 2 并给出人工修正或改用自由格式的指引，不冒险改写源码。限制：只判定列区与语法，不检查缩进宽度、大小写风格、行长上限等 cobc 不强制的风格项；自由格式（COBOL-2002）文件因不受列区约束，恒判为合规。",
+      "unparsable_detection": "none"
     }
   ]
 }

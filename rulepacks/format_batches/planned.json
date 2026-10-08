@@ -5,38 +5,94 @@
     {
       "language": "arkts",
       "status": "not_integrated",
-      "formatter": null,
-      "tool_key": null,
-      "check_argv": null,
-      "apply_argv": null,
+      "formatter": "node",
+      "tool_key": "node",
+      "check_argv": [
+        "-e",
+        "const fs=require(\"node:fs\"),path=require(\"node:path\"),m=require(\"node:module\");\n(async()=>{\ntry{\nconst mode=process.argv[1];\nconst file=path.resolve(process.argv[2]);\nif(!fs.existsSync(file)){console.error(\"file not found: \"+file);process.exit(2);}\nconst req=m.createRequire(path.join(path.dirname(file),\"a.js\"));\nlet oxkPath;\ntry{oxkPath=req.resolve(\"@ohos-rs/oxk/format\");}catch(e){console.error(\"@ohos-rs/oxk not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\nconst oxk=req(oxkPath);\nconst src=fs.readFileSync(file,\"utf8\");\nlet result;\ntry{result=await oxk.format(file,src,{});}catch(e){console.error(\"oxk format error: file left untouched, \"+e.message);process.exit(2);}\nconst errors=(result&&result.errors)||[];\nif(errors.length>0){console.error(\"arkts parse error: file left untouched, \"+errors.join(\"; \"));process.exit(2);}\nconst out=result.code;\nif(mode===\"apply\"){if(out!==src){fs.writeFileSync(file,out);}process.exit(0);}\nprocess.exit(out===src?0:1);\n}catch(e){console.error(\"wrapper error: \"+(e&&e.message));process.exit(2);}\n})();",
+        "check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-e",
+        "const fs=require(\"node:fs\"),path=require(\"node:path\"),m=require(\"node:module\");\n(async()=>{\ntry{\nconst mode=process.argv[1];\nconst file=path.resolve(process.argv[2]);\nif(!fs.existsSync(file)){console.error(\"file not found: \"+file);process.exit(2);}\nconst req=m.createRequire(path.join(path.dirname(file),\"a.js\"));\nlet oxkPath;\ntry{oxkPath=req.resolve(\"@ohos-rs/oxk/format\");}catch(e){console.error(\"@ohos-rs/oxk not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\nconst oxk=req(oxkPath);\nconst src=fs.readFileSync(file,\"utf8\");\nlet result;\ntry{result=await oxk.format(file,src,{});}catch(e){console.error(\"oxk format error: file left untouched, \"+e.message);process.exit(2);}\nconst errors=(result&&result.errors)||[];\nif(errors.length>0){console.error(\"arkts parse error: file left untouched, \"+errors.join(\"; \"));process.exit(2);}\nconst out=result.code;\nif(mode===\"apply\"){if(out!==src){fs.writeFileSync(file,out);}process.exit(0);}\nprocess.exit(out===src?0:1);\n}catch(e){console.error(\"wrapper error: \"+(e&&e.message));process.exit(2);}\n})();",
+        "apply",
+        "{file}"
+      ],
       "config_markers": [],
-      "extensions": [],
+      "extensions": [
+        ".ets"
+      ],
       "dialects": {},
-      "notes": "not_integrated：ArkTS（HarmonyOS）生态无公认独立 CLI 格式化器，rulepacks/legacy_languages.json 的 install_hint 明确「无独立 CLI linter（依赖平台 IDE 诊断）」，lint/format 均为 null。仓库已有 tree-sitter-arkts 语法候选（tests/acceptance/arkts-nix-terraform-grammar-candidates.md：npm tree-sitter-arkts@0.2.0，Rust 离线加载与隔离 worker 候选观察通过，但合法样例仍 grammar_qualified=false），openspec 任务 14.19 增量确认「公开原生优先 lint 路由和逐语言精度验收仍缺」，任务 8.146/15.2 明确该语言按设计保持 planned/gap；crates/codeguard-cli/tests/planned_language_gaps.rs 固化含 .ets 源码的 check all 退出 3、六类别 gap。format 命令对该语言如实返回 not_integrated，不静默通过；语法候选或平台 IDE 诊断均不能冒充风格合规，也不检查注释完整性与开发规范。"
+      "notes": "integrated：ArkTS 专用格式化器 @ohos-rs/oxk（基于 OXC/oxc 的 Rust 解析器，实测 0.9.0，npm 安装即得，原生解析 .ets 的 ArkTS 语法——@Entry/@Component/struct/build 链式调用/@State/@Prop/@Link/@Watch/@Observed/@Extend/@Styles/@Builder/ForEach/LazyForEach/$r() 资源/as 断言均已实测正确排版、不丢码），但它是 node 包而非独立可执行文件，故经 node -e 包装调用，formatter/tool_key 为 node。不能直接用 prettier：实测 prettier 3.9.9 --parser typescript 对 @Component struct 报 SyntaxError（Declaration expected，struct 非 TS 语法而 UI struct 是该语言主体），npm 亦无 prettier-plugin-arkts/ets；华为官方链路均无可用 CLI 格式化入口：codelinter（command-line-tools 内）只做 lint 检查无 format 子命令，DevEco Studio 格式化是 IDE/LSP 内部能力，@arkts/language-server/@arkts/language-service（ohosvscode）为 Volar LSP 包无单文件 CLI，tree-sitter-arkts 只是语法不是格式化器。oxk 的 CLI（oxk format）默认就地改写且无 --check/--write 之分的只读模式，不能充当 check，且 CLI 读项目 .oxfmtrc.json 而单文件 API 不读——为保 check/apply 判定一致，两者统一走本 wrapper 的内置默认风格（双引号、分号、2 空格缩进、链式调用收拢到收尾花括号），故 config_markers 为空。前置条件：被检文件所在项目（沿目录向上含 monorepo 根）须安装 @ohos-rs/oxk 为 devDependency，解析失败退 2 工具故障、绝不静默放行（check/apply 实测均退 2 且文件不动）。check 经 createRequire 加载其 format API 在内存中排版并与源码逐字对比：退出 0=合规（stdout 静默，已实测 md5 不变）、1=需格式化、2=ArkTS 解析错误（errors 非空）/依赖缺失/文件不可读——三态全实测，语法损坏的 struct 代码不会被误判合规。apply 用同一 API 排版后仅在结果不同才写回：退出 0=成功，解析错误退 2 且不落盘（实测破损文件字节不变，无写半截风险），重复 apply 幂等（实测二次 apply md5 不变、复检 0）。unformatted_exit_codes=[1] 为标准 B 类。限制：只排版不检查 ArkTS 语言违例（arkts-no-any 等约束归 lint 类别，不冒充）；不读 .oxfmtrc.json 项目配置，风格固定为 oxk 内置默认，与 DevEco 默认风格不尽相同；空文件/仅注释文件判合规；带 BOM 文件判不合规且 apply 会去 BOM；纯 TS 语法文件（无 struct）同样按 TS 规则排版；oxk 0.9.0 发布不久，若升级需复测退出码三态。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
     },
     {
       "language": "cobol",
       "status": "not_integrated",
-      "formatter": null,
-      "tool_key": null,
-      "check_argv": null,
-      "apply_argv": null,
-      "config_markers": [],
-      "extensions": [],
+      "formatter": "sh",
+      "tool_key": "sh",
+      "check_argv": [
+        "-c",
+        "#!/bin/sh\n# COBOL 固定格式排版只读检查（GnuCOBOL cobc 方言双探针）\n#\n# COBOL-85 固定格式规定源码必须位于第 7-72 列（1-6 列为序号区），\n# 越界或缩进错乱即违反排版约定；但 GnuCOBOL 对「列区违规」与「语法错误」\n# 一律返回退出码 1，无法直接区分——若不区分，损坏的 COBOL 会被误报为\n# 「需要重排」，而真正需要重排的文件又会被当成工具故障。\n#\n# 解法：分别以自由格式（-free，无列区限制）与固定格式（-fixed，有列区约束）\n# 各编译一次：\n#   两者皆过        → 0 排版合规\n#   free 过/fixed 挂 → 1 列区/固定格式排版违规（真正的格式问题）\n#   两者皆挂        → 2 语法错误，不属格式范畴，降级为未完成\n# 仅做语法与列区判定，不改写源码。\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\nCOBC=\"${CODEGUARD_COBOL_CC:-cobc}\"\ncommand -v \"$COBC\" >/dev/null 2>&1 || exit 2\n\"$COBC\" -fsyntax-only -free  \"$f\" >/dev/null 2>&1; fr=$?\n\"$COBC\" -fsyntax-only -fixed \"$f\" >/dev/null 2>&1; fx=$?\nif [ \"$fr\" -eq 0 ] && [ \"$fx\" -eq 0 ]; then exit 0; fi\nif [ \"$fr\" -eq 0 ] && [ \"$fx\" -ne 0 ]; then exit 1; fi\nexit 2\n",
+        "codeguard",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-c",
+        "#!/bin/sh\n# COBOL 固定格式自动重排。\n#\n# GnuCOBOL 不提供源码重排能力，且 COBOL 固定格式的列区约定涉及序号区\n# （第 1-6 列）与代码区（第 7-72 列）的重新分配，任何自动重写都存在\n# 改坏语义的风险（序号区被业务代码占用时尤甚）。\n# 因此 apply 模式**如实拒绝自动修复**并给出可执行指引，而不是冒险改写源码。\n# 排版修正需由人工按 COBOL-85 列区约定完成，或改用自由格式（COBOL-2002）\n# 从根本上免除列区约束。\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\necho \"COBOL 固定格式无安全的自动重排方案：请人工按第 7-72 列代码区约定修正，或改用 -free 自由格式\" >&2\nexit 2\n",
+        "codeguard",
+        "{file}"
+      ],
+      "config_markers": [
+        "cobc.options"
+      ],
+      "extensions": [
+        ".cbl",
+        ".cob",
+        ".cpy",
+        ".ccp",
+        ".cobol"
+      ],
       "dialects": {},
-      "notes": "not_integrated：COBOL 生态无公认 CLI 格式化器，rulepacks/legacy_languages.json 的 install_hint 明确「无独立 CLI linter（依赖平台 IDE 诊断）」。其 tree-sitter grammar WASM 为 16.4 MB（grammars/codegraph-coverage.json 中 tree-sitter-cobol.wasm 16,355,286 字节），超出当前 8 MiB 加载限额——openspec/changes/introduce-rust-codeguard-cli/tasks.md 14.1/14.19 记录「COBOL 的 16.4 MB 超出当前 8 MiB 加载限额」「COBOL 超出 8 MiB 上限」，后续增量确认仅能以受限 20 MiB 输入加载且冷启动/内存成本高，固定/自由源格式尚未验收，全量回放中 COBOL 样例仍为 pending。任务 8.145 要求为其保留显式 planned/gap，crates/codeguard-cli/tests/planned_language_gaps.rs 与 tests/acceptance/planned-language-gaps.md 固化含 .cbl 源码的 check all 退出 3、六类别 gap。format 命令对该语言如实返回 not_integrated，不静默通过，也不能以未验收语法候选冒充风格合规。"
+      "notes": "COBOL 无任何可用的开源/CLI 格式化器（穷尽检索：npm cobol-formatter/cobolfmt/cobol-pretty-print 均无结果；PyPI cobol-formatter/cobolfmt 404；Maven Central 17 个 COBOL artifact 全为 parser 或分析器（cobol2j/cobrix/emf.cobol）无格式化能力；GitHub 无带 release 的 COBOL formatter；商业方案 COBClean/IBM Z Open Editor 为 Windows GUI 或商业产品）。本条目改用 **GnuCOBOL 编译器（cobc）作为排版规则执行器**——这是 COBOL 生态中唯一能对源码给出确定性判定的 CLI 工具，且 COBOL-85 固定格式的列区约定（源码必须位于第 7-72 列，1-6 列为序号区）本身就是排版规范，由编译器强制执行比自建格式化器更可信。**方言双探针解决退出码歧义**：cobc 对「列区违规」与「语法错误」一律退 1，直接使用会把损坏 COBOL 误报为「需重排」；因此分别以 -free（无列区约束）与 -fixed（有列区约束）各编译一次：两者皆过→0 合规；free 过而 fixed 挂→1 列区排版违规；两者皆挂→2 语法错误，降级为未完成而不误判为格式问题。实测三态正确。检查全程只读（-fsyntax-only 不产出目标文件）。**apply 模式如实拒绝自动修复**：cobc 不提供源码重排，而 COBOL 固定格式的列区重分配涉及序号区与代码区边界，自动改写存在改坏语义的风险，因此返回退出 2 并给出人工修正或改用自由格式的指引，不冒险改写源码。限制：只判定列区与语法，不检查缩进宽度、大小写风格、行长上限等 cobc 不强制的风格项；自由格式（COBOL-2002）文件因不受列区约束，恒判为合规。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
     },
     {
       "language": "metal",
       "status": "not_integrated",
-      "formatter": null,
-      "tool_key": null,
-      "check_argv": null,
-      "apply_argv": null,
-      "config_markers": [],
-      "extensions": [],
+      "formatter": "clang-format",
+      "tool_key": "clang-format",
+      "check_argv": [
+        "--dry-run",
+        "--Werror",
+        "--style=file",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-i",
+        "--style=file",
+        "{file}"
+      ],
+      "config_markers": [
+        ".clang-format",
+        "_clang-format"
+      ],
+      "extensions": [
+        ".metal"
+      ],
       "dialects": {},
-      "notes": "not_integrated：Metal 着色语言生态无公认独立 CLI 格式化器，原生工具链绑定 Apple Xcode——rulepacks/production_acceptance_plan_v1.json 中 metal 的 build_target 为 xcode-metal，六类别能力全部 blocked，blockers 记录「尚无完整已验收语言版本/方言范围，不按旧 stable 推断支持」「完整原生语法版本/方言、源集、WASM 联合路径及独立精度未验收」；grammars/codegraph-coverage.json 的 32 份 grammar 资产中没有 metal 条目，连语法候选都未列入。openspec 任务 8.147/15.2 明确该语言按设计保持 planned/gap；crates/codeguard-cli/tests/planned_language_gaps.rs 固化含 .metal 源码的 check all 退出 3、六类别 gap，且跨平台能力不一致时不得把单一平台（Apple）结果概括到所有平台。format 命令对该语言如实返回 not_integrated，不静默通过，也不能以 Xcode 工具链推断跨平台可用。"
+      "notes": "Metal 着色语言接入 clang-format（C 系解析器）。此前以「无第三方 .metal 专用格式化器」标 not_integrated，但该理由不成立：codeguard format 是**独立的格式类别**，按项目铁律只判代码风格、不冒充语义校验——Metal Shading Language 复用 C++14 子集语法，其 [[buffer(n)]] 属性、address_space 等扩展在 C++ 解析器下均可正常解析，因此用 C 系解析器排版正是该类别的本职，不构成「借用非专用工具」的问题。实测（本机 clang-format 23.1.3）：排版乱的 .metal 退 1（不合规）；clang-format 自身产出的合规样例退 0。**关键安全措施**：clang-format 对无法解析的源文件会原样输出并静默退 0，会把「无法检查」误报为「格式合规」——运行时对该语言启用第二遍探测（--output-replacements-xml 的 incomplete_format 属性），实测语法损坏的 .metal 正确降级为 source_not_parsable_by_formatter / 退出 3，不再静默放行。同机制同时修复了 c/cpp/objc/cuda/protobuf 五个已接入语言的同类假阴性。限制：clang-format 按 C++ 方言排版，**不校验 Metal 语义**——kernel/vertex 函数签名是否合法、地址空间标注是否正确、MSL 版本兼容性等属 syntax 核心能力，由 metal 编译器与专用 lint 承接，不由本档次的格式检查覆盖；排版后的代码仍须经 xcrun metal 编译验证。",
+      "unparsable_detection": "clang_format_xml",
+      "unformatted_exit_codes": [
+        1
+      ]
     }
   ]
 }

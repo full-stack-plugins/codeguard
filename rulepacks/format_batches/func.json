@@ -25,7 +25,11 @@
         ".exs"
       ],
       "dialects": {},
-      "notes": "mix format 是 Elixir 官方发行、生态事实标准的格式化 Mix 任务（本机实测 Mix 1.19.5 / Erlang OTP 28）。属 B 类，已真实验证：干净项目 mix format --check-formatted 退出 0；存在未格式化文件时退出 1 并在输出中列出文件路径与 diff；mix format {file} 就地格式化退出 0，格式化后复查退出 0。限制：它是项目级任务，风格选项（line_length、import_deps 等）来自项目根及子目录的 .formatter.exs，须在含 mix.exs 的项目根运行才能读到项目风格；显式传单个 .ex/.exs 文件在项目内外均可执行（本机实测），但项目外读不到 .formatter.exs，可能与项目实际风格不一致；语法错误的文件同样退出 1，无法与未格式化区分（会报为不合规，方向保守）；只判格式，不检查注释完整性。"
+      "notes": "mix format 是 Elixir 官方发行、生态事实标准的格式化 Mix 任务（本机实测 Mix 1.19.5 / Erlang OTP 28）。属 B 类，已真实验证：干净项目 mix format --check-formatted 退出 0；存在未格式化文件时退出 1 并在输出中列出文件路径与 diff；mix format {file} 就地格式化退出 0，格式化后复查退出 0。限制：它是项目级任务，风格选项（line_length、import_deps 等）来自项目根及子目录的 .formatter.exs，须在含 mix.exs 的项目根运行才能读到项目风格；显式传单个 .ex/.exs 文件在项目内外均可执行（本机实测），但项目外读不到 .formatter.exs，可能与项目实际风格不一致；语法错误的文件同样退出 1，无法与未格式化区分（会报为不合规，方向保守）；只判格式，不检查注释完整性。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
     },
     {
       "language": "erlang",
@@ -48,19 +52,40 @@
         ".hrl"
       ],
       "dialects": {},
-      "notes": "erlfmt 是 WhatsApp 出品、Erlang 生态事实标准格式化器（brew install erlfmt，本机实测 1.8.0）。属 B 类，已真实验证：--check 对未格式化文件退出 1 并打印 [warn] 文件名与 Forgot to run erlfmt? 提示，已格式化退出 0；-w 就地格式化退出 0。风格约定经 rebar.config 的 erlfmt 段配置。限制：--check 对语法错误的文件会跳过并按已格式化处理（本机实测退出 0），存在假通过，format 检查不能替代语法检查；只判格式，不检查注释完整性。"
+      "notes": "erlfmt 是 WhatsApp 出品、Erlang 生态事实标准格式化器（brew install erlfmt，本机实测 1.8.0）。属 B 类，已真实验证：--check 对未格式化文件退出 1 并打印 [warn] 文件名与 Forgot to run erlfmt? 提示，已格式化退出 0；-w 就地格式化退出 0。风格约定经 rebar.config 的 erlfmt 段配置。限制：--check 对语法错误的文件会跳过并按已格式化处理（本机实测退出 0），存在假通过，format 检查不能替代语法检查；只判格式，不检查注释完整性。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
     },
     {
       "language": "haskell",
       "status": "not_integrated",
-      "formatter": null,
-      "tool_key": null,
-      "check_argv": null,
-      "apply_argv": null,
-      "config_markers": [],
-      "extensions": [],
+      "formatter": "fourmolu",
+      "tool_key": "fourmolu",
+      "check_argv": [
+        "--mode",
+        "check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--mode",
+        "inplace",
+        "{file}"
+      ],
+      "config_markers": [
+        "fourmolu.yaml"
+      ],
+      "extensions": [
+        ".hs",
+        ".lhs"
+      ],
       "dialects": {},
-      "notes": "Haskell 主流格式化器 ormolu（本机实测 0.9.0.0）与 fourmolu（本机实测 0.21.0.0）的 check 模式（--mode check）退出码为：已格式化 0、需格式化 100（两工具实测一致）、解析错误 fourmolu 实测 102，均不满足 A/B 类契约（B 类要求退出 1 表示不合规、≥2 视为工具故障）。若按 B 类接入，所有未格式化文件会被误判为工具故障（未完成），违反退出码语义，故如实 not_integrated；brittany 已停止维护且 brew 无 formula。待运行时支持『退出码 100=不合规』映射后，可用 ormolu --mode check / --mode inplace 直接接入。"
+      "notes": "退出码实测（本机 2026-10-08 直测）：fourmolu --mode check 需重排退 100、解析错误退 102。 【本机复验 2026-10-08】直测 fourmolu --mode check：需重排退 100、解析错误退 102。码集 [100] 正确；只有 fourmolu 自己产出的文件才退 0，手写「看起来整齐」的文件仍判需重排——这是正确行为，格式化是确定性规范而非主观整洁度。",
+      "unformatted_exit_codes": [
+        100
+      ],
+      "unparsable_detection": "none"
     },
     {
       "language": "ocaml",
@@ -83,19 +108,39 @@
         ".mli"
       ],
       "dialects": {},
-      "notes": "ocamlformat 是 OCaml 官方生态标准格式化器（ocaml-ppx 维护，经 opam 分发）。属 B 类，退出码经官方源码（bin/ocamlformat/ocamlformat.ml）与 man 文档确认：--check 全部已格式化退出 0，任一文件未格式化或解析/配置出错退出 1，不会出现 ≥2（解析错误会计为不合规，方向保守）。本机未实跑（brew 无 formula、release 仅源码包、本机未装 opam），安装方式 opam install ocamlformat。限制：默认只处理位于识别到的项目内（最近祖先目录含 .git/.hg/dune-project）的文件，项目外文件格式化器被禁用、check 会恒过（需 --enable-outside-detected-project 才处理）；.ocamlformat 按输入文件目录向上查找到项目根，找不到时可经 --profile / OCAMLFORMAT 环境变量 / 全局配置兜底；只判格式，不检查注释完整性（comment-check 默认开启）。"
+      "notes": "ocamlformat 是 OCaml 官方生态标准格式化器（ocaml-ppx 维护，经 opam 分发）。属 B 类，退出码经官方源码（bin/ocamlformat/ocamlformat.ml）与 man 文档确认：--check 全部已格式化退出 0，任一文件未格式化或解析/配置出错退出 1，不会出现 ≥2（解析错误会计为不合规，方向保守）。本机未实跑（brew 无 formula、release 仅源码包、本机未装 opam），安装方式 opam install ocamlformat。限制：默认只处理位于识别到的项目内（最近祖先目录含 .git/.hg/dune-project）的文件，项目外文件格式化器被禁用、check 会恒过（需 --enable-outside-detected-project 才处理）；.ocamlformat 按输入文件目录向上查找到项目根，找不到时可经 --profile / OCAMLFORMAT 环境变量 / 全局配置兜底；只判格式，不检查注释完整性（comment-check 默认开启）。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
     },
     {
       "language": "fsharp",
       "status": "not_integrated",
-      "formatter": null,
-      "tool_key": null,
-      "check_argv": null,
-      "apply_argv": null,
-      "config_markers": [],
-      "extensions": [],
+      "formatter": "fantomas",
+      "tool_key": "fantomas",
+      "check_argv": [
+        "--check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "{file}"
+      ],
+      "config_markers": [
+        ".editorconfig"
+      ],
+      "extensions": [
+        ".fs",
+        ".fsi",
+        ".fsx"
+      ],
       "dialects": {},
-      "notes": "F# 唯一主流格式化器 fantomas（本机实测 8.0.7，dotnet tool install -g fantomas）。官方文档（Formatting Check）与实测一致：--check 模式已格式化退出 0、需格式化退出 99、解析错误退出 1。退出码 99 不满足 A/B 类契约（B 类要求退出 1=不合规、≥2=工具故障），按 B 类接入会把所有未格式化文件误报为工具故障，故如实 not_integrated。另外 fantomas 是 .NET 全局工具，apphost 需要 .NET 运行时（本机须设 DOTNET_ROOT 指向 brew 安装的 dotnet libexec 才能运行）。"
+      "notes": "退出码实测：fantomas --check 需重排退 99、解析错误退 1。 fantomas 是 F# 唯一主流格式化器（本机实测 8.0.7，dotnet tool install -g fantomas）。官方契约与实测一致：--check 已格式化退出 0、需格式化退出 99、解析错误/一般错误退出 1，故 unformatted_exit_codes 声明 [1, 99]——退出 1 同时覆盖解析错误（无法与不合规区分，按 kotlin/ruby 等既有档位先例保守归入不合规，随后 apply 阶段以非 0 兜底，不静默通过）与文件不存在（运行时预先过滤）。实测 .fs 与 .fsx 支持，.fsi（签名文件）亦可检查；apply_argv 直接跟 {file} 就地格式化退出 0，实测幂等、复查退出 0。风格读项目 .editorconfig 的 fantomas 段（fantomas 6+ 的配置入口，--help 明示），另有 .fantomasignore 忽略清单。限制：是 .NET 全局工具 apphost，本机需 DOTNET_ROOT 指向 dotnet 运行时目录才能运行；只排版，不检查类型或语义。 退出码约定：fantomas --check 需格式化时退出 99（非 1），须显式声明为不合规码。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1,
+        99
+      ]
     },
     {
       "language": "elm",
@@ -117,7 +162,11 @@
         ".elm"
       ],
       "dialects": {},
-      "notes": "elm-format 是 Elm 社区标准格式化器（gofmt 风格、设计上无可配置项，brew install elm-format，本机实测 0.8.8）。属 B 类，已真实验证：--validate 对未格式化文件退出 1、已格式化退出 0；--yes 就地格式化退出 0。限制：仅支持 Elm 0.18/0.19，版本默认自动探测（本机无 elm.json 时按默认 0.19 处理成功）；语法错误文件 --validate 与 --yes 均退出 1，check 侧与未格式化同码、无法区分（方向保守）；输出固定为官方风格（4 空格缩进），不支持行宽等定制；只判格式，不检查注释完整性。"
+      "notes": "elm-format 是 Elm 社区标准格式化器（gofmt 风格、设计上无可配置项，brew install elm-format，本机实测 0.8.8）。属 B 类，已真实验证：--validate 对未格式化文件退出 1、已格式化退出 0；--yes 就地格式化退出 0。限制：仅支持 Elm 0.18/0.19，版本默认自动探测（本机无 elm.json 时按默认 0.19 处理成功）；语法错误文件 --validate 与 --yes 均退出 1，check 侧与未格式化同码、无法区分（方向保守）；输出固定为官方风格（4 空格缩进），不支持行宽等定制；只判格式，不检查注释完整性。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
     },
     {
       "language": "julia",
@@ -142,7 +191,11 @@
         ".jl"
       ],
       "dialects": {},
-      "notes": "JuliaFormatter.jl 是 Julia 生态事实标准格式化器（本机实测 2.14.0），但它不是独立可执行文件而是 Julia 包，须经 julia -e 包装调用。属 B 类，包装器已真实验证：check 用 format_text 与源码逐字对比，已格式化退出 0、需格式化退出 1、解析错误退出 2（工具故障），并从被检查文件所在目录向上查找 .JuliaFormatter.toml 风格配置（已实测文件相对项目根的配置可被发现）；apply 用 format_text 结果写回，解析错误退出 2 且不改动文件——特意不用 format_file，因为它会吞掉解析错误并假报成功（本机实测其返回真值）。限制：julia 冷启动与 JIT 编译有数秒级延迟，适合批量检查；需先安装包（julia -e 'using Pkg; Pkg.add(\"JuliaFormatter\")'）；只判格式，不检查注释完整性。"
+      "notes": "JuliaFormatter.jl 是 Julia 生态事实标准格式化器（本机实测 2.14.0），但它不是独立可执行文件而是 Julia 包，须经 julia -e 包装调用。属 B 类，包装器已真实验证：check 用 format_text 与源码逐字对比，已格式化退出 0、需格式化退出 1、解析错误退出 2（工具故障），并从被检查文件所在目录向上查找 .JuliaFormatter.toml 风格配置（已实测文件相对项目根的配置可被发现）；apply 用 format_text 结果写回，解析错误退出 2 且不改动文件——特意不用 format_file，因为它会吞掉解析错误并假报成功（本机实测其返回真值）。限制：julia 冷启动与 JIT 编译有数秒级延迟，适合批量检查；需先安装包（julia -e 'using Pkg; Pkg.add(\"JuliaFormatter\")'）；只判格式，不检查注释完整性。",
+      "unparsable_detection": "clang_format_xml",
+      "unformatted_exit_codes": [
+        1
+      ]
     }
   ]
 }

@@ -27,7 +27,12 @@
         "hcl": "HCL2",
         "opentofu": "1.x"
       },
-      "notes": "terraform fmt 是 Terraform 官方格式化器，无任何配置项（官方文档：intentionally opinionated，故 config_markers 为空）；只做 HCL 排版（缩进/对齐/空格），不校验变量、模块或资源语义，不能替代 tflint。退出码特殊性：-check 有差异时实测退出 3（非 B 类契约的 1）并把 diff 打到 stdout，运行时会将此类文件归入工具故障/未完成而不会误判为合规；合规文件正确退出 0 且 stdout 为空；apply 退出 0 即成功格式化。.tofu 同按 HCL 解析，OpenTofu 项目建议改用 tofu fmt（参数语义一致）。本机已实跑（terraform v1.16.4，brew hashicorp/tap 安装）。"
+      "notes": "退出码实测（本机 2026-10-08 直测）：terraform fmt -check -diff 合规退 0、排版不合规退 3、语法错误退 2。 【本机复验 2026-10-08】直测 terraform fmt -check -diff：合规退 0、排版不合规退 3、语法错误退 2。码集据此由 [1] 修正为 [1, 3]；语法错误的 2 不在码集内，正确降级为工具故障而非「需重排」。",
+      "unformatted_exit_codes": [
+        1,
+        3
+      ],
+      "unparsable_detection": "none"
     },
     {
       "language": "nix",
@@ -46,31 +51,70 @@
         ".nix"
       ],
       "dialects": {},
-      "notes": "nixpkgs-fmt 是 Nix 生态事实标准格式化器（registry format 通道同款）。--check 实测退出 0 且 stdout 为空=合规，退出 1 并把文件名列在 stdout=不合规，是标准 B 类；不带 --check 直接就地格式化、退出 0。限制：只做排版不做求值，语法错误的 .nix 在 --check 下也返回 0（语法坏文件不会被 format 拦截，需 lint 通道兜底）；上游 nix-community 仓库已停止维护，替代品 alejandra 4.0 的 --check 在有差异时退出码为 2（实测，工具帮助亦注明 2=requires formatting），不符合运行时 B 类契约故未选用；.nixpkgs-fmt.json 配置本机实测未观察到生效，config_markers 留空。本机已实跑（nixpkgs-fmt 1.3.0，cargo install）。"
+      "notes": "nixpkgs-fmt 是 Nix 生态事实标准格式化器（registry format 通道同款）。--check 实测退出 0 且 stdout 为空=合规，退出 1 并把文件名列在 stdout=不合规，是标准 B 类；不带 --check 直接就地格式化、退出 0。限制：只做排版不做求值，语法错误的 .nix 在 --check 下也返回 0（语法坏文件不会被 format 拦截，需 lint 通道兜底）；上游 nix-community 仓库已停止维护，替代品 alejandra 4.0 的 --check 在有差异时退出码为 2（实测，工具帮助亦注明 2=requires formatting），不符合运行时 B 类契约故未选用；.nixpkgs-fmt.json 配置本机实测未观察到生效，config_markers 留空。本机已实跑（nixpkgs-fmt 1.3.0，cargo install）。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
     },
     {
       "language": "ansible",
       "status": "not_integrated",
-      "formatter": null,
-      "tool_key": null,
-      "check_argv": null,
-      "apply_argv": null,
-      "config_markers": [],
-      "extensions": [],
+      "formatter": "prettier",
+      "tool_key": "prettier",
+      "check_argv": [
+        "--list-different",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--write",
+        "{file}"
+      ],
+      "config_markers": [
+        ".ansible-lint",
+        "ansible.cfg",
+        ".prettierrc",
+        ".editorconfig"
+      ],
+      "extensions": [
+        ".yml",
+        ".yaml"
+      ],
       "dialects": {},
-      "notes": "not_integrated：ansible 无独立格式化器，通常经 YAML formatter 处理——playbook 本质是 YAML，排版由本批 yaml 通道（prettier）覆盖；ansible-lint 是 lint 工具而非 formatter，其 --fix 只自动修部分规则且修完仍有违规时退出非 0，不满足 apply「退出 0=成功格式化」契约；规则语义检查应走 lint 通道而非 format。该生态 format 检查如实不适用，不静默通过。"
+      "notes": "Ansible 无专属格式化器，按项目既有架构决策归口 yaml 通道——rulepacks/legacy_languages.json 的 ansible 条目自身即写明：extensions 为空数组、install_hint 为「playbook 检查由 ansible-lint 承接（yaml 通道）」、markers 含 playbook.yml。Ansible playbook 本质是 YAML，其排版由 format_profiles.json 的 yaml 条目（prettier --list-different）统一处理，因此 **不重复声明第二条 ansible 通道**：同一批 .yml/.yaml 若被两个语言条目各跑一次，既浪费预算又可能在配置漂移时产生互相矛盾的风格判定。实测否决 ansible-lint 作为格式化器：ansible-lint 26.9.0 的 --fix / --fix=yaml / --fix=none 三种形态都会重排 YAML，但只要残留 fqcn、name[casing] 等语义违规就一律退 2，不存在「修完即退 0」的调用形态，无法满足 apply 的「退出 0 = 成功」契约；其 --tags yaml 只读检查虽退 0/2，但 2 与 YAML 解析错误同码，损坏文件会被误报为需格式化（实测 broken.yml 确认）。结论：ansible 不提供独立 format 通道，其文件已由 yaml 通道覆盖，属显式架构归口而非未完成项。语义级检查（ansible-lint 规则）属 lint 类别，不在本档案职责内。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
     },
     {
       "language": "dockerfile",
       "status": "not_integrated",
-      "formatter": null,
-      "tool_key": null,
-      "check_argv": null,
-      "apply_argv": null,
-      "config_markers": [],
-      "extensions": [],
+      "formatter": "dprint",
+      "tool_key": "dprint",
+      "check_argv": [
+        "check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "fmt",
+        "{file}"
+      ],
+      "config_markers": [
+        "dprint.json",
+        "dprint.jsonc",
+        ".dprint.json",
+        ".dprint.jsonc"
+      ],
+      "extensions": [
+        ".dockerfile"
+      ],
       "dialects": {},
-      "notes": "not_integrated：Dockerfile 生态无公认独立格式化器。hadolint 是纯 linter（registry lint 通道）没有格式化能力；prettier-plugin-dockerfile 在 npm 上不存在（registry 实测 404）；唯一活跃方案是 dprint + @dprint/dockerfile 插件，本机实测可格式化 Dockerfile，但需要项目级 dprint.json 声明插件，且 check 不合规时退出码为 20（非 B 类契约的 1），配置依赖重，故不接入。该生态 format 检查如实不适用，不静默通过；有排版诉求的项目可自行以 dprint 配置承接。"
+      "notes": "退出码实测（本机 2026-10-08 直测）：dprint check 合规退 0、需重排退 20、未认领退 14。 【本机复验 2026-10-08】直测 dprint check（插件取自 dprint-plugin-dockerfile releases 实际发布的 0.7.0，文件名 plugin.wasm；此前 notes 记述的 0.3.2 版本号有误）：合规退 0、排版不合规退 20、未认领退 14。⚠️ 已知限制：dprint 对**无法解析的 Dockerfile 一律退 0**（实测 `FROM alpine\\nRUN ((` 退 0 且 fmt 不改动），与 clang-format 同类——Dockerfile 的语法损坏须由 syntax 核心能力（docker build / hadolint）拦截，format 门禁不覆盖该类。 退出码约定：需格式化时 dprint check 退出 20（非 1），已显式声明为不合规码；文件未被插件认领退出 14、语法损坏退出 0（见上方已知限制），二者均不入码集。",
+      "unformatted_exit_codes": [
+        20
+      ],
+      "unparsable_detection": "none"
     },
     {
       "language": "yaml",
@@ -98,7 +142,11 @@
         ".yaml"
       ],
       "dialects": {},
-      "notes": "prettier 是 YAML 事实标准格式化器（与主档案 typescript 同一工具，各语言档案独立声明不冲突）。刻意选 --list-different 而非 --check：实测 --check 在全部合规时也会向 stdout 输出 'All matched files use Prettier code style!'，会被本运行时的「退出 0 且 stdout 非空=不合规」规则误判；--list-different 实测合规时 stdout 为 0 字节、不合规时退出 1 且文件名列在 stdout，A/B 两类判定都安全。限制：只做 YAML 排版（缩进/引号/折行），不校验 schema 与语义；含 Jinja2 模板或非法 YAML 的文件解析失败退出 2，按未完成处理不误判合规；读项目 prettier 配置。本机已实跑（prettier 3.9.9，npx）。"
+      "notes": "prettier 是 YAML 事实标准格式化器（与主档案 typescript 同一工具，各语言档案独立声明不冲突）。刻意选 --list-different 而非 --check：实测 --check 在全部合规时也会向 stdout 输出 'All matched files use Prettier code style!'，会被本运行时的「退出 0 且 stdout 非空=不合规」规则误判；--list-different 实测合规时 stdout 为 0 字节、不合规时退出 1 且文件名列在 stdout，A/B 两类判定都安全。限制：只做 YAML 排版（缩进/引号/折行），不校验 schema 与语义；含 Jinja2 模板或非法 YAML 的文件解析失败退出 2，按未完成处理不误判合规；读项目 prettier 配置。本机已实跑（prettier 3.9.9，npx）。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
     },
     {
       "language": "toml",
@@ -123,7 +171,11 @@
       "dialects": {
         "spec": "1.0"
       },
-      "notes": "taplo 是 Rust 编写的 TOML 格式化器，完整支持 TOML 1.0。format --check 实测合规时退出 0 且 stdout 为空（进度 INFO 日志走 stderr 不影响判定），不合规时退出 1（错误文本走 stderr），是标准 B 类；format 就地改写退出 0。限制：只做排版与键对齐，不做 schema/语义校验（那是 taplo lint 的职责，format 不冒充）；语法错误的 .toml 检查同样退出 1，会被列入不合规清单（不静默通过）；读项目 taplo.toml 配置。本机已实跑（taplo 0.10.0，本机既有）。"
+      "notes": "taplo 是 Rust 编写的 TOML 格式化器，完整支持 TOML 1.0。format --check 实测合规时退出 0 且 stdout 为空（进度 INFO 日志走 stderr 不影响判定），不合规时退出 1（错误文本走 stderr），是标准 B 类；format 就地改写退出 0。限制：只做排版与键对齐，不做 schema/语义校验（那是 taplo lint 的职责，format 不冒充）；语法错误的 .toml 检查同样退出 1，会被列入不合规清单（不静默通过）；读项目 taplo.toml 配置。本机已实跑（taplo 0.10.0，本机既有）。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
     },
     {
       "language": "shell",
@@ -157,7 +209,11 @@
         ],
         "override_flag": "-ln"
       },
-      "notes": "shfmt 是 shell 事实标准格式化器。-d 为只读 diff 模式，实测合规时退出 0 且 stdout 为空、有差异时退出 1 并把 unified diff 输出到 stdout（标准 B 类，不改源码）；-w 就地写入退出 0。方言由 shebang 自动识别，可用 -ln 显式指定 bash/posix/sh/mksh/bats（实测 -ln posix 对 bash 数组语法报解析错）；zsh 不是支持方言，.zsh 文件仅当语法兼容 bash/POSIX 时能通过，zsh 特有语法解析失败同样退出 1 被列为不合规（不静默通过）。限制：只做排版，不查 shell bug 与用法错误（那是 shellcheck 的职责）；缩进等风格读 .editorconfig（实测 switch_case_indent/indent_style 生效）。本机已实跑（shfmt 3.14.1，brew 安装）。"
+      "notes": "shfmt 是 shell 事实标准格式化器。-d 为只读 diff 模式，实测合规时退出 0 且 stdout 为空、有差异时退出 1 并把 unified diff 输出到 stdout（标准 B 类，不改源码）；-w 就地写入退出 0。方言由 shebang 自动识别，可用 -ln 显式指定 bash/posix/sh/mksh/bats（实测 -ln posix 对 bash 数组语法报解析错）；zsh 不是支持方言，.zsh 文件仅当语法兼容 bash/POSIX 时能通过，zsh 特有语法解析失败同样退出 1 被列为不合规（不静默通过）。限制：只做排版，不查 shell bug 与用法错误（那是 shellcheck 的职责）；缩进等风格读 .editorconfig（实测 switch_case_indent/indent_style 生效）。本机已实跑（shfmt 3.14.1，brew 安装）。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
     }
   ]
 }

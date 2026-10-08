@@ -306,6 +306,7 @@ fn execute(args: &[String], mode: Mode) -> std::process::ExitCode {
         language_results.push(json!({
             "language": language,
             "formatter": profile["formatter"],
+            "unparsable_detection": profile["unparsable_detection"],
             "routed_from": profile["routed_from"],
             "routed_to": profile["routed_to"],
             "status": result["status"],
@@ -354,6 +355,8 @@ fn execute(args: &[String], mode: Mode) -> std::process::ExitCode {
         "root": request.path.to_string_lossy(),
         "mutates_sources": mode.mutates_sources(),
         "separation_note": "format 只判代码风格；不冒充注释完整性、开发规范或依赖漏洞检查",
+        "syntax_verified": language_results.iter().all(|row| row["unparsable_detection"] == "clang_format_xml"),
+        "syntax_verification_note": "部分语言的格式化器对无法解析的源码静默放行（退 0），本门禁无法识别；allow 仅代表代码风格达标，不代表源码可编译。逐语言的解析探测能力见 languages[].unparsable_detection。语法有效性由 syntax 核心能力（各语言编译器/解析器）负责。",
         "elapsed_ms": started.elapsed().as_millis() as u64,
         "language_count": language_results.len(),
         "unformatted_count": total_unformatted.len(),
@@ -503,7 +506,10 @@ fn run_language(profile: &Value, request: &Request, mode: Mode) -> Value {
                 let stdout = String::from_utf8_lossy(&result.stdout);
                 if mode == Mode::Check && !stdout.trim().is_empty() {
                     unformatted.push(file.to_string_lossy().to_string());
-                } else if mode == Mode::Check && detect_unparsable(&tool, file) {
+                } else if mode == Mode::Check
+                    && profile["unparsable_detection"] == "clang_format_xml"
+                    && detect_unparsable(&tool, file)
+                {
                     // 工具对无法解析的源文件会静默退 0（clang-format 的已知行为：
                     // 解析失败时原样输出并返回成功）。这会把「无法检查」误报成
                     // 「格式合规」，必须用第二遍探测把它降级为未完成。

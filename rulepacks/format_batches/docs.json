@@ -29,19 +29,42 @@
         ".markdown"
       ],
       "dialects": {},
-      "notes": "prettier 是 Markdown 生态事实标准格式化器，同时支持 .md 与 .markdown 扩展名。check_argv 刻意选 --list-different 而非 --check：实测 prettier 3.9.9 的 --check 在全部合规时仍向 stdout 打印「All matched files use Prettier code style!」，与「退出 0 且 stdout 为空 → 合规」的判定冲突；--list-different 合规时退出 0 且 stdout 为空，不合规时退出 1 并在 stdout 逐行列出文件路径，同时满足 A 类（stdout 列出不合规文件）与 B 类（退出 1 = 不合规）语义，退出 ≥2 视为工具故障。实测记录（npx prettier@3.9.9）：脏文件 --list-different 退出 1 且 stdout 为该文件路径；干净文件退出 0 且无输出；--write 对脏文件退出 0 并就地改写，对合规文件退出 0 且内容不变。prettier 读项目 prettier 配置与 .editorconfig 决定缩进/折行。限制：只重排版面（标题、列表、表格、换行、代码块围栏），不校验 Markdown 语法正确性、链接有效性、frontmatter 内容或文档结构完整性，不能替代 markdownlint 类 lint。本档案与 typescript 档案同为 prettier，但 language 不同，各自独立成档、互不冲突。"
+      "notes": "prettier 是 Markdown 生态事实标准格式化器，同时支持 .md 与 .markdown 扩展名。check_argv 刻意选 --list-different 而非 --check：实测 prettier 3.9.9 的 --check 在全部合规时仍向 stdout 打印「All matched files use Prettier code style!」，与「退出 0 且 stdout 为空 → 合规」的判定冲突；--list-different 合规时退出 0 且 stdout 为空，不合规时退出 1 并在 stdout 逐行列出文件路径，同时满足 A 类（stdout 列出不合规文件）与 B 类（退出 1 = 不合规）语义，退出 ≥2 视为工具故障。实测记录（npx prettier@3.9.9）：脏文件 --list-different 退出 1 且 stdout 为该文件路径；干净文件退出 0 且无输出；--write 对脏文件退出 0 并就地改写，对合规文件退出 0 且内容不变。prettier 读项目 prettier 配置与 .editorconfig 决定缩进/折行。限制：只重排版面（标题、列表、表格、换行、代码块围栏），不校验 Markdown 语法正确性、链接有效性、frontmatter 内容或文档结构完整性，不能替代 markdownlint 类 lint。本档案与 typescript 档案同为 prettier，但 language 不同，各自独立成档、互不冲突。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
     },
     {
       "language": "liquid",
       "status": "not_integrated",
-      "formatter": null,
-      "tool_key": null,
-      "check_argv": null,
-      "apply_argv": null,
-      "config_markers": [],
-      "extensions": [],
+      "formatter": "node",
+      "tool_key": "node",
+      "check_argv": [
+        "-e",
+        "const fs=require(\"node:fs\"),path=require(\"node:path\"),m=require(\"node:module\"),u=require(\"node:url\");\n(async()=>{\ntry{\nconst file=path.resolve(process.argv[2]||process.argv[1]);\nif(!fs.existsSync(file)){console.error(\"file not found: \"+file);process.exit(2);}\nconst req=m.createRequire(path.join(path.dirname(file),\"a.js\"));\nlet prettierPath,pluginPath;\ntry{prettierPath=req.resolve(\"prettier\");}catch(e){console.error(\"prettier not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\ntry{pluginPath=req.resolve(\"@shopify/prettier-plugin-liquid\");}catch(e){console.error(\"@shopify/prettier-plugin-liquid not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\nconst prettier=req(prettierPath);\nlet plugin=await import(u.pathToFileURL(pluginPath).href);\nplugin=plugin.default||plugin;\nconst src=fs.readFileSync(file,\"utf8\");\nlet config=null;\ntry{config=await prettier.resolveConfig(file);}catch(e){config=null;}\nconst options=Object.assign({},config||{},{parser:\"liquid-html\",plugins:[plugin]});\nlet out;\ntry{out=await prettier.format(src,options);}catch(e){console.error(\"prettier format error: \"+e.message);process.exit(2);}\nprocess.exit(out===src?0:1);\n}catch(e){console.error(\"wrapper error: \"+(e&&e.message));process.exit(2);}\n})();",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-e",
+        "const fs=require(\"node:fs\"),path=require(\"node:path\"),m=require(\"node:module\"),u=require(\"node:url\");\n(async()=>{\ntry{\nconst file=path.resolve(process.argv[2]||process.argv[1]);\nif(!fs.existsSync(file)){console.error(\"file not found: \"+file);process.exit(2);}\nconst req=m.createRequire(path.join(path.dirname(file),\"a.js\"));\nlet prettierPath,pluginPath;\ntry{prettierPath=req.resolve(\"prettier\");}catch(e){console.error(\"prettier not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\ntry{pluginPath=req.resolve(\"@shopify/prettier-plugin-liquid\");}catch(e){console.error(\"@shopify/prettier-plugin-liquid not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\nconst prettier=req(prettierPath);\nlet plugin=await import(u.pathToFileURL(pluginPath).href);\nplugin=plugin.default||plugin;\nconst src=fs.readFileSync(file,\"utf8\");\nlet config=null;\ntry{config=await prettier.resolveConfig(file);}catch(e){config=null;}\nconst options=Object.assign({},config||{},{parser:\"liquid-html\",plugins:[plugin]});\nlet out;\ntry{out=await prettier.format(src,options);}catch(e){console.error(\"prettier format error: file left untouched, \"+e.message);process.exit(2);}\nfs.writeFileSync(file,out);\nprocess.exit(0);\n}catch(e){console.error(\"wrapper error: \"+(e&&e.message));process.exit(2);}\n})();",
+        "{file}"
+      ],
+      "config_markers": [
+        ".prettierrc",
+        ".prettierrc.json",
+        ".prettierrc.yaml",
+        "prettier.config.js"
+      ],
+      "extensions": [
+        ".liquid"
+      ],
       "dialects": {},
-      "notes": "Liquid 生态无开箱即用的公认格式化器，故 format 检查如实返回 not_integrated，不静默通过。实测 prettier 3.9.9 原生不支持 liquid 语法（--parser liquid 报 Couldn't resolve parser）；官方方案 @shopify/prettier-plugin-liquid 必须预先安装进项目 node_modules，npx 现场解析失败（Cannot find package），且报错退出码为 1，会与「退出 1 = 不合规」的判定混淆，存在把工具故障误判为不合规的风险；Shopify 官方 theme-check 仅为 linter，不做格式化。待插件可稳定通过统一工具绑定（--tool NAME=ABS_PATH）后可再接入。"
+      "notes": "Liquid 模板的事实标准格式化器是 prettier + Shopify 官方插件 @shopify/prettier-plugin-liquid（实测 prettier 3.9.9 + 插件 3.x，parser 名为 liquid-html 而非 liquid），但插件是 node 包而非独立可执行文件，故经 node -e 包装调用，formatter/tool_key 为 node。不能直接用 prettier CLI：实测显式 --plugin 指定插件但项目未安装时，prettier 退 1 且 stdout 为空（Cannot find package 打在 stderr），与本工具「退 1=不合规」同码，会对未配置项目全量误报；不带插件则 No parser could be inferred 退 2。包装器先用 createRequire 从被检文件所在项目解析 prettier 与插件：任一缺失退 2（工具故障/未配置，绝不静默放行，实测 check/apply 均退 2 且文件不动）；随后调 prettier.format 与原文对比：0=合规、1=需格式化、prettier 抛错退 2，check 全程只读（实测 md5 不变、stdout 静默），apply 就地写回、实测幂等且解析失败不落盘。resolveConfig 已实测读取项目 .prettierrc（printWidth 改动会改变判定），config_markers 据此声明。限制：liquid-html 解析器宽松，残缺模板（未闭合 if 等）多数不会抛错而是被当作需格式化（check 退 1、apply 会重写补全，与官方 CLI --write 行为一致），不能依赖它做语法校验；只排版，不覆盖 theme-check 的 lint 规则；需项目预装 prettier 与插件两个 devDependency。 【2026-10-08 复核修正】此前 final_five 分片据 prettier CLI 测试判为 not_integrated，理由是「插件缺失与需格式化同为退出 1」。该结论只覆盖 CLI 路径，未覆盖本档案的 node wrapper。实测 wrapper 四场景全部正确：合规 0；不合规 1；移走 node_modules 后依赖解析失败退 2（工具故障，不误判为不合规）；文件不存在退 2。apply 实测就地重排退出 0、复检 0 幂等。wrapper 用 createRequire 从被检文件所在目录解析依赖，正是它把「依赖缺失」与「需格式化」彻底分离，因此本条目维持 integrated。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
     }
   ]
 }
