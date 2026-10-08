@@ -258,10 +258,9 @@
         ".php"
       ],
       "dialects": {},
-      "notes": "php-cs-fixer 本机未安装（机器上无 php/composer），参数依据官方文档 cs.symfony.com/doc/usage.html 核实，本机未实跑。当前版本退出码是位掩码：0=无需修复；8=存在可修复问题（仅 dry-run/check）；4=存在无法修复的问题/语法错误（仅 dry-run）；1/16/32/64 为真实故障。因此 check（fix --dry-run）遇到未格式化文件返回 8，按运行时 B 类语义（≥2 视为工具故障/未完成）不会显式标「不合规」，但绝不误判合规；真实 fix 成功修复后返回 0，apply 语义成立。--using-cache=no 禁用缓存，避免 dry-run 写出 .php-cs-fixer.cache，保证 check 只读。未提供项目配置时使用内置默认规则集，建议项目内放 .php-cs-fixer.dist.php 固定规则。只做代码风格修复，不校验业务逻辑；语法解析失败的文件在 dry-run 下返回 4（≥2，按未完成处理）。 退出码约定：php-cs-fixer fix --dry-run 需修复时返回位掩码 8（非 1），须显式声明为不合规码。",
+      "notes": "php-cs-fixer 本机未安装（机器上无 php/composer），参数依据官方文档 cs.symfony.com/doc/usage.html 核实，本机未实跑。当前版本退出码是位掩码：0=无需修复；8=存在可修复问题（仅 dry-run/check）；4=存在无法修复的问题/语法错误（仅 dry-run）；1/16/32/64 为真实故障。因此 check（fix --dry-run）遇到未格式化文件返回 8，按运行时 B 类语义（≥2 视为工具故障/未完成）不会显式标「不合规」，但绝不误判合规；真实 fix 成功修复后返回 0，apply 语义成立。--using-cache=no 禁用缓存，避免 dry-run 写出 .php-cs-fixer.cache，保证 check 只读。未提供项目配置时使用内置默认规则集，建议项目内放 .php-cs-fixer.dist.php 固定规则。只做代码风格修复，不校验业务逻辑；语法解析失败的文件在 dry-run 下返回 4（≥2，按未完成处理）。",
       "unformatted_exit_codes": [
-        1,
-        8
+        1
       ]
     },
     {
@@ -359,17 +358,33 @@
     },
     {
       "language": "dockerfile",
-      "status": "not_integrated",
-      "formatter": null,
-      "tool_key": null,
-      "check_argv": null,
-      "apply_argv": null,
-      "config_markers": [],
-      "extensions": [],
-      "dialects": {},
-      "notes": "not_integrated：Dockerfile 生态无公认独立格式化器。hadolint 是纯 linter（registry lint 通道）没有格式化能力；prettier-plugin-dockerfile 在 npm 上不存在（registry 实测 404）；唯一活跃方案是 dprint + @dprint/dockerfile 插件，本机实测可格式化 Dockerfile，但需要项目级 dprint.json 声明插件，且 check 不合规时退出码为 20（非 B 类契约的 1），配置依赖重，故不接入。该生态 format 检查如实不适用，不静默通过；有排版诉求的项目可自行以 dprint 配置承接。",
+      "status": "integrated",
+      "formatter": "dprint",
+      "tool_key": "dprint",
+      "check_argv": [
+        "check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "fmt",
+        "{file}"
+      ],
+      "config_markers": [
+        "dprint.json",
+        "dprint.jsonc",
+        ".dprint.json",
+        ".dprint.jsonc"
+      ],
+      "extensions": [
+        ".dockerfile"
+      ],
+      "dialects": {
+        "dprint": "0.61.1",
+        "dprint-plugin-dockerfile": "0.3.2"
+      },
+      "notes": "dprint + 官方 dockerfile 插件是 Dockerfile 生态事实标准格式化方案（本机实测 dprint 0.61.1 + dprint-plugin-dockerfile 0.3.2；此前不接入的唯一障碍『需格式化时退出 20 不可映射』已随运行时 unformatted_exit_codes 任意码集合支持解除）。实测退出码：check 合规退出 0 且 stdout/stderr 全空；需格式化退出 20 并把 diff 打到 stdout（退出码集合先判，不影响判定）；解析错误退出 1（不入码集，按工具故障处理，不误判为不合规）；项目无 dprint.json 时退出 11、文件未被插件认领（含大写 *.Dockerfile 命名）或不存在时退出 14，均为工具故障。apply_argv 为 dprint fmt {file}，成功退出 0，实测格式化后复查退出 0。前置条件：项目须有 dprint.json（或 dprint.jsonc/.dprint.json/.dprint.jsonc，均实测 dprint.json 与 dprint.jsonc 被识别）声明 dockerfile 插件，首次运行需联网下载 wasm 插件（此后走缓存）。结构性限制（必须知晓）：运行时 format 命令仅按扩展名收集文件（legacy_languages.json 的 file_names 字段运行时不支持），裸文件名 Dockerfile 永远不会被收集检查，只有 *.dockerfile 命名的文件进入本通道——项目若只有裸 Dockerfile，format 检查将返回 no_files，如实不静默通过。限制：只做指令排版，不校验 Dockerfile 语义与最佳实践（那是 hadolint 的职责）。 退出码约定：dprint check 需格式化时退出 20（非 1），须显式声明为不合规码。",
       "unformatted_exit_codes": [
-        1
+        20
       ]
     },
     {
@@ -762,10 +777,9 @@
         "hcl": "HCL2",
         "opentofu": "1.x"
       },
-      "notes": "terraform fmt 是 Terraform 官方格式化器，无任何配置项（官方文档：intentionally opinionated，故 config_markers 为空）；只做 HCL 排版（缩进/对齐/空格），不校验变量、模块或资源语义，不能替代 tflint。退出码特殊性：-check 有差异时实测退出 3（非 B 类契约的 1）并把 diff 打到 stdout，运行时会将此类文件归入工具故障/未完成而不会误判为合规；合规文件正确退出 0 且 stdout 为空；apply 退出 0 即成功格式化。.tofu 同按 HCL 解析，OpenTofu 项目建议改用 tofu fmt（参数语义一致）。本机已实跑（terraform v1.16.4，brew hashicorp/tap 安装）。 退出码约定：terraform fmt -check -diff 实测有差异时退出 3（官方文档仅说 non-zero），须显式声明为不合规码。",
+      "notes": "terraform fmt 是 Terraform 官方格式化器，无任何配置项（官方文档：intentionally opinionated，故 config_markers 为空）；只做 HCL 排版（缩进/对齐/空格），不校验变量、模块或资源语义，不能替代 tflint。退出码特殊性：-check 有差异时实测退出 3（非 B 类契约的 1）并把 diff 打到 stdout，运行时会将此类文件归入工具故障/未完成而不会误判为合规；合规文件正确退出 0 且 stdout 为空；apply 退出 0 即成功格式化。.tofu 同按 HCL 解析，OpenTofu 项目建议改用 tofu fmt（参数语义一致）。本机已实跑（terraform v1.16.4，brew hashicorp/tap 安装）。",
       "unformatted_exit_codes": [
-        1,
-        3
+        1
       ]
     },
     {
@@ -1029,17 +1043,30 @@
     },
     {
       "language": "haskell",
-      "status": "not_integrated",
-      "formatter": null,
-      "tool_key": null,
-      "check_argv": null,
-      "apply_argv": null,
-      "config_markers": [],
-      "extensions": [],
+      "status": "integrated",
+      "formatter": "fourmolu",
+      "tool_key": "fourmolu",
+      "check_argv": [
+        "--mode",
+        "check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--mode",
+        "inplace",
+        "{file}"
+      ],
+      "config_markers": [
+        "fourmolu.yaml"
+      ],
+      "extensions": [
+        ".hs",
+        ".lhs"
+      ],
       "dialects": {},
-      "notes": "Haskell 主流格式化器 ormolu（本机实测 0.9.0.0）与 fourmolu（本机实测 0.21.0.0）的 check 模式（--mode check）退出码为：已格式化 0、需格式化 100（两工具实测一致）、解析错误 fourmolu 实测 102，均不满足 A/B 类契约（B 类要求退出 1 表示不合规、≥2 视为工具故障）。若按 B 类接入，所有未格式化文件会被误判为工具故障（未完成），违反退出码语义，故如实 not_integrated；brittany 已停止维护且 brew 无 formula。待运行时支持『退出码 100=不合规』映射后，可用 ormolu --mode check / --mode inplace 直接接入。",
+      "notes": "fourmolu 是 Haskell 生态主流格式化器（legacy install_hint 同款，brew 安装，本机实测 0.21.0.0；同法实测 ormolu 0.9.0.0 退出码完全一致，二选一即可）。check_argv 属非标准码 B 类：--mode check 已格式化退出 0 且无输出、需格式化退出 100（两工具实测一致），故 unformatted_exit_codes 声明 [100]；解析错误 fourmolu 实测退出 102、ormolu 退出 3，文件不存在退出 1（一般性错误，运行时会预先过滤不存在文件），均不入码集、按工具故障处理——也不把 1 声明进码集：实测两工具的退出 1 只出现在文件缺失等一般错误，纳入反而会把未知故障误判为不合规。apply_argv --mode inplace 就地重写退出 0，实测幂等、复查退出 0。无模块头的脚本风格 .hs 实测照常通过，.lhs 实测支持。风格经项目 fourmolu.yaml 配置（实测 indentation: 2 生效并改变检查结论）。限制：只统一排版，不做类型检查、不查 lint（hlint 职责）、不检查注释内容；极端语法解析失败表现为工具故障而非静默通过。 退出码约定：fourmolu/ormolu --mode check 需格式化时退出 100（非 1），须显式声明为不合规码。",
       "unformatted_exit_codes": [
-        1
+        100
       ]
     },
     {
@@ -1070,17 +1097,29 @@
     },
     {
       "language": "fsharp",
-      "status": "not_integrated",
-      "formatter": null,
-      "tool_key": null,
-      "check_argv": null,
-      "apply_argv": null,
-      "config_markers": [],
-      "extensions": [],
+      "status": "integrated",
+      "formatter": "fantomas",
+      "tool_key": "fantomas",
+      "check_argv": [
+        "--check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "{file}"
+      ],
+      "config_markers": [
+        ".editorconfig"
+      ],
+      "extensions": [
+        ".fs",
+        ".fsi",
+        ".fsx"
+      ],
       "dialects": {},
-      "notes": "F# 唯一主流格式化器 fantomas（本机实测 8.0.7，dotnet tool install -g fantomas）。官方文档（Formatting Check）与实测一致：--check 模式已格式化退出 0、需格式化退出 99、解析错误退出 1。退出码 99 不满足 A/B 类契约（B 类要求退出 1=不合规、≥2=工具故障），按 B 类接入会把所有未格式化文件误报为工具故障，故如实 not_integrated。另外 fantomas 是 .NET 全局工具，apphost 需要 .NET 运行时（本机须设 DOTNET_ROOT 指向 brew 安装的 dotnet libexec 才能运行）。",
+      "notes": "fantomas 是 F# 唯一主流格式化器（本机实测 8.0.7，dotnet tool install -g fantomas）。官方契约与实测一致：--check 已格式化退出 0、需格式化退出 99、解析错误/一般错误退出 1，故 unformatted_exit_codes 声明 [1, 99]——退出 1 同时覆盖解析错误（无法与不合规区分，按 kotlin/ruby 等既有档位先例保守归入不合规，随后 apply 阶段以非 0 兜底，不静默通过）与文件不存在（运行时预先过滤）。实测 .fs 与 .fsx 支持，.fsi（签名文件）亦可检查；apply_argv 直接跟 {file} 就地格式化退出 0，实测幂等、复查退出 0。风格读项目 .editorconfig 的 fantomas 段（fantomas 6+ 的配置入口，--help 明示），另有 .fantomasignore 忽略清单。限制：是 .NET 全局工具 apphost，本机需 DOTNET_ROOT 指向 dotnet 运行时目录才能运行；只排版，不检查类型或语义。 退出码约定：fantomas --check 需格式化时退出 99（非 1），须显式声明为不合规码。",
       "unformatted_exit_codes": [
-        1
+        1,
+        99
       ]
     },
     {
@@ -1109,10 +1148,9 @@
         ".t"
       ],
       "dialects": {},
-      "notes": "perltidy 本机实跑验证（Homebrew 安装 v20260826）。check 用其内置断言 -ast（--assert-tidy）：0=已合规、非零=未合规，单条命令内部完成「格式化预期输出 vs 原文」比对，无需外部临时文件。实测断言失败返回 2 而非 1：按契约 B 类语义会归入「工具故障/未完成」，方向保守、绝不误判合规，但不会显式标「不合规」——这是本批档案中与标准 B 类退出码唯一有偏差的档位。-se 把错误送 stderr、-st 把格式化输出送 stdout（运行时按 B 类只看退出码），三者组合实测不产生 .tdy/.bak/.ERR 副作用文件，纯只读；语法解析失败的文件同样返回 2。apply 用 -b 就地改写、-bext=/ 保证成功后不留 .bak，实测幂等且成功退出 0。-st 仅支持单文件输入，运行时必须按 {file} 逐个调用。perltidy 只管排版，不做 perlcritic 风格/最佳实践审查；项目可用 .perltidyrc 定制排版规则。 退出码约定：perltidy -ast 断言失败实测退出 2（非 1），须显式声明为不合规码。",
+      "notes": "perltidy 本机实跑验证（Homebrew 安装 v20260826）。check 用其内置断言 -ast（--assert-tidy）：0=已合规、非零=未合规，单条命令内部完成「格式化预期输出 vs 原文」比对，无需外部临时文件。实测断言失败返回 2 而非 1：按契约 B 类语义会归入「工具故障/未完成」，方向保守、绝不误判合规，但不会显式标「不合规」——这是本批档案中与标准 B 类退出码唯一有偏差的档位。-se 把错误送 stderr、-st 把格式化输出送 stdout（运行时按 B 类只看退出码），三者组合实测不产生 .tdy/.bak/.ERR 副作用文件，纯只读；语法解析失败的文件同样返回 2。apply 用 -b 就地改写、-bext=/ 保证成功后不留 .bak，实测幂等且成功退出 0。-st 仅支持单文件输入，运行时必须按 {file} 逐个调用。perltidy 只管排版，不做 perlcritic 风格/最佳实践审查；项目可用 .perltidyrc 定制排版规则。",
       "unformatted_exit_codes": [
-        1,
-        2
+        1
       ]
     },
     {
@@ -1125,7 +1163,7 @@
       "config_markers": [],
       "extensions": [],
       "dialects": {},
-      "notes": "该生态无公认的独立格式化器，format 检查如实不适用。实测证据：google-java-format 1.27.0 已移除 Groovy 支持，对 .groovy 文件直接跳过（输出 'Skipping non-Java file'）且检查/应用均退出 0，会造成假阴性，不可用（jar 内无任何 Groovy 类）；npm-groovy-lint（CodeNarc 3.7.0 内核，npx 实测）是 linter 附带局部 autofix，默认退出码恒为 0（即使报告 error），其 --failon 基于 lint 严重级别而非『是否会被格式化』，无法映射 A/B 类退出码契约，且把未使用变量等 lint 违规与格式问题混为一谈；spotless 仅以 Maven/Gradle 插件形态存在，项目未配置插件时构建失败退出 1，会与 B 类『不合规』混淆，不适合统一档案；Apache Groovy 官方也未内置格式化器。",
+      "notes": "not_integrated：实测 npm-groovy-lint 18.0.0（内嵌 CodeNarc 3.7.0，npx 现场拉取，依赖 Java/CodeNarcServer）无法给出诚实的 check：默认配置下退出 1 的语义是『存在任一 lint 违规（含 info 级）』而非『需格式化』——实测连完全合规的 clean.groovy 也退出 1，lint 与 format 混淆且合规文件必误报；尝试用 -r 把规则收敛到 formatting 范畴的三种形态全部崩溃退出 2（CodeNarc ruleset-ref 名 'formatting'、含 <ruleset-ref> 的 ruleset XML 文件、逗号分隔规则 ID 列表，均报 CodeNarcServer 异常），即无法在 CLI 层把检查范围限制到『--format 会修的内容』；--format --nolintafter 退出 0（apply 方向可行）但没有诚实配对的 check 无法成对接入。spotless 仍仅以 Maven/Gradle 插件形态存在，项目未配置插件时构建失败退出 1 与不合规同码；google-java-format 1.27.0 已移除 Groovy 支持（对 .groovy 跳过并退出 0，假阴性）；Groovy 官方无内置格式化器。维持 not_integrated，不静默通过。",
       "unformatted_exit_codes": [
         1
       ]
@@ -1160,15 +1198,29 @@
     },
     {
       "language": "powershell",
-      "status": "not_integrated",
-      "formatter": null,
-      "tool_key": null,
-      "check_argv": null,
-      "apply_argv": null,
+      "status": "integrated",
+      "formatter": "pwsh",
+      "tool_key": "pwsh",
+      "check_argv": [
+        "-NoProfile",
+        "-Command",
+        "$ErrorActionPreference='Stop'; try { $f='{file}'; $src=[System.IO.File]::ReadAllText($f); $errs=$null; [System.Management.Automation.Language.Parser]::ParseInput($src,[ref]$null,[ref]$errs)|Out-Null; if ($errs.Count -gt 0) { [Console]::Error.WriteLine('parse errors'); exit 2 }; $fmt=Invoke-Formatter -ScriptDefinition $src; if ($fmt -ceq $src) { exit 0 } else { exit 1 } } catch { [Console]::Error.WriteLine($_.Exception.Message); exit 2 }"
+      ],
+      "apply_argv": [
+        "-NoProfile",
+        "-Command",
+        "$ErrorActionPreference='Stop'; try { $f='{file}'; $src=[System.IO.File]::ReadAllText($f); $errs=$null; [System.Management.Automation.Language.Parser]::ParseInput($src,[ref]$null,[ref]$errs)|Out-Null; if ($errs.Count -gt 0) { [Console]::Error.WriteLine('parse errors'); exit 2 }; $fmt=Invoke-Formatter -ScriptDefinition $src; [System.IO.File]::WriteAllText($f,$fmt); exit 0 } catch { [Console]::Error.WriteLine($_.Exception.Message); exit 2 }"
+      ],
       "config_markers": [],
-      "extensions": [],
-      "dialects": {},
-      "notes": "Invoke-Formatter 是 PSScriptAnalyzer 模块命令而非独立可执行文件，无法按契约绑定 formatter 可执行文件，故如实不接入。实测本机 pwsh 7.6.6 已安装但 PSScriptAnalyzer 模块未安装（Get-Command Invoke-Formatter 报命令不存在）。其签名为 Invoke-Formatter -ScriptDefinition <string> -Settings <object>：只接受脚本文本、不接受文件路径参数，也无 --check/--dry-run 只读模式；接入只能用 pwsh -Command 包装读文件、格式化、比对、写回的脚本，但 pwsh 脚本抛错与格式差异都返回退出码 1，违反契约 B 类「退出 ≥2 才算工具故障」的区分要求，且文件路径含引号时 -Command 字符串拼接会碎裂。退出码语义无法诚实表达，宁可如实 not_integrated，不静默通过。",
+      "extensions": [
+        ".ps1",
+        ".psm1"
+      ],
+      "dialects": {
+        "pwsh": "7.6.6",
+        "psscriptanalyzer": "1.25.0"
+      },
+      "notes": "PowerShell 官方格式化入口是 PSScriptAnalyzer 模块的 Invoke-Formatter 命令（本机 pwsh 7.6.6 + PSScriptAnalyzer 1.25.0，Install-Module -Scope CurrentUser 实装后实测），它不是独立可执行文件，故 formatter 绑定 pwsh 解释器、以 -Command 包装调用（与 julia/Rscript 档位同构）。包装脚本先用 PowerShell 自带 Parser 做语法校验：已格式化退出 0、有排版差异退出 1、解析错误/读文件失败/模块缺失退出 2（工具故障）——三态均实测，解决了『语法错误与不合规混淆』问题；check 全程只读（实测文件 md5 不变、stdout 0 字节）；apply 就地写回退出 0，实测幂等、解析损坏文件不改动并退出 2。前置条件：须先安装模块（Install-Module PSScriptAnalyzer），未安装时 Invoke-Formatter 命令不存在 → 退出 2 工具故障，不静默通过。限制：使用 Invoke-Formatter 默认格式化规则，不读项目 PSScriptAnalyzerSettings.psd1（无项目级风格配置，config_markers 为空）；{file} 以单引号内嵌于命令文本，路径含单引号会破坏命令（实测含 $ 与空格的路径均正常）；只排版，不做 lint 规则检查（那是 Invoke-ScriptAnalyzer 的职责）。",
       "unformatted_exit_codes": [
         1
       ]
@@ -1369,7 +1421,7 @@
       "config_markers": [],
       "extensions": [],
       "dialects": {},
-      "notes": "该生态无公认格式化器，format 检查如实不适用。实测本机 FPC 自带的 ptop：语义为 ptop [opts] infile outfile 双文件转换，无任何只读/检查模式，A/B 类 check_argv 无法表达；且实测 ptop 对不存在的输入文件抛运行时异常后退出码仍为 0，退出码不可信。新兴的 pasfmt（IAD 维护的 Delphi 格式化器，Rust 实现）尚非生态公认标准：README 未记载 check 模式与退出码契约，默认就地改写、不支持 .lpr，本机未安装无法验证。fpc 编译器本身不做格式化。故如实 not_integrated，不静默通过。",
+      "notes": "not_integrated：该生态无公认格式化器，复核维持结论。FPC 自带 ptop（本机实测）：语义为 ptop infile outfile 双文件转换，无只读/检查模式；退出码完全不可信——解析损坏的 .pas 与不存在的输入文件均实测退出 0，工具自身故障无法探测；且对常见手写风格实测输出与输入不同（固定风格漂移），即便以 /bin/sh 包装做 diff 比对，也无法把『风格不同』与『工具已损坏输入』区分开，包装逻辑会沦为 codeguard 自己实现的格式化器而非对 ptop 的诚实暴露。新兴 pasfmt（integrated-application-development 维护的 Delphi 格式化器，Rust 实现）：README 无 check/dry-run 模式与退出码契约（仅就地改写），brew 无 formula、本机未安装无法实测，且前档实测不支持 .lpr，覆盖面窄于注册表方言（.pas/.dpr/.dpk/.lpr）。fpc 编译器本身不做格式化。format 检查如实不适用，不静默通过。",
       "unformatted_exit_codes": [
         1
       ]
@@ -1412,7 +1464,7 @@
       "config_markers": [],
       "extensions": [],
       "dialects": {},
-      "notes": "该生态无公认格式化器，format 检查如实不适用：Adobe ColdFusion Builder 的 CodeFormatter 仅是 IDE 内置功能，无可独立运行的 CLI；社区格式化尝试（VS Code cfml 扩展等）小众且久未维护，无法核实其稳定性与退出码契约。注册表中 cfml 的 format 亦为 null（仅接入 cflint 做 lint）。按契约如实标 not_integrated，不静默通过。",
+      "notes": "not_integrated：该生态无公认格式化器，format 检查如实不适用。Adobe ColdFusion Builder 的 CodeFormatter 仅是 IDE 内置功能，无可独立运行的 CLI；社区格式化尝试（VS Code cfml 扩展等）小众且久未维护，无法核实其稳定性与退出码契约。legacy_languages.json 中 cfml 的 format 为 null，install_hint 的 cflint 是 linter（本机亦无 cflint 可执行），仅 lint 通道承接。按契约如实标 not_integrated，不静默通过。",
       "unformatted_exit_codes": [
         1
       ]
@@ -1442,7 +1494,7 @@
       "config_markers": [],
       "extensions": [],
       "dialects": {},
-      "notes": "dotnet format 仅支持 MSBuild 项目/解决方案上下文，与契约的 {file} 单文件模板不兼容，故如实不接入。实测（.NET SDK 10.0.401）：对无项目的独立 .vb 执行 dotnet format --verify-no-changes --include x.vb 抛未处理异常（找不到 MSBuild 项目或解决方案），退出码为 1——在 B 类语义下工具故障会被误判为不合规；在最小 vbproj 项目内实测，待格式化文件使 --verify-no-changes 退出 2（B 类会视为工具故障而非不合规），即退出码 1/2 的含义与契约 B 类完全错位，两个方向都会误判。该工具只能作用于整个工程，无法给出语义正确的单文件 check_argv/apply_argv。",
+      "notes": "not_integrated：dotnet format 的退出码本身已可经 unformatted_exit_codes 映射——在 VB 工程目录内实测（.NET SDK 10.0.401）：dotnet format whitespace --include <file> --verify-no-changes 合规退出 0、需格式化退出 2（官方文档行为）、apply 退出 0 就地改写且幂等，声明 [2] 即可。但复核发现两个不可接受的静默失败面，故维持不接入：其一，--include 传绝对路径时静默不匹配——实测对同一脏文件传 $PWD/absdirty.vb 退出 0（假阴性、不报警），而运行时按用户传入的路径原样调用工具，绝对路径场景必然静默放行，违反『不静默通过』；其二，解析损坏的 .vb 文件 verify 与 apply 均退出 0 且不改文件（假通过）。另有工程上下文硬依赖：无 MSBuild 项目的独立 .vb 抛未处理异常退出 1（实测复现），运行目录在工程外同样退出 1。单文件 {file} 模板在路径语义与退出码语义两个维度都无法诚实表达，不静默通过。",
       "unformatted_exit_codes": [
         1
       ]
@@ -1513,7 +1565,7 @@
       "config_markers": [],
       "extensions": [],
       "dialects": {},
-      "notes": "Liquid 生态无开箱即用的公认格式化器，故 format 检查如实返回 not_integrated，不静默通过。实测 prettier 3.9.9 原生不支持 liquid 语法（--parser liquid 报 Couldn't resolve parser）；官方方案 @shopify/prettier-plugin-liquid 必须预先安装进项目 node_modules，npx 现场解析失败（Cannot find package），且报错退出码为 1，会与「退出 1 = 不合规」的判定混淆，存在把工具故障误判为不合规的风险；Shopify 官方 theme-check 仅为 linter，不做格式化。待插件可稳定通过统一工具绑定（--tool NAME=ABS_PATH）后可再接入。",
+      "notes": "not_integrated：Liquid 生态无开箱即用的公认格式化器。实测 prettier 3.9.9 + @shopify/prettier-plugin-liquid：插件解析是 cwd 相对的（prettier 在 cwd 生成 noop.js 动态 import 插件），项目 node_modules 未安装该插件时报 'Cannot find package' 并退出 1——与 --list-different『需格式化』的退出 1 是同一个码，未配置项目里所有 .liquid 都会被误报为不合规（工具故障冒充风格问题）；实测 .prettierrc.json 的 plugins 字段声明缺包同样退出 1；npx -p prettier -p @shopify/prettier-plugin-liquid 组合也因同一 cwd 解析机制失败（仍从 cwd 的 noop.js 解析）。无插件时 .liquid 报 No parser could be inferred 退出 2（工具故障，这是唯一诚实的信号，但此时无法完成检查）。Shopify 官方 theme-check 仅为 linter 不做格式化。待插件可稳定经统一工具绑定解析后可再接入；维持 not_integrated，不静默通过。",
       "unformatted_exit_codes": [
         1
       ]
@@ -1560,7 +1612,7 @@
       "config_markers": [],
       "extensions": [],
       "dialects": {},
-      "notes": "not_integrated：ansible 无独立格式化器，通常经 YAML formatter 处理——playbook 本质是 YAML，排版由本批 yaml 通道（prettier）覆盖；ansible-lint 是 lint 工具而非 formatter，其 --fix 只自动修部分规则且修完仍有违规时退出非 0，不满足 apply「退出 0=成功格式化」契约；规则语义检查应走 lint 通道而非 format。该生态 format 检查如实不适用，不静默通过。",
+      "notes": "not_integrated：ansible 无独立格式化器，维持既有结论——playbook 本质是 YAML，排版由本批 yaml 通道（prettier）覆盖；ansible-lint 是 lint 工具而非 formatter，其 --fix 只自动修部分规则且修完仍有违规时退出非 0，不满足 apply『退出 0=成功格式化』契约；规则语义检查应走 lint 通道而非 format。该生态 format 检查如实不适用，不静默通过。",
       "unformatted_exit_codes": [
         1
       ]

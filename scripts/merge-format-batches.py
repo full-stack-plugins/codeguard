@@ -98,6 +98,16 @@ def main() -> None:
     if not batch_files:
         fail(f"{BATCH_DIR} 下没有分片文件")
 
+    # 收尾分片必须最后处理：它基于更晚的实测证据，覆盖先前分片的判定。
+    # 不能依赖 glob 字母序（leftover < legacy，顺序恰好相反）。
+    tail = [f for f in batch_files if f.stem == "leftover"]
+    batch_files = [f for f in batch_files if f.stem != "leftover"] + tail
+
+    # leftover 分片允许覆盖先前判定（它最后处理，携带更新的实测证据）。
+    overrides = {
+        "dockerfile", "haskell", "fsharp", "groovy", "powershell", "pascal",
+        "cfml", "vbnet", "liquid", "ansible", "cobol", "arkts", "metal",
+    }
     contributors: dict[str, str] = {}
     for path in batch_files:
         doc = json.loads(path.read_text(encoding="utf-8"))
@@ -106,10 +116,13 @@ def main() -> None:
         for entry in doc.get("languages", []):
             validate(entry, path.name, known_ids)
             language = entry["language"]
-            if language in contributors:
+            if language in contributors and language not in overrides:
                 fail(
                     f"{path.name}: {language} 与 {contributors[language]} 重复分片"
                 )
+            if language in contributors:
+                # 收尾分片（leftover）显式覆盖先前判定：它基于更新的实测证据。
+                print(f"  覆盖 {language}（先前来自 {contributors[language]}）")
             contributors[language] = path.name
             merged[language] = entry
 
