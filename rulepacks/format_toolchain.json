@@ -1,0 +1,328 @@
+{
+  "schema_version": "0.1.0",
+  "document_type": "formatter_toolchain_manifest",
+  "authority": "repository_declaration_only",
+  "policy": "codeguard 不安装任何工具；本清单由项目在门禁之外消费（开发机/CI 显式安装），门禁只校验已装工具",
+  "security_note": "门禁在 CI 上对任意 PR 运行，让它自动安装工具等于让任意贡献者获得 CI 执行任意安装脚本的路径",
+  "reproducibility_note": "门禁结果必须只取决于「源码 + 已锁定工具版本」，不能取决于运行机器上恰好装了什么",
+  "tool_count": 37,
+  "language_count": 57,
+  "tools": [
+    {
+      "formatter": "Rscript",
+      "install_kind": "ecosystem",
+      "install": "R 已装 + install.packages('styler')",
+      "languages": [
+        "r"
+      ]
+    },
+    {
+      "formatter": "bash",
+      "install_kind": "ecosystem",
+      "install": "系统自带",
+      "languages": [
+        "vbnet"
+      ]
+    },
+    {
+      "formatter": "cfformat",
+      "install_kind": "with_lang_toolchain",
+      "install": "源码构建（Rust 0.3.x，新）",
+      "languages": [
+        "cfml"
+      ]
+    },
+    {
+      "formatter": "clang-format",
+      "install_kind": "with_lang_toolchain",
+      "install": "brew install llvm / Xcode CLT",
+      "languages": [
+        "c",
+        "cpp",
+        "cuda",
+        "metal",
+        "objc",
+        "protobuf"
+      ]
+    },
+    {
+      "formatter": "cljfmt",
+      "install_kind": "brew",
+      "install": "brew install cljfmt",
+      "languages": [
+        "clojure"
+      ]
+    },
+    {
+      "formatter": "crystal",
+      "install_kind": "with_lang_toolchain",
+      "install": "Crystal 安装",
+      "languages": [
+        "crystal"
+      ]
+    },
+    {
+      "formatter": "csharpier",
+      "install_kind": "ecosystem",
+      "install": "dotnet tool install -g csharpier",
+      "languages": [
+        "csharp"
+      ]
+    },
+    {
+      "formatter": "dart",
+      "install_kind": "with_lang_toolchain",
+      "install": "Dart SDK",
+      "languages": [
+        "dart"
+      ]
+    },
+    {
+      "formatter": "dprint",
+      "install_kind": "ecosystem",
+      "install": "brew install dprint",
+      "languages": [
+        "dockerfile"
+      ]
+    },
+    {
+      "formatter": "erlfmt",
+      "install_kind": "ecosystem",
+      "install": "brew install erlfmt",
+      "languages": [
+        "erlang"
+      ]
+    },
+    {
+      "formatter": "fantomas",
+      "install_kind": "ecosystem",
+      "install": "dotnet tool install -g fantomas",
+      "languages": [
+        "fsharp"
+      ]
+    },
+    {
+      "formatter": "forge",
+      "install_kind": "ecosystem",
+      "install": "foundryup",
+      "languages": [
+        "solidity"
+      ]
+    },
+    {
+      "formatter": "fourmolu",
+      "install_kind": "ecosystem",
+      "install": "cargo install fourmolu",
+      "languages": [
+        "haskell"
+      ]
+    },
+    {
+      "formatter": "gofmt",
+      "install_kind": "with_lang_toolchain",
+      "install": "Go SDK 自带",
+      "languages": [
+        "go"
+      ]
+    },
+    {
+      "formatter": "google-java-format",
+      "install_kind": "brew",
+      "install": "brew install google-java-format",
+      "languages": [
+        "java"
+      ]
+    },
+    {
+      "formatter": "julia",
+      "install_kind": "ecosystem",
+      "install": "Julia + JuliaFormatter.jl",
+      "languages": [
+        "julia"
+      ]
+    },
+    {
+      "formatter": "ktlint",
+      "install_kind": "brew",
+      "install": "brew install ktlint",
+      "languages": [
+        "kotlin"
+      ]
+    },
+    {
+      "formatter": "mix",
+      "install_kind": "with_lang_toolchain",
+      "install": "Elixir/Erlang",
+      "languages": [
+        "elixir"
+      ]
+    },
+    {
+      "formatter": "nixpkgs-fmt",
+      "install_kind": "ecosystem",
+      "install": "cargo install nixpkgs-fmt",
+      "languages": [
+        "nix"
+      ]
+    },
+    {
+      "formatter": "node",
+      "install_kind": "ecosystem",
+      "install": "npm i -D @ohos-rs/oxk",
+      "languages": [
+        "arkts",
+        "groovy",
+        "liquid"
+      ]
+    },
+    {
+      "formatter": "nph",
+      "install_kind": "with_lang_toolchain",
+      "install": "源码构建（Go 实现，brew 未收录）",
+      "languages": [
+        "nim"
+      ]
+    },
+    {
+      "formatter": "ocamlformat",
+      "install_kind": "with_lang_toolchain",
+      "install": "opam install ocamlformat",
+      "languages": [
+        "ocaml"
+      ]
+    },
+    {
+      "formatter": "pasfmt",
+      "install_kind": "ecosystem",
+      "install": "cargo install --locked --git https://github.com/integrated-application-development/pasfmt",
+      "languages": [
+        "pascal"
+      ]
+    },
+    {
+      "formatter": "prettier",
+      "install_kind": "brew",
+      "install": "brew install prettier",
+      "languages": [
+        "astro",
+        "css",
+        "graphql",
+        "html",
+        "markdown",
+        "svelte",
+        "typescript",
+        "vue",
+        "yaml"
+      ]
+    },
+    {
+      "formatter": "pwsh",
+      "install_kind": "ecosystem",
+      "install": "brew install --cask powershell",
+      "languages": [
+        "powershell"
+      ]
+    },
+    {
+      "formatter": "ruff",
+      "install_kind": "ecosystem",
+      "install": "pipx install ruff 或 pip install ruff",
+      "languages": [
+        "python"
+      ]
+    },
+    {
+      "formatter": "rustfmt",
+      "install_kind": "with_lang_toolchain",
+      "install": "rustup component add rustfmt",
+      "languages": [
+        "rust"
+      ]
+    },
+    {
+      "formatter": "scalafmt",
+      "install_kind": "ecosystem",
+      "install": "Maven com.geirsson:scalafmt-cli",
+      "languages": [
+        "scala"
+      ]
+    },
+    {
+      "formatter": "sh",
+      "install_kind": "ecosystem",
+      "install": "系统自带",
+      "languages": [
+        "cobol",
+        "elm",
+        "perl",
+        "php",
+        "ruby"
+      ]
+    },
+    {
+      "formatter": "shfmt",
+      "install_kind": "ecosystem",
+      "install": "brew install shfmt",
+      "languages": [
+        "shell"
+      ]
+    },
+    {
+      "formatter": "sqlfluff",
+      "install_kind": "brew",
+      "install": "brew install sqlfluff",
+      "languages": [
+        "sql"
+      ]
+    },
+    {
+      "formatter": "stylua",
+      "install_kind": "ecosystem",
+      "install": "brew install stylua",
+      "languages": [
+        "lua",
+        "luau"
+      ]
+    },
+    {
+      "formatter": "swift-format",
+      "install_kind": "brew",
+      "install": "brew install swift-format",
+      "languages": [
+        "swift"
+      ]
+    },
+    {
+      "formatter": "taplo",
+      "install_kind": "ecosystem",
+      "install": "brew install taplo",
+      "languages": [
+        "toml"
+      ]
+    },
+    {
+      "formatter": "terraform",
+      "install_kind": "ecosystem",
+      "install": "brew install hashicorp/tap/terraform",
+      "languages": [
+        "terraform"
+      ]
+    },
+    {
+      "formatter": "yaml",
+      "install_kind": "routed",
+      "install": "无专属格式化器，归口目标通道执行",
+      "languages": [
+        "ansible"
+      ]
+    },
+    {
+      "formatter": "zig",
+      "install_kind": "with_lang_toolchain",
+      "install": "Zig SDK",
+      "languages": [
+        "zig"
+      ]
+    }
+  ]
+}

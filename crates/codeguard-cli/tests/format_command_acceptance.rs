@@ -535,3 +535,61 @@ fn format_gate_scope_accounting_is_complete_and_auditable() {
         "口径声明的已接入集合必须与 format list 实际输出逐字一致"
     );
 }
+
+/// 工具清单必须与格式化档案一致：每个已接入语言都能查到安装方式。
+///
+/// 门禁不安装工具（见 rulepacks/format_toolchain.json 的 policy 字段），
+/// 因此「这个语言的工具从哪来」必须有机器可读的答案；
+/// 缺答案意味着真实环境无法准备，门禁会永远停在 formatter_not_found。
+#[test]
+fn every_integrated_language_has_declared_tool_install() {
+    let profiles: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../rulepacks/format_profiles.json"
+    ))
+    .expect("format_profiles.json 应可解析");
+    let toolchain: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../rulepacks/format_toolchain.json"
+    ))
+    .expect("format_toolchain.json 应可解析");
+
+    // 门禁不安装工具：这是安全与可复现性的前提，必须留在文件里
+    let policy = toolchain["policy"].as_str().unwrap_or("");
+    assert!(
+        policy.contains("不安装"),
+        "工具清单必须显式声明「codeguard 不安装任何工具」——这是安全与可复现性前提"
+    );
+
+    let mut declared: Vec<&str> = Vec::new();
+    for tool in toolchain["tools"].as_array().expect("tools 列表") {
+        for language in tool["languages"].as_array().map(Vec::as_slice).unwrap_or(&[]) {
+            if let Some(name) = language.as_str() {
+                declared.push(name);
+            }
+        }
+    }
+
+    for row in profiles["languages"].as_array().unwrap() {
+        if row["status"] != "integrated" {
+            continue;
+        }
+        let language = row["language"].as_str().unwrap();
+        assert!(
+            declared.contains(&language),
+            "{language} 已接入格式化门禁，但工具清单里没有它的安装方式——\
+真实环境无法准备，该语言的门禁会永远停在 formatter_not_found"
+        );
+    }
+
+    // 清单自身必须完整：每个工具都要有安装方式（归口条目除外）
+    for tool in toolchain["tools"].as_array().unwrap() {
+        let kind = tool["install_kind"].as_str().unwrap_or("");
+        if kind == "routed" {
+            continue;
+        }
+        assert!(
+            tool["install"].as_str().is_some_and(|i| !i.trim().is_empty()),
+            "工具 {} 缺少安装方式声明",
+            tool["formatter"].as_str().unwrap_or("?")
+        );
+    }
+}
