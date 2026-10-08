@@ -448,3 +448,88 @@ fn which(name: &str) -> Option<String> {
         .find(|candidate| candidate.is_file())
         .map(|p| p.to_string_lossy().to_string())
 }
+
+/// 解析探测能力必须如实披露。
+///
+/// 多数格式化器对**无法解析的源码静默放行**（退 0）：实测 nixpkgs-fmt、erlfmt、
+/// clang-format 处理残缺 `.proto` 均如此。若门禁对此不声明，调用方会把
+/// 「风格达标」误读为「源码有效」。因此报告必须区分：
+///   syntax_verified = true  → 该轮所有语言都做了第二遍解析探测
+///   syntax_verified = false → 至少一种语言无法识别损坏源码，allow 只代表风格达标
+#[test]
+fn syntax_verification_capability_is_disclosed() {
+    let dir = ensure_clean_dir("cg-syntax-capability");
+
+    // 随机路径下两种情形都要给出可判定结果
+    for language in ["c", "nix"] {
+        let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args(["format", "check", language, dir.to_str().unwrap(), "--format=json"])
+            .output()
+            .expect("无法运行 codeguard format check");
+        let report: serde_json::Value =
+            serde_json::from_slice(&output.stdout).expect("JSON 解析失败");
+
+        // 顶层必须显式声明语法是否已验证
+        assert!(
+            report["syntax_verified"].is_boolean(),
+            "{language} 报告缺 syntax_verified 声明——调用方无法判断 allow 是否代表源码有效"
+        );
+        // 必须给出可操作的说明
+        let note = report["syntax_verification_note"].as_str().unwrap_or("");
+        assert!(
+            note.contains("allow") && note.contains("不代表"),
+            "{language} 的 syntax_verification_note 应说明 allow 的确切含义"
+        );
+        // 逐语言必须投影探测能力
+        let row = &report["languages"].as_array().unwrap()[0];
+        assert!(
+            row["unparsable_detection"].is_string(),
+            "{language} 未投影 unparsable_detection"
+        );
+    }
+
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+/// 声明支持解析探测的语言，损坏源码必须降级而非放行。
+#[test]
+fn languages_claiming_parse_detection_reject_unparsable_sources() {
+    let clang_format = std::env::var("CODEGUARD_TEST_CLANG_FORMAT")
+        .ok()
+        .or_else(|| which("clang-format"));
+    let Some(clang_format) = clang_format else {
+        eprintln!("clang-format 不可用，跳过");
+        return;
+    };
+
+    // 只取档案声明了 clang_format_xml 的语言，且样本是 C 系语法
+    let dir = ensure_clean_dir("cg-parse-claim");
+    for (language, file, body) in [
+        ("c", "b.c", "int main( {\n"),
+        ("cpp", "b.cpp", "int main( {\n"),
+        ("cuda", "b.cu", "__global__ void k( {\n"),
+    ] {
+        std::fs::write(dir.join(file), body).unwrap();
+        let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args([
+                "format", "check", language, dir.to_str().unwrap(),
+                "--tool", &format!("clang-format={clang_format}"),
+                "--format=json",
+            ])
+            .output()
+            .expect("无法运行 codeguard format check");
+        let report: serde_json::Value = serde_json::from_slice(&output.stdout).expect("JSON 解析失败");
+
+        // 声明了探测能力，就必须真的拦得住
+        assert_eq!(
+            report["languages"][0]["unparsable_detection"], "clang_format_xml",
+            "{language} 应声明 clang_format_xml 探测能力"
+        );
+        assert_ne!(
+            report["delivery_decision"].as_str().unwrap_or(""),
+            "allow",
+            "{language} 声明了解析探测能力，却把损坏源码判为合规"
+        );
+    }
+    let _ = std::fs::remove_dir_all(&dir);
+}
