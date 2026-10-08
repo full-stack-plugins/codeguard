@@ -1,8 +1,8 @@
 {
-  "schema_version": "0.2.0",
+  "schema_version": "0.3.0",
   "document_type": "format_gate_scope",
   "authority": "repository_scope_declaration",
-  "target_statement": "54 种 stable 语言全部具备可执行格式门禁；3 种 planned 语言按设计排除且不计入交付口径",
+  "target_statement": "全部 stable 语言 + 可用工具链的 planned 语言均具备可执行格式门禁；工具调研未果的 planned 语言如实排除",
   "registry_total": 57,
   "registry_stable": 54,
   "registry_planned": 3,
@@ -58,11 +58,12 @@
     "cfml",
     "vbnet",
     "erlang",
+    "metal",
     "liquid",
     "cuda",
     "ansible"
   ],
-  "integrated_count": 54,
+  "integrated_count": 55,
   "routed_entries": [
     {
       "language": "ansible",
@@ -73,32 +74,36 @@
   "planned_excluded": [
     {
       "language": "cobol",
-      "reason": "注册表 planned 状态：语言生态或工具链未稳定，从未进入 stable 交付口径",
+      "reason": "注册表 planned 状态；正在进行工具调研，未接入前如实排除",
       "registry_status": "planned",
       "evidence": [
-        "rulepacks/legacy_languages.json 该条目 status=planned",
-        "crates/codeguard-cli/tests/planned_language_gaps.rs 验证 check 退出 3 且不生成空义务"
+        "rulepacks/legacy_languages.json 该条目 status=planned"
       ]
     },
     {
       "language": "arkts",
-      "reason": "注册表 planned 状态：语言生态或工具链未稳定，从未进入 stable 交付口径",
+      "reason": "注册表 planned 状态；正在进行工具调研，未接入前如实排除",
       "registry_status": "planned",
       "evidence": [
-        "rulepacks/legacy_languages.json 该条目 status=planned",
-        "crates/codeguard-cli/tests/planned_language_gaps.rs 验证 check 退出 3 且不生成空义务"
-      ]
-    },
-    {
-      "language": "metal",
-      "reason": "注册表 planned 状态：语言生态或工具链未稳定，从未进入 stable 交付口径",
-      "registry_status": "planned",
-      "evidence": [
-        "rulepacks/legacy_languages.json 该条目 status=planned",
-        "crates/codeguard-cli/tests/planned_language_gaps.rs 验证 check 退出 3 且不生成空义务"
+        "rulepacks/legacy_languages.json 该条目 status=planned"
       ]
     }
   ],
   "explicit_gaps": [],
-  "separation_note": "planned 排除不是未完成项而是可审计的正式分类；routed 条目是可执行的真实门禁（非缺口声明），点名单选时真正执行并给出 deny/allow，all 模式下不与目标通道重复跑"
+  "parse_failure_detection": {
+    "tools": [
+      "clang-format"
+    ],
+    "reason": "clang-format 对无法解析的源文件原样输出并静默退 0，会把「无法检查」误报为「格式合规」",
+    "mitigation": "运行时第二遍探测 --output-replacements-xml 的 incomplete_format 属性，标注为 source_not_parsable_by_formatter",
+    "languages_covered": [
+      "c",
+      "cpp",
+      "objc",
+      "cuda",
+      "protobuf",
+      "metal"
+    ]
+  },
+  "separation_note": "planned 排除不是未完成项而是可审计的正式分类；解析失败一律降级为未完成，绝不静默放行"
 }

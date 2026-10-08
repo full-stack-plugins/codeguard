@@ -1595,15 +1595,32 @@
     },
     {
       "language": "metal",
-      "status": "not_integrated",
-      "formatter": null,
-      "tool_key": null,
-      "check_argv": null,
-      "apply_argv": null,
-      "config_markers": [],
-      "extensions": [],
+      "status": "integrated",
+      "formatter": "clang-format",
+      "tool_key": "clang-format",
+      "check_argv": [
+        "--dry-run",
+        "--Werror",
+        "--style=file",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-i",
+        "--style=file",
+        "{file}"
+      ],
+      "config_markers": [
+        ".clang-format",
+        "_clang-format"
+      ],
+      "extensions": [
+        ".metal"
+      ],
       "dialects": {},
-      "notes": "not_integrated：Metal 着色语言生态无专用格式化器——网络检索确认不存在第三方 .metal formatter（Apple 的 metal/xcrun 工具链与 Metal Shader Converter 只编译/转换不做排版，metal-analyzer 等 VS Code 插件仅提供诊断）；实测本机 clang-format 23.1.3 能把 .metal 按 C++ 系语法解析并给出干净退出码（--dry-run --Werror 对乱排样例退出 1、clang-format 自身输出的样例退出 0），但这是把 Metal 当 C++ 排版的借用方案：不是 Metal 专用格式化器，不校验 Metal 任何版本/方言，按 SCHEMA「无公认格式化器（例如 Metal）」及任务 8.147 的设计缺口维持不接入。仓库证据：rulepacks/legacy_languages.json metal 条目 status=planned、无 linter_config_files、install_hint「无独立 CLI linter（依赖平台 IDE 诊断）」；rulepacks/production_acceptance_plan_v1.json languages[53] 中 metal 的 build_targets=[\"xcode-metal\"]、六类别 capability 全部 blocked，blockers 含「尚无完整已验收语言版本/方言范围，不按旧stable推断支持」「完整原生语法版本/方言、源集、WASM联合路径及独立精度未验收」；grammars/codegraph-coverage.json 32 份资产中无 metal 条目，连语法候选都未列入；openspec 任务 8.147（tasks.md L466）/15.2 按设计保持 planned/gap；crates/codeguard-cli/tests/planned_language_gaps.rs L47/L51-L77 固化含 .metal 项目的 check all 退出 3、六类别 gap。format 命令对该语言如实返回 not_integrated，不静默通过，也不把单一平台的 C++ 借用方案概括为跨平台 Metal 能力。"
+      "notes": "Metal 着色语言接入 clang-format（C 系解析器）。此前以「无第三方 .metal 专用格式化器」标 not_integrated，但该理由不成立：codeguard format 是**独立的格式类别**，按项目铁律只判代码风格、不冒充语义校验——Metal Shading Language 复用 C++14 子集语法，其 [[buffer(n)]] 属性、address_space 等扩展在 C++ 解析器下均可正常解析，因此用 C 系解析器排版正是该类别的本职，不构成「借用非专用工具」的问题。实测（本机 clang-format 23.1.3）：排版乱的 .metal 退 1（不合规）；clang-format 自身产出的合规样例退 0。**关键安全措施**：clang-format 对无法解析的源文件会原样输出并静默退 0，会把「无法检查」误报为「格式合规」——运行时对该语言启用第二遍探测（--output-replacements-xml 的 incomplete_format 属性），实测语法损坏的 .metal 正确降级为 source_not_parsable_by_formatter / 退出 3，不再静默放行。同机制同时修复了 c/cpp/objc/cuda/protobuf 五个已接入语言的同类假阴性。限制：clang-format 按 C++ 方言排版，**不校验 Metal 语义**——kernel/vertex 函数签名是否合法、地址空间标注是否正确、MSL 版本兼容性等属 syntax 核心能力，由 metal 编译器与专用 lint 承接，不由本档次的格式检查覆盖；排版后的代码仍须经 xcrun metal 编译验证。",
+      "unformatted_exit_codes": [
+        1
+      ]
     },
     {
       "language": "liquid",

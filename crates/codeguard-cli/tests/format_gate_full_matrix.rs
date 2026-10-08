@@ -79,6 +79,11 @@ const SAMPLES: &[Sample] = &[
     Sample { language: "vbnet", file: "A.vb", body: "Module  A\nEnd  Module\n" },
     Sample { language: "erlang", file: "a.erl", body: "-module(a).\n-export([f/0]).\nf()  ->  ok.\n" },
     Sample { language: "cuda", file: "a.cu", body: "__global__  void  k( )  { }\n" },
+    Sample {
+        language: "metal",
+        file: "a.metal",
+        body: "#include <metal_stdlib>\nusing namespace metal;\nkernel void k( device float *o [[buffer(0)]], uint g [[thread_position_in_grid]] )  {\n  o[g] = 1.0f;\n}\n",
+    },
     Sample { language: "liquid", file: "a.liquid", body: "{%% assign  x  =  1 %%}\n{{  x  }}\n" },
     // 路由条目：ansible 无专属格式化器，归口 yaml 通道执行
     Sample { language: "ansible", file: "playbook.yml", body: "---\n- name:   A\n  hosts:   all\n  tasks:  []\n" },
@@ -120,7 +125,16 @@ fn all_stable_languages_produce_verifiable_gate_decisions() {
             "{language} 是已接入的 stable 语言但端到端样本缺失——门禁语义将无人验证"
         );
     }
-    assert_eq!(stable.len(), 54, "口径声明应有 54 种 stable 语言");
+    // 覆盖全部已接入语言（含 stable 与可用工具链的 planned），数量跟随口径声明
+    assert_eq!(
+        stable.len() as u64,
+        scope["integrated_count"].as_u64().expect("integrated_count"),
+        "样本覆盖数必须等于口径声明的已接入数"
+    );
+    assert!(
+        stable.len() as u64 >= 54,
+        "全部 54 种 stable 语言必须纳入矩阵覆盖"
+    );
 
     let mut with_tool = 0usize;
     let mut degraded = 0usize;
@@ -341,4 +355,79 @@ fn format_all_does_not_duplicate_routed_entries() {
     );
 
     let _ = std::fs::remove_dir_all(&dir);
+}
+
+/// 解析失败检测：clang-format 对无法解析的源文件会静默退 0，
+/// 运行时必须用第二遍探测（--output-replacements-xml）把它降级为未完成。
+///
+/// 这不是假设——是实测到的真实缺陷：clang-format 遇到解析失败会原样输出并返回成功，
+/// 于是损坏的 C/C++/CUDA/proto/ObjC/Metal 源码会被误报为「格式合规」。
+#[test]
+fn unparsable_source_is_never_reported_as_compliant() {
+    let clang_format = std::env::var("CODEGUARD_TEST_CLANG_FORMAT")
+        .ok()
+        .or_else(|| which("clang-format"));
+    let Some(clang_format) = clang_format else {
+        eprintln!("clang-format 不可用，跳过解析失败检测断言");
+        return;
+    };
+
+    // clang-format 系语言各测一个损坏样本
+    for (language, file, body) in [
+        ("c", "broken.c", "int main( {\n  return 0;\n}\n"),
+        ("cpp", "broken.cpp", "int main( {\n  return 0;\n}\n"),
+        ("metal", "broken.metal", "#include <metal_stdlib>\nkernel void k( {\n"),
+        ("cuda", "broken.cu", "__global__ void k( {\n"),
+    ] {
+        let dir = ensure_clean_dir(&format!("cg-unparsable-{language}"));
+        std::fs::write(dir.join(file), body).unwrap();
+
+        let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args([
+                "format",
+                "check",
+                language,
+                dir.to_str().unwrap(),
+                "--tool",
+                &format!("clang-format={clang_format}"),
+                "--format=json",
+            ])
+            .output()
+            .expect("无法运行 codeguard format check");
+        let report: serde_json::Value = serde_json::from_slice(&output.stdout).expect("JSON 解析失败");
+
+        // 核心断言：损坏文件绝不能被判为 allow
+        assert_ne!(
+            report["delivery_decision"].as_str().unwrap_or(""),
+            "allow",
+            "{language} 的语法损坏文件被判为格式合规——解析失败检测失效"
+        );
+        assert_eq!(
+            report["exit_code"], 3,
+            "{language} 解析失败应退出 3（未完成），实际 {}",
+            report["exit_code"]
+        );
+        assert_eq!(
+            output.status.code(),
+            Some(3),
+            "{language} 解析失败应退出 3"
+        );
+
+        // 且原因应可归因
+        let reason = report["languages"][0]["reason"].as_str().unwrap_or("");
+        assert!(
+            reason == "source_not_parsable_by_formatter" || reason == "formatter_execution_failed",
+            "{language} 解析失败原因应可归因，实际 {reason:?}"
+        );
+
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+}
+
+fn which(name: &str) -> Option<String> {
+    let path = std::env::var_os("PATH")?;
+    std::env::split_paths(&path)
+        .map(|dir| dir.join(name))
+        .find(|candidate| candidate.is_file())
+        .map(|p| p.to_string_lossy().to_string())
 }
