@@ -85,6 +85,11 @@ const SAMPLES: &[Sample] = &[
         body: "#include <metal_stdlib>\nusing namespace metal;\nkernel void k( device float *o [[buffer(0)]], uint g [[thread_position_in_grid]] )  {\n  o[g] = 1.0f;\n}\n",
     },
     Sample { language: "liquid", file: "a.liquid", body: "{%% assign  x  =  1 %%}\n{{  x  }}\n" },
+    Sample {
+        language: "arkts",
+        file: "Index.ets",
+        body: "@Entry\n@Component\nstruct   Index   {\n  @State   message:string='hi';\n  build( )  { }\n}\n",
+    },
     // 路由条目：ansible 无专属格式化器，归口 yaml 通道执行
     Sample { language: "ansible", file: "playbook.yml", body: "---\n- name:   A\n  hosts:   all\n  tasks:  []\n" },
 ];

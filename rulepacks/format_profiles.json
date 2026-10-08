@@ -1583,15 +1583,32 @@
     },
     {
       "language": "arkts",
-      "status": "not_integrated",
-      "formatter": null,
-      "tool_key": null,
-      "check_argv": null,
-      "apply_argv": null,
+      "status": "integrated",
+      "formatter": "node",
+      "tool_key": "node",
+      "check_argv": [
+        "-e",
+        "const fs=require(\"node:fs\"),path=require(\"node:path\"),m=require(\"node:module\");\n(async()=>{\ntry{\nconst mode=process.argv[1];\nconst file=path.resolve(process.argv[2]);\nif(!fs.existsSync(file)){console.error(\"file not found: \"+file);process.exit(2);}\nconst req=m.createRequire(path.join(path.dirname(file),\"a.js\"));\nlet oxkPath;\ntry{oxkPath=req.resolve(\"@ohos-rs/oxk/format\");}catch(e){console.error(\"@ohos-rs/oxk not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\nconst oxk=req(oxkPath);\nconst src=fs.readFileSync(file,\"utf8\");\nlet result;\ntry{result=await oxk.format(file,src,{});}catch(e){console.error(\"oxk format error: file left untouched, \"+e.message);process.exit(2);}\nconst errors=(result&&result.errors)||[];\nif(errors.length>0){console.error(\"arkts parse error: file left untouched, \"+errors.join(\"; \"));process.exit(2);}\nconst out=result.code;\nif(mode===\"apply\"){if(out!==src){fs.writeFileSync(file,out);}process.exit(0);}\nprocess.exit(out===src?0:1);\n}catch(e){console.error(\"wrapper error: \"+(e&&e.message));process.exit(2);}\n})();",
+        "check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-e",
+        "const fs=require(\"node:fs\"),path=require(\"node:path\"),m=require(\"node:module\");\n(async()=>{\ntry{\nconst mode=process.argv[1];\nconst file=path.resolve(process.argv[2]);\nif(!fs.existsSync(file)){console.error(\"file not found: \"+file);process.exit(2);}\nconst req=m.createRequire(path.join(path.dirname(file),\"a.js\"));\nlet oxkPath;\ntry{oxkPath=req.resolve(\"@ohos-rs/oxk/format\");}catch(e){console.error(\"@ohos-rs/oxk not resolvable from \"+file+\" (install it as project devDependency): \"+e.message);process.exit(2);}\nconst oxk=req(oxkPath);\nconst src=fs.readFileSync(file,\"utf8\");\nlet result;\ntry{result=await oxk.format(file,src,{});}catch(e){console.error(\"oxk format error: file left untouched, \"+e.message);process.exit(2);}\nconst errors=(result&&result.errors)||[];\nif(errors.length>0){console.error(\"arkts parse error: file left untouched, \"+errors.join(\"; \"));process.exit(2);}\nconst out=result.code;\nif(mode===\"apply\"){if(out!==src){fs.writeFileSync(file,out);}process.exit(0);}\nprocess.exit(out===src?0:1);\n}catch(e){console.error(\"wrapper error: \"+(e&&e.message));process.exit(2);}\n})();",
+        "apply",
+        "{file}"
+      ],
       "config_markers": [],
-      "extensions": [],
-      "dialects": {},
-      "notes": "not_integrated：ArkTS（HarmonyOS）无独立 CLI 格式化器——实测 prettier 3.x --parser typescript 对典型 ArkTS UI 声明（@Entry/@Component struct Index{build(){...}}）报 SyntaxError「Declaration expected」退出 2（struct 组件声明不是合法 TS 语法，而 UI struct 文件恰是该语言主体），仅纯 TS 风格 .ets 模型类可被格式化，覆盖不完整；npm registry 检索 ets-formatter/arkts-formatter/@ohos/ets-formatter 均 404，官方 codelinter 是 lint 工具且经 DevEco command-line-tools 分发，DevEco Studio 的代码格式化仅存在于 IDE 内，均无可用 CLI formatter。仓库阻塞维持：rulepacks/legacy_languages.json arkts 条目 status=planned、无 linter_config_files、install_hint「无独立 CLI linter（依赖平台 IDE 诊断）」；tests/acceptance/arkts-nix-terraform-grammar-candidates.md 记录 tree-sitter-arkts@0.2.0 候选观察通过但 grammar_qualified=false；openspec 任务 8.146（tasks.md L465）与 14.19/15.2 按设计保持 planned/gap；crates/codeguard-cli/tests/planned_language_gaps.rs L47/L51-L77 固化含 .ets 项目的 check all 退出 3、六类别 gap。format 命令对该语言如实返回 not_integrated，不静默通过，也不检查注释完整性与开发规范。"
+      "extensions": [
+        ".ets"
+      ],
+      "dialects": {
+        "oxk": "0.9.0"
+      },
+      "unformatted_exit_codes": [
+        1
+      ],
+      "notes": "integrated：ArkTS 专用格式化器 @ohos-rs/oxk（基于 OXC/oxc 的 Rust 解析器，实测 0.9.0，npm 安装即得，原生解析 .ets 的 ArkTS 语法——@Entry/@Component/struct/build 链式调用/@State/@Prop/@Link/@Watch/@Observed/@Extend/@Styles/@Builder/ForEach/LazyForEach/$r() 资源/as 断言均已实测正确排版、不丢码），但它是 node 包而非独立可执行文件，故经 node -e 包装调用，formatter/tool_key 为 node。不能直接用 prettier：实测 prettier 3.9.9 --parser typescript 对 @Component struct 报 SyntaxError（Declaration expected，struct 非 TS 语法而 UI struct 是该语言主体），npm 亦无 prettier-plugin-arkts/ets；华为官方链路均无可用 CLI 格式化入口：codelinter（command-line-tools 内）只做 lint 检查无 format 子命令，DevEco Studio 格式化是 IDE/LSP 内部能力，@arkts/language-server/@arkts/language-service（ohosvscode）为 Volar LSP 包无单文件 CLI，tree-sitter-arkts 只是语法不是格式化器。oxk 的 CLI（oxk format）默认就地改写且无 --check/--write 之分的只读模式，不能充当 check，且 CLI 读项目 .oxfmtrc.json 而单文件 API 不读——为保 check/apply 判定一致，两者统一走本 wrapper 的内置默认风格（双引号、分号、2 空格缩进、链式调用收拢到收尾花括号），故 config_markers 为空。前置条件：被检文件所在项目（沿目录向上含 monorepo 根）须安装 @ohos-rs/oxk 为 devDependency，解析失败退 2 工具故障、绝不静默放行（check/apply 实测均退 2 且文件不动）。check 经 createRequire 加载其 format API 在内存中排版并与源码逐字对比：退出 0=合规（stdout 静默，已实测 md5 不变）、1=需格式化、2=ArkTS 解析错误（errors 非空）/依赖缺失/文件不可读——三态全实测，语法损坏的 struct 代码不会被误判合规。apply 用同一 API 排版后仅在结果不同才写回：退出 0=成功，解析错误退 2 且不落盘（实测破损文件字节不变，无写半截风险），重复 apply 幂等（实测二次 apply md5 不变、复检 0）。unformatted_exit_codes=[1] 为标准 B 类。限制：只排版不检查 ArkTS 语言违例（arkts-no-any 等约束归 lint 类别，不冒充）；不读 .oxfmtrc.json 项目配置，风格固定为 oxk 内置默认，与 DevEco 默认风格不尽相同；空文件/仅注释文件判合规；带 BOM 文件判不合规且 apply 会去 BOM；纯 TS 语法文件（无 struct）同样按 TS 规则排版；oxk 0.9.0 发布不久，若升级需复测退出码三态。"
     },
     {
       "language": "metal",
@@ -1708,7 +1725,7 @@
         ".yaml"
       ],
       "dialects": {},
-      "notes": "Ansible 无专属格式化器，本条目是**可执行的路由条目**而非缺口声明：ansible playbook 本质是 YAML，排版复用 yaml 通道的 prettier（check=--list-different / apply=--write），使 `codeguard format check ansible <path>` 真正执行并给出 deny/allow 判定。执行语义：点名单选 ansible 时路由到 yaml 档案执行，报告同时给出 routed_from=ansible、routed_to=yaml；`format check all` 时不重复执行——目标通道已在同一轮被检查，再跑一次会重复格式化同一批 .yml/.yaml，并可能在两侧配置漂移时产生互相矛盾的风格判定。实测否决 ansible-lint 26.9.0 作为本通道格式化器：①其 yaml 规则违规与 YAML 解析错误同为退出 2（--format json 下同为 load-failure[yaml]），无法在退出码层面区分「需格式化」与「文件损坏」，会静默把损坏 playbook 误判为需重排；②--fix 只要残留 fqcn、name[casing] 等语义违规即恒退 2，不存在「修完即退 0」的调用形态，无法满足 apply 契约。限制：归口通道只处理版面，不校验 playbook 语义（FQCN、命名、任务结构等属 lint 类别，由 ansible-lint 承接）；playbook 特有约定（如是否需要 `---` 起始标记）不在本档职责内。",
+      "notes": "Ansible 无专属格式化器，按项目既有架构决策归口 yaml 通道——rulepacks/legacy_languages.json 的 ansible 条目自身即写明：extensions 为空数组、install_hint 为「playbook 检查由 ansible-lint 承接（yaml 通道）」、markers 含 playbook.yml。Ansible playbook 本质是 YAML，其排版由 format_profiles.json 的 yaml 条目（prettier --list-different）统一处理，因此 **不重复声明第二条 ansible 通道**：同一批 .yml/.yaml 若被两个语言条目各跑一次，既浪费预算又可能在配置漂移时产生互相矛盾的风格判定。实测否决 ansible-lint 作为格式化器：ansible-lint 26.9.0 的 --fix / --fix=yaml / --fix=none 三种形态都会重排 YAML，但只要残留 fqcn、name[casing] 等语义违规就一律退 2，不存在「修完即退 0」的调用形态，无法满足 apply 的「退出 0 = 成功」契约；其 --tags yaml 只读检查虽退 0/2，但 2 与 YAML 解析错误同码，损坏文件会被误报为需格式化（实测 broken.yml 确认）。结论：ansible 不提供独立 format 通道，其文件已由 yaml 通道覆盖，属显式架构归口而非未完成项。语义级检查（ansible-lint 规则）属 lint 类别，不在本档案职责内。",
       "routed_to": "yaml",
       "unformatted_exit_codes": [
         1
