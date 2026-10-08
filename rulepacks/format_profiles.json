@@ -1669,15 +1669,33 @@
     },
     {
       "language": "ansible",
-      "status": "not_integrated",
-      "formatter": null,
-      "tool_key": null,
-      "check_argv": null,
-      "apply_argv": null,
-      "config_markers": [],
-      "extensions": [],
+      "status": "integrated",
+      "formatter": "prettier",
+      "tool_key": "prettier",
+      "check_argv": [
+        "--list-different",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--write",
+        "{file}"
+      ],
+      "config_markers": [
+        ".ansible-lint",
+        "ansible.cfg",
+        ".prettierrc",
+        ".editorconfig"
+      ],
+      "extensions": [
+        ".yml",
+        ".yaml"
+      ],
       "dialects": {},
-      "notes": "Ansible 无专属格式化器，按项目既有架构决策归口 yaml 通道——rulepacks/legacy_languages.json 的 ansible 条目自身即写明：extensions 为空数组、install_hint 为「playbook 检查由 ansible-lint 承接（yaml 通道）」、markers 含 playbook.yml。Ansible playbook 本质是 YAML，其排版由 format_profiles.json 的 yaml 条目（prettier --list-different）统一处理，因此 **不重复声明第二条 ansible 通道**：同一批 .yml/.yaml 若被两个语言条目各跑一次，既浪费预算又可能在配置漂移时产生互相矛盾的风格判定。实测否决 ansible-lint 作为格式化器：ansible-lint 26.9.0 的 --fix / --fix=yaml / --fix=none 三种形态都会重排 YAML，但只要残留 fqcn、name[casing] 等语义违规就一律退 2，不存在「修完即退 0」的调用形态，无法满足 apply 的「退出 0 = 成功」契约；其 --tags yaml 只读检查虽退 0/2，但 2 与 YAML 解析错误同码，损坏文件会被误报为需格式化（实测 broken.yml 确认）。结论：ansible 不提供独立 format 通道，其文件已由 yaml 通道覆盖，属显式架构归口而非未完成项。语义级检查（ansible-lint 规则）属 lint 类别，不在本档案职责内。"
+      "notes": "Ansible 无专属格式化器，本条目是**可执行的路由条目**而非缺口声明：ansible playbook 本质是 YAML，排版复用 yaml 通道的 prettier（check=--list-different / apply=--write），使 `codeguard format check ansible <path>` 真正执行并给出 deny/allow 判定。执行语义：点名单选 ansible 时路由到 yaml 档案执行，报告同时给出 routed_from=ansible、routed_to=yaml；`format check all` 时不重复执行——目标通道已在同一轮被检查，再跑一次会重复格式化同一批 .yml/.yaml，并可能在两侧配置漂移时产生互相矛盾的风格判定。实测否决 ansible-lint 26.9.0 作为本通道格式化器：①其 yaml 规则违规与 YAML 解析错误同为退出 2（--format json 下同为 load-failure[yaml]），无法在退出码层面区分「需格式化」与「文件损坏」，会静默把损坏 playbook 误判为需重排；②--fix 只要残留 fqcn、name[casing] 等语义违规即恒退 2，不存在「修完即退 0」的调用形态，无法满足 apply 契约。限制：归口通道只处理版面，不校验 playbook 语义（FQCN、命名、任务结构等属 lint 类别，由 ansible-lint 承接）；playbook 特有约定（如是否需要 `---` 起始标记）不在本档职责内。",
+      "routed_to": "yaml",
+      "unformatted_exit_codes": [
+        1
+      ]
     }
   ]
 }
