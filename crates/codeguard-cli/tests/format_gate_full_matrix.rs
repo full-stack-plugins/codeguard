@@ -90,6 +90,18 @@ const SAMPLES: &[Sample] = &[
         file: "Index.ets",
         body: "@Entry\n@Component\nstruct   Index   {\n  @State   message:string='hi';\n  build( )  { }\n}\n",
     },
+    Sample {
+        language: "cobol",
+        file: "HELLO.cbl",
+        body: concat!(
+            "       IDENTIFICATION DIVISION.\n",
+            "PROGRAM-ID. UGLY.\n",
+            "       PROCEDURE DIVISION.\n",
+            "       MAIN-PARA.\n",
+            "           DISPLAY \"HI\".\n",
+            "           STOP RUN.\n",
+        ),
+    },
     // 路由条目：ansible 无专属格式化器，归口 yaml 通道执行
     Sample { language: "ansible", file: "playbook.yml", body: "---\n- name:   A\n  hosts:   all\n  tasks:  []\n" },
 ];

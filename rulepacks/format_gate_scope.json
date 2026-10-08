@@ -1,8 +1,8 @@
 {
-  "schema_version": "0.4.0",
+  "schema_version": "0.5.0",
   "document_type": "format_gate_scope",
   "authority": "repository_scope_declaration",
-  "target_statement": "全部 stable 语言 + 工具链可用的 planned 语言均具备可执行格式门禁；调研未果的 planned 语言如实排除",
+  "target_statement": "全部 57 种注册语言均具备可执行格式门禁（含 3 种原 planned 语言 cobol/arkts/metal）",
   "registry_total": 57,
   "registry_stable": 54,
   "registry_planned": 3,
@@ -56,6 +56,7 @@
     "pascal",
     "r",
     "cfml",
+    "cobol",
     "vbnet",
     "erlang",
     "arkts",
@@ -64,7 +65,7 @@
     "cuda",
     "ansible"
   ],
-  "integrated_count": 56,
+  "integrated_count": 57,
   "routed_entries": [
     {
       "language": "ansible",
@@ -72,16 +73,7 @@
       "formatter": "prettier"
     }
   ],
-  "planned_excluded": [
-    {
-      "language": "cobol",
-      "reason": "注册表 planned 状态；工具调研未果前如实排除",
-      "registry_status": "planned",
-      "evidence": [
-        "rulepacks/legacy_languages.json 该条目 status=planned"
-      ]
-    }
-  ],
+  "planned_excluded": [],
   "explicit_gaps": [],
   "parse_failure_detection": {
     "tools": [
@@ -98,5 +90,15 @@
       "metal"
     ]
   },
-  "separation_note": "planned 排除不是未完成项而是可审计的正式分类；解析失败一律降级为未完成，绝不静默放行"
+  "separation_note": "planned 排除不是未完成项而是可审计的正式分类；解析失败一律降级为未完成，绝不静默放行",
+  "wrapper_entries": [
+    "arkts",
+    "cobol",
+    "groovy",
+    "julia",
+    "liquid",
+    "powershell",
+    "r",
+    "vbnet"
+  ]
 }
