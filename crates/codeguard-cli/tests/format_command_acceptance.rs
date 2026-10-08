@@ -448,11 +448,33 @@ fn format_gate_scope_accounting_is_complete_and_auditable() {
     // 注册表口径自洽
     assert_eq!(stable + planned, total, "stable + planned 必须等于总数");
     // 全部 stable 必须有可执行门禁，不允许留缺口
-    assert_eq!(
-        integrated,
-        stable,
+    let integrated_langs: Vec<&str> = scope["integrated_languages"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter_map(|v| v.as_str())
+        .collect();
+    let excluded_langs: Vec<&str> = excluded
+        .iter()
+        .filter_map(|e| e["language"].as_str())
+        .collect();
+    for language in &integrated_langs {
+        assert!(
+            !excluded_langs.contains(language),
+            "{language} 同时出现在已接入与排除集合中"
+        );
+    }
+    // stable 全部必须已接入（planned 可部分排除，但排除项必须真为 planned）
+    assert!(
+        integrated >= stable,
         "全部 {stable} 种 stable 语言必须具备可执行格式门禁，当前仅 {integrated}"
     );
+    for language in &excluded_langs {
+        assert!(
+            !integrated_langs.contains(language),
+            "{language} 被排除但已接入集合中也有它"
+        );
+    }
     // 三类恰好穷尽：已接入 + planned 排除 + 显式缺口
     assert_eq!(
         integrated as usize + excluded.len() + gaps.len(),

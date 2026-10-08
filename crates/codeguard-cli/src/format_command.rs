@@ -296,9 +296,11 @@ fn execute(args: &[String], mode: Mode) -> std::process::ExitCode {
                 total_reformatted.push(p.to_owned());
             }
         }
-        for path in result["failed"].as_array().into_iter().flatten() {
-            if let Some(p) = path.as_str() {
-                total_failed.push(p.to_owned());
+        for key in ["failed", "unparsable"] {
+            for path in result[key].as_array().into_iter().flatten() {
+                if let Some(p) = path.as_str() {
+                    total_failed.push(p.to_owned());
+                }
             }
         }
         language_results.push(json!({
@@ -471,6 +473,7 @@ fn run_language(profile: &Value, request: &Request, mode: Mode) -> Value {
         .unwrap_or_else(|| vec![1]);
 
     let mut unformatted = Vec::new();
+    let mut unparsable = Vec::new();
     let mut reformatted = Vec::new();
     let mut failed = Vec::new();
 
@@ -500,6 +503,11 @@ fn run_language(profile: &Value, request: &Request, mode: Mode) -> Value {
                 let stdout = String::from_utf8_lossy(&result.stdout);
                 if mode == Mode::Check && !stdout.trim().is_empty() {
                     unformatted.push(file.to_string_lossy().to_string());
+                } else if mode == Mode::Check && detect_unparsable(&tool, file) {
+                    // 工具对无法解析的源文件会静默退 0（clang-format 的已知行为：
+                    // 解析失败时原样输出并返回成功）。这会把「无法检查」误报成
+                    // 「格式合规」，必须用第二遍探测把它降级为未完成。
+                    unparsable.push(file.to_string_lossy().to_string());
                 } else if mode == Mode::Apply {
                     reformatted.push(file.to_string_lossy().to_string());
                 }
@@ -521,8 +529,14 @@ fn run_language(profile: &Value, request: &Request, mode: Mode) -> Value {
     }
 
     json!({
-        "status": if failed.is_empty() { "complete" } else { "incomplete" },
-        "reason": if failed.is_empty() { Value::Null } else { json!("formatter_execution_failed") },
+        "status": if failed.is_empty() && unparsable.is_empty() { "complete" } else { "incomplete" },
+        "reason": if !unparsable.is_empty() {
+            json!("source_not_parsable_by_formatter")
+        } else if failed.is_empty() {
+            Value::Null
+        } else {
+            json!("formatter_execution_failed")
+        },
         "tool_version": version,
         "tool_digest": tool_digest,
         "config_ref": config_ref,
@@ -530,7 +544,40 @@ fn run_language(profile: &Value, request: &Request, mode: Mode) -> Value {
         "unformatted": unformatted,
         "reformatted": reformatted,
         "failed": failed,
+        "unparsable": unparsable,
     })
+}
+
+/// 探测格式化器是否**静默放行**了无法解析的源文件。
+///
+/// 已知问题：clang-format 在遇到解析失败的源文件时，会原样输出内容并返回成功退出码，
+/// 于是「无法检查」被误报为「格式合规」。它只在 `--output-replacements-xml` 的
+/// `incomplete_format` 属性里如实标注 `true`。只读检查若不额外探测，
+/// 损坏的源文件（包括 Metal 着色器、CUDA 内核等借用的 C 系方言）会被静默放行。
+///
+/// 这里对已用 C 系解析器（clang-format）的语言做第二遍探测：
+/// 用与检查相同的输入跑一次 `--output-replacements-xml`，读 `incomplete_format`。
+/// 只有明确标注 `incomplete_format='true'` 才判定为不可解析；其它工具不适用此探测，
+/// 返回 false 让它们沿用自身退出码语义。
+fn detect_unparsable(tool: &Path, file: &Path) -> bool {
+    let name = tool
+        .file_name()
+        .map(|n| n.to_string_lossy().to_string())
+        .unwrap_or_default();
+    if !name.contains("clang-format") {
+        return false;
+    }
+    let probe = Command::new(tool)
+        .arg("--output-replacements-xml")
+        .arg(file)
+        .output();
+    match probe {
+        Ok(result) => {
+            let xml = String::from_utf8_lossy(&result.stdout);
+            xml.contains("incomplete_format='true'") || xml.contains("incomplete_format=\"true\"")
+        }
+        Err(_) => false,
+    }
 }
 
 fn collect_files(dir: &Path, extensions: &[&str], out: &mut Vec<PathBuf>, limit: usize) {
