@@ -28,7 +28,7 @@
 
 当前聚合结构化输出使用 `--format json`（或已支持的 SARIF）和可选 `--output PATH`，**不支持 `--report`**。保存文件时仍输出到 stdout；导出失败保留 finding，报告 `export.status=failed`，stderr 给诊断。早期参数/路径/运行错误可能无 JSON，不能假设每个错误都有报告。详见[兼容与导出契约](docs/technical-design.md#10-三代退出码与输出契约禁止静默归一化)及[历史协议指南](docs/Codeguard-Legacy-Compatibility.zh_CN.md)。
 
-GuardEngine 接入是尚未实现的增量设计。其严格 `guard.partme.ai/v1alpha1` 仅接受 GuardContract YAML、GuardFacts JSON、GuardReport JSON 和精确 `forbid_relation`，拒绝任意字段。本域 finding、工具故障和批准元数据不能直接塞入这些对象。partial facts 为 BLOCK/INDETERMINATE；complete 只表示分析器声明范围。报告不带签名，verify 重算一致性，不认证来源或授予权限。
+本地分支已实现可选 SDK 与 `guard-project` CLI 增量接入；原生 profile 仍未通过能力资格验证，不能据此宣称完整覆盖。见[实施证据](docs/implementation-progress.md)和[冻结能力映射](docs/frozen-integration-capabilities.md)。其严格 `guard.partme.ai/v1alpha1` 仅接受 GuardContract YAML、GuardFacts JSON、GuardReport JSON 和精确 `forbid_relation`，拒绝任意字段。本域 finding、工具故障和批准元数据不能直接塞入这些对象。partial facts 为 BLOCK/INDETERMINATE；complete 只表示分析器声明范围。报告不带签名，verify 重算一致性，不认证来源或授予权限。
 
 独立 [GuardRunEnvelope 草案](docs/integration-contract.md) 使用 `guard.integration/v1alpha1`，表达运行状态、不可变 candidate/base/merge-group、task/worktree 绑定、覆盖、制品摘要和经认证批准引用；当前解析器不接受。候选、政策、分析器、覆盖、批准基线变化及批准过期/撤销使受影响结果失效，晚到结果不得覆盖新候选。受保护 CI 必须复查精确合并队列候选。ALLOW 只是有范围的技术结论，不能授予合并/发布；批准不能弥补缺失分析或工具故障。本域政策仍归 CodeGuard，GuardEngine 只拥有通用契约/规则/证据机制。
 
