@@ -37,3 +37,28 @@ A separate newly authorized PR31 repair will use another worktree at958a106636ad
 ## Projection expansion review correction
 
 Independent review found first engine evaluation could expand a valid487KBnative report into23MB. Behavioral regression failed before the fix, then passed after switching to shared GuardEngine evaluate_bounded (GE11e1d86). Adapter/boundary24and native-contract36checks pass,3ignored. This bounds engine evaluation before report allocation; source/profile qualification remains absent. A separate possible relation-string multiplication during projection construction is retained for review, not claimed covered by this engine-budget fix.
+
+## Borrowed fact construction correction plan
+
+Review P2 (e15c48a) leaves tasks 1.6/2.3 partial. Reproduce the review's 96 findings
+and three 64 KiB contract relation fields with a real counting allocator, requiring
+rejection before excess relation copies. Replace prebuilt owned sources and relation
+clones with borrowed mapping lookup and shared GE FactBudget construction; retain
+bounded evaluation and unchanged native/domain evidence behavior. Update the local
+path dependency lock, run focused integration/native contract regressions and scoped
+clippy, then record exact evidence and commit locally. No native qualification,
+release pin, full-task acceptance, PR31 edits, or checkbox changes are implied.
+
+Construction regression RED measured 18,874,368 bytes in 288 actual 64 KiB
+allocations during project() (22,707-byte native report, 197,028-byte typed contract,
+96 findings). With GE c80ec32 FactBudget source-parts API, GREEN measured 8,257,536
+bytes (126 accepted copies), then rejected before excess copies. Mapping fields and
+source fragments remain borrowed until the shared budget accepts them; no owned
+source staging vector remains. Native/scope references retain their exact strings.
+Focused integration, crate-boundary, run-report, legacy and check-all contracts:
+61 passed, 3 existing pinned-Ruff-dependent tests ignored. Full native workspace
+was not rerun for this focused correction; earlier native failures remain recorded.
+Scoped clippy (`--no-deps --lib --test guard_integration_projection -- -D warnings
+-A deprecated`) passed. Unsuppressed strict clippy was blocked by the preexisting
+runtime `process_runner.rs:116` unnecessary u64 cast; existing CLI fetch_update
+deprecation is explicitly allowed only for scoped verification, with no native edit.
