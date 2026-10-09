@@ -259,3 +259,5 @@ pub mod content_identity;
 pub mod strict_cache;
 pub mod correlation_trace;
 pub mod offline_boundary_v2;
+
+pub mod private_artifact_store;

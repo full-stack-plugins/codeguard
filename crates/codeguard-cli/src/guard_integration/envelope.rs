@@ -20,6 +20,25 @@ pub struct EnvelopeOutput {
     domain: Vec<u8>,
 }
 impl EnvelopeOutput {
+    /// Only the audit module calls this after receipt, blob and engine verification.
+    pub(super) fn restore_verified(
+        envelope: GuardRunEnvelope,
+        mapping_digest: Option<String>,
+        contract: Option<Vec<u8>>,
+        facts: Option<Vec<u8>>,
+        report: Option<Vec<u8>>,
+        domain: Vec<u8>,
+    ) -> Self {
+        Self {
+            envelope,
+            mapping_digest,
+            contract,
+            facts,
+            report,
+            domain,
+        }
+    }
+
     pub fn mapping_digest(&self) -> Option<&str> {
         self.mapping_digest.as_deref()
     }

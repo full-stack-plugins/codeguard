@@ -19,3 +19,5 @@ pub mod ruff_command;
 pub mod shadow;
 
 pub mod consumer;
+
+pub mod audit;
