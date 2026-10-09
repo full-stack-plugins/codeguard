@@ -12,6 +12,7 @@ pub struct FrozenRun {
     template: GuardRunEnvelope,
 }
 pub struct EnvelopeOutput {
+    mapping_digest: Option<String>,
     envelope: GuardRunEnvelope,
     contract: Option<Vec<u8>>,
     facts: Option<Vec<u8>>,
@@ -19,6 +20,9 @@ pub struct EnvelopeOutput {
     domain: Vec<u8>,
 }
 impl EnvelopeOutput {
+    pub fn mapping_digest(&self) -> Option<&str> {
+        self.mapping_digest.as_deref()
+    }
     pub fn envelope(&self) -> &GuardRunEnvelope {
         &self.envelope
     }
@@ -152,6 +156,7 @@ impl FrozenRun {
             .map_err(|_| "engine artifact verification failed")?;
         Ok(EnvelopeOutput {
             envelope,
+            mapping_digest: Some(projection.mapping_digest),
             contract: Some(projection.contract_bytes),
             facts: Some(facts),
             report: Some(report),
@@ -215,6 +220,7 @@ impl FrozenRun {
         }
         EnvelopeOutput {
             envelope,
+            mapping_digest: None,
             contract: None,
             facts: None,
             report: None,
@@ -256,6 +262,7 @@ impl FrozenRun {
             .map_err(|_| "failed envelope validation")?;
         Ok(EnvelopeOutput {
             envelope,
+            mapping_digest: None,
             contract: None,
             facts: None,
             report: None,

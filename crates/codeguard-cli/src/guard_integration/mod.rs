@@ -17,3 +17,5 @@ pub mod ruff_profile;
 pub mod ruff_command;
 
 pub mod shadow;
+
+pub mod consumer;

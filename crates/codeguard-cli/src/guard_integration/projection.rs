@@ -8,10 +8,10 @@ use guardengine::{
     API_VERSION, AnalyzerIdentity, Completeness, GuardAssertion, GuardContract, GuardFacts,
     GuardReport, GuardSubject,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Deserialize, Serialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 pub(super) enum Source {
     Finding {
@@ -22,20 +22,38 @@ pub(super) enum Source {
         detail: String,
     },
 }
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 struct Entry {
     source: Source,
     rule_id: String,
 }
 /// Caller must obtain this mapping and the contract from protected policy, not the candidate.
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct ProtectedMapping {
     version: String,
     entries: Vec<Entry>,
 }
 impl ProtectedMapping {
+    /// Semantic mapping identity, captured by sealed projections; not authentication.
+    pub fn digest(&self) -> String {
+        use sha2::{Digest, Sha256};
+        struct HashWriter(Sha256);
+        impl std::io::Write for HashWriter {
+            fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+                self.0.update(bytes);
+                Ok(bytes.len())
+            }
+            fn flush(&mut self) -> std::io::Result<()> {
+                Ok(())
+            }
+        }
+        let mut writer = HashWriter(Sha256::new());
+        serde_json::to_writer(&mut writer, self).expect("mapping serializes");
+        format!("sha256:{:x}", writer.0.finalize())
+    }
+
     pub fn parse(bytes: &[u8]) -> Result<Self, &'static str> {
         if bytes.len() > 1024 * 1024 {
             return Err("mapping exceeds limit");
@@ -98,6 +116,7 @@ pub(super) fn exact(s: &str) -> bool {
 }
 /// Immutable result; native bytes remain separate from the engine wire.
 pub struct Projection {
+    pub(crate) mapping_digest: String,
     pub(crate) required_targets: std::collections::BTreeMap<String, Vec<String>>,
     pub(crate) native_run_id: String,
     pub(crate) facts: GuardFacts,
@@ -213,6 +232,7 @@ pub fn project(
     // JSON is also valid YAML, accepted by the engine's strict contract loader.
     let contract_bytes = serde_json::to_vec(contract).map_err(|_| "cannot serialize contract")?;
     Ok(Projection {
+        mapping_digest: mapping.digest(),
         required_targets: obligations.frozen_targets(),
         native_run_id: evidence.report().run_id.clone(),
         facts,

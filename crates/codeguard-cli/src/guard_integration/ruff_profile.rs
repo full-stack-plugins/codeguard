@@ -532,6 +532,7 @@ pub fn project_ruff(
     let report =
         evaluate_bounded(contract, &facts).map_err(|_| "engine evaluation rejected projection")?;
     Ok(Projection {
+        mapping_digest: mapping.digest(),
         required_targets: BTreeMap::from([(
             evidence.scope_id.clone(),
             vec![evidence.target.clone()],
