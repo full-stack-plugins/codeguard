@@ -1,5 +1,6 @@
 //! Explicit private Linux SDK artifact storage; consistency is not authority or eligibility.
 pub mod access;
+pub mod attempts;
 use super::{
     consumer::{budget_output, serialized_size},
     envelope::{ApprovalAttachment, EnvelopeOutput},

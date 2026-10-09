@@ -189,6 +189,12 @@ impl AuditAccess {
             Err(AccessError::Permission)
         }
     }
+    pub(super) fn check_admin(&self, administration: &Administration) -> Result<(), AccessError> {
+        self.authorize(&administration.0)
+    }
+    pub(super) fn check_raw(&self, raw: &RawAccess) -> Result<(), AccessError> {
+        self.authorize(&raw.0)
+    }
     pub fn view_access(&self, administration: &Administration) -> Result<ViewAccess, AccessError> {
         self.authorize(&administration.0)?;
         Ok(ViewAccess(self.session.clone()))

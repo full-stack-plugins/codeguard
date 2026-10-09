@@ -136,3 +136,63 @@ callers bypassing it with retained in-memory evidence are outside this access
 API. Current attempt/CAS remains separate task 3.4. Actual GG tree/provenance
 revalidation remains the candidate host's responsibility, and production
 identity-provider task 3.2 remains independent.
+
+## Process-local attempts and binding CAS (3.4)
+
+`audit::attempts::AttemptHistory` is an explicit controller-owned local history
+borrowed from one `AuditAccess` session. It reuses GuardEngine's
+`InMemoryAttemptStore` for generation advance, append/replay and publication.
+There is no durable checkpoint, globally current result, cross-process CAS or
+restart recovery. A new history is a new controller context, not permission to
+revive previous eligibility.
+
+`AttemptWork::freeze` admits borrowed input before cloning or hashing: at most
+64 requirements and 64 scopes, each field at most 1 KiB, and the complete encoded
+work descriptor at most 64 KiB. It freezes the full binding, producer, required
+scopes, contract digest and mapping digest and reuses GE's structural preparation
+validation. Ruff scopes already incorporate profile, tool, config, source and
+native producer identity. No report-supplied descriptor should replace the
+controller's independent frozen work. Actual Git state/provenance is still the
+candidate host's responsibility.
+
+The private target contains actual repo, task, worktree and sorted requirement
+IDs. GE Target has no worktree field, so each full CG target owns a separate GE
+store. The adapter does not rewrite or fabricate a wire binding to add worktree
+isolation. At most 256 registrations exist in one history. Run IDs are unique
+across that history, bounded to 128 ASCII letters/digits/dash/underscore/dot.
+
+`register` requires Administration and a compare-and-swap expected generation.
+Success clears the prior current pointer immediately, before a result exists.
+It returns a private non-serializable ticket bound to this history instance,
+exact run ID, full target, work digest and assigned generation. Neither ticket
+fields nor a target's fields can be changed by callers.
+
+`import` requires Administration, a separate RawAccess grant and an already
+retained Receipt. It always rechecks retention, original blobs, actual run ID
+and registered binding before using GE append. Identical receipt/envelope bytes
+replay idempotently; changed bytes under the same attempt conflict and do not
+change history. Failed append never reports acceptance. No alternate raw JSON
+import, output relabeling or retention bypass is added. Approval references must
+be frozen into the imported envelope; changing them is a conflicting envelope
+revision, while revocation/status changes remain fresh provider observations.
+
+`publish` rechecks retained evidence and lets GE compare its generation to the
+latest registered generation. A late head1 success may enter historical records,
+but cannot replace head2's current BLOCK. Error and partial observations can be
+recorded without being promoted to engine-backed complete results. The generic
+GE record's eligibility flag is always false: no authorization is cached.
+
+`current` and `history` expose bounded borrowed metadata to Administration only;
+they do not return artifacts or assert availability/eligibility. Such metadata
+may outlive expired or purged evidence. `consume_current` separately checks raw
+permission, current run/work/envelope and the independent expected descriptor,
+then delegates to the existing retained consume path for all artifacts and a
+fresh authority query. Missing, expired, purged or changed evidence cannot yield
+an eligible result; approval revocation does not rewrite the technical decision
+or original native/report bytes.
+
+Mutations require exclusive mutable access. A caller-owned Mutex can serialize
+complete operations across threads; tests exercise real competing threads with
+one expected-generation winner. This is local serialization, not a multiprocess
+lock protocol. The immutable storage and retention APIs retain their existing
+semantics, and all native commands/default paths remain unchanged.
