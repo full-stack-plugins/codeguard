@@ -78,6 +78,23 @@ impl PreparedConsumption {
             baseline: baseline.cloned(),
         })
     }
+    /// An explicitly required integration remains required while its adapter is disabled.
+    /// Absence never queries authority or changes the frozen policy; presence uses
+    /// exactly the same current trust and artifact checks as `consume`.
+    pub fn consume_required(
+        &self,
+        output: Option<&EnvelopeOutput>,
+        provider: &dyn AuthorityProvider,
+        now: i64,
+        cause: Option<&str>,
+    ) -> Result<Consumption, &'static str> {
+        self.consume(
+            output.ok_or("required integration evidence missing")?,
+            provider,
+            now,
+            cause,
+        )
+    }
     pub fn consume(
         &self,
         output: &EnvelopeOutput,

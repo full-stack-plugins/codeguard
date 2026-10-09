@@ -138,3 +138,11 @@ No new cache or identity service is installed. A controller-owned Mutex may cove
 this complete operation across threads, as in the real-queue fixture. The earlier
 free consumers still reject non-null baselines. See
 `tests/acceptance/guard-integration-joint-queue.md` for the exact local scope.
+
+For an explicitly required integration, `PreparedConsumption::consume_required`
+accepts optional evidence at the controller boundary. `None` fails before any
+provider call; `Some` delegates to the unchanged full consumer. Stopping the
+adapter therefore cannot erase the controller's frozen requirements or turn
+missing evidence into success. Native entrypoints and pure shadow comparison
+remain independent. See `tests/acceptance/guard-integration-rollback.md` for the
+actual local four-step library/CLI composition and retained native boundaries.
