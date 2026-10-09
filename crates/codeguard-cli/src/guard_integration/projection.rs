@@ -3,9 +3,10 @@ use super::{
     reader::NativeEvidence,
     scope::{FrozenObligations, ScopeAssessment, assess_scope},
 };
+use guardengine::integration::FactBudget;
 use guardengine::{
-    API_VERSION, AnalyzerIdentity, Completeness, GuardAssertion, GuardContract, GuardFact,
-    GuardFacts, GuardReport, GuardSubject,
+    API_VERSION, AnalyzerIdentity, Completeness, GuardAssertion, GuardContract, GuardFacts,
+    GuardReport, GuardSubject,
 };
 use serde::Deserialize;
 use std::collections::BTreeSet;
@@ -136,60 +137,39 @@ pub fn project(
         return Err("mapping references unknown contract rule");
     }
     let ScopeAssessment::Partial { gaps } = assess_scope(evidence, obligations);
-    let mut sources = Vec::new();
+    let mut budget = FactBudget::new();
     for result in evidence.report().document()["results"]
         .as_array()
         .ok_or("missing results")?
     {
         for finding in result["findings"].as_array().ok_or("missing findings")? {
-            sources.push((
-                Source::Finding {
-                    tool_id: finding["tool_id"].as_str().ok_or("missing tool")?.into(),
-                    native_rule_id: finding["native_rule_id"]
-                        .as_str()
-                        .ok_or("missing rule")?
-                        .into(),
+            let tool = finding["tool_id"].as_str().ok_or("missing tool")?;
+            let native_rule = finding["native_rule_id"].as_str().ok_or("missing rule")?;
+            let id = finding["id"].as_str().ok_or("missing finding")?;
+            push_mapped_relation(
+                &mut budget,
+                mapping,
+                contract,
+                |source| {
+                    matches!(source, Source::Finding { tool_id, native_rule_id }
+                    if tool_id == tool && native_rule_id == native_rule)
                 },
-                format!(
-                    "native:{}",
-                    finding["id"].as_str().ok_or("missing finding")?
-                ),
-            ));
+                &["native:", id],
+            )?;
         }
     }
     for gap in &gaps {
-        sources.push((
-            Source::Gap {
-                detail: gap.clone(),
-            },
-            format!("scope:{gap}"),
-        ));
+        push_mapped_relation(
+            &mut budget,
+            mapping,
+            contract,
+            |source| matches!(source, Source::Gap { detail } if detail == gap),
+            &["scope:", gap],
+        )?;
     }
-    let mut facts = Vec::new();
-    for (source, reference) in sources {
-        let entry = mapping
-            .entries
-            .iter()
-            .find(|entry| entry.source == source)
-            .ok_or("unmapped native finding or scope gap")?;
-        let rule = contract
-            .spec
-            .rules
-            .iter()
-            .find(|rule| rule.id == entry.rule_id)
-            .ok_or("mapping references unknown contract rule")?;
-        let GuardAssertion::ForbidRelation {
-            subject,
-            predicate,
-            object,
-        } = &rule.assertion;
-        facts.push(GuardFact {
-            subject: subject.clone(),
-            predicate: predicate.clone(),
-            object: object.clone(),
-            source: reference,
-        });
-    }
+    let mut facts = budget
+        .finish()
+        .map_err(|_| "fact construction rejected projection")?;
     facts.sort();
     facts.dedup();
     let facts = GuardFacts {
@@ -217,4 +197,33 @@ pub fn project(
         domain: evidence.raw_bytes().to_vec(),
         required_scopes: obligations.scope_ids(),
     })
+}
+
+// Mapping and contract fields stay borrowed until the shared builder accepts their cost.
+fn push_mapped_relation(
+    budget: &mut FactBudget,
+    mapping: &ProtectedMapping,
+    contract: &GuardContract,
+    matches_source: impl Fn(&Source) -> bool,
+    source_parts: &[&str],
+) -> Result<(), &'static str> {
+    let entry = mapping
+        .entries
+        .iter()
+        .find(|entry| matches_source(&entry.source))
+        .ok_or("unmapped native finding or scope gap")?;
+    let rule = contract
+        .spec
+        .rules
+        .iter()
+        .find(|rule| rule.id == entry.rule_id)
+        .ok_or("mapping references unknown contract rule")?;
+    let GuardAssertion::ForbidRelation {
+        subject,
+        predicate,
+        object,
+    } = &rule.assertion;
+    budget
+        .push_relation_with_source_parts(subject, predicate, object, source_parts)
+        .map_err(|_| "fact construction rejected projection")
 }

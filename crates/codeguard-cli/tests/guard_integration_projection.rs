@@ -51,6 +51,11 @@ fn partial_projection_uses_engine_for_every_enforcement_and_keeps_attachment() {
         );
         assert_eq!(projection.domain_bytes(), bytes);
         assert_eq!(projection.facts().facts.len(), 2);
+        assert_eq!(projection.facts().facts[0].source, "native:f-1");
+        assert_eq!(
+            projection.facts().facts[1].source,
+            "scope:native profile unqualified"
+        );
     }
 }
 #[test]
@@ -166,5 +171,75 @@ fn projection_rejects_rule_fact_expansion_before_evaluation() {
     assert_eq!(
         project(&evidence, &obligations(), &m, &c, subject()).err(),
         Some("engine evaluation rejected projection")
+    );
+}
+
+thread_local! {
+    static TRACK_ALLOCATIONS: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+struct ReviewAlloc;
+static LARGE_BYTES: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
+unsafe impl std::alloc::GlobalAlloc for ReviewAlloc {
+    unsafe fn alloc(&self, layout: std::alloc::Layout) -> *mut u8 {
+        if layout.size() == 65536 && TRACK_ALLOCATIONS.with(|tracking| tracking.get()) {
+            LARGE_BYTES.fetch_add(layout.size(), std::sync::atomic::Ordering::Relaxed);
+        }
+        unsafe { std::alloc::System.alloc(layout) }
+    }
+    unsafe fn dealloc(&self, ptr: *mut u8, layout: std::alloc::Layout) {
+        unsafe { std::alloc::System.dealloc(ptr, layout) }
+    }
+}
+#[global_allocator]
+static REVIEW_ALLOC: ReviewAlloc = ReviewAlloc;
+#[test]
+fn projection_rejects_relation_amplification_before_excess_clones() {
+    let mut native = fixture::valid();
+    let template = native["results"][0]["findings"][0].clone();
+    let mut fs = vec![];
+    let mut ids = vec![];
+    for i in 0..96 {
+        let mut f = template.clone();
+        let id = format!("finding-{i}");
+        f["id"] = json!(id);
+        ids.push(json!(id));
+        fs.push(f);
+    }
+    native["results"][0]["findings"] = json!(fs);
+    native["delivery_gate"]["blocking_finding_ids"] = json!(ids);
+    let bytes = serde_json::to_vec(&native).unwrap();
+    let evidence = read_native(&bytes, &fixture::invocation()).unwrap();
+    let mut c = contract("advise");
+    c.spec.rules[0].assertion = guardengine::GuardAssertion::ForbidRelation {
+        subject: "s".repeat(65536),
+        predicate: "p".repeat(65536),
+        object: "o".repeat(65536),
+    };
+    c.validate().unwrap();
+    let contract_size = serde_json::to_vec(&c).unwrap().len();
+    let m = ProtectedMapping::parse(&serde_json::to_vec(&mapping()).unwrap()).unwrap();
+    LARGE_BYTES.store(0, std::sync::atomic::Ordering::Relaxed);
+    let obligations = obligations();
+    let subject = subject();
+    TRACK_ALLOCATIONS.with(|tracking| tracking.set(true));
+    let result = project(&evidence, &obligations, &m, &c, subject);
+    TRACK_ALLOCATIONS.with(|tracking| tracking.set(false));
+    let allocated = LARGE_BYTES.load(std::sync::atomic::Ordering::Relaxed);
+    println!(
+        "native_bytes={} contract_bytes={} findings=96 exactly_64KiB_allocations_bytes={} result={:?}",
+        bytes.len(),
+        contract_size,
+        allocated,
+        result.as_ref().err()
+    );
+    assert_eq!(result.err(), Some("fact construction rejected projection"));
+    assert_eq!(bytes.len(), 22_707);
+    assert_eq!(contract_size, 197_028);
+    // The builder charges serialized + owned payload, so accepted relation copies
+    // cannot consume more than half its byte budget. This measures actual allocator
+    // calls during project(), not a synthetic estimate or eventual error alone.
+    assert!(
+        allocated <= guardengine::integration::MAX_ARTIFACT_BYTES / 2,
+        "relation bytes allocated before rejection: {allocated}"
     );
 }
