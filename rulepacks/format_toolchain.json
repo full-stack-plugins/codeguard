@@ -110,9 +110,9 @@
       ]
     },
     {
-      "formatter": "format.sh (IntelliJ IDEA)",
-      "install_kind": "with_lang_toolchain",
-      "install": "随 IntelliJ IDEA 分发（/Applications/IntelliJ IDEA.app/Contents/bin/format.sh）；Linux/自定义安装用 CODEGUARD_IDEA_FORMAT 环境变量指定",
+      "formatter": "builtin:idea-markdown",
+      "install_kind": "builtin",
+      "install": "无需安装——codeguard 内置 Rust 实现（golden 差分锁定与 IDEA 2026.2.3 一致）",
       "languages": [
         "markdown"
       ]

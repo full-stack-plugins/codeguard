@@ -36,6 +36,18 @@ def fail(message: str) -> None:
     raise SystemExit(1)
 
 
+BUILTIN_FORMATTERS = {"builtin:idea-markdown"}
+
+
+def validate_builtin(entry: dict, formatter_name: str, source: str) -> None:
+    if formatter_name not in BUILTIN_FORMATTERS:
+        fail(f"{source}: 未知内置格式化器 {formatter_name}（注册于 idea_markdown.rs）")
+    if entry.get("check_argv") is not None or entry.get("apply_argv") is not None:
+        fail(f"{source}: {formatter_name} 内置条目不应声明 argv（不走外部命令）")
+    if entry.get("config_markers") is None or entry.get("extensions") is None:
+        fail(f"{source}: {formatter_name} 仍需声明 config_markers/extensions")
+
+
 def validate(entry: dict, source: str, known_ids: set) -> None:
     language = entry.get("language")
     if not isinstance(language, str) or not language:
@@ -47,6 +59,7 @@ def validate(entry: dict, source: str, known_ids: set) -> None:
         if field not in entry:
             fail(f"{source}: {language} 缺字段 {field}")
 
+    formatter_name = entry.get("formatter") or ""
     status = entry["status"]
     if status not in ("integrated", "not_integrated"):
         fail(f"{source}: {language} status 非法: {status}")
@@ -55,6 +68,9 @@ def validate(entry: dict, source: str, known_ids: set) -> None:
     if not isinstance(notes, str) or not notes.strip():
         fail(f"{source}: {language} notes 不得为空")
 
+    if formatter_name.startswith("builtin:"):
+        validate_builtin(entry, formatter_name, source)
+        return
     if status == "not_integrated":
         # 如实披露：不得编造工具身份
         if entry["formatter"] is not None or entry["tool_key"] is not None:

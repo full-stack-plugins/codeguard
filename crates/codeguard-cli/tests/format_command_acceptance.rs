@@ -378,20 +378,31 @@ fn every_language_has_executable_or_evidenced_disposition() {
                     row["formatter"].as_str().is_some_and(|f| !f.is_empty()),
                     "{language} integrated 但缺 formatter"
                 );
-                assert!(
-                    row["check_argv"].as_array().is_some_and(|a| !a.is_empty()),
-                    "{language} integrated 但缺 check_argv"
-                );
-                assert!(
-                    row["apply_argv"].as_array().is_some_and(|a| !a.is_empty()),
-                    "{language} integrated 但缺 apply_argv"
-                );
-                assert!(
-                    row["unformatted_exit_codes"]
-                        .as_array()
-                        .is_some_and(|c| !c.is_empty()),
-                    "{language} integrated 但缺 unformatted_exit_codes"
-                );
+                let is_builtin = row["formatter"]
+                    .as_str()
+                    .is_some_and(|f| f.starts_with("builtin:"));
+                if !is_builtin {
+                    assert!(
+                        row["check_argv"].as_array().is_some_and(|a| !a.is_empty()),
+                        "{language} integrated 但缺 check_argv"
+                    );
+                    assert!(
+                        row["apply_argv"].as_array().is_some_and(|a| !a.is_empty()),
+                        "{language} integrated 但缺 apply_argv"
+                    );
+                    assert!(
+                        row["unformatted_exit_codes"]
+                            .as_array()
+                            .is_some_and(|c| !c.is_empty()),
+                        "{language} integrated 但缺 unformatted_exit_codes"
+                    );
+                } else {
+                    // 内置条目：argv 必须为 null（防误配外部命令参数）
+                    assert!(
+                        row["check_argv"].is_null() && row["apply_argv"].is_null(),
+                        "{language} 内置条目不应声明 argv"
+                    );
+                }
                 assert!(
                     !row["extensions"].as_array().unwrap_or(&vec![]).is_empty(),
                     "{language} integrated 但缺 extensions"

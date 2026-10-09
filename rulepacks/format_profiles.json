@@ -1022,27 +1022,11 @@
     {
       "language": "markdown",
       "status": "integrated",
-      "formatter": "sh",
-      "tool_key": "sh",
-      "check_argv": [
-        "-c",
-        "#!/bin/sh\n# IDEA 格式化器只读检查（dry run），复现 IDEA 内 ⌘⌥L 的排版结果。\n#\n# wrapper 强制封装的四个原因（均在 IDEA 2026.2.3 真机实测踩到）：\n# 1. -d dry run：不改文件，退出码 0=合规 / 1=需重排，正好是门禁语义；\n# 2. -allowDefaults 必须恒传：不加时不在 IDEA 项目里的文件被静默忽略\n#    （dry 仍退 0），排版乱的文件会被当作合规放行；\n# 3. 丢弃 stdout：即使判定通过也打印版本横幅，触发运行时 A 类误判\n#    （退出 0 且 stdout 非空 = 不合规），会把每个合规文件误报为需重排；\n# 4. IDEA_PROPERTIES 指向独立配置目录：IDEA GUI 开着时 format.sh 因\n#    单实例锁拒绝运行，独立目录可绕过。\n# 可用 CODEGUARD_IDEA_FORMAT 指定 format.sh 绝对路径（Linux/自定义安装）。\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\nFORMAT=\"${CODEGUARD_IDEA_FORMAT:-/Applications/IntelliJ IDEA.app/Contents/bin/format.sh}\"\n[ -f \"$FORMAT\" ] || exit 2\nexport IDEA_PROPERTIES=\"${IDEA_PROPERTIES:-/tmp/codeguard-idea-format.properties}\"\n[ -f \"$IDEA_PROPERTIES\" ] || printf '%s\\n' \\\n  'idea.config.path=/tmp/codeguard-idea-fmt/config' \\\n  'idea.system.path=/tmp/codeguard-idea-fmt/system' \\\n  'idea.log.path=/tmp/codeguard-idea-fmt/log' \\\n  'idea.plugins.path=/tmp/codeguard-idea-fmt/plugins' > \"$IDEA_PROPERTIES\"\n\"$FORMAT\" -d -allowDefaults \"$f\" >/dev/null 2>&1\nexit $?\n",
-        "codeguard",
-        "{file}"
-      ],
-      "apply_argv": [
-        "-c",
-        "#!/bin/sh\n# IDEA 格式化器就地格式化（等价于在 IDEA 内按 ⌘⌥L）。\n# 同样恒传 -allowDefaults 防静默忽略；丢弃 stdout 防 A 类误判。\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\nFORMAT=\"${CODEGUARD_IDEA_FORMAT:-/Applications/IntelliJ IDEA.app/Contents/bin/format.sh}\"\n[ -f \"$FORMAT\" ] || exit 2\nexport IDEA_PROPERTIES=\"${IDEA_PROPERTIES:-/tmp/codeguard-idea-format.properties}\"\n[ -f \"$IDEA_PROPERTIES\" ] || printf '%s\\n' \\\n  'idea.config.path=/tmp/codeguard-idea-fmt/config' \\\n  'idea.system.path=/tmp/codeguard-idea-fmt/system' \\\n  'idea.log.path=/tmp/codeguard-idea-fmt/log' \\\n  'idea.plugins.path=/tmp/codeguard-idea-fmt/plugins' > \"$IDEA_PROPERTIES\"\n\"$FORMAT\" -allowDefaults \"$f\" >/dev/null 2>&1\nexit $?\n",
-        "codeguard",
-        "{file}"
-      ],
+      "formatter": "builtin:idea-markdown",
+      "tool_key": "builtin:idea-markdown",
+      "check_argv": null,
+      "apply_argv": null,
       "config_markers": [
-        ".prettierrc",
-        ".prettierrc.json",
-        ".prettierrc.yaml",
-        ".prettierrc.yml",
-        ".prettierrc.toml",
-        "prettier.config.js",
         ".editorconfig"
       ],
       "extensions": [
@@ -1050,7 +1034,7 @@
         ".markdown"
       ],
       "dialects": {},
-      "notes": "IDEA 内置格式化引擎（经命令行 format.sh），效果与 IDE 内 ⌘⌥L 完全一致——2026-10-08 真机对比实测：与 prettier 输出存在 4 类可见差异（标题/正文空格策略、列表标记归一为 * 而非 -、表格分隔行按列宽对齐补齐），两者是独立引擎，prettier 无法通过配置复现 IDEA 风格。wrapper 强制封装四个原因：① -d dry run 天然匹配门禁 check 语义；② -allowDefaults 恒传——不加时不在 IDEA 项目里的文件被静默忽略（dry 仍退 0），排版文件会当作合规放行；③ 丢弃 stdout——成功时也打印版本横幅，会触发运行时 A 类误判；④ IDEA_PROPERTIES 独立配置目录绕过单实例锁，IDEA GUI 开着时 format.sh 仍可用。前置条件：本机装有 IntelliJ IDEA（macOS 默认路径自动探测，其他平台用 CODEGUARD_IDEA_FORMAT 环境变量指定 format.sh 绝对路径）；工具缺失时 wrapper 退 2，门禁如实降级为 incomplete，不静默放行。限制：语法损坏与需重排同为退出 1（IDEA 做容错排版，无法区分），语法有效性由 syntax 核心能力负责；仅排版，不校验 markdown 链接/结构。CI 注意：门禁依赖 IDE 安装，CI 上未装 IDEA 的 runner 对该语言诚实降级。",
+      "notes": "IDEA 风格 Markdown 格式化，**内置 Rust 实现**（builtin:idea-markdown），codeguard 独立分发不依赖用户安装 IntelliJ IDEA。一致性由 golden 差分锁定：tests/fixtures/idea_markdown/ 下每个样本配对 IDEA 2026.2.3 format.sh 的真实输出（.expected.md），idea_markdown_differential 测试断言逐字节一致且幂等——CI 无需安装 IDE。从 golden 提炼的规则：标题标记后空格收敛为单空格而标题文本内部空格保留、无空格标题（###X）原样、正文/引用/列表内容行内多空格收敛单空格（code span 内容不动）、列表标记字符保留不归一（标记后单空格）、同标记连续项不插空行而标记变化视为新块（块间一空行，有序列表按分隔符同理）、表格列宽=max 显示宽（CJK 记 2）且数据行两侧单空格 padding、分隔行为 -×(列宽+2)、引用块前保留原空行数、围栏代码块内容原样、尾部是否换行跟随输入。与 prettier 输出存在可见差异（列表标记、标题空格策略、表格风格），两者是独立引擎。限制：与 IDEA 一样对语法损坏的 markdown 做容错排版（无法区分需重排与语法错误，同判不合规），语法有效性由 syntax 核心能力负责；IDEA 升级若改变风格，需在装有对应版本的机器上重新生成 golden 并提升 RULES_VERSION。",
       "unparsable_detection": "none",
       "unformatted_exit_codes": [
         1
