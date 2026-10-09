@@ -66,7 +66,7 @@
 
 - [x] 4.1 在拟新增 `tests/fixtures/guard-integration/queue/` 和 `guard_integration_queue.rs` 接入固定版本GG-CANDIDATE只读fixture；PR head与synthetic M不同、base推进、组成员重排均拒旧证据，M原生结果经投影后才可满足该范围。追踪「Protected gates consume exact queue candidates」。
 - [x] 4.2 在拟新增 `tests/acceptance/guard-integration-native-parity.md` 记录选定真工具的完整/违规/partial/故障样本及前后输出，运行1.1差分测试；native字段/退出/副作用无未解释差异，已知工具缺口仍由旧change登记。追踪「Native interfaces remain unchanged」「Complete projection requires proven native scope」。
-- [ ] 4.3 在 `guard_integration_concurrency.rs` 联合队列fixture测试双需求并行、批准扫描后撤销、旧run迟到和新base重验；保存原始输入/输出/摘要，任一失效不能ALLOW，审批不能覆盖工具故障。追踪「Parallel projections preserve immutable ownership」「Changed bindings invalidate eligibility」。
+- [x] 4.3 在 `guard_integration_concurrency.rs` 联合队列fixture测试双需求并行、批准扫描后撤销、旧run迟到和新base重验；保存原始输入/输出/摘要，任一失效不能ALLOW，审批不能覆盖工具故障。追踪「Parallel projections preserve immutable ownership」「Changed bindings invalidate eligibility」。
 - [ ] 4.4 在拟新增 `tests/acceptance/guard-integration-host.md` 固定一个获授权可检查宿主版本并记录能力/取消/重入/凭据边界；`guard_integration_host.rs` 测试read-only调用，不可取得宿主则记录unverified且不宣称兼容通过。追踪「Rollout preserves native ownership and rollback」。
 
 ## 5. C5 显式发布、兼容矩阵与回滚（生产分发等待 GE-RELEASE）
@@ -77,3 +77,5 @@
 
 
 2026-10-09 task3.2 independently accepted for the controller-supplied local SDK baseline-authentication port at0d6e0ec: fixed-source19 tests passed, original native code/commands unchanged. PreparedConsumption freezes baseline ref/policy and queries GE approval on every consume; older free consumers reject non-null baselines. Production identity deployment and durable baseline storage are not claimed. Evidence: external codeguard-baseline-trust-independent-review.md. CG adapter21/26; other pending tasks unchanged.
+
+2026-10-09 task4.3 independently accepted at a3dadb5 for the explicit local joint profile:18 fixed-source joint/concurrency tests passed,38 hashes/37 original byte pairs verified, output matched. New baseline projections and fixture authority are distinguished from unchanged original native captures. Evidence: external codeguard-joint-independent-review.md. Adapter22/26; no production host/issuer or unrelated native qualification asserted.

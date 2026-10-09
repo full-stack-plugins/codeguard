@@ -237,3 +237,5 @@ The new joint test and existing concurrency/trust regressions cover A/B parallel
 consumption, current approval revocation, M1 late rejection after M2/newbase,
 cross-context refusal, store expiry and immutable history. Native functionality
 and task4.3 checkbox remain unchanged pending review.
+
+Root independent review accepted task4.3 at a3dadb5:18 fixed-source tests and38 transport hashes/37 unchanged original byte pairs, no findings. Adapter22/26. Evidence codeguard-joint-independent-review.md. Remaining host/release/rollout tasks unchanged.
