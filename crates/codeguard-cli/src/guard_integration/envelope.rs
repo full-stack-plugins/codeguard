@@ -40,6 +40,89 @@ impl EnvelopeOutput {
     }
 }
 
+/// A new envelope over borrowed immutable SDK artifacts. References are not grants.
+pub struct ApprovalAttachment<'a> {
+    pub(super) original: &'a EnvelopeOutput,
+    envelope: GuardRunEnvelope,
+}
+impl ApprovalAttachment<'_> {
+    pub fn envelope(&self) -> &GuardRunEnvelope {
+        &self.envelope
+    }
+    pub fn contract_bytes(&self) -> Option<&[u8]> {
+        self.original.contract_bytes()
+    }
+    pub fn facts_bytes(&self) -> Option<&[u8]> {
+        self.original.facts_bytes()
+    }
+    pub fn report_bytes(&self) -> Option<&[u8]> {
+        self.original.report_bytes()
+    }
+    pub fn domain_bytes(&self) -> &[u8] {
+        self.original.domain_bytes()
+    }
+}
+impl EnvelopeOutput {
+    /// Only the controller may select references. This does not verify or issue approval.
+    /// A provider must freshly authenticate the new envelope digest on consumption.
+    pub fn with_approval_refs(
+        &self,
+        refs: &[String],
+    ) -> Result<ApprovalAttachment<'_>, &'static str> {
+        use super::consumer::{budget_output, serialized_size};
+        budget_output(self, &self.envelope)?;
+        if refs.len() > 64 {
+            return Err("approval reference count exceeded");
+        }
+        let mut total = 0usize;
+        for reference in refs {
+            if reference.trim().is_empty()
+                || reference.len() > 1024
+                || reference.chars().any(char::is_control)
+            {
+                return Err("invalid approval reference");
+            }
+            total = total
+                .checked_add(reference.len())
+                .ok_or("approval reference budget exceeded")?;
+        }
+        if total > 16_384 || refs.windows(2).any(|pair| pair[0] >= pair[1]) {
+            return Err("approval references must be bounded sorted unique");
+        }
+        let original_size = serialized_size(&self.envelope)?;
+        let new_refs_size = serialized_size(&refs)?;
+        let old_refs_size = serialized_size(&self.envelope.approval_refs)?;
+        if original_size - old_refs_size + new_refs_size > 1_048_576 {
+            return Err("approval envelope budget exceeded");
+        }
+        if self.envelope.run_status != RunStatus::Completed
+            || self.envelope.coverage.status != CoverageStatus::Complete
+            || self.envelope.decision != Some(guardengine::Decision::RequireApproval)
+        {
+            return Err("approval attachment requires complete review result");
+        }
+        let verified = verify_engine_artifacts(
+            &self.envelope,
+            self.contract_bytes().ok_or("missing contract")?,
+            self.facts_bytes().ok_or("missing facts")?,
+            self.report_bytes().ok_or("missing report")?,
+        )
+        .map_err(|_| "approval attachment artifact verification failed")?;
+        if verified.decision != guardengine::Decision::RequireApproval {
+            return Err("approval attachment requires review decision");
+        }
+        let mut envelope = self.envelope.clone();
+        envelope.approval_refs = refs.to_vec();
+        envelope
+            .validate(EvidenceProfile::EngineBacked)
+            .map_err(|_| "invalid approval envelope")?;
+        Ok(ApprovalAttachment {
+            original: self,
+            envelope,
+        })
+    }
+}
+
 fn reference(run: &str, name: &str, bytes: &[u8]) -> ArtifactRef {
     ArtifactRef {
         uri: format!("artifact://{run}/{name}"),

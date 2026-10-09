@@ -1,5 +1,6 @@
 //! Read-only SDK consumption. Actual Git candidate/provenance validation is a host responsibility.
-use super::envelope::EnvelopeOutput;
+use super::envelope::{ApprovalAttachment, EnvelopeOutput};
+use guardengine::integration::GuardRunEnvelope;
 use guardengine::integration::eligibility::{
     ArtifactBytes, AuthorityProvider, EligibilityPolicy, EligibilityResult, evaluate_eligibility,
 };
@@ -34,9 +35,34 @@ impl Write for Budget {
         Ok(())
     }
 }
-fn bounded(value: &impl Serialize) -> Result<(), &'static str> {
-    serde_json::to_writer(Budget(1_048_576), value).map_err(|_| "consumer metadata budget exceeded")
+pub(super) fn serialized_size(value: &impl Serialize) -> Result<usize, &'static str> {
+    let mut budget = Budget(1_048_576);
+    serde_json::to_writer(&mut budget, value).map_err(|_| "consumer metadata budget exceeded")?;
+    Ok(1_048_576 - budget.0)
 }
+pub(super) fn budget_output(
+    output: &EnvelopeOutput,
+    envelope: &GuardRunEnvelope,
+) -> Result<(), &'static str> {
+    serialized_size(envelope)?;
+    if output.domain_bytes().len() > 1_048_576 {
+        return Err("consumer domain budget exceeded");
+    }
+    for bytes in [
+        output.contract_bytes(),
+        output.facts_bytes(),
+        output.report_bytes(),
+    ]
+    .into_iter()
+    .flatten()
+    {
+        if bytes.len() > guardengine::integration::MAX_ARTIFACT_BYTES {
+            return Err("consumer artifact budget exceeded");
+        }
+    }
+    Ok(())
+}
+
 fn digest(bytes: &[u8]) -> String {
     format!("sha256:{:x}", Sha256::digest(bytes))
 }
@@ -50,11 +76,37 @@ pub fn consume(
     now: i64,
     cause: Option<&str>,
 ) -> Result<Consumption, &'static str> {
-    let envelope = output.envelope();
-    // All borrowed metadata and bytes are bounded before GE hashes/serializes anything.
-    bounded(envelope)?;
-    bounded(expected)?;
-    if cause.is_some_and(|s| s.len() > 16_384) || output.domain_bytes().len() > 1_048_576 {
+    consume_view(output, output.envelope(), expected, provider, now, cause)
+}
+
+/// Consume a bounded controller attachment; new envelope authentication is required.
+pub fn consume_attached(
+    attachment: &ApprovalAttachment<'_>,
+    expected: &ExpectedConsumption,
+    provider: &dyn AuthorityProvider,
+    now: i64,
+    cause: Option<&str>,
+) -> Result<Consumption, &'static str> {
+    consume_view(
+        attachment.original,
+        attachment.envelope(),
+        expected,
+        provider,
+        now,
+        cause,
+    )
+}
+fn consume_view(
+    output: &EnvelopeOutput,
+    envelope: &GuardRunEnvelope,
+    expected: &ExpectedConsumption,
+    provider: &dyn AuthorityProvider,
+    now: i64,
+    cause: Option<&str>,
+) -> Result<Consumption, &'static str> {
+    budget_output(output, envelope)?;
+    serialized_size(expected)?;
+    if cause.is_some_and(|s| s.len() > 16_384) {
         return Err("consumer input budget exceeded");
     }
     let (contract, facts, report) = (
@@ -62,11 +114,6 @@ pub fn consume(
         output.facts_bytes(),
         output.report_bytes(),
     );
-    for bytes in [contract, facts, report].into_iter().flatten() {
-        if bytes.len() > guardengine::integration::MAX_ARTIFACT_BYTES {
-            return Err("consumer artifact budget exceeded");
-        }
-    }
     let envelope_digest = digest(&serde_json::to_vec(envelope).map_err(|_| "invalid envelope")?);
     let raw_digest = digest(output.domain_bytes());
     if envelope.run_id != expected.run_id

@@ -53,6 +53,30 @@ fn repeated_consumption_leaves_actual_source_events_refs_and_index_unchanged() {
                 .eligible
         );
     }
+    let (review, mut review_expected) = fixture::sample(true);
+    let attached = review.with_approval_refs(&["approval:one".into()]).unwrap();
+    review_expected.envelope_digest = format!(
+        "sha256:{:x}",
+        Sha256::digest(serde_json::to_vec(attached.envelope()).unwrap())
+    );
+    for _ in 0..10 {
+        let result = codeguard_cli::guard_integration::consumer::consume_attached(
+            &attached,
+            &review_expected,
+            &provider,
+            fixture::NOW,
+            None,
+        )
+        .unwrap();
+        assert_eq!(
+            result.eligibility.code,
+            guardengine::integration::eligibility::EligibilityCode::InvalidApproval
+        );
+        assert_eq!(
+            result.eligibility.technical_decision,
+            Some(guardengine::Decision::RequireApproval)
+        );
+    }
     assert_eq!(before, snapshot(&root));
     assert_eq!(report, output.report_bytes().unwrap());
 }

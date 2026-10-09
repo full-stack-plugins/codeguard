@@ -27,7 +27,14 @@ fn fixture(name: &str) -> Vec<u8> {
 pub(crate) fn sample(review: bool) -> (EnvelopeOutput, ExpectedConsumption) {
     sample_native(if review { "bad" } else { "clean" }, review)
 }
-fn sample_native(name: &str, review: bool) -> (EnvelopeOutput, ExpectedConsumption) {
+pub(crate) fn sample_native(name: &str, review: bool) -> (EnvelopeOutput, ExpectedConsumption) {
+    sample_with_requirements(name, review, vec!["R".into()])
+}
+pub(crate) fn sample_with_requirements(
+    name: &str,
+    review: bool,
+    requirements: Vec<String>,
+) -> (EnvelopeOutput, ExpectedConsumption) {
     let raw = fixture(&format!("ruff-f401/{name}.json"));
     let native: Value = serde_json::from_slice(&raw).unwrap();
     let capture: Value = serde_json::from_slice(&fixture("ruff-f401/capture.json")).unwrap();
@@ -50,7 +57,7 @@ fn sample_native(name: &str, review: bool) -> (EnvelopeOutput, ExpectedConsumpti
         repo_id: "repo".into(),
         task_id: "task".into(),
         worktree_id: "worktree".into(),
-        requirement_ids: vec!["R".into()],
+        requirement_ids: requirements,
         candidate_oid: "a".repeat(40),
         base_oid: "b".repeat(40),
         merge_group_id: None,

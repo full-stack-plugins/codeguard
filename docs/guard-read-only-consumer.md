@@ -30,10 +30,11 @@ GE's current audit, including run/envelope/raw/mapping and policy identity. It i
 an observation identifier, never permission to skip revalidation or reuse a run.
 
 Eligibility failure does not rewrite the technical report or decision. Partial
-scope remains BLOCK. The current sealed SDK output supplies no approval-reference
-attachment interface: review results therefore remain MissingApproval. This
-slice does not claim an approved review path or production authority service.
-Unsupported/native-only output cannot become a completed engine result here.
+scope remains BLOCK. Original SDK outputs without approval references remain
+MissingApproval for review results. The additive `with_approval_refs` and
+`consume_attached` path below supports locally verified references; it does not
+issue approvals or implement a production authority service. Unsupported/native-only
+output cannot become a completed engine result here.
 
 This is the **SDK local profile**, not the Git candidate-host provenance consumer.
 It cannot inspect actual Git state or prove the controller's labels. A host must
@@ -50,3 +51,32 @@ compares a real Git fixture's source, .codeguard events, refs and index before a
 after ten consumptions. Linux strace records no child invocation, network call,
 write-open or filesystem mutation in that test. Native commands and wire output
 are unchanged; only private in-memory mapping metadata was added.
+
+## Bounded approval-reference attachment
+
+A protected controller may call `output.with_approval_refs(&references)` to create
+an `ApprovalAttachment` borrowing all original contract/facts/report/domain bytes.
+Only a complete, completed, engine-recomputed REQUIRE_APPROVAL result permits
+attachment. ALLOW, BLOCK/partial, error and cancelled outputs are refused.
+The original envelope remains unchanged. The new envelope changes only approval
+references; technical report and REQUIRE_APPROVAL decision remain unchanged.
+
+References must be sorted and unique, at most 64 entries, each nonempty and at
+most 1024 UTF-8 bytes with no control characters, at most 16 KiB total. Actual
+serialized metadata including escaping must remain within 1 MiB; these checks
+precede cloning the envelope. An empty list is valid and means no approval.
+References are opaque identifiers, never grants or authority claims.
+
+The controller independently updates its expected envelope digest and uses
+`consumer::consume_attached`. The provider must authenticate the **new** envelope
+digest; a record authenticating the old envelope is rejected. Every call freshly
+queries applicable approvals using GE's unchanged action, purpose, principal,
+binding, contract and validity rules. Expired/revoked/untrusted/unavailable records
+remain ineligible. Changing or removing references invalidates the old expectation
+and old authenticated producer record. No cross-run or approval cache exists.
+
+Local fixture tests demonstrate eligible approved review while preserving the
+technical REQUIRE_APPROVAL decision, plus changed/expired/revoked/provider-error
+counterexamples. These fixtures authenticate only explicitly fixed test digests
+and do not establish production authority (3.2), issue a grant, or authorize host
+writes. The SDK/GG provenance separation described above still applies.
