@@ -53,7 +53,7 @@
 输出：独立资格评估及不可变审计引用；原始report和信封不改写。先固定控制器port，不选择生产批准服务或持有签发密钥。
 
 - [x] 3.1 在 `guard_integration/consumer.rs` 校验repo/task/worktree/requirement集合、完整OID、candidate/base/group及sourceSnapshotDigest；`guard_integration_candidate.rs` 覆盖SHA-1/SHA-256、dirty字节与HEAD不符、错repo四类反例，可信队列消费只接受clean冻结候选。追踪「Changed bindings invalidate eligibility」。
-- [ ] 3.2 在 `guard_integration/consumer.rs` 接入GE-TRUST认证引用port，校验baseline不可变digest/ref、批准issuer/scope/expiry/revocation；`guard_integration_trust.rs` 覆盖伪accepted、错issuer、跨scope、过期、撤销、provider不可用，均不授权且原REQUIRE_APPROVAL字节不变。追踪「Approved references require authenticated consumption」。
+- [x] 3.2 在 `guard_integration/consumer.rs` 接入GE-TRUST认证引用port，校验baseline不可变digest/ref、批准issuer/scope/expiry/revocation；`guard_integration_trust.rs` 覆盖伪accepted、错issuer、跨scope、过期、撤销、provider不可用，均不授权且原REQUIRE_APPROVAL字节不变。追踪「Approved references require authenticated consumption」。
 - [x] 3.3 在 `guard_integration/consumer.rs` 实现资格键和失效理由；`guard_integration_freshness.rs` 逐项变更candidate/base/group/source/baseline/contract/tool-config/mapping/analyzer/coverage及批准状态，全部重验，首版不跨run缓存执行结果。追踪「Changed bindings invalidate eligibility」。
 - [x] 3.4 在 `guard_integration/audit.rs` 实现runId尝试分离、同次导入幂等及绑定CAS；`guard_integration_concurrency.rs` 运行两个需求/两个worktree和迟到head1成功反例，断言记录不串用且不覆盖head2。追踪「Parallel projections preserve immutable ownership」。
 - [x] 3.5 在 `guard_integration/audit.rs` 实现显式私有目录的有界工件读取/原子发布/摘要复核；`guard_integration_storage.rs` 注入symlink、越界路径、截断、磁盘/权限失败和中断，拒绝覆盖原报告/用户文件且保留内存finding。追踪「Projection storage is bounded and read-only by default」。
@@ -74,3 +74,6 @@
 - [ ] 5.1 在拟新增 `docs/guard-integration-compatibility.md` 锁定已验证GE/native/mapping/envelope/平台/宿主组合及固定依赖制品；`guard_integration_version_matrix.rs` 对支持及未知N/N-1逐项测试，未知组合拒绝，不以crate semver推报告版本。追踪「Rollout preserves native ownership and rollback」。
 - [ ] 5.2 在 `guard_integration/command.rs` 与拟新增 `tests/acceptance/guard-integration-rollback.md` 验证默认关闭→shadow→显式opt-in→停用适配器路径；原生命令历史fixture全部保持，required集成证据缺失仍阻断，停用不删除工件或改政策。追踪「Native interfaces remain unchanged」「Rollout preserves native ownership and rollback」。
 - [ ] 5.3 在拟新增 `tests/acceptance/guard-integration-release.md` 汇总真实命令、版本、各spec scenario到测试/产物的矩阵及未支持范围；执行适用新测试和旧native受影响回归，全部指定负例通过、零false ALLOW且无未解释差异才宣布CG-ADAPTER切片验收，未完成旧任务保持未完成。追踪全部12条Requirement。
+
+
+2026-10-09 task3.2 independently accepted for the controller-supplied local SDK baseline-authentication port at0d6e0ec: fixed-source19 tests passed, original native code/commands unchanged. PreparedConsumption freezes baseline ref/policy and queries GE approval on every consume; older free consumers reject non-null baselines. Production identity deployment and durable baseline storage are not claimed. Evidence: external codeguard-baseline-trust-independent-review.md. CG adapter21/26; other pending tasks unchanged.

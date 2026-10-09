@@ -223,3 +223,5 @@ approval10/freshness4 tests pass; prior producer-only baseline qualification was
 observed as a real RED failure. See guard-read-only-consumer.md and ledger
 codeguard-baseline-trust-{red,green}.log. No roadmap checkbox changed; this is a
 controller-supplied authentication port, not a production identity installation.
+
+Root independently accepted task3.2 at0d6e0ec after19 fixed-source tests and exact four-file diff verification. Task register21/26. No native edits, production issuer deployment or durable baseline-store acceptance implied; task4.3 remains pending.
