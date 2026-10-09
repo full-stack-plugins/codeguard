@@ -2,6 +2,7 @@
 pub mod profile;
 pub mod reader;
 pub mod scope;
+mod scope_budget;
 
 pub mod projection;
 
