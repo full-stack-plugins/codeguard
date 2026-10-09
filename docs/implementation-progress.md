@@ -79,3 +79,28 @@ pass. Focused adapter/native contracts: 63 passed, 3 existing ignored; scoped cl
 with the previously documented no-deps/deprecated exclusions passed. Evidence:
 external codeguard-scope-budget-{red,green,regression,clippy}.log. Caller-owned
 input allocations and exact RSS are outside this admission policy guarantee.
+
+## Qualification and boundary evidence slice
+
+Prioritize task1.4: explicit zero-findings, WASM-only candidate, and resolved-task
+negative controls; all registered profiles remain unqualified and successful
+projection remains Partial/BLOCK. Expand qualification fixture with source-backed
+legacy-task requirements and actual adapter-only evidence; no native-task status
+changes. Task1.2: correct ADR to actual SDK dependency and reviewed GE revision,
+record selected byte-only library entry and future CLI arguments, exercise repeated
+projection and unselected native query under Linux syscall tracing. Release/pin
+limitations must remain explicit. Tasks2.4/2.5 CLI are deferred for this small slice.
+Root authorized task1.3 acceptance after independent review; register only that box.
+Qualification controls passed for zero findings/exit0, WASM inventory and resolved
+messages: each accepted report remains Partial/BLOCK; unsupported proof kinds and
+non-run-report task previews reject. Fixture-completeness test first failed on the
+missing explicit unverified status, then passed after source-backed legacy task
+requirements were added. No runtime qualification behavior was changed.
+Boundary test repeats ten byte-only SDK projections with identical output. Explicit
+Linux strace run passed, recording no file/process/network syscalls in the marked
+projection interval and no adapter/project access in native --version; sentinels
+unchanged. Default focused suite: 69 passed, 4 ignored (three pinned Ruff cases and
+the separately executed syscall test). Scoped clippy passed under documented
+existing exclusions. Added explicit fixture export example and a native-only
+profile rejection test for engine-backed consumers. Only independently accepted
+1.3 is checked; 1.2/1.4 await review, and 2.1/2.2/CLI gaps remain unchanged.

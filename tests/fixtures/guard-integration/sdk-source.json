@@ -1,0 +1,11 @@
+{
+  "version": "codeguard.sdk-source/v1alpha1",
+  "source_kind": "reviewed-local-snapshot",
+  "repository": "https://github.com/full-stack-plugins/guardengine",
+  "revision": "c80ec325449842d51007db2fd507040c53dc8f51",
+  "crate_version": "0.1.0",
+  "engine_wire_version": "guard.partme.ai/v1alpha1",
+  "integration_version": "guard.integration/v1alpha1",
+  "cargo_dependency": "local-path-not-content-pinned",
+  "release_status": "unreleased"
+}
