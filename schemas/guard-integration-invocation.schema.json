@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "codeguard.invocation/v1alpha1",
+  "title": "Narrow unqualified native evidence invocation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "package_version",
+    "command",
+    "native_schema",
+    "flags",
+    "request_id",
+    "run_id",
+    "process_exit"
+  ],
+  "properties": {
+    "version": {
+      "const": "codeguard.invocation/v1alpha1"
+    },
+    "package_version": {
+      "const": "0.1.4"
+    },
+    "command": {
+      "const": "lint"
+    },
+    "native_schema": {
+      "const": "1.0"
+    },
+    "flags": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "const": "--format=json"
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "request_id": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "process_exit": {
+      "enum": [
+        0,
+        1,
+        3,
+        4,
+        130
+      ]
+    }
+  }
+}
