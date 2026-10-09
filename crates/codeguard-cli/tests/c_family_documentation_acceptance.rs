@@ -15,12 +15,12 @@ fn ensure_clean_dir(name: &str) -> std::path::PathBuf {
     tmp.canonicalize().unwrap_or(tmp)
 }
 
-fn clang_tool() -> &'static str {
-    "/usr/bin/clang"
+fn clang_tool() -> String {
+    std::env::var("CODEGUARD_TEST_CLANG").unwrap_or_else(|_| "/usr/bin/clang".into())
 }
 
-fn clangpp_tool() -> &'static str {
-    "/usr/bin/clang++"
+fn clangpp_tool() -> String {
+    std::env::var("CODEGUARD_TEST_CLANGXX").unwrap_or_else(|_| "/usr/bin/clang++".into())
 }
 
 const COMPLETE_C: &str = r#"/**
@@ -69,7 +69,7 @@ fn complete_c_documentation_native_scan_no_false_positive() {
             "c",
             file.to_str().unwrap(),
             "--clang-tool",
-            clang_tool(),
+            &clang_tool(),
             "--standard",
             "c11",
             "--format=json",
@@ -86,7 +86,10 @@ fn complete_c_documentation_native_scan_no_false_positive() {
         report["native"]["reason"]
     );
     // 完整文档不得产生原生诊断（零假阳性）
-    let diagnostics = report["native"]["diagnostics"].as_array().cloned().unwrap_or_default();
+    let diagnostics = report["native"]["diagnostics"]
+        .as_array()
+        .cloned()
+        .unwrap_or_default();
     assert!(
         diagnostics.is_empty(),
         "完整 Doxygen 文档不应有原生诊断（零假阳性）: {diagnostics:?}"
@@ -111,7 +114,7 @@ fn complete_cpp_documentation_native_scan_no_false_positive() {
             "cpp",
             file.to_str().unwrap(),
             "--clang-tool",
-            clangpp_tool(),
+            &clangpp_tool(),
             "--standard",
             "c++17",
             "--format=json",
@@ -126,7 +129,10 @@ fn complete_cpp_documentation_native_scan_no_false_positive() {
         "完整文档的 C++ 文件原生扫描应完成: {}",
         report["native"]["reason"]
     );
-    let diagnostics = report["native"]["diagnostics"].as_array().cloned().unwrap_or_default();
+    let diagnostics = report["native"]["diagnostics"]
+        .as_array()
+        .cloned()
+        .unwrap_or_default();
     assert!(
         diagnostics.is_empty(),
         "完整 Doxygen 文档不应有原生诊断（零假阳性）: {diagnostics:?}"
@@ -149,7 +155,7 @@ fn symlink_source_path_is_rejected() {
             "c",
             link.to_str().unwrap(),
             "--clang-tool",
-            clang_tool(),
+            &clang_tool(),
             "--standard",
             "c11",
             "--format=json",
@@ -208,7 +214,7 @@ fn report_contains_verification_command_and_standard() {
             "c",
             file.to_str().unwrap(),
             "--clang-tool",
-            clang_tool(),
+            &clang_tool(),
             "--standard",
             "c11",
             "--format=json",
@@ -253,7 +259,7 @@ fn missing_docs_keeps_honest_incomplete_status() {
             "c",
             file.to_str().unwrap(),
             "--clang-tool",
-            clang_tool(),
+            &clang_tool(),
             "--standard",
             "c11",
             "--format=json",
@@ -269,7 +275,10 @@ fn missing_docs_keeps_honest_incomplete_status() {
     assert_eq!(report["command_status"], "incomplete");
     assert_ne!(report["delivery_decision"], "allow");
     // 应有修复指引
-    let actions = report["next_actions"].as_array().cloned().unwrap_or_default();
+    let actions = report["next_actions"]
+        .as_array()
+        .cloned()
+        .unwrap_or_default();
     assert!(
         !actions.is_empty(),
         "缺文档样本应保留下一步指引，不得静默放行"
