@@ -239,3 +239,5 @@ cross-context refusal, store expiry and immutable history. Native functionality
 and task4.3 checkbox remain unchanged pending review.
 
 Root independent review accepted task4.3 at a3dadb5:18 fixed-source tests and38 transport hashes/37 unchanged original byte pairs, no findings. Adapter22/26. Evidence codeguard-joint-independent-review.md. Remaining host/release/rollout tasks unchanged.
+
+Task4.4 local host library profile independently accepted at e04cc1b: actual probe1 passed/0 ignored, both pinned native invocations preserved exit3,21 retained artifacts verified, source refs/index unchanged. Adapter23/26. Scope and cancellation/credential limitations: tests/acceptance/guard-integration-host.md; independent external evidence codeguard-host-independent-review.md. Tasks5.1–5.3 unchanged.
