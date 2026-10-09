@@ -440,3 +440,114 @@ fn controller_binary_pin_mismatch_refuses_capture() {
             .is_err()
     );
 }
+
+#[test]
+fn typed_prebinding_transport_rejects_all_four_failure_classes_without_envelopes() {
+    use codeguard_gg_candidate_host::transport::{PrebindingCode, prepare};
+    fn rejected(
+        result: Result<
+            PreparedCandidate,
+            codeguard_gg_candidate_host::transport::PrebindingDiagnostic,
+        >,
+        code: PrebindingCode,
+    ) {
+        let error = match result {
+            Err(error) => error,
+            Ok(_) => panic!("unexpected prepared candidate"),
+        };
+        assert_eq!(error.code(), code);
+        let wire: serde_json::Value = serde_json::from_slice(&error.to_json()).unwrap();
+        assert_eq!(
+            wire,
+            serde_json::json!({"apiVersion":"codeguard.transport/v1alpha1","kind":"GuardTransportDiagnostic","phase":"unbound","code":code.as_str(),"exitCode":4})
+        );
+        assert!(wire.get("envelope").is_none());
+        assert!(wire.get("decision").is_none());
+        if let Some(dir) = std::env::var_os("CODEGUARD_TRANSPORT_CAPTURE_DIR") {
+            std::fs::create_dir_all(&dir).unwrap();
+            std::fs::write(
+                std::path::Path::new(&dir).join(format!("{}.json", code.as_str())),
+                error.to_json(),
+            )
+            .unwrap();
+        }
+    }
+    for format in ["sha1", "sha256"] {
+        let (root, snapshot) = fixture(format);
+        assert!(prepare(&snapshot, root.path(), "app.py").is_ok());
+        rejected(
+            prepare(&snapshot, root.path(), "../app.py"),
+            PrebindingCode::BadParameters,
+        );
+        rejected(
+            prepare(b"{", root.path(), "app.py"),
+            PrebindingCode::BadParameters,
+        );
+        rejected(
+            prepare(
+                &snapshot,
+                &root.path().join("missing-nonempty-repository"),
+                "app.py",
+            ),
+            PrebindingCode::UnknownRepository,
+        );
+        let nonrepo = tempfile::tempdir().unwrap();
+        rejected(
+            prepare(&snapshot, nonrepo.path(), "app.py"),
+            PrebindingCode::UnknownRepository,
+        );
+        for field in ["candidate_oid", "base_oid"] {
+            for value in [None, Some(serde_json::json!(""))] {
+                let mut doc: serde_json::Value = serde_json::from_slice(&snapshot).unwrap();
+                if let Some(value) = value {
+                    doc[field] = value;
+                } else {
+                    doc.as_object_mut().unwrap().remove(field);
+                }
+                rejected(
+                    prepare(&serde_json::to_vec(&doc).unwrap(), root.path(), "app.py"),
+                    PrebindingCode::MissingCandidateOrBase,
+                );
+            }
+        }
+        for field in ["requirement_ids", "allowed_paths", "policy_digest"] {
+            let mut doc: serde_json::Value = serde_json::from_slice(&snapshot).unwrap();
+            doc[field] = if field == "policy_digest" {
+                serde_json::json!("")
+            } else {
+                serde_json::json!([])
+            };
+            rejected(
+                prepare(&serde_json::to_vec(&doc).unwrap(), root.path(), "app.py"),
+                PrebindingCode::UnfrozenScope,
+            );
+        }
+        std::fs::write(root.path().join("app.py"), "dirty\n").unwrap();
+        rejected(
+            prepare(&snapshot, root.path(), "app.py"),
+            PrebindingCode::CandidateBindingInvalid,
+        );
+    }
+}
+
+#[test]
+fn typed_transport_rejects_raw_budget_depth_and_duplicate_ambiguity() {
+    use codeguard_gg_candidate_host::transport::{PrebindingCode, prepare};
+    let (root, snapshot) = fixture("sha1");
+    let text = String::from_utf8(snapshot).unwrap();
+    let duplicate = text
+        .replacen('{', "{\"candidate_oid\":\"\",", 1)
+        .into_bytes();
+    let deeply_nested = format!("{}0{}", "[".repeat(200), "]".repeat(200)).into_bytes();
+    for bytes in [vec![b' '; 1_048_577], duplicate, deeply_nested] {
+        let Err(error) = prepare(&bytes, root.path(), "app.py") else {
+            panic!("invalid input accepted")
+        };
+        assert_eq!(error.code(), PrebindingCode::BadParameters);
+        assert!(
+            !String::from_utf8(error.to_json())
+                .unwrap()
+                .contains(&root.path().to_string_lossy().to_string())
+        );
+    }
+}

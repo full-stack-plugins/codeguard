@@ -9,6 +9,7 @@ publish = false
 [workspace]
 
 [dependencies]
+codeguard-adapters = { path = "../../crates/codeguard-adapters" }
 codeguard-cli = { path = "../../crates/codeguard-cli" }
 codeguard-runtime = { path = "../../crates/codeguard-runtime" }
 gitguard = { path = "../../../gitguard" }

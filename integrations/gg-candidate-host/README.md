@@ -40,3 +40,27 @@ CodeGuard `f5661d51dd1b2629f3b87b726fb09a9060ce7958` binary, SHA256
 `b7576afa78f5ab6fdc8133650a1c75dc113357ac927e553b4f5c67731eea3a8c`.
 Relative path dependencies require the controller to select matching local
 checkouts; this unpublished host is not a signed/released distribution.
+
+## Typed prebinding transport
+
+`transport::prepare(snapshot_bytes, explicit_absolute_root, target)` is an additive
+host API returning either the existing private `PreparedCandidate` or a typed
+`PrebindingDiagnostic`. The caller must supply the independently fixed controller
+snapshot and root. The API neither discovers a trusted root from cwd nor treats a
+repository label as authentication. It resolves the actual explicit repository
+through the already validated GitGuard host path.
+
+Diagnostics serialize to the existing
+`schemas/guard-integration-transport-error.schema.json`: versioned transport kind,
+`phase: unbound`, fixed `code`, and `exitCode: 4`. They have no envelope or decision.
+Codes distinguish bad parameters, unavailable/non-repository explicit root,
+missing candidate/base, unfrozen required scope, and other candidate-binding
+failures. No arbitrary input, path, or credential appears in diagnostic JSON.
+This API does not itself write stdout/stderr or change any native command exit.
+
+Before classification, raw bytes are bounded to 1 MiB and parsed with the mature
+strict duplicate-key reader and its default serde depth limit. Missing fields are
+classified, never accepted as defaults. All successes still call the unchanged
+`PreparedCandidate::from_bytes` with original bytes and perform full candidate,
+clean-tree, exact configuration, target and source checks. No uploaded digest or
+new caller boolean can create a capture or qualified result.

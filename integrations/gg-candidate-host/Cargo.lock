@@ -135,6 +135,7 @@ dependencies = [
 name = "codeguard-gg-candidate-host"
 version = "0.1.0"
 dependencies = [
+ "codeguard-adapters",
  "codeguard-cli",
  "codeguard-runtime",
  "gitguard",
