@@ -1,0 +1,655 @@
+{
+  "schema": "codeguard.local-release-evidence/v1",
+  "implemented_source_pin": "9337cf2b8b8163c29abd7130c85529ec19bc0881",
+  "spec_scenario_count": 24,
+  "scope": "explicit local adapter profiles; not production activation or all native qualification",
+  "requirements": [
+    {
+      "id": "R01",
+      "requirement": "Native interfaces remain unchanged",
+      "spec_path": "openspec/changes/add-guardengine-compatibility-adapter/specs/native-evidence-projection/spec.md",
+      "scenarios": [
+        {
+          "id": "R01S1",
+          "scenario": "Adapter is disabled",
+          "test_files": [
+            "crates/codeguard-cli/tests/guard_integration_compat.rs",
+            "crates/codeguard-cli/tests/guard_integration_rollback.rs"
+          ],
+          "independent_reports": [
+            "codeguard-native-parity-independent-review.md",
+            "codeguard-rollback-independent-review.md"
+          ],
+          "primary_test": {
+            "file": "crates/codeguard-cli/tests/guard_integration_compat.rs",
+            "function": "real_streams_and_source_side_effects_are_digest_bound",
+            "ignored_by_default": false
+          }
+        },
+        {
+          "id": "R01S2",
+          "scenario": "Legacy exit semantics differ",
+          "test_files": [
+            "crates/codeguard-cli/tests/guard_integration_compat.rs",
+            "crates/codeguard-cli/tests/guard_integration_rollback.rs"
+          ],
+          "independent_reports": [
+            "codeguard-native-parity-independent-review.md",
+            "codeguard-rollback-independent-review.md"
+          ],
+          "primary_test": {
+            "file": "crates/codeguard-cli/tests/guard_integration_compat.rs",
+            "function": "native_exit_families_and_exact_explained_differences_stay_separate",
+            "ignored_by_default": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "R02",
+      "requirement": "Native evidence readers reject ambiguity",
+      "spec_path": "openspec/changes/add-guardengine-compatibility-adapter/specs/native-evidence-projection/spec.md",
+      "scenarios": [
+        {
+          "id": "R02S1",
+          "scenario": "Unknown schema or duplicate key arrives",
+          "test_files": [
+            "crates/codeguard-cli/tests/guard_integration_reader_matrix.rs",
+            "crates/codeguard-cli/tests/guard_integration_reader.rs",
+            "crates/codeguard-cli/tests/guard_integration_version_matrix.rs"
+          ],
+          "independent_reports": [
+            "codeguard-reader-shadow-independent-review.md"
+          ],
+          "primary_test": {
+            "file": "crates/codeguard-cli/tests/guard_integration_reader.rs",
+            "function": "rejects_stale_run_exit_conflict_unknown_schema_and_truncation",
+            "ignored_by_default": false
+          }
+        },
+        {
+          "id": "R02S2",
+          "scenario": "Export failed with retained findings",
+          "test_files": [
+            "crates/codeguard-cli/tests/guard_integration_reader_matrix.rs",
+            "crates/codeguard-cli/tests/guard_integration_reader.rs",
+            "crates/codeguard-cli/tests/guard_integration_version_matrix.rs"
+          ],
+          "independent_reports": [
+            "codeguard-reader-shadow-independent-review.md"
+          ],
+          "primary_test": {
+            "file": "crates/codeguard-cli/tests/guard_integration_reader_matrix.rs",
+            "function": "actual_export_failure_keeps_native_f401_and_original_digest_but_aggregate_is_unsupported",
+            "ignored_by_default": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "R03",
+      "requirement": "Complete projection requires proven native scope",
+      "spec_path": "openspec/changes/add-guardengine-compatibility-adapter/specs/native-evidence-projection/spec.md",
+      "scenarios": [
+        {
+          "id": "R03S1",
+          "scenario": "Aggregate feedback remains incomplete",
+          "test_files": [
+            "crates/codeguard-cli/tests/guard_integration_ruff.rs",
+            "crates/codeguard-cli/tests/guard_integration_scope.rs",
+            "crates/codeguard-cli/tests/guard_integration_scope_dimensions.rs"
+          ],
+          "independent_reports": [
+            "codeguard-ruff-independent-review.md",
+            "codeguard-reader-shadow-independent-review.md"
+          ],
+          "primary_test": {
+            "file": "crates/codeguard-cli/tests/guard_integration_cli.rs",
+            "function": "native_aggregate_three_remains_partial_block_not_approval",
+            "ignored_by_default": false
+          }
+        },
+        {
+          "id": "R03S2",
+          "scenario": "Narrow profile gains qualification",
+          "test_files": [
+            "crates/codeguard-cli/tests/guard_integration_ruff.rs",
+            "crates/codeguard-cli/tests/guard_integration_scope.rs",
+            "crates/codeguard-cli/tests/guard_integration_scope_dimensions.rs"
+          ],
+          "independent_reports": [
+            "codeguard-ruff-independent-review.md",
+            "codeguard-reader-shadow-independent-review.md"
+          ],
+          "primary_test": {
+            "file": "crates/codeguard-cli/tests/guard_integration_ruff.rs",
+            "function": "genuine_bad_fixed_and_clean_have_only_narrow_f401_coverage",
+            "ignored_by_default": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "R04",
+      "requirement": "Projection uses exact supported engine relations",
+      "spec_path": "openspec/changes/add-guardengine-compatibility-adapter/specs/native-evidence-projection/spec.md",
+      "scenarios": [
+        {
+          "id": "R04S1",
+          "scenario": "A finding has no supported mapping",
+          "test_files": [
+            "crates/codeguard-cli/tests/guard_integration_relations.rs",
+            "crates/codeguard-cli/tests/guard_integration_projection.rs"
+          ],
+          "independent_reports": [
+            "codeguard-reader-shadow-independent-review.md",
+            "codeguard-ruff-independent-review.md"
+          ],
+          "primary_test": {
+            "file": "crates/codeguard-cli/tests/guard_integration_relations.rs",
+            "function": "each_registered_finding_and_gap_has_positive_and_missing_mapping_counterexample",
+            "ignored_by_default": false
+          }
+        },
+        {
+          "id": "R04S2",
+          "scenario": "Partial facts are evaluable",
+          "test_files": [
+            "crates/codeguard-cli/tests/guard_integration_relations.rs",
+            "crates/codeguard-cli/tests/guard_integration_projection.rs"
+          ],
+          "independent_reports": [
+            "codeguard-reader-shadow-independent-review.md",
+            "codeguard-ruff-independent-review.md"
+          ],
+          "primary_test": {
+            "file": "crates/codeguard-cli/tests/guard_integration_projection.rs",
+            "function": "partial_projection_uses_engine_for_every_enforcement_and_keeps_attachment",
+            "ignored_by_default": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "R05",
+      "requirement": "Execution outcome is separate from technical decision",
+      "spec_path": "openspec/changes/add-guardengine-compatibility-adapter/specs/native-evidence-projection/spec.md",
+      "scenarios": [
+        {
+          "id": "R05S1",
+          "scenario": "Native tool crashes after producing findings",
+          "test_files": [
+            "crates/codeguard-cli/tests/guard_integration_binding.rs",
+            "crates/codeguard-cli/tests/guard_integration_cli.rs",
+            "crates/codeguard-cli/tests/guard_integration_ruff_cli.rs"
+          ],
+          "independent_reports": [
+            "codeguard-cli-independent-review.md",
+            "codeguard-ruff-cli-independent-review.md"
+          ],
+          "primary_test": {
+            "file": "crates/codeguard-cli/tests/guard_integration_binding.rs",
+            "function": "bound_native_failure_and_cancellation_keep_null_decision_and_findings",
+            "ignored_by_default": false
+          }
+        },
+        {
+          "id": "R05S2",
+          "scenario": "Native cancellation is projected",
+          "test_files": [
+            "crates/codeguard-cli/tests/guard_integration_binding.rs",
+            "crates/codeguard-cli/tests/guard_integration_cli.rs",
+            "crates/codeguard-cli/tests/guard_integration_ruff_cli.rs"
+          ],
+          "independent_reports": [
+            "codeguard-cli-independent-review.md",
+            "codeguard-ruff-cli-independent-review.md"
+          ],
+          "primary_test": {
+            "file": "crates/codeguard-cli/tests/guard_integration_cli.rs",
+            "function": "bound_native_errors_and_cancellation_preserve_original_exit_and_null_decision",
+            "ignored_by_default": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "R06",
+      "requirement": "Binding precedes envelope publication",
+      "spec_path": "openspec/changes/add-guardengine-compatibility-adapter/specs/native-evidence-projection/spec.md",
+      "scenarios": [
+        {
+          "id": "R06S1",
+          "scenario": "Candidate is unresolved",
+          "test_files": [
+            "crates/codeguard-cli/tests/guard_integration_binding.rs",
+            "crates/codeguard-cli/tests/guard_integration_ruff_cli.rs",
+            "crates/codeguard-cli/tests/guard_integration_approval.rs",
+            "integrations/gg-candidate-host/tests/candidate_binding.rs"
+          ],
+          "independent_reports": [
+            "codeguard-host-transport-independent-review.md",
+            "codeguard-approval-attachment-independent-review.md"
+          ],
+          "primary_test": {
+            "file": "integrations/gg-candidate-host/tests/candidate_binding.rs",
+            "function": "typed_prebinding_transport_rejects_all_four_failure_classes_without_envelopes",
+            "ignored_by_default": false
+          }
+        },
+        {
+          "id": "R06S2",
+          "scenario": "Engine requires review",
+          "test_files": [
+            "crates/codeguard-cli/tests/guard_integration_binding.rs",
+            "crates/codeguard-cli/tests/guard_integration_ruff_cli.rs",
+            "crates/codeguard-cli/tests/guard_integration_approval.rs",
+            "integrations/gg-candidate-host/tests/candidate_binding.rs"
+          ],
+          "independent_reports": [
+            "codeguard-host-transport-independent-review.md",
+            "codeguard-approval-attachment-independent-review.md"
+          ],
+          "primary_test": {
+            "file": "crates/codeguard-cli/tests/guard_integration_approval.rs",
+            "function": "approval_attachment_is_a_separate_borrowed_envelope",
+            "ignored_by_default": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "R07",
+      "requirement": "Approved references require authenticated consumption",
+      "spec_path": "openspec/changes/add-guardengine-compatibility-adapter/specs/bound-projection-consumption/spec.md",
+      "scenarios": [
+        {
+          "id": "R07S1",
+          "scenario": "Approval is forged locally",
+          "test_files": [
+            "crates/codeguard-cli/tests/guard_integration_trust.rs",
+            "crates/codeguard-cli/tests/guard_integration_approval.rs"
+          ],
+          "independent_reports": [
+            "codeguard-baseline-trust-independent-review.md"
+          ],
+          "primary_test": {
+            "file": "crates/codeguard-cli/tests/guard_integration_trust.rs",
+            "function": "baseline_queries_are_fresh_and_cannot_be_replaced_by_text_or_rehashed_issuer",
+            "ignored_by_default": false
+          }
+        },
+        {
+          "id": "R07S2",
+          "scenario": "Approval service is unavailable",
+          "test_files": [
+            "crates/codeguard-cli/tests/guard_integration_trust.rs",
+            "crates/codeguard-cli/tests/guard_integration_approval.rs"
+          ],
+          "independent_reports": [
+            "codeguard-baseline-trust-independent-review.md"
+          ],
+          "primary_test": {
+            "file": "crates/codeguard-cli/tests/guard_integration_trust.rs",
+            "function": "baseline_queries_are_fresh_and_cannot_be_replaced_by_text_or_rehashed_issuer",
+            "ignored_by_default": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "R08",
+      "requirement": "Changed bindings invalidate eligibility",
+      "spec_path": "openspec/changes/add-guardengine-compatibility-adapter/specs/bound-projection-consumption/spec.md",
+      "scenarios": [
+        {
+          "id": "R08S1",
+          "scenario": "Analyzer or baseline changes",
+          "test_files": [
+            "crates/codeguard-cli/tests/guard_integration_freshness.rs",
+            "crates/codeguard-cli/tests/guard_integration_trust.rs",
+            "crates/codeguard-cli/tests/guard_integration_approval.rs"
+          ],
+          "independent_reports": [
+            "codeguard-approval-attachment-independent-review.md",
+            "codeguard-baseline-trust-independent-review.md"
+          ],
+          "primary_test": {
+            "file": "crates/codeguard-cli/tests/guard_integration_freshness.rs",
+            "function": "each_frozen_binding_mapping_run_domain_contract_analyzer_and_scope_change_invalidates",
+            "ignored_by_default": false
+          }
+        },
+        {
+          "id": "R08S2",
+          "scenario": "Approval is revoked after evaluation",
+          "test_files": [
+            "crates/codeguard-cli/tests/guard_integration_freshness.rs",
+            "crates/codeguard-cli/tests/guard_integration_trust.rs",
+            "crates/codeguard-cli/tests/guard_integration_approval.rs"
+          ],
+          "independent_reports": [
+            "codeguard-approval-attachment-independent-review.md",
+            "codeguard-baseline-trust-independent-review.md"
+          ],
+          "primary_test": {
+            "file": "crates/codeguard-cli/tests/guard_integration_freshness.rs",
+            "function": "every_call_requeries_authority_and_preserves_original_report",
+            "ignored_by_default": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "R09",
+      "requirement": "Parallel projections preserve immutable ownership",
+      "spec_path": "openspec/changes/add-guardengine-compatibility-adapter/specs/bound-projection-consumption/spec.md",
+      "scenarios": [
+        {
+          "id": "R09S1",
+          "scenario": "Two requirements share extraction",
+          "test_files": [
+            "crates/codeguard-cli/tests/guard_integration_concurrency.rs",
+            "crates/codeguard-cli/tests/guard_integration_joint_queue.rs"
+          ],
+          "independent_reports": [
+            "codeguard-attempt-cas-independent-review.md",
+            "codeguard-joint-independent-review.md"
+          ],
+          "primary_test": {
+            "file": "crates/codeguard-cli/tests/guard_integration_concurrency.rs",
+            "function": "two_tasks_two_worktrees_and_two_requirements_keep_attempts_separate",
+            "ignored_by_default": false
+          }
+        },
+        {
+          "id": "R09S2",
+          "scenario": "Old success arrives late",
+          "test_files": [
+            "crates/codeguard-cli/tests/guard_integration_concurrency.rs",
+            "crates/codeguard-cli/tests/guard_integration_joint_queue.rs"
+          ],
+          "independent_reports": [
+            "codeguard-attempt-cas-independent-review.md",
+            "codeguard-joint-independent-review.md"
+          ],
+          "primary_test": {
+            "file": "crates/codeguard-cli/tests/guard_integration_concurrency.rs",
+            "function": "late_head1_success_cannot_overwrite_current_head2_block",
+            "ignored_by_default": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "R10",
+      "requirement": "Protected gates consume exact queue candidates",
+      "spec_path": "openspec/changes/add-guardengine-compatibility-adapter/specs/bound-projection-consumption/spec.md",
+      "scenarios": [
+        {
+          "id": "R10S1",
+          "scenario": "Queue candidate differs from PR head",
+          "test_files": [
+            "crates/codeguard-cli/tests/guard_integration_joint_queue.rs",
+            "integrations/gg-candidate-host/tests/candidate_binding.rs"
+          ],
+          "independent_reports": [
+            "codeguard-candidate-host-independent-review.md",
+            "codeguard-joint-independent-review.md"
+          ],
+          "primary_test": {
+            "file": "integrations/gg-candidate-host/tests/candidate_binding.rs",
+            "function": "actual_queue_m_not_pr_head_and_changed_full_identity_rejects_old_evidence",
+            "ignored_by_default": true
+          }
+        },
+        {
+          "id": "R10S2",
+          "scenario": "Queue is regrouped",
+          "test_files": [
+            "crates/codeguard-cli/tests/guard_integration_joint_queue.rs",
+            "integrations/gg-candidate-host/tests/candidate_binding.rs"
+          ],
+          "independent_reports": [
+            "codeguard-candidate-host-independent-review.md",
+            "codeguard-joint-independent-review.md"
+          ],
+          "primary_test": {
+            "file": "crates/codeguard-cli/tests/guard_integration_joint_queue.rs",
+            "function": "real_queue_parallel_consumption_rechecks_baseline_and_late_current",
+            "ignored_by_default": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "R11",
+      "requirement": "Projection storage is bounded and read-only by default",
+      "spec_path": "openspec/changes/add-guardengine-compatibility-adapter/specs/bound-projection-consumption/spec.md",
+      "scenarios": [
+        {
+          "id": "R11S1",
+          "scenario": "Input contains a malicious path",
+          "test_files": [
+            "crates/codeguard-cli/tests/guard_integration_storage.rs",
+            "crates/codeguard-cli/tests/guard_integration_redaction.rs",
+            "crates/codeguard-cli/tests/guard_integration_side_effects.rs"
+          ],
+          "independent_reports": [
+            "codeguard-store-independent-review.md",
+            "codeguard-retention-independent-review.md",
+            "codeguard-consumer-independent-review.md"
+          ],
+          "primary_test": {
+            "file": "crates/codeguard-cli/tests/guard_integration_storage.rs",
+            "function": "required_artifact_uris_are_never_paths_and_receipts_are_not_trusted_size_claims",
+            "ignored_by_default": false
+          }
+        },
+        {
+          "id": "R11S2",
+          "scenario": "Projection is retried without output request",
+          "test_files": [
+            "crates/codeguard-cli/tests/guard_integration_storage.rs",
+            "crates/codeguard-cli/tests/guard_integration_redaction.rs",
+            "crates/codeguard-cli/tests/guard_integration_side_effects.rs"
+          ],
+          "independent_reports": [
+            "codeguard-store-independent-review.md",
+            "codeguard-retention-independent-review.md",
+            "codeguard-consumer-independent-review.md"
+          ],
+          "primary_test": {
+            "file": "crates/codeguard-cli/tests/guard_integration_side_effects.rs",
+            "function": "repeated_consumption_leaves_actual_source_events_refs_and_index_unchanged",
+            "ignored_by_default": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "R12",
+      "requirement": "Rollout preserves native ownership and rollback",
+      "spec_path": "openspec/changes/add-guardengine-compatibility-adapter/specs/bound-projection-consumption/spec.md",
+      "scenarios": [
+        {
+          "id": "R12S1",
+          "scenario": "Selected native slice is unfinished",
+          "test_files": [
+            "crates/codeguard-cli/tests/guard_integration_version_matrix.rs",
+            "crates/codeguard-cli/tests/guard_integration_rollback.rs",
+            "crates/codeguard-cli/tests/guard_integration_shadow.rs",
+            "crates/codeguard-cli/tests/guard_integration_scope.rs",
+            "integrations/gg-candidate-host/tests/candidate_binding.rs"
+          ],
+          "independent_reports": [
+            "codeguard-host-independent-review.md",
+            "codeguard-package-independent-review.md",
+            "codeguard-rollback-independent-review.md"
+          ],
+          "primary_test": {
+            "file": "crates/codeguard-cli/tests/guard_integration_scope.rs",
+            "function": "zero_findings_and_native_exit_zero_cannot_qualify_complete",
+            "ignored_by_default": false
+          }
+        },
+        {
+          "id": "R12S2",
+          "scenario": "Adapter is rolled back",
+          "test_files": [
+            "crates/codeguard-cli/tests/guard_integration_version_matrix.rs",
+            "crates/codeguard-cli/tests/guard_integration_rollback.rs",
+            "crates/codeguard-cli/tests/guard_integration_shadow.rs",
+            "crates/codeguard-cli/tests/guard_integration_scope.rs",
+            "integrations/gg-candidate-host/tests/candidate_binding.rs"
+          ],
+          "independent_reports": [
+            "codeguard-host-independent-review.md",
+            "codeguard-package-independent-review.md",
+            "codeguard-rollback-independent-review.md"
+          ],
+          "primary_test": {
+            "file": "crates/codeguard-cli/tests/guard_integration_rollback.rs",
+            "function": "actual_default_shadow_optin_disable_preserves_native_and_required_policy",
+            "ignored_by_default": false
+          }
+        }
+      ]
+    }
+  ],
+  "source_file_sha256": {
+    "crates/codeguard-cli/tests/guard_integration_approval.rs": "db637bdf59b8d6560779be524e98e593646faf59581bee699c277ddbc8bb0b2b",
+    "crates/codeguard-cli/tests/guard_integration_binding.rs": "e77e1d2266424de9d508f8ddcbda5d6f23833eb962eba01fbd9d29315abbc6fe",
+    "crates/codeguard-cli/tests/guard_integration_cli.rs": "46a741da0042eb1c9b9a45a6dd0f59d599eccab9157d1f2dcfd7cc57e98c9561",
+    "crates/codeguard-cli/tests/guard_integration_compat.rs": "e45b15434303aafb567d7a3be01ae637e9df6902c2964d4f84d369ddbd7bbefd",
+    "crates/codeguard-cli/tests/guard_integration_concurrency.rs": "3d45279824b416e1aa480e60c80c456437d2cceb2111bbf4fcb50fb68f0fa947",
+    "crates/codeguard-cli/tests/guard_integration_freshness.rs": "839627da7364c0e6dce7aad6571bed8fbe372d60610d12c0db1ac2b64ba0d0ab",
+    "crates/codeguard-cli/tests/guard_integration_joint_queue.rs": "ba7bff256eedc33f38aca066ddf55d5d038c86da192c831120b8bef74a593953",
+    "crates/codeguard-cli/tests/guard_integration_projection.rs": "22a21854cd5a7b203a93fce8abedc767f4e0c7cc3a9d63eb97191ab084eb8c50",
+    "crates/codeguard-cli/tests/guard_integration_reader.rs": "d05ce02869d43fc4be21318b32c55ce00d63165c91a49c0bf9acd85e7b205776",
+    "crates/codeguard-cli/tests/guard_integration_reader_matrix.rs": "0c705e2bc0643253cc6c981d5c3587555b7788f77d84af51a368e19656f6039e",
+    "crates/codeguard-cli/tests/guard_integration_redaction.rs": "4730894ea2141da032b7b3a410d9ab292a5f4bcbb87863154f15ce727f98e735",
+    "crates/codeguard-cli/tests/guard_integration_relations.rs": "99c6a039687aaa4e12b7e09a3e45e3524f5fb851ca2b7a47eb02ea8c62f67ba1",
+    "crates/codeguard-cli/tests/guard_integration_rollback.rs": "ae43584bb63ae0f33cd00fab7bad2ee18062035925b28f984d701e7a15132337",
+    "crates/codeguard-cli/tests/guard_integration_ruff.rs": "dd08218ebf80f653ad7867e1f4fdcfab342532575e79b50f016a8a446fa3d13b",
+    "crates/codeguard-cli/tests/guard_integration_ruff_cli.rs": "0e11d9ee09778ee32bce2459aa7a926da31a04b2f6f37cab8f7e6fb637cc9a8f",
+    "crates/codeguard-cli/tests/guard_integration_scope.rs": "200580b4574057b13011396881660ce96be162de05063a14fcd3682eb52273c3",
+    "crates/codeguard-cli/tests/guard_integration_scope_dimensions.rs": "edbe436bd9c425c4a908f39a6441f2493e753f6d38894a4bd18c059cf3ab4f85",
+    "crates/codeguard-cli/tests/guard_integration_shadow.rs": "973bc689b98612799434c9ba5bba02d69c1ba2328b736373ce20ab3eff497c5f",
+    "crates/codeguard-cli/tests/guard_integration_side_effects.rs": "7416f6b25fba3ccc6e0ba1ab124bdeb18b61a09568e7404523440ef5cbe29668",
+    "crates/codeguard-cli/tests/guard_integration_storage.rs": "bcd860ee7030d060faf17e1d6aeebca617aa45b5717c58e1039a00329b7391eb",
+    "crates/codeguard-cli/tests/guard_integration_trust.rs": "1309353ef3952c4137a85e19066f505181af9bf53ff53e0c44930bc5c839c122",
+    "crates/codeguard-cli/tests/guard_integration_version_matrix.rs": "ab4f76d92894f9315cffd5ad185bc0401290085669efacebf075c5c298f4b757",
+    "integrations/gg-candidate-host/tests/candidate_binding.rs": "2e7688b376869b27936adab7ecdb2a8a969e53089979c464e6c745113f89dab8",
+    "openspec/changes/add-guardengine-compatibility-adapter/specs/bound-projection-consumption/spec.md": "fb86c4c710858088f54a4f54eeb89c04d35f9f1b031211544edecdb9ff0450a9",
+    "openspec/changes/add-guardengine-compatibility-adapter/specs/native-evidence-projection/spec.md": "0af1edd3f0071c0e8cfadd1bea6a92fc34ddc4b7febfb242cd1df46a1fdeeb20"
+  },
+  "external_ledger_sha256": {
+    "codeguard-approval-attachment-independent-review.md": "c5d4dfb1936b0c80fd4def8dfa0c118b223eee65b2c3d87038b23ba4c4139012",
+    "codeguard-attempt-cas-independent-review.md": "fd3379850327e8fccd59352f74508adab6a2e4d3252a247a4ca92b6a403e2f9c",
+    "codeguard-baseline-trust-independent-review.md": "91215359404dd6ccb2dd695f07c11579906fb6e55d9bb511b80e5d0e702ce8ee",
+    "codeguard-candidate-host-independent-review.md": "a02003b72e22cc8736699ee21bc94627f496b396fa2b282b73585fd75901236d",
+    "codeguard-cli-independent-review.md": "1c6a11f75471ed8e20d05433c544ede23a1bd015673529e4144de122a957ff5a",
+    "codeguard-consumer-independent-review.md": "29399cffd10bc46a5242bd9ed16e7418d633605f4278e34545bdbe557ac8f47e",
+    "codeguard-host-independent-review.md": "e22fe9967720a7eb5f50240a10ba5e2c8cae7e693839b826581a5ba27b9c4dd1",
+    "codeguard-host-independent-verification.json": "6618d2122494e20dc8840c4a524e846ec1398e28a0280c82d0d65c2d901dc1a8",
+    "codeguard-host-transport-independent-review.md": "305a3dbf692ca64ad7d744ad67e7cf7a3c9987c512b53c2c11a8df8608316136",
+    "codeguard-joint-independent-review.md": "ff5743d79a49514c8ac1c8bf8c952d27fd8a45ab4ef11f1331cc2027a383746b",
+    "codeguard-joint-independent-verification.json": "eaa64a5760b84cf92a1853bd5d9452096b6de9b91f33251c9785f18ab70bc89d",
+    "codeguard-local-source-594644d.tar.gz": "a7f2872c1029a12f1b5bbdd94c98e39800288129f5913b6e3781d3b70a9204bf",
+    "codeguard-native-parity-independent-review.md": "5e0969747e120dca8237bfd1557082c555c8de264eb17abf2f715b5be120755a",
+    "codeguard-package-independent-review.md": "dc8da948a6b6baafc16bfe7ec572315e4761118d1cd3a3853a178c431b899c18",
+    "codeguard-package-independent-verification.json": "34ee3d76e5c0ee556208f47f4c497677e2f0fa6654606533c4b739ce903412dc",
+    "codeguard-reader-shadow-independent-review.md": "b04f13ca9e99394fa99baffe5dc9765138abb638ae962ff4368eacbf7bf8b737",
+    "codeguard-retention-independent-review.md": "6a7432a1b191c2d8d1b2e3fbd8ecfa55513383d2d332b65ea627924c367e4b30",
+    "codeguard-rollback-independent-review.md": "556bc84bff548612fdd2e6d283ec1deb0d90ab84605e7be683ed296817d0b3cb",
+    "codeguard-rollback-independent-verification.json": "3257125a3dbf4b12284ad6acf2cd7fbf185bc3f8067059bc1f9262ccc1e8635b",
+    "codeguard-ruff-cli-independent-review.md": "e82c29eddb5598afca4015a0ce9a8940c5bdb6c5115d6f04967159e3bebdd6bb",
+    "codeguard-ruff-independent-review.md": "42be7c91346b5e88a8bfbbf9d2b76bd5c474e5d6d440ce203397f67fb3b70365",
+    "codeguard-store-independent-review.md": "32fcbbd15100ecb204d834a9e38d691aea2e1769e8d18a698d0281478a3af221"
+  },
+  "recent_preservation": {
+    "baseline": "32b8444eebccb4d5906931e41458af7087cd2269",
+    "through": "9337cf2b8b8163c29abd7130c85529ec19bc0881",
+    "changed_file_count": 58,
+    "allowed_prefixes": [
+      "crates/codeguard-cli/src/guard_integration/",
+      "crates/codeguard-cli/tests/guard_integration_",
+      "tests/fixtures/guard-integration/",
+      "tests/acceptance/guard-integration-",
+      "docs/guard-",
+      "integrations/gg-candidate-host/",
+      "integrations/local_package/",
+      "openspec/changes/add-guardengine-compatibility-adapter/"
+    ],
+    "changed_paths": [
+      "crates/codeguard-cli/src/guard_integration/audit/access.rs",
+      "crates/codeguard-cli/src/guard_integration/audit/attempts.rs",
+      "crates/codeguard-cli/src/guard_integration/consumer.rs",
+      "crates/codeguard-cli/tests/guard_integration_joint_queue.rs",
+      "crates/codeguard-cli/tests/guard_integration_rollback.rs",
+      "crates/codeguard-cli/tests/guard_integration_trust.rs",
+      "crates/codeguard-cli/tests/guard_integration_version_matrix.rs",
+      "docs/guard-integration-compatibility.md",
+      "docs/guard-integration-progress.md",
+      "docs/guard-read-only-consumer.md",
+      "integrations/gg-candidate-host/README.md",
+      "integrations/gg-candidate-host/tests/candidate_binding.rs",
+      "integrations/local_package/prepare.py",
+      "integrations/local_package/test_prepare.py",
+      "openspec/changes/add-guardengine-compatibility-adapter/tasks.md",
+      "tests/acceptance/guard-integration-host.md",
+      "tests/acceptance/guard-integration-joint-queue.md",
+      "tests/acceptance/guard-integration-rollback.md",
+      "tests/fixtures/guard-integration/joint/A/codeguard/context.json",
+      "tests/fixtures/guard-integration/joint/A/codeguard/contract.json",
+      "tests/fixtures/guard-integration/joint/A/codeguard/envelope.json",
+      "tests/fixtures/guard-integration/joint/A/codeguard/expected.json",
+      "tests/fixtures/guard-integration/joint/A/codeguard/facts.json",
+      "tests/fixtures/guard-integration/joint/A/codeguard/mapping.json",
+      "tests/fixtures/guard-integration/joint/A/codeguard/native.json",
+      "tests/fixtures/guard-integration/joint/A/codeguard/report.json",
+      "tests/fixtures/guard-integration/joint/A/gitguard/candidate.json",
+      "tests/fixtures/guard-integration/joint/B/codeguard/context.json",
+      "tests/fixtures/guard-integration/joint/B/codeguard/contract.json",
+      "tests/fixtures/guard-integration/joint/B/codeguard/envelope.json",
+      "tests/fixtures/guard-integration/joint/B/codeguard/expected.json",
+      "tests/fixtures/guard-integration/joint/B/codeguard/facts.json",
+      "tests/fixtures/guard-integration/joint/B/codeguard/mapping.json",
+      "tests/fixtures/guard-integration/joint/B/codeguard/native.json",
+      "tests/fixtures/guard-integration/joint/B/codeguard/report.json",
+      "tests/fixtures/guard-integration/joint/B/gitguard/candidate.json",
+      "tests/fixtures/guard-integration/joint/M1/codeguard/context.json",
+      "tests/fixtures/guard-integration/joint/M1/codeguard/contract.json",
+      "tests/fixtures/guard-integration/joint/M1/codeguard/envelope.json",
+      "tests/fixtures/guard-integration/joint/M1/codeguard/expected.json",
+      "tests/fixtures/guard-integration/joint/M1/codeguard/facts.json",
+      "tests/fixtures/guard-integration/joint/M1/codeguard/mapping.json",
+      "tests/fixtures/guard-integration/joint/M1/codeguard/native.json",
+      "tests/fixtures/guard-integration/joint/M1/codeguard/report.json",
+      "tests/fixtures/guard-integration/joint/M1/gitguard/candidate.json",
+      "tests/fixtures/guard-integration/joint/M2/codeguard/context.json",
+      "tests/fixtures/guard-integration/joint/M2/codeguard/contract.json",
+      "tests/fixtures/guard-integration/joint/M2/codeguard/envelope.json",
+      "tests/fixtures/guard-integration/joint/M2/codeguard/expected.json",
+      "tests/fixtures/guard-integration/joint/M2/codeguard/facts.json",
+      "tests/fixtures/guard-integration/joint/M2/codeguard/mapping.json",
+      "tests/fixtures/guard-integration/joint/M2/codeguard/native.json",
+      "tests/fixtures/guard-integration/joint/M2/codeguard/report.json",
+      "tests/fixtures/guard-integration/joint/M2/gitguard/candidate.json",
+      "tests/fixtures/guard-integration/joint/README.md",
+      "tests/fixtures/guard-integration/joint/TRANSPORT.json",
+      "tests/fixtures/guard-integration/joint/producer-manifest.json",
+      "tests/fixtures/guard-integration/joint/source.bundle"
+    ],
+    "outside_adapter_scope": []
+  },
+  "package": {
+    "source_pin": "594644d02b0de1a74f236340f9a0d301a0d7f58e",
+    "engine_source_pin": "b0e4b445e1a20a9354d55ebb41bbedaf16ec8a74",
+    "gitguard_source_pin": "20f3a82e3858c8bdffe752e6314a97bef82f063a",
+    "contains_later_rollback_api": false,
+    "artifact": "codeguard-local-source-594644d.tar.gz"
+  },
+  "task_5_3_independently_accepted": false
+}
