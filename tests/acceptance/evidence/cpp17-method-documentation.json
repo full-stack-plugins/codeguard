@@ -1,0 +1,86 @@
+{
+  "compiler_sha256": "34129c71a01a74f7f3b2443521519b2e5447553fa187f5fcafaaf8c42cc192e2",
+  "compiler_version": "Apple clang version 21.0.0 (clang-2100.3.34.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Library/Developer/CommandLineTools/usr/bin",
+  "native_ast_sha256": "edb98a337b0836375c12ad1a4bcce98503535cd1a9ab9b7a83e9c4e99fb2a8fb",
+  "observation": {
+    "authority": "local_unverified",
+    "coverage_proven": false,
+    "errors_and_behavior": "not_evaluated",
+    "functions": [
+      {
+        "column_byte": 5,
+        "comment_presence": "present",
+        "line": 5,
+        "missing_components": [],
+        "name": "read",
+        "offset_byte": 84,
+        "parameters": [
+          {
+            "description": "nonempty",
+            "index": 0,
+            "name": "x"
+          }
+        ],
+        "purpose_description": "nonempty",
+        "return_description": "nonempty",
+        "structure_status": "observed_supported_subset"
+      },
+      {
+        "column_byte": 6,
+        "comment_presence": "present",
+        "line": 7,
+        "missing_components": [],
+        "name": "clear",
+        "offset_byte": 121,
+        "parameters": [],
+        "purpose_description": "nonempty",
+        "return_description": "not_applicable",
+        "structure_status": "observed_supported_subset"
+      },
+      {
+        "column_byte": 5,
+        "comment_presence": "absent",
+        "line": 8,
+        "missing_components": [
+          "documentation_comment"
+        ],
+        "name": "undocumented",
+        "offset_byte": 134,
+        "parameters": [],
+        "purpose_description": "unknown",
+        "return_description": "unknown",
+        "structure_status": "observed_supported_subset"
+      },
+      {
+        "column_byte": 1,
+        "comment_presence": "present",
+        "line": 11,
+        "missing_components": [],
+        "name": "Box",
+        "offset_byte": 200,
+        "parameters": [
+          {
+            "description": "nonempty",
+            "index": 0,
+            "name": "size"
+          }
+        ],
+        "purpose_description": "nonempty",
+        "return_description": "not_applicable",
+        "structure_status": "observed_supported_subset"
+      }
+    ],
+    "observation_type": "clang_function_documentation_structure",
+    "qualification": "not_granted",
+    "schema_version": "0.1.0",
+    "semantic_accuracy": "not_evaluated",
+    "unresolved_declaration_kinds": [
+      "CXXMethodDecl",
+      "CXXRecordDecl"
+    ]
+  },
+  "qualification": "not_granted",
+  "scope": "cpp17_ordinary_in_class_methods_and_explicit_constructors",
+  "source_sha256": "6049fae8aec9786b36e75a684c195db4b55155fe2281ad8e6bd0b1504a76b13c",
+  "test_source_sha256": "f89d2fe3c05c338e7b7cb572fb74eb0a8d6520438f301849ad69fb2a1e0d4ffe"
+}

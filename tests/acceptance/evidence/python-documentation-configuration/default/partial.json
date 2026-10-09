@@ -1,0 +1,321 @@
+{
+  "authority": "local_unverified",
+  "command_status": "incomplete",
+  "coverage_proven": false,
+  "delivery_decision": "not_evaluated",
+  "detailed_contract_qualification": "not_granted",
+  "documentation_configuration": {
+    "coverage_proven": false,
+    "files": [
+      {
+        "config_ref": "ruff.toml",
+        "config_sha256": "d95f54072c477cf2c90d74479aed21820e8b2282db4203b1bc0449890d23f7d2",
+        "globally_enabled_documentation_rules": [
+          "DOC201"
+        ],
+        "path": "app.py",
+        "per_file_ignores_present": false,
+        "reason": null,
+        "settings_sha256": "1e8956580f5cc0f136ad01e1913aa60a0ffb02380e4c7e6f9e50c1f2af74ddc7",
+        "source_sha256": "3b098a008d27cd64dc676167543788dbb9c96306089eb6ed0d4037b32f2e74c4",
+        "status": "selected",
+        "tool_sha256": "5d29e6c23b416220746e7d8e87646f9921f0c1c0c8d5da6c1dcf1179eedb8c34"
+      },
+      {
+        "config_ref": null,
+        "config_sha256": null,
+        "globally_enabled_documentation_rules": null,
+        "path": "nested/app.py",
+        "per_file_ignores_present": null,
+        "reason": "rule_settings_report_mismatch",
+        "settings_sha256": null,
+        "source_sha256": null,
+        "status": "unavailable",
+        "tool_sha256": null
+      }
+    ],
+    "next_action": "恢复原生检查和配置，获取同轮文档规则设置；不凭零诊断判定合规。",
+    "reason": null,
+    "scope": "global_rule_selection_only",
+    "selected_file_count": 1,
+    "source_file_count": 2,
+    "status": "partial",
+    "unavailable_file_count": 1,
+    "unselected_file_count": 0
+  },
+  "documentation_findings": [
+    {
+      "codeguard_rule_id": null,
+      "column": 1,
+      "finding_fingerprint": null,
+      "finding_id": null,
+      "line": 2,
+      "next_action": "先恢复检查完整性并重新运行原生工具",
+      "path": "nested/app.py",
+      "repair_hint": {
+        "status": "verification_required",
+        "step": "先恢复原生检查完整性并重新扫描该源码"
+      },
+      "rule_id": "DOC201",
+      "rule_summary": "文档缺少实际返回值说明",
+      "rulepack_sha256": null,
+      "rulepack_status": "unverified_incomplete"
+    }
+  ],
+  "documentation_rule_coverage": "unverified",
+  "execution_budget": {
+    "enforcement": "native_execution_only",
+    "source": "builtin_default",
+    "timeout_ms": 1800000
+  },
+  "exit_code": 3,
+  "language": "python",
+  "local_scan_complete": false,
+  "native_report": {
+    "adapter_sha256": null,
+    "backlog_status": "synced_partial",
+    "backlog_sync": {
+      "failed_reports": 0,
+      "historical_findings": 0,
+      "imported_reports": 1,
+      "new_blockers": 1,
+      "new_findings": 0
+    },
+    "checker_configurations": [
+      {
+        "build_root": ".",
+        "checker_id": "python.ruff",
+        "configuration": "configured",
+        "configuration_ref": "ruff.toml",
+        "next_action": "用原生 Ruff 核对生效规则、扫描范围和诊断"
+      },
+      {
+        "build_root": "nested",
+        "checker_id": "python.ruff",
+        "configuration": "configured",
+        "configuration_ref": "nested/ruff.toml",
+        "next_action": "用原生 Ruff 核对生效规则、扫描范围和诊断"
+      }
+    ],
+    "command_status": "incomplete",
+    "delivery_decision": "not_evaluated",
+    "execution_budget": {
+      "enforcement": "native_execution_only",
+      "source": "builtin_default",
+      "timeout_ms": 1800000
+    },
+    "exit_code": 3,
+    "files": [
+      {
+        "config_sha256": "d95f54072c477cf2c90d74479aed21820e8b2282db4203b1bc0449890d23f7d2",
+        "configuration_ref": "ruff.toml",
+        "findings": [],
+        "path": "app.py",
+        "reason": null,
+        "recheck_argv": [
+          "ruff",
+          "check",
+          "app.py"
+        ],
+        "recheck_cwd": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-py-comments-50116-6",
+        "rule_settings": {
+          "coverage_proven": false,
+          "globally_enabled_mapped_rules": [
+            "F401"
+          ],
+          "per_file_ignores_present": false,
+          "settings_sha256": "1e8956580f5cc0f136ad01e1913aa60a0ffb02380e4c7e6f9e50c1f2af74ddc7"
+        },
+        "run_status": "passed",
+        "source_sha256": "3b098a008d27cd64dc676167543788dbb9c96306089eb6ed0d4037b32f2e74c4",
+        "suppression_audit": {
+          "audit_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+          "scope": "source_comments_only",
+          "suppressed_diagnostic_count": 0,
+          "suppressed_rule_ids": []
+        },
+        "tool_sha256": "5d29e6c23b416220746e7d8e87646f9921f0c1c0c8d5da6c1dcf1179eedb8c34"
+      },
+      {
+        "config_sha256": null,
+        "configuration_ref": "nested/ruff.toml",
+        "findings": [
+          {
+            "codeguard_rule_id": null,
+            "column": 1,
+            "finding_fingerprint": null,
+            "finding_id": null,
+            "line": 2,
+            "next_action": "先恢复检查完整性并重新运行原生工具",
+            "path": "nested/app.py",
+            "repair_hint": {
+              "status": "verification_required",
+              "step": "先恢复原生检查完整性并重新扫描该源码"
+            },
+            "rule_id": "DOC201",
+            "rule_summary": "文档缺少实际返回值说明",
+            "rulepack_sha256": null,
+            "rulepack_status": "unverified_incomplete"
+          },
+          {
+            "codeguard_rule_id": null,
+            "column": 1,
+            "finding_fingerprint": null,
+            "finding_id": null,
+            "line": 1,
+            "next_action": "先恢复检查完整性并重新运行原生工具",
+            "path": "nested/app.py",
+            "repair_hint": {
+              "status": "verification_required",
+              "step": "先恢复原生检查完整性并重新扫描该源码"
+            },
+            "rule_id": "F401",
+            "rule_summary": "导入未使用",
+            "rulepack_sha256": null,
+            "rulepack_status": "unverified_incomplete"
+          }
+        ],
+        "path": "nested/app.py",
+        "reason": "rule_settings_report_mismatch",
+        "recheck_argv": [
+          "ruff",
+          "check",
+          "nested/app.py"
+        ],
+        "recheck_cwd": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-py-comments-50116-6",
+        "rule_settings": null,
+        "run_status": "incomplete",
+        "source_sha256": "585c93666fcb046b7b264d3fa73202aa2a38254ae82a4b3ba19e873c2d5a9886",
+        "suppression_audit": null,
+        "tool_sha256": null
+      }
+    ],
+    "incomplete_reasons": [
+      "nested/app.py:rule_settings_report_mismatch"
+    ],
+    "language": "python",
+    "local_scan_complete": false,
+    "native_tool_version": "ruff 0.16.8",
+    "next": {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "actionable",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "restore-checker-environment",
+        "affected_paths": [
+          "nested/app.py"
+        ],
+        "authority": "local_unverified",
+        "build_root": "nested",
+        "checker_id": "python.ruff",
+        "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+        "constraints": [
+          "先恢复检查完整性",
+          "不得关闭检查器或修改无关源码"
+        ],
+        "disposition": "actionable",
+        "evidence_ref": {
+          "first_report_sha256": "a5b5d6b72b61a4ddb0f3ff52d4e3953deceadbfd992257c64e009203c8807df2",
+          "first_run_id": "lint-50869-1791317175153082000"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": []
+        },
+        "kind": "blocker",
+        "reason_code": "rule_settings_report_mismatch",
+        "recheck_argv": [
+          "codeguard",
+          "lint",
+          "python",
+          "."
+        ],
+        "schema_version": "0.1.0",
+        "scope": "nested",
+        "step": "检查原生工具、配置和输入稳定性，恢复完整检查",
+        "task_id": "CG-B-62f056d49eaddf8a6bdfa86fd1e1d626"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.1.0"
+    },
+    "operation": "lint",
+    "repair_brief_reason": null,
+    "repair_brief_status": "available",
+    "report_type": "python_lint_feedback",
+    "rulepack_approval": "unverified",
+    "run_id": "lint-50869-1791317175153082000",
+    "schema_version": "0.12.0",
+    "scope": "local_native_scan_only",
+    "tool_approval": "unverified",
+    "workspace_binding": "bound",
+    "workspace_id": "ws-b8456e3bae75e8f84c6a4b4eb3d7f8a1"
+  },
+  "next": {
+    "authority": "local_unverified",
+    "command_status": "complete",
+    "delivery_decision": "not_evaluated",
+    "disposition": "actionable",
+    "exit_code": 0,
+    "next_actions": [],
+    "operation": "next",
+    "reason": "local_task_selected",
+    "repair_brief": {
+      "action_id": "restore-checker-environment",
+      "affected_paths": [
+        "nested/app.py"
+      ],
+      "authority": "local_unverified",
+      "build_root": "nested",
+      "checker_id": "python.ruff",
+      "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+      "constraints": [
+        "先恢复检查完整性",
+        "不得关闭检查器或修改无关源码"
+      ],
+      "disposition": "actionable",
+      "evidence_ref": {
+        "first_report_sha256": "a5b5d6b72b61a4ddb0f3ff52d4e3953deceadbfd992257c64e009203c8807df2",
+        "first_run_id": "lint-50869-1791317175153082000"
+      },
+      "history": {
+        "attempt_count": 0,
+        "awaiting_verification": false,
+        "budget": 2,
+        "no_progress_count": 0,
+        "open_attempt_id": null,
+        "recent": []
+      },
+      "kind": "blocker",
+      "reason_code": "rule_settings_report_mismatch",
+      "recheck_argv": [
+        "codeguard",
+        "lint",
+        "python",
+        "."
+      ],
+      "schema_version": "0.1.0",
+      "scope": "nested",
+      "step": "检查原生工具、配置和输入稳定性，恢复完整检查",
+      "task_id": "CG-B-62f056d49eaddf8a6bdfa86fd1e1d626"
+    },
+    "report_type": "repair_brief_preview",
+    "schema_version": "0.1.0"
+  },
+  "next_actions": [
+    "核对原项目 Ruff 文档规则和配置；不会隐式启用 preview 或改写规则选择。",
+    "按稳定任务使用 task verify 原工具复检；零诊断不证明文档规则完整启用、详细内容准确或任务已关闭。"
+  ],
+  "operation": "comments",
+  "reason": "native_documentation_coverage_unverified",
+  "report_type": "python_comments_feedback",
+  "schema_version": "0.2.0"
+}

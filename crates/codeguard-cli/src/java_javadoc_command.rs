@@ -1,6 +1,6 @@
 //! JDK 原生 Javadoc 缺失注释的隔离单文件诊断；不签发项目质量结论。
 
-use codeguard_adapters::{JavadocParseState, parse_javadoc_output};
+use codeguard_adapters::{JavadocParseState, parse_detailed_javadoc_output};
 use codeguard_runtime::{
     ProcessSpec, SourceSnapshot, Termination, read_bounded_regular_file, run_process_recorded,
 };
@@ -107,7 +107,7 @@ pub(crate) fn observe(args: &Args, deadline: Instant, cancelled: &AtomicBool) ->
         .to_string_lossy()
         .into_owned();
     let mut report = json!({
-        "schema_version":"0.1.0", "report_type":"java_javadoc_local_feedback",
+        "schema_version":"0.2.0", "report_type":"java_javadoc_local_feedback",
         "operation":"lint", "language":"java", "category":"comments",
         "command_status":"incomplete", "exit_code":3, "local_status":"incomplete",
         "reason":"prerequisites_missing", "path":source_path, "source_sha256":null,
@@ -253,7 +253,7 @@ pub(crate) fn observe(args: &Args, deadline: Instant, cancelled: &AtomicBool) ->
         return with_reason(report, "native_output_unrecognized");
     }
     let copied_path = copied.to_string_lossy();
-    let parsed = parse_javadoc_output(&outcome.stderr, &copied_path, &source_bytes);
+    let parsed = parse_detailed_javadoc_output(&outcome.stderr, &copied_path, &source_bytes);
     if parsed.state != JavadocParseState::ValidDiagnostics {
         return with_reason(
             report,
@@ -277,7 +277,7 @@ pub(crate) fn observe(args: &Args, deadline: Instant, cancelled: &AtomicBool) ->
         findings.push(json!({
             "path":source_path, "line":diagnostic.line, "column":diagnostic.column,
             "rule_id":diagnostic.rule_id,
-            "rule_summary":"JDK Javadoc 缺失注释或标签；核对原始源码后复检"
+            "rule_summary":"JDK Javadoc 缺失注释、用途或标签详细说明；核对实际API契约后复检"
         }));
     }
     report["findings"] = json!(findings);

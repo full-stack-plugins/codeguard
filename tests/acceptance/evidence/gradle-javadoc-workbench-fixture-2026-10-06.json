@@ -1,0 +1,577 @@
+{
+  "evidence_kind": "constructed_work_sync_fixture",
+  "historical_check": {
+    "authority": "local_unverified",
+    "category_candidates": [
+      {
+        "capability_status": "gap",
+        "category": "lint",
+        "checker_id": null,
+        "language": "java",
+        "legacy_status": "stable",
+        "next_action": null,
+        "reason": "native_scan_incomplete",
+        "status": "native_incomplete"
+      },
+      {
+        "capability_status": "gap",
+        "category": "comments",
+        "checker_id": null,
+        "language": "java",
+        "legacy_status": "stable",
+        "next_action": "按源码最近构建根核验 Maven/Gradle 的生效 Javadoc 配置、doclint/doclet 和源集；当前静态观察未知，不判配置缺失，也不要求修改无关构建器",
+        "reason": "javadoc_configuration_unresolved",
+        "status": "configuration_unresolved"
+      },
+      {
+        "capability_status": "gap",
+        "category": "dependencies",
+        "checker_id": null,
+        "language": "java",
+        "legacy_status": "stable",
+        "next_action": "解析目标构建根的 Gradle 生效模型后重新检查",
+        "reason": "gradle_model_not_resolved",
+        "status": "configuration_unresolved"
+      },
+      {
+        "capability_status": "gap",
+        "category": "cve",
+        "checker_id": null,
+        "language": "java",
+        "legacy_status": "stable",
+        "next_action": "解析目标构建根的 Gradle 生效模型后重新检查",
+        "reason": "gradle_model_not_resolved",
+        "status": "configuration_unresolved"
+      },
+      {
+        "capability_status": "gap",
+        "category": "security",
+        "checker_id": null,
+        "language": "java",
+        "legacy_status": "stable",
+        "next_action": "解析目标构建根的 Gradle 生效模型后重新检查",
+        "reason": "gradle_model_not_resolved",
+        "status": "configuration_unresolved"
+      },
+      {
+        "capability_status": "gap",
+        "category": "build",
+        "checker_id": null,
+        "language": "java",
+        "legacy_status": "stable",
+        "next_action": null,
+        "reason": "native_adapter_not_integrated",
+        "status": "not_integrated"
+      }
+    ],
+    "command_status": "incomplete",
+    "delivery_decision": "not_evaluated",
+    "discovery": {
+      "blocked_paths": [],
+      "build_roots": [
+        {
+          "manifests": [
+            "build.gradle",
+            "settings.gradle"
+          ],
+          "path": "."
+        }
+      ],
+      "checker_configurations": [
+        {
+          "build_root": ".",
+          "category": "lint",
+          "checker_id": "java.gradle.pmd",
+          "configuration": "unknown",
+          "configuration_ref": "build.gradle",
+          "next_action": "解析生效 Gradle 模型以确定检查配置",
+          "reason": "gradle_model_not_resolved"
+        },
+        {
+          "build_root": ".",
+          "category": "lint",
+          "checker_id": "java.gradle.p3c",
+          "configuration": "unknown",
+          "configuration_ref": "build.gradle",
+          "next_action": "解析生效 Gradle 模型以确定检查配置",
+          "reason": "gradle_model_not_resolved"
+        },
+        {
+          "build_root": ".",
+          "category": "lint",
+          "checker_id": "java.gradle.checkstyle",
+          "configuration": "unknown",
+          "configuration_ref": "build.gradle",
+          "next_action": "解析生效 Gradle 模型以确定检查配置",
+          "reason": "gradle_model_not_resolved"
+        },
+        {
+          "build_root": ".",
+          "category": "comments",
+          "checker_id": "java.gradle.javadoc",
+          "configuration": "unknown",
+          "configuration_ref": "build.gradle",
+          "next_action": "解析生效 Gradle 模型以确定检查配置",
+          "reason": "gradle_model_not_resolved"
+        },
+        {
+          "build_root": ".",
+          "category": "dependencies",
+          "checker_id": "java.gradle.dependency",
+          "configuration": "unknown",
+          "configuration_ref": "build.gradle",
+          "next_action": "解析生效 Gradle 模型以确定检查配置",
+          "reason": "gradle_model_not_resolved"
+        },
+        {
+          "build_root": ".",
+          "category": "cve",
+          "checker_id": "java.gradle.dependency_check",
+          "configuration": "unknown",
+          "configuration_ref": "build.gradle",
+          "next_action": "解析生效 Gradle 模型以确定检查配置",
+          "reason": "gradle_model_not_resolved"
+        },
+        {
+          "build_root": ".",
+          "category": "security",
+          "checker_id": "java.gradle.findsecbugs",
+          "configuration": "unknown",
+          "configuration_ref": "build.gradle",
+          "next_action": "解析生效 Gradle 模型以确定检查配置",
+          "reason": "gradle_model_not_resolved"
+        }
+      ],
+      "declared_versions": {},
+      "languages": [
+        {
+          "id": "java",
+          "manifests": [
+            "build.gradle",
+            "settings.gradle"
+          ],
+          "source_files": [
+            "src/main/java/Sample.java"
+          ]
+        }
+      ],
+      "lockfiles": [],
+      "manifest_sha256": {
+        "build.gradle": "6e0f149b48e56ac4352b780924aec782b775cb7181fd3d7937185f6e847bf3e1",
+        "settings.gradle": "5fc71a8158938e049ea85421a78c9591c38732aa7fa3b559c545c3754f43c6ec"
+      },
+      "native_tool_candidates": [],
+      "observation_complete": true,
+      "observed_entries": 7,
+      "report_type": "discovery",
+      "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-gradle-sync-44685-0",
+      "schema_version": "0.4.0",
+      "scope_summary": {
+        "configuration_exception_files_observed": 0,
+        "dependency_roots_excluded": 0,
+        "dot_prefix_roots_excluded": 1,
+        "git_safety_status": "not_evaluated",
+        "ordinary_scan_policy": "project_sources_default_v2"
+      },
+      "source_set_candidates": [
+        {
+          "basis": "directory_convention",
+          "language": "java",
+          "path": "src/main/java",
+          "role": "main"
+        }
+      ],
+      "unknown_conditions": [
+        "build_model_not_evaluated",
+        "some_manifest_metadata_not_parsed",
+        "source_sets_not_fully_classified",
+        "dialects_not_classified"
+      ]
+    },
+    "execution_budget": {
+      "enforcement": "native_execution_only",
+      "jobs_limit": 4,
+      "jobs_source": "builtin_default",
+      "native_task_count": 1,
+      "source": "builtin_default",
+      "started_native_task_count": 1,
+      "timeout_ms": 1800000
+    },
+    "execution_tasks": [
+      {
+        "id": "java.p3c",
+        "status": "native_incomplete"
+      }
+    ],
+    "exit_code": 3,
+    "export": {
+      "reason_code": null,
+      "status": "not_requested"
+    },
+    "gradle_javadoc_tasks": null,
+    "native_results": {
+      "erlang_lint": null,
+      "go_lint": null,
+      "java_cve": null,
+      "java_dependencies": null,
+      "java_javadoc": null,
+      "java_p3c": {
+        "authority": "local_unverified",
+        "backlog_status": "synced_partial",
+        "backlog_sync": {
+          "failed_reports": 0,
+          "historical_findings": 0,
+          "imported_reports": 1,
+          "new_blockers": 1,
+          "new_findings": 0
+        },
+        "category": "lint",
+        "checker_id": "java.maven.p3c",
+        "command_status": "incomplete",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "exit_code": 3,
+        "files": [
+          {
+            "build_root": ".",
+            "configuration": "unknown",
+            "configuration_ref": null,
+            "configuration_sha256": null,
+            "observation": null,
+            "path": "src/main/java/Sample.java",
+            "reason": "p3c_configuration_not_confirmed"
+          }
+        ],
+        "finding_count": 0,
+        "findings": [],
+        "language": "java",
+        "local_observation_complete": false,
+        "next": {
+          "authority": "local_unverified",
+          "command_status": "complete",
+          "delivery_decision": "not_evaluated",
+          "disposition": "needs_decision",
+          "exit_code": 0,
+          "next_actions": [],
+          "operation": "next",
+          "reason": "local_task_selected",
+          "repair_brief": {
+            "action_id": "review-project-policy",
+            "affected_paths": [
+              "src/main/java/Sample.java"
+            ],
+            "authority": "local_unverified",
+            "build_root": ".",
+            "checker_id": "java.maven.p3c",
+            "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+            "constraints": [
+              "先恢复检查完整性",
+              "不得关闭检查器或修改无关源码"
+            ],
+            "disposition": "needs_decision",
+            "evidence_ref": {
+              "first_report_sha256": "176f499ffb1a7f5be3d3a00ca43da2fbec292985b3f911a09653966e7f0c46d5",
+              "first_run_id": "java-p3c-44698-1791285796167497000-0"
+            },
+            "history": {
+              "attempt_count": 0,
+              "awaiting_verification": false,
+              "budget": 2,
+              "no_progress_count": 0,
+              "open_attempt_id": null,
+              "recent": []
+            },
+            "kind": "blocker",
+            "reason_code": "p3c_configuration_not_confirmed",
+            "recheck_argv": [
+              "codeguard",
+              "check",
+              "all",
+              ".",
+              "--maven-tool",
+              "<绝对路径>",
+              "--java-home",
+              "<绝对路径>",
+              "--maven-repo",
+              "<绝对路径>",
+              "--repo-sha256",
+              "<固定摘要>"
+            ],
+            "schema_version": "0.1.0",
+            "scope": ".",
+            "step": "确认该 Maven 模块是否要求 P3C；若要求，修正原生插件及规则配置并复扫；否则提交受保护策略决策",
+            "task_id": "CG-B-4085aef64088761aff2b040e8a230d62"
+          },
+          "report_type": "repair_brief_preview",
+          "schema_version": "0.1.0"
+        },
+        "observed_file_count": 0,
+        "operation": "lint",
+        "report_type": "java_p3c_project_observation",
+        "rulepack_approval": "unverified",
+        "run_id": "java-p3c-44698-1791285796167497000-0",
+        "schema_version": "0.2.0",
+        "source_file_count": 1,
+        "tool_approval": "unverified",
+        "workspace_binding": "bound",
+        "workspace_id": "ws-1b9c0e4f0c83b41fdea054f62d2d9f7e"
+      },
+      "kotlin_lint": null,
+      "node_lint": null,
+      "npm_cve": [],
+      "python_cve": [],
+      "python_lint": null,
+      "ruby_lint": null,
+      "rust_build": null,
+      "rust_comments": null,
+      "rust_cve": null,
+      "rust_lint": null,
+      "shell_lint": null,
+      "swift_lint": null,
+      "zig_lint": null
+    },
+    "next": {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "actionable",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "repair-source",
+        "authority": "local_unverified",
+        "checker_id": "java.gradle.javadoc",
+        "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+        "constraints": [
+          "仅修改目标源码",
+          "不得忽略规则或将任务勾选当作复检"
+        ],
+        "disposition": "actionable",
+        "evidence_ref": {
+          "first_report_sha256": "296bebc7dd9962e4775d4377be4d505ef113275eee91af9eca47de47913a4cad",
+          "first_run_id": "javadoc-gradle-44685-1791285795876693000"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": []
+        },
+        "kind": "finding",
+        "native_rule_id": "JavadocMissingComment",
+        "observation_scope": "selected_gradle_javadoc_inputs",
+        "recheck_argv": [
+          "codeguard",
+          "check",
+          "java",
+          "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-gradle-sync-44685-0",
+          "--gradle-javadoc",
+          "--gradle-bundle",
+          "<已核验原Gradle绝对路径>",
+          "--java-home",
+          "<已核验原JDK21绝对路径>",
+          "--gradle-project-file",
+          "build.gradle",
+          "--gradle-project-file",
+          "settings.gradle",
+          "--gradle-project-file",
+          "src/main/java/Sample.java",
+          "--format=json"
+        ],
+        "rule_basis": "原Gradle官方Javadoc任务原生诊断；完整详细规则与源集尚未验收",
+        "schema_version": "0.22.0",
+        "scope": "src/main/java/Sample.java",
+        "source_sha256": "edbe481b5cca42c8e7665f2a02eddba612cd759d03f48a710d6f9ac8f41dcf3e",
+        "step": "核对本轮原生规则和API契约，补齐用途、参数、返回及异常详细说明，裸标签不能代替内容；按相同所选输入及原Gradle/JDK复扫，不关闭规则或勾选关闭",
+        "task_id": "CG-084204e05a7b4ae51cdb216c2d01e3fd",
+        "task_verify_status": "not_integrated"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.22.0"
+    },
+    "obligation_status": "unresolved",
+    "operation": "check",
+    "reason": "java_selection_obligations_and_trusted_policy_unavailable",
+    "report_type": "check_feedback",
+    "required_obligations": null,
+    "schema_version": "0.65.0",
+    "selection": "java",
+    "syntax_candidates": {
+      "authority": "candidate_unqualified",
+      "delivery_decision": "incomplete",
+      "execution_phase": "after_native",
+      "native_preferred_count": 0,
+      "next_action": "使用包含固定语法资产的发行包运行候选初检，并完成适用原生检查",
+      "observations": [],
+      "reason": "binary_without_wasm_precheck",
+      "skipped_count": 0,
+      "source_file_count": 1,
+      "status": "not_run",
+      "unrouted_count": 0
+    },
+    "syntax_tasks": {
+      "failures": [],
+      "new_blockers": 0,
+      "status": "synced_partial",
+      "tasks": []
+    },
+    "unresolved_conditions": [
+      "build_model_not_evaluated",
+      "dialects_not_classified",
+      "java_p3c_task_incomplete",
+      "required_obligations_unresolved",
+      "some_manifest_metadata_not_parsed",
+      "source_sets_not_fully_classified",
+      "tool_lock_unverified",
+      "trusted_policy_unavailable"
+    ]
+  },
+  "next": {
+    "authority": "local_unverified",
+    "command_status": "complete",
+    "delivery_decision": "not_evaluated",
+    "disposition": "actionable",
+    "exit_code": 0,
+    "next_actions": [],
+    "operation": "next",
+    "reason": "local_task_selected",
+    "repair_brief": {
+      "action_id": "repair-source",
+      "authority": "local_unverified",
+      "checker_id": "java.gradle.javadoc",
+      "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+      "constraints": [
+        "仅修改目标源码",
+        "不得忽略规则或将任务勾选当作复检"
+      ],
+      "disposition": "actionable",
+      "evidence_ref": {
+        "first_report_sha256": "296bebc7dd9962e4775d4377be4d505ef113275eee91af9eca47de47913a4cad",
+        "first_run_id": "javadoc-gradle-44685-1791285795876693000"
+      },
+      "history": {
+        "attempt_count": 0,
+        "awaiting_verification": false,
+        "budget": 2,
+        "no_progress_count": 0,
+        "open_attempt_id": null,
+        "recent": []
+      },
+      "kind": "finding",
+      "native_rule_id": "JavadocMissingComment",
+      "observation_scope": "selected_gradle_javadoc_inputs",
+      "recheck_argv": [
+        "codeguard",
+        "check",
+        "java",
+        "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-gradle-sync-44685-0",
+        "--gradle-javadoc",
+        "--gradle-bundle",
+        "<已核验原Gradle绝对路径>",
+        "--java-home",
+        "<已核验原JDK21绝对路径>",
+        "--gradle-project-file",
+        "build.gradle",
+        "--gradle-project-file",
+        "settings.gradle",
+        "--gradle-project-file",
+        "src/main/java/Sample.java",
+        "--format=json"
+      ],
+      "rule_basis": "原Gradle官方Javadoc任务原生诊断；完整详细规则与源集尚未验收",
+      "schema_version": "0.22.0",
+      "scope": "src/main/java/Sample.java",
+      "source_sha256": "edbe481b5cca42c8e7665f2a02eddba612cd759d03f48a710d6f9ac8f41dcf3e",
+      "step": "核对本轮原生规则和API契约，补齐用途、参数、返回及异常详细说明，裸标签不能代替内容；按相同所选输入及原Gradle/JDK复扫，不关闭规则或勾选关闭",
+      "task_id": "CG-084204e05a7b4ae51cdb216c2d01e3fd",
+      "task_verify_status": "not_integrated"
+    },
+    "report_type": "repair_brief_preview",
+    "schema_version": "0.22.0"
+  },
+  "report": {
+    "authority": "local_unverified",
+    "blockers": [
+      {
+        "affected_paths": [
+          "src/main/java/Sample.java"
+        ],
+        "build_root": ".",
+        "checker_id": "java.gradle.javadoc",
+        "diagnostic_reason": "selected_sources_and_complete_documentation_rules_unverified",
+        "fingerprint": "9aebf6877bb1b844d23ecd72d4c4e9fbddf1a80a8e51694bb667ae578cfbfad9",
+        "id": "CG-B-9aebf6877bb1b844d23ecd72d4c4e9fb",
+        "reason": "gradle_documentation_rules_and_coverage_unverified",
+        "scope": "."
+      }
+    ],
+    "checker_id": "java.gradle.javadoc",
+    "coverage_proven": false,
+    "delivery_decision": "not_evaluated",
+    "findings": [
+      {
+        "checker_id": "java.gradle.javadoc",
+        "column": 8,
+        "finding_fingerprint": "084204e05a7b4ae51cdb216c2d01e3fd9bff89fa665528569f518fae8c19ec55",
+        "finding_id": "CG-084204e05a7b4ae51cdb216c2d01e3fd",
+        "line": 1,
+        "path": "src/main/java/Sample.java",
+        "rule_id": "JavadocMissingComment",
+        "source_sha256": "edbe481b5cca42c8e7665f2a02eddba612cd759d03f48a710d6f9ac8f41dcf3e"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "build.gradle",
+        "sha256": "6e0f149b48e56ac4352b780924aec782b775cb7181fd3d7937185f6e847bf3e1"
+      },
+      {
+        "path": "settings.gradle",
+        "sha256": "5fc71a8158938e049ea85421a78c9591c38732aa7fa3b559c545c3754f43c6ec"
+      },
+      {
+        "path": "src/main/java/Sample.java",
+        "sha256": "edbe481b5cca42c8e7665f2a02eddba612cd759d03f48a710d6f9ac8f41dcf3e"
+      }
+    ],
+    "native": {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [
+        {
+          "column": 8,
+          "line": 1,
+          "path": "src/main/java/Sample.java",
+          "rule_id": "JavadocMissingComment"
+        }
+      ],
+      "gradle_bundle_sha256": "915f28e8fd4f7133e51321c688bf59dbc4c18da8748a297913010d245ddd3651",
+      "init_scripts_sha256": "f759fb2fde664dbf316a17f752630f5f78b4b98dac5131f2ac43133e763ba309",
+      "java_entry_sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e",
+      "jdk_release_sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583",
+      "model_report_sha256": "4b6e4673bc26d43ebf422edc7e6dba28f4ad91a20a8166dba6f0a4029580a664",
+      "native_status": "findings_observed_unverified",
+      "native_stderr_sha256": "7915344e7e17ad67e59a65208f70d70699401c59a37475219308d6ddd23b2e84",
+      "native_stdout_sha256": "345ad3994d7c90d240429a29e59cb1259cfe81aee908c46c2404f510c7c9d830",
+      "reason": "selected_sources_and_complete_documentation_rules_unverified",
+      "report_type": "gradle_javadoc_probe",
+      "rule_configuration_complete": false,
+      "schema_version": "0.1.0",
+      "selected_java_file_count": 1,
+      "source_snapshot_sha256": "537ab9a1e75e4d4b068132577936ed1b73ca5fe3d883afb792f4e52dd11df091",
+      "task_paths": [
+        ":javadoc"
+      ]
+    },
+    "report_type": "gradle_javadoc_workbench_observation",
+    "run_id": "javadoc-gradle-44685-1791285795876693000",
+    "schema_version": "0.1.0",
+    "workspace_binding": "bound",
+    "workspace_id": "ws-1b9c0e4f0c83b41fdea054f62d2d9f7e"
+  }
+}

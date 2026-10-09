@@ -1,0 +1,91 @@
+{
+  "blockers": [
+    {
+      "affected_paths": [
+        "src/main/java/Sample.java"
+      ],
+      "build_root": ".",
+      "checker_id": "java.gradle.javadoc",
+      "diagnostic_reason": "selected_sources_and_complete_documentation_rules_unverified",
+      "fingerprint": "9aebf6877bb1b844d23ecd72d4c4e9fbddf1a80a8e51694bb667ae578cfbfad9",
+      "id": "CG-B-9aebf6877bb1b844d23ecd72d4c4e9fb",
+      "reason": "gradle_documentation_rules_and_coverage_unverified",
+      "scope": "."
+    }
+  ],
+  "coverage_proven": false,
+  "delivery_decision": "not_evaluated",
+  "evidence_kind": "actual_native_projection",
+  "findings": [
+    {
+      "checker_id": "java.gradle.javadoc",
+      "column": 8,
+      "finding_fingerprint": "28b493c3b3971675db5556cd38c5389e029afe60817e757393ca5756332ef81f",
+      "finding_id": "CG-28b493c3b3971675db5556cd38c5389e",
+      "line": 6,
+      "path": "src/main/java/Sample.java",
+      "rule_id": "JavadocEmptyParamDescription",
+      "source_sha256": "ea8cb3c6b0371c55c8c7b17ec30b78c88c25a31b941d2d35b981160836f64ea5"
+    },
+    {
+      "checker_id": "java.gradle.javadoc",
+      "column": 8,
+      "finding_fingerprint": "7e41af069910f642a66d586c6512b3809fdf6eb7e1c16a8e89a661a22859b8c8",
+      "finding_id": "CG-7e41af069910f642a66d586c6512b380",
+      "line": 7,
+      "path": "src/main/java/Sample.java",
+      "rule_id": "JavadocEmptyReturnDescription",
+      "source_sha256": "ea8cb3c6b0371c55c8c7b17ec30b78c88c25a31b941d2d35b981160836f64ea5"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "build.gradle",
+      "sha256": "f384f049381aea97fd0172b41cfe6ba9e8b57a173c7a16ba71d6772ebcbdadea"
+    },
+    {
+      "path": "settings.gradle",
+      "sha256": "5fc71a8158938e049ea85421a78c9591c38732aa7fa3b559c545c3754f43c6ec"
+    },
+    {
+      "path": "src/main/java/Sample.java",
+      "sha256": "ea8cb3c6b0371c55c8c7b17ec30b78c88c25a31b941d2d35b981160836f64ea5"
+    }
+  ],
+  "native": {
+    "authority": "local_unverified",
+    "coverage_proven": false,
+    "delivery_decision": "not_evaluated",
+    "findings": [
+      {
+        "column": 8,
+        "line": 6,
+        "path": "src/main/java/Sample.java",
+        "rule_id": "JavadocEmptyParamDescription"
+      },
+      {
+        "column": 8,
+        "line": 7,
+        "path": "src/main/java/Sample.java",
+        "rule_id": "JavadocEmptyReturnDescription"
+      }
+    ],
+    "gradle_bundle_sha256": "915f28e8fd4f7133e51321c688bf59dbc4c18da8748a297913010d245ddd3651",
+    "init_scripts_sha256": "f759fb2fde664dbf316a17f752630f5f78b4b98dac5131f2ac43133e763ba309",
+    "java_entry_sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e",
+    "jdk_release_sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583",
+    "model_report_sha256": "4b6e4673bc26d43ebf422edc7e6dba28f4ad91a20a8166dba6f0a4029580a664",
+    "native_status": "findings_observed_unverified",
+    "native_stderr_sha256": "051e8c6be25d399d589ec4f0456cb5b8c5987abe9af828aa26244769a9c7f340",
+    "native_stdout_sha256": "ea7954ea91ea3f81561331c16bc48b23a17d138288e946479e229731be0e3987",
+    "reason": "selected_sources_and_complete_documentation_rules_unverified",
+    "report_type": "gradle_javadoc_probe",
+    "rule_configuration_complete": false,
+    "schema_version": "0.1.0",
+    "selected_java_file_count": 1,
+    "source_snapshot_sha256": "909de015a40aac170d0330a765bcf5577b3cf9cdf2d9173f6e7306e2c3b8b367",
+    "task_paths": [
+      ":javadoc"
+    ]
+  }
+}

@@ -113,3 +113,15 @@ CARGO_PROFILE_TEST_DEBUG=0 cargo clippy --workspace --all-targets \
 | `/tmp/codeguard-clippy-cargo-final-feature-clippy.log` | `be1f2cfcb9492811fba755b6f9a5a8e9b900d09a84e13869fcf0c1f0fa4ff704` |
 | `/tmp/codeguard-clippy-cargo-schema.log` | `8c64986b98abb475039e8176f5b1f89717904de37f88c4a8df18966c53e17785` |
 | `tests/acceptance/evidence/clippy-input-stability-2026-10-04.json` | `5302f3a5c15153363e93107b5f7570e10626902ac694d8ecb64e64147f1c0bd8` |
+
+## 2026-10-06 源码集合及嵌套清单连续性
+
+新增源码期间旧局部扫描仍显示local_scan_complete=true的公开反例先失败。RustInputInventory复用现有静态发现的策略与100000条目预算，RustLintInputs绑定全部已观察Rust源码、嵌套Cargo清单与Cargo.lock字节，运行后比较范围集合；新增/删除/重命名、其它Rust文件或嵌套清单变化撤回当前diagnostic及进程内覆盖。发现失败或截断不按空集合处理。根配置的不存在性保护保留，工作台生成记录不使范围失效。无新增CLI参数或协议版本。
+
+最终default三目标32通过/0失败/5条件忽略，WASM三目标33通过/0失败/5条件忽略；WASM当前源码目标覆盖单元1通过。两种构建均包含四条新增集成测试，其中一条覆盖其它源码内容修改、重命名和删除三场景。实际Cargo1.98.1/Clippy0.1.98的两个显式测试通过：原生有效诊断产生后修改既有源码或新增源码，当前诊断被撤回。测试使用显式已安装工具，不安装SDK、不更改仓库用户源码。
+
+[实际原生观察](evidence/rust-input-inventory-2026-10-06.json)保留两份Rust观察器结果及已选择Cargo制品摘要；包装器只用于在实际Clippy完成后触发变化，不作为精度oracle或可信工具链证明。复现：`CODEGUARD_CARGO_BIN=/absolute/cargo cargo test --locked -p codeguard-cli --test rust_lint_input_stability real_clippy_output -- --ignored`。
+
+仍不证明动态Cargo目标、外部依赖、全部祖先/成员配置、进程沙箱、跨平台或可信关闭；Rust编辑原生快检继续未接线。父任务3.7/7.1/9.x/14.x保持开放，历史验收数据不改。
+
+终态：实际`lint rust`→发现→修复→原工具`task verify`链路1通过；default/WASM workspace/all-targets严格Clippy均通过。分层、OpenSpec严格验证、差异检查通过。未运行最终完整workspace或用户Erlang差分草稿，不能据此声明全项目验收。

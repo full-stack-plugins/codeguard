@@ -79,7 +79,19 @@ pub(crate) fn load(
                     serde_json::to_value(identity).map_err(|_| "task_lifecycle_encoding_failed")?;
                 if !matches!(
                     value["schema_version"].as_str(),
-                    Some("0.1.0" | "0.2.0" | "0.3.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.7.0")
+                    Some(
+                        "0.1.0"
+                            | "0.2.0"
+                            | "0.3.0"
+                            | "0.4.0"
+                            | "0.5.0"
+                            | "0.6.0"
+                            | "0.7.0"
+                            | "0.8.0"
+                            | "0.9.0"
+                            | "0.10.0"
+                            | "0.11.0"
+                    )
                 ) || value["report_type"] != "task_resolution_evidence"
                     || value["identity"] != identity_value
                     || value["original_report_sha256"] != original_sha
@@ -137,7 +149,11 @@ fn original_task_report(
     if fact["id"] != identity.task_id
         || fact["workspace_id"] != identity.workspace_id
         || fact["checker_id"] != identity.checker_id
-        || fact["scope"] != identity.scope
+        || (if identity.checker_id == "shell.shellcheck" {
+            &fact["path"]
+        } else {
+            &fact["scope"]
+        }) != &identity.scope
         || fact["first_report_sha256"] != sha
     {
         return Err("task_lifecycle_evidence_binding_invalid");
@@ -164,10 +180,28 @@ fn original_task_report(
         return codeguard_adapters::parse_unique_json(&bytes)
             .map_err(|_| "task_lifecycle_evidence_binding_invalid");
     }
+    if identity.checker_id == "shell.shellcheck" {
+        return crate::shell_task_recheck::original(
+            root,
+            &serde_json::json!({"run_id":fact["first_run_id"],"sha256":sha}),
+        );
+    }
     crate::syntax_task_recheck::original(root, &brief)
         .map_err(|_| "task_lifecycle_evidence_binding_invalid")
 }
 fn origin_matches_evidence(original: &serde_json::Value, evidence: &serde_json::Value) -> bool {
+    if evidence["schema_version"] == "0.11.0" {
+        return original["report_type"] == "shellcheck_workbench_observation"
+            && original["schema_version"] == "0.1.0"
+            && original["source_sha256"] == evidence["original_source_sha256"]
+            && original["dialect"] == evidence["dialect"]
+            && original["project_configuration"] == evidence["project_configuration"]
+            && original["native"]["tool_sha256"] == evidence["tool_sha256"]
+            && crate::shell_resolution_evidence::contains_rule(
+                &original["native"],
+                evidence["native_rule_id"].as_str().unwrap_or(""),
+            );
+    }
     if evidence["schema_version"] == "0.6.0" {
         let dedicated = original["report_type"] == "python_syntax_confirmation_observation"
             && matches!(original["schema_version"].as_str(), Some("0.1.0" | "0.2.0"));
@@ -199,7 +233,30 @@ fn origin_matches_evidence(original: &serde_json::Value, evidence: &serde_json::
             | (Some("swift"), Some("0.3.0"))
             | (Some("kotlin"), Some("0.4.0"))
             | (Some("go"), Some("0.7.0"))
+            | (Some("rust"), Some("0.8.0" | "0.9.0"))
+            | (Some("ruby"), Some("0.10.0"))
     ) {
+        return false;
+    }
+    if evidence["schema_version"] == "0.10.0"
+        && (!matches!(
+            original["schema_version"].as_str(),
+            Some("0.1.0" | "0.7.0" | "0.9.0")
+        ) || ((original["schema_version"] == "0.9.0") != evidence["grammar_sha256"].is_null()))
+    {
+        return false;
+    }
+    if evidence["schema_version"] == "0.9.0"
+        && (!matches!(original["schema_version"].as_str(), Some("0.1.0" | "0.7.0"))
+            || !original["native_evidence"].is_null())
+    {
+        return false;
+    }
+    if evidence["schema_version"] == "0.8.0"
+        && (original["schema_version"] != "0.12.0"
+            || evidence["edition_context"]
+                != original["native_evidence"]["native"]["edition_context"])
+    {
         return false;
     }
     if (evidence["schema_version"] == "0.5.0") != (original["schema_version"] == "0.6.0") {
@@ -207,7 +264,7 @@ fn origin_matches_evidence(original: &serde_json::Value, evidence: &serde_json::
     }
     if matches!(
         original["schema_version"].as_str(),
-        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0")
+        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.9.0" | "0.12.0")
     ) {
         evidence["grammar_sha256"].is_null()
             && evidence["original_source_sha256"]
@@ -301,11 +358,18 @@ pub(crate) fn guidance(
                 }
             };
             // 只从严格绑定的首次报告区分来源；原生任务没有可归咎的 grammar。
-            if original["native_evidence"].is_object() {
+            if original["report_type"] == "shellcheck_workbench_observation" {
+                "原样本的原生反证未检出原规则；核对首次诊断、原样本、工具、方言、配置及抑制差异，保留原生反证，不继续修改无对应诊断的源码或自行白名单放行"
+            } else if original["native_evidence"].is_object() {
                 "原样本的原生反证未检出语法诊断；核对首次原生诊断与反证运行的输入、工具及环境差异，保留误报调查证据并提交限定范围纠错请求，不继续修改已合法源码或自行白名单放行"
             } else {
                 "原样本的原生反证未检出语法诊断；核对首次 WASM 观察、grammar 语言版本与原生对照差异，保留误报调查证据并提交限定范围纠错请求，不直接认定 grammar 缺陷或自行白名单放行"
             }
+        }
+        Some(TaskLifecycleKind::VerificationRequired { reason_code, .. })
+            if reason_code == "suppression_requires_review" =>
+        {
+            "原规则相关禁用指令存在或本轮禁用指令变化；核对作用域、原规则及批准白名单，不把规则被抑制当作源码修复，保留任务并复检"
         }
         _ => {
             "生命周期已有原生观察；先核对当前输入与原工具证据，不沿用旧 WASM 疑似位置重复修复或重新安装工具"
@@ -321,6 +385,9 @@ pub(crate) fn record_native_recurrence(
     brief: &serde_json::Value,
     scan: &serde_json::Value,
 ) -> Result<(), &'static str> {
+    if brief["checker_id"] == "shell.shellcheck" {
+        return crate::shell_task_resolution_service::record_recurrence(root, brief, scan);
+    }
     if brief["checker_id"] == "python.ruff" {
         return crate::python_task_resolution_service::record_recurrence(root, brief, scan);
     }
@@ -383,7 +450,11 @@ pub(crate) fn record_native_recurrence(
                 | (Some("0.3.0"), Some("swift"))
                 | (Some("0.4.0"), Some("kotlin"))
                 | (Some("0.7.0"), Some("go"))
+                | (Some("0.8.0" | "0.9.0"), Some("rust"))
+                | (Some("0.10.0"), Some("ruby"))
         )
+        || (matches!(evidence["schema_version"].as_str(), Some("0.8.0" | "0.9.0"))
+            && scan["native"]["edition_context"] != evidence["edition_context"])
         || (evidence["schema_version"] == "0.7.0"
             && (scan["native"]["gofmt_sha256"] != evidence["gofmt_sha256"]
                 || scan["native"]["companion_binding_sha256"]

@@ -27,6 +27,12 @@ pub(crate) fn run(
         "local_status":"incomplete","reason":"prerequisites_missing","scan":null,
         "target":{"task_id":brief["task_id"],"path":brief["scope"],"rule_id":brief["native_rule_id"],"checker_class":brief["checkstyle_guidance"]["checker_class"]},
         "current_rule_class":null,"tool_identity_matches":false,"task_input_stable":null});
+    if brief["checkstyle_guidance"]["checker_class"]
+        .as_str()
+        .is_some_and(codeguard_adapters::checkstyle_detailed_rule_class)
+    {
+        report["schema_version"] = json!("0.2.0");
+    }
     if !["--java-tool", "--checkstyle-jar", "--config"]
         .iter()
         .all(|k| options.contains_key(*k))
@@ -68,6 +74,13 @@ pub(crate) fn run(
     match prepare(root, &observed, inputs) {
         Ok(mut scan) => {
             scan["run_id"] = report["run_id"].clone();
+            if scan["schema_version"] == "0.2.0" {
+                report["schema_version"] = json!("0.2.0");
+            }
+            if report["schema_version"] == "0.2.0" {
+                // 原详细规则即使被移除，仍用新容器记录当前局部扫描，随后按原规则身份要求复核。
+                scan["schema_version"] = json!("0.2.0");
+            }
             report["workspace_id"] = scan["workspace_id"].clone();
             report["scan"] = scan;
             report["local_status"] = json!("observed");
@@ -164,7 +177,11 @@ pub(crate) fn valid_shape(report: &Value) -> bool {
     report
         .as_object()
         .is_some_and(|o| o.len() == keys.len() && keys.iter().all(|k| o.contains_key(*k)))
-        && report["schema_version"] == "0.1.0"
+        && matches!(report["schema_version"].as_str(), Some("0.1.0" | "0.2.0"))
+        && (report["schema_version"] == "0.2.0"
+            || !report["target"]["checker_class"]
+                .as_str()
+                .is_some_and(codeguard_adapters::checkstyle_detailed_rule_class))
         && report["report_type"] == "checkstyle_task_recheck"
         && report["workspace_binding"] == "bound"
         && report["checker_id"] == "java.checkstyle"
@@ -189,6 +206,7 @@ pub(crate) fn valid_shape(report: &Value) -> bool {
             && report["task_input_stable"].is_null())
             || (report["local_status"] == "observed"
                 && report["scan"].is_object()
+                && report["scan"]["schema_version"] == report["schema_version"]
                 && report["scan"]["run_id"] == report["run_id"]
                 && report["scan"]["workspace_id"] == report["workspace_id"]
                 && report["task_input_stable"].is_boolean()))

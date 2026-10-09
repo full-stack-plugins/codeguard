@@ -217,7 +217,23 @@ pub fn scan_and_sync_report_with_deadline(
     deadline: Instant,
     cancelled: &AtomicBool,
 ) -> Result<Value, &'static str> {
-    let mut feedback = scan_local_report_with_deadline(root, ruff_tool, deadline, cancelled)?;
+    let feedback = scan_local_report_with_deadline(root, ruff_tool, deadline, cancelled)?;
+    Ok(sync_and_brief_feedback(root, feedback))
+}
+
+/// 为文档入口复用同轮扫描和设置观察，不重复调用原生工具；返回原报告与独立配置投影。
+pub(crate) fn scan_and_sync_documentation_with_deadline(
+    root: &Path,
+    ruff_tool: Option<&Path>,
+    deadline: Instant,
+    cancelled: &AtomicBool,
+) -> Result<(Value, Value), &'static str> {
+    let (feedback, configuration) =
+        scan_local_observation_with_deadline(root, ruff_tool, None, deadline, cancelled, true)?;
+    Ok((sync_and_brief_feedback(root, feedback), configuration))
+}
+
+fn sync_and_brief_feedback(root: &Path, mut feedback: Value) -> Value {
     let (backlog_status, backlog_summary) = match save_local_report(root, &feedback) {
         Ok(()) if feedback["workspace_binding"] == "bound" => match sync_local_workspace(root) {
             Ok(summary) => (
@@ -263,7 +279,7 @@ pub fn scan_and_sync_report_with_deadline(
     );
     document.insert("repair_brief_reason".into(), brief_reason);
     document.insert("next".into(), next);
-    Ok(feedback)
+    feedback
 }
 
 /// 为公开对话反馈加入预算来源；工作区内保存的原始 0.9 扫描报告保持独立。
@@ -339,6 +355,25 @@ pub(crate) fn scan_local_report_scoped_with_deadline(
     deadline: Instant,
     cancelled: &AtomicBool,
 ) -> Result<Value, &'static str> {
+    scan_local_observation_with_deadline(
+        root,
+        ruff_tool,
+        selected_paths,
+        deadline,
+        cancelled,
+        false,
+    )
+    .map(|(feedback, _)| feedback)
+}
+
+fn scan_local_observation_with_deadline(
+    root: &Path,
+    ruff_tool: Option<&Path>,
+    selected_paths: Option<&[String]>,
+    deadline: Instant,
+    cancelled: &AtomicBool,
+    observe_documentation: bool,
+) -> Result<(Value, Value), &'static str> {
     let registry = legacy_registry().map_err(|_| "registry_invalid")?;
     let discovery = match selected_paths {
         Some(paths) => crate::python_selected_discovery::discover_selected(
@@ -395,6 +430,11 @@ pub(crate) fn scan_local_report_scoped_with_deadline(
         },
         cancelled,
     );
+    let documentation = if observe_documentation {
+        crate::python_documentation_configuration::observe(&scan)
+    } else {
+        Value::Null
+    };
     let mut feedback = python_lint_feedback(&discovery, &scan);
     annotate_rulepack(&mut feedback, native_tool_version.as_deref());
     let has_native_findings = feedback["files"]
@@ -446,7 +486,7 @@ pub(crate) fn scan_local_report_scoped_with_deadline(
     document.insert("command_status".into(), Value::String("incomplete".into()));
     document.insert("exit_code".into(), Value::from(3));
     document.insert("tool_approval".into(), Value::String("unverified".into()));
-    Ok(feedback)
+    Ok((feedback, documentation))
 }
 
 /// 只给本轮已运行的 CodeGuard 可执行制品生成适配器身份，不能证明它已获策略批准。

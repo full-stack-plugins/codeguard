@@ -32,7 +32,7 @@ impl Fixture {
     }
     fn tool(&self, body: &str) -> PathBuf {
         let path = self.0.join("fake-cargo");
-        fs::write(&path, format!("#!/bin/sh\n{body}\n")).unwrap();
+        fs::write(&path, format!("#!/bin/sh\ncase \"$1\" in clippy) printf '%s\\n' '{{\"reason\":\"build-finished\",\"success\":true}}'; exit 0;; esac\n{body}\n")).unwrap();
         fs::set_permissions(&path, fs::Permissions::from_mode(0o700)).unwrap();
         path
     }
@@ -58,7 +58,8 @@ impl Fixture {
             .unwrap();
         (
             output.status.code().unwrap(),
-            serde_json::from_slice(&output.stdout).unwrap(),
+            serde_json::from_slice::<Value>(&output.stdout).unwrap()["native_results"]["rustdoc"]
+                .clone(),
         )
     }
     fn warning(&self) -> String {
@@ -384,10 +385,18 @@ fn initialized_missing_tool_creates_preparation_task_without_source_violation() 
         .unwrap()
         .flatten()
         .collect();
-    assert_eq!(tasks.len(), 1);
-    let text = fs::read_to_string(tasks[0].path()).unwrap();
-    assert!(text.contains("rustdoc"));
+    assert_eq!(tasks.len(), 2, "双原生入口分别保留两项准备任务");
+    let texts: Vec<_> = tasks
+        .iter()
+        .map(|task| fs::read_to_string(task.path()).unwrap())
+        .collect();
+    let text = texts.iter().find(|text| text.contains("rustdoc")).unwrap();
     assert!(text.contains("不是源码违规"));
+    assert!(
+        texts
+            .iter()
+            .any(|text| text.contains("Clippy") || text.contains("clippy"))
+    );
 }
 
 #[test]
@@ -472,9 +481,12 @@ fn target_mismatch_and_input_change_cannot_be_complete_observations() {
 #[test]
 fn invalid_arguments_stop_before_tool_execution() {
     let fixture = Fixture::new();
+    let marker = fixture.0.join("unexpected-native-execution");
+    let tool = fixture.tool(&format!(": > '{}'", marker.display()));
+    fs::copy(tool, fixture.0.join("cargo")).unwrap();
     for args in [
         vec!["comments", "rust", "--cargo-tool", "relative"],
-        vec!["comments", "java"],
+        vec!["comments", "unknown-language"],
         vec!["comments", "rust", "--format=sarif"],
         vec!["comments", "rust", "--timeout", "0s"],
     ] {
@@ -482,13 +494,35 @@ fn invalid_arguments_stop_before_tool_execution() {
             Command::new(env!("CARGO_BIN_EXE_codeguard"))
                 .args(args)
                 .current_dir(&fixture.0)
+                .env("PATH", &fixture.0)
                 .output()
                 .unwrap()
                 .status
                 .code(),
             Some(2)
         );
+        assert!(
+            !marker.exists(),
+            "invalid arguments must not execute native tools"
+        );
     }
+}
+
+#[test]
+fn supported_java_comments_without_java_sources_is_incomplete_not_usage_error() {
+    let fixture = Fixture::new();
+    let out = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["comments", "java", "--format=json"])
+        .current_dir(&fixture.0)
+        .env("PATH", &fixture.0)
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(3));
+    let report: Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(report["report_type"], "java_comments_feedback");
+    assert_eq!(report["language"], "java");
+    assert_eq!(report["command_status"], "incomplete");
+    assert_eq!(report["delivery_decision"], "not_evaluated");
 }
 
 #[test]

@@ -46,6 +46,9 @@ impl Fixture {
         tool
     }
     fn check(&self, format: &str, extra: &[&str]) -> (i32, Vec<u8>) {
+        self.check_in_path(format, extra, "/no/tools")
+    }
+    fn check_in_path(&self, format: &str, extra: &[&str], path: &str) -> (i32, Vec<u8>) {
         let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
             .args([
                 "check",
@@ -59,6 +62,7 @@ impl Fixture {
                 "10s",
             ])
             .args(extra)
+            .env("PATH", path)
             .env_remove("CODEGUARD_TIMEOUT")
             .env_remove("CODEGUARD_JOBS")
             .output()
@@ -156,6 +160,11 @@ fn missing_cargo_audit_is_a_visible_environment_blocker() {
     let (exit, bytes) = fixture.check("json", &[]);
     let report: Value = serde_json::from_slice(&bytes).unwrap();
     assert_eq!(exit, 3);
+    assert_eq!(report["schema_version"], "0.56.0");
+    assert_eq!(
+        report["next"]["repair_brief"]["checker_id"],
+        "rust.cargo_clippy"
+    );
     assert_eq!(
         report["native_results"]["rust_cve"]["reason"],
         "cargo_audit_tool_not_selected"
@@ -573,4 +582,129 @@ fn input_change_after_attempt_cannot_bind_a_new_cve_recheck_to_it() {
         "--format=json",
     ]);
     assert_eq!(code, 0, "{new_attempt}");
+}
+
+#[test]
+fn project_cve_discovers_existing_path_tool_and_reports_database_separately() {
+    let fixture = Fixture::new();
+    let bin = fixture.0.join("bin");
+    fs::create_dir(&bin).unwrap();
+    let tool = fixture.native_tool();
+    fs::rename(tool, bin.join("cargo-audit")).unwrap();
+    let db = fixture.0.join("advisory-db");
+    let (_, bytes) = fixture.check_in_path(
+        "json",
+        &["--rustsec-db", db.to_str().unwrap()],
+        bin.to_str().unwrap(),
+    );
+    let report: Value = serde_json::from_slice(&bytes).unwrap();
+    assert_eq!(
+        report["native_results"]["rust_cve"]["local_scan_complete"], true,
+        "{report}"
+    );
+    assert_eq!(
+        report["native_results"]["rust_cve"]["findings"][0]["advisory_id"],
+        "RUSTSEC-2020-0071"
+    );
+    let (_, bytes) = fixture.check_in_path("json", &[], bin.to_str().unwrap());
+    let report: Value = serde_json::from_slice(&bytes).unwrap();
+    assert_eq!(
+        report["native_results"]["rust_cve"]["reason"],
+        "cargo_audit_database_not_selected"
+    );
+}
+
+#[test]
+fn explicit_and_first_path_failures_do_not_try_a_later_cargo_audit() {
+    let fixture = Fixture::new();
+    let good = fixture.0.join("good");
+    fs::create_dir(&good).unwrap();
+    let tool = fixture.native_tool();
+    fs::rename(tool, good.join("cargo-audit")).unwrap();
+    let bad = fixture.0.join("bad");
+    fs::create_dir(&bad).unwrap();
+    let broken = bad.join("cargo-audit");
+    std::os::unix::fs::symlink("/no/such/audit", &broken).unwrap();
+    let db = fixture.0.join("advisory-db");
+    for explicit in [false, true] {
+        let mut args = vec!["--rustsec-db", db.to_str().unwrap()];
+        if explicit {
+            args.extend(["--cargo-audit-tool", broken.to_str().unwrap()]);
+        }
+        let paths = if explicit {
+            good.display().to_string()
+        } else {
+            format!("{}:{}", bad.display(), good.display())
+        };
+        let (_, bytes) = fixture.check_in_path("json", &args, &paths);
+        let report: Value = serde_json::from_slice(&bytes).unwrap();
+        assert_eq!(
+            report["native_results"]["rust_cve"]["reason"], "cargo_audit_tool_unavailable",
+            "{report}"
+        );
+        assert!(
+            report["native_results"]["rust_cve"]["findings"]
+                .as_array()
+                .unwrap()
+                .is_empty()
+        );
+    }
+}
+
+#[test]
+#[ignore = "requires existing cargo-audit and offline RustSec database via explicit environment"]
+fn actual_path_audit_preserves_advisory_and_one_stable_cve_task() {
+    let tool =
+        PathBuf::from(std::env::var("CODEGUARD_CARGO_AUDIT_BIN").expect("existing cargo-audit"))
+            .canonicalize()
+            .unwrap();
+    let db = PathBuf::from(
+        std::env::var("CODEGUARD_CARGO_AUDIT_DB").expect("existing offline database"),
+    )
+    .canonicalize()
+    .unwrap();
+    let fixture = Fixture::new();
+    fixture.init();
+    let bin = fixture.0.join("only-audit");
+    fs::create_dir(&bin).unwrap();
+    std::os::unix::fs::symlink(&tool, bin.join("cargo-audit")).unwrap();
+    let mut reports = Vec::new();
+    for _ in 0..2 {
+        let (exit, bytes) = fixture.check_in_path(
+            "json",
+            &["--rustsec-db", db.to_str().unwrap()],
+            bin.to_str().unwrap(),
+        );
+        let report: Value = serde_json::from_slice(&bytes).unwrap();
+        assert_eq!(exit, 3);
+        let scan = &report["native_results"]["rust_cve"];
+        assert_eq!(scan["local_scan_complete"], true, "{scan}");
+        assert!(
+            scan["findings"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|r| r["advisory_id"] == "RUSTSEC-2020-0071")
+        );
+        assert_eq!(scan["database_freshness"], "unverified");
+        assert_eq!(report["delivery_decision"], "incomplete");
+        reports.push(report);
+    }
+    let cve_tasks: Vec<Value> = fs::read_dir(fixture.0.join(".codeguard/findings"))
+        .unwrap()
+        .map(|entry| {
+            serde_json::from_slice::<Value>(
+                &fs::read(entry.unwrap().path().join("finding.json")).unwrap(),
+            )
+            .unwrap()
+        })
+        .filter(|fact| fact["checker_id"] == "rust.cargo_audit")
+        .collect();
+    assert_eq!(cve_tasks.len(), 1);
+    assert_eq!(cve_tasks[0]["state"], "open");
+    if let Ok(file) = std::env::var("CODEGUARD_CARGO_AUDIT_DISCOVERY_REPORT") {
+        use sha2::{Digest, Sha256};
+        let result = json!({"actual_native_tool_executed":true,"native_tool_sha256":format!("{:x}",Sha256::digest(fs::read(&tool).unwrap())),"codeguard_binary_sha256":format!("{:x}",Sha256::digest(fs::read(env!("CARGO_BIN_EXE_codeguard")).unwrap())),"reports":reports,"stable_cve_tasks":cve_tasks,"database_freshness":"unverified","actual_host_executed":false});
+        fs::write(file, serde_json::to_vec_pretty(&result).unwrap()).unwrap();
+    }
 }

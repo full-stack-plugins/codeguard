@@ -27,6 +27,21 @@ pub struct JavadocParsed {
 /// 参数为原始 stderr、隔离副本绝对路径与扫描前源码字节；不读取项目文件或执行原生工具。
 #[must_use]
 pub fn parse_javadoc_output(bytes: &[u8], expected_file: &str, source: &[u8]) -> JavadocParsed {
+    parse_output(bytes, expected_file, source, false)
+}
+
+/// 解析 JDK21 缺注释及详细描述诊断；参数为原生输出、隔离路径和扫描源码。
+/// 返回源位置绑定的局部诊断；未知文字保持未完成，不授予项目覆盖资格。
+#[must_use]
+pub fn parse_detailed_javadoc_output(
+    bytes: &[u8],
+    expected_file: &str,
+    source: &[u8],
+) -> JavadocParsed {
+    parse_output(bytes, expected_file, source, true)
+}
+
+fn parse_output(bytes: &[u8], expected_file: &str, source: &[u8], detailed: bool) -> JavadocParsed {
     if bytes.len() > 1024 * 1024 || expected_file.is_empty() || source.len() > 16 * 1024 * 1024 {
         return incomplete("javadoc_output_invalid");
     }
@@ -84,7 +99,9 @@ pub fn parse_javadoc_output(bytes: &[u8], expected_file: &str, source: &[u8]) ->
         {
             return incomplete("javadoc_source_line_mismatch");
         }
-        let Some(rule_id) = rule_id(message) else {
+        let Some(rule_id) =
+            rule_id(message).or_else(|| detailed.then(|| detailed_rule_id(message)).flatten())
+        else {
             return incomplete("javadoc_rule_unrecognized");
         };
         let caret = chunk[2];
@@ -141,5 +158,16 @@ fn incomplete(reason: &'static str) -> JavadocParsed {
         state: JavadocParseState::Incomplete,
         diagnostics: Vec::new(),
         reason: Some(reason),
+    }
+}
+
+fn detailed_rule_id(message: &str) -> Option<&'static str> {
+    match message {
+        "empty comment" => Some("JavadocEmptyComment"),
+        "no main description" => Some("JavadocMissingMainDescription"),
+        "no description for @param" => Some("JavadocEmptyParamDescription"),
+        "no description for @return" => Some("JavadocEmptyReturnDescription"),
+        "no description for @throws" => Some("JavadocEmptyThrowsDescription"),
+        _ => None,
     }
 }

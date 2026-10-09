@@ -54,6 +54,45 @@ fn clean_candidate_cannot_be_promoted_to_clean() {
 }
 
 #[test]
+fn wide_normal_siblings_preserve_worker_incomplete_status() {
+    let source = format!("class A {{ {} int x = ; }}", ";".repeat(200_010));
+    let result = run_syntax_worker_candidate(
+        env!("CARGO_BIN_EXE_codeguard").as_ref(),
+        "java",
+        "src/A.java",
+        source.as_bytes(),
+        deadline(),
+        &AtomicBool::new(false),
+    )
+    .expect("bounded wide-tree worker observation");
+    assert_eq!(result.precheck.status, SyntaxPrecheckStatus::Incomplete);
+    assert_eq!(result.precheck.truncated_files, 1);
+    assert!(!result.grammar_qualified);
+}
+
+#[test]
+fn structural_visit_budget_preserves_worker_facts_and_incomplete_status() {
+    let source = format!("def missing():\n{}", "pass\n".repeat(60_000));
+    let result = run_syntax_worker_candidate(
+        env!("CARGO_BIN_EXE_codeguard").as_ref(),
+        "python",
+        "src/app.py",
+        source.as_bytes(),
+        deadline(),
+        &AtomicBool::new(false),
+    )
+    .expect("bounded structural worker observation");
+    assert_eq!(result.precheck.status, SyntaxPrecheckStatus::Incomplete);
+    assert_eq!(result.precheck.truncated_files, 1);
+    assert!(!result.grammar_qualified);
+    assert_eq!(result.structural_observations.len(), 1);
+    assert_eq!(
+        result.structural_observations[0].rule_id,
+        "codeguard.python.required_suite"
+    );
+}
+
+#[test]
 fn go_whole_file_rule_stays_separate_and_forged_worker_frames_are_rejected() {
     use std::io::Write;
     use std::process::{Command, Stdio};
@@ -583,4 +622,91 @@ fn output_flood_and_midflight_cancel_do_not_poison_later_observation() {
         )
         .is_ok()
     );
+}
+
+#[test]
+fn unlocated_error_frames_are_versioned_and_cannot_claim_complete_scanning() {
+    use std::io::Write;
+    use std::process::{Command, Stdio};
+    let source = b"func f(_ x: ) {}\n";
+    let mut child = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+        .args(["__syntax-worker", "swift"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .spawn()
+        .unwrap();
+    child.stdin.take().unwrap().write_all(source).unwrap();
+    let out = child.wait_with_output().unwrap();
+    assert!(out.status.success());
+    let original: serde_json::Value = serde_json::from_slice(&out.stdout).unwrap();
+    assert_eq!(original["schema_version"], "1.4.0");
+    assert_eq!(original["parser_error_location_unavailable"], true);
+    let actual = run_syntax_worker_candidate(
+        env!("CARGO_BIN_EXE_codeguard").as_ref(),
+        "swift",
+        "a.swift",
+        source,
+        deadline(),
+        &AtomicBool::new(false),
+    )
+    .unwrap();
+    assert!(actual.parser_error_location_unavailable);
+    for edit in ["old_version", "false_flag", "missing_flag", "complete"] {
+        let mut value = original.clone();
+        match edit {
+            "old_version" => value["schema_version"] = serde_json::json!("1.0.0"),
+            "false_flag" => value["parser_error_location_unavailable"] = serde_json::json!(false),
+            "missing_flag" => {
+                value
+                    .as_object_mut()
+                    .unwrap()
+                    .remove("parser_error_location_unavailable");
+            }
+            _ => value["truncated"] = serde_json::json!(false),
+        }
+        let quoted = value.to_string().replace('\'', "'\\''");
+        let fake = fake_worker(&format!("printf '%s' '{quoted}'"));
+        assert!(
+            run_syntax_worker_candidate(
+                &fake,
+                "swift",
+                "a.swift",
+                source,
+                deadline(),
+                &AtomicBool::new(false)
+            )
+            .is_err(),
+            "{edit}"
+        );
+        fs::remove_file(fake).unwrap();
+    }
+}
+
+#[test]
+fn rust_worker_matches_existing_web_runtime_on_hidden_error_fixtures() {
+    let reference: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../tests/acceptance/evidence/hidden-error-web-reference-2026-10-06.json"
+    ))
+    .unwrap();
+    assert_eq!(reference["runtime"], "web-tree-sitter");
+    assert_eq!(reference["version"], "0.25.10");
+    for row in reference["rows"].as_array().unwrap() {
+        let language = row["language"].as_str().unwrap();
+        let source = row["source"].as_str().unwrap().as_bytes();
+        let actual = run_syntax_worker_candidate(
+            env!("CARGO_BIN_EXE_codeguard").as_ref(),
+            language,
+            "sample.txt",
+            source,
+            deadline(),
+            &AtomicBool::new(false),
+        )
+        .unwrap();
+        assert_eq!(actual.grammar_sha256, row["grammar_sha256"]);
+        assert!(actual.parser_error_location_unavailable);
+        assert!(actual.recoveries.is_empty());
+        assert_eq!(row["has_error"], true);
+        assert_eq!(row["recoveries"], serde_json::json!([]));
+        assert!(row["sexp"].as_str().unwrap().contains("(MISSING "));
+    }
 }

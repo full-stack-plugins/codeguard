@@ -669,6 +669,8 @@ Cargo 为 rustup 等按入口名称分派的代理时，Clippy、rustdoc 与构�
 聚合原生阶段完成后，当前源码会用 Clippy 的非缓存 `compiler-artifact`、原根清单身份和启动前源码摘要，免除同字节 Rust 目标入口的重复 WASM。覆盖只在本次进程内传递，不从可编辑报告恢复；失败、输入/工具变化、重复 JSON 键或结束记录后的事件不授予覆盖。`all-targets` 不能证明整个目录已解析，未证明的模块和条件排除文件继续初检；原生告警、稳定任务及完整交付义务均保留。同一文件/规则/行/列在库和测试目标中重复报告时只投影一项 finding，级别以 error 优先；不同位置分别保留，历史重复任务不自动关闭。见 [Rust 原生优先验收](../tests/acceptance/check-all-native-preferred-rust.md)。公开 npm 0.1.4 尚不包含本批修改。
 
 
+Clippy 输入保护还会沿同一有界静态发现策略复核 Rust 源码、Cargo 清单和锁文件的集合，快照固定全部已观察 Rust 文件及嵌套清单/锁的字节。新增、删除、重命名或读取失败使本轮观察未完成，撤回当前 finding 与原生覆盖；自有工作台记录沿既有排除策略处理，不制造源码变化。外部依赖、动态目标及完整配置闭包仍未证明。
+
 ### 已安装 Cargo 自动发现（当前源码）
 
 `check all`、`comments rust`、`build rust` 及其 Cargo 任务复检接受可选 `--cargo-tool`。未指定时，从调用方 PATH 的绝对目录中选择首个普通可执行 `cargo`；空目录、相对目录和不可执行入口不作为候选。显式无效工具或已选工具执行失败保留具体阻塞，不换用下一个 Cargo。聚合 Rust 检查共用本轮已选入口。
@@ -1002,4 +1004,588 @@ Ruby 六类别候选档案已独立固化运行时方言、项目锁版本策略
 
 SC1071/1090/1091/1092/1134/1144/1145 分类为环境或依赖阻塞；可同时保留 SC2086 等局部发现。`json1` 的列按 Unicode 标量计数，tab 算一个字符；不能沿用旧 json 的 tab 展开列。非法或部分报告不能获得完整状态。原生日志自由文本与替换内容不进入修复指引。
 
-0.1.0 `shell_lint_feedback` 提供七要素修复简报、原工具复检 argv 和官方规则链接。`task_workflow_status=not_integrated`、空尝试历史明确尚未接入持久任务；未完成输入只提供调查指引，不给源码修改范围。即使原生零诊断，整体仍为 incomplete/退出3、delivery_decision=not_evaluated；项目全范围、Dockerfile/IaC、安全、可信白名单与任务关闭不得由单文件结果替代。参见 [局部验收](../tests/acceptance/shellcheck-native-baseline.md)。
+未初始化工作台时，0.1.0 `shell_lint_feedback` 提供七要素修复简报、原工具复检 argv 和官方规则链接。`task_workflow_status=not_integrated`、空尝试历史明确尚未接入持久任务；未完成输入只提供调查指引，不给源码修改范围。即使原生零诊断，整体仍为 incomplete/退出3、delivery_decision=not_evaluated；项目全范围、Dockerfile/IaC、安全、可信白名单与任务关闭不得由单文件结果替代。参见 [局部验收](../tests/acceptance/shellcheck-native-baseline.md)。
+
+## Shell 原生规则组与修复工作台
+
+在已初始化 `.codeguard` 的工作区，单文件 `lint shell` 现在保存独立的0.1.0 `shellcheck_workbench_observation`，复用工作台的报告消费、事实、追加事件及Markdown任务机制。反馈升级0.2.0并返回实际同步状态和稳定任务ID；未初始化仍保留0.1.0局部反馈，不自动初始化。持久化或导入失败明确incomplete，不删除原生结果，不伪造任务ID。
+
+稳定单位为“工作区内文件、显式方言、原生SC规则”位置组，同一组内全部原生位置保留在报告；不把相同规则的不同文件或不同方言混成一个任务，也不声称多个位置是同一个语义缺陷。位置移动或新增同规则位置不另建组；缺工具、错误方言、坏rc及source依赖阻塞共享同文件同方言的环境恢复任务，具体原因保存在各次原报告。过期输入只进入历史/环境调查，不按旧位置新建可修源码问题。
+
+`next` 为Shell提供0.17.0指引，`task show` 为0.3.0，两者推荐绑定任务ID及绝对工作区的task verify，保留Shell工具参数；原方言/显式rc由首次报告绑定，工具入口仍需重新核验。源码或原rc变化会撤回直接修改指引，先要求原生复扫；配置抑制、同步成功或零诊断不关闭已有任务。Shell专用 `task verify CG-… . --shellcheck-tool /absolute/shellcheck --format json` 已接入0.24.0局部复检、既有租约和失败尝试历史，绑定首次方言、原显式rc及SC规则组。原规则仍存在为still_present；配置改变后零诊断为rule_coverage_requires_review；疑似disable注释为suppression_requires_review；修复后零诊断为candidate_absent_unverified_policy。注释观察不证明实际抑制。受信任关闭、复发和项目全范围尚未验收，7.4继续开放。任务勾选或删除Markdown不能消除事实。
+
+Shell失败尝试可通过 `task claim → task attempt start → task attempt finish --outcome ready-to-verify → task verify` 记录，复检事件绑定attempt ID。相同输入/动作两次仍有原SC规则时，next为needs_decision，第三次相同动作被拒绝；不会删除问题或自动批准白名单。历史Markdown保留原字节，task show/next提供当前指引。真实原工具记录见 [Shell指引验收](../tests/acceptance/shellcheck-task-recheck-baseline.md)。
+
+```mermaid
+flowchart LR
+    A[原生发现与稳定任务] --> B[next或task show]
+    B --> C[claim与attempt start]
+    C --> D[修复并finish ready-to-verify]
+    D --> E[绑定原任务的task verify]
+    E -->|原规则仍存在| F[绑定尝试的失败事件]
+    F -->|仍有预算| B
+    F -->|两次同动作无进展| G[needs_decision并拒绝第三次]
+    E -->|候选消失| H[等待可信政策和覆盖核验]
+```
+
+## Shell 项目发现范围的原生检查
+
+`codeguard check shell . --shellcheck-tool /absolute/shellcheck --format json` 和 `check all` 现在对静态发现的Shell文件逐项调用ShellCheck0.11.0，共享总deadline。0.52.0反馈的 `native_results.shell_lint` 为0.1.0 `shell_native_scan`，保存每个文件的源码摘要、方言、原rc、SC规则/Unicode标量位置、输入稳定性及工作台状态。human显示原规则位置；SARIF只投影当前观察，位置和原生消息仍留私有证据。
+
+方言优先来自shebang及明确扩展名；无声明的文件可显式提供 `--shell-dialect bash` 作为默认值，不能覆盖已有zsh/fish声明。未知或不适用方言保持未完成，next提出具体方言/检查器决策，不重复安装不适用工具。每次最多64文件，超限显示unobserved_count；local_check_complete仅说明这批冻结单文件原生观察完成，不能证明项目source依赖、所有检查族或可信覆盖。
+
+已初始化时绑定请求项目根，子工作台不改变归属；未初始化不创建目录。相同文件/方言/SC规则更新原任务；环境和配置故障保留阻塞。源码、范围、工具或rc变化撤回当前定位权限。Shell没有WASM资产时不伪造初检。check shell仍退出3/not_evaluated，check all仍为incomplete；安全、CVE、source依赖、可信关闭/复发、zsh/fish专用能力、Dockerfile/IaC和跨平台验收继续开放。
+
+```mermaid
+flowchart LR
+    A[静态发现Shell文件] --> B[逐文件方言与rc]
+    B --> C[原生ShellCheck与共享deadline]
+    C --> D[复核源码 范围 配置 工具]
+    D --> E[绑定请求根的稳定任务]
+    E --> F[next与task verify]
+    C --> G[逐文件诊断和环境阻塞]
+    G --> H[human JSON SARIF局部反馈]
+```
+
+证据见 [项目Shell验收](../tests/acceptance/shellcheck-project-baseline.md)。
+
+### Shell 编辑与修复事件
+
+Rust `hook execute` 和 Claude 格式适配器现在把已确认的 Shell 编辑路由到同一 ShellCheck 逐文件路径，接受 `--shellcheck-tool /absolute/path`；仅检查事件选择的文件，共享事件超时，不运行完整项目构建。任务 ID 与 `lint shell` / `check shell` 保持一致，未初始化工作区不自动创建任务。
+
+```mermaid
+flowchart LR
+    A[确认 Shell 编辑] --> B[选中文件及实际方言]
+    B --> C[原生 ShellCheck 与当前输入复核]
+    C --> D[更新同一任务及脱敏对话摘要]
+    D --> E[智能体修复]
+    E --> F[repair_ready 绑定任务]
+    F --> G[原规则 task verify]
+    G --> H[记录观察 仍须核验关闭条件]
+```
+
+编辑反馈外层协议0.21、内层0.11，旧协议保留。对话仅显示当前 SC 规则、Unicode 标量位置、实际已同步任务 ID 及复检命令，排除源码和原生自由文本。缺工具、不支持方言、工具失败和工作台保存失败保持未完成；当前不存在 Shell 内置 WASM，不虚构兜底。失败写入不检查；`repair_ready` 复用既有任务复检，零诊断不关闭问题。
+
+[验收记录](../tests/acceptance/shellcheck-hook-baseline.md)区分真实 ShellCheck 报告、受控工具测试、npm 离线安装及实际宿主会话。Claude 形状重放通过不代表真实已安装宿主或完整项目门禁已验收。
+
+CFQuery的SQL语法对照必须绑定数据库方言：PostgreSQL可接受空SELECT列表，却拒绝DISTINCT空列表。当前隔离原生验证揭示固定WASM对两者均零恢复，不能将无方言样例升级为已确认错误。详见[方言证据](CFQuery-SQL-Dialect-Evidence.zh_CN.md)；项目SQL原生适配与grammar修复仍开放。
+
+失败写入的通用分流进一步允许已登记的 Go/Cargo/Maven 等检查器配置参数，直接返回 `not_run/write_failed`，不启动工具或创建工作台；租约/所有权、未知或格式错误参数仍拒绝。此例外仅用于失败写入，不将未接线工具静默启用于确认编辑。见[验收](../tests/acceptance/hook-failed-write-options.md)。
+
+## Go 编辑原生语法快检（局部验收）
+
+`hook execute . --go-tool /绝对路径/go --timeout 30s --format=json` 对确认编辑中的选中文件优先调用固定 Go1.23.4 SDK 的同目录 gofmt；入口、辅助工具和源码字节分别复核，不运行源码、依赖安装或项目级 go vet。缺工具保留 WASM 候选；选定工具失败、辅助工具缺失、未知版本及 `//line` 位置重映射保持未完成，不静默切换检查器。当前仅固定 SDK 语法观察，项目语言版本与全部构建条件尚未验收。
+
+```mermaid
+flowchart LR
+    E[确认 Go 文件编辑] --> S{SDK 已选择?}
+    S -->|是| G[同 SDK gofmt 检查冻结 stdin]
+    G -->|诊断| T[更新同一稳定语法任务]
+    G -->|失败| B[保留环境阻塞与具体诊断需求]
+    S -->|否| W[内置 WASM 初检]
+    W -->|疑似异常或未完成| R[要求原生确认]
+    W -->|完整零恢复| I[推荐准备原生 lint]
+    T --> V[task verify --go-tool 原 SDK]
+    V --> O[记录尝试与证据，保持未批准任务开放]
+```
+
+编辑外层协议0.22/内层0.12、新原生首次观察0.10；历史版本保留。原生诊断与候选沿用相同工作区/路径/语言任务身份；Claude格式仅显示当前Go规则、UTF-8字节位置及实际任务复检指引，排除源码/自由文本。原 SDK 复检零诊断不等于可信关闭，仍须go vet、类型、依赖、安全及完整项目检查。证据见[Go Hook验收](../tests/acceptance/go-native-hook.md)。
+
+Go首次原生观察的任务指引使用 `repair_brief_preview` 0.18和 `syntax-confirm-` 引用；实际任务复检继续使用0.14和 `syntax-native-` 引用，历史schema保持不变。最终受影响回归：WASM 78通过/5条件忽略，默认15通过/0忽略。此前1461通过的默认全量结果早于这次末尾协议修正。
+
+Go固定1.23.4语法SDK现于编辑及原工具任务复检前静态检查最近 `go.mod` 和最近 `go.work`。最低版本或建议工具链超出支持范围、声明歧义或不可读时返回环境观察，不运行不适用SDK、不降级WASM；运行期间变化撤回诊断，当前声明不适用时撤回旧修复位置。该边界不代表通用工具链选择或语言版本验收。证据：[Go项目版本](../tests/acceptance/go-project-version.md)。
+
+### CFQuery 静态 DISTINCT 投影候选
+
+固定 CFQuery grammar 能识别 SQL token，不能完整验证 SQL 子句。Codeguard 对直接相邻的 AST 关键词 `SELECT DISTINCT FROM` 增加独立候选，原始 ERROR/MISSING 保持不变。字符串、引号标识符和 CFML 插值会打断匹配；注释可跳过。该规则不标记 `SELECT FROM users`，因为 PostgreSQL 允许未使用 DISTINCT 的空投影。
+
+```mermaid
+flowchart LR
+    A[CFQuery SQL fragment] --> B[Fixed WASM AST]
+    B --> C[Raw ERROR / MISSING]
+    B --> D[Adjacent SELECT DISTINCT FROM keywords]
+    D --> E[Independent unqualified candidate]
+    E --> F[Whole-file identity + fragment identity + file positions]
+    F --> G[One stable confirmation task]
+    G --> H[Resolve datasource, dialect, version and template context]
+    H --> I[Applicable native SQL confirmation required]
+```
+
+worker 使用1.3、显式probe 0.4、项目反馈0.53、编辑反馈0.23/0.13、持久候选0.11；历史schema及grammar资产不改。嵌入观察同时记录完整文件 `source_sha256` 和独立 `fragment_source_sha256`，坐标还原到文件。重复扫描复用同一任务；候选消失不关闭任务。`next` 明确要求确认datasource、数据库方言/版本、动态模板和schema上下文：CFQuery原生task verify adapter仍未接入，不自动连接项目数据库。
+
+```bash
+codeguard grammar probe cfquery query.sql --format=json
+codeguard check all . --format=json
+codeguard next . --format=json
+```
+
+报告示例（字段节选，不是完整schema）：
+
+```json
+{"language":"cfquery","recoveries":[],"structural_observations":[{"basis":"codeguard_structure_rule","rule_id":"codeguard.cfquery.distinct_projection","rule_version":"1.0.0","parent_syntax_kind":"program"}],"grammar_qualified":false,"status":"incomplete","delivery_decision":"not_evaluated","next_action":"confirm_candidate_structure_with_applicable_native_tool"}
+```
+
+本轮只在候选层纠正一个固定原生反例，不代表grammar取得资格、独立holdout精度、全部SQL方言、SQL注入安全或原生adapter/发行验收完成。证据：[CFQuery候选验收](../tests/acceptance/cfquery-structure.md)。
+
+
+### Rustfmt 原生解析对照（开发期）
+
+Rust 开发重放现支持显式选择 Rustfmt1.9.0-stable：冻结 stdin、私有 edition2024 配置、空环境、共同预算，并复核入口、制品和配置。合法但未格式化的源码不算语法违规，不使用 `--check`；只保留有界 stdin 原生定位，兼容实测 EOF 和 E0765/退出101，崩溃及无定位输出保持未完成。固定 edition 不推断项目版本，不覆盖外部模块，不替代 Clippy/构建，不关闭任务；Rust 编辑 Hook 接线仍待实现。实际16例对照为5TP/11TN/0FP/0FN/0unknown，仅限小规模非独立holdout语料，语言资格仍0/32。执行路径、协议与复现命令见[局部验收](../tests/acceptance/rustfmt-controlled-native-differential.md)。
+
+
+Rust选中文件解析前置现从有界包/工作区声明确定Cargo edition，并在原生调用之间复核声明与源码连续性。Unix库服务已保留真实2015/2021/2024反例；选中文件编辑Hook、稳定确认任务与原工具复检已连接；完整项目与实际宿主验收仍开放。见[项目edition契约](Rust-Project-Edition-Syntax.zh_CN.md)。
+
+Rust编辑反馈现保留安全行号、稳定任务与原Rustfmt复检指引，Clippy/类型/构建义务继续保留。见[局部链路验收](../tests/acceptance/rust-native-hook.md)。
+
+Rust编辑后现提供可执行的批次后Clippy指令，明确编辑阶段未运行项目lint。原任务repair_ready保留当前规则/行号并撤回输入变化后的指引；这不是后台队列或可信关闭。见[项目lint后续流程](Rust-Project-Lint-Followup.zh_CN.md)。
+
+Rust 原生首次与 WASM 首次语法任务均可通过同一受保护宿主 SDK 确认、限定关闭和同工具复发重开。原生首次保留 grammar=null（策略1.7/证据0.8）；WASM 首次保留真实 grammar 摘要（策略1.8/证据0.9）。两者绑定 Cargo edition 来源与原反例；原生反证转调查，未完成或输入变化不能关闭。生产宿主批准接线仍待完成，不替代 Clippy/项目门禁。详见 [限定验收](../tests/acceptance/rust-task-resolution.md)。
+
+WASM 首次闭环的实际执行路径、协议与误报分流见 [验收记录](../tests/acceptance/rust-wasm-task-resolution.md)。
+
+
+```mermaid
+flowchart LR
+    A[首次语法任务] --> B{首次来源}
+    B -->|原生| C["核对首次工具及 edition 来源<br/>策略1.7 / 证据0.8 / grammar=null"]
+    B -->|WASM| D["绑定首次 grammar 与批准 edition<br/>策略1.8 / 证据0.9"]
+    C --> E[同一工具及预算复检原反例和当前源码]
+    D --> E
+    E -->|原反例有诊断且当前已修复| F[限定任务关闭]
+    E -->|原反例无诊断| G[误报调查]
+    E -->|未完成或输入变化| H[继续核验]
+    F --> I[普通原工具复检检出复发]
+    I --> J[重开同一父链任务]
+```
+
+该图对应当前源码的宿主批准路径；批准上下文来自宿主SDK调用方，尚未实现生产宿主自动接线，不能从项目本地历史推断全项目通过。
+
+未完成解析反馈现明确要求对原始源码进行适用原生确认：原生确认合法时调查grammar版本/兼容性或扫描预算，诊断成立时才按真实位置修复。不能仅凭截断声称grammar已报告错误。项目输出、编辑对话、持久任务及next/task show共用此分流，任务身份和关闭要求保持原有语义。[Acceptance](../tests/acceptance/incomplete-syntax-guidance.md)
+
+### JavaScript 候选检查入口共享（当前源码候选）
+
+独立 `lint typescript` 按JavaScript文件扩展选择原生优先路径，复用项目检查和编辑Hook的有界候选扫描与任务同步。自动原生发现受所选工作区边界限制，不执行父项目检查器；已选入口失败保留原故障。各入口的公开协议分别版本化，共享规则、字节/位置验证及稳定ESLint任务身份；不以初检零候选替代原生确认或完整门禁。
+
+```mermaid
+flowchart LR
+    A[独立 lint] --> B[工作区内原生优先]
+    C[项目检查] --> D[共享单文件候选观察]
+    E[确认编辑 Hook] --> D
+    B -->|缺本地上下文| D
+    B -->|入口可用| N[原生 ESLint]
+    D --> F[共享稳定任务与 next]
+    D --> G{零候选且无历史待办}
+    G -->|是| H[推荐原生 lint]
+    G -->|否| F
+    F --> N
+    N --> I[原工具复检及既有关闭契约]
+```
+
+独立反馈0.6将当前初检与历史待确认分开：有历史任务时保留ID和required；同步失败保留候选，先恢复工作区身份或报告路径。真实宿主、完整策略关闭和全部语言资格仍待验收。详见[验收](../tests/acceptance/javascript-lint-candidate.md)。
+
+独立lint为每个注册表规范ID提供明确入口；原生适配缺口不能证明工具未安装。候选解析、共享任务同步与原工具确认分别保留能力边界。
+
+```mermaid
+flowchart LR
+    A["lint language FILE"] --> B{Native adapter}
+    B -->|Integrated| C[Native-first language command]
+    B -->|Gap| D[Unknown native configuration]
+    D --> E{Matching WASM available}
+    E -->|Yes| F[Bounded candidate observation]
+    E -->|No| G[Explicit incomplete feedback]
+    F --> H[Shared stable confirmation task]
+    H --> I[Native confirmation or adapter decision]
+```
+
+
+Erlang项目/编辑路径已串起原生优先、有界WASM结构兜底与稳定任务复检。环境阻塞、候选及原生复检沿用同一身份，零诊断不自行关闭。见[工作流与执行图](../tests/acceptance/erlang-form-workbench.md)。
+
+## Java 注释统一入口（源码增量，尚未发布）
+
+`comments java [path]` 复用既有原生 Javadoc 探针：文件模式执行显式 JDK21 局部诊断；项目模式只选择已识别配置及所属主源码。缺配置不运行 Javadoc，也不生成注释违规。显式 Maven 上下文选择原 POM 多文件检查，失败不退回单文件探针。
+
+```bash
+codeguard comments java File.java --java-home /absolute/jdk21 --format json
+codeguard comments java . --java-home /absolute/jdk21 --maven-tool /absolute/mvn --maven-repo /absolute/repository --repo-sha256 SHA256 --timeout 60s --format json
+```
+
+独立包装协议 `java_comments_feedback 0.1.0` 保留 `native_observation` 原报告，不修改旧 `lint java --checker javadoc` 的协议。预算使用 CLI、登记环境变量、项目默认值、内置默认值的优先级；所有原生子任务共用截止时间。报告显示 `target_kind`、`execution_budget`、具体观察和下一步；局部零诊断仍是 `coverage_proven=false`、`delivery_decision=not_evaluated`，退出3（取消130）。不隐式安装或修改源码。
+
+**范围限制：** Maven多文件模式的工作台适配尚未接通；文件入口通过显式--workspace接线，见下方说明。可信关闭仍待完成，本入口不伪造任务，不据局部探针关闭问题。示例中的绝对工具路径和离线仓库摘要需替换为当前真实环境。
+
+### Javadoc 项目工作台接线（源码增量）
+
+已初始化项目的 `comments java .` 在 JDK 单文件模式中自动保存局部观察并同步稳定任务，包装协议现为 `java_comments_feedback 0.4.0`；未绑定工作台仍沿用0.1局部反馈，显式文件工作台见下方。行号用于定位；规则、文件、源码锚点和同锚点序号构成身份。重复扫描追加观察，不增加重复任务。
+
+```mermaid
+flowchart LR
+    A[Java comments原生观察] --> B{项目已初始化且为JDK模式}
+    B -->|是| C[保存摘要绑定报告]
+    C --> D[复核源码 配置与稳定身份]
+    D --> E[归并源码任务或准备任务]
+    E --> F[对话显示workbench.next]
+    B -->|否| G[局部报告与具体能力缺口]
+    C -->|失败| H[显示持久化错误 不虚构任务]
+```
+
+缺配置或原生未完成生成准备记录，不成为源码违规或自动新增交付义务。报告使用 `workbench.status/new_findings/new_blockers/next`，持久失败不返回虚构任务；`next` 和任务文字提供证据、规则、允许范围、步骤、复检和关闭条件。局部零诊断保留开放任务，`task_verify_status=local_observation_only`，原任务复检见下节；Maven多文件报告工作台适配尚未接通，显式文件工作台见下方。完整可信关闭和宿主验收仍待完成。
+
+### Javadoc 原任务复检（源码增量）
+
+已初始化项目 JDK 模式的 Javadoc 任务支持原工具复检：
+
+```bash
+codeguard task verify CG-<任务身份> . --java-home /absolute/jdk21 --format json
+```
+
+复检读取摘要绑定的原观察，只选择任务对应主源码与当前原生配置；不会从报告里选择可执行程序。显式 JDK21 的源码、配置、工具字节在扫描及记录前核对。其它检查器参数在租约和启动前拒绝。结果 `still_present`、`incomplete`、`rule_coverage_requires_review`、`candidate_absent_unverified_policy` 保存到同一任务事件，绑定原生报告和本次尝试。缺工具、工具失配或输入变化不成为修复完成；配置改变或同规则不同锚点需要复核。
+
+```mermaid
+flowchart LR
+    A[任务原报告与当前输入] --> B[显式JDK21原工具复检]
+    B --> C[归属 源码 配置与工具身份复核]
+    C --> D[原任务复检事件与尝试历史]
+    D --> E[next提供当前原生反馈]
+    E --> F{连续无进展}
+    F -->|是| G[具体决策需求]
+    F -->|否| H[按规则继续修复或恢复环境]
+```
+
+当前版本：绑定工作台包装 `java_comments_feedback 0.4.0`、Javadoc修复简报0.3、原生复检容器 `javadoc_task_recheck 0.2.0`、公开 `task_verification_preview 0.27.0`。旧schema保持可读；`task_verify_status=local_observation_only` 表示已接通局部复检，正式可信关闭仍未验收。补齐文档后的零诊断只记录消失候选并保持open；白名单审批、原完整项目规则归因与实际宿主仍需独立完成。Maven多文件任务同步已接通，可信关闭/复发及真实宿主验收仍待完成；显式文件工作台见下方。
+
+### 显式 Java 文件工作台（源码增量）
+
+```bash
+codeguard comments java File.java --workspace . --java-home /absolute/jdk21 --format json
+codeguard task verify CG-<任务身份> . --java-home /absolute/jdk21 --format json
+```
+
+`--workspace` 显式绑定可读工作区：文件必须位于其中；项目目标必须与工作区根一致。越界在工具启动前拒绝；未初始化时显示 `workspace_not_initialized`，不会自动初始化。只提供文件、未指定工作台时仍为原局部反馈，不从父目录猜工作区。显式工作区也用于共享预算的项目默认值。
+
+持久观察0.2、修复简报0.3及原任务复检0.2增加 `observation_scope`：`explicit_file_probe` 为显式单文件诊断，配置引用必须为空；`configured_project_probe` 仍按项目原配置筛选主源码。原任务复检沿首次模式，不能因为后来新增POM把文件探针变成项目检查。行号只定位，稳定身份仍按原规则/文件/锚点归并。缺JDK只产生准备任务；局部零诊断及同步仍不关闭原任务。
+
+当前绑定工作台包装为 `java_comments_feedback 0.4.0`，公开任务复检为 `task_verification_preview 0.27.0`；旧schema保留。Human输出也显示工作台状态、任务身份、模式、下一步与复检参数。Maven多文件任务同步已接通，可信关闭/复发及真实宿主验收仍待完成。
+
+### Maven Javadoc 多文件工作台（源码增量）
+
+已初始化项目使用显式 Maven 上下文运行 `comments java` 时，原生多文件诊断保存到 `.codeguard/reports/` 并归并稳定修复任务；缺配置或未完成执行生成准备任务。工作台在原生执行前捕获有界源码/POM快照，保存前再核对当前字节；导入时重新核对摘要、构建根、原POM、工具观察身份、规则和位置，并重算问题投影。篡改、越界或输入变化不产生新的源码问题。已消费历史报告按原摘要收据保留，不因后来修复源码反复变成导入失败。
+
+```bash
+codeguard comments java . --maven-tool /absolute/mvn --java-home /absolute/jdk21 --maven-repo /absolute/offline-repo --repo-sha256 <实际仓库摘要> --format json
+codeguard next . --format json
+```
+
+Maven绑定包装为 `java_comments_feedback 0.6.0`，保存观察为 `maven_javadoc_workbench_observation 0.1.0`，修复简报内部版本0.5且 `observation_scope=configured_maven_multifile_probe`。JDK文件/项目模式保留0.4包装及已有复检协议。反馈包含稳定任务身份、证据引用、原生规则、允许范围和原Maven重扫argv。`task_verify_status=local_observation_only` 明示已接通Maven局部原任务复检，不能套用JDK单文件复检；准备任务只恢复环境，不修改无关源码。重复扫描不重复建任务，局部零诊断不关闭历史任务。
+
+当前只覆盖既有简单静态POM直接重放探针；完整生效模型、复杂项目、可信关闭/复发、真实宿主及发行仍需验收。本轮验证使用受控Maven进程夹具，不冒充真实插件执行。详见 `tests/acceptance/maven-javadoc-workbench.md`。
+
+## Maven Javadoc 原任务复检（源码实现）
+
+`codeguard task verify CG-任务身份 . --maven-tool /绝对路径/mvn --java-home /绝对路径/jdk --maven-repo /绝对路径/离线仓库 --repo-sha256 固定摘要 --format json` 复用首次报告的构建根与原生多文件探针。缺工具或工具身份变化反馈未完成；POM或源码集合变化反馈 `rule_coverage_requires_review`。问题仍存在记录 `still_present`；补齐注释后的局部零诊断记录 `candidate_absent_unverified_policy`，任务保持开放。范围外源码的准备任务不能借主源码探针完成而消失。
+
+复检接通原租约与尝试记录；同一动作两次无进展后 `next` 要求具体决策。Maven绑定包装0.6、内部简报0.5、原任务容器0.1、公开任务复检0.28；`task_verify_status=local_observation_only`。JDK入口与历史schema保留。聚合报告0.57为嵌入新Maven简报提供严格协议；本批真实聚合输出选择了更优先的P3C准备任务，仍是0.38；校验暴露其旧schema不接受P3C准备简报，历史失败保留；后续0.58已修复该配置准备简报分支，见下节。
+
+```mermaid
+flowchart LR
+    A[原任务与首次报告] --> B[核对工作区 构建根 工具身份]
+    B --> C[Maven原多文件探针]
+    C --> D{配置与源集保持一致}
+    D -->|变化| E[保留任务 要求覆盖复核]
+    D -->|一致| F[记录仍存在或局部消失候选]
+    F --> G[绑定租约与尝试历史]
+    G --> H{连续无进展}
+    H -->|两次| I[提出具体决策]
+    H -->|未达到| J[继续修复与原工具复检]
+```
+
+验收见 [Maven原任务复检](../tests/acceptance/maven-javadoc-task-recheck.md)。本批使用受控Maven进程夹具；真实Maven插件新工作台、完整生效模型、可信关闭/复发、真实宿主和发行仍未验收。
+
+### P3C配置准备任务的聚合协议修复
+
+`check_feedback 0.58.0` 为选中的 `java.maven.p3c` / `p3c_configuration_not_confirmed` 准备任务提供明确的封闭简报协议，保留0.38等历史schema。简报仍是blocker及review-project-policy动作；配置是否必需由项目策略确认，不把缺配置转为源码违规。新schema包含CLI现有Java选择原因码，实际聚合及两处内嵌简报通过校验，伪造检查器、finding类型、原因、源码修复动作、批准权威和交付allow均被拒绝。其它P3C finding/工具阻塞分支仍按既有版本处理，本批不声称完整P3C协议验收。见 [局部验收](../tests/acceptance/p3c-preparation-aggregate-schema.md)。
+
+## CLI语言别名（源码构建）
+
+公开检查命令和plan支持：py→python、rs→rust、ts→typescript、rb→ruby、kt→kotlin、erl→erlang、golang→go、c++→cpp、c#→csharp。例如 `codeguard plan lint py . --format json` 返回规范python身份；`codeguard lint py .` 进入既有Ruff入口。仅语言参数位置归一，源码/工具路径不修改。grammar probe保留独立语法身份，JavaScript/TSX/bash等不作推测映射；未登记拼写继续由原入口校验。别名不安装工具、不新增检测能力、不改变退出码或planned状态。
+
+## `lint all` 的多语言检查范围
+
+源码 CLI 的 `codeguard lint all . --jobs 2 --timeout 30m --format json` 复用项目发现与共享调度预算，只选择 lint 节点；不创建独立 build、comments、dependencies 或 CVE 任务。Clippy 等原生 lint 自身仍可能编译项目，原生规则返回的注释问题也保留。专用 CVE 参数在读取项目和启动工具前拒绝。
+
+```mermaid
+flowchart LR
+    A[lint all] --> B[发现项目语言与构建根]
+    B --> C[仅选择 lint 候选]
+    C --> D[共享预算与现有原生适配器]
+    C --> E[有界 WASM 候选或能力缺口]
+    D --> F[统一局部反馈与 lint 修复指引]
+    E --> F
+```
+
+正常反馈沿用 check_feedback 报告，版本为 0.59.0，并明确 requested_categories=["lint"]。下面仅为字段节选，不是完整报告：
+
+```json
+{"schema_version":"0.59.0","report_type":"check_feedback","selection":"all","requested_categories":["lint"],"delivery_decision":"incomplete"}
+```
+
+历史其他类别事实保留，但本次 next 不选其他类别简报。缺原生工具、未接入语言和未获资格的 WASM 均保留未完成状态；原生局部零诊断不能签发完整项目 allow。真实 SIGINT 验收覆盖 lint 模式取消：退出 130，保留已完成兄弟任务诊断，并核对子孙进程清理；内部异常仍使用现有 check_aborted 协议，尚未独立验收 lint 模式内部异常。当前能力属于源码实现，不能据此宣称 npm 已发布相同能力。
+
+`lint all` 的 next 通过一次本地事实校验，在允许的 lint 检查器集合内选择；历史构建/CVE/注释任务不使有效 lint 指引变成空值，也不会被删除。语法确认后备只选择本轮产生的任务 ID。
+
+当前源码29ec2e1的WASM扩展回归已结束：基础crate与CLI lib/bins、201个集成目标合计1879通过、0失败、177条件用例未执行，明确排除未提交Erlang草稿。严格Clippy通过；这不代表独立语料、原生工具全矩阵、宿主或发布验收。详见tests/acceptance/wasm-regression-29ec2e1.md；32个grammar仍为候选，正式资格0。
+
+## 显式 JavaScript module 候选边界
+
+`grammar probe javascript FILE --module --format=json`将显式module请求固定到私有worker1.7及probe0.8。worker只读冻结stdin，使用同一固定grammar：原始ERROR/MISSING、重复直接绑定和函数外return分别留证据。父进程验证模式/版本/源码/grammar/规则摘要/字节位置；旧请求不能消费module规则，错语言或未知模式在解析前拒绝。记录总预算仍128，原始恢复与两类结构候选共用，访问截断保留未完成；零候选也保留module身份和incomplete。缺文件等失败同样保留请求模式。
+
+```mermaid
+flowchart LR
+    A[显式候选请求] --> B{声明 module 模式?}
+    B -->|JavaScript --module| C[父进程绑定模式和冻结输入]
+    B -->|未声明| D[既有语法与绑定候选]
+    C --> E[隔离 worker 1.7]
+    E --> F[原始解析恢复]
+    E --> G[重复绑定与函数外 return]
+    F --> H[父进程验证身份与预算]
+    G --> H
+    H --> I[Probe 0.8: incomplete + 原生确认指引]
+```
+
+该入口不自动推断项目模式，不安装工具，不执行源码，不取代原生lint或关闭任务。CommonJS的顶层return可合法，不能套用模块规则。旧报告schema保持不变；新字段/规则只能通过新协议消费。项目模式自动观察、任务与宿主接线仍需独立验收。见[局部验收](../tests/acceptance/javascript-module-worker-probe.md)。
+
+## 项目 JavaScript 声明模式证据接口
+
+源码模式观察接口已实现，返回`javascript_mode_observation`0.1：普通源码和物理工作区绑定后，`.mjs`/`.cjs`分别明确module/CommonJS，`.js`只读取工作区内最近包的唯一显式`type`。缺type、坏/重复JSON、链接、越界、超预算、loader模式未知时不猜测或继承外包。源码上限1MiB、清单256KiB、搜索64目录；源码/包摘要和已搜索目录保留，便于扫描前后发现近包变化。它不执行原生工具，也不证明生效ESLint配置。
+
+该接口基线批次尚未接入自动scanner/任务/Hook；当前接线及独立验收见下方新增章节。真实Node按文件路径的5例对照和21份协议观察见[局部验收](../tests/acceptance/javascript-project-mode.md)。
+
+```mermaid
+flowchart LR
+    A[物理工作区与普通源码] --> B{源码后缀}
+    B -->|mjs / cjs| C[明确后缀模式]
+    B -->|js| D[工作区内最近 package.json]
+    B -->|loader 或不支持| E[unknown 与原因]
+    D -->|唯一显式 type| F[包声明模式与摘要]
+    D -->|缺失 损坏 链接 超预算| E
+    C --> G[模式证据与源码摘要]
+    F --> G
+    E --> G
+    G -.待接线: 前后连续性核对.-> H[项目候选与稳定任务]
+```
+
+## 四类核心生产验收与声明模块接线
+
+生产目标要求57个canonical语言条目逐项验收语法、详细文档注释、开发规范和漏洞检查；历史planned仍是未完成目标。Java必须分别验收Maven/Gradle漏洞路径、详细Javadoc和原生P3C。配置存在、WASM可运行或模拟测试通过都不能证明生产就绪。独立标注评测、声明支持的版本/构建器/平台、原工具修复复检关闭与复发重开均为必需验收；当前WASM正式资格仍为0/32。详见OpenSpec任务15.1–15.7。
+
+当前源码把JavaScript声明模式证据接入项目检查、独立 `lint typescript`、`lint all` 与文件编辑反馈，适用原生ESLint仍优先。未覆盖的整文件 `.mjs` 和明确声明module的 `.js` 使用模块候选worker；CommonJS/未知模式继续原有有界初检，不启用函数外return模块规则。worker之后复核源码和模式证据；持久确认0.15、项目检查0.60、ESLint反馈0.7、Hook0.29/局部0.17与模块修复简报0.21使用独立版本契约。包声明改变时原任务复检报告上下文失效，不能沿用旧模块证据。重复检查复用稳定任务，清洁候选不能关闭任务。本批不声称新的npm/宿主发行或生产资格。见[接线验收](../tests/acceptance/javascript-module-workbench.md)。
+
+```mermaid
+flowchart LR
+    A[项目lint或编辑请求] --> B{适用原生ESLint}
+    B -->|可用| C[原配置原生检查]
+    B -->|缺失或未覆盖| D[观察源码与声明模式]
+    D -->|Module| E[模块WASM候选worker]
+    D -->|CommonJS或未知| F[原有有界初检]
+    E --> G[复核源码与模式]
+    F --> H[未完成初检反馈]
+    G -->|变化| H
+    G -->|稳定| I[绑定证据的稳定确认任务]
+    I --> J[智能体反馈与原工具复检]
+    J --> K[关闭仍需通过原生修复验收]
+```
+
+## 同构建根的 Maven 与 Gradle 归属
+
+静态发现现逐份保留同一物理目录的Maven、Groovy Gradle、Kotlin Gradle配置引用。损坏POM不能遮蔽Gradle，两种Gradle脚本并存也分别保留。Java依赖/CVE/安全类别保留构建器混合或Gradle未解析状态，不再挂全范围Maven身份；已经取得的Maven局部依赖图和漏洞观察仍放在native_results。check反馈0.61保留普通检查/lint-only两个封闭契约，Java注释not_configured原因严格限于对应类别，旧schema不改。这是范围归属修复，不是原生Gradle插件执行或生产验收完成。本地缓存Gradle8.10.2版本命令已实际运行，所检查OWASP Gradle插件缓存路径不存在，本批未安装或下载。见[验收记录](../tests/acceptance/java-mixed-build-roots.md)。
+
+
+### Gradle 原生模型局部采集（开发期）
+
+Rust 应用服务 `gradle_model_probe::observe` 可通过固定 init 脚本、已有 Gradle 和独立离线工作目录，观察选定构建文件对应的真实插件及任务实现基类/启用状态。已实测 Gradle 8.10.2 的 Groovy 多子项目与 Kotlin DSL；普通同名任务不授予 OWASP 身份。完整 Gradle 制品树、选定源码及脚本前后核对，JDK 目前只核对入口和 release。报告协议为 `gradle-model-probe-v0.1.schema.json`，保持局部未受信配置观察；不证明完整配置覆盖或质量检查通过。
+
+开发期CLI已通过 `check java` / `check all` 接入选定输入观察：显式提供 `--gradle-bundle`、`--java-home` 和可重复的 `--gradle-project-file`。复用统一调度与截止时间，check_feedback 0.62 在 `native_results.java_gradle_model` 单独保存模型；`lint all` 拒绝这组模型参数。detect/config explain 保持只读；后续仍需原生 Javadoc/规范/漏洞任务执行、报告归属、依赖图和漏洞库及修复闭环。真实测试与边界见 [原生模型局部采集验收](../tests/acceptance/gradle-native-model-probe.md)。
+
+
+### Gradle 原生 Javadoc 应用服务（开发期局部能力）
+
+新增 `gradle_javadoc_probe::observe` 在一次离线 Gradle 调用中采集模型并重跑已启用的官方 Javadoc 任务，使用原项目 doclint/doclet/访问范围/源集，只固定诊断 JVM 的英语语言。Rust 校验选定源码及诊断位置，原生失败、未知诊断、输入变化等保持未完成。真实 Gradle 8.10.2/JDK21 四组样例得到 3 条缺注释、2 条缺标签、2 条空标签描述、0 条诊断；这是一个原生条件测试中的四次观察，不是独立精度语料或生产验收。无诊断报告仍为 `empty_output_unverified`，`rule_configuration_complete=false`、`coverage_proven=false`。
+
+开发期 `check java` / `check all` 现可显式追加 `--gradle-javadoc`，同时提供 `--gradle-bundle`、`--java-home` 和可重复的 `--gradle-project-file`（含根 settings/build 及 Java 文件）。统一调度只生成一个 `java.gradle.javadoc` 任务，单次原生调用完成模型/注释检查，check_feedback 0.65 在 `native_results.java_gradle_javadoc` 保存诊断；不额外调用配置模型。仅模型请求仍使用 0.62；`lint all` 拒绝文档参数。SIGINT 保留取消观察，check_aborted 0.17 保留兄弟异常之前的文档观察。公开质量反馈已接入，原工具任务复检关闭、完整规则及完整 JDK/源码闭包和跨项目/custom doclet 验收仍待完成。见 [公开 Javadoc 入口验收](../tests/acceptance/gradle-public-javadoc-check.md)。
+
+Java 注释类别在显式 Gradle 文档请求下保留局部观察或原生未完成，不能把实际诊断或工具故障误报为 Maven 未配置；规则/完整范围仍未验收。见 [类别归属修复](../tests/acceptance/gradle-javadoc-category-attribution.md)。
+
+Gradle 文档的工作台基础现在提供独立 `gradle_javadoc_workbench::project`：首次导入前核对选定路径、源码摘要及原生快照摘要，归并相同原生定位，把工具故障/未验收覆盖保留为独立准备观察。同一路径/规则/源码行锚点仅移动行号时保留身份；修改锚点或插入相同锚点可能产生新身份，不承诺完整符号级身份。投影接口的首次基础验收没有持久化接线；当前接线和独立协议见下文，可信关闭仍待完成。见 [投影验收](../tests/acceptance/gradle-javadoc-projection.md)。
+
+Gradle 文档工作台已接入开发期 `check java/all --gradle-javadoc`：原生运行前捕获选定输入，首次导入再次核对摘要/位置，保存局部报告并同步稳定问题与准备任务；重复扫描追加观察，缺失 Markdown 可从事实恢复。`next` / `task show` 使用原任务 `task verify` 参数，原选定输入保留在绑定报告中，工具路径须复核；check_feedback 0.67 与修复指引 0.24 独立消费（历史0.65/0.22、0.66/0.23保持不变），普通 Java 检查也能读取历史指引。`gradle_javadoc_tasks` 的计数范围为本次工作区同步，并非只统计 Gradle。三次真实公开检查验证发现、复用和修复后空诊断；原问题仍开放。`task_verify_status=local_observation_only`，原任务复检已接通，可信关闭/复发重开和完整规则/范围仍待验收。见 [工作台验收](../tests/acceptance/gradle-javadoc-workbench.md)。
+
+准备任务的存储原因码固定为 `gradle_javadoc_preparation_required`，最新诊断由消费收据和原报告绑定；执行失败、取消和恢复后的覆盖核验沿同一任务更新。最新诊断篡改时拒绝指引，不退回陈旧动作。
+
+内部 `gradle_javadoc_task_recheck` 服务已能绑定原已消费报告、任务范围/规则及选定输入；Java 字节允许修复，构建配置或已知工具身份变化停止原工具运行。局部观察区分仍存在、未受信消失、规则待复核与执行不完整，残缺原生报告不能冒充零问题。公开 `task verify` 已按 `--gradle-bundle` 和 `--java-home` 复用原选定范围；导入重核原事实和当前输入，保存与尝试关联的复检观察，支持首证据来自复检容器的新任务。`next` 撤回源码/配置/工具变化后的旧观察；同文件同规则不同身份进入复核，不误认原问题仍存在。任务复检预览0.30与修复预览0.24仅为局部观察，可信关闭和生产资格仍待验收。初始服务基线见 [内部复检验收](../tests/acceptance/gradle-javadoc-task-recheck-service.md)。
+
+当前公开复检证据、尝试关联和失效处理见 [验收](../tests/acceptance/gradle-javadoc-public-task-recheck.md)。
+
+Gradle文档原生描述检查现补齐空注释、缺主描述和空异常说明，分别保留 `JavadocEmptyComment`、`JavadocMissingMainDescription`、`JavadocEmptyThrowsDescription`；原参数/返回空描述规则继续保留。由原JDK21输出定位，经源码快照核验后进入稳定任务和原工具复检，不把注释文字存在等同于业务契约充分。原生、工作台和复检协议使用独立0.2，历史0.1不扩大；聚合0.67、异常0.18、修复0.24和任务复检0.30封闭消费。真实空类型/构造器/字段/方法注释4条、裸标签3条、缺用途1条；中文完整注释与合法继承文档0条，零诊断仍未受信。Maven旧协议保持不变，新增详细描述能力见后文；独立JDK现使用下列详细描述独立协议，完整详细注释验收继续待完成。见[详细描述验收](../tests/acceptance/gradle-javadoc-detailed-descriptions.md)。
+
+
+独立JDK21路径现按原生消息识别空注释、缺用途及裸参数/返回/异常描述，并保留五种原生规则到稳定修复任务。`lint java FILE --checker javadoc`、`comments java FILE --workspace .`、已识别配置的项目comments及原任务task verify共用源字节绑定解析器；旧解析器和Maven协议不扩大。新增JDK原生0.2、项目0.4、工作台/复检0.3、文件反馈0.7/工作台反馈0.8、修复指引0.4、任务预览0.31、聚合0.68和异常0.19；缺配置/工具/未知格式仍未完成。真实JDK21两种模式各运行4/3/1/0诊断样例，16张原任务逐项确认仍存在及修复后未受信消失，事实仍open；详细中文与合法继承说明不产生诊断。这不是全部Java详细行为契约或生产资格，Maven真实描述验收、Checkstyle完整描述验收、所有语言四核心和可信关闭仍待完成。见[独立JDK详细描述验收](../tests/acceptance/jdk-javadoc-detailed-descriptions.md)。
+
+## Maven详细Javadoc描述：实现与验收分开
+
+Maven原POM多文件路径现接入五类原生描述规则：空注释、缺主用途及空参数/返回/异常描述。新的详细解析入口保留源码行/caret、消息、位置和汇总核验；历史解析入口及schema不扩大。BUILD SUCCESS中的warning也保留为问题；未知输出、工具/配置故障与实际离线插件缺失保持检查不完整，生成准备任务。绝不回退单文件检查绕过Maven失败。
+
+```mermaid
+flowchart TD
+    A[comments java / check java 原Maven上下文] --> B[原POM多文件检查和输入核验]
+    B --> C{输出性质}
+    C -->|可定位原生warning| D[稳定源码任务与详细修复指引]
+    C -->|插件缓存缺失或未知输出| E[环境或诊断准备任务]
+    D --> F[task verify 原工具原范围复检]
+    E --> F
+    F --> G{原任务身份}
+    G -->|同一问题| H[still_present]
+    G -->|同文件同规则但新锚点| I[rule_coverage_requires_review]
+    G -->|局部无诊断| J[candidate_absent_unverified_policy]
+    H --> K[记录尝试，事实保持open]
+    I --> K
+    J --> K
+```
+
+统一入口仍为 `codeguard comments java . --maven-tool /absolute/mvn --java-home /absolute/jdk21 --maven-repo /absolute/offline-repo --repo-sha256 ACTUAL_DIGEST --format json`；复检为 `codeguard task verify CG-task-id .` 并显式提供同样的原工具上下文。替换路径和实际缓存摘要；CodeGuard不自动安装插件或降低规则。修复指引要求说明用途、参数、返回和异常，不能用裸标签替代详细说明。
+
+新增封闭协议：Maven原生/工作台/复检0.2、项目0.5、comments未绑定0.9/工作台0.10、内brief0.6/预览0.3、任务预览0.32、聚合0.69/异常0.20。首次导入重算规则和投影并拒绝版本降级；复检核对已消费首次报告的摘要收据与原任务范围/规则，支持首次证据为复检包裹报告的新任务。零诊断不会自动关闭，可信关闭/复发仍待验收。
+
+受控Maven进程输出完成五规则×成功/警告失败的公开检查、任务归并、原任务复检及修复后未受信消失回归；这不是实际插件诊断验收。本机已有Maven3.9.16/JDK21实际运行空离线库检查与环境任务复检，两次均识别Javadoc3.12.0插件缺失、没有源码问题。缓存缺失，真实插件详细描述4/3/1/0样例及警告失败配置验收尚未执行，独立条件测试保持待运行。完整Java详细行为契约、Checkstyle完整描述验收、57语言四核心、平台/宿主与可信关闭继续未完成；OpenSpec15.3/15.6不勾选，正式语法资格仍0/32。见[分项验收](../tests/acceptance/maven-javadoc-detailed-descriptions.md)。
+
+## Checkstyle详细描述模块：源码实现，原生验收待完成
+
+原配置的 `JavadocStyle`、`NonEmptyAtclauseDescription`、`SummaryJavadoc` 现可通过固定10.21.4静态适配，保留完整类名/短名、自定义ID、severity及各自属性。空描述开关、Java正则、首句/HTML、scope/tokens、标签token、摘要period/禁用片段和非紧凑HTML开关照原XML交给工具，不在Rust中替代原生检查。模块不能借用其它模块参数，未知token/来源和共享ID继续待解析；空period或摘要正则保留原生合法配置，Rust不以自己的正则语法判断Java正则。
+
+统一入口：`codeguard lint java FILE --checker checkstyle --workspace . --config ORIGINAL_XML --java-tool EXISTING_JAVA --checkstyle-jar EXISTING_JAR --format json`。诊断进入稳定任务，`next` 给出详细用途、参数/返回/异常或摘要修复方向，`task verify CG-task-id .` 显式提供原工具/原配置复检。环境恢复产生的新源码任务也可据包裹首次报告复检；局部消失和恢复都不关闭任务。
+
+```mermaid
+flowchart LR
+    A[原Checkstyle配置和原工具] --> B[原生XML与精确规则绑定]
+    B --> C[源码修复任务]
+    B --> D[环境准备任务]
+    C --> E[next详细指引]
+    D --> F[task verify恢复环境]
+    F --> C
+    E --> G[task verify原工具复检]
+    G --> H[记录仍存在或未受信消失，保持open]
+```
+
+新协议为局部反馈0.5、工作台/源码复检/准备复检0.2、修复简报与预览0.25、源码任务预览0.33/准备任务预览0.34。历史schema不扩大，首次导入拒绝新配置伪装成工作台0.1；复检容器与scan版本配对。选中详细Checkstyle简报的聚合支持0.70，但本批实际公开聚合选择优先级更高的P3C准备任务，仍用0.58；0.70仅有构造序列化验证，不能称实际路由验收。另修正该实际聚合中不符合旧协议的Javadoc未配置原因码，现使用已有 `javadoc_checker_not_configured`，不虚构配置或运行。
+
+受控XML进程夹具验证三类诊断、归并/修复复检、准备恢复及新任务复检；夹具不是Java或Checkstyle，不证明原模块语义或精度。当前未找到已有10.21.4自包含JAR，真实条件测试未执行；完整描述规则/配置/项目模型、独立误报评测、可信关闭/复发、57语言四核心与平台/宿主生产验收继续未完成，15.3/15.6不勾选，正式语法资格0/32。见[分项验收](../tests/acceptance/checkstyle-detailed-descriptions.md)。
+
+## Python 详细文档契约：Ruff DOC 原生增量（2026-10-06）
+
+固定 Ruff 0.16.8 的 DOC102（多余参数）、DOC201/202（返回）、DOC402/403（生成值）、DOC501/502（异常）已进入原生文档分类、限定修复指引、稳定任务及原工具复检。原项目须自行明确启用 preview 和规则；CodeGuard 不添加参数开启预览，不复制语义检测实现。生效设置与诊断规则矛盾时仍未完成，未知 DOC 编号不凭前缀取得适配资格；原 D### 分类与未批准规则映射保持。
+
+DOC502 只对照直接 raise，可能与真实隐式异常文档冲突：报告保留，指引要求调查实际调用链和项目约定，禁止自动删除真实异常说明，必要时走精确误报裁定。Google 首句 Return/Yield、None、stub 和抽象 stub 等原生零诊断均保留；本机带具体返回实现的抽象方法仍收到 DOC201，不把笼统豁免说明当完整验收。用途、完整参数/异常契约及文档内容的正确性仍需逐项验证，不能从此七项规则推断全部文档规范已通过。
+
+```mermaid
+flowchart LR
+    A[原项目配置与既有 Ruff] --> B[原生设置和诊断交叉核验]
+    B --> C[DOC 注释发现与稳定任务]
+    C --> D[详细修复或异常约定调查]
+    D --> E[原任务原工具复检]
+    E --> F[仍存在 / 抑制需复核 / 未受信消失]
+```
+
+真实七项规则已验证重复扫描身份、存在、noqa 抑制及文档修复后未受信消失，事实保持 open；另有原生豁免、隐式异常冲突和未选择 DOC 的边界。既有协议允许原规则 ID 和脱敏指引，本次不扩大历史 schema、受批准映射或关闭权限。验收与版本限制见 [Ruff DOC 验收](../tests/acceptance/ruff-documentation-contract.md)。当前仍不是完整 Python 文档、独立误报评测、全平台或生产资格。
+
+四核心验收计划只读入口：`codeguard capabilities [language] --acceptance-plan --format=json`. 57 语言/228 义务保留未授予资格，筛选不缩减总义务。参见[acceptance plan](Codeguard-Production-Acceptance-Plan.zh_CN.md).
+
+Java Gradle 漏洞检查新增显式原任务入口 `codeguard cve java`；JSON 原配置与可选模块缓存保留，结果仍未受信，工作台和完整原生验收待完成。详见[Gradle OWASP](Codeguard-Gradle-Vulnerability-Checks.zh_CN.md).
+
+
+显式Gradle CVE已接入已初始化工作区的脱敏稳定准备任务，next/task show保留原输入/任务参数；空报告不关闭，task verify已接入冻结原上下文局部观察，统一check现支持显式原任务调度；自动发现与完整验收仍未完成。协议/执行路径与当前验收见[Gradle漏洞检查](Codeguard-Gradle-Vulnerability-Checks.zh_CN.md)。
+
+
+C/C++ 独立 Clang 入口已修复字符串、注释和原始字符串中的井号误判，并补预处理替代记号/续行防护；行首非 ASCII 恢复仍保守未解析。仅局部验收，完整项目语法、文档规范、开发规范、CVE 四核心生产门槛保持开放。见 [验收边界](../tests/acceptance/clang-preprocessor-context.md)。
+
+
+Rust 的详细文档任务现对原生 Clippy `missing_errors_doc`、`missing_panics_doc`、`missing_safety_doc` 给出具体 Errors/Panics/Safety 修复指引，复用稳定任务及原工具抑制对照。已有 Clippy 实测接受空章节标题，因此零诊断不代表详细说明合格，事实继续 open；不会隐式启用 pedantic。`comments rust` 现共用截止时间采集 Rustdoc 探针与原项目 Clippy，保留独立原生报告、任务和原工具复检；详细内容完整性仍未取得资格。参见 [统一入口验收](../tests/acceptance/rust-comments-combined.md)。参见 [局部验收与缺口](../tests/acceptance/clippy-documentation-contract.md)。
+
+
+`check rust/all` 现在把原生 Clippy 的三类文档诊断作为独立 comments 观察，与原 Rustdoc 行并存，不覆盖原工具阻塞或重复执行 Clippy；仅精确已知规则参与，零发现不证明详细契约启用。参见 [聚合验收](../tests/acceptance/clippy-documentation-aggregate.md)。
+
+
+Cargo 文档配置现在逐构建根记录五项精确 lint 的清单声明等级，绑定同次摘要；继承、组、源码属性和未声明均保留待核验。`init` 将详情写入项目画像，AGENTS 保留摘要与引用，不自行添加规则或授予详细文档合格。见[声明验收](../tests/acceptance/cargo-documentation-declarations.md)。
+
+Cargo文档配置发现现可将明确选择继承的成员与最近已观察workspace规则关联，保留两份清单身份及原成员配置引用；候选不可读或变化保持发现不完整，最近规则缺失/非法不能借用更远规则。项目内便携相对package.workspace引用现只选择声明来源并核验有界遍历及摘要；绝对/非便携引用、完整成员归属与生效覆盖仍待核验，这项候选关联不授予生产资格。
+
+
+### Python 独立文档入口的局部能力
+
+`codeguard comments python . --ruff-tool /absolute/path/to/ruff --format=json` 复用项目原 Ruff 配置和原工具检查，返回 `python_comments_feedback` 0.2。`native_report` 保留完整脱敏原生0.12对话报告；顶层 `documentation_findings` 仅取已有D###和七项明确DOC规则，顶层 `next` 保留当前及历史文档任务与准备任务，其他开发规范问题仍保留在原生子报告。零诊断不等于详细注释合格：规则覆盖固定 `unverified`，详细契约资格固定 `not_granted`，整体退出3。缺配置生成准备任务；不会开启preview、改配置或用WASM代替文档检查。已初始化项目沿用稳定任务和 `task verify` 原工具复检，原事实不自动关闭。
+
+参见 [独立入口与真实Ruff验收](../tests/acceptance/python-comments-cli.md)。
+
+
+Python文档入口现在返回0.2封装，新增 `documentation_configuration`，直接复用同轮原生设置，区分已选择文档规则、未选择与设置不可用。零诊断也会显示实际全局文档规则及逐文件配置/源码/工具/设置身份；子配置独立，原生不完整不沿用旧设置，不新增工具调用。`observed`只指设置观察完成，逐文件忽略、源码抑制与详细语义资格仍未证明。历史0.1和原0.12协议保留；旧封装消费者需接受0.2。参见[同轮配置观察验收](../tests/acceptance/python-documentation-configuration.md)。
+
+
+Rust CVE局部观察现在核对同轮RustSec crates/rust内容、成员及物理入口稳定性；库变化或不可安全读取时，不因原生退出/JSON有效而报告局部完整，有效候选仍保留为未完成反馈。正常根级锁/Git整理不作advisory内容。共享预算与有界读取不等于可信数据库来源或时效，原0.1协议与not_evaluated保持。参见[漏洞库稳定性验收](../tests/acceptance/cargo-audit-database-stability.md)。
+
+
+### C/C++ 独立原生文档入口（源码增量，尚未发布）
+
+`codeguard comments c api.c --clang-tool /absolute/clang --standard c11 --format=json`；C++ 使用 `comments cpp api.cpp --standard c++17` 并保留同一工具参数。当前仅适配已实测的 Apple Clang 21 独立文档警告档案，明确工具与标准，不隐式安装。原生 SARIF 的空命令描述、错误参数名及 void 返回标签三项精确规则带有修复步骤、仅文档允许范围和原工具复检 argv；未知规则单独保留。坏报告、输入变化、取消和未解析预处理不能成为源码违规。
+
+这是 `c_family_comments_feedback` 0.1 的局部观察：项目原配置未知，完整详细契约未授予资格；Clang完全缺失注释也可能零诊断。未绑定工作台时保留0.1/`next=null`；已有工作台现在提供0.4反馈、按文件/语言标准/原规则归并的稳定任务和next0.30，保留全部当前位置及原工具复扫argv。输入或工具变化撤回修复定位，清洁复扫保留开放任务。专用task verify已沿首次工具/标准/规则接通，记录局部事实并保持任务开放；专用尝试日志已接通，按当前源码/原工具上下文记录失败与预算；项目检查和Hook仍待接通；退出3，取消130，不自动关闭任务或授予门禁。真实16例、执行路径和剩余缺口见[原生文档验收](../tests/acceptance/c-family-comments-native.md)。
+
+C/C++ 原任务复检与新封闭协议的当前证据见[复检验收](../tests/acceptance/c-family-comments-task-recheck.md)；完整四核心生产资格仍未授予。
+
+C/C++ 受控尝试、无进展诊断与当前协议见[尝试日志验收](../tests/acceptance/c-family-comments-attempt-history.md)；本地日志不能替代完整四核心生产验收。
+
+
+C/C++现新增原生Clang AST函数文档结构适配器，可区分无文档、空用途及缺参数/返回说明；重声明、文档引用和复杂类型保持未知。该能力现已接入显式comments反馈，check与专用结构复检/尝试闭环尚未接入，不替代现有原生警告或完整生产验收。见[结构验收](../tests/acceptance/clang-documentation-structure.md)。
+
+
+C/C++显式comments现同次原生扫描返回原警告及函数文档结构：无原警告也会报告缺注释；未知/非法结构、源码工具失稳不变成违规。反馈0.5/0.6保留原条数并归并重复定位，结构稳定任务现partial，专用复检/尝试尚未接通，完整详细文档资格未授予。见[公开结构反馈](../tests/acceptance/c-family-comments-structure-cli.md)。
+
+
+C/C++结构缺失现按文件/语言标准/Codeguard自有策略创建稳定修复任务，next给出全部当前函数定位与原comments复扫命令；重载和行号移动不重复创建，删除Markdown可恢复，局部消失仍open。专用task verify/attempt目前执行前拒绝，完整详细准确性与可信关闭仍未验收。见[结构任务验收](../tests/acceptance/c-family-structure-workbench.md)。
+
+C/C++结构原工具复检更新：结构任务现可执行绑定首次工具/标准的 `task verify`，记录 still_present、incomplete 或 candidate_absent_unverified_policy 局部观察；任务仍开放。新的brief0.32/task show0.6/反馈0.8/复检0.37将原comments复扫指引升级为任务绑定的原工具复检，测试直接执行生成argv。结构attempt/无进展及可信关闭继续未完成，历史段落保留为检查点。
+
+C/C++ structural rechecks now use the original compiler and standard through task verify, recording local observations without closing tasks. Brief0.32, task-show0.6, feedback0.8 and verification0.37 upgrade comments re-scan guidance to task-bound original-tool verification; native tests execute the generated argv. Controlled structural attempts, no-progress handling and trusted closure remain pending. Earlier sections are historical checkpoints.
+
+C/C++结构尝试更新：结构任务接入租约、repair-source尝试日志、ready后的原工具复检与同一输入两次失败预算。新brief0.33/task show0.7/绑定反馈0.9显示等待、必须复检或具体决策；重复扫描、删Markdown及重命名动作不能恢复预算。缺历史报告保持未验证，篡改事件拒绝。跨输入语义无进展、完整详细准确性/项目/平台/独立精度及可信关闭仍未验收。
+
+C/C++ structural tasks now use leases, repair-source journals, original rechecks after ready attempts and a two-failure budget for unchanged inputs. Brief0.33/task-show0.7/feedback0.9 show waiting, required verification or a concrete decision. Rescans, projection deletion and action renaming cannot reset failures; missing reports remain unverified and forged events are rejected. Cross-input semantic progress, full accuracy/context/platform/independent precision and trusted closure remain unqualified.
+
+### C/C++ 统一检查入口（当前源码，局部验收）
+
+```bash
+codeguard check all . --clang-tool /usr/bin/clang --c-standard c11 --cpp-standard c++17 --jobs 4 --format=json
+codeguard check c . --clang-tool /usr/bin/clang --c-standard c11 --format=json
+```
+
+仅用于已验证的 Apple Clang 21 独立源码档案。`c.comments`、`cpp.comments` 在同一任务图中共享截止时间、取消和 jobs，上述两个任务共用编译器资源锁；每语言最多观察64文件，累计反馈包含任务投影且限制16MiB。报告0.72的 `native_results.c_family_comments` 区分上下文缺失、未执行、局部观察和未观察尾部；不能据此推断头文件、预处理或完整构建配置。
+
+全项目输入复核后才接入原警告和结构稳定任务；源码、工具、范围变化或取消撤回当前定位及下一步权限。未初始化项目不创建`.codeguard/`，缺工具不会生成源码违规。JSON/human/SARIF保留局部结果，SARIF分别标记原生发现与CodeGuard自有结构策略。退出3；取消130。详细准确性、完整项目覆盖、可信关闭、Hook、跨平台/独立精度及四核心生产验收仍未完成。实际测试及报告见[统一入口验收](../tests/acceptance/check-c-family-documentation.md)。
+
+```mermaid
+flowchart TD
+  A[发现所选 C/C++ 源码并冻结范围] --> B{原 Clang 与明确标准可用?}
+  B -->|否| C[记录上下文/环境阻塞，不生成源码违规]
+  B -->|是| D[共享任务图预算，串行原生文档警告及 AST 观察]
+  D --> E{全项目输入及原工具仍一致?}
+  E -->|否/取消| F[撤回定位和下一步权限，保留未完成]
+  E -->|是| G[在已有工作台更新原警告与结构稳定任务]
+  G --> H[返回局部反馈和任务绑定原工具复检指引]
+  C --> I[项目覆盖及生产资格仍未完成]
+  F --> I
+  H --> I
+```
+
+C/C++文档修复Hook当前增量：`repair_ready`按首次任务恢复原Clang/标准，外层反馈0.30与摘要0.9区分原警告和CodeGuard结构策略，最多8处定位并保留总数。当前输入变化、期限耗尽或消费收据失效撤回定位/报告引用；消失仍保持任务open，不授予详细准确性或可信关闭。已完成默认/WASM真实Clang及过期/篡改回归；自动编辑、已安装宿主和完整生产资格仍缺。见[局部验收](../tests/acceptance/c-family-documentation-hook.md)。
+
+
+已确认的C/C++编辑事件可通过 `hook execute PATH --clang-tool ABS --c-standard c11 --cpp-standard c++17 --format=json` 接入有界文档观察。事件仍从stdin JSON输入，不由选项推断。缺工具/标准保留context_required；原生警告与自有结构规则分开，文档检查不消除原生语法缺口、不授予交付资格。当前仅检查所选独立源码，不覆盖项目编译参数或头文件。repair_ready仍恢复原任务标准并拒绝编辑档案覆盖。此为CLI协议候选，不代表已安装宿主验收。
+
+
+Claude协议适配器现将C/C++编辑文档观察投影为有界对话指引：展示当前原生规则/位置，独立标记结构规则及已核验任务引用；不回显源码/注释或过期定位。局部无问题不要求修改源码，也不关闭历史任务。已有Clang的受控PostToolUse协议测试不代表真实宿主安装或配置自动发现验收。

@@ -1,0 +1,418 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:repair-brief-preview:0.18.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "command_status",
+    "exit_code",
+    "disposition",
+    "reason",
+    "repair_brief",
+    "next_actions",
+    "authority",
+    "delivery_decision"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.18.0"
+    },
+    "report_type": {
+      "const": "repair_brief_preview"
+    },
+    "operation": {
+      "const": "next"
+    },
+    "command_status": {
+      "enum": [
+        "complete",
+        "incomplete"
+      ]
+    },
+    "exit_code": {
+      "enum": [
+        0,
+        3
+      ]
+    },
+    "disposition": {
+      "enum": [
+        "actionable",
+        "waiting",
+        "needs_decision",
+        "verification_required",
+        "no_applicable_work"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repair_brief": {
+      "$ref": "#/$defs/go_syntax_recheck_brief"
+    },
+    "next_actions": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "failed_reports": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "run_id",
+          "reason",
+          "report_ref"
+        ],
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,120}$"
+          },
+          "reason": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]{1,80}$"
+          },
+          "report_ref": {
+            "type": "string",
+            "pattern": "^\\.codeguard/reports/[A-Za-z0-9_-]{1,120}\\.json$"
+          }
+        }
+      }
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    }
+  },
+  "$defs": {
+    "go_syntax_recheck_brief": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "task_id",
+        "kind",
+        "checker_id",
+        "evidence_ref",
+        "recheck_argv",
+        "history",
+        "action_id",
+        "authority",
+        "closure_condition",
+        "scope",
+        "build_root",
+        "affected_paths",
+        "reason_code",
+        "constraints",
+        "step",
+        "disposition",
+        "native_confirmation_reason",
+        "native_column_unit",
+        "native_confirmation_status",
+        "native_confirmation_ref",
+        "native_diagnostic_positions"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "0.18.0"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^CG-B-[0-9a-f]{32}$"
+        },
+        "kind": {
+          "const": "blocker"
+        },
+        "checker_id": {
+          "const": "syntax.native_confirmation"
+        },
+        "evidence_ref": {
+          "$ref": "repair-brief-preview.schema.json#/$defs/evidence"
+        },
+        "recheck_argv": {
+          "oneOf": [
+            {
+              "type": "array",
+              "prefixItems": [
+                {
+                  "const": "codeguard"
+                },
+                {
+                  "const": "task"
+                },
+                {
+                  "const": "verify"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^CG-B-[0-9a-f]{32}$"
+                },
+                {
+                  "const": "."
+                },
+                {
+                  "const": "--format"
+                },
+                {
+                  "const": "json"
+                }
+              ],
+              "items": false,
+              "minItems": 7
+            },
+            {
+              "type": "array",
+              "prefixItems": [
+                {
+                  "const": "codeguard"
+                },
+                {
+                  "const": "task"
+                },
+                {
+                  "const": "verify"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^CG-B-[0-9a-f]{32}$"
+                },
+                {
+                  "const": "."
+                },
+                {
+                  "const": "--format"
+                },
+                {
+                  "const": "json"
+                },
+                {
+                  "const": "--go-tool"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^/",
+                  "minLength": 2
+                }
+              ],
+              "items": false,
+              "minItems": 9
+            }
+          ]
+        },
+        "history": {
+          "$ref": "repair-brief-preview.schema.json#/$defs/brief/properties/history"
+        },
+        "action_id": {
+          "enum": [
+            "restore-checker-environment",
+            "repair-source"
+          ]
+        },
+        "authority": {
+          "const": "local_unverified"
+        },
+        "closure_condition": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "build_root": {
+          "const": "."
+        },
+        "affected_paths": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "reason_code": {
+          "const": "native_syntax_confirmation_needed"
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "step": {
+          "type": "string",
+          "minLength": 1
+        },
+        "disposition": {
+          "enum": [
+            "needs_decision",
+            "verification_required",
+            "waiting",
+            "actionable"
+          ]
+        },
+        "native_confirmation_status": {
+          "enum": [
+            "stale",
+            "diagnostics_observed",
+            "completed",
+            "not_run",
+            "incomplete"
+          ]
+        },
+        "native_confirmation_ref": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "run_id",
+                "report_ref",
+                "report_sha256"
+              ],
+              "properties": {
+                "run_id": {
+                  "type": "string",
+                  "pattern": "^syntax-(?:native|confirm)-[0-9]+-[0-9]+$"
+                },
+                "report_ref": {
+                  "type": "string",
+                  "pattern": "^\\.codeguard/reports/syntax-(?:native|confirm)-[0-9]+-[0-9]+\\.json$"
+                },
+                "report_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                }
+              }
+            }
+          ]
+        },
+        "native_diagnostic_positions": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "$ref": "syntax-task-recheck-v0.9.schema.json#/$defs/diagnostic"
+          }
+        },
+        "native_confirmation_reason": {
+          "type": "string",
+          "pattern": "^[a-z_]{1,128}$"
+        },
+        "native_column_unit": {
+          "const": "utf8_byte"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "native_confirmation_status": {
+                "enum": [
+                  "stale",
+                  "completed",
+                  "not_run",
+                  "incomplete"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "native_diagnostic_positions": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "native_confirmation_status": {
+                "const": "diagnostics_observed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "native_confirmation_reason": {
+                "const": "go_native_syntax_diagnostics"
+              },
+              "native_diagnostic_positions": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "native_confirmation_status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "native_confirmation_reason": {
+                "const": "go_native_syntax_no_diagnostics"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "native_confirmation_status": {
+                "const": "stale"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "native_confirmation_reason": {
+                "const": "syntax_confirmation_inputs_changed"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "native_confirmation_status": {
+                "enum": [
+                  "completed",
+                  "diagnostics_observed"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "native_confirmation_ref": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

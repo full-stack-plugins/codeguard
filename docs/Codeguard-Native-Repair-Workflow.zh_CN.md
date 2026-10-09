@@ -266,3 +266,93 @@ Rust 读取并复核有界源码字节，通过冻结 stdin、固定 `/` cwd、�
 原生错误使同一任务的 `next` 进入源码修复；源码或工具变化撤回旧位置。修复后零诊断记录 `candidate_absent_unverified_policy`，不自动关闭，也不替代项目 lint、类型检查、宏/条件编译上下文、构建、安全或交付义务。重复无进展仍使用既有尝试预算。本批不提升 Swift grammar 资格或 32 语言精度结论，公开 npm 0.1.4 尚不含此扩展。
 
 新增协议分别为 `syntax_task_recheck` 0.4.0、`task_verification_preview` 0.15.0、`repair_brief_preview` 0.6.0、Hook 反馈 0.9.0（任务摘要 0.3.0）。聚合 `check` 的 `next` 含 Swift 原生简报时用 0.39.0，其他路径保留 0.38.0；旧 schema 原件不改。具体实测和完整报告见 [Swift 原生确认验收](../tests/acceptance/swift-native-task-confirmation.md)。
+
+
+### Ruby 原工具关闭与复发（当前源码 SDK）
+
+`verify_ruby_task_resolution(&RubyTaskResolutionRequest)` 将固定 Ruby 2.6.10p210 接入现有宿主 SDK。签名策略 1.9.0 与证据 0.10.0 同时支持原生首次及 WASM 首次任务：前者 grammar 为 null 并绑定首次工具，后者保留首次 grammar。原始样例与当前源码共用预算；版本声明及其缺项在请求前后复核。只有原工具确认原问题、当前已修改源码完整无诊断且输入稳定，才关闭限定任务。重复复检幂等；同工具的普通 `task verify --ruby-tool` 可沿父链记录复发。
+
+原始样例原生无诊断时提出误报复核；未知版本、坏输出或声明变化不能关闭。Ruby 诊断只使用原生行号，不制造列号或冒充 RuboCop。签名/信任根仍由独立宿主提供；本批源码能力尚未发布到 npm，也未证明默认插件已能可信关闭。详见 [Ruby 原工具验收](../tests/acceptance/ruby-task-resolution.md)。
+
+
+### ShellCheck 原规则关闭与复发（当前源码 SDK）
+
+`verify_shell_task_resolution(&ShellTaskResolutionRequest)` 支持固定 ShellCheck 0.11.0 的原生普通问题任务。策略 1.10.0 绑定原任务、规则、原报告、源码、工具、适配器、方言及项目配置；证据 0.11.0 和收据 0.2.0 使用普通 `CG-…` 身份，旧 0.1.0 收据保持不变。原始源码及当前源码用同一工具和冻结配置复检，原规则在当前源码中消失即可关闭该任务；其它规则的发现和任务仍保留。普通复检在同工具同配置下发现原规则复发，会沿同一任务父链重开。
+
+配置变化不能冒充源码修复；禁用注释变化或既有原规则禁用指令没有作用域证明时要求复核，未变化且只涉及其它规则的指令不会自动阻止关闭。坏报告、未完成执行或原样本不能确认原规则时保持开放或待复核。SDK 支持借用租约与消耗已完成尝试，独立宿主签名要求保持不变；这不是普通 CLI 自动关闭、项目全部通过或公开 npm 已包含的证明。详见 [ShellCheck 原规则验收](../tests/acceptance/shell-task-resolution.md)。
+
+
+### 隐藏 grammar 错误的确认指引（当前源码）
+
+显式 `grammar probe` 遇到语法树 has_error、公开恢复节点不可定位时，使用0.5报告 `parser_error_location_unavailable=true`，要求用原字节做原生确认，再判断源码修复还是grammar调查；零位置不再只给常规lint建议。未确认前保留未完成，不生成虚构定位，不称初检通过。预算耗尽保持已有聚合但不冒充隐藏错误；普通和结构路径保留历史协议。
+
+同一Kotlin/Swift资产在已安装web-tree-sitter0.25.10也出现相同可见性缺口；切换加载器本身不能解决。合法Kotlin对象声明也可能触发隐藏分号，必须避免按has_error直接改源码。实际输出、兼容性及验收边界见[隐藏错误指引](../tests/acceptance/hidden-parser-error-guidance.md)。
+
+
+独立JDK21路径现按原生消息识别空注释、缺用途及裸参数/返回/异常描述，并保留五种原生规则到稳定修复任务。`lint java FILE --checker javadoc`、`comments java FILE --workspace .`、已识别配置的项目comments及原任务task verify共用源字节绑定解析器；旧解析器和Maven协议不扩大。新增JDK原生0.2、项目0.4、工作台/复检0.3、文件反馈0.7/工作台反馈0.8、修复指引0.4、任务预览0.31、聚合0.68和异常0.19；缺配置/工具/未知格式仍未完成。真实JDK21两种模式各运行4/3/1/0诊断样例，16张原任务逐项确认仍存在及修复后未受信消失，事实仍open；详细中文与合法继承说明不产生诊断。这不是全部Java详细行为契约或生产资格，Maven真实描述验收、Checkstyle完整描述验收、所有语言四核心和可信关闭仍待完成。见[独立JDK详细描述验收](../tests/acceptance/jdk-javadoc-detailed-descriptions.md)。
+
+## Maven详细Javadoc描述：实现与验收分开
+
+Maven原POM多文件路径现接入五类原生描述规则：空注释、缺主用途及空参数/返回/异常描述。新的详细解析入口保留源码行/caret、消息、位置和汇总核验；历史解析入口及schema不扩大。BUILD SUCCESS中的warning也保留为问题；未知输出、工具/配置故障与实际离线插件缺失保持检查不完整，生成准备任务。绝不回退单文件检查绕过Maven失败。
+
+```mermaid
+flowchart TD
+    A[comments java / check java 原Maven上下文] --> B[原POM多文件检查和输入核验]
+    B --> C{输出性质}
+    C -->|可定位原生warning| D[稳定源码任务与详细修复指引]
+    C -->|插件缓存缺失或未知输出| E[环境或诊断准备任务]
+    D --> F[task verify 原工具原范围复检]
+    E --> F
+    F --> G{原任务身份}
+    G -->|同一问题| H[still_present]
+    G -->|同文件同规则但新锚点| I[rule_coverage_requires_review]
+    G -->|局部无诊断| J[candidate_absent_unverified_policy]
+    H --> K[记录尝试，事实保持open]
+    I --> K
+    J --> K
+```
+
+统一入口仍为 `codeguard comments java . --maven-tool /absolute/mvn --java-home /absolute/jdk21 --maven-repo /absolute/offline-repo --repo-sha256 ACTUAL_DIGEST --format json`；复检为 `codeguard task verify CG-task-id .` 并显式提供同样的原工具上下文。替换路径和实际缓存摘要；CodeGuard不自动安装插件或降低规则。修复指引要求说明用途、参数、返回和异常，不能用裸标签替代详细说明。
+
+新增封闭协议：Maven原生/工作台/复检0.2、项目0.5、comments未绑定0.9/工作台0.10、内brief0.6/预览0.3、任务预览0.32、聚合0.69/异常0.20。首次导入重算规则和投影并拒绝版本降级；复检核对已消费首次报告的摘要收据与原任务范围/规则，支持首次证据为复检包裹报告的新任务。零诊断不会自动关闭，可信关闭/复发仍待验收。
+
+受控Maven进程输出完成五规则×成功/警告失败的公开检查、任务归并、原任务复检及修复后未受信消失回归；这不是实际插件诊断验收。本机已有Maven3.9.16/JDK21实际运行空离线库检查与环境任务复检，两次均识别Javadoc3.12.0插件缺失、没有源码问题。缓存缺失，真实插件详细描述4/3/1/0样例及警告失败配置验收尚未执行，独立条件测试保持待运行。完整Java详细行为契约、Checkstyle完整描述验收、57语言四核心、平台/宿主与可信关闭继续未完成；OpenSpec15.3/15.6不勾选，正式语法资格仍0/32。见[分项验收](../tests/acceptance/maven-javadoc-detailed-descriptions.md)。
+
+## Checkstyle详细描述模块：源码实现，原生验收待完成
+
+原配置的 `JavadocStyle`、`NonEmptyAtclauseDescription`、`SummaryJavadoc` 现可通过固定10.21.4静态适配，保留完整类名/短名、自定义ID、severity及各自属性。空描述开关、Java正则、首句/HTML、scope/tokens、标签token、摘要period/禁用片段和非紧凑HTML开关照原XML交给工具，不在Rust中替代原生检查。模块不能借用其它模块参数，未知token/来源和共享ID继续待解析；空period或摘要正则保留原生合法配置，Rust不以自己的正则语法判断Java正则。
+
+统一入口：`codeguard lint java FILE --checker checkstyle --workspace . --config ORIGINAL_XML --java-tool EXISTING_JAVA --checkstyle-jar EXISTING_JAR --format json`。诊断进入稳定任务，`next` 给出详细用途、参数/返回/异常或摘要修复方向，`task verify CG-task-id .` 显式提供原工具/原配置复检。环境恢复产生的新源码任务也可据包裹首次报告复检；局部消失和恢复都不关闭任务。
+
+```mermaid
+flowchart LR
+    A[原Checkstyle配置和原工具] --> B[原生XML与精确规则绑定]
+    B --> C[源码修复任务]
+    B --> D[环境准备任务]
+    C --> E[next详细指引]
+    D --> F[task verify恢复环境]
+    F --> C
+    E --> G[task verify原工具复检]
+    G --> H[记录仍存在或未受信消失，保持open]
+```
+
+新协议为局部反馈0.5、工作台/源码复检/准备复检0.2、修复简报与预览0.25、源码任务预览0.33/准备任务预览0.34。历史schema不扩大，首次导入拒绝新配置伪装成工作台0.1；复检容器与scan版本配对。选中详细Checkstyle简报的聚合支持0.70，但本批实际公开聚合选择优先级更高的P3C准备任务，仍用0.58；0.70仅有构造序列化验证，不能称实际路由验收。另修正该实际聚合中不符合旧协议的Javadoc未配置原因码，现使用已有 `javadoc_checker_not_configured`，不虚构配置或运行。
+
+受控XML进程夹具验证三类诊断、归并/修复复检、准备恢复及新任务复检；夹具不是Java或Checkstyle，不证明原模块语义或精度。当前未找到已有10.21.4自包含JAR，真实条件测试未执行；完整描述规则/配置/项目模型、独立误报评测、可信关闭/复发、57语言四核心与平台/宿主生产验收继续未完成，15.3/15.6不勾选，正式语法资格0/32。见[分项验收](../tests/acceptance/checkstyle-detailed-descriptions.md)。
+
+## Python 详细文档契约：Ruff DOC 原生增量（2026-10-06）
+
+固定 Ruff 0.16.8 的 DOC102（多余参数）、DOC201/202（返回）、DOC402/403（生成值）、DOC501/502（异常）已进入原生文档分类、限定修复指引、稳定任务及原工具复检。原项目须自行明确启用 preview 和规则；CodeGuard 不添加参数开启预览，不复制语义检测实现。生效设置与诊断规则矛盾时仍未完成，未知 DOC 编号不凭前缀取得适配资格；原 D### 分类与未批准规则映射保持。
+
+DOC502 只对照直接 raise，可能与真实隐式异常文档冲突：报告保留，指引要求调查实际调用链和项目约定，禁止自动删除真实异常说明，必要时走精确误报裁定。Google 首句 Return/Yield、None、stub 和抽象 stub 等原生零诊断均保留；本机带具体返回实现的抽象方法仍收到 DOC201，不把笼统豁免说明当完整验收。用途、完整参数/异常契约及文档内容的正确性仍需逐项验证，不能从此七项规则推断全部文档规范已通过。
+
+```mermaid
+flowchart LR
+    A[原项目配置与既有 Ruff] --> B[原生设置和诊断交叉核验]
+    B --> C[DOC 注释发现与稳定任务]
+    C --> D[详细修复或异常约定调查]
+    D --> E[原任务原工具复检]
+    E --> F[仍存在 / 抑制需复核 / 未受信消失]
+```
+
+真实七项规则已验证重复扫描身份、存在、noqa 抑制及文档修复后未受信消失，事实保持 open；另有原生豁免、隐式异常冲突和未选择 DOC 的边界。既有协议允许原规则 ID 和脱敏指引，本次不扩大历史 schema、受批准映射或关闭权限。验收与版本限制见 [Ruff DOC 验收](../tests/acceptance/ruff-documentation-contract.md)。当前仍不是完整 Python 文档、独立误报评测、全平台或生产资格。

@@ -1,0 +1,397 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:repair-brief-preview:0.26.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "command_status",
+    "exit_code",
+    "disposition",
+    "reason",
+    "repair_brief",
+    "next_actions",
+    "authority",
+    "delivery_decision"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.26.0"
+    },
+    "report_type": {
+      "const": "repair_brief_preview"
+    },
+    "operation": {
+      "const": "next"
+    },
+    "command_status": {
+      "enum": [
+        "complete",
+        "incomplete"
+      ]
+    },
+    "exit_code": {
+      "enum": [
+        0,
+        3
+      ]
+    },
+    "disposition": {
+      "enum": [
+        "actionable",
+        "waiting",
+        "needs_decision",
+        "verification_required",
+        "no_applicable_work"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repair_brief": {
+      "$ref": "#/$defs/gradle_cve_brief"
+    },
+    "next_actions": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "failed_reports": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "run_id",
+          "reason",
+          "report_ref"
+        ],
+        "properties": {
+          "run_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,120}$"
+          },
+          "reason": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]{1,80}$"
+          },
+          "report_ref": {
+            "type": "string",
+            "pattern": "^\\.codeguard/reports/[A-Za-z0-9_-]{1,120}\\.json$"
+          }
+        }
+      }
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "first_run_id",
+        "first_report_sha256"
+      ],
+      "properties": {
+        "first_run_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,120}$"
+        },
+        "first_report_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "gradle_cve_brief": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "task_id",
+        "kind",
+        "checker_id",
+        "evidence_ref",
+        "recheck_argv",
+        "history",
+        "action_id",
+        "authority",
+        "closure_condition",
+        "scope",
+        "build_root",
+        "affected_paths",
+        "reason_code",
+        "constraints",
+        "step",
+        "disposition",
+        "first_diagnostic_reason",
+        "task_verify_status"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "0.26.0"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^CG-B-[0-9a-f]{32}$"
+        },
+        "kind": {
+          "const": "blocker"
+        },
+        "checker_id": {
+          "const": "java.gradle.dependency_check"
+        },
+        "evidence_ref": {
+          "$ref": "#/$defs/evidence"
+        },
+        "recheck_argv": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "minItems": 15,
+          "maxItems": 523,
+          "prefixItems": [
+            {
+              "const": "codeguard"
+            },
+            {
+              "const": "cve"
+            },
+            {
+              "const": "java"
+            },
+            {
+              "const": "."
+            },
+            {
+              "const": "--gradle-bundle"
+            },
+            {
+              "const": "<原Gradle绝对路径>"
+            },
+            {
+              "const": "--java-home"
+            },
+            {
+              "const": "<原JDK21绝对路径>"
+            }
+          ]
+        },
+        "history": {
+          "oneOf": [
+            {
+              "const": "attempt_history_unavailable"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "attempt_count",
+                "no_progress_count",
+                "open_attempt_id",
+                "awaiting_verification",
+                "budget",
+                "recent"
+              ],
+              "properties": {
+                "attempt_count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "no_progress_count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "open_attempt_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "pattern": "^CG-A-[0-9a-f]{32}$"
+                },
+                "awaiting_verification": {
+                  "type": "boolean"
+                },
+                "budget": {
+                  "const": 2
+                },
+                "recent": {
+                  "type": "array",
+                  "maxItems": 5,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "attempt_id",
+                      "action_id",
+                      "outcome",
+                      "note_code",
+                      "observed_change"
+                    ],
+                    "properties": {
+                      "attempt_id": {
+                        "type": "string",
+                        "pattern": "^CG-A-[0-9a-f]{32}$"
+                      },
+                      "action_id": {
+                        "enum": [
+                          "repair-source",
+                          "review-project-policy",
+                          "restore-checker-environment"
+                        ]
+                      },
+                      "outcome": {
+                        "type": [
+                          "string",
+                          "null"
+                        ],
+                        "enum": [
+                          "ready-to-verify",
+                          "no-change",
+                          "failed",
+                          "blocked",
+                          "abandoned",
+                          null
+                        ]
+                      },
+                      "note_code": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "observed_change": {
+                        "type": [
+                          "boolean",
+                          "null"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "action_id": {
+          "const": "restore-checker-environment"
+        },
+        "authority": {
+          "const": "local_unverified"
+        },
+        "closure_condition": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "build_root": {
+          "type": "string",
+          "minLength": 1
+        },
+        "affected_paths": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "reason_code": {
+          "const": "gradle_cve_preparation_required"
+        },
+        "constraints": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "step": {
+          "type": "string",
+          "minLength": 1
+        },
+        "disposition": {
+          "enum": [
+            "actionable",
+            "needs_decision",
+            "verification_required",
+            "waiting"
+          ]
+        },
+        "first_diagnostic_reason": {
+          "enum": [
+            "database_and_dependency_coverage_unverified",
+            "gradle_dependency_cache_budget_exceeded",
+            "gradle_dependency_cache_capture_interrupted",
+            "gradle_dependency_cache_changed_during_task",
+            "gradle_dependency_cache_materialization_incomplete",
+            "gradle_dependency_cache_scope_invalid",
+            "gradle_dependency_cache_snapshot_unavailable",
+            "gradle_dependency_cache_unavailable",
+            "gradle_native_model_incomplete",
+            "gradle_native_model_invalid",
+            "gradle_owasp_composite_build_unresolved",
+            "gradle_owasp_configuration_api_unresolved",
+            "gradle_owasp_json_not_configured",
+            "gradle_owasp_native_report_attribution_unresolved",
+            "gradle_owasp_native_report_invalid",
+            "gradle_owasp_report_missing",
+            "gradle_owasp_report_ownership_duplicate",
+            "gradle_owasp_report_ownership_invalid",
+            "gradle_owasp_report_ownership_unavailable",
+            "gradle_owasp_report_preexisting",
+            "gradle_owasp_report_scope_invalid",
+            "gradle_owasp_report_unavailable",
+            "gradle_owasp_reserved_task_collision",
+            "gradle_owasp_scan_skipped",
+            "gradle_owasp_task_selection_invalid",
+            "gradle_owasp_task_unavailable",
+            "jdk21_version_unresolved",
+            "native_execution_incomplete",
+            "native_failure_with_reports_unverified",
+            "native_identity_changed_during_task",
+            "native_identity_unavailable",
+            "native_prerequisite_unavailable",
+            "native_process_incomplete",
+            "prerequisites_missing",
+            "private_workspace_unavailable",
+            "request_cancelled",
+            "request_deadline_exceeded",
+            "root_build_inputs_missing",
+            "selected_inputs_changed_during_task",
+            "selected_inputs_unavailable",
+            "gradle_owasp_report_budget_exceeded"
+          ]
+        },
+        "task_verify_status": {
+          "const": "not_integrated"
+        }
+      }
+    }
+  }
+}

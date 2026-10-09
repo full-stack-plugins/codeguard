@@ -347,6 +347,8 @@ Rust 实现与本 change 归本仓；宿主实现归独立 codeguard-plugin 仓�
 | SP11 | [syntax-precheck](specs/syntax-precheck/spec.md) / Fallback rollout SHALL preserve command and delivery compatibility | 14.7,14.9,14.18 |
 | SP12 | [syntax-precheck](specs/syntax-precheck/spec.md) / Syntax support claims SHALL have per-language and per-host evaluation evidence | 14.14,14.15,14.16,14.17,14.18 |
 | BD12 | [binary-distribution](specs/binary-distribution/spec.md) / npm launchers SHALL delegate checks to the matching Rust binary | 13.4.1,14.18 |
+| SP13 | [syntax-precheck](specs/syntax-precheck/spec.md) / Rust formatter parser comparisons SHALL retain explicit syntax scope | 12.11,14.17,14.19 |
+| SP14 | [syntax-precheck](specs/syntax-precheck/spec.md) / Rust edit parsing SHALL resolve Cargo edition before native syntax observation | 9.17,11.17,14.6,14.9,14.17,14.19 |
 
 2026-10-04：SP07/SP08 与 HP 编辑快检继续由 11.17、14.9–14.11 管理。新增通用候选确认报告复用现有工作台和 Python/ESLint 身份，不创建第二套状态清单；原生能力匹配关闭仍由未完成的 14.11 管理。
 
@@ -374,3 +376,7 @@ syntax-precheck的隐藏token场景→9.3/9.9/14.7/14.10/14.11/14.19：check all
 
 
 Rust独立lint原生优先及工作台→2.1/2.7/7.3/9.9/14.9–14.11/14.19：复用聚合原生服务、稳定任务和原工具复检，缺Cargo有界WASM初检，显式失败不回退；Rust简报专用schema和help0.2以实际报告验证。完整构建/政策/资格/宿主/发布未完成，证据见[验收](../../../tests/acceptance/rust-standalone-lint.md)。
+
+## 四类核心生产门槛补充（2026-10-06）
+
+用户明确要求各语言的语法、详细文档注释、开发规范与漏洞检查全部生产就绪。新增 Requirement 位于 native-tool-adapters / Every registered language SHALL qualify all four core production capabilities，映射任务15.1–15.7；执行复用6.x/7.x/8.x、9.x/10.x/11.x/12.x，不另建规格事实源。57个canonical条目均纳入目标；当前32个WASM运行与0个正式资格分别报告，planned条目仍是未完成目标。Java漏洞路径必须分别验收Maven/Gradle。本文M3原有planned保留说明是历史迁移状态，不构成本次生产目标的豁免。任何未验收核心单元不得投影为已生产就绪。

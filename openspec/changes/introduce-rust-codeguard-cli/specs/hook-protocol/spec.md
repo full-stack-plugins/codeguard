@@ -163,3 +163,92 @@ Stop 事件 MAY 从已存在的本地任务事实生成有界、只读的下一�
 - **THEN** the fixed-version Ruby stdin parser runs only for selected files using the event deadline; selected failures never switch to WASM, absence retains bundled candidate feedback, and native diagnostics reuse the same task as lint/check
 - **AND** dialogue shows only current line positions and safe task IDs, with project-version verification and original-tool recheck guidance; it does not invent columns, echo tool messages, execute source/gems, or close tasks from zero diagnostics
 - **AND** repair_ready preserves saved report references and stale-input handling through a versioned line-only summary; failed writes do not run any parser
+
+#### Scenario: Shell edits and repair-ready events share original ShellCheck tasks
+- **WHEN** a confirmed Shell edit selects an explicit absolute ShellCheck tool or a caller PATH entry, or repair_ready references a persisted shell.shellcheck task
+- **THEN** only selected files are checked using the common event deadline, observed file dialect and project rc; native failures remain incomplete and no absent Shell WASM is invented
+- **AND** current SC rules and Unicode scalar positions, actual saved task IDs and original-tool recheck guidance appear in bounded dialogue; source text and tool messages are excluded
+- **AND** repair_ready calls the existing original-rule task verifier, preserves event persistence and absence-versus-suppression outcomes, and never closes a task from zero diagnostics; failed writes run no check and ignore preconfigured native-tool selections instead of reporting repair-ready argument errors
+
+#### Scenario: Failed write retains preconfigured checker options without executing them
+- **WHEN** a validated failed-write event carries registered checker/tool configuration options
+- **THEN** the no-check route ignores those options, returns `not_run/write_failed`, and starts no process or workbench mutation
+- **AND** unknown, duplicate, empty, relative-path and over-budget arguments remain invalid; task ownership and lease options remain restricted to task verification
+- **AND** this exception does not silently enable an unwired checker on a confirmed edit
+
+#### Scenario: Go edits use the frozen SDK whole-file syntax probe before WASM
+- **WHEN** a confirmed Go edit selects an explicit Go SDK or an absolute PATH entry
+- **THEN** only selected files are passed as frozen stdin to the same SDK's verified gofmt under one deadline; no project code, go vet or dependency installation executes
+- **AND** selected tool failures remain incomplete without WASM fallback; missing tools retain candidate feedback and confirmation requirements
+- **AND** native observations reuse stable syntax tasks and original-SDK task verification; zero diagnostics do not close tasks or prove project lint coverage
+
+#### Scenario: Fixed Go syntax SDK does not satisfy project version declarations
+
+- **WHEN** a selected Go source belongs to a nearest `go.mod` or enclosing `go.work` declaring a minimum Go version or suggested toolchain newer than the supported syntax SDK, or the relevant declarations cannot be read unambiguously
+- **THEN** editing and original-tool task verification return an environment observation without invoking the incompatible SDK, generating source diagnostics, or silently switching to WASM; declarations are read statically with bounded input, and changes during observation withdraw prior diagnostics
+- **AND** saved guidance withdraws source positions when current declarations become incompatible; absence of a declaration is still only an unapproved local syntax observation, never full language-version or project acceptance
+
+
+### Requirement: Rust edit feedback SHALL use edition-bound native parsing and retain lint obligations
+
+Confirmed Rust edits SHALL observe only requested safe files through the shared deadline and bounded fixed Rustfmt parser with applicable Cargo edition. Explicit/absolute-PATH native selection SHALL take precedence over WASM initial parsing; selected-tool failures SHALL remain incomplete without fallback. Absent tools MAY yield bundled WASM candidates while preserving native preparation/confirmation tasks. Edition/source/tool changes SHALL withdraw current positions. The formatter parser SHALL NOT be described as Clippy, complete lint/type/build validation or delivery permission; those project obligations remain outstanding.
+
+Current native diagnostics and environment failures SHALL reuse stable Rust syntax confirmation tasks and safe conversation guidance. Repeated observations SHALL update evidence rather than create duplicate tasks. Repair-ready and task verification SHALL use the same scoped project parser, retain original evidence and record an observation; zero diagnostics SHALL NOT automatically close the task. Failed writes SHALL neither run the parser nor create workbench state.
+
+#### Scenario: Rust editing and task verification share one scoped task
+- **WHEN** a confirmed selected Rust edit produces native syntax diagnostics and repeats, then source is repaired and the original task is rechecked
+- **THEN** preserve one task, expose safe line/rule/source-independent guidance and original-tool observation, keep the task open after local zero diagnostics and retain Clippy/build obligations
+
+#### Scenario: Missing tool and selected tool failure differ
+- **WHEN** no Rustfmt entry exists, or an explicit selected tool fails/has unverified version or project edition is unresolved
+- **THEN** only true absence enables the WASM initial scan; selected failure or unresolved edition produces concrete preparation/decision feedback without source-edit instructions or a quality pass
+
+### Requirement: Rust project lint follow-up SHALL remain executable and current
+
+Rust edit dialogue SHALL identify project Clippy as not executed and provide an executable Codeguard lint follow-up after the editing batch. This instruction SHALL NOT claim that project lint is queued, executed or passed. Project lint remains outside selected-file editing and Stop execution; ordinary edits SHALL NOT start Cargo compilation.
+
+Clippy repair-ready SHALL reuse task-bound Cargo verification and preserve bounded rule/line feedback only for the original finding. Source/configuration inventory SHALL be captured before child verification and rechecked before projection. Changed source, Cargo lock/configuration or selected tool SHALL withdraw positions and report incomplete. No raw tool message, source content, inferred column unit or task closure SHALL be emitted.
+
+#### Scenario: Rust syntax success still requires project lint
+- **WHEN** selected-file Rust parsing completes with no diagnostics
+- **THEN** dialogue provides `codeguard lint rust . --format=json`, identifies Clippy as not run, and retains complete project obligations
+
+#### Scenario: Original Clippy finding remains after repair-ready
+- **WHEN** a current same-task Cargo recheck reports the original rule and source identity
+- **THEN** repair feedback carries only validated rule and line; input changes withdraw positions, and local absence does not close the task
+
+### Requirement: Repair-ready hooks SHALL recheck C-family documentation through the original task contract
+
+`repair_ready` for C/C++ native-warning and structural-documentation tasks SHALL delegate to the task-bound original Clang/standard verification contract within the shared hook deadline and output/history budgets. Explicit Clang selection SHALL be absolute and must match the original task; foreign tool/standard/parameter overrides SHALL fail before leasing or process execution. Hooks SHALL not execute task Markdown or infer replacement compiler arguments. The summary SHALL retain source-currentness, original native versus CodeGuard structural rule authority, local presence/absence/incomplete status and a verified persisted report reference. Input/tool changes, invalid bindings or missing receipts SHALL withdraw locations and next-step authority. Zero diagnostics or disappearance SHALL keep tasks open and SHALL NOT qualify detailed documentation or delivery. This path SHALL NOT silently enable unsupported fast-edit Clang options or claim installed-host acceptance.
+
+#### Scenario: A structural task is ready after an edit
+- **WHEN** a bound C/C++ structural documentation task triggers repair_ready
+- **THEN** use its original compiler and standard, validate the returned task/source/report identity, project a bounded local summary and preserve the open fact
+
+#### Scenario: Native warnings disappear after documentation is repaired
+- **WHEN** the original documentation warning is not observed in a fresh task-bound native scan
+- **THEN** preserve candidate_absent_unverified_policy and a consumed report reference; do not close the task or grant production qualification
+
+
+### Requirement: Confirmed C-family edits preserve explicit documentation context
+Confirmed file edits SHALL expose bounded C/C++ documentation observations using the same native Clang adapter and shared deadline as unified checks. Standards SHALL be explicit c11/c++17 profiles; missing tool or standard SHALL remain context_required rather than a source violation. Documentation observations SHALL NOT remove native syntax coverage gaps, grant qualification or delivery, or initialize a workspace implicitly. Failed writes SHALL consume no checker configuration. Repair-ready verification SHALL retain the original task standard and reject edit-profile overrides.
+
+#### Scenario: Missing edit documentation profile
+- **WHEN** a confirmed C/C++ edit has no explicit Clang and language standard
+- **THEN** its documentation observation reports context_required without executing Clang or generating source violations
+
+#### Scenario: Explicit standalone documentation profile
+- **WHEN** a confirmed C/C++ edit supplies an existing Clang and supported explicit standard
+- **THEN** selected files receive bounded native documentation observations, with structural policy kept distinct and native syntax coverage gaps retained
+
+
+### Requirement: C-family edit documentation SHALL have bounded conversation guidance
+The Claude event adapter SHALL project current C/C++ documentation observations into bounded agent context, separating native warning rules from structural policy and retaining incomplete context. Source text, comment descriptions, editable task Markdown and unvalidated task identifiers SHALL NOT be echoed. Stale or incomplete native observations SHALL NOT supply repair positions. Projection SHALL NOT grant task closure or delivery qualification.
+
+#### Scenario: Missing C-family documentation context in conversation
+- **WHEN** a confirmed C/C++ edit lacks a required explicit documentation profile
+- **THEN** the conversation reports the context gap and does not direct unrelated source edits
+
+#### Scenario: Current native documentation observations
+- **WHEN** the adapter receives current supported native observations
+- **THEN** it provides bounded rules, positions and validated task references without source or comment text

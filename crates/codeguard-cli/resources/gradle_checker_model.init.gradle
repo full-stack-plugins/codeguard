@@ -1,0 +1,46 @@
+// 只观察模型，不调用质量任务、不授予检查通过；由Rust固定脚本字节和输出位置。
+import groovy.json.JsonOutput
+
+gradle.projectsEvaluated {
+    def root = gradle.rootProject
+    def taskName = 'codeguardObserveCheckerModel'
+    if (root.tasks.findByName(taskName) != null) {
+        throw new GradleException('codeguard_reserved_task_collision')
+    }
+    root.tasks.register(taskName) {
+        doLast {
+            def knownPlugins = ['java', 'java-library', 'org.owasp.dependencycheck', 'checkstyle', 'pmd', 'com.github.spotbugs']
+            def knownTypes = ['org.owasp.dependencycheck.gradle.tasks.Analyze', 'org.owasp.dependencycheck.gradle.tasks.Aggregate', 'org.gradle.api.tasks.javadoc.Javadoc', 'org.gradle.api.plugins.quality.Checkstyle', 'org.gradle.api.plugins.quality.Pmd', 'com.github.spotbugs.snom.SpotBugsTask']
+            def base = root.projectDir.canonicalFile.toPath()
+            def relative = { File file ->
+                def path = file.canonicalFile.toPath()
+                if (!path.startsWith(base)) { throw new GradleException('codeguard_model_directory_outside_root') }
+                def value = base.relativize(path).toString().replace(File.separatorChar, '/' as char)
+                value.isEmpty() ? '.' : value
+            }
+            if (root.allprojects.size() > 128) { throw new GradleException('codeguard_model_project_budget') }
+            def projects = root.allprojects.sort { a, b -> a.path <=> b.path }.collect { project ->
+                def tasks = []
+                project.tasks.each { task ->
+                    def implementation = task.class.name
+                    def matched = false
+                    def type = task.class
+                    while (type != null) {
+                        if (knownTypes.contains(type.name)) { implementation = type.name; matched = true; break }
+                        type = type.superclass
+                    }
+                    def relevantName = task.name == 'javadoc' || task.name.startsWith('dependencyCheck') || task.name.startsWith('checkstyle') || task.name.startsWith('pmd') || task.name.startsWith('spotbugs')
+                    if (matched || relevantName) { tasks.add([name: task.name, implementation: implementation, enabled: task.enabled]) }
+                    if (tasks.size() > 64) { throw new GradleException('codeguard_model_task_budget') }
+                }
+                [path: project.path, project_dir: relative(project.projectDir), build_dir: relative(project.layout.buildDirectory.get().asFile), plugins: knownPlugins.findAll { project.plugins.hasPlugin(it) }, tasks: tasks.sort { a, b -> a.name <=> b.name }]
+            }
+            def model = [schema_version: '0.1.0', report_type: 'gradle_checker_model', gradle_version: gradle.gradleVersion, included_build_count: gradle.includedBuilds.size(), projects: projects]
+            def bytes = JsonOutput.toJson(model).getBytes('UTF-8')
+            if (bytes.length > 1024 * 1024) { throw new GradleException('codeguard_model_output_budget') }
+            def output = new File(System.getProperty('codeguard.model.output'))
+            if (!output.createNewFile()) { throw new GradleException('codeguard_model_output_already_exists') }
+            output.bytes = bytes
+        }
+    }
+}

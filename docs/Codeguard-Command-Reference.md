@@ -329,3 +329,161 @@ Source builds add `codeguard lint ruby FILE.rb --ruby-tool /absolute/path/to/rub
 
 
 Ruby edit feedback: source builds of `hook execute` / `hook claude post-tool-use` accept `--ruby-tool ABS_PATH` or select Ruby from the caller's absolute PATH entries. Only confirmed edited files are parsed under the event deadline. Selected failures do not fall back; absence retains WASM candidates. Bounded dialogue carries current line positions and real stable tasks without source/tool-message echoes or invented columns, and asks agents to verify project Ruby compatibility first. `repair_ready` rechecks using the selected tool and retains real evidence references; zero diagnostics do not close tasks. New closed protocols are edit feedback 0.19 (inner 0.10) and recheck feedback 0.20 (inner 0.6); old schemas are preserved. Actual installed-host triggering, complete RuboCop coverage, and public npm release remain unverified.
+
+Rust edit entry: source-built `hook execute ROOT --rustfmt-tool ABS_PATH --timeout 30s --format=json` and `hook claude post-tool-use` use selected-file Cargo edition with fixed Rustfmt1.9.0-stable. Without an explicit selection, only absolute PATH entries are searched; genuine absence retains built-in WASM prechecks when available. `next ROOT --format=json` returns a stable confirmation task and original-tool recheck arguments; `task verify TASK_ID ROOT --rustfmt-tool ABS_PATH --format=json` records the same task's observation. Rustfmt supplies parser observations; Clippy/type/full-build obligations remain pending, and zero diagnostics cannot close tasks. Selected failures stay incomplete, including unverified proxy versions. Source changes and offline installation tests do not update the public npm release.
+
+Rust edit dialogue now provides an executable post-batch Clippy command and explicitly states that project lint did not run during editing. Original-task repair-ready retains current rule/line feedback and withdraws changed-input guidance; this is not a background queue or authoritative closure. See [project lint follow-up](Rust-Project-Lint-Followup.md).
+
+## Unified Java comments entry (source increment, not released)
+
+`comments java [path]` reuses the existing native Javadoc probes. A file selects an explicit JDK21 local observation. A project selects recognized Javadoc configuration and its main sources only. Missing configuration does not launch Javadoc or produce comment violations. Explicit Maven context selects original-POM multi-file checking; failure never falls back to a single-file probe.
+
+```bash
+codeguard comments java File.java --java-home /absolute/jdk21 --format json
+codeguard comments java . --java-home /absolute/jdk21 --maven-tool /absolute/mvn --maven-repo /absolute/repository --repo-sha256 SHA256 --timeout 60s --format json
+```
+
+The independent `java_comments_feedback 0.1.0` wrapper preserves the existing report under `native_observation`; the old `lint java --checker javadoc` protocol remains unchanged. Budget precedence is CLI, registered environment, project default, then built-in default. All native child work shares one deadline. Feedback exposes target kind, budget, observations and next actions. Zero local diagnostics still means `coverage_proven=false`, `delivery_decision=not_evaluated`, exit3 (130 on cancellation). No implicit installation or source changes occur.
+
+**Scope limitation:** Maven multi-file task synchronization is connected; Maven original-task verification, trusted closure/recurrence and actual host acceptance remain incomplete; standalone files can explicitly bind --workspace as described below. Trusted closure remains incomplete. This entry creates no fake tasks and does not close findings from a local probe. Replace the absolute tool paths and offline-repository digest with real current values.
+
+### Javadoc project workbench integration (source increment)
+
+For initialized projects, `comments java .` in JDK single-file mode saves local observations and synchronizes stable tasks using wrapper protocol `java_comments_feedback 0.4.0`. Unbound checks retain 0.1 local feedback; explicit-file workspaces are described below. Rule, relative file, source anchor and occurrence ordinal define identity; line numbers only locate evidence. Repeat scans append observations without duplicate tasks.
+
+```mermaid
+flowchart LR
+    A[Native Java comments observation] --> B{Initialized project and JDK mode}
+    B -->|Yes| C[Save digest-bound report]
+    C --> D[Recheck source configuration and identity]
+    D --> E[Merge source or preparation tasks]
+    E --> F[Display workbench.next in feedback]
+    B -->|No| G[Local feedback and concrete capability gap]
+    C -->|Failure| H[Visible persistence error without fake tasks]
+```
+
+Missing configuration or incomplete execution creates preparation records, not source violations or new mandatory delivery obligations. Feedback exposes `workbench.status/new_findings/new_blockers/next`. Persistence failures return no fake tasks. Briefs and task text include evidence, rule basis, scope, steps, recheck and closure conditions. Local zero diagnostics leave prior tasks open with `task_verify_status=local_observation_only`; original-task rechecks are described below. Maven multi-file task synchronization is connected; Maven original-task verification, trusted closure/recurrence and actual host acceptance remain incomplete; explicit-file integration is described below, as do trusted closure and actual host acceptance.
+
+### Recheck the original Javadoc task (source increment)
+
+Initialized-project JDK-mode Javadoc tasks now support original-tool rechecks:
+
+```bash
+codeguard task verify CG-<task-identity> . --java-home /absolute/jdk21 --format json
+```
+
+The recheck reads the digest-bound original observation and selects the task source with current native configuration. It never selects an executable from saved reports. Source, configuration and explicit JDK21 tool bytes are checked around scanning and before recording. Unrelated checker options are rejected before leases or execution. Results `still_present`, `incomplete`, `rule_coverage_requires_review` and `candidate_absent_unverified_policy` are recorded on the original task, bound to the native report and current attempt. Missing or changed tools and unstable inputs cannot mean repair completion. Changed configuration or another anchor for the same rule requires review.
+
+```mermaid
+flowchart LR
+    A[Original task report and current inputs] --> B[Explicit JDK21 native recheck]
+    B --> C[Validate scope source configuration and tool identity]
+    C --> D[Original task event and attempt history]
+    D --> E[next gives current native feedback]
+    E --> F{Repeated lack of progress}
+    F -->|Yes| G[Concrete decision required]
+    F -->|No| H[Continue rule repair or environment recovery]
+```
+
+Current protocols: bound-workbench wrapper `java_comments_feedback 0.4.0`, Javadoc brief0.3, native container `javadoc_task_recheck 0.2.0`, public `task_verification_preview 0.27.0`. Older schemas remain readable. `task_verify_status=local_observation_only` means local rechecks are connected; trusted closure remains unaccepted. Zero diagnostics after documentation repair only records an absence candidate and leaves the task open. Whitelist approval, full project-rule attribution and actual host acceptance remain independent work. Maven multi-file task synchronization is connected; Maven original-task verification, trusted closure/recurrence and actual host acceptance remain incomplete; explicit-file integration is described below.
+
+### Explicit Java file workbench (source increment)
+
+```bash
+codeguard comments java File.java --workspace . --java-home /absolute/jdk21 --format json
+codeguard task verify CG-<task-identity> . --java-home /absolute/jdk21 --format json
+```
+
+`--workspace` explicitly binds a readable workspace. Files must belong to it; a project target must equal the workspace root. Out-of-scope files are rejected before execution. Uninitialized roots report `workspace_not_initialized` and are not initialized automatically. A file without an explicit workspace retains local feedback; no parent workspace is guessed. The explicit root also supplies project defaults for the shared budget.
+
+Observation0.2, brief0.3 and recheck0.2 add `observation_scope`: `explicit_file_probe` means an explicitly selected file and requires null configuration references; `configured_project_probe` still selects main sources through original project configuration. Task rechecks preserve the original mode. Adding a POM later cannot turn a file probe into a project check. Lines only locate evidence; original rule/file/anchor identity stays stable. A missing JDK creates preparation tasks only. Local zero diagnostics or synchronization never closes a task.
+
+The bound-workbench wrapper is now `java_comments_feedback 0.4.0`, public verification is `task_verification_preview 0.27.0`; older schemas remain available. Human output also shows workbench status, task identity, mode, next step and recheck arguments. Maven multi-file task synchronization is connected; Maven original-task verification, trusted closure/recurrence and actual host acceptance remain incomplete.
+
+### Maven Javadoc multi-file workbench (source increment)
+
+In an initialized workspace, `comments java` with explicit Maven context persists native multi-file observations under `.codeguard/reports/` and creates stable repair tasks. Missing configuration or incomplete execution creates preparation tasks. A bounded source/POM snapshot is captured before native execution and checked again before persistence. Import revalidates current hashes, build-root ownership, the original POM, observed tool identities, rules and locations, then recomputes finding projections. Tampered or changed inputs cannot create new source findings. Consumed historical reports retain their original digest receipts after source edits.
+
+```bash
+codeguard comments java . --maven-tool /absolute/mvn --java-home /absolute/jdk21 --maven-repo /absolute/offline-repo --repo-sha256 <actual-repository-digest> --format json
+codeguard next . --format json
+```
+
+The Maven-bound wrapper is `java_comments_feedback 0.5.0`, the saved observation is `maven_javadoc_workbench_observation 0.1.0`, and the inner repair brief is0.4 with `observation_scope=configured_maven_multifile_probe`. Existing JDK file/project wrappers and recheck protocols remain available. Feedback includes the stable task, evidence, native rule, allowed scope and original Maven rescan arguments. `task_verify_status=not_integrated` explicitly identifies the missing Maven task-verification integration; a JDK single-file check cannot substitute for it. Preparation tasks restore the environment, repeat scans reuse the task, and local zero diagnostics do not close historical tasks.
+
+This covers the existing simple static-POM direct-replay probe. Effective models, complex projects, Maven original-task verification, trusted closure/recurrence, actual hosts and release acceptance remain open. This increment uses controlled Maven process fixtures and does not claim actual plugin execution. See `tests/acceptance/maven-javadoc-workbench.md`.
+
+
+### Gradle model observation in project check (development CLI)
+
+```bash
+codeguard check java . --gradle-bundle /absolute/gradle-8.10.2 --java-home /absolute/jdk \
+  --gradle-project-file settings.gradle --gradle-project-file build.gradle \
+  --gradle-project-file app/build.gradle --format json
+```
+
+Select the actual Groovy or Kotlin DSL files explicitly. The model describes only the selected copy and does not establish complete project coverage or execute documentation, convention or vulnerability tasks. All options are required together; paths must be unique normal relative files. The check remains incomplete, preserving the model separately in check_feedback 0.62. `check all` accepts the same options; `lint all` rejects them. This is local development CLI acceptance, without an npm release claim. See [public Gradle model acceptance](../tests/acceptance/gradle-public-model-check.md).
+
+
+### Explicit Gradle native documentation check
+
+The development `check java` / `check all` entry now accepts explicit `--gradle-javadoc` with `--gradle-bundle`, `--java-home`, and repeatable `--gradle-project-file` inputs including root settings/build and Java files. One scheduled `java.gradle.javadoc` job captures the model and executes original documentation tasks in one native invocation. Check feedback 0.64 preserves `native_results.java_gradle_javadoc`; it does not launch a second model invocation. Model-only requests retain 0.62; `lint all` rejects documentation options. SIGINT preserves cancellation observations, and check_aborted 0.17 preserves documentation observations before a sibling failure. Public quality feedback is connected; automatic task persistence, repair recheck/closure, complete rules and JDK/source closure, multi-project/custom-doclet and per-language qualification remain open. See [public Javadoc acceptance](../tests/acceptance/gradle-public-javadoc-check.md).
+
+```bash
+codeguard check java . --gradle-javadoc \
+  --gradle-bundle /absolute/gradle --java-home /absolute/jdk21 \
+  --gradle-project-file settings.gradle --gradle-project-file build.gradle \
+  --gradle-project-file src/main/java/Example.java --format json
+```
+
+For explicit Gradle documentation requests, the Java comments category preserves a partial observation or native incompleteness. Native diagnostics and tool failures are not mislabeled as absent Maven configuration; complete rules and coverage remain unverified. See [category attribution fix](../tests/acceptance/gradle-javadoc-category-attribution.md).
+
+The development `check java/all --gradle-javadoc` now captures selected inputs before native execution, revalidates digests/locations at first import, and saves local reports with stable findings and preparation tasks. Repeated scans append observations; missing Markdown can be restored from facts. `next` / `task show` provide original-task `task verify` arguments; selected inputs are retained in the bound original report and tool paths require validation. Check feedback 0.67 and repair preview 0.24 are separate closed protocols (historical 0.65/0.22 and 0.66/0.23 remain unchanged); ordinary Java checks also retain historical guidance. Counts in `gradle_javadoc_tasks` cover the current workspace sync, not exclusively Gradle records. Three actual public checks verify detection, reuse and empty output after repair while historical findings remain open. `task_verify_status=local_observation_only`: original-task verification is connected; trusted closure/reopen and complete rule/scope acceptance remain pending. See [workbench acceptance](../tests/acceptance/gradle-javadoc-workbench.md).
+
+See [public recheck acceptance](../tests/acceptance/gradle-javadoc-public-task-recheck.md) for native observations, attempt binding and invalidation evidence.
+
+Gradle native documentation feedback now preserves empty comments, missing main descriptions and empty exception descriptions as `JavadocEmptyComment`, `JavadocMissingMainDescription` and `JavadocEmptyThrowsDescription`; existing empty parameter/return rules remain. Original JDK21 output is bound to selected source bytes before stable task import and original-tool recheck. Native/workbench/recheck protocols use separate 0.2 contracts; historical 0.1 is not widened. Aggregation 0.67, aborted feedback 0.18, repair preview 0.24 and task preview 0.30 remain closed contracts. Actual empty type/constructor/field/method comments yield four diagnostics, bare tags three, missing purpose one; detailed Chinese comments and valid inherited documentation yield zero, still untrusted. Standalone JDK/Maven historical protocols do not yet integrate these new rules, and complete documentation qualification remains pending. See [description acceptance](../tests/acceptance/gradle-javadoc-detailed-descriptions.md).
+
+Read-only four-core acceptance plan: `codeguard capabilities [language] --acceptance-plan --format=json`. All 57 languages / 228 obligations remain unqualified; filtering preserves full obligations. See [acceptance plan](Codeguard-Production-Acceptance-Plan.md).
+
+Java Gradle vulnerability checks now expose explicit original tasks through `codeguard cve java`, preserving JSON configuration and optional module-cache inputs. Observations remain unverified; workbench integration and full native acceptance are pending. See [Gradle OWASP](Codeguard-Gradle-Vulnerability-Checks.md).
+
+`comments rust` now returns the dedicated `rust_comments_feedback` 0.1 wrapper, retaining original Rustdoc 0.4 and Clippy 0.2 observations under `native_results`. It runs both sequentially within one deadline and selects documentation tasks for `next`. Consumers of the former standalone Rustdoc JSON must read `native_results.rustdoc`; stored native reports and original-tool task verification remain compatible. See [combined-entry acceptance](../tests/acceptance/rust-comments-combined.md).
+
+
+### Partial standalone Python documentation entry
+
+`codeguard comments python . --ruff-tool /absolute/path/to/ruff --format=json` reuses project-configured native Ruff and returns `python_comments_feedback` 0.2. `native_report` retains the complete sanitized 0.12 native conversation report. Top-level `documentation_findings` selects existing D### observations and seven explicitly mapped DOC rules; top-level `next` retains current and historical documentation tasks and preparation blockers. Other convention findings remain in the native child report. Zero diagnostics do not qualify detailed comments: documentation rule coverage stays `unverified`, detailed contract qualification stays `not_granted`, and the overall exit is 3. Missing configuration creates preparation work. It does not enable preview, modify configuration or substitute WASM for documentation checks. Initialized projects reuse stable tasks and original-tool `task verify`; native facts are not closed automatically.
+
+See [standalone entry and actual Ruff acceptance](../tests/acceptance/python-comments-cli.md).
+
+
+The Python documentation entry now returns wrapper 0.2 with `documentation_configuration`, reusing same-run native settings to distinguish selected documentation rules, unselected rules and unavailable settings. Even zero diagnostics include global documentation rules and per-file config/source/tool/settings identities. Nested configurations remain independent; incomplete native results do not reuse old settings, and no native call is added. `observed` means settings observation completed, while per-file ignores, source suppressions and detailed semantic qualification remain unresolved. Historical 0.1 and native 0.12 protocols remain; wrapper consumers must accept 0.2. See [same-run configuration acceptance](../tests/acceptance/python-documentation-configuration.md).
+
+
+Rust CVE observations now check same-run stability of RustSec crates/rust contents, membership and physical entry identities. Changed or unreadable database input prevents local completion even with valid native exit/JSON; valid candidates remain visible as incomplete observations. Routine root lock/Git housekeeping is outside advisory content. Shared budgets and bounded reads do not qualify database source or freshness; original protocol 0.1 and not_evaluated remain. See [database stability acceptance](../tests/acceptance/cargo-audit-database-stability.md).
+
+
+### Standalone native C/C++ documentation entry (source increment, not released)
+
+`codeguard comments c api.c --clang-tool /absolute/clang --standard c11 --format=json`; C++ selects `comments cpp api.cpp --standard c++17` with the same tool argument. The measured Apple Clang 21 documentation profile requires an explicit tool and matching standard, without installation. Three precise native SARIF rules cover empty command descriptions, unknown parameter names and return tags on void functions, with repair steps, comment-only scope and original-tool verification argv. Unknown rules remain separate. Invalid reports, changed inputs, cancellation and unresolved preprocessing cannot become source violations.
+
+The dedicated `c_family_comments_feedback` 0.1 observation leaves project configuration unknown and detailed-contract qualification ungranted. Completely missing comments may yield zero native diagnostics. Without a workspace, feedback remains 0.1 with `next=null`. An existing workspace now receives feedback0.4, stable file/language/standard/native-rule tasks and next0.30 with all current positions and original-tool rescan argv. Input/tool changes withdraw repair locations; clean rescans keep tasks open. Dedicated task verification now binds the first tool, standard and rule and records local observations while keeping tasks open. Dedicated attempt journals now retain failures and budgets under the current source/tool context. Project checks and Hooks remain unintegrated. Exit3 or cancellation130 persists, without automatic closure or delivery permission. See the [16-case native evidence, execution path and remaining gaps](../tests/acceptance/c-family-comments-native.md).
+
+See [C/C++ original-task recheck acceptance](../tests/acceptance/c-family-comments-task-recheck.md) for current closed protocols and evidence. Full four-core production qualification remains ungranted.
+
+See [C/C++ controlled attempt acceptance](../tests/acceptance/c-family-comments-attempt-history.md) for current repair history and protocols. Local history does not replace full four-core production acceptance.
+
+
+Explicit C/C++ comments now returns native warnings and function-documentation structure from one scan. Zero warnings can still expose absent comments; unsupported/invalid or changed-input structures cannot become violations. Feedback0.5/0.6 preserves raw warning counts and groups repeated positions. Structural tasks are now partial; dedicated verification and attempts remain unintegrated and full detailed-documentation qualification is not granted. See [public structural feedback](../tests/acceptance/c-family-comments-structure-cli.md).
+
+
+C/C++ structural deficits now form stable file/language/standard/Codeguard-policy repair tasks. Next lists current function evidence and the original comments re-scan command; overloads/line movement do not duplicate tasks, projections can be recovered and local absence leaves facts open. Dedicated task verify/attempt currently reject before execution; full accuracy and trusted closure remain unqualified. See [structural task evidence](../tests/acceptance/c-family-structure-workbench.md).
+
+C/C++结构原工具复检更新：结构任务现可执行绑定首次工具/标准的 `task verify`，记录 still_present、incomplete 或 candidate_absent_unverified_policy 局部观察；任务仍开放。新的brief0.32/task show0.6/反馈0.8/复检0.37将原comments复扫指引升级为任务绑定的原工具复检，测试直接执行生成argv。结构attempt/无进展及可信关闭继续未完成，历史段落保留为检查点。
+
+C/C++ structural rechecks now use the original compiler and standard through task verify, recording local observations without closing tasks. Brief0.32, task-show0.6, feedback0.8 and verification0.37 upgrade comments re-scan guidance to task-bound original-tool verification; native tests execute the generated argv. Controlled structural attempts, no-progress handling and trusted closure remain pending. Earlier sections are historical checkpoints.
+
+C/C++结构尝试更新：结构任务接入租约、repair-source尝试日志、ready后的原工具复检与同一输入两次失败预算。新brief0.33/task show0.7/绑定反馈0.9显示等待、必须复检或具体决策；重复扫描、删Markdown及重命名动作不能恢复预算。缺历史报告保持未验证，篡改事件拒绝。跨输入语义无进展、完整详细准确性/项目/平台/独立精度及可信关闭仍未验收。
+
+C/C++ structural tasks now use leases, repair-source journals, original rechecks after ready attempts and a two-failure budget for unchanged inputs. Brief0.33/task-show0.7/feedback0.9 show waiting, required verification or a concrete decision. Rescans, projection deletion and action renaming cannot reset failures; missing reports remain unverified and forged events are rejected. Cross-input semantic progress, full accuracy/context/platform/independent precision and trusted closure remain unqualified.

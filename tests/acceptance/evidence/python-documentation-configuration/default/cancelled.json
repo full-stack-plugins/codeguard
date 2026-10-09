@@ -1,0 +1,217 @@
+{
+  "authority": "local_unverified",
+  "command_status": "cancelled",
+  "coverage_proven": false,
+  "delivery_decision": "not_evaluated",
+  "detailed_contract_qualification": "not_granted",
+  "documentation_configuration": {
+    "coverage_proven": false,
+    "files": [
+      {
+        "config_ref": null,
+        "config_sha256": null,
+        "globally_enabled_documentation_rules": null,
+        "path": "app.py",
+        "per_file_ignores_present": null,
+        "reason": "request_cancelled",
+        "settings_sha256": null,
+        "source_sha256": null,
+        "status": "unavailable",
+        "tool_sha256": null
+      }
+    ],
+    "next_action": "恢复原生检查和配置，获取同轮文档规则设置；不凭零诊断判定合规。",
+    "reason": null,
+    "scope": "global_rule_selection_only",
+    "selected_file_count": 0,
+    "source_file_count": 1,
+    "status": "unavailable",
+    "unavailable_file_count": 1,
+    "unselected_file_count": 0
+  },
+  "documentation_findings": [],
+  "documentation_rule_coverage": "unverified",
+  "execution_budget": {
+    "enforcement": "native_execution_only",
+    "source": "cli",
+    "timeout_ms": 5000
+  },
+  "exit_code": 130,
+  "language": "python",
+  "local_scan_complete": false,
+  "native_report": {
+    "adapter_sha256": null,
+    "backlog_status": "synced_partial",
+    "backlog_sync": {
+      "failed_reports": 0,
+      "historical_findings": 0,
+      "imported_reports": 1,
+      "new_blockers": 1,
+      "new_findings": 0
+    },
+    "checker_configurations": [
+      {
+        "build_root": ".",
+        "checker_id": "python.ruff",
+        "configuration": "configured",
+        "configuration_ref": "ruff.toml",
+        "next_action": "用原生 Ruff 核对生效规则、扫描范围和诊断"
+      }
+    ],
+    "command_status": "cancelled",
+    "delivery_decision": "not_evaluated",
+    "execution_budget": {
+      "enforcement": "native_execution_only",
+      "source": "cli",
+      "timeout_ms": 5000
+    },
+    "exit_code": 130,
+    "files": [
+      {
+        "config_sha256": null,
+        "configuration_ref": "ruff.toml",
+        "findings": [],
+        "path": "app.py",
+        "reason": "request_cancelled",
+        "recheck_argv": [
+          "ruff",
+          "check",
+          "app.py"
+        ],
+        "recheck_cwd": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-py-comments-50116-3",
+        "rule_settings": null,
+        "run_status": "incomplete",
+        "source_sha256": null,
+        "suppression_audit": null,
+        "tool_sha256": null
+      }
+    ],
+    "incomplete_reasons": [
+      "app.py:request_cancelled"
+    ],
+    "language": "python",
+    "local_scan_complete": false,
+    "native_tool_version": null,
+    "next": {
+      "authority": "local_unverified",
+      "command_status": "complete",
+      "delivery_decision": "not_evaluated",
+      "disposition": "actionable",
+      "exit_code": 0,
+      "next_actions": [],
+      "operation": "next",
+      "reason": "local_task_selected",
+      "repair_brief": {
+        "action_id": "restore-checker-environment",
+        "affected_paths": [
+          "app.py"
+        ],
+        "authority": "local_unverified",
+        "build_root": ".",
+        "checker_id": "python.ruff",
+        "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+        "constraints": [
+          "先恢复检查完整性",
+          "不得关闭检查器或修改无关源码"
+        ],
+        "disposition": "actionable",
+        "evidence_ref": {
+          "first_report_sha256": "72320627a3cd73bf48a923a6ffab289794b83d849669a7dd0a2090f1f3796ec1",
+          "first_run_id": "lint-50856-1791317175129674000"
+        },
+        "history": {
+          "attempt_count": 0,
+          "awaiting_verification": false,
+          "budget": 2,
+          "no_progress_count": 0,
+          "open_attempt_id": null,
+          "recent": []
+        },
+        "kind": "blocker",
+        "reason_code": "request_cancelled",
+        "recheck_argv": [
+          "codeguard",
+          "lint",
+          "python",
+          "."
+        ],
+        "schema_version": "0.1.0",
+        "scope": ".",
+        "step": "检查原生工具、配置和输入稳定性，恢复完整检查",
+        "task_id": "CG-B-af2f55fe475e8b52448d68ae87164a7b"
+      },
+      "report_type": "repair_brief_preview",
+      "schema_version": "0.1.0"
+    },
+    "operation": "lint",
+    "repair_brief_reason": null,
+    "repair_brief_status": "available",
+    "report_type": "python_lint_feedback",
+    "rulepack_approval": "unverified",
+    "run_id": "lint-50856-1791317175129674000",
+    "schema_version": "0.12.0",
+    "scope": "local_native_scan_only",
+    "tool_approval": "unverified",
+    "workspace_binding": "bound",
+    "workspace_id": "ws-ea80abd590be0d8a94432f4541437940"
+  },
+  "next": {
+    "authority": "local_unverified",
+    "command_status": "complete",
+    "delivery_decision": "not_evaluated",
+    "disposition": "actionable",
+    "exit_code": 0,
+    "next_actions": [],
+    "operation": "next",
+    "reason": "local_task_selected",
+    "repair_brief": {
+      "action_id": "restore-checker-environment",
+      "affected_paths": [
+        "app.py"
+      ],
+      "authority": "local_unverified",
+      "build_root": ".",
+      "checker_id": "python.ruff",
+      "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+      "constraints": [
+        "先恢复检查完整性",
+        "不得关闭检查器或修改无关源码"
+      ],
+      "disposition": "actionable",
+      "evidence_ref": {
+        "first_report_sha256": "72320627a3cd73bf48a923a6ffab289794b83d849669a7dd0a2090f1f3796ec1",
+        "first_run_id": "lint-50856-1791317175129674000"
+      },
+      "history": {
+        "attempt_count": 0,
+        "awaiting_verification": false,
+        "budget": 2,
+        "no_progress_count": 0,
+        "open_attempt_id": null,
+        "recent": []
+      },
+      "kind": "blocker",
+      "reason_code": "request_cancelled",
+      "recheck_argv": [
+        "codeguard",
+        "lint",
+        "python",
+        "."
+      ],
+      "schema_version": "0.1.0",
+      "scope": ".",
+      "step": "检查原生工具、配置和输入稳定性，恢复完整检查",
+      "task_id": "CG-B-af2f55fe475e8b52448d68ae87164a7b"
+    },
+    "report_type": "repair_brief_preview",
+    "schema_version": "0.1.0"
+  },
+  "next_actions": [
+    "核对原项目 Ruff 文档规则和配置；不会隐式启用 preview 或改写规则选择。",
+    "按稳定任务使用 task verify 原工具复检；零诊断不证明文档规则完整启用、详细内容准确或任务已关闭。"
+  ],
+  "operation": "comments",
+  "reason": "native_documentation_coverage_unverified",
+  "report_type": "python_comments_feedback",
+  "schema_version": "0.2.0"
+}

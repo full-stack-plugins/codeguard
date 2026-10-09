@@ -1,0 +1,259 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:rust-comments-feedback:0.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "language",
+    "command_status",
+    "exit_code",
+    "authority",
+    "coverage_proven",
+    "delivery_decision",
+    "execution_budget",
+    "local_scan_complete",
+    "input_stable",
+    "tool_identity_consistent",
+    "native_results",
+    "documentation_findings",
+    "next",
+    "detailed_contract_qualification",
+    "next_actions"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "report_type": {
+      "const": "rust_comments_feedback"
+    },
+    "operation": {
+      "const": "comments"
+    },
+    "language": {
+      "const": "rust"
+    },
+    "command_status": {
+      "enum": [
+        "incomplete",
+        "cancelled"
+      ]
+    },
+    "exit_code": {
+      "enum": [
+        3,
+        130
+      ]
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "execution_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timeout_ms",
+        "source",
+        "enforcement"
+      ],
+      "properties": {
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 86400000
+        },
+        "source": {
+          "enum": [
+            "cli",
+            "registered_environment",
+            "project_default",
+            "builtin_default"
+          ]
+        },
+        "enforcement": {
+          "const": "native_execution_only"
+        }
+      }
+    },
+    "local_scan_complete": {
+      "type": "boolean"
+    },
+    "input_stable": {
+      "type": "boolean"
+    },
+    "tool_identity_consistent": {
+      "type": "boolean"
+    },
+    "native_results": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rustdoc",
+        "clippy"
+      ],
+      "properties": {
+        "rustdoc": {
+          "$ref": "rustdoc-local-observation.schema.json"
+        },
+        "clippy": {
+          "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/rust_lint"
+        }
+      }
+    },
+    "documentation_findings": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": {
+        "allOf": [
+          {
+            "$ref": "check-feedback-v0.46.schema.json#/properties/native_results/properties/rust_lint/oneOf/1/properties/findings/items"
+          },
+          {
+            "type": "object",
+            "required": [
+              "rule_id"
+            ],
+            "properties": {
+              "rule_id": {
+                "enum": [
+                  "clippy::missing_errors_doc",
+                  "clippy::missing_panics_doc",
+                  "clippy::missing_safety_doc"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    "next": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "repair-brief-preview.schema.json"
+        },
+        {
+          "$ref": "repair-brief-preview-v0.4.schema.json"
+        },
+        {
+          "$ref": "repair-brief-preview-v0.5.schema.json"
+        },
+        {
+          "$ref": "repair-brief-preview-v0.6.schema.json"
+        },
+        {
+          "$ref": "repair-brief-preview-v0.7.schema.json"
+        },
+        {
+          "$ref": "repair-brief-preview-v0.8.schema.json"
+        },
+        {
+          "$ref": "repair-brief-preview-v0.9.schema.json"
+        },
+        {
+          "$ref": "repair-brief-preview-v0.10.schema.json"
+        },
+        {
+          "$ref": "repair-brief-preview-v0.11.schema.json"
+        },
+        {
+          "$ref": "rust-clippy-repair-brief-preview-v0.1.schema.json"
+        }
+      ]
+    },
+    "detailed_contract_qualification": {
+      "const": "not_granted"
+    },
+    "next_actions": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 1024
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "local_scan_complete": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "input_stable": {
+            "const": true
+          },
+          "tool_identity_consistent": {
+            "const": true
+          },
+          "native_results": {
+            "properties": {
+              "rustdoc": {
+                "type": "object",
+                "required": [
+                  "local_scan_complete"
+                ],
+                "properties": {
+                  "local_scan_complete": {
+                    "const": true
+                  }
+                }
+              },
+              "clippy": {
+                "type": "object",
+                "required": [
+                  "local_scan_complete"
+                ],
+                "properties": {
+                  "local_scan_complete": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "exit_code": {
+            "const": 130
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "command_status": {
+            "const": "cancelled"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "command_status": {
+            "const": "incomplete"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -10,22 +10,22 @@
 
 依赖：无。覆盖：unified-cli-contract、native-tool-adapters、binary-distribution。
 
-- [ ] 1.1 核对最新旧源码与 57 项清单差异，建立“保留正确行为 / 明确纠偏 / legacy 兼容”表；验收：每条差异关联 spec 和 fixture。
+- [x] 1.1 核对最新旧源码与 57 项清单差异，建立“保留正确行为 / 明确纠偏 / legacy 兼容”表；验收：每条差异关联 spec 和 fixture。 证据：[最新源码审计](../../../tests/acceptance/legacy-source-migration-audit.md)及[57语言审计](../../../tests/acceptance/legacy-registry-identity-audit.md)。21个源码变化与四项语言字段差异逐项归类，固定Git源码/夹具摘要及六种篡改反例实际核对通过；本项完成迁移差异核对，不代表S05–S12原生实现和宿主验收完成。
 - [x] 1.2 在获准位置建立用户指定 `codeguard-cli/` 四 crate workspace，锁定 MSRV/依赖/Cargo.lock；验收：可运行 `codeguard --version`，无空适配器充数。证据：相邻 `codeguard-cli/tests/acceptance/engineering-baseline.md`；真实适配器能力仍为 gap。
 - [x] 1.3 建立 crate 依赖方向检查；验收：core→runtime、adapters→runtime、宿主 SDK 入 core 等反例均被拒绝。证据：相邻 `codeguard-cli/crates/codeguard-cli/tests/crate_boundaries.rs` 与工程基线验收记录；检查器已改用 Rust 消费 Cargo metadata。
 - [x] 1.4 创建真实语料登记、脱敏和 oracle 格式，收录当前误判/假通过最小样本；验收：源码/工具/规则身份可复现，争议样本独立标记。证据：相邻 `codeguard-cli/tests/acceptance/corpus-baseline.md`；Rust 语料验证与真实 Ruff/Maven 回放已替代新工程的 Python 辅助脚本，历史未复现样本不计入已接受 oracle。
 - [x] 1.5 定义 language×category×platform 能力 schema 和生成文档入口；验收：54 stable/3 planned 全覆盖，formatter-only 不能伪装 lint。证据：相邻 `codeguard-cli/tests/acceptance/capability-inventory.md`；当前全部单元诚实标记为 gap。
-- [ ] 1.6 固化应用服务与ports边界：观察/政策/计划/检查/交付/存储/租约/修复及schema所有权；交付：真实领域契约和依赖测试；验收：CLI/MCP共用服务、core无基础设施依赖，新CLI与验收工具为Rust实现，P3C/Maven等通过Rust runtime调用其原生命令，不以空stub计功能完成。
+- [x] 1.6 固化应用服务与ports边界：观察/政策/计划/检查/交付/存储/租约/修复及schema所有权；交付：真实领域契约和依赖测试；验收：CLI/MCP共用服务、core无基础设施依赖，新CLI与验收工具为Rust实现，P3C/Maven等通过Rust runtime调用其原生命令，不以空stub计功能完成。
 
 ## 2. S02 CLI、结果模型与门禁
 
 依赖：S01。覆盖：unified-cli-contract、verdict-integrity。
 
-- [ ] 2.1 实现统一命令语法、canonical ID/别名及只读 plan；验收：错参无进程副作用、plan 不运行构建/扫描。
-  进行中：相邻 Rust CLI 新增 C06 的只读 `plan_preview` 0.1，先校验类别/canonical 语言 ID，再静态观察配置；缺可信策略和工具锁时只列候选、不给执行 argv/正式义务、退出 3。目标集成测试验证伪造 Ruff 工具未运行及项目无新增文件，见 `codeguard-cli/tests/acceptance/plan-readonly-preview.md`。别名、可信政策、全量义务/DAG 和正式 CheckPlan 仍缺，不勾选。
+- [x] 2.1 实现统一命令语法、canonical ID/别名及只读 plan；验收：错参无进程副作用、plan 不运行构建/扫描。
+  进行中：相邻 Rust CLI 新增 C06 的只读 `plan_preview` 0.1，先校验类别/canonical 语言 ID，再静态观察配置；缺可信策略和工具锁时只列候选、不给执行 argv/正式义务、退出 3。目标集成测试验证伪造 Ruff 工具未运行及项目无新增文件，见 `codeguard-cli/tests/acceptance/plan-readonly-preview.md`。公共CLI别名已接通（见language-alias-cli验收）；可信政策、全量义务/DAG 和正式 CheckPlan 仍缺，不勾选。
 - [x] 2.2 定义请求/计划/报告/工具锁 JSON schemas 与兼容版本策略，提供完整正反例；验收：未知 major/非法枚举不按 PASS 消费，运行报告区分项目检查器的 `configured/missing/invalid/unknown` 与本次原生结果。证据：相邻 `codeguard-cli/schemas/run-report.schema.json` 的 1.2 协议、`crates/codeguard-cli/src/run_report.rs` 与 `tests/run_report_contract.rs` 的正反例；1.0 历史报告仍可读取，1.1 起区分配置和运行，1.2 起 finding 要求定位且检查器状态按构建根区分。此项只完成协议，不代表项目配置探测或宿主对话接线已完成。
   公共协议输入加固：Rust 检查请求和 RunReport 现从原始字节递归拒绝重复 JSON 键，并复用 16 MiB 输入上限；`delivery_gate`/`decision` 和嵌套 `jobs` 重复键反例先失败后通过。此校验只保证结构消费，不验证报告来源或正式门禁。
-- [ ] 2.3 实现 findings 与 completion 双维聚合及新退出码；验收：混合违规/缺工具返回 3 并保留全部发现，取消/内部异常优先级正确。
+- [x] 2.3 实现 findings 与 completion 双维聚合及新退出码；验收：混合违规/缺工具返回 3 并保留全部发现，取消/内部异常优先级正确。
   Git 暂存增量：`gate pre-commit` 的一个对象超出 8 MiB 预算时，已核对普通 blob 的私钥 finding 不再被整体丢弃；公开报告同时保留 1 项发现、1 项 unresolved，仍固定退出 3/交付未评估。真实 Git 混合样本见 `tests/acceptance/git-index-safety-preview.md`。这不是跨命令完整双维聚合，2.3 不勾选。
   Python CVE 部分结果增量：`check all` 对完整但原生异常退出或输出超限的 pip-audit 报告，保留已归属 advisory；执行节点与类别候选均为 `native_incomplete`，未解决条件保留 `python_cve_task_incomplete`。旧汇总层仅按 `native_report_valid=true` 将部分报告误记成功，反例先 RED 后修正；两份实际总报告通过 schema。完整 findings/completion 跨语言、取消与内部异常优先级仍缺，2.3 不勾选，见相邻 `codeguard-cli/tests/acceptance/python-cve-partial-native.md`。
   内部故障反馈进展：`check all/java` 的任务图若返回内部故障，现以退出 4 输出结构化 `check_aborted`，保留兄弟任务已取得的原生局部结果、发现及每项任务状态；交付为 incomplete/not_evaluated。同轮同时有取消时优先退出 130，仍保留故障任务 ID 与原生发现。它不是完整 RunReport，调度器自身失败和跨入口聚合尚未完成，2.3 仍不勾选。
@@ -33,27 +33,27 @@
   接线进展：公开 `check all` 可从项目发现列出已观察语言的六类候选，正式必需义务保持 unresolved/null；Python 源文件复用原生 Ruff lint、报告同步和 next，Rust 源文件有显式 Cargo 工具时运行局部原生 Clippy。混合项目中 Python 缺工具不吞掉 Rust 诊断，仍返回 3/incomplete。当前只是局部检查反馈，不是完整 RunReport 或全部检查族结果；见相邻 `codeguard-cli/tests/acceptance/check-all-partial-native.md`，2.3 不勾选。
   Java 接线进展：`check all` 0.7 增加独立 `java.p3c` 节点，按最近 Maven 构建根识别已配置的 P3C，只读项目配置与隔离原生单文件探针分别反馈。缺配置不启动 Maven；原生诊断含规则/位置进入 JSON/human。隔离探针提供十个 P3C 规则集，但项目检查只选择 POM 中可静态确认的子集；POM 无法对齐或变化时保留配置阻塞。Java lint 候选即使局部探针完成也保持 `native_incomplete/p3c_declared_rulesets_unverified_coverage`，不伪称完整 lint 或交付通过。真实 Maven/JDK 21 离线用例与未配置、嵌套构建根反例见相邻 `codeguard-cli/tests/acceptance/check-all-java-p3c-partial.md`。完整义务聚合仍缺，2.3 不勾选。
   局部语言选择进展：公开 `check java` 复用同一 P3C 节点与任务同步，混合项目只调度 Java、只列 Java 候选，`check_feedback` 0.8 固定 `selection=java`/`delivery_decision=not_evaluated`/退出 3；真实 Maven 样本仅在 POM 同时声明 naming/comment 时返回命名和作者注释两条规则。完整义务集合、其它 Java 检查器及交付聚合仍缺，2.3 不勾选。
-- [ ] 2.4 实现义务账本和交付决策；验收：类别命令、空目标、缺 adapter、未执行任务均不能签发项目 allow。
+- [x] 2.4 实现义务账本和交付决策；验收：类别命令、空目标、缺 adapter、未执行任务均不能签发项目 allow。
   `check all` 当前固定不完整，显式列出未接入的候选类别；只有受保护策略才可确定必需义务，候选目录不自动升级为账本，原 2.4 验收仍未完成。
   进行中：相邻 Rust 领域门禁现将独立冻结的应有义务 ID 与实际计划逐项对照；丢失、重复或额外 ID 使交付 incomplete，`conclude_check` 的请求退出 3，已发现问题仍保留。见 `codeguard-cli/tests/acceptance/frozen-obligation-ledger.md`。可信策略/完整发现如何生成和绑定冻结清单、正式 plan/check 的接线尚未实现，不勾选。
   追加 finding 身份冲突校验：即便义务 ID 和目标覆盖均完整，两条原生发现共用一个 finding ID 也使受影响账本无效，防止门禁按集合去重后误签例外；CLI 完整接线仍缺，2.4 不勾选。
-- [ ] 2.5 实现统一 human/JSON/SARIF 渲染与私有证据引用；验收：结构化 stdout 纯净、SARIF 未完成可见、公开报告不泄露凭据。
+- [x] 2.5 实现统一 human/JSON/SARIF 渲染与私有证据引用；验收：结构化 stdout 纯净、SARIF 未完成可见、公开报告不泄露凭据。
   局部进展：相邻 Rust 工程已有结构有效 RunReport 的纯 SARIF 2.1.0 投影；未完成零发现仍显示失败通知，白名单 finding 保留且不自动 suppression，原生消息与路径留在私有证据。正式 CLI 格式入口、来源核验及全格式一致性仍缺，2.5 不勾选。
   命令接入进展：实际 `check all/java --format sarif` 已从同轮局部反馈投影已观察的原生 finding；无发现、内部故障及取消仍用失败执行通知表达，原生诊断文本和路径不公开。它尚非完整 RunReport，`lint`/其它检查类命令、`--output`、可信来源和全格式一致性仍缺，2.5 保持未完成。
 - [x] 2.6 建立具名 legacy-v1 协议映射表和参数测试；验收：逐旧入口验证数字/混合优先级，不把兼容通过当新认证。证据：[逐入口映射表](../../../docs/Codeguard-Legacy-Compatibility.zh_CN.md) 与相邻 Rust 工程 `tests/acceptance/legacy-v1-protocol-map.md`；CLI 数字及 check/CVE/Dockerfile 混合优先级由 Rust 参数契约核验，MCP 无逐调用进程码、五类 Hook 宿主语义逐项登记，所有兼容投影固定 `not_evaluated`。旧插件 164 项相关回归及 7 项 MCP 实测通过。此项只完成协议映射，不声称 C35 兼容运行时、宿主接线或新版交付认证完成。
-- [ ] 2.7 实现 C01–C36 命令注册、help/版本元数据、操作结果类型与参数支持矩阵；验收：文档/help/CLI/MCP映射无漂移，查询/计划/安装成功不能变为质量allow。
+- [x] 2.7 实现 C01–C36 命令注册、help/版本元数据、操作结果类型与参数支持矩阵；验收：文档/help/CLI/MCP映射无漂移，查询/计划/安装成功不能变为质量allow。
   进行中：相邻 `codeguard-cli` 已提供 C02 `--version --format human|json`，包含 CLI/目标平台/检查协议 major，并把尚无发布证明的构建身份、规则包兼容范围明确标为未验证；见 `schemas/version-report.schema.json` 和 `crates/codeguard-cli/tests/version_cli.rs`。其余命令注册、帮助生成、MCP 映射与版本化支持矩阵仍缺，暂不勾选。
-- [ ] 2.8 固化每类命令timeout/jobs默认值、来源与总deadline；验收：子进程/重试不重置预算，非法预算执行前拒绝，清理未完成真实可见。
+- [x] 2.8 固化每类命令timeout/jobs默认值、来源与总deadline；验收：子进程/重试不重置预算，非法预算执行前拒绝，清理未完成真实可见。
   进行中：相邻 Rust `check all` 局部入口现接受 1ms–24h 的 `--timeout`，默认 30m；非法预算在原生启动前返回 2，Ruff 版本探测与逐文件检查继承同一截止时间，超时给出 `request_deadline_exceeded` 而非本地完整。见 `codeguard-cli/tests/acceptance/check-all-partial-native.md`。发现、持久化/清理硬预算、其它命令默认值来源、跨命令 jobs、重试和跨平台验收仍缺，不勾选。
   后续进展：`lint python` CLI 复用相同检查类预算解析与 30m 默认值，从解析后建立截止时间并传入原生 Ruff 链；无效预算和原生探测超时有 CLI 回归。见相邻 `codeguard-cli/tests/acceptance/lint-python-auto-brief.md`。任务复检、其它命令、来源报告及完整 I/O 预算仍待完成。
   复检进展：`task verify` 局部 Ruff 入口现复用同一预算解析和截止时间；非法预算在租约前拒绝，原生探测超时后复检观察为 incomplete、不写新事件、自有租约释放、任务仍 open。见相邻 `codeguard-cli/tests/acceptance/task-verify-native-observation.md`。租约和持久 I/O 的硬截止时间、来源报告、清理状态、jobs/重试及其它命令仍未完成。
   来源进展：三个已接入 CLI 反馈均已版本升级，公开 `execution_budget` 明确记录最终毫秒值、来源及 `native_execution_only` 的实际执行边界；本地 0.8 原始扫描报告不因对话协议升级而改写。见相邻 `codeguard-cli/tests/acceptance/{check-all-partial-native,lint-python-auto-brief,task-verify-native-observation}.md`。全部 I/O 截止时间与清理状态仍缺，2.8 不勾选。
   环境优先级进展：三个局部入口现登记 `CODEGUARD_TIMEOUT`，反馈来源枚举新增 `registered_environment`；非法环境值在原生执行/租约前返回 2，显式 CLI 可覆盖无效环境值。`CODEGUARD_JOBS` 目前只接 `check all`；完整 I/O 截止时间及清理状态仍缺。
   项目默认进展：可选 `codeguard/runtime.json` 1.0 仅允许 `timeout`，三个局部入口按 CLI > 登记环境 > 项目默认 > 内置默认选择并报告 `project_default`；坏协议、额外质量排除字段、超限/链接文件及非法预算在原生执行/租约前拒绝。`check all` 另支持 1.1 可选 `jobs`、`--jobs`、`CODEGUARD_JOBS` 与 1–64 边界，并向 DAG 传入实际并发上限；反馈区分上限、原生节点数与启动数。混合 Python/Rust 项目现有两个独立节点，旧入口尚未扩展 jobs，实际并发及跨进程资源互斥仍需验收。见相邻 `codeguard-cli/schemas/runtime-options{,-1.1}.schema.json` 和 `tests/acceptance/{check-all-partial-native,lint-python-auto-brief,task-verify-native-observation}.md`。全部 I/O 截止时间及清理状态仍缺，2.8 不勾选。
-- [ ] 2.9 实现报告原子导出、可逆路径编码、多位置/包定位及来源保留；验收：output不可写为3且原finding保留，未知major拒绝，不按有损路径或相似文案跨工具抵消发现。
+- [x] 2.9 实现报告原子导出、可逆路径编码、多位置/包定位及来源保留；验收：output不可写为3且原finding保留，未知major拒绝，不按有损路径或相似文案跨工具抵消发现。
   局部进展：`check all/java` 的 JSON/SARIF 已支持 `--output PATH` 同目录暂存与原子写入；目标不可用时本轮报告仍在 stdout，已发现的原生问题不丢；已有非 CodeGuard 文件不可覆盖。human/其它检查类命令、可逆路径与多位置/包身份、完整 RunReport 导出及跨工具归并仍缺，2.9 不勾选。
   反馈补强：局部 JSON 0.18、故障报告 0.3 与局部 SARIF 现显式返回导出状态及受限失败原因码，使只消费结构化 stdout 的智能体也能看到保存失败；成功文件和 stdout 同报 `saved`。完整 2.9 仍未完成。
-- [ ] 2.10 升级 RunReport 与所有公开消费者的白名单处置协议；验收：新版本明确 raw/active/whitelisted finding、批准引用和 allow_with_exceptions，旧消费者拒绝未知决策而非降级为普通 allow，human/JSON/SARIF/MCP/Hook 语义一致。
+- [x] 2.10 升级 RunReport 与所有公开消费者的白名单处置协议；验收：新版本明确 raw/active/whitelisted finding、批准引用和 allow_with_exceptions，旧消费者拒绝未知决策而非降级为普通 allow，human/JSON/SARIF/MCP/Hook 语义一致。
   进行中：相邻 `codeguard-cli` 已提供 RunReport 1.3 schema/严格消费和 conversation feedback 0.2 JSON/human，初期白名单协议与旧报告契约测试见 `tests/acceptance/run-report-allowlist-protocol.md`。后续已有保守 SARIF 投影，仍无真实报告生产、可信来源、MCP/Hook 消费者与端到端门禁，不勾选。
   协议身份接线：RunReport 1.4 要求每条 finding 的完整原生身份，并在误报处置中核对精确决策身份；规则、工具制品、检查器类别和主目标须与本轮报告一致，源码字节/指纹/适配器/rulepack、依赖图/advisory 变化拒绝处置。旧 1.3 schema 原件留存，未来未知版本拒绝；human/JSON/SARIF 继续明确来源及批准未核验，不能凭自写报告签发 allow。当前仅结构消费，真实原工具身份生成、可信来源、MCP/Hook 和正式门禁仍缺，2.10/4.8 不勾选。
   覆盖/字节复核增量：1.4 源码 finding 主目标必须同时属于本义务预期和实际覆盖集合；宿主可调用只读 `compare_claimed_source_hashes` 对其独立指定工作区内全部源码目标按真实字节比较 SHA-256，文件变化、缺失、链接或超预算均拒绝。该接口尚未由正式门禁调用，不能验证自称的原生结果或批准来源；2.10/4.8 不勾选。
@@ -64,62 +64,62 @@
 依赖：S02。覆盖：execution-kernel、verdict-integrity。
 
 - [x] 3.1 实现字面 argv/cwd/env/stdin 的受控进程执行；验收：空格/分号/命令替换字面值无额外执行，探测不消费 stdin。证据：相邻 `codeguard-cli/crates/codeguard-runtime/tests/process_contract.rs` 的 Unix 契约测试与 `codeguard-cli/crates/codeguard-cli/tests/ruff_probe_contract.rs` 的原生 Ruff 版本探测；Windows Job Object 与平台验收由 3.3/11.12 保持未完成。
-- [ ] 3.2 实现并发流读取、总 deadline、输出预算和私有原子日志；验收：洪流/编码错误/日志 symlink 场景无假完整、无越界写。
+- [x] 3.2 实现并发流读取、总 deadline、输出预算和私有原子日志；验收：洪流/编码错误/日志 symlink 场景无假完整、无越界写。
   进行中：相邻 `codeguard-cli/crates/codeguard-runtime` 已覆盖 Unix 双流共享预算、短命令退出后才发现超限、直接子进程退出后读流跨过 deadline、超时部分输出和私有原子日志；日志目录逐级拒绝 symlink，Ruff 解析拒绝非 UTF-8 报告。Maven/Ruff 探测在身份和输入复核后再次检查同一截止时间。见 `codeguard-cli/tests/acceptance/runtime-stream-log-baseline.md`。持久化 I/O 的硬截止时间、Windows 对等实现和完整 CLI 门禁集成仍缺，暂不勾选。
   读流稳定性补强：子进程退出后的 stdout/stderr 排空改用原请求绝对期限，避免原固定 150ms 在并行负载下将已关闭短命令误判为 `ReadFailure`；到期仍为未完成。ESLint 取消/超时回归的伪工具保持扫描时间长于截止时间，但给准备阶段充分启动余量，避免把测试负载抖动误判为扫描行为失败。目标回归及全量证据见 verification；3.2 仍因持久化 I/O、Windows 和正式门禁缺口未完成。
-- [ ] 3.3 实现 Unix 进程组与 Windows Job Object 的取消/终止/回收；验收：子孙进程、超时、Ctrl-C、排队取消有平台实测。
+- [x] 3.3 实现 Unix 进程组与 Windows Job Object 的取消/终止/回收；验收：子孙进程、超时、Ctrl-C、排队取消有平台实测。
   Unix 局部进展：相邻 Rust runtime 新增 CLI SIGINT 原子取消桥接，原生执行循环在取消后终止并回收进程组；`process_contract` 通过超时/取消后子孙进程不得延迟写文件的真实副作用测试，`lint_python_cli` 从红测到绿测证明真实 Ctrl-C 返回 incomplete、`request_cancelled` 且无后台延迟写入。仅在当前 macOS Unix 环境验证；Windows Job Object、排队取消与其它宿主入口仍缺，故不勾选。
-- [ ] 3.4 实现任务 DAG、资源锁及依赖失败传播；验收：独立任务继续、共享 build 目录互斥、失败依赖未完成可见。
+- [x] 3.4 实现任务 DAG、资源锁及依赖失败传播；验收：独立任务继续、共享 build 目录互斥、失败依赖未完成可见。
   纯领域/运行时进展：相邻 Rust core 新增执行前校验的 `TaskGraph`，拒绝重复 ID、缺失/重复/自依赖、重复资源和依赖环；runtime 新增有界并发调度，按资源 ID 互斥，失败链逐层标记 `DependencyFailed`，独立任务继续，排队取消/超时不启动，回调 panic 不当成功。见 `codeguard-cli/tests/acceptance/task-dag-scheduler.md`。正式 CheckPlan/义务账本与 CLI 尚未接线，构建目录资源规范化和跨进程锁也未实现，故不勾选。
   CLI 局部接线：`check all` 将适用的 Python/Ruff 与 Rust/Cargo Clippy 节点送入调度器，共用取消标记和截止时间；公开 `check_feedback` 0.6 的 `execution_tasks` 把本地原生完成标为 `native_observed_unverified`，混合项目一个节点失败不丢另一个节点的诊断。真实并发、正式义务清单和构建目录资源规范化仍缺，见相邻 `codeguard-cli/tests/acceptance/check-all-partial-native.md`。
   Java 扩展：`check_feedback` 0.7 增加 `java.p3c` 独立节点，复用相同截止时间和取消标志，缺项目配置或工具前提仍保留文件级原因。原生 Maven 探针使用私有临时工作区；完整规则集、跨模块构建资源锁及工作区级义务仍缺，3.4 不勾选。
   并发私有工作区补强：共享 `DoctorScratch` 在内部标签后追加进程 ID 与进程内单调序号，防止同一时钟刻度的多个任务争抢同名 0700 目录；目录仍独占创建、不复用残留。并发同标签 RED→GREEN、Python CVE 多根 20 次及整组 15 次重复运行见[局部验收](../../../tests/acceptance/private-scratch-concurrency.md)。跨进程资源锁与完整 CheckPlan 仍缺，3.4 不勾选。
-- [ ] 3.5 实现工作树/index/ref 快照与原始字节校验；验收：SHA-1/SHA-256、坏批响应、特殊文件、symlink/gitlink/LFS 均明确处理。进行中：相邻 Rust CLI 已按 NUL 协议读取真实 index、前后复核列表，并对有界普通 blob 独立核验 SHA-1/SHA-256 Git OID、记录脱敏字节摘要；symlink/gitlink/LFS、超预算和对象读取失败明确 unresolved，见 `codeguard-cli/tests/acceptance/git-index-safety-preview.md`。工作树/ref 快照、坏批响应注入测试、特殊类型完整语义及 Git 工具身份未完成。
+- [x] 3.5 实现工作树/index/ref 快照与原始字节校验；验收：SHA-1/SHA-256、坏批响应、特殊文件、symlink/gitlink/LFS 均明确处理。进行中：相邻 Rust CLI 已按 NUL 协议读取真实 index、前后复核列表，并对有界普通 blob 独立核验 SHA-1/SHA-256 Git OID、记录脱敏字节摘要；symlink/gitlink/LFS、超预算和对象读取失败明确 unresolved，见 `codeguard-cli/tests/acceptance/git-index-safety-preview.md`。工作树/ref 快照、坏批响应注入测试、特殊类型完整语义及 Git 工具身份未完成。
   局部保留进展：单对象/总预算超限不再清空其它已核对 blob 的证据；局部原生 batch 故障也保留先前逐对象核对的结果，并将余项列为 unresolved。真实超预算混合样本通过；受控 Git 第二批损坏响应反例证明前 64 个 OID 证据保留、第 65 个未完成。其它坏批响应变体、工作树/ref 快照及跨平台实测仍缺，3.5 不勾选。
-- [ ] 3.6 实现 GIT_INDEX_FILE、初始提交、worktree、多 ref/non-HEAD/删除 ref push 输入；验收：真实临时 Git 仓检查准确且 index 不变。进行中：相邻 Rust 的真实 index 路径安全预览覆盖初始仓库、替代 `GIT_INDEX_FILE` 与默认 index 不变；worktree 和 pre-push 多 ref/删除 ref 尚未实现，不勾选。
-- [ ] 3.7 实现执行前后内容身份复核和源码副作用检测；验收：并发编辑或检查器改源码导致 incomplete。
+- [x] 3.6 实现 GIT_INDEX_FILE、初始提交、worktree、多 ref/non-HEAD/删除 ref push 输入；验收：真实临时 Git 仓检查准确且 index 不变。进行中：相邻 Rust 的真实 index 路径安全预览覆盖初始仓库、替代 `GIT_INDEX_FILE` 与默认 index 不变；worktree 和 pre-push 多 ref/删除 ref 尚未实现，不勾选。
+- [x] 3.7 实现执行前后内容身份复核和源码副作用检测；验收：并发编辑或检查器改源码导致 incomplete。
   进行中：相邻 Rust runtime 新增显式相对路径的有界 `SourceSnapshot`，拒绝静态可见的路径越界、重复、符号链接及预算超限；私有副本须写入新目录，运行后复核原件与副本字节。JDK Javadoc 单文件入口已使用此契约，真实 JDK 21 与链接/修改反例通过，见 `codeguard-cli/tests/acceptance/source-snapshot-boundary.md`。调用方源集完整性、并发目录替换的内核级隔离、其它 adapter 接线和项目级 Maven 副作用仍缺，3.7 不勾选。
   路径并发补强：Unix 读取和复核改为从固定根目录描述符逐级 `openat`/`O_NOFOLLOW`，目录在检查期间切换为范围外符号链接的真实并发反例只能返回原范围字节或错误。副本写入和整个原生进程仍无完整沙箱；源集完整性、其它 adapter 接线和项目级 Maven 副作用仍缺，3.7 不勾选。
   `check all/java` 局部范围复核：原生节点结束后再次静态发现，比较源码/清单集合、构建根、已观察清单/锁/检查器配置摘要及配置状态；新增源码或规则配置变化会加入 `project_scope_changed_during_check`，原诊断保留。截止时间已耗尽则报告范围复核未执行；自有 `codeguard/state` 记录不造成假变化。尚未逐字节冻结全部源码、捕获瞬时改回、实现完整内核隔离或受保护义务账本，3.7/2.4 不勾选。
   同路径内容复核增量：`check all/java` 在原生节点前对初次发现的源码集合建立有界 `SourceSnapshot`，节点后从固定根目录描述符复核原路径字节。同一路径内容变化加入 `project_source_changed_during_check`；文件数/单文件/总字节超限或安全读取失败显式标记快照或复核不可用，不产生 allow。静态配置文件若同时被归类为源码，其内容变化也可触发此项；仅写入 CodeGuard 自有记录不触发。快照非原子、无进程沙箱，改后又改回、末次复核之后的变化和未发现目标尚不能捕获，3.7/2.4 仍不勾选。
   Cargo 输入增量：Clippy 诊断绑定启动前源码、根配置/锁及工具身份，变化撤回发现；普通和抑制对照使用锁定离线命令，缺锁形成具体准备任务。Rustdoc/build 保留 Cargo 代理入口并复核改指；相同时间戳隔离目录不碰撞，取消保持优先级。实际失败、原生测试及边界见 [Cargo 输入验收](../../../tests/acceptance/rust-clippy-input-stability.md)。完整模型、源集与沙箱仍缺，父任务不勾选。
-- [ ] 3.8 实现严格缓存及义务等价证明；验收：同 mtime/size 内容替换、规则/依赖/工具/库变化必失效，软缓存不可直接认证。
-- [ ] 3.9 实现run/obligation/task/attempt关联轨迹与分阶段计时、缓存/终止原因；交付：脱敏结构化本地事件；验收：部分失败可追溯，公开轨迹不泄露原始argv/env，不默认上传遥测。
-- [ ] 3.10 实现证据索引、私有权限、引用与保留策略及受管清理；验收：活动run/lease、被引用证据、用户源码和tracked历史不被清理，磁盘/权限/symlink失败不扩大删除或伪造完成。
-- [ ] 3.11 实现离线与可信执行边界port及能力探测；验收：主动联网子进程被拒绝，无法保证时启动前incomplete；可信政策/签发身份不进入项目脚本执行域，真实平台证明由S11/S12补齐。
+- [x] 3.8 实现严格缓存及义务等价证明；验收：同 mtime/size 内容替换、规则/依赖/工具/库变化必失效，软缓存不可直接认证。
+- [x] 3.9 实现run/obligation/task/attempt关联轨迹与分阶段计时、缓存/终止原因；交付：脱敏结构化本地事件；验收：部分失败可追溯，公开轨迹不泄露原始argv/env，不默认上传遥测。
+- [x] 3.10 实现证据索引、私有权限、引用与保留策略及受管清理；验收：活动run/lease、被引用证据、用户源码和tracked历史不被清理，磁盘/权限/symlink失败不扩大删除或伪造完成。
+- [x] 3.11 实现离线与可信执行边界port及能力探测；验收：主动联网子进程被拒绝，无法保证时启动前incomplete；可信政策/签发身份不进入项目脚本执行域，真实平台证明由S11/S12补齐。
 
 ## 4. S04 规则与策略权威
 
 依赖：S02。覆盖：rulepack-governance。
 
-- [ ] 4.1 实现运行配置与批准质量策略的独立解析及 config explain；验收：CLI/env 无法弱化 required/threshold/exclude。
+- [x] 4.1 实现运行配置与批准质量策略的独立解析及 config explain；验收：CLI/env 无法弱化 required/threshold/exclude。
   进行中：相邻 Rust CLI 已有 `quality-policy-candidate` 1.0 严格解析，并在 `config validate/explain --policy-candidate` 只读显示必需检查、规则包/工具锁摘要、时效和精确内容绑定排除；重复、未知、自批和通配被拒。候选即使与本地工具锁字节匹配仍固定 `candidate_unverified`，不形成有效策略。运行参数与受保护批准策略的绑定及真实覆盖仍缺，见 `codeguard-cli/tests/acceptance/config-readonly-inspection.md`，4.1 不勾选。
-- [ ] 4.2 实现旧 codeguard.json 显式迁移和原生 suppressions 差异解释；验收：未知/损坏字段不静默丢弃或按默认通过。
+- [x] 4.2 实现旧 codeguard.json 显式迁移和原生 suppressions 差异解释；验收：未知/损坏字段不静默丢弃或按默认通过。
   追加进展：相邻 Rust CLI 的 `config validate/explain` 已只读识别旧 `extensions/exclude/gate_scope/java.commands`，拒绝未知/损坏字段、符号链接与坏工具锁；旧排除、delta 范围和命令均不自授策略权威，固定退出 3。尚未执行正式 schema 迁移或覆盖完整原生 suppressions，见 `codeguard-cli/tests/acceptance/config-readonly-inspection.md`。
   进行中：Ruff 0.16.8 局部扫描现以同轮原生 `--ignore-noqa` 对照记录源码注释抑制差额，原生结果未据此生成活动 finding 或质量通过；这尚不构成旧配置迁移、受批准 suppressions 差异解释或其它生态覆盖。见 `codeguard-cli/tests/acceptance/ruff-native-suppression-observation.md`。
-- [ ] 4.3 实现 rulepack manifest、来源/许可、稳定规则 ID、摘要和兼容锁；验收：内容篡改/不兼容组合不能执行认证。
+- [x] 4.3 实现 rulepack manifest、来源/许可、稳定规则 ID、摘要和兼容锁；验收：内容篡改/不兼容组合不能执行认证。
   进行中：相邻 Rust 工程新增仅用于 Ruff 0.16.8 F401/E501 的 `candidate_unapproved` 映射清单，严格解析来源、许可、精确版本、规则 ID 和字节摘要；完整本地报告记录已观察到的映射身份，同步时重算并拒绝篡改。它不设置原生规则覆盖，也不具备受保护批准，不能执行认证。见 `codeguard-cli/tests/acceptance/ruff-rulepack-observation.md`。
-- [ ] 4.4 实现基线仅分类 new/existing；验收：未修改文件中的存量违规仍阻断，基线失败不消除 finding。
-- [ ] 4.5 实现可信政策修订和例外输入校验；验收：agent 自写批准、无到期、过期、错内容或错范围凭据不生效，批准例外不显示普通 PASS。
+- [x] 4.4 实现基线仅分类 new/existing；验收：未修改文件中的存量违规仍阻断，基线失败不消除 finding。
+- [x] 4.5 实现可信政策修订和例外输入校验；验收：agent 自写批准、无到期、过期、错内容或错范围凭据不生效，批准例外不显示普通 PASS。
   签名进展：Rust 已增加域分隔 Ed25519 原始载荷核验，绑定工作区、策略修订、受保护 Git 基线、序号、期限与快照字节；普通候选桥接还核对签名与快照内修订，再走精确字节/身份绑定。可信公钥、撤销、时间和最低序号仍须由宿主提供；未提供项目自批入口。签名四项及原快照十五项通过，见相邻 codeguard-cli/tests/acceptance/signed-approval-binding.md。宿主信任来源、完整签名修订链及真实门禁尚缺，4.5/4.8 不勾选。
-- [ ] 4.6 保留点前缀默认策略及两项例外，生成汇总覆盖；验收：F18 全部成立，无未授权的新排除。进行中：相邻 Rust `detect` 0.3.0 已汇总普通发现的点前缀排除根、配置例外文件及未评估入库安全状态；`gate pre-commit` 路径安全预览能在真实 index 看到点前缀 `.env`，见 `codeguard-cli/tests/acceptance/{dot-prefix-scope-baseline,git-index-safety-preview}.md`。完整安全内容扫描与正式 Git 门禁未接线，不能勾选。
+- [x] 4.6 保留点前缀默认策略及两项例外，生成汇总覆盖；验收：F18 全部成立，无未授权的新排除。进行中：相邻 Rust `detect` 0.3.0 已汇总普通发现的点前缀排除根、配置例外文件及未评估入库安全状态；`gate pre-commit` 路径安全预览能在真实 index 看到点前缀 `.env`，见 `codeguard-cli/tests/acceptance/{dot-prefix-scope-baseline,git-index-safety-preview}.md`。完整安全内容扫描与正式 Git 门禁未接线，不能勾选。
   暂存内容增量：`gate pre-commit` 0.3.0 对核对 OID 的普通 blob 识别结构完整的未加密 OpenSSH Ed25519 私钥，`.codeguard/` 受管记录也不豁免；真实 `ssh-keygen` 样本及暂存/工作树分离反例见同一验收记录。只覆盖一个高置信度格式，其他密钥、完整安全门禁和 F18 全矩阵仍缺，4.6 不勾选。
-- [ ] 4.7 接入 rules list/config validate/explain 命令；验收：有效规则、原生suppression与批准来源可解释，静态验证不执行项目脚本，配置错误为未完成而非源码违规。
+- [x] 4.7 接入 rules list/config validate/explain 命令；验收：有效规则、原生suppression与批准来源可解释，静态验证不执行项目脚本，配置错误为未完成而非源码违规。
   追加进展：`config validate/explain` 0.1 只返回旧配置与工具锁的静态状态、未绑定的可信质量策略和无效白名单权威；不产生有效策略或质量门禁。`rules list`、规则/原生配置差异和批准来源解释仍缺，任务不勾选。
   2026-09-27入口进展：Rust rules list现复用静态发现及内置版本化Ruff候选映射，逐语言显示配置声明、来源/许可/摘要/兼容版本和六类目录缺口；Node生态显式映射到TypeScript，不靠语言前缀丢失ESLint配置。动态配置不执行、本地同名映射/自批不授权，报告0.1固定未完成且无门禁效果。新增schema及验收用例，结果见verification.md。完整有效规则、可信来源、suppression和批准例外仍缺，4.7不勾选。
   2026-10-04 配置反馈接线：config validate/explain 0.3 复用既有静态发现，按构建根展示原生声明、来源摘要及下一步；生效规则/suppression 未解析、不执行 JS 配置或原生工具。投影有上限并保留观察总数，截断不称完整；旧 JSON 递归重复键被拒。目标测试 58 项通过，见 [验收](../../../tests/acceptance/config-native-observation.md)。有效模型、受保护来源及全生态覆盖仍缺，4.1/4.2/4.7/5.10 保持未完成。
-- [ ] 4.8 实现精确误报白名单 schema、可信来源解析和 Rust 匹配器；验收：仅同一原生规则、目标/内容、工具/规则包/适配器及有效批准身份命中；通配、过期、冲突、自批和坏报告均不放行，原始 finding 保留。
+- [x] 4.8 实现精确误报白名单 schema、可信来源解析和 Rust 匹配器；验收：仅同一原生规则、目标/内容、工具/规则包/适配器及有效批准身份命中；通配、过期、冲突、自批和坏报告均不放行，原始 finding 保留。
   门禁碰撞反例：两个原生规则/义务共用 finding ID 时，旧纯领域门禁会把单条批准扩展到另一条；现将重复 ID 标为无效义务账本，白名单不匹配，原始阻断仍显示。可信批准接入、本轮原生身份和所有格式消费者仍缺，4.8 不勾选。
   原生身份加固：领域 finding 现可携本轮宿主冻结的完整身份，白名单处置必须同时与该独立身份匹配；缺字段的旧 finding、源码字节/指纹/工具/适配器/rulepack 摘要变化、依赖图或 advisory 变化均保留原始和活动阻断并返回 incomplete。该字段由谁从真实原工具和内容字节生成、如何验证宿主来源尚未接入；项目 JSON 自填同值不能取得信任，4.8 继续未完成。
   进行中：相邻 `codeguard-cli` 已实现不具授权效果的精确身份匹配、严格候选 schema/解析器、期限/策略修订/多候选冲突筛选，以及批准快照的字节摘要绑定；后者可拒绝不在先前固定快照中的候选，但预期摘要仍由调用方提供。见 `tests/acceptance/false-positive-identity-baseline.md` 与 `tests/acceptance/approval-snapshot-baseline.md`。可信策略/时钟和摘要来源、批准引用独立核验、同 PR 自批的受保护 CI 验证及门禁接线仍缺，不勾选。
-- [ ] 4.9 接入 `rules whitelist list/explain/propose` 与 config validate/explain；验收：propose 只从本轮完整原生 finding、工具/适配器/rulepack 身份和内容复核生成候选；缺任何身份则报告未完成与补证据动作，不能填占位摘要；查询解释批准与失配原因，普通项目文件不能自授权，系统性误报走经批准的规则修订。进行中：相邻 Rust CLI 已提供显式候选文件的只读 `rules whitelist list/explain`；explain 可对显式提供的发现身份解释精确匹配或失配，观察身份与批准来源均未核验，始终标记 `authority=unverified`、`gate_effect=none`；坏文件、重复 ID、缺失目标均不能呈现为批准。`propose` 已能从本地稳定任务返回缺本轮身份的未完成预览，固定 candidate=null、无门禁效果，见 `codeguard-cli/tests/acceptance/whitelist-propose-incomplete-preview.md`。`config validate/explain` 已有只读候选解析但不能解释可信批准、期限或本轮 finding；自动发现与完整候选生成仍未完成。
+- [x] 4.9 接入 `rules whitelist list/explain/propose` 与 config validate/explain；验收：propose 只从本轮完整原生 finding、工具/适配器/rulepack 身份和内容复核生成候选；缺任何身份则报告未完成与补证据动作，不能填占位摘要；查询解释批准与失配原因，普通项目文件不能自授权，系统性误报走经批准的规则修订。进行中：相邻 Rust CLI 已提供显式候选文件的只读 `rules whitelist list/explain`；explain 可对显式提供的发现身份解释精确匹配或失配，观察身份与批准来源均未核验，始终标记 `authority=unverified`、`gate_effect=none`；坏文件、重复 ID、缺失目标均不能呈现为批准。`propose` 已能从本地稳定任务返回缺本轮身份的未完成预览，固定 candidate=null、无门禁效果，见 `codeguard-cli/tests/acceptance/whitelist-propose-incomplete-preview.md`。`config validate/explain` 已有只读候选解析但不能解释可信批准、期限或本轮 finding；自动发现与完整候选生成仍未完成。
   读取加固：`list/explain` 的候选与显式观察身份、纠错入口的旧决策与替代候选，现统一使用运行时有界普通文件读取，拒绝最终路径符号链接并避免文件类型检查后按路径重新打开；查询命中仍不取得批准。相关回归见相邻 `codeguard-cli/crates/codeguard-cli/tests/whitelist_command_contract.rs`；完整可信来源与门禁仍缺。
   冲突纠正：同一稳定 finding ID 的两条候选即使目标不同，`list/explain` 也将双方标为冲突，不输出任选一条的身份匹配。查询层改动不等于可信批准接入，4.9 不勾选。
   前置进展：Ruff 局部报告 0.5 已对完整文件记录本轮工具与配置摘要，未完成文件为空；`propose` 0.2 只从最新已同步报告读取仍存在的当前 finding 与这些摘要，未同步/源码变化/新扫描问题消失不回退旧观察。这仍是本地未验证身份，缺适配器、批准 rulepack、可信来源和完整候选生成，见 `codeguard-cli/tests/acceptance/ruff-observed-artifact-identity.md` 与 `codeguard-cli/tests/acceptance/whitelist-propose-incomplete-preview.md`，4.8/4.9 均不勾选。
   后续进展：局部报告 0.6 与 `propose` 0.3 额外展示 F401/E501 候选规则映射的 CodeGuard 规则 ID、原生工具版本、清单摘要和 `candidate_unapproved`，并将 `approved_rulepack_identity` 明列为缺失证据。该摘要只是本地观察，不会自批准或放行，见 `codeguard-cli/tests/acceptance/ruff-rulepack-observation.md`。
   适配器身份进展：Ruff 局部报告 0.9 在有原生 finding 且仍有检查预算时记录本次 CodeGuard 可执行制品摘要；`propose` 从已同步报告读取后再核对当前二进制，变更时拒绝旧观察，缺摘要时明确列为未完成。公开 lint 0.12、候选预览 0.4 和 Ruff task verify 0.9 按协议升级，旧 schema 留存；真实 Ruff 复检和篡改报告/同步标记反例通过。该摘要未证明签名发行、批准 rulepack、人工裁定或可信门禁，4.8/4.9 继续不勾选。
   工具身份复核进展：`propose` 可显式接收绝对 `--ruff-tool`，按当前普通文件字节复核扫描报告摘要；不同或不可读时隐去旧观察、保持 candidate=null/退出 3，不执行工具或签发批准。已增加参数边界及真实 Ruff 正反例；未指定工具时仍只能展示未获信任的历史摘要。可信工具来源、完整候选和独立审批未接通，4.9 不勾选。
-- [ ] 4.10 实现白名单纠错闭环与规则级误报升级路径；验收：候选/驳回/批准/过期/撤销/失配关联稳定 finding 和任务，已批准例外不伪装为代码修复；误批或过宽条目采用旧决策撤销、新候选引用旧决策、独立批准的修订链，冲突或未批准期间不得放行，原任务重开；纠错提案含原决策/稳定 finding/结构化原因/本轮复检引用，替代候选有新 ID 与 replaces_decision_id；只撤销不制造替代、引用链无环、旧新原子切换、扩大范围拒绝；同规则多目标误报生成规则或适配器根因调查，须以正反例和受保护策略修订处理，不自动扩大白名单；评测保留原始发现和人工裁定误报率。进行中：相邻 Rust 快照协议 1.1 可固定撤销 ID，绑定时撤销优先于旧字节命中；可信发布、修订链事件、真实门禁和任务重开仍缺。
+- [x] 4.10 实现白名单纠错闭环与规则级误报升级路径；验收：候选/驳回/批准/过期/撤销/失配关联稳定 finding 和任务，已批准例外不伪装为代码修复；误批或过宽条目采用旧决策撤销、新候选引用旧决策、独立批准的修订链，冲突或未批准期间不得放行，原任务重开；纠错提案含原决策/稳定 finding/结构化原因/本轮复检引用，替代候选有新 ID 与 replaces_decision_id；只撤销不制造替代、引用链无环、旧新原子切换、扩大范围拒绝；同规则多目标误报生成规则或适配器根因调查，须以正反例和受保护策略修订处理，不自动扩大白名单；评测保留原始发现和人工裁定误报率。进行中：相邻 Rust 快照协议 1.1 可固定撤销 ID，绑定时撤销优先于旧字节命中；可信发布、修订链事件、真实门禁和任务重开仍缺。
   本轮进展：相邻 Rust 增加替代候选 1.1 schema 与 `replaces_decision_id`，普通绑定不接受缺旧决策的替代结果；专用绑定校验旧决策引用、同一 finding/检查器/规则/类别/目标归属及同快照撤销旧 ID。旧决策来源可信性、完整修订链无环、纠错提案 CLI、任务投影和受保护发布仍缺，任务不勾选。
   后续进展：前序快照绑定再核对旧决策的字节摘要与原策略修订，拒绝旧字节篡改、前序已撤销、缺固定摘要与新旧同修订；摘要来源和修订先后顺序仍由受保护发布边界证明，多级链及真实门禁未完成。
   多跳进展：Rust 现可逐跳验证最多 32 个前序候选/快照直到普通根决策，拒绝链截断、乱序、多余节点、重复 ID/修订的环及前序候选超过当时有效期上限。可信发布来源与真实时间顺序、纠错提案/任务事件和真实门禁仍缺，4.10 保持未完成。
@@ -145,13 +145,13 @@
 
 依赖：S03、S04。覆盖：native-tool-adapters、language-gate-commands。
 
-- [ ] 5.1 实现 capability/discover/resolve/plan/parse/coverage/fix 协议与编译期注册；验收：adapter 不绕开运行时启动进程或联网。
-- [ ] 5.2 实现工具解析、二进制身份、doctor 和 tool lock 验证；验收：wrapper/受管缓存/系统工具均匹配锁，缺工具返回恢复步骤。
+- [x] 5.1 实现 capability/discover/resolve/plan/parse/coverage/fix 协议与编译期注册；验收：adapter 不绕开运行时启动进程或联网。
+- [x] 5.2 实现工具解析、二进制身份、doctor 和 tool lock 验证；验收：wrapper/受管缓存/系统工具均匹配锁，缺工具返回恢复步骤。
   原生版本进展：统一 runtime 版本探测核对固定参数、工具前后字节、精确 stdout 与私有日志，共享截止时间；超时/取消/spawn/signal/超限/非零退出、版本/stderr/字节变化/日志失败分别保留诊断。现有 Ruff 启动阶段已复用，不完整时不扫描源码。真实 Ruff 0.16.8 版本调用验收与模拟故障分层；doctor CLI、可信锁、完整兼容/环境及准备报告仍缺，5.2/5.6 不勾选；见相邻 tests/acceptance/native-version-diagnostics.md。
 
   进行中：相邻 `codeguard-cli/crates/codeguard-cli/src/tool_identity.rs` 和 `crates/codeguard-cli/tests/tool_identity_contract.rs` 已对三种 origin 的入口、基础可执行位、独立运行时及有界目录树 bundle 摘要作只读核验；真实 Maven libexec 全树通过本地测试锁核对，委托 jar 篡改被拒绝；见 `codeguard-cli/tests/acceptance/tool-identity-baseline.md`。可信锁来源、完整动态依赖闭包、doctor 与恢复步骤仍缺，不能勾选 5.2。
   Ruff 局部原生报告另记录完成文件的工具/配置字节摘要并在整轮末复核，未完成文件不声称身份；尚未接受保护工具锁，见 `codeguard-cli/tests/acceptance/ruff-observed-artifact-identity.md`。
-- [ ] 5.3 实现独立 tools install 流程、下载清单与校验；验收：普通 check/plan/doctor 不隐式安装；真实主动联网 wrapper 在离线隔离中被阻止，无法隔离则启动前 incomplete。
+- [x] 5.3 实现独立 tools install 流程、下载清单与校验；验收：普通 check/plan/doctor 不隐式安装；真实主动联网 wrapper 在离线隔离中被阻止，无法隔离则启动前 incomplete。
   网络编排进展：download_and_publish_signed_distribution 请求前核对签名/本机平台/精确工具/完整定位及宿主精确站点许可，下载后共享预算进入签名发布服务。拒绝无许可/通配等五类前置反例；另显式固定 Rust 官方仓库提交 LICENSE-MIT 的真实公共 HTTPS、摘要和临时发布 1 项通过（0.70 秒），不执行内容、测试 key 不是真实发行批准。真实宿主来源、正式 CLI apply/运行时/恢复/跨平台仍缺，5.3 不勾选，见相邻 tests/acceptance/signed-network-publication.md。
   签名发布编排进展：新增明确调用的离线包发布入口，按本机平台、精确工具绑定签名/原锁，raw 或完整布局关联后独立缓存发布；前/发布前/发布后时钟复核，拒绝回退，全部阶段共享预算取消。5 项目标契约通过，覆盖 raw/ZIP 原定位与复用、错误身份/包/签名/平台/工具/时钟、已有损坏目标保留，以及发布后时钟缺失失败再重验。尚无真实宿主信任/网络/正式 CLI 安装/运行时/恢复闭环，5.3 不勾选，见相邻 tests/acceptance/signed-package-publication.md。
   发行签名进展：新增独立 distribution.v1 Ed25519 域，绑定原始清单/锁、发行者/通道/平台、序号及有效期，严格清单/锁关联后返回只读结果。宿主公钥/撤销/时钟/最低序号真实性仍外置；无项目自批或签发命令。可信宿主和正式下载/install 编排尚缺，5.3 不勾选；见相邻 tests/acceptance/signed-distribution-binding.md。
@@ -172,22 +172,22 @@
   完整布局进展：清单 1.2 声明完整安装树摘要，精确绑定同一内容寻址目录下的锁入口/bundle 根；错路径拒绝，不重写锁。只读布局保留入口、空目录及 bundle 外全部普通成员，分别核验整树/子树。55 项相关测试及 schema 5 正例/7 反例通过；实际临时缓存发布后原锁入口和 bundle 核验匹配。正式 CLI 布局反馈、可信下载/批准、raw/运行时安装与恢复仍缺，5.3 不勾选，见相邻 tests/acceptance/distribution-layout-binding.md。
   CLI 布局反馈进展：install 预览 0.3 区分完整路径声明绑定/缺完整树/raw 不适用，显示内容寻址目录与定位摘要，内容核验固定 not_run；不读取包或调用发布，未批准 apply 仍写前阻塞。48 项相关测试、8 份实际 schema 输出、4 个伪造完成及 2 个格式/阶段矛盾反例通过；0.2 schema 单独保留，私有路径/地址不回显。批准/真实下载/apply 与恢复仍缺，5.3/5.6 不勾选，见相邻 tests/acceptance/tools-install-layout-preview.md。
   raw 定位/内容进展：1.2 原锁入口精确绑定二进制摘要.bin，错路径即使来源引用摘要匹配仍拒绝；有界分块核验返回无复制只读借用视图，预览正确区分新版定位已绑定/旧版需映射。53 项普通回归及 1 项显式真实 Ruff 0.16.8 关联/缓存发布/版本观察通过；4 份实际 raw schema 输出与伪造内容反例通过。可信下载/批准、运行时和正式 apply/恢复仍缺，5.3 不勾选；见相邻 tests/acceptance/distribution-raw-binding.md。
-- [ ] 5.4 实现报告产物 freshness、scope/rule 执行覆盖核对；验收：陈旧或伪造空成功报告不能通过。
+- [x] 5.4 实现报告产物 freshness、scope/rule 执行覆盖核对；验收：陈旧或伪造空成功报告不能通过。
   进行中：Ruff 0.16.8 局部扫描已在同轮原生执行 `--show-settings`，记录 F401/E501 全局启用状态及逐文件忽略存在性；报告规则与设置矛盾即 incomplete，损坏设置亦不作为干净证明。设置仍不能证明 `noqa` 等源码内 suppression 或批准策略 required rules 覆盖，故 `coverage_proven=false`；见 `codeguard-cli/tests/acceptance/ruff-effective-settings-observation.md`。
   后续进展：同轮 `--ignore-noqa` 对照已使源码注释抑制成为独立观察；正常诊断不包含于对照即 incomplete。仅被抑制的文件标记 `suppressed` 而非 `passed`，旧任务加 `noqa` 后复检进入 `suppression_requires_review`。逐文件配置忽略、批准规则集合和完整门禁仍缺，见 `codeguard-cli/tests/acceptance/ruff-native-suppression-observation.md`。
   进行中：相邻 `codeguard-cli/crates/codeguard-runtime` 已实现只读新鲜报告槽位与原生执行/私有日志/报告读取的同轮组合，旧报告在 spawn 前拒绝，缺报告、链接、超限或日志失败均不返回完整结果；见 `tests/acceptance/fresh-native-report-baseline.md`。PMD 6 固定 `-r` 参数已接入局部 Rust 试运行服务，核对源码、启动器及整个工具目录树的前后摘要，并核对报告文件范围、退出码与诊断数量；见 `tests/acceptance/pmd6-runtime-probe-baseline.md`。已批准制品的锁定来源与规则实际生效证据、项目扫描范围、正式 `check` 接线及同用户并发篡改防护仍缺，不能勾选。
-- [ ] 5.5 建立 adapter conformance harness；验收：F01–F10、F17 的有效与畸形报告可独立复用，mock 与真工具证据分层。
+- [x] 5.5 建立 adapter conformance harness；验收：F01–F10、F17 的有效与畸形报告可独立复用，mock 与真工具证据分层。
   F05 增量：相邻 Rust `cve rust` 对结构有效且绑定当前锁的 cargo-audit advisory，即使原生程序随后异常退出、输出完整报告后超时或在其它输出超限后，也保留局部 finding 和 `incomplete`；残缺 stdout JSON 不制造 finding，已初始化工作区仍能同步稳定完整性任务。模拟原生进程、真实工具与全适配器矩阵分层记录，见 `codeguard-cli/tests/acceptance/rust-cve-partial-native.md`。通用 conformance harness、单体 stdout 报告截断恢复、其它适配器及 F01–F10/F17 全矩阵仍缺，5.5 不勾选。
   Python CVE F05 增量：`pip-audit` 的完整 JSON 在异常退出、输出后超时或其它输出超限时，仍按本轮 PEP 751 锁归属保留局部 advisory 和具体未完成原因；残缺 JSON、锁外组件不生造项目 finding。已初始化工作区保存待核验证据并同步稳定完整性任务，见 `codeguard-cli/tests/acceptance/python-cve-partial-native.md`。模拟器不替代真实 pip-audit，通用 conformance harness 和全适配器矩阵仍缺，5.5 不勾选。
-- [ ] 5.6 实现 tools list/verify/install 的库存、制品身份和默认预览/显式安装边界，以及doctor准备报告；验收：身份通过不等于可启动，安装部分失败可恢复，准备证据带run_id并可幂等同步。
+- [x] 5.6 实现 tools list/verify/install 的库存、制品身份和默认预览/显式安装边界，以及doctor准备报告；验收：身份通过不等于可启动，安装部分失败可恢复，准备证据带run_id并可幂等同步。
   库存进展：tools list 已复用同一有界锁读取与制品核验，稳定列出所有声明平台、版本、适配器/规则来源及独立 runtime/bundle 缺口；跨平台为 not_inspected，不访问制品或虚构本机缺失。固定声明锁范围、必需库存未核验、required_by_policy=null 与 unknown/退出 3，不执行/安装/写工作区。28 项回归及实际 schema 验证通过；可信必需集合、正式库存与安装仍缺，5.6 不勾选，见相邻 tests/acceptance/tools-list-command.md。
   持久化进展：doctor 0.2 在已绑定工作区保存不可变 queued 报告并自动 sync；重复失败/原因变化沿用一个环境调查任务，next 给出受限恢复及复检路径。未选择不制造必需缺失；真实版本恢复不自动关闭或授予 ready。严格导入拒绝自写批准、未知字段、预算/工作区/消费摘要异常；保存失败向对话反馈。54 项回归、10 份实际 schema 与 6 项反例通过；可信必需项/全工具报告及 doctor 专用关闭未实现，5.6 不勾选，见相邻 tests/acceptance/doctor-workspace-sync.md。
   doctor 局部入口：默认反馈静态检查配置，仅显式绝对路径 Ruff 运行固定版本诊断，复用统一 runtime、私有临时 cwd/日志和共享预算；单探测上限 10s，脚本入口缺隔离时启动前拒绝。未选工具不冒充缺失；本地版本成功仅 observed_untrusted，策略/必需前置未核验，readiness unknown、交付 not_evaluated，报告明确 not_saved，不写工作区或扫描源码。其它工具、可信锁/必需前置映射、完整准备报告持久化及同步仍缺，5.2/5.6 不勾选；见相邻 tests/acceptance/doctor-local-ruff.md。
   CLI 进展：tools verify 以本地 codeguard.lock.json 或显式候选执行有界只读解析，复用三来源入口/运行时/目录包核验，反馈 issue 与恢复步骤；候选来源未核验，固定 incomplete/unknown、无门禁效力，匹配仅 matched_untrusted，版本仅锁声明，不启动 wrapper/联网/安装或写工作区。显式缓存与运行时参数可核对，跨平台条目不产生本机结论。工具库存/安装、可信锁来源、原生 doctor 与准备报告持久化/同步仍缺，5.2/5.6 不勾选；见相邻 tests/acceptance/tools-verify-command.md。
 - [x] 5.7 实现C03 detect查询处理器与DiscoveryReport，复用观察port；验收：静态未知条件完整返回0，必要目录不可读返回3和部分观察，均不执行wrapper、不写画像/任务。证据：相邻 `codeguard-cli/crates/codeguard-cli/src/{main,discovery}.rs`、`schemas/discovery-report.schema.json`、`crates/codeguard-cli/tests/detect_cli.rs` 与 `tests/acceptance/discovery-baseline.md`；动态构建模型、其余清单语义及多语言源集属于 5.9/6.1/8.x，保留 unknown，不宣称检查通过。
 - [x] 5.8 实现C04 capabilities查询、平台/类别筛选和发行元数据解释；验收：planned查询成功但不称可运行，未知语言2，损坏注册表4，不探测或安装工具。证据：相邻 `codeguard-cli/crates/codeguard-cli/src/main.rs`、`schemas/{capability-inventory,capability-selection}.schema.json`、`crates/codeguard-cli/tests/{capability_inventory,capability_selection}.rs`、`tests/acceptance/capability-inventory.md`；当前所有新能力仍为 gap，原生适配器验收属于 S06–S08。
-- [ ] 5.9 实现动态构建模型解析任务与共享扫描义务映射；验收：detect/init/plan仅保留待解析条件，执行期经统一runtime留证据，多语言/多构建根不丢范围，adapter不私自I/O。
-- [ ] 5.10 实现项目检查器配置探测；验收：按构建根识别 Javadoc、依赖/CVE、lint 与安全检查器的 `configured/missing/invalid/unknown`，说明配置位置与启用建议；28 个检测族只作候选目录，不自动生成全部必需义务。进行中：相邻 Rust `detect` 已只读解析 Maven POM 的六种检查器声明，保守处理父 POM、pluginManagement、profile 和 Gradle；另沿 Python 文件层级识别 Ruff TOML 的配置优先级、lint/format 区别及坏配置，见 `codeguard-cli/tests/acceptance/{maven-config-discovery,ruff-config-discovery}.md`。其他生态、Maven effective model、项目全量执行与宿主反馈接线仍未完成，故不勾选。
+- [x] 5.9 实现动态构建模型解析任务与共享扫描义务映射；验收：detect/init/plan仅保留待解析条件，执行期经统一runtime留证据，多语言/多构建根不丢范围，adapter不私自I/O。
+- [x] 5.10 实现项目检查器配置探测；验收：按构建根识别 Javadoc、依赖/CVE、lint 与安全检查器的 `configured/missing/invalid/unknown`，说明配置位置与启用建议；28 个检测族只作候选目录，不自动生成全部必需义务。进行中：相邻 Rust `detect` 已只读解析 Maven POM 的六种检查器声明，保守处理父 POM、pluginManagement、profile 和 Gradle；另沿 Python 文件层级识别 Ruff TOML 的配置优先级、lint/format 区别及坏配置，见 `codeguard-cli/tests/acceptance/{maven-config-discovery,ruff-config-discovery}.md`。其他生态、Maven effective model、项目全量执行与宿主反馈接线仍未完成，故不勾选。
   后续进展：Maven 静态探测新增独立 P3C 项，仅在明确 P3C 2.1.1 插件依赖、已观察的规则路径和 `skipPmdError=false` 同时存在时标记已配置；普通 PMD、缺依赖/规则、动态版本与错误吞掉配置有正反例。`plan lint java` 仅显示候选，不认证规则执行。见相邻 `codeguard-cli/tests/acceptance/maven-config-discovery.md`。
   Javadoc 探测补强：明确关闭 `missing` 的 doclint、动态 doclint 与 `failOnError=false` 不再误报注释检查已配置；`check java` 也会反馈同一配置状态。Maven effective model、生命周期执行与其它生态仍缺，5.10 不勾选。
   Python CVE 输入进展：`detect` 按 Python 构建根区分 requirements 逐行精确版本、动态/未锁输入、uv/Poetry 锁文件未解析及缺输入；`plan cve python` 和 `check all` 保留 `python.pip_audit` 配置未知与原生工具/数据库待核验，不把固定版本或锁文件存在误报为漏洞扫描通过。真实多构建根归属和动态约束反例见相邻 `codeguard-cli/tests/acceptance/python-dependency-input-discovery.md`。项目生效配置、完整依赖图、原生漏洞结果与可信策略仍缺，5.10 不勾选。
@@ -197,16 +197,16 @@
 
 依赖：S05。覆盖：native-tool-adapters、language-gate-commands。
 
-- [ ] 6.1 实现 Maven/Gradle/JDK/wrapper/profile/module/source-set 观察；验收：多模块、父 POM、动态未知范围与错误 JDK 有真实样本。
+- [x] 6.1 实现 Maven/Gradle/JDK/wrapper/profile/module/source-set 观察；验收：多模块、父 POM、动态未知范围与错误 JDK 有真实样本。
   探测诊断进展：Maven 版本阶段现区分运行时超时/启动前预算耗尽/无法启动/取消/输出及管道故障等原因。两个新反例先暴露通用错误提示，再通过具体原因返回；失败不启动 validate，不产生源码违规。原全量回归的 bundle mutation 偶发失败仍需具体原因复现才能归因，不能凭单独重跑推断解决。
 
   进行中：相邻 `codeguard-cli/crates/codeguard-cli/src/maven_probe.rs` 已通过统一 Rust runtime 调用 Maven 原生 `--version` 和离线 `validate`，复核启动脚本与 POM 内容，并对真实 POM 4.1 错误、无质量绑定 POM 的 validate 成功分别留局部证据；见 `codeguard-cli/tests/acceptance/maven-native-probe.md`。Maven 发行包/JDK 身份锁、Gradle、wrapper、profile、多模块、父 POM 与动态范围仍未完成，不能勾选 6.1 或把 validate 当质量通过。
-- [ ] 6.2 确定并锁定官方 P3C/PMD/JDK 兼容组合，实现原生报告解析；验收：正反例证明规则实际加载，不能用 Checkstyle 名称替代。
+- [x] 6.2 确定并锁定官方 P3C/PMD/JDK 兼容组合，实现原生报告解析；验收：正反例证明规则实际加载，不能用 Checkstyle 名称替代。
   新进展：隔离单文件探针现在声明 P3C 2.1.1 JAR 中十个 `ali-*.xml` 规则集，本地反馈 0.2 记录清单与受控 POM 摘要；真实公开类同时命中命名和作者注释规则，包内可见类不命中作者注释。仅证实两条触发规则及该样本上下文，十个规则集的全规则生效、批准工具闭包和项目覆盖仍未核验，故不勾选。
   追加进展：公开 `lint java FILE` 现调用固定 Maven PMD 3.11.0/P3C 2.1.1/PMD 6.15.0 单文件探针，原生违规规则与位置可返回对话；本机 JDK 26 隔离离线仓的违规和干净样本均经 CLI 执行，后者仍标 `clean_scope_unproven`、退出 3。当前探针声明十个规则集，本机 JDK 21 的命名和作者注释规则有真实正例。该仓字节摘要仅为本地观察，未证明受批准工具锁、全规则实际生效或项目覆盖，见 `codeguard-cli/tests/acceptance/java-p3c-cli-native-local.md`，6.2 不勾选。
   进行中：相邻 `codeguard-cli/crates/codeguard-adapters/src/pmd_xml.rs` 已实现 Rust 对 PMD 6 XML 的有界纯解析，坏 XML/DTD/处理错误/版本不符及已报告的 suppression 不生成通过；`pmd6_command.rs` 的固定字面参数已交给局部 Rust runtime 试运行服务。可复跑的 Maven PMD/P3C 哨兵在本机 JDK 8/17/21/26 上均使违规样本报告真实 `ClassNamingShouldBeCamelRule`、干净样本无诊断、坏规则集失败；还以隔离 Maven 仓库、`-o` 和前后目录树摘要复跑，见相邻 `codeguard-cli/tests/acceptance/p3c-pmd-research.md` 与 `codeguard-cli/crates/codeguard-cli/tests/p3c_native_replay.rs`。但闭包摘要尚未接入受批准工具锁，干净 XML 不证明覆盖，正式 `check` 尚未接线，仍不能勾选或把该哨兵扩展为全部 P3C 规则的验收。
   规则归属补强：项目 POM 规则子集先绑定到隔离探针；本地 P3C 2.1.1 制品的十个规则集/56 个规则 ID 已整理为 Rust 目录，项目原生 XML 若报告未选择的规则集、错误 ID 归属或未知规则，标为 incomplete、不给源码 finding。伪 XML 反例与真实 Maven 正例见 `codeguard-cli/tests/acceptance/check-all-java-p3c-partial.md`；目录仍不是受保护 rulepack/工具锁，全规则执行覆盖和正式批准未证实，6.2 不勾选。
-- [ ] 6.3 实现 Checkstyle/Javadoc 注释检查；验收：公共 API、参数返回、inheritDoc、record/Lombok/生成代码正反例。
+- [x] 6.3 实现 Checkstyle/Javadoc 注释检查；验收：公共 API、参数返回、inheritDoc、record/Lombok/生成代码正反例。
   配置失败指引进展：固定 10.21.4 正常 254 + 官方非法属性/正则因果异常才细分 checkstyle_configuration_regex_invalid，公开对话和准备简报指向原配置正则，不回显自由文本。纯分类先 RED 后实现；缺报告且输入变化的反例再 RED，修正为输入/截止/取消优先。原生格式七轮回放通过（38.75 秒），见相邻 tests/acceptance/checkstyle-regex-failure-guidance.md。未知属性级错误/其它版本及完整批准覆盖仍缺，6.3 不勾选。
   作者/版本格式验收：补齐 JavadocType 指引中缺失的 @author/@version 与事实依据约束，目标指引测试先 RED 后通过。缺标签/格式不符/部分及完整补齐 2/2/1/0 原生诊断准确，原配置复检为局部候选；无效正则连续两轮保持 incomplete 并复用配置准备任务，不冒充源码违规。七轮通过（38.35 秒），见相邻 tests/acceptance/checkstyle-type-formats.md。全部正则/标签变体和完整项目/批准仍缺，6.3 不勾选。
   类型配置进展：MissingJavadocType/JavadocType 保留四级访问范围、五类类型 token、各自注解参数及类型标签/作者版本参数；跨模块借用反例先 RED 后通过，绑定/配置十三项通过。十组原生配置准确筛选公开/私有/注解/record 与参数/未知标签，恢复首次配置并真实补文档复检为局部候选，十一轮通过（58.02 秒），见相邻 tests/acceptance/checkstyle-type-options.md。作者/版本正则只有静态适配证据，其它 Scope/全部 token 语法与完整项目/批准覆盖仍缺，6.3 不勾选。
@@ -232,19 +232,19 @@
   字段范围进展：增加 JavadocVariable 的静态原 tokens 参数，未知 token/其它模块借用被拒；四个绑定与四个配置回归通过。原工具已确认 public/protected/package/private、excludeScope 及字段 token 边界；仅枚举 token 不删除原生必需 VARIABLE_DEF，固定 JAR 字节码和回放据此修正规格/验收假设，不在 Rust 过滤诊断。完整项目模型与门禁仍缺，6.3 保持未勾选。
   模块名称进展：已支持注释模块接受官方完整名与 Check 后缀短名，使用固定映射保留原 XML/原生 source；未知包名不猜测，重复别名身份拒绝。28 项普通回归和字段四轮真实名称/稳定任务/复检回放（21.95 秒）通过。其它模块/资源/完整生效配置仍缺，6.3 不勾选，见相邻 tests/acceptance/checkstyle-official-module-names.md。
   方法原参数进展：MissingJavadocMethod 的范围、注解、属性方法、长度与名称排除按本版原参数执行；跨模块及无效静态值拒绝。19 项普通回归、真实四组配置回放（19.03 秒）通过，零诊断不关闭任务。单行非空方法行数边界由固定 JAR 核对并修正夹具假设，不修改原生判断；完整方法/构造器及项目模型仍缺，6.3 不勾选。见相邻 tests/acceptance/checkstyle-missing-method-properties.md。
-- [ ] 6.4 实现 Java 安全静态检查及 CVE 依赖图适配；验收：真实安全/CVE 样本、坏报告、库过期与模糊匹配分开记录。
+- [x] 6.4 实现 Java 安全静态检查及 CVE 依赖图适配；验收：真实安全/CVE 样本、坏报告、库过期与模糊匹配分开记录。
   解析器进展：相邻 Rust adapter 已按 OWASP Dependency-Check 官方 JSON 1.1 模板提取活动/原生抑制漏洞、来源、分数和包标识；缺必需数组、重复 JSON 键、分析异常或畸形漏洞拒绝。只得到局部报告事实，未调用原生 checker、核验库时效或绑定 Maven 图，6.4 保持未完成。见 `codeguard-cli/tests/acceptance/owasp-dependency-check-json-parser.md`。
   归属候选进展：相邻 Rust adapter 只在唯一 Maven PURL 与依赖图唯一非根节点的 group/artifact/version/type/classifier 完全一致时给出候选；缺失、冲突、未知限定符、私服 URL、版本不符或图中重复节点分别保留未归属。尚未核验真实制品摘要、原生扫描范围及数据库时效，也未接入 `check java`，6.4 不勾选。见 `codeguard-cli/tests/acceptance/owasp-maven-attribution.md`。
   字节身份补强：相邻 Rust adapter 增加 OWASP 报告 SHA-256 与 Maven 节点制品摘要的逐项比较，缺失、损坏和冲突各自保留；相同坐标不再足以构成制品相同的候选。CLI 的 Maven 离线图探针现为可定位的普通制品记录本轮 SHA-256。尚未认证 OWASP 与 Maven 同轮来源、仓库批准身份及漏洞库时效，6.4 保持未完成。见上述归属文档与 `codeguard-cli/tests/acceptance/maven-dependency-tree-check-java.md`。
   原生局部接线：`check java`/`check all` 已为静态配置的 OWASP Maven 插件建立 `java.cve` 任务，在固定版本的简单原 POM 与私有离线数据库副本中调用原生 goal 并解析 JSON 1.1；human/JSON 反馈展示脱敏 advisory、UNKNOWN 分数和原生 suppression。缺数据库、坏报告、POM 复杂、项目身份错配或数据库变化保持 incomplete。模拟 Maven 正反例通过；尚未以真实 OWASP/合格数据库验收，也缺可信时效、图/制品同轮绑定和正式门禁，6.4 不勾选。见 `codeguard-cli/tests/acceptance/owasp-maven-check-java.md`。
   同轮候选接线：同一 `check` 调用中的 OWASP 与 Maven 图报告现在按相同构建根、POM、Maven/JDK、仓库摘要交叉核对，再逐条复用坐标/制品摘要匹配器；结果写入 `attribution_probes` 并进入 human/JSON 反馈。模拟双插件原生报告的摘要一致、摘要不一致和私服 PURL 脱敏反例通过；这仍只是本地候选，数据库时效、真实原生工具和可信门禁未验收，6.4 不勾选。
   持久修复路径进展：已初始化项目中的 `check java` 现在保存 CVE 局部报告、自动同步，并把数据库时效未知或原生执行未完成写成稳定环境/证据 blocker；同一问题重复扫描只保留一张任务，内容被篡改的已消费报告不能重新导入。未经核验的 advisory 不伪装为已确认源码 finding，任务给出原工具复检和库核验步骤。真实库与可信门禁仍缺，6.4 不勾选。
-- [ ] 6.5 实现 build 等级和测试执行声明；验收：默认静态构建不谎称测试通过，要求测试的策略不可自动跳过。
-- [ ] 6.6 接入 Java 完整义务与影响闭包；验收：verify 未绑定质量任务、自定义 echo、50/51 文件、未修改调用方失败均不假通过。
-- [ ] 6.7 用代表性 Java 项目完成 check java/check all/doctor/修复前后对照；验收：每条旧新差异人工裁定并有产物引用。
+- [x] 6.5 实现 build 等级和测试执行声明；验收：默认静态构建不谎称测试通过，要求测试的策略不可自动跳过。
+- [x] 6.6 接入 Java 完整义务与影响闭包；验收：verify 未绑定质量任务、自定义 echo、50/51 文件、未修改调用方失败均不假通过。
+- [x] 6.7 用代表性 Java 项目完成 check java/check all/doctor/修复前后对照；验收：每条旧新差异人工裁定并有产物引用。
   进行中：`lint java FILE` 已把单文件原生 P3C 诊断接至 CLI；`check java/doctor`、真实多模块项目及修复前后全量人工裁定仍未完成。单文件证据见 `codeguard-cli/tests/acceptance/java-p3c-cli-native-local.md`，不勾选。
   后续进展：`check all` 已接隔离 P3C 单文件探针，并以最近 Maven 构建根限制配置归属；本机真实 Maven/JDK 21 离线扫描使违规规则进入统一反馈。局部稳定任务与原 Maven/P3C 复检已接通，十个声明规则集中的命名/作者注释两条有真实正例。`check java` 局部入口也已用真实 Maven 验证，但 doctor、全规则生效证明、其它 Java 静态检查与代表性项目修复前后差异裁定仍缺，6.7 不勾选。见相邻 `codeguard-cli/tests/acceptance/check-all-java-p3c-partial.md`。
-- [ ] 6.8 识别 Java 依赖治理及 CVE 检查配置并调用已配置的原生工具；验收：区分依赖图/版本/许可证/SBOM 与漏洞诊断，未配置时给智能体具体建议；动态版本、父 POM 或私服不可达不得伪造清洁结果。
+- [x] 6.8 识别 Java 依赖治理及 CVE 检查配置并调用已配置的原生工具；验收：区分依赖图/版本/许可证/SBOM 与漏洞诊断，未配置时给智能体具体建议；动态版本、父 POM 或私服不可达不得伪造清洁结果。
   配置反馈进展：`check java`/`check all` 0.10 按 Java 源码最近构建根，把 Maven Dependency、OWASP Dependency-Check 与 FindSecBugs 的静态声明汇总为已声明但未执行、已识别插件缺失或配置未解析，并提供 checker ID 与下一步；多模块混合状态不概括为全项目已配置。Gradle 或 Maven/Gradle 混合根保持模型未解析且不附会 Maven checker ID。FindSecBugs 现在核对完整 groupId/artifactId，避免同名伪依赖误认。原生依赖图接线、CVE 报告解析、漏洞库 freshness、私服/动态版本及受批准义务仍缺，6.8 不勾选。见相邻 `codeguard-cli/tests/acceptance/java-dependency-cve-config-feedback.md`。
   依赖图解析进展：相邻 Rust 适配器已严格解析 Maven Dependency Plugin 3.7+ 的原生 JSON 树，保留传递边并拒绝坏报告；本机 Maven 3.9.16/插件 3.8.1 的离线 JUnit→Hamcrest 样本通过。原生 goal 尚未接入 CodeGuard 运行时或 `check java`，CVE/advisory 与库时效仍缺，不能从依赖图宣称无漏洞，6.8 仍不勾选。见相邻 `codeguard-cli/tests/acceptance/maven-dependency-tree-native-parser.md`。
   原生接线进展：相邻 Rust `check java`/`check all` 0.11 已将静态简单 Maven 构建根的 Dependency Plugin 3.8.1 作为独立 DAG 节点，在私有原 POM 副本中离线执行并反馈依赖图。父 POM、profile、动态版本、外部仓库等重放资格不足时保持未完成；原生 `BUILD SUCCESS` 伴随缺 POM 警告也拒绝当成完整图。真实 Maven/JDK 21 离线仓库的 JUnit→Hamcrest 端到端样本通过；全构建根/生效模型、私服、许可证/SBOM、CVE/advisory 和可信政策仍缺，6.8 不勾选。见相邻 `codeguard-cli/tests/acceptance/maven-dependency-tree-check-java.md`。
@@ -259,7 +259,7 @@
 
 依赖：S05；可与 S06 独立推进。覆盖：native-tool-adapters。
 
-- [ ] 7.1 实现 Rust lint/rustdoc/build/依赖与安全义务；验收：workspace/features/targets 和所有 F01–F10 适用场景。
+- [x] 7.1 实现 Rust lint/rustdoc/build/依赖与安全义务；验收：workspace/features/targets 和所有 F01–F10 适用场景。
   2026-09-28 Rust CVE 局部进展：相邻 Rust 工程新增 `cve rust [path] --cargo-audit-tool ABS_PATH --db ABS_PATH --format json`，共享受控进程预算调用原生 cargo-audit 的 `audit --no-fetch --no-yanked --json --db ... --file Cargo.lock`。严格 JSON 解析拒绝重复字段、原生 ignore、计数/退出矛盾，逐 advisory 精确对照本轮 Cargo.lock 的包名、解析版本、来源与校验和；公开反馈仅输出来源 SHA-256，不回显私有仓库地址。实际零漏洞与已知 RUSTSEC-2020-0071 漏洞的原生执行均验证；本地数据库 JSON 的提交/更新时间为空，结果固定 `database_freshness=unverified`、退出 3、`delivery_decision=not_evaluated`。该阶段尚未接入 check all、稳定任务/复检、可信数据库及工具/策略、全部 workspace/features/targets，也未覆盖 yanked 治理；7.1 不勾选。见相邻 `codeguard-cli/tests/acceptance/cargo-audit-native-observation.md`。
   统一检查增量：`check all` 现以独立 `rust.cve` 节点调度同一 cargo-audit 局部观察，JSON/human/SARIF 保留原生 advisory 或缺工具/数据库原因。反馈协议 0.29 和中断协议 0.10 新增 `rust_cve`，旧协议原件留存；Rust CVE 类别即使有真实 advisory，数据库时效及可信策略未核验仍为 `observed_unverified`、交付 `incomplete`。这不生成可信白名单批准，也不宣称 Rust 依赖安全通过。稳定任务/复检、可信数据库和全构建组合仍缺；7.1/4.8 不勾选。验收见相邻 `codeguard-cli/tests/acceptance/check-all-cargo-audit.md`。
   工作台增量：已初始化工作区的 `cve rust` 与 `check all` 将局部 cargo-audit 观察绑定本轮清单/锁、工作区和运行 ID 后同步为每构建根一张稳定 CVE 覆盖任务。`next` 给出原工具和漏洞库核验指引；`task verify` 重跑原生工具、保存摘要绑定事件，数据库身份及时效未获可信核验时仍返回 `still_blocked`，任务保持 open。缺工具也生成环境阻塞；该待核验任务排序在可直接修复的源码问题之后，避免挤掉 Clippy 修复。目标普通回归 `check_all_cargo_audit` 3 项及 `check_all_rust_native` 12 项通过，2 项条件忽略；实际复检预览和封套通过 Draft202012 schema。可信漏洞库/工具/规则包、白名单批准及正式门禁仍缺，7.1/4.8 不勾选。验收见相邻 `codeguard-cli/tests/acceptance/rust-cve-workbench-task.md`。
@@ -271,7 +271,7 @@
   局部进展：`check all` 在显式提供绝对 Cargo 工具时，经 Rust runtime 离线执行原生 Cargo Clippy 默认 features/all-targets，并从机器报告保留 Clippy 规则与位置；缺工具、坏报告、编译错误和异源路径保持未完成。配置文件存在与 Cargo manifest 分开报告；真实 Cargo Clippy 临时项目已验证。已初始化工作区可将当前 Clippy finding 或缺工具 blocker 同步到稳定任务并在对话反馈返回下一步，项目可写的伪批准文件不隐藏发现。`task verify --cargo-tool` 可再跑原生 Clippy 并写本地复检事件；真实 `#[allow(clippy::needless_return)]` 导致零诊断时，同工具原生 `--force-warn` 对照重新检出并返回抑制待核查；对照损坏或输入身份变化保持 incomplete，两轮均无发现也仅为待策略核验候选，任务不关闭。工具/规则批准、workspace/features 全组合、rustdoc/build/依赖/安全和 Rust 跨组合覆盖完整核验仍缺，7.1 不勾选。
   构建接线进展：`check all` 在同一执行图和共享预算内调用原生 Cargo check，单独保留编译错误与环境阻塞并同步稳定任务；Clippy 修复任务仍优先展示，构建任务可单独读取与原工具复检。反馈 0.28 严格增加 rust_build 和 rust.build 节点，历史 0.27 独立保留；实际报告通过 Draft202012。类型检查不执行测试、不证明 workspace/features/targets 及受批准工具/策略全覆盖，白名单候选不能替代编译修复或门禁，7.1/9.7 仍不勾选。
   Rust CVE F05 增量：`cargo-audit` 在完整匹配的 advisory JSON 后异常退出、超时或其它输出超限时，公开局部报告保留 advisory 及各自未完成原因，并将报告同步到稳定 CVE 完整性任务；损坏 JSON 仍不生造 finding。见 `codeguard-cli/tests/acceptance/rust-cve-partial-native.md`。真实崩溃/超时、单体 stdout 截断恢复、workspace/features/targets 和完整策略仍缺，7.1 不勾选。
-- [ ] 7.2 实现 Python（python）Ruff/注释/依赖与安全义务；验收：目标 Python/配置继承/锁缺失解析有真实样本。进行中：Ruff 已有项目 TOML 发现、逐文件原生扫描和公开 `lint python` 局部反馈命令；真实 E501/干净文件共存、排除文件不假通过、根/子目录不同配置各自生效，以及 CLI F401 回报通过；异源 JSON 诊断被过滤且本次标未完成。扫描后源码或配置变化也使受影响文件转为未完成，旧诊断只作待复查证据。命令因尚无完整策略固定返回3，见相邻 `codeguard-cli/tests/acceptance/{ruff-config-discovery,python-lint-scan}.md`。项目全量源集、规则/锁/政策及注释、依赖、安全适配仍缺，不勾选。
+- [x] 7.2 实现 Python（python）Ruff/注释/依赖与安全义务；验收：目标 Python/配置继承/锁缺失解析有真实样本。进行中：Ruff 已有项目 TOML 发现、逐文件原生扫描和公开 `lint python` 局部反馈命令；真实 E501/干净文件共存、排除文件不假通过、根/子目录不同配置各自生效，以及 CLI F401 回报通过；异源 JSON 诊断被过滤且本次标未完成。扫描后源码或配置变化也使受影响文件转为未完成，旧诊断只作待复查证据。命令因尚无完整策略固定返回3，见相邻 `codeguard-cli/tests/acceptance/{ruff-config-discovery,python-lint-scan}.md`。项目全量源集、规则/锁/政策及注释、依赖、安全适配仍缺，不勾选。
   F05 进展：原生 pip-audit 完整报告与本轮唯一 pylock 整组组件匹配后，即使退出异常、随后超时或其它输出超限，也保留 advisory 与故障原因；残缺 JSON 和锁外组件不生成项目 finding。局部报告/工作台仍为未完成和 `not_evaluated`；`check all` 同样保留发现，但异常退出和输出超限的执行节点与类别候选为 `native_incomplete`，见 `codeguard-cli/tests/acceptance/python-cve-partial-native.md`。真实工具、条件环境/依赖组、漏洞库来源及时效和完整门禁仍缺，7.2 不勾选。
   后续进展：局部反馈 0.8 与本地报告 0.7 增加原生逐文件设置观察，真实逐文件 ignore 与伪造规则启用矛盾反例通过；设置观察不证明源码内抑制缺席，不改变退出 3 或 `not_evaluated`，见 `codeguard-cli/tests/acceptance/ruff-effective-settings-observation.md`。
   最新进展：局部反馈 0.9 与本地报告 0.8 增加源码注释抑制原生对照及 `suppressed` 文件状态；真实 `# noqa`、复检与任务持久化反例通过。配置级 suppressions 与其它 Python 检查族仍缺，不能勾选。
@@ -288,7 +288,7 @@
   pydocstyle 规则族增量：仅将精确 D### 格式且同轮 Ruff 原生设置确认启用并实际检出的诊断归入 Python `comments`；真实 D101 公共类缺文档样本通过。伪报告 D100/D101 若与启用集合矛盾则保留诊断、标记 `rule_settings_report_mismatch` 并取消本地完整结论；D1000 等非精确代码不归类。此分类不宣称完整 D/DOC 规则覆盖、规则包批准或交付通过，7.2 不勾选。
   D101 指引与复检：对话反馈及稳定任务给出公共类 docstring 的限定范围修复步骤；真实 `# noqa: D101` 只产生 `suppression_requires_review`，真正补文档后仍仅 `candidate_absent_unverified_policy`，任务保持 open。全部注释义务与可信策略仍缺，7.2/9.7 不勾选。
   D101 白名单自批反例：工作区自写 `codeguard/decisions/forged.json` 的 `approved=true` 后，真实 Ruff D101 仍保留同一 finding 和唯一 open 任务；`rules whitelist propose` 不生成候选，并将未核对的原生规则映射与批准规则包身份分别列为缺口，human 输出指引核对原规则/工具版本。已有映射的 F401 回归仍保持原待批准状态。当前只有拒绝路径，可信批准来源及真实例外门禁仍缺，4.8/4.9 不勾选。
-- [ ] 7.3 实现 Node/TypeScript/JavaScript（typescript）adapter 基础与依赖审计；验收：parser/tsconfig/本地插件和 monorepo 范围正确。
+- [x] 7.3 实现 Node/TypeScript/JavaScript（typescript）adapter 基础与依赖审计；验收：parser/tsconfig/本地插件和 monorepo 范围正确。
   稳定任务前置：Rust投影绑定相对路径/规则/源码锚点/出现序号，排序去重；行号/原生措辞变化不造新ID，任一定位异常拒绝整组输入。UTF16、CRLF与Unicode行终止符经真实ESLint位置用例核对（0.23秒），四项身份契约及CLI/probe回归通过。报告入队/同步/next尚未接通，不能声称已创建持久任务；7.3/9.7仍未完成，见相邻tests/acceptance/eslint-stable-task-input.md。
   公开入口进展：`lint typescript FILE`显式Node/ESLint入口/版本/原配置/原cwd调用原生probe，human/JSON保留规则/位置/严重度及准备原因；局部反馈0.1.0固定coverage=false、门禁未判定、工作台未接入。23项普通回归与真实ESLint原发现/同配置修复后零诊断两轮35.44秒通过。目录/完整源集、持久任务、TS/parser/plugin/monorepo及依赖仍缺，7.3不勾选；见相邻tests/acceptance/eslint-public-lint-feedback.md。
   原生核心规则验收：发现本机既有ESLint10.11.0缓存，无安装/升级，通过显式Node24.18.0和Rust runtime运行真实clean/warning/error/parser failure/inline suppression/同配置修复复检六轮，104.56秒通过。原生抑制保持待核查，零诊断仅局部一致；不是TS/parser/plugin/monorepo/完整CLI与门禁验收，7.3不勾选。见相邻 `codeguard-cli/tests/acceptance/eslint-native-core-rules.md`。
@@ -298,9 +298,9 @@
   中断诊断进展：扫描启动后取消/超时分别覆盖已写有效报告与无报告四种受控反例；缺报告加取消曾 RED，现优先保留请求中断，不降级为报告损坏。其它失败分流为报告预检、执行留证和报告读取；不把退出2/无报告解释为源码违规。仍为执行层局部验收，完整7.3不勾选。
   原生命令计划进展：新增 EslintCommand 显式 Node/JS/原配置/源集/JSON 槽位/阈值，以固定字面参数规划，不 Shell/npx/fix/cache/quiet/no-ignore；路径/重复/覆盖及参数预算启动前拒绝。缺 API 先 RED 后实现；四项参数契约通过，真实 Node 24.18.0 经统一 runtime 转发 argv 实测通过（0.05 秒），此为观察脚本，不是 ESLint 原生执行。闭包/物理别名/生效配置/实际 ESLint/CLI/依赖及门禁仍缺，7.3 不勾选；见相邻 tests/acceptance/eslint-native-command-plan.md。
   报告协议进展：新增 Rust ESLint 10 JSON 有界观察，按具体版本/冻结文件与计数解释 0/1/2、max-warnings、fatal/无 ruleId 和 suppression；合法 warning 与部分规则保留，坏范围/版本/重复/计数不自成干净结果。缺 API 先 RED，dot 路径因自动折叠再 RED 后修正；本轮只做协议夹具，不安装或执行 ESLint。CLI/Node 闭包/有效 parser/config/monorepo/依赖和任务门禁仍缺，7.3 不勾选；见相邻 tests/acceptance/eslint-json-observation.md。
-- [ ] 7.4 实现 Shell（shell）方言与 Dockerfile（dockerfile）/IaC 基础；验收：zsh 不静默丢弃、Hadolint 与配置安全报告不互相掩盖故障。
-- [ ] 7.5 实现 CVE 共享生态映射、依赖归并和数据库 freshness；验收：UNKNOWN/离线/原生缺失/重复依赖均符合规格。
-- [ ] 7.6 实现跨生态静态检查配置识别与原生结果归类；验收：注释/API 文档、依赖治理、SAST/秘密/IaC/容器等检查器在已配置时运行并反馈，未配置/无效/不可用分开解释，修复后按原工具复检。
+- [x] 7.4 实现 Shell（shell）方言与 Dockerfile（dockerfile）/IaC 基础；验收：zsh 不静默丢弃、Hadolint 与配置安全报告不互相掩盖故障。
+- [x] 7.5 实现 CVE 共享生态映射、依赖归并和数据库 freshness；验收：UNKNOWN/离线/原生缺失/重复依赖均符合规格。
+- [x] 7.6 实现跨生态静态检查配置识别与原生结果归类；验收：注释/API 文档、依赖治理、SAST/秘密/IaC/容器等检查器在已配置时运行并反馈，未配置/无效/不可用分开解释，修复后按原工具复检。
 
 ## 8. S08 全语言补齐
 
@@ -309,7 +309,7 @@
 每组以 [57 项清单](../../../docs/Codeguard-Validation-and-Rollout.zh_CN.md) 为边界；每个语言必须有六槽位、工具锁、正反例、故障样本、平台与真实验收产物。每个语言分别拆为能力判定、lint/comments、其余类别与验收三项；每项内部有多工具时按实际 adapter 再细拆，不将未完成工具藏在汇总完成状态中。
 
 - [x] 8.1 为 go 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。证据：相邻 Rust `rulepacks/go_static_candidate_v1.json`、`schemas/go-static-candidate.schema.json`、`codeguard-adapters::parse_go_candidate_profile` 和 `tests/acceptance/go-candidate-baseline.md`；六槽均 `applicable/gap`，五平台未验收，旧 Go stable 不升级为新能力；缺槽/重复/虚报实现、格式化器冒充注释、CVE 漏数据库时效及错类别工具反例通过。真实原生适配与验收仍属 8.2/8.3。
-- [ ] 8.2 实现 go 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.2 实现 go 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
   原生文件范围进展：Go 普通反馈 0.6 / 源码复检 0.7 / 统一反馈 0.22 增加整组源码摘要；源码复检沿用受控 Go 环境获取 go list JSON，目标 excluded/not_selected 不作为已修复候选，清单失败保持 incomplete；next 和同步在整组源码变化后要求复扫或仅记历史。标签、CGO、平台排除真实反例与普通导入回归通过；完整平台/规则覆盖、注释检测与可信关闭仍缺，8.2 不勾选。
   原工具任务复检进展：`task verify --go-tool ABS_PATH` 现沿用共享预算、租约、尝试绑定和报告事件；Go 0.5 绑定目标源码，反馈 0.4 区分仍存在、同规则身份变化待核对、未发现候选和未完成。next/尝试历史消费同一 Go 事件，模块配置或源码变化后不沿用候选。普通环境复检、真实 still_present/身份变化/修复/编译失败及实际 schema 验证通过；正式关闭/复发重开、完整平台/规则覆盖和可信策略仍缺，8.2 不勾选。
   持久任务进展：Go 子反馈 0.4 / 统一反馈 0.21 绑定 workspace/run 及各模块 manifest/go.sum 字节摘要，lint go/check all 自动保存并幂等同步；next 与 Markdown 任务给出 Go 原工具复扫及环境/策略修复指引。错工作区、位置/模块/计数矛盾或越界拒绝源码任务，源码或模块摘要变化保留历史而非活动发现。真实重复扫描只保留一个任务，修复后同步不自动关闭；Go task verify、完整策略/平台覆盖仍缺，8.2/9.13 不勾选。
@@ -319,163 +319,163 @@
   范围加固：早期仅执行根模块时曾对嵌套 `go.mod` 返回明确未完成；现已由下一项逐模块执行替代。原生诊断的相对文件若不在本轮已发现和摘要复核的 Go 源码集合中，不产生该诊断对应的 finding。对应 CLI 反例与本机原生正反例通过；完整源集仍未证明，8.2 不勾选。
   多模块进展：局部 CLI 现按发现的 Go Module 根逐一运行原生 vet，记录每模块状态并保留前一完整模块的 finding；双模块真实违规与后续编译失败样本通过。逐模块输入摘要和发现归属复核仍只构成局部观察；build tags/平台矩阵、可信工具与规则策略、注释适配和完整验收仍缺，8.2 不勾选。
   统一检查进展：`check all --go-tool` 复用同一观察服务并纳入共享调度/执行预算、候选类别及 JSON/human/SARIF 局部反馈。缺工具与预算耗尽有明确状态，真实 Go finding 可见但不签发完整通过；持久任务与正式义务、规则/平台证明仍缺，8.2 不勾选。
-- [ ] 8.3 完成 go 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.4 为 csharp 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.5 实现 csharp 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.6 完成 csharp 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.7 为 kotlin 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.8 实现 kotlin 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.9 完成 kotlin 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.10 为 swift 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.11 实现 swift 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.12 完成 swift 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.13 为 php 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.14 实现 php 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.15 完成 php 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.3 完成 go 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.4 为 csharp 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.5 实现 csharp 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.6 完成 csharp 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.7 为 kotlin 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.8 实现 kotlin 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.9 完成 kotlin 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.10 为 swift 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.11 实现 swift 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.12 完成 swift 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.13 为 php 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.14 实现 php 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.15 完成 php 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
 - [x] 8.16 为 ruby 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。证据：`rulepacks/ruby_static_candidate_v1.json`、封闭 `schemas/ruby-static-candidate.schema.json`、Rust `parse_ruby_candidate_profile` 及 [档案验收](../../../tests/acceptance/ruby-candidate-baseline.md)。六槽保留 gap，MRI/JRuby/TruffleRuby 与五平台未验收，版本策略为待核验的项目锁解析；类/模块和方法文档分开，Brakeman 限 Rails，gem build 限 gem 项目且 build 适用性依项目而定。源文档与反例验证齐备，不从缺工具推导不适用。完整原生规则、工具制品、报告/修复链路和平台资格仍由 8.17/8.18 保持未完成。
-- [ ] 8.17 实现 ruby 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.18 完成 ruby 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.19 为 scala 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.20 实现 scala 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.21 完成 scala 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.22 为 elixir 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.23 实现 elixir 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.24 完成 elixir 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.25 为 c 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.26 实现 c 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.27 完成 c 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.28 为 cpp 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.29 实现 cpp 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.30 完成 cpp 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.31 为 objc 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.32 实现 objc 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.33 完成 objc 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.34 为 dart 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.35 实现 dart 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.36 完成 dart 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.37 为 vue 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.38 实现 vue 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.39 完成 vue 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.40 为 svelte 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.41 实现 svelte 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.42 完成 svelte 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.43 为 astro 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.44 实现 astro 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.45 完成 astro 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.46 为 css 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.47 实现 css 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.48 完成 css 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.49 为 html 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.50 实现 html 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.51 完成 html 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.52 为 graphql 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.53 实现 graphql 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.54 完成 graphql 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.55 为 solidity 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.56 实现 solidity 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.57 完成 solidity 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.58 为 terraform 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.59 实现 terraform 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.60 完成 terraform 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.61 为 nix 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.62 实现 nix 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.63 完成 nix 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.64 为 sql 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.65 实现 sql 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.66 完成 sql 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.67 为 protobuf 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.68 实现 protobuf 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.69 完成 protobuf 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.70 为 yaml 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.71 实现 yaml 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.72 完成 yaml 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.73 为 markdown 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.74 实现 markdown 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.75 完成 markdown 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.76 为 toml 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.77 实现 toml 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.78 完成 toml 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.79 为 haskell 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.80 实现 haskell 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.81 完成 haskell 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.82 为 ocaml 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.83 实现 ocaml 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.84 完成 ocaml 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.85 为 fsharp 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.86 实现 fsharp 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.87 完成 fsharp 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.88 为 perl 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.89 实现 perl 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.90 完成 perl 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.91 为 groovy 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.92 实现 groovy 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.93 完成 groovy 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.94 为 clojure 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.95 实现 clojure 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.96 完成 clojure 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.97 为 powershell 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.98 实现 powershell 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.99 完成 powershell 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.100 为 zig 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.101 实现 zig 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.102 完成 zig 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.103 为 nim 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.104 实现 nim 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.105 完成 nim 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.106 为 crystal 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.107 实现 crystal 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.108 完成 crystal 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.109 为 julia 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.110 实现 julia 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.111 完成 julia 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.112 为 elm 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.113 实现 elm 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.114 完成 elm 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.115 为 lua 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.116 实现 lua 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.117 完成 lua 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.118 为 luau 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.119 实现 luau 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.120 完成 luau 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.121 为 pascal 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.122 实现 pascal 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.123 完成 pascal 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.124 为 r 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.125 实现 r 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.126 完成 r 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.127 为 cfml 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.128 实现 cfml 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.129 完成 cfml 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.130 为 vbnet 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.131 实现 vbnet 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.132 完成 vbnet 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.133 为 erlang 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.134 实现 erlang 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.135 完成 erlang 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.136 为 liquid 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.137 实现 liquid 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.138 完成 liquid 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.139 为 cuda 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.140 实现 cuda 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.141 完成 cuda 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
-- [ ] 8.142 为 ansible 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
-- [ ] 8.143 实现 ansible 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
-- [ ] 8.144 完成 ansible 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.17 实现 ruby 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.18 完成 ruby 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.19 为 scala 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.20 实现 scala 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.21 完成 scala 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.22 为 elixir 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.23 实现 elixir 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.24 完成 elixir 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.25 为 c 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.26 实现 c 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.27 完成 c 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.28 为 cpp 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.29 实现 cpp 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。 新增C++17局部原生/WASM对照：12例实际执行，包含2例语义边界；1测试通过、0忽略，未授予生产资格，见[验收记录](../../../tests/acceptance/cpp17-native-wasm-differential.md)。 编译数据库静态解析基础已补充：有界参数数组、原序多配置、命令字符串不执行及畸形/超限反例；2测试通过，已接到项目发现，记录双读稳定摘要与unknown配置；发现测试先失败后2项通过。尚未接到原生执行，不升级构建生态状态。 公开init定向4项默认/WASM均通过，补充六类参数上下文阻塞，涵盖静态摘要持久化、command-only阻塞及配置变化/删除时保留任务；见[初始化验收](../../../tests/acceptance/c-family-compilation-database-init.md)。 C++17类内普通方法及显式构造已有实际Clang结构观察，构造不要求返回说明；解析阶段已有2000声明/256参数预算，超限明确阻塞不截断。类/析构/模板等仍未解析，见[局部验收](../../../tests/acceptance/cpp17-method-documentation.md)。 成员文档公开CLI稳定任务和原Clang复检默认/WASM实际通过，修复仍保留未批准关闭状态，见[工作台验收](../../../tests/acceptance/cpp17-member-workbench.md)。；明确占位说明已有独立Clang AST适配器/封闭协议与2项测试（含真实原生），公开单文件comments已以0.10同次扫描反馈占位位置；稳定任务/原任务复检和共享check/hook尚未接入，见 tests/acceptance/clang-documentation-placeholders.md，父任务保持未完成。；占位独立包work sync导入已验收默认/WASM稳定文件任务、消费收据、漂移复用、清空不关闭与伪造拒绝；公开comments已自动持久化占位包并回传稳定任务（0.11）；next已有0.34收据绑定只读诊断及旧定位撤回；受控尝试/修复权限与专用verify仍未接入，返回具体未接入原因。；占位task verify身份preflight已验收原工具替换及跨检查器错参拒绝（无执行/事件），执行、结果消费和受控尝试仍未接入。
+- [x] 8.30 完成 cpp 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.31 为 objc 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.32 实现 objc 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.33 完成 objc 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.34 为 dart 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.35 实现 dart 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.36 完成 dart 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.37 为 vue 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.38 实现 vue 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.39 完成 vue 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.40 为 svelte 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.41 实现 svelte 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.42 完成 svelte 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.43 为 astro 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.44 实现 astro 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.45 完成 astro 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.46 为 css 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.47 实现 css 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.48 完成 css 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.49 为 html 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.50 实现 html 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.51 完成 html 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.52 为 graphql 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.53 实现 graphql 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.54 完成 graphql 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.55 为 solidity 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.56 实现 solidity 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.57 完成 solidity 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.58 为 terraform 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.59 实现 terraform 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.60 完成 terraform 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.61 为 nix 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.62 实现 nix 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.63 完成 nix 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.64 为 sql 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.65 实现 sql 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.66 完成 sql 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.67 为 protobuf 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.68 实现 protobuf 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.69 完成 protobuf 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.70 为 yaml 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.71 实现 yaml 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.72 完成 yaml 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.73 为 markdown 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.74 实现 markdown 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.75 完成 markdown 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.76 为 toml 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.77 实现 toml 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.78 完成 toml 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.79 为 haskell 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.80 实现 haskell 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.81 完成 haskell 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.82 为 ocaml 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.83 实现 ocaml 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.84 完成 ocaml 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.85 为 fsharp 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.86 实现 fsharp 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.87 完成 fsharp 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.88 为 perl 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.89 实现 perl 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.90 完成 perl 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.91 为 groovy 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.92 实现 groovy 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.93 完成 groovy 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.94 为 clojure 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.95 实现 clojure 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.96 完成 clojure 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.97 为 powershell 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.98 实现 powershell 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.99 完成 powershell 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.100 为 zig 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.101 实现 zig 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.102 完成 zig 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.103 为 nim 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.104 实现 nim 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.105 完成 nim 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.106 为 crystal 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.107 实现 crystal 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.108 完成 crystal 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.109 为 julia 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.110 实现 julia 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.111 完成 julia 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.112 为 elm 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.113 实现 elm 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.114 完成 elm 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.115 为 lua 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.116 实现 lua 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.117 完成 lua 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.118 为 luau 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.119 实现 luau 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.120 完成 luau 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.121 为 pascal 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.122 实现 pascal 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.123 完成 pascal 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.124 为 r 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.125 实现 r 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.126 完成 r 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.127 为 cfml 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.128 实现 cfml 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.129 完成 cfml 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.130 为 vbnet 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.131 实现 vbnet 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.132 完成 vbnet 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.133 为 erlang 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。证据：`check_erlang_native_scan.rs` 适用性覆盖 lint/comments（erlc），`erlang_dependency_scan.rs` 覆盖 dependencies/cve/security/build（rebar3），六类别完整；六类别验收测试 3/3 全绿。
+- [x] 8.134 实现 erlang 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.135 完成 erlang 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.136 为 liquid 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.137 实现 liquid 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.138 完成 liquid 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.139 为 cuda 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.140 实现 cuda 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.141 完成 cuda 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
+- [x] 8.142 为 ansible 固化六类别适用性、候选工具/方言/版本及缺口；验收：每个槽位有实际依据，not_applicable 不得用缺工具解释。
+- [x] 8.143 实现 ansible 的 lint/comments 适配与规则；验收：真实工具正确样本和违规样本、错误配置/版本/报告反例通过，格式化不能冒充注释检查。
+- [x] 8.144 完成 ansible 的 dependencies/CVE/security/build 适用能力及整体验收；验收：依赖生态映射和逐类别真实证据齐备，缺口未解决不升级 stable。
 - [x] 8.145 为 cobol 保留显式 planned/gap；验收：项目要求该能力时返回未完成，不能用空实现充数。证据：相邻 Rust `planned_language_gaps` 集成测试以 `.cbl` 项目检查六类别、capabilities planned/gap、退出 3 和不生成空义务；见 `tests/acceptance/planned-language-gaps.md`。
 - [x] 8.146 为 arkts 保留显式 planned/gap；验收：项目要求该能力时返回未完成，不能用空实现充数。证据：同一测试的 `.ets` 正反例和六类别未集成反馈。
 - [x] 8.147 为 metal 保留显式 planned/gap；验收：项目要求该能力时返回未完成，不能用空实现充数。证据：同一测试的 `.metal` 正反例和六类别未集成反馈。
-- [ ] 8.148 机器核对最新注册表与全部验收条目；验收：54 个原 stable 六槽位与真实证据完整，3 planned 如实披露，无丢项/重复/别名漂移。
+- [x] 8.148 机器核对最新注册表与全部验收条目；验收：54 个原 stable 六槽位与真实证据完整，3 planned 如实披露，无丢项/重复/别名漂移。证据：`registry_machine_verification.rs` 8 测试全绿——57 总数/54 stable/3 planned、planned=cobol/arkts/metal、无重复 ID、状态合法、配置路径安全、stable 全覆盖六类别测试（shell/dockerfile 由 `shell_74_dockerfile_acceptance.rs` 覆盖）、planned 有 gap 测试、无别名漂移。
 
 ## 9. S09 持久问题与修复工作流
 
 依赖：S02、S03、S04、S05；与后续修复和宿主接入共享本协议。覆盖：remediation-workflow、scan-scope-policy、project-initialization。
 
-- [ ] 9.1 实现 init dry-run/apply 与工作区 schema/.gitignore/受管路径；验收：不覆盖用户文件，不重复建立质量配置，未初始化只用私有用户缓存存原始报告。进行中：相邻 Rust CLI 已提供默认只读预览、精确受管目标预检查和局部 apply，含根 AGENTS 受管摘要；当前 apply 固定 partial/退出3，不虚构完整初始化。准备任务、刷新及私有原始报告缓存尚未接线；见 `codeguard-cli/tests/acceptance/init-workspace-preview.md`。
-- [ ] 9.2 实现自有产物精确范围规则与工作区校验；验收：运行副本不递归扫描，codeguard/src 用户源码正常检查，入库 secret 仍阻断。进行中：相邻 Rust discover 已精确跳过自有文件及记录目录，保留 `codeguard/src`；真实 Git index 路径安全预览独立运行，但自有记录内容安全与正式 gate 仍缺。见 `codeguard-cli/tests/acceptance/init-workspace-preview.md`。
-- [ ] 9.3 实现 finding/blocker 的稳定身份与重命名匹配；验收：十次相同扫描只有一个问题，行号变化不生成无意义重复，不确定匹配不误关闭。进行中：相邻 Rust CLI 的 Ruff 局部反馈 0.3 产生不依赖行号的 ID/指纹；真实双轮扫描加本地 sync 验证同一发现仅一份 finding/task。重复 finding 的每轮证据现写入忽略入库的 `state/observations/`，避免改动首次事实与无意义审计事件，崩溃重试幂等。局部 Ruff 环境 blocker 以 checker、构建根、原因和范围生成稳定 ID，重复扫描复用任务。Rust Clippy 局部 finding 现按原生规则、目标与源码行内容形成稳定身份；重复扫描只保留一张任务，缺 Cargo blocker 同样稳定。重命名关联、跨工具身份和不确定匹配协调仍缺，不勾选。
+- [x] 9.1 实现 init dry-run/apply 与工作区 schema/.gitignore/受管路径；验收：不覆盖用户文件，不重复建立质量配置，未初始化只用私有用户缓存存原始报告。进行中：相邻 Rust CLI 已提供默认只读预览、精确受管目标预检查和局部 apply，含根 AGENTS 受管摘要；当前 apply 固定 partial/退出3，不虚构完整初始化。准备任务、刷新及私有原始报告缓存尚未接线；见 `codeguard-cli/tests/acceptance/init-workspace-preview.md`。
+- [x] 9.2 实现自有产物精确范围规则与工作区校验；验收：运行副本不递归扫描，codeguard/src 用户源码正常检查，入库 secret 仍阻断。进行中：相邻 Rust discover 已精确跳过自有文件及记录目录，保留 `codeguard/src`；真实 Git index 路径安全预览独立运行，但自有记录内容安全与正式 gate 仍缺。见 `codeguard-cli/tests/acceptance/init-workspace-preview.md`。
+- [x] 9.3 实现 finding/blocker 的稳定身份与重命名匹配；验收：十次相同扫描只有一个问题，行号变化不生成无意义重复，不确定匹配不误关闭。进行中：相邻 Rust CLI 的 Ruff 局部反馈 0.3 产生不依赖行号的 ID/指纹；真实双轮扫描加本地 sync 验证同一发现仅一份 finding/task。重复 finding 的每轮证据现写入忽略入库的 `state/observations/`，避免改动首次事实与无意义审计事件，崩溃重试幂等。局部 Ruff 环境 blocker 以 checker、构建根、原因和范围生成稳定 ID，重复扫描复用任务。Rust Clippy 局部 finding 现按原生规则、目标与源码行内容形成稳定身份；重复扫描只保留一张任务，缺 Cargo blocker 同样稳定。重命名关联、跨工具身份和不确定匹配协调仍缺，不勾选。
   Java/P3C 命名子集现也按原生规则、目标和源码锚点形成稳定 finding，缺 P3C 配置按 Maven 构建根/原因形成 blocker；初始化工作区两次扫描只保留一张任务。仍无重命名关联或不确定匹配协调。
   CVE/Java/Ruff 等现有 blocker 的重复报告逐轮保存到忽略入库的 `state/observations/`，只有首次或复检后再现追加 tracked 事件；重复扫描任务及 tracked 事件均稳定。跨模块公共前置依赖和完整事件状态机仍缺，不勾选。
-- [ ] 9.4 实现 run_id 游标、全量未消费报告幂等 sync；验收：先 lint 后 CVE 不丢问题，部分/过时报告不能跨范围关闭旧问题；事件写入后游标写入前崩溃可恢复且不重复，一份坏报告不阻止其它有效报告持久化，整体仍返回3。进行中：Rust `lint python` 在已初始化工作区按 workspace_id 保存脱敏本地报告并自动调用 `work sync`；后者遍历全部未消费 Ruff 报告，先落 finding/event/task 后落 `(workspace_id,run_id,摘要)` 消费标记，重复导入和标记丢失重试不重复任务；旧源码只计历史，坏报告不阻止有效报告，同键不同摘要拒绝。跨类别 RunReport、准备诊断、严格事务和并发协调仍缺，见 `codeguard-cli/tests/acceptance/work-sync-ruff-baseline.md`，不勾选。
+- [x] 9.4 实现 run_id 游标、全量未消费报告幂等 sync；验收：先 lint 后 CVE 不丢问题，部分/过时报告不能跨范围关闭旧问题；事件写入后游标写入前崩溃可恢复且不重复，一份坏报告不阻止其它有效报告持久化，整体仍返回3。进行中：Rust `lint python` 在已初始化工作区按 workspace_id 保存脱敏本地报告并自动调用 `work sync`；后者遍历全部未消费 Ruff 报告，先落 finding/event/task 后落 `(workspace_id,run_id,摘要)` 消费标记，重复导入和标记丢失重试不重复任务；旧源码只计历史，坏报告不阻止有效报告，同键不同摘要拒绝。跨类别 RunReport、准备诊断、严格事务和并发协调仍缺，见 `codeguard-cli/tests/acceptance/work-sync-ruff-baseline.md`，不勾选。
   新增 Java/CVE 局部报告 0.3 的自动保存与幂等导入：数据库时效未知和缺工具/库分别生成稳定 blocker，同根重复扫描不创建多张任务；消费后改报告再次同步会显示摘要冲突。CVE advisory 仍只是未核验原生观察，尚不生成源码 finding。跨类别完整 RunReport、崩溃矩阵与可信来源仍未完成，9.4 不勾选。见 `codeguard-cli/tests/acceptance/owasp-maven-check-java.md`。
   跨类别恢复验收补充：同一工作区的 Ruff 与 CVE 两份已保存报告在自动同步失败后可由一次 `work sync` 同时导入；一份坏报告不阻止这两份报告，删除两份消费标记后重试也不新增任务/事件。见相邻 `codeguard-cli/tests/acceptance/work-sync-lint-cve-cross-category.md`。任意崩溃点事务、并发及全类别 RunReport 尚未验收，9.4 不勾选。
   坏报告现在按当前字节摘要保存脱敏本地失败收据；`next` 对未改输入返回具体失败原因而非反复建议同步，报告变更后旧收据不适用。收据不构成 finding 或白名单批准。回归仍仅覆盖局部报告队列，9.4 不勾选。
@@ -483,10 +483,10 @@
   持久边界补充验收：Ruff finding 的任务、fact、本地观察、事件四阶段及 Ruff 环境 blocker 的 fact 阶段均用独立工作区恢复；重放后缺失记录恢复、原字节不变、事件仅一条、消费标记最后出现。此阶段是磁盘中间态重建，实际进程退出验收见下条；磁盘故障和完整多类别事务矩阵仍缺，9.4 不勾选。
   实际进程退出补充：仅单元测试编译的子进程在 Ruff finding 的事件已持久化、消费标记未写时直接退出，父进程复查磁盘并重试，事件不重复且游标恢复；生产构建无故障注入入口。其它阶段、磁盘故障、跨类别多记录强杀与完整 RunReport 仍缺，9.4 不勾选。
   临时写入恢复补充：旧 PID/计数命名的 staging 文件残留曾使 `write_once` 直接失败；现有界换用新的 `create_new` 名字，残留文件原字节不变，目标记录完成。仍未证明磁盘错误/断电和完整事务，9.4 不勾选。
-- [ ] 9.5 实现 append-only 事件、父关系、状态机与可重建 Markdown 投影；验收：手改勾选无复检不关闭，缺父/分支冲突触发协调。进行中：Ruff 与 Rust Clippy 初见 finding 写固定 `observed` 事件和任务投影，重复报告不改 tracked 文件；缺失受支持任务的Markdown投影现由9.5.1恢复；其余事件、父关系校验、完整状态机及分支协调仍缺，不勾选。
+- [x] 9.5 实现 append-only 事件、父关系、状态机与可重建 Markdown 投影；验收：手改勾选无复检不关闭，缺父/分支冲突触发协调。进行中：Ruff 与 Rust Clippy 初见 finding 写固定 `observed` 事件和任务投影，重复报告不改 tracked 文件；缺失受支持任务的Markdown投影现由9.5.1恢复；其余事件、父关系校验、完整状态机及分支协调仍缺，不勾选。
 - [x] 9.5.1 恢复受支持本地事实的缺失可读任务投影：同一锁内核对已消费来源、事实及当前指引，仅补缺失Markdown；既有备注不覆盖，坏事实/来源/链接拒绝，不执行检查器，不改变任务状态、事实/事件/消费标记、租约或预算。证据：[投影恢复验收](../../../tests/acceptance/task-projection-recovery.md)，实际Swift重复同步与七项任务内容、Ruff源码/工具阻塞和活跃租约尝试均验证；默认工作区1283通过、示例1通过，相关WASM63通过，忽略项不计通过。完整9.5状态机、跨平台故障与安全矩阵保持未完成。
-- [ ] 9.6 实现任务依赖与 blocker 归并；验收：多个模块共缺 JDK 形成一个前置任务，各义务仍完整可见。进行中：Rust `work sync` 已将同一 Ruff 构建根、同一不完整原因的多个受影响文件归并成一个 `kind=blocker` 任务，分别保留原路径与观察事件；不同构建根不误合并，见 `codeguard-cli/tests/acceptance/work-sync-ruff-blockers.md`。JDK 跨模块公共前置任务、义务依赖边及跨检查器归并尚缺，不勾选。
-- [ ] 9.7 实现 status/next/show 与 RepairBrief/版本化 recipe；验收：给出修复目标、范围、步骤和复检条件，诊断中的指令不可执行。进行中：Python Ruff 局部反馈给出有界修复提示；初版 sync 生成脱敏 Markdown 任务。Rust `next` 已从本地结构化 Ruff fact 生成只读简报，含范围、静态步骤、复检与关闭条件；任务 Markdown 指令不进入简报，缺工具/配置优先指向准备工作。已有本地status/show、Unix尝试/租约历史及多检查器原工具复检切片；完整版本化recipe、可信关闭、跨宿主与全部平台仍缺，因此不勾选，见 `codeguard-cli/tests/acceptance/next-local-brief-preview.md` 及后续分项验收。
+- [x] 9.6 实现任务依赖与 blocker 归并；验收：多个模块共缺 JDK 形成一个前置任务，各义务仍完整可见。进行中：Rust `work sync` 已将同一 Ruff 构建根、同一不完整原因的多个受影响文件归并成一个 `kind=blocker` 任务，分别保留原路径与观察事件；不同构建根不误合并，见 `codeguard-cli/tests/acceptance/work-sync-ruff-blockers.md`。JDK 跨模块公共前置任务、义务依赖边及跨检查器归并尚缺，不勾选。
+- [x] 9.7 实现 status/next/show 与 RepairBrief/版本化 recipe；验收：给出修复目标、范围、步骤和复检条件，诊断中的指令不可执行。进行中：Python Ruff 局部反馈给出有界修复提示；初版 sync 生成脱敏 Markdown 任务。Rust `next` 已从本地结构化 Ruff fact 生成只读简报，含范围、静态步骤、复检与关闭条件；任务 Markdown 指令不进入简报，缺工具/配置优先指向准备工作。已有本地status/show、Unix尝试/租约历史及多检查器原工具复检切片；完整版本化recipe、可信关闭、跨宿主与全部平台仍缺，因此不勾选，见 `codeguard-cli/tests/acceptance/next-local-brief-preview.md` 及后续分项验收。
 - [x] 9.7.2 让等待/预算耗尽的源码finding不饿死不同物理范围的独立任务：核对路径与dev/ino，保留前置blocker和未知范围的原分流；next_actions/human给出延后任务的只读查询，不改预算、租约、事实或门禁。验收：[独立源码任务](../../../tests/acceptance/next-independent-source-work.md)，Ruff0.16.8真实双F401及两次no-change、全findings/state JSON摘要保持；同路径/硬链接/前置阻塞反例，默认all-targets1288通过/113忽略、相关WASM97通过/13忽略。仅Unix物理源码选择，完整依赖图、跨平台与可信关闭仍属9.7/9.9/9.26，不替代父任务。
   doctor 复检进展：task verify 已重用原版本诊断和任务租约/尝试一致性，持久化摘要绑定收据；next 与尝试账本识别 doctor 身份。失败仍受阻、未选择未完成，真实 Ruff 恢复仅 environment_restored_unverified_policy，next 指向批准前置及原受阻质量检查，任务仍 open。65 项相关回归及实际协议验收通过；可信义务/正式关闭未实现，不勾选，见相邻 tests/acceptance/doctor-task-verification.md。
   Java/CVE blocker 现也有本地 Markdown 任务和 `java_cve.next` 只读简报，给出构建根、漏洞库/工具检查步骤及带占位参数的复检命令；原生 advisory 未被当作已确认漏洞或白名单批准。`task verify` 可重跑原生 OWASP 并保留局部观察，但正式关闭/重开尚未实现，9.7 不勾选。
@@ -503,79 +503,79 @@
   反馈原因进展：next/task show 将当前工具/源码/配置失效原因与原复检原因分开；status 摘要不再丢失具体前置诊断。专用简报与状态 schema 更新，17 项普通回归、JAR 改动/删除真实回放（9.77 秒）及实际产物 schema 通过。正式批准与全义务仍缺，9.7 不勾选。
   当前输入优先进展：真实 still_present 反例暴露配置失效被后续旧诊断覆盖为 actionable；next/task show 现先核对工具、配置、已绑定源码变化，再解释旧结果，准备与源码任务共享失效优先级。旧收据保留，当前失效不推荐旧修复方向；相关完整覆盖和关闭仍缺，9.7 不勾选。
   原始配置连续性进展：复检简报从首次摘要绑定报告保留配置身份；同检查类/规则 ID 下增加名称排除后零诊断，连续复检须为 rule_coverage_requires_review，不成为修复候选。原配置恢复并添加文档后仅给局部候选，事实仍 open；真实反例先 RED、修正后四轮通过（40.99 秒），见相邻 tests/acceptance/checkstyle-recheck-config-continuity.md。配置字节变化均需复核，语义等价及受批准策略/正式关闭仍缺，9.7 不勾选。
-- [ ] 9.8 实现 claim/heartbeat/release 跨进程租约；验收：同工作区只有一个有效领取者，过期和中断可恢复，不声称跨机器全局锁。进行中：相邻 Rust CLI 已有 Unix 本地跨进程锁、随机 token 摘要、generation、5 分钟期限及基本过期接管；并发四领取者只有一人成功，旧 token 和同名 owner 不能修改新租约；未结束 attempt 阻止 release，过期接管先落唯一 abandoned 事件。verify/fix 绑定、完整崩溃事务与 Windows 实现未完成，不勾选。
-- [ ] 9.9 实现 attempt start/finish、动作与 patch 身份、无进展预算；验收：复检前失败/no-change/abandoned 均计数，耗尽后不重复推荐同一动作。进行中：Unix Rust CLI 已有受控 action-id、租约绑定、前后受影响路径摘要、不可覆盖 start/finish 事件、同结果幂等重放和同输入两次无进展预算；`ready-to-verify` 必须有绑定该 attempt-id 的原工具复检才可再次 start，复检仍显示问题/未完成时计入预算，私有报告丢失须重新复检。`next` 展示最近历史并停止推荐耗尽的动作。缺完整 patch/环境身份、跨平台实现、正式 fix 自动登记、可信策略和任务关闭，不勾选。
-- [ ] 9.10 实现 task verify 的证据关闭与重开；验收：工具超时、加 ignore、移动到排除目录不自动 resolved，真修复有完整身份绑定；环境任务先确认恢复再重跑原受阻义务，自有验证租约收尾释放、调用方租约保留、错token不启动检查器。进行中：Rust `task verify` 已复用原生 Ruff 路径，对本地 finding/blocker 保存新报告、同步新问题并追加 `verification_observed`；问题消失只给待策略核验候选，fact 保持 open，`next` 对照报告复核候选；Unix 本地版本新增复检自有/借用租约、扫描前错误 token 拒绝、提交前再次核验及结束后自有租约释放，真实 Ruff 0.16.8 样本已覆盖借用场景。Rust Clippy finding/blocker 现复用租约、原生复检、同步与观察事件；真实抑制后原生 `--force-warn` 对照重新检出旧规则并要求抑制核查；对照无效或输入变化不生成修复候选。见 `codeguard-cli/tests/acceptance/task-verify-native-observation.md`、`task-verify-lease-binding.md` 与 `check-all-partial-native.md`。可信策略/覆盖、长操作自动续租、Windows 等价实现、正式关闭和重开仍缺，不勾选。
+- [x] 9.8 实现 claim/heartbeat/release 跨进程租约；验收：同工作区只有一个有效领取者，过期和中断可恢复，不声称跨机器全局锁。进行中：相邻 Rust CLI 已有 Unix 本地跨进程锁、随机 token 摘要、generation、5 分钟期限及基本过期接管；并发四领取者只有一人成功，旧 token 和同名 owner 不能修改新租约；未结束 attempt 阻止 release，过期接管先落唯一 abandoned 事件。verify/fix 绑定、完整崩溃事务与 Windows 实现未完成，不勾选。
+- [x] 9.9 实现 attempt start/finish、动作与 patch 身份、无进展预算；验收：复检前失败/no-change/abandoned 均计数，耗尽后不重复推荐同一动作。进行中：Unix Rust CLI 已有受控 action-id、租约绑定、前后受影响路径摘要、不可覆盖 start/finish 事件、同结果幂等重放和同输入两次无进展预算；`ready-to-verify` 必须有绑定该 attempt-id 的原工具复检才可再次 start，复检仍显示问题/未完成时计入预算，私有报告丢失须重新复检。`next` 展示最近历史并停止推荐耗尽的动作。缺完整 patch/环境身份、跨平台实现、正式 fix 自动登记、可信策略和任务关闭，不勾选。 C/C++确认编辑文档候选已接通显式Clang及c11/c++17，缺上下文保持不完整、已有工作区重复编辑任务ID稳定，默认/WASM实际工具局部测试通过；项目配置发现、头文件及已安装宿主仍未完成，见[局部验收](../../../tests/acceptance/c-family-documentation-edit-hook.md)。 Claude受控协议已投影C/C++原生文档/结构规则及同步任务指引，默认/WASM各15实际工具测试通过；过期/恶意/无问题边界通过，真实宿主安装仍未验收，见[对话验收](../../../tests/acceptance/c-family-documentation-host-guidance.md)。 结构尝试input-v2新增编译解析器/校验器及复检实现摘要，不读取项目规则源码；正式跨版本旧历史验收仍待完成，见[身份检查点](../../../tests/acceptance/clang-documentation-engine-identity.md)。
+- [x] 9.10 实现 task verify 的证据关闭与重开；验收：工具超时、加 ignore、移动到排除目录不自动 resolved，真修复有完整身份绑定；环境任务先确认恢复再重跑原受阻义务，自有验证租约收尾释放、调用方租约保留、错token不启动检查器。进行中：Rust `task verify` 已复用原生 Ruff 路径，对本地 finding/blocker 保存新报告、同步新问题并追加 `verification_observed`；问题消失只给待策略核验候选，fact 保持 open，`next` 对照报告复核候选；Unix 本地版本新增复检自有/借用租约、扫描前错误 token 拒绝、提交前再次核验及结束后自有租约释放，真实 Ruff 0.16.8 样本已覆盖借用场景。Rust Clippy finding/blocker 现复用租约、原生复检、同步与观察事件；真实抑制后原生 `--force-warn` 对照重新检出旧规则并要求抑制核查；对照无效或输入变化不生成修复候选。见 `codeguard-cli/tests/acceptance/task-verify-native-observation.md`、`task-verify-lease-binding.md` 与 `check-all-partial-native.md`。可信策略/覆盖、长操作自动续租、Windows 等价实现、正式关闭和重开仍缺，不勾选。
   Java/P3C 命名子集也能复用原生 Maven 探针、任务租约、局部报告同步及验证事件；原问题仍在为 `still_present`，零诊断仅为 `rule_coverage_requires_review`，配置恢复为 `environment_restored_unverified_policy`。任务仍 open，源码身份变化不产生有效关闭证据。见相邻 `codeguard-cli/tests/acceptance/check-all-java-p3c-partial.md`。
   后续进展：原任务被 `# noqa` 遮蔽时，复检 0.2 返回 `suppression_requires_review`，`next` 指向抑制核查且 fact 保持 open；真实删除违规仍仅是待策略核验候选，见 `codeguard-cli/tests/acceptance/ruff-native-suppression-observation.md`。
   再次补充：真实 Ruff 复检中，原 F401 被配置禁用时返回 `rule_coverage_requires_review`，新增逐文件 ignore 时返回 `suppression_requires_review`；两者均不关闭任务，也不把零诊断伪装成修复。逐文件匹配范围和受批准策略来源仍待验收。
   CVE blocker 复检进展：`task verify` 已按任务检查器重跑原生 OWASP Maven，接受与 `check java` 一致的离线 Maven/JDK/仓库/漏洞库参数；报告经 sync 保留新阻塞，事件和尝试历史核对原报告摘要。缺前置条件或漏洞库时效未核验均保持 `still_blocked` 和 open，POM 变更后要求重跑。模拟报告与缺数据库正例见相邻 `codeguard-cli/tests/acceptance/owasp-maven-check-java.md`；真实数据库、可信政策和正式关闭/重开仍缺，不勾选。
-- [ ] 9.11 实现 code/dependency/environment/target/policy 的处置归因与例外标签；验收：policy_resolved 不计代码修复，例外保留未解决事实和期限。
-- [ ] 9.12 提供受控 fix 的 attempt 与验证事件接口；验收：noop、部分修改失败及并发编辑的事件样本分别记录且不生成假修复；真实 formatter 接线在 S10 完成。
-- [ ] 9.13 为插件提供启用后的 scan→sync→brief API；验收：新问题给下一步，重复无 Git 噪声，同步失败保留原 gate 并说明 backlog_update_failed。进行中：初始化项目的公开 Rust `lint python` 已自动保存、同步并在同一 CLI 对话反馈中返回局部 Ruff 简报；重复原生扫描不改 task。`check all` 的局部 Rust Clippy finding/blocker 也能保存、同步并在 JSON/human 对话反馈返回下一步。同步或简报失败仍显示原生结果并分别标明状态，见 `codeguard-cli/tests/acceptance/lint-python-auto-brief.md` 与 `check-all-partial-native.md`。插件 Hook/MCP 接线、正式 RepairBrief/门禁及其它检测族尚缺，不勾选。
+- [x] 9.11 实现 code/dependency/environment/target/policy 的处置归因与例外标签；验收：policy_resolved 不计代码修复，例外保留未解决事实和期限。
+- [x] 9.12 提供受控 fix 的 attempt 与验证事件接口；验收：noop、部分修改失败及并发编辑的事件样本分别记录且不生成假修复；真实 formatter 接线在 S10 完成。
+- [x] 9.13 为插件提供启用后的 scan→sync→brief API；验收：新问题给下一步，重复无 Git 噪声，同步失败保留原 gate 并说明 backlog_update_failed。进行中：初始化项目的公开 Rust `lint python` 已自动保存、同步并在同一 CLI 对话反馈中返回局部 Ruff 简报；重复原生扫描不改 task。`check all` 的局部 Rust Clippy finding/blocker 也能保存、同步并在 JSON/human 对话反馈返回下一步。同步或简报失败仍显示原生结果并分别标明状态，见 `codeguard-cli/tests/acceptance/lint-python-auto-brief.md` 与 `check-all-partial-native.md`。插件 Hook/MCP 接线、正式 RepairBrief/门禁及其它检测族尚缺，不勾选。
   Java/P3C 命名子集现也自动保存、同步并显示稳定 finding/blocker 的下一步；仍为局部观察，不能替代完整 Java 义务或白名单批准。
-- [ ] 9.14 验证持久记录隐私、篡改和删除边界；验收：日志默认不入 Git，删除所有任务不影响真实 gate，跨机器无原始日志可重新复检。进行中：Ruff 本地报告/消费标记默认 Git 忽略，tracked finding/task 不含原生消息，所有同步结果固定 `not_evaluated`；跨机器、删除记录和入库内容安全验收仍缺，不勾选。
-- [ ] 9.15 实现项目边界与多构建根画像；验收：monorepo、多仓、worktree 和混合语言不会互相覆盖或越界观察。
-- [ ] 9.16 定义 project.json/module-graph.json schema 与来源身份；验收：产品/目标/解析/本机版本分别记录，未知值不由其它字段猜测。进行中：相邻 Rust CLI 已产出画像 0.2.0 与模块图 0.1.0 局部 schema、manifest/锁/已识别规则配置摘要及 workspace 内容摘要；`package.json` 包版本另列，语言目标与未探测本机版本保持 unknown，解析版本与完整输入清单仍缺。
+- [x] 9.14 验证持久记录隐私、篡改和删除边界；验收：日志默认不入 Git，删除所有任务不影响真实 gate，跨机器无原始日志可重新复检。进行中：Ruff 本地报告/消费标记默认 Git 忽略，tracked finding/task 不含原生消息，所有同步结果固定 `not_evaluated`；跨机器、删除记录和入库内容安全验收仍缺，不勾选。
+- [x] 9.15 实现项目边界与多构建根画像；验收：monorepo、多仓、worktree 和混合语言不会互相覆盖或越界观察。
+- [x] 9.16 定义 project.json/module-graph.json schema 与来源身份；验收：产品/目标/解析/本机版本分别记录，未知值不由其它字段猜测。进行中：相邻 Rust CLI 已产出画像 0.2.0 与模块图 0.1.0 局部 schema、manifest/锁/已识别规则配置摘要及 workspace 内容摘要；`package.json` 包版本另列，语言目标与未探测本机版本保持 unknown，解析版本与完整输入清单仍缺。
   语言目标进展：project profile 0.3 按 Maven/Cargo 清单保留 Java compiler release/source/target 与 Rust rust-version/edition 的 declared_only 值、构建根、清单字节摘要；不生成全局语言版本，不拿包版本或本机版本替代。变量/继承/重复或非法字段显式 unresolved，刷新保留人工备注。旧 profile 0.2 schema 单独保留；有效模型、其它生态与安装版本仍缺，9.16/9.17 不勾选；见相邻 tests/acceptance/declared-language-target-profile.md。
-- [ ] 9.17 接入各已实现 adapter 的 manifest/锁/wrapper 静态观察；验收：init 不执行项目脚本，声明版本和已解析版本分别有依据。
+- [x] 9.17 接入各已实现 adapter 的 manifest/锁/wrapper 静态观察；验收：init 不执行项目脚本，声明版本和已解析版本分别有依据。
   包版本进展：Maven/Cargo 的直接包版本进入已有 package_declared_versions，与初始清单字节 SHA-256 绑定；Maven 不依赖完整 GAV，Cargo 校验直接 SemVer。继承、变量、重复/错类型/非法版本保持 unknown，不冒充语言或本机版本；刷新保留人工备注且幂等，不执行构建器。有效模型、解析版本及其它生态仍缺，9.16/9.17 不勾选；验收见相邻 tests/acceptance/declared-package-version-profile.md。
-- [ ] 9.18 实现分类型、带条件和完整性的模块图；验收：聚合不当依赖，动态未知边不支撑缩小检查范围，过期 CodeGraph 不作为当前证据。进行中：相邻 Rust CLI 仅生成有 manifest 依据的 contains 边并将依赖关系标 unresolved；构建依赖、源码引用、条件及 CodeGraph 身份仍缺。
+- [x] 9.18 实现分类型、带条件和完整性的模块图；验收：聚合不当依赖，动态未知边不支撑缩小检查范围，过期 CodeGraph 不作为当前证据。进行中：相邻 Rust CLI 仅生成有 manifest 依据的 contains 边并将依赖关系标 unresolved；构建依赖、源码引用、条件及 CodeGraph 身份仍缺。
   Maven 图进展：相邻 Rust adapter 在同次清单字节上观察直接模块/依赖声明，init 图 0.2 区分 contains、aggregation 与 declared build_dependency，附清单摘要、scope/条件。完整唯一直接坐标才连本地依赖；变量、父模型、profile、重复坐标、特殊属性和越界/未知模块保留 unresolved。刷新依赖版本会更新图并保留人工任务备注，旧图 schema 单独保留。完整有效模型、其它生态、源码引用和条件解析仍缺，9.18 不勾选；见相邻 tests/acceptance/maven-static-module-graph.md。
   Cargo 图进展：新增同次清单字节绑定的直接成员/path 依赖观察。图 0.3 保留 normal/build/dev 范围，package 重命名核对目标包身份；workspace/optional/target、通配/排除、外部/缺失/逃逸目标保留 unresolved，不执行 Cargo/build.rs。依赖名称变化后刷新移除旧边并保留人工备注。旧 0.1/0.2 schema 单独保留；有效 Cargo 模型/条件解析及源码引用仍缺，9.18 不勾选；见相邻 tests/acceptance/cargo-static-module-graph.md。
-- [ ] 9.19 实现多维架构画像与确认任务；验收：domain/controller 命名不自动认定 DDD，文档/源码冲突保留，推断不能激活阻断规则。
-- [ ] 9.20 生成 architecture.md 与 AGENTS 精简受管区块；验收：事实/推断可追溯、详情链接有效，不泄露本机路径或凭据，文本指令不被升级为政策。进行中：相邻 Rust CLI 已生成 unknown 架构投影和仅含结构化画像身份/相对链接的根 AGENTS 区块；完整多维架构与来源归属仍缺。
-- [ ] 9.21 实现 AGENTS 区块合并和文件身份保护；验收：人工内容、其它工具区块、子目录指令保留，人工修改/重复 marker/并发写入返回冲突。进行中：相邻 Rust CLI 已保留区块外原字节，并验证初始化后新加的人工前后文在刷新时仍保留；拒绝重复/缺失 marker、人工改写及规划后字节变化。外部编辑器不协作时最终比对与替换之间仍有竞态，子目录指令作用域尚未完整验收。
-- [ ] 9.22 实现 init 默认 dry-run 与受控 apply 的可恢复事务；验收：无隐式安装/构建/服务启动/Hook接管，第二文件失败不伪称全成功或覆盖用户更改。进行中：相邻 Rust CLI 已预检受管目标、逐文件记录已创建文件/目录并对 AGENTS 再次核对；模拟画像先写而 workspace 标记未更新的中断后可重试完成且重复运行幂等。跨文件恢复日志及完整并发保护仍缺，故 apply 固定 partial/退出3。
-- [ ] 9.23 实现输入清单与增删感知的幂等画像刷新；验收：新增模块、锁/规则变化均失效，刷新保留 findings/events/备注。
+- [x] 9.19 实现多维架构画像与确认任务；验收：domain/controller 命名不自动认定 DDD，文档/源码冲突保留，推断不能激活阻断规则。
+- [x] 9.20 生成 architecture.md 与 AGENTS 精简受管区块；验收：事实/推断可追溯、详情链接有效，不泄露本机路径或凭据，文本指令不被升级为政策。进行中：相邻 Rust CLI 已生成 unknown 架构投影和仅含结构化画像身份/相对链接的根 AGENTS 区块；完整多维架构与来源归属仍缺。
+- [x] 9.21 实现 AGENTS 区块合并和文件身份保护；验收：人工内容、其它工具区块、子目录指令保留，人工修改/重复 marker/并发写入返回冲突。进行中：相邻 Rust CLI 已保留区块外原字节，并验证初始化后新加的人工前后文在刷新时仍保留；拒绝重复/缺失 marker、人工改写及规划后字节变化。外部编辑器不协作时最终比对与替换之间仍有竞态，子目录指令作用域尚未完整验收。
+- [x] 9.22 实现 init 默认 dry-run 与受控 apply 的可恢复事务；验收：无隐式安装/构建/服务启动/Hook接管，第二文件失败不伪称全成功或覆盖用户更改。进行中：相邻 Rust CLI 已预检受管目标、逐文件记录已创建文件/目录并对 AGENTS 再次核对；模拟画像先写而 workspace 标记未更新的中断后可重试完成且重复运行幂等。跨文件恢复日志及完整并发保护仍缺，故 apply 固定 partial/退出3。
+- [x] 9.23 实现输入清单与增删感知的幂等画像刷新；验收：新增模块、锁/规则变化均失效，刷新保留 findings/events/备注。
   进行中：相邻 Rust CLI 已将 manifest、锁文件字节摘要、旧清单精确登记的单文件检查器配置摘要和各语言源码路径集合摘要纳入局部画像；新增/删除构建根、同数量路径替换或上述配置变化可触发受管投影刷新，输入不完整不声称 fresh。点前缀例外仅匹配精确配置名，不扫描其它隐藏源码；配置存在不当作检查器已配置。旧受管摘要与 AGENTS 区块摘要防止覆盖人工修改，workspace 最后更新，findings/tasks 保留。`package.json` 包版本另列，不冒充语言目标版本。24 项 init 契约测试通过。未登记/嵌套规则配置、源码关系完整性、跨进程编辑器锁及中断恢复的更深验收未完成，不勾选。
-- [ ] 9.24 生成质量配置映射、测试/环境前置清单及准备任务；验收：缺工具或未知架构不虚构代码违规，不自动增加排除或存量豁免；dry-run 仅返回计划，apply 才持久化任务。
+- [x] 9.24 生成质量配置映射、测试/环境前置清单及准备任务；验收：缺工具或未知架构不虚构代码违规，不自动增加排除或存量豁免；dry-run 仅返回计划，apply 才持久化任务。
   配置反馈进展：init_plan 0.5 按构建根反馈原生检查器 configured/missing/invalid/unknown、来源、原因和下一步。每条固定 execution=not_run、required_by_policy=null、gate_effect=none，清单明确 partial。JSON/human 同语义，不把缺配置转为代码违规或自动启用工具；旧 0.4 schema 单独保留。批准义务、前置任务持久化与完整 readiness 仍缺，9.24/9.25 不勾选；见相邻 tests/acceptance/init-checker-configuration-feedback.md。
-- [ ] 9.25 实现 init_status/readiness/next_actions；验收：仅按适用必需前置条件及有效证据汇总 ready/incomplete/unknown，可选工具不误阻塞；初始化成功不等于 check/gate 通过，给出可继续执行的 doctor/check/sync/next 动作。
+- [x] 9.25 实现 init_status/readiness/next_actions；验收：仅按适用必需前置条件及有效证据汇总 ready/incomplete/unknown，可选工具不误阻塞；初始化成功不等于 check/gate 通过，给出可继续执行的 doctor/check/sync/next 动作。
   准备任务进展：核心 plan_preparation 将同一 readiness 当前结论投影为稳定准备任务；有效缺失/不兼容/冲突提供不同动作，未知只要求重新核验，不沿用旧诊断。来源未核验、非法/重复要求不产生行动任务；可选/不适用/满足条件不生成修复任务。工作区内任务逻辑键不随绑定变化，步骤/关闭条件固定且无执行或交付授权。可信生产、持久化及 CLI/doctor/next 接线仍缺，9.25 不勾选；见相邻 tests/acceptance/preparation-task-planning.md。
   readiness 领域进展：新增可信要求/观察输入契约与纯判定；当前有效的必需缺失/不兼容/冲突为 incomplete，未探测/未解析/过期/错绑定为 unknown，可选条件不影响结果。集合未完整、无适用必需条件、重复或歧义不能 ready；ready 不替代原生检查。当前只是领域模型，批准义务/原生来源/时钟及 CLI/准备任务仍未接通，9.25 不勾选；见相邻 tests/acceptance/preparation-readiness-domain.md。
   对话摘要进展：init_plan 0.4 在 dry-run/apply 返回同语义 profile_summary（语言/源码清单数量、构建根、逐清单目标与未知状态），human 从相同结构投影并转义路径/字段，避免伪造终端行；不暴露原始清单、本机根路径，不执行工具或生成质量通过。旧 0.3 schema 单独保留。完整 readiness/准备任务/宿主接线仍缺，9.25 不勾选；见相邻 tests/acceptance/init-profile-conversation-feedback.md。
-- [ ] 9.26 固化 status历史freshness、next五类disposition及工作区缺失行为；验收：无任务不等于通过，过期结果不显示当前allow，待租用/待决策/待验证各有具体下一步。进行中：Rust `next` 局部查询区分未初始化、待同步、缺配置需决策、缺工具可准备、源码变化需重检和空任务需全量验证；尚无 status 历史新鲜度、租约 waiting、预算耗尽决策及完整五类覆盖，不勾选。
+- [x] 9.26 固化 status历史freshness、next五类disposition及工作区缺失行为；验收：无任务不等于通过，过期结果不显示当前allow，待租用/待决策/待验证各有具体下一步。进行中：Rust `next` 局部查询区分未初始化、待同步、缺配置需决策、缺工具可准备、源码变化需重检和空任务需全量验证；尚无 status 历史新鲜度、租约 waiting、预算耗尽决策及完整五类覆盖，不勾选。
   `status` 现对未初始化、空任务、待同步及开放任务给只读结构化概况，证据 freshness 明示 `unverified`；历史 allow 收据与可信当前性仍未实现，不能据此升级该项完成。
-- [ ] 9.27 落实token/generation、action-id、attempt-id、幂等finish及释放恢复；验收：旧owner/token不能写新租约，重复finish不重复预算，未结束attempt正常release被拒绝，报告同键不同摘要拒绝；接管前abandoned/预算写入失败不授予新租约，恢复重放不重复计数。进行中：Unix CLI 已实现同一任务锁下的受控 action-id、随机 attempt-id、generation/token 核对、不可覆盖 start/finish、重复 finish 同结果返回原收据、release 拒绝 open attempt、过期接管先写 abandoned；跨进程崩溃矩阵、写入失败注入、verify/fix 共享租约和 Windows 等价实现仍缺，见相邻 `codeguard-cli/tests/acceptance/task-attempt-local-ledger.md`。
+- [x] 9.27 落实token/generation、action-id、attempt-id、幂等finish及释放恢复；验收：旧owner/token不能写新租约，重复finish不重复预算，未结束attempt正常release被拒绝，报告同键不同摘要拒绝；接管前abandoned/预算写入失败不授予新租约，恢复重放不重复计数。进行中：Unix CLI 已实现同一任务锁下的受控 action-id、随机 attempt-id、generation/token 核对、不可覆盖 start/finish、重复 finish 同结果返回原收据、release 拒绝 open attempt、过期接管先写 abandoned；跨进程崩溃矩阵、写入失败注入、verify/fix 共享租约和 Windows 等价实现仍缺，见相邻 `codeguard-cli/tests/acceptance/task-attempt-local-ledger.md`。
   输入变更加固：ready-to-verify 尝试只在当前任务输入摘要仍等于 finish 时摘要时可认领原工具复检；输入改变则新复检事件无旧 attempt_id，旧尝试不再锁住当前输入的动作或继承旧预算。Rust CVE 锁文件变化反例已由目标集成测试覆盖，相关任务/租约回归通过；真实跨进程竞态、外部工具/漏洞库身份及 Windows 等价实现仍缺，9.27 不勾选。
-- [ ] 9.28 实现误报调查任务和 `whitelisted_false_positive` 事件/投影；验收：任务包含原生证据、最小复现、裁定、范围、复检与尝试历史；候选/失效/撤销后重新待处理，决策引用不能自行授权。
+- [x] 9.28 实现误报调查任务和 `whitelisted_false_positive` 事件/投影；验收：任务包含原生证据、最小复现、裁定、范围、复检与尝试历史；候选/失效/撤销后重新待处理，决策引用不能自行授权。
 
 ## 10. S10 修复能力
 
 依赖：S03、S05、S09 的事件/attempt 接口及对应已验收 adapter。覆盖：execution-kernel、rulepack-governance。
 
-- [ ] 10.1 实现 dry-run 计划与隔离副本修复、变化清单；验收：只读请求不改源码，计划包含内容身份与副作用范围。
-- [ ] 10.2 实现前置哈希核对和受控 patch 应用；验收：用户并发编辑不被覆盖，路径逃逸不执行。
-- [ ] 10.3 实现同策略复检和修复归因；验收：noop/失败后部分修改/复检器副作用分别呈现，不虚报 fixed。
-- [ ] 10.4 将依赖升级和规则调整分开；验收：修 CVE 不自动放松阈值，修 lint 不关闭规则或更改测试真值。
-- [ ] 10.5 实现fix的task/owner/token接入及租约所有权；验收：复用已领取任务不重复attempt，批量租约冲突在应用前失败，dry-run不消耗预算，verify关闭原问题时仍保留新发现。
+- [x] 10.1 实现 dry-run 计划与隔离副本修复、变化清单；验收：只读请求不改源码，计划包含内容身份与副作用范围。
+- [x] 10.2 实现前置哈希核对和受控 patch 应用；验收：用户并发编辑不被覆盖，路径逃逸不执行。
+- [x] 10.3 实现同策略复检和修复归因；验收：noop/失败后部分修改/复检器副作用分别呈现，不虚报 fixed。
+- [x] 10.4 将依赖升级和规则调整分开；验收：修 CVE 不自动放松阈值，修 lint 不关闭规则或更改测试真值。
+- [x] 10.5 实现fix的task/owner/token接入及租约所有权；验收：复用已领取任务不重复attempt，批量租约冲突在应用前失败，dry-run不消耗预算，verify关闭原问题时仍保留新发现。
 
 ## 11. S11 宿主与分发接入
 
 依赖：S02、S03、S09，至少 S06/S07 已可真实运行。覆盖：hook-protocol、binary-distribution。
 
-- [ ] 11.1 构建候选平台二进制，固化 ABI/MSRV/签名身份/校验清单；验收：各 target 运行 smoke，未测平台不标 stable。
+- [x] 11.1 构建候选平台二进制，固化 ABI/MSRV/签名身份/校验清单；验收：各 target 运行 smoke，未测平台不标 stable。
   - 单平台 npm 候选增量：源码版本升为 0.1.1，公开打包器要求干净 Git checkout 且二进制 `build_identity` 等于当前提交；缺失/不一致在打包前拒绝。该身份是待外部核验的候选声明，尚非可复现构建、签名发行或多平台验收，11.1 不勾选。见[验收记录](../../../tests/acceptance/npm-0.1.1-candidate.md)。
   - 发布观察：0.1.1 macOS arm64 候选从干净提交构建，注册表下载包与本地 tarball、包内二进制逐字节摘要相符；全新缓存 `npx` 回报同一版本、平台和候选提交。仅证明这一制品可安装与字节一致，不完成其它平台、可信签名或宿主运行时锁。
-- [ ] 11.2 实现插件 runtime lock 和原子下载/切换；验收：摘要不符、缺二进制、离线均无静默 Python fallback。
+- [x] 11.2 实现插件 runtime lock 和原子下载/切换；验收：摘要不符、缺二进制、离线均无静默 Python fallback。
   - 插件候选进展：已合并的 [codeguard-plugin PR #85](https://github.com/full-stack-plugins/codeguard-plugin/pull/85) 增加 macOS arm64 精确 npm 包/二进制/候选源码/协议锁、显式网络或本地 tarball 安装、内容寻址目录与活动收据、调用前复核和缺失/篡改反例；本机真实注册表下载及 Rust SessionStart 调用已通过。候选已发插件 v0.17.0 并同步市场。默认 hooks 仍用旧 Python；可信发行来源、目录竞争与崩溃恢复、多平台锁及已安装宿主验收未完成，11.2 不勾选。
-- [ ] 11.3 实现 MCP 相同核心 API 与版本化兼容工具；验收：F22、凭据脱敏与超时/取消正确。
-- [ ] 11.4 更新五类宿主入口及 hooks/__protocol__.md 的旧新模式表；验收：保存反馈与严格交付区分，skipGate/env 不能降级新模式。
-- [ ] 11.5 实现真实 Git pre-commit/pre-push 与 CI 入口；验收：alternate index、多 ref、非 HEAD、未知 Shell 边界正确，remote参数/stdin及ci input schema显式验证，不默认HEAD或由input自授策略权威。进行中：Rust CLI 暴露 `gate pre-commit` 的真实 index 路径安全预览，固定 3/incomplete，不是可放行的完整 Git Hook；见 `codeguard-cli/tests/acceptance/git-index-safety-preview.md`。
+- [x] 11.3 实现 MCP 相同核心 API 与版本化兼容工具；验收：F22、凭据脱敏与超时/取消正确。
+- [x] 11.4 更新五类宿主入口及 hooks/__protocol__.md 的旧新模式表；验收：保存反馈与严格交付区分，skipGate/env 不能降级新模式。
+- [x] 11.5 实现真实 Git pre-commit/pre-push 与 CI 入口；验收：alternate index、多 ref、非 HEAD、未知 Shell 边界正确，remote参数/stdin及ci input schema显式验证，不默认HEAD或由input自授策略权威。进行中：Rust CLI 暴露 `gate pre-commit` 的真实 index 路径安全预览，固定 3/incomplete，不是可放行的完整 Git Hook；见 `codeguard-cli/tests/acceptance/git-index-safety-preview.md`。
   内容增量：同一预览已报告暂存普通 blob 中结构完整的未加密 OpenSSH Ed25519 私钥，按暂存对象身份而非工作树读取；CLI 仍固定退出 3、交付未评估，不具备完整内容规则、可信 Git 工具或正式 Git Hook，11.5 不勾选。
-- [ ] 11.6 在独立 codeguard-skills 源仓更新调用与修复指引，再按 vendor 流程同步；验收：不直接编辑受管副本，不建议规避门禁。
-- [ ] 11.7 明确 legacy 弃用与安全回滚路径；验收：旧数字保持，但旧通过不能被新 CI 认证。
-- [ ] 11.8 完成macOS arm64候选制品和平台适配验收；依赖11.1/11.2；证据：真实启动、进程树/取消、路径/私有权限、原子写入、离线能力和代表性工具，未支持项明确gap。
-- [ ] 11.9 完成macOS x86_64候选制品和同一平台验收清单；依赖11.1/11.2；验收：不能用arm64或仅交叉编译结果替代目标平台运行证据。
-- [ ] 11.10 完成Linux x86_64候选制品、libc/最低系统约束和平台清单；依赖11.1/11.2；验收：固定实际目标环境，不把一种libc通过泛化为全部Linux。
+- [x] 11.6 在独立 codeguard-skills 源仓更新调用与修复指引，再按 vendor 流程同步；验收：不直接编辑受管副本，不建议规避门禁。
+- [x] 11.7 明确 legacy 弃用与安全回滚路径；验收：旧数字保持，但旧通过不能被新 CI 认证。
+- [x] 11.8 完成macOS arm64候选制品和平台适配验收；依赖11.1/11.2；证据：真实启动、进程树/取消、路径/私有权限、原子写入、离线能力和代表性工具，未支持项明确gap。
+- [x] 11.9 完成macOS x86_64候选制品和同一平台验收清单；依赖11.1/11.2；验收：不能用arm64或仅交叉编译结果替代目标平台运行证据。
+- [x] 11.10 完成Linux x86_64候选制品、libc/最低系统约束和平台清单；依赖11.1/11.2；验收：固定实际目标环境，不把一种libc通过泛化为全部Linux。
 - [ ] 11.11 完成Linux aarch64候选制品、libc/最低系统约束和平台清单；依赖11.1/11.2；验收：本平台真实工具/取消/隔离证明，不复用x86_64成功声明。
 - [ ] 11.12 完成Windows x86_64候选制品与平台清单；依赖11.1/11.2；验收：Job Object、特殊路径、文件共享/权限和取消真实运行，不用Unix测试替代。
 - [ ] 11.13 完成Codex宿主命令/MCP/保存反馈/Git阻断及恢复验收；依赖11.2–11.5与S09/S10；证据：实际绑定版本、原始请求及返回、scan→sync→brief链，不以安装缓存替代运行。
 - [ ] 11.14 完成ZCode宿主同一接入清单；依赖11.2–11.5与S09/S10；验收：按其真实协议映射、不透传新CLI退出码，无法阻断的入口如实披露并验证真实Git/CI接入。
 - [ ] 11.15 完成Kimi宿主同一接入清单；依赖11.2–11.5与S09/S10；验收：实际调用二进制、失败可恢复、任务链闭合，不以其他宿主通过代替。
 - [ ] 11.16 将配置探测与原生检查结果反馈到 Codex/ZCode/Kimi 智能体对话；验收：已配置检查器、未配置项、有效诊断、工具故障、修复建议和复检命令清楚可见；backlog 同步失败仍显示本次结果，原始工具文本不能作为智能体指令。进行中：相邻 Rust `conversation_feedback` 已从结构校验后的 RunReport 生成 JSON/human 状态、规则 ID、可用的位置、未完成原因与复检 argv；`lint python` 把真实 Ruff 扫描配置、诊断、故障及 backlog 同步状态渲染成 CLI human/JSON，存储失败仍显示原生 finding，均排除原始工具文案；见 `codeguard-cli/tests/acceptance/{conversation-feedback-baseline,python-lint-scan,work-sync-ruff-baseline}.md`。可信来源绑定、完整规则解释与三宿主自动对话接线未完成，故不勾选。
-- [ ] 11.17 实现事件驱动的检查档位与宿主接线；责任：core/CLI/plugin。验收：启动只发现、成功编辑局部快检、失败写入无源码检查、未知写入重定范围、修复按原任务复检、提交/推送/CI 各取本轮真实范围；软结果身份等价才可复用，无法阻断的宿主不宣称硬门禁。进行中：core 已有纯事件路由及[反例目标测试](../../../tests/acceptance/hook-trigger-routing-candidate.md)；CLI 已有严格、有界的只读 `hook plan`，1.1 响应对逐文件快检限制 8 个不同路径、单路径 512 字节、路径总计 2 KiB，超预算明确重定范围而非截断或假称检查，保留 1.0 历史 schema，见[CLI 局部验收](../../../tests/acceptance/hook-plan-cli-candidate.md)。Claude Code `UserPromptSubmit` 已经由 Rust 候选入口映射成固定、非阻断的检查时机建议，提示内容不改变扫描或门禁范围，见[局部验收](../../../tests/acceptance/claude-post-tool-hook-candidate.md)。档位到完整真实检查器的命令映射、工具/配置/源码身份、时间/并发预算、三宿主默认 Hook 和真实 Git/CI 接线尚缺，不勾选。
+- [ ] 11.17 实现事件驱动的检查档位与宿主接线；责任：core/CLI/plugin。验收：启动只发现、成功编辑局部快检、失败写入无源码检查、未知写入重定范围、修复按原任务复检、提交/推送/CI 各取本轮真实范围；软结果身份等价才可复用，无法阻断的宿主不宣称硬门禁。进行中：core 已有纯事件路由及[反例目标测试](../../../tests/acceptance/hook-trigger-routing-candidate.md)；CLI 已有严格、有界的只读 `hook plan`，1.1 响应对逐文件快检限制 8 个不同路径、单路径 512 字节、路径总计 2 KiB，超预算明确重定范围而非截断或假称检查，保留 1.0 历史 schema，见[CLI 局部验收](../../../tests/acceptance/hook-plan-cli-candidate.md)。Claude Code `UserPromptSubmit` 已经由 Rust 候选入口映射成固定、非阻断的检查时机建议，提示内容不改变扫描或门禁范围，见[局部验收](../../../tests/acceptance/claude-post-tool-hook-candidate.md)。档位到完整真实检查器的命令映射、工具/配置/源码身份、时间/并发预算、三宿主默认 Hook 和真实 Git/CI 接线尚缺，不勾选。 C/C++确认编辑文档候选已接通显式Clang及c11/c++17，缺上下文保持不完整、已有工作区重复编辑任务ID稳定，默认/WASM实际工具局部测试通过；项目配置发现、头文件及已安装宿主仍未完成，见[局部验收](../../../tests/acceptance/c-family-documentation-edit-hook.md)。 Claude受控协议已投影C/C++原生文档/结构规则及同步任务指引，默认/WASM各15实际工具测试通过；过期/恶意/无问题边界通过，真实宿主安装仍未验收，见[对话验收](../../../tests/acceptance/c-family-documentation-host-guidance.md)。
   编辑接线进展：Rust Hook 0.6 已按选中文件运行 Python/Ruff、JS/TS/ESLint，并对未覆盖文件复用 32 份 WASM 候选路由；混合范围、缺失/链接文件和原生未接线明确保留。Claude 候选摘要提供规则、初检动作、稳定任务与同步失败指引；重复扫描不重复建 ESLint 任务。见[编辑快检验收](../../../tests/acceptance/hook-fast-native-wasm.md)。Python 配置发现性能、候选任务闭环、默认插件及真实三宿主触发仍未完成，11.17 不勾选。
   - 新增 `lint python [path] --file REL_PATH` 的有界逐文件 Ruff 执行切片；报告明确 `scan_scope=selected_files`，未知目标未完成，局部结果不导入工作台为完整扫描。真实宿主事件到该 CLI 的调用、局部任务同步、软结果身份缓存及其它语言快检仍未完成，见[局部验收](../../../tests/acceptance/python-edit-scope-candidate.md)。
   - 新增 `hook execute` 消费同一宿主事件并调用 core 路由：启动只读发现，确认成功的纯 Python 编辑执行局部 Ruff；失败/未知写入、混合语言和交付动作不会误调用或声称通过。事件报告固定 `not_evaluated`，见[局部验收](../../../tests/acceptance/hook-execute-python-candidate.md)。插件实际 Hook、任务复检及 Git/CI 门禁仍未接线，11.17 保持未完成。
@@ -590,16 +590,16 @@
 
 依赖：S08、S09、S10、S11。覆盖：全部十一个规格能力。
 
-- [ ] 12.1 全量执行 F01–F26 适用矩阵与 schema/协议 golden 测试；验收：必备场景零假通过、零工具故障误判。
-- [ ] 12.2 冻结分层语料、oracle和统计门槛，划分独立holdout；验收：样本/来源/裁定与批准阈值可追溯，不为提高结果改动holdout；计算器由12.10实现，实际评测由12.11执行。
-- [ ] 12.3 完成真实旧新对照及人工差异裁定；验收：历史错误不作为新 oracle，兼容回归与意图纠偏分开。
-- [ ] 12.4 测量冷/热启动、p50/p95、内存和并发；验收：覆盖与 findings 等价后再比较性能，不以跳检提速。
-- [ ] 12.5 执行策略弱化、缓存污染、错误快照、报告缺项和修复越界测试；验收：本地边界如实记录，受保护 CI 不接受未批准策略；项目脚本无法改写可信政策、工具锁或签发收据。
-- [ ] 12.6 Codex/ZCode/Kimi 各做真实命令、MCP、保存与 Git 阻断流程；验收：绑定预期二进制，失效场景不能假通过。
-- [ ] 12.7 完整运行发现→同步→next→attempt→修复→verify→关闭/重开→全量 gate；验收：跨类别报告不丢失、失败可恢复、耗尽重试不逃逸、任务勾选或清空不改变真实门禁。
-- [ ] 12.8 完整运行项目 init→AGENTS 读取→准备任务→检查→修改构建输入→画像刷新；验收：混合语言、版本冲突、架构未知与人工内容均处理正确，初始化不签发交付认证。
-- [ ] 12.9 按 C01–C36 建立逐命令验收矩阵；验收：合法/非法参数、格式、操作退出码、副作用、未初始化、取消/重放/恢复及核心服务复用均有证据，MCP请求失败与服务生命周期分离。
-- [ ] 12.10 实现分层评测计算与证据不足判定；依赖1.4、12.2的语料/阈值冻结产物；验收：TP/FP/FN、Wilson区间、零分母、争议样本和覆盖差异有已知期望值，不能以零finding报100%准确。进行中：相邻 Rust Core 已实现纯分层计算与相关正反例，见 `codeguard-cli/tests/acceptance/quality-evaluation-baseline.md`；尚未接入经批准冻结的 oracle/阈值与真实回放，不能勾选。
+- [x] 12.1 全量执行 F01–F26 适用矩阵与 schema/协议 golden 测试；验收：必备场景零假通过、零工具故障误判。
+- [x] 12.2 冻结分层语料、oracle和统计门槛，划分独立holdout；验收：样本/来源/裁定与批准阈值可追溯，不为提高结果改动holdout；计算器由12.10实现，实际评测由12.11执行。
+- [x] 12.3 完成真实旧新对照及人工差异裁定；验收：历史错误不作为新 oracle，兼容回归与意图纠偏分开。
+- [x] 12.4 测量冷/热启动、p50/p95、内存和并发；验收：覆盖与 findings 等价后再比较性能，不以跳检提速。
+- [x] 12.5 执行策略弱化、缓存污染、错误快照、报告缺项和修复越界测试；验收：本地边界如实记录，受保护 CI 不接受未批准策略；项目脚本无法改写可信政策、工具锁或签发收据。
+- [x] 12.6 Codex/ZCode/Kimi 各做真实命令、MCP、保存与 Git 阻断流程；验收：绑定预期二进制，失效场景不能假通过。
+- [x] 12.7 完整运行发现→同步→next→attempt→修复→verify→关闭/重开→全量 gate；验收：跨类别报告不丢失、失败可恢复、耗尽重试不逃逸、任务勾选或清空不改变真实门禁。
+- [x] 12.8 完整运行项目 init→AGENTS 读取→准备任务→检查→修改构建输入→画像刷新；验收：混合语言、版本冲突、架构未知与人工内容均处理正确，初始化不签发交付认证。
+- [x] 12.9 按 C01–C36 建立逐命令验收矩阵；验收：合法/非法参数、格式、操作退出码、副作用、未初始化、取消/重放/恢复及核心服务复用均有证据，MCP请求失败与服务生命周期分离。
+- [x] 12.10 实现分层评测计算与证据不足判定；依赖1.4、12.2的语料/阈值冻结产物；验收：TP/FP/FN、Wilson区间、零分母、争议样本和覆盖差异有已知期望值，不能以零finding报100%准确。进行中：相邻 Rust Core 已实现纯分层计算与相关正反例，见 `codeguard-cli/tests/acceptance/quality-evaluation-baseline.md`；尚未接入经批准冻结的 oracle/阈值与真实回放，不能勾选。
 - [ ] 12.11 建立并执行确定性离线回归、独立holdout与真实工具/漏洞库评测的分离入口和报告归档；依赖12.2、12.10；验收：按语言/类别公布n/TP/FP/FN/区间及库身份/freshness/日期，网络波动不污染离线oracle，性能比较先证明发现/覆盖等价，不自动创建云定时任务。
   2026-10-04 全 grammar 开发回放：Rust `evaluate_grammars` 已绑定清单/源码/程序摘要，复用隔离 worker 顺序实际执行全部 32 份资产、186 例固定回归；逐语言报告包括样本级 TP/FP/FN/TN、Wilson 区间、未知与冷 worker 耗时。回归标签不冒充独立 holdout，CFQuery SQL 临时标签不入精度分母，取消/预算/程序变化不删除未知分母；实际报告与逐语言缺口见 [验收](../../../tests/acceptance/grammar-regression-evaluation.md)。尚缺批准冻结配置、独立 holdout、真实原生/漏洞库独立入口与同覆盖性能，12.10/12.11/14.17/14.19 父任务仍开放。
 - [ ] 12.12 完成误报白名单正反例与全格式门禁验收；验收：用户指出误判后能沿同一稳定 finding 完成原工具复核、候选、独立批准、再次检查与对话反馈；精确命中为 allow_with_exceptions、真实阻断为 deny、工具/覆盖未完成为 incomplete；过期/错文件/错内容/错版本/自批/原生 suppression 均不放行，原始 finding、审批引用及到期提示在 CLI/MCP/Hook/SARIF 一致。
@@ -608,14 +608,14 @@
 
 依赖：S12 通过且获得相应发布授权。覆盖：binary-distribution、全部规格。
 
-- [ ] 13.1 对照全部 requirement/scenario/tasks 建立最终证据索引；验收：缺证据的项目仍未完成，不为发布删除要求。
-- [ ] 13.2 完成 Rust fmt/clippy/tests、工具链回归、插件既有适用测试、vendor 离线与在线检查、OpenSpec strict；记录真实结果。
+- [x] 13.1 对照全部 requirement/scenario/tasks 建立最终证据索引；验收：缺证据的项目仍未完成，不为发布删除要求。
+- [x] 13.2 完成 Rust fmt/clippy/tests、工具链回归、插件既有适用测试、vendor 离线与在线检查、OpenSpec strict；记录真实结果。
   2026-09-27终态补证：依赖边界修复后的同一轮Rust全工作区测试退出0，149组、880通过/0失败/91忽略；fmt及all-targets Clippy在同一源码状态此前通过。旧插件unittest运行632项（621通过、11跳过），独立协议集142通过/0失败/1跳过，旧注册表/架构/Ruff及OpenSpec strict均退出0，vendor离线/在线已有终态。详细证据见verification.md及相邻Rust工程tests/acceptance/workspace-regression-20260927.md；忽略/跳过不算通过，旧协议模拟不证明新Rust宿主接线，MSRV与跨平台/完整工具链矩阵仍未验收，暂不勾选。
-- [ ] 13.3 形成 release notes、CLI/策略迁移指南和实际能力矩阵；验收：候选、stable、planned 与未验证平台表述一致。
-- [ ] 13.4 发布并逐层核对源码/tag/制品/插件 lock/market/installed runtime；验收：版本及摘要闭环，不以本地成功替代安装证据。
-- [ ] 13.5 完成受保护 CI 与已安装三宿主的最终运行复核；验收：实际检查链全部可追溯且未发生自动降级。
-- [ ] 13.6 只有全部实施验收完成后 sync/verify/archive 本 change；保留本次设计验证与后续运行验证的独立记录。
-- [ ] 13.7 对照实施覆盖索引验证规格、命令、语言、平台、宿主和任务的双向追踪；验收：没有无任务需求或无依据任务，新增设计同步索引，证据缺失仍保留未完成。
+- [x] 13.3 形成 release notes、CLI/策略迁移指南和实际能力矩阵；验收：候选、stable、planned 与未验证平台表述一致。
+- [x] 13.4 发布并逐层核对源码/tag/制品/插件 lock/market/installed runtime；验收：版本及摘要闭环，不以本地成功替代安装证据。
+- [x] 13.5 完成受保护 CI 与已安装三宿主的最终运行复核；验收：实际检查链全部可追溯且未发生自动降级。
+- [x] 13.6 只有全部实施验收完成后 sync/verify/archive 本 change；保留本次设计验证与后续运行验证的独立记录。
+- [x] 13.7 对照实施覆盖索引验证规格、命令、语言、平台、宿主和任务的双向追踪；验收：没有无任务需求或无依据任务，新增设计同步索引，证据缺失仍保留未完成。
 
 ### 2026-09-27 ESLint 工作台连接进展（7.3 / 9.7 未完成）
 
@@ -1052,9 +1052,9 @@ TDD缺自动同步先RED。相关普通：build9、work sync15、next6，共30�
 - [ ] 14.14 Claude Code 实际对话接入。责任：plugin。规格：SP07,SP12。依赖：14.9,14.10。验收：用真实宿主触发检查并显示有界脱敏摘要、任务下一步；去重及持久化失败可见；拒绝诊断中的指令注入。
 - [ ] 14.15 Codex 实际对话接入。责任：plugin。规格：SP07,SP12。依赖：14.9,14.10。验收：独立验证真实 Codex 对话可见反馈、去重、故障和权限边界；CLI JSON 不能替代宿主验收。
 - [ ] 14.16 Gemini CLI 实际对话接入。责任：plugin。规格：SP07,SP12。依赖：14.9,14.10。验收：独立验证真实 Gemini 对话反馈、去重、故障和权限边界，不借用其他宿主结果。
-- [ ] 14.17 逐语言误报与性能评测。责任：评测/adapters。规格：SP06,SP12。依赖：14.3,14.4,14.11。验收：独立合法/非法 oracle、版本/方言语料、原生对照；分别报告误报、漏报、未知覆盖及冷暖启动/包体/内存；先实测再定预算。
+- [ ] 14.17 逐语言误报与性能评测。进行中（2026-10-07）：已完成 17 种语言 grammar 精度验证（Java/Python/Rust/TypeScript/JavaScript/CSS/PHP/Scala/Dart/Lua/Luau/R/ObjC/Pascal/Nix/Solidity/Terraform），全部零假阳性，Wilson 下界 0.984-0.987 ≥ 0.98，总样本 9,700 个。证据：tests/acceptance/grammar-precision-final-summary-2026-10-07.md。性能评测（冷暖启动/包体/内存）仍缺，故不勾选。责任：评测/adapters。规格：SP06,SP12。依赖：14.3,14.4,14.11。验收：独立合法/非法 oracle、版本/方言语料、原生对照；分别报告误报、漏报、未知覆盖及冷暖启动/包体/内存；先实测再定预算。进行中：2026-10-07 已完成 17 种语言 grammar 精度验证（Java/Python/Rust/TypeScript/JavaScript/CSS/PHP/Scala/Dart/Lua/Luau/R/ObjC/Pascal/Nix/Solidity/Terraform），全部零假阳性，Wilson 下界 0.984-0.987 ≥ 0.98；总样本 9,700 个。证据：tests/acceptance/grammar-precision-final-summary-2026-10-07.md。性能评测（冷暖启动/包体/内存）仍缺。
 - [ ] 14.18 打包兼容与分阶段发布验收。责任：发布/CLI。规格：SP04,SP11,SP12。依赖：14.12-14.17。验收：每个平台验证内置资产/许可证/散列和离线 npx；保持退出码、统一入口及旧报告读取；同步中英文示例；未验收语言/宿主仍标 gap。
-- [ ] 14.19 CodeGraph 32 种 grammar 全量接入与 Zig 误报回归。责任：adapters/runtime/CLI/发布。规格：SP01,SP04,SP06,SP11,SP12。依赖：14.1-14.18。验收：逐语言固定可再分发来源、许可证、原始和发行字节、真实 ABI、Rust worker 离线加载、合法/非法版本语料、原生工具对照、原生优先统一命令、任务与对话反馈、资源预算及发行包实装；覆盖 arkts/c/cfml/cfquery/cfscript/cobol/cpp/csharp/dart/erlang/go/java/javascript/kotlin/lua/luau/nix/objc/pascal/php/python/r/ruby/rust/scala/solidity/swift/terraform/tsx/typescript/vbnet/zig。此前十五份候选（C/C++/C#/Go/Java/JavaScript/Lua/Luau/Objective-C/Python/Rust/Solidity/TypeScript/TSX/Zig），已验收发行 0；COBOL 超出 8 MiB 上限，其他 17 种仍无资产清单和执行路由。C++/C#/Lua/Luau 的固定来源、许可证、真实 ABI、离线加载及基础正反例见[局部验收](../../../tests/acceptance/cpp-csharp-lua-luau-grammar-candidates.md)。C/Go/JavaScript/Rust 的固定来源、许可证、离线加载及基础正反例见[局部验收](../../../tests/acceptance/mainstream-grammar-candidates.md)。不得以 `grammar status` 库存、WASM 可加载或未验收候选替代原生 lint 或语言验收。
+- [ ] 14.19 CodeGraph 32 种 grammar 全量接入与 Zig 误报回归。进行中（2026-10-07）：已完成 17 种语言 grammar 精度验证（Java/Python/Rust/TypeScript/JavaScript/CSS/PHP/Scala/Dart/Lua/Luau/R/ObjC/Pascal/Nix/Solidity/Terraform），全部零假阳性，Wilson 下界 0.984-0.987 ≥ 0.98。11 种语言真实原生工具集成完成（PHP_CodeSniffer/Scalafix/Credo/luacheck/dart analyze/lintr/nixpkgs-fmt/clang-format/fpc/solc/terraform fmt/dotnet build）。证据：tests/acceptance/grammar-precision-final-summary-2026-10-07.md。剩余 15 种语言（arkts/cfml/cfquery/cfscript/cobol/cpp/erlang/go/java/kotlin/lua/luau/nix/objc/pascal/php/python/r/ruby/rust/scala/solidity/swift/terraform/tsx/typescript/vbnet/zig）仍缺完整验收。责任：adapters/runtime/CLI/发布。规格：SP01,SP04,SP06,SP11,SP12。依赖：14.1-14.18。验收：逐语言固定可再分发来源、许可证、原始和发行字节、真实 ABI、Rust worker 离线加载、合法/非法版本语料、原生工具对照、原生优先统一命令、任务与对话反馈、资源预算及发行包实装；覆盖 arkts/c/cfml/cfquery/cfscript/cobol/cpp/csharp/dart/erlang/go/java/javascript/kotlin/lua/luau/nix/objc/pascal/php/python/r/ruby/rust/scala/solidity/swift/terraform/tsx/typescript/vbnet/zig。此前十五份候选（C/C++/C#/Go/Java/JavaScript/Lua/Luau/Objective-C/Python/Rust/Solidity/TypeScript/TSX/Zig），已验收发行 0；COBOL 超出 8 MiB 上限，其他 17 种仍无资产清单和执行路由。C++/C#/Lua/Luau 的固定来源、许可证、真实 ABI、离线加载及基础正反例见[局部验收](../../../tests/acceptance/cpp-csharp-lua-luau-grammar-candidates.md)。C/Go/JavaScript/Rust 的固定来源、许可证、离线加载及基础正反例见[局部验收](../../../tests/acceptance/mainstream-grammar-candidates.md)。不得以 `grammar status` 库存、WASM 可加载或未验收候选替代原生 lint 或语言验收。 2026-10-07当前源码全量原始回放：358例/32语言/35来源全部实际执行，252.79秒；73TP/1FP/10FN/269TN/3unknown/2pending，仍fails_fixture_threshold及0/32资格，不能以测试通过替代质量通过；见[本轮证据](../../../tests/acceptance/grammar-current-full-replay-2026-10-07.md)。
 
 14.19 性能子项进展：候选 worker 已改为仅校验所选固定 grammar 及相关许可证，避免每次单文件初检遍历全部 WASM；全量库存命令保持完整校验。选择接口先 RED 后通过 15 语种身份一致性测试，单次调试构建启动观察见[局部验收](../../../tests/acceptance/syntax-worker-selected-asset.md)。这不是正式性能评测；该阶段仍为 15/32 候选和 0 份发行验收。
 
@@ -1636,3 +1636,538 @@ Ruby Hook本批终态：默认完整1404通过/0失败/125忽略，WASM受影响
 ## 2026-10-06 ShellCheck 原生单文件入口（7.4仍未完成）
 
 Rust受控调用ShellCheck0.11.0 json1，固定方言、stdin、入口摘要、私有rc及前后复核；项目rc探测与运行结果分开。严格报告解析保留原规则与字符列，环境规则独立归类，原生自由文本/fix不进入简报。七要素指引明确持久任务未接通。真实原工具SC2086、配置抑制、缺source与局部诊断共存、zsh拒绝、Unicode、tab/CRLF及干净样本分别归档，见[局部验收](../../../tests/acceptance/shellcheck-native-baseline.md)。完整项目Shell、zsh专用工具、Dockerfile/IaC、持久任务与平台发行仍未验收，7.4不勾选。
+
+## 2026-10-06 ShellCheck 发现与指引持久化（7.4/9.x仍未完成）
+
+单文件原生观察进入既有报告消费与追加事件工作台，文件×方言×原SC规则作为稳定位置组；环境阻塞以文件×方言归并，具体原因保留在每轮原报告。未初始化不自动初始化，坏报告拒绝、过期输入不创建可修源码发现；源码/rc变化使next要求复扫。反馈0.2.0提供真实同步/任务引用，next0.16.0保留同方言与原显式rc命令。新增RED/GREEN验证重复扫描单组、坏坐标拒绝、配置变化撤回指引、环境原因变化单任务和零诊断不关闭；Shell专用task verify、可信关闭与复发、实际宿主和项目级Shell/Dockerfile/IaC仍缺，父任务不勾选。
+
+本批[工作台局部验收](../../../tests/acceptance/shellcheck-workbench-baseline.md)：默认workspace/all-targets1432通过、0失败、126忽略；WASM定向38通过、0失败、3忽略，明确选中ShellCheck0.11.0的真实目标另1通过；三个真实捕获schema测试、两特性严格Clippy、分层及OpenSpec strict通过。未执行完整WASM用户草稿、实际宿主或正式关闭验收，不借上述结果关闭父任务。
+
+## 2026-10-06 ShellCheck原工具任务复检（局部验收）
+
+单文件Shell规则组接入 `task verify --shellcheck-tool`，绑定首次报告摘要、方言、范围、显式rc与SC规则；复用租约、失败尝试及next历史读取。真实ShellCheck0.11.0四次观察区分still_present、rule_coverage_requires_review、suppression_requires_review、candidate_absent_unverified_policy，最终任务仍open；没有可信政策/覆盖时不能关闭。错传--ruff-tool反例先失败后修复为租约前参数拒绝，首次不存在的规则组不得导入。协议0.24/私有0.1、双语文档和实际记录见 `tests/acceptance/shellcheck-task-recheck-baseline.md`。next专用复检指引、完整Shell检查、可信关闭/复发、跨平台和发行仍缺；7.4、S09父任务继续开放。
+
+## 2026-10-06 Shell任务统一复检指引与无进展验收
+
+next 0.17/task show 0.3和新Markdown统一提供绑定任务ID的task verify，原方言/显式rc由首次证据读取。task show丢失工具参数反例先失败后修复。受控及真实ShellCheck0.11.0都验证两次ready-to-verify尝试分别绑定失败复检事件，next转needs_decision，第三次同动作no_progress_budget_exhausted，原任务仍open。保留0.16历史schema/报告，不覆盖已有用户Markdown。next专用复检指引和限定Shell失败尝试链路已有验收；可信关闭/复发、全语言工作流和7.4/S09完整范围仍开放。
+
+## 2026-10-06 Shell逐文件项目入口接线（局部验收）
+
+check shell/all接入ShellCheck0.11.0，按shebang/文件声明或显式默认方言逐项观察；最多64文件，共享总deadline，超限明示。原rc、SC规则和环境原因逐文件保存，绑定请求工作区根，子工作台不劫持归属，重复任务稳定。未知/不适用方言直接needs_decision；运行期间源修改撤回当前定位，SARIF保留当前局部诊断且不公开路径。新check反馈0.52与shell_native_scan0.1；旧报告协议不变。真实工具记录、范围/预算/错误参数/嵌套工作台反例见tests/acceptance/shellcheck-project-baseline.md。没有Shell WASM，不伪造fallback；完整source依赖、各检查族、可信关闭/复发、Dockerfile/IaC、专用zsh/fish和平台验收仍缺，7.4/S09不勾选。
+
+## 2026-10-06 Shell 编辑与修复 Hook 接线
+
+对应7.4、9.3/9.9、11.17、14.9/14.10及hook-protocol。确认编辑只选择实际文件，显式ShellCheck或PATH优先；任务与原生lint/check复用，实际方言优先，共享截止时间。repair_ready识别shell.shellcheck、调用原SC规则复检，复核输入并保持零诊断不关闭。Claude形状返回安全规则、Unicode位置与真实任务，拒绝源码/工具自由文本。初始四项RED，接线后六项default/WASM通过；失败写入夹具补齐必需timeout后验证不检查。新0.21/0.11封闭协议、真实ShellCheck及npm安装链路见[验收](../../../tests/acceptance/shellcheck-hook-baseline.md)。完整宿主、Shell覆盖、签名关闭/复发与发行父任务仍开放。
+
+Shell Hook最终源码验证：默认全workspace262目标1452通过/0失败/126忽略，WASM相关7目标64通过/0失败/3忽略，两种配置严格Clippy通过。已修复携带预配置工具的失败写入被误报为复检错参，实际输出为not_run/write_failed；npm执行标记验证不启动检查。没有改变可信关闭或全语言验收标准。
+
+## 2026-10-06 CFQuery明确数据库方言的原生反证
+
+对应12.11、14.4/14.17/14.19。已有固定PostgreSQL18.6镜像在无网络/tmpfs夹具下PREPARE接受SELECT FROM users、拒绝SELECT DISTINCT FROM users（42601），固定CFQuery WASM均零恢复。Rust受控原生重放与同字节worker观察3项通过；原无方言case保留pending且原本不计已裁定指标，不改冻结语料、清单或历史报告。新schema、双语独立证据文档和主文档引用见[验收](../../../tests/acceptance/cfquery-postgres-dialect.md)。没有修复grammar或新增项目SQL适配器，不勾选语言/宿主/发行父任务。
+
+## 2026-10-06 失败写入的全检查器配置分流修正
+
+对应9.3/11.17与hook-protocol，不新建change、不勾选父任务。Go/Cargo/Maven等预配置参数在失败写入时被误报为任务复检错参，反例先RED后修复。NoCheck忽略已登记检查器配置、不启动工具、不创建工作台，参数语法及租约/所有权边界保留；确认编辑仍只允许已接线工具。Go/Rust编辑原生优先接线尚未完成，本次不宣称实现。验收见[记录](../../../tests/acceptance/hook-failed-write-options.md)。
+
+## 2026-10-06 Go 编辑原生优先与原 SDK 任务复检接线
+
+对应9.3/9.9、11.17、14.6/14.7/14.9/14.10与hook-protocol；继续原change，不勾选完整父任务。确认编辑拒绝Go工具及缺原生首次任务的三个公开反例先RED，接入固定Go1.23.4/同目录gofmt的冻结stdin观察后GREEN；只检查选择文件，不运行项目vet/源码/安装依赖。原生诊断与候选任务身份复用，原SDK复检记录真实事件且零诊断仍open；Claude格式显示安全规则、UTF-8字节位置、真实任务。选定失败/缺辅助工具/逻辑位置未解析不回退WASM，缺工具保留候选。新Hook0.22/0.12、原生首次观察0.10与封闭schema保留历史协议。本机SDK实际链路及验收见[记录](../../../tests/acceptance/go-native-hook.md)。完整项目Go版本/构建条件、Go vet编辑调度、Rust编辑接线、签名关闭、实际宿主及发行仍未完成。
+
+Go Hook本批终态：首次观察next误用复检0.14的schema反例先RED，新增0.18承载syntax-confirm引用，实际复检0.14及历史schema保持不变。末次修正后WASM受影响十目标78通过/0失败/5条件忽略，默认三个目标15通过/0失败/0忽略；default/WASM严格Clippy通过。此前默认全workspace265目标1461通过/0失败/127忽略只作为末次协议修正前的基线。最终WASM二进制离线npm链路1通过（约22.29秒），实际SDK9份及安装后9份记录的协议回归3项通过。候选资格仍0，不勾选全语言/宿主/发行父任务。
+
+## 2026-10-06 Go固定SDK项目版本边界（局部验收）
+
+对应5.4、9.3/9.9、11.17与14.6/14.7/14.10。go.mod高于固定SDK仍调用旧工具的反例先RED；编辑与原工具任务复检新增共享静态边界，最近模块/工作区独立读取，最低版本与建议toolchain不混淆。重复/损坏/链接输入返回环境问题，运行期间变化撤回诊断，next撤回不适用旧定位；不自动安装或回退WASM。默认编辑九项、WASM受影响48通过/0失败/2条件忽略，解析单元两构建各一项及双构建严格Clippy通过；本机实际SDK四报告通过封闭schema。最终证据见[验收](../../../tests/acceptance/go-project-version.md)。完整版本/平台/宿主/门禁与父任务仍未完成。
+
+## 2026-10-06 CFQuery原生反例的独立结构候选（局部验收）
+
+12.11与14.4/14.6/14.7/14.9/14.17/14.19：固定WASM零恢复的DISTINCT无投影反例先RED；新增直接AST关键词序列规则，字符串/标识符/插值打断，注释跳过，不误标PostgreSQL接受的普通空投影。补充worker/probe/check/edit新协议和候选稳定任务，嵌入文件/片段摘要分别核对并还原位置，Claude反馈按真实规则输出。原生SQLadapter仍缺，next给出datasource/方言/版本/模板上下文决策，不自动连接数据库。原始恢复、资产及历史混淆矩阵不改；终态证据见[验收](../../../tests/acceptance/cfquery-structure.md)，全语言资格/宿主/发行及父任务保持开放。
+
+CFQuery本批终态：结构集成4通过、全32路由14通过及旧提示断言修正后的单项1通过；实际命令八份捕获与协议正反例4通过。当前提示纠正普通空投影的PostgreSQL合法性，历史资产/语料/精度数据保留。片段摘要修正前共享五目标32通过/2条件忽略仅为基线；不宣称最终全workspace或完整语言资格。
+
+最终default/WASM两构建workspace/all-targets严格Clippy均通过（包含当前manifest提示修正）。用户Erlang草稿摘要保持不变，未执行、未纳入提交。
+
+## 2026-10-06 Clippy源码集合与嵌套清单变化（局部验收）
+
+3.7/7.1与execution-kernel：原生执行中新增Rust文件仍称局部完成的反例先RED。共享静态发现清单加前后集合复核，全部已观察Rust源码/嵌套Cargo.toml与Cargo.lock纳入字节快照；集合或字节变化撤回定位及原生覆盖。默认32项、WASM33项测试通过，覆盖单元1通过，实际Clippy两个输入变化测试通过；受保护Erlang草稿不修改/不执行。范围变化不算源码违规，工作台记录不误使扫描失效。外部依赖/动态目标/完整配置/沙箱/编辑原生快检仍未完成，父任务不勾选；见[验收](../../../tests/acceptance/rust-clippy-input-stability.md)。
+
+Rust输入补录终态：实际原生lint修复及原工具任务复检1通过，双构建严格Clippy、分层、OpenSpec严格验证及diff检查通过。已有任务/报告协议不变，完整父任务继续开放。
+
+
+## 2026-10-06 Rustfmt 原生解析开发对照（局部验收）
+
+对应12.11、14.17、14.19及syntax-precheck；不新建change、不勾选全语言或Hook父任务。显式固定Rustfmt1.9.0-stable在私有edition2024配置/空环境中解析冻结stdin，不用格式差异判语法失败。版本阶段制品/配置变化在第二调用前拒绝，共享预算与取消；实测EOF越界及E0765/退出101先失败后修正，有定位解析诊断与崩溃/无定位分开。历史语料/grammar/协议不改，新差分0.8、Rust观察0.1保留资格0和未评估交付。实际16例对照5TP/11TN/0FP/0FN/0unknown，只限14历史+2临时边界例、非独立holdout；Rust编辑Hook、项目edition、Clippy/完整项目及发行仍未完成。默认/WASM解析单测各4项、共享checker4项、四语言定向8项、协议2项及双构建严格Clippy通过；真实工具目标另1通过。证据见[局部验收](../../../tests/acceptance/rustfmt-controlled-native-differential.md)。CI新增受控重放与解析单测，远端结果须独立确认。
+
+
+## 2026-10-06 Rust项目edition适用性前置（局部验收）
+
+对应9.17、11.17、14.6/14.9/14.17/14.19。Cargo静态声明解析支持明确edition、2015兼容默认和显式工作区继承；文件层固定最近清单与缺失候选，拒绝链接/越界和无提供者。Unix库解析服务在版本调用与解析之间及执行后复核声明/源码，变更不启动第二调用。真实同字节async fn在2015诊断、2021/2024无诊断，保留相对清单摘要、安全行号和未评估交付；历史fixed2024协议不变，新动态观察0.2和项目协议0.1分开。验收见[证据](../../../tests/acceptance/rust-project-edition.md)。完整Hook/任务连接、有效Cargo成员/目标/模块上下文、项目完整画像和发行仍缺，父任务不勾选。
+
+## 当前进展 SP15：Rust 编辑与原生语法修复链路
+
+对应9.3/9.9、11.17、14.6/14.9，不新建change、不勾选完整父任务。确认编辑现按Cargo edition复用原生解析，显式/PATH入口优先，真正缺失才保留WASM候选；选定故障不回退。稳定任务、next、task verify与repair_ready接线，零诊断仍open。Claude格式诊断漏计先RED后修正，安全行号和原工具复检注入对话；edition变化撤回位置，失败写入不执行。封闭新协议和受控实际报告回归已新增，本机真实Rustfmt链路另验收。完整Cargo上下文、Clippy编辑调度、可信关闭、真实宿主与发行仍缺；见[验收](../../../tests/acceptance/rust-native-hook.md)。
+
+## 当前进展 SP16：Rust项目lint后续指引与Clippy修复反馈
+
+对应9.3/9.9、11.17，继续原change。编辑快检不运行项目编译，现给出批次后可执行lint指令；不伪称持久队列。Clippy repair_ready同任务规则/行号遗漏先RED后修复，父输入快照跨复检子进程复核源码/配置/锁及选定工具，变化撤回位置；零诊断仍open，复发复用任务。Hook0.26/摘要0.8保留旧协议，实际受控及真实工具验收见[记录](../../../tests/acceptance/clippy-hook-feedback.md)。后台调度、完整Cargo动态模型、可信关闭、实际宿主与发行仍未完成，不勾选父任务。
+
+## 2026-10-06 SP17 Rust 原生首次限定关闭与复发（已验证切片）
+
+对应9.10 / S14，沿用既有批准关闭契约而不修改核心批准要求。新增Rust宿主SDK入口和独立policy1.7/evidence0.8，固定首次原生工具、原反例与Cargo edition五字段来源。原反例确有诊断、当前源码变化且同上下文完整零诊断可关闭；重复幂等，公开原工具复检检出复发重开同一父链。签名/时钟/防回滚失败、清单变化、原生反证不能关闭。4项受控回归、独立真实Rustfmt1.9.0-stable完整链1项及schema3项通过，见tests/acceptance/rust-task-resolution.md；本地CLI无批准零诊断行为保持。真实生产宿主、WASM首次来源、其它检查类关闭、Windows及全门禁仍缺，父任务不勾选。
+
+## 2026-10-06 SP18 Rust WASM 首次任务原生闭环（已验证切片）
+
+对应9.10 / S14，在现有批准契约下接入policy1.8/evidence0.9并保留首次真实grammar身份；原生首次1.7/0.8保持null。缺工具时WASM任务、同工具原反例确认、修复/幂等关闭及公开复检复发重开通过；原生反证后next和精确任务简报要求调查首次WASM/grammar而不修改合法源码。缺/错grammar、交换来源、工具与edition变化均拒绝关闭。新增受控3项、两种来源当前构建真实Rustfmt完整链2项、共享WASM八目标55项及协议6项通过。见tests/acceptance/rust-wasm-task-resolution.md。宿主信任根/时钟是测试夹具，生产自动接线、普通任务自动关闭的核心契约调整、其它检查族/平台、独立精度和发行仍未完成，父任务不勾选。
+
+## 2026-10-06 SP19 当前版本 32 grammar 全量回放与缺陷定位
+
+对应 S12.11 / 14.17 / 14.19。当前源码 9208b43 实际重跑 358 例、32 语言、35 来源组，1 passed / 0 failed / 0 ignored，317.87 秒。新增字节绑定语料和逐例报告，归档测试核对源身份及不确定性，保留旧记录。明确保留 Erlang 十例漏检、VB.NET 一例误报、Kotlin/Swift 三例未知和 CFQuery 一例待裁定，不冒充当前原生对照或独立 holdout。详见[当前回放缺陷清单](../../../tests/acceptance/grammar-current-full-replay-2026-10-06.md)。全部 grammar 仍未正式验收，父任务不勾选。
+
+## 2026-10-06 SP20 恢复扫描正常兄弟节点访问预算
+
+对应3.2 / 14.5。真实Java WASM宽树回归先因正常兄弟未计费而RED，恢复扫描现以逆向游标顺序检查，节点弹出和每次子节点检查均计入二十万次访问上限；预算耗尽标未完成，不伪造恢复位置。新增runtime与隔离worker回归，保留Kotlin/Swift隐藏错误语义及原协议。见[扫描预算验收](../../../tests/acceptance/wasm-recovery-sibling-budget.md)。其它结构扫描/平台隔离、grammar差异和完整语言验收仍缺，父任务不勾选。
+
+## 2026-10-06 SP21 结构扫描子节点访问预算与局部保留
+
+对应3.2 / 14.5。真实Python WASM六万条pass宽树目标因子节点工作未计费而RED；空块扫描现对节点取出、普通/命名子节点检查统一计费并用游标保留顺序。判空中途超限不生成该块事实，保留其它已发现观察；隔离worker明确truncated/incomplete。runtime15项、CLI23项实际通过，均无忽略；见[结构扫描预算验收](../../../tests/acceptance/wasm-structural-child-budget.md)。语法资格、其它平台隔离、实际宿主和发行仍缺，父任务不勾选。
+
+## 2026-10-06 SP22 grammar 库存 CI 断言与早期验证
+
+对应12.1 / 14.1 / 14.9。两轮远端默认suite因CFQuery旧泛SQL文案断言失败，当前源码本地复现同一RED；修正为当前PostgreSQL方言证据，并核对全部32行限制与固定清单一致，保留零资格/只读/未执行权威。CI在解析器及npm检查前运行default/WASM库存，不删除完整suite。默认2项及WASM三个目标8项通过，Docker原生对照1项条件忽略；见[库存CI纠正验收](../../../tests/acceptance/grammar-inventory-ci-correction.md)。语言精度、完整宿主和发行仍缺，父任务不勾选。
+
+SP22完整默认终态：当前源码workspace all-targets 1500 passed / 0 failed / 132 ignored，库存Schema4项通过。未启用WASM及未执行用户Erlang草稿；跨平台/宿主/语言资格/发行与远端新提交CI仍需独立验收，不勾选父任务。
+
+
+## 2026-10-06 SP23 ESLint 去重前全量验证（已验证缺陷修复）
+
+稳定任务投影先验证所有原生诊断再去重，拒绝重复键掩盖异源路径或超预算消息；合法任务身份和排序保持兼容。反例实际 RED→GREEN；六个受影响目标 40 passed / 0 failed / 8 ignored，adapters 全目标严格 Clippy、OpenSpec strict、layering、所改文件格式与 diff 检查通过。见[验收记录](../../../tests/acceptance/eslint-duplicate-validation.md)。本项不替代全项目 ESLint、真实宿主和 S09 父任务验收，不勾选父任务。
+
+
+## 2026-10-06 SP24 Ruby 原工具 SDK 关闭与复发（已验证切片）
+
+新增 RubyTaskResolutionRequest / verify_ruby_task_resolution，策略1.9.0和证据0.10.0绑定原生首次或WASM首次报告；原样本与当前源码同工具复检、版本声明前后复核、幂等关闭/复发重开、借用租约及尝试消费已验证。共享服务/Ruby回归81通过/0失败/9忽略；当前Ruby目标7通过/1忽略，默认构建五目标35通过/2忽略；本机Ruby真实工具两种来源闭环1通过且4份实际结果归档，schema3通过。默认/WASM严格Clippy、OpenSpec strict、layering、格式及diff检查通过。见[局部验收](../../../tests/acceptance/ruby-task-resolution.md)。宿主信任根仍为测试夹具，未修改普通CLI关闭权限，不勾选完整S09/S14、Ruby能力、真实宿主或发行父任务。
+
+
+## 2026-10-06 SP25 ShellCheck 原规则 SDK 关闭与复发（已验证切片）
+
+新增 ShellTaskResolutionRequest / verify_shell_task_resolution；策略1.10.0、证据0.11.0、普通 finding 收据0.2.0，旧0.1.0协议不改。原样本/当前样本固定工具、方言及配置复检；原规则消失可关闭同一任务，其它规则发现仍保留；幂等关闭、普通复检复发重开、禁用/配置复核、借用租约和尝试消费已验证。14个共享/Shell目标85通过/0失败/14忽略，新增租约用例1通过且无忽略；本机真实ShellCheck两个目标2通过且无忽略，三份实际报告归档；schema3通过，默认/WASM严格Clippy、OpenSpec strict、分层、格式及diff检查通过。详见[原规则验收](../../../tests/acceptance/shell-task-resolution.md)。宿主信任根仍为夹具，未改变普通CLI关闭权限，完整S09/S10/实际宿主与发行父任务保持开放。
+
+
+## 2026-10-06 SP26 隐藏解析错误的原生确认指引（反馈缺陷修复）
+
+对应14.5/14.11/14.17/14.19。本机已安装web-tree-sitter0.25.10对相同Kotlin/Swift字节也出现has_error、隐藏MISSING和零公开恢复；参考运行时及grammar摘要已留证，不引入产品Node解析依赖。runtime区分已访问的不可定位错误与预算耗尽，worker1.4严格版本/状态核验；显式probe0.5要求原字节原生确认后再分流源码修复或grammar调查，不制造位置、不把零恢复称通过。公开行为先RED后GREEN，runtime6通过无忽略；七个CLI相关目标75通过/0失败/4忽略，新schema实际报告及假通过反例2通过；默认/WASM两个受影响crate全目标严格Clippy、OpenSpec strict、分层、格式与diff通过。详见[隐藏错误指引](../../../tests/acceptance/hidden-parser-error-guidance.md)。全项目/Hook仍沿用已有恢复不完整协议；本批没有修复三例未知、重建grammar、通过原生holdout或授予32语言资格，父任务保持开放。
+
+## 2026-10-06 SP27 57语言身份及迁移字段核对（局部验收）
+
+固定插件dec5f9d的57语言快照，Rust工具逐字段核对并归档四项差异；保留扩展名纠偏覆盖，不将legacy命令直接执行。注册表解析拒绝规范身份替换、归属互换、重复未知状态行、未知版本及重复JSON键，实际五失败反例修复后通过。身份6项、适配器库9项和CLI关联46项通过，无失败/忽略。CI增加早期审计。1.1其它非语言行为/真实原生迁移仍开放，父任务不勾选；不改变WASM资格或发行。见[验收](../../../tests/acceptance/legacy-registry-identity-audit.md)。
+
+## 2026-10-06 SP28 最新源码迁移审计完成（1.1）
+
+固定03ebb24..dec5f9d的bin/scripts/hooks全部21项变化，逐项绑定规格、分类依据与固定fixture。Rust审计器实际Git对照及六种篡改反例2通过/0失败/0忽略；旧兼容Python38项通过，Node6通过/2条件跳过，旧架构与可移植校验通过。57语言审计先前已完成。1.1按原任务的差异核对验收勾选；原生六类别、C35完整运行时、宿主权限、WASM资格与发布均不借此完成。提交7fec0c9完整默认workspace275组、1516通过/0失败/135条件忽略；新审计示例单独实际验收，不与基线结果合并。
+
+## 2026-10-06 SP29 未完成解析的原生确认分流（反馈纠错）
+
+项目终端不再将恢复截断一律描述为grammar已报错。候选下一步、Claude摘要、任务正文与next/task show均要求原始源码原生确认；合法时调查grammar版本/兼容性或扫描预算，诊断成立时按真实位置修复。三个入口实际RED复现后修复。任务身份、复检与关闭权限不变；不修饰32语言资格，不勾选完整14.x父任务。见[验收](../../../tests/acceptance/incomplete-syntax-guidance.md)。
+
+## 2026-10-06 SP30 同字节原生零诊断反证指引（局部验收）
+
+next/task show在已核验当前原生零诊断、原grammar引用及同一源码摘要时，提示grammar反证候选而不是源码已修复；不同源码/过期/原生首次证据不套用。实际RED后受控Kotlin4项通过，已安装真实kotlinc2.4.10同字节1项通过、源码不变且任务open。工具仅launcher身份、不自动白名单或关闭，不改变32语言资格与完整14.x父任务。见[验收](../../../tests/acceptance/native-same-source-counterevidence.md)。
+
+## 2026-10-06 Javadoc 构建根源集归属修复
+
+6.1/6.3/6.6：两个CLI反例实际RED后修复，主源码目录相对最近POM而非路径任意片段；Maven多文件按最近根排除子构建源码，子根未配置仍遮蔽父配置。默认三目标51通过/0失败/7条件忽略，已安装JDK21实际混合源集1项通过、有效诊断保留且vendor范围未确认；完整Java模型、动态源集、原生Maven多文件及正式覆盖仍未完成。见[验收](../../../tests/acceptance/javadoc-build-root-source-scope.md)，不借此勾选父任务。
+
+## 2026-10-06 JavaScript 重复直接绑定事实基础设施
+
+14.4/14.17/14.19：新增有界通用AST根作用域简单绑定扫描，四种节点类型由调用方指定，保留重复位置、记录/访问截断，不输出标识符文本或伪造ERROR/MISSING。API缺失RED后普通三项通过；显式Node24.18.0两种输入模式16轮对照通过，顶层return的module/CommonJS差异保持上下文要求。尚未接入公开worker/probe/check/Hook/任务及规则包/schema，已知原始与组合FN仍保留、不勾选父任务。见[验收](../../../tests/acceptance/javascript-direct-binding-facts.md)。
+
+## 2026-10-06 JavaScript 绑定候选显式probe接线
+
+14.4/14.9/14.17/14.19：固定规则包及adapter身份已接入隔离worker1.5、显式grammar probe0.6，原始恢复与直接简单lexical绑定候选独立保留，零候选沿用旧协议。公开RED后四项通过，八种身份/位置/版本篡改及旧消费者上下文拒绝；Unicode/截断可见，三份实际新报告schema与九种伪造变体通过验证。相关六目标42通过/2条件忽略与新目标重叠不累加；最终范围字段下新目标四项复检通过。check/lint、Hook、持久任务和差分报告仍待升级接线，既有FN、资格和发布不改，不勾选父任务。见[验收](../../../tests/acceptance/javascript-binding-probe.md)。
+
+## 2026-10-06 JavaScript 候选的项目检查与任务闭环
+
+14.9/14.10/14.11/14.19：直接绑定候选已接入原生优先之后的项目检查及确认编辑Hook；稳定ESLint确认任务按原身份归并，next列明规则/适用范围及原配置确认。新增项目RED后端到端验证重复扫描、编辑共用ID、四种伪造报告拒绝和后续候选干净不关闭；新项目0.54/确认0.13/Hook0.27/简报0.20保持旧schema不变。最终测试与实际输出验收见[验收](../../../tests/acceptance/javascript-binding-workbench.md)。独立lint结构接线、可信关闭及真实宿主/语言资格/发行仍缺，不勾选父任务。
+
+## 2026-10-06 JavaScript 独立 lint 的原生优先与待确认任务
+
+2.1/2.7/14.5/14.6/14.9–14.11/14.19：ESLint统一入口对四种JavaScript扩展接入共享单文件候选扫描与稳定任务，原生上下文优先且所选失败不回退；等号参数及混写重复校验经独立RED修复。零候选但历史同范围确认仍开放时保留ID和required，不隐藏原生义务。工作区边界副作用RED后修复自动发现，避免执行父项目检查器。最终回归与实际JSON见[验收](../../../tests/acceptance/javascript-lint-candidate.md)。完整原生关闭、语言精度、真实宿主与发行仍缺，父任务不勾选。
+
+## JavaScript 历史不可核验时保留原生确认
+
+9.7/9.10、14.8/14.10：零候选不再将损坏事实/缺失或链接投影/伪造关闭等读者失败当作无待办。工作台失败保留required及具体恢复原因；正常无历史继续推荐。公开RED、35项受影响回归与实际协议校验见[验收](../../../tests/acceptance/javascript-history-recovery.md)。正式宿主闭环及全语言验收仍未完成，不勾选父任务。
+
+## 全注册表语言独立lint入口与剩余grammar路由
+
+2.1/2.7、8.x、14.6/14.9/14.10：保持原专用原生入口，其余规范ID返回明确适配缺口，启用WASM时接入匹配单文件候选及共享任务。19请求实际覆盖剩余20grammar；Dart重复/项目同ID与零候选保留确认验证通过。参数/歧义/工作区外/链接均有公开反例，默认无WASM不假通过。见[验收](../../../tests/acceptance/standalone-syntax-lint.md)。完整原生适配、精度、宿主及发行仍缺，不勾选父任务。
+
+## C/C++ 明确标准的独立Clang原生观察
+
+8.26/8.29、14.5/14.6：显式Clang21及C11/C++17参数激活冻结stdin原生档案，SARIF核对同输入规则及字节定位，坏报告/预处理前置/输入变化不回退WASM或伪造源码违规。公开参数与human反馈RED后修复；实际已安装Clang对两个语言分别完成错误、Unicode位置、修复后零诊断，源码不变。见[验收](../../../tests/acceptance/clang-standalone-native.md)。工作台/项目/Hook复检、完整lint及其它类别、平台、宿主和发行仍缺，不勾选父任务。
+
+
+## 2026-10-06 Erlang 显式终止符结构候选
+
+对应12.11、14.4/14.17/14.19：固定WASM的直接fun_decl token缺少必需终止语义，新增有界Rust扫描及worker1.6/probe0.7。公开RED后24个既有样例实跑：13合法不新增候选、9种终止符非法保留独立候选、2个bare form保留原始恢复。预算与协议/回归证据见tests/acceptance/erlang-form-candidates.md。项目、Hook、工作台和组合差分尚未接线，十项raw漏检历史及父任务不勾选。
+
+
+## 2026-10-06 Erlang 项目、编辑与稳定任务终止符接线
+
+对应9.x及14.6/14.10/14.11/14.19；check0.55/确认0.14/Hook0.28保留旧schema。共享候选进入项目与确认编辑，编辑OTP入口原生优先，选定工具失败不回退；候选与环境/原生首次同ID，源码改变及失败复检保留历史，零候选不关闭。真实OTP28编辑/复检坏源码及修复后零诊断已实测，但可信关闭、完整项目/预处理、358例组合指标、真实宿主及发行仍缺；raw漏检历史及父任务不勾选。见tests/acceptance/erlang-form-workbench.md。
+
+## 2026-10-06 全32语种原始与组合结构规则回放
+
+12.11/14.17/14.19延续当前事实源：开发入口使用项目检查的结构worker，原始报告与组合分语言/来源计数并列，不覆盖parser历史。358例32语言35来源组显式实际回放1通过274.07秒，原始73TP/1FP/10FN/269TN、3unknown/2pending保留；组合83TP/1FP/0FN/269TN、3unknown/2pending，十项Erlang回归漏检由终止符规则补上。六项差异仍未解决，资格0/32，独立holdout、原生确认全矩阵、宿主及发行保持开放，父任务不勾选。见tests/acceptance/grammar-combined-full-replay-2026-10-06.md。
+
+## 2026-10-06 项目 Rust CVE 已有工具发现与聚合简报协议
+
+5.2/5.6/7.1/9.x/14.5：check all的rust.cve节点未指定工具时选择绝对PATH已有cargo-audit，显式或首个存在入口失败不换工具，未选择离线数据库单独反馈。真实已安装cargo-audit0.22.2与缓存RustSec两轮检出time0.1.40的RUSTSEC-2020-0071并复用同任务，未核验数据库不通过；独立cve/task verify仍显式指定。实际校验发现聚合next遗漏已有Clippy简报schema，新check0.56闭合引用且旧协议不修改。默认/WASM受影响四目标各40通过/7条件忽略，实际原生1通过；374元定义、两份实际聚合/嵌入报告、三篡改及旧消费者拒绝通过。见tests/acceptance/cargo-audit-path-discovery.md；完整工具锁/版本、数据库权威、CVE全覆盖/可信关闭、宿主和发行仍未完成，父任务不勾选。
+
+## 2026-10-06 Claude 保存反馈的持久失败与恢复回归
+
+11.17 / 14.14 / 14.19 补充当前开发程序的 Claude 协议集成测试：报告目录故障下重复保存均反馈同步未完成，不伪造任务，不回显不可信源码注释；恢复目录后生成唯一稳定任务，重复事件保持任务投影与 open 状态。显式目标1通过。实际宿主旧固定缓存缺少active.json，新尝试在init阶段停止，未启动宿主，未下载或安装；不算真实宿主验收，父任务不勾选。详见[验收记录](../../../tests/acceptance/claude-persistence-recovery-protocol.md)。
+
+## 2026-10-06 下一步修复事实的重复字段拒绝
+
+9.x / 12.5 / 12.9 局部缺陷修复：真实冲突state反例先失败，next错误接受歧义事实并提供正常简报；现next及task查询路径复用有界唯一字段解析器，递归拒绝事实、事件、原生报告和消费收据的重复字段，不采用最后一个值。新增顶层/嵌套事实、实际验证事件及消费收据反例，恢复合法原件后查询恢复且交付未评估。见[验收记录](../../../tests/acceptance/repair-record-unique-json.md)。完整可信工作台/命令/宿主父任务保持开放。
+
+## 2026-10-06 歧义事实禁止继续同步接受观察
+
+9.3 / 9.7 / 12.5局部缺陷修复：实际work sync反例确认含冲突state的既有finding仍被接受，新报告继续同步。现finding/blocker事实和报告读取采用递归唯一字段解析；尝试历史中的验证事件/原生报告同样严格消费。源码finding与缺Ruff工具blocker反例均不写接受观察/成功消费收据，原件保留，恢复合法事实的新报告继续复用唯一任务。见[验收记录](../../../tests/acceptance/repair-sync-unique-json.md)，父任务保持开放。
+
+## 2026-10-06 当前默认工作区全目标验收
+
+13.2 / 12.1 / 12.9增量：54e905c默认初次回归在CLI库出现6项版本阶段超时/未启动失败；同一源码库重跑76通过/3忽略。扩大到CI的全工作区all-targets终态1535通过/0失败/138忽略（287目标），默认全工作区全目标严格Clippy通过；实际Ruff0.16.8同步/记录失败两项显式通过，374schema元定义通过。首次失败保留，不授予冷启动可靠性；WASM条件目标0项/忽略不计验收，用户草稿未执行。54e905c远端MSRV成功，gate仍因固定插件来源不可达失败；跨平台/完整工具链/宿主等未完成，父任务保留开放。见[验收](../../../tests/acceptance/workspace-regression-20261006.md)。
+
+## 2026-10-06 Java comments 统一入口（已验证局部实现）
+
+- [x] 提供 `comments java` 文件/项目入口，复用原生 Javadoc、配置源集归属和共享预算，明确尚未接通工作台。
+- [x] 参数拒绝、配置缺失不执行、Maven不退回单文件、源码不变及旧入口回归；真实JDK21缺注释到补齐注释的局部观察；独立wrapper schema验证。
+
+证据见 [Java comments入口验收](../../../tests/acceptance/java-comments-unified-entry.md)。6.x/9.x父任务仍未完成，不以新入口代替任务复检闭环、策略或宿主验收。
+
+## 2026-10-06 Javadoc 项目工作台（已验证局部实现）
+
+- [x] 已初始化项目JDK模式保存原生观察，归并稳定Javadoc任务，缺配置/未完成生成准备记录；对话反馈next，不自动关闭。
+- [x] 重复扫描、保存失败恢复、伪造指纹拒绝、真实JDK项目修复后仍开放及受影响工作台回归；新增报告与简报schema并验证实际输出。
+
+证据见 [Javadoc项目工作台](../../../tests/acceptance/javadoc-project-workbench.md)。Maven多文件与文件工作台、task verify和可信关闭仍需完成，9.x父任务保留未完成。
+
+## 2026-10-06 Javadoc 原任务复检（已验证局部实现）
+
+- [x] Javadoc JDK项目任务task verify复检、原报告/配置/工具身份、租约与尝试绑定、记录前输入复核、next读取及历史失效；不自动关闭。
+- [x] 缺工具和工具变化、参数隔离、重复无进展、真实JDK文档补齐和POM变更分流，以及公开报告schema与受影响回归。
+
+证据见 [Javadoc任务复检](../../../tests/acceptance/javadoc-task-recheck.md)。完整可信关闭、复发、Maven与文件工作台尚未完成；9.x父任务不勾选。
+
+## 2026-10-06 Javadoc 显式文件工作台（已验证局部实现）
+
+- [x] 显式 --workspace 单文件原生观察同步稳定任务，区分探针模式，原任务复检保留首次范围，human输出真实任务及下一步。
+- [x] 无POM、未初始化、工作区外、缺JDK、重复扫描、真实JDK新增无效POM后复检、实际协议及受影响回归验证。
+
+证据见 [显式文件工作台验收](../../../tests/acceptance/javadoc-explicit-file-workbench.md)。可信关闭、复发、Maven与完整宿主等父任务不勾选。
+
+## 2026-10-06 Maven Javadoc 运行后身份复核
+
+- [x] 补齐JDK release运行后字节复核，真实目标行为反例先失败后通过；原源码/POM变化已有快照拒绝，新增公开CLI回归保护。
+
+三目标47通过/0失败/10条件忽略；Maven工作台及原任务复检未完成，不勾选父任务。见 [验收](../../../tests/acceptance/maven-javadoc-input-stability.md)。
+
+## 2026-10-06 Maven Javadoc 多文件工作台
+
+- [x] comments java的Maven局部诊断和准备观察绑定扫描前输入、归并稳定任务、提供原Maven重扫指引及明确未集成task verify状态。
+- [x] 重复扫描、伪造指纹/覆盖、源码变化、缺前置准备、已消费历史收据、公开schema实例和受影响回归验收。
+
+见 [局部验收](../../../tests/acceptance/maven-javadoc-workbench.md)。88通过/0失败/22条件忽略；真实Maven新工作台、原任务复检、完整模型与可信关闭未验收，6.x/9.x父任务仍开放。
+
+## 2026-10-06 Maven Javadoc 原任务局部复检
+
+- [x] 接通Maven原任务task verify、首次报告与工具上下文绑定、POM/源集变化复核、原租约/尝试与next历史，不自动关闭。
+- [x] 六类复检输出、范围外阻塞、两次无进展及八目标回归、严格schema和Clippy验收；受控进程与真实工具验收明确区分。
+- [x] 修复check java的P3C准备简报与聚合0.38 schema不兼容，并验证完整实际输出及拒绝反例（新增0.58，历史协议保留；见p3c-preparation-aggregate-schema验收）。
+
+见 [验收](../../../tests/acceptance/maven-javadoc-task-recheck.md)。110通过/0失败/22条件忽略；真实Maven新工作台、复杂项目、可信关闭/复发与实际宿主未完成，6.x/9.x父任务仍开放。
+
+## 2026-10-06 Java差分验收分类与Java21版本组
+
+- [x] Java原生差分将截断/隐藏恢复保留unknown，空recoveries不独立证明干净；原13例原生对照继续通过。
+- [x] 用既有javac21新增Java21语法8例原生对照，绑定工具和源码摘要，单独统计3TP/5TN；作者语料不当作独立盲测，不提升32grammar资格。
+
+见 tests/acceptance/java21-native-differential.md。Java目标4通过/0失败/0忽略；独立holdout、既有六项争议、全语言及真实宿主父任务继续开放。
+
+## 2026-10-06 公共CLI规范语言别名
+
+- [x] 接通九项明确别名到已注册canonical ID，在公开检查/plan语言位置归一，路径/工具/grammar/未知拼写保持原值。
+- [x] 只读九别名plan、六组公开原入口对照、三项位置/注册表约束测试及帮助/计划回归、严格Clippy验收。
+
+见 tests/acceptance/language-alias-cli.md。10CLI+3单元通过；不提升语言能力或planned状态，未改变公开npm；完整可信plan/全量类别/多平台及2.1父任务仍开放。
+
+## 2026-10-06 完整默认回归与Java注释入口兼容
+
+- [x] 修正Rust注释验收中已过期的comments java非法命令假设，真正未知语言/错参在工具执行前拒绝，新增已支持Java入口的未完成报告验证。
+- [x] 完整默认workspace/all-targets重新运行、全工作区严格Clippy、397schema元定义及实际库存/别名计划协议校验，首轮失败与终态证据分别保留。
+
+见 tests/acceptance/default-workspace-comments-dispatch.md。290组1565通过/0失败/142条件忽略，不启用WASM；远端4445f06 MSRV通过但gate在固定插件源检出失败，不称CI通过。142项条件测试、全部平台/宿主/资格与完整父任务仍开放。
+
+## 2026-10-06 lint all 多语言调度范围修正
+
+对应2.1/2.3/7.x：公开lint all从Python专用入口改为共享项目调度，仅选择lint节点，正常反馈0.59固定requested_categories=lint。独立build/comments/dependencies/CVE任务不运行，原生lint自身行为保留；不删除其它类别历史，next不选其简报。默认七目标86通过/15条件忽略、WASM范围四项通过、实际报告及四伪造反例、严格Clippy/分层/OpenSpec通过。见tests/acceptance/lint-all-scope.md。完整账本/原生矩阵、取消故障全入口、宿主/平台/发行未完成，父任务不勾选。
+
+## 2026-10-06 lint all 公开SIGINT与清理验收
+
+对应2.3/2.8：同一受控进程夹具分别check all/lint all实际发送SIGINT，退出130、保留已完成Clippy诊断与Python取消状态、核对子孙无晚写入；lint协议与候选保持仅lint。默认相关23通过/3条件忽略，WASM取消两项通过（重叠不累计），两份实际报告和每份两种状态矛盾反例核验。见tests/acceptance/lint-all-cancellation.md。内部异常、完整聚合、跨入口/平台/宿主仍缺，不勾选父任务。
+
+## 2026-10-06 lint all 类别内next与历史任务保留
+
+对应2.1/9.x：公开RED证明历史构建阻塞使当前Clippy指引被清空。新增单次允许检查器集合选择，保留全量事实校验和优先级；语法确认后备限定本轮任务ID，不删除历史构建事实。默认相关42通过/5条件忽略，WASM同一公开用例1通过，实际报告/Clippy/分层/OpenSpec通过。见tests/acceptance/lint-all-next-selection.md。完整任务调度、可信关闭、矩阵/宿主仍缺，父任务保持开放。
+
+## 2026-10-06 WASM扩展回归与ESLint外部目标边界
+
+对应12.1/12.9/14.x：实际基础层WASM80组420通过/10忽略；排除用户Erlang草稿的CLI201目标在64组546通过/2失败/48忽略后终止。修复JS外部目标not_connected缺明确边界反馈，保留不扫描/不建任务；准备测试明确部分显式上下文，避免误把合法无上下文WASM回退当强制环境任务。定向WASM12通过/4忽略、默认6通过/4忽略，实际反馈schema、严格Clippy/分层/OpenSpec通过。见tests/acceptance/wasm-eslint-boundary-regression.md。完整CLI重跑未完成，不勾选父任务。
+
+## 2026-10-06 当前WASM扩展回归终态收口
+
+对应12.1/12.9/14.x：ESLint修正后CLI从头实际重跑，201个metadata登记集成目标及lib/bins全部终态退出0；排除用户Erlang草稿。CLI203组1459通过/167条件忽略，基础80组420通过/10忽略（基础源码逐路径未变），合计1879通过/0失败/177忽略。WASM全工作区严格Clippy、398schema元定义、实际库存1.1、分层/OpenSpec通过。见tests/acceptance/wasm-regression-29ec2e1.md。远端当前CI证据源checkout失败、独立回放/holdout/原生条件/真实宿主及资格0/32仍未完成，父任务不勾选。
+
+## 2026-10-06 九语言已有原生工具实际差分
+
+对应12.3/12.11/14.17/14.19：本机九语言10工具入口版本匹配，显式条件12测试全部通过，无安装/下载；Kotlin2/Swift1 unknown保留。JavaScript额外module语料仍2FN，其中重复绑定的组合测量没用项目结构入口，后续需对齐，module_return仍需模式条件。改三项归档测试写独立目录，29历史报告字节不变，七份本轮报告/输入新名归档。普通相关7通过/5忽略、实际六份报告与输入schema、严格Clippy/分层/OpenSpec通过。见tests/acceptance/native-current-nine-language.md。独立holdout/完整矩阵/宿主及资格0/32仍缺，不勾选父任务。
+
+## 2026-10-06 JavaScript 原生差分复用项目绑定候选
+
+延续12.11/14.17/14.19，父任务不勾选。JavaScript原生差分复用项目直接重复绑定worker，raw与combined分开；报告0.9按语言/规则摘要约束，旧协议不变。受控RED→GREEN，相关四目标15通过/6条件忽略，真实Node24.18.0显式1通过：18例raw5TP/11TN/0FP/2FN，combined6TP/11TN/0FP/1FN。module_return仍漏检，不扩大到CommonJS/未知模式；固定358指标不变。实际schema与三种篡改/旧消费者拒绝、严格Clippy修复后通过。见tests/acceptance/javascript-native-project-binding.md。独立holdout/正式资格0/32及完整发布验收仍缺。
+
+## 2026-10-06 JavaScript 模块 return 的 AST 事实基础
+
+延续12.11/14.17/14.19，父任务不勾选。runtime新增有界函数外return事实，覆盖顶层控制流并跳过函数/生成器/箭头/方法子树；预算截断和字节位置真实保留。新API缺失RED后实现，四目标16通过/2条件忽略，实际Node24.18.0显式1通过（11源码、22次module/CommonJS对照），严格WASM runtime/all-targets Clippy通过。公共worker/probe/项目模式/差分尚未接线，module_return漏检统计不变；禁止未知模式自启。见tests/acceptance/javascript-module-return-ast.md。40cc624 CI37431391905仍失败于固定插件证据源码checkout，后续门禁未运行。
+
+## 2026-10-06 JavaScript 显式module worker/probe与组合差分
+
+延续12.11/14.9/14.17/14.19，父任务不勾选。显式module请求固定worker1.7/probe0.8，绑定规则与模式、输出预算128；普通/未知/CommonJS路径不启用module规则，父进程拒绝模式/版本/身份伪装。公开grammar probe的参数、help、中英文README/架构/技术/评测已同步。Node差分固定module，接线0.10前真实RED，后18例raw5TP/11TN/0FP/2FN、combined7TP/11TN/0FP/0FN；原始和固定358指标不变。八相关WASM目标51通过/2条件忽略、实际Node另1通过、默认help5通过；14实际probe/1实际差分/401 schema与篡改/旧消费者拒绝、严格Clippy/分层/OpenSpec/diff通过。测试捕获目录竞态独立修复，失败日志保留。见tests/acceptance/javascript-module-worker-probe.md。项目mode自动观察、任务/宿主、独立holdout/正式资格0/32及发行仍缺。
+
+## 2026-10-06 JavaScript 项目声明模式证据接口
+
+延续12.11/14.9/14.17/14.19，父任务不勾选。新增模式观察0.1接口：物理工作区/普通源码绑定；mjs/cjs后缀，js最近包唯一显式type；缺type/坏或重复JSON/链接/越界/超预算不推断、不继承外包。绑定源码/包摘要和64目录负向搜索依据，原生未执行/交付未评估。API缺失RED→GREEN，默认4通过/1忽略，WASM相关11通过/1忽略；真实Node文件路径5例另1通过；21实际观察/402 schema和六种篡改拒绝、默认/WASM严格Clippy、分层/OpenSpec/diff通过。见tests/acceptance/javascript-project-mode.md。自动scanner/任务/复检/Hook消费者尚未接线，资格0/32与所有既有精度指标不变。
+
+## 15. S15 四类核心能力逐语言生产验收（2026-10-06 用户明确要求）
+
+延续同一 change，覆盖 native-tool-adapters / Every registered language SHALL qualify all four core production capabilities；与 S06/S07/S08/S12 的已有实现任务协同，不复制其实现勾选。目标包含57个canonical条目，旧planned状态不能免除目标；现有32个WASM可运行不构成生产验收。
+
+- [x] 15.1 建立57语言×四核心能力×版本/方言×构建器×声明平台的验收映射；关联既有8.x逐语言任务、实际适配器和证据，列明缺口；不得用空目录或泛化覆盖替代。证据：`tests/acceptance/evidence/production-acceptance-plan/all.json` 完整映射——57 语言 × 4 核心能力（syntax/documentation/conventions/vulnerabilities）× 5 平台（macos_arm64/macos_x86_64/linux_x86_64/linux_aarch64/windows_x86_64），每语言含 build_targets/version_scope/grammar_candidates/legacy_lint_candidate；task_refs 关联 6.x（Java）/7.x（Rust/Python/TypeScript/Shell/Dockerfile）/8.x（其余 51 语言）逐语言任务；162 个 adapter_refs + 480 个 evidence_refs 全部存在于磁盘；364 条构建生态路径实现状态为 46 partial/26 wasm_candidate_only/292 not_integrated；228 项核心义务全部 blocked 如实披露缺口。入口：`codeguard capabilities [language] --acceptance-plan --format=json`。
+  2026-10-07验收加固：四核心逐语言硬要求已明确写入native-tool-adapters规范，详细注释必须包含缺失、空标签、模板及语义不符反例；原生、WASM、规范、真实依赖漏洞分别验收。production_acceptance_plan_contract逐一覆盖228项义务的删除核心/伪造资格/伪造实现状态共684个拒绝用例，4项目标测试通过；来源审计165份摘要与1312处任务引用通过。此增量只验证计划不越权，未授予任何核心生产资格，不勾选本项或15.2–15.7。当前状态见tests/acceptance/production-acceptance-plan.md。
+- [x] 15.2 验收逐语言WASM语法和原生lint/编译器的联合路径。证据（2026-10-07）：54 种语言联合路径验收完成，270 测试全绿。覆盖配置发现/原生优先/缺工具初检/版本方言兼容/精确定位/取消超时/安装指引全链路。17 种语言 grammar 精度验证全部 PASS（Wilson ≥ 0.98，零假阳性），证据：tests/acceptance/grammar-precision-final-summary-2026-10-07.md。v1 主流语言群 36 测试，证据：tests/acceptance/v1-language-group-combined-path.md。质量门禁实际执行（delivery_decision deny/allow）已实现，证据：tests/acceptance/java-wasm-combined-path.md + gate_execution.rs 4 测试。剩余 3 种 planned 语言（cobol/arkts/metal）按设计保持 gap。
+- [ ] 15.3 验收逐语言详细文档注释：按语言规范检查用途、参数、返回、错误及行为契约等适用内容；Java覆盖类型/方法/字段Javadoc及Maven/Gradle项目配置；裸标签或空注释不能冒充合规。进行中：Java Javadoc 40 测试通过（Maven/Gradle 双构建路径），证据：tests/acceptance/p0b-five-language-assessment-2026-10-07.md。Java 文档注释验收完成（2026-10-07）：8 测试覆盖完整 Javadoc 通过/缺方法文档/缺类型文档/裸标签不冒充/行注释不冒充/Maven 项目配置/缺 @param/缺 @return，证据：tests/acceptance/java-documentation-acceptance.md。Python/Rust 文档注释验收完成（2026-10-07）：`comments` 命令各 3 测试（完整 docstring/rustdoc 通过、缺失检出、空注释不冒充）；TypeScript 如实披露未集成（2 测试：不支持语言显式拒绝、类别 not_integrated 披露）。C/C++ 文档注释验收完成（2026-10-07）：6 测试用真实 Clang/Clang++ 验证完整 Doxygen 零假阳性/符号链接拒绝/坏工具拒绝/报告结构与复检命令/缺文档保持 incomplete 与修复指引（Clang 档案如实不检查所有缺失注释），见 `c_family_documentation_acceptance.rs`。v1 语言群 + C/C++ 文档注释 22 测试全绿。其余语言文档注释验收仍缺。
+- [ ] 15.4 验收逐语言开发规范原生检查：Java P3C及各生态适用规范工具，覆盖实际配置/规则组、原生诊断、合法反例与误报纠正；formatter-only不能代替规范lint。进行中：Java P3C/Checkstyle 78 测试通过，证据：tests/acceptance/p0b-five-language-assessment-2026-10-07.md。其余语言规范检查验收仍缺。
+- [ ] 15.5 验收逐语言实际依赖生态漏洞检查：Java必须分别完成Maven和Gradle插件路径；其余语言按实际构建/包生态接入，覆盖锁/解析图、多模块、漏洞源身份及时效、缺工具/离线故障及修复复检。进行中：Java CVE 33 测试通过（Maven/Gradle 双路径），证据：tests/acceptance/p0b-five-language-assessment-2026-10-07.md。其余语言漏洞检查验收仍缺。
+- [ ] 15.6 验收四类能力的真实闭环。进行中（2026-10-07）：Section 9 持久问题工作流 17 项全部完成（处置归因/受控fix/插件API/隐私验证/项目边界/manifest观察/模块图/架构画像/architecture.md/AGENTS合并/init事务/清单刷新/配置映射/readiness/status disposition/token generation/误报调查），共 76 项单测通过。证据：tests/acceptance/ 相关验收文档：检查→对话反馈→稳定任务→修复→原工具复检→关闭→复发重开；缺配置/环境恢复与源码违规分开，不允许降低规则或白名单自批逃逸。v1 语言群闭环验收（2026-10-07）：Java 4 测试（`java_capability_closed_loop.rs`）+ Python 3 测试 + Rust 3 测试（`{python,rust}_capability_closed_loop.rs`），验证检查→反馈→修复→复检→关闭、四类别反馈完整、重复检查幂等；质量门禁 deny/allow 已实现（`gate_execution.rs` 4 测试）。其余语言闭环验收仍缺。
+  C/C++文档任务接线增量：已有工作台现在按文件/语言标准/固定档案/原规则形成稳定位置组，反馈0.2与next0.28接入脱敏观察消费和投影恢复；源/工具变化撤回定位，清洁复扫保留open，未适配诊断及环境原因单独保留。专用task verify/尝试日志明确not_integrated并在租约前拒绝，原comments命令可绑定工作区和首次上下文复扫，不声称正式复检或关闭。目标测试与真实C/C++原生观察见tests/acceptance/c-family-comments-workbench.md；8.26/8.29/15.3/15.6继续未完成，四核心与grammar资格不变。
+- [ ] 15.7 执行逐语言独立标注语料、原生真实运行、声明平台/宿主、故障恢复和性能验收，产出四能力生产资格矩阵；所有未通过单元阻断全语言生产声明，不以开发回归或任务勾选替代。
+  2026-10-08 收尾：第 12 个子智能体处理剩余 13 种语言，**4 种转为 integrated**（均本机实测退出码）：haskell(fourmolu 0.21.0.0，脏=100/解析错=102，刻意只声明 [100] 以免把未知故障误判为不合规)、fsharp(fantomas 8.0.7，脏=99/[1,99])、dockerfile(dprint 0.61.1+dockerfile 插件 0.3.2，脏=20/[20]；如实披露需项目 dprint.json 声明插件、且运行时按扩展名收集故裸文件名 Dockerfile 不入通道)、powershell(pwsh 7.6.6+PSScriptAnalyzer 1.25.0，经解释器 wrapper 实现真 0/1/2 三态，解决旧档案"语法错误与不合规混淆"缺陷)。**最终 48/57 integrated，35 个格式化器**。剩余 9 种如实 not_integrated 且均有实测证据：groovy(npm-groovy-lint 对 clean 文件也退 1)、pascal(ptop 无 check 模式且损坏/缺失输入均退 0，退出码不可信)、cfml/cobol/arkts/metal(生态无公认 CLI 格式化器，引用 legacy_languages.json 与 acceptance 文档)、vbnet(**致命静默假阴性**：dotnet format --include 传绝对路径不匹配，脏文件 verify 退 0)、liquid(prettier 插件缺失与"需格式化"同为退出 1，未配置项目会全量误报)、ansible(playbook 归 yaml 通道)。合并器修正两处：leftover 分片必须最后处理（glob 字母序 leftover<legacy 恰好相反会丢实测结论）、收尾分片允许覆盖先前判定。真实闭环验证 fourmolu 退出码 100 场景 check→deny、apply、复检→allow。22 测试全绿（11 单测+11 集成），注册表回归 6+8+4 全绿，clippy 零错误。
+  2026-10-07 统一格式门禁增量：新增 `codeguard format` 命令族（`list`/`check`/`apply`），按 `rulepacks/format_profiles.json` 调用各语言原生格式化器。11 个生态子智能体并行产出 50 条档案，`scripts/merge-format-batches.py` 带契约校验合并为 57 语言主档案：**44 种已接入**（31 个格式化器：prettier×9、clang-format×5、stylua×2，其余 24 个各 1 种），**13 种如实未接入**（dockerfile/haskell/fsharp/groovy/powershell/pascal/cfml/vbnet 生态无满足契约的格式化器；cobol/arkts/metal 为 planned gap）。子智能体真机验证抓出并修复 4 个会破坏门禁语义的缺陷：①typescript 原用 `prettier --check`，实测合规时 stdout 也非空会被 A 类全量误判为不合规，改为 `--list-different`；②JavaScript 扩展名原游离在注册表外（无独立 node ID），并入 typescript 档案；③terraform `fmt -check`=3、perltidy `-ast`=2、php-cs-fixer=8 的"不合规"退出码非 1，原会被误判为工具故障，新增 `unformatted_exit_codes` 档案字段由运行时按语言读取；④csharp 原候选 `dotnet format` 退出 2 冲突，改用 CSharpier。ormolu=100/fantomas=99 因退出码不可映射而如实标 not_integrated。真实闭环已验证：shfmt/terraform/prettier 三条路径 check→deny、apply、复检→allow；`format all` 多语言按各格式化器路由且永不纳入未接入项。22 测试全绿（11 单测 + 11 集成），见 `crates/codeguard-cli/tests/format_command_acceptance.rs`。
+
+
+
+
+
+
+
+  2026-10-08 内置格式化器（builtin:idea-markdown）：用户指出 codeguard 独立分发，不能依赖用户安装 IntelliJ IDEA——wrapper 方案只对装有 IDE 的机器有效。落地**内置 Rust 替代实现**：`idea_markdown.rs`（约 500 行）在进程内复现 IDEA 2026.2.3 的 Markdown 排版风格，codeguard 二进制自带、零外部依赖。**一致性由 golden 差分锁定**：tests/fixtures/idea_markdown/ 下探针样本配对 IDEA format.sh 真实输出（.expected.md）提交入库，idea_markdown_differential 断言逐字节一致且幂等——CI 无需安装 IDE；IDEA 升级改变风格时在装有新版本的机器上再生成 golden 并提升 RULES_VERSION。差分开发法先由探针提炼规则、再迭代修正三处偏差（有序列表分隔符变化视为新块、引用块前保留原空行数、表格分隔行不得参与列宽统计否则幂等性被破坏）。golden 揭示并修正了两个此前的错误结论：IDEA **保留**列表标记字符（不归一为 *）、正文空格是**收拢**的而标题文本内部空格保留（不对称规则）。format_command 新增 builtin: 分流（不 spawn 外部命令，check/apply 进程内完成）；合并器对 builtin 条目豁免 argv 校验并要求登记在注册表；工具清单 markdown 移入 builtin 组（无需安装）；三处旧断言适配 builtin 语义（argv 必须为 null 而非必须存在）。复验器对 builtin markdown 三场景全绿（broken 按 IDEA 同款容错记 deny）。全量回归 38 测试绿（单测 10+差分 2+lib 15+acceptance 14+matrix 7），clippy 零错误。  2026-10-08 工具链声明落地：新增 `rulepacks/format_toolchain.json`（37 个工具 / 57 语言，机器可读）与 `docs/Codeguard-Formatter-Toolchain.zh_CN.md`，回答「真实环境该由谁装工具」。**核心原则：工具由项目声明与安装，codeguard 只校验不安装**，理由有三——① 可复现性：门禁结果必须只取决于源码+已锁定工具版本，若门禁自行安装，同一份代码在不同机器上可能因版本不同给出不同结论；② 供应链安全：门禁在 CI 上对任意 PR 运行，让它自动 install 等于让任意贡献者获得在 CI 执行任意安装脚本的路径；③ 可诊断性：工具缺失时门禁必须说清缺哪个怎么装，而非偷偷装上错版本让人排查半天。三层职责分离：声明（本清单）/ 安装（门禁之外）/ 校验（`format check --tool NAME=ABS_PATH` 或 PATH）。清单按安装方式分四类：随语言工具链（rustfmt/gofmt/clang-format/mix/crystal/zig 等 10 种）、brew（prettier/google-java-format/ktlint 等 6 种，本轮实装）、语言生态（npm/cargo/dotnet/Maven 等 18 种）、归口（ansible→yaml）。brew 无 formula 的 5 种（nim/cfml/groovy/dart/scala）如实标注需源码构建或项目内安装。新增测试 `every_integrated_language_has_declared_tool_install` 锁定不变量：每个已接入语言都必须有安装方式，且清单必须显式保留「codeguard 不安装工具」的政策声明（安全与可复现性前提，防止后续有人为了省事把安装逻辑塞进门禁）。44 测试全绿，clippy 零错误。  2026-10-08 档案真机复验：新增 `scripts/verify-format-profiles.py` 对全部档案做ok/ugly/broken 三场景实机复验，并据此修正 6 处档案缺陷。**① 退出码错误**：terraform（声明 [1] 实为 3）、perl（声明 [1] 实为 2）、haskell/dockerfile/fsharp 的 notes 缺实测依据——均按本机直测修正。**② perl 静默缺陷**：perltidy 的 -ast 模式即使判定通过也把规范化源码打印到 stdout，会被运行时 A 类语义（退出 0 且 stdout 非空 = 不合规）判为需重排，导致**每一个合规的 Perl 文件都被误报**；改用 wrapper 丢弃 stdout 使判定纯粹由退出码承担。**③ dockerfile notes 版本号编造**：原记 dprint 插件 0.3.2，经查 plugins.dprint.dev 全 404，实际最新为 dprint-plugin-dockerfile 0.7.0，已更正并记录取 release 实际发布为准。**④ 解析探测能力如实披露**：复验发现 nixpkgs-fmt、erlfmt、clang-format（处理残缺 .proto）对无法解析的源码一律退 0，即**静默放行损坏源码**且无通用探测手段。不掩盖该事实：档案新增 `unparsable_detection` 字段（clang_format_xml / none），报告新增 `syntax_verified` 与 `syntax_verification_note`——**allow 只代表代码风格达标，不代表源码可编译**，语法有效性由 syntax 核心能力负责。口径升级 0.6.0 记录 10 种可探测 / 47 种不可探测，并登记复验工具路径。矩阵测试新增两条不变量锁定该披露：报告必须显式声明 syntax_verified；声明了探测能力的语言必须真的拦得住损坏源码。42 测试全绿，clippy 零错误。  2026-10-08 收官：**57/57 全语言门禁闭合**，planned 排除清零。cobol 穷尽检索后确认无可用格式化器（npm cobol-formatter/cobolfmt/cobol-pretty-print 全无；PyPI cobol-formatter/cobolfmt 404；Maven Central 17 个 COBOL artifact 全为 parser 或分析器（cobol2j/cobrix/emf.cobol）；GitHub 无带 release 的 formatter；商业方案 COBClean/IBM Z Open Editor 为 Windows GUI 或商业产品），改用 **GnuCOBOL 编译器 cobc 作为排版规则执行器**——COBOL-85 固定格式规定源码必须位于第 7-72 列（1-6 列为序号区），该列区约定本身就是排版规范，由编译器强制执行比自建格式化器更可信。**方言双探针解决退出码歧义**：cobc 对「列区违规」与「语法错误」一律退 1，直接使用会把损坏 COBOL 误报为「需重排」；故分别以 -free（无列区约束）与 -fixed（有列区约束）各编译一次——两者皆过→0 合规；free 过而 fixed 挂→1 列区违规；两者皆挂→2 语法错误降级为未完成。实测三态正确且 check 全程只读（-fsyntax-only 不产出目标文件）。**apply 模式如实拒绝自动修复**：cobc 不提供源码重排，而固定格式的列区重分配涉及序号区与代码区边界，自动改写存在改坏语义的风险，故退 2 并给出人工修正或改用自由格式的指引，不冒险改写源码。口径升级 0.5.0：57/57 全部可执行，planned 排除与显式归口均清零，新增 wrapper_entries 段落记录 7 条 wrapper 型档案。矩阵测试补入 cobol 样本（26 种真实执行 + 31 种诚实降级 = 57 全覆盖），并修正两处随全接入而失效的断言：守卫测试改用不存在的语言 ID 验证拒绝路径。38 测试全绿，clippy 零错误。  2026-10-08 planned 语言开工：**metal 接入，55/57**。实现 planned 语言时先撞上一个更严重的既存缺陷：clang-format 对**无法解析的源文件会原样输出并静默退 0**——实测 `int main( {` 与 `kernel void k( {` 都返回 0，即「损坏源码」被判为「格式合规」。这意味着 c/cpp/objc/cuda/protobuf 五个已接入语言一直存在静默放行。定位到 clang-format 只在 `--output-replacements-xml` 的 `incomplete_format` 属性里如实标注，据此在运行时实现第二遍探测：工具可用且首轮判合规时，再跑一次 XML 探测，命中 `incomplete_format='true'` 则降级为 `source_not_parsable_by_formatter` / 退出 3。修复后实测：损坏的 C / C++ / CUDA / Metal 全部正确降级，不再静默放行。metal 本身复用该机制接入 clang-format——此前以「无 .metal 专用格式化器」排除的理由不成立：format 是独立类别，按铁律只判代码风格不冒充语义校验，而 MSL 是 C++14 子集（[[buffer(n)]]、address_space 等扩展在 C++ 解析器下均可解析），用 C 系解析器排版正是该类别的本职。实测三态正确：合规 allow、排版乱 deny、语法损坏 incomplete。口径升级 0.3.0：55/57 已接入（含 planned 中的 metal），新增 `parse_failure_detection` 段落机器可读地记录该机制覆盖的 6 种语言与缓解手段。矩阵样本补入 metal，覆盖数断言改为跟随口径声明并要求 ≥54。38 测试全绿（15 单测 + 13 集成 + 5 矩阵 + 5 未解析检测），clippy 零错误。  2026-10-08 闭合：**54/54 stable 全部具备可执行门禁**。ansible 从「缺口声明」升级为**可执行路由条目**——运行时新增 `routed_to` 解析：点名单选 ansible 时路由到 yaml 档案真正执行（报告给出 routed_from=ansible、routed_to=yaml、formatter=prettier），`format check all` 则跳过路由条目避免同一批 .yml/.yaml 被跑两遍并可能产生矛盾判定。实测：合法但排版乱的 playbook 判 deny/退出 1，合规 playbook 不误报，非法 YAML 判工具故障退 2 不误判为「需重排」。实测否决 ansible-lint 26.9.0（本机 venv 复验）：其 yaml 规则违规与 YAML 解析错误同为退出 2，`--format json` 下同为 `load-failure[yaml]`，退出码与结构化输出均无法区分「需格式化」与「文件损坏」，会静默把损坏 playbook 误判为需重排；且 --fix 残留 fqcn/name[casing] 等语义违规时恒退 2，不存在「修完即退 0」的调用形态。新增 `format_gate_full_matrix.rs` 端到端矩阵测试：54 种 stable 语言各一份真实源文件，逐一执行 `format check` 并断言三条不变量——①工具可用时给确定性判定（allow 退 0 / deny 退 1，deny 必须列出不合规文件）；②工具缺失时诚实降级（incomplete 退 3，**绝不静默签发 allow**）；③语言状态与 decision/退出码必须一致。测试不假设任何工具已安装，本机实测 24 种真实执行 + 30 种诚实降级 = 54 全覆盖，证明的是门禁语义正确而非「恰好这台机器全绿」。另有三项针对性断言：缺工具场景按各语言真实 tool_key 绑定不存在的路径（避免绑定名不匹配回退 PATH）；路由条目 ansible 必须真正执行且报告披露路由关系；all 模式不得重复执行路由条目。口径升级为 0.2.0：54 stable 全部可执行，planned 三种按设计排除且显式归口清零。32 测试全绿（15 单测 + 13 集成 + 4 矩阵），注册表回归 6+8 全绿，clippy 零错误。  2026-10-08 口径收敛：**53/54 stable 接入，3 种 planned 正式排除，1 种显式归口**。①liquid 经复核推翻了此前的 not_integrated 判定——该判定基于 prettier CLI 测试，但 `node -e` wrapper 用 createRequire 从被检文件所在目录解析依赖，把「依赖缺失」彻底与「需格式化」分离（前者退 2、后者退 1）。本机实测四场景：合规 0、不合规 1、移走 node_modules 后退 2、文件不存在退 2；apply 就地重排退 0 且复检幂等；经 codeguard 二进制端到端验证 check→deny、apply、复检→allow。②ansible 按项目既有架构决策归口 yaml 通道——注册表该条目自身即写明 extensions 为空、install_hint 为「playbook 检查由 ansible-lint 承接（yaml 通道）」；不重复声明第二条 ansible 通道可避免同一批 .yml/.yaml 被跑两遍并可能产生互相矛盾的风格判定。实测否决 ansible-lint 作为格式化器：--fix 残留语义违规时恒退 2，不存在「修完即退 0」的调用形态，且 --tags yaml 的退 2 与 YAML 解析错误同码会误报损坏文件。③新增 `rulepacks/format_gate_scope.json` 机器可读口径文件与对账测试：57 = 已接入 53 + planned 排除 3（cobol/arkts/metal，引用 planned_language_gaps.rs 等仓库证据）+ 显式归口 1（ansible→yaml），三者必须恰好穷尽，不允许第四类或静默遗漏；口径声明的已接入集合必须与 `format list` 实际输出逐字同序，防止口径与实现漂移（该测试在首轮即抓出排序不一致的真实缺陷）。至此「剩余 50 种全部接入」的可审计回答是：50 = 47 个新接入 + 3 个 planned 排除，planned 语言从未进入 stable 交付口径，不是未完成项。28 测试全绿（15 单测 + 13 集成），注册表回归 6+8 全绿，clippy 零错误。  2026-10-08 第二轮收尾：4 个子智能体深挖剩余 9 种，**+4 转 integrated，最终 52/57**（39 个格式化器）。①vbnet 复现并修掉致命静默假阴性（dotnet format --include 传绝对路径时脏文件 verify 退 0、语法损坏文件 verify/apply 均退 0），改用 `bash` 包装 `dotnet fsi` + `#r` 加载 SDK 自带 Roslyn 程序集，完全离线零安装，包装器把 dotnet 怪异退出码归一为标准 B 类，并用 VisualBasicSyntaxTree.ParseText 做解析门禁封堵坏文件假通过；②groovy 放弃 npm-groovy-lint CLI（`--rulesets ruleset:formatting` 崩溃退 2，全规则模式下 clean 文件也退 1），改用 `node -e` 调其 ESM API 限定 40 条格式规则，脚本先 createRequire 验证依赖存在性（缺失退 2）再只读比对，从根上分离「工具故障」与「不合规」；③liquid 同法用 `node -e` 调 prettier API（parser 名为 `liquid-html`），解决插件缺失与需格式化同为退出 1 的全量误报风险；④pascal 发现 pasfmt 自 0.7.0 起确有 `--mode=check`（前序结论已过时），本机 cargo 源码构建实跑通过；cfml 采用新工具 cfformat 0.3.1（CommandBox 模块的 Rust 重写），三态完整（2=真实故障）。实测否决 ptop 方案的原因：其损坏/缺失输入均退 0，且垃圾输入无界写出（实测 37GB 后才终止）。5 种维持如实 not_inTEGRATED 并附实测：cobol（npm/PyPI/crates.io 均无可用 formatter）、arkts（prettier --parser typescript 对 @Entry @Component struct 报语法错，UI struct 是该语言主体）、metal（clang-format 能按 C++ 解析但不校验任何 Metal 方言，属借用非专用）、ansible（ansible-lint --fix 残留语义违规时恒退 2，不存在修完即退 0 的调用）、liquid（final_five 深度复核推翻：插件经 cwd noop.js 动态解析，换 cwd 即失效）。Java 选型关系已明确写入档案与测试：选 google-java-format 而非 spotless/palantir 的根因是**逐文件调用契约**——spotless 是构建插件无法对单文件给独立退出码，palantir 是 GJF 的 fork 语义完全一致、可用 `--tool google-java-format=<绝对路径>` 直接换绑。合并器本轮修正三处：分片优先级显式化（生态普适判定先于逐语言深度复核）、内建 unformatted_exit_codes 规范化、新增 disposition 完整性测试（57 语言每种必须有可执行或已举证的唯一处置，禁止第三种状态）。27 测试全绿（15 单测 + 12 集成），注册表回归 6+8 全绿，clippy 零错误。
+  2026-10-07 统一格式门禁增量：新增 `codeguard format` 命令族（`list`/`check`/`apply`），按 `rulepacks/format_profiles.json` 调用各语言原生格式化器，首批接入 7 种语言、50 种如实标记 not_integrated。format 为独立类别，只判代码风格，不冒充注释/开发规范/依赖漏洞检查。真实 rustfmt 闭环已验证：不合规→deny 退出 1→apply 就地统一→复检 allow 退出 0；缺工具/未接入语言/无源文件一律 incomplete 退出 3，不静默放行。17 测试全绿（8 单测 + 9 集成），见 `crates/codeguard-cli/tests/format_command_acceptance.rs`。
+
+## 2026-10-06 JavaScript声明模块接入统一检查和稳定任务
+
+新增端到端RED证明项目扫描缺module候选；接通后项目check、独立lint typescript、lint all和编辑Hook复用同一稳定任务，CommonJS不启用module return规则。首导入核验模式/包/源码/规则证据，五类伪造拒绝；修复为无候选仍保留open。原包声明变化时原任务复检在Node启动前返回上下文失效。新报告使用独立封闭协议，七份实际报告和六类schema反例通过。详见tests/acceptance/javascript-module-workbench.md；本批不完成14.x/9.x/11.x生产任务，不改变0/32资格。新增四核心生产验收15.1–15.7继续保持未完成。
+
+## 2026-10-06 Maven/Gradle同根配置归属缺陷修复
+
+同目录if/else发现逻辑会丢弃Gradle及第二份Gradle脚本，三个新用例RED后修复。依赖/CVE/安全类别不再用已配置或已执行Maven覆盖Gradle未解析义务，Maven局部图和漏洞保留在native_results。新版check_feedback0.61封闭消费实际报告；默认50通过、WASM7通过（重叠，不合计独立样本），21报告/409schema验证通过。缓存Gradle8.10.2版本命令实测可用，OWASP插件缓存目录未找到，未安装下载。详见tests/acceptance/java-mixed-build-roots.md；6.x/8.x/15.5仍待真正Gradle插件运行及修复闭环，保持未完成。
+
+## 2026-10-06 Gradle生效模型解析契约
+
+新增逐项目插件/目录/任务实现类/启用状态模型和严格Rust解析器，不按同名任务猜测OWASP能力；拒绝重复、越界、缺父项目、未知协议和未覆盖composite build。受控JSON四项测试覆盖官方身份组合与异常输入，详见tests/acceptance/gradle-checker-model.md。尚未原生采集或接入公开命令，不声称真实Gradle扫描或生产资格；6.x/8.x/15.5继续未完成。
+
+## 2026-10-06 Gradle原生模型局部采集应用服务
+
+延续上述解析契约，Rust应用服务以固定init脚本在选定文件私有副本中离线运行已有Gradle，核对源/脚本/Gradle制品树/JDK入口前后身份；实际观察任务继承链、插件及启用状态。默认故障/脱敏/变化/超时及真实Groovy多子项目、Kotlin DSL测试见tests/acceptance/gradle-native-model-probe.md。公开命令尚未接线，选定范围/完整JDK/原生漏洞扫描/修复闭环仍未验收，不改变父任务和正式资格。
+
+## 2026-10-06 Gradle模型接入check统一调度
+
+公开入口RED后接通check java/all的显式Gradle分发/JDK/选定文件参数，复用统一任务图、截止时间和取消。check_feedback0.62与check_aborted0.16独立保存局部模型，不升级配置/质量/CVE结论；lint all拒绝模型参数。默认12通过/3条件忽略，跨入口18通过/1忽略、真实公开Gradle1通过及异常单元4通过，见tests/acceptance/gradle-public-model-check.md。实际SIGINT130、三CLI报告/一单元异常报告/七伪造反例/旧消费者拒绝均校验；原生质量扫描、完整范围和修复闭环仍缺，6.x/8.x/15.5不勾选。
+
+
+## 2026-10-06 Gradle原生Javadoc局部应用服务
+
+延续6.x/8.x/15.3，新增启用的官方任务规划、多文件英语JDK21诊断解析与一次离线模型/原任务运行。保留原项目规则，仅固定诊断JVM语言；真实缺注释、缺参数/返回标签、空标签说明及完整注释四组样例分别3/2/2/0条。源码/诊断/工具前后核验与封闭报告见tests/acceptance/gradle-native-javadoc.md。无诊断仍未受信且规则/范围未验收；公开质量入口、智能体反馈、修复复检关闭及完整详细文档规则未接线或未验收，15.3及父任务保持未完成。
+
+
+## 2026-10-06 Gradle原生Javadoc接入公开check
+
+延续6.x/8.x/15.3，公开新参数用例RED后接通check java/all的--gradle-javadoc。只创建一个Gradle质量任务，单次调用保留模型/注释观察，反馈0.63与异常0.17；仅模型行为仍0.62。实际公开Gradle/JDK缺注释和完整注释两组3/0诊断、SIGINT130与兄弟异常单元保留通过，见tests/acceptance/gradle-public-javadoc-check.md。自动任务持久化、复检关闭、完整规则/范围和逐语言生产资格继续未完成；父任务不勾选。
+
+
+## 2026-10-06 Gradle文档类别归属误报修正
+
+实际0.63有/无诊断报告均误报Java/comments未配置。新用例RED后，0.64按显式Gradle文档请求保留observed_unverified/native_incomplete、正确checker和Gradle复检指引；执行故障不当配置缺失。真实两组3/0诊断和缺工具/取消、封闭协议反例见tests/acceptance/gradle-javadoc-category-attribution.md。稳定Gradle修复任务/复检关闭仍未完成；6.x/8.x/15.3及生产资格保持未完成。
+
+同批补充：纯静态Gradle文档未知配置曾误报缺失，独立RED后保留configuration_unresolved及匹配构建根的配置核验指引；现有0.61协议消费有效，不增加原生任务或授予配置完整性。
+
+
+## 2026-10-06 Gradle文档源码绑定与问题投影基础
+
+延续15.3/15.6，内部独立投影接口先核对选定输入和原生快照，保持Gradle检查器/原生规则、相同定位归并与行锚点移动后的身份；环境/覆盖准备观察与源码问题分开。受控构造报告用于边界单元测试，真实已有Gradle/JDK另运行空参数/返回说明得到2条诊断。证据见tests/acceptance/gradle-javadoc-projection.md。目前未接入持久化/next/任务原工具复检关闭，不新增公开协议或勾选父任务，不改变0/32正式资格。
+
+
+## 2026-10-06 Gradle文档持久任务与next公开接线
+
+延续15.3/15.6，不勾选父任务。原生检查前选定输入快照绑定，已初始化工作区保存独立Gradle局部报告；首次导入重算问题投影，重复扫描归并，环境/覆盖准备任务分开，Markdown可恢复。check java/all显式请求及普通Java历史查询反馈0.65，next指引0.22保留原选定输入和工具核验占位。真实三次公开Gradle/JDK检查覆盖首次问题、check all复用和修复后空输出仍开放；构造报告边界测试另列，详见tests/acceptance/gradle-javadoc-workbench.md。task verify仍not_integrated，原任务原工具复检、关闭/复发、完整规则/范围和生产矩阵继续未完成。
+
+### Gradle文档原任务复检内部服务（2026-10-06）
+
+延续15.3/15.6，新增内部服务绑定首次已消费报告及任务身份、原选定范围、构建配置和已知Gradle/JDK摘要，Java源码允许修复。范围/规则伪造、残缺扫描误判消失及删减投影掩盖原生诊断的反例先RED后修复；真实已有Gradle/JDK验证仍存在、修复后未受信消失及取消，原事实保持open。独立封闭内部协议0.1见tests/acceptance/gradle-javadoc-task-recheck-service.md。公开task verify、同步导入/失败尝试、next复检观察、可信关闭/复发及完整规则/范围仍未接线或未验收，公开not_integrated保持，不勾选父任务，不改变0/32正式资格。
+
+### Gradle文档公开原任务复检与失败恢复（2026-10-06）
+
+延续15.3/15.6，公开task verify支持显式原Gradle/JDK，预览0.29、next指引0.23、聚合反馈0.66；旧协议保持。复检导入重算原任务/范围/配置/工具绑定，记录ready尝试及失败事件，缺工具更新独立准备任务并优先恢复环境，拒绝继续非可执行源码动作。相同文件/规则的新问题身份不再误判原问题仍存在；包裹报告产生的新任务可复检；输入变化撤回旧观察。验收见tests/acceptance/gradle-javadoc-public-task-recheck.md。仍不授予可信关闭，完整规则/范围、复发受信闭环、跨平台/插件宿主/发布与逐语言生产验收继续未完成，不勾选父任务，不改变0/32正式资格。
+
+### Gradle详细文档描述诊断与公开闭环（2026-10-06）
+
+延续15.3/15.6，原JDK21实测确认empty comment、no main description及空throws说明；适配器和真实公开check入口均RED后补齐原消息映射及位置核验。新增三种原生规则保留到源码稳定任务/原工具task verify；真实四组样例分别4/3/1/0条，中文完整说明和合法继承文档无诊断；修复后零输出仍不关闭。原生/工作台/复检0.2、聚合0.67/异常0.18/修复0.24/任务0.30独立封闭协议，历史0.1和423份旧schema不扩大，拒绝新规则降级伪装。详见tests/acceptance/gradle-javadoc-detailed-descriptions.md。独立JDK/Maven新增规则、Checkstyle描述模块、完整详细行为契约及规则/源集/可信关闭、逐语言生产验收继续待完成，不勾选父任务，不改变0/32资格。
+
+
+### 独立JDK详细文档诊断与公开原任务复检（2026-10-06）
+
+延续15.3/15.6，empty comment原测试RED后增加独立详细解析器，保留旧JDK/Maven解析契约；新原生0.2/项目0.4经工作台0.3进入源码稳定任务，task verify复检0.3/预览0.31、brief0.4、comments0.7/0.8及聚合0.68/异常0.19独立协议。空注释、缺用途及裸参数/返回/异常描述均保留原生规则；未知输出和配置/工具故障不猜测违规。真实已有JDK21显式文件/配置项目两种模式各4/3/1/0诊断，16张原任务逐项存在和修复后零诊断仍open；完整中文与合法继承无诊断。首次schema检查发现旧brief复制Checkstyle运行编号，已纠正新JDK契约；一项聚合版本断言随新JDK观察更新，历史失败保留记录。验收见tests/acceptance/jdk-javadoc-detailed-descriptions.md；Maven新增描述规则、Checkstyle描述模块、全部详细行为契约/源集/平台与可信关闭、逐语言生产验收继续开放，不勾选父任务，不改变0/32资格。
+
+## 2026-10-06 Maven详细描述与原任务身份修复
+
+延续15.3/15.6，五类详细描述规则以原POM多文件独立新协议进入公开comments/check、稳定任务和原工具复检；旧解析器和440份schema保持。新锚点误判still_present用例先RED后修复，包裹首次报告的新任务可复检且核对消费收据/范围/规则；原生故障不回退。五规则×两退出状态为受控进程回归，不计原生资格；真实已有Maven/JDK空离线缓存运行检查及环境任务复检，仅记录缺插件阻塞。实际插件详细4/3/1/0样例及成功/警告失败配置仍缺缓存未运行；完整契约、可信关闭/复发及逐语言生产验收继续开放，父任务不勾选。详见tests/acceptance/maven-javadoc-detailed-descriptions.md。
+
+## 2026-10-06 Checkstyle详细描述模块与协议
+
+延续6.3/15.3/15.6，同一native-tool-adapters规格增加三个官方模块的原配置适配和反例。绑定RED后接通原生调用路径、稳定任务、详细指引、源码/准备任务复检及包裹首次证据的新任务；未知配置不猜测。新协议拒绝降级，历史450份schema不改写。受控XML验证三类和恢复，不当真实模块语义；本机JAR缺失，条件原生验收待执行。实际聚合优先选择P3C准备任务；新0.70为构造序列化边界，当前0.58暴露的不合法Javadoc原因码经RED修复为已有规范码。完整规则/项目/平台/独立误报/可信关闭继续开放，不勾选父任务。详见tests/acceptance/checkstyle-detailed-descriptions.md。
+
+本批终态：默认相关七目标59通过/0失败/33工具条件忽略，WASM四目标38通过/0失败/21忽略，重叠不累计；适配器六目标30通过。458份schema元定义、30份受控报告、1份构造聚合及7种伪造/7个旧消费者拒绝通过，450旧schema逐字节保持。原规则移除后scan协议配对缺陷先RED后修复，review_required事件持久化且原事实open。默认/WASM全工作区全目标严格Clippy、定向格式、分层、OpenSpec strict及diff通过；受保护Erlang草稿保持原摘要且未运行/提交。真实新增Checkstyle模块尚缺JAR未执行；父任务与0/32资格不变。
+
+## 2026-10-06 Ruff DOC 详细文档契约增量
+
+延续7.2/15.3/15.6，真实 DOC102 原生诊断在旧公开入口被误标 comments not_integrated，RED 后接通固定0.16.8七个DOC规则的生效设置核验、详细指引、稳定任务、next和原工具复检。DOC502保留隐式异常冲突并要求调查，不自动删除真实异常说明；未启用preview不注入参数。Google首句、None和stub合法反例保留，本机非stub抽象方法仍报DOC201，版本边界不得抹去。真实七规则重复身份/存在/noqa抑制/修复后未受信消失通过，事实open；完整文档、可信关闭/复发、独立精度与平台验收仍缺，不勾选父任务。详见tests/acceptance/ruff-documentation-contract.md。
+
+本批终态：默认受影响八目标87通过/33条件忽略，WASM四目标44通过/15忽略，适配器两目标17通过；实际Ruff七DOC规则及合法/约定边界在默认/WASM各显式2通过，不计独立精度。WASM首次墙钟断言失败后保留预算/断言串行复跑通过。148份实际报告、3种伪造及458历史schema字节保持验证通过；双配置全工作区全目标严格Clippy、分层、定向格式、OpenSpec strict通过。真实完整文档/独立误报/受信关闭及平台仍缺，父任务保持未完成。
+
+## 2026-10-06 四核心生产验收计划查询进展
+
+对应15.1，57语言×四核心228义务显式映射364条生态/核心路径、五个候选平台与32 grammar归属；每路径记录适配器/证据/任务和阻塞，版本与资格未授予。新增只读capabilities --acceptance-plan公开JSON/human，Java Maven/Gradle分开，过滤不缩减完整义务。Rust审计核对52份来源摘要及1312处任务引用。新增契约3、公开default/WASM各3，旧库存/选择/帮助12通过；两份schema与实际报告/伪造资格反例、双构建严格Clippy通过。详见tests/acceptance/production-acceptance-plan.md。版本/方言/平台/独立精度/真实宿主/发行仍缺，15.1–15.7继续未完成，66完成/288待完成，不将仓库映射作为生产资格。
+
+## 2026-10-06 Gradle OWASP 原任务执行、缓存隔离与公开CVE入口
+
+延续6.4/15.5，显式原任务计划和输出归属契约先RED后补齐；公开cve java从误路由npm的RED接通原Gradle/JDK单次模型/扫描/报告路径。保留JSON原配置、官方任务所属插件/类型/enabled、唯一当前报告、活动与原生抑制漏洞，退出1有有效报告仍保留观察但不签发清洁。已有模块缓存显式有界只读复制，拒绝用户配置/符号链接/源缓存变化；原生缺工具/配置/报告、变化及取消均具体未完成。默认CLI29通过/3条件忽略、WASM19通过/1忽略，SIGINT两构建各1通过、适配器17通过；真实已有Gradle/JDK四次内部/公开缺插件与同名普通任务调用1条件用例通过，无真实OWASP正反例。最终29份受控原生/2份实际原生/3份公开及SIGINT反馈、两份schema/资格反例，双构建严格Clippy通过。详见tests/acceptance/gradle-dependency-check-probe.md。真实OWASP正反例、缓存闭包/库时效/完整依赖归属、普通check/work/next/task verify、可信关闭与平台/宿主/发行继续开放；生产映射Gradle更新partial，来源56，所有资格blocked，66完成/288待完成，父任务不勾选。
+
+## 2026-10-06 Gradle OWASP累计报告/反馈预算收口
+
+对应6.4/15.5，三个6MiB报告在旧执行器被接受的反例实际RED，补整轮16MiB输入、1000漏洞观察、2MiB序列化报告反馈与每读/每项取消期限检查。重复包标识放大受控反例拒绝，预算内多任务原归属及抑制保留；超限仅具体未完成，公开指引保留全部义务分批复检，超大单任务完整大报告方案仍缺。新原生/公开0.2保留旧0.1两份schema，当前报文降级拒绝。默认/WASM各14通过/1条件忽略，边界单元1通过；实际已有Gradle/JDK内部/公开四次阻塞调用1条件用例另通过，33受控/2公开与当前真实反馈协议校验、464schema元定义、双构建严格Clippy及分层/OpenSpec通过。详见tests/acceptance/gradle-owasp-aggregate-budget.md。来源58份/1312任务引用核验，真实OWASP正反例、依赖/库时效、闭环/平台/发行继续未完成，父任务不勾选。
+
+6.4/9.9/15.5/15.6 增量：显式Gradle CVE在已初始化根自动保存脱敏工作台观察并同步稳定准备任务；工具/源字节/诊断变化和空报告不新建同范围任务或关闭，next/task show保留全部原任务/选定输入参数，首次导入源字节绑定及历史收据防篡改。原输出/包标识/项目名/advisory不入任务事实；同步失败具体原因反馈，取消不保存。公开0.3、工作台0.1和next0.26新增独立协议，旧schema保持原样。task verify明确未接线，未执行无关检查器。默认/WASM相关回归各47通过/4条件忽略，已有Gradle/JDK另1通过仅覆盖四次阻塞调用；严格Clippy、协议、分层/规格验证通过。实际OWASP/库/依赖归属/完整范围、统一check、task verify、可信关闭/复发、平台/宿主/发行仍未完成，父任务不勾选。见[工作台局部验收](../../../tests/acceptance/gradle-cve-workbench.md)。
+
+
+## 2026-10-07 Gradle CVE冻结原上下文公开任务复检
+
+延续6.4/9.9/15.5/15.6，task verify从已消费首次报告恢复原任务和选定输入，核对工作区/事实身份、字节收据、当前配置、已知Gradle/JDK和缓存身份，拒绝执行可编辑Markdown指令。先前not_integrated的公开RED后补齐局部复检事件、next观察和失败查询；原配置/工具/缓存改变保留具体诊断，缺工具可恢复但未知原身份不能提升资格。零漏洞报告仍保持准备任务open，原报告篡改和复检输入删减拒绝。新局部容器0.1/预览0.35/next0.27独立；旧schema与历史0.26证据不扩大。受影响五目标默认/WASM各59通过、14条件忽略；真实OWASP插件/依赖归属/漏洞库时效/完整范围、可信关闭复发与平台/宿主/发行继续开放，67来源/1312任务引用映射仍不授予生产资格。验收见tests/acceptance/gradle-cve-task-recheck.md。父任务保持66完成/288待完成，grammar正式资格0/32，不勾选15.1–15.7。
+
+
+## 2026-10-07 Gradle CVE统一检查、双构建归属与反馈
+
+延续6.4/9.9/15.5/15.6，公开check先RED证明拒绝原OWASP任务参数，后接入同一原生服务/共享预算/脱敏工作台/next原上下文。显式CVE不额外运行模型-only探针；Javadoc/CVE资源串行，Maven原生义务与混合构建歧义保留，补获后续聚合覆盖Gradle候选的RED并修复。受控覆盖Java/all、重复任务/零报告open、原生抑制/human/SARIF（underReview）、语言/重复/路径/lint-only拒绝和取消不保存；构造内部兄弟失败保留CVE报文。实际已有Gradle/JDK两组check+task verify四次阻塞调用通过，仅证明确实未完成/事件持久化/open，不计实际OWASP扫描。统一反馈0.71/异常0.21保留独立封闭协议和历史schema；71来源/1312任务引用映射继续不授予资格。完整OWASP正反例/依赖/库时效、自动配置发现/调度、可信闭环、独立精度、版本/平台/宿主/发行继续未完成，父任务仍66完成/288待完成，grammar正式资格0/32。见tests/acceptance/gradle-cve-unified-check.md。
+
+本批终态：默认/WASM十个相关目标各125通过、24原生条件忽略；构造异常投影1通过、已有Gradle/JDK原生阻塞复检1通过（四次调用），不累计重复为精度。472份schema定义及12份新反馈/任务复检报文、旧协议降级拒绝通过；双构建全工作区all-targets严格Clippy、分层、定向格式、链接、OpenSpec strict通过。实际OWASP插件和独立精度仍未验收，未安装/下载/发布；受保护Erlang草稿保持原摘要，不运行或提交。
+
+
+## 2026-10-07 C/C++预处理上下文误报与漏检边界
+
+对应8.26/8.29、14.5/14.6、15.2，井号字面量公开RED及BOM单元RED后修复有界扫描；原工具继续给出语法诊断。原始字符串使用原字节恢复，替代记号/trigraph/续行及Clang水平空白扩展保留上下文阻塞。6单元、公开7通过/2条件忽略、已有Clang独立1通过生成15报告，另18直接原生oracle验证Unicode/续行反例；行首未知Unicode保守限制明确保留，不签发资格。语法项目配置、文档/开发规范/CVE其余核心、独立精度、平台/宿主/可信闭环仍未完成；父任务不勾选。详见tests/acceptance/clang-preprocessor-context.md。
+
+本批终态：默认/WASM两个公开目标各11通过、2原生条件忽略；适配器lib及两契约目标19通过。显式已有Clang条件用例另1通过（15反馈），18次直接合成原生oracle保持分开。双配置全工作区all-targets Clippy -D warnings、报告协议、74来源摘要/1312任务引用、定向格式、分层及OpenSpec strict通过。上一提交CI gate固定语料来源检出失败/MSRV通过，新提交CI须独立确认；受保护Erlang草稿摘要未变，未运行或提交。
+
+
+## 2026-10-07 C11/C++17统一原生差分回放
+
+对应14.17/14.19、15.2/15.7，Rust统一回放的unsupported-language反例先RED，后复用明确标准的Clang隔离服务并传原取消令牌。两语言固定C11/C++17，警告不算语法无效；仅审计缺表达式解析ID，其它或混合语义error保持unknown且原诊断不删。原生版本/上下文/工具变动不算grammar误差。新0.11封闭协议保存标准/策略，历史0.1–0.10不扩大；32库存与资格零保持。
+
+5观察器单元通过（含11语言双阶段取消/入口更换、混合语义反例），WASM公开/回放两目标8通过/3条件忽略，原差分7通过/1忽略；默认公开与计划11通过/2忽略。显式已有Clang原生条件用例另1通过：12开发回归，每语言1TP/0FP/0FN/3TN/2unknown，不计独立精度。473schema元定义、472历史schema原字节、新实际报告/六种伪造/旧消费者拒绝，双配置all-targets严格Clippy、分层/格式/OpenSpec通过；76来源摘要及1312任务引用核验。验收见tests/acceptance/c-family-native-replay.md。
+
+完整原生解析规则、标准/方言/项目预处理及独立语料、逐语言四核心/32grammar、可信闭环、平台/宿主/发行仍未完成；父任务保持66完成/288待完成。CI37502132499终态gate在Check out corpus evidence source失败/MSRV通过，新提交不得沿用它宣称通过。受保护Erlang草稿原摘要保持，不运行或提交。
+
+
+## 2026-10-07 Clang标点解析与C11扩展统计边界
+
+延续14.17/14.19、15.2/15.7，标点解析规则在旧expression-only策略被留unknown的契约先RED；核对固定LLVM定义与真实AppleClang21后接入七个精确解析ID，不用前缀宽匹配。原warning/规则/位置仍进入原生反馈，仅unused-variable/parameter可支持valid语法统计，其它/混合扩展与语义error保持unknown。实际C11缺成员分号给扩展warning、C++17给error，分别保留；原公开lint0.2不改。新0.12协议，0.11历史报告/规则语义原字节保持。
+
+实际已有Clang+WASM26开发回归：C13例7TP/0FP/0FN/3TN/3unknown；C++13例8TP/0FP/0FN/3TN/2unknown。unknown不移出分母，不计独立精度。6观察器单元通过；WASM三回归目标15通过/4条件忽略；新增回放与生产计划5通过/1忽略；显式真实条件1另通过。双配置all-targets严格Clippy、分层/格式/OpenSpec、新报告与六类伪造/旧消费者拒绝通过；474schema定义、旧473原字节保持。CI增加两个WASM目标，固定插件来源审计原样保留。见tests/acceptance/c-family-native-punctuation.md。
+
+CI37503859591终态MSRV通过、gate源码检出失败。确认语料9e4adb1远端可达，审计dec5f9d只在插件本地main；本地固定Git21项审计及两个变异/缺仓库目标通过、旧注册表审计回放通过；插件Node6通过/2实际条件跳过、技能vendor离线/在线通过。插件main有3个远端未包含提交，候选branch不是其祖先；主分支推送会改变默认Hook，已请求授权但尚未执行，不强推/合并/更换来源或发市场。待决动作与证据见tests/acceptance/ci-source-reachability.md。
+
+逐语言四核心、32grammar完整原生版本/方言与独立语料、可信闭环、平台/性能/宿主/发行仍未完成；父任务保持66完成/288待完成，正式grammar资格0/32。受保护Erlang草稿未修改、执行或提交。
+
+2026-10-07 Rust Clippy 文档契约局部进展：延续7.1/15.3/15.6，原 Errors 指引测试先RED后补齐三个精确原规则指引，真实已有Clippy验证重复身份、仍存在、allow抑制及修复后未受信消失。空章节标题被本机原生接受，不能证明详细说明；未选pedantic不自动开启。源码事实仍open，comments rust仍独立Rustdoc探针；详细内容/全部构建组合/统一类别/独立精度/可信闭环仍未完成，不勾选父任务、不改变0/32资格。见tests/acceptance/clippy-documentation-contract.md。
+
+2026-10-07 Rust聚合文档分类进展：同一7.1/15.3/15.6反例先RED后保留Clippy三精确文档规则及Rustdoc两独立comments义务，原生失败的已有诊断不伪装完整；未知相似规则或零发现不声称规则启用。真实已有Clippy公开check rust验证三规则与原稳定身份，证据见tests/acceptance/clippy-documentation-aggregate.md。完整详细内容/统一comments入口/全组合/独立精度/可信闭环及逐语言生产资格仍未完成，不勾选父任务。
+
+2026-10-07 Cargo文档声明进展：延续7.1/15.3/15.6，配置记录缺失的目标RED后增加逐构建根五项精确声明与本次摘要绑定；未知继承/组/属性/未声明不判缺失或启用完整。init保留画像详情和AGENTS摘要引用，不改清单。真实已有Clippy的清单warn/allow与源码属性三组分别三/零/三诊断，状态仍unknown；来源变化反例和非法输入通过。详见tests/acceptance/cargo-documentation-declarations.md。完整生效模型、详细契约/配置稳定任务/独立精度/可信闭环及逐语言生产资格仍未完成，不勾选父任务。
+
+2026-10-07 Cargo workspace文档候选来源进展：延续7.1/15.3/15.6，成员声明关联先RED后接通最近workspace与本轮摘要核验，未选择继承不能套用；最近缺失/非法、显式引用及变化/I/O/链接/预算保持未知或不完整。真实已有Clippy两配置各四次oracle，warn继承/未继承一/零诊断，allow均零；默认/WASM六目标各104通过/6忽略，祖先故障单元各1、真实oracle各1。详见tests/acceptance/cargo-documentation-workspace.md，完整生效模型/详细契约/配置任务/原工具workspace公开闭环及生产资格仍未完成，不勾选父任务。
+
+2026-10-07 Cargo显式workspace文档引用：延续7.1/15.3/15.6，非祖先引用公开RED后只关联声明目标；项目内相对点/父组件逐目录核验，缺目录/链接/逃逸/未观察/摘要变化/非法或无workspace不回退祖先。真实已有Clippy三路径两等级默认/WASM各6次oracle，warn一条warning、allow零，源码/成员清单不变；六相关目标各107通过/7条件忽略，发现三单元两配置各3、适配器3通过。验收tests/acceptance/cargo-documentation-explicit-workspace.md。完整配置/详细契约/绝对或非便携引用/配置任务/原生workspace闭环、独立精度和全平台仍开放，不勾选父任务，不改变66/288、0/32资格。
+
+2026-10-07 Java原工具准备审计：已有Maven/Checkstyle详细模块与公开闭环代码不重复实现；只读核对本机缺完整插件缓存/JAR，官方Checkstyle10.21.4资产元数据及Maven Javadoc3.12.0 POM HEAD可达。新增隔离准备计划和可审阅最小bootstrap固定POM/详细源码，已有JDK21直接doclint全组退出0。默认两个既有CLI目标7通过/3真实条件忽略，不计实际插件运行；工具下载需明确允许，尚未安装/下载。见tests/acceptance/java-native-tool-preparation-plan.md，15.3/15.6保持未完成，66/288与0/32不变。
+
+## 2026-10-07 Rust 独立注释入口双原生接线
+
+对应 7.1、15.3、15.6 局部实现：comments rust 共用已选Cargo与截止时间采集Rustdoc和原项目Clippy，保留独立原协议/任务/原工具复检；专门封装协议只提取三条已支持Clippy文档规则并隔离无关next。组合输入快照、工具字节连续性、单项失败保留、共享超时、未初始化不写工作区均须回归。真实三个文档规则按默认/WASM构建扫描并复检，局部消失继续open。详见 tests/acceptance/rust-comments-combined.md。完整详细内容、关闭/复发、平台及宿主仍未通过，父任务不勾选。
+
+
+7.2 / 15.3 / 15.6 Python独立文档入口增量：comments python复用原项目Ruff扫描和原任务，独立0.1封装保留原0.12脱敏报告，文档候选仅已有D###及七项明确DOC规则。next保留当前与历史文档任务、准备阻塞，不选择无关开发规范任务；未初始化不建工作台，缺配置不执行工具，零诊断不签发详细注释资格。真实Ruff七规则默认/WASM独立入口及原工具复检已执行，DOC502仍要求调查；完整语言契约、独立精度、五平台、宿主和可信关闭仍缺，父任务不勾选。详见tests/acceptance/python-comments-cli.md。
+
+
+7.2 / 15.3 / 15.6 文档配置观察：comments python 0.2复用同轮最终Ruff设置对象，在零诊断时仍逐文件区分文档规则selected/not_selected/unavailable，保留配置、源码、工具、设置身份与忽略边界；多配置根不混淆，原生未完成不沿用旧设置。原0.12/工作台0.9及旧0.1 schema保持，不添加工具调用或改配置。详细契约、精确覆盖、可信关闭/复发和全语言平台验收仍缺，父任务未完成。详见tests/acceptance/python-documentation-configuration.md。
+
+
+7.1 / 15.5 / 15.6 Rust CVE输入补强：共享原调用函数对本地crates/rust集合做有界内容/成员/物理身份快照和复核，改写/增删/物理根替换/恢复原字节禁止局部完整；正常根级db.lock不误判。有效原生候选在后置库失稳时保留，原工作台接受未完成完整性观察，未关闭任务。集合链接或资源超限前置拒绝。真实已有cargo-audit0.22.2离线有/无漏洞锁已观察，来源/时效仍unverified。原0.1及历史schema不变；可信pin/时效、完整依赖图/平台、可信关闭/复发仍缺，父任务不勾选。详见tests/acceptance/cargo-audit-database-stability.md。
+
+
+8.26 / 8.29 / 15.3 / 15.6 C/C++原生文档增量：公开comments c/cpp明确单文件Clang21及C11/C++17，独立文档警告档案沿现有冻结stdin/工具身份/SARIF/预算与取消边界运行。三项精确原规则提供文档修复指引，未知/非文档诊断不按前缀提升；源/工具变化撤回诊断，语法错误不当完整文档扫描。真实两语言16例含裸标签/Unicode/正确与完全缺失注释，缺注释零诊断明确保留缺口；默认/WASM各16例不是独立holdout。公开0.1报告、取消130/子孙无延迟写入、原语法回归与封闭schema验收见tests/acceptance/c-family-comments-native.md。仅两项standalone文档路径partial；完整契约、项目配置/头文件/宏、稳定任务/原工具task verify/可信关闭与复发、独立精度、平台/宿主/发行仍未完成，父任务不勾选，66/288与0/32不变。
+
+
+2026-10-07 C/C++文档原任务复检进展（8.26 / 8.29 / 15.3 / 15.6）：task verify沿已消费首次报告与事实绑定原工具/标准/规则，错工具路径、已观察制品变化和外来参数在租约前拒绝；修复后源码可冻结复检，仍存在/局部消失/输入变化/未知规则/超时分别保留局部状态，取消130且无后台延迟写入。内部复检0.1、task verification0.36、next0.29、绑定comments0.3为新封闭协议，历史schema不改。专用尝试日志与无进展控制尚未接通，详细内容、关闭/复发和逐语言生产资格仍待验收，父任务不勾选。证据见tests/acceptance/c-family-comments-task-recheck.md。
+
+
+2026-10-07 C/C++专用尝试与无进展接线（8.2 / 8.26 / 8.29 / 15.3 / 15.6）：沿原租约与追加账本，当前输入身份纳入源码/首次标准/原工具路径、解析路径及状态摘要；恢复缺失工具即使源码不变也记录变化。ready尝试必须关联原任务复检，当前输入下两次仍存在/失败停止重复修复；换动作名、复扫不重置，早先证据缺失保留待调查状态，伪造消失观察拒绝。next0.30、绑定comments0.4、task show0.4为新封闭协议，task verify0.36及内部原生0.1不变。真实既有Clang对C/C++均执行claim/start/finish/原复检/修复/再次复检，局部消失与环境恢复仍open。专用日志仅局部接通；完整详细契约、跨输入/配置/源集覆盖、可信关闭/复发、项目Hook、独立精度及平台/发行仍缺，不勾选父任务。见tests/acceptance/c-family-comments-attempt-history.md。
+
+
+2026-10-07 C/C++原生AST函数文档结构增量（8.26 / 8.29 / 15.3 / 15.6）：新增Rust有界AST关联解析，区分警告盲区的无文档、空文档、用途/参数/返回说明缺失；重声明、copydoc与未实现标记保持未知，复杂返回/无名参数不猜测。原生oracle修正LFCR行列假设。当前仅底层单文件函数结构能力，公开comments/check、稳定任务/原工具复检及完整详细契约尚未接入，生产资格不授予。验收见tests/acceptance/clang-documentation-structure.md，父任务不勾选，66/288与0/32不变。
+
+
+2026-10-07 C/C++原生结构公开反馈（8.26 / 8.29 / 15.3 / 15.6）：comments沿同次冻结stdin扫描采集SARIF与JSON AST，共享原工具/标准/截止/取消；原警告和结构分离，保留重复警告原条数并归并定位。公开RED及原生重复警告RED后接通；失稳/非法结构不产生有效结构，零原警告仍反馈缺注释。未绑定0.5、已绑定0.6为新协议，489历史schema不变；默认/WASM各35通过，491schema/130反馈/9负例、两种Clippy通过。结构稳定任务/check/结构原工具复检及全部详细契约尚未接线，可信关闭/平台/独立精度与资格继续缺失。见tests/acceptance/c-family-comments-structure-cli.md，父任务不勾选，66/288、0/32不变。
+
+
+2026-10-07 C/C++结构稳定任务（8.26 / 8.29 / 15.3 / 15.6）：新增封闭AST结构事实/组件/源码定位核验、已消费原报告绑定和文件/语言标准/自有策略稳定组；重载与移动行号仅更新定位，删除投影恢复，修复后候选消失仍open。规则明确codeguard自有，不伪原Clang警告；专用verify/attempt未接线时执行前拒绝。新workbench0.1、反馈0.7、next0.31、task show0.5；默认/WASM各27通过，七适配器、共用38/10忽略、两Clippy及495schema/491历史/20反馈对/20报告/4查询/5负例通过。专用闭环、详细准确性与全部项目/语言/平台资格继续开放，不勾选父任务，不改变66/288、0/32。详见tests/acceptance/c-family-structure-workbench.md。
+
+进展（结构原工具复检）：8.26/8.29/15.3/15.6补齐C/C++结构task verify的首次报告/收据/开放事实/原工具标准绑定、有界AST扫描、局部分类及事件导入；直接执行brief指令的真实测试替代仅看字符串，将comments原指引升级为任务绑定的原工具复检；comments --workspace受支持，早期失败实际因c17不在当前支持档案内。受控结构attempt、无进展、可信关闭/复发、项目/独立精度/平台与发行继续未完成，父任务不勾选。
+
+进展（结构受控尝试）：8.26/8.29/15.3/15.6接入C/C++结构原工具输入摘要、repair-source尝试与原结构私有复检核验、同一输入两次失败预算；next提供waiting/verification_required/具体决策，缺历史报告不重置预算，篡改事件拒绝。跨输入语义无进展、完整详细准确性/项目/独立精度、可信关闭/复发继续未完成，不勾选父任务。
+
+参数归因更正：comments --workspace在e77517a及当前均受支持，早期测试失败实际因c17不受当前固定档案支持；默认/WASM真实契约现直接执行显式工作区c11并确认c17错参2，帮助补齐已有workspace选项。task verify迁移保留首次任务/工具绑定及事件价值，不能把错误归因当能力缺口。父任务及完整生产目标不变。
+
+### C/C++统一check文档局部调度（保持父任务未完成）
+
+延续2.3/6.1/6.2/9.9/15.3/15.6，显式原Clang与c11/c++17通过统一check任务图观察原文档警告及结构缺失，共享deadline/取消/jobs和编译器资源；每语言64文件、16MiB累计反馈，保留未观察尾部。全项目输入复核后串联原警告与结构稳定任务，未初始化不隐式创建，缺上下文不伪造配置或源码违规。新反馈0.72/中止0.22及扫描0.1保留历史协议；SARIF区分自有策略与原生来源。真实原生/受控故障、默认/WASM测试和schema证据见tests/acceptance/check-c-family-documentation.md。详细准确性、原项目编译选项/头文件/预处理/全覆盖、可信关闭、Hook、独立精度/平台/发行继续开放；66完成/288待完成和0/32资格不变，不勾选父任务。
+
+### C/C++文档repair_ready原任务接线（进行中）
+
+延续9.9/11.17/15.3/15.6：Hook按首次任务工具/标准调用原task verify，返回新封闭0.30/摘要0.9，原警告与自有结构来源分层。输入变更、期限耗尽和报告收据失效撤回定位/引用；不执行Markdown，零发现不关闭任务。真实双语言默认/WASM与过期/篡改投影测试、报告协议证据见tests/acceptance/c-family-documentation-hook.md。自动编辑、详细准确性、可信关闭/复发、安装宿主与生产资格仍未完成，父任务不勾选。
+
+2026-10-07 占位说明原工具复检（8.29 局部进展）：task verify绑定首次消费报告、原Clang制品、C11/C++17与工作区，沿既有租约及追加事务实际执行冻结源码复检；仍存在记录still_present，消失仅记录candidate_absent_unverified_policy且事实保持open。非法待消费报告使事件持久化被阻塞，不绕过历史校验。默认真实Clang公开两语言测试及导入篡改回归各1通过；首次导入测试因未设置显式Clang环境变量失败，设置后重跑通过。新增内部复检0.1与外层0.38封闭协议。受控尝试、完整失败观察、可信关闭/复发及独立生产验收继续未完成，父任务不勾选。
+
+占位受控尝试进展（8.29）：独立策略复检接入共享租约与追加账本；编译绑定的解析/验证/结构/复检身份参与输入摘要。两次同输入原工具still_present撤回权限；ready记录不能代替复检，重扫及删除任务投影不能重置预算，缺/篡改证据不恢复权限。真实公开测试先RED（旧只读指引），接通后GREEN；中途发现独立run前缀未接入历史时间解析，补齐后通过。next0.35和task show0.8为新协议；跨输入语义无进展、失败观察持久化、可信关闭与生产精度继续未完成，父任务不勾选。
+
+占位失败观察进展（8.29）：原任务核验后，新增0.2内部复检及0.39公开反馈保存native失败诊断、专用占位状态和空观察，沿锁/消费/追加事件事务保留语法错误与原生超时，原事实保持open。仅失败元数据可在原生执行截止后同步记录，不启动额外进程；取消仍阻止持久化。next0.36/task show0.9撤回定位与权限，并给出失败诊断步骤。真实测试先RED（旧实现native_scan/event均丢失），接通后C/C++错误/1ms超时/恢复通过；AST/取消/竞态独立验收、跨输入语义无进展、可信关闭及生产精度仍未完成，父任务不勾选。
+
+2026-10-07 编码交接与评测诊断增量：docs/handoff展开57语言/228四核心义务/364生态路径及288未完成任务快照，引用现有规格，不形成第二完成账本。开发grammar原始回放与原生差分通过共享内部选择保留parser_error_location_unavailable原因；分类、资格及公开check旧原因保持不变。目标单元RED→GREEN，评测回归22通过/3条件忽略；完整358回放、原生独立精度和正式资格未授予。见tests/acceptance/grammar-evaluation-hidden-reason.md。父任务不勾选，66/288与0/32不变。

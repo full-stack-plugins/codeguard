@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:javadoc-workbench-observation:0.2.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "workspace_binding",
+    "checker_id",
+    "authority",
+    "coverage_proven",
+    "delivery_decision",
+    "workspace_id",
+    "run_id",
+    "sources",
+    "observation_scope"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.2.0"
+    },
+    "report_type": {
+      "const": "javadoc_workbench_observation"
+    },
+    "workspace_binding": {
+      "const": "bound"
+    },
+    "checker_id": {
+      "const": "java.jdk.javadoc"
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "workspace_id": {
+      "type": "string",
+      "pattern": "^ws-[0-9a-f]{32}$"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^javadoc-[A-Za-z0-9-]{1,100}$"
+    },
+    "sources": {
+      "type": "array",
+      "maxItems": 100000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "source_sha256",
+          "reason",
+          "configuration_ref",
+          "configuration_sha256",
+          "native",
+          "findings"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "reason": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]{1,80}$"
+          },
+          "configuration_ref": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "configuration_sha256": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "native": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "java-javadoc-local-feedback.schema.json"
+              }
+            ]
+          },
+          "findings": {
+            "type": "array",
+            "maxItems": 100000,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "finding_id",
+                "finding_fingerprint",
+                "path",
+                "source_sha256",
+                "rule_id",
+                "line"
+              ],
+              "properties": {
+                "finding_id": {
+                  "type": "string",
+                  "pattern": "^CG-[0-9a-f]{32}$"
+                },
+                "finding_fingerprint": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "source_sha256": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{64}$"
+                },
+                "rule_id": {
+                  "enum": [
+                    "JavadocMissingComment",
+                    "JavadocDefaultConstructorMissingComment",
+                    "JavadocMissingParam",
+                    "JavadocMissingReturn",
+                    "JavadocMissingThrows"
+                  ]
+                },
+                "line": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "observation_scope": {
+      "enum": [
+        "explicit_file_probe",
+        "configured_project_probe"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "observation_scope": {
+            "const": "explicit_file_probe"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "sources": {
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "properties": {
+                "configuration_ref": {
+                  "type": "null"
+                },
+                "configuration_sha256": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

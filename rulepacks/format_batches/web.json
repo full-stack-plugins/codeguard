@@ -1,0 +1,205 @@
+{
+  "schema_version": "0.1.0",
+  "batch": "web",
+  "languages": [
+    {
+      "language": "vue",
+      "status": "integrated",
+      "formatter": "prettier",
+      "tool_key": "prettier",
+      "check_argv": [
+        "--list-different",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--write",
+        "{file}"
+      ],
+      "config_markers": [
+        ".prettierrc",
+        ".prettierrc.json",
+        ".prettierrc.yaml",
+        ".prettierrc.yml",
+        ".prettierrc.mjs",
+        ".prettierrc.cjs",
+        ".prettierrc.toml",
+        "prettier.config.js",
+        "prettier.config.mjs",
+        "prettier.config.cjs",
+        "prettier.config.toml"
+      ],
+      "extensions": [
+        ".vue"
+      ],
+      "dialects": {
+        "prettier": "3.9.9"
+      },
+      "notes": "prettier 内置 vue parser，可把 .vue SFC 的 template/script/style 作为整体格式化。实测（prettier 3.9.9）：不合规 --list-different 退出 1 且 stdout 列出文件，--write 退出 0，格式化后复查退出 0 且 stdout 为空，符合 B 类语义。限制：只调整格式，不校验模板语义、组件属性与事件合法性；不逐块处理 SFC，模板内嵌表达式按文本级排版；自定义块（custom block）不格式化；无法替代 vue-tsc 类类型检查。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "svelte",
+      "status": "integrated",
+      "formatter": "prettier",
+      "tool_key": "prettier",
+      "check_argv": [
+        "--plugin=prettier-plugin-svelte",
+        "--list-different",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--plugin=prettier-plugin-svelte",
+        "--write",
+        "{file}"
+      ],
+      "config_markers": [
+        ".prettierrc",
+        ".prettierrc.json",
+        ".prettierrc.yaml",
+        ".prettierrc.yml",
+        ".prettierrc.mjs",
+        ".prettierrc.cjs",
+        ".prettierrc.toml",
+        "prettier.config.js",
+        "prettier.config.mjs",
+        "prettier.config.cjs",
+        "prettier.config.toml"
+      ],
+      "extensions": [
+        ".svelte"
+      ],
+      "dialects": {
+        "prettier": "3.9.9",
+        "prettier-plugin-svelte": "3.5.2"
+      },
+      "notes": "prettier 必须搭配 prettier-plugin-svelte 才能解析 .svelte：实测不传 --plugin 时退出 2 并报 [error] No parser could be inferred（按 B 类『退出≥2 工具故障』处理，不会误判合规）；传 --plugin=prettier-plugin-svelte 后实测闭环通过：不合规退出 1 列出文件，--write 退出 0，复查退出 0 且 stdout 空。验证版本：prettier 3.9.9 + prettier-plugin-svelte 3.5.2（插件 3.x 要求 prettier 3）。也可在 .prettierrc 的 plugins 字段声明插件以省略 CLI flag，此时 check_argv 无需 --plugin。限制：只调整格式，不校验组件逻辑与 store 用法；不提供 svelte-check 的类型/可访问性诊断；运行时编译错误不在格式化阶段暴露。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "astro",
+      "status": "integrated",
+      "formatter": "prettier",
+      "tool_key": "prettier",
+      "check_argv": [
+        "--plugin=prettier-plugin-astro",
+        "--list-different",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--plugin=prettier-plugin-astro",
+        "--write",
+        "{file}"
+      ],
+      "config_markers": [
+        ".prettierrc",
+        ".prettierrc.json",
+        ".prettierrc.yaml",
+        ".prettierrc.yml",
+        ".prettierrc.mjs",
+        ".prettierrc.cjs",
+        ".prettierrc.toml",
+        "prettier.config.js",
+        "prettier.config.mjs",
+        "prettier.config.cjs",
+        "prettier.config.toml"
+      ],
+      "extensions": [
+        ".astro"
+      ],
+      "dialects": {
+        "prettier": "3.9.9",
+        "prettier-plugin-astro": "0.13.0"
+      },
+      "notes": "prettier 必须搭配 prettier-plugin-astro 才能解析 .astro：实测不传 --plugin 时退出 2 报 No parser could be inferred；传 --plugin=prettier-plugin-astro 后实测闭环通过：不合规退出 1 列出文件，--write 退出 0，复查退出 0 且 stdout 空；前置 frontmatter（TS）与模板一并格式化。验证版本：prettier 3.9.9 + prettier-plugin-astro 0.13.0。限制：只调整格式，不校验 frontmatter 类型；内嵌框架组件（React/Vue/Svelte）不会递归调用对应插件格式化，需项目自行配置额外插件；不提供 astro check 的诊断能力。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "html",
+      "status": "integrated",
+      "formatter": "prettier",
+      "tool_key": "prettier",
+      "check_argv": [
+        "--list-different",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--write",
+        "{file}"
+      ],
+      "config_markers": [
+        ".prettierrc",
+        ".prettierrc.json",
+        ".prettierrc.yaml",
+        ".prettierrc.yml",
+        ".prettierrc.mjs",
+        ".prettierrc.cjs",
+        ".prettierrc.toml",
+        "prettier.config.js",
+        "prettier.config.mjs",
+        "prettier.config.cjs",
+        "prettier.config.toml"
+      ],
+      "extensions": [
+        ".html",
+        ".htm"
+      ],
+      "dialects": {
+        "prettier": "3.9.9"
+      },
+      "notes": "prettier 内置 html parser，.html/.htm 均支持。实测（prettier 3.9.9）：不合规 --list-different 退出 1 且 stdout 列出文件，--write 退出 0，复查退出 0 且 stdout 为空，符合 B 类语义。限制：只调整标签排版与缩进，不校验 HTML 合法性与可访问性，不检查链接/资源存在；模板引擎语法（Jinja/ERB/Liquid 等内嵌占位符）可能被当普通文本排版；默认行宽 80 自动换行。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "css",
+      "status": "integrated",
+      "formatter": "prettier",
+      "tool_key": "prettier",
+      "check_argv": [
+        "--list-different",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--write",
+        "{file}"
+      ],
+      "config_markers": [
+        ".prettierrc",
+        ".prettierrc.json",
+        ".prettierrc.yaml",
+        ".prettierrc.yml",
+        ".prettierrc.mjs",
+        ".prettierrc.cjs",
+        ".prettierrc.toml",
+        "prettier.config.js",
+        "prettier.config.mjs",
+        "prettier.config.cjs",
+        "prettier.config.toml"
+      ],
+      "extensions": [
+        ".css",
+        ".scss",
+        ".less"
+      ],
+      "dialects": {
+        "prettier": "3.9.9"
+      },
+      "notes": "选 prettier 而非 clang-format：实测 Apple clang-format 21（CommandLineTools 自带）把 body{color:red;margin:0} 格式化成 C++ 成员初始化风格（color:/red; 各占一行再缩进），破坏 CSS 惯用格式，不能用作 CSS 格式化器；prettier 输出惯用 CSS 且是 Web 生态事实标准，与本分片其余 5 种语言统一同一工具，--tool 绑定一次 prettier 即可覆盖全部。实测 prettier 3.9.9 闭环：.css/.scss/.less 不合规退出 1 列出文件，--write 退出 0，复查退出 0 且 stdout 为空（B 类）。限制：.sass 缩进语法 prettier 无 parser（实测退出 2 No parser could be inferred），故 extensions 排除 .sass；只调整格式，不检查样式正确性、浏览器兼容性；SCSS/LESS 变量与嵌套按对应语法排版但不做编译校验。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    }
+  ]
+}

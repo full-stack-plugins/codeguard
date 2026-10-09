@@ -19,9 +19,22 @@ use crate::java_p3c_scan::finding_record;
 use crate::workspace_refresh::read_workspace_baseline;
 
 const MAX_REPORT_BYTES: u64 = 16 * 1024 * 1024;
+#[cfg(unix)]
+pub(crate) mod c_family_comments_report;
+pub(crate) mod c_family_placeholder_report;
+#[cfg(unix)]
+pub(crate) mod c_family_structure_report;
 mod checkstyle_report;
 mod doctor_report;
 mod eslint_report;
+#[cfg(unix)]
+mod gradle_cve_report;
+#[cfg(unix)]
+mod gradle_javadoc_report;
+#[cfg(unix)]
+mod javadoc_report;
+#[cfg(unix)]
+mod maven_javadoc_report;
 mod npm_preparation_report;
 mod npm_report;
 mod python_cve_report;
@@ -29,6 +42,8 @@ mod python_syntax_confirmation_report;
 mod rust_build_report;
 mod rust_cve_report;
 mod rustdoc_report;
+#[cfg(unix)]
+pub(crate) mod shell_report;
 mod syntax_confirmation_report;
 mod task_projection;
 static NEXT_WRITE: AtomicU64 = AtomicU64::new(0);
@@ -336,7 +351,8 @@ pub(crate) fn latest_current_finding_observation(
     let (_, _, path) = latest.ok_or("no_local_scan_report")?;
     let bytes = read_bounded_file(&path, MAX_REPORT_BYTES)?;
     let digest = format!("{:x}", Sha256::digest(&bytes));
-    let report: Value = serde_json::from_slice(&bytes).map_err(|_| "latest_report_invalid")?;
+    let report: Value =
+        codeguard_adapters::parse_unique_json(&bytes).map_err(|_| "latest_report_invalid")?;
     let parsed = parse_report(root, &workspace_id, &path, &report, digest.clone())
         .map_err(|_| "latest_report_invalid")?;
     let marker = consumed.join(format!("{}.json", parsed.run_id));
@@ -468,7 +484,8 @@ fn import_one(
 ) -> Result<(bool, u64, u64, u64), &'static str> {
     let bytes = read_bounded_file(path, MAX_REPORT_BYTES)?;
     let digest = format!("{:x}", Sha256::digest(&bytes));
-    let value: Value = serde_json::from_slice(&bytes).map_err(|_| "report_invalid_json")?;
+    let value: Value =
+        codeguard_adapters::parse_unique_json(&bytes).map_err(|_| "report_invalid_json")?;
     if value["report_type"] == "npm_cve_workbench_observation" {
         codeguard_adapters::parse_unique_json(&bytes)
             .map_err(|_| "npm_report_duplicate_or_invalid_json")?;
@@ -502,6 +519,14 @@ fn import_one(
                     | "eslint_task_recheck"
                     | "eslint_preparation_observation"
                     | "java_checkstyle_workbench_observation"
+                    | "javadoc_workbench_observation"
+                    | "maven_javadoc_workbench_observation"
+                    | "gradle_javadoc_workbench_observation"
+                    | "gradle_cve_workbench_observation"
+                    | "gradle_cve_task_recheck"
+                    | "gradle_javadoc_task_recheck"
+                    | "maven_javadoc_task_recheck"
+                    | "javadoc_task_recheck"
                     | "checkstyle_task_recheck"
                     | "checkstyle_preparation_observation"
                     | "checkstyle_preparation_recheck"
@@ -593,6 +618,86 @@ fn parse_report(
     report: &Value,
     digest: String,
 ) -> Result<ReportInput, &'static str> {
+    #[cfg(unix)]
+    if report["report_type"] == "clang_documentation_structure_task_recheck" {
+        if !crate::c_family_structure_task_recheck::valid_shape(root, report) {
+            return Err("clang_structure_recheck_invalid");
+        }
+        return c_family_structure_report::parse(
+            root,
+            workspace_id,
+            path,
+            &crate::c_family_structure_task_recheck::normal(report),
+            digest,
+        );
+    }
+    if report["report_type"] == "clang_documentation_placeholder_task_recheck" {
+        if !crate::c_family_placeholder_task_recheck::valid_shape(root, report) {
+            return Err("clang_placeholder_recheck_invalid");
+        }
+        if report["placeholders"].is_null() {
+            let run = report["run_id"].as_str().ok_or("report_run_id_invalid")?;
+            if report["workspace_id"] != workspace_id
+                || path.file_stem().and_then(|s| s.to_str()) != Some(run)
+            {
+                return Err("clang_placeholder_recheck_invalid");
+            }
+            // 不完整复检只消费脱敏诊断和事件，不制造结构/占位违规，也不关闭原事实。
+            return Ok(ReportInput {
+                workspace_id: workspace_id.into(),
+                run_id: run.into(),
+                digest,
+                findings: Vec::new(),
+                blockers: Vec::new(),
+                historical_findings: 0,
+            });
+        }
+        return c_family_placeholder_report::parse(
+            root,
+            workspace_id,
+            path,
+            &crate::c_family_placeholder_task_recheck::normal(report),
+            digest,
+        );
+    }
+    if report["report_type"] == "clang_documentation_placeholder_workbench_observation" {
+        return c_family_placeholder_report::parse(root, workspace_id, path, report, digest);
+    }
+    if report["report_type"] == "clang_documentation_structure_workbench_observation" {
+        return c_family_structure_report::parse(root, workspace_id, path, report, digest);
+    }
+    #[cfg(unix)]
+    if report["report_type"] == "clang_documentation_task_recheck" {
+        if !crate::c_family_comments_task_recheck::valid_shape(root, report)
+            || report["workspace_id"] != workspace_id
+        {
+            return Err("clang_documentation_recheck_invalid");
+        }
+        let run = report["run_id"].as_str().ok_or("report_run_id_invalid")?;
+        if path.file_stem().and_then(|p| p.to_str()) != Some(run) {
+            return Err("report_run_id_invalid");
+        }
+        return Ok(ReportInput {
+            workspace_id: workspace_id.into(),
+            run_id: run.into(),
+            digest,
+            findings: Vec::new(),
+            blockers: Vec::new(),
+            historical_findings: 0,
+        });
+    }
+    #[cfg(unix)]
+    if report["report_type"] == "clang_documentation_workbench_observation" {
+        return c_family_comments_report::parse(root, workspace_id, path, report, digest);
+    }
+    #[cfg(unix)]
+    if report["report_type"] == "shellcheck_task_recheck" {
+        return shell_report::parse_recheck(root, workspace_id, path, report, digest);
+    }
+    #[cfg(unix)]
+    if report["report_type"] == "shellcheck_workbench_observation" {
+        return shell_report::parse(root, workspace_id, path, report, digest);
+    }
     if report["report_type"] == "syntax_task_recheck" {
         if !crate::syntax_task_recheck::valid_shape(root, report)
             || report["workspace_id"] != workspace_id
@@ -617,6 +722,14 @@ fn parse_report(
     }
     if report["report_type"] == "python_syntax_confirmation_observation" {
         return python_syntax_confirmation_report::parse(root, workspace_id, path, report, digest);
+    }
+    #[cfg(unix)]
+    if report["report_type"] == "gradle_cve_task_recheck" {
+        return gradle_cve_report::parse_recheck(root, workspace_id, path, report, digest);
+    }
+    #[cfg(unix)]
+    if report["report_type"] == "gradle_cve_workbench_observation" {
+        return gradle_cve_report::parse(root, workspace_id, path, report, digest);
     }
     if report["report_type"] == "python_cve_workbench_observation" {
         return python_cve_report::parse(root, workspace_id, path, report, digest);
@@ -677,6 +790,30 @@ fn parse_report(
     }
     if report["report_type"] == "rust_clippy_local_observation" {
         return parse_rust_report(root, workspace_id, path, report, digest);
+    }
+    #[cfg(unix)]
+    if report["report_type"] == "javadoc_task_recheck" {
+        return javadoc_report::parse_recheck(root, workspace_id, path, report, digest);
+    }
+    #[cfg(unix)]
+    if report["report_type"] == "maven_javadoc_task_recheck" {
+        return maven_javadoc_report::parse_recheck(root, workspace_id, path, report, digest);
+    }
+    #[cfg(unix)]
+    if report["report_type"] == "gradle_javadoc_task_recheck" {
+        return gradle_javadoc_report::parse_recheck(root, workspace_id, path, report, digest);
+    }
+    #[cfg(unix)]
+    if report["report_type"] == "gradle_javadoc_workbench_observation" {
+        return gradle_javadoc_report::parse(root, workspace_id, path, report, digest);
+    }
+    #[cfg(unix)]
+    if report["report_type"] == "maven_javadoc_workbench_observation" {
+        return maven_javadoc_report::parse(root, workspace_id, path, report, digest);
+    }
+    #[cfg(unix)]
+    if report["report_type"] == "javadoc_workbench_observation" {
+        return javadoc_report::parse(root, workspace_id, path, report, digest);
     }
     if report["report_type"] == "java_p3c_project_observation" {
         return parse_java_report(root, workspace_id, path, report, digest);
@@ -1842,7 +1979,8 @@ fn persist_finding(
         true
     } else {
         let old = read_bounded_file(&fact_path, 128 * 1024)?;
-        let value: Value = serde_json::from_slice(&old).map_err(|_| "finding_corrupt")?;
+        let value: Value =
+            codeguard_adapters::parse_unique_json(&old).map_err(|_| "finding_corrupt")?;
         if value["fingerprint"] != finding.fingerprint
             || value["checker_id"] != finding.checker_id
             || value["path"] != finding.path
@@ -1951,7 +2089,10 @@ fn run_sequence(run_id: &str) -> Option<u128> {
             Some(last)
         };
     }
-    if run_id.starts_with("checkstyle-") || run_id.starts_with("eslint-") {
+    if run_id.starts_with("checkstyle-")
+        || run_id.starts_with("eslint-")
+        || run_id.starts_with("javadoc-")
+    {
         return run_id.rsplit('-').next()?.parse().ok();
     }
     if let Some(value) = run_id
@@ -2012,7 +2153,8 @@ fn persist_blocker(
         true
     } else {
         let old = read_bounded_file(&fact_path, 128 * 1024)?;
-        let value: Value = serde_json::from_slice(&old).map_err(|_| "blocker_fact_corrupt")?;
+        let value: Value =
+            codeguard_adapters::parse_unique_json(&old).map_err(|_| "blocker_fact_corrupt")?;
         if value["kind"] != "blocker"
             || value["checker_id"] != blocker.checker_id
             || value["fingerprint"] != blocker.fingerprint
@@ -2089,9 +2231,82 @@ fn persist_local_blocker_observation(
 }
 
 fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
-    if blocker.diagnostic_reason.as_deref() == Some("syntax_recovery_incomplete") {
+    if matches!(
+        blocker.checker_id.as_str(),
+        "c.clang.documentation" | "cpp.clang.documentation"
+    ) {
         return format!(
-            "# {} 语法检查能力恢复任务\n\n- 问题证据：范围 `{}`；报告 `.codeguard/reports/{}.json`，摘要 `{}`；固定 grammar 的恢复扫描未完成或错误无法定位，恢复节点数组为空；报告保留源码和 grammar 身份，没有可用的源码错误位置。\n- 规则依据：初检完整性与原生确认要求；零恢复不能代表语法通过，本任务不是已确认源码违规。\n- 允许修改范围：适用检查工具、语言版本和 grammar 配置；原生确认前不得修改源码，不关闭检查器，不伪造定位。\n- 修复步骤：核对原报告的语言、版本与已知限制，恢复适用原生 lint/编译器或调查 grammar；确认 adapter 缺失时提出具体能力决策，不重复无依据的源码修补。\n- 复检命令：codeguard task verify {} . --format=json；codeguard next . --format=json 显示当前能力缺口，恢复检查后再对同一范围复扫。\n- 历史尝试：首次 run {}；后续扫描和失败尝试保留在同一任务，正文不代表完整历史。\n- 关闭条件：同一源码范围的有效原生确认、完整覆盖及既有关闭策略均满足；安装、WASM 零恢复或勾选均不能关闭。\n",
+            "# {} Clang文档环境/覆盖阻塞\n\n- 问题证据：原因 {}，范围 {}；原报告 .codeguard/reports/{}.json，摘要 {}。\n- 规则依据：原生检查完整性与规则映射要求；不是源码违规。\n- 允许修改的范围：仅核对该源码、原工具及匹配标准，先恢复原生检查。\n- 修复步骤：查看next中当前原因和原生观察；缺工具、语法受阻及未适配规则分别诊断，不修改无关源码。\n- 复检命令：codeguard next . --format=json读取首次上下文绑定的comments argv，核验原工具后重扫。\n- 历史尝试：首次run {}；重复阻塞更新同一范围，独立尝试日志尚未接通。\n- 关闭条件：专用原工具复检、完整覆盖和可信关闭；零诊断或任务勾选不能关闭。\n",
+            blocker.id,
+            blocker.reason,
+            serde_json::to_string(&blocker.scope).unwrap(),
+            report.run_id,
+            report.digest,
+            report.run_id
+        );
+    }
+    if blocker.checker_id == "java.gradle.dependency_check" {
+        return format!(
+            "# {} Gradle CVE准备任务\n\n- 问题证据：原报告 .codeguard/reports/{}.json，摘要 {}，具体原因 {}。\n- 规则依据：原生OWASP任务、数据库时效及依赖归属；未经确认的观察不是源码漏洞。\n- 允许范围：原Gradle/JDK21、选定输入、原任务及漏洞库；不修改无关源码。\n- 修复步骤：恢复原工具和配置，超预算按完整任务清单分批复检；观察到advisory后核验库与真实组件，不能删检查义务。\n- 复检命令：codeguard task show {} . --format=json读取完整原任务/选定输入参数，然后按recheck_argv运行codeguard task verify；冻结原配置/工具/缓存，局部复检无可信关闭权威。\n- 历史尝试：首次run {}，重复扫描追加稳定任务的观察；失败需记录。\n- 关闭条件：原工具完整复检与可信策略均通过；空报告、勾选、删除任务或局部成功均不能关闭。\n",
+            blocker.id,
+            report.run_id,
+            report.digest,
+            blocker.diagnostic_reason.as_deref().unwrap_or("unknown"),
+            blocker.id,
+            report.run_id
+        );
+    }
+    if blocker.checker_id == "java.gradle.javadoc" {
+        return format!(
+            "# {} Gradle Javadoc准备任务\n\n- 问题证据：原因 {} / {}；报告 .codeguard/reports/{}.json，摘要 {}。\n- 规则依据：原工具执行和完整规则/范围核验，不是源码违规。\n- 允许范围：原Gradle、JDK21、构建配置及所选范围，不修改无关源码。\n- 修复步骤：故障时恢复原工具与原配置；规则/覆盖未验收时提出具体项目政策决策，不反复安装或修改源码。\n- 复检命令：codeguard task verify {0} . --gradle-bundle <原Gradle绝对路径> --java-home <原JDK21绝对路径> --format=json；codeguard next . --format=json核对指引及原Gradle/JDK路径后复检；复用原选定输入，记录失败和局部观察，不授予可信关闭。\n- 历史尝试：首次run {}；重复扫描沿同一准备问题追加观察，失败尝试需记录。\n- 关闭条件：原工具完整复检与可信政策均满足；无诊断、安装或勾选不关闭，当前仅局部观察。\n",
+            blocker.id,
+            blocker.reason,
+            blocker.diagnostic_reason.as_deref().unwrap_or("unknown"),
+            report.run_id,
+            report.digest,
+            report.run_id
+        );
+    }
+
+    if blocker.checker_id == "java.maven.javadoc" {
+        return format!(
+            "# {} Maven Javadoc准备任务\n\n- 问题证据：原因 {}；原报告 {} / {}。\n- 规则依据：原生多文件检查完整性，非源码违规。\n- 允许范围：构建根 {}、原POM、Maven/JDK和离线仓库；不修改无关源码。\n- 修复步骤：恢复匹配工具和原配置，再按相同上下文重跑comments java。\n- 复检命令：codeguard task verify {0} . --maven-tool <原绝对路径> --java-home <原JDK21> --maven-repo <原离线仓库> --repo-sha256 <复核摘要> --format json。\n- 历史尝试：首次run {}；task attempt记录诊断，后续扫描追加原任务。\n- 关闭条件：原工具完整复检和可信策略；原任务局部复检已接通，可信关闭未验收，零诊断不关闭。\n",
+            blocker.id,
+            blocker.reason,
+            report.run_id,
+            report.digest,
+            blocker.build_root,
+            report.run_id
+        );
+    }
+    if blocker.checker_id == "java.jdk.javadoc" {
+        return format!(
+            "# {} Javadoc 准备任务\n\n- 问题证据：原因 {}，范围 {}；报告 {}，摘要 {}。\n- 规则依据：原配置与完整原生观察前置；不是源码违规，不自动成为交付义务。\n- 允许范围：JDK21、原配置和环境，不能反复修改无关源码。\n- 修复步骤：核对配置和原工具版本，恢复适用检查能力。\n- 复检命令：codeguard task verify {0} . --java-home <已核验JDK21绝对路径> --format json。\n- 历史尝试：首次run {}；用task attempt记录失败和具体诊断。\n- 关闭条件：原工具完整复检及可信策略；可信关闭仍待验证，安装、勾选或局部成功不关闭。\n",
+            blocker.id, blocker.reason, blocker.scope, report.run_id, report.digest, report.run_id
+        );
+    }
+    if blocker.checker_id == "shell.shellcheck" {
+        return format!(
+            "# {} ShellCheck 环境恢复任务\n\n- 问题证据：报告 .codeguard/reports/{}.json，摘要 {}；范围 {}；原因 {}。\n- 规则依据：原生检查能力必须完整，环境故障不是源码违规。\n- 允许范围：仅检查环境、方言及原配置；不修改无关源码。\n- 修复步骤：核对原工具版本、source依赖、rc及输入稳定性，恢复后复扫；zsh/fish需要专用原生能力。\n- 复检命令：codeguard task verify {} . --shellcheck-tool <已核验绝对路径> --format=json。\n- 历史尝试：首次run {}，后续不同阻塞原因仍归同一任务；通过task attempt记录尝试，原工具复检绑定结果；task show/next查询当前历史。\n- 关闭条件：恢复原检查且正式复检流程通过；安装、勾选和零诊断不能自行关闭。\n",
+            blocker.id,
+            report.run_id,
+            report.digest,
+            blocker.scope,
+            blocker
+                .diagnostic_reason
+                .as_deref()
+                .unwrap_or(&blocker.reason),
+            blocker.id,
+            report.run_id
+        );
+    }
+    if blocker
+        .diagnostic_reason
+        .as_deref()
+        .is_some_and(codeguard_core::is_incomplete_syntax_reason)
+    {
+        return format!(
+            "# {} 语法检查能力恢复任务\n\n- 问题证据：范围 `{}`；报告 `.codeguard/reports/{}.json`，摘要 `{}`；固定 grammar 的恢复扫描未完成或错误无法定位，恢复节点数组为空；报告保留源码和 grammar 身份，没有可用的源码错误位置。\n- 规则依据：初检完整性与原生确认要求；零恢复不能代表语法通过，本任务不是已确认源码违规。\n- 允许修改范围：适用检查工具、语言版本和 grammar 配置；原生确认前不得修改源码，不关闭检查器，不伪造定位。\n- 修复步骤：核对原报告的语言、版本与已知限制，恢复适用原生 lint/编译器并对原始源码确认；原生确认合法时调查 grammar 版本/兼容性或扫描预算，原生诊断成立时才按真实位置修复。确认 adapter 缺失时提出具体能力决策，不重复无依据的源码修补。\n- 复检命令：codeguard task verify {} . --format=json；codeguard next . --format=json 显示当前能力缺口，恢复检查后再对同一范围复扫。\n- 历史尝试：首次 run {}；后续扫描和失败尝试保留在同一任务，正文不代表完整历史。\n- 关闭条件：同一源码范围的有效原生确认、完整覆盖及既有关闭策略均满足；安装、WASM 零恢复或勾选均不能关闭。\n",
             blocker.id, blocker.scope, report.run_id, report.digest, blocker.id, report.run_id
         );
     }
@@ -2116,6 +2331,14 @@ fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
     {
         return format!(
             "# {} Erlang 原生检查发现待处理\n\n- 问题证据：范围 `{}`；报告 `.codeguard/reports/{}.json`，摘要 `{}`，记录当前源码、工具身份和原生诊断或环境阻塞；首次证据不含 WASM 观察。\n- 规则依据：OTP 28 原生 scanner/parser；局部语法诊断与缺工具、版本、预处理阻塞分别处理，不视为完整项目 lint 结论。\n- 允许修改范围：当前原生诊断成立时仅修复该范围源码；环境阻塞仅恢复原工具、版本和项目预处理上下文，不修改无关源码或关闭检查。\n- 修复步骤：先运行 codeguard next . --format=json 核对最新证据和允许动作，再按当前原生位置修复或恢复具体环境；源码或工具改变先复检，旧位置不能沿用。\n- 复检命令：codeguard task verify {} . --erl-tool <next 建议或已核验的绝对路径> --format=json；复用原生工具，不因已有诊断重复安装。\n- 历史尝试：首次 run {}；后续扫描、尝试和复检追加在同一任务，任务正文不是完整历史。\n- 关闭条件：原工具复检、可信项目策略与覆盖及正式关闭流程均满足；局部零诊断、任务勾选或安装完成不能自行关闭。\n",
+            blocker.id, blocker.scope, report.run_id, report.digest, blocker.id, report.run_id
+        );
+    }
+    if blocker.checker_id == "syntax.native_confirmation"
+        && blocker.diagnostic_reason.as_deref() == Some("erlang_form_terminator_candidate")
+    {
+        return format!(
+            "# {} Erlang 函数终止符原生确认任务\n\n- 问题证据：范围 `{}`；报告 `.codeguard/reports/{}.json`，摘要 `{}`；独立函数form结构候选保留缺失句点或末尾分号位置，与ERROR/MISSING分开。\n- 规则依据：codeguard.erlang.form_terminator 1.0.0，仅直接AST标点和可能子句续接，不是已确认源码违规。\n- 允许修改范围：先核对OTP版本、原源码和预处理上下文；原生诊断成立后仅修复对应源码，不修改无关文件或关闭检查器。\n- 修复步骤：核对候选原字节位置；准备适用OTP28 erl，原生scanner/parser确认后才修复。字符串、字符、浮点和注释的句点不当终止符，子句名称及参数语义仍交原生检查。\n- 复检命令：codeguard task verify {} . --erl-tool <next建议或已核验绝对路径> --format=json。\n- 历史尝试：首次run {}；重复扫描、失败和复检追加在同一稳定任务。\n- 关闭条件：适用原工具、当前输入与正式关闭策略满足；安装、零候选、勾选或局部零诊断不自行关闭。\n",
             blocker.id, blocker.scope, report.run_id, report.digest, blocker.id, report.run_id
         );
     }
@@ -2167,10 +2390,17 @@ fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
         );
     }
     if blocker.checker_id == "node.eslint.preparation"
-        && blocker.diagnostic_reason.as_deref() == Some("eslint_syntax_confirmation_needed")
+        && matches!(
+            blocker.diagnostic_reason.as_deref(),
+            Some(
+                "eslint_syntax_confirmation_needed"
+                    | "javascript_direct_binding_candidate"
+                    | "javascript_module_context_candidate"
+            )
+        )
     {
         return format!(
-            "# {} TypeScript 语法原生确认任务\n\n- 问题证据：源码范围 `{}` 的候选 WASM 初检尚未验收；脱敏疑似位置、源码及 grammar 摘要在 `.codeguard/reports/{}.json` 的 `syntax_evidence`，报告 SHA-256 `{}`。这些不是已确认源码违规。\n- 规则依据：Tree-sitter 恢复节点只提示疑似语法位置；原生 TypeScript/ESLint 能力和项目原配置仍须确认。\n- 允许范围：核对本源码、对应构建根、原生工具及配置；不得仅凭 WASM 恢复节点修改源码、增加忽略或白名单。\n- 修复步骤：先查看同 run 的脱敏位置，再恢复适用的原生语法检查；若原生反证，保留证据并进入 grammar 误报调查。\n- 复检命令：codeguard lint typescript <原源码> --workspace <原工作区> --node-tool <核验绝对路径> --eslint-entry <核验绝对路径> --eslint-version <核验版本> --config <原配置绝对路径> --cwd <原工作目录绝对路径>。\n- 历史尝试：首次 run `{}`；后续观察、尝试和复检保留在同一任务，首张 Markdown 不是完整历史。\n- 关闭条件：同输入、范围、方言及语法能力的原生复检和正式策略/覆盖核验均满足；安装、WASM 零恢复或任务勾选不能关闭。\n",
+            "# {} JavaScript/TypeScript 语法与结构原生确认任务\n\n- 问题证据：源码范围 `{}` 的候选 WASM 初检尚未验收；脱敏疑似位置、源码及 grammar 摘要在 `.codeguard/reports/{}.json` 中的脱敏语法/结构观察（`observations` 或 `syntax_evidence`），报告 SHA-256 `{}`。这些不是已确认源码违规。\n- 规则依据：Tree-sitter 恢复节点及有界结构规则只提示疑似问题；原生 JavaScript/TypeScript/ESLint 能力和项目原配置仍须确认。\n- 允许范围：核对本源码、对应构建根、原生工具及配置；不得仅凭 WASM 恢复节点修改源码、增加忽略或白名单。\n- 修复步骤：先查看同 run 的脱敏位置，再恢复适用的原生语法检查；若原生反证，保留证据并进入 grammar 误报调查。\n- 复检命令：codeguard lint typescript <原源码> --workspace <原工作区> --node-tool <核验绝对路径> --eslint-entry <核验绝对路径> --eslint-version <核验版本> --config <原配置绝对路径> --cwd <原工作目录绝对路径>。\n- 历史尝试：首次 run `{}`；后续观察、尝试和复检保留在同一任务，首张 Markdown 不是完整历史。\n- 关闭条件：同输入、范围、方言及语法能力的原生复检和正式策略/覆盖核验均满足；安装、WASM 零恢复或任务勾选不能关闭。\n",
             blocker.id, blocker.scope, report.run_id, report.digest, report.run_id
         );
     }
@@ -2324,6 +2554,87 @@ fn render_blocker_task(report: &ReportInput, blocker: &BlockerInput) -> String {
 }
 
 fn render_task(report: &ReportInput, finding: &FindingInput) -> String {
+    if matches!(
+        finding.checker_id.as_str(),
+        "c.clang.documentation_structure" | "cpp.clang.documentation_structure"
+    ) {
+        return format!(
+            "# {} Codeguard函数文档结构策略任务\n\n- 问题证据：策略 {}，文件 {}，首次行 {}；全部当前函数组件见.codeguard/reports/{}.json，摘要 {}。\n- 规则依据：原生AST关联的Codeguard自有结构策略，不是原Clang警告或完整语义准确性证明。\n- 允许修改：仅当前文件文档注释，保留API及行为；先用next核对字节定位。\n- 修复步骤：根据真实声明和行为补齐所有缺失文档、用途、参数与适用返回组件，同名/重载属于文件策略组。\n- 复检命令：codeguard next . --format=json取得固定首次工具/标准/工作区的task verify命令，记录原工具结构复检；局部观察不关闭本任务。\n- 历史尝试：首次run {}；扫描只追加局部观察，专用尝试日志与同一输入失败预算已接入；跨输入语义诊断仍未验收。\n- 关闭条件：完整详细准确性/项目覆盖与可信关闭/复发；本地零缺失或勾选均不关闭。\n",
+            finding.id,
+            finding.rule_id,
+            serde_json::to_string(&finding.path).unwrap(),
+            finding.line,
+            report.run_id,
+            report.digest,
+            report.run_id
+        );
+    }
+    if matches!(
+        finding.checker_id.as_str(),
+        "c.clang.documentation" | "cpp.clang.documentation"
+    ) {
+        return format!(
+            "# {} Clang文档规则组修复任务\n\n- 问题证据：原生规则 {}，文件 {}，首次行 {}；同文件/语言标准/原规则的全部位置保存在 .codeguard/reports/{}.json；摘要 {}。\n- 规则依据：Clang固定文档档案；详细文档覆盖和项目配置仍未验收。\n- 允许修改的范围：仅本文件文档注释，保留API及行为；先用next核对当前输入。\n- 修复步骤：按当前原生规则补充实际契约，不能只填空标签或关闭规则。\n- 复检命令：codeguard next . --format=json取得绑定首次工具、语言标准和工作区的comments原命令，核验工具后复扫；专用task verify未接通。\n- 历史尝试：首次run {}；后续扫描归并同任务，独立尝试日志仍待接通。\n- 关闭条件：原工具专用任务复检、完整文档覆盖和可信关闭均须完成；本地零诊断和勾选不能关闭。\n",
+            finding.id,
+            finding.rule_id,
+            serde_json::to_string(&finding.path).unwrap(),
+            finding.line,
+            report.run_id,
+            report.digest,
+            report.run_id
+        );
+    }
+    if finding.checker_id == "java.gradle.javadoc" {
+        return format!(
+            "# {} Gradle Javadoc修复任务\n\n- 问题证据：原生 {}，目标 {}，首次行 {}；报告 .codeguard/reports/{}.json，摘要 {}。\n- 规则依据：原Gradle官方Javadoc任务诊断，原doclint/doclet及源集保持，完整详细规则尚未验收。\n- 允许范围：仅该源码与真实API文档，不关闭检查器或添加抑制代替修复。\n- 修复步骤：核对本轮位置和实际契约，补齐用途、参数、返回或异常的详细说明，裸标签不能代替内容。\n- 复检命令：codeguard task verify {0} . --gradle-bundle <原Gradle绝对路径> --java-home <原JDK21绝对路径> --format=json；codeguard next . --format=json核对指引及原Gradle/JDK后复检；沿用原选定输入，记录局部观察和尝试，不授予可信关闭。\n- 历史尝试：首次run {}；重复扫描追加同一问题，记录失败和无进展，旧行号不能直接修改。\n- 关闭条件：原工具完整复检和可信政策；当前不自动关闭，零诊断和勾选均不能关闭。\n",
+            finding.id,
+            finding.rule_id,
+            finding.path,
+            finding.line,
+            report.run_id,
+            report.digest,
+            report.run_id
+        );
+    }
+
+    if finding.checker_id == "java.maven.javadoc" {
+        return format!(
+            "# {} Maven Javadoc修复任务\n\n- 问题证据：原生 {}，目标 {}，首次行 {}；报告 {} / {}。\n- 规则依据：原POM固定Javadoc多文件诊断，项目政策尚未核验。\n- 允许范围：仅目标源码，保留规则和API语义。\n- 修复步骤：依据实际契约补齐公共类、构造函数、参数、返回及异常文档。\n- 复检命令：codeguard task verify {0} . --maven-tool <原绝对路径> --java-home <原JDK21> --maven-repo <原离线仓库> --repo-sha256 <复核摘要> --format json。\n- 历史尝试：首次run {}；重扫归并同任务，task attempt记录失败。\n- 关闭条件：原工具完整复检及可信策略；原任务局部复检已接通，可信关闭未验收，勾选或零诊断不关闭。\n",
+            finding.id,
+            finding.rule_id,
+            finding.path,
+            finding.line,
+            report.run_id,
+            report.digest,
+            report.run_id
+        );
+    }
+    if finding.checker_id == "java.jdk.javadoc" {
+        return format!(
+            "# {} Javadoc 修复任务\n\n- 问题证据：原生规则 {}，首次行 {}；报告 {}，摘要 {}。\n- 规则依据：JDK21 Javadoc 原生注释和标签检查；项目政策未核验。\n- 允许范围：仅目标源码 {}，禁止关闭规则替代修复。\n- 修复步骤：核对API契约，补类、公共构造函数、参数、返回或异常文档；误报提交精确纠错。\n- 复检命令：codeguard task verify {0} . --java-home <已核验JDK21绝对路径> --format json。\n- 历史尝试：首次run {}；后续观察保存到同一问题，task attempt记录尝试。\n- 关闭条件：原工具完整复检及可信策略；可信关闭尚未验收，零诊断与勾选不能关闭。\n",
+            finding.id,
+            finding.rule_id,
+            finding.line,
+            report.run_id,
+            report.digest,
+            finding.path,
+            report.run_id
+        );
+    }
+    if finding.checker_id == "shell.shellcheck" {
+        return format!(
+            "# {} ShellCheck 规则组修复任务\n\n- 问题证据：原生 {}，首次行 {}；原报告 .codeguard/reports/{}.json，摘要 {}；同文件同方言同规则的多个位置作为一组，原位置在报告中保留。\n- 规则依据：https://www.shellcheck.net/wiki/{}；原项目rc与可信策略分开。\n- 允许范围：仅目标源码 {}；先核对当前证据，不能按历史位置修改。\n- 修复步骤：按原规则修复引用、展开或可移植性，保留行为；不关闭规则代替修复。\n- 复检命令：codeguard task verify {} . --shellcheck-tool <已核验绝对路径> --format=json；方言和显式rc由首次报告绑定。\n- 历史尝试：首次run {}；后续扫描追加在同一任务。task attempt记录失败及无进展，task show/next查询当前历史；可信关闭仍待验收。\n- 关闭条件：稳定输入的原工具复检、完整策略和正式关闭流程；零诊断、配置抑制、同步或勾选不能关闭。\n",
+            finding.id,
+            finding.rule_id,
+            finding.line,
+            report.run_id,
+            report.digest,
+            finding.rule_id,
+            serde_json::to_string(&finding.path).unwrap(),
+            finding.id,
+            report.run_id
+        );
+    }
     if finding.checker_id == "rust.cargo_check" {
         return format!(
             "# {} 编译待修复\n\n- 问题证据：原生编译 `{}`，首次行 {}；报告摘要 `{}`。\n- 规则依据：rustc原生编译错误码及对应类型/语言约束；不是Clippy或文档规则。\n- 允许范围：仅目标文件 {}；跨文件影响须先扩展可核验范围。\n- 修复步骤：核对本轮源码和原生错误码，修正类型或符号归属；不关闭检查替代修复。\n- 复检命令：codeguard build rust . --cargo-tool <本轮已核验绝对路径> --format json；类型检查不执行测试。\n- 历史尝试：首次run {}；后续观察保留在同一问题，首张任务不是当前完整历史。\n- 关闭条件：原工具稳定输入下确认问题消失，并完成项目策略/构建组合/测试核验；同步或勾选不能关闭。\n",
@@ -2431,11 +2742,13 @@ fn render_task(report: &ReportInput, finding: &FindingInput) -> String {
             report.run_id
         );
     }
+    let doc = codeguard_adapters::RuffDocumentationRule::from_code(&finding.rule_id);
     let step = match finding.rule_id.as_str() {
         "F401" => "核对导入是否仍被使用；确认后仅修改该文件的导入。",
         "E501" => "核对项目 Ruff 行长配置，保持语义并重排行内容。",
         "D100" => "确认该公共模块的用途，为模块补充准确的顶层 docstring。",
         "D101" => "确认该公共类的职责，为类补充准确的 docstring。",
+        _ if doc.is_some() => doc.as_ref().expect("已核对规则").step,
         _ => "查阅原生规则和私有诊断，先确认根因再修改。",
     };
     let path = serde_json::to_string(&finding.path).expect("路径可编码");

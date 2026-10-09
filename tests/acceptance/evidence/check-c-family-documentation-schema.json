@@ -1,0 +1,12 @@
+{
+  "evidence_kind": "development_check_c_documentation_schema",
+  "qualification": "not_granted",
+  "schemas_valid": 507,
+  "historical_schemas_unchanged": 503,
+  "check_reports_valid": 20,
+  "language_scans_valid": 28,
+  "child_reports_valid": 150,
+  "controlled_aborted_builders_valid": 2,
+  "negative_cases_rejected": 11,
+  "test_source_sha256": "b44559e0cc7c657c16a5456a328014bf24ba810beccd6c15aa027b8c130c86c4"
+}

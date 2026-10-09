@@ -14,7 +14,8 @@ fn main() -> ExitCode {
         eprintln!("无法登记 Ctrl-C 取消：{error}");
         return ExitCode::from(4);
     }
-    let args: Vec<String> = std::env::args().skip(1).collect();
+    let mut args: Vec<String> = std::env::args().skip(1).collect();
+    codeguard_cli::language_alias::normalize_arguments(&mut args);
     if let Some(selection) = codeguard_cli::help_command::trailing_selection(&args) {
         return codeguard_cli::help_command::run(&selection);
     }
@@ -28,6 +29,7 @@ fn main() -> ExitCode {
         [command, rest @ ..] if command == "init" => codeguard_cli::init_command::run(rest),
         [command, rest @ ..] if command == "config" => codeguard_cli::config_command::run(rest),
         [command, rest @ ..] if command == "tools" => codeguard_cli::tools_command::run(rest),
+        [command, rest @ ..] if command == "format" => codeguard_cli::format_command::run(rest),
         [command, operation, rest @ ..] if command == "grammar" && operation == "status" => {
             codeguard_cli::grammar_status_command::run(rest)
         }
@@ -54,6 +56,22 @@ fn main() -> ExitCode {
             codeguard_cli::syntax_worker_command::run(rest)
         }
         #[cfg(unix)]
+        [command, language, rest @ ..]
+            if command == "comments" && matches!(language.as_str(), "c" | "cpp") =>
+        {
+            let mut request = vec![language.clone()];
+            request.extend_from_slice(rest);
+            codeguard_cli::c_family_comments_command::run(&request)
+        }
+        #[cfg(unix)]
+        [command, language, rest @ ..] if command == "comments" && language == "python" => {
+            codeguard_cli::python_comments_command::run(rest)
+        }
+        #[cfg(unix)]
+        [command, language, rest @ ..] if command == "comments" && language == "java" => {
+            codeguard_cli::java_comments_command::run(rest)
+        }
+        #[cfg(unix)]
         [command, language, rest @ ..] if command == "comments" && language == "rust" => {
             codeguard_cli::rust_comments_command::run(rest)
         }
@@ -70,6 +88,10 @@ fn main() -> ExitCode {
         #[cfg(unix)]
         [command, language, rest @ ..] if command == "cve" && language == "python" => {
             codeguard_cli::python_cve_command::run(rest)
+        }
+        #[cfg(unix)]
+        [command, language, rest @ ..] if command == "cve" && language == "java" => {
+            codeguard_cli::java_gradle_cve_command::run(rest)
         }
         #[cfg(unix)]
         [command, rest @ ..] if command == "cve" => codeguard_cli::npm_audit_command::run(rest),
@@ -106,6 +128,9 @@ fn main() -> ExitCode {
         [command, rest @ ..] if command == "task" => codeguard_cli::task_verify_command::run(rest),
         #[cfg(unix)]
         [command, rest @ ..] if command == "lint" => {
+            if rest.first().is_some_and(|language| language == "all") {
+                return codeguard_cli::check_command::run_lint_all(rest);
+            }
             if rest.first().is_some_and(|language| language == "java") {
                 codeguard_cli::java_lint_dispatch::run(&rest[1..])
             } else if rest.first().is_some_and(|language| language == "zig") {
@@ -129,6 +154,11 @@ fn main() -> ExitCode {
                 codeguard_cli::rust_lint_command::run(&rest[1..])
             } else if rest.first().is_some_and(|language| language == "shell") {
                 codeguard_cli::shell_lint_command::run(&rest[1..])
+            } else if rest
+                .first()
+                .is_some_and(|language| language != "python" && language != "all")
+            {
+                codeguard_cli::syntax_lint_command::run(rest)
             } else {
                 codeguard_cli::python_lint_command::run(rest)
             }
@@ -288,6 +318,9 @@ fn parse_detect_args(args: &[String]) -> Result<(PathBuf, bool), String> {
 }
 
 fn capabilities(args: &[String]) -> ExitCode {
+    if args.iter().any(|arg| arg == "--acceptance-plan") {
+        return codeguard_cli::production_acceptance_plan_command::run(args);
+    }
     let query = match parse_capabilities_args(args) {
         Ok(value) => value,
         Err(message) => {

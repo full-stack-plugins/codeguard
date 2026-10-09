@@ -1,0 +1,81 @@
+{
+  "schema_version": "1.0.0",
+  "language": "elixir",
+  "dialect": "elixir_1_15",
+  "platforms": ["macos_arm64", "macos_x86_64", "linux_x86_64", "linux_aarch64", "windows_x86_64"],
+  "platform_validation": "unverified",
+  "categories": [
+    {
+      "category": "lint",
+      "applicability": "applicable",
+      "status": "gap",
+      "candidate_tool": "credo",
+      "candidate_version": "project_toolchain",
+      "version_status": "resolved_at_run",
+      "candidate_argv": ["mix", "credo", "--strict"],
+      "requires_database_freshness": false,
+      "sources": ["https://hexdocs.pm/credo/"],
+      "coverage_gaps": ["native_adapter_unvalidated", "elixir_version_unvalidated"]
+    },
+    {
+      "category": "comments",
+      "applicability": "applicable",
+      "status": "gap",
+      "candidate_tool": "credo",
+      "candidate_version": "project_toolchain",
+      "version_status": "resolved_at_run",
+      "candidate_argv": ["mix", "credo", "--strict", "--checks=Readability"],
+      "requires_database_freshness": false,
+      "sources": ["https://hexdocs.pm/credo/"],
+      "coverage_gaps": ["comment_rules_unvalidated", "moduledoc_convention_unvalidated"]
+    },
+    {
+      "category": "dependencies",
+      "applicability": "applicable",
+      "status": "gap",
+      "candidate_tool": "mix_deps",
+      "candidate_version": "project_toolchain",
+      "version_status": "resolved_at_run",
+      "candidate_argv": ["mix", "deps.tree"],
+      "requires_database_freshness": false,
+      "sources": ["https://hexdocs.pm/mix/"],
+      "coverage_gaps": ["dependency_graph_unvalidated", "hex_version_unvalidated"]
+    },
+    {
+      "category": "cve",
+      "applicability": "applicable",
+      "status": "gap",
+      "candidate_tool": "mix_deps_audit",
+      "candidate_version": "project_toolchain",
+      "version_status": "resolved_at_run",
+      "candidate_argv": ["mix", "deps.audit"],
+      "requires_database_freshness": true,
+      "sources": ["https://hexdocs.pm/mix/"],
+      "coverage_gaps": ["cve_database_freshness_unvalidated", "vulnerability_mapping_unvalidated"]
+    },
+    {
+      "category": "security",
+      "applicability": "applicable",
+      "status": "gap",
+      "candidate_tool": "mix_deps_audit",
+      "candidate_version": "project_toolchain",
+      "version_status": "resolved_at_run",
+      "candidate_argv": ["mix", "deps.audit"],
+      "requires_database_freshness": true,
+      "sources": ["https://hexdocs.pm/mix/"],
+      "coverage_gaps": ["security_rules_unvalidated", "sast_unvalidated"]
+    },
+    {
+      "category": "build",
+      "applicability": "applicable",
+      "status": "gap",
+      "candidate_tool": "mix",
+      "candidate_version": "project_toolchain",
+      "version_status": "resolved_at_run",
+      "candidate_argv": ["mix", "compile", "--warnings-as-errors"],
+      "requires_database_freshness": false,
+      "sources": ["https://hexdocs.pm/mix/"],
+      "coverage_gaps": ["build_verification_unvalidated", "otp_version_unvalidated"]
+    }
+  ]
+}

@@ -32,6 +32,28 @@ impl SyntaxWorkerStructure {
     /// 核对固定规则、父节点和原始源码位置；参数必须是同轮冻结源码与语言。
     pub fn valid(&self, language: &str, source: &[u8]) -> bool {
         let rule_valid = match language {
+            "javascript" => {
+                (self.rule_id == "codeguard.javascript.duplicate_direct_lexical_binding"
+                    && self.rule_sha256 == codeguard_adapters::javascript_binding_rule_sha256()
+                    && self.parent_syntax_kind == "program"
+                    && self.start_byte < self.end_byte)
+                    || (self.rule_id == "codeguard.javascript.module_return_outside_function"
+                        && self.rule_sha256
+                            == codeguard_adapters::javascript_module_return_rule_sha256()
+                        && self.parent_syntax_kind == "return_statement"
+                        && self.start_byte < self.end_byte
+                        && source
+                            .get(self.start_byte..self.end_byte)
+                            .is_some_and(|span| span.starts_with(b"return")))
+            }
+            "erlang" => {
+                self.rule_id == "codeguard.erlang.form_terminator"
+                    && self.rule_sha256 == codeguard_adapters::erlang_form_rule_sha256()
+                    && self.parent_syntax_kind == "fun_decl"
+                    && source
+                        .get(self.start_byte..self.end_byte)
+                        .is_some_and(|span| span.is_empty() || span == b";")
+            }
             "python" => {
                 self.rule_id == "codeguard.python.required_suite"
                     && self.rule_sha256 == codeguard_adapters::python_suite_rule_sha256()
@@ -43,6 +65,14 @@ impl SyntaxWorkerStructure {
                     && self.parent_syntax_kind == "source_file"
                     && self.start_byte == 0
                     && self.end_byte == 0
+            }
+            "cfquery" => {
+                self.rule_id == "codeguard.cfquery.distinct_projection"
+                    && self.rule_sha256 == codeguard_adapters::cfquery_projection_rule_sha256()
+                    && self.parent_syntax_kind == "program"
+                    && source
+                        .get(self.start_byte..self.end_byte)
+                        .is_some_and(codeguard_adapters::cfquery_projection_span_valid)
             }
             _ => false,
         };

@@ -1,0 +1,189 @@
+{
+  "schema_version": "0.1.0",
+  "batch": "scripting",
+  "languages": [
+    {
+      "language": "ruby",
+      "status": "integrated",
+      "formatter": "sh",
+      "tool_key": "sh",
+      "check_argv": [
+        "-c",
+        "#!/bin/sh\n# rubocop 只读检查：丢弃 stdout，判定纯粹由退出码承担。\n#\n# 本机 1.91.0 实测：rubocop 判定通过时仍打印「Inspecting 1 file…」等进度摘要，\n# 而运行时把「退出 0 且 stdout 非空」判为 A 类语义（gofmt -l 那种），\n# 会把每一个合规的 Ruby 文件误判为需重排。\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\ncommand -v rubocop >/dev/null 2>&1 || exit 2\nrubocop --only Layout -f quiet \"$f\" >/dev/null 2>&1\nexit $?\n",
+        "codeguard",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-c",
+        "#!/bin/sh\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\ncommand -v rubocop >/dev/null 2>&1 || exit 2\nrubocop --only Layout --autocorrect -f quiet \"$f\" >/dev/null 2>&1\nexit $?\n",
+        "codeguard",
+        "{file}"
+      ],
+      "config_markers": [
+        ".rubocop.yml",
+        ".rubocop.yaml"
+      ],
+      "extensions": [
+        ".rb"
+      ],
+      "dialects": {},
+      "notes": "rubocop 是 Ruby 生态事实标准（布局由 Layout cops 集合覆盖）。检查与修复均限定 --only Layout（仅排版类规则），刻意不用 -A——unsafe 修正可能改变代码行为。**必须经 wrapper 丢弃 stdout**：本机 1.91.0 实测 rubocop 判定通过时仍打印「Inspecting 1 file…」等进度摘要，而运行时把「退出 0 且 stdout 非空」判为 A 类语义（gofmt -l 那种），直接调用会把每一个合规的 Ruby 文件误判为需重排。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "perl",
+      "status": "integrated",
+      "formatter": "sh",
+      "tool_key": "sh",
+      "check_argv": [
+        "-c",
+        "#!/bin/sh\n# perltidy 只读检查包装器\n#\n# perltidy 的 -ast（断言 tidy）模式在判定通过时**仍把规范化后的源码打印到 stdout**，\n# 而运行时把「退出 0 且 stdout 非空」判为 A 类语义（不合规，如 gofmt -l / prettier --list-different），\n# 于是每一个合规的 Perl 文件都会被误报为需重排。\n# 这里丢弃 stdout，让判定纯粹由退出码承担：0=合规，2=需重排（与语法错误同码，\n# perltidy 断言模式无法区分，见 notes）。\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\nperltidy -ast -se -st \"$f\" >/dev/null 2>&1\nexit $?\n",
+        "codeguard",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-c",
+        "#!/bin/sh\n# perltidy 就地格式化\n# -b -bext=/ 指定空后缀备份文件，成功后不留 .bak；-se 关闭错误stderr 输出。\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\nperltidy -b -bext=/ -se \"$f\" >/dev/null 2>&1\nrc=$?\n# 成功时清理可能残留的备份文件\n[ \"$rc\" -eq 0 ] && rm -f \"$f\"~\nexit $rc\n",
+        "codeguard",
+        "{file}"
+      ],
+      "config_markers": [
+        ".perltidyrc"
+      ],
+      "extensions": [
+        ".pl",
+        ".pm",
+        ".t"
+      ],
+      "dialects": {},
+      "notes": "退出码实测（本机 2026-10-08 直测）：perltidy -ast 合规退 0、需重排退 2、语法错误亦退 2。 perltidy 是 Perl 生态事实标准格式化器。**必须经 wrapper 使用**：perltidy 的 -ast（断言 tidy）模式即使判定通过也会把规范化后的源码打印到 stdout，而运行时把「退出 0 且 stdout 非空」判为 A 类语义（不合规，如 gofmt -l / prettier --list-different），若直接调用会导致**每一个合规的 Perl 文件都被误报为需重排**——本条档案在 2026-10-08 的真机复验中正是因此暴露，此前档案直接用 perltidy -ast -se -st {file} 属静默缺陷。wrapper 丢弃 stdout 后判定纯粹由退出码承担。本机实测：合规退 0（经 wrapper）、排版不合规退 2、语法错误亦退 2；码集 [1, 2] 保证真实不合规不被误判为工具故障。限制：perltidy 断言模式**无法区分「需重排」与「语法错误」**（同为退出 2），因此语法错误的 Perl 会被报为需重排而非未完成——这是 perltidy 的能力边界，代价是判定精度下降，但远优于漏判（静默放行）。apply 幂等且不留备份文件。",
+      "unformatted_exit_codes": [
+        1,
+        2
+      ],
+      "unparsable_detection": "none"
+    },
+    {
+      "language": "php",
+      "status": "integrated",
+      "formatter": "sh",
+      "tool_key": "sh",
+      "check_argv": [
+        "-c",
+        "#!/bin/sh\n# php-cs-fixer 只读检查\n#\n# 前置条件：项目必须提供 .php-cs-fixer.dist.php 或 .php-cs-fixer.php。\n# 本机 3.95.27 实测：无配置时它创建 .gitignore 并退 0 却不格式化（静默无效），\n# 不拦截会把未检查当合规，故无配置返回 2。\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\ncommand -v php-cs-fixer >/dev/null 2>&1 || exit 2\n[ -f .php-cs-fixer.dist.php ] || [ -f .php-cs-fixer.php ] || exit 2\nphp-cs-fixer fix --dry-run --using-cache=no \"$f\" >/dev/null 2>&1\nexit $?\n",
+        "codeguard",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-c",
+        "#!/bin/sh\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\ncommand -v php-cs-fixer >/dev/null 2>&1 || exit 2\n[ -f .php-cs-fixer.dist.php ] || [ -f .php-cs-fixer.php ] || exit 2\nphp-cs-fixer fix --using-cache=no \"$f\" >/dev/null 2>&1\nexit $?\n",
+        "codeguard",
+        "{file}"
+      ],
+      "config_markers": [
+        ".php-cs-fixer.php",
+        ".php-cs-fixer.dist.php"
+      ],
+      "extensions": [
+        ".php"
+      ],
+      "dialects": {},
+      "notes": "php-cs-fixer 是 PHP 生态事实标准。**退出码实测（本机 3.95.27）**：需修复时 `fix --dry-run` 返回位掩码 8（非 1），已并入码集 [1, 8]；语法错误与无配置均不入码集。**项目须提供 .php-cs-fixer.dist.php（或 .php-cs-fixer.php）**：本机实测无配置时它会创建 .gitignore 并退出 0 却**不做任何格式化**——属静默无效，wrapper 在无配置时返回 2（工具故障）而非 0，避免把未检查当合规。同时丢弃 stdout 以避免 A 类误判（php-cs-fixer 判定通过时仍打印进度摘要）。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1,
+        8
+      ]
+    },
+    {
+      "language": "lua",
+      "status": "integrated",
+      "formatter": "stylua",
+      "tool_key": "stylua",
+      "check_argv": [
+        "--check",
+        "{file}"
+      ],
+      "apply_argv": [
+        "{file}"
+      ],
+      "config_markers": [
+        "stylua.toml",
+        ".stylua.toml"
+      ],
+      "extensions": [
+        ".lua"
+      ],
+      "dialects": {},
+      "notes": "stylua 本机实跑验证（Homebrew 安装 2.5.2，B 类：0=合规、1=不合规、≥2=工具故障）。--check 只读，已实测不改动源文件且退出码三态正确（含语法坏文件返回 2）。默认 --syntax All、缩进为 Tab；项目可用 stylua.toml / .stylua.toml（向上查找）或 .editorconfig 覆盖。apply 不带参数直接对 {file} 就地格式化，实测退出 0。只做排版，不检查逻辑与未定义变量。不解析 Luau 扩展语法，Luau 代码请用本批 luau 档位。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "luau",
+      "status": "integrated",
+      "formatter": "stylua",
+      "tool_key": "stylua",
+      "check_argv": [
+        "--check",
+        "--syntax",
+        "luau",
+        "{file}"
+      ],
+      "apply_argv": [
+        "--syntax",
+        "luau",
+        "{file}"
+      ],
+      "config_markers": [
+        "stylua.toml",
+        ".stylua.toml"
+      ],
+      "extensions": [
+        ".luau"
+      ],
+      "dialects": {
+        "syntax": "luau"
+      },
+      "notes": "与 lua 档位共用同一 stylua 可执行（实测 2.5.2），但必须带 --syntax luau 才能解析 Luau 扩展语法（类型标注、复合赋值等）；实测省略该 flag 时 Luau 文件解析失败返回 2，该参数不可省。check/apply 退出码语义与 lua 档位一致（0/1/2），check 只读不改文件已实测。stylua.toml 亦支持 syntax = \"Luau\" 持久化方言设置。只做排版，类型检查需 luau-analyze，不在 format 档案范围内。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    },
+    {
+      "language": "r",
+      "status": "integrated",
+      "formatter": "Rscript",
+      "tool_key": "Rscript",
+      "check_argv": [
+        "-e",
+        "f<-commandArgs(TRUE)[1]; t<-tempfile(fileext='.R'); ok<-invisible(file.copy(f,t,overwrite=TRUE)); res<-try(withCallingHandlers(invisible(capture.output(suppressMessages(styler::style_file(t)))),warning=function(w) stop(conditionMessage(w))),silent=TRUE); if(!isTRUE(ok)||inherits(res,'try-error')||!file.exists(t)) quit(status=2L); same<-identical(readBin(f,'raw',file.size(f)),readBin(t,'raw',file.size(t))); unlink(t); quit(status=if(same) 0L else 1L)",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-e",
+        "f<-commandArgs(TRUE)[1]; res<-try(withCallingHandlers(invisible(capture.output(suppressMessages(styler::style_file(f)))),warning=function(w) stop(conditionMessage(w))),silent=TRUE); quit(status=if(inherits(res,'try-error')) 2L else 0L)",
+        "{file}"
+      ],
+      "config_markers": [],
+      "extensions": [
+        ".r",
+        ".R"
+      ],
+      "dialects": {
+        "style_guide": "tidyverse"
+      },
+      "notes": "R 生态无独立格式化器可执行文件，采用事实标准 styler 包（tidyverse 风格）经 Rscript 调用，因此 formatter/tool_key 为 Rscript，用 --tool Rscript=<abs> 绑定；styler 包必须已安装（Rscript -e 'install.packages(\"styler\")'）。本机 R 4.6.1 + CRAN styler 实测通过。check 表达式：文件复制到临时副本→styler::style_file(副本)→与原文件按字节比对——相同 0、不同 1、复制失败或样式化报错（含语法解析失败）2，标准 B 类三态，且已实测 check 全程绝不改动原文件（warning 也升级为失败，防止解析坏文件误判合规）。apply 用 style_file 就地改写，实测幂等，语法坏文件返回 2 而非假成功。style_file 依扩展名识别文件类型，.r 与 .R 均实测可用；非 UTF-8 或带 BOM 文件按字节比对可能误报不合规。styler 无独立配置文件（config_markers 为空），排版偏好经 R options 设置；只管排版，不做 lintr 检查。",
+      "unparsable_detection": "none",
+      "unformatted_exit_codes": [
+        1
+      ]
+    }
+  ]
+}

@@ -1,16 +1,26 @@
 //! CLI 共享的 Rust 开发期验收与命令应用服务入口。
 
+#[cfg(unix)]
+pub mod gradle_javadoc_probe;
+#[cfg(unix)]
+pub mod gradle_javadoc_task_recheck;
+#[cfg(unix)]
+pub mod gradle_javadoc_workbench;
+#[cfg(unix)]
+pub mod gradle_model_probe;
+#[cfg(unix)]
+pub mod gradle_model_probe_request;
+
 pub mod agents_block;
-mod command_catalogue;
-mod command_descriptor;
-mod command_examples;
-pub mod help_command;
 pub mod approval_snapshot;
 mod bound_false_positive_disposition;
 #[cfg(unix)]
 mod cargo_tool_selection;
 #[cfg(unix)]
 mod check_erlang_scan;
+mod command_catalogue;
+mod command_descriptor;
+mod command_examples;
 #[cfg(unix)]
 pub mod doctor_command;
 #[cfg(unix)]
@@ -46,6 +56,8 @@ mod eslint_syntax_evidence;
 mod eslint_task_recheck;
 #[cfg(unix)]
 mod eslint_workbench;
+pub mod help_command;
+pub mod language_alias;
 #[cfg(unix)]
 mod npm_audit_arguments;
 #[cfg(unix)]
@@ -116,12 +128,16 @@ pub mod config_command;
 mod config_project_observation;
 pub mod conversation_feedback;
 pub mod corpus;
+pub mod format_command;
+pub mod idea_markdown;
+mod csharp_dependency_scan;
 pub mod discovery;
 pub mod false_positive_decision;
 #[cfg(unix)]
 pub mod git_index_safety;
 #[cfg(unix)]
 pub mod git_index_safety_command;
+mod go_dependency_scan;
 #[cfg(unix)]
 pub mod go_lint_command;
 pub mod grammar_evaluation;
@@ -139,6 +155,8 @@ pub mod hook_plan_command;
 pub mod init_command;
 mod java_checker_config_status;
 pub mod java_checkstyle_command;
+#[cfg(unix)]
+pub mod java_comments_command;
 mod java_cve_attribution;
 #[cfg(unix)]
 mod java_cve_scan;
@@ -155,11 +173,19 @@ mod java_p3c_scan;
 mod java_p3c_workbench;
 #[cfg(feature = "wasm-precheck")]
 mod java_syntax_precheck;
+#[cfg(unix)]
+mod javadoc_task_recheck;
+#[cfg(unix)]
+mod javadoc_workbench;
 pub mod legacy_v1_protocol;
 #[cfg(unix)]
 mod maven_dependency_probe;
 #[cfg(unix)]
 mod maven_javadoc_probe;
+#[cfg(unix)]
+mod maven_javadoc_task_recheck;
+#[cfg(unix)]
+mod maven_javadoc_workbench;
 #[cfg(unix)]
 pub mod maven_probe;
 mod native_tool_candidate;
@@ -174,6 +200,7 @@ pub mod plan_command;
 pub mod pmd6_probe;
 #[cfg(unix)]
 mod project_runtime_options;
+mod python_confirmation_recheck;
 #[cfg(unix)]
 pub mod python_cve_command;
 pub(crate) mod python_cve_task_recheck;
@@ -185,19 +212,23 @@ pub mod python_lint_scan;
 mod python_selected_discovery;
 #[cfg(unix)]
 mod python_syntax_confirmation;
-mod python_confirmation_recheck;
-#[cfg(unix)]
-mod python_task_resolution_request;
 #[cfg(unix)]
 mod python_task_resolution_policy_input;
 #[cfg(unix)]
+mod python_task_resolution_request;
+#[cfg(unix)]
 mod python_task_resolution_service;
+mod vbnet_dependency_scan;
+#[cfg(unix)]
+pub use python_confirmation_recheck::validate_python_task_original_source;
 #[cfg(unix)]
 pub use python_task_resolution_request::PythonTaskResolutionRequest;
 #[cfg(unix)]
 pub use python_task_resolution_service::verify_python_task_resolution;
 #[cfg(unix)]
-pub use python_confirmation_recheck::validate_python_task_original_source;
+mod check_rust_syntax_scan;
+#[cfg(all(unix, feature = "wasm-precheck"))]
+mod javascript_syntax_precheck;
 #[cfg(all(unix, feature = "wasm-precheck"))]
 mod python_syntax_precheck;
 pub mod quality_policy_candidate;
@@ -217,14 +248,32 @@ pub(crate) mod rust_build_task_recheck;
 pub mod rust_comments_command;
 pub(crate) mod rust_cve_task_recheck;
 #[cfg(unix)]
+mod rust_documentation_command;
+#[cfg(unix)]
+mod rust_input_inventory;
+#[cfg(unix)]
 mod rust_lint_inputs;
 #[cfg(unix)]
 pub mod rust_lint_scan;
 #[cfg(unix)]
 mod rust_native_syntax_coverage;
+#[cfg(unix)]
+pub mod rust_project_edition;
+#[cfg(unix)]
+pub mod rust_project_syntax;
+#[cfg(unix)]
+mod rust_syntax_evidence;
+#[cfg(unix)]
+mod rust_syntax_task_recheck;
 pub mod rustdoc_repair_brief;
 #[cfg(unix)]
 pub(crate) mod rustdoc_task_recheck;
+#[cfg(unix)]
+mod rustfmt_scratch;
+#[cfg(unix)]
+mod rustfmt_syntax_probe;
+#[cfg(unix)]
+mod rustfmt_tool_selection;
 pub mod sarif_feedback;
 mod source_language_hint;
 #[cfg(feature = "wasm-precheck")]
@@ -318,6 +367,9 @@ mod erlang_task_resolution_request;
 mod go_task_resolution_request;
 #[cfg(unix)]
 mod kotlin_task_resolution_request;
+mod ruby_task_resolution_request;
+#[cfg(unix)]
+mod rust_task_resolution_request;
 #[cfg(unix)]
 mod swift_task_resolution_request;
 #[cfg(unix)]
@@ -338,12 +390,16 @@ pub use erlang_task_resolution_request::ErlangTaskResolutionRequest;
 pub use go_task_resolution_request::GoTaskResolutionRequest;
 #[cfg(unix)]
 pub use kotlin_task_resolution_request::KotlinTaskResolutionRequest;
+pub use ruby_task_resolution_request::RubyTaskResolutionRequest;
+#[cfg(unix)]
+pub use rust_task_resolution_request::RustTaskResolutionRequest;
 #[cfg(unix)]
 pub use swift_task_resolution_request::SwiftTaskResolutionRequest;
 #[cfg(unix)]
 pub use task_resolution_service::{
     verify_erlang_task_resolution, verify_go_task_resolution, verify_kotlin_task_resolution,
-    verify_swift_task_resolution, verify_zig_task_resolution,
+    verify_ruby_task_resolution, verify_rust_task_resolution, verify_swift_task_resolution,
+    verify_zig_task_resolution,
 };
 #[cfg(unix)]
 pub use zig_task_resolution_request::ZigTaskResolutionRequest;
@@ -379,30 +435,100 @@ pub mod grammar_native_differential;
 
 pub mod syntax_worker_structure;
 
-#[cfg(all(feature = "wasm-precheck", unix))]
-mod grammar_native_checker;
-#[cfg(all(feature = "wasm-precheck", unix))]
-mod javascript_syntax_probe;
-#[cfg(unix)]
-mod ruby_syntax_probe;
-#[cfg(unix)]
-mod ruby_project_version;
-#[cfg(unix)]
-pub mod ruby_lint_command;
-#[cfg(unix)]
-mod ruby_tool_selection;
-#[cfg(unix)]
-mod ruby_lint_workbench;
+mod archive_bundle;
+mod c_dependency_scan;
+mod check_arkts_native_scan;
+mod check_c_native_scan;
+mod check_cfml_native_scan;
+mod check_cfquery_native_scan;
+mod check_cfscript_native_scan;
+mod check_cobol_native_scan;
+mod check_cpp_native_scan;
+mod check_csharp_scan;
+mod check_dart_scan;
+mod check_elixir_scan;
+mod check_erlang_native_scan;
+mod check_go_scan;
+mod check_go_syntax_scan;
+mod check_java_scan;
+mod check_javascript_native_scan;
+mod check_kotlin_native_scan;
+mod check_lua_scan;
+mod check_luau_native_scan;
+mod check_native_results;
+mod check_nix_scan;
+mod check_objc_scan;
+mod check_pascal_scan;
+mod check_php_scan;
+mod check_python_native_scan;
+mod check_r_scan;
+mod check_report_assembly;
+mod check_ruby_native_scan;
 #[cfg(unix)]
 mod check_ruby_scan;
+mod check_rust_native_scan;
+mod check_scala_scan;
+mod check_solidity_scan;
+mod check_swift_native_scan;
+mod check_terraform_scan;
+mod check_tsx_native_scan;
+mod check_typescript_native_scan;
+mod check_vbnet_scan;
+mod check_zig_native_scan;
+mod ci_release;
+mod controlled_fix;
+mod cpp_dependency_scan;
+mod dart_dependency_scan;
+mod distribution_installer;
+mod elixir_dependency_scan;
+mod erlang_dependency_scan;
+#[cfg(unix)]
+mod go_lint_fallback;
+mod go_project_version;
 #[cfg(unix)]
 mod go_syntax_probe;
 #[cfg(unix)]
 mod go_tool_selection;
-#[cfg(unix)]
-mod go_lint_fallback;
+#[cfg(all(feature = "wasm-precheck", unix))]
+mod grammar_native_checker;
+mod holdout_performance;
+mod host_entry;
+mod javascript_dependency_scan;
+#[cfg(all(feature = "wasm-precheck", unix))]
+mod javascript_syntax_probe;
+mod kotlin_dependency_scan;
+mod lua_dependency_scan;
+mod manifest_refresh;
+mod mcp_integration;
+mod nix_dependency_scan;
+mod objc_dependency_scan;
+mod pascal_dependency_scan;
+mod php_dependency_scan;
+mod policy_repair_test;
+mod python_dependency_scan;
 #[cfg(unix)]
 mod python_syntax_probe;
+mod quality_evaluation;
+mod r_dependency_scan;
+mod ruby_dependency_scan;
+#[cfg(unix)]
+pub mod ruby_lint_command;
+#[cfg(unix)]
+mod ruby_lint_workbench;
+#[cfg(unix)]
+mod ruby_project_version;
+#[cfg(unix)]
+mod ruby_syntax_probe;
+#[cfg(unix)]
+mod ruby_tool_selection;
+mod rust_dependency_scan;
+mod scala_dependency_scan;
+mod schema_freeze;
+mod solidity_dependency_scan;
+mod swift_dependency_scan;
+mod terraform_dependency_scan;
+mod typescript_dependency_scan;
+mod zig_dependency_scan;
 
 #[cfg(unix)]
 mod rust_lint_arguments;
@@ -414,10 +540,153 @@ mod rust_lint_fallback;
 mod rust_lint_workbench;
 
 #[cfg(unix)]
-pub mod shell_lint_command;
-#[cfg(unix)]
 mod shell_lint_arguments;
+#[cfg(unix)]
+pub mod shell_lint_command;
 #[cfg(unix)]
 mod shellcheck_config;
 #[cfg(unix)]
 mod shellcheck_probe;
+
+#[cfg(unix)]
+mod shell_lint_workbench;
+
+#[cfg(unix)]
+mod shell_task_recheck;
+
+#[cfg(unix)]
+mod check_shell_scan;
+
+#[cfg(unix)]
+mod clippy_hook_feedback;
+
+mod shell_resolution_evidence;
+mod shell_task_resolution_policy_input;
+mod shell_task_resolution_request;
+mod shell_task_resolution_service;
+pub use shell_task_resolution_request::ShellTaskResolutionRequest;
+pub use shell_task_resolution_service::verify_shell_task_resolution;
+
+#[cfg(unix)]
+mod syntax_lint_arguments;
+#[cfg(unix)]
+pub mod syntax_lint_command;
+
+#[cfg(all(unix, feature = "wasm-precheck"))]
+mod syntax_lint_feedback;
+
+#[cfg(unix)]
+mod c_family_comments_arguments;
+#[cfg(unix)]
+pub mod c_family_comments_command;
+#[cfg(unix)]
+mod c_family_comments_task_recheck;
+#[cfg(unix)]
+mod c_family_comments_workbench;
+#[cfg(unix)]
+mod c_family_structure_workbench;
+#[cfg(unix)]
+mod clang_lint_feedback;
+#[cfg(unix)]
+mod clang_syntax_probe;
+#[cfg(unix)]
+mod native_clang_profile;
+
+#[cfg(feature = "wasm-precheck")]
+mod syntax_worker_mode;
+
+pub mod javascript_mode_observation;
+
+pub mod production_acceptance_plan_command;
+
+#[cfg(unix)]
+pub mod gradle_dependency_check_request;
+
+#[cfg(unix)]
+pub mod gradle_dependency_check_probe;
+
+#[cfg(unix)]
+pub mod java_gradle_cve_command;
+
+#[cfg(unix)]
+mod gradle_module_cache;
+
+#[cfg(unix)]
+mod gradle_owasp_report_budget;
+
+#[cfg(unix)]
+pub mod gradle_cve_workbench;
+
+#[cfg(unix)]
+pub mod gradle_cve_task_recheck;
+
+#[cfg(unix)]
+mod python_comments_arguments;
+#[cfg(unix)]
+pub mod python_comments_command;
+
+#[cfg(unix)]
+mod python_documentation_configuration;
+
+#[cfg(unix)]
+mod cargo_audit_database_snapshot;
+
+#[cfg(all(test, unix))]
+mod c_family_structure_recheck_tests;
+
+mod c_family_structure_task_recheck;
+
+mod check_c_family_comments;
+
+mod c_family_documentation_hook_feedback;
+mod c_family_documentation_host_guidance;
+
+mod c_family_compilation_discovery;
+
+mod c_family_placeholder_workbench;
+
+mod c_family_placeholder_task_recheck;
+pub mod run_config;
+pub mod baseline_classification;
+pub mod init_dry_run;
+pub mod artifact_scope;
+pub mod finding_identity;
+pub mod run_id_cursor;
+pub mod append_only_events;
+pub mod task_dependency_merge;
+pub mod repair_brief;
+pub mod process_lease;
+pub mod disposition_attribution;
+pub mod attempt_tracking;
+pub mod controlled_fix_events;
+pub mod plugin_api;
+pub mod task_verification;
+pub mod privacy_verification;
+pub mod project_boundary;
+pub mod project_schema;
+pub mod manifest_lock_observer;
+pub mod typed_module_graph;
+pub mod architecture_profile;
+pub mod architecture_md;
+pub mod agents_block_merge;
+pub mod init_transaction;
+pub mod profile_refresh;
+pub mod quality_config_mapping;
+pub mod init_readiness;
+pub mod token_generation;
+pub mod rules_config_commands;
+pub mod whitelist_matcher;
+pub mod run_config_policy;
+pub mod baseline_classifier;
+pub mod dot_prefix_policy;
+pub mod whitelist_commands;
+pub mod whitelist_correction;
+pub mod false_positive_investigation;
+pub mod attempt_ledger;
+pub mod status_disposition;
+pub mod unified_command;
+pub mod service_boundary;
+pub mod kotlin_applicability;
+pub mod language_applicability;
+pub mod zig_applicability;
+pub mod remaining_language_applicability;

@@ -1,0 +1,12 @@
+{
+  "evidence_kind": "development_claude_c_documentation_context",
+  "output": {
+    "hookSpecificOutput": {
+      "additionalContext": "CodeGuard：changed.cpp 局部检查反馈：原生诊断 1 项；规则 ；WASM 候选 1 项、疑似恢复节点 0 项、独立结构观察 0 项、恢复扫描未完成 0 项；不可检查文件 0 项、原生快检未接线 1 项。请核对原生报告；补齐缺失工具或未接线检查并在修复后复检。已知 grammar 限制 [cpp]：Rust loader smoke and narrow fixtures passed; language versions, dialect corpus, native differential, resource isolation and release remain unqualified；C++ 原生文档规则 clang.warn_doc_block_command_empty_paragraph 位置 2:4；文档任务 CG-b85aa405c4805b5550c5e8d3c2a41b6e：codeguard task show CG-b85aa405c4805b5550c5e8d3c2a41b6e . --format=json；文档任务 CG-9b56a95e38f4b314b143eba36a3375b6：codeguard task show CG-9b56a95e38f4b314b143eba36a3375b6 . --format=json；C++ 自有结构规则 codeguard.documentation.function_structure_required 缺少说明组件 2 项；这不是原生警告。C++ 先读取原任务和经批准的纠错决定，按任务允许范围补用途、参数及返回说明，使用原Clang复检；结构候选不证明语义准确，不能勾选关闭或跳过完整语法检查。候选语法能力尚未完整验收，完整项目与交付未评估。",
+      "hookEventName": "PostToolUse"
+    },
+    "systemMessage": "CodeGuard 局部检查反馈"
+  },
+  "qualification": "not_granted",
+  "test_source_sha256": "f1423466d11280c0f6b4103ce4e5ffe0d3a47721bd9b571d03bc98d270c7eee8"
+}

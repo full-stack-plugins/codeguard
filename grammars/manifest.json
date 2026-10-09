@@ -459,7 +459,7 @@
       "codeguard_runtime_validation": "rust_loader_smoke_passed",
       "language_versions": [],
       "known_limitations": [
-        "SELECT FROM inside a CFQuery fragment yields zero recovery despite missing SQL select list; this grammar does not validate full SQL semantics. Native dialect comparison, systematic precision, public lint route, resource budget and release remain unqualified"
+        "Pinned grammar has zero recovery for SELECT DISTINCT FROM users, rejected by PostgreSQL 18.6; SELECT FROM users is accepted by that dialect. Independent structural candidates require applicable native confirmation. Other dialects, systematic precision and release remain unqualified"
       ],
       "release_status": "candidate_unvalidated"
     },

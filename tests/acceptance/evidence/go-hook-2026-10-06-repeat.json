@@ -1,0 +1,133 @@
+{
+  "delivery_decision": "not_evaluated",
+  "execution": "local_observation",
+  "host_blocking_verified": false,
+  "local_feedback": {
+    "candidate_recovery_count": 0,
+    "coverage_proven": false,
+    "delivery_decision": "not_evaluated",
+    "go_syntax": {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "files": [
+        {
+          "current": true,
+          "native": {
+            "companion_binding_sha256": "19436fb5bd7825f4450058b0704166c843979e04dddada5174d14710174fe7e4",
+            "diagnostics": [
+              {
+                "column": 12,
+                "column_unit": "utf8_byte",
+                "line": 2,
+                "rule_id": "go.syntax"
+              },
+              {
+                "column": 14,
+                "column_unit": "utf8_byte",
+                "line": 2,
+                "rule_id": "go.syntax"
+              }
+            ],
+            "gofmt_sha256": "f0e9b77df6dcfeec18d33bd9305ff034c28aa2142d3a4fa3aa44e62a44c89e3b",
+            "input_type": "whole_file",
+            "reason": "go_native_syntax_diagnostics",
+            "status": "diagnostics_observed",
+            "tool_sha256": "5900a8e0942f88b7bacf2b44b397b4950c8dc9f850a16ae1249e1636860dd6ef",
+            "version": "go1.23.4"
+          },
+          "next_action": "\u5148\u6838\u5bf9\u9879\u76eeGo\u7248\u672c\u662f\u5426\u9002\u7528\uff0c\u518d\u6309\u5f53\u524d\u539f\u751f\u884c\u53f7\u786e\u8ba4\u548c\u4fee\u590d\u8bed\u6cd5\uff1b\u6309UTF-8\u5b57\u8282\u5217\u5b9a\u4f4d\uff1b\u7ee7\u7eedgo vet\u4e0e\u5b8c\u6574\u9879\u76ee\u68c0\u67e5",
+          "path": "app.go",
+          "recheck_argv": [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-374e645c8d56728554421f6a427974bc",
+            "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-go-hook-real-2h9f2bkw",
+            "--go-tool",
+            "/usr/local/go/bin/go",
+            "--format=json"
+          ],
+          "source_sha256": "cdcb7b5c81af6ffdcf7b000d28b4814ccb27e8f7879d9c7e3248c0303c208341",
+          "task_id": "CG-B-374e645c8d56728554421f6a427974bc",
+          "task_sync_reason": null,
+          "tool_path": "/usr/local/go/bin/go"
+        }
+      ],
+      "local_parse_complete": true,
+      "report_type": "go_syntax_scan",
+      "schema_version": "0.2.0",
+      "scope": "single_frozen_go_files",
+      "scope_stable": true,
+      "source_file_count": 1,
+      "task_status": "synced_partial",
+      "tool_selection": {
+        "executable": "/usr/local/go/bin/go",
+        "source": "explicit"
+      },
+      "unobserved_count": 0
+    },
+    "kotlin_lint": null,
+    "native_unwired_files": [],
+    "next_action": "repair_native_source",
+    "node_lint": {
+      "backlog_status": "not_connected",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "files": [],
+      "new_blockers": 0,
+      "new_findings": 0,
+      "next": null,
+      "reason": "eslint_files_incomplete",
+      "status": "incomplete",
+      "unexecuted_files": []
+    },
+    "python_lint": null,
+    "report_type": "hook_fast_feedback",
+    "requested_paths": [
+      "app.go"
+    ],
+    "ruby_lint": null,
+    "scan_scope": "selected_files",
+    "schema_version": "0.12.0",
+    "shell_lint": null,
+    "swift_lint": null,
+    "syntax_candidates": {
+      "authority": "candidate_unqualified",
+      "delivery_decision": "incomplete",
+      "execution_phase": "after_native",
+      "native_preferred_count": 1,
+      "next_action": "\u6838\u5bf9\u9002\u7528\u8bed\u8a00\u7248\u672c\u4e0e\u539f\u751f lint/\u7f16\u8bd1\u5668\uff1b\u5019\u9009\u6062\u590d\u8282\u70b9\u4e0d\u662f\u5df2\u786e\u8ba4\u8fdd\u89c4\uff0c\u96f6\u6062\u590d\u4e5f\u4e0d\u8868\u793a\u5b8c\u6574\u901a\u8fc7",
+      "observations": [],
+      "reason": "native_preferred",
+      "skipped_count": 0,
+      "source_file_count": 1,
+      "status": "not_run",
+      "unrouted_count": 0
+    },
+    "syntax_tasks": {
+      "failures": [],
+      "new_blockers": 0,
+      "status": "synced_partial",
+      "tasks": []
+    },
+    "unavailable_files": [],
+    "zig_lint": null
+  },
+  "plan": {
+    "action": "fast_file_check",
+    "host_blocking_claimed": false,
+    "may_claim_delivery": false,
+    "requires_git_snapshot": false,
+    "scope_resolution_reason": null,
+    "soft_result_reuse_candidate": true,
+    "target_paths": [
+      "app.go"
+    ],
+    "task_id": null
+  },
+  "reason": null,
+  "report_type": "hook_execution_feedback",
+  "schema_version": "0.22.0",
+  "soft_result_reused": false
+}

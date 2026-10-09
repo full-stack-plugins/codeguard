@@ -157,6 +157,16 @@ RunReport 与准备诊断 PrerequisiteReport MUST 使用 workspace_id + run_id �
 - **THEN** 原反例有已核对 UTF-16/UTF-8 坐标的语法诊断，当前源码变化且同工具完整零诊断时 SHALL 记录 code_fixed；单独或混合项目上下文诊断、未知输出、超时、工具/输入变化 MUST NOT 证明修复
 - **AND** 当前原工具再次检出同一语法问题时 SHALL 保留发现并重开原父链，即使另有项目上下文未完成；只有上下文诊断时不得伪造语法复发。Kotlin 使用独立策略/证据版本，原生首次 grammar=null，不批准全项目 lint、类型或交付
 
+#### Scenario: Protected Rust syntax resolution binds the Cargo edition context
+- **WHEN** 受保护宿主验签 Rustfmt 1.9.0-stable 的原生首次限定语法任务策略，固定首次报告、原反例、工具和 Cargo edition 来源摘要
+- **THEN** 仅原反例在同一 edition 下确有语法诊断、当前源码已变化且原工具完整零诊断时 SHALL 关闭限定任务；重复验证幂等，同 edition 和同工具普通复检检出复发 SHALL 重开原父链
+- **AND** edition/清单来源变化、超时、工具变化、签名失效、原反例无诊断 MUST NOT 关闭。Rust 使用独立策略和证据版本，grammar=null；收据不证明 Clippy、类型、构建或项目交付
+
+#### Scenario: Rust WASM-first tasks require native counterexample verification
+- **WHEN** Rust任务首次来自固定WASM观察，受保护宿主批准原任务/原反例/grammar和已解析Cargo edition来源，并选择固定Rustfmt1.9.0-stable
+- **THEN** 同一任务 SHALL 用该edition的原生原反例/当前源码对照完成确认、限定关闭和普通复检复发重开；原反例原生无诊断 SHALL 转误报调查，不把WASM恢复节点当成已确认违规，也不把安装原生工具当成修复
+- **AND** WASM首次使用独立policy1.8/evidence0.9并保留真实grammar摘要；原生首次policy1.7/evidence0.8保持grammar=null。替换来源、缺/错grammar、清单变化或未完成 MUST NOT 关闭；批准edition不推断为WASM首次已观察的历史上下文
+
 #### Scenario: Rehashed lifecycle evidence cannot change the original language
 - **WHEN** 本地关闭证据和父链记录被重算摘要，但证据协议、语言或 grammar 与已同步的首次任务事实不同
 - **THEN** 历史读取 SHALL 在原生执行前拒绝身份矛盾，并由 next 提供核对决策，不将本地文件当作可信关闭
@@ -222,6 +232,15 @@ MUST 提供 attempt 开始/结束协议，受控 fix apply 自动登记，自由
 #### Scenario: Task list is empty but current full verification is absent
 - **WHEN** next没有可修复任务且缺新鲜完整检查证据
 - **THEN** 返回verification_required和检查动作，不据任务清空证明交付通过
+
+
+#### Scenario: duplicate fields in local repair records
+- **WHEN** 问题事实、验证事件、原生报告或消费收据在任意嵌套对象中包含重复JSON字段，即使最后一个值看似合法
+- **THEN** next/status/task show SHALL 拒绝歧义记录，不发布该记录的修复指令或恢复结论；不回显不可信字段，历史原件保留供诊断，修复合法记录后只读查询可以恢复，查询成功不签发交付许可
+
+#### Scenario: synchronization encounters ambiguous existing facts
+- **WHEN** 新原生观察对应的既有finding或blocker事实含重复JSON字段
+- **THEN** work sync SHALL 记录该报告导入失败，保留原始事实，不给该记录追加已接受观察或消费成功收据；恢复合法事实后的新报告继续复用同一任务，不通过改写历史假装旧报告已成功
 
 ### Requirement: Enabled plugin workflows SHALL connect scans to actionable briefs
 
@@ -374,6 +393,10 @@ Checkstyle 任务复检 SHALL 在统一预算、取消和任务租约下使用�
 ### Requirement: ESLint task identity SHALL bind native rule and stable source anchor
 
 ESLint 原生发现投影 MUST 使用工作区相对路径、原生规则、源码锚点及稳定出现序号，行号与整文件摘要只作本轮证据，不因插入空行而制造新任务身份。MUST 稳定排序并去除重复原生诊断；完整输入中的任一归属或定位无效则不得发布部分源码任务。源码定位 MUST 处理 UTF-16 列及 JavaScript 原生行终止符，不把字节长度当列范围。投影只记录脱敏诊断，不证明本轮报告来源、批准策略或问题关闭。
+
+#### Scenario: 去重不得掩盖无效诊断
+- **WHEN** 原生规则、位置和严重性相同的重复诊断包含异源路径或超预算消息，无论输入顺序如何
+- **THEN** 投影 MUST 在去重前验证全部诊断并拒绝整组任务输入；合法重复诊断的稳定身份和排序 MUST 保持兼容
 
 #### Scenario: Source moves by inserted blank lines or native wording changes
 - **WHEN** 同一路径与规则的原源码锚点保持，行号或原生消息文字变化
@@ -560,3 +583,101 @@ Python确认任务的当前原生结果为still_present且输入未失效时 MUS
 - **GIVEN** Python语法确认曾有原生诊断
 - **WHEN** 当前源码或配置绑定已失效
 - **THEN** 撤销旧源码修复动作，要求重新核验，不能用旧位置指导修改
+
+
+### Requirement: Ruby 原工具限定修复与复发
+
+宿主 SDK SHALL 支持固定 Ruby 2.6.10p210 的原生首次与 WASM 首次任务。批准策略 1.9.0 MUST 绑定原任务、原报告、原源码、原工具和适配器；原生首次 grammar MUST 为 null，WASM 首次 MUST 保留原 grammar。脱敏证据 0.10.0 MUST 保留 Ruby 原生行号，不制造列号。原样本与当前样本 MUST 共用截止时间；项目版本声明及其缺项 MUST 在请求前后复核。此入口延续已有签名宿主要求，不改变普通 CLI 关闭权限。
+
+#### Scenario: 修复、幂等复检和复发
+- **WHEN** 原样本被同一 Ruby 工具确认存在语法诊断，当前已修改源码完整检查无诊断且输入未变化
+- **THEN** 宿主 SDK SHALL 关闭同一任务；重复复检 SHALL 幂等；同工具再发现原问题 SHALL 沿父链重开，不能签发项目 allow
+
+#### Scenario: 原生反证及环境变更
+- **WHEN** 原样本无原生诊断、原工具不匹配、版本声明变化或检查未完成
+- **THEN** SHALL 保留问题并要求误报裁定或环境复检，不关闭任务；跨语言证据不得替代原报告
+
+
+### Requirement: ShellCheck 原规则限定关闭
+
+宿主 SDK SHALL 支持 ShellCheck 0.11.0 原生 finding 任务的原样本与当前源码对照。签名策略 1.10.0 MUST 绑定原任务、规则、报告、源码、工具、适配器、方言和原配置；证据 0.11.0 与收据 0.2.0 MUST 明确 ShellCheck 普通 finding 身份，旧收据 0.1.0 不得放宽为接受此身份。原规则已消失但其它规则仍存在时 SHALL 仅关闭原任务并保留其它发现；禁止以全工具零诊断作为单任务关闭的唯一判据。配置变化、禁用注释、环境任务或原生反证 SHALL 保留复核要求。既有原规则禁用指令没有作用域证明时亦须复核；未变化且仅涉及其它规则的指令不自动阻止原任务解决。沿用已有宿主签名约束，不改变普通 CLI 关闭权限。
+
+#### Scenario: 修复原规则且保留其它规则
+- **WHEN** 原工具确认原样本的原规则，当前修改源码完整检查不含原规则且规则配置、工具、方言及输入稳定
+- **THEN** SHALL 关闭原任务并保留其他原生发现；同工具同配置再次发现原规则 SHALL 沿同一任务父链重开
+
+#### Scenario: 规则放宽和原生反证不能关闭
+- **WHEN** 配置变化、添加禁用注释、原样本不含原规则或执行未完成
+- **THEN** SHALL 记录具体复核原因且不将任务标为已修复
+
+### Requirement: Javadoc local observations SHALL produce stable repair tasks
+
+已初始化的显式 Java 项目工作区 MUST 将 Javadoc 完整局部诊断同步为稳定问题，按规则、相对文件、源码锚点及同锚点序号归并，行号变化不单独新建任务。缺配置或原生未完成 MUST 生成检查准备记录，不生成源码违规。持久化或同步失败 MUST 在对话反馈中可见，不虚构任务身份。没有初始化的项目不自动初始化。局部零诊断不关闭历史问题；任务复检及可信关闭未接通时 MUST 明示该能力缺口。
+
+#### Scenario: Repeat a configured Javadoc project observation
+- **WHEN** 同一已配置主源码连续两次产生相同原生诊断
+- **THEN** 同步只保留一个任务、追加观察，提供 Java comments 复检指引及允许范围，任务保持开放
+
+#### Scenario: Project Javadoc configuration is absent
+- **WHEN** 用户显式选择 Java comments 而该项目没有确认的配置
+- **THEN** 保留一个可读准备任务，不运行工具、不报告源码违规，不将该建议升级为必需交付义务
+
+### Requirement: Javadoc task recheck SHALL bind original context and keep unverified closure open
+
+Javadoc任务 MUST 支持显式JDK21的原工具复检，保存对应任务的复检事件及失败尝试。原报告摘要、任务范围、源码、原配置和工具身份 MUST 绑定；缺工具或输入变化为incomplete，配置变化及同规则不同锚点需要复核；局部零诊断只能成为未核验消失候选，不能自动关闭或批准白名单。其它检查器参数 MUST 在取得租约和启动工具前拒绝。
+
+#### Scenario: Javadoc task is still present or native tool is missing
+- **WHEN** 对原任务运行同工具复检或未提供必需JDK
+- **THEN** 保存still_present或incomplete事件，保持open，反馈原检查器的下一步
+
+#### Scenario: Documented source has no original Javadoc diagnostic
+- **WHEN** 同工具及原配置下补齐文档后复检为零诊断
+- **THEN** 保存candidate_absent_unverified_policy，保留任务开放；配置或工具变更不能获得该结论
+
+### Requirement: Explicit Java file workspace SHALL preserve local probe scope
+
+`comments java FILE --workspace ROOT` MUST 在显式工作区中同步单文件原生诊断并支持原任务复检，不要求或伪造项目Javadoc配置。MUST 记录 `explicit_file_probe` 范围并与 `configured_project_probe` 区分；任务复检保持首次观察的模式。文件必须位于指定工作区，越界在原生启动前拒绝；没有初始化时反馈明确状态，不自动初始化。未完成原生检查只生成准备记录，局部零诊断不关闭任务。
+
+#### Scenario: Explicit file probe has no project Javadoc configuration
+- **WHEN** 已初始化工作区中的Java文件通过显式workspace运行JDK诊断
+- **THEN** 同步稳定局部任务，原任务复检沿显式文件模式运行，不凭不存在的POM阻断或宣称项目配置通过
+
+#### Scenario: File is outside the explicit workspace
+- **WHEN** 文件位于指定工作区外部
+- **THEN** 参数错误拒绝，原生工具未启动，工作台不写入
+
+### Requirement: Maven Javadoc observations SHALL reject runtime identity drift
+Maven Javadoc observations SHALL revalidate the selected Java runtime executable and JDK release metadata against pre-execution bytes before accepting native diagnostics. Unavailable or changed metadata SHALL produce an incomplete observation without source findings.
+
+#### Scenario: JDK release changes during a private Maven probe
+- **WHEN** the selected JDK release file changes while Maven executes against the frozen private source copy
+- **THEN** CodeGuard discards the native diagnostics and reports a runtime identity change
+- **AND** the observation cannot close tasks or claim complete project coverage
+
+### Requirement: Maven Javadoc diagnostics SHALL join the stable workbench
+An initialized workspace SHALL persist native Maven Javadoc multi-file observations bound to a bounded pre-execution source/POM snapshot. Import SHALL revalidate current input hashes, build ownership, native rule locations and projected identities. Incomplete execution SHALL create preparation tasks without source findings. Local zero diagnostics SHALL NOT close tasks.
+
+#### Scenario: Repeated Maven diagnostics
+- **WHEN** the same original Maven context reports the same rule at the same source anchor again
+- **THEN** the existing stable task receives another observation
+- **AND** feedback includes native evidence and Maven rescan arguments with task verification explicitly marked not integrated
+
+#### Scenario: Changed or forged observation
+- **WHEN** input bytes change before persistence/import or a projected fingerprint is forged
+- **THEN** CodeGuard rejects the new observation without accepting source findings
+- **AND** previously consumed reports remain historical under their original digest receipts
+
+### Requirement: Maven Javadoc task verification SHALL retain the original multi-file context
+Maven Javadoc 原任务复检 SHALL 绑定首次报告、工作区、最近构建根、POM、Maven、JDK 和离线仓库身份，重新调用既有原生多文件探针。工具缺失或身份不匹配不得切换为 JDK 单文件检查；配置与源集变化不得据零诊断关闭任务。复检事件 SHALL 接入原任务租约与尝试历史，局部观察保持开放。
+
+#### Scenario: Documentation is repaired under unchanged Maven context
+- **WHEN** 原任务在同一构建根和工具上下文下补齐注释，局部原生复检不再检出
+- **THEN** 保存 candidate_absent_unverified_policy，保持任务开放，明确完整规则覆盖和关闭策略尚未核验
+
+#### Scenario: POM or source membership changes
+- **WHEN** 当前 POM 或归属于该构建根的 Java 源码集合与首次报告不同
+- **THEN** 保存 rule_coverage_requires_review；主源码探针完成也不能清除范围外的源集阻塞
+
+#### Scenario: Repeated repair attempts make no progress
+- **WHEN** 同一租约下两次修复动作结束后，原 Maven 复检仍检出相同问题
+- **THEN** 尝试历史记录两次结果，next 返回 needs_decision，不能凭任务勾选或重复执行签发关闭

@@ -1,0 +1,463 @@
+{
+  "codeguard_binary_sha256": "6e9f68e65bb20799c84db935a2920ece3b62a685b62d44dbb98f71efc0cd71e8",
+  "evidence_kind": "actual_existing_maven_offline_missing_plugin",
+  "feedback": {
+    "authority": "local_unverified",
+    "category": "comments",
+    "command_status": "incomplete",
+    "coverage_proven": false,
+    "delivery_decision": "not_evaluated",
+    "discovery": {
+      "blocked_paths": [],
+      "build_roots": [
+        {
+          "manifests": [
+            "pom.xml"
+          ],
+          "path": "."
+        }
+      ],
+      "checker_configurations": [
+        {
+          "build_root": ".",
+          "category": "lint",
+          "checker_id": "java.maven.pmd",
+          "configuration": "missing",
+          "configuration_ref": "pom.xml",
+          "next_action": "在项目中配置对应原生检查器或明确采用其他检查命令",
+          "reason": "plugin_not_declared"
+        },
+        {
+          "build_root": ".",
+          "category": "lint",
+          "checker_id": "java.maven.p3c",
+          "configuration": "missing",
+          "configuration_ref": "pom.xml",
+          "next_action": "检查是否需要在 Maven PMD 中声明 P3C 制品和规则集",
+          "reason": "p3c_plugin_not_declared"
+        },
+        {
+          "build_root": ".",
+          "category": "lint",
+          "checker_id": "java.maven.checkstyle",
+          "configuration": "missing",
+          "configuration_ref": "pom.xml",
+          "next_action": "在项目中配置对应原生检查器或明确采用其他检查命令",
+          "reason": "plugin_not_declared"
+        },
+        {
+          "build_root": ".",
+          "category": "comments",
+          "checker_id": "java.maven.javadoc",
+          "configuration": "configured",
+          "configuration_ref": "pom.xml",
+          "next_action": "运行对应原生检查并读取诊断",
+          "reason": "plugin_declared_in_build_plugins"
+        },
+        {
+          "build_root": ".",
+          "category": "dependencies",
+          "checker_id": "java.maven.dependency",
+          "configuration": "missing",
+          "configuration_ref": "pom.xml",
+          "next_action": "在项目中配置对应原生检查器或明确采用其他检查命令",
+          "reason": "plugin_not_declared"
+        },
+        {
+          "build_root": ".",
+          "category": "cve",
+          "checker_id": "java.maven.dependency_check",
+          "configuration": "missing",
+          "configuration_ref": "pom.xml",
+          "next_action": "在项目中配置对应原生检查器或明确采用其他检查命令",
+          "reason": "plugin_not_declared"
+        },
+        {
+          "build_root": ".",
+          "category": "security",
+          "checker_id": "java.maven.findsecbugs",
+          "configuration": "missing",
+          "configuration_ref": "pom.xml",
+          "next_action": "在项目中配置对应原生检查器或明确采用其他检查命令",
+          "reason": "plugin_not_declared"
+        }
+      ],
+      "declared_versions": {
+        "pom.xml": "1"
+      },
+      "languages": [
+        {
+          "id": "java",
+          "manifests": [
+            "pom.xml"
+          ],
+          "source_files": [
+            "src/main/java/Helper.java",
+            "src/main/java/Sample.java"
+          ]
+        }
+      ],
+      "lockfiles": [],
+      "manifest_sha256": {
+        "pom.xml": "028f53ab97958d57c79990b54adf86a6d629cc80b2c384e6c1448c36500ce445"
+      },
+      "native_tool_candidates": [],
+      "observation_complete": true,
+      "observed_entries": 12,
+      "report_type": "discovery",
+      "root": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-maven-detailed-94882-0",
+      "schema_version": "0.4.0",
+      "scope_summary": {
+        "configuration_exception_files_observed": 0,
+        "dependency_roots_excluded": 0,
+        "dot_prefix_roots_excluded": 1,
+        "git_safety_status": "not_evaluated",
+        "ordinary_scan_policy": "project_sources_default_v2"
+      },
+      "source_set_candidates": [
+        {
+          "basis": "directory_convention",
+          "language": "java",
+          "path": "src/main/java",
+          "role": "main"
+        }
+      ],
+      "unknown_conditions": [
+        "build_model_not_evaluated",
+        "source_sets_not_fully_classified",
+        "dialects_not_classified"
+      ]
+    },
+    "execution_budget": {
+      "enforcement": "native_execution_only",
+      "source": "builtin_default",
+      "timeout_ms": 1800000
+    },
+    "exit_code": 3,
+    "language": "java",
+    "native_observation": {
+      "authority": "local_unverified",
+      "category": "comments",
+      "checker_id": "java.maven.javadoc",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "files": [
+        {
+          "build_root": ".",
+          "configuration": "configured",
+          "configuration_ref": "pom.xml",
+          "configuration_sha256": "028f53ab97958d57c79990b54adf86a6d629cc80b2c384e6c1448c36500ce445",
+          "observation": null,
+          "path": "src/main/java/Helper.java",
+          "reason": "maven_multifile_probe_selected"
+        },
+        {
+          "build_root": ".",
+          "configuration": "configured",
+          "configuration_ref": "pom.xml",
+          "configuration_sha256": "028f53ab97958d57c79990b54adf86a6d629cc80b2c384e6c1448c36500ce445",
+          "observation": null,
+          "path": "src/main/java/Sample.java",
+          "reason": "maven_multifile_probe_selected"
+        }
+      ],
+      "language": "java",
+      "local_probe_complete": false,
+      "maven_multifile_probes": [
+        {
+          "build_root": ".",
+          "configuration_ref": "pom.xml",
+          "observation": {
+            "authority": "local_unverified",
+            "checker_id": "java.maven.javadoc",
+            "coverage_proven": false,
+            "delivery_decision": "not_evaluated",
+            "dependency_closure_sha256": "30d3c71b4752c520d0fddbd5d9875ee0ca6794f982077d7585e19a62627dab2f",
+            "findings": [],
+            "java_runtime_sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e",
+            "maven_tool_sha256": "840832118022e6adc8d87150debb16cef405710799925d527b9adcd70a33ffa1",
+            "native_plan_sha256": "028f53ab97958d57c79990b54adf86a6d629cc80b2c384e6c1448c36500ce445",
+            "native_status": "incomplete",
+            "observed_source_count": 0,
+            "pom_mode": "direct_pom_replay",
+            "project_checker_attribution": "unverified",
+            "reason": "maven_javadoc_offline_plugin_unavailable",
+            "report_type": "maven_javadoc_multifile_probe",
+            "schema_version": "0.2.0",
+            "source_count": 2
+          }
+        }
+      ],
+      "observed_file_count": 0,
+      "probe_mode": "maven_multifile",
+      "project_checker_attribution": "unverified",
+      "report_type": "java_javadoc_project_probe",
+      "schema_version": "0.5.0",
+      "source_file_count": 2
+    },
+    "next_actions": [
+      "依据Maven原生诊断及稳定任务恢复环境或修复注释，使用相同原POM、Maven、JDK和固定离线仓库重跑comments java",
+      "按原Maven任务运行task verify记录局部复检；可信关闭尚未验收，零诊断和勾选不能关闭任务"
+    ],
+    "operation": "comments",
+    "reason": "project_comments_observed_with_unverified_coverage",
+    "report_type": "java_comments_feedback",
+    "schema_version": "0.10.0",
+    "target_kind": "project",
+    "workbench": {
+      "new_blockers": 1,
+      "new_findings": 0,
+      "next": {
+        "authority": "local_unverified",
+        "command_status": "complete",
+        "delivery_decision": "not_evaluated",
+        "disposition": "actionable",
+        "exit_code": 0,
+        "next_actions": [],
+        "operation": "next",
+        "reason": "local_task_selected",
+        "repair_brief": {
+          "action_id": "restore-checker-environment",
+          "affected_paths": [
+            "src/main/java/Helper.java",
+            "src/main/java/Sample.java"
+          ],
+          "authority": "local_unverified",
+          "build_root": ".",
+          "checker_id": "java.maven.javadoc",
+          "closure_condition": "原生工具按相同受控策略完整复检并确认问题已解决；局部查询不能关闭任务",
+          "constraints": [
+            "先恢复检查完整性",
+            "不得关闭检查器或修改无关源码"
+          ],
+          "disposition": "actionable",
+          "evidence_ref": {
+            "first_report_sha256": "eb3c544f5fbbee0a58c5b6674f61e46ada3ccc8ea07d11de48a4579ab58c5f82",
+            "first_run_id": "javadoc-maven-95577-1791294706710466000"
+          },
+          "history": {
+            "attempt_count": 0,
+            "awaiting_verification": false,
+            "budget": 2,
+            "no_progress_count": 0,
+            "open_attempt_id": null,
+            "recent": []
+          },
+          "kind": "blocker",
+          "observation_scope": "configured_maven_multifile_probe",
+          "reason_code": "maven_javadoc_offline_plugin_unavailable",
+          "recheck_argv": [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-4aa402fdf21e9bffdadf42d6d2352d79",
+            ".",
+            "--maven-tool",
+            "<原Maven绝对路径>",
+            "--java-home",
+            "<原JDK21绝对路径>",
+            "--maven-repo",
+            "<原离线仓库绝对路径>",
+            "--repo-sha256",
+            "<复核的固定摘要>",
+            "--format",
+            "json"
+          ],
+          "rule_basis": "原POM固定Javadoc多文件缺注释与详细描述原生诊断；项目政策未核验",
+          "schema_version": "0.6.0",
+          "scope": ".",
+          "step": "核对本构建根原POM、Maven、JDK21及Javadoc3.12.0插件和依赖离线缓存，恢复后按原任务运行task verify；不得修改无关源码或关闭检查器",
+          "task_id": "CG-B-4aa402fdf21e9bffdadf42d6d2352d79",
+          "task_verify_status": "local_observation_only"
+        },
+        "report_type": "repair_brief_preview",
+        "schema_version": "0.1.0"
+      },
+      "status": "synced_partial",
+      "task_verify_status": "local_observation_only"
+    },
+    "workbench_status": "synced_partial"
+  },
+  "verify": {
+    "authority": "local_unverified",
+    "command_status": "incomplete",
+    "delivery_decision": "not_evaluated",
+    "event_persisted": true,
+    "execution_budget": {
+      "enforcement": "native_execution_only",
+      "source": "builtin_default",
+      "timeout_ms": 1800000
+    },
+    "exit_code": 3,
+    "kind": "blocker",
+    "native_scan": {
+      "authority": "local_unverified",
+      "checker_id": "java.maven.javadoc",
+      "configuration_matches": true,
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "input_bindings": [
+        {
+          "location": "workspace",
+          "path": "pom.xml",
+          "sha256": "028f53ab97958d57c79990b54adf86a6d629cc80b2c384e6c1448c36500ce445"
+        },
+        {
+          "location": "workspace",
+          "path": "src/main/java/Helper.java",
+          "sha256": "05362e3376ff9dc1f824b9a63a1ece0123aaccb536215a8519a9daf3d2feb750"
+        },
+        {
+          "location": "workspace",
+          "path": "src/main/java/Sample.java",
+          "sha256": "018f29982d0c09667a2fea408d5dfcc6c36645018e80423445559b14b8a4ffb1"
+        },
+        {
+          "location": "tool",
+          "path": "/opt/homebrew/Cellar/maven/3.9.16/bin/mvn",
+          "sha256": "840832118022e6adc8d87150debb16cef405710799925d527b9adcd70a33ffa1"
+        },
+        {
+          "location": "tool",
+          "path": "/Users/wandl/Library/Java/JavaVirtualMachines/ms-21.0.12.1/Contents/Home/bin/java",
+          "sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e"
+        },
+        {
+          "location": "tool",
+          "path": "/Users/wandl/Library/Java/JavaVirtualMachines/ms-21.0.12.1/Contents/Home/release",
+          "sha256": "9e5f483cd7a0b0bd3524139fb7e08dae750bd9b60336004fa70cd2d00bcc0583"
+        },
+        {
+          "location": "bundle",
+          "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-maven-detailed-94882-0/repo",
+          "sha256": "30d3c71b4752c520d0fddbd5d9875ee0ca6794f982077d7585e19a62627dab2f"
+        }
+      ],
+      "operation": "task_verify",
+      "origin": {
+        "first_report_sha256": "eb3c544f5fbbee0a58c5b6674f61e46ada3ccc8ea07d11de48a4579ab58c5f82",
+        "first_run_id": "javadoc-maven-95577-1791294706710466000"
+      },
+      "reason": "maven_javadoc_local_policy_unverified",
+      "report_type": "maven_javadoc_task_recheck",
+      "run_id": "javadoc-maven-task-95599-1791294706773314000",
+      "scan": {
+        "authority": "local_unverified",
+        "blockers": [
+          {
+            "affected_paths": [
+              "src/main/java/Helper.java",
+              "src/main/java/Sample.java"
+            ],
+            "build_root": ".",
+            "fingerprint": "4aa402fdf21e9bffdadf42d6d2352d7950fca2a9e49c765cf35b6825f0e5e02b",
+            "id": "CG-B-4aa402fdf21e9bffdadf42d6d2352d79",
+            "reason": "maven_javadoc_offline_plugin_unavailable",
+            "scope": "."
+          }
+        ],
+        "checker_id": "java.maven.javadoc",
+        "coverage_proven": false,
+        "delivery_decision": "not_evaluated",
+        "findings": [],
+        "inputs": [
+          {
+            "path": "pom.xml",
+            "sha256": "028f53ab97958d57c79990b54adf86a6d629cc80b2c384e6c1448c36500ce445"
+          },
+          {
+            "path": "src/main/java/Helper.java",
+            "sha256": "05362e3376ff9dc1f824b9a63a1ece0123aaccb536215a8519a9daf3d2feb750"
+          },
+          {
+            "path": "src/main/java/Sample.java",
+            "sha256": "018f29982d0c09667a2fea408d5dfcc6c36645018e80423445559b14b8a4ffb1"
+          }
+        ],
+        "native": {
+          "authority": "local_unverified",
+          "category": "comments",
+          "checker_id": "java.maven.javadoc",
+          "coverage_proven": false,
+          "delivery_decision": "not_evaluated",
+          "files": [
+            {
+              "build_root": ".",
+              "configuration": "configured",
+              "configuration_ref": "pom.xml",
+              "configuration_sha256": "028f53ab97958d57c79990b54adf86a6d629cc80b2c384e6c1448c36500ce445",
+              "observation": null,
+              "path": "src/main/java/Helper.java",
+              "reason": "maven_multifile_probe_selected"
+            },
+            {
+              "build_root": ".",
+              "configuration": "configured",
+              "configuration_ref": "pom.xml",
+              "configuration_sha256": "028f53ab97958d57c79990b54adf86a6d629cc80b2c384e6c1448c36500ce445",
+              "observation": null,
+              "path": "src/main/java/Sample.java",
+              "reason": "maven_multifile_probe_selected"
+            }
+          ],
+          "language": "java",
+          "local_probe_complete": false,
+          "maven_multifile_probes": [
+            {
+              "build_root": ".",
+              "configuration_ref": "pom.xml",
+              "observation": {
+                "authority": "local_unverified",
+                "checker_id": "java.maven.javadoc",
+                "coverage_proven": false,
+                "delivery_decision": "not_evaluated",
+                "dependency_closure_sha256": "30d3c71b4752c520d0fddbd5d9875ee0ca6794f982077d7585e19a62627dab2f",
+                "findings": [],
+                "java_runtime_sha256": "e820b09ad7e80bf14ec6803d9ade8abc02dfbfe9d0540f9b0e8c6d334706bc5e",
+                "maven_tool_sha256": "840832118022e6adc8d87150debb16cef405710799925d527b9adcd70a33ffa1",
+                "native_plan_sha256": "028f53ab97958d57c79990b54adf86a6d629cc80b2c384e6c1448c36500ce445",
+                "native_status": "incomplete",
+                "observed_source_count": 0,
+                "pom_mode": "direct_pom_replay",
+                "project_checker_attribution": "unverified",
+                "reason": "maven_javadoc_offline_plugin_unavailable",
+                "report_type": "maven_javadoc_multifile_probe",
+                "schema_version": "0.2.0",
+                "source_count": 2
+              }
+            }
+          ],
+          "observed_file_count": 0,
+          "probe_mode": "maven_multifile",
+          "project_checker_attribution": "unverified",
+          "report_type": "java_javadoc_project_probe",
+          "schema_version": "0.5.0",
+          "source_file_count": 2
+        },
+        "report_type": "maven_javadoc_workbench_observation",
+        "run_id": "javadoc-maven-task-95599-1791294706773314000",
+        "schema_version": "0.2.0",
+        "workspace_binding": "bound",
+        "workspace_id": "ws-1414336c2b371a105a647f4a7b70af5e"
+      },
+      "schema_version": "0.2.0",
+      "source_scope_matches": true,
+      "task_id": "CG-B-4aa402fdf21e9bffdadf42d6d2352d79",
+      "task_input_stable": true,
+      "task_path": ".",
+      "task_rule": null,
+      "tool_identity_matches": true,
+      "workspace_binding": "bound",
+      "workspace_id": "ws-1414336c2b371a105a647f4a7b70af5e"
+    },
+    "next_actions": [
+      "inspect_native_recheck_and_policy_before_closure"
+    ],
+    "observation": "incomplete",
+    "operation": "task_verify",
+    "reason": null,
+    "report_type": "task_verification_preview",
+    "schema_version": "0.32.0",
+    "task_id": "CG-B-4aa402fdf21e9bffdadf42d6d2352d79"
+  }
+}

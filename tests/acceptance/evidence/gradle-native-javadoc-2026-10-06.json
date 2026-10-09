@@ -1,0 +1,71 @@
+{
+  "record_kind": "local_acceptance_summary",
+  "recorded_date": "2026-10-06",
+  "scope": "Gradle Javadoc application service; public quality integration not implemented",
+  "source_sha256": {
+    "crates/codeguard-adapters/src/gradle_javadoc_task_plan.rs": "b518a425a731e21a45cd3ef1c7d433f9e0768879bc2ebb623bec28c8c38114e2",
+    "crates/codeguard-adapters/src/gradle_javadoc_plan.rs": "e81872c5c50636c5dee48b7267f856a4e72d560658e0d6768dd9b25fa97fac42",
+    "crates/codeguard-adapters/src/gradle_javadoc_diagnostic.rs": "c4a9c5be6327fcdc305b50de97321ae4c7bd8d6bac495a25a99166e8178ef7d3",
+    "crates/codeguard-adapters/src/gradle_javadoc_output.rs": "a361c5a759f18f46804a24daf3d72c20e85adcc9d2a675c43ef4b145794e658b",
+    "crates/codeguard-adapters/tests/gradle_javadoc.rs": "98f4e3bfa4e40dde12ec691061a9c7a03d3bb2103ee10d21447ab0857994cd8d",
+    "crates/codeguard-cli/resources/gradle_javadoc.init.gradle": "3e7bd954fc0392705f4d5b30e3ce89955d9a19b68e351ab7017647f4db1ea6f9",
+    "crates/codeguard-cli/resources/gradle_checker_model.init.gradle": "f84431ce09fcb594c7f00ba89a2118fe054d865ca8e4fea6312668ba5443453a",
+    "crates/codeguard-cli/src/gradle_javadoc_probe.rs": "975a919f3236e85083966547fc96208d480034a17b150569fe1be781f6191a62",
+    "crates/codeguard-cli/tests/gradle_javadoc_probe.rs": "22925c7538e52bba0e58aac2c4986a9881c24e3d485812e8d9be9d62e879bee9",
+    "schemas/gradle-javadoc-probe-v0.1.schema.json": "7e106e3c005d8449314f8f52aa209fba8d37cb8b261bb241ae1f8da77a5600cd"
+  },
+  "tests": {
+    "default_adapter": {
+      "passed": 15,
+      "failed": 0,
+      "ignored": 2
+    },
+    "default_cli": {
+      "passed": 18,
+      "failed": 0,
+      "ignored": 5
+    },
+    "actual_gradle_javadoc": {
+      "passed": 1,
+      "failed": 0,
+      "observations": 4,
+      "counts": [
+        3,
+        2,
+        2,
+        0
+      ]
+    },
+    "wasm_cli": {
+      "passed": 8,
+      "failed": 0,
+      "ignored": 4,
+      "overlap_with_default": true
+    }
+  },
+  "schema": {
+    "meta_valid": 413,
+    "actual_reports_valid": 8,
+    "forgeries_rejected": 9
+  },
+  "checks": {
+    "default_clippy": "pass",
+    "wasm_clippy": "pass",
+    "layering": "pass",
+    "openspec_strict": "pass",
+    "diff": "pass"
+  },
+  "coverage_proven": false,
+  "rule_configuration_complete": false,
+  "production_qualified": false,
+  "delivery_decision": "not_evaluated",
+  "reports_sha256": "8486cdd4a022cceab37630f7eaa55c14a514d66af7528a3fa1a914e3c46de175",
+  "pending": [
+    "public quality entry and agent feedback",
+    "task repair and native recheck closure",
+    "complete detailed documentation rules",
+    "complete original source/configuration and JDK closure",
+    "multi-project/custom-doclet quality tasks",
+    "independent precision corpus and per-language production qualification"
+  ]
+}

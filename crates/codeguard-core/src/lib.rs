@@ -24,6 +24,7 @@ mod observation_port;
 mod repository_path_safety;
 mod syntax_file_observation;
 mod syntax_file_state;
+mod syntax_incomplete_reason;
 mod syntax_precheck;
 mod syntax_precheck_outcome;
 mod syntax_precheck_status;
@@ -69,6 +70,10 @@ pub use observation_port::{ObservationPort, ObservedPathKind};
 pub use repository_path_safety::{RepositoryPathViolation, check_repository_paths};
 pub use syntax_file_observation::SyntaxFileObservation;
 pub use syntax_file_state::SyntaxFileState;
+pub use syntax_incomplete_reason::{
+    INCOMPLETE_REASON, REASON_PARSER_ERROR_UNLOCATED, REASON_SCAN_TRUNCATED,
+    is_incomplete_syntax_reason,
+};
 pub use syntax_precheck::assess_syntax_precheck;
 pub use syntax_precheck_outcome::SyntaxPrecheckOutcome;
 pub use syntax_precheck_status::SyntaxPrecheckStatus;

@@ -48,6 +48,9 @@ pub(crate) fn run(
     match prepare(root, &observed, &observed["input_bindings"]) {
         Ok(mut scan) => {
             scan["run_id"] = report["run_id"].clone();
+            if scan["schema_version"] == "0.2.0" {
+                report["schema_version"] = json!("0.2.0");
+            }
             report["scan"] = scan;
             report["local_status"] = json!("observed");
             report["reason"] = json!("original_selection_and_quality_policy_unverified");
@@ -152,7 +155,7 @@ pub(crate) fn valid_shape(report: &Value) -> bool {
                         .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
             })
         })
-        && report["schema_version"] == "0.1.0"
+        && matches!(report["schema_version"].as_str(), Some("0.1.0" | "0.2.0"))
         && report["report_type"] == "checkstyle_preparation_recheck"
         && report["workspace_binding"] == "bound"
         && report["checker_id"] == "java.checkstyle.preparation"
@@ -178,6 +181,7 @@ pub(crate) fn valid_shape(report: &Value) -> bool {
             && report["task_input_stable"].is_null())
             || (report["local_status"] == "observed"
                 && report["scan"].is_object()
+                && report["scan"]["schema_version"] == report["schema_version"]
                 && report["task_input_stable"].is_boolean()
                 && report["scan"]["run_id"] == report["run_id"]
                 && report["scan"]["workspace_id"] == report["workspace_id"]

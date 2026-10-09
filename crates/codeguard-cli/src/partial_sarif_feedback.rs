@@ -7,22 +7,91 @@ use sha2::{Digest, Sha256};
 #[must_use]
 pub fn partial_check_sarif(report: &Value) -> Value {
     let mut results = Vec::new();
+    let mut structural_policy_count = 0usize;
     if let Some(checkers) = report["native_results"].as_object() {
         for (checker, value) in checkers {
-            if checker == "zig_lint" {
+            if checker == "c_family_comments" {
+                for scan in value.as_object().into_iter().flat_map(|m| m.values()) {
+                    for file in scan["files"]
+                        .as_array()
+                        .into_iter()
+                        .flatten()
+                        .filter(|f| f["current"] == true)
+                    {
+                        for finding in file["feedback"]["documentation_findings"]
+                            .as_array()
+                            .into_iter()
+                            .flatten()
+                        {
+                            results.push(sarif_observation(
+                                "clang.documentation",
+                                finding,
+                                results.len(),
+                            ));
+                        }
+                        for function in
+                            file["feedback"]["documentation_structure"]["observation"]["functions"]
+                                .as_array()
+                                .into_iter()
+                                .flatten()
+                                .filter(|f| {
+                                    f["missing_components"]
+                                        .as_array()
+                                        .is_some_and(|m| !m.is_empty())
+                                })
+                        {
+                            let mut finding = function.clone();
+                            finding["rule_id"] =
+                                json!("codeguard.documentation.function_structure_required");
+                            let mut result = sarif_observation(
+                                "codeguard.documentation_structure",
+                                &finding,
+                                results.len(),
+                            );
+                            result["properties"]["ruleSource"] =
+                                json!("codeguard_structural_policy");
+                            result["properties"]["codeguardObservation"] =
+                                json!("structural_policy_unverified");
+                            result["message"]["text"] = json!(
+                                "CodeGuard observed incomplete documentation structure; API accuracy and project policy coverage remain unverified."
+                            );
+                            results.push(result);
+                            structural_policy_count += 1;
+                        }
+                    }
+                }
+                continue;
+            }
+            if matches!(checker.as_str(), "zig_lint" | "shell_lint") {
                 // 原生语法探针使用 diagnostics；仅投影当前输入的定位，不遗失真实发现或输出旧坐标。
-                for file in value["files"]
-                    .as_array()
-                    .into_iter()
-                    .flatten()
-                    .filter(|f| f["current"] == true)
-                {
+                for file in value["files"].as_array().into_iter().flatten().filter(|f| {
+                    if checker == "shell_lint" {
+                        f["input_stable"] == true
+                    } else {
+                        f["current"] == true
+                    }
+                }) {
                     for diagnostic in file["native"]["diagnostics"]
                         .as_array()
                         .into_iter()
                         .flatten()
                     {
                         results.push(sarif_observation(checker, diagnostic, results.len()));
+                    }
+                }
+            }
+            if checker == "java_gradle_cve" {
+                for task in value["reports"].as_array().into_iter().flatten() {
+                    for advisory in task["advisories"].as_array().into_iter().flatten() {
+                        let mut row = sarif_observation(checker, advisory, results.len());
+                        row["properties"]["nativeSuppressionObserved"] =
+                            advisory["suppressed_by_native_tool"].clone();
+                        row["properties"]["nativeTaskDigest"] =
+                            json!(digest(task["task_path"].as_str().unwrap_or("").as_bytes()));
+                        if advisory["suppressed_by_native_tool"] == true {
+                            row["suppressions"] = json!([{"kind":"external","status":"underReview","justification":"Suppression observed in the native tool; CodeGuard policy approval remains unverified."}]);
+                        }
+                        results.push(row);
                     }
                 }
             }
@@ -55,7 +124,8 @@ pub fn partial_check_sarif(report: &Value) -> Value {
                 "codeguardObligationStatus":"unresolved",
                 "codeguardExportStatus":report["export"]["status"],
                 "codeguardExportReason":report["export"]["reason_code"],
-                "nativeFindingCount":results.len(),
+                "nativeFindingCount":results.len().saturating_sub(structural_policy_count),
+                "structuralPolicyFindingCount":structural_policy_count,
                 "locationsVisibility":"private_evidence_only"
             }
         }]
@@ -119,6 +189,18 @@ mod tests {
     use serde_json::json;
 
     #[test]
+    fn shell_diagnostics_keep_current_observations_without_exposing_paths() {
+        let source = json!({"report_type":"check_feedback","command_status":"incomplete","delivery_decision":"incomplete","exit_code":3,
+        "native_results":{"shell_lint":{"files":[
+            {"path":"secret-source.sh","input_stable":true,"native":{"diagnostics":[{"rule_id":"SC2086"}]}},
+            {"path":"stale.sh","input_stable":false,"native":{"diagnostics":[{"rule_id":"SC2000"}]}}
+        ]}}});
+        let sarif = partial_check_sarif(&source);
+        assert_eq!(sarif["runs"][0]["results"].as_array().unwrap().len(), 1);
+        assert!(!sarif.to_string().contains("secret-source.sh"));
+    }
+
+    #[test]
     fn aborted_report_keeps_sibling_findings_without_claiming_success() {
         let source = json!({
             "report_type":"check_aborted","command_status":"internal_error",
@@ -144,5 +226,27 @@ mod tests {
         );
         assert_eq!(sarif["runs"][0]["properties"]["nativeFindingCount"], 2);
         assert!(!sarif.to_string().contains("token=private"));
+    }
+    #[test]
+    fn c_documentation_export_separates_native_and_self_policy_and_discards_stale_rows() {
+        let source = json!({"native_results":{"c_family_comments":{"c":{"files":[
+            {"current":true,"feedback":{"documentation_findings":[{"rule_id":"clang.warn_doc"}],"documentation_structure":{"observation":{"functions":[{"missing_components":["purpose"]}]}}}},
+            {"current":false,"feedback":{"documentation_findings":[{"rule_id":"clang.stale"}],"documentation_structure":{"observation":{"functions":[{"missing_components":["purpose"]}]}}}}
+        ]}}}});
+        let sarif = partial_check_sarif(&source);
+        assert_eq!(sarif["runs"][0]["results"].as_array().unwrap().len(), 2);
+        assert_eq!(sarif["runs"][0]["properties"]["nativeFindingCount"], 1);
+        assert_eq!(
+            sarif["runs"][0]["properties"]["structuralPolicyFindingCount"],
+            1
+        );
+        assert_eq!(
+            sarif["runs"][0]["results"][1]["properties"]["codeguardObservation"],
+            "structural_policy_unverified"
+        );
+        assert_eq!(
+            sarif["runs"][0]["invocations"][0]["executionSuccessful"],
+            false
+        );
     }
 }

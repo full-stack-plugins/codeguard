@@ -1,0 +1,67 @@
+{
+  "date": "2026-10-06",
+  "source_base": "40cc624958ade6eeb0f1c3dc03a538f1d92d4be7",
+  "scope": "bounded_ast_facts_only",
+  "red": "new scanner API absent: E0432/E0425",
+  "regression": {
+    "targets": 4,
+    "passed": 16,
+    "failed": 0,
+    "ignored": 2
+  },
+  "actual_node": {
+    "path": "/Users/wandl/.nvm/versions/node/v24.18.0/bin/node",
+    "version": "v24.18.0",
+    "sha256": "ee6fb0e015284d83a91e8ec5213f43a157f8a392b58555301682892ba928c04a",
+    "source_samples": 11,
+    "source_checks": 22,
+    "modes": [
+      "module",
+      "commonjs"
+    ],
+    "test_passed": 1,
+    "entry_bytes_stable_during_test": true
+  },
+  "strict_feature_clippy": "passed",
+  "public_worker_connected": false,
+  "project_module_policy_connected": false,
+  "native_differential_module_false_negative_changed": false,
+  "grammar_qualified_count": 0,
+  "independent_holdout": false,
+  "sources": [
+    {
+      "path": "crates/codeguard-runtime/src/wasm_outer_return.rs",
+      "sha256": "e63c7589ce98a5870dd844741c4e4471bf3c2a03dc6d0ebd9cbe65466b8638cb"
+    },
+    {
+      "path": "crates/codeguard-runtime/src/wasm_outer_return_scan.rs",
+      "sha256": "9a317d37c35761e054de51b22d2839a9ffda6dc49cc98d291475bfecceeac7f6"
+    },
+    {
+      "path": "crates/codeguard-runtime/tests/wasm_outer_return_scan.rs",
+      "sha256": "652c3eeac2c213ebd076054c8b0fca36ae192ba83b5eddfb7bf9a4c91540e972"
+    }
+  ],
+  "logs": [
+    {
+      "path": "/private/tmp/cg-module-return-ast-red.log",
+      "sha256": "f6b22cc25e401889260c27a69cb48f2aa384586a4b03b240c4bd9a168fd9ee07"
+    },
+    {
+      "path": "/private/tmp/cg-module-return-ast-green.log",
+      "sha256": "5a0e865069927f0d96758be38ec8d0e112348112df9090a6f6e17d30fbcd98ce"
+    },
+    {
+      "path": "/private/tmp/cg-module-return-ast-actual.log",
+      "sha256": "086ebc4d9089322b78da5b262048f4f8c808116714290339b7fd36e87ebe505d"
+    },
+    {
+      "path": "/private/tmp/cg-module-return-ast-regression.log",
+      "sha256": "3a080a8b9893703aa9776dbfeb5d116cb9aa40de8aa3cf6011988d7832fd5cf9"
+    },
+    {
+      "path": "/private/tmp/cg-module-return-ast-clippy.log",
+      "sha256": "c40a073cd7bcc484eabaca12a3eeda3897d4adf39d69dd0180bf26ed5c8173e0"
+    }
+  ]
+}

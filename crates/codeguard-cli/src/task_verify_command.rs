@@ -39,14 +39,19 @@ struct Arguments {
     erl_tool: Option<PathBuf>,
     swift_tool: Option<PathBuf>,
     ruby_tool: Option<PathBuf>,
+    rustfmt_tool: Option<PathBuf>,
     kotlinc_tool: Option<PathBuf>,
     cargo_tool: Option<PathBuf>,
+    shellcheck_tool: Option<PathBuf>,
+    clang_tool: Option<PathBuf>,
     cargo_audit_tool: Option<PathBuf>,
     rustsec_db: Option<PathBuf>,
     pip_audit_tool: Option<PathBuf>,
     pip_audit_version: Option<String>,
     go_tool: Option<PathBuf>,
     maven_tool: Option<PathBuf>,
+    gradle_bundle: Option<PathBuf>,
+    gradle_module_cache: Option<PathBuf>,
     java_home: Option<PathBuf>,
     java_tool: Option<PathBuf>,
     checkstyle_jar: Option<PathBuf>,
@@ -91,6 +96,66 @@ pub fn run(args: &[String]) -> ExitCode {
         Ok(brief) => brief,
         Err(reason) => return print_unavailable(&parsed, reason),
     };
+    let c_placeholder_task = matches!(
+        brief["checker_id"].as_str(),
+        Some("c.clang.documentation_placeholder" | "cpp.clang.documentation_placeholder")
+    );
+    let gradle_cve_task = brief["checker_id"] == "java.gradle.dependency_check";
+    let c_structure_task = matches!(
+        brief["checker_id"].as_str(),
+        Some("c.clang.documentation_structure" | "cpp.clang.documentation_structure")
+    );
+    let c_documentation_task = matches!(
+        brief["checker_id"].as_str(),
+        Some("c.clang.documentation" | "cpp.clang.documentation")
+    );
+    if parsed.clang_tool.is_some()
+        && !c_documentation_task
+        && !c_structure_task
+        && !c_placeholder_task
+    {
+        eprintln!("--clang-tool 仅用于C/C++文档任务");
+        return ExitCode::from(2);
+    }
+    if c_documentation_task || c_structure_task || c_placeholder_task {
+        if args.iter().filter(|s| s.starts_with("--")).any(|s| {
+            !matches!(
+                s.as_str(),
+                "--clang-tool"
+                    | "--timeout"
+                    | "--format"
+                    | "--format=json"
+                    | "--format=human"
+                    | "--owner"
+                    | "--lease-token"
+            )
+        }) {
+            eprintln!("C/C++文档任务仅接受原工具及共享复检参数");
+            return ExitCode::from(2);
+        }
+        let preflight = if c_placeholder_task {
+            crate::c_family_placeholder_task_recheck::preflight(
+                &root,
+                &brief,
+                parsed.clang_tool.as_deref(),
+            )
+        } else if c_structure_task {
+            crate::c_family_structure_task_recheck::preflight(
+                &root,
+                &brief,
+                parsed.clang_tool.as_deref(),
+            )
+        } else {
+            crate::c_family_comments_task_recheck::preflight(
+                &root,
+                &brief,
+                parsed.clang_tool.as_deref(),
+            )
+        };
+        if let Err(reason) = preflight {
+            return print_unavailable(&parsed, reason);
+        }
+    }
     let python_confirmation = brief["checker_id"] == "python.ruff"
         && brief["reason_code"] == "python_syntax_confirmation_needed";
     let python_original = if python_confirmation {
@@ -101,10 +166,101 @@ pub fn run(args: &[String]) -> ExitCode {
     } else {
         None
     };
+    let javadoc_task = brief["checker_id"] == "java.jdk.javadoc";
+    let maven_javadoc_task = brief["checker_id"] == "java.maven.javadoc";
+    let gradle_javadoc_task = brief["checker_id"] == "java.gradle.javadoc";
+    if parsed.gradle_module_cache.is_some() && !gradle_cve_task {
+        eprintln!("--gradle-module-cache 仅用于Gradle CVE任务");
+        return ExitCode::from(2);
+    }
+    if parsed.gradle_bundle.is_some() && !gradle_javadoc_task && !gradle_cve_task {
+        eprintln!("--gradle-bundle 仅用于Gradle Javadoc/CVE任务");
+        return ExitCode::from(2);
+    }
+    if (gradle_javadoc_task || gradle_cve_task)
+        && (parsed.ruff_tool.is_some()
+            || parsed.zig_tool.is_some()
+            || parsed.erl_tool.is_some()
+            || parsed.swift_tool.is_some()
+            || parsed.ruby_tool.is_some()
+            || parsed.rustfmt_tool.is_some()
+            || parsed.kotlinc_tool.is_some()
+            || parsed.cargo_tool.is_some()
+            || parsed.shellcheck_tool.is_some()
+            || parsed.cargo_audit_tool.is_some()
+            || parsed.rustsec_db.is_some()
+            || parsed.pip_audit_tool.is_some()
+            || parsed.pip_audit_version.is_some()
+            || parsed.go_tool.is_some()
+            || parsed.maven_tool.is_some()
+            || parsed.java_tool.is_some()
+            || parsed.checkstyle_jar.is_some()
+            || parsed.checkstyle_config.is_some()
+            || parsed.maven_repo.is_some()
+            || parsed.repo_sha256.is_some()
+            || parsed.cve_data_dir.is_some()
+            || parsed.cve_data_sha256.is_some()
+            || !parsed.eslint_options.is_empty()
+            || !parsed.npm_options.is_empty())
+    {
+        eprintln!("Gradle Javadoc任务仅接受原Gradle分发、JDK路径和共享参数");
+        return ExitCode::from(2);
+    }
+    if maven_javadoc_task
+        && (parsed.ruff_tool.is_some()
+            || parsed.cargo_tool.is_some()
+            || parsed.cve_data_dir.is_some()
+            || parsed.cve_data_sha256.is_some()
+            || !parsed.eslint_options.is_empty()
+            || !parsed.npm_options.is_empty())
+    {
+        eprintln!("Maven Javadoc任务只接受原Maven、JDK和离线仓库上下文及共享参数");
+        return ExitCode::from(2);
+    }
+    if javadoc_task
+        && (parsed.maven_tool.is_some()
+            || parsed.maven_repo.is_some()
+            || parsed.repo_sha256.is_some()
+            || parsed.cargo_tool.is_some()
+            || parsed.ruff_tool.is_some()
+            || parsed.cve_data_dir.is_some()
+            || parsed.cve_data_sha256.is_some())
+    {
+        eprintln!("JDK Javadoc任务仅接受对应JDK与共享预算参数");
+        return ExitCode::from(2);
+    }
+    let shell_task = brief["checker_id"] == "shell.shellcheck";
+    if parsed.shellcheck_tool.is_some() && !shell_task {
+        eprintln!("--shellcheck-tool 仅用于ShellCheck任务");
+        return ExitCode::from(2);
+    }
+    if shell_task
+        && (parsed.ruff_tool.is_some()
+            || parsed.cargo_tool.is_some()
+            || parsed.cargo_audit_tool.is_some()
+            || parsed.rustsec_db.is_some()
+            || parsed.pip_audit_tool.is_some()
+            || parsed.pip_audit_version.is_some()
+            || parsed.maven_tool.is_some()
+            || parsed.java_home.is_some()
+            || parsed.java_tool.is_some()
+            || parsed.checkstyle_jar.is_some()
+            || parsed.checkstyle_config.is_some()
+            || parsed.maven_repo.is_some()
+            || parsed.repo_sha256.is_some()
+            || parsed.cve_data_dir.is_some()
+            || parsed.cve_data_sha256.is_some()
+            || !parsed.eslint_options.is_empty()
+            || !parsed.npm_options.is_empty())
+    {
+        eprintln!("ShellCheck任务不接受其它检查器的工具或配置参数");
+        return ExitCode::from(2);
+    }
     let syntax_task = brief["checker_id"] == "syntax.native_confirmation";
     if (parsed.zig_tool.is_some()
         || parsed.erl_tool.is_some()
         || parsed.swift_tool.is_some()
+        || parsed.rustfmt_tool.is_some()
         || parsed.ruby_tool.is_some()
         || parsed.kotlinc_tool.is_some())
         && !syntax_task
@@ -117,6 +273,7 @@ pub fn run(args: &[String]) -> ExitCode {
         && (parsed.zig_tool.is_some()
             || parsed.erl_tool.is_some()
             || parsed.swift_tool.is_some()
+            || parsed.rustfmt_tool.is_some()
             || parsed.ruby_tool.is_some()
             || parsed.kotlinc_tool.is_some()
             || parsed.go_tool.is_some())
@@ -128,6 +285,7 @@ pub fn run(args: &[String]) -> ExitCode {
         if (parsed.zig_tool.is_some() && original["language"] != "zig")
             || (parsed.erl_tool.is_some() && original["language"] != "erlang")
             || (parsed.swift_tool.is_some() && original["language"] != "swift")
+            || (parsed.rustfmt_tool.is_some() && original["language"] != "rust")
             || (parsed.ruby_tool.is_some() && original["language"] != "ruby")
             || (parsed.kotlinc_tool.is_some() && original["language"] != "kotlin")
             || (parsed.go_tool.is_some() && original["language"] != "go")
@@ -233,8 +391,41 @@ pub fn run(args: &[String]) -> ExitCode {
     } else {
         None
     };
-    let mut scan = if syntax_task {
+    let mut scan = if c_placeholder_task {
+        match crate::c_family_placeholder_task_recheck::run(&root, &brief, deadline) {
+            Ok(report) => report,
+            Err(reason) => {
+                let release = finish_verification(&root, &parsed.task_id, &lease);
+                return print_unavailable(&parsed, release.err().unwrap_or(reason));
+            }
+        }
+    } else if c_structure_task {
+        match crate::c_family_structure_task_recheck::run(&root, &brief, deadline) {
+            Ok(report) => report,
+            Err(reason) => {
+                let release = finish_verification(&root, &parsed.task_id, &lease);
+                return print_unavailable(&parsed, release.err().unwrap_or(reason));
+            }
+        }
+    } else if c_documentation_task {
+        match crate::c_family_comments_task_recheck::run(&root, &brief, deadline) {
+            Ok(report) => report,
+            Err(reason) => {
+                let release = finish_verification(&root, &parsed.task_id, &lease);
+                return print_unavailable(&parsed, release.err().unwrap_or(reason));
+            }
+        }
+    } else if syntax_task {
         let recheck = if crate::syntax_task_recheck::original(&root, &brief)
+            .is_ok_and(|original| original["language"] == "rust")
+        {
+            crate::rust_syntax_task_recheck::run(
+                &root,
+                &brief,
+                parsed.rustfmt_tool.as_deref(),
+                deadline,
+            )
+        } else if crate::syntax_task_recheck::original(&root, &brief)
             .is_ok_and(|original| original["language"] == "go")
         {
             crate::syntax_task_recheck::run_go(&root, &brief, parsed.go_tool.as_deref(), deadline)
@@ -299,6 +490,66 @@ pub fn run(args: &[String]) -> ExitCode {
             crate::checkstyle_preparation_recheck::run(&root, &brief, &options, deadline)
         } else {
             crate::checkstyle_task_recheck::run(&root, &brief, &options, deadline)
+        }
+    } else if gradle_cve_task {
+        match crate::gradle_cve_task_recheck::run(
+            &root,
+            &brief,
+            parsed.gradle_bundle.as_deref(),
+            parsed.java_home.as_deref(),
+            parsed.gradle_module_cache.as_deref(),
+            deadline,
+            &std::sync::atomic::AtomicBool::new(false),
+        ) {
+            Ok(report) => report,
+            Err(reason) => {
+                let release = finish_verification(&root, &parsed.task_id, &lease);
+                return print_unavailable(&parsed, release.err().unwrap_or(reason));
+            }
+        }
+    } else if gradle_javadoc_task {
+        match crate::gradle_javadoc_task_recheck::run(
+            &root,
+            &brief,
+            parsed.gradle_bundle.as_deref(),
+            parsed.java_home.as_deref(),
+            deadline,
+            &std::sync::atomic::AtomicBool::new(false),
+        ) {
+            Ok(report) => report,
+            Err(reason) => {
+                let release = finish_verification(&root, &parsed.task_id, &lease);
+                return print_unavailable(&parsed, release.err().unwrap_or(reason));
+            }
+        }
+    } else if maven_javadoc_task {
+        match crate::maven_javadoc_task_recheck::run(
+            &root,
+            &brief,
+            &crate::java_javadoc_scan::NativeContext {
+                manifest_sha256: &std::collections::BTreeMap::new(),
+                java_home: parsed.java_home.as_deref(),
+                maven_tool: parsed.maven_tool.as_deref(),
+                maven_repo: parsed.maven_repo.as_deref(),
+                repo_sha256: parsed.repo_sha256.as_deref(),
+                deadline,
+                cancelled: &std::sync::atomic::AtomicBool::new(false),
+            },
+        ) {
+            Ok(report) => report,
+            Err(reason) => {
+                let release = finish_verification(&root, &parsed.task_id, &lease);
+                return print_unavailable(&parsed, release.err().unwrap_or(reason));
+            }
+        }
+    } else if javadoc_task {
+        match crate::javadoc_task_recheck::run(&root, &brief, parsed.java_home.as_deref(), deadline)
+        {
+            Ok(report) => report,
+            Err(reason) => {
+                let release = finish_verification(&root, &parsed.task_id, &lease);
+                return print_unavailable(&parsed, release.err().unwrap_or(reason));
+            }
         }
     } else if brief["checker_id"] == "go.vet" {
         crate::go_lint_command::observe_for_check(
@@ -442,6 +693,19 @@ pub fn run(args: &[String]) -> ExitCode {
                     &parsed,
                     release.err().unwrap_or("python_cve_workbench_unavailable"),
                 );
+            }
+        }
+    } else if shell_task {
+        match crate::shell_task_recheck::run(
+            &root,
+            &brief,
+            parsed.shellcheck_tool.as_deref(),
+            deadline,
+        ) {
+            Ok(report) => report,
+            Err(reason) => {
+                let release = finish_verification(&root, &parsed.task_id, &lease);
+                return print_unavailable(&parsed, release.err().unwrap_or(reason));
             }
         }
     } else if brief["checker_id"] == "rust.cargo_rustdoc" {
@@ -645,6 +909,14 @@ pub fn run(args: &[String]) -> ExitCode {
             crate::npm_task_recheck::classify(&root, &brief, &scan)
         } else if eslint_task {
             crate::eslint_task_recheck::classify(&brief, &scan)
+        } else if gradle_cve_task {
+            crate::gradle_cve_task_recheck::classify(&brief, &scan)
+        } else if gradle_javadoc_task {
+            crate::gradle_javadoc_task_recheck::classify(&brief, &scan)
+        } else if maven_javadoc_task {
+            crate::maven_javadoc_task_recheck::classify(&brief, &scan)
+        } else if javadoc_task {
+            crate::javadoc_task_recheck::classify(&brief, &scan)
         } else if brief["checker_id"] == "java.checkstyle.preparation" {
             crate::checkstyle_preparation_recheck::classify(&brief, &scan)
         } else if brief["checker_id"] == "java.checkstyle" {
@@ -663,6 +935,14 @@ pub fn run(args: &[String]) -> ExitCode {
             crate::rust_cve_task_recheck::classify(&brief, &scan)
         } else if brief["checker_id"] == "python.pip_audit" {
             crate::python_cve_task_recheck::classify(&brief, &scan)
+        } else if c_placeholder_task {
+            crate::c_family_placeholder_task_recheck::classify(&brief, &scan)
+        } else if c_structure_task {
+            crate::c_family_structure_task_recheck::classify(&brief, &scan)
+        } else if c_documentation_task {
+            crate::c_family_comments_task_recheck::classify(&brief, &scan)
+        } else if shell_task {
+            crate::shell_task_recheck::classify(&brief, &scan)
         } else if brief["checker_id"] == "rust.cargo_rustdoc" {
             crate::rustdoc_task_recheck::classify(&brief, &scan)
         } else if brief["checker_id"] == "rust.cargo_clippy" {
@@ -681,8 +961,44 @@ pub fn run(args: &[String]) -> ExitCode {
         "execution_budget":budget_record(parsed.timeout_ms, parsed.timeout_source),
         "next_actions":["inspect_native_recheck_and_policy_before_closure"]
     });
+    if matches!(
+        report["native_scan"]["report_type"].as_str(),
+        Some("checkstyle_task_recheck" | "checkstyle_preparation_recheck")
+    ) && report["native_scan"]["schema_version"] == "0.2.0"
+    {
+        report["schema_version"] = json!(if report["kind"] == "finding" {
+            "0.33.0"
+        } else {
+            "0.34.0"
+        });
+    }
+    if c_placeholder_task {
+        report["schema_version"] = json!("0.39.0");
+    }
+    if c_structure_task {
+        report["schema_version"] = json!("0.37.0");
+    }
+    if c_documentation_task {
+        report["schema_version"] = json!("0.36.0");
+    }
+    if gradle_cve_task {
+        report["schema_version"] = json!("0.35.0");
+    }
+    if gradle_javadoc_task {
+        report["schema_version"] = json!("0.30.0");
+    }
+    if maven_javadoc_task {
+        report["schema_version"] = json!("0.32.0");
+    }
+    if javadoc_task {
+        report["schema_version"] = json!("0.31.0");
+    }
+    if shell_task {
+        report["schema_version"] = json!("0.24.0");
+    }
     if syntax_task {
         report["schema_version"] = json!(match report["native_scan"]["schema_version"].as_str() {
+            Some("0.11.0") => "0.25.0",
             Some("0.10.0") => "0.23.0",
             Some("0.9.0") => "0.22.0",
             Some("0.8.0") => "0.19.0",
@@ -724,18 +1040,49 @@ pub fn run(args: &[String]) -> ExitCode {
     }
     let persist = if codeguard_runtime::sigint_cancellation_requested() {
         Err("request_cancelled")
-    } else if Instant::now() >= deadline {
+    } else if Instant::now() >= deadline
+        && !(c_placeholder_task
+            && scan["schema_version"] == "0.2.0"
+            && scan["placeholder_observation_status"] == "incomplete")
+    {
         Err("request_deadline_exceeded")
     } else {
         match lock_verification(&root, &parsed.task_id, &lease) {
             Ok(_guard) => match latest_ready_attempt(&root, &parsed.task_id) {
                 Ok(current) if current == bound_attempt => {
-                    if (python_confirmation
-                        && (!crate::python_confirmation_recheck::valid_binding(&root, &scan)
-                            || (scan["task_input_stable"] == true
-                                && !crate::python_confirmation_recheck::inputs_current(
+                    if (c_placeholder_task
+                        && (!crate::c_family_placeholder_task_recheck::valid_shape(&root, &scan)
+                            || (scan["input_stable"] == true
+                                && !crate::c_family_placeholder_task_recheck::inputs_current(
                                     &root, &scan,
                                 ))))
+                        || (c_structure_task
+                            && (!crate::c_family_structure_task_recheck::valid_shape(&root, &scan)
+                                || (scan["input_stable"] == true
+                                    && !crate::c_family_structure_task_recheck::inputs_current(
+                                        &root, &scan,
+                                    ))))
+                        || (c_documentation_task
+                            && (!crate::c_family_comments_task_recheck::valid_shape(&root, &scan)
+                                || (scan["input_stable"] == true
+                                    && !crate::c_family_comments_task_recheck::inputs_current(
+                                        &root, &scan,
+                                    ))))
+                        || (gradle_cve_task
+                            && (crate::gradle_cve_task_recheck::validate_binding(
+                                &root, &brief, &scan,
+                            )
+                            .is_err()
+                                || (scan["task_input_stable"] == true
+                                    && !crate::gradle_cve_task_recheck::inputs_current(
+                                        &root, &scan,
+                                    ))))
+                        || (python_confirmation
+                            && (!crate::python_confirmation_recheck::valid_binding(&root, &scan)
+                                || (scan["task_input_stable"] == true
+                                    && !crate::python_confirmation_recheck::inputs_current(
+                                        &root, &scan,
+                                    ))))
                         || (syntax_task
                             && scan["input_stable"] == true
                             && !crate::syntax_task_recheck::inputs_current(&root, &scan))
@@ -747,9 +1094,21 @@ pub fn run(args: &[String]) -> ExitCode {
                             && !crate::rust_cve_task_recheck::inputs_current(&root, &scan))
                         || (brief["checker_id"] == "python.pip_audit"
                             && !crate::python_cve_task_recheck::inputs_current(&root, &scan))
+                        || (shell_task
+                            && scan["input_stable"] == true
+                            && !crate::shell_task_recheck::inputs_current(&root, &scan))
                         || (brief["checker_id"] == "rust.cargo_rustdoc"
                             && scan["input_stable"] == true
                             && !crate::rustdoc_task_recheck::inputs_current(&root, &scan))
+                        || (gradle_javadoc_task
+                            && scan["task_input_stable"] == true
+                            && !crate::gradle_javadoc_task_recheck::inputs_current(&root, &scan))
+                        || (maven_javadoc_task
+                            && scan["task_input_stable"] == true
+                            && !crate::maven_javadoc_task_recheck::inputs_current(&root, &scan))
+                        || (javadoc_task
+                            && scan["task_input_stable"] == true
+                            && !crate::javadoc_task_recheck::inputs_current(&root, &scan))
                         || (brief["checker_id"] == "java.checkstyle.preparation"
                             && !crate::checkstyle_preparation_recheck::inputs_current(&scan))
                         || (brief["checker_id"] == "java.checkstyle"
@@ -775,7 +1134,12 @@ pub fn run(args: &[String]) -> ExitCode {
     if let Err(reason) = persist {
         if reason == "source_changed_before_verification_record" {
             report["observation"] = json!("incomplete");
-            report["native_scan"][if syntax_task {
+            report["native_scan"][if syntax_task
+                || shell_task
+                || c_documentation_task
+                || c_structure_task
+                || c_placeholder_task
+            {
                 "input_stable"
             } else {
                 "task_input_stable"
@@ -787,6 +1151,13 @@ pub fn run(args: &[String]) -> ExitCode {
     }
     if let Err(reason) = finish_verification(&root, &parsed.task_id, &lease) {
         report["reason"] = json!(reason);
+    }
+    if (c_documentation_task || c_structure_task || c_placeholder_task)
+        && codeguard_runtime::sigint_cancellation_requested()
+    {
+        report["command_status"] = json!("cancelled");
+        report["exit_code"] = json!(130);
+        report["reason"] = json!("request_cancelled");
     }
     if parsed.json {
         println!("{report}");
@@ -918,7 +1289,7 @@ pub fn run(args: &[String]) -> ExitCode {
             }
         }
     }
-    ExitCode::from(3)
+    ExitCode::from(if report["exit_code"] == 130 { 130 } else { 3 })
 }
 
 pub(crate) fn classify_doctor(brief: &Value, report: &Value) -> &'static str {
@@ -1491,14 +1862,19 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
     let mut erl_tool = None;
     let mut swift_tool = None;
     let mut ruby_tool = None;
+    let mut rustfmt_tool = None;
     let mut kotlinc_tool = None;
     let mut cargo_tool = None;
+    let mut shellcheck_tool = None;
+    let mut clang_tool = None;
     let mut cargo_audit_tool = None;
     let mut rustsec_db = None;
     let mut pip_audit_tool = None;
     let mut pip_audit_version = None;
     let mut go_tool = None;
     let mut maven_tool = None;
+    let mut gradle_bundle = None;
+    let mut gradle_module_cache = None;
     let mut java_home = None;
     let mut java_tool = None;
     let mut checkstyle_jar = None;
@@ -1531,15 +1907,20 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                 | "--zig-tool"
                 | "--erl-tool"
                 | "--swift-tool"
+                | "--rustfmt-tool"
                 | "--ruby-tool"
                 | "--kotlinc-tool"
                 | "--cargo-tool"
+                | "--clang-tool"
+                | "--shellcheck-tool"
                 | "--cargo-audit-tool"
                 | "--rustsec-db"
                 | "--pip-audit-tool"
                 | "--pip-audit-version"
                 | "--go-tool"
                 | "--maven-tool"
+                | "--gradle-bundle"
+                | "--gradle-module-cache"
                 | "--java-home"
                 | "--java-tool"
                 | "--checkstyle-jar"
@@ -1569,9 +1950,12 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                 "--zig-tool" if zig_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--erl-tool" if erl_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--swift-tool" if swift_tool.replace(PathBuf::from(value)).is_none() => {}
+                "--rustfmt-tool" if rustfmt_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--ruby-tool" if ruby_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--kotlinc-tool" if kotlinc_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--cargo-tool" if cargo_tool.replace(PathBuf::from(value)).is_none() => {}
+                "--clang-tool" if clang_tool.replace(PathBuf::from(value)).is_none() => {}
+                "--shellcheck-tool" if shellcheck_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--cargo-audit-tool"
                     if cargo_audit_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--rustsec-db" if rustsec_db.replace(PathBuf::from(value)).is_none() => {}
@@ -1579,6 +1963,9 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
                 "--pip-audit-version" if pip_audit_version.replace(value.clone()).is_none() => {}
                 "--go-tool" if go_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--maven-tool" if maven_tool.replace(PathBuf::from(value)).is_none() => {}
+                "--gradle-module-cache"
+                    if gradle_module_cache.replace(PathBuf::from(value)).is_none() => {}
+                "--gradle-bundle" if gradle_bundle.replace(PathBuf::from(value)).is_none() => {}
                 "--java-home" if java_home.replace(PathBuf::from(value)).is_none() => {}
                 "--java-tool" if java_tool.replace(PathBuf::from(value)).is_none() => {}
                 "--checkstyle-jar" if checkstyle_jar.replace(PathBuf::from(value)).is_none() => {}
@@ -1613,6 +2000,12 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
     {
         return Err("--kotlinc-tool 必须是绝对路径".into());
     }
+    if rustfmt_tool
+        .as_ref()
+        .is_some_and(|tool| !tool.is_absolute())
+    {
+        return Err("--rustfmt-tool 必须为绝对路径".into());
+    }
     if ruby_tool.as_ref().is_some_and(|tool| !tool.is_absolute()) {
         return Err("Ruby工具必须为绝对路径".into());
     }
@@ -1645,8 +2038,16 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
     {
         return Err("Python CVE 工具与版本必须成对提供，工具路径必须为绝对路径".into());
     }
+    if clang_tool.as_ref().is_some_and(|p| !p.is_absolute()) {
+        return Err("--clang-tool 必须是绝对路径".into());
+    }
+    if shellcheck_tool.as_ref().is_some_and(|p| !p.is_absolute()) {
+        return Err("--shellcheck-tool 必须是绝对路径".into());
+    }
     if [
         maven_tool.as_ref(),
+        gradle_bundle.as_ref(),
+        gradle_module_cache.as_ref(),
         java_home.as_ref(),
         java_tool.as_ref(),
         checkstyle_jar.as_ref(),
@@ -1700,14 +2101,19 @@ fn parse_args(args: &[String]) -> Result<Arguments, String> {
         erl_tool,
         swift_tool,
         ruby_tool,
+        rustfmt_tool,
         kotlinc_tool,
         cargo_tool,
+        shellcheck_tool,
+        clang_tool,
         cargo_audit_tool,
         rustsec_db,
         pip_audit_tool,
         pip_audit_version,
         go_tool,
         maven_tool,
+        gradle_bundle,
+        gradle_module_cache,
         java_home,
         java_tool,
         checkstyle_jar,

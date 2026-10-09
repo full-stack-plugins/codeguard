@@ -18,13 +18,16 @@ impl Drop for Project {
 }
 impl Project {
     fn new() -> (Self, String) {
+        Self::new_with_source("fun f(x: ) = x\n")
+    }
+    fn new_with_source(source: &str) -> (Self, String) {
         let root = std::env::temp_dir().canonicalize().unwrap().join(format!(
             "cg-kotlin-task-{}-{}",
             std::process::id(),
             NEXT.fetch_add(1, Ordering::Relaxed)
         ));
         fs::create_dir(&root).unwrap();
-        fs::write(root.join("App.kt"), "fun f(x: ) = x\n").unwrap();
+        fs::write(root.join("App.kt"), source).unwrap();
         let p = Self(root);
         let out = p
             .command()
@@ -281,5 +284,133 @@ fn mixed_kotlin_syntax_and_context_preserve_actionable_source_evidence() {
             .unwrap()
             .len(),
         1
+    );
+}
+
+#[test]
+fn same_source_native_zero_is_grammar_counterevidence_not_a_source_fix() {
+    let source = "object C { val value = 1 }\n";
+    let (p, id) = Project::new_with_source(source);
+    let tool = p.tool("exit 0");
+    let verified = p.verify(&id, Some(&tool));
+    assert_eq!(
+        verified["observation"],
+        "candidate_absent_unverified_policy"
+    );
+    let next = p.next();
+    let brief = &next["repair_brief"];
+    let step = brief["step"].as_str().unwrap();
+    assert!(
+        step.contains("同一源码") && step.contains("grammar反证候选"),
+        "{next}"
+    );
+    assert_eq!(brief["task_id"], id);
+    assert_eq!(brief["disposition"], "verification_required");
+    assert_eq!(fs::read_to_string(p.0.join("App.kt")).unwrap(), source);
+    assert_eq!(next["delivery_decision"], "not_evaluated");
+    fs::write(p.0.join("App.kt"), "class C {}\n").unwrap();
+    let stale = p.next();
+    assert!(
+        !stale["repair_brief"]["step"]
+            .as_str()
+            .unwrap()
+            .contains("grammar反证候选"),
+        "{stale}"
+    );
+    p.verify(&id, Some(&tool));
+    let changed = p.next();
+    assert!(
+        !changed["repair_brief"]["step"]
+            .as_str()
+            .unwrap()
+            .contains("grammar反证候选"),
+        "{changed}"
+    );
+}
+
+#[test]
+#[ignore = "需要显式已安装Kotlin/JVM2.4.10；只验证局部同字节反证，不批准关闭"]
+fn real_kotlin_same_source_counterevidence_preserves_legal_source_and_open_task() {
+    let tool = std::env::var_os("CODEGUARD_KOTLINC_BIN").expect("指定已安装的kotlinc绝对路径");
+    let tool = PathBuf::from(tool).canonicalize().unwrap();
+    let source = "object C { val value = 1 }\n";
+    let (p, id) = Project::new_with_source(source);
+    let mut command = p.command();
+    // 保留实际已安装JDK/bash的环境；首次Hook仍隔离PATH，固定WASM来源。
+    command.env("PATH", std::env::var_os("PATH").unwrap());
+    let out = command
+        .args(["task", "verify", &id])
+        .arg(&p.0)
+        .args(["--format=json", "--timeout", "90s", "--kotlinc-tool"])
+        .arg(&tool)
+        .output()
+        .unwrap();
+    assert_eq!(
+        out.status.code(),
+        Some(3),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let report = decode(&out);
+    assert_eq!(
+        report["observation"], "candidate_absent_unverified_policy",
+        "{report}"
+    );
+    assert_eq!(
+        report["native_scan"]["native"]["status"], "completed",
+        "{report}"
+    );
+    let next = p.next();
+    let step = next["repair_brief"]["step"].as_str().unwrap();
+    assert!(
+        step.contains("同一源码") && step.contains("grammar反证候选"),
+        "{next}"
+    );
+    assert_eq!(fs::read_to_string(p.0.join("App.kt")).unwrap(), source);
+    let fact: Value = serde_json::from_slice(
+        &fs::read(p.0.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(fact["state"], "open");
+    fs::write(
+        std::env::temp_dir().join("codeguard-kotlin-counterevidence-native-report.json"),
+        serde_json::to_vec_pretty(&json!({"verification":report,"next":next})).unwrap(),
+    )
+    .unwrap();
+}
+
+#[test]
+fn archived_real_counterevidence_binds_original_bytes_without_delivery_approval() {
+    use sha2::{Digest, Sha256};
+    let archive = codeguard_adapters::parse_unique_json(include_bytes!(
+        "../../../tests/acceptance/evidence/kotlin-same-source-counterevidence-2026-10-06.json"
+    ))
+    .unwrap();
+    let native = &archive["verification"]["native_scan"];
+    let source_sha = format!("{:x}", Sha256::digest(b"object C { val value = 1 }\n"));
+    assert_eq!(native["target"]["source_sha256"], source_sha);
+    assert_eq!(native["original_report"]["source_sha256"], source_sha);
+    assert_eq!(native["native"]["version"], "kotlinc-jvm 2.4.10");
+    assert_eq!(native["native"]["status"], "completed");
+    assert_eq!(native["native"]["tool_identity_scope"], "launcher_only");
+    assert_eq!(native["native"]["diagnostics"], json!([]));
+    assert_eq!(native["native"]["context_diagnostics"], json!([]));
+    assert_eq!(native["authority"], "local_unverified");
+    assert_eq!(native["coverage_proven"], false);
+    assert_eq!(native["delivery_decision"], "not_evaluated");
+    assert_eq!(archive["next"]["delivery_decision"], "not_evaluated");
+    assert_eq!(
+        archive["next"]["repair_brief"]["native_confirmation_ref"]["run_id"],
+        native["run_id"]
+    );
+    assert_eq!(
+        archive["next"]["repair_brief"]["task_id"],
+        native["task_id"]
+    );
+    assert!(
+        archive["next"]["repair_brief"]["step"]
+            .as_str()
+            .unwrap()
+            .contains("grammar反证候选")
     );
 }

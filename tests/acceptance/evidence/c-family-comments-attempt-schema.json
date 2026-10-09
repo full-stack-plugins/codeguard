@@ -1,0 +1,16 @@
+{
+  "qualification": "not_granted",
+  "evidence_kind": "development_schema_regression",
+  "schemas_valid": 488,
+  "historical_schemas_unchanged": 485,
+  "reports_valid": {
+    "c_family_comments_feedback": 118,
+    "repair_brief_preview": 100,
+    "clang_documentation_workbench_observation": 148,
+    "clang_documentation_task_recheck": 31,
+    "task_verification_preview": 31,
+    "task_show_preview": 12
+  },
+  "negative_cases_rejected": 22,
+  "old_consumer_rejects_new_version": true
+}

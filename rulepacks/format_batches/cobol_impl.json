@@ -1,0 +1,43 @@
+{
+  "schema_version": "0.1.0",
+  "batch": "cobol_impl",
+  "languages": [
+    {
+      "language": "cobol",
+      "status": "integrated",
+      "formatter": "sh",
+      "tool_key": "sh",
+      "check_argv": [
+        "-c",
+        "#!/bin/sh\n# COBOL 固定格式排版只读检查（GnuCOBOL cobc 方言双探针）\n#\n# COBOL-85 固定格式规定源码必须位于第 7-72 列（1-6 列为序号区），\n# 越界或缩进错乱即违反排版约定；但 GnuCOBOL 对「列区违规」与「语法错误」\n# 一律返回退出码 1，无法直接区分——若不区分，损坏的 COBOL 会被误报为\n# 「需要重排」，而真正需要重排的文件又会被当成工具故障。\n#\n# 解法：分别以自由格式（-free，无列区限制）与固定格式（-fixed，有列区约束）\n# 各编译一次：\n#   两者皆过        → 0 排版合规\n#   free 过/fixed 挂 → 1 列区/固定格式排版违规（真正的格式问题）\n#   两者皆挂        → 2 语法错误，不属格式范畴，降级为未完成\n# 仅做语法与列区判定，不改写源码。\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\nCOBC=\"${CODEGUARD_COBOL_CC:-cobc}\"\ncommand -v \"$COBC\" >/dev/null 2>&1 || exit 2\n\"$COBC\" -fsyntax-only -free  \"$f\" >/dev/null 2>&1; fr=$?\n\"$COBC\" -fsyntax-only -fixed \"$f\" >/dev/null 2>&1; fx=$?\nif [ \"$fr\" -eq 0 ] && [ \"$fx\" -eq 0 ]; then exit 0; fi\nif [ \"$fr\" -eq 0 ] && [ \"$fx\" -ne 0 ]; then exit 1; fi\nexit 2\n",
+        "codeguard",
+        "{file}"
+      ],
+      "apply_argv": [
+        "-c",
+        "#!/bin/sh\n# COBOL 固定格式自动重排。\n#\n# GnuCOBOL 不提供源码重排能力，且 COBOL 固定格式的列区约定涉及序号区\n# （第 1-6 列）与代码区（第 7-72 列）的重新分配，任何自动重写都存在\n# 改坏语义的风险（序号区被业务代码占用时尤甚）。\n# 因此 apply 模式**如实拒绝自动修复**并给出可执行指引，而不是冒险改写源码。\n# 排版修正需由人工按 COBOL-85 列区约定完成，或改用自由格式（COBOL-2002）\n# 从根本上免除列区约束。\nf=\"$1\"\n[ -f \"$f\" ] || exit 2\necho \"COBOL 固定格式无安全的自动重排方案：请人工按第 7-72 列代码区约定修正，或改用 -free 自由格式\" >&2\nexit 2\n",
+        "codeguard",
+        "{file}"
+      ],
+      "config_markers": [
+        "cobc.options"
+      ],
+      "extensions": [
+        ".cbl",
+        ".cob",
+        ".cpy",
+        ".ccp",
+        ".cobol"
+      ],
+      "dialects": {
+        "fixed_format": "COBOL-85",
+        "free_format": "COBOL-2002"
+      },
+      "unformatted_exit_codes": [
+        1
+      ],
+      "notes": "COBOL 无任何可用的开源/CLI 格式化器（穷尽检索：npm cobol-formatter/cobolfmt/cobol-pretty-print 均无结果；PyPI cobol-formatter/cobolfmt 404；Maven Central 17 个 COBOL artifact 全为 parser 或分析器（cobol2j/cobrix/emf.cobol）无格式化能力；GitHub 无带 release 的 COBOL formatter；商业方案 COBClean/IBM Z Open Editor 为 Windows GUI 或商业产品）。本条目改用 **GnuCOBOL 编译器（cobc）作为排版规则执行器**——这是 COBOL 生态中唯一能对源码给出确定性判定的 CLI 工具，且 COBOL-85 固定格式的列区约定（源码必须位于第 7-72 列，1-6 列为序号区）本身就是排版规范，由编译器强制执行比自建格式化器更可信。**方言双探针解决退出码歧义**：cobc 对「列区违规」与「语法错误」一律退 1，直接使用会把损坏 COBOL 误报为「需重排」；因此分别以 -free（无列区约束）与 -fixed（有列区约束）各编译一次：两者皆过→0 合规；free 过而 fixed 挂→1 列区排版违规；两者皆挂→2 语法错误，降级为未完成而不误判为格式问题。实测三态正确。检查全程只读（-fsyntax-only 不产出目标文件）。**apply 模式如实拒绝自动修复**：cobc 不提供源码重排，而 COBOL 固定格式的列区重分配涉及序号区与代码区边界，自动改写存在改坏语义的风险，因此返回退出 2 并给出人工修正或改用自由格式的指引，不冒险改写源码。限制：只判定列区与语法，不检查缩进宽度、大小写风格、行长上限等 cobc 不强制的风格项；自由格式（COBOL-2002）文件因不受列区约束，恒判为合规。",
+      "unparsable_detection": "none"
+    }
+  ]
+}

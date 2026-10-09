@@ -119,15 +119,147 @@ pub(crate) fn observe(
         crate::native_syntax_confirmation::connect(root, &mut ruby_lint, deadline);
         crate::check_ruby_scan::refresh(root, &mut ruby_lint, deadline);
     }
+    let shell_extensions = codeguard_adapters::legacy_registry()
+        .ok()
+        .and_then(|r| r.languages.into_iter().find(|l| l.id == "shell"))
+        .map(|l| l.extensions)
+        .unwrap_or_default();
+    let shell_paths = selected
+        .iter()
+        .filter(|p| shell_extensions.iter().any(|e| p.ends_with(e)))
+        .cloned()
+        .collect::<BTreeSet<_>>();
+    let mut shell_lint = if shell_paths.is_empty() {
+        Value::Null
+    } else {
+        crate::check_shell_scan::observe(
+            root,
+            &shell_paths,
+            tools.shellcheck.map(Path::to_path_buf),
+            None,
+            deadline,
+            &cancelled,
+        )
+    };
+    if shell_lint.is_object() {
+        crate::check_shell_scan::connect(root, &mut shell_lint, deadline);
+        crate::check_shell_scan::refresh(root, &mut shell_lint, deadline);
+    }
+    let go_paths = selected
+        .iter()
+        .filter(|p| p.ends_with(".go"))
+        .cloned()
+        .collect::<BTreeSet<_>>();
+    let mut go_syntax = if go_paths.is_empty() {
+        Value::Null
+    } else {
+        crate::check_go_syntax_scan::observe(
+            root,
+            &go_paths,
+            tools.go.map(Path::to_path_buf),
+            deadline,
+            &cancelled,
+        )
+    };
+    if go_syntax.is_object() {
+        crate::native_syntax_confirmation::connect(root, &mut go_syntax, deadline);
+        crate::check_go_syntax_scan::refresh(root, &mut go_syntax, deadline);
+    }
+    let rust_paths = selected
+        .iter()
+        .filter(|p| p.ends_with(".rs"))
+        .cloned()
+        .collect::<BTreeSet<_>>();
+    let mut rust_syntax = if rust_paths.is_empty() {
+        Value::Null
+    } else {
+        crate::check_rust_syntax_scan::observe(
+            root,
+            &rust_paths,
+            tools.rustfmt.map(Path::to_path_buf),
+            deadline,
+            &cancelled,
+        )
+    };
+    if rust_syntax.is_object() {
+        crate::native_syntax_confirmation::connect(root, &mut rust_syntax, deadline);
+    }
+    let erlang_paths = selected
+        .iter()
+        .filter(|p| p.ends_with(".erl") || p.ends_with(".hrl"))
+        .cloned()
+        .collect::<BTreeSet<_>>();
+    let mut erlang_lint = if erlang_paths.is_empty() {
+        Value::Null
+    } else {
+        crate::check_erlang_scan::observe(
+            root,
+            &erlang_paths,
+            tools.erl.map(Path::to_path_buf),
+            deadline,
+            &cancelled,
+        )
+    };
+    if erlang_lint.is_object() {
+        crate::check_erlang_scan::refresh(root, &mut erlang_lint, deadline);
+        // 缺工具先由候选分流是否需要确认；选择过工具的失败必须保留原生环境任务。
+        if !cfg!(feature = "wasm-precheck")
+            || erlang_lint["tool_selection"]["source"] != "not_found"
+        {
+            crate::native_syntax_confirmation::connect(root, &mut erlang_lint, deadline);
+            crate::check_erlang_scan::refresh(root, &mut erlang_lint, deadline);
+        }
+    }
+    let mut c_documentation = Value::Null;
+    let mut cpp_documentation = Value::Null;
+    for (language, standard, report) in [
+        ("c", tools.c_standard, &mut c_documentation),
+        ("cpp", tools.cpp_standard, &mut cpp_documentation),
+    ] {
+        let paths = selected
+            .iter()
+            .filter(|p| {
+                if language == "c" {
+                    p.ends_with(".c")
+                } else {
+                    p.ends_with(".cpp") || p.ends_with(".cc") || p.ends_with(".cxx")
+                }
+            })
+            .cloned()
+            .collect::<BTreeSet<_>>();
+        if !paths.is_empty() {
+            *report = crate::check_c_family_comments::observe(
+                root,
+                language,
+                &paths,
+                tools.clang,
+                standard,
+                deadline,
+                &cancelled,
+            );
+            crate::check_c_family_comments::connect(root, report, deadline);
+        }
+    }
+    // 所选原生入口故障不能以WASM掩盖；确实缺入口才允许候选初检。
+    #[cfg(feature = "wasm-precheck")]
+    let syntax_selected = selected
+        .iter()
+        .filter(|p| !p.ends_with(".rs") || rust_syntax["tool_selection"]["source"] == "not_found")
+        .filter(|p| {
+            !(p.ends_with(".erl") || p.ends_with(".hrl"))
+                || erlang_lint["tool_selection"]["source"] == "not_found"
+        })
+        .cloned()
+        .collect::<BTreeSet<_>>();
     #[cfg(feature = "wasm-precheck")]
     let syntax = crate::check_syntax_candidates::observe_selected(
         root,
-        &selected,
+        &syntax_selected,
         crate::check_syntax_candidates::NativeCoverage {
             node_lint: &node_lint,
             python_lint: &python_lint,
-            go_lint: &Value::Null,
-            erlang_lint: &Value::Null,
+            go_lint: &go_syntax,
+            erlang_lint: &erlang_lint,
             kotlin_lint: &kotlin_lint,
             swift_lint: &swift_lint,
             ruby_lint: &ruby_lint,
@@ -151,10 +283,21 @@ pub(crate) fn observe(
     if ruby_lint.is_object() {
         crate::check_ruby_scan::refresh(root, &mut ruby_lint, deadline);
     }
+    if shell_lint.is_object() {
+        crate::check_shell_scan::refresh(root, &mut shell_lint, deadline);
+    }
+    if go_syntax.is_object() {
+        crate::check_go_syntax_scan::refresh(root, &mut go_syntax, deadline);
+    }
     let native_unwired: Vec<&String> = selected
         .iter()
         .filter(|p| {
-            !p.ends_with(".rb")
+            !p.ends_with(".rs")
+                && !p.ends_with(".go")
+                && !p.ends_with(".erl")
+                && !p.ends_with(".hrl")
+                && !shell_paths.contains(*p)
+                && !p.ends_with(".rb")
                 && !p.ends_with(".zig")
                 && !p.ends_with(".py")
                 && !p.ends_with(".kt")
@@ -184,7 +327,23 @@ pub(crate) fn observe(
             })
         }) {
         "require_native_lint_confirmation"
-    } else if [&swift_lint, &zig_lint, &ruby_lint].iter().any(|report| {
+    } else if shell_lint["files"].as_array().is_some_and(|files| {
+        files.iter().any(|f| {
+            f["input_stable"] == true
+                && f["native"]["diagnostics"]
+                    .as_array()
+                    .is_some_and(|d| !d.is_empty())
+        })
+    }) || [
+        &rust_syntax,
+        &go_syntax,
+        &swift_lint,
+        &zig_lint,
+        &ruby_lint,
+        &erlang_lint,
+    ]
+    .iter()
+    .any(|report| {
         report["files"].as_array().is_some_and(|files| {
             files.iter().any(|f| {
                 f["current"] == true
@@ -209,18 +368,32 @@ pub(crate) fn observe(
     } else {
         "review_native_results_and_resolve_incomplete_checks"
     };
+    let cfquery = syntax["observations"]
+        .as_array()
+        .is_some_and(|rows| rows.iter().any(|r| r["language"] == "cfquery"));
     let mut feedback = json!({
-        "schema_version":if ruby_lint.is_object(){"0.10.0"}else if structures > 0 && syntax["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.9.0"} else if structures > 0 {"0.8.0"} else if zig_lint["schema_version"] == "0.2.0" {"0.7.0"}else if zig_lint.is_object(){"0.6.0"}else if swift_lint["schema_version"] == "0.2.0" {"0.5.0"} else if swift_lint.is_object(){"0.4.0"}else if kotlin_lint.is_object(){"0.3.0"}else{"0.2.0"},"report_type":"hook_fast_feedback",
+        "schema_version":if syntax["observations"].as_array().is_some_and(|rows| rows.iter().any(|row|row.get("javascript_mode_observation").is_some())) {"0.17.0"}else if erlang_lint.is_object() || syntax["observations"].as_array().is_some_and(|rows| rows.iter().any(|row|row["language"]=="erlang" && row.get("structural_observations").is_some())) {"0.16.0"}else if syntax["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"]=="javascript" && row.get("structural_observations").is_some())) {"0.15.0"}else if rust_syntax.is_object(){"0.14.0"}else if cfquery {"0.13.0"}else if go_syntax.is_object(){"0.12.0"}else if shell_lint.is_object(){"0.11.0"}else if ruby_lint.is_object(){"0.10.0"}else if structures > 0 && syntax["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.9.0"} else if cfquery || structures > 0 {"0.8.0"} else if zig_lint["schema_version"] == "0.2.0" {"0.7.0"}else if zig_lint.is_object(){"0.6.0"}else if swift_lint["schema_version"] == "0.2.0" {"0.5.0"} else if swift_lint.is_object(){"0.4.0"}else if kotlin_lint.is_object(){"0.3.0"}else{"0.2.0"},"report_type":"hook_fast_feedback",
         "scan_scope":"selected_files","requested_paths":requested,
         "python_lint":python_lint,"node_lint":node_lint,"syntax_candidates":syntax,"syntax_tasks":syntax_tasks,
         "unavailable_files":unavailable,"native_unwired_files":native_unwired,
         "candidate_recovery_count":recoveries,"next_action":next_action,
         "delivery_decision":"not_evaluated","coverage_proven":false
     });
-    if structures > 0 {
+    if feedback["schema_version"] == "0.17.0"
+        || rust_syntax.is_object()
+        || cfquery
+        || structures > 0
+    {
         feedback["candidate_structure_count"] = json!(structures);
     }
-    if ruby_lint.is_object()
+    if matches!(
+        feedback["schema_version"].as_str(),
+        Some("0.16.0" | "0.17.0")
+    ) || rust_syntax.is_object()
+        || cfquery
+        || go_syntax.is_object()
+        || shell_lint.is_object()
+        || ruby_lint.is_object()
         || structures > 0
         || kotlin_lint.is_object()
         || swift_lint.is_object()
@@ -228,14 +401,89 @@ pub(crate) fn observe(
     {
         feedback["kotlin_lint"] = kotlin_lint;
     }
-    if ruby_lint.is_object() || structures > 0 || swift_lint.is_object() || zig_lint.is_object() {
+    if matches!(
+        feedback["schema_version"].as_str(),
+        Some("0.16.0" | "0.17.0")
+    ) || rust_syntax.is_object()
+        || cfquery
+        || go_syntax.is_object()
+        || shell_lint.is_object()
+        || ruby_lint.is_object()
+        || structures > 0
+        || swift_lint.is_object()
+        || zig_lint.is_object()
+    {
         feedback["swift_lint"] = swift_lint;
     }
-    if ruby_lint.is_object() || structures > 0 || zig_lint.is_object() {
+    if matches!(
+        feedback["schema_version"].as_str(),
+        Some("0.16.0" | "0.17.0")
+    ) || rust_syntax.is_object()
+        || cfquery
+        || go_syntax.is_object()
+        || shell_lint.is_object()
+        || ruby_lint.is_object()
+        || structures > 0
+        || zig_lint.is_object()
+    {
         feedback["zig_lint"] = zig_lint;
     }
-    if ruby_lint.is_object() {
+    if matches!(
+        feedback["schema_version"].as_str(),
+        Some("0.15.0" | "0.16.0" | "0.17.0")
+    ) || rust_syntax.is_object()
+        || cfquery
+        || go_syntax.is_object()
+        || shell_lint.is_object()
+        || ruby_lint.is_object()
+    {
         feedback["ruby_lint"] = ruby_lint;
+    }
+    if matches!(
+        feedback["schema_version"].as_str(),
+        Some("0.15.0" | "0.16.0" | "0.17.0")
+    ) || rust_syntax.is_object()
+        || cfquery
+        || go_syntax.is_object()
+        || shell_lint.is_object()
+    {
+        feedback["shell_lint"] = shell_lint;
+    }
+    if matches!(
+        feedback["schema_version"].as_str(),
+        Some("0.15.0" | "0.16.0" | "0.17.0")
+    ) || rust_syntax.is_object()
+        || cfquery
+        || go_syntax.is_object()
+    {
+        feedback["go_syntax"] = go_syntax;
+    }
+    if matches!(
+        feedback["schema_version"].as_str(),
+        Some("0.15.0" | "0.16.0" | "0.17.0")
+    ) || rust_syntax.is_object()
+    {
+        feedback["rust_syntax"] = rust_syntax;
+    }
+    if matches!(
+        feedback["schema_version"].as_str(),
+        Some("0.16.0" | "0.17.0")
+    ) {
+        feedback["erlang_lint"] = erlang_lint;
+    }
+    if c_documentation.is_object() || cpp_documentation.is_object() {
+        for report in [&mut c_documentation, &mut cpp_documentation] {
+            if report.is_object() {
+                crate::check_c_family_comments::refresh(root, report, deadline);
+            }
+        }
+        feedback["schema_version"] = json!("0.18.0");
+        feedback["c_family_documentation"] =
+            json!({"scope":"selected_files","c":c_documentation,"cpp":cpp_documentation});
+        // 文档检查不消除原生语法缺口；统一后续动作仍要求处理未完成检查。
+        if feedback["next_action"] != "require_native_lint_confirmation" {
+            feedback["next_action"] = json!("review_native_results_and_resolve_incomplete_checks");
+        }
     }
     feedback
 }

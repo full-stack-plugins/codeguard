@@ -151,3 +151,29 @@ check ruby/all新增--ruby-tool并复用固定版本有界语法扫描；64文�
 已补齐Ruby编辑Hook的实际未接线缺口，复用限定原生扫描/稳定任务，支持--ruby-tool及绝对PATH，repair_ready保留当前行号及真实报告引用。对话不猜列号或回显工具消息；原生失败不换WASM，零诊断不自闭任务。8份实际CLI报告与封闭协议回归通过；最终安装和受影响回归见[验收](../../../tests/acceptance/ruby-native-hook.md)。真实宿主触发和公开发行不以形状重放计完成。
 
 Ruby Hook本批终态：默认完整1404通过/0失败/125忽略，WASM受影响85通过/0失败/4忽略；默认/WASM严格Clippy、fmt、分层、OpenSpec strict通过。离线npm安装链路1通过、8份实际Hook报告及9份结构化安装报告协议回归通过。前一aaa3879的Linux CI 37324440688全成功，此前Go失败未复现但根因未确认；本批远端结果须独立核验。详见tests/acceptance/ruby-native-hook.md，不勾选完整语言、真实宿主或发行父任务。
+
+
+## 2026-10-06 Ruby 原工具限定关闭与复发（源码 SDK）
+
+Ruby原生/WASM首次稳定任务已接入共享宿主服务，保留原报告、工具与grammar身份及版本声明变化；本机Ruby2.6.10p210确认修复、幂等与复发，默认构建支持原生首次链路。普通task verify仍不从项目历史取得关闭批准。真实宿主政策提供者、完整RuboCop/语言规则与发行资格未完成。见[验收](../../../tests/acceptance/ruby-task-resolution.md)。
+
+## 2026-10-06 最新源码迁移审计完成
+
+1.1的最新源码与57语言差异核对已实际验收，证据见[完整源码审计](../../../tests/acceptance/legacy-source-migration-audit.md)。仅关闭该审计任务，原生适配、真实宿主、WASM资格和交付门禁仍开放。7fec0c9完整默认测试1516通过/0失败/135条件忽略；新增源码审计2项单独通过。
+
+## 2026-10-06 原任务复检、协议与语言入口更新
+
+Maven Javadoc多文件工作台及原任务task verify已接通稳定任务、扫描前/保存前输入复核、首次构建根/POM/Maven/JDK/离线仓库身份、原租约与尝试历史；局部零诊断不关闭，配置或源集变化需覆盖复核。P3C未确认配置准备简报已新增封闭聚合0.58，完整实际报告与拒绝反例通过。公共检查/plan入口已支持九项明确语言别名，不改写路径/grammar身份。详见 [Maven复检](../../../tests/acceptance/maven-javadoc-task-recheck.md)、[P3C协议](../../../tests/acceptance/p3c-preparation-aggregate-schema.md)、[语言别名](../../../tests/acceptance/language-alias-cli.md)。
+
+Java21增量原生差分及隐藏恢复分类已补齐：本轮作者样本不作为独立holdout，32份grammar全部仍是候选，released_count=0。来源与版本证据见 [Java21验收](../../../tests/acceptance/java21-native-differential.md)。公开发行、独立精度、完整语言/项目模型、可信关闭及真实宿主分别验收，完整目标仍未完成。2026-09-28表是历史切片，不用旧“别名未实现”等描述覆盖后续证据。
+
+当前远端提交4445f06的CI37423582241：MSRV成功，gate在Check out corpus evidence source阶段失败，因锁定的插件提交dec5f9d远端不可达，未运行后续门禁；不称为CI通过。不能为消除失败修改语料锁或撤去检查。
+
+
+独立JDK详细文档增量（2026-10-06）：五类原生描述消息由新版解析器进入文件/配置项目观察、稳定任务及原工具复检。当前原生0.2、项目0.4、工作台/复检0.3、comments0.7/0.8、brief0.4、任务预览0.31、check0.68/aborted0.19；旧协议不改写，Maven仍独立。实际两种模式各4/3/1/0诊断、16任务逐项存在及修复后消失仍open。详见 tests/acceptance/jdk-javadoc-detailed-descriptions.md；15.3/15.6父任务、可信关闭和逐语言生产验收不据此完成。
+
+Maven详细描述增量（2026-10-06）：原POM多文件原生消息进入稳定任务、详细指引及原任务复检，五类规则由独立新协议承载。相同文件/规则的新锚点要求复核；首次证据为包裹报告的新任务据消费收据复检。受控输出来回归全部五类，不冒充原插件验收；实际已有Maven空离线库的检查/环境复检两次均缺Javadoc插件，仅生成阻塞。真实插件详细描述条件测试待缓存完成，15.3/15.6和四核心生产资格继续未完成。见 tests/acceptance/maven-javadoc-detailed-descriptions.md。
+
+Checkstyle详细描述源码增量（2026-10-06）：原10.21.4配置的JavadocStyle、NonEmptyAtclauseDescription、SummaryJavadoc以独立反馈/工作台/复检/简报协议进入稳定任务和原工具复检；历史规则与schema保留。受控XML进程验证三类及准备恢复新任务，不冒充真实工具语义；JAR缺失，原生条件验收待执行。聚合实际0.58的Javadoc未配置原因码修复，选中详细Checkstyle的0.70仅构造协议验证。15.3/15.6、可信关闭和全部四核心资格不据此完成，见tests/acceptance/checkstyle-detailed-descriptions.md。
+
+Ruff 0.16.8 DOC 七规则进入注释分类及原工具任务复检；真实原生和抑制/豁免边界见 tests/acceptance/ruff-documentation-contract.md。DOC502只允许调查实际隐式异常约定，不能自动删文档；完整Python文档及生产资格仍未验收，历史schema/受批准规则映射不扩大。

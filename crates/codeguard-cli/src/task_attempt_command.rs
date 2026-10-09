@@ -296,11 +296,42 @@ pub(crate) fn attempt_history(root: &Path, id: &str, brief: &Value) -> Result<Va
             "observed_change":finish.map(|value| value.observed_change)})
         })
         .collect();
-    Ok(json!({"attempt_count":history.attempt_count,
+    let mut result = json!({"attempt_count":history.attempt_count,
         "no_progress_count":history.no_progress_count,
         "open_attempt_id":ledger.open_attempt().map(|start| start.attempt_id.as_str()),
         "awaiting_verification":awaiting_verification(&ledger, &rechecks, &input),
-        "budget":NO_PROGRESS_BUDGET, "recent":recent}))
+        "budget":NO_PROGRESS_BUDGET, "recent":recent});
+    if matches!(
+        brief["checker_id"].as_str(),
+        Some(
+            "c.clang.documentation"
+                | "cpp.clang.documentation"
+                | "c.clang.documentation_structure"
+                | "cpp.clang.documentation_structure"
+                | "c.clang.documentation_placeholder"
+                | "cpp.clang.documentation_placeholder"
+        )
+    ) {
+        let latest = ledger
+            .starts
+            .values()
+            .max_by_key(|s| s.sequence)
+            .map(|s| s.attempt_id.as_str());
+        result["unverified_prior_attempt_count"] = json!(
+            ledger
+                .starts
+                .values()
+                .filter(|s| Some(s.attempt_id.as_str()) != latest
+                    && s.before_sha256 == input
+                    && ledger
+                        .finishes
+                        .get(&s.attempt_id)
+                        .is_some_and(|f| f.outcome == "ready-to-verify" && f.after_sha256 == input)
+                    && !rechecks.contains_key(&s.attempt_id))
+                .count()
+        );
+    }
+    Ok(result)
 }
 
 struct History {
@@ -430,17 +461,24 @@ fn verified_rechecks(
         else {
             continue;
         };
-        let nanos = if run_id.starts_with("rust-cve-") || run_id.starts_with("python-cve-") {
+        let nanos = if let Some(value) = run_id.strip_prefix("shellcheck-") {
+            value.split('-').next().and_then(|s| s.parse::<u128>().ok())
+        } else if run_id.starts_with("rust-cve-") || run_id.starts_with("python-cve-") {
             run_id
                 .rsplit('-')
                 .nth(1)
                 .and_then(|s| s.parse::<u128>().ok())
         } else if run_id.starts_with("syntax-native-")
+            || run_id.starts_with("cve-gradle-task-")
             || run_id.starts_with("checkstyle-")
+            || run_id.starts_with("javadoc-")
             || run_id.starts_with("eslint-")
             || run_id.starts_with("npm-")
             || run_id.starts_with("rustdoc-")
             || run_id.starts_with("cargo-build-")
+            || run_id.starts_with("clangdoc-")
+            || run_id.starts_with("clangdocstruct-")
+            || run_id.starts_with("clangdocplaceholder-")
         {
             run_id
                 .rsplit('-')
@@ -465,8 +503,8 @@ fn verified_rechecks(
         }
         .ok_or("verification_event_invalid")?;
         let bytes = bounded_regular(&entry.path(), MAX_EVENT_BYTES)?;
-        let event: Value =
-            serde_json::from_slice(&bytes).map_err(|_| "verification_event_invalid")?;
+        let event: Value = codeguard_adapters::parse_unique_json(&bytes)
+            .map_err(|_| "verification_event_invalid")?;
         if event["schema_version"] != "0.3.0" {
             continue;
         }
@@ -506,8 +544,8 @@ fn verified_rechecks(
             }
             Err(reason) => return Err(reason),
         };
-        let report: Value =
-            serde_json::from_slice(&report_bytes).map_err(|_| "verification_event_invalid")?;
+        let report: Value = codeguard_adapters::parse_unique_json(&report_bytes)
+            .map_err(|_| "verification_event_invalid")?;
         if brief["checker_id"] == "node.npm.audit" {
             codeguard_adapters::parse_unique_json(&report_bytes)
                 .map_err(|_| "verification_event_invalid")?;
@@ -539,7 +577,124 @@ fn verified_rechecks(
         {
             continue;
         }
-        let report_matches = if brief["checker_id"] == "syntax.native_confirmation" {
+        if brief["checker_id"] == "java.gradle.dependency_check"
+            && report["task_input_stable"] == true
+            && event["report_sha256"] == digest(&report_bytes)
+            && !crate::gradle_cve_task_recheck::inputs_current(root, &report)
+        {
+            continue;
+        }
+        if brief["checker_id"] == "java.gradle.javadoc"
+            && report["task_input_stable"] == true
+            && event["report_sha256"] == digest(&report_bytes)
+            && !crate::gradle_javadoc_task_recheck::inputs_current(root, &report)
+        {
+            continue;
+        }
+        if brief["checker_id"] == "java.maven.javadoc"
+            && report["task_input_stable"] == true
+            && event["report_sha256"] == digest(&report_bytes)
+            && !crate::maven_javadoc_task_recheck::inputs_current(root, &report)
+        {
+            continue;
+        }
+        if brief["checker_id"] == "java.jdk.javadoc"
+            && report["task_input_stable"] == true
+            && event["report_sha256"] == digest(&report_bytes)
+            && !crate::javadoc_task_recheck::inputs_current(root, &report)
+        {
+            continue;
+        }
+        let c_documentation = matches!(
+            brief["checker_id"].as_str(),
+            Some("c.clang.documentation" | "cpp.clang.documentation")
+        );
+        if c_documentation {
+            if event["report_sha256"] != digest(&report_bytes)
+                || !crate::c_family_comments_task_recheck::valid_shape(root, &report)
+                || report["task_id"] != id
+            {
+                return Err("verification_event_invalid");
+            }
+            if report["input_stable"] != true
+                || !crate::c_family_comments_task_recheck::inputs_current(root, &report)
+                || finish.after_sha256 != input_digest(root, brief)?
+            {
+                continue;
+            }
+        }
+        let c_structure = matches!(
+            brief["checker_id"].as_str(),
+            Some("c.clang.documentation_structure" | "cpp.clang.documentation_structure")
+        );
+        if c_structure {
+            let marker_path = root.join(format!(".codeguard/state/consumed/{run_id}.json"));
+            let marker = match bounded_regular(&marker_path, 4096) {
+                Ok(b) => b,
+                Err("verification_evidence_unavailable") if !marker_path.exists() => continue,
+                Err(_) => return Err("verification_event_invalid"),
+            };
+            let expected=serde_json::to_vec_pretty(&json!({"schema_version":"0.1.0","workspace_id":report["workspace_id"],"run_id":run_id,"report_sha256":digest(&report_bytes)})).map_err(|_|"verification_event_invalid")?;
+            if marker != expected {
+                return Err("verification_event_invalid");
+            }
+            if event["report_sha256"] != digest(&report_bytes)
+                || !crate::c_family_structure_task_recheck::valid_shape(root, &report)
+                || report["task_id"] != id
+            {
+                return Err("verification_event_invalid");
+            }
+            if report["input_stable"] != true
+                || !crate::c_family_structure_task_recheck::inputs_current(root, &report)
+                || finish.after_sha256 != input_digest(root, brief)?
+            {
+                continue;
+            }
+        }
+        let c_placeholder = matches!(
+            brief["checker_id"].as_str(),
+            Some("c.clang.documentation_placeholder" | "cpp.clang.documentation_placeholder")
+        );
+        if c_placeholder {
+            let marker_path = root.join(format!(".codeguard/state/consumed/{run_id}.json"));
+            let marker = match bounded_regular(&marker_path, 4096) {
+                Ok(b) => b,
+                Err("verification_evidence_unavailable") if !marker_path.exists() => continue,
+                Err(_) => return Err("verification_event_invalid"),
+            };
+            let expected=serde_json::to_vec_pretty(&json!({"schema_version":"0.1.0","workspace_id":report["workspace_id"],"run_id":run_id,"report_sha256":digest(&report_bytes)})).map_err(|_|"verification_event_invalid")?;
+            if marker != expected {
+                return Err("verification_event_invalid");
+            }
+            if event["report_sha256"] != digest(&report_bytes)
+                || !crate::c_family_placeholder_task_recheck::valid_shape(root, &report)
+                || report["task_id"] != id
+            {
+                return Err("verification_event_invalid");
+            }
+            if report["input_stable"] != true
+                || !crate::c_family_placeholder_task_recheck::inputs_current(root, &report)
+                || finish.after_sha256 != input_digest(root, brief)?
+            {
+                continue;
+            }
+        }
+        let report_matches = if c_placeholder {
+            crate::c_family_placeholder_task_recheck::valid_shape(root, &report)
+                && event["observation"]
+                    == crate::c_family_placeholder_task_recheck::classify(brief, &report)
+        } else if c_structure {
+            crate::c_family_structure_task_recheck::valid_shape(root, &report)
+                && event["observation"]
+                    == crate::c_family_structure_task_recheck::classify(brief, &report)
+        } else if c_documentation {
+            crate::c_family_comments_task_recheck::valid_shape(root, &report)
+                && event["observation"]
+                    == crate::c_family_comments_task_recheck::classify(brief, &report)
+        } else if brief["checker_id"] == "java.gradle.dependency_check" {
+            crate::gradle_cve_task_recheck::validate_binding(root, brief, &report).is_ok()
+                && event["observation"] == crate::gradle_cve_task_recheck::classify(brief, &report)
+        } else if brief["checker_id"] == "syntax.native_confirmation" {
             crate::syntax_task_recheck::valid_shape(root, &report)
                 && event["observation"] == crate::syntax_task_recheck::classify(&report)
         } else if brief["checker_id"] == "python.ruff.doctor" {
@@ -562,6 +717,17 @@ fn verified_rechecks(
                 )
                 && report["checker_id"] == "go.vet"
                 && event["observation"] == classify_go(brief, &report)
+        } else if brief["checker_id"] == "java.gradle.javadoc" {
+            crate::gradle_javadoc_task_recheck::valid_shape(&report)
+                && event["observation"]
+                    == crate::gradle_javadoc_task_recheck::classify(brief, &report)
+        } else if brief["checker_id"] == "java.maven.javadoc" {
+            crate::maven_javadoc_task_recheck::valid_shape(&report)
+                && event["observation"]
+                    == crate::maven_javadoc_task_recheck::classify(brief, &report)
+        } else if brief["checker_id"] == "java.jdk.javadoc" {
+            crate::javadoc_task_recheck::valid_shape(&report)
+                && event["observation"] == crate::javadoc_task_recheck::classify(brief, &report)
         } else if brief["checker_id"] == "java.checkstyle.preparation" {
             crate::checkstyle_preparation_recheck::valid_shape(&report)
                 && event["observation"]
@@ -588,6 +754,9 @@ fn verified_rechecks(
         } else if brief["checker_id"] == "python.pip_audit" {
             crate::work_sync::valid_python_cve_observation(root, &report)
                 && event["observation"] == crate::python_cve_task_recheck::classify(brief, &report)
+        } else if brief["checker_id"] == "shell.shellcheck" {
+            crate::shell_task_recheck::valid_shape(root, &report)
+                && event["observation"] == crate::shell_task_recheck::classify(brief, &report)
         } else if brief["checker_id"] == "rust.cargo_rustdoc" {
             crate::rustdoc_task_recheck::valid_shape(&report)
                 && event["observation"] == crate::rustdoc_task_recheck::classify(brief, &report)
@@ -833,6 +1002,26 @@ fn action_fingerprint(task_id: &str, action_id: &str) -> String {
 }
 
 fn input_digest(root: &Path, brief: &Value) -> Result<String, &'static str> {
+    if matches!(
+        brief["checker_id"].as_str(),
+        Some("c.clang.documentation_placeholder" | "cpp.clang.documentation_placeholder")
+    ) {
+        return crate::c_family_placeholder_task_recheck::attempt_input_digest(root, brief);
+    }
+    if matches!(
+        brief["checker_id"].as_str(),
+        Some("c.clang.documentation_structure" | "cpp.clang.documentation_structure")
+    ) {
+        return crate::c_family_structure_task_recheck::attempt_input_digest(root, brief);
+    }
+
+    if matches!(
+        brief["checker_id"].as_str(),
+        Some("c.clang.documentation" | "cpp.clang.documentation")
+    ) {
+        return crate::c_family_comments_task_recheck::attempt_input_digest(root, brief);
+    }
+
     let paths: Vec<&str> = if brief["kind"] == "finding" {
         vec![brief["scope"].as_str().ok_or("attempt_scope_invalid")?]
     } else {

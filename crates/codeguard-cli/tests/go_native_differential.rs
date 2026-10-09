@@ -300,7 +300,13 @@ fn pinned_go_uniform_replay_archives_whole_file_and_companion_evidence() {
         "只有未解析逻辑位置留作原生未知"
     );
     assert_eq!(go["compared_count"], 19, "不能丢弃EOF语法诊断的样本");
-    let evidence = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../tests/acceptance/evidence");
+    // 独立输出本轮证据，保留旧源码/工具身份绑定的历史报告。
+    let evidence = std::env::var_os("CODEGUARD_NATIVE_DIFFERENTIAL_REPORT_DIR")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| {
+            std::env::temp_dir().join(format!("cg-native-go-{}", std::process::id()))
+        });
+    fs::create_dir_all(&evidence).unwrap();
     fs::write(
         evidence.join("go-native-grammar-package-input-2026-10-05.json"),
         bytes,

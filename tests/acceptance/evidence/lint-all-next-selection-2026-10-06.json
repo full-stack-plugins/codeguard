@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-06",
+  "base": "ee7d5a04180457cce508505064472df691818772",
+  "scope": "lint all category-aware next selection",
+  "default": {
+    "passed": 42,
+    "failed": 0,
+    "ignored": 5
+  },
+  "wasm": {
+    "passed": 1,
+    "failed": 0
+  },
+  "logs": [
+    {
+      "path": "/private/tmp/cg-lint-next-red.log",
+      "sha256": "a679a392e5402ef0bf102df20a287716bc047eb4266fd041213c6b492c968a15"
+    },
+    {
+      "path": "/private/tmp/cg-lint-next-final.log",
+      "sha256": "a63615666722cf75f71a2d3f743bcbf55cae8c00ee5fe41d14f47cda820ae34d"
+    },
+    {
+      "path": "/private/tmp/cg-lint-next-wasm-final.log",
+      "sha256": "4ed7262d54258b5afe8c2f440a73f0cc1a17ba062860cbfc8585eca9c77be869"
+    },
+    {
+      "path": "/private/tmp/cg-lint-next-clippy-final.log",
+      "sha256": "198abdee3b7a2189a8dc100c21c6833621c159f26ce6d3697edfdaad3e5b2062"
+    },
+    {
+      "path": "/private/tmp/cg-lint-next-actual.json",
+      "sha256": "27213f70cc0bb3dc266c6a8a24fe8e0c0b31fe01d0554be95379b6b0733ca469"
+    }
+  ],
+  "delivery_qualified": false
+}

@@ -1,0 +1,120 @@
+{
+  "delivery_decision": "not_evaluated",
+  "execution": "local_observation",
+  "host_blocking_verified": false,
+  "local_feedback": {
+    "candidate_recovery_count": 0,
+    "coverage_proven": false,
+    "delivery_decision": "not_evaluated",
+    "go_syntax": {
+      "authority": "local_unverified",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "files": [
+        {
+          "current": true,
+          "native": {
+            "companion_binding_sha256": "19436fb5bd7825f4450058b0704166c843979e04dddada5174d14710174fe7e4",
+            "diagnostics": [],
+            "gofmt_sha256": "f0e9b77df6dcfeec18d33bd9305ff034c28aa2142d3a4fa3aa44e62a44c89e3b",
+            "input_type": "whole_file",
+            "reason": "go_native_syntax_no_diagnostics",
+            "status": "completed",
+            "tool_sha256": "5900a8e0942f88b7bacf2b44b397b4950c8dc9f850a16ae1249e1636860dd6ef",
+            "version": "go1.23.4"
+          },
+          "next_action": "\u672c\u6587\u4ef6\u539f\u751f\u96f6\u8bca\u65ad\uff1b\u7ee7\u7eed\u9879\u76ee lint\u3001\u7c7b\u578b\u3001\u6ce8\u91ca\u3001\u5b89\u5168\u4e0e\u4f9d\u8d56\u68c0\u67e5\uff0c\u4e0d\u51ed\u6b64\u5173\u95ed\u4efb\u52a1",
+          "path": "app.go",
+          "recheck_argv": [
+            "codeguard",
+            "task",
+            "verify",
+            "CG-B-374e645c8d56728554421f6a427974bc",
+            "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-go-hook-real-2h9f2bkw",
+            "--go-tool",
+            "/usr/local/go/bin/go",
+            "--format=json"
+          ],
+          "source_sha256": "15dfc4f51b4ed90211b566886f456d23d6984e1bb298460786c9740b01ac183e",
+          "task_id": "CG-B-374e645c8d56728554421f6a427974bc",
+          "task_sync_reason": null,
+          "tool_path": "/usr/local/go/bin/go"
+        }
+      ],
+      "local_parse_complete": true,
+      "report_type": "go_syntax_scan",
+      "schema_version": "0.2.0",
+      "scope": "single_frozen_go_files",
+      "scope_stable": true,
+      "source_file_count": 1,
+      "task_status": "synced_partial",
+      "tool_selection": {
+        "executable": "/usr/local/go/bin/go",
+        "source": "explicit"
+      },
+      "unobserved_count": 0
+    },
+    "kotlin_lint": null,
+    "native_unwired_files": [],
+    "next_action": "review_native_results_and_resolve_incomplete_checks",
+    "node_lint": {
+      "backlog_status": "not_connected",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "files": [],
+      "new_blockers": 0,
+      "new_findings": 0,
+      "next": null,
+      "reason": "eslint_files_incomplete",
+      "status": "incomplete",
+      "unexecuted_files": []
+    },
+    "python_lint": null,
+    "report_type": "hook_fast_feedback",
+    "requested_paths": [
+      "app.go"
+    ],
+    "ruby_lint": null,
+    "scan_scope": "selected_files",
+    "schema_version": "0.12.0",
+    "shell_lint": null,
+    "swift_lint": null,
+    "syntax_candidates": {
+      "authority": "candidate_unqualified",
+      "delivery_decision": "incomplete",
+      "execution_phase": "after_native",
+      "native_preferred_count": 1,
+      "next_action": "\u6838\u5bf9\u9002\u7528\u8bed\u8a00\u7248\u672c\u4e0e\u539f\u751f lint/\u7f16\u8bd1\u5668\uff1b\u5019\u9009\u6062\u590d\u8282\u70b9\u4e0d\u662f\u5df2\u786e\u8ba4\u8fdd\u89c4\uff0c\u96f6\u6062\u590d\u4e5f\u4e0d\u8868\u793a\u5b8c\u6574\u901a\u8fc7",
+      "observations": [],
+      "reason": "native_preferred",
+      "skipped_count": 0,
+      "source_file_count": 1,
+      "status": "not_run",
+      "unrouted_count": 0
+    },
+    "syntax_tasks": {
+      "failures": [],
+      "new_blockers": 0,
+      "status": "synced_partial",
+      "tasks": []
+    },
+    "unavailable_files": [],
+    "zig_lint": null
+  },
+  "plan": {
+    "action": "fast_file_check",
+    "host_blocking_claimed": false,
+    "may_claim_delivery": false,
+    "requires_git_snapshot": false,
+    "scope_resolution_reason": null,
+    "soft_result_reuse_candidate": true,
+    "target_paths": [
+      "app.go"
+    ],
+    "task_id": null
+  },
+  "reason": null,
+  "report_type": "hook_execution_feedback",
+  "schema_version": "0.22.0",
+  "soft_result_reused": false
+}

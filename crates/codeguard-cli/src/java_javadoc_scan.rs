@@ -35,14 +35,7 @@ pub(crate) fn observe_project(
     let mut files = Vec::with_capacity(sources.len());
     let mut observed_file_count = 0_usize;
     for relative in sources {
-        let configuration = configurations
-            .iter()
-            .filter(|entry| {
-                entry.checker_id == "java.maven.javadoc"
-                    && (entry.build_root == "."
-                        || relative.starts_with(&format!("{}/", entry.build_root)))
-            })
-            .max_by_key(|entry| entry.build_root.len());
+        let configuration = nearest_configuration(configurations, relative);
         let config_status = configuration.map_or("unknown", |entry| entry.configuration.as_str());
         let pom_ref = configuration.map(|entry| entry.configuration_ref.as_str());
         let pom_sha = pom_ref.and_then(|reference| {
@@ -53,8 +46,10 @@ pub(crate) fn observe_project(
         let config_stable = pom_ref.is_some_and(|reference| {
             context.manifest_sha256.get(reference).map(String::as_str) == pom_sha.as_deref()
         });
-        let source_in_main =
-            relative.starts_with("src/main/java/") || relative.contains("/src/main/java/");
+        // 主源码目录必须相对最近构建根，不能借用路径中任意同名片段。
+        let source_in_main = configuration
+            .and_then(|entry| relative_source(relative, &entry.build_root))
+            .is_some_and(|source| source.starts_with("src/main/java/"));
         let (reason, observation) = if context.cancelled.load(Ordering::Relaxed)
             || codeguard_runtime::sigint_cancellation_requested()
         {
@@ -117,6 +112,12 @@ pub(crate) fn observe_project(
             };
             let selected: BTreeSet<String> = sources
                 .iter()
+                .filter(|source| {
+                    nearest_configuration(configurations, source).is_some_and(|nearest| {
+                        nearest.build_root == configuration.build_root
+                            && nearest.configuration_ref == configuration.configuration_ref
+                    })
+                })
                 .filter_map(|source| source.strip_prefix(&prefix))
                 .filter(|source| source.starts_with("src/main/java/"))
                 .map(str::to_owned)
@@ -175,7 +176,7 @@ pub(crate) fn observe_project(
             .sum();
     }
     json!({
-        "schema_version":"0.3.0",
+        "schema_version":if context.maven_tool.is_some() {"0.5.0"} else {"0.4.0"},
         "probe_mode":if context.maven_tool.is_some(){"maven_multifile"}else{"jdk_single_file"},
         "report_type":"java_javadoc_project_probe",
         "checker_id":if context.maven_tool.is_some(){"java.maven.javadoc"}else{"java.jdk.javadoc"},
@@ -191,4 +192,25 @@ pub(crate) fn observe_project(
         "files":files,
         "maven_multifile_probes":maven_probes
     })
+}
+
+fn nearest_configuration<'a>(
+    configurations: &'a [CheckerConfiguration],
+    source: &str,
+) -> Option<&'a CheckerConfiguration> {
+    configurations
+        .iter()
+        .filter(|entry| {
+            entry.checker_id == "java.maven.javadoc"
+                && relative_source(source, &entry.build_root).is_some()
+        })
+        .max_by_key(|entry| entry.build_root.len())
+}
+
+fn relative_source<'a>(source: &'a str, build_root: &str) -> Option<&'a str> {
+    if build_root == "." {
+        Some(source)
+    } else {
+        source.strip_prefix(build_root)?.strip_prefix('/')
+    }
 }

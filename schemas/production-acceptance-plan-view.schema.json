@@ -1,0 +1,713 @@
+{
+  "type": "object",
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "selection",
+    "full_language_count",
+    "full_requirement_count",
+    "selected_language_count",
+    "authority",
+    "qualification",
+    "delivery_decision",
+    "source_plan_sha256",
+    "plan"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "report_type": {
+      "const": "production_acceptance_plan_view"
+    },
+    "operation": {
+      "const": "capabilities"
+    },
+    "selection": {
+      "enum": [
+        "all",
+        "java",
+        "rust",
+        "typescript",
+        "python",
+        "go",
+        "csharp",
+        "kotlin",
+        "swift",
+        "php",
+        "ruby",
+        "scala",
+        "shell",
+        "dockerfile",
+        "yaml",
+        "elixir",
+        "css",
+        "c",
+        "cpp",
+        "objc",
+        "dart",
+        "vue",
+        "svelte",
+        "astro",
+        "solidity",
+        "terraform",
+        "nix",
+        "html",
+        "sql",
+        "graphql",
+        "protobuf",
+        "markdown",
+        "toml",
+        "haskell",
+        "ocaml",
+        "fsharp",
+        "perl",
+        "groovy",
+        "clojure",
+        "powershell",
+        "zig",
+        "nim",
+        "crystal",
+        "julia",
+        "elm",
+        "lua",
+        "luau",
+        "pascal",
+        "r",
+        "cfml",
+        "cobol",
+        "vbnet",
+        "erlang",
+        "arkts",
+        "metal",
+        "liquid",
+        "cuda",
+        "ansible"
+      ]
+    },
+    "full_language_count": {
+      "const": 57
+    },
+    "full_requirement_count": {
+      "const": 228
+    },
+    "selected_language_count": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 57
+    },
+    "authority": {
+      "const": "repository_plan_only"
+    },
+    "qualification": {
+      "const": "not_granted"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "source_plan_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "plan": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "document_type",
+        "authority",
+        "qualification",
+        "platform_scope",
+        "platform_targets",
+        "source_hashes",
+        "languages"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "0.1.0"
+        },
+        "document_type": {
+          "const": "production_acceptance_plan"
+        },
+        "authority": {
+          "const": "repository_plan_only"
+        },
+        "qualification": {
+          "const": "not_granted"
+        },
+        "platform_scope": {
+          "const": "candidate_targets_not_advertised_support"
+        },
+        "platform_targets": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "macos_arm64",
+              "macos_x86_64",
+              "linux_x86_64",
+              "linux_aarch64",
+              "windows_x86_64"
+            ]
+          },
+          "minItems": 5,
+          "maxItems": 5,
+          "uniqueItems": true
+        },
+        "source_hashes": {
+          "type": "object",
+          "minProperties": 2,
+          "maxProperties": 512,
+          "propertyNames": {
+            "type": "string",
+            "maxLength": 256,
+            "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.?(/|$))[A-Za-z0-9_./-]+$"
+          },
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "language",
+              "legacy_status",
+              "version_scope",
+              "build_targets",
+              "grammar_candidates",
+              "legacy_lint_candidate",
+              "capabilities"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "language": {
+                "enum": [
+                  "java",
+                  "rust",
+                  "typescript",
+                  "python",
+                  "go",
+                  "csharp",
+                  "kotlin",
+                  "swift",
+                  "php",
+                  "ruby",
+                  "scala",
+                  "shell",
+                  "dockerfile",
+                  "yaml",
+                  "elixir",
+                  "css",
+                  "c",
+                  "cpp",
+                  "objc",
+                  "dart",
+                  "vue",
+                  "svelte",
+                  "astro",
+                  "solidity",
+                  "terraform",
+                  "nix",
+                  "html",
+                  "sql",
+                  "graphql",
+                  "protobuf",
+                  "markdown",
+                  "toml",
+                  "haskell",
+                  "ocaml",
+                  "fsharp",
+                  "perl",
+                  "groovy",
+                  "clojure",
+                  "powershell",
+                  "zig",
+                  "nim",
+                  "crystal",
+                  "julia",
+                  "elm",
+                  "lua",
+                  "luau",
+                  "pascal",
+                  "r",
+                  "cfml",
+                  "cobol",
+                  "vbnet",
+                  "erlang",
+                  "arkts",
+                  "metal",
+                  "liquid",
+                  "cuda",
+                  "ansible"
+                ]
+              },
+              "legacy_status": {
+                "enum": [
+                  "stable",
+                  "planned"
+                ]
+              },
+              "version_scope": {
+                "type": "object",
+                "required": [
+                  "qualification",
+                  "policy",
+                  "manifest_markers",
+                  "dialect_requirement",
+                  "blockers"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "qualification": {
+                    "const": "unqualified"
+                  },
+                  "policy": {
+                    "const": "project_declared_version_and_dialect_must_be_verified"
+                  },
+                  "manifest_markers": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 2048
+                    },
+                    "minItems": 0,
+                    "maxItems": 128,
+                    "uniqueItems": true
+                  },
+                  "dialect_requirement": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 2048
+                  },
+                  "blockers": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 2048
+                    },
+                    "minItems": 1,
+                    "maxItems": 128,
+                    "uniqueItems": true
+                  }
+                }
+              },
+              "build_targets": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                },
+                "minItems": 1,
+                "maxItems": 128,
+                "uniqueItems": true
+              },
+              "grammar_candidates": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                },
+                "minItems": 0,
+                "maxItems": 128,
+                "uniqueItems": true
+              },
+              "legacy_lint_candidate": {
+                "anyOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "object"
+                  },
+                  {
+                    "type": "array"
+                  }
+                ]
+              },
+              "capabilities": {
+                "type": "object",
+                "required": [
+                  "syntax",
+                  "documentation",
+                  "conventions",
+                  "vulnerabilities"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "syntax": {
+                    "type": "object",
+                    "required": [
+                      "qualification",
+                      "task_refs",
+                      "build_paths"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "qualification": {
+                        "const": "blocked"
+                      },
+                      "task_refs": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "pattern": "^[0-9]+(?:\\.[0-9]+)+$"
+                        },
+                        "minItems": 1,
+                        "maxItems": 128,
+                        "uniqueItems": true
+                      },
+                      "build_paths": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "required": [
+                            "ecosystem",
+                            "implementation_status",
+                            "adapter_refs",
+                            "evidence_refs",
+                            "blockers"
+                          ],
+                          "additionalProperties": false,
+                          "properties": {
+                            "ecosystem": {
+                              "type": "string",
+                              "pattern": "^[a-z0-9_-]{1,100}$"
+                            },
+                            "implementation_status": {
+                              "enum": [
+                                "partial",
+                                "configuration_only",
+                                "wasm_candidate_only",
+                                "not_integrated"
+                              ]
+                            },
+                            "adapter_refs": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "maxLength": 256,
+                                "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.?(/|$))[A-Za-z0-9_./-]+$"
+                              },
+                              "minItems": 0,
+                              "maxItems": 128,
+                              "uniqueItems": true
+                            },
+                            "evidence_refs": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "maxLength": 256,
+                                "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.?(/|$))[A-Za-z0-9_./-]+$"
+                              },
+                              "minItems": 0,
+                              "maxItems": 128,
+                              "uniqueItems": true
+                            },
+                            "blockers": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 2048
+                              },
+                              "minItems": 1,
+                              "maxItems": 128,
+                              "uniqueItems": true
+                            }
+                          }
+                        },
+                        "minItems": 1,
+                        "maxItems": 128,
+                        "uniqueItems": true
+                      }
+                    }
+                  },
+                  "documentation": {
+                    "type": "object",
+                    "required": [
+                      "qualification",
+                      "task_refs",
+                      "build_paths"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "qualification": {
+                        "const": "blocked"
+                      },
+                      "task_refs": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "pattern": "^[0-9]+(?:\\.[0-9]+)+$"
+                        },
+                        "minItems": 1,
+                        "maxItems": 128,
+                        "uniqueItems": true
+                      },
+                      "build_paths": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "required": [
+                            "ecosystem",
+                            "implementation_status",
+                            "adapter_refs",
+                            "evidence_refs",
+                            "blockers"
+                          ],
+                          "additionalProperties": false,
+                          "properties": {
+                            "ecosystem": {
+                              "type": "string",
+                              "pattern": "^[a-z0-9_-]{1,100}$"
+                            },
+                            "implementation_status": {
+                              "enum": [
+                                "partial",
+                                "configuration_only",
+                                "wasm_candidate_only",
+                                "not_integrated"
+                              ]
+                            },
+                            "adapter_refs": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "maxLength": 256,
+                                "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.?(/|$))[A-Za-z0-9_./-]+$"
+                              },
+                              "minItems": 0,
+                              "maxItems": 128,
+                              "uniqueItems": true
+                            },
+                            "evidence_refs": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "maxLength": 256,
+                                "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.?(/|$))[A-Za-z0-9_./-]+$"
+                              },
+                              "minItems": 0,
+                              "maxItems": 128,
+                              "uniqueItems": true
+                            },
+                            "blockers": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 2048
+                              },
+                              "minItems": 1,
+                              "maxItems": 128,
+                              "uniqueItems": true
+                            }
+                          }
+                        },
+                        "minItems": 1,
+                        "maxItems": 128,
+                        "uniqueItems": true
+                      }
+                    }
+                  },
+                  "conventions": {
+                    "type": "object",
+                    "required": [
+                      "qualification",
+                      "task_refs",
+                      "build_paths"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "qualification": {
+                        "const": "blocked"
+                      },
+                      "task_refs": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "pattern": "^[0-9]+(?:\\.[0-9]+)+$"
+                        },
+                        "minItems": 1,
+                        "maxItems": 128,
+                        "uniqueItems": true
+                      },
+                      "build_paths": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "required": [
+                            "ecosystem",
+                            "implementation_status",
+                            "adapter_refs",
+                            "evidence_refs",
+                            "blockers"
+                          ],
+                          "additionalProperties": false,
+                          "properties": {
+                            "ecosystem": {
+                              "type": "string",
+                              "pattern": "^[a-z0-9_-]{1,100}$"
+                            },
+                            "implementation_status": {
+                              "enum": [
+                                "partial",
+                                "configuration_only",
+                                "wasm_candidate_only",
+                                "not_integrated"
+                              ]
+                            },
+                            "adapter_refs": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "maxLength": 256,
+                                "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.?(/|$))[A-Za-z0-9_./-]+$"
+                              },
+                              "minItems": 0,
+                              "maxItems": 128,
+                              "uniqueItems": true
+                            },
+                            "evidence_refs": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "maxLength": 256,
+                                "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.?(/|$))[A-Za-z0-9_./-]+$"
+                              },
+                              "minItems": 0,
+                              "maxItems": 128,
+                              "uniqueItems": true
+                            },
+                            "blockers": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 2048
+                              },
+                              "minItems": 1,
+                              "maxItems": 128,
+                              "uniqueItems": true
+                            }
+                          }
+                        },
+                        "minItems": 1,
+                        "maxItems": 128,
+                        "uniqueItems": true
+                      }
+                    }
+                  },
+                  "vulnerabilities": {
+                    "type": "object",
+                    "required": [
+                      "qualification",
+                      "task_refs",
+                      "build_paths"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "qualification": {
+                        "const": "blocked"
+                      },
+                      "task_refs": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "pattern": "^[0-9]+(?:\\.[0-9]+)+$"
+                        },
+                        "minItems": 1,
+                        "maxItems": 128,
+                        "uniqueItems": true
+                      },
+                      "build_paths": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "required": [
+                            "ecosystem",
+                            "implementation_status",
+                            "adapter_refs",
+                            "evidence_refs",
+                            "blockers"
+                          ],
+                          "additionalProperties": false,
+                          "properties": {
+                            "ecosystem": {
+                              "type": "string",
+                              "pattern": "^[a-z0-9_-]{1,100}$"
+                            },
+                            "implementation_status": {
+                              "enum": [
+                                "partial",
+                                "configuration_only",
+                                "wasm_candidate_only",
+                                "not_integrated"
+                              ]
+                            },
+                            "adapter_refs": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "maxLength": 256,
+                                "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.?(/|$))[A-Za-z0-9_./-]+$"
+                              },
+                              "minItems": 0,
+                              "maxItems": 128,
+                              "uniqueItems": true
+                            },
+                            "evidence_refs": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "maxLength": 256,
+                                "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.?(/|$))[A-Za-z0-9_./-]+$"
+                              },
+                              "minItems": 0,
+                              "maxItems": 128,
+                              "uniqueItems": true
+                            },
+                            "blockers": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 2048
+                              },
+                              "minItems": 1,
+                              "maxItems": 128,
+                              "uniqueItems": true
+                            }
+                          }
+                        },
+                        "minItems": 1,
+                        "maxItems": 128,
+                        "uniqueItems": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "minItems": 1,
+          "maxItems": 57,
+          "uniqueItems": true
+        }
+      },
+      "$schema": "https://json-schema.org/draft/2020-12/schema"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

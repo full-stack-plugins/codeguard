@@ -14,6 +14,11 @@ use crate::workspace_refresh::read_workspace_baseline;
 
 const MAX_FACT_BYTES: u64 = 128 * 1024;
 const MAX_SOURCE_BYTES: u64 = 16 * 1024 * 1024;
+#[cfg(unix)]
+mod c_family_comments_candidate;
+mod c_family_placeholder_candidate;
+#[cfg(unix)]
+mod c_family_structure_candidate;
 
 struct Arguments {
     root: PathBuf,
@@ -27,6 +32,7 @@ struct Candidate {
 }
 
 struct VerificationObservation {
+    gradle_inputs_stale: bool,
     outcome: String,
     run_id: String,
     report_sha256: String,
@@ -99,7 +105,32 @@ pub(crate) fn read_local_brief_for_checker(
     root: &Path,
     checker_id: &str,
 ) -> Result<Value, &'static str> {
-    build_view(root, Some(checker_id), None)
+    build_view(root, Some(&[checker_id]), None)
+}
+
+/// 一次校验本地事实并从允许的检查器集合选择任务，避免重复遍历历史队列。
+pub(crate) fn read_local_brief_for_checkers(
+    root: &Path,
+    checker_ids: &[&str],
+) -> Result<Value, &'static str> {
+    build_view(root, Some(checker_ids), None)
+}
+
+/// 选择当前或历史开放的 Rust 文档任务；保留准备任务，不借用其它 Clippy 规则。
+#[cfg(unix)]
+pub(crate) fn read_rust_documentation_brief(root: &Path) -> Result<Value, &'static str> {
+    build_filtered_view(
+        root,
+        Some(&["rust.cargo_rustdoc", "rust.cargo_clippy"]),
+        None,
+        Some("rust"),
+    )
+}
+
+/// 选择当前或历史开放的 Python 文档任务；复用原 Ruff 原生规则分类和准备任务。
+#[cfg(unix)]
+pub(crate) fn read_python_documentation_brief(root: &Path) -> Result<Value, &'static str> {
+    build_filtered_view(root, Some(&["python.ruff"]), None, Some("python"))
 }
 
 /// 从本轮已同步的任务身份读取下一步；返回既有 next 协议，不扩大到其它历史任务。
@@ -157,7 +188,7 @@ fn read_task_brief_inner(
     if !real_directory(&directory) || !projection_valid {
         return Err("task_record_unavailable");
     }
-    let fact: Value = serde_json::from_slice(&read_bounded(
+    let fact: Value = codeguard_adapters::parse_unique_json(&read_bounded(
         &directory.join("finding.json"),
         MAX_FACT_BYTES,
     )?)
@@ -175,8 +206,17 @@ fn read_task_brief_inner(
 
 fn build_view(
     root: &Path,
-    checker_id: Option<&str>,
+    checker_ids: Option<&[&str]>,
     task_ids: Option<&std::collections::BTreeSet<String>>,
+) -> Result<Value, &'static str> {
+    build_filtered_view(root, checker_ids, task_ids, None)
+}
+
+fn build_filtered_view(
+    root: &Path,
+    checker_ids: Option<&[&str]>,
+    task_ids: Option<&std::collections::BTreeSet<String>>,
+    documentation_language: Option<&str>,
 ) -> Result<Value, &'static str> {
     let baseline = read_workspace_baseline(root).map_err(|reason| {
         if reason == "legacy_workspace_requires_manual_migration" {
@@ -238,9 +278,11 @@ fn build_view(
         if !safe_id(&id) {
             return Err("finding_id_invalid");
         }
-        let fact: Value =
-            serde_json::from_slice(&read_bounded(&path.join("finding.json"), MAX_FACT_BYTES)?)
-                .map_err(|_| "finding_fact_invalid")?;
+        let fact: Value = codeguard_adapters::parse_unique_json(&read_bounded(
+            &path.join("finding.json"),
+            MAX_FACT_BYTES,
+        )?)
+        .map_err(|_| "finding_fact_invalid")?;
         if fact["id"] != id
             || fact["workspace_id"] != workspace_id
             || fact["state"] != "open"
@@ -252,22 +294,47 @@ fn build_view(
             return Err("finding_fact_conflict");
         }
         let candidate = candidate(root, &id, &fact)?;
-        if checker_id.is_none_or(|checker| candidate.brief["checker_id"] == checker)
-            && task_ids.is_none_or(|ids| ids.contains(&candidate.id))
+        if checker_ids.is_none_or(|checkers| {
+            checkers
+                .iter()
+                .any(|checker| candidate.brief["checker_id"] == *checker)
+        }) && task_ids.is_none_or(|ids| ids.contains(&candidate.id))
+            && match documentation_language {
+                None => true,
+                Some(_) if candidate.brief["kind"] == "blocker" => true,
+                Some("rust") => {
+                    candidate.brief["checker_id"] == "rust.cargo_rustdoc"
+                        || matches!(
+                            candidate.brief["native_rule_id"].as_str(),
+                            Some(
+                                "clippy::missing_errors_doc"
+                                    | "clippy::missing_panics_doc"
+                                    | "clippy::missing_safety_doc"
+                            )
+                        )
+                }
+                Some("python") => candidate.brief["native_rule_id"]
+                    .as_str()
+                    .is_some_and(codeguard_adapters::is_ruff_documentation_rule),
+                Some(_) => false,
+            }
         {
             candidates.push(candidate);
         }
     }
     if candidates.is_empty() {
-        let selected_command = if matches!(
-            checker_id,
-            Some("java.maven.p3c" | "java.maven.dependency_check")
-        ) {
+        let selected_command = if checker_ids.is_some_and(|checkers| {
+            checkers.len() == 1
+                && matches!(
+                    checkers[0],
+                    "java.maven.p3c" | "java.maven.dependency_check"
+                )
+        }) {
             "java"
         } else {
             "all"
         };
-        let reason = if checker_id.is_some() {
+        let reason = if checker_ids.is_some() {
             "no_selected_tasks_without_fresh_language_check"
         } else {
             "no_tasks_without_fresh_full_gate"
@@ -381,6 +448,26 @@ fn independent_source_task_index(root: &Path, candidates: &[Candidate]) -> Optio
 }
 
 fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static str> {
+    if matches!(
+        fact["checker_id"].as_str(),
+        Some("c.clang.documentation_placeholder" | "cpp.clang.documentation_placeholder")
+    ) {
+        return c_family_placeholder_candidate::candidate(root, id, fact);
+    }
+    #[cfg(unix)]
+    if matches!(
+        fact["checker_id"].as_str(),
+        Some("c.clang.documentation_structure" | "cpp.clang.documentation_structure")
+    ) {
+        return c_family_structure_candidate::candidate(root, id, fact);
+    }
+    #[cfg(unix)]
+    if matches!(
+        fact["checker_id"].as_str(),
+        Some("c.clang.documentation" | "cpp.clang.documentation")
+    ) {
+        return c_family_comments_candidate::candidate(root, id, fact);
+    }
     let kind = fact["kind"].as_str().ok_or("finding_kind_invalid")?;
     let fingerprint = fact["fingerprint"]
         .as_str()
@@ -406,10 +493,15 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                     | "python.ruff.doctor"
                     | "python.pip_audit"
                     | "go.vet"
+                    | "shell.shellcheck"
                     | "rust.cargo_clippy"
                     | "rust.cargo_rustdoc"
                     | "rust.cargo_check"
                     | "rust.cargo_audit"
+                    | "java.jdk.javadoc"
+                    | "java.maven.javadoc"
+                    | "java.gradle.javadoc"
+                    | "java.gradle.dependency_check"
                     | "java.checkstyle"
                     | "java.checkstyle.preparation"
                     | "java.maven.p3c"
@@ -428,6 +520,16 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         .as_str()
         .filter(|sha| valid_sha256(sha))
         .ok_or("finding_report_invalid")?;
+    #[cfg(unix)]
+    let gradle_preparation = if checker_id == "java.gradle.javadoc" && kind == "blocker" {
+        Some(crate::gradle_javadoc_workbench::latest_preparation(
+            root, id, fact,
+        )?)
+    } else {
+        None
+    };
+    #[cfg(not(unix))]
+    let gradle_preparation: Option<(String, Value)> = None;
     let recheck = if checker_id == "syntax.native_confirmation" {
         json!(["codeguard", "task", "verify", id, ".", "--format", "json"])
     } else if matches!(checker_id, "node.eslint" | "node.eslint.preparation") {
@@ -454,6 +556,18 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             "<已核验原配置绝对路径>",
             "--cwd",
             "<已核验原工作目录绝对路径>"
+        ])
+    } else if checker_id == "shell.shellcheck" {
+        // 原方言及显式rc由首次任务报告绑定，智能体不自行重建或替换规则上下文。
+        json!([
+            "codeguard",
+            "task",
+            "verify",
+            id,
+            root,
+            "--shellcheck-tool",
+            "<已核验的绝对路径>",
+            "--format=json"
         ])
     } else if checker_id == "python.ruff.doctor" {
         json!([
@@ -542,6 +656,36 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             "--registry",
             "<已核验审计源>"
         ])
+    } else if checker_id == "java.gradle.dependency_check" {
+        #[cfg(unix)]
+        {
+            {
+                let original = crate::gradle_cve_task_recheck::original(
+                    root,
+                    &json!({"checker_id":checker_id,"kind":kind,"scope":fact["scope"],"task_id":id,"evidence_ref":{"first_run_id":first_run,"first_report_sha256":report_sha}}),
+                )?;
+                let mut args = vec![
+                    json!("codeguard"),
+                    json!("task"),
+                    json!("verify"),
+                    json!(id),
+                    json!("."),
+                    json!("--gradle-bundle"),
+                    json!("<原Gradle绝对路径>"),
+                    json!("--java-home"),
+                    json!("<原JDK21绝对路径>"),
+                ];
+                if original["module_cache_selected"] == true {
+                    args.extend([json!("--gradle-module-cache"), json!("<原缓存绝对路径>")]);
+                }
+                args.push(json!("--format=json"));
+                json!(args)
+            }
+        }
+        #[cfg(not(unix))]
+        {
+            json!(["codeguard", "cve", "java", "."])
+        }
     } else if checker_id == "java.maven.dependency_check" {
         json!([
             "codeguard",
@@ -593,6 +737,45 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             "--checkstyle-jar",
             "<原 JAR 绝对路径>"
         ])
+    } else if checker_id == "java.jdk.javadoc" {
+        json!([
+            "codeguard",
+            "task",
+            "verify",
+            id,
+            ".",
+            "--java-home",
+            "<已核验的JDK21绝对路径>",
+            "--format",
+            "json"
+        ])
+    } else if checker_id == "java.gradle.javadoc" {
+        #[cfg(unix)]
+        {
+            crate::gradle_javadoc_workbench::recheck_argv(root, id, first_run, report_sha)?
+        }
+        #[cfg(not(unix))]
+        {
+            return Err("gradle_javadoc_platform_unsupported");
+        }
+    } else if checker_id == "java.maven.javadoc" {
+        json!([
+            "codeguard",
+            "task",
+            "verify",
+            id,
+            ".",
+            "--maven-tool",
+            "<原Maven绝对路径>",
+            "--java-home",
+            "<原JDK21绝对路径>",
+            "--maven-repo",
+            "<原离线仓库绝对路径>",
+            "--repo-sha256",
+            "<复核的固定摘要>",
+            "--format",
+            "json"
+        ])
     } else if checker_id == "java.maven.p3c" {
         json!([
             "codeguard",
@@ -612,7 +795,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         json!(["codeguard", "lint", "python", "."])
     };
     let mut brief = json!({
-        "schema_version":if checker_id == "syntax.native_confirmation" {"0.3.0"} else {"0.1.0"}, "task_id":id, "kind":kind,
+        "schema_version":if checker_id == "shell.shellcheck" {"0.17.0"} else if checker_id == "syntax.native_confirmation" {"0.3.0"} else {"0.1.0"}, "task_id":id, "kind":kind,
         "checker_id":checker_id, "evidence_ref":{
             "first_run_id":first_run, "first_report_sha256":report_sha
         },
@@ -661,8 +844,11 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                 "needs_decision",
                 if fact["first_diagnostic_reason"] == "go_package_structure_candidate" {
                     "Go整文件候选未发现package声明；先恢复适用原生Go lint或编译器确认完整文件范围，核对声明应属于哪个包。注释或字符串不算声明；不得凭候选删除函数、猜包名或关闭任务，原生确认后只修复目标源码并复检"
-                } else if fact["first_diagnostic_reason"] == "syntax_recovery_incomplete" {
-                    "固定 grammar 的恢复扫描未完成或错误无法定位；核对语言版本、grammar 限制并恢复适用原生 lint/编译器或提出具体能力决策。原生确认前不得修改源码，不虚构错误位置，不凭零恢复关闭任务"
+                } else if fact["first_diagnostic_reason"]
+                    .as_str()
+                    .is_some_and(codeguard_core::is_incomplete_syntax_reason)
+                {
+                    "固定 grammar 的恢复扫描未完成或错误无法定位；恢复适用原生 lint/编译器，对原始源码确认。原生确认合法时调查 grammar 版本/兼容性或扫描预算；原生诊断成立时才按真实位置修复。缺 adapter 提出具体能力决策；原生确认前不得修改源码，不虚构错误位置，不凭零恢复关闭任务"
                 } else {
                     "查看固定 grammar 与当前源码的疑似证据；通过同一任务的原生复检核对适用语法能力，工具或 adapter 缺失时提出具体恢复或能力决策，不能改用 Python 或凭 WASM 零恢复关闭任务"
                 },
@@ -706,6 +892,13 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                 "actionable",
                 "先恢复package.json及锁文件的可读普通文件和物理路径，再核对语法、重复字段、scripts类型，修正配置后恢复原生npm审计；再核验锁节点和漏洞源覆盖及时效，按原报告修订依赖并复检，局部零发现不得关闭任务",
             )
+        } else if checker_id == "java.gradle.dependency_check" {
+            brief["first_diagnostic_reason"] = fact["first_diagnostic_reason"].clone();
+            (
+                5,
+                "actionable",
+                "按原task verify冻结范围恢复Gradle OWASP；配置/工具变化先审查并重扫，超限保留全部义务；核验漏洞库和依赖归属，局部观察及空报告无可信关闭权威",
+            )
         } else if checker_id == "java.maven.dependency_check" {
             (
                 1,
@@ -724,6 +917,30 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                 5,
                 "actionable",
                 "核对该 Python 构建根的标准锁、原生 pip-audit advisory 和解析版本；恢复工具或锁输入，验证漏洞源及时效。局部零漏洞与自写白名单均不能关闭任务",
+            )
+        } else if checker_id == "java.gradle.javadoc" {
+            (
+                if gradle_preparation.as_ref().is_some_and(|(reason, _)| {
+                    reason == "selected_sources_and_complete_documentation_rules_unverified"
+                }) {
+                    4
+                } else {
+                    1
+                },
+                if gradle_preparation.as_ref().is_some_and(|(reason, _)| {
+                    reason == "selected_sources_and_complete_documentation_rules_unverified"
+                }) {
+                    "needs_decision"
+                } else {
+                    "actionable"
+                },
+                "核对原Gradle/JDK与原项目规则、源集；环境故障先恢复工具，规则/覆盖缺口须明确具体政策，不修改无关源码",
+            )
+        } else if checker_id == "java.jdk.javadoc" {
+            (
+                1,
+                "actionable",
+                "核对Javadoc原配置与JDK21，恢复检查后重新运行comments java，不修改无关源码",
             )
         } else if checker_id == "java.maven.p3c" {
             (
@@ -819,7 +1036,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         brief["native_rule_id"] = json!(rule);
         brief["source_sha256"] = json!(source_sha);
         brief["constraints"] = json!(["仅修改目标源码", "不得忽略规则或将任务勾选当作复检"]);
-        let step = finding_repair_step(rule);
+        let step = finding_repair_step(checker_id, rule);
         brief["step"] = json!(if same_source {
             step
         } else {
@@ -834,8 +1051,108 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             },
         )
     };
+    if checker_id == "java.gradle.dependency_check" {
+        brief["schema_version"] = json!("0.27.0");
+        brief["task_verify_status"] = json!("local_observation_only");
+        #[cfg(unix)]
+        {
+            let original = crate::gradle_cve_task_recheck::original(root, &brief)?;
+            brief["original_context"] = json!({"inputs":original["inputs"],"task_paths":original["task_paths"],"module_cache_selected":original["module_cache_selected"]});
+        }
+        brief["closure_condition"] = json!(
+            "原工具完整复检、漏洞库与依赖归属及可信策略均核验；当前task verify只记录原上下文局部观察，无关闭权威"
+        );
+    }
+    if checker_id == "java.gradle.javadoc" {
+        brief["schema_version"] = json!("0.24.0");
+        brief["observation_scope"] = json!("selected_gradle_javadoc_inputs");
+        brief["task_verify_status"] = json!("local_observation_only");
+        if let Some((reason, evidence)) = &gradle_preparation {
+            brief["latest_diagnostic_reason"] = json!(reason);
+            brief["latest_preparation_ref"] = evidence.clone();
+        }
+
+        brief["rule_basis"] = json!("原Gradle官方Javadoc任务原生诊断；完整详细规则与源集尚未验收");
+        if kind == "finding" && disposition == "actionable" {
+            brief["step"] = json!(
+                "核对本轮原生规则和API契约，补齐用途、参数、返回及异常详细说明，裸标签不能代替内容；对原任务运行task verify，复用原选定输入及原Gradle/JDK，不关闭规则或勾选关闭"
+            );
+        }
+    }
+    if checker_id == "java.maven.javadoc" {
+        brief["schema_version"] = json!("0.6.0");
+        brief["observation_scope"] = json!("configured_maven_multifile_probe");
+        brief["task_verify_status"] = json!("local_observation_only");
+        brief["rule_basis"] =
+            json!("原POM固定Javadoc多文件缺注释与详细描述原生诊断；项目政策未核验");
+        brief["step"] = json!(if kind == "blocker" {
+            "核对本构建根原POM、Maven、JDK21及Javadoc3.12.0插件和依赖离线缓存，恢复后按原任务运行task verify；不得修改无关源码或关闭检查器"
+        } else {
+            "核对原生规则、位置及实际API契约，补齐用途、参数、返回及异常详细说明，空注释和裸标签不能替代说明；按原Maven多文件上下文运行task verify；源码变化先复检，不勾选关闭；可信关闭未验收"
+        });
+    }
+    if checker_id == "java.jdk.javadoc" {
+        brief["schema_version"] = json!("0.4.0");
+        brief["observation_scope"] =
+            json!(crate::javadoc_task_recheck::original_scope(root, &brief)?);
+        brief["task_verify_status"] = json!("local_observation_only");
+        brief["rule_basis"] =
+            json!("JDK21 Javadoc 原生缺注释、用途及标签详细描述诊断；项目政策未核验");
+        brief["step"] = json!(if kind == "blocker" {
+            "核对原配置、JDK21和检查范围，恢复后按本任务运行task verify；不修改无关源码，不把缺配置当源码违规或必需交付义务"
+        } else {
+            "核对原生位置与实际API契约，补全类、公共构造函数、参数、返回值或异常详细文档，空注释、缺用途或裸标签不能代替详细说明；源码变化时先对本任务运行task verify确认；不得关闭规则或用勾选代替复检"
+        });
+    }
+    if checker_id == "shell.shellcheck" {
+        brief["step"] = json!(if kind == "blocker" {
+            "核对原报告的ShellCheck版本、方言、source依赖和rc；先恢复检查能力，不修改无关源码。后续原生零诊断和配置抑制不能关闭此任务。"
+        } else {
+            "按当前原生SC规则和位置组修复目标源码，保持行为；源码变化后先重跑同方言同原配置检查，不关闭规则代替修复，按任务指引运行task verify；候选消失仍需可信政策和覆盖才能正式关闭。"
+        });
+    }
     brief["disposition"] = json!(disposition);
     let mut priority = priority;
+    #[cfg(unix)]
+    if checker_id == "shell.shellcheck" && kind == "finding" {
+        let current = read_bounded(
+            &root.join(format!(".codeguard/reports/{first_run}.json")),
+            128 * 1024,
+        )
+        .ok()
+        .filter(|b| format!("{:x}", Sha256::digest(b)) == report_sha)
+        .and_then(|b| codeguard_adapters::parse_unique_json(&b).ok())
+        .is_some_and(|r| crate::work_sync::shell_report::current(root, &r));
+        if !current {
+            brief["disposition"] = json!("verification_required");
+            brief["step"] = json!(
+                "Shell源码或原rc已经变化；先按同方言和原工具重新检查当前规则适用性，不按旧位置直接修改。配置抑制和零诊断不是已修复，任务正式关闭仍须复检流程。"
+            );
+            priority = 3;
+        }
+    }
+    if checker_id == "shell.shellcheck" && kind == "blocker" {
+        let reason = read_bounded(
+            &root.join(format!(".codeguard/reports/{first_run}.json")),
+            128 * 1024,
+        )
+        .ok()
+        .filter(|b| format!("{:x}", Sha256::digest(b)) == report_sha)
+        .and_then(|b| codeguard_adapters::parse_unique_json(&b).ok())
+        .and_then(|r| r["native"]["reason"].as_str().map(str::to_owned));
+        if matches!(
+            reason.as_deref(),
+            Some("shell_dialect_unresolved" | "shell_dialect_unsupported")
+        ) {
+            brief["disposition"] = json!("needs_decision");
+            brief["step"] = json!(if reason.as_deref() == Some("shell_dialect_unresolved") {
+                "原任务缺少已核验Shell方言；先确认shebang、文件约定或check --shell-dialect所代表的项目默认方言，再按确认的语境检查。不要猜成bash、重复安装或直接关闭旧任务。"
+            } else {
+                "原方言或文件声明不适用ShellCheck；确认实际方言和专用原生检查器，保留能力缺口。重复安装ShellCheck或强制改成bash不能恢复此检查。"
+            });
+            priority = 0;
+        }
+    }
     if checker_id == "rust.cargo_check" && kind == "finding" {
         brief["disposition"] = json!("verification_required");
         brief["step"] = json!(
@@ -861,6 +1178,28 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
         } else {
             3
         };
+    }
+    // JavaScript 结构候选复用 ESLint 身份，但不能把非 ESLint 报告当作环境准备证据。
+    if checker_id == "node.eslint.preparation"
+        && matches!(
+            fact["first_diagnostic_reason"].as_str(),
+            Some("javascript_direct_binding_candidate" | "javascript_module_context_candidate")
+        )
+    {
+        brief["schema_version"] = json!(if fact["first_diagnostic_reason"]
+            == "javascript_module_context_candidate"
+        {
+            "0.21.0"
+        } else {
+            "0.20.0"
+        });
+        brief["disposition"] = json!("verification_required");
+        brief["step"] = json!(
+            "查看原报告中 JavaScript 结构规则的位置和摘要；核对声明的 module 模式（如有）、构建根及 package.json/ESLint 配置身份，恢复适用原生 lint 确认后才修复并复检。直接绑定与模块函数外 return 均只属待确认候选，CommonJS/未知模式不启用 module 规则；WASM 零恢复不能关闭任务"
+        );
+        brief["preparation_guidance"] =
+            json!({"disposition":"verification_required", "step":brief["step"]});
+        priority = 3;
     }
     if checker_id == "java.checkstyle.preparation" {
         let guidance = crate::checkstyle_preparation::guidance(
@@ -902,6 +1241,12 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                 .ok_or("workspace_id_invalid")?,
         )?;
         brief["checkstyle_guidance"] = guidance.clone();
+        if guidance["checker_class"]
+            .as_str()
+            .is_some_and(codeguard_adapters::checkstyle_detailed_rule_class)
+        {
+            brief["schema_version"] = json!("0.25.0");
+        }
         brief["recheck_argv"] = guidance["recheck_argv"].clone();
         let source_current = read_bounded(
             &root.join(brief["scope"].as_str().ok_or("finding_path_invalid")?),
@@ -927,6 +1272,9 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
     };
     if let Some(observation) = verification_observation.as_ref() {
         let outcome = observation.outcome.as_str();
+        if checker_id == "java.gradle.dependency_check" {
+            brief["verification_observation"] = json!(outcome);
+        }
         brief["verification_run_id"] = json!(observation.run_id);
         if let Some(reason) = observation.checkstyle_reason.as_ref() {
             brief["verification_reason"] = json!(reason);
@@ -988,7 +1336,22 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                         .is_some_and(|bytes| format!("{:x}", Sha256::digest(bytes)) == *sha)
                 })
             });
-        if checkstyle_tools_changed {
+        if checker_id == "java.gradle.javadoc" && observation.gradle_inputs_stale {
+            brief["verification_invalidated_reason"] =
+                json!("gradle_inputs_changed_or_unavailable");
+            brief["disposition"] = json!("verification_required");
+            brief["step"] = json!(
+                "Gradle复检后的所选源码、配置或工具已变化或不可用；重新核对原上下文并运行原任务，不沿用旧诊断或消失结论"
+            );
+            priority = 0;
+        } else if checker_id == "java.gradle.javadoc" && outcome == "incomplete" {
+            brief["verification_observation"] = json!(outcome);
+            brief["disposition"] = json!("verification_required");
+            brief["step"] = json!(
+                "Gradle原任务复检不完整；查看绑定报告的具体工具、配置或输入原因，恢复后对原任务复检，不修改无关源码"
+            );
+            priority = if kind == "finding" { 2 } else { 0 };
+        } else if checkstyle_tools_changed {
             brief["verification_invalidated_reason"] = json!("tool_inputs_changed_or_unavailable");
             brief["disposition"] = json!("verification_required");
             brief["step"] = json!(
@@ -1120,6 +1483,10 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                 }
             } else if checker_id == "rust.cargo_clippy" {
                 "Clippy 本轮未再报告原问题；核查 allow/cap-lints、Cargo lints、特性组合和工具身份后重新复检"
+            } else if checker_id == "java.gradle.javadoc" {
+                "原Gradle构建配置、工具或规则/范围需要复核；核对原报告与本轮输入差异，恢复原受批准配置后对同一任务复检，不凭局部输出关闭"
+            } else if checker_id == "java.jdk.javadoc" {
+                "Javadoc局部零诊断不关闭历史问题；用同一原配置和JDK复检，可信关闭仍待完成"
             } else if checker_id == "java.maven.p3c" {
                 "P3C 命名规则局部复检未再报告原问题；核查原生报告的文件覆盖、配置及工具身份，完成全规则与策略复检后再裁定"
             } else {
@@ -1194,10 +1561,15 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             brief["source_sha256"] = json!(observation.source_sha256);
             brief["verification_observation"] = json!(outcome);
             brief["disposition"] = json!("actionable");
-            brief["step"] = if checker_id == "java.checkstyle" {
+            brief["step"] = if checker_id == "java.gradle.javadoc" {
+                json!(
+                    "原Gradle任务仍报告该原生文档规则；核对当前位置及API契约，补齐详细用途和适用参数/返回/异常说明后对原任务复检，不关闭规则"
+                )
+            } else if checker_id == "java.checkstyle" {
                 brief["checkstyle_guidance"]["repair_steps"][0].clone()
             } else {
                 json!(finding_repair_step(
+                    checker_id,
                     brief["native_rule_id"]
                         .as_str()
                         .ok_or("finding_rule_invalid")?
@@ -1299,6 +1671,8 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
                         | "0.12.0"
                         | "0.14.0"
                         | "0.15.0"
+                        | "0.18.0"
+                        | "0.19.0"
                 )
             ) {
                 brief["schema_version"] = guidance["schema_version"].clone();
@@ -1308,7 +1682,7 @@ fn candidate(root: &Path, id: &str, fact: &Value) -> Result<Candidate, &'static 
             }
             if matches!(
                 guidance["schema_version"].as_str(),
-                Some("0.14.0" | "0.15.0")
+                Some("0.14.0" | "0.15.0" | "0.18.0" | "0.19.0")
             ) {
                 brief["native_confirmation_ref"] = guidance["native_confirmation_ref"].clone();
             }
@@ -1439,7 +1813,7 @@ fn current_correction_refs(
         if format!("{:x}", Sha256::digest(&bytes)) != digest {
             continue;
         }
-        let Ok(event) = serde_json::from_slice::<Value>(&bytes) else {
+        let Ok(event) = codeguard_adapters::parse_unique_json(&bytes) else {
             continue;
         };
         if event["schema_version"] != "0.1.0"
@@ -1478,8 +1852,34 @@ fn current_correction_refs(
     Ok((references, projections))
 }
 
-fn finding_repair_step(rule: &str) -> &'static str {
+fn finding_repair_step(checker_id: &str, rule: &str) -> &'static str {
+    if checker_id == "rust.cargo_clippy" {
+        match rule {
+            "clippy::missing_errors_doc" => {
+                return "核对实际 Result 错误类型与触发条件，补齐 # Errors 的具体说明；章节标题不能代替内容，不改变返回类型或错误行为迎合检查；按原任务原 Cargo 运行 task verify，零诊断不代表详细契约或可信关闭";
+            }
+            "clippy::missing_panics_doc" => {
+                return "核对实际 panic、unwrap、expect 及适用调用条件，补齐 # Panics 的具体说明；章节标题不能代替内容，不改变 API 行为迎合检查；按原任务原 Cargo 运行 task verify，隐式或跨调用 panic 仍需调查";
+            }
+            "clippy::missing_safety_doc" => {
+                return "核对 unsafe API 的调用前置条件与调用者责任，补齐 # Safety 的具体说明；章节标题不能代替内容，不删除 unsafe 或改变 API 逃逸；按原任务原 Cargo 运行 task verify，说明的准确性仍需语义核验";
+            }
+            _ => {}
+        }
+    }
+    if checker_id == "python.ruff" {
+        if let Some(doc) = codeguard_adapters::RuffDocumentationRule::from_code(rule) {
+            return doc.step;
+        }
+    }
     match rule {
+        "JavadocEmptyComment"
+        | "JavadocMissingMainDescription"
+        | "JavadocEmptyParamDescription"
+        | "JavadocEmptyReturnDescription"
+        | "JavadocEmptyThrowsDescription" => {
+            "核对原生诊断与实际API契约，补齐用途、参数、返回及异常详细说明；空注释或裸标签不能代替说明，修复后按原任务原工具复检"
+        }
         "F401" => "核对导入是否仍被使用；确认后仅修改目标文件导入",
         "E501" => "核对已配置行长，保持语义并重排行内容",
         _ => "查阅原生规则与私有诊断，先确认根因再修复",
@@ -1510,8 +1910,23 @@ pub(crate) fn canonical_action_id(brief: &Value) -> Result<&'static str, &'stati
             Ok("repair-source")
         }
         Some("blocker")
+            if brief["checker_id"] == "java.gradle.javadoc"
+                && brief["verification_observation"] == "incomplete" =>
+        {
+            Ok("restore-checker-environment")
+        }
+        Some("blocker")
+            if brief["checker_id"] == "java.gradle.javadoc"
+                && brief["verification_observation"] == "rule_coverage_requires_review" =>
+        {
+            Ok("review-project-policy")
+        }
+        Some("blocker")
             if brief["reason_code"] == "project_ruff_config_not_found"
-                || brief["reason_code"] == "p3c_configuration_not_confirmed" =>
+                || brief["reason_code"] == "p3c_configuration_not_confirmed"
+                || (brief["checker_id"] == "java.gradle.javadoc"
+                    && brief["latest_diagnostic_reason"]
+                        == "selected_sources_and_complete_documentation_rules_unverified") =>
         {
             Ok("review-project-policy")
         }
@@ -1551,7 +1966,7 @@ fn latest_verification_observation(
             continue;
         }
         if is_verify {
-            let event: Value = serde_json::from_slice(&read_bounded(&path, 4096)?)
+            let event: Value = codeguard_adapters::parse_unique_json(&read_bounded(&path, 4096)?)
                 .map_err(|_| "verification_event_invalid")?;
             if !matches!(
                 event["schema_version"].as_str(),
@@ -1581,14 +1996,32 @@ fn latest_verification_observation(
                 }
                 Err(reason) => return Err(reason),
             };
-            let report: Value =
-                serde_json::from_slice(&report_bytes).map_err(|_| "verification_event_invalid")?;
+            let report: Value = codeguard_adapters::parse_unique_json(&report_bytes)
+                .map_err(|_| "verification_event_invalid")?;
             if brief["checker_id"] == "node.npm.audit" {
                 codeguard_adapters::parse_unique_json(&report_bytes)
                     .map_err(|_| "verification_event_invalid")?;
                 if !crate::npm_task_recheck::matches_task(brief, &report) {
                     return Err("verification_event_invalid");
                 }
+            }
+            if brief["checker_id"] == "java.maven.javadoc"
+                && report["task_input_stable"] == true
+                && event["report_sha256"] == format!("{:x}", Sha256::digest(&report_bytes))
+                && !crate::maven_javadoc_task_recheck::inputs_current(root, &report)
+            {
+                latest_verify = None;
+                latest_run = sequence;
+                continue;
+            }
+            if brief["checker_id"] == "java.jdk.javadoc"
+                && report["task_input_stable"] == true
+                && event["report_sha256"] == format!("{:x}", Sha256::digest(&report_bytes))
+                && !crate::javadoc_task_recheck::inputs_current(root, &report)
+            {
+                latest_verify = None;
+                latest_run = sequence;
+                continue;
             }
             // 输入已变化的npm历史复检不能继续解释当前依赖，也不阻断新的复检指引。
             if brief["checker_id"] == "rust.cargo_check"
@@ -1615,6 +2048,14 @@ fn latest_verification_observation(
                 latest_run = sequence;
                 continue;
             }
+            if brief["checker_id"] == "shell.shellcheck"
+                && event["report_sha256"] == format!("{:x}", Sha256::digest(&report_bytes))
+                && !crate::shell_task_recheck::inputs_current(root, &report)
+            {
+                latest_verify = None;
+                latest_run = sequence;
+                continue;
+            }
             if brief["checker_id"] == "rust.cargo_rustdoc"
                 && event["report_sha256"] == format!("{:x}", Sha256::digest(&report_bytes))
                 && !crate::rustdoc_task_recheck::inputs_current(root, &report)
@@ -1631,6 +2072,15 @@ fn latest_verification_observation(
                 latest_run = sequence;
                 continue;
             }
+            if brief["checker_id"] == "java.gradle.dependency_check"
+                && event["report_sha256"] == format!("{:x}", Sha256::digest(&report_bytes))
+                && report["task_input_stable"] == true
+                && !crate::gradle_cve_task_recheck::inputs_current(root, &report)
+            {
+                latest_verify = None;
+                latest_run = sequence;
+                continue;
+            }
             let python_scoped_report = brief["checker_id"] == "python.ruff"
                 && matches!(report["schema_version"].as_str(), Some("0.18.0" | "0.19.0"));
             let go_report = brief["checker_id"] == "go.vet";
@@ -1639,7 +2089,11 @@ fn latest_verification_observation(
             let checkstyle_report = brief["checker_id"] == "java.checkstyle";
             let preparation_report = brief["checker_id"] == "java.checkstyle.preparation";
             let cve_report = brief["checker_id"] == "java.maven.dependency_check";
-            let report_shape_valid = if brief["checker_id"] == "python.ruff.doctor" {
+            let report_shape_valid = if brief["checker_id"] == "java.gradle.dependency_check" {
+                crate::gradle_cve_task_recheck::validate_binding(root, brief, &report).is_ok()
+                    && event["observation"]
+                        == crate::gradle_cve_task_recheck::classify(brief, &report)
+            } else if brief["checker_id"] == "python.ruff.doctor" {
                 crate::work_sync::valid_doctor_report(&report)
                     && event["observation"] == classify_doctor(brief, &report)
             } else if matches!(
@@ -1660,6 +2114,17 @@ fn latest_verification_observation(
                     )
                     && report["checker_id"] == "go.vet"
                     && event["observation"] == classify_go(brief, &report)
+            } else if brief["checker_id"] == "java.gradle.javadoc" {
+                crate::gradle_javadoc_task_recheck::valid_shape(&report)
+                    && event["observation"]
+                        == crate::gradle_javadoc_task_recheck::classify(brief, &report)
+            } else if brief["checker_id"] == "java.maven.javadoc" {
+                crate::maven_javadoc_task_recheck::valid_shape(&report)
+                    && event["observation"]
+                        == crate::maven_javadoc_task_recheck::classify(brief, &report)
+            } else if brief["checker_id"] == "java.jdk.javadoc" {
+                crate::javadoc_task_recheck::valid_shape(&report)
+                    && event["observation"] == crate::javadoc_task_recheck::classify(brief, &report)
             } else if preparation_report {
                 crate::checkstyle_preparation_recheck::valid_shape(&report)
                     && event["observation"]
@@ -1692,6 +2157,9 @@ fn latest_verification_observation(
                 crate::work_sync::valid_python_cve_observation(root, &report)
                     && event["observation"]
                         == crate::python_cve_task_recheck::classify(brief, &report)
+            } else if brief["checker_id"] == "shell.shellcheck" {
+                crate::shell_task_recheck::valid_shape(root, &report)
+                    && event["observation"] == crate::shell_task_recheck::classify(brief, &report)
             } else if brief["checker_id"] == "rust.cargo_rustdoc" {
                 crate::rustdoc_task_recheck::valid_shape(&report)
                     && event["observation"] == crate::rustdoc_task_recheck::classify(brief, &report)
@@ -1763,7 +2231,12 @@ fn latest_verification_observation(
                 "still_present"
                     | "candidate_absent_unverified_policy"
                     | "suppression_requires_review"
-            ) || ((go_report || checkstyle_report)
+            ) || ((go_report
+                || checkstyle_report
+                || brief["checker_id"] == "shell.shellcheck"
+                || brief["checker_id"] == "java.jdk.javadoc"
+                || brief["checker_id"] == "java.maven.javadoc"
+                || brief["checker_id"] == "java.gradle.javadoc")
                 && outcome == "rule_coverage_requires_review"))
                 && brief["kind"] == "finding"
             {
@@ -1779,6 +2252,20 @@ fn latest_verification_observation(
                             .to_owned()
                     } else if matches!(
                         brief["checker_id"].as_str(),
+                        Some("java.jdk.javadoc" | "java.maven.javadoc" | "java.gradle.javadoc")
+                    ) {
+                        report["input_bindings"]
+                            .as_array()
+                            .and_then(|rows| {
+                                rows.iter()
+                                    .find(|r| r["location"] == "workspace" && r["path"] == path)
+                            })
+                            .and_then(|r| r["sha256"].as_str())
+                            .filter(|s| valid_sha256(s))
+                            .ok_or("javadoc_verification_source_invalid")?
+                            .to_owned()
+                    } else if matches!(
+                        brief["checker_id"].as_str(),
                         Some("rust.cargo_rustdoc" | "rust.cargo_check")
                     ) {
                         report["input_identities"]
@@ -1787,6 +2274,12 @@ fn latest_verification_observation(
                             .and_then(|r| r["sha256"].as_str())
                             .filter(|s| valid_sha256(s))
                             .ok_or("rust_verification_source_identity_invalid")?
+                            .to_owned()
+                    } else if brief["checker_id"] == "shell.shellcheck" {
+                        report["source_sha256"]
+                            .as_str()
+                            .filter(|s| valid_sha256(s))
+                            .ok_or("shell_verification_source_invalid")?
                             .to_owned()
                     } else if go_report {
                         report["task_target"]["source_sha256"]
@@ -1827,6 +2320,9 @@ fn latest_verification_observation(
                 None
             };
             latest_verify = Some(VerificationObservation {
+                gradle_inputs_stale: brief["checker_id"] == "java.gradle.javadoc"
+                    && report["task_input_stable"] == true
+                    && !crate::gradle_javadoc_task_recheck::inputs_current(root, &report),
                 outcome,
                 run_id: run_id.to_owned(),
                 report_sha256: event["report_sha256"]
@@ -1848,7 +2344,11 @@ fn latest_verification_observation(
                 } else {
                     None
                 },
-                checkstyle_reason: if checkstyle_report || preparation_report {
+                checkstyle_reason: if checkstyle_report
+                    || preparation_report
+                    || brief["checker_id"] == "java.gradle.javadoc"
+                    || brief["checker_id"] == "java.gradle.dependency_check"
+                {
                     report["reason"].as_str().map(str::to_owned)
                 } else {
                     None
@@ -1903,6 +2403,15 @@ fn latest_verification_observation(
 }
 
 fn run_sequence(run_id: &str) -> Option<u128> {
+    if run_id.starts_with("cve-gradle-task-") {
+        return run_id.rsplit('-').next()?.parse().ok();
+    }
+    if run_id.starts_with("cve-gradle-") {
+        return run_id.rsplit('-').nth(1)?.parse().ok();
+    }
+    if let Some(value) = run_id.strip_prefix("shellcheck-") {
+        return value.split('-').next()?.parse().ok();
+    }
     if run_id.starts_with("rust-cve-") || run_id.starts_with("python-cve-") {
         return run_id.rsplit('-').nth(1)?.parse().ok();
     }
@@ -1912,7 +2421,10 @@ fn run_sequence(run_id: &str) -> Option<u128> {
     if run_id.starts_with("eslint-") || run_id.starts_with("npm-") {
         return run_id.rsplit('-').next()?.parse().ok();
     }
-    if run_id.starts_with("checkstyle-") || run_id.starts_with("syntax-confirm-") {
+    if run_id.starts_with("checkstyle-")
+        || run_id.starts_with("syntax-confirm-")
+        || run_id.starts_with("javadoc-")
+    {
         return run_id.rsplit('-').next()?.parse().ok();
     }
     if let Some(value) = run_id
@@ -1936,7 +2448,7 @@ fn run_sequence(run_id: &str) -> Option<u128> {
 
 fn view(disposition: &str, reason: &str, brief: Value, actions: Value) -> Value {
     json!({
-        "schema_version":if brief["checker_id"] == "go.vet" {json!("0.13.0")} else if brief["checker_id"] == "syntax.native_confirmation" {brief["schema_version"].clone()} else {json!("0.1.0")}, "report_type":"repair_brief_preview",
+        "schema_version":if brief["schema_version"] == "0.36.0" {json!("0.36.0")}else if brief["schema_version"] == "0.35.0" {json!("0.35.0")}else if brief["schema_version"] == "0.34.0" {json!("0.34.0")}else if brief["schema_version"] == "0.33.0" {json!("0.33.0")}else if brief["schema_version"] == "0.32.0" {json!("0.32.0")}else if brief["schema_version"] == "0.31.0" {json!("0.31.0")}else if brief["schema_version"] == "0.30.0" {json!("0.30.0")}else if brief["schema_version"] == "0.29.0" {json!("0.29.0")}else if brief["schema_version"] == "0.28.0" {json!("0.28.0")}else if brief["schema_version"] == "0.27.0" {json!("0.27.0")}else if brief["schema_version"] == "0.26.0" {json!("0.26.0")}else if brief["schema_version"] == "0.25.0" {json!("0.25.0")}else if brief["schema_version"] == "0.24.0" {json!("0.24.0")}else if brief["schema_version"] == "0.23.0" {json!("0.23.0")}else if brief["schema_version"] == "0.22.0" {json!("0.22.0")}else if brief["schema_version"] == "0.21.0" {json!("0.21.0")}else if brief["schema_version"] == "0.20.0" {json!("0.20.0")}else if brief["checker_id"] == "shell.shellcheck" {json!("0.17.0")} else if brief["checker_id"] == "go.vet" {json!("0.13.0")} else if brief["checker_id"] == "syntax.native_confirmation" {brief["schema_version"].clone()} else {json!("0.1.0")}, "report_type":"repair_brief_preview",
         "operation":"next", "command_status":"complete", "exit_code":0,
         "disposition":disposition, "reason":reason,
         "repair_brief":brief, "next_actions":actions,
@@ -1982,8 +2494,9 @@ fn pending_reports(
                     .join("import-failures")
                     .join(format!("{run_id}-{digest}.json"));
                 if failure.exists() {
-                    let receipt: Value = serde_json::from_slice(&read_bounded(&failure, 4096)?)
-                        .map_err(|_| "import_failure_receipt_invalid")?;
+                    let receipt: Value =
+                        codeguard_adapters::parse_unique_json(&read_bounded(&failure, 4096)?)
+                            .map_err(|_| "import_failure_receipt_invalid")?;
                     if receipt["schema_version"] != "0.1.0"
                         || receipt["record_type"] != "local_import_failure"
                         || receipt["workspace_id"] != workspace_id
@@ -2005,8 +2518,9 @@ fn pending_reports(
                 }
                 continue;
             }
-            let marker: Value = serde_json::from_slice(&read_bounded(&marker, 4096)?)
-                .map_err(|_| "consumed_marker_invalid")?;
+            let marker: Value =
+                codeguard_adapters::parse_unique_json(&read_bounded(&marker, 4096)?)
+                    .map_err(|_| "consumed_marker_invalid")?;
             let bytes = read_bounded(&path, 16 * 1024 * 1024)?;
             if marker["schema_version"] != "0.1.0"
                 || marker["workspace_id"] != workspace_id
@@ -2142,6 +2656,22 @@ fn parse_format(value: &str) -> Result<bool, String> {
 mod python_action_tests {
     use super::canonical_action_id;
     use serde_json::json;
+    #[test]
+    fn clippy_documentation_guidance_requires_exact_checker_and_rule() {
+        for (rule, section) in [
+            ("missing_errors_doc", "Errors"),
+            ("missing_panics_doc", "Panics"),
+            ("missing_safety_doc", "Safety"),
+        ] {
+            let rule = format!("clippy::{rule}");
+            assert!(super::finding_repair_step("rust.cargo_clippy", &rule).contains(section));
+            assert!(!super::finding_repair_step("python.ruff", &rule).contains(section));
+            assert!(
+                !super::finding_repair_step("rust.cargo_clippy", &format!("{rule}_unknown"))
+                    .contains(section)
+            );
+        }
+    }
     #[test]
     fn native_syntax_evidence_controls_action_even_when_budget_requires_decision() {
         let mut brief = json!({"kind":"blocker","checker_id":"python.ruff","reason_code":"python_syntax_confirmation_needed","verification_observation":"still_present","disposition":"actionable"});

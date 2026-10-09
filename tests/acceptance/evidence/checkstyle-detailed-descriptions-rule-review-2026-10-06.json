@@ -1,0 +1,98 @@
+{
+  "authority": "local_unverified",
+  "command_status": "incomplete",
+  "delivery_decision": "not_evaluated",
+  "event_persisted": true,
+  "execution_budget": {
+    "enforcement": "native_execution_only",
+    "source": "builtin_default",
+    "timeout_ms": 1800000
+  },
+  "exit_code": 3,
+  "kind": "finding",
+  "native_scan": {
+    "authority": "local_unverified",
+    "checker_id": "java.checkstyle",
+    "coverage_proven": false,
+    "current_rule_class": "com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocTypeCheck",
+    "delivery_decision": "not_evaluated",
+    "local_status": "observed",
+    "reason": "project_configuration_and_quality_policy_unverified",
+    "report_type": "checkstyle_task_recheck",
+    "run_id": "checkstyle-task-18639-1791296249401521000",
+    "scan": {
+      "authority": "local_unverified",
+      "checker_id": "java.checkstyle",
+      "coverage_proven": false,
+      "delivery_decision": "not_evaluated",
+      "findings": [
+        {
+          "finding_fingerprint": "bc5eea6e4bb88c0741ce38e0797ba13d111c888adef648c2765aed16da914b24",
+          "finding_id": "CG-bc5eea6e4bb88c0741ce38e0797ba13d",
+          "line": 1,
+          "native": {
+            "checker_class": "com.puppycrawl.tools.checkstyle.checks.javadoc.MissingJavadocTypeCheck",
+            "column": 1,
+            "line": 1,
+            "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-0/Foo.java",
+            "repair_steps": [
+              "确认类型的用途与原配置范围后补充 Javadoc，不编造业务语义",
+              "使用同一原配置和原检查器复检；零诊断不单独作为项目交付或任务关闭条件"
+            ],
+            "rule_id": "detailDocs",
+            "rule_reference": "https://checkstyle.org/checks/javadoc/missingjavadoctype.html",
+            "rule_summary": "类型缺少 Javadoc",
+            "severity": "warning"
+          },
+          "path": "Foo.java",
+          "rule_id": "detailDocs",
+          "source_sha256": "626d55c191ca3a9f4467cc0564a4dffce3a4f3febd92d0df79814eeb4d8fec0d"
+        }
+      ],
+      "inputs": {
+        "config": {
+          "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-0/checks.xml",
+          "sha256": "4a7a9ecc02d993e1f0c725eb55c0e18760e60d083d658e57103453b8cba26fba"
+        },
+        "jar": {
+          "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-0/fixture.jar",
+          "sha256": "294fbce99942fcf856f72354f4d677e332494c8ac01e43726b5b1caec9f22f2d"
+        },
+        "java": {
+          "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-0/transport",
+          "sha256": "d491ad28d588d3307e1e00e6bb9cccdd6be3b1fdac2c6ddbb3edcfb773df1c1b"
+        },
+        "source": {
+          "path": "/private/var/folders/_s/9_xnnkz141920t1yv5zhvd1r0000gn/T/cg-checkstyle-detail-18579-0/Foo.java",
+          "sha256": "626d55c191ca3a9f4467cc0564a4dffce3a4f3febd92d0df79814eeb4d8fec0d"
+        }
+      },
+      "report_type": "java_checkstyle_workbench_observation",
+      "run_id": "checkstyle-task-18639-1791296249401521000",
+      "schema_version": "0.2.0",
+      "source_path": "Foo.java",
+      "workspace_binding": "bound",
+      "workspace_id": "ws-f5f9d97a71cbfdfffeb3ada2ab9e6d19"
+    },
+    "schema_version": "0.2.0",
+    "target": {
+      "checker_class": "com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck",
+      "path": "Foo.java",
+      "rule_id": "detailDocs",
+      "task_id": "CG-12e1811806015abdc977259d3721c4b7"
+    },
+    "task_input_stable": true,
+    "tool_identity_matches": true,
+    "workspace_binding": "bound",
+    "workspace_id": "ws-f5f9d97a71cbfdfffeb3ada2ab9e6d19"
+  },
+  "next_actions": [
+    "inspect_native_recheck_and_policy_before_closure"
+  ],
+  "observation": "rule_coverage_requires_review",
+  "operation": "task_verify",
+  "reason": null,
+  "report_type": "task_verification_preview",
+  "schema_version": "0.33.0",
+  "task_id": "CG-12e1811806015abdc977259d3721c4b7"
+}

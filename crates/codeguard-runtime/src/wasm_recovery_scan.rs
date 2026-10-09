@@ -10,10 +10,13 @@ pub struct WasmRecoveryScan {
     pub recoveries: Vec<WasmRecovery>,
     /// 诊断数量、遍历预算耗尽，或语法树错误无法定位；消费者须标记初检不完整。
     pub truncated: bool,
+    /// 已访问的错误分支未提供可遍历恢复节点；不等同于耗尽资源预算。
+    pub parser_error_location_unavailable: bool,
 }
 
 /// 遍历语法树中有错误的分支，提取 ERROR 与 MISSING 并去除精确重复节点。
 /// 参数为语法树和最大诊断数量；返回原始恢复节点与截断状态。
+/// 节点取出与每次子节点检查均计入二十万次访问预算，包括正常兄弟节点。
 pub fn scan_wasm_recoveries(tree: &Tree, max_records: usize) -> Result<WasmRecoveryScan, String> {
     if !(1..=1024).contains(&max_records) {
         return Err("语法恢复节点预算无效".into());
@@ -70,15 +73,26 @@ pub fn scan_wasm_recoveries(tree: &Tree, max_records: usize) -> Result<WasmRecov
             ancestor_error_group
         };
         let mut visible_error_child = false;
-        for index in (0..node.child_count()).rev() {
-            let Some(child) = node.child(index) else {
-                continue;
-            };
-            if child.has_error() || child.is_error() || child.is_missing() {
-                visible_error_child = true;
-                stack.push((child, child_error_group));
-                if stack.len() > 200_000 {
+        // 逆向游标维持原有入栈顺序，宽节点只顺序遍历一次。
+        // 正常兄弟也参与错误定位工作，不能绕过访问预算。
+        let mut cursor = node.walk();
+        if cursor.goto_last_child() {
+            loop {
+                visited += 1;
+                if visited > 200_000 {
                     truncated = true;
+                    break;
+                }
+                let child = cursor.node();
+                if child.has_error() || child.is_error() || child.is_missing() {
+                    visible_error_child = true;
+                    stack.push((child, child_error_group));
+                    if stack.len() > 200_000 {
+                        truncated = true;
+                        break;
+                    }
+                }
+                if !cursor.goto_previous_sibling() {
                     break;
                 }
             }
@@ -95,6 +109,7 @@ pub fn scan_wasm_recoveries(tree: &Tree, max_records: usize) -> Result<WasmRecov
     Ok(WasmRecoveryScan {
         recoveries,
         truncated: truncated || unlocated_error,
+        parser_error_location_unavailable: unlocated_error,
     })
 }
 

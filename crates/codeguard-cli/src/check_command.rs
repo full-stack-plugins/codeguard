@@ -57,7 +57,17 @@ struct Args {
     kotlinc_tool: Option<PathBuf>,
     swift_tool: Option<PathBuf>,
     ruby_tool: Option<PathBuf>,
+    shellcheck_tool: Option<PathBuf>,
+    shell_dialect: Option<String>,
     zig_tool: Option<PathBuf>,
+    clang_tool: Option<PathBuf>,
+    c_standard: Option<String>,
+    cpp_standard: Option<String>,
+    gradle_bundle: Option<PathBuf>,
+    gradle_javadoc: bool,
+    gradle_owasp_tasks: Vec<String>,
+    gradle_module_cache: Option<PathBuf>,
+    gradle_project_files: BTreeSet<PathBuf>,
     maven_tool: Option<PathBuf>,
     java_home: Option<PathBuf>,
     maven_repo: Option<PathBuf>,
@@ -81,6 +91,48 @@ enum OutputFormat {
 
 /// 执行已接入的原生检查并报告待确认的候选类别；当前绝不签发 allow。
 pub fn run(args: &[String]) -> ExitCode {
+    run_scoped(args, false)
+}
+
+/// 对全部发现语言执行lint类别；输入复用检查参数，返回原生局部检查退出语义。
+pub fn run_lint_all(args: &[String]) -> ExitCode {
+    if args.first().map(String::as_str) != Some("all") {
+        eprintln!("lint all需要all语言选择");
+        return ExitCode::from(2);
+    }
+    let forbidden = [
+        "--clang-tool",
+        "--c-standard",
+        "--cpp-standard",
+        "--gradle-owasp-task",
+        "--gradle-module-cache",
+        "--gradle-javadoc",
+        "--gradle-bundle",
+        "--gradle-project-file",
+        "--pip-audit-tool",
+        "--pip-audit-version",
+        "--cargo-audit-tool",
+        "--rustsec-db",
+        "--cve-data-dir",
+        "--cve-data-sha256",
+        "--node-tool",
+        "--npm-entry",
+        "--npm-version",
+        "--userconfig",
+        "--globalconfig",
+        "--registry",
+    ];
+    if args
+        .iter()
+        .any(|a| forbidden.contains(&a.split('=').next().unwrap_or(a)))
+    {
+        eprintln!("lint all不接受独立CVE或配置模型参数");
+        return ExitCode::from(2);
+    }
+    run_scoped(args, true)
+}
+
+fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
     let mut parsed = match parse_args(args) {
         Ok(parsed) => parsed,
         Err(reason) => {
@@ -142,6 +194,22 @@ pub fn run(args: &[String]) -> ExitCode {
         .map(Some)
         .map_err(|_| "project_source_snapshot_unavailable")
     };
+    let c_paths: BTreeMap<String, BTreeSet<String>> = if lint_only {
+        BTreeMap::new()
+    } else {
+        ["c", "cpp"]
+            .into_iter()
+            .filter(|l| parsed.selection.includes(l))
+            .filter_map(|l| {
+                discovery
+                    .languages
+                    .get(l)
+                    .filter(|e| !e.source_files.is_empty())
+                    .map(|e| (l.into(), e.source_files.clone()))
+            })
+            .collect()
+    };
+    let mut c_family_comments = Value::Null;
     let python_present = parsed.selection.includes("python")
         && discovery
             .languages
@@ -191,47 +259,54 @@ pub fn run(args: &[String]) -> ExitCode {
         .map(|evidence| &evidence.source_files);
     let java_present =
         parsed.selection.includes("java") && java_sources.is_some_and(|files| !files.is_empty());
-    let dependency_configured = parsed.selection.includes("java")
+    let dependency_configured = !lint_only
+        && parsed.selection.includes("java")
         && discovery.checker_configurations.iter().any(|entry| {
             entry.checker_id == "java.maven.dependency" && entry.configuration == "configured"
         });
-    let cve_configured = parsed.selection.includes("java")
+    let cve_configured = !lint_only
+        && parsed.selection.includes("java")
         && discovery.checker_configurations.iter().any(|entry| {
             entry.checker_id == "java.maven.dependency_check" && entry.configuration == "configured"
         });
-    let javadoc_configured = java_present
+    let javadoc_configured = !lint_only
+        && java_present
         && discovery.checker_configurations.iter().any(|entry| {
             entry.checker_id == "java.maven.javadoc" && entry.configuration == "configured"
         });
-    let javadoc_configuration_unresolved = java_present
+    let javadoc_configuration_unresolved = !lint_only
+        && java_present
         && !javadoc_configured
         && discovery.checker_configurations.iter().any(|entry| {
-            entry.checker_id == "java.maven.javadoc"
-                && matches!(entry.configuration.as_str(), "unknown" | "invalid")
+            matches!(
+                entry.checker_id.as_str(),
+                "java.maven.javadoc" | "java.gradle.javadoc"
+            ) && matches!(entry.configuration.as_str(), "unknown" | "invalid")
         });
     let mut npm_roots: BTreeMap<String, (String, Option<String>)> = BTreeMap::new();
-    let python_cve_roots: BTreeMap<String, String> = if parsed.selection.includes("python") {
-        discovery
-            .checker_configurations
-            .iter()
-            .filter(|entry| entry.checker_id == "python.pip_audit")
-            .filter(|entry| {
-                let manifest = if entry.build_root == "." {
-                    "pyproject.toml".to_owned()
-                } else {
-                    format!("{}/pyproject.toml", entry.build_root)
-                };
-                discovery.manifest_sha256.contains_key(&manifest)
-            })
-            .enumerate()
-            .map(|(index, entry)| (format!("python.cve.{index}"), entry.build_root.clone()))
-            .collect()
-    } else {
-        BTreeMap::new()
-    };
+    let python_cve_roots: BTreeMap<String, String> =
+        if !lint_only && parsed.selection.includes("python") {
+            discovery
+                .checker_configurations
+                .iter()
+                .filter(|entry| entry.checker_id == "python.pip_audit")
+                .filter(|entry| {
+                    let manifest = if entry.build_root == "." {
+                        "pyproject.toml".to_owned()
+                    } else {
+                        format!("{}/pyproject.toml", entry.build_root)
+                    };
+                    discovery.manifest_sha256.contains_key(&manifest)
+                })
+                .enumerate()
+                .map(|(index, entry)| (format!("python.cve.{index}"), entry.build_root.clone()))
+                .collect()
+        } else {
+            BTreeMap::new()
+        };
     let mut historical_npm_scope_error = None;
     let mut recorded_npm_scope_error = None;
-    if parsed.selection.includes_node() && cfg!(unix) {
+    if !lint_only && parsed.selection.includes_node() && cfg!(unix) {
         let mut scopes = BTreeMap::new();
         for entry in discovery
             .checker_configurations
@@ -380,6 +455,29 @@ pub fn run(args: &[String]) -> ExitCode {
         execution_tasks.push(json!({"id":"ruby.lint","status":if report["local_parse_complete"]==true {"native_observed_unverified"} else {"native_incomplete"}}));
         report
     };
+    let shell_sources = if parsed.selection.includes("shell") {
+        discovery
+            .languages
+            .get("shell")
+            .map(|e| e.source_files.clone())
+            .unwrap_or_default()
+    } else {
+        BTreeSet::new()
+    };
+    let mut shell_lint = if shell_sources.is_empty() {
+        Value::Null
+    } else {
+        let report = crate::check_shell_scan::observe(
+            &root,
+            &shell_sources,
+            parsed.shellcheck_tool.clone(),
+            parsed.shell_dialect.as_deref(),
+            deadline,
+            &AtomicBool::new(false),
+        );
+        execution_tasks.push(json!({"id":"shell.lint","status":if report["local_check_complete"]==true{"native_observed_unverified"}else{"native_incomplete"}}));
+        report
+    };
     let zig_sources = if parsed.selection.includes("zig") {
         discovery
             .languages
@@ -408,6 +506,37 @@ pub fn run(args: &[String]) -> ExitCode {
         execution_tasks.push(json!({"id":"zig.lint","status":if report["local_parse_complete"]==true {"native_observed_unverified"}else{"native_incomplete"}}));
         report
     };
+    let gradle_cve_requested = !parsed.gradle_owasp_tasks.is_empty();
+    let gradle_requested =
+        parsed.gradle_bundle.is_some() && (parsed.gradle_javadoc || !gradle_cve_requested);
+    let mut java_gradle_cve = Value::Null;
+    let mut gradle_cve_outcome = None;
+    // 在首个原生任务前绑定选定输入，结果返回后再核对，不能用执行后的字节补造证据。
+    let gradle_javadoc_snapshot = if parsed.gradle_javadoc {
+        codeguard_runtime::SourceSnapshot::capture(
+            &root,
+            parsed.gradle_project_files.clone(),
+            128,
+            1024 * 1024,
+            16 * 1024 * 1024,
+        )
+        .ok()
+    } else {
+        None
+    };
+
+    let gradle_task_id = if parsed.gradle_javadoc {
+        "java.gradle.javadoc"
+    } else {
+        "java.gradle.model"
+    };
+    let gradle_result_key = if parsed.gradle_javadoc {
+        "java_gradle_javadoc"
+    } else {
+        "java_gradle_model"
+    };
+    let mut java_gradle_model = Value::Null;
+    let mut gradle_model_outcome = None;
     let mut java_p3c = Value::Null;
     let mut java_javadoc = Value::Null;
     let mut java_dependencies = Value::Null;
@@ -419,12 +548,22 @@ pub fn run(args: &[String]) -> ExitCode {
         || go_present
         || erlang_present
         || java_present
+        || gradle_cve_requested
+        || gradle_requested
         || dependency_configured
         || cve_configured
         || !npm_roots.is_empty()
         || !python_cve_roots.is_empty()
+        || !c_paths.is_empty()
     {
         let mut nodes = Vec::new();
+        for language in c_paths.keys() {
+            nodes.push(TaskNode {
+                id: format!("{language}.comments"),
+                dependencies: Vec::new(),
+                resources: vec!["clang.documentation".into()],
+            });
+        }
         if node_present {
             nodes.push(TaskNode {
                 id: "node.lint".into(),
@@ -440,21 +579,23 @@ pub fn run(args: &[String]) -> ExitCode {
             });
         }
         if rust_present {
-            nodes.push(TaskNode {
-                id: "rust.cve".into(),
-                dependencies: Vec::new(),
-                resources: vec!["rust.advisory_db".into()],
-            });
-            nodes.push(TaskNode {
-                id: "rust.build".into(),
-                dependencies: Vec::new(),
-                resources: vec!["rust.cargo_target".into()],
-            });
-            nodes.push(TaskNode {
-                id: "rust.comments".into(),
-                dependencies: Vec::new(),
-                resources: vec!["rust.cargo_target".into()],
-            });
+            if !lint_only {
+                nodes.push(TaskNode {
+                    id: "rust.cve".into(),
+                    dependencies: Vec::new(),
+                    resources: vec!["rust.advisory_db".into()],
+                });
+                nodes.push(TaskNode {
+                    id: "rust.build".into(),
+                    dependencies: Vec::new(),
+                    resources: vec!["rust.cargo_target".into()],
+                });
+                nodes.push(TaskNode {
+                    id: "rust.comments".into(),
+                    dependencies: Vec::new(),
+                    resources: vec!["rust.cargo_target".into()],
+                });
+            }
             nodes.push(TaskNode {
                 id: "rust.lint".into(),
                 dependencies: Vec::new(),
@@ -488,6 +629,20 @@ pub fn run(args: &[String]) -> ExitCode {
                     resources: vec!["java.jdk_javadoc".into()],
                 });
             }
+        }
+        if gradle_cve_requested {
+            nodes.push(TaskNode {
+                id: "java.gradle.dependency_check".into(),
+                dependencies: Vec::new(),
+                resources: vec!["java.gradle_model".into()],
+            });
+        }
+        if gradle_requested {
+            nodes.push(TaskNode {
+                id: gradle_task_id.into(),
+                dependencies: Vec::new(),
+                resources: vec!["java.gradle_model".into()],
+            });
         }
         if dependency_configured {
             nodes.push(TaskNode {
@@ -528,11 +683,14 @@ pub fn run(args: &[String]) -> ExitCode {
         let node_slot = Mutex::new(None::<crate::check_eslint_scan::CheckEslintScan>);
         let go_slot = Mutex::new(None);
         let erlang_slot = Mutex::new(None);
+        let gradle_model_slot = Mutex::new(None);
+        let gradle_cve_slot = Mutex::new(None);
         let java_slot = Mutex::new(None);
         let javadoc_slot = Mutex::new(None);
         let dependency_slot = Mutex::new(None);
         let cve_slot = Mutex::new(None);
         let npm_slots = Mutex::new(BTreeMap::<String, Value>::new());
+        let c_comments_slot = Mutex::new(BTreeMap::<String, Value>::new());
         let python_cve_slots = Mutex::new(BTreeMap::<String, Value>::new());
         let mut outcomes = match run_task_graph(
             &graph,
@@ -540,7 +698,42 @@ pub fn run(args: &[String]) -> ExitCode {
             deadline,
             &cancelled,
             |id, deadline, flag| {
-                if let Some(build) = python_cve_roots.get(&id.id) {
+                if let Some(language) = id
+                    .id
+                    .strip_suffix(".comments")
+                    .filter(|l| c_paths.contains_key(*l))
+                {
+                    let standard = if language == "c" {
+                        parsed.c_standard.as_deref()
+                    } else {
+                        parsed.cpp_standard.as_deref()
+                    };
+                    let report = crate::check_c_family_comments::observe(
+                        &root,
+                        language,
+                        &c_paths[language],
+                        parsed.clang_tool.as_deref(),
+                        standard,
+                        deadline,
+                        flag,
+                    );
+                    let outcome = if flag.load(Ordering::Relaxed)
+                        || codeguard_runtime::sigint_cancellation_requested()
+                    {
+                        TaskExecution::Cancelled
+                    } else if Instant::now() >= deadline {
+                        TaskExecution::TimedOut
+                    } else if report["local_scan_complete"] == true {
+                        TaskExecution::Succeeded
+                    } else {
+                        TaskExecution::Failed
+                    };
+                    c_comments_slot
+                        .lock()
+                        .expect("Clang结果槽未中毒")
+                        .insert(language.into(), report);
+                    outcome
+                } else if let Some(build) = python_cve_roots.get(&id.id) {
                     let build_path = if build == "." {
                         root.clone()
                     } else {
@@ -671,9 +864,12 @@ pub fn run(args: &[String]) -> ExitCode {
                     *go_slot.lock().expect("Go 结果槽位未中毒") = Some(report);
                     outcome
                 } else if id.id == "rust.cve" {
+                    let cargo_audit_tool = crate::cargo_audit_command::discover_for_project_check(
+                        parsed.cargo_audit_tool.as_deref(),
+                    );
                     let report = crate::cargo_audit_command::observe_for_check(
                         &root,
-                        parsed.cargo_audit_tool.as_deref(),
+                        cargo_audit_tool.as_deref(),
                         parsed.rustsec_db.as_deref(),
                         parsed.timeout_ms,
                         parsed.timeout_source,
@@ -763,6 +959,66 @@ pub fn run(args: &[String]) -> ExitCode {
                     };
                     *rust_slot.lock().expect("Rust 结果槽位未中毒") = Some(report);
                     *rust_coverage_slot.lock().expect("Rust源码覆盖槽位未中毒") = Some(coverage);
+                    outcome
+                } else if id.id == "java.gradle.dependency_check" {
+                    let report = crate::gradle_dependency_check_probe::observe(
+                        &crate::gradle_dependency_check_request::Request {
+                            module_cache: parsed.gradle_module_cache.clone(),
+                            native: crate::gradle_model_probe_request::Request {
+                                project_root: root.clone(),
+                                project_files: parsed.gradle_project_files.clone(),
+                                gradle_bundle: parsed
+                                    .gradle_bundle
+                                    .clone()
+                                    .expect("原生Gradle参数已验证"),
+                                java_home: parsed.java_home.clone().expect("原生JDK参数已验证"),
+                                deadline,
+                            },
+                            task_paths: parsed.gradle_owasp_tasks.clone(),
+                        },
+                        flag,
+                    );
+                    let outcome = if report["reason"] == "request_cancelled" {
+                        TaskExecution::Cancelled
+                    } else if report["reason"] == "request_deadline_exceeded" {
+                        TaskExecution::TimedOut
+                    } else if report["native_status"] == "reports_observed_unverified" {
+                        TaskExecution::Succeeded
+                    } else {
+                        TaskExecution::Failed
+                    };
+                    *gradle_cve_slot.lock().expect("Gradle CVE结果槽未中毒") = Some(report);
+                    outcome
+                } else if id.id == gradle_task_id {
+                    let request = crate::gradle_model_probe::Request {
+                        project_root: root.clone(),
+                        project_files: parsed.gradle_project_files.clone(),
+                        gradle_bundle: parsed.gradle_bundle.clone().expect("显式Gradle任务有工具"),
+                        java_home: parsed.java_home.clone().expect("参数验证要求JDK"),
+                        deadline,
+                    };
+                    let report = if parsed.gradle_javadoc {
+                        crate::gradle_javadoc_probe::observe(&request, flag)
+                    } else {
+                        crate::gradle_model_probe::observe(&request, flag)
+                    };
+                    let outcome = if report["reason"] == "request_cancelled" {
+                        TaskExecution::Cancelled
+                    } else if report["reason"] == "request_deadline_exceeded" {
+                        TaskExecution::TimedOut
+                    } else if matches!(
+                        report["native_status"].as_str(),
+                        Some(
+                            "model_observed_unverified"
+                                | "findings_observed_unverified"
+                                | "empty_output_unverified"
+                        )
+                    ) {
+                        TaskExecution::Succeeded
+                    } else {
+                        TaskExecution::Failed
+                    };
+                    *gradle_model_slot.lock().expect("Gradle模型结果槽未中毒") = Some(report);
                     outcome
                 } else if id.id == "java.javadoc" {
                     let report = observe_javadoc_project(
@@ -945,6 +1201,50 @@ pub fn run(args: &[String]) -> ExitCode {
                 "java_cve":snapshot_native_slot(&cve_slot),
                 "npm_cve":npm_slots.lock().unwrap_or_else(std::sync::PoisonError::into_inner).values().cloned().collect::<Vec<_>>()
             });
+            if !c_paths.is_empty() {
+                let mut scans = c_comments_slot
+                    .lock()
+                    .unwrap_or_else(std::sync::PoisonError::into_inner)
+                    .clone();
+                for (language, paths) in &c_paths {
+                    scans.entry(language.clone()).or_insert_with(|| {
+                        crate::check_c_family_comments::empty(
+                            language,
+                            paths.len(),
+                            parsed.clang_tool.as_deref(),
+                            if language == "c" {
+                                parsed.c_standard.as_deref()
+                            } else {
+                                parsed.cpp_standard.as_deref()
+                            },
+                        )
+                    });
+                }
+                for scan in scans.values_mut() {
+                    scan["scope_stable"] = json!(false);
+                    crate::check_c_family_comments::refresh(&root, scan, deadline);
+                }
+                native_results["c_family_comments"] = json!(scans);
+            }
+            if gradle_cve_requested {
+                native_results["java_gradle_cve"] = snapshot_native_slot(&gradle_cve_slot);
+            }
+            if gradle_requested {
+                native_results[gradle_result_key] = snapshot_native_slot(&gradle_model_slot);
+                // 只在该语言确实产出结果时写入槽位。无条件写入 null 会让「本项目没有该语言
+                // 源码」与「该语言结果为 null」在报告里不可区分，下游据此误判覆盖范围。
+                for (key, value) in [
+                    ("kotlin_lint", &kotlin_lint),
+                    ("swift_lint", &swift_lint),
+                    ("ruby_lint", &ruby_lint),
+                    ("shell_lint", &shell_lint),
+                    ("zig_lint", &zig_lint),
+                ] {
+                    if value.is_object() {
+                        native_results[key] = value.clone();
+                    }
+                }
+            }
             if zig_lint.is_object() {
                 crate::check_zig_scan::refresh(&root, &mut zig_lint, deadline);
                 native_results["zig_lint"] = zig_lint.clone();
@@ -1012,6 +1312,26 @@ pub fn run(args: &[String]) -> ExitCode {
             crate::npm_check_scan::sync(&root, &mut report, deadline);
             npm_cve.push(report);
         }
+        if !c_paths.is_empty() {
+            let mut results = c_comments_slot.into_inner().expect("Clang结果槽未中毒");
+            for (language, paths) in &c_paths {
+                let id = format!("{language}.comments");
+                execution_tasks.push(json!({"id":id,"status":task_status(*outcomes.get(&id).expect("Clang任务结果完整"))}));
+                results.entry(language.clone()).or_insert_with(|| {
+                    crate::check_c_family_comments::empty(
+                        language,
+                        paths.len(),
+                        parsed.clang_tool.as_deref(),
+                        if language == "c" {
+                            parsed.c_standard.as_deref()
+                        } else {
+                            parsed.cpp_standard.as_deref()
+                        },
+                    )
+                });
+            }
+            c_family_comments = json!(results);
+        }
         if python_present {
             let outcome = *outcomes.get("python.lint").expect("任务图结果应完整");
             if outcome == TaskOutcome::InternalFailure {
@@ -1037,27 +1357,31 @@ pub fn run(args: &[String]) -> ExitCode {
             };
         }
         if rust_present {
-            let cve_outcome = *outcomes.get("rust.cve").expect("Rust CVE 任务结果完整");
-            rust_cve_outcome = Some(cve_outcome);
-            execution_tasks.push(json!({"id":"rust.cve","status":task_status(cve_outcome)}));
-            rust_cve = rust_cve_slot
-                .into_inner()
-                .expect("Rust CVE 结果槽未中毒")
-                .unwrap_or(Value::Null);
-            let build_outcome = *outcomes.get("rust.build").expect("Rust构建任务结果完整");
-            rust_build_outcome = Some(build_outcome);
-            execution_tasks.push(json!({"id":"rust.build","status":task_status(build_outcome)}));
-            rust_build = rust_build_slot
-                .into_inner()
-                .expect("Rust构建结果槽未中毒")
-                .unwrap_or(Value::Null);
-            let doc_outcome = *outcomes.get("rust.comments").expect("Rust文档任务结果完整");
-            rust_comments_outcome = Some(doc_outcome);
-            execution_tasks.push(json!({"id":"rust.comments","status":task_status(doc_outcome)}));
-            rust_comments = rust_comments_slot
-                .into_inner()
-                .expect("Rust文档结果槽未中毒")
-                .unwrap_or(Value::Null);
+            if !lint_only {
+                let cve_outcome = *outcomes.get("rust.cve").expect("Rust CVE 任务结果完整");
+                rust_cve_outcome = Some(cve_outcome);
+                execution_tasks.push(json!({"id":"rust.cve","status":task_status(cve_outcome)}));
+                rust_cve = rust_cve_slot
+                    .into_inner()
+                    .expect("Rust CVE 结果槽未中毒")
+                    .unwrap_or(Value::Null);
+                let build_outcome = *outcomes.get("rust.build").expect("Rust构建任务结果完整");
+                rust_build_outcome = Some(build_outcome);
+                execution_tasks
+                    .push(json!({"id":"rust.build","status":task_status(build_outcome)}));
+                rust_build = rust_build_slot
+                    .into_inner()
+                    .expect("Rust构建结果槽未中毒")
+                    .unwrap_or(Value::Null);
+                let doc_outcome = *outcomes.get("rust.comments").expect("Rust文档任务结果完整");
+                rust_comments_outcome = Some(doc_outcome);
+                execution_tasks
+                    .push(json!({"id":"rust.comments","status":task_status(doc_outcome)}));
+                rust_comments = rust_comments_slot
+                    .into_inner()
+                    .expect("Rust文档结果槽未中毒")
+                    .unwrap_or(Value::Null);
+            }
             let outcome = *outcomes.get("rust.lint").expect("任务图结果应完整");
             if outcome == TaskOutcome::InternalFailure {
                 eprintln!("Rust 任务发生内部异常");
@@ -1090,6 +1414,27 @@ pub fn run(args: &[String]) -> ExitCode {
             go_lint = go_slot
                 .into_inner()
                 .expect("Go 结果槽位未中毒")
+                .unwrap_or(Value::Null);
+        }
+        if gradle_cve_requested {
+            let outcome = *outcomes
+                .get("java.gradle.dependency_check")
+                .expect("Gradle CVE任务结果完整");
+            gradle_cve_outcome = Some(outcome);
+            execution_tasks
+                .push(json!({"id":"java.gradle.dependency_check","status":task_status(outcome)}));
+            java_gradle_cve = gradle_cve_slot
+                .into_inner()
+                .expect("Gradle CVE结果槽未中毒")
+                .unwrap_or(Value::Null);
+        }
+        if gradle_requested {
+            let outcome = *outcomes.get(gradle_task_id).expect("Gradle任务结果完整");
+            gradle_model_outcome = Some(outcome);
+            execution_tasks.push(json!({"id":gradle_task_id, "status":task_status(outcome)}));
+            java_gradle_model = gradle_model_slot
+                .into_inner()
+                .expect("Gradle模型结果槽未中毒")
                 .unwrap_or(Value::Null);
         }
         if java_present {
@@ -1184,6 +1529,37 @@ pub fn run(args: &[String]) -> ExitCode {
             }
         }
     }
+    let gradle_cve_tasks = if gradle_cve_requested {
+        let result = if java_gradle_cve["reason"] == "request_cancelled"
+            || codeguard_runtime::sigint_cancellation_requested()
+        {
+            Err("request_cancelled")
+        } else {
+            crate::gradle_cve_workbench::persist(
+                &root,
+                &parsed.gradle_project_files,
+                &parsed.gradle_owasp_tasks,
+                parsed.gradle_module_cache.is_some(),
+                &java_gradle_cve,
+            )
+        };
+        match result {
+            Ok(true) => json!({"task_sync":"synced","task_sync_reason":null}),
+            Ok(false) => json!({"task_sync":"not_initialized","task_sync_reason":null}),
+            Err(reason) => json!({"task_sync":"incomplete","task_sync_reason":reason}),
+        }
+    } else {
+        Value::Null
+    };
+    let gradle_javadoc_tasks = if parsed.gradle_javadoc {
+        crate::gradle_javadoc_workbench::connect(
+            &root,
+            gradle_javadoc_snapshot.as_ref(),
+            &java_gradle_model,
+        )
+    } else {
+        Value::Null
+    };
     if rust_lint.is_object() {
         crate::rust_lint_workbench::persist_and_sync(&root, &mut rust_lint);
     }
@@ -1274,6 +1650,14 @@ pub fn run(args: &[String]) -> ExitCode {
         crate::native_syntax_confirmation::connect(&root, &mut ruby_lint, deadline);
         crate::check_ruby_scan::refresh(&root, &mut ruby_lint, deadline);
     }
+    if shell_lint.is_object() {
+        if source_recheck.or(scope_recheck).is_some() {
+            shell_lint["scope_stable"] = json!(false);
+        }
+        crate::check_shell_scan::refresh(&root, &mut shell_lint, deadline);
+        crate::check_shell_scan::connect(&root, &mut shell_lint, deadline);
+        crate::check_shell_scan::refresh(&root, &mut shell_lint, deadline);
+    }
     if erlang_lint.is_object() {
         if source_recheck.or(scope_recheck).is_some() {
             crate::check_erlang_scan::invalidate_scope(&mut erlang_lint);
@@ -1282,6 +1666,16 @@ pub fn run(args: &[String]) -> ExitCode {
         crate::native_syntax_confirmation::connect(&root, &mut erlang_lint, deadline);
         crate::check_erlang_scan::refresh(&root, &mut erlang_lint, deadline);
     }
+    for scan in c_family_comments
+        .as_object_mut()
+        .into_iter()
+        .flat_map(|m| m.values_mut())
+    {
+        if source_recheck.or(scope_recheck).is_some() {
+            scan["scope_stable"] = json!(false);
+        }
+        crate::check_c_family_comments::connect(&root, scan, deadline);
+    }
     let python_doc_observed = python_lint["files"].as_array().is_some_and(|files| {
         files.iter().any(|file| {
             file["run_status"] == "findings"
@@ -1289,7 +1683,20 @@ pub fn run(args: &[String]) -> ExitCode {
                     findings.iter().any(|finding| {
                         finding["rule_id"]
                             .as_str()
-                            .is_some_and(codeguard_adapters::is_ruff_pydocstyle_rule)
+                            .is_some_and(codeguard_adapters::is_ruff_documentation_rule)
+                    })
+                })
+        })
+    });
+    let python_contract_doc_observed = python_lint["files"].as_array().is_some_and(|files| {
+        files.iter().any(|file| {
+            file["run_status"] == "findings"
+                && file["findings"].as_array().is_some_and(|findings| {
+                    findings.iter().any(|finding| {
+                        finding["rule_id"]
+                            .as_str()
+                            .and_then(codeguard_adapters::RuffDocumentationRule::from_code)
+                            .is_some()
                     })
                 })
         })
@@ -1315,6 +1722,9 @@ pub fn run(args: &[String]) -> ExitCode {
         });
         let planned_language = legacy_status == "planned";
         for category in CHECK_CATEGORIES {
+            if lint_only && category != "lint" {
+                continue;
+            }
             let npm_selected = matches!(language.as_str(), "typescript" | "javascript")
                 && category == "cve"
                 && !npm_roots.is_empty();
@@ -1381,8 +1791,96 @@ pub fn run(args: &[String]) -> ExitCode {
                 "checker_id": if rust_cve_selected {Some("rust.cargo_audit")} else if rust_build_selected {Some("rust.cargo_check")} else if rust_comments_selected {Some("rust.cargo_rustdoc")} else if npm_selected { Some("node.npm.audit") } else if go_lint_selected { Some("go.vet") } else if language == "java" && category == "dependencies" && dependency_configured { Some("java.maven.dependency") } else if cve_scope_configured { Some("java.maven.dependency_check") } else { java_checker.as_ref().and_then(|candidate| candidate.checker_id) },
                 "next_action": if rust_cve_selected {Some("核对原生漏洞及解析版本；补齐离线数据库身份和时效、受批准工具与策略，再用原工具复检")} else if rust_build_selected {Some("核对原生编译错误与锁定输入，读取稳定任务并用同一Cargo复检；类型检查不执行测试，完整构建组合和策略仍须核验")} else if rust_comments_selected {Some("按文档原生规则修复或恢复锁定离线环境；读取稳定任务并用同一Cargo复检，核验原配置和完整目标范围")} else if npm_selected { Some("核对逐npm构建根的原生诊断、锁版本及漏洞源覆盖及时效，取得稳定任务并用原工具复检") } else if planned_language { Some("该语言尚无已验证的原生适配器；先确定原生检查工具、适用规则和正反例，再实现并验收检查链") } else if go_lint_selected { Some("提供匹配的 Go 1.23.4 工具、修复环境或源码后重跑逐模块 vet；仍须确认规则和平台覆盖") } else if language == "java" && category == "dependencies" && dependency_configured { Some("补齐 Maven/JDK/离线仓库身份或修正原生报告，再运行依赖图探针") } else if cve_scope_configured { Some("补齐原生工具和离线漏洞库身份，核验数据库时效及漏洞归属后重新检查") } else { java_checker.as_ref().map(|candidate| candidate.next_action) },
                 "status": if observed { "observed_unverified" } else if npm_selected || python_lint_selected || rust_lint_selected || rust_comments_selected || rust_build_selected || rust_cve_selected || go_lint_selected || java_lint_selected || java_comments_selected || (language == "java" && category == "dependencies" && dependency_configured) || (cve_scope_configured) { "native_incomplete" } else if language == "java" && category == "comments" { if javadoc_configuration_unresolved { "configuration_unresolved" } else { "not_configured" } } else if let Some(candidate) = java_checker.as_ref() { candidate.status } else { "not_integrated" },
-                "reason": if rust_cve_selected { if observed { "rust_cve_database_freshness_unverified" } else { "rust_cve_native_incomplete" } } else if npm_selected { "npm_advisory_coverage_and_freshness_unverified" } else if planned_language { "planned_language_adapter_gap" } else if observed { "trusted_policy_and_coverage_unavailable" } else if java_lint_selected && java_p3c["local_observation_complete"] == true { "p3c_declared_rulesets_unverified_coverage" } else if java_comments_selected && java_javadoc["maven_multifile_probes"].as_array().is_some_and(|probes| probes.iter().any(|probe| matches!(probe["observation"]["native_status"].as_str(), Some("findings_observed_untrusted" | "clean_log_unverified")))) { "javadoc_multifile_probe_unverified_project_coverage" } else if java_comments_selected && java_javadoc["local_probe_complete"] == true { "javadoc_single_file_probe_unverified_coverage" } else if language == "java" && category == "dependencies" && java_dependencies["observed_graph_count"].as_u64().is_some_and(|count| count > 0) { "dependency_graph_observed_unverified_coverage" } else if cve_scope_configured && java_cve["observed_report_count"].as_u64().is_some_and(|count| count > 0) { "cve_report_observed_database_unverified" } else if (language == "java" && category == "dependencies" && dependency_configured) || cve_scope_configured || python_lint_selected || rust_lint_selected || rust_comments_selected || rust_build_selected || go_lint_selected || java_lint_selected || java_comments_selected { "native_scan_incomplete" } else if language == "java" && category == "comments" { if javadoc_configuration_unresolved { "javadoc_configuration_unresolved" } else { "not_configured" } } else if let Some(candidate) = java_checker.as_ref() { candidate.reason } else { "native_adapter_not_integrated" }
+                "reason": if rust_cve_selected { if observed { "rust_cve_database_freshness_unverified" } else { "rust_cve_native_incomplete" } } else if npm_selected { "npm_advisory_coverage_and_freshness_unverified" } else if planned_language { "planned_language_adapter_gap" } else if observed { "trusted_policy_and_coverage_unavailable" } else if java_lint_selected && java_p3c["local_observation_complete"] == true { "p3c_declared_rulesets_unverified_coverage" } else if java_comments_selected && java_javadoc["maven_multifile_probes"].as_array().is_some_and(|probes| probes.iter().any(|probe| matches!(probe["observation"]["native_status"].as_str(), Some("findings_observed_untrusted" | "clean_log_unverified")))) { "javadoc_multifile_probe_unverified_project_coverage" } else if java_comments_selected && java_javadoc["local_probe_complete"] == true { "javadoc_single_file_probe_unverified_coverage" } else if language == "java" && category == "dependencies" && java_dependencies["observed_graph_count"].as_u64().is_some_and(|count| count > 0) { "dependency_graph_observed_unverified_coverage" } else if cve_scope_configured && java_cve["observed_report_count"].as_u64().is_some_and(|count| count > 0) { "cve_report_observed_database_unverified" } else if (language == "java" && category == "dependencies" && dependency_configured) || cve_scope_configured || python_lint_selected || rust_lint_selected || rust_comments_selected || rust_build_selected || go_lint_selected || java_lint_selected || java_comments_selected { "native_scan_incomplete" } else if language == "java" && category == "comments" { if javadoc_configuration_unresolved { "javadoc_configuration_unresolved" } else { "javadoc_checker_not_configured" } } else if let Some(candidate) = java_checker.as_ref() { candidate.reason } else { "native_adapter_not_integrated" }
             });
+            if matches!(language.as_str(), "c" | "cpp") && category == "comments" {
+                let scan = &c_family_comments[language];
+                candidate["checker_id"] = json!(if language == "c" {
+                    "c.clang.documentation_structure"
+                } else {
+                    "cpp.clang.documentation_structure"
+                });
+                candidate["status"] = json!(if scan["local_scan_complete"] == true {
+                    "observed_unverified"
+                } else if scan["status"] == "context_required" {
+                    "not_configured"
+                } else {
+                    "native_incomplete"
+                });
+                candidate["reason"] = json!(if scan["status"] == "context_required" {
+                    "clang_documentation_context_required"
+                } else {
+                    "clang_documentation_project_coverage_unverified"
+                });
+                candidate["next_action"] = json!(
+                    "提供匹配项目的原Clang与明确标准；读取原警告及结构任务，用原工具task verify复检，完整项目与详细准确性仍未验收。"
+                );
+            }
+            if language == "java" && category == "comments" && javadoc_configuration_unresolved {
+                candidate["next_action"] = json!(
+                    "按源码最近构建根核验 Maven/Gradle 的生效 Javadoc 配置、doclint/doclet 和源集；当前静态观察未知，不判配置缺失，也不要求修改无关构建器"
+                );
+            }
+            // 显式Gradle文档检查不能被Maven配置探测的“未配置”覆盖。
+            // 此处只归属所选适配器的局部观察，完整规则/原项目覆盖仍未验收。
+            if language == "java" && category == "comments" && parsed.gradle_javadoc {
+                let gradle_observed = gradle_model_outcome == Some(TaskOutcome::Succeeded)
+                    && matches!(
+                        java_gradle_model["native_status"].as_str(),
+                        Some("findings_observed_unverified" | "empty_output_unverified")
+                    );
+                candidate["checker_id"] = json!("java.gradle.javadoc");
+                candidate["status"] = json!(if gradle_observed {
+                    "observed_unverified"
+                } else {
+                    "native_incomplete"
+                });
+                candidate["reason"] = json!(if gradle_observed {
+                    "gradle_javadoc_selected_inputs_and_rules_unverified"
+                } else {
+                    "gradle_javadoc_native_incomplete"
+                });
+                candidate["next_action"] = json!(if gradle_observed {
+                    "读取 native_results.java_gradle_javadoc 的原生诊断；按用途、参数和返回等规则修复，用相同 Gradle/JDK/选定输入复检；无诊断仍须核验原项目 doclint、源集和完整规则，不签发合规"
+                } else {
+                    "读取 native_results.java_gradle_javadoc 的具体阻塞，恢复已有 Gradle/JDK、选定构建和 Java 输入或取消/超时原因，再用相同原生任务复检；不能据执行故障判断配置缺失或修改无关源码"
+                });
+            }
+            // 原生Maven局部结果继续保留，但不能覆盖同一源码范围的Gradle未解析义务。
+            if let Some(scope) = java_checker.as_ref().filter(|scope| {
+                language == "java"
+                    && matches!(category, "dependencies" | "cve" | "security")
+                    && matches!(
+                        scope.reason,
+                        "checker_build_systems_mixed" | "gradle_model_not_resolved"
+                    )
+            }) {
+                candidate["checker_id"] = json!(scope.checker_id);
+                candidate["status"] = json!(scope.status);
+                candidate["reason"] = json!(scope.reason);
+                candidate["next_action"] = json!(scope.next_action);
+            }
+            if language == "java" && category == "cve" && gradle_cve_requested {
+                let observed = gradle_cve_outcome == Some(TaskOutcome::Succeeded)
+                    && java_gradle_cve["native_status"] == "reports_observed_unverified";
+                if cve_configured {
+                    candidates.push(candidate.clone());
+                }
+                candidate["checker_id"] = json!("java.gradle.dependency_check");
+                candidate["status"] = json!(if observed {
+                    "observed_unverified"
+                } else {
+                    "native_incomplete"
+                });
+                candidate["reason"] = json!(if observed {
+                    "gradle_cve_coverage_and_freshness_unverified"
+                } else {
+                    "gradle_cve_native_incomplete"
+                });
+                candidate["next_action"] = json!(
+                    "读取native_results.java_gradle_cve原任务报告和具体阻塞，保留活动及原生抑制漏洞；核对完整依赖和库时效，读取稳定准备任务并用原工具task verify；零报告不授予无漏洞资格"
+                );
+            }
             if language == "kotlin" && category == "lint" && kotlin_lint.is_object() {
                 candidate["checker_id"] = json!("kotlin.jvm.compiler");
                 candidate["status"] = json!("native_incomplete");
@@ -1411,6 +1909,15 @@ pub fn run(args: &[String]) -> ExitCode {
                     "读取 native_results.swift_lint 的当前语法位置、环境阻塞；核对逐文件任务同步结果，单文件 parse不代替项目 lint 与完整构建"
                 );
             }
+            if language == "shell" && category == "lint" && shell_lint.is_object() {
+                candidate["checker_id"] = json!("shell.shellcheck");
+                candidate["status"] = json!("native_incomplete");
+                candidate["reason"] =
+                    json!("shell_project_obligations_and_source_coverage_unverified");
+                candidate["next_action"] = json!(
+                    "读取shell_lint逐文件SC规则与环境阻塞，使用原任务复检；source依赖、其它检查族及可信覆盖仍需核验"
+                );
+            }
             if language == "ruby" && category == "lint" && ruby_lint.is_object() {
                 candidate["checker_id"] = json!("ruby.syntax");
                 candidate["status"] = json!("native_incomplete");
@@ -1433,18 +1940,58 @@ pub fn run(args: &[String]) -> ExitCode {
             if python_comments_selected {
                 candidate["checker_id"] = json!("python.ruff");
                 candidate["next_action"] = json!(
-                    "核对 Ruff 原生 pydocstyle 规则与定位，按项目约定修正文档后运行同一原生工具复检；完整规则集与批准覆盖仍须核验"
+                    "核对 Ruff 原生文档规则与定位，按项目约定修正文档后运行同一原生工具复检；完整规则集与批准覆盖仍须核验"
                 );
                 candidate["status"] = json!(if observed {
                     "observed_unverified"
                 } else {
                     "native_incomplete"
                 });
-                candidate["reason"] = json!(if observed {
+                candidate["reason"] = json!(if python_contract_doc_observed {
+                    if observed {
+                        "trusted_policy_and_coverage_unavailable"
+                    } else {
+                        "native_scan_incomplete"
+                    }
+                } else if observed {
                     "ruff_d100_native_finding_unverified_coverage"
                 } else {
                     "ruff_d100_native_observation_incomplete"
                 });
+            }
+            // 文档类原生发现来自两个独立服务；保留Rustdoc义务，不能用Clippy结果覆盖。
+            // 只分类精确已适配的原规则，空结果不证明这些规则启用或详细内容合格。
+            if rust_comments_selected
+                && rust_lint["findings"].as_array().is_some_and(|findings| {
+                    findings.iter().any(|finding| {
+                        matches!(
+                            finding["rule_id"].as_str(),
+                            Some(
+                                "clippy::missing_errors_doc"
+                                    | "clippy::missing_panics_doc"
+                                    | "clippy::missing_safety_doc"
+                            )
+                        )
+                    })
+                })
+            {
+                candidates.push(candidate.clone());
+                candidate["checker_id"] = json!("rust.cargo_clippy");
+                let complete = rust_task_outcome == Some(TaskOutcome::Succeeded)
+                    && rust_lint["local_scan_complete"] == true;
+                candidate["status"] = json!(if complete {
+                    "observed_unverified"
+                } else {
+                    "native_incomplete"
+                });
+                candidate["reason"] = json!(if complete {
+                    "trusted_policy_and_coverage_unavailable"
+                } else {
+                    "native_scan_incomplete"
+                });
+                candidate["next_action"] = json!(
+                    "读取 native_results.rust_lint 的原生 Errors/Panics/Safety 规则与稳定任务，说明实际契约并用原 Cargo 对原任务 task verify；空章节不能代替详细说明，Rustdoc 与完整文档覆盖仍须分别核验"
+                );
             }
             if language == "python" && category == "cve" {
                 candidate["checker_id"] = json!("python.pip_audit");
@@ -1543,7 +2090,7 @@ pub fn run(args: &[String]) -> ExitCode {
             unresolved.insert("python_cve_task_incomplete".into());
         }
     }
-    if rust_present {
+    if rust_present && !lint_only {
         unresolved.insert("rust_cve_database_freshness_unverified".into());
         if rust_cve_outcome != Some(TaskOutcome::Succeeded) {
             unresolved.insert("rust_cve_task_incomplete".into());
@@ -1623,6 +2170,15 @@ pub fn run(args: &[String]) -> ExitCode {
             unresolved.insert("ruby_native_scan_incomplete".into());
         }
     }
+    if shell_lint.is_object() {
+        unresolved.insert("shell_project_obligations_and_source_coverage_unverified".into());
+        if shell_lint["local_check_complete"] != true {
+            unresolved.insert("shell_native_scan_incomplete".into());
+        }
+        if shell_lint["task_status"] != "synced_partial" {
+            unresolved.insert("shell_native_tasks_not_fully_connected".into());
+        }
+    }
     if erlang_present {
         unresolved.insert("erlang_project_lint_preprocessing_and_build_coverage_unverified".into());
         if erlang_task_outcome != Some(TaskOutcome::Succeeded)
@@ -1691,6 +2247,8 @@ pub fn run(args: &[String]) -> ExitCode {
             javadoc_task_outcome,
             dependency_task_outcome,
             cve_task_outcome,
+            gradle_model_outcome,
+            gradle_cve_outcome,
         ]
         .into_iter()
         .flatten()
@@ -1700,6 +2258,28 @@ pub fn run(args: &[String]) -> ExitCode {
                 TaskOutcome::Cancelled | TaskOutcome::CancelledBeforeStart
             )
         });
+    if gradle_requested {
+        unresolved
+            .insert("gradle_selected_configuration_model_and_quality_coverage_unverified".into());
+        if parsed.gradle_javadoc {
+            unresolved
+                .insert("gradle_detailed_documentation_rules_and_repair_closure_unverified".into());
+            if java_gradle_model["native_status"] == "incomplete" || java_gradle_model.is_null() {
+                unresolved.insert("gradle_native_javadoc_incomplete".into());
+            }
+        } else if java_gradle_model["native_status"] != "model_observed_unverified" {
+            unresolved.insert("gradle_native_model_incomplete".into());
+        }
+    }
+    if gradle_cve_requested {
+        unresolved.insert("gradle_cve_coverage_and_freshness_unverified".into());
+        if gradle_cve_outcome != Some(TaskOutcome::Succeeded) {
+            unresolved.insert("gradle_cve_native_incomplete".into());
+        }
+        if gradle_cve_tasks["task_sync"] == "incomplete" {
+            unresolved.insert("gradle_cve_task_sync_incomplete".into());
+        }
+    }
     if request_cancelled {
         unresolved.insert("request_cancelled".into());
     }
@@ -1787,6 +2367,18 @@ pub fn run(args: &[String]) -> ExitCode {
                 Value::Null
             }
         });
+    if parsed.gradle_javadoc || parsed.selection == Selection::Java {
+        match read_local_brief_for_checker(&root, "java.gradle.javadoc") {
+            Ok(brief) if brief["repair_brief"].is_object() => next = brief,
+            Ok(_) => {}
+            Err(reason) => {
+                unresolved.insert(format!("gradle_next_unavailable:{reason}"));
+            }
+        }
+    }
+    if next.is_null() && shell_lint["task_status"] == "synced_partial" {
+        next = read_local_brief_for_checker(&root, "shell.shellcheck").unwrap_or(Value::Null);
+    }
     if let Selection::Language(language) = &parsed.selection {
         let checkers: &[&str] = match language.as_str() {
             "python" => &["python.ruff", "python.ruff.doctor", "python.pip_audit"],
@@ -1796,7 +2388,13 @@ pub fn run(args: &[String]) -> ExitCode {
                 "rust.cargo_rustdoc",
                 "rust.cargo_audit",
             ],
+            "c" => &["c.clang.documentation", "c.clang.documentation_structure"],
+            "cpp" => &[
+                "cpp.clang.documentation",
+                "cpp.clang.documentation_structure",
+            ],
             "go" => &["go.vet"],
+            "shell" => &["shell.shellcheck"],
             "javascript" | "typescript" => {
                 &["node.eslint", "node.eslint.preparation", "node.npm.audit"]
             }
@@ -1836,6 +2434,18 @@ pub fn run(args: &[String]) -> ExitCode {
             };
         }
     }
+    if gradle_cve_requested {
+        match read_local_brief_for_checker(&root, "java.gradle.dependency_check") {
+            Ok(brief) if brief["repair_brief"].is_object() => next = brief,
+            Ok(_) => {}
+            Err(reason) => {
+                unresolved.insert(format!("gradle_cve_next_unavailable:{reason}"));
+            }
+        }
+    }
+    if !c_paths.is_empty() {
+        unresolved.insert("c_family_documentation_project_context_and_coverage_unverified".into());
+    }
     let started_native_task_count = [
         node_task_outcome,
         python_task_outcome,
@@ -1848,6 +2458,8 @@ pub fn run(args: &[String]) -> ExitCode {
         javadoc_task_outcome,
         dependency_task_outcome,
         cve_task_outcome,
+        gradle_model_outcome,
+        gradle_cve_outcome,
     ]
     .into_iter()
     .flatten()
@@ -1885,6 +2497,14 @@ pub fn run(args: &[String]) -> ExitCode {
                 .as_array()
                 .is_some_and(|files| files.iter().any(|f| f["native"]["tool_sha256"].is_string())),
         );
+    let started_native_task_count =
+        started_native_task_count + usize::from(shell_lint["native_task_started"] == true);
+    let started_native_task_count = started_native_task_count
+        + c_family_comments.as_object().map_or(0, |m| {
+            m.values()
+                .filter(|r| r["native_task_started"] == true)
+                .count()
+        });
     #[cfg(feature = "wasm-precheck")]
     let syntax_candidates = crate::check_syntax_candidates::observe(
         &root,
@@ -1947,79 +2567,131 @@ pub fn run(args: &[String]) -> ExitCode {
             }
         }
     }
+    if lint_only {
+        // 按本次类别选择候选，不能在全历史首项选中后简单丢弃而使有效lint任务饥饿。
+        match crate::next_command::read_local_brief_for_checkers(
+            &root,
+            &[
+                "rust.cargo_clippy",
+                "python.ruff",
+                "python.ruff.doctor",
+                "java.maven.p3c",
+                "node.eslint",
+                "node.eslint.preparation",
+                "go.vet",
+                "shell.shellcheck",
+            ],
+        ) {
+            Ok(brief) if brief["repair_brief"].is_object() => next = brief,
+            Ok(_) => next = Value::Null,
+            Err(reason) => {
+                unresolved.insert(format!("lint_next_unavailable:{reason}"));
+                next = Value::Null;
+            }
+        }
+        if next.is_null() {
+            // 语法确认仅允许本轮原生/候选产生的任务，不扩大到任意历史语种。
+            let ids = [
+                &erlang_lint,
+                &kotlin_lint,
+                &swift_lint,
+                &zig_lint,
+                &ruby_lint,
+            ]
+            .into_iter()
+            .flat_map(|report| report["files"].as_array().into_iter().flatten())
+            .filter_map(|file| file["task_id"].as_str().map(str::to_owned))
+            .chain(
+                syntax_tasks["tasks"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .filter_map(|task| task["task_id"].as_str().map(str::to_owned)),
+            )
+            .collect();
+            match crate::next_command::read_local_brief_for_tasks(&root, &ids) {
+                Ok(brief) => next = brief,
+                Err(reason) => {
+                    unresolved.insert(format!("lint_next_unavailable:{reason}"));
+                }
+            }
+        }
+    }
     if zig_lint.is_object() {
         crate::check_zig_scan::refresh(&root, &mut zig_lint, deadline);
     }
     if ruby_lint.is_object() {
         crate::check_ruby_scan::refresh(&root, &mut ruby_lint, deadline);
     }
+    if shell_lint.is_object() {
+        crate::check_shell_scan::refresh(&root, &mut shell_lint, deadline);
+    }
+    let gradle_model_unresolved = discovery
+        .checker_configurations
+        .iter()
+        .any(|entry| entry.checker_id.starts_with("java.gradle."));
+    let confirmed_findings: usize = syntax_candidates["observations"].as_array()
+        .map(|arr| arr.iter().filter(|obs| {
+            let status = obs["status"].as_str().unwrap_or("");
+            status == "confirmed" || status == "violation"
+        }).count())
+        .unwrap_or(0);
+    let has_unresolved = !unresolved.is_empty();
+    let delivery_decision = if confirmed_findings > 0 {
+        "deny"
+    } else if !has_unresolved && parsed.selection == Selection::All {
+        "allow"
+    } else if parsed.selection == Selection::All {
+        "incomplete"
+    } else {
+        "not_evaluated"
+    };
     let mut report = json!({
-        "schema_version":if ruby_lint.is_object() || next["schema_version"] == "0.15.0" {"0.51.0"} else if next["schema_version"] == "0.14.0" {"0.50.0"} else if next["schema_version"] == "0.13.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.49.0"} else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row.get("structural_observations").is_some())) {"0.48.0"} else if zig_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.12.0" {"0.47.0"}else if zig_lint.is_object() {"0.46.0"} else if matches!(parsed.selection, Selection::Language(_)) {"0.45.0"} else if swift_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.11.0" {"0.44.0"} else if swift_lint.is_object() {"0.43.0"} else if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
+        "schema_version":if !c_paths.is_empty(){"0.72.0"}else if gradle_cve_requested {"0.71.0"}else if next["schema_version"] == "0.25.0" && next["repair_brief"]["checker_id"] == "java.checkstyle" {"0.70.0"}else if java_javadoc["schema_version"] == "0.5.0" || next["repair_brief"]["checker_id"] == "java.maven.javadoc" {"0.69.0"}else if java_javadoc["schema_version"] == "0.4.0" || next["repair_brief"]["checker_id"] == "java.jdk.javadoc" {"0.68.0"}else if parsed.gradle_javadoc || next["schema_version"] == "0.24.0" {"0.67.0"}else if gradle_requested {"0.62.0"}else if gradle_model_unresolved {"0.61.0"}else if next["schema_version"] == "0.21.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row|row.get("javascript_mode_observation").is_some())) {"0.60.0"}else if lint_only {"0.59.0"}else if next["repair_brief"]["checker_id"] == "java.maven.p3c" && next["repair_brief"]["reason_code"] == "p3c_configuration_not_confirmed" {"0.58.0"}else if next["repair_brief"]["checker_id"] == "java.maven.javadoc" {"0.57.0"}else if next["repair_brief"]["checker_id"] == "rust.cargo_clippy" {"0.56.0"}else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"]=="erlang" && row.get("structural_observations").is_some())) {"0.55.0"} else if next["schema_version"] == "0.20.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"]=="javascript" && row.get("structural_observations").is_some())) {"0.54.0"}else if syntax_candidates["observations"].as_array().is_some_and(|rows|rows.iter().any(|row|row["language"]=="cfquery")) {"0.53.0"}else if shell_lint.is_object() || next["schema_version"]=="0.17.0" {"0.52.0"}else if ruby_lint.is_object() || next["schema_version"] == "0.15.0" {"0.51.0"} else if next["schema_version"] == "0.14.0" {"0.50.0"} else if next["schema_version"] == "0.13.0" || syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row["language"] == "go" && row.get("structural_observations").is_some())) {"0.49.0"} else if syntax_candidates["observations"].as_array().is_some_and(|rows| rows.iter().any(|row| row.get("structural_observations").is_some())) {"0.48.0"} else if zig_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.12.0" {"0.47.0"}else if zig_lint.is_object() {"0.46.0"} else if matches!(parsed.selection, Selection::Language(_)) {"0.45.0"} else if swift_lint["schema_version"] == "0.2.0" || next["schema_version"] == "0.11.0" {"0.44.0"} else if swift_lint.is_object() {"0.43.0"} else if kotlin_lint.is_object() || next["schema_version"] == "0.10.0" {"0.42.0"} else if matches!(next["schema_version"].as_str(), Some("0.8.0" | "0.9.0")) {"0.41.0"} else if next["schema_version"] == "0.7.0" {"0.40.0"} else if next["schema_version"] == "0.6.0" {"0.39.0"} else {"0.38.0"}, "report_type":"check_feedback",
         "operation":"check", "selection":parsed.selection.as_str(), "command_status":if request_cancelled { "cancelled" } else { "incomplete" },
-        "exit_code":if request_cancelled { 130 } else { 3 }, "delivery_decision":if parsed.selection == Selection::All { "incomplete" } else { "not_evaluated" }, "authority":"local_unverified",
+        "exit_code":if request_cancelled { 130 } else { 3 }, "delivery_decision":delivery_decision, "authority":"local_unverified",
         "reason":if request_cancelled { "request_cancelled" } else if parsed.selection == Selection::All { "full_project_obligations_and_trusted_policy_unavailable" } else if parsed.selection == Selection::Java { "java_selection_obligations_and_trusted_policy_unavailable" } else { "language_selection_obligations_and_trusted_policy_unavailable" },
         "discovery":discovery.to_json(),
-        "native_results":{"node_lint":node_lint,"python_lint":python_lint,"python_cve":python_cve,"rust_lint":rust_lint,"rust_comments":rust_comments,"rust_build":rust_build,"rust_cve":rust_cve,"go_lint":go_lint,"erlang_lint":erlang_lint,"kotlin_lint":kotlin_lint,"swift_lint":swift_lint,"java_p3c":java_p3c,"java_javadoc":java_javadoc,"java_dependencies":java_dependencies,"java_cve":java_cve,"npm_cve":npm_cve}, "execution_tasks":execution_tasks,
+        "native_results":crate::check_native_results::assemble(vec![
+            ("node_lint",node_lint),("python_lint",python_lint),("python_cve",json!(python_cve)),
+            ("rust_lint",rust_lint),("rust_comments",rust_comments),("rust_build",rust_build),
+            ("rust_cve",rust_cve),("go_lint",go_lint),("erlang_lint",erlang_lint),
+            // kotlin_lint / swift_lint 在下方 execution_budget 仍被借用，此处克隆以避免 move。
+            ("kotlin_lint",kotlin_lint.clone()),("swift_lint",swift_lint.clone()),("java_p3c",java_p3c),
+            ("java_javadoc",java_javadoc),("java_dependencies",java_dependencies),
+            ("java_cve",java_cve),("npm_cve",json!(npm_cve))
+        ]), "execution_tasks":execution_tasks,
         "obligation_status":"unresolved", "required_obligations":null,
         "category_candidates":candidates, "unresolved_conditions":unresolved,
         "syntax_candidates":syntax_candidates,
         "syntax_tasks":syntax_tasks,
         "execution_budget":check_budget_record(
             parsed.timeout_ms, parsed.timeout_source, parsed.jobs_limit, parsed.jobs_source,
-            usize::from(node_present) + usize::from(python_present) + python_cve_roots.len() + 4 * usize::from(rust_present) + usize::from(go_present) + usize::from(erlang_present) + usize::from(java_present) + usize::from(javadoc_configured) + usize::from(dependency_configured) + usize::from(cve_configured) + npm_roots.len() + usize::from(kotlin_lint.is_object()) + usize::from(swift_lint.is_object()) + usize::from(zig_lint.is_object()) + usize::from(ruby_lint.is_object()), started_native_task_count
+            c_paths.len() + usize::from(node_present) + usize::from(python_present) + python_cve_roots.len() + 4 * usize::from(rust_present) + usize::from(go_present) + usize::from(erlang_present) + usize::from(java_present) + usize::from(javadoc_configured) + usize::from(dependency_configured) + usize::from(cve_configured) + npm_roots.len() + usize::from(kotlin_lint.is_object()) + usize::from(swift_lint.is_object()) + usize::from(zig_lint.is_object()) + usize::from(ruby_lint.is_object()) + usize::from(shell_lint.is_object()) + usize::from(gradle_requested) + usize::from(gradle_cve_requested), started_native_task_count
         ),
         "next":next,
         "export":{"status":"not_requested","reason_code":null}
     });
-    if zig_lint.is_object()
-        || matches!(
-            report["schema_version"].as_str(),
-            Some("0.47.0" | "0.48.0" | "0.49.0" | "0.50.0" | "0.51.0")
-        )
-    {
-        report["native_results"]["zig_lint"] = zig_lint.clone();
-    }
-    // 历史报告维持封闭协议；只有新 Kotlin 报告携带新增原生字段。
-    if !matches!(
-        report["schema_version"].as_str(),
-        Some(
-            "0.42.0"
-                | "0.43.0"
-                | "0.44.0"
-                | "0.45.0"
-                | "0.46.0"
-                | "0.47.0"
-                | "0.48.0"
-                | "0.49.0"
-                | "0.50.0"
-                | "0.51.0"
-        )
-    ) {
-        if let Some(native) = report["native_results"].as_object_mut() {
-            native.remove("kotlin_lint");
-        }
-    }
-    if !matches!(
-        report["schema_version"].as_str(),
-        Some(
-            "0.43.0"
-                | "0.44.0"
-                | "0.45.0"
-                | "0.46.0"
-                | "0.47.0"
-                | "0.48.0"
-                | "0.49.0"
-                | "0.50.0"
-                | "0.51.0"
-        )
-    ) {
-        if let Some(native) = report["native_results"].as_object_mut() {
-            native.remove("swift_lint");
-        }
-    }
-    if report["schema_version"] == "0.51.0" {
-        report["native_results"]["ruby_lint"] = ruby_lint.clone();
-    }
+    // 报告形状决策：条件槽位、schema_version 兼容修剪、lint_only 收窄。
+    // 逻辑在 check_report_assembly 模块，此处只传入决定形状的条件与结果。
+    crate::check_report_assembly::finalize(
+        &mut report,
+        crate::check_report_assembly::ReportShapeInput {
+            c_paths_nonempty: !c_paths.is_empty(),
+            c_family_comments,
+            gradle_cve_requested,
+            gradle_requested,
+            gradle_result_key,
+            java_gradle_cve,
+            gradle_cve_tasks,
+            java_gradle_model,
+            gradle_javadoc_tasks,
+            zig_lint,
+            ruby_lint,
+            shell_lint,
+            lint_only,
+        },
+    );
     if parsed.format != OutputFormat::Human {
         emit_structured(&report, &parsed);
     } else {
@@ -2083,6 +2755,38 @@ pub fn run(args: &[String]) -> ExitCode {
                         .unwrap_or("核对原生工具及项目配置")
                 );
             }
+        }
+        for (language, scan) in report["native_results"]["c_family_comments"]
+            .as_object()
+            .into_iter()
+            .flat_map(|m| m.iter())
+        {
+            println!(
+                "{language}/Clang 文档：{}；{}；未观察 {} 文件；完整项目配置未确认",
+                scan["status"], scan["reason"], scan["unobserved_count"]
+            );
+            for row in scan["files"].as_array().into_iter().flatten() {
+                println!(
+                    "  {}：{}；原生文档发现 {} 项；结构缺口 {} 项；任务 {}",
+                    row["path"],
+                    row["reason"],
+                    row["feedback"]["documentation_findings"]
+                        .as_array()
+                        .map_or(0, Vec::len),
+                    row["feedback"]["documentation_structure"]["observation"]["functions"]
+                        .as_array()
+                        .map_or(0, |functions| functions
+                            .iter()
+                            .filter(|f| f["missing_components"]
+                                .as_array()
+                                .is_some_and(|m| !m.is_empty()))
+                            .count()),
+                    row["feedback"]["structural_workbench"]["task_ids"]
+                );
+            }
+            println!(
+                "  下一步：提供原 Clang 与 c11/c++17 标准；按当前任务补充真实文档并运行 task verify。头文件、预处理、完整构建与注释准确性仍待核验。"
+            );
         }
         if let Some(files) = report["native_results"]["python_lint"]["files"].as_array() {
             for file in files {
@@ -2228,6 +2932,25 @@ pub fn run(args: &[String]) -> ExitCode {
                 }
             }
         }
+        if let Some(files) = report["native_results"]["shell_lint"]["files"].as_array() {
+            println!("Shell原生逐文件观察，source依赖和完整项目覆盖待核验");
+            for file in files {
+                println!(
+                    "  {}：{}；方言 {}；输入当前 {}",
+                    file["path"], file["native"]["reason"], file["dialect"], file["input_stable"]
+                );
+                for d in file["native"]["diagnostics"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                {
+                    println!(
+                        "  {}:{}:{} {}（Unicode标量列）",
+                        file["path"], d["line"], d["column"], d["rule_id"]
+                    );
+                }
+            }
+        }
         if let Some(files) = report["native_results"]["ruby_lint"]["files"].as_array() {
             println!("Ruby 原生冻结单文件语法观察；完整 lint、类型、构建和任务同步仍待完成");
             for file in files {
@@ -2330,6 +3053,69 @@ pub fn run(args: &[String]) -> ExitCode {
                     finding["path"], finding["line"], finding["rule_id"]
                 );
             }
+        }
+        if report["native_results"]["java_gradle_javadoc"].is_object() {
+            let observation = &report["native_results"]["java_gradle_javadoc"];
+            println!(
+                "Gradle/Javadoc（选定范围）: {} ({})",
+                observation["native_status"], observation["reason"]
+            );
+            for finding in observation["findings"].as_array().into_iter().flatten() {
+                println!(
+                    "  {}:{}:{} {}",
+                    finding["path"], finding["line"], finding["column"], finding["rule_id"]
+                );
+            }
+            if report["gradle_javadoc_tasks"].is_object() {
+                println!(
+                    "Gradle文档触发工作区同步：{}；新增问题 {}，准备任务 {}；task verify 尚未整合",
+                    report["gradle_javadoc_tasks"]["status"],
+                    report["gradle_javadoc_tasks"]["new_findings"],
+                    report["gradle_javadoc_tasks"]["new_blockers"]
+                );
+            }
+            println!(
+                "下一步：依据原生诊断补齐用途、参数和返回等说明，用相同输入及原工具复检；完整规则、覆盖与修复关闭仍待验收。"
+            );
+        }
+        if report["native_results"]["java_gradle_cve"].is_object() {
+            let native = &report["native_results"]["java_gradle_cve"];
+            println!("Java/Gradle CVE：{}；原生观察未验收", native["reason"]);
+            for task in native["reports"].as_array().into_iter().flatten() {
+                println!(
+                    "原任务 {}：依赖观察 {} 项",
+                    task["task_path"], task["dependency_count"]
+                );
+                for advisory in task["advisories"].as_array().into_iter().flatten() {
+                    println!(
+                        "  {} {}；原生抑制={}；依赖={}",
+                        advisory["source"],
+                        advisory["advisory_id"],
+                        advisory["suppressed_by_native_tool"],
+                        advisory["package_ids"]
+                    );
+                }
+            }
+            println!("工作台同步：{}", report["gradle_cve_tasks"]["task_sync"]);
+        }
+        if report["native_results"]["java_gradle_model"].is_object() {
+            let model = &report["native_results"]["java_gradle_model"];
+            println!(
+                "Gradle配置模型（选定输入，未执行质量任务）: {} ({})",
+                model["native_status"].as_str().unwrap_or("incomplete"),
+                model["reason"].as_str().unwrap_or("unknown")
+            );
+            for project in model["model"]["projects"].as_array().into_iter().flatten() {
+                println!(
+                    "Gradle项目 {}: 插件 {}；相关任务 {}",
+                    project["path"].as_str().unwrap_or(":"),
+                    project["plugins"],
+                    project["tasks"]
+                );
+            }
+            println!(
+                "下一步：补全原项目配置范围，并运行原生注释、开发规范和漏洞检查；当前模型不证明质量通过。"
+            );
         }
         if let Some(files) = report["native_results"]["java_p3c"]["files"].as_array() {
             for file in files {
@@ -2589,7 +3375,7 @@ pub fn run(args: &[String]) -> ExitCode {
                     .take(8)
                 {
                     println!(
-                        "  {} [{}] grammar 报告错误但恢复位置不完整；初检未完成，需适用原生工具确认。",
+                        "  {} [{}] 候选解析未完成，恢复位置无法完整核验；先对原始源码运行适用原生工具。原生确认合法时调查 grammar 版本/兼容性或扫描预算；原生诊断成立时才按真实位置修复。",
                         item["path"].as_str().unwrap_or("?"),
                         item["language"].as_str().unwrap_or("unknown")
                     );
@@ -2850,7 +3636,7 @@ fn aborted_task_report(
         execution_tasks.push(json!({"id":"zig.lint","status":if native_results["zig_lint"]["local_parse_complete"]==true {"native_observed_unverified"}else{"native_incomplete"}}));
     }
     json!({
-        "schema_version":if native_results["zig_lint"].is_object() {"0.15.0"}else if matches!(selection, Selection::Language(_)) {"0.14.0"} else {"0.13.0"}, "report_type":"check_aborted",
+        "schema_version":if native_results.get("c_family_comments").is_some() {"0.22.0"}else if native_results.get("java_gradle_cve").is_some() {"0.21.0"}else if native_results["java_javadoc"]["schema_version"] == "0.5.0" {"0.20.0"}else if native_results["java_javadoc"]["schema_version"] == "0.4.0" {"0.19.0"}else if native_results.get("java_gradle_javadoc").is_some() {if native_results["java_gradle_javadoc"]["schema_version"] == "0.2.0" {"0.18.0"}else{"0.17.0"}}else if native_results.get("java_gradle_model").is_some() {"0.16.0"}else if native_results["zig_lint"].is_object() {"0.15.0"}else if matches!(selection, Selection::Language(_)) {"0.14.0"} else {"0.13.0"}, "report_type":"check_aborted",
         "operation":"check", "selection":selection.as_str(),
         "command_status":if cancelled { "cancelled" } else { "internal_error" },
         "exit_code":if cancelled { 130 } else { 4 },
@@ -2877,7 +3663,17 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
     let mut kotlinc_tool = None;
     let mut swift_tool = None;
     let mut ruby_tool = None;
+    let mut shellcheck_tool = None;
+    let mut shell_dialect = None;
     let mut zig_tool = None;
+    let mut clang_tool = None;
+    let mut c_standard = None;
+    let mut cpp_standard = None;
+    let mut gradle_bundle = None;
+    let mut gradle_javadoc = false;
+    let mut gradle_owasp_tasks = Vec::<String>::new();
+    let mut gradle_module_cache = None;
+    let mut gradle_project_files = BTreeSet::new();
     let mut maven_tool = None;
     let mut java_home = None;
     let mut maven_repo = None;
@@ -2899,6 +3695,33 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
                 let value = args.get(index).ok_or("npm审计参数缺少值")?;
                 if npm_options.insert(arg.clone(), value.clone()).is_some() {
                     return Err("npm审计参数重复".into());
+                }
+            }
+            "--clang-tool" => {
+                index += 1;
+                if clang_tool
+                    .replace(PathBuf::from(args.get(index).ok_or("缺少Clang路径")?))
+                    .is_some()
+                {
+                    return Err("--clang-tool重复".into());
+                }
+            }
+            "--c-standard" => {
+                index += 1;
+                if c_standard
+                    .replace(args.get(index).ok_or("缺少C标准")?.clone())
+                    .is_some()
+                {
+                    return Err("--c-standard重复".into());
+                }
+            }
+            "--cpp-standard" => {
+                index += 1;
+                if cpp_standard
+                    .replace(args.get(index).ok_or("缺少C++标准")?.clone())
+                    .is_some()
+                {
+                    return Err("--cpp-standard重复".into());
                 }
             }
             "--ruff-tool" => {
@@ -2988,6 +3811,24 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
                     return Err("--swift-tool 重复".into());
                 }
             }
+            "--shellcheck-tool" => {
+                index += 1;
+                if shellcheck_tool
+                    .replace(PathBuf::from(args.get(index).ok_or("缺少ShellCheck路径")?))
+                    .is_some()
+                {
+                    return Err("--shellcheck-tool重复".into());
+                }
+            }
+            "--shell-dialect" => {
+                index += 1;
+                if shell_dialect
+                    .replace(args.get(index).ok_or("缺少Shell方言")?.clone())
+                    .is_some()
+                {
+                    return Err("--shell-dialect重复".into());
+                }
+            }
             "--ruby-tool" => {
                 index += 1;
                 if ruby_tool
@@ -3015,6 +3856,67 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
                     .is_some()
                 {
                     return Err("--go-tool 重复".into());
+                }
+            }
+            "--gradle-module-cache" => {
+                index += 1;
+                if gradle_module_cache
+                    .replace(PathBuf::from(args.get(index).ok_or("缺少Gradle缓存路径")?))
+                    .is_some()
+                {
+                    return Err("--gradle-module-cache重复".into());
+                }
+            }
+            "--gradle-owasp-task" => {
+                index += 1;
+                let value = args.get(index).ok_or("缺少Gradle原任务路径")?;
+                if !value.starts_with(':')
+                    || value.len() > 256
+                    || value[1..].split(':').any(|part| {
+                        part.is_empty()
+                            || !part
+                                .bytes()
+                                .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'_' | b'-'))
+                    })
+                    || gradle_owasp_tasks.contains(value)
+                    || gradle_owasp_tasks.len() >= 128
+                {
+                    return Err("Gradle原任务路径无效、重复或超限".into());
+                }
+                gradle_owasp_tasks.push(value.clone());
+            }
+            "--gradle-javadoc" => {
+                if gradle_javadoc {
+                    return Err("--gradle-javadoc重复".into());
+                }
+                gradle_javadoc = true;
+            }
+            "--gradle-bundle" => {
+                index += 1;
+                if gradle_bundle
+                    .replace(PathBuf::from(args.get(index).ok_or("缺少Gradle分发路径")?))
+                    .is_some()
+                {
+                    return Err("--gradle-bundle重复".into());
+                }
+            }
+            "--gradle-project-file" => {
+                index += 1;
+                let file = PathBuf::from(args.get(index).ok_or("缺少Gradle选定文件")?);
+                if file.as_os_str().is_empty()
+                    || file.is_absolute()
+                    || !file
+                        .components()
+                        .all(|c| matches!(c, std::path::Component::Normal(_)))
+                    || file.to_str().is_none_or(|s| {
+                        s.chars().any(char::is_control)
+                            || s.contains(['\\', ':'])
+                            || s.split('/').any(|p| p.is_empty() || p == "." || p == "..")
+                    })
+                    || !gradle_project_files.insert(file)
+                    || gradle_project_files.len() > 128
+                {
+                    return Err("Gradle选定文件必须唯一且为普通相对路径".into());
                 }
             }
             "--maven-tool" => {
@@ -3157,6 +4059,15 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
     if zig_tool.as_ref().is_some_and(|path| !path.is_absolute()) {
         return Err("--zig-tool 必须是绝对路径".into());
     }
+    if shellcheck_tool.as_ref().is_some_and(|p| !p.is_absolute()) {
+        return Err("--shellcheck-tool必须是绝对路径".into());
+    }
+    if shell_dialect
+        .as_ref()
+        .is_some_and(|s| s.is_empty() || s.len() > 16 || !s.bytes().all(|b| b.is_ascii_lowercase()))
+    {
+        return Err("--shell-dialect必须是小写方言ID".into());
+    }
     if ruby_tool.as_ref().is_some_and(|path| !path.is_absolute()) {
         return Err("--ruby-tool 必须是绝对路径".into());
     }
@@ -3169,6 +4080,38 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
     if go_tool.as_ref().is_some_and(|path| !path.is_absolute()) {
         return Err("--go-tool 必须是绝对路径".into());
     }
+    if clang_tool.as_ref().is_some_and(|p| !p.is_absolute())
+        || c_standard.as_deref().is_some_and(|s| s != "c11")
+        || cpp_standard.as_deref().is_some_and(|s| s != "c++17")
+        || clang_tool.is_some() != (c_standard.is_some() || cpp_standard.is_some())
+        || (c_standard.is_some() && !selection.includes("c"))
+        || (cpp_standard.is_some() && !selection.includes("cpp"))
+    {
+        return Err("Clang文档需要绝对工具及选定语言的c11/c++17标准，不能猜测项目上下文".into());
+    }
+    if gradle_javadoc
+        && (gradle_bundle.is_none()
+            || !gradle_project_files
+                .iter()
+                .any(|p| p.extension().is_some_and(|e| e == "java")))
+    {
+        return Err("Gradle Javadoc要求显式工具、构建文件及Java源文件".into());
+    }
+    if gradle_bundle.is_some() != !gradle_project_files.is_empty()
+        || (gradle_bundle.is_some() && java_home.is_none())
+    {
+        return Err("Gradle模型要求--gradle-bundle、--java-home和选定项目文件同时提供".into());
+    }
+    if gradle_bundle.is_some()
+        && (!["settings.gradle", "settings.gradle.kts"]
+            .iter()
+            .any(|p| gradle_project_files.contains(&PathBuf::from(p)))
+            || !["build.gradle", "build.gradle.kts"]
+                .iter()
+                .any(|p| gradle_project_files.contains(&PathBuf::from(p))))
+    {
+        return Err("Gradle模型缺少根settings/build选定输入".into());
+    }
     if (!selection.includes("python") && (ruff_tool.is_some() || pip_audit_tool.is_some()))
         || (!selection.includes("rust")
             && (cargo_tool.is_some() || cargo_audit_tool.is_some() || rustsec_db.is_some()))
@@ -3177,9 +4120,11 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
         || (!selection.includes("kotlin") && kotlinc_tool.is_some())
         || (!selection.includes("swift") && swift_tool.is_some())
         || (!selection.includes("ruby") && ruby_tool.is_some())
+        || (!selection.includes("shell") && (shellcheck_tool.is_some() || shell_dialect.is_some()))
         || (!selection.includes("zig") && zig_tool.is_some())
         || (!selection.includes("java")
-            && (maven_tool.is_some()
+            && (gradle_bundle.is_some()
+                || maven_tool.is_some()
                 || java_home.is_some()
                 || maven_repo.is_some()
                 || repo_sha256.is_some()
@@ -3188,7 +4133,14 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
     {
         return Err("check 语言选择不接受其它语言的原生工具参数".into());
     }
+    if (!gradle_owasp_tasks.is_empty() && (gradle_bundle.is_none() || !selection.includes("java")))
+        || (gradle_module_cache.is_some() && gradle_owasp_tasks.is_empty())
+    {
+        return Err("Gradle CVE需要匹配Java选择、原任务及显式工具上下文；缓存不能单独使用".into());
+    }
     if [
+        gradle_module_cache.as_ref(),
+        gradle_bundle.as_ref(),
         maven_tool.as_ref(),
         java_home.as_ref(),
         maven_repo.as_ref(),
@@ -3233,7 +4185,17 @@ fn parse_args(args: &[String]) -> Result<Args, String> {
         kotlinc_tool,
         swift_tool,
         ruby_tool,
+        shellcheck_tool,
+        shell_dialect,
         zig_tool,
+        clang_tool,
+        c_standard,
+        cpp_standard,
+        gradle_bundle,
+        gradle_javadoc,
+        gradle_owasp_tasks,
+        gradle_module_cache,
+        gradle_project_files,
         maven_tool,
         java_home,
         maven_repo,
@@ -3266,6 +4228,198 @@ mod tests {
     use serde_json::json;
 
     use super::{Selection, aborted_task_report};
+
+    #[test]
+    fn gradle_cve_survives_sibling_internal_failure_without_acceptance() {
+        let source: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../tests/acceptance/evidence/gradle-cve-unified-check/check.json"
+        ))
+        .unwrap();
+        let outcomes = BTreeMap::from([
+            (
+                "java.gradle.dependency_check".into(),
+                TaskOutcome::Succeeded,
+            ),
+            ("java.p3c".into(), TaskOutcome::InternalFailure),
+        ]);
+        let report = aborted_task_report(
+            Selection::Java,
+            source["discovery"].clone(),
+            &outcomes,
+            source["native_results"].clone(),
+            false,
+        );
+        assert_eq!(report["schema_version"], "0.21.0");
+        assert_eq!(report["exit_code"], 4);
+        assert_eq!(
+            report["native_results"]["java_gradle_cve"],
+            source["native_results"]["java_gradle_cve"]
+        );
+        assert_eq!(report["failed_task_ids"], json!(["java.p3c"]));
+        assert_eq!(report["delivery_decision"], "not_evaluated");
+        if let Some(path) = std::env::var_os("CODEGUARD_TEST_GRADLE_CVE_CHECK_ABORT_EVIDENCE") {
+            std::fs::write(path, serde_json::to_vec_pretty(&report).unwrap()).unwrap();
+        }
+    }
+
+    #[test]
+    fn gradle_model_survives_sibling_internal_failure_without_acceptance() {
+        let bundle: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../tests/acceptance/evidence/gradle-public-model-check-reports-2026-10-06.json"
+        ))
+        .unwrap();
+        let source = &bundle["reports"][1];
+        let outcomes = BTreeMap::from([
+            ("java.gradle.model".into(), TaskOutcome::Succeeded),
+            ("java.p3c".into(), TaskOutcome::InternalFailure),
+        ]);
+        let report = aborted_task_report(
+            Selection::Java,
+            source["discovery"].clone(),
+            &outcomes,
+            source["native_results"].clone(),
+            false,
+        );
+        assert_eq!(report["schema_version"], "0.16.0");
+        assert_eq!(report["exit_code"], 4);
+        assert_eq!(
+            report["native_results"]["java_gradle_model"],
+            source["native_results"]["java_gradle_model"]
+        );
+        assert_eq!(report["failed_task_ids"], json!(["java.p3c"]));
+        assert_eq!(report["delivery_decision"], "not_evaluated");
+        if let Some(path) = std::env::var_os("CODEGUARD_TEST_GRADLE_ABORT_REPORT") {
+            std::fs::write(path, serde_json::to_vec_pretty(&report).unwrap()).unwrap();
+        }
+    }
+
+    #[test]
+    fn gradle_javadoc_survives_sibling_internal_failure_without_acceptance() {
+        let bundle: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../tests/acceptance/evidence/gradle-public-model-check-reports-2026-10-06.json"
+        ))
+        .unwrap();
+        let docs: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../tests/acceptance/evidence/gradle-native-javadoc-reports-2026-10-06.json"
+        ))
+        .unwrap();
+        let source = &bundle["reports"][1];
+        let mut native = source["native_results"].clone();
+        native.as_object_mut().unwrap().remove("java_gradle_model");
+        native["java_gradle_javadoc"] = docs[0]["report"].clone();
+        let outcomes = BTreeMap::from([
+            ("java.gradle.javadoc".into(), TaskOutcome::Succeeded),
+            ("java.p3c".into(), TaskOutcome::InternalFailure),
+        ]);
+        let report = aborted_task_report(
+            Selection::Java,
+            source["discovery"].clone(),
+            &outcomes,
+            native,
+            false,
+        );
+        assert_eq!(report["schema_version"], "0.17.0");
+        assert_eq!(report["exit_code"], 4);
+        assert_eq!(
+            report["native_results"]["java_gradle_javadoc"],
+            docs[0]["report"]
+        );
+        assert_eq!(report["delivery_decision"], "not_evaluated");
+        let sarif = crate::partial_sarif_feedback::partial_check_sarif(&report);
+        assert_eq!(sarif["runs"][0]["results"].as_array().unwrap().len(), 3);
+        assert_eq!(
+            sarif["runs"][0]["invocations"][0]["executionSuccessful"],
+            false
+        );
+        assert!(!sarif.to_string().contains("Sample.java"));
+        if let Some(path) = std::env::var_os("CODEGUARD_TEST_GRADLE_JAVADOC_ABORT_REPORT") {
+            std::fs::write(path, serde_json::to_vec_pretty(&report).unwrap()).unwrap();
+        }
+
+        // 新描述协议的兄弟失败不能吞掉已有原生问题；此处仅构造反馈边界，不执行工具。
+        let mut expanded = report["native_results"].clone();
+        expanded["java_gradle_javadoc"]["schema_version"] = json!("0.2.0");
+        expanded["java_gradle_javadoc"]["findings"][0]["rule_id"] = json!("JavadocEmptyComment");
+        let current = aborted_task_report(
+            Selection::Java,
+            source["discovery"].clone(),
+            &outcomes,
+            expanded,
+            false,
+        );
+        assert_eq!(current["schema_version"], "0.18.0");
+        assert_eq!(
+            current["native_results"]["java_gradle_javadoc"]["findings"][0]["rule_id"],
+            "JavadocEmptyComment"
+        );
+        assert_eq!(current["delivery_decision"], "not_evaluated");
+        assert_eq!(current["exit_code"], 4);
+        if let Some(path) = std::env::var_os("CODEGUARD_TEST_GRADLE_JAVADOC_ABORT_V2_REPORT") {
+            std::fs::write(path, serde_json::to_vec_pretty(&current).unwrap()).unwrap();
+        }
+    }
+
+    #[test]
+    fn maven_detailed_project_survives_sibling_failure_without_acceptance() {
+        let bundle: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../tests/acceptance/evidence/maven-javadoc-detailed-descriptions-fixtures-2026-10-06.json"
+        )).unwrap();
+        let source = &bundle[0]["aggregate"];
+        // 此处复用受控Maven输出来构造兄弟故障；不声称原插件诊断或故障真实执行。
+        let mut native = source["native_results"].clone();
+        native["java_javadoc"] = bundle[0]["feedback"]["native_observation"].clone();
+        let outcomes = BTreeMap::from([
+            ("java.javadoc".into(), TaskOutcome::Succeeded),
+            ("java.p3c".into(), TaskOutcome::InternalFailure),
+        ]);
+        let report = aborted_task_report(
+            Selection::Java,
+            source["discovery"].clone(),
+            &outcomes,
+            native.clone(),
+            false,
+        );
+        assert_eq!(report["schema_version"], "0.20.0");
+        assert_eq!(report["exit_code"], 4);
+        assert_eq!(report["native_results"], native);
+        assert_eq!(report["delivery_decision"], "not_evaluated");
+        if let Some(path) = std::env::var_os("CODEGUARD_TEST_MAVEN_DETAILED_ABORT_REPORT") {
+            std::fs::write(path, serde_json::to_vec_pretty(&report).unwrap()).unwrap();
+        }
+    }
+
+    #[test]
+    fn jdk_detailed_project_survives_sibling_failure_without_acceptance() {
+        let bundle: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../tests/acceptance/evidence/jdk-javadoc-detailed-descriptions-native-2026-10-06.json"
+        )).unwrap();
+        let source = &bundle["reports"][1]["aggregate"];
+        // 使用真实有问题观察构造兄弟故障反馈；不声称故障实际发生或重新运行工具。
+        let mut native = source["native_results"].clone();
+        native["java_javadoc"] = bundle["reports"][1]["feedback"]["native_observation"].clone();
+        let outcomes = BTreeMap::from([
+            ("java.javadoc".into(), TaskOutcome::Succeeded),
+            ("java.p3c".into(), TaskOutcome::InternalFailure),
+        ]);
+        let report = aborted_task_report(
+            Selection::Java,
+            source["discovery"].clone(),
+            &outcomes,
+            native.clone(),
+            false,
+        );
+        assert_eq!(report["schema_version"], "0.19.0");
+        assert_eq!(report["exit_code"], 4);
+        assert_eq!(
+            report["native_results"]["java_javadoc"],
+            native["java_javadoc"]
+        );
+        assert_eq!(report["delivery_decision"], "not_evaluated");
+        assert_eq!(report["failed_task_ids"], json!(["java.p3c"]));
+        if let Some(path) = std::env::var_os("CODEGUARD_TEST_JDK_JAVADOC_ABORT_REPORT") {
+            std::fs::write(path, serde_json::to_vec_pretty(&report).unwrap()).unwrap();
+        }
+    }
 
     #[test]
     fn internal_task_failure_keeps_sibling_native_findings_visible() {
@@ -3358,5 +4512,35 @@ mod tests {
                 .len(),
             1
         );
+    }
+    #[test]
+    #[ignore = "requires actual captured C documentation report"]
+    fn aborted_c_documentation_report_keeps_explicit_version_and_local_scope() {
+        let path = std::env::var_os("CODEGUARD_CHECK_C_DOCUMENTATION_EVIDENCE")
+            .expect("captured native observation");
+        let evidence: serde_json::Value =
+            serde_json::from_slice(&std::fs::read(&path).unwrap()).unwrap();
+        let first = &evidence["first"];
+        let report = aborted_task_report(
+            Selection::All,
+            first["discovery"].clone(),
+            &BTreeMap::from([
+                ("c.comments".into(), TaskOutcome::Succeeded),
+                ("cpp.comments".into(), TaskOutcome::InternalFailure),
+            ]),
+            first["native_results"].clone(),
+            false,
+        );
+        assert_eq!(report["schema_version"], "0.22.0");
+        assert_eq!(report["exit_code"], 4);
+        assert_eq!(report["delivery_decision"], "incomplete");
+        assert_eq!(report["failed_task_ids"], json!(["cpp.comments"]));
+        assert_eq!(
+            report["native_results"]["c_family_comments"],
+            first["native_results"]["c_family_comments"]
+        );
+        let mut output = std::path::PathBuf::from(path);
+        output.set_extension("abort.json");
+        std::fs::write(output, serde_json::to_vec_pretty(&report).unwrap()).unwrap();
     }
 }

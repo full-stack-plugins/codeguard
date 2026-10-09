@@ -49,11 +49,27 @@ pub(crate) fn persist(root: &Path, syntax: &Value, deadline: Instant) -> Value {
                 .map_err(|_| "clock_unavailable")?
                 .as_nanos();
             // 新版只扩展无位置的未完成观察；旧有可定位观察仍使用原协议和稳定身份。
-            let schema_version = if rows
+            let schema_version = if language == "javascript"
+                && rows
+                    .iter()
+                    .any(|row| row.get("javascript_mode_observation").is_some())
+            {
+                "0.15.0"
+            } else if language == "cfquery" {
+                "0.11.0"
+            } else if rows
                 .iter()
                 .any(|row| row.get("structural_observations").is_some())
             {
-                if language == "go" { "0.8.0" } else { "0.7.0" }
+                if language == "erlang" {
+                    "0.14.0"
+                } else if language == "javascript" {
+                    "0.13.0"
+                } else if language == "go" {
+                    "0.8.0"
+                } else {
+                    "0.7.0"
+                }
             } else if rows.iter().any(|row| row["recovery_count"] == 0) {
                 "0.3.0"
             } else {
@@ -97,7 +113,7 @@ pub(crate) fn persist(root: &Path, syntax: &Value, deadline: Instant) -> Value {
 pub(crate) fn valid_report(root: &Path, workspace: &str, report: &Value) -> bool {
     if matches!(
         report["schema_version"].as_str(),
-        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.9.0")
+        Some("0.2.0" | "0.4.0" | "0.5.0" | "0.6.0" | "0.9.0" | "0.10.0" | "0.12.0")
     ) {
         return crate::native_syntax_confirmation::valid_history_report(root, workspace, report)
             && crate::syntax_task_recheck::inputs_current(root, &report["native_evidence"]);
@@ -113,6 +129,16 @@ pub(crate) fn valid_report(root: &Path, workspace: &str, report: &Value) -> bool
         return false;
     };
     valid_source_snapshot(workspace, report, &bytes)
+        && (report["schema_version"] != "0.15.0"
+            || report["observations"].as_array().is_some_and(|rows| {
+                rows.iter().all(|row| {
+                    row["javascript_mode_observation"]
+                        == json!(crate::javascript_mode_observation::observe_javascript_mode(
+                            root,
+                            Path::new(path)
+                        ))
+                })
+            }))
 }
 
 /// 对指定冻结字节核对候选报告身份、固定资产和位置，不读取修复后的当前文件。
@@ -153,9 +179,13 @@ pub(crate) fn valid_source_snapshot(workspace: &str, report: &Value, bytes: &[u8
     let (checker, reason, fingerprint) = identity(workspace, path, language);
     if !matches!(
         report["schema_version"].as_str(),
-        Some("0.1.0" | "0.3.0" | "0.7.0" | "0.8.0")
+        Some("0.1.0" | "0.3.0" | "0.7.0" | "0.8.0" | "0.11.0" | "0.13.0" | "0.14.0" | "0.15.0")
     ) || (report["schema_version"] == "0.7.0" && language != "python")
         || (report["schema_version"] == "0.8.0" && language != "go")
+        || (report["schema_version"] == "0.11.0" && language != "cfquery")
+        || (report["schema_version"] == "0.13.0" && language != "javascript")
+        || (report["schema_version"] == "0.14.0" && language != "erlang")
+        || (report["schema_version"] == "0.15.0" && language != "javascript")
         || report["report_type"] != "syntax_confirmation_observation"
         || report["workspace_binding"] != "bound"
         || report["workspace_id"] != workspace
@@ -200,7 +230,11 @@ pub(crate) fn valid_source_snapshot(workspace: &str, report: &Value, bytes: &[u8
     };
     let mut offsets = std::collections::BTreeSet::new();
     rows.iter().all(|row| {
-        let structural = matches!(report["schema_version"].as_str(), Some("0.7.0" | "0.8.0"));
+        let structural = matches!(
+            report["schema_version"].as_str(),
+            Some("0.7.0" | "0.8.0" | "0.13.0" | "0.14.0" | "0.15.0")
+        ) || (report["schema_version"] == "0.11.0"
+            && row.get("structural_observations").is_some());
         let mut row_keys = vec![
             "path",
             "language",
@@ -215,6 +249,12 @@ pub(crate) fn valid_source_snapshot(workspace: &str, report: &Value, bytes: &[u8
             "recoveries",
             "known_limitations",
         ];
+        if report["schema_version"] == "0.11.0" {
+            row_keys.push("fragment_source_sha256");
+        }
+        if report["schema_version"] == "0.15.0" {
+            row_keys.push("javascript_mode_observation");
+        }
         if structural {
             row_keys.extend(["structural_observation_count", "structural_observations"]);
         }
@@ -235,13 +275,31 @@ pub(crate) fn valid_source_snapshot(workspace: &str, report: &Value, bytes: &[u8
         }) else {
             return false;
         };
+        if report["schema_version"] == "0.11.0"
+            && row["fragment_source_sha256"] != format!("{:x}", Sha256::digest(route.source))
+        {
+            return false;
+        }
         if !offsets.insert(route.byte_offset) {
             return false;
         }
         if structural {
+            if report["schema_version"] == "0.15.0"
+                && !crate::javascript_mode_observation::valid_module_snapshot(
+                    &row["javascript_mode_observation"],
+                    path,
+                    bytes,
+                )
+            {
+                return false;
+            }
             let Some(count) = row["structural_observation_count"]
                 .as_u64()
-                .filter(|count| *count > 0 && *count <= 128 && (language != "go" || *count == 1))
+                .filter(|count| {
+                    (*count > 0 || report["schema_version"] == "0.15.0")
+                        && *count <= 128
+                        && (language != "go" || *count == 1)
+                })
             else {
                 return false;
             };
@@ -251,13 +309,19 @@ pub(crate) fn valid_source_snapshot(workspace: &str, report: &Value, bytes: &[u8
             else {
                 return false;
             };
-            if route.byte_offset != 0
-                || route.source != bytes
+            if (language != "cfquery" && (route.byte_offset != 0 || route.source != bytes))
                 || !structures.iter().all(|value| {
                     serde_json::from_value::<crate::syntax_worker_structure::SyntaxWorkerStructure>(
                         value.clone(),
                     )
-                    .is_ok_and(|value| value.valid(language, bytes))
+                    .is_ok_and(|value| {
+                        value.valid(language, bytes)
+                            && (value.rule_id
+                                != "codeguard.javascript.module_return_outside_function"
+                                || report["schema_version"] == "0.15.0")
+                            && value.start_byte >= route.byte_offset
+                            && value.end_byte <= route.byte_offset + route.source.len()
+                    })
                 })
             {
                 return false;
@@ -269,7 +333,7 @@ pub(crate) fn valid_source_snapshot(workspace: &str, report: &Value, bytes: &[u8
                     || *c + row["structural_observation_count"].as_u64().unwrap_or(129) <= 128)
                 && (*c > 0
                     || structural
-                    || (report["schema_version"] == "0.3.0"
+                    || (matches!(report["schema_version"].as_str(), Some("0.3.0" | "0.11.0"))
                         && row["reason"] == "syntax_recovery_incomplete"))
         }) else {
             return false;

@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-06",
+  "scope": "existing_gradle_version_only",
+  "entry_path": "/Users/wandl/.gradle/wrapper/dists/gradle-8.10.2-bin/a04bxjujx95o3nb99gddekhwo/gradle-8.10.2/bin/gradle",
+  "entry_sha256_before": "9162b83b6681bd17b816de3a1f492d6b705f31d9492530ce47aafbe33a5a83b3",
+  "entry_sha256_after": "9162b83b6681bd17b816de3a1f492d6b705f31d9492530ce47aafbe33a5a83b3",
+  "argv": [
+    "--offline",
+    "--no-daemon",
+    "--version"
+  ],
+  "exit_code": 0,
+  "stdout_sha256": "407ab525ffa271000860f659728d760f8d170d68fafcd2acfa9234cc7fabed3a",
+  "gradle_version": "8.10.2",
+  "dependency_check_executed": false,
+  "artifact_bundle_verified": false,
+  "checked_plugin_cache_paths": [
+    {
+      "path": "/Users/wandl/.gradle/caches/modules-2/files-2.1/org.owasp/dependency-check-gradle",
+      "exists": false
+    },
+    {
+      "path": "/Users/wandl/.gradle/caches/modules-2/files-2.1/org.owasp.dependencycheck/org.owasp.dependencycheck.gradle.plugin",
+      "exists": false
+    }
+  ],
+  "downloads_performed": false,
+  "production_qualified": false
+}
