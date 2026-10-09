@@ -421,3 +421,5 @@ mod shell_lint_arguments;
 mod shellcheck_config;
 #[cfg(unix)]
 mod shellcheck_probe;
+
+pub mod guard_integration;

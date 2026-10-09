@@ -1,0 +1,1 @@
+{"version":"codeguard.qualification/v1alpha1","profiles":[{"command":"lint","native_schema":"1.0","package_version":"0.1.4","qualified":false,"native_task_dependencies":["2.3","2.4","2.5","2.9","3.5","3.7","5.4","5.5"],"reason":"Adapter fixture only; no true-tool positive and negative scope qualification or stable input proof."}]}
