@@ -204,7 +204,7 @@ pub fn project(
         facts,
         diagnostics: gaps,
     };
-    let report = guardengine::evaluate(contract, &facts)
+    let report = guardengine::integration::evaluate_bounded(contract, &facts)
         .map_err(|_| "engine evaluation rejected projection")?;
     // JSON is also valid YAML, accepted by the engine's strict contract loader.
     let contract_bytes = serde_json::to_vec(contract).map_err(|_| "cannot serialize contract")?;
