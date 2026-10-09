@@ -18,6 +18,8 @@ Codeguard 面向开发者与编程智能体，识别项目已有质量配置，�
 参见[CLI 合同](docs/guard-project-cli.md)、[Ruff 范围](docs/guard-integration-ruff-f401.md)
 、[Ruff CLI](docs/guard-project-ruff-cli.md)及[冻结能力映射](docs/frozen-integration-capabilities.md)。
 
+GuardEngine 本地适配切片已独立验收 **26/26** 项任务。参见[最终验收矩阵](tests/acceptance/guard-integration-release.md)中的 12 条要求、24 个场景及固定源码与原始证据索引。此结论限于明确列出的本地 CLI/library、宿主与源码包组合；不改变原生项目尚未完成的任务、57 种语言的资格、生产身份与保护门禁或公共发行状态。历史固定源码包也不会自动包含后续适配 API。
+
 ```text
 项目文件 + 已有检查器配置
            |
