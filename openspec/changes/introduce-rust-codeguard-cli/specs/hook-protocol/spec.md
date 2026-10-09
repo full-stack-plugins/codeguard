@@ -72,8 +72,13 @@ CLI、MCP、宿主 Hook、真实 Git Hook 与 CI 对相同请求和证据 MUST �
 - **THEN** 各宿主均保留二者，严格交付入口阻断，保存反馈不冒充交付通过
 
 ### Requirement: Host events SHALL route to bounded checks without weakening delivery gates
+新宿主入口 MUST 把事件送入 Rust 统一路由：会话启动只读发现；用户提示只给非阻断性意图建议，不能凭提示词认定已触发严格 Git 门禁；确认成功的编辑只请求对应文件的快速反馈；写入结果未知或路径不可确定须重新确定范围；确认失败的写入不启动源码检查；修复尝试按稳定任务 ID 请求原工具复检。
 
-新宿主入口 MUST 把事件送入 Rust 统一路由：会话启动只读发现；用户提示只给非阻断性意图建议，不能凭提示词认定已触发严格 Git 门禁；确认成功的编辑只请求对应文件的快速反馈；写入结果未知或路径不可确定须重新确定范围；确认失败的写入不启动源码检查；修复尝试按稳定任务 ID 请求原工具复检。提交、推送及 CI 事件 MUST 分别请求本轮真实 Git 提交面、推送面及完整项目义务，不能由宿主提供的变更路径或旧软反馈缓存决定交付检查面。路由计划本身 MUST NOT 签发质量或交付通过；无法可靠阻断的宿主必须显示能力缺口并依赖真实 Git/CI 门禁。
+#### Scenario: Detailed contract obligations
+- **WHEN** this requirement applies to the described input or execution
+- **THEN** the following detailed obligations apply unchanged:
+
+提交、推送及 CI 事件 MUST 分别请求本轮真实 Git 提交面、推送面及完整项目义务，不能由宿主提供的变更路径或旧软反馈缓存决定交付检查面。路由计划本身 MUST NOT 签发质量或交付通过；无法可靠阻断的宿主必须显示能力缺口并依赖真实 Git/CI 门禁。
 
 快反馈 MAY 仅在源码、配置、工具、规则、范围及结果完整性身份等价时复用；超时、未完成或身份变化 MUST 重新检查。事件去重只合并同一快照的重复执行，不吞掉交付事件、失败复检或修复后的重新验证。项目级构建/CVE 等重任务可在编辑阶段排队，但提交/CI 的必需义务不能被排队状态视为完成。
 

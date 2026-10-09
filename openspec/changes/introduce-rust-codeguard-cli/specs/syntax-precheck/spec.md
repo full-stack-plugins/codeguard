@@ -5,8 +5,13 @@
 ## ADDED Requirements
 
 ### Requirement: Unified lint entry points SHALL select native checking before syntax fallback per module
+`codeguard lint java .`、`codeguard lint typescript .` 及 `codeguard check all .` MUST 按模块、语言版本/方言、源码范围、配置与适用原生能力选择执行路径。
 
-`codeguard lint java .`、`codeguard lint typescript .` 及 `codeguard check all .` MUST 按模块、语言版本/方言、源码范围、配置与适用原生能力选择执行路径。选择过程 MUST 检查显式工具、项目本地工具及已支持的构建集成，不以 PATH 无命令直接认定未安装。可用原生工具和有效配置 MUST 优先执行；缺工具、配置不可用或原生执行故障可提供内置初检，但 MUST 保留原阻塞及有效原生发现。原生违规 MUST NOT 触发用于覆盖原结论的降级。init/detect/plan MUST 保持只读观察，不因配置发现而启动 WASM 或安装。
+#### Scenario: Detailed contract obligations
+- **WHEN** this requirement applies to the described input or execution
+- **THEN** the following detailed obligations apply unchanged:
+
+选择过程 MUST 检查显式工具、项目本地工具及已支持的构建集成，不以 PATH 无命令直接认定未安装。可用原生工具和有效配置 MUST 优先执行；缺工具、配置不可用或原生执行故障可提供内置初检，但 MUST 保留原阻塞及有效原生发现。原生违规 MUST NOT 触发用于覆盖原结论的降级。init/detect/plan MUST 保持只读观察，不因配置发现而启动 WASM 或安装。
 
 只读发现报告的项目本地工具候选 MUST 与检查器配置分开列示；候选只携带相对构建根、检查器、候选状态、可见版本和下一步，不回显可能含凭据的依赖声明。`node_modules` 不进入普通源码范围，固定工具路径可单独有界观察；中间目录或最终入口为链接、特殊文件、不可读或本轮输入变化时 MUST 保留不完整/不可信状态，不跟随链接读取或执行。Maven `.mvn` 配置可作为固定路径观察，不能因普通点目录跳过而误判 Wrapper 缺失。
 
@@ -128,8 +133,13 @@
 - **THEN** 保留一项具体环境/能力决策，不无限重复相同安装动作；独立任务继续
 
 ### Requirement: Bundled grammar assets SHALL have pinned provenance and measured compatibility
+引入的 CodeGraph 或上游 grammar MUST 固定源码提交、必要补丁、许可证、WASM SHA-256、ABI/运行时兼容范围、语言/方言版本、语料引用及已知限制。
 
-引入的 CodeGraph 或上游 grammar MUST 固定源码提交、必要补丁、许可证、WASM SHA-256、ABI/运行时兼容范围、语言/方言版本、语料引用及已知限制。活动工作目录中的未固定字节 MUST NOT 直接作为受认可发行输入。文件存在、Rust 加载成功、语法验收完成 MUST 为独立状态。语法包 MUST 随支持平台发行离线可用；不要求用户安装 CodeGraph、tree-sitter-cli 或 Node 解析运行时。Node 可以继续作为 npm 启动层。额外包升级 MUST 经清单校验，不静默使用 latest。
+#### Scenario: Detailed contract obligations
+- **WHEN** this requirement applies to the described input or execution
+- **THEN** the following detailed obligations apply unchanged:
+
+活动工作目录中的未固定字节 MUST NOT 直接作为受认可发行输入。文件存在、Rust 加载成功、语法验收完成 MUST 为独立状态。语法包 MUST 随支持平台发行离线可用；不要求用户安装 CodeGraph、tree-sitter-cli 或 Node 解析运行时。Node 可以继续作为 npm 启动层。额外包升级 MUST 经清单校验，不静默使用 latest。
 
 CodeGuard MUST 提供只读的来源覆盖清单，区分 CodeGraph 随仓 WASM、由依赖包提供但尚未固定字节的 grammar、CodeGuard 已复制候选及已验收发行能力。覆盖清单或 `grammar status` 的存在 MUST NOT 自动改变原生检查义务、加载未经批准的字节，或把来源资产数量说成已支持语言数量。来源资产超过当前加载预算时 MUST 明示预算缺口，不能静默跳过。
 
@@ -197,8 +207,13 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 - **THEN** 如实登记缺口，不将该平台标为已通过运行验收
 
 ### Requirement: Syntax observations SHALL preserve grammar fidelity and source positions
+解析 MUST 同时识别 ERROR/MISSING 恢复，并按同一恢复原因归并级联节点；诊断 MUST 保留原文件位置、必要的有界脱敏上下文及 grammar 身份。
 
-解析 MUST 同时识别 ERROR/MISSING 恢复，并按同一恢复原因归并级联节点；诊断 MUST 保留原文件位置、必要的有界脱敏上下文及 grammar 身份。不确定版本/方言、模板、宏、嵌入语言 MUST 明示覆盖限制。CodeGraph 用于提取符号的源码遮盖/启发式 MUST NOT 静默移入语法判定。仅凭恢复节点不得猜测具体缺失 token 或自动授予源码修改范围。
+#### Scenario: Detailed contract obligations
+- **WHEN** this requirement applies to the described input or execution
+- **THEN** the following detailed obligations apply unchanged:
+
+不确定版本/方言、模板、宏、嵌入语言 MUST 明示覆盖限制。CodeGraph 用于提取符号的源码遮盖/启发式 MUST NOT 静默移入语法判定。仅凭恢复节点不得猜测具体缺失 token 或自动授予源码修改范围。
 
 若语法树标记错误但可遍历节点中无法定位任何对应 ERROR/MISSING，MUST 将该文件标为初检未完成，并保留原生检查义务；不得将零恢复节点当成语法有效或制造没有位置依据的源码 finding。
 

@@ -47,8 +47,13 @@ ShellCheck单文件入口 MUST 明确方言和工具兼容版本，冻结有界U
 - **THEN** 为其保留能力缺口或选择已验证的专用适配器，不静默删除义务
 
 ### Requirement: Native evidence SHALL be interpreted per tool contract
+adapter MUST 根据工具版本的报告及退出语义解析结果；MUST NOT 以通用非零、exit 1、关键词或模型主观判断替代。
 
-adapter MUST 根据工具版本的报告及退出语义解析结果；MUST NOT 以通用非零、exit 1、关键词或模型主观判断替代。无效、截断、陈旧、与计划不符或内部矛盾的报告 MUST 产生未完成。有效部分发现 MUST 保留。
+#### Scenario: Detailed contract obligations
+- **WHEN** this requirement applies to the described input or execution
+- **THEN** the following detailed obligations apply unchanged:
+
+无效、截断、陈旧、与计划不符或内部矛盾的报告 MUST 产生未完成。有效部分发现 MUST 保留。
 
 Rust 注释诊断 MUST 使用原生 Cargo/rustdoc 机器流，不能复用只接收 Clippy 规则的解析器或通过正则重写文档规则。已识别 missing_docs 与 rustdoc::broken_intra_doc_links 的观察 MUST 保留原生规则/级别、唯一主定位和原生 package/manifest/target 身份供执行层核对；不得把其它编译错误改称注释问题。重复 JSON 键、缺失/重复/失败的结束记录、结束后新事件、歧义主定位及未支持的警告 MUST 保持未完成。纯解析或显式局部库目标执行不证明项目原配置、完整工作区/features/targets、可信工具或批准规则覆盖。
 

@@ -1,8 +1,13 @@
 ## ADDED Requirements
 
 ### Requirement: Verdicts SHALL preserve uncertainty across interfaces
+显式 legacy-v1 入口 MUST 保持 PASS、FAIL、UNVERIFIED、SKIPPED、PLANNED 及原聚合退出约定：通常 FAIL=2、无 FAIL 但有未验证/计划项=1、已验证或无须检查=0；各旧子命令的已记录差异由兼容层保持。
 
-显式 legacy-v1 入口 MUST 保持 PASS、FAIL、UNVERIFIED、SKIPPED、PLANNED 及原聚合退出约定：通常 FAIL=2、无 FAIL 但有未验证/计划项=1、已验证或无须检查=0；各旧子命令的已记录差异由兼容层保持。仅真实成功检查允许 passed=true，无法验证不得触发自动修复或 all passed。
+#### Scenario: Detailed contract obligations
+- **WHEN** this requirement applies to the described input or execution
+- **THEN** the following detailed obligations apply unchanged:
+
+仅真实成功检查允许 passed=true，无法验证不得触发自动修复或 all passed。
 
 旧 `check`、CVE 与 Dockerfile MUST 分别保留其混合优先级：前两者在已确认 FAIL 与 UNVERIFIED 并存时返回旧 2，Dockerfile 在同样组合时返回旧 1 且保留已确认风险。旧 CVE 参数错误是 3，而其他使用 argparse 的旧检查/修复/规划入口参数错误为 2；旧 PreToolUse 的 2 是宿主拦截。兼容投影和 MCP/Hook 生命周期成功都 MUST 固定为新版交付 `not_evaluated`，不得按旧数字推导新版 allow。
 
