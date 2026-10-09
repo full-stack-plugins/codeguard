@@ -418,6 +418,13 @@ fn run_language(profile: &Value, request: &Request, mode: Mode) -> Value {
         });
     }
 
+    // 内置格式化器分流：formatter 以 builtin: 开头时不解析外部工具，
+    // 直接在进程内执行（codeguard 独立分发，不依赖用户安装任何 IDE）。
+    let formatter_name = profile["formatter"].as_str().unwrap_or("");
+    if let Some(builtin_id) = formatter_name.strip_prefix("builtin:") {
+        return run_builtin(builtin_id, profile, &files, mode, &config_ref);
+    }
+
     // 解析格式化器可执行文件：显式 --tool 优先，其次同名 PATH。
     // 显式路径不存在时不得回退 PATH，避免绕过用户指定的工具身份。
     let tool_key = profile["tool_key"].as_str().unwrap_or("");
@@ -586,6 +593,71 @@ fn detect_unparsable(tool: &Path, file: &Path) -> bool {
     }
 }
 
+/// 内置格式化器执行：进程内完成 check/apply，不 spawn 任何外部工具。
+/// 目前注册：idea-markdown（Rust 复现 IDEA 2026.2.3 风格，golden 差分锁定）。
+fn run_builtin(
+    id: &str,
+    profile: &Value,
+    files: &[PathBuf],
+    mode: Mode,
+    config_ref: &str,
+) -> Value {
+    let mut unformatted = Vec::new();
+    let mut reformatted = Vec::new();
+    let mut failed = Vec::new();
+    let unsupported = json!({
+        "status": "incomplete",
+        "reason": "builtin_formatter_unknown",
+        "tool_version": Value::Null,
+        "tool_digest": Value::Null,
+        "config_ref": config_ref,
+        "file_count": files.len(),
+        "unformatted": [],
+        "reformatted": [],
+        "failed": [],
+    });
+    for file in files {
+        let Ok(content) = std::fs::read_to_string(file) else {
+            failed.push(file.to_string_lossy().to_string());
+            continue;
+        };
+        match id {
+            "idea-markdown" => match mode {
+                Mode::Check => {
+                    let (status, _) = crate::idea_markdown::check(&content);
+                    if status != "clean" {
+                        unformatted.push(file.to_string_lossy().to_string());
+                    }
+                }
+                Mode::Apply => {
+                    let formatted = crate::idea_markdown::apply(&content);
+                    if formatted != content {
+                        if std::fs::write(file, &formatted).is_ok() {
+                            reformatted.push(file.to_string_lossy().to_string());
+                        } else {
+                            failed.push(file.to_string_lossy().to_string());
+                        }
+                    }
+                }
+            },
+            _ => return unsupported,
+        }
+    }
+    let _ = profile;
+    json!({
+        "status": if failed.is_empty() { "complete" } else { "incomplete" },
+        "reason": if failed.is_empty() { Value::Null } else { json!("builtin_io_failed") },
+        "tool_version": crate::idea_markdown::RULES_VERSION,
+        "tool_digest": Value::Null,
+        "config_ref": config_ref,
+        "file_count": files.len(),
+        "unformatted": unformatted,
+        "reformatted": reformatted,
+        "failed": failed,
+        "builtin": true,
+    })
+}
+
 fn collect_files(dir: &Path, extensions: &[&str], out: &mut Vec<PathBuf>, limit: usize) {
     let Ok(entries) = std::fs::read_dir(dir) else {
         // 允许直接传单文件。
@@ -701,6 +773,10 @@ mod tests {
     #[test]
     fn integrated_profiles_have_formatter_and_argv() {
         for row in profiles().iter().filter(|r| r["status"] == "integrated") {
+            // 内置格式化器不走外部命令（差分测试另行锁定其行为）
+            if row["formatter"].as_str().is_some_and(|f| f.starts_with("builtin:")) {
+                continue;
+            }
             assert!(
                 row["formatter"].as_str().is_some_and(|f| !f.is_empty()),
                 "{} 应有格式化器",
@@ -795,6 +871,19 @@ mod tests {
     #[test]
     fn every_integrated_profile_has_file_placeholder() {
         for row in profiles().iter().filter(|r| r["status"] == "integrated") {
+            // 内置格式化器不走外部命令，无 argv；仅校验身份合法
+            if row["formatter"]
+                .as_str()
+                .is_some_and(|f| f.starts_with("builtin:"))
+            {
+                assert!(
+                    row["formatter"] == "builtin:idea-markdown",
+                    "{} 声明了未注册的内置格式化器 {}",
+                    row["language"],
+                    row["formatter"]
+                );
+                continue;
+            }
             for field in ["check_argv", "apply_argv"] {
                 let argv: Vec<&str> = row[field]
                     .as_array()
