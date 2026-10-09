@@ -124,7 +124,16 @@ impl FrozenRun {
         let mut envelope = self.template.clone();
         envelope.run_status = RunStatus::Completed;
         envelope.decision = Some(projection.report.decision.clone());
-        envelope.diagnostics = vec![diagnostic("native_profile_unqualified")];
+        if projection.facts.completeness == guardengine::Completeness::Complete {
+            // Only a sealed, independently qualified profile projection can
+            // construct Complete facts; caller declarations cannot select this.
+            envelope.coverage.status = CoverageStatus::Complete;
+            envelope.coverage.observed_scopes = envelope.coverage.required_scopes.clone();
+            envelope.coverage.missing_scopes.clear();
+            envelope.diagnostics = vec![diagnostic("qualified_scope_complete")];
+        } else {
+            envelope.diagnostics = vec![diagnostic("native_profile_unqualified")];
+        }
         envelope.artifacts = Artifacts {
             contract: Some(reference(
                 &envelope.run_id,

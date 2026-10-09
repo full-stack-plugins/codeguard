@@ -13,7 +13,7 @@ use std::collections::BTreeSet;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
-enum Source {
+pub(super) enum Source {
     Finding {
         tool_id: String,
         native_rule_id: String,
@@ -46,7 +46,31 @@ impl ProtectedMapping {
         mapping.validate()?;
         Ok(mapping)
     }
-    fn validate(&self) -> Result<(), &'static str> {
+    pub(super) fn validate_ruff_scope(&self, contract: &GuardContract) -> Result<(), &'static str> {
+        if contract.spec.rules.len() != 1 || self.entries.len() != 2
+            || self.entries.iter().any(|entry| {
+                entry.rule_id != contract.spec.rules[0].id
+                    || !matches!(&entry.source,
+                        Source::Finding {tool_id, native_rule_id} if tool_id == "ruff" && native_rule_id == "F401")
+                       && !matches!(&entry.source, Source::Gap {detail} if detail == "ruff_f401_scope_incomplete")
+            }) {
+            return Err("contract exceeds qualified Ruff F401 scope");
+        }
+        Ok(())
+    }
+    pub(super) fn validate_references(&self, contract: &GuardContract) -> Result<(), &'static str> {
+        if self.entries.iter().any(|entry| {
+            !contract
+                .spec
+                .rules
+                .iter()
+                .any(|rule| rule.id == entry.rule_id)
+        }) {
+            return Err("mapping references unknown contract rule");
+        }
+        Ok(())
+    }
+    pub(super) fn validate(&self) -> Result<(), &'static str> {
         if self.version != "codeguard.mapping/v1alpha1" || self.entries.is_empty() {
             return Err("unsupported mapping");
         }
@@ -69,7 +93,7 @@ impl ProtectedMapping {
         Ok(())
     }
 }
-fn exact(s: &str) -> bool {
+pub(super) fn exact(s: &str) -> bool {
     !s.trim().is_empty() && !s.contains(['*', '?', '[', ']'])
 }
 /// Immutable result; native bytes remain separate from the engine wire.
@@ -200,7 +224,7 @@ pub fn project(
 }
 
 // Mapping and contract fields stay borrowed until the shared builder accepts their cost.
-fn push_mapped_relation(
+pub(super) fn push_mapped_relation(
     budget: &mut FactBudget,
     mapping: &ProtectedMapping,
     contract: &GuardContract,

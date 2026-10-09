@@ -169,3 +169,22 @@ unrelated target, duplicate/malformed identity and actual large-allocation rejec
 This slice does not finish2.2 or qualify a native producer; see
 `docs/guard-integration-scope.md` and ledger scope-dimensions report. No new task
 checkboxes are changed pending independent review and actual native coverage work.
+
+## Actual Ruff F401 SDK profile (pending independent review)
+
+Strict selected-file python_lint_feedback0.13 reader and frozen Linux Ruff0.16.8
+F401-only profile added separately from the old run_report1.0/guard-project path.
+Native producer untouched; original exit3/status/bytes retained. Scope qualification
+combines exact caller-frozen source/config/tool/producer identities, native local
+completion, F401 settings and zero-suppression audit. No caller qualification flag.
+Exactly one protected F401 contract rule is supported; broader contracts reject.
+The sealed Projection now supplies complete envelope scope only when its validated
+facts are Complete. Existing unqualified projections remain Partial/BLOCK.
+
+API RED and complete-envelope verification RED captured before implementations.
+80 focused tests pass plus one explicit real-tool test exercising nine native
+cases; scoped clippy passes with existing PR31 warnings. Eighteen real SDK bundles
+under ledger/codeguard-ruff-sdk-final preserve raw native3 and separate direct
+Ruff0/1/2/spawn-error provenance. Caller binding IDs/timestamps are fixture values;
+this is not authenticated production/candidate acceptance. New profile is SDK-only;
+CLI0/3 and general task2.2 scope remain incomplete. No additional task boxes changed.

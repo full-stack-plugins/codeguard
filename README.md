@@ -10,6 +10,15 @@ Codeguard helps developers and coding agents discover existing quality configura
 >
 > **Baseline:** The current source and [implementation evidence](openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md) define callable behavior. Declared Rust minimum `1.85`, edition `2024`, Cargo resolver `2`. `@partme.ai/codeguard@0.1.4` is published for Apple Silicon macOS; no multi-platform binary release or crates.io availability is claimed.
 
+The local source branch also includes an explicit read-only GuardEngine adapter:
+`codeguard guard-project --invocation FILE --native-report FILE --context FILE --mapping FILE --contract FILE`.
+Its current CLI run_report1.0 profile stays unqualified and returns partial BLOCK
+or bound error; aggregate native exit3 is never approval. A separate SDK-only
+Ruff F401 profile consumes actual selected-file feedback with frozen tool/config/
+source identities; it covers only that narrow rule and does not change native
+commands, project-wide qualification, or the CLI profile. See [CLI contract](docs/guard-project-cli.md),
+[Ruff scope](docs/guard-integration-ruff-f401.md), and [frozen capability mapping](docs/frozen-integration-capabilities.md).
+
 ```text
 Project files + existing checker configuration
                     |

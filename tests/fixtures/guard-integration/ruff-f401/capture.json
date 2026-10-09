@@ -1,0 +1,243 @@
+{
+  "codeguardCommit": "f5661d51dd1b2629f3b87b726fb09a9060ce7958",
+  "guardengineRevision": "c80ec325449842d51007db2fd507040c53dc8f51",
+  "codeguardSha256": "b7576afa78f5ab6fdc8133650a1c75dc113357ac927e553b4f5c67731eea3a8c",
+  "ruffVersion": "ruff 0.16.8",
+  "ruffSha256": "f3eb080f0173e1a5884fabcc2c836f5a0ebea35fccf252e718fc71b17f821ef7",
+  "cases": {
+    "bad": {
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/codeguard-f5661d5",
+        "lint",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/bad",
+        "--format=json",
+        "--file",
+        "app.py",
+        "--ruff-tool",
+        "/workspace/guard-toolchain/python-native/bin/ruff"
+      ],
+      "exit": 3,
+      "stdoutSha256": "fc9e61290e7ce1c33cef15bb225d6387507ab85fa69ba35d5e673d78ca1ab8e1",
+      "ruffArgv": [
+        "/workspace/guard-toolchain/python-native/bin/ruff",
+        "check",
+        "--no-cache",
+        "--output-format",
+        "json",
+        "app.py"
+      ],
+      "ruffExit": 1,
+      "sourceSha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "configSha256": "e2b5cd05041fed8edc034e96416644bba8ae65478a18352eb103c04d74f04c47"
+    },
+    "fixed": {
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/codeguard-f5661d5",
+        "lint",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/fixed",
+        "--format=json",
+        "--file",
+        "app.py",
+        "--ruff-tool",
+        "/workspace/guard-toolchain/python-native/bin/ruff"
+      ],
+      "exit": 3,
+      "stdoutSha256": "c127a5240a6ef4422776e967649942564788671fcec138d63b9216ee9417c634",
+      "ruffArgv": [
+        "/workspace/guard-toolchain/python-native/bin/ruff",
+        "check",
+        "--no-cache",
+        "--output-format",
+        "json",
+        "app.py"
+      ],
+      "ruffExit": 0,
+      "sourceSha256": "b80792336156c7b0f7fe02eeef24610d2d52a10d1810397744471d1dc5738180",
+      "configSha256": "e2b5cd05041fed8edc034e96416644bba8ae65478a18352eb103c04d74f04c47"
+    },
+    "clean": {
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/codeguard-f5661d5",
+        "lint",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/clean",
+        "--format=json",
+        "--file",
+        "app.py",
+        "--ruff-tool",
+        "/workspace/guard-toolchain/python-native/bin/ruff"
+      ],
+      "exit": 3,
+      "stdoutSha256": "66949d37a88edb667c856d7aa6e78f79b788bea81cb9094bb3120bc6cdedbb54",
+      "ruffArgv": [
+        "/workspace/guard-toolchain/python-native/bin/ruff",
+        "check",
+        "--no-cache",
+        "--output-format",
+        "json",
+        "app.py"
+      ],
+      "ruffExit": 0,
+      "sourceSha256": "8ade5dc0b99fd2af8b246472c8ed410337fc4a214aa5792b979b49f9dc83ecdf",
+      "configSha256": "e2b5cd05041fed8edc034e96416644bba8ae65478a18352eb103c04d74f04c47"
+    },
+    "missing-tool": {
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/codeguard-f5661d5",
+        "lint",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/missing-tool",
+        "--format=json",
+        "--file",
+        "app.py",
+        "--ruff-tool",
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/missing-tool/absent-ruff"
+      ],
+      "exit": 3,
+      "stdoutSha256": "ce09656f8ad8e7ddf5ab753de5ae32ee3fd16cc90d69a8ab7670a5ec2b6b5b50",
+      "ruffArgv": [
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/missing-tool/absent-ruff",
+        "check",
+        "--no-cache",
+        "--output-format",
+        "json",
+        "app.py"
+      ],
+      "ruffExit": null,
+      "sourceSha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "configSha256": "e2b5cd05041fed8edc034e96416644bba8ae65478a18352eb103c04d74f04c47"
+    },
+    "disabled-rule": {
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/codeguard-f5661d5",
+        "lint",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/disabled-rule",
+        "--format=json",
+        "--file",
+        "app.py",
+        "--ruff-tool",
+        "/workspace/guard-toolchain/python-native/bin/ruff"
+      ],
+      "exit": 3,
+      "stdoutSha256": "fa61d15db5820ce3bbee6c52e3821be79189b0069369022c013909587dd421a0",
+      "ruffArgv": [
+        "/workspace/guard-toolchain/python-native/bin/ruff",
+        "check",
+        "--no-cache",
+        "--output-format",
+        "json",
+        "app.py"
+      ],
+      "ruffExit": 0,
+      "sourceSha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "configSha256": "859ea827fa3f25c6d16072fbe411a4348cd8f684267499fa0076b9c7c931a975"
+    },
+    "noqa": {
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/codeguard-f5661d5",
+        "lint",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/noqa",
+        "--format=json",
+        "--file",
+        "app.py",
+        "--ruff-tool",
+        "/workspace/guard-toolchain/python-native/bin/ruff"
+      ],
+      "exit": 3,
+      "stdoutSha256": "04740af4316ecde754cf8f1f63cffd7b5a3f37234ac75bca99811409aba674aa",
+      "ruffArgv": [
+        "/workspace/guard-toolchain/python-native/bin/ruff",
+        "check",
+        "--no-cache",
+        "--output-format",
+        "json",
+        "app.py"
+      ],
+      "ruffExit": 0,
+      "sourceSha256": "29d262fc143f04a903268f64720c1e8d7d7841e22b6c11d7164fb1d20f2531ca",
+      "configSha256": "e2b5cd05041fed8edc034e96416644bba8ae65478a18352eb103c04d74f04c47"
+    },
+    "per-file-ignore": {
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/codeguard-f5661d5",
+        "lint",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/per-file-ignore",
+        "--format=json",
+        "--file",
+        "app.py",
+        "--ruff-tool",
+        "/workspace/guard-toolchain/python-native/bin/ruff"
+      ],
+      "exit": 3,
+      "stdoutSha256": "053d3ae3c0e11021dd2ea6e0a22768ddb9088cac90ba703e97ae448ebcb9731f",
+      "ruffArgv": [
+        "/workspace/guard-toolchain/python-native/bin/ruff",
+        "check",
+        "--no-cache",
+        "--output-format",
+        "json",
+        "app.py"
+      ],
+      "ruffExit": 0,
+      "sourceSha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "configSha256": "622f536784ee6ce8383efce62209c1899022d0a8cb12d00985363fa65a2aa8ef"
+    },
+    "tool-error": {
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/codeguard-f5661d5",
+        "lint",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/tool-error",
+        "--format=json",
+        "--file",
+        "app.py",
+        "--ruff-tool",
+        "/workspace/guard-toolchain/python-native/bin/ruff"
+      ],
+      "exit": 3,
+      "stdoutSha256": "637081a499e7e5f0178a8403c99b40cbdb845c74df124228d51303366aa1f28b",
+      "ruffArgv": [
+        "/workspace/guard-toolchain/python-native/bin/ruff",
+        "check",
+        "--no-cache",
+        "--output-format",
+        "json",
+        "app.py"
+      ],
+      "ruffExit": 2,
+      "sourceSha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "configSha256": "ba79221058ec60058c772b0901406952b756033d6aeca446accd2b39353f4c34"
+    },
+    "source-changed": {
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/codeguard-f5661d5",
+        "lint",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/source-changed",
+        "--format=json",
+        "--file",
+        "app.py",
+        "--ruff-tool",
+        "/workspace/guard-toolchain/python-native/bin/ruff"
+      ],
+      "exit": 3,
+      "stdoutSha256": "014c632065a444608c9d245690fb607e17e11da8609c50d3cde960e6fff01854",
+      "ruffArgv": [
+        "/workspace/guard-toolchain/python-native/bin/ruff",
+        "check",
+        "--no-cache",
+        "--output-format",
+        "json",
+        "app.py"
+      ],
+      "ruffExit": 0,
+      "sourceSha256": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+      "configSha256": "e2b5cd05041fed8edc034e96416644bba8ae65478a18352eb103c04d74f04c47"
+    }
+  }
+}

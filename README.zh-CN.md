@@ -10,6 +10,14 @@ Codeguard 面向开发者与编程智能体，识别项目已有质量配置，�
 >
 > **基线：**可调用行为以当前源码和[实施证据](openspec/changes/introduce-rust-codeguard-cli/implementation-baseline.md)为准。声明 Rust 最低版本 `1.85`，edition `2024`，Cargo resolver `2`。`@partme.ai/codeguard@0.1.4` 已发布，当前仅支持 Apple Silicon macOS；不声称已有多平台二进制发行版或 crates.io 发布。
 
+本地源码分支已有显式只读 GuardEngine 适配入口：
+`codeguard guard-project --invocation FILE --native-report FILE --context FILE --mapping FILE --contract FILE`。
+当前 CLI 的 run_report1.0 profile 仍未取得完整资格，只返回 partial BLOCK 或绑定后错误；
+原生 aggregate exit3 不代表批准。独立的 SDK-only Ruff F401 profile 消费真实单文件反馈，
+冻结工具、配置和源码身份，仅覆盖该规则，不改变原生命令、项目整体资格或既有 CLI profile。
+参见[CLI 合同](docs/guard-project-cli.md)、[Ruff 范围](docs/guard-integration-ruff-f401.md)
+及[冻结能力映射](docs/frozen-integration-capabilities.md)。
+
 ```text
 项目文件 + 已有检查器配置
            |

@@ -10,3 +10,5 @@ pub mod envelope;
 
 #[cfg(unix)]
 pub mod command;
+
+pub mod ruff_profile;
