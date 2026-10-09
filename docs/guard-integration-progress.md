@@ -241,3 +241,5 @@ and task4.3 checkbox remain unchanged pending review.
 Root independent review accepted task4.3 at a3dadb5:18 fixed-source tests and38 transport hashes/37 unchanged original byte pairs, no findings. Adapter22/26. Evidence codeguard-joint-independent-review.md. Remaining host/release/rollout tasks unchanged.
 
 Task4.4 local host library profile independently accepted at e04cc1b: actual probe1 passed/0 ignored, both pinned native invocations preserved exit3,21 retained artifacts verified, source refs/index unchanged. Adapter23/26. Scope and cancellation/credential limitations: tests/acceptance/guard-integration-host.md; independent external evidence codeguard-host-independent-review.md. Tasks5.1–5.3 unchanged.
+
+Task5.1 independently accepted at7e2ef43: fixed complete three-source bundle594644d+GEb0+GG20f, byte/metadata validation, package regressions and actual package-host probe1passed/0ignored with GEb0 accepted. Adapter24/26. OriginalGE68 task4.4 evidence retained separately; no deployment/publication or implicit adjacent-version support. External report codeguard-package-independent-review.md.

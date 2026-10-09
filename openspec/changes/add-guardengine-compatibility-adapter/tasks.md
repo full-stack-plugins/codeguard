@@ -71,7 +71,7 @@
 
 ## 5. C5 显式发布、兼容矩阵与回滚（生产分发等待 GE-RELEASE）
 
-- [ ] 5.1 在拟新增 `docs/guard-integration-compatibility.md` 锁定已验证GE/native/mapping/envelope/平台/宿主组合及固定依赖制品；`guard_integration_version_matrix.rs` 对支持及未知N/N-1逐项测试，未知组合拒绝，不以crate semver推报告版本。追踪「Rollout preserves native ownership and rollback」。
+- [x] 5.1 在拟新增 `docs/guard-integration-compatibility.md` 锁定已验证GE/native/mapping/envelope/平台/宿主组合及固定依赖制品；`guard_integration_version_matrix.rs` 对支持及未知N/N-1逐项测试，未知组合拒绝，不以crate semver推报告版本。追踪「Rollout preserves native ownership and rollback」。
 - [ ] 5.2 在 `guard_integration/command.rs` 与拟新增 `tests/acceptance/guard-integration-rollback.md` 验证默认关闭→shadow→显式opt-in→停用适配器路径；原生命令历史fixture全部保持，required集成证据缺失仍阻断，停用不删除工件或改政策。追踪「Native interfaces remain unchanged」「Rollout preserves native ownership and rollback」。
 - [ ] 5.3 在拟新增 `tests/acceptance/guard-integration-release.md` 汇总真实命令、版本、各spec scenario到测试/产物的矩阵及未支持范围；执行适用新测试和旧native受影响回归，全部指定负例通过、零false ALLOW且无未解释差异才宣布CG-ADAPTER切片验收，未完成旧任务保持未完成。追踪全部12条Requirement。
 
@@ -81,3 +81,5 @@
 2026-10-09 task4.3 independently accepted at a3dadb5 for the explicit local joint profile:18 fixed-source joint/concurrency tests passed,38 hashes/37 original byte pairs verified, output matched. New baseline projections and fixture authority are distinguished from unchanged original native captures. Evidence: external codeguard-joint-independent-review.md. Adapter22/26; no production host/issuer or unrelated native qualification asserted.
 
 2026-10-09 task4.4 independently accepted at e04cc1b for the existing local host library0.1.0: exact actual probe1 passed/0 ignored, two original native exit3 captures, fixed tool hashes,21 artifacts and source refs/index unchanged. Independent report: codeguard-host-independent-review.md. Sequential reentry/pre-cancellation and cleared child environment only; no MCP, production identity or SDK single-domain compatibility claim. Adapter23/26;5.1–5.3 remain pending.
+
+2026-10-09 task5.1 independently accepted at7e2ef43, source bundle594644d+GEb0+GG20f. Independent archive/hash/source/metadata checks and exact package-host probe1 passed (GEb0, two native exit3) succeeded; targeted package tests20passed/1existingignored retained. Evidence: codeguard-package-independent-review.md and verification.json/host.log/capture. Adapter24/26; no public release, runtime binary inclusion, cross-platform or N/N-1 promise.

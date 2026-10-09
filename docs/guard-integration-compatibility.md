@@ -15,7 +15,7 @@ and every Cargo manifest/lock are retained byte-for-byte.
 | Legacy reader | package0.1.4, `codeguard.invocation/v1alpha1`, `run_report`1.0, lint `--format=json` | Unqualified/partial. The protocol fixture is not relabeled an actual native capture. Real `guard-project` CLI subprocess tests consume that fixture and retain BLOCK/null/error semantics. |
 | Mapping | `codeguard.mapping/v1alpha1` | Existing exact F401/fixed-gap relations only. Unknown mapping version rejected by the actual parser. |
 | Engine/wire | `guard.partme.ai/v1alpha1` contract; `guard.integration/v1alpha1` envelope | Independent namespaces; existing Ruff artifact tests recompute engine artifacts. No inference from crate semver or native schema. |
-| Host | existing `codeguard-gg-candidate-host`0.1.0, optional local trusted-executor library | Task4.4 actual probe accepted with GG20f3a82 and GE68f3c1f. This source package separately includes GG20f3a82 and GEb0; its metadata resolves entirely inside the package. Host has two domain artifacts; SDK consumer has a separate single-domain contract. No MCP or deployment claim. |
+| Host | existing `codeguard-gg-candidate-host`0.1.0, optional local trusted-executor library | Task4.4 actual probe accepted with GG20f3a82 and GE68f3c1f. This source package separately includes GG20f3a82 and GEb0; its metadata resolves entirely inside the package, and independent package-host execution with GEb0 subsequently passed (1 actual test,0 ignored,two native exit3). Host has two domain artifacts; SDK consumer has a separate single-domain contract. No MCP or deployment claim. |
 | Platform/toolchain | Linux x86_64, Rust1.99.0 `b940084d7`, locked offline cached dependencies | Neither declared Rust1.85/1.90 minima nor other OS/architectures were executed. No all-platform claim. |
 
 `guard_integration_version_matrix` checks native schema 0.13.0 positive and
@@ -90,3 +90,10 @@ metadata to Linux, does not install missing packages and does not assert that
 other-target resolution now works. Public distribution awaits applicable
 GE-RELEASE gates; local compatibility acceptance does not deploy an issuer or
 weaken required evidence checks.
+
+Independent follow-up acceptance: `codeguard-package-independent-review.md` and
+its `verification.json`/`host.log`/capture independently validate the fixed bundle
+and actually execute the package host against bundled GEb0 (1 passed,0 ignored).
+This complements, rather than replaces, the earlier GE68 task4.4 run. Task5.1
+local compatibility accepted; public distribution and untested platforms remain
+outside the claim.
