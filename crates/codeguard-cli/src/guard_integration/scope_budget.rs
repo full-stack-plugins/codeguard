@@ -48,3 +48,43 @@ pub(super) fn validate(targets: &BTreeMap<String, Vec<String>>) -> Result<(), &'
     }
     Ok(())
 }
+
+/// Admit all possible diagnostic strings and copied target identities before
+/// constructing them. The shared 16MiB budget applies to the combined dimensions.
+pub(super) fn validate_requirements(
+    requirements: &BTreeMap<String, super::scope::RequiredScope>,
+) -> Result<(), &'static str> {
+    let mut charged = 1024usize;
+    for (id, scope) in requirements {
+        let id_bytes = encoded_size(id)?;
+        charged = charged.saturating_add(id_bytes.saturating_add(128).saturating_mul(4));
+        let mut row = |fields: &[&str]| -> Result<(), &'static str> {
+            let mut bytes = id_bytes.saturating_add(128);
+            for field in fields {
+                bytes = bytes.saturating_add(encoded_size(field)?);
+            }
+            charged = charged.saturating_add(bytes.saturating_mul(4));
+            if charged > MAX_ARTIFACT_BYTES {
+                return Err(ERROR);
+            }
+            Ok(())
+        };
+        for target in &scope.targets {
+            row(&[target])?;
+        }
+        for rule in &scope.rules {
+            row(&[rule])?;
+        }
+        for tool in &scope.tools {
+            row(&[&tool.id, &tool.version, &tool.sha256])?;
+            row(&[&tool.id])?; // Matching identity and per-obligation execution are distinct.
+        }
+        for config in &scope.configurations {
+            row(&[&config.reference, &config.sha256])?;
+        }
+        if charged > MAX_ARTIFACT_BYTES {
+            return Err(ERROR);
+        }
+    }
+    Ok(())
+}

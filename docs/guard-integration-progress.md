@@ -155,3 +155,17 @@ requirement; tests use an explicit archivedc80ec32 SDK, not an assumed path pin.
 Migration validation and remaining baseline failures are recorded separately in
 `ledger/codeguard-pr31-adapter-transplant-report.md`. Original PR31 and adapter
 worktrees remain independent; no push, merge or release was performed.
+
+## Frozen scope dimensions SDK slice (task2.2 partial)
+
+TDD added `FrozenObligations::with_requirements`: immutable per-obligation targets,
+rule IDs, exact tool version/digest and configuration reference/digest. Borrowed
+combined admission accounting runs before clones or gap formatting. The existing
+v1alpha1 CLI/targets-only constructor remains unchanged and unqualified.
+run_report1.0 has no executed-rule/config/per-obligation tool observations; these
+produce explicit missing-evidence gaps. A matching finding/policy hash/global tool
+identity cannot close those gaps. Seven focused tests include changed/absent tool,
+unrelated target, duplicate/malformed identity and actual large-allocation rejection.
+This slice does not finish2.2 or qualify a native producer; see
+`docs/guard-integration-scope.md` and ledger scope-dimensions report. No new task
+checkboxes are changed pending independent review and actual native coverage work.
