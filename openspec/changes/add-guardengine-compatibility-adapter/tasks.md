@@ -30,7 +30,7 @@
 
 输出：`InvocationDescriptor`、默认unqualified的`CapabilityProfile`及版本化fixture。满足GE-CONTRACT后才冻结外部schema；对应GE各门见[engine change](https://github.com/full-stack-plugins/guardengine/tree/docs/guard-design-20261009/openspec/changes/add-versioned-guard-integration-contracts)。
 
-- [ ] 1.1 在拟新增 `tests/fixtures/guard-integration/native-matrix.json` 与 `crates/codeguard-cli/tests/guard_integration_compat.rs` 冻结command/flags/schema/退出/stdout/stderr/副作用样本；对旧check/CVE/Dockerfile混合优先级、Rust0/1/2/3/4/130及query成功分别断言，验收不按数字跨入口猜测。追踪「Native interfaces remain unchanged」。
+- [x] 1.1 在拟新增 `tests/fixtures/guard-integration/native-matrix.json` 与 `crates/codeguard-cli/tests/guard_integration_compat.rs` 冻结command/flags/schema/退出/stdout/stderr/副作用样本；对旧check/CVE/Dockerfile混合优先级、Rust0/1/2/3/4/130及query成功分别断言，验收不按数字跨入口猜测。追踪「Native interfaces remain unchanged」。
 - [x] 1.2 在拟新增 `docs/adr/guard-integration-boundary.md` 决定纯模块+SDK或受限进程的调用边界、明确新opt-in入口名和参数；通过接口fixture断言未选入口无额外I/O/进程，所选接口只消费已有工件，固定GE源码revision和未来发布门。追踪「Native interfaces remain unchanged」「Rollout preserves native ownership and rollback」。
 - [x] 1.3 在拟新增 `schemas/guard-integration-invocation.schema.json` 和 `guard_integration/profile.rs` 固定InvocationDescriptor/CapabilityProfile字段、独立版本及允许flags；`guard_integration_profile.rs` 验证未知版本/字段/命令组合全部拒绝，区分包版本、native schema、mapping和wire版本。追踪「Native evidence readers reject ambiguity」。
 - [x] 1.4 在拟新增 `tests/fixtures/guard-integration/qualification.json` 建立所选native切片到旧任务/真实验收的映射；`guard_integration_scope.rs` 测试WASM、zero findings、task resolved均不能升级complete；无可证明切片时所有profile保持unqualified仍可进入partial开发。追踪「Complete projection requires proven native scope」。
@@ -65,7 +65,7 @@
 只读候选依赖[GitGuard change](https://github.com/full-stack-plugins/gitguard/tree/docs/guard-design-20261009/openspec/changes/add-candidate-bound-git-governance)，不等待其特权写执行器。真实native范围不足则联验标为不支持，不能用mock冒充生产资格。
 
 - [x] 4.1 在拟新增 `tests/fixtures/guard-integration/queue/` 和 `guard_integration_queue.rs` 接入固定版本GG-CANDIDATE只读fixture；PR head与synthetic M不同、base推进、组成员重排均拒旧证据，M原生结果经投影后才可满足该范围。追踪「Protected gates consume exact queue candidates」。
-- [ ] 4.2 在拟新增 `tests/acceptance/guard-integration-native-parity.md` 记录选定真工具的完整/违规/partial/故障样本及前后输出，运行1.1差分测试；native字段/退出/副作用无未解释差异，已知工具缺口仍由旧change登记。追踪「Native interfaces remain unchanged」「Complete projection requires proven native scope」。
+- [x] 4.2 在拟新增 `tests/acceptance/guard-integration-native-parity.md` 记录选定真工具的完整/违规/partial/故障样本及前后输出，运行1.1差分测试；native字段/退出/副作用无未解释差异，已知工具缺口仍由旧change登记。追踪「Native interfaces remain unchanged」「Complete projection requires proven native scope」。
 - [ ] 4.3 在 `guard_integration_concurrency.rs` 联合队列fixture测试双需求并行、批准扫描后撤销、旧run迟到和新base重验；保存原始输入/输出/摘要，任一失效不能ALLOW，审批不能覆盖工具故障。追踪「Parallel projections preserve immutable ownership」「Changed bindings invalidate eligibility」。
 - [ ] 4.4 在拟新增 `tests/acceptance/guard-integration-host.md` 固定一个获授权可检查宿主版本并记录能力/取消/重入/凭据边界；`guard_integration_host.rs` 测试read-only调用，不可取得宿主则记录unverified且不宣称兼容通过。追踪「Rollout preserves native ownership and rollback」。
 
