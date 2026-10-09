@@ -15,3 +15,5 @@ pub mod ruff_profile;
 
 #[cfg(unix)]
 pub mod ruff_command;
+
+pub mod shadow;

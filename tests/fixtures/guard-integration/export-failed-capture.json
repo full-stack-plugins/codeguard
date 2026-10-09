@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/codeguard-f5661d5",
+    "check",
+    "all",
+    "/workspace/guard-implementation-ledger/codeguard-reader-export-capture/project",
+    "--format=json",
+    "--ruff-tool",
+    "/workspace/guard-toolchain/python-native/bin/ruff",
+    "--output",
+    "/workspace/guard-implementation-ledger/codeguard-reader-export-capture/user-file.txt"
+  ],
+  "exit": 3,
+  "stdoutSha256": "1d557fcff264f33bd4df2dd573538fd0d9731c1cc0199b9e64a235b43dc4a567",
+  "producerSha256": "b7576afa78f5ab6fdc8133650a1c75dc113357ac927e553b4f5c67731eea3a8c",
+  "oldExportPreserved": true,
+  "fixtureVersion": "codeguard.reader-capture/v1alpha1",
+  "fixture": "export-failed-check-feedback.json",
+  "format": "check_feedback",
+  "nativeSchema": "0.38.0",
+  "readerDisposition": "unsupported entire aggregate; do not relabel header or extract nested feedback as a separate invocation",
+  "findingPreserved": "native_results.python_lint contains F401 despite export failure"
+}

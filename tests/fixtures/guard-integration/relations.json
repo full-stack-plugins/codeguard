@@ -1,0 +1,23 @@
+{
+  "version": "codeguard.relations/v1alpha1",
+  "profile": "codeguard.ruff-f401/linux-x86_64/v1alpha1",
+  "mapping": {
+    "version": "codeguard.mapping/v1alpha1",
+    "entries": [
+      {"source":{"kind":"finding","tool_id":"ruff","native_rule_id":"F401"},"rule_id":"f401"},
+      {"source":{"kind":"gap","detail":"ruff_f401_scope_incomplete"},"rule_id":"f401"}
+    ]
+  },
+  "contract": {
+    "apiVersion":"guard.partme.ai/v1alpha1","kind":"GuardContract",
+    "metadata":{"id":"ruff-f401","revision":"1"},
+    "spec":{"rules":[{"id":"f401","enforcement":"enforce","assertion":{"type":"forbid_relation","subject":"python","predicate":"has","object":"unused-import"}}]}
+  },
+  "cases": [
+    {"entry":0,"nativeFixture":"bad","sourcePrefix":"native:","completeness":"complete"},
+    {"entry":1,"nativeFixture":"missing-tool","sourcePrefix":"scope:ruff_f401_scope_incomplete","completeness":"partial"}
+  ],
+  "unsupportedAssertions":["count","regex","all"],
+  "unsupportedSources":["count","approval","wildcard"],
+  "authority":"protected caller input; fixture is not an authentication provider"
+}
