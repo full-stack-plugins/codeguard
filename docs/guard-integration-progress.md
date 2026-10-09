@@ -201,3 +201,7 @@ check all keeps3/stdout=file with only run-ID differences. New command strace sh
 one exec(self), no network or write opens. Mature57language source preservation
 remains an explicit invariant, not a full platform/runtime test claim. No new
 checkbox from this implementation; independent review required for2.5.
+
+## Independently accepted Ruff CLI:6/26
+
+Task2.5 accepted at72d80ae453c0380ad7061c10847595c5a4ac1736 for the explicit local Linux Ruff F401 profile. Independent92 passing tests (4 existing ignored),27 actual CLI projections and schema/digest checks, bound/unbound error4 and native old/new byte comparison passed. Existing guard-project output is unchanged; native checkall still exits3. All3190 original paths remain present. Evidence: cloud ledger codeguard-ruff-cli-independent-review.md. No57-tool runtime qualification, platform/authentication or generic scope-completeness claim.
