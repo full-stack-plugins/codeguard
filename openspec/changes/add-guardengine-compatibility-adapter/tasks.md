@@ -52,7 +52,7 @@
 
 输出：独立资格评估及不可变审计引用；原始report和信封不改写。先固定控制器port，不选择生产批准服务或持有签发密钥。
 
-- [ ] 3.1 在 `guard_integration/consumer.rs` 校验repo/task/worktree/requirement集合、完整OID、candidate/base/group及sourceSnapshotDigest；`guard_integration_candidate.rs` 覆盖SHA-1/SHA-256、dirty字节与HEAD不符、错repo四类反例，可信队列消费只接受clean冻结候选。追踪「Changed bindings invalidate eligibility」。
+- [x] 3.1 在 `guard_integration/consumer.rs` 校验repo/task/worktree/requirement集合、完整OID、candidate/base/group及sourceSnapshotDigest；`guard_integration_candidate.rs` 覆盖SHA-1/SHA-256、dirty字节与HEAD不符、错repo四类反例，可信队列消费只接受clean冻结候选。追踪「Changed bindings invalidate eligibility」。
 - [ ] 3.2 在 `guard_integration/consumer.rs` 接入GE-TRUST认证引用port，校验baseline不可变digest/ref、批准issuer/scope/expiry/revocation；`guard_integration_trust.rs` 覆盖伪accepted、错issuer、跨scope、过期、撤销、provider不可用，均不授权且原REQUIRE_APPROVAL字节不变。追踪「Approved references require authenticated consumption」。
 - [ ] 3.3 在 `guard_integration/consumer.rs` 实现资格键和失效理由；`guard_integration_freshness.rs` 逐项变更candidate/base/group/source/baseline/contract/tool-config/mapping/analyzer/coverage及批准状态，全部重验，首版不跨run缓存执行结果。追踪「Changed bindings invalidate eligibility」。
 - [ ] 3.4 在 `guard_integration/audit.rs` 实现runId尝试分离、同次导入幂等及绑定CAS；`guard_integration_concurrency.rs` 运行两个需求/两个worktree和迟到head1成功反例，断言记录不串用且不覆盖head2。追踪「Parallel projections preserve immutable ownership」。
@@ -64,7 +64,7 @@
 
 只读候选依赖[GitGuard change](https://github.com/full-stack-plugins/gitguard/tree/docs/guard-design-20261009/openspec/changes/add-candidate-bound-git-governance)，不等待其特权写执行器。真实native范围不足则联验标为不支持，不能用mock冒充生产资格。
 
-- [ ] 4.1 在拟新增 `tests/fixtures/guard-integration/queue/` 和 `guard_integration_queue.rs` 接入固定版本GG-CANDIDATE只读fixture；PR head与synthetic M不同、base推进、组成员重排均拒旧证据，M原生结果经投影后才可满足该范围。追踪「Protected gates consume exact queue candidates」。
+- [x] 4.1 在拟新增 `tests/fixtures/guard-integration/queue/` 和 `guard_integration_queue.rs` 接入固定版本GG-CANDIDATE只读fixture；PR head与synthetic M不同、base推进、组成员重排均拒旧证据，M原生结果经投影后才可满足该范围。追踪「Protected gates consume exact queue candidates」。
 - [ ] 4.2 在拟新增 `tests/acceptance/guard-integration-native-parity.md` 记录选定真工具的完整/违规/partial/故障样本及前后输出，运行1.1差分测试；native字段/退出/副作用无未解释差异，已知工具缺口仍由旧change登记。追踪「Native interfaces remain unchanged」「Complete projection requires proven native scope」。
 - [ ] 4.3 在 `guard_integration_concurrency.rs` 联合队列fixture测试双需求并行、批准扫描后撤销、旧run迟到和新base重验；保存原始输入/输出/摘要，任一失效不能ALLOW，审批不能覆盖工具故障。追踪「Parallel projections preserve immutable ownership」「Changed bindings invalidate eligibility」。
 - [ ] 4.4 在拟新增 `tests/acceptance/guard-integration-host.md` 固定一个获授权可检查宿主版本并记录能力/取消/重入/凭据边界；`guard_integration_host.rs` 测试read-only调用，不可取得宿主则记录unverified且不宣称兼容通过。追踪「Rollout preserves native ownership and rollback」。

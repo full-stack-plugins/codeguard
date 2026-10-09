@@ -205,3 +205,9 @@ checkbox from this implementation; independent review required for2.5.
 ## Independently accepted Ruff CLI:6/26
 
 Task2.5 accepted at72d80ae453c0380ad7061c10847595c5a4ac1736 for the explicit local Linux Ruff F401 profile. Independent92 passing tests (4 existing ignored),27 actual CLI projections and schema/digest checks, bound/unbound error4 and native old/new byte comparison passed. Existing guard-project output is unchanged; native checkall still exits3. All3190 original paths remain present. Evidence: cloud ledger codeguard-ruff-cli-independent-review.md. No57-tool runtime qualification, platform/authentication or generic scope-completeness claim.
+
+## Independently accepted real candidate host:8/26
+
+Tasks3.1 and4.1 accepted at9d5bb0aae0c07a8b553cfbe11c81311bb34a17d7 for the independent local controller-owned Ruff F401 host. Ten actual native tests/probes, six freshly regenerated evidence sets, actual immutable Git tree/source/digest verification and hostClippy pass. The host is a separate opt-in workspace preserving all3248 pre-host tracked bytes, all3190 original PR31 paths and57 profile declarations at that exact commit. Its lock separately pins the tested GitGuard/GE/libc combination; original CodeGuard lock and four-crate architecture remain intact. Evidence: cloud ledger codeguard-candidate-host-independent-review.md.
+
+Candidate preparation/capture is private and real native execution occurs on a private copy. GitGuard full tree/candidate provenance remains separate from CodeGuard's real single-file source digest. No production provider authentication, same-UID hostile isolation or57-tool runtime qualification is asserted.
