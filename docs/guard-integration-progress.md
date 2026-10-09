@@ -211,3 +211,15 @@ Task2.5 accepted at72d80ae453c0380ad7061c10847595c5a4ac1736 for the explicit loc
 Tasks3.1 and4.1 accepted at9d5bb0aae0c07a8b553cfbe11c81311bb34a17d7 for the independent local controller-owned Ruff F401 host. Ten actual native tests/probes, six freshly regenerated evidence sets, actual immutable Git tree/source/digest verification and hostClippy pass. The host is a separate opt-in workspace preserving all3248 pre-host tracked bytes, all3190 original PR31 paths and57 profile declarations at that exact commit. Its lock separately pins the tested GitGuard/GE/libc combination; original CodeGuard lock and four-crate architecture remain intact. Evidence: cloud ledger codeguard-candidate-host-independent-review.md.
 
 Candidate preparation/capture is private and real native execution occurs on a private copy. GitGuard full tree/candidate provenance remains separate from CodeGuard's real single-file source digest. No production provider authentication, same-UID hostile isolation or57-tool runtime qualification is asserted.
+
+
+## Authenticated baseline consumption port (pending independent review)
+
+The task3.2 local consumer gap is now implemented in consumer.rs: independent
+owned baseline expectations and GE current approval validation, with non-null
+baselines explicitly rejected by the older source-only consumer. Native CLI,
+commands, reports and language adapters are unchanged. New trust5 plus existing
+approval10/freshness4 tests pass; prior producer-only baseline qualification was
+observed as a real RED failure. See guard-read-only-consumer.md and ledger
+codeguard-baseline-trust-{red,green}.log. No roadmap checkbox changed; this is a
+controller-supplied authentication port, not a production identity installation.

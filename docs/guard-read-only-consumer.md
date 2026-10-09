@@ -6,7 +6,8 @@ time, and an optional predecessor cause. It performs no repository discovery,
 installation, native invocation, network operation, notification, or repair.
 An injected authority provider is an external port: its authentication, freshness,
 and side effects are the controller's responsibility. The tests use a fixture
-provider and do not establish a production identity provider (task 3.2).
+provider and do not establish a production identity provider. The generic port
+accepts the protected controller's provider; no fixture provider is installed.
 
 The controller freezes these expected inputs separately from the observation:
 
@@ -78,5 +79,51 @@ and old authenticated producer record. No cross-run or approval cache exists.
 Local fixture tests demonstrate eligible approved review while preserving the
 technical REQUIRE_APPROVAL decision, plus changed/expired/revoked/provider-error
 counterexamples. These fixtures authenticate only explicitly fixed test digests
-and do not establish production authority (3.2), issue a grant, or authorize host
+and do not establish production authority, issue a grant, or authorize host
 writes. The SDK/GG provenance separation described above still applies.
+
+
+## Independently frozen baseline authentication
+
+`PreparedConsumption::freeze(&expected, baseline.as_ref())` owns controller-selected
+expectations before evidence consumption. A non-null binding baseline requires a
+`BaselineRequirement` with an opaque reference, purpose and independently selected
+GE eligibility policy. Its binding, contract, producer, required scopes and action
+must equal the technical policy; its approval principal policy must explicitly
+allow the baseline purpose. A null baseline rejects an extraneous requirement.
+Metadata is bounded before cloning. Expected source/baseline fields are never
+inferred from submitted reports or Markdown accepted text.
+
+The prepared context exposes `consume` and `consume_attached`, preserving the
+existing complete-review attachment protocol. Every call validates real artifact
+bytes through the existing consumer/GE path, then queries the baseline reference
+through the caller's `AuthorityProvider` and delegates exact principal/purpose/
+action/binding/contract/validity checks to GE `validate_approval_record`. Baseline
+approval is independent of technical review approval and can only withdraw
+eligibility, never repair BLOCK/partial/error or turn REQUIRE_APPROVAL into ALLOW.
+The original output, attached envelope and all report/native bytes are immutable.
+No URI resolution, signing, native execution, network access or grant is added.
+
+The older free `consume` / `consume_attached` functions remain the null-baseline
+profile. They now explicitly refuse non-null envelope baselines instead of treating
+producer authenticity as proof of baseline approval. Audit/store APIs that call
+those older functions therefore fail closed for that unsupported combination;
+this slice does not add a new durable authenticated-baseline storage profile.
+
+Prepared consumption includes the frozen baseline requirement and resulting GE
+audit outcome in its freshness key. This key is an observation identity, not a
+cached authorization. There is no cross-call approval cache. Protected caller time
+must be nonnegative and the provider must query its actual current authority.
+The provider and any eventual execution are trusted controller responsibilities;
+this port is neither a production identity service nor a distributed transaction.
+
+`guard_integration_trust` restores actual retained Ruff fixture outputs and builds
+their existing mapping/engine projection with an explicit local non-null baseline.
+Its authority records are test-only. RED demonstrated that producer-only ALLOW
+previously qualified a non-null baseline. GREEN covers explicit frozen references,
+caller mutation after freeze, forged/cross-scope/expired/revoked/unavailable
+approvals, both review and baseline obligations, unchanged REQUIRE_APPROVAL bytes,
+and inability to repair real technical BLOCK or partial output. Existing approval
+and freshness suites retain null-baseline, failed/cancelled and attachment coverage.
+Task3.2 registration awaits independent review of this local port; production
+issuer deployment is not claimed or required to test the interface semantics.
