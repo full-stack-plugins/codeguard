@@ -412,7 +412,7 @@ cargo run --locked -p codeguard-cli --example validate_corpus -- \
 | 能力 | [生成能力表](docs/CAPABILITIES.md) | 共享 ID 与状态 |
 | 证据 | [验收记录](tests/acceptance) | 每项注明范围与日期 |
 
-既有 [OpenSpec 规范与任务](openspec/changes/introduce-rust-codeguard-cli/proposal.md) 已整体迁入本 Rust 仓，是唯一规格与任务事实源。已实现切片和剩余工作分别记录，本文不维护第二份可独立勾选的任务。
+既有 [OpenSpec 规范与任务](openspec/changes/introduce-rust-codeguard-cli/proposal.md) 已整体迁入本 Rust 仓，是原生实现的唯一规格与任务事实源；新增 GuardEngine adapter change 只拥有增量集成任务。已实现切片和剩余工作分别记录，本文不维护第二份可独立勾选的任务。
 
 贡献应保持原生规则语义、补齐正反例、区分环境失败与发现，并同步双语文档和受影响 schema。非敏感缺陷可提交 [GitHub Issues](https://github.com/full-stack-plugins/codeguard/issues)。专门的安全披露政策尚未建立。
 
@@ -704,3 +704,8 @@ Ruby 六类别候选档案已独立固化运行时方言、项目锁版本策略
 SC1071/1090/1091/1092/1134/1144/1145 分类为环境或依赖阻塞；可同时保留 SC2086 等局部发现。`json1` 的列按 Unicode 标量计数，tab 算一个字符；不能沿用旧 json 的 tab 展开列。非法或部分报告不能获得完整状态。原生日志自由文本与替换内容不进入修复指引。
 
 0.1.0 `shell_lint_feedback` 提供七要素修复简报、原工具复检 argv 和官方规则链接。`task_workflow_status=not_integrated`、空尝试历史明确尚未接入持久任务；未完成输入只提供调查指引，不给源码修改范围。即使原生零诊断，整体仍为 incomplete/退出3、delivery_decision=not_evaluated；项目全范围、Dockerfile/IaC、安全、可信白名单与任务关闭不得由单文件结果替代。参见 [局部验收](tests/acceptance/shellcheck-native-baseline.md)。
+
+
+## OpenSpec 实施待办
+
+新增增量 [proposal](openspec/changes/add-guardengine-compatibility-adapter/proposal.md)、[design](openspec/changes/add-guardengine-compatibility-adapter/design.md)、[规范](openspec/changes/add-guardengine-compatibility-adapter/specs/) 与 [tasks](openspec/changes/add-guardengine-compatibility-adapter/tasks.md)，将架构方案拆成待实施工作。参阅[跨仓依赖路线图](openspec/guard-roadmap.md)与[结构验证记录](openspec/validation-2026-10-09.md)。所有新增实施任务保持未勾选；本分支新增规划，不新增产品功能。前文源码树清单和验证限制对应检查基线或较早的架构审阅阶段；本次另行新增 OpenSpec 文档并记录实际 CLI 校验。既有 change 的任务归属和历史完成证据继续保留。

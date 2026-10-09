@@ -414,7 +414,7 @@ The [documentation index](docs/README.md) assigns ownership and status to the ar
 | Capabilities | [Generated inventory](docs/CAPABILITIES.md) | Shared IDs and statuses |
 | Evidence | [Acceptance records](tests/acceptance) | Each record states scope and date |
 
-The existing [OpenSpec change](openspec/changes/introduce-rust-codeguard-cli/proposal.md) now lives in this Rust repository and is the sole specification and task authority. Implemented slices and remaining work are tracked separately; these documents do not maintain a second task ledger.
+The existing [OpenSpec change](openspec/changes/introduce-rust-codeguard-cli/proposal.md) now lives in this Rust repository and is the sole specification and task authority for native implementation. The new GuardEngine adapter change owns only incremental integration work. Implemented slices and remaining work are tracked separately; these documents do not maintain a second task ledger.
 
 Contributions should preserve native rule meaning, add positive/negative cases, separate environment failure from findings, and update bilingual documents and affected schemas. Use [GitHub Issues](https://github.com/full-stack-plugins/codeguard/issues) for non-sensitive bugs. A dedicated security reporting policy is not yet present.
 
@@ -721,3 +721,8 @@ An explicit absolute `--shellcheck-config` or the nearest ancestor rc is frozen 
 SC1071/1090/1091/1092/1134/1144/1145 represent environment/dependency blockers and may coexist with retained local SC2086 diagnostics. `json1` columns count Unicode scalar characters, with each tab counting one character. Invalid/partial reports cannot claim completeness. Free-text native messages and replacement payloads are not forwarded into repair instructions.
 
 Version 0.1.0 `shell_lint_feedback` includes seven-part repair guidance, original-tool recheck argv and official rule links. `task_workflow_status=not_integrated` and empty attempt history explicitly identify the missing persistence integration. Incomplete evidence yields investigation guidance without authorized source paths. Even native zero diagnostics leaves the overall command incomplete/exit 3 and delivery not evaluated. Project coverage, Dockerfile/IaC, security, trusted exceptions and task closure require independent implementation and acceptance. See the [partial acceptance record](tests/acceptance/shellcheck-native-baseline.md).
+
+
+## OpenSpec implementation backlog
+
+The incremental [proposal](openspec/changes/add-guardengine-compatibility-adapter/proposal.md), [design](openspec/changes/add-guardengine-compatibility-adapter/design.md), [requirements](openspec/changes/add-guardengine-compatibility-adapter/specs/) and [tasks](openspec/changes/add-guardengine-compatibility-adapter/tasks.md) translate the architecture into pending implementation work. See the [cross-repository dependency roadmap](openspec/guard-roadmap.md) and [structural validation record](openspec/validation-2026-10-09.md). Every new implementation task remains unchecked; this branch adds planning artifacts, not product features. Earlier source-tree inventories and validation limitations describe the inspected baseline or earlier architecture-review stage; this planning stage adds OpenSpec artifacts and separately records actual CLI validation. Existing change ownership and historical completion evidence remain intact.
