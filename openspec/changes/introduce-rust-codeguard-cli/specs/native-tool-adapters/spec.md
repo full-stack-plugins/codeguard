@@ -18,7 +18,11 @@ C/C++显式文件文档检查 MUST 在已有工作台保存脱敏原生观察并
 
 ### Requirement: Every registered language SHALL satisfy all four production cores independently
 
-全部57个canonical语言 MUST 分别完成syntax、documentation、conventions、vulnerabilities四项核心能力，共228项义务。每项 MUST 按声明的语言版本、方言、构建生态和目标平台取得真实原生运行与独立验收证据；局部实现、配置存在、工具退出0、任务勾选及模拟报告 MUST NOT 授予生产资格。Java Maven与Gradle MUST 分别完成文档、规范和依赖漏洞路径，不得以其中之一代替另一条路径。未完成项 MUST 保留blocked及具体缺口，不能改为不适用来消除既定义务。
+全部57个canonical语言 MUST 分别完成syntax、documentation、conventions、vulnerabilities四项核心能力，共228项义务。
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN** 每项 MUST 按声明的语言版本、方言、构建生态和目标平台取得真实原生运行与独立验收证据；局部实现、配置存在、工具退出0、任务勾选及模拟报告 MUST NOT 授予生产资格。Java Maven与Gradle MUST 分别完成文档、规范和依赖漏洞路径，不得以其中之一代替另一条路径。未完成项 MUST 保留blocked及具体缺口，不能改为不适用来消除既定义务。
 
 syntax MUST 集成适用的官方编译器或原生lint，并完成全部32个WASM grammar的加载、合法/非法源码、ERROR/MISSING、版本兼容和误报反证验收，包含Dart与Zig。原生优先；原生缺失时WASM只提供初检和原生工具准备指引。WASM初检通过 MUST NOT 证明类型、跨文件语义、原生规范或完整项目通过。
 
@@ -122,7 +126,11 @@ ShellCheck单文件入口 MUST 明确方言和工具兼容版本，冻结有界U
 
 ### Requirement: Native evidence SHALL be interpreted per tool contract
 
-adapter MUST 根据工具版本的报告及退出语义解析结果；MUST NOT 以通用非零、exit 1、关键词或模型主观判断替代。无效、截断、陈旧、与计划不符或内部矛盾的报告 MUST 产生未完成。有效部分发现 MUST 保留。
+adapter MUST 根据工具版本的报告及退出语义解析结果；MUST NOT 以通用非零、exit 1、关键词或模型主观判断替代。
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN** 无效、截断、陈旧、与计划不符或内部矛盾的报告 MUST 产生未完成。有效部分发现 MUST 保留。
 
 Rust 注释诊断 MUST 使用原生 Cargo/rustdoc 机器流，不能复用只接收 Clippy 规则的解析器或通过正则重写文档规则。已识别 missing_docs 与 rustdoc::broken_intra_doc_links 的观察 MUST 保留原生规则/级别、唯一主定位和原生 package/manifest/target 身份供执行层核对；不得把其它编译错误改称注释问题。重复 JSON 键、缺失/重复/失败的结束记录、结束后新事件、歧义主定位及未支持的警告 MUST 保持未完成。纯解析或显式局部库目标执行不证明项目原配置、完整工作区/features/targets、可信工具或批准规则覆盖。
 
@@ -825,7 +833,11 @@ Rust npm审计适配 MUST 核对具体原工具版本、auditReportVersion、冻
 
 ### Requirement: Every registered language SHALL qualify all four core production capabilities
 
-Codeguard SHALL target every one of the 57 canonical registry entries for production qualification of syntax, documentation comments, development conventions and vulnerability checking. The historical stable/planned labels SHALL NOT establish qualification or exclude an entry from this target. Qualification SHALL be recorded per language, supported version/dialect, build ecosystem and advertised platform, with reproducible real-tool and end-to-end acceptance evidence. A candidate asset, formatter-only adapter, configured tool, zero findings, mocked process or passed unit suite SHALL NOT establish production readiness. Missing implementations SHALL remain explicit release blockers. These four capabilities SHALL supplement, not replace, existing dependency/security/build requirements.
+Codeguard SHALL target every one of the 57 canonical registry entries for production qualification of syntax, documentation comments, development conventions and vulnerability checking.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  The historical stable/planned labels SHALL NOT establish qualification or exclude an entry from this target. Qualification SHALL be recorded per language, supported version/dialect, build ecosystem and advertised platform, with reproducible real-tool and end-to-end acceptance evidence. A candidate asset, formatter-only adapter, configured tool, zero findings, mocked process or passed unit suite SHALL NOT establish production readiness. Missing implementations SHALL remain explicit release blockers. These four capabilities SHALL supplement, not replace, existing dependency/security/build requirements.
 
 #### Scenario: Explicit C and C++ documentation probes preserve native diagnostic scope
 - **WHEN** comments c/cpp receives one explicit source file, a selected supported Clang entry and its matching C11/C++17 standard
@@ -862,7 +874,11 @@ Codeguard SHALL target every one of the 57 canonical registry entries for produc
 
 ### Requirement: Gradle checker model observation SHALL preserve native project and task identities
 
-The public check entry SHALL accept an explicitly selected partial Gradle model probe through `--gradle-bundle`, `--java-home` and repeatable `--gradle-project-file` options. It SHALL use the existing task scheduler and shared deadline/cancellation limits, preserve the observation separately from quality results, and SHALL NOT upgrade static checker configuration, project coverage or quality acceptance from this partial model. Invalid scope options SHALL fail before execution. The lint-only entry SHALL reject these configuration-model options.
+The public check entry SHALL accept an explicitly selected partial Gradle model probe through `--gradle-bundle`, `--java-home` and repeatable `--gradle-project-file` options.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  It SHALL use the existing task scheduler and shared deadline/cancellation limits, preserve the observation separately from quality results, and SHALL NOT upgrade static checker configuration, project coverage or quality acceptance from this partial model. Invalid scope options SHALL fail before execution. The lint-only entry SHALL reject these configuration-model options.
 
 Rust SHALL interpret a versioned native Gradle configuration model per root/subproject, preserving the applied checker plugin IDs, actual task implementation types, enabled flags and bounded project/build directories. Matching task names alone SHALL NOT establish OWASP capability. Duplicate JSON fields, repeated identities, missing parent projects, unsupported protocols, oversized models and out-of-root directories SHALL remain incomplete. Included composite builds SHALL NOT be silently omitted. A selected-file model probe SHALL preserve its partial input scope and SHALL NOT claim complete project coverage, vulnerability results, detailed-documentation compliance or production readiness.
 
@@ -880,7 +896,11 @@ Rust SHALL interpret a versioned native Gradle configuration model per root/subp
 
 ### Requirement: Gradle Javadoc observations SHALL execute original native tasks without replacing documentation rules
 
-The Gradle Javadoc application service SHALL select enabled tasks by the official Javadoc implementation base class and an observed Java plugin, use fully qualified task paths, and preserve original doclint/doclet/access/source-set configuration. It MAY fix diagnostic JVM language in the private invocation. Native model capture and selected quality tasks SHALL share a single bounded offline Gradle invocation over the same immutable selected inputs. Unknown output, out-of-scope locations, unsupported JDK format, cancellation, tool/input changes and native execution failures SHALL remain incomplete rather than source violations or clean acceptance.
+The Gradle Javadoc application service SHALL select enabled tasks by the official Javadoc implementation base class and an observed Java plugin, use fully qualified task paths, and preserve original doclint/doclet/access/source-set configuration.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  It MAY fix diagnostic JVM language in the private invocation. Native model capture and selected quality tasks SHALL share a single bounded offline Gradle invocation over the same immutable selected inputs. Unknown output, out-of-scope locations, unsupported JDK format, cancellation, tool/input changes and native execution failures SHALL remain incomplete rather than source violations or clean acceptance.
 
 #### Scenario: Empty comments, purpose and tag descriptions remain native findings
 - **WHEN** JDK21 reports an empty comment, missing main description, or missing description for @param, @return or @throws in the selected source snapshot
@@ -904,7 +924,11 @@ The Gradle Javadoc application service SHALL select enabled tasks by the officia
 
 ### Requirement: Gradle documentation workbench projection SHALL preserve original input binding
 
-Gradle Javadoc repair observations SHALL use their own java.gradle.javadoc checker identity. Before first import, the selected build/source file set and every input digest SHALL be revalidated, including the native selected-input snapshot digest when present. Findings SHALL preserve native rule identity and validated source location with content-anchored identity independent of diagnostic line shifts; out-of-scope diagnostics and forged complete coverage/rules SHALL be rejected; repeated identical native locations SHALL merge into one finding. Environment incompleteness SHALL produce a separate stable preparation observation rather than a source finding. Empty diagnostics SHALL NOT close historical tasks or establish complete documentation compliance. Persistence, next guidance and original-native task verification SHALL retain this identity and remain separate acceptance obligations.
+Gradle Javadoc repair observations SHALL use their own java.gradle.javadoc checker identity.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  Before first import, the selected build/source file set and every input digest SHALL be revalidated, including the native selected-input snapshot digest when present. Findings SHALL preserve native rule identity and validated source location with content-anchored identity independent of diagnostic line shifts; out-of-scope diagnostics and forged complete coverage/rules SHALL be rejected; repeated identical native locations SHALL merge into one finding. Environment incompleteness SHALL produce a separate stable preparation observation rather than a source finding. Empty diagnostics SHALL NOT close historical tasks or establish complete documentation compliance. Persistence, next guidance and original-native task verification SHALL retain this identity and remain separate acceptance obligations.
 
 #### Scenario: Source-bound Gradle diagnostics retain identity after line movement
 - **WHEN** the selected inputs and native snapshot match and the same diagnostic source anchor moves to another line
@@ -972,7 +996,11 @@ Gradle Javadoc repair observations SHALL use their own java.gradle.javadoc check
 
 ### Requirement: Production acceptance planning SHALL preserve every registered core obligation
 
-`capabilities --acceptance-plan` SHALL expose a separate read-only repository plan for all 57 canonical languages and syntax/documentation/conventions/vulnerabilities. Each language SHALL retain its concrete target ecosystems, version/dialect qualification gaps, all five candidate platforms, implementation and evidence references, existing task identities and blockers. Java Maven and Gradle SHALL be separate paths; configuration observation SHALL NOT become CVE execution. The view SHALL NOT execute tools, read project code or grant production qualification. The legacy capabilities protocol SHALL remain unchanged.
+`capabilities --acceptance-plan` SHALL expose a separate read-only repository plan for all 57 canonical languages and syntax/documentation/conventions/vulnerabilities.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  Each language SHALL retain its concrete target ecosystems, version/dialect qualification gaps, all five candidate platforms, implementation and evidence references, existing task identities and blockers. Java Maven and Gradle SHALL be separate paths; configuration observation SHALL NOT become CVE execution. The view SHALL NOT execute tools, read project code or grant production qualification. The legacy capabilities protocol SHALL remain unchanged.
 
 #### Scenario: A filtered plan is mistaken for all-language readiness
 - **WHEN** a caller queries only Java's acceptance plan
@@ -988,7 +1016,11 @@ Gradle Javadoc repair observations SHALL use their own java.gradle.javadoc check
 
 ### Requirement: Gradle OWASP native execution SHALL preserve original task and report ownership
 
-The Gradle vulnerability application service SHALL execute explicitly selected, enabled official Analyze/Aggregate task paths from a bounded native model, with the applied org.owasp.dependencycheck plugin in the owning project. It SHALL preserve original scan, suppression, severity and report-format settings. Missing JSON configuration, skipped tasks, unsupported configuration APIs, duplicate output ownership, pre-existing report files, escaped paths or mismatched report project attribution SHALL remain incomplete. No implicit task-name match or Maven fallback is permitted.
+The Gradle vulnerability application service SHALL execute explicitly selected, enabled official Analyze/Aggregate task paths from a bounded native model, with the applied org.owasp.dependencycheck plugin in the owning project.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  It SHALL preserve original scan, suppression, severity and report-format settings. Missing JSON configuration, skipped tasks, unsupported configuration APIs, duplicate output ownership, pre-existing report files, escaped paths or mismatched report project attribution SHALL remain incomplete. No implicit task-name match or Maven fallback is permitted.
 
 Model capture, original task execution and report ownership observation SHALL share one bounded offline invocation over immutable selected inputs. Rust SHALL validate reports using the existing OWASP JSON parser and preserve native-suppressed advisories. Missing or invalid reports, analysis failure, cancellation, timeout and tool/input changes SHALL NOT become a clean CVE result. Source identities, original task paths and report digests SHALL remain explicit; database freshness, complete dependency attribution, production qualification and repair integration are separate obligations.
 
@@ -1050,7 +1082,11 @@ Model capture, original task execution and report ownership observation SHALL sh
 
 ### Requirement: Standalone Rust comments SHALL retain both native documentation observations
 
-`comments rust` SHALL execute the existing rustdoc library probe and project-configured Clippy all-targets observation through one selected Cargo entry and one shared deadline. It SHALL preserve each original native protocol, findings and task identity independently; failures from either checker SHALL NOT erase the sibling result or become a complete combined observation. The public wrapper SHALL use a dedicated closed schema, and historical native schemas SHALL remain unchanged. Uninitialized projects SHALL NOT gain a workspace implicitly. Clippy documentation candidates SHALL be selected only from the explicitly supported native missing_errors_doc, missing_panics_doc and missing_safety_doc rules; other Clippy diagnostics remain in the original report, and SHALL NOT become documentation findings by prefix or replace the documentation next action. Current observed inputs and the selected Cargo byte identity SHALL be checked across both observations. Each original task SHALL retain its original-tool verification. This entry SHALL NOT implicitly enable pedantic, accept bare headings as detailed contracts, close tasks or grant production qualification.
+`comments rust` SHALL execute the existing rustdoc library probe and project-configured Clippy all-targets observation through one selected Cargo entry and one shared deadline.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  It SHALL preserve each original native protocol, findings and task identity independently; failures from either checker SHALL NOT erase the sibling result or become a complete combined observation. The public wrapper SHALL use a dedicated closed schema, and historical native schemas SHALL remain unchanged. Uninitialized projects SHALL NOT gain a workspace implicitly. Clippy documentation candidates SHALL be selected only from the explicitly supported native missing_errors_doc, missing_panics_doc and missing_safety_doc rules; other Clippy diagnostics remain in the original report, and SHALL NOT become documentation findings by prefix or replace the documentation next action. Current observed inputs and the selected Cargo byte identity SHALL be checked across both observations. Each original task SHALL retain its original-tool verification. This entry SHALL NOT implicitly enable pedantic, accept bare headings as detailed contracts, close tasks or grant production qualification.
 
 #### Scenario: Both documentation checkers produce a diagnostic
 - **WHEN** standalone comments rust observes a rustdoc missing_docs finding and a configured Clippy missing_errors_doc finding
@@ -1066,7 +1102,11 @@ Model capture, original task execution and report ownership observation SHALL sh
 
 ### Requirement: Standalone Python comments SHALL reuse original configured Ruff evidence
 
-`comments python` SHALL expose the existing project Ruff observation through Rust orchestration, preserving original native rule selection, version, config and source bindings, rule settings checks, stable tasks and original-tool verification. It SHALL NOT enable preview, install tools or change project configuration. The public dedicated wrapper SHALL retain the original native conversation protocol and stored scan protocol, classify documentation using the existing D-style and seven precise DOC rules, and select only current/historical open documentation tasks and Ruff preparation tasks. Convention findings SHALL remain in the native report without taking the documentation next action. Zero diagnostics SHALL NOT establish complete enabled documentation policy, detailed semantic correctness or task closure. Missing configuration SHALL remain an environment/preparation observation and SHALL NOT execute a selected checker before configuration discovery.
+`comments python` SHALL expose the existing project Ruff observation through Rust orchestration, preserving original native rule selection, version, config and source bindings, rule settings checks, stable tasks and original-tool verification.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  It SHALL NOT enable preview, install tools or change project configuration. The public dedicated wrapper SHALL retain the original native conversation protocol and stored scan protocol, classify documentation using the existing D-style and seven precise DOC rules, and select only current/historical open documentation tasks and Ruff preparation tasks. Convention findings SHALL remain in the native report without taking the documentation next action. Zero diagnostics SHALL NOT establish complete enabled documentation policy, detailed semantic correctness or task closure. Missing configuration SHALL remain an environment/preparation observation and SHALL NOT execute a selected checker before configuration discovery.
 
 #### Scenario: A configured Ruff emits documentation and convention findings
 - **WHEN** comments python observes DOC201 and F401 from the same configured native Ruff
@@ -1078,7 +1118,11 @@ Model capture, original task execution and report ownership observation SHALL sh
 
 ### Requirement: Python comments SHALL report native documentation rule selection independently of diagnostics
 
-The standalone comments report SHALL distinguish native documentation rules selected with zero diagnostics, rules not selected, and unavailable settings. The observation SHALL come from the same completed Ruff scan and validated settings used for the original diagnostics; it SHALL NOT run a second checker or infer selection from configuration text, diagnostic absence or a rule-name prefix. Each file SHALL retain original config/source/tool/settings identities, global documentation rule selection and the unresolved per-file-ignore boundary. Partial or unavailable native observations SHALL NOT count as observed configuration. This new projection SHALL NOT modify historical native protocols, stored scan facts, rulepack approval or detailed documentation qualification.
+The standalone comments report SHALL distinguish native documentation rules selected with zero diagnostics, rules not selected, and unavailable settings.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  The observation SHALL come from the same completed Ruff scan and validated settings used for the original diagnostics; it SHALL NOT run a second checker or infer selection from configuration text, diagnostic absence or a rule-name prefix. Each file SHALL retain original config/source/tool/settings identities, global documentation rule selection and the unresolved per-file-ignore boundary. Partial or unavailable native observations SHALL NOT count as observed configuration. This new projection SHALL NOT modify historical native protocols, stored scan facts, rulepack approval or detailed documentation qualification.
 
 #### Scenario: A clean native file has documentation rules enabled
 - **WHEN** Ruff completes with no diagnostics and its same-run settings explicitly enable DOC201
@@ -1090,7 +1134,11 @@ The standalone comments report SHALL distinguish native documentation rules sele
 
 ### Requirement: Rust CVE local completion SHALL require stable advisory database inputs
 
-The Rust caller SHALL capture bounded content and physical path observations for the selected local RustSec crates/rust collections before and after native cargo-audit execution, sharing the operation deadline and cancellation. Changed content, file membership or collection/root identity SHALL prevent local_scan_complete even if the native JSON and exit code are valid. Symlinks, special files, unreadable paths and exhausted resource budgets SHALL remain environment/integrity observations, not source violations. Valid parsed advisory candidates SHALL remain visible with incomplete status when post-execution database stability fails; no trusted source or freshness qualification SHALL be inferred from stability. Routine root-level database lock files and Git housekeeping SHALL NOT be treated as advisory content.
+The Rust caller SHALL capture bounded content and physical path observations for the selected local RustSec crates/rust collections before and after native cargo-audit execution, sharing the operation deadline and cancellation.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  Changed content, file membership or collection/root identity SHALL prevent local_scan_complete even if the native JSON and exit code are valid. Symlinks, special files, unreadable paths and exhausted resource budgets SHALL remain environment/integrity observations, not source violations. Valid parsed advisory candidates SHALL remain visible with incomplete status when post-execution database stability fails; no trusted source or freshness qualification SHALL be inferred from stability. Routine root-level database lock files and Git housekeeping SHALL NOT be treated as advisory content.
 
 #### Scenario: Native audit rewrites an advisory database entry
 - **WHEN** the selected native process returns a valid advisory but the same-run database snapshot changes
@@ -1103,7 +1151,11 @@ The Rust caller SHALL capture bounded content and physical path observations for
 
 ### Requirement: C-family documentation tasks SHALL recheck the original native context
 
-Public task verify SHALL bind the consumed first report, immutable task facts, language, standard, native rule group and selected tool path. A different tool path, changed previously observed tool bytes or foreign checker parameters SHALL be rejected before leasing or native execution. Repaired source bytes MAY be rechecked through a bounded snapshot. Same-run input instability, unknown native rules, timeout and cancellation SHALL prevent complete repair classification. Observations SHALL use the existing verification lease and append-only event storage without importing unrelated rule groups as new tasks. Zero diagnostics SHALL remain candidate_absent_unverified_policy and SHALL NOT close a task, grant detailed documentation coverage or approve delivery. Dedicated attempt journaling SHALL bind current source/tool context and preserve failed rechecks. Trusted closure/reopen remain separate uncompleted obligations.
+Public task verify SHALL bind the consumed first report, immutable task facts, language, standard, native rule group and selected tool path.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  A different tool path, changed previously observed tool bytes or foreign checker parameters SHALL be rejected before leasing or native execution. Repaired source bytes MAY be rechecked through a bounded snapshot. Same-run input instability, unknown native rules, timeout and cancellation SHALL prevent complete repair classification. Observations SHALL use the existing verification lease and append-only event storage without importing unrelated rule groups as new tasks. Zero diagnostics SHALL remain candidate_absent_unverified_policy and SHALL NOT close a task, grant detailed documentation coverage or approve delivery. Dedicated attempt journaling SHALL bind current source/tool context and preserve failed rechecks. Trusted closure/reopen remain separate uncompleted obligations.
 
 #### Scenario: Native documentation rule disappears after editing comments
 - **WHEN** the original native checker rechecks repaired source with the same language, standard and tool identity and the original rule is absent
@@ -1120,7 +1172,11 @@ Public task verify SHALL bind the consumed first report, immutable task facts, l
 
 ### Requirement: C-family documentation attempts SHALL preserve bounded original-tool repair history
 
-C/C++ documentation task attempts SHALL reuse existing claim tokens, generation checks, task locks and append-only start/finish events. Their input digest SHALL include bounded current source bytes, the first language/standard/profile, selected tool path, canonical tool and observed/missing/unavailable tool state. Missing-tool restoration SHALL count as environment change without requiring source edits. Attempt-ready state SHALL require a matching original-task native recheck before retry. A recheck SHALL match immutable task facts, original consumed evidence, task/workspace/run identity, report digest, ready finish timing and current input before affecting the current-input budget. Two failed original rechecks under the same input/action SHALL stop repetitive source repair and expose concrete rule/native reasons and recent attempts. Changing action labels or rescanning SHALL NOT reset this budget. Unverifiable earlier ready attempts under current input SHALL remain visible and require investigation rather than being dropped as success. Local observations SHALL NOT close tasks, approve exceptions or grant detailed-contract qualification.
+C/C++ documentation task attempts SHALL reuse existing claim tokens, generation checks, task locks and append-only start/finish events.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  Their input digest SHALL include bounded current source bytes, the first language/standard/profile, selected tool path, canonical tool and observed/missing/unavailable tool state. Missing-tool restoration SHALL count as environment change without requiring source edits. Attempt-ready state SHALL require a matching original-task native recheck before retry. A recheck SHALL match immutable task facts, original consumed evidence, task/workspace/run identity, report digest, ready finish timing and current input before affecting the current-input budget. Two failed original rechecks under the same input/action SHALL stop repetitive source repair and expose concrete rule/native reasons and recent attempts. Changing action labels or rescanning SHALL NOT reset this budget. Unverifiable earlier ready attempts under current input SHALL remain visible and require investigation rather than being dropped as success. Local observations SHALL NOT close tasks, approve exceptions or grant detailed-contract qualification.
 
 #### Scenario: Two ready attempts still have the same documentation warning
 - **WHEN** both original-task rechecks still contain the same native rule under the same source/tool context
@@ -1154,7 +1210,11 @@ Codeguard SHALL interpret a version-bound original Clang JSON AST to distinguish
 
 ### Requirement: Public C-family comments SHALL expose separately bounded native structural observations
 
-The explicit standalone comments command SHALL obtain warning diagnostics and a function-documentation JSON AST from one original Clang scan of the same frozen stdin, under the same selected-tool identity, deadline and cancellation boundary. It SHALL expose structural observation separately from original native warnings, withdraw structure on source/tool changes or interruption, and preserve an explicit structural failure if AST is malformed. Existing warning facts SHALL NOT be invented from structural absence.
+The explicit standalone comments command SHALL obtain warning diagnostics and a function-documentation JSON AST from one original Clang scan of the same frozen stdin, under the same selected-tool identity, deadline and cancellation boundary.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  It SHALL expose structural observation separately from original native warnings, withdraw structure on source/tool changes or interruption, and preserve an explicit structural failure if AST is malformed. Existing warning facts SHALL NOT be invented from structural absence.
 
 #### Scenario: Zero warnings hide absent documentation
 - **WHEN** comments c/cpp executes a supported explicit standalone source with no function documentation and the original warnings are empty
@@ -1196,7 +1256,11 @@ A structural recheck SHALL bind the first consumed report and file-policy fact, 
 
 ### Requirement: Structural documentation attempts SHALL retain failed original rechecks
 
-Structural file-policy tasks SHALL use controlled leases and canonical repair-source actions. Input identity SHALL bind current source plus original language, standard, AST profile, policy and selected compiler identity. A ready attempt SHALL require a private, consumed original structural recheck before retry. Two failed rechecks for unchanged inputs SHALL withdraw repair permission and request concrete diagnosis; rescan/action renaming SHALL NOT reset that budget. Missing historical reports SHALL remain unverified; altered reports/events SHALL be rejected. Local attempt results SHALL NOT close tasks.
+Structural file-policy tasks SHALL use controlled leases and canonical repair-source actions.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  Input identity SHALL bind current source plus original language, standard, AST profile, policy and selected compiler identity. A ready attempt SHALL require a private, consumed original structural recheck before retry. Two failed rechecks for unchanged inputs SHALL withdraw repair permission and request concrete diagnosis; rescan/action renaming SHALL NOT reset that budget. Missing historical reports SHALL remain unverified; altered reports/events SHALL be rejected. Local attempt results SHALL NOT close tasks.
 
 #### Scenario: Unchanged structural repair attempts exhaust the retry budget
 - **WHEN** two ready-to-verify attempts receive original still_present structural rechecks for the same input context
@@ -1206,7 +1270,11 @@ Structural file-policy tasks SHALL use controlled leases and canonical repair-so
 
 ### Requirement: Unified check SHALL schedule bounded C-family documentation without guessing project context
 
-check c/cpp/all SHALL expose original warning and structural documentation observations for selected discovered files. An explicitly selected compiler and language-specific standard SHALL be required for the current standalone profile; missing project/compiler context SHALL remain unconfigured, not a source violation. C and C++ jobs SHALL share the check deadline/cancellation/jobs limit and serialize compiler use. Each job SHALL limit files and aggregate report bytes. Stable input observations SHALL connect existing workbench tasks; changed scope/source/tool, cancellation or expired budget SHALL withdraw repair permissions and avoid new persistence. Uninitialized workspaces SHALL remain uninitialized.
+check c/cpp/all SHALL expose original warning and structural documentation observations for selected discovered files.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  An explicitly selected compiler and language-specific standard SHALL be required for the current standalone profile; missing project/compiler context SHALL remain unconfigured, not a source violation. C and C++ jobs SHALL share the check deadline/cancellation/jobs limit and serialize compiler use. Each job SHALL limit files and aggregate report bytes. Stable input observations SHALL connect existing workbench tasks; changed scope/source/tool, cancellation or expired budget SHALL withdraw repair permissions and avoid new persistence. Uninitialized workspaces SHALL remain uninitialized.
 
 #### Scenario: Explicit native documentation context enters unified check
 - **WHEN** check selects discovered C/C++ source with an explicit original compiler and applicable c11/c++17 profile
@@ -1215,7 +1283,11 @@ check c/cpp/all SHALL expose original warning and structural documentation obser
 
 ### Requirement: C-family compilation database observation SHALL preserve unexecuted context
 
-The adapter SHALL parse bounded compilation database bytes without filesystem access or command execution. Each accepted entry SHALL preserve its directory, source file and full argument vector; it SHALL NOT infer a missing language standard, resolve headers/macros, choose among duplicate source configurations or claim project integration. Command-string-only entries SHALL remain unresolved rather than being split using a shell. Invalid, oversized or ambiguous entry shapes SHALL fail observation rather than silently yielding an empty clean scope. Later execution SHALL independently validate tool identity, paths, response files, compiler plugins, flags and immutable inputs; parsing SHALL NOT authorize arbitrary arguments.
+The adapter SHALL parse bounded compilation database bytes without filesystem access or command execution.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  Each accepted entry SHALL preserve its directory, source file and full argument vector; it SHALL NOT infer a missing language standard, resolve headers/macros, choose among duplicate source configurations or claim project integration. Command-string-only entries SHALL remain unresolved rather than being split using a shell. Invalid, oversized or ambiguous entry shapes SHALL fail observation rather than silently yielding an empty clean scope. Later execution SHALL independently validate tool identity, paths, response files, compiler plugins, flags and immutable inputs; parsing SHALL NOT authorize arbitrary arguments.
 
 #### Scenario: Multiple configurations for one translation unit
 - **WHEN** a compilation database contains two argument-vector entries for one file with different include paths and macros
@@ -1235,7 +1307,11 @@ The adapter SHALL parse bounded compilation database bytes without filesystem ac
 
 ### Requirement: C++ ordinary class methods SHALL retain partial documentation observations
 
-Clang documentation observation SHALL inspect non-implicit ordinary identifier-named methods inside explicit CXXRecordDecl contexts using the same frozen-source location, comment, parameter and supported return-type checks as ordinary functions. It SHALL retain unresolved class documentation and unsupported constructors, operators, templates and out-of-class method contexts rather than infer full C++ contract coverage. New method observations SHALL NOT grant semantic accuracy, exceptions/behavior qualification or production support.
+Clang documentation observation SHALL inspect non-implicit ordinary identifier-named methods inside explicit CXXRecordDecl contexts using the same frozen-source location, comment, parameter and supported return-type checks as ordinary functions.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  It SHALL retain unresolved class documentation and unsupported constructors, operators, templates and out-of-class method contexts rather than infer full C++ contract coverage. New method observations SHALL NOT grant semantic accuracy, exceptions/behavior qualification or production support.
 
 #### Scenario: Class member with missing documentation
 - **WHEN** an explicit C++ class contains a directly located ordinary method without a documentation comment
@@ -1267,7 +1343,11 @@ Free operator declarations whose Clang semantic names are not ordinary source id
 
 ### Requirement: Structural documentation attempt identity SHALL bind the compiled engine
 
-Current attempt input identity SHALL include the compiled structural parser and validator fingerprint and the compiled recheck implementation identity, in addition to original scope/standard/profile, frozen source and native tool identity. The engine fingerprint SHALL separate file boundaries and be embedded from build inputs rather than reading project-editable source files at runtime. Engine changes SHALL distinguish current-input accounting without deleting prior attempts, authorizing rule edits or closing unqualified tasks. Legacy input-v1 history SHALL remain visible and SHALL NOT be rewritten as current input-v2 evidence.
+Current attempt input identity SHALL include the compiled structural parser and validator fingerprint and the compiled recheck implementation identity, in addition to original scope/standard/profile, frozen source and native tool identity.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  The engine fingerprint SHALL separate file boundaries and be embedded from build inputs rather than reading project-editable source files at runtime. Engine changes SHALL distinguish current-input accounting without deleting prior attempts, authorizing rule edits or closing unqualified tasks. Legacy input-v1 history SHALL remain visible and SHALL NOT be rewritten as current input-v2 evidence.
 
 #### Scenario: Structural engine upgrade with unchanged source
 - **WHEN** a structural parser, validator or recheck implementation changes while project source and Clang remain unchanged
@@ -1275,7 +1355,11 @@ Current attempt input identity SHALL include the compiled structural parser and 
 
 ### Requirement: C-family placeholder observations SHALL remain a separate conservative policy
 
-The adapter SHALL expose a separately versioned, source-associated placeholder observation from the original bounded Clang AST. Only an entire supported purpose, named parameter or applicable return description equal to TODO, TBD, FIXME, 待补充 or 待完善 after whitespace and terminal sentence punctuation normalization SHALL produce codeguard.documentation.placeholder_description. Existing nonempty structure facts SHALL retain their meaning. Unsupported comments/redeclarations SHALL not produce guesses. This policy SHALL not claim native warning authority, semantic accuracy or full coverage. Public feedback/task/recheck integration remains required before this adapter capability counts as an integrated production path.
+The adapter SHALL expose a separately versioned, source-associated placeholder observation from the original bounded Clang AST.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  Only an entire supported purpose, named parameter or applicable return description equal to TODO, TBD, FIXME, 待补充 or 待完善 after whitespace and terminal sentence punctuation normalization SHALL produce codeguard.documentation.placeholder_description. Existing nonempty structure facts SHALL retain their meaning. Unsupported comments/redeclarations SHALL not produce guesses. This policy SHALL not claim native warning authority, semantic accuracy or full coverage. Public feedback/task/recheck integration remains required before this adapter capability counts as an integrated production path.
 
 #### Scenario: Placeholder and explanatory mention are distinct
 - **WHEN** a supported description consists only of TODO or 待补充 with terminal punctuation
@@ -1285,7 +1369,11 @@ The adapter SHALL expose a separately versioned, source-associated placeholder o
 
 ### Requirement: Public standalone comments SHALL expose same-scan placeholder observations without false task coverage
 
-The standalone comments entry SHALL use the original frozen stdin Clang AST for a separately versioned placeholder observation. It SHALL NOT launch another compiler scan. Source instability, tool failure, cancellation or expired deadline SHALL withdraw that observation. Feedback SHALL distinguish this Codeguard policy from native warnings and retain exact function/component positions and original-tool re-scan guidance. Historical shared check/hook and stored structural protocols SHALL remain unchanged until their own integration is accepted. Until stable placeholder tasks and original-task verification are implemented, feedback SHALL explicitly report placeholder_task_workflow_status=not_integrated and SHALL NOT equate absence of structural tasks with resolution of a placeholder issue.
+The standalone comments entry SHALL use the original frozen stdin Clang AST for a separately versioned placeholder observation.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  It SHALL NOT launch another compiler scan. Source instability, tool failure, cancellation or expired deadline SHALL withdraw that observation. Feedback SHALL distinguish this Codeguard policy from native warnings and retain exact function/component positions and original-tool re-scan guidance. Historical shared check/hook and stored structural protocols SHALL remain unchanged until their own integration is accepted. Until stable placeholder tasks and original-task verification are implemented, feedback SHALL explicitly report placeholder_task_workflow_status=not_integrated and SHALL NOT equate absence of structural tasks with resolution of a placeholder issue.
 
 #### Scenario: The native compiler emits no warning for a placeholder description
 - **WHEN** public comments reads a supported full description consisting of an explicit placeholder
@@ -1295,7 +1383,11 @@ The standalone comments entry SHALL use the original frozen stdin Clang AST for 
 
 ### Requirement: Placeholder consumption SHALL reject forged component associations
 
-Before exposing usable placeholder positions, the native probe SHALL validate the closed placeholder protocol against the same source-associated supported Clang structure. Positions SHALL match function byte offset, line and byte column; components SHALL refer only to observed nonempty purpose, applicable return or actual named parameter descriptions. Duplicate position/component pairs, unsupported declarations, unknown parameters and claimed native/trusted authority SHALL be rejected. This association validation SHALL NOT prove comment text from editable local reports; original AST/tool identity and consumed report binding remain required for future task import.
+Before exposing usable placeholder positions, the native probe SHALL validate the closed placeholder protocol against the same source-associated supported Clang structure.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  Positions SHALL match function byte offset, line and byte column; components SHALL refer only to observed nonempty purpose, applicable return or actual named parameter descriptions. Duplicate position/component pairs, unsupported declarations, unknown parameters and claimed native/trusted authority SHALL be rejected. This association validation SHALL NOT prove comment text from editable local reports; original AST/tool identity and consumed report binding remain required for future task import.
 
 #### Scenario: A forged return or parameter is inserted
 - **WHEN** a placeholder position names a void return, unknown parameter, foreign source token or duplicate component
@@ -1303,7 +1395,11 @@ Before exposing usable placeholder positions, the native probe SHALL validate th
 
 ### Requirement: Placeholder workbench import SHALL retain a separate stable open file task
 
-work sync SHALL consume a separately versioned placeholder packet only after original native/structural shape, workspace/run identity, current tool/source association and placeholder component validation. File path, language, standard and placeholder policy SHALL define one stable task independent of source digest and line drift; this task SHALL have a distinct checker and rule identity from missing-component and native-warning tasks. Clean observations SHALL retain historical open facts. Forged component packets SHALL not obtain a consumption marker or new task. Until a dedicated candidate and original-task verifier exist, next/task verify SHALL report clang_placeholder_task_workflow_not_integrated without invoking another checker or recording a verification event. Public automatic persistence remains an uncompleted integration requirement.
+work sync SHALL consume a separately versioned placeholder packet only after original native/structural shape, workspace/run identity, current tool/source association and placeholder component validation.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  File path, language, standard and placeholder policy SHALL define one stable task independent of source digest and line drift; this task SHALL have a distinct checker and rule identity from missing-component and native-warning tasks. Clean observations SHALL retain historical open facts. Forged component packets SHALL not obtain a consumption marker or new task. Until a dedicated candidate and original-task verifier exist, next/task verify SHALL report clang_placeholder_task_workflow_not_integrated without invoking another checker or recording a verification event. Public automatic persistence remains an uncompleted integration requirement.
 
 #### Scenario: A placeholder moves and is later replaced by real documentation
 - **WHEN** repeated current native observations move the function to another line, then report no placeholder positions
@@ -1313,7 +1409,11 @@ work sync SHALL consume a separately versioned placeholder packet only after ori
 
 ### Requirement: Public placeholder observations SHALL persist automatically in initialized workspaces
 
-The standalone comments command SHALL automatically save and consume its independent placeholder packet when an initialized bound workspace and a complete same-scan observation are available. It SHALL return separately versioned bounded persistence status and stable task IDs. Uninitialized projects SHALL remain read-only; failed or unavailable observations SHALL remain incomplete without usable IDs. Repeated scans SHALL reuse the file task; clean scans SHALL preserve open historical facts. Shared check/hook integration, dedicated task guidance and original-task verification SHALL remain explicitly incomplete until implemented, and persistence alone SHALL not authorize closure or detailed qualification.
+The standalone comments command SHALL automatically save and consume its independent placeholder packet when an initialized bound workspace and a complete same-scan observation are available.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  It SHALL return separately versioned bounded persistence status and stable task IDs. Uninitialized projects SHALL remain read-only; failed or unavailable observations SHALL remain incomplete without usable IDs. Repeated scans SHALL reuse the file task; clean scans SHALL preserve open historical facts. Shared check/hook integration, dedicated task guidance and original-task verification SHALL remain explicitly incomplete until implemented, and persistence alone SHALL not authorize closure or detailed qualification.
 
 #### Scenario: Public comments runs before and after initialization
 - **WHEN** comments c/cpp runs outside an initialized workspace
@@ -1323,7 +1423,11 @@ The standalone comments command SHALL automatically save and consume its indepen
 
 ### Requirement: Placeholder task diagnostics SHALL bind origins and retract stale positions
 
-next SHALL provide a separately versioned placeholder diagnostic brief after validating immutable task identity, the first consumed report digest, workspace/path/language/policy identity and exact consumption markers. The most recent consumed same-file observation SHALL retain the original tool and standard context. Changed source/tool context or missing/contradictory receipts SHALL withdraw usable positions. The brief SHALL retain original commands, policy basis, constraints and concrete integration gaps. Until dedicated attempts and original-task verification are implemented, allowed_paths SHALL remain empty and attempt_history_status SHALL be not_integrated; no artificial history counters or repair permission SHALL be issued. This integration gap is not an approved exception or task closure.
+next SHALL provide a separately versioned placeholder diagnostic brief after validating immutable task identity, the first consumed report digest, workspace/path/language/policy identity and exact consumption markers.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  The most recent consumed same-file observation SHALL retain the original tool and standard context. Changed source/tool context or missing/contradictory receipts SHALL withdraw usable positions. The brief SHALL retain original commands, policy basis, constraints and concrete integration gaps. Until dedicated attempts and original-task verification are implemented, allowed_paths SHALL remain empty and attempt_history_status SHALL be not_integrated; no artificial history counters or repair permission SHALL be issued. This integration gap is not an approved exception or task closure.
 
 #### Scenario: Input or consumed receipt changes
 - **WHEN** the file no longer matches the latest consumed observation or an original receipt is tampered with
@@ -1333,7 +1437,11 @@ next SHALL provide a separately versioned placeholder diagnostic brief after val
 
 ### Requirement: Placeholder verification preflight SHALL reject changed origin identity before execution
 
-Before leasing or executing a placeholder task recheck, the verifier SHALL validate the first independent placeholder report, exact consumed marker, immutable open task fingerprint/path/workspace/rule/source/report identity and original selected tool bytes. A supplied different tool path SHALL be rejected even if it might invoke another Clang binary. Foreign checker parameters SHALL fail as argument errors before leasing or execution. Until the dedicated execution/result/attempt integration exists, a healthy preflight SHALL still return the explicit workflow-not-integrated state with no native scan or verification event.
+Before leasing or executing a placeholder task recheck, the verifier SHALL validate the first independent placeholder report, exact consumed marker, immutable open task fingerprint/path/workspace/rule/source/report identity and original selected tool bytes.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  A supplied different tool path SHALL be rejected even if it might invoke another Clang binary. Foreign checker parameters SHALL fail as argument errors before leasing or execution. Until the dedicated execution/result/attempt integration exists, a healthy preflight SHALL still return the explicit workflow-not-integrated state with no native scan or verification event.
 
 #### Scenario: Tool override and foreign checker options
 - **WHEN** task verify selects a different Clang path for a placeholder task
@@ -1343,7 +1451,11 @@ Before leasing or executing a placeholder task recheck, the verifier SHALL valid
 
 ### Requirement: Placeholder task verify SHALL execute and consume an original bounded recheck
 
-The dedicated verifier SHALL reuse verification leases/locks, freeze the current single-file source, execute the first selected Clang and language standard with the same bounded AST profile, and classify only the original placeholder policy. Current source/tool and first task binding SHALL be revalidated before append-only report consumption and verification event persistence. Supported present positions SHALL yield still_present; supported local absence SHALL yield candidate_absent_unverified_policy while the fact remains open. Instability, unknown/failed AST or native failure SHALL not become absence. This local execution SHALL not enable source repair permissions, fake attempt history, trusted closure or detailed documentation qualification.
+The dedicated verifier SHALL reuse verification leases/locks, freeze the current single-file source, execute the first selected Clang and language standard with the same bounded AST profile, and classify only the original placeholder policy.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  Current source/tool and first task binding SHALL be revalidated before append-only report consumption and verification event persistence. Supported present positions SHALL yield still_present; supported local absence SHALL yield candidate_absent_unverified_policy while the fact remains open. Instability, unknown/failed AST or native failure SHALL not become absence. This local execution SHALL not enable source repair permissions, fake attempt history, trusted closure or detailed documentation qualification.
 
 #### Scenario: The original placeholder is present and then corrected
 - **WHEN** task verify rechecks the same open file task with the original compiler/standard
@@ -1352,7 +1464,11 @@ The dedicated verifier SHALL reuse verification leases/locks, freeze the current
 - **THEN** local candidate absence MAY be recorded, but the same historical fact SHALL remain open
 ### Requirement: Placeholder repair attempts SHALL consume their own original rechecks
 
-The C/C++ placeholder policy SHALL use the existing lease-protected append-only attempt ledger. Its input identity SHALL bind source, original language and standard, current tool bytes, placeholder parser and validator implementation, and the recheck implementation. A ready-to-verify record SHALL require the original placeholder recheck before another repair attempt. Two still-present rechecks on the same input SHALL withdraw mutation scope and require a concrete decision. Repeated scans and task projection deletion SHALL NOT reset this budget. Missing or modified historical evidence SHALL NOT grant new permission. Native structural deficits and placeholder findings SHALL NOT consume one another's verification evidence. Local absence SHALL NOT close a finding.
+The C/C++ placeholder policy SHALL use the existing lease-protected append-only attempt ledger.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  Its input identity SHALL bind source, original language and standard, current tool bytes, placeholder parser and validator implementation, and the recheck implementation. A ready-to-verify record SHALL require the original placeholder recheck before another repair attempt. Two still-present rechecks on the same input SHALL withdraw mutation scope and require a concrete decision. Repeated scans and task projection deletion SHALL NOT reset this budget. Missing or modified historical evidence SHALL NOT grant new permission. Native structural deficits and placeholder findings SHALL NOT consume one another's verification evidence. Local absence SHALL NOT close a finding.
 
 #### Scenario: Repeated unsuccessful placeholder repair remains visible
 - **WHEN** two lease-bound attempts report ready-to-verify and their original placeholder rechecks still observe the same policy on the same input
@@ -1360,7 +1476,11 @@ The C/C++ placeholder policy SHALL use the existing lease-protected append-only 
 - **AND** rescanning or regenerating the readable task does not restore the budget
 ### Requirement: Failed placeholder rechecks SHALL retain bounded diagnostic observations
 
-After a valid original-task preflight, a completed native execution attempt that cannot establish a placeholder observation SHALL produce a versioned incomplete recheck with its native diagnostics and explicit placeholder failure state. Syntax errors, unavailable AST and exhausted native execution budgets SHALL NOT become empty-clean results or reuse historical positions. The original open task SHALL remain open. Failure observation persistence MAY finish synchronously under the existing verification lock after the native execution deadline, without starting another process or granting quality authority; cancellation SHALL still prevent persistence. The report, consumption receipt and append-only verification event SHALL remain linked. Current incomplete evidence SHALL withdraw repair permission; a later original successful observation MAY restore only local task guidance.
+After a valid original-task preflight, a completed native execution attempt that cannot establish a placeholder observation SHALL produce a versioned incomplete recheck with its native diagnostics and explicit placeholder failure state.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  Syntax errors, unavailable AST and exhausted native execution budgets SHALL NOT become empty-clean results or reuse historical positions. The original open task SHALL remain open. Failure observation persistence MAY finish synchronously under the existing verification lock after the native execution deadline, without starting another process or granting quality authority; cancellation SHALL still prevent persistence. The report, consumption receipt and append-only verification event SHALL remain linked. Current incomplete evidence SHALL withdraw repair permission; a later original successful observation MAY restore only local task guidance.
 
 #### Scenario: Native error and native timeout preserve diagnostic state
 - **WHEN** a bound original C/C++ placeholder task is rechecked against a source syntax error or a native timeout

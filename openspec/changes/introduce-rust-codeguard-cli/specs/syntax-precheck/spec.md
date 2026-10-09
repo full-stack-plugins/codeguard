@@ -6,7 +6,11 @@
 
 ### Requirement: Unified lint entry points SHALL select native checking before syntax fallback per module
 
-`codeguard lint java .`、`codeguard lint typescript .` 及 `codeguard check all .` MUST 按模块、语言版本/方言、源码范围、配置与适用原生能力选择执行路径。选择过程 MUST 检查显式工具、项目本地工具及已支持的构建集成，不以 PATH 无命令直接认定未安装。可用原生工具和有效配置 MUST 优先执行；缺工具、配置不可用或原生执行故障可提供内置初检，但 MUST 保留原阻塞及有效原生发现。原生违规 MUST NOT 触发用于覆盖原结论的降级。init/detect/plan MUST 保持只读观察，不因配置发现而启动 WASM 或安装。
+`codeguard lint java .`、`codeguard lint typescript .` 及 `codeguard check all .` MUST 按模块、语言版本/方言、源码范围、配置与适用原生能力选择执行路径。
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN** 选择过程 MUST 检查显式工具、项目本地工具及已支持的构建集成，不以 PATH 无命令直接认定未安装。可用原生工具和有效配置 MUST 优先执行；缺工具、配置不可用或原生执行故障可提供内置初检，但 MUST 保留原阻塞及有效原生发现。原生违规 MUST NOT 触发用于覆盖原结论的降级。init/detect/plan MUST 保持只读观察，不因配置发现而启动 WASM 或安装。
 
 只读发现报告的项目本地工具候选 MUST 与检查器配置分开列示；候选只携带相对构建根、检查器、候选状态、可见版本和下一步，不回显可能含凭据的依赖声明。`node_modules` 不进入普通源码范围，固定工具路径可单独有界观察；中间目录或最终入口为链接、特殊文件、不可读或本轮输入变化时 MUST 保留不完整/不可信状态，不跟随链接读取或执行。Maven `.mvn` 配置可作为固定路径观察，不能因普通点目录跳过而误判 Wrapper 缺失。
 
@@ -129,7 +133,11 @@
 
 ### Requirement: Bundled grammar assets SHALL have pinned provenance and measured compatibility
 
-引入的 CodeGraph 或上游 grammar MUST 固定源码提交、必要补丁、许可证、WASM SHA-256、ABI/运行时兼容范围、语言/方言版本、语料引用及已知限制。活动工作目录中的未固定字节 MUST NOT 直接作为受认可发行输入。文件存在、Rust 加载成功、语法验收完成 MUST 为独立状态。语法包 MUST 随支持平台发行离线可用；不要求用户安装 CodeGraph、tree-sitter-cli 或 Node 解析运行时。Node 可以继续作为 npm 启动层。额外包升级 MUST 经清单校验，不静默使用 latest。
+引入的 CodeGraph 或上游 grammar MUST 固定源码提交、必要补丁、许可证、WASM SHA-256、ABI/运行时兼容范围、语言/方言版本、语料引用及已知限制。
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN** 活动工作目录中的未固定字节 MUST NOT 直接作为受认可发行输入。文件存在、Rust 加载成功、语法验收完成 MUST 为独立状态。语法包 MUST 随支持平台发行离线可用；不要求用户安装 CodeGraph、tree-sitter-cli 或 Node 解析运行时。Node 可以继续作为 npm 启动层。额外包升级 MUST 经清单校验，不静默使用 latest。
 
 CodeGuard MUST 提供只读的来源覆盖清单，区分 CodeGraph 随仓 WASM、由依赖包提供但尚未固定字节的 grammar、CodeGuard 已复制候选及已验收发行能力。覆盖清单或 `grammar status` 的存在 MUST NOT 自动改变原生检查义务、加载未经批准的字节，或把来源资产数量说成已支持语言数量。来源资产超过当前加载预算时 MUST 明示预算缺口，不能静默跳过。
 
@@ -206,7 +214,11 @@ Rust runtime MUST 按需加载 grammar，在受控解析工作进程中限制输
 
 ### Requirement: Syntax observations SHALL preserve grammar fidelity and source positions
 
-解析 MUST 同时识别 ERROR/MISSING 恢复，并按同一恢复原因归并级联节点；诊断 MUST 保留原文件位置、必要的有界脱敏上下文及 grammar 身份。不确定版本/方言、模板、宏、嵌入语言 MUST 明示覆盖限制。CodeGraph 用于提取符号的源码遮盖/启发式 MUST NOT 静默移入语法判定。仅凭恢复节点不得猜测具体缺失 token 或自动授予源码修改范围。
+解析 MUST 同时识别 ERROR/MISSING 恢复，并按同一恢复原因归并级联节点；诊断 MUST 保留原文件位置、必要的有界脱敏上下文及 grammar 身份。
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN** 不确定版本/方言、模板、宏、嵌入语言 MUST 明示覆盖限制。CodeGraph 用于提取符号的源码遮盖/启发式 MUST NOT 静默移入语法判定。仅凭恢复节点不得猜测具体缺失 token 或自动授予源码修改范围。
 
 若语法树标记错误但可遍历节点中无法定位任何对应 ERROR/MISSING，MUST 将该文件标为初检未完成，并保留原生检查义务；不得将零恢复节点当成语法有效或制造没有位置依据的源码 finding。
 
@@ -726,7 +738,11 @@ Go syntax-confirmation task resolution SHALL use host-verified approval policy 1
 - **THEN** approval mismatch is rejected before native execution or current-input/native-incomplete evidence is preserved; zero original diagnostics requires false-positive review rather than code-fixed closure
 
 ### Requirement: SQL grammar disagreements SHALL retain explicit database dialect context
-CFQuery grammar evaluation SHALL NOT promote provisional generic SQL labels to confirmed invalid source or language qualification without an applicable database dialect and native context. Explicit dialect counterevidence SHALL be archived separately from frozen generic corpora, preserving undecided labels and original metrics. Native SQL syntax evidence SHALL identify the engine version and fixture identity; fixture query preparation SHALL NOT be presented as executing project queries or proving full CFML/project lint.
+CFQuery grammar evaluation SHALL NOT promote provisional generic SQL labels to confirmed invalid source or language qualification without an applicable database dialect and native context.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  Explicit dialect counterevidence SHALL be archived separately from frozen generic corpora, preserving undecided labels and original metrics. Native SQL syntax evidence SHALL identify the engine version and fixture identity; fixture query preparation SHALL NOT be presented as executing project queries or proving full CFML/project lint.
 
 #### Scenario: PostgreSQL empty projection disagrees with a generic SQL assumption
 - **WHEN** a fixed isolated PostgreSQL parser accepts `SELECT FROM users` and rejects `SELECT DISTINCT FROM users`, while the pinned CFQuery grammar reports zero recoveries for both
@@ -734,7 +750,11 @@ CFQuery grammar evaluation SHALL NOT promote provisional generic SQL labels to c
 
 ### Requirement: CFQuery keyword candidates SHALL preserve native dialect uncertainty
 
-Fixed CFQuery grammar direct AST keyword sequence SELECT/DISTINCT/FROM MAY produce a separately versioned structural candidate with fixed rule digest. Quotes, identifiers, interpolation and other AST nodes MUST interrupt the sequence; comments MAY be ignored. SELECT/FROM without DISTINCT MUST NOT be flagged by this rule. ERROR/MISSING, asset identities and historical grammar metrics MUST remain unchanged. Candidate reports, selected-file feedback and stable confirmation tasks MUST bind whole-file identity and restore embedded fragment coordinates; neither candidate absence nor task deletion grants delivery permission. Dynamic templates and database dialect/schema context MUST be resolved by applicable native confirmation, not by guessing source edits.
+Fixed CFQuery grammar direct AST keyword sequence SELECT/DISTINCT/FROM MAY produce a separately versioned structural candidate with fixed rule digest. Quotes, identifiers, interpolation and other AST nodes MUST interrupt the sequence; comments MAY be ignored.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  SELECT/FROM without DISTINCT MUST NOT be flagged by this rule. ERROR/MISSING, asset identities and historical grammar metrics MUST remain unchanged. Candidate reports, selected-file feedback and stable confirmation tasks MUST bind whole-file identity and restore embedded fragment coordinates; neither candidate absence nor task deletion grants delivery permission. Dynamic templates and database dialect/schema context MUST be resolved by applicable native confirmation, not by guessing source edits.
 
 #### Scenario: PostgreSQL rejects DISTINCT with no projection
 
@@ -744,7 +764,11 @@ Fixed CFQuery grammar direct AST keyword sequence SELECT/DISTINCT/FROM MAY produ
 
 ### Requirement: Rust formatter parser comparisons SHALL retain explicit syntax scope
 
-Development Rust differential replay SHALL accept an explicitly selected absolute Rustfmt 1.9.0-stable executable and frozen UTF-8 stdin using a private fixed edition2024 configuration, empty environment and the shared deadline/cancellation/output budget. It SHALL verify executable path/content and private configuration continuity before the second invocation and after parsing. It SHALL NOT use `--check` formatting differences as syntax violations, read project formatter configuration, install an SDK, write formatted source, or grant Clippy/build/project coverage. The fixed edition SHALL remain an explicit replay condition, not an inferred project edition.
+Development Rust differential replay SHALL accept an explicitly selected absolute Rustfmt 1.9.0-stable executable and frozen UTF-8 stdin using a private fixed edition2024 configuration, empty environment and the shared deadline/cancellation/output budget.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  It SHALL verify executable path/content and private configuration continuity before the second invocation and after parsing. It SHALL NOT use `--check` formatting differences as syntax violations, read project formatter configuration, install an SDK, write formatted source, or grant Clippy/build/project coverage. The fixed edition SHALL remain an explicit replay condition, not an inferred project edition.
 
 Diagnostics SHALL require a recognized error header and bounded positions referring to the same stdin. Exit101 alone SHALL NOT prove a source violation: located parser errors MAY be retained, while panic, foreign-file, unlocated, invalid-coordinate, unknown-version, timeout and changed-input observations SHALL remain incomplete. A bounded EOF coordinate exception SHALL be limited to the observed unclosed-delimiter/trailing-newline case. Public observations SHALL expose safe rule IDs and validated line numbers without raw source, arbitrary diagnostics or guessed columns. Grammar and combined structural metrics SHALL remain separate; historical corpora/reports SHALL remain immutable and replay SHALL NOT grant language qualification or task closure.
 
@@ -762,7 +786,11 @@ Diagnostics SHALL require a recognized error header and bounded positions referr
 
 ### Requirement: Rust edit parsing SHALL resolve Cargo edition before native syntax observation
 
-Project Rust parser selection SHALL distinguish package edition, explicit workspace inheritance, absent package edition and standalone source. A valid package with no edition uses Cargo's backward-compatible 2015 default, not the newest formatter edition. Explicit `edition.workspace=true` SHALL require a supplied valid workspace package edition; false inheritance, unknown editions, malformed/duplicate TOML and virtual-workspace-only source SHALL remain unresolved. Static declaration parsing SHALL be bounded, shall not execute Cargo or project scripts, and shall retain an explicit package.workspace locator for the filesystem layer to resolve. A missing Cargo manifest SHALL NOT default standalone source to any edition. Declaration parsing alone SHALL NOT prove workspace membership, source ownership, tool suitability or project lint coverage.
+Project Rust parser selection SHALL distinguish package edition, explicit workspace inheritance, absent package edition and standalone source.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  A valid package with no edition uses Cargo's backward-compatible 2015 default, not the newest formatter edition. Explicit `edition.workspace=true` SHALL require a supplied valid workspace package edition; false inheritance, unknown editions, malformed/duplicate TOML and virtual-workspace-only source SHALL remain unresolved. Static declaration parsing SHALL be bounded, shall not execute Cargo or project scripts, and shall retain an explicit package.workspace locator for the filesystem layer to resolve. A missing Cargo manifest SHALL NOT default standalone source to any edition. Declaration parsing alone SHALL NOT prove workspace membership, source ownership, tool suitability or project lint coverage.
 
 #### Scenario: Package and workspace editions differ
 - **WHEN** a package explicitly declares edition2018 while its surrounding workspace declares2024
@@ -884,7 +912,11 @@ The implementation SHALL derive return-outside-function facts from bounded AST t
 
 ### Requirement: Project JavaScript mode observation SHALL bind only bounded local evidence
 
-Before automatically activating module-only candidates, the implementation SHALL observe the exact source path and bytes within the selected physical workspace. `.mjs` SHALL identify module and `.cjs` SHALL identify CommonJS without package inheritance. For `.js`, only the nearest bounded readable ordinary `package.json` with an explicit unique `type` of `module` or `commonjs` SHALL identify the declared mode. Missing, invalid, duplicate, linked, ambiguous or unsupported input SHALL retain unknown mode, without inheriting past the nearest package or reading outside the selected root. Source and package digests, searched directories and incomplete reasons SHALL remain available for pre/post-scan continuity comparison. This static observation SHALL NOT prove native execution or project quality.
+Before automatically activating module-only candidates, the implementation SHALL observe the exact source path and bytes within the selected physical workspace.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  `.mjs` SHALL identify module and `.cjs` SHALL identify CommonJS without package inheritance. For `.js`, only the nearest bounded readable ordinary `package.json` with an explicit unique `type` of `module` or `commonjs` SHALL identify the declared mode. Missing, invalid, duplicate, linked, ambiguous or unsupported input SHALL retain unknown mode, without inheriting past the nearest package or reading outside the selected root. Source and package digests, searched directories and incomplete reasons SHALL remain available for pre/post-scan continuity comparison. This static observation SHALL NOT prove native execution or project quality.
 
 #### Scenario: Nested package boundaries and negative evidence remain current
 - **WHEN** a source is inside a nested package or a previously absent nearer package is created

@@ -98,7 +98,11 @@ rulepack MUST 有版本、规则来源/许可、稳定规则映射、内容摘�
 
 ### Requirement: False-positive allowlists SHALL be exact, authorized dispositions
 
-误报白名单 MUST 仅处置经原生工具复现、人工裁定的精确 finding；MUST 保留原始 finding、规则依据、复检命令和批准引用。条目 MUST 绑定原生检查器/规则/类别、目标和内容身份、finding 指纹、工具/适配器/rulepack 身份、误报依据、可信策略修订及有限期限。源码目标按仓库相对路径与本次文件字节摘要匹配；依赖目标按组件、解析版本、依赖图及 advisory 身份匹配。首版 MUST NOT 允许通配符、正则、整目录或整条规则豁免。重复性规则误报应通过经批准的 rulepack 或项目策略修订及正反例解决。
+误报白名单 MUST 仅处置经原生工具复现、人工裁定的精确 finding；MUST 保留原始 finding、规则依据、复检命令和批准引用。
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN** 条目 MUST 绑定原生检查器/规则/类别、目标和内容身份、finding 指纹、工具/适配器/rulepack 身份、误报依据、可信策略修订及有限期限。源码目标按仓库相对路径与本次文件字节摘要匹配；依赖目标按组件、解析版本、依赖图及 advisory 身份匹配。首版 MUST NOT 允许通配符、正则、整目录或整条规则豁免。重复性规则误报应通过经批准的 rulepack 或项目策略修订及正反例解决。
 
 匹配 MUST 发生在原生结果解析、路径归属、内容和覆盖复核之后。缺字段、失配、过期、冲突或未获独立批准的条目 MUST NOT 放行；可信来源不可验证时相关策略义务为 incomplete。`false_positive` MUST 与仍然真实存在但被批准接受的 `accepted_risk` 分开。工具故障、坏报告、原生 suppression、未配置必需检查和覆盖不足 MUST NOT 被白名单处置。
 

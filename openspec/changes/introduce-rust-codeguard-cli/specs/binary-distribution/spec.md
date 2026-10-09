@@ -94,7 +94,11 @@
 
 ### Requirement: Archive bundle roots SHALL be projected explicitly without discarding other members
 
-归档安装 MUST 在选择子目录前验证完整归档树。bundle 根 MUST 是显式声明的规范目录；空根仅表示明确选择整树，不得根据包名或首个目录猜测。投影 MUST 按完整目录边界去除前缀，保留选中空目录，并按既有 bundle 树协议核对预期摘要。未消费成员 MUST 保留原路径与内容供安装计划单独处理，不得无声丢弃。非法根、失配、取消或预算耗尽 MUST NOT 返回成功。内容匹配 MUST NOT 自行授予来源批准、工具准备或安装完成状态；正式落盘仍须核验文件系统与制品身份。
+归档安装 MUST 在选择子目录前验证完整归档树。
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN** bundle 根 MUST 是显式声明的规范目录；空根仅表示明确选择整树，不得根据包名或首个目录猜测。投影 MUST 按完整目录边界去除前缀，保留选中空目录，并按既有 bundle 树协议核对预期摘要。未消费成员 MUST 保留原路径与内容供安装计划单独处理，不得无声丢弃。非法根、失配、取消或预算耗尽 MUST NOT 返回成功。内容匹配 MUST NOT 自行授予来源批准、工具准备或安装完成状态；正式落盘仍须核验文件系统与制品身份。
 
 发行清单 1.1 MUST 在声明 bundle 树摘要时显式提供 `bundle_archive_root`，无 bundle 时不得声明映射，raw 包不得携带映射。1.0 清单 MUST 保持可读，但不能凭旧声明猜测 bundle 根。内容关联 MUST 绑定清单原字节与同一锁原字节、精确工具/平台、包大小/摘要、入口摘要和 bundle 摘要；关联成功仅证明内容，不授予下载、安装或可信来源权威。
 

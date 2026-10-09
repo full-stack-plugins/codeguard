@@ -73,7 +73,11 @@ CLI、MCP、宿主 Hook、真实 Git Hook 与 CI 对相同请求和证据 MUST �
 
 ### Requirement: Host events SHALL route to bounded checks without weakening delivery gates
 
-新宿主入口 MUST 把事件送入 Rust 统一路由：会话启动只读发现；用户提示只给非阻断性意图建议，不能凭提示词认定已触发严格 Git 门禁；确认成功的编辑只请求对应文件的快速反馈；写入结果未知或路径不可确定须重新确定范围；确认失败的写入不启动源码检查；修复尝试按稳定任务 ID 请求原工具复检。提交、推送及 CI 事件 MUST 分别请求本轮真实 Git 提交面、推送面及完整项目义务，不能由宿主提供的变更路径或旧软反馈缓存决定交付检查面。路由计划本身 MUST NOT 签发质量或交付通过；无法可靠阻断的宿主必须显示能力缺口并依赖真实 Git/CI 门禁。
+新宿主入口 MUST 把事件送入 Rust 统一路由：会话启动只读发现；用户提示只给非阻断性意图建议，不能凭提示词认定已触发严格 Git 门禁；确认成功的编辑只请求对应文件的快速反馈；写入结果未知或路径不可确定须重新确定范围；确认失败的写入不启动源码检查；修复尝试按稳定任务 ID 请求原工具复检。
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN** 提交、推送及 CI 事件 MUST 分别请求本轮真实 Git 提交面、推送面及完整项目义务，不能由宿主提供的变更路径或旧软反馈缓存决定交付检查面。路由计划本身 MUST NOT 签发质量或交付通过；无法可靠阻断的宿主必须显示能力缺口并依赖真实 Git/CI 门禁。
 
 快反馈 MAY 仅在源码、配置、工具、规则、范围及结果完整性身份等价时复用；超时、未完成或身份变化 MUST 重新检查。事件去重只合并同一快照的重复执行，不吞掉交付事件、失败复检或修复后的重新验证。项目级构建/CVE 等重任务可在编辑阶段排队，但提交/CI 的必需义务不能被排队状态视为完成。
 
@@ -191,7 +195,11 @@ Stop 事件 MAY 从已存在的本地任务事实生成有界、只读的下一�
 
 ### Requirement: Rust edit feedback SHALL use edition-bound native parsing and retain lint obligations
 
-Confirmed Rust edits SHALL observe only requested safe files through the shared deadline and bounded fixed Rustfmt parser with applicable Cargo edition. Explicit/absolute-PATH native selection SHALL take precedence over WASM initial parsing; selected-tool failures SHALL remain incomplete without fallback. Absent tools MAY yield bundled WASM candidates while preserving native preparation/confirmation tasks. Edition/source/tool changes SHALL withdraw current positions. The formatter parser SHALL NOT be described as Clippy, complete lint/type/build validation or delivery permission; those project obligations remain outstanding.
+Confirmed Rust edits SHALL observe only requested safe files through the shared deadline and bounded fixed Rustfmt parser with applicable Cargo edition.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  Explicit/absolute-PATH native selection SHALL take precedence over WASM initial parsing; selected-tool failures SHALL remain incomplete without fallback. Absent tools MAY yield bundled WASM candidates while preserving native preparation/confirmation tasks. Edition/source/tool changes SHALL withdraw current positions. The formatter parser SHALL NOT be described as Clippy, complete lint/type/build validation or delivery permission; those project obligations remain outstanding.
 
 Current native diagnostics and environment failures SHALL reuse stable Rust syntax confirmation tasks and safe conversation guidance. Repeated observations SHALL update evidence rather than create duplicate tasks. Repair-ready and task verification SHALL use the same scoped project parser, retain original evidence and record an observation; zero diagnostics SHALL NOT automatically close the task. Failed writes SHALL neither run the parser nor create workbench state.
 
@@ -205,7 +213,11 @@ Current native diagnostics and environment failures SHALL reuse stable Rust synt
 
 ### Requirement: Rust project lint follow-up SHALL remain executable and current
 
-Rust edit dialogue SHALL identify project Clippy as not executed and provide an executable Codeguard lint follow-up after the editing batch. This instruction SHALL NOT claim that project lint is queued, executed or passed. Project lint remains outside selected-file editing and Stop execution; ordinary edits SHALL NOT start Cargo compilation.
+Rust edit dialogue SHALL identify project Clippy as not executed and provide an executable Codeguard lint follow-up after the editing batch.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  This instruction SHALL NOT claim that project lint is queued, executed or passed. Project lint remains outside selected-file editing and Stop execution; ordinary edits SHALL NOT start Cargo compilation.
 
 Clippy repair-ready SHALL reuse task-bound Cargo verification and preserve bounded rule/line feedback only for the original finding. Source/configuration inventory SHALL be captured before child verification and rechecked before projection. Changed source, Cargo lock/configuration or selected tool SHALL withdraw positions and report incomplete. No raw tool message, source content, inferred column unit or task closure SHALL be emitted.
 
@@ -219,7 +231,11 @@ Clippy repair-ready SHALL reuse task-bound Cargo verification and preserve bound
 
 ### Requirement: Repair-ready hooks SHALL recheck C-family documentation through the original task contract
 
-`repair_ready` for C/C++ native-warning and structural-documentation tasks SHALL delegate to the task-bound original Clang/standard verification contract within the shared hook deadline and output/history budgets. Explicit Clang selection SHALL be absolute and must match the original task; foreign tool/standard/parameter overrides SHALL fail before leasing or process execution. Hooks SHALL not execute task Markdown or infer replacement compiler arguments. The summary SHALL retain source-currentness, original native versus CodeGuard structural rule authority, local presence/absence/incomplete status and a verified persisted report reference. Input/tool changes, invalid bindings or missing receipts SHALL withdraw locations and next-step authority. Zero diagnostics or disappearance SHALL keep tasks open and SHALL NOT qualify detailed documentation or delivery. This path SHALL NOT silently enable unsupported fast-edit Clang options or claim installed-host acceptance.
+`repair_ready` for C/C++ native-warning and structural-documentation tasks SHALL delegate to the task-bound original Clang/standard verification contract within the shared hook deadline and output/history budgets.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  Explicit Clang selection SHALL be absolute and must match the original task; foreign tool/standard/parameter overrides SHALL fail before leasing or process execution. Hooks SHALL not execute task Markdown or infer replacement compiler arguments. The summary SHALL retain source-currentness, original native versus CodeGuard structural rule authority, local presence/absence/incomplete status and a verified persisted report reference. Input/tool changes, invalid bindings or missing receipts SHALL withdraw locations and next-step authority. Zero diagnostics or disappearance SHALL keep tasks open and SHALL NOT qualify detailed documentation or delivery. This path SHALL NOT silently enable unsupported fast-edit Clang options or claim installed-host acceptance.
 
 #### Scenario: A structural task is ready after an edit
 - **WHEN** a bound C/C++ structural documentation task triggers repair_ready
@@ -231,7 +247,11 @@ Clippy repair-ready SHALL reuse task-bound Cargo verification and preserve bound
 
 
 ### Requirement: Confirmed C-family edits preserve explicit documentation context
-Confirmed file edits SHALL expose bounded C/C++ documentation observations using the same native Clang adapter and shared deadline as unified checks. Standards SHALL be explicit c11/c++17 profiles; missing tool or standard SHALL remain context_required rather than a source violation. Documentation observations SHALL NOT remove native syntax coverage gaps, grant qualification or delivery, or initialize a workspace implicitly. Failed writes SHALL consume no checker configuration. Repair-ready verification SHALL retain the original task standard and reject edit-profile overrides.
+Confirmed file edits SHALL expose bounded C/C++ documentation observations using the same native Clang adapter and shared deadline as unified checks.
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN**  Standards SHALL be explicit c11/c++17 profiles; missing tool or standard SHALL remain context_required rather than a source violation. Documentation observations SHALL NOT remove native syntax coverage gaps, grant qualification or delivery, or initialize a workspace implicitly. Failed writes SHALL consume no checker configuration. Repair-ready verification SHALL retain the original task standard and reject edit-profile overrides.
 
 #### Scenario: Missing edit documentation profile
 - **WHEN** a confirmed C/C++ edit has no explicit Clang and language standard

@@ -145,7 +145,11 @@ CLI MUST 提供帮助/版本、detect、capabilities、init、plan、doctor、ru
 
 ### Requirement: Operation success SHALL remain separate from quality certification
 
-`rules whitelist list/explain/propose` MUST 复用规则与策略服务。list/explain 为只读；propose 仅产生候选及依据，不批准、不修改有效政策、不签发质量结论。`config validate` MUST 校验白名单 schema、精确范围、批准身份、期限和策略差异；静态无法验证可信批准时 MUST 报未完成，不能按本地声明通过。
+`rules whitelist list/explain/propose` MUST 复用规则与策略服务。
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN** list/explain 为只读；propose 仅产生候选及依据，不批准、不修改有效政策、不签发质量结论。`config validate` MUST 校验白名单 schema、精确范围、批准身份、期限和策略差异；静态无法验证可信批准时 MUST 报未完成，不能按本地声明通过。
 propose 缺少本轮完整原生 finding 或工具/适配器/rulepack 身份时 MUST 返回未完成和缺证据项，不能以占位摘要生成形式上有效的候选。
 
 命令结果 MUST 有版本及 report_type/operation/request_id/command_status/exit_code/warnings/next_actions，并保留类型特有的完整payload。RunReport MUST 继续包含逐项完整性、身份、finding和gate。信息/计划/管理操作的 exit 0 只表示该操作完成；doctor/config validate/tools verify 对所选必需条件不能验证满足时 MUST 返回3。非交付操作 MUST NOT 据操作成功签发allow，status 展示历史决策时 MUST 附来源身份与freshness。MCP 服务生命周期与单请求结果 MUST 分开。
@@ -160,7 +164,11 @@ propose 缺少本轮完整原生 finding 或工具/适配器/rulepack 身份时 
 
 ### Requirement: Preparation commands SHALL preserve observation and mutation boundaries
 
-detect/capabilities/rules/config/tools list和verify MUST 静态观察，不执行项目脚本或安装工具。config validate MUST 核验配置与批准策略引用；explain MUST 解释来源而不自动选择较松要求；tools verify MUST 区分制品身份与运行能力。doctor MAY 执行适配器声明、身份已解析且有界的诊断，不隐式构建、安装、启动服务或读取凭据值。doctor 的 PrerequisiteReport MUST 带run_id、报告类型、工作区/内容/政策/工具身份、范围与freshness，可被同步为准备证据，不能作为源码质量通过。
+detect/capabilities/rules/config/tools list和verify MUST 静态观察，不执行项目脚本或安装工具。
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN** config validate MUST 核验配置与批准策略引用；explain MUST 解释来源而不自动选择较松要求；tools verify MUST 区分制品身份与运行能力。doctor MAY 执行适配器声明、身份已解析且有界的诊断，不隐式构建、安装、启动服务或读取凭据值。doctor 的 PrerequisiteReport MUST 带run_id、报告类型、工作区/内容/政策/工具身份、范围与freshness，可被同步为准备证据，不能作为源码质量通过。
 
 tools list 的本地候选库存 MUST 明示仅覆盖声明锁，完整必需集合未经核验；MUST 区分声明版本、当前平台制品观察和跨平台未检查条目。运行时/发行包须分别显示缺口，字节相符不能称已批准、可启动或 ready。缺锁、空当前平台或未获可信策略绑定不能将空库存解释为无必需工具；普通候选不得自写 required_by_policy。MUST 复用制品核验服务，不启动 wrapper、联网、安装或写工作区。
 
@@ -236,7 +244,11 @@ pre-commit MUST 使用Git传入环境的index；pre-push MUST 接受remote-name/
 
 ### Requirement: Execution budgets SHALL have explicit defaults and a shared deadline
 
-有执行行为的命令 MUST 在版本化命令schema中固化timeout/jobs的支持范围、默认值和来源优先级，报告有效值。初版检查/gate/fix/verify默认总预算30分钟，doctor 2分钟且单探测不超过10秒，tools install 10分钟；检查默认并行度为min(4,max(1,可用CPU并行度))。CLI优先于已登记环境变量、项目运行默认及发行内置值；这些值 MUST 不改变质量义务。子任务和重试 MUST 继承剩余deadline，包含排队、快照、执行、解析、存储及清理，不重置预算。无法及时回收进程 MUST 明示cleanup_pending而不声称完成。
+有执行行为的命令 MUST 在版本化命令schema中固化timeout/jobs的支持范围、默认值和来源优先级，报告有效值。
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN** 初版检查/gate/fix/verify默认总预算30分钟，doctor 2分钟且单探测不超过10秒，tools install 10分钟；检查默认并行度为min(4,max(1,可用CPU并行度))。CLI优先于已登记环境变量、项目运行默认及发行内置值；这些值 MUST 不改变质量义务。子任务和重试 MUST 继承剩余deadline，包含排队、快照、执行、解析、存储及清理，不重置预算。无法及时回收进程 MUST 明示cleanup_pending而不声称完成。
 
 项目检查/复检的可选运行默认值 MUST 从版本化 `codeguard/runtime.json` 读取；该文件只能声明运行预算，不能承载或覆盖必需规则、扫描排除、白名单及批准身份。CLI/已登记环境变量优先于它；当项目默认值成为候选来源时，未知字段、坏版本、非普通文件、符号链接或无效预算 MUST 在执行原生工具及取得任务租约前拒绝，不回退内置默认值来掩盖配置错误。报告 MUST 保留最终值与 `project_default` 来源，项目默认值不能把不完整检查改成通过。
 

@@ -201,7 +201,11 @@ RunReport 与准备诊断 PrerequisiteReport MUST 使用 workspace_id + run_id �
 
 ### Requirement: Repair briefs SHALL guide bounded progress without changing authority
 
-经可信批准的误报处置 MUST 是独立事件/任务状态 `whitelisted_false_positive`，不得记作 `resolved_by_code_fix` 或删除 finding。疑似误报任务 MUST 记录原生证据、最小复现、裁定原因、精确目标、批准请求和原工具复检命令；候选、过期、失配或撤销的白名单 MUST 重新进入调查/修复队列。`.codeguard/decisions/` 只保存可读引用，不自授策略权威。
+经可信批准的误报处置 MUST 是独立事件/任务状态 `whitelisted_false_positive`，不得记作 `resolved_by_code_fix` 或删除 finding。
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN** 疑似误报任务 MUST 记录原生证据、最小复现、裁定原因、精确目标、批准请求和原工具复检命令；候选、过期、失配或撤销的白名单 MUST 重新进入调查/修复队列。`.codeguard/decisions/` 只保存可读引用，不自授策略权威。
 
 `status/next/task show` MUST 提供只读视图；next MUST 返回含依据、范围、步骤、约束、验证和历史尝试的 RepairBrief。recipe MUST 有受控来源，原生诊断和仓库文本 MUST 当作不可信数据。无进展重试超预算 MUST 阻塞该任务或请求具体决策，不能降低门禁；其它独立任务仍可推进。
 
@@ -298,7 +302,11 @@ claim MUST 返回不可复用lease_token/generation和到期；heartbeat/release
 
 ### Requirement: Repair command handoffs SHALL bind attempts and leases explicitly
 
-attempt start MUST 接受来自受控简报的action-id并由CLI计算动作指纹、观察前置内容，返回attempt_id；finish新增结束事件 MUST 明确attempt-id及当前lease-token，记录观察变化与执行者说明，冲突结束拒绝，同结果重放幂等。已落盘结束收据的原请求重放只返回该收据，即便租约过期也不得再次写入或影响新租约。每任务只允许一个未结束attempt；换action名称不重置同一无进展动作预算。finish结果仅允许ready-to-verify/no-change/failed/blocked，不直接resolved。
+attempt start MUST 接受来自受控简报的action-id并由CLI计算动作指纹、观察前置内容，返回attempt_id；finish新增结束事件 MUST 明确attempt-id及当前lease-token，记录观察变化与执行者说明，冲突结束拒绝，同结果重放幂等。
+
+#### Scenario: Preserve the complete contract details
+- **WHEN** this requirement is applied
+- **THEN** 已落盘结束收据的原请求重放只返回该收据，即便租约过期也不得再次写入或影响新租约。每任务只允许一个未结束attempt；换action名称不重置同一无进展动作预算。finish结果仅允许ready-to-verify/no-change/failed/blocked，不直接resolved。
 
 fix MUST 支持task及成对owner/lease-token绑定；已领取任务复用有效租约，由FixService登记自己的受控attempt，不接管已有未结束自由attempt。未领取时可自行取得并仅释放自有租约。已初始化工作区的批量apply在补丁应用前取得全部受影响任务租约，冲突不能静默跳过；未初始化时只保留私有证据，不调用持久同步/租约，不声称持久任务存在。fix dry-run MUST 不登记正式修复尝试或消耗预算；apply自动登记，插件不得重复计数。
 
