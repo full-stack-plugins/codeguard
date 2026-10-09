@@ -1,0 +1,375 @@
+1921003 execve("/workspace/guard-implementation-ledger/codeguard-native-parity-capture/bin/codeguard-ff4efa9", ["/workspace/guard-implementation-ledger/codeguard-native-parity-capture/bin/codeguard-ff4efa9", "lint", "python", "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/native-cancel", "--file", "app.py", "--ruff-tool", "/workspace/guard-toolchain/python-native/bin/ruff", "--format=json", "--timeout", "30s"], 0x7ffdc6b4a2b8 /* 16 vars */) = 0
+1921003 rt_sigaction(SIGPIPE, {sa_handler=SIG_IGN, sa_mask=[PIPE], sa_flags=SA_RESTORER|SA_RESTART, sa_restorer=0x7f2d9cebadf0}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+1921003 rt_sigaction(SIGSEGV, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+1921003 sigaltstack(NULL, {ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+1921003 sigaltstack({ss_sp=0x7f2d9d0bd000, ss_flags=0, ss_size=8192}, NULL) = 0
+1921003 rt_sigaction(SIGSEGV, {sa_handler=0x558e29f78ea0, sa_mask=[], sa_flags=SA_RESTORER|SA_ONSTACK|SA_SIGINFO, sa_restorer=0x7f2d9cebadf0}, NULL, 8) = 0
+1921003 rt_sigaction(SIGBUS, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+1921003 rt_sigaction(SIGBUS, {sa_handler=0x558e29f78ea0, sa_mask=[], sa_flags=SA_RESTORER|SA_ONSTACK|SA_SIGINFO, sa_restorer=0x7f2d9cebadf0}, NULL, 8) = 0
+1921003 rt_sigaction(SIGINT, {sa_handler=0x558e29b9c7a0, sa_mask=[INT], sa_flags=SA_RESTORER|SA_RESTART, sa_restorer=0x7f2d9cebadf0}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+1921003 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921003 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921003 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921003 clone3({flags=CLONE_VM|CLONE_VFORK|CLONE_CLEAR_SIGHAND, exit_signal=SIGCHLD, stack=0x7f2d9d0b1000, stack_size=0x9000}, 88 <unfinished ...>
+1921004 rt_sigprocmask(SIG_BLOCK, NULL, ~[KILL STOP], 8) = 0
+1921004 rt_sigaction(SIGPIPE, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7f2d9cebadf0}, NULL, 8) = 0
+1921004 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921004 execve("/workspace/guard-toolchain/python-native/bin/ruff", ["/workspace/guard-toolchain/python-native/bin/ruff", "--version"], 0x558e59a2d5b0 /* 0 vars */ <unfinished ...>
+1921003 <... clone3 resumed>)           = 1921004
+1921004 <... execve resumed>)           = 0
+1921003 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921003 rt_sigaction(SIGRT_1, {sa_handler=0x7f2d9cf0b4b0, sa_mask=[], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f2d9cebadf0}, NULL, 8) = 0
+1921003 rt_sigprocmask(SIG_UNBLOCK, [RTMIN RT_1], NULL, 8) = 0
+1921003 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921003 clone3({flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, child_tid=0x7f2d9ce78990, parent_tid=0x7f2d9ce78990, exit_signal=0, stack=0x7f2d9cc78000, stack_size=0x1fff00, tls=0x7f2d9ce786c0} => {parent_tid=[1921005]}, 88) = 1921005
+1921003 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921003 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921003 clone3({flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, child_tid=0x7f2d9cc77990, parent_tid=0x7f2d9cc77990, exit_signal=0, stack=0x7f2d9ca77000, stack_size=0x1fff00, tls=0x7f2d9cc776c0} <unfinished ...>
+1921005 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921003 <... clone3 resumed> => {parent_tid=[1921006]}, 88) = 1921006
+1921003 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921003 wait4(1921004, 0x7fff7191c3f8, WNOHANG, NULL) = 0
+1921006 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921005 sigaltstack(NULL, {ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+1921006 sigaltstack(NULL, {ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+1921005 sigaltstack({ss_sp=0x7f2d9d0b8000, ss_flags=0, ss_size=8192}, NULL) = 0
+1921006 sigaltstack({ss_sp=0x7f2d9d0b5000, ss_flags=0, ss_size=8192}, NULL) = 0
+1921004 rt_sigaction(SIGPIPE, {sa_handler=SIG_IGN, sa_mask=[PIPE], sa_flags=SA_RESTORER|SA_RESTART, sa_restorer=0x7f2d31b7edf0}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+1921004 rt_sigaction(SIGSEGV, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+1921004 sigaltstack(NULL, {ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+1921004 sigaltstack({ss_sp=0x7f2d31e82000, ss_flags=0, ss_size=8192}, NULL) = 0
+1921004 rt_sigaction(SIGSEGV, {sa_handler=0x55825dcfadf0, sa_mask=[], sa_flags=SA_RESTORER|SA_ONSTACK|SA_SIGINFO, sa_restorer=0x7f2d31b7edf0}, NULL, 8) = 0
+1921004 rt_sigaction(SIGBUS, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+1921004 rt_sigaction(SIGBUS, {sa_handler=0x55825dcfadf0, sa_mask=[], sa_flags=SA_RESTORER|SA_ONSTACK|SA_SIGINFO, sa_restorer=0x7f2d31b7edf0}, NULL, 8) = 0
+1921004 sigaltstack({ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=8192}, NULL) = 0
+1921004 exit_group(0)                   = ?
+1921004 +++ exited with 0 +++
+1921003 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=1921004, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+1921003 wait4(1921004, [{WIFEXITED(s) && WEXITSTATUS(s) == 0}], WNOHANG, NULL) = 1921004
+1921003 kill(-1921004, SIGKILL)         = -1 ESRCH (No such process)
+1921006 sigaltstack({ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=8192}, NULL) = 0
+1921005 sigaltstack({ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=8192},  <unfinished ...>
+1921006 rt_sigprocmask(SIG_BLOCK, ~[RT_1],  <unfinished ...>
+1921005 <... sigaltstack resumed>NULL)  = 0
+1921006 <... rt_sigprocmask resumed>NULL, 8) = 0
+1921006 exit(0 <unfinished ...>
+1921005 rt_sigprocmask(SIG_BLOCK, ~[RT_1],  <unfinished ...>
+1921006 <... exit resumed>)             = ?
+1921005 <... rt_sigprocmask resumed>NULL, 8) = 0
+1921006 +++ exited with 0 +++
+1921005 exit(0)                         = ?
+1921005 +++ exited with 0 +++
+1921003 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921003 clone3({flags=CLONE_VM|CLONE_VFORK|CLONE_CLEAR_SIGHAND, exit_signal=SIGCHLD, stack=0x7f2d9d0b1000, stack_size=0x9000}, 88 <unfinished ...>
+1921007 rt_sigprocmask(SIG_BLOCK, NULL, ~[KILL STOP], 8) = 0
+1921007 rt_sigaction(SIGPIPE, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7f2d9cebadf0}, NULL, 8) = 0
+1921007 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921007 execve("/workspace/guard-toolchain/python-native/bin/ruff", ["/workspace/guard-toolchain/python-native/bin/ruff", "--version"], 0x558e59a41900 /* 0 vars */ <unfinished ...>
+1921003 <... clone3 resumed>)           = 1921007
+1921007 <... execve resumed>)           = 0
+1921003 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921003 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921003 clone3({flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, child_tid=0x7f2d9cc77990, parent_tid=0x7f2d9cc77990, exit_signal=0, stack=0x7f2d9ca77000, stack_size=0x1fff00, tls=0x7f2d9cc776c0} => {parent_tid=[1921008]}, 88) = 1921008
+1921003 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921003 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921008 rt_sigprocmask(SIG_SETMASK, [],  <unfinished ...>
+1921003 clone3({flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, child_tid=0x7f2d9ce78990, parent_tid=0x7f2d9ce78990, exit_signal=0, stack=0x7f2d9cc78000, stack_size=0x1fff00, tls=0x7f2d9ce786c0} <unfinished ...>
+1921008 <... rt_sigprocmask resumed>NULL, 8) = 0
+1921003 <... clone3 resumed> => {parent_tid=[1921009]}, 88) = 1921009
+1921003 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921003 wait4(1921007,  <unfinished ...>
+1921008 sigaltstack(NULL,  <unfinished ...>
+1921003 <... wait4 resumed>0x7fff71916ea8, WNOHANG, NULL) = 0
+1921008 <... sigaltstack resumed>{ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+1921009 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921008 sigaltstack({ss_sp=0x7f2d9d0b8000, ss_flags=0, ss_size=8192}, NULL) = 0
+1921009 sigaltstack(NULL, {ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+1921009 sigaltstack({ss_sp=0x7f2d9d0b5000, ss_flags=0, ss_size=8192}, NULL) = 0
+1921007 rt_sigaction(SIGPIPE, {sa_handler=SIG_IGN, sa_mask=[PIPE], sa_flags=SA_RESTORER|SA_RESTART, sa_restorer=0x7f28f132adf0}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+1921007 rt_sigaction(SIGSEGV, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+1921007 sigaltstack(NULL, {ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+1921007 sigaltstack({ss_sp=0x7f28f162e000, ss_flags=0, ss_size=8192}, NULL) = 0
+1921007 rt_sigaction(SIGSEGV, {sa_handler=0x56438b046df0, sa_mask=[], sa_flags=SA_RESTORER|SA_ONSTACK|SA_SIGINFO, sa_restorer=0x7f28f132adf0}, NULL, 8) = 0
+1921007 rt_sigaction(SIGBUS, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+1921007 rt_sigaction(SIGBUS, {sa_handler=0x56438b046df0, sa_mask=[], sa_flags=SA_RESTORER|SA_ONSTACK|SA_SIGINFO, sa_restorer=0x7f28f132adf0}, NULL, 8) = 0
+1921007 sigaltstack({ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=8192}, NULL) = 0
+1921007 exit_group(0)                   = ?
+1921007 +++ exited with 0 +++
+1921003 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=1921007, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
+1921009 sigaltstack({ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=8192}, NULL) = 0
+1921008 sigaltstack({ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=8192},  <unfinished ...>
+1921009 rt_sigprocmask(SIG_BLOCK, ~[RT_1],  <unfinished ...>
+1921008 <... sigaltstack resumed>NULL)  = 0
+1921009 <... rt_sigprocmask resumed>NULL, 8) = 0
+1921008 rt_sigprocmask(SIG_BLOCK, ~[RT_1],  <unfinished ...>
+1921009 exit(0 <unfinished ...>
+1921008 <... rt_sigprocmask resumed>NULL, 8) = 0
+1921009 <... exit resumed>)             = ?
+1921009 +++ exited with 0 +++
+1921008 exit(0)                         = ?
+1921008 +++ exited with 0 +++
+1921003 wait4(1921007, [{WIFEXITED(s) && WEXITSTATUS(s) == 0}], WNOHANG, NULL) = 1921007
+1921003 kill(-1921007, SIGKILL)         = -1 ESRCH (No such process)
+1921003 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921003 clone3({flags=CLONE_VM|CLONE_VFORK|CLONE_CLEAR_SIGHAND, exit_signal=SIGCHLD, stack=0x7f2d9d0b1000, stack_size=0x9000}, 88 <unfinished ...>
+1921010 rt_sigprocmask(SIG_BLOCK, NULL, ~[KILL STOP], 8) = 0
+1921010 rt_sigaction(SIGPIPE, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7f2d9cebadf0}, NULL, 8) = 0
+1921010 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921010 execve("/workspace/guard-toolchain/python-native/bin/ruff", ["/workspace/guard-toolchain/python-native/bin/ruff", "check", "--show-files", "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/native-cancel/app.py"], 0x558e59a4ad10 /* 0 vars */ <unfinished ...>
+1921003 <... clone3 resumed>)           = 1921010
+1921010 <... execve resumed>)           = 0
+1921003 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921003 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921003 clone3({flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, child_tid=0x7f2d9ce78990, parent_tid=0x7f2d9ce78990, exit_signal=0, stack=0x7f2d9cc78000, stack_size=0x1fff00, tls=0x7f2d9ce786c0} => {parent_tid=[1921011]}, 88) = 1921011
+1921003 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921003 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921003 clone3({flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, child_tid=0x7f2d9cc77990, parent_tid=0x7f2d9cc77990, exit_signal=0, stack=0x7f2d9ca77000, stack_size=0x1fff00, tls=0x7f2d9cc776c0} => {parent_tid=[1921012]}, 88) = 1921012
+1921003 rt_sigprocmask(SIG_SETMASK, [],  <unfinished ...>
+1921011 rt_sigprocmask(SIG_SETMASK, [],  <unfinished ...>
+1921003 <... rt_sigprocmask resumed>NULL, 8) = 0
+1921011 <... rt_sigprocmask resumed>NULL, 8) = 0
+1921003 wait4(1921010, 0x7fff719171d8, WNOHANG, NULL) = 0
+1921012 rt_sigprocmask(SIG_SETMASK, [],  <unfinished ...>
+1921011 sigaltstack(NULL,  <unfinished ...>
+1921012 <... rt_sigprocmask resumed>NULL, 8) = 0
+1921011 <... sigaltstack resumed>{ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+1921012 sigaltstack(NULL, {ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+1921012 sigaltstack({ss_sp=0x7f2d9d0b5000, ss_flags=0, ss_size=8192}, NULL) = 0
+1921011 sigaltstack({ss_sp=0x7f2d9d0b8000, ss_flags=0, ss_size=8192}, NULL) = 0
+1921010 rt_sigaction(SIGPIPE, {sa_handler=SIG_IGN, sa_mask=[PIPE], sa_flags=SA_RESTORER|SA_RESTART, sa_restorer=0x7f48d9e16df0}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+1921010 rt_sigaction(SIGSEGV, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+1921010 sigaltstack(NULL, {ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+1921010 sigaltstack({ss_sp=0x7f48da11a000, ss_flags=0, ss_size=8192}, NULL) = 0
+1921010 rt_sigaction(SIGSEGV, {sa_handler=0x559578758df0, sa_mask=[], sa_flags=SA_RESTORER|SA_ONSTACK|SA_SIGINFO, sa_restorer=0x7f48d9e16df0}, NULL, 8) = 0
+1921010 rt_sigaction(SIGBUS, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+1921010 rt_sigaction(SIGBUS, {sa_handler=0x559578758df0, sa_mask=[], sa_flags=SA_RESTORER|SA_ONSTACK|SA_SIGINFO, sa_restorer=0x7f48d9e16df0}, NULL, 8) = 0
+1921010 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921010 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921003 wait4(1921010, 0x7fff719171d8, WNOHANG, NULL) = 0
+1921010 rt_sigaction(SIGRT_1, {sa_handler=0x7f48d9e674b0, sa_mask=[], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f48d9e16df0}, NULL, 8) = 0
+1921010 rt_sigprocmask(SIG_UNBLOCK, [RTMIN RT_1], NULL, 8) = 0
+1921010 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921010 clone3({flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, child_tid=0x7f48d93ff990, parent_tid=0x7f48d93ff990, exit_signal=0, stack=0x7f48d91ff000, stack_size=0x1fef40, tls=0x7f48d93ff6c0} => {parent_tid=[1921013]}, 88) = 1921013
+1921010 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921010 rt_sigprocmask(SIG_BLOCK, ~[],  <unfinished ...>
+1921013 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921010 <... rt_sigprocmask resumed>[], 8) = 0
+1921010 clone3({flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, child_tid=0x7f48d91fe990, parent_tid=0x7f48d91fe990, exit_signal=0, stack=0x7f48d8ffe000, stack_size=0x1fef40, tls=0x7f48d91fe6c0} => {parent_tid=[1921014]}, 88) = 1921014
+1921010 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921013 sigaltstack(NULL,  <unfinished ...>
+1921010 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921013 <... sigaltstack resumed>{ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+1921010 clone3({flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, child_tid=0x7f48d8ffd990, parent_tid=0x7f48d8ffd990, exit_signal=0, stack=0x7f48d8dfd000, stack_size=0x1fef40, tls=0x7f48d8ffd6c0} <unfinished ...>
+1921014 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921013 sigaltstack({ss_sp=0x7f48da115000, ss_flags=0, ss_size=8192},  <unfinished ...>
+1921010 <... clone3 resumed> => {parent_tid=[1921015]}, 88) = 1921015
+1921013 <... sigaltstack resumed>NULL)  = 0
+1921010 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921015 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921010 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921010 clone3({flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, child_tid=0x7f48d8dfc990, parent_tid=0x7f48d8dfc990, exit_signal=0, stack=0x7f48d8bfc000, stack_size=0x1fef40, tls=0x7f48d8dfc6c0} => {parent_tid=[1921016]}, 88) = 1921016
+1921010 rt_sigprocmask(SIG_SETMASK, [],  <unfinished ...>
+1921014 sigaltstack(NULL,  <unfinished ...>
+1921010 <... rt_sigprocmask resumed>NULL, 8) = 0
+1921014 <... sigaltstack resumed>{ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+1921015 sigaltstack(NULL,  <unfinished ...>
+1921016 rt_sigprocmask(SIG_SETMASK, [],  <unfinished ...>
+1921015 <... sigaltstack resumed>{ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+1921016 <... rt_sigprocmask resumed>NULL, 8) = 0
+1921014 sigaltstack({ss_sp=0x7f48da112000, ss_flags=0, ss_size=8192},  <unfinished ...>
+1921015 sigaltstack({ss_sp=0x7f48da10f000, ss_flags=0, ss_size=8192},  <unfinished ...>
+1921014 <... sigaltstack resumed>NULL)  = 0
+1921015 <... sigaltstack resumed>NULL)  = 0
+1921016 sigaltstack(NULL, {ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+1921016 sigaltstack({ss_sp=0x7f48da10c000, ss_flags=0, ss_size=8192}, NULL) = 0
+1921016 sigaltstack({ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=8192}, NULL) = 0
+1921016 rt_sigprocmask(SIG_BLOCK, ~[RT_1], NULL, 8) = 0
+1921016 exit(0)                         = ?
+1921016 +++ exited with 0 +++
+1921014 sigaltstack({ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=8192},  <unfinished ...>
+1921013 sigaltstack({ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=8192}, NULL) = 0
+1921014 <... sigaltstack resumed>NULL)  = 0
+1921015 sigaltstack({ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=8192},  <unfinished ...>
+1921013 rt_sigprocmask(SIG_BLOCK, ~[RT_1],  <unfinished ...>
+1921015 <... sigaltstack resumed>NULL)  = 0
+1921013 <... rt_sigprocmask resumed>NULL, 8) = 0
+1921014 rt_sigprocmask(SIG_BLOCK, ~[RT_1],  <unfinished ...>
+1921013 exit(0)                         = ?
+1921013 +++ exited with 0 +++
+1921014 <... rt_sigprocmask resumed>NULL, 8) = 0
+1921014 exit(0)                         = ?
+1921015 rt_sigprocmask(SIG_BLOCK, ~[RT_1],  <unfinished ...>
+1921014 +++ exited with 0 +++
+1921015 <... rt_sigprocmask resumed>NULL, 8) = 0
+1921003 wait4(1921010, 0x7fff719171d8, WNOHANG, NULL) = 0
+1921015 exit(0)                         = ?
+1921015 +++ exited with 0 +++
+1921010 sigaltstack({ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=8192}, NULL) = 0
+1921010 exit_group(0)                   = ?
+1921010 +++ exited with 0 +++
+1921003 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=1921010, si_uid=1000, si_status=0, si_utime=0, si_stime=1 /* 0.01 s */} ---
+1921012 sigaltstack({ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=8192},  <unfinished ...>
+1921011 sigaltstack({ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=8192},  <unfinished ...>
+1921012 <... sigaltstack resumed>NULL)  = 0
+1921011 <... sigaltstack resumed>NULL)  = 0
+1921012 rt_sigprocmask(SIG_BLOCK, ~[RT_1], NULL, 8) = 0
+1921011 rt_sigprocmask(SIG_BLOCK, ~[RT_1], NULL, 8) = 0
+1921012 exit(0)                         = ?
+1921012 +++ exited with 0 +++
+1921011 exit(0)                         = ?
+1921011 +++ exited with 0 +++
+1921003 wait4(1921010, [{WIFEXITED(s) && WEXITSTATUS(s) == 0}], WNOHANG, NULL) = 1921010
+1921003 kill(-1921010, SIGKILL)         = -1 ESRCH (No such process)
+1921003 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921003 clone3({flags=CLONE_VM|CLONE_VFORK|CLONE_CLEAR_SIGHAND, exit_signal=SIGCHLD, stack=0x7f2d9d0b1000, stack_size=0x9000}, 88 <unfinished ...>
+1921017 rt_sigprocmask(SIG_BLOCK, NULL, ~[KILL STOP], 8) = 0
+1921017 rt_sigaction(SIGPIPE, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7f2d9cebadf0}, NULL, 8) = 0
+1921017 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921017 execve("/workspace/guard-toolchain/python-native/bin/ruff", ["/workspace/guard-toolchain/python-native/bin/ruff", "check", "--show-settings", "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/native-cancel/app.py"], 0x558e59a4ad10 /* 0 vars */ <unfinished ...>
+1921003 <... clone3 resumed>)           = 1921017
+1921003 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921017 <... execve resumed>)           = 0
+1921003 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921003 clone3({flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, child_tid=0x7f2d9cc77990, parent_tid=0x7f2d9cc77990, exit_signal=0, stack=0x7f2d9ca77000, stack_size=0x1fff00, tls=0x7f2d9cc776c0} => {parent_tid=[1921018]}, 88) = 1921018
+1921003 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921003 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921003 clone3({flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, child_tid=0x7f2d9ce78990, parent_tid=0x7f2d9ce78990, exit_signal=0, stack=0x7f2d9cc78000, stack_size=0x1fff00, tls=0x7f2d9ce786c0} <unfinished ...>
+1921018 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921003 <... clone3 resumed> => {parent_tid=[1921019]}, 88) = 1921019
+1921003 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921003 wait4(1921017, 0x7fff719171d8, WNOHANG, NULL) = 0
+1921018 sigaltstack(NULL,  <unfinished ...>
+1921019 rt_sigprocmask(SIG_SETMASK, [],  <unfinished ...>
+1921018 <... sigaltstack resumed>{ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+1921019 <... rt_sigprocmask resumed>NULL, 8) = 0
+1921018 sigaltstack({ss_sp=0x7f2d9d0b8000, ss_flags=0, ss_size=8192},  <unfinished ...>
+1921019 sigaltstack(NULL,  <unfinished ...>
+1921018 <... sigaltstack resumed>NULL)  = 0
+1921019 <... sigaltstack resumed>{ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+1921019 sigaltstack({ss_sp=0x7f2d9d0b5000, ss_flags=0, ss_size=8192}, NULL) = 0
+1921003 wait4(1921017, 0x7fff719171d8, WNOHANG, NULL) = 0
+1921017 rt_sigaction(SIGPIPE, {sa_handler=SIG_IGN, sa_mask=[PIPE], sa_flags=SA_RESTORER|SA_RESTART, sa_restorer=0x7f9cb6e9fdf0}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+1921017 rt_sigaction(SIGSEGV, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+1921017 sigaltstack(NULL, {ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+1921017 sigaltstack({ss_sp=0x7f9cb71a3000, ss_flags=0, ss_size=8192}, NULL) = 0
+1921017 rt_sigaction(SIGSEGV, {sa_handler=0x5571db1d1df0, sa_mask=[], sa_flags=SA_RESTORER|SA_ONSTACK|SA_SIGINFO, sa_restorer=0x7f9cb6e9fdf0}, NULL, 8) = 0
+1921017 rt_sigaction(SIGBUS, NULL, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+1921017 rt_sigaction(SIGBUS, {sa_handler=0x5571db1d1df0, sa_mask=[], sa_flags=SA_RESTORER|SA_ONSTACK|SA_SIGINFO, sa_restorer=0x7f9cb6e9fdf0}, NULL, 8) = 0
+1921017 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921017 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921003 wait4(1921017, 0x7fff719171d8, WNOHANG, NULL) = 0
+1921003 wait4(1921017, 0x7fff719171d8, WNOHANG, NULL) = 0
+1921017 rt_sigaction(SIGRT_1, {sa_handler=0x7f9cb6ef04b0, sa_mask=[], sa_flags=SA_RESTORER|SA_ONSTACK|SA_RESTART|SA_SIGINFO, sa_restorer=0x7f9cb6e9fdf0}, NULL, 8) = 0
+1921017 rt_sigprocmask(SIG_UNBLOCK, [RTMIN RT_1], NULL, 8) = 0
+1921017 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921017 clone3({flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, child_tid=0x7f9cb65ff990, parent_tid=0x7f9cb65ff990, exit_signal=0, stack=0x7f9cb63ff000, stack_size=0x1fef40, tls=0x7f9cb65ff6c0} => {parent_tid=[1921020]}, 88) = 1921020
+1921017 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921020 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921017 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921017 clone3({flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, child_tid=0x7f9cb63fe990, parent_tid=0x7f9cb63fe990, exit_signal=0, stack=0x7f9cb61fe000, stack_size=0x1fef40, tls=0x7f9cb63fe6c0} <unfinished ...>
+1921020 sigaltstack(NULL, {ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+1921017 <... clone3 resumed> => {parent_tid=[1921021]}, 88) = 1921021
+1921020 sigaltstack({ss_sp=0x7f9cb719e000, ss_flags=0, ss_size=8192},  <unfinished ...>
+1921017 rt_sigprocmask(SIG_SETMASK, [],  <unfinished ...>
+1921020 <... sigaltstack resumed>NULL)  = 0
+1921017 <... rt_sigprocmask resumed>NULL, 8) = 0
+1921021 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921017 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921017 clone3({flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, child_tid=0x7f9cb61fd990, parent_tid=0x7f9cb61fd990, exit_signal=0, stack=0x7f9cb5ffd000, stack_size=0x1fef40, tls=0x7f9cb61fd6c0} => {parent_tid=[1921022]}, 88) = 1921022
+1921021 sigaltstack(NULL, {ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+1921022 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921021 sigaltstack({ss_sp=0x7f9cb719b000, ss_flags=0, ss_size=8192},  <unfinished ...>
+1921017 rt_sigprocmask(SIG_SETMASK, [],  <unfinished ...>
+1921021 <... sigaltstack resumed>NULL)  = 0
+1921017 <... rt_sigprocmask resumed>NULL, 8) = 0
+1921022 sigaltstack(NULL,  <unfinished ...>
+1921017 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921022 <... sigaltstack resumed>{ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+1921017 clone3({flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, child_tid=0x7f9cb59ff990, parent_tid=0x7f9cb59ff990, exit_signal=0, stack=0x7f9cb57ff000, stack_size=0x1fef40, tls=0x7f9cb59ff6c0} <unfinished ...>
+1921022 sigaltstack({ss_sp=0x7f9cb7198000, ss_flags=0, ss_size=8192}, NULL) = 0
+1921017 <... clone3 resumed> => {parent_tid=[1921023]}, 88) = 1921023
+1921017 rt_sigprocmask(SIG_SETMASK, [],  <unfinished ...>
+1921023 rt_sigprocmask(SIG_SETMASK, [],  <unfinished ...>
+1921017 <... rt_sigprocmask resumed>NULL, 8) = 0
+1921023 <... rt_sigprocmask resumed>NULL, 8) = 0
+1921023 sigaltstack(NULL, {ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+1921023 sigaltstack({ss_sp=0x7f9cb7195000, ss_flags=0, ss_size=8192}, NULL) = 0
+1921023 sigaltstack({ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=8192}, NULL) = 0
+1921023 rt_sigprocmask(SIG_BLOCK, ~[RT_1], NULL, 8) = 0
+1921023 exit(0)                         = ?
+1921022 sigaltstack({ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=8192},  <unfinished ...>
+1921023 +++ exited with 0 +++
+1921022 <... sigaltstack resumed>NULL)  = 0
+1921020 sigaltstack({ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=8192}, NULL) = 0
+1921022 rt_sigprocmask(SIG_BLOCK, ~[RT_1], NULL, 8) = 0
+1921022 exit(0)                         = ?
+1921020 rt_sigprocmask(SIG_BLOCK, ~[RT_1],  <unfinished ...>
+1921022 +++ exited with 0 +++
+1921020 <... rt_sigprocmask resumed>NULL, 8) = 0
+1921020 exit(0)                         = ?
+1921020 +++ exited with 0 +++
+1921021 sigaltstack({ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=8192}, NULL) = 0
+1921003 wait4(1921017, 0x7fff719171d8, WNOHANG, NULL) = 0
+1921021 rt_sigprocmask(SIG_BLOCK, ~[RT_1], NULL, 8) = 0
+1921021 exit(0)                         = ?
+1921021 +++ exited with 0 +++
+1921017 sigaltstack({ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=8192}, NULL) = 0
+1921017 exit_group(0)                   = ?
+1921017 +++ exited with 0 +++
+1921003 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=1921017, si_uid=1000, si_status=0, si_utime=0, si_stime=1 /* 0.01 s */} ---
+1921019 sigaltstack({ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=8192}, NULL) = 0
+1921019 rt_sigprocmask(SIG_BLOCK, ~[RT_1], NULL, 8) = 0
+1921019 exit(0)                         = ?
+1921019 +++ exited with 0 +++
+1921018 sigaltstack({ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=8192}, NULL) = 0
+1921018 rt_sigprocmask(SIG_BLOCK, ~[RT_1], NULL, 8) = 0
+1921018 exit(0)                         = ?
+1921018 +++ exited with 0 +++
+1921003 wait4(1921017, [{WIFEXITED(s) && WEXITSTATUS(s) == 0}], WNOHANG, NULL) = 1921017
+1921003 kill(-1921017, SIGKILL)         = -1 ESRCH (No such process)
+1921003 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921003 clone3({flags=CLONE_VM|CLONE_VFORK|CLONE_CLEAR_SIGHAND, exit_signal=SIGCHLD, stack=0x7f2d9d0b1000, stack_size=0x9000}, 88 <unfinished ...>
+1921024 rt_sigprocmask(SIG_BLOCK, NULL, ~[KILL STOP], 8) = 0
+1921024 rt_sigaction(SIGPIPE, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=SA_RESTORER, sa_restorer=0x7f2d9cebadf0}, NULL, 8) = 0
+1921024 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921024 execve("/workspace/guard-toolchain/python-native/bin/ruff", ["/workspace/guard-toolchain/python-native/bin/ruff", "check", "--no-cache", "--output-format", "json", "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/native-cancel/app.py"], 0x558e59a4ad10 /* 0 vars */ <unfinished ...>
+1921003 <... clone3 resumed>)           = 1921024
+1921024 <... execve resumed>)           = 0
+1921003 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921003 --- SIGINT {si_signo=SIGINT, si_code=SI_USER, si_pid=1920942, si_uid=1000} ---
+1921003 rt_sigreturn({mask=[]})         = 0
+1921003 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921003 clone3({flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, child_tid=0x7f2d9ce78990, parent_tid=0x7f2d9ce78990, exit_signal=0, stack=0x7f2d9cc78000, stack_size=0x1fff00, tls=0x7f2d9ce786c0} => {parent_tid=[1921025]}, 88) = 1921025
+1921003 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921003 rt_sigprocmask(SIG_BLOCK, ~[], [], 8) = 0
+1921003 clone3({flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, child_tid=0x7f2d9cc77990, parent_tid=0x7f2d9cc77990, exit_signal=0, stack=0x7f2d9ca77000, stack_size=0x1fff00, tls=0x7f2d9cc776c0} <unfinished ...>
+1921025 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921003 <... clone3 resumed> => {parent_tid=[1921026]}, 88) = 1921026
+1921003 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+1921003 kill(-1921024, SIGKILL)         = 0
+1921003 wait4(1921024,  <unfinished ...>
+1921026 rt_sigprocmask(SIG_SETMASK, [],  <unfinished ...>
+1921025 sigaltstack(NULL,  <unfinished ...>
+1921024 +++ killed by SIGKILL +++
+1921003 <... wait4 resumed>[{WIFSIGNALED(s) && WTERMSIG(s) == SIGKILL}], 0, NULL) = 1921024
+1921026 <... rt_sigprocmask resumed>NULL, 8) = 0
+1921025 <... sigaltstack resumed>{ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+1921003 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_KILLED, si_pid=1921024, si_uid=1000, si_status=SIGKILL, si_utime=0, si_stime=0} ---
+1921026 sigaltstack(NULL, {ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=0}) = 0
+1921025 sigaltstack({ss_sp=0x7f2d9d0b8000, ss_flags=0, ss_size=8192}, NULL) = 0
+1921026 sigaltstack({ss_sp=0x7f2d9d0b5000, ss_flags=0, ss_size=8192}, NULL) = 0
+1921025 sigaltstack({ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=8192},  <unfinished ...>
+1921026 sigaltstack({ss_sp=NULL, ss_flags=SS_DISABLE, ss_size=8192},  <unfinished ...>
+1921025 <... sigaltstack resumed>NULL)  = 0
+1921026 <... sigaltstack resumed>NULL)  = 0
+1921026 rt_sigprocmask(SIG_BLOCK, ~[RT_1],  <unfinished ...>
+1921025 rt_sigprocmask(SIG_BLOCK, ~[RT_1],  <unfinished ...>
+1921026 <... rt_sigprocmask resumed>NULL, 8) = 0
+1921025 <... rt_sigprocmask resumed>NULL, 8) = 0
+1921026 exit(0)                         = ?
+1921025 exit(0 <unfinished ...>
+1921026 +++ exited with 0 +++
+1921025 <... exit resumed>)             = ?
+1921025 +++ exited with 0 +++
+1921003 exit_group(130)                 = ?
+1921003 +++ exited with 130 +++

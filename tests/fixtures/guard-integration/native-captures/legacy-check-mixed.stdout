@@ -1,0 +1,7 @@
+[codeguard] project: /workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/legacy-check
+[codeguard] languages: ['elixir', 'python']
+
+  elixir       ⚠️ UNVERIFIED (项目缺少已声明的检查配置，未执行)
+  python       ❌ FAILED (exit=1)
+
+[codeguard] ❌ some lints failed

@@ -1,0 +1,88 @@
+{
+  "status": "UNVERIFIED",
+  "exit_code": 1,
+  "files": [
+    "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/legacy-docker/Dockerfile"
+  ],
+  "root": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/legacy-docker",
+  "hadolint": {
+    "tool": "hadolint",
+    "status": "FAIL",
+    "exit": 2,
+    "scanned": 1,
+    "tool_ok": true,
+    "findings": [
+      "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/legacy-docker/Dockerfile:1 DL3007 warning Using latest is prone to errors if the image will ever update. Pin the version explicitly to a release tag",
+      "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/legacy-docker/Dockerfile:2 DL3009 info Delete the apt-get lists after installing something"
+    ],
+    "attempts": [
+      {
+        "file": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/legacy-docker/Dockerfile",
+        "argv": [
+          "hadolint",
+          "--format",
+          "json",
+          "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/legacy-docker/Dockerfile"
+        ],
+        "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/legacy-docker",
+        "exit": 1,
+        "stdout": "[{\"code\":\"DL3007\",\"column\":1,\"file\":\"/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/legacy-docker/Dockerfile\",\"level\":\"warning\",\"line\":1,\"message\":\"Using latest is prone to errors if the image will ever update. Pin the version explicitly to a release tag\"},{\"code\":\"DL3009\",\"column\":1,\"file\":\"/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/legacy-docker/Dockerfile\",\"level\":\"info\",\"line\":2,\"message\":\"Delete the apt-get lists after installing something\"}]",
+        "stderr": "",
+        "status": "FAIL",
+        "reason": "有效报告发现 Dockerfile 风险"
+      }
+    ],
+    "summary_tail": "",
+    "records": [
+      {
+        "code": "DL3007",
+        "column": 1,
+        "file": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/legacy-docker/Dockerfile",
+        "level": "warning",
+        "line": 1,
+        "message": "Using latest is prone to errors if the image will ever update. Pin the version explicitly to a release tag"
+      },
+      {
+        "code": "DL3009",
+        "column": 1,
+        "file": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/legacy-docker/Dockerfile",
+        "level": "info",
+        "line": 2,
+        "message": "Delete the apt-get lists after installing something"
+      }
+    ],
+    "fix_hint": "确认 hadolint 已安装（brew install hadolint），按规则修复 Dockerfile"
+  },
+  "trivy": {
+    "tool": "trivy config",
+    "status": "UNVERIFIED",
+    "exit": 127,
+    "scanned": 1,
+    "tool_ok": false,
+    "findings": [],
+    "attempts": [
+      {
+        "file": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/legacy-docker/Dockerfile",
+        "argv": [
+          "trivy",
+          "config",
+          "--format",
+          "json",
+          "--quiet",
+          "--exit-code",
+          "2",
+          "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/legacy-docker/Dockerfile"
+        ],
+        "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/legacy-docker",
+        "exit": 127,
+        "stdout": "",
+        "stderr": "command not found: [Errno 2] No such file or directory: 'trivy'",
+        "status": "UNVERIFIED",
+        "reason": "无有效扫描报告：Expecting value: line 1 column 1 (char 0)"
+      }
+    ],
+    "summary_tail": "无有效扫描报告：Expecting value: line 1 column 1 (char 0): command not found: [Errno 2] No such file or directory: 'trivy'",
+    "records": [],
+    "fix_hint": "确认 trivy 已安装（brew install trivy），按 resolution 修复后重扫"
+  }
+}

@@ -1,0 +1,9 @@
+ruff failed
+  Cause: Failed to load configuration `/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/lint-error/ruff.toml`
+  Cause: Failed to parse /workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/lint-error/ruff.toml
+  Cause: TOML parse error at line 1, column 6
+  |
+1 | [lint
+  |      ^
+unclosed table, expected `]`
+

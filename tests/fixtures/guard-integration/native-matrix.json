@@ -1,1 +1,1151 @@
-{"version":"codeguard.native-matrix/v1alpha1","status":"source-backed; full command capture pending","families":[{"entry":"legacy check/cve","mixed_fail_unverified_exit":2,"delivery":"not_evaluated"},{"entry":"legacy dockerfile","mixed_fail_unverified_exit":1,"delivery":"not_evaluated"},{"entry":"rust verdict","exits":{"passed":0,"violations":1,"usage":2,"incomplete":3,"internal_error":4,"cancelled":130}},{"entry":"query success","exit":0,"delivery":"not_evaluated"}],"native_check_export":{"stdout":"retained when --output selected","export_failure":"stderr diagnostic; findings retained in stdout"},"sources":["crates/codeguard-cli/src/legacy_v1_protocol.rs","crates/codeguard-core/src/verdict.rs","crates/codeguard-cli/src/check_command.rs"]}
+{
+  "version": "codeguard.native-matrix/v1alpha1",
+  "status": "actual-command-captures",
+  "native_baseline": "96bae1381a84649420a74b7b6d772f3d992bf3d2",
+  "binaries": {
+    "old": {
+      "source_pin": "f5661d51dd1b2629f3b87b726fb09a9060ce7958",
+      "path": "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/codeguard-f5661d5",
+      "sha256": "b7576afa78f5ab6fdc8133650a1c75dc113357ac927e553b4f5c67731eea3a8c"
+    },
+    "new": {
+      "source_pin": "ff4efa9a2083ab1cbd5820970c996c2cce4b773a",
+      "path": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/bin/codeguard-ff4efa9",
+      "sha256": "f54f299c79a6aa1ae923fe85fbe5aac3ce0e058cc35f875f7003ede6ff6108f0"
+    }
+  },
+  "tools": {
+    "ruff": {
+      "path": "/workspace/guard-toolchain/python-native/bin/ruff",
+      "sha256": "f3eb080f0173e1a5884fabcc2c836f5a0ebea35fccf252e718fc71b17f821ef7",
+      "version_stdout": "ruff 0.16.8\n",
+      "version_stderr": ""
+    },
+    "hadolint": {
+      "path": "/workspace/guard-toolchain/hadolint-2.12.0/hadolint",
+      "sha256": "56de6d5e5ec427e17b74fa48d51271c7fc0d61244bf5c90e828aab8362d55010",
+      "version_stdout": "Haskell Dockerfile Linter 2.12.0\n",
+      "version_stderr": ""
+    },
+    "node": {
+      "path": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+      "sha256": "bc17c508ffeed0ec622934f9b7fa72f8e78da65350e63c3eceb56fa688aa5e12",
+      "version_stdout": "v24.19.0\n",
+      "version_stderr": ""
+    },
+    "npm": {
+      "path": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/npm",
+      "entry_sha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7",
+      "version_stdout": "11.9.0\n"
+    }
+  },
+  "platform": "Linux x86_64 local; no external host or Windows/WASM acceptance",
+  "captures": [
+    {
+      "id": "legacy-check-mixed",
+      "evidence_kind": "actual-command",
+      "argv": [
+        "/workspace/guard-implementation/codeguard-plugin/bin/codeguard",
+        "check",
+        "--lang",
+        "python,elixir",
+        "--quiet",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/legacy-check"
+      ],
+      "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/legacy-check",
+      "exit": 2,
+      "before": {
+        "app.py": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+        "demo.ex": "3c76eb04d712e8173eecc302478484afba117d9093f5e06e49e8b2fc216fa56a",
+        "requirements.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "ruff.toml": "9f8abaeb93816fc1c97cf1d9e130d0d53dd2744f046987763029965240a3eea5"
+      },
+      "after": {
+        ".ruff_cache/.gitignore": "9e3a60f1e6ec4ae60215c11d54b171392745ec25e9dded433d5bd921363af316",
+        ".ruff_cache/0.16.8/1056026674299032913": "ebcc4df5a70ef86368226d17ea356c3e08f3bddc7ed26eb2c43c5048942d9040",
+        ".ruff_cache/CACHEDIR.TAG": "5953156d7e0c564a427251316eaf26f8870e6483ae2197f916b630e4f93e31ae",
+        "app.py": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+        "demo.ex": "3c76eb04d712e8173eecc302478484afba117d9093f5e06e49e8b2fc216fa56a",
+        "requirements.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "ruff.toml": "9f8abaeb93816fc1c97cf1d9e130d0d53dd2744f046987763029965240a3eea5"
+      },
+      "family": "legacy-plugin",
+      "source_pin": "9e4adb16f73d0d77d31e3b42ad08a5942503b2a3",
+      "stdout": {
+        "path": "native-captures/legacy-check-mixed.stdout",
+        "sha256": "521148f7c5bc95367a973557e187039c0dd3d7432354de606634bc7d747c296e"
+      },
+      "stderr": {
+        "path": "native-captures/legacy-check-mixed.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "side_effects": {
+        "changed_paths": [
+          ".ruff_cache/.gitignore",
+          ".ruff_cache/0.16.8/1056026674299032913",
+          ".ruff_cache/CACHEDIR.TAG"
+        ],
+        "interpretation": "only actual Ruff cache effects; every other input file unchanged"
+      },
+      "stdin": "null"
+    },
+    {
+      "id": "legacy-cve-mixed",
+      "evidence_kind": "actual-command",
+      "argv": [
+        "/workspace/guard-implementation/codeguard-plugin/bin/codeguard",
+        "cve",
+        "--json",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/legacy-cve"
+      ],
+      "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/legacy-cve",
+      "exit": 2,
+      "before": {
+        "package-lock.json": "d102c366f794d30918ecdfc8b25390c7d08b4e34f47a1cb762342260aa82b660",
+        "package.json": "b99e19d9e72683f83be41488798942c27915e44e662f507b8dfbe05e13f6c340",
+        "requirements.txt": "ba866c0dec7a887ce90b4e8259d234aceb8deb3b32f083f4e7a9d86384a43322"
+      },
+      "after": {
+        "package-lock.json": "d102c366f794d30918ecdfc8b25390c7d08b4e34f47a1cb762342260aa82b660",
+        "package.json": "b99e19d9e72683f83be41488798942c27915e44e662f507b8dfbe05e13f6c340",
+        "requirements.txt": "ba866c0dec7a887ce90b4e8259d234aceb8deb3b32f083f4e7a9d86384a43322"
+      },
+      "family": "legacy-plugin",
+      "source_pin": "9e4adb16f73d0d77d31e3b42ad08a5942503b2a3",
+      "stdout": {
+        "path": "native-captures/legacy-cve-mixed.stdout",
+        "sha256": "e83a5277990d1e845519eb84c4367230234f23ed737110e418533765024bbc37"
+      },
+      "stderr": {
+        "path": "native-captures/legacy-cve-mixed.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "side_effects": {
+        "changed_paths": [],
+        "interpretation": "only actual Ruff cache effects; every other input file unchanged"
+      },
+      "stdin": "null"
+    },
+    {
+      "id": "legacy-docker-mixed",
+      "evidence_kind": "actual-command",
+      "argv": [
+        "/workspace/guard-implementation/codeguard-plugin/bin/codeguard",
+        "dockerfile",
+        "--json",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/legacy-docker"
+      ],
+      "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/legacy-docker",
+      "exit": 1,
+      "before": {
+        "Dockerfile": "eca7c13304298b05c3419b55c0fab51b2750ab62eab162be477feeb4f12f5a01"
+      },
+      "after": {
+        "Dockerfile": "eca7c13304298b05c3419b55c0fab51b2750ab62eab162be477feeb4f12f5a01"
+      },
+      "family": "legacy-plugin",
+      "source_pin": "9e4adb16f73d0d77d31e3b42ad08a5942503b2a3",
+      "stdout": {
+        "path": "native-captures/legacy-docker-mixed.stdout",
+        "sha256": "321febd5a16c1cb7f36226e0506eaad40700b78db95759a9cdf2a1a3c4447c79"
+      },
+      "stderr": {
+        "path": "native-captures/legacy-docker-mixed.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "side_effects": {
+        "changed_paths": [],
+        "interpretation": "only actual Ruff cache effects; every other input file unchanged"
+      },
+      "stdin": "null"
+    },
+    {
+      "id": "old-format-clean",
+      "evidence_kind": "actual-command",
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/codeguard-f5661d5",
+        "format",
+        "check",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/format-clean",
+        "--tool",
+        "ruff=/workspace/guard-toolchain/python-native/bin/ruff",
+        "--format=json"
+      ],
+      "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/format-clean",
+      "exit": 0,
+      "before": {
+        "app.py": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4"
+      },
+      "after": {
+        ".ruff_cache/.gitignore": "9e3a60f1e6ec4ae60215c11d54b171392745ec25e9dded433d5bd921363af316",
+        ".ruff_cache/0.16.8/7691332392886928061": "031cfa89c3979c71f05d9b78309e4cb5641c61a583011df440ee6c1d4548508b",
+        ".ruff_cache/CACHEDIR.TAG": "5953156d7e0c564a427251316eaf26f8870e6483ae2197f916b630e4f93e31ae",
+        "app.py": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4"
+      },
+      "family": "rust-native",
+      "source_pin": "f5661d51dd1b2629f3b87b726fb09a9060ce7958",
+      "stdout": {
+        "path": "native-captures/old-format-clean.stdout",
+        "sha256": "1af480cff5a84ebcc0d1c86c1ce5cedc89670fefeb5442ce8c8278c842e384b5"
+      },
+      "stderr": {
+        "path": "native-captures/old-format-clean.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "side_effects": {
+        "changed_paths": [
+          ".ruff_cache/.gitignore",
+          ".ruff_cache/0.16.8/7691332392886928061",
+          ".ruff_cache/CACHEDIR.TAG"
+        ],
+        "interpretation": "only actual Ruff cache effects; every other input file unchanged"
+      },
+      "stdin": "null"
+    },
+    {
+      "id": "old-format-bad",
+      "evidence_kind": "actual-command",
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/codeguard-f5661d5",
+        "format",
+        "check",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/format-bad",
+        "--tool",
+        "ruff=/workspace/guard-toolchain/python-native/bin/ruff",
+        "--format=json"
+      ],
+      "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/format-bad",
+      "exit": 1,
+      "before": {
+        "app.py": "98752ee28d5484bdc2814fb70adb6a0b2fb31f6a9b8ee7ae81fd2fc9cf300b3b"
+      },
+      "after": {
+        ".ruff_cache/.gitignore": "9e3a60f1e6ec4ae60215c11d54b171392745ec25e9dded433d5bd921363af316",
+        ".ruff_cache/CACHEDIR.TAG": "5953156d7e0c564a427251316eaf26f8870e6483ae2197f916b630e4f93e31ae",
+        "app.py": "98752ee28d5484bdc2814fb70adb6a0b2fb31f6a9b8ee7ae81fd2fc9cf300b3b"
+      },
+      "family": "rust-native",
+      "source_pin": "f5661d51dd1b2629f3b87b726fb09a9060ce7958",
+      "stdout": {
+        "path": "native-captures/old-format-bad.stdout",
+        "sha256": "3b77d917bbe3001da732ebdeb619f68fa82889336a9619ff53488d933501eda7"
+      },
+      "stderr": {
+        "path": "native-captures/old-format-bad.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "side_effects": {
+        "changed_paths": [
+          ".ruff_cache/.gitignore",
+          ".ruff_cache/CACHEDIR.TAG"
+        ],
+        "interpretation": "only actual Ruff cache effects; every other input file unchanged"
+      },
+      "stdin": "null"
+    },
+    {
+      "id": "old-query",
+      "evidence_kind": "actual-command",
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/codeguard-f5661d5",
+        "--version",
+        "--format=json"
+      ],
+      "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/native-query",
+      "exit": 0,
+      "before": {
+        "app.py": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4"
+      },
+      "after": {
+        "app.py": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4"
+      },
+      "family": "rust-native",
+      "source_pin": "f5661d51dd1b2629f3b87b726fb09a9060ce7958",
+      "stdout": {
+        "path": "native-captures/old-query.stdout",
+        "sha256": "07509e912027508689ca65c30e558a89aca52fc6e52ed15a336ab4d50838f740"
+      },
+      "stderr": {
+        "path": "native-captures/old-query.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "side_effects": {
+        "changed_paths": [],
+        "interpretation": "only actual Ruff cache effects; every other input file unchanged"
+      },
+      "stdin": "null"
+    },
+    {
+      "id": "old-usage",
+      "evidence_kind": "actual-command",
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/codeguard-f5661d5",
+        "lint",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/native-query",
+        "--unsupported-parity-flag"
+      ],
+      "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/native-query",
+      "exit": 2,
+      "before": {
+        "app.py": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4"
+      },
+      "after": {
+        "app.py": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4"
+      },
+      "family": "rust-native",
+      "source_pin": "f5661d51dd1b2629f3b87b726fb09a9060ce7958",
+      "stdout": {
+        "path": "native-captures/old-usage.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "native-captures/old-usage.stderr",
+        "sha256": "cb84a20fe7bce8695e7fbc02d6e9390f8dff99ec20446b639c4b5c7133139f12"
+      },
+      "side_effects": {
+        "changed_paths": [],
+        "interpretation": "only actual Ruff cache effects; every other input file unchanged"
+      },
+      "stdin": "null"
+    },
+    {
+      "id": "old-lint-clean",
+      "evidence_kind": "actual-command",
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/codeguard-f5661d5",
+        "lint",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/lint-clean",
+        "--file",
+        "app.py",
+        "--ruff-tool",
+        "/workspace/guard-toolchain/python-native/bin/ruff",
+        "--format=json",
+        "--timeout",
+        "10s"
+      ],
+      "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/lint-clean",
+      "exit": 3,
+      "before": {
+        "app.py": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4",
+        "ruff.toml": "9f8abaeb93816fc1c97cf1d9e130d0d53dd2744f046987763029965240a3eea5"
+      },
+      "after": {
+        "app.py": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4",
+        "ruff.toml": "9f8abaeb93816fc1c97cf1d9e130d0d53dd2744f046987763029965240a3eea5"
+      },
+      "family": "rust-native",
+      "source_pin": "f5661d51dd1b2629f3b87b726fb09a9060ce7958",
+      "stdout": {
+        "path": "native-captures/old-lint-clean.stdout",
+        "sha256": "1030fc598590e34651d23448c5f766ca1223f977c59ba57839ecc4a9b02f92b8"
+      },
+      "stderr": {
+        "path": "native-captures/old-lint-clean.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "side_effects": {
+        "changed_paths": [],
+        "interpretation": "only actual Ruff cache effects; every other input file unchanged"
+      },
+      "stdin": "null"
+    },
+    {
+      "id": "old-lint-bad",
+      "evidence_kind": "actual-command",
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/codeguard-f5661d5",
+        "lint",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/lint-bad",
+        "--file",
+        "app.py",
+        "--ruff-tool",
+        "/workspace/guard-toolchain/python-native/bin/ruff",
+        "--format=json",
+        "--timeout",
+        "10s"
+      ],
+      "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/lint-bad",
+      "exit": 3,
+      "before": {
+        "app.py": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+        "ruff.toml": "9f8abaeb93816fc1c97cf1d9e130d0d53dd2744f046987763029965240a3eea5"
+      },
+      "after": {
+        "app.py": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+        "ruff.toml": "9f8abaeb93816fc1c97cf1d9e130d0d53dd2744f046987763029965240a3eea5"
+      },
+      "family": "rust-native",
+      "source_pin": "f5661d51dd1b2629f3b87b726fb09a9060ce7958",
+      "stdout": {
+        "path": "native-captures/old-lint-bad.stdout",
+        "sha256": "880f1e74a6b08b41af27996eda185f1cd521145612d4e7b1b37117b0cf4b58af"
+      },
+      "stderr": {
+        "path": "native-captures/old-lint-bad.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "side_effects": {
+        "changed_paths": [],
+        "interpretation": "only actual Ruff cache effects; every other input file unchanged"
+      },
+      "stdin": "null"
+    },
+    {
+      "id": "old-lint-missing",
+      "evidence_kind": "actual-command",
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/codeguard-f5661d5",
+        "lint",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/lint-missing",
+        "--file",
+        "app.py",
+        "--ruff-tool",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/absent-ruff",
+        "--format=json",
+        "--timeout",
+        "10s"
+      ],
+      "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/lint-missing",
+      "exit": 3,
+      "before": {
+        "app.py": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+        "ruff.toml": "9f8abaeb93816fc1c97cf1d9e130d0d53dd2744f046987763029965240a3eea5"
+      },
+      "after": {
+        "app.py": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+        "ruff.toml": "9f8abaeb93816fc1c97cf1d9e130d0d53dd2744f046987763029965240a3eea5"
+      },
+      "family": "rust-native",
+      "source_pin": "f5661d51dd1b2629f3b87b726fb09a9060ce7958",
+      "stdout": {
+        "path": "native-captures/old-lint-missing.stdout",
+        "sha256": "9e00bf19e74b985d8fa9a33d7ae90aad530ba543a78eca9a595746e70e7bdcdd"
+      },
+      "stderr": {
+        "path": "native-captures/old-lint-missing.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "side_effects": {
+        "changed_paths": [],
+        "interpretation": "only actual Ruff cache effects; every other input file unchanged"
+      },
+      "stdin": "null"
+    },
+    {
+      "id": "old-lint-error",
+      "evidence_kind": "actual-command",
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/codeguard-f5661d5",
+        "lint",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/lint-error",
+        "--file",
+        "app.py",
+        "--ruff-tool",
+        "/workspace/guard-toolchain/python-native/bin/ruff",
+        "--format=json",
+        "--timeout",
+        "10s"
+      ],
+      "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/lint-error",
+      "exit": 3,
+      "before": {
+        "app.py": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+        "ruff.toml": "314fcdf37c595eee5c2bd1e1a16e46a2d71bf1e9f3c6129d06950bb747a8f306"
+      },
+      "after": {
+        "app.py": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+        "ruff.toml": "314fcdf37c595eee5c2bd1e1a16e46a2d71bf1e9f3c6129d06950bb747a8f306"
+      },
+      "family": "rust-native",
+      "source_pin": "f5661d51dd1b2629f3b87b726fb09a9060ce7958",
+      "stdout": {
+        "path": "native-captures/old-lint-error.stdout",
+        "sha256": "9b064b41583f219dd988a60e01b57aa643f837ceb02d5f5b4649eced6c5428e0"
+      },
+      "stderr": {
+        "path": "native-captures/old-lint-error.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "side_effects": {
+        "changed_paths": [],
+        "interpretation": "only actual Ruff cache effects; every other input file unchanged"
+      },
+      "stdin": "null"
+    },
+    {
+      "id": "old-io-error",
+      "evidence_kind": "actual-command",
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/codeguard-f5661d5",
+        "hook",
+        "execute",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/native-query",
+        "--format=json",
+        "--timeout",
+        "1s"
+      ],
+      "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/native-query",
+      "exit": 4,
+      "before": {
+        "app.py": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4"
+      },
+      "after": {
+        "app.py": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4"
+      },
+      "family": "rust-native",
+      "source_pin": "f5661d51dd1b2629f3b87b726fb09a9060ce7958",
+      "stdout": {
+        "path": "native-captures/old-io-error.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "native-captures/old-io-error.stderr",
+        "sha256": "83337cb89970cf15b6fc099d52617969a6c58872218bb5a7c62c0276ff222649"
+      },
+      "side_effects": {
+        "changed_paths": [],
+        "interpretation": "only actual Ruff cache effects; every other input file unchanged"
+      },
+      "stdin": "directory FD; real read EISDIR"
+    },
+    {
+      "id": "old-cancel",
+      "evidence_kind": "actual-command",
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-ruff-native-capture/codeguard-f5661d5",
+        "lint",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/native-cancel",
+        "--file",
+        "app.py",
+        "--ruff-tool",
+        "/workspace/guard-toolchain/python-native/bin/ruff",
+        "--format=json",
+        "--timeout",
+        "30s"
+      ],
+      "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/native-cancel",
+      "exit": 130,
+      "before": {
+        "app.py": "ca13c326263136e5539d18b4464d8c3277df2aacdb5120f37b7b8befbb5fbbd8",
+        "ruff.toml": "9f8abaeb93816fc1c97cf1d9e130d0d53dd2744f046987763029965240a3eea5"
+      },
+      "after": {
+        "app.py": "ca13c326263136e5539d18b4464d8c3277df2aacdb5120f37b7b8befbb5fbbd8",
+        "ruff.toml": "9f8abaeb93816fc1c97cf1d9e130d0d53dd2744f046987763029965240a3eea5"
+      },
+      "family": "rust-native",
+      "source_pin": "f5661d51dd1b2629f3b87b726fb09a9060ce7958",
+      "stdout": {
+        "path": "native-captures/old-cancel.stdout",
+        "sha256": "876fdca32e78bd33eac5eb881b99fecce6da8e8ed59d2f8bd1999dd0b93a864e"
+      },
+      "stderr": {
+        "path": "native-captures/old-cancel.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "side_effects": {
+        "changed_paths": [],
+        "interpretation": "only actual Ruff cache effects; every other input file unchanged"
+      },
+      "signal": "SIGINT after real Ruff check exec observed",
+      "process_trace": {
+        "path": "native-captures/old-cancel.process.trace",
+        "sha256": "78d426dbf2d43372646f989e92a29700a3b06294ad4e7d9f02b2f7a00d0fba88",
+        "observed_exec": [
+          "1920982 execve(\"/workspace/guard-toolchain/python-native/bin/ruff\", [\"/workspace/guard-toolchain/python-native/bin/ruff\", \"check\", \"--no-cache\", \"--output-format\", \"json\", \"/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/native-cancel/app.py\"], 0x564fcdb10d10 /* 0 vars */ <unfinished ...>"
+        ]
+      }
+    },
+    {
+      "id": "new-format-clean",
+      "evidence_kind": "actual-command",
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/bin/codeguard-ff4efa9",
+        "format",
+        "check",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/format-clean",
+        "--tool",
+        "ruff=/workspace/guard-toolchain/python-native/bin/ruff",
+        "--format=json"
+      ],
+      "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/format-clean",
+      "exit": 0,
+      "before": {
+        "app.py": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4"
+      },
+      "after": {
+        ".ruff_cache/.gitignore": "9e3a60f1e6ec4ae60215c11d54b171392745ec25e9dded433d5bd921363af316",
+        ".ruff_cache/0.16.8/7691332392886928061": "e06420636c9f560b9a62947298ddfbf43fca4119467cf57878c72874f3da24d9",
+        ".ruff_cache/CACHEDIR.TAG": "5953156d7e0c564a427251316eaf26f8870e6483ae2197f916b630e4f93e31ae",
+        "app.py": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4"
+      },
+      "family": "rust-native",
+      "source_pin": "ff4efa9a2083ab1cbd5820970c996c2cce4b773a",
+      "stdout": {
+        "path": "native-captures/new-format-clean.stdout",
+        "sha256": "65bb9daf1de7d1fd3c791e3b9bf61b014eef4bdf8412c978f9c2eec71ea3934c"
+      },
+      "stderr": {
+        "path": "native-captures/new-format-clean.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "side_effects": {
+        "changed_paths": [
+          ".ruff_cache/.gitignore",
+          ".ruff_cache/0.16.8/7691332392886928061",
+          ".ruff_cache/CACHEDIR.TAG"
+        ],
+        "interpretation": "only actual Ruff cache effects; every other input file unchanged"
+      },
+      "stdin": "null"
+    },
+    {
+      "id": "new-format-bad",
+      "evidence_kind": "actual-command",
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/bin/codeguard-ff4efa9",
+        "format",
+        "check",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/format-bad",
+        "--tool",
+        "ruff=/workspace/guard-toolchain/python-native/bin/ruff",
+        "--format=json"
+      ],
+      "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/format-bad",
+      "exit": 1,
+      "before": {
+        "app.py": "98752ee28d5484bdc2814fb70adb6a0b2fb31f6a9b8ee7ae81fd2fc9cf300b3b"
+      },
+      "after": {
+        ".ruff_cache/.gitignore": "9e3a60f1e6ec4ae60215c11d54b171392745ec25e9dded433d5bd921363af316",
+        ".ruff_cache/CACHEDIR.TAG": "5953156d7e0c564a427251316eaf26f8870e6483ae2197f916b630e4f93e31ae",
+        "app.py": "98752ee28d5484bdc2814fb70adb6a0b2fb31f6a9b8ee7ae81fd2fc9cf300b3b"
+      },
+      "family": "rust-native",
+      "source_pin": "ff4efa9a2083ab1cbd5820970c996c2cce4b773a",
+      "stdout": {
+        "path": "native-captures/new-format-bad.stdout",
+        "sha256": "b79a2861e58e896488d5479d8d9ef5da6eabc8a8167f17cb5c6a9d665ca59a40"
+      },
+      "stderr": {
+        "path": "native-captures/new-format-bad.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "side_effects": {
+        "changed_paths": [
+          ".ruff_cache/.gitignore",
+          ".ruff_cache/CACHEDIR.TAG"
+        ],
+        "interpretation": "only actual Ruff cache effects; every other input file unchanged"
+      },
+      "stdin": "null"
+    },
+    {
+      "id": "new-query",
+      "evidence_kind": "actual-command",
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/bin/codeguard-ff4efa9",
+        "--version",
+        "--format=json"
+      ],
+      "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/native-query",
+      "exit": 0,
+      "before": {
+        "app.py": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4"
+      },
+      "after": {
+        "app.py": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4"
+      },
+      "family": "rust-native",
+      "source_pin": "ff4efa9a2083ab1cbd5820970c996c2cce4b773a",
+      "stdout": {
+        "path": "native-captures/new-query.stdout",
+        "sha256": "07509e912027508689ca65c30e558a89aca52fc6e52ed15a336ab4d50838f740"
+      },
+      "stderr": {
+        "path": "native-captures/new-query.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "side_effects": {
+        "changed_paths": [],
+        "interpretation": "only actual Ruff cache effects; every other input file unchanged"
+      },
+      "stdin": "null"
+    },
+    {
+      "id": "new-usage",
+      "evidence_kind": "actual-command",
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/bin/codeguard-ff4efa9",
+        "lint",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/native-query",
+        "--unsupported-parity-flag"
+      ],
+      "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/native-query",
+      "exit": 2,
+      "before": {
+        "app.py": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4"
+      },
+      "after": {
+        "app.py": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4"
+      },
+      "family": "rust-native",
+      "source_pin": "ff4efa9a2083ab1cbd5820970c996c2cce4b773a",
+      "stdout": {
+        "path": "native-captures/new-usage.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "native-captures/new-usage.stderr",
+        "sha256": "cb84a20fe7bce8695e7fbc02d6e9390f8dff99ec20446b639c4b5c7133139f12"
+      },
+      "side_effects": {
+        "changed_paths": [],
+        "interpretation": "only actual Ruff cache effects; every other input file unchanged"
+      },
+      "stdin": "null"
+    },
+    {
+      "id": "new-lint-clean",
+      "evidence_kind": "actual-command",
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/bin/codeguard-ff4efa9",
+        "lint",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/lint-clean",
+        "--file",
+        "app.py",
+        "--ruff-tool",
+        "/workspace/guard-toolchain/python-native/bin/ruff",
+        "--format=json",
+        "--timeout",
+        "10s"
+      ],
+      "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/lint-clean",
+      "exit": 3,
+      "before": {
+        "app.py": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4",
+        "ruff.toml": "9f8abaeb93816fc1c97cf1d9e130d0d53dd2744f046987763029965240a3eea5"
+      },
+      "after": {
+        "app.py": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4",
+        "ruff.toml": "9f8abaeb93816fc1c97cf1d9e130d0d53dd2744f046987763029965240a3eea5"
+      },
+      "family": "rust-native",
+      "source_pin": "ff4efa9a2083ab1cbd5820970c996c2cce4b773a",
+      "stdout": {
+        "path": "native-captures/new-lint-clean.stdout",
+        "sha256": "c60d9ed58d98b4d7b3374b358bb8679d3eb4466f4b9d27ef408b5bd16404c2f3"
+      },
+      "stderr": {
+        "path": "native-captures/new-lint-clean.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "side_effects": {
+        "changed_paths": [],
+        "interpretation": "only actual Ruff cache effects; every other input file unchanged"
+      },
+      "stdin": "null"
+    },
+    {
+      "id": "new-lint-bad",
+      "evidence_kind": "actual-command",
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/bin/codeguard-ff4efa9",
+        "lint",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/lint-bad",
+        "--file",
+        "app.py",
+        "--ruff-tool",
+        "/workspace/guard-toolchain/python-native/bin/ruff",
+        "--format=json",
+        "--timeout",
+        "10s"
+      ],
+      "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/lint-bad",
+      "exit": 3,
+      "before": {
+        "app.py": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+        "ruff.toml": "9f8abaeb93816fc1c97cf1d9e130d0d53dd2744f046987763029965240a3eea5"
+      },
+      "after": {
+        "app.py": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+        "ruff.toml": "9f8abaeb93816fc1c97cf1d9e130d0d53dd2744f046987763029965240a3eea5"
+      },
+      "family": "rust-native",
+      "source_pin": "ff4efa9a2083ab1cbd5820970c996c2cce4b773a",
+      "stdout": {
+        "path": "native-captures/new-lint-bad.stdout",
+        "sha256": "1b8db85a83c21581afbedfc3ed6decfbc3e8fbfb3d8ef9e5d6396c67e1a20b71"
+      },
+      "stderr": {
+        "path": "native-captures/new-lint-bad.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "side_effects": {
+        "changed_paths": [],
+        "interpretation": "only actual Ruff cache effects; every other input file unchanged"
+      },
+      "stdin": "null"
+    },
+    {
+      "id": "new-lint-missing",
+      "evidence_kind": "actual-command",
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/bin/codeguard-ff4efa9",
+        "lint",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/lint-missing",
+        "--file",
+        "app.py",
+        "--ruff-tool",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/absent-ruff",
+        "--format=json",
+        "--timeout",
+        "10s"
+      ],
+      "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/lint-missing",
+      "exit": 3,
+      "before": {
+        "app.py": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+        "ruff.toml": "9f8abaeb93816fc1c97cf1d9e130d0d53dd2744f046987763029965240a3eea5"
+      },
+      "after": {
+        "app.py": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+        "ruff.toml": "9f8abaeb93816fc1c97cf1d9e130d0d53dd2744f046987763029965240a3eea5"
+      },
+      "family": "rust-native",
+      "source_pin": "ff4efa9a2083ab1cbd5820970c996c2cce4b773a",
+      "stdout": {
+        "path": "native-captures/new-lint-missing.stdout",
+        "sha256": "1cdeaa8a2865a3fdcebf6020e8cf75d73c3ce07deb5c001be3436b1856ae9531"
+      },
+      "stderr": {
+        "path": "native-captures/new-lint-missing.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "side_effects": {
+        "changed_paths": [],
+        "interpretation": "only actual Ruff cache effects; every other input file unchanged"
+      },
+      "stdin": "null"
+    },
+    {
+      "id": "new-lint-error",
+      "evidence_kind": "actual-command",
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/bin/codeguard-ff4efa9",
+        "lint",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/lint-error",
+        "--file",
+        "app.py",
+        "--ruff-tool",
+        "/workspace/guard-toolchain/python-native/bin/ruff",
+        "--format=json",
+        "--timeout",
+        "10s"
+      ],
+      "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/lint-error",
+      "exit": 3,
+      "before": {
+        "app.py": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+        "ruff.toml": "314fcdf37c595eee5c2bd1e1a16e46a2d71bf1e9f3c6129d06950bb747a8f306"
+      },
+      "after": {
+        "app.py": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+        "ruff.toml": "314fcdf37c595eee5c2bd1e1a16e46a2d71bf1e9f3c6129d06950bb747a8f306"
+      },
+      "family": "rust-native",
+      "source_pin": "ff4efa9a2083ab1cbd5820970c996c2cce4b773a",
+      "stdout": {
+        "path": "native-captures/new-lint-error.stdout",
+        "sha256": "5a6447ea0c7acdd36ca6b5b34ad501e3928d8099d3a325f123ff50b8e5dec369"
+      },
+      "stderr": {
+        "path": "native-captures/new-lint-error.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "side_effects": {
+        "changed_paths": [],
+        "interpretation": "only actual Ruff cache effects; every other input file unchanged"
+      },
+      "stdin": "null"
+    },
+    {
+      "id": "new-io-error",
+      "evidence_kind": "actual-command",
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/bin/codeguard-ff4efa9",
+        "hook",
+        "execute",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/native-query",
+        "--format=json",
+        "--timeout",
+        "1s"
+      ],
+      "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/native-query",
+      "exit": 4,
+      "before": {
+        "app.py": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4"
+      },
+      "after": {
+        "app.py": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4"
+      },
+      "family": "rust-native",
+      "source_pin": "ff4efa9a2083ab1cbd5820970c996c2cce4b773a",
+      "stdout": {
+        "path": "native-captures/new-io-error.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "native-captures/new-io-error.stderr",
+        "sha256": "83337cb89970cf15b6fc099d52617969a6c58872218bb5a7c62c0276ff222649"
+      },
+      "side_effects": {
+        "changed_paths": [],
+        "interpretation": "only actual Ruff cache effects; every other input file unchanged"
+      },
+      "stdin": "directory FD; real read EISDIR"
+    },
+    {
+      "id": "new-cancel",
+      "evidence_kind": "actual-command",
+      "argv": [
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/bin/codeguard-ff4efa9",
+        "lint",
+        "python",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/native-cancel",
+        "--file",
+        "app.py",
+        "--ruff-tool",
+        "/workspace/guard-toolchain/python-native/bin/ruff",
+        "--format=json",
+        "--timeout",
+        "30s"
+      ],
+      "cwd": "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/native-cancel",
+      "exit": 130,
+      "before": {
+        "app.py": "ca13c326263136e5539d18b4464d8c3277df2aacdb5120f37b7b8befbb5fbbd8",
+        "ruff.toml": "9f8abaeb93816fc1c97cf1d9e130d0d53dd2744f046987763029965240a3eea5"
+      },
+      "after": {
+        "app.py": "ca13c326263136e5539d18b4464d8c3277df2aacdb5120f37b7b8befbb5fbbd8",
+        "ruff.toml": "9f8abaeb93816fc1c97cf1d9e130d0d53dd2744f046987763029965240a3eea5"
+      },
+      "family": "rust-native",
+      "source_pin": "ff4efa9a2083ab1cbd5820970c996c2cce4b773a",
+      "stdout": {
+        "path": "native-captures/new-cancel.stdout",
+        "sha256": "8d9450032d4cdc7bb0b3605b07f6435ef1d1408436a2eca001d52c7c6b134eab"
+      },
+      "stderr": {
+        "path": "native-captures/new-cancel.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "side_effects": {
+        "changed_paths": [],
+        "interpretation": "only actual Ruff cache effects; every other input file unchanged"
+      },
+      "signal": "SIGINT after real Ruff check exec observed",
+      "process_trace": {
+        "path": "native-captures/new-cancel.process.trace",
+        "sha256": "781eeb310450014cbc07b00cdb85140db85e15283d808958f1ff7db521d0b540",
+        "observed_exec": [
+          "1921024 execve(\"/workspace/guard-toolchain/python-native/bin/ruff\", [\"/workspace/guard-toolchain/python-native/bin/ruff\", \"check\", \"--no-cache\", \"--output-format\", \"json\", \"/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/native-cancel/app.py\"], 0x558e59a4ad10 /* 0 vars */"
+        ]
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "old": "old-format-clean",
+      "new": "new-format-clean",
+      "json": true,
+      "variable_fields": [
+        "elapsed_ms"
+      ],
+      "explanation": "run_id is actual per-execution identity; elapsed_ms is measured native duration; adapter_sha256 is actual executable identity, never findings or qualification"
+    },
+    {
+      "old": "old-format-bad",
+      "new": "new-format-bad",
+      "json": true,
+      "variable_fields": [
+        "elapsed_ms"
+      ],
+      "explanation": "run_id is actual per-execution identity; elapsed_ms is measured native duration; adapter_sha256 is actual executable identity, never findings or qualification"
+    },
+    {
+      "old": "old-query",
+      "new": "new-query",
+      "json": true,
+      "variable_fields": [],
+      "explanation": "run_id is actual per-execution identity; elapsed_ms is measured native duration; adapter_sha256 is actual executable identity, never findings or qualification"
+    },
+    {
+      "old": "old-usage",
+      "new": "new-usage",
+      "json": false,
+      "variable_fields": [],
+      "explanation": "run_id is actual per-execution identity; elapsed_ms is measured native duration; adapter_sha256 is actual executable identity, never findings or qualification"
+    },
+    {
+      "old": "old-lint-clean",
+      "new": "new-lint-clean",
+      "json": true,
+      "variable_fields": [
+        "run_id"
+      ],
+      "explanation": "run_id is actual per-execution identity; elapsed_ms is measured native duration; adapter_sha256 is actual executable identity, never findings or qualification"
+    },
+    {
+      "old": "old-lint-bad",
+      "new": "new-lint-bad",
+      "json": true,
+      "variable_fields": [
+        "run_id",
+        "adapter_sha256"
+      ],
+      "explanation": "run_id is actual per-execution identity; elapsed_ms is measured native duration; adapter_sha256 is actual executable identity, never findings or qualification"
+    },
+    {
+      "old": "old-lint-missing",
+      "new": "new-lint-missing",
+      "json": true,
+      "variable_fields": [
+        "run_id"
+      ],
+      "explanation": "run_id is actual per-execution identity; elapsed_ms is measured native duration; adapter_sha256 is actual executable identity, never findings or qualification"
+    },
+    {
+      "old": "old-lint-error",
+      "new": "new-lint-error",
+      "json": true,
+      "variable_fields": [
+        "run_id"
+      ],
+      "explanation": "run_id is actual per-execution identity; elapsed_ms is measured native duration; adapter_sha256 is actual executable identity, never findings or qualification"
+    },
+    {
+      "old": "old-io-error",
+      "new": "new-io-error",
+      "json": false,
+      "variable_fields": [],
+      "explanation": "run_id is actual per-execution identity; elapsed_ms is measured native duration; adapter_sha256 is actual executable identity, never findings or qualification"
+    },
+    {
+      "old": "old-cancel",
+      "new": "new-cancel",
+      "json": true,
+      "variable_fields": [
+        "run_id"
+      ],
+      "explanation": "run_id is actual per-execution identity; elapsed_ms is measured native duration; adapter_sha256 is actual executable identity, never findings or qualification"
+    }
+  ],
+  "limits": [
+    "format0/1 cover formatting only; local_unverified is preserved",
+    "query0 grants no delivery decision",
+    "Ruff native lint3 is never upgraded to passed",
+    "historical plugin check/CVE2 differs from Docker mixed1 and Rust usage2",
+    "engine opt-in command codes are outside this native matrix",
+    "npm audit result is a dated actual generated-project capture, not a permanent vulnerability database"
+  ],
+  "direct_tool_captures": [
+    {
+      "id": "direct-ruff-lint-clean",
+      "argv": [
+        "/workspace/guard-toolchain/python-native/bin/ruff",
+        "check",
+        "--no-cache",
+        "--output-format=json",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/lint-clean/app.py"
+      ],
+      "exit": 0,
+      "source_before": {
+        "app.py": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4",
+        "ruff.toml": "9f8abaeb93816fc1c97cf1d9e130d0d53dd2744f046987763029965240a3eea5"
+      },
+      "source_after": {
+        "app.py": "9e26bf369911c45c243c684147b23fc9e1dcfcf257d299a1c632016a6fcd33f4",
+        "ruff.toml": "9f8abaeb93816fc1c97cf1d9e130d0d53dd2744f046987763029965240a3eea5"
+      },
+      "stdout": {
+        "path": "native-captures/direct-ruff-lint-clean.stdout",
+        "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "stderr": {
+        "path": "native-captures/direct-ruff-lint-clean.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "id": "direct-ruff-lint-bad",
+      "argv": [
+        "/workspace/guard-toolchain/python-native/bin/ruff",
+        "check",
+        "--no-cache",
+        "--output-format=json",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/lint-bad/app.py"
+      ],
+      "exit": 1,
+      "source_before": {
+        "app.py": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+        "ruff.toml": "9f8abaeb93816fc1c97cf1d9e130d0d53dd2744f046987763029965240a3eea5"
+      },
+      "source_after": {
+        "app.py": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+        "ruff.toml": "9f8abaeb93816fc1c97cf1d9e130d0d53dd2744f046987763029965240a3eea5"
+      },
+      "stdout": {
+        "path": "native-captures/direct-ruff-lint-bad.stdout",
+        "sha256": "a3fbaf3321f2883d5e60301d3211660d9cf2826d0b5d5e31293d22ecc045a32b"
+      },
+      "stderr": {
+        "path": "native-captures/direct-ruff-lint-bad.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "id": "direct-ruff-lint-error",
+      "argv": [
+        "/workspace/guard-toolchain/python-native/bin/ruff",
+        "check",
+        "--no-cache",
+        "--output-format=json",
+        "/workspace/guard-implementation-ledger/codeguard-native-parity-capture/projects/lint-error/app.py"
+      ],
+      "exit": 2,
+      "source_before": {
+        "app.py": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+        "ruff.toml": "314fcdf37c595eee5c2bd1e1a16e46a2d71bf1e9f3c6129d06950bb747a8f306"
+      },
+      "source_after": {
+        "app.py": "3727adff524e0616022eadd8f4af21a0778b29fc4c77bdfefd1afce2cbf5e4b7",
+        "ruff.toml": "314fcdf37c595eee5c2bd1e1a16e46a2d71bf1e9f3c6129d06950bb747a8f306"
+      },
+      "stdout": {
+        "path": "native-captures/direct-ruff-lint-error.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "native-captures/direct-ruff-lint-error.stderr",
+        "sha256": "66b113431352dd2aa4a1211b5ef92b049060b1602030af096dac95f7cdcfa89e"
+      }
+    }
+  ]
+}
