@@ -2,6 +2,18 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
+## CodeGuard in the Guard architecture
+
+**CodeGuard** is the code-quality and native-checker specialist. GuardEngine owns the shared contract/rule/evidence protocol; ArchGuard owns architecture; TestGuard owns required behavior and test adequacy; GitGuard owns branch/merge safety; SpecGuard owns requirement baselines; FlowGuard owns lifecycle approvals. Existing CodeGuard CLI commands and its repair task workbench remain authoritative for their implemented scope.
+
+- [Independent CodeGuard architecture and cross-Guard responsibilities](docs/architecture.md)
+- [GuardEngine integration technical design, migration and validation plan](docs/technical-design.md)
+- [Original detailed implementation architecture](docs/Codeguard-Architecture.md)
+- [Original implementation technical manual](docs/Codeguard-Technical-Design.md)
+
+**Maturity:** the CodeGuard Rust workspace already implements bounded checks and repair workflows; complete GuardEngine interoperability, trusted CI authorization and all language combinations remain future work. The new documents do not replace existing OpenSpec task ownership.
+
+
 **A Rust CLI for native static checks and actionable repair workflows.**
 
 Codeguard helps developers and coding agents discover existing quality configuration, run selected native checkers, and turn results into durable repair tasks. Rust owns orchestration and interpretation; Maven, P3C, Checkstyle, Javadoc, Ruff, Cargo, ESLint, and other native tools remain responsible for their checks.
