@@ -2,7 +2,7 @@
 //! Capabilities isolate delegated API sessions, not hostile processes sharing the owner's UID.
 use super::{AuditError, AuditEvidence, AuditStore, Receipt, digest, hex};
 use crate::guard_integration::{
-    consumer::{self, Consumption, ExpectedConsumption},
+    consumer::{self, Consumption, ExpectedConsumption, PreparedConsumption},
     envelope::EnvelopeOutput,
 };
 use codeguard_runtime::private_artifact_store::{PrivateArtifactStore, RootLease, StoreLimits};
@@ -379,6 +379,22 @@ impl AuditAccess {
         let lease = self.controls.lease()?;
         let output = self.load(&lease, receipt, now)?;
         consumer::consume(&output, expected, provider, now, cause)
+            .map_err(|_| AccessError::Consumption)
+    }
+    pub(super) fn consume_prepared(
+        &self,
+        raw: &RawAccess,
+        receipt: &Receipt,
+        prepared: &PreparedConsumption,
+        provider: &dyn AuthorityProvider,
+        now: i64,
+        cause: Option<&str>,
+    ) -> Result<Consumption, AccessError> {
+        self.authorize(&raw.0)?;
+        let lease = self.controls.lease()?;
+        let output = self.load(&lease, receipt, now)?;
+        prepared
+            .consume(&output, provider, now, cause)
             .map_err(|_| AccessError::Consumption)
     }
     /// Tombstone is durable before any leaf deletion. A deletion failure leaves it in force.

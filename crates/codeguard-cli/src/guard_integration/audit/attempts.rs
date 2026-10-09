@@ -5,7 +5,7 @@ use super::{
     digest, valid_digest,
 };
 use crate::guard_integration::{
-    consumer::{self, Consumption, ExpectedConsumption},
+    consumer::{self, Consumption, ExpectedConsumption, PreparedConsumption},
     envelope::EnvelopeOutput,
 };
 pub use guardengine::integration::attempt_store::AppendOutcome as ImportOutcome;
@@ -438,6 +438,32 @@ impl<'a> AttemptHistory<'a> {
         now: i64,
         cause: Option<&str>,
     ) -> Result<Consumption, AttemptError> {
+        let receipt = self.current_receipt(raw, expected, cause)?;
+        Ok(self
+            .access
+            .consume(raw, receipt, expected, provider, now, cause)?)
+    }
+    /// Same current-record and retained-byte checks with independently frozen baseline authority.
+    /// The caller's exclusive borrow/Mutex covers this complete observation, not a later grant.
+    pub fn consume_current_prepared(
+        &self,
+        raw: &RawAccess,
+        prepared: &PreparedConsumption,
+        provider: &dyn AuthorityProvider,
+        now: i64,
+        cause: Option<&str>,
+    ) -> Result<Consumption, AttemptError> {
+        let receipt = self.current_receipt(raw, prepared.expected(), cause)?;
+        Ok(self
+            .access
+            .consume_prepared(raw, receipt, prepared, provider, now, cause)?)
+    }
+    fn current_receipt(
+        &self,
+        raw: &RawAccess,
+        expected: &ExpectedConsumption,
+        cause: Option<&str>,
+    ) -> Result<&Receipt, AttemptError> {
         self.access.check_raw(raw)?;
         consumer::serialized_size(expected).map_err(|_| AttemptError::Budget)?;
         if cause.is_some_and(|s| s.len() > 16_384) {
@@ -465,9 +491,7 @@ impl<'a> AttemptHistory<'a> {
             .imported
             .get(&current.run_id)
             .ok_or(AttemptError::Binding)?;
-        Ok(self
-            .access
-            .consume(raw, &imported.receipt, expected, provider, now, cause)?)
+        Ok(&imported.receipt)
     }
 }
 fn observation(record: &AttemptRecord) -> AttemptObservation<'_> {

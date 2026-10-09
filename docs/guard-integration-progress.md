@@ -225,3 +225,15 @@ codeguard-baseline-trust-{red,green}.log. No roadmap checkbox changed; this is a
 controller-supplied authentication port, not a production identity installation.
 
 Root independently accepted task3.2 at0d6e0ec after19 fixed-source tests and exact four-file diff verification. Task register21/26. No native edits, production issuer deployment or durable baseline-store acceptance implied; task4.3 remains pending.
+
+## Real retained queue composition (pending independent review)
+
+Task4.3 now has a four-candidate joint fixture using untouched independently
+captured native reports/IDs and exact original Git objects. A small
+consume_current_prepared addition composes existing AttemptHistory, AuditAccess
+and PreparedConsumption, without another storage or authority framework. New
+fixture baseline projections are explicitly separate from original native bytes.
+The new joint test and existing concurrency/trust regressions cover A/B parallel
+consumption, current approval revocation, M1 late rejection after M2/newbase,
+cross-context refusal, store expiry and immutable history. Native functionality
+and task4.3 checkbox remain unchanged pending review.

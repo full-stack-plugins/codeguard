@@ -127,3 +127,14 @@ and inability to repair real technical BLOCK or partial output. Existing approva
 and freshness suites retain null-baseline, failed/cancelled and attachment coverage.
 Task3.2 registration awaits independent review of this local port; production
 issuer deployment is not claimed or required to test the interface semantics.
+
+## Current stored baseline consumption
+
+`AttemptHistory::consume_current_prepared` composes the frozen baseline context
+with the existing current-record check and retained access/TTL/byte validation.
+It accepts only the current full binding/run/work/envelope and calls the prepared
+consumer over freshly loaded actual artifacts under the existing store lease.
+No new cache or identity service is installed. A controller-owned Mutex may cover
+this complete operation across threads, as in the real-queue fixture. The earlier
+free consumers still reject non-null baselines. See
+`tests/acceptance/guard-integration-joint-queue.md` for the exact local scope.

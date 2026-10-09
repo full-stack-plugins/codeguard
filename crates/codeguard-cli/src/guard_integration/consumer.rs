@@ -37,6 +37,9 @@ pub struct PreparedConsumption {
     baseline: Option<BaselineRequirement>,
 }
 impl PreparedConsumption {
+    pub(super) fn expected(&self) -> &ExpectedConsumption {
+        &self.expected
+    }
     pub fn freeze(
         expected: &ExpectedConsumption,
         baseline: Option<&BaselineRequirement>,
@@ -125,12 +128,12 @@ impl PreparedConsumption {
                 })
                 .and_then(|record| validate_approval_record(&record, &b.policy, &b.purpose, now));
             // Baseline approval can only withdraw eligibility, never repair technical failure.
-            if consumed.eligibility.eligible
-                && let Err(code) = validation
-            {
-                consumed.eligibility.eligible = false;
-                consumed.eligibility.code = code;
-                consumed.eligibility.audit.code = code;
+            if consumed.eligibility.eligible {
+                if let Err(code) = validation {
+                    consumed.eligibility.eligible = false;
+                    consumed.eligibility.code = code;
+                    consumed.eligibility.audit.code = code;
+                }
             }
         }
         consumed.freshness_key = digest(
