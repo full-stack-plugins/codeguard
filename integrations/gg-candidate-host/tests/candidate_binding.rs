@@ -179,6 +179,127 @@ fn pin() -> codeguard_gg_candidate_host::ProducerPin {
             .into(),
     }
 }
+
+#[test]
+#[ignore = "explicit actual native pins, credential sentinel and capture directory required"]
+fn actual_local_host_reentry_cancel_and_credential_boundary() {
+    use codeguard_runtime::{ProcessSpec, Termination, run_process};
+    use sha2::{Digest, Sha256};
+    use std::sync::atomic::AtomicBool;
+    let sentinel = std::env::var("CODEGUARD_HOST_CREDENTIAL_SENTINEL")
+        .expect("explicit fake credential sentinel");
+    assert!(sentinel.len() >= 16);
+    let output_dir = std::path::PathBuf::from(
+        std::env::var_os("CODEGUARD_CANDIDATE_CAPTURE_DIR").expect("capture directory"),
+    );
+    assert!(output_dir.is_dir());
+    let pin = pin();
+    let (root, expected) = fixture("sha1");
+    let before = state(root.path());
+    let cancel = AtomicBool::new(false);
+
+    // Mechanism probe: the same runtime and empty environment used by capture.
+    // Native output absence alone would not prove that credentials were not inherited.
+    let env = run_process(
+        &ProcessSpec {
+            executable: "/usr/bin/env".into(),
+            args: vec![],
+            cwd: root.path().into(),
+            env: Default::default(),
+            stdin: None,
+            deadline: std::time::Instant::now() + std::time::Duration::from_secs(5),
+            output_limit_bytes: 4096,
+        },
+        &cancel,
+    );
+    assert_eq!(env.termination, Termination::Exited(0));
+    assert!(env.stdout.is_empty());
+    assert!(env.stderr.is_empty());
+
+    let first = PreparedCandidate::from_bytes(&expected, root.path(), "app.py")
+        .unwrap()
+        .capture(&pin, &cancel)
+        .unwrap();
+    let retained_raw = first.raw_bytes().to_vec();
+    let first_projection = first
+        .project(&expected, &mapping(), &contract("enforce"))
+        .unwrap();
+    assert_eq!(
+        first_projection.envelope().decision,
+        Some(guardengine::Decision::Allow)
+    );
+    assert_eq!(first.native_exit(), 3);
+    assert_eq!(before, state(root.path()));
+
+    // Cancellation cannot return a capture or poison a subsequent independent call.
+    let cancelled = PreparedCandidate::from_bytes(&expected, root.path(), "app.py")
+        .unwrap()
+        .capture(&pin, &AtomicBool::new(true));
+    assert!(cancelled.is_err());
+    assert_eq!(before, state(root.path()));
+    let second = PreparedCandidate::from_bytes(&expected, root.path(), "app.py")
+        .unwrap()
+        .capture(&pin, &cancel)
+        .unwrap();
+    let second_projection = second
+        .project(&expected, &mapping(), &contract("enforce"))
+        .unwrap();
+    assert_eq!(second.native_exit(), 3);
+    assert_eq!(
+        second_projection.envelope().decision,
+        Some(guardengine::Decision::Allow)
+    );
+    assert_ne!(first.provenance()["runId"], second.provenance()["runId"]);
+    assert_eq!(
+        first.provenance()["candidate"],
+        second.provenance()["candidate"]
+    );
+    assert_eq!(retained_raw, first.raw_bytes());
+    assert!(
+        first
+            .project(&expected, &mapping(), &contract("enforce"))
+            .is_ok()
+    );
+    for capture in [&first, &second] {
+        assert_eq!(capture.provenance()["authorization"], "not-evaluated");
+        assert!(!String::from_utf8_lossy(capture.raw_bytes()).contains(&sentinel));
+        assert!(!capture.provenance().to_string().contains(&sentinel));
+    }
+    assert_eq!(before, state(root.path()));
+    export(
+        "host-first",
+        &first,
+        &expected,
+        &first_projection,
+        root.path(),
+    );
+    export(
+        "host-reentry",
+        &second,
+        &expected,
+        &second_projection,
+        root.path(),
+    );
+    assert_eq!(before, state(root.path()));
+    let summary = serde_json::json!({
+        "host": "codeguard-gg-candidate-host/0.1.0", "profile": "local-trusted-executor",
+        "nativeExits": [first.native_exit(), second.native_exit()],
+        "runIds": [first.provenance()["runId"], second.provenance()["runId"]],
+        "rawSha256": [format!("{:x}", Sha256::digest(first.raw_bytes())), format!("{:x}", Sha256::digest(second.raw_bytes()))],
+        "preCancelledRejected": true, "reentryAfterCancel": true,
+        "runtimeEmptyEnvironment": true, "credentialSentinelNotExported": true,
+        "sourceRefsIndexBytesUnchanged": true, "sourceFileCount": before.len(),
+        "candidateSha256": format!("{:x}", Sha256::digest(&expected)),
+        "authorization": "not-evaluated", "productionAuthenticated": false,
+        "sdkSingleDomainConsumptionClaimed": false
+    });
+    let mut out = std::fs::OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(output_dir.join("host-summary.json"))
+        .unwrap();
+    std::io::Write::write_all(&mut out, &serde_json::to_vec_pretty(&summary).unwrap()).unwrap();
+}
 fn mapping() -> codeguard_cli::guard_integration::projection::ProtectedMapping {
     codeguard_cli::guard_integration::projection::ProtectedMapping::parse(br#"{"version":"codeguard.mapping/v1alpha1","entries":[{"source":{"kind":"finding","tool_id":"ruff","native_rule_id":"F401"},"rule_id":"f401"},{"source":{"kind":"gap","detail":"ruff_f401_scope_incomplete"},"rule_id":"f401"}]}"#).unwrap()
 }

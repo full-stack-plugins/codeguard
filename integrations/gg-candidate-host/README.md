@@ -64,3 +64,10 @@ classified, never accepted as defaults. All successes still call the unchanged
 `PreparedCandidate::from_bytes` with original bytes and perform full candidate,
 clean-tree, exact configuration, target and source checks. No uploaded digest or
 new caller boolean can create a capture or qualified result.
+
+The later task 4.4 [local host acceptance](../../tests/acceptance/guard-integration-host.md)
+records an actually executed 0.1.0 library profile with separate dependency pins,
+sequential reentry, pre-cancellation, empty child environment and source refs/index
+byte parity. Its targeted ignored test must be explicitly run; a skipped test is
+not compatibility evidence. The two-domain host artifacts remain distinct from
+the separate SDK single-domain authenticated consumer.
