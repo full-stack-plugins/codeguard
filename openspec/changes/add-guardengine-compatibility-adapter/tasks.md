@@ -34,7 +34,7 @@
 - [x] 1.2 在拟新增 `docs/adr/guard-integration-boundary.md` 决定纯模块+SDK或受限进程的调用边界、明确新opt-in入口名和参数；通过接口fixture断言未选入口无额外I/O/进程，所选接口只消费已有工件，固定GE源码revision和未来发布门。追踪「Native interfaces remain unchanged」「Rollout preserves native ownership and rollback」。
 - [x] 1.3 在拟新增 `schemas/guard-integration-invocation.schema.json` 和 `guard_integration/profile.rs` 固定InvocationDescriptor/CapabilityProfile字段、独立版本及允许flags；`guard_integration_profile.rs` 验证未知版本/字段/命令组合全部拒绝，区分包版本、native schema、mapping和wire版本。追踪「Native evidence readers reject ambiguity」。
 - [x] 1.4 在拟新增 `tests/fixtures/guard-integration/qualification.json` 建立所选native切片到旧任务/真实验收的映射；`guard_integration_scope.rs` 测试WASM、zero findings、task resolved均不能升级complete；无可证明切片时所有profile保持unqualified仍可进入partial开发。追踪「Complete projection requires proven native scope」。
-- [ ] 1.5 在拟新增 `schemas/guard-integration-transport-error.schema.json` 与 `guard_integration/envelope.rs` 固定前置诊断和绑定后结果接口，等待GE-CONTRACT冻结；`guard_integration_binding.rs` 至少覆盖坏参数、未知repo、缺candidate/base、未冻结scope四类无信封反例。追踪「Binding precedes envelope publication」。
+- [x] 1.5 在拟新增 `schemas/guard-integration-transport-error.schema.json` 与 `guard_integration/envelope.rs` 固定前置诊断和绑定后结果接口，等待GE-CONTRACT冻结；`guard_integration_binding.rs` 至少覆盖坏参数、未知repo、缺candidate/base、未冻结scope四类无信封反例。追踪「Binding precedes envelope publication」。
 - [x] 1.6 在拟新增 `tests/fixtures/guard-integration/relations.json` 和 `guard_integration/projection.rs` 定义受保护mapping词表、每个必需finding/缺口的精确规则覆盖及unsupported输出；`guard_integration_projection.rs` 对每条映射提供正反例，拒绝count/通配符/未映射项，无假ALLOW。追踪「Projection uses exact supported engine relations」。
 
 ## 2. C1/C2 严格读取与显式投影（依赖 GE-CONTRACT、GE-ADAPTER 和所选 native 切片）
