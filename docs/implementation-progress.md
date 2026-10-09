@@ -51,3 +51,12 @@ All rows below remain open. Prior local work/evidence is preserved in tasks.md; 
 | 15.5 | Per-build-ecosystem actual vulnerability graphs/source freshness/failures and fix/recheck. |
 | 15.6 | Java observed bad/fixed/bad stable task now proven; trusted close/reopen and installed dialogue still missing. |
 | 15.7 | Independent four-capability production matrix including native/platform/host/failure/performance proof. |
+
+
+## Reviewed reader, scope and shadow closure
+
+Tasks 1.6, 2.1, 2.2 and 2.6 accepted at `9202c9107103570f330558187495caf1cee5c77f` for the registered local legacy reader and narrow Ruff F401 profiles. Independent verification passed 47 focused tests and an additional exact-byte shadow probe. Each frozen finding/gap mapping has positive and negative coverage; missing source/target/tool/config/rule evidence cannot be rescued by unrelated successful work. Complete/truncated/duplicate/oversized/export-failed/stale native inputs remain distinguished.
+
+The reviewer reproduced actual F401/native exit3/export failure using the preserved native binary and verified the pre-existing user output file remained intact. The whole check_feedback aggregate stays unsupported; no nested extraction or schema relabelling manufactures support. Read-only shadow comparison requires exact raw bytes against a sealed projection, recomputes GE reports, and produces no envelope. Native-only input has no engine decision; ten repeated projections preserve semantic facts/reports.
+
+All 3190 mature baseline paths remain: 3182 byte-identical, eight previously reviewed additive modifications, zero deletions. This is neither all-57-language native qualification nor authenticated repository identity. Task 1.5 remains partial at this pin. Evidence: cloud ledger `codeguard-reader-shadow-independent-review.md` and `codeguard-closure-preservation/`.

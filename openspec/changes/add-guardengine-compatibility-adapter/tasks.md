@@ -35,18 +35,18 @@
 - [x] 1.3 在拟新增 `schemas/guard-integration-invocation.schema.json` 和 `guard_integration/profile.rs` 固定InvocationDescriptor/CapabilityProfile字段、独立版本及允许flags；`guard_integration_profile.rs` 验证未知版本/字段/命令组合全部拒绝，区分包版本、native schema、mapping和wire版本。追踪「Native evidence readers reject ambiguity」。
 - [x] 1.4 在拟新增 `tests/fixtures/guard-integration/qualification.json` 建立所选native切片到旧任务/真实验收的映射；`guard_integration_scope.rs` 测试WASM、zero findings、task resolved均不能升级complete；无可证明切片时所有profile保持unqualified仍可进入partial开发。追踪「Complete projection requires proven native scope」。
 - [ ] 1.5 在拟新增 `schemas/guard-integration-transport-error.schema.json` 与 `guard_integration/envelope.rs` 固定前置诊断和绑定后结果接口，等待GE-CONTRACT冻结；`guard_integration_binding.rs` 至少覆盖坏参数、未知repo、缺candidate/base、未冻结scope四类无信封反例。追踪「Binding precedes envelope publication」。
-- [ ] 1.6 在拟新增 `tests/fixtures/guard-integration/relations.json` 和 `guard_integration/projection.rs` 定义受保护mapping词表、每个必需finding/缺口的精确规则覆盖及unsupported输出；`guard_integration_projection.rs` 对每条映射提供正反例，拒绝count/通配符/未映射项，无假ALLOW。追踪「Projection uses exact supported engine relations」。
+- [x] 1.6 在拟新增 `tests/fixtures/guard-integration/relations.json` 和 `guard_integration/projection.rs` 定义受保护mapping词表、每个必需finding/缺口的精确规则覆盖及unsupported输出；`guard_integration_projection.rs` 对每条映射提供正反例，拒绝count/通配符/未映射项，无假ALLOW。追踪「Projection uses exact supported engine relations」。
 
 ## 2. C1/C2 严格读取与显式投影（依赖 GE-CONTRACT、GE-ADAPTER 和所选 native 切片）
 
 接口：`read_native(bytes, invocation, profile) -> Result<NativeEvidence, ProjectionError>` → `assess_scope(evidence, obligations, binding) -> ScopeAssessment` → `project(scope, mapping) -> ProjectionOutcome`；类型按1.x冻结，本组不得改变旧native报告。
 
-- [ ] 2.1 在 `guard_integration/reader.rs` 实现有界只读读取、重复键/未知版本/格式及exit矛盾校验；`guard_integration_reader.rs` 覆盖完整、截断、重复键、超限、export failed和残留旧文件六类fixture，原finding与raw digest保留且坏输入无ALLOW。追踪「Native evidence readers reject ambiguity」。
-- [ ] 2.2 在 `guard_integration/scope.rs` 对照独立冻结义务及native实际目标/规则/工具/配置范围；`guard_integration_scope.rs` 逐项删除必需目标并加入额外无关成功项，全部保持partial/unsupported，当前aggregate exit3永不升级。追踪「Complete projection requires proven native scope」。
+- [x] 2.1 在 `guard_integration/reader.rs` 实现有界只读读取、重复键/未知版本/格式及exit矛盾校验；`guard_integration_reader.rs` 覆盖完整、截断、重复键、超限、export failed和残留旧文件六类fixture，原finding与raw digest保留且坏输入无ALLOW。追踪「Native evidence readers reject ambiguity」。
+- [x] 2.2 在 `guard_integration/scope.rs` 对照独立冻结义务及native实际目标/规则/工具/配置范围；`guard_integration_scope.rs` 逐项删除必需目标并加入额外无关成功项，全部保持partial/unsupported，当前aggregate exit3永不升级。追踪「Complete projection requires proven native scope」。
 - [x] 2.3 在 `guard_integration/projection.rs` 将已证明范围映射到严格engine输入，保留domain finding附件；`guard_integration_projection.rs` 核验enforce/review/advise、partial优先、未知字段/不支持关系拒绝，重算结果与固定engine黄金向量一致。追踪「Projection uses exact supported engine relations」。
 - [x] 2.4 在 `guard_integration/envelope.rs` 实现binding/producer/coverage前置校验和已绑定error/cancelled路径；`guard_integration_binding.rs` 覆盖前置失败无信封、工具故障null、取消null、completed decision与引擎一致四组反例，native130原值保存。追踪「Execution outcome is separate from technical decision」「Binding precedes envelope publication」。
 - [x] 2.5 在拟新增 `guard_integration/command.rs` 接线1.2已批准的显式入口及help描述，最小修改既有CLI分发而不更改native处理；`guard_integration_cli.rs` 断言新增0/2/3/4、stdout结构化/诊断stderr、原生check仍正常3且--output同时输出stdout。追踪「Native interfaces remain unchanged」。
-- [ ] 2.6 在 `guard_integration/projection.rs` 增加只读shadow结果比较和profile能力声明；`guard_integration_shadow.rs` 确认native-only/unsupported工件无伪completed决策，要求engine验证的消费者拒绝较弱profile；相同输入重复10次得到相同语义facts/report。追踪「Complete projection requires proven native scope」「Rollout preserves native ownership and rollback」。
+- [x] 2.6 在 `guard_integration/projection.rs` 增加只读shadow结果比较和profile能力声明；`guard_integration_shadow.rs` 确认native-only/unsupported工件无伪completed决策，要求engine验证的消费者拒绝较弱profile；相同输入重复10次得到相同语义facts/report。追踪「Complete projection requires proven native scope」「Rollout preserves native ownership and rollback」。
 
 ## 3. C2/C3 绑定、信任和安全消费（受信使用依赖 GE-TRUST）
 
