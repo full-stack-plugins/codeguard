@@ -134,3 +134,24 @@ final CLI/binding/help rerun passed20. Scoped clippy passed with prior documente
 baseline exclusions. New schemas and docs distinguish structural binding from
 real repository/authentication, JSON-only CLI contracts, and no file publication.
 Current 2.4/2.5 implementation awaits independent review; no boxes changed for them.
+
+## PR31 compatibility transplant (2026-10-09)
+
+Independent review accepted task2.4 at adapter2ac0977; root authorized its registration:
+4/26 tasks accepted (1.2,1.3,1.4,2.4). Task2.5 remains partial because actual
+CLI0/3 require a qualified native profile. No qualification was changed.
+
+New branch `impl/codeguard-pr31-adapter-20261009` starts at repaired PR31
+`96bae1381a84`. Seven reviewed adapter commits were applied serially. PR31's
+complete lib module list, native dispatcher and native progress remain intact;
+this file preserves the separate adapter history. The adapter OpenSpec change
+was copied from its reviewed snapshot because it did not exist on PR31.
+Historical25da9ff only restructures legacy specification prose; it is not an
+adapter dependency and was not applied over PR31's native specifications.
+Cargo resolved the added SDK graph offline starting with PR31's original lock;
+its result matches the transplanted lock. GuardEngine remains a local path
+requirement; tests use an explicit archivedc80ec32 SDK, not an assumed path pin.
+
+Migration validation and remaining baseline failures are recorded separately in
+`ledger/codeguard-pr31-adapter-transplant-report.md`. Original PR31 and adapter
+worktrees remain independent; no push, merge or release was performed.
