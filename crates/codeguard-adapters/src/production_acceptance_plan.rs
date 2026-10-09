@@ -25,10 +25,7 @@ pub fn parse_production_acceptance_plan(raw: &[u8]) -> Result<Value, String> {
     if doc["schema_version"] != "0.1.0"
         || doc["document_type"] != "production_acceptance_plan"
         || doc["authority"] != "repository_plan_only"
-        || !matches!(
-            doc["qualification"].as_str(),
-            Some("not_granted") | Some("v1_granted")
-        )
+        || !matches!(doc["qualification"].as_str(), Some("not_granted"))
         || doc["platform_scope"] != "candidate_targets_not_advertised_support"
     {
         return Err("验收计划协议或资格越权".into());
@@ -107,9 +104,9 @@ pub fn parse_production_acceptance_plan(raw: &[u8]) -> Result<Value, String> {
         )?;
         if !matches!(
             row["version_scope"]["qualification"].as_str(),
-            Some("unqualified") | Some("v1_qualified")
+            Some("unqualified")
         ) || row["version_scope"]["policy"]
-                != "project_declared_version_and_dialect_must_be_verified"
+            != "project_declared_version_and_dialect_must_be_verified"
             || row["version_scope"]["manifest_markers"] != original["markers"]
             || !bounded_text(&row["version_scope"]["dialect_requirement"])
             || strings(&row["version_scope"]["blockers"])?.is_empty()
@@ -140,10 +137,8 @@ pub fn parse_production_acceptance_plan(raw: &[u8]) -> Result<Value, String> {
         )?;
         for (cap, cell) in row["capabilities"].as_object().ok_or("缺核心能力")? {
             exact_keys(cell, &["qualification", "task_refs", "build_paths"])?;
-            if !matches!(
-                cell["qualification"].as_str(),
-                Some("blocked") | Some("v1_qualified")
-            ) || strings(&cell["task_refs"])?.is_empty()
+            if !matches!(cell["qualification"].as_str(), Some("blocked"))
+                || strings(&cell["task_refs"])?.is_empty()
             {
                 return Err("核心能力越权或缺任务归属".into());
             }

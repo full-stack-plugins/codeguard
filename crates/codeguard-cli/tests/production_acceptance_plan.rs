@@ -20,10 +20,7 @@ fn all_registered_languages_keep_four_blocked_core_obligations() {
     assert_eq!(report["report_type"], "production_acceptance_plan_view");
     assert_eq!(report["full_requirement_count"], 228);
     assert_eq!(report["selected_language_count"], 57);
-    assert!(
-        ["not_granted", "v1_granted"].contains(&report["qualification"].as_str().unwrap_or("")),
-        "顶层 qualification 应为 not_granted 或 v1_granted"
-    );
+    assert_eq!(report["qualification"], "not_granted");
     assert_eq!(report["delivery_decision"], "not_evaluated");
     assert_eq!(
         report["plan"]["platform_targets"].as_array().unwrap().len(),
@@ -31,15 +28,9 @@ fn all_registered_languages_keep_four_blocked_core_obligations() {
     );
     for row in report["plan"]["languages"].as_array().unwrap() {
         assert_eq!(row["capabilities"].as_object().unwrap().len(), 4);
-        assert!(
-            ["unqualified", "v1_qualified"].contains(&row["version_scope"]["qualification"].as_str().unwrap_or("")),
-            "version_scope qualification 应为 unqualified 或 v1_qualified"
-        );
+        assert_eq!(row["version_scope"]["qualification"], "unqualified");
         for cell in row["capabilities"].as_object().unwrap().values() {
-            assert!(
-                ["blocked", "v1_qualified"].contains(&cell["qualification"].as_str().unwrap_or("")),
-                "capability qualification 应为 blocked 或 v1_qualified"
-            );
+            assert_eq!(cell["qualification"], "blocked");
             assert!(!cell["task_refs"].as_array().unwrap().is_empty());
             assert_eq!(
                 cell["build_paths"].as_array().unwrap().len(),
@@ -97,10 +88,7 @@ fn partial_gradle_cve_never_grants_native_scan_or_repair_qualification() {
     let out = query(&["capabilities", "java", "--acceptance-plan", "--format=json"]);
     let report: Value = serde_json::from_slice(&out.stdout).unwrap();
     let cell = &report["plan"]["languages"][0]["capabilities"]["vulnerabilities"];
-    assert!(
-        ["blocked", "v1_qualified"].contains(&cell["qualification"].as_str().unwrap_or("")),
-        "vulnerabilities qualification 应为 blocked 或 v1_qualified"
-    );
+    assert_eq!(cell["qualification"], "blocked");
     let gradle = cell["build_paths"]
         .as_array()
         .unwrap()
@@ -124,10 +112,7 @@ fn cpp_standalone_replay_is_traceable_without_project_qualification() {
     let report: Value = serde_json::from_slice(&out.stdout).unwrap();
     let plan = &report["plan"];
     let capability = &plan["languages"][0]["capabilities"]["syntax"];
-    assert!(
-        ["blocked", "v1_qualified"].contains(&capability["qualification"].as_str().unwrap_or("")),
-        "syntax qualification 应为 blocked 或 v1_qualified"
-    );
+    assert_eq!(capability["qualification"], "blocked");
     let evidence = "tests/acceptance/evidence/cpp17-native-wasm-differential.json";
     for path in capability["build_paths"].as_array().unwrap() {
         let included = path["evidence_refs"]

@@ -13,10 +13,7 @@ fn full_mapping_preserves_unqualified_four_core_obligations() {
     let raw = include_bytes!("../../../rulepacks/production_acceptance_plan_v1.json");
     let parsed = parse_production_acceptance_plan(raw).unwrap();
     assert_eq!(parsed["languages"].as_array().unwrap().len(), 57);
-    assert!(
-        ["not_granted", "v1_granted"].contains(&parsed["qualification"].as_str().unwrap_or("")),
-        "顶层 qualification 应为 not_granted 或 v1_granted"
-    );
+    assert_eq!(parsed["qualification"], "not_granted");
 }
 
 #[test]
@@ -116,4 +113,24 @@ fn every_language_and_core_rejects_missing_obligations_and_forged_readiness() {
     }
     // 对全部228项义务逐项检验；不能只验证第一种语言或把局部状态升级为生产资格。
     assert_eq!(checked, 57 * 4 * 3);
+}
+
+#[test]
+fn repository_plan_cannot_grant_qualification_with_unresolved_blockers() {
+    for level in 0..3 {
+        let mut doc = plan();
+        doc["qualification"] = "not_granted".into();
+        match level {
+            0 => doc["qualification"] = "v1_granted".into(),
+            1 => doc["languages"][0]["version_scope"]["qualification"] = "v1_qualified".into(),
+            _ => {
+                doc["languages"][0]["capabilities"]["syntax"]["qualification"] =
+                    "v1_qualified".into()
+            }
+        }
+        assert!(
+            parse_production_acceptance_plan(&serde_json::to_vec(&doc).unwrap()).is_err(),
+            "repository plan granted authority at level {level}"
+        );
+    }
 }
