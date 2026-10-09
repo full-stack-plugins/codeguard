@@ -65,3 +65,8 @@ All 3190 mature baseline paths remain: 3182 byte-identical, eight previously rev
 ## Reviewed candidate-host prebinding transport
 
 Task 1.5 accepted at `ff96c179e0312c76a3ef127ac6fb0400a11a2557` for the separate actual candidate-host boundary plus previously reviewed bound transport. Eleven independent tests (ten maintained and one new probe, including actual native execution) passed. Real SHA1/SHA256 repositories exercise bad parameters, unknown nonempty repository paths, missing candidate/base and unfrozen scopes; exact five-field unbound diagnostics contain no envelope or input echo. Five captured diagnostics pass the existing strict schema. Success retains the original complete verifier and original bytes. The pure projection CLI still treats repository IDs as labels; this acceptance does not claim production repository authentication. Native source/tests/root Cargo files are unchanged. Evidence: cloud ledger `codeguard-host-transport-independent-review.md`.
+
+
+## Reviewed read-only SDK consumption
+
+Task 3.7 accepted at `dd4dd8a99e19f973ec1df6d5774858c46a94c864`. Independent focused verification passed26 tests; the intentionally ignored actual Git/strace test was then explicitly executed and passed. Ten repeated consumptions preserve source, events, refs/index and original report bytes with no extra exec, network call, write-open or mutation. External AuthorityProvider implementations retain their own I/O responsibilities. Sealed output and independent expectations remain mandatory; this SDK does not replace actual GG provenance consumption. Task3.3 remains partial at this pin because attached valid approval and subsequent approval-state invalidation are not yet exercised. Evidence: cloud ledger `codeguard-consumer-independent-review.md`.

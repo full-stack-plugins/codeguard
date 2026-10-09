@@ -58,7 +58,7 @@
 - [ ] 3.4 在 `guard_integration/audit.rs` 实现runId尝试分离、同次导入幂等及绑定CAS；`guard_integration_concurrency.rs` 运行两个需求/两个worktree和迟到head1成功反例，断言记录不串用且不覆盖head2。追踪「Parallel projections preserve immutable ownership」。
 - [ ] 3.5 在 `guard_integration/audit.rs` 实现显式私有目录的有界工件读取/原子发布/摘要复核；`guard_integration_storage.rs` 注入symlink、越界路径、截断、磁盘/权限失败和中断，拒绝覆盖原报告/用户文件且保留内存finding。追踪「Projection storage is bounded and read-only by default」。
 - [ ] 3.6 在 `guard_integration/audit.rs` 固定脱敏字段白名单、访问权限和可配置保留策略；`guard_integration_redaction.rs` 注入token/env/源码/原生消息指令，断言公开诊断无秘密、不执行指令，缺必需工件使消费资格失效。追踪「Projection storage is bounded and read-only by default」。
-- [ ] 3.7 在 `guard_integration/consumer.rs` 提供宿主可调用只读消费接口，不新增任意shell/MCP授权面；`guard_integration_side_effects.rs` 比较源码、.codeguard事件、refs/index与网络/进程记录，重复投影均无隐式native运行/repair/install/通知。追踪「Projection storage is bounded and read-only by default」「Native interfaces remain unchanged」。
+- [x] 3.7 在 `guard_integration/consumer.rs` 提供宿主可调用只读消费接口，不新增任意shell/MCP授权面；`guard_integration_side_effects.rs` 比较源码、.codeguard事件、refs/index与网络/进程记录，重复投影均无隐式native运行/repair/install/通知。追踪「Projection storage is bounded and read-only by default」「Native interfaces remain unchanged」。
 
 ## 4. C3/C4 精确候选与跨守卫联验（依赖适用 GE-TRUST、GG-CANDIDATE）
 
