@@ -13,6 +13,7 @@ name = "codeguard"
 path = "src/main.rs"
 
 [dependencies]
+guardengine = { path = "../../../guardengine" }
 codeguard-core = { path = "../codeguard-core" }
 codeguard-runtime = { path = "../codeguard-runtime" }
 codeguard-adapters = { path = "../codeguard-adapters" }

@@ -32,7 +32,7 @@ fn allowed(package: &str, dependency: &str, kind: &str) -> bool {
         }
         "codeguard-cli" => {
             (matches!(dependency, "ring" | "tokio" | "base64") && kind == "dev")
-                || (dependency == "http" && kind == "normal")
+                || (matches!(dependency, "http" | "guardengine") && kind == "normal")
                 || matches!(
                     dependency,
                     "codeguard-core"
@@ -226,4 +226,13 @@ fn network_dependencies_are_runtime_only_and_async_cli_support_is_test_only() {
     for package in ["codeguard-core", "codeguard-adapters", "codeguard-cli"] {
         assert!(!violations(&one_dependency(package, "rustls", "dev")).is_empty());
     }
+}
+
+#[test]
+fn guardengine_sdk_is_only_a_cli_normal_dependency() {
+    assert!(violations(&one_dependency("codeguard-cli", "guardengine", "normal")).is_empty());
+    for package in ["codeguard-core", "codeguard-runtime", "codeguard-adapters"] {
+        assert!(!violations(&one_dependency(package, "guardengine", "normal")).is_empty());
+    }
+    assert!(!violations(&one_dependency("codeguard-cli", "guardengine", "build")).is_empty());
 }
