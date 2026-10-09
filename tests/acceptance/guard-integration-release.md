@@ -1,9 +1,13 @@
 # CodeGuard local adapter final acceptance index
 
 This reconciles original task5.3, all12 requirements and their24 scenarios at
-implemented source `9337cf2b8b8163c29abd7130c85529ec19bc0881`. Tasks1–5.2 have
-independent local acceptance (25/26). Task5.3 remains unchecked until this final
-matrix/index is independently reviewed. This document changes no native behavior.
+implemented source `9337cf2b8b8163c29abd7130c85529ec19bc0881`. All26 adapter tasks now have independent local acceptance. Final task5.3
+reconciliation at `2ba05c66732076a9f5c9ebb1a3b1e24c10d3228a` was independently
+verified:12 requirements/24 scenarios,25source hashes,22external evidence hashes
+and58 scoped paths. Evidence: `codeguard-release-index-independent-review.md`
+and its verification JSON/log. This registration changes no native behavior.
+The machine index retains its pre-review preparation status; this acceptance
+record is separate and does not rewrite the reviewed hash set.
 
 The delivered scope is the explicitly selected local SDK/CLI adapter, one-file
 Linux Ruff F401 qualification, controller-provided authenticated-reference ports,

@@ -73,7 +73,7 @@
 
 - [x] 5.1 在拟新增 `docs/guard-integration-compatibility.md` 锁定已验证GE/native/mapping/envelope/平台/宿主组合及固定依赖制品；`guard_integration_version_matrix.rs` 对支持及未知N/N-1逐项测试，未知组合拒绝，不以crate semver推报告版本。追踪「Rollout preserves native ownership and rollback」。
 - [x] 5.2 在 `guard_integration/command.rs` 与拟新增 `tests/acceptance/guard-integration-rollback.md` 验证默认关闭→shadow→显式opt-in→停用适配器路径；原生命令历史fixture全部保持，required集成证据缺失仍阻断，停用不删除工件或改政策。追踪「Native interfaces remain unchanged」「Rollout preserves native ownership and rollback」。
-- [ ] 5.3 在拟新增 `tests/acceptance/guard-integration-release.md` 汇总真实命令、版本、各spec scenario到测试/产物的矩阵及未支持范围；执行适用新测试和旧native受影响回归，全部指定负例通过、零false ALLOW且无未解释差异才宣布CG-ADAPTER切片验收，未完成旧任务保持未完成。追踪全部12条Requirement。
+- [x] 5.3 在拟新增 `tests/acceptance/guard-integration-release.md` 汇总真实命令、版本、各spec scenario到测试/产物的矩阵及未支持范围；执行适用新测试和旧native受影响回归，全部指定负例通过、零false ALLOW且无未解释差异才宣布CG-ADAPTER切片验收，未完成旧任务保持未完成。追踪全部12条Requirement。
 
 
 2026-10-09 task3.2 independently accepted for the controller-supplied local SDK baseline-authentication port at0d6e0ec: fixed-source19 tests passed, original native code/commands unchanged. PreparedConsumption freezes baseline ref/policy and queries GE approval on every consume; older free consumers reject non-null baselines. Production identity deployment and durable baseline storage are not claimed. Evidence: external codeguard-baseline-trust-independent-review.md. CG adapter21/26; other pending tasks unchanged.
@@ -85,3 +85,5 @@
 2026-10-09 task5.1 independently accepted at7e2ef43, source bundle594644d+GEb0+GG20f. Independent archive/hash/source/metadata checks and exact package-host probe1 passed (GEb0, two native exit3) succeeded; targeted package tests20passed/1existingignored retained. Evidence: codeguard-package-independent-review.md and verification.json/host.log/capture. Adapter24/26; no public release, runtime binary inclusion, cross-platform or N/N-1 promise.
 
 2026-10-09 task5.2 independently accepted at9337cf2: exact new2 rollback tests passed,0ignored;3413 CG source and18 GE source files/9capture artifacts verified by reviewer. Missing required evidence refuses, Some delegates original current trust, native entry and retained evidence unchanged. Evidence: codeguard-rollback-independent-review.md plus verification.json/test.log/capture. Adapter25/26; final5.3 evidence review pending.
+
+2026-10-09 task5.3 independently accepted at2ba05c66732076a9f5c9ebb1a3b1e24c10d3228a. Independent read-only verification confirms12 requirements/24scenarios,25source hashes,22external evidence hashes and all58 scoped changedpaths; ignored tests and actual executions are correctly distinguished. Evidence: codeguard-release-index-independent-review.md/verification.json/log. Adapter26/26 complete for documented local profiles only. Original native tasks, unqualified scopes and public/production deployment status are unchanged.

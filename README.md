@@ -19,6 +19,15 @@ source identities; it covers only that narrow rule and does not change native
 commands, project-wide qualification, or the older CLI profile. See [CLI contract](docs/guard-project-cli.md),
 [Ruff scope](docs/guard-integration-ruff-f401.md), [Ruff CLI](docs/guard-project-ruff-cli.md), and [frozen capability mapping](docs/frozen-integration-capabilities.md).
 
+All 26 tasks in the local GuardEngine adapter plan have independent acceptance.
+The [final scenario/evidence matrix](tests/acceptance/guard-integration-release.md)
+covers the explicit SDK/CLI, narrow Linux Ruff F401 profile, caller-provided trust
+ports, bounded local storage, exact candidate host, fixed source compatibility and
+rollback. This does not complete the original native implementation tasks or
+qualify all 57 languages, deploy production identity services, or publish a new
+release. Existing native gaps remain governed by the original change.
+
+
 ```text
 Project files + existing checker configuration
                     |
