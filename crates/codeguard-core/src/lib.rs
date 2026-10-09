@@ -139,3 +139,9 @@ mod task_resolution_policy;
 pub use task_resolution_policy::TaskResolutionPolicy;
 mod task_lifecycle_record;
 pub use task_lifecycle_record::TaskLifecycleRecord;
+
+pub mod finding_identity;
+
+pub mod run_config;
+
+pub mod typed_module_graph;
