@@ -1,6 +1,6 @@
 # CodeGuard — 代码守卫总体架构
 
-> 版本：2.0（面向独立 Guard 产品的架构边界文档） · 日期：2026-10-09 · **现有实现**：Rust Workspace 0.1.4。该文档补充而不覆盖 [既有技术架构](Codeguard-Architecture.md) 与 [技术方案](Codeguard-Technical-Design.md)。
+> 版本：2.1（面向独立 Guard 产品的架构边界文档） · 日期：2026-10-09 · **现有实现**：Rust Workspace 0.1.4。该文档补充而不覆盖 [既有技术架构](Codeguard-Architecture.md) 与 [技术方案](Codeguard-Technical-Design.md)。
 
 ## 1. 定位：守住实现质量，而非重新设计系统
 
@@ -46,9 +46,9 @@
                     Repair Task Workbench
                  claim → attempt → verify → repeat
                              │
-             CodeGuard Result + Guard Protocol Adapter
+             CodeGuard Result → [目标] Guard Protocol Adapter
                              │
-                        GuardEngine
+                   [目标接入] GuardEngine
                     Rule / Contract / Evidence
                              │
              CLI / Host Plugin / CI / MCP / FlowGuard
@@ -75,7 +75,7 @@
 
 ### 3.4 多维结果模型
 
-独立返回：
+目标适配层分别表达以下概念（不是当前 JSON 字段/枚举定义）：
 - `execution`：COMPLETED / FAILED_TOOL / TIMED_OUT / CANCELLED；
 - `assessment`：SATISFIED / VIOLATION / UNKNOWN；
 - `coverage`：COMPLETE_WITHIN_SCOPE / PARTIAL / NOT_RUN；
@@ -93,15 +93,15 @@
 | TestGuard | 必需测试计划、行为验证和覆盖 | CodeGuard 可提供构建检查结果；不得替 TestGuard 判定测试充分 |
 | GitGuard | 版本、分支、变更范围、最终合并候选 | 共享绑定同一候选的检查证据，不触发受保护合并 |
 | FlowGuard | 阶段、人工批准、下一动作资格 | 消费 CodeGuard 本域报告，缺证据不能自填 PASS |
-| GuardEngine | 通用协议、契约、规则执行、证据基元 | CodeGuard 依赖其版本化 SDK，不把六 Guard 规则塞回 CLI |
+| GuardEngine | 通用协议、契约、规则执行、证据基元 | 目标：CodeGuard 通过版本化适配器接入，不把六 Guard 规则塞回 CLI |
 
-现有 [codeguard-plugin](https://github.com/full-stack-plugins/codeguard-plugin) 是宿主集成层：Hooks/命令/反馈/安装；要避免在插件中再造独立代码质量规则引擎。其它 [codegraph-plugin](https://github.com/full-stack-plugins/codegraph-plugin) 与 [codereview-plugin](https://github.com/full-stack-plugins/codereview-plugin) 分别是结构事实和 REVIEW/ADVISE 来源，不是 CodeGuard 完成质量门禁的替代证据。
+外部兼容目标 [codeguard-plugin](https://github.com/full-stack-plugins/codeguard-plugin) 的预期角色是宿主集成层：Hooks/命令/反馈/安装；要避免在插件中再造独立代码质量规则引擎。其它 [codegraph-plugin](https://github.com/full-stack-plugins/codegraph-plugin) 与 [codereview-plugin](https://github.com/full-stack-plugins/codereview-plugin) 分别是结构事实和 REVIEW/ADVISE 来源，不是 CodeGuard 完成质量门禁的替代证据。本轮未检出或验证这些外部仓库/真实宿主，不能依据链接宣称兼容完成。
 
 ## 5. 系统信任与安全
 
 **本地 CLI 不能保证不可绕过。** AI 可以控制其工作区和本地 hook，因此“本地检查绿”只能反馈检查事实。要实现强制治理，CI 必须从受保护规则版本生成固定检查义务，使用受信工具版本与正确的 checkout、重新执行并绑定当前 Git commit/tree；合并必须由 Git 平台分支保护/required checks/可信操作者执行。
 
-安全执行约束：
+目标安全执行约束（已有快照/签名/预算机制仍需逐入口核验，不等于完整沙箱）：
 - CLI 只运行经明确批准的原生工具及参数；避免将源内容拼成 shell 命令；
 - 原生执行可能执行项目脚本或加载插件，必要时隔离容器/VM，并剥离生产凭据；
 - 解析输入路径、符号链接、报告内容和下载资产需要边界/大小/签名检查；
@@ -129,3 +129,31 @@
 | Trusted CI / GitHub required check | 目标 | 需实际证明改规则/漏测试不能合并 |
 
 具体 crate 适配、协议映射与 Wave 实施见 [技术方案](technical-design.md)。**本文件为新的体系角色与边界说明，不取代已有 1.2.4 技术手册和 OpenSpec 实施账本。**
+
+
+## 8. 本次源码核对与领域边界
+
+本次静态核对基线：main `b499f13922647d4bf1e2344eaa5c37c450e302b5`（2026-10-09）；crate 版本与 npm 发布状态不是同一件事。本文仅记录源码和测试定义的证据，不宣称本轮执行过原生工具或验证过公开制品。
+
+| 已有领域对象 / 源码 | 实际含义及边界 |
+|---|---|
+| [Finding](../crates/codeguard-core/src/finding.rs) | 原生规则、工具、严重性、位置、义务归属；`gate_impact` 与原生 severity 分离 |
+| [aggregate](../crates/codeguard-core/src/aggregate.rs) | 取消 → 内部故障 → 不完整/未知政策 → 阻断违规 → 全部不适用 → 通过；保留部分 finding |
+| [CheckSession](../crates/codeguard-core/src/check_session.rs) | 未执行义务补为 incomplete；独立维护请求 verdict 与交付 gate |
+| [DeliveryInput](../crates/codeguard-core/src/delivery_gate.rs) | 冻结义务、观察目标、当前批准范围、政策修订、最终时钟、原生 checker 绑定；布尔 `trusted_bindings_verified` 是受信调用方前置条件，不是信任凭证 |
+| [SourceSnapshot](../crates/codeguard-runtime/src/source_snapshot.rs) | 显式路径、有界文件/字节读取及执行后复核；并不证明发现了完整项目 |
+| [TaskLifecycleState](../crates/codeguard-core/src/task_lifecycle_state.rs) | open / resolved / verification_required / reconciliation_required；只描述该问题，不等于项目交付 |
+
+工作台状态与进程状态独立：claim 获得租约，attempt 追加尝试，verify 记录原工具复验；零诊断不能跳过独立批准政策。受限语言的宿主 SDK 可写入经核验的 resolution 事件，复发可重新打开；缺失验证转 verification_required，事件分叉/归属冲突需要 reconciliation。并非所有语言或任务族都实现同样的关闭路径。详见 [task resolution](../crates/codeguard-core/src/task_resolution.rs)、[lifecycle store](../crates/codeguard-cli/src/task_lifecycle_store.rs) 与现有双语修复手册。
+
+使用场景按范围消费：编辑 Hook 给当前文件反馈；本地 lint 给指定工具观察；`check all` 汇总局部原生结果及缺口；可信 CI 目标才可把批准义务绑定最终合并候选。空目录、全部不适用、准备成功、任务关闭均不能独立授予发布或合并权限。
+
+## 9. GuardEngine 协议和审计边界（接入尚未实现）
+
+共享冻结协议 `guard.partme.ai/v1alpha1` 仅包含 GuardContract YAML、GuardFacts JSON、GuardReport JSON；只执行精确 `forbid_relation`。其封闭结构拒绝未知字段，不接收本域任意 finding、审批或工具日志扩展。`enforce/review/advise` 与 `ALLOW/BLOCK/REQUIRE_APPROVAL` 必须按引擎语义解释；partial facts 产生 BLOCK/INDETERMINATE，complete 仅表示分析器声明的范围。现有 CodeGuard 报告不能直接作为 GuardReport 使用。引擎报告不带签名，verify 是重算一致性，不是来源认证或授权。
+
+拟议的 [共享集成信封](integration-contract.md) 使用独立 `guard.integration/v1alpha1` 草案版本，当前引擎不解析。运行失败/取消与领域决策分离，关联 repo/task/worktree/requirement、candidate/base/merge group、分析器/覆盖以及 contract/facts/report 摘要；诊断和批准引用在信封及受控证据存储中，不塞进当前 GuardReport。
+
+目标审计链：受保护政策和不可变批准基线 → 冻结计划 → 源码/工具/配置快照 → 原始报告摘要 → 本域解释 → 可表达的 facts 投影 → 引擎重算 → 受信控制器核验当前绑定。批准记录由外部认证系统提供，Markdown 中的 accepted 或工作区布尔值不足以批准。候选、base、merge group、规则/分析器/覆盖、基线修订变化或批准过期/撤销均使受影响证据失效。人工批准不能覆盖分析不完整和工具故障。
+
+并行任务按不可变绑定隔离；重复提交相同绑定可幂等复用，旧运行晚到不能覆盖新候选状态。最终门禁重算精确 merge-queue 候选，单独 PR head 结果不够。ALLOW 只是有范围的技术结论，FlowGuard/GitGuard 与受保护平台继续负责流程及合入权限。

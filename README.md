@@ -14,6 +14,24 @@
 **Maturity:** the CodeGuard Rust workspace already implements bounded checks and repair workflows; complete GuardEngine interoperability, trusted CI authorization and all language combinations remain future work. The new documents do not replace existing OpenSpec task ownership.
 
 
+### Compatibility baseline and GuardEngine migration
+
+Documentation was checked against main `b499f13922647d4bf1e2344eaa5c37c450e302b5` on 2026-10-09. This is a source/document review, not a new native-tool, release or OpenSpec validation run. Existing language guides and dated acceptance records below remain intact.
+
+Three exit protocols coexist in the design; consumers must bind the exact command, flags and report version:
+
+| Interface | Meaning |
+|---|---|
+| Historical plugin mapping | Old check/CVE failures use 2, unverified results use 1, with entry-specific precedence. The Rust compatibility projection always leaves delivery `not_evaluated`; external legacy plugins were not inspected in this review. |
+| Current Rust CLI | Domain verdicts use 0 passed/not-applicable, 1 violations, 3 incomplete, 4 internal error and 130 cancelled; argument errors use 2. Public aggregate `check` remains partial: normal feedback exits 3 even with no findings. Query success is not quality approval. |
+| Future explicit GuardEngine adapter | Target check mapping is 0 ALLOW, 2 BLOCK, 3 REQUIRE_APPROVAL, 4 input/runtime/verification error. This must not silently change existing CLI codes or JSON. |
+
+Current structured aggregate output uses `--format json` (or supported SARIF) and optional `--output PATH`, **not `--report`**. It remains on stdout even when saved to a file. Failed export retains findings and reports `export.status=failed`, with diagnostics on stderr. Early argument/path/runtime failures can have no JSON; do not assume every error produces a report. See [precise compatibility and export behavior](docs/technical-design.md#10-三代退出码与输出契约禁止静默归一化) and the [historical protocol guide](docs/Codeguard-Legacy-Compatibility.md).
+
+GuardEngine integration is incremental and unimplemented. Its strict `guard.partme.ai/v1alpha1` accepts only GuardContract YAML, GuardFacts JSON and GuardReport JSON with exact `forbid_relation`; it rejects arbitrary fields. CodeGuard native findings, tool failures and approval metadata cannot simply be inserted into those objects. Partial facts mean BLOCK/INDETERMINATE; complete only describes the analyzer's declared scope. Reports are unsigned and verification recomputes consistency, not identity or authority.
+
+The separate [GuardRunEnvelope draft](docs/integration-contract.md), `guard.integration/v1alpha1`, carries run status, immutable candidate/base/merge-group and task/worktree bindings, coverage, artifact digests and authenticated approval references. No current parser accepts it. Candidate, policy, analyzer, coverage or approved-baseline changes and approval expiry/revocation invalidate affected results; late results cannot overwrite a newer candidate. Protected CI must recheck the exact merge-queue candidate. ALLOW is a scoped technical decision, never merge/release authority; approval cannot repair missing analysis or tool failure. Domain policies remain in CodeGuard, with neutral contract/rule/evidence mechanics in GuardEngine.
+
 **A Rust CLI for native static checks and actionable repair workflows.**
 
 Codeguard helps developers and coding agents discover existing quality configuration, run selected native checkers, and turn results into durable repair tasks. Rust owns orchestration and interpretation; Maven, P3C, Checkstyle, Javadoc, Ruff, Cargo, ESLint, and other native tools remain responsible for their checks.

@@ -14,6 +14,24 @@
 **当前状态：**部分多语言检查与修复工作流已有代码，统一 Guard Protocol、可信 CI 合并授权、全语言/平台能力尚未全部实现。本文和新增设计文档不代表历史未完成任务已经完成。
 
 
+### 兼容基线与 GuardEngine 渐进迁移
+
+本轮文档核对 main `b499f13922647d4bf1e2344eaa5c37c450e302b5`（2026-10-09）。这是源码/文档审阅，不是新的原生工具、发布或 OpenSpec 验证记录。以下既有语言指南和带日期的验收证据继续保留。
+
+设计中有三套退出协议；消费者必须绑定具体命令、参数和报告版本：
+
+| 接口 | 含义 |
+|---|---|
+| 历史插件映射 | 旧 check/CVE 失败为2，未验证为1，各入口有不同优先级。Rust 兼容投影的交付始终为 `not_evaluated`；本轮未检出或验证外部旧插件。 |
+| 当前 Rust CLI | 领域 verdict：0通过/不适用、1违规、3不完整、4内部错误、130取消；参数错误为2。公开聚合 `check` 仍是局部检查，正常反馈即使零 finding 也退出3。查询成功不是质量批准。 |
+| 未来显式 GuardEngine 适配入口 | 目标 check 映射为0 ALLOW、2 BLOCK、3 REQUIRE_APPROVAL、4输入/运行/验证错误；不得静默修改既有 CLI 数字和 JSON。 |
+
+当前聚合结构化输出使用 `--format json`（或已支持的 SARIF）和可选 `--output PATH`，**不支持 `--report`**。保存文件时仍输出到 stdout；导出失败保留 finding，报告 `export.status=failed`，stderr 给诊断。早期参数/路径/运行错误可能无 JSON，不能假设每个错误都有报告。详见[兼容与导出契约](docs/technical-design.md#10-三代退出码与输出契约禁止静默归一化)及[历史协议指南](docs/Codeguard-Legacy-Compatibility.zh_CN.md)。
+
+GuardEngine 接入是尚未实现的增量设计。其严格 `guard.partme.ai/v1alpha1` 仅接受 GuardContract YAML、GuardFacts JSON、GuardReport JSON 和精确 `forbid_relation`，拒绝任意字段。本域 finding、工具故障和批准元数据不能直接塞入这些对象。partial facts 为 BLOCK/INDETERMINATE；complete 只表示分析器声明范围。报告不带签名，verify 重算一致性，不认证来源或授予权限。
+
+独立 [GuardRunEnvelope 草案](docs/integration-contract.md) 使用 `guard.integration/v1alpha1`，表达运行状态、不可变 candidate/base/merge-group、task/worktree 绑定、覆盖、制品摘要和经认证批准引用；当前解析器不接受。候选、政策、分析器、覆盖、批准基线变化及批准过期/撤销使受影响结果失效，晚到结果不得覆盖新候选。受保护 CI 必须复查精确合并队列候选。ALLOW 只是有范围的技术结论，不能授予合并/发布；批准不能弥补缺失分析或工具故障。本域政策仍归 CodeGuard，GuardEngine 只拥有通用契约/规则/证据机制。
+
 **用统一 Rust CLI 串起原生静态检查和可执行的修复流程。**
 
 Codeguard 面向开发者与编程智能体，识别项目已有质量配置，调用选定的原生检查器，并将结果转成持久修复任务。Rust 负责调度和结果解释；Maven、P3C、Checkstyle、Javadoc、Ruff、Cargo、ESLint 等原生工具继续负责具体检查。
