@@ -130,3 +130,41 @@ fn unused_mapping_to_unknown_rule_is_rejected() {
         .is_err()
     );
 }
+
+#[test]
+fn projection_rejects_rule_fact_expansion_before_evaluation() {
+    let mut native = fixture::valid();
+    let template = native["results"][0]["findings"][0].clone();
+    let mut findings = vec![];
+    let mut ids = vec![];
+    for i in 0..400 {
+        let mut f = template.clone();
+        let id = format!("f-{i}-{}", "x".repeat(500));
+        f["id"] = json!(id);
+        ids.push(json!(id));
+        findings.push(f);
+    }
+    native["results"][0]["findings"] = json!(findings);
+    native["delivery_gate"]["blocking_finding_ids"] = json!(ids);
+    let bytes = serde_json::to_vec(&native).unwrap();
+    assert!(bytes.len() < 1024 * 1024);
+    let evidence = read_native(&bytes, &fixture::invocation()).unwrap();
+    let mut c = contract("advise");
+    let mut rules = vec![];
+    for i in 0..100 {
+        let mut r = c.spec.rules[0].clone();
+        r.id = if i == 0 {
+            "finding".into()
+        } else {
+            format!("rule-{i}")
+        };
+        rules.push(r);
+    }
+    rules.push(c.spec.rules[1].clone());
+    c.spec.rules = rules;
+    let m = ProtectedMapping::parse(&serde_json::to_vec(&mapping()).unwrap()).unwrap();
+    assert_eq!(
+        project(&evidence, &obligations(), &m, &c, subject()).err(),
+        Some("engine evaluation rejected projection")
+    );
+}
