@@ -142,3 +142,29 @@ fn changing_frozen_targets_under_same_obligation_id_rejects_publication() {
     .unwrap();
     assert!(frozen.complete(sample_projection()).is_err());
 }
+
+#[test]
+fn native_only_attachment_cannot_satisfy_engine_backed_consumption() {
+    use guardengine::integration::EvidenceProfile;
+    let output = freeze(binding())
+        .unwrap()
+        .complete(sample_projection())
+        .unwrap();
+    let mut weaker = output.envelope().clone();
+    weaker.artifacts.contract = None;
+    weaker.artifacts.facts = None;
+    weaker.artifacts.report = None;
+    assert!(weaker.validate(EvidenceProfile::NativeOnly).is_ok());
+    assert!(weaker.validate(EvidenceProfile::EngineBacked).is_err());
+    assert!(
+        verify_engine_artifacts(
+            &weaker,
+            output.contract_bytes().unwrap(),
+            output.facts_bytes().unwrap(),
+            output.report_bytes().unwrap(),
+        )
+        .is_err()
+    );
+    assert_eq!(weaker.decision, Some(Decision::Block));
+    assert_eq!(weaker.coverage.status, CoverageStatus::Partial);
+}

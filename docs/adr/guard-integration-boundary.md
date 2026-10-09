@@ -1,7 +1,78 @@
-# Guard integration boundary, local slice
+# Guard integration boundary, local SDK profile
 
-The initial boundary is a pure Rust library module that consumes bounded bytes and a separately captured invocation descriptor. Native command dispatch is unchanged. The future explicit entry is `codeguard guard-project --invocation <file> --native-report <file>`; this slice does not expose that command or promise its output. It will require frozen binding, protected mapping and pinned GuardEngine revision before publication.
+## Selected interface
 
-This slice registers only native run_report schema 1.0, lint with JSON output, package 0.1.4. The existing strict run_report parser remains the native format authority. This is an intentionally narrow compatibility reader, not qualification for native scope completeness. Raw bytes, SHA-256, native findings and exit semantics remain available. Caller-provided invocation identity is an integrity cross-check, not provenance authentication. No filesystem reads, tool execution, policy approvals, or source mutation occur in the reader.
+The selected interface is the pure Rust `codeguard_cli::guard_integration` library,
+using the GuardEngine SDK in the CLI crate only. Existing native command dispatch
+is unchanged. `InvocationDescriptor::parse` and `read_native` consume existing
+bounded byte slices; `FrozenObligations::new` receives protected required targets;
+`ProtectedMapping::parse` receives protected exact mapping bytes. `project` takes
+that evidence, frozen obligations, mapping, typed GuardContract and GuardSubject.
+`FrozenRun` checks structural binding before returning an in-memory result bundle.
+These calls do not open artifact paths, spawn native tools, run policy scripts,
+install tools, repair source, contact a host, or publish files.
 
-SDK integration is preferred over process invocation: reuse the fixed shared engine crate once its contract is frozen. No engine dependency is installed or asserted pinned yet. Production release, envelope publication, export-failure feedback format support, query/hook/legacy compatibility and authenticated consumption remain separate gates.
+Inputs are supplied by the caller from separately captured native evidence and
+protected policy. Matching invocation, hashes and binding is an integrity check,
+not caller/provenance authentication. No profile currently qualifies complete
+native scope. Completed projections remain partial/BLOCK; native aggregate exit3
+cannot mean REQUIRE_APPROVAL. Native failure130 remains in the original bytes and
+maps to cancelled/null on the bound failure path.
+
+The future explicit CLI entry is:
+
+```
+codeguard guard-project --invocation <file> --native-report <file> \
+  --context <file> --mapping <file> --contract <file>
+```
+
+`context` is reserved for versioned structural binding, independently frozen
+obligations and times; mapping/contract must come from protected policy. This
+command and its file-input/transport schemas are **not implemented** in this slice.
+It must consume existing artifacts only, preserve pre-binding diagnostic versus
+bound-envelope separation, and use the new entry's 0/2/3/4 semantics. Current users
+call the byte-only SDK interface; native commands do not select it implicitly.
+CLI task2.5, file publication task3.5, and host consumer task3.7 remain separate.
+
+## Source and release gate
+
+The CLI has the existing local path dependency `guardengine = { path =
+"../../../guardengine" }`. The reviewed SDK source snapshot for this compatibility
+fixture is `c80ec325449842d51007db2fd507040c53dc8f51`, recorded in
+`tests/fixtures/guard-integration/sdk-source.json`. It includes the integration YAML
+preflight, typed evaluation budget and borrowed FactBudget source-fragment builder.
+Engine wire is `guard.partme.ai/v1alpha1`; envelope is
+`guard.integration/v1alpha1`; neither is the crate package version or a qualification
+claim. A different source revision requires rerunning the compatibility fixture.
+
+This is a review-source pin, not a Cargo-enforced Git/registry dependency pin:
+Cargo.lock does not pin content of a sibling path. Release remains unavailable
+until an approved immutable artifact/source revision, archive and toolchain
+provenance, clean independent consumer verification, dependency lock and actual
+native/adapter version matrix are fixed. Publishing or claiming a released SDK is
+not authorized by this local fixture. No engine process protocol is used.
+
+## Qualified extent and evidence
+
+Only native run_report schema1.0, lint with JSON output, package0.1.4 is registered.
+The strict native run_report parser remains the format authority. Raw native bytes,
+SHA-256, findings and original exit are retained. Feedback/export-failure output,
+query/hook/legacy input, and unknown native schemas remain unsupported by this
+reader. This does not change their native behavior.
+
+`guard_integration_scope.rs` proves zero findings/exit0, a WASM-only inventory, and
+resolved-task messages do not grant complete scope. Unknown proof kinds and a
+task-verification preview cannot substitute for the registered native report.
+The qualification fixture maps missing true-native requirements to the historical
+task IDs; adapter tests cannot certify completion of those tasks.
+
+`guard_integration_boundary.rs` repeats the selected byte-only projection ten times
+and checks identical reports and raw domain bytes. Its explicit Linux strace test
+records file/process/network syscalls between probe markers and sees no projection
+file or process/network activity. An unselected native `--version --format=json`
+query records only its own exec, no adapter/project artifact access or network,
+and unchanged source, .codeguard events, Git index and ref sentinels. Dynamic-loader
+file reads at native process startup remain normal native startup, not adapter I/O.
+This is actual Linux fixture evidence, not Windows/macOS coverage or a sandbox.
+Run the ignored trace test explicitly where strace is installed; absence of that
+prerequisite is unverified, not a passing side-effect test.

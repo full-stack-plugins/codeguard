@@ -1,1 +1,40 @@
-{"version":"codeguard.qualification/v1alpha1","profiles":[{"command":"lint","native_schema":"1.0","package_version":"0.1.4","qualified":false,"native_task_dependencies":["2.3","2.4","2.5","2.9","3.5","3.7","5.4","5.5"],"reason":"Adapter fixture only; no true-tool positive and negative scope qualification or stable input proof."}]}
+{
+  "version": "codeguard.qualification/v1alpha1",
+  "profiles": [
+    {
+      "command": "lint",
+      "native_schema": "1.0",
+      "package_version": "0.1.4",
+      "qualified": false,
+      "native_task_dependencies": [
+        "2.3",
+        "2.4",
+        "2.5",
+        "2.9",
+        "3.5",
+        "3.7",
+        "5.4",
+        "5.5"
+      ],
+      "reason": "Adapter fixture only; no true-tool positive and negative scope qualification or stable input proof.",
+      "qualification_status": "unverified",
+      "adapter_evidence": [
+        "crates/codeguard-cli/tests/guard_integration_scope.rs: zero-findings/native-exit-zero remains Partial/BLOCK",
+        "crates/codeguard-cli/tests/guard_integration_scope.rs: WASM-only inventory remains Partial/BLOCK; unsupported proof kinds reject",
+        "crates/codeguard-cli/tests/guard_integration_scope.rs: task-resolved messages cannot qualify scope; task preview cannot substitute for native run_report"
+      ]
+    }
+  ],
+  "native_task_source": "openspec/changes/introduce-rust-codeguard-cli/tasks.md",
+  "native_task_requirements": {
+    "2.3": "Dual finding/completion aggregation, error/cancellation priority and preservation of findings.",
+    "2.4": "Independent obligations and delivery decisions; missing/unexecuted adapters cannot allow.",
+    "2.5": "Native human/JSON/SARIF output, visible partial status and private evidence references.",
+    "2.9": "Atomic export and retained findings on output failure; protocol/version and source fidelity.",
+    "3.5": "Real working-tree/index/ref snapshot and raw-byte identity, including special files.",
+    "3.7": "Before/after content identity and source-side-effect detection.",
+    "5.4": "Report freshness plus actual scope/rule execution coverage.",
+    "5.5": "Adapter conformance with valid/malformed inputs and separate actual-tool evidence."
+  },
+  "qualification_rule": "Adapter regressions and legacy task completion records do not establish true native qualification. Every registered profile remains unqualified until independent native scope evidence is approved."
+}
