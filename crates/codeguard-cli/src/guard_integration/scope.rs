@@ -14,6 +14,7 @@ impl FrozenObligations {
         self.0.keys().cloned().collect()
     }
     pub fn new(targets: BTreeMap<String, Vec<String>>) -> Result<Self, &'static str> {
+        super::scope_budget::validate(&targets)?;
         if targets.is_empty()
             || targets.iter().any(|(id, items)| {
                 id.trim().is_empty()

@@ -62,3 +62,20 @@ Scoped clippy (`--no-deps --lib --test guard_integration_projection -- -D warnin
 -A deprecated`) passed. Unsuppressed strict clippy was blocked by the preexisting
 runtime `process_runner.rs:116` unnecessary u64 cast; existing CLI fetch_update
 deprecation is explicitly allowed only for scoped verification, with no native edit.
+
+## Scope admission correction before CLI transport
+
+Independent review accepted cf84913's relation-copy boundary but found another P2:
+a 256 KiB obligation ID and 64 short targets expand into >16 MiB gap strings in
+assess_scope. Before tasks 2.4/2.5 CLI work, tighten FrozenObligations construction
+with borrowed worst-case encoded gap accounting before validation collections or
+formatting. Preserve all-or-error required scope and normal partial semantics;
+prove actual allocation rejection with the independent fixture. Task 2.2 remains
+partial and unchecked pending review. No CLI/native/PR31 changes in this correction.
+Scope admission RED measured 50,596,694 cumulative allocated bytes in allocations
+at least 256 KiB during constructor + assessment; GREEN measured zero such copies,
+with constructor error before assessment. Additional escaping/small-scope controls
+pass. Focused adapter/native contracts: 63 passed, 3 existing ignored; scoped clippy
+with the previously documented no-deps/deprecated exclusions passed. Evidence:
+external codeguard-scope-budget-{red,green,regression,clippy}.log. Caller-owned
+input allocations and exact RSS are outside this admission policy guarantee.
