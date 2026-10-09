@@ -44,6 +44,7 @@ mod linux {
             atomic::{AtomicU64, Ordering},
         },
     };
+    include!("private_artifact_retention_linux.rs");
     static NEXT: AtomicU64 = AtomicU64::new(0);
     pub struct PrivateArtifactStore {
         root: Arc<File>,
@@ -666,7 +667,7 @@ mod linux {
     }
 }
 #[cfg(target_os = "linux")]
-pub use linux::{PrivateArtifactStore, StagedArtifacts};
+pub use linux::{PrivateArtifactStore, RootLease, StagedArtifacts};
 #[cfg(not(target_os = "linux"))]
 pub struct PrivateArtifactStore;
 #[cfg(not(target_os = "linux"))]
@@ -693,6 +694,30 @@ impl PrivateArtifactStore {
 #[cfg(not(target_os = "linux"))]
 impl StagedArtifacts {
     pub fn publish(self) -> Result<(), StoreError> {
+        Err(StoreError::Unsupported)
+    }
+}
+
+#[cfg(not(target_os = "linux"))]
+pub struct RootLease<'a>(std::marker::PhantomData<&'a PrivateArtifactStore>);
+#[cfg(not(target_os = "linux"))]
+impl PrivateArtifactStore {
+    pub fn lease(&self) -> Result<RootLease<'_>, StoreError> {
+        Err(StoreError::Unsupported)
+    }
+}
+#[cfg(not(target_os = "linux"))]
+impl RootLease<'_> {
+    pub fn is_empty(&self) -> Result<bool, StoreError> {
+        Err(StoreError::Unsupported)
+    }
+    pub fn read_control(&self, _: &str, _: u64) -> Result<Option<Vec<u8>>, StoreError> {
+        Err(StoreError::Unsupported)
+    }
+    pub fn replace_control(&self, _: &str, _: &[u8], _: u64) -> Result<(), StoreError> {
+        Err(StoreError::Unsupported)
+    }
+    pub fn purge(&self, _: &str) -> Result<(), StoreError> {
         Err(StoreError::Unsupported)
     }
 }
