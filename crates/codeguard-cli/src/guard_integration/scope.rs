@@ -3,6 +3,16 @@ use std::collections::{BTreeMap, BTreeSet};
 /// Required targets come from the caller's protected policy, never the native report.
 pub struct FrozenObligations(BTreeMap<String, Vec<String>>);
 impl FrozenObligations {
+    pub(crate) fn frozen_targets(&self) -> BTreeMap<String, Vec<String>> {
+        let mut targets = self.0.clone();
+        for items in targets.values_mut() {
+            items.sort();
+        }
+        targets
+    }
+    pub(crate) fn scope_ids(&self) -> Vec<String> {
+        self.0.keys().cloned().collect()
+    }
     pub fn new(targets: BTreeMap<String, Vec<String>>) -> Result<Self, &'static str> {
         if targets.is_empty()
             || targets.iter().any(|(id, items)| {
