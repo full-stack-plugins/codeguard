@@ -104,3 +104,33 @@ the separately executed syscall test). Scoped clippy passed under documented
 existing exclusions. Added explicit fixture export example and a native-only
 profile rejection test for engine-backed consumers. Only independently accepted
 1.3 is checked; 1.2/1.4 await review, and 2.1/2.2/CLI gaps remain unchanged.
+
+## Explicit CLI slice plan (tasks2.4/2.5; transport substeps1.5)
+
+Implement approved guard-project --invocation/--native-report/--context/--mapping/
+--contract in the CLI crate only. Context is closed versioned JSON with RunBinding,
+runId, frozen requiredTargets and start/finish times; it is structural caller input,
+not Git/provenance authentication. Contract input is bounded JSON (YAML subset),
+avoiding unrestricted YAML parsing on this new surface. Reuse runtime bounded
+regular-file reads; no engine/native subprocess, default discovery or file outputs.
+Before binding, arguments/context/policy errors emit structured stderr only and4.
+After binding, native read/parse/mapping/budget errors emit error/null bundles and4;
+native4/130 preserve bytes/status,130 normalizes4. Completed unqualified projections
+emit engine-backed partial/BLOCK2 with exact native bytes in inline artifact text.
+A bounded serializer completes the whole bundle before stdout; failed serialization
+falls back to bound error/null. Native command dispatch gains only the explicit arm,
+help gains a partial entry. Tests prove actual CLI before/after, native check3 plus
+stdout with --output, aggregate3 never approval, errors/cancel, strict inputs and
+engine recomputation. 0/3 helper unit tests do not qualify unreachable current paths.
+Root authorized registration of independently accepted1.2/1.4: foundation3/26.
+CLI RED: six new entry/help/transport cases failed because guard-project remained
+unknown/native-usage2; the actual native check --output baseline passed3 with both
+stdout and file JSON. Initial GREEN passed all seven. Additional strict input,
+real escaped inline-bundle overflow, and native0-with-zero-findings controls now
+pass (10 CLI cases); two unit tests cover generic0/2/3/4 mapping and bound adapter
+cancellation without implying current ALLOW/approval reachability. Broad focused
+run passed83 with4existing/explicit-trace ignores before the extra native0 case;
+final CLI/binding/help rerun passed20. Scoped clippy passed with prior documented
+baseline exclusions. New schemas and docs distinguish structural binding from
+real repository/authentication, JSON-only CLI contracts, and no file publication.
+Current 2.4/2.5 implementation awaits independent review; no boxes changed for them.

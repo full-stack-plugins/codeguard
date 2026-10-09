@@ -4,6 +4,17 @@ use crate::{command_descriptor::CommandDescriptor, command_examples::examples};
 pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
     vec![
         CommandDescriptor {
+            tracking_id: None,
+            command: "guard-project",
+            examples: &["codeguard guard-project --invocation invocation.json --native-report native.json --context context.json --mapping mapping.json --contract contract.json"],
+            support: if cfg!(unix) { "partial" } else { "unavailable_build" },
+            executable: cfg!(unix),
+            operation_kind: "query",
+            usage: "guard-project --invocation FILE --native-report FILE --context FILE --mapping FILE --contract FILE",
+            scope: "Explicit read-only SDK projection; unqualified native evidence remains partial/BLOCK; no native execution or provenance authentication",
+            languages: &[],
+        },
+        CommandDescriptor {
             tracking_id: Some(r#"C01"#),
             command: r#"help"#,
             examples: examples("help"),

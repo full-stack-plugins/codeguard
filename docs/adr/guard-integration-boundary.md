@@ -19,20 +19,21 @@ native scope. Completed projections remain partial/BLOCK; native aggregate exit3
 cannot mean REQUIRE_APPROVAL. Native failure130 remains in the original bytes and
 maps to cancelled/null on the bound failure path.
 
-The future explicit CLI entry is:
+The explicit Unix CLI entry, added in the subsequent transport slice, is:
 
 ```
 codeguard guard-project --invocation <file> --native-report <file> \
   --context <file> --mapping <file> --contract <file>
 ```
 
-`context` is reserved for versioned structural binding, independently frozen
-obligations and times; mapping/contract must come from protected policy. This
-command and its file-input/transport schemas are **not implemented** in this slice.
-It must consume existing artifacts only, preserve pre-binding diagnostic versus
-bound-envelope separation, and use the new entry's 0/2/3/4 semantics. Current users
-call the byte-only SDK interface; native commands do not select it implicitly.
-CLI task2.5, file publication task3.5, and host consumer task3.7 remain separate.
+`context` carries versioned structural binding, independently frozen obligations
+and times; mapping/contract must come from protected policy. The explicit CLI
+consumes existing bounded regular files only and emits an inline versioned bundle.
+See [the CLI contract](../guard-project-cli.md) for pre-binding stderr diagnostics,
+bound null-decision failures, JSON-only contract input and the current reachable
+BLOCK2/error4 outcomes. It does not select the adapter for native commands.
+File publication task3.5 and host consumer task3.7 remain separate. CLI2.5 is
+implemented pending independent review, not a production qualification claim.
 
 ## Source and release gate
 

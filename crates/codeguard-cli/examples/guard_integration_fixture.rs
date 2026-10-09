@@ -67,6 +67,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "binding":binding,
         "scope":{"python/app/lint/ruff":["src/main.py"]}
     }))?;
+    let context = serde_json::to_vec_pretty(&json!({
+        "version":"codeguard.context/v1alpha1", "runId":"native-001", "binding":binding,
+        "requiredTargets":{"python/app/lint/ruff":["src/main.py"]},
+        "startedAt":"2026-10-09T00:00:00Z", "finishedAt":"2026-10-09T00:01:00Z"
+    }))?;
     let files = [
         ("envelope.json", serde_json::to_vec(output.envelope())?),
         ("contract.json", output.contract_bytes().unwrap().to_vec()),
@@ -76,6 +81,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         ("invocation.json", serde_json::to_vec(&invocation)?),
         ("mapping.json", mapping_bytes.to_vec()),
         ("fixture.json", manifest),
+        ("context.json", context),
     ];
     let mut directory = fs::DirBuilder::new();
     #[cfg(unix)]

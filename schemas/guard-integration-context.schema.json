@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "title": "CodeGuard structural projection context v1alpha1",
+  "required": [
+    "version",
+    "runId",
+    "binding",
+    "requiredTargets",
+    "startedAt",
+    "finishedAt"
+  ],
+  "properties": {
+    "version": {
+      "const": "codeguard.context/v1alpha1"
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9_.-]+$"
+    },
+    "binding": {
+      "$ref": "https://full-stack-plugins.github.io/guardengine/schemas/integration/v1alpha1/guard-run-envelope.schema.json#/properties/binding"
+    },
+    "requiredTargets": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "array",
+        "minItems": 1,
+        "uniqueItems": true,
+        "items": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        }
+      },
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "\\S"
+      }
+    },
+    "startedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "finishedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

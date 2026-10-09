@@ -7,3 +7,6 @@ mod scope_budget;
 pub mod projection;
 
 pub mod envelope;
+
+#[cfg(unix)]
+pub mod command;

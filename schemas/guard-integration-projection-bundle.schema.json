@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "title": "CodeGuard inline projection bundle v1alpha1",
+  "required": [
+    "apiVersion",
+    "kind",
+    "nativeExit",
+    "envelope",
+    "artifacts"
+  ],
+  "properties": {
+    "apiVersion": {
+      "const": "codeguard.projection/v1alpha1"
+    },
+    "kind": {
+      "const": "GuardProjectionBundle"
+    },
+    "nativeExit": {
+      "enum": [
+        0,
+        1,
+        3,
+        4,
+        130
+      ]
+    },
+    "envelope": {
+      "$ref": "https://full-stack-plugins.github.io/guardengine/schemas/integration/v1alpha1/guard-run-envelope.schema.json"
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract",
+        "facts",
+        "report",
+        "domain"
+      ],
+      "properties": {
+        "contract": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "facts": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "report": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "domain": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

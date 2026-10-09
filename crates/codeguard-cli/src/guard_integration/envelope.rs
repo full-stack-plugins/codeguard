@@ -149,6 +149,42 @@ impl FrozenRun {
             domain: projection.domain,
         })
     }
+    /// Bound adapter failure. Attach only evidence matching this run and snapshot.
+    #[cfg(unix)]
+    pub(crate) fn error(
+        &self,
+        code: &'static str,
+        evidence: Option<&NativeEvidence>,
+    ) -> EnvelopeOutput {
+        let mut envelope = self.template.clone();
+        envelope.diagnostics = vec![diagnostic(code)];
+        let domain = evidence
+            .filter(|e| {
+                e.report().run_id == envelope.run_id
+                    && e.report().document()["identities"]["content"]["digest"]
+                        .as_str()
+                        .is_some_and(|digest| {
+                            envelope.binding.source_snapshot_digest == format!("sha256:{digest}")
+                        })
+            })
+            .map_or_else(Vec::new, |e| e.raw_bytes().to_vec());
+        if !domain.is_empty() {
+            envelope.artifacts.domain = vec![reference(&envelope.run_id, "native.json", &domain)];
+        }
+        EnvelopeOutput {
+            envelope,
+            contract: None,
+            facts: None,
+            report: None,
+            domain,
+        }
+    }
+    #[cfg(unix)]
+    pub(crate) fn cancelled(&self, evidence: Option<&NativeEvidence>) -> EnvelopeOutput {
+        let mut output = self.error("adapter_cancelled", evidence);
+        output.envelope.run_status = RunStatus::Cancelled;
+        output
+    }
     pub fn failure(&self, evidence: &NativeEvidence) -> Result<EnvelopeOutput, &'static str> {
         if evidence.report().run_id != self.template.run_id
             || format!(
