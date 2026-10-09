@@ -205,3 +205,8 @@ C0 已有多个部分能力，不能简单打勾整阶段；后续每个小交�
 - [check_session_contract](../crates/codeguard-cli/tests/check_session_contract.rs)：冻结账本与请求/交付结论。
 - [task_resolution_contract](../crates/codeguard-core/tests/task_resolution_contract.rs)：任务解决证据与作用域。
 - [OpenSpec tasks](../openspec/changes/introduce-rust-codeguard-cli/tasks.md)：2.3/2.4/2.5/2.9等仍有未完成集成；历史验收记录不可替代本轮重跑。
+
+
+### 集成错误的绑定前置条件
+
+上述目标 error/cancelled 信封只适用于调用身份、精确候选/基底、producer 与必查覆盖已经冻结的尝试。参数非法、仓库不可解析或绑定歧义等前置故障使用独立传输诊断和失败退出状态，不生成 GuardRunEnvelope，不伪造 OID 或空字段；当前各 CLI 的既有行为仍按本文事实表保留。详见[共享契约](integration-contract.md)。
