@@ -1151,3 +1151,7 @@ C/C++已确认编辑事件已接入有界文档观察：`hook execute PATH --cla
 
 
 Claude协议适配器现将C/C++编辑文档观察投影为有界对话指引：展示当前原生规则/位置，独立标记结构规则及已核验任务引用；不回显源码/注释或过期定位。局部无问题不要求修改源码，也不关闭历史任务。已有Clang的受控PostToolUse协议测试不代表真实宿主安装或配置自动发现验收。
+
+## 保留的 Guard 设计文档
+
+[架构](docs/architecture.md)与[技术方案](docs/technical-design.md)逐字保留远程 main `b499f13922647d4bf1e2344eaa5c37c450e302b5` 的文档。它们描述该设计检查点；当前可选接入与资格限制见[集成进展](docs/guard-integration-progress.md)。PR31 成熟的原生检查、格式档案、命令及修复流程继续作为实现基础。

@@ -1175,3 +1175,7 @@ Confirmed C/C++ file edits now expose a bounded documentation observation throug
 
 
 The Claude protocol adapter now projects C/C++ edit documentation observations into bounded conversation guidance: current native rules/positions, separate structural policy, and validated task references. It suppresses source/comment text and stale positions; clean local observations do not request source edits or close historical tasks. Controlled PostToolUse tests with existing Clang do not establish installed-host acceptance or automatic configuration discovery.
+
+## Preserved Guard design documents
+
+The [architecture](docs/architecture.md) and [technical design](docs/technical-design.md) retain the exact documents from remote main `b499f13922647d4bf1e2344eaa5c37c450e302b5`. They describe that design checkpoint; current opt-in implementation and qualification limits are recorded in [integration progress](docs/guard-integration-progress.md). The mature PR31 native checks, formatter profiles, commands and repair workflows remain the implementation foundation.
