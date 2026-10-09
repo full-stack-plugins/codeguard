@@ -5,7 +5,7 @@
   "policy": "codeguard 不安装任何工具；本清单由项目在门禁之外消费（开发机/CI 显式安装），门禁只校验已装工具",
   "security_note": "门禁在 CI 上对任意 PR 运行，让它自动安装工具等于让任意贡献者获得 CI 执行任意安装脚本的路径",
   "reproducibility_note": "门禁结果必须只取决于「源码 + 已锁定工具版本」，不能取决于运行机器上恰好装了什么",
-  "tool_count": 37,
+  "tool_count": 38,
   "language_count": 57,
   "tools": [
     {
@@ -110,6 +110,14 @@
       ]
     },
     {
+      "formatter": "format.sh (IntelliJ IDEA)",
+      "install_kind": "with_lang_toolchain",
+      "install": "随 IntelliJ IDEA 分发（/Applications/IntelliJ IDEA.app/Contents/bin/format.sh）；Linux/自定义安装用 CODEGUARD_IDEA_FORMAT 环境变量指定",
+      "languages": [
+        "markdown"
+      ]
+    },
+    {
       "formatter": "fourmolu",
       "install_kind": "ecosystem",
       "install": "cargo install fourmolu",
@@ -208,7 +216,6 @@
         "css",
         "graphql",
         "html",
-        "markdown",
         "svelte",
         "typescript",
         "vue",

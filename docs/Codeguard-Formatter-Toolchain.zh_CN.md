@@ -42,7 +42,8 @@
 | `zig fmt` | Zig SDK | zig |
 | `ocamlformat` | `opam install ocamlformat` | ocaml |
 | `elm-format` | `npm i -g elm-format` | elm |
-| `npx prettier` | `npm i -D prettier`（项目本地） | typescript, yaml, css, html, vue, svelte, astro, graphql, markdown, ansible |
+| `npx prettier` | `npm i -D prettier`（项目本地） | typescript, yaml, css, html, vue, svelte, astro, graphql, ansible |
+| `format.sh` | 随 IntelliJ IDEA 分发（`CODEGUARD_IDEA_FORMAT` 可指定路径） | markdown |
 | `ktlint` | Maven/Gradle 插件或独立 jar | kotlin |
 | `cljfmt` | `deps.edn` / lein | clojure |
 | `erlfmt` | `mix` / rebar3 插件 | erlang |
@@ -156,3 +157,19 @@ php 的码集错误）全都是人工审档案看不出来的。
 这样门禁的输出只取决于「源码 + 已锁定的工具」，不取决于「谁在哪台机器上跑」——
 这正是门禁该有的性质。工具装不上不是门禁的错，是环境声明不完整；
 codeguard 的职责是把这件事说得足够清楚。
+
+## 七、IDEA wrapper：复现 IDE 内 ⌘⌥L 的排版
+
+若团队日常在 IDEA 内排版（尤其 markdown：表格按列宽对齐、列表归一为 `*`），
+门禁可用 IDEA 命令行格式化器复现同一效果。wrapper 已内置四项实测防坑：
+
+1. `-d` dry run 做 check（2026.2+ 支持，退出码 0=合规 / 1=需重排）
+2. `-allowDefaults` 恒传——否则不在 IDEA 项目里的文件被静默忽略（dry 仍退 0）
+3. 丢弃 stdout——成功时也打印版本横幅，会触发门禁 A 类误判
+4. `IDEA_PROPERTIES` 独立配置目录——IDEA GUI 开着时单实例锁会拒绝 format.sh
+
+与 prettier 的 markdown 输出**不一致**（独立引擎：空格策略、列表标记、表格样式均不同，
+详见档案 notes 的对比实测）。选择了 IDEA wrapper 就选择了与 IDE 内排版完全一致。
+
+CI 注意：该档案依赖 IDE 安装，未装 IDEA 的 runner 对 markdown 诚实降级
+（incomplete / 退出 3），不会静默放行。
