@@ -54,7 +54,7 @@
 
 - [x] 3.1 在 `guard_integration/consumer.rs` 校验repo/task/worktree/requirement集合、完整OID、candidate/base/group及sourceSnapshotDigest；`guard_integration_candidate.rs` 覆盖SHA-1/SHA-256、dirty字节与HEAD不符、错repo四类反例，可信队列消费只接受clean冻结候选。追踪「Changed bindings invalidate eligibility」。
 - [ ] 3.2 在 `guard_integration/consumer.rs` 接入GE-TRUST认证引用port，校验baseline不可变digest/ref、批准issuer/scope/expiry/revocation；`guard_integration_trust.rs` 覆盖伪accepted、错issuer、跨scope、过期、撤销、provider不可用，均不授权且原REQUIRE_APPROVAL字节不变。追踪「Approved references require authenticated consumption」。
-- [ ] 3.3 在 `guard_integration/consumer.rs` 实现资格键和失效理由；`guard_integration_freshness.rs` 逐项变更candidate/base/group/source/baseline/contract/tool-config/mapping/analyzer/coverage及批准状态，全部重验，首版不跨run缓存执行结果。追踪「Changed bindings invalidate eligibility」。
+- [x] 3.3 在 `guard_integration/consumer.rs` 实现资格键和失效理由；`guard_integration_freshness.rs` 逐项变更candidate/base/group/source/baseline/contract/tool-config/mapping/analyzer/coverage及批准状态，全部重验，首版不跨run缓存执行结果。追踪「Changed bindings invalidate eligibility」。
 - [ ] 3.4 在 `guard_integration/audit.rs` 实现runId尝试分离、同次导入幂等及绑定CAS；`guard_integration_concurrency.rs` 运行两个需求/两个worktree和迟到head1成功反例，断言记录不串用且不覆盖head2。追踪「Parallel projections preserve immutable ownership」。
 - [ ] 3.5 在 `guard_integration/audit.rs` 实现显式私有目录的有界工件读取/原子发布/摘要复核；`guard_integration_storage.rs` 注入symlink、越界路径、截断、磁盘/权限失败和中断，拒绝覆盖原报告/用户文件且保留内存finding。追踪「Projection storage is bounded and read-only by default」。
 - [ ] 3.6 在 `guard_integration/audit.rs` 固定脱敏字段白名单、访问权限和可配置保留策略；`guard_integration_redaction.rs` 注入token/env/源码/原生消息指令，断言公开诊断无秘密、不执行指令，缺必需工件使消费资格失效。追踪「Projection storage is bounded and read-only by default」。
