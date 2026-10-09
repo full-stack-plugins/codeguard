@@ -2,6 +2,18 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
+## CodeGuard 在六大守卫中的正式定位
+
+**CodeGuard** 只负责代码质量、安全与原生检查器执行；GuardEngine 提供通用规则/契约/证据，ArchGuard 负责架构，TestGuard 负责测试义务，GitGuard 负责合并安全，SpecGuard 负责规格，FlowGuard 负责审批和流程。现有 Rust CLI、修复任务、原生检查器适配、公开制品与测试记录继续保留，不重复建设。
+
+- [CodeGuard 独立架构与跨守卫边界](docs/architecture.md)
+- [GuardEngine 集成技术方案、迁移与测试](docs/technical-design.md)
+- [已有详细架构手册](docs/Codeguard-Architecture.zh_CN.md)
+- [已有详细技术实现手册](docs/Codeguard-Technical-Design.zh_CN.md)
+
+**当前状态：**部分多语言检查与修复工作流已有代码，统一 Guard Protocol、可信 CI 合并授权、全语言/平台能力尚未全部实现。本文和新增设计文档不代表历史未完成任务已经完成。
+
+
 **用统一 Rust CLI 串起原生静态检查和可执行的修复流程。**
 
 Codeguard 面向开发者与编程智能体，识别项目已有质量配置，调用选定的原生检查器，并将结果转成持久修复任务。Rust 负责调度和结果解释；Maven、P3C、Checkstyle、Javadoc、Ruff、Cargo、ESLint 等原生工具继续负责具体检查。
