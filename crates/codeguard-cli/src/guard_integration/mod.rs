@@ -1,4 +1,4 @@
-//! Opt-in, read-only native evidence boundary. No profile currently qualifies complete scope.
+//! Opt-in, read-only evidence boundary. Each profile covers only its documented native scope.
 pub mod profile;
 pub mod reader;
 pub mod scope;
@@ -12,3 +12,6 @@ pub mod envelope;
 pub mod command;
 
 pub mod ruff_profile;
+
+#[cfg(unix)]
+pub mod ruff_command;

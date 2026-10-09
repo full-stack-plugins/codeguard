@@ -158,6 +158,39 @@ impl FrozenRun {
             domain: projection.domain,
         })
     }
+    /// Ruff transport failure retains only the sealed evidence for this frozen scope.
+    #[cfg(unix)]
+    pub(super) fn ruff_error(
+        &self,
+        code: &'static str,
+        evidence: Option<&super::ruff_profile::RuffEvidence>,
+    ) -> EnvelopeOutput {
+        let mut output = self.error(code, None);
+        if let Some(evidence) = evidence.filter(|e| {
+            e.matches_binding(
+                &self.template.run_id,
+                &self.template.binding.source_snapshot_digest,
+                &self.required_targets,
+            )
+        }) {
+            output.domain = evidence.raw_bytes().to_vec();
+            output.envelope.artifacts.domain = vec![reference(
+                &self.template.run_id,
+                "native.json",
+                &output.domain,
+            )];
+        }
+        output
+    }
+    #[cfg(unix)]
+    pub(super) fn ruff_cancelled(
+        &self,
+        evidence: Option<&super::ruff_profile::RuffEvidence>,
+    ) -> EnvelopeOutput {
+        let mut output = self.ruff_error("adapter_cancelled", evidence);
+        output.envelope.run_status = RunStatus::Cancelled;
+        output
+    }
     /// Bound adapter failure. Attach only evidence matching this run and snapshot.
     #[cfg(unix)]
     pub(crate) fn error(

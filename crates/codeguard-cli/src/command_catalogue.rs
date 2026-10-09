@@ -5,6 +5,17 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
     vec![
         CommandDescriptor {
             tracking_id: None,
+            command: "guard-project-ruff",
+            examples: &["codeguard guard-project-ruff --invocation invocation.json --native-report native.json --context context.json --mapping mapping.json --contract contract.json"],
+            support: if cfg!(unix) { "partial" } else { "unavailable_build" },
+            executable: cfg!(unix),
+            operation_kind: "query",
+            usage: "guard-project-ruff --invocation FILE --native-report FILE --context FILE --mapping FILE --contract FILE",
+            scope: "Explicit read-only single-file Ruff0.16.8 F401 projection; no native execution, broad Python qualification or provenance authentication",
+            languages: &[],
+        },
+        CommandDescriptor {
+            tracking_id: None,
             command: "guard-project",
             examples: &["codeguard guard-project --invocation invocation.json --native-report native.json --context context.json --mapping mapping.json --contract contract.json"],
             support: if cfg!(unix) { "partial" } else { "unavailable_build" },

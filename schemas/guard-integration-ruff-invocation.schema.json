@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "title": "Captured selected-file Ruff invocation v1alpha1",
+  "required": [
+    "version",
+    "packageVersion",
+    "nativeSchema",
+    "executable",
+    "argv",
+    "runId",
+    "processExit",
+    "producerSha256"
+  ],
+  "properties": {
+    "version": {
+      "const": "codeguard.ruff-invocation/v1alpha1"
+    },
+    "packageVersion": {
+      "const": "0.1.4"
+    },
+    "nativeSchema": {
+      "const": "0.13.0"
+    },
+    "executable": {
+      "type": "string",
+      "maxLength": 4096,
+      "pattern": "^/"
+    },
+    "argv": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "prefixItems": [
+        {
+          "const": "lint"
+        },
+        {
+          "const": "python"
+        },
+        {
+          "type": "string",
+          "maxLength": 4096,
+          "pattern": "^/"
+        },
+        {
+          "const": "--format=json"
+        },
+        {
+          "const": "--file"
+        },
+        {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 256,
+          "pattern": "\\.py$"
+        },
+        {
+          "const": "--ruff-tool"
+        },
+        {
+          "type": "string",
+          "maxLength": 4096,
+          "pattern": "^/"
+        }
+      ]
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9_.-]+$"
+    },
+    "processExit": {
+      "const": 3
+    },
+    "producerSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

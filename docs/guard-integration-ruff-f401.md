@@ -8,7 +8,9 @@ in the domain artifact. This is one-file unused-import coverage, not whole Pytho
 quality, the aggregate CLI gate, task closure, or production authorization.
 
 The SDK profile is separate from guard-project's existing run_report1.0 reader.
-That CLI still cannot reach ALLOW0/REQUIRE_APPROVAL3. Unknown feedback versions,
+That old CLI still cannot reach ALLOW0/REQUIRE_APPROVAL3. The additional
+[guard-project-ruff command](guard-project-ruff-cli.md) exposes this narrow profile
+through its own versioned captured-invocation and frozen-context inputs. Unknown feedback versions,
 WASM variants, workspace-bound variants, discovered-project scans, multiple files,
 unknown/duplicate fields, truncated input and reports above1MiB are rejected.
 No native producer or old profile qualification flag is changed.

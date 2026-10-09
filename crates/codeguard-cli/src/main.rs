@@ -28,6 +28,10 @@ fn main() -> ExitCode {
         [command, rest @ ..] if command == "guard-project" => {
             codeguard_cli::guard_integration::command::run(rest)
         }
+        #[cfg(unix)]
+        [command, rest @ ..] if command == "guard-project-ruff" => {
+            codeguard_cli::guard_integration::ruff_command::run(rest)
+        }
         [command, rest @ ..] if command == "capabilities" => capabilities(rest),
         [command, rest @ ..] if command == "detect" => detect(rest),
         [command, rest @ ..] if command == "init" => codeguard_cli::init_command::run(rest),

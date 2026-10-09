@@ -75,6 +75,19 @@ pub struct RuffEvidence {
     gaps: Vec<String>,
 }
 impl RuffEvidence {
+    pub(super) fn matches_binding(
+        &self,
+        run_id: &str,
+        source_digest: &str,
+        targets: &BTreeMap<String, Vec<String>>,
+    ) -> bool {
+        self.run_id == run_id
+            && source_digest.strip_prefix("sha256:") == Some(self.source_sha256.as_str())
+            && targets.len() == 1
+            && targets
+                .get(&self.scope_id)
+                .is_some_and(|items| items.len() == 1 && items[0] == self.target)
+    }
     pub fn raw_bytes(&self) -> &[u8] {
         &self.raw
     }

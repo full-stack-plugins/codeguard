@@ -47,7 +47,7 @@ struct TransportDiagnostic<'a> {
     code: &'a str,
     exit_code: u8,
 }
-fn diagnostic(stderr: &mut impl Write, phase: &'static str, code: &str) {
+pub(super) fn diagnostic(stderr: &mut impl Write, phase: &'static str, code: &str) {
     let _ = serde_json::to_writer(
         &mut *stderr,
         &TransportDiagnostic {
@@ -60,10 +60,10 @@ fn diagnostic(stderr: &mut impl Write, phase: &'static str, code: &str) {
     );
     let _ = stderr.write_all(b"\n");
 }
-fn read(path: &Path, cap: u64) -> Result<Vec<u8>, &'static str> {
+pub(super) fn read(path: &Path, cap: u64) -> Result<Vec<u8>, &'static str> {
     codeguard_runtime::read_bounded_regular_file(path, cap).map_err(|_| "artifact_read_failed")
 }
-fn json<T: serde::de::DeserializeOwned>(bytes: &[u8]) -> Result<T, &'static str> {
+pub(super) fn json<T: serde::de::DeserializeOwned>(bytes: &[u8]) -> Result<T, &'static str> {
     let value = codeguard_adapters::parse_unique_json(bytes).map_err(|_| "invalid_input_json")?;
     serde_json::from_value(value).map_err(|_| "invalid_input_fields")
 }
@@ -142,7 +142,7 @@ struct Bundle<'a> {
     envelope: &'a GuardRunEnvelope,
     artifacts: InlineArtifacts<'a>,
 }
-fn encode(output: &EnvelopeOutput, native_exit: u64) -> Result<Vec<u8>, &'static str> {
+pub(super) fn encode(output: &EnvelopeOutput, native_exit: u64) -> Result<Vec<u8>, &'static str> {
     fn text(bytes: Option<&[u8]>) -> Result<Option<&str>, &'static str> {
         bytes
             .map(std::str::from_utf8)
@@ -184,7 +184,7 @@ fn encode(output: &EnvelopeOutput, native_exit: u64) -> Result<Vec<u8>, &'static
         .map_err(|_| "transport_serialization_failed")?;
     Ok(encoded.0)
 }
-fn exit_code(envelope: &GuardRunEnvelope) -> u8 {
+pub(super) fn exit_code(envelope: &GuardRunEnvelope) -> u8 {
     if envelope.run_status != RunStatus::Completed {
         return 4;
     }

@@ -13,11 +13,11 @@ Codeguard helps developers and coding agents discover existing quality configura
 The local source branch also includes an explicit read-only GuardEngine adapter:
 `codeguard guard-project --invocation FILE --native-report FILE --context FILE --mapping FILE --contract FILE`.
 Its current CLI run_report1.0 profile stays unqualified and returns partial BLOCK
-or bound error; aggregate native exit3 is never approval. A separate SDK-only
-Ruff F401 profile consumes actual selected-file feedback with frozen tool/config/
+or bound error; aggregate native exit3 is never approval. The separate `guard-project-ruff` command exposes the reviewed
+Ruff F401 SDK profile using actual selected-file feedback with frozen tool/config/
 source identities; it covers only that narrow rule and does not change native
-commands, project-wide qualification, or the CLI profile. See [CLI contract](docs/guard-project-cli.md),
-[Ruff scope](docs/guard-integration-ruff-f401.md), and [frozen capability mapping](docs/frozen-integration-capabilities.md).
+commands, project-wide qualification, or the older CLI profile. See [CLI contract](docs/guard-project-cli.md),
+[Ruff scope](docs/guard-integration-ruff-f401.md), [Ruff CLI](docs/guard-project-ruff-cli.md), and [frozen capability mapping](docs/frozen-integration-capabilities.md).
 
 ```text
 Project files + existing checker configuration

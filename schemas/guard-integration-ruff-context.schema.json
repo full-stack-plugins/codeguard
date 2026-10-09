@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "title": "CodeGuard Ruff projection context v1alpha1",
+  "required": [
+    "version",
+    "runId",
+    "binding",
+    "target",
+    "producerSha256",
+    "startedAt",
+    "finishedAt"
+  ],
+  "properties": {
+    "version": {
+      "const": "codeguard.ruff-context/v1alpha1"
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9_.-]+$"
+    },
+    "binding": {
+      "$ref": "https://full-stack-plugins.github.io/guardengine/schemas/integration/v1alpha1/guard-run-envelope.schema.json#/properties/binding"
+    },
+    "target": {
+      "type": "string",
+      "minLength": 4,
+      "maxLength": 256,
+      "pattern": "\\.py$"
+    },
+    "producerSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "startedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "finishedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

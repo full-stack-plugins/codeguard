@@ -188,3 +188,16 @@ under ledger/codeguard-ruff-sdk-final preserve raw native3 and separate direct
 Ruff0/1/2/spawn-error provenance. Caller binding IDs/timestamps are fixture values;
 this is not authenticated production/candidate acceptance. New profile is SDK-only;
 CLI0/3 and general task2.2 scope remain incomplete. No additional task boxes changed.
+
+## Additive Ruff CLI slice (task2.5 pending review)
+
+Registered independently accepted Ruff2.3 only on integrated branch:5/26.
+Added separate guard-project-ruff with versioned captured invocation/frozen context;
+existing guard-project/native handlers preserved. Common0/2/3/4 tested through real
+subprocesses consuming original captured feedback.90focusedpass;27CLI artifact
+captures schema/digest checked plus prebinding/bound4. Scoped clippy passes with
+existing435PR31warnings. Actual old guard-project stdout byte-identical, and native
+check all keeps3/stdout=file with only run-ID differences. New command strace shows
+one exec(self), no network or write opens. Mature57language source preservation
+remains an explicit invariant, not a full platform/runtime test claim. No new
+checkbox from this implementation; independent review required for2.5.
