@@ -96,3 +96,42 @@ fn builtin_check_apply_roundtrip_on_golden() {
         }
     }
 }
+
+/// Fence-like code must never terminate a different/longer outer fence.
+#[test]
+fn fenced_code_preserves_delimiter_length_and_kind() {
+    for input in [
+        "````python\n```\nx = 'a  b'\n````\n",
+        "```python\n~~~\nx = 'a  b'\n```\n",
+        "~~~python\n```\nx = 'a  b'\n~~~\n",
+        "```python\n``` not a closer\nx = 'a  b'\n```\n",
+        "```python\n    ```\nx = 'a  b'\n```\n",
+        "  ```python\nx = 'a  b'  \n   ```\n",
+        "````python\n```\nx = 'a  b'  ",
+    ] {
+        assert_eq!(idea_markdown::apply(input), input, "code bytes changed");
+        assert_eq!(idea_markdown::check(input).0, "clean");
+    }
+}
+
+#[test]
+fn longer_matching_fence_closes_before_normal_prose() {
+    let input = "  ~~~python\nx = 'a  b'\n ~~~~  \n\ntext  words\n";
+    let expected = "  ~~~python\nx = 'a  b'\n ~~~~  \n\ntext words\n";
+    assert_eq!(idea_markdown::apply(input), expected);
+    assert_eq!(idea_markdown::apply(expected), expected);
+}
+
+#[test]
+fn top_level_indented_code_preserves_content_and_blank_lines() {
+    for input in [
+        "    x = 'a  b'\n    print(x)\n",
+        "\tx = 'a  b'\n\tprint(x)\n",
+        "Paragraph.\n\n    x = 'a  b'  \n\n    print(x)\n\nAfter.\n",
+        "    x = 'a  b'\n    \n    print(x)",
+        "    -  literal code\n    ```\n    x = 'a  b'\n",
+    ] {
+        assert_eq!(idea_markdown::apply(input), input, "indented code changed");
+        assert_eq!(idea_markdown::check(input).0, "clean");
+    }
+}

@@ -27,8 +27,8 @@ use serde_json::{Value, json};
 
 /// 内置格式化器注册名（档案 formatter 字段使用）。
 pub const FORMATTER_ID: &str = "builtin:idea-markdown";
-/// 规则版本：随 golden 再生成而演进。
-pub const RULES_VERSION: &str = "0.1.0-idea2026.2.3";
+/// 规则版本：golden 基线与代码保真修复均须更新；0.1.1 修复代码块边界。
+pub const RULES_VERSION: &str = "0.1.1-idea2026.2.3";
 
 /// 对单个文件执行内置 check。
 /// 返回 (status, reason)：("clean", None) / ("unformatted", None)。
@@ -240,6 +240,21 @@ fn is_table_separator(t: &str) -> bool {
         })
 }
 
+/// CommonMark fence boundaries: at most three leading spaces and a run of
+/// at least three identical backticks or tildes. Keep the raw lines untouched.
+fn fence_marker(line: &str) -> Option<(u8, usize, &str)> {
+    let body = line.trim_start_matches(' ');
+    if line.len() - body.len() > 3 {
+        return None;
+    }
+    let marker = *body.as_bytes().first()?;
+    if marker != b'`' && marker != b'~' {
+        return None;
+    }
+    let count = body.bytes().take_while(|&b| b == marker).count();
+    (count >= 3).then_some((marker, count, &body[count..]))
+}
+
 /// 主入口：按 golden 规则格式化 markdown 文本。
 pub(crate) fn format(input: &str) -> String {
     let ends_with_newline = input.ends_with('\n');
@@ -249,7 +264,7 @@ pub(crate) fn format(input: &str) -> String {
 
     let mut out: Vec<String> = Vec::new();
     let mut i = 0usize;
-    let mut in_fence = false;
+    let mut fence: Option<(u8, usize)> = None;
     let mut prev_kind: Option<LineKind> = None;
     let mut pending_blanks = 0usize;
 
@@ -258,19 +273,50 @@ pub(crate) fn format(input: &str) -> String {
         let t = raw.trim_end_matches([' ', '\t']);
 
         // 围栏代码块：内容与围栏行原样
-        if in_fence {
+        if let Some((opening_marker, opening_length)) = fence {
             out.push(raw.to_string());
-            if t.starts_with("```") || t.starts_with("~~~") {
-                in_fence = false;
+            if fence_marker(raw).is_some_and(|(marker, length, suffix)| {
+                marker == opening_marker
+                    && length >= opening_length
+                    && suffix.chars().all(|c| matches!(c, ' ' | '\t' | '\r'))
+            }) {
+                fence = None;
             }
             i += 1;
             prev_kind = Some(LineKind::Fence);
             continue;
         }
-        if t.starts_with("```") || t.starts_with("~~~") {
+        // Preserve top-level indented code rather than collapsing its contents
+        // as prose. A paragraph needs a blank separator; existing list context
+        // remains handled by the list rules below, not reclassified as code.
+        let code_indent = |line: &str| line.starts_with("    ") || line.starts_with('\t');
+        let outside_list = !matches!(prev_kind, Some(LineKind::List(_) | LineKind::OrderedList(_)));
+        if code_indent(raw) && (prev_kind.is_none() || (pending_blanks > 0 && outside_list)) {
+            ensure_gap(&mut out, prev_kind, LineKind::Fence);
+            while i < lines.len() {
+                let line = lines[i];
+                let internal_blank = line.trim().is_empty()
+                    && lines[i + 1..]
+                        .iter()
+                        .find(|next| !next.trim().is_empty())
+                        .is_some_and(|next| code_indent(next));
+                if !code_indent(line) && !internal_blank {
+                    break;
+                }
+                out.push(line.to_string());
+                i += 1;
+            }
+            pending_blanks = 0;
+            prev_kind = Some(LineKind::Fence);
+            continue;
+        }
+        if let Some((marker, length, _)) = fence_marker(raw)
+            .filter(|(marker, _, suffix)| *marker != b'`' || !suffix.contains('`'))
+        {
             ensure_gap(&mut out, prev_kind, LineKind::Fence);
             out.push(raw.to_string());
-            in_fence = true;
+            fence = Some((marker, length));
+            pending_blanks = 0;
             i += 1;
             prev_kind = Some(LineKind::Fence);
             continue;

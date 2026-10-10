@@ -43,7 +43,7 @@
 | `ocamlformat` | `opam install ocamlformat` | ocaml |
 | `elm-format` | `npm i -g elm-format` | elm |
 | `npx prettier` | `npm i -D prettier`（项目本地） | typescript, yaml, css, html, vue, svelte, astro, graphql, ansible |
-| `format.sh` | 随 IntelliJ IDEA 分发（`CODEGUARD_IDEA_FORMAT` 可指定路径） | markdown |
+| `builtin:idea-markdown` | 随 codeguard 内置，无需外部工具或 IDEA | markdown |
 | `ktlint` | Maven/Gradle 插件或独立 jar | kotlin |
 | `cljfmt` | `deps.edn` / lein | clojure |
 | `erlfmt` | `mix` / rebar3 插件 | erlang |
@@ -158,18 +158,24 @@ php 的码集错误）全都是人工审档案看不出来的。
 这正是门禁该有的性质。工具装不上不是门禁的错，是环境声明不完整；
 codeguard 的职责是把这件事说得足够清楚。
 
-## 七、IDEA wrapper：复现 IDE 内 ⌘⌥L 的排版
+## 七、内置 IDEA 风格 Markdown 格式化器
 
-若团队日常在 IDEA 内排版（尤其 markdown：表格按列宽对齐、列表归一为 `*`），
-门禁可用 IDEA 命令行格式化器复现同一效果。wrapper 已内置四项实测防坑：
+Markdown 档案使用 `builtin:idea-markdown`，规则版本为
+`0.1.1-idea2026.2.3`。check/apply 在 codeguard 进程内完成，不调用
+`format.sh`，不需要安装 IDEA、Prettier 或提供外部工具路径。
 
-1. `-d` dry run 做 check（2026.2+ 支持，退出码 0=合规 / 1=需重排）
-2. `-allowDefaults` 恒传——否则不在 IDEA 项目里的文件被静默忽略（dry 仍退 0）
-3. 丢弃 stdout——成功时也打印版本横幅，会触发门禁 A 类误判
-4. `IDEA_PROPERTIES` 独立配置目录——IDEA GUI 开着时单实例锁会拒绝 format.sh
+内置规则保留列表标记（如 `-`、`*`、`1.`、`1)`），保留标题文本内部空格，
+收拢正文空格，并按列宽对齐表格。提交的两组 golden 样本及差分测试锁定
+这些样本的逐字节输出与幂等性；它们不代表所有 Markdown 文档或 IDEA 配置
+都已验证等价。`.editorconfig` 是档案的配置发现标记，当前内置实现不读取
+其中的格式化选项。当前本地补丁修复了围栏边界识别及顶层缩进代码的内容保真，
+未重新生成 IDEA golden，也不改变包版本。
 
-与 prettier 的 markdown 输出**不一致**（独立引擎：空格策略、列表标记、表格样式均不同，
-详见档案 notes 的对比实测）。选择了 IDEA wrapper 就选择了与 IDE 内排版完全一致。
+```bash
+codeguard format check markdown . --format json
+codeguard format apply markdown . --format json
+```
 
-CI 注意：该档案依赖 IDE 安装，未装 IDEA 的 runner 对 markdown 诚实降级
-（incomplete / 退出 3），不会静默放行。
+报告通过 `formatter: "builtin:idea-markdown"` 和 `tool_version` 披露内置规则身份。
+未安装 IDEA 不会导致 Markdown 降级；文件读写失败则返回
+`builtin_io_failed` 和 `incomplete`。
