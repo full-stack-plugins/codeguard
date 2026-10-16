@@ -75,9 +75,34 @@ pub(super) fn validate(value: &Value, version: &str) -> Result<(), String> {
     let schema = json!({"$schema":"https://json-schema.org/draft/2020-12/schema","$ref":format!("#/$defs/{}",pointer(&root)),"$defs":defs});
     let validator =
         SchemaValidator::build(&serde_json::to_vec(&schema).map_err(|e| e.to_string())?)?;
-    if validator.validate(value).is_empty() {
+    let issues = validator.validate(value);
+    if issues.is_empty() {
         Ok(())
     } else {
-        Err("feedback does not satisfy its exact closed Schema".into())
+        // 只输出编译期 Schema 中的固定位置，不回显实例路径、错误值或原件正文。
+        // 根 oneOf 的摘要会遮住具体字段；逐个求值既有闭合分支，仅用于诊断。
+        let mut paths: BTreeSet<String> =
+            issues.into_iter().map(|issue| issue.schema_path).collect();
+        let root_pointer = format!("/$defs/{}", pointer(&root));
+        let branches = schema
+            .pointer(&format!("{root_pointer}/oneOf"))
+            .and_then(Value::as_array)
+            .map_or(0, Vec::len);
+        for index in 0..branches.min(4) {
+            let mut branch = schema.clone();
+            branch["$ref"] = json!(format!("#{root_pointer}/oneOf/{index}"));
+            let validator =
+                SchemaValidator::build(&serde_json::to_vec(&branch).map_err(|e| e.to_string())?)?;
+            paths.extend(
+                validator
+                    .validate(value)
+                    .into_iter()
+                    .map(|issue| issue.schema_path),
+            );
+        }
+        Err(format!(
+            "feedback does not satisfy its exact closed Schema; static_schema_paths={}",
+            paths.into_iter().take(24).collect::<Vec<_>>().join(",")
+        ))
     }
 }

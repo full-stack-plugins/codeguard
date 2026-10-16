@@ -981,3 +981,14 @@ fn current_feedback_selection_matches_the_actual_product_registry() {
         "wire choices must match the product registry"
     );
 }
+
+#[test]
+fn closed_schema_diagnostics_locate_static_fields_without_echoing_raw_values() {
+    let mut report = actual_maven_javadoc_feedback();
+    report["schema_version"] = serde_json::json!("0.73.0");
+    report["command_status"] = serde_json::json!("PRIVATE_UNTRUSTED_VALUE_DO_NOT_LOG");
+    let error = super::feedback_schema::validate(&report, "0.73.0").unwrap_err();
+    assert!(error.contains("properties/command_status"), "{error}");
+    assert!(!error.contains("PRIVATE_UNTRUSTED_VALUE_DO_NOT_LOG"));
+    assert!(!error.contains("credentials"));
+}

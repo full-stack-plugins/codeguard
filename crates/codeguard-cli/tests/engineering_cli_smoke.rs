@@ -60,6 +60,18 @@ fn real_java_and_all_cli_missing_tools_preserve_raw_feedback_without_delivery_up
         assert_eq!(document["authority"], "local_unverified");
         assert!(document["required_obligations"].is_null());
         let projected = project_raw(raw, None);
+        if projected
+            .issues()
+            .iter()
+            .any(|issue| issue.contains("exact closed Schema"))
+        {
+            // 这里只含本测试新建的受控Java/POM与缺工具路径；绝不在产品入口打印用户原件。
+            panic!(
+                "controlled CLI fixture selection={selection}; issues={:?}\nCONTROLLED_FEEDBACK_JSON_BEGIN\n{}\nCONTROLLED_FEEDBACK_JSON_END",
+                projected.issues(),
+                serde_json::to_string_pretty(&document).unwrap()
+            );
+        }
         assert_eq!(projected.original_bytes(), raw);
         assert_eq!(projected.trust_level(), "UNVERIFIED");
         assert_eq!(projected.status(), "incomplete");
