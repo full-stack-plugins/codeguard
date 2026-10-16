@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
@@ -19,6 +19,16 @@ test('离线 npm 包贯通编辑任务与原生复检，未批准时不关闭', 
   assert.ok(tarball.endsWith('.tgz'));
   const scratch = realpathSync(mkdtempSync(path.join(os.tmpdir(), 'codeguard-npm-repair-')));
   try {
+    // 此路径验收 WASM 初检到显式原生复检。控制发现范围，不能依赖宿主恰好未安装 Zig。
+    // 只给安装启动器保留 Node/npm/sh；显式原生夹具仍经 --zig-tool 选择并核验版本。
+    const hostBin = path.join(scratch, 'launcher-bin');
+    mkdirSync(hostBin);
+    const npmEntry = process.env.PATH.split(path.delimiter)
+      .map(directory => path.join(directory, 'npm')).find(candidate => existsSync(candidate));
+    assert.ok(npmEntry, 'existing npm launcher is required');
+    symlinkSync(realpathSync(process.execPath), path.join(hostBin, 'node'));
+    symlinkSync(realpathSync(npmEntry), path.join(hostBin, 'npm'));
+    symlinkSync(realpathSync('/bin/sh'), path.join(hostBin, 'sh'));
     const file = path.join(scratch, 'app.zig');
     const bad = 'pub fn main( void {\n';
     const good = 'pub fn main() void {}\n';
@@ -30,7 +40,7 @@ test('离线 npm 包贯通编辑任务与原生复检，未批准时不关闭', 
       ], {
         cwd: scratch, input: input === undefined ? undefined : JSON.stringify(input),
         encoding: 'utf8', timeout: 120_000, maxBuffer: 1024 * 1024,
-        env: { ...process.env, npm_config_audit: 'false', npm_config_fund: 'false' },
+        env: { ...process.env, PATH: hostBin, npm_config_audit: 'false', npm_config_fund: 'false' },
       });
       assert.equal(result.error, undefined, result.error?.message);
       assert.equal(result.signal, null);
@@ -55,8 +65,11 @@ test('离线 npm 包贯通编辑任务与原生复检，未批准时不关闭', 
     assert.equal(first.value.delivery_decision, 'not_evaluated');
     assert.ok(first.value.local_feedback?.syntax_tasks,
       'installed package must connect edit feedback to syntax tasks');
+    assert.equal(first.value.local_feedback.zig_lint.tool_selection.source, 'not_found',
+      'candidate path must not inherit a host Zig executable');
     const tasks = first.value.local_feedback.syntax_tasks;
     assert.equal(tasks?.status, 'synced_partial', 'installed package must persist syntax tasks');
+    assert.ok(tasks.tasks.length > 0, JSON.stringify(first.value.local_feedback));
     const id = tasks.tasks[0].task_id;
     assert.match(id, /^CG-B-[a-f0-9]+$/);
     const repeated = edit();

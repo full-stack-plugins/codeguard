@@ -82,6 +82,18 @@ jobs:
           cargo test --locked -p codeguard-cli --test grammar_status_cli
           cargo test --locked -p codeguard-cli --features wasm-precheck --test grammar_status_cli
 
+      - name: Verify the local npm package contains a running WASM worker
+        run: |
+          cargo build --locked -p codeguard-cli --features wasm-precheck
+          export CODEGUARD_NO_WASM_BIN="$RUNNER_TEMP/codeguard-no-wasm"
+          export CODEGUARD_WASM_BIN="$PWD/target/debug/codeguard"
+          # 提前串行汇总全部安装包验收；失败仍以非零退出码阻断，不争抢 WASM 预算。
+          result=0
+          for suite in wasm repair erlang_repair ruby_repair shell_repair go_syntax_repair rust_syntax_repair; do
+            node --test "tests/npm_pack_${suite}.test.mjs" || result=1
+          done
+          exit "$result"
+
       - name: Verify Linux WASM worker resource boundary
         run: |
           # 帮助目录须保留当前构建特性；默认 suite 无法证明 WASM 入口状态。
@@ -118,27 +130,6 @@ jobs:
           cargo test --locked -p codeguard-cli --features wasm-precheck --test grammar_evaluation \
             replay_expanded_cohorts_and_archive_current_evidence -- \
             --ignored --exact --nocapture --test-threads=1
-
-      - name: Verify the local npm package contains a running WASM worker
-        run: |
-          cargo build --locked -p codeguard-cli --features wasm-precheck
-          CODEGUARD_NO_WASM_BIN="$RUNNER_TEMP/codeguard-no-wasm" \
-          CODEGUARD_WASM_BIN="$PWD/target/debug/codeguard" \
-          node --test tests/npm_pack_wasm.test.mjs
-          # 独占打包输出与 npm 缓存，不与上面的全量 grammar 包测试并发。
-          CODEGUARD_WASM_BIN="$PWD/target/debug/codeguard" \
-          node --test tests/npm_pack_repair.test.mjs
-          # 安装后的原生首次发现不依赖 WASM 任务；真实 OTP 目标须显式选择。
-          CODEGUARD_WASM_BIN="$PWD/target/debug/codeguard" \
-          node --test tests/npm_pack_erlang_repair.test.mjs
-          CODEGUARD_WASM_BIN="$PWD/target/debug/codeguard" \
-          node --test tests/npm_pack_ruby_repair.test.mjs
-          CODEGUARD_WASM_BIN="$PWD/target/debug/codeguard" \
-          node --test tests/npm_pack_shell_repair.test.mjs
-          CODEGUARD_WASM_BIN="$PWD/target/debug/codeguard" \
-          node --test tests/npm_pack_go_syntax_repair.test.mjs
-          CODEGUARD_WASM_BIN="$PWD/target/debug/codeguard" \
-          node --test tests/npm_pack_rust_syntax_repair.test.mjs
 
       - name: Explain remaining layering debt
         if: always()
