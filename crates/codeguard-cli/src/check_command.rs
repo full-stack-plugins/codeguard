@@ -91,7 +91,7 @@ enum OutputFormat {
 
 /// 执行已接入的原生检查并报告待确认的候选类别；当前绝不签发 allow。
 pub fn run(args: &[String]) -> ExitCode {
-    run_scoped(args, false)
+    run_scoped(args, false, None)
 }
 
 /// 对全部发现语言执行lint类别；输入复用检查参数，返回原生局部检查退出语义。
@@ -129,10 +129,40 @@ pub fn run_lint_all(args: &[String]) -> ExitCode {
         eprintln!("lint all不接受独立CVE或配置模型参数");
         return ExitCode::from(2);
     }
-    run_scoped(args, true)
+    run_scoped(args, true, None)
 }
 
-fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
+/// 执行同样检查，并显式观察同次Maven私有证据；不改变旧报告/退出语义。
+/// callback失败只写入capture_errors，原始检查仍正常完成。
+pub fn run_observed(
+    args: &[String],
+    observer: &crate::maven_capture_observer::MavenCaptureObserver<'_>,
+) -> crate::observed_check_outcome::ObservedCheckOutcome {
+    let errors = std::sync::Mutex::new(Vec::new());
+    let capture = |value: &crate::maven_native_capture::MavenNativeCapture| {
+        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| observer(value)))
+            .unwrap_or_else(|_| Err("native capture observer panicked".into()));
+        if let Err(error) = result {
+            errors
+                .lock()
+                .map_err(|_| "capture error slot poisoned".to_string())?
+                .push(error);
+        }
+        Ok(())
+    };
+    let exit_code = run_scoped(args, false, Some(&capture));
+    crate::observed_check_outcome::ObservedCheckOutcome {
+        exit_code,
+        capture_errors: errors
+            .into_inner()
+            .unwrap_or_else(|_| vec!["capture error slot poisoned".into()]),
+    }
+}
+fn run_scoped(
+    args: &[String],
+    lint_only: bool,
+    observer: Option<&crate::maven_capture_observer::MavenCaptureObserver<'_>>,
+) -> ExitCode {
     let mut parsed = match parse_args(args) {
         Ok(parsed) => parsed,
         Err(reason) => {
@@ -1026,6 +1056,7 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
                         java_sources.expect("Java 任务具备源码范围"),
                         &discovery.checker_configurations,
                         &JavadocNativeContext {
+                            observer,
                             manifest_sha256: &discovery.manifest_sha256,
                             java_home: parsed.java_home.as_deref(),
                             maven_tool: parsed.maven_tool.as_deref(),
@@ -2630,11 +2661,16 @@ fn run_scoped(args: &[String], lint_only: bool) -> ExitCode {
         .checker_configurations
         .iter()
         .any(|entry| entry.checker_id.starts_with("java.gradle."));
-    let confirmed_findings: usize = syntax_candidates["observations"].as_array()
-        .map(|arr| arr.iter().filter(|obs| {
-            let status = obs["status"].as_str().unwrap_or("");
-            status == "confirmed" || status == "violation"
-        }).count())
+    let confirmed_findings: usize = syntax_candidates["observations"]
+        .as_array()
+        .map(|arr| {
+            arr.iter()
+                .filter(|obs| {
+                    let status = obs["status"].as_str().unwrap_or("");
+                    status == "confirmed" || status == "violation"
+                })
+                .count()
+        })
         .unwrap_or(0);
     let has_unresolved = !unresolved.is_empty();
     let delivery_decision = if confirmed_findings > 0 {

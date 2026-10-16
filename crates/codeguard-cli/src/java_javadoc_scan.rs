@@ -16,6 +16,7 @@ use crate::maven_javadoc_probe::{
 };
 
 pub(crate) struct NativeContext<'a> {
+    pub observer: Option<&'a crate::maven_capture_observer::MavenCaptureObserver<'a>>,
     pub manifest_sha256: &'a BTreeMap<String, String>,
     pub java_home: Option<&'a Path>,
     pub maven_tool: Option<&'a Path>,
@@ -139,6 +140,7 @@ pub(crate) fn observe_project(
             });
             let observation = if stable {
                 observe_maven(&MavenRequest {
+                    observer: context.observer,
                     build_root: &root.join(&configuration.build_root),
                     sources: &selected,
                     expected_pom_sha256: context

@@ -1,17 +1,17 @@
 # Partme Guard 跨项目临时实施账本
 
-状态：全部待实施。本轮仅完成规划；下面的 fixture/测试模块为拟新增，不声称已经存在或执行。只在实现、目标 RED→GREEN、受影响回归及所需真实环境证据齐备后勾选。
+状态以逐项勾选为准。EG-M01清单建设已取得原生来源、引用、仓库发现及负例校验证据；其余任务仍按完整实现与实际验收判断，不因部分候选模块存在而勾选。各任务只有在目标RED→GREEN、受影响回归和要求的真实环境证据齐备后关闭。
 
 历史依赖前缀 K 为旧方案编号，现已按任务分别移交 GuardCore/ArchGuard/CodeGuard/GitGuard/FlowGuard，不能按前缀推断所有权；详见 ownership.md。其他前缀：F=codegraph-plugin，H=codeguard-plugin，R=codereview-plugin，G=gitflow-plugin，W=flowguard-plugin。跨仓依赖通过任务 ID 引用，完成状态只在所属仓账本维护。所有实现先复核当前 HEAD 与用户修改；目标路径与唯一 owner 见 [任务所有权](../../../docs/engineering-guard/ownership.md)；所有新项目代码应在目标仓库实现。
 
 ## 1. P0 协议与批准契约
 
-- [ ] 1.1 **EG-K01** 冻结协议 v1 和跨仓字段清单；新增 protocol crate、闭合 schemas 及正负黄金 fixture，验证未知版本/重复字段拒绝与旧报告保留。 依赖：EG-M01。规格：EG-CON-001, EG-EVI-004。
-- [ ] 1.2 **EG-K02** 实现 JSON Schema 校验和契约编译：组织锁定、来源引用、冲突、验证器可用性；先用缺 OPA/缺规则/冲突配置写 RED，再验证只读无安装/初始化。 依赖：EG-K01。规格：EG-CON-002, EG-CON-005。
-- [ ] 1.3 **EG-K03** 实现 TaskBinding、批准快照与冻结义务集合；用候选自改规则、漏模块、运行中契约变化反例验证；批准快照不能由结果倒推。 依赖：EG-K02。规格：EG-CON-001, EG-CON-003, EG-CON-004。
-- [ ] 1.4 **EG-K04** 实现 SubjectSnapshot/index/commit/merge_candidate 输入清单与无损路径身份；真实临时 Git 验证 SHA1/SHA256、rename、mode、symlink/submodule 支持或明确拒绝。 依赖：EG-K01。规格：EG-EVI-002。
-- [ ] 1.5 **EG-K05** 实现 SQLite/文件证据存储和事务恢复；验证并发写、busy、落盘中断、链接替换、丢失 artifact、脱敏与保留期限，不改旧 .codeguard 状态。 依赖：EG-K01。规格：EG-EVI-005。
-- [ ] 1.6 **EG-K06** 实现有界 Tokio runner、取消整棵受管进程树、运行序列和部分结果；验证超时/输出截断/迟到 PASS/崩溃恢复。 依赖：EG-K04, EG-K05。规格：EG-EVI-001, EG-EVI-003, EG-GATE-007。
+- [x] 1.1 **EG-K01** 冻结协议 v1 和跨仓字段清单；新增 protocol crate、闭合 schemas 及正负黄金 fixture，验证未知版本/重复字段拒绝与旧报告保留。 依赖：EG-M01。规格：EG-CON-001, EG-EVI-004。
+- [x] 1.2 **EG-K02** 实现 JSON Schema 校验和契约编译：组织锁定、来源引用、冲突、验证器可用性；先用缺 OPA/缺规则/冲突配置写 RED，再验证只读无安装/初始化。 依赖：EG-K01。规格：EG-CON-002, EG-CON-005。
+- [x] 1.3 **EG-K03** 实现 TaskBinding、批准快照与冻结义务集合；用候选自改规则、漏模块、运行中契约变化反例验证；批准快照不能由结果倒推。 依赖：EG-K02。规格：EG-CON-001, EG-CON-003, EG-CON-004。
+- [x] 1.4 **EG-K04** 实现 SubjectSnapshot/index/commit/merge_candidate 输入清单与无损路径身份；真实临时 Git 验证 SHA1/SHA256、rename、mode、symlink/submodule 支持或明确拒绝。 依赖：EG-K01。规格：EG-EVI-002。
+- [x] 1.5 **EG-K05** 实现 SQLite/文件证据存储和事务恢复；验证并发写、busy、落盘中断、链接替换、丢失 artifact、脱敏与保留期限，不改旧 .codeguard 状态。 依赖：EG-K01。规格：EG-EVI-005。
+- [x] 1.6 **EG-K06** 实现有界 Tokio runner、取消整棵受管进程树、运行序列和部分结果；验证超时/输出截断/迟到 PASS/崩溃恢复。 依赖：EG-K04, EG-K05。规格：EG-EVI-001, EG-EVI-003, EG-GATE-007。
 - [ ] 1.7 **EG-K07** 适配当前 CodeGuard completion/findings/evaluate_delivery；真实报告与旧协议双读对照，local_unverified/not_evaluated 不升级。 依赖：EG-K03, EG-K06。规格：EG-EVI-004, EG-GATE-001。
 - [ ] 1.8 **EG-K08** 接入固定版本 OPA argv 子进程和政策包；编写 Rego 正负测试，覆盖 undefined/超时/错误、不可豁免项和不同 mode；通用执行器和已批准规则包差分一致；流程组合策略由 FlowGuard 提供。 依赖：EG-K03, EG-K06。规格：EG-GATE-001, EG-GATE-005。
 - [ ] 1.9 **EG-K09** 实现独立 receipt/授权验证端口与可信提供者；伪造 actor、错 audience、撤销、过期和授权范围扩大均拒绝；范围不变不重复询问。 依赖：EG-K03, EG-K08。规格：EG-GATE-002, EG-GATE-003。
@@ -51,7 +51,7 @@
 
 以下沿用当前临时账本，目标 owner 是实现归属；新仓接收后按 EG-M01 转移，不能在两个位置分别勾选。第一阶段为 P0，第二阶段为 P1/P2；P3/P4 保留深化范围。
 
-- [ ] 6.1 **EG-M01** [P0; owner=guardcore] 建立七项目规格/任务/场景移交清单，核实目标仓库和初始化授权；保留稳定 ID、旧位置指针与唯一账本，未接收前不删原记录；用重复 owner 和丢失用例反例校验。 依赖：无。规格：EG-PROD-001, EG-PROD-003。
+- [x] 6.1 **EG-M01** [P0; owner=guardcore] 建立七项目规格/任务/场景移交清单，核实目标仓库和初始化授权；保留稳定 ID、旧位置指针与唯一账本，未接收前不删原记录；用重复 owner 和丢失用例反例校验。 依赖：无。规格：EG-PROD-001, EG-PROD-003。
 
 - [ ] 6.2 **EG-A01** [P0; owner=archguard] 实现独立 ArchGuard 产品入口、ArchUnit 适配和最小批准分层规则，合法/禁止边/不完整输入均真实验证；不将规则写入 GuardCore。 依赖：EG-K01, EG-K03, EG-K06。规格：EG-ARCH-001, EG-PROD-001, EG-PROD-006。
 

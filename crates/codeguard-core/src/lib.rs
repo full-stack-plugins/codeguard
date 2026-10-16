@@ -146,3 +146,6 @@ pub mod finding_identity;
 pub mod run_config;
 /// 带完整性状态的纯模块图。
 pub mod typed_module_graph;
+
+mod unbound_native_diagnostic;
+pub use unbound_native_diagnostic::UnboundNativeDiagnostic;

@@ -1,6 +1,6 @@
 # 工程守卫需求、任务与验收追溯
 
-日期：2026-10-09。共 50 条新增要求、78 项待实施任务、36 个跨仓端到端用例。此表仅引用原生账本，不保存第二份完成状态。每条正式 Requirement 自带 WHEN/THEN 场景；端到端用例补充跨组件验证，不替代局部场景。
+更新：2026-10-17。当前登记66条要求、113项稳定任务、94个正式局部场景和43个跨仓端到端用例。原先缺失的插件定义按既有规划重建并明确来源，不声称历史原文恢复。此表仅引用原生账本，不保存第二份完成状态。每条正式 Requirement 自带 WHEN/THEN 场景；端到端用例补充跨组件验证，不替代局部场景。
 
 ## codeguard
 
@@ -62,11 +62,11 @@
 | EG-WF-001 保留十阶段与原生事实源 | `docs/superpowers/specs/2026-09-23-flowguard-docs-ten-stage-governance.md` | EG-W01, EG-W07, EG-W12 | 正式规格局部场景；发布综合验收 |
 | EG-WF-002 独立证据与实际候选 | `docs/superpowers/specs/2026-09-23-flowguard-docs-ten-stage-governance.md` | EG-W02, EG-W09 | EG-AT-005 |
 | EG-WF-003 批准的来源与有效期 | `docs/superpowers/specs/2026-09-23-flowguard-docs-ten-stage-governance.md` | EG-W03, EG-W04, EG-W05, EG-W11 | EG-AT-004, EG-AT-018, EG-AT-020, EG-AT-034 |
-| EG-WF-004 唯一流程判定与统一动作决策 | `docs/superpowers/specs/2026-09-23-flowguard-docs-ten-stage-governance.md` | EG-W03, EG-W05, EG-W07 | EG-AT-004 |
+| EG-WF-004 唯一流程判定与统一动作决策 | `docs/superpowers/specs/2026-09-23-flowguard-docs-ten-stage-governance.md` | EG-W03, EG-W05, EG-W07, EG-W13 | EG-AT-004 |
 | EG-WF-005 跨插件协调与有界恢复 | `docs/superpowers/specs/2026-09-23-flowguard-docs-ten-stage-governance.md` | EG-W04, EG-W08 | EG-AT-018, EG-AT-020, EG-AT-032 |
 | EG-WF-006 任务依赖与风险范围 | `docs/superpowers/specs/2026-09-23-flowguard-docs-ten-stage-governance.md` | EG-W06, EG-W09, EG-W10 | EG-AT-033 |
 | EG-WF-007 历史与平台治理 | `docs/superpowers/specs/2026-09-23-flowguard-docs-ten-stage-governance.md` | EG-W10, EG-W11 | EG-AT-033, EG-AT-034 |
-| EG-WF-008 宿主与受控门禁验收 | `docs/superpowers/specs/2026-09-23-flowguard-docs-ten-stage-governance.md` | EG-W05, EG-W08, EG-W12 | EG-AT-004, EG-AT-032 |
+| EG-WF-008 宿主与受控门禁验收 | `docs/superpowers/specs/2026-09-23-flowguard-docs-ten-stage-governance.md` | EG-W05, EG-W08, EG-W12, EG-W13 | EG-AT-004, EG-AT-032 |
 ## gitflow-plugin
 
 | 要求 | 规范位置 | 实施任务 | 关联端到端用例 |
@@ -80,3 +80,26 @@
 ## 使用规则
 
 规范位置相对于本节仓库根；跨仓不依赖安装者具有兄弟目录。完整任务/依赖见各自 tasks 或 FlowGuard 原计划第 5 节。逐条验证在实施时保存实际测试名、命令、源码/输入指纹和报告引用；本表不填虚假的通过记录。
+
+## 七产品补充要求
+
+以下16项沿用总体change已有正式规格，补齐原追溯表未列出的七产品/SpecGuard/TestGuard范围。局部场景均在原生规格中，端到端用例仍待执行。
+
+| 要求 | 规范位置 | 实施任务 | 关联端到端用例 |
+|---|---|---|---|
+| EG-PROD-001 Seven independent products | [formal spec](../../openspec/changes/add-engineering-guard-core/specs/guard-product-boundaries/spec.md) | EG-M01, EG-A01, EG-Q01, EG-Q02, EG-J02, EG-L02 | EG-AT-042 |
+| EG-PROD-002 Five interfaces | [formal spec](../../openspec/changes/add-engineering-guard-core/specs/guard-product-boundaries/spec.md) | EG-J05, EG-P01, EG-P02, EG-P03, EG-P04, EG-P05, EG-P06, EG-P07 | EG-AT-042 |
+| EG-PROD-003 Single migration owner | [formal spec](../../openspec/changes/add-engineering-guard-core/specs/guard-product-boundaries/spec.md) | EG-M01, EG-J01, EG-J04, EG-J05, EG-L01, EG-L04 | EG-AT-031, EG-AT-042 |
+| EG-PROD-004 Generation and verification | [formal spec](../../openspec/changes/add-engineering-guard-core/specs/guard-product-boundaries/spec.md) | EG-A02, EG-S05 | EG-AT-043 |
+| EG-PROD-005 Honest staged delivery | [formal spec](../../openspec/changes/add-engineering-guard-core/specs/guard-product-boundaries/spec.md) | EG-J03, EG-L03, EG-L05, EG-S06, EG-T06 | EG-AT-001, EG-AT-042 |
+| EG-PROD-006 Independent and composed use | [formal spec](../../openspec/changes/add-engineering-guard-core/specs/guard-product-boundaries/spec.md) | EG-A01, EG-Q01, EG-J01, EG-L01, EG-L02, EG-L05, EG-P01, EG-P02, EG-P03, EG-P04, EG-P05, EG-P06, EG-P07 | EG-AT-042 |
+| EG-SPEC-001 Native specification sources | [formal spec](../../openspec/changes/add-engineering-guard-core/specs/specification-governance/spec.md) | EG-S01, EG-S06 | EG-AT-037 |
+| EG-SPEC-002 Completeness and traceability | [formal spec](../../openspec/changes/add-engineering-guard-core/specs/specification-governance/spec.md) | EG-S02, EG-S06 | EG-AT-038 |
+| EG-SPEC-003 Immutable requirement baseline | [formal spec](../../openspec/changes/add-engineering-guard-core/specs/specification-governance/spec.md) | EG-S03, EG-S06 | EG-AT-039 |
+| EG-SPEC-004 Consistency and acceptance | [formal spec](../../openspec/changes/add-engineering-guard-core/specs/specification-governance/spec.md) | EG-S02, EG-S04, EG-S06 | EG-AT-038 |
+| EG-SPEC-005 Evolution and protected input | [formal spec](../../openspec/changes/add-engineering-guard-core/specs/specification-governance/spec.md) | EG-S05, EG-S06 | EG-AT-039, EG-AT-043 |
+| EG-TEST-001 Frozen test plan | [formal spec](../../openspec/changes/add-engineering-guard-core/specs/test-governance/spec.md) | EG-T01, EG-T06 | EG-AT-040 |
+| EG-TEST-002 Real execution evidence | [formal spec](../../openspec/changes/add-engineering-guard-core/specs/test-governance/spec.md) | EG-T02, EG-T06 | EG-AT-040 |
+| EG-TEST-003 Coverage and adequacy | [formal spec](../../openspec/changes/add-engineering-guard-core/specs/test-governance/spec.md) | EG-T03, EG-T06 | EG-AT-040 |
+| EG-TEST-004 Contract and regression | [formal spec](../../openspec/changes/add-engineering-guard-core/specs/test-governance/spec.md) | EG-T04, EG-T06 | EG-AT-041 |
+| EG-TEST-005 Trusted and reproducible tests | [formal spec](../../openspec/changes/add-engineering-guard-core/specs/test-governance/spec.md) | EG-T05, EG-T06 | EG-AT-041 |

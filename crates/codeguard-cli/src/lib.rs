@@ -691,3 +691,12 @@ pub mod kotlin_applicability;
 pub mod language_applicability;
 pub mod zig_applicability;
 pub mod remaining_language_applicability;
+
+pub mod engineering_projection;
+
+#[cfg(unix)]
+pub mod maven_native_capture;
+#[cfg(unix)]
+pub mod maven_capture_observer;
+#[cfg(unix)]
+pub mod observed_check_outcome;

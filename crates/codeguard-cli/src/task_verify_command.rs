@@ -527,6 +527,7 @@ pub fn run(args: &[String]) -> ExitCode {
             &root,
             &brief,
             &crate::java_javadoc_scan::NativeContext {
+                observer: None,
                 manifest_sha256: &std::collections::BTreeMap::new(),
                 java_home: parsed.java_home.as_deref(),
                 maven_tool: parsed.maven_tool.as_deref(),

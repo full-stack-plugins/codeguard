@@ -49,6 +49,26 @@ jobs:
             exit 1
           }
 
+      - name: Verify Engineering Guard projection and real CLI smoke early
+        timeout-minutes: 15
+        # Runs before SDK provisioning/full language suite. Missing tools remain incomplete.
+        run: |
+          python3 scripts/verify_engineering_schema_sources.py
+          cargo test --locked -p codeguard-cli --lib engineering_projection::tests -- --test-threads=2
+          cargo test --locked -p codeguard-cli --test engineering_cli_smoke -- --nocapture --test-threads=1
+
+      - name: Verify real same-run Java Maven projection before full language suite
+        timeout-minutes: 10
+        # JDK21 is the existing native Javadoc profile requirement; no global SDK install.
+        # Preparation resolves isolated Maven plugin artifacts only; its logs are never reused as run evidence.
+        run: |
+          test -x "$JAVA_HOME_21_X64/bin/java"
+          export CODEGUARD_TEST_JAVA_HOME="$JAVA_HOME_21_X64"
+          export CODEGUARD_MAVEN_BIN="$(command -v mvn)"
+          export CODEGUARD_JAVADOC_MAVEN_REPO="$RUNNER_TEMP/engineering-maven-artifacts"
+          export CODEGUARD_ENGINEERING_MAVEN_SMOKE_WARMUP=1
+          cargo test --locked -p codeguard-cli --test engineering_maven_smoke -- --ignored --exact real_maven_same_execution_projects_product_feedback_with_captured_sources_and_logs --test-threads=1
+
       - name: Verify crate layering debt does not grow
         run: python3 scripts/check_layering.py
 

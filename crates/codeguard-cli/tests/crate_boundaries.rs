@@ -31,8 +31,11 @@ fn allowed(package: &str, dependency: &str, kind: &str) -> bool {
                 )
         }
         "codeguard-cli" => {
-            (matches!(dependency, "ring" | "tokio" | "base64") && kind == "dev")
-                || (matches!(dependency, "http" | "guard-install") && kind == "normal")
+            (matches!(dependency, "ring" | "tokio" | "base64" | "guard-subject") && kind == "dev")
+                || (matches!(
+                    dependency,
+                    "http" | "guard-install" | "guard-protocol" | "guard-contract"
+                ) && kind == "normal")
                 || matches!(
                     dependency,
                     "codeguard-core"
@@ -229,12 +232,28 @@ fn network_dependencies_are_runtime_only_and_async_cli_support_is_test_only() {
 }
 
 #[test]
-fn agent_installation_is_cli_normal_only() {
-    assert!(violations(&one_dependency("codeguard-cli", "guard-install", "normal")).is_empty());
-    for package in ["codeguard-core", "codeguard-runtime", "codeguard-adapters"] {
-        assert!(!violations(&one_dependency(package, "guard-install", "normal")).is_empty());
+fn shared_guard_libraries_are_cli_normal_only() {
+    // 真实Git候选采集只用于CLI集成验收，不能变成专业内核/运行时生产依赖。
+    for package in [
+        "codeguard-core",
+        "codeguard-runtime",
+        "codeguard-adapters",
+        "codeguard-cli",
+    ] {
+        for kind in ["normal", "build", "dev"] {
+            assert_eq!(
+                violations(&one_dependency(package, "guard-subject", kind)).is_empty(),
+                package == "codeguard-cli" && kind == "dev"
+            );
+        }
     }
-    for kind in ["dev", "build"] {
-        assert!(!violations(&one_dependency("codeguard-cli", "guard-install", kind)).is_empty());
+    for dependency in ["guard-install", "guard-protocol", "guard-contract"] {
+        assert!(violations(&one_dependency("codeguard-cli", dependency, "normal")).is_empty());
+        for package in ["codeguard-core", "codeguard-runtime", "codeguard-adapters"] {
+            assert!(!violations(&one_dependency(package, dependency, "normal")).is_empty());
+        }
+        for kind in ["dev", "build"] {
+            assert!(!violations(&one_dependency("codeguard-cli", dependency, kind)).is_empty());
+        }
     }
 }

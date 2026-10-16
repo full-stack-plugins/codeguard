@@ -23,6 +23,7 @@ const SETTINGS: &str = include_str!("../resources/isolated_maven_settings.xml");
 
 /// 多文件探针输入；所有路径相对同一个构建根。
 pub(crate) struct Request<'a> {
+    pub observer: Option<&'a crate::maven_capture_observer::MavenCaptureObserver<'a>>,
     pub build_root: &'a Path,
     pub sources: &'a BTreeSet<String>,
     pub expected_pom_sha256: &'a str,
@@ -160,10 +161,12 @@ pub(crate) fn observe(request: &Request<'_>) -> Value {
         deadline: request.deadline,
         output_limit_bytes: 2 * 1024 * 1024,
     };
+    let dispatch_requested_at = SystemTime::now();
     let outcome = match run_process_recorded(&spec, request.cancelled, &evidence, "javadoc.log") {
         Ok(outcome) => outcome,
         Err(_) => return with_reason(report, "native_process_incomplete"),
     };
+    let process_observed_finished_at = SystemTime::now();
     if snapshot.verify_unchanged(&project).ok() != Some(true)
         || read_bounded_regular_file(&project.join("settings.xml"), 64 * 1024)
             .ok()
@@ -252,7 +255,34 @@ pub(crate) fn observe(request: &Request<'_>) -> Value {
         MavenJavadocParseState::CleanLogUnverified => "clean_log_unverified",
         MavenJavadocParseState::Incomplete => unreachable!(),
     });
-    with_reason(report, "direct_pom_scope_and_effective_model_unverified")
+    let report = with_reason(report, "direct_pom_scope_and_effective_model_unverified");
+    if let Some(observer) = request.observer {
+        let sources = snapshot
+            .files()
+            .iter()
+            .filter(|(path, _)| path.as_path() != Path::new("pom.xml"))
+            .map(|(path, bytes)| {
+                (
+                    path.to_string_lossy().into_owned(),
+                    (
+                        project.join(path).to_string_lossy().into_owned(),
+                        bytes.clone(),
+                    ),
+                )
+            })
+            .collect();
+        // 此时输入、工具身份与原生诊断位置均已复验；回调只读取私有快照，不改变产品报告。
+        let capture = crate::maven_native_capture::MavenNativeCapture {
+            native_report: report.clone(),
+            sources,
+            outcome,
+            dispatch_requested_at,
+            process_observed_finished_at,
+        };
+        // run_observed包装器负责收集Err；默认observe调用没有观察者。
+        let _ = observer(&capture);
+    }
+    report
 }
 
 /// 为检查前配置变化生成同形状的未完成观察，避免宿主得到无法解析的局部对象。
@@ -324,6 +354,7 @@ mod tests {
         let sources = BTreeSet::from(["src/main/java/Demo.java".to_owned()]);
         let cancelled = AtomicBool::new(false);
         let request = Request {
+            observer: None,
             build_root: &root,
             sources: &sources,
             expected_pom_sha256: &format!(
@@ -343,6 +374,7 @@ mod tests {
         assert_eq!(report["findings"], serde_json::json!([]));
         assert_eq!(report["pom_mode"], "unverified");
         let changed = observe(&Request {
+            observer: None,
             expected_pom_sha256: &"f".repeat(64),
             ..request
         });
@@ -376,6 +408,7 @@ mod tests {
             let sources =
                 BTreeSet::from(["src/main/java/Demo.java".to_owned(), generated.to_owned()]);
             let request = Request {
+                observer: None,
                 build_root: &root,
                 sources: &sources,
                 expected_pom_sha256: &pom_digest,
@@ -418,6 +451,7 @@ mod tests {
             sha2::Sha256::digest(fs::read(root.join("pom.xml")).unwrap())
         );
         let report = observe(&Request {
+            observer: None,
             build_root: &root,
             sources: &sources,
             expected_pom_sha256: &pom_digest,

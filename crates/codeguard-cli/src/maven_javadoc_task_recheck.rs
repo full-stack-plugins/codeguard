@@ -172,6 +172,7 @@ pub(crate) fn run(
         &sources,
         &discovery.checker_configurations,
         &NativeContext {
+            observer: context.observer,
             manifest_sha256: &discovery.manifest_sha256,
             java_home: Some(home),
             maven_tool: Some(maven),

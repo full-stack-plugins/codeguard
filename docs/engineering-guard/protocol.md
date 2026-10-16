@@ -2,7 +2,7 @@
 
 > 当前协议 owner 为目标项目 GuardCore；本文暂存在 CodeGuard 规划目录，迁移由 EG-M01 执行。专业规则包必须声明 domainOwner=specguard/archguard/codeguard/testguard/gitguard/flowguard，GuardCore 不接受自身作为专业域 owner。
 
-状态：规划，未发布 schema/CLI。规范要求见 [engineering-evidence](../../openspec/changes/add-engineering-guard-core/specs/engineering-evidence/spec.md) 和 [engineering-gate](../../openspec/changes/add-engineering-guard-core/specs/engineering-gate/spec.md)。本文细化字段，不建立另一份完成账本。
+状态：v1候选类型、Schema与黄金样本已在GuardEngine的guard-protocol中实现，尚未发布；完整CLI及受信控制面仍待完成。规范要求见 [engineering-evidence](../../openspec/changes/add-engineering-guard-core/specs/engineering-evidence/spec.md) 和 [engineering-gate](../../openspec/changes/add-engineering-guard-core/specs/engineering-gate/spec.md)。本文细化字段，不建立另一份完成账本。
 
 ## 1. 共用标识与契约
 
@@ -19,6 +19,31 @@
 | FactEnvelope | factType、symbol/edge/sourceSpan、sourceDigest、producerIdentity、indexIdentity、resolutionKind、coverage、limitations；图谱事实不含放行权 |
 
 JSON 规范化采用 RFC 8785/JCS 兼容字节规则并固定实现测试向量；大数身份用字符串，时间为明确 UTC 格式，文件摘要基于原始字节。Git 路径以无损字节表示或显式编码，不能经大小写折叠、Unicode 归一化或损失解码碰撞。仓库 ID 不直接等同本地路径；跨克隆映射由受信注册表确认，不凭 remote URL 猜测同一身份。
+
+### 契约目标与执行目标（2026-10-17 实施细化）
+
+批准契约冻结的是完整检查义务、目标选择和受保护输入，不是把未来所有业务代码固定为批准时字节。候选字节变化必须产生新计划并使旧结果失效，但不因此自动扩大授权或重复申请同一范围授权。候选自行修改规则、删目标或降低证据要求，仍不能改变批准契约。
+
+| 类型 | 所属阶段 | 字段与边界 |
+|---|---|---|
+| TargetSelection | 批准契约 | repositoryId/path/selector，以及可选protectedDigest；缺protectedDigest表示在批准选择范围内绑定当前候选，存在则必须核对固定内容，不能自动刷新 |
+| ContractObligation | 批准契约 | obligationId/ruleId/verifierId/required/requiredEvidence/targets（TargetSelection全集）；不从实际扫描结果删减 |
+| ExactTarget | 执行前 | repositoryId/path/selector/inputDigest；从实际输入绑定本次内容身份，不能用空摘要补缺目标 |
+| Obligation | VerificationPlan | 保留原义务身份与要求，将全部TargetSelection解析成ExactTarget；缺模块或受保护内容不符时返回明确incomplete，不产生缩减的可执行计划 |
+
+ContractSnapshot使用ContractObligation，VerificationPlan使用已绑定Obligation。批准范围、protectedDigest、规则、工具或策略变化属于契约/环境变化，需要相应批准与新计划；单纯候选内容变化在既有批准范围内重新冻结和复验。持久化读取或JSON解析本身不能恢复受信权限，恢复绑定仍须核对批准契约及实际候选。
+
+```mermaid
+flowchart LR
+  A[原生规格与独立批准] --> C[固定规则和目标选择]
+  C --> B[不可变有效契约]
+  S[实际 Git 候选与完整输入] --> P[执行前冻结计划]
+  B --> P
+  P -->|缺模块或受保护内容不符| I[明确 incomplete]
+  P -->|义务完整且输入匹配| R[受管执行与证据]
+  S -->|候选改变| N[生成新计划并复验]
+  B --> N
+```
 
 ## 2. GuardResult
 
@@ -76,4 +101,4 @@ FlowGuard 已有 CodeReview evidence 消费代码，必须差分迁移该映射�
 
 v1 发布包包含 JSON Schema、正负黄金 fixture、enum/退出映射、兼容矩阵和摘要清单。生产者和消费者分别验证，不能只互相接受同一个错误。旧报告通过明确 adapterVersion 投影，原件保留；未知 major 返回 incomplete。
 
-根协议 owner 是 codeguard 的本 change。其它仓库引用协议 ID 和不可变发布摘要；未发布阶段用仓库名 + 相对路径定位，不建立跨仓 Python import 或不可移植的 sibling skill 链接。release manifest 冻结 core/五插件/schema/policy/toolchain 的版本组合，禁止 `latest` 作为信任依据。
+协议实现owner是逻辑GuardCore，实际仓库为guardengine；正式规格及总体任务在移交前仍由CodeGuard本change维护。其它仓库引用协议ID和不可变发布摘要；未发布阶段用仓库名+相对路径定位，不建立跨仓Python import或不可移植的sibling skill链接。release manifest最终冻结core/五插件/schema/policy/toolchain版本组合；当前protocol候选清单只锁Schema与样本，不能替代该完整组合清单，禁止latest作为信任依据。
