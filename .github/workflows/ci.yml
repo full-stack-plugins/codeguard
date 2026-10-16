@@ -24,7 +24,7 @@ jobs:
           cargo +1.85.0 check --locked --workspace --all-targets --features wasm-precheck
   gate:
     # ubuntu-latest 预装稳定版 Rust；Cargo.toml 声明 rust-version = 1.85 / edition = 2024。
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       # Linux 完整 DWARF 测试制品会超出 SDK 的 256 MiB 宿主制品读取预算。
       # 仅去掉测试调试符号；保留 debug assertions 和产品读取上限。
@@ -51,6 +51,10 @@ jobs:
 
       - name: Verify crate layering debt does not grow
         run: python3 scripts/check_layering.py
+
+      - name: Provision real acceptance toolchains
+        # 仅安装到临时 CI runner；缺工具不能冒充负例检出或通过。
+        run: bash scripts/setup_ci_native_toolchains.sh
 
       - name: Build workspace
         run: cargo build --workspace --all-targets
