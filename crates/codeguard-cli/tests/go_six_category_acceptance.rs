@@ -2,12 +2,20 @@
 
 use std::process::Command;
 
+/// 为每个并行验收创建独立项目，禁止清理其它测试正在使用的目录。
+fn project_dir(name: &str) -> std::path::PathBuf {
+    let nonce = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_nanos();
+    let root = std::env::temp_dir().join(format!("{name}-{}-{nonce}", std::process::id()));
+    std::fs::create_dir(&root).unwrap();
+    root
+}
+
 #[test]
 fn valid_go_samples_pass_vet() {
-    let tmp = std::env::temp_dir().join("go-comment-test");
-    let _ = std::fs::remove_dir_all(&tmp);
-    let tmp = std::env::temp_dir().join("go-valid-test");
-    std::fs::create_dir_all(tmp.clone()).unwrap();
+    let tmp = project_dir("go-valid-test");
     std::fs::write(tmp.join("go.mod"), "module example\ngo 1.21\n").unwrap();
     std::fs::write(tmp.join("main.go"), "package main\n\nfunc main() {}\n").unwrap();
 
@@ -27,10 +35,7 @@ fn valid_go_samples_pass_vet() {
 
 #[test]
 fn invalid_go_samples_are_detected() {
-    let tmp = std::env::temp_dir().join("go-comment-test");
-    let _ = std::fs::remove_dir_all(&tmp);
-    let tmp = std::env::temp_dir().join("go-invalid-test");
-    std::fs::create_dir_all(tmp.clone()).unwrap();
+    let tmp = project_dir("go-invalid-test");
     std::fs::write(tmp.join("go.mod"), "module example\ngo 1.21\n").unwrap();
     // 语法错误
     std::fs::write(tmp.join("main.go"), "package main\n\nfunc main( { }\n").unwrap();
@@ -47,12 +52,9 @@ fn invalid_go_samples_are_detected() {
 
 #[test]
 fn formatting_cannot_impersonate_comment_checking() {
-    let tmp = std::env::temp_dir().join("go-comment-test");
-    let _ = std::fs::remove_dir_all(&tmp);
     // 关键验证：go vet 能通过（格式正确）不等于注释合规
     // go vet 检查的是代码正确性，不是文档完整性
-    let tmp = std::env::temp_dir().join("go-comment-test");
-    std::fs::create_dir_all(&tmp).unwrap();
+    let tmp = project_dir("go-comment-test");
     std::fs::write(tmp.join("go.mod"), "module example\ngo 1.21\n").unwrap();
     std::fs::write(
         tmp.join("main.go"),

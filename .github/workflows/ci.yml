@@ -55,6 +55,11 @@ jobs:
       - name: Build workspace
         run: cargo build --workspace --all-targets
 
+      - name: Run test suite
+        # 先汇总普通构建全部测试失败，避免长耗时 WASM 回放后才发现前置兼容问题。
+        # --no-fail-fast 仍以非零退出码阻断流水线，只扩展本轮可诊断的失败范围。
+        run: cargo test --workspace --all-targets --no-fail-fast
+
       - name: Verify canonical legacy identities and archived migration audit
         run: |
           cargo test --locked -p codeguard-adapters --test legacy_registry_identity
@@ -130,9 +135,6 @@ jobs:
           node --test tests/npm_pack_go_syntax_repair.test.mjs
           CODEGUARD_WASM_BIN="$PWD/target/debug/codeguard" \
           node --test tests/npm_pack_rust_syntax_repair.test.mjs
-
-      - name: Run test suite
-        run: cargo test --workspace --all-targets
 
       - name: Explain remaining layering debt
         if: always()

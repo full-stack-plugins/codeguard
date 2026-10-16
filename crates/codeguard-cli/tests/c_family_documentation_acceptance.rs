@@ -1,11 +1,11 @@
 //! C/C++ 详细文档注释验收（15.3）。
 //!
-//! `comments <c|cpp> FILE --clang-tool ABS --standard` 使用真实 Clang
-//! 文档观察档案。Clang 此档案不检查所有缺失注释（如实披露），
-//! 本验收验证：完整文档原生完成零假阳性、符号链接拒绝、
-//! 坏工具拒绝、报告结构与复检命令完整。
+//! 使用显式固定协议的受控子进程，验证 CLI 观察与报告契约。
+//! 这些样本不证明真实 Clang 的文档解析准确性；真实工具回放保留在
+//! c_family_comments_cli 的显式 Apple Clang 21 测试中。
+//! 同时验证错版本在扫描前被拒绝，零诊断不能证明详细文档合规。
 
-use std::process::Command;
+use std::{os::unix::fs::PermissionsExt, path::Path, process::Command};
 
 fn ensure_clean_dir(name: &str) -> std::path::PathBuf {
     let tmp = std::env::temp_dir().join(format!("{}-{}", name, std::process::id()));
@@ -15,12 +15,27 @@ fn ensure_clean_dir(name: &str) -> std::path::PathBuf {
     tmp.canonicalize().unwrap_or(tmp)
 }
 
-fn clang_tool() -> &'static str {
-    "/usr/bin/clang"
+/// 受控协议夹具：不能把 CI 预装的任意 Clang 冒充固定 Apple Clang。
+fn clang_tool(root: &Path) -> String {
+    clang_with_version(root, "Apple clang version 21.0.0 (clang-2100.3.34.2)")
 }
 
-fn clangpp_tool() -> &'static str {
-    "/usr/bin/clang++"
+fn clang_with_version(root: &Path, version: &str) -> String {
+    let tool = root.join("clang-fixture");
+    let report = serde_json::json!({
+        "version":"2.1.0",
+        "runs":[{"columnKind":"unicodeCodePoints",
+            "invocations":[{"executionSuccessful":true}], "artifacts":[],
+            "tool":{"driver":{"name":"clang",
+                "version":"Apple clang version 21.0.0 (clang-2100.3.34.2)","rules":[]}},
+            "results":[]}]
+    });
+    std::fs::write(&tool, format!(
+        "#!/bin/sh\nif [ \"$1\" = '--version' ]; then echo '{version}'; exit 0; fi\ncat >/dev/null\ntouch '{}/scan-executed'\ncat <<'REPORT' >&2\n{report}\nREPORT\n",
+        root.display()
+    )).unwrap();
+    std::fs::set_permissions(&tool, std::fs::Permissions::from_mode(0o700)).unwrap();
+    tool.to_str().unwrap().to_owned()
 }
 
 const COMPLETE_C: &str = r#"/**
@@ -57,7 +72,7 @@ int add(int a, int b) {
 }
 "#;
 
-/// 完整 Doxygen 文档的 C 文件：真实 Clang 原生扫描完成且零假阳性。
+/// C 文档样本的受控零诊断回执保留本地完成状态，不签发合规结论。
 #[test]
 fn complete_c_documentation_native_scan_no_false_positive() {
     let root = ensure_clean_dir("codeguard-c-doc-complete");
@@ -69,7 +84,7 @@ fn complete_c_documentation_native_scan_no_false_positive() {
             "c",
             file.to_str().unwrap(),
             "--clang-tool",
-            clang_tool(),
+            &clang_tool(&root),
             "--standard",
             "c11",
             "--format=json",
@@ -79,14 +94,19 @@ fn complete_c_documentation_native_scan_no_false_positive() {
     let stdout = String::from_utf8_lossy(&output.stdout);
     let report: serde_json::Value = serde_json::from_str(&stdout).expect("JSON 解析失败");
 
-    // 原生扫描应完成（真实 Clang 被调用）
+    // 受控子进程报告完成，不冒充真实工具准确性验收。
     assert_eq!(
         report["native"]["status"], "completed",
         "完整文档的 C 文件原生扫描应完成: {}",
         report["native"]["reason"]
     );
-    // 完整文档不得产生原生诊断（零假阳性）
-    let diagnostics = report["native"]["diagnostics"].as_array().cloned().unwrap_or_default();
+    assert_eq!(report["detailed_contract_qualification"], "not_granted");
+    // 协议夹具的空诊断必须原样保留，不冒充真实语义证明。
+    assert!(root.join("scan-executed").exists());
+    let diagnostics = report["native"]["diagnostics"]
+        .as_array()
+        .cloned()
+        .unwrap_or_default();
     assert!(
         diagnostics.is_empty(),
         "完整 Doxygen 文档不应有原生诊断（零假阳性）: {diagnostics:?}"
@@ -99,7 +119,7 @@ fn complete_c_documentation_native_scan_no_false_positive() {
     let _ = std::fs::remove_dir_all(&root);
 }
 
-/// 完整 Doxygen 文档的 C++ 文件：真实 Clang++ 原生扫描完成且零假阳性。
+/// C++ 文档样本的受控零诊断回执保留本地完成状态。
 #[test]
 fn complete_cpp_documentation_native_scan_no_false_positive() {
     let root = ensure_clean_dir("codeguard-cpp-doc-complete");
@@ -111,7 +131,7 @@ fn complete_cpp_documentation_native_scan_no_false_positive() {
             "cpp",
             file.to_str().unwrap(),
             "--clang-tool",
-            clangpp_tool(),
+            &clang_tool(&root),
             "--standard",
             "c++17",
             "--format=json",
@@ -126,7 +146,11 @@ fn complete_cpp_documentation_native_scan_no_false_positive() {
         "完整文档的 C++ 文件原生扫描应完成: {}",
         report["native"]["reason"]
     );
-    let diagnostics = report["native"]["diagnostics"].as_array().cloned().unwrap_or_default();
+    assert!(root.join("scan-executed").exists());
+    let diagnostics = report["native"]["diagnostics"]
+        .as_array()
+        .cloned()
+        .unwrap_or_default();
     assert!(
         diagnostics.is_empty(),
         "完整 Doxygen 文档不应有原生诊断（零假阳性）: {diagnostics:?}"
@@ -149,7 +173,7 @@ fn symlink_source_path_is_rejected() {
             "c",
             link.to_str().unwrap(),
             "--clang-tool",
-            clang_tool(),
+            &clang_tool(&root),
             "--standard",
             "c11",
             "--format=json",
@@ -208,7 +232,7 @@ fn report_contains_verification_command_and_standard() {
             "c",
             file.to_str().unwrap(),
             "--clang-tool",
-            clang_tool(),
+            &clang_tool(&root),
             "--standard",
             "c11",
             "--format=json",
@@ -253,7 +277,7 @@ fn missing_docs_keeps_honest_incomplete_status() {
             "c",
             file.to_str().unwrap(),
             "--clang-tool",
-            clang_tool(),
+            &clang_tool(&root),
             "--standard",
             "c11",
             "--format=json",
@@ -265,14 +289,51 @@ fn missing_docs_keeps_honest_incomplete_status() {
 
     // 原生扫描应完成
     assert_eq!(report["native"]["status"], "completed");
+    assert!(root.join("scan-executed").exists());
     // 但命令整体不得声称完成（零诊断不能证明详细文档合规）
     assert_eq!(report["command_status"], "incomplete");
     assert_ne!(report["delivery_decision"], "allow");
     // 应有修复指引
-    let actions = report["next_actions"].as_array().cloned().unwrap_or_default();
+    let actions = report["next_actions"]
+        .as_array()
+        .cloned()
+        .unwrap_or_default();
     assert!(
         !actions.is_empty(),
         "缺文档样本应保留下一步指引，不得静默放行"
     );
     let _ = std::fs::remove_dir_all(&root);
+}
+
+/// 相近版本或另一发行版均不能获得固定检查器资格，也不得开始扫描。
+#[test]
+fn unverified_clang_versions_are_rejected_before_scanning() {
+    for (name, version) in [
+        ("upstream", "clang version 21.0.0"),
+        ("apple-other", "Apple clang version 20.0.0 (clang-2000.0.0)"),
+    ] {
+        let root = ensure_clean_dir(&format!("codeguard-c-doc-version-{name}"));
+        let file = root.join("complete.c");
+        std::fs::write(&file, COMPLETE_C).unwrap();
+        let tool = clang_with_version(&root, version);
+        let output = Command::new(env!("CARGO_BIN_EXE_codeguard"))
+            .args([
+                "comments",
+                "c",
+                file.to_str().unwrap(),
+                "--clang-tool",
+                &tool,
+                "--standard",
+                "c11",
+                "--format=json",
+            ])
+            .output()
+            .unwrap();
+        let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+        assert_eq!(report["native"]["status"], "incomplete");
+        assert_eq!(report["native"]["reason"], "clang_version_unverified");
+        assert_ne!(report["delivery_decision"], "allow");
+        assert!(!root.join("scan-executed").exists());
+        std::fs::remove_dir_all(root).unwrap();
+    }
 }
