@@ -663,7 +663,7 @@ fn actual_public_original_recheck_imports_wrapped_findings_and_invalidates_old_o
         .unwrap();
     assert_eq!(out.status.code(), Some(3));
     let historical: Value = serde_json::from_slice(&out.stdout).unwrap();
-    assert_eq!(historical["schema_version"], "0.67.0");
+    assert_eq!(historical["schema_version"], "0.73.0");
     let fact: Value = serde_json::from_slice(
         &fs::read(dir.0.join(format!(".codeguard/findings/{id}/finding.json"))).unwrap(),
     )

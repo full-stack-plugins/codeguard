@@ -146,7 +146,7 @@ fn controlled_success_and_warning_failure_preserve_each_detailed_rule_through_or
                     .contains("详细说明")
             );
             let aggregate = f.run(&["check", "java"], true);
-            assert_eq!(aggregate["schema_version"], "0.69.0");
+            assert_eq!(aggregate["schema_version"], "0.73.0");
             let path = fs::read_dir(f.root.join(".codeguard/reports"))
                 .unwrap()
                 .map(|p| p.unwrap().path())

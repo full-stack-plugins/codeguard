@@ -90,7 +90,7 @@ fn module_fallback_reuses_task_across_project_lint_and_edit_without_commonjs_fal
     let cjs = rows.iter().find(|r| r["path"] == "input.cjs").unwrap();
     assert!(cjs.get("structural_observations").is_none());
     assert!(cjs.get("javascript_mode_observation").is_none());
-    assert_eq!(first["schema_version"], "0.60.0");
+    assert_eq!(first["schema_version"], "0.73.0");
     assert_eq!(first["syntax_tasks"]["failures"], json!([]));
     let id = first["syntax_tasks"]["tasks"]
         .as_array()
@@ -115,7 +115,7 @@ fn module_fallback_reuses_task_across_project_lint_and_edit_without_commonjs_fal
     assert_eq!(lint["setup"]["task_id"], id, "{lint}");
     assert_eq!(lint["setup"]["requirement"], "required");
     let lint_all = run(&fixture.0, &["lint", "all"], None);
-    assert_eq!(lint_all["schema_version"], "0.60.0");
+    assert_eq!(lint_all["schema_version"], "0.73.0");
     assert_eq!(lint_all["requested_categories"], json!(["lint"]));
     assert!(
         lint_all["syntax_tasks"]["tasks"]

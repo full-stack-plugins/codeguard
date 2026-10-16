@@ -59,7 +59,7 @@ test('离线npm ShellCheck编辑、项目检查和原工具复检复用任务，
     assert.match(id ?? '', /^CG-[a-f0-9]{32}$/);
     assert.equal(edit().local_feedback.shell_lint.files[0].workbench.task_ids[0], id);
     const aggregate = invoke(['check', 'shell', project, '--shellcheck-tool', tool, '--timeout', '30s']);
-    assert.equal(aggregate.schema_version, '0.52.0');
+    assert.equal(aggregate.schema_version, '0.73.0');
     assert.equal(aggregate.native_results.shell_lint.files.find(f => f.path === 'app.sh').workbench.task_ids[0], id);
     assert.deepEqual(aggregate.syntax_candidates.observations, []);
     const lint = invoke(['lint', 'shell', source, '--dialect', 'bash', '--shellcheck-tool', tool, '--timeout', '30s']);

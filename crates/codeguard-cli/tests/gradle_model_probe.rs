@@ -320,7 +320,7 @@ fn public_check_preserves_gradle_model_failure_as_local_configuration_observatio
         .unwrap();
     assert_eq!(output.status.code(), Some(3), "{output:?}");
     let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
-    assert_eq!(report["schema_version"], "0.62.0");
+    assert_eq!(report["schema_version"], "0.73.0");
     assert_eq!(
         report["native_results"]["java_gradle_model"]["reason"],
         "native_execution_incomplete"
@@ -440,7 +440,7 @@ fn public_check_runs_existing_gradle_model_without_promoting_quality_configurati
         .unwrap();
     assert_eq!(output.status.code(), Some(3), "{output:?}");
     let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
-    assert_eq!(report["schema_version"], "0.62.0");
+    assert_eq!(report["schema_version"], "0.73.0");
     assert_eq!(
         report["native_results"]["java_gradle_model"]["native_status"], "model_observed_unverified",
         "{report}"

@@ -1099,7 +1099,7 @@ fn unified_check_schedules_original_gradle_cve_and_exposes_native_advisories() {
         String::from_utf8_lossy(&out.stderr)
     );
     let value: Value = serde_json::from_slice(&out.stdout).unwrap();
-    assert_eq!(value["schema_version"], "0.71.0");
+    assert_eq!(value["schema_version"], "0.73.0");
     assert_eq!(
         value["native_results"]["java_gradle_cve"]["native_status"],
         "reports_observed_unverified"

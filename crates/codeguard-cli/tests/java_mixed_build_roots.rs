@@ -75,7 +75,7 @@ fn same_root_maven_and_each_gradle_dsl_preserve_both_checker_paths() {
             );
         }
         let checked = p.run(&["check", "java"]);
-        assert_eq!(checked["schema_version"], "0.61.0");
+        assert_eq!(checked["schema_version"], "0.73.0");
         for category in ["dependencies", "cve", "security"] {
             let row = checked["category_candidates"]
                 .as_array()
@@ -88,7 +88,7 @@ fn same_root_maven_and_each_gradle_dsl_preserve_both_checker_paths() {
             assert_eq!(row["reason"], "checker_build_systems_mixed", "{checked}");
         }
         let lint = p.run(&["lint", "all"]);
-        assert_eq!(lint["schema_version"], "0.61.0");
+        assert_eq!(lint["schema_version"], "0.73.0");
         assert_eq!(lint["requested_categories"], json!(["lint"]));
         assert!(
             lint["category_candidates"]

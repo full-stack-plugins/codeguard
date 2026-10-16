@@ -7,7 +7,7 @@
 `codeguard_cli::engineering_projection::project_raw(raw_bytes, optional_context)`分别处理：
 
 1. `run_report`的精确1.0/1.1/1.2/1.3/1.4，复用既有`run_report::parse_run_report`。类型化completion/findings/coverage映射保留已确认发现，继续调用`codeguard_core::evaluate_delivery`，不重写质量规则。1.04等非规范拼法也拒绝。
-2. 实际`check_command::run`输出的`check_feedback`，按已有0.38..0.72各具体schema文件识别，不存在/未知版本保持Incomplete。包含106份编译期白名单Schema的完整引用闭包；已有file/URN引用先改写到内存`$defs`，由GuardCore的`guard-contract::SchemaValidator`真实求值，不读取调用者路径或联网。`scripts/verify_engineering_schema_sources.py`只读核对全部引用与编译期清单。
+2. 实际`check_command::run`输出的`check_feedback`，按已有0.38..0.73各具体schema文件识别，不存在/未知版本保持Incomplete。包含107份编译期白名单Schema的完整引用闭包；已有file/URN引用先改写到内存`$defs`，由GuardCore的`guard-contract::SchemaValidator`真实求值，不读取调用者路径或联网。`scripts/verify_engineering_schema_sources.py`只读核对全部引用与编译期清单。
 
 不是把run_report构造样本当作真实check输出。实际check_feedback仍为local_unverified、未冻结必需义务；native_results原样保留在私有原件中，不从本轮扫描到的文件反推完整义务，更不把空public结果当零违规。现已对三项明确原生profile提取已确认发现：rust.cargo_clippy/rust_clippy_local_observation@0.2.0、rust.cargo_rustdoc/rustdoc_local_observation@0.4.0、rust.cargo_audit/rust_cve_local_observation@0.1.0。精确checker、制品摘要、批准原生规则映射、目标路径与输入摘要匹配后，blocking发现映射VIOLATION；覆盖始终Partial或Unknown，绝不生成SATISFIED。其他checker明确unsupported，原件保留且结果Incomplete。新增真实provider smoke使用缺工具Java/Maven及all选择，预期exit3，不安装SDK或初始化规格。
 
@@ -45,7 +45,7 @@ cargo test --locked -p codeguard-cli --test engineering_cli_smoke -- --nocapture
 
 本地focused命令：`cargo +1.85 test --locked --offline --manifest-path crates/codeguard-cli/tests/engineering_projection_harness/Cargo.toml`。不得用harness成功替代Ubuntu实际provider运行，CI配置文件存在也不等于已运行成功。K06接线、K07真实CI与完整专业结果消费仍需后续验证；不勾任务，不宣称P0可交付。
 
-当前Windows focused源码回归17项、分层边界8项通过；106 Schema引用闭包独立检查通过。最终fmt/clippy另按实际命令核对，Ubuntu smoke仍待运行，不作已通过声明。
+当前Windows focused源码回归29项（18项投影与11项真实装配单测）、分层边界8项通过；107 Schema引用闭包独立检查通过。最终fmt/clippy另按实际命令核对，Ubuntu smoke仍待运行，不作已通过声明。
 
 ## 实际原生报告的能力边界
 
@@ -69,7 +69,7 @@ Java明确支持java.maven.javadoc（java_javadoc_project_probe@0.5.0 → maven_
 
 ## 同次Maven捕获支路与真实Linux验证入口（尚待执行）
 
-原有maven_javadoc_probe已在同次调用持有SourceSnapshot和ProcessOutcome，但只返回Value，私有scratch退出即删除；不能把另一次mvn输出挂到CLI报告。现增加显式check_command::run_observed(args, observer)，旧run/run_lint_all仍传None，旧报告与退出路径不变。observer逐层传入java_javadoc_scan和maven_javadoc_probe，仅在原有输入未变、工具身份复验、诊断位置检查之后，给出同次子报告、源码原字节/原生临时路径、stdout/stderr/终止原因。MavenNativeCapture无Serialize；不向产品JSON增加原始日志，不宣称回调已将证据持久化。回调Err/可展开panic由ObservedCheckOutcome.capture_errors独立返回，不抹掉原产品报告。
+原有maven_javadoc_probe已在同次调用持有SourceSnapshot和ProcessOutcome，但只返回Value，私有scratch退出即删除；不能把另一次mvn输出挂到CLI报告。现增加显式check_command::run_observed(args, observer)，旧run/run_lint_all仍传None，观察者不改变同版本原生报告和退出路径；当前顶层wire另按下述0.73修正。observer逐层传入java_javadoc_scan和maven_javadoc_probe，仅在原有输入未变、工具身份复验、诊断位置检查之后，给出同次子报告、源码原字节/原生临时路径、stdout/stderr/终止原因。MavenNativeCapture无Serialize；不向产品JSON增加原始日志，不宣称回调已将证据持久化。回调Err/可展开panic由ObservedCheckOutcome.capture_errors独立返回，不抹掉原产品报告。
 
 捕获时间是调用run_process_recorded之前与返回之后的实际观察边界；前者不是OS精确spawn时刻，后者包含私有日志落盘时间。本库未提供OS级进程trace或K06执行资格，不能用observer调用时刻补造spawn。真实smoke公开结果仍UNVERIFIED，并将观测范围明确保留在测试说明中。
 
@@ -82,3 +82,12 @@ cargo test --locked -p codeguard-cli --test engineering_maven_smoke -- --ignored
 ```
 
 该命令使用默认full-cli feature，必须在Unix、有真实JDK21/Maven且工件缓存明确准备后执行；缺工具时失败，不静默skip成PASS。
+
+
+## 0.73精确wire修正
+
+真实Ubuntu CI38964163817证明Rust1.85编译通过、生产投影17项通过；真实缺工具CLI输出随后被闭合Schema拒绝，Maven smoke尚未执行。原因是当前native_results装配已采用“未观察槽位缺省”的明确语义，却仍声明历史0.38..0.72要求必需null槽位的版本。直接复用真实assemble/finalize对Maven历史子报告结构重放，已实际RED证实该矛盾。
+
+当前check和lint-all生产输出统一声明精确0.73；保留既有命令和退出语义，属于顶层wire版本修正，不能再声称新旧报告字节完全不变。旧0.38..0.72 Schema及历史原件保持不变，历史报告仍双读。0.73使用最新闭合顶层字段、固定注册语言枚举和显式lint请求约束；native_results仅取消未观察槽位必需性，属性白名单仍闭合，每个存在的payload精确引用既有已支持原生版本。未知顶层/原生属性、坏原生版本、缺必需头字段、未知或非规范版本继续拒绝；缺槽位不等于零违规或覆盖完成。
+
+compiled Schema闭包现107份。Windows focused回归增加真实生产装配函数与其既有单测，共30项，包含root新增的产品注册表与协议selection枚举全集一致性检查；明确保留Kotlin无源码时槽位缺失的现有断言，没有把新语义改回假null。旧归档不经过新producer重写；所有版本expectation修改只针对当前实际CLI/npm包输出。实际0.73 Ubuntu CLI/Maven smoke还需新CI证明，EG-K07仍不关闭。

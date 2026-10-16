@@ -30,7 +30,7 @@ fn aggregate_keeps_python_structure_and_reuses_lint_confirmation_task() {
     let id = lint["setup"]["task_id"].as_str().unwrap();
     for selection in ["python", "all"] {
         let report = command(&["check", selection, path, "--format=json"]);
-        assert_eq!(report["schema_version"], "0.48.0");
+        assert_eq!(report["schema_version"], "0.73.0");
         let row = report["syntax_candidates"]["observations"]
             .as_array()
             .unwrap()

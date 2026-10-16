@@ -160,7 +160,7 @@ fn missing_cargo_audit_is_a_visible_environment_blocker() {
     let (exit, bytes) = fixture.check("json", &[]);
     let report: Value = serde_json::from_slice(&bytes).unwrap();
     assert_eq!(exit, 3);
-    assert_eq!(report["schema_version"], "0.56.0");
+    assert_eq!(report["schema_version"], "0.73.0");
     assert_eq!(
         report["next"]["repair_brief"]["checker_id"],
         "rust.cargo_clippy"

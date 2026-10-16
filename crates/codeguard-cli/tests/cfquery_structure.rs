@@ -187,7 +187,7 @@ fn embedded_structure_reuses_task_and_restores_whole_file_identity_and_positions
         None,
         3,
     );
-    assert_eq!(check["schema_version"], "0.53.0", "{check}");
+    assert_eq!(check["schema_version"], "0.73.0", "{check}");
     assert_eq!(check["syntax_tasks"]["failures"], json!([]), "{check}");
     assert_eq!(check["syntax_tasks"]["tasks"][0]["task_id"], id);
     fs::write(

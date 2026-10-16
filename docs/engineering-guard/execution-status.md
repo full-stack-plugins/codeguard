@@ -4,6 +4,8 @@
 
 ## 总体判断
 
+最新远端复核：guardengine `0981705d3dfbfa472cbc60d02c16d3ebaf5094ea` 的 [CI 38963571148](https://github.com/full-stack-plugins/guardengine/actions/runs/38963571148) 已终态成功，15/15 jobs通过。CodeGuard `d978e3b50aa3e18ec0d4e2780617562adf2a2d68` 的 [CI 38964163817](https://github.com/full-stack-plugins/codeguard/actions/runs/38964163817) 终态失败：MSRV通过，真实CLI输出与历史Schema不一致，后续真实Maven步骤未执行；同提交安装检查成功。下文旧CI表及“仍待终态”为当时快照，不能代替此处最新结果。当前精确0.73修正已获root独立30项回归、107份Schema闭包与分层检查通过，并经独立只读审查；仍须提交后的Ubuntu真实CLI/Maven及完整CI验收，EG-K07保持未完成。
+
 整体架构已有职责划分、协议设计、路线、所有权和验收矩阵。原先缺失的插件任务已按既有规划重建，当前113项稳定任务、66条需求、94个局部场景及43个端到端用例均可追踪，内部依赖无环；全部实现和验收仍未完成。最近八个增量批次的任务勾选和七仓 CI 成功，只覆盖各自批次与检查范围，不能证明完整 P0–P4 路线已交付。
 
 ## 实际仓库与规格事实源

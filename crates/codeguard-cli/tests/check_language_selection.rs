@@ -71,7 +71,7 @@ fn python_selection_does_not_schedule_other_languages_in_a_mixed_project() {
     assert_eq!(output.status.code(), Some(3));
     let report: Value = serde_json::from_slice(&output.stdout).unwrap();
     assert_eq!(report["selection"], "python");
-    assert_eq!(report["schema_version"], "0.45.0");
+    assert_eq!(report["schema_version"], "0.73.0");
     assert!(
         report["category_candidates"]
             .as_array()

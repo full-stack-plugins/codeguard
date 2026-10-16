@@ -54,7 +54,7 @@ pub(super) fn validate(value: &Value, version: &str) -> Result<(), String> {
         .and_then(|s| s.strip_suffix(".0"))
         .ok_or("unknown feedback version")?;
     let root = format!("check-feedback-v0.{minor}.schema.json");
-    if !(38..=72).any(|n| version == format!("0.{n}.0")) || source(&root).is_none() {
+    if !(38..=73).any(|n| version == format!("0.{n}.0")) || source(&root).is_none() {
         return Err("unknown feedback version".into());
     }
     let mut pending = BTreeSet::from([root.clone()]);

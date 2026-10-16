@@ -772,7 +772,7 @@ fn unlocated_project_check_and_edit_hook_share_the_same_task_and_next_step() {
         report["syntax_tasks"]["status"], "synced_partial",
         "{report}"
     );
-    assert_eq!(report["schema_version"], "0.44.0");
+    assert_eq!(report["schema_version"], "0.73.0");
     assert_eq!(
         report["native_results"]["swift_lint"]["tool_selection"]["source"],
         "not_found"

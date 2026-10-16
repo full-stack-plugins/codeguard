@@ -319,6 +319,9 @@ pub(super) fn source(name: &str) -> Option<&'static [u8]> {
         "zig-lint-feedback-v0.2.schema.json" => Some(include_bytes!(
             "../../../../schemas/zig-lint-feedback-v0.2.schema.json"
         )),
+        "check-feedback-v0.73.schema.json" => Some(include_bytes!(
+            "../../../../schemas/check-feedback-v0.73.schema.json"
+        )),
         _ => None,
     }
 }
@@ -722,5 +725,9 @@ pub(super) const IDS: &[(&str, &str)] = &[
     (
         "urn:codeguard:syntax-lint-feedback:0.2",
         "syntax-lint-feedback-v0.2.schema.json",
+    ),
+    (
+        "urn:codeguard:schema:check-feedback:0.73.0",
+        "check-feedback-v0.73.schema.json",
     ),
 ];

@@ -875,3 +875,109 @@ fn controlled_p3c_reuses_native_xml_catalog_and_source_proof_with_failed_executi
     assert!(evidence.result.findings.is_empty());
     assert_eq!(unbound.len(), 1);
 }
+
+#[test]
+fn current_maven_producer_slot_assembly_preserves_exact_closed_feedback_contract() {
+    let mut report = actual_maven_javadoc_feedback();
+    report["schema_version"] = serde_json::json!("0.73.0");
+    let old = report["native_results"].clone();
+    report["native_results"] = crate::check_native_results::assemble(
+        old.as_object()
+            .unwrap()
+            .iter()
+            .map(|(k, v)| (k.as_str(), v.clone()))
+            .collect(),
+    );
+    crate::check_report_assembly::finalize(
+        &mut report,
+        crate::check_report_assembly::ReportShapeInput {
+            c_paths_nonempty: false,
+            c_family_comments: serde_json::Value::Null,
+            gradle_cve_requested: false,
+            gradle_requested: false,
+            gradle_result_key: "java_gradle_model",
+            java_gradle_cve: serde_json::Value::Null,
+            gradle_cve_tasks: serde_json::Value::Null,
+            java_gradle_model: serde_json::Value::Null,
+            gradle_javadoc_tasks: serde_json::Value::Null,
+            zig_lint: old["zig_lint"].clone(),
+            ruby_lint: old["ruby_lint"].clone(),
+            shell_lint: old["shell_lint"].clone(),
+            lint_only: false,
+        },
+    );
+    let version = report["schema_version"].as_str().unwrap();
+    assert!(
+        super::feedback_schema::validate(&report, version).is_ok(),
+        "producer assembly omitted required closed-schema native slots: {}",
+        report["native_results"]
+            .as_object()
+            .unwrap()
+            .keys()
+            .cloned()
+            .collect::<Vec<_>>()
+            .join(",")
+    );
+    for absent in ["rust_lint", "kotlin_lint", "swift_lint"] {
+        assert!(
+            report["native_results"].get(absent).is_none(),
+            "unused native slot must remain absent: {absent}"
+        );
+    }
+    let mut rust = actual_clippy_feedback();
+    rust["schema_version"] = serde_json::json!("0.73.0");
+    rust["gradle_javadoc_tasks"] = serde_json::Value::Null;
+    assert!(
+        super::feedback_schema::validate(&rust, "0.73.0").is_ok(),
+        "known real Rust native payload must remain supported"
+    );
+    let mut old_claim = report.clone();
+    old_claim["schema_version"] = serde_json::json!("0.69.0");
+    assert!(super::feedback_schema::validate(&old_claim, "0.69.0").is_err());
+    for (name, value) in [
+        ("unknown_slot", serde_json::json!({})),
+        ("rust_lint", serde_json::json!({"schema_version":"9.0.0"})),
+    ] {
+        let mut invalid = report.clone();
+        invalid["native_results"][name] = value;
+        assert!(
+            super::feedback_schema::validate(&invalid, "0.73.0").is_err(),
+            "new wire accepted invalid native slot {name}"
+        );
+    }
+    let mut missing = report.clone();
+    missing.as_object_mut().unwrap().remove("command_status");
+    assert!(super::feedback_schema::validate(&missing, "0.73.0").is_err());
+    let mut unexpected = report.clone();
+    unexpected["unknown_root"] = serde_json::json!(true);
+    assert!(super::feedback_schema::validate(&unexpected, "0.73.0").is_err());
+    assert!(super::feedback_schema::validate(&report, "0.74.0").is_err());
+    assert!(super::feedback_schema::validate(&report, "0.073.0").is_err());
+}
+
+#[test]
+fn current_feedback_selection_matches_the_actual_product_registry() {
+    use std::collections::BTreeSet;
+
+    let schema: serde_json::Value = serde_json::from_slice(include_bytes!(
+        "../../../../schemas/check-feedback-v0.73.schema.json"
+    ))
+    .unwrap();
+    let actual: BTreeSet<String> = schema["oneOf"][0]["properties"]["selection"]["enum"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|id| id.as_str().unwrap().to_owned())
+        .collect();
+    let mut expected: BTreeSet<String> = codeguard_adapters::legacy_registry()
+        .unwrap()
+        .languages
+        .into_iter()
+        .map(|language| language.id)
+        .collect();
+    expected.insert("all".to_owned());
+    assert_eq!(
+        actual, expected,
+        "wire choices must match the product registry"
+    );
+}

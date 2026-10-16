@@ -61,7 +61,7 @@ fn shell_project_scan_preserves_per_file_rules_and_stable_tasks() {
     p.init();
     let tool = p.tool();
     let first = p.run("shell", Some(&tool));
-    assert_eq!(first["schema_version"], "0.52.0");
+    assert_eq!(first["schema_version"], "0.73.0");
     let scan = &first["native_results"]["shell_lint"];
     assert_eq!(scan["files"].as_array().unwrap().len(), 2);
     assert_eq!(scan["local_check_complete"], true);

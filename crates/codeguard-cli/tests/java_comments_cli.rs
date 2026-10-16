@@ -1062,7 +1062,7 @@ fn actual_jdk_detailed_descriptions_file_and_configured_project() {
             };
             let aggregate = if mode == "configured_project_probe" {
                 let scan = run(&["check", "java", root, "--java-home", java]);
-                assert_eq!(scan["schema_version"], "0.68.0", "{scan}");
+                assert_eq!(scan["schema_version"], "0.73.0", "{scan}");
                 scan
             } else {
                 Value::Null

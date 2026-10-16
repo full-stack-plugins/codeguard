@@ -225,7 +225,7 @@ fn public_check_schedules_one_documentation_job_and_preserves_incomplete_feedbac
         let output = public_command(&project, selection).output().unwrap();
         assert_eq!(output.status.code(), Some(3), "{output:?}");
         let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
-        assert_eq!(report["schema_version"], "0.67.0");
+        assert_eq!(report["schema_version"], "0.73.0");
         let category = report["category_candidates"]
             .as_array()
             .unwrap()
@@ -332,7 +332,7 @@ fn actual_public_check_preserves_native_documentation_findings_without_coverage_
             .unwrap();
         assert_eq!(output.status.code(), Some(3), "{output:?}");
         let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
-        assert_eq!(report["schema_version"], "0.67.0");
+        assert_eq!(report["schema_version"], "0.73.0");
         let category = report["category_candidates"]
             .as_array()
             .unwrap()
@@ -417,7 +417,7 @@ fn public_javadoc_sigint_preserves_cancelled_native_observation() {
     let output = child.wait_with_output().unwrap();
     assert_eq!(output.status.code(), Some(130), "{output:?}");
     let report: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
-    assert_eq!(report["schema_version"], "0.67.0");
+    assert_eq!(report["schema_version"], "0.73.0");
     assert_eq!(
         report["native_results"]["java_gradle_javadoc"]["reason"],
         "request_cancelled"

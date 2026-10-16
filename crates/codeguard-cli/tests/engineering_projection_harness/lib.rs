@@ -4,3 +4,10 @@ pub mod check_request;
 pub mod engineering_projection;
 #[path = "../../src/run_report.rs"]
 pub mod run_report;
+
+#[cfg(test)]
+#[path = "../../src/check_native_results.rs"]
+mod check_native_results;
+#[cfg(test)]
+#[path = "../../src/check_report_assembly.rs"]
+mod check_report_assembly;
