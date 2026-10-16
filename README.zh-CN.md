@@ -1155,3 +1155,19 @@ C/C++已确认编辑事件已接入有界文档观察：`hook execute PATH --cla
 
 
 Claude协议适配器现将C/C++编辑文档观察投影为有界对话指引：展示当前原生规则/位置，独立标记结构规则及已核验任务引用；不回显源码/注释或过期定位。局部无问题不要求修改源码，也不关闭历史任务。已有Clang的受控PostToolUse协议测试不代表真实宿主安装或配置自动发现验收。
+
+## 智能体安装与提示注入
+
+已接入共享安装器：`install`、`uninstall`、`context`、`instructions render|sync`、`doctor --integration`、`serve --mcp`。支持 Codex、Claude Code 和 Gemini CLI；按本工具职责生成独立标记区块。
+
+```sh
+cargo build --locked -p codeguard-cli --no-default-features
+codeguard install --agents codex,claude,gemini --project /absolute/project --bin-dir /absolute/bin --dry-run
+codeguard context --project /absolute/project
+```
+
+构建后请先通过 `target/debug/工具名`（Windows 加 `.exe`）调用；上面的短命令假定程序已加入 PATH。指定 `--bin-dir` 会复制当前二进制，安装器不自动修改 PATH；去掉 `--dry-run` 才实际安装。需要同级 `../guardengine/crates/guard-install` 源码。
+
+上面的 `--no-default-features` 是仅接入构建，专业检查不可用；默认完整构建仍保留既有能力与平台限制。`doctor --integration` 不替代原 `doctor`，`serve --mcp` 只读，不把规划中的专业 `mcp serve` 标记为完成。
+
+[统一设计、宿主文件映射、更新、卸载和验证说明](https://github.com/full-stack-plugins/guardengine/blob/main/docs/agent-installation.md)。安装成功不代表宿主已加载或专业检查通过。

@@ -6,21 +6,24 @@ rust-version.workspace = true
 license.workspace = true
 
 [features]
-wasm-precheck = ["codeguard-runtime/wasm-precheck"]
+default = ["full-cli"]
+full-cli = ["dep:codeguard-core", "dep:codeguard-runtime", "dep:codeguard-adapters", "dep:serde", "dep:sha2", "dep:sha1", "dep:http"]
+wasm-precheck = ["full-cli", "codeguard-runtime/wasm-precheck"]
 
 [[bin]]
 name = "codeguard"
 path = "src/main.rs"
 
 [dependencies]
-codeguard-core = { path = "../codeguard-core" }
-codeguard-runtime = { path = "../codeguard-runtime" }
-codeguard-adapters = { path = "../codeguard-adapters" }
-serde.workspace = true
+guard-install = { path = "../../../guardengine/crates/guard-install" }
+codeguard-core = { path = "../codeguard-core", optional = true }
+codeguard-runtime = { path = "../codeguard-runtime", optional = true }
+codeguard-adapters = { path = "../codeguard-adapters", optional = true }
+serde = { workspace = true, optional = true }
 serde_json.workspace = true
-sha2.workspace = true
-sha1.workspace = true
-http = "=1.5.0"
+sha2 = { workspace = true, optional = true }
+sha1 = { workspace = true, optional = true }
+http = { version = "=1.5.0", optional = true }
 
 [dev-dependencies]
 base64.workspace = true

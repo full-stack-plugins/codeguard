@@ -1,4 +1,5 @@
 //! CLI 共享的 Rust 开发期验收与命令应用服务入口。
+#![cfg(feature = "full-cli")]
 
 #[cfg(unix)]
 pub mod gradle_javadoc_probe;

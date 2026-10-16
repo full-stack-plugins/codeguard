@@ -1178,3 +1178,19 @@ Confirmed C/C++ file edits now expose a bounded documentation observation throug
 
 
 The Claude protocol adapter now projects C/C++ edit documentation observations into bounded conversation guidance: current native rules/positions, separate structural policy, and validated task references. It suppresses source/comment text and stale positions; clean local observations do not request source edits or close historical tasks. Controlled PostToolUse tests with existing Clang do not establish installed-host acceptance or automatic configuration discovery.
+
+## Agent installation and managed instructions
+
+The shared installer provides `install`, `uninstall`, `context`, `instructions render|sync`, `doctor --integration`, and `serve --mcp` for Codex, Claude Code, and Gemini CLI. Each tool renders its own managed block.
+
+```sh
+cargo build --locked -p codeguard-cli --no-default-features
+codeguard install --agents codex,claude,gemini --project /absolute/project --bin-dir /absolute/bin --dry-run
+codeguard context --project /absolute/project
+```
+
+After building, invoke the executable under `target/debug/` (with `.exe` on Windows); short commands above assume PATH is configured. `--bin-dir` copies the current executable; PATH is not changed automatically. Remove `--dry-run` to apply. A sibling `../guardengine/crates/guard-install` source checkout is required.
+
+`--no-default-features` builds integration only, without domain checks. The default full build retains its existing behavior and platform requirements. `doctor --integration` is separate from the existing doctor; read-only `serve --mcp` does not complete the planned professional `mcp serve` API.
+
+[Shared design, host mapping, update/uninstall and verification](https://github.com/full-stack-plugins/guardengine/blob/main/docs/agent-installation.md). Configuration success does not prove host loading or quality approval.

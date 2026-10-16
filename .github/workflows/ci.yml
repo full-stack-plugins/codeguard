@@ -13,6 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check out shared Guard installation source
+        # Temporary sibling dependency; publish the reviewed guardengine change before this pipeline.
+        run: git clone --depth 1 https://github.com/full-stack-plugins/guardengine.git ../guardengine
       - name: Install the declared minimum Rust in this CI runner
         run: rustup toolchain install 1.85.0 --profile minimal
       - name: Check default and WASM targets with actual Rust 1.85
@@ -28,6 +31,9 @@ jobs:
       CARGO_PROFILE_TEST_DEBUG: "0"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check out shared Guard installation source
+        # Temporary sibling dependency; publish the reviewed guardengine change before this pipeline.
+        run: git clone --depth 1 https://github.com/full-stack-plugins/guardengine.git ../guardengine
 
       - name: Check out corpus evidence source
         # 固定语料按 sha256 校验来自插件仓的真实文件（provenance.source_ref =

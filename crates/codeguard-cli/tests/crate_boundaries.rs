@@ -32,7 +32,7 @@ fn allowed(package: &str, dependency: &str, kind: &str) -> bool {
         }
         "codeguard-cli" => {
             (matches!(dependency, "ring" | "tokio" | "base64") && kind == "dev")
-                || (dependency == "http" && kind == "normal")
+                || (matches!(dependency, "http" | "guard-install") && kind == "normal")
                 || matches!(
                     dependency,
                     "codeguard-core"
@@ -225,5 +225,16 @@ fn network_dependencies_are_runtime_only_and_async_cli_support_is_test_only() {
     assert!(!violations(&one_dependency("codeguard-runtime", "rustls", "normal")).is_empty());
     for package in ["codeguard-core", "codeguard-adapters", "codeguard-cli"] {
         assert!(!violations(&one_dependency(package, "rustls", "dev")).is_empty());
+    }
+}
+
+#[test]
+fn agent_installation_is_cli_normal_only() {
+    assert!(violations(&one_dependency("codeguard-cli", "guard-install", "normal")).is_empty());
+    for package in ["codeguard-core", "codeguard-runtime", "codeguard-adapters"] {
+        assert!(!violations(&one_dependency(package, "guard-install", "normal")).is_empty());
+    }
+    for kind in ["dev", "build"] {
+        assert!(!violations(&one_dependency("codeguard-cli", "guard-install", kind)).is_empty());
     }
 }

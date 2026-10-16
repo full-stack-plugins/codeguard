@@ -2,7 +2,7 @@ use crate::{command_descriptor::CommandDescriptor, command_examples::examples};
 
 /// 返回当前编译入口的固定目录；未实现操作保留planned，不读取工作区或工具。
 pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
-    vec![
+    let mut entries = vec![
         CommandDescriptor {
             tracking_id: Some(r#"C01"#),
             command: r#"help"#,
@@ -642,5 +642,47 @@ pub(crate) fn descriptors() -> Vec<CommandDescriptor> {
             scope: r#"限定候选提案；可信批准与正式门禁仍缺"#,
             languages: &[],
         },
-    ]
+    ];
+    for (command, usage, operation_kind) in [
+        (
+            "install",
+            "install --agents codex,claude,gemini|none [--project PATH] [--scope project|user] [--bin-dir PATH] [--dry-run]",
+            "management",
+        ),
+        (
+            "uninstall",
+            "uninstall [--project PATH] [--scope project|user] [--remove-binary] [--dry-run]",
+            "management",
+        ),
+        ("context", "context [--project PATH]", "query"),
+        (
+            "instructions render",
+            "instructions render [--project PATH]",
+            "query",
+        ),
+        (
+            "instructions sync",
+            "instructions sync [--project PATH] [--dry-run]",
+            "management",
+        ),
+        (
+            "doctor --integration",
+            "doctor --integration [--project PATH] [--scope project|user]",
+            "query",
+        ),
+        ("serve --mcp", "serve --mcp", "protocol"),
+    ] {
+        entries.push(CommandDescriptor {
+            tracking_id: None,
+            command,
+            usage,
+            operation_kind,
+            examples: &["codeguard install --agents codex --project . --dry-run"],
+            support: "implemented",
+            executable: true,
+            scope: "智能体接入和只读上下文；不执行专业 MCP 检查，不授予审批",
+            languages: &[],
+        });
+    }
+    entries
 }

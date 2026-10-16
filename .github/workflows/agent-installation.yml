@@ -1,0 +1,30 @@
+name: Guard agent installation
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  integration:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: codeguard
+      - uses: actions/checkout@v4
+        with:
+          repository: full-stack-plugins/guardengine
+          path: guardengine
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build actual CLI
+        working-directory: codeguard
+        run: cargo build --locked -p codeguard-cli --no-default-features
+      - name: Exercise installation and MCP in isolated fixtures
+        working-directory: codeguard
+        run: python -B ../guardengine/scripts/verify_guard_installation.py --bin-dir target/debug --tools codeguard
