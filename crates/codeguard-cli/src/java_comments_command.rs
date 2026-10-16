@@ -184,6 +184,7 @@ pub fn run(args: &[String]) -> ExitCode {
                     &sources,
                     &discovery.checker_configurations,
                     &NativeContext {
+                        observer: None,
                         manifest_sha256: &discovery.manifest_sha256,
                         java_home: java_home.as_deref(),
                         maven_tool: maven_tool.as_deref(),

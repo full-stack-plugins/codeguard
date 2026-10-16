@@ -70,6 +70,7 @@ pub(crate) fn run(
             &BTreeSet::from([relative.to_owned()]),
             &discovery.checker_configurations,
             &NativeContext {
+                observer: None,
                 manifest_sha256: &discovery.manifest_sha256,
                 java_home: home,
                 maven_tool: None,
