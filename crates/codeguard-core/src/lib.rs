@@ -139,3 +139,10 @@ mod task_resolution_policy;
 pub use task_resolution_policy::TaskResolutionPolicy;
 mod task_lifecycle_record;
 pub use task_lifecycle_record::TaskLifecycleRecord;
+
+/// 稳定问题身份的纯领域契约。
+pub mod finding_identity;
+/// 批准策略和运行配置的纯合并规则。
+pub mod run_config;
+/// 带完整性状态的纯模块图。
+pub mod typed_module_graph;

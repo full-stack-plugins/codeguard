@@ -27,20 +27,20 @@ impl IdentityGenerator {
             hash ^= byte as u64;
             hash = hash.wrapping_mul(0x100000001b3);
         }
-        
+
         FindingIdentity {
             file: file.to_string(),
             rule: rule.to_string(),
             content_fingerprint: format!("{:016x}", hash),
         }
     }
-    
+
     /// 匹配（支持重命名）
     pub fn match_identity(a: &FindingIdentity, b: &FindingIdentity) -> bool {
         // 规则和内容指纹相同
         a.rule == b.rule && a.content_fingerprint == b.content_fingerprint
     }
-    
+
     /// 行号变化不生成重复
     pub fn same_finding_despite_line_change(
         file: &str,
@@ -63,19 +63,25 @@ pub struct IdentityRegistry {
 impl IdentityRegistry {
     /// 创建注册表
     pub fn new() -> Self {
-        Self { identities: Vec::new() }
+        Self {
+            identities: Vec::new(),
+        }
     }
-    
+
     /// 注册身份
     pub fn register(&mut self, identity: FindingIdentity) -> bool {
         // 检查是否已存在
-        if self.identities.iter().any(|i| IdentityGenerator::match_identity(i, &identity)) {
+        if self
+            .identities
+            .iter()
+            .any(|i| IdentityGenerator::match_identity(i, &identity))
+        {
             return false; // 已存在，不重复注册
         }
         self.identities.push(identity);
         true
     }
-    
+
     /// 获取唯一身份数
     pub fn unique_count(&self) -> usize {
         self.identities.len()

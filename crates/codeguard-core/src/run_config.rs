@@ -46,15 +46,15 @@ pub struct ConfigResolver;
 
 impl ConfigResolver {
     /// 解析并合并配置
-    /// 
+    ///
     /// 验收标准：CLI/env 无法弱化 required/threshold/exclude
     pub fn resolve(
         approved_policy: &ApprovedPolicy,
         cli_overrides: &RunConfig,
         env_overrides: &RunConfig,
     ) -> MergedConfig {
-        let mut weakening_details = Vec::new();
-        
+        let weakening_details = Vec::new();
+
         // 运行配置合并（CLI 优先于 env）
         let run = RunConfig {
             version: cli_overrides.version.clone(),
@@ -69,10 +69,10 @@ impl ConfigResolver {
                 env_overrides.jobs
             },
         };
-        
+
         // 检查是否有弱化尝试（CLI/env 不能修改 required/threshold/exclude）
         // 这里我们只接受 approved_policy，不接受来自 CLI/env 的弱化
-        
+
         MergedConfig {
             policy: approved_policy.clone(),
             run,
@@ -80,27 +80,27 @@ impl ConfigResolver {
             weakening_details,
         }
     }
-    
+
     /// 验证配置是否合法
     pub fn validate(config: &MergedConfig) -> Result<(), String> {
         // 验证必需检查类别不为空
         if config.policy.required.is_empty() {
             return Err("required_categories_empty".into());
         }
-        
+
         // 验证阈值在合理范围
         if config.policy.min_threshold < 0.0 || config.policy.min_threshold > 1.0 {
             return Err("threshold_out_of_range".into());
         }
-        
+
         // 验证超时合理
         if config.run.timeout_ms == 0 {
             return Err("timeout_must_be_positive".into());
         }
-        
+
         Ok(())
     }
-    
+
     /// 配置解释（config explain）
     pub fn explain(config: &MergedConfig) -> ConfigExplanation {
         ConfigExplanation {

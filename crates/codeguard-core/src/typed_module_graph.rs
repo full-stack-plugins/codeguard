@@ -48,7 +48,8 @@ impl TypedModuleGraphGenerator {
         modules: &[String],
         edges: &[(String, String, DependencyType)],
     ) -> TypedModuleGraph {
-        let module_edges = edges.iter()
+        let module_edges = edges
+            .iter()
             .map(|(from, to, dep_type)| ModuleEdge {
                 from: from.clone(),
                 to: to.clone(),
@@ -56,24 +57,32 @@ impl TypedModuleGraphGenerator {
                 resolved: *dep_type != DependencyType::DynamicUnknown,
             })
             .collect();
-        
-        let complete = edges.iter().all(|(_, _, t)| *t != DependencyType::DynamicUnknown);
-        
+
+        let complete = edges
+            .iter()
+            .all(|(_, _, t)| *t != DependencyType::DynamicUnknown);
+
         TypedModuleGraph {
             modules: modules.to_vec(),
             edges: module_edges,
             complete,
         }
     }
-    
+
     /// 检查是否聚合不当依赖
     pub fn check_improper_aggregation(graph: &TypedModuleGraph) -> bool {
         // 动态未知边不支撑缩小检查范围
-        graph.edges.iter().any(|e| e.dep_type == DependencyType::DynamicUnknown && e.resolved)
+        graph
+            .edges
+            .iter()
+            .any(|e| e.dep_type == DependencyType::DynamicUnknown && e.resolved)
     }
-    
+
     /// 验证过期 CodeGraph 不作为当前证据
     pub fn validate_no_stale_codegraph(graph: &TypedModuleGraph) -> bool {
-        graph.edges.iter().all(|e| e.resolved || e.dep_type == DependencyType::DynamicUnknown)
+        graph
+            .edges
+            .iter()
+            .all(|e| e.resolved || e.dep_type == DependencyType::DynamicUnknown)
     }
 }
