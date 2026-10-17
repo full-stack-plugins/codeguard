@@ -92,7 +92,7 @@ fi
             .unwrap();
         if let Some(dir) = std::env::var_os("CODEGUARD_JAVA_MIXED_BUILD_REPORT_DIR") {
             let value: Value = serde_json::from_slice(&output.stdout).unwrap();
-            if value["schema_version"] == "0.61.0" {
+            if value["report_type"] == "check_feedback" && value["schema_version"] == "0.73.0" {
                 fs::create_dir_all(&dir).unwrap();
                 fs::write(
                     PathBuf::from(dir).join(format!(

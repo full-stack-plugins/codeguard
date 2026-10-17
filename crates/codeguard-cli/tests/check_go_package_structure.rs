@@ -71,14 +71,7 @@ fn public_go_package_candidate_reuses_one_task_across_checks_and_save() {
     let mut task = None;
     for selection in ["go", "all", "go"] {
         let report = command(&["check", selection, path, "--format=json"], None);
-        assert_eq!(
-            report["schema_version"],
-            if report["next"]["schema_version"] == "0.14.0" {
-                "0.50.0"
-            } else {
-                "0.49.0"
-            }
-        );
+        assert_eq!(report["schema_version"], "0.73.0");
         let row = report["syntax_candidates"]["observations"]
             .as_array()
             .unwrap()
