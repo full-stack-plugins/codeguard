@@ -10,12 +10,8 @@ fn ensure_clean_dir(name: &str) -> std::path::PathBuf {
 #[test]
 fn valid_css_samples_pass_lint() {
     let tmp = ensure_clean_dir("css-valid-test");
-    std::fs::write(tmp.join("style.css"), "/* Main styles */\nbody {\n    margin: 0;\n    padding: 0;\n    font-family: sans-serif;\n}\n\n.container {\n    max-width: 1200px;\n    margin: 0 auto;\n}\n").unwrap();
-
-    let _ = Command::new("npx")
-        .args(["prettier", "--write", "style.css"])
-        .current_dir(&tmp)
-        .output();
+    // 有效夹具本身符合默认格式；不先静默修复输入再声称检查通过。
+    std::fs::write(tmp.join("style.css"), "/* Main styles */\nbody {\n  margin: 0;\n  padding: 0;\n  font-family: sans-serif;\n}\n\n.container {\n  max-width: 1200px;\n  margin: 0 auto;\n}\n").unwrap();
 
     let output = Command::new("npx")
         .args(["prettier", "--check", "style.css"])
@@ -54,12 +50,7 @@ fn invalid_css_samples_are_detected() {
 fn formatting_cannot_impersonate_comment_checking() {
     let tmp = ensure_clean_dir("css-comment-test");
     // 格式正确但缺少注释——prettier 不检查注释
-    std::fs::write(tmp.join("style.css"), ".header {\n    background: #333;\n    color: white;\n}\n\n.footer {\n    background: #666;\n    color: white;\n}\n").unwrap();
-
-    let _ = Command::new("npx")
-        .args(["prettier", "--write", "style.css"])
-        .current_dir(&tmp)
-        .output();
+    std::fs::write(tmp.join("style.css"), ".header {\n  background: #333;\n  color: white;\n}\n\n.footer {\n  background: #666;\n  color: white;\n}\n").unwrap();
 
     let output = Command::new("npx")
         .args(["prettier", "--check", "style.css"])
