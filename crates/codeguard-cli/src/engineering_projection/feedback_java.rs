@@ -27,7 +27,7 @@ pub(super) fn extract(
                 && native["schema_version"] == "0.5.0"
         } else {
             native["report_type"] == "java_p3c_project_observation"
-                && native["schema_version"] == "0.2.0"
+                && matches!(native["schema_version"].as_str(), Some("0.2.0" | "0.3.0"))
         };
     if !root_valid {
         issues.push("Java checker/profile mismatch or missing".into());

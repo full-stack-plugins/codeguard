@@ -57,6 +57,15 @@ pub(super) fn validate(value: &Value, version: &str) -> Result<(), String> {
     if !(38..=73).any(|n| version == format!("0.{n}.0")) || source(&root).is_none() {
         return Err("unknown feedback version".into());
     }
+    validate_root(value, &root)
+}
+// 测试真实装配器的中止wire；公共结果投影仍不支持check_aborted，不由此授信。
+#[cfg(test)]
+pub(super) fn validate_aborted(value: &Value) -> Result<(), String> {
+    validate_root(value, "check-aborted-v0.23.schema.json")
+}
+fn validate_root(value: &Value, root: &str) -> Result<(), String> {
+    let root = root.to_owned();
     let mut pending = BTreeSet::from([root.clone()]);
     let mut done = BTreeMap::new();
     while let Some(name) = pending.pop_first() {

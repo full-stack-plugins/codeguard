@@ -1,2 +1,4 @@
 # 来源补丁保留原始字节与固定摘要，不自动调整上下文空白。
 grammars/*/source.patch -whitespace
+# 保留真实CI受控报告的原始字节，跨平台检出不得改变固定原件摘要。
+tests/acceptance/evidence/k07-cli-073-controlled-java-2026-10-17.json -text

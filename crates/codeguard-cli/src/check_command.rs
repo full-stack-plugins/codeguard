@@ -3585,16 +3585,7 @@ fn discovery_scope_changed(before: &DiscoveryReport, after: &DiscoveryReport) ->
 }
 
 fn task_status(outcome: TaskOutcome) -> &'static str {
-    match outcome {
-        TaskOutcome::Succeeded => "native_observed_unverified",
-        TaskOutcome::Failed => "native_incomplete",
-        TaskOutcome::Cancelled => "cancelled",
-        TaskOutcome::TimedOut => "deadline_exceeded",
-        TaskOutcome::DependencyFailed => "dependency_failed",
-        TaskOutcome::CancelledBeforeStart => "cancelled_before_start",
-        TaskOutcome::DeadlineBeforeStart => "deadline_before_start",
-        TaskOutcome::InternalFailure => "internal_failure",
-    }
+    crate::check_report_assembly::task_status(outcome)
 }
 
 fn emit_structured(report: &Value, args: &Args) {
@@ -3638,50 +3629,16 @@ fn aborted_task_report(
     selection: Selection,
     discovery: Value,
     outcomes: &BTreeMap<String, TaskOutcome>,
-    mut native_results: Value,
+    native_results: Value,
     cancelled: bool,
 ) -> Value {
-    if native_results.get("erlang_lint").is_none() {
-        native_results["erlang_lint"] = Value::Null;
-    }
-    if native_results.get("node_lint").is_none() {
-        native_results["node_lint"] = Value::Null;
-    }
-    if native_results.get("rust_cve").is_none() {
-        native_results["rust_cve"] = Value::Null;
-    }
-    if native_results.get("rust_comments").is_none() {
-        native_results["rust_comments"] = Value::Null;
-    }
-    if native_results.get("npm_cve").is_none() {
-        native_results["npm_cve"] = json!([]);
-    }
-    if native_results.get("python_cve").is_none() {
-        native_results["python_cve"] = json!([]);
-    }
-    let failed_task_ids: Vec<_> = outcomes
-        .iter()
-        .filter(|(_, outcome)| **outcome == TaskOutcome::InternalFailure)
-        .map(|(id, _)| id.clone())
-        .collect();
-    let mut execution_tasks: Vec<_> = outcomes
-        .iter()
-        .map(|(id, outcome)| json!({"id":id,"status":task_status(*outcome)}))
-        .collect();
-    if native_results["zig_lint"].is_object() {
-        execution_tasks.push(json!({"id":"zig.lint","status":if native_results["zig_lint"]["local_parse_complete"]==true {"native_observed_unverified"}else{"native_incomplete"}}));
-    }
-    json!({
-        "schema_version":if native_results.get("c_family_comments").is_some() {"0.22.0"}else if native_results.get("java_gradle_cve").is_some() {"0.21.0"}else if native_results["java_javadoc"]["schema_version"] == "0.5.0" {"0.20.0"}else if native_results["java_javadoc"]["schema_version"] == "0.4.0" {"0.19.0"}else if native_results.get("java_gradle_javadoc").is_some() {if native_results["java_gradle_javadoc"]["schema_version"] == "0.2.0" {"0.18.0"}else{"0.17.0"}}else if native_results.get("java_gradle_model").is_some() {"0.16.0"}else if native_results["zig_lint"].is_object() {"0.15.0"}else if matches!(selection, Selection::Language(_)) {"0.14.0"} else {"0.13.0"}, "report_type":"check_aborted",
-        "operation":"check", "selection":selection.as_str(),
-        "command_status":if cancelled { "cancelled" } else { "internal_error" },
-        "exit_code":if cancelled { 130 } else { 4 },
-        "delivery_decision":if selection == Selection::All { "incomplete" } else { "not_evaluated" },
-        "authority":"local_unverified", "reason":if cancelled { "request_cancelled" } else { "native_task_internal_failure" },
-        "failed_task_ids":failed_task_ids, "execution_tasks":execution_tasks,
-        "discovery":discovery, "native_results":native_results,
-        "export":{"status":"not_requested","reason_code":null}
-    })
+    crate::check_report_assembly::aborted_task_report(
+        selection.as_str(),
+        discovery,
+        outcomes,
+        native_results,
+        cancelled,
+    )
 }
 
 fn parse_args(args: &[String]) -> Result<Args, String> {

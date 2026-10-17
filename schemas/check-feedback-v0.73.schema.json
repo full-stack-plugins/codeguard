@@ -479,6 +479,9 @@
                 },
                 {
                   "$ref": "check-feedback-v0.72.schema.json#/oneOf/0/properties/native_results/properties/java_p3c"
+                },
+                {
+                  "$ref": "java-p3c-project-observation-v0.3.schema.json"
                 }
               ]
             },

@@ -28,6 +28,7 @@ def references(value):
             yield from references(child)
 
 pending = [f"check-feedback-v0.{n}.schema.json" for n in range(38, 74) if (ROOT / "schemas" / f"check-feedback-v0.{n}.schema.json").exists()]
+pending.append("check-aborted-v0.23.schema.json")
 seen = set()
 while pending:
     name = pending.pop()

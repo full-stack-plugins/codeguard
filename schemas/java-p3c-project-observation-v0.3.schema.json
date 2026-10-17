@@ -1,0 +1,255 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:codeguard:schema:java-p3c-project-observation:0.3.0",
+  "title": "Untrusted P3C project observation with explicit configuration explanation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_type",
+    "operation",
+    "command_status",
+    "exit_code",
+    "workspace_binding",
+    "workspace_id",
+    "run_id",
+    "tool_approval",
+    "rulepack_approval",
+    "checker_id",
+    "language",
+    "category",
+    "source_file_count",
+    "observed_file_count",
+    "finding_count",
+    "findings",
+    "local_observation_complete",
+    "coverage_proven",
+    "authority",
+    "delivery_decision",
+    "files",
+    "backlog_status",
+    "backlog_sync",
+    "next"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.3.0"
+    },
+    "report_type": {
+      "const": "java_p3c_project_observation"
+    },
+    "operation": {
+      "const": "lint"
+    },
+    "command_status": {
+      "const": "incomplete"
+    },
+    "exit_code": {
+      "const": 3
+    },
+    "workspace_binding": {
+      "enum": [
+        "bound",
+        "uninitialized",
+        "legacy_unbound",
+        "invalid"
+      ]
+    },
+    "workspace_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "tool_approval": {
+      "const": "unverified"
+    },
+    "rulepack_approval": {
+      "const": "unverified"
+    },
+    "checker_id": {
+      "const": "java.maven.p3c"
+    },
+    "language": {
+      "const": "java"
+    },
+    "category": {
+      "const": "lint"
+    },
+    "source_file_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "observed_file_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "finding_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "findings": {
+      "type": "array"
+    },
+    "local_observation_complete": {
+      "type": "boolean"
+    },
+    "coverage_proven": {
+      "const": false
+    },
+    "authority": {
+      "const": "local_unverified"
+    },
+    "delivery_decision": {
+      "const": "not_evaluated"
+    },
+    "backlog_status": {
+      "enum": [
+        "synced_partial",
+        "not_initialized",
+        "backlog_update_failed"
+      ]
+    },
+    "backlog_sync": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "next": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "build_root",
+          "configuration",
+          "configuration_ref",
+          "reason",
+          "observation",
+          "configuration_reason",
+          "configuration_next_action"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "build_root": {
+            "type": "string",
+            "minLength": 1
+          },
+          "configuration": {
+            "enum": [
+              "configured",
+              "missing",
+              "unknown",
+              "invalid"
+            ]
+          },
+          "configuration_ref": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "configuration_sha256": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "reason": {
+            "enum": [
+              "native_probe_returned",
+              "finding_projection_incomplete",
+              "p3c_configuration_not_confirmed",
+              "p3c_configuration_changed_before_scan",
+              "p3c_configuration_changed_during_scan",
+              "p3c_ruleset_selection_unresolved",
+              "request_cancelled",
+              "request_deadline_exceeded"
+            ]
+          },
+          "observation": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "schema_version",
+                  "report_type",
+                  "local_status",
+                  "reason",
+                  "declared_rulesets",
+                  "native_plan_sha256",
+                  "findings",
+                  "coverage_proven",
+                  "delivery_decision"
+                ],
+                "properties": {
+                  "schema_version": {
+                    "const": "0.2.0"
+                  },
+                  "report_type": {
+                    "const": "java_p3c_local_feedback"
+                  },
+                  "local_status": {
+                    "type": "string"
+                  },
+                  "reason": {
+                    "type": "string"
+                  },
+                  "declared_rulesets": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 10,
+                    "uniqueItems": true
+                  },
+                  "native_plan_sha256": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "findings": {
+                    "type": "array"
+                  },
+                  "coverage_proven": {
+                    "const": false
+                  },
+                  "delivery_decision": {
+                    "const": "not_evaluated"
+                  }
+                }
+              }
+            ]
+          },
+          "configuration_reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "configuration_next_action": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

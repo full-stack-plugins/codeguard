@@ -8,7 +8,9 @@
 //! 槽位存在性的**唯一事实源**是 [`crate::check_native_results::assemble`]；本模块只做
 //! 后置的形状修剪，不要在这里新增语言专属的存在性规则。
 
-use serde_json::Value;
+use codeguard_runtime::TaskOutcome;
+use serde_json::{Value, json};
+use std::collections::BTreeMap;
 
 /// 后处理所需的全部条件与可选结果。字段只收「决定报告形状」的东西，
 /// 执行过程中的中间状态（选中的源集、工具路径等）不进这里。
@@ -174,6 +176,71 @@ fn remove_slot(report: &mut Value, key: &str) {
     if let Some(native) = report["native_results"].as_object_mut() {
         native.remove(key);
     }
+}
+
+/// 将真实任务终态投影为原生观察状态；不推断交付批准。
+pub(crate) fn task_status(outcome: TaskOutcome) -> &'static str {
+    match outcome {
+        TaskOutcome::Succeeded => "native_observed_unverified",
+        TaskOutcome::Failed => "native_incomplete",
+        TaskOutcome::Cancelled => "cancelled",
+        TaskOutcome::TimedOut => "deadline_exceeded",
+        TaskOutcome::DependencyFailed => "dependency_failed",
+        TaskOutcome::CancelledBeforeStart => "cancelled_before_start",
+        TaskOutcome::DeadlineBeforeStart => "deadline_before_start",
+        TaskOutcome::InternalFailure => "internal_failure",
+    }
+}
+
+/// 装配真实任务中止原件；参数为规范选择、发现、实际任务终态及已观察原生槽位。
+pub(crate) fn aborted_task_report(
+    selection: &str,
+    discovery: Value,
+    outcomes: &BTreeMap<String, TaskOutcome>,
+    mut native_results: Value,
+    cancelled: bool,
+) -> Value {
+    if native_results.get("erlang_lint").is_none() {
+        native_results["erlang_lint"] = Value::Null;
+    }
+    if native_results.get("node_lint").is_none() {
+        native_results["node_lint"] = Value::Null;
+    }
+    if native_results.get("rust_cve").is_none() {
+        native_results["rust_cve"] = Value::Null;
+    }
+    if native_results.get("rust_comments").is_none() {
+        native_results["rust_comments"] = Value::Null;
+    }
+    if native_results.get("npm_cve").is_none() {
+        native_results["npm_cve"] = json!([]);
+    }
+    if native_results.get("python_cve").is_none() {
+        native_results["python_cve"] = json!([]);
+    }
+    let failed_task_ids: Vec<_> = outcomes
+        .iter()
+        .filter(|(_, outcome)| **outcome == TaskOutcome::InternalFailure)
+        .map(|(id, _)| id.clone())
+        .collect();
+    let mut execution_tasks: Vec<_> = outcomes
+        .iter()
+        .map(|(id, outcome)| json!({"id":id,"status":task_status(*outcome)}))
+        .collect();
+    if native_results["zig_lint"].is_object() {
+        execution_tasks.push(json!({"id":"zig.lint","status":if native_results["zig_lint"]["local_parse_complete"]==true {"native_observed_unverified"}else{"native_incomplete"}}));
+    }
+    json!({
+        "schema_version":if native_results["java_p3c"]["schema_version"] == "0.3.0" {"0.23.0"}else if native_results.get("c_family_comments").is_some() {"0.22.0"}else if native_results.get("java_gradle_cve").is_some() {"0.21.0"}else if native_results["java_javadoc"]["schema_version"] == "0.5.0" {"0.20.0"}else if native_results["java_javadoc"]["schema_version"] == "0.4.0" {"0.19.0"}else if native_results.get("java_gradle_javadoc").is_some() {if native_results["java_gradle_javadoc"]["schema_version"] == "0.2.0" {"0.18.0"}else{"0.17.0"}}else if native_results.get("java_gradle_model").is_some() {"0.16.0"}else if native_results["zig_lint"].is_object() {"0.15.0"}else if !matches!(selection, "all" | "java") {"0.14.0"} else {"0.13.0"}, "report_type":"check_aborted",
+        "operation":"check", "selection":selection,
+        "command_status":if cancelled { "cancelled" } else { "internal_error" },
+        "exit_code":if cancelled { 130 } else { 4 },
+        "delivery_decision":if selection == "all" { "incomplete" } else { "not_evaluated" },
+        "authority":"local_unverified", "reason":if cancelled { "request_cancelled" } else { "native_task_internal_failure" },
+        "failed_task_ids":failed_task_ids, "execution_tasks":execution_tasks,
+        "discovery":discovery, "native_results":native_results,
+        "export":{"status":"not_requested","reason_code":null}
+    })
 }
 
 #[cfg(test)]

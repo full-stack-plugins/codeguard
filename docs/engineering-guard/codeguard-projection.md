@@ -91,3 +91,17 @@ cargo test --locked -p codeguard-cli --test engineering_maven_smoke -- --ignored
 当前check和lint-all生产输出统一声明精确0.73；保留既有命令和退出语义，属于顶层wire版本修正，不能再声称新旧报告字节完全不变。旧0.38..0.72 Schema及历史原件保持不变，历史报告仍双读。0.73使用最新闭合顶层字段、固定注册语言枚举和显式lint请求约束；native_results仅取消未观察槽位必需性，属性白名单仍闭合，每个存在的payload精确引用既有已支持原生版本。未知顶层/原生属性、坏原生版本、缺必需头字段、未知或非规范版本继续拒绝；缺槽位不等于零违规或覆盖完成。
 
 compiled Schema闭包现107份。Windows focused回归增加真实生产装配函数与其既有单测，共30项，包含root新增的产品注册表与协议selection枚举全集一致性检查；明确保留Kotlin无源码时槽位缺失的现有断言，没有把新语义改回假null。旧归档不经过新producer重写；所有版本expectation修改只针对当前实际CLI/npm包输出。实际0.73 Ubuntu CLI/Maven smoke还需新CI证明，EG-K07仍不关闭。
+
+### P3C 项目报告精确版本修正
+
+真实 Linux CI38972395021/job117213637719 的受控 CLI 原件已保存在 `tests/acceptance/evidence/k07-cli-073-controlled-java-2026-10-17.json`（8824 字节，SHA256 `83770811649c0ab1bb8ce1eabc6fac74eba9e1206b7f835ec2c7484bb5a19360`），并固定 Git 原始字节。精确失败来自 `java_p3c.files[].configuration_reason` 和 `configuration_next_action`：生产器输出了新增字段，但仍声明原生项目版本 0.2；其旧闭合 Schema 不包含这两字段。
+
+现仅将 `java_p3c_scan::observe_project` 的项目报告升到 0.3，新增独立 `java-p3c-project-observation-v0.3.schema.json`；0.73 显式支持该新身份，继续支持历史 0.2 原定义。新项目和逐文件对象保持闭合，两项新增配置说明均必需且精确为 string/null。独立 `java_p3c_local_feedback` 仍是 0.2，没有改其身份或旧 Schema。已有坏版本原件不被修写、放宽或升级为通过；回放保持拒绝并保留全部原始字节。测试中的新 wire 仅将该准确报告的项目版本改为 0.3 来验证新定义，同时断言类型错误、未知字段、冒称旧顶层版本仍拒绝。
+
+`feedback_java` 接受两个明确项目身份，保留既有工具/源码证明、PMD 版本匹配及部分执行阳性逻辑。有效结构的缺配置报告仍 `UNVERIFIED`、`incomplete`、交付门禁 `NotEvaluated`；不产生批准或覆盖完成。内存闭包增加到108份。真实 Unix smoke 新增对当前生产器原生0.3的断言；Windows仅执行精确报告回放与生产装配/投影模块，不声称已运行Unix CLI或真实Maven smoke。EG-K07仍待新CI验证，不勾选。
+
+同一原生身份也必须适用于内部失败/取消路径。实际 `aborted_task_report` 装配逻辑移至现有纯 `check_report_assembly` 模块，Unix入口仍调用该唯一函数；只在保留的P3C项目报告为0.3时输出新 `check_aborted` 0.23。新闭合中止定义沿用0.22的错误/取消/导出语义，允许现有注册表选择，保留原先基础槽位必需性，C文档槽位仍仅在实际存在时出现；原生负载引用0.73的显式白名单并要求P3C精确0.3。历史0.13..0.22 Schema和选择分支保持。此支持只用于原生wire装配/验证；公共投影仍把 `check_aborted` 作为不支持的原件保留，不颁发执行或交付资格。
+
+新增实际装配回归先真实失败（错误选中0.13），再通过0.23内部失败与取消两支，核验精确闭合Schema、完整原生P3C保留、未知字段拒绝、旧版本冒称拒绝及不授信。当前内存Schema闭包为109份。该测试直接执行从原入口抽出的实际装配函数，不能冒充Windows已执行Unix CLI或真实原生进程。
+
+本地 Rust1.85 完整 focused harness 最终33/33通过（27.66秒），harness all-targets Clippy `--no-deps -- -D warnings`、受影响文件fmt、layering与109份闭包核验均通过。额外crate_boundaries构建因E盘空间不足而未执行，不能记为通过；测试环境缓存清理被自动审批策略拒绝，未绕过限制。最终Linux生产CLI和同次Maven验证仍待新CI；不因本地回放通过勾选EG-K07。

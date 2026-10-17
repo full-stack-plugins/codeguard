@@ -59,6 +59,12 @@ fn real_java_and_all_cli_missing_tools_preserve_raw_feedback_without_delivery_up
         assert_eq!(document["report_type"], "check_feedback");
         assert_eq!(document["authority"], "local_unverified");
         assert!(document["required_obligations"].is_null());
+        if document["native_results"]["java_p3c"].is_object() {
+            assert_eq!(
+                document["native_results"]["java_p3c"]["schema_version"],
+                "0.3.0"
+            );
+        }
         let projected = project_raw(raw, None);
         if projected
             .issues()

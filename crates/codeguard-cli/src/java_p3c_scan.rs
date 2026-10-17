@@ -162,7 +162,7 @@ pub(crate) fn observe_project(
         }));
     }
     json!({
-        "schema_version":"0.2.0",
+        "schema_version":"0.3.0",
         "report_type":"java_p3c_project_observation",
         "operation":"lint", "command_status":"incomplete", "exit_code":3,
         "workspace_binding":workspace_binding, "workspace_id":workspace_id,

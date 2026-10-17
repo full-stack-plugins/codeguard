@@ -37,7 +37,7 @@ GuardCore 是角色名，`guardengine` 是已有实现仓库名；此映射不�
 | archguard / java-source-architecture | 6 / 6 | Java 源码既有批次 |
 | archguard / project-model-baseline | 6 / 6 | 项目基线与需求增量既有批次 |
 | codeguard / introduce-rust-codeguard-cli | 322 / 354 | 32 项未勾选；勾选不等于本次重新验收全部语言与宿主 |
-| codeguard / add-engineering-guard-core | 7 / 62 | EG-M01及K01–K06局部任务已验收；K07及其余任务保持未完成 |
+| codeguard / add-engineering-guard-core | 9 / 62 | EG-M01、K01–K06、S01及A01局部任务已验收；K07及其他任务保持未完成 |
 | 四插件集成changes / FlowGuard追加计划 | 0 / 51 | 按既有总体要求重建的原生定义；不是历史任务已完成证明 |
 
 以上为人工复核时点快照；任务状态仍以各原生账本为准。未勾选不代表没有任何源码，已勾选也不能替代与实际候选、工具及范围绑定的证据。
@@ -90,7 +90,7 @@ GuardCore 是角色名，`guardengine` 是已有实现仓库名；此映射不�
 
 guard-protocol已本地冻结11类根交换对象、闭合Schema、严格重复键入口、无损路径、旧报告保留与完整RFC8785规范字节；新增独立release_artifact分型并保留四种Git wire。Rust1.85协议27项通过，96个样本（25有效/71无效）、112个LF锁输入及24个RFC数字向量覆盖核心边界；独立schema--check与全锁覆盖/摘要复算通过。EG-K01按本地冻结范围勾选，保持candidate-unpublished，详见guardengine/docs/delivery/EG-K01-evidence.md。
 
-库存v2共113项稳定任务，7项verified、106项pending：EG-M01清单建设与EG-K01–K06六项局部任务。任务完成仅按原生任务字面与独立证据，不关闭CON/EVI整条需求。逐项证据位于guardengine/docs/delivery/的对应EG-K01至K06-evidence.md。
+库存v2共113项稳定任务，9项verified、104项pending：EG-M01清单建设、EG-K01–K06六项局部任务、EG-S01来源适配及EG-A01字节码闭环。任务完成仅按原生任务字面与独立证据，不关闭CON/EVI整条需求。逐项证据位于guardengine/docs/delivery/的对应EG-K01至K06-evidence.md。
 
 K02真实Draft2020-12/契约组合23项测试通过，原82个样本区分23有效/40原始或Schema拒绝/19语义拒绝；release补充后当前96个样本及contract23项受影响回归也通过。K03真实Git/SQLite12项通过，作者、独立审查及root最终Rust1.85回归一致；候选普通源码复用批准scope，保护摘要固定，repo/task唯一头与批准迁移CAS已验证。K05独立Rust1.85共27 reported测试通过，包含3个辅助进程入口；并发、busy、中断、链接替换、损坏持久隔离和retention均有真实反例。
 
@@ -101,3 +101,7 @@ K04真实Git全套9项通过；Windows别名与真实硬链接两个新例已独
 清单建设及K01–K06局部任务已验收；下一步完成K07真实CodeGuard双读和Java/Maven证据投影，以及ArchGuard真实ArchUnit适配，再推进策略、授权与执行。各域接入后，以真实 Java/Maven/JUnit/ArchUnit、受保护 CI 和精确目标操作完成闭环，保留 Cargo 回归。平台与跨仓发布验收按原路线继续，不能以本阶段结束替代全路线完成。
 
 所有任务仅在实现、必要反例、受影响回归和要求的真实环境证据齐备后勾选。整体目标继续进行，当前不执行总体 sync/archive。
+
+最新SpecGuard验收：main d4463477b2b665ab7909ff7a67b54acd78810971（CLI/插件0.3.0）实际GitHub CI38972402820的Ubuntu/Windows两job全部成功；新三类规格来源只读适配及稳定ID取得独立49项回归与真实语料缺口证据，EG-S01按原任务验收。总体路线现8/113 verified、105 pending，原生总体账本8/62；详细证据见guardengine/docs/delivery/EG-S01-evidence.md。其余专业实现和生产能力未据此扩大完成范围。
+
+ArchGuard 0.6.0实现86f0c2a、工作流修复2a237fc已真实核验：CI38987740407三job全成功（Ubuntu/Windows Java19测试+14依赖锁+两个Rust E2E），安装CI38987740448双平台成功；root在最终工具pin上独立两个E2E通过325.13秒。EG-A01据原任务最小批准规则范围验收。当前总体9/113 verified、104 pending，总体原生账本9/62；EG-K07/K08及其他完整任务继续未勾选，详见guardengine/docs/delivery/EG-A01-evidence.md。

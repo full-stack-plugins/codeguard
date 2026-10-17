@@ -53,7 +53,7 @@
 
 - [x] 6.1 **EG-M01** [P0; owner=guardcore] 建立七项目规格/任务/场景移交清单，核实目标仓库和初始化授权；保留稳定 ID、旧位置指针与唯一账本，未接收前不删原记录；用重复 owner 和丢失用例反例校验。 依赖：无。规格：EG-PROD-001, EG-PROD-003。
 
-- [ ] 6.2 **EG-A01** [P0; owner=archguard] 实现独立 ArchGuard 产品入口、ArchUnit 适配和最小批准分层规则，合法/禁止边/不完整输入均真实验证；不将规则写入 GuardCore。 依赖：EG-K01, EG-K03, EG-K06。规格：EG-ARCH-001, EG-PROD-001, EG-PROD-006。
+- [x] 6.2 **EG-A01** [P0; owner=archguard] 实现独立 ArchGuard 产品入口、ArchUnit 适配和最小批准分层规则，合法/禁止边/不完整输入均真实验证；不将规则写入 GuardCore。 依赖：EG-K01, EG-K03, EG-K06。规格：EG-ARCH-001, EG-PROD-001, EG-PROD-006。
 
 - [ ] 6.3 **EG-A02** [P1; owner=archguard] 固定架构规则包、领域测试义务与 TestGuard 的交接，以及 architecture-plugin 候选设计接口；未经批准 ADR 与模型分数不得成为 ENFORCE。 依赖：EG-A01, EG-K14。规格：EG-ARCH-002, EG-ARCH-003, EG-PROD-004。
 
@@ -81,7 +81,7 @@
 
 - [ ] 6.15 **EG-L05** [P4; owner=flowguard] 验证完整六守卫证据推进、平台身份、跨仓恢复及回滚；任何领域未知或旧报告不能被阶段文本覆盖。 依赖：EG-L04, EG-S06, EG-T06, EG-W12。规格：EG-PROD-005, EG-PROD-006。
 
-- [ ] 6.16 **EG-S01** [P1; owner=specguard] 实现 Spec Kit/OpenSpec/Superpowers 只读来源适配和稳定需求 ID；未知/双事实源冲突不自动选择或初始化。 依赖：EG-M01, EG-K01。规格：EG-SPEC-001。
+- [x] 6.16 **EG-S01** [P1; owner=specguard] 实现 Spec Kit/OpenSpec/Superpowers 只读来源适配和稳定需求 ID；未知/双事实源冲突不自动选择或初始化。 依赖：EG-M01, EG-K01。规格：EG-SPEC-001。
 
 - [ ] 6.17 **EG-S02** [P1; owner=specguard] 实现结构完整性、引用和需求—设计—任务追溯检查；标题齐全的语义遗漏反例必须保持 REVIEW。 依赖：EG-S01, EG-K03。规格：EG-SPEC-002, EG-SPEC-004。
 

@@ -827,6 +827,14 @@ fn controlled_p3c_reuses_native_xml_catalog_and_source_proof_with_failed_executi
         evidence.result.completion,
         codeguard_core::Completion::Incomplete
     );
+    report["native_results"]["java_p3c"]["schema_version"] = serde_json::json!("0.3.0");
+    let (current, _, unbound) = super::feedback_java::extract(&report, &bound, &pin);
+    assert!(unbound.is_empty());
+    assert_eq!(current.result.findings.len(), 1);
+    assert_eq!(
+        current.result.completion,
+        codeguard_core::Completion::Incomplete
+    );
     for (replacement, confirmed) in [
         (
             String::from_utf8(xml.to_vec())
@@ -991,4 +999,128 @@ fn closed_schema_diagnostics_locate_static_fields_without_echoing_raw_values() {
     assert!(error.contains("properties/command_status"), "{error}");
     assert!(!error.contains("PRIVATE_UNTRUSTED_VALUE_DO_NOT_LOG"));
     assert!(!error.contains("credentials"));
+}
+
+#[test]
+fn actual_linux_missing_p3c_configuration_report_preserves_exact_schema_and_untrusted_state() {
+    // 原件来自真实CI38972395021/job117213637719的受控CLI marker，不从历史fixture重建。
+    let raw = include_bytes!(
+        "../../../../tests/acceptance/evidence/k07-cli-073-controlled-java-2026-10-17.json"
+    );
+    let mut report: serde_json::Value = serde_json::from_slice(raw).unwrap();
+    assert_eq!(
+        report["native_results"]["java_p3c"]["files"][0]["configuration_reason"],
+        "p3c_plugin_not_declared"
+    );
+    assert!(report["native_results"]["java_p3c"]["files"][0]["observation"].is_null());
+    // 原件错误地用native0.2声明新增配置字段，保持拒绝且保留原始字节。
+    assert_eq!(
+        format!("{:x}", sha2::Sha256::digest(raw)),
+        "83770811649c0ab1bb8ce1eabc6fac74eba9e1206b7f835ec2c7484bb5a19360"
+    );
+    assert!(super::feedback_schema::validate(&report, "0.73.0").is_err());
+    assert_eq!(project_raw(raw, None).original_bytes(), raw);
+    // 只改变已明确升级的project identity，独立local_feedback仍为0.2，不改实际配置/状态。
+    report["native_results"]["java_p3c"]["schema_version"] = serde_json::json!("0.3.0");
+    super::feedback_schema::validate(&report, "0.73.0").unwrap();
+    let corrected = serde_json::to_vec(&report).unwrap();
+    let projected = project_raw(&corrected, None);
+    assert_eq!(projected.original_bytes(), corrected);
+    assert_eq!(projected.trust_level(), "UNVERIFIED");
+    assert_eq!(projected.status(), "incomplete");
+    assert_eq!(
+        projected.gate().decision,
+        codeguard_core::DeliveryDecision::NotEvaluated
+    );
+    assert!(
+        projected
+            .issues()
+            .iter()
+            .any(|issue| issue.contains("lacks_frozen_obligation_evidence"))
+    );
+    for (key, value) in [
+        ("configuration_reason", serde_json::json!(true)),
+        ("configuration_next_action", serde_json::json!(13)),
+        ("unknown_config", serde_json::json!("not_declared")),
+    ] {
+        let mut invalid = report.clone();
+        invalid["native_results"]["java_p3c"]["files"][0][key] = value;
+        assert!(
+            super::feedback_schema::validate(&invalid, "0.73.0").is_err(),
+            "{key}"
+        );
+    }
+    let mut old_claim = report.clone();
+    old_claim["schema_version"] = serde_json::json!("0.72.0");
+    assert!(super::feedback_schema::validate(&old_claim, "0.72.0").is_err());
+}
+
+#[test]
+fn actual_aborted_assembly_keeps_new_p3c_identity_for_failure_and_cancellation() {
+    use codeguard_runtime::TaskOutcome;
+    use std::collections::BTreeMap;
+    let raw = include_bytes!(
+        "../../../../tests/acceptance/evidence/k07-cli-073-controlled-java-2026-10-17.json"
+    );
+    let report: serde_json::Value = serde_json::from_slice(raw).unwrap();
+    let mut native = report["native_results"].clone();
+    native["java_p3c"]["schema_version"] = serde_json::json!("0.3.0");
+    // 真实abort收集器保留已完成槽位及未开始的null；不是用正常report假装中止输出。
+    for key in [
+        "python_lint",
+        "rust_lint",
+        "go_lint",
+        "java_javadoc",
+        "java_dependencies",
+        "java_cve",
+        "rust_build",
+    ] {
+        if native.get(key).is_none() {
+            native[key] = serde_json::Value::Null;
+        }
+    }
+    let outcomes = BTreeMap::from([
+        ("java.p3c".into(), TaskOutcome::Succeeded),
+        ("python.lint".into(), TaskOutcome::InternalFailure),
+    ]);
+    for cancelled in [false, true] {
+        let aborted = crate::check_report_assembly::aborted_task_report(
+            "java",
+            report["discovery"].clone(),
+            &outcomes,
+            native.clone(),
+            cancelled,
+        );
+        assert_eq!(aborted["schema_version"], "0.23.0");
+        super::feedback_schema::validate_aborted(&aborted).unwrap();
+        let mut invalid = aborted.clone();
+        invalid["native_results"]["java_p3c"]["files"][0]["unknown_configuration"] =
+            serde_json::json!(true);
+        assert!(super::feedback_schema::validate_aborted(&invalid).is_err());
+        invalid = aborted.clone();
+        invalid["schema_version"] = serde_json::json!("0.22.0");
+        assert!(super::feedback_schema::validate_aborted(&invalid).is_err());
+        assert_eq!(aborted["exit_code"], if cancelled { 130 } else { 4 });
+        assert_eq!(aborted["native_results"]["java_p3c"], native["java_p3c"]);
+        let bytes = serde_json::to_vec(&aborted).unwrap();
+        let projected = project_raw(&bytes, None);
+        assert_eq!(projected.original_bytes(), bytes);
+        assert_eq!(projected.trust_level(), "UNVERIFIED");
+        assert!(!matches!(
+            projected.gate().decision,
+            codeguard_core::DeliveryDecision::Allow
+                | codeguard_core::DeliveryDecision::AllowWithExceptions
+        ));
+    }
+    native["java_p3c"]["schema_version"] = serde_json::json!("0.2.0");
+    assert_eq!(
+        crate::check_report_assembly::aborted_task_report(
+            "java",
+            report["discovery"].clone(),
+            &outcomes,
+            native,
+            false
+        )["schema_version"],
+        "0.13.0"
+    );
 }
