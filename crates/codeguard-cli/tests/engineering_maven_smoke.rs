@@ -329,13 +329,16 @@ fn real_maven_same_execution_projects_product_feedback_with_captured_sources_and
             },
             version: id("existing-distribution-artifact-pinned"),
             artifact_digest: digest(&fs::read(&maven).unwrap()),
-            native_rules: ["JavadocEmptyComment", "JavadocMissingComment"]
-                .iter()
-                .map(|r| ProjectionNativeRule {
-                    native_rule_id: id(r),
-                    gate_impact: GateImpact::Blocking,
-                })
-                .collect(),
+            native_rules: serde_json::from_str::<Vec<String>>(include_str!(
+                "../../../tests/fixtures/engineering_maven_smoke_native_rules.json"
+            ))
+            .unwrap()
+            .iter()
+            .map(|r| ProjectionNativeRule {
+                native_rule_id: id(r),
+                gate_impact: GateImpact::Blocking,
+            })
+            .collect(),
             feedback_target: None,
         };
         let raw_ref = private(&evidence, "original-report-copy.json", &raw);

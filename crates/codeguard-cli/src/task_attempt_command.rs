@@ -17,7 +17,7 @@ use crate::task_lease_command::{
     valid_token,
 };
 use crate::task_verify_command::{
-    classify, classify_cve, classify_doctor, classify_go, classify_java, classify_rust,
+    classify, classify_cve, classify_doctor, classify_go, classify_rust,
 };
 use crate::work_sync::write_once;
 use crate::workspace_refresh::read_workspace_baseline;
@@ -736,10 +736,7 @@ fn verified_rechecks(
             crate::checkstyle_task_recheck::valid_shape(&report)
                 && event["observation"] == crate::checkstyle_task_recheck::classify(brief, &report)
         } else if brief["checker_id"] == "java.maven.p3c" {
-            report["report_type"] == "java_p3c_project_observation"
-                && report["schema_version"] == "0.2.0"
-                && report["checker_id"] == "java.maven.p3c"
-                && event["observation"] == classify_java(brief, &report)
+            crate::java_p3c_task_recheck::valid_event(brief, &report, &event["observation"])
         } else if brief["checker_id"] == "java.maven.dependency_check" {
             report["report_type"] == "java_cve_project_probe"
                 && report["schema_version"] == "0.3.0"

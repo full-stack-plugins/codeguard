@@ -372,12 +372,7 @@ pub(crate) fn observe(args: &Args, deadline: Instant, cancelled: &AtomicBool) ->
 
 /// 判断非空诊断能否投影为问题；异常退出只保留已经核对的正向事实，不证明完整性。
 pub(crate) fn has_projectable_findings(report: &Value) -> bool {
-    report["findings"]
-        .as_array()
-        .is_some_and(|findings| !findings.is_empty())
-        && (report["local_status"] == "findings_observed_untrusted"
-            || (report["local_status"] == "incomplete"
-                && report["reason"] == "native_execution_failed"))
+    crate::java_p3c_task_recheck::has_projectable_findings(report)
 }
 
 pub(crate) fn render_pom(selected: &[&str]) -> String {

@@ -18,7 +18,6 @@ use crate::java_cve_attribution::attach_candidates;
 use crate::java_cve_scan::{
     NativeContext as CveNativeContext, observe_project as observe_cve_project,
 };
-use crate::java_p3c_command::has_projectable_findings;
 use crate::java_p3c_scan::{NativeContext, observe_project};
 use crate::next_command::read_task_brief;
 use crate::python_lint_command::scan_local_report_with_deadline;
@@ -899,7 +898,8 @@ pub fn run(args: &[String]) -> ExitCode {
         }
     }
     if brief["checker_id"] == "java.maven.p3c" {
-        scan["task_input_stable"] = json!(java_task_inputs_stable(&root, &brief, &scan));
+        let stable = java_task_inputs_stable(&root, &brief, &scan);
+        crate::java_p3c_task_recheck::bind_task_input(&mut scan, stable);
     }
     let outcome = if Instant::now() >= deadline || scan["task_input_stable"] == false {
         "incomplete"
@@ -972,6 +972,9 @@ pub fn run(args: &[String]) -> ExitCode {
         } else {
             "0.34.0"
         });
+    }
+    if brief["checker_id"] == "java.maven.p3c" {
+        report["schema_version"] = json!(crate::java_p3c_task_recheck::preview_version(&scan));
     }
     if c_placeholder_task {
         report["schema_version"] = json!("0.39.0");
@@ -1397,70 +1400,7 @@ pub(crate) fn classify_cve(brief: &Value, scan: &Value) -> &'static str {
 }
 
 pub(crate) fn classify_java(brief: &Value, scan: &Value) -> &'static str {
-    if scan["report_type"] != "java_p3c_project_observation"
-        || scan["schema_version"] != "0.2.0"
-        || scan["checker_id"] != "java.maven.p3c"
-        || scan["coverage_proven"] != false
-        || scan["task_input_stable"] == false
-    {
-        return "incomplete";
-    }
-    let Some(files) = scan["files"].as_array() else {
-        return "incomplete";
-    };
-    let valid_file = |path: &str| {
-        files
-            .iter()
-            .find(|file| file["path"] == path)
-            .is_some_and(|file| {
-                file["configuration"] == "configured"
-                    && file["reason"] == "native_probe_returned"
-                    && matches!(
-                        file["observation"]["local_status"].as_str(),
-                        Some("findings_observed_untrusted" | "clean_scope_unproven")
-                    )
-            })
-    };
-    if brief["kind"] == "blocker" {
-        return if brief["affected_paths"].as_array().is_some_and(|paths| {
-            !paths.is_empty()
-                && paths
-                    .iter()
-                    .all(|path| path.as_str().is_some_and(valid_file))
-        }) {
-            "environment_restored_unverified_policy"
-        } else {
-            "still_blocked"
-        };
-    }
-    if brief["kind"] != "finding" {
-        return "incomplete";
-    }
-    let Some(path) = brief["scope"].as_str() else {
-        return "incomplete";
-    };
-    let partial_positive = files.iter().any(|file| {
-        file["path"] == path
-            && file["configuration"] == "configured"
-            && file["reason"] == "native_probe_returned"
-            && has_projectable_findings(&file["observation"])
-    });
-    if !valid_file(path) && !partial_positive {
-        return "incomplete";
-    }
-    if scan["findings"].as_array().is_some_and(|findings| {
-        findings.iter().any(|finding| {
-            finding["finding_id"] == brief["task_id"]
-                && finding["path"] == path
-                && finding["rule_id"] == brief["native_rule_id"]
-        })
-    }) {
-        "still_present"
-    } else if valid_file(path) {
-        "rule_coverage_requires_review"
-    } else {
-        "incomplete"
-    }
+    crate::java_p3c_task_recheck::classify(brief, scan)
 }
 
 /// 解释原生 Go 局部复检；无发现不证明构建标签、平台或策略完整。

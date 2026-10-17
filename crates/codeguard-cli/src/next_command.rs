@@ -8,7 +8,7 @@ use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 
 use crate::task_verify_command::{
-    classify, classify_cve, classify_doctor, classify_go, classify_java, classify_rust,
+    classify, classify_cve, classify_doctor, classify_go, classify_rust,
 };
 use crate::workspace_refresh::read_workspace_baseline;
 
@@ -2134,11 +2134,7 @@ fn latest_verification_observation(
                     && event["observation"]
                         == crate::checkstyle_task_recheck::classify(brief, &report)
             } else if java_report {
-                report["report_type"] == "java_p3c_project_observation"
-                    && report["schema_version"] == "0.2.0"
-                    && report["checker_id"] == "java.maven.p3c"
-                    && report["coverage_proven"] == false
-                    && event["observation"] == classify_java(brief, &report)
+                crate::java_p3c_task_recheck::valid_event(brief, &report, &event["observation"])
             } else if cve_report {
                 report["report_type"] == "java_cve_project_probe"
                     && report["schema_version"] == "0.3.0"

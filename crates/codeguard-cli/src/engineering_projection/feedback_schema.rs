@@ -64,6 +64,17 @@ pub(super) fn validate(value: &Value, version: &str) -> Result<(), String> {
 pub(super) fn validate_aborted(value: &Value) -> Result<(), String> {
     validate_root(value, "check-aborted-v0.23.schema.json")
 }
+#[cfg(test)]
+pub(super) fn validate_p3c_wrapper(value: &Value, task: bool) -> Result<(), String> {
+    validate_root(
+        value,
+        if task {
+            "task-verification-preview-v0.40.schema.json"
+        } else {
+            "java-p3c-file-feedback-v0.2.schema.json"
+        },
+    )
+}
 fn validate_root(value: &Value, root: &str) -> Result<(), String> {
     let root = root.to_owned();
     let mut pending = BTreeSet::from([root.clone()]);

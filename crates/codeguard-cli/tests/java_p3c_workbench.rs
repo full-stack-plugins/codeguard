@@ -115,6 +115,8 @@ fn single_file_lint_and_project_check_reuse_the_same_p3c_task_and_native_recheck
     let source = project.root.join("src/main/java/Bad_Name.java");
     let first = project.lint(source.to_str().unwrap());
     assert_eq!(first["report_type"], "java_p3c_file_feedback");
+    assert_eq!(first["schema_version"], "0.2.0");
+    assert_eq!(first["project_observation"]["schema_version"], "0.3.0");
     assert_eq!(first["workbench"]["status"], "synced_partial", "{first}");
     assert_eq!(first["project_observation"]["source_file_count"], 1);
     assert_eq!(
@@ -141,6 +143,9 @@ fn single_file_lint_and_project_check_reuse_the_same_p3c_task_and_native_recheck
         &["task", "verify", id, project.root.to_str().unwrap()],
         true,
     );
+    assert_eq!(verify["schema_version"], "0.40.0");
+    assert_eq!(verify["native_scan"]["schema_version"], "0.4.0");
+    assert_eq!(verify["native_scan"]["task_input_stable"], true);
     assert_eq!(verify["observation"], "still_present");
     assert_eq!(verify["event_persisted"], true);
     assert_eq!(verify["delivery_decision"], "not_evaluated");

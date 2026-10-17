@@ -1225,7 +1225,7 @@ fn parse_java_report(
         .filter(|id| safe_run_id(id))
         .ok_or("report_run_id_invalid")?;
     if path.file_stem().and_then(|stem| stem.to_str()) != Some(run_id)
-        || report["schema_version"] != "0.2.0"
+        || !crate::java_p3c_task_recheck::valid_shape(report)
         || report["operation"] != "lint"
         || report["language"] != "java"
         || report["checker_id"] != "java.maven.p3c"

@@ -1,6 +1,16 @@
 // 已审历史Schema的编译期白名单；仅使用内存，不接受候选路径或网络资源。
 pub(super) fn source(name: &str) -> Option<&'static [u8]> {
     match name {
+        "java-p3c-project-observation-v0.4.schema.json" => Some(include_bytes!(
+            "../../../../schemas/java-p3c-project-observation-v0.4.schema.json"
+        )),
+        "task-verification-preview-v0.40.schema.json" => Some(include_bytes!(
+            "../../../../schemas/task-verification-preview-v0.40.schema.json"
+        )),
+        "java-p3c-file-feedback-v0.2.schema.json" => Some(include_bytes!(
+            "../../../../schemas/java-p3c-file-feedback-v0.2.schema.json"
+        )),
+
         "check-aborted-v0.23.schema.json" => Some(include_bytes!(
             "../../../../schemas/check-aborted-v0.23.schema.json"
         )),
@@ -332,6 +342,18 @@ pub(super) fn source(name: &str) -> Option<&'static [u8]> {
     }
 }
 pub(super) const IDS: &[(&str, &str)] = &[
+    (
+        "urn:codeguard:schema:java-p3c-project-observation:0.4.0",
+        "java-p3c-project-observation-v0.4.schema.json",
+    ),
+    (
+        "urn:codeguard:schema:task-verification-preview:0.40.0",
+        "task-verification-preview-v0.40.schema.json",
+    ),
+    (
+        "urn:codeguard:schema:java-p3c-file-feedback:0.2.0",
+        "java-p3c-file-feedback-v0.2.schema.json",
+    ),
     (
         "urn:codeguard:schema:check-aborted:0.23.0",
         "check-aborted-v0.23.schema.json",

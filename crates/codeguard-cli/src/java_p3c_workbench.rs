@@ -199,12 +199,7 @@ pub(crate) fn persist_and_sync(root: &Path, scan: &mut Value) -> Value {
 }
 
 fn envelope(args: &Args) -> Value {
-    json!({"schema_version":"0.1.0","report_type":"java_p3c_file_feedback",
-        "operation":"lint","language":"java","checker_id":"java.maven.p3c",
-        "command_status":"incomplete","exit_code":3,"scope":"single_file",
-        "path":args.source.to_string_lossy(),"project_observation":null,
-        "workbench":{"status":"backlog_update_failed","reason":"not_run"},"next":null,
-        "coverage_proven":false,"delivery_decision":"not_evaluated"})
+    crate::java_p3c_task_recheck::file_feedback(&args.source.to_string_lossy())
 }
 
 fn source_has_link(source: &Path) -> bool {

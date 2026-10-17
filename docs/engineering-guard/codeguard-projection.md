@@ -105,3 +105,23 @@ compiled Schema闭包现107份。Windows focused回归增加真实生产装配�
 新增实际装配回归先真实失败（错误选中0.13），再通过0.23内部失败与取消两支，核验精确闭合Schema、完整原生P3C保留、未知字段拒绝、旧版本冒称拒绝及不授信。当前内存Schema闭包为109份。该测试直接执行从原入口抽出的实际装配函数，不能冒充Windows已执行Unix CLI或真实原生进程。
 
 本地 Rust1.85 完整 focused harness 最终33/33通过（27.66秒），harness all-targets Clippy `--no-deps -- -D warnings`、受影响文件fmt、layering与109份闭包核验均通过。额外crate_boundaries构建因E盘空间不足而未执行，不能记为通过；测试环境缓存清理被自动审批策略拒绝，未绕过限制。最终Linux生产CLI和同次Maven验证仍待新CI；不因本地回放通过勾选EG-K07。
+
+
+### P3C 修复复验消费者与精确外层协议
+
+项目报告0.3的消费者同时包含任务分类、已保存复验事件、next候选与work sync。它们现共用从原入口抽取的 `java_p3c_task_recheck` 分类/身份函数，精确读取历史0.2、当前普通扫描0.3和任务复验0.4；未来版本、错误checker、错误覆盖声明或不匹配事件分类仍拒绝。既有文件摘要、工作区、原件与输入证明检查留在各调用方，不用版本匹配替代这些检查。复验输入不稳定仍incomplete；既有违规仍still_present，缺违规仍需覆盖审阅，不会关闭任务或授信。
+
+当前任务入口在真实输入稳定性检查后输出项目0.4，显式要求boolean `task_input_stable`，外层 `task_verification_preview` 精确0.40；普通0.3没有该复验字段。任务入口不执行backlog sync，0.4不要求伪造backlog元数据。当前单文件信封使用 `java_p3c_file_feedback` 0.2并仅嵌入已绑定的项目0.3；独立 `java_p3c_local_feedback` 0.2保持原语义。三个新Schema均闭合，旧版本与历史原件未改；登记冻结表同步显式记录新身份。编译期Schema闭包现112份。
+
+实际生产分类测试先在native0.3失败，再验证历史/当前读取及保存事件一致性；生产绑定/文件信封函数与闭合Schema互验，覆盖未知字段、缺稳定性字段、错嵌套版本和伪造接受分类。Windows Rust1.85 focused harness最终35/35通过（24.96秒），all-targets Clippy（不检查依赖告警）、112份闭包、layering及8项crate_boundaries均通过。前次E盘容量阻断之后，boundary已在独立D盘target实际完成，未清理旧缓存。
+
+Ubuntu早期CI新增既有 `single_file_lint_and_project_check_reuse_the_same_p3c_task_and_native_recheck` 生产入口用例，并断言文件0.2→项目0.3→任务0.4/外层0.40和原有still_present/事件保存/not_evaluated。该集成用例复用已有受控Maven输出夹具，证明真实CLI修复链消费者；它不冒充真实Maven工具资格或同次真实Java执行，后者由独立smoke继续验证。EG-K07仍未验收。
+
+
+### 真实 Maven CI 规则映射诊断
+
+CI38989061198/job117267115339已实际执行同次Maven并捕获一次callback，退出0，产品原生报告包含 `JavadocEmptyComment` 和 `JavadocDefaultConstructorMissingComment`；测试的预先冻结清单只有EmptyComment/MissingComment，导致默认构造器诊断按既定生产边界正确保留unbound，随后“所有诊断已绑定”的断言失败。这一轮不能记为完整smoke通过。
+
+smoke现与受控投影回归共用固定 `engineering_maven_smoke_native_rules.json`，明确预先声明上述三条本夹具适用规则，不从扫描结果动态生成批准清单。未改生产解析/确认边界，未移除原empty断言或跳过诊断。新回归先用旧两条规则真实复现相同unbound失败，加入第三条后通过，并反向删除第三条再次验证1项确认+1项unbound；仍Partial/UNVERIFIED。受控日志只用于parser/source绑定单测，不冒充CI私有日志或另一轮原生运行证据。
+
+受影响Windows Rust1.85完整harness现36/36通过（22.47秒），all-targets Clippy `--no-deps -- -D warnings`、两处Rust格式检查、layering、diffcheck通过。修正后的真实Unix同次Maven仍需新CI重新执行；EG-K07保持未验收。

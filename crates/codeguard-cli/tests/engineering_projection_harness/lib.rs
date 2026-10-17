@@ -11,3 +11,7 @@ mod check_native_results;
 #[cfg(test)]
 #[path = "../../src/check_report_assembly.rs"]
 mod check_report_assembly;
+
+#[cfg(test)]
+#[path = "../../src/java_p3c_task_recheck.rs"]
+mod java_p3c_task_recheck;

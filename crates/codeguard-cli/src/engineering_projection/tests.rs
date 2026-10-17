@@ -1124,3 +1124,209 @@ fn actual_aborted_assembly_keeps_new_p3c_identity_for_failure_and_cancellation()
         "0.13.0"
     );
 }
+
+#[test]
+fn production_p3c_classification_and_saved_event_keep_current_versions_unverified() {
+    let raw = include_bytes!(
+        "../../../../tests/acceptance/evidence/k07-cli-073-controlled-java-2026-10-17.json"
+    );
+    let document: serde_json::Value = serde_json::from_slice(raw).unwrap();
+    let mut report = document["native_results"]["java_p3c"].clone();
+    let brief =
+        serde_json::json!({"kind":"blocker","affected_paths":["src/main/java/Example.java"]});
+    assert_eq!(
+        crate::java_p3c_task_recheck::classify(&brief, &report),
+        "still_blocked"
+    );
+    for version in ["0.3.0", "0.4.0"] {
+        report["schema_version"] = serde_json::json!(version);
+        if version == "0.4.0" {
+            report["task_input_stable"] = serde_json::json!(true);
+        }
+        assert!(
+            crate::java_p3c_task_recheck::valid_shape(&report),
+            "{version}"
+        );
+        assert_eq!(
+            crate::java_p3c_task_recheck::classify(&brief, &report),
+            "still_blocked"
+        );
+        assert!(crate::java_p3c_task_recheck::valid_event(
+            &brief,
+            &report,
+            &serde_json::json!("still_blocked")
+        ));
+        assert!(!crate::java_p3c_task_recheck::valid_event(
+            &brief,
+            &report,
+            &serde_json::json!("accepted")
+        ));
+    }
+    report["files"][0]["configuration"] = serde_json::json!("configured");
+    report["files"][0]["reason"] = serde_json::json!("native_probe_returned");
+    report["files"][0]["observation"] = serde_json::json!({"local_status":"clean_scope_unproven"});
+    assert_eq!(
+        crate::java_p3c_task_recheck::classify(&brief, &report),
+        "environment_restored_unverified_policy"
+    );
+    report["task_input_stable"] = serde_json::json!(false);
+    assert_eq!(
+        crate::java_p3c_task_recheck::classify(&brief, &report),
+        "incomplete"
+    );
+    report["schema_version"] = serde_json::json!("0.5.0");
+    assert!(!crate::java_p3c_task_recheck::valid_shape(&report));
+}
+
+#[test]
+fn production_p3c_current_wrappers_match_closed_schemas_without_upgrade() {
+    let raw = include_bytes!(
+        "../../../../tests/acceptance/evidence/k07-cli-073-controlled-java-2026-10-17.json"
+    );
+    let document: serde_json::Value = serde_json::from_slice(raw).unwrap();
+    let mut scan = document["native_results"]["java_p3c"].clone();
+    scan["schema_version"] = serde_json::json!("0.3.0");
+    let mut file = crate::java_p3c_task_recheck::file_feedback("src/main/java/Example.java");
+    assert_eq!(file["schema_version"], "0.2.0");
+    super::feedback_schema::validate_p3c_wrapper(&file, false).unwrap();
+    scan["workspace_binding"] = serde_json::json!("bound");
+    scan["workspace_id"] = serde_json::json!("controlled-fixture-workspace");
+    file["project_observation"] = scan.clone();
+    super::feedback_schema::validate_p3c_wrapper(&file, false).unwrap();
+    file["project_observation"]["files"][0]["unknown_property"] = serde_json::json!(true);
+    assert!(super::feedback_schema::validate_p3c_wrapper(&file, false).is_err());
+    crate::java_p3c_task_recheck::bind_task_input(&mut scan, false);
+    assert_eq!(scan["schema_version"], "0.4.0");
+    assert_eq!(scan["task_input_stable"], false);
+    // 真实task入口不执行backlog sync，不虚构这些字段。
+    for field in ["backlog_status", "backlog_sync", "next"] {
+        scan.as_object_mut().unwrap().remove(field);
+    }
+    let mut preview = serde_json::json!({
+        "schema_version":crate::java_p3c_task_recheck::preview_version(&scan),
+        "report_type":"task_verification_preview","operation":"task_verify",
+        "command_status":"incomplete","exit_code":3,"task_id":null,"kind":"blocker",
+        "observation":"incomplete","event_persisted":false,"reason":null,"native_scan":scan,
+        "authority":"local_unverified","delivery_decision":"not_evaluated",
+        "execution_budget":{"timeout_ms":1000,"source":"cli","enforcement":"native_execution_only"},
+        "next_actions":["inspect_native_recheck_and_policy_before_closure"]});
+    assert_eq!(preview["schema_version"], "0.40.0");
+    super::feedback_schema::validate_p3c_wrapper(&preview, true).unwrap();
+    preview["native_scan"]
+        .as_object_mut()
+        .unwrap()
+        .remove("task_input_stable");
+    assert!(!crate::java_p3c_task_recheck::valid_shape(
+        &preview["native_scan"]
+    ));
+    assert!(super::feedback_schema::validate_p3c_wrapper(&preview, true).is_err());
+    preview["native_scan"]["task_input_stable"] = serde_json::json!(true);
+    preview["native_scan"]["schema_version"] = serde_json::json!("0.3.0");
+    assert!(super::feedback_schema::validate_p3c_wrapper(&preview, true).is_err());
+}
+
+#[test]
+fn maven_smoke_frozen_rules_cover_jdk21_default_constructor_diagnostic() {
+    // 受控parser/source回归，复现真实CI观察到的规则集合；不是CI私有原生日志回放。
+    let mut report = actual_maven_javadoc_feedback();
+    let observation =
+        &mut report["native_results"]["java_javadoc"]["maven_multifile_probes"][0]["observation"];
+    observation["findings"] = serde_json::json!([
+        {"path":"src/main/java/Sample.java","line":2,"column":1,"rule_id":"JavadocEmptyComment"},
+        {"path":"src/main/java/Sample.java","line":2,"column":1,"rule_id":"JavadocDefaultConstructorMissingComment"}]);
+    let raw = serde_json::to_vec(&report).unwrap();
+    let base = context(&raw);
+    let source = b"/** */\npublic class Sample {}\n";
+    let path = guard_protocol::GitPath::from_bytes(b"src/main/java/Sample.java").unwrap();
+    let mut plan = base.plan.clone();
+    plan.obligations[0].targets[0].path = path.clone();
+    plan.obligations[0].targets[0].input_digest = private_ref(&base, source).digest;
+    plan.targets = plan.obligations[0].targets.clone();
+    let mut task = base.task.clone();
+    task.scope.paths = vec![path];
+    let mut pin = base.checker_pins[0].clone();
+    pin.binding.checker_id = "java.maven.javadoc".into();
+    pin.binding.tool_id = "maven-javadoc".into();
+    pin.artifact_digest = guard_protocol::Digest::new(
+        "sha256:5de154f4a84239e4021e4ed6937ad4f41d9db01350572beb58bcbf99abd422b7",
+    )
+    .unwrap();
+    pin.native_rules = serde_json::from_str::<Vec<String>>(include_str!(
+        "../../../../tests/fixtures/engineering_maven_smoke_native_rules.json"
+    ))
+    .unwrap()
+    .iter()
+    .map(|rule| super::ProjectionNativeRule {
+        native_rule_id: guard_protocol::Identifier::new(rule).unwrap(),
+        gate_impact: codeguard_core::GateImpact::Blocking,
+    })
+    .collect();
+    let ctx = super::ProjectionContext::new(
+        &plan,
+        &task,
+        &base.rules,
+        &base.producer,
+        &base.run,
+        &base.raw_evidence,
+        &[pin.clone()],
+    )
+    .unwrap();
+    let log=b"[INFO] --- javadoc:3.12.0:javadoc (default-cli) @ demo ---\n[WARNING] Javadoc Warnings\n[WARNING] /workspace/src/main/java/Sample.java:2: warning: empty comment\n[WARNING] public class Sample {}\n[WARNING] ^\n[WARNING] /workspace/src/main/java/Sample.java:2: warning: use of default constructor, which does not provide a comment\n[WARNING] public class Sample {}\n[WARNING] ^\n[WARNING] 2 warnings\n[INFO] BUILD SUCCESS\n";
+    let proof = super::ProjectionSourceProof::new(
+        &plan,
+        &ctx.run,
+        &plan.targets[0],
+        "/workspace/src/main/java/Sample.java",
+        source,
+        &private_ref(&ctx, source),
+    )
+    .unwrap();
+    let bind = |context: super::ProjectionContext| {
+        context
+            .with_java_execution(
+                guard_protocol::Identifier::new("java.maven.javadoc").unwrap(),
+                log,
+                &private_ref(&ctx, log),
+                0,
+                guard_protocol::Identifier::new("3.12.0").unwrap(),
+                vec![proof.clone()],
+            )
+            .unwrap()
+    };
+    let projected = project_raw(&raw, Some(&bind(ctx.clone())));
+    assert!(
+        projected.unbound_diagnostics().is_empty(),
+        "{:?}",
+        projected.issues()
+    );
+    assert_eq!(projected.findings().len(), 2);
+    assert_eq!(
+        projected.results()[0].assessment.verdict,
+        guard_protocol::Verdict::Violation
+    );
+    assert_eq!(
+        projected.results()[0].assessment.coverage,
+        guard_protocol::Coverage::Partial
+    );
+    assert_eq!(projected.trust_level(), "UNVERIFIED");
+    // 缺批准映射仍只能保留unbound，不能从扫描发现反向扩充规则。
+    pin.native_rules
+        .retain(|rule| rule.native_rule_id.as_str() != "JavadocDefaultConstructorMissingComment");
+    let missing = super::ProjectionContext::new(
+        &plan,
+        &task,
+        &base.rules,
+        &base.producer,
+        &base.run,
+        &base.raw_evidence,
+        &[pin],
+    )
+    .unwrap();
+    let projected = project_raw(&raw, Some(&bind(missing)));
+    assert_eq!(projected.findings().len(), 1);
+    assert_eq!(projected.unbound_diagnostics().len(), 1);
+    assert_eq!(
+        projected.unbound_diagnostics()[0].native_rule_id,
+        "JavadocDefaultConstructorMissingComment"
+    );
+}
