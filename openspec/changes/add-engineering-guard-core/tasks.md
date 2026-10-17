@@ -14,7 +14,7 @@
 - [x] 1.6 **EG-K06** 实现有界 Tokio runner、取消整棵受管进程树、运行序列和部分结果；验证超时/输出截断/迟到 PASS/崩溃恢复。 依赖：EG-K04, EG-K05。规格：EG-EVI-001, EG-EVI-003, EG-GATE-007。
 - [ ] 1.7 **EG-K07** 适配当前 CodeGuard completion/findings/evaluate_delivery；真实报告与旧协议双读对照，local_unverified/not_evaluated 不升级。 依赖：EG-K03, EG-K06。规格：EG-EVI-004, EG-GATE-001。
 - [x] 1.8 **EG-K08** 接入固定版本 OPA argv 子进程和政策包；编写 Rego 正负测试，覆盖 undefined/超时/错误、不可豁免项和不同 mode；通用执行器和已批准规则包差分一致；流程组合策略由 FlowGuard 提供。 依赖：EG-K03, EG-K06。规格：EG-GATE-001, EG-GATE-005。
-- [ ] 1.9 **EG-K09** 实现独立 receipt/授权验证端口与可信提供者；伪造 actor、错 audience、撤销、过期和授权范围扩大均拒绝；范围不变不重复询问。 依赖：EG-K03, EG-K08。规格：EG-GATE-002, EG-GATE-003。
+- [x] 1.9 **EG-K09** 实现独立 receipt/授权验证端口与可信提供者；伪造 actor、错 audience、撤销、过期和授权范围扩大均拒绝；范围不变不重复询问。 依赖：EG-K03, EG-K08。规格：EG-GATE-002, EG-GATE-003。
 - [ ] 1.10 **EG-K10** 实现最小可信 controller/授权消费框架（Git 动作实现归 GitGuard）：候选 runner 无写凭据、grant 精确绑定与幂等对账；先注入越权与重放，再验证合法操作成功。 依赖：EG-K04, EG-K09。规格：EG-GATE-004, EG-GATE-006。
 - [ ] 1.11 **EG-K11** 实现 GuardCore Clap CLI 的 doctor/contract/plan/run/evidence/policy；定义副作用和退出映射，保留原 codeguard CLI；验证无内核/策略时不弱化回退。 依赖：EG-K02, EG-K08。规格：EG-CON-005, EG-GATE-007。
 - [ ] 1.12 **EG-K12** 建立 Java Maven 多模块/JUnit/ArchUnit 真工具试点及 GitHub 独立 CI；完成正常交付与绕过反例，包含必需 review 缺口处理，不把模型无发现当通过。 依赖：EG-K07, EG-K10, EG-K11, EG-G06, EG-W05, EG-H04, EG-R04, EG-A01, EG-Q01, EG-J03, EG-L03。规格：EG-GATE-001, EG-GATE-006, EG-ARCH-001, EG-ARCH-002。
