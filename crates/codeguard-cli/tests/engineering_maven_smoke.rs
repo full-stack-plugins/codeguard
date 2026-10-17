@@ -118,7 +118,9 @@ fn real_maven_same_execution_projects_product_feedback_with_captured_sources_and
         fs::set_permissions(&evidence, fs::Permissions::from_mode(0o700)).unwrap();
         fs::create_dir_all(root.join("src/main/java")).unwrap();
         let source = b"/** */\npublic class Sample {}\n";
-        let pom=b"<project><modelVersion>4.0.0</modelVersion><groupId>smoke</groupId><artifactId>demo</artifactId><version>1</version><properties><maven.compiler.source>17</maven.compiler.source><maven.compiler.target>17</maven.compiler.target></properties><build><plugins><plugin><artifactId>maven-javadoc-plugin</artifactId><version>3.12.0</version><configuration><doclint>missing</doclint><failOnWarnings>false</failOnWarnings></configuration></plugin></plugins></build></project>";
+        let pom =
+            include_bytes!("../../../tests/acceptance/fixtures/engineering-maven-smoke/pom.xml");
+        assert!(codeguard_adapters::javadoc_pom_direct_replay_eligible(pom));
         fs::write(root.join("pom.xml"), pom).unwrap();
         fs::write(root.join("src/main/java/Sample.java"), source).unwrap();
         fs::write(root.join(".gitignore"), b"target/\n.codeguard/\n").unwrap();
